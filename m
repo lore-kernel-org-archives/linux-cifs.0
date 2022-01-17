@@ -2,58 +2,137 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85CF7C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 01:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE42C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 03:04:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236662AbiAQBLe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 16 Jan 2022 20:11:34 -0500
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:47405 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233958AbiAQBLe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 16 Jan 2022 20:11:34 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0V1ytjFC_1642381891;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0V1ytjFC_1642381891)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 17 Jan 2022 09:11:32 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     sfrench@samba.org
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, Yang Li <yang.lee@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next] cifs: clean up an inconsistent indenting
-Date:   Mon, 17 Jan 2022 09:11:30 +0800
-Message-Id: <20220117011130.84223-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        id S236900AbiAQDEc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 16 Jan 2022 22:04:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51980 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234146AbiAQDEb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 16 Jan 2022 22:04:31 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4140AC061574;
+        Sun, 16 Jan 2022 19:04:31 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id p27so40680679lfa.1;
+        Sun, 16 Jan 2022 19:04:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=BcLWSCFxcIxXuHQd2ZX9wwZMoc7+0eTGm4EM3OR4jpU=;
+        b=ZaYjBcoytcgYu0YN53yR2+fkLtowk5L8XQrd3YiWdvpWRMdSuV+UiGQWRqZglFwrxL
+         nywXxwAMzJynw9HACRFMOllznNjNePAsByIFVs+g78yNBgqaRe2A9dV32wAspZvqXISi
+         KmyVLzXj9mlQM5ZZupLPyx+3ynUKXuws0mCzgyM4ZrqghLrCbkP/DWJzEMFwmefjT9+t
+         g+wlmuZJgiE3HQrBlFZGhhR7aD9Yk2HwmfeoRUs1eGUVNRDb7FAQlqxs2DWFQzb60iaJ
+         6XLCYkEdxisU4Zc8UpzIeNbWtn6k3FdHtQ3JHKRwkn1KXA3cWHmH8hYEOGFzLV20fLpd
+         IIvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=BcLWSCFxcIxXuHQd2ZX9wwZMoc7+0eTGm4EM3OR4jpU=;
+        b=fvU7etFEfMzX4yIWd8ktYiTDq0agB3CVyHrivYcT9tt3e7jga9XTPPqaU0Ft+NM2fT
+         58y9U6MLe5kDzJdCGR4Ua5aLN64J02+rx74jvILfKpd+xmGXvY8JXu3c/R/acUq2AE59
+         md1V+VAoM6o3/AYLm02xDFKZCSC8GRJ36PpHEGM0ux/7emD+q5h6Lp04EgMZZrqvaFrk
+         sRgrKT2UIHcbBg1mQLkgcs1RF69KR7uf3+XnZGqtWKwLYeXrquFdpXL3TB/WNHiTl/HT
+         2aW3to2F3eZ8AjbJjIx1LyllAVP+uz/GyfYSYTvlA1F/iAmLPhvV4npflr6SSpwa3AnJ
+         kibg==
+X-Gm-Message-State: AOAM5331ms7CpIwcgHb3+UyixmmwMPC/1XosvCKFHnrA0okhmco25B6t
+        z1S9toSWr7A+bEoOYszy2DnKwrXiYAQmT7LqZg2txqpID8c=
+X-Google-Smtp-Source: ABdhPJz4uUl+FXb01sRnnkK7Rxg2VDSdVajRNqiRCXRw5oGeSNRQP49xOMe53sf7wPJJQPyYgOM+qr8r1nbY3pkSCgE=
+X-Received: by 2002:a19:8c4a:: with SMTP id i10mr14679181lfj.537.1642388668824;
+ Sun, 16 Jan 2022 19:04:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 16 Jan 2022 21:04:17 -0600
+Message-ID: <CAH2r5mu=D=hnvdUTnZg8fYYRUbnGkOLzzo667XxmbYw8ZOBTxA@mail.gmail.com>
+Subject: [GIT PULL] cifs/smb3 fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Eliminate the follow smatch warning:
-fs/cifs/sess.c:1581 sess_auth_rawntlmssp_authenticate() warn:
-inconsistent indenting
+Please pull the following changes since commit
+c9e6606c7fe92b50a02ce51dda82586ebdf99b48:
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- fs/cifs/sess.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Linux 5.16-rc8 (2022-01-02 14:23:25 -0800)
 
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index d12490e12be5..96434cad0bfe 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -1574,7 +1574,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
- out:
- 	sess_free_buffer(sess_data);
- 
--	 if (!rc)
-+	if (!rc)
- 		rc = sess_establish_session(sess_data);
- 
- 	/* Cleanup */
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc-part1-smb3-fixes
+
+for you to fetch changes up to 9bbf8662a27b56358366027d1a77c0676f85b222:
+
+  cifs: fix FILE_BOTH_DIRECTORY_INFO definition (2022-01-15 10:08:47 -0600)
+
+----------------------------------------------------------------
+13 cifs/smb3 fixes
+
+- 9 multichannel patches mostly related to improving reconnect behavior
+- 4 minor cleanup patches
+
+There are a similar number of additional patches that I will send later
+in the week that are still being tested and reviewed, and hopefully that
+will also include the integration with the new fscache that Dave Howell's
+is working with me on.
+----------------------------------------------------------------
+Colin Ian King (1):
+      cifs: remove redundant assignment to pointer p
+
+Enzo Matsumiya (1):
+      cifs: fix hang on cifs_get_next_mid()
+
+Eugene Korenevsky (1):
+      cifs: fix FILE_BOTH_DIRECTORY_INFO definition
+
+Jeff Layton (1):
+      cifs: move superblock magic defitions to magic.h
+
+Shyam Prasad N (8):
+      cifs: track individual channel status using chans_need_reconnect
+      cifs: use the chans_need_reconnect bitmap for reconnect status
+      cifs: adjust DebugData to use chans_need_reconnect for conn status
+      cifs: add WARN_ON for when chan_count goes below minimum
+      cifs: reconnect only the connection and not smb session where possible
+      cifs: take cifs_tcp_ses_lock for status checks
+      cifs: maintain a state machine for tcp/smb/tcon sessions
+      cifs: avoid race during socket reconnect between send and recv
+
+Yang Li (1):
+      cifs: Fix smb311_update_preauth_hash() kernel-doc comment
+
+ fs/cifs/cifs_debug.c       |   8 ++-
+ fs/cifs/cifs_spnego.c      |   4 +-
+ fs/cifs/cifs_spnego.h      |   3 +-
+ fs/cifs/cifs_swn.c         |   4 +-
+ fs/cifs/cifsencrypt.c      |   6 +-
+ fs/cifs/cifsfs.c           |   5 +-
+ fs/cifs/cifsglob.h         |  79 +++++++++++--------------
+ fs/cifs/cifspdu.h          |   2 +-
+ fs/cifs/cifsproto.h        |  31 ++++++++--
+ fs/cifs/cifssmb.c          |  94 +++++++++++++++++++++++------
+ fs/cifs/connect.c          | 230
+++++++++++++++++++++++++++++++++++++++++++++++++++---------------------
+ fs/cifs/netmisc.c          |   4 +-
+ fs/cifs/ntlmssp.h          |   2 +
+ fs/cifs/sess.c             | 183
+++++++++++++++++++++++++++++++++++++++------------------
+ fs/cifs/smb1ops.c          |  24 +++++---
+ fs/cifs/smb2glob.h         |   2 -
+ fs/cifs/smb2misc.c         |   5 +-
+ fs/cifs/smb2ops.c          |  34 +++++++----
+ fs/cifs/smb2pdu.c          | 179
++++++++++++++++++++++++++++++++++++++------------------
+ fs/cifs/smb2proto.h        |   6 +-
+ fs/cifs/smb2transport.c    |  61 ++++++++++++++-----
+ fs/cifs/transport.c        |  78 ++++++++++++++++--------
+ include/uapi/linux/magic.h |   4 ++
+ 23 files changed, 723 insertions(+), 325 deletions(-)
+
+
 -- 
-2.20.1.7.g153144c
+Thanks,
 
+Steve
