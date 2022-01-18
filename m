@@ -2,82 +2,100 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E93CC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 17:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76658C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 22:40:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244344AbiARRyM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jan 2022 12:54:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23163 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244169AbiARRyL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 18 Jan 2022 12:54:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642528451;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nPPBU7fRyyAQC3IqAePmc/y5C5VKzN6r/ufwnOhkpIs=;
-        b=iE3uhSSDdIuO00kVaKVJLqcK0SL7Qojtwarw4xnZst3SEooCMXgh2tOhpaj4ViyhmLbR93
-        p21ZX7GL7VYHH22/xALm8VF4BLjJVb3y9oMNTYvneXtxjRXiB+1u13CHWf4ObHCTRcXFYu
-        brRsTsRlGPjIf2XOLPsri8WXYmky7D8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-654-dYizNdE7Pt6DN4j2koeeug-1; Tue, 18 Jan 2022 12:54:08 -0500
-X-MC-Unique: dYizNdE7Pt6DN4j2koeeug-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8231109455A;
-        Tue, 18 Jan 2022 17:40:23 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A82257ED93;
-        Tue, 18 Jan 2022 17:40:15 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <YebpktrcUZOlBHkZ@infradead.org>
-References: <YebpktrcUZOlBHkZ@infradead.org> <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk> <164251409447.3435901.10092442643336534999.stgit@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
-        Jeff Layton <jlayton@kernel.org>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <smfrench@gmail.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        JeffleXu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 09/11] vfs, fscache: Add an IS_KERNEL_FILE() macro for the S_KERNEL_FILE flag
+        id S1344690AbiARWkR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Jan 2022 17:40:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57366 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240802AbiARWkR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jan 2022 17:40:17 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05760C061574
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Jan 2022 14:40:17 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id s30so1335661lfo.7
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Jan 2022 14:40:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=yqjcDkDLFuxD/E3IY7kN5HbG7Me5rWq+SC0fQFHJSCU=;
+        b=ikQYOBQho1WQEk+6MPYwSlxb/cMjeYv6C784FHZww1zgXtO2sscmmkXUMrlQKKCDrA
+         VlO8zKIJS92c+S/4lwFC4YNPqXGVwTsENkgWPuBXP1HPi3+8hu7rHcShgPawkUxf0on2
+         1Yjn8swD/EvXh6d1unoKf3Wd6g+hYMpXWNl7JddD+L37wViRXBhATWI3joxEFYYDd0QE
+         BsBWosUmuX58e2rU6/F6ZaMVqo719kd8I1TfYIPnGof2QnKi82URtJ5FqETG/7Z3GA9/
+         BYEnVq6/Z5JN1Szq54siNIb6v62vS1/3uqtjW950JRG1WpMZStYZPCRDzz8qSqHi6z3y
+         baUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=yqjcDkDLFuxD/E3IY7kN5HbG7Me5rWq+SC0fQFHJSCU=;
+        b=fqSt3NWyDjVUVr8uEIo4OuWkwTef3ULnsf0gJc18y+gW77Zc905bK2K0N8UDjF/9bF
+         g0Xym8QCw+kXlOOgBs+5n0RmhnjBz5UcPG+Z35a58waZe+WsPszsNI8uPYS74BHVjfwy
+         mH0HMTCzsskFrqLM3+Uz3alSu1joWheA49nAbCuEe39dVJAhK4M9E7Istlwyw54uEuRV
+         F2BQ4e94KjCtyeY3vFjOn+FBDsqcZ7D+DMBl/B6UgLyUlU9qe1kt/Dl1bOHYUxnvz/Pl
+         CK5F2+GKbi+0xSyIgzM6uitGVrL1gw9D6xCy90sBt9ZPWIAIPZXZ8tW3a56ZFHEUd3qU
+         +b0w==
+X-Gm-Message-State: AOAM53339QzriZkJJg8DjE3BLW+NU1W5wPzq9NLWqqPLrNFJMCAUfKGO
+        5NPvuiEf4fCOJj4tlXef5j+os66rrNnFF8rRZ0W2Ushno0w=
+X-Google-Smtp-Source: ABdhPJx7wt+iJsuUhXfvPvn17JqE5Ol++PQR8kFg7Zxhiu6ZUoVqek9wvXcqtMsQD37C7XRI5UujJa0wIPHbVQw5S/I=
+X-Received: by 2002:a05:651c:1503:: with SMTP id e3mr19651971ljf.460.1642545615084;
+ Tue, 18 Jan 2022 14:40:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3613680.1642527614.1@warthog.procyon.org.uk>
-Date:   Tue, 18 Jan 2022 17:40:14 +0000
-Message-ID: <3613681.1642527614@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 18 Jan 2022 16:40:04 -0600
+Message-ID: <CAH2r5msv5w5oWVomujjwoC=PiNBu3b7kbQO6uJXVKbAwxGKuJw@mail.gmail.com>
+Subject: [PATCH][SMB3] add new defines from protocol specification
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+Trivial update to list of valid smb3 fsctls
 
-> On Tue, Jan 18, 2022 at 01:54:54PM +0000, David Howells wrote:
-> > Add an IS_KERNEL_FILE() macro to test the S_KERNEL_FILE inode flag as is
-> > common practice for the other inode flags[1].
-> 
-> Please fix the flag to have a sensible name first, as the naming of the
-> flag and this new helper is utterly wrong as we already discussed.
+In the October updates to MS-SMB2 two additional FSCTLs
+were described.  Add the missing defines for these,
+as well as fix a typo in an earlier define.
 
-And I suggested a new name, which you didn't comment on.
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/smbfs_common/smb2pdu.h  | 2 +-
+ fs/smbfs_common/smbfsctl.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-David
+diff --git a/fs/smbfs_common/smb2pdu.h b/fs/smbfs_common/smb2pdu.h
+index 7ccadcbe684b..38b8fc514860 100644
+--- a/fs/smbfs_common/smb2pdu.h
++++ b/fs/smbfs_common/smb2pdu.h
+@@ -449,7 +449,7 @@ struct smb2_netname_neg_context {
+  */
 
+ /* Flags */
+-#define SMB2_ACCEPT_TRANSFORM_LEVEL_SECURITY 0x00000001
++#define SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY 0x00000001
+
+ struct smb2_transport_capabilities_context {
+  __le16 ContextType; /* 6 */
+diff --git a/fs/smbfs_common/smbfsctl.h b/fs/smbfs_common/smbfsctl.h
+index 926f87cd6af0..d51939c43ad7 100644
+--- a/fs/smbfs_common/smbfsctl.h
++++ b/fs/smbfs_common/smbfsctl.h
+@@ -95,8 +95,10 @@
+ #define FSCTL_SET_SHORT_NAME_BEHAVIOR 0x000901B4 /* BB add struct */
+ #define FSCTL_GET_INTEGRITY_INFORMATION 0x0009027C
+ #define FSCTL_GET_REFS_VOLUME_DATA   0x000902D8 /* See MS-FSCC 2.3.24 */
++#define FSCTL_SET_INTEGRITY_INFORMATION_EXT 0x00090380
+ #define FSCTL_GET_RETRIEVAL_POINTERS_AND_REFCOUNT 0x000903d3
+ #define FSCTL_GET_RETRIEVAL_POINTER_COUNT 0x0009042b
++#define FSCTL_REFS_STREAM_SNAPSHOT_MANAGEMENT 0x00090440
+ #define FSCTL_QUERY_ALLOCATED_RANGES 0x000940CF
+ #define FSCTL_SET_DEFECT_MANAGEMENT  0x00098134 /* BB add struct */
+ #define FSCTL_FILE_LEVEL_TRIM        0x00098208 /* BB add struct */
+-- 
+
+-- 
+Thanks,
+
+Steve
