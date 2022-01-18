@@ -2,120 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF37CC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 16:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3660AC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 16:26:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242917AbiARQYL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jan 2022 11:24:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55232 "EHLO
+        id S236383AbiARQ0y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Jan 2022 11:26:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239145AbiARQYH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jan 2022 11:24:07 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8182C061574
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Jan 2022 08:24:06 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id e3so70108306lfc.9
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Jan 2022 08:24:06 -0800 (PST)
+        with ESMTP id S235878AbiARQ0y (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jan 2022 11:26:54 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BCFC061574
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Jan 2022 08:26:53 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id o15so72839050lfo.11
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Jan 2022 08:26:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8bVGbF/R36qoh4Mic/8KJh0/oLABb53Jr0jfqfEBvUg=;
-        b=HtorDj2KLNrc/4NI2zoAxM4V8hX30AE6vOBhkFr1plVtJyCvRn6ZNrXm/TPIbf51wF
-         eymTPKwBD5V8Z8tmgEhcId7U6DSRSpKdyGRKzVdjIv4+wZ9j1S+R3rlboz2wn4Nhytbc
-         Q0+B6H3YJ6xSW7F+GRuHEXjOIp/hZFXdL+8aAvOyxGLAfyzkB0eR7EW9IfPJkohFQDgH
-         oCIA4ePg0UNusyo2G8xvYPI8J1kydmXhSciMzgVs6GCNjRWFvkp+tWIFQikqOC7GvmE+
-         f4n2u9Yg1cTvWn15fnSbXKp14dymXWjfFjisUQoBHwk36EnuU167BGMMYxPVdVvK2nDo
-         BayA==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=JTUB5ic0JD5Skfd8nRgcdVQ3dICdSvSAyGsCx+vPqJk=;
+        b=OOFaiguktVi3FkZ2+Ll4jPQFgzms11IDbW0Ixgtta6RDrmTphyTvyG//Ob6a+Eg1lk
+         py2r/8qeKUrhmI4AJga3guBjKCGpuJMji0KjQmbDHK32imlrRoj6QINakDykVWqD3l2w
+         m+2K75C20Cv+JdaZOBIvAHXj1GFCJZ8xLAo8copnZuVua2l2JI83OTvQUM1mMu7kq8jj
+         ZFhe7S5Yce44Vcsyd+lIkbygo8XEc5dZZzRqwGT36EUp+jrMbx2ZfnCMkRof7szDCPMX
+         P0NzzTigDPm42VlchOUPBd4I2t6/J6IZTPVtrsjR/fH555WnMVZzpRC3NlsbBu9w/XkL
+         ViEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8bVGbF/R36qoh4Mic/8KJh0/oLABb53Jr0jfqfEBvUg=;
-        b=saY6/cMpSQEXO1t2BmbibtG2NI5q8vqes7XPvluV9fLqV4FvnsTC3XdlVJmF9ugOLo
-         zzN+v9VQbRS43i9zTLrThzUOPzdXpoqmQwLYXmT79CRtSLuHEIbpiz38pAorupK8uJRd
-         ueVjc89NLaGLR184OD1YQNKO1yJkI8bs7rkrp+6tryh4YNBRx4j662smrXT0PEglsFb6
-         Fr3wXyCDZtldvcjfhs3CMPlpLeT5L6osEbCshyWsRGNoRjwitx+fynzles6009XWg6H0
-         nYMyZkzQ1gD40EUklqnYyblr1z0jgVmFZ5vRKBA2iPqoBZiDajaGihWvFI/PcFIUuPA8
-         1gLA==
-X-Gm-Message-State: AOAM531RCOL6SAPwwrR+ScaxMIctIM20wd7l2vWm8SlTRDbr7I4mn3US
-        hpxKLyWOaYMCUeyxTfPE23moZug27MjXbfSoaiiVIKBY
-X-Google-Smtp-Source: ABdhPJx6W+KA880pD1f6FFvtXZIClcAFYK4kroCDylTxRwaqAonuBXhle2yRXFc25Z2e5dwt0Xj8mcmhnX2iZ1Nr0Hc=
-X-Received: by 2002:ac2:4c41:: with SMTP id o1mr22507032lfk.545.1642523044887;
- Tue, 18 Jan 2022 08:24:04 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=JTUB5ic0JD5Skfd8nRgcdVQ3dICdSvSAyGsCx+vPqJk=;
+        b=SbQaNTjQNLe2szf71F43XN9IavqnOSoaAYXHAXW/NvqJnA7XMj61wylSC8PQnD98dG
+         nryyac/YUK+PXUHSgLOTrnSQBld+T+nwDA+j6IZgsXkS/5hEeAE7lukWImHktBjrt8fV
+         s+CWYYCc9uUVA9k8AxkviqvthwV3g0u1NSQTwCdG4xqSBSo/i553ZZu2VeMtbBlCnCmA
+         E3u7uiJRGGnGdGLhW0Xw5kR8vUvAG8oUwlFOttU0GiihleujryZgxO3HJfgxRSQAgxbt
+         MBZqymnhHmqx13Zdx0OSiLYx+O3UkeHB3ODJPk0HYno/YOILhQoHd4HI2vnVGlCGJZJV
+         njKQ==
+X-Gm-Message-State: AOAM533zdc0DwmU+SUAvStf30XHTl4/kj3vG00xQUjOF4hYg3QtJBdUJ
+        IJX5jlRmjqwG+cYinomrk+Z+rZNvadPO6U1Cls6Ror2IeOA=
+X-Google-Smtp-Source: ABdhPJzXLyvEiDukAv9ztFvTsnIBcgOh+DjQSAioG/h1ntKQQHsJELcdYolcdDNO35uXaWTN7gvRytWW+DaaNJ8k0dI=
+X-Received: by 2002:a2e:8658:: with SMTP id i24mr19918147ljj.209.1642523211899;
+ Tue, 18 Jan 2022 08:26:51 -0800 (PST)
 MIME-Version: 1.0
-References: <20220118074512.2153136-1-lsahlber@redhat.com>
-In-Reply-To: <20220118074512.2153136-1-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 18 Jan 2022 10:23:53 -0600
-Message-ID: <CAH2r5mvcNEbvechpxWDGyW+4WnZtAjQkFLKtineEVraK+67gUg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: serialize all mount attempts
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Tue, 18 Jan 2022 10:26:40 -0600
+Message-ID: <CAH2r5msUYQPgRgCBTwt_=aO++yNtqD5+tnVgud1sdspUvvLUOw@mail.gmail.com>
+Subject: memleak on test generic/422 to windows
+To:     Shyam Prasad N <nspmangalore@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Am curious why serializing on a per-socket mutex
-(TCP_Server_info)->srv_mutex doesn't work?
+generic/422 18s ... _check_kmemleak: something found in kmemleak (see
+/data/xfstests-dev/results//smb3/generic/422.kmemleak)
 
-On Tue, Jan 18, 2022 at 1:45 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> RHBZ: 2008434
->
-> If we try to perform multiple concurrent mounts ot the same server we might
-> end up in a situation where:
-> Thread #1                          Thread #2
->     creates TCP connection
->     Issues NegotiateProtocol
->     ...                            Pick the TCP connection for Thread #1
->                                    Issue a new NegotiateProtocol
->
-> which then leads to the the server kills off the session.
-> There are also other a similar race where several threads ending up
-> withe their own unique tcp connection that all go to the same server structure ....
->
-> The most straightforward way to fix these races with concurrent mounts are to serialize
-> them. I.e. only allow one mount to be in progress at a time.
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/fs_context.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index e3ed25dc6f3f..7ec35f3f0a5f 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -37,6 +37,8 @@
->  #include "rfc1002pdu.h"
->  #include "fs_context.h"
->
-> +static DEFINE_MUTEX(cifs_mount_mutex);
-> +
->  static const match_table_t cifs_smb_version_tokens = {
->         { Smb_1, SMB1_VERSION_STRING },
->         { Smb_20, SMB20_VERSION_STRING},
-> @@ -707,10 +709,14 @@ static int smb3_get_tree_common(struct fs_context *fc)
->  static int smb3_get_tree(struct fs_context *fc)
->  {
->         int err = smb3_fs_context_validate(fc);
-> +       int ret;
->
->         if (err)
->                 return err;
-> -       return smb3_get_tree_common(fc);
-> +       mutex_lock(&cifs_mount_mutex);
-> +       ret = smb3_get_tree_common(fc);
-> +       mutex_unlock(&cifs_mount_mutex);
-> +       return ret;
->  }
->
->  static void smb3_fs_context_free(struct fs_context *fc)
-> --
-> 2.30.2
->
+Ran: generic/422
+Failures: generic/422
+Failed 1 of 1 tests
+
+SECTION       -- smb3
+=========================
+Ran: generic/422
+Failures: generic/422
+Failed 1 of 1 tests
+
+[root@fedora29 xfstests-dev]# cat
+/data/xfstests-dev/results/smb3/generic/422.kmemleak
+EXPERIMENTAL kmemleak reported some memory leaks!  Due to the way kmemleak
+works, the leak might be from an earlier test, or something totally unrelated.
+unreferenced object 0xffff93ce8da27680 (size 64):
+  comm "xfs_io", pid 2192, jiffies 4295079181 (age 11.080s)
+  hex dump (first 32 bytes):
+    20 e7 15 97 ce 93 ff ff 20 e7 15 97 ce 93 ff ff   ....... .......
+    c0 5a 77 88 ce 93 ff ff 00 00 00 00 00 00 00 00  .Zw.............
+  backtrace:
+    [<000000006347e51d>] kmem_cache_alloc_trace+0x148/0x1e0
+    [<000000008fd709d1>] cifs_close+0x53/0x1d0 [cifs]
+    [<0000000078434f61>] __fput+0x9b/0x260
+    [<000000007c7c1be3>] task_work_run+0x6a/0xa0
+    [<0000000010962b60>] do_exit+0x386/0xc80
+    [<00000000ea225eec>] do_group_exit+0x33/0xb0
+    [<00000000a9ccd814>] get_signal+0xbe/0xee0
+    [<000000006bfe7e75>] arch_do_signal_or_restart+0xba/0x710
+    [<00000000606ff0f6>] exit_to_user_mode_prepare+0xe8/0x2b0
+    [<00000000645b542d>] syscall_exit_to_user_mode+0x2c/0x60
+    [<000000009113bdcc>] do_syscall_64+0x46/0x80
+    [<00000000f9e0cc0a>] entry_SYSCALL_64_after_hwframe+0x44/0xae
+unreferenced object 0xffff93ce8db5df40 (size 64):
+  comm "xfs_io", pid 2206, jiffies 4295079315 (age 10.946s)
+  hex dump (first 32 bytes):
+    10 74 33 97 ce 93 ff ff 10 74 33 97 ce 93 ff ff  .t3......t3.....
+    c0 5a 77 88 ce 93 ff ff 00 00 00 00 00 00 00 00  .Zw.............
+  backtrace:
+    [<000000006347e51d>] kmem_cache_alloc_trace+0x148/0x1e0
+    [<000000008fd709d1>] cifs_close+0x53/0x1d0 [cifs]
+    [<0000000078434f61>] __fput+0x9b/0x260
+    [<000000007c7c1be3>] task_work_run+0x6a/0xa0
+    [<0000000010962b60>] do_exit+0x386/0xc80
+    [<00000000ea225eec>] do_group_exit+0x33/0xb0
+    [<000000007effc4d0>] __x64_sys_exit_group+0x14/0x20
+    [<0000000026ca460f>] do_syscall_64+0x3a/0x80
+    [<00000000f9e0cc0a>] entry_SYSCALL_64_after_hwframe+0x44/0xae
 
 
 -- 
