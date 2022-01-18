@@ -2,157 +2,77 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44950C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 06:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 025E6C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 07:26:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240670AbiARGkP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jan 2022 01:40:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33090 "EHLO
+        id S232060AbiARH0I (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Jan 2022 02:26:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230233AbiARGkP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jan 2022 01:40:15 -0500
-Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF157C061574
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 22:40:14 -0800 (PST)
-Received: by mail-vk1-xa2a.google.com with SMTP id w5so4424178vke.12
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 22:40:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=6Kox8iEi+x0Y+6Ez3+6/MBasLAtS7u3jE0QcMTeBWbs=;
-        b=qtWDrfAAFV0QBxvRB8YkNiufr0xi6XTAJNI7Aqv3IM+pqx6jXAdnlSht0Fo3C0EGXN
-         2vzZAUhpXDpCYZt1sUYrMsmtxfx03RQK9X5PkEHS+CY/0PUrCsKDP4NF+VoDU1ae/Aap
-         7HTI4msjStGPoPobT5ck7v6a/L7RDDSVLr1sitGL3M23zCODmWntaLp4xZ4FcJFPNVUC
-         3g912qlcPc29yNRxo3prd40sxwJ6Gv53+3cqPGJzA1mF4CGvml3OTu39vjaj2IMP5yJg
-         9sFMWkEFe/mcCUqen0XHKXAZYEB35fcMRZ45HxZSagYJlAqejONeSi8y9I5T3JMe5Zbx
-         jv6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=6Kox8iEi+x0Y+6Ez3+6/MBasLAtS7u3jE0QcMTeBWbs=;
-        b=yd4g1fsPstdGswRFWEbFix38q3WMSNCv93cJ32ehZw2++iS8Fb6V9lUKYTgHqwanZI
-         qDs1HG75+XX+FIU04IdwkqC2khV8MpwsZazzIBUYC7MVSTUPElAfqbn1dLsM3LbEESBf
-         7XiYBCNk8im0WjbWKJKlvXceU5S2/c8RIiNtYbIJEfZwhxWcRiPYZYfkRW4jVLjbuFz4
-         IMZBavIm8moNpolTMrJN2/F12J11qkSXhlDocH4mqRk+s6L89ylqqB4AtgDe/6Ea/Iu+
-         K0SIJjNBxmDG+mzG5fDrgf4vQMRzF/IfAw18zKkeF/1Cqkqi+9O7qD8/y/Uo0MuRCTuJ
-         ayDQ==
-X-Gm-Message-State: AOAM533DTEf1Krdb/Hd7sEXKH25+qhM6vY61JapFMIjALwGaXnwN5QlF
-        iTD4tcY3b2UD94Bgf67iiWMpUdO++ob0eLXikyU=
-X-Google-Smtp-Source: ABdhPJxJX28jWVwzBvluagMqiYMtslSSsT8A0DngX7A1NbK5NTbJuHfo8LNnSF9Uc2CfYIjignq5w7WOyZ0c7YPtcAo=
-X-Received: by 2002:a1f:a84c:: with SMTP id r73mr9191276vke.6.1642488013905;
- Mon, 17 Jan 2022 22:40:13 -0800 (PST)
+        with ESMTP id S229541AbiARH0I (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jan 2022 02:26:08 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2244C061574;
+        Mon, 17 Jan 2022 23:26:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=+dhYCXllEHNKm5Sc731XzwwsjVqJhcW4C4oj7NGz3M4=; b=TGajYPjm2XkqLBdJOhVzBzTwlB
+        boJ4d295sjI9UUInwlPKhDyuNoTCqGg0FQw18iEAahbV/VVb81mYPWPf2+b0qiATEyluQn27qsXLu
+        5EVgEHA+7ijXmvn4H9WVCyKxYjU5n2iMLOTjwqsd83+4PS4pEhBcGzUeq1dUTDUkcbQTongiSpChY
+        fMZaj3W15A+CXTQEIRuyROppX7fq6If8tvRdRgQkFWIaI+wN8ZUno+UKphp83Uu8eTqHUPFrbKJbF
+        AjzrmA/xEfJMnw5y3y5YjNzCJMWjtRHB0WCK6aAmH9OhkBqR/9ABbA+LAF3arRARXloUVo1Ubox1R
+        7bgznWDQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n9iri-000afR-VI; Tue, 18 Jan 2022 07:25:14 +0000
+Date:   Mon, 17 Jan 2022 23:25:14 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Dave Wysochanski <dwysocha@redhat.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Omar Sandoval <osandov@osandov.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cachefs@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: Out of order read() completion and buffer filling beyond
+ returned amount
+Message-ID: <YeZrWoQY/3dKZHfT@infradead.org>
+References: <2752208.1642413437@warthog.procyon.org.uk>
+ <CAHk-=wjQG5HnwQD98z8de1EvRzDnebZxh=gQUVTKCn0DOp7PQw@mail.gmail.com>
+ <YeVvXToTxCsMzHZv@casper.infradead.org>
 MIME-Version: 1.0
-References: <20220107054531.619487-1-hyc.lee@gmail.com> <20220107054531.619487-2-hyc.lee@gmail.com>
- <CAKYAXd9qYgpf9oGhK5bdE2M6nbfpeTEAOg+zDGGXomOLaNmR9Q@mail.gmail.com>
- <CAH2r5mtTs5bxF9+_M0-3a7YkZB4zqBCm4_kL_QpHAPhEVAG-WA@mail.gmail.com>
- <CAKYAXd9ndasXA3q2F05f9JMXHPT6cQRf0M8owP-dwdv_LWggwQ@mail.gmail.com>
- <CANFS6baREfEidN+FqZROiF+6QtOQ6FXae6f0L9EVKaUFK2L3hg@mail.gmail.com> <CAKYAXd8uQ4MG=y8_GqhAwPX0CVfk9EoEu=WZuO7+UCCYJ2RBDw@mail.gmail.com>
-In-Reply-To: <CAKYAXd8uQ4MG=y8_GqhAwPX0CVfk9EoEu=WZuO7+UCCYJ2RBDw@mail.gmail.com>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Tue, 18 Jan 2022 15:40:03 +0900
-Message-ID: <CANFS6bZMH00MzjFrBVNFrtDvwGRkXtiZM6TOCUDk+mGouRk4Dw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] ksmbd: smbd: change the default maximum read/write,
- receive size
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YeVvXToTxCsMzHZv@casper.infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022=EB=85=84 1=EC=9B=94 18=EC=9D=BC (=ED=99=94) =EC=98=A4=EC=A0=84 8:33, N=
-amjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> 2022-01-10 10:37 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> > 2022=EB=85=84 1=EC=9B=94 9=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 9:56=
-, Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
-> >>
-> >> 2022-01-09 15:44 GMT+09:00, Steve French <smfrench@gmail.com>:
-> >> > Do you have more detail on what the negotiated readsize/writesize
-> >> > would be for Windows clients with this size? for Linux clients?
-> >> Hyunchul, Please answer.
-> >>
-> >
-> > For a Linux client, if connected using smb-direct,
-> > the size will be 1048512. But connected with multichannel,
-> > the size will be 4MB instead of 1048512. And this causes
-> > problems because the read/write size is bigger than 1048512.
-> > It looks like a bug. I have to limit the ksmbd's SMB2 maximum
-> > read/write size for a test.
-> >
-> > For Windows clients, the actual read/write size is less than
-> > 1048512.
-> In the case of my Chelsio device, Need to set it to about
-> 512K(512*1024 - 64) for it to work.
-> The 1048512 value seems insufficient to cover all devices. Is there
-> any other way to set the minimum read/write value? Calibrate this
-> minimum value by looking at
-> the device information? For example variables in ib_dev->attrs.
->
+On Mon, Jan 17, 2022 at 01:30:05PM +0000, Matthew Wilcox wrote:
+> I think for DIO, you're sacrificing the entire buffer with any filesystem.
+> If the underlying file is split across multiple drives, or is even
+> just fragmented on a single drive, we'll submit multiple BIOs which
+> will complete independently (even for SCSI which writes sequentially;
+> never mind NVMe which can DMA blocks asynchronously).  It might be
+> more apparent in a networking situation where errors are more common,
+> but it's always been a possibility since Linux introduced DIO.
 
-Let me check it. But I think multiple buffer descriptors caused
-this problem. because of a client's device limitation, a client
-seems to send a read/write request with multiple buffer descriptors
-for sending 1048512 bytes.
-
-To check this assumption, can you tell me the buffer descriptors'
-content when the default read/write size is 1048512?
-
-> >
-> >> >
-> >> > It looked like it would still be 4MB at first glance (although in
-> >> > theory some Windows could do 8MB) ... I may have missed something
-> >> I understood that multiple-buffer descriptor support was required to
-> >> set a read/write size of 1MB or more. As I know, Hyunchul is currently
-> >> working on it.
-> >> It seems to be set to the smaller of max read/write size in smb-direct
-> >> negotiate and max read/write size in smb2 negotiate.
-> >>
-> >> Hyunchul, I have one question more, How did you get 1048512 setting va=
-lue
-> >> ?
-> >> >
-> >
-> > I remember when the size was 1MB, Windows clients requested read/write =
-with
-> > 1048512 and 64.
-> >
-> >> > On Sat, Jan 8, 2022 at 8:43 PM Namjae Jeon <linkinjeon@kernel.org>
-> >> > wrote:
-> >> >>
-> >> >> 2022-01-07 14:45 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> >> >> > Due to restriction that cannot handle multiple
-> >> >> > buffer descriptor structures, decrease the maximum
-> >> >> > read/write size for Windows clients.
-> >> >> >
-> >> >> > And set the maximum fragmented receive size
-> >> >> > in consideration of the receive queue size.
-> >> >> >
-> >> >> > Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-> >> >> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-> >> >
-> >> >
-> >> >
-> >> > --
-> >> > Thanks,
-> >> >
-> >> > Steve
-> >> >
-> >
-> >
-> >
-> > --
-> > Thanks,
-> > Hyunchul
-> >
-
-
-
---=20
-Thanks,
-Hyunchul
+Yes.  Probably because of that we also never allow short reads or writes
+due to I/O errrors but always fail the whole I/O.
