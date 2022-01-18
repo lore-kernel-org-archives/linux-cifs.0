@@ -2,102 +2,148 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E189C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 07:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51AEDC433FE
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 13:53:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232713AbiARHp0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jan 2022 02:45:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38393 "EHLO
+        id S243202AbiARNxE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Jan 2022 08:53:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:60693 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229683AbiARHpZ (ORCPT
+        by vger.kernel.org with ESMTP id S243192AbiARNxD (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 18 Jan 2022 02:45:25 -0500
+        Tue, 18 Jan 2022 08:53:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642491925;
+        s=mimecast20190719; t=1642513983;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding;
-        bh=vZ8/J7pU/trjuWr5BnhLzlq4lcSec3iaw4t8ycXw8Ok=;
-        b=IMleN+zCrdPTBxhKy8daKUVG/8ASq5xlS0xakx8hASNTSbCef4a+WJhxxExgthOrP+XGGF
-        Fe0+C9g0DOPS4DHD6D5sdKPbMcoL1QLrZiFsq5dvF1v86nPf7brOlzo+sxPJRlsGh8QXuH
-        qve1Pwmthcb2KEzl+NkUdPW+0MHeczg=
+        bh=pXij1A1UndEUt7HP7zwNeasuXhEJIKez5EOEb9nfLFg=;
+        b=ES72jGlvvTfJTtlGqpe2LKuMYYlqS3yIje/B7lDHnE9sZe+2QIiAKiTGmb0IFkNpH1GBSo
+        dPnzZCeFrEiVNwVNmndtWuqpZ85G/pX7emrIBdJYGbzsszJOlxnc1cixlxEu/ijvL4IsIR
+        gGoNsRA+gbJEgVNETlQDpQcQvNvk/W8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-196-oDR_3RygM3mwbJs1Px6bRQ-1; Tue, 18 Jan 2022 02:45:21 -0500
-X-MC-Unique: oDR_3RygM3mwbJs1Px6bRQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-527-JlXrDARYNMW5NYWotQtA7w-1; Tue, 18 Jan 2022 08:52:59 -0500
+X-MC-Unique: JlXrDARYNMW5NYWotQtA7w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6950E8143E5;
-        Tue, 18 Jan 2022 07:45:20 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-105.bne.redhat.com [10.64.54.105])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AC33B795A0;
-        Tue, 18 Jan 2022 07:45:19 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH] cifs: serialize all mount attempts
-Date:   Tue, 18 Jan 2022 17:45:12 +1000
-Message-Id: <20220118074512.2153136-1-lsahlber@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2FCD64097;
+        Tue, 18 Jan 2022 13:52:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 54B1F8049C;
+        Tue, 18 Jan 2022 13:52:50 +0000 (UTC)
+Subject: [PATCH 00/11] fscache, cachefiles: Rewrite fixes/updates
+From:   David Howells <dhowells@redhat.com>
+To:     linux-cachefs@redhat.com
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        Steve French <smfrench@gmail.com>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>, dhowells@redhat.com,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <smfrench@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Tue, 18 Jan 2022 13:52:49 +0000
+Message-ID: <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-RHBZ: 2008434
 
-If we try to perform multiple concurrent mounts ot the same server we might
-end up in a situation where:
-Thread #1                          Thread #2
-    creates TCP connection
-    Issues NegotiateProtocol
-    ...                            Pick the TCP connection for Thread #1
-                                   Issue a new NegotiateProtocol
+Here's a set of fixes and minor updates for the fscache rewrite[1]:
 
-which then leads to the the server kills off the session.
-There are also other a similar race where several threads ending up
-withe their own unique tcp connection that all go to the same server structure ....
+ (1) Fix mishandling of volume collisions (the wait condition is inverted
+     and so it was only waiting if the volume collision was already
+     resolved).
 
-The most straightforward way to fix these races with concurrent mounts are to serialize
-them. I.e. only allow one mount to be in progress at a time.
+And for cachefiles, including addressing some of Jeff Layton's review
+comments:
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+ (2) Fix miscalculation of whether there's space available.
+
+ (3) Make sure a default cache name is set on a cache if the user hasn't
+     set one by the time they bind the cache.
+
+ (4) Adjust the way the backing inode is presented in tracepoints, add a
+     tracepoint for mkdir and trace directory lookup.
+
+ (5) Trace failure to set the active file mark.
+
+ (6) Add explanation of the checks made on the backing filesystem.
+
+ (7) Check that the backing filesystem supports tmpfile.
+
+ (8) Document how the page-release cancellation of the read-skip
+     optimisation works.
+
+ (9) Add an IS_KERNEL_FILE() check macro for the S_KERNEL_FILE inode flag.
+
+And I've included a change for netfslib:
+
+(10) Make ops->init_rreq() optional.
+
+I've also added the patch to rewrite cifs's fscache indexing.
+
+
+Link: https://lore.kernel.org/r/164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk/ [1]
+
 ---
- fs/cifs/fs_context.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+David Howells (9):
+      fscache: Fix the volume collision wait condition
+      cachefiles: Calculate the blockshift in terms of bytes, not pages
+      cachefiles: Make some tracepoint adjustments
+      cachefiles: Trace active-mark failure
+      cachefiles: Explain checks in a comment
+      cachefiles: Check that the backing filesystem supports tmpfiles
+      fscache: Add a comment explaining how page-release optimisation works
+      vfs, fscache: Add an IS_KERNEL_FILE() macro for the S_KERNEL_FILE flag
+      cifs: Support fscache indexing rewrite
 
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index e3ed25dc6f3f..7ec35f3f0a5f 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -37,6 +37,8 @@
- #include "rfc1002pdu.h"
- #include "fs_context.h"
- 
-+static DEFINE_MUTEX(cifs_mount_mutex);
-+
- static const match_table_t cifs_smb_version_tokens = {
- 	{ Smb_1, SMB1_VERSION_STRING },
- 	{ Smb_20, SMB20_VERSION_STRING},
-@@ -707,10 +709,14 @@ static int smb3_get_tree_common(struct fs_context *fc)
- static int smb3_get_tree(struct fs_context *fc)
- {
- 	int err = smb3_fs_context_validate(fc);
-+	int ret;
- 
- 	if (err)
- 		return err;
--	return smb3_get_tree_common(fc);
-+	mutex_lock(&cifs_mount_mutex);
-+	ret = smb3_get_tree_common(fc);
-+	mutex_unlock(&cifs_mount_mutex);
-+	return ret;
- }
- 
- static void smb3_fs_context_free(struct fs_context *fc)
--- 
-2.30.2
+Jeffle Xu (2):
+      cachefiles: set default tag name if it's unspecified
+      netfs: Make ops->init_rreq() optional
+
+
+ fs/cachefiles/cache.c             |  17 +-
+ fs/cachefiles/daemon.c            |  11 +
+ fs/cachefiles/internal.h          |   2 +-
+ fs/cachefiles/io.c                |   2 +-
+ fs/cachefiles/namei.c             |  18 +-
+ fs/ceph/addr.c                    |   5 -
+ fs/cifs/Kconfig                   |   2 +-
+ fs/cifs/Makefile                  |   2 +-
+ fs/cifs/cache.c                   | 105 ----------
+ fs/cifs/cifsfs.c                  |  19 +-
+ fs/cifs/cifsglob.h                |   5 +-
+ fs/cifs/connect.c                 |  15 +-
+ fs/cifs/dir.c                     |   5 +
+ fs/cifs/file.c                    |  70 ++++---
+ fs/cifs/fscache.c                 | 333 +++++++-----------------------
+ fs/cifs/fscache.h                 | 126 ++++-------
+ fs/cifs/inode.c                   |  19 +-
+ fs/namei.c                        |   2 +-
+ fs/netfs/read_helper.c            |   3 +-
+ include/linux/fs.h                |   1 +
+ include/linux/fscache.h           |   5 +
+ include/trace/events/cachefiles.h | 103 ++++++---
+ 22 files changed, 313 insertions(+), 557 deletions(-)
+ delete mode 100644 fs/cifs/cache.c
+
 
