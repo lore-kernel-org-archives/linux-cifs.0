@@ -2,155 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2AC4C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 23:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C87C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 02:17:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235692AbiAQXww (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Jan 2022 18:52:52 -0500
-Received: from mail-pl1-f174.google.com ([209.85.214.174]:44954 "EHLO
-        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231768AbiAQXwu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 18:52:50 -0500
-Received: by mail-pl1-f174.google.com with SMTP id v2so7885199ply.11;
-        Mon, 17 Jan 2022 15:52:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=E3Vs4IXxZ1o53P+v4lST9asSyi4iNaTfykJHulxAP6I=;
-        b=38Yw2iTO6o3QAQGw/srBNIoeGQ+tvzTIOOzpN0EPdlQa66302aMLRXCP5KjTPNonWo
-         l0QavEZFwSLpJPj7p1xCO+RG+ZmECkqNzFV6852nri0IUAYXx8Qjk78ytLiVzNWL6sBu
-         LHXOJpkU7fVCaROKUSw1LTE+PTTo3FCqKXN+XvZzuDQG/zfdufPSk+iUw8v9SMixmAo1
-         xC5C/Z/yAGmaEnvOQNVI8Rb8JPy5b+AV9UphkkWxcgWvAZtUsPhKqYIzGYURlFmeuh39
-         YXNmDq3Ti1ls3q7nfzd6rKWblpk2+J/d+2ZcxFOw4gj0lTxcwR1jHg57vdpXD9a887LV
-         jKrw==
-X-Gm-Message-State: AOAM5303/XuJuHEKhpemxomAwTgYyG2nLOX330FpJZeEdOwllUSm+8Pu
-        VrKM+y2ZPJ7SkUs+HnXoCGp2fIl53t4=
-X-Google-Smtp-Source: ABdhPJz4ZuSC9e8w3+8LhUWLe9QPlc2LklE09KfjXKRJLZVfJd2L4Hj4kOSjzkoNHa8F+bDJ71z6qg==
-X-Received: by 2002:a17:902:8d82:b0:149:a740:d8d0 with SMTP id v2-20020a1709028d8200b00149a740d8d0mr25253359plo.5.1642463570215;
-        Mon, 17 Jan 2022 15:52:50 -0800 (PST)
-Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id x6sm12883412pge.50.2022.01.17.15.52.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jan 2022 15:52:49 -0800 (PST)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>, stable@vger.kernel.org
-Subject: [PATCH] ksmbd: fix guest connection failure with nautilus
-Date:   Tue, 18 Jan 2022 08:52:42 +0900
-Message-Id: <20220117235242.9385-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        id S231517AbiARCRI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Jan 2022 21:17:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50451 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236398AbiARCRI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 17 Jan 2022 21:17:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642472227;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Ok9Tsfw8z5RyOU+c8fJBBTT29ERjo9Lo2JSMK9hXSAo=;
+        b=FxK188kyUmMNyC2hzzZbUsEtjHIikYdIgaaMwdtQdStZH3LEp7gG/vz4AeCr0pqYhYouGG
+        SRctSEB025X7LN1Git7MTNJ1Jok2mGPn8ae0XSG/w8bdQ8geky7UWCKqHIR3I9N5BiasW2
+        p9Kju+LQ29z6j4IDDaBxhrRvYMPFkPI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-412-RbSCAs8uM0yniNLwNgjN7g-1; Mon, 17 Jan 2022 21:17:05 -0500
+X-MC-Unique: RbSCAs8uM0yniNLwNgjN7g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5B101923B92;
+        Tue, 18 Jan 2022 02:17:04 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-105.bne.redhat.com [10.64.54.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 53F425DF37;
+        Tue, 18 Jan 2022 02:17:04 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: serialize all mount attempts
+Date:   Tue, 18 Jan 2022 12:16:57 +1000
+Message-Id: <20220118021657.2145245-1-lsahlber@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-MS-SMB2 describe session sign like the following.
-Session.SigningRequired MUST be set to TRUE under the following conditions:
- - If the SMB2_NEGOTIATE_SIGNING_REQUIRED bit is set in the SecurityMode
-   field of the client request.
- - If the SMB2_SESSION_FLAG_IS_GUEST bit is not set in the SessionFlags
-   field and Session.IsAnonymous is FALSE and either Connection.ShouldSign
-   or global RequireMessageSigning is TRUE.
+RHBZ: 2008434
 
-When trying guest account connection using nautilus, The login failure
-happened on session setup. ksmbd does not allow this connection
-when the user is a guest and the connection sign is set. Just do not set
-session sign instead of error response as described in the specification.
-And this change improves the guest connection in Nautilus.
+Some servers, such as Windows2016 have a very low number of concurrent mounts that
+they allow from each client.
+This can be a problem if you have a more than a handful (==3 in this case)
+of cifs entries in your fstab and cause a number of the mounts there to randomly fail.
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Cc: stable@vger.kernel.org # v5.15+
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Add a global mutex and use it to serialize all mount attempts.
+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/ksmbd/smb2pdu.c | 62 ++++++++++++++++++++++------------------------
- 1 file changed, 29 insertions(+), 33 deletions(-)
+ fs/cifs/fs_context.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 15f331dbe17a..1866c81c5c99 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -1464,11 +1464,6 @@ static int ntlm_authenticate(struct ksmbd_work *work)
- 	}
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index e3ed25dc6f3f..7ec35f3f0a5f 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -37,6 +37,8 @@
+ #include "rfc1002pdu.h"
+ #include "fs_context.h"
  
- 	if (user_guest(sess->user)) {
--		if (conn->sign) {
--			ksmbd_debug(SMB, "Guest login not allowed when signing enabled\n");
--			return -EPERM;
--		}
--
- 		rsp->SessionFlags = SMB2_SESSION_FLAG_IS_GUEST_LE;
- 	} else {
- 		struct authenticate_message *authblob;
-@@ -1481,38 +1476,39 @@ static int ntlm_authenticate(struct ksmbd_work *work)
- 			ksmbd_debug(SMB, "authentication failed\n");
- 			return -EPERM;
- 		}
-+	}
++static DEFINE_MUTEX(cifs_mount_mutex);
++
+ static const match_table_t cifs_smb_version_tokens = {
+ 	{ Smb_1, SMB1_VERSION_STRING },
+ 	{ Smb_20, SMB20_VERSION_STRING},
+@@ -707,10 +709,14 @@ static int smb3_get_tree_common(struct fs_context *fc)
+ static int smb3_get_tree(struct fs_context *fc)
+ {
+ 	int err = smb3_fs_context_validate(fc);
++	int ret;
  
--		/*
--		 * If session state is SMB2_SESSION_VALID, We can assume
--		 * that it is reauthentication. And the user/password
--		 * has been verified, so return it here.
--		 */
--		if (sess->state == SMB2_SESSION_VALID) {
--			if (conn->binding)
--				goto binding_session;
--			return 0;
--		}
-+	/*
-+	 * If session state is SMB2_SESSION_VALID, We can assume
-+	 * that it is reauthentication. And the user/password
-+	 * has been verified, so return it here.
-+	 */
-+	if (sess->state == SMB2_SESSION_VALID) {
-+		if (conn->binding)
-+			goto binding_session;
-+		return 0;
-+	}
+ 	if (err)
+ 		return err;
+-	return smb3_get_tree_common(fc);
++	mutex_lock(&cifs_mount_mutex);
++	ret = smb3_get_tree_common(fc);
++	mutex_unlock(&cifs_mount_mutex);
++	return ret;
+ }
  
--		if ((conn->sign || server_conf.enforced_signing) ||
--		    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
--			sess->sign = true;
-+	if ((rsp->SessionFlags != SMB2_SESSION_FLAG_IS_GUEST_LE &&
-+	     (conn->sign || server_conf.enforced_signing)) ||
-+	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
-+		sess->sign = true;
- 
--		if (smb3_encryption_negotiated(conn) &&
--		    !(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
--			rc = conn->ops->generate_encryptionkey(sess);
--			if (rc) {
--				ksmbd_debug(SMB,
--					    "SMB3 encryption key generation failed\n");
--				return -EINVAL;
--			}
--			sess->enc = true;
--			rsp->SessionFlags = SMB2_SESSION_FLAG_ENCRYPT_DATA_LE;
--			/*
--			 * signing is disable if encryption is enable
--			 * on this session
--			 */
--			sess->sign = false;
-+	if (smb3_encryption_negotiated(conn) &&
-+			!(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
-+		rc = conn->ops->generate_encryptionkey(sess);
-+		if (rc) {
-+			ksmbd_debug(SMB,
-+					"SMB3 encryption key generation failed\n");
-+			return -EINVAL;
- 		}
-+		sess->enc = true;
-+		rsp->SessionFlags = SMB2_SESSION_FLAG_ENCRYPT_DATA_LE;
-+		/*
-+		 * signing is disable if encryption is enable
-+		 * on this session
-+		 */
-+		sess->sign = false;
- 	}
- 
- binding_session:
+ static void smb3_fs_context_free(struct fs_context *fc)
 -- 
-2.25.1
+2.30.2
 
