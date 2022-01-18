@@ -2,48 +2,48 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE2CC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 13:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3708DC43217
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 13:55:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244326AbiARNzV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jan 2022 08:55:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43001 "EHLO
+        id S244383AbiARNz3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Jan 2022 08:55:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:56957 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243400AbiARNzJ (ORCPT
+        by vger.kernel.org with ESMTP id S244592AbiARNzO (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 18 Jan 2022 08:55:09 -0500
+        Tue, 18 Jan 2022 08:55:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642514109;
+        s=mimecast20190719; t=1642514113;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VF4onKqMIrYu5mloBKsdeoO9FD6g9xK5Udf/2HJaEOo=;
-        b=gqvn1Nv0w+8HetegEP8ZVF7uSVN5MsWjWyxJWOFrZL4SDfEr5Mzr8S+GzXNnIqVUGp0Wc1
-        TtGNYI4EiED0dtNF2FkiZVDlDWdikR8lVCz42Y173JcrXhi+pGoLgtxeg6/sDoPA5zZF9Q
-        Sgk6TNn030wRK3LkppyGLYFvLCRmG8k=
+        bh=cXe4YspbeqL1UIsHa2vIA3a4UNzwdccpKe51H60C8Ag=;
+        b=DzaxqiSlLYsg50GNRTVKCrUsC3W4Y89SwTfQJoEk3hrFzq9A8mva6nwEzTS2vsA88FvuwY
+        UblMZsqOTCzHNhWAPP8b+701NUTUzDBVyGCVFkkLsId1xrNcp/LnX5BFUVxFpTqhL8X8P/
+        kt/7JyV9JHDtNK/RyVA2gfEoIUkWYes=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-58-vgBLGJ2uORa7FAsl4Z7w7Q-1; Tue, 18 Jan 2022 08:55:03 -0500
-X-MC-Unique: vgBLGJ2uORa7FAsl4Z7w7Q-1
+ us-mta-399-hdKOMO8COgitZ1LVaFnJuQ-1; Tue, 18 Jan 2022 08:55:10 -0500
+X-MC-Unique: hdKOMO8COgitZ1LVaFnJuQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A5521090017;
-        Tue, 18 Jan 2022 13:54:49 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20582101F000;
+        Tue, 18 Jan 2022 13:55:08 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AAE842DE92;
-        Tue, 18 Jan 2022 13:54:45 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B866F2BCFF;
+        Tue, 18 Jan 2022 13:55:04 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 08/11] fscache: Add a comment explaining how page-release
- optimisation works
+Subject: [PATCH 10/11] netfs: Make ops->init_rreq() optional
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
-Cc:     Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
+Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
         Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <smfrench@gmail.com>,
@@ -58,8 +58,8 @@ Cc:     Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 18 Jan 2022 13:54:44 +0000
-Message-ID: <164251408479.3435901.9540165422908194636.stgit@warthog.procyon.org.uk>
+Date:   Tue, 18 Jan 2022 13:55:03 +0000
+Message-ID: <164251410387.3435901.2504600788262093313.stgit@warthog.procyon.org.uk>
 In-Reply-To: <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk>
 References: <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
@@ -71,53 +71,61 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a comment into fscache_note_page_release() to explain how the
-page-release optimisation logic works[1].  It's not entirely obvious as it
-has nothing to do with whether or not the netfs file contains data.
+From: Jeffle Xu <jefflexu@linux.alibaba.com>
 
-FSCACHE_COOKIE_NO_DATA_TO_READ is set if we have no data in the cache yet
-(ie. the backing file lookup was negative, the file is 0 length or the
-cookie got invalidated).  It means that we have no data in the cache, not
-that the file is necessarily empty on the server.
+Make the ops->init_rreq() callback optional.  This isn't required for the
+erofs changes I'm implementing to do on-demand read through fscache[1].
+Further, ceph has an empty init_rreq method that can then be removed and
+it's marked optional in the documentation.
 
-FSCACHE_COOKIE_HAVE_DATA is set once we've stored data in the backing file.
-From that point on, we have data we *could* read - however, it's covered by
-pages in the netfs pagecache until at such time one of those covering pages
-is released.
-
-So if we've written data to the cache (HAVE_DATA) and there wasn't any data
-in the cache when we started (NO_DATA_TO_READ), it may no longer be true
-that we can skip reading from the cache.
-
-Read skipping is done by cachefiles_prepare_read().
-
-Note that tracking is not done on a per-page basis, but only on a per-file
-basis.
-
+Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Jeff Layton <jlayton@kernel.org>
 cc: linux-cachefs@redhat.com
-Link: https://lore.kernel.org/r/043a206f03929c2667a465314144e518070a9b2d.camel@kernel.org/ [1]
+Link: https://lore.kernel.org/r/20211227125444.21187-1-jefflexu@linux.alibaba.com/ [1]
+Link: https://lore.kernel.org/r/20211228124419.103020-1-jefflexu@linux.alibaba.com
 ---
 
- include/linux/fscache.h |    5 +++++
- 1 file changed, 5 insertions(+)
+ fs/ceph/addr.c         |    5 -----
+ fs/netfs/read_helper.c |    3 ++-
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/fscache.h b/include/linux/fscache.h
-index ede50406bcb0..296c5f1d9f35 100644
---- a/include/linux/fscache.h
-+++ b/include/linux/fscache.h
-@@ -665,6 +665,11 @@ static inline void fscache_clear_inode_writeback(struct fscache_cookie *cookie,
- static inline
- void fscache_note_page_release(struct fscache_cookie *cookie)
+diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+index b3d9459c9bbd..c98e5238a1b6 100644
+--- a/fs/ceph/addr.c
++++ b/fs/ceph/addr.c
+@@ -297,10 +297,6 @@ static void ceph_netfs_issue_op(struct netfs_read_subrequest *subreq)
+ 	dout("%s: result %d\n", __func__, err);
+ }
+ 
+-static void ceph_init_rreq(struct netfs_read_request *rreq, struct file *file)
+-{
+-}
+-
+ static void ceph_readahead_cleanup(struct address_space *mapping, void *priv)
  {
-+	/* If we've written data to the cache (HAVE_DATA) and there wasn't any
-+	 * data in the cache when we started (NO_DATA_TO_READ), it may no
-+	 * longer be true that we can skip reading from the cache - so clear
-+	 * the flag that causes reads to be skipped.
-+	 */
- 	if (cookie &&
- 	    test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&
- 	    test_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags))
+ 	struct inode *inode = mapping->host;
+@@ -312,7 +308,6 @@ static void ceph_readahead_cleanup(struct address_space *mapping, void *priv)
+ }
+ 
+ static const struct netfs_read_request_ops ceph_netfs_read_ops = {
+-	.init_rreq		= ceph_init_rreq,
+ 	.is_cache_enabled	= ceph_is_cache_enabled,
+ 	.begin_cache_operation	= ceph_begin_cache_operation,
+ 	.issue_op		= ceph_netfs_issue_op,
+diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
+index 6169659857b3..501da990c259 100644
+--- a/fs/netfs/read_helper.c
++++ b/fs/netfs/read_helper.c
+@@ -55,7 +55,8 @@ static struct netfs_read_request *netfs_alloc_read_request(
+ 		INIT_WORK(&rreq->work, netfs_rreq_work);
+ 		refcount_set(&rreq->usage, 1);
+ 		__set_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
+-		ops->init_rreq(rreq, file);
++		if (ops->init_rreq)
++			ops->init_rreq(rreq, file);
+ 		netfs_stat(&netfs_n_rh_rreq);
+ 	}
+ 
 
 
