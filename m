@@ -2,82 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2E5EC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 17:24:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E93CC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 17:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347288AbiARRYp convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jan 2022 12:24:45 -0500
-Received: from mail.astralinux.ru ([217.74.38.119]:33080 "EHLO
-        mail.astralinux.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347283AbiARRYo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jan 2022 12:24:44 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mail.astralinux.ru (Postfix) with ESMTP id F0880306860F;
-        Tue, 18 Jan 2022 20:24:42 +0300 (MSK)
-Received: from mail.astralinux.ru ([127.0.0.1])
-        by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 7w5laBlctcBO; Tue, 18 Jan 2022 20:24:42 +0300 (MSK)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.astralinux.ru (Postfix) with ESMTP id 1AB303068611;
-        Tue, 18 Jan 2022 20:24:42 +0300 (MSK)
-X-Virus-Scanned: amavisd-new at astralinux.ru
-Received: from mail.astralinux.ru ([127.0.0.1])
-        by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 9s-lfl6eD-0w; Tue, 18 Jan 2022 20:24:42 +0300 (MSK)
-Received: from debian-BULLSEYE-live-builder-AMD64 (unknown [46.148.196.130])
-        by mail.astralinux.ru (Postfix) with ESMTPSA id DD0E2306860D;
-        Tue, 18 Jan 2022 20:24:41 +0300 (MSK)
-Date:   Tue, 18 Jan 2022 20:24:40 +0300
-From:   Eugene Korenevsky <ekorenevsky@astralinux.ru>
-To:     Enzo Matsumiya <ematsumiya@suse.de>
-Cc:     linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] cifs: quirk for STATUS_OBJECT_NAME_INVALID
- returned for non-ASCII dfs refs
-Message-ID: <Yeb32NlvfHzi7TxD@debian-BULLSEYE-live-builder-AMD64>
-References: <YeHUxJ9zTVNrKveF@himera.home>
- <20220117211305.ambdxok747u6kwlm@cyberdelia>
+        id S244344AbiARRyM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Jan 2022 12:54:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23163 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244169AbiARRyL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 18 Jan 2022 12:54:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642528451;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nPPBU7fRyyAQC3IqAePmc/y5C5VKzN6r/ufwnOhkpIs=;
+        b=iE3uhSSDdIuO00kVaKVJLqcK0SL7Qojtwarw4xnZst3SEooCMXgh2tOhpaj4ViyhmLbR93
+        p21ZX7GL7VYHH22/xALm8VF4BLjJVb3y9oMNTYvneXtxjRXiB+1u13CHWf4ObHCTRcXFYu
+        brRsTsRlGPjIf2XOLPsri8WXYmky7D8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-654-dYizNdE7Pt6DN4j2koeeug-1; Tue, 18 Jan 2022 12:54:08 -0500
+X-MC-Unique: dYizNdE7Pt6DN4j2koeeug-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8231109455A;
+        Tue, 18 Jan 2022 17:40:23 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A82257ED93;
+        Tue, 18 Jan 2022 17:40:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <YebpktrcUZOlBHkZ@infradead.org>
+References: <YebpktrcUZOlBHkZ@infradead.org> <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk> <164251409447.3435901.10092442643336534999.stgit@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
+        Jeff Layton <jlayton@kernel.org>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <smfrench@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 09/11] vfs, fscache: Add an IS_KERNEL_FILE() macro for the S_KERNEL_FILE flag
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220117211305.ambdxok747u6kwlm@cyberdelia>
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3613680.1642527614.1@warthog.procyon.org.uk>
+Date:   Tue, 18 Jan 2022 17:40:14 +0000
+Message-ID: <3613681.1642527614@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jan 17, 2022 at 06:14:05PM -0300, Enzo Matsumiya wrote:
+Christoph Hellwig <hch@infradead.org> wrote:
 
-> The patch fixes the initial issue (mount and listing files) as per
-> reported in the mentioned bugzilla, but it still fails to create files:
+> On Tue, Jan 18, 2022 at 01:54:54PM +0000, David Howells wrote:
+> > Add an IS_KERNEL_FILE() macro to test the S_KERNEL_FILE inode flag as is
+> > common practice for the other inode flags[1].
 > 
-> % echo "test" | sudo tee myfile
-> tee: myfile: No such file or directory
-> test
+> Please fix the flag to have a sensible name first, as the naming of the
+> flag and this new helper is utterly wrong as we already discussed.
 
+And I suggested a new name, which you didn't comment on.
 
-Sorry, cannot reproduce.
+David
 
-```
-# mount
-...
-//192.168.57.14/дфс on /tmp/x type cifs (rw,relatime,vers=default,cache=strict,username=user,domain=WIN-TCIN4O86A6M,uid=0,noforceuid,gid=0,noforcegid,addr=192.168.57.14,file_mode=0755,dir_mode=0755,soft,nounix,mapposix,rsize=4194304,wsize=4194304,bsize=1048576,echo_interval=60,actimeo=1)
-//WIN-TCIN4O86A6M/дфс/temp on /tmp/x/temp type cifs (rw,relatime,vers=3.1.1,cache=strict,username=user,domain=WIN-TCIN4O86A6M,uid=0,noforceuid,gid=0,noforcegid,addr=192.168.57.4,file_mode=0755,dir_mode=0755,soft,nounix,mapposix,rsize=4194304,wsize=4194304,bsize=1048576,echo_interval=60,actimeo=1)
-# pwd
-/tmp/x/temp
-# echo test | tee myfile
-test
-# rm myfile
-# echo test | tee myfile
-test
-# cat myfile
-test
-# rm myfile && echo ok
-ok
-```
-
-Could you provide your 'mount' output as well?
-
-
---
-Eugene
