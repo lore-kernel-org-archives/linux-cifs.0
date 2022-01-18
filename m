@@ -2,53 +2,53 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E4AC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 03:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B0FC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 03:54:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349077AbiARDHB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Jan 2022 22:07:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34844 "EHLO
+        id S1351606AbiARDy3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Jan 2022 22:54:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346492AbiARCtG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 21:49:06 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0F8C06175D
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 18:41:21 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id d3so64811468lfv.13
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 18:41:21 -0800 (PST)
+        with ESMTP id S1348155AbiARDyT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 22:54:19 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79D2C037028
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 19:43:09 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id m1so65436263lfq.4
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 19:43:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=SfuS7i4CmtH30Nbs+DfTZaqSeCJrs+JBZZMqovJ/nL4=;
-        b=Q0yRbfX6xnX9Hdx+4pS6mld8DmqX/Y2xyiXrv7fXXIlfbNDyfZfWG3s7dPpsK1oqTz
-         iqER5GHlBB9uahjiudcWfWx2NTX3dQXoEbew6Hb3XMz2S4/muKagDsvgTOHbiEBEj3w3
-         mDbMa2c7Kv8mjB3+0eHihL6tRBAHP/oupSAjfcF4A6xbj5aqkp+ISgPGOn8xFJqKd5Z2
-         68PqEjsbvQ+2F4FeIpTBkHndfG62oZIL87zExGzJkt1X2u0iCD6pAgnX3yopE3YaziDB
-         ARUd6H8j8yBIt/Z6fHT51HqA+Uwijqt/nNS0Ap8fpxW2IK54Cmej4A37kPB3b5Mdhskn
-         4MSA==
+        bh=qGsDmJkw8dPiztr6msGMN+vMl5AMfliEVmlxBJivCUw=;
+        b=lgiDrkMmYAGBC3QMiszQ+WGlLzWFBvpwPRMCBHjiXI68JOq3hX0/DXfnF+M/nOWcdG
+         5Wv9dW7iCLGNeIjDqDB8D+FJkmDtAijOJIWjHqDzLkUxRFR9d4YwhISBf92Qdeb7Ht3b
+         4f9X5kgxyfWHk+l0zEeIFzPSy02azYeNfXForld34vTv/E1GnY8NKPZ5jAdce5O/6DeP
+         A3rTa5J/M7rynOEWxwX11bxeQAAvqy9YvX/m1hOL90C8qZo79OIQGbSWzI7XojXwVhYL
+         hjUc15+NS9avR0RPxmZCKwWK0f2raMKP644elfQy/XinquhFHafH6iHUvGeMLhP0E3S1
+         le9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=SfuS7i4CmtH30Nbs+DfTZaqSeCJrs+JBZZMqovJ/nL4=;
-        b=L4+UdMOL28ANNSWlo5S+U+WovTX8PoP9IRVC/iv3TqBeTxZ6ahCGQbg+499TZ7DA4T
-         hgUIfwfCOg58ase3QFK1RQ+RI8g8AG6YPaQ05ExyZdvfUDZOg+oI7/ALOktX5wu0Usl1
-         vZc3ZZjveMkDnE3yJC410FU5+tg323osHWXV0pWtVFjvsWxPv78tdzhVrirp1dtvmUK2
-         Jfr4lF/0WlWLGH+e3vqsvQfAttBH+tH+u7tpfedSwrEMEB9b8YoI0xbJGe+Lt+OeAMjY
-         SAPcuPR0ActcPWCbVV5a0XCVbha46nkRz7Ufu7H7i+MiNbkLnc7WyouKY+Lglf55glHk
-         eWVQ==
-X-Gm-Message-State: AOAM533X5Mo4OpQ2L1CWEB9lPjvt6ml71X0tkL5+8yGngm5Y3jOWcPlY
-        PpYyQJmRehscggPHvv0Is25Jj2BLKU7W0ChqB8cR7ylN
-X-Google-Smtp-Source: ABdhPJwUL/8wTOuquz+ngeC758oHOuphN1QCOjwrSVJbRaYH1sTdwjPcfsfafx3BTkHJn+Br+PMoJxVh8poEwm0pGOo=
-X-Received: by 2002:a05:6512:3e02:: with SMTP id i2mr19262783lfv.667.1642473679805;
- Mon, 17 Jan 2022 18:41:19 -0800 (PST)
+        bh=qGsDmJkw8dPiztr6msGMN+vMl5AMfliEVmlxBJivCUw=;
+        b=qSqAMgFEf6MEIKA/SevjxGMyW0nu2ic3Ny0HT0Gw8Cecu6g6jH4QO+p94JNAnjkR0E
+         b1H/jMWCJ3a9U9h5N1QcOZW0ql+7gRThJNziWBJh0SxVP286Zozqgibvk+Y/LgHdol/f
+         ml3FfOABAufXFG3Nvhu+xZsVVVvN8aUYHoNo71EwMUToEM+AqnUFbRDndz4Jdyg0woi1
+         CMkZ5318o77/p2XrwAsywIH1gL0zyuy1cPfXz+7DH9H/C2dIA29iTE2i/imO4ENf6Wez
+         O0arRLVLedm3fFaD2JixdaXADBKHPaG8GlHbUv088Pp4UoCrIrlUOcJDsBCuSo/KRVd5
+         keqw==
+X-Gm-Message-State: AOAM530GP+XQ4jFsu1CMHw0m8MKqCargIkVIwduC0kflNIlgKePF54QA
+        Y96okIuOimKS26E7l9fIrCSMHMyBnCzff+hxB8w=
+X-Google-Smtp-Source: ABdhPJzBZqu29Hir32ZBP27vFEQ1GHsben10Iwg6R5oYfeI62nkC52+PUt/O8vlNITlLNOx1iM1PM4SNZ19i13WVitE=
+X-Received: by 2002:a19:7416:: with SMTP id v22mr18655287lfe.595.1642477388023;
+ Mon, 17 Jan 2022 19:43:08 -0800 (PST)
 MIME-Version: 1.0
 References: <20220118021657.2145245-1-lsahlber@redhat.com>
 In-Reply-To: <20220118021657.2145245-1-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 17 Jan 2022 20:41:05 -0600
-Message-ID: <CAH2r5mvbgXVPC3r_fBzCpyb1FFTzy9fNtCZ-AJRcAeZ8bwv0sg@mail.gmail.com>
+Date:   Mon, 17 Jan 2022 21:42:57 -0600
+Message-ID: <CAH2r5mtDfpA8dsS3bE8-NsDmVc6_=vkx_wBKFva7hSpt4cCRAA@mail.gmail.com>
 Subject: Re: [PATCH] cifs: serialize all mount attempts
 To:     Ronnie Sahlberg <lsahlber@redhat.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>
@@ -57,8 +57,13 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Would this slow things down much at boot time when you do have e.g. 3
-mounts ... would end up serializing a bit more?
+What would happen if on boot you had 3 servers in fstab, the first two
+of which time out due to bad address (or in my case port 445 blocked
+for the internet but not for local servers in the house), does it slow
+down bootup? Does it slow down the mount to the 3rd server (which is
+reachable)?
+
+Would it slow things down too much in some cases?
 
 On Mon, Jan 17, 2022 at 8:17 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
