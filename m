@@ -2,120 +2,157 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B0FC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 03:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44950C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 06:40:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351606AbiARDy3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Jan 2022 22:54:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50552 "EHLO
+        id S240670AbiARGkP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Jan 2022 01:40:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348155AbiARDyT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 22:54:19 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79D2C037028
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 19:43:09 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id m1so65436263lfq.4
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 19:43:09 -0800 (PST)
+        with ESMTP id S230233AbiARGkP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jan 2022 01:40:15 -0500
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF157C061574
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 22:40:14 -0800 (PST)
+Received: by mail-vk1-xa2a.google.com with SMTP id w5so4424178vke.12
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 22:40:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qGsDmJkw8dPiztr6msGMN+vMl5AMfliEVmlxBJivCUw=;
-        b=lgiDrkMmYAGBC3QMiszQ+WGlLzWFBvpwPRMCBHjiXI68JOq3hX0/DXfnF+M/nOWcdG
-         5Wv9dW7iCLGNeIjDqDB8D+FJkmDtAijOJIWjHqDzLkUxRFR9d4YwhISBf92Qdeb7Ht3b
-         4f9X5kgxyfWHk+l0zEeIFzPSy02azYeNfXForld34vTv/E1GnY8NKPZ5jAdce5O/6DeP
-         A3rTa5J/M7rynOEWxwX11bxeQAAvqy9YvX/m1hOL90C8qZo79OIQGbSWzI7XojXwVhYL
-         hjUc15+NS9avR0RPxmZCKwWK0f2raMKP644elfQy/XinquhFHafH6iHUvGeMLhP0E3S1
-         le9g==
+         :cc:content-transfer-encoding;
+        bh=6Kox8iEi+x0Y+6Ez3+6/MBasLAtS7u3jE0QcMTeBWbs=;
+        b=qtWDrfAAFV0QBxvRB8YkNiufr0xi6XTAJNI7Aqv3IM+pqx6jXAdnlSht0Fo3C0EGXN
+         2vzZAUhpXDpCYZt1sUYrMsmtxfx03RQK9X5PkEHS+CY/0PUrCsKDP4NF+VoDU1ae/Aap
+         7HTI4msjStGPoPobT5ck7v6a/L7RDDSVLr1sitGL3M23zCODmWntaLp4xZ4FcJFPNVUC
+         3g912qlcPc29yNRxo3prd40sxwJ6Gv53+3cqPGJzA1mF4CGvml3OTu39vjaj2IMP5yJg
+         9sFMWkEFe/mcCUqen0XHKXAZYEB35fcMRZ45HxZSagYJlAqejONeSi8y9I5T3JMe5Zbx
+         jv6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qGsDmJkw8dPiztr6msGMN+vMl5AMfliEVmlxBJivCUw=;
-        b=qSqAMgFEf6MEIKA/SevjxGMyW0nu2ic3Ny0HT0Gw8Cecu6g6jH4QO+p94JNAnjkR0E
-         b1H/jMWCJ3a9U9h5N1QcOZW0ql+7gRThJNziWBJh0SxVP286Zozqgibvk+Y/LgHdol/f
-         ml3FfOABAufXFG3Nvhu+xZsVVVvN8aUYHoNo71EwMUToEM+AqnUFbRDndz4Jdyg0woi1
-         CMkZ5318o77/p2XrwAsywIH1gL0zyuy1cPfXz+7DH9H/C2dIA29iTE2i/imO4ENf6Wez
-         O0arRLVLedm3fFaD2JixdaXADBKHPaG8GlHbUv088Pp4UoCrIrlUOcJDsBCuSo/KRVd5
-         keqw==
-X-Gm-Message-State: AOAM530GP+XQ4jFsu1CMHw0m8MKqCargIkVIwduC0kflNIlgKePF54QA
-        Y96okIuOimKS26E7l9fIrCSMHMyBnCzff+hxB8w=
-X-Google-Smtp-Source: ABdhPJzBZqu29Hir32ZBP27vFEQ1GHsben10Iwg6R5oYfeI62nkC52+PUt/O8vlNITlLNOx1iM1PM4SNZ19i13WVitE=
-X-Received: by 2002:a19:7416:: with SMTP id v22mr18655287lfe.595.1642477388023;
- Mon, 17 Jan 2022 19:43:08 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=6Kox8iEi+x0Y+6Ez3+6/MBasLAtS7u3jE0QcMTeBWbs=;
+        b=yd4g1fsPstdGswRFWEbFix38q3WMSNCv93cJ32ehZw2++iS8Fb6V9lUKYTgHqwanZI
+         qDs1HG75+XX+FIU04IdwkqC2khV8MpwsZazzIBUYC7MVSTUPElAfqbn1dLsM3LbEESBf
+         7XiYBCNk8im0WjbWKJKlvXceU5S2/c8RIiNtYbIJEfZwhxWcRiPYZYfkRW4jVLjbuFz4
+         IMZBavIm8moNpolTMrJN2/F12J11qkSXhlDocH4mqRk+s6L89ylqqB4AtgDe/6Ea/Iu+
+         K0SIJjNBxmDG+mzG5fDrgf4vQMRzF/IfAw18zKkeF/1Cqkqi+9O7qD8/y/Uo0MuRCTuJ
+         ayDQ==
+X-Gm-Message-State: AOAM533DTEf1Krdb/Hd7sEXKH25+qhM6vY61JapFMIjALwGaXnwN5QlF
+        iTD4tcY3b2UD94Bgf67iiWMpUdO++ob0eLXikyU=
+X-Google-Smtp-Source: ABdhPJxJX28jWVwzBvluagMqiYMtslSSsT8A0DngX7A1NbK5NTbJuHfo8LNnSF9Uc2CfYIjignq5w7WOyZ0c7YPtcAo=
+X-Received: by 2002:a1f:a84c:: with SMTP id r73mr9191276vke.6.1642488013905;
+ Mon, 17 Jan 2022 22:40:13 -0800 (PST)
 MIME-Version: 1.0
-References: <20220118021657.2145245-1-lsahlber@redhat.com>
-In-Reply-To: <20220118021657.2145245-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 17 Jan 2022 21:42:57 -0600
-Message-ID: <CAH2r5mtDfpA8dsS3bE8-NsDmVc6_=vkx_wBKFva7hSpt4cCRAA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: serialize all mount attempts
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+References: <20220107054531.619487-1-hyc.lee@gmail.com> <20220107054531.619487-2-hyc.lee@gmail.com>
+ <CAKYAXd9qYgpf9oGhK5bdE2M6nbfpeTEAOg+zDGGXomOLaNmR9Q@mail.gmail.com>
+ <CAH2r5mtTs5bxF9+_M0-3a7YkZB4zqBCm4_kL_QpHAPhEVAG-WA@mail.gmail.com>
+ <CAKYAXd9ndasXA3q2F05f9JMXHPT6cQRf0M8owP-dwdv_LWggwQ@mail.gmail.com>
+ <CANFS6baREfEidN+FqZROiF+6QtOQ6FXae6f0L9EVKaUFK2L3hg@mail.gmail.com> <CAKYAXd8uQ4MG=y8_GqhAwPX0CVfk9EoEu=WZuO7+UCCYJ2RBDw@mail.gmail.com>
+In-Reply-To: <CAKYAXd8uQ4MG=y8_GqhAwPX0CVfk9EoEu=WZuO7+UCCYJ2RBDw@mail.gmail.com>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Tue, 18 Jan 2022 15:40:03 +0900
+Message-ID: <CANFS6bZMH00MzjFrBVNFrtDvwGRkXtiZM6TOCUDk+mGouRk4Dw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ksmbd: smbd: change the default maximum read/write,
+ receive size
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-What would happen if on boot you had 3 servers in fstab, the first two
-of which time out due to bad address (or in my case port 445 blocked
-for the internet but not for local servers in the house), does it slow
-down bootup? Does it slow down the mount to the 3rd server (which is
-reachable)?
-
-Would it slow things down too much in some cases?
-
-On Mon, Jan 17, 2022 at 8:17 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+2022=EB=85=84 1=EC=9B=94 18=EC=9D=BC (=ED=99=94) =EC=98=A4=EC=A0=84 8:33, N=
+amjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
 >
-> RHBZ: 2008434
->
-> Some servers, such as Windows2016 have a very low number of concurrent mounts that
-> they allow from each client.
-> This can be a problem if you have a more than a handful (==3 in this case)
-> of cifs entries in your fstab and cause a number of the mounts there to randomly fail.
->
-> Add a global mutex and use it to serialize all mount attempts.
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/fs_context.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index e3ed25dc6f3f..7ec35f3f0a5f 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -37,6 +37,8 @@
->  #include "rfc1002pdu.h"
->  #include "fs_context.h"
->
-> +static DEFINE_MUTEX(cifs_mount_mutex);
-> +
->  static const match_table_t cifs_smb_version_tokens = {
->         { Smb_1, SMB1_VERSION_STRING },
->         { Smb_20, SMB20_VERSION_STRING},
-> @@ -707,10 +709,14 @@ static int smb3_get_tree_common(struct fs_context *fc)
->  static int smb3_get_tree(struct fs_context *fc)
->  {
->         int err = smb3_fs_context_validate(fc);
-> +       int ret;
->
->         if (err)
->                 return err;
-> -       return smb3_get_tree_common(fc);
-> +       mutex_lock(&cifs_mount_mutex);
-> +       ret = smb3_get_tree_common(fc);
-> +       mutex_unlock(&cifs_mount_mutex);
-> +       return ret;
->  }
->
->  static void smb3_fs_context_free(struct fs_context *fc)
-> --
-> 2.30.2
+> 2022-01-10 10:37 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> > 2022=EB=85=84 1=EC=9B=94 9=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 9:56=
+, Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+> >>
+> >> 2022-01-09 15:44 GMT+09:00, Steve French <smfrench@gmail.com>:
+> >> > Do you have more detail on what the negotiated readsize/writesize
+> >> > would be for Windows clients with this size? for Linux clients?
+> >> Hyunchul, Please answer.
+> >>
+> >
+> > For a Linux client, if connected using smb-direct,
+> > the size will be 1048512. But connected with multichannel,
+> > the size will be 4MB instead of 1048512. And this causes
+> > problems because the read/write size is bigger than 1048512.
+> > It looks like a bug. I have to limit the ksmbd's SMB2 maximum
+> > read/write size for a test.
+> >
+> > For Windows clients, the actual read/write size is less than
+> > 1048512.
+> In the case of my Chelsio device, Need to set it to about
+> 512K(512*1024 - 64) for it to work.
+> The 1048512 value seems insufficient to cover all devices. Is there
+> any other way to set the minimum read/write value? Calibrate this
+> minimum value by looking at
+> the device information? For example variables in ib_dev->attrs.
 >
 
+Let me check it. But I think multiple buffer descriptors caused
+this problem. because of a client's device limitation, a client
+seems to send a read/write request with multiple buffer descriptors
+for sending 1048512 bytes.
 
--- 
+To check this assumption, can you tell me the buffer descriptors'
+content when the default read/write size is 1048512?
+
+> >
+> >> >
+> >> > It looked like it would still be 4MB at first glance (although in
+> >> > theory some Windows could do 8MB) ... I may have missed something
+> >> I understood that multiple-buffer descriptor support was required to
+> >> set a read/write size of 1MB or more. As I know, Hyunchul is currently
+> >> working on it.
+> >> It seems to be set to the smaller of max read/write size in smb-direct
+> >> negotiate and max read/write size in smb2 negotiate.
+> >>
+> >> Hyunchul, I have one question more, How did you get 1048512 setting va=
+lue
+> >> ?
+> >> >
+> >
+> > I remember when the size was 1MB, Windows clients requested read/write =
+with
+> > 1048512 and 64.
+> >
+> >> > On Sat, Jan 8, 2022 at 8:43 PM Namjae Jeon <linkinjeon@kernel.org>
+> >> > wrote:
+> >> >>
+> >> >> 2022-01-07 14:45 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> >> >> > Due to restriction that cannot handle multiple
+> >> >> > buffer descriptor structures, decrease the maximum
+> >> >> > read/write size for Windows clients.
+> >> >> >
+> >> >> > And set the maximum fragmented receive size
+> >> >> > in consideration of the receive queue size.
+> >> >> >
+> >> >> > Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+> >> >> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+> >> >
+> >> >
+> >> >
+> >> > --
+> >> > Thanks,
+> >> >
+> >> > Steve
+> >> >
+> >
+> >
+> >
+> > --
+> > Thanks,
+> > Hyunchul
+> >
+
+
+
+--=20
 Thanks,
-
-Steve
+Hyunchul
