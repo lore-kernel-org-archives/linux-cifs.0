@@ -2,147 +2,68 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E00EC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jan 2022 09:48:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F06CBC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jan 2022 10:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353327AbiASJsh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 19 Jan 2022 04:48:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37052 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353343AbiASJsc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Jan 2022 04:48:32 -0500
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A9DC06161C
-        for <linux-cifs@vger.kernel.org>; Wed, 19 Jan 2022 01:48:32 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 30so8579158edv.3
-        for <linux-cifs@vger.kernel.org>; Wed, 19 Jan 2022 01:48:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IVCPFov7KvarrvK7GFlUMAPRVZfDajPFlPM1dU7MIbM=;
-        b=T46TRr4C71zCuHrX0pAzK8hrmH0PLpxp7l0am/j7i1AoFrGbw0KnF3lYzsyOZjTCGT
-         /iiNB5eVYd4YPXT513WmWZrTkxRyNhgIEWsy9hbSodigoEXF/zN1wgAlwNo0PN7cbk7D
-         Wv/I1Foj8if6+7QcNU6ddcqNnk4NjjR0FSKFOtEZ8CT2TnGePioGdV13AFfCMlD2zMdb
-         cFkLvY+bpTqz5NCshNqgNuB+/V4b2MSZr01fhBts/Rbt5eMre4MbfmHWSeD213IPkOgI
-         dNt6Sxn4ivRfORmBmZldKukyZy6Wy/oIxVbwzH9ZI4uNuGXQPofJgDf5eL5nyCSEPu4k
-         U+Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IVCPFov7KvarrvK7GFlUMAPRVZfDajPFlPM1dU7MIbM=;
-        b=P0GwwLKz9BZ8qjYnQqCSCNt/p6mJxsO/ldUI8f33PEap4Aj1bTw0e11xJFwjjo3YnD
-         SAcsiA8YPNeFZ8ec9HhYN4IuEe/z8u2l2eILPa9P/Rhmdw/7vjX2/+p/yAKhnJa7kPg/
-         +O3O5HsrwqRVFtf4GJVTnrJZLQthQkx+O3Ge0INbNjwK4pcOr0o1TSIkzWJdR61A5EP8
-         NXCb8E1wt5qkuwQFc53r9m8H12eXXVjNEGsh7BmbA3KDNBuQI7h224pNKydak4rFo0mc
-         0f0k5Ztdqj/kCm8SApipvWDF2L6Rdvp4QIv2k4bD7TIocTHjzuR020yX7PIqvxcavAfw
-         WCCg==
-X-Gm-Message-State: AOAM531V1Qpx2FK62pS9QnEeBh+juNLXZG5hdfTv0Kq1qPAB5SQLq+4y
-        1TNIgWZjJmuiDKcUj8l6yrvU7H+Q7AtaguyUa/M=
-X-Google-Smtp-Source: ABdhPJzCDkCHHJSmgYyHBHjwzUvV/ayqcmc3H9a+8x0Q6kqS0IZ74NO6IWvs4Mk6BFUmhKSgNR1NHbOiR/b/TmRb8a4=
-X-Received: by 2002:a17:907:20ad:: with SMTP id pw13mr2683714ejb.73.1642585710586;
- Wed, 19 Jan 2022 01:48:30 -0800 (PST)
-MIME-Version: 1.0
-References: <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk>
- <164251411336.3435901.17077059669994001060.stgit@warthog.procyon.org.uk>
- <CAH2r5muTanw9pJqzAHd01d9A8keeChkzGsCEH6=0rHutVLAF-A@mail.gmail.com> <3762846.1642581170@warthog.procyon.org.uk>
-In-Reply-To: <3762846.1642581170@warthog.procyon.org.uk>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 19 Jan 2022 15:18:19 +0530
-Message-ID: <CANT5p=pM_frmMwyLcXeCHsSDObz=nKXs_juy3vaKYh=rkNFFRw@mail.gmail.com>
-Subject: Re: [PATCH 11/11] cifs: Support fscache indexing rewrite
-To:     David Howells <dhowells@redhat.com>
-Cc:     Steve French <smfrench@gmail.com>,
+        id S1348607AbiASKiz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 19 Jan 2022 05:38:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41068 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240089AbiASKiz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 19 Jan 2022 05:38:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642588734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JITo1IbmRg4QBCngpVVwY2JnCsrfMgBtUBMFC81XcNg=;
+        b=FDtffsLiqktvyagIvzliKYGsgdrmlkbFD+5PXwupQlPpEjaqes6Qqkw1AwRHU81ADe7dch
+        xV6tUKJNWnGjxVpr2HULa6i7u7AWDDM4RTF57sP7oiS39LfKStkPpqX6TrhnysovK8W22Q
+        a388ZLIjIBQ3jfwUAgxEnCRCM4Vn2Q0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-553-BlECXh52MdWAOkgLNTaodQ-1; Wed, 19 Jan 2022 05:38:53 -0500
+X-MC-Unique: BlECXh52MdWAOkgLNTaodQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3990D46860;
+        Wed, 19 Jan 2022 10:38:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 138E76128B;
+        Wed, 19 Jan 2022 10:38:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CANT5p=pM_frmMwyLcXeCHsSDObz=nKXs_juy3vaKYh=rkNFFRw@mail.gmail.com>
+References: <CANT5p=pM_frmMwyLcXeCHsSDObz=nKXs_juy3vaKYh=rkNFFRw@mail.gmail.com> <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk> <164251411336.3435901.17077059669994001060.stgit@warthog.procyon.org.uk> <CAH2r5muTanw9pJqzAHd01d9A8keeChkzGsCEH6=0rHutVLAF-A@mail.gmail.com> <3762846.1642581170@warthog.procyon.org.uk>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>,
         Jeff Layton <jlayton@redhat.com>,
         rohiths msft <rohiths.msft@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 11/11] cifs: Support fscache indexing rewrite
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3924745.1642588730.1@warthog.procyon.org.uk>
+Date:   Wed, 19 Jan 2022 10:38:50 +0000
+Message-ID: <3924746.1642588730@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 2:02 PM David Howells <dhowells@redhat.com> wrote:
->
-> Steve French <smfrench@gmail.com> wrote:
->
-> > WARNING: Missing a blank line after declarations
-> > #460: FILE: fs/cifs/file.c:658:
-> > + struct cifs_fscache_inode_coherency_data cd;
-> > + cifs_fscache_fill_coherency(file_inode(file), &cd);
->
-> I have a small patch to abstract cache invalidation for cifs into a helper
-> function (see attached) that I'll merge in that will also take care of this.
->
-> David
-> ---
-> commit ff463eee039fbe119ae0d4185cb8a90aec10ec80
-> Author: David Howells <dhowells@redhat.com>
-> Date:   Fri Jan 7 18:08:37 2022 +0000
->
->     cifs: Abstract cache invalidation into a helper function
->
->     Abstract fscache invalidation for a cifs inode out into a helper function
->     as there will be more than one caller of it.
->
->     Signed-off-by: David Howells <dhowells@redhat.com>
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 27604eb01a94..015fd415e5ee 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -653,13 +653,9 @@ int cifs_open(struct inode *inode, struct file *file)
->                            file->f_mode & FMODE_WRITE);
->         if (file->f_flags & O_DIRECT &&
->             (!((file->f_flags & O_ACCMODE) != O_RDONLY) ||
-> -            file->f_flags & O_APPEND)) {
-> -               struct cifs_fscache_inode_coherency_data cd;
-> -               cifs_fscache_fill_coherency(file_inode(file), &cd);
-> -               fscache_invalidate(cifs_inode_cookie(file_inode(file)),
-> -                                  &cd, i_size_read(file_inode(file)),
-> -                                  FSCACHE_INVAL_DIO_WRITE);
-> -       }
-> +            file->f_flags & O_APPEND))
-> +               cifs_invalidate_cache(file_inode(file),
-> +                                     FSCACHE_INVAL_DIO_WRITE);
->
->  out:
->         free_dentry_path(page);
-> diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-> index e444445d0906..b741d38df6c8 100644
-> --- a/fs/cifs/fscache.h
-> +++ b/fs/cifs/fscache.h
-> @@ -71,6 +71,15 @@ static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode)
->         return netfs_i_cookie(inode);
->  }
->
-> +static inline void cifs_invalidate_cache(struct inode *inode, unsigned int flags)
-> +{
-> +       struct cifs_fscache_inode_coherency_data cd;
-> +
-> +       cifs_fscache_fill_coherency(inode, &cd);
-> +       fscache_invalidate(cifs_inode_cookie(inode), &cd,
-> +                          i_size_read(inode), flags);
-> +}
-> +
->  static inline int cifs_readpage_from_fscache(struct inode *inode,
->                                              struct page *page)
->  {
-> @@ -112,6 +121,7 @@ static inline void cifs_fscache_get_inode_cookie(struct inode *inode) {}
->  static inline void cifs_fscache_release_inode_cookie(struct inode *inode) {}
->  static inline void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update) {}
->  static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode) { return NULL; }
-> +static inline void cifs_invalidate_cache(struct inode *inode, unsigned int flags) {}
->
->  static inline int
->  cifs_readpage_from_fscache(struct inode *inode, struct page *page)
->
-Hi David,
+Shyam Prasad N <nspmangalore@gmail.com> wrote:
 
-Can you let us know the branch name that you're working on in your tree?
-I do not see this last patch in fscache-rewrite branch. Is there
-another branch we should be looking at?
+> Can you let us know the branch name that you're working on in your tree?
+> I do not see this last patch in fscache-rewrite branch. Is there
+> another branch we should be looking at?
 
--- 
-Regards,
-Shyam
+I hadn't got round to pushing it yet.  I've done that now.
+
+David
+
