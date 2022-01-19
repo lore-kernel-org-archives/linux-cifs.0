@@ -2,146 +2,145 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F47C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jan 2022 08:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D49DC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jan 2022 09:18:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352509AbiASIdB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 19 Jan 2022 03:33:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:24035 "EHLO
+        id S1352970AbiASJSY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 19 Jan 2022 04:18:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39122 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1352506AbiASIdA (ORCPT
+        by vger.kernel.org with ESMTP id S1352966AbiASJSY (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 19 Jan 2022 03:33:00 -0500
+        Wed, 19 Jan 2022 04:18:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642581179;
+        s=mimecast20190719; t=1642583903;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ue/zR5ctL9xqmZaX8RC/BhnarR76dUxiZFjQFbBnl8A=;
-        b=DNy5X2mEeWkMqCG0iCmu+0SspvD/XzrPFNLkmyiNwbaOkAa5NibkDCPo8nrz1b1IbwUXu1
-        p+Z/lS1ES4elKh46a13xvdoejqJFerq9yyBFvVHLvQm2PZbDbX2pKq21ADUDAIlSAGfRwT
-        3Fepp1OJjj2e67czroiojmW/I7aFK2U=
+        bh=qsHFjR3VZGRzuJsXGrmQKYKJ/CFlVyV1IKZ/8UEEbWk=;
+        b=hZx9c6vsj4M4OonxWbm7CmdS40XFOkgCe1NXyf4qqlUE4hMR5w5gbhZsBTfFwORPNPjB1S
+        IRt8bm1waqCNvz2l2/6Ut+UWk+4WGSJrNdFHGAMFN+aiyng7tQqy8zbQFlPlGKZBH1iM6l
+        JXclfyN5w+kkmy6hnIxhNj4Zp4hTGao=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-479-BMxSBeW-O2WF1IKJi5zyiw-1; Wed, 19 Jan 2022 03:32:56 -0500
-X-MC-Unique: BMxSBeW-O2WF1IKJi5zyiw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-315-GmWhYa85PziqVu9-iauLvg-1; Wed, 19 Jan 2022 04:18:20 -0500
+X-MC-Unique: GmWhYa85PziqVu9-iauLvg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A0821966320;
-        Wed, 19 Jan 2022 08:32:55 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B820814249;
+        Wed, 19 Jan 2022 09:18:18 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A12CB60C28;
-        Wed, 19 Jan 2022 08:32:51 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 163D27B9D6;
+        Wed, 19 Jan 2022 09:18:05 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAH2r5muTanw9pJqzAHd01d9A8keeChkzGsCEH6=0rHutVLAF-A@mail.gmail.com>
-References: <CAH2r5muTanw9pJqzAHd01d9A8keeChkzGsCEH6=0rHutVLAF-A@mail.gmail.com> <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk> <164251411336.3435901.17077059669994001060.stgit@warthog.procyon.org.uk>
-To:     Steve French <smfrench@gmail.com>
-Cc:     dhowells@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>
-Subject: Re: [PATCH 11/11] cifs: Support fscache indexing rewrite
+In-Reply-To: <YeefizLOGt1Qf35o@infradead.org>
+References: <YeefizLOGt1Qf35o@infradead.org> <YebpktrcUZOlBHkZ@infradead.org> <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk> <164251409447.3435901.10092442643336534999.stgit@warthog.procyon.org.uk> <3613681.1642527614@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
+        Jeff Layton <jlayton@kernel.org>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <smfrench@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 09/11] vfs, fscache: Add an IS_KERNEL_FILE() macro for the S_KERNEL_FILE flag
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3762845.1642581170.1@warthog.procyon.org.uk>
+Content-ID: <3765723.1642583885.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 19 Jan 2022 08:32:50 +0000
-Message-ID: <3762846.1642581170@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Date:   Wed, 19 Jan 2022 09:18:05 +0000
+Message-ID: <3765724.1642583885@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve French <smfrench@gmail.com> wrote:
+Christoph Hellwig <hch@infradead.org> wrote:
 
-> WARNING: Missing a blank line after declarations
-> #460: FILE: fs/cifs/file.c:658:
-> + struct cifs_fscache_inode_coherency_data cd;
-> + cifs_fscache_fill_coherency(file_inode(file), &cd);
+> On Tue, Jan 18, 2022 at 05:40:14PM +0000, David Howells wrote:
+> > Christoph Hellwig <hch@infradead.org> wrote:
+> > =
 
-I have a small patch to abstract cache invalidation for cifs into a helper
-function (see attached) that I'll merge in that will also take care of thi=
-s.
+> > > On Tue, Jan 18, 2022 at 01:54:54PM +0000, David Howells wrote:
+> > > > Add an IS_KERNEL_FILE() macro to test the S_KERNEL_FILE inode flag=
+ as is
+> > > > common practice for the other inode flags[1].
+> > > =
+
+> > > Please fix the flag to have a sensible name first, as the naming of =
+the
+> > > flag and this new helper is utterly wrong as we already discussed.
+> > =
+
+> > And I suggested a new name, which you didn't comment on.
+> =
+
+> Again, look at the semantics of the flag:  The only thing it does in the
+> VFS is to prevent a rmdir.  So you might want to name it after that.
+> =
+
+> Or in fact drop the flag entirely.  We don't have that kind of
+> protection for other in-kernel file use or important userspace daemons
+> either.  I can't see why cachefiles is the magic snowflake here that
+> suddenly needs semantics no one else has.
+
+The flag cannot just be dropped - it's an important part of the interactio=
+n
+with cachefilesd with regard to culling.  Culling to free up space is
+offloaded to userspace rather than being done within the kernel.
+
+Previously, cachefiles, the kernel module, had to maintain a huge tree of
+records of every backing inode that it was currently using so that it coul=
+d
+forbid cachefilesd to cull one when cachefilesd asked.  I've reduced that =
+to a
+single bit flag on the inode struct, thereby saving both memory and time. =
+ You
+can argue whether it's worth sacrificing an inode flag bit for that, but t=
+he
+flag can be reused for any other kernel service that wants to similarly ma=
+rk
+an inode in use.
+
+Further, it's used as a mark to prevent cachefiles accidentally using an i=
+node
+twice - say someone misconfigures a second cache overlapping the first - a=
+nd,
+again, this works if some other kernel driver wants to mark inode it is us=
+ing
+in use.  Cachefiles will refuse to use them if it ever sees them, so no
+problem there.
+
+And it's not true that we don't have that kind of protection for other
+in-kernel file use.  See S_SWAPFILE.  I did consider using that, but that =
+has
+other side effects.  I mentioned that perhaps I should make swapon set
+S_KERNEL_FILE also.  Also blockdevs have some exclusion also, I think.
+
+The rmdir thing should really apply to rename and unlink also.  That's to
+prevent someone, cachefilesd included, causing cachefiles to malfunction b=
+y
+removing the directories it created.  Possibly this should be a separate b=
+it
+to S_KERNEL_FILE, maybe S_NO_DELETE.
+
+So I could change S_KERNEL_FILE to S_KERNEL_LOCK, say, or maybe S_EXCLUSIV=
+E.
 
 David
----
-commit ff463eee039fbe119ae0d4185cb8a90aec10ec80
-Author: David Howells <dhowells@redhat.com>
-Date:   Fri Jan 7 18:08:37 2022 +0000
-
-    cifs: Abstract cache invalidation into a helper function
-    =
-
-    Abstract fscache invalidation for a cifs inode out into a helper funct=
-ion
-    as there will be more than one caller of it.
-    =
-
-    Signed-off-by: David Howells <dhowells@redhat.com>
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 27604eb01a94..015fd415e5ee 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -653,13 +653,9 @@ int cifs_open(struct inode *inode, struct file *file)
- 			   file->f_mode & FMODE_WRITE);
- 	if (file->f_flags & O_DIRECT &&
- 	    (!((file->f_flags & O_ACCMODE) !=3D O_RDONLY) ||
--	     file->f_flags & O_APPEND)) {
--		struct cifs_fscache_inode_coherency_data cd;
--		cifs_fscache_fill_coherency(file_inode(file), &cd);
--		fscache_invalidate(cifs_inode_cookie(file_inode(file)),
--				   &cd, i_size_read(file_inode(file)),
--				   FSCACHE_INVAL_DIO_WRITE);
--	}
-+	     file->f_flags & O_APPEND))
-+		cifs_invalidate_cache(file_inode(file),
-+				      FSCACHE_INVAL_DIO_WRITE);
- =
-
- out:
- 	free_dentry_path(page);
-diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-index e444445d0906..b741d38df6c8 100644
---- a/fs/cifs/fscache.h
-+++ b/fs/cifs/fscache.h
-@@ -71,6 +71,15 @@ static inline struct fscache_cookie *cifs_inode_cookie(=
-struct inode *inode)
- 	return netfs_i_cookie(inode);
- }
- =
-
-+static inline void cifs_invalidate_cache(struct inode *inode, unsigned in=
-t flags)
-+{
-+	struct cifs_fscache_inode_coherency_data cd;
-+
-+	cifs_fscache_fill_coherency(inode, &cd);
-+	fscache_invalidate(cifs_inode_cookie(inode), &cd,
-+			   i_size_read(inode), flags);
-+}
-+
- static inline int cifs_readpage_from_fscache(struct inode *inode,
- 					     struct page *page)
- {
-@@ -112,6 +121,7 @@ static inline void cifs_fscache_get_inode_cookie(struc=
-t inode *inode) {}
- static inline void cifs_fscache_release_inode_cookie(struct inode *inode)=
- {}
- static inline void cifs_fscache_unuse_inode_cookie(struct inode *inode, b=
-ool update) {}
- static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inod=
-e) { return NULL; }
-+static inline void cifs_invalidate_cache(struct inode *inode, unsigned in=
-t flags) {}
- =
-
- static inline int
- cifs_readpage_from_fscache(struct inode *inode, struct page *page)
 
