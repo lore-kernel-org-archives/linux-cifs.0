@@ -2,111 +2,80 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFBF7C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jan 2022 22:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F9DC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jan 2022 05:20:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237704AbiARWpQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jan 2022 17:45:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58456 "EHLO
+        id S243827AbiASFU3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 19 Jan 2022 00:20:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350030AbiARWpO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jan 2022 17:45:14 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85EABC061574
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Jan 2022 14:45:14 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id p5so1380601ybd.13
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Jan 2022 14:45:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3zVzd8hYKT3zsWzOt6lF6gWakNp/Fk139BBliRPW3Kw=;
-        b=dqjE55k+zE/bKty/XlwHbc859LBeNKFcShQy2gKWecSD/mJiOhhmnRC05/WqtyiBQ/
-         aGfTZvBOpuMBBXA+I3LKVUIP3gdNXYoXpvLdmgVbYYWHMoKvrjNQ72OK8XQivMNRUtst
-         bB12Gz4kXyn1lN07dXd+DBS/rN+GA8cfFjehJcblwKqvLEd+/KehVqjqY6z3WPes7vmi
-         IWh3Q5T5coBCqBte8v5Dgo7GYZ3Y/u7cHPvvQ944Ezqd7m/Kwkc9GPloHgTjzBagVky5
-         KW/CWOnSU6tnnDW2EYKPeg30H8kbpPKaoRAm6wLS/gIZ77WHjl/h1UlR5/HQz7U2ICAx
-         BpUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3zVzd8hYKT3zsWzOt6lF6gWakNp/Fk139BBliRPW3Kw=;
-        b=Sghf/iLvqfXXX9Fh6jJmyCrNTebE9OINb37d0DFGNnqGbVdA85wJUTaDAzkcXpcvjF
-         +oXjzUtELgGmxkR5PUuEq7ztUWeanRurjOZXj0Qp4dDc01jNQSM5QmcGJNwLuGXzfaHy
-         4RvWAd9hA3SkKdM7UtoqwjtDXm3g966b6c2AQzIBHQ+0W3S3ODkqnkKgl+ejOcHaS3Aa
-         2OOoPcAQZ2hYVxNgwg4zhFnSqG/E5SVwsT5QO/Hk3UHN4gEmLHfn8lvEzZdPy/q3GAO4
-         PkX+amZePOIKJtfv++WCH58AtCINLTKFn7bF6KJgBa/8AmkLlPwut6DerrkeFgz42u04
-         IFKg==
-X-Gm-Message-State: AOAM533vV8D0jmlSg7JW44PDYWyjSVWCNqNYsVuKgnKmYexrMMOyLw3e
-        ZVLiP+qvfwRaQrGBhyuS4HwtXBM9aFVE/mWWNIg=
-X-Google-Smtp-Source: ABdhPJweMgO2xTgCPT+YiGAWMyne3hp/hAARqLDLslSk/68CSSVvqduh7ws90XpLiT3sZt6IP3eWDn62ekIKLvx8jjo=
-X-Received: by 2002:a25:1e0b:: with SMTP id e11mr36255586ybe.272.1642545913530;
- Tue, 18 Jan 2022 14:45:13 -0800 (PST)
+        with ESMTP id S231567AbiASFU2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Jan 2022 00:20:28 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25D0C061574;
+        Tue, 18 Jan 2022 21:20:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zCnUn09sb6ERyGqIvgioo3seFmwAbbVIJnBrFXm1CgA=; b=2IiHzr3sF6AOeiLyrYxB3stg6B
+        In72SYB4+LQGzhMbHoql1xCZ3FVDIuJnKKf2vow9nyfeDi7RuGy9/Qlno8PlYmL9Ug3tC9RB/E8Js
+        MW22sT6fJYOti8nlF//wxgcYQmr8yUxIdbAVb++QfZ9fi2BeEIvGq9P/v/eUZgTqO3/HwBjWQ9WCG
+        B99ElFBr2hiiTS9KQriCGobMvbk5ORDrXoWfhAC0AypL72vq6MIc/I70ZBTuX5L53jI6tdazyHAbN
+        qCCIw0znLs/dl1/oCtbeHkjgltfsFJKoCyax0bk6b5j2QduT2Tln9uSU1wDSAWBODpQ2Am6X2vX1h
+        4SK/v2Cw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nA3OF-003qhc-Es; Wed, 19 Jan 2022 05:20:11 +0000
+Date:   Tue, 18 Jan 2022 21:20:11 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-cachefs@redhat.com,
+        Jeff Layton <jlayton@kernel.org>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <smfrench@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 09/11] vfs, fscache: Add an IS_KERNEL_FILE() macro for
+ the S_KERNEL_FILE flag
+Message-ID: <YeefizLOGt1Qf35o@infradead.org>
+References: <YebpktrcUZOlBHkZ@infradead.org>
+ <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk>
+ <164251409447.3435901.10092442643336534999.stgit@warthog.procyon.org.uk>
+ <3613681.1642527614@warthog.procyon.org.uk>
 MIME-Version: 1.0
-References: <CAH2r5msv5w5oWVomujjwoC=PiNBu3b7kbQO6uJXVKbAwxGKuJw@mail.gmail.com>
-In-Reply-To: <CAH2r5msv5w5oWVomujjwoC=PiNBu3b7kbQO6uJXVKbAwxGKuJw@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Wed, 19 Jan 2022 08:45:01 +1000
-Message-ID: <CAN05THSRBhqs=YMGGhp1BSB-Qhm=7bQc83UcBDhrr6Qo36sZQQ@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] add new defines from protocol specification
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3613681.1642527614@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-reviewed by me
+On Tue, Jan 18, 2022 at 05:40:14PM +0000, David Howells wrote:
+> Christoph Hellwig <hch@infradead.org> wrote:
+> 
+> > On Tue, Jan 18, 2022 at 01:54:54PM +0000, David Howells wrote:
+> > > Add an IS_KERNEL_FILE() macro to test the S_KERNEL_FILE inode flag as is
+> > > common practice for the other inode flags[1].
+> > 
+> > Please fix the flag to have a sensible name first, as the naming of the
+> > flag and this new helper is utterly wrong as we already discussed.
+> 
+> And I suggested a new name, which you didn't comment on.
 
-On Wed, Jan 19, 2022 at 8:41 AM Steve French via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> Trivial update to list of valid smb3 fsctls
->
-> In the October updates to MS-SMB2 two additional FSCTLs
-> were described.  Add the missing defines for these,
-> as well as fix a typo in an earlier define.
->
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
->  fs/smbfs_common/smb2pdu.h  | 2 +-
->  fs/smbfs_common/smbfsctl.h | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/smbfs_common/smb2pdu.h b/fs/smbfs_common/smb2pdu.h
-> index 7ccadcbe684b..38b8fc514860 100644
-> --- a/fs/smbfs_common/smb2pdu.h
-> +++ b/fs/smbfs_common/smb2pdu.h
-> @@ -449,7 +449,7 @@ struct smb2_netname_neg_context {
->   */
->
->  /* Flags */
-> -#define SMB2_ACCEPT_TRANSFORM_LEVEL_SECURITY 0x00000001
-> +#define SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY 0x00000001
->
->  struct smb2_transport_capabilities_context {
->   __le16 ContextType; /* 6 */
-> diff --git a/fs/smbfs_common/smbfsctl.h b/fs/smbfs_common/smbfsctl.h
-> index 926f87cd6af0..d51939c43ad7 100644
-> --- a/fs/smbfs_common/smbfsctl.h
-> +++ b/fs/smbfs_common/smbfsctl.h
-> @@ -95,8 +95,10 @@
->  #define FSCTL_SET_SHORT_NAME_BEHAVIOR 0x000901B4 /* BB add struct */
->  #define FSCTL_GET_INTEGRITY_INFORMATION 0x0009027C
->  #define FSCTL_GET_REFS_VOLUME_DATA   0x000902D8 /* See MS-FSCC 2.3.24 */
-> +#define FSCTL_SET_INTEGRITY_INFORMATION_EXT 0x00090380
->  #define FSCTL_GET_RETRIEVAL_POINTERS_AND_REFCOUNT 0x000903d3
->  #define FSCTL_GET_RETRIEVAL_POINTER_COUNT 0x0009042b
-> +#define FSCTL_REFS_STREAM_SNAPSHOT_MANAGEMENT 0x00090440
->  #define FSCTL_QUERY_ALLOCATED_RANGES 0x000940CF
->  #define FSCTL_SET_DEFECT_MANAGEMENT  0x00098134 /* BB add struct */
->  #define FSCTL_FILE_LEVEL_TRIM        0x00098208 /* BB add struct */
-> --
->
-> --
-> Thanks,
->
-> Steve
->
+Again, look at the semantics of the flag:  The only thing it does in the
+VFS is to prevent a rmdir.  So you might want to name it after that.
+
+Or in fact drop the flag entirely.  We don't have that kind of
+protection for other in-kernel file use or important userspace daemons
+either.  I can't see why cachefiles is the magic snowflake here that
+suddenly needs semantics no one else has.
