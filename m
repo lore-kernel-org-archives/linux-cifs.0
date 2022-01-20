@@ -2,97 +2,147 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A0DBC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jan 2022 22:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41949C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jan 2022 02:56:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357567AbiASWnd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 19 Jan 2022 17:43:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344033AbiASWnb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Jan 2022 17:43:31 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F177C061574;
-        Wed, 19 Jan 2022 14:43:31 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S229620AbiATC4e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 19 Jan 2022 21:56:34 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:43502 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230235AbiATC4e (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Jan 2022 21:56:34 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JfLJw5xvFz4y3q;
-        Thu, 20 Jan 2022 09:43:28 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1642632209;
-        bh=w4RJa7LhdlEwidZ+0nB3oeRlJt8ZXOwyiD8Czy99fzU=;
-        h=Date:From:To:Cc:Subject:From;
-        b=TA9kdtZ8Cax6NiKl4d2zCMZr/te6y4kixuSSJMFG7wFNCUjzHRsE6QATh2aSMV75t
-         ypR7Ndm073YXOfkqH0AfXLZ7z8tiIC6ZY1ZkZ8/7GuBkVGzMjKfLtCsldU5qokgb2L
-         n+w4bXCBu7slmY5/4BwBOLNfpV61YrrKug3/tqePZjj8338iXiUPwFmXoqUsa2qQqC
-         q/EMSMoV4pG57vcTVljnwzrPrqUbr7IGiR2yLNwdijtFErn2B6b7cz6M8+VHfwZegq
-         UJand6kq6LJULCgZLe6xQcsLXuHlQIJN9y6HZinSOzBmkHqILViUHdMZijTys90cOZ
-         WfCGRaxjY0BVA==
-Date:   Thu, 20 Jan 2022 09:43:28 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Steve French <stfrench@microsoft.com>
-Subject: linux-next: manual merge of the cifs tree with the fscache tree
-Message-ID: <20220120094328.1e7015cb@canb.auug.org.au>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9B8F361604
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Jan 2022 02:56:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F41FCC340E3
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Jan 2022 02:56:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642647393;
+        bh=0MkilCkGjYn9WbQsWPwx/vQVVhiKz7a19dTRBjSNzTc=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=TItwrGfZeohChDWGaZyQP0SEgAEe95EQ5aa01SwAIcHBSHuoZQ2C/CtAGZ2MUfbLK
+         b5O0C9YAJx0aFAprVq6M67uJlGmtdqv0X/tSiEpLrXUrtz2J31xIKu5xUtay1Cj5EJ
+         T8x8Cntvcn7yVrvPtXnwhRiggdUNL9wBdDpNj+SPy3i8TizwSvcD6UolXrBAolp3aO
+         /r5w8ZsCysusm0lU57UxIK8S4HDvq9QEvn51I4WKlj8Bj84PKHgQQ7ZR6ts3FJtvye
+         7cPEn5NsgSPxZKRp1FJxF7GW6mq2ScslPb4MR9PSCgHyFZ8CA5WLRAB4RmdUIqCpVi
+         wpyB5Ab2SokNw==
+Received: by mail-yb1-f172.google.com with SMTP id m6so13583654ybc.9
+        for <linux-cifs@vger.kernel.org>; Wed, 19 Jan 2022 18:56:32 -0800 (PST)
+X-Gm-Message-State: AOAM5320mHq9KXfnUUpdLv1W9NwtBY4YtUjN7P3udDQvcapJtNzytsMu
+        IIsHax4S6L0QJ98R6d0CPXe9md1h3Xmn3iu0qbo=
+X-Google-Smtp-Source: ABdhPJzi37kDSMyL8QKHWG4mW4GcxCDyumS/kui4aDObhdPubPPeu3q419Xw29/apkkbQoVrryifBgoKjYDvg+jHuwU=
+X-Received: by 2002:a25:cb10:: with SMTP id b16mr13802895ybg.106.1642647392047;
+ Wed, 19 Jan 2022 18:56:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/bOe_3LTxZ/S.vWHPjj+71Yj";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Received: by 2002:a05:7110:5011:b0:123:6c39:8652 with HTTP; Wed, 19 Jan 2022
+ 18:56:31 -0800 (PST)
+In-Reply-To: <20220119150115.177058-1-hyc.lee@gmail.com>
+References: <20220119150115.177058-1-hyc.lee@gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 20 Jan 2022 11:56:31 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-sxcM+tOMKHhq=K4XNPHMvDjqtcA5dN-rZUe7hy_XY0g@mail.gmail.com>
+Message-ID: <CAKYAXd-sxcM+tOMKHhq=K4XNPHMvDjqtcA5dN-rZUe7hy_XY0g@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: smbd: validate buffer descriptor structures
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-cifs@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/bOe_3LTxZ/S.vWHPjj+71Yj
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+2022-01-20 0:01 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> Check ChannelInfoOffset and ChannelInfoLength
+> to validate buffer descriptor structures.
+> And add a debug log to print the structures'
+> content.
+>
+> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+> ---
+>  fs/ksmbd/smb2pdu.c | 31 +++++++++++++++++++++++++------
+>  1 file changed, 25 insertions(+), 6 deletions(-)
+>
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index c3f248d461e6..f664fbadb09a 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -6130,12 +6130,20 @@ static int smb2_set_remote_key_for_rdma(struct
+> ksmbd_work *work,
+>  					__le16 ChannelInfoOffset,
+>  					__le16 ChannelInfoLength)
+>  {
+> +	unsigned int i, ch_count;
+> +
+>  	if (work->conn->dialect == SMB30_PROT_ID &&
+>  	    Channel != SMB2_CHANNEL_RDMA_V1)
+>  		return -EINVAL;
+>
+> -	if (ChannelInfoOffset == 0 ||
+> -	    le16_to_cpu(ChannelInfoLength) < sizeof(*desc))
+> +	ch_count = le16_to_cpu(ChannelInfoLength) / sizeof(*desc);
+> +	for (i = 0; i < ch_count; i++) {
+unneeded loop is executed on non-debug mode. I think that this loop is
+covered with rdma debug.
+Please check this :
+ if (ksmbd_debug_types & KSMBD_DEBUG_RDMA) { }
 
-Hi all,
+> +		ksmbd_debug(RDMA, "RDMA r/w request %#x: token %#x, length %#x\n",
+> +			    i,
+> +			    le32_to_cpu(desc[i].token),
+> +			    le32_to_cpu(desc[i].length));
+> +	}
+> +	if (ch_count != 1)
+Need to add error print that ksmbd doesn't support multiple buffer desc yet.
+>  		return -EINVAL;
 
-Today's linux-next merge of the cifs tree got conflicts in:
-
-  fs/cifs/file.c
-  fs/cifs/fscache.h
-
-between commit:
-
-  a91e6e1c8074 ("cifs: Support fscache indexing rewrite")
-
-from the fscache tree and commit:
-
-  70431bfd825d ("cifs: Support fscache indexing rewrite")
-
-from the cifs tree.
-
-I fixed it up (I just used the latter version) and can carry the fix as
-necessary. This is now fixed as far as linux-next is concerned, but any
-non trivial conflicts should be mentioned to your upstream maintainer
-when your tree is submitted for merging.  You may also want to consider
-cooperating with the maintainer of the conflicting tree to minimise any
-particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/bOe_3LTxZ/S.vWHPjj+71Yj
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHolBAACgkQAVBC80lX
-0GwSuAf/dlThWpO7LU9wRWkFgFqPTONn2TeyQPiPn1nrP97g/M+82fxLpZRw2ez7
-oLh1iIqRV5xDdVlL9EIVZ5XWA1qc1WCZ3KYeBXHGv9tX8JYG6GlvhfrOHJoc3zbj
-7leI+pF1nIEg4gh+TXotCD8y09Vs0j8k/hVCXYAQrB8J4xhUFKd1NDKIY3ajdhax
-EGXjoGq/aj6OmD28LDkZ1HPPUIskkTL7tVa0gMExeX5PxhF+A5sU8/rrTtZBIce+
-PugOhy65ywGia7/FRErmu+rd4VPhNhxFTrdkNQLDzRuvapCUQNWGxUl2obJJsetU
-eXYJSKs2/AUKf/V8wIFmeAu02M4TgQ==
-=i3M4
------END PGP SIGNATURE-----
-
---Sig_/bOe_3LTxZ/S.vWHPjj+71Yj--
+And multiple buffer desc support is required for a fundamental
+solution, but it is expected that it will take a very long time for
+you to implement it. Is that right? If so, first, find a way to set
+the optimal read/write size so that the client send a single buffer
+desc to ksmbd.
+>
+>  	work->need_invalidate_rkey =
+> @@ -6189,9 +6197,15 @@ int smb2_read(struct ksmbd_work *work)
+>
+>  	if (req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE ||
+>  	    req->Channel == SMB2_CHANNEL_RDMA_V1) {
+> +		unsigned int ch_offset = le16_to_cpu(req->ReadChannelInfoOffset);
+> +
+> +		if (ch_offset < offsetof(struct smb2_read_req, Buffer)) {
+> +			err = -EINVAL;
+> +			goto out;
+> +		}
+>  		err = smb2_set_remote_key_for_rdma(work,
+>  						   (struct smb2_buffer_desc_v1 *)
+> -						   &req->Buffer[0],
+> +						   ((char *)req + ch_offset),
+>  						   req->Channel,
+>  						   req->ReadChannelInfoOffset,
+>  						   req->ReadChannelInfoLength);
+> @@ -6432,11 +6446,16 @@ int smb2_write(struct ksmbd_work *work)
+>
+>  	if (req->Channel == SMB2_CHANNEL_RDMA_V1 ||
+>  	    req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
+> -		if (req->Length != 0 || req->DataOffset != 0)
+> -			return -EINVAL;
+> +		unsigned int ch_offset = le16_to_cpu(req->WriteChannelInfoOffset);
+> +
+> +		if (req->Length != 0 || req->DataOffset != 0 ||
+> +		    ch_offset < offsetof(struct smb2_write_req, Buffer)) {
+> +			err = -EINVAL;
+> +			goto out;
+> +		}
+>  		err = smb2_set_remote_key_for_rdma(work,
+>  						   (struct smb2_buffer_desc_v1 *)
+> -						   &req->Buffer[0],
+> +						   ((char *)req + ch_offset),
+>  						   req->Channel,
+>  						   req->WriteChannelInfoOffset,
+>  						   req->WriteChannelInfoLength);
+> --
+> 2.25.1
+>
+>
