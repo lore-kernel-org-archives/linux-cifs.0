@@ -2,151 +2,118 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E17EDC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jan 2022 12:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E234C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jan 2022 19:18:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232227AbiATMKU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 20 Jan 2022 07:10:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56482 "EHLO
+        id S235820AbiATTSe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 20 Jan 2022 14:18:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232127AbiATMKT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Jan 2022 07:10:19 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AAAC061574
-        for <linux-cifs@vger.kernel.org>; Thu, 20 Jan 2022 04:10:18 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id d10-20020a17090a498a00b001b33bc40d01so4328523pjh.1
-        for <linux-cifs@vger.kernel.org>; Thu, 20 Jan 2022 04:10:18 -0800 (PST)
+        with ESMTP id S231733AbiATTSe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Jan 2022 14:18:34 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA9BAC061574
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Jan 2022 11:18:33 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id x7so25407664lfu.8
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Jan 2022 11:18:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3bwLvQpBC3Gj8vEqJSlEfgT0a+lniW2+2CulhEgl7WA=;
-        b=XdVz6pG6o44upNVLz5yttmpkkZ17F1RmBdERY5QrT2YrbpaNnfOkXg+4bxMYFiUgnF
-         ACcvyUXcsLFOPFGkDy8LtOBaW6iIITEEMt8BzIP8Tgozj0ddBn7cOKtdFP3ruL6c/ayt
-         EG4b9oOj1n5aVjVpWFAww2d4e9Yj5M98VMSm9z2O0CTwEs4eImCoWDk0gjrNnei3sNn6
-         aiK/U+I4c3JiYHQTUBQpltFBZ9vfB9hDuH97cMihEIBWvcNgB/U4Sh0xWjkVPOloeDqu
-         gIBkuCTiumWNonMwNcuhc0WDYYXyCdx4ySWnWzKMqBbqGmLrz3swT447MTNFdO0N2MxB
-         Vivg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=aQwRQjE2Eoz59MxMVZ8JQyIp3GYdDA+jCE0Nw+uhzZU=;
+        b=biJT/ZUA2Jt9Uk+s0hgAABhdebjjzM1L2VpTnHNlyqIsVUOxFE2UecVDnBhg0OgX6L
+         sKqPedknuYzKksGN7FEu284o+ZUYKsTPDhf30mu2hGa6tVeqG0tuUlBWgfbo+o9ITBzP
+         eZTsDBUTTelNJWyFITK7Kh46L3KCtpg5f2o2F4UwSwqoqkcUhVfohGET6FsUd5K4OdXX
+         i0w7C1yn7J61uw43iok1ZcJ01oylRVtTDhY7uCc/fAbsQkD2ZwQOFSqmNXaUUZrgfn14
+         r8tx84lUAVt217gXLuXJZVH4rs0+xNVJcVOZ9xHexvExUAJF1BbMu3Ia2igACyGRpdLz
+         MC8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3bwLvQpBC3Gj8vEqJSlEfgT0a+lniW2+2CulhEgl7WA=;
-        b=Qfdi3gZY/kp9RWtk5XC18s8mwq+sgQfmuPBidqajGYczcRzmbGLjMWyOBMUIviQqbW
-         M0b4DIITJxdxZXkODTHuqLyUspX8dcvrhj3iEt1SbPYtxTX+i/FV0GOk+MrhFUXXjz0J
-         PdVeOTo8afnmFONa/W2UV39aLdkmGZB1sGaZO64Q6uIki/G2WwnUuFvUKTM5s2AGXGUm
-         cuGz539JEgg2Heh2jkXGCC5KA01V7lRlZKLRiR5ayFsDtciIIyiFDnjbKJuyg5pPkmcP
-         p0oMUq/NenZyE5zQkrj8zGLFoUscr05SAXCCqyufRRi1K9Tk1800q0hxzUOkrP901RGK
-         MK9Q==
-X-Gm-Message-State: AOAM530fX2+HGXqJHYSTwX84Tm8+TRLHTkuzUkdKvqMZjKMZ7DMk2bVm
-        SMZuUPKLTV4gBxH4XSRYGkvD3q4+k+U=
-X-Google-Smtp-Source: ABdhPJzFhfTlJJdDgkoBa9r3PK1855GoOHjAVYH67yrBkF+WnUp3jNQweFJBcvB8sVL4gOKBhf0W3Q==
-X-Received: by 2002:a17:902:bcc1:b0:149:a13f:af62 with SMTP id o1-20020a170902bcc100b00149a13faf62mr37625746pls.147.1642680618182;
-        Thu, 20 Jan 2022 04:10:18 -0800 (PST)
-Received: from localhost.localdomain ([125.177.232.58])
-        by smtp.googlemail.com with ESMTPSA id o11sm2459032pgj.33.2022.01.20.04.10.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jan 2022 04:10:17 -0800 (PST)
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>
-Subject: [PATCH v2] ksmbd: smbd: validate buffer descriptor structures
-Date:   Thu, 20 Jan 2022 21:10:11 +0900
-Message-Id: <20220120121011.213873-1-hyc.lee@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=aQwRQjE2Eoz59MxMVZ8JQyIp3GYdDA+jCE0Nw+uhzZU=;
+        b=rN6L1tovvT42z5xYHsdG5T6k4OTqAjmcfphkq1xAI2yViGjFaErWlfi4NR6roqGScJ
+         zAQeupgv4kV/T5EDPV3gGdEIFCM1/P2HLVyeal/Y/0AMTEBUBEu0f/R+X6yKhBpiPV2o
+         bGeY+72dwYAzEaIWLR3S7TjcO9s2hCkscK9zg5RLO312jKZkEar9vCpRd9uU/GzMalhc
+         LjxwBxjaiPGI0Nj6w9HGKRWK1dXv5GXLoQ1CBfOifxGSIp6LdQYeMiOYuI05uIKWQNPK
+         ASipVt6xNPOSHup7/jCT4NmgjjSmqEESpCLqNXs4GbbQrG9r7nhLW0L2O+jDARWm7hbh
+         uoYw==
+X-Gm-Message-State: AOAM532qdZZXlOAdV/w7R4A8ZauaJ6FTk1qfqc6o/GfDx9bUTVxEEJv5
+        TtbLH2CmoO77EYoY3HTEM4PxZSEK30iuSJG41lA=
+X-Google-Smtp-Source: ABdhPJxQvy2AvHQ8yKzrluqhZFka7TLQs3x1g+rF3/3sUZMMNEvuGaNzvFByXan+ugU/6pbScFIdyvNPI3pfvYDYJps=
+X-Received: by 2002:a2e:8658:: with SMTP id i24mr356923ljj.209.1642706311826;
+ Thu, 20 Jan 2022 11:18:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <YeHUxJ9zTVNrKveF@himera.home> <20220117211305.ambdxok747u6kwlm@cyberdelia>
+ <Yeb32NlvfHzi7TxD@debian-BULLSEYE-live-builder-AMD64>
+In-Reply-To: <Yeb32NlvfHzi7TxD@debian-BULLSEYE-live-builder-AMD64>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 20 Jan 2022 13:18:20 -0600
+Message-ID: <CAH2r5msL=w_GhGF6suzGrz4LG6vQUfw4F=Ft1ZVjZzKLTq4PGQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] cifs: quirk for STATUS_OBJECT_NAME_INVALID
+ returned for non-ASCII dfs refs
+To:     Eugene Korenevsky <ekorenevsky@astralinux.ru>
+Cc:     Enzo Matsumiya <ematsumiya@suse.de>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Check ChannelInfoOffset and ChannelInfoLength
-to validate buffer descriptor structures.
-And add a debug log to print the structures'
-content.
+we can do a followon to this if you find any problems with it later in the =
+week.
 
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
----
-changes from v1:
- - avoid a loop for printing debug logs.
- - print a debug log if the number of buffer descriptors is not 1.
+On Thu, Jan 20, 2022 at 1:16 PM Eugene Korenevsky
+<ekorenevsky@astralinux.ru> wrote:
+>
+> On Mon, Jan 17, 2022 at 06:14:05PM -0300, Enzo Matsumiya wrote:
+>
+> > The patch fixes the initial issue (mount and listing files) as per
+> > reported in the mentioned bugzilla, but it still fails to create files:
+> >
+> > % echo "test" | sudo tee myfile
+> > tee: myfile: No such file or directory
+> > test
+>
+>
+> Sorry, cannot reproduce.
+>
+> ```
+> # mount
+> ...
+> //192.168.57.14/=D0=B4=D1=84=D1=81 on /tmp/x type cifs (rw,relatime,vers=
+=3Ddefault,cache=3Dstrict,username=3Duser,domain=3DWIN-TCIN4O86A6M,uid=3D0,=
+noforceuid,gid=3D0,noforcegid,addr=3D192.168.57.14,file_mode=3D0755,dir_mod=
+e=3D0755,soft,nounix,mapposix,rsize=3D4194304,wsize=3D4194304,bsize=3D10485=
+76,echo_interval=3D60,actimeo=3D1)
+> //WIN-TCIN4O86A6M/=D0=B4=D1=84=D1=81/temp on /tmp/x/temp type cifs (rw,re=
+latime,vers=3D3.1.1,cache=3Dstrict,username=3Duser,domain=3DWIN-TCIN4O86A6M=
+,uid=3D0,noforceuid,gid=3D0,noforcegid,addr=3D192.168.57.4,file_mode=3D0755=
+,dir_mode=3D0755,soft,nounix,mapposix,rsize=3D4194304,wsize=3D4194304,bsize=
+=3D1048576,echo_interval=3D60,actimeo=3D1)
+> # pwd
+> /tmp/x/temp
+> # echo test | tee myfile
+> test
+> # rm myfile
+> # echo test | tee myfile
+> test
+> # cat myfile
+> test
+> # rm myfile && echo ok
+> ok
+> ```
+>
+> Could you provide your 'mount' output as well?
+>
+>
+> --
+> Eugene
 
- fs/ksmbd/smb2pdu.c | 36 ++++++++++++++++++++++++++++++------
- 1 file changed, 30 insertions(+), 6 deletions(-)
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index c3f248d461e6..de8e651248bd 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -6130,13 +6130,26 @@ static int smb2_set_remote_key_for_rdma(struct ksmbd_work *work,
- 					__le16 ChannelInfoOffset,
- 					__le16 ChannelInfoLength)
- {
-+	unsigned int i, ch_count;
-+
- 	if (work->conn->dialect == SMB30_PROT_ID &&
- 	    Channel != SMB2_CHANNEL_RDMA_V1)
- 		return -EINVAL;
- 
--	if (ChannelInfoOffset == 0 ||
--	    le16_to_cpu(ChannelInfoLength) < sizeof(*desc))
-+	ch_count = le16_to_cpu(ChannelInfoLength) / sizeof(*desc);
-+	if (ksmbd_debug_types & KSMBD_DEBUG_RDMA) {
-+		for (i = 0; i < ch_count; i++) {
-+			pr_info("RDMA r/w request %#x: token %#x, length %#x\n",
-+				i,
-+				le32_to_cpu(desc[i].token),
-+				le32_to_cpu(desc[i].length));
-+		}
-+	}
-+	if (ch_count != 1) {
-+		ksmbd_debug(RDMA, "RDMA multiple buffer descriptors %d are not supported yet\n",
-+			    ch_count);
- 		return -EINVAL;
-+	}
- 
- 	work->need_invalidate_rkey =
- 		(Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
-@@ -6189,9 +6202,15 @@ int smb2_read(struct ksmbd_work *work)
- 
- 	if (req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE ||
- 	    req->Channel == SMB2_CHANNEL_RDMA_V1) {
-+		unsigned int ch_offset = le16_to_cpu(req->ReadChannelInfoOffset);
-+
-+		if (ch_offset < offsetof(struct smb2_read_req, Buffer)) {
-+			err = -EINVAL;
-+			goto out;
-+		}
- 		err = smb2_set_remote_key_for_rdma(work,
- 						   (struct smb2_buffer_desc_v1 *)
--						   &req->Buffer[0],
-+						   ((char *)req + ch_offset),
- 						   req->Channel,
- 						   req->ReadChannelInfoOffset,
- 						   req->ReadChannelInfoLength);
-@@ -6432,11 +6451,16 @@ int smb2_write(struct ksmbd_work *work)
- 
- 	if (req->Channel == SMB2_CHANNEL_RDMA_V1 ||
- 	    req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
--		if (req->Length != 0 || req->DataOffset != 0)
--			return -EINVAL;
-+		unsigned int ch_offset = le16_to_cpu(req->WriteChannelInfoOffset);
-+
-+		if (req->Length != 0 || req->DataOffset != 0 ||
-+		    ch_offset < offsetof(struct smb2_write_req, Buffer)) {
-+			err = -EINVAL;
-+			goto out;
-+		}
- 		err = smb2_set_remote_key_for_rdma(work,
- 						   (struct smb2_buffer_desc_v1 *)
--						   &req->Buffer[0],
-+						   ((char *)req + ch_offset),
- 						   req->Channel,
- 						   req->WriteChannelInfoOffset,
- 						   req->WriteChannelInfoLength);
--- 
-2.25.1
 
+--=20
+Thanks,
+
+Steve
