@@ -2,80 +2,79 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BBAC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jan 2022 09:37:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A299C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jan 2022 09:38:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359383AbiATJh4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 20 Jan 2022 04:37:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:24171 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1359276AbiATJhx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 20 Jan 2022 04:37:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642671472;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vwaun9h4PrGOctit7O7Y3jbampOsovEgn1eDqCi+RHc=;
-        b=D0U09Nf/GtBHbwgWYAkbcpTpOzE1szrzeEnWCey6vQN0v1N5YqzI5VibQrJnGvGcjLWtOI
-        AamITjP70kmVdoSsnMBklAcLnxs4Dnrdd3qfoZJ7nfzZrn0IBt7oTYIUUAA325b7UI62KA
-        6AlzR6ZQsfAK8xJIVtGefLZ0bxIpFQw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-45-TlUAgrb-MjSgqaMVPtjPzw-1; Thu, 20 Jan 2022 04:37:49 -0500
-X-MC-Unique: TlUAgrb-MjSgqaMVPtjPzw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A09901091DA5;
-        Thu, 20 Jan 2022 09:37:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B386D131CC;
-        Thu, 20 Jan 2022 09:37:21 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <YekmpeQvNlGlMvNY@infradead.org>
-References: <YekmpeQvNlGlMvNY@infradead.org> <YeefizLOGt1Qf35o@infradead.org> <YebpktrcUZOlBHkZ@infradead.org> <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk> <164251409447.3435901.10092442643336534999.stgit@warthog.procyon.org.uk> <3613681.1642527614@warthog.procyon.org.uk> <3765724.1642583885@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
-        Jeff Layton <jlayton@kernel.org>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <smfrench@gmail.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        JeffleXu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 09/11] vfs, fscache: Add an IS_KERNEL_FILE() macro for the S_KERNEL_FILE flag
+        id S233571AbiATJit (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 20 Jan 2022 04:38:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49680 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239800AbiATJij (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Jan 2022 04:38:39 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06EABC061574
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Jan 2022 01:38:39 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id b14so19384030lff.3
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Jan 2022 01:38:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1oi7dnPWui9j/+jfFhXtfalwSWwfnL2+HSbsutApadI=;
+        b=HbAegqtQNWgcz+td/MyfrH87a4+U1kdadgAIfqZCkN7kZtr3xtkmVZSYev132PB2lv
+         F9JhmYXbOmyUu7udCIPtbc5qDt0YmIGJ5Cn1DDC0vbxx7iY08T7k10d5XHoLECUX6ks0
+         aOWDJleGZpgOCpRwm0o6S06MFIN2RTkCA3a53/apLXn/E+E2+3gwHIHvFOPxGPbvxJQk
+         QiPnr23wbJaeJ/EXU+3ddS9AtRRW+7uiEoe3jK1muw9XwZS0M/OGu7AmSLbiyG2NtqI8
+         0s4H3JlqFBQn+4ogg1UulxbfkYr19nC2bEZ8Cj4EkLrAHZDBDUoyFtLFTY2gq88EuXrn
+         aDEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1oi7dnPWui9j/+jfFhXtfalwSWwfnL2+HSbsutApadI=;
+        b=bjdw+sbaCAEPK7SGonqlJoEaATvpOz5tWT564f65dhfbWbymBP9Ysy8SEijxON5Ky0
+         i/4cWRUIzSC+9SYq9/JdXaYOC8CHZVXQlpnDvO54DdUPEoMJDpI98nmnzC6NXi2si6jj
+         pIkb5Gb2DhlsOW1ekzgdzL+Ud6VoZOtvP3Ajt37KTyks/BpZsDYpetTWK8dlPmEiz3aA
+         lRdaCS1UF+mrAgcKZZGxAvCmJB+RpCY1smAD7J9ScqsyxMhajuYzvxXMRbEDvNGKWzqQ
+         PBxiBbzR7ZN2poQxjiSzhY5UD9JPksGw10swGSB67WUtEMlzWfqoF6vb50kuI3enNsSI
+         iyzw==
+X-Gm-Message-State: AOAM530FVLyLKXnZgbrFkvk2VDM1HaiKkx3J7msgHPK6mWlWO55+qMVZ
+        1UEP3nqw6lQtiR5h04S0gAh/DEir9bsD9ZfctJQ=
+X-Google-Smtp-Source: ABdhPJx7RWuSkQer3fXEzuGR7eKZ4fTbCvkKkHKj7dgXsUzRdZzFGzoNlBwQ82vu1b3h2KoZzah9CU5BeU1TcozOg14=
+X-Received: by 2002:a05:6512:11d0:: with SMTP id h16mr30704159lfr.307.1642671517214;
+ Thu, 20 Jan 2022 01:38:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <58089.1642671440.1@warthog.procyon.org.uk>
-Date:   Thu, 20 Jan 2022 09:37:20 +0000
-Message-ID: <58090.1642671440@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+References: <20220118074512.2153136-1-lsahlber@redhat.com>
+In-Reply-To: <20220118074512.2153136-1-lsahlber@redhat.com>
+From:   =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aurelien.aptel@gmail.com>
+Date:   Thu, 20 Jan 2022 10:38:26 +0100
+Message-ID: <CA+5B0FPc3O7shzFgnVoWc9X2QktW0X2K-znU04L6P7Hpby8L5Q@mail.gmail.com>
+Subject: Re: [PATCH] cifs: serialize all mount attempts
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+On Wed, Jan 19, 2022 at 9:49 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>
+> RHBZ: 2008434
+>
+> If we try to perform multiple concurrent mounts ot the same server we might
+> end up in a situation where:
+> Thread #1                          Thread #2
+>     creates TCP connection
+>     Issues NegotiateProtocol
+>     ...                            Pick the TCP connection for Thread #1
+>                                    Issue a new NegotiateProtocol
 
-> But you tricked Linus
+checking server->tcpStatus state should prevent this situation no?
 
-Tricked?  I put a notice explicitly pointing out that I was adding it and
-indicating that it might be controversial in the cover note and the pull
-request and further explained the use in the patches that handle it.  I posted
-the patches adding/using it a bunch of times to various mailing lists.  TYVM.
-
-David
-
+> which then leads to the the server kills off the session.
+> There are also other a similar race where several threads ending up
+> withe their own unique tcp connection that all go to the same server structure ....
+>
+> The most straightforward way to fix these races with concurrent mounts are to serialize
+> them. I.e. only allow one mount to be in progress at a time.
