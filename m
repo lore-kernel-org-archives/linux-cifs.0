@@ -2,126 +2,62 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 957DCC433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 21 Jan 2022 17:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F9DC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 21 Jan 2022 21:29:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382023AbiAURxm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 21 Jan 2022 12:53:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34980 "EHLO
+        id S229660AbiAUV3O (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 21 Jan 2022 16:29:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350142AbiAURxM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Jan 2022 12:53:12 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE59CC06173B;
-        Fri, 21 Jan 2022 09:53:11 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4BA3261B0D;
-        Fri, 21 Jan 2022 17:53:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F25C340E1;
-        Fri, 21 Jan 2022 17:53:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642787590;
-        bh=ThQXA6SoRQU7Z3j3cfZ8hZaWXTx2O3dQBqVmVVdKdRg=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=Z+uy9Nno6dBEZtnV5CHOdZas1aZMJ4hu9LnjqQjvnKAlaNXGPRY5wjkuKNH84yUfR
-         LA6c/o2PmF1zZtyArrLUx2sAPUKDiuqggo7P1s5B3gtrZ8HAFIrlqoKIhtjKvPT0zr
-         WDJTqrg8144wD16x9bPXIbWNxPO2ajo9hxmQnvQVgpopFUzI63HqEnkruxwGG5Nd/6
-         Ul3wLwr6jSBpxfaT5fgO3GP5I3x+UxV7PAsjAs5xOX1hRBEF7f3jMRSvWEu8VpNOgI
-         xvLjpqyi9VR+Je3dQAxxU57a+G0JMlFCA+Ipa2DQ9DnrdYrg5cHS1lXu5dm6m7SFel
-         3WV98pUOeYZOw==
-Message-ID: <952f31150513af64ca5ccbb440d1e0ca88a37900.camel@kernel.org>
-Subject: Re: [PATCH 05/11] cachefiles: Trace active-mark failure
-From:   Jeff Layton <jlayton@kernel.org>
-To:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com
-Cc:     Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <smfrench@gmail.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        JeffleXu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 21 Jan 2022 12:53:08 -0500
-In-Reply-To: <164251404666.3435901.17331742792401482190.stgit@warthog.procyon.org.uk>
-References: <164251396932.3435901.344517748027321142.stgit@warthog.procyon.org.uk>
-         <164251404666.3435901.17331742792401482190.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
+        with ESMTP id S229459AbiAUV3N (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Jan 2022 16:29:13 -0500
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46473C06173B
+        for <linux-cifs@vger.kernel.org>; Fri, 21 Jan 2022 13:29:13 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id z26so2011711lji.6
+        for <linux-cifs@vger.kernel.org>; Fri, 21 Jan 2022 13:29:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=UXGv2x5YtAHM4AgvmGakTL+11bRnhwTubJMyxdTzw1E=;
+        b=mwxYU13F+0sILvkCkM2Cn30yyX5ecy1cATl5jWGY4HrD+5F1d6sjON/ygEyO85hpOW
+         5Xpx0J607YEcyo2pMCGlNwAoE5HMZQs3kbaQAh2bnmJhA5B3ZifDtIh6QJ701N7hnP7D
+         dY3RJFOl4otnKwJ0HuA6ZMCF4Yh3UlCMJXTcG51w9RmcbsNr/zgvJ8qmxfF7g2XKNsTI
+         eVxH52UhLDUqEHug3S9NiCWAN6WhLKkECzBGma0K7DCyeR311T6hhKIPVtKFyadDrgUj
+         2UHOjAO7LHH9k98Iirhf1Fha78kApltm1ZLhRrBRaqJUNFyKus/djOKYU+aeQDq3w7xk
+         7Uww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=UXGv2x5YtAHM4AgvmGakTL+11bRnhwTubJMyxdTzw1E=;
+        b=8RTcRHMb+tHoGHctJOKIcEve3j/v4pSCiYXDgBmESUOUbSnzXDmeHqbO/aTAuQqLKe
+         B/x+AkPSLYhliFRrBXmN75nGM2Q6phRxh3kSweyVHwDIq+oFt4JcrxMnLnWE5gEvkpVP
+         nBrelhI1/1yP/qht8nif7YiTAfJga7GQZpM7BpShH8B2kQDemJkm96s5Y7sOgsytsGrn
+         iT2U25kF3snGUzziBd3W4WU8y75UwwqOEUmFgLRJeNlZFz6SI+XIfzef3UarS9rUEkMH
+         EH8Xh1Fln5uwfp2wp47UJlsoern6cXfU1ocn4aagjd6UfoLlslMzu9KBC5G9CwDBHPJx
+         2+6Q==
+X-Gm-Message-State: AOAM532lcPabbeK/QM6cAtTv9k+4T58j+1DyJ3XYHZttnoXO9VioGvjz
+        lQ8xBaMCXzV3jQA344aMze351HTjor4mAjlJdSOu7tkHceo=
+X-Google-Smtp-Source: ABdhPJy1YYOkYzAqIyE27qA5BgPRkiVE89Xz/fM1SEHBiM/ejOkrqybfNk24n0Nb74mbMeo1pyeknzmrAVB+F1grefE=
+X-Received: by 2002:a05:651c:198a:: with SMTP id bx10mr4521182ljb.500.1642800551262;
+ Fri, 21 Jan 2022 13:29:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 21 Jan 2022 15:29:00 -0600
+Message-ID: <CAH2r5msBe2RPy1vmg9pyqiAe2AH7J1XKfSeXkWZDiSGJG-aDFg@mail.gmail.com>
+Subject: ksmbd kernel docs
+To:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 2022-01-18 at 13:54 +0000, David Howells wrote:
-> Add a tracepoint to log failure to apply an active mark to a file in
-> addition to tracing successfully setting and unsetting the mark.
-> 
-> Also include the backing file inode number in the message logged to dmesg.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: linux-cachefs@redhat.com
-> ---
-> 
->  fs/cachefiles/namei.c             |    4 +++-
->  include/trace/events/cachefiles.h |   21 +++++++++++++++++++++
->  2 files changed, 24 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-> index 52c9f0864a87..f256c8aff7bb 100644
-> --- a/fs/cachefiles/namei.c
-> +++ b/fs/cachefiles/namei.c
-> @@ -25,7 +25,9 @@ static bool __cachefiles_mark_inode_in_use(struct cachefiles_object *object,
->  		trace_cachefiles_mark_active(object, inode);
->  		can_use = true;
->  	} else {
-> -		pr_notice("cachefiles: Inode already in use: %pd\n", dentry);
-> +		trace_cachefiles_mark_failed(object, inode);
-> +		pr_notice("cachefiles: Inode already in use: %pd (B=%lx)\n",
-> +			  dentry, inode->i_ino);
->  	}
->  
->  	return can_use;
-> diff --git a/include/trace/events/cachefiles.h b/include/trace/events/cachefiles.h
-> index 093c4acb7a3a..c6f5aa74db89 100644
-> --- a/include/trace/events/cachefiles.h
-> +++ b/include/trace/events/cachefiles.h
-> @@ -573,6 +573,27 @@ TRACE_EVENT(cachefiles_mark_active,
->  		      __entry->obj, __entry->inode)
->  	    );
->  
-> +TRACE_EVENT(cachefiles_mark_failed,
-> +	    TP_PROTO(struct cachefiles_object *obj,
-> +		     struct inode *inode),
-> +
-> +	    TP_ARGS(obj, inode),
-> +
-> +	    /* Note that obj may be NULL */
-> +	    TP_STRUCT__entry(
-> +		    __field(unsigned int,		obj		)
-> +		    __field(ino_t,			inode		)
-> +			     ),
-> +
-> +	    TP_fast_assign(
-> +		    __entry->obj	= obj ? obj->debug_id : 0;
-> +		    __entry->inode	= inode->i_ino;
-> +			   ),
-> +
-> +	    TP_printk("o=%08x B=%lx",
-> +		      __entry->obj, __entry->inode)
-> +	    );
-> +
->  TRACE_EVENT(cachefiles_mark_inactive,
->  	    TP_PROTO(struct cachefiles_object *obj,
->  		     struct inode *inode),
-> 
-> 
+Looks like various updates needed (added ksmbd server features now
+supported) to the kernel doc:
+https://www.kernel.org/doc/html/latest//filesystems/cifs/ksmbd.html
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+-- 
+Thanks,
+
+Steve
