@@ -2,158 +2,74 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0A5C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 21 Jan 2022 21:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D56C5C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 21 Jan 2022 23:53:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232443AbiAUV5s (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 21 Jan 2022 16:57:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54343 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232432AbiAUV5r (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 21 Jan 2022 16:57:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642802267;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=LbdPydri53Ys0YI/ksP8tcx8qE6UcE8forSIwOZlU4M=;
-        b=U9n2EofyAOsAjly7aYJnBzkl3S39PLGgGi6Pa4k4zISVYFwjCUNL1cgzOckrPXM8cuXO3k
-        vWkfwjfODh/J7NP1fh8aRBHpJDpEMlXTH0MvkFlIKAR77WiCcBtaF4sPYuPrpTTRyQjVma
-        6Iv0mw96RHUgP9cgI5cRqT+RX4zqnpk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-496-Va8Qp28gP3G0ynu2Pd9lOg-1; Fri, 21 Jan 2022 16:57:43 -0500
-X-MC-Unique: Va8Qp28gP3G0ynu2Pd9lOg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 739B419251A0;
-        Fri, 21 Jan 2022 21:57:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.5])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A28712E1C;
-        Fri, 21 Jan 2022 21:57:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        Steve French <smfrench@gmail.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>, dhowells@redhat.com,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>, linux-cachefs@redhat.com,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [GIT PULL] fscache: Fixes and minor updates for rewrite
+        id S229852AbiAUXx4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 21 Jan 2022 18:53:56 -0500
+Received: from mail-pf1-f179.google.com ([209.85.210.179]:41818 "EHLO
+        mail-pf1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229827AbiAUXxz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Jan 2022 18:53:55 -0500
+Received: by mail-pf1-f179.google.com with SMTP id x37so6281452pfh.8;
+        Fri, 21 Jan 2022 15:53:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q/aXQZ68RTanxH11FEnoBmUV0EdbBxwAc8bXGd6VfMY=;
+        b=iCbXevdcNCVRL1uDFHSt/z690JA5h85F5nRDUzgUvqiGMLWjh79h85SkJknD7y+XIK
+         d3OrisQurdHdE8lpMAqNPzRVU6TbDXdfSY9x0mlX4m8bT4YF1UrALPGdcNl8C+f+JB55
+         13TkOk3BUzlcyDkqJJ78bEoSh7qGWZ9JLoWvPTUTivIv3+6sKGlmEObqvrjOB9WL/B43
+         89FfzCHlC62fD8TyDGaXM/RzicK2JOVenZ3xox8xCyYxgs/BlJLKTNCoxh2jhWqCUuJ4
+         q74ADG9dFyJM/XG2vQyunDYc+Sdo2pOBz3KF/AKW+d8CXKHj10w2wwYI7zMZXs/1FL21
+         P7gw==
+X-Gm-Message-State: AOAM531Vzu8qQOl/Tw3jJXWBWMvKJfhUxJWBoQRRkB0/rIggSPeDslhY
+        2k0YymcriLbJO8V6bBm9l9A=
+X-Google-Smtp-Source: ABdhPJyX4EVNerqXGcdrAms7gZqrIXGQpY73l3zyZebDzZmrut1PBF735MHyiYcItMXumCtOhIAs2g==
+X-Received: by 2002:a63:fd53:: with SMTP id m19mr4341759pgj.563.1642809235362;
+        Fri, 21 Jan 2022 15:53:55 -0800 (PST)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id nn14sm6076356pjb.26.2022.01.21.15.53.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jan 2022 15:53:55 -0800 (PST)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     gregkh@linuxfoundation.org
+Cc:     stable@vger.kernel.org, smfrench@gmail.com,
+        linux-cifs@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH 5.15.y 0/4] ksmbd stable patches for 5.15.y
+Date:   Sat, 22 Jan 2022 08:53:36 +0900
+Message-Id: <20220121235340.10269-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1339461.1642802244.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 21 Jan 2022 21:57:24 +0000
-Message-ID: <1339462.1642802244@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Linus,
+These patches include 2 patches to run the recently updated
+ksmbd.mountd(3.4.4) and 2 other patches to fix issues to avoid out of
+memory issues caused by many outstanding smb2 locks. These are
+important patches applied to linux-5.17-rc1, but they cannot be applied
+to the stable kernel, so they are sent as separately backported patches.
 
-Could you pull this set of fixes and minor updates for the fscache
-rewrite[1] please?
+Namjae Jeon (4):
+  ksmbd: add support for smb2 max credit parameter
+  ksmbd: move credit charge deduction under processing request
+  ksmbd: limits exceeding the maximum allowable outstanding requests
+  ksmbd: add reserved room in ipc request/response
 
- (1) Fix mishandling of volume collisions (the wait condition is inverted
-     and so it was only waiting if the volume collision was already
-     resolved).
+ fs/ksmbd/connection.c    |  1 +
+ fs/ksmbd/connection.h    |  4 ++--
+ fs/ksmbd/ksmbd_netlink.h | 12 +++++++++++-
+ fs/ksmbd/smb2misc.c      | 18 ++++++++++++------
+ fs/ksmbd/smb2ops.c       | 16 ++++++++++++----
+ fs/ksmbd/smb2pdu.c       | 25 +++++++++++++++----------
+ fs/ksmbd/smb2pdu.h       |  1 +
+ fs/ksmbd/smb_common.h    |  1 +
+ fs/ksmbd/transport_ipc.c |  2 ++
+ 9 files changed, 57 insertions(+), 23 deletions(-)
 
- (2) Fix miscalculation of whether there's space available in cachefiles.
-
- (3) Make sure a default cache name is set on a cache if the user hasn't
-     set one by the time they bind the cache.
-
- (4) Adjust the way the backing inode is presented in tracepoints, add a
-     tracepoint for mkdir and trace directory lookup.
-
- (5) Add a tracepoint for failure to set the active file mark.
-
- (6) Add an explanation of the checks made on the backing filesystem.
-
- (7) Check that the backing filesystem supports tmpfile.
-
- (8) Document how the page-release cancellation of the read-skip
-     optimisation works.
-
-And I've included a change for netfslib:
-
- (9) Make ops->init_rreq() optional.
-
-Note that I dropped the patch that I had to add IS_KERNEL_FILE() as the
-naming of S_KERNEL_FILE is undergoing late discussion[2] and I dropped the
-patch to rewrite cifs's fscache indexing as SteveF has taken that into his
-tree.
-
-Thanks,
-David
-
-
-Link: https://lore.kernel.org/r/510611.1641942444@warthog.procyon.org.uk/ =
-[1]
-Link: https://lore.kernel.org/r/CAOQ4uxjEcvffv=3DrNXS-r+NLz+=3D6yk4abRuX_A=
-Mq9v-M4nf_PtA@mail.gmail.com/ [2]
-Link: https://lore.kernel.org/r/164251396932.3435901.344517748027321142.st=
-git@warthog.procyon.org.uk/ # v1
----
-The following changes since commit 455e73a07f6e288b0061dfcf4fcf54fa9fe0645=
-8:
-
-  Merge tag 'clk-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/g=
-it/clk/linux (2022-01-12 17:02:27 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
-/fscache-fixes-20220121
-
-for you to fetch changes up to cef0223191452b3c493a1070baad9ffe806babac:
-
-  netfs: Make ops->init_rreq() optional (2022-01-21 21:36:28 +0000)
-
-----------------------------------------------------------------
-fscache fixes
-
-----------------------------------------------------------------
-David Howells (7):
-      fscache: Fix the volume collision wait condition
-      cachefiles: Calculate the blockshift in terms of bytes, not pages
-      cachefiles: Make some tracepoint adjustments
-      cachefiles: Trace active-mark failure
-      cachefiles: Explain checks in a comment
-      cachefiles: Check that the backing filesystem supports tmpfiles
-      fscache: Add a comment explaining how page-release optimisation work=
-s
-
-Jeffle Xu (2):
-      cachefiles: set default tag name if it's unspecified
-      netfs: Make ops->init_rreq() optional
-
- fs/cachefiles/cache.c             |  17 ++++---
- fs/cachefiles/daemon.c            |  11 ++++
- fs/cachefiles/internal.h          |   2 +-
- fs/cachefiles/io.c                |   2 +-
- fs/cachefiles/namei.c             |  12 +++--
- fs/ceph/addr.c                    |   5 --
- fs/fscache/volume.c               |   4 +-
- fs/netfs/read_helper.c            |   3 +-
- include/linux/fscache.h           |   5 ++
- include/trace/events/cachefiles.h | 103 ++++++++++++++++++++++++++-------=
------
- 10 files changed, 113 insertions(+), 51 deletions(-)
+-- 
+2.25.1
 
