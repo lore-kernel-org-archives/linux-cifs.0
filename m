@@ -2,76 +2,65 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89760C43219
-	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jan 2022 09:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1F9C433EF
+	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jan 2022 09:40:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233200AbiAVJkJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 22 Jan 2022 04:40:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45942 "EHLO
+        id S234248AbiAVJkT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 22 Jan 2022 04:40:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232237AbiAVJkI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jan 2022 04:40:08 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75CA7C06173B;
-        Sat, 22 Jan 2022 01:40:08 -0800 (PST)
+        with ESMTP id S234209AbiAVJkQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jan 2022 04:40:16 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C65C061401;
+        Sat, 22 Jan 2022 01:40:16 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AE813B81785;
-        Sat, 22 Jan 2022 09:40:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 44C43C004E1;
-        Sat, 22 Jan 2022 09:40:05 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D549F60C42;
+        Sat, 22 Jan 2022 09:40:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A92B3C340EB;
+        Sat, 22 Jan 2022 09:40:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642844405;
-        bh=henkmRl3HfTRAowTOP/RK23Q67yuCV3HA56VhpKoBks=;
+        s=k20201202; t=1642844415;
+        bh=MOXNN6+9zF4Ah4Pruz4Jj3fw/AZzwy+ohbgpgx5w38g=;
         h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=NKM6qjRQaQm4rNU9/RrE7JODEuKQEHJpghqkSS1311lLhHxtdUZm4BSjgz+h8z2zQ
-         QSVYgZs739kQqWfPYOZDTRxBUjgy7GeH/n1McqDHhBOWT21dqXVsuyyGty53wWjvOQ
-         TSPqLmRCdBD3sU8D1PqbcKdPA1skGg89V0ZLvieurJbQjRbaa79MvZDYTxQcWJ8d/L
-         Ym3D/50s55/IJ2MkUuZxH9Z4ppCLnNkOeAFoKvpxj3hLFn2yiYOHqY5PNTkquUSmK8
-         fk5jmGpQN7/QEagAqziftFzzvkIN8iBFWOjl20RuaR7K8NCcZCZEiB+X+REN4HBN6H
-         uNehTqqPl+qVA==
+        b=iraf5GWhQCR9OIp0s8aYF7tsuCra0btgYeo3QKvnrVUropNiZy44t3GCYAJ36LOc8
+         dXOySWigGVkPundGvwA78MlyZjSTZr5rj1l0kYe6gXqfAIJIV5sAaZQytRV67az1Fr
+         s+5hGt5midyhRKvi87r4Oy936dWpPteWHvoo+ijb0UvqJ5p1WeLFyXYFDKt+hrBuDM
+         zv5h9lxr6sUapFDCcRyScn8/NGx3ROTIX9KjhBTXH+MSNtQRstts0wzpNMO8PhXt5O
+         JbAd1I6OYFfzEowHQsehmgFIkJslM60BDho1wOM19M5rgDY+Ya9QJ/2TfM1CWkSlIw
+         yeaswEh4DaFpA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 23234F60796;
-        Sat, 22 Jan 2022 09:40:05 +0000 (UTC)
-Subject: Re: [GIT PULL] fscache: Fixes and minor updates for rewrite
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 981CAF60798;
+        Sat, 22 Jan 2022 09:40:15 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 fixes
 From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1339462.1642802244@warthog.procyon.org.uk>
-References: <1339462.1642802244@warthog.procyon.org.uk>
-X-PR-Tracked-List-Id: <linux-nfs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1339462.1642802244@warthog.procyon.org.uk>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/fscache-fixes-20220121
-X-PR-Tracked-Commit-Id: cef0223191452b3c493a1070baad9ffe806babac
+In-Reply-To: <CAH2r5mvb8d_mo+tEhQ+rXE33zgixiq5YiFyapcMEzEd6bXqf2Q@mail.gmail.com>
+References: <CAH2r5mvb8d_mo+tEhQ+rXE33zgixiq5YiFyapcMEzEd6bXqf2Q@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mvb8d_mo+tEhQ+rXE33zgixiq5YiFyapcMEzEd6bXqf2Q@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc-part2-smb3-fixes
+X-PR-Tracked-Commit-Id: 51620150ca2df62f8ea472ab8962be590c957288
 X-PR-Merge-Tree: torvalds/linux.git
 X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 7fd350f6ff846f788ba5f6668bacf2ce4257ed8f
-Message-Id: <164284440509.7666.8294766242390570357.pr-tracker-bot@kernel.org>
-Date:   Sat, 22 Jan 2022 09:40:05 +0000
-To:     David Howells <dhowells@redhat.com>
+X-PR-Merge-Commit-Id: 8205ae327e396820fb7a176a94768146ac0b87ea
+Message-Id: <164284441561.7666.8847091032449578335.pr-tracker-bot@kernel.org>
+Date:   Sat, 22 Jan 2022 09:40:15 +0000
+To:     Steve French <smfrench@gmail.com>
 Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        Steve French <smfrench@gmail.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>, dhowells@redhat.com,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>, linux-cachefs@redhat.com,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+        LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 21 Jan 2022 21:57:24 +0000:
+The pull request you sent on Fri, 21 Jan 2022 23:51:11 -0600:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/fscache-fixes-20220121
+> git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc-part2-smb3-fixes
 
 has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/7fd350f6ff846f788ba5f6668bacf2ce4257ed8f
+https://git.kernel.org/torvalds/c/8205ae327e396820fb7a176a94768146ac0b87ea
 
 Thank you!
 
