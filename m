@@ -2,68 +2,77 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1F9C433EF
-	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jan 2022 09:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D19C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jan 2022 17:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234248AbiAVJkT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 22 Jan 2022 04:40:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234209AbiAVJkQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jan 2022 04:40:16 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C65C061401;
-        Sat, 22 Jan 2022 01:40:16 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S231437AbiAVRjV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 22 Jan 2022 12:39:21 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:46726 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230289AbiAVRjU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jan 2022 12:39:20 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D549F60C42;
-        Sat, 22 Jan 2022 09:40:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A92B3C340EB;
-        Sat, 22 Jan 2022 09:40:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642844415;
-        bh=MOXNN6+9zF4Ah4Pruz4Jj3fw/AZzwy+ohbgpgx5w38g=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=iraf5GWhQCR9OIp0s8aYF7tsuCra0btgYeo3QKvnrVUropNiZy44t3GCYAJ36LOc8
-         dXOySWigGVkPundGvwA78MlyZjSTZr5rj1l0kYe6gXqfAIJIV5sAaZQytRV67az1Fr
-         s+5hGt5midyhRKvi87r4Oy936dWpPteWHvoo+ijb0UvqJ5p1WeLFyXYFDKt+hrBuDM
-         zv5h9lxr6sUapFDCcRyScn8/NGx3ROTIX9KjhBTXH+MSNtQRstts0wzpNMO8PhXt5O
-         JbAd1I6OYFfzEowHQsehmgFIkJslM60BDho1wOM19M5rgDY+Ya9QJ/2TfM1CWkSlIw
-         yeaswEh4DaFpA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 981CAF60798;
-        Sat, 22 Jan 2022 09:40:15 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvb8d_mo+tEhQ+rXE33zgixiq5YiFyapcMEzEd6bXqf2Q@mail.gmail.com>
-References: <CAH2r5mvb8d_mo+tEhQ+rXE33zgixiq5YiFyapcMEzEd6bXqf2Q@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvb8d_mo+tEhQ+rXE33zgixiq5YiFyapcMEzEd6bXqf2Q@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc-part2-smb3-fixes
-X-PR-Tracked-Commit-Id: 51620150ca2df62f8ea472ab8962be590c957288
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8205ae327e396820fb7a176a94768146ac0b87ea
-Message-Id: <164284441561.7666.8847091032449578335.pr-tracker-bot@kernel.org>
-Date:   Sat, 22 Jan 2022 09:40:15 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8245A1F380;
+        Sat, 22 Jan 2022 17:39:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1642873159; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=EDgVTl8OuNCYSeHaFkj1HiE88I1lShAUUtTzSNoo9tk=;
+        b=MuZl2qrolTBETXP08OjlH5qy74aEP4JfjQQKbft8QAQzuhLCEAfm98Ls3pL3YKCGli4zq7
+        FKNsO+Wjs7PqVgc0cbFLs4Xv8zy3yjyGECrdCqBmwMmyQRQMZdYgOodmXNPGUfc2ebFFq+
+        YI7TEoa2rHY8zgtYnU5PTedh05W8+60=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1642873159;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=EDgVTl8OuNCYSeHaFkj1HiE88I1lShAUUtTzSNoo9tk=;
+        b=n35ZnPIdJGk/syuclu7h9TfZlAXMLc9n22zaL3xh7jBXJeBs6WrXK4ss56EC6kCezFMv4w
+        8ZLXADNE5SyjYSDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 14C2D13B04;
+        Sat, 22 Jan 2022 17:39:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id LkqvMEZB7GGxcgAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Sat, 22 Jan 2022 17:39:18 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     linkinjeon@kernel.org, Enzo Matsumiya <ematsumiya@suse.de>
+Subject: [PATCH] fix return-type warning in usm_handle_logout_request()
+Date:   Sat, 22 Jan 2022 14:39:15 -0300
+Message-Id: <20220122173915.3894-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 21 Jan 2022 23:51:11 -0600:
+Also put_ksmbd_user(user) before returning.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc-part2-smb3-fixes
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ lib/management/user.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8205ae327e396820fb7a176a94768146ac0b87ea
-
-Thank you!
-
+diff --git a/lib/management/user.c b/lib/management/user.c
+index b4727a761ba0..5ce75e83b70a 100644
+--- a/lib/management/user.c
++++ b/lib/management/user.c
+@@ -405,4 +405,7 @@ int usm_handle_logout_request(struct ksmbd_logout_request *req)
+ 		user->failed_login_count = 0;
+ 		user->flags &= ~KSMBD_USER_FLAG_DELAY_SESSION;
+ 	}
++
++	put_ksmbd_user(user);
++	return 0;
+ }
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.31.1
+
