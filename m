@@ -2,145 +2,67 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D9BC433EF
-	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jan 2022 05:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D76FC433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jan 2022 08:05:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232561AbiAVFvZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 22 Jan 2022 00:51:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52388 "EHLO
+        id S233683AbiAVIFV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 22 Jan 2022 03:05:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbiAVFvZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jan 2022 00:51:25 -0500
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9154BC06173B;
-        Fri, 21 Jan 2022 21:51:24 -0800 (PST)
-Received: by mail-lj1-x22c.google.com with SMTP id w7so3242605ljw.11;
-        Fri, 21 Jan 2022 21:51:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=E4IaFvH/PCJMVLVC64/0KaKQlWqnlMzYgCVzrsXDxRE=;
-        b=hR1w7Er4P5ukaD/8e3QBLs37jiPN6SuotHSjxK4rx8XkFUvqVp6Nmi5wPy/huaECKC
-         wdoftPzlb/9ufXYFpIy47SzXqSGqgKKgoI+djeG1uw06nGSWBNQm0Ys9m8pJeveWdzER
-         ubrnPqRuSpiRzyn0V5qWBWiLb1IntvXvTlvx6y40+1L9nUsM21EppZC9pEJNPXuDtgUJ
-         oGjvss/b1Z31TCTscxzZ4O7+OrHD0wMp8BkKQ+9/MC/1pJTi2GIl+uwQHjJQMyE7SkVi
-         jkuZrWAWoMK9CRfGATXXPDy5uaWG3VvSBCot2mf2YMJxOcNpu+NWasz14Jk+UEhp5Zj3
-         9OUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=E4IaFvH/PCJMVLVC64/0KaKQlWqnlMzYgCVzrsXDxRE=;
-        b=tB1Ns7yRdJDqd5vnaVnukd15PscoAoy5X0rSkArNlOj+BmJ6ZvAhTKRWt1tgPBIzg/
-         4i4tpNjxYOOe2ZIyNrXqLVqVTavTVblMHRFCynp53WNR8WiZW028yY/+ELVCgV/Kv3H1
-         XP+Us3mF/cOjYtc3oJ93V+G/s8IyfE/cg8lzqW4cqeZD5IuE+Va679AxcZnxO/GXGrEM
-         w3kry4COVddirLf1ZfIxAcT7ds9kb/VyOrDne8OXH9U9HvFG24uGXQWGszF9sRXycYr8
-         Jl+XMKVbUhjtqFHBNpmzfTioSzWKnswtcCHKKrv/+I2lD7r2Nra25SoTwEWyq4WfnqfM
-         yThA==
-X-Gm-Message-State: AOAM533ibJysnV3enCObbLrBJOMODEXYD73SNXpK9DGMRZtfAsNvaqM2
-        5TrBVlv6fB0/UzXVpzf6aPDS9tqI6voc5R59cm2tkR/4hwY=
-X-Google-Smtp-Source: ABdhPJzkaZldnvuY9pHHhBxRFwd9im93D7sBhfIPySFG4zwN51CaZfXMcdqamQFude/LqtPhknbMf9s/uuKNyzyhrKw=
-X-Received: by 2002:a2e:9813:: with SMTP id a19mr5190706ljj.23.1642830682594;
- Fri, 21 Jan 2022 21:51:22 -0800 (PST)
+        with ESMTP id S233626AbiAVIFV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jan 2022 03:05:21 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D95C06173B
+        for <linux-cifs@vger.kernel.org>; Sat, 22 Jan 2022 00:05:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 61AF76114F
+        for <linux-cifs@vger.kernel.org>; Sat, 22 Jan 2022 08:05:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C93BAC340E5
+        for <linux-cifs@vger.kernel.org>; Sat, 22 Jan 2022 08:05:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642838719;
+        bh=oy+vGYpTgbRrMUoQVuJICfQLUjkWJU0IWLfrKTxyOoE=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=FKrV4Zq9wCHUiBFYGzHjhZ/2n9Uin9qUzfbG6rCiQPSVZ065MpkEvVAIyx1uAuIOt
+         XXw+8rUIRxvVYcPgRKGQOWX2n8j2r5/8eM8kWnuI7k5216P30551+JvXtQDVoJP6Nd
+         37ERfBRc8je/1CPZbVykK456xV+X0WTxOEDbXS4qncQOWG8jAJYHrJe3ddNBdu7K8m
+         OVvQjAGJIXz0YtZh2G/dYYOYw3QEXzv9DghiRt8OQ5QUHgYkbmNSwUljX8rnOj1jPR
+         i/Zq1MX7wr/B1yozmk8fr7SeiUzaqYPPdd81eBdNaZozwjK+EOfpSVhuh4AzG1yFLv
+         f2yvouRou3YLg==
+Received: by mail-yb1-f172.google.com with SMTP id h14so34306921ybe.12
+        for <linux-cifs@vger.kernel.org>; Sat, 22 Jan 2022 00:05:19 -0800 (PST)
+X-Gm-Message-State: AOAM532gBV/YTtaEbEmDSPUc/6uu1gUY5aS52umSG+MBQbwxN7xVBBT/
+        ATKZPcIATZB+rpQkaR13c4NtfoTZvFVtMWAsCxQ=
+X-Google-Smtp-Source: ABdhPJwY5Mw3LEKLq4i5c/TuL037LEGMeKtGPHs+cDJUPSp1Fk19SEHi9GfKoj6ts9iHATTPArEe/51cT0sYRsawv1Y=
+X-Received: by 2002:a5b:244:: with SMTP id g4mr11579555ybp.507.1642838718884;
+ Sat, 22 Jan 2022 00:05:18 -0800 (PST)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 21 Jan 2022 23:51:11 -0600
-Message-ID: <CAH2r5mvb8d_mo+tEhQ+rXE33zgixiq5YiFyapcMEzEd6bXqf2Q@mail.gmail.com>
-Subject: [GIT PULL] smb3 fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+Received: by 2002:a05:7110:b08e:b0:127:3295:9956 with HTTP; Sat, 22 Jan 2022
+ 00:05:18 -0800 (PST)
+In-Reply-To: <CAH2r5msBe2RPy1vmg9pyqiAe2AH7J1XKfSeXkWZDiSGJG-aDFg@mail.gmail.com>
+References: <CAH2r5msBe2RPy1vmg9pyqiAe2AH7J1XKfSeXkWZDiSGJG-aDFg@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sat, 22 Jan 2022 17:05:18 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-SP9memOgaYXddYu+Jamrbc9-GaNU7x6QQzKavRdfx+A@mail.gmail.com>
+Message-ID: <CAKYAXd-SP9memOgaYXddYu+Jamrbc9-GaNU7x6QQzKavRdfx+A@mail.gmail.com>
+Subject: Re: ksmbd kernel docs
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-0c947b893d69231a9add855939da7c66237ab44f:
-
-  Merge tag '5.17-rc-part1-smb3-fixes' of
-git://git.samba.org/sfrench/cifs-2.6 (2022-01-17 09:53:21 +0200)
-
-are available in the Git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc-part2-smb3-fixes
-
-for you to fetch changes up to 51620150ca2df62f8ea472ab8962be590c957288:
-
-  cifs: update internal module number (2022-01-19 23:14:34 -0600)
-
-----------------------------------------------------------------
-18 cifs/smb3 fixes including:
-- 9 multichannel fixes, addressing additional reconnect and DFS scenarios
-- reenabling fscache support (indexing rewrite, metadata caching e.g.)
-- send additional version information during NTLMSSP negotiate to
-improve debugging
-- fix for a mount race
-- 2 DFS fixes
-- fix for a memory leak for stable
-----------------------------------------------------------------
-David Howells (1):
-      cifs: Support fscache indexing rewrite
-
-Eugene Korenevsky (2):
-      cifs: alloc_path_with_tree_prefix: do not append sep. if the path is empty
-      cifs: quirk for STATUS_OBJECT_NAME_INVALID returned for non-ASCII dfs refs
-
-Muhammad Usama Anjum (1):
-      cifs: remove unused variable ses_selected
-
-Ronnie Sahlberg (1):
-      cifs: serialize all mount attempts
-
-Shyam Prasad N (9):
-      cifs: free ntlmsspblob allocated in negotiate
-      cifs: check reconnects for channels of active tcons too
-      cifs: fix the connection state transitions with multichannel
-      cifs: protect all accesses to chan_* with chan_lock
-      cifs: fix the cifs_reconnect path for DFS
-      cifs: remove repeated state change in dfs tree connect
-      cifs: make status checks in version independent callers
-      cifs: update tcpStatus during negotiate and sess setup
-      cifs: cifs_ses_mark_for_reconnect should also update reconnect bits
-
-Steve French (3):
-      smb3: add new defines from protocol specification
-      smb3: send NTLMSSP version information
-      cifs: update internal module number
-
-Yang Li (1):
-      cifs: clean up an inconsistent indenting
-
- fs/cifs/Kconfig            |   2 +-
- fs/cifs/Makefile           |   2 +-
- fs/cifs/cache.c            | 105 ---------------------
- fs/cifs/cifs_swn.c         |   9 +-
- fs/cifs/cifsfs.c           |  19 ++--
- fs/cifs/cifsfs.h           |   3 +-
- fs/cifs/cifsglob.h         |   7 +-
- fs/cifs/cifsproto.h        |   8 ++
- fs/cifs/connect.c          | 142 ++++++++++++++++++----------
- fs/cifs/dfs_cache.c        |   2 +-
- fs/cifs/dir.c              |   5 +
- fs/cifs/file.c             |  66 ++++++++-----
- fs/cifs/fs_context.c       |   8 +-
- fs/cifs/fscache.c          | 333
-++++++++++++++++--------------------------------------------------
- fs/cifs/fscache.h          | 128 +++++++++----------------
- fs/cifs/inode.c            |  25 +++--
- fs/cifs/misc.c             |  49 ++++++++++
- fs/cifs/netmisc.c          |   5 +-
- fs/cifs/ntlmssp.h          |  30 +++++-
- fs/cifs/sess.c             | 112 ++++++++++++++++------
- fs/cifs/smb2pdu.c          | 112 +++++++++++++++-------
- fs/cifs/smb2transport.c    |   6 ++
- fs/cifs/transport.c        |  17 +---
- fs/smbfs_common/smb2pdu.h  |   2 +-
- fs/smbfs_common/smbfsctl.h |   2 +
- 25 files changed, 573 insertions(+), 626 deletions(-)
- delete mode 100644 fs/cifs/cache.c
-
-
--- 
-Thanks,
-
-Steve
+2022-01-22 6:29 GMT+09:00, Steve French <smfrench@gmail.com>:
+> Looks like various updates needed (added ksmbd server features now
+> supported) to the kernel doc:
+> https://www.kernel.org/doc/html/latest//filesystems/cifs/ksmbd.html
+Okay, I will:) Thanks for pointing that out!
+>
+> --
+> Thanks,
+>
+> Steve
+>
