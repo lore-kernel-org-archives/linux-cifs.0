@@ -2,35 +2,32 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49116C433F5
-	for <linux-cifs@archiver.kernel.org>; Sun, 23 Jan 2022 00:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 786C8C4332F
+	for <linux-cifs@archiver.kernel.org>; Sun, 23 Jan 2022 00:13:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235183AbiAWALr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 22 Jan 2022 19:11:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36538 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235170AbiAWALo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jan 2022 19:11:44 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A41C06173B;
-        Sat, 22 Jan 2022 16:11:44 -0800 (PST)
+        id S235276AbiAWANY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 22 Jan 2022 19:13:24 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:45812 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235408AbiAWAMh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jan 2022 19:12:37 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B741C60DCB;
-        Sun, 23 Jan 2022 00:11:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35DEDC340E7;
-        Sun, 23 Jan 2022 00:11:42 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 90DE8CE0025;
+        Sun, 23 Jan 2022 00:12:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3EEAC340E5;
+        Sun, 23 Jan 2022 00:12:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642896703;
-        bh=Tc+ralUCr4d7Hr5t+NyESJ0qiDEF2Yt26/wg7XkvEJ4=;
+        s=k20201202; t=1642896752;
+        bh=qqpRGZs9vyVriCQDILu1jkcUDxNgsFDawEY70zufFUc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mMXDAcCDRRjMBWjpdLt2HHte69/b898lNbOIBROoCWoGsVSiy+SQ68DqMAo29C3Qm
-         YNlaa8S+mQgbhqfvzYx9jSdd1wlDel+BxNxXGx5/DOtSCt1EsNwwIFpL0dzqSOqcEn
-         bxht9zayqQy8zfSWhziAYTZyFMZ8DZCPAKeE9v5MpTMtygW+2ctBaEfA1x7SkBDCOK
-         LgNJOrYEZtYiETUgK4BWUvXm4zAPg135PIo7HlN2xn+o8lhof5o6FOJkFDRS0g4r5i
-         yvri7sj9IsZUhcnfmHvdF9Q9vCbb5j2yKHro4FzhQXITN6FE5mGwFXwbPnZE7y2nwP
-         I4gbIfbew6obQ==
+        b=idD4VnV+ntbjiBx1LgU98HIjlMXKY9wh9FrH98XDlUhuiUIPzsIhUG0y8HDNn9w9b
+         ebBw6wMcknpAz3xvHI4Md4DGAWg8KK0xzwDBg+LK3LMKC6Mbe7d0eZL+rrWjg4G7hS
+         gMbTqfxP2/ZhEeptV6hIZEnj01AJLt12ZpOZMQp6crwnMeWvvBSWGXkoz3ueYkcj5C
+         4j6BvOUPkgb4rjw04J8Old8f2n3rDU2iFeiTZWhSA0VFaosR2aiQi0Dwtn+aY8Ouls
+         GfSCNH64exJWlX4rFMCAlOeHYdjrMUO8AbsnjXjtB+EKYJJbtsceTsVaukVowAyNwk
+         /YYWB8KmKGrsw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
@@ -38,12 +35,12 @@ Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, senozhatsky@chromium.org,
         sfrench@samba.org, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 05/19] ksmbd: smbd: call rdma_accept() under CM handler
-Date:   Sat, 22 Jan 2022 19:10:58 -0500
-Message-Id: <20220123001113.2460140-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 05/16] ksmbd: smbd: call rdma_accept() under CM handler
+Date:   Sat, 22 Jan 2022 19:12:04 -0500
+Message-Id: <20220123001216.2460383-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220123001113.2460140-1-sashal@kernel.org>
-References: <20220123001113.2460140-1-sashal@kernel.org>
+In-Reply-To: <20220123001216.2460383-1-sashal@kernel.org>
+References: <20220123001216.2460383-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -90,7 +87,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 59 insertions(+), 43 deletions(-)
 
 diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-index 7e57cbb0bb356..1d28175b90158 100644
+index a2fd5a4d4cd5e..ee4011c41608a 100644
 --- a/fs/ksmbd/transport_rdma.c
 +++ b/fs/ksmbd/transport_rdma.c
 @@ -555,6 +555,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
