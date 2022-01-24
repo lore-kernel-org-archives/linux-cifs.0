@@ -2,357 +2,564 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E359C433FE
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jan 2022 16:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCCAC433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jan 2022 16:58:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244038AbiAXQ6j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Jan 2022 11:58:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20438 "EHLO
+        id S244046AbiAXQ67 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Jan 2022 11:58:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25080 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244033AbiAXQ6h (ORCPT
+        by vger.kernel.org with ESMTP id S244048AbiAXQ66 (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 24 Jan 2022 11:58:37 -0500
+        Mon, 24 Jan 2022 11:58:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643043516;
+        s=mimecast20190719; t=1643043537;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=rXeW0RkeozhZN5H4axKRAaeApYRvTDjymtyyH769ib0=;
-        b=PZJOtzAaHw1zN0TkoUf30L1dNcFLvYA7jDUC3WUF9StEaZ99yrxFTtx7y7y/iGN/NqMksC
-        XsDNcv+FbhORNjUYgRAHEB2EM3px5zITRNFIZgixosNP1zaSbGLE94GVKckdANiACOcN9y
-        dcVTlpYwO6s9HrVPR3Zwyu1zfhk5v5c=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4ZjBDEDIMqFYvpJS3kqx+kAdsEz3qEnBTwJQiHwLDvc=;
+        b=HdF8xDHLU1ntA/JsQY0aNHzpjv85+9kNQDvYR8U8rxWgtxSHl3CQ/wwiMu4tNVH5saav8K
+        LMx39O1iCKbp9bXfLID7Kcbp0P9AH7v4rTAfjNKmUVhZch28MIKGwPR6bV6VVR3Y8EtwMH
+        25z1gAl02TZ19sjNwqTrbjlgTNhcfek=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-114-rsY71BK5N8C1YPh8TfJzKQ-1; Mon, 24 Jan 2022 11:58:32 -0500
-X-MC-Unique: rsY71BK5N8C1YPh8TfJzKQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-302-nahyB63hMomWo2uLkhWvWw-1; Mon, 24 Jan 2022 11:58:54 -0500
+X-MC-Unique: nahyB63hMomWo2uLkhWvWw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 863941018734;
-        Mon, 24 Jan 2022 16:58:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A8A283DD20;
+        Mon, 24 Jan 2022 16:58:53 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.5])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D12A87E91A;
-        Mon, 24 Jan 2022 16:58:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 915377A42E;
+        Mon, 24 Jan 2022 16:58:37 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [RFC PATCH 1/2] cifs: Transition from ->readpages() to ->readahead()
+Subject: [RFC PATCH 2/2] cifs: Implement cache I/O by accessing the cache
+ directly
 From:   David Howells <dhowells@redhat.com>
 To:     smfrench@gmail.com, nspmangalore@gmail.com
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+Cc:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
         linux-cachefs@redhat.com, dhowells@redhat.com
-Date:   Mon, 24 Jan 2022 16:58:05 +0000
-Message-ID: <164304348524.2349137.12280578401440758411.stgit@warthog.procyon.org.uk>
+Date:   Mon, 24 Jan 2022 16:58:36 +0000
+Message-ID: <164304351677.2349137.11658590526534563187.stgit@warthog.procyon.org.uk>
+In-Reply-To: <164304348524.2349137.12280578401440758411.stgit@warthog.procyon.org.uk>
+References: <164304348524.2349137.12280578401440758411.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Transition the cifs filesystem from using the old ->readpages() method to
-using the new ->readahead() method.
+Move cifs to using fscache DIO API instead of the old upstream I/O API as
+that has been removed.  This is a stopgap solution as the intention is that
+at sometime in the future, the cache will move to using larger blocks and
+won't be able to store individual pages in order to deal with the potential
+for data corruption due to the backing filesystem being able insert/remove
+bridging blocks of zeros into its extent list[1].
 
-For the moment, this removes any invocation of fscache to read data from
-the local cache, leaving that to another patch.
+cifs then reads and writes cache pages synchronously and one page at a time.
+
+The preferred change would be to use the netfs lib, but the new I/O API can
+be used directly.  It's just that as the cache now needs to track data for
+itself, caching blocks may exceed page size...
+
+This code is somewhat borrowed from my "fallback I/O" patchset[2].
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <smfrench@gmail.com>
+cc: Steve French <sfrench@samba.org>
 cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Jeff Layton <jlayton@kernel.org>
 cc: linux-cifs@vger.kernel.org
 cc: linux-cachefs@redhat.com
+Link: https://lore.kernel.org/r/YO17ZNOcq+9PajfQ@mit.edu [1]
+Link: https://lore.kernel.org/r/202112100957.2oEDT20W-lkp@intel.com/ [2]
 ---
 
- fs/cifs/file.c |  169 +++++++++++---------------------------------------------
- 1 file changed, 33 insertions(+), 136 deletions(-)
+ fs/cachefiles/io.c    |   59 +++++++++++++++++++++++
+ fs/cifs/file.c        |   55 +++++++++++++++++++--
+ fs/cifs/fscache.c     |  126 ++++++++++++++++++++++++++++++++++++++++++-------
+ fs/cifs/fscache.h     |   79 +++++++++++++++++++------------
+ include/linux/netfs.h |    7 +++
+ 5 files changed, 273 insertions(+), 53 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 59334be9ed3b..384a7323702f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -4269,8 +4269,6 @@ cifs_readv_complete(struct work_struct *work)
- 	for (i = 0; i < rdata->nr_pages; i++) {
- 		struct page *page = rdata->pages[i];
- 
--		lru_cache_add(page);
--
- 		if (rdata->result == 0 ||
- 		    (rdata->result == -EAGAIN && got_bytes)) {
- 			flush_dcache_page(page);
-@@ -4340,7 +4338,6 @@ readpages_fill_pages(struct TCP_Server_Info *server,
- 			 * fill them until the writes are flushed.
- 			 */
- 			zero_user(page, 0, PAGE_SIZE);
--			lru_cache_add(page);
- 			flush_dcache_page(page);
- 			SetPageUptodate(page);
- 			unlock_page(page);
-@@ -4350,7 +4347,6 @@ readpages_fill_pages(struct TCP_Server_Info *server,
- 			continue;
- 		} else {
- 			/* no need to hold page hostage */
--			lru_cache_add(page);
- 			unlock_page(page);
- 			put_page(page);
- 			rdata->pages[i] = NULL;
-@@ -4393,92 +4389,16 @@ cifs_readpages_copy_into_pages(struct TCP_Server_Info *server,
- 	return readpages_fill_pages(server, rdata, iter, iter->count);
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index 04eb52736990..753986ea1583 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -191,6 +191,64 @@ static int cachefiles_read(struct netfs_cache_resources *cres,
+ 	return ret;
  }
  
--static int
--readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
--		    unsigned int rsize, struct list_head *tmplist,
--		    unsigned int *nr_pages, loff_t *offset, unsigned int *bytes)
--{
--	struct page *page, *tpage;
--	unsigned int expected_index;
--	int rc;
--	gfp_t gfp = readahead_gfp_mask(mapping);
++/*
++ * Query the occupancy of the cache in a region, returning where the next chunk
++ * of data starts and how long it is.
++ */
++static int cachefiles_query_occupancy(struct netfs_cache_resources *cres,
++				      loff_t start, size_t len, size_t granularity,
++				      loff_t *_data_start, size_t *_data_len)
++{
++	struct cachefiles_object *object;
++	struct file *file;
++	loff_t off, off2;
++
++	*_data_start = -1;
++	*_data_len = 0;
++
++	if (!fscache_wait_for_operation(cres, FSCACHE_WANT_READ))
++		return -ENOBUFS;
++
++	object = cachefiles_cres_object(cres);
++	file = cachefiles_cres_file(cres);
++	granularity = max_t(size_t, object->volume->cache->bsize, granularity);
++
++	_enter("%pD,%li,%llx,%zx/%llx",
++	       file, file_inode(file)->i_ino, start, len,
++	       i_size_read(file_inode(file)));
++
++	off = cachefiles_inject_read_error();
++	if (off == 0)
++		off = vfs_llseek(file, start, SEEK_DATA);
++	if (off == -ENXIO)
++		return -ENODATA; /* Beyond EOF */
++	if (off < 0 && off >= (loff_t)-MAX_ERRNO)
++		return -ENOBUFS; /* Error. */
++	if (round_up(off, granularity) >= start + len)
++		return -ENODATA; /* No data in range */
++
++	off2 = cachefiles_inject_read_error();
++	if (off2 == 0)
++		off2 = vfs_llseek(file, off, SEEK_HOLE);
++	if (off2 == -ENXIO)
++		return -ENODATA; /* Beyond EOF */
++	if (off2 < 0 && off2 >= (loff_t)-MAX_ERRNO)
++		return -ENOBUFS; /* Error. */
++
++	/* Round away partial blocks */
++	off = round_up(off, granularity);
++	off2 = round_down(off2, granularity);
++	if (off2 <= off)
++		return -ENODATA;
++
++	*_data_start = off;
++	if (off2 > start + len)
++		*_data_len = len;
++	else
++		*_data_len = off2 - off;
++	return 0;
++}
++
+ /*
+  * Handle completion of a write to the cache.
+  */
+@@ -545,6 +603,7 @@ static const struct netfs_cache_ops cachefiles_netfs_cache_ops = {
+ 	.write			= cachefiles_write,
+ 	.prepare_read		= cachefiles_prepare_read,
+ 	.prepare_write		= cachefiles_prepare_write,
++	.query_occupancy	= cachefiles_query_occupancy,
+ };
+ 
+ /*
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 384a7323702f..492abe8f4213 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -4276,12 +4276,12 @@ cifs_readv_complete(struct work_struct *work)
+ 		} else
+ 			SetPageError(page);
+ 
+-		unlock_page(page);
 -
--	INIT_LIST_HEAD(tmplist);
--
--	page = lru_to_page(page_list);
--
--	/*
--	 * Lock the page and put it in the cache. Since no one else
--	 * should have access to this page, we're safe to simply set
--	 * PG_locked without checking it first.
--	 */
--	__SetPageLocked(page);
--	rc = add_to_page_cache_locked(page, mapping,
--				      page->index, gfp);
--
--	/* give up if we can't stick it in the cache */
--	if (rc) {
--		__ClearPageLocked(page);
--		return rc;
--	}
--
--	/* move first page to the tmplist */
--	*offset = (loff_t)page->index << PAGE_SHIFT;
--	*bytes = PAGE_SIZE;
--	*nr_pages = 1;
--	list_move_tail(&page->lru, tmplist);
--
--	/* now try and add more pages onto the request */
--	expected_index = page->index + 1;
--	list_for_each_entry_safe_reverse(page, tpage, page_list, lru) {
--		/* discontinuity ? */
--		if (page->index != expected_index)
--			break;
--
--		/* would this page push the read over the rsize? */
--		if (*bytes + PAGE_SIZE > rsize)
--			break;
--
--		__SetPageLocked(page);
--		rc = add_to_page_cache_locked(page, mapping, page->index, gfp);
--		if (rc) {
--			__ClearPageLocked(page);
--			break;
--		}
--		list_move_tail(&page->lru, tmplist);
--		(*bytes) += PAGE_SIZE;
--		expected_index++;
--		(*nr_pages)++;
--	}
--	return rc;
--}
--
--static int cifs_readpages(struct file *file, struct address_space *mapping,
--	struct list_head *page_list, unsigned num_pages)
-+static void cifs_readahead(struct readahead_control *ractl)
- {
- 	int rc;
--	int err = 0;
--	struct list_head tmplist;
--	struct cifsFileInfo *open_file = file->private_data;
--	struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(file);
-+	struct cifsFileInfo *open_file = ractl->file->private_data;
-+	struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(ractl->file);
+ 		if (rdata->result == 0 ||
+ 		    (rdata->result == -EAGAIN && got_bytes))
+ 			cifs_readpage_to_fscache(rdata->mapping->host, page);
+ 
++		unlock_page(page);
++
+ 		got_bytes -= min_t(unsigned int, PAGE_SIZE, got_bytes);
+ 
+ 		put_page(page);
+@@ -4396,7 +4396,11 @@ static void cifs_readahead(struct readahead_control *ractl)
+ 	struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(ractl->file);
  	struct TCP_Server_Info *server;
  	pid_t pid;
- 	unsigned int xid;
+-	unsigned int xid;
++	unsigned int xid, nr_pages, cache_nr_pages = 0;
++	pgoff_t next_cached = ULONG_MAX;
++	bool caching = fscache_cookie_enabled(cifs_inode_cookie(ractl->mapping->host)) &&
++		cifs_inode_cookie(ractl->mapping->host)->cache_priv;
++	bool check_cache = caching;
  
  	xid = get_xid();
--	/*
--	 * Reads as many pages as possible from fscache. Returns -ENOBUFS
--	 * immediately if the cookie is negative
--	 *
--	 * After this point, every page in the list might have PG_fscache set,
--	 * so we will need to clean that up off of every page we don't use.
--	 */
--	rc = cifs_readpages_from_fscache(mapping->host, mapping, page_list,
--					 &num_pages);
--	if (rc == 0) {
--		free_xid(xid);
--		return rc;
--	}
  
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
- 		pid = open_file->pid;
-@@ -4489,39 +4409,32 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 	server = cifs_pick_channel(tlink_tcon(open_file->tlink)->ses);
- 
- 	cifs_dbg(FYI, "%s: file=%p mapping=%p num_pages=%u\n",
--		 __func__, file, mapping, num_pages);
-+		 __func__, ractl->file, ractl->mapping, readahead_count(ractl));
- 
+@@ -4414,12 +4418,52 @@ static void cifs_readahead(struct readahead_control *ractl)
  	/*
--	 * Start with the page at end of list and move it to private
--	 * list. Do the same with any following pages until we hit
--	 * the rsize limit, hit an index discontinuity, or run out of
--	 * pages. Issue the async read and then start the loop again
--	 * until the list is empty.
--	 *
--	 * Note that list order is important. The page_list is in
--	 * the order of declining indexes. When we put the pages in
--	 * the rdata->pages, then we want them in increasing order.
-+	 * Chop the readahead request up into rsize-sized read requests.
+ 	 * Chop the readahead request up into rsize-sized read requests.
  	 */
--	while (!list_empty(page_list) && !err) {
--		unsigned int i, nr_pages, bytes, rsize;
--		loff_t offset;
--		struct page *page, *tpage;
-+	while (readahead_count(ractl) - ractl->_batch_count) {
-+		unsigned int i, nr_pages, got, rsize;
-+		struct page *page;
+-	while (readahead_count(ractl) - ractl->_batch_count) {
+-		unsigned int i, nr_pages, got, rsize;
++	while ((nr_pages = readahead_count(ractl) - ractl->_batch_count)) {
++		unsigned int i, got, rsize;
+ 		struct page *page;
  		struct cifs_readdata *rdata;
  		struct cifs_credits credits_on_stack;
  		struct cifs_credits *credits = &credits_on_stack;
++		pgoff_t index = readahead_index(ractl) + ractl->_batch_count;
++
++		/*
++		 * Find out if we have anything cached in the range of
++		 * interest, and if so, where the next chunk of cached data is.
++		 */
++		if (caching) {
++			if (check_cache) {
++				rc = cifs_fscache_query_occupancy(
++					ractl->mapping->host, index, nr_pages,
++					&next_cached, &cache_nr_pages);
++				if (rc < 0)
++					caching = false;
++				check_cache = false;
++			}
++
++			if (index == next_cached) {
++				/*
++				 * TODO: Send a whole batch of pages to be read
++				 * by the cache.
++				 */
++				page = readahead_page(ractl);
++				BUG_ON(!page);
++				if (cifs_readpage_from_fscache(ractl->mapping->host,
++							       page) < 0) {
++					/*
++					 * TODO: Deal with cache read failure
++					 * here, but for the moment, delegate
++					 * that to readpage.
++					 */
++					caching = false;
++				}
++				unlock_page(page);
++				next_cached++;
++				cache_nr_pages--;
++				if (cache_nr_pages == 0)
++					check_cache = true;
++				continue;
++			}
++		}	
  
  		if (open_file->invalidHandle) {
  			rc = cifs_reopen_file(open_file, true);
--			if (rc == -EAGAIN)
--				continue;
--			else if (rc)
-+			if (rc) {
-+				if (rc == -EAGAIN)
-+					continue;
- 				break;
-+			}
- 		}
- 
- 		rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
- 						   &rsize, credits);
+@@ -4435,6 +4479,7 @@ static void cifs_readahead(struct readahead_control *ractl)
  		if (rc)
  			break;
-+		nr_pages = min_t(size_t, rsize / PAGE_SIZE, readahead_count(ractl));
+ 		nr_pages = min_t(size_t, rsize / PAGE_SIZE, readahead_count(ractl));
++		nr_pages = min_t(size_t, nr_pages, next_cached - index);
  
  		/*
  		 * Give up immediately if rsize is too small to read an entire
-@@ -4529,16 +4442,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 		 * reach this point however since we set ra_pages to 0 when the
- 		 * rsize is smaller than a cache page.
- 		 */
--		if (unlikely(rsize < PAGE_SIZE)) {
--			add_credits_and_wake_if(server, credits, 0);
--			free_xid(xid);
--			return 0;
--		}
--
--		nr_pages = 0;
--		err = readpages_get_pages(mapping, page_list, rsize, &tmplist,
--					 &nr_pages, &offset, &bytes);
--		if (!nr_pages) {
-+		if (unlikely(!nr_pages)) {
- 			add_credits_and_wake_if(server, credits, 0);
- 			break;
- 		}
-@@ -4546,36 +4450,31 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 		rdata = cifs_readdata_alloc(nr_pages, cifs_readv_complete);
- 		if (!rdata) {
- 			/* best to give up if we're out of mem */
--			list_for_each_entry_safe(page, tpage, &tmplist, lru) {
--				list_del(&page->lru);
--				lru_cache_add(page);
--				unlock_page(page);
--				put_page(page);
--			}
--			rc = -ENOMEM;
- 			add_credits_and_wake_if(server, credits, 0);
- 			break;
- 		}
- 
--		rdata->cfile = cifsFileInfo_get(open_file);
--		rdata->server = server;
--		rdata->mapping = mapping;
--		rdata->offset = offset;
--		rdata->bytes = bytes;
--		rdata->pid = pid;
--		rdata->pagesz = PAGE_SIZE;
--		rdata->tailsz = PAGE_SIZE;
-+		got = __readahead_batch(ractl, rdata->pages, nr_pages);
-+		if (got != nr_pages) {
-+			pr_warn("__readahead_batch() returned %u/%u\n",
-+				got, nr_pages);
-+			nr_pages = got;
-+		}
-+
-+		rdata->nr_pages = nr_pages;
-+		rdata->bytes	= readahead_batch_length(ractl);
-+		rdata->cfile	= cifsFileInfo_get(open_file);
-+		rdata->server	= server;
-+		rdata->mapping	= ractl->mapping;
-+		rdata->offset	= readahead_pos(ractl);
-+		rdata->pid	= pid;
-+		rdata->pagesz	= PAGE_SIZE;
-+		rdata->tailsz	= PAGE_SIZE;
- 		rdata->read_into_pages = cifs_readpages_read_into_pages;
- 		rdata->copy_into_pages = cifs_readpages_copy_into_pages;
--		rdata->credits = credits_on_stack;
--
--		list_for_each_entry_safe(page, tpage, &tmplist, lru) {
--			list_del(&page->lru);
--			rdata->pages[rdata->nr_pages++] = page;
--		}
-+		rdata->credits	= credits_on_stack;
- 
- 		rc = adjust_credits(server, &rdata->credits, rdata->bytes);
--
- 		if (!rc) {
- 			if (rdata->cfile->invalidHandle)
- 				rc = -EAGAIN;
-@@ -4587,7 +4486,6 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 			add_credits_and_wake_if(server, &rdata->credits, 0);
- 			for (i = 0; i < rdata->nr_pages; i++) {
- 				page = rdata->pages[i];
--				lru_cache_add(page);
- 				unlock_page(page);
- 				put_page(page);
- 			}
-@@ -4600,7 +4498,6 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
+index efaac4d5ff55..f98cfcc0d397 100644
+--- a/fs/cifs/fscache.c
++++ b/fs/cifs/fscache.c
+@@ -134,37 +134,127 @@ void cifs_fscache_release_inode_cookie(struct inode *inode)
  	}
+ }
  
- 	free_xid(xid);
--	return rc;
++static inline void fscache_end_operation(struct netfs_cache_resources *cres)
++{
++	const struct netfs_cache_ops *ops = fscache_operation_valid(cres);
++
++	if (ops)
++		ops->end_operation(cres);
++}
++
+ /*
+- * Retrieve a page from FS-Cache
++ * Fallback page reading interface.
+  */
+-int __cifs_readpage_from_fscache(struct inode *inode, struct page *page)
++static int fscache_fallback_read_page(struct inode *inode, struct page *page)
+ {
+-	cifs_dbg(FYI, "%s: (fsc:%p, p:%p, i:0x%p\n",
+-		 __func__, CIFS_I(inode)->fscache, page, inode);
+-	return -ENOBUFS; // Needs conversion to using netfslib
++	struct netfs_cache_resources cres;
++	struct fscache_cookie *cookie = cifs_inode_cookie(inode);
++	struct iov_iter iter;
++	struct bio_vec bvec[1];
++	int ret;
++
++	memset(&cres, 0, sizeof(cres));
++	bvec[0].bv_page		= page;
++	bvec[0].bv_offset	= 0;
++	bvec[0].bv_len		= PAGE_SIZE;
++	iov_iter_bvec(&iter, READ, bvec, ARRAY_SIZE(bvec), PAGE_SIZE);
++
++	ret = fscache_begin_read_operation(&cres, cookie);
++	if (ret < 0)
++		return ret;
++
++	ret = fscache_read(&cres, page_offset(page), &iter, NETFS_READ_HOLE_FAIL,
++			   NULL, NULL);
++	fscache_end_operation(&cres);
++	return ret;
  }
  
  /*
-@@ -4924,7 +4821,7 @@ void cifs_oplock_break(struct work_struct *work)
-  * In the non-cached mode (mount with cache=none), we shunt off direct read and write requests
-  * so this method should never be called.
-  *
-- * Direct IO is not yet supported in the cached mode. 
-+ * Direct IO is not yet supported in the cached mode.
+- * Retrieve a set of pages from FS-Cache
++ * Fallback page writing interface.
   */
- static ssize_t
- cifs_direct_io(struct kiocb *iocb, struct iov_iter *iter)
-@@ -5006,7 +4903,7 @@ static int cifs_set_page_dirty(struct page *page)
+-int __cifs_readpages_from_fscache(struct inode *inode,
+-				struct address_space *mapping,
+-				struct list_head *pages,
+-				unsigned *nr_pages)
++static int fscache_fallback_write_page(struct inode *inode, struct page *page,
++				       bool no_space_allocated_yet)
+ {
+-	cifs_dbg(FYI, "%s: (0x%p/%u/0x%p)\n",
+-		 __func__, CIFS_I(inode)->fscache, *nr_pages, inode);
+-	return -ENOBUFS; // Needs conversion to using netfslib
++	struct netfs_cache_resources cres;
++	struct fscache_cookie *cookie = cifs_inode_cookie(inode);
++	struct iov_iter iter;
++	struct bio_vec bvec[1];
++	loff_t start = page_offset(page);
++	size_t len = PAGE_SIZE;
++	int ret;
++
++	memset(&cres, 0, sizeof(cres));
++	bvec[0].bv_page		= page;
++	bvec[0].bv_offset	= 0;
++	bvec[0].bv_len		= PAGE_SIZE;
++	iov_iter_bvec(&iter, WRITE, bvec, ARRAY_SIZE(bvec), PAGE_SIZE);
++
++	ret = fscache_begin_write_operation(&cres, cookie);
++	if (ret < 0)
++		return ret;
++
++	ret = cres.ops->prepare_write(&cres, &start, &len, i_size_read(inode),
++				      no_space_allocated_yet);
++	if (ret == 0)
++		ret = fscache_write(&cres, page_offset(page), &iter, NULL, NULL);
++	fscache_end_operation(&cres);
++	return ret;
+ }
  
- const struct address_space_operations cifs_addr_ops = {
- 	.readpage = cifs_readpage,
--	.readpages = cifs_readpages,
-+	.readahead = cifs_readahead,
- 	.writepage = cifs_writepage,
- 	.writepages = cifs_writepages,
- 	.write_begin = cifs_write_begin,
+-void __cifs_readpage_to_fscache(struct inode *inode, struct page *page)
++/*
++ * Retrieve a page from FS-Cache
++ */
++int __cifs_readpage_from_fscache(struct inode *inode, struct page *page)
+ {
+-	struct cifsInodeInfo *cifsi = CIFS_I(inode);
++	int ret;
+ 
+-	WARN_ON(!cifsi->fscache);
++	cifs_dbg(FYI, "%s: (fsc:%p, p:%p, i:0x%p\n",
++		 __func__, cifs_inode_cookie(inode), page, inode);
+ 
++	ret = fscache_fallback_read_page(inode, page);
++	if (ret < 0)
++		return ret;
++
++	/* Read completed synchronously */
++	SetPageUptodate(page);
++	return 0;
++}
++
++void __cifs_readpage_to_fscache(struct inode *inode, struct page *page)
++{
+ 	cifs_dbg(FYI, "%s: (fsc: %p, p: %p, i: %p)\n",
+-		 __func__, cifsi->fscache, page, inode);
++		 __func__, cifs_inode_cookie(inode), page, inode);
++
++	fscache_fallback_write_page(inode, page, true);
++}
++
++/*
++ * Query the cache occupancy.
++ */
++int __cifs_fscache_query_occupancy(struct inode *inode,
++				   pgoff_t first, unsigned nr_pages,
++				   pgoff_t *_data_first,
++				   unsigned int *_data_nr_pages)
++{
++	struct netfs_cache_resources cres;
++	struct fscache_cookie *cookie = cifs_inode_cookie(inode);
++	loff_t start, data_start;
++	size_t len, data_len;
++	int ret;
+ 
+-	// Needs conversion to using netfslib
++	ret = fscache_begin_read_operation(&cres, cookie);
++	if (ret < 0)
++		return ret;
++
++	start = first * PAGE_SIZE;
++	len = nr_pages * PAGE_SIZE;
++	ret = cres.ops->query_occupancy(&cres, start, len, PAGE_SIZE,
++					&data_start, &data_len);
++	if (ret == 0) {
++		*_data_first = data_start / PAGE_SIZE;
++		*_data_nr_pages = len / PAGE_SIZE;
++	}
++
++	fscache_end_operation(&cres);
++	return ret;
+ }
+diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
+index c6ca49ac33d4..3896c95fe9ac 100644
+--- a/fs/cifs/fscache.h
++++ b/fs/cifs/fscache.h
+@@ -9,6 +9,7 @@
+ #ifndef _CIFS_FSCACHE_H
+ #define _CIFS_FSCACHE_H
+ 
++#include <linux/swap.h>
+ #include <linux/fscache.h>
+ 
+ #include "cifsglob.h"
+@@ -58,14 +59,6 @@ void cifs_fscache_fill_coherency(struct inode *inode,
+ }
+ 
+ 
+-extern int cifs_fscache_release_page(struct page *page, gfp_t gfp);
+-extern int __cifs_readpage_from_fscache(struct inode *, struct page *);
+-extern int __cifs_readpages_from_fscache(struct inode *,
+-					 struct address_space *,
+-					 struct list_head *,
+-					 unsigned *);
+-extern void __cifs_readpage_to_fscache(struct inode *, struct page *);
+-
+ static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode)
+ {
+ 	return CIFS_I(inode)->fscache;
+@@ -80,33 +73,52 @@ static inline void cifs_invalidate_cache(struct inode *inode, unsigned int flags
+ 			   i_size_read(inode), flags);
+ }
+ 
+-static inline int cifs_readpage_from_fscache(struct inode *inode,
+-					     struct page *page)
+-{
+-	if (CIFS_I(inode)->fscache)
+-		return __cifs_readpage_from_fscache(inode, page);
++extern int __cifs_fscache_query_occupancy(struct inode *inode,
++					  pgoff_t first, unsigned nr_pages,
++					  pgoff_t *_data_first,
++					  unsigned int *_data_nr_pages);
+ 
+-	return -ENOBUFS;
++static inline int cifs_fscache_query_occupancy(struct inode *inode,
++					       pgoff_t first, unsigned nr_pages,
++					       pgoff_t *_data_first,
++					       unsigned int *_data_nr_pages)
++{
++	if (!cifs_inode_cookie(inode))
++		return -ENOBUFS;
++	return __cifs_fscache_query_occupancy(inode, first, nr_pages,
++					      _data_first, _data_nr_pages);
+ }
+ 
+-static inline int cifs_readpages_from_fscache(struct inode *inode,
+-					      struct address_space *mapping,
+-					      struct list_head *pages,
+-					      unsigned *nr_pages)
++extern int __cifs_readpage_from_fscache(struct inode *, struct page *);
++extern void __cifs_readpage_to_fscache(struct inode *, struct page *);
++
++
++static inline int cifs_readpage_from_fscache(struct inode *inode,
++					     struct page *page)
+ {
+-	if (CIFS_I(inode)->fscache)
+-		return __cifs_readpages_from_fscache(inode, mapping, pages,
+-						     nr_pages);
++	if (cifs_inode_cookie(inode))
++		return __cifs_readpage_from_fscache(inode, page);
+ 	return -ENOBUFS;
+ }
+ 
+ static inline void cifs_readpage_to_fscache(struct inode *inode,
+ 					    struct page *page)
+ {
+-	if (PageFsCache(page))
++	if (cifs_inode_cookie(inode))
+ 		__cifs_readpage_to_fscache(inode, page);
+ }
+ 
++static inline int cifs_fscache_release_page(struct page *page, gfp_t gfp)
++{
++	if (PageFsCache(page)) {
++		if (current_is_kswapd() || !(gfp & __GFP_FS))
++			return false;
++		wait_on_page_fscache(page);
++		fscache_note_page_release(cifs_inode_cookie(page->mapping->host));
++	}
++	return true;
++}
++
+ #else /* CONFIG_CIFS_FSCACHE */
+ static inline
+ void cifs_fscache_fill_coherency(struct inode *inode,
+@@ -123,22 +135,29 @@ static inline void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool upd
+ static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode) { return NULL; }
+ static inline void cifs_invalidate_cache(struct inode *inode, unsigned int flags) {}
+ 
+-static inline int
+-cifs_readpage_from_fscache(struct inode *inode, struct page *page)
++static inline int cifs_fscache_query_occupancy(struct inode *inode,
++					       pgoff_t first, unsigned nr_pages,
++					       pgoff_t *_data_first,
++					       unsigned int *_data_nr_pages)
+ {
++	_data_first = ULONG_MAX;
++	_data_nr_pages = 0;
+ 	return -ENOBUFS;
+ }
+ 
+-static inline int cifs_readpages_from_fscache(struct inode *inode,
+-					      struct address_space *mapping,
+-					      struct list_head *pages,
+-					      unsigned *nr_pages)
++static inline int
++cifs_readpage_from_fscache(struct inode *inode, struct page *page)
+ {
+ 	return -ENOBUFS;
+ }
+ 
+-static inline void cifs_readpage_to_fscache(struct inode *inode,
+-			struct page *page) {}
++static inline
++void cifs_readpage_to_fscache(struct inode *inode, struct page *page) {}
++
++static inline int nfs_fscache_release_page(struct page *page, gfp_t gfp)
++{
++	return true; /* May release page */
++}
+ 
+ #endif /* CONFIG_CIFS_FSCACHE */
+ 
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index b46c39d98bbd..614f22213e21 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -244,6 +244,13 @@ struct netfs_cache_ops {
+ 	int (*prepare_write)(struct netfs_cache_resources *cres,
+ 			     loff_t *_start, size_t *_len, loff_t i_size,
+ 			     bool no_space_allocated_yet);
++
++	/* Query the occupancy of the cache in a region, returning where the
++	 * next chunk of data starts and how long it is.
++	 */
++	int (*query_occupancy)(struct netfs_cache_resources *cres,
++			       loff_t start, size_t len, size_t granularity,
++			       loff_t *_data_start, size_t *_data_len);
+ };
+ 
+ struct readahead_control;
 
 
