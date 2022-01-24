@@ -2,66 +2,91 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 398F7C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jan 2022 14:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D39FC433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jan 2022 15:14:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234520AbiAXOUD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Jan 2022 09:20:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234653AbiAXOUD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Jan 2022 09:20:03 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22711C06173B
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Jan 2022 06:20:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=FyUvH9okx3QW3BeHHjRYOG14mog6x9sWF/iX1pzpMLc=; b=qNVkHi1Q2Xh/DoGB6Ny1OjxYAu
-        Vi0wMbp43VYL6gTa+4vMoA2eFFHa85XvdyoE+Rcv/RzH9NjaehXONnt0iGhdt3W4kBDxNAxcC9C1K
-        sMpLf543OIqpGEgDKepXx9+1CLphIPHcpKWf9wNHucSfROV3C0J1faY4gYKDUFNxZ4YdldhZXd+Zi
-        mwY3jChgvq++AFw+f5orgGZ6EALU58yY5QPIXN38ohJ0t2geVlOhwOoxsP9Vq7DxEWWBD4EQdgZBf
-        5t+B0wzV44NB1/G/Mj2xG5ju8yAWAxHUue9Vr1lUpsuZQiTOnm8KYAGAiXJsYjhzvgCdi+87H2u73
-        Rarnb0Tw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nC0CL-000kY5-Fu; Mon, 24 Jan 2022 14:19:57 +0000
-Date:   Mon, 24 Jan 2022 14:19:57 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     smfrench@gmail.com, nspmangalore@gmail.com,
+        id S240706AbiAXPOx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Jan 2022 10:14:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30538 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240744AbiAXPOs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 24 Jan 2022 10:14:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643037288;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=b32czmsHk3lhEJ6XbrXNWZ8fxyModf2w9QxuPOXZga8=;
+        b=VR4VkVpGbwL0NzjRpICAF+jqF+lfieuPG0QwsMVInVGepgfCHApvkjVPkWjg0zRTh7VWQN
+        4P+K2tHfosqWdqUR8zP5kvQqyY4Lcjij0mhwoVzhbf3JVaH2hYOaWtUpjd+KAAOp363LXR
+        0NP8gcT/f3dbZBtUWQrVnheU60mFcJo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-548-7eYqOQcOP-aEmr1DcwH6uw-1; Mon, 24 Jan 2022 10:14:44 -0500
+X-MC-Unique: 7eYqOQcOP-aEmr1DcwH6uw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8761C18C8C0C;
+        Mon, 24 Jan 2022 15:14:43 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3721E7D48A;
+        Mon, 24 Jan 2022 15:14:42 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <Ye61jfhL7K9Ethxz@casper.infradead.org>
+References: <Ye61jfhL7K9Ethxz@casper.infradead.org> <164303051132.2163193.10493291874899600548.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, smfrench@gmail.com, nspmangalore@gmail.com,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-cachefs@redhat.com
 Subject: Re: [RFC PATCH] cifs: Transition from ->readpages() to ->readahead()
-Message-ID: <Ye61jfhL7K9Ethxz@casper.infradead.org>
-References: <164303051132.2163193.10493291874899600548.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <164303051132.2163193.10493291874899600548.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2255917.1643037281.1@warthog.procyon.org.uk>
+Date:   Mon, 24 Jan 2022 15:14:41 +0000
+Message-ID: <2255918.1643037281@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jan 24, 2022 at 01:21:51PM +0000, David Howells wrote:
-> Transition the cifs filesystem from using the old ->readpages() method to
-> using the new ->readahead() method.
-> 
-> For the moment, this removes any invocation of fscache to read data from
-> the local cache, leaving that to another patch.
-> 
-> Questions for Willy:
->  - Can we get a function to return the number of pages in a readahead
->    batch?
-> 
->  - Can we get a function to commit a readahead batch?  Currently, this is
->    done when we call __readahead_batch(), but that means ractl->_nr_pages
->    isn't up to date at the point we need it to be.  However, we want to
->    check to see if the ractl is empty, then get server credits and only
->    *then* call __readahead_batch() as we don't know how big a batch we're
->    allowed till we have the credits.
+Matthew Wilcox <willy@infradead.org> wrote:
 
-If you insist on using the primitives in a way that nobody else uses
-them, you're going to find they don't work.  What's wrong with the
-way that FUSE uses them in fuse_readahead()?
+> > Questions for Willy:
+> >  - Can we get a function to return the number of pages in a readahead
+> >    batch?
+> > 
+> >  - Can we get a function to commit a readahead batch?  Currently, this is
+> >    done when we call __readahead_batch(), but that means ractl->_nr_pages
+> >    isn't up to date at the point we need it to be.  However, we want to
+> >    check to see if the ractl is empty, then get server credits and only
+> >    *then* call __readahead_batch() as we don't know how big a batch we're
+> >    allowed till we have the credits.
+> 
+> If you insist on using the primitives in a way that nobody else uses
+> them, you're going to find they don't work.  What's wrong with the
+> way that FUSE uses them in fuse_readahead()?
+
+You mean doing this?
+
+		nr_pages = readahead_count(rac) - nr_pages;
+
+that would seem to indicate that the readahead interface is wrong.  Why should
+readahead_count() need correction?  I think I can see *why* the batching stuff
+is hidden, but it seems that the comment for readahead_count() needs to
+mention this if you aren't going to fix it.
+
+Would it be possible to make readahead_count() do:
+
+	return rac->_nr_pages - rac->_batch_count;
+
+maybe?
+
+David
 
