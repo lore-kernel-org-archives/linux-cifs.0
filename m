@@ -2,116 +2,141 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4873DC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 Jan 2022 14:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9775BC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 25 Jan 2022 15:00:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1389022AbiAYOoo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 25 Jan 2022 09:44:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40646 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1580005AbiAYOlf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 25 Jan 2022 09:41:35 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256C0C061749
-        for <linux-cifs@vger.kernel.org>; Tue, 25 Jan 2022 06:41:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=SxzwNPb+8L5l7COlADYOY1zE/U72F31PI7I+27pXwO4=; b=OWQZRSF3LlklJweEVKYwrMRQ/r
-        k2TZDHWleJpOjcaJMzDiEV0dciekgMcKb0oAfZK1etsgfQH7vIM2z+IfhkK/JrFW8/EIWIbo8kROh
-        lEmbfqBNcMueTaN+dti2HXSKY4JSSJlZkz+GDQV9k+fDUS3c8BgNr+5xqp43/LTkZkrenbcI77EtK
-        7mvmTJMyfuZV8FjyP+kgkQvFpvtyZoBIlEBX0vZcZA9xUqU+sPqSJs7ifB4O0K4ocGcFs40IDoONb
-        4c+nAXTEFdfuIzd9vhVutUyxOpe3CGDPr2WwYZ4UASmieGvEfSUYVzhhgNCE/eNsv7MurXxHnnrWv
-        ej8PdtXg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nCN0h-002ytE-Rg; Tue, 25 Jan 2022 14:41:27 +0000
-Date:   Tue, 25 Jan 2022 14:41:27 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     smfrench@gmail.com, nspmangalore@gmail.com,
+        id S1378775AbiAYPAu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 25 Jan 2022 10:00:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42959 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1354500AbiAYO5S (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 25 Jan 2022 09:57:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643122635;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IczQL1YvwZoBijT+ednRWpEpcXI6INviykxL+Hwilow=;
+        b=Fs9cwWmUG9NuUxOsutt0dyx0KU9jYGHJ5LdG/OGOYaPP7Ks/aFm+SpLzwUNs9TYA/voCAY
+        0rF9aYiJM6wfh5UqrlFu7kBNk79LMlueFr3NJrm7wb8enxde4XsTN762FoYCST2wHs7fcw
+        ZQrZVT3tSEE6S1TuytluG+kWB4bQNY4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-330-k1Ci7QWJP3CvO6bs8HVgNQ-1; Tue, 25 Jan 2022 09:57:12 -0500
+X-MC-Unique: k1Ci7QWJP3CvO6bs8HVgNQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 454AD1923E21;
+        Tue, 25 Jan 2022 14:57:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AD6B17E2EF;
+        Tue, 25 Jan 2022 14:57:04 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <YfAHJcXeSsAE4uMB@casper.infradead.org>
+References: <YfAHJcXeSsAE4uMB@casper.infradead.org> <164311902471.2806745.10187041199819525677.stgit@warthog.procyon.org.uk> <164311906472.2806745.605202239282432844.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, smfrench@gmail.com, nspmangalore@gmail.com,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-cachefs@redhat.com
-Subject: Re: [RFC PATCH] cifs: Transition from ->readpages() to ->readahead()
-Message-ID: <YfAMF/azs+59zNiU@casper.infradead.org>
-References: <Ye7Ms67MA0kycc/x@casper.infradead.org>
- <Ye7GtNRgxkT9S6sG@casper.infradead.org>
- <Ye61jfhL7K9Ethxz@casper.infradead.org>
- <164303051132.2163193.10493291874899600548.stgit@warthog.procyon.org.uk>
- <2255918.1643037281@warthog.procyon.org.uk>
- <2270964.1643039187@warthog.procyon.org.uk>
- <2311840.1643041511@warthog.procyon.org.uk>
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/7] cifs: Transition from ->readpages() to ->readahead()
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2311840.1643041511@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2810188.1643122623.1@warthog.procyon.org.uk>
+Date:   Tue, 25 Jan 2022 14:57:03 +0000
+Message-ID: <2810189.1643122623@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jan 24, 2022 at 04:25:11PM +0000, David Howells wrote:
-> Matthew Wilcox <willy@infradead.org> wrote:
+Matthew Wilcox <willy@infradead.org> wrote:
+
+> On Tue, Jan 25, 2022 at 01:57:44PM +0000, David Howells wrote:
+> > +	while (readahead_count(ractl) - ractl->_batch_count) {
 > 
-> > Well, that's the problem isn't it?  You're expecting to mutate the state
-> > and then refer to its previous state instead of its current state,
-> 
-> No.  I *don't* want to see the previous state.  That's where the problem is:
-> The previous state isn't cleared up until the point I ask for a new batch -
-> but I need to query the ractl to find the remaining window before I can ask
-> for a new batch.
+> You do understand that prefixing a structure member with an '_' means
+> "Don't use this", right?  If I could get the compiler to prevent you, I
+> would.
 
-Oh, right, even worse -- you want to know the _future_ state of the
-iterator before you mutate it (it's kind of the same thing though
-if you haven't looked at how the iterator works internally).
+Yes, I know.  However, as previously discussed, I think that your
+implementation of readahead batching doesn't work right - hence the need to
+apply compensation to the values returned by the accessor functions.
 
-> > whereas the other users refer to the current state instead of the
-> > previous state.
-> 
-> Fuse has exactly the same issues:
+Btw, I end up doing this:
 
-... and yet you refuse to solve it the same way as fuse ...
+		for (i = 0; i < nr_pages; i++)
+			if (!readahead_folio(ractl))
+				BUG();
 
-> > Can't you pull readahead_index() out of the ractl ahead of the mutation?
-> 
-> I'm not sure what you mean by that.  What I'm now doing is:
-> 
-> 	while ((nr_pages = readahead_count(ractl) - ractl->_batch_count)) {
-> 		...
-> 		pgoff_t index = readahead_index(ractl) + ractl->_batch_count;
-> 		...
-> 		rc = cifs_fscache_query_occupancy(
-> 			ractl->mapping->host, index, nr_pages,
-> 		...
-> 		rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
-> 						   &rsize, credits);
-> 		...
-> 		nr_pages = min_t(size_t, rsize / PAGE_SIZE, readahead_count(ractl));
-> 		nr_pages = min_t(size_t, nr_pages, next_cached - index);
-> 		...
-> 		rdata = cifs_readdata_alloc(nr_pages, cifs_readv_complete);
-> 		...
-> 		got = __readahead_batch(ractl, rdata->pages, nr_pages);
-> 		...
-> 	}
-> 
-> I need the count to know how many, if any, pages are remaining; I need the
-> count and index of the window to find out if fscache has any data; I need the
-> count to allocate a page array.  Only after all that can I crank the next
-> batch for the server (assuming I didn't delegate to the cache along the way,
-> but that calls readahead_page()).
+in patch 5.  I want to create a batch, but I don't want to be given the array
+of addresses of the folios as I'm going to use an xarray-class iterator.
+Further, _batch_count at this point is some value related to just the last
+folio and not the batch as a whole:-/
 
-The problem is that the other users very much want to refer to the
-pre-mutation state.  eg, btrfs:
+(Also, the above won't work if any folios retrieved are larger than a page)
 
-        while ((nr = readahead_page_batch(rac, pagepool))) {
-                u64 contig_start = readahead_pos(rac);
-                u64 contig_end = contig_start + readahead_batch_length(rac) - 1;
+Note that cifs_readahead() is removed in patch 7 and readahead functionality
+is offloaded to netfslib, so I'm not sure it's worth spending much time on
+fixing.
 
-                contiguous_readpages(pagepool, nr, contig_start, contig_end,
-                                &em_cached, &bio_ctrl, &prev_em_start);
-        }
+[I should mention that netfs_readahead() also does:
 
-The API isn't designed to work the way you want it to work.  So either
-we redesign it (... and change all the existing users ...) or you use
-it the way that FUSE does, which is admittedly suboptimal, but you're
-also saying it's temporary.
+	while (readahead_folio(ractl))
+		;
+which could probably be replaced with something better that doesn't keep
+taking and dropping the RCU readlock.]
+
+Would you object if I added a function like:
+
+	static inline
+	unsigned int readahead_commit_batch(struct readahead_control *rac)
+	{
+		BUG_ON(rac->_batch_count > rac->_nr_pages);
+		rac->_nr_pages -= rac->_batch_count;
+		rac->_index += rac->_batch_count;
+		rac->_batch_count = 0;
+	}
+
+It could then be called from both __readahead_folio() and __readahead_batch().
+For __readahead_folio(), the duplicate setting of _batch_count should be
+optimised away on the path where a folio is returned.  I could then call this
+from the loop in cifs before going round again.
+
+I'd also like to consider adding something like:
+
+	static inline
+	void readahead_set_batch(struct readahead_control *rac)
+	{
+		unsigned int i = 0;
+		struct page *page;
+		XA_STATE(xas, &rac->mapping->i_pages, 0);
+
+		BUG_ON(rac->_batch_count > rac->_nr_pages);
+		rac->_nr_pages -= rac->_batch_count;
+		rac->_index += rac->_batch_count;
+		rac->_batch_count = 0;
+
+		xas_set(&xas, rac->_index);
+		rcu_read_lock();
+		xas_for_each(&xas, page, rac->_index + rac->_nr_pages - 1) {
+			if (xas_retry(&xas, page))
+				continue;
+			VM_BUG_ON_PAGE(!PageLocked(page), page);
+			VM_BUG_ON_PAGE(PageTail(page), page);
+			rac->_batch_count += thp_nr_pages(page);
+		}
+		rcu_read_unlock();
+	}
+
+so that netfslib can use it to load all the pages it is given into a batch
+without retrieving the page pointers.
+
+David
+
