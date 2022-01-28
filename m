@@ -2,64 +2,99 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54AFAC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jan 2022 07:05:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D025C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jan 2022 10:58:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346624AbiA1HFU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Jan 2022 02:05:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229759AbiA1HFU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jan 2022 02:05:20 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F5BC061714;
-        Thu, 27 Jan 2022 23:05:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=jf2E0pUG3GOZxihUHfPlYjorrQluw3AZrzDbcNera34=; b=bSrIeDjXe0kg3MTDdcQumiTEIp
-        IksleX6eyErXVnT1iLyg1ZCBmqioCp3PbXMjc4sPeR6DRewgGFgE2ZVEcAtuYigTyTrHP7MGldcHY
-        DK1hD72+iajXZTdIOh8pl9YauMSILSaOKfTXVGdHUpl7eLvRA/R3fTs3EtACH/zV3wM6ElH3axvdr
-        jntQAzojiTkRqldKzjaW7gL0vWEVXNzSaAHifzk/8BLge541m44TJeD/r/QHhvwsv5sfOnh1a5gKd
-        IdvOl27Th9lgeKoP5kDcX7tZhRBeVpUIcOgw9ncKRTrfCBQFbTM9b8lK+y5YiDzJoaaeXfF95lTBg
-        iW3L+a/Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nDLJg-000iLD-EQ; Fri, 28 Jan 2022 07:05:04 +0000
-Date:   Thu, 27 Jan 2022 23:05:04 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
+        id S1347951AbiA1K6Y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Jan 2022 05:58:24 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:49924 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242852AbiA1K6X (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jan 2022 05:58:23 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1FCF561DFF;
+        Fri, 28 Jan 2022 10:58:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF14CC340E0;
+        Fri, 28 Jan 2022 10:58:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643367502;
+        bh=+zWMkFDrZZM+qbNwpezGJFJ66XZ2aI38VXsj6i5zjVc=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=n2GH3c7VO+JatCdg0jYNo1RcnnnE6Tof8QDipRbmPk+HfcvlbFNLW3SMyMW3v9xDR
+         XvcyPjQ+zoBMaFiIKbF/tqUDjVspc1G6LJwMKY4DtoSJ2KXnm/6PcxgIbMDlaMVZXi
+         pb2+obmFd/8+yM0m5/GQrVyAKczJMz9xx29t4vVYf6gfmpiVY+kpqH13W7lmOVz5VY
+         VW19GXitDz+VslMV9LqEoIE2wjWWnUmWV9G550P5RpLY/K7VmgePVtnpx7ceTzmX/J
+         pQfwOpWyooISOPvAVxAcrCNdf/ZYURJx1w+rki4YAv7LBw6X1mzp5ceEXPFVJWonmp
+         lNnYMldKZd+6A==
+Message-ID: <e5bee4a3e8a7c860d447fe74d5cf2d1846e8600d.camel@kernel.org>
+Subject: Re: [PATCH 0/4] cifs: Use fscache I/O again after the rewrite
+ disabled it
+From:   Jeff Layton <jlayton@kernel.org>
+To:     David Howells <dhowells@redhat.com>,
+        Steve French <smfrench@gmail.com>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-cifs@vger.kernel.org, linux-cachefs@redhat.com,
         Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        JeffleXu <jefflexu@linux.alibaba.com>, linux-cachefs@redhat.com,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC][PATCH] cachefiles: Split and rename S_KERNEL_FILE and
- extend effects
-Message-ID: <YfOVoIQqaXkzDju5@infradead.org>
-References: <1079106.1642772886@warthog.procyon.org.uk>
+Date:   Fri, 28 Jan 2022 05:58:20 -0500
+In-Reply-To: <164329930161.843658.7387773437540491743.stgit@warthog.procyon.org.uk>
+References: <164329930161.843658.7387773437540491743.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1079106.1642772886@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Jan 21, 2022 at 01:48:06PM +0000, David Howells wrote:
-> Split S_KERNEL_FILE into two separate flags to do two separate jobs and give
-> them new names[1][2]:
+On Thu, 2022-01-27 at 16:01 +0000, David Howells wrote:
+> Hi Steve,
+> 
+> Here are some patches to make cifs actually do I/O to the cache after it
+> got disabled in the fscache rewrite[1] plus a warning fix that you might
+> want to detach and take separately:
+> 
+>  (1) Fix a kernel doc warning.
+> 
+>  (2) Change cifs from using ->readpages() to using ->readahead().
+> 
+>  (3) Provide a netfs cache op to query for the presence of data in the
+>      cache.[*]
+> 
+>  (4) Make ->readahead() call
+> 
+> The patches can be found here also:
+> 
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-rewrite
+> 
+> David
+> 
+> [*] Ideally, we would use the netfslib read helpers, but it's probably better
+>     to roll iterators down into cifs's I/O layer before doing that[2].
+> 
+> Link: https://lore.kernel.org/r/164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk/ [1]
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-experimental [2]
+> 
+> ---
+> David Howells (4):
+>       Fix a warning about a malformed kernel doc comment in cifs by removing the
+>       cifs: Transition from ->readpages() to ->readahead()
+>       netfs, cachefiles: Add a method to query presence of data in the cache
+>       cifs: Implement cache I/O by accessing the cache directly
+> 
+> 
+>  Documentation/filesystems/netfs_library.rst |  16 ++
+>  fs/cachefiles/io.c                          |  59 ++++++
+>  fs/cifs/connect.c                           |   2 +-
+>  fs/cifs/file.c                              | 221 ++++++++------------
+>  fs/cifs/fscache.c                           | 126 +++++++++--
+>  fs/cifs/fscache.h                           |  79 ++++---
+>  include/linux/netfs.h                       |   7 +
+>  7 files changed, 322 insertions(+), 188 deletions(-)
+> 
+> 
 
-I strong disagreewith this.  The flag is a horrible hack that does not
-have any business to exist to start with.  Splitting it an potentially
-proliferating the use is not a good.
-
-The proper fix would be to fix the cachefiles design to not rely on it
-at all.
+Acked-by: Jeff Layton <jlayton@kernel.org>
