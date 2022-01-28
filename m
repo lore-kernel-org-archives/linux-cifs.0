@@ -2,47 +2,47 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EE1C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jan 2022 13:39:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD3B5C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jan 2022 13:50:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238991AbiA1Njw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Jan 2022 08:39:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59908 "EHLO
+        id S236497AbiA1Nur (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Jan 2022 08:50:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238016AbiA1Njw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jan 2022 08:39:52 -0500
-Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AC57C061714;
-        Fri, 28 Jan 2022 05:39:52 -0800 (PST)
-Received: by mail-vs1-xe31.google.com with SMTP id g23so3028338vsf.7;
-        Fri, 28 Jan 2022 05:39:52 -0800 (PST)
+        with ESMTP id S243502AbiA1Nur (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jan 2022 08:50:47 -0500
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 282EBC061714;
+        Fri, 28 Jan 2022 05:50:47 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id k17so18628233ybk.6;
+        Fri, 28 Jan 2022 05:50:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=mhe3GEpJO2nK1ZxndsPmNrp2c6vjPQdZ5vtf4DHCHDc=;
-        b=itgdo0vlshIcywh4CMRbFu5RXMgvayKBB+GOx7pNM7xrT/0YZelH1A4IEueWSM2qhM
-         O7Y5BEDfBz5jqaczAD4FmX1NCb3wuMzCMvu/q3X0krx9zdbFcxOYER9R2ped2I5b9EHr
-         ITt9oagebCvRpxXmr+rk9OVZSrdI7zxMUT5qPLLThPXbxCFIRG2/iYmefFZSyLocG3P5
-         7L8TTb12CSUcWiYsxeMrshkpf3+yALx2DiSx26p1Wc+d5LXDt0YvZgJcXYD32d2se3fp
-         29iWrKLRlOIAIIJG6fGg8bcnl9NCNQI8E+6oYGpGcn3W59i2Z1xguafNwkPJ2SXgw8I0
-         gEAQ==
+        bh=gT9SInkkMwHDdS/o+TmNDLEffI0M2Tk/s675iCqlZek=;
+        b=YPIdONdoZg8MPE+7BhlEvuGFlqPxTzPXwKeF/HyUK97158V6MrxT8AHpTOJAvDV8K/
+         H7EugRXfDypqWr94IAOlUh0EWnoa+XbefqYbFHATzRrA9beo8c8OhBx58XpTDdGY8Mzv
+         WRERccwDsbzrZOKm8vWARwW+5iiP4s3agkJbUQw7Ryz9uPQXDNpZDE2A2b+QyX55Q1T9
+         QIVTLa1i27QNiHE4D850NjSSTCxJp5NwmNav9hdluxltzCfw/8+W2qQZ0Zd1NHYm3Swp
+         Ay2L5HYNUtoKxVXHIVCP4Y8FFZRLpLULHns7JiT++PG740pF+W3ukCYXSmJ2K7zL8WqM
+         OoRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=mhe3GEpJO2nK1ZxndsPmNrp2c6vjPQdZ5vtf4DHCHDc=;
-        b=wzjQf/WpwjRdw47AJkfmW0kZlHXiJ/Gtp0fQOmW4ch5LFjPoqYYdgO3KZb799qqPRR
-         m0Z/i5kAUQ2ljb3PMi3kxvexZSpyUN4AZhXT5R8JfqPDYvRQ0t3zKOo0S6LuSjL5MK9Z
-         prd95gJFLxC6vTK7Uf1apQVYHb3xSj813x6SbzSFILeKAQ9CRzCgXg0dgX9vLe3VxY8M
-         w+Cu7FfRoGeT5fTcefRNTfFLnt2OgWuNFLk8haxmKFT71x7Ug6EBEBYx9cqw8/ugKzAE
-         w/gszkfy0gTsL4i6JTyuAhO9Y7iz1WxQLzTKfOssRCQLEkJk67dFWmWcypJ5C5aZzSq2
-         +Jxg==
-X-Gm-Message-State: AOAM533CdZ9eX1DNQ39MnFPvMFslfzRgNAAMSyap40fBjZqhJlqoxYk2
-        SqCJ8PjGniK4Lo/jOoxGexJYYliR25N4qRYS8ZU=
-X-Google-Smtp-Source: ABdhPJyDKnPkJ4cGV4kAXz8HUzvSm8CAKKLiVF96wbi/6BD/1reJZW9zUnHQf4MuZqCW1f8iA0VIFdQqHTZIhaCjKjc=
-X-Received: by 2002:a67:a64a:: with SMTP id r10mr3843909vsh.76.1643377191253;
- Fri, 28 Jan 2022 05:39:51 -0800 (PST)
+        bh=gT9SInkkMwHDdS/o+TmNDLEffI0M2Tk/s675iCqlZek=;
+        b=A1wxHmfAAJaVey0yCBQ95fSOEtPTyih8OJFgQtvmjSCHW/GgSbVLmKeZpopl+uEY/+
+         wZLaaNxjnc3SxQ7scZ4olPPQ7Q6aWs2xMYf39rtnE5SlG/x5yRE5c8U+mFly/UU+RahX
+         S9KjhKDzy4emaQCUzfQPqXmvcrTQGQp8AwT8h8WDsZ3XrrvovpOAXCK9KklwTK53mRft
+         9sTn57lvF1af5oSiRCKK4G57iti4tMXvd1JpW7xrWdCWjxFwUsPzClf/KiaXeXmEaoXc
+         zgG//hgyXEt+7TpeGg3Rl1OfaZeblBBtF+JqeUU3Vl+qjfYmk0EdrMAf9DKCsdkKGX9C
+         5cEQ==
+X-Gm-Message-State: AOAM531rNY11uABI3o+4El8SkAKoUQKLX7iegoWOcjAVKk5UUX0FhxeD
+        FO62U0McV88GWmSxDyuf8wTZWfl9/DxORMfd8PI=
+X-Google-Smtp-Source: ABdhPJz13tunAzz3zbGbsqhZivMNe2/Dk2pELl5R/a2KRQkXYimx63OJnGMaHQ/dd1xVCtlWGHE5MNcHby6tcQf4b6c=
+X-Received: by 2002:a25:2ac3:: with SMTP id q186mr13076468ybq.272.1643377846206;
+ Fri, 28 Jan 2022 05:50:46 -0800 (PST)
 MIME-Version: 1.0
 References: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
  <CAH2r5mt_2f==5reyc0HmMLvYJVmP4Enykwauo+LQoFGFbVFeRQ@mail.gmail.com>
@@ -52,14 +52,13 @@ References: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
  <CAN05THSGwCKckQoeB6D91iBv0Sed+ethK7tde7GSc1UzS-0OYg@mail.gmail.com>
  <CAJjP=BvcWrF-k_sFxak1mgHAHVVS7_JZow+h_47XB1VzG2+Drw@mail.gmail.com> <ebf8c487-0377-834e-fbb7-725cceae1fbb@leemhuis.info>
 In-Reply-To: <ebf8c487-0377-834e-fbb7-725cceae1fbb@leemhuis.info>
-From:   Davyd McColl <davydm@gmail.com>
-Date:   Fri, 28 Jan 2022 15:39:40 +0200
-Message-ID: <CAJjP=BuZsA81yr2J1MxYWiGvr0yLOo70h0-ErgUpi4OZ9z6mjw@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Fri, 28 Jan 2022 23:50:34 +1000
+Message-ID: <CAN05THRJJj48ueb34t18Yj=JYuhiwZ8hTvOssX4D6XhNpjx-bg@mail.gmail.com>
 Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
  machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
 To:     Thorsten Leemhuis <regressions@leemhuis.info>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>,
+Cc:     Davyd McColl <davydm@gmail.com>, Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -67,21 +66,7 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Thorsten
-
-I definitely haven't forgotten - I'm keeping any kernel updates coming
-in patched
-so that my stuff continues to work as expected. I've pre-emptively implemented
-native CIFS support in my sync app just in case, but I'd really prefer
-not to need
-it since it's using a rather dormant port of a Java library to .net so
-there's no
-way that I expect the same level of reliability and functionality as a good old
-CIFS mount.
-
--d
-
-On Fri, 28 Jan 2022 at 15:30, Thorsten Leemhuis
+On Fri, Jan 28, 2022 at 11:30 PM Thorsten Leemhuis
 <regressions@leemhuis.info> wrote:
 >
 > Hi, this is your Linux kernel regression tracker speaking.
@@ -91,6 +76,21 @@ On Fri, 28 Jan 2022 at 15:30, Thorsten Leemhuis
 > Davyd, Ronnie, and/or Steve: What the status here? It seems after some
 > productive debugging back and forth it seems everyone forgot about this.
 > Or was progress made somewhere and I just missed it?
+
+I tried but can not find a system old enough to reproduce.
+Remember, this is an authentication mechanism that Microsoft begged
+people to stop using and migrate away from over 20 years ago.
+Win2k works just fine, as does samba3.0.
+I have no idea if Samba 2.0 works with current cifs.ko   but then
+again  I seriously doubt you can even get samba 2.0 to even compile on
+a modern
+machine as so many APIs have changed or just gone away since the late 90s.
+
+I tried, but there is just so much time you can spend on something
+that was declared obsolete 20 years ago.
+
+
+
 >
 > Ciao, Thorsten
 >
@@ -296,19 +296,3 @@ On Fri, 28 Jan 2022 at 15:30, Thorsten Leemhuis
 > >
 > >
 >
-
-
--- 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-If you say that getting the money is the most important thing
-You will spend your life completely wasting your time
-You will be doing things you don't like doing
-In order to go on living
-That is, to go on doing things you don't like doing
-
-Which is stupid.
-
-- Alan Watts
-https://www.youtube.com/watch?v=-gXTZM_uPMY
-
-Quidquid latine dictum sit, altum sonatur.
