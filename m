@@ -2,112 +2,89 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB22C433FE
-	for <linux-cifs@archiver.kernel.org>; Mon, 31 Jan 2022 17:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC765C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 31 Jan 2022 17:54:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353243AbiAaRxI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 31 Jan 2022 12:53:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26392 "EHLO
+        id S236809AbiAaRy5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 31 Jan 2022 12:54:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:46949 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1354715AbiAaRxF (ORCPT
+        by vger.kernel.org with ESMTP id S230440AbiAaRy5 (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 31 Jan 2022 12:53:05 -0500
+        Mon, 31 Jan 2022 12:54:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643651585;
+        s=mimecast20190719; t=1643651696;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding;
-        bh=Dad+NRO6CeianVL7/Op9DvhkqOApC5yos9M42t9RgSs=;
-        b=ABHjVJKvPKF2LGeTk23j0ywc91OcF0QA5h4Pn60Y6y4LzZnPOKg63GgZJsNAV+xCs3oa6o
-        xjZBhdI1fAG1SKFYhEipxFaw1fW8pUI4VzQZNMXe3u93iPbaxxWZclzh+H5pV+ofL6PdvR
-        PRZMXU0kbswdMkIf3WZPYITGhynpRE8=
+        bh=4VOyZm9lpQO744a2uQCixeDSL5Uo6s7F22zRoD6ixdk=;
+        b=IxxaXqfcobEuHW7favsjUowftpTFE7yLUbPkanWugiBX0tOsuD+BpqYk/KTW0qHRt/rL1P
+        yzX9lK2JVk5JkBbxb93rJh1n3kiCdaU2bcTE52oh3QgaMx6Xbnl/eDvgQAytPoJd1IEJqq
+        Nugbjosp1/W4yRkkZXEPx5F66I4OydI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-436-ExP3oVaSOZW5qjvIia2n6A-1; Mon, 31 Jan 2022 12:53:01 -0500
-X-MC-Unique: ExP3oVaSOZW5qjvIia2n6A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-147-jbvl_FeBP-i935CIBvD2JQ-1; Mon, 31 Jan 2022 12:54:55 -0500
+X-MC-Unique: jbvl_FeBP-i935CIBvD2JQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4EE3101F001;
-        Mon, 31 Jan 2022 17:52:59 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBB4218B6143;
+        Mon, 31 Jan 2022 17:54:53 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A3D0838D2;
-        Mon, 31 Jan 2022 17:52:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 120467CD6E;
+        Mon, 31 Jan 2022 17:54:43 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH] cachefiles: Fix the volume coherency check
+Subject: [PATCH 1/2] cifs: Fix the readahead conversion to manage the batch
+ when reading from cache
 From:   David Howells <dhowells@redhat.com>
 To:     smfrench@gmail.com
-Cc:     Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-cachefs@redhat.com, dhowells@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 31 Jan 2022 17:52:47 +0000
-Message-ID: <164365156782.2040161.8222945480682704501.stgit@warthog.procyon.org.uk>
+Cc:     Rohith Surabattula <rohiths.msft@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        dhowells@redhat.com
+Date:   Mon, 31 Jan 2022 17:54:43 +0000
+Message-ID: <164365168321.2045659.15295459927789942552.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.4
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix the cache volume coherency attribute check.  It was copied from the
-file coherency check which uses as struct to lay out the xattr, and so
-needs to add a bit on to find the coherency data - but the volume coherency
-attribute only contains the coherency data, so we shouldn't be using the
-layout struct for it.
+Fix the readahead conversion to correctly manage the last batch skipping
+when reading from cache.  This involves a readahead batch of one page or
+one folio, so set the batch size according to the number of constituent
+pages (should be 1 for a filesystem that doesn't do multipage folios yet).
 
-This has passed unnoticed so far because it only affects cifs at the
-moment, and cifs had its fscache component disabled.
-
-This can now be checked by enabling CONFIG_CIFS_FSCACHE, enabling the
-following tracepoint:
-
-	/sys/kernel/debug/tracing/events/cachefiles/cachefiles_vol_coherency/enable
-
-and making a cifs mount.  Without this change, the trace shows a
-cachefiles_vol_coherency line with "VOL BAD cmp" in it; with this change it
-shows "VOL OK" instead.
-
-Fixes: 32e150037dce ("fscache, cachefiles: Store the volume coherency data")
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
 cc: Steve French <smfrench@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
 cc: linux-cifs@vger.kernel.org
-cc: linux-cachefs@redhat.com
 ---
 
- fs/cachefiles/xattr.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/file.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
-index 83f41bd0c3a9..c6171e818a7c 100644
---- a/fs/cachefiles/xattr.c
-+++ b/fs/cachefiles/xattr.c
-@@ -218,10 +218,10 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
-  */
- int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
- {
--	struct cachefiles_xattr *buf;
- 	struct dentry *dentry = volume->dentry;
- 	unsigned int len = volume->vcookie->coherency_len;
- 	const void *p = volume->vcookie->coherency;
-+	void *buf;
- 	enum cachefiles_coherency_trace why;
- 	ssize_t xlen;
- 	int ret = -ESTALE;
-@@ -245,7 +245,7 @@ int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
- 					"Failed to read xattr with error %zd", xlen);
- 		}
- 		why = cachefiles_coherency_vol_check_xattr;
--	} else if (memcmp(buf->data, p, len) != 0) {
-+	} else if (memcmp(buf, p, len) != 0) {
- 		why = cachefiles_coherency_vol_check_cmp;
- 	} else {
- 		why = cachefiles_coherency_vol_check_ok;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 1b41b6f2a04b..e7af802dcfa6 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -4446,7 +4446,7 @@ static void cifs_readahead(struct readahead_control *ractl)
+ 				 * by the cache.
+ 				 */
+ 				page = readahead_page(ractl);
+-				BUG_ON(!page);
++				last_batch_size = 1 << thp_order(page);
+ 				if (cifs_readpage_from_fscache(ractl->mapping->host,
+ 							       page) < 0) {
+ 					/*
 
 
