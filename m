@@ -2,105 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ED56C433FE
-	for <linux-cifs@archiver.kernel.org>; Mon, 31 Jan 2022 18:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F78C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue,  1 Feb 2022 07:36:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344176AbiAaSnV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 31 Jan 2022 13:43:21 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:59774 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350447AbiAaSnV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 31 Jan 2022 13:43:21 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E128C6115C;
-        Mon, 31 Jan 2022 18:43:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1109C340E8;
-        Mon, 31 Jan 2022 18:43:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643654600;
-        bh=MlCVNXyMLH8N9zlEgC505sGgVhNwmsbLQHiBxPE+K58=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=IM19ayOIddG1TmaKYhEGPvyzdDS/gGRO9UoQES/v9E/djUqXQnoHmovXnNkwq+E2A
-         SAzWRVnV9+s8D2WaIhSak1rGr3hDcSJXijPTAGmX17QgXTdzot2WlNR3qs4mC9vDPc
-         OdHOzwN16WNYk3f1ZJTpWV1VyQ9VkieVJ49eYWHvUFP87xvXEQF56xxVz72r/aubyk
-         46vIfIe3et2S7mxrUOFaIqUnuWp8F8qolITZ5Mc8ACd5aYeZ2sgQ5wCxt7iyLPqTC5
-         bGEvhZ07U3Kj53WNWx/9u8HcAjqxU+vUr8LDftcXRn+kujXAETeSKpoSv3HNjwI2xU
-         fsbb0Rx5MWmrQ==
-Message-ID: <cc2a90295935c8841abf5d0538590eb5202a745c.camel@kernel.org>
-Subject: Re: [PATCH] cachefiles: Fix the volume coherency check
-From:   Jeff Layton <jlayton@kernel.org>
-To:     David Howells <dhowells@redhat.com>, smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, linux-cachefs@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 31 Jan 2022 13:43:18 -0500
-In-Reply-To: <164365156782.2040161.8222945480682704501.stgit@warthog.procyon.org.uk>
-References: <164365156782.2040161.8222945480682704501.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
+        id S234194AbiBAHgt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 1 Feb 2022 02:36:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234936AbiBAHgt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Feb 2022 02:36:49 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BCA6C06173D
+        for <linux-cifs@vger.kernel.org>; Mon, 31 Jan 2022 23:36:49 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id z19so31862321lfq.13
+        for <linux-cifs@vger.kernel.org>; Mon, 31 Jan 2022 23:36:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=elKn4vakOsBG7m79uqt+w4yX/RyLRRgctL1bVd6YaPA=;
+        b=hBa/ppq71p1kvgwiphWUuRTuTwyXeUVFVtvyJ37H3a9Bk4yLuhKxbAMl0LK0DogNcf
+         uQKl7cAtZ/itEaeQIQCWiGaJzqHTBMJkLV5rBvGjVvmNKIQ5Wj/Wr7FoxA2nRlVRk8Io
+         humpu1a5a3ZC9WbkftdNcy32OWfS5Ye0rHzy4XZfE0Q/BYj+VxBO5A6Flm+n+WDIJ6Mo
+         beoo7WSL3rucn5yIypblxJqh68KgSunJdQjAkoetQ2PSQjMky9OhNMOAFRpJK0dMw61H
+         Fek57CHBShv/2RUFjcdqyb27aDBmtsSKwRbwlIpDIUm+EGa2Tn0d/b6M88PhoI2xu70I
+         2pYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=elKn4vakOsBG7m79uqt+w4yX/RyLRRgctL1bVd6YaPA=;
+        b=cbFEyM6Ktv2LRGOQ8XEidPvM6TsulVbsgra8dTgOjg+34CR1Ez6RvO0DYyYQTvywdI
+         2uUrkEIPYtnFt2a2IVpyYNj4oxGuBlnym73XiRbN5SjRxQVJ+XHsuK5nW1vzO48qaKyU
+         B92yQfi+OnzOwLKLheALsGJlol4/zQPGqQDcsKkXHwEynxhgXydECtbCXKT6irFZTKDA
+         rh/ZppKYd1X2bzbw59pmqWqhfz0DsNSidC1ipQnwswNkWNl1+UveRjpc2NMa14fBL8+h
+         l7zGJeK7AxD6ilVP26McRGd3YtfMCcPDyyXRuD2xPwA7PllMAdih5uTG/F3otspguFqq
+         O+DQ==
+X-Gm-Message-State: AOAM532vf9c35F61jWZ+7HZHwi7rYODTzPc6NVuckmH7cTas3dTRKw9M
+        6s0/aL59R+j7zpBmIbQw+lWnvdioh/sOBA13jTJJ5Yk8
+X-Google-Smtp-Source: ABdhPJw1Pciv5rfuxjsVknnRGJebbQ8m+RBy0v63CVMirdKBmu7K75ePNDvgKGx/8JV8iG2mKX3x9I065yRvg5tjBUA=
+X-Received: by 2002:a05:6512:68e:: with SMTP id t14mr18818746lfe.366.1643701007414;
+ Mon, 31 Jan 2022 23:36:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From:   Rohith Surabattula <rohiths.msft@gmail.com>
+Date:   Tue, 1 Feb 2022 13:06:36 +0530
+Message-ID: <CACdtm0b61sLQo85HdZubh34ieMveMZdZ_tbpmf41U7u+-_LgFw@mail.gmail.com>
+Subject: [PATCH] cifs: Invalidate fscache cookie
+To:     Steve French <smfrench@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: multipart/mixed; boundary="000000000000aa39b805d6eff670"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 2022-01-31 at 17:52 +0000, David Howells wrote:
-> Fix the cache volume coherency attribute check.  It was copied from the
-> file coherency check which uses as struct to lay out the xattr, and so
-> needs to add a bit on to find the coherency data - but the volume coherency
-> attribute only contains the coherency data, so we shouldn't be using the
-> layout struct for it.
-> 
-> This has passed unnoticed so far because it only affects cifs at the
-> moment, and cifs had its fscache component disabled.
-> 
-> This can now be checked by enabling CONFIG_CIFS_FSCACHE, enabling the
-> following tracepoint:
-> 
-> 	/sys/kernel/debug/tracing/events/cachefiles/cachefiles_vol_coherency/enable
-> 
-> and making a cifs mount.  Without this change, the trace shows a
-> cachefiles_vol_coherency line with "VOL BAD cmp" in it; with this change it
-> shows "VOL OK" instead.
-> 
-> Fixes: 32e150037dce ("fscache, cachefiles: Store the volume coherency data")
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: Steve French <smfrench@gmail.com>
-> cc: linux-cifs@vger.kernel.org
-> cc: linux-cachefs@redhat.com
-> ---
-> 
->  fs/cachefiles/xattr.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
-> index 83f41bd0c3a9..c6171e818a7c 100644
-> --- a/fs/cachefiles/xattr.c
-> +++ b/fs/cachefiles/xattr.c
-> @@ -218,10 +218,10 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
->   */
->  int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
->  {
-> -	struct cachefiles_xattr *buf;
->  	struct dentry *dentry = volume->dentry;
->  	unsigned int len = volume->vcookie->coherency_len;
->  	const void *p = volume->vcookie->coherency;
-> +	void *buf;
->  	enum cachefiles_coherency_trace why;
->  	ssize_t xlen;
->  	int ret = -ESTALE;
-> @@ -245,7 +245,7 @@ int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
->  					"Failed to read xattr with error %zd", xlen);
->  		}
->  		why = cachefiles_coherency_vol_check_xattr;
-> -	} else if (memcmp(buf->data, p, len) != 0) {
-> +	} else if (memcmp(buf, p, len) != 0) {
->  		why = cachefiles_coherency_vol_check_cmp;
->  	} else {
->  		why = cachefiles_coherency_vol_check_ok;
-> 
-> 
+--000000000000aa39b805d6eff670
+Content-Type: text/plain; charset="UTF-8"
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Hi All,
+
+Currently, FScache is getting invalidated during close of the file. It
+should be invalidated only when there is change in inode attributes.
+
+Please find the below patch which will address the fscache invalidation.
+
+Regards,
+Rohith
+
+--000000000000aa39b805d6eff670
+Content-Type: application/octet-stream; 
+	name="Invalidate-fscache-cookie-only-when-inode-attributes.patch"
+Content-Disposition: attachment; 
+	filename="Invalidate-fscache-cookie-only-when-inode-attributes.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kz3t0t0m0>
+X-Attachment-Id: f_kz3t0t0m0
+
+RnJvbSA5NjUxMzA3ZTkwNzU1YWM4MmU2YTFmZjNlODJjMjk0Y2RlMmM3ZWIyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSb2hpdGggU3VyYWJhdHR1bGEgPHJvaGl0aHNAbWljcm9zb2Z0
+LmNvbT4KRGF0ZTogVHVlLCAxIEZlYiAyMDIyIDA3OjIyOjAyICswMDAwClN1YmplY3Q6IFtQQVRD
+SF0gSW52YWxpZGF0ZSBmc2NhY2hlIGNvb2tpZSBvbmx5IHdoZW4gaW5vZGUgYXR0cmlidXRlcyBh
+cmUKIGNoYW5nZWQuCgpTaWduZWQtb2ZmLWJ5OiBSb2hpdGggU3VyYWJhdHR1bGEgPHJvaGl0aHNA
+bWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2lub2RlLmMgfCA4ICsrKystLS0tCiAxIGZpbGUg
+Y2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2Zz
+L2NpZnMvaW5vZGUuYyBiL2ZzL2NpZnMvaW5vZGUuYwppbmRleCA3ZDhiM2NlYjJhZjMuLjYwZDg1
+M2M5MmY2YSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9pbm9kZS5jCisrKyBiL2ZzL2NpZnMvaW5vZGUu
+YwpAQCAtODMsNiArODMsNyBAQCBzdGF0aWMgdm9pZCBjaWZzX3NldF9vcHMoc3RydWN0IGlub2Rl
+ICppbm9kZSkKIHN0YXRpYyB2b2lkCiBjaWZzX3JldmFsaWRhdGVfY2FjaGUoc3RydWN0IGlub2Rl
+ICppbm9kZSwgc3RydWN0IGNpZnNfZmF0dHIgKmZhdHRyKQogeworCXN0cnVjdCBjaWZzX2ZzY2Fj
+aGVfaW5vZGVfY29oZXJlbmN5X2RhdGEgY2Q7CiAJc3RydWN0IGNpZnNJbm9kZUluZm8gKmNpZnNf
+aSA9IENJRlNfSShpbm9kZSk7CiAKIAljaWZzX2RiZyhGWUksICIlczogcmV2YWxpZGF0aW5nIGlu
+b2RlICVsbHVcbiIsCkBAIC0xMTMsNiArMTE0LDkgQEAgY2lmc19yZXZhbGlkYXRlX2NhY2hlKHN0
+cnVjdCBpbm9kZSAqaW5vZGUsIHN0cnVjdCBjaWZzX2ZhdHRyICpmYXR0cikKIAljaWZzX2RiZyhG
+WUksICIlczogaW52YWxpZGF0aW5nIGlub2RlICVsbHUgbWFwcGluZ1xuIiwKIAkJIF9fZnVuY19f
+LCBjaWZzX2ktPnVuaXF1ZWlkKTsKIAlzZXRfYml0KENJRlNfSU5PX0lOVkFMSURfTUFQUElORywg
+JmNpZnNfaS0+ZmxhZ3MpOworCS8qIEludmFsaWRhdGUgZnNjYWNoZSBjb29raWUgKi8KKwljaWZz
+X2ZzY2FjaGVfZmlsbF9jb2hlcmVuY3koJmNpZnNfaS0+dmZzX2lub2RlLCAmY2QpOworCWZzY2Fj
+aGVfaW52YWxpZGF0ZShjaWZzX2lub2RlX2Nvb2tpZShpbm9kZSksICZjZCwgaV9zaXplX3JlYWQo
+aW5vZGUpLCAwKTsKIH0KIAogLyoKQEAgLTIyNjEsOCArMjI2NSw2IEBAIGNpZnNfZGVudHJ5X25l
+ZWRzX3JldmFsKHN0cnVjdCBkZW50cnkgKmRlbnRyeSkKIGludAogY2lmc19pbnZhbGlkYXRlX21h
+cHBpbmcoc3RydWN0IGlub2RlICppbm9kZSkKIHsKLQlzdHJ1Y3QgY2lmc19mc2NhY2hlX2lub2Rl
+X2NvaGVyZW5jeV9kYXRhIGNkOwotCXN0cnVjdCBjaWZzSW5vZGVJbmZvICpjaWZzaSA9IENJRlNf
+SShpbm9kZSk7CiAJaW50IHJjID0gMDsKIAogCWlmIChpbm9kZS0+aV9tYXBwaW5nICYmIGlub2Rl
+LT5pX21hcHBpbmctPm5ycGFnZXMgIT0gMCkgewpAQCAtMjI3Miw4ICsyMjc0LDYgQEAgY2lmc19p
+bnZhbGlkYXRlX21hcHBpbmcoc3RydWN0IGlub2RlICppbm9kZSkKIAkJCQkgX19mdW5jX18sIGlu
+b2RlKTsKIAl9CiAKLQljaWZzX2ZzY2FjaGVfZmlsbF9jb2hlcmVuY3koJmNpZnNpLT52ZnNfaW5v
+ZGUsICZjZCk7Ci0JZnNjYWNoZV9pbnZhbGlkYXRlKGNpZnNfaW5vZGVfY29va2llKGlub2RlKSwg
+JmNkLCBpX3NpemVfcmVhZChpbm9kZSksIDApOwogCXJldHVybiByYzsKIH0KIAotLSAKMi4zMi4w
+Cgo=
+--000000000000aa39b805d6eff670--
