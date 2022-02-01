@@ -2,43 +2,43 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 838E1C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  1 Feb 2022 09:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE02C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue,  1 Feb 2022 12:10:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235526AbiBAJPY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 1 Feb 2022 04:15:24 -0500
-Received: from mail-pj1-f47.google.com ([209.85.216.47]:43633 "EHLO
-        mail-pj1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230264AbiBAJPY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Feb 2022 04:15:24 -0500
-Received: by mail-pj1-f47.google.com with SMTP id qe6-20020a17090b4f8600b001b7aaad65b9so1803390pjb.2
-        for <linux-cifs@vger.kernel.org>; Tue, 01 Feb 2022 01:15:24 -0800 (PST)
+        id S237787AbiBAMKr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 1 Feb 2022 07:10:47 -0500
+Received: from mail-pj1-f51.google.com ([209.85.216.51]:44761 "EHLO
+        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237815AbiBAMKq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Feb 2022 07:10:46 -0500
+Received: by mail-pj1-f51.google.com with SMTP id y5-20020a17090aca8500b001b8127e3d3aso2244185pjt.3
+        for <linux-cifs@vger.kernel.org>; Tue, 01 Feb 2022 04:10:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=aL3O2Vf3cVDHKRDVp1GoVcvdxlOn+9IHPjP/B8lDW6k=;
-        b=nxveMoNRQV7lPIZyrXxVjwJWc4oOzF4xz4we1M6Inf1hihcBOGNaRwsNSbK5eLgVki
-         QitzXzFNKt394w2Ua9asDDWw1KWBKzqSmCdWMt17b7imwjDu0jGgrKNh0TPpySqJwIz6
-         LNnhUfsx8HJdv7h2yPvAHx17OlG/1n5s/XRBl62w4fviryvbU/IhLr74ovI4ChUWPWRy
-         gPgcBaZi1rCbir2dr/JzbJQx9zIU0M8e2CgWzDs79yQZJ87/NyINz+DwjoDzZnfhpAX/
-         t+8z1ghmSZzYynROf5RtEJ3nzfnYgyBjTvlrsgApBeay8JrL2J3XJUwxbuAhaBtWOZzX
-         ODhA==
-X-Gm-Message-State: AOAM5300XegL8xnVcqo1cqlDOqd8R9mHoCeLKOK32r+k4bTlT7V9N6/f
-        X/WwyTGhnD3K9hwO2lewbyxZiCr0Gdg=
-X-Google-Smtp-Source: ABdhPJxUWn3MoQJ2IFl0aVCRgzAjAQWAmpoNsVUFTi4ND5mdOvawNOAywg/Q0wJVdfFAaBDvWKke4w==
-X-Received: by 2002:a17:90b:3841:: with SMTP id nl1mr1260338pjb.50.1643706923538;
-        Tue, 01 Feb 2022 01:15:23 -0800 (PST)
+        bh=7bL16LqTMexCIlpqlhEW1iKoicAHpNVXb4rEE58APvA=;
+        b=Sb/RA5DJqz4ScUNgj5lT3jon4wvbWfC5kNFuX9ZzVBweUgRlYUoCA7URqiBxC+5AJn
+         qGXQ18ktdhxrVuOfhaX2rwlp/kOCjoTGYwdktHUXVU9FSXVJeftOg8lsqBOOF8BDsgrL
+         7pJ143SX2q3mEHby15fM+PV5aKSOJNI9MnNcT0RSvlTAXhddxB1g91izRw8rw1En5IWb
+         NPtaRL+a2q1BrgVMKbpLilF4VGg5VHTOa+275HUg/47kgwQK8+JSZ3UMRgBiBPVy4rLn
+         EvQyQLefeisnI/9uDtjfB/wstZu6KQc4s/9FMYfo1cup+rwMbtrqLwsAo/7DXNo+fDgm
+         rp/Q==
+X-Gm-Message-State: AOAM532xOH5QopBiI0mNqojgwLrgGYM531rX0YBYJiGj++Ayy1+ZoRgS
+        Z5JtsN+32/89hZOiKi6vMelF65uc1RY=
+X-Google-Smtp-Source: ABdhPJwoSHymme6V8oBtzo7znbKUPl/WWMW5FAxfPHXfkEbGmZljtlJCQhn09ihD3GjvIVJuRJ5WvQ==
+X-Received: by 2002:a17:903:24f:: with SMTP id j15mr25674045plh.89.1643717446319;
+        Tue, 01 Feb 2022 04:10:46 -0800 (PST)
 Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id n3sm20152599pfu.84.2022.02.01.01.15.22
+        by smtp.gmail.com with ESMTPSA id u19sm22425039pfi.150.2022.02.01.04.10.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 01:15:23 -0800 (PST)
+        Tue, 01 Feb 2022 04:10:46 -0800 (PST)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>
-Subject: [PATCH v2] ksmbd: reduce smb direct max read/write size
-Date:   Tue,  1 Feb 2022 18:15:12 +0900
-Message-Id: <20220201091512.11167-1-linkinjeon@kernel.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: add support for key exchange
+Date:   Tue,  1 Feb 2022 21:10:32 +0900
+Message-Id: <20220201121032.6242-1-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -46,33 +46,89 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-ksmbd does not support more than one Buffer Descriptor V1 element in
-an smbdirect protocol request. Reducing the maximum read/write size to
-about 512KB allows interoperability with Windows over a wider variety
-of RDMA NICs, as an interim workaround.
+When mounting cifs client, can see the following warning message.
 
-Cc: Tom Talpey <tom@talpey.com>
+CIFS: decode_ntlmssp_challenge: authentication has been weakened as server
+does not support key exchange
+
+To remove this warning message, Add support for key exchange feature to
+ksmbd. This patch decrypts 16-byte ciphertext value sent by the client
+using RC4 with session key. The decrypted value is the recovered secondary
+key that will use instead of the session key for signing and sealing.
+
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- v2:
-   - update patch description (Written by Tom Talpey).
+ fs/Kconfig      |  4 ++--
+ fs/ksmbd/auth.c | 27 +++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 2 deletions(-)
 
- fs/ksmbd/transport_rdma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-index 3c1ec1ac0b27..ba5a22bc2e6d 100644
---- a/fs/ksmbd/transport_rdma.c
-+++ b/fs/ksmbd/transport_rdma.c
-@@ -80,7 +80,7 @@ static int smb_direct_max_fragmented_recv_size = 1024 * 1024;
- /*  The maximum single-message size which can be received */
- static int smb_direct_max_receive_size = 8192;
+diff --git a/fs/Kconfig b/fs/Kconfig
+index 7a2b11c0b803..6c7dc1387beb 100644
+--- a/fs/Kconfig
++++ b/fs/Kconfig
+@@ -369,8 +369,8 @@ source "fs/ksmbd/Kconfig"
  
--static int smb_direct_max_read_write_size = 1048512;
-+static int smb_direct_max_read_write_size = 524224;
+ config SMBFS_COMMON
+ 	tristate
+-	default y if CIFS=y
+-	default m if CIFS=m
++	default y if CIFS=y || SMB_SERVER=y
++	default m if CIFS=m || SMB_SERVER=m
  
- static int smb_direct_max_outstanding_rw_ops = 8;
+ source "fs/coda/Kconfig"
+ source "fs/afs/Kconfig"
+diff --git a/fs/ksmbd/auth.c b/fs/ksmbd/auth.c
+index dc3d061edda9..21d3630fe980 100644
+--- a/fs/ksmbd/auth.c
++++ b/fs/ksmbd/auth.c
+@@ -29,6 +29,7 @@
+ #include "mgmt/user_config.h"
+ #include "crypto_ctx.h"
+ #include "transport_ipc.h"
++#include "../smbfs_common/arc4.h"
  
+ /*
+  * Fixed format data defining GSS header and fixed string
+@@ -336,6 +337,29 @@ int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
+ 				nt_len - CIFS_ENCPWD_SIZE,
+ 				domain_name, conn->ntlmssp.cryptkey);
+ 	kfree(domain_name);
++
++	/* The recovered secondary session key */
++	if (conn->ntlmssp.client_flags & NTLMSSP_NEGOTIATE_KEY_XCH) {
++		struct arc4_ctx *ctx_arc4;
++		unsigned int sess_key_off, sess_key_len;
++
++		sess_key_off = le32_to_cpu(authblob->SessionKey.BufferOffset);
++		sess_key_len = le16_to_cpu(authblob->SessionKey.Length);
++
++		if (blob_len < (u64)sess_key_off + sess_key_len)
++			return -EINVAL;
++
++		ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
++		if (!ctx_arc4)
++			return -ENOMEM;
++
++		cifs_arc4_setkey(ctx_arc4, sess->sess_key,
++				 SMB2_NTLMV2_SESSKEY_SIZE);
++		cifs_arc4_crypt(ctx_arc4, sess->sess_key,
++				(char *)authblob + sess_key_off, sess_key_len);
++		kfree_sensitive(ctx_arc4);
++	}
++
+ 	return ret;
+ }
+ 
+@@ -408,6 +432,9 @@ ksmbd_build_ntlmssp_challenge_blob(struct challenge_message *chgblob,
+ 	    (cflags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
+ 		flags |= NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+ 
++	if (cflags & NTLMSSP_NEGOTIATE_KEY_XCH)
++		flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
++
+ 	chgblob->NegotiateFlags = cpu_to_le32(flags);
+ 	len = strlen(ksmbd_netbios_name());
+ 	name = kmalloc(2 + UNICODE_LEN(len), GFP_KERNEL);
 -- 
 2.25.1
 
