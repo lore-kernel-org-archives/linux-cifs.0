@@ -2,118 +2,180 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA98C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Feb 2022 03:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFB6C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Feb 2022 03:40:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348776AbiBCDca (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Feb 2022 22:32:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52356 "EHLO
+        id S233602AbiBCDkw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Feb 2022 22:40:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238257AbiBCDca (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Feb 2022 22:32:30 -0500
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A110BC061714
-        for <linux-cifs@vger.kernel.org>; Wed,  2 Feb 2022 19:32:29 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id q22so1951373ljh.7
-        for <linux-cifs@vger.kernel.org>; Wed, 02 Feb 2022 19:32:29 -0800 (PST)
+        with ESMTP id S231564AbiBCDkv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Feb 2022 22:40:51 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A68EBC061714;
+        Wed,  2 Feb 2022 19:40:51 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id z4so3221308lft.3;
+        Wed, 02 Feb 2022 19:40:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=rifR8JYiq1RGWwua2ATPPPhzFaT/RzC0IagjomCuyHw=;
-        b=mfLdREEW7nV5xN1x+0L85oKtWxkzzbrvT7+FjPNbbBkbWel0eY7GRR4WMfATjd/xMk
-         UgnSpV3UqprTIoHVd13EeZorOtJlXa0oFYt2/zvpe49HNZFdh1wRyUIaLm9RCit/v+Pl
-         BXu9gmwTnrDB08GV0IGxQf4LwFteWKN9Wmdi5o3cK9VlDbMJxunrclbSF25c7uY4vhld
-         HDP1NJMs/cJVzfmrsF3kFIjq9M/wUsZil3T0ONlrj9UGs4pihFLghFjl1TH69N43AO1x
-         BfcoakuJvknM+JK6EKLeXtRdhlwH240NW7FeaZ2qbHVZkJCM32e2cojpMd381EEcWC5r
-         rm3Q==
+        bh=uyEDTT7UWcx0aQYR+EyAeRErzTRFuEJTWicokIyg/X8=;
+        b=Cp35ItJkrFPCC1+ZfrNG4XN0hg6G4Yoy2CzfSRy2FWJCu4ia08qfUbOlOIeGcSjDK5
+         yVYxu3JN/E8ii1sk5h/UmG3QBO085GTVOSo6/DdsGFUwfV0KpwW4Gz8jTQsDVfSIRP7A
+         ClHkgzujvx8Gsi9gIufTJA9oaCJJafzXlHOkWX8L8PE2dwpNi6WRoO9fNiJRKoMssL35
+         pJqvekbdwqSOkUfPGsu07XLlvEDoeNyuLMZTexRwkfUHKX64IVjLsu/BWWQG4bDHnjhP
+         QLxwOaDWplkfF1MbfLZAxJlfeYWictcUCYDrgmug8bjBMXQNSHp6gVQKiX6eqoaCx8Xh
+         Z3Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rifR8JYiq1RGWwua2ATPPPhzFaT/RzC0IagjomCuyHw=;
-        b=mx69ixlZH17i1kG+iX9FTvXbhjKIx4dGpTL4hKowSRmzeNzER2Bq90PaEbwRmrgytl
-         JRof+ADDjEKjmWYY4TwU2n/izW08HzoR/OYapoXyEVmtfcDOZoOlHbizy1sAfPSVdHgg
-         3x0csArkgnz7GcnRIbTKKEWG7c+plo3Gnzh/6TXdY76n0f/2DHM0ctRuJiheaisu8ucw
-         mn57mLcXGc3KEM2a83k+I3IuhvJImjlL0kKXU3glby6pmVBkWqZ3E/fzrnyX1MvQlz6U
-         inMM9DY0AnAbMpbZlZ5KUajBbgjApQ1vOduh+KzAQs41B2cLqSEOgFBwQoPypOkH1K0O
-         wYuw==
-X-Gm-Message-State: AOAM531nIKm8l25oK53idqIYuQZ0vUb7uXVeWt4P0sqNyhULAg2mrseQ
-        bLFTjDHiv6MCS14t8iiEqx4Ss8Ce8Eu/SO8cdM4diEun
-X-Google-Smtp-Source: ABdhPJzW5S4DYEo11S0qvmgiTINdve94m8XDqHeFvOZJ5u6pT2JpaQGX60QAyCqfdOQGhs9sJUlG1ncXY5qjQcr47VI=
-X-Received: by 2002:a05:651c:1315:: with SMTP id u21mr21145923lja.398.1643859147165;
- Wed, 02 Feb 2022 19:32:27 -0800 (PST)
+        bh=uyEDTT7UWcx0aQYR+EyAeRErzTRFuEJTWicokIyg/X8=;
+        b=0aYJfSvMTbex6Q1bTvlJB+cHGbr8ijNltl1y8zIRl9bX42Tub7mIhaoSd4hW7z0O+/
+         WMJKgtShGhdLH1RIByh8WGJPtsgQiCxFeME0LewQkZeGpBkeKXIOiz2/1F5mdsXRZ++1
+         rUF7amC65kWivFtiy1wmIGTddCkCAG9NVLnqKEJomMeIsdWyvFiV5D6QuebGvhkZl0il
+         r7ujmZaGNyxhFrAn6Zi3D8ONZL6vW/wLpWeWO689f1O8VHibt3HcqasXsSKk/h53fae1
+         B+ZRSc+UbQcTO+sE9g+c6M0DH2xZJJRF+WF60+z/wVRLcpJqvHcELuDGOqvU3n+Rdz36
+         J7Cg==
+X-Gm-Message-State: AOAM531g+xBcA6ZwhuhD7bJSptxgctDfV29m9hH5B6eygp0e/ETeO+ky
+        Z3ztbeuyEf+8mXuqIxzJYR+y/3CMTpQbdawJUFgcUa2R
+X-Google-Smtp-Source: ABdhPJzPg+zSnT0SKrtipmoLp2+mt0UbTrXwpd0OYsdp8nW2Rksld9GezBee71wcQB0o2Ra72WaOst/UsAeYF0J+Cn8=
+X-Received: by 2002:a19:ae04:: with SMTP id f4mr24353648lfc.667.1643859649878;
+ Wed, 02 Feb 2022 19:40:49 -0800 (PST)
 MIME-Version: 1.0
-References: <20211222160405.3174438-1-ryandbair@gmail.com> <20211222160405.3174438-2-ryandbair@gmail.com>
-In-Reply-To: <20211222160405.3174438-2-ryandbair@gmail.com>
+References: <3a066f81-a53d-4d39-5efb-bd957443e7e2@suse.de> <C4E94EAA-7452-4D69-9C06-E5AD5B7A1F14@oracle.com>
+In-Reply-To: <C4E94EAA-7452-4D69-9C06-E5AD5B7A1F14@oracle.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 2 Feb 2022 21:32:16 -0600
-Message-ID: <CAH2r5msgnA2hEJEz-VFJDJw-zgqiOwV8wSHO=BJb2re7GvAahA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix workstation_name for multiuser mounts
-To:     Ryan Bair <ryandbair@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
+Date:   Wed, 2 Feb 2022 21:40:39 -0600
+Message-ID: <CAH2r5msVxenATfo+7iu7kjsQXXXT0dq2jp2JSxrY5Qm2PEde5w@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC][LSF/MM/BPF ATTEND] TLS handshake for in-kernel consumers
+To:     Chuck Lever III <chuck.lever@oracle.com>
+Cc:     "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Missed this email thread during the holidays - will test it out later this week.
+This is an interesting question - and got me thinking about whether
+also could be helpful to the critical question we have been asked
+about multiple times for SMB, about how to get QUIC in the kernel (see
+the various Storage Developer Conference presentations etc), while
+putting as much as possible of the session establishment in userspace
+accessed via upcalls.
 
-On Fri, Dec 24, 2021 at 5:07 AM Ryan Bair <ryandbair@gmail.com> wrote:
+I don't mind discussing this in detail at LSF (or at SambaXP a few
+weeks after LSF), and since there are some SMB servers that support
+QUIC already we could probably do at least some prototyping if there
+is overlap between these two efforts.
+
+On Wed, Feb 2, 2022 at 10:04 AM Chuck Lever III <chuck.lever@oracle.com> wrote:
 >
-> Set workstation_name from the master_tcon for multiuser mounts.
+> [ ... adding NFS and CIFS ... ]
 >
-> Just in case, protect size_of_ntlmssp_blob against a NULL workstation_name.
+> > On Feb 2, 2022, at 9:12 AM, Hannes Reinecke <hare@suse.de> wrote:
+> >
+> > Hi all,
+> >
+> > nvme-over-tcp has the option to utilize TLS for encrypted traffic, but due to the internal design of the nvme-over-fabrics stack we cannot initiate the TLS connection from userspace (as the current in-kernel TLS implementation is designed).
+> >
+> > This leaves us with two options:
+> > 1) Put TLS handshake into the kernel (which will be quite some
+> >  discussion as it's arguably a userspace configuration)
+> > 2) Pass an in-kernel socket to userspace and have a userspace
+> >  application to run the TLS handshake.
+> >
+> > None of these options are quiet clear cut, as we will be have to put
+> > quite some complexity into the kernel to do full TLS handshake (if we
+> > were to go with option 1) or will have to design a mechanism to pass
+> > an in-kernel socket to userspace as we don't do that currently (if we were going with option 2).
+> >
+> > We have been discussing some ideas on how to implement option 2 (together with Chuck Lever and the NFS crowd), but so far haven't been able to come up with a decent design.
+> >
+> > So I would like to discuss with interested parties on how TLS handshake could be facilitated, and what would be the best design options here.
 >
-> Signed-off-by: Ryan Bair <ryandbair@gmail.com>
-> ---
->  fs/cifs/connect.c | 13 +++++++++++++
->  fs/cifs/sess.c    |  6 +++++-
->  2 files changed, 18 insertions(+), 1 deletion(-)
+> IMO we are a bit farther along than Hannes suggests, and I had
+> the impression that we have already agreed on a "decent design"
+> (see Ben Coddington's earlier post).
 >
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 1060164b984a..cefd0e9623ba 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1945,6 +1945,19 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
->                 }
->         }
+> We currently have several prototypes we can discuss, and there
+> are some important issues on the table.
 >
-> +       ctx->workstation_name = kstrdup(ses->workstation_name, GFP_KERNEL);
-> +       if (!ctx->workstation_name) {
-> +               cifs_dbg(FYI, "Unable to allocate memory for workstation_name\n");
-> +               rc = -ENOMEM;
-> +               kfree(ctx->username);
-> +               ctx->username = NULL;
-> +               kfree_sensitive(ctx->password);
-> +               ctx->password = NULL;
-> +               kfree(ctx->domainname);
-> +               ctx->domainname = NULL;
-> +               goto out_key_put;
-> +       }
-> +
->  out_key_put:
->         up_read(&key->sem);
->         key_put(key);
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index 035dc3e245dc..42133939f35d 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -675,7 +675,11 @@ static int size_of_ntlmssp_blob(struct cifs_ses *ses, int base_size)
->         else
->                 sz += sizeof(__le16);
+> First, from the start we have recognized that we have a range
+> of potential in-kernel TLS consumers. To name a few: NVMe/TLS,
+> RPC-with-TLS (for in-transit NFS encryption), CIFS/SMB, and,
+> when it arrives, the QUICv1 transport. We don't intend to
+> build something that works for only one of these, thus it
+> will not be based on existing security infrastructure like
+> rpc.gssd.
 >
-> -       sz += sizeof(__le16) * strnlen(ses->workstation_name, CIFS_MAX_WORKSTATION_LEN);
-> +       if (ses->workstation_name)
-> +               sz += sizeof(__le16) * strnlen(ses->workstation_name,
-> +                       CIFS_MAX_WORKSTATION_LEN);
-> +       else
-> +               sz += sizeof(__le16);
+> Second, we believe in-kernel consumers will hitch onto the
+> existing kTLS infrastructure to handle payload encryption and
+> decryption. This transparently enables both software-based
+> and offload, and in the latter case, we hope for quite
+> reasonable performance.
 >
->         return sz;
->  }
+> As Hannes said, the missing piece is support for the TLS
+> handshake protocol to boot strap each TLS session.
+>
+> The security community has demanded that we stick with user
+> space handshake implementations because they view the TLS
+> handshake as complex and a broad attack surface. I question
+> those assumptions, but even so...
+>
+> We will need to have in-kernel handshake to support NFSROOT
+> and NVMe/TLS with a root filesystem, which are requirements
+> for the storage community.
+>
+> We have an in-kernel prototype based on Tempesta's TLSv1.2
+> offload in the works. See the "topic-rpc-with-tls" branch:
+>
+>  https://git.kernel.org/pub/scm/linux/kernel/git/cel/linux.git
+>
+> We also have three promising user space upcall implementations
+> that are helping us with architectural choices. The main issue
+> here is how to set the correct peer authentication parameters
+> for each handshake. As Ben said, key rings can play a critical
+> part (as might netlink, but perhaps that can be avoided). We
+> are sensitive to containerization requirements as well.
+>
+> One (not-yet-working) user space prototype is published in
+> the "topic-rpc-with-tls-upcall" branch in the repo above.
+>
+>
+> > The proposed configd would be an option, but then we don't have that, either :-)
+> >
+> > Required attendees:
+> >
+> > Chuck Lever
+> > James Bottomley
+> > Sagi Grimberg
+> > Keith Busch
+> > Christoph Hellwig
+> > David Howells
+>
+> Anyone from the CIFS team? Enzo? How about Dave Miller?
+>
+> Actually I think we need to have security and network folks
+> at the table. LSF/MM might not be the right venue for a
+> full-scale discussion of alternatives. We have been waiting
+> for an opportunity to bring this to a broad community event
+> such as Plumbers but the pandemic has interfered.
+>
+> However, I am happy to discuss alternative upcall mechanisms,
+> new requirements, and anything related to securing an
+> in-kernel handshake against remote attack.
+>
 > --
-> 2.33.1
+> Chuck Lever
+>
+>
 >
 
 
