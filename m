@@ -2,150 +2,122 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A5C6C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Feb 2022 23:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA98C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Feb 2022 03:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347984AbiBBXQ0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Feb 2022 18:16:26 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:47518 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347982AbiBBXQZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Feb 2022 18:16:25 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 34C65B832AC;
-        Wed,  2 Feb 2022 23:16:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFEF7C340EB;
-        Wed,  2 Feb 2022 23:16:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643843782;
-        bh=GfEwU6uYg771bgA3f9CiI67zPmMXrskYblsTIUztBfg=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=YuuIAXwEF/7MHugB8GjsVCMOdsNOwdwdZ9gG6yzwavhQGdoNPXEsPwi3aB/NdnKpE
-         Vxfz1N+eDt34Dhtj18DdTyyiGzAC3HjLKBkypk2BDPBa7X7h0LiNjVy6kKtLfoTi0s
-         ZYoR66XzJqC62Z4f29+6LcM4Vamx2nkaypLiYMn4zzEYX+89DQB444RcIZD4A12Zc5
-         2WiSg9sFsaylBu/nZwP7kmufBfQHzioOgD6Zq7bxPCSXQc7CAlFcmpb8eGnCrY9Ke3
-         l6docqOiHFxJGkIFMij6p7hgL2HDjt1w78PVxxoVGKjD3ECPffngiiEu3P93zuxsxm
-         HJfc5TVxSviFw==
-Received: by mail-yb1-f176.google.com with SMTP id k31so3439357ybj.4;
-        Wed, 02 Feb 2022 15:16:22 -0800 (PST)
-X-Gm-Message-State: AOAM533tBIWQKgXCxhRcFKNmwSUXNnKs/AoHDimD//g2YmcbNFUW3ynX
-        CxKLXkCjMBe/Sp0sebGtn5AHhgwrggLOdI7iptk=
-X-Google-Smtp-Source: ABdhPJyqnkjSpCfTwycqtpnJGQcUFvpXCn2RkCP8NV+uz1BDIwW0ntf6KrGq7wQZhvj3Co4Bv30GU06o2oKq6MOpHV8=
-X-Received: by 2002:a25:b217:: with SMTP id i23mr48951849ybj.722.1643843781926;
- Wed, 02 Feb 2022 15:16:21 -0800 (PST)
+        id S1348776AbiBCDca (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Feb 2022 22:32:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52356 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238257AbiBCDca (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Feb 2022 22:32:30 -0500
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A110BC061714
+        for <linux-cifs@vger.kernel.org>; Wed,  2 Feb 2022 19:32:29 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id q22so1951373ljh.7
+        for <linux-cifs@vger.kernel.org>; Wed, 02 Feb 2022 19:32:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rifR8JYiq1RGWwua2ATPPPhzFaT/RzC0IagjomCuyHw=;
+        b=mfLdREEW7nV5xN1x+0L85oKtWxkzzbrvT7+FjPNbbBkbWel0eY7GRR4WMfATjd/xMk
+         UgnSpV3UqprTIoHVd13EeZorOtJlXa0oFYt2/zvpe49HNZFdh1wRyUIaLm9RCit/v+Pl
+         BXu9gmwTnrDB08GV0IGxQf4LwFteWKN9Wmdi5o3cK9VlDbMJxunrclbSF25c7uY4vhld
+         HDP1NJMs/cJVzfmrsF3kFIjq9M/wUsZil3T0ONlrj9UGs4pihFLghFjl1TH69N43AO1x
+         BfcoakuJvknM+JK6EKLeXtRdhlwH240NW7FeaZ2qbHVZkJCM32e2cojpMd381EEcWC5r
+         rm3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rifR8JYiq1RGWwua2ATPPPhzFaT/RzC0IagjomCuyHw=;
+        b=mx69ixlZH17i1kG+iX9FTvXbhjKIx4dGpTL4hKowSRmzeNzER2Bq90PaEbwRmrgytl
+         JRof+ADDjEKjmWYY4TwU2n/izW08HzoR/OYapoXyEVmtfcDOZoOlHbizy1sAfPSVdHgg
+         3x0csArkgnz7GcnRIbTKKEWG7c+plo3Gnzh/6TXdY76n0f/2DHM0ctRuJiheaisu8ucw
+         mn57mLcXGc3KEM2a83k+I3IuhvJImjlL0kKXU3glby6pmVBkWqZ3E/fzrnyX1MvQlz6U
+         inMM9DY0AnAbMpbZlZ5KUajBbgjApQ1vOduh+KzAQs41B2cLqSEOgFBwQoPypOkH1K0O
+         wYuw==
+X-Gm-Message-State: AOAM531nIKm8l25oK53idqIYuQZ0vUb7uXVeWt4P0sqNyhULAg2mrseQ
+        bLFTjDHiv6MCS14t8iiEqx4Ss8Ce8Eu/SO8cdM4diEun
+X-Google-Smtp-Source: ABdhPJzW5S4DYEo11S0qvmgiTINdve94m8XDqHeFvOZJ5u6pT2JpaQGX60QAyCqfdOQGhs9sJUlG1ncXY5qjQcr47VI=
+X-Received: by 2002:a05:651c:1315:: with SMTP id u21mr21145923lja.398.1643859147165;
+ Wed, 02 Feb 2022 19:32:27 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:7110:b08e:b0:127:3295:9956 with HTTP; Wed, 2 Feb 2022
- 15:16:21 -0800 (PST)
-In-Reply-To: <YfdCElWBOdOnsH5b@zeniv-ca.linux.org.uk>
-References: <YfdCElWBOdOnsH5b@zeniv-ca.linux.org.uk>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 3 Feb 2022 08:16:21 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-k=AvMcxsJg1rVsY2PPhsZuRUegqAhEFB2r-qXH3+5-w@mail.gmail.com>
-Message-ID: <CAKYAXd-k=AvMcxsJg1rVsY2PPhsZuRUegqAhEFB2r-qXH3+5-w@mail.gmail.com>
-Subject: Re: [ksmbd] racy uses of ->d_parent and ->d_name
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20211222160405.3174438-1-ryandbair@gmail.com> <20211222160405.3174438-2-ryandbair@gmail.com>
+In-Reply-To: <20211222160405.3174438-2-ryandbair@gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 2 Feb 2022 21:32:16 -0600
+Message-ID: <CAH2r5msgnA2hEJEz-VFJDJw-zgqiOwV8wSHO=BJb2re7GvAahA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix workstation_name for multiuser mounts
+To:     Ryan Bair <ryandbair@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-01-31 10:57 GMT+09:00, Al Viro <viro@zeniv.linux.org.uk>:
-> 	Folks, ->d_name and ->d_parent are *NOT* stable unless the
-> appropriate locks are held.  In particular, locking a directory that
-> might not be our parent is obviously not going to prevent anything.
-> Even if it had been our parent at some earlier point.
-Hi Al,
+Missed this email thread during the holidays - will test it out later this week.
 
-First, Thanks for pointing that out!
+On Fri, Dec 24, 2021 at 5:07 AM Ryan Bair <ryandbair@gmail.com> wrote:
 >
-> 	->d_lock would suffice, but it can't be held over blocking
-> operation and it can't be held over dcache lookups anyway (instant
-> deadlocks).  IOW, the following is racy:
+> Set workstation_name from the master_tcon for multiuser mounts.
 >
-> int ksmbd_vfs_lock_parent(struct user_namespace *user_ns, struct dentry
-> *parent,
->                           struct dentry *child)
-> {
->         struct dentry *dentry;
->         int ret = 0;
+> Just in case, protect size_of_ntlmssp_blob against a NULL workstation_name.
 >
->         inode_lock_nested(d_inode(parent), I_MUTEX_PARENT);
->         dentry = lookup_one(user_ns, child->d_name.name, parent,
->                             child->d_name.len);
->         if (IS_ERR(dentry)) {
->                 ret = PTR_ERR(dentry);
->                 goto out_err;
+> Signed-off-by: Ryan Bair <ryandbair@gmail.com>
+> ---
+>  fs/cifs/connect.c | 13 +++++++++++++
+>  fs/cifs/sess.c    |  6 +++++-
+>  2 files changed, 18 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 1060164b984a..cefd0e9623ba 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1945,6 +1945,19 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
+>                 }
 >         }
 >
->         if (dentry != child) {
->                 ret = -ESTALE;
->                 dput(dentry);
->                 goto out_err;
->         }
+> +       ctx->workstation_name = kstrdup(ses->workstation_name, GFP_KERNEL);
+> +       if (!ctx->workstation_name) {
+> +               cifs_dbg(FYI, "Unable to allocate memory for workstation_name\n");
+> +               rc = -ENOMEM;
+> +               kfree(ctx->username);
+> +               ctx->username = NULL;
+> +               kfree_sensitive(ctx->password);
+> +               ctx->password = NULL;
+> +               kfree(ctx->domainname);
+> +               ctx->domainname = NULL;
+> +               goto out_key_put;
+> +       }
+> +
+>  out_key_put:
+>         up_read(&key->sem);
+>         key_put(key);
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index 035dc3e245dc..42133939f35d 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -675,7 +675,11 @@ static int size_of_ntlmssp_blob(struct cifs_ses *ses, int base_size)
+>         else
+>                 sz += sizeof(__le16);
 >
->         dput(dentry);
->         return 0;
-> out_err:
->         inode_unlock(d_inode(parent));
->         return ret;
-> }
+> -       sz += sizeof(__le16) * strnlen(ses->workstation_name, CIFS_MAX_WORKSTATION_LEN);
+> +       if (ses->workstation_name)
+> +               sz += sizeof(__le16) * strnlen(ses->workstation_name,
+> +                       CIFS_MAX_WORKSTATION_LEN);
+> +       else
+> +               sz += sizeof(__le16);
 >
+>         return sz;
+>  }
+> --
+> 2.33.1
 >
-> 	Some of that might be fixable - verifying that ->d_parent points
-> to parent immediately after inode_lock would stabilize ->d_name in case
-> of match.  However, a quick look through the callers shows e.g. this:
->                 write_lock(&ci->m_lock);
->                 if (ci->m_flags & (S_DEL_ON_CLS | S_DEL_PENDING)) {
->                         dentry = filp->f_path.dentry;
->                         dir = dentry->d_parent;
->                         ci->m_flags &= ~(S_DEL_ON_CLS | S_DEL_PENDING);
->                         write_unlock(&ci->m_lock);
->                         ksmbd_vfs_unlink(file_mnt_user_ns(filp), dir,
-> dentry);
->                         write_lock(&ci->m_lock);
->                 }
->                 write_unlock(&ci->m_lock);
->
-> 	What's to keep dir from getting freed right under us, just as
-> ksmbd_vfs_lock_parent() (from ksmbd_vfs_unlink()) tries to grab ->i_rwsem
-> on its inode?
-Right. We need to get parent using dget_parent().
->
-> 	Have the file moved to other directory and apply memory pressure.
-> What's to prevent dir from being evicted, its memory recycled, etc.?
-Let me check it.
->
-> 	For another fun example, consider e.g. smb2_rename():
->                 if (file_present &&
->                     strncmp(old_name, path.dentry->d_name.name,
-> strlen(old_name))) {
->                         rc = -EEXIST;
->                         ksmbd_debug(SMB,
->                                     "cannot rename already existing
-> file\n");
->                         goto out;
->                 }
->
-> Suppose path.dentry has a name longer than 32 bytes (i.e. too large to
-> fit into ->d_iname and thus allocated separately).  At this point you
-> are not holding any locks (otherwise ksmbd_vfs_fp_rename() immediately
-> downstream would deadlock).  So what's to prevent rename(2) on host
-> ending up with path.dentry getting renamed and old name getting freed?
->
-> 	More of the same: ksmbd_vfs_fp_rename().  In this one
-> dget_parent() will at least avoid parent getting freed.  It won't do
-> a damn thing to stabilize src_dent->d_name after lock_rename(),
-> though, since we are not guaranteed that the thing we locked is
-> still the parent...
-Okay, I will check it.
->
-> 	Why is so much tied to "open, then figure out where it is" model?
-> Is it a legacy of userland implementation, or a network fs protocol that
-> manages to outsuck NFS, or...?
-It need to use absolute based path given from request.
 
-Thanks!
->
+
+-- 
+Thanks,
+
+Steve
