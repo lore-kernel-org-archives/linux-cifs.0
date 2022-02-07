@@ -2,101 +2,101 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90ED6C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Feb 2022 06:18:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C93C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Feb 2022 21:04:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbiBGGSU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Feb 2022 01:18:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51152 "EHLO
+        id S231918AbiBGVEU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 7 Feb 2022 16:04:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231767AbiBGEur (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Feb 2022 23:50:47 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA4EC043181
-        for <linux-cifs@vger.kernel.org>; Sun,  6 Feb 2022 20:50:46 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id n8so24466163lfq.4
-        for <linux-cifs@vger.kernel.org>; Sun, 06 Feb 2022 20:50:46 -0800 (PST)
+        with ESMTP id S231667AbiBGVEU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Feb 2022 16:04:20 -0500
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D140C06173B;
+        Mon,  7 Feb 2022 13:04:19 -0800 (PST)
+Received: by mail-lf1-x12a.google.com with SMTP id b9so29335766lfq.6;
+        Mon, 07 Feb 2022 13:04:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=PQ7+LdtWbkHWKNl9CTBFFg0xqgyq3ew9jM8gttjb63o=;
-        b=BIHggsgchtMJCtkz67QLTwqqJlnDOEdxa1FVL8moLHB18ArJsr/9ZlKOKwxBQKo0Lb
-         f9OvSpCAQ8TuImTKsQ/9dV4SypJLrvdulJhso4IdWC7Nwcc1VICF4u0d018CRoHX8llI
-         yw2G6W1fqkxZlN3v/GpH4aSzKL0sxCYXZSbNUWSBO6nUIp4sQBkMqaBB/5cGmaQzhWM0
-         29BAtDTO8Iz5u8aWoDV/LPXEMrmRfckWtbpruDrSiBVTGdugCqmLHOSXMOwIdF900DfZ
-         rVi7RBpz2r69QuwOykR6gxzq7T5W1b4O54HYYn29cGGn/B7EsUPpdz1Ya9tcQWh0tdd7
-         t0Dg==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=IS0NV7Wj7WBc0nHIZQdxvQ5ddc8mhbJ83KJ/odH85X8=;
+        b=TAMIOExM4wGKLVkc/S5VkKo7A12LDRzYBpci4A2FA/xQT2lI3GcNBYqVce/WO8j0Wt
+         JBmZ7fas15zRLDoaYmvVgk0ypqD+sNm1Q9RWRUmOpocz7SMC5L3GLCOFrm+Xkx9r3/mO
+         lN2lYQ09HdCM8RUyne+0qQN+1448gyOh4J4JAlZ5Q8iAdEHFiWfHbJoSZqnKiESVMbUf
+         tH6YZ4wGHW21nlQVdB8qME6EBT0XaqJrZw7cnNqaHYPOnVeziJzVrR3grkfHh/yVBsl2
+         TPZCI9mXaUEk8TAfhdOpfHBpDE/KiBQBY9opsG4I/b8wlS9FsYCZEnuOVlFPw5hscshe
+         p3MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=PQ7+LdtWbkHWKNl9CTBFFg0xqgyq3ew9jM8gttjb63o=;
-        b=6V4FlBrVe9oVoCiS97sUr1oCFnDKgQmHQhieG3VMfBr6BIQl52bWfivaGF748NEgMJ
-         GS7xMa6F+BkKiT6RoTHBd4aK3zQN7JQG1y4RYPXRrIjVMZPdlB708pqJwzPlFOWYDyRl
-         ntVGptIhurgES9HpR/2YjcHzMLO/ej83pwj4nz72TQ0xkoupCpMlNye0Dpm1Q0tb47PV
-         tup0xvJxHz8IslTp9GeEpbWkVVRSjLy3AQ8S7LAJCOoqMcK9nSELlWz7NqiusBQ2Aow1
-         Jk5GSTs8/DK4B/zLrLXTuFUT2Ac1MyxSCwyGhR36bUIVxxly2QXz7o0UE7xUOzaEynNh
-         +ucA==
-X-Gm-Message-State: AOAM533J9OAwlyY80sgRhva08ePxxwyJVklRad62OnRICOAkN79pni1b
-        j8ujMX6EaeFy/LOZFAQaZUTw1sCds8yXUA4NGCkjZSFNgw8=
-X-Google-Smtp-Source: ABdhPJykm5Y+6IbGiCS/Tj/T+htH6UaNQjF+KQmq/1ngcrOPOimVdV8yqs4UX5a/+4cc9mkCdp/WsHqvaCHhaQd+Qog=
-X-Received: by 2002:ac2:5df6:: with SMTP id z22mr7242326lfq.601.1644209444646;
- Sun, 06 Feb 2022 20:50:44 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=IS0NV7Wj7WBc0nHIZQdxvQ5ddc8mhbJ83KJ/odH85X8=;
+        b=PShQmgTZ41b4JPxlAXrmhvTmFQXrrO4k3lznlTL80zhf5nu/O4ASR9TwaZjLtezmNI
+         jd01+uT5XY3ku05MrYW4sHd1wS5wao1xPGxImBVwtIfMWSHmke0yn1g44vYXZaVtoyL4
+         o+637X64jnCCdw+f9J17+7XO/zCTVvK/SfuWzITog53vujvZih7pVHwy/UmUPA04/9UM
+         co+WzqFAE9EDY6Fgjr5Hw6uVcnpEVThmMQXlbLi/FVroOv8OE0atqZQmSzpjd53W5Nzl
+         Fv1zqqdzck69sw3ipxX+kpcoHiOOel+PXD0/7k4PD9CL9L9p4fUxL7WtJWTNQbberMxi
+         WbrQ==
+X-Gm-Message-State: AOAM530XvAUqGv639AoKOW0R//nXR8VMDlj7ylW7FqGlh4TCpY86Ab88
+        TYLWrRsJGs96EVU+kGVfxNv8URpVIdjbUTcvpYkJP0iCEvw=
+X-Google-Smtp-Source: ABdhPJzXtEMfZtRgZyOwYRCXj+FJI+yotQe1tVk6j9KP6xZSKGTr+dm5iR19bL4eVqnMgt+kWs2VnMviI+0KiJTl/4o=
+X-Received: by 2002:a05:6512:c1d:: with SMTP id z29mr912257lfu.320.1644267857553;
+ Mon, 07 Feb 2022 13:04:17 -0800 (PST)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 6 Feb 2022 22:50:33 -0600
-Message-ID: <CAH2r5msPYuG-jUxBkqCz5tYg80JGpnjYTVXZFzzwRKwLJxdmFw@mail.gmail.com>
-Subject: [PATCH][SMB3] improve error message when mount options conflict with posix
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000e2a3b905d76657c3"
+Date:   Mon, 7 Feb 2022 15:04:06 -0600
+Message-ID: <CAH2r5ms7nZOL5jiGO2+AY8WO_hVXuEK9WsA9jE8utZgyHMoxZA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000e2a3b905d76657c3
-Content-Type: text/plain; charset="UTF-8"
+Please pull the following changes since commit
+e783362eb54cd99b2cac8b3a9aeac942e6f6ac07:
 
-POSIX extensions require SMB3.1.1 (so improve the error
-    message when vers=3.0, 2.1 or 2.0 is specified on mount)
+  Linux 5.17-rc1 (2022-01-23 10:12:53 +0200)
 
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/5.17-rc3-ksmbd-server-fixes
+
+for you to fetch changes up to f9929ef6a2a55f03aac61248c6a3a987b8546f2a:
+
+  ksmbd: add support for key exchange (2022-02-04 00:12:22 -0600)
+
+----------------------------------------------------------------
+6 ksmbd server fixes including:
+- NTLMSSP authentication improvement
+- RDMA (smbdirect) fix allowing broader set of NICs to be supported
+- improved buffer validation
+- 3 additional small fixes, including a posix extensions fix for stable
+
+Regression test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/100
+----------------------------------------------------------------
+Hyunchul Lee (1):
+      ksmbd: smbd: validate buffer descriptor structures
+
+Namjae Jeon (5):
+      ksmbd: fix SMB 3.11 posix extension mount failure
+      ksmbd: fix same UniqueId for dot and dotdot entries
+      ksmbd: don't align last entry offset in smb2 query directory
+      ksmbd: reduce smb direct max read/write size
+      ksmbd: add support for key exchange
+
+ fs/Kconfig                |  4 ++--
+ fs/ksmbd/auth.c           | 27 +++++++++++++++++++++++++++
+ fs/ksmbd/smb2pdu.c        | 45 +++++++++++++++++++++++++++++++++++----------
+ fs/ksmbd/smb_common.c     |  5 ++++-
+ fs/ksmbd/transport_rdma.c |  2 +-
+ fs/ksmbd/vfs.h            |  1 +
+ 6 files changed, 70 insertions(+), 14 deletions(-)
 
 -- 
 Thanks,
 
 Steve
-
---000000000000e2a3b905d76657c3
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-improve-error-message-when-mount-options-confli.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-improve-error-message-when-mount-options-confli.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kzc7tn3k0>
-X-Attachment-Id: f_kzc7tn3k0
-
-RnJvbSBkMGNiZTU2YTdkNWFjMTcwZjZjZjM3NTdlZjVhMTRkZDg1NGU3ZGE5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgNiBGZWIgMjAyMiAxODo1OTo1NyAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIFtz
-bWIzXSBpbXByb3ZlIGVycm9yIG1lc3NhZ2Ugd2hlbiBtb3VudCBvcHRpb25zIGNvbmZsaWN0IHdp
-dGgKIHBvc2l4CgpQT1NJWCBleHRlbnNpb25zIHJlcXVpcmUgU01CMy4xLjEgKHNvIGltcHJvdmUg
-dGhlIGVycm9yCm1lc3NhZ2Ugd2hlbiB2ZXJzPTMuMCwgMi4xIG9yIDIuMCBpcyBzcGVjaWZpZWQg
-b24gbW91bnQpCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29m
-dC5jb20+Ci0tLQogZnMvY2lmcy9jb25uZWN0LmMgfCAxMSArKysrKysrKysrLQogMSBmaWxlIGNo
-YW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9mcy9j
-aWZzL2Nvbm5lY3QuYyBiL2ZzL2NpZnMvY29ubmVjdC5jCmluZGV4IDBiNzQyYmQ1MDY0Mi4uY2Zm
-NmMwMWZlYWUyIDEwMDY0NAotLS0gYS9mcy9jaWZzL2Nvbm5lY3QuYworKysgYi9mcy9jaWZzL2Nv
-bm5lY3QuYwpAQCAtMjM0MCwxMCArMjM0MCwxOSBAQCBjaWZzX2dldF90Y29uKHN0cnVjdCBjaWZz
-X3NlcyAqc2VzLCBzdHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgpCiAJCWlmIChzZXMtPnNlcnZl
-ci0+cG9zaXhfZXh0X3N1cHBvcnRlZCkgewogCQkJdGNvbi0+cG9zaXhfZXh0ZW5zaW9ucyA9IHRy
-dWU7CiAJCQlwcl93YXJuX29uY2UoIlNNQjMuMTEgUE9TSVggRXh0ZW5zaW9ucyBhcmUgZXhwZXJp
-bWVudGFsXG4iKTsKLQkJfSBlbHNlIHsKKwkJfSBlbHNlIGlmICgoc2VzLT5zZXJ2ZXItPnZhbHMt
-PnByb3RvY29sX2lkID09IFNNQjMxMV9QUk9UX0lEKSB8fAorCQkgICAgKHN0cmNtcChzZXMtPnNl
-cnZlci0+dmFscy0+dmVyc2lvbl9zdHJpbmcsCisJCSAgICAgU01CM0FOWV9WRVJTSU9OX1NUUklO
-RykgPT0gMCkgfHwKKwkJICAgIChzdHJjbXAoc2VzLT5zZXJ2ZXItPnZhbHMtPnZlcnNpb25fc3Ry
-aW5nLAorCQkgICAgIFNNQkRFRkFVTFRfVkVSU0lPTl9TVFJJTkcpID09IDApKSB7CiAJCQljaWZz
-X2RiZyhWRlMsICJTZXJ2ZXIgZG9lcyBub3Qgc3VwcG9ydCBtb3VudGluZyB3aXRoIHBvc2l4IFNN
-QjMuMTEgZXh0ZW5zaW9uc1xuIik7CiAJCQlyYyA9IC1FT1BOT1RTVVBQOwogCQkJZ290byBvdXRf
-ZmFpbDsKKwkJfSBlbHNlIHsKKwkJCWNpZnNfZGJnKFZGUywgIkNoZWNrIHZlcnM9IG1vdW50IG9w
-dGlvbi4gU01CMy4xMSAiCisJCQkJImRpc2FibGVkIGJ1dCByZXF1aXJlZCBmb3IgUE9TSVggZXh0
-ZW5zaW9uc1xuIik7CisJCQlyYyA9IC1FT1BOT1RTVVBQOworCQkJZ290byBvdXRfZmFpbDsKIAkJ
-fQogCX0KIAotLSAKMi4zMi4wCgo=
---000000000000e2a3b905d76657c3--
