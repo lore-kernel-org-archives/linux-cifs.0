@@ -2,53 +2,53 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF97C433F5
-	for <linux-cifs@archiver.kernel.org>; Sun, 13 Feb 2022 23:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3ECC433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Feb 2022 00:13:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238819AbiBMXrT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 13 Feb 2022 18:47:19 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57258 "EHLO
+        id S230355AbiBNANt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 13 Feb 2022 19:13:49 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230195AbiBMXrS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 13 Feb 2022 18:47:18 -0500
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19C8751E4B
-        for <linux-cifs@vger.kernel.org>; Sun, 13 Feb 2022 15:47:12 -0800 (PST)
-Received: by mail-lj1-x22b.google.com with SMTP id be32so1557830ljb.7
-        for <linux-cifs@vger.kernel.org>; Sun, 13 Feb 2022 15:47:12 -0800 (PST)
+        with ESMTP id S230195AbiBNANt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 13 Feb 2022 19:13:49 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C1151E6A
+        for <linux-cifs@vger.kernel.org>; Sun, 13 Feb 2022 16:13:42 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id bx31so20150750ljb.0
+        for <linux-cifs@vger.kernel.org>; Sun, 13 Feb 2022 16:13:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FqKcYte9o6iPfTdeapjGwq/aivR7PK9Pwf+EwCHDC4E=;
-        b=VfeMBhrbFylPo9qDv787OmX9yqaUdZAyymYIHrXr3tKHh7KLh9YG5ooMj2QBa3mxEz
-         hspt+ifQLSc1w40hdjkxY9+Ws7rd1U+4ptdospDA7yXq0h6g/pHugCZQlu3VeKZae5B8
-         m/U5Xpw7KwpTWnirBcrO+D0BmZpREjrwoYzLTp3Uo4pcr/q+8tYBTyo7te05XPODtnYt
-         H7dszHMguJXxrukBkNXLEP4YfLRp4wWJWmWBPDOiz5S0dbrY0jnQ0lgM3x/hDvAMJyDI
-         VCeomcasJCkGeW++F7kSq7/ZBbOeTY3qxMPJh2AoKcKxylImILDghTvSOKUEh6SYT462
-         uiZQ==
+        bh=UwvUse9y9j4tJu8PHCN610HJR4p+TqkgHOPOwX7TDLg=;
+        b=H8MWCAeauBMqtErW1FSaOjYnOWGZqgL8qJlZ3tzYhtpw6P+Iz7zjbKMN+3KKGEAeLO
+         vPIy35wtRqJx1SumF3zBGbRcPWgklUX6rLG1rxfaDEaew0b3WcSAcDHTXS3xkB5WZycg
+         2faKoGIOYMWK/wEgIPw4ajqdgZPk7h6hGjxkyAe4NNdcUdxsGYNO/FVvZMybOfhN6AAa
+         yoKEKbklqR2afhFH8gnovxsRAeMXD8iy3Lq7uTOVnSBonzSKJKq9UpY461W4qN3smQlD
+         FFOLRaZrBy23RoAN2n3bWD2tOmp4BDkM942pusGt2rAdpfff4LbImBVFJGe8U+u9A5Jw
+         ZYSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FqKcYte9o6iPfTdeapjGwq/aivR7PK9Pwf+EwCHDC4E=;
-        b=fiGy7aRt4NMpZWkkShTd41W6nmZPdsLrYa3XukwjhRwR6pJpHmizTBLmIPkKJUTTBx
-         9n4Kmq+uMYbOJAK+waQ1lKHfbjpMCaYEuSLTFRa6qBJ6aKtOv1e9Z+8GTo9R/04dU06j
-         80ZQdcANL9mmVrMXZQ+wxfAzQPdTk4N5VhUZRULlH8ES8aenZDoLN5Wm6Xb9rJGwlxI+
-         TOG+GDn1EjvbP7gkuSeaVv3T4vTx6KDG0+MnB0++4P7+qw2nsrwVhtb8wXTKLylMSV+g
-         ofYxQNHQp4SqW7LsFDxjYNqVp7yfO51gKx9c/h8Dap5ljcQsCylh8AaE2XKLXy/bal5A
-         ob/Q==
-X-Gm-Message-State: AOAM530DuEDsznWXgpZqRFxF+V/nVL5SyuizC3JajjtZeESa5WnoUrYi
-        lhhNOub0JLG+uGAJZ8AuMJg1KVjQ4PRi4tqwEAA=
-X-Google-Smtp-Source: ABdhPJwismsRT3uVtE0W6iW4h4OKGySwS+wh6thxzDNAkQJ5ZrByA4MDGVN9Z+0XLTnDd3j2wU4a1QAzqMZ4ARN8Pnc=
-X-Received: by 2002:a05:651c:104e:: with SMTP id x14mr7430860ljm.23.1644796030241;
- Sun, 13 Feb 2022 15:47:10 -0800 (PST)
+        bh=UwvUse9y9j4tJu8PHCN610HJR4p+TqkgHOPOwX7TDLg=;
+        b=aw0i97I4LUHxxxj3fCYMQrFYySx8eOipWNykYQrhvwBLxRJMATPihpu3s4JqKg/E3+
+         qS4lSCv9gQz5A+Z1np9qgznWsJFypSpsguCMb1qSPB0Q8YN65uLGjqy+j4komf+IZhm8
+         eQ/RZ70S/h7bHBq/nk5ZkDJzk6Y+j2MZvQJMN7UWkbxtRyYeHvzRCCZL0M9ZzfOkDCmt
+         BYjkUopgVlyDSMQZf+ZA8/TbawTXPiBRqPXz26e335MureCaXIaylt9RHzzPw1L++4FD
+         nGilRqteOp+DRzUqOu0Czjk6ukBuGNcc+xYs9ZI8U6nFGtgZPIarYz7TL1LaRcNd3jDt
+         ROaA==
+X-Gm-Message-State: AOAM532vP+XMBi2ZpuVuax6SgQtkshBuBt7ulPwDk5SRlMfrxkHhjoaN
+        TkNgVZbuYaRUmLb08MNC0VZI5qVrgWY7PXMsjjJHkKcn
+X-Google-Smtp-Source: ABdhPJw4uQmCz7UlT1Ta3oTYhgPlUlFfcqLaCd3NrnEnmIF5lmMUjRVw2ByD2ZICGUa3ufXiPuNBEAMcYIm7IfnM2R0=
+X-Received: by 2002:a2e:9c04:: with SMTP id s4mr7598755lji.229.1644797620694;
+ Sun, 13 Feb 2022 16:13:40 -0800 (PST)
 MIME-Version: 1.0
 References: <20220213224052.3387192-1-lsahlber@redhat.com> <20220213224052.3387192-2-lsahlber@redhat.com>
 In-Reply-To: <20220213224052.3387192-2-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 13 Feb 2022 17:46:59 -0600
-Message-ID: <CAH2r5ms+mW2ujPBObv4MbSe2VkXwthwVqJYQjd75MmyAU1YC-w@mail.gmail.com>
+Date:   Sun, 13 Feb 2022 18:13:29 -0600
+Message-ID: <CAH2r5mtK6pgX31NN4yA0EbRm5nF+9mfu-1urjsEOU4OZejXjqQ@mail.gmail.com>
 Subject: Re: [PATCH] cifs: modefromsids must add an ACE for authenticated users
 To:     Ronnie Sahlberg <lsahlber@redhat.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>
@@ -57,10 +57,11 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Should I add:
-   cc:Stable # 5.12+
+merged into cifs-2.6.git for-next pending review and more testing
 
-Thoughts?
+Ronnie,
+Maybe we should add a small test for create file with modefromsid,
+chmod the file, and then getcifsacl?
 
 On Sun, Feb 13, 2022 at 4:41 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
