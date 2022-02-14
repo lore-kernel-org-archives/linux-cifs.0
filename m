@@ -2,104 +2,127 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CEFC433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Feb 2022 07:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB63C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Feb 2022 13:02:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232267AbiBNHxJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Feb 2022 02:53:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33666 "EHLO
+        id S1353777AbiBNNCo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 14 Feb 2022 08:02:44 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231537AbiBNHxJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Feb 2022 02:53:09 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FF25B3CB
-        for <linux-cifs@vger.kernel.org>; Sun, 13 Feb 2022 23:53:02 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id p19so43565488ybc.6
-        for <linux-cifs@vger.kernel.org>; Sun, 13 Feb 2022 23:53:02 -0800 (PST)
+        with ESMTP id S229631AbiBNNCo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Feb 2022 08:02:44 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58CD74C7A4
+        for <linux-cifs@vger.kernel.org>; Mon, 14 Feb 2022 05:02:36 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id f17so26957395edd.2
+        for <linux-cifs@vger.kernel.org>; Mon, 14 Feb 2022 05:02:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ia2tt8+ptc8yIY0SEFcLL1aiG3ffN+q2941Ezj1CSec=;
-        b=qGGbjcBzs7ly+dgBM3vgot0LAOWv6vm+j9ANiELp0Gtpa8MuabFklJRGOZ91LyxXnl
-         UhN+jvRO2pVJWK4LSoMNRXysghUaKREF89VIhoQBc2tL9rcWBdWRQ6lD356OJPeXoIi9
-         B4BBZ7gltFmLaPB1QkeE6P+ysyghEixR7mOyef+pq7r5ncbq9XN0gh4bVefmeyokqcQb
-         GUfk6oGqx0ZxfsG7iT/IDvWO6+UXSSTGal+NMPGPxbhQi/TghGvZOd5w3wzHacXYGrkp
-         95xL7R1eo5Erba+mv9owVOH7M8wnMJ0+lnDjP0B+IlDPw56jSGBdkD0+Hg7a+KoOdliL
-         xzag==
+        bh=1pff2KaA2YsJBdWQk9iXxsMw8KxxWwYcdZ74mkRkdQs=;
+        b=Qg6HAyrj3mzu+1gg1+eeRTV6lkAV5fsWdFHN9OTi/39hS9jq27O3VsEtpdfm+7JUkH
+         nDBLTocNtttAnDHN0Fxp0rnoTFCxZc3hTyyYtVktmx81POtUqlH+n7MpPH8HCtgpJ+pu
+         YRJTGU1lQ8cvtbJjfK7pRHskIHnuvHP39YpVK3R0nx4VEZWuwWe8Lsfbc2EjTkRapNsV
+         fLbEI11KPV0Ah29VFjuCeifWzp6MOANbtzRN0smcu3JWpnH2BlULHA8ISOa3GxokjI2+
+         5ykyQk031pR8hlsQYuNxzMi5aCKCsykj6yo+1dHaAt8+yHOmbGY1SmalgwEnZhUunIFK
+         TyZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ia2tt8+ptc8yIY0SEFcLL1aiG3ffN+q2941Ezj1CSec=;
-        b=1bYqcK4vzMsXSZvIir2TidR8yVxpWV1OgxsAMcQC+EjZjtDKGwzhYa2HKfRDGXMH8d
-         gqJ+Wdh4qh6EbXBsWstjvxxEoHsiyDSrn1HS2/qBRB6/I/Lm7py+CIKRIPCnjkGWZnFf
-         qtl5jSoiRHZNOlbPUm7ksH17ENWJkLbKUtmFxYwf2MnLcJURTy57MfrSzb4gSy795lpC
-         /PS9lApBlK5CdsPKUiFc8iPsADM+b//LWgHHxLOH6bA4Umz6nPBdTT/esc5TUajOiTh2
-         XXkMYVgJ9iqdKbMAPFyVIVdW/+H99smMAnNLM79DG+CFqNxHcQpqB4unL4JmKBU2Pa/4
-         Xy6A==
-X-Gm-Message-State: AOAM531/i1+8bKTXlBSra79weI1XzvzdCMm855G7uTnnoWK44sIWcMA6
-        Nndq7WQmtFVnwUIqRgrIiLn6pfoaO3Y91cJHuBQ=
-X-Google-Smtp-Source: ABdhPJwDl9GD98iFFoe1bQ4tEtF5wNuNmLxDWSvoxqPhA6rH25Y5iQQbnziYgi6fIcSsb+/8zh6sJS5BpQuT6YDOCzs=
-X-Received: by 2002:a25:e308:: with SMTP id z8mr11022025ybd.53.1644825181342;
- Sun, 13 Feb 2022 23:53:01 -0800 (PST)
+        bh=1pff2KaA2YsJBdWQk9iXxsMw8KxxWwYcdZ74mkRkdQs=;
+        b=BIBOmOAHnlJOff9o6lM1QZFQ1wR4fG5bJY+mxa5jhdUgDugmWkdrZjRh5AHXUiFlox
+         eX6ot2Zr0rY6RkJ/eQPUv3Sfzd6PubBAlLPWAmlD/TM759uHh/4S89h2edurZUuJ9M3b
+         0vXH5McpDE6CKKK1jlunjeuggeOeLk6UKBFwepb9qrj9XN/UYIKY9+Ci3ij7b0xg7w1A
+         Ezx6/yvFrk6j5tl3qT37YQm5lQEL1reMGUx6S2uJc0+lKK7kK+iKKi3QrzyHyMaiDKpA
+         NIW/r2lQ5HJZRshTDXJ9vvi5Y8UhMmsFaEHpUb3LNFRZeCDHiFLvhJzlbBrmVZXhCQSy
+         m8JQ==
+X-Gm-Message-State: AOAM5308sOPT5towshfQrYXROuGD6Sv+CMXcAEBkBdyX19PW2U/mre8y
+        G5LwlBgi8S4daGt0V6fcarHjUy8m41TqntfEynw=
+X-Google-Smtp-Source: ABdhPJzSGoiVW0AAY80f/Z8XOuuvOtG1NJDwaQ/T8qJvEk94okmCQxE98ED+QjHS3x2lwocvYMaaWhF2tV41+kBl+L4=
+X-Received: by 2002:a50:cccb:: with SMTP id b11mr15438435edj.57.1644843754633;
+ Mon, 14 Feb 2022 05:02:34 -0800 (PST)
 MIME-Version: 1.0
-References: <20220213224052.3387192-1-lsahlber@redhat.com>
-In-Reply-To: <20220213224052.3387192-1-lsahlber@redhat.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Mon, 14 Feb 2022 17:52:50 +1000
-Message-ID: <CAN05THRUfzu5G2Zn36Wopw8U-Ey4pZPpxdYsYkqBZaDnDt2SQA@mail.gmail.com>
-Subject: Re:
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>
+References: <20220213224052.3387192-1-lsahlber@redhat.com> <20220213224052.3387192-2-lsahlber@redhat.com>
+ <CAH2r5ms+mW2ujPBObv4MbSe2VkXwthwVqJYQjd75MmyAU1YC-w@mail.gmail.com>
+In-Reply-To: <CAH2r5ms+mW2ujPBObv4MbSe2VkXwthwVqJYQjd75MmyAU1YC-w@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Mon, 14 Feb 2022 18:32:22 +0530
+Message-ID: <CANT5p=ptM__+A6kjuxp5_Dm-ccMyUhabP+xb=LSX0FOsQDwe0g@mail.gmail.com>
+Subject: Re: [PATCH] cifs: modefromsids must add an ACE for authenticated users
+To:     Steve French <smfrench@gmail.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve,
+On Mon, Feb 14, 2022 at 3:45 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Should I add:
+>    cc:Stable # 5.12+
+>
+> Thoughts?
+>
+> On Sun, Feb 13, 2022 at 4:41 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+> >
+> > When we create a file with modefromsids we set an ACL that
+> > has one ACE for the magic modefromsid as well as a second ACE that
+> > grants full access to all authenticated users.
+> >
+> > When later we chante the mode on the file we strip away this, and other,
+> > ACE for authenticated users in set_chmod_dacl() and then just add back/update
+> > the modefromsid ACE.
+> > Thus leaving the file with a single ACE that is for the mode and no ACE
+> > to grant any user any rights to access the file.
+> > Fix this by always adding back also the modefromsid ACE so that we do not
+> > drop the rights to access the file.
+> >
+> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > ---
+> >  fs/cifs/cifsacl.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> > index ee3aab3dd4ac..40cda87ce384 100644
+> > --- a/fs/cifs/cifsacl.c
+> > +++ b/fs/cifs/cifsacl.c
+> > @@ -949,6 +949,9 @@ static void populate_new_aces(char *nacl_base,
+> >                 pnntace = (struct cifs_ace *) (nacl_base + nsize);
+> >                 nsize += setup_special_mode_ACE(pnntace, nmode);
+> >                 num_aces++;
+> > +               pnntace = (struct cifs_ace *) (nacl_base + nsize);
+> > +               nsize += setup_authusers_ACE(pnntace);
+> > +               num_aces++;
+> >                 goto set_size;
+> >         }
+> >
+> > @@ -1613,7 +1616,7 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 *pnmode,
+> >         nsecdesclen = secdesclen;
+> >         if (pnmode && *pnmode != NO_CHANGE_64) { /* chmod */
+> >                 if (mode_from_sid)
+> > -                       nsecdesclen += sizeof(struct cifs_ace);
+> > +                       nsecdesclen += 2 * sizeof(struct cifs_ace);
+> >                 else /* cifsacl */
+> >                         nsecdesclen += 5 * sizeof(struct cifs_ace);
+> >         } else { /* chown */
+> > --
+> > 2.30.2
+> >
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-I  have added a test to the buildbot to verify the fix.
-I.e. two ACEs when file are created, one for mode and one for AuthenticatedUsers
-and that after chmod we still have two ACEs but the one for mode has
-been updated.
+Good catch. Changes look good.
+Please run the tests with memory sanitizers enabled for this one.
 
-The test is cifs/107
-and it can also show how we can now modify the mountoptions we need on
-a test by test
-basis by using -o remount, ...     wooohooo new mount api :-)
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
 
-
-
-On Mon, Feb 14, 2022 at 9:47 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> Steve, List,
->
-> Here is a small patch htat fixes an issue with modefromsid where
-> it would strip off and remove all the ACEs that grants us access to the file.
-> It fixes this by restoring the "allow AuthenticatedUsers access" ACE that is stripped in
->
-> set_chmod_dacl():
->                 /* If it's any one of the ACE we're replacing, skip! */
->                 if (((compare_sids(&pntace->sid, &sid_unix_NFS_mode) == 0) ||
->                                 (compare_sids(&pntace->sid, pownersid) == 0) ||
->                                 (compare_sids(&pntace->sid, pgrpsid) == 0) ||
->                                 (compare_sids(&pntace->sid, &sid_everyone) == 0) ||
->                                 (compare_sids(&pntace->sid, &sid_authusers) == 0))) {
->                         goto next_ace;
->                 }
->
-> This part is confusing since form many of these cases we are NOT replacing
-> all these ACEs but only some of them but the code unconditionally removes
-> all of them, contrary to what the comment suggests.
->
-> I think some of my confusion here is that afaik we don't have good documentation
-> of how modefromsid, and idsfromsid, are supposed to work, what the
-> restrictions are or the expected semantics.
-> We need to document both modefromsid and idsfromsid and what the expected
-> semantics are for when either of them or both of them are enabled.
->
->
->
->
+-- 
+Regards,
+Shyam
