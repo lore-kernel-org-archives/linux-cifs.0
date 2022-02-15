@@ -2,65 +2,101 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34CE1C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Feb 2022 14:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B842DC43217
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Feb 2022 15:27:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229745AbiBOOP0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Feb 2022 09:15:26 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33532 "EHLO
+        id S239832AbiBOP1i (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Feb 2022 10:27:38 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233231AbiBOOPZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Feb 2022 09:15:25 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD4F89BAD6
-        for <linux-cifs@vger.kernel.org>; Tue, 15 Feb 2022 06:15:15 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id b14so7735824ede.9
-        for <linux-cifs@vger.kernel.org>; Tue, 15 Feb 2022 06:15:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=JtxbWQSRF8DqLTk2YVEvbsJUWiYKkB1YZvzIEdrfYns=;
-        b=aOnAXUo9dQ5+yKYf/yXaGb7HGcyQH62JAcpGe2T6/KYWUWH6K0ZdTGiMrvmcMqrIGx
-         KVjVezmxHbiwHNwooNJ18BKvhyjz93rIgptPSvP6spBQnpcABHMQxWJxxmMxKNrTxBgF
-         8+r9v7lmGCl6d8OVFkQbaRvCGHQOT7UdK7f0Y2RtgXxHRl0nW6sW6UjyLjt7f9aDZQic
-         RFBEpixrpqpOLlmDXM3hrBWEQ/Xl+f2qSrJw/vsBUWcsoonTzR9Tte+8Tmt6V/utUml3
-         fIWDBpRcKPvO3q469SEeu8UI3ziGAwe3VdgZkEJxwD3KGWqQ+9rInNRSO8QsiBrI/bBt
-         o30Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=JtxbWQSRF8DqLTk2YVEvbsJUWiYKkB1YZvzIEdrfYns=;
-        b=uuMtxcqqpCH4xqlWuRVOqFtGdPzt349bCcBdfTQgeQ/+ywLom2Ef8728D4V0mIlbE2
-         kC7Jk4ovpWh534MkGR4gAW8s8LH7wL886qtBXUgGbbv0FkRfQn5C6UnjnN6SZHXkP/WD
-         UsQaOefLe9edT8nfpa8LmvZ9y5kZP9HUsOBQ8C9xfzZSR6EwGdVGlTAO2Hm7Mb5rOQgA
-         JnTkW+jcyfPf3oCEibxt2bt3u7WkgVuuoP1uk+5riALUNQdqEGKulQXDbmFWykwHZ5tC
-         aY3R/8eLbzk1xFETabjDJ3WE+awTDesXmTPYc+Q3FxPJgsQRTtM4i3Vq6gY4rBE3ufsP
-         /Vhg==
-X-Gm-Message-State: AOAM533tPJg16Y8B0EM550uAZvp4rpcPQuoc9TvPcWXnnF1Mso0bQYwQ
-        2UFY25vGoPZ5/F2ntnPv8zD+C5fq5gxUMXwYgk5jbtdT5Eo=
-X-Google-Smtp-Source: ABdhPJzNHAJzCMnpLvgU1d9MaSiYqvElHOasvzbMcl1sQsm78zT+F+NORfC5chqE/wWRlvKKz2db4hFc6GZDpq2YLQs=
-X-Received: by 2002:a05:6402:1e8e:: with SMTP id f14mr1072173edf.240.1644934514247;
- Tue, 15 Feb 2022 06:15:14 -0800 (PST)
+        with ESMTP id S239829AbiBOP1g (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Feb 2022 10:27:36 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667FEA6505;
+        Tue, 15 Feb 2022 07:27:21 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 05135615E6;
+        Tue, 15 Feb 2022 15:27:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75028C36AE2;
+        Tue, 15 Feb 2022 15:27:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644938840;
+        bh=H/fR1pHcd6IqJQK3Dd1OyYzgmulAJOBsJJZHyTg8cng=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=udGla094FDakVSUDRnrE+nAr/WOkhmMV+A0aWaSLgzSpb2KsatxRsgni2h+uVx7ip
+         lK3JzvqDw5lVooQb0yet/iB76j0VcnMrP7hkprqQs4GzildhzSWX5G9X/Hino7FCni
+         YaJsStUTMGyjREm6WEvtRyX+1QiMfm2q/F96mAhzp7WIfYgd1tSByivtopo1qfVDRq
+         6m1CJnOB05HUk+ZhNDWmn/+fBt/DDsuRqWT8tZsBZyHhAUZ+1Ok02ccNPxmB2tnVQq
+         8GwhZ+kkjGmdk7T3BKpycpdBgYdjDH0THC383wWAh0s3TDLvLm+xo+LFNeFsi2gKPq
+         XEqaoJ19Ez5MA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, senozhatsky@chromium.org,
+        sfrench@samba.org, hyc.lee@gmail.com, linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.16 10/34] ksmbd: fix same UniqueId for dot and dotdot entries
+Date:   Tue, 15 Feb 2022 10:26:33 -0500
+Message-Id: <20220215152657.580200-10-sashal@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220215152657.580200-1-sashal@kernel.org>
+References: <20220215152657.580200-1-sashal@kernel.org>
 MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Tue, 15 Feb 2022 19:45:03 +0530
-Message-ID: <CANT5p=oyS-49nAvmddV=s+VOz+TG0SG7RcTEs6f25g_2hC-rUQ@mail.gmail.com>
-Subject: [PATCH] cifs: use a different reconnect helper for non-cifsd threads
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Steve,
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-My patch last week was not sufficient to fix some of the buildbot
-failures we saw recently.
-Please review and use the following patch for new buildbot runs.
+[ Upstream commit 97550c7478a2da93e348d8c3075d92cddd473a78 ]
 
-https://github.com/sprasad-microsoft/smb3-kernel-client/commit/2b599dec7c9399b66b56419fcb252ab37de94e3b.patch
+ksmbd sets the inode number to UniqueId. However, the same UniqueId for
+dot and dotdot entry is set to the inode number of the parent inode.
+This patch set them using the current inode and parent inode.
 
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/ksmbd/smb_common.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
+index ef7f42b0290a8..9a7e211dbf4f4 100644
+--- a/fs/ksmbd/smb_common.c
++++ b/fs/ksmbd/smb_common.c
+@@ -308,14 +308,17 @@ int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work, int info_level,
+ 	for (i = 0; i < 2; i++) {
+ 		struct kstat kstat;
+ 		struct ksmbd_kstat ksmbd_kstat;
++		struct dentry *dentry;
+ 
+ 		if (!dir->dot_dotdot[i]) { /* fill dot entry info */
+ 			if (i == 0) {
+ 				d_info->name = ".";
+ 				d_info->name_len = 1;
++				dentry = dir->filp->f_path.dentry;
+ 			} else {
+ 				d_info->name = "..";
+ 				d_info->name_len = 2;
++				dentry = dir->filp->f_path.dentry->d_parent;
+ 			}
+ 
+ 			if (!match_pattern(d_info->name, d_info->name_len,
+@@ -327,7 +330,7 @@ int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work, int info_level,
+ 			ksmbd_kstat.kstat = &kstat;
+ 			ksmbd_vfs_fill_dentry_attrs(work,
+ 						    user_ns,
+-						    dir->filp->f_path.dentry->d_parent,
++						    dentry,
+ 						    &ksmbd_kstat);
+ 			rc = fn(conn, info_level, d_info, &ksmbd_kstat);
+ 			if (rc)
 -- 
-Regards,
-Shyam
+2.34.1
+
