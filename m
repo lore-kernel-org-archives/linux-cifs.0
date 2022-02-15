@@ -2,91 +2,104 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1423C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Feb 2022 19:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54689C43219
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Feb 2022 19:13:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243397AbiBOTL5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Feb 2022 14:11:57 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53714 "EHLO
+        id S241780AbiBOTNu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Feb 2022 14:13:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243393AbiBOTL4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Feb 2022 14:11:56 -0500
-X-Greylist: delayed 304 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Feb 2022 11:11:46 PST
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 632953F325
-        for <linux-cifs@vger.kernel.org>; Tue, 15 Feb 2022 11:11:45 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S229844AbiBOTNs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Feb 2022 14:13:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F9F107A91;
+        Tue, 15 Feb 2022 11:13:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id CB717808A9;
-        Tue, 15 Feb 2022 19:06:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1644951999;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JPAZc3JY2LcAMYfpwdNOYBCFdIYxs59jHP4C75eG+ss=;
-        b=gfy50yYc+C+NDanU/Um19J65y6T++cqitqpF156kvDR7XopIpIABm0HRfJ9fU46mJIQkhj
-        U7+Q1ZBtLpqqcnhTrwrNRHYCDMyQIVKcSNOh8ABh/y5eW8BqhEg5hkRZ+l7eh9BLIzEh3e
-        gvpN28iB/MRnPe6x4585UcXml6ecDmV+7J/+5p2TwH1A2S5hwdIhKRYCyMb1nrYe1x27g8
-        7QHys7RgHUstEItINoQRtUoJ2G+mwZD9TqJ+M1Z+OjAF4av5aUS8z5EnA6DgGG1vdpdYnv
-        V5KrReYMYiAfVJ/aZm158ksMDPuALrgz1kzIgjCOKQUhF2YzS46G4WoGvT9ZBQ==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] cifs: use a different reconnect helper for non-cifsd
- threads
-In-Reply-To: <CANT5p=oyS-49nAvmddV=s+VOz+TG0SG7RcTEs6f25g_2hC-rUQ@mail.gmail.com>
-References: <CANT5p=oyS-49nAvmddV=s+VOz+TG0SG7RcTEs6f25g_2hC-rUQ@mail.gmail.com>
-Date:   Tue, 15 Feb 2022 16:06:35 -0300
-Message-ID: <87leyckkzo.fsf@cjr.nz>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1449BB81C63;
+        Tue, 15 Feb 2022 19:13:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA149C340EB;
+        Tue, 15 Feb 2022 19:13:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644952415;
+        bh=aWKfLj+OcuQ7ORm2NzKcSLdWPXwTMvCyCCSlhItZJdc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Pb9b+lIl3czsbILZx4JGaHKfxai5nhmkbafSdXIePkm1+42+PtZWRvtnxsIxieHjT
+         9ekyHuwvisvcr9fVX07+lClUNa2p0vhktIvKZSAjwuXs2gg0KwuzJxVI1eJwsCEsx9
+         QAqj6xuEKLMkpaRxHB9Jbh5UZNn3lhP/U/32rVpI9FJi1e5LJ0Z2HLVW0p7KctTIZB
+         uH0ohVDX/Qm561zC5FzYDM+alYJWObfXnSGwWXg348TFcT9AqtFzE3U54RAksJmBj5
+         t03G17WjapCI9e95mge26r6O7cubp0cNepLCQdTnroGWEV76h8vqtZwzBmUYMX3S66
+         UcWCeciahTo0A==
+Date:   Tue, 15 Feb 2022 13:21:10 -0600
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     GR-QLogic-Storage-Upstream@marvell.com,
+        linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-xtensa@linux-xtensa.org,
+        linux-crypto@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+        coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+        linux-staging@lists.linux.dev,
+        linux-rpi-kernel@lists.infradead.org, sparmaintainer@unisys.com,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-ext4@vger.kernel.org, linux-acpi@vger.kernel.org,
+        devel@acpica.org, linux-arch@vger.kernel.org, linux-mm@kvack.org,
+        greybus-dev@lists.linaro.org, linux-i3c@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        alsa-devel@alsa-project.org, devicetree@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] treewide: Replace zero-length arrays with
+ flexible-array members
+Message-ID: <20220215192110.GA883653@embeddedor>
+References: <20220215174743.GA878920@embeddedor>
+ <202202151016.C0471D6E@keescook>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <202202151016.C0471D6E@keescook>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Shyam,
+On Tue, Feb 15, 2022 at 10:17:40AM -0800, Kees Cook wrote:
+> On Tue, Feb 15, 2022 at 11:47:43AM -0600, Gustavo A. R. Silva wrote:
+> > There is a regular need in the kernel to provide a way to declare
+> > having a dynamically sized set of trailing elements in a structure.
+> > Kernel code should always use “flexible array members”[1] for these
+> > cases. The older style of one-element or zero-length arrays should
+> > no longer be used[2].
+> > 
+> > This code was transformed with the help of Coccinelle:
+> > (next-20220214$ spatch --jobs $(getconf _NPROCESSORS_ONLN) --sp-file script.cocci --include-headers --dir . > output.patch)
+> > 
+> > @@
+> > identifier S, member, array;
+> > type T1, T2;
+> > @@
+> > 
+> > struct S {
+> >   ...
+> >   T1 member;
+> >   T2 array[
+> > - 0
+> >   ];
+> > };
+> 
+> These all look trivially correct to me. Only two didn't have the end of
+> the struct visible in the patch, and checking those showed them to be
+> trailing members as well, so:
+> 
+> Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+I'll add this to my -next tree.
 
-> My patch last week was not sufficient to fix some of the buildbot
-> failures we saw recently.
-> Please review and use the following patch for new buildbot runs.
->
-> https://github.com/sprasad-microsoft/smb3-kernel-client/commit/2b599dec7c9399b66b56419fcb252ab37de94e3b.patch
-
-Patch looks good, however you missed these:
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 053cb449eb16..2e00cd58a8b5 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -4416,7 +4416,7 @@ static int tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *tco
- 	 */
- 	if (rc && server->current_fullpath != server->origin_fullpath) {
- 		server->current_fullpath = server->origin_fullpath;
--		cifs_reconnect(tcon->ses->server, true);
-+		cifs_signal_cifsd_for_reconnect(server, true);
- 	}
- 
- 	dfs_cache_free_tgts(tl);
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index ebe236b9d9f5..235aa1b395eb 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -896,7 +896,7 @@ map_and_check_smb_error(struct mid_q_entry *mid, bool logErr)
- 		if (class == ERRSRV && code == ERRbaduid) {
- 			cifs_dbg(FYI, "Server returned 0x%x, reconnecting session...\n",
- 				code);
--			cifs_reconnect(mid->server, false);
-+			cifs_signal_cifsd_for_reconnect(mid->server, false);
- 		}
- 	}
-
-With that, feel free to add:
-
-Acked-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Thanks!
+--
+Gustavo
