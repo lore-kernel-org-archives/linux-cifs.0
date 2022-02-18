@@ -2,268 +2,348 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CB1C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Feb 2022 08:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B0AC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Feb 2022 13:30:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231165AbiBRIC4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Feb 2022 03:02:56 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38840 "EHLO
+        id S235491AbiBRNab (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Feb 2022 08:30:31 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231209AbiBRIC4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Feb 2022 03:02:56 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9725321FECA;
-        Fri, 18 Feb 2022 00:02:39 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 123F2B81C21;
-        Fri, 18 Feb 2022 08:02:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6BCAC340EB;
-        Fri, 18 Feb 2022 08:02:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645171356;
-        bh=NUlcL9+98RkSnEHuB4RbeA0kdHu/Vm1M0qRPByORiXM=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=FK/wUgOeKLrPHPKc45gRhzQFctFkPUl7hmSuzFrqMDyRC7Q9U95qPIizQGG/+jYF8
-         ac3D++/CBBD0erAILfvbOXBUcX/xci9M03GFE6/PIE4iZXs6zzv73mwCaVw+dAEwJO
-         w61mUwRBQZlu1olneQEGKNaC/H7MQACTafBBkrMcicG4eO0vA5o+qKs19TPn6wd7r5
-         yNwUSXuO+0cjOitOMdqc0Tgh4hNRXXtTbFyuXPoQyY41deI/rmX469zGgfi731k1cF
-         ImMXu//UmuDrO3q6LlEkNsU5OnajBaJOC+SQ7J20S9efRuNkzxuDJ9XrpVbUeUbVI2
-         jHJhvFn7TqIEA==
-Received: by mail-wm1-f49.google.com with SMTP id n8so4662927wms.3;
-        Fri, 18 Feb 2022 00:02:36 -0800 (PST)
-X-Gm-Message-State: AOAM531vTHyZHgm13Obef2ONQt2jTLl5y2yLz+jStw11n3xqmqGhManZ
-        ME/WcX18qIeANm4DEyhTHbSdNQeAFLWmvEx+vmQ=
-X-Google-Smtp-Source: ABdhPJwx1r4+NgODyxjeVLAvCm8mGNWsCilCANKqgUh3sMl4RDeoYrxSb75BOy9FgVWe2dUZ9UM30oIRUrf3FcTXflI=
-X-Received: by 2002:a7b:c001:0:b0:37d:409d:624d with SMTP id
- c1-20020a7bc001000000b0037d409d624dmr5945124wmb.64.1645171354835; Fri, 18 Feb
- 2022 00:02:34 -0800 (PST)
+        with ESMTP id S229737AbiBRNaa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Feb 2022 08:30:30 -0500
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B95729692D;
+        Fri, 18 Feb 2022 05:30:13 -0800 (PST)
+Received: by mail-vs1-xe32.google.com with SMTP id e26so9985086vso.3;
+        Fri, 18 Feb 2022 05:30:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vWenGxp5Hz0NOJbMbHu6FiVIIwXifwzr2lS+VLp64wQ=;
+        b=Dl7Spd4yNqCuZBoBWQ/jbzaROWYYDSXlAIbRYxsdHcj2Vk4uWrPgtygnzMAwmqichG
+         ZEdhy655LDxtJcNX3M5rhVwtJwH0YGIIkx597JAqEe6KJbVQRrUgXGdsEER+JnT4bBtl
+         Bk32TaOyFiI0gGAJYPTh9AzRcYp2kbX+ZxDtjHjvWAXKzBGSS6SLRrVAY3Oy/vVlD3em
+         iJKKQS8TxI7f15ab5HzMCEZNxExmycAaNOOCfhR/kkIratGMLSFQvbzDTWZ5GuBH9U09
+         Zkqgmjx0ODsGz6aqMP0XnelPPycHi8tq5TTW4wTPjTwqWG0tLTXpxGNUzwq/QKvra0AL
+         z+Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vWenGxp5Hz0NOJbMbHu6FiVIIwXifwzr2lS+VLp64wQ=;
+        b=eIuZlne/G1Wbuc/xJEt7z8q8FXmsaTmJTmkWsoFJ4MYdLqmoBiK5YRhK/lxWfdLKsI
+         ppclfHIlhYd9Uzz6CDzGotPaLHh1nk83LfPw7GbHDjiMSzp43L+Oex0/ahWAyhTCy+uy
+         qrUzTSv9Wbh/iogaZPv6aIn/HZsDKazi56OQZhV3awe5wQ5/3FUJYl80X9X5QMz6noYa
+         umGjZpHuOGMsQdVKCRHL0rB1zG2vQJfvJG9GbNIDUGpxitbk8WgjOCkIzL4zj00KwIfx
+         bPyVFTdRBUsR3pFS+oB/YUJ+0l4ueDGc29+FwVzsMA/yIps4FrMocnVHWqO6SIWILbkg
+         u17g==
+X-Gm-Message-State: AOAM531jF6+dxmfAxLnKyXkuhRCVGF2yIwknRFBe0TmDXD5gUhEv0j52
+        N1R6JF5JEiEEwL4C2RfXPK0ForWZ9vdc6jOwdCuSPbW/RR4=
+X-Google-Smtp-Source: ABdhPJySd6CUHOISiL0QEGym/Sp0aVsp5nhMsiQyDAio7YHWNl07/Scxwvde83+37lTGa1k1YtOGSVPeQOcDkEas+ms=
+X-Received: by 2002:a05:6102:6c6:b0:315:dd8c:a with SMTP id
+ m6-20020a05610206c600b00315dd8c000amr3637264vsg.57.1645191012244; Fri, 18 Feb
+ 2022 05:30:12 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:6000:168c:0:0:0:0 with HTTP; Fri, 18 Feb 2022 00:02:34
- -0800 (PST)
-In-Reply-To: <Yg7dMwEebkITEMI+@zeniv-ca.linux.org.uk>
-References: <20220216230319.6436-1-linkinjeon@kernel.org> <Yg7dMwEebkITEMI+@zeniv-ca.linux.org.uk>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 18 Feb 2022 17:02:34 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9CEDqfwNsVU=DkfBhmL2zmiRaTfALeDRt8KHqMVnQ=1w@mail.gmail.com>
-Message-ID: <CAKYAXd9CEDqfwNsVU=DkfBhmL2zmiRaTfALeDRt8KHqMVnQ=1w@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: fix racy issue from using ->d_parent and ->d_name
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org
+References: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
+ <CAH2r5mt_2f==5reyc0HmMLvYJVmP4Enykwauo+LQoFGFbVFeRQ@mail.gmail.com>
+ <CAJjP=BvNVOj3KRnhFgk6xiwnxVhxE-sN98-pr6e1Kzc5Xg5EvQ@mail.gmail.com>
+ <CAH2r5mvsetx5G+c=8ePh+X8ng7FvMrnuM9+FJ4Sid4b3E+T41Q@mail.gmail.com>
+ <CAJjP=BvqZUnJPq=C0OUKbXr=mbJd7a6YDSJC-sNY1j_33_e-uw@mail.gmail.com>
+ <CAN05THSGwCKckQoeB6D91iBv0Sed+ethK7tde7GSc1UzS-0OYg@mail.gmail.com>
+ <CAJjP=BvcWrF-k_sFxak1mgHAHVVS7_JZow+h_47XB1VzG2+Drw@mail.gmail.com>
+ <ebf8c487-0377-834e-fbb7-725cceae1fbb@leemhuis.info> <CAN05THRJJj48ueb34t18Yj=JYuhiwZ8hTvOssX4D6XhNpjx-bg@mail.gmail.com>
+ <f7eb4a3e-9799-3fe4-d464-d84dd9e64510@leemhuis.info>
+In-Reply-To: <f7eb4a3e-9799-3fe4-d464-d84dd9e64510@leemhuis.info>
+From:   Davyd McColl <davydm@gmail.com>
+Date:   Fri, 18 Feb 2022 15:30:00 +0200
+Message-ID: <CAJjP=Bus1_ce4vbHXpiou1WrSe8a61U1NzGm4XvN5fYCPGNikA@mail.gmail.com>
+Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
+ machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Al,
-2022-02-18 8:41 GMT+09:00, Al Viro <viro@zeniv.linux.org.uk>:
-> On Thu, Feb 17, 2022 at 08:03:19AM +0900, Namjae Jeon wrote:
->> Al pointed out that ksmbd has racy issue from using ->d_parent and
->> ->d_name
->> in ksmbd_vfs_unlink and smb2_vfs_rename(). and he suggested changing from
->> the way it start with dget_parent(), which can cause retry loop and
->> unexpected errors, to find the parent of child, lock it and then look for
->> a child in locked directory.
->>
->> This patch introduce a new helper(vfs_path_parent_lookup()) to avoid
->> out of share access and export vfs functions like the following ones to
->> use
->> vfs_path_parent_lookup() and filename_parentat().
->>  - __lookup_hash().
->>  - getname_kernel() and putname().
->>  - filename_parentat()
->
-> First of all, your vfs_path_parent_lookup() calling conventions are wrong.
-> You have 3 callers:
-> 	err = vfs_path_parent_lookup(share->vfs_path.dentry,
-> 				     share->vfs_path.mnt, filename_struct,
-> 				     LOOKUP_NO_SYMLINKS | LOOKUP_BENEATH,
-> 				     &path, &last, &type);
-> 	err = vfs_path_parent_lookup(share_conf->vfs_path.dentry,
-> 				     share_conf->vfs_path.mnt, to,
-> 				     lookup_flags | LOOKUP_BENEATH,
-> 				     &new_path, &new_last, &new_type);
-> 	err = vfs_path_parent_lookup(share->vfs_path.dentry,
-> 				     share->vfs_path.mnt, filename_struct,
-> 				     LOOKUP_NO_SYMLINKS | LOOKUP_BENEATH,
-> 				     &path, &last, &type);
-> Note that in all of them the first two arguments come from ->dentry and
-> ->mnt of the same struct path instance.  Now, look at the function itself:
->
-> int vfs_path_parent_lookup(struct dentry *dentry, struct vfsmount *mnt,
-> 			   struct filename *filename, unsigned int flags,
-> 			   struct path *parent, struct qstr *last, int *type)
-> {
-> 	struct path root = {.mnt = mnt, .dentry = dentry};
->
-> 	return  __filename_parentat(AT_FDCWD, filename, flags, parent, last,
-> 				    type, &root);
-> }
->
-> What about the __filename_parentat() last argument?  It's declared as
-> struct path *root and passed to set_nameidata().  No other uses.  And
-> set_nameidata() gets it via const struct path *root argument.  IOW,
-> it's not going to modify the contents of that struct path.  Since
-> you __filename_parentat() doesn't do anything else with its root
-> argument, there's no reason not to make _that_ const struct path *,
-> is there?
-Yep, No reason.
+Apologies for the late response - I didn't see the last bit of the
+mail asking for more info.
 
+Thorsten: the only group policy modification I have on my win11
+machine (which was
+loaded fresh not too long ago) is to enable insecure guest logins,
+which is obviously
+required for samba shares where the share allows a guest login without
+any password.
+I have to enable this to browse the shares on my Gentoo machine from the win11
+machine anyway.
+
+-d
+
+On Fri, 28 Jan 2022 at 16:02, Thorsten Leemhuis
+<regressions@leemhuis.info> wrote:
 >
-> Now, if you do that, you can safely turn vfs_path_parent_lookup()
-> take const struct path * instead of dentry/vfsmount pair of arguments
-> and drop the local struct path instance in the vfs_path_parent_lookup()
-> itself.
-Yes. I will change it.
-
+> On 28.01.22 14:50, ronnie sahlberg wrote:
+> > On Fri, Jan 28, 2022 at 11:30 PM Thorsten Leemhuis
+> > <regressions@leemhuis.info> wrote:
+> >>
+> >> Hi, this is your Linux kernel regression tracker speaking.
+> >>
+> >> Top-posting for once, to make this easy accessible to everyone.
+> >>
+> >> Davyd, Ronnie, and/or Steve: What the status here? It seems after some
+> >> productive debugging back and forth it seems everyone forgot about this.
+> >> Or was progress made somewhere and I just missed it?
+> >
+> > I tried but can not find a system old enough to reproduce.
+> > Remember, this is an authentication mechanism that Microsoft begged
+> > people to stop using and migrate away from over 20 years ago.
+> > Win2k works just fine, as does samba3.0.
+> > I have no idea if Samba 2.0 works with current cifs.ko   but then
+> > again  I seriously doubt you can even get samba 2.0 to even compile on
+> > a modern
+> > machine as so many APIs have changed or just gone away since the late 90s.
+> >
+> > I tried, but there is just so much time you can spend on something
+> > that was declared obsolete 20 years ago.
 >
-> The fact that vfs_path_lookup() passes vfsmount and dentry separately
-> doesn't mean you need to do the same - look at the existing callers
-> of vfs_path_lookup() (outside of ksmbd itself) and you'll see the
-> difference.  Incidentally, this
-> fs/ksmbd/vfs.c:22:#include "../internal.h"      /* for vfs_path_lookup */
-> had been a really bad idea.  And no, nfsd doing the same is not a good
-> thing either...
+> I can fully understand that -- otoh then I'd normally say "well, then
+> let's just revert the commit that causes this". But in this case I can
+> understand that it might not be wise.
 >
-> General rule: if it's exported, it's *NOT* internal.
-Okay. Then as another patch, I will move vfs_path_lookup prototype in
-internal.h to linux/namei.h.
-
+> There is one thing that would help me to judge this situation better:
 >
+> Davyd, did a default Win11 install connect fine with standard settings
+> or did you have to modify something in the registry to make it work
+> there (which you might have done years ago in case you updated the
+> machine!), as Ronnie suspected? Or was this already clarified in this
+> thread somewhere and I just missed that (in that case: sorry!)?
 >
-> Next:
+> Ciao, Thorsten
 >
->> index 077b8761d099..b094cd1d4951 100644
->> --- a/fs/ksmbd/oplock.c
->> +++ b/fs/ksmbd/oplock.c
->> @@ -1713,11 +1713,14 @@ int smb2_check_durable_oplock(struct ksmbd_file
->> *fp,
->>  			ret = -EBADF;
->>  			goto out;
->>  		}
->> +		down_read(&fp->filename_lock);
->>  		if (name && strcmp(fp->filename, name)) {
->> +			up_read(&fp->filename_lock);
->>  			pr_err("invalid name reconnect %s\n", name);
->>  			ret = -EINVAL;
->>  			goto out;
->>  		}
->> +		up_read(&fp->filename_lock);
->
-> What assumptions do you make about those strings?  Note that opened file
-> is *NOT* guaranteed to have its pathname remain unchanged - having
-> /tmp/foo/bar/baz/blah opened will not prevent mv /tmp/foo /tmp/barf
-> and the file will remain opened (and working just fine).  AFAICS, you
-> only update it in smb2_rename(), which is not going to be called by
-> mv(1) called by admin on server.
-Whenever a FILE_ALL_INFORMATION request is received from a client,
-ksmbd need to call d_path(then, removing the share path in pathname is
-required) to obtain pathname for windows. To avoid the issue you
-mentioned, we can remove the all uses of ->filename and calling
-d_path() whenever pathname is need.
+> >> Ciao, Thorsten
+> >>
+> >> #regzbot poke
+> >>
+> >>
+> >> On 12.01.22 06:49, Davyd McColl wrote:
+> >>> Hi Ronnie
+> >>>
+> >>> The regular fstab line for this mount is:
+> >>>
+> >>> //mede8er/mede8er  /mnt/mede8er-smb  cifs
+> >>> noauto,guest,users,uid=daf,gid=daf,iocharset=utf8,vers=1.0,nobrl,sec=none
+> >>>  0  0
+> >>>
+> >>> Altering the end of the options from "sec=none" to
+> >>> "username=guest,sec=ntlmssp" or "guest,sec=ntlmssp" results in failure
+> >>> to mount
+> >>> (tested on my patched kernel, which still supports the original fstab
+> >>> line), with dmesg containing:
+> >>>
+> >>> [45753.525219] CIFS: VFS: Use of the less secure dialect vers=1.0 is
+> >>> not recommended unless required for acc
+> >>> ess to very old servers
+> >>> [45753.525222] CIFS: Attempting to mount \\mede8er\mede8er
+> >>> [45756.861351] CIFS: VFS: Unable to select appropriate authentication method!
+> >>> [45756.861361] CIFS: VFS: \\mede8er Send error in SessSetup = -22
+> >>> [45756.861395] CIFS: VFS: cifs_mount failed w/return code = -22
+> >>>
+> >>> There is no way that I know of to set up users for smb auth on this
+> >>> device - it only supports guest connections.
+> >>>
+> >>> -d
+> >>>
+> >>>
+> >>> On Wed, 12 Jan 2022 at 04:32, ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
+> >>>>
+> >>>> Thanks for the network traces.
+> >>>>
+> >>>> In the traces, both win11 and linux are not using even NTLM but the
+> >>>> even older "share password" authentication mode where you specify a
+> >>>> password for the share in the TreeConnect command.
+> >>>> That is something I think we should not support at all.
+> >>>>
+> >>>> What is the exact mount command line you use?
+> >>>> Can you try mounting the share using a username and ntlmssp ?
+> >>>> I.e. username=your-user,sec=ntlmssp  on the mount command
+> >>>>
+> >>>> regards
+> >>>> ronnie sahlberg
+> >>>>
+> >>>> On Wed, Jan 12, 2022 at 6:57 AM Davyd McColl <davydm@gmail.com> wrote:
+> >>>>>
+> >>>>> Hi Steve
+> >>>>>
+> >>>>> As requested, wireshark captures to the device in question, as well as
+> >>>>> the fstab entry I have for the device:
+> >>>>> - win11, browsing with explorer
+> >>>>> - win11, net use
+> >>>>> - unpatched linux 5.16.0 attempt to mount
+> >>>>> - patched linux 5.16.0 successful mount
+> >>>>> - fstab entry - note that I have to specify samba version 1.0 as the
+> >>>>> default has changed and the mount fails otherwise. Explicitly
+> >>>>> specifying 2.0 errors and suggests that I should select a different
+> >>>>> version.
+> >>>>>
+> >>>>> -d
+> >>>>>
+> >>>>> On Tue, 11 Jan 2022 at 00:13, Steve French <smfrench@gmail.com> wrote:
+> >>>>>>
+> >>>>>> I would be surprised if Windows 11 still negotiates (with default
+> >>>>>> registry settings) SMB1 much less NTLMv1 in SMB1, but I have not tried
+> >>>>>> Windows 11 with an NTLMv1 only server (they are hard to find - I may
+> >>>>>> have an original NT4 and an NT3.5 CD somewhere - might be possible to
+> >>>>>> install a VM with NT3.5 but that is really really old and not sure I
+> >>>>>> can find those CDs).
+> >>>>>>
+> >>>>>> Is it possible to send me the wireshark trace (or other network trace)
+> >>>>>> of the failing mount from Linux and also the one with the succeeding
+> >>>>>> NET USE from Windows 11 to the same server?
+> >>>>>>
+> >>>>>> Hopefully it is something unrelated to NTLMv1, there has been a LOT of
+> >>>>>> pushback across the world, across products in making sure no one uses
+> >>>>>> SMB1 anymore.  See e.g.
+> >>>>>> https://techcommunity.microsoft.com/t5/storage-at-microsoft/stop-using-smb1/ba-p/425858
+> >>>>>> and https://twitter.com/nerdpyle/status/776900804712148993
+> >>>>>>
+> >>>>>> On Mon, Jan 10, 2022 at 2:30 PM Davyd McColl <davydm@gmail.com> wrote:
+> >>>>>>>
+> >>>>>>> I don't understand. I tracked down the exact commit where the issue
+> >>>>>>> occurs with a 2 hour git bisect. This was after first confirming that
+> >>>>>>> my older 5.14 kernel did not display the symptoms. I can still connect
+> >>>>>>> to the share via windows 11 explorer. I don't know what else I need to
+> >>>>>>> do here to show where the issue was introduced?
+> >>>>>>>
+> >>>>>>> Apologies for bouncing mails - literally no email client I have seems
+> >>>>>>> to be capable of plaintext emails, so every time I forget, I have to
+> >>>>>>> find a browser with the gmail web interface to reply.
+> >>>>>>>
+> >>>>>>> -d
+> >>>>>>>
+> >>>>>>> On Mon, 10 Jan 2022 at 19:31, Steve French <smfrench@gmail.com> wrote:
+> >>>>>>>>
+> >>>>>>>> I want to make sure that we don't have an unrelated regression
+> >>>>>>>> involved here since NTLMv2 replaced NTLMv1 over 20 years ago (googling
+> >>>>>>>> this e.g. I see "NTLMv2, introduced in Windows NT 4.0 SP4 and natively
+> >>>>>>>> supported in Windows 2000")  and should be the default for Windows
+> >>>>>>>> NT4, Windows 2000 etc. as well as any version of Samba from the last
+> >>>>>>>> 15 years+.  I have significant concerns with adding mechanisms that
+> >>>>>>>> were asked to be disabled ~19 years ago e.g. see
+> >>>>>>>> https://support.microsoft.com/en-us/topic/security-guidance-for-ntlmv1-and-lm-network-authentication-da2168b6-4a31-0088-fb03-f081acde6e73
+> >>>>>>>> due to security concerns.
+> >>>>>>>>
+> >>>>>>>> Can we double check that there are not other issues involved in your example?
+> >>>>>>>>
+> >>>>>>>> The concerns about NTLMv1 security concerns (and why it should never
+> >>>>>>>> be used) are very persuasive e.g. many articles like
+> >>>>>>>> https://miriamxyra.com/2017/11/08/stop-using-lan-manager-and-ntlmv1/
+> >>>>>>>>
+> >>>>>>>> On Mon, Jan 10, 2022 at 7:48 AM Davyd McColl <davydm@gmail.com> wrote:
+> >>>>>>>>>
+> >>>>>>>>> Good day
+> >>>>>>>>>
+> >>>>>>>>> I'm following advice from the thread at
+> >>>>>>>>> https://bugzilla.kernel.org/show_bug.cgi?id=215375 as to how to report
+> >>>>>>>>> this, so please bear with me and redirect me as necessary.
+> >>>>>>>>>
+> >>>>>>>>> Since commit 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c, I'm unable to
+> >>>>>>>>> mount a CIFS 1.0 share ( from a media player: mede8er med600x3d, which
+> >>>>>>>>> runs some older linux). Apparently I'm not the only one, according to
+> >>>>>>>>> that thread, though the other affected party there is windows-based.
+> >>>>>>>>>
+> >>>>>>>>> I first logged this in the Gentoo bugtracker
+> >>>>>>>>> (https://bugs.gentoo.org/821895) and a reversion patch is available
+> >>>>>>>>> there for the time being.
+> >>>>>>>>>
+> >>>>>>>>> I understand that some of the encryption methods upon which the
+> >>>>>>>>> original feature relied are to be removed and, as such, the ability to
+> >>>>>>>>> mount these older shares was removed. This is sure to affect anyone
+> >>>>>>>>> running older Windows virtual machines (or older, internally-visible
+> >>>>>>>>> windows hosts) in addition to anyone attempting to connect to shares
+> >>>>>>>>> from esoteric devices like mine.
+> >>>>>>>>>
+> >>>>>>>>> Whilst I understand the desire to clean up code and remove dead
+> >>>>>>>>> branches, I'd really appreciate it if this particular feature remains
+> >>>>>>>>> available either by kernel configuration (which suits me fine, but is
+> >>>>>>>>> likely to be a hassle for anyone running a binary distribution) or via
+> >>>>>>>>> boot parameters. In the mean-time, I'm updating my own sync software
+> >>>>>>>>> to support this older device because if I can't sync media to the
+> >>>>>>>>> player, the device is not very useful to me.
+> >>>>>>>>>
+> >>>>>>>>> Thanks
+> >>>>>>>>> -d
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>> --
+> >>>>>>>> Thanks,
+> >>>>>>>>
+> >>>>>>>> Steve
+> >>>>>>>
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> --
+> >>>>>>> -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+> >>>>>>> If you say that getting the money is the most important thing
+> >>>>>>> You will spend your life completely wasting your time
+> >>>>>>> You will be doing things you don't like doing
+> >>>>>>> In order to go on living
+> >>>>>>> That is, to go on doing things you don't like doing
+> >>>>>>>
+> >>>>>>> Which is stupid.
+> >>>>>>>
+> >>>>>>> - Alan Watts
+> >>>>>>> https://www.youtube.com/watch?v=-gXTZM_uPMY
+> >>>>>>>
+> >>>>>>> Quidquid latine dictum sit, altum sonatur.
+> >>>>>>
+> >>>>>>
+> >>>>>>
+> >>>>>> --
+> >>>>>> Thanks,
+> >>>>>>
+> >>>>>> Steve
+> >>>>>
+> >>>>>
+> >>>>>
+> >>>>> --
+> >>>>> -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+> >>>>> If you say that getting the money is the most important thing
+> >>>>> You will spend your life completely wasting your time
+> >>>>> You will be doing things you don't like doing
+> >>>>> In order to go on living
+> >>>>> That is, to go on doing things you don't like doing
+> >>>>>
+> >>>>> Which is stupid.
+> >>>>>
+> >>>>> - Alan Watts
+> >>>>> https://www.youtube.com/watch?v=-gXTZM_uPMY
+> >>>>>
+> >>>>> Quidquid latine dictum sit, altum sonatur.
+> >>>
+> >>>
+> >>>
+> >>
+> >
 
->
-> BTW, while grepping through the related code, convert_to_nt_pathname()
-> is Not Nice(tm).  Seriously, strlen(s) == 0 is not an idiomatic way to
-> check that s is an empty string.  What's more, return value of that
-> function ends up passed to kfree().  Which is not a good thing to do
-> to a string constant.  That can be recovered by use of kfree_const() in
-> get_file_all_info(), but.. ouch.
-Okay.
 
->
-> ksmbd_vfs_rename(): UGH.
-> 	* you allocate a buffer
-> 	* do d_path() into it
-> 	* then use getname_kernel() to allocate another one and copy the contents
-> into it.  By that point the string might have nothing to do with the actual
-> location of object, BTW (see above)
-Can we use dget_parent() and take_dentry_name_snapshot() for source
-file instead of d_path(), getname_kernel() and filename_parentat()?
-Because ksmbd receive fileid(ksmbd_file) for source file from client.
-[See control flow the below]
 
-> 	* then you use filename_parentat() (BTW, the need to export both it and
-> vfs_path_parent_lookup() is an artefact of bad calling conventions -
-> passing
-> NULL as const struct path * would do the right thing, if not for the fact
-> that
-> with your calling conventions you have to pass a non-NULL pointer - that to
-> a local struct path in your vfs_path_parent_lookup()).
-Okay.
+-- 
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+If you say that getting the money is the most important thing
+You will spend your life completely wasting your time
+You will be doing things you don't like doing
+In order to go on living
+That is, to go on doing things you don't like doing
 
-> 	* then you use vfs_path_parent_lookup() to find the new parent.  OK,
-> but...
-> you proceed to check if it has somehow returned you a symlink.  Huh?  How
-> does
-> one get a symlink from path_parentat() or anything that would use it?
-As security issues, We made it not to allow symlinks.
+Which is stupid.
 
-> I would very much appreciate a reproducer for that.
-> 	* you use lock_rename() to lock both parents.  Which relies upon the
-> caller having checked that they live on the same filesystem.  Neither old
-> nor
-> new version do that, which means relatively easy deadlocks.
-Okay. will add the check for this.
+- Alan Watts
+https://www.youtube.com/watch?v=-gXTZM_uPMY
 
-> 	* look the last components up.  NB: the old one might very well have
-> nothing to do with the path.dentry.
-Okay.
-
-> 	* do usual checks re loop prevention (with slightly unusual error
-> values, but whatever)
-I understood that you pointed out to add retry_estale() check and retry.
-
-> 	* call ksmbd_lookup_fd_inode() on the old parent.  Then dereference
-> the return value (if non-NULL)... and never do anything else to it.  How
-> can
-> that possibly work?  What's there to prevent freeing of that struct
-> ksmbd_file
-> just as ksmbd_lookup_fd_inode() returns it?  Looks like it's either a leak
-> or
-> use-after-free, and looking at ksmbd_lookup_fd_inode() it's probably the
-> latter.
-Right. Need to increase reference count of ksmbd_file. I will fix it.
-
-> 	* proceed with vfs_rename(), drop the stuff you'd acquired and go
-> away.
-Okay.
-
->
-> ksmbd_vfs_unlink():
-> 	* const char *filename, please, unless you really modify it there.
-Okay.
-> 	* what the hell is that ihold/iput pair for?
-I refered codes in do_unlinkat() for this. If this pair is not needed,
-I'll delete it,
-but could you please tell me why it's needed in unlinkat() ?
-
->
-> I'm not sure that the set you'd exported is the right one, but that's
-> secondary - I'd really like to understand what assumptions are you
-> making about the ->filename contents, as well as the control flow
-> from protocol request that demands rename to the actual call of
-> vfs_rename().  Could you elaborate on that?  I am not familiar with
-> the protocol, other than bits and pieces I'd observed in fs/cifs
-> code.
-As I said above, the uses of ->filename can be replaced with d_path().
-control flow for rename is the following.
-
- a. Receiving smb2 create(open) request from client.
-     - Getting struct file after calling vfs_path_lookup() and
-dentry_open() using pathname from client.
-     - create ksmbd_file and add struct file to fp->filp and generate
-fileid for struct ksmbd_file.
-     - send smb2 create response included fileid of ksmbd_file to client.
- b. Receiving smb2_set_info file(FILE_RENAME_INFORMATION) request from client.
-     - lookup ksmbd_file using fileid of request. This will source
-file for rename.
-     - get absolute pathname for destination fille in smb2 set info
-file for rename.
-     - find both parents of source and destination and lock and do rename...
- c. Receiving smb2 close.
-
-Thanks for your review!
->
+Quidquid latine dictum sit, altum sonatur.
