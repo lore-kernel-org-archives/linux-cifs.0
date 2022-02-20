@@ -2,164 +2,109 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB9BC433F5
-	for <linux-cifs@archiver.kernel.org>; Sat, 26 Feb 2022 16:45:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E34C433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 20 Feb 2022 19:07:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232355AbiBZQph (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 26 Feb 2022 11:45:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34872 "EHLO
+        id S230064AbiBTTIN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 20 Feb 2022 14:08:13 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232377AbiBZQpb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 26 Feb 2022 11:45:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 885B315A13
-        for <linux-cifs@vger.kernel.org>; Sat, 26 Feb 2022 08:44:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645893896;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lwMysCu29wz4OMNuwMpG+mGhMkT1ZhFO9Qcz0+0ggms=;
-        b=KfEmglK8EN9AMLrsgDyPnBdbCYb+D1i3vBdPoNrR+LgH8rKojrxO3f8SOuAYteVDuXBtWt
-        icb18OpPLpQgeXwPKcFZamyDtZRwhexBLSS5/Nbf5nly/IEynwBCmjGtU7LIfuUGwnMX67
-        bLJuIvr5XtCJDUbQ4c3Xw17hqWMgaSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-317-Ua6DDJrUNHWzFxBM7yQ-4g-1; Sat, 26 Feb 2022 11:44:51 -0500
-X-MC-Unique: Ua6DDJrUNHWzFxBM7yQ-4g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38DAB180A08B;
-        Sat, 26 Feb 2022 16:44:49 +0000 (UTC)
-Received: from horse.redhat.com (unknown [10.22.32.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D387C6A4B9;
-        Sat, 26 Feb 2022 16:44:48 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id D890C2237E9; Sat, 26 Feb 2022 11:44:47 -0500 (EST)
-Date:   Sat, 26 Feb 2022 11:44:47 -0500
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        lsf-pc@lists.linux-foundation.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ioannis Angelakopoulos <jaggel@bu.edu>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Enabling change notification for network and
- cluster fs
-Message-ID: <YhpY/zZe3UA2u3fj@redhat.com>
-References: <CAH2r5mt9OfU+8PoKsmv_7aszhbw-dOuDCL6BOxb_2yRwc4HHCw@mail.gmail.com>
- <Yhf+FemcQQToB5x+@redhat.com>
- <CAH2r5mt6Sh7qorfCHWnZzc6LUDd-s_NzGB=sa-UDM2-ivzpmAQ@mail.gmail.com>
- <YhjYSMIE2NBZ/dGr@redhat.com>
- <YhjeX0HvXbED65IM@casper.infradead.org>
- <CAH2r5mt9EtTEJCKsHkvRctfhMv7LnT6XT_JEvAb7ji6-oYnTPg@mail.gmail.com>
- <YhkFZE8wUWhycwX2@redhat.com>
- <CAH2r5msPz1JZK4OWX_=+2HTzKTZE07ACxbEv3xM-1T0HTnVWMw@mail.gmail.com>
+        with ESMTP id S236158AbiBTTIM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 20 Feb 2022 14:08:12 -0500
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03AA940E67
+        for <linux-cifs@vger.kernel.org>; Sun, 20 Feb 2022 11:07:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Date:To:From:CC;
+        bh=6roXkl1hawGu1OtzMYvihsEZoXJVgvf/ELRFmzr3u8o=; b=QusTwOZYue7d3HkoxyAhlO4unZ
+        Qw0LKtN0UUwSvRjpi9uyalcZ6sdUkpEQHttM5UcNU6oEvVYUe1z4wvRp2meSl1n9HmgesYdDyudLq
+        kWC9D1ye3xqSkxr0JmnBJySKVhMpqrYQ1v80bdd5C/wgiekodhxPTzM8yhBSx3Q/m+c08/HC3bYpc
+        50VsoGX+Zi8SODJiRroaOe/kPTETjkYyu3pEXaEDEFt8DNaCWST2YcIuvdFhMYaksfln+P0L4slKU
+        kZsuYFdVazsbtX/UawN8fwk6H48m20RrCnHlUfLqZH07BoW9ZVtI5JZp2HuLL1GIvTcY4jkqEOVlt
+        P+1GyCUhgpvuXVqnOk6XK+ig2u9mrBWN6J9CWU2g9ejgUlczLITI5ehZ09BoZdzskWc1qsIH5WzLE
+        JvKjHv9g2i5V1AYOrNOk/D0G+tieXBdwySAQG2cWKfTm7uqCxtR03hWxf5wfyW1oIxVe6Uc+ickY/
+        vFNzjESOjIKntvMDgmMxvAas;
+Received: from [2a01:4f8:192:486::6:0] (port=59788 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1nLrYh-004gg2-6B
+        for cifs-qa@samba.org; Sun, 20 Feb 2022 19:07:47 +0000
+Received: from www-data by hr6.samba.org with local (Exim 4.93)
+        (envelope-from <www-data@samba.org>)
+        id 1nLrYg-0034Wx-FU
+        for cifs-qa@samba.org; Sun, 20 Feb 2022 19:07:46 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 14713] SMBv3 negotiation fails with a Solaris server
+Date:   Sun, 20 Feb 2022 19:07:45 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 5.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: richard.flint@gmail.com
+X-Bugzilla-Status: ASSIGNED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: sfrench@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-14713-10630-jr8d9dN2Dp@https.bugzilla.samba.org/>
+In-Reply-To: <bug-14713-10630@https.bugzilla.samba.org/>
+References: <bug-14713-10630@https.bugzilla.samba.org/>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH2r5msPz1JZK4OWX_=+2HTzKTZE07ACxbEv3xM-1T0HTnVWMw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 01:11:10PM -0500, Steve French wrote:
-> > IOW, in general disable all local events and let filesystems decide which
-> local events to generate? And locally cached write is one such example?
-> 
-> The fs doesn't see cached writes so probably best to still use the common
-> existing code for notification on local writes
+https://bugzilla.samba.org/show_bug.cgi?id=3D14713
 
-Filesystems could provide a hook/function which local notifications could
-call and then filesystem could take a decision whether to allow that
-particular local event. 
+--- Comment #39 from Richard Flint <richard.flint@gmail.com> ---
+Appreciate it has been sometime since this was updated but I just wanted to
+update this for completeness. I have tested this on Fedora 35
+(5.16.9-200.fc35.x86_64) and can confirm successful negotiation of 3.0 3.0.2
+and 3.1.1 with Solaris 11.4 servers both with and without encryption (as
+enabled by the seal parameter).=20
 
-For example, Ioannis implemented inode operation ->fsnotify_event()
+E.g. the following is successful:=20
+//myserver/myshare/myfolder /mnt/myserver/myfolder cifs
+noauto,nounix,vers=3D3.1.1,seal,noserverino,ro,_netdev,noexec,nosuid,perm,n=
+odev,iocharset=3Dutf8,cache=3Dstrict,sec=3Dntlmv2,credentials=3D/root/passw=
+ord,port=3D445,context=3D"system_u:object_r:myapp_content_t:s0",forceuid,fo=
+rcegid,file_mode=3D0440,dir_mode=3D0550,uid=3D1000,gid=3D1001
+0 0
 
-https://lore.kernel.org/linux-fsdevel/20211025204634.2517-6-iangelak@redhat.com/
+Though noisy. E.g.:
 
-This gives local event to fuse. And now fuse can decide whether to
-dispatch the event to user space by calling __fsnotify() or drop it
-on the floor.
+[Sat Feb 19 08:34:30 2022] CIFS: decode_ntlmssp_challenge: authentication h=
+as
+been weakened as server does not support key exchange
+[Sat Feb 19 08:34:30 2022] CIFS: VFS: \\myserver\myshare error -9 on ioctl =
+to
+get interface list
+[Sat Feb 19 08:34:30 2022] CIFS: VFS: \\myserver\IPC$ smb2_get_dfs_refer: i=
+octl
+error: rc=3D-19
 
-As of now we drop everything on the floor if remote notifications are
-enabled. But I realize that cache=writeback mode can cache writes, so
-fs could selectively allow some local events.
+Intriguingly, despite specifying nounix in the mount, Wireshark shows we are
+still sending SMB2_POSIX_EXTENSIONS_CAPABILITY in the Negotiate Protocol
+Request - I'm not clear if that is the desired behaviour.
 
-I guess for virtiofs, we could allow all local events. Supress remote
-events if event is triggered due to the action of same client. If we
-use fanotify on server, then it will report PID of process that caused
-the event. And if PID belongs to this virtiofsd instance, it probably
-could supress remote event. 
+The issue is still reproducible on the latest CentOS 8 Stream release, but =
+that
+it works on Fedora 35 makes we wonder if an issue was fixed in the meantime
+that never got back-ported to CentOS 8. If that's true, then this isn't rea=
+lly
+a fault in the CIFSVFS product itself I think - or maybe it isn't anymore.
 
-That way an application running inside the guest will see all local
-events + remote events triggered by other clients. (But should not
-see duplicate events).
-
-Thanks
-Vivek
-
-> 
-> On Fri, Feb 25, 2022, 11:35 Vivek Goyal <vgoyal@redhat.com> wrote:
-> 
-> > On Fri, Feb 25, 2022 at 09:27:55AM -0600, Steve French wrote:
-> > > On Fri, Feb 25, 2022 at 7:49 AM Matthew Wilcox <willy@infradead.org>
-> > wrote:
-> > > >
-> > > > On Fri, Feb 25, 2022 at 08:23:20AM -0500, Vivek Goyal wrote:
-> > > > > What about local events. I am assuming you want to supress local
-> > events
-> > > > > and only deliver remote events. Because having both local and remote
-> > > > > events delivered at the same time will be just confusing at best.
-> > > >
-> > > > This paragraph confuses me.  If I'm writing, for example, a file
-> > manager
-> > > > and I want it to update its display automatically when another task
-> > alters
-> > > > the contents of a directory, I don't care whether the modification was
-> > > > done locally or remotely.
-> > > >
-> > > > If I understand the SMB protocol correctly, it allows the client to
-> > take
-> > > > out a lease on a directory and not send its modifications back to the
-> > > > server until the client chooses to (or the server breaks the lease).
-> > > > So you wouldn't get any remote notifications because the client hasn't
-> > > > told the server.
-> > >
-> > > Directory leases would be broken by file create so the more important
-> > > question is what happens when client 1 has a change notification on
-> > writes
-> > > to files in a directory then client 2 opens a file in the same directory
-> > and is
-> > > granted a file lease and starts writing to the file (which means the
-> > > writes could get cached).   This is probably a minor point because when
-> > > writes get flushed from client 2, client 1 (and any others with
-> > notifications
-> > > requested) will get notified of the event (changes to files in a
-> > directory
-> > > that they are watching).
-> > >
-> > > Local applications watching a file on a network or cluster mount in Linux
-> > > (just as is the case with Windows, Macs etc.) should be able to be
-> > notified of
-> > > local (cached) writes to a remote file or remote writes to the file from
-> > another
-> > > client.  I don't think the change is large, and there was an earlier
-> > version of
-> > > a patch circulated for this
-> >
-> > So local notifications are generated by filesystem code as needed?
-> >
-> > IOW, in general disable all local events and let filesystems decide which
-> > local events to generate? And locally cached write is one such example?
-> >
-> > Thanks
-> > Vivek
-> >
-> >
-
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
