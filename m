@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D872C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Feb 2022 02:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 866D7C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Feb 2022 02:30:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235625AbiBWC3u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Feb 2022 21:29:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43172 "EHLO
+        id S236855AbiBWCav (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Feb 2022 21:30:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236900AbiBWC3Y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Feb 2022 21:29:24 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B643447056;
-        Tue, 22 Feb 2022 18:28:50 -0800 (PST)
+        with ESMTP id S236936AbiBWC3n (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Feb 2022 21:29:43 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CEE541AB;
+        Tue, 22 Feb 2022 18:29:01 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4EF3261515;
-        Wed, 23 Feb 2022 02:28:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9BFCC340F1;
-        Wed, 23 Feb 2022 02:28:48 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 19FCFB81DD2;
+        Wed, 23 Feb 2022 02:29:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B70C340E8;
+        Wed, 23 Feb 2022 02:28:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645583329;
-        bh=Bn7oBZoG4xShtRwSYpsv4u4xeQP5D8FI6py9uUOP7w0=;
+        s=k20201202; t=1645583339;
+        bh=kS8D6bkfgqqgmMhggKntZnsLULvt63AbdUvRgellOS4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LEyv8llEi6V8WL4IGPZEGFoxbLXyw1EKDKQhFHzY3Z3e0IrfrWhLHsQoSie8EWQjR
-         IZx79Of/wu9vzXMC+W8I9Ewr/+TaC8iYAJbLofD/zkFAqQb8u3jmipDiJ/7iZ9SDN0
-         wWzvSkhS8/ZKz6km6VrDld7DaWyuJLKpa2z0UplJHTPFSB08EGXCZvGqe0RjOIqcro
-         o8e7n/ZU6ttdY8MIa8DCwB3XQZKTP7vDuC+iTQjmoElJl6YRDGXx4hzsC7CgBLFR7w
-         BjQgqBp1us5+cTa0tlyCHcSj+HEKjnCEhIaZ/NjBBKA1oRaTgGrtPoApYXthf1CHPS
-         wKCb34y5yVCwQ==
+        b=Grlcqg4NocKZlNVn/5Et/3ZED/Yg9IuYVcCjDIZqi+N6TZGkj78d8wB7jUP9vAGTJ
+         L+cau7zJiLXcIE1XMHXzRh5hblbOgi7nFqycbaIHD2bqjyioVjgtyckCzlrHCvXDpk
+         tN+WZuzZTfSY+2FaKQn59ZjuGJoKHzv4Vi73hR/028eavCITWJ/d70+vvLKALNO3IF
+         Jr0L0o16FCYWJgV+EiMTNq9LBUv1zyk3WRpXcSv+77g82mkaW148QHtfMquHijxsFs
+         X+NivdK0rC502bT220Lw37brXQNBD/5ODwsF7DWgjhd3cAr1+8zZTUDlIq+BeaiN6Y
+         hwYXAjPWL3+eg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
@@ -38,9 +38,9 @@ Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.16 15/30] cifs: fix double free race when mount fails in cifs_get_root()
-Date:   Tue, 22 Feb 2022 21:28:04 -0500
-Message-Id: <20220223022820.240649-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.16 20/30] cifs: modefromsids must add an ACE for authenticated users
+Date:   Tue, 22 Feb 2022 21:28:09 -0500
+Message-Id: <20220223022820.240649-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220223022820.240649-1-sashal@kernel.org>
 References: <20220223022820.240649-1-sashal@kernel.org>
@@ -54,91 +54,51 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-[ Upstream commit 3d6cc9898efdfb062efb74dc18cfc700e082f5d5 ]
+[ Upstream commit 0c6f4ebf8835d01866eb686d47578cde80097981 ]
 
-When cifs_get_root() fails during cifs_smb3_do_mount() we call
-deactivate_locked_super() which eventually will call delayed_free() which
-will free the context.
-In this situation we should not proceed to enter the out: section in
-cifs_smb3_do_mount() and free the same resources a second time.
+When we create a file with modefromsids we set an ACL that
+has one ACE for the magic modefromsid as well as a second ACE that
+grants full access to all authenticated users.
 
-[Thu Feb 10 12:59:06 2022] BUG: KASAN: use-after-free in rcu_cblist_dequeue+0x32/0x60
-[Thu Feb 10 12:59:06 2022] Read of size 8 at addr ffff888364f4d110 by task swapper/1/0
+When later we chante the mode on the file we strip away this, and other,
+ACE for authenticated users in set_chmod_dacl() and then just add back/update
+the modefromsid ACE.
+Thus leaving the file with a single ACE that is for the mode and no ACE
+to grant any user any rights to access the file.
+Fix this by always adding back also the modefromsid ACE so that we do not
+drop the rights to access the file.
 
-[Thu Feb 10 12:59:06 2022] CPU: 1 PID: 0 Comm: swapper/1 Tainted: G           OE     5.17.0-rc3+ #4
-[Thu Feb 10 12:59:06 2022] Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.0 12/17/2019
-[Thu Feb 10 12:59:06 2022] Call Trace:
-[Thu Feb 10 12:59:06 2022]  <IRQ>
-[Thu Feb 10 12:59:06 2022]  dump_stack_lvl+0x5d/0x78
-[Thu Feb 10 12:59:06 2022]  print_address_description.constprop.0+0x24/0x150
-[Thu Feb 10 12:59:06 2022]  ? rcu_cblist_dequeue+0x32/0x60
-[Thu Feb 10 12:59:06 2022]  kasan_report.cold+0x7d/0x117
-[Thu Feb 10 12:59:06 2022]  ? rcu_cblist_dequeue+0x32/0x60
-[Thu Feb 10 12:59:06 2022]  __asan_load8+0x86/0xa0
-[Thu Feb 10 12:59:06 2022]  rcu_cblist_dequeue+0x32/0x60
-[Thu Feb 10 12:59:06 2022]  rcu_core+0x547/0xca0
-[Thu Feb 10 12:59:06 2022]  ? call_rcu+0x3c0/0x3c0
-[Thu Feb 10 12:59:06 2022]  ? __this_cpu_preempt_check+0x13/0x20
-[Thu Feb 10 12:59:06 2022]  ? lock_is_held_type+0xea/0x140
-[Thu Feb 10 12:59:06 2022]  rcu_core_si+0xe/0x10
-[Thu Feb 10 12:59:06 2022]  __do_softirq+0x1d4/0x67b
-[Thu Feb 10 12:59:06 2022]  __irq_exit_rcu+0x100/0x150
-[Thu Feb 10 12:59:06 2022]  irq_exit_rcu+0xe/0x30
-[Thu Feb 10 12:59:06 2022]  sysvec_hyperv_stimer0+0x9d/0xc0
-...
-[Thu Feb 10 12:59:07 2022] Freed by task 58179:
-[Thu Feb 10 12:59:07 2022]  kasan_save_stack+0x26/0x50
-[Thu Feb 10 12:59:07 2022]  kasan_set_track+0x25/0x30
-[Thu Feb 10 12:59:07 2022]  kasan_set_free_info+0x24/0x40
-[Thu Feb 10 12:59:07 2022]  ____kasan_slab_free+0x137/0x170
-[Thu Feb 10 12:59:07 2022]  __kasan_slab_free+0x12/0x20
-[Thu Feb 10 12:59:07 2022]  slab_free_freelist_hook+0xb3/0x1d0
-[Thu Feb 10 12:59:07 2022]  kfree+0xcd/0x520
-[Thu Feb 10 12:59:07 2022]  cifs_smb3_do_mount+0x149/0xbe0 [cifs]
-[Thu Feb 10 12:59:07 2022]  smb3_get_tree+0x1a0/0x2e0 [cifs]
-[Thu Feb 10 12:59:07 2022]  vfs_get_tree+0x52/0x140
-[Thu Feb 10 12:59:07 2022]  path_mount+0x635/0x10c0
-[Thu Feb 10 12:59:07 2022]  __x64_sys_mount+0x1bf/0x210
-[Thu Feb 10 12:59:07 2022]  do_syscall_64+0x5c/0xc0
-[Thu Feb 10 12:59:07 2022]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-[Thu Feb 10 12:59:07 2022] Last potentially related work creation:
-[Thu Feb 10 12:59:07 2022]  kasan_save_stack+0x26/0x50
-[Thu Feb 10 12:59:07 2022]  __kasan_record_aux_stack+0xb6/0xc0
-[Thu Feb 10 12:59:07 2022]  kasan_record_aux_stack_noalloc+0xb/0x10
-[Thu Feb 10 12:59:07 2022]  call_rcu+0x76/0x3c0
-[Thu Feb 10 12:59:07 2022]  cifs_umount+0xce/0xe0 [cifs]
-[Thu Feb 10 12:59:07 2022]  cifs_kill_sb+0xc8/0xe0 [cifs]
-[Thu Feb 10 12:59:07 2022]  deactivate_locked_super+0x5d/0xd0
-[Thu Feb 10 12:59:07 2022]  cifs_smb3_do_mount+0xab9/0xbe0 [cifs]
-[Thu Feb 10 12:59:07 2022]  smb3_get_tree+0x1a0/0x2e0 [cifs]
-[Thu Feb 10 12:59:07 2022]  vfs_get_tree+0x52/0x140
-[Thu Feb 10 12:59:07 2022]  path_mount+0x635/0x10c0
-[Thu Feb 10 12:59:07 2022]  __x64_sys_mount+0x1bf/0x210
-[Thu Feb 10 12:59:07 2022]  do_syscall_64+0x5c/0xc0
-[Thu Feb 10 12:59:07 2022]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Reported-by: Shyam Prasad N <sprasad@microsoft.com>
-Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/cifsfs.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/cifs/cifsacl.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index dca42aa87d305..99c51391a48da 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -908,6 +908,7 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 5df21d63dd04e..bf861fef2f0c3 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -949,6 +949,9 @@ static void populate_new_aces(char *nacl_base,
+ 		pnntace = (struct cifs_ace *) (nacl_base + nsize);
+ 		nsize += setup_special_mode_ACE(pnntace, nmode);
+ 		num_aces++;
++		pnntace = (struct cifs_ace *) (nacl_base + nsize);
++		nsize += setup_authusers_ACE(pnntace);
++		num_aces++;
+ 		goto set_size;
+ 	}
  
- out_super:
- 	deactivate_locked_super(sb);
-+	return root;
- out:
- 	if (cifs_sb) {
- 		kfree(cifs_sb->prepath);
+@@ -1613,7 +1616,7 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 *pnmode,
+ 	nsecdesclen = secdesclen;
+ 	if (pnmode && *pnmode != NO_CHANGE_64) { /* chmod */
+ 		if (mode_from_sid)
+-			nsecdesclen += sizeof(struct cifs_ace);
++			nsecdesclen += 2 * sizeof(struct cifs_ace);
+ 		else /* cifsacl */
+ 			nsecdesclen += 5 * sizeof(struct cifs_ace);
+ 	} else { /* chown */
 -- 
 2.34.1
 
