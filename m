@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E8CC433FE
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Feb 2022 02:38:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08BA1C43217
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Feb 2022 02:38:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230136AbiBWCjT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Feb 2022 21:39:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35662 "EHLO
+        id S237683AbiBWCjV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Feb 2022 21:39:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237669AbiBWChy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Feb 2022 21:37:54 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2356554A1;
-        Tue, 22 Feb 2022 18:32:51 -0800 (PST)
+        with ESMTP id S237757AbiBWCiB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Feb 2022 21:38:01 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4F435574C;
+        Tue, 22 Feb 2022 18:33:01 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1FF8F61582;
-        Wed, 23 Feb 2022 02:32:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19DFDC340F4;
-        Wed, 23 Feb 2022 02:32:08 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 01F72B81E16;
+        Wed, 23 Feb 2022 02:32:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1DAAC340E8;
+        Wed, 23 Feb 2022 02:32:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645583529;
-        bh=LhIqB/AXGZIWV3j1TOPEnsVqsIHXY5aG13aEurkFvyk=;
+        s=k20201202; t=1645583564;
+        bh=N2eSg4cBpi7JwxNmSliSC4Pe8EBDIBV8CNUL9/bYicI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ltn/ixogeFU9t/KxL/o6mIbL6D0xCbfZj6+SE5rDlP6ibarKEy9NygKhwltoyHBwe
-         dL7BVXsApUE8lDrlgu7vlS86WiTG/+AvFVlReLE5oH1MVPA9vcWeNFZl/uHlnE3nlt
-         HNSOXQunCo8cxKsEjXq/QV0ZnrwsTHGt0rum1/fS14RRDZtGO8nk5qw/ODkO3oX8tj
-         qSrDu7A6Blv0QMpN8aICSHxLnA1J2Tw3a+HE1H3ji7VrADmsoYdofdZqFrxrLGZLwA
-         dU06cB6OqYD1k56swCdbe0QPDYvB2L+NDD0G7cSriB2v0CqYSxigfxL/XWjv2y0bMi
-         DxrqAtmxLaGmg==
+        b=VB6K1c3v9VtX3DA+RH2d2AOLfJvbVEHF7EkaDRLrzCnFOtNrUJdRMkFWTfL2E5BLk
+         slmTVypscSayrt4di+5rXES47+etY8ZV91s5ZX1V91s+G+IY1Y/Mb/+2kjM/ZVOj0E
+         hfNHWE2Qw04p929sZKygGg4hm3LEkCQ1qVinVOh5Xbs6U3rtHgBoIgiCqj6O9tgSjR
+         3xWn+nxH1EgDy5Fcs3u9vXXPn6T8Zp73aMqnpxfTVStnMOciJuW4lMl7RLmeoCPdzY
+         +sE7LDMVLJFBcBmyy5Tfa4ngDAr0QnXvqdjfa8Xv0gjPgZ8MswfC8yEN2wqEI88vom
+         TCsmQhvy4lxGA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
@@ -38,12 +38,12 @@ Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.19 07/13] cifs: fix double free race when mount fails in cifs_get_root()
-Date:   Tue, 22 Feb 2022 21:31:46 -0500
-Message-Id: <20220223023152.242065-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 05/10] cifs: fix double free race when mount fails in cifs_get_root()
+Date:   Tue, 22 Feb 2022 21:32:28 -0500
+Message-Id: <20220223023233.242468-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220223023152.242065-1-sashal@kernel.org>
-References: <20220223023152.242065-1-sashal@kernel.org>
+In-Reply-To: <20220223023233.242468-1-sashal@kernel.org>
+References: <20220223023233.242468-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -128,10 +128,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index bc906fcf3f6db..baa1713d66958 100644
+index 74f405a05efc3..dba0d12c3db19 100644
 --- a/fs/cifs/cifsfs.c
 +++ b/fs/cifs/cifsfs.c
-@@ -779,6 +779,7 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+@@ -753,6 +753,7 @@ cifs_do_mount(struct file_system_type *fs_type,
  
  out_super:
  	deactivate_locked_super(sb);
