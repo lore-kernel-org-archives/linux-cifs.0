@@ -2,142 +2,93 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B526C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Feb 2022 01:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52ADDC43217
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Feb 2022 02:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236283AbiBWBOy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Feb 2022 20:14:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46560 "EHLO
+        id S236966AbiBWC3s (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Feb 2022 21:29:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236331AbiBWBOx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Feb 2022 20:14:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9FC1396B5
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Feb 2022 17:14:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645578865;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=tKWFnXD4lRNjvlW/uR3GsRTJ6fRgVp1YJiBvmEsFaW0=;
-        b=O2tmx2S3rhQX7X0uC5ej3eMlptcnWk+Qy88uCAOekt8Maw783ncb1LLBdBpt4NGBRTaQ1h
-        UOwWn276zhTC1t+SFdXsCC0mWvqdr1f5OA2/RxASsH5lXRjpBybWlm0YvXwfqPc3bkx2Lr
-        JNvVFrgXzHOEuiZ62SIlHEQUlYIQpqw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-473-jnbsQXI5Oki3Q30EsDE_9A-1; Tue, 22 Feb 2022 20:14:24 -0500
-X-MC-Unique: jnbsQXI5Oki3Q30EsDE_9A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S236901AbiBWC3Y (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Feb 2022 21:29:24 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 001EA3FDB5;
+        Tue, 22 Feb 2022 18:28:50 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86E2D1800D50;
-        Wed, 23 Feb 2022 01:14:23 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-34.bne.redhat.com [10.64.54.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E23F25DB80;
-        Wed, 23 Feb 2022 01:14:22 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH] cifs: truncate the inode and mapping when we simulate fcollapse
-Date:   Wed, 23 Feb 2022 11:14:16 +1000
-Message-Id: <20220223011416.323085-1-lsahlber@redhat.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 95449B81DD2;
+        Wed, 23 Feb 2022 02:28:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D3AEC340F0;
+        Wed, 23 Feb 2022 02:28:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645583328;
+        bh=pGLG2SOVo6AjJURheQjGN51ViP8G0Dfy41nopw84HZg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=NbzxgGe05L88HtOgAnS+TuEELRcq9Wh0hUZEPi9obRa5sTRuI9z/3NQDzeaTFiz3r
+         E/C2xHZoOya8P3mUzpOL2m/vqtsoxKpBLfl+zkwxyu/LWm5L/3AEtWfzFvgAIXiyqE
+         qpRQ8+LefTxyoeYdmMfVLfaquRpmvunr/4Y2d9NTjDF6kf72zwUnQktqblI+uUigku
+         fhq7PVZ440s2nXbBnz66S638hn8D8OFg5mLE98mSmHEwEXYc+Q2OfND1P3dvFELliO
+         8NXSAT8fOVQmeJBnmaniQ+DmPZgCJM2Dwb6oAUPA8giqsXXSUkitnlCEJ1TRmLM/sq
+         ln7zVKDS9T++w==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 5.16 14/30] cifs: do not use uninitialized data in the owner/group sid
+Date:   Tue, 22 Feb 2022 21:28:03 -0500
+Message-Id: <20220223022820.240649-14-sashal@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220223022820.240649-1-sashal@kernel.org>
+References: <20220223022820.240649-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-RHBZ:1997367
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-When we collapse a range in smb3_collapse_range() we must make sure
-we update the inode size and pagecache accordingly.
+[ Upstream commit 26d3dadebbcbddfaf1d9caad42527a28a0ed28d8 ]
 
-If not, both inode size and pagecahce may be stale until it is refreshed.
+When idsfromsid is used we create a special SID for owner/group.
+This structure must be initialized or else the first 5 bytes
+of the Authority field of the SID will contain uninitialized data
+and thus not be a valid SID.
 
-This can be demonstrated for the inode size by running :
-
-xfs_io -i -f -c "truncate 320k" -c "fcollapse 64k 128k" -c "fiemap -v"  \
-/mnt/testfile
-
-where we can see the result of stale data in the fiemap output.
-The third line of the output is wrong, all this data should be truncated.
-
- EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
-   0: [0..127]:        hole               128
-   1: [128..383]:      128..383           256   0x1
-   2: [384..639]:      hole               256
-
-And the correct output, when the inode size has been updated correctly should
-look like this:
-
- EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
-   0: [0..127]:        hole               128
-   1: [128..383]:      128..383           256   0x1
-
-Reported-by: Xiaoli Feng <xifeng@redhat.com>
-Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/smb2ops.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ fs/cifs/cifsacl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index af5d0830bc8a..891b11576e55 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -25,6 +25,7 @@
- #include "smb2glob.h"
- #include "cifs_ioctl.h"
- #include "smbdirect.h"
-+#include "fscache.h"
- #include "fs_context.h"
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index ee3aab3dd4ac6..5df21d63dd04e 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -1297,7 +1297,7 @@ static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
  
- /* Change credits for different ops and return the total number of credits */
-@@ -3887,29 +3888,38 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
- {
- 	int rc;
- 	unsigned int xid;
-+	struct inode *inode;
- 	struct cifsFileInfo *cfile = file->private_data;
-+	struct cifsInodeInfo *cifsi;
- 	__le64 eof;
- 
- 	xid = get_xid();
- 
--	if (off >= i_size_read(file->f_inode) ||
--	    off + len >= i_size_read(file->f_inode)) {
-+	inode = d_inode(cfile->dentry);
-+	cifsi = CIFS_I(inode);
-+
-+	if (off >= i_size_read(inode) ||
-+	    off + len >= i_size_read(inode)) {
- 		rc = -EINVAL;
- 		goto out;
- 	}
- 
- 	rc = smb2_copychunk_range(xid, cfile, cfile, off + len,
--				  i_size_read(file->f_inode) - off - len, off);
-+				  i_size_read(inode) - off - len, off);
- 	if (rc < 0)
- 		goto out;
- 
--	eof = cpu_to_le64(i_size_read(file->f_inode) - len);
-+	eof = cpu_to_le64(i_size_read(inode) - len);
- 	rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 			  cfile->fid.volatile_fid, cfile->pid, &eof);
- 	if (rc < 0)
- 		goto out;
- 
- 	rc = 0;
-+
-+	cifsi->server_eof = i_size_read(inode) - len;
-+	truncate_setsize(inode, cifsi->server_eof);
-+	fscache_resize_cookie(cifs_inode_cookie(inode), cifsi->server_eof);
-  out:
- 	free_xid(xid);
- 	return rc;
+ 		if (uid_valid(uid)) { /* chown */
+ 			uid_t id;
+-			nowner_sid_ptr = kmalloc(sizeof(struct cifs_sid),
++			nowner_sid_ptr = kzalloc(sizeof(struct cifs_sid),
+ 								GFP_KERNEL);
+ 			if (!nowner_sid_ptr) {
+ 				rc = -ENOMEM;
+@@ -1326,7 +1326,7 @@ static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 		}
+ 		if (gid_valid(gid)) { /* chgrp */
+ 			gid_t id;
+-			ngroup_sid_ptr = kmalloc(sizeof(struct cifs_sid),
++			ngroup_sid_ptr = kzalloc(sizeof(struct cifs_sid),
+ 								GFP_KERNEL);
+ 			if (!ngroup_sid_ptr) {
+ 				rc = -ENOMEM;
 -- 
-2.30.2
+2.34.1
 
