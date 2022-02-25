@@ -2,159 +2,101 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39CB4C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Feb 2022 02:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F4FC433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Feb 2022 15:28:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236933AbiBWCrM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Feb 2022 21:47:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50278 "EHLO
+        id S241944AbiBYP2k (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Feb 2022 10:28:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236232AbiBWCrF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Feb 2022 21:47:05 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80A7445792
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Feb 2022 18:44:15 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id b11so28476381lfb.12
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Feb 2022 18:44:15 -0800 (PST)
+        with ESMTP id S231340AbiBYP2k (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Feb 2022 10:28:40 -0500
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E512036EC;
+        Fri, 25 Feb 2022 07:28:08 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id v28so7854073ljv.9;
+        Fri, 25 Feb 2022 07:28:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=aB5e2tjVmAADTaOQSzpkGPj0yJ8zFPpGuVapYuWYx/U=;
-        b=o5NDsxUAHE48brHPcaz4/1JQNN2tEEzHUzTeE8wuY4d90jl0I+a9bQuhi+gt7/ET1J
-         JyZ70iNgR7YD6Fvf+hrstyWNiHVa/kUzpOZKrGwDvU8uIzVGGB3g3z4vdCclI6STeHvg
-         sxjysEPU8CuKC/yvB2WJwS0A7OhLFZJAgTPzDEdP4SDyKxI2vixe8gUjde9xhVs7GGo4
-         MYUgbtTZFm46SWJDbJaERXttnlbD0pAsOXt7Nh2rl3PLwOo+MpgSY8qwI3KVeL3YZwk6
-         YfPcGNUCdghX1qHmd6mdI5yd1oJDVsvSo6Q6KPXAUWVkIrTv2QIj4JPUGNe2JGdJPf8b
-         OGVw==
+        bh=9EAGZgY5SPdT1cVkvJoh2QfrN+7asBE1KRK8S40gaDQ=;
+        b=fRej6ns/ZWUEzUvxNGbQZNAT0BSw4zJppp4g8vJ12SjSS7/PKWYqWh+qGLnO51O8iL
+         xYfz41lSy7g9p5dFSX/Vhn9G1iI4DI42ZpPD98CNT4CIVD+KHqAMGHjPeFAxtW7r4OWJ
+         Bt24gJWuMtOlAENd3MxdHU1fclGI3Ej7waj6TqxJBGC+e5Plc8MWVww3O23yMZN5MEai
+         +v5oPQeRV/Ecda+PFN2Fi3sqCicKjkSIcXNayKhRTQKBSKzcFg6VPMXnJJl+dWQ+yZ2I
+         Us39X3Lp2huMeqYZOnP4q4WORoar2kNDCdTWI8b0htO7xg8iaNf+S0vFGZcd7nT8mqH5
+         YvuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=aB5e2tjVmAADTaOQSzpkGPj0yJ8zFPpGuVapYuWYx/U=;
-        b=t5z7ybaUvW5VDHjezKwuVR1Nc2ehEqjH+CusxFLUYejWMSTFN/4L19uaHSH+KZBxqb
-         +Bs9rNcGP/cnidNSP0+pJ5rKRlS51tGKYVTs5QyK5vZGEjKOeheV1qalECESE0PySxYF
-         pkv/VmVavqOchPBOsVJvThEDq9nH/MNksprB6l3oj14f9X9JwOId/FUoffCxtZZQZvUT
-         qrRYDg/B1LfhMJuz0tAWJF5Srb9dEyiQ0/Oqrv/GD72HQUj3nhs0GnCvp718HlykkDgh
-         EMvjumMnIF9y2uLmu5qA53PBDJ+qFhYv4qNqR5NEBz0FmIeNHwkus9hLZYfexxNoE5oW
-         kiAQ==
-X-Gm-Message-State: AOAM533c93oFDx2zNJyD9tiC1vHCMlEX1iZrPBTYvwUPTGDzMpQ2s9/g
-        HdAENVyfTe/AEOSwhffIFCEd7dJQZqhTHPQrsdkykvA2ZGk=
-X-Google-Smtp-Source: ABdhPJzO39nNvyFEktWfpip5OBtFU7GbxdMTYj9FaurcfqP/XSa40Uspy9xnleBxl8os8qSnmr82bQB4dgHgrt+iGZg=
-X-Received: by 2002:ac2:4156:0:b0:443:1591:c2be with SMTP id
- c22-20020ac24156000000b004431591c2bemr19640418lfi.234.1645584253705; Tue, 22
- Feb 2022 18:44:13 -0800 (PST)
+        bh=9EAGZgY5SPdT1cVkvJoh2QfrN+7asBE1KRK8S40gaDQ=;
+        b=e/pMh0ERo9zeLe7Plgh6uI5/hPKEzI5VttLGDzkP2q4RgNNKM8RQvteO3sAY/9mefi
+         1eWNXUzgXbXnPi6kkQYDlRxiIlpl+oTAJowSbcgId2H5bPVUbT3GpX8/mT5KtHjN1sJp
+         mSQsDHrEG+HHkCeL1oG0t47zLX+Xs05Z59o6JNlYPUqw9A6IUuTw3vDTJ1my43xip37A
+         P+CCAov6mLEoXM2spSrd/a/JQhhSXFQVW7nNapjSGtyDtLhU2hr5HmmDFYiSXxBwHtmu
+         FlGeG9Zyc8T6jHRgZ8L5Z+MyQkvTn+mTU8AO72H4dvpAQmkkE2X6Uz7Xg/PpTIag5y06
+         hsyA==
+X-Gm-Message-State: AOAM532AZbdtveSY4Q7UY8n9VHmouzS1A8s4vyL8+KJaBns3Yltl3Qfr
+        BCoC80v2vrHSH6g2+t2kgVhCq+S0o9vyKDvaaqQ=
+X-Google-Smtp-Source: ABdhPJwxd5AOIZzj1xHVv9ZDVXsnGHmJoUs7e6+bgciCEyzgPU77fjeFtutgvognPrXU36YRHWEpujkFHRb8BSzbEgE=
+X-Received: by 2002:a2e:b014:0:b0:23c:9593:f7 with SMTP id y20-20020a2eb014000000b0023c959300f7mr5517803ljk.209.1645802886225;
+ Fri, 25 Feb 2022 07:28:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20220223011416.323085-1-lsahlber@redhat.com>
-In-Reply-To: <20220223011416.323085-1-lsahlber@redhat.com>
+References: <CAH2r5mt9OfU+8PoKsmv_7aszhbw-dOuDCL6BOxb_2yRwc4HHCw@mail.gmail.com>
+ <Yhf+FemcQQToB5x+@redhat.com> <CAH2r5mt6Sh7qorfCHWnZzc6LUDd-s_NzGB=sa-UDM2-ivzpmAQ@mail.gmail.com>
+ <YhjYSMIE2NBZ/dGr@redhat.com> <YhjeX0HvXbED65IM@casper.infradead.org>
+In-Reply-To: <YhjeX0HvXbED65IM@casper.infradead.org>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 22 Feb 2022 20:44:02 -0600
-Message-ID: <CAH2r5mth2tMZq5k2Z89aSC9Tv1+k-WWN9a_5TGBJ5kTQGDWYUg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: truncate the inode and mapping when we simulate fcollapse
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Fri, 25 Feb 2022 09:27:55 -0600
+Message-ID: <CAH2r5mt9EtTEJCKsHkvRctfhMv7LnT6XT_JEvAb7ji6-oYnTPg@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Enabling change notification for network and
+ cluster fs
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Vivek Goyal <vgoyal@redhat.com>, lsf-pc@lists.linux-foundation.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ioannis Angelakopoulos <jaggel@bu.edu>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Tentatively merged into cifs-2.6.git for-next pending review and testing
+On Fri, Feb 25, 2022 at 7:49 AM Matthew Wilcox <willy@infradead.org> wrote:
+>
+> On Fri, Feb 25, 2022 at 08:23:20AM -0500, Vivek Goyal wrote:
+> > What about local events. I am assuming you want to supress local events
+> > and only deliver remote events. Because having both local and remote
+> > events delivered at the same time will be just confusing at best.
+>
+> This paragraph confuses me.  If I'm writing, for example, a file manager
+> and I want it to update its display automatically when another task alters
+> the contents of a directory, I don't care whether the modification was
+> done locally or remotely.
+>
+> If I understand the SMB protocol correctly, it allows the client to take
+> out a lease on a directory and not send its modifications back to the
+> server until the client chooses to (or the server breaks the lease).
+> So you wouldn't get any remote notifications because the client hasn't
+> told the server.
 
-On Tue, Feb 22, 2022 at 7:14 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> RHBZ:1997367
->
-> When we collapse a range in smb3_collapse_range() we must make sure
-> we update the inode size and pagecache accordingly.
->
-> If not, both inode size and pagecahce may be stale until it is refreshed.
->
-> This can be demonstrated for the inode size by running :
->
-> xfs_io -i -f -c "truncate 320k" -c "fcollapse 64k 128k" -c "fiemap -v"  \
-> /mnt/testfile
->
-> where we can see the result of stale data in the fiemap output.
-> The third line of the output is wrong, all this data should be truncated.
->
->  EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
->    0: [0..127]:        hole               128
->    1: [128..383]:      128..383           256   0x1
->    2: [384..639]:      hole               256
->
-> And the correct output, when the inode size has been updated correctly should
-> look like this:
->
->  EXT: FILE-OFFSET      BLOCK-RANGE      TOTAL FLAGS
->    0: [0..127]:        hole               128
->    1: [128..383]:      128..383           256   0x1
->
-> Reported-by: Xiaoli Feng <xifeng@redhat.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/smb2ops.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index af5d0830bc8a..891b11576e55 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -25,6 +25,7 @@
->  #include "smb2glob.h"
->  #include "cifs_ioctl.h"
->  #include "smbdirect.h"
-> +#include "fscache.h"
->  #include "fs_context.h"
->
->  /* Change credits for different ops and return the total number of credits */
-> @@ -3887,29 +3888,38 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
->  {
->         int rc;
->         unsigned int xid;
-> +       struct inode *inode;
->         struct cifsFileInfo *cfile = file->private_data;
-> +       struct cifsInodeInfo *cifsi;
->         __le64 eof;
->
->         xid = get_xid();
->
-> -       if (off >= i_size_read(file->f_inode) ||
-> -           off + len >= i_size_read(file->f_inode)) {
-> +       inode = d_inode(cfile->dentry);
-> +       cifsi = CIFS_I(inode);
-> +
-> +       if (off >= i_size_read(inode) ||
-> +           off + len >= i_size_read(inode)) {
->                 rc = -EINVAL;
->                 goto out;
->         }
->
->         rc = smb2_copychunk_range(xid, cfile, cfile, off + len,
-> -                                 i_size_read(file->f_inode) - off - len, off);
-> +                                 i_size_read(inode) - off - len, off);
->         if (rc < 0)
->                 goto out;
->
-> -       eof = cpu_to_le64(i_size_read(file->f_inode) - len);
-> +       eof = cpu_to_le64(i_size_read(inode) - len);
->         rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
->                           cfile->fid.volatile_fid, cfile->pid, &eof);
->         if (rc < 0)
->                 goto out;
->
->         rc = 0;
-> +
-> +       cifsi->server_eof = i_size_read(inode) - len;
-> +       truncate_setsize(inode, cifsi->server_eof);
-> +       fscache_resize_cookie(cifs_inode_cookie(inode), cifsi->server_eof);
->   out:
->         free_xid(xid);
->         return rc;
-> --
-> 2.30.2
->
+Directory leases would be broken by file create so the more important
+question is what happens when client 1 has a change notification on writes
+to files in a directory then client 2 opens a file in the same directory and is
+granted a file lease and starts writing to the file (which means the
+writes could get cached).   This is probably a minor point because when
+writes get flushed from client 2, client 1 (and any others with notifications
+requested) will get notified of the event (changes to files in a directory
+that they are watching).
 
+Local applications watching a file on a network or cluster mount in Linux
+(just as is the case with Windows, Macs etc.) should be able to be notified of
+local (cached) writes to a remote file or remote writes to the file from another
+client.  I don't think the change is large, and there was an earlier version of
+a patch circulated for this
 
 -- 
 Thanks,
