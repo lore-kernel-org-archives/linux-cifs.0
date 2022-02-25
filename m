@@ -2,103 +2,109 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F4FC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Feb 2022 15:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C770BC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Feb 2022 16:35:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241944AbiBYP2k (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Feb 2022 10:28:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55596 "EHLO
+        id S243065AbiBYQg1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Feb 2022 11:36:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbiBYP2k (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Feb 2022 10:28:40 -0500
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E512036EC;
-        Fri, 25 Feb 2022 07:28:08 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id v28so7854073ljv.9;
-        Fri, 25 Feb 2022 07:28:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9EAGZgY5SPdT1cVkvJoh2QfrN+7asBE1KRK8S40gaDQ=;
-        b=fRej6ns/ZWUEzUvxNGbQZNAT0BSw4zJppp4g8vJ12SjSS7/PKWYqWh+qGLnO51O8iL
-         xYfz41lSy7g9p5dFSX/Vhn9G1iI4DI42ZpPD98CNT4CIVD+KHqAMGHjPeFAxtW7r4OWJ
-         Bt24gJWuMtOlAENd3MxdHU1fclGI3Ej7waj6TqxJBGC+e5Plc8MWVww3O23yMZN5MEai
-         +v5oPQeRV/Ecda+PFN2Fi3sqCicKjkSIcXNayKhRTQKBSKzcFg6VPMXnJJl+dWQ+yZ2I
-         Us39X3Lp2huMeqYZOnP4q4WORoar2kNDCdTWI8b0htO7xg8iaNf+S0vFGZcd7nT8mqH5
-         YvuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9EAGZgY5SPdT1cVkvJoh2QfrN+7asBE1KRK8S40gaDQ=;
-        b=e/pMh0ERo9zeLe7Plgh6uI5/hPKEzI5VttLGDzkP2q4RgNNKM8RQvteO3sAY/9mefi
-         1eWNXUzgXbXnPi6kkQYDlRxiIlpl+oTAJowSbcgId2H5bPVUbT3GpX8/mT5KtHjN1sJp
-         mSQsDHrEG+HHkCeL1oG0t47zLX+Xs05Z59o6JNlYPUqw9A6IUuTw3vDTJ1my43xip37A
-         P+CCAov6mLEoXM2spSrd/a/JQhhSXFQVW7nNapjSGtyDtLhU2hr5HmmDFYiSXxBwHtmu
-         FlGeG9Zyc8T6jHRgZ8L5Z+MyQkvTn+mTU8AO72H4dvpAQmkkE2X6Uz7Xg/PpTIag5y06
-         hsyA==
-X-Gm-Message-State: AOAM532AZbdtveSY4Q7UY8n9VHmouzS1A8s4vyL8+KJaBns3Yltl3Qfr
-        BCoC80v2vrHSH6g2+t2kgVhCq+S0o9vyKDvaaqQ=
-X-Google-Smtp-Source: ABdhPJwxd5AOIZzj1xHVv9ZDVXsnGHmJoUs7e6+bgciCEyzgPU77fjeFtutgvognPrXU36YRHWEpujkFHRb8BSzbEgE=
-X-Received: by 2002:a2e:b014:0:b0:23c:9593:f7 with SMTP id y20-20020a2eb014000000b0023c959300f7mr5517803ljk.209.1645802886225;
- Fri, 25 Feb 2022 07:28:06 -0800 (PST)
-MIME-Version: 1.0
-References: <CAH2r5mt9OfU+8PoKsmv_7aszhbw-dOuDCL6BOxb_2yRwc4HHCw@mail.gmail.com>
- <Yhf+FemcQQToB5x+@redhat.com> <CAH2r5mt6Sh7qorfCHWnZzc6LUDd-s_NzGB=sa-UDM2-ivzpmAQ@mail.gmail.com>
- <YhjYSMIE2NBZ/dGr@redhat.com> <YhjeX0HvXbED65IM@casper.infradead.org>
-In-Reply-To: <YhjeX0HvXbED65IM@casper.infradead.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 25 Feb 2022 09:27:55 -0600
-Message-ID: <CAH2r5mt9EtTEJCKsHkvRctfhMv7LnT6XT_JEvAb7ji6-oYnTPg@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Enabling change notification for network and
- cluster fs
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Vivek Goyal <vgoyal@redhat.com>, lsf-pc@lists.linux-foundation.org,
+        with ESMTP id S240475AbiBYQg1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Feb 2022 11:36:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E2DBF20A96F
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Feb 2022 08:35:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645806954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fqYY7w88iLzBzKsxm+iVgsvPAyDnq+ffNP0ORFfBhSI=;
+        b=I7qqpsCJXIWLWDoN5f3tnXIYgZcgQxCnZ5+TjpVUuguJ4RfzrN/ce9GwTgKjy9AzmnVDpk
+        56DUdSI51yQUMIXlkY79Ekj71WcFx+87Xjyf96cNJ0pejitbIeALJq1aOw/UpqjFN5XDhu
+        dv2vlX1L6+OuYOjMPu27EB3AaLaQHJ8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-648--e9CF4UpMz-0XyEgup1qLg-1; Fri, 25 Feb 2022 11:35:50 -0500
+X-MC-Unique: -e9CF4UpMz-0XyEgup1qLg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3967F51A8;
+        Fri, 25 Feb 2022 16:35:49 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.22.17.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D730A7C04A;
+        Fri, 25 Feb 2022 16:35:48 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 446602237E9; Fri, 25 Feb 2022 11:35:48 -0500 (EST)
+Date:   Fri, 25 Feb 2022 11:35:48 -0500
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        lsf-pc@lists.linux-foundation.org,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Ioannis Angelakopoulos <jaggel@bu.edu>,
         CIFS <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [LSF/MM/BPF TOPIC] Enabling change notification for network and
+ cluster fs
+Message-ID: <YhkFZE8wUWhycwX2@redhat.com>
+References: <CAH2r5mt9OfU+8PoKsmv_7aszhbw-dOuDCL6BOxb_2yRwc4HHCw@mail.gmail.com>
+ <Yhf+FemcQQToB5x+@redhat.com>
+ <CAH2r5mt6Sh7qorfCHWnZzc6LUDd-s_NzGB=sa-UDM2-ivzpmAQ@mail.gmail.com>
+ <YhjYSMIE2NBZ/dGr@redhat.com>
+ <YhjeX0HvXbED65IM@casper.infradead.org>
+ <CAH2r5mt9EtTEJCKsHkvRctfhMv7LnT6XT_JEvAb7ji6-oYnTPg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAH2r5mt9EtTEJCKsHkvRctfhMv7LnT6XT_JEvAb7ji6-oYnTPg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 7:49 AM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Fri, Feb 25, 2022 at 08:23:20AM -0500, Vivek Goyal wrote:
-> > What about local events. I am assuming you want to supress local events
-> > and only deliver remote events. Because having both local and remote
-> > events delivered at the same time will be just confusing at best.
->
-> This paragraph confuses me.  If I'm writing, for example, a file manager
-> and I want it to update its display automatically when another task alters
-> the contents of a directory, I don't care whether the modification was
-> done locally or remotely.
->
-> If I understand the SMB protocol correctly, it allows the client to take
-> out a lease on a directory and not send its modifications back to the
-> server until the client chooses to (or the server breaks the lease).
-> So you wouldn't get any remote notifications because the client hasn't
-> told the server.
+On Fri, Feb 25, 2022 at 09:27:55AM -0600, Steve French wrote:
+> On Fri, Feb 25, 2022 at 7:49 AM Matthew Wilcox <willy@infradead.org> wrote:
+> >
+> > On Fri, Feb 25, 2022 at 08:23:20AM -0500, Vivek Goyal wrote:
+> > > What about local events. I am assuming you want to supress local events
+> > > and only deliver remote events. Because having both local and remote
+> > > events delivered at the same time will be just confusing at best.
+> >
+> > This paragraph confuses me.  If I'm writing, for example, a file manager
+> > and I want it to update its display automatically when another task alters
+> > the contents of a directory, I don't care whether the modification was
+> > done locally or remotely.
+> >
+> > If I understand the SMB protocol correctly, it allows the client to take
+> > out a lease on a directory and not send its modifications back to the
+> > server until the client chooses to (or the server breaks the lease).
+> > So you wouldn't get any remote notifications because the client hasn't
+> > told the server.
+> 
+> Directory leases would be broken by file create so the more important
+> question is what happens when client 1 has a change notification on writes
+> to files in a directory then client 2 opens a file in the same directory and is
+> granted a file lease and starts writing to the file (which means the
+> writes could get cached).   This is probably a minor point because when
+> writes get flushed from client 2, client 1 (and any others with notifications
+> requested) will get notified of the event (changes to files in a directory
+> that they are watching).
+> 
+> Local applications watching a file on a network or cluster mount in Linux
+> (just as is the case with Windows, Macs etc.) should be able to be notified of
+> local (cached) writes to a remote file or remote writes to the file from another
+> client.  I don't think the change is large, and there was an earlier version of
+> a patch circulated for this
 
-Directory leases would be broken by file create so the more important
-question is what happens when client 1 has a change notification on writes
-to files in a directory then client 2 opens a file in the same directory and is
-granted a file lease and starts writing to the file (which means the
-writes could get cached).   This is probably a minor point because when
-writes get flushed from client 2, client 1 (and any others with notifications
-requested) will get notified of the event (changes to files in a directory
-that they are watching).
+So local notifications are generated by filesystem code as needed?
 
-Local applications watching a file on a network or cluster mount in Linux
-(just as is the case with Windows, Macs etc.) should be able to be notified of
-local (cached) writes to a remote file or remote writes to the file from another
-client.  I don't think the change is large, and there was an earlier version of
-a patch circulated for this
+IOW, in general disable all local events and let filesystems decide which
+local events to generate? And locally cached write is one such example?
 
--- 
-Thanks,
+Thanks
+Vivek
 
-Steve
