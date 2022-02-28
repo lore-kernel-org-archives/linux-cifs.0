@@ -2,86 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C18B3C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 28 Feb 2022 14:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8C2C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Feb 2022 14:28:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232089AbiB1OYW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 28 Feb 2022 09:24:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48454 "EHLO
+        id S236523AbiB1O3V (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 28 Feb 2022 09:29:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231794AbiB1OYW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Feb 2022 09:24:22 -0500
-Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC12193E7
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Feb 2022 06:23:42 -0800 (PST)
-Received: by mail-vs1-xe2e.google.com with SMTP id y26so13101851vsq.8
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Feb 2022 06:23:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5nVXvC2nHbZHmN0RlyE35i5oxN5wsrAV/DM06yoOt6o=;
-        b=Dq8BYL3m1kfYI+jzcRgK2nghUdbIlfRQ+FnOgRiCAiKFb+98rBr2y8EfmqYE1FniGy
-         DIYw804pUY1GR8IWaaq5zhBTOmziFXA8ZaemOLnDwqIeYng4PyTwRv8kHvU423/f0j6+
-         xyiB23icf6UDMEjK54s9kbaIc11qE/P5W/Tv2pw56QX1uWgTvVfF7FBxa01Zt/SuLh8f
-         0wyCaI7n633R0Pllu8vct74wSRycMvtow/J7CktRlp0bLmf0I5p8uyjrieYz8N46SNWr
-         Efmj1ghdEBe/KM19Mi9KWmROBvtaoU1BHR/5gDO2ClY3tgKk+2eIE0PVZ5DnPfXKueRn
-         Plng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5nVXvC2nHbZHmN0RlyE35i5oxN5wsrAV/DM06yoOt6o=;
-        b=wx3HZsoRyIvSiih7YNoR4gg1xW/vivLY8RnG6Xt31FrvlnEFeJcUibr30sjV6R+NG5
-         4hfBkW34HfFFeT+DOPY12iWsDY+vj+kPHBNriFyeqDgvsL6dmV+lX+W50yHVS18VyrpR
-         L6BH6koCm/6Mof2aLJl/cD8PM9lDY+E9ZTj2ogq9jSkDRpOj2LrBdxk3MTwcZoZu7nr3
-         caOLnxo515hTpO51QQbcQ2oUpJ8CE/Oy6LUngQ1PC1ieLeCj4E0BLwMosq+oRFFbtlqo
-         KDbmZ9Y+JyqU9LYbsbkRRidw8MJ7mR5i5DZC/Cetg1dZzAA3Ry1ujtJ8gTcQ0wVX/pcN
-         ed1A==
-X-Gm-Message-State: AOAM532VMk9eTXx/U8YT+frasP0MpiVOuii4TbHWsvC5qTNvfyqRsD2g
-        kJW9pTtNVMYUisyRVKzxespFB4VDzXTXloEx1Vo=
-X-Google-Smtp-Source: ABdhPJyIvScS8gl5mnIHa9dmbTH424Pbq4tlXRJ5kA7QJBXKIU/JZQVuduBnwsGAc7lZ+/WaUZcFUJs862mJXp0HwlU=
-X-Received: by 2002:a67:d618:0:b0:31b:734f:b36 with SMTP id
- n24-20020a67d618000000b0031b734f0b36mr8078038vsj.13.1646058221124; Mon, 28
- Feb 2022 06:23:41 -0800 (PST)
+        with ESMTP id S237144AbiB1O3V (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Feb 2022 09:29:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 04EEA220C7
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Feb 2022 06:28:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646058519;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=T7bpbKpVEq9MLTWx6hiGqkGi7ZJ+dBk/1YROkWUQd0k=;
+        b=YPHTgc7lTQs3uuuH8YhjbAMVTFe26Qe2xVT2BHjXVO9zfS4PRmFNd3FQQo4r64RVNuXfOR
+        FlFBvr9lBx1YwWmRpgYf9I1FpIsvD/lb8SUj8cii8BrkOCD5gi2woW5t0uoCL9GRK5JEPa
+        +BBIfZvwOuBzBY5Vs4PyxPDWm0CkYi4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-519-J65TzDB_MTehWf8efipJpQ-1; Mon, 28 Feb 2022 09:28:36 -0500
+X-MC-Unique: J65TzDB_MTehWf8efipJpQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1250FC81;
+        Mon, 28 Feb 2022 14:28:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.37.0])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C7A561057FCB;
+        Mon, 28 Feb 2022 14:28:28 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CACdtm0Z4zXpbPBLJx-=AgBRd63hp_n+U-5qc0gQDQW0c2PY7gg@mail.gmail.com>
+References: <CACdtm0Z4zXpbPBLJx-=AgBRd63hp_n+U-5qc0gQDQW0c2PY7gg@mail.gmail.com> <164311902471.2806745.10187041199819525677.stgit@warthog.procyon.org.uk> <164311919732.2806745.2743328800847071763.stgit@warthog.procyon.org.uk> <CACdtm0YtxAUMet_PSxpg69OR9_TQbMQOzU5Kbm_5YDe_C7Nb-w@mail.gmail.com> <3013921.1644856403@warthog.procyon.org.uk>
+To:     Rohith Surabattula <rohiths.msft@gmail.com>
+Cc:     dhowells@redhat.com, smfrench@gmail.com, nspmangalore@gmail.com,
+        jlayton@kernel.org, linux-cifs@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC PATCH 7/7] cifs: Use netfslib to handle reads
 MIME-Version: 1.0
-References: <CACdtm0Z4crPr868DRGCYNd=euVXzm+T+rPHT4PdqK66TV7iioQ@mail.gmail.com>
- <914621.1645046759@warthog.procyon.org.uk>
-In-Reply-To: <914621.1645046759@warthog.procyon.org.uk>
-From:   Rohith Surabattula <rohiths.msft@gmail.com>
-Date:   Mon, 28 Feb 2022 19:53:30 +0530
-Message-ID: <CACdtm0ZteTve1EbSgDX_jochhHT7Ufm3gJg7j28BOjmRSg8dTQ@mail.gmail.com>
-Subject: Re: [PATCH] [CIFS]: Add clamp_length support
-To:     David Howells <dhowells@redhat.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Paulo Alcantara <pc@cjr.nz>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2498967.1646058507.1@warthog.procyon.org.uk>
+Date:   Mon, 28 Feb 2022 14:28:27 +0000
+Message-ID: <2498968.1646058507@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi David,
+Rohith Surabattula <rohiths.msft@gmail.com> wrote:
 
-Do you mean the clamp handler in netfs should return the size of data
-to be allocated instead of allocating itself ?
+> R=00000006 READAHEAD c=00000000 ni=0 s=0 1000
+>               vi-1631    [000] .....  2519.247540: netfs_read:
 
-Regards,
-Rohith
+"c=00000000" would indicate that no fscache cookie was allocated for this
+inode.
 
-On Thu, Feb 17, 2022 at 2:56 AM David Howells <dhowells@redhat.com> wrote:
->
-> Rohith Surabattula <rohiths.msft@gmail.com> wrote:
->
-> > +     credits = kmalloc(sizeof(struct cifs_credits), GFP_KERNEL);
-> > ...
-> > +     subreq->subreq_priv = credits;
->
-> Would it be better if I made it so that the netfs could specify the size of
-> the netfs_read_subrequest struct to be allocated, thereby allowing it to tag
-> extra data on the end?
->
-> David
->
+> COOKIE   VOLUME   REF ACT ACC S FL DEF
+> ======== ======== === === === = == ================
+> 00000002 00000001   1   0   0 - 4008 302559bec76a7924,
+> 0a13e961000000000a13e96100000000d01f4719d01f4719
+> 00000003 00000001   1   0   0 - 4000 0000000000640090,
+> 37630162000000003763016200000000e8650f119c49f411
+
+But we can see some cookies have been allocated.
+
+Can you turn on:
+
+  echo 1 >/sys/kernel/debug/tracing/events/fscache/fscache_acquire/enable
+
+David
+
