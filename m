@@ -2,152 +2,90 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6A7C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 28 Feb 2022 14:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 719D9C4167B
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Feb 2022 18:41:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236853AbiB1OkB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 28 Feb 2022 09:40:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39924 "EHLO
+        id S240704AbiB1Sm2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 28 Feb 2022 13:42:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236629AbiB1OkA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Feb 2022 09:40:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 32B886F494
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Feb 2022 06:39:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646059161;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mdaocAi1oYiZvvsxCSy0zGl10s5ARkCh7O1MONuTu2c=;
-        b=MUHJfnFPjDvujbDQ8S2PoPsbJ/JcWMq50FURY7OjJIA6zoR9vs3ARRkkyDaCClew2lkrFH
-        xWafnXfvxYE8bvqY8QWgCvpV3Xq/vZXNBnsoYM2tulIol62OA8D3t0Ij3exyY+zd+WVtVo
-        c2yGyKQ4gvisGUbImdEofq6Fuu9F8G8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-528-05diB5kTNC6bfd-XemHmrg-1; Mon, 28 Feb 2022 09:39:18 -0500
-X-MC-Unique: 05diB5kTNC6bfd-XemHmrg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 096FD835DE3;
-        Mon, 28 Feb 2022 14:39:15 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.37.0])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 32AB72ED88;
-        Mon, 28 Feb 2022 14:39:12 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CACdtm0ZteTve1EbSgDX_jochhHT7Ufm3gJg7j28BOjmRSg8dTQ@mail.gmail.com>
-References: <CACdtm0ZteTve1EbSgDX_jochhHT7Ufm3gJg7j28BOjmRSg8dTQ@mail.gmail.com> <CACdtm0Z4crPr868DRGCYNd=euVXzm+T+rPHT4PdqK66TV7iioQ@mail.gmail.com> <914621.1645046759@warthog.procyon.org.uk>
-To:     Rohith Surabattula <rohiths.msft@gmail.com>
-Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Paulo Alcantara <pc@cjr.nz>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] [CIFS]: Add clamp_length support
+        with ESMTP id S240699AbiB1SmV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Feb 2022 13:42:21 -0500
+X-Greylist: delayed 599 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 28 Feb 2022 10:36:57 PST
+Received: from relay4.hostedemail.com (relay4.hostedemail.com [64.99.140.36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 745EFD95;
+        Mon, 28 Feb 2022 10:36:57 -0800 (PST)
+Received: from omf09.hostedemail.com (a10.router.float.18 [10.200.18.1])
+        by unirelay11.hostedemail.com (Postfix) with ESMTP id 8480C81766;
+        Mon, 28 Feb 2022 18:20:49 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf09.hostedemail.com (Postfix) with ESMTPA id 5C4272002A;
+        Mon, 28 Feb 2022 18:20:29 +0000 (UTC)
+Message-ID: <0be9de3920442df490f01b6fb1c42521c3de6190.camel@perches.com>
+Subject: Re: [PATCH 1/6] drivers: usb: remove usage of list iterator past
+ the loop body
+From:   Joe Perches <joe@perches.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergman <arnd@arndb.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-sgx@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-usb@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+        bcm-kernel-feedback-list@broadcom.com, linux-tegra@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, kvm@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        v9fs-developer@lists.sourceforge.net,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Date:   Mon, 28 Feb 2022 10:20:28 -0800
+In-Reply-To: <20220228112413.GA2812@kadam>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+         <20220228110822.491923-2-jakobkoschel@gmail.com>
+         <20220228112413.GA2812@kadam>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.40.4-1ubuntu2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2500956.1646059150.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 28 Feb 2022 14:39:10 +0000
-Message-ID: <2500957.1646059150@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: 1e1i8ombnsc3cdkptu3anccezjc89zox
+X-Rspamd-Server: rspamout07
+X-Rspamd-Queue-Id: 5C4272002A
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1+i6vY6IDwHpNq++UEo/5hqvP4PvgQNb4E=
+X-HE-Tag: 1646072429-12569
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Rohith Surabattula <rohiths.msft@gmail.com> wrote:
+On Mon, 2022-02-28 at 14:24 +0300, Dan Carpenter wrote:
 
-> > Rohith Surabattula <rohiths.msft@gmail.com> wrote:
-> >
-> > > +     credits =3D kmalloc(sizeof(struct cifs_credits), GFP_KERNEL);
-> > > ...
-> > > +     subreq->subreq_priv =3D credits;
-> >
-> > Would it be better if I made it so that the netfs could specify the si=
-ze of
-> > the netfs_read_subrequest struct to be allocated, thereby allowing it =
-to tag
-> > extra data on the end?
->
-> Do you mean the clamp handler in netfs should return the size of data
-> to be allocated instead of allocating itself ?
+> a multi-line indent gets curly braces for readability even though
+> it's not required by C.  And then both sides would get curly braces.
 
-No, I was thinking of putting a size_t in struct netfs_request_ops that
-indicates how big the subrequest struct should be:
+That's more your personal preference than a coding style guideline.
 
-	struct netfs_request_ops {
-		...
-		size_t subrequest_size;
-	};
-
-and then:
-
-	struct netfs_read_subrequest *netfs_alloc_subrequest(
-		struct netfs_read_request *rreq)
-	{
-		struct netfs_read_subrequest *subreq;
-
-		subreq =3D kzalloc(rreq->ops->subrequest_size, GFP_KERNEL);
-		if (subreq) {
-			INIT_LIST_HEAD(&subreq->rreq_link);
-			refcount_set(&subreq->usage, 2);
-			subreq->rreq =3D rreq;
-			netfs_get_read_request(rreq);
-			netfs_stat(&netfs_n_rh_sreq);
-		}
-
-		return subreq;
-	}
-
-This would allow you to do, for instance:
-
-	struct cifs_subrequest {
-		struct netfs_read_subrequest subreq;
-		struct cifs_credits credits;
-	};
-
-then:
-
-	const struct netfs_request_ops cifs_req_ops =3D {
-		.subrequest_size	=3D sizeof(struct cifs_subrequest),
-		.init_rreq		=3D cifs_init_rreq,
-		.expand_readahead	=3D cifs_expand_readahead,
-		.clamp_length		=3D cifs_clamp_length,
-		.issue_op		=3D cifs_req_issue_op,
-		.done			=3D cifs_rreq_done,
-		.cleanup		=3D cifs_req_cleanup,
-	};
-
-and then:
-
-	static bool cifs_clamp_length(struct netfs_read_subrequest *subreq)
-	{
-		struct cifs_subrequest *cifs_subreq =3D
-			container_of(subreq, struct cifs_subrequest, subreq);
-		struct cifs_sb_info *cifs_sb =3D CIFS_SB(subreq->rreq->inode->i_sb);
-		struct TCP_Server_Info *server;
-		struct cifsFileInfo *open_file =3D subreq->rreq->netfs_priv;
-		struct cifs_credits *credits =3D &cifs_subreq->credits;
-		unsigned int rsize;
-		int rc;
-
-		server =3D cifs_pick_channel(tlink_tcon(open_file->tlink)->ses);
-
-		rc =3D server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
-	                                                   &rsize, credits);
-		if (rc)
-			return false;
-
-		subreq->len =3D rsize;
-		return true;
-	}
-
-David
 
