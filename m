@@ -2,123 +2,120 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5E6C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  1 Mar 2022 07:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3614DC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue,  1 Mar 2022 08:35:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230089AbiCAHWW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 1 Mar 2022 02:22:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45544 "EHLO
+        id S231320AbiCAIfn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 1 Mar 2022 03:35:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbiCAHWW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Mar 2022 02:22:22 -0500
-Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BEF21EED8;
-        Mon, 28 Feb 2022 23:21:42 -0800 (PST)
-Received: by mail-vk1-xa34.google.com with SMTP id b64so3066344vkf.7;
-        Mon, 28 Feb 2022 23:21:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yIhHbRiRsE369Y60O9So9Za6xEeWordfQYdXDUDiS1Y=;
-        b=j+XVVDtX5Xt1++P52QR+lZEfQuFKMkJabOEQllcUpNHLHi7nrIrDs4eWRiVoxBpylF
-         AhvmHZvhIZ54pmn3pGgcfsHrYPyBoXzAe+qwecrkWYI3XQu67FYVumFfKjE7i4vQMMHl
-         r9Y6PeqKS8UC7a8iAgTNEz6Jbr7CBC1wDHCWxcz1qBpqfydgtwaSrthKd2K5njvgZ/1V
-         bLcYldjP/BaNkkIo3ANGgvSMgFg7xBJEFEPF4GVwiVJK2dQOKHaB6Wr6TCH0SMpIKuzx
-         n6C6iiRxy6zfzKz216PqcFAA0EfmZB0UVYdDRTKwKjyAJR7AkpE55R1S+hm1bj7b6NeZ
-         E9Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yIhHbRiRsE369Y60O9So9Za6xEeWordfQYdXDUDiS1Y=;
-        b=B0R7hurMvw4Vud5fsVs2SZhLuPuLoNBUx9rgcP8V9fhaGWhmfqs01wtLzZB0/W5mkE
-         pW0H0ZVyTu2vzkxaR4L4TunVEzjBNASbB0yx5stE/MZ1H0/Y3Bdoj0imgKzMAVyXRXjh
-         kxOHEBmOzVkIH9zTUQRSZI0HSvQMmuPAuPlMUBp3tESoaP88BOPTPTysb+mToHFbkaAY
-         7HYQYLccSYpcjs2qmoereLYIJLZ8aJxe/Is2dPrTLQZ50DNpRsLFeXb28V4CE7jADHEb
-         R92g9xZlPpocfOmOSEkM+QnKRego6FFR+voIsiAiCEf+rjDxtZ+707z2WMJY40ZAPapW
-         YQWg==
-X-Gm-Message-State: AOAM530d4fCO1GaTAl3zj8xYqpb3KxUsJbwazgIiAM9kHX82j1S+rie3
-        lqf9sws5Q9JhbtHk2Zd00TNSDtrfQ9ZXVUW1mnE=
-X-Google-Smtp-Source: ABdhPJx0f65q+nbNuz6F41AtV0+nlc6GVfOsX//5scKABZG+GDQ9u09qk04s4wFA4zwiR2OuLu9yu8wiED3Gqg9mXj0=
-X-Received: by 2002:a05:6122:d04:b0:333:318c:1460 with SMTP id
- az4-20020a0561220d0400b00333318c1460mr4177721vkb.41.1646119301238; Mon, 28
- Feb 2022 23:21:41 -0800 (PST)
+        with ESMTP id S230457AbiCAIfn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Mar 2022 03:35:43 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B588163BE7;
+        Tue,  1 Mar 2022 00:35:02 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 47020B817C1;
+        Tue,  1 Mar 2022 08:35:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEE9AC340EE;
+        Tue,  1 Mar 2022 08:34:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646123699;
+        bh=5Xklv0cLK0GdlVFhbNsPD9P+D1oYr0QR/N2h+ojqkoc=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=ZAYdRIsJgIKcc/JFxiUrxwR+fnyf+talltJN5ymyabdoWZ6CYy6yTlT5YIPMa9bEu
+         Z9skfUzNEviZ1NrSzpECr/VcdxxHpKyHN2GsBhTJAV5cmnSmSfniqJ20DCJfJZTbE2
+         islRPKg1Y/SelG4WvXkrJSAxuR4aBht1AH4gK3XjoI4yDDOVis/YRi13nJvM94uhAZ
+         54/XIs/3jj4aBOFBwxqlIybQFm4jGmXKPGydTYwZkRlyHINOUx5NSqfOavgVflQkUI
+         1zDFKWVgFSg3q25kZguyW2qBxL7L5Ip2KzSuwBtbgn2/ZIYtf4LbSU+yGrYG/0lhO/
+         pAKUDbsMaUlSA==
+Received: by mail-wm1-f49.google.com with SMTP id l2-20020a7bc342000000b0037fa585de26so626334wmj.1;
+        Tue, 01 Mar 2022 00:34:59 -0800 (PST)
+X-Gm-Message-State: AOAM531HkN0K8+OYhOac2BuMkIj6ofB3dP3TbWJw+6bIerYmkxx1hKHm
+        JApnYxevM5MDzpHCKQFsX6Fhgc1EDVezpf2m6/U=
+X-Google-Smtp-Source: ABdhPJznfnt4qRoVXxZVgvPQwUSYOc43dCMfq5XyQkkEUIRS5cmuwSvm5PQHgdxy0t6XmAmdDEuR0uTdr2RLlB2jT+E=
+X-Received: by 2002:a7b:c001:0:b0:37d:409d:624d with SMTP id
+ c1-20020a7bc001000000b0037d409d624dmr16062747wmb.64.1646123698077; Tue, 01
+ Mar 2022 00:34:58 -0800 (PST)
 MIME-Version: 1.0
-References: <164311902471.2806745.10187041199819525677.stgit@warthog.procyon.org.uk>
- <164311919732.2806745.2743328800847071763.stgit@warthog.procyon.org.uk>
- <CACdtm0YtxAUMet_PSxpg69OR9_TQbMQOzU5Kbm_5YDe_C7Nb-w@mail.gmail.com>
- <3013921.1644856403@warthog.procyon.org.uk> <CACdtm0Z4zXpbPBLJx-=AgBRd63hp_n+U-5qc0gQDQW0c2PY7gg@mail.gmail.com>
- <2498968.1646058507@warthog.procyon.org.uk>
-In-Reply-To: <2498968.1646058507@warthog.procyon.org.uk>
-From:   Rohith Surabattula <rohiths.msft@gmail.com>
-Date:   Tue, 1 Mar 2022 12:51:30 +0530
-Message-ID: <CACdtm0aZnQLyduKxr9dhcpYB_r00UFnR=WQvAnqL0DebxgbrOw@mail.gmail.com>
-Subject: Re: [RFC PATCH 7/7] cifs: Use netfslib to handle reads
-To:     David Howells <dhowells@redhat.com>
-Cc:     smfrench@gmail.com, nspmangalore@gmail.com, jlayton@kernel.org,
-        linux-cifs@vger.kernel.org, linux-cachefs@redhat.com,
-        linux-fsdevel@vger.kernel.org
+Received: by 2002:a5d:4e02:0:0:0:0:0 with HTTP; Tue, 1 Mar 2022 00:34:57 -0800 (PST)
+In-Reply-To: <Yh2dqrb6SrOlWL9t@google.com>
+References: <20220228234833.10434-1-linkinjeon@kernel.org> <20220228234833.10434-2-linkinjeon@kernel.org>
+ <Yh2dqrb6SrOlWL9t@google.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 1 Mar 2022 17:34:57 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-XKnNH264M+K91ecUXp7vKsPfxteBv98Ot8455dGQYPw@mail.gmail.com>
+Message-ID: <CAKYAXd-XKnNH264M+K91ecUXp7vKsPfxteBv98Ot8455dGQYPw@mail.gmail.com>
+Subject: Re: [PATCH 2/4] ksmbd: remove filename in ksmbd_file
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        smfrench@gmail.com, hyc.lee@gmail.com,
+        Al Viro <viro@zeniv.linux.org.uk>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi David,
+2022-03-01 13:14 GMT+09:00, Sergey Senozhatsky <senozhatsky@chromium.org>:
+> On (22/03/01 08:48), Namjae Jeon wrote:
+>> -char *convert_to_nt_pathname(char *filename)
+>> +char *convert_to_nt_pathname(struct ksmbd_share_config *share,
+>> +			     struct path *path)
+>>  {
+>> -	char *ab_pathname;
+>> +	char *pathname, *ab_pathname, *nt_pathname = NULL;
+>> +	int share_path_len = strlen(share->path);
+>>
+>> -	if (strlen(filename) == 0)
+>> -		filename = "\\";
+>> +	pathname = kmalloc(PATH_MAX, GFP_KERNEL);
+>> +	if (!pathname)
+>> +		return ERR_PTR(-EACCES);
+>>
+>> -	ab_pathname = kstrdup(filename, GFP_KERNEL);
+>> -	if (!ab_pathname)
+>> -		return NULL;
+>> +	ab_pathname = d_path(path, pathname, PATH_MAX);
+>> +	if (IS_ERR(ab_pathname)) {
+>> +		nt_pathname = ERR_PTR(-EACCES);
+>> +		goto free_pathname;
+>> +	}
+>> +
+>> +	if (strncmp(ab_pathname, share->path, share_path_len)) {
+>> +		nt_pathname = ERR_PTR(-EACCES);
+>> +		goto free_pathname;
+>> +	}
+>> +
+>> +	nt_pathname = kzalloc(strlen(&ab_pathname[share_path_len]) + 1,
+>> GFP_KERNEL);
+>> +	if (!nt_pathname) {
+>> +		nt_pathname = ERR_PTR(-ENOMEM);
+>> +		goto free_pathname;
+>> +	}
+>> +	if (ab_pathname[share_path_len] == '\0')
+>> +		strcpy(nt_pathname, "/");
+>> +	strcat(nt_pathname, &ab_pathname[share_path_len]);
+>> +
+>> +	ksmbd_conv_path_to_windows(nt_pathname);
+>>
+>> -	ksmbd_conv_path_to_windows(ab_pathname);
+>> -	return ab_pathname;
+>> +free_pathname:
+>> +	kfree(pathname);
+>> +	return nt_pathname;
+>>  }
+>
+> convert_to_nt_pathname() can return NULL
+I can not find where this function return NULL.. Initializing NULL for
+nt_pathname is unnecessary.
 
-Below are traces:
-              vi-9189    [001] ..... 64454.731493: fscache_acquire:
-c=0000001f V=00000001 vr=31 vc=30
-              vi-9189    [001] ..... 64454.739242: fscache_acquire:
-c=00000020 V=00000001 vr=32 vc=31
-              vi-9189    [001] ..... 64454.783474: fscache_acquire:
-c=00000021 V=00000001 vr=33 vc=32
-              vi-9189    [001] ..... 64454.794650: netfs_read:
-R=00000007 READAHEAD c=00000000 ni=0 s=0 1000
-              vi-9189    [001] ..... 64454.794652: netfs_read:
-R=00000007 EXPANDED  c=00000000 ni=0 s=0 1000
-              vi-9189    [001] ..... 64454.794661: netfs_sreq:
-R=00000007[0] PREP  DOWN f=00 s=0 0/100000 e=0
-              vi-9189    [001] ..... 64454.794662: netfs_sreq:
-R=00000007[0] SUBMT DOWN f=00 s=0 0/100000 e=0
-           cifsd-1390    [000] ..... 64454.817450: netfs_sreq:
-R=00000007[0] TERM  DOWN f=02 s=0 100000/100000 e=0
-           cifsd-1390    [000] ..... 64454.817451: netfs_rreq:
-R=00000007 ASSESS f=20
-           cifsd-1390    [000] ..... 64454.817452: netfs_rreq:
-R=00000007 UNLOCK f=20
-           cifsd-1390    [000] ..... 64454.817464: netfs_rreq:
-R=00000007 DONE   f=00
-           cifsd-1390    [000] ..... 64454.817464: netfs_sreq:
-R=00000007[0] FREE  DOWN f=02 s=0 100000/100000 e=0
-           cifsd-1390    [000] ..... 64454.817465: netfs_rreq:
-R=00000007 FREE   f=00
-
-Regards,
-Rohith
-
-On Mon, Feb 28, 2022 at 7:58 PM David Howells <dhowells@redhat.com> wrote:
 >
-> Rohith Surabattula <rohiths.msft@gmail.com> wrote:
+>> +	filename = convert_to_nt_pathname(work->tcon->share_conf,
+>> &fp->filp->f_path);
+>> +	if (IS_ERR(filename))
+>> +		return PTR_ERR(filename);
 >
-> > R=00000006 READAHEAD c=00000000 ni=0 s=0 1000
-> >               vi-1631    [000] .....  2519.247540: netfs_read:
->
-> "c=00000000" would indicate that no fscache cookie was allocated for this
-> inode.
->
-> > COOKIE   VOLUME   REF ACT ACC S FL DEF
-> > ======== ======== === === === = == ================
-> > 00000002 00000001   1   0   0 - 4008 302559bec76a7924,
-> > 0a13e961000000000a13e96100000000d01f4719d01f4719
-> > 00000003 00000001   1   0   0 - 4000 0000000000640090,
-> > 37630162000000003763016200000000e8650f119c49f411
->
-> But we can see some cookies have been allocated.
->
-> Can you turn on:
->
->   echo 1 >/sys/kernel/debug/tracing/events/fscache/fscache_acquire/enable
->
-> David
+> I don't think this will catch NULL nt_pathname return.
 >
