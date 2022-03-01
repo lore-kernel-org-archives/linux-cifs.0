@@ -2,157 +2,117 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4407BC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue,  1 Mar 2022 03:04:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0DAC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue,  1 Mar 2022 04:14:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232103AbiCADEj convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 28 Feb 2022 22:04:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36458 "EHLO
+        id S230189AbiCAEPW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 28 Feb 2022 23:15:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232063AbiCADEi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Feb 2022 22:04:38 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D54355BD21
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Feb 2022 19:03:56 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-267-9MSeLLg1PRGi9Q5Mk98pjw-1; Tue, 01 Mar 2022 03:03:54 +0000
-X-MC-Unique: 9MSeLLg1PRGi9Q5Mk98pjw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.28; Tue, 1 Mar 2022 03:03:52 +0000
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.028; Tue, 1 Mar 2022 03:03:52 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Matthew Wilcox' <willy@infradead.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-CC:     =?iso-8859-1?Q?Christian_K=F6nig?= <christian.koenig@amd.com>,
-        "Jakob Koschel" <jakobkoschel@gmail.com>,
-        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
-        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
-        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux1394-devel@lists.sourceforge.net" 
-        <linux1394-devel@lists.sourceforge.net>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
-        "Bos, H.J." <h.j.bos@vu.nl>, Jason Gunthorpe <jgg@ziepe.ca>,
-        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-        "kgdb-bugreport@lists.sourceforge.net" 
-        <kgdb-bugreport@lists.sourceforge.net>,
-        "bcm-kernel-feedback-list@broadcom.com" 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        "Arnd Bergman" <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        "v9fs-developer@lists.sourceforge.net" 
-        <v9fs-developer@lists.sourceforge.net>,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Linux F2FS Dev Mailing List" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Thread-Topic: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Thread-Index: AQHYLOAn+DU/OogLf0+tiSFmjztyUKyp1n9A
-Date:   Tue, 1 Mar 2022 03:03:52 +0000
-Message-ID: <198022f201814cdc9384ef083741185e@AcuMS.aculab.com>
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com>
- <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
- <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
- <Yh0tl3Lni4weIMkl@casper.infradead.org>
-In-Reply-To: <Yh0tl3Lni4weIMkl@casper.infradead.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        with ESMTP id S230021AbiCAEPV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Feb 2022 23:15:21 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E4D12612
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Feb 2022 20:14:40 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id 12so13420220pgd.0
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Feb 2022 20:14:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2WOOrNgu/4waRHpgeE8ItroxnZ75K4bN3bPZXcqdM/s=;
+        b=iVR62Ph82p6yttDHLy4q7W5PMHWMVksi0PfdvMEAOQdHUr/7nWJCQr5JmgmcSbbDZW
+         1bOM1HC4UX8lmiokRNIWmOmUIitpD+tWBzM47tqTt+lfwTkxbl0w9n71I8BM2dWSObh/
+         AlQzORAsWprj+9Dr2vBi1Sb1p7p4bG8UtvBH8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2WOOrNgu/4waRHpgeE8ItroxnZ75K4bN3bPZXcqdM/s=;
+        b=MCPuzW6H9l0hLLVco63QtrW1PNJNIjz6fvlRibtWDnjGdWP6mzSHQnL4lbO3hm7nxl
+         SNEKPvWqsuYJawrNAf89yuEFgXdhp6Izsv81Xb8QpiK8uX+RBH/JfdgnlIBQG2h6Ja/V
+         IzEVDrbqp+B1R/+Y+0jra2z5LAo8H/pjdK2kDvu9AfOx5Tjr3Gb5eT3ujjmZ7kJVDfYm
+         Plr+hKAdz7qzLEJl+UY2zjwnXF6xQhpQXfGuWn/+DrtuNXypPeaOCnqrH5pnr02NvUyy
+         zVvsac+vI1JM9t3AyOWzEZvHtPadrp7NEyl6rE3zrpXXv+vwgcmZR+38Jn1lPMH0mIGF
+         JE/A==
+X-Gm-Message-State: AOAM531czshtmgNwbBLq32ZgBKLhqLPGw1vtoBdqMKai8fhnuyV0/0XY
+        Fz8OE3iaCkxlAjUx6MnRacT6+qispXL0+A==
+X-Google-Smtp-Source: ABdhPJyBnuFWEJilTVDO/nWyocXEsLWJ+qGQkYdVDAVLHnhru2I7QfSXzKFRf7Hg1HUWGc/fM6wB8A==
+X-Received: by 2002:a63:724b:0:b0:378:7967:e45c with SMTP id c11-20020a63724b000000b003787967e45cmr10652509pgn.602.1646108080185;
+        Mon, 28 Feb 2022 20:14:40 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:95ec:e94d:ec6b:6068])
+        by smtp.gmail.com with ESMTPSA id bo10-20020a17090b090a00b001bc8405bd55sm738300pjb.30.2022.02.28.20.14.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Feb 2022 20:14:39 -0800 (PST)
+Date:   Tue, 1 Mar 2022 13:14:34 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
+        Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH 2/4] ksmbd: remove filename in ksmbd_file
+Message-ID: <Yh2dqrb6SrOlWL9t@google.com>
+References: <20220228234833.10434-1-linkinjeon@kernel.org>
+ <20220228234833.10434-2-linkinjeon@kernel.org>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220228234833.10434-2-linkinjeon@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Matthew Wilcox
-> Sent: 28 February 2022 20:16
-> 
-> On Mon, Feb 28, 2022 at 12:10:24PM -0800, Linus Torvalds wrote:
-> > We can do
-> >
-> >         typeof(pos) pos
-> >
-> > in the 'for ()' loop, and never use __iter at all.
-> >
-> > That means that inside the for-loop, we use a _different_ 'pos' than outside.
-> 
-> Then we can never use -Wshadow ;-(  I'd love to be able to turn it on;
-> it catches real bugs.
-> 
-> > +#define list_for_each_entry(pos, head, member)					\
-> > +	for (typeof(pos) pos = list_first_entry(head, typeof(*pos), member);	\
-> > +	     !list_entry_is_head(pos, head, member);	\
-> >  	     pos = list_next_entry(pos, member))
+On (22/03/01 08:48), Namjae Jeon wrote:
+> -char *convert_to_nt_pathname(char *filename)
+> +char *convert_to_nt_pathname(struct ksmbd_share_config *share,
+> +			     struct path *path)
+>  {
+> -	char *ab_pathname;
+> +	char *pathname, *ab_pathname, *nt_pathname = NULL;
+> +	int share_path_len = strlen(share->path);
+>  
+> -	if (strlen(filename) == 0)
+> -		filename = "\\";
+> +	pathname = kmalloc(PATH_MAX, GFP_KERNEL);
+> +	if (!pathname)
+> +		return ERR_PTR(-EACCES);
+>  
+> -	ab_pathname = kstrdup(filename, GFP_KERNEL);
+> -	if (!ab_pathname)
+> -		return NULL;
+> +	ab_pathname = d_path(path, pathname, PATH_MAX);
+> +	if (IS_ERR(ab_pathname)) {
+> +		nt_pathname = ERR_PTR(-EACCES);
+> +		goto free_pathname;
+> +	}
+> +
+> +	if (strncmp(ab_pathname, share->path, share_path_len)) {
+> +		nt_pathname = ERR_PTR(-EACCES);
+> +		goto free_pathname;
+> +	}
+> +
+> +	nt_pathname = kzalloc(strlen(&ab_pathname[share_path_len]) + 1, GFP_KERNEL);
+> +	if (!nt_pathname) {
+> +		nt_pathname = ERR_PTR(-ENOMEM);
+> +		goto free_pathname;
+> +	}
+> +	if (ab_pathname[share_path_len] == '\0')
+> +		strcpy(nt_pathname, "/");
+> +	strcat(nt_pathname, &ab_pathname[share_path_len]);
+> +
+> +	ksmbd_conv_path_to_windows(nt_pathname);
+>  
+> -	ksmbd_conv_path_to_windows(ab_pathname);
+> -	return ab_pathname;
+> +free_pathname:
+> +	kfree(pathname);
+> +	return nt_pathname;
+>  }
 
-Actually can't you use 'pos' to temporarily hold the address of 'member'.
-Something like:
-	for (pos = (void *)head; \
-		pos ? ((pos = (void *)pos - offsetof(member)), 1) : 0; \
-		pos = (void *)pos->next)
-So that 'pos' is NULL if the loop terminates.
-No pointers outside structures are generated.
-Probably need to kill list_entry_is_head() - or it just checks for NULL.
+convert_to_nt_pathname() can return NULL
 
-	David
+> +	filename = convert_to_nt_pathname(work->tcon->share_conf, &fp->filp->f_path);
+> +	if (IS_ERR(filename))
+> +		return PTR_ERR(filename);
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+I don't think this will catch NULL nt_pathname return.
