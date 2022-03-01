@@ -2,101 +2,66 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8D1C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue,  1 Mar 2022 08:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 244D3C433FE
+	for <linux-cifs@archiver.kernel.org>; Tue,  1 Mar 2022 09:39:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230314AbiCAIlL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 1 Mar 2022 03:41:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50136 "EHLO
+        id S231645AbiCAJkD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 1 Mar 2022 04:40:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232077AbiCAIlK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Mar 2022 03:41:10 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482CD888D6;
-        Tue,  1 Mar 2022 00:40:29 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S233665AbiCAJkB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Mar 2022 04:40:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ED79145523
+        for <linux-cifs@vger.kernel.org>; Tue,  1 Mar 2022 01:39:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646127560;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pTzdsYa5YSVczKzUN4WM0G6s7Arj4BQWQDc4bwTJlys=;
+        b=S0MEP1AJnwyxnzSoFaOsCI/LXcBrKKAUcE7GTzLUqnQ4VATD5LwEvvL0EiJNhdaqkyF8Ec
+        4M0/SLCJ0nA9MlNz1g6XMn31cg0W/JNdec9BU1ShOh9Iht+y9SbpQ5C51lbr1nZcBqN63w
+        t0cXloift7CUXsPHJuoG3XBSygYPrak=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-502-RvHXMJnANwOEE6MCenBbTQ-1; Tue, 01 Mar 2022 04:39:18 -0500
+X-MC-Unique: RvHXMJnANwOEE6MCenBbTQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8FEDB6147A;
-        Tue,  1 Mar 2022 08:40:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1134C340EE;
-        Tue,  1 Mar 2022 08:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646124029;
-        bh=WL/IYhFRSmf+n/SVEgXVr+y6kldvUj1aMHyALkZb0PA=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=b4ziXgSG02Hlfmj6+7pwwO2SjoI0bkotabqY1PCl7pbPkrZ6DFRO72pl9Gkip/aY8
-         NkEt4zSyGWpW4SlDdDxFwwCFf7aw7+pcpXK1bTYfMaDFehZPcmu83Og3Qh8jRAriOE
-         RihBHWC2UdKamBfR5UR8K8540TgNbNRdfN+fI7pp52sUvcm9QcRNRCbgk6dEKt3pdE
-         2Nl/GiyR0Mul5PQ4V/EmwbLoQ8AXQBsdiGhanY7mxi7wSjjNw4Nmgolj+3EJiizkJv
-         aLWv+bNXIAZL3TyQMBat/OUF6rcpRPnzDGzKW1cu4jO5aolZAeKVDQrLaQZZ23OALC
-         iFFppbPIxeLWQ==
-Received: by mail-wr1-f43.google.com with SMTP id m6so2004795wrr.10;
-        Tue, 01 Mar 2022 00:40:28 -0800 (PST)
-X-Gm-Message-State: AOAM531Frb3LNDsB3R28x443ZaZxbcmmtUITc+fvVfejE6lU5KrJZmTm
-        qAAwq6jilr/U/5HXt9snisZYfcsql6wUsPPNADQ=
-X-Google-Smtp-Source: ABdhPJx57/Hyy0tOwGXp8yUIubw0RqZ2cDGbUQOG7BKmdDTEzN3EXrztAhBZF4H+gDOXu3QIwtZLrC6SLapXviDGTAY=
-X-Received: by 2002:a5d:4ad1:0:b0:1ef:9481:f343 with SMTP id
- y17-20020a5d4ad1000000b001ef9481f343mr9552893wrs.165.1646124027296; Tue, 01
- Mar 2022 00:40:27 -0800 (PST)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 407E7FC80;
+        Tue,  1 Mar 2022 09:39:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.37.0])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 783E083199;
+        Tue,  1 Mar 2022 09:39:12 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CACdtm0aZnQLyduKxr9dhcpYB_r00UFnR=WQvAnqL0DebxgbrOw@mail.gmail.com>
+References: <CACdtm0aZnQLyduKxr9dhcpYB_r00UFnR=WQvAnqL0DebxgbrOw@mail.gmail.com> <164311902471.2806745.10187041199819525677.stgit@warthog.procyon.org.uk> <164311919732.2806745.2743328800847071763.stgit@warthog.procyon.org.uk> <CACdtm0YtxAUMet_PSxpg69OR9_TQbMQOzU5Kbm_5YDe_C7Nb-w@mail.gmail.com> <3013921.1644856403@warthog.procyon.org.uk> <CACdtm0Z4zXpbPBLJx-=AgBRd63hp_n+U-5qc0gQDQW0c2PY7gg@mail.gmail.com> <2498968.1646058507@warthog.procyon.org.uk>
+To:     Rohith Surabattula <rohiths.msft@gmail.com>
+Cc:     dhowells@redhat.com, smfrench@gmail.com, nspmangalore@gmail.com,
+        jlayton@kernel.org, linux-cifs@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC PATCH 7/7] cifs: Use netfslib to handle reads
 MIME-Version: 1.0
-Received: by 2002:a5d:4e02:0:0:0:0:0 with HTTP; Tue, 1 Mar 2022 00:40:26 -0800 (PST)
-In-Reply-To: <Yh2fY6F8n/8KvMEH@google.com>
-References: <20220228234833.10434-1-linkinjeon@kernel.org> <20220228234833.10434-3-linkinjeon@kernel.org>
- <Yh2fY6F8n/8KvMEH@google.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 1 Mar 2022 17:40:26 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-RutZ6m4kD6LBYGfShU+X+aQw9rhhtQQHCzC7j3hQtHg@mail.gmail.com>
-Message-ID: <CAKYAXd-RutZ6m4kD6LBYGfShU+X+aQw9rhhtQQHCzC7j3hQtHg@mail.gmail.com>
-Subject: Re: [PATCH 3/4] ksmbd: increment reference count of parent fp
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        smfrench@gmail.com, hyc.lee@gmail.com,
-        Al Viro <viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2568724.1646127551.1@warthog.procyon.org.uk>
+Date:   Tue, 01 Mar 2022 09:39:11 +0000
+Message-ID: <2568725.1646127551@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-03-01 13:21 GMT+09:00, Sergey Senozhatsky <senozhatsky@chromium.org>:
-> On (22/03/01 08:48), Namjae Jeon wrote:
->> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->> index 3151ab7d7410..03c3733e54e4 100644
->> --- a/fs/ksmbd/smb2pdu.c
->> +++ b/fs/ksmbd/smb2pdu.c
->> @@ -5764,8 +5764,10 @@ static int set_rename_info(struct ksmbd_work *work,
->> struct ksmbd_file *fp,
->>  	if (parent_fp) {
->>  		if (parent_fp->daccess & FILE_DELETE_LE) {
->>  			pr_err("parent dir is opened with delete access\n");
->> +			ksmbd_fd_put(work, parent_fp);
->>  			return -ESHARE;
->>  		}
->> +		ksmbd_fd_put(work, parent_fp);
->>  	}
->
-> And also in ksmbd_validate_entry_in_use()?
-ksmbd_validate_entry_in_use() is removed in 4/4 patch.
-I need to change the order of the patches to avoid confusion.
+Btw, do you have any changes on top of my cifs-experimental branch?
 
-Thanks!
->
->>  next:
->>  	return smb2_rename(work, fp, user_ns, rename_info,
->> diff --git a/fs/ksmbd/vfs_cache.c b/fs/ksmbd/vfs_cache.c
->> index 0974d2e972b9..c4d59d2735f0 100644
->> --- a/fs/ksmbd/vfs_cache.c
->> +++ b/fs/ksmbd/vfs_cache.c
->> @@ -496,6 +496,7 @@ struct ksmbd_file *ksmbd_lookup_fd_inode(struct inode
->> *inode)
->>  	list_for_each_entry(lfp, &ci->m_fp_list, node) {
->>  		if (inode == file_inode(lfp->filp)) {
->>  			atomic_dec(&ci->m_count);
->> +			lfp = ksmbd_fp_get(lfp);
->>  			read_unlock(&ci->m_lock);
->>  			return lfp;
->>  		}
->> --
->> 2.25.1
->>
->
+Also, what commands are you running to test it?  I see you're using 'vi' - is
+it possible that vi is opening the file O_RDWR?
+
+David
+
