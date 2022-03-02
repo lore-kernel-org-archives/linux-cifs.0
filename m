@@ -2,229 +2,177 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 985BEC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Mar 2022 07:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8BAC4321E
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Mar 2022 09:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231142AbiCBH6J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Mar 2022 02:58:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37590 "EHLO
+        id S240436AbiCBJaW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Mar 2022 04:30:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237740AbiCBH6G (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 02:58:06 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A365CB43
-        for <linux-cifs@vger.kernel.org>; Tue,  1 Mar 2022 23:57:22 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id a8so1875633ejc.8
-        for <linux-cifs@vger.kernel.org>; Tue, 01 Mar 2022 23:57:22 -0800 (PST)
+        with ESMTP id S240457AbiCBJaV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 04:30:21 -0500
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8197FB8212
+        for <linux-cifs@vger.kernel.org>; Wed,  2 Mar 2022 01:29:36 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id o6so1395761ljp.3
+        for <linux-cifs@vger.kernel.org>; Wed, 02 Mar 2022 01:29:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c34cIaLI1PnKUQ4CoQk1O/A4OcKXNkTPVxjm7VM0/GA=;
-        b=DuCS7l9Po2w3OW9w8m8GPyCCLNxHM9xXofbY1/xKLNti5sLyeJetwk66z+GH1eOyEx
-         IV21DMNgDSHoipW8Pw1SUIIKbzM0RmeIrQouqcKEdtVujIkhXJwK7CI0idEbLTvtTZLK
-         6sLxsezktFPu2mtybG1yln8DafxSZF3iDlqv4au0oMS+Ht+iZGq97r4vDdPjBn/YvuBJ
-         KlAZItgNI0S0weCuajRXzfsQYK09fHYQiedlCvACJ2TsbqVotOa8ndJXVFJykiOR8N6M
-         eJEZGpT3e1OcDQ6+2NPgKPYTdjTNSdYy1UNEEYem2XLsOXjJzGMCm3cQqwO12X57jHxC
-         UvZw==
+        d=rasmusvillemoes.dk; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=XH8CYV/Z50iBLZ27uSo3DlVY0KhJ8ZO+RiecWTcYel0=;
+        b=IQg4uBejV+wOE9gbvRPz3nvi4LkiiVw4YSIjC8NPteocLXX0uLpiZyGXJ60leACu72
+         E2mMgbaj2BDeYnhoOw0DKPRcT2bjIlB4yRTWQZ65OcYRTHhlWzgeq8LyFprIEpiij6N8
+         YNaymndxJaFKphqyYHlKdyPolm4uaJOX+WJuI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c34cIaLI1PnKUQ4CoQk1O/A4OcKXNkTPVxjm7VM0/GA=;
-        b=ZLLIy9ht6Urx5TLIWhhaVvnlEKJk97L2+GDOxOcoJGltwpjbsw2E12oDJAVeikYu/x
-         dkTvbSCBFHNotEKwhM/1qBgV6yXRH6VbI+Ph/w8tJBR0XvXWDUogvaHEIxQkCFFfufPV
-         Fm9mS4/PEQksctLg2VD0M6vEvWltNJQB3Ad+miikStnleH11rDyZBtlFUt7tK4IUbvM2
-         l2xxu/2WAIU/o7E/Nh5hr3mrY46UYA1+z4Bmkj+cgdL+yxlGc9/3iuu866Jkf146W37B
-         hoGDRbvEXodCJY5o+W1l9pL87+q1m5GVOxefiR/S9efqhiQa/u8Bj6b+V/5IAMqN71Ow
-         Ay9w==
-X-Gm-Message-State: AOAM531PnF/MUbkv0Kq8IBfo9Zk8WMh2ER6+sD6zJ4Rzic7jNHrw7xI2
-        B3oXK0sKjFk/3EJEzVRn12TkCjoRyCNjhxEyQKU=
-X-Google-Smtp-Source: ABdhPJwYz+Hsktt6MrZavdqMi+nJJegJ4b8ukBIKJMpuPPZQKJpGz55rpg4wmKeD98KtOFgycGMjUZA9rDQVLxjNzeU=
-X-Received: by 2002:a17:907:9057:b0:6cf:d288:c9ee with SMTP id
- az23-20020a170907905700b006cfd288c9eemr21221499ejc.169.1646207840955; Tue, 01
- Mar 2022 23:57:20 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=XH8CYV/Z50iBLZ27uSo3DlVY0KhJ8ZO+RiecWTcYel0=;
+        b=2+u10BSifL64IQEcvkmpfUQCWCx8myKLKVMv+qU+f+iV5uFzX160AlS2Dd07D9sT5S
+         uAEouipiUr7eA5AhZSLfwZgMhxYtH+wH0XcjmUX0jp9ip0udOKw8dia9PQB6J5gm7uoD
+         uS/gkbIGxdHYd2AdOiCvqV4DWAcAFpA8g4f4r7dh6G6W+QABu5CJ+BFOMvprDmRnCeb8
+         qpKvWlFXUCjDDh6kZdmFyuuMB546U/9Q+mTUs/+pwaUyVtkJKcsXw14fjNmvYcalJRf4
+         mRqgIYGhvqPiejz0m9BYhIzeArnw8MxlIA5i1/Y84SQMwpC4M8tmj5Fx1pv99r50vjCY
+         OBig==
+X-Gm-Message-State: AOAM5306xkuq791jMZ87yiAfkU0+KYiVloPcJYgDPDsP7KugtUHFXGLM
+        KjvWZ8eSP5bI9X+RYTZ+irYq0Q==
+X-Google-Smtp-Source: ABdhPJxPRWTwhfDKGEWi/HTZUmtnN6xoKL1T2KNwEAF9KgB2sMMXSt6lke7BfBVtPRIEaNMyntkyzw==
+X-Received: by 2002:a2e:3c0d:0:b0:246:3c52:7ada with SMTP id j13-20020a2e3c0d000000b002463c527adamr19885072lja.459.1646213374808;
+        Wed, 02 Mar 2022 01:29:34 -0800 (PST)
+Received: from [172.16.11.74] ([81.216.59.226])
+        by smtp.gmail.com with ESMTPSA id f36-20020a0565123b2400b0043795432e87sm1960430lfv.150.2022.03.02.01.29.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Mar 2022 01:29:33 -0800 (PST)
+Message-ID: <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
+Date:   Wed, 2 Mar 2022 10:29:31 +0100
 MIME-Version: 1.0
-References: <CAFrh3J9soC36+BVuwHB=g9z_KB5Og2+p2_W+BBoBOZveErz14w@mail.gmail.com>
- <eae5c0cc-55d1-f8db-aba0-57cee7f10332@leemhuis.info> <CAH2r5msUiBuZ74_nPVyzn=k=g0ELpcMnoTm_z30zrMSxF4sn1A@mail.gmail.com>
- <CAFrh3J-oOR1FxPrpzKsQQvronyk9fhDSqD2CY5DNsYO5Lt0ydg@mail.gmail.com>
- <CAFrh3J-TOW4JG6QND0nz_9asiv2g0DzPmxR68BBB_an9yAQ+Vw@mail.gmail.com> <CAFrh3J83sUd3tQYHzssKoBb4uQXd3MXf9e=4jLsJ9aH7z2B3oA@mail.gmail.com>
-In-Reply-To: <CAFrh3J83sUd3tQYHzssKoBb4uQXd3MXf9e=4jLsJ9aH7z2B3oA@mail.gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 2 Mar 2022 13:27:09 +0530
-Message-ID: <CANT5p=qvrV5mrE8dN=RAmCBefGd4_3BzTfM7U98eqmZN2ZVjEg@mail.gmail.com>
-Subject: Re: Failure to access cifs mount of samba share after resume from
- sleep with 5.17-rc5
-To:     Satadru Pramanik <satadru@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Thorsten Leemhuis <regressions@leemhuis.info>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        David Laight <David.Laight@aculab.com>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        "linux1394-devel@lists.sourceforge.net" 
+        <linux1394-devel@lists.sourceforge.net>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+        "kgdb-bugreport@lists.sourceforge.net" 
+        <kgdb-bugreport@lists.sourceforge.net>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        "v9fs-developer@lists.sourceforge.net" 
+        <v9fs-developer@lists.sourceforge.net>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Mike Rapoport <rppt@kernel.org>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com>
+ <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com>
+ <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
+ <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
+ <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+ <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
+ <7dc860874d434d2288f36730d8ea3312@AcuMS.aculab.com>
+ <CAHk-=whKqg89zu4T95+ctY-hocR6kDArpo2qO14-kV40Ga7ufw@mail.gmail.com>
+ <0ced2b155b984882b39e895f0211037c@AcuMS.aculab.com>
+ <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
+In-Reply-To: <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Mar 2, 2022 at 3:51 AM Satadru Pramanik <satadru@gmail.com> wrote:
->
-> I have put the trace.dat and other debug files here since I can not
-> attach the files to a message to the list. (Apparently the trace.dat
-> file is too large.)
->
-> https://drive.google.com/drive/folders/1wEi968RbXxivXMMH8J7XUsHhrxu9OWDX?usp=sharing
->
-> On Mon, Feb 28, 2022 at 11:12 PM Satadru Pramanik <satadru@gmail.com> wrote:
-> >
-> > The trace.dat file is attached, covering the period before suspend,
-> > and through wake several hours later, when the mount no longer worked,
-> > and showed the CIFS: VFS: cifs_tree_connect: could not find
-> > superblock: -22 message, and through when I unmounted and remounted
-> > the share, which then started working.
-> >
-> > On Mon, Feb 28, 2022 at 9:31 AM Satadru Pramanik <satadru@gmail.com> wrote:
-> > >
-> > > Here is the DebugData from before and after from the system with the
-> > > failed mount.
-> > > Both systems are now running 5.17-rc6.
-> > >
-> > > Working on the trace-cmd now.
-> > >
-> > > On Sun, Feb 27, 2022 at 9:37 PM Steve French <smfrench@gmail.com> wrote:
-> > > >
-> > > > I would like to see the output of:
-> > > >
-> > > > /proc/fs/cifs/DebugData before and after the failure if possible.
-> > > >
-> > > > In addition, there would be some value in seeing trace information
-> > > > (e.g start tracing by
-> > > > "trace-cmd record -e cifs" before the failure and then forward the
-> > > > debug information displayed by "trace-cmd show" after the failure)
-> > > >
-> > > > On Sun, Feb 27, 2022 at 7:55 AM Thorsten Leemhuis
-> > > > <regressions@leemhuis.info> wrote:
-> > > > >
-> > > > > [TLDR: I'm adding the regression report below to regzbot, the Linux
-> > > > > kernel regression tracking bot; all text you find below is compiled from
-> > > > > a few templates paragraphs you might have encountered already already
-> > > > > from similar mails.]
-> > > > >
-> > > > > Hi, this is your Linux kernel regression tracker. Top-posting for once,
-> > > > > to make this easily accessible to everyone.
-> > > > >
-> > > > > CCing the regression mailing list, as it should be in the loop for all
-> > > > > regressions, as explained here:
-> > > > > https://www.kernel.org/doc/html/latest/admin-guide/reporting-issues.html
-> > > > >
-> > > > > To be sure below issue doesn't fall through the cracks unnoticed, I'm
-> > > > > adding it to regzbot, my Linux kernel regression tracking bot:
-> > > > >
-> > > > > #regzbot ^introduced v5.16.11..v5.17-rc5
-> > > > > #regzbot title cifs: Failure to access cifs mount of samba share after
-> > > > > resume from sleep
-> > > > > #regzbot ignore-activity
-> > > > >
-> > > > > Reminder for developers: when fixing the issue, please add a 'Link:'
-> > > > > tags pointing to the report (the mail quoted above) using
-> > > > > lore.kernel.org/r/, as explained in
-> > > > > 'Documentation/process/submitting-patches.rst' and
-> > > > > 'Documentation/process/5.Posting.rst'. This allows the bot to connect
-> > > > > the report with any patches posted or committed to fix the issue; this
-> > > > > again allows the bot to show the current status of regressions and
-> > > > > automatically resolve the issue when the fix hits the right tree.
-> > > > >
-> > > > > I'm sending this to everyone that got the initial report, to make them
-> > > > > aware of the tracking. I also hope that messages like this motivate
-> > > > > people to directly get at least the regression mailing list and ideally
-> > > > > even regzbot involved when dealing with regressions, as messages like
-> > > > > this wouldn't be needed then. And don't worry, if I need to send other
-> > > > > mails regarding this regression only relevant for regzbot I'll send them
-> > > > > to the regressions lists only (with a tag in the subject so people can
-> > > > > filter them away). With a bit of luck no such messages will be needed
-> > > > > anyway.
-> > > > >
-> > > > > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> > > > >
-> > > > > P.S.: As the Linux kernel's regression tracker I'm getting a lot of
-> > > > > reports on my table. I can only look briefly into most of them and lack
-> > > > > knowledge about most of the areas they concern. I thus unfortunately
-> > > > > will sometimes get things wrong or miss something important. I hope
-> > > > > that's not the case here; if you think it is, don't hesitate to tell me
-> > > > > in a public reply, it's in everyone's interest to set the public record
-> > > > > straight.
-> > > > >
-> > > > >
-> > > > > On 27.02.22 03:36, Satadru Pramanik wrote:
-> > > > > > I'm on a x86_64 ubuntu 22.04 system accessing a similar system running
-> > > > > > samba Version 4.13.14-Ubuntu. Both systems are on ubuntu mainline
-> > > > > > kernel 5.17-rc5.
-> > > > > >
-> > > > > > I have a samba share mounted from my fstab, and file access works fine.
-> > > > > > Upon suspending my system and resuming though, the mounted samba share
-> > > > > > is inaccessible, and my dmesg has many "CIFS: VFS: cifs_tree_connect:
-> > > > > > could not find superblock: -22" messages.
-> > > > > >
-> > > > > > Unmounting and remounting the share restores access.
-> > > > > >
-> > > > > > When I boot into kernel 5.16.11, I do not have this issue. The cifs
-> > > > > > share is accessible just fine after a suspend/resume cycle.
-> > > > > >
-> > > > > > I assume this is a regression with 5.17? Is there any information
-> > > > > > worth providing which might help debug and fix this issue?
-> > > > > >
-> > > > > > Regards,
-> > > > > >
-> > > > > > Satadru Pramanik
-> > > > >
-> > > > > --
-> > > > > Additional information about regzbot:
-> > > > >
-> > > > > If you want to know more about regzbot, check out its web-interface, the
-> > > > > getting start guide, and the references documentation:
-> > > > >
-> > > > > https://linux-regtracking.leemhuis.info/regzbot/
-> > > > > https://gitlab.com/knurd42/regzbot/-/blob/main/docs/getting_started.md
-> > > > > https://gitlab.com/knurd42/regzbot/-/blob/main/docs/reference.md
-> > > > >
-> > > > > The last two documents will explain how you can interact with regzbot
-> > > > > yourself if your want to.
-> > > > >
-> > > > > Hint for reporters: when reporting a regression it's in your interest to
-> > > > > CC the regression list and tell regzbot about the issue, as that ensures
-> > > > > the regression makes it onto the radar of the Linux kernel's regression
-> > > > > tracker -- that's in your interest, as it ensures your report won't fall
-> > > > > through the cracks unnoticed.
-> > > > >
-> > > > > Hint for developers: you normally don't need to care about regzbot once
-> > > > > it's involved. Fix the issue as you normally would, just remember to
-> > > > > include 'Link:' tag in the patch descriptions pointing to all reports
-> > > > > about the issue. This has been expected from developers even before
-> > > > > regzbot showed up for reasons explained in
-> > > > > 'Documentation/process/submitting-patches.rst' and
-> > > > > 'Documentation/process/5.Posting.rst'.
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Thanks,
-> > > >
-> > > > Steve
+On 02/03/2022 00.55, Linus Torvalds wrote:
+> On Tue, Mar 1, 2022 at 3:19 PM David Laight <David.Laight@aculab.com> wrote:
+>>
 
-The DebugData shows that the connection and smb session are fine, but
-the tree connect is not in a good state.
-Similarly, the trace output shows that connection was reconnected
-successfully, SMB session was reconnected as well. However, the tree
-connect did not go over the wire.
+> With the "don't use iterator outside the loop" approach, the exact
+> same code works in both the old world order and the new world order,
+> and you don't have the semantic confusion. And *if* you try to use the
+> iterator outside the loop, you'll _mostly_ (*) get a compiler warning
+> about it not being initialized.
+> 
+>              Linus
+> 
+> (*) Unless somebody initializes the iterator pointer pointlessly.
+> Which clearly does happen. Thus the "mostly". It's not perfect, and
+> that's most definitely not nice - but it should at least hopefully
+> make it that much harder to mess up.
 
-> The trace.dat file is attached, covering the period before suspend,
-> and through wake several hours later, when the mount no longer worked,
-> and showed the CIFS: VFS: cifs_tree_connect: could not find
-> superblock: -22 message, and through when I unmounted and remounted
-> the share, which then started working.
+This won't help the current issue (because it doesn't exist and might
+never), but just in case some compiler people are listening, I'd like to
+have some sort of way to tell the compiler "treat this variable as
+uninitialized from here on". So one could do
 
-This suggests to me that the cifs_tcp_get_super is failing.
-This is odd, since it looks up the server as pointers.
-Did we start undercounting the ref count somewhere?
+#define kfree(p) do { __kfree(p); __magic_uninit(p); } while (0)
 
--- 
-Regards,
-Shyam
+with __magic_uninit being a magic no-op that doesn't affect the
+semantics of the code, but could be used by the compiler's "[is/may be]
+used uninitialized" machinery to flag e.g. double frees on some odd
+error path etc. It would probably only work for local automatic
+variables, but it should be possible to just ignore the hint if p is
+some expression like foo->bar or has side effects. If we had that, the
+end-of-loop test could include that to "uninitialize" the iterator.
+
+Maybe sparse/smatch or some other static analyzer could implement such a
+magic thing? Maybe it's better as a function attribute
+[__attribute__((uninitializes(1)))] to avoid having to macrofy all
+functions that release resources.
+
+Rasmus
