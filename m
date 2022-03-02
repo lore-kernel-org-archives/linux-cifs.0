@@ -2,177 +2,159 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F74C4332F
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Mar 2022 09:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E244C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Mar 2022 11:05:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236727AbiCBJcP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Mar 2022 04:32:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42232 "EHLO
+        id S233035AbiCBLGF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Mar 2022 06:06:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234241AbiCBJcO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 04:32:14 -0500
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BC44B82C6;
-        Wed,  2 Mar 2022 01:31:31 -0800 (PST)
-Received: by mail-pf1-x442.google.com with SMTP id g21so1381278pfj.11;
-        Wed, 02 Mar 2022 01:31:31 -0800 (PST)
+        with ESMTP id S231533AbiCBLGE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 06:06:04 -0500
+Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B6A3CFC3
+        for <linux-cifs@vger.kernel.org>; Wed,  2 Mar 2022 03:05:21 -0800 (PST)
+Received: by mail-vs1-xe31.google.com with SMTP id j3so1410475vsi.7
+        for <linux-cifs@vger.kernel.org>; Wed, 02 Mar 2022 03:05:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=yRnvPGVK9XQdKYPg/H0ecgdZJeSxpiKw/X1pv37GC+w=;
-        b=FSwFYVuD0cAwR74FpWh/UVnJlZEuhHuzmEJF2CmWuTU5VQk08y1iQ6Cm+4Kk/IHZ7f
-         ykn4dSn+LtVJ/QNPcAOF0Kr9OP0uyQbpGUjZhyE2BsGEuIYzlTgMZwHl/BYpjMpkMG0+
-         P9mnuSE0YONb1xqLwPVeO/elgzKWhvv7I7OGEBThyQYghI00EIr5RS9MGp7GsCYrqLUi
-         wR7dcG4fdae3Ke7WyU9tBlNyUPSMcC8RmnmBsmKYAmxRcsIUhLqhpYW4uCJTlnf3AogC
-         YxEVbABh4/fwCz1Lhf2xi5Cnii6w5cwNjqEkAadiEwyP0C/cLXPnnAaLLll6ns+CdAHq
-         Ceuw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mcjbdWWiFvvsQk+lWzyVsWoNL1cENXl918noct1y1Hk=;
+        b=eO13Q60mYA0e+fcfipkuhNnHyYGn1+/Z87ZXBxrUNEHxUvLnL/JEzOGzO12IrkrfG4
+         VtGFWScJjrQHZVHkgMJ2Ua0fXe5YWgg6RCE3Zdnp4jTmINoXNsrachz3ZtEuNuhdIjtH
+         H16FbmO8Rht7w5fPKdc3Uj2sOJYkSQWXGIA9ESBOvZ6/POwHvEd8vYQZmFfJO0uIQIyN
+         90uCSKn4qSnJoikrhbxFNP6gue6wNwlt/USZcZu407aPlFcFDUxOi5SK1MbS9CeNS9ea
+         7GgIK4H1v8bCV+7o/Ucb/JmBjcAvFKEn2c6+Jf2BVFQZSzXQ08GoB4W6hBlTZw8g1Lpm
+         nyOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=yRnvPGVK9XQdKYPg/H0ecgdZJeSxpiKw/X1pv37GC+w=;
-        b=25yx3bE7Tdrh/FIfqtXGWF61WwqDjC5WxWRj3uOQy+xFnOnfSJl4gpSITPKOL6ppvz
-         xr1P/lP+YEIjzKBbNpn03p1MRiNHMFQej41PCQiM7ZYsONScWzARDV9MTLbKYCaJYJKQ
-         0PMbmVDfkgxq+NGUQ/4L1sjWJCqawtx0WZc8uvOruTsaRxv/JHUoXdW3juEItsMZijYe
-         x2y+YeZzcxjNVO2IQiv/vTcoq57n/NERNBTqppUmx/bB0aCArn2Ue28JJCF3twXdYp3U
-         vU+mkukYaeKpIEfnGoPctJjIVuyPhmzcWRY3JAuBB5C9SBIozZ19ogGvwbwxCHlWpuG7
-         k/Jw==
-X-Gm-Message-State: AOAM531WtYP64z3jF1qFTFjDxv9zG3DFlHc4cRXPthGe4IdA63Ho0KnG
-        GBKdtpGAym33H9R0xGshBiw=
-X-Google-Smtp-Source: ABdhPJxxYDNcbSMxl56+YduSTiv9ULKN3/PKEO9PEtlxvCfSyuhc7esxotc8paaSBF6ReGk5V/MJxQ==
-X-Received: by 2002:a05:6a00:244b:b0:4c9:319e:ecb7 with SMTP id d11-20020a056a00244b00b004c9319eecb7mr31990006pfj.58.1646213490674;
-        Wed, 02 Mar 2022 01:31:30 -0800 (PST)
-Received: from ubuntu.huawei.com ([119.3.119.20])
-        by smtp.googlemail.com with ESMTPSA id y74-20020a62644d000000b004f129e94f40sm19496506pfb.131.2022.03.02.01.31.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 01:31:30 -0800 (PST)
-From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
-To:     torvalds@linux-foundation.org
-Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
-        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
-        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
-        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
-        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
-        dan.carpenter@oracle.com, dmaengine@vger.kernel.org,
-        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
-        gustavo@embeddedor.com, h.j.bos@vu.nl,
-        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
-        jakobkoschel@gmail.com, jgg@ziepe.ca, keescook@chromium.org,
-        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
-        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
-        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
-        rppt@kernel.org, samba-technical@lists.samba.org,
-        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
-        v9fs-developer@lists.sourceforge.net
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
-Date:   Wed,  2 Mar 2022 17:31:06 +0800
-Message-Id: <20220302093106.8402-1-xiam0nd.tong@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
-References: <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mcjbdWWiFvvsQk+lWzyVsWoNL1cENXl918noct1y1Hk=;
+        b=xAdkVs8l/Zi+NpP/tLb6bMKGkJTvsC8RKT/h8e7yr7WflJ9jcG0betta2SG8N4dhjj
+         qFXbDbvTTE0/nyLIPK0i7jEJSrg8c72uWgHM/tQhRfM8RbyVbB++OlbTN1kh+g452+/v
+         W14R/ZZarsSwOAVsw9KquLLEs1J+uOg9N08Xq4g3+NLQt41i/gOl8qRfbwrckoDs7x4j
+         VhLR37pIvaoWpVMydH/7GSnftX0WatdUizQVrQqgNMgB8TQTwGxNjmfQEHIXfZSzQDBd
+         iSIAsVqSt/9YuQFdN12L7JBR/1IJTwCJ17h12Vu6RzrbmiUwGje2OovZvIo6fVbwTXNT
+         nRbg==
+X-Gm-Message-State: AOAM532e70/1LWc/Wpzfb+OTeIc4aZlwN/Ox8P5uQbrVX+pxsNGoZ2gv
+        UnSk8+EWAwGd7R/pXVjPyfSqByhQW49FqH185Q4=
+X-Google-Smtp-Source: ABdhPJxOkBbPXKG15vmxTrfImogI5GmgyuKmv7ZPgEP3ST/9T16S/P/0wHTolXu+drpd7MRXNsiOWPXR2MFKTQXLExI=
+X-Received: by 2002:a67:fdc2:0:b0:30e:ef23:3349 with SMTP id
+ l2-20020a67fdc2000000b0030eef233349mr11307799vsq.21.1646219120441; Wed, 02
+ Mar 2022 03:05:20 -0800 (PST)
+MIME-Version: 1.0
+References: <CACdtm0Z4crPr868DRGCYNd=euVXzm+T+rPHT4PdqK66TV7iioQ@mail.gmail.com>
+ <914621.1645046759@warthog.procyon.org.uk> <CACdtm0ZteTve1EbSgDX_jochhHT7Ufm3gJg7j28BOjmRSg8dTQ@mail.gmail.com>
+ <2500957.1646059150@warthog.procyon.org.uk>
+In-Reply-To: <2500957.1646059150@warthog.procyon.org.uk>
+From:   Rohith Surabattula <rohiths.msft@gmail.com>
+Date:   Wed, 2 Mar 2022 16:35:12 +0530
+Message-ID: <CACdtm0amJS+5O4=Qun-xxSK1JoCoVfEbRrpHCJ0QYVa7Tc8szQ@mail.gmail.com>
+Subject: Re: [PATCH] [CIFS]: Add clamp_length support
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Paulo Alcantara <pc@cjr.nz>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 28 Feb 2022 16:41:04 -0800, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+Yes, It will look better. Agree with your idea. I will work on it.
+
+Regards,
+Rohith
+
+On Mon, Feb 28, 2022 at 8:09 PM David Howells <dhowells@redhat.com> wrote:
 >
-> But basically to _me_, the important part is that the end result is
-> maintainable longer-term.
-
-I couldn't agree more. And because of that, I stick with the following
-approach because it's maintainable longer-term than "type(pos) pos" one:
- Implements a new macro for each list_for_each_entry* with _inside suffix.
-  #define list_for_each_entry_inside(pos, type, head, member)
-
-I have posted a patch series here to demonstrate this approach:
-https://lore.kernel.org/lkml/20220301075839.4156-3-xiam0nd.tong@gmail.com/
-
-Although we need replace all the use of list_for_each_entry* (15000+)
-with list_for_each_entry*_inside, the work can be done gradually rather
-than all at once. We can incrementally replace these callers until
-all these in the kernel are completely updated with *_inside* one. At
-that time, we can just remove the implements of origin macros and rename
-the *_inside* macro back to the origin name just in one single patch.
-
-And the "type(pos) pos" approach need teach developers to "not initialize
-the iterator variable, otherwise the use-after-loop will not be reported by
-compiler", which is unreasonable and impossible for all developers. 
-
-And it will mess up the following code logic and no warnning reported by
-compiler, even without initializing "ext" at the beginning:
-void foo(struct mem_extent *arg) {
-  struct mem_extent *ext;  // used both for iterator and normal ptr
-  ...
-  ext = arg;  // this assignment can alse be done in another bar() func
-  ...
-  list_for_each_entry(ext, head, member) {
-    if (found(ext))
-       break;
-  }
-  ...
-  // use ext after the loop
-  ret = ext;
-}
-If the loop hit the break, the last "ret" will be the found ext iterator.
-However, if the "type(pos) pos" approach applied, the last "ret" will be
-"arg" which is not the intention of the developers, because the "ext" is
-two different variables inside and outside the loop.
-
-Thus, my idea is *better a finger off than always aching*, let's choose
-the "list_for_each_entry_inside(pos, type, head, member)" approach.
-
-> It turns out that just syntactically, it's really nice to give the
-> type of the iterator from outside the way we do now. Yeah, it may be a
-> bit odd, and maybe it's partly because I'm so used to the
-> "list_for_each_list_entry()" syntax, but moving the type into the loop
-> construct really made it nasty - either one very complex line, or
-> having to split it over two lines which was even worse.
+> Rohith Surabattula <rohiths.msft@gmail.com> wrote:
 >
-> Maybe the place I looked at just happened to have a long typename, but
-> it's basically always going to be a struct, so it's never a _simple_
-> type. And it just looked very odd adn unnatural to have the type as
-> one of the "arguments" to that list_for_each_entry() macro.
-
-we can pass a shorter type name to list_for_each_entry_inside, thus no
-need to split it over two lines. Actually it is not a big problem.
-+ #define t struct sram_bank_info
-- list_for_each_entry(pos, head, member) {
-+ list_for_each_entry_inside(pos, t, head, member) {
-
-I put the type at the second argument not the first to avoid messing up
-the pattern match in some coccinelle scripts.
-
->  (b) gives us a nice warning for any normal use-after-loop case
-> (unless you explicitly initialized it like that
-> sgx_mmu_notifier_release() function did for no good reason
-
-sometimes developers can be confused by the reported warnning:
-"used without having been initialized", and can not figure out immediately
-that "oh, now i am using another different variable but with the same name
-of the loop iterator variable", which has changed the programming habits
-of developers.
-
->  (c) also guarantees that even if you don't get a warning,
-> non-converted (or newly written) bad code won't actually _work_
+> > > Rohith Surabattula <rohiths.msft@gmail.com> wrote:
+> > >
+> > > > +     credits = kmalloc(sizeof(struct cifs_credits), GFP_KERNEL);
+> > > > ...
+> > > > +     subreq->subreq_priv = credits;
+> > >
+> > > Would it be better if I made it so that the netfs could specify the size of
+> > > the netfs_read_subrequest struct to be allocated, thereby allowing it to tag
+> > > extra data on the end?
+> >
+> > Do you mean the clamp handler in netfs should return the size of data
+> > to be allocated instead of allocating itself ?
 >
-> so you end up getting the new rules without any ambiguity or mistaken
-
-It will lead to a wrong/NULL pointer dereference if the pointer is used
-anywhere else, depend on which value is used to initialized with.
-
-Best regard,
---
-Xiaomeng Tong
+> No, I was thinking of putting a size_t in struct netfs_request_ops that
+> indicates how big the subrequest struct should be:
+>
+>         struct netfs_request_ops {
+>                 ...
+>                 size_t subrequest_size;
+>         };
+>
+> and then:
+>
+>         struct netfs_read_subrequest *netfs_alloc_subrequest(
+>                 struct netfs_read_request *rreq)
+>         {
+>                 struct netfs_read_subrequest *subreq;
+>
+>                 subreq = kzalloc(rreq->ops->subrequest_size, GFP_KERNEL);
+>                 if (subreq) {
+>                         INIT_LIST_HEAD(&subreq->rreq_link);
+>                         refcount_set(&subreq->usage, 2);
+>                         subreq->rreq = rreq;
+>                         netfs_get_read_request(rreq);
+>                         netfs_stat(&netfs_n_rh_sreq);
+>                 }
+>
+>                 return subreq;
+>         }
+>
+> This would allow you to do, for instance:
+>
+>         struct cifs_subrequest {
+>                 struct netfs_read_subrequest subreq;
+>                 struct cifs_credits credits;
+>         };
+>
+> then:
+>
+>         const struct netfs_request_ops cifs_req_ops = {
+>                 .subrequest_size        = sizeof(struct cifs_subrequest),
+>                 .init_rreq              = cifs_init_rreq,
+>                 .expand_readahead       = cifs_expand_readahead,
+>                 .clamp_length           = cifs_clamp_length,
+>                 .issue_op               = cifs_req_issue_op,
+>                 .done                   = cifs_rreq_done,
+>                 .cleanup                = cifs_req_cleanup,
+>         };
+>
+> and then:
+>
+>         static bool cifs_clamp_length(struct netfs_read_subrequest *subreq)
+>         {
+>                 struct cifs_subrequest *cifs_subreq =
+>                         container_of(subreq, struct cifs_subrequest, subreq);
+>                 struct cifs_sb_info *cifs_sb = CIFS_SB(subreq->rreq->inode->i_sb);
+>                 struct TCP_Server_Info *server;
+>                 struct cifsFileInfo *open_file = subreq->rreq->netfs_priv;
+>                 struct cifs_credits *credits = &cifs_subreq->credits;
+>                 unsigned int rsize;
+>                 int rc;
+>
+>                 server = cifs_pick_channel(tlink_tcon(open_file->tlink)->ses);
+>
+>                 rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
+>                                                            &rsize, credits);
+>                 if (rc)
+>                         return false;
+>
+>                 subreq->len = rsize;
+>                 return true;
+>         }
+>
+> David
+>
