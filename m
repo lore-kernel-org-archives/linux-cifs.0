@@ -2,52 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AC0C433FE
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Mar 2022 20:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 340E3C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Mar 2022 20:25:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242901AbiCBUH7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Mar 2022 15:07:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38782 "EHLO
+        id S243270AbiCBU0i (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Mar 2022 15:26:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242814AbiCBUH4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 15:07:56 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D655CB653
-        for <linux-cifs@vger.kernel.org>; Wed,  2 Mar 2022 12:07:06 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id e2so2516327pls.10
-        for <linux-cifs@vger.kernel.org>; Wed, 02 Mar 2022 12:07:06 -0800 (PST)
+        with ESMTP id S234311AbiCBU0h (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 15:26:37 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1CBE48393
+        for <linux-cifs@vger.kernel.org>; Wed,  2 Mar 2022 12:25:53 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id i11so4810552lfu.3
+        for <linux-cifs@vger.kernel.org>; Wed, 02 Mar 2022 12:25:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9llME+iRL2iH9L07jwvbWbmbHLr47Rbz7WJ4fOgTlZc=;
-        b=IvpJRwG7ynxkReEE85KaN5rJUYtD4xKNHA+hy6TwBmoQ8B3uYeJI+QViQcnaGiWq86
-         F88M3HTERkoil1v4VBpPtCvYuei+/tfueI2kCXzM7ddvcotxLyWZwiewhTHLUCy28lRK
-         BraqPBOXvwYRthhpbxTgJWS9pGCc3zSZJBqHk=
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Uy+qIY61mUv01aVZ77KYqcI4VQ6CnEr5ehBFaIlKwdg=;
+        b=Be+smD91jIehBxsphVP8GxPmG9fZ7UzsziFVI8sCcayH4ghcjVwFadN69qX3SSZZfA
+         w/nKcppYscRVDTynDM99u+3Int1mDvzuW1vHPoDdJ+8JxYLDdH7+xaY9DZL7COnmW4q3
+         yEVm7FisHcBkdW7xwzBny/SyDipBoZU1ONqUc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9llME+iRL2iH9L07jwvbWbmbHLr47Rbz7WJ4fOgTlZc=;
-        b=zG4VTXEBYz5N0EZJXwQPtR7kidOA1gX4P8rEGFPKV6hR246BwJ31ROfJGKxvMvcTlT
-         S9UQLDMjuoQcjWcFy/a8Uhl5fezpft1mNU2960qsElWlMniHi899iKbl+RHlvWbNbM+H
-         kxqdUpoLOMXsWLGP82LbrtrwgPHTWAXJ0FmYKv3cJc9ObZvLgf3UP6P8S1uhbyL+pOMj
-         D0MC4gWHzus7HY1acIuSbUcKe4yHrKmDD+MqrdlSSVubbYBtzrtNGjdVisVgvxmh/mBj
-         aWLhWaaHtBxHPL2V7O4uN+7D+YJgxBBuL7sVfe8SpvjYRKj2qYstqBpyqvP7NBSEGp0m
-         iedA==
-X-Gm-Message-State: AOAM533i9fAE4/iGnIC1PEmfuIm7zDyw8hph0Flv7NUFmlgrQ9iJz+qk
-        5ldpISiFgfeAkkqILiydqgRt8Q==
-X-Google-Smtp-Source: ABdhPJyalZw/yElDAQSdRYusWOxjkvZUrvn+e5j/jboS/+hXUtUpvVb6mMnbBbqlv1j/a0ygzQBPkQ==
-X-Received: by 2002:a17:90b:94e:b0:1bc:c99f:ede1 with SMTP id dw14-20020a17090b094e00b001bcc99fede1mr1518926pjb.49.1646251625762;
-        Wed, 02 Mar 2022 12:07:05 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id d25-20020a637359000000b0037843afb785sm6664pgn.25.2022.03.02.12.07.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 12:07:05 -0800 (PST)
-Date:   Wed, 2 Mar 2022 12:07:04 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Uy+qIY61mUv01aVZ77KYqcI4VQ6CnEr5ehBFaIlKwdg=;
+        b=Iewkvy3/ou0NVhxlyj9eCHOaSi2l1tijeIgukUz8DEA4eH/2OPoiGV7rXtXpvkXYBk
+         FQIUMJTh590t/87iWYzR+1FnJs5FCaxpSmTbj738sP6brZhhQT3G3tDESJK9z+G/y02Q
+         cyYy21ewBP/GC26U0gJvQYlo4zB7sVQPENJv7xD7JtuZnXdvP7bHrbg25rrHE1WAOzys
+         5EbGhHlgqG+ALIXvIEcZz7MW2d1nIrixYzP6xbe3uBGgogrb3Vm0SL4zzRXXZKM4PpM+
+         TTK7nMCJSJY51aKp6h8QC7rR1tyKlDM3q1u+WuXEHjlhyBbK4XMglYi5G4gaxEN5r8kd
+         Zj8Q==
+X-Gm-Message-State: AOAM533ZeG7DtYHT4RzXqLroCOO5BKdinxipIMth2tLUHzuXr6oFoN+d
+        imZYge2USAW7FFeRNuYBHk28H3UEYT+RBcwE/aE=
+X-Google-Smtp-Source: ABdhPJxywXlBv7BIc96alx7e5Xr7TM34x03VQEXh9+7F5FaP+8vHND28FdZReDXMlsRd2wFlJ10eEw==
+X-Received: by 2002:a19:5517:0:b0:443:7f9f:a2e9 with SMTP id n23-20020a195517000000b004437f9fa2e9mr19436089lfe.684.1646252752068;
+        Wed, 02 Mar 2022 12:25:52 -0800 (PST)
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
+        by smtp.gmail.com with ESMTPSA id d6-20020ac25446000000b00443f15de8basm14698lfn.43.2022.03.02.12.25.51
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Mar 2022 12:25:51 -0800 (PST)
+Received: by mail-lf1-f52.google.com with SMTP id i11so4810484lfu.3
+        for <linux-cifs@vger.kernel.org>; Wed, 02 Mar 2022 12:25:51 -0800 (PST)
+X-Received: by 2002:a2e:3013:0:b0:246:2ca9:365e with SMTP id
+ w19-20020a2e3013000000b002462ca9365emr21092331ljw.291.1646252342192; Wed, 02
+ Mar 2022 12:19:02 -0800 (PST)
+MIME-Version: 1.0
+References: <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com> <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
+ <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org> <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+ <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
+ <7dc860874d434d2288f36730d8ea3312@AcuMS.aculab.com> <CAHk-=whKqg89zu4T95+ctY-hocR6kDArpo2qO14-kV40Ga7ufw@mail.gmail.com>
+ <0ced2b155b984882b39e895f0211037c@AcuMS.aculab.com> <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+ <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk> <202203021158.DB5204A0@keescook>
+In-Reply-To: <202203021158.DB5204A0@keescook>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 2 Mar 2022 12:18:45 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wikKPC0LUqZ8++EC5JOvGdBqVH9uUaTX=DvBioDoReYww@mail.gmail.com>
+Message-ID: <CAHk-=wikKPC0LUqZ8++EC5JOvGdBqVH9uUaTX=DvBioDoReYww@mail.gmail.com>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         David Laight <David.Laight@aculab.com>,
         James Bottomley <James.Bottomley@hansenpartnership.com>,
         linux-wireless <linux-wireless@vger.kernel.org>,
@@ -107,79 +125,31 @@ Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         <linux-mediatek@lists.infradead.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
         Mike Rapoport <rppt@kernel.org>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Message-ID: <202203021158.DB5204A0@keescook>
-References: <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com>
- <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
- <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
- <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
- <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
- <7dc860874d434d2288f36730d8ea3312@AcuMS.aculab.com>
- <CAHk-=whKqg89zu4T95+ctY-hocR6kDArpo2qO14-kV40Ga7ufw@mail.gmail.com>
- <0ced2b155b984882b39e895f0211037c@AcuMS.aculab.com>
- <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
- <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 10:29:31AM +0100, Rasmus Villemoes wrote:
-> This won't help the current issue (because it doesn't exist and might
-> never), but just in case some compiler people are listening, I'd like to
-> have some sort of way to tell the compiler "treat this variable as
-> uninitialized from here on". So one could do
-> 
-> #define kfree(p) do { __kfree(p); __magic_uninit(p); } while (0)
-> 
-> with __magic_uninit being a magic no-op that doesn't affect the
-> semantics of the code, but could be used by the compiler's "[is/may be]
-> used uninitialized" machinery to flag e.g. double frees on some odd
-> error path etc. It would probably only work for local automatic
-> variables, but it should be possible to just ignore the hint if p is
-> some expression like foo->bar or has side effects. If we had that, the
-> end-of-loop test could include that to "uninitialize" the iterator.
+On Wed, Mar 2, 2022 at 12:07 PM Kees Cook <keescook@chromium.org> wrote:
+>
+> I've long wanted to change kfree() to explicitly set pointers to NULL on
+> free. https://github.com/KSPP/linux/issues/87
 
-I've long wanted to change kfree() to explicitly set pointers to NULL on
-free. https://github.com/KSPP/linux/issues/87
+We've had this discussion with the gcc people in the past, and gcc
+actually has some support for it, but it's sadly tied to the actual
+function name (ie gcc has some special-casing for "free()")
 
-The thing stopping a trivial transformation of kfree() is:
+See
 
-	kfree(get_some_pointer());
+    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94527
 
-I would argue, though, that the above is poor form: the thing holding
-the pointer should be the thing freeing it, so these cases should be
-refactored and kfree() could do the NULLing by default.
+for some of that discussion.
 
-Quoting myself in the above issue:
+Oh, and I see some patch actually got merged since I looked there last
+so that you can mark "deallocator" functions, but I think it's only
+for the context matching, not for actually killing accesses to the
+pointer afterwards.
 
-
-Without doing massive tree-wide changes, I think we need compiler
-support. If we had something like __builtin_is_lvalue(), we could
-distinguish function returns from lvalues. For example, right now a
-common case are things like:
-
-	kfree(get_some_ptr());
-
-But if we could at least gain coverage of the lvalue cases, and detect
-them statically at compile-time, we could do:
-
-#define __kfree_and_null(x) do { __kfree(*x); *x = NULL; } while (0)
-#define kfree(x) __builtin_choose_expr(__builtin_is_lvalue(x),
-			__kfree_and_null(&(x)), __kfree(x))
-
-Alternatively, we could do a tree-wide change of the former case (findable
-with Coccinelle) and change them into something like kfree_no_null()
-and redefine kfree() itself:
-
-#define kfree_no_null(x) do { void *__ptr = (x); __kfree(__ptr); } while (0)
-#define kfree(x) do { __kfree(x); x = NULL; } while (0)
-
--- 
-Kees Cook
+               Linus
