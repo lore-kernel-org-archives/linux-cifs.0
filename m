@@ -2,354 +2,229 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8A2C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Mar 2022 06:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 985BEC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Mar 2022 07:57:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235576AbiCBG7F (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Mar 2022 01:59:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53944 "EHLO
+        id S231142AbiCBH6J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Mar 2022 02:58:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235475AbiCBG7E (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 01:59:04 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F7ADB0A5A;
-        Tue,  1 Mar 2022 22:58:20 -0800 (PST)
-Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1nPIwD-0002nj-TX; Wed, 02 Mar 2022 07:58:17 +0100
-Message-ID: <fe156bb6-c6d2-57da-7f62-57d2972bf1ae@leemhuis.info>
-Date:   Wed, 2 Mar 2022 07:58:17 +0100
+        with ESMTP id S237740AbiCBH6G (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 02:58:06 -0500
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A365CB43
+        for <linux-cifs@vger.kernel.org>; Tue,  1 Mar 2022 23:57:22 -0800 (PST)
+Received: by mail-ej1-x636.google.com with SMTP id a8so1875633ejc.8
+        for <linux-cifs@vger.kernel.org>; Tue, 01 Mar 2022 23:57:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=c34cIaLI1PnKUQ4CoQk1O/A4OcKXNkTPVxjm7VM0/GA=;
+        b=DuCS7l9Po2w3OW9w8m8GPyCCLNxHM9xXofbY1/xKLNti5sLyeJetwk66z+GH1eOyEx
+         IV21DMNgDSHoipW8Pw1SUIIKbzM0RmeIrQouqcKEdtVujIkhXJwK7CI0idEbLTvtTZLK
+         6sLxsezktFPu2mtybG1yln8DafxSZF3iDlqv4au0oMS+Ht+iZGq97r4vDdPjBn/YvuBJ
+         KlAZItgNI0S0weCuajRXzfsQYK09fHYQiedlCvACJ2TsbqVotOa8ndJXVFJykiOR8N6M
+         eJEZGpT3e1OcDQ6+2NPgKPYTdjTNSdYy1UNEEYem2XLsOXjJzGMCm3cQqwO12X57jHxC
+         UvZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=c34cIaLI1PnKUQ4CoQk1O/A4OcKXNkTPVxjm7VM0/GA=;
+        b=ZLLIy9ht6Urx5TLIWhhaVvnlEKJk97L2+GDOxOcoJGltwpjbsw2E12oDJAVeikYu/x
+         dkTvbSCBFHNotEKwhM/1qBgV6yXRH6VbI+Ph/w8tJBR0XvXWDUogvaHEIxQkCFFfufPV
+         Fm9mS4/PEQksctLg2VD0M6vEvWltNJQB3Ad+miikStnleH11rDyZBtlFUt7tK4IUbvM2
+         l2xxu/2WAIU/o7E/Nh5hr3mrY46UYA1+z4Bmkj+cgdL+yxlGc9/3iuu866Jkf146W37B
+         hoGDRbvEXodCJY5o+W1l9pL87+q1m5GVOxefiR/S9efqhiQa/u8Bj6b+V/5IAMqN71Ow
+         Ay9w==
+X-Gm-Message-State: AOAM531PnF/MUbkv0Kq8IBfo9Zk8WMh2ER6+sD6zJ4Rzic7jNHrw7xI2
+        B3oXK0sKjFk/3EJEzVRn12TkCjoRyCNjhxEyQKU=
+X-Google-Smtp-Source: ABdhPJwYz+Hsktt6MrZavdqMi+nJJegJ4b8ukBIKJMpuPPZQKJpGz55rpg4wmKeD98KtOFgycGMjUZA9rDQVLxjNzeU=
+X-Received: by 2002:a17:907:9057:b0:6cf:d288:c9ee with SMTP id
+ az23-20020a170907905700b006cfd288c9eemr21221499ejc.169.1646207840955; Tue, 01
+ Mar 2022 23:57:20 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
- machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
-Content-Language: en-US
-To:     Davyd McColl <davydm@gmail.com>, Steve French <smfrench@gmail.com>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+References: <CAFrh3J9soC36+BVuwHB=g9z_KB5Og2+p2_W+BBoBOZveErz14w@mail.gmail.com>
+ <eae5c0cc-55d1-f8db-aba0-57cee7f10332@leemhuis.info> <CAH2r5msUiBuZ74_nPVyzn=k=g0ELpcMnoTm_z30zrMSxF4sn1A@mail.gmail.com>
+ <CAFrh3J-oOR1FxPrpzKsQQvronyk9fhDSqD2CY5DNsYO5Lt0ydg@mail.gmail.com>
+ <CAFrh3J-TOW4JG6QND0nz_9asiv2g0DzPmxR68BBB_an9yAQ+Vw@mail.gmail.com> <CAFrh3J83sUd3tQYHzssKoBb4uQXd3MXf9e=4jLsJ9aH7z2B3oA@mail.gmail.com>
+In-Reply-To: <CAFrh3J83sUd3tQYHzssKoBb4uQXd3MXf9e=4jLsJ9aH7z2B3oA@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 2 Mar 2022 13:27:09 +0530
+Message-ID: <CANT5p=qvrV5mrE8dN=RAmCBefGd4_3BzTfM7U98eqmZN2ZVjEg@mail.gmail.com>
+Subject: Re: Failure to access cifs mount of samba share after resume from
+ sleep with 5.17-rc5
+To:     Satadru Pramanik <satadru@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Thorsten Leemhuis <regressions@leemhuis.info>,
         CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-References: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
- <CAH2r5mt_2f==5reyc0HmMLvYJVmP4Enykwauo+LQoFGFbVFeRQ@mail.gmail.com>
- <CAJjP=BvNVOj3KRnhFgk6xiwnxVhxE-sN98-pr6e1Kzc5Xg5EvQ@mail.gmail.com>
- <CAH2r5mvsetx5G+c=8ePh+X8ng7FvMrnuM9+FJ4Sid4b3E+T41Q@mail.gmail.com>
- <CAJjP=BvqZUnJPq=C0OUKbXr=mbJd7a6YDSJC-sNY1j_33_e-uw@mail.gmail.com>
- <CAN05THSGwCKckQoeB6D91iBv0Sed+ethK7tde7GSc1UzS-0OYg@mail.gmail.com>
- <CAJjP=BvcWrF-k_sFxak1mgHAHVVS7_JZow+h_47XB1VzG2+Drw@mail.gmail.com>
- <ebf8c487-0377-834e-fbb7-725cceae1fbb@leemhuis.info>
- <CAN05THRJJj48ueb34t18Yj=JYuhiwZ8hTvOssX4D6XhNpjx-bg@mail.gmail.com>
- <f7eb4a3e-9799-3fe4-d464-d84dd9e64510@leemhuis.info>
- <CAJjP=Bus1_ce4vbHXpiou1WrSe8a61U1NzGm4XvN5fYCPGNikA@mail.gmail.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <CAJjP=Bus1_ce4vbHXpiou1WrSe8a61U1NzGm4XvN5fYCPGNikA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1646204300;4c65dc37;
-X-HE-SMSGID: 1nPIwD-0002nj-TX
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi, this is your Linux kernel regression tracker, once again...
+On Wed, Mar 2, 2022 at 3:51 AM Satadru Pramanik <satadru@gmail.com> wrote:
+>
+> I have put the trace.dat and other debug files here since I can not
+> attach the files to a message to the list. (Apparently the trace.dat
+> file is too large.)
+>
+> https://drive.google.com/drive/folders/1wEi968RbXxivXMMH8J7XUsHhrxu9OWDX?usp=sharing
+>
+> On Mon, Feb 28, 2022 at 11:12 PM Satadru Pramanik <satadru@gmail.com> wrote:
+> >
+> > The trace.dat file is attached, covering the period before suspend,
+> > and through wake several hours later, when the mount no longer worked,
+> > and showed the CIFS: VFS: cifs_tree_connect: could not find
+> > superblock: -22 message, and through when I unmounted and remounted
+> > the share, which then started working.
+> >
+> > On Mon, Feb 28, 2022 at 9:31 AM Satadru Pramanik <satadru@gmail.com> wrote:
+> > >
+> > > Here is the DebugData from before and after from the system with the
+> > > failed mount.
+> > > Both systems are now running 5.17-rc6.
+> > >
+> > > Working on the trace-cmd now.
+> > >
+> > > On Sun, Feb 27, 2022 at 9:37 PM Steve French <smfrench@gmail.com> wrote:
+> > > >
+> > > > I would like to see the output of:
+> > > >
+> > > > /proc/fs/cifs/DebugData before and after the failure if possible.
+> > > >
+> > > > In addition, there would be some value in seeing trace information
+> > > > (e.g start tracing by
+> > > > "trace-cmd record -e cifs" before the failure and then forward the
+> > > > debug information displayed by "trace-cmd show" after the failure)
+> > > >
+> > > > On Sun, Feb 27, 2022 at 7:55 AM Thorsten Leemhuis
+> > > > <regressions@leemhuis.info> wrote:
+> > > > >
+> > > > > [TLDR: I'm adding the regression report below to regzbot, the Linux
+> > > > > kernel regression tracking bot; all text you find below is compiled from
+> > > > > a few templates paragraphs you might have encountered already already
+> > > > > from similar mails.]
+> > > > >
+> > > > > Hi, this is your Linux kernel regression tracker. Top-posting for once,
+> > > > > to make this easily accessible to everyone.
+> > > > >
+> > > > > CCing the regression mailing list, as it should be in the loop for all
+> > > > > regressions, as explained here:
+> > > > > https://www.kernel.org/doc/html/latest/admin-guide/reporting-issues.html
+> > > > >
+> > > > > To be sure below issue doesn't fall through the cracks unnoticed, I'm
+> > > > > adding it to regzbot, my Linux kernel regression tracking bot:
+> > > > >
+> > > > > #regzbot ^introduced v5.16.11..v5.17-rc5
+> > > > > #regzbot title cifs: Failure to access cifs mount of samba share after
+> > > > > resume from sleep
+> > > > > #regzbot ignore-activity
+> > > > >
+> > > > > Reminder for developers: when fixing the issue, please add a 'Link:'
+> > > > > tags pointing to the report (the mail quoted above) using
+> > > > > lore.kernel.org/r/, as explained in
+> > > > > 'Documentation/process/submitting-patches.rst' and
+> > > > > 'Documentation/process/5.Posting.rst'. This allows the bot to connect
+> > > > > the report with any patches posted or committed to fix the issue; this
+> > > > > again allows the bot to show the current status of regressions and
+> > > > > automatically resolve the issue when the fix hits the right tree.
+> > > > >
+> > > > > I'm sending this to everyone that got the initial report, to make them
+> > > > > aware of the tracking. I also hope that messages like this motivate
+> > > > > people to directly get at least the regression mailing list and ideally
+> > > > > even regzbot involved when dealing with regressions, as messages like
+> > > > > this wouldn't be needed then. And don't worry, if I need to send other
+> > > > > mails regarding this regression only relevant for regzbot I'll send them
+> > > > > to the regressions lists only (with a tag in the subject so people can
+> > > > > filter them away). With a bit of luck no such messages will be needed
+> > > > > anyway.
+> > > > >
+> > > > > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> > > > >
+> > > > > P.S.: As the Linux kernel's regression tracker I'm getting a lot of
+> > > > > reports on my table. I can only look briefly into most of them and lack
+> > > > > knowledge about most of the areas they concern. I thus unfortunately
+> > > > > will sometimes get things wrong or miss something important. I hope
+> > > > > that's not the case here; if you think it is, don't hesitate to tell me
+> > > > > in a public reply, it's in everyone's interest to set the public record
+> > > > > straight.
+> > > > >
+> > > > >
+> > > > > On 27.02.22 03:36, Satadru Pramanik wrote:
+> > > > > > I'm on a x86_64 ubuntu 22.04 system accessing a similar system running
+> > > > > > samba Version 4.13.14-Ubuntu. Both systems are on ubuntu mainline
+> > > > > > kernel 5.17-rc5.
+> > > > > >
+> > > > > > I have a samba share mounted from my fstab, and file access works fine.
+> > > > > > Upon suspending my system and resuming though, the mounted samba share
+> > > > > > is inaccessible, and my dmesg has many "CIFS: VFS: cifs_tree_connect:
+> > > > > > could not find superblock: -22" messages.
+> > > > > >
+> > > > > > Unmounting and remounting the share restores access.
+> > > > > >
+> > > > > > When I boot into kernel 5.16.11, I do not have this issue. The cifs
+> > > > > > share is accessible just fine after a suspend/resume cycle.
+> > > > > >
+> > > > > > I assume this is a regression with 5.17? Is there any information
+> > > > > > worth providing which might help debug and fix this issue?
+> > > > > >
+> > > > > > Regards,
+> > > > > >
+> > > > > > Satadru Pramanik
+> > > > >
+> > > > > --
+> > > > > Additional information about regzbot:
+> > > > >
+> > > > > If you want to know more about regzbot, check out its web-interface, the
+> > > > > getting start guide, and the references documentation:
+> > > > >
+> > > > > https://linux-regtracking.leemhuis.info/regzbot/
+> > > > > https://gitlab.com/knurd42/regzbot/-/blob/main/docs/getting_started.md
+> > > > > https://gitlab.com/knurd42/regzbot/-/blob/main/docs/reference.md
+> > > > >
+> > > > > The last two documents will explain how you can interact with regzbot
+> > > > > yourself if your want to.
+> > > > >
+> > > > > Hint for reporters: when reporting a regression it's in your interest to
+> > > > > CC the regression list and tell regzbot about the issue, as that ensures
+> > > > > the regression makes it onto the radar of the Linux kernel's regression
+> > > > > tracker -- that's in your interest, as it ensures your report won't fall
+> > > > > through the cracks unnoticed.
+> > > > >
+> > > > > Hint for developers: you normally don't need to care about regzbot once
+> > > > > it's involved. Fix the issue as you normally would, just remember to
+> > > > > include 'Link:' tag in the patch descriptions pointing to all reports
+> > > > > about the issue. This has been expected from developers even before
+> > > > > regzbot showed up for reasons explained in
+> > > > > 'Documentation/process/submitting-patches.rst' and
+> > > > > 'Documentation/process/5.Posting.rst'.
+> > > >
+> > > >
+> > > >
+> > > > --
+> > > > Thanks,
+> > > >
+> > > > Steve
 
-On 18.02.22 14:30, Davyd McColl wrote:
-> Apologies for the late response - I didn't see the last bit of the
-> mail asking for more info.
-> 
-> Thorsten: the only group policy modification I have on my win11
-> machine (which was
-> loaded fresh not too long ago) is to enable insecure guest logins,
-> which is obviously
-> required for samba shares where the share allows a guest login without
-> any password.
-> I have to enable this to browse the shares on my Gentoo machine from the win11
-> machine anyway.
+The DebugData shows that the connection and smb session are fine, but
+the tree connect is not in a good state.
+Similarly, the trace output shows that connection was reconnected
+successfully, SMB session was reconnected as well. However, the tree
+connect did not go over the wire.
 
-Thx for the update. I pointed Linus towards this thread two times now,
-but he didn't comment on it afaics. CCing him now, maybe that will to
-the trick. If not, it'll leave me with two options:
+> The trace.dat file is attached, covering the period before suspend,
+> and through wake several hours later, when the mount no longer worked,
+> and showed the CIFS: VFS: cifs_tree_connect: could not find
+> superblock: -22 message, and through when I unmounted and remounted
+> the share, which then started working.
 
-a) give up
-b) submit a revert for 5.18 to force a discussion of the issue
+This suggests to me that the cifs_tcp_get_super is failing.
+This is odd, since it looks up the server as pointers.
+Did we start undercounting the ref count somewhere?
 
-I currently tend to do the latter due to the fact that it's something
-that still works on Win11 with a simple change in the registry. But
-before that:
-
-@Steve: what's your option on this? Do you basically agree with what
-Ronnie stated in
-https://lore.kernel.org/lkml/CAN05THQbR4d55kx6MEHGcn-iLZKJG1C0vhq19wfo=NrB6q1Apg@mail.gmail.com/
-To quote:
-```
-> Right now you can likely just revert it. Maybe in the next kernel too.
-> But in a kernel not too far into the future some of the crypto primitives that
-> this depended on will simply not exist any more in the linux kernel
-> and will not be
-> available through the standard api.
-> 
-> At that point it is no longer a matter of just reverting the patch but
-> a matter of
-> re-importing an equivalent crypto replacement and port cifs.ko to its new api.
-> 
-> That is a lot of work and maintenance for something that is obsolete.
-```
-
-And Davyd: if you have a minute, could you maybe try running 5.17-rc6
-(or Linus mainline from git) with
-76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c reverted and check if
-everything wrt to cifs continues to work?
-
-Ciao, Thorsten
-
-> On Fri, 28 Jan 2022 at 16:02, Thorsten Leemhuis
-> <regressions@leemhuis.info> wrote:
->>
->> On 28.01.22 14:50, ronnie sahlberg wrote:
->>> On Fri, Jan 28, 2022 at 11:30 PM Thorsten Leemhuis
->>> <regressions@leemhuis.info> wrote:
->>>>
->>>> Hi, this is your Linux kernel regression tracker speaking.
->>>>
->>>> Top-posting for once, to make this easy accessible to everyone.
->>>>
->>>> Davyd, Ronnie, and/or Steve: What the status here? It seems after some
->>>> productive debugging back and forth it seems everyone forgot about this.
->>>> Or was progress made somewhere and I just missed it?
->>>
->>> I tried but can not find a system old enough to reproduce.
->>> Remember, this is an authentication mechanism that Microsoft begged
->>> people to stop using and migrate away from over 20 years ago.
->>> Win2k works just fine, as does samba3.0.
->>> I have no idea if Samba 2.0 works with current cifs.ko   but then
->>> again  I seriously doubt you can even get samba 2.0 to even compile on
->>> a modern
->>> machine as so many APIs have changed or just gone away since the late 90s.
->>>
->>> I tried, but there is just so much time you can spend on something
->>> that was declared obsolete 20 years ago.
->>
->> I can fully understand that -- otoh then I'd normally say "well, then
->> let's just revert the commit that causes this". But in this case I can
->> understand that it might not be wise.
->>
->> There is one thing that would help me to judge this situation better:
->>
->> Davyd, did a default Win11 install connect fine with standard settings
->> or did you have to modify something in the registry to make it work
->> there (which you might have done years ago in case you updated the
->> machine!), as Ronnie suspected? Or was this already clarified in this
->> thread somewhere and I just missed that (in that case: sorry!)?
->>
->> Ciao, Thorsten
->>
->>>> Ciao, Thorsten
->>>>
->>>> #regzbot poke
->>>>
->>>>
->>>> On 12.01.22 06:49, Davyd McColl wrote:
->>>>> Hi Ronnie
->>>>>
->>>>> The regular fstab line for this mount is:
->>>>>
->>>>> //mede8er/mede8er  /mnt/mede8er-smb  cifs
->>>>> noauto,guest,users,uid=daf,gid=daf,iocharset=utf8,vers=1.0,nobrl,sec=none
->>>>>  0  0
->>>>>
->>>>> Altering the end of the options from "sec=none" to
->>>>> "username=guest,sec=ntlmssp" or "guest,sec=ntlmssp" results in failure
->>>>> to mount
->>>>> (tested on my patched kernel, which still supports the original fstab
->>>>> line), with dmesg containing:
->>>>>
->>>>> [45753.525219] CIFS: VFS: Use of the less secure dialect vers=1.0 is
->>>>> not recommended unless required for acc
->>>>> ess to very old servers
->>>>> [45753.525222] CIFS: Attempting to mount \\mede8er\mede8er
->>>>> [45756.861351] CIFS: VFS: Unable to select appropriate authentication method!
->>>>> [45756.861361] CIFS: VFS: \\mede8er Send error in SessSetup = -22
->>>>> [45756.861395] CIFS: VFS: cifs_mount failed w/return code = -22
->>>>>
->>>>> There is no way that I know of to set up users for smb auth on this
->>>>> device - it only supports guest connections.
->>>>>
->>>>> -d
->>>>>
->>>>>
->>>>> On Wed, 12 Jan 2022 at 04:32, ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
->>>>>>
->>>>>> Thanks for the network traces.
->>>>>>
->>>>>> In the traces, both win11 and linux are not using even NTLM but the
->>>>>> even older "share password" authentication mode where you specify a
->>>>>> password for the share in the TreeConnect command.
->>>>>> That is something I think we should not support at all.
->>>>>>
->>>>>> What is the exact mount command line you use?
->>>>>> Can you try mounting the share using a username and ntlmssp ?
->>>>>> I.e. username=your-user,sec=ntlmssp  on the mount command
->>>>>>
->>>>>> regards
->>>>>> ronnie sahlberg
->>>>>>
->>>>>> On Wed, Jan 12, 2022 at 6:57 AM Davyd McColl <davydm@gmail.com> wrote:
->>>>>>>
->>>>>>> Hi Steve
->>>>>>>
->>>>>>> As requested, wireshark captures to the device in question, as well as
->>>>>>> the fstab entry I have for the device:
->>>>>>> - win11, browsing with explorer
->>>>>>> - win11, net use
->>>>>>> - unpatched linux 5.16.0 attempt to mount
->>>>>>> - patched linux 5.16.0 successful mount
->>>>>>> - fstab entry - note that I have to specify samba version 1.0 as the
->>>>>>> default has changed and the mount fails otherwise. Explicitly
->>>>>>> specifying 2.0 errors and suggests that I should select a different
->>>>>>> version.
->>>>>>>
->>>>>>> -d
->>>>>>>
->>>>>>> On Tue, 11 Jan 2022 at 00:13, Steve French <smfrench@gmail.com> wrote:
->>>>>>>>
->>>>>>>> I would be surprised if Windows 11 still negotiates (with default
->>>>>>>> registry settings) SMB1 much less NTLMv1 in SMB1, but I have not tried
->>>>>>>> Windows 11 with an NTLMv1 only server (they are hard to find - I may
->>>>>>>> have an original NT4 and an NT3.5 CD somewhere - might be possible to
->>>>>>>> install a VM with NT3.5 but that is really really old and not sure I
->>>>>>>> can find those CDs).
->>>>>>>>
->>>>>>>> Is it possible to send me the wireshark trace (or other network trace)
->>>>>>>> of the failing mount from Linux and also the one with the succeeding
->>>>>>>> NET USE from Windows 11 to the same server?
->>>>>>>>
->>>>>>>> Hopefully it is something unrelated to NTLMv1, there has been a LOT of
->>>>>>>> pushback across the world, across products in making sure no one uses
->>>>>>>> SMB1 anymore.  See e.g.
->>>>>>>> https://techcommunity.microsoft.com/t5/storage-at-microsoft/stop-using-smb1/ba-p/425858
->>>>>>>> and https://twitter.com/nerdpyle/status/776900804712148993
->>>>>>>>
->>>>>>>> On Mon, Jan 10, 2022 at 2:30 PM Davyd McColl <davydm@gmail.com> wrote:
->>>>>>>>>
->>>>>>>>> I don't understand. I tracked down the exact commit where the issue
->>>>>>>>> occurs with a 2 hour git bisect. This was after first confirming that
->>>>>>>>> my older 5.14 kernel did not display the symptoms. I can still connect
->>>>>>>>> to the share via windows 11 explorer. I don't know what else I need to
->>>>>>>>> do here to show where the issue was introduced?
->>>>>>>>>
->>>>>>>>> Apologies for bouncing mails - literally no email client I have seems
->>>>>>>>> to be capable of plaintext emails, so every time I forget, I have to
->>>>>>>>> find a browser with the gmail web interface to reply.
->>>>>>>>>
->>>>>>>>> -d
->>>>>>>>>
->>>>>>>>> On Mon, 10 Jan 2022 at 19:31, Steve French <smfrench@gmail.com> wrote:
->>>>>>>>>>
->>>>>>>>>> I want to make sure that we don't have an unrelated regression
->>>>>>>>>> involved here since NTLMv2 replaced NTLMv1 over 20 years ago (googling
->>>>>>>>>> this e.g. I see "NTLMv2, introduced in Windows NT 4.0 SP4 and natively
->>>>>>>>>> supported in Windows 2000")  and should be the default for Windows
->>>>>>>>>> NT4, Windows 2000 etc. as well as any version of Samba from the last
->>>>>>>>>> 15 years+.  I have significant concerns with adding mechanisms that
->>>>>>>>>> were asked to be disabled ~19 years ago e.g. see
->>>>>>>>>> https://support.microsoft.com/en-us/topic/security-guidance-for-ntlmv1-and-lm-network-authentication-da2168b6-4a31-0088-fb03-f081acde6e73
->>>>>>>>>> due to security concerns.
->>>>>>>>>>
->>>>>>>>>> Can we double check that there are not other issues involved in your example?
->>>>>>>>>>
->>>>>>>>>> The concerns about NTLMv1 security concerns (and why it should never
->>>>>>>>>> be used) are very persuasive e.g. many articles like
->>>>>>>>>> https://miriamxyra.com/2017/11/08/stop-using-lan-manager-and-ntlmv1/
->>>>>>>>>>
->>>>>>>>>> On Mon, Jan 10, 2022 at 7:48 AM Davyd McColl <davydm@gmail.com> wrote:
->>>>>>>>>>>
->>>>>>>>>>> Good day
->>>>>>>>>>>
->>>>>>>>>>> I'm following advice from the thread at
->>>>>>>>>>> https://bugzilla.kernel.org/show_bug.cgi?id=215375 as to how to report
->>>>>>>>>>> this, so please bear with me and redirect me as necessary.
->>>>>>>>>>>
->>>>>>>>>>> Since commit 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c, I'm unable to
->>>>>>>>>>> mount a CIFS 1.0 share ( from a media player: mede8er med600x3d, which
->>>>>>>>>>> runs some older linux). Apparently I'm not the only one, according to
->>>>>>>>>>> that thread, though the other affected party there is windows-based.
->>>>>>>>>>>
->>>>>>>>>>> I first logged this in the Gentoo bugtracker
->>>>>>>>>>> (https://bugs.gentoo.org/821895) and a reversion patch is available
->>>>>>>>>>> there for the time being.
->>>>>>>>>>>
->>>>>>>>>>> I understand that some of the encryption methods upon which the
->>>>>>>>>>> original feature relied are to be removed and, as such, the ability to
->>>>>>>>>>> mount these older shares was removed. This is sure to affect anyone
->>>>>>>>>>> running older Windows virtual machines (or older, internally-visible
->>>>>>>>>>> windows hosts) in addition to anyone attempting to connect to shares
->>>>>>>>>>> from esoteric devices like mine.
->>>>>>>>>>>
->>>>>>>>>>> Whilst I understand the desire to clean up code and remove dead
->>>>>>>>>>> branches, I'd really appreciate it if this particular feature remains
->>>>>>>>>>> available either by kernel configuration (which suits me fine, but is
->>>>>>>>>>> likely to be a hassle for anyone running a binary distribution) or via
->>>>>>>>>>> boot parameters. In the mean-time, I'm updating my own sync software
->>>>>>>>>>> to support this older device because if I can't sync media to the
->>>>>>>>>>> player, the device is not very useful to me.
->>>>>>>>>>>
->>>>>>>>>>> Thanks
->>>>>>>>>>> -d
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> --
->>>>>>>>>> Thanks,
->>>>>>>>>>
->>>>>>>>>> Steve
->>>>>>>>>
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> --
->>>>>>>>> -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
->>>>>>>>> If you say that getting the money is the most important thing
->>>>>>>>> You will spend your life completely wasting your time
->>>>>>>>> You will be doing things you don't like doing
->>>>>>>>> In order to go on living
->>>>>>>>> That is, to go on doing things you don't like doing
->>>>>>>>>
->>>>>>>>> Which is stupid.
->>>>>>>>>
->>>>>>>>> - Alan Watts
->>>>>>>>> https://www.youtube.com/watch?v=-gXTZM_uPMY
->>>>>>>>>
->>>>>>>>> Quidquid latine dictum sit, altum sonatur.
->>>>>>>>
->>>>>>>>
->>>>>>>>
->>>>>>>> --
->>>>>>>> Thanks,
->>>>>>>>
->>>>>>>> Steve
->>>>>>>
->>>>>>>
->>>>>>>
->>>>>>> --
->>>>>>> -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
->>>>>>> If you say that getting the money is the most important thing
->>>>>>> You will spend your life completely wasting your time
->>>>>>> You will be doing things you don't like doing
->>>>>>> In order to go on living
->>>>>>> That is, to go on doing things you don't like doing
->>>>>>>
->>>>>>> Which is stupid.
->>>>>>>
->>>>>>> - Alan Watts
->>>>>>> https://www.youtube.com/watch?v=-gXTZM_uPMY
->>>>>>>
->>>>>>> Quidquid latine dictum sit, altum sonatur.
->>>>>
->>>>>
->>>>>
->>>>
->>>
-> 
-> 
-> 
-
+-- 
+Regards,
+Shyam
