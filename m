@@ -2,116 +2,119 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24267C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Mar 2022 01:27:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6DFCC43219
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Mar 2022 02:28:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231335AbiCCB2J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Mar 2022 20:28:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57896 "EHLO
+        id S231764AbiCCC2j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Mar 2022 21:28:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231249AbiCCB2J (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 20:28:09 -0500
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29FB6337;
-        Wed,  2 Mar 2022 17:27:24 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id j15so416674lfg.1;
-        Wed, 02 Mar 2022 17:27:24 -0800 (PST)
+        with ESMTP id S231743AbiCCC2i (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Mar 2022 21:28:38 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B340D10FC6;
+        Wed,  2 Mar 2022 18:27:53 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id p3-20020a17090a680300b001bbfb9d760eso6464723pjj.2;
+        Wed, 02 Mar 2022 18:27:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NJ2B08gabJYFOVfBFYdoJ25PiQBivMoWx7JQUDugqj8=;
-        b=XK9g8de1WlKR4Ep1aunBAzRbzL518T38TZYa+51FTG7FvSU8eLsi/nPu656mKCH3tV
-         JH4GFqGnnFtf2my/pCAoyx47iWRGwifeiqCC/OsIPznUnTM480n+pYXRyVT1Jr4LcZE8
-         osGTSqU24WTVrl81+DZWGMqkEbT7dv4j0f8NPM48OMpy9n5HTOl7X7M6MLLk8ySG6qbE
-         7HyxRjPwSLMvCIi+2Ltqij3/T/09vIWT4r8KR53HvfWG4TeSGu2Pi9/mWCuB+2UympSV
-         7sH0wXU9YBz8I3fn6OtNut9/J79iOUxbLowji/gOK4aMzilo1tkX7lJaqiH6QF6+LQFk
-         V+mw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=C6016/38QKZUQAyk5HMPjenTvm42Pe8sPBzTcqL5vmY=;
+        b=qBGtve+IuFrAkJa+gsN1WQjHRs2fvQkSK1D44BenBKAqsyswWIPF49CjeAw6Lc/Xiz
+         7VY9uX10GWOeYOq3Roffx9lK59MGCnSnWmLkHD6Zz3XGADMqQbIXFAspvzlfyt7tl87F
+         C44YITS/y0gKUKqqxM42VKL4jH/Xx4KasojD++jZOWXtcwkx1m//DlSoFwhQEbp4i/NS
+         eGEaCL2abI9d2Qo/vgVE47lljuFHl9RIsYb9haWI9DYl1+oIMHXMK3O9uyeK26H4D1AX
+         Jy4saNgfSyFkb5FP8pbKE6ds3BSqIpGBCoZu+qijzq/vfSl1dGYXTnehjmH9/ySByi+z
+         BIOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NJ2B08gabJYFOVfBFYdoJ25PiQBivMoWx7JQUDugqj8=;
-        b=RgcQahWITDUySjS7TK8cXeH8It24rMR2gDruja3o+9nDzLoufu014QUAhOxhFm9KLX
-         U94/RnX5eiOB6NkIQELRxXawGzPp5qdEH4mlwAnNDZcqPdVX55KeHuTGR704IR4ft2fy
-         VypDQ9Cm41DQDXOsyZoN400t0LoMZwJ0gV0A1dv13BRGd82L5SdhnjtPYScEr0+68yxn
-         Sl6uWulROIChRW7iUwt2f1okEtG6EEGMT7X/oGRZJFU+ggyy1mVZsx2jrCUt5DMuTA14
-         za1agTFBlbmYMRRR4QLlwFje7E5LBD9F9/eL3Qb9Fi6GZ5YG9/5a7+hLsmdiY9jO9uNC
-         WamQ==
-X-Gm-Message-State: AOAM53332AeEKGnllXXx/PsV1Z6xCQuXwJxpDI6PQvMeeAgudO3uZd+B
-        jlLRdGaLBgHZlfS0CMPlXdwrDi8X1cTScqIQDhk=
-X-Google-Smtp-Source: ABdhPJybVffnhsMu3mAEUolbs46+nnRBt8avMFeRcwJ2+g9t25FCJJ53mhJ8wrGGNqA36LrGqEDGOHuh7DCGTPUkUik=
-X-Received: by 2002:ac2:5c11:0:b0:445:b993:bfff with SMTP id
- r17-20020ac25c11000000b00445b993bfffmr3943357lfp.595.1646270842893; Wed, 02
- Mar 2022 17:27:22 -0800 (PST)
-MIME-Version: 1.0
-References: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
- <CAH2r5mt_2f==5reyc0HmMLvYJVmP4Enykwauo+LQoFGFbVFeRQ@mail.gmail.com>
- <CAJjP=BvNVOj3KRnhFgk6xiwnxVhxE-sN98-pr6e1Kzc5Xg5EvQ@mail.gmail.com>
- <CAH2r5mvsetx5G+c=8ePh+X8ng7FvMrnuM9+FJ4Sid4b3E+T41Q@mail.gmail.com>
- <CAJjP=BvqZUnJPq=C0OUKbXr=mbJd7a6YDSJC-sNY1j_33_e-uw@mail.gmail.com>
- <CAN05THSGwCKckQoeB6D91iBv0Sed+ethK7tde7GSc1UzS-0OYg@mail.gmail.com>
- <CAJjP=BvcWrF-k_sFxak1mgHAHVVS7_JZow+h_47XB1VzG2+Drw@mail.gmail.com>
- <ebf8c487-0377-834e-fbb7-725cceae1fbb@leemhuis.info> <CAN05THRJJj48ueb34t18Yj=JYuhiwZ8hTvOssX4D6XhNpjx-bg@mail.gmail.com>
- <f7eb4a3e-9799-3fe4-d464-d84dd9e64510@leemhuis.info> <CAJjP=Bus1_ce4vbHXpiou1WrSe8a61U1NzGm4XvN5fYCPGNikA@mail.gmail.com>
- <fe156bb6-c6d2-57da-7f62-57d2972bf1ae@leemhuis.info> <CAHk-=wjSBvRk-ksUBOiQzJd=e19UZKvOSZs1UHahK5U0QVh6RQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wjSBvRk-ksUBOiQzJd=e19UZKvOSZs1UHahK5U0QVh6RQ@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 2 Mar 2022 19:27:11 -0600
-Message-ID: <CAH2r5mvQnQTDQaci-NbLBjRb=gCPtMewrKhLBOLGrN2_Zpc3Bg@mail.gmail.com>
-Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
- machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Thorsten Leemhuis <regressions@leemhuis.info>,
-        Davyd McColl <davydm@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=C6016/38QKZUQAyk5HMPjenTvm42Pe8sPBzTcqL5vmY=;
+        b=CzJtZPcuhcWcftaDgdBMfTH8+c9EoS3XmQ505LWS57kdN7/Y7hxiGiFhGCtkVhWR4n
+         9QiYMg9DgjK+2U+OgCUW8Ihc/Zsz1tArsI+VPvsbHeizYXBDN8PT/Evowom4DSVx5ZKW
+         SbKPrObrC5eMgExacIP+ZPEND4qx5Us+NJQ0WRDXPRpYk5m/o2sqMuwebEko7dN7/HEk
+         eAq5ky/UWz0+SWqk5EOcM1gkci5Yts4Pn4Ct+p/tQQvAT2EONElmTfre57WvwdfOJKPi
+         0JSo3Tr1FuDqKJWi6MM1A+v0Yqa4E2WoDAES5x9cgi/rm9pPbPuEvHVBoD12sn5e/d+j
+         6agg==
+X-Gm-Message-State: AOAM531YwoKciGKl5/xB3iguH9sB6KyY7W/Y8igN4n9GDfpUTuo8ZSvU
+        LuwF03lr62QEMLGgZKYD3hLDUsWYyg5BSQ==
+X-Google-Smtp-Source: ABdhPJwdGKGtPoJbq9KB0b78P8kOQOqlHazHAUCZQHvA6TzNHcldJErwW75BUHOqmaVxrll88UvLqQ==
+X-Received: by 2002:a17:902:ec90:b0:151:a632:7ebb with SMTP id x16-20020a170902ec9000b00151a6327ebbmr1936164plg.154.1646274473191;
+        Wed, 02 Mar 2022 18:27:53 -0800 (PST)
+Received: from ubuntu.huawei.com ([119.3.119.19])
+        by smtp.googlemail.com with ESMTPSA id d15-20020a17090ab30f00b001b8e65326b3sm359822pjr.9.2022.03.02.18.27.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 18:27:52 -0800 (PST)
+From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
+To:     david.laight@aculab.com
+Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
+        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
+        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
+        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
+        dan.carpenter@oracle.com, dmaengine@vger.kernel.org,
+        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
+        gustavo@embeddedor.com, h.j.bos@vu.nl,
+        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+        jakobkoschel@gmail.com, jgg@ziepe.ca, keescook@chromium.org,
+        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
+        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        rppt@kernel.org, samba-technical@lists.samba.org,
+        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
+        torvalds@linux-foundation.org,
+        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
+Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Date:   Thu,  3 Mar 2022 10:27:29 +0800
+Message-Id: <20220303022729.9321-1-xiam0nd.tong@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
+References: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We have been looking to see if we could setup some VMs for something
-that old, and we are willing to test against it if it could
-realistically be setup, but it has been harder than expected.  Ronnie
-had some ideas and we are willing to experiment more but realistically
-it is very hard to deal with 'legacy museum style' unless we have some
-VMs available for old systems.
+On Wed, 2 Mar 2022 14:04:06 +0000, David Laight
+<David.Laight@ACULAB.COM> wrote:
+> I think that it would be better to make any alternate loop macro
+> just set the variable to NULL on the loop exit.
+> That is easier to code for and the compiler might be persuaded to
+> not redo the test.
 
-Feel free to contact Ronnie and me or Shyam etc (offline if easier) if
-you have ideas on how to setup something like this.   We don't want to
-be encouraging SMB1, but certainly not NTLMv1 auth with SMB1 given its
-security weaknesses (especially given the particular uses hackers have
-made of 25+ year old NTLMv1 weaknesses).
+No, that would lead to a NULL dereference.
 
-On Wed, Mar 2, 2022 at 6:51 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Tue, Mar 1, 2022 at 10:58 PM Thorsten Leemhuis
-> <regressions@leemhuis.info> wrote:
-> >
-> > Thx for the update. I pointed Linus towards this thread two times now,
-> > but he didn't comment on it afaics. CCing him now, maybe that will to
-> > the trick.
->
-> So I have to admit that I think it's a 20+ year old legacy and
-> insecure protocol that nobody should be using.
->
-> When the maintainer can't really even test it, and it really has been
-> deprecated that long, I get the feeling that somebody who wants it to
-> be maintained will need to do that job himself.
->
-> This seems to be a _very_ niche thing, possibly legacy museum style
-> equipment, and maybe using an older kernel ends up being the answer if
-> nobody steps up and maintains it as an external patch.
->
->              Linus
+The problem is the mis-use of iterator outside the loop on exit, and
+the iterator will be the HEAD's container_of pointer which pointers
+to a type-confused struct. Sidenote: The *mis-use* here refers to
+mistakely access to other members of the struct, instead of the
+list_head member which acutally is the valid HEAD.
 
+IOW, you would dereference a (NULL + offset_of_member) address here.
 
+Please remind me if i missed something, thanks.
 
--- 
-Thanks,
+> OTOH there may be alternative definitions that can be used to get
+> the compiler (or other compiler-like tools) to detect broken code.
+> Even if the definition can't possibly generate a working kerrnel.
 
-Steve
+The "list_for_each_entry_inside(pos, type, head, member)" way makes
+the iterator invisiable outside the loop, and would be catched by
+compiler if use-after-loop things happened.
+
+Can you share your "alternative definitions" details? thanks!
+
+--
+Xiaomeng Tong
