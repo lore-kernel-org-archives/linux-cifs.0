@@ -2,101 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46957C433FE
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Mar 2022 16:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D0BC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Mar 2022 17:12:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240743AbiCDQZV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 4 Mar 2022 11:25:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52848 "EHLO
+        id S238743AbiCDRNA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 4 Mar 2022 12:13:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229966AbiCDQZU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Mar 2022 11:25:20 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E18C1C2D8C
-        for <linux-cifs@vger.kernel.org>; Fri,  4 Mar 2022 08:24:32 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 34A18808C1;
-        Fri,  4 Mar 2022 16:24:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1646411070;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ig2F6uo0V+ywXYOMpGZdT4yDySs7NqZYZUXEDqyi38w=;
-        b=KfnMIweZiwdLZSXzV/xxvV05sBRQkAuCBI25fLw6dCxsUInG+AT+akpRY4kbIf0Z1/pdDJ
-        3d56yKOO/aNi+ADhhvqLNlat+uLtwGXnM7WfRZ3FZzwPZK2n5+c5S4lZnBoitnWXLblQe9
-        Ek4qvDMmxMLA56pGAKBNg3JpuR9qvFvbDswItVV99Q8KvIqhOje/s8GyxLk6r0K0jsWiU+
-        deCxjAdmNqdEXopylRUfEuCdfE8NCzxvlV3SiDdATSLOFx6es0BIdTvkZvHVleY0X2dIz+
-        GoMTpPXRhd61RkXcHUzi4uK2a+Q/Z1cXmQKrckeJ0r/Gf+dK8eekjOhn/l26yg==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
-Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH] cifs: do not skip link targets when an I/O fails
-Date:   Fri,  4 Mar 2022 13:22:15 -0300
-Message-Id: <20220304162215.25536-1-pc@cjr.nz>
+        with ESMTP id S237000AbiCDRM7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Mar 2022 12:12:59 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A9F11CD9F4
+        for <linux-cifs@vger.kernel.org>; Fri,  4 Mar 2022 09:12:11 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id m14so15279516lfu.4
+        for <linux-cifs@vger.kernel.org>; Fri, 04 Mar 2022 09:12:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wHW7mutHCkekekPtx2nWdk4aiFz7sC34O38seFW3hIQ=;
+        b=Lz/spEKDEYzHrdHdnbA8d6u0fBL1GI8Z6k8tz3HbMxFCbhK/MmQylwn1hdFJHVHkPi
+         ie7p3gM8AKY58B4O+Kd2voK7bacz5roBiESrj4nVloQmjMwugcLmJ4hXRezUlPLXsKFn
+         zU721wgo6qPmsK3FmjgSHXAsvFmrBWcG0EjwDOu341aQwXrss2MRMpzApOgus57L3dCM
+         Bz9RY/ru3Fb9mQsfwUR9e7BeOWPrf0hCRlG8bpDv7HUw7NMh1PQ2MeXF6KBqJTEKhpcG
+         hcludW5MaE4AIPEIMNO7enEO4V0tj2j4faw6CystOOCg5tx76I4oP+PChr0BD9oGj6W1
+         xRhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wHW7mutHCkekekPtx2nWdk4aiFz7sC34O38seFW3hIQ=;
+        b=p1SHpPOPtQVFyrvel2XY+btDQbApjiDtxq1ty9FKU3tacpANFDLdII52eCYKTBaDUH
+         9wFfluA632NvvyZn1OU298Zxh5F0nn6ftnuiC6Dqp6i5U8VD4+PQYwYemHlte5b2VDyr
+         U0SgfgM03HV8GsAz41WlW4kCLU5zN9TmCQWoUmxr5VwyqdPKrLiHUitC+oGDpuTLS3Vy
+         iXlUyJexS+4foEvlJn2PsWlQaPoUR6iG6wvr8lKgpGh5AKfhatx+tVmKpVOjS9gSqFeP
+         DE602rz0Chjn+gICJFDEcolxrGNvqz6sHtfRdjwmqyOjHkGzdJ/YycRMfYuFvuvTZoeA
+         GP0A==
+X-Gm-Message-State: AOAM532EkcUVxTmQMxzM3CBscVmwEDrrpz3/4gKxzYLnvPkNXhkqQjXK
+        UshQxzSS5eFn4xj6o4NvYUBVFrS6eGO6nXQ5awY=
+X-Google-Smtp-Source: ABdhPJxBwASPS7CyTqN6Epc3/+DodWOnKo/GHtk06DWCd3FLA2nqDnzgKDoB5XdYHDGUyoWMqz1LmytgqpNKU16MYGs=
+X-Received: by 2002:a05:6512:2315:b0:439:731f:a11e with SMTP id
+ o21-20020a056512231500b00439731fa11emr26277899lfu.545.1646413926908; Fri, 04
+ Mar 2022 09:12:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220304003149.299182-1-lsahlber@redhat.com> <87ee3h20am.fsf@cjr.nz>
+In-Reply-To: <87ee3h20am.fsf@cjr.nz>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 4 Mar 2022 11:11:55 -0600
+Message-ID: <CAH2r5msPf85900KpdOxPOs-VLD1UK6Q0-XT4_PH2Ajqa7j86+g@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix handlecache and multiuser
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When I/O fails in one of the currently connected DFS targets, retry it
-from other targets as specified in MS-DFSC "3.1.5.2 I/O Operation to
-+Target Fails with an Error Other Than STATUS_PATH_NOT_COVERED."
+Added Acked-by and also added cc: Stable
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
----
- fs/cifs/connect.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 053cb449eb16..79b5f20c38e7 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3473,6 +3473,9 @@ static int connect_dfs_target(struct mount_ctx *mnt_ctx, const char *full_path,
- 	struct cifs_sb_info *cifs_sb = mnt_ctx->cifs_sb;
- 	char *oldmnt = cifs_sb->ctx->mount_options;
- 
-+	cifs_dbg(FYI, "%s: full_path=%s ref_path=%s target=%s\n", __func__, full_path, ref_path,
-+		 dfs_cache_get_tgt_name(tit));
-+
- 	rc = dfs_cache_get_tgt_referral(ref_path, tit, &ref);
- 	if (rc)
- 		goto out;
-@@ -3571,13 +3574,18 @@ static int __follow_dfs_link(struct mount_ctx *mnt_ctx)
- 	if (rc)
- 		goto out;
- 
--	/* Try all dfs link targets */
-+	/* Try all dfs link targets.  If an I/O fails from currently connected DFS target with an
-+	 * error other than STATUS_PATH_NOT_COVERED (-EREMOTE), then retry it from other targets as
-+	 * specified in MS-DFSC "3.1.5.2 I/O Operation to Target Fails with an Error Other Than
-+	 * STATUS_PATH_NOT_COVERED."
-+	 */
- 	for (rc = -ENOENT, tit = dfs_cache_get_tgt_iterator(&tl);
- 	     tit; tit = dfs_cache_get_next_tgt(&tl, tit)) {
- 		rc = connect_dfs_target(mnt_ctx, full_path, mnt_ctx->leaf_fullpath + 1, tit);
- 		if (!rc) {
- 			rc = is_path_remote(mnt_ctx);
--			break;
-+			if (!rc || rc == -EREMOTE)
-+				break;
- 		}
- 	}
- 
-@@ -3651,7 +3659,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
- 		goto error;
- 
- 	rc = is_path_remote(&mnt_ctx);
--	if (rc == -EREMOTE)
-+	if (rc)
- 		rc = follow_dfs_link(&mnt_ctx);
- 	if (rc)
- 		goto error;
+On Fri, Mar 4, 2022 at 9:40 AM Paulo Alcantara <pc@cjr.nz> wrote:
+>
+> Ronnie Sahlberg <lsahlber@redhat.com> writes:
+>
+> > In multiuser each individual user has their own tcon structure for the
+> > share and thus their own handle for a cached directory.
+> > When we umount such a share we much make sure to release the pinned down dentry
+> > for each such tcon and not just the master tcon.
+> >
+> > Otherwise we will get nasty warnings on umount that dentries are still in use:
+> > [ 3459.590047] BUG: Dentry 00000000115c6f41{i=12000000019d95,n=/}  still in use\
+> >  (2) [unmount of cifs cifs]
+> > ...
+> > [ 3459.590492] Call Trace:
+> > [ 3459.590500]  d_walk+0x61/0x2a0
+> > [ 3459.590518]  ? shrink_lock_dentry.part.0+0xe0/0xe0
+> > [ 3459.590526]  shrink_dcache_for_umount+0x49/0x110
+> > [ 3459.590535]  generic_shutdown_super+0x1a/0x110
+> > [ 3459.590542]  kill_anon_super+0x14/0x30
+> > [ 3459.590549]  cifs_kill_sb+0xf5/0x104 [cifs]
+> > [ 3459.590773]  deactivate_locked_super+0x36/0xa0
+> > [ 3459.590782]  cleanup_mnt+0x131/0x190
+> > [ 3459.590789]  task_work_run+0x5c/0x90
+> > [ 3459.590798]  exit_to_user_mode_loop+0x151/0x160
+> > [ 3459.590809]  exit_to_user_mode_prepare+0x83/0xd0
+> > [ 3459.590818]  syscall_exit_to_user_mode+0x12/0x30
+> > [ 3459.590828]  do_syscall_64+0x48/0x90
+> > [ 3459.590833]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> >
+> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > ---
+> >  fs/cifs/cifsfs.c | 13 ++++++++++---
+> >  1 file changed, 10 insertions(+), 3 deletions(-)
+>
+> Acked-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+
+
+
 -- 
-2.35.1
+Thanks,
 
+Steve
