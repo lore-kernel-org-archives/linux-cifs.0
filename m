@@ -2,169 +2,238 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D99C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Mar 2022 01:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB793C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Mar 2022 01:34:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234607AbiCGBe5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 6 Mar 2022 20:34:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36574 "EHLO
+        id S230119AbiCGBfG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 6 Mar 2022 20:35:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233960AbiCGBe5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Mar 2022 20:34:57 -0500
+        with ESMTP id S233630AbiCGBfF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Mar 2022 20:35:05 -0500
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CF013EAB
-        for <linux-cifs@vger.kernel.org>; Sun,  6 Mar 2022 17:33:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DAE813F0F
+        for <linux-cifs@vger.kernel.org>; Sun,  6 Mar 2022 17:34:12 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6F356210FF;
-        Mon,  7 Mar 2022 01:33:57 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 2B3E9210ED;
+        Mon,  7 Mar 2022 01:34:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1646616837; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=lgYb+ENhs24TdAT2IUenIcZL53vK2G11yeghmPvCUDU=;
-        b=xowYVk9z3QnQISftu0flvhD4OrmubnhrJOR2ZR3J4hgF+Vc4DpQ6/Ir1vBxvC+49PYoy5Q
-        zrAHFbdN7/35BbAVrorHXwdZVxu/K4E3g3XV2iUc+fwqgZIg9JYzmz1TZyOjhNAxtZuD2D
-        5OeXljbu1eebqIGx3azY87Jc8z1NauA=
+        t=1646616851; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ncawbqa6M80oHrUdZW7Y47IzHu+OPdxE6ab1dMvSiSE=;
+        b=DaLscTU2plvV4I69PpCyyvldOjRU8iU1bxMYji1VLkST5pXIsbwBuOussDdmIMDacF0vBz
+        rj8sjaYz0ja5K0Jqf2oxP35xdTVOZqRaQbseQyv20JNF35a30HemZg0wlkwX33akWhqgsd
+        pY2uBx/NKNcd87Jun3TMrDQRewNp5iE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1646616837;
+        s=susede2_ed25519; t=1646616851;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=lgYb+ENhs24TdAT2IUenIcZL53vK2G11yeghmPvCUDU=;
-        b=7uRNhQATogKs3/Z2+iwCHMblUtU6XM0hlZUS6r2vyprs0o7R6oxL5gPRxdwjCv8RE8mJ5I
-        GIxJ97HoigWIVhCA==
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ncawbqa6M80oHrUdZW7Y47IzHu+OPdxE6ab1dMvSiSE=;
+        b=rtsaFK4qPCqjjD6ksHY0VYGrbcEGEZ7qcv3hrdTljDWrfvkVFI5q0mxFkjEFQ684UegCY1
+        cKAd3Smcso6rP/CA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DED211340A;
-        Mon,  7 Mar 2022 01:33:56 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A69CE1340A;
+        Mon,  7 Mar 2022 01:34:10 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id GjxCKARhJWIFdAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Mon, 07 Mar 2022 01:33:56 +0000
+        id I37eGhJhJWISdAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Mon, 07 Mar 2022 01:34:10 +0000
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     linux-cifs@vger.kernel.org, linkinjeon@kernel.org
 Cc:     senozhatsky@chromium.org, sergey.senozhatsky@gmail.com,
         hyc.lee@gmail.com, smfrench@gmail.com,
         Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH 0/9] Unify all programs into a single binary "ksmbdctl"
-Date:   Sun,  6 Mar 2022 22:33:35 -0300
-Message-Id: <20220307013344.29064-1-ematsumiya@suse.de>
+Subject: [PATCH 1/9] ksmbd-tools: rename dirs to reflect new commands
+Date:   Sun,  6 Mar 2022 22:33:36 -0300
+Message-Id: <20220307013344.29064-2-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220307013344.29064-1-ematsumiya@suse.de>
+References: <20220307013344.29064-1-ematsumiya@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello,
+Rename directories to reflect command names, in preparation for binary
+unification.
 
-This commit unifies all existing programs
-(ksmbd.{adduser,addshare,control,mountd}) into a single ksmbdctl binary.
-
-The intention is to make it more like other modern tools (e.g. git,
-nvme, virsh, etc) which have more clear user interface, readable
-commands, and also makes it easier to script.
-
-Example commands:
-  # ksmbdctl share add myshare -o "guest ok=yes, writable=yes, path=/mnt/data"
-  # ksmbdctl user add myuser
-  # ksmbdctl user add -i $HOME/mysmb.conf anotheruser
-  # ksmbdctl daemon start
-
-Besides adding a new "share list" command, any previously working
-functionality shouldn't be affected.
-
-Basic testing was done manually.
-
-TODO:
-- run more complex tests in more complex environments
-- implement unit tests (for each command and subcommand)
-- create an abstract command interface, to make it easier to add/modify
-  commands
-
-Enzo Matsumiya (9):
-  ksmbd-tools: rename dirs to reflect new commands
-  ksmbd-tools: move control functions to daemon
-  ksmbd-tools: use quotes for local includes
-  share: introduce share_cmd
-  user: introduce user_cmd
-  daemon: introduce daemon_cmd
-  daemon/rpc_samr: drop unused function rpc_samr_remove_domain_entry()
-  Unify all programs into a single binary "ksmbdctl"
-  README: change to markdown, updates for ksmbdctl
-
- Makefile.am                        |  14 +-
- README                             | 100 -------
- README.md                          |  57 ++--
- addshare/addshare.c                | 172 -------------
- addshare/share_admin.h             |  15 --
- adduser/adduser.c                  | 180 -------------
- adduser/user_admin.h               |  15 --
- configure.ac                       |   7 +-
- control/Makefile.am                |   7 -
- control/control.c                  | 128 ---------
- {mountd => daemon}/Makefile.am     |   2 +-
- mountd/mountd.c => daemon/daemon.c | 401 +++++++++++++++++++++--------
- daemon/daemon.h                    |  55 ++++
- {mountd => daemon}/ipc.c           |  27 +-
- {mountd => daemon}/rpc.c           |  21 +-
- {mountd => daemon}/rpc_lsarpc.c    |  13 +-
- {mountd => daemon}/rpc_samr.c      |  22 +-
- {mountd => daemon}/rpc_srvsvc.c    |  11 +-
- {mountd => daemon}/rpc_wkssvc.c    |  10 +-
- {mountd => daemon}/smbacl.c        |   4 +-
- {mountd => daemon}/worker.c        |  32 +--
- include/config_parser.h            |   2 +-
- include/ksmbdtools.h               |  24 +-
- ksmbdctl.c                         | 182 +++++++++++++
- lib/config_parser.c                |  15 +-
- lib/ksmbdtools.c                   |  26 +-
- lib/management/spnego.c            |   6 +-
- lib/management/spnego_krb5.c       |   4 +-
- {addshare => share}/Makefile.am    |   2 +-
- share/share.c                      | 227 ++++++++++++++++
- {addshare => share}/share_admin.c  |  97 +++++--
- share/share_admin.h                |  44 ++++
- {adduser => user}/Makefile.am      |   2 +-
- {adduser => user}/md4_hash.c       |   2 +-
- {adduser => user}/md4_hash.h       |   0
- user/user.c                        | 238 +++++++++++++++++
- {adduser => user}/user_admin.c     | 263 ++++++++++---------
- user/user_admin.h                  |  44 ++++
- 38 files changed, 1458 insertions(+), 1013 deletions(-)
- delete mode 100644 README
- delete mode 100644 addshare/addshare.c
- delete mode 100644 addshare/share_admin.h
- delete mode 100644 adduser/adduser.c
- delete mode 100644 adduser/user_admin.h
- delete mode 100644 control/Makefile.am
- delete mode 100644 control/control.c
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ Makefile.am                        | 2 +-
+ configure.ac                       | 6 +++---
+ {mountd => daemon}/Makefile.am     | 2 +-
+ mountd/mountd.c => daemon/daemon.c | 0
+ {mountd => daemon}/ipc.c           | 0
+ {mountd => daemon}/rpc.c           | 0
+ {mountd => daemon}/rpc_lsarpc.c    | 0
+ {mountd => daemon}/rpc_samr.c      | 0
+ {mountd => daemon}/rpc_srvsvc.c    | 0
+ {mountd => daemon}/rpc_wkssvc.c    | 0
+ {mountd => daemon}/smbacl.c        | 0
+ {mountd => daemon}/worker.c        | 0
+ {addshare => share}/Makefile.am    | 0
+ {addshare => share}/addshare.c     | 0
+ {addshare => share}/share_admin.c  | 0
+ {addshare => share}/share_admin.h  | 0
+ {adduser => user}/Makefile.am      | 0
+ {adduser => user}/adduser.c        | 0
+ {adduser => user}/md4_hash.c       | 0
+ {adduser => user}/md4_hash.h       | 0
+ {adduser => user}/user_admin.c     | 0
+ {adduser => user}/user_admin.h     | 0
+ 22 files changed, 5 insertions(+), 5 deletions(-)
  rename {mountd => daemon}/Makefile.am (95%)
- rename mountd/mountd.c => daemon/daemon.c (55%)
- create mode 100644 daemon/daemon.h
- rename {mountd => daemon}/ipc.c (95%)
- rename {mountd => daemon}/rpc.c (98%)
- rename {mountd => daemon}/rpc_lsarpc.c (98%)
- rename {mountd => daemon}/rpc_samr.c (98%)
- rename {mountd => daemon}/rpc_srvsvc.c (98%)
- rename {mountd => daemon}/rpc_wkssvc.c (97%)
- rename {mountd => daemon}/smbacl.c (99%)
- rename {mountd => daemon}/worker.c (95%)
- create mode 100644 ksmbdctl.c
- rename {addshare => share}/Makefile.am (74%)
- create mode 100644 share/share.c
- rename {addshare => share}/share_admin.c (68%)
- create mode 100644 share/share_admin.h
- rename {adduser => user}/Makefile.am (69%)
- rename {adduser => user}/md4_hash.c (99%)
+ rename mountd/mountd.c => daemon/daemon.c (100%)
+ rename {mountd => daemon}/ipc.c (100%)
+ rename {mountd => daemon}/rpc.c (100%)
+ rename {mountd => daemon}/rpc_lsarpc.c (100%)
+ rename {mountd => daemon}/rpc_samr.c (100%)
+ rename {mountd => daemon}/rpc_srvsvc.c (100%)
+ rename {mountd => daemon}/rpc_wkssvc.c (100%)
+ rename {mountd => daemon}/smbacl.c (100%)
+ rename {mountd => daemon}/worker.c (100%)
+ rename {addshare => share}/Makefile.am (100%)
+ rename {addshare => share}/addshare.c (100%)
+ rename {addshare => share}/share_admin.c (100%)
+ rename {addshare => share}/share_admin.h (100%)
+ rename {adduser => user}/Makefile.am (100%)
+ rename {adduser => user}/adduser.c (100%)
+ rename {adduser => user}/md4_hash.c (100%)
  rename {adduser => user}/md4_hash.h (100%)
- create mode 100644 user/user.c
- rename {adduser => user}/user_admin.c (52%)
- create mode 100644 user/user_admin.h
+ rename {adduser => user}/user_admin.c (100%)
+ rename {adduser => user}/user_admin.h (100%)
 
+diff --git a/Makefile.am b/Makefile.am
+index 00a6148ff29d..e3ee928691bf 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2,7 +2,7 @@
+ 
+ ACLOCAL_AMFLAGS = -I m4
+ 
+-SUBDIRS = lib mountd adduser addshare control
++SUBDIRS = lib daemon user share control
+ 
+ # other stuff
+ EXTRA_DIST =			\
+diff --git a/configure.ac b/configure.ac
+index 6aceade6ed01..1f107805325f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -62,9 +62,9 @@ AM_CONDITIONAL(HAVE_LIBKRB5, [test "$enable_krb5" != "no"])
+ AC_CONFIG_FILES([
+ 	Makefile
+ 	lib/Makefile
+-	mountd/Makefile
+-	adduser/Makefile
+-	addshare/Makefile
++	daemon/Makefile
++	user/Makefile
++	share/Makefile
+ 	control/Makefile
+ ])
+ 
+diff --git a/mountd/Makefile.am b/daemon/Makefile.am
+similarity index 95%
+rename from mountd/Makefile.am
+rename to daemon/Makefile.am
+index 4719170f2d05..6249a098025d 100644
+--- a/mountd/Makefile.am
++++ b/daemon/Makefile.am
+@@ -4,5 +4,5 @@ ksmbd_mountd_LDADD = $(top_builddir)/lib/libksmbdtools.a
+ 
+ sbin_PROGRAMS = ksmbd.mountd
+ 
+-ksmbd_mountd_SOURCES = worker.c ipc.c rpc.c rpc_srvsvc.c rpc_wkssvc.c mountd.c \
++ksmbd_mountd_SOURCES = worker.c ipc.c rpc.c rpc_srvsvc.c rpc_wkssvc.c daemon.c \
+ 		       smbacl.c rpc_samr.c rpc_lsarpc.c
+diff --git a/mountd/mountd.c b/daemon/daemon.c
+similarity index 100%
+rename from mountd/mountd.c
+rename to daemon/daemon.c
+diff --git a/mountd/ipc.c b/daemon/ipc.c
+similarity index 100%
+rename from mountd/ipc.c
+rename to daemon/ipc.c
+diff --git a/mountd/rpc.c b/daemon/rpc.c
+similarity index 100%
+rename from mountd/rpc.c
+rename to daemon/rpc.c
+diff --git a/mountd/rpc_lsarpc.c b/daemon/rpc_lsarpc.c
+similarity index 100%
+rename from mountd/rpc_lsarpc.c
+rename to daemon/rpc_lsarpc.c
+diff --git a/mountd/rpc_samr.c b/daemon/rpc_samr.c
+similarity index 100%
+rename from mountd/rpc_samr.c
+rename to daemon/rpc_samr.c
+diff --git a/mountd/rpc_srvsvc.c b/daemon/rpc_srvsvc.c
+similarity index 100%
+rename from mountd/rpc_srvsvc.c
+rename to daemon/rpc_srvsvc.c
+diff --git a/mountd/rpc_wkssvc.c b/daemon/rpc_wkssvc.c
+similarity index 100%
+rename from mountd/rpc_wkssvc.c
+rename to daemon/rpc_wkssvc.c
+diff --git a/mountd/smbacl.c b/daemon/smbacl.c
+similarity index 100%
+rename from mountd/smbacl.c
+rename to daemon/smbacl.c
+diff --git a/mountd/worker.c b/daemon/worker.c
+similarity index 100%
+rename from mountd/worker.c
+rename to daemon/worker.c
+diff --git a/addshare/Makefile.am b/share/Makefile.am
+similarity index 100%
+rename from addshare/Makefile.am
+rename to share/Makefile.am
+diff --git a/addshare/addshare.c b/share/addshare.c
+similarity index 100%
+rename from addshare/addshare.c
+rename to share/addshare.c
+diff --git a/addshare/share_admin.c b/share/share_admin.c
+similarity index 100%
+rename from addshare/share_admin.c
+rename to share/share_admin.c
+diff --git a/addshare/share_admin.h b/share/share_admin.h
+similarity index 100%
+rename from addshare/share_admin.h
+rename to share/share_admin.h
+diff --git a/adduser/Makefile.am b/user/Makefile.am
+similarity index 100%
+rename from adduser/Makefile.am
+rename to user/Makefile.am
+diff --git a/adduser/adduser.c b/user/adduser.c
+similarity index 100%
+rename from adduser/adduser.c
+rename to user/adduser.c
+diff --git a/adduser/md4_hash.c b/user/md4_hash.c
+similarity index 100%
+rename from adduser/md4_hash.c
+rename to user/md4_hash.c
+diff --git a/adduser/md4_hash.h b/user/md4_hash.h
+similarity index 100%
+rename from adduser/md4_hash.h
+rename to user/md4_hash.h
+diff --git a/adduser/user_admin.c b/user/user_admin.c
+similarity index 100%
+rename from adduser/user_admin.c
+rename to user/user_admin.c
+diff --git a/adduser/user_admin.h b/user/user_admin.h
+similarity index 100%
+rename from adduser/user_admin.h
+rename to user/user_admin.h
 -- 
 2.34.1
 
