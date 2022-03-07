@@ -2,60 +2,60 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F04C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Mar 2022 01:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7595C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Mar 2022 01:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234620AbiCGBfb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 6 Mar 2022 20:35:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39214 "EHLO
+        id S234624AbiCGBfg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 6 Mar 2022 20:35:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234623AbiCGBfa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Mar 2022 20:35:30 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DBEB5D5C8
-        for <linux-cifs@vger.kernel.org>; Sun,  6 Mar 2022 17:34:37 -0800 (PST)
+        with ESMTP id S234622AbiCGBff (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Mar 2022 20:35:35 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64A0F3E0CB
+        for <linux-cifs@vger.kernel.org>; Sun,  6 Mar 2022 17:34:40 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C2F9A1F38E;
-        Mon,  7 Mar 2022 01:34:35 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 2244B210ED;
+        Mon,  7 Mar 2022 01:34:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1646616875; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1646616879; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pfW+RsNzUdaCfNn5wJgoXJ9e1veQxuzr1kVald3OfRo=;
-        b=uvbMzMDHjh7z2uWA97XqHT2mA3NudPDmUbZ47k2C/kXa5hZM9J8rwak4elWox/mkY8qfUT
-        6VNEvq5k8BQfu8izoatCgd37ggsfWov6um3oWU7PljnNjNI+U/ZlHpsxWcV0mrPhnJDMR6
-        EZgD4QKkbe78O/KoybVDTh7L+qxOO+8=
+        bh=OyM4dNIElj3ftzvx7Skp56qIDauSPsWpul6l2EGUp5c=;
+        b=znJukYGIDZawvbgByS8F93PYrq9abHUORUnQl4Rm/8/+cfv1VA41fuK2IMZrHHf9LdsEpI
+        HqD6wM85TCi7ila5GaD3ct074xoWKwLWjTi26yoDb80ZtOJ11lQ/XDs8uJo/QsJFZJKVUs
+        aRb5WJyX570j1eCbBPYoU1Pjx6tmLN0=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1646616875;
+        s=susede2_ed25519; t=1646616879;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pfW+RsNzUdaCfNn5wJgoXJ9e1veQxuzr1kVald3OfRo=;
-        b=UTHulVHK0KBpWWlEP6bFngKM8kONGXZYhARXbDKAimBDzx8Vm33lYeMnlyoNRPe3SNUUAM
-        J1pHMxQ0kZZJiaCw==
+        bh=OyM4dNIElj3ftzvx7Skp56qIDauSPsWpul6l2EGUp5c=;
+        b=+Ti9NU1k/Mf1KSIEJE+ICQqZEbdZnEJmXezdjZ7CdHWBHYHMdfFwHKyHzfYuW0xhL4/ro6
+        Hwa7OLkVtB6VuBBQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3E6FD1340A;
-        Mon,  7 Mar 2022 01:34:34 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9A79B1340A;
+        Mon,  7 Mar 2022 01:34:38 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 0C+SOyphJWJGdAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Mon, 07 Mar 2022 01:34:34 +0000
+        id grCkFy5hJWJMdAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Mon, 07 Mar 2022 01:34:38 +0000
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     linux-cifs@vger.kernel.org, linkinjeon@kernel.org
 Cc:     senozhatsky@chromium.org, sergey.senozhatsky@gmail.com,
         hyc.lee@gmail.com, smfrench@gmail.com,
         Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH 8/9] Unify all programs into a single binary "ksmbdctl"
-Date:   Sun,  6 Mar 2022 22:33:43 -0300
-Message-Id: <20220307013344.29064-9-ematsumiya@suse.de>
+Subject: [PATCH 9/9] README: change to markdown, updates for ksmbdctl
+Date:   Sun,  6 Mar 2022 22:33:44 -0300
+Message-Id: <20220307013344.29064-10-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220307013344.29064-1-ematsumiya@suse.de>
 References: <20220307013344.29064-1-ematsumiya@suse.de>
@@ -65,250 +65,234 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This commit unifies all existing programs
-(ksmbd.{adduser,addshare,control,mountd}) into a single ksmbdctl binary.
+Change README to markdown format.
 
-The intention is to make it more like other modern tools (e.g. git,
-nvme, virsh, etc) which have more clear user interface, readable
-commands, and also makes it easier to script.
+Includes instructions for openSUSE.
 
-Example commands:
-  # ksmbdctl share add myshare -o "guest ok=yes, writable=yes, path=/mnt/data"
-  # ksmbdctl user add myuser
-  # ksmbdctl user add -i $HOME/mysmb.conf anotheruser
-  # ksmbdctl daemon start
-
-Besides adding a new "share list" command, any previously working
-functionality shouldn't be affected.
-
-Basic testing was done manually.
-
-TODO:
-- run more complex tests in more complex environments
-- implement unit tests (for each command and subcommand)
-- create an abstract command interface, to make it easier to add/modify
-  commands
+Updates instructions for ksmbdctl (single binary).
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- Makefile.am |  14 +++-
- ksmbdctl.c  | 182 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 195 insertions(+), 1 deletion(-)
- create mode 100644 ksmbdctl.c
+ README    | 100 ------------------------------------------------------
+ README.md |  57 ++++++++++++++++---------------
+ 2 files changed, 30 insertions(+), 127 deletions(-)
+ delete mode 100644 README
 
-diff --git a/Makefile.am b/Makefile.am
-index b4e205895825..8059a360605b 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -2,7 +2,19 @@
+diff --git a/README b/README
+deleted file mode 100644
+index c64b75c58c2f..000000000000
+--- a/README
++++ /dev/null
+@@ -1,100 +0,0 @@
+-________________________
+-BUILDING KSMBD TOOLS
+-________________________
+-
+-Install preprequisite packages:
+-	For Ubuntu:
+-	sudo apt-get install autoconf libtool pkg-config libnl-3-dev \
+-	libnl-genl-3-dev libglib2.0-dev
+-
+-	For Fedora, RHEL:
+-	sudo yum install autoconf automake libtool glib2-devel libnl3-devel
+-
+-	For CentOS:
+-	sudo yum install glib2-devel libnl3-devel
+-
+-ksmbd-tools.spec should serve as a base template for RPM packagers.
+-
+-Build steps:
+-        - cd into the ksmbd-tools directory
+-        - ./autogen.sh
+-        - ./configure
+-        - make
+-        - make install
+-
+-_____________________
+-USING KSMBD TOOLS
+-_____________________
+-
+-Setup steps:
+-	- install smbd kernel driver
+-		modprobe ksmbd
+-	- create user/password for SMB share
+-		mkdir /etc/ksmbd/
+-		ksmbd.adduser -a <Enter USERNAME for SMB share access>
+-		Enter password for SMB share access
+-	- create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
+-		Refer smb.conf.example
+-	- start smbd user space daemon
+-		ksmbd.mountd
+-	- access share from Windows or Linux using CIFS
+-
+-_____________________
+-RESTART KSMBD
+-_____________________
+-
+-steps:
+-	- kill user and kernel space daemon
+-		sudo ksmbd.control -s
+-	- restart user space daemon
+-		ksmbd.mountd
+-
+-_____________________
+-Shutdown KSMBD
+-_____________________
+-
+-steps:
+-	- kill user and kernel space daemon
+-		sudo ksmbd.control -s
+-	- unload ksmbd module
+-		rmmod ksmbd
+-
+-
+-_____________________
+-Enable debug prints
+-_____________________
+-
+-steps:
+-	- Enable all component prints
+-		sudo ksmbd.control -d "all"
+-	- Enable one of components(smb, auth, vfs, oplock, ipc, conn, rdma)
+-		sudo ksmbd.control -d "smb"
+-	- Disable prints:
+-		If you try the selected component once more, It is disabled without brackets.
+-
+-
+---------------------
+-ADMIN TOOLS
+---------------------
+-
+-- ksmbd.adduser
+-	Adds, updates or removes (-a/-u/-d) a user from ksmbd pwd file.
+-
+-- ksmbd.addshare
+-	Adds, updates or removes (-a/-u/-d) a net share from smb.conf file.
+-
+-Usage example:
+-
+-Creating a new share:
+-
+-ksmbd.addshare -a files -o "\
+-		     path=/home/users/files \
+-		     comment=exported files \
+-		     writeable=yes \
+-		     read only = no \
+-		     "
+-
+-Note that share options (-o) must always be enquoted ("...").
+-
+-ksmbd.addshare tool does not modify [global] smb.conf section; only net
+-share configs are supported at the moment.
+diff --git a/README.md b/README.md
+index 7156c2e20dee..1e8fceb11e23 100644
+--- a/README.md
++++ b/README.md
+@@ -5,16 +5,17 @@
+ ##### Install prerequisite packages:
  
- ACLOCAL_AMFLAGS = -I m4
+ - For Ubuntu:
+-  - `sudo apt-get install autoconf libtool pkg-config libnl-3-dev libnl-genl-3-dev libglib2.0-dev`
++  - `sudo apt-get install autoconf libtool pkg-config libnl-3-dev libnl-genl-3-dev libglib2.0-dev libkrb5-dev`
  
--SUBDIRS = lib daemon user share
-+SUBDIRS = lib
-+AM_CFLAGS = -Iinclude $(GLIB_CFLAGS) $(LIBNL_CFLAGS) -fno-common
-+LIBS = $(GLIB_LIBS) $(LIBNL_LIBS) $(LIBKRB5_LIBS)
-+ksmbdctl_LDADD = lib/libksmbdtools.a
-+
-+sbin_PROGRAMS = ksmbdctl
-+
-+ksmbdctl_SOURCES = share/share_admin.c share/share.c share/share_admin.h \
-+		   ksmbdctl.c user/md4_hash.c user/user_admin.c user/user.c \
-+		   user/md4_hash.h user/user_admin.h daemon/worker.c \
-+		   daemon/ipc.c daemon/rpc.c  daemon/rpc_srvsvc.c \
-+		   daemon/rpc_wkssvc.c daemon/daemon.c daemon/smbacl.c \
-+		   daemon/rpc_samr.c daemon/rpc_lsarpc.c
+ - For Fedora, RHEL:
+-  - `sudo yum install autoconf automake libtool glib2-devel libnl3-devel`
++  - `sudo yum install autoconf automake libtool glib2-devel libnl3-devel krb5-devel`
  
- # other stuff
- EXTRA_DIST =			\
-diff --git a/ksmbdctl.c b/ksmbdctl.c
-new file mode 100644
-index 000000000000..04e7cd7170fb
---- /dev/null
-+++ b/ksmbdctl.c
-@@ -0,0 +1,182 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *   Copyright (C) 2021 SUSE LLC
-+ *   Author: Enzo Matsumiya <ematsumiya@suse.de>
-+ *
-+ *   linux-cifsd-devel@lists.sourceforge.net
-+ */
+ - For CentOS:
+-  - `sudo yum install glib2-devel libnl3-devel`
++  - `sudo yum install glib2-devel libnl3-devel krb5-devel`
+ 
+ - For openSUSE:
+-  - `sudo zypper install glib2-devel libnl3-devel`
++  - `sudo zypper install glib2-devel libnl3-devel krb5-devel`
 +
-+#include <glib.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <stdbool.h>
-+#include <unistd.h>
-+#include <getopt.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <sys/types.h>
-+#include <signal.h>
-+#include <errno.h>
-+#include <ctype.h>
-+
-+#include "config_parser.h"
-+#include "ksmbdtools.h"
-+#include "management/share.h"
-+#include "linux/ksmbd_server.h"
-+#include "share/share_admin.h"
-+#include "user/user_admin.h"
-+#include "daemon/daemon.h"
-+#include "version.h"
-+
-+typedef enum {
-+       KSMBD_CMD_NONE = 0,
-+       KSMBD_CMD_SHARE,
-+       KSMBD_CMD_USER,
-+       KSMBD_CMD_DAEMON,
-+       KSMBD_CMD_VERSION,
-+       KSMBD_CMD_HELP,
-+       KSMBD_CMD_MAX
-+} ksmbd_cmd;
-+
-+/* List of supported commands */
-+static const char *ksmbd_cmds_str[] = {
-+       "none",
-+       "share",
-+       "user",
-+       "daemon",
-+       "version",
-+       "help"
-+};
-+
-+static ksmbd_cmd ksmbd_get_cmd(char *cmd)
-+{
-+       int i;
-+
-+       if (!cmd)
-+               return KSMBD_CMD_NONE;
-+
-+       for (i = 1; i < KSMBD_CMD_MAX; i++)
-+               if (!strcmp(cmd, ksmbd_cmds_str[i]))
-+                       return (ksmbd_cmd)i;
-+
-+       return KSMBD_CMD_NONE;
-+}
-+
-+static const char *ksmbd_get_cmd_str(ksmbd_cmd cmd)
-+{
-+       return ksmbd_cmds_str[(int)cmd];
-+}
-+
-+ksmbd_cmd get_cmd_type(char *cmd)
-+{
-+       int i;
-+
-+       if (!cmd)
-+               return KSMBD_CMD_NONE;
-+
-+       for (i = 1; i < KSMBD_CMD_MAX; i++)
-+               if (!strcmp(cmd, ksmbd_cmds_str[i]))
-+                       return i;
-+
-+       return KSMBD_CMD_NONE;
-+}
-+
-+static void version(void)
-+{
-+	pr_out("ksmbd-tools version: %s\n", KSMBD_TOOLS_VERSION);
-+}
-+
-+static void usage(ksmbd_cmd cmd)
-+{
-+	version();
-+
-+	switch (cmd) {
-+	case KSMBD_CMD_SHARE:
-+		share_usage(0);
-+		break;
-+	case KSMBD_CMD_USER:
-+		user_usage(0);
-+		break;
-+	case KSMBD_CMD_DAEMON:
-+		daemon_usage(0);
-+		break;
-+	case KSMBD_CMD_HELP:
-+	default:
-+		pr_out("Usage: ksmbdctl [-v] <command> [<option>] <args>\n\n");
-+		pr_out("%-20s%s", "  -v", "Enable verbose output. Use -vv or -vvv for more verbose.\n\n");
-+		pr_out("List of available commands:\n");
-+		pr_out("%-20s%s", "  share", "Manage ksmbd shares\n");
-+		pr_out("%-20s%s", "  user", "Manage ksmbd users\n");
-+		pr_out("%-20s%s", "  daemon", "Manage ksmbd daemon\n");
-+		pr_out("%-20s%s", "  version", "Show ksmbd version\n");
-+		pr_out("%-20s%s", "  help", "Show this help menu\n\n");
-+		break;
-+	}
-+
-+	exit(EXIT_FAILURE);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int ret = EXIT_FAILURE;
-+	int cmd_argc, c;
-+	char **cmd_argv;
-+	int verbosity = 0;
-+
-+	if (geteuid() != 0) {
-+		pr_out("You need to be root to run this program.\n");
-+		return ret;
-+	}
-+
-+	if (argc < 2)
-+		usage(KSMBD_CMD_NONE);
-+
-+	while ((c = getopt(argc, argv, "-:v")) != EOF)
-+		switch (c) {
-+		case 'v':
-+			verbosity++;
-+			break;
-+		case 1:
-+			goto out_opt;
-+			break;
-+		case '?':
-+		default:
-+			usage(KSMBD_CMD_NONE);
-+			break;
-+		}
-+
-+out_opt:
-+	log_level = verbosity > PR_DEBUG ? PR_DEBUG : verbosity;
-+
-+	/* check cmd */
-+	ksmbd_cmd cmd = get_cmd_type(argv[optind-1]);
-+
-+	/* strip "ksmbdctl" from argv/argc */
-+	cmd_argc = argc - 1;
-+	if (verbosity)
-+		cmd_argc--;
-+
-+	cmd_argv = &argv[optind-1];
-+
-+	switch (cmd) {
-+	case KSMBD_CMD_SHARE:
-+		ret = share_cmd(cmd_argc, cmd_argv);
-+		break;
-+	case KSMBD_CMD_USER:
-+		ret = user_cmd(cmd_argc, cmd_argv);
-+		break;
-+	case KSMBD_CMD_DAEMON:
-+		ret = daemon_cmd(cmd_argc, cmd_argv);
-+		break;
-+	case KSMBD_CMD_VERSION:
-+		version();
-+		break;
-+	case KSMBD_CMD_HELP:
-+	case KSMBD_CMD_NONE:
-+	default:
-+		usage(KSMBD_CMD_NONE);
-+		break;
-+	}
-+
-+	return ret;
-+}
+ 
+ ##### Building:
+ 
+@@ -32,31 +33,31 @@ All administration tasks must be done as root.
+ 
+ ##### Setup:
+ 
+-- Install ksmbd kernel driver
++- Install ksmbd kernel driver (requires CONFIG_SMB_SERVER=y)
+ 	- `modprobe ksmbd`
+ - Create user/password for SMB share
+ 	- `mkdir /etc/ksmbd`
+-	- `ksmbd.adduser -a <username>`
+-	- Enter password for SMB share access
++	- `ksmbdctl user add <username>`
++	- Enter password for user when prompted
+ - Create `/etc/ksmbd/smb.conf` file
+ 	- Refer `smb.conf.example`
+ - Add share to `smb.conf`
+-	- This can be done manually or with `ksmbd.addshare`, e.g.:
+-	- `ksmbd.addshare -a myshare -o "guest ok = yes, writable = yes, path = /mnt/data"`
++	- This can be done either manually or with `ksmbdctl`, e.g.:
++	- `ksmbdctl share add myshare -o "guest ok = yes, writable = yes, path = /mnt/data"`
+ 
+ 	- Note: share options (-o) must always be enclosed with double quotes ("...").
+ - Start ksmbd user space daemon
+-	- `ksmbd.mountd`
+-- Access share from Windows or Linux using CIFS
++	- `ksmbdctl daemon start`
++- Access share from Windows or Linux
+ 
+ 
+ ##### Stopping and restarting the daemon:
+ 
+-First, kill user and kernel space daemon
+-  - `ksmbd.control -s`
++First, kill user and kernel space daemon:
++  - `ksmbdctl daemon shutdown`
+ 
+ Then, to restart the daemon, run:
+-  - `ksmbd.mountd`
++  - `ksmbdctl daemon start`
+ 
+ Or to shut it down completely:
+   - `rmmod ksmbd`
+@@ -64,25 +65,27 @@ Or to shut it down completely:
+ 
+ ### Debugging
+ 
+-- Enable all component prints
+-  - `ksmbd.control -d "all"`
+-- Enable a single component (see below)
+-  - `ksmbd.control -d "smb"`
+-- Run the command with the same component name again to disable it
++- Enable debugging all components
++  - `ksmbdctl daemon debug "all"`
++- Enable debugging a single component (see more below)
++  - `ksmbdctl daemon debug "smb"`
++- Run the commands above with the same component name again to disable it
+ 
+ Currently available debug components:
+ smb, auth, vfs, oplock, ipc, conn, rdma
+ 
+ 
+-### More...
++### User management
+ 
+-- ksmbd.adduser
+-  - Adds (-a), updates (-u), or deletes (-d) a user from user database.
+-  - Default database file is `/etc/ksmbd/users.db`
++- ksmbdctl user
++  - Adds, updates, deletes, or lists users from database.
++  - Default database file is `/etc/ksmbd/users.db`, but can be changed with '-d'
++    option.
+ 
+-- ksmbd.addshare
+-  - Adds (-a), updates (-u), or deletes (-d) a net share from config file.
+-  - Default config file is `/etc/ksmbd/smb.conf`
++- ksmbdctl share
++  - Adds, updates, deletes, or lists net shares from config file.
++  - Default config file is `/etc/ksmbd/smb.conf`, but can be changed with '-c'
++    option.
+ 
+-`ksmbd.addshare` does not modify `[global]` section in config file; only net
++`ksmbdctl share add` does not modify `[global]` section in config file; only net
+ share configs are supported at the moment.
 -- 
 2.34.1
 
