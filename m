@@ -2,55 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A08C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Mar 2022 18:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 651E0C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Mar 2022 19:02:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236344AbiCGS74 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Mar 2022 13:59:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52838 "EHLO
+        id S245030AbiCGTDO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 7 Mar 2022 14:03:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234880AbiCGS7z (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Mar 2022 13:59:55 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D054E388
-        for <linux-cifs@vger.kernel.org>; Mon,  7 Mar 2022 10:59:01 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 0C70A7FC42;
-        Mon,  7 Mar 2022 18:58:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1646679539;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tPsSDyi001VRuYuOCAY/XhKw5EoUkT0naEkLXgOeRgQ=;
-        b=fWg2i8PqP7qLATXKTFFoV5GBGNESJir+JeB5ysgh3SgJTuX8FL0LD5B64NNTAsqOMVosNp
-        QHMgYDUp3dqygHX0eXya/bWgJhqUahB95sUnBHKeYRkW6lJJVRLJnCk3VJ5n4spjMtkiBD
-        ZmZb22csoP8zws5puUM9jEjenPXgJc5cPCAj/0dE7c8NzAfJ9dmQwCAOw7opwnjloq3Nhv
-        8F5yga3aE4Hng8Nql22hhE98nPE94AFus9V/aYf30dz0KLgCQ1ptx6z6w6ZlMK64Dr6uNM
-        JnPLDvp/yGVrgAkZuVDpw079PW+qaMez4k1Rdc7lAPXbyXRiXTKg2f8dMEDHVQ==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Rohith Surabattula <rohiths.msft@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Subject: Re: [PATCH][SMB3]Adjust cifssb maximum read size
-In-Reply-To: <CACdtm0ad+byeGwcpAmLCJWoyyXjJeu=6ZX=QODa0fgxs4X-iyA@mail.gmail.com>
-References: <CACdtm0ad+byeGwcpAmLCJWoyyXjJeu=6ZX=QODa0fgxs4X-iyA@mail.gmail.com>
-Date:   Mon, 07 Mar 2022 15:58:54 -0300
-Message-ID: <87h789bndd.fsf@cjr.nz>
+        with ESMTP id S244938AbiCGTCz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Mar 2022 14:02:55 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262196D4E5
+        for <linux-cifs@vger.kernel.org>; Mon,  7 Mar 2022 11:02:00 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id z26so13711182lji.8
+        for <linux-cifs@vger.kernel.org>; Mon, 07 Mar 2022 11:01:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UaElNruVNuFS2nBZB+dXtlNVultIerGxWoXXB1VaxQk=;
+        b=bDhussN6WOiZvzqzym5zlYyMrCE4m9fbBR46M+0oRYN2Qb0X/4yo09rfejxbZVYCul
+         wo1WeUBwE4fM2MZzkFWC1i57yJy95P0GXvIUWjLPDEahm9eKlplAi6IC+I5dS6yroO4u
+         CQgygTD3Q7slVNh4AkhIMmhqOqJFoukkVPfD1PKF350Eubpn5kHytnh/9kryU24M8jno
+         Zd9eTK3djCE1yYPqDolC+xOirCGscRvvWuGjMbNLFEpfL9zwTP5CTWjCbhbvgc1NpsQa
+         9a2+ykiwCCua/daD8Tmb+Qf6A9hr0eXasLrKzJxSyL+wetuJ2xwnUsQ4yiXvfSWhGbsF
+         1tLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UaElNruVNuFS2nBZB+dXtlNVultIerGxWoXXB1VaxQk=;
+        b=AQicH+PgTYxEKImP9MFq18aKbSFvXOmI3w/rMvcK/ivMlaaksBG5eAru+1l9gYvV6L
+         tb3Cf6MhDMltGRxwQmd81k8GCNNLrZ6CvYLe6xMJgOrI1R8lpLBt0ozvpeQ+h76LZSPa
+         1Z7KRoJOn+kbXbiuImgPhAhOexlApI8aGhmPjKGisIV9SjmTzAKQ5lBEFujZCY6KaBPC
+         W8qSJ9xEYficORWao4/ml+28uQj8OiGR5iauuZRGyjl2PXBkoEDk0gKVmRzQ0tj1Gt7i
+         Jl8NP2Dh/6UK0xbtUZLwdicih+bd0wbCyL/wz6LJIYHQkT8IhQPDTc+kiv8yPeqUUm6n
+         Aa3Q==
+X-Gm-Message-State: AOAM532O0yvRoGY+UXNNHeZVRafl+N1rMV8ZejoziiZUmGPfatoBBvkE
+        ie0tlgmXIKbBU6tGrdj59hcSu3mIAZX1IsZJgwuUmWuV
+X-Google-Smtp-Source: ABdhPJzcPhd6NWbxPA7ptT6iGjoWP913VJ6io+ooI04vVU/Q/t65z37hJlvCDni08f3dPaiw5+1sioTUHdx1Su4Il0E=
+X-Received: by 2002:a2e:908f:0:b0:246:3e31:a80e with SMTP id
+ l15-20020a2e908f000000b002463e31a80emr8479407ljg.23.1646679715092; Mon, 07
+ Mar 2022 11:01:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <CACdtm0ad+byeGwcpAmLCJWoyyXjJeu=6ZX=QODa0fgxs4X-iyA@mail.gmail.com>
+In-Reply-To: <CACdtm0ad+byeGwcpAmLCJWoyyXjJeu=6ZX=QODa0fgxs4X-iyA@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 7 Mar 2022 13:01:43 -0600
+Message-ID: <CAH2r5mt4aaQb2dVFAYLCU_MrPfJmwPM7bUXtOJO7Nwrjm1N1pQ@mail.gmail.com>
+Subject: Re: [PATCH][SMB3]Adjust cifssb maximum read size
+To:     Rohith Surabattula <rohiths.msft@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Paulo Alcantara <pc@cjr.nz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Rohith Surabattula <rohiths.msft@gmail.com> writes:
+Could this be related to any of the intermittent xfstest failures?
 
+On Mon, Mar 7, 2022 at 12:46 PM Rohith Surabattula
+<rohiths.msft@gmail.com> wrote:
+>
 > Hi All,
 >
 > When session gets reconnected during mount then read size in super
@@ -59,7 +74,13 @@ Rohith Surabattula <rohiths.msft@gmail.com> writes:
 >
 > Attaching 2 patches, one for releases before 5.17 and other for latest.
 > Please take a look.
+>
+> Regards,
+> Rohith
 
-LGTM.  Thanks Rohith!
 
-Acked-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+
+-- 
+Thanks,
+
+Steve
