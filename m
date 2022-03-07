@@ -2,60 +2,60 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70728C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Mar 2022 01:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E08AC433EF
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Mar 2022 01:34:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233960AbiCGBfL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 6 Mar 2022 20:35:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37502 "EHLO
+        id S234615AbiCGBfO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 6 Mar 2022 20:35:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233630AbiCGBfJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Mar 2022 20:35:09 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF81B13F0F
-        for <linux-cifs@vger.kernel.org>; Sun,  6 Mar 2022 17:34:15 -0800 (PST)
+        with ESMTP id S234611AbiCGBfM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Mar 2022 20:35:12 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D26313EAB
+        for <linux-cifs@vger.kernel.org>; Sun,  6 Mar 2022 17:34:19 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8CAA81F38E;
-        Mon,  7 Mar 2022 01:34:14 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0A396210ED;
+        Mon,  7 Mar 2022 01:34:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1646616854; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1646616858; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yppu1R8h359jajMr3n2ZHRnQDxR9TRl0JhDM9sUqZdE=;
-        b=HmolPeQYlq09rZXzfehQgy7zCRtWqJVO+WWW/Qi7xEegDt+JRBOUD6e+nEQe57HsEPA1zE
-        q+E8piH2B+N6enBrWcUJjvPIDm1s4FHRb1pyCaAXH8ldjlXzkEe5M5hvRQ3wenIUoovdvm
-        aV6R+1S6Fr23I4Ol5qhU+/FiIjcQCR0=
+        bh=UeM4ryfZPtgrggTEPep42lZ/UfnOePBQDuR/Lsw93Xc=;
+        b=kvXo39hagfDfpJ8FcKbEGXegwTV/5v0WR6o3V9HMcDSNaeKjQdkwVyvuBw3vB6uHIxFHaT
+        3gS9KPTnIH7uVJ5i/LTxz5CdEkgbOWZglvjzODbomy651KByHgXHLNETTMqOmikYb/VTlI
+        QbPhEM8Tmmnk5Wrrqr03Oc/iswsVa9k=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1646616854;
+        s=susede2_ed25519; t=1646616858;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yppu1R8h359jajMr3n2ZHRnQDxR9TRl0JhDM9sUqZdE=;
-        b=PjSLb8EFlBILemqol60ACjAQr/RS8egHMQ1PytZzzrNuMlrY+FpfJrzd89ynmuAxBo9CD9
-        99gjBFLQdhagSNAg==
+        bh=UeM4ryfZPtgrggTEPep42lZ/UfnOePBQDuR/Lsw93Xc=;
+        b=Nla4mUEAlLr8cJflp88UFIsA3yQHUMhEDldyhcFBaIxNAouslxqAB7k4xAfYUUoCz/sHtf
+        rlU/SeuBMAAoKsDQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0CBE21340A;
-        Mon,  7 Mar 2022 01:34:13 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 736FF1340A;
+        Mon,  7 Mar 2022 01:34:17 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id NhgmMBVhJWIWdAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Mon, 07 Mar 2022 01:34:13 +0000
+        id tkWZDRlhJWIbdAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Mon, 07 Mar 2022 01:34:17 +0000
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     linux-cifs@vger.kernel.org, linkinjeon@kernel.org
 Cc:     senozhatsky@chromium.org, sergey.senozhatsky@gmail.com,
         hyc.lee@gmail.com, smfrench@gmail.com,
         Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH 2/9] ksmbd-tools: move control functions to daemon
-Date:   Sun,  6 Mar 2022 22:33:37 -0300
-Message-Id: <20220307013344.29064-3-ematsumiya@suse.de>
+Subject: [PATCH 3/9] ksmbd-tools: use quotes for local includes
+Date:   Sun,  6 Mar 2022 22:33:38 -0300
+Message-Id: <20220307013344.29064-4-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220307013344.29064-1-ematsumiya@suse.de>
 References: <20220307013344.29064-1-ematsumiya@suse.de>
@@ -65,402 +65,358 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Move the control functionality to the daemon command.
-
-This commit builds, but doesn't work since the commands will be
-implemented in a next patch from this series.
+Cosmetic only, but better practice.
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- Makefile.am          |   2 +-
- configure.ac         |   1 -
- control/Makefile.am  |   7 ---
- control/control.c    | 128 -------------------------------------------
- daemon/daemon.c      |  85 +++++++++++++++++++++++++++-
- daemon/daemon.h      |  29 ++++++++++
- include/ksmbdtools.h |   1 +
- lib/ksmbdtools.c     |  24 ++++++++
- 8 files changed, 139 insertions(+), 138 deletions(-)
- delete mode 100644 control/Makefile.am
- delete mode 100644 control/control.c
- create mode 100644 daemon/daemon.h
+ daemon/ipc.c                 | 16 ++++++++--------
+ daemon/rpc.c                 | 17 +++++++++--------
+ daemon/rpc_lsarpc.c          | 13 +++++++------
+ daemon/rpc_samr.c            | 13 +++++++------
+ daemon/rpc_srvsvc.c          | 11 ++++++-----
+ daemon/rpc_wkssvc.c          | 10 +++++-----
+ daemon/smbacl.c              |  4 ++--
+ daemon/worker.c              | 19 ++++++++++---------
+ lib/config_parser.c          | 11 ++++++-----
+ lib/ksmbdtools.c             |  2 +-
+ lib/management/spnego.c      |  6 +++---
+ lib/management/spnego_krb5.c |  4 ++--
+ share/share_admin.c          | 12 +++++-------
+ user/md4_hash.c              |  2 +-
+ user/user_admin.c            | 16 +++++++---------
+ 15 files changed, 79 insertions(+), 77 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index e3ee928691bf..b4e205895825 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -2,7 +2,7 @@
+diff --git a/daemon/ipc.c b/daemon/ipc.c
+index eded431e8112..c46cbc174175 100644
+--- a/daemon/ipc.c
++++ b/daemon/ipc.c
+@@ -15,14 +15,14 @@
+ #include <linux/genetlink.h>
+ #include <netlink/genl/mngt.h>
  
- ACLOCAL_AMFLAGS = -I m4
+-#include <linux/ksmbd_server.h>
+-
+-#include <ksmbdtools.h>
+-#include <ipc.h>
+-#include <worker.h>
+-#include <config_parser.h>
+-#include <management/user.h>
+-#include <management/share.h>
++#include "linux/ksmbd_server.h"
++
++#include "ksmbdtools.h"
++#include "ipc.h"
++#include "worker.h"
++#include "config_parser.h"
++#include "management/user.h"
++#include "management/share.h"
  
--SUBDIRS = lib daemon user share control
-+SUBDIRS = lib daemon user share
+ static struct nl_sock *sk;
  
- # other stuff
- EXTRA_DIST =			\
-diff --git a/configure.ac b/configure.ac
-index 1f107805325f..d7ec538cbbf0 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -65,7 +65,6 @@ AC_CONFIG_FILES([
- 	daemon/Makefile
- 	user/Makefile
- 	share/Makefile
--	control/Makefile
- ])
+diff --git a/daemon/rpc.c b/daemon/rpc.c
+index 2361634f1a55..ab2a7c6dfebe 100644
+--- a/daemon/rpc.c
++++ b/daemon/rpc.c
+@@ -9,14 +9,15 @@
+ #include <endian.h>
+ #include <glib.h>
+ #include <errno.h>
+-#include <linux/ksmbd_server.h>
+-
+-#include <rpc.h>
+-#include <rpc_srvsvc.h>
+-#include <rpc_wkssvc.h>
+-#include <rpc_samr.h>
+-#include <rpc_lsarpc.h>
+-#include <ksmbdtools.h>
++
++#include "linux/ksmbd_server.h"
++
++#include "rpc.h"
++#include "rpc_srvsvc.h"
++#include "rpc_wkssvc.h"
++#include "rpc_samr.h"
++#include "rpc_lsarpc.h"
++#include "ksmbdtools.h"
  
- AC_OUTPUT
-diff --git a/control/Makefile.am b/control/Makefile.am
-deleted file mode 100644
-index 0b3559ab60ed..000000000000
---- a/control/Makefile.am
-+++ /dev/null
-@@ -1,7 +0,0 @@
--AM_CFLAGS = -I$(top_srcdir)/include $(GLIB_CFLAGS) $(LIBNL_CFLAGS) -fno-common
--LIBS = $(GLIB_LIBS)
--ksmbd_control_LDADD = $(top_builddir)/lib/libksmbdtools.a
--
--sbin_PROGRAMS = ksmbd.control
--
--ksmbd_control_SOURCES = control.c
-diff --git a/control/control.c b/control/control.c
-deleted file mode 100644
-index 780a48ab9259..000000000000
---- a/control/control.c
-+++ /dev/null
-@@ -1,128 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *   Copyright (C) 2020 Samsung Electronics Co., Ltd.
-- *
-- *   linux-cifsd-devel@lists.sourceforge.net
-- */
--
--#include <getopt.h>
--#include <fcntl.h>
--#include <errno.h>
--
--#include "ksmbdtools.h"
--#include "version.h"
--
--static void usage(void)
--{
--	fprintf(stderr, "Usage: ksmbd.control\n");
--	fprintf(stderr, "\t-s | --shutdown\n");
--	fprintf(stderr, "\t-d | --debug=all or [smb, auth, etc...]\n");
--	fprintf(stderr, "\t-c | --ksmbd-version\n");
--	fprintf(stderr, "\t-V | --version\n");
--
--	exit(EXIT_FAILURE);
--}
--
--static void show_version(void)
--{
--	printf("ksmbd-tools version : %s\n", KSMBD_TOOLS_VERSION);
--	exit(EXIT_FAILURE);
--}
--
--static int ksmbd_control_shutdown(void)
--{
--	int fd, ret;
--
--	terminate_ksmbd_daemon();
--
--	fd = open("/sys/class/ksmbd-control/kill_server", O_WRONLY);
--	if (fd < 0) {
--		pr_err("open failed: %d\n", errno);
--		return EXIT_FAILURE;
--	}
--
--	ret = write(fd, "hard", 4);
--	close(fd);
--	return ret != -1 ? EXIT_SUCCESS : EXIT_FAILURE;
--}
--
--static int ksmbd_control_show_version(void)
--{
--	int fd, ret;
--	char ver[255] = {0};
--
--	fd = open("/sys/module/ksmbd/version", O_RDONLY);
--	if (fd < 0) {
--		pr_err("open failed: %d\n", errno);
--		return EXIT_FAILURE;
--	}
--
--	ret = read(fd, ver, 255);
--	close(fd);
--	if (ret != -1)
--		pr_info("ksmbd version : %s\n", ver);
--	return ret != -1 ? EXIT_SUCCESS : EXIT_FAILURE;
--}
--
--static int ksmbd_control_debug(char *comp)
--{
--	int fd, ret;
--	char buf[255] = {0};
--
--	fd = open("/sys/class/ksmbd-control/debug", O_RDWR);
--	if (fd < 0) {
--		pr_err("open failed: %d\n", errno);
--		return EXIT_FAILURE;
--	}
--
--	ret = write(fd, comp, strlen(comp));
--	if (ret < 0)
--		goto out;
--	ret = read(fd, buf, 255);
--	if (ret < 0)
--		goto out;
--
--	pr_info("%s\n", buf);
--out:
--	close(fd);
--	return ret != -1 ? EXIT_SUCCESS : EXIT_FAILURE;
--}
--
--int main(int argc, char *argv[])
--{
--	int ret = EXIT_FAILURE;
--	int c;
--
--	set_logger_app_name("ksmbd.control");
--
--	if (getuid() != 0) {
--		pr_err("Please try it as root.\n");
--		return ret;
--	}
--
--	opterr = 0;
--	while ((c = getopt(argc, argv, "sd:cVh")) != EOF)
--		switch (c) {
--		case 's':
--			ret = ksmbd_control_shutdown();
--			break;
--		case 'd':
--			ret = ksmbd_control_debug(optarg);
--			break;
--		case 'c':
--			ret = ksmbd_control_show_version();
--			break;
--		case 'V':
--			show_version();
--			break;
--		case '?':
--		case 'h':
--		default:
--			usage();
--	}
--
--	if (argc < 2)
--		usage();
--
--	return ret;
--}
-diff --git a/daemon/daemon.c b/daemon/daemon.c
-index a3a683222a92..946f500bc977 100644
---- a/daemon/daemon.c
-+++ b/daemon/daemon.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
-+ *   Copyright (C) 2021 SUSE LLC
-  *
-  *   linux-cifsd-devel@lists.sourceforge.net
+ static GHashTable	*pipes_table;
+ static GRWLock		pipes_table_lock;
+diff --git a/daemon/rpc_lsarpc.c b/daemon/rpc_lsarpc.c
+index 5caf4d9ef3ac..23fc68c3810b 100644
+--- a/daemon/rpc_lsarpc.c
++++ b/daemon/rpc_lsarpc.c
+@@ -10,13 +10,14 @@
+ #include <glib.h>
+ #include <pwd.h>
+ #include <errno.h>
+-#include <linux/ksmbd_server.h>
+ 
+-#include <management/user.h>
+-#include <rpc.h>
+-#include <rpc_lsarpc.h>
+-#include <smbacl.h>
+-#include <ksmbdtools.h>
++#include "linux/ksmbd_server.h"
++
++#include "management/user.h"
++#include "rpc.h"
++#include "rpc_lsarpc.h"
++#include "smbacl.h"
++#include "ksmbdtools.h"
+ 
+ #define LSARPC_OPNUM_DS_ROLE_GET_PRIMARY_DOMAIN_INFO	0
+ #define LSARPC_OPNUM_OPEN_POLICY2			44
+diff --git a/daemon/rpc_samr.c b/daemon/rpc_samr.c
+index 95c607c101a3..396e38f58013 100644
+--- a/daemon/rpc_samr.c
++++ b/daemon/rpc_samr.c
+@@ -9,13 +9,14 @@
+ #include <endian.h>
+ #include <glib.h>
+ #include <errno.h>
+-#include <linux/ksmbd_server.h>
+ 
+-#include <management/user.h>
+-#include <rpc.h>
+-#include <rpc_samr.h>
+-#include <smbacl.h>
+-#include <ksmbdtools.h>
++#include "linux/ksmbd_server.h"
++
++#include "management/user.h"
++#include "rpc.h"
++#include "rpc_samr.h"
++#include "smbacl.h"
++#include "ksmbdtools.h"
+ 
+ #define SAMR_OPNUM_CONNECT5		64
+ #define SAMR_OPNUM_ENUM_DOMAIN		6
+diff --git a/daemon/rpc_srvsvc.c b/daemon/rpc_srvsvc.c
+index f3b4d069031a..c3ec1c2bccd5 100644
+--- a/daemon/rpc_srvsvc.c
++++ b/daemon/rpc_srvsvc.c
+@@ -9,13 +9,14 @@
+ #include <endian.h>
+ #include <glib.h>
+ #include <errno.h>
+-#include <linux/ksmbd_server.h>
+ 
+-#include <management/share.h>
++#include "linux/ksmbd_server.h"
++ 
++#include "management/share.h"
+ 
+-#include <rpc.h>
+-#include <rpc_srvsvc.h>
+-#include <ksmbdtools.h>
++#include "rpc.h"
++#include "rpc_srvsvc.h"
++#include "ksmbdtools.h"
+ 
+ #define SHARE_TYPE_TEMP			0x40000000
+ #define SHARE_TYPE_HIDDEN		0x80000000
+diff --git a/daemon/rpc_wkssvc.c b/daemon/rpc_wkssvc.c
+index 32b7893eb2c6..a84f99b41888 100644
+--- a/daemon/rpc_wkssvc.c
++++ b/daemon/rpc_wkssvc.c
+@@ -9,13 +9,13 @@
+ #include <endian.h>
+ #include <glib.h>
+ #include <errno.h>
+-#include <linux/ksmbd_server.h>
+ 
+-#include <management/share.h>
++#include "linux/ksmbd_server.h"
+ 
+-#include <rpc.h>
+-#include <rpc_wkssvc.h>
+-#include <ksmbdtools.h>
++#include "management/share.h"
++#include "rpc.h"
++#include "rpc_wkssvc.h"
++#include "ksmbdtools.h"
+ 
+ #define WKSSVC_NETWKSTA_GET_INFO	(0)
+ 
+diff --git a/daemon/smbacl.c b/daemon/smbacl.c
+index 66531c3bebea..a0ce2878fa18 100644
+--- a/daemon/smbacl.c
++++ b/daemon/smbacl.c
+@@ -6,8 +6,8 @@
+  *   Author(s): Namjae Jeon (linkinjeon@kernel.org)
   */
-@@ -13,6 +14,7 @@
  
- #include <stdlib.h>
- #include <stdio.h>
-+#include <stdbool.h>
+-#include <smbacl.h>
+-#include <ksmbdtools.h>
++#include "smbacl.h"
++#include "ksmbdtools.h"
+ #include <glib.h>
+ #include <glib/gprintf.h>
+ 
+diff --git a/daemon/worker.c b/daemon/worker.c
+index 70f2655b36c3..0ddd88cea12c 100644
+--- a/daemon/worker.c
++++ b/daemon/worker.c
+@@ -7,17 +7,18 @@
+ #include <memory.h>
+ #include <glib.h>
+ #include <errno.h>
+-#include <linux/ksmbd_server.h>
+ 
+-#include <ksmbdtools.h>
+-#include <worker.h>
+-#include <ipc.h>
+-#include <rpc.h>
++#include "linux/ksmbd_server.h"
+ 
+-#include <management/user.h>
+-#include <management/share.h>
+-#include <management/tree_conn.h>
+-#include <management/spnego.h>
++#include "ksmbdtools.h"
++#include "worker.h"
++#include "ipc.h"
++#include "rpc.h"
++
++#include "management/user.h"
++#include "management/share.h"
++#include "management/tree_conn.h"
++#include "management/spnego.h"
+ 
+ #define MAX_WORKER_THREADS	4
+ static GThreadPool *pool;
+diff --git a/lib/config_parser.c b/lib/config_parser.c
+index aa1dbf2a403e..20e27c3ab8ec 100644
+--- a/lib/config_parser.c
++++ b/lib/config_parser.c
+@@ -12,12 +12,13 @@
+ #include <sys/types.h>
  #include <unistd.h>
- #include <getopt.h>
  #include <fcntl.h>
-@@ -24,6 +26,7 @@
- #include "ipc.h"
- #include "rpc.h"
- #include "worker.h"
-+#include "daemon.h"
- #include "config_parser.h"
- #include "management/user.h"
- #include "management/share.h"
-@@ -555,12 +558,92 @@ static struct option opts[] = {
- 	{NULL,		0,			NULL,	 0  }
- };
+-#include <linux/ksmbd_server.h>
  
-+int daemon_shutdown_cmd(void)
-+{
-+	int fd, ret;
+-#include <config_parser.h>
+-#include <ksmbdtools.h>
+-#include <management/user.h>
+-#include <management/share.h>
++#include "linux/ksmbd_server.h"
 +
-+	if (get_running_pid() == -ENOENT) {
-+		pr_info("Server is not running.\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	terminate_ksmbd_daemon();
-+
-+	fd = open(KSMBD_SYSFS_KILL_SERVER, O_WRONLY);
-+	if (fd < 0) {
-+		pr_debug("open failed (%d): %s\n", errno, strerr(errno));
-+		return fd;
-+	}
-+
-+	ret = write(fd, "hard", 4);
-+	close(fd);
-+	return ret;
-+}
-+
-+int daemon_debug_cmd(char *debug_type)
-+{
-+	int i, fd, ret;
-+	bool valid = false;
-+	char buf[255] = { 0 };
-+
-+	for (i = 0; i < ARRAY_SIZE(debug_type_strings); i++) {
-+		if (!strcmp(debug_type, debug_type_strings[i])) {
-+			valid = true;
-+			break;
-+		}
-+	}
-+
-+	if (!valid)
-+		return -EINVAL;
-+
-+	ret = fd = open(KSMBD_SYSFS_DEBUG, O_RDWR);
-+	if (fd < 0)
-+		goto err_open;
-+
-+	ret = write(fd, debug_type, strlen(debug_type));
-+	if (ret < 0)
-+		goto err;
-+
-+	ret = read(fd, buf, 255);
-+	if (ret < 0)
-+		goto err;
-+
-+	pr_info("debug: %s\n", buf);
-+err:
-+	close(fd);
-+err_open:
-+	if (ret == -EBADF)
-+		pr_debug("Can't open %s. Is ksmbd kernel module loaded?\n");
-+	return ret;
-+}
-+
-+int daemon_version_cmd(void)
-+{
-+	int fd, ret;
-+	char version[255] = { 0 };
-+
-+	ret = fd = open(KSMBD_SYSFS_VERSION, O_RDONLY);
-+	if (fd < 0)
-+		goto err;
-+
-+	ret = read(fd, version, 255);
-+	close(fd);
-+
-+err:
-+	if (ret < 0)
-+		pr_err("%s. Is kernel module loaded?\n", strerr(errno));
-+	else
-+		pr_info("ksmbd module version: %s\n", version);
-+
-+	return ret;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	int systemd_service = 0;
- 	int c;
++#include "config_parser.h"
++#include "ksmbdtools.h"
++#include "management/user.h"
++#include "management/share.h"
  
--	set_logger_app_name("ksmbd.mountd");
-+	set_logger_app_name("ksmbd.daemon");
- 	memset(&global_conf, 0x00, sizeof(struct smbconf_global));
- 	global_conf.pwddb = PATH_PWDDB;
- 	global_conf.smbconf = PATH_SMBCONF;
-diff --git a/daemon/daemon.h b/daemon/daemon.h
-new file mode 100644
-index 000000000000..ca064b2b732d
---- /dev/null
-+++ b/daemon/daemon.h
-@@ -0,0 +1,29 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ *   Copyright (C) 2021 SUSE LLC
-+ *
-+ *   linux-cifsd-devel@lists.sourceforge.net
-+ */
-+
-+#ifndef __DAEMON_H__
-+#define __DAEMON_H__
-+
-+#define KSMBD_SYSFS_KILL_SERVER "/sys/class/ksmbd-control/kill_server"
-+#define KSMBD_SYSFS_DEBUG	"/sys/class/ksmbd-control/debug"
-+#define KSMBD_SYSFS_VERSION	"/sys/module/ksmbd/version"
-+
-+static const char * const debug_type_strings[] = {
-+	"all", "smb", "auth", "vfs", "oplock", "ipc", "conn", "rdma"
-+};
-+
-+static struct option daemon_opts[] = {
-+	{ "port", required_argument, NULL, 'p' },
-+	{ "config", required_argument, NULL, 'c' },
-+	{ "usersdb", required_argument, NULL, 'u' },
-+	{ "nodetach", no_argument, NULL, 'n' },
-+	{ "systemd", no_argument, NULL, 's' },
-+	{ "help", no_argument, NULL, 'h' },
-+	{ 0, 0, 0, 0 },
-+};
-+
-+#endif /* __DAEMON_H__ */
-diff --git a/include/ksmbdtools.h b/include/ksmbdtools.h
-index c51673e0253f..170ce23ead2c 100644
---- a/include/ksmbdtools.h
-+++ b/include/ksmbdtools.h
-@@ -168,6 +168,7 @@ enum charset_idx {
- 
- extern char *ksmbd_conv_charsets[KSMBD_CHARSET_MAX + 1];
- 
-+int get_running_pid(void);
- void notify_ksmbd_daemon(void);
- void terminate_ksmbd_daemon(void);
- int test_file_access(char *conf);
+ struct smbconf_global global_conf;
+ struct smbconf_parser parser;
 diff --git a/lib/ksmbdtools.c b/lib/ksmbdtools.c
-index 91d82946f6d6..b636f34af98e 100644
+index b636f34af98e..126b20c6a56a 100644
 --- a/lib/ksmbdtools.c
 +++ b/lib/ksmbdtools.c
-@@ -255,6 +255,30 @@ void terminate_ksmbd_daemon(void)
- 	send_signal_to_ksmbd_daemon(SIGTERM);
- }
+@@ -13,7 +13,7 @@
+ #include <fcntl.h>
  
-+int get_running_pid(void)
-+{
-+	char daemon_pid[10] = { 0 };
-+	pid_t pid = 0;
-+	int fd;
-+
-+	fd = open(KSMBD_LOCK_FILE, O_RDONLY);
-+	if (fd < 0) {
-+		pr_info("Can't open lock file %s: %s\n", KSMBD_LOCK_FILE, strerr(errno));
-+		return -ENOENT;
-+	}
-+
-+	if (read(fd, &daemon_pid, sizeof(daemon_pid)) == -1) {
-+		pr_err("Unable to read lock file: %s\n", strerr(errno));
-+		close(fd);
-+		return -EINVAL;
-+	}
-+
-+	close(fd);
-+	pid = strtol(daemon_pid, NULL, 10);
-+
-+	return pid;
-+}
-+
- int test_file_access(char *conf)
- {
- 	int fd = open(conf, O_RDWR | O_CREAT, S_IRWXU | S_IRGRP);
+ #include <stdio.h>
+-#include <ksmbdtools.h>
++#include "ksmbdtools.h"
+ 
+ static const char *app_name = "unknown";
+ static int log_open;
+diff --git a/lib/management/spnego.c b/lib/management/spnego.c
+index 473caf66e036..685d88beebc3 100644
+--- a/lib/management/spnego.c
++++ b/lib/management/spnego.c
+@@ -19,9 +19,9 @@
+ #include <stdint.h>
+ #include <stdbool.h>
+ 
+-#include <linux/ksmbd_server.h>
+-#include <management/spnego.h>
+-#include <asn1.h>
++#include "linux/ksmbd_server.h"
++#include "management/spnego.h"
++#include "asn1.h"
+ #include "spnego_mech.h"
+ 
+ static struct spnego_mech_ctx mech_ctxs[SPNEGO_MAX_MECHS];
+diff --git a/lib/management/spnego_krb5.c b/lib/management/spnego_krb5.c
+index 4bf7585bfb09..9e1516642145 100644
+--- a/lib/management/spnego_krb5.c
++++ b/lib/management/spnego_krb5.c
+@@ -15,8 +15,8 @@
+ #include <netdb.h>
+ #include <krb5.h>
+ 
+-#include <management/spnego.h>
+-#include <asn1.h>
++#include "management/spnego.h"
++#include "asn1.h"
+ #include "spnego_mech.h"
+ 
+ struct spnego_krb5_ctx {
+diff --git a/share/share_admin.c b/share/share_admin.c
+index 8365f872d620..0ff13d8017dd 100644
+--- a/share/share_admin.c
++++ b/share/share_admin.c
+@@ -13,13 +13,11 @@
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ 
+-#include <config_parser.h>
+-#include <ksmbdtools.h>
+-
+-#include <management/share.h>
+-
+-#include <linux/ksmbd_server.h>
+-#include <share_admin.h>
++#include "config_parser.h"
++#include "ksmbdtools.h"
++#include "management/share.h"
++#include "linux/ksmbd_server.h"
++#include "share_admin.h"
+ 
+ static int conf_fd = -1;
+ static char wbuf[16384];
+diff --git a/user/md4_hash.c b/user/md4_hash.c
+index 1dd4f61ac82a..3ef0996557c8 100644
+--- a/user/md4_hash.c
++++ b/user/md4_hash.c
+@@ -19,8 +19,8 @@
+ 
+ #include <stdlib.h>
+ #include <memory.h>
+-#include <md4_hash.h>
+ #include <asm/byteorder.h>
++#include "md4_hash.h"
+ 
+ #define u8 unsigned char
+ #define u32 unsigned int
+diff --git a/user/user_admin.c b/user/user_admin.c
+index 4e8591517c48..95b05ea33f28 100644
+--- a/user/user_admin.c
++++ b/user/user_admin.c
+@@ -14,15 +14,13 @@
+ #include <fcntl.h>
+ #include <termios.h>
+ 
+-#include <config_parser.h>
+-#include <ksmbdtools.h>
+-
+-#include <md4_hash.h>
+-#include <user_admin.h>
+-#include <management/user.h>
+-#include <management/share.h>
+-
+-#include <linux/ksmbd_server.h>
++#include "config_parser.h"
++#include "ksmbdtools.h"
++#include "md4_hash.h"
++#include "user_admin.h"
++#include "management/user.h"
++#include "management/share.h"
++#include "linux/ksmbd_server.h"
+ 
+ #define MAX_NT_PWD_LEN 129
+ 
 -- 
 2.34.1
 
