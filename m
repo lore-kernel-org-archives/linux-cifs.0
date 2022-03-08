@@ -2,78 +2,194 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB1AC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Mar 2022 15:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2782C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Mar 2022 21:53:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347792AbiCHP1g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Mar 2022 10:27:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57738 "EHLO
+        id S233505AbiCHVxz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Mar 2022 16:53:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347796AbiCHP1f (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Mar 2022 10:27:35 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D50C4DF65
-        for <linux-cifs@vger.kernel.org>; Tue,  8 Mar 2022 07:26:39 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id C8DEC7FC42;
-        Tue,  8 Mar 2022 15:26:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1646753197;
+        with ESMTP id S229741AbiCHVxz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Mar 2022 16:53:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AEE663A1A2
+        for <linux-cifs@vger.kernel.org>; Tue,  8 Mar 2022 13:52:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646776376;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gKiseKnYftMjo3uG9X7LhfA0PGdtnPg0St721nCHxCg=;
-        b=WJivTI81UhFPuvLeJbRjHSD6hj3y4EN0m3hKB9QZlj6iTLIlvT3blUTm/geWMGc7rjQf//
-        aLiK3j7CVCdxZT3g3R4xyll2Glspp/cncMRYHZUFpbRKGDl0VU0BloIpYah9OW5tz8oVrw
-        wmeIByfsXIoTjLhGPpzjO3+/cCwdOAIawQXGRgAyHvNgVv0l7CRyMvpkkeEI7pSdN5v7bt
-        2ERxi0ieHuU49B1ClpMAVjVkr+lHR8cWb62RzYrJu+laxMMMz4Y/Dx7lJrCccrLfNB+0lJ
-        Q0wcfJpuQNeOXrT1fiWHrPeEWLBSHdmcRmOeE56NjpRA0gyl6bm2wFZJ2AF1mA==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Shyam Prasad N <nspmangalore@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Pavel Shilovsky <piastryyy@gmail.com>,
-        Steve French <smfrench@gmail.com>
-Subject: Re: DFS tests failing in buildbot
-In-Reply-To: <CANT5p=okysnTQhdXixXwJ8KAzukM=dkh2LRxKFKcpsVBW=Ex7w@mail.gmail.com>
-References: <CANT5p=okysnTQhdXixXwJ8KAzukM=dkh2LRxKFKcpsVBW=Ex7w@mail.gmail.com>
-Date:   Tue, 08 Mar 2022 12:26:32 -0300
-Message-ID: <87tuc81n4n.fsf@cjr.nz>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NzjXlBirb+xRpK0AjbCq+oEkMZQAkLue8HFEU88UcqU=;
+        b=V+zADMwOwCn6/JL0g9zurd2/JXNlzMZbY5aon8P6zJkPHUcvTpTtd6nrPdbatDB0dyNp+a
+        mINpXTFfspJYgHuQckbDDUWfVnpZWBoAHRU2AzuIHm6Y5rOTHQ7Hjc7jdR9Aj1lVNCZJP6
+        0fAvC31Jchy5iOfrQbzgUJJi8oi7AzE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-279-14iLTJPnONOwL58BgUFfrQ-1; Tue, 08 Mar 2022 16:52:53 -0500
+X-MC-Unique: 14iLTJPnONOwL58BgUFfrQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D395800050;
+        Tue,  8 Mar 2022 21:52:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4284EADF1;
+        Tue,  8 Mar 2022 21:52:42 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH] cachefiles: Fix volume coherency attribute
+From:   David Howells <dhowells@redhat.com>
+To:     rohiths.msft@gmail.com
+Cc:     Steve French <smfrench@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-cachefs@redhat.com, dhowells@redhat.com,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Tue, 08 Mar 2022 21:52:41 +0000
+Message-ID: <164677636135.1191348.1664733858863676368.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.4
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+A network filesystem may set coherency data on a volume cookie, and if
+given, cachefiles will store this in an xattr on the directory in the cache
+corresponding to the volume.
 
-> There is a race condition that exists between cifsd and I/O threads
-> when the tcp connection is broken. The cifsd thread marks the
-> server/session/tcon structures for reconnect, and recreates the
-> socket, and sets 1 credit for this server. This only changes after the
-> next negotiate/session-setup completes, where it can get more credits.
-> During this window, if any ongoing I/O requires more than 1 credit,
-> then it will return with smb3_insufficient_credits (note that slightly
-> earlier in the same code, we identify reconnect with
-> smb3_reconnect_detected, but do nothing about it). The I/O will now
-> leak -EHOSTDOWN or -EAGAIN into userspace.
+The function that sets the xattr just stores the contents of the volume
+coherency buffer directly into the xattr, with nothing added; the checking
+function, on the other hand, has a cut'n'paste error whereby it tries to
+interpret the xattr contents as would be the xattr on an ordinary file
+(using the cachefiles_xattr struct).  This results in a failure to match
+the coherency data because the buffer ends up being shifted by 18 bytes.
 
-I don't see why it would be a problem returning either -EAGAIN or
--EHOSTDOWN back to userspace on *soft* mounts.  Isn't this what we want?
+Fix this by defining a structure specifically for the volume xattr and
+making both the setting and checking functions use it.
 
-If the syscall gets signaled while we are waiting for the tcp connection
-being restablished, then we return -ERESTARTSYS.  See
-wait_event_interruptible_timeout() in smb2_reconnect().
+Since the volume coherency doesn't work if used, take the opportunity to
+insert a reserved field for future use, set it to 0 and check that it is 0.
+Log mismatch through the appropriate tracepoint.
 
-> I feel that we should return a special error (-ERESTARTSYS?) when
-> smb3_reconnect_detected, and use this errno to ask the caller to
-> restart the syscall.
+Note that this only affects cifs; 9p, afs, ceph and nfs don't use the
+volume coherency data at the moment.
 
-Userspace doesn't handle -ERESTARTSYS.  When we return -ERESTARTSYS from
-a signaled syscall, this means that the kernel will either handle the
-signal and restart syscall from the beginning, or return -EINTR back to
-userspace.
+Fixes: 32e150037dce ("fscache, cachefiles: Store the volume coherency data")
+Reported-by: Rohith Surabattula <rohiths.msft@gmail.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <smfrench@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+cc: linux-cachefs@redhat.com
+---
+
+ fs/cachefiles/xattr.c             |   23 ++++++++++++++++++++---
+ include/trace/events/cachefiles.h |    2 ++
+ 2 files changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
+index 83f41bd0c3a9..35465109d9c4 100644
+--- a/fs/cachefiles/xattr.c
++++ b/fs/cachefiles/xattr.c
+@@ -28,6 +28,11 @@ struct cachefiles_xattr {
+ static const char cachefiles_xattr_cache[] =
+ 	XATTR_USER_PREFIX "CacheFiles.cache";
+ 
++struct cachefiles_vol_xattr {
++	__be32	reserved;	/* Reserved, should be 0 */
++	__u8	data[];		/* netfs volume coherency data */
++} __packed;
++
+ /*
+  * set the state xattr on a cache file
+  */
+@@ -185,6 +190,7 @@ void cachefiles_prepare_to_write(struct fscache_cookie *cookie)
+  */
+ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+ {
++	struct cachefiles_vol_xattr *buf;
+ 	unsigned int len = volume->vcookie->coherency_len;
+ 	const void *p = volume->vcookie->coherency;
+ 	struct dentry *dentry = volume->dentry;
+@@ -192,10 +198,17 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+ 
+ 	_enter("%x,#%d", volume->vcookie->debug_id, len);
+ 
++	len += sizeof(*buf);
++	buf = kmalloc(len, GFP_KERNEL);
++	if (!buf)
++		return false;
++	buf->reserved = cpu_to_be32(0);
++	memcpy(buf->data, p, len);
++
+ 	ret = cachefiles_inject_write_error();
+ 	if (ret == 0)
+ 		ret = vfs_setxattr(&init_user_ns, dentry, cachefiles_xattr_cache,
+-				   p, len, 0);
++				   buf, len, 0);
+ 	if (ret < 0) {
+ 		trace_cachefiles_vfs_error(NULL, d_inode(dentry), ret,
+ 					   cachefiles_trace_setxattr_error);
+@@ -209,6 +222,7 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+ 					       cachefiles_coherency_vol_set_ok);
+ 	}
+ 
++	kfree(buf);
+ 	_leave(" = %d", ret);
+ 	return ret == 0;
+ }
+@@ -218,7 +232,7 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+  */
+ int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
+ {
+-	struct cachefiles_xattr *buf;
++	struct cachefiles_vol_xattr *buf;
+ 	struct dentry *dentry = volume->dentry;
+ 	unsigned int len = volume->vcookie->coherency_len;
+ 	const void *p = volume->vcookie->coherency;
+@@ -228,6 +242,7 @@ int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
+ 
+ 	_enter("");
+ 
++	len += sizeof(*buf);
+ 	buf = kmalloc(len, GFP_KERNEL);
+ 	if (!buf)
+ 		return -ENOMEM;
+@@ -245,7 +260,9 @@ int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
+ 					"Failed to read xattr with error %zd", xlen);
+ 		}
+ 		why = cachefiles_coherency_vol_check_xattr;
+-	} else if (memcmp(buf->data, p, len) != 0) {
++	} else if (buf->reserved != cpu_to_be32(0)) {
++		why = cachefiles_coherency_vol_check_resv;
++	} else if (memcmp(buf->data, p, len - sizeof(*buf)) != 0) {
+ 		why = cachefiles_coherency_vol_check_cmp;
+ 	} else {
+ 		why = cachefiles_coherency_vol_check_ok;
+diff --git a/include/trace/events/cachefiles.h b/include/trace/events/cachefiles.h
+index 002d0ae4f9bc..311c14a20e70 100644
+--- a/include/trace/events/cachefiles.h
++++ b/include/trace/events/cachefiles.h
+@@ -56,6 +56,7 @@ enum cachefiles_coherency_trace {
+ 	cachefiles_coherency_set_ok,
+ 	cachefiles_coherency_vol_check_cmp,
+ 	cachefiles_coherency_vol_check_ok,
++	cachefiles_coherency_vol_check_resv,
+ 	cachefiles_coherency_vol_check_xattr,
+ 	cachefiles_coherency_vol_set_fail,
+ 	cachefiles_coherency_vol_set_ok,
+@@ -139,6 +140,7 @@ enum cachefiles_error_trace {
+ 	EM(cachefiles_coherency_set_ok,		"SET ok  ")		\
+ 	EM(cachefiles_coherency_vol_check_cmp,	"VOL BAD cmp ")		\
+ 	EM(cachefiles_coherency_vol_check_ok,	"VOL OK      ")		\
++	EM(cachefiles_coherency_vol_check_resv,	"VOL BAD resv")	\
+ 	EM(cachefiles_coherency_vol_check_xattr,"VOL BAD xatt")		\
+ 	EM(cachefiles_coherency_vol_set_fail,	"VOL SET fail")		\
+ 	E_(cachefiles_coherency_vol_set_ok,	"VOL SET ok  ")
+
+
