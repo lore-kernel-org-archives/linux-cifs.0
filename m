@@ -2,46 +2,46 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADDAC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Mar 2022 01:02:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC2E4C4332F
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Mar 2022 01:02:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiCIBDk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Mar 2022 20:03:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44606 "EHLO
+        id S229636AbiCIBDn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Mar 2022 20:03:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229710AbiCIBDd (ORCPT
+        with ESMTP id S229717AbiCIBDd (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Mar 2022 20:03:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CA89B26C2C1
-        for <linux-cifs@vger.kernel.org>; Tue,  8 Mar 2022 16:40:40 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5174626C2E8
+        for <linux-cifs@vger.kernel.org>; Tue,  8 Mar 2022 16:40:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646786440;
+        s=mimecast20190719; t=1646786446;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3QWldaxUgjSqrqhHqZ9kQzTo6lY37kzhgmv3hw+9M2s=;
-        b=KdOx4/o+uKGCmFZPmQsHpWVslrl5h0+yW5IW/qL8EKgd1xVAVye1+xNgVQ7lwOzq3yxBq2
-        UY0hsMXKqmlC9qpCqwhR9k7udaGXG/XfbrMuO1w6sm2CXMt6Ph/P4Ka6Nt3U05Y9jZvUyn
-        JjYQ4864uGWOprVpNg+1JMDAnC5dDqw=
+        bh=LzpdmCDROwTrlpYlkIraqtI+njSbi6AnE1ba2zkJXHY=;
+        b=EEq5UwheSruDDai63xNV5IAT8zKYveB7YL7tKV/E/XI0qvnbhKFROZ/N5BT2qFIFYq0B2a
+        M5VSR9e3J0UzoUZRLx/DYG++zyNPm4975+hGacz4UhkdTSAOwl5hvWskHANnwwf4atOLfF
+        Ej93g/aHxeV44V+SwhyPjlguNt9f5x4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-351-XvRYsVbpM0uP4zx8B0iw_g-1; Tue, 08 Mar 2022 18:29:17 -0500
-X-MC-Unique: XvRYsVbpM0uP4zx8B0iw_g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-134-MLHGqE6TOLyeFxOn5_KQqQ-1; Tue, 08 Mar 2022 18:29:49 -0500
+X-MC-Unique: MLHGqE6TOLyeFxOn5_KQqQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5C241006AA6;
-        Tue,  8 Mar 2022 23:29:15 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB4ED80205C;
+        Tue,  8 Mar 2022 23:29:47 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EA4B34CEFB;
-        Tue,  8 Mar 2022 23:29:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D44435DBA0;
+        Tue,  8 Mar 2022 23:29:44 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v2 14/19] netfs: Prepare to split read_helper.c
+Subject: [PATCH v2 17/19] netfs: Split some core bits out into their own file
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
 Cc:     dhowells@redhat.com, Anna Schumaker <anna.schumaker@netapp.com>,
@@ -56,78 +56,113 @@ Cc:     dhowells@redhat.com, Anna Schumaker <anna.schumaker@netapp.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 08 Mar 2022 23:29:12 +0000
-Message-ID: <164678215208.1200972.9761906209395002182.stgit@warthog.procyon.org.uk>
+Date:   Tue, 08 Mar 2022 23:29:44 +0000
+Message-ID: <164678218407.1200972.1731208226140990280.stgit@warthog.procyon.org.uk>
 In-Reply-To: <164678185692.1200972.597611902374126174.stgit@warthog.procyon.org.uk>
 References: <164678185692.1200972.597611902374126174.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.4
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Rename netfs_rreq_unlock() to netfs_rreq_unlock_folios() to make it sound
-less like it's dropping a lock on an netfs_io_request struct.
-
-Remove the 'static' marker on netfs_rreq_unlock_folios() and declaring it
-in internal.h preparatory to splitting the file.
-
-Changes
-=======
-ver #2)
- - Slide this patch to after the one adding netfs_begin_read().
- - As a consequence, don't need to unstatic so many functions.
+Split some core bits out into their own file.  More bits will be added to
+this file later.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: linux-cachefs@redhat.com
 
-Link: https://lore.kernel.org/r/164623002861.3564931.17340149482236413375.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/164623006934.3564931.17932680017894039748.stgit@warthog.procyon.org.uk/ # v1
 ---
 
- fs/netfs/internal.h    |    5 +++++
- fs/netfs/read_helper.c |    4 ++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ fs/netfs/Makefile   |    1 +
+ fs/netfs/internal.h |    7 +++++--
+ fs/netfs/io.c       |   10 ----------
+ fs/netfs/main.c     |   20 ++++++++++++++++++++
+ 4 files changed, 26 insertions(+), 12 deletions(-)
+ create mode 100644 fs/netfs/main.c
 
+diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+index 88b904532bc7..f684c0cd1ec5 100644
+--- a/fs/netfs/Makefile
++++ b/fs/netfs/Makefile
+@@ -3,6 +3,7 @@
+ netfs-y := \
+ 	buffered_read.o \
+ 	io.o \
++	main.o \
+ 	objects.o
+ 
+ netfs-$(CONFIG_NETFS_STATS) += stats.o
 diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 937c2465943f..11c0c9ef9299 100644
+index 1cd2778bfa7d..622b421d4753 100644
 --- a/fs/netfs/internal.h
 +++ b/fs/netfs/internal.h
-@@ -15,6 +15,11 @@
- 
- #define pr_fmt(fmt) "netfs: " fmt
+@@ -23,10 +23,13 @@ void netfs_rreq_unlock_folios(struct netfs_io_request *rreq);
+ /*
+  * io.c
+  */
+-extern unsigned int netfs_debug;
+-
+ int netfs_begin_read(struct netfs_io_request *rreq, bool sync);
  
 +/*
-+ * buffered_read.c
++ * main.c
 + */
-+void netfs_rreq_unlock_folios(struct netfs_io_request *rreq);
++extern unsigned int netfs_debug;
 +
  /*
   * objects.c
   */
-diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-index 19d4fe0b4987..058a534ba917 100644
---- a/fs/netfs/read_helper.c
-+++ b/fs/netfs/read_helper.c
-@@ -250,7 +250,7 @@ static void netfs_rreq_write_to_cache(struct netfs_io_request *rreq)
-  * Unlock the folios in a read operation.  We need to set PG_fscache on any
-  * folios we're going to write back before we unlock them.
-  */
--static void netfs_rreq_unlock(struct netfs_io_request *rreq)
-+void netfs_rreq_unlock_folios(struct netfs_io_request *rreq)
- {
- 	struct netfs_io_subrequest *subreq;
- 	struct folio *folio;
-@@ -432,7 +432,7 @@ static void netfs_rreq_assess(struct netfs_io_request *rreq, bool was_async)
- 		return;
- 	}
+diff --git a/fs/netfs/io.c b/fs/netfs/io.c
+index 1fe9706c58a5..4a3b7989cd1c 100644
+--- a/fs/netfs/io.c
++++ b/fs/netfs/io.c
+@@ -15,16 +15,6 @@
+ #include <linux/sched/mm.h>
+ #include <linux/task_io_accounting_ops.h>
+ #include "internal.h"
+-#define CREATE_TRACE_POINTS
+-#include <trace/events/netfs.h>
+-
+-MODULE_DESCRIPTION("Network fs support");
+-MODULE_AUTHOR("Red Hat, Inc.");
+-MODULE_LICENSE("GPL");
+-
+-unsigned netfs_debug;
+-module_param_named(debug, netfs_debug, uint, S_IWUSR | S_IRUGO);
+-MODULE_PARM_DESC(netfs_debug, "Netfs support debugging mask");
  
--	netfs_rreq_unlock(rreq);
-+	netfs_rreq_unlock_folios(rreq);
- 
- 	clear_bit_unlock(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
- 	wake_up_bit(&rreq->flags, NETFS_RREQ_IN_PROGRESS);
+ /*
+  * Clear the unread part of an I/O request.
+diff --git a/fs/netfs/main.c b/fs/netfs/main.c
+new file mode 100644
+index 000000000000..068568702957
+--- /dev/null
++++ b/fs/netfs/main.c
+@@ -0,0 +1,20 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Miscellaneous bits for the netfs support library.
++ *
++ * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#include <linux/module.h>
++#include <linux/export.h>
++#include "internal.h"
++#define CREATE_TRACE_POINTS
++#include <trace/events/netfs.h>
++
++MODULE_DESCRIPTION("Network fs support");
++MODULE_AUTHOR("Red Hat, Inc.");
++MODULE_LICENSE("GPL");
++
++unsigned netfs_debug;
++module_param_named(debug, netfs_debug, uint, S_IWUSR | S_IRUGO);
++MODULE_PARM_DESC(netfs_debug, "Netfs support debugging mask");
 
 
