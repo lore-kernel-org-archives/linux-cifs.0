@@ -2,135 +2,190 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1EEC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Mar 2022 01:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD96C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Mar 2022 01:11:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbiCIBE2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Mar 2022 20:04:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47114 "EHLO
+        id S229953AbiCIBMa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Mar 2022 20:12:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbiCIBD6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Mar 2022 20:03:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C5A7026E2B8
-        for <linux-cifs@vger.kernel.org>; Tue,  8 Mar 2022 16:41:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646786473;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p+pgcNpWd9Z0Lg44C5ppkgCdlhM7jaOoTuVvdLpsIEA=;
-        b=dFODF/usA6C+pnJ+t9+8Kq5vJjoCqX0xNdVCaP6lj8o1srf/nMRlilqASr91402EqWG3zB
-        JPmj9FAc3DR2p90ENlo1gcu3kjpoob8wnmLs1dXYfq4RcLPG7DeUSpynYoG5Zjw2oRhxcs
-        WQF8QNxX0yxp8tmGr2vPtSlJoj+kAp0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-433-x6cLh8qPM5mvnMPkDZgq8w-1; Tue, 08 Mar 2022 18:30:07 -0500
-X-MC-Unique: x6cLh8qPM5mvnMPkDZgq8w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S230194AbiCIBL7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Mar 2022 20:11:59 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74155EB323;
+        Tue,  8 Mar 2022 17:03:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE1671006AA9;
-        Tue,  8 Mar 2022 23:30:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D9F755DBA7;
-        Tue,  8 Mar 2022 23:30:02 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v2 19/19] afs: Maintain netfs_i_context::remote_i_size
-From:   David Howells <dhowells@redhat.com>
-To:     linux-cachefs@redhat.com
-Cc:     linux-afs@lists.infradead.org, dhowells@redhat.com,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 08 Mar 2022 23:30:02 +0000
-Message-ID: <164678220204.1200972.17408022517463940584.stgit@warthog.procyon.org.uk>
-In-Reply-To: <164678185692.1200972.597611902374126174.stgit@warthog.procyon.org.uk>
-References: <164678185692.1200972.597611902374126174.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/1.4
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 08B2D612E3;
+        Wed,  9 Mar 2022 01:03:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF2FAC340EC;
+        Wed,  9 Mar 2022 01:03:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646787837;
+        bh=mx9Fa9vJmECpUyzdd1x48DQGKh6o3F6PUEM6C2wW0HE=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=VPWtoOjcYDPN1cdxarH9H6OV0ANg/reMn/N70M7QJn6ReKHK7KfoIu3N0WhqkAFq3
+         wFezjjAqg2z+rYVCetNRes+U6r1y3GsyNYm/4Pp/iI9PnLOgLJQfXQZcuEloKuoVvR
+         snHbs+yPSthZKMoQG277tnF1EjotsoJ3Gz0pLPvzWc/bCfJe1R5cFubRNXNBBEX29G
+         cDW6qwMW8IENbJTek6Fp2JFEGJF0vlcOsP6ZDmwZWvuAuvfEdfQegO9VGbbfC02Qho
+         3dmx3Sy9L0FyhFeqI1B7OtdSVdjI61m9yjx5R2OlmNJirsHNYSUqWw2/TmALEiB9HU
+         8UiI8P9mYqVLg==
+Message-ID: <bc03c9acb654121f123cfff64d75c1749ff401c5.camel@kernel.org>
+Subject: Re: [PATCH] cachefiles: Fix volume coherency attribute
+From:   Jeff Layton <jlayton@kernel.org>
+To:     David Howells <dhowells@redhat.com>, rohiths.msft@gmail.com
+Cc:     Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Tue, 08 Mar 2022 20:03:55 -0500
+In-Reply-To: <164677636135.1191348.1664733858863676368.stgit@warthog.procyon.org.uk>
+References: <164677636135.1191348.1664733858863676368.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make afs use netfslib's tracking for the server's idea of what the current
-inode size is independently of inode->i_size.  We really want to use this
-value when calculating the new vnode size when initiating a StoreData RPC
-op rather than the size stat() presents to the user (ie. inode->i_size) as
-the latter is affected by as-yet uncommitted writes.
+On Tue, 2022-03-08 at 21:52 +0000, David Howells wrote:
+> A network filesystem may set coherency data on a volume cookie, and if
+> given, cachefiles will store this in an xattr on the directory in the cache
+> corresponding to the volume.
+> 
+> The function that sets the xattr just stores the contents of the volume
+> coherency buffer directly into the xattr, with nothing added; the checking
+> function, on the other hand, has a cut'n'paste error whereby it tries to
+> interpret the xattr contents as would be the xattr on an ordinary file
+> (using the cachefiles_xattr struct).  This results in a failure to match
+> the coherency data because the buffer ends up being shifted by 18 bytes.
+> 
+> Fix this by defining a structure specifically for the volume xattr and
+> making both the setting and checking functions use it.
+> 
+> Since the volume coherency doesn't work if used, take the opportunity to
+> insert a reserved field for future use, set it to 0 and check that it is 0.
+> Log mismatch through the appropriate tracepoint.
+> 
+> Note that this only affects cifs; 9p, afs, ceph and nfs don't use the
+> volume coherency data at the moment.
+> 
+> Fixes: 32e150037dce ("fscache, cachefiles: Store the volume coherency data")
+> Reported-by: Rohith Surabattula <rohiths.msft@gmail.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <smfrench@gmail.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-cachefs@redhat.com
+> ---
+> 
+>  fs/cachefiles/xattr.c             |   23 ++++++++++++++++++++---
+>  include/trace/events/cachefiles.h |    2 ++
+>  2 files changed, 22 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
+> index 83f41bd0c3a9..35465109d9c4 100644
+> --- a/fs/cachefiles/xattr.c
+> +++ b/fs/cachefiles/xattr.c
+> @@ -28,6 +28,11 @@ struct cachefiles_xattr {
+>  static const char cachefiles_xattr_cache[] =
+>  	XATTR_USER_PREFIX "CacheFiles.cache";
+>  
+> +struct cachefiles_vol_xattr {
+> +	__be32	reserved;	/* Reserved, should be 0 */
+> +	__u8	data[];		/* netfs volume coherency data */
+> +} __packed;
+> +
+>  /*
+>   * set the state xattr on a cache file
+>   */
+> @@ -185,6 +190,7 @@ void cachefiles_prepare_to_write(struct fscache_cookie *cookie)
+>   */
+>  bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+>  {
+> +	struct cachefiles_vol_xattr *buf;
+>  	unsigned int len = volume->vcookie->coherency_len;
+>  	const void *p = volume->vcookie->coherency;
+>  	struct dentry *dentry = volume->dentry;
+> @@ -192,10 +198,17 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+>  
+>  	_enter("%x,#%d", volume->vcookie->debug_id, len);
+>  
+> +	len += sizeof(*buf);
+> +	buf = kmalloc(len, GFP_KERNEL);
+> +	if (!buf)
+> +		return false;
+> +	buf->reserved = cpu_to_be32(0);
+> +	memcpy(buf->data, p, len);
+> +
+>  	ret = cachefiles_inject_write_error();
+>  	if (ret == 0)
+>  		ret = vfs_setxattr(&init_user_ns, dentry, cachefiles_xattr_cache,
+> -				   p, len, 0);
+> +				   buf, len, 0);
+>  	if (ret < 0) {
+>  		trace_cachefiles_vfs_error(NULL, d_inode(dentry), ret,
+>  					   cachefiles_trace_setxattr_error);
+> @@ -209,6 +222,7 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+>  					       cachefiles_coherency_vol_set_ok);
+>  	}
+>  
+> +	kfree(buf);
+>  	_leave(" = %d", ret);
+>  	return ret == 0;
+>  }
+> @@ -218,7 +232,7 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+>   */
+>  int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
+>  {
+> -	struct cachefiles_xattr *buf;
+> +	struct cachefiles_vol_xattr *buf;
+>  	struct dentry *dentry = volume->dentry;
+>  	unsigned int len = volume->vcookie->coherency_len;
+>  	const void *p = volume->vcookie->coherency;
+> @@ -228,6 +242,7 @@ int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
+>  
+>  	_enter("");
+>  
+> +	len += sizeof(*buf);
+>  	buf = kmalloc(len, GFP_KERNEL);
+>  	if (!buf)
+>  		return -ENOMEM;
+> @@ -245,7 +260,9 @@ int cachefiles_check_volume_xattr(struct cachefiles_volume *volume)
+>  					"Failed to read xattr with error %zd", xlen);
+>  		}
+>  		why = cachefiles_coherency_vol_check_xattr;
+> -	} else if (memcmp(buf->data, p, len) != 0) {
+> +	} else if (buf->reserved != cpu_to_be32(0)) {
+> +		why = cachefiles_coherency_vol_check_resv;
+> +	} else if (memcmp(buf->data, p, len - sizeof(*buf)) != 0) {
+>  		why = cachefiles_coherency_vol_check_cmp;
+>  	} else {
+>  		why = cachefiles_coherency_vol_check_ok;
+> diff --git a/include/trace/events/cachefiles.h b/include/trace/events/cachefiles.h
+> index 002d0ae4f9bc..311c14a20e70 100644
+> --- a/include/trace/events/cachefiles.h
+> +++ b/include/trace/events/cachefiles.h
+> @@ -56,6 +56,7 @@ enum cachefiles_coherency_trace {
+>  	cachefiles_coherency_set_ok,
+>  	cachefiles_coherency_vol_check_cmp,
+>  	cachefiles_coherency_vol_check_ok,
+> +	cachefiles_coherency_vol_check_resv,
+>  	cachefiles_coherency_vol_check_xattr,
+>  	cachefiles_coherency_vol_set_fail,
+>  	cachefiles_coherency_vol_set_ok,
+> @@ -139,6 +140,7 @@ enum cachefiles_error_trace {
+>  	EM(cachefiles_coherency_set_ok,		"SET ok  ")		\
+>  	EM(cachefiles_coherency_vol_check_cmp,	"VOL BAD cmp ")		\
+>  	EM(cachefiles_coherency_vol_check_ok,	"VOL OK      ")		\
+> +	EM(cachefiles_coherency_vol_check_resv,	"VOL BAD resv")	\
+>  	EM(cachefiles_coherency_vol_check_xattr,"VOL BAD xatt")		\
+>  	EM(cachefiles_coherency_vol_set_fail,	"VOL SET fail")		\
+>  	E_(cachefiles_coherency_vol_set_ok,	"VOL SET ok  ")
+> 
+> 
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: linux-cachefs@redhat.com
-cc: linux-afs@lists.infradead.org
+Looks good.
 
-Link: https://lore.kernel.org/r/164623014626.3564931.8375344024648265358.stgit@warthog.procyon.org.uk/ # v1
----
-
- fs/afs/inode.c |    1 +
- fs/afs/write.c |    7 +++----
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/fs/afs/inode.c b/fs/afs/inode.c
-index 5b5e40197655..2fe402483ad5 100644
---- a/fs/afs/inode.c
-+++ b/fs/afs/inode.c
-@@ -246,6 +246,7 @@ static void afs_apply_status(struct afs_operation *op,
- 		 * idea of what the size should be that's not the same as
- 		 * what's on the server.
- 		 */
-+		vnode->netfs_ctx.remote_i_size = status->size;
- 		if (change_size) {
- 			afs_set_i_size(vnode, status->size);
- 			inode->i_ctime = t;
-diff --git a/fs/afs/write.c b/fs/afs/write.c
-index e4b47f67a408..85c9056ba9fb 100644
---- a/fs/afs/write.c
-+++ b/fs/afs/write.c
-@@ -353,9 +353,10 @@ static const struct afs_operation_ops afs_store_data_operation = {
- static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter, loff_t pos,
- 			  bool laundering)
- {
-+	struct netfs_i_context *ictx = &vnode->netfs_ctx;
- 	struct afs_operation *op;
- 	struct afs_wb_key *wbk = NULL;
--	loff_t size = iov_iter_count(iter), i_size;
-+	loff_t size = iov_iter_count(iter);
- 	int ret = -ENOKEY;
- 
- 	_enter("%s{%llx:%llu.%u},%llx,%llx",
-@@ -377,15 +378,13 @@ static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter, loff_t
- 		return -ENOMEM;
- 	}
- 
--	i_size = i_size_read(&vnode->vfs_inode);
--
- 	afs_op_set_vnode(op, 0, vnode);
- 	op->file[0].dv_delta = 1;
- 	op->file[0].modification = true;
- 	op->store.write_iter = iter;
- 	op->store.pos = pos;
- 	op->store.size = size;
--	op->store.i_size = max(pos + size, i_size);
-+	op->store.i_size = max(pos + size, ictx->remote_i_size);
- 	op->store.laundering = laundering;
- 	op->mtime = vnode->vfs_inode.i_mtime;
- 	op->flags |= AFS_OPERATION_UNINTR;
-
-
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
