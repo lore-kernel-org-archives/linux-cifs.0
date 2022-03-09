@@ -2,50 +2,41 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5EAC433FE
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Mar 2022 15:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6785C43219
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Mar 2022 17:04:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234035AbiCIPuo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 9 Mar 2022 10:50:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60240 "EHLO
+        id S237454AbiCIRFg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 9 Mar 2022 12:05:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233941AbiCIPun (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Mar 2022 10:50:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9767131121
-        for <linux-cifs@vger.kernel.org>; Wed,  9 Mar 2022 07:49:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646840983;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QxS/WDQr3tUQMEh78l2OAofG/jJPLXvvMADs/iNJnek=;
-        b=Y38uGL4YV9PzF7I2iDARJ+CyW0Rw9+kDA3a5Ei6VyxGY7YoxiP95f9aKckOIuXb0+m/TyN
-        N8CDEPKU9QMmEv2rccCf3MlM0GXKm1A0wDQU/FQ7KXmJ61a6qXJIduKG31fHa/f0j9OweC
-        pvsbdhZnwuhy+EWm7P/3mHG/NMCODHg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-563-fKjxpOpmPaS5naFCbwTcEA-1; Wed, 09 Mar 2022 10:49:42 -0500
-X-MC-Unique: fKjxpOpmPaS5naFCbwTcEA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S238844AbiCIREI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Mar 2022 12:04:08 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3F39AD8A;
+        Wed,  9 Mar 2022 08:52:47 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6004FC80;
-        Wed,  9 Mar 2022 15:49:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C291D804CD;
-        Wed,  9 Mar 2022 15:49:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <c2f4b3dc107b106e04c48f54945a12715cccfdf3.camel@redhat.com>
-References: <c2f4b3dc107b106e04c48f54945a12715cccfdf3.camel@redhat.com> <164678185692.1200972.597611902374126174.stgit@warthog.procyon.org.uk> <164678192454.1200972.4428834328108580460.stgit@warthog.procyon.org.uk>
-To:     Jeff Layton <jlayton@redhat.com>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
-        Anna Schumaker <anna.schumaker@netapp.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0C30E61B45;
+        Wed,  9 Mar 2022 16:52:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F6CC340EC;
+        Wed,  9 Mar 2022 16:52:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646844755;
+        bh=wIeGbE6Q41oIhTY+lLUbah8qqKEMzvsX86DStRQLx9g=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=ajZf+msEiuAWYsEHyAa1la9mmAEWm9CLYkJ001PCn+OQvcazGSJy3d9bN2D8B8QOl
+         5AmoJJMr61AzJpz/9+Ut/VwC1v4hD8jL5NrR+B7Tcg/own5k4BGYTnt/h4otdOlDEa
+         5nzPVdlP12f35p/OQIYWEAYEpd+EMx+VJpxJ9RwcIpFERATK2geEjU5UtMXmU3dMTt
+         8+VCsgjtIlQWdTx6ECnl08vIoCehsmH4HavcgIT1iTq9WjSopxA4kmJQ4PjDaBaak/
+         zxymJkFfufPzJLXiDgcXeJwV6wBNC7DrdpaFm2CX46qY7OsD49zaSn1Xoof0/8QlTi
+         63TkLPMr13Wtg==
+Message-ID: <4cbb2bb06eafb8f03135fc377ced779102004ea7.camel@kernel.org>
+Subject: Re: [PATCH v2 11/19] netfs: Change ->init_request() to return an
+ error code
+From:   Jeff Layton <jlayton@kernel.org>
+To:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com
+Cc:     Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
         David Wysochanski <dwysocha@redhat.com>,
@@ -56,22 +47,199 @@ Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 02/19] netfs: Generate enums from trace symbol mapping lists
+Date:   Wed, 09 Mar 2022 11:52:32 -0500
+In-Reply-To: <164678212401.1200972.16537041523832944934.stgit@warthog.procyon.org.uk>
+References: <164678185692.1200972.597611902374126174.stgit@warthog.procyon.org.uk>
+         <164678212401.1200972.16537041523832944934.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.42.4 (3.42.4-1.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1712591.1646840957.1@warthog.procyon.org.uk>
-Date:   Wed, 09 Mar 2022 15:49:17 +0000
-Message-ID: <1712592.1646840957@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Jeff Layton <jlayton@redhat.com> wrote:
+On Tue, 2022-03-08 at 23:28 +0000, David Howells wrote:
+> Change the request initialisation function to return an error code so that
+> the network filesystem can return a failure (ENOMEM, for example).
+> 
+> This will also allow ceph to abort a ->readahead() op if the server refuses
+> to give it a cap allowing local caching from within the netfslib framework
+> (errors aren't passed back through ->readahead(), so returning, say,
+> -ENOBUFS will cause the op to be aborted).
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: linux-cachefs@redhat.com
+> ---
+> 
+>  fs/9p/vfs_addr.c       |    3 ++-
+>  fs/afs/file.c          |    3 ++-
+>  fs/netfs/objects.c     |   41 ++++++++++++++++++++++++-----------------
+>  fs/netfs/read_helper.c |   20 ++++++++++++--------
+>  include/linux/netfs.h  |    2 +-
+>  5 files changed, 41 insertions(+), 28 deletions(-)
+> 
+> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+> index fdc1033a1546..91d3926c9559 100644
+> --- a/fs/9p/vfs_addr.c
+> +++ b/fs/9p/vfs_addr.c
+> @@ -56,12 +56,13 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
+>   * @rreq: The read request
+>   * @file: The file being read from
+>   */
+> -static void v9fs_init_request(struct netfs_io_request *rreq, struct file *file)
+> +static int v9fs_init_request(struct netfs_io_request *rreq, struct file *file)
+>  {
+>  	struct p9_fid *fid = file->private_data;
+>  
+>  	refcount_inc(&fid->count);
+>  	rreq->netfs_priv = fid;
+> +	return 0;
+>  }
+>  
+>  /**
+> diff --git a/fs/afs/file.c b/fs/afs/file.c
+> index b19d635eed12..6469d7f98ef5 100644
+> --- a/fs/afs/file.c
+> +++ b/fs/afs/file.c
+> @@ -359,9 +359,10 @@ static int afs_symlink_readpage(struct file *file, struct page *page)
+>  	return ret;
+>  }
+>  
+> -static void afs_init_request(struct netfs_io_request *rreq, struct file *file)
+> +static int afs_init_request(struct netfs_io_request *rreq, struct file *file)
+>  {
+>  	rreq->netfs_priv = key_get(afs_file_key(file));
+> +	return 0;
+>  }
+>  
+>  static bool afs_is_cache_enabled(struct inode *inode)
+> diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+> index 986d7a9d25dd..ae18827e156b 100644
+> --- a/fs/netfs/objects.c
+> +++ b/fs/netfs/objects.c
+> @@ -20,27 +20,34 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
+>  {
+>  	static atomic_t debug_ids;
+>  	struct netfs_io_request *rreq;
+> +	int ret;
+>  
+>  	rreq = kzalloc(sizeof(struct netfs_io_request), GFP_KERNEL);
+> -	if (rreq) {
+> -		rreq->start	= start;
+> -		rreq->len	= len;
+> -		rreq->origin	= origin;
+> -		rreq->netfs_ops	= ops;
+> -		rreq->netfs_priv = netfs_priv;
+> -		rreq->mapping	= mapping;
+> -		rreq->inode	= file_inode(file);
+> -		rreq->i_size	= i_size_read(rreq->inode);
+> -		rreq->debug_id	= atomic_inc_return(&debug_ids);
+> -		INIT_LIST_HEAD(&rreq->subrequests);
+> -		INIT_WORK(&rreq->work, netfs_rreq_work);
+> -		refcount_set(&rreq->ref, 1);
+> -		__set_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
+> -		if (ops->init_request)
+> -			ops->init_request(rreq, file);
+> -		netfs_stat(&netfs_n_rh_rreq);
+> +	if (!rreq)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	rreq->start	= start;
+> +	rreq->len	= len;
+> +	rreq->origin	= origin;
+> +	rreq->netfs_ops	= ops;
+> +	rreq->netfs_priv = netfs_priv;
+> +	rreq->mapping	= mapping;
+> +	rreq->inode	= file_inode(file);
+> +	rreq->i_size	= i_size_read(rreq->inode);
+> +	rreq->debug_id	= atomic_inc_return(&debug_ids);
+> +	INIT_LIST_HEAD(&rreq->subrequests);
+> +	INIT_WORK(&rreq->work, netfs_rreq_work);
+> +	refcount_set(&rreq->ref, 1);
+> +	__set_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
+> +	if (rreq->netfs_ops->init_request) {
+> +		ret = rreq->netfs_ops->init_request(rreq, file);
+> +		if (ret < 0) {
+> +			kfree(rreq);
+> +			return ERR_PTR(ret);
+> +		}
+>  	}
+>  
+> +	netfs_stat(&netfs_n_rh_rreq);
+>  	return rreq;
+>  }
+>  
+> diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
+> index dea085715286..b5176f4320f4 100644
+> --- a/fs/netfs/read_helper.c
+> +++ b/fs/netfs/read_helper.c
+> @@ -768,7 +768,7 @@ void netfs_readahead(struct readahead_control *ractl,
+>  				   readahead_pos(ractl),
+>  				   readahead_length(ractl),
+>  				   NETFS_READAHEAD);
+> -	if (!rreq)
+> +	if (IS_ERR(rreq))
+>  		goto cleanup;
+>  
+>  	if (ops->begin_cache_operation) {
+> @@ -842,11 +842,9 @@ int netfs_readpage(struct file *file,
+>  	rreq = netfs_alloc_request(folio->mapping, file, ops, netfs_priv,
+>  				   folio_file_pos(folio), folio_size(folio),
+>  				   NETFS_READPAGE);
+> -	if (!rreq) {
+> -		if (netfs_priv)
+> -			ops->cleanup(folio_file_mapping(folio), netfs_priv);
+> -		folio_unlock(folio);
+> -		return -ENOMEM;
+> +	if (IS_ERR(rreq)) {
+> +		ret = PTR_ERR(rreq);
+> +		goto alloc_error;
+>  	}
+>  
+>  	if (ops->begin_cache_operation) {
+> @@ -887,6 +885,11 @@ int netfs_readpage(struct file *file,
+>  out:
+>  	netfs_put_request(rreq, false, netfs_rreq_trace_put_hold);
+>  	return ret;
+> +alloc_error:
+> +	if (netfs_priv)
+> +		ops->cleanup(folio_file_mapping(folio), netfs_priv);
+> +	folio_unlock(folio);
+> +	return ret;
+>  }
+>  EXPORT_SYMBOL(netfs_readpage);
+>  
+> @@ -1007,12 +1010,13 @@ int netfs_write_begin(struct file *file, struct address_space *mapping,
+>  		goto have_folio_no_wait;
+>  	}
+>  
+> -	ret = -ENOMEM;
+>  	rreq = netfs_alloc_request(mapping, file, ops, netfs_priv,
+>  				   folio_file_pos(folio), folio_size(folio),
+>  				   NETFS_READ_FOR_WRITE);
+> -	if (!rreq)
+> +	if (IS_ERR(rreq)) {
+> +		ret = PTR_ERR(rreq);
+>  		goto error;
+> +	}
+>  	rreq->no_unlock_folio	= folio_index(folio);
+>  	__set_bit(NETFS_RREQ_NO_UNLOCK_FOLIO, &rreq->flags);
+>  	netfs_priv = NULL;
+> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+> index 7dc741d9b21b..4b99e38f73d9 100644
+> --- a/include/linux/netfs.h
+> +++ b/include/linux/netfs.h
+> @@ -193,7 +193,7 @@ struct netfs_io_request {
+>   */
+>  struct netfs_request_ops {
+>  	bool (*is_cache_enabled)(struct inode *inode);
+> -	void (*init_request)(struct netfs_io_request *rreq, struct file *file);
+> +	int (*init_request)(struct netfs_io_request *rreq, struct file *file);
+>  	int (*begin_cache_operation)(struct netfs_io_request *rreq);
+>  	void (*expand_readahead)(struct netfs_io_request *rreq);
+>  	bool (*clamp_length)(struct netfs_io_subrequest *subreq);
+> 
+> 
 
-> Should you undef EM and E_ here after creating these?
-
-Maybe.  So far it hasn't mattered...
-
-David
-
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
