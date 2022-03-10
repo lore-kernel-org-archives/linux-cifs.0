@@ -2,86 +2,72 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D48DBC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Mar 2022 22:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B812C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Mar 2022 01:40:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238742AbiCIWga (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 9 Mar 2022 17:36:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37750 "EHLO
+        id S233862AbiCJBl3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 9 Mar 2022 20:41:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238739AbiCIWg3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Mar 2022 17:36:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7B91B1216AA
-        for <linux-cifs@vger.kernel.org>; Wed,  9 Mar 2022 14:35:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646865328;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7BCptgTn0msFj3Lu2nO08V4lR03WYPl53I+vGTYn7fk=;
-        b=gSNXI8vgGTo67NIFjpEAQcJcIK2L4YE1lTEVUPnpo8Ms8CFQwyhAwNnsGdykxK7OMCzenC
-        uaJlzMkzZZI+s4zENJfJFpkLf/7WP40+3iuv12MUzR2tlIKaX3pdz9Cr9LsN8lf8dfOE8e
-        KVbUYQglm1lm8ys1Gg+SqJqpo6Z+2eg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-578-P-IsmW0HMkWz7wctcP4Pcg-1; Wed, 09 Mar 2022 17:35:27 -0500
-X-MC-Unique: P-IsmW0HMkWz7wctcP4Pcg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE0D7835DE0;
-        Wed,  9 Mar 2022 22:35:23 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 954F945302;
-        Wed,  9 Mar 2022 22:35:02 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <92ebc9fbdda967c14274f2b246ef3f77a1f21224.camel@kernel.org>
-References: <92ebc9fbdda967c14274f2b246ef3f77a1f21224.camel@kernel.org> <164678185692.1200972.597611902374126174.stgit@warthog.procyon.org.uk> <164678220204.1200972.17408022517463940584.stgit@warthog.procyon.org.uk>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
-        linux-afs@lists.infradead.org,
-        Anna Schumaker <anna.schumaker@netapp.com>,
+        with ESMTP id S232929AbiCJBl2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Mar 2022 20:41:28 -0500
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBEF79BAE6;
+        Wed,  9 Mar 2022 17:40:27 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R261e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0V6m1KrN_1646876422;
+Received: from 30.225.24.63(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0V6m1KrN_1646876422)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 10 Mar 2022 09:40:23 +0800
+Message-ID: <3e942459-bb15-6322-10ae-dbadb09dd72c@linux.alibaba.com>
+Date:   Thu, 10 Mar 2022 09:40:21 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH v2 01/19] fscache: export fscache_end_operation()
+Content-Language: en-US
+To:     Jeff Layton <jlayton@kernel.org>,
+        David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com
+Cc:     Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
         David Wysochanski <dwysocha@redhat.com>,
         Ilya Dryomov <idryomov@gmail.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 19/19] afs: Maintain netfs_i_context::remote_i_size
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1842057.1646865301.1@warthog.procyon.org.uk>
-Date:   Wed, 09 Mar 2022 22:35:01 +0000
-Message-ID: <1842058.1646865301@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <164678185692.1200972.597611902374126174.stgit@warthog.procyon.org.uk>
+ <164678190346.1200972.7453733431978569479.stgit@warthog.procyon.org.uk>
+ <9132b97b5e52fec9c2838b31739175619df3e752.camel@kernel.org>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+In-Reply-To: <9132b97b5e52fec9c2838b31739175619df3e752.camel@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Jeff Layton <jlayton@kernel.org> wrote:
 
-> > -	op->store.i_size = max(pos + size, i_size);
-> > +	op->store.i_size = max(pos + size, ictx->remote_i_size);
+
+On 3/9/22 11:26 PM, Jeff Layton wrote:
+> On Tue, 2022-03-08 at 23:25 +0000, David Howells wrote:
+>> From: Jeffle Xu <jefflexu@linux.alibaba.com>
+>>
+>> Export fscache_end_operation() to avoid code duplication.
+>>
+>> Besides, considering the paired fscache_begin_read_operation() is
+>> already exported, it shall make sense to also export
+>> fscache_end_operation().
+>>
 > 
-> Ahh ok, so if i_size is larger than is represented by this write, you'll
-> have a zeroed out region until writeback catches up. Makes sense.
+> Not what I think of when you say "exporting" but the patch itself looks
+> fine.
+> 
 
-That's the way it was working.  With this change, we track the server's idea
-of the file size separately from our local inode->i_size (which is updated by
-the modifications into the pagecache) and only expand the server's setting to
-the end of the data we're storing, not to our local i_size.  I'm trying to
-avoid zeroed-out regions appearing in the file.
+Yes, maybe "fscache: make fscache_end_operation() generally available"
+as David said shall be better...
 
-Forcible expansion by truncate is a different matter.
-
-David
-
+-- 
+Thanks,
+Jeffle
