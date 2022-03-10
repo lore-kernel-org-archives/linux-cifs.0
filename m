@@ -2,46 +2,47 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E89C433FE
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Mar 2022 16:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38804C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Mar 2022 16:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240294AbiCJQSh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 10 Mar 2022 11:18:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37400 "EHLO
+        id S241731AbiCJQSi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 10 Mar 2022 11:18:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241731AbiCJQRw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Mar 2022 11:17:52 -0500
+        with ESMTP id S242825AbiCJQSY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Mar 2022 11:18:24 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7EDA5190C3B
-        for <linux-cifs@vger.kernel.org>; Thu, 10 Mar 2022 08:16:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8BA4F190C16
+        for <linux-cifs@vger.kernel.org>; Thu, 10 Mar 2022 08:17:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646929009;
+        s=mimecast20190719; t=1646929041;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=m0zrrGDSu3YpWsafJE6HK4NAMWnjg+E7bcoPNDsGgLA=;
-        b=hu8P5O0Skx4PX12blbhmF6redb+3kaqVoS0YSHlvmhoqKY9HBtcDihBfyIZegXUfH5FxEw
-        dm+hLZwtM2YNs5zkx1aQcJYOYDuJEja2tNkvButg18Uu5RC/EtFjaE7U94gyQpQNhpvulj
-        mgErQkJ47N+AD/Ca6y4RGnlBgwEQ+Rk=
+        bh=+5rw8zSPtNYHlJz50ggoUHurB2GiVXScpwkdQ7wos44=;
+        b=JU6H8Tknhryc/C12iJWT0Dzl6Uk+GyNwJMwbtuZV3fCYRjiza2gDvgJcqEg26UL6NAWPRe
+        cV1Cu3+1oW8G36zWfKrZt9KqpINQNnyNpCdU3VzNtUpvdIM9VL1dz+s2tcQ/KuFSNvqfwZ
+        fSe8fGRkWGE7/ljN2CGXEFqRwAVdnQ8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-593-oBrO6CweM-uyQIPhsOA3Gw-1; Thu, 10 Mar 2022 11:16:46 -0500
-X-MC-Unique: oBrO6CweM-uyQIPhsOA3Gw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-551-KgVhwZz1OrS_G-xw4bYWdQ-1; Thu, 10 Mar 2022 11:17:18 -0500
+X-MC-Unique: KgVhwZz1OrS_G-xw4bYWdQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDF78824FA7;
-        Thu, 10 Mar 2022 16:16:43 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4ED86180FD71;
+        Thu, 10 Mar 2022 16:17:16 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B11CC86C33;
-        Thu, 10 Mar 2022 16:16:27 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2EBAC8379E;
+        Thu, 10 Mar 2022 16:17:13 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v3 06/20] netfs: Adjust the netfs_rreq tracepoint slightly
+Subject: [PATCH v3 09/20] netfs: Adjust the netfs_failure tracepoint to
+ indicate non-subreq lines
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
 Cc:     Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
@@ -57,90 +58,66 @@ Cc:     Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 10 Mar 2022 16:16:26 +0000
-Message-ID: <164692898684.2099075.12153225958137716567.stgit@warthog.procyon.org.uk>
+Date:   Thu, 10 Mar 2022 16:17:12 +0000
+Message-ID: <164692903233.2099075.15414355147237641274.stgit@warthog.procyon.org.uk>
 In-Reply-To: <164692883658.2099075.5745824552116419504.stgit@warthog.procyon.org.uk>
 References: <164692883658.2099075.5745824552116419504.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.4
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Adjust the netfs_rreq tracepoint to include the origin of the request and
-to increase the size of the "what trace" output strings by a character so
-that "ENCRYPT" and "DECRYPT" will fit without abbreviation.
+Adjust the netfs_failure tracepoint to indicate a subrequest number of -1
+when it's a full-request failure unrelated to any particular subrequest,
+such as a failure to encrypt its data buffer.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Jeff Layton <jlayton@kernel.org>
 cc: linux-cachefs@redhat.com
-Link: https://lore.kernel.org/r/164622996715.3564931.4252319907990358129.stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/164678199468.1200972.17275585970238114726.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/164623001948.3564931.2353852999649380059.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/164678204587.1200972.14893513018190383961.stgit@warthog.procyon.org.uk/ # v2
 ---
 
- fs/netfs/read_helper.c       |    2 +-
- include/trace/events/netfs.h |   18 +++++++++---------
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ include/trace/events/netfs.h |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-index ef23ef9889d5..181aeda32649 100644
---- a/fs/netfs/read_helper.c
-+++ b/fs/netfs/read_helper.c
-@@ -181,7 +181,7 @@ static void netfs_rreq_do_write_to_cache(struct netfs_io_request *rreq)
- 	struct iov_iter iter;
- 	int ret;
- 
--	trace_netfs_rreq(rreq, netfs_rreq_trace_write);
-+	trace_netfs_rreq(rreq, netfs_rreq_trace_copy);
- 
- 	/* We don't want terminating writes trying to wake us up whilst we're
- 	 * still going through the list.
 diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index b40809c0bd74..0c7a26c4d11c 100644
+index dcea5e888fd0..556859b0f107 100644
 --- a/include/trace/events/netfs.h
 +++ b/include/trace/events/netfs.h
-@@ -22,13 +22,13 @@
- 	E_(netfs_read_trace_write_begin,	"WRITEBEGN")
- 
- #define netfs_rreq_traces					\
--	EM(netfs_rreq_trace_assess,		"ASSESS")	\
--	EM(netfs_rreq_trace_done,		"DONE  ")	\
--	EM(netfs_rreq_trace_free,		"FREE  ")	\
--	EM(netfs_rreq_trace_resubmit,		"RESUBM")	\
--	EM(netfs_rreq_trace_unlock,		"UNLOCK")	\
--	EM(netfs_rreq_trace_unmark,		"UNMARK")	\
--	E_(netfs_rreq_trace_write,		"WRITE ")
-+	EM(netfs_rreq_trace_assess,		"ASSESS ")	\
-+	EM(netfs_rreq_trace_copy,		"COPY   ")	\
-+	EM(netfs_rreq_trace_done,		"DONE   ")	\
-+	EM(netfs_rreq_trace_free,		"FREE   ")	\
-+	EM(netfs_rreq_trace_resubmit,		"RESUBMT")	\
-+	EM(netfs_rreq_trace_unlock,		"UNLOCK ")	\
-+	E_(netfs_rreq_trace_unmark,		"UNMARK ")
- 
- #define netfs_sreq_sources					\
- 	EM(NETFS_FILL_WITH_ZEROES,		"ZERO")		\
-@@ -134,7 +134,7 @@ TRACE_EVENT(netfs_rreq,
+@@ -222,7 +222,7 @@ TRACE_EVENT(netfs_failure,
  
  	    TP_STRUCT__entry(
  		    __field(unsigned int,		rreq		)
--		    __field(unsigned short,		flags		)
-+		    __field(unsigned int,		flags		)
- 		    __field(enum netfs_rreq_trace,	what		)
- 			     ),
+-		    __field(unsigned short,		index		)
++		    __field(short,			index		)
+ 		    __field(short,			error		)
+ 		    __field(unsigned short,		flags		)
+ 		    __field(enum netfs_io_source,	source		)
+@@ -234,17 +234,17 @@ TRACE_EVENT(netfs_failure,
  
-@@ -182,8 +182,8 @@ TRACE_EVENT(netfs_sreq,
+ 	    TP_fast_assign(
+ 		    __entry->rreq	= rreq->debug_id;
+-		    __entry->index	= sreq ? sreq->debug_index : 0;
++		    __entry->index	= sreq ? sreq->debug_index : -1;
+ 		    __entry->error	= error;
+ 		    __entry->flags	= sreq ? sreq->flags : 0;
+ 		    __entry->source	= sreq ? sreq->source : NETFS_INVALID_READ;
+ 		    __entry->what	= what;
+-		    __entry->len	= sreq ? sreq->len : 0;
++		    __entry->len	= sreq ? sreq->len : rreq->len;
+ 		    __entry->transferred = sreq ? sreq->transferred : 0;
+ 		    __entry->start	= sreq ? sreq->start : 0;
+ 			   ),
  
- 	    TP_printk("R=%08x[%u] %s %s f=%02x s=%llx %zx/%zx e=%d",
+-	    TP_printk("R=%08x[%u] %s f=%02x s=%llx %zx/%zx %s e=%d",
++	    TP_printk("R=%08x[%d] %s f=%02x s=%llx %zx/%zx %s e=%d",
  		      __entry->rreq, __entry->index,
--		      __print_symbolic(__entry->what, netfs_sreq_traces),
  		      __print_symbolic(__entry->source, netfs_sreq_sources),
-+		      __print_symbolic(__entry->what, netfs_sreq_traces),
  		      __entry->flags,
- 		      __entry->start, __entry->transferred, __entry->len,
- 		      __entry->error)
 
 
