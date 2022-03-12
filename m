@@ -2,81 +2,87 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93666C433EF
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Mar 2022 08:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC693C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Mar 2022 10:28:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231282AbiCLIPG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 12 Mar 2022 03:15:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33776 "EHLO
+        id S229657AbiCLK3X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 12 Mar 2022 05:29:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230113AbiCLIPG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Mar 2022 03:15:06 -0500
-Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA6F61261A;
-        Sat, 12 Mar 2022 00:14:00 -0800 (PST)
-Received: by nautica.notk.org (Postfix, from userid 108)
-        id 7F113C020; Sat, 12 Mar 2022 09:13:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-        t=1647072836; bh=jFy3V5tJygVoG+31/6kc8XlbG5/C7Z4Td0QKNDh9/WU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=busjI0t7vgzULY8jXBsjcE6B8BrO6/e1n352++NjPRTXLTBOuK7XBO6As8kBlRnwV
-         T4jabpmD0ADkGHN57LmECyjH+mS/nMWJ93nxoPtHJTM0a61Il4V0mjGyog1I8diFL1
-         TWyq91VE4qWaDm/WWL948pRLP85S1yWoRgdS/q22+u8ffNdnSuPyU2V9SIIkgbq8UU
-         VKmJ/yrzKkjJqjgtTmTZMb7bnIXYpm5/HG4/vnrXgePXpNUOnS/UZgktyp7FMtd+2S
-         smMi2f+b5FY162ibvUm6R+rnwx6dJi4Kvlq7UFYlNbmz1fnMqBr9xAh2Pguhnp8tfE
-         fTnd+bfqV6E1g==
-Received: from odin.codewreck.org (localhost [127.0.0.1])
-        by nautica.notk.org (Postfix) with ESMTPS id 1ADC3C009;
-        Sat, 12 Mar 2022 09:13:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-        t=1647072835; bh=jFy3V5tJygVoG+31/6kc8XlbG5/C7Z4Td0QKNDh9/WU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=iSKF4cf4U0hmfSjiK8vQqls/D/IdiX53/xbtJCnilU20M24d8ieUWHg3NYDYmC7Jj
-         HWTZ/dgs1XPBXRpO4znrreaXG2trQiKcivKx9K7+h95oxej/WvQbITBQxI3SEO0sq/
-         48iK7CoijX4VI0/vm1uuI0RI4UlXC5l9qf+322YcqDE3knM4dGf3gYZ/bjCzv89rWX
-         shs44QSDOm4XstiOgZPhFXhohmVIL9f0I+JcolbPqqvHNA9yG6VJeW7Bux5xs4Fz10
-         mWZY/vKUwk16AeA3GuzQQzWI03/GehZ6uU5nDerRoSYRrqDcQjmf7IFkgWCMBpPvTR
-         VEskXuzquTMeQ==
-Received: from localhost (odin.codewreck.org [local])
-        by odin.codewreck.org (OpenSMTPD) with ESMTPA id 72c8ef7a;
-        Sat, 12 Mar 2022 08:13:47 +0000 (UTC)
-Date:   Sat, 12 Mar 2022 17:13:32 +0900
-From:   Dominique Martinet <asmadeus@codewreck.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-cachefs@redhat.com, ceph-devel@vger.kernel.org,
-        Jeff Layton <jlayton@redhat.com>,
-        linux-afs@lists.infradead.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 00/20] netfs: Prep for write helpers
-Message-ID: <YixWLJXyWtD+STvl@codewreck.org>
-References: <164692883658.2099075.5745824552116419504.stgit@warthog.procyon.org.uk>
+        with ESMTP id S229802AbiCLK3W (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Mar 2022 05:29:22 -0500
+X-Greylist: delayed 63 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 12 Mar 2022 02:28:16 PST
+Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACE89EEA48
+        for <linux-cifs@vger.kernel.org>; Sat, 12 Mar 2022 02:28:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Cf3d/zYyP1qElLyGMKalfDePFpmbmiLI2TKBOV9FAj8=;
+  b=r1LvOmlMPSBgD1ppTQls3Zx1NDsxNu/BY1x1IlAbU4VoDfy0tGxd7p1v
+   9UDwmqUuvBCgRGtSd5UR4X6K8V1l7ZtjpMe88rbvO2r3tgx9aaHYbrPK9
+   Ykws3igWEYUgiBIOhLGyjtnrOmUplk3NkoOiT9UGgxTAd3PvoI0hjW5nn
+   w=;
+Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="5.90,175,1643670000"; 
+   d="scan'208";a="25781347"
+Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2022 11:27:11 +0100
+From:   Julia Lawall <Julia.Lawall@inria.fr>
+To:     Steve French <sfrench@samba.org>
+Cc:     kernel-janitors@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/6] cifs: use kzalloc
+Date:   Sat, 12 Mar 2022 11:27:00 +0100
+Message-Id: <20220312102705.71413-2-Julia.Lawall@inria.fr>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20220312102705.71413-1-Julia.Lawall@inria.fr>
+References: <20220312102705.71413-1-Julia.Lawall@inria.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <164692883658.2099075.5745824552116419504.stgit@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-David Howells wrote on Thu, Mar 10, 2022 at 04:13:56PM +0000:
-> The patches can be found on this branch:
-> 
-> 	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-next
+Use kzalloc instead of kmalloc + memset.
 
-Looks good to me from the 9p side:
-Tested-by: Dominique Martinet <asmadeus@codewreck.org> # 9p
+The semantic patch that makes this change is:
+(https://coccinelle.gitlabpages.inria.fr/website/)
 
-writes being done by 4k chunk is really slow so will be glad to see this
-finished, keep it up! :)
+//<smpl>
+@@
+expression res, size, flag;
+@@
+- res = kmalloc(size, flag);
++ res = kzalloc(size, flag);
+  ...
+- memset(res, 0, size);
+//</smpl>
 
--- 
-Dominique
+Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+
+---
+ fs/cifs/transport.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index eeb1a699bd6f..4ff8e165a180 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -464,13 +464,12 @@ smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 		return -EIO;
+ 	}
+ 
+-	tr_hdr = kmalloc(sizeof(*tr_hdr), GFP_NOFS);
++	tr_hdr = kzalloc(sizeof(*tr_hdr), GFP_NOFS);
+ 	if (!tr_hdr)
+ 		return -ENOMEM;
+ 
+ 	memset(&cur_rqst[0], 0, sizeof(cur_rqst));
+ 	memset(&iov, 0, sizeof(iov));
+-	memset(tr_hdr, 0, sizeof(*tr_hdr));
+ 
+ 	iov.iov_base = tr_hdr;
+ 	iov.iov_len = sizeof(*tr_hdr);
+
