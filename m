@@ -2,134 +2,194 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B4FC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Mar 2022 03:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE1A9C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Mar 2022 03:51:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239201AbiCODuo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Mar 2022 23:50:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47272 "EHLO
+        id S237369AbiCODwZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 14 Mar 2022 23:52:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238429AbiCODun (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Mar 2022 23:50:43 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C11488B9
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Mar 2022 20:49:30 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id w7so30762589lfd.6
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Mar 2022 20:49:30 -0700 (PDT)
+        with ESMTP id S234022AbiCODwZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Mar 2022 23:52:25 -0400
+Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B01B488B9
+        for <linux-cifs@vger.kernel.org>; Mon, 14 Mar 2022 20:51:12 -0700 (PDT)
+Received: by mail-vs1-xe31.google.com with SMTP id a186so19448098vsc.3
+        for <linux-cifs@vger.kernel.org>; Mon, 14 Mar 2022 20:51:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tlwze64iAf+fTuJdNCODFyrPE9BARRQB7Jc3sKpEbHM=;
-        b=FFL7Fy44mel5dKuljA4CRjGUYpzqbxRM6SuRAAYqwB1u+2dRq57o7MMOVjmrdOEtsO
-         Ahf0I/xRnELJxZFa8IRQy+MxW0pBy+EP4XNonlBwLazthoIDqjtCT+QCL7u0kMfD3gx/
-         N2wrnCSOVkFyOEpqvpZdDBnQju/KZceyBfJNAkH4fgvcSUg1KWIiWtADlmP4zXW50OIU
-         Wk2oGxlJFnlvktt364L59G9QFwgxb1HKX1It0FqWdovfvT5sxxVIadCiuTjAcVAwFyGj
-         GtTLfB1VHlQAfsD/Q5mufp00J7xKr0asafxnd9eH8wBN4PZ4rsnApCb+qKXlrcOB3S3x
-         rFrw==
+         :cc:content-transfer-encoding;
+        bh=9c+DHjfwIT1UIfYoasri1+p+4zYyJSUJ/KPOc7fkS3I=;
+        b=l995aN/uo5uJgUv1F0pqZ2I9yenBms9MFsyjf64f9DvWIkQ1qcsZOEYFg/X5dH/JKv
+         yowe45SsoDA3uuC/kh2fAGGFmmkd3an4Yfu/v/tAE0jQ0WD3L/z2fiR2jqHmO7Gh/qDi
+         78uTfvFJcmXZKSAtHFfu/fBlV46GQyppdoVbSZeZJNxU5JdbsRf9PZi2B9E5jrnXOhkb
+         sVEXV9YRwgZauer5DPhhQxZ3BNqArdSbCJLd1ko2o4XHSErTjB7exuHR24CWvdxGpF8T
+         ICEQdtWZPlxJ3Qa4X2hZhLPwuhE1BloS1u00JJrojcPf2FxRb5jULv9TC3ooSrhfYBPK
+         NiXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tlwze64iAf+fTuJdNCODFyrPE9BARRQB7Jc3sKpEbHM=;
-        b=g0lcib85qwMTddox2hEbifqmlLfsrfAzN0gNe5UlVcP0urB0P5LE+QmfgBDbFkQRDb
-         LdhSVNeXwqzFGeXJLLLfJVsKHvHHjSJmjUnv3V/RzX1VDIQAGOaP+YkXSQwNgCy+sYDT
-         aR0cWm9zXeU4Vi9ziPfbvfUrGZVqGqOk1IlCL2YEL37elbNpYcEI77m2in4MAbLMauJk
-         am7DtrD8YRgWSG2DWz3b95ZOWK5AtKW06GU2ILhKPWIgoJMGaisd7j3LiW3b5rW7jmq0
-         1RW74TQ6znUvwoBRiJB6gV1PgMciICfb2CsOVpQiHlI36rPIAuecAFWyCRso95l+zETC
-         zgPg==
-X-Gm-Message-State: AOAM5305eY28GrJTJOZhkoUC3p7lzGu6rmBmOy3D+Af+3nd7BQ80/Kx/
-        WVPm1cQbRSOTQ5pcxljliA3JOuJvOnxf55U9HXE=
-X-Google-Smtp-Source: ABdhPJwuRR4/z82GpvSI6OM9NF6uFqSqUKU/VYuZoB2Vx3dL1t4te9hcrY98kWVDSWFm8FUcbrY7vpDHYi5RKFzDUyI=
-X-Received: by 2002:a05:6512:3b11:b0:448:35d2:6092 with SMTP id
- f17-20020a0565123b1100b0044835d26092mr15974417lfv.234.1647316169061; Mon, 14
- Mar 2022 20:49:29 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=9c+DHjfwIT1UIfYoasri1+p+4zYyJSUJ/KPOc7fkS3I=;
+        b=Kh5IJufnUlR5aDPivcIfQyzDQ76+3D/sVJ+kx1vszwKxdZw7IzqwfQgf3XmNLyxa78
+         R4viJvckxDQa9oHTfsn98Cq9UpzaJYS4ahq0DJvpDk3ZjTLUJwWe4kBgPYZ1YPX2GqFE
+         /P+hq4l3flRlTwlX7HMYey0GjH6Y5LIsxuCr92g3sqZd0hCdd6aim2IaIq62oHA/2Mi9
+         4sdmVCUoH0Hjcg2Bze7Dx2Fc5p/bOzPPIcvLm6r51paJM5Cts+2e+c8wDkocNOHjrhr/
+         tUepcqtRpT9qJPYq1woAU6LujkcavEk5GXPSI+H9gSA6KtA/68IvfT6KUyizqwpap/+T
+         3Gjw==
+X-Gm-Message-State: AOAM5300uaY/zX5q3OgNGIyxQOfKLIoGckhrQrzftIW4cxL5F6c7E9nv
+        so5iH5nu0pL33v2oRPBAyttQfZQnkzTZlnSprfXLNW3Mbxg=
+X-Google-Smtp-Source: ABdhPJyZDIcJ6onm2n7oinyBklgRiAJEqr7ruEtZ60vXPvbkQmKl9oXMgOk7QhUQXCaGh9q1oJEugqHXS2baQM4pUhg=
+X-Received: by 2002:a67:1a05:0:b0:31a:511d:886a with SMTP id
+ a5-20020a671a05000000b0031a511d886amr10244140vsa.72.1647316271127; Mon, 14
+ Mar 2022 20:51:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220315034404.623539-1-lsahlber@redhat.com>
-In-Reply-To: <20220315034404.623539-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 14 Mar 2022 22:49:18 -0500
-Message-ID: <CAH2r5msq--3d01+rV0QQmyUWAmyOqChQdjomZhUtYaAyXAuMbQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: we do not need a spinlock around the tree access
- during umount
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+References: <2314914.1646986773@warthog.procyon.org.uk> <2315193.1646987135@warthog.procyon.org.uk>
+In-Reply-To: <2315193.1646987135@warthog.procyon.org.uk>
+From:   Rohith Surabattula <rohiths.msft@gmail.com>
+Date:   Tue, 15 Mar 2022 09:20:59 +0530
+Message-ID: <CACdtm0Y_F7JjoqvC63+3CU0brETf+iEQ_UjMyx+WzhtwE1HGSw@mail.gmail.com>
+Subject: Re: cifs conversion to netfslib
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Paulo Alcantara <pc@cjr.nz>, jlayton@kernel.org,
+        linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending testing
+Hi David,
 
-On Mon, Mar 14, 2022 at 10:44 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+Below change needs to be applied on top of your branch.
+
+lxsmbadmin@netfsvm:~/latest_14mar/linux-fs$ git diff
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index af7483c246ac..447934ff80b8 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2969,6 +2969,12 @@ cifs_write_from_iter(loff_t offset, size_t len,
+struct iov_iter *from,
+
+                cur_len =3D min_t(const size_t, len, wsize);
+
++               if (!cur_len) {
++                       rc =3D -EAGAIN;
++                       add_credits_and_wake_if(server, credits, 0);
++                       break;
++               }
++
+                wdata =3D cifs_writedata_alloc(cifs_uncached_writev_complet=
+e);
+                if (!wdata) {
+                        rc =3D -ENOMEM;
+
+lxsmbadmin@netfsvm:~/xfstests-dev$ sudo ./check generic/013
+SECTION       -- smb3
+FSTYP         -- cifs
+PLATFORM      -- Linux/x86_64 netfsvm 5.17.0-rc6+ #1 SMP PREEMPT Mon
+Mar 14 09:05:47 UTC 2022
+MKFS_OPTIONS  -- //127.0.0.1/sambashare_scratch
+MOUNT_OPTIONS -- -ousername=3D,password=3D,noperm,vers=3D3.0,actimeo=3D0
+//127.0.0.1/sambashare_scratch /mnt/xfstests_scratch
+
+generic/013      149s
+Ran: generic/013
+Passed all 1 tests
+
+SECTION       -- smb3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Ran: generic/013
+Passed all 1 tests
+
+Regards,
+Rohith
+
+On Fri, Mar 11, 2022 at 1:56 PM David Howells <dhowells@redhat.com> wrote:
 >
-> Remove the spinlock around the tree traversal as we are calling possibly
-> sleeping functions.
-> We do not need a spinlock here as there will be no modifications to this
-> tree at this point.
 >
-> This prevents warnings like this to occur in dmesg:
-> [  653.774996] BUG: sleeping function called from invalid context at kernel/loc\
-> king/mutex.c:280
-> [  653.775088] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 1827, nam\
-> e: umount
-> [  653.775152] preempt_count: 1, expected: 0
-> [  653.775191] CPU: 0 PID: 1827 Comm: umount Tainted: G        W  OE     5.17.0\
-> -rc7-00006-g4eb628dd74df #135
-> [  653.775195] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-\
-> 1.fc33 04/01/2014
-> [  653.775197] Call Trace:
-> [  653.775199]  <TASK>
-> [  653.775202]  dump_stack_lvl+0x34/0x44
-> [  653.775209]  __might_resched.cold+0x13f/0x172
-> [  653.775213]  mutex_lock+0x75/0xf0
-> [  653.775217]  ? __mutex_lock_slowpath+0x10/0x10
-> [  653.775220]  ? _raw_write_lock_irq+0xd0/0xd0
-> [  653.775224]  ? dput+0x6b/0x360
-> [  653.775228]  cifs_kill_sb+0xff/0x1d0 [cifs]
-> [  653.775285]  deactivate_locked_super+0x85/0x130
-> [  653.775289]  cleanup_mnt+0x32c/0x4d0
-> [  653.775292]  ? path_umount+0x228/0x380
-> [  653.775296]  task_work_run+0xd8/0x180
-> [  653.775301]  exit_to_user_mode_loop+0x152/0x160
-> [  653.775306]  exit_to_user_mode_prepare+0x89/0xd0
-> [  653.775315]  syscall_exit_to_user_mode+0x12/0x30
-> [  653.775322]  do_syscall_64+0x48/0x90
-> [  653.775326]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> David Howells <dhowells@redhat.com> wrote:
 >
-> Fixes: 187af6e98b44e5d8f25e1d41a92db138eb54416f ("cifs: fix handlecache and multiuser")
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > The other issue is that if I run splice to an empty file, it works; run=
+ning
+> > another splice to the same file will result in the server giving
+> > STATUS_ACCESS_DENIED when cifs_write_begin() tries to read from the fil=
+e:
+> >
+> >     7 0.009485249  192.168.6.2 =E2=86=92 192.168.6.1  SMB2 183 Read Req=
+uest Len:65536 Off:0 File: x
+> >     8 0.009674245  192.168.6.1 =E2=86=92 192.168.6.2  SMB2 143 Read Res=
+ponse, Error: STATUS_ACCESS_DENIED
+> >
+> > Actually - that might be because the file is only 65536 bytes long beca=
+use the
+> > first splice finished short.
+>
+> Actually, it's because I opened the output file O_WRONLY.  If I open it
+> O_RDWR, it works.  The test program is attached below.
+>
+> David
 > ---
->  fs/cifs/cifsfs.c | 2 --
->  1 file changed, 2 deletions(-)
+> #define _GNU_SOURCE
+> #include <stdio.h>
+> #include <stdlib.h>
+> #include <string.h>
+> #include <unistd.h>
+> #include <fcntl.h>
 >
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 677c02aa8731..6e5246122ee2 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -269,7 +269,6 @@ static void cifs_kill_sb(struct super_block *sb)
->                 dput(cifs_sb->root);
->                 cifs_sb->root = NULL;
+> int main(int argc, char *argv[])
+> {
+>         off64_t opos;
+>         size_t len;
+>         int in, out;
+>
+>         if (argc !=3D 4) {
+>                 printf("Format: %s size in out\n", argv[0]);
+>                 exit(2);
 >         }
-> -       spin_lock(&cifs_sb->tlink_tree_lock);
->         node = rb_first(root);
->         while (node != NULL) {
->                 tlink = rb_entry(node, struct tcon_link, tl_rbnode);
-> @@ -283,7 +282,6 @@ static void cifs_kill_sb(struct super_block *sb)
->                 mutex_unlock(&cfid->fid_mutex);
->                 node = rb_next(node);
+>
+>         len =3D atol(argv[1]);
+>
+>         if (strcmp(argv[2], "-") !=3D 0) {
+>                 in =3D open(argv[2], O_RDONLY);
+>                 if (in < 0) {
+>                         perror(argv[2]);
+>                         return 1;
+>                 }
+>         } else {
+>                 in =3D 0;
 >         }
-> -       spin_unlock(&cifs_sb->tlink_tree_lock);
 >
->         kill_anon_super(sb);
->         cifs_umount(cifs_sb);
-> --
-> 2.30.2
+>         if (strcmp(argv[3], "-") !=3D 0) {
+>                 out =3D open(argv[3], O_WRONLY);  // Change to O_RDWR
+>                 if (out < 0) {
+>                         perror(argv[3]);
+>                         return 1;
+>                 }
+>         } else {
+>                 out =3D 1;
+>         }
 >
-
-
--- 
-Thanks,
-
-Steve
+>         opos =3D 3;
+>         if (splice(in, NULL, out, &opos, len, 0) < 0) {
+>                 perror("splice");
+>                 return 1;
+>         }
+>
+>         if (close(in) < 0) {
+>                 perror("close/in");
+>                 return 1;
+>         }
+>
+>         if (close(out) < 0) {
+>                 perror("close/out");
+>                 return 1;
+>         }
+>
+>         return 0;
+> }
+>
