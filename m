@@ -2,140 +2,255 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF06C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Mar 2022 04:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCD98C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Mar 2022 09:54:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344752AbiCOEfK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Mar 2022 00:35:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39846 "EHLO
+        id S1343563AbiCOJzm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Mar 2022 05:55:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239466AbiCOEfJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Mar 2022 00:35:09 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 101F33527E
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Mar 2022 21:33:58 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id s29so9495888lfb.13
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Mar 2022 21:33:57 -0700 (PDT)
+        with ESMTP id S1346869AbiCOJzl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Mar 2022 05:55:41 -0400
+Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E36ABED
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Mar 2022 02:54:29 -0700 (PDT)
+Received: by mail-vs1-xe2f.google.com with SMTP id v62so20171349vsv.1
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Mar 2022 02:54:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4peSpXK2mmvCJvbN2k3BvzkqWMrTyTAdaRBSS6B8ZmU=;
-        b=gJkkKRXFtbqf9b+A/ootv7FqYr2qMGYMEZ2jDXTZI3JEeTjpYMK7DOhiJ2ldpoIuHv
-         Nk/jWyHiE/fTPQGZKzEaMSQd0PSIxTC/kYbu/7OfPLwqz9y48VNV4vgFUiVw1rZBdHyA
-         Le/OqpNfbd/2rtalSqiiR3MpqmJ3UvbtTQ/618wCeqJBGWLlCg+y3N9BinUbt86sP9iT
-         1F39OrleIFFUa6ZJ7c1zzbNYoR1qm2l3104Ot+L9qLPAUHuBozOxasgB9jKSw2U3Sfc6
-         pI/KZnlYSvGbc524wL72yb32jzHZyIxzBSXHFT2959B+kj+mHE+w/ba7jaKt8WmQV2JE
-         1SIg==
+         :cc:content-transfer-encoding;
+        bh=29U2Y37ya/nYB6jU5h4WfAmZBLEXi35+S+4/hPc/D9U=;
+        b=RCd2RuHGiL8/9nWR40w/PU5GbxMRWUGXctB74HXPvnzl8RB2n90sYwBDwxRq6JCd5o
+         UmvkV9hZzCLn7jdyc7b6QnFYtFGqZvT7zCKoeipGjJuFTaMu52rkkSj6TmAU6EU8anHa
+         S2NQYWljKGQJlBFG/leCSlriRyQybhw7HjwDqex1eow+jmDZbX1QvwMtcq6Zu6qnrR6X
+         hYFL+L58y3hZ3q8mO72CoaegHB4zswv+LXblysdmysb3yCbE1xnWB9e0YUs+Uope7f8z
+         yYVehy2IQ8UuM8BoDcPLejwg8H5kEcJe7uw3ete+0FKb6WHK3iHy4Lu2+HHZZODbxHBu
+         kDng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4peSpXK2mmvCJvbN2k3BvzkqWMrTyTAdaRBSS6B8ZmU=;
-        b=gT3vgLjP+OIwdbZNaYQt9+w07OYN33rSNQYWfOTD5ctjk93SicJUVCzI7Oh/FgDF6n
-         Xz8J5lb6GxZDKCUuBQZVQ8jvxbQjjB0hPVAhud4/IovSBXUwi2wEUiIj/+xCp1DjAWnn
-         W353Z4OuAxTal9HIveQiHzkHEmIoiJF/Nsm+z9BJPyJoPMLNR0tvUwd9KsI9nJbn9tPx
-         rPh4wQy/bFz4BC1WeTeRSNjKUYtmF3IDbRU86LNHkfURwSmROwxD8VDP2EbjoHB/5Njv
-         vB8awVNpV13gGvbU02ZxyniPb50EcUSFUsBukOtVeR5I7HerakDPYc4njol3t4gHB9YM
-         JLMQ==
-X-Gm-Message-State: AOAM532E8MMbtSvLlIKFZJ6ExwmzeWtKevM40h5PtQv7SgPerE4wMbP3
-        Waw5eGe3EelfdMmUSHEYlqxFPgeoqlF6qz3NbxGWp5ksFCw=
-X-Google-Smtp-Source: ABdhPJxVbUMmgEWI4Gt0geMnf+wRCldWJSLEVW1hkQtncqCtA9AwawKgwaHu673JMi7CP0TTl5InexSha5NGO+M8SZc=
-X-Received: by 2002:a05:6512:b19:b0:446:f1c6:81bd with SMTP id
- w25-20020a0565120b1900b00446f1c681bdmr15506644lfu.320.1647318836293; Mon, 14
- Mar 2022 21:33:56 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=29U2Y37ya/nYB6jU5h4WfAmZBLEXi35+S+4/hPc/D9U=;
+        b=Q1W32r8SRIPFbkoJ0iZNp+Xv/kws9qeD3zBYWjBAq05makI3Apncs3c4k2Uxfvayy/
+         51ZOoqafipuBbaZI1zregzk7ik31b9zHmYJQ1VCm4IR5C5gKgwtLYKdRjynNaBB9qmKC
+         cI3t/Z6lAD+RpEHZ6djSxlt+tmu7YnR/o2TLuHrGrK64QyCuQ4gtv/uuMgW02A5/lvHO
+         S9YO5pj3ETK3pyQ/OzVdksLZsu00LS/XSfw2BRvUUkNlPXtZSIJYdQwe7uOpJwTQXFC1
+         4AusvbdfRL7W2rxoya46eA8KYbsJxGYkI3oYTdaO+0zqNpNlATDmQgR9fqpn7eb5wJXx
+         T46w==
+X-Gm-Message-State: AOAM533Vv4UtjCEZ6KQTr/80EBZo0QcuyIHk6afA7Ye+AOojdDWLwp+r
+        Sgj+SNM1Ahf7sGorR0/NXfOOp2XojMo0FlXdIYY369qiOHA=
+X-Google-Smtp-Source: ABdhPJxgXXtFnYeQPp7bTrStj9bI5mMAvPwzky3MIBfnLhizc3gk4Jj4jW9Mun6BLHfuEP49n6WSj0iIISde8sbD1LQ=
+X-Received: by 2002:a05:6102:40d:b0:322:a0f5:c8fe with SMTP id
+ d13-20020a056102040d00b00322a0f5c8femr10073962vsq.40.1647338068111; Tue, 15
+ Mar 2022 02:54:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220315041745.625517-1-lsahlber@redhat.com>
-In-Reply-To: <20220315041745.625517-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 14 Mar 2022 23:33:45 -0500
-Message-ID: <CAH2r5mv_Oi=jQpnQRHYOweJoyH8VT8DCfW9YUkze-qvDZbx1GQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix KASAN warning in parse_server_interfaces()
- during mount
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+References: <2314914.1646986773@warthog.procyon.org.uk> <2315193.1646987135@warthog.procyon.org.uk>
+ <CACdtm0Y_F7JjoqvC63+3CU0brETf+iEQ_UjMyx+WzhtwE1HGSw@mail.gmail.com>
+In-Reply-To: <CACdtm0Y_F7JjoqvC63+3CU0brETf+iEQ_UjMyx+WzhtwE1HGSw@mail.gmail.com>
+From:   Rohith Surabattula <rohiths.msft@gmail.com>
+Date:   Tue, 15 Mar 2022 15:24:17 +0530
+Message-ID: <CACdtm0YuO+t46wQf9pKu9-U-=vguvwpEu6VXrkXV3JDocFM2qg@mail.gmail.com>
+Subject: Re: cifs conversion to netfslib
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Paulo Alcantara <pc@cjr.nz>, jlayton@kernel.org,
+        linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6-git for-next pending testing
+Hi David,
 
-On Mon, Mar 14, 2022 at 11:17 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> In parse_server_interfaces() we hold a spinlock across a parsing look that
-> calls kmalloc(). Use GFP_ATOMIC for this kmalloc since we can not sleep
-> while holding a spinlock.
->
-> KASAN warning for this bug looks as:
-> [ 2638.506227] BUG: sleeping function called from invalid context at include/li\
-> nux/sched/mm.h:256
-> [ 2638.506360] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 3633, nam\
-> e: mount.cifs
-> [ 2638.506446] preempt_count: 1, expected: 0
-> [ 2638.506486] CPU: 0 PID: 3633 Comm: mount.cifs Tainted: G        W  OE     5.\
-> 17.0-rc7-00006-g4eb628dd74df #135
-> [ 2638.506490] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-\
-> 1.fc33 04/01/2014
-> [ 2638.506493] Call Trace:
-> [ 2638.506495]  <TASK>
-> [ 2638.506497]  dump_stack_lvl+0x34/0x44
-> [ 2638.506505]  __might_resched.cold+0x13f/0x172
-> [ 2638.506509]  ? _raw_spin_lock+0x81/0xe0
-> [ 2638.506514]  ? parse_server_interfaces+0x3fe/0xc17 [cifs]
-> [ 2638.506610]  kmem_cache_alloc_trace+0x261/0x2f0
-> [ 2638.506616]  parse_server_interfaces+0x3fe/0xc17 [cifs]
-> [ 2638.506685]  ? kref_put.isra.0+0x42/0x42 [cifs]
-> [ 2638.506754]  smb3_qfs_tcon.cold+0x28/0x2d [cifs]
-> [ 2638.506821]  ? open_cached_dir+0x1080/0x1080 [cifs]
-> [ 2638.506884]  ? io_schedule_timeout+0x1a0/0x1a0
-> [ 2638.506888]  ? _raw_spin_lock+0x81/0xe0
-> [ 2638.506892]  ? _raw_write_lock_irq+0xd0/0xd0
-> [ 2638.506896]  ? __raw_callee_save___native_queued_spin_unlock+0x11/0x1e
-> [ 2638.506901]  ? _raw_spin_lock+0x81/0xe0
-> [ 2638.506904]  ? cifs_get_tcon+0xea3/0x1bc0 [cifs]
-> [ 2638.506959]  mount_get_conns+0x366/0xf60 [cifs]
-> [ 2638.507012]  cifs_mount+0xcc/0xe90 [cifs]
-> [ 2638.507068]  ? __irq_work_queue_local+0x67/0xa0
-> [ 2638.507073]  ? follow_dfs_link+0x810/0x810 [cifs]
-> [ 2638.507125]  ? _raw_spin_lock+0x81/0xe0
-> [ 2638.507130]  cifs_smb3_do_mount+0x259/0x5f0 [cifs]
-> [ 2638.507180]  ? cifs_sb_deactive+0x60/0x60 [cifs]
-> [ 2638.507231]  ? mutex_lock+0x9f/0xf0
-> [ 2638.507234]  ? __mutex_lock_slowpath+0x10/0x10
-> [ 2638.507238]  ? smb3_fs_context_parse_monolithic+0x10b/0x2e0 [cifs]
-> [ 2638.507309]  ? smb3_init_fs_context+0x1b6/0x8f0 [cifs]
-> [ 2638.507388]  smb3_get_tree+0x77/0xf0 [cifs]
-> [ 2638.507450]  vfs_get_tree+0x84/0x2b0
-> [ 2638.507455]  do_new_mount+0x21e/0x480
-> [ 2638.507460]  ? do_add_mount+0x370/0x370
-> [ 2638.507464]  ? security_capable+0x56/0x90
-> [ 2638.507469]  path_mount+0x2ad/0x1660
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/smb2ops.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index e04c3045c4d6..0ecd6e1832a1 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -569,7 +569,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
->
->                 /* no match. insert the entry in the list */
->                 info = kmalloc(sizeof(struct cifs_server_iface),
-> -                              GFP_KERNEL);
-> +                              GFP_ATOMIC);
->                 if (!info) {
->                         rc = -ENOMEM;
->                         spin_unlock(&ses->iface_lock);
-> --
-> 2.30.2
->
+I noticed 2 other issues while running xfstests.
 
+Noticed kernel OOPS during test generic/286:
+folio_test_writeback returned false which means PG_writeback flag has
+been cleared. I am not sure whether head page has PG_writeback flag
+set initially? Can you please confirm.
 
--- 
-Thanks,
+[ 2275.941096] CIFS: bad 2000 @64f0000 page 64f0 64f1
+[ 2275.945785] ------------[ cut here ]------------
+[ 2275.945787] kernel BUG at
+/home/lxsmbadmin/latest_14mar/linux-fs/fs/cifs/cifssmb.c:1954!
+[ 2275.952198] invalid opcode: 0000 [#1] PREEMPT SMP PTI
+[ 2275.956500] CPU: 0 PID: 3369 Comm: kworker/0:7 Tainted: G
+OE     5.17.0-rc6+ #1
+[ 2275.962573] Hardware name: Microsoft Corporation Virtual
+Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 10/27/2020
+[ 2275.969812] Workqueue: cifsiod cifs_writev_complete [cifs]
+[ 2275.974909] RIP: 0010:cifs_pages_written_back+0x1e1/0x1f0 [cifs]
+[ 2275.975570] CIFS: bad 2000 @64f0000 page 64f0 64f1
+[ 2275.980619] Code: 00 48 8b 07 f6 c4 04 0f 84 92 84 06 00 e8 77 a6
+e6 db 48 89 c1 49 89 d8 4c 89 e2 44 89 ee 48 c7 c7 e0 f5 8e c0 e8 a4
+9d 71 dc <0f> 0b e8 58 f5 76 dc 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00
+55 48
+[ 2275.980622] RSP: 0018:ffffac614177fdc8 EFLAGS: 00010246
+[ 2275.980625] RAX: 0000000000000026 RBX: 00000000000064f1 RCX: 00000000000=
+00000
+[ 2275.980626] RDX: 0000000000000000 RSI: ffffffff9d767af1 RDI: 00000000fff=
+fffff
+[ 2275.980628] RBP: ffffac614177fe28 R08: 0000000000000000 R09: ffffac61417=
+7fbc0
+[ 2275.980629] R10: ffffac614177fbb8 R11: ffffffff9df52b68 R12: 00000000064=
+f0000
+[ 2275.980631] R13: 0000000000002000 R14: 0000000000000000 R15: ffff9c8193b=
+c7e40
+[ 2275.980632] FS:  0000000000000000(0000) GS:ffff9c8337c00000(0000)
+knlGS:0000000000000000
+[ 2275.980636] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2275.980638] CR2: 00007fd099e56b90 CR3: 00000001028e4006 CR4: 00000000003=
+706f0
+[ 2275.980639] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000=
+00000
+[ 2275.980640] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000=
+00400
+[ 2275.980641] Call Trace:
+[ 2275.980643]  <TASK>
+[ 2275.980648]  cifs_writev_complete+0x43d/0x500 [cifs]
 
-Steve
+Noticed that with netfs integration, file open with O_DIRECT flag is
+not supported.
+
+Regards,
+Rohith
+
+On Tue, Mar 15, 2022 at 9:20 AM Rohith Surabattula
+<rohiths.msft@gmail.com> wrote:
+>
+> Hi David,
+>
+> Below change needs to be applied on top of your branch.
+>
+> lxsmbadmin@netfsvm:~/latest_14mar/linux-fs$ git diff
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index af7483c246ac..447934ff80b8 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -2969,6 +2969,12 @@ cifs_write_from_iter(loff_t offset, size_t len,
+> struct iov_iter *from,
+>
+>                 cur_len =3D min_t(const size_t, len, wsize);
+>
+> +               if (!cur_len) {
+> +                       rc =3D -EAGAIN;
+> +                       add_credits_and_wake_if(server, credits, 0);
+> +                       break;
+> +               }
+> +
+>                 wdata =3D cifs_writedata_alloc(cifs_uncached_writev_compl=
+ete);
+>                 if (!wdata) {
+>                         rc =3D -ENOMEM;
+>
+> lxsmbadmin@netfsvm:~/xfstests-dev$ sudo ./check generic/013
+> SECTION       -- smb3
+> FSTYP         -- cifs
+> PLATFORM      -- Linux/x86_64 netfsvm 5.17.0-rc6+ #1 SMP PREEMPT Mon
+> Mar 14 09:05:47 UTC 2022
+> MKFS_OPTIONS  -- //127.0.0.1/sambashare_scratch
+> MOUNT_OPTIONS -- -ousername=3D,password=3D,noperm,vers=3D3.0,actimeo=3D0
+> //127.0.0.1/sambashare_scratch /mnt/xfstests_scratch
+>
+> generic/013      149s
+> Ran: generic/013
+> Passed all 1 tests
+>
+> SECTION       -- smb3
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+> Ran: generic/013
+> Passed all 1 tests
+>
+> Regards,
+> Rohith
+>
+> On Fri, Mar 11, 2022 at 1:56 PM David Howells <dhowells@redhat.com> wrote=
+:
+> >
+> >
+> > David Howells <dhowells@redhat.com> wrote:
+> >
+> > > The other issue is that if I run splice to an empty file, it works; r=
+unning
+> > > another splice to the same file will result in the server giving
+> > > STATUS_ACCESS_DENIED when cifs_write_begin() tries to read from the f=
+ile:
+> > >
+> > >     7 0.009485249  192.168.6.2 =E2=86=92 192.168.6.1  SMB2 183 Read R=
+equest Len:65536 Off:0 File: x
+> > >     8 0.009674245  192.168.6.1 =E2=86=92 192.168.6.2  SMB2 143 Read R=
+esponse, Error: STATUS_ACCESS_DENIED
+> > >
+> > > Actually - that might be because the file is only 65536 bytes long be=
+cause the
+> > > first splice finished short.
+> >
+> > Actually, it's because I opened the output file O_WRONLY.  If I open it
+> > O_RDWR, it works.  The test program is attached below.
+> >
+> > David
+> > ---
+> > #define _GNU_SOURCE
+> > #include <stdio.h>
+> > #include <stdlib.h>
+> > #include <string.h>
+> > #include <unistd.h>
+> > #include <fcntl.h>
+> >
+> > int main(int argc, char *argv[])
+> > {
+> >         off64_t opos;
+> >         size_t len;
+> >         int in, out;
+> >
+> >         if (argc !=3D 4) {
+> >                 printf("Format: %s size in out\n", argv[0]);
+> >                 exit(2);
+> >         }
+> >
+> >         len =3D atol(argv[1]);
+> >
+> >         if (strcmp(argv[2], "-") !=3D 0) {
+> >                 in =3D open(argv[2], O_RDONLY);
+> >                 if (in < 0) {
+> >                         perror(argv[2]);
+> >                         return 1;
+> >                 }
+> >         } else {
+> >                 in =3D 0;
+> >         }
+> >
+> >         if (strcmp(argv[3], "-") !=3D 0) {
+> >                 out =3D open(argv[3], O_WRONLY);  // Change to O_RDWR
+> >                 if (out < 0) {
+> >                         perror(argv[3]);
+> >                         return 1;
+> >                 }
+> >         } else {
+> >                 out =3D 1;
+> >         }
+> >
+> >         opos =3D 3;
+> >         if (splice(in, NULL, out, &opos, len, 0) < 0) {
+> >                 perror("splice");
+> >                 return 1;
+> >         }
+> >
+> >         if (close(in) < 0) {
+> >                 perror("close/in");
+> >                 return 1;
+> >         }
+> >
+> >         if (close(out) < 0) {
+> >                 perror("close/out");
+> >                 return 1;
+> >         }
+> >
+> >         return 0;
+> > }
+> >
