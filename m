@@ -2,114 +2,120 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A4DC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Mar 2022 04:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03FBAC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Mar 2022 04:17:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238877AbiCOEQp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Mar 2022 00:16:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34364 "EHLO
+        id S229532AbiCOETI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Mar 2022 00:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbiCOEQo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Mar 2022 00:16:44 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 148693D1C6;
-        Mon, 14 Mar 2022 21:15:33 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id h14so30799090lfk.11;
-        Mon, 14 Mar 2022 21:15:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MX+6thpdmH9Fmh6G8WI/hYT23j8vgEmJnH4dIzx5fhI=;
-        b=VYtL8vemdJkuH/Vis/B8Rof9Cp3UWDhYCJj/PVdFco+0KeaZ8btcr5zxL/DxWpUOOZ
-         nuUiJMoTnqiAIb5l1ZywONQgyQF2U3KUwkYHZAL2y3JpWG+bsocGuEY/cHWxkwn2SBSc
-         fcZ0ZL38lizuWMJjn9Vzp7a9bZt414Nn26+BD+F5xBTzfwsgW2t6tFPDuO7A+F32ATHi
-         Ooytl5VhT02NLwbgaduZySpG0XfqkxTA4dCo6LuKypk5jZGHX2ENR5ReRTWpAiXwS9KJ
-         OPPxH09ZwYSCbUGLeKXJxThPoNkXkDPdKzDUFpHs1Dj9d03WONUwopdi+dgAZVpbsxLc
-         8MuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MX+6thpdmH9Fmh6G8WI/hYT23j8vgEmJnH4dIzx5fhI=;
-        b=giio+/I44tZBP11iJHy+ybzt7Tp76ZHwNhkIH++ujg0QUt7wgUrKRToSNdAb3BrYVt
-         AMMJw9gb0D0IHIOhUd7Ot8yO+oXYvoDOGOrKVpKZriBNJVgTJ/DuFDF4YewPtYgXkt+T
-         qTsR+mF6Jmpe/oPcaqmS5i9rKyGV1rRltm0vYj5TzEJsvjy9fHXBazCSkmrBCPMcvIG+
-         t+AGFvnFFT7+ySo/qY9iXLGBIQJdaYo8BPii/pzE+LG/VHk0mHN7mSlvkxhgnjnG452Y
-         v0LkekIjhi+3eGSfFAqLe8qVpMGwuAh1Bm6tf2h3C+qByyINxWEXuYrLGVWW/rhy7wa7
-         L8UQ==
-X-Gm-Message-State: AOAM531AR2xIBt/uD4XJllE6I6cITTFin+Hckez1mIfnfTQPnWZImJSw
-        l02PjQxH8jbaKHAvmbRgnLFZxnEtI3dyebQgJtOs3C87vC8=
-X-Google-Smtp-Source: ABdhPJz37KwMUSCRY+zf4rBXiMdU8hH8Ijn8GNbH3cY07jiXP3+drPZ9RfdPXYk9LDPnv/CO8u6fcDfxk+ak4Ncq8+0=
-X-Received: by 2002:a19:490f:0:b0:448:4bf8:6084 with SMTP id
- w15-20020a19490f000000b004484bf86084mr14810015lfa.537.1647317731326; Mon, 14
- Mar 2022 21:15:31 -0700 (PDT)
+        with ESMTP id S1344746AbiCOETH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Mar 2022 00:19:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5C0AEE081
+        for <linux-cifs@vger.kernel.org>; Mon, 14 Mar 2022 21:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647317875;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=WAdBRsecU14/qYYiPxPWyIHiCYmLHaJWJ7UJkQgTWXU=;
+        b=d11ueWqRR7eIzvTlIkuKSOIdXQc/RoxLRdQUB2KBAWvKy2GHxpAzSquq8HV4knyGUa0M3n
+        DQlMGhMGPRMz2Pm6nncyTbYJL3Trd0KEvBspYzBwsYzbX5YuDYP8lmaebSwtA8KYNYc2k6
+        oAM75xm/FwwKZdNxI9vbF8aGp1GrMBc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-454-xbpT5tymP4y3xcUwxZ8hCQ-1; Tue, 15 Mar 2022 00:17:53 -0400
+X-MC-Unique: xbpT5tymP4y3xcUwxZ8hCQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4EC82185A7BA;
+        Tue, 15 Mar 2022 04:17:53 +0000 (UTC)
+Received: from thinkpad (vpn2-54-164.bne.redhat.com [10.64.54.164])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 601CA4B8D59;
+        Tue, 15 Mar 2022 04:17:52 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: fix KASAN warning in parse_server_interfaces() during mount
+Date:   Tue, 15 Mar 2022 14:17:45 +1000
+Message-Id: <20220315041745.625517-1-lsahlber@redhat.com>
 MIME-Version: 1.0
-References: <20220312102705.71413-1-Julia.Lawall@inria.fr> <20220312102705.71413-2-Julia.Lawall@inria.fr>
-In-Reply-To: <20220312102705.71413-2-Julia.Lawall@inria.fr>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 14 Mar 2022 23:15:20 -0500
-Message-ID: <CAH2r5mtD3=BiSDE4pLMpsc708dkP43hXosdyorfENawV9ura9g@mail.gmail.com>
-Subject: Re: [PATCH 1/6] cifs: use kzalloc
-To:     Julia Lawall <Julia.Lawall@inria.fr>
-Cc:     kernel-janitors <kernel-janitors@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Which tree should this be merged from?  cifs-2.6.git for-next ... or
-do you prefer that these all go together through a different tree
+In parse_server_interfaces() we hold a spinlock across a parsing look that
+calls kmalloc(). Use GFP_ATOMIC for this kmalloc since we can not sleep
+while holding a spinlock.
 
-On Sun, Mar 13, 2022 at 11:36 AM Julia Lawall <Julia.Lawall@inria.fr> wrote:
->
-> Use kzalloc instead of kmalloc + memset.
->
-> The semantic patch that makes this change is:
-> (https://coccinelle.gitlabpages.inria.fr/website/)
->
-> //<smpl>
-> @@
-> expression res, size, flag;
-> @@
-> - res = kmalloc(size, flag);
-> + res = kzalloc(size, flag);
->   ...
-> - memset(res, 0, size);
-> //</smpl>
->
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
->
-> ---
->  fs/cifs/transport.c |    3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index eeb1a699bd6f..4ff8e165a180 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -464,13 +464,12 @@ smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
->                 return -EIO;
->         }
->
-> -       tr_hdr = kmalloc(sizeof(*tr_hdr), GFP_NOFS);
-> +       tr_hdr = kzalloc(sizeof(*tr_hdr), GFP_NOFS);
->         if (!tr_hdr)
->                 return -ENOMEM;
->
->         memset(&cur_rqst[0], 0, sizeof(cur_rqst));
->         memset(&iov, 0, sizeof(iov));
-> -       memset(tr_hdr, 0, sizeof(*tr_hdr));
->
->         iov.iov_base = tr_hdr;
->         iov.iov_len = sizeof(*tr_hdr);
->
+KASAN warning for this bug looks as:
+[ 2638.506227] BUG: sleeping function called from invalid context at include/li\
+nux/sched/mm.h:256
+[ 2638.506360] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 3633, nam\
+e: mount.cifs
+[ 2638.506446] preempt_count: 1, expected: 0
+[ 2638.506486] CPU: 0 PID: 3633 Comm: mount.cifs Tainted: G        W  OE     5.\
+17.0-rc7-00006-g4eb628dd74df #135
+[ 2638.506490] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-\
+1.fc33 04/01/2014
+[ 2638.506493] Call Trace:
+[ 2638.506495]  <TASK>
+[ 2638.506497]  dump_stack_lvl+0x34/0x44
+[ 2638.506505]  __might_resched.cold+0x13f/0x172
+[ 2638.506509]  ? _raw_spin_lock+0x81/0xe0
+[ 2638.506514]  ? parse_server_interfaces+0x3fe/0xc17 [cifs]
+[ 2638.506610]  kmem_cache_alloc_trace+0x261/0x2f0
+[ 2638.506616]  parse_server_interfaces+0x3fe/0xc17 [cifs]
+[ 2638.506685]  ? kref_put.isra.0+0x42/0x42 [cifs]
+[ 2638.506754]  smb3_qfs_tcon.cold+0x28/0x2d [cifs]
+[ 2638.506821]  ? open_cached_dir+0x1080/0x1080 [cifs]
+[ 2638.506884]  ? io_schedule_timeout+0x1a0/0x1a0
+[ 2638.506888]  ? _raw_spin_lock+0x81/0xe0
+[ 2638.506892]  ? _raw_write_lock_irq+0xd0/0xd0
+[ 2638.506896]  ? __raw_callee_save___native_queued_spin_unlock+0x11/0x1e
+[ 2638.506901]  ? _raw_spin_lock+0x81/0xe0
+[ 2638.506904]  ? cifs_get_tcon+0xea3/0x1bc0 [cifs]
+[ 2638.506959]  mount_get_conns+0x366/0xf60 [cifs]
+[ 2638.507012]  cifs_mount+0xcc/0xe90 [cifs]
+[ 2638.507068]  ? __irq_work_queue_local+0x67/0xa0
+[ 2638.507073]  ? follow_dfs_link+0x810/0x810 [cifs]
+[ 2638.507125]  ? _raw_spin_lock+0x81/0xe0
+[ 2638.507130]  cifs_smb3_do_mount+0x259/0x5f0 [cifs]
+[ 2638.507180]  ? cifs_sb_deactive+0x60/0x60 [cifs]
+[ 2638.507231]  ? mutex_lock+0x9f/0xf0
+[ 2638.507234]  ? __mutex_lock_slowpath+0x10/0x10
+[ 2638.507238]  ? smb3_fs_context_parse_monolithic+0x10b/0x2e0 [cifs]
+[ 2638.507309]  ? smb3_init_fs_context+0x1b6/0x8f0 [cifs]
+[ 2638.507388]  smb3_get_tree+0x77/0xf0 [cifs]
+[ 2638.507450]  vfs_get_tree+0x84/0x2b0
+[ 2638.507455]  do_new_mount+0x21e/0x480
+[ 2638.507460]  ? do_add_mount+0x370/0x370
+[ 2638.507464]  ? security_capable+0x56/0x90
+[ 2638.507469]  path_mount+0x2ad/0x1660
 
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/smb2ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index e04c3045c4d6..0ecd6e1832a1 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -569,7 +569,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 
+ 		/* no match. insert the entry in the list */
+ 		info = kmalloc(sizeof(struct cifs_server_iface),
+-			       GFP_KERNEL);
++			       GFP_ATOMIC);
+ 		if (!info) {
+ 			rc = -ENOMEM;
+ 			spin_unlock(&ses->iface_lock);
 -- 
-Thanks,
+2.30.2
 
-Steve
