@@ -2,89 +2,87 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E19C4C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Mar 2022 14:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E73D9C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Mar 2022 17:15:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237525AbiCROut (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Mar 2022 10:50:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36652 "EHLO
+        id S239485AbiCRRQS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Mar 2022 13:16:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237779AbiCROug (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Mar 2022 10:50:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4B4351C1EEA
-        for <linux-cifs@vger.kernel.org>; Fri, 18 Mar 2022 07:48:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647614898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AXh1kXJA2Arm+k9zVpD08NoMYuNv/3gU6u7CxBA2E8s=;
-        b=eL3fnSJkkPjULPlXkRSPeZrho2FlLoYHvVmcOUIYifY4l5ZnW+nUFG8xnr4gNHGwtaY45+
-        d17qsmsYK6keutVE+ML6PNuJ2iCIYxgrJlAmKRzxaOIzI0O5IdbsLHS6Q5MS+GEn0ksh6u
-        FkVG86cd32sGnKvbIJOQkIUZ5+r5SzA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-622-ZiK8pNwNPmCjf2x7J_dSuQ-1; Fri, 18 Mar 2022 10:48:13 -0400
-X-MC-Unique: ZiK8pNwNPmCjf2x7J_dSuQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80D99296A625;
-        Fri, 18 Mar 2022 14:48:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 16A4040D282F;
-        Fri, 18 Mar 2022 14:48:09 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <f5633dea0bfabd40ba548fc8502e5838c033fbae.camel@kernel.org>
-References: <f5633dea0bfabd40ba548fc8502e5838c033fbae.camel@kernel.org> <164692909854.2099075.9535537286264248057.stgit@warthog.procyon.org.uk> <164692883658.2099075.5745824552116419504.stgit@warthog.procyon.org.uk> <306388.1647595110@warthog.procyon.org.uk>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 13/20] netfs: Add a netfs inode context
+        with ESMTP id S238495AbiCRRQS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Mar 2022 13:16:18 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15BB610661A;
+        Fri, 18 Mar 2022 10:14:59 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id bn33so12119892ljb.6;
+        Fri, 18 Mar 2022 10:14:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=FZMk1ix4XIuWfpGs1FppUJm9YWSTbpi3Jqa4aZR3Fq8=;
+        b=Uem8BC9g0IhfcqKWAOTk7em8o0MDuLrGnBSL+MPCvtEj3VxZCUCeMMMMUAeXb343AR
+         JblmLcmtLSNUURJQ2qidIAr82GpkNU0B2GsVbx+Ln+PWKMb6CyJFwCAgoNfp10qI/kQH
+         4lLLGVENlO+r30jTykkrKEL0Zlb0/tPXryBT8gFEqSTvT32PiCdA+I8f4X4wnuxpdIum
+         uOSswd+fHjRWRtfOGhcP7DSAQ+pwATgJtKP8Fhxnpjb8eIt5Y2ypEHZgZvifydJ9zkot
+         MfFw3E8iBIeEFL6LJjKywpkzmh4l5E/4hXBeMqGS3uY5oqSqtQSza0/Q3UPMg3VqySF9
+         uEkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=FZMk1ix4XIuWfpGs1FppUJm9YWSTbpi3Jqa4aZR3Fq8=;
+        b=YGdlzqp+qacftbVyvUJYikz86IpopwZO/d4yEVeCJO1+1X6B4DnvuQ3ougtIpD9dCp
+         zDgIjCMQUE6vlltCpMT0fhgKOXGOOjgcADxiIRkWMRnn69j+Dy0cijYFbt16J/sMKyL2
+         cpWbMK7xJoLuMv1fAhKGGxxqK6Fluq9VwTglYbA4AzmSOS/NgDr5OtAeMcWo4K8Q2eYY
+         rla/Ktxf0cAwObaaDXduGa8L8i681c/U7EEqFSu2LHPQwtLMSbm3bRv6MHmCVu8Tqdhs
+         QXSlK00//oqhhlKKPX5XtlAKsDaIXzOYcoP0pr57IOX+CS11m2ZkkIffODnfrBpmvuAE
+         L3sw==
+X-Gm-Message-State: AOAM533PDF9K/Q6+BJT8BXryv23A1cT30wd2ac/ztGOxlkgAM5VC5Dhb
+        QdvPSXvr74J49sCodS2HFUFznq6eIgiOaZCIPyo5MWvTtZI=
+X-Google-Smtp-Source: ABdhPJx0BlIOREgDP6HiEqhIa+fXB+UPg//JiJTFVe6AT7ngcPPf8duS6zgAOniXSXVVBpO92pNE1RaEmJJARFY1TWM=
+X-Received: by 2002:a2e:9dcf:0:b0:247:f8eb:90d5 with SMTP id
+ x15-20020a2e9dcf000000b00247f8eb90d5mr6592267ljj.23.1647623696692; Fri, 18
+ Mar 2022 10:14:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <666407.1647614889.1@warthog.procyon.org.uk>
-Date:   Fri, 18 Mar 2022 14:48:09 +0000
-Message-ID: <666408.1647614889@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 18 Mar 2022 12:14:45 -0500
+Message-ID: <CAH2r5mvgGMBOXhSvDw67aUoHLoEeDFh-hAUfHmdFsEptMkT+LA@mail.gmail.com>
+Subject: [GIT PULL] smb3 fix
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Jeff Layton <jlayton@kernel.org> wrote:
+Please pull the following changes since commit
+09688c0166e76ce2fb85e86b9d99be8b0084cdf9:
 
-> > +static inline bool netfs_is_cache_enabled(struct netfs_i_context *ctx)
-> > +{
-> > +#if IS_ENABLED(CONFIG_FSCACHE)
-> > +	struct fscache_cookie *cookie = ctx->cache;
-> > +
-> > +	return fscache_cookie_valid(cookie) && cookie->cache_priv &&
-> > +		fscache_cookie_enabled(cookie);
-> 
-> 
-> As you mentioned in the other thread, it may be cleaner to move the
-> cookie->cache_priv check into fscache_cookie_enabled. Is there ever a
-> case where you'd need to separate the two checks?
+  Linux 5.17-rc8 (2022-03-13 13:23:37 -0700)
 
-I'm not sure, but I'd prefer not to do it in this series as it would affect
-NFS plus some other operations, so will need retesting thoroughly.  I'd prefer
-to defer it.
+are available in the Git repository at:
 
-David
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc8-smb3-fix
 
+for you to fetch changes up to e3ee9fb22652f228225c352bd4fabec330cac5f0:
+
+  smb3: fix incorrect session setup check for multiuser mounts
+(2022-03-16 22:48:55 -0500)
+
+----------------------------------------------------------------
+Small fix for regression in multiuser mounts
+
+Will wait for 5.18-rc for the additional improvements
+suggested by Ronnie to make the server and session status
+handling code easier to read
+----------------------------------------------------------------
+Steve French (1):
+      smb3: fix incorrect session setup check for multiuser mounts
+
+ fs/cifs/connect.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+-- 
+Thanks,
+
+Steve
