@@ -2,1812 +2,1271 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C9EC433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Mar 2022 09:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CDACC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Mar 2022 11:05:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234331AbiCRJUN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Mar 2022 05:20:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60528 "EHLO
+        id S235011AbiCRLGr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Mar 2022 07:06:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234226AbiCRJUL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Mar 2022 05:20:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 64C091EC71
-        for <linux-cifs@vger.kernel.org>; Fri, 18 Mar 2022 02:18:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647595129;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+Hj6lp9cb+j/tPgdExJZow6f3VrKM4A02J6ZV/TYS3U=;
-        b=RD2E0uJA+evTXgeJBn2djBsd/5WDy9Lw1uQI/+xYPE8LXRrtAifMwqYvPnxCgqPwLnfOcA
-        Ls7BfyUHUZ+8Uc/dIEH81AbeDarE7neKduS/seJX1VGVzojeaHJyuitCioCUHWPDaU/1AH
-        /3gu/wbYS4hVS4OVbNl+UTsXUPRH/vg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-10-gamC1ELSObafAry468Xllw-1; Fri, 18 Mar 2022 05:18:48 -0400
-X-MC-Unique: gamC1ELSObafAry468Xllw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 66F3C180075C;
-        Fri, 18 Mar 2022 09:18:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E4D4EC50943;
-        Fri, 18 Mar 2022 09:18:33 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <164692909854.2099075.9535537286264248057.stgit@warthog.procyon.org.uk>
-References: <164692909854.2099075.9535537286264248057.stgit@warthog.procyon.org.uk> <164692883658.2099075.5745824552116419504.stgit@warthog.procyon.org.uk>
-To:     linux-cachefs@redhat.com
-Cc:     dhowells@redhat.com, Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 13/20] netfs: Add a netfs inode context
+        with ESMTP id S231623AbiCRLGp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Mar 2022 07:06:45 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6082EF3A4B
+        for <linux-cifs@vger.kernel.org>; Fri, 18 Mar 2022 04:05:23 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id w4so9811463edc.7
+        for <linux-cifs@vger.kernel.org>; Fri, 18 Mar 2022 04:05:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8WvMdXeXp1lq9d4s6ueWR/j4AkUWdOEiecvqwlurJ/0=;
+        b=Isc51aXsvtlHQSt3Aj/48Eb8ybop6Bi0GyA88xM7ihxBoDooVjbVOOD363SWw67AxY
+         f31irJSy/046NbNm+wXPWYkgqj+qqT2K4vt7GFcgkeNSrnauslykiMiO/tCYuuy0hwAO
+         ELuEjD49flqvb7JsjGeJ7qfxSe/rcxl6WhW9WDTvo0W29BHolyiRspxAgJn9Fr7+ygyM
+         iMBEbqb8BOesr8/9uF/1a5VCab4Rbi5PRpbfib2WYI/5lL4+wE+YZSd+70wbkah6xUb2
+         d24gJeWyOMhHinGz2tzQWovnLtJS+v3a5PZk8cA16kzQgw1ityoDE46Zg8eulDmoj7+x
+         ZtNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8WvMdXeXp1lq9d4s6ueWR/j4AkUWdOEiecvqwlurJ/0=;
+        b=mIun3ASiDpSihfOMtH8Izv19J1qm6d/ywfK4ms2heAF/cFMIRcq3dNCTjLJiu8mYKT
+         pLNujXvc0o0ozfWBg9fPEZKesZpOoqCeg851VE5GIsdb3/lfAPAi9TPV9ae8S6TZ8OLu
+         31Dv1E22N6gfx+AAJ1OvCEThGLjS4d27drAtff/rbejpaaQjO9qqKt2+27ygqu7zl3yp
+         BBqeOM+qmEOfILpduzQycXkyD/w7kY02E4SuPSZZK40P+0rWN+Leze3feyVOuAr5P+7V
+         +lF8GOubumun1gJ1Ul8KatJ1MqcxwfB1+0kbaf60XvZp9hiXwDAKrEYi/qNMpHTHuAnG
+         nEGw==
+X-Gm-Message-State: AOAM531PDuhcOgTbzcXgI2nLKi8vkv0v9Lyl+nQRgpgU/KsFug+yi2er
+        HAfd6GpFggh8kBY7l/HhtLt6NBRvpFFAkPA7/LY=
+X-Google-Smtp-Source: ABdhPJzMVX6Wn7YWLcSQ3nyVsWeX5JXncb1CaYnxfoV+WCuqHnZe3nDJOLsa0TZKGzjKDtJQ0ygBpyBikigmaq+JZPs=
+X-Received: by 2002:a50:a6c2:0:b0:410:a328:3c86 with SMTP id
+ f2-20020a50a6c2000000b00410a3283c86mr8863951edc.55.1647601521157; Fri, 18 Mar
+ 2022 04:05:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <306387.1647595110.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 18 Mar 2022 09:18:30 +0000
-Message-ID: <306388.1647595110@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+References: <CAFrh3J9soC36+BVuwHB=g9z_KB5Og2+p2_W+BBoBOZveErz14w@mail.gmail.com>
+ <eae5c0cc-55d1-f8db-aba0-57cee7f10332@leemhuis.info> <CAH2r5msUiBuZ74_nPVyzn=k=g0ELpcMnoTm_z30zrMSxF4sn1A@mail.gmail.com>
+ <CAFrh3J-oOR1FxPrpzKsQQvronyk9fhDSqD2CY5DNsYO5Lt0ydg@mail.gmail.com>
+ <CAFrh3J-TOW4JG6QND0nz_9asiv2g0DzPmxR68BBB_an9yAQ+Vw@mail.gmail.com>
+ <CAFrh3J83sUd3tQYHzssKoBb4uQXd3MXf9e=4jLsJ9aH7z2B3oA@mail.gmail.com>
+ <CANT5p=qvrV5mrE8dN=RAmCBefGd4_3BzTfM7U98eqmZN2ZVjEg@mail.gmail.com>
+ <CAFrh3J8xaEoLo56SmgTKd7gU_KZiyK2AqmrT_7VSM-Hxsyxwrw@mail.gmail.com>
+ <CANT5p=p50RU4HY=Dbx0+HzorZ_W0gTmE6iCZbQf0RdF3ZcfRLw@mail.gmail.com>
+ <CAFrh3J-xXK1ScRT2BddWzYw9VbeUsGT9cL30bC_KwhQn4G3dtQ@mail.gmail.com>
+ <CAFrh3J8+Yb9gHoCaxMPCTyzzS68v9Fz9VGggkjm2hOB07Hj0Yw@mail.gmail.com>
+ <CAFrh3J_GSfsXkT5A773E0Raem+h4FsN-KOdXK+qC7LUr6dUmpQ@mail.gmail.com>
+ <472a1fec-ef7b-a8e2-6c14-cc5fa97bd8b3@leemhuis.info> <CAH2r5mvn7=Vt3tv6whjNDqnmpQDnmVFPppZux9ZfvyVA0rNJvg@mail.gmail.com>
+ <CAN05THQvLyo-rQ9HOnWZQ2KHJCZcj171T_-BG=z4kahamLX_ZA@mail.gmail.com>
+ <CAH2r5ms7XCTnCdW26Zh_ekXqk2bzqm7QxyYRLCDUPrAadqtyTA@mail.gmail.com>
+ <CAN05THSctgGb63eHYJtZ__ZuoZ6fo8h7foUZROiPWDPVxZ=Ygg@mail.gmail.com>
+ <CAFrh3J8pN8gG7s46dqn9yrA9HyGZ7LrZQ_ZO=B9O1xmSm8GiYw@mail.gmail.com> <CAFrh3J85Lrf9D=_GKb1U0t2+_z5UQ42qC+wTtvWKHbYv+_f2Zg@mail.gmail.com>
+In-Reply-To: <CAFrh3J85Lrf9D=_GKb1U0t2+_z5UQ42qC+wTtvWKHbYv+_f2Zg@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Fri, 18 Mar 2022 16:35:08 +0530
+Message-ID: <CANT5p=qtEABmzh3nLNbt-NZBUXA288-JHwCq7ZYozs0Do2_51w@mail.gmail.com>
+Subject: Re: Failure to access cifs mount of samba share after resume from
+ sleep with 5.17-rc5
+To:     Satadru Pramanik <satadru@gmail.com>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        Thorsten Leemhuis <regressions@leemhuis.info>,
+        CIFS <linux-cifs@vger.kernel.org>, regressions@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a netfs_i_context struct that should be included in the network
-filesystem's own inode struct wrapper, directly after the VFS's inode
-struct, e.g.:
-
-        struct my_inode {
-                struct {
-                        /* These must be contiguous */
-                        struct inode            vfs_inode;
-                        struct netfs_i_context  netfs_ctx;
-                };
-        };
-
-The netfs_i_context struct so far contains a single field for the network
-filesystem to use - the cache cookie:
-
-        struct netfs_i_context {
-                ...
-                struct fscache_cookie   *cache;
-        };
-
-Three functions are provided to help with this:
-
- (1) void netfs_i_context_init(struct inode *inode,
-                               const struct netfs_request_ops *ops);
-
-     Initialise the netfs context and set the operations.
-
- (2) struct netfs_i_context *netfs_i_context(struct inode *inode);
-
-     Find the netfs context from the VFS inode.
-
- (3) struct inode *netfs_inode(struct netfs_i_context *ctx);
-
-     Find the VFS inode from the netfs context.
-
-Changes
-=3D=3D=3D=3D=3D=3D=3D
-ver #4)
- - Fix netfs_is_cache_enabled() to check cookie->cache_priv to see if a
-   cache is present[3].
- - Fix netfs_skip_folio_read() to zero out all of the page, not just some
-   of it[3].
-
-ver #3)
- - Split out the bit to move ceph cap-getting on readahead into
-   ceph_init_request()[1].
- - Stick in a comment to the netfs inode structs indicating the contiguity
-   requirements[2].
-
-ver #2)
- - Adjust documentation to match.
- - Use "#if IS_ENABLED()" in netfs_i_cookie(), not "#ifdef".
- - Move the cap check from ceph_readahead() to ceph_init_request() to be
-   called from netfslib.
- - Remove ceph_readahead() and use  netfs_readahead() directly instead.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Jeff Layton <jlayton@kernel.org>
-cc: linux-cachefs@redhat.com
-Link: https://lore.kernel.org/r/8af0d47f17d89c06bbf602496dd845f2b0bf25b3.c=
-amel@kernel.org/ [1]
-Link: https://lore.kernel.org/r/beaf4f6a6c2575ed489adb14b257253c868f9a5c.c=
-amel@kernel.org/ [2]
-Link: https://lore.kernel.org/r/3536452.1647421585@warthog.procyon.org.uk/=
- [3]
-Link: https://lore.kernel.org/r/164622984545.3564931.15691742939278418580.=
-stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/164678213320.1200972.16807551936267647470.=
-stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/164692909854.2099075.9535537286264248057.s=
-tgit@warthog.procyon.org.uk/ # v3
----
- Documentation/filesystems/netfs_library.rst |  101 +++++++++++++++++++---=
-------
- fs/9p/cache.c                               |   10 +-
- fs/9p/v9fs.c                                |    4 -
- fs/9p/v9fs.h                                |   13 ++-
- fs/9p/vfs_addr.c                            |   43 +----------
- fs/9p/vfs_inode.c                           |   13 ++-
- fs/afs/dynroot.c                            |    1 =
-
- fs/afs/file.c                               |   26 -------
- fs/afs/inode.c                              |   31 +++++---
- fs/afs/internal.h                           |   19 +++--
- fs/afs/super.c                              |    4 -
- fs/afs/write.c                              |    3 =
-
- fs/ceph/addr.c                              |   31 +-------
- fs/ceph/cache.c                             |   28 +++----
- fs/ceph/cache.h                             |   11 ---
- fs/ceph/inode.c                             |    6 -
- fs/ceph/super.h                             |   17 ++--
- fs/cifs/cifsglob.h                          |   10 +-
- fs/cifs/fscache.c                           |   11 +--
- fs/cifs/fscache.h                           |    2 =
-
- fs/netfs/internal.h                         |   18 ++++
- fs/netfs/objects.c                          |   12 +--
- fs/netfs/read_helper.c                      |  100 ++++++++++++----------=
------
- fs/netfs/stats.c                            |    1 =
-
- include/linux/netfs.h                       |   81 +++++++++++++++++++---
- 25 files changed, 318 insertions(+), 278 deletions(-)
-
-diff --git a/Documentation/filesystems/netfs_library.rst b/Documentation/f=
-ilesystems/netfs_library.rst
-index 4eb7e7b7b0fc..9c8bc5666b46 100644
---- a/Documentation/filesystems/netfs_library.rst
-+++ b/Documentation/filesystems/netfs_library.rst
-@@ -7,6 +7,8 @@ Network Filesystem Helper Library
- .. Contents:
- =
-
-  - Overview.
-+ - Per-inode context.
-+   - Inode context helper functions.
-  - Buffered read helpers.
-    - Read helper functions.
-    - Read helper structures.
-@@ -28,6 +30,69 @@ Note that the library module doesn't link against local=
- caching directly, so
- access must be provided by the netfs.
- =
-
- =
-
-+Per-Inode Context
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+The network filesystem helper library needs a place to store a bit of sta=
-te for
-+its use on each netfs inode it is helping to manage.  To this end, a cont=
-ext
-+structure is defined::
-+
-+	struct netfs_i_context {
-+		const struct netfs_request_ops *ops;
-+		struct fscache_cookie	*cache;
-+	};
-+
-+A network filesystem that wants to use netfs lib must place one of these
-+directly after the VFS ``struct inode`` it allocates, usually as part of =
-its
-+own struct.  This can be done in a way similar to the following::
-+
-+	struct my_inode {
-+		struct {
-+			/* These must be contiguous */
-+			struct inode		vfs_inode;
-+			struct netfs_i_context  netfs_ctx;
-+		};
-+		...
-+	};
-+
-+This allows netfslib to find its state by simple offset from the inode po=
-inter,
-+thereby allowing the netfslib helper functions to be pointed to directly =
-by the
-+VFS/VM operation tables.
-+
-+The structure contains the following fields:
-+
-+ * ``ops``
-+
-+   The set of operations provided by the network filesystem to netfslib.
-+
-+ * ``cache``
-+
-+   Local caching cookie, or NULL if no caching is enabled.  This field do=
-es not
-+   exist if fscache is disabled.
-+
-+
-+Inode Context Helper Functions
-+------------------------------
-+
-+To help deal with the per-inode context, a number helper functions are
-+provided.  Firstly, a function to perform basic initialisation on a conte=
-xt and
-+set the operations table pointer::
-+
-+	void netfs_i_context_init(struct inode *inode,
-+				  const struct netfs_request_ops *ops);
-+
-+then two functions to cast between the VFS inode structure and the netfs
-+context::
-+
-+	struct netfs_i_context *netfs_i_context(struct inode *inode);
-+	struct inode *netfs_inode(struct netfs_i_context *ctx);
-+
-+and finally, a function to get the cache cookie pointer from the context
-+attached to an inode (or NULL if fscache is disabled)::
-+
-+	struct fscache_cookie *netfs_i_cookie(struct inode *inode);
-+
-+
- Buffered Read Helpers
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
- =
-
-@@ -70,38 +135,22 @@ Read Helper Functions
- =
-
- Three read helpers are provided::
- =
-
--	void netfs_readahead(struct readahead_control *ractl,
--			     const struct netfs_request_ops *ops,
--			     void *netfs_priv);
-+	void netfs_readahead(struct readahead_control *ractl);
- 	int netfs_readpage(struct file *file,
--			   struct folio *folio,
--			   const struct netfs_request_ops *ops,
--			   void *netfs_priv);
-+			   struct page *page);
- 	int netfs_write_begin(struct file *file,
- 			      struct address_space *mapping,
- 			      loff_t pos,
- 			      unsigned int len,
- 			      unsigned int flags,
- 			      struct folio **_folio,
--			      void **_fsdata,
--			      const struct netfs_request_ops *ops,
--			      void *netfs_priv);
--
--Each corresponds to a VM operation, with the addition of a couple of para=
-meters
--for the use of the read helpers:
-+			      void **_fsdata);
- =
-
-- * ``ops``
--
--   A table of operations through which the helpers can talk to the filesy=
-stem.
--
-- * ``netfs_priv``
-+Each corresponds to a VM address space operation.  These operations use t=
-he
-+state in the per-inode context.
- =
-
--   Filesystem private data (can be NULL).
--
--Both of these values will be stored into the read request structure.
--
--For ->readahead() and ->readpage(), the network filesystem should just ju=
-mp
--into the corresponding read helper; whereas for ->write_begin(), it may b=
-e a
-+For ->readahead() and ->readpage(), the network filesystem just point dir=
-ectly
-+at the corresponding read helper; whereas for ->write_begin(), it may be =
-a
- little more complicated as the network filesystem might want to flush
- conflicting writes or track dirty data and needs to put the acquired foli=
-o if
- an error occurs after calling the helper.
-@@ -246,7 +295,6 @@ through which it can issue requests and negotiate::
- =
-
- 	struct netfs_request_ops {
- 		void (*init_request)(struct netfs_io_request *rreq, struct file *file);
--		bool (*is_cache_enabled)(struct inode *inode);
- 		int (*begin_cache_operation)(struct netfs_io_request *rreq);
- 		void (*expand_readahead)(struct netfs_io_request *rreq);
- 		bool (*clamp_length)(struct netfs_io_subrequest *subreq);
-@@ -265,11 +313,6 @@ The operations are as follows:
-    [Optional] This is called to initialise the request structure.  It is =
-given
-    the file for reference and can modify the ->netfs_priv value.
- =
-
-- * ``is_cache_enabled()``
--
--   [Required] This is called by netfs_write_begin() to ask if the file is=
- being
--   cached.  It should return true if it is being cached and false otherwi=
-se.
--
-  * ``begin_cache_operation()``
- =
-
-    [Optional] This is called to ask the network filesystem to call into t=
-he
-diff --git a/fs/9p/cache.c b/fs/9p/cache.c
-index 55e108e5e133..1c8dc696d516 100644
---- a/fs/9p/cache.c
-+++ b/fs/9p/cache.c
-@@ -49,22 +49,20 @@ int v9fs_cache_session_get_cookie(struct v9fs_session_=
-info *v9ses,
- =
-
- void v9fs_cache_inode_get_cookie(struct inode *inode)
- {
--	struct v9fs_inode *v9inode;
-+	struct v9fs_inode *v9inode =3D V9FS_I(inode);
- 	struct v9fs_session_info *v9ses;
- 	__le32 version;
- 	__le64 path;
- =
-
- 	if (!S_ISREG(inode->i_mode))
- 		return;
--
--	v9inode =3D V9FS_I(inode);
--	if (WARN_ON(v9inode->fscache))
-+	if (WARN_ON(v9fs_inode_cookie(v9inode)))
- 		return;
- =
-
- 	version =3D cpu_to_le32(v9inode->qid.version);
- 	path =3D cpu_to_le64(v9inode->qid.path);
- 	v9ses =3D v9fs_inode2v9ses(inode);
--	v9inode->fscache =3D
-+	v9inode->netfs_ctx.cache =3D
- 		fscache_acquire_cookie(v9fs_session_cache(v9ses),
- 				       0,
- 				       &path, sizeof(path),
-@@ -72,5 +70,5 @@ void v9fs_cache_inode_get_cookie(struct inode *inode)
- 				       i_size_read(&v9inode->vfs_inode));
- =
-
- 	p9_debug(P9_DEBUG_FSC, "inode %p get cookie %p\n",
--		 inode, v9inode->fscache);
-+		 inode, v9fs_inode_cookie(v9inode));
- }
-diff --git a/fs/9p/v9fs.c b/fs/9p/v9fs.c
-index 08f65c40af4f..e28ddf763b3b 100644
---- a/fs/9p/v9fs.c
-+++ b/fs/9p/v9fs.c
-@@ -623,9 +623,7 @@ static void v9fs_sysfs_cleanup(void)
- static void v9fs_inode_init_once(void *foo)
- {
- 	struct v9fs_inode *v9inode =3D (struct v9fs_inode *)foo;
--#ifdef CONFIG_9P_FSCACHE
--	v9inode->fscache =3D NULL;
--#endif
-+
- 	memset(&v9inode->qid, 0, sizeof(v9inode->qid));
- 	inode_init_once(&v9inode->vfs_inode);
- }
-diff --git a/fs/9p/v9fs.h b/fs/9p/v9fs.h
-index bc8b30205d36..ec0e8df3b2eb 100644
---- a/fs/9p/v9fs.h
-+++ b/fs/9p/v9fs.h
-@@ -9,6 +9,7 @@
- #define FS_9P_V9FS_H
- =
-
- #include <linux/backing-dev.h>
-+#include <linux/netfs.h>
- =
-
- /**
-  * enum p9_session_flags - option flags for each 9P session
-@@ -108,14 +109,15 @@ struct v9fs_session_info {
- #define V9FS_INO_INVALID_ATTR 0x01
- =
-
- struct v9fs_inode {
--#ifdef CONFIG_9P_FSCACHE
--	struct fscache_cookie *fscache;
--#endif
-+	struct {
-+		/* These must be contiguous */
-+		struct inode	vfs_inode;	/* the VFS's inode record */
-+		struct netfs_i_context netfs_ctx; /* Netfslib context */
-+	};
- 	struct p9_qid qid;
- 	unsigned int cache_validity;
- 	struct p9_fid *writeback_fid;
- 	struct mutex v_mutex;
--	struct inode vfs_inode;
- };
- =
-
- static inline struct v9fs_inode *V9FS_I(const struct inode *inode)
-@@ -126,7 +128,7 @@ static inline struct v9fs_inode *V9FS_I(const struct i=
-node *inode)
- static inline struct fscache_cookie *v9fs_inode_cookie(struct v9fs_inode =
-*v9inode)
- {
- #ifdef CONFIG_9P_FSCACHE
--	return v9inode->fscache;
-+	return netfs_i_cookie(&v9inode->vfs_inode);
- #else
- 	return NULL;
- #endif
-@@ -163,6 +165,7 @@ extern struct inode *v9fs_inode_from_fid(struct v9fs_s=
-ession_info *v9ses,
- extern const struct inode_operations v9fs_dir_inode_operations_dotl;
- extern const struct inode_operations v9fs_file_inode_operations_dotl;
- extern const struct inode_operations v9fs_symlink_inode_operations_dotl;
-+extern const struct netfs_request_ops v9fs_req_ops;
- extern struct inode *v9fs_inode_from_fid_dotl(struct v9fs_session_info *v=
-9ses,
- 					      struct p9_fid *fid,
- 					      struct super_block *sb, int new);
-diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
-index 91d3926c9559..ed06f3c34e98 100644
---- a/fs/9p/vfs_addr.c
-+++ b/fs/9p/vfs_addr.c
-@@ -77,17 +77,6 @@ static void v9fs_req_cleanup(struct address_space *mapp=
-ing, void *priv)
- 	p9_client_clunk(fid);
- }
- =
-
--/**
-- * v9fs_is_cache_enabled - Determine if caching is enabled for an inode
-- * @inode: The inode to check
-- */
--static bool v9fs_is_cache_enabled(struct inode *inode)
--{
--	struct fscache_cookie *cookie =3D v9fs_inode_cookie(V9FS_I(inode));
--
--	return fscache_cookie_enabled(cookie) && cookie->cache_priv;
--}
--
- /**
-  * v9fs_begin_cache_operation - Begin a cache operation for a read
-  * @rreq: The read request
-@@ -103,36 +92,13 @@ static int v9fs_begin_cache_operation(struct netfs_io=
-_request *rreq)
- #endif
- }
- =
-
--static const struct netfs_request_ops v9fs_req_ops =3D {
-+const struct netfs_request_ops v9fs_req_ops =3D {
- 	.init_request		=3D v9fs_init_request,
--	.is_cache_enabled	=3D v9fs_is_cache_enabled,
- 	.begin_cache_operation	=3D v9fs_begin_cache_operation,
- 	.issue_read		=3D v9fs_issue_read,
- 	.cleanup		=3D v9fs_req_cleanup,
- };
- =
-
--/**
-- * v9fs_vfs_readpage - read an entire page in from 9P
-- * @file: file being read
-- * @page: structure to page
-- *
-- */
--static int v9fs_vfs_readpage(struct file *file, struct page *page)
--{
--	struct folio *folio =3D page_folio(page);
--
--	return netfs_readpage(file, folio, &v9fs_req_ops, NULL);
--}
--
--/**
-- * v9fs_vfs_readahead - read a set of pages from 9P
-- * @ractl: The readahead parameters
-- */
--static void v9fs_vfs_readahead(struct readahead_control *ractl)
--{
--	netfs_readahead(ractl, &v9fs_req_ops, NULL);
--}
--
- /**
-  * v9fs_release_page - release the private state associated with a page
-  * @page: The page to be released
-@@ -326,8 +292,7 @@ static int v9fs_write_begin(struct file *filp, struct =
-address_space *mapping,
- 	 * file.  We need to do this before we get a lock on the page in case
- 	 * there's more than one writer competing for the same cache block.
- 	 */
--	retval =3D netfs_write_begin(filp, mapping, pos, len, flags, &folio, fsd=
-ata,
--				   &v9fs_req_ops, NULL);
-+	retval =3D netfs_write_begin(filp, mapping, pos, len, flags, &folio, fsd=
-ata);
- 	if (retval < 0)
- 		return retval;
- =
-
-@@ -388,8 +353,8 @@ static int v9fs_set_page_dirty(struct page *page)
- #endif
- =
-
- const struct address_space_operations v9fs_addr_operations =3D {
--	.readpage =3D v9fs_vfs_readpage,
--	.readahead =3D v9fs_vfs_readahead,
-+	.readpage =3D netfs_readpage,
-+	.readahead =3D netfs_readahead,
- 	.set_page_dirty =3D v9fs_set_page_dirty,
- 	.writepage =3D v9fs_vfs_writepage,
- 	.write_begin =3D v9fs_write_begin,
-diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
-index 2a10242c79c7..a7dc6781a622 100644
---- a/fs/9p/vfs_inode.c
-+++ b/fs/9p/vfs_inode.c
-@@ -231,9 +231,6 @@ struct inode *v9fs_alloc_inode(struct super_block *sb)
- 	v9inode =3D kmem_cache_alloc(v9fs_inode_cache, GFP_KERNEL);
- 	if (!v9inode)
- 		return NULL;
--#ifdef CONFIG_9P_FSCACHE
--	v9inode->fscache =3D NULL;
--#endif
- 	v9inode->writeback_fid =3D NULL;
- 	v9inode->cache_validity =3D 0;
- 	mutex_init(&v9inode->v_mutex);
-@@ -250,6 +247,14 @@ void v9fs_free_inode(struct inode *inode)
- 	kmem_cache_free(v9fs_inode_cache, V9FS_I(inode));
- }
- =
-
-+/*
-+ * Set parameters for the netfs library
-+ */
-+static void v9fs_set_netfs_context(struct inode *inode)
-+{
-+	netfs_i_context_init(inode, &v9fs_req_ops);
-+}
-+
- int v9fs_init_inode(struct v9fs_session_info *v9ses,
- 		    struct inode *inode, umode_t mode, dev_t rdev)
- {
-@@ -338,6 +343,8 @@ int v9fs_init_inode(struct v9fs_session_info *v9ses,
- 		err =3D -EINVAL;
- 		goto error;
- 	}
-+
-+	v9fs_set_netfs_context(inode);
- error:
- 	return err;
- =
-
-diff --git a/fs/afs/dynroot.c b/fs/afs/dynroot.c
-index db832cc931c8..f120bcb8bf73 100644
---- a/fs/afs/dynroot.c
-+++ b/fs/afs/dynroot.c
-@@ -76,6 +76,7 @@ struct inode *afs_iget_pseudo_dir(struct super_block *sb=
-, bool root)
- 	/* there shouldn't be an existing inode */
- 	BUG_ON(!(inode->i_state & I_NEW));
- =
-
-+	netfs_i_context_init(inode, NULL);
- 	inode->i_size		=3D 0;
- 	inode->i_mode		=3D S_IFDIR | S_IRUGO | S_IXUGO;
- 	if (root) {
-diff --git a/fs/afs/file.c b/fs/afs/file.c
-index 6469d7f98ef5..2b68b2070248 100644
---- a/fs/afs/file.c
-+++ b/fs/afs/file.c
-@@ -19,13 +19,11 @@
- #include "internal.h"
- =
-
- static int afs_file_mmap(struct file *file, struct vm_area_struct *vma);
--static int afs_readpage(struct file *file, struct page *page);
- static int afs_symlink_readpage(struct file *file, struct page *page);
- static void afs_invalidatepage(struct page *page, unsigned int offset,
- 			       unsigned int length);
- static int afs_releasepage(struct page *page, gfp_t gfp_flags);
- =
-
--static void afs_readahead(struct readahead_control *ractl);
- static ssize_t afs_file_read_iter(struct kiocb *iocb, struct iov_iter *it=
-er);
- static void afs_vm_open(struct vm_area_struct *area);
- static void afs_vm_close(struct vm_area_struct *area);
-@@ -52,8 +50,8 @@ const struct inode_operations afs_file_inode_operations =
-=3D {
- };
- =
-
- const struct address_space_operations afs_file_aops =3D {
--	.readpage	=3D afs_readpage,
--	.readahead	=3D afs_readahead,
-+	.readpage	=3D netfs_readpage,
-+	.readahead	=3D netfs_readahead,
- 	.set_page_dirty	=3D afs_set_page_dirty,
- 	.launder_page	=3D afs_launder_page,
- 	.releasepage	=3D afs_releasepage,
-@@ -365,13 +363,6 @@ static int afs_init_request(struct netfs_io_request *=
-rreq, struct file *file)
- 	return 0;
- }
- =
-
--static bool afs_is_cache_enabled(struct inode *inode)
--{
--	struct fscache_cookie *cookie =3D afs_vnode_cache(AFS_FS_I(inode));
--
--	return fscache_cookie_enabled(cookie) && cookie->cache_priv;
--}
--
- static int afs_begin_cache_operation(struct netfs_io_request *rreq)
- {
- #ifdef CONFIG_AFS_FSCACHE
-@@ -399,25 +390,12 @@ static void afs_priv_cleanup(struct address_space *m=
-apping, void *netfs_priv)
- =
-
- const struct netfs_request_ops afs_req_ops =3D {
- 	.init_request		=3D afs_init_request,
--	.is_cache_enabled	=3D afs_is_cache_enabled,
- 	.begin_cache_operation	=3D afs_begin_cache_operation,
- 	.check_write_begin	=3D afs_check_write_begin,
- 	.issue_read		=3D afs_issue_read,
- 	.cleanup		=3D afs_priv_cleanup,
- };
- =
-
--static int afs_readpage(struct file *file, struct page *page)
--{
--	struct folio *folio =3D page_folio(page);
--
--	return netfs_readpage(file, folio, &afs_req_ops, NULL);
--}
--
--static void afs_readahead(struct readahead_control *ractl)
--{
--	netfs_readahead(ractl, &afs_req_ops, NULL);
--}
--
- int afs_write_inode(struct inode *inode, struct writeback_control *wbc)
- {
- 	fscache_unpin_writeback(wbc, afs_vnode_cache(AFS_FS_I(inode)));
-diff --git a/fs/afs/inode.c b/fs/afs/inode.c
-index 5964f8aee090..5b5e40197655 100644
---- a/fs/afs/inode.c
-+++ b/fs/afs/inode.c
-@@ -53,6 +53,14 @@ static noinline void dump_vnode(struct afs_vnode *vnode=
-, struct afs_vnode *paren
- 		dump_stack();
- }
- =
-
-+/*
-+ * Set parameters for the netfs library
-+ */
-+static void afs_set_netfs_context(struct afs_vnode *vnode)
-+{
-+	netfs_i_context_init(&vnode->vfs_inode, &afs_req_ops);
-+}
-+
- /*
-  * Initialise an inode from the vnode status.
-  */
-@@ -128,6 +136,7 @@ static int afs_inode_init_from_status(struct afs_opera=
-tion *op,
- 	}
- =
-
- 	afs_set_i_size(vnode, status->size);
-+	afs_set_netfs_context(vnode);
- =
-
- 	vnode->invalid_before	=3D status->data_version;
- 	inode_set_iversion_raw(&vnode->vfs_inode, status->data_version);
-@@ -420,7 +429,7 @@ static void afs_get_inode_cache(struct afs_vnode *vnod=
-e)
- 	struct afs_vnode_cache_aux aux;
- =
-
- 	if (vnode->status.type !=3D AFS_FTYPE_FILE) {
--		vnode->cache =3D NULL;
-+		vnode->netfs_ctx.cache =3D NULL;
- 		return;
- 	}
- =
-
-@@ -430,12 +439,14 @@ static void afs_get_inode_cache(struct afs_vnode *vn=
-ode)
- 	key.vnode_id_ext[1]	=3D htonl(vnode->fid.vnode_hi);
- 	afs_set_cache_aux(vnode, &aux);
- =
-
--	vnode->cache =3D fscache_acquire_cookie(
--		vnode->volume->cache,
--		vnode->status.type =3D=3D AFS_FTYPE_FILE ? 0 : FSCACHE_ADV_SINGLE_CHUNK=
-,
--		&key, sizeof(key),
--		&aux, sizeof(aux),
--		vnode->status.size);
-+	afs_vnode_set_cache(vnode,
-+			    fscache_acquire_cookie(
-+				    vnode->volume->cache,
-+				    vnode->status.type =3D=3D AFS_FTYPE_FILE ?
-+				    0 : FSCACHE_ADV_SINGLE_CHUNK,
-+				    &key, sizeof(key),
-+				    &aux, sizeof(aux),
-+				    vnode->status.size));
- #endif
- }
- =
-
-@@ -528,6 +539,7 @@ struct inode *afs_root_iget(struct super_block *sb, st=
-ruct key *key)
- =
-
- 	vnode =3D AFS_FS_I(inode);
- 	vnode->cb_v_break =3D as->volume->cb_v_break,
-+	afs_set_netfs_context(vnode);
- =
-
- 	op =3D afs_alloc_operation(key, as->volume);
- 	if (IS_ERR(op)) {
-@@ -786,11 +798,8 @@ void afs_evict_inode(struct inode *inode)
- 		afs_put_wb_key(wbk);
- 	}
- =
-
--#ifdef CONFIG_AFS_FSCACHE
--	fscache_relinquish_cookie(vnode->cache,
-+	fscache_relinquish_cookie(afs_vnode_cache(vnode),
- 				  test_bit(AFS_VNODE_DELETED, &vnode->flags));
--	vnode->cache =3D NULL;
--#endif
- =
-
- 	afs_prune_wb_keys(vnode);
- 	afs_put_permits(rcu_access_pointer(vnode->permit_cache));
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index c56a0e1719ae..75ca3026457e 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -619,15 +619,16 @@ enum afs_lock_state {
-  * leak from one inode to another.
-  */
- struct afs_vnode {
--	struct inode		vfs_inode;	/* the VFS's inode record */
-+	struct {
-+		/* These must be contiguous */
-+		struct inode	vfs_inode;	/* the VFS's inode record */
-+		struct netfs_i_context netfs_ctx; /* Netfslib context */
-+	};
- =
-
- 	struct afs_volume	*volume;	/* volume on which vnode resides */
- 	struct afs_fid		fid;		/* the file identifier for this inode */
- 	struct afs_file_status	status;		/* AFS status info for this file */
- 	afs_dataversion_t	invalid_before;	/* Child dentries are invalid before t=
-his */
--#ifdef CONFIG_AFS_FSCACHE
--	struct fscache_cookie	*cache;		/* caching cookie */
--#endif
- 	struct afs_permits __rcu *permit_cache;	/* cache of permits so far obtai=
-ned */
- 	struct mutex		io_lock;	/* Lock for serialising I/O on this mutex */
- 	struct rw_semaphore	validate_lock;	/* lock for validating this vnode */
-@@ -674,12 +675,20 @@ struct afs_vnode {
- static inline struct fscache_cookie *afs_vnode_cache(struct afs_vnode *vn=
-ode)
- {
- #ifdef CONFIG_AFS_FSCACHE
--	return vnode->cache;
-+	return netfs_i_cookie(&vnode->vfs_inode);
- #else
- 	return NULL;
- #endif
- }
- =
-
-+static inline void afs_vnode_set_cache(struct afs_vnode *vnode,
-+				       struct fscache_cookie *cookie)
-+{
-+#ifdef CONFIG_AFS_FSCACHE
-+	vnode->netfs_ctx.cache =3D cookie;
-+#endif
-+}
-+
- /*
-  * cached security record for one user's attempt to access a vnode
-  */
-diff --git a/fs/afs/super.c b/fs/afs/super.c
-index 5ec9fd97eccc..e66c6f54ac8e 100644
---- a/fs/afs/super.c
-+++ b/fs/afs/super.c
-@@ -688,13 +688,11 @@ static struct inode *afs_alloc_inode(struct super_bl=
-ock *sb)
- 	/* Reset anything that shouldn't leak from one inode to the next. */
- 	memset(&vnode->fid, 0, sizeof(vnode->fid));
- 	memset(&vnode->status, 0, sizeof(vnode->status));
-+	afs_vnode_set_cache(vnode, NULL);
- =
-
- 	vnode->volume		=3D NULL;
- 	vnode->lock_key		=3D NULL;
- 	vnode->permit_cache	=3D NULL;
--#ifdef CONFIG_AFS_FSCACHE
--	vnode->cache		=3D NULL;
--#endif
- =
-
- 	vnode->flags		=3D 1 << AFS_VNODE_UNSET;
- 	vnode->lock_state	=3D AFS_VNODE_LOCK_NONE;
-diff --git a/fs/afs/write.c b/fs/afs/write.c
-index 5e9157d0da29..e4b47f67a408 100644
---- a/fs/afs/write.c
-+++ b/fs/afs/write.c
-@@ -59,8 +59,7 @@ int afs_write_begin(struct file *file, struct address_sp=
-ace *mapping,
- 	 * file.  We need to do this before we get a lock on the page in case
- 	 * there's more than one writer competing for the same cache block.
- 	 */
--	ret =3D netfs_write_begin(file, mapping, pos, len, flags, &folio, fsdata=
-,
--				&afs_req_ops, NULL);
-+	ret =3D netfs_write_begin(file, mapping, pos, len, flags, &folio, fsdata=
-);
- 	if (ret < 0)
- 		return ret;
- =
-
-diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
-index 4aeccafa5dda..5512f448f609 100644
---- a/fs/ceph/addr.c
-+++ b/fs/ceph/addr.c
-@@ -403,7 +403,7 @@ static void ceph_readahead_cleanup(struct address_spac=
-e *mapping, void *priv)
- 		ceph_put_cap_refs(ci, got);
- }
- =
-
--static const struct netfs_request_ops ceph_netfs_read_ops =3D {
-+const struct netfs_request_ops ceph_netfs_ops =3D {
- 	.init_request		=3D ceph_init_request,
- 	.begin_cache_operation	=3D ceph_begin_cache_operation,
- 	.issue_read		=3D ceph_netfs_issue_read,
-@@ -413,28 +413,6 @@ static const struct netfs_request_ops ceph_netfs_read=
-_ops =3D {
- 	.cleanup		=3D ceph_readahead_cleanup,
- };
- =
-
--/* read a single page, without unlocking it. */
--static int ceph_readpage(struct file *file, struct page *subpage)
--{
--	struct folio *folio =3D page_folio(subpage);
--	struct inode *inode =3D file_inode(file);
--	struct ceph_inode_info *ci =3D ceph_inode(inode);
--	struct ceph_vino vino =3D ceph_vino(inode);
--	size_t len =3D folio_size(folio);
--	u64 off =3D folio_file_pos(folio);
--
--	dout("readpage ino %llx.%llx file %p off %llu len %zu folio %p index %lu=
-\n inline %d",
--	     vino.ino, vino.snap, file, off, len, folio, folio_index(folio),
--	     ci->i_inline_version !=3D CEPH_INLINE_NONE);
--
--	return netfs_readpage(file, folio, &ceph_netfs_read_ops, NULL);
--}
--
--static void ceph_readahead(struct readahead_control *ractl)
--{
--	netfs_readahead(ractl, &ceph_netfs_read_ops, NULL);
--}
--
- #ifdef CONFIG_CEPH_FSCACHE
- static void ceph_set_page_fscache(struct page *page)
- {
-@@ -1333,8 +1311,7 @@ static int ceph_write_begin(struct file *file, struc=
-t address_space *mapping,
- 	struct folio *folio =3D NULL;
- 	int r;
- =
-
--	r =3D netfs_write_begin(file, inode->i_mapping, pos, len, 0, &folio, NUL=
-L,
--			      &ceph_netfs_read_ops, NULL);
-+	r =3D netfs_write_begin(file, inode->i_mapping, pos, len, 0, &folio, NUL=
-L);
- 	if (r =3D=3D 0)
- 		folio_wait_fscache(folio);
- 	if (r < 0) {
-@@ -1388,8 +1365,8 @@ static int ceph_write_end(struct file *file, struct =
-address_space *mapping,
- }
- =
-
- const struct address_space_operations ceph_aops =3D {
--	.readpage =3D ceph_readpage,
--	.readahead =3D ceph_readahead,
-+	.readpage =3D netfs_readpage,
-+	.readahead =3D netfs_readahead,
- 	.writepage =3D ceph_writepage,
- 	.writepages =3D ceph_writepages_start,
- 	.write_begin =3D ceph_write_begin,
-diff --git a/fs/ceph/cache.c b/fs/ceph/cache.c
-index 7d22850623ef..ddea99922073 100644
---- a/fs/ceph/cache.c
-+++ b/fs/ceph/cache.c
-@@ -29,26 +29,25 @@ void ceph_fscache_register_inode_cookie(struct inode *=
-inode)
- 	if (!(inode->i_state & I_NEW))
- 		return;
- =
-
--	WARN_ON_ONCE(ci->fscache);
-+	WARN_ON_ONCE(ci->netfs_ctx.cache);
- =
-
--	ci->fscache =3D fscache_acquire_cookie(fsc->fscache, 0,
--					     &ci->i_vino, sizeof(ci->i_vino),
--					     &ci->i_version, sizeof(ci->i_version),
--					     i_size_read(inode));
-+	ci->netfs_ctx.cache =3D
-+		fscache_acquire_cookie(fsc->fscache, 0,
-+				       &ci->i_vino, sizeof(ci->i_vino),
-+				       &ci->i_version, sizeof(ci->i_version),
-+				       i_size_read(inode));
- }
- =
-
--void ceph_fscache_unregister_inode_cookie(struct ceph_inode_info* ci)
-+void ceph_fscache_unregister_inode_cookie(struct ceph_inode_info *ci)
- {
--	struct fscache_cookie *cookie =3D ci->fscache;
--
--	fscache_relinquish_cookie(cookie, false);
-+	fscache_relinquish_cookie(ceph_fscache_cookie(ci), false);
- }
- =
-
- void ceph_fscache_use_cookie(struct inode *inode, bool will_modify)
- {
- 	struct ceph_inode_info *ci =3D ceph_inode(inode);
- =
-
--	fscache_use_cookie(ci->fscache, will_modify);
-+	fscache_use_cookie(ceph_fscache_cookie(ci), will_modify);
- }
- =
-
- void ceph_fscache_unuse_cookie(struct inode *inode, bool update)
-@@ -58,9 +57,10 @@ void ceph_fscache_unuse_cookie(struct inode *inode, boo=
-l update)
- 	if (update) {
- 		loff_t i_size =3D i_size_read(inode);
- =
-
--		fscache_unuse_cookie(ci->fscache, &ci->i_version, &i_size);
-+		fscache_unuse_cookie(ceph_fscache_cookie(ci),
-+				     &ci->i_version, &i_size);
- 	} else {
--		fscache_unuse_cookie(ci->fscache, NULL, NULL);
-+		fscache_unuse_cookie(ceph_fscache_cookie(ci), NULL, NULL);
- 	}
- }
- =
-
-@@ -69,14 +69,14 @@ void ceph_fscache_update(struct inode *inode)
- 	struct ceph_inode_info *ci =3D ceph_inode(inode);
- 	loff_t i_size =3D i_size_read(inode);
- =
-
--	fscache_update_cookie(ci->fscache, &ci->i_version, &i_size);
-+	fscache_update_cookie(ceph_fscache_cookie(ci), &ci->i_version, &i_size);
- }
- =
-
- void ceph_fscache_invalidate(struct inode *inode, bool dio_write)
- {
- 	struct ceph_inode_info *ci =3D ceph_inode(inode);
- =
-
--	fscache_invalidate(ceph_inode(inode)->fscache,
-+	fscache_invalidate(ceph_fscache_cookie(ci),
- 			   &ci->i_version, i_size_read(inode),
- 			   dio_write ? FSCACHE_INVAL_DIO_WRITE : 0);
- }
-diff --git a/fs/ceph/cache.h b/fs/ceph/cache.h
-index b8b3b5cb6438..c20e43cade94 100644
---- a/fs/ceph/cache.h
-+++ b/fs/ceph/cache.h
-@@ -26,14 +26,9 @@ void ceph_fscache_unuse_cookie(struct inode *inode, boo=
-l update);
- void ceph_fscache_update(struct inode *inode);
- void ceph_fscache_invalidate(struct inode *inode, bool dio_write);
- =
-
--static inline void ceph_fscache_inode_init(struct ceph_inode_info *ci)
--{
--	ci->fscache =3D NULL;
--}
--
- static inline struct fscache_cookie *ceph_fscache_cookie(struct ceph_inod=
-e_info *ci)
- {
--	return ci->fscache;
-+	return netfs_i_cookie(&ci->vfs_inode);
- }
- =
-
- static inline void ceph_fscache_resize(struct inode *inode, loff_t to)
-@@ -91,10 +86,6 @@ static inline void ceph_fscache_unregister_fs(struct ce=
-ph_fs_client* fsc)
- {
- }
- =
-
--static inline void ceph_fscache_inode_init(struct ceph_inode_info *ci)
--{
--}
--
- static inline void ceph_fscache_register_inode_cookie(struct inode *inode=
-)
- {
- }
-diff --git a/fs/ceph/inode.c b/fs/ceph/inode.c
-index 7b1e93c8a0d2..6a176d9d394a 100644
---- a/fs/ceph/inode.c
-+++ b/fs/ceph/inode.c
-@@ -453,6 +453,9 @@ struct inode *ceph_alloc_inode(struct super_block *sb)
- =
-
- 	dout("alloc_inode %p\n", &ci->vfs_inode);
- =
-
-+	/* Set parameters for the netfs library */
-+	netfs_i_context_init(&ci->vfs_inode, &ceph_netfs_ops);
-+
- 	spin_lock_init(&ci->i_ceph_lock);
- =
-
- 	ci->i_version =3D 0;
-@@ -538,9 +541,6 @@ struct inode *ceph_alloc_inode(struct super_block *sb)
- 	INIT_WORK(&ci->i_work, ceph_inode_work);
- 	ci->i_work_mask =3D 0;
- 	memset(&ci->i_btime, '\0', sizeof(ci->i_btime));
--
--	ceph_fscache_inode_init(ci);
--
- 	return &ci->vfs_inode;
- }
- =
-
-diff --git a/fs/ceph/super.h b/fs/ceph/super.h
-index 0b4b519682f1..e1c65aa8d3b6 100644
---- a/fs/ceph/super.h
-+++ b/fs/ceph/super.h
-@@ -17,13 +17,11 @@
- #include <linux/posix_acl.h>
- #include <linux/refcount.h>
- #include <linux/security.h>
-+#include <linux/netfs.h>
-+#include <linux/fscache.h>
- =
-
- #include <linux/ceph/libceph.h>
- =
-
--#ifdef CONFIG_CEPH_FSCACHE
--#include <linux/fscache.h>
--#endif
--
- /* large granularity for statfs utilization stats to facilitate
-  * large volume sizes on 32-bit machines. */
- #define CEPH_BLOCK_SHIFT   22  /* 4 MB */
-@@ -317,6 +315,11 @@ struct ceph_inode_xattrs_info {
-  * Ceph inode.
-  */
- struct ceph_inode_info {
-+	struct {
-+		/* These must be contiguous */
-+		struct inode vfs_inode;
-+		struct netfs_i_context netfs_ctx; /* Netfslib context */
-+	};
- 	struct ceph_vino i_vino;   /* ceph ino + snap */
- =
-
- 	spinlock_t i_ceph_lock;
-@@ -427,11 +430,6 @@ struct ceph_inode_info {
- =
-
- 	struct work_struct i_work;
- 	unsigned long  i_work_mask;
--
--#ifdef CONFIG_CEPH_FSCACHE
--	struct fscache_cookie *fscache;
--#endif
--	struct inode vfs_inode; /* at end */
- };
- =
-
- static inline struct ceph_inode_info *
-@@ -1215,6 +1213,7 @@ extern void __ceph_touch_fmode(struct ceph_inode_inf=
-o *ci,
- =
-
- /* addr.c */
- extern const struct address_space_operations ceph_aops;
-+extern const struct netfs_request_ops ceph_netfs_ops;
- extern int ceph_mmap(struct file *file, struct vm_area_struct *vma);
- extern int ceph_uninline_data(struct file *file);
- extern int ceph_pool_perm_check(struct inode *inode, int need);
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 48b343d03430..0a4085ced40f 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -16,6 +16,7 @@
- #include <linux/mempool.h>
- #include <linux/workqueue.h>
- #include <linux/utsname.h>
-+#include <linux/netfs.h>
- #include "cifs_fs_sb.h"
- #include "cifsacl.h"
- #include <crypto/internal/hash.h>
-@@ -1402,6 +1403,11 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_fil=
-e);
-  */
- =
-
- struct cifsInodeInfo {
-+	struct {
-+		/* These must be contiguous */
-+		struct inode	vfs_inode;	/* the VFS's inode record */
-+		struct netfs_i_context netfs_ctx; /* Netfslib context */
-+	};
- 	bool can_cache_brlcks;
- 	struct list_head llist;	/* locks helb by this inode */
- 	/*
-@@ -1432,10 +1438,6 @@ struct cifsInodeInfo {
- 	u64  uniqueid;			/* server inode number */
- 	u64  createtime;		/* creation time on server */
- 	__u8 lease_key[SMB2_LEASE_KEY_SIZE];	/* lease key for this inode */
--#ifdef CONFIG_CIFS_FSCACHE
--	struct fscache_cookie *fscache;
--#endif
--	struct inode vfs_inode;
- 	struct list_head deferred_closes; /* list of deferred closes */
- 	spinlock_t deferred_lock; /* protection on deferred list */
- 	bool lease_granted; /* Flag to indicate whether lease or oplock is grant=
-ed. */
-diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-index b47c2011ce5b..a638b29e9062 100644
---- a/fs/cifs/fscache.c
-+++ b/fs/cifs/fscache.c
-@@ -103,7 +103,7 @@ void cifs_fscache_get_inode_cookie(struct inode *inode=
-)
- =
-
- 	cifs_fscache_fill_coherency(&cifsi->vfs_inode, &cd);
- =
-
--	cifsi->fscache =3D
-+	cifsi->netfs_ctx.cache =3D
- 		fscache_acquire_cookie(tcon->fscache, 0,
- 				       &cifsi->uniqueid, sizeof(cifsi->uniqueid),
- 				       &cd, sizeof(cd),
-@@ -126,11 +126,12 @@ void cifs_fscache_unuse_inode_cookie(struct inode *i=
-node, bool update)
- void cifs_fscache_release_inode_cookie(struct inode *inode)
- {
- 	struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
-+	struct fscache_cookie *cookie =3D cifs_inode_cookie(inode);
- =
-
--	if (cifsi->fscache) {
--		cifs_dbg(FYI, "%s: (0x%p)\n", __func__, cifsi->fscache);
--		fscache_relinquish_cookie(cifsi->fscache, false);
--		cifsi->fscache =3D NULL;
-+	if (cookie) {
-+		cifs_dbg(FYI, "%s: (0x%p)\n", __func__, cookie);
-+		fscache_relinquish_cookie(cookie, false);
-+		cifsi->netfs_ctx.cache =3D NULL;
- 	}
- }
- =
-
-diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-index 55129908e2c1..52355c0912ae 100644
---- a/fs/cifs/fscache.h
-+++ b/fs/cifs/fscache.h
-@@ -61,7 +61,7 @@ void cifs_fscache_fill_coherency(struct inode *inode,
- =
-
- static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inod=
-e)
- {
--	return CIFS_I(inode)->fscache;
-+	return netfs_i_cookie(inode);
- }
- =
-
- static inline void cifs_invalidate_cache(struct inode *inode, unsigned in=
-t flags)
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 89837e904fa7..54c761bcc8e6 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -6,6 +6,7 @@
-  */
- =
-
- #include <linux/netfs.h>
-+#include <linux/fscache.h>
- #include <trace/events/netfs.h>
- =
-
- #ifdef pr_fmt
-@@ -19,8 +20,6 @@
-  */
- struct netfs_io_request *netfs_alloc_request(struct address_space *mappin=
-g,
- 					     struct file *file,
--					     const struct netfs_request_ops *ops,
--					     void *netfs_priv,
- 					     loff_t start, size_t len,
- 					     enum netfs_io_origin origin);
- void netfs_get_request(struct netfs_io_request *rreq, enum netfs_rreq_ref=
-_trace what);
-@@ -81,6 +80,21 @@ static inline void netfs_stat_d(atomic_t *stat)
- #define netfs_stat_d(x) do {} while(0)
- #endif
- =
-
-+/*
-+ * Miscellaneous functions.
-+ */
-+static inline bool netfs_is_cache_enabled(struct netfs_i_context *ctx)
-+{
-+#if IS_ENABLED(CONFIG_FSCACHE)
-+	struct fscache_cookie *cookie =3D ctx->cache;
-+
-+	return fscache_cookie_valid(cookie) && cookie->cache_priv &&
-+		fscache_cookie_enabled(cookie);
-+#else
-+	return false;
-+#endif
-+}
-+
- /************************************************************************=
-*****/
- /*
-  * debug tracing
-diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
-index ae18827e156b..657b19e60118 100644
---- a/fs/netfs/objects.c
-+++ b/fs/netfs/objects.c
-@@ -13,12 +13,12 @@
-  */
- struct netfs_io_request *netfs_alloc_request(struct address_space *mappin=
-g,
- 					     struct file *file,
--					     const struct netfs_request_ops *ops,
--					     void *netfs_priv,
- 					     loff_t start, size_t len,
- 					     enum netfs_io_origin origin)
- {
- 	static atomic_t debug_ids;
-+	struct inode *inode =3D file ? file_inode(file) : mapping->host;
-+	struct netfs_i_context *ctx =3D netfs_i_context(inode);
- 	struct netfs_io_request *rreq;
- 	int ret;
- =
-
-@@ -29,11 +29,10 @@ struct netfs_io_request *netfs_alloc_request(struct ad=
-dress_space *mapping,
- 	rreq->start	=3D start;
- 	rreq->len	=3D len;
- 	rreq->origin	=3D origin;
--	rreq->netfs_ops	=3D ops;
--	rreq->netfs_priv =3D netfs_priv;
-+	rreq->netfs_ops	=3D ctx->ops;
- 	rreq->mapping	=3D mapping;
--	rreq->inode	=3D file_inode(file);
--	rreq->i_size	=3D i_size_read(rreq->inode);
-+	rreq->inode	=3D inode;
-+	rreq->i_size	=3D i_size_read(inode);
- 	rreq->debug_id	=3D atomic_inc_return(&debug_ids);
- 	INIT_LIST_HEAD(&rreq->subrequests);
- 	INIT_WORK(&rreq->work, netfs_rreq_work);
-@@ -76,6 +75,7 @@ static void netfs_free_request(struct work_struct *work)
- {
- 	struct netfs_io_request *rreq =3D
- 		container_of(work, struct netfs_io_request, work);
-+
- 	netfs_clear_subrequests(rreq, false);
- 	if (rreq->netfs_priv)
- 		rreq->netfs_ops->cleanup(rreq->mapping, rreq->netfs_priv);
-diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-index b5176f4320f4..c048cd328ce5 100644
---- a/fs/netfs/read_helper.c
-+++ b/fs/netfs/read_helper.c
-@@ -14,7 +14,6 @@
- #include <linux/uio.h>
- #include <linux/sched/mm.h>
- #include <linux/task_io_accounting_ops.h>
--#include <linux/netfs.h>
- #include "internal.h"
- #define CREATE_TRACE_POINTS
- #include <trace/events/netfs.h>
-@@ -735,8 +734,6 @@ static void netfs_rreq_expand(struct netfs_io_request =
-*rreq,
- /**
-  * netfs_readahead - Helper to manage a read request
-  * @ractl: The description of the readahead request
-- * @ops: The network filesystem's operations for the helper to use
-- * @netfs_priv: Private netfs data to be retained in the request
-  *
-  * Fulfil a readahead request by drawing data from the cache if possible,=
- or
-  * the netfs if not.  Space beyond the EOF is zero-filled.  Multiple I/O
-@@ -744,35 +741,32 @@ static void netfs_rreq_expand(struct netfs_io_reques=
-t *rreq,
-  * readahead window can be expanded in either direction to a more conveni=
-ent
-  * alighment for RPC efficiency or to make storage in the cache feasible.
-  *
-- * The calling netfs must provide a table of operations, only one of whic=
-h,
-- * issue_op, is mandatory.  It may also be passed a private token, which =
-will
-- * be retained in rreq->netfs_priv and will be cleaned up by ops->cleanup=
-().
-+ * The calling netfs must initialise a netfs context contiguous to the vf=
-s
-+ * inode before calling this.
-  *
-  * This is usable whether or not caching is enabled.
-  */
--void netfs_readahead(struct readahead_control *ractl,
--		     const struct netfs_request_ops *ops,
--		     void *netfs_priv)
-+void netfs_readahead(struct readahead_control *ractl)
- {
- 	struct netfs_io_request *rreq;
-+	struct netfs_i_context *ctx =3D netfs_i_context(ractl->mapping->host);
- 	unsigned int debug_index =3D 0;
- 	int ret;
- =
-
- 	_enter("%lx,%x", readahead_index(ractl), readahead_count(ractl));
- =
-
- 	if (readahead_count(ractl) =3D=3D 0)
--		goto cleanup;
-+		return;
- =
-
- 	rreq =3D netfs_alloc_request(ractl->mapping, ractl->file,
--				   ops, netfs_priv,
- 				   readahead_pos(ractl),
- 				   readahead_length(ractl),
- 				   NETFS_READAHEAD);
- 	if (IS_ERR(rreq))
--		goto cleanup;
-+		return;
- =
-
--	if (ops->begin_cache_operation) {
--		ret =3D ops->begin_cache_operation(rreq);
-+	if (ctx->ops->begin_cache_operation) {
-+		ret =3D ctx->ops->begin_cache_operation(rreq);
- 		if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS)
- 			goto cleanup_free;
- 	}
-@@ -804,42 +798,35 @@ void netfs_readahead(struct readahead_control *ractl=
-,
- cleanup_free:
- 	netfs_put_request(rreq, false, netfs_rreq_trace_put_failed);
- 	return;
--cleanup:
--	if (netfs_priv)
--		ops->cleanup(ractl->mapping, netfs_priv);
--	return;
- }
- EXPORT_SYMBOL(netfs_readahead);
- =
-
- /**
-  * netfs_readpage - Helper to manage a readpage request
-  * @file: The file to read from
-- * @folio: The folio to read
-- * @ops: The network filesystem's operations for the helper to use
-- * @netfs_priv: Private netfs data to be retained in the request
-+ * @subpage: A subpage of the folio to read
-  *
-  * Fulfil a readpage request by drawing data from the cache if possible, =
-or the
-  * netfs if not.  Space beyond the EOF is zero-filled.  Multiple I/O requ=
-ests
-  * from different sources will get munged together.
-  *
-- * The calling netfs must provide a table of operations, only one of whic=
-h,
-- * issue_op, is mandatory.  It may also be passed a private token, which =
-will
-- * be retained in rreq->netfs_priv and will be cleaned up by ops->cleanup=
-().
-+ * The calling netfs must initialise a netfs context contiguous to the vf=
-s
-+ * inode before calling this.
-  *
-  * This is usable whether or not caching is enabled.
-  */
--int netfs_readpage(struct file *file,
--		   struct folio *folio,
--		   const struct netfs_request_ops *ops,
--		   void *netfs_priv)
-+int netfs_readpage(struct file *file, struct page *subpage)
- {
-+	struct folio *folio =3D page_folio(subpage);
-+	struct address_space *mapping =3D folio->mapping;
- 	struct netfs_io_request *rreq;
-+	struct netfs_i_context *ctx =3D netfs_i_context(mapping->host);
- 	unsigned int debug_index =3D 0;
- 	int ret;
- =
-
- 	_enter("%lx", folio_index(folio));
- =
-
--	rreq =3D netfs_alloc_request(folio->mapping, file, ops, netfs_priv,
-+	rreq =3D netfs_alloc_request(mapping, file,
- 				   folio_file_pos(folio), folio_size(folio),
- 				   NETFS_READPAGE);
- 	if (IS_ERR(rreq)) {
-@@ -847,8 +834,8 @@ int netfs_readpage(struct file *file,
- 		goto alloc_error;
- 	}
- =
-
--	if (ops->begin_cache_operation) {
--		ret =3D ops->begin_cache_operation(rreq);
-+	if (ctx->ops->begin_cache_operation) {
-+		ret =3D ctx->ops->begin_cache_operation(rreq);
- 		if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS)=
- {
- 			folio_unlock(folio);
- 			goto out;
-@@ -886,8 +873,6 @@ int netfs_readpage(struct file *file,
- 	netfs_put_request(rreq, false, netfs_rreq_trace_put_hold);
- 	return ret;
- alloc_error:
--	if (netfs_priv)
--		ops->cleanup(folio_file_mapping(folio), netfs_priv);
- 	folio_unlock(folio);
- 	return ret;
- }
-@@ -898,6 +883,7 @@ EXPORT_SYMBOL(netfs_readpage);
-  * @folio: The folio being prepared
-  * @pos: starting position for the write
-  * @len: length of write
-+ * @always_fill: T if the folio should always be completely filled/cleare=
-d
-  *
-  * In some cases, write_begin doesn't need to read at all:
-  * - full folio write
-@@ -907,17 +893,27 @@ EXPORT_SYMBOL(netfs_readpage);
-  * If any of these criteria are met, then zero out the unwritten parts
-  * of the folio and return true. Otherwise, return false.
-  */
--static bool netfs_skip_folio_read(struct folio *folio, loff_t pos, size_t=
- len)
-+static bool netfs_skip_folio_read(struct folio *folio, loff_t pos, size_t=
- len,
-+				 bool always_fill)
- {
- 	struct inode *inode =3D folio_inode(folio);
- 	loff_t i_size =3D i_size_read(inode);
- 	size_t offset =3D offset_in_folio(folio, pos);
-+	size_t plen =3D folio_size(folio);
-+
-+	if (unlikely(always_fill)) {
-+		if (pos - offset + len <=3D i_size)
-+			return false; /* Page entirely before EOF */
-+		zero_user_segment(&folio->page, 0, plen);
-+		folio_mark_uptodate(folio);
-+		return true;
-+	}
- =
-
- 	/* Full folio write */
--	if (offset =3D=3D 0 && len >=3D folio_size(folio))
-+	if (offset =3D=3D 0 && len >=3D plen)
- 		return true;
- =
-
--	/* pos beyond last folio in the file */
-+	/* Page entirely beyond the end of the file */
- 	if (pos - offset >=3D i_size)
- 		goto zero_out;
- =
-
-@@ -927,7 +923,7 @@ static bool netfs_skip_folio_read(struct folio *folio,=
- loff_t pos, size_t len)
- =
-
- 	return false;
- zero_out:
--	zero_user_segments(&folio->page, 0, offset, offset + len, folio_size(fol=
-io));
-+	zero_user_segments(&folio->page, 0, offset, offset + len, plen);
- 	return true;
- }
- =
-
-@@ -940,8 +936,6 @@ static bool netfs_skip_folio_read(struct folio *folio,=
- loff_t pos, size_t len)
-  * @aop_flags: AOP_* flags
-  * @_folio: Where to put the resultant folio
-  * @_fsdata: Place for the netfs to store a cookie
-- * @ops: The network filesystem's operations for the helper to use
-- * @netfs_priv: Private netfs data to be retained in the request
-  *
-  * Pre-read data for a write-begin request by drawing data from the cache=
- if
-  * possible, or the netfs if not.  Space beyond the EOF is zero-filled.
-@@ -960,17 +954,18 @@ static bool netfs_skip_folio_read(struct folio *foli=
-o, loff_t pos, size_t len)
-  * should go ahead; unlock the folio and return -EAGAIN to cause the foli=
-o to
-  * be regot; or return an error.
-  *
-+ * The calling netfs must initialise a netfs context contiguous to the vf=
-s
-+ * inode before calling this.
-+ *
-  * This is usable whether or not caching is enabled.
-  */
- int netfs_write_begin(struct file *file, struct address_space *mapping,
- 		      loff_t pos, unsigned int len, unsigned int aop_flags,
--		      struct folio **_folio, void **_fsdata,
--		      const struct netfs_request_ops *ops,
--		      void *netfs_priv)
-+		      struct folio **_folio, void **_fsdata)
- {
- 	struct netfs_io_request *rreq;
-+	struct netfs_i_context *ctx =3D netfs_i_context(file_inode(file ));
- 	struct folio *folio;
--	struct inode *inode =3D file_inode(file);
- 	unsigned int debug_index =3D 0, fgp_flags;
- 	pgoff_t index =3D pos >> PAGE_SHIFT;
- 	int ret;
-@@ -986,9 +981,9 @@ int netfs_write_begin(struct file *file, struct addres=
-s_space *mapping,
- 	if (!folio)
- 		return -ENOMEM;
- =
-
--	if (ops->check_write_begin) {
-+	if (ctx->ops->check_write_begin) {
- 		/* Allow the netfs (eg. ceph) to flush conflicts. */
--		ret =3D ops->check_write_begin(file, pos, len, folio, _fsdata);
-+		ret =3D ctx->ops->check_write_begin(file, pos, len, folio, _fsdata);
- 		if (ret < 0) {
- 			trace_netfs_failure(NULL, NULL, ret, netfs_fail_check_write_begin);
- 			if (ret =3D=3D -EAGAIN)
-@@ -1004,13 +999,13 @@ int netfs_write_begin(struct file *file, struct add=
-ress_space *mapping,
- 	 * within the cache granule containing the EOF, in which case we need
- 	 * to preload the granule.
- 	 */
--	if (!ops->is_cache_enabled(inode) &&
--	    netfs_skip_folio_read(folio, pos, len)) {
-+	if (!netfs_is_cache_enabled(ctx) &&
-+	    netfs_skip_folio_read(folio, pos, len, false)) {
- 		netfs_stat(&netfs_n_rh_write_zskip);
- 		goto have_folio_no_wait;
- 	}
- =
-
--	rreq =3D netfs_alloc_request(mapping, file, ops, netfs_priv,
-+	rreq =3D netfs_alloc_request(mapping, file,
- 				   folio_file_pos(folio), folio_size(folio),
- 				   NETFS_READ_FOR_WRITE);
- 	if (IS_ERR(rreq)) {
-@@ -1019,10 +1014,9 @@ int netfs_write_begin(struct file *file, struct add=
-ress_space *mapping,
- 	}
- 	rreq->no_unlock_folio	=3D folio_index(folio);
- 	__set_bit(NETFS_RREQ_NO_UNLOCK_FOLIO, &rreq->flags);
--	netfs_priv =3D NULL;
- =
-
--	if (ops->begin_cache_operation) {
--		ret =3D ops->begin_cache_operation(rreq);
-+	if (ctx->ops->begin_cache_operation) {
-+		ret =3D ctx->ops->begin_cache_operation(rreq);
- 		if (ret =3D=3D -ENOMEM || ret =3D=3D -EINTR || ret =3D=3D -ERESTARTSYS)
- 			goto error_put;
- 	}
-@@ -1076,8 +1070,6 @@ int netfs_write_begin(struct file *file, struct addr=
-ess_space *mapping,
- 	if (ret < 0)
- 		goto error;
- have_folio_no_wait:
--	if (netfs_priv)
--		ops->cleanup(mapping, netfs_priv);
- 	*_folio =3D folio;
- 	_leave(" =3D 0");
- 	return 0;
-@@ -1087,8 +1079,6 @@ int netfs_write_begin(struct file *file, struct addr=
-ess_space *mapping,
- error:
- 	folio_unlock(folio);
- 	folio_put(folio);
--	if (netfs_priv)
--		ops->cleanup(mapping, netfs_priv);
- 	_leave(" =3D %d", ret);
- 	return ret;
- }
-diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
-index 9ae538c85378..5510a7a14a40 100644
---- a/fs/netfs/stats.c
-+++ b/fs/netfs/stats.c
-@@ -7,7 +7,6 @@
- =
-
- #include <linux/export.h>
- #include <linux/seq_file.h>
--#include <linux/netfs.h>
- #include "internal.h"
- =
-
- atomic_t netfs_n_rh_readahead;
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 4b99e38f73d9..8458b30172a5 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -118,6 +118,16 @@ enum netfs_io_source {
- typedef void (*netfs_io_terminated_t)(void *priv, ssize_t transferred_or_=
-error,
- 				      bool was_async);
- =
-
-+/*
-+ * Per-inode description.  This must be directly after the inode struct.
-+ */
-+struct netfs_i_context {
-+	const struct netfs_request_ops *ops;
-+#if IS_ENABLED(CONFIG_FSCACHE)
-+	struct fscache_cookie	*cache;
-+#endif
-+};
-+
- /*
-  * Resources required to do operations on a cache.
-  */
-@@ -192,7 +202,6 @@ struct netfs_io_request {
-  * Operations the network filesystem can/must provide to the helpers.
-  */
- struct netfs_request_ops {
--	bool (*is_cache_enabled)(struct inode *inode);
- 	int (*init_request)(struct netfs_io_request *rreq, struct file *file);
- 	int (*begin_cache_operation)(struct netfs_io_request *rreq);
- 	void (*expand_readahead)(struct netfs_io_request *rreq);
-@@ -263,18 +272,11 @@ struct netfs_cache_ops {
- };
- =
-
- struct readahead_control;
--extern void netfs_readahead(struct readahead_control *,
--			    const struct netfs_request_ops *,
--			    void *);
--extern int netfs_readpage(struct file *,
--			  struct folio *,
--			  const struct netfs_request_ops *,
--			  void *);
-+extern void netfs_readahead(struct readahead_control *);
-+extern int netfs_readpage(struct file *, struct page *);
- extern int netfs_write_begin(struct file *, struct address_space *,
- 			     loff_t, unsigned int, unsigned int, struct folio **,
--			     void **,
--			     const struct netfs_request_ops *,
--			     void *);
-+			     void **);
- =
-
- extern void netfs_subreq_terminated(struct netfs_io_subrequest *, ssize_t=
-, bool);
- extern void netfs_get_subrequest(struct netfs_io_subrequest *subreq,
-@@ -283,4 +285,61 @@ extern void netfs_put_subrequest(struct netfs_io_subr=
-equest *subreq,
- 				 bool was_async, enum netfs_sreq_ref_trace what);
- extern void netfs_stats_show(struct seq_file *);
- =
-
-+/**
-+ * netfs_i_context - Get the netfs inode context from the inode
-+ * @inode: The inode to query
-+ *
-+ * Get the netfs lib inode context from the network filesystem's inode.  =
-The
-+ * context struct is expected to directly follow on from the VFS inode st=
-ruct.
-+ */
-+static inline struct netfs_i_context *netfs_i_context(struct inode *inode=
-)
-+{
-+	return (struct netfs_i_context *)(inode + 1);
-+}
-+
-+/**
-+ * netfs_inode - Get the netfs inode from the inode context
-+ * @ctx: The context to query
-+ *
-+ * Get the netfs inode from the netfs library's inode context.  The VFS i=
-node
-+ * is expected to directly precede the context struct.
-+ */
-+static inline struct inode *netfs_inode(struct netfs_i_context *ctx)
-+{
-+	return ((struct inode *)ctx) - 1;
-+}
-+
-+/**
-+ * netfs_i_context_init - Initialise a netfs lib context
-+ * @inode: The inode with which the context is associated
-+ * @ops: The netfs's operations list
-+ *
-+ * Initialise the netfs library context struct.  This is expected to foll=
-ow on
-+ * directly from the VFS inode struct.
-+ */
-+static inline void netfs_i_context_init(struct inode *inode,
-+					const struct netfs_request_ops *ops)
-+{
-+	struct netfs_i_context *ctx =3D netfs_i_context(inode);
-+
-+	memset(ctx, 0, sizeof(*ctx));
-+	ctx->ops =3D ops;
-+}
-+
-+/**
-+ * netfs_i_cookie - Get the cache cookie from the inode
-+ * @inode: The inode to query
-+ *
-+ * Get the caching cookie (if enabled) from the network filesystem's inod=
-e.
-+ */
-+static inline struct fscache_cookie *netfs_i_cookie(struct inode *inode)
-+{
-+#if IS_ENABLED(CONFIG_FSCACHE)
-+	struct netfs_i_context *ctx =3D netfs_i_context(inode);
-+	return ctx->cache;
-+#else
-+	return NULL;
-+#endif
-+}
-+
- #endif /* _LINUX_NETFS_H */
-
+Hi Satadru,
+
+For the sleep/resume issue:
+After going through the logs in detail, I could see that cifs.ko is
+mostly behaving the way it should be. I could see that a reconnect was
+triggered, and that also worked fine for the most part.
+The only issue is that the superblock is missing. I'm trying to
+understand what led to that.
+
+You mentioned that you have the mount setup as an fstab entry. If it
+is possible, can you repeat the same experiment with this entry
+removed from fstab.
+Also as another experiment, can you replace the hostname (cheekon)
+with the corresponding IP address and repeat the same experiment. (I
+could see "failed to resolve hostname" logs from some of your earlier
+logs after resume).
+
+I have a feeling that one of these two factors is exposing this bug in cifs.ko.
+
+For the samba server restart issue, I could see from the logs that you
+pasted that your I/O process was pending a signal. This was the reason
+that the I/O kept returning errno 512 (ERESTARTSYS).
+
+Hi Thorsten,
+Based on my investigations above, I believe that the way Satadru's
+laptop is setup has exposed a bug that we're finding it hard to
+reproduce.
+I think that the above experiments that I suggested will help narrow
+down the problem and take us closer to root causing the issue.
+
+Regards,
+Shyam
+
+On Wed, Mar 16, 2022 at 10:57 PM Satadru Pramanik <satadru@gmail.com> wrote:
+>
+> I am unable to mount a cifs volume with that patch reversed.
+> This is what dmesg shows:
+> [  242.560881] INFO: task mount.smb3:3219 blocked for more than 120 seconds.
+> [  242.560901]       Tainted: P           OE
+> 5.17.0-051700rc8-generic #202203132130
+> [  242.560904] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [  242.560907] task:mount.smb3      state:D stack:    0 pid: 3219
+> ppid:     1 flags:0x00004006
+> [  242.560914] Call Trace:
+> [  242.560918]  <TASK>
+> [  242.560927]  __schedule+0x240/0x5a0
+> [  242.560939]  schedule+0x55/0xd0
+> [  242.560941]  schedule_preempt_disabled+0x15/0x20
+> [  242.560944]  __mutex_lock.constprop.0+0x2e0/0x4b0
+> [  242.560949]  __mutex_lock_slowpath+0x13/0x20
+> [  242.560953]  mutex_lock+0x34/0x40
+> [  242.560958]  cifs_get_smb_ses+0x367/0xab0 [cifs]
+> [  242.561108]  ? __queue_delayed_work+0x5c/0x90
+> [  242.561120]  mount_get_conns+0x63/0x430 [cifs]
+> [  242.561182]  cifs_mount+0x86/0x420 [cifs]
+> [  242.561222]  cifs_smb3_do_mount+0x10d/0x320 [cifs]
+> [  242.561252]  ? cifs_smb3_do_mount+0x10d/0x320 [cifs]
+> [  242.561283]  ? vfs_parse_fs_string+0x7f/0xb0
+> [  242.561290]  smb3_get_tree+0x3e/0x70 [cifs]
+> [  242.561337]  vfs_get_tree+0x27/0xc0
+> [  242.561343]  do_new_mount+0x14b/0x1a0
+> [  242.561348]  path_mount+0x1d4/0x530
+> [  242.561350]  ? putname+0x55/0x60
+> [  242.561357]  __x64_sys_mount+0x108/0x140
+> [  242.561360]  do_syscall_64+0x59/0xc0
+> [  242.561368]  ? do_syscall_64+0x69/0xc0
+> [  242.561372]  ? handle_mm_fault+0xba/0x290
+> [  242.561376]  ? do_user_addr_fault+0x1dd/0x670
+> [  242.561382]  ? syscall_exit_to_user_mode+0x27/0x50
+> [  242.561385]  ? exit_to_user_mode_prepare+0x37/0xb0
+> [  242.561392]  ? irqentry_exit_to_user_mode+0x9/0x20
+> [  242.561394]  ? irqentry_exit+0x33/0x40
+> [  242.561397]  ? exc_page_fault+0x89/0x180
+> [  242.561399]  ? asm_exc_page_fault+0x8/0x30
+> [  242.561405]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> [  242.561409] RIP: 0033:0x7f42af11ceae
+> [  242.561414] RSP: 002b:00007fff6af66c48 EFLAGS: 00000206 ORIG_RAX:
+> 00000000000000a5
+> [  242.561418] RAX: ffffffffffffffda RBX: 000055dcbe40beb0 RCX: 00007f42af11ceae
+> [  242.561420] RDX: 000055dcbe1a447e RSI: 000055dcbe1a44da RDI: 00007fff6af67ea6
+> [  242.561421] RBP: 0000000000000000 R08: 000055dcbe40beb0 R09: 000055dcbe40cf40
+> [  242.561423] R10: 0000000000000000 R11: 0000000000000206 R12: 00007fff6af67e9b
+> [  242.561424] R13: 00007f42af237000 R14: 00007f42af23990f R15: 000055dcbe40cf40
+> [  242.561427]  </TASK>
+>
+> On Wed, Mar 16, 2022 at 9:22 AM Satadru Pramanik <satadru@gmail.com> wrote:
+> >
+> > I will try that.
+> >
+> > On Wed, Mar 16, 2022 at 1:27 AM ronnie sahlberg
+> > <ronniesahlberg@gmail.com> wrote:
+> > >
+> > > I have analyzed the patch Steve bisected and we have figured out why
+> > > it breaks multiuser mounts.
+> > > (It basically assumes there is a 1-to-1 correlation between two
+> > > structures in the kernel while for multiuser it is actually a 1-n and
+> > > we tracked important state information for 'n' in the '1' structure
+> > > :-( )
+> > >
+> > > But now that we understand how that patch broke multiuser I am not
+> > > certain it is also responsible for breaking suspend.
+> > > Satadru, can you try to compile a kernel without this patch and see if
+> > > it fixes your issue?
+> > >
+> > > On Wed, Mar 16, 2022 at 12:25 PM Steve French <smfrench@gmail.com> wrote:
+> > > >
+> > > > Fix shouldn't be hard but agree with Ronnie's points about adding those tests to the buildbot
+> > > >
+> > > > On Tue, Mar 15, 2022, 21:15 ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
+> > > >>
+> > > >> I can confirm that patch is what broke multiuser mounts too.
+> > > >> Now the question is why the buildbot did not catch this.  I remember
+> > > >> adding a test that basic multiuser worked long time ago.
+> > > >>
+> > > >> I would suggest, once the code is fixed or reverted,
+> > > >> We need someone to look at why the buildbot did not detect that
+> > > >> multiuser was broken.
+> > > >> We should also add tests in buildbot for a simple suspend/resume cycle
+> > > >> which should be possible to do using simple virsh commands.
+> > > >>
+> > > >>
+> > > >>
+> > > >> On Wed, Mar 16, 2022 at 8:47 AM Steve French <smfrench@gmail.com> wrote:
+> > > >> >
+> > > >> > We have bisected a regression (may be related) that was reproducible
+> > > >> > (we had difficulty reproducing Satadru's scenario) and affects a
+> > > >> > similar area so are focused on that.  We bisected that regression down
+> > > >> > to this commit added early in 5.17-rc. Adding Ronnie on cc because he
+> > > >> > had noticed the easier to repro scenario. Still debugging.
+> > > >> >
+> > > >> > commit 73f9bfbe3d818bb52266d5c9f3ba57d97842ffe7 (HEAD -> tmp)
+> > > >> > Author: Shyam Prasad N <sprasad@microsoft.com>
+> > > >> > Date:   Mon Jul 19 17:37:52 2021 +0000
+> > > >> >
+> > > >> >     cifs: maintain a state machine for tcp/smb/tcon sessions
+> > > >> >
+> > > >> >     If functions like cifs_negotiate_protocol, cifs_setup_session,
+> > > >> >     cifs_tree_connect are called in parallel on different channels,
+> > > >> >     each of these will be execute the requests. This maybe unnecessary
+> > > >> >     in some cases, and only the first caller may need to do the work.
+> > > >> >
+> > > >> >     This is achieved by having more states for the tcp/smb/tcon session
+> > > >> >     status fields. And tracking the state of reconnection based on the
+> > > >> >     state machine.
+> > > >> >
+> > > >> >     For example:
+> > > >> >     for tcp connections:
+> > > >> >     CifsNew/CifsNeedReconnect ->
+> > > >> >       CifsNeedNegotiate ->
+> > > >> >         CifsInNegotiate ->
+> > > >> >           CifsNeedSessSetup ->
+> > > >> >             CifsInSessSetup ->
+> > > >> >               CifsGood
+> > > >> >
+> > > >> >     for smb sessions:
+> > > >> >     CifsNew/CifsNeedReconnect ->
+> > > >> >       CifsGood
+> > > >> >
+> > > >> > On Tue, Mar 15, 2022 at 8:26 AM Thorsten Leemhuis
+> > > >> > <regressions@leemhuis.info> wrote:
+> > > >> > >
+> > > >> > > Hi, this is your Linux kernel regression tracker. Top-posting for once,
+> > > >> > > to make this easily accessible to everyone.
+> > > >> > >
+> > > >> > > Steve, Shyam, what's up here? Satadru prodided lot's of data already
+> > > >> > > last week and wrote below message 24h ago, but I haven't seen anything
+> > > >> > > about this from your side for more than ten days now. Or is the issue
+> > > >> > > (or even a fix?) discussed somewhere else and I just missed it?
+> > > >> > >
+> > > >> > > Just asking, because thx to rc8 there is still a chance to get this
+> > > >> > > fixed before the final release happens.
+> > > >> > >
+> > > >> > > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> > > >> > >
+> > > >> > > P.S.: As the Linux kernel's regression tracker I'm getting a lot of
+> > > >> > > reports on my table. I can only look briefly into most of them and lack
+> > > >> > > knowledge about most of the areas they concern. I thus unfortunately
+> > > >> > > will sometimes get things wrong or miss something important. I hope
+> > > >> > > that's not the case here; if you think it is, don't hesitate to tell me
+> > > >> > > in a public reply, it's in everyone's interest to set the public record
+> > > >> > > straight.
+> > > >> > >
+> > > >> > > On 14.03.22 14:00, Satadru Pramanik wrote:
+> > > >> > > > This still appears to be an issue in 5.17-rc8.
+> > > >> > > >
+> > > >> > > > I would also not this issue appears when the samba server reboots. The
+> > > >> > > > client has an unresponsive cifs mount instead of attempting to retry
+> > > >> > > > the connection.
+> > > >> > > >
+> > > >> > > > dmesg after resume from suspend on 5.17-rc8:
+> > > >> > > >
+> > > >> > > > [ 4072.503603] PM: suspend exit
+> > > >> > > > [ 4076.381594] IPv6: ADDRCONF(NETDEV_CHANGE): wlp3s0: link becomes ready
+> > > >> > > > [ 4090.501947] CIFS: fs/cifs/inode.c: VFS: in
+> > > >> > > > cifs_revalidate_dentry_attr as Xid: 633 with uid: 0
+> > > >> > > > [ 4090.501966] CIFS: fs/cifs/inode.c: Update attributes: \bin inode
+> > > >> > > > 0x00000000b30e5246 count 1 dentry: 0x0000000080235318 d_time
+> > > >> > > > 4295826505 jiffies 4295914933
+> > > >> > > > [ 4090.502012] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 3 credits total=3005
+> > > >> > > > [ 4090.502053] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4090.502081] CIFS: fs/cifs/transport.c: Sending smb: smb_len=400
+> > > >> > > > [ 4096.800754] CIFS: fs/cifs/cifsfs.c: VFS: in cifs_statfs as Xid: 634
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4096.800783] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 3 credits total=3002
+> > > >> > > > [ 4096.800822] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4096.800845] CIFS: fs/cifs/transport.c: Sending smb: smb_len=400
+> > > >> > > > [ 4099.320129] CIFS: fs/cifs/dir.c: VFS: in cifs_lookup as Xid: 635
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4099.320137] CIFS: fs/cifs/dir.c: parent inode = 0x00000000cc8fcd81
+> > > >> > > > name is: bashprompt.sh and dentry = 0x000000007afa4336
+> > > >> > > > [ 4099.320143] CIFS: fs/cifs/dir.c: NULL inode in lookup
+> > > >> > > > [ 4099.320145] CIFS: fs/cifs/dir.c: Full path: \bashprompt.sh inode =
+> > > >> > > > 0x0000000000000000
+> > > >> > > > [ 4099.320164] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 3 credits total=2999
+> > > >> > > > [ 4099.320185] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4099.320193] CIFS: fs/cifs/transport.c: Sending smb: smb_len=424
+> > > >> > > > [ 4105.135867] CIFS: fs/cifs/smb2pdu.c: In echo request for conn_id 4
+> > > >> > > > [ 4105.135891] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=0
+> > > >> > > > [ 4105.135921] CIFS: fs/cifs/transport.c: Sending smb: smb_len=72
+> > > >> > > > [ 4166.576112] CIFS: fs/cifs/smb2pdu.c: In echo request for conn_id 4
+> > > >> > > > [ 4166.576131] CIFS: fs/cifs/smb2pdu.c: Echo request failed: -11
+> > > >> > > > [ 4166.576138] CIFS: fs/cifs/connect.c: Unable to send echo request to
+> > > >> > > > server: cheekon
+> > > >> > > > [ 4204.895155] CIFS: fs/cifs/inode.c: VFS: in
+> > > >> > > > cifs_revalidate_dentry_attr as Xid: 636 with uid: 1000
+> > > >> > > > [ 4204.895165] CIFS: fs/cifs/inode.c: Update attributes:  inode
+> > > >> > > > 0x00000000cc8fcd81 count 2 dentry: 0x000000002b8e3e8b d_time 0 jiffies
+> > > >> > > > 4295943531
+> > > >> > > > [ 4204.895186] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 3 credits total=2996
+> > > >> > > > [ 4204.895210] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4204.895221] CIFS: fs/cifs/transport.c: Sending smb: smb_len=400
+> > > >> > > > [ 4205.757794] CIFS: fs/cifs/transport.c: \\cheekon Cancelling wait
+> > > >> > > > for mid 321 cmd: 5
+> > > >> > > > [ 4205.757811] CIFS: fs/cifs/transport.c: \\cheekon Cancelling wait
+> > > >> > > > for mid 322 cmd: 16
+> > > >> > > > [ 4205.757816] CIFS: fs/cifs/transport.c: \\cheekon Cancelling wait
+> > > >> > > > for mid 323 cmd: 6
+> > > >> > > > [ 4205.757832] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -512
+> > > >> > > > [ 4205.757840] CIFS: fs/cifs/inode.c: VFS: leaving
+> > > >> > > > cifs_revalidate_dentry_attr (xid = 636) rc = -512
+> > > >> > > >
+> > > >> > > >
+> > > >> > > > Also including a manual unmount and remount:
+> > > >> > > >
+> > > >> > > > [ 4205.757840] CIFS: fs/cifs/inode.c: VFS: leaving
+> > > >> > > > cifs_revalidate_dentry_attr (xid = 636) rc = -512
+> > > >> > > > [ 4220.854276] CIFS: VFS: \\cheekon has not responded in 180 seconds.
+> > > >> > > > Reconnecting...
+> > > >> > > > [ 4220.854284] CIFS: fs/cifs/connect.c: Mark tcp session as need reconnect
+> > > >> > > > [ 4220.854287] CIFS: fs/cifs/connect.c:
+> > > >> > > > cifs_mark_tcp_ses_conns_for_reconnect: marking necessary sessions and
+> > > >> > > > tcons for reconnect
+> > > >> > > > [ 4220.854289] CIFS: fs/cifs/sess.c: Set reconnect bitmask for chan 0; now 0x1
+> > > >> > > > [ 4220.854292] CIFS: fs/cifs/connect.c: cifs_abort_connection: tearing
+> > > >> > > > down socket
+> > > >> > > > [ 4220.854293] CIFS: fs/cifs/connect.c: State: 0x3 Flags: 0x0
+> > > >> > > > [ 4220.854371] CIFS: fs/cifs/connect.c: Post shutdown state: 0x3 Flags: 0x0
+> > > >> > > > [ 4220.854378] CIFS: fs/cifs/connect.c: cifs_abort_connection: moving
+> > > >> > > > mids to private list
+> > > >> > > > [ 4220.854380] CIFS: fs/cifs/connect.c: cifs_abort_connection: issuing
+> > > >> > > > mid callbacks
+> > > >> > > > [ 4220.854383] cifs_small_buf_release: 1 callbacks suppressed
+> > > >> > > > [ 4220.854384] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854387] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854388] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854397] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854412] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4220.854425] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=5
+> > > >> > > > mid=317 state=8
+> > > >> > > > [ 4220.854431] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854431] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=5
+> > > >> > > > mid=314 state=8
+> > > >> > > > [ 4220.854433] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854437] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854439] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854442] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854444] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4220.854451] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -11
+> > > >> > > > [ 4220.854450] CIFS: fs/cifs/cifsfs.c: VFS: leaving cifs_statfs (xid =
+> > > >> > > > 634) rc = -11
+> > > >> > > > [ 4220.854451] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -11
+> > > >> > > > [ 4220.854463] CIFS: fs/cifs/smb2pdu.c: smb2_reconnect: aborting
+> > > >> > > > reconnect due to a received signal by the process
+> > > >> > > > [ 4220.854463] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -512
+> > > >> > > > [ 4220.854466] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -512
+> > > >> > > > [ 4220.854467] CIFS: fs/cifs/inode.c: VFS: leaving
+> > > >> > > > cifs_revalidate_dentry_attr (xid = 633) rc = -512
+> > > >> > > > [ 4220.854468] CIFS: fs/cifs/dir.c: Unexpected lookup error -512
+> > > >> > > > [ 4220.854470] CIFS: fs/cifs/dir.c: cifs_revalidate_dentry failed with rc=-512
+> > > >> > > > [ 4220.854470] CIFS: fs/cifs/dir.c: VFS: leaving cifs_lookup (xid =
+> > > >> > > > 635) rc = -512
+> > > >> > > > [ 4220.854490] CIFS: fs/cifs/dir.c: VFS: in cifs_lookup as Xid: 637
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4220.854493] CIFS: fs/cifs/dir.c: parent inode = 0x00000000cc8fcd81
+> > > >> > > > name is: bashprompt.sh and dentry = 0x00000000afae7ba3
+> > > >> > > > [ 4220.854498] CIFS: fs/cifs/dir.c: NULL inode in lookup
+> > > >> > > > [ 4220.854499] CIFS: fs/cifs/dir.c: Full path: \bashprompt.sh inode =
+> > > >> > > > 0x0000000000000000
+> > > >> > > > [ 4220.854508] CIFS: fs/cifs/smb2pdu.c: smb2_reconnect: aborting
+> > > >> > > > reconnect due to a received signal by the process
+> > > >> > > > [ 4220.854511] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -512
+> > > >> > > > [ 4220.854513] CIFS: fs/cifs/dir.c: Unexpected lookup error -512
+> > > >> > > > [ 4220.854514] CIFS: fs/cifs/dir.c: VFS: leaving cifs_lookup (xid =
+> > > >> > > > 637) rc = -512
+> > > >> > > > [ 4220.854523] CIFS: fs/cifs/dir.c: VFS: in cifs_lookup as Xid: 638
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4220.854529] CIFS: fs/cifs/dir.c: parent inode = 0x00000000cc8fcd81
+> > > >> > > > name is: bashprompt.sh and dentry = 0x00000000fe692902
+> > > >> > > > [ 4220.854535] CIFS: fs/cifs/dir.c: NULL inode in lookup
+> > > >> > > > [ 4220.854536] CIFS: fs/cifs/dir.c: Full path: \bashprompt.sh inode =
+> > > >> > > > 0x0000000000000000
+> > > >> > > > [ 4220.854546] CIFS: fs/cifs/smb2pdu.c: smb2_reconnect: aborting
+> > > >> > > > reconnect due to a received signal by the process
+> > > >> > > > [ 4220.854549] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -512
+> > > >> > > > [ 4220.854552] CIFS: fs/cifs/dir.c: Unexpected lookup error -512
+> > > >> > > > [ 4220.854554] CIFS: fs/cifs/dir.c: VFS: leaving cifs_lookup (xid =
+> > > >> > > > 638) rc = -512
+> > > >> > > > [ 4220.855211] CIFS: fs/cifs/inode.c: VFS: in
+> > > >> > > > cifs_revalidate_dentry_attr as Xid: 639 with uid: 0
+> > > >> > > > [ 4220.855218] CIFS: fs/cifs/inode.c: Update attributes: \bin inode
+> > > >> > > > 0x00000000b30e5246 count 1 dentry: 0x0000000080235318 d_time
+> > > >> > > > 4295826505 jiffies 4295947521
+> > > >> > > > [ 4220.856348] CIFS: fs/cifs/cifsfs.c: VFS: in cifs_statfs as Xid: 640
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4225.844263] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4225.844273] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4225.844276] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4225.844281] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4225.844283] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4225.844293] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4225.844295] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4228.912632] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4228.912670] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4231.088378] CIFS: fs/cifs/smb2pdu.c: gave up waiting on reconnect in smb_init
+> > > >> > > > [ 4231.088383] CIFS: fs/cifs/smb2pdu.c: gave up waiting on reconnect in smb_init
+> > > >> > > > [ 4231.088385] cifs_small_buf_release: 7 callbacks suppressed
+> > > >> > > > [ 4231.088387] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4231.088388] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4231.088390] CIFS: fs/cifs/cifsfs.c: VFS: leaving cifs_statfs (xid =
+> > > >> > > > 640) rc = -112
+> > > >> > > > [ 4231.088393] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -112
+> > > >> > > > [ 4231.088398] CIFS: fs/cifs/inode.c: VFS: leaving
+> > > >> > > > cifs_revalidate_dentry_attr (xid = 639) rc = -112
+> > > >> > > > [ 4231.088401] CIFS: fs/cifs/dir.c: cifs_revalidate_dentry failed with rc=-112
+> > > >> > > > [ 4231.088421] CIFS: fs/cifs/inode.c: VFS: in
+> > > >> > > > cifs_revalidate_dentry_attr as Xid: 641 with uid: 0
+> > > >> > > > [ 4231.088425] CIFS: fs/cifs/inode.c: Update attributes: \x86_64 inode
+> > > >> > > > 0x000000004022c915 count 1 dentry: 0x00000000669397cc d_time
+> > > >> > > > 4295826508 jiffies 4295950080
+> > > >> > > > [ 4232.112342] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4238.141384] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4238.141400] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4238.141408] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4238.141417] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4238.141422] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4238.141441] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4238.141445] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4241.200798] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4241.200826] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4241.328397] CIFS: fs/cifs/smb2pdu.c: gave up waiting on reconnect in smb_init
+> > > >> > > > [ 4241.328409] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4241.328417] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -112
+> > > >> > > > [ 4241.328423] CIFS: fs/cifs/inode.c: VFS: leaving
+> > > >> > > > cifs_revalidate_dentry_attr (xid = 641) rc = -112
+> > > >> > > > [ 4241.328426] CIFS: fs/cifs/dir.c: cifs_revalidate_dentry failed with rc=-112
+> > > >> > > > [ 4244.400422] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4250.434011] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4250.434033] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4250.434043] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4250.434056] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4250.434063] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4250.434086] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4250.434091] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4253.488848] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4253.488875] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4256.688419] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4265.790981] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4265.790995] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4265.791000] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4265.791005] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4265.791008] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4265.791022] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4265.791025] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4268.848709] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4268.848752] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4272.052440] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4278.078864] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4278.078889] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4278.078898] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4278.078904] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4278.078911] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4278.078937] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4278.078942] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4280.826140] CIFS: fs/cifs/cifsfs.c: VFS: in cifs_statfs as Xid: 642
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4281.136704] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4281.136737] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4284.336534] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4290.992510] CIFS: fs/cifs/smb2pdu.c: gave up waiting on reconnect in smb_init
+> > > >> > > > [ 4290.992532] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4290.992543] CIFS: fs/cifs/cifsfs.c: VFS: leaving cifs_statfs (xid =
+> > > >> > > > 642) rc = -112
+> > > >> > > > [ 4292.289757] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4292.289765] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4292.289769] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4292.289773] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4292.289776] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4292.289793] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4292.289794] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4295.348741] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4295.348773] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4298.416556] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4308.425564] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4308.425582] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4308.425589] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4308.425595] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4308.425599] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4308.425621] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4308.425625] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4311.505060] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4311.505094] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4314.544551] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4323.328365] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4323.328387] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4323.328397] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4323.328406] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4323.328413] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4323.328437] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4323.328441] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4326.384727] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4326.384755] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4329.392599] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4339.406543] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4339.406550] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > cheekon to IP: -4
+> > > >> > > > [ 4339.406553] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4339.406556] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4339.406559] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4339.406567] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4339.406568] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4340.826465] CIFS: fs/cifs/cifsfs.c: VFS: in cifs_statfs as Xid: 643
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4342.481043] CIFS: fs/cifs/connect.c: Error -113 connecting to server
+> > > >> > > > [ 4342.481071] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -113
+> > > >> > > > [ 4343.513393] CIFS: fs/cifs/inode.c: VFS: in
+> > > >> > > > cifs_revalidate_dentry_attr as Xid: 644 with uid: 0
+> > > >> > > > [ 4343.513400] CIFS: fs/cifs/inode.c: Update attributes:  inode
+> > > >> > > > 0x00000000cc8fcd81 count 2 dentry: 0x000000002b8e3e8b d_time 0 jiffies
+> > > >> > > > 4295978186
+> > > >> > > > [ 4345.520578] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: probably server name is whole unc:
+> > > >> > > > \\cheekon
+> > > >> > > > [ 4350.900608] CIFS: fs/cifs/smb2pdu.c: gave up waiting on reconnect in smb_init
+> > > >> > > > [ 4350.900628] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4350.900632] CIFS: fs/cifs/cifsfs.c: VFS: leaving cifs_statfs (xid =
+> > > >> > > > 643) rc = -112
+> > > >> > > > [ 4353.712700] CIFS: fs/cifs/smb2pdu.c: gave up waiting on reconnect in smb_init
+> > > >> > > > [ 4353.712720] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4353.712728] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -112
+> > > >> > > > [ 4353.712734] CIFS: fs/cifs/inode.c: VFS: leaving
+> > > >> > > > cifs_revalidate_dentry_attr (xid = 644) rc = -112
+> > > >> > > > [ 4353.714004] CIFS: fs/cifs/connect.c: cifs_put_tcon: tc_count=1
+> > > >> > > > [ 4353.714015] CIFS: fs/cifs/connect.c: VFS: in cifs_put_tcon as Xid:
+> > > >> > > > 645 with uid: 0
+> > > >> > > > [ 4353.714020] CIFS: fs/cifs/smb2pdu.c: Tree Disconnect
+> > > >> > > > [ 4353.714024] CIFS: fs/cifs/fscache.c:
+> > > >> > > > cifs_fscache_release_super_cookie: (0x0000000000000000)
+> > > >> > > > [ 4353.714032] CIFS: fs/cifs/connect.c: cifs_put_smb_ses: ses_count=1
+> > > >> > > > [ 4353.714037] CIFS: fs/cifs/connect.c: cifs_put_smb_ses: ses_count=1
+> > > >> > > > [ 4353.714039] CIFS: fs/cifs/connect.c: cifs_put_smb_ses: ses ipc:
+> > > >> > > > \\cheekon\IPC$
+> > > >> > > > [ 4355.529971] CIFS: fs/cifs/dns_resolve.c:
+> > > >> > > > dns_resolve_server_name_to_ip: unable to resolve: cheekon
+> > > >> > > > [ 4355.529988] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: failed to resolve server part of
+> > > >> > > > \x1b\x86\xb9\xeaj1\x15\xb2;\x87\xb9\xeaj1\x15\x8a@\x04 to IP: -4
+> > > >> > > > [ 4355.529996] CIFS: fs/cifs/connect.c:
+> > > >> > > > reconn_set_ipaddr_from_hostname: next dns resolution scheduled for 600
+> > > >> > > > seconds in the future
+> > > >> > > > [ 4355.530002] CIFS: fs/cifs/connect.c: __cifs_reconnect:
+> > > >> > > > reconn_set_ipaddr_from_hostname: rc=-4
+> > > >> > > > [ 4355.530006] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4355.530025] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4355.530027] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4355.530185] CIFS: fs/cifs/connect.c: Error -4 connecting to server
+> > > >> > > > [ 4355.530201] CIFS: fs/cifs/connect.c: __cifs_reconnect: reconnect error -4
+> > > >> > > > [ 4372.001470] IPv6: ADDRCONF(NETDEV_CHANGE): wlp3s0: link becomes ready
+> > > >> > > > [ 4377.427015] smb3_fs_context_parse_param: 1 callbacks suppressed
+> > > >> > > > [ 4377.427018] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount
+> > > >> > > > option 'source'
+> > > >> > > > [ 4377.427025] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'ip'
+> > > >> > > > [ 4377.427028] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'unc'
+> > > >> > > > [ 4377.427030] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount
+> > > >> > > > option 'forceuid'
+> > > >> > > > [ 4377.427032] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount
+> > > >> > > > option 'resilienthandles'
+> > > >> > > > [ 4377.427033] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount
+> > > >> > > > option 'vers'
+> > > >> > > > [ 4377.427036] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount
+> > > >> > > > option 'iocharset'
+> > > >> > > > [ 4377.427038] CIFS: fs/cifs/fs_context.c: iocharset set to utf8
+> > > >> > > > [ 4377.427039] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount
+> > > >> > > > option 'cifsacl'
+> > > >> > > > [ 4377.427040] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'uid'
+> > > >> > > > [ 4377.427043] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount
+> > > >> > > > option 'user'
+> > > >> > > > [ 4377.427047] CIFS: fs/cifs/cifsfs.c: Devname: \\cheekon\localnet flags: 0
+> > > >> > > > [ 4377.427050] CIFS: fs/cifs/connect.c: Username: localnet
+> > > >> > > > [ 4377.427052] CIFS: fs/cifs/connect.c: file mode: 0755  dir mode: 0755
+> > > >> > > > [ 4377.427055] CIFS: fs/cifs/connect.c: VFS: in mount_get_conns as
+> > > >> > > > Xid: 646 with uid: 0
+> > > >> > > > [ 4377.427057] CIFS: fs/cifs/connect.c: UNC: \\cheekon\localnet
+> > > >> > > > [ 4377.427060] CIFS: fs/cifs/connect.c: generic_ip_connect: connecting
+> > > >> > > > to 192.168.0.20:445
+> > > >> > > > [ 4377.427067] CIFS: fs/cifs/connect.c: Socket created
+> > > >> > > > [ 4377.427069] CIFS: fs/cifs/connect.c: sndbuf 16384 rcvbuf 131072
+> > > >> > > > rcvtimeo 0x6d6
+> > > >> > > > [ 4377.428082] CIFS: fs/cifs/connect.c: cifs_get_tcp_session: next dns
+> > > >> > > > resolution scheduled for 600 seconds in the future
+> > > >> > > > [ 4377.428086] CIFS: fs/cifs/connect.c: VFS: in cifs_get_smb_ses as
+> > > >> > > > Xid: 647 with uid: 0
+> > > >> > > > [ 4377.428089] CIFS: fs/cifs/connect.c: Existing smb sess not found
+> > > >> > > > [ 4377.428093] CIFS: fs/cifs/smb2pdu.c: Negotiate protocol
+> > > >> > > > [ 4377.428093] CIFS: fs/cifs/connect.c: Demultiplex PID: 77240
+> > > >> > > > [ 4377.428098] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=0
+> > > >> > > > [ 4377.428113] CIFS: fs/cifs/transport.c: Sending smb: smb_len=220
+> > > >> > > > [ 4377.432265] CIFS: fs/cifs/connect.c: RFC1002 header 0x10c
+> > > >> > > > [ 4377.432272] CIFS: fs/cifs/smb2misc.c: SMB2 data length 74 offset 128
+> > > >> > > > [ 4377.432274] CIFS: fs/cifs/smb2misc.c: SMB2 len 202
+> > > >> > > > [ 4377.432276] CIFS: fs/cifs/smb2misc.c: length of negcontexts 60 pad 6
+> > > >> > > > [ 4377.432279] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 1
+> > > >> > > > credits total=1
+> > > >> > > > [ 4377.432305] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=0
+> > > >> > > > mid=0 state=4
+> > > >> > > > [ 4377.432314] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.432317] CIFS: fs/cifs/smb2pdu.c: mode 0x1
+> > > >> > > > [ 4377.432319] CIFS: fs/cifs/smb2pdu.c: negotiated smb3.1.1 dialect
+> > > >> > > > [ 4377.432322] CIFS: fs/cifs/smb2pdu.c: decoding 2 negotiate contexts
+> > > >> > > > [ 4377.432324] CIFS: fs/cifs/smb2pdu.c: decode SMB3.11 encryption neg
+> > > >> > > > context of len 4
+> > > >> > > > [ 4377.432326] CIFS: fs/cifs/smb2pdu.c: SMB311 cipher type:2
+> > > >> > > > [ 4377.432328] CIFS: fs/cifs/connect.c: Security Mode: 0x1
+> > > >> > > > Capabilities: 0x300046 TimeAdjust: 0
+> > > >> > > > [ 4377.432332] CIFS: fs/cifs/smb2pdu.c: Session Setup
+> > > >> > > > [ 4377.432333] CIFS: fs/cifs/smb2pdu.c: sess setup type 2
+> > > >> > > > [ 4377.432336] CIFS: fs/cifs/smb2pdu.c: Fresh session. Previous: 0
+> > > >> > > > [ 4377.432338] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=0
+> > > >> > > > [ 4377.432346] CIFS: fs/cifs/transport.c: Sending smb: smb_len=136
+> > > >> > > > [ 4377.433477] CIFS: fs/cifs/connect.c: RFC1002 header 0xda
+> > > >> > > > [ 4377.433483] CIFS: fs/cifs/smb2misc.c: SMB2 data length 146 offset 72
+> > > >> > > > [ 4377.433485] CIFS: fs/cifs/smb2misc.c: SMB2 len 218
+> > > >> > > > [ 4377.433488] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 1
+> > > >> > > > credits total=1
+> > > >> > > > [ 4377.433512] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=1
+> > > >> > > > mid=1 state=4
+> > > >> > > > [ 4377.433518] CIFS: Status code returned 0xc0000016
+> > > >> > > > STATUS_MORE_PROCESSING_REQUIRED
+> > > >> > > > [ 4377.433526] CIFS: fs/cifs/smb2maperror.c: Mapping SMB2 status code
+> > > >> > > > 0xc0000016 to POSIX err -5
+> > > >> > > > [ 4377.433531] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.433534] CIFS: fs/cifs/sess.c: decode_ntlmssp_challenge:
+> > > >> > > > negotiate=0xe2088235 challenge=0xe28a8235
+> > > >> > > > [ 4377.433536] CIFS: fs/cifs/smb2pdu.c: rawntlmssp session setup challenge phase
+> > > >> > > > [ 4377.433539] CIFS: fs/cifs/smb2pdu.c: Fresh session. Previous: 0
+> > > >> > > > [ 4377.433558] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=0
+> > > >> > > > [ 4377.433565] CIFS: fs/cifs/transport.c: Sending smb: smb_len=320
+> > > >> > > > [ 4377.446423] CIFS: fs/cifs/connect.c: RFC1002 header 0x48
+> > > >> > > > [ 4377.446436] CIFS: fs/cifs/smb2misc.c: SMB2 data length 0 offset 72
+> > > >> > > > [ 4377.446440] CIFS: fs/cifs/smb2misc.c: SMB2 len 73
+> > > >> > > > [ 4377.446442] CIFS: fs/cifs/smb2misc.c: Calculated size 73 length 72
+> > > >> > > > mismatch mid 2
+> > > >> > > > [ 4377.446446] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 130
+> > > >> > > > credits total=130
+> > > >> > > > [ 4377.446478] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=1
+> > > >> > > > mid=2 state=4
+> > > >> > > > [ 4377.446484] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.446499] CIFS: fs/cifs/smb2pdu.c: SMB2/3 session established successfully
+> > > >> > > > [ 4377.446502] CIFS: fs/cifs/sess.c: Cleared reconnect bitmask for
+> > > >> > > > chan 0; now 0x0
+> > > >> > > > [ 4377.446505] CIFS: fs/cifs/connect.c: VFS: leaving cifs_get_smb_ses
+> > > >> > > > (xid = 647) rc = 0
+> > > >> > > > [ 4377.446508] CIFS: fs/cifs/connect.c: VFS: in cifs_setup_ipc as Xid:
+> > > >> > > > 648 with uid: 0
+> > > >> > > > [ 4377.446510] CIFS: fs/cifs/smb2pdu.c: TCON
+> > > >> > > > [ 4377.446513] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=129
+> > > >> > > > [ 4377.446539] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.446548] CIFS: fs/cifs/transport.c: Sending smb: smb_len=158
+> > > >> > > > [ 4377.455288] CIFS: fs/cifs/connect.c: RFC1002 header 0x84
+> > > >> > > > [ 4377.455308] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.455310] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.455312] CIFS: fs/cifs/smb2misc.c: SMB2 len 80
+> > > >> > > > [ 4377.455315] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 64
+> > > >> > > > credits total=191
+> > > >> > > > [ 4377.455344] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=3
+> > > >> > > > mid=3 state=4
+> > > >> > > > [ 4377.455349] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.455352] CIFS: fs/cifs/smb2pdu.c: connection to pipe share
+> > > >> > > > [ 4377.455355] CIFS: fs/cifs/connect.c: VFS: leaving cifs_setup_ipc
+> > > >> > > > (xid = 648) rc = 0
+> > > >> > > > [ 4377.455357] CIFS: fs/cifs/connect.c: IPC tcon rc = 0 ipc tid = -1798775872
+> > > >> > > > [ 4377.455362] CIFS: fs/cifs/connect.c: VFS: in cifs_get_tcon as Xid:
+> > > >> > > > 649 with uid: 0
+> > > >> > > > [ 4377.455364] CIFS: fs/cifs/smb2pdu.c: TCON
+> > > >> > > > [ 4377.455367] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=190
+> > > >> > > > [ 4377.455376] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.455384] CIFS: fs/cifs/transport.c: Sending smb: smb_len=166
+> > > >> > > > [ 4377.457328] CIFS: fs/cifs/connect.c: RFC1002 header 0x84
+> > > >> > > > [ 4377.457341] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.457343] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.457345] CIFS: fs/cifs/smb2misc.c: SMB2 len 80
+> > > >> > > > [ 4377.457347] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 64
+> > > >> > > > credits total=254
+> > > >> > > > [ 4377.457373] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=3
+> > > >> > > > mid=4 state=4
+> > > >> > > > [ 4377.457378] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.457380] CIFS: fs/cifs/smb2pdu.c: connection to disk share
+> > > >> > > > [ 4377.457383] CIFS: fs/cifs/connect.c: VFS: leaving cifs_get_tcon
+> > > >> > > > (xid = 649) rc = 0
+> > > >> > > > [ 4377.457385] CIFS: fs/cifs/connect.c: Tcon rc = 0
+> > > >> > > > [ 4377.457388] CIFS: fs/cifs/smb2pdu.c: create/open
+> > > >> > > > [ 4377.457391] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=253
+> > > >> > > > [ 4377.457400] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.457407] CIFS: fs/cifs/transport.c: Sending smb: smb_len=208
+> > > >> > > > [ 4377.458319] CIFS: fs/cifs/connect.c: RFC1002 header 0x104
+> > > >> > > > [ 4377.458331] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.458333] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.458334] CIFS: fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+> > > >> > > > [ 4377.458336] CIFS: fs/cifs/smb2misc.c: SMB2 len 208
+> > > >> > > > [ 4377.458338] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 10
+> > > >> > > > credits total=263
+> > > >> > > > [ 4377.458362] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=5
+> > > >> > > > mid=5 state=4
+> > > >> > > > [ 4377.458367] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.458371] CIFS: fs/cifs/smb2pdu.c: SMB2 IOCTL
+> > > >> > > > [ 4377.458373] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=262
+> > > >> > > > [ 4377.458382] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.458387] CIFS: fs/cifs/transport.c: Sending smb: smb_len=177
+> > > >> > > > [ 4377.459230] CIFS: fs/cifs/connect.c: RFC1002 header 0x4cc
+> > > >> > > > [ 4377.459244] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.459245] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.459247] CIFS: fs/cifs/smb2misc.c: SMB2 data length 1064 offset 112
+> > > >> > > > [ 4377.459248] CIFS: fs/cifs/smb2misc.c: SMB2 len 1176
+> > > >> > > > [ 4377.459250] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 10
+> > > >> > > > credits total=272
+> > > >> > > > [ 4377.459274] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=11
+> > > >> > > > mid=6 state=4
+> > > >> > > > [ 4377.459282] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: adding iface 0
+> > > >> > > > [ 4377.459284] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: speed
+> > > >> > > > 10000000000 bps
+> > > >> > > > [ 4377.459285] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces:
+> > > >> > > > capabilities 0x00000001
+> > > >> > > > [ 4377.459287] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: ipv4
+> > > >> > > > 192.168.0.20
+> > > >> > > > [ 4377.459289] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: adding iface 1
+> > > >> > > > [ 4377.459290] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: speed
+> > > >> > > > 10000000000 bps
+> > > >> > > > [ 4377.459291] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces:
+> > > >> > > > capabilities 0x00000001
+> > > >> > > > [ 4377.459293] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: ipv6
+> > > >> > > > fd40:1eef:5174:0000:f872:6d14:bade:233b
+> > > >> > > > [ 4377.459294] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: adding iface 2
+> > > >> > > > [ 4377.459296] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: speed
+> > > >> > > > 10000000000 bps
+> > > >> > > > [ 4377.459297] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces:
+> > > >> > > > capabilities 0x00000001
+> > > >> > > > [ 4377.459298] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: ipv6
+> > > >> > > > fd40:1eef:5174:0000:7f90:c7fb:ffa7:a8dd
+> > > >> > > > [ 4377.459299] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: adding iface 3
+> > > >> > > > [ 4377.459300] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: speed
+> > > >> > > > 10000000000 bps
+> > > >> > > > [ 4377.459302] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces:
+> > > >> > > > capabilities 0x00000001
+> > > >> > > > [ 4377.459303] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: ipv6
+> > > >> > > > 2001:0470:e1f3:0000:187d:e160:8517:e8df
+> > > >> > > > [ 4377.459304] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: adding iface 4
+> > > >> > > > [ 4377.459305] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: speed
+> > > >> > > > 10000000000 bps
+> > > >> > > > [ 4377.459307] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces:
+> > > >> > > > capabilities 0x00000001
+> > > >> > > > [ 4377.459308] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: ipv6
+> > > >> > > > 2001:0470:e1f3:0000:11c8:9923:c250:1d0e
+> > > >> > > > [ 4377.459309] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: adding iface 5
+> > > >> > > > [ 4377.459310] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: speed
+> > > >> > > > 1000000000 bps
+> > > >> > > > [ 4377.459311] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces:
+> > > >> > > > capabilities 0x00000000
+> > > >> > > > [ 4377.459312] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: ipv4 127.0.0.1
+> > > >> > > > [ 4377.459314] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: adding iface 6
+> > > >> > > > [ 4377.459315] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: speed
+> > > >> > > > 1000000000 bps
+> > > >> > > > [ 4377.459317] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces:
+> > > >> > > > capabilities 0x00000000
+> > > >> > > > [ 4377.459318] CIFS: fs/cifs/smb2ops.c: parse_server_interfaces: ipv6
+> > > >> > > > 0000:0000:0000:0000:0000:0000:0000:0001
+> > > >> > > > [ 4377.459321] CIFS: fs/cifs/smb2pdu.c: Query FSInfo level 5
+> > > >> > > > [ 4377.459324] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=271
+> > > >> > > > [ 4377.459332] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.459337] CIFS: fs/cifs/transport.c: Sending smb: smb_len=161
+> > > >> > > > [ 4377.460257] CIFS: fs/cifs/connect.c: RFC1002 header 0x90
+> > > >> > > > [ 4377.460267] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.460269] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.460271] CIFS: fs/cifs/smb2misc.c: SMB2 data length 20 offset 72
+> > > >> > > > [ 4377.460272] CIFS: fs/cifs/smb2misc.c: SMB2 len 92
+> > > >> > > > [ 4377.460274] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 10
+> > > >> > > > credits total=281
+> > > >> > > > [ 4377.460299] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=16
+> > > >> > > > mid=7 state=4
+> > > >> > > > [ 4377.460304] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.460306] CIFS: fs/cifs/smb2pdu.c: Query FSInfo level 4
+> > > >> > > > [ 4377.460309] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=280
+> > > >> > > > [ 4377.460317] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.460322] CIFS: fs/cifs/transport.c: Sending smb: smb_len=161
+> > > >> > > > [ 4377.461344] CIFS: fs/cifs/connect.c: RFC1002 header 0x84
+> > > >> > > > [ 4377.461356] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.461359] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.461361] CIFS: fs/cifs/smb2misc.c: SMB2 data length 8 offset 72
+> > > >> > > > [ 4377.461363] CIFS: fs/cifs/smb2misc.c: SMB2 len 80
+> > > >> > > > [ 4377.461366] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 10
+> > > >> > > > credits total=290
+> > > >> > > > [ 4377.461393] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=16
+> > > >> > > > mid=8 state=4
+> > > >> > > > [ 4377.461399] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.461401] CIFS: fs/cifs/smb2pdu.c: Query FSInfo level 1
+> > > >> > > > [ 4377.461403] CIFS: fs/cifs/transport.c: wait_for_free_credits:
+> > > >> > > > remove 1 credits total=289
+> > > >> > > > [ 4377.461412] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.461418] CIFS: fs/cifs/transport.c: Sending smb: smb_len=161
+> > > >> > > > [ 4377.462309] CIFS: fs/cifs/connect.c: RFC1002 header 0x9e
+> > > >> > > > [ 4377.462322] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.462324] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.462326] CIFS: fs/cifs/smb2misc.c: SMB2 data length 34 offset 72
+> > > >> > > > [ 4377.462329] CIFS: fs/cifs/smb2misc.c: SMB2 len 106
+> > > >> > > > [ 4377.462332] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 10
+> > > >> > > > credits total=299
+> > > >> > > > [ 4377.462358] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=16
+> > > >> > > > mid=9 state=4
+> > > >> > > > [ 4377.462363] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.462366] CIFS: fs/cifs/smb2pdu.c: Query FSInfo level 11
+> > > >> > > > [ 4377.462376] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.463243] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.463248] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.463250] CIFS: fs/cifs/smb2misc.c: SMB2 data length 28 offset 72
+> > > >> > > > [ 4377.463278] CIFS: fs/cifs/misc.c: Null buffer passed to
+> > > >> > > > cifs_small_buf_release
+> > > >> > > > [ 4377.463283] CIFS: fs/cifs/smb2pdu.c: Close
+> > > >> > > > [ 4377.463293] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.464259] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.464262] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.464291] CIFS: fs/cifs/dfs_cache.c: cache_refresh_path: search
+> > > >> > > > path: \cheekon\localnet
+> > > >> > > > [ 4377.464297] CIFS: fs/cifs/dfs_cache.c: get_dfs_referral: get an DFS
+> > > >> > > > referral for \cheekon\localnet
+> > > >> > > > [ 4377.464299] CIFS: fs/cifs/smb2ops.c: smb2_get_dfs_refer: path:
+> > > >> > > > \cheekon\localnet
+> > > >> > > > [ 4377.464302] CIFS: fs/cifs/smb2pdu.c: SMB2 IOCTL
+> > > >> > > > [ 4377.464311] CIFS: fs/cifs/smb2ops.c: Encrypt message returned 0
+> > > >> > > > [ 4377.465280] CIFS: fs/cifs/smb2ops.c: Decrypt message returned 0
+> > > >> > > > [ 4377.465286] CIFS: fs/cifs/smb2ops.c: mid found
+> > > >> > > > [ 4377.465288] CIFS: fs/cifs/smb2misc.c: SMB2 data length 0 offset 0
+> > > >> > > > [ 4377.465322] CIFS: Status code returned 0xc000019c STATUS_FS_DRIVER_REQUIRED
+> > > >> > > > [ 4377.465336] CIFS: fs/cifs/smb2maperror.c: Mapping SMB2 status code
+> > > >> > > > 0xc000019c to POSIX err -95
+> > > >> > > > [ 4377.465342] CIFS: fs/cifs/connect.c: is_path_remote: full_path:
+> > > >> > > > [ 4377.465347] CIFS: fs/cifs/smb2pdu.c: create/open
+> > > >> > > > [ 4377.466524] CIFS: fs/cifs/smb2pdu.c: Close
+> > > >> > > > [ 4377.467607] CIFS: fs/cifs/smb2pdu.c: create/open
+> > > >> > > > [ 4377.468787] CIFS: fs/cifs/smb2pdu.c: Close
+> > > >> > > > [ 4377.469850] CIFS: fs/cifs/connect.c: VFS: leaving cifs_mount (xid =
+> > > >> > > > 646) rc = 0
+> > > >> > > > [ 4377.469856] CIFS: fs/cifs/sess.c: ses already at max_channels (1),
+> > > >> > > > nothing to open
+> > > >> > > > [ 4377.470004] CIFS: fs/cifs/inode.c: VFS: in cifs_root_iget as Xid:
+> > > >> > > > 650 with uid: 0
+> > > >> > > > [ 4377.471323] CIFS: fs/cifs/smb2misc.c: Calculated size 208 length
+> > > >> > > > 512 mismatch mid 17
+> > > >> > > > [ 4377.471344] CIFS: fs/cifs/smb2misc.c: Calculated size 174 length
+> > > >> > > > 512 mismatch mid 18
+> > > >> > > > [ 4377.471347] CIFS: fs/cifs/smb2misc.c: Calculated size 124 length
+> > > >> > > > 512 mismatch mid 19
+> > > >> > > > [ 4377.471395] CIFS: fs/cifs/smb2ops.c: get smb3 acl for path
+> > > >> > > > [ 4377.471403] CIFS: fs/cifs/smb2ops.c: VFS: in get_smb2_acl_by_path
+> > > >> > > > as Xid: 651 with uid: 0
+> > > >> > > > [ 4377.471409] CIFS: fs/cifs/smb2pdu.c: create/open
+> > > >> > > > [ 4377.472632] CIFS: fs/cifs/smb2pdu.c: Query Info
+> > > >> > > > [ 4377.473671] CIFS: fs/cifs/smb2pdu.c: Close
+> > > >> > > > [ 4377.474729] CIFS: fs/cifs/smb2ops.c: VFS: leaving
+> > > >> > > > get_smb2_acl_by_path (xid = 651) rc = 0
+> > > >> > > > [ 4377.474733] CIFS: fs/cifs/smb2ops.c: get_smb2_acl_by_path: rc = 0 ACL len 312
+> > > >> > > > [ 4377.477086] CIFS: fs/cifs/cifsacl.c: sid_to_id: Can't map SID
+> > > >> > > > os:S-1-5-21-122774138-3582407017-3610500266-1001 to a uid
+> > > >> > > > [ 4377.478800] CIFS: fs/cifs/cifsacl.c: sid_to_id: Can't map SID
+> > > >> > > > gs:S-1-22-2-1001 to a gid
+> > > >> > > > [ 4377.478809] CIFS: fs/cifs/inode.c: looking for uniqueid=263248
+> > > >> > > > [ 4377.478821] CIFS: fs/cifs/inode.c: cifs_revalidate_cache:
+> > > >> > > > revalidating inode 263248
+> > > >> > > > [ 4377.478823] CIFS: fs/cifs/inode.c: cifs_revalidate_cache: inode 263248 is new
+> > > >> > > > [ 4377.478826] CIFS: fs/cifs/inode.c: VFS: leaving cifs_root_iget (xid
+> > > >> > > > = 650) rc = 0
+> > > >> > > > [ 4377.478830] CIFS: fs/cifs/cifsfs.c: Get root dentry for
+> > > >> > > > [ 4377.478832] CIFS: fs/cifs/cifsfs.c: dentry root is: 0000000095b05357
+> > > >> > > > [ 4377.480027] CIFS: fs/cifs/dir.c: VFS: in cifs_lookup as Xid: 652
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4377.480033] CIFS: fs/cifs/dir.c: parent inode = 0x00000000cc8fcd81
+> > > >> > > > name is: .Trash and dentry = 0x000000001bf85909
+> > > >> > > > [ 4377.480039] CIFS: fs/cifs/dir.c: NULL inode in lookup
+> > > >> > > > [ 4377.480041] CIFS: fs/cifs/dir.c: Full path: \.Trash inode =
+> > > >> > > > 0x0000000000000000
+> > > >> > > > [ 4377.481529] CIFS: fs/cifs/cifsfs.c: VFS: in cifs_statfs as Xid: 653
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4377.481861] CIFS: fs/cifs/smb2misc.c: Calculated size 73 length 240
+> > > >> > > > mismatch mid 23
+> > > >> > > > [ 4377.481867] CIFS: fs/cifs/smb2misc.c: Calculated size 73 length 240
+> > > >> > > > mismatch mid 24
+> > > >> > > > [ 4377.481870] CIFS: fs/cifs/smb2misc.c: Calculated size 73 length 240
+> > > >> > > > mismatch mid 25
+> > > >> > > > [ 4377.481885] CIFS: Status code returned 0xc0000034
+> > > >> > > > STATUS_OBJECT_NAME_NOT_FOUND
+> > > >> > > > [ 4377.481893] CIFS: fs/cifs/smb2maperror.c: Mapping SMB2 status code
+> > > >> > > > 0xc0000034 to POSIX err -2
+> > > >> > > > [ 4377.481901] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -2
+> > > >> > > > [ 4377.481905] CIFS: fs/cifs/dir.c: VFS: leaving cifs_lookup (xid = 652) rc = -2
+> > > >> > > > [ 4377.481957] CIFS: fs/cifs/dir.c: VFS: in cifs_lookup as Xid: 654
+> > > >> > > > with uid: 1000
+> > > >> > > > [ 4377.481960] CIFS: fs/cifs/dir.c: parent inode = 0x00000000cc8fcd81
+> > > >> > > > name is: .Trash-1000 and dentry = 0x000000007d3b3552
+> > > >> > > > [ 4377.481966] CIFS: fs/cifs/dir.c: NULL inode in lookup
+> > > >> > > > [ 4377.481967] CIFS: fs/cifs/dir.c: Full path: \.Trash-1000 inode =
+> > > >> > > > 0x0000000000000000
+> > > >> > > > [ 4377.483453] CIFS: fs/cifs/smb2misc.c: Calculated size 208 length
+> > > >> > > > 440 mismatch mid 26
+> > > >> > > > [ 4377.483463] CIFS: fs/cifs/smb2misc.c: Calculated size 104 length
+> > > >> > > > 440 mismatch mid 27
+> > > >> > > > [ 4377.483466] CIFS: fs/cifs/smb2misc.c: Calculated size 124 length
+> > > >> > > > 440 mismatch mid 28
+> > > >> > > > [ 4377.483491] CIFS: fs/cifs/cifsfs.c: VFS: leaving cifs_statfs (xid =
+> > > >> > > > 653) rc = 0
+> > > >> > > > [ 4377.484901] CIFS: Status code returned 0xc0000034
+> > > >> > > > STATUS_OBJECT_NAME_NOT_FOUND
+> > > >> > > > [ 4377.484908] CIFS: fs/cifs/smb2maperror.c: Mapping SMB2 status code
+> > > >> > > > 0xc0000034 to POSIX err -2
+> > > >> > > > [ 4377.484913] CIFS: fs/cifs/inode.c: cifs_get_inode_info: unhandled err rc -2
+> > > >> > > > [ 4377.484916] CIFS: fs/cifs/dir.c: VFS: leaving cifs_lookup (xid = 654) rc = -2
+> > > >> > > >
+> > > >> > > >
+> > > >> > > >
+> > > >> > > > On Fri, Mar 4, 2022 at 9:01 AM Satadru Pramanik <satadru@gmail.com> wrote:
+> > > >> > > >>
+> > > >> > > >> Here is a subset of the recent dmesg during failed mounts, followed by
+> > > >> > > >> an unmount and remount.
+> > > >> > > >>
+> > > >> > > >> On Fri, Mar 4, 2022 at 8:58 AM Satadru Pramanik <satadru@gmail.com> wrote:
+> > > >> > > >>>
+> > > >> > > >>> I have put this in my /etc/rc.local:
+> > > >> > > >>> echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
+> > > >> > > >>> echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
+> > > >> > > >>> echo 7 > /proc/fs/cifs/cifsFYI
+> > > >> > > >>>
+> > > >> > > >>> I ran the commands again manually, and the attached dmesg appears to
+> > > >> > > >>> be capturing some of the aforementioned reconnection efforts this
+> > > >> > > >>> morning.
+> > > >> > > >>>
+> > > >> > > >>> On Fri, Mar 4, 2022 at 12:49 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> > > >> > > >>>>
+> > > >> > > >>>> On Wed, Mar 2, 2022 at 8:16 PM Satadru Pramanik <satadru@gmail.com> wrote:
+> > > >> > > >>>>>
+> > > >> > > >>>>> Here is also the dmesg as promised. (After resuming from suspend/sleep
+> > > >> > > >>>>> this morning, when I again had the same issue.)
+> > > >> > > >>>>>
+> > > >> > > >>>>> On Wed, Mar 2, 2022 at 2:57 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> > > >> > > >>>>>>
+> > > >> > > >>>>>> On Wed, Mar 2, 2022 at 3:51 AM Satadru Pramanik <satadru@gmail.com> wrote:
+> > > >> > > >>>>>>>
+> > > >> > > >>>>>>> I have put the trace.dat and other debug files here since I can not
+> > > >> > > >>>>>>> attach the files to a message to the list. (Apparently the trace.dat
+> > > >> > > >>>>>>> file is too large.)
+> > > >> > > >>>>>>>
+> > > >> > > >>>>>>> https://drive.google.com/drive/folders/1wEi968RbXxivXMMH8J7XUsHhrxu9OWDX?usp=sharing
+> > > >> > > >>>>>>>
+> > > >> > > >>>>>>> On Mon, Feb 28, 2022 at 11:12 PM Satadru Pramanik <satadru@gmail.com> wrote:
+> > > >> > > >>>>>>>>
+> > > >> > > >>>>>>>> The trace.dat file is attached, covering the period before suspend,
+> > > >> > > >>>>>>>> and through wake several hours later, when the mount no longer worked,
+> > > >> > > >>>>>>>> and showed the CIFS: VFS: cifs_tree_connect: could not find
+> > > >> > > >>>>>>>> superblock: -22 message, and through when I unmounted and remounted
+> > > >> > > >>>>>>>> the share, which then started working.
+> > > >> > > >>>>>>>>
+> > > >> > > >>>>>>>> On Mon, Feb 28, 2022 at 9:31 AM Satadru Pramanik <satadru@gmail.com> wrote:
+> > > >> > > >>>>>>>>>
+> > > >> > > >>>>>>>>> Here is the DebugData from before and after from the system with the
+> > > >> > > >>>>>>>>> failed mount.
+> > > >> > > >>>>>>>>> Both systems are now running 5.17-rc6.
+> > > >> > > >>>>>>>>>
+> > > >> > > >>>>>>>>> Working on the trace-cmd now.
+> > > >> > > >>>>>>>>>
+> > > >> > > >>>>>>>>> On Sun, Feb 27, 2022 at 9:37 PM Steve French <smfrench@gmail.com> wrote:
+> > > >> > > >>>>>>>>>>
+> > > >> > > >>>>>>>>>> I would like to see the output of:
+> > > >> > > >>>>>>>>>>
+> > > >> > > >>>>>>>>>> /proc/fs/cifs/DebugData before and after the failure if possible.
+> > > >> > > >>>>>>>>>>
+> > > >> > > >>>>>>>>>> In addition, there would be some value in seeing trace information
+> > > >> > > >>>>>>>>>> (e.g start tracing by
+> > > >> > > >>>>>>>>>> "trace-cmd record -e cifs" before the failure and then forward the
+> > > >> > > >>>>>>>>>> debug information displayed by "trace-cmd show" after the failure)
+> > > >> > > >>>>>>>>>>
+> > > >> > > >>>>>>>>>> On Sun, Feb 27, 2022 at 7:55 AM Thorsten Leemhuis
+> > > >> > > >>>>>>>>>> <regressions@leemhuis.info> wrote:
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> [TLDR: I'm adding the regression report below to regzbot, the Linux
+> > > >> > > >>>>>>>>>>> kernel regression tracking bot; all text you find below is compiled from
+> > > >> > > >>>>>>>>>>> a few templates paragraphs you might have encountered already already
+> > > >> > > >>>>>>>>>>> from similar mails.]
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> Hi, this is your Linux kernel regression tracker. Top-posting for once,
+> > > >> > > >>>>>>>>>>> to make this easily accessible to everyone.
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> CCing the regression mailing list, as it should be in the loop for all
+> > > >> > > >>>>>>>>>>> regressions, as explained here:
+> > > >> > > >>>>>>>>>>> https://www.kernel.org/doc/html/latest/admin-guide/reporting-issues.html
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> To be sure below issue doesn't fall through the cracks unnoticed, I'm
+> > > >> > > >>>>>>>>>>> adding it to regzbot, my Linux kernel regression tracking bot:
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> #regzbot ^introduced v5.16.11..v5.17-rc5
+> > > >> > > >>>>>>>>>>> #regzbot title cifs: Failure to access cifs mount of samba share after
+> > > >> > > >>>>>>>>>>> resume from sleep
+> > > >> > > >>>>>>>>>>> #regzbot ignore-activity
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> Reminder for developers: when fixing the issue, please add a 'Link:'
+> > > >> > > >>>>>>>>>>> tags pointing to the report (the mail quoted above) using
+> > > >> > > >>>>>>>>>>> lore.kernel.org/r/, as explained in
+> > > >> > > >>>>>>>>>>> 'Documentation/process/submitting-patches.rst' and
+> > > >> > > >>>>>>>>>>> 'Documentation/process/5.Posting.rst'. This allows the bot to connect
+> > > >> > > >>>>>>>>>>> the report with any patches posted or committed to fix the issue; this
+> > > >> > > >>>>>>>>>>> again allows the bot to show the current status of regressions and
+> > > >> > > >>>>>>>>>>> automatically resolve the issue when the fix hits the right tree.
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> I'm sending this to everyone that got the initial report, to make them
+> > > >> > > >>>>>>>>>>> aware of the tracking. I also hope that messages like this motivate
+> > > >> > > >>>>>>>>>>> people to directly get at least the regression mailing list and ideally
+> > > >> > > >>>>>>>>>>> even regzbot involved when dealing with regressions, as messages like
+> > > >> > > >>>>>>>>>>> this wouldn't be needed then. And don't worry, if I need to send other
+> > > >> > > >>>>>>>>>>> mails regarding this regression only relevant for regzbot I'll send them
+> > > >> > > >>>>>>>>>>> to the regressions lists only (with a tag in the subject so people can
+> > > >> > > >>>>>>>>>>> filter them away). With a bit of luck no such messages will be needed
+> > > >> > > >>>>>>>>>>> anyway.
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> P.S.: As the Linux kernel's regression tracker I'm getting a lot of
+> > > >> > > >>>>>>>>>>> reports on my table. I can only look briefly into most of them and lack
+> > > >> > > >>>>>>>>>>> knowledge about most of the areas they concern. I thus unfortunately
+> > > >> > > >>>>>>>>>>> will sometimes get things wrong or miss something important. I hope
+> > > >> > > >>>>>>>>>>> that's not the case here; if you think it is, don't hesitate to tell me
+> > > >> > > >>>>>>>>>>> in a public reply, it's in everyone's interest to set the public record
+> > > >> > > >>>>>>>>>>> straight.
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> On 27.02.22 03:36, Satadru Pramanik wrote:
+> > > >> > > >>>>>>>>>>>> I'm on a x86_64 ubuntu 22.04 system accessing a similar system running
+> > > >> > > >>>>>>>>>>>> samba Version 4.13.14-Ubuntu. Both systems are on ubuntu mainline
+> > > >> > > >>>>>>>>>>>> kernel 5.17-rc5.
+> > > >> > > >>>>>>>>>>>>
+> > > >> > > >>>>>>>>>>>> I have a samba share mounted from my fstab, and file access works fine.
+> > > >> > > >>>>>>>>>>>> Upon suspending my system and resuming though, the mounted samba share
+> > > >> > > >>>>>>>>>>>> is inaccessible, and my dmesg has many "CIFS: VFS: cifs_tree_connect:
+> > > >> > > >>>>>>>>>>>> could not find superblock: -22" messages.
+> > > >> > > >>>>>>>>>>>>
+> > > >> > > >>>>>>>>>>>> Unmounting and remounting the share restores access.
+> > > >> > > >>>>>>>>>>>>
+> > > >> > > >>>>>>>>>>>> When I boot into kernel 5.16.11, I do not have this issue. The cifs
+> > > >> > > >>>>>>>>>>>> share is accessible just fine after a suspend/resume cycle.
+> > > >> > > >>>>>>>>>>>>
+> > > >> > > >>>>>>>>>>>> I assume this is a regression with 5.17? Is there any information
+> > > >> > > >>>>>>>>>>>> worth providing which might help debug and fix this issue?
+> > > >> > > >>>>>>>>>>>>
+> > > >> > > >>>>>>>>>>>> Regards,
+> > > >> > > >>>>>>>>>>>>
+> > > >> > > >>>>>>>>>>>> Satadru Pramanik
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> --
+> > > >> > > >>>>>>>>>>> Additional information about regzbot:
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> If you want to know more about regzbot, check out its web-interface, the
+> > > >> > > >>>>>>>>>>> getting start guide, and the references documentation:
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> https://linux-regtracking.leemhuis.info/regzbot/
+> > > >> > > >>>>>>>>>>> https://gitlab.com/knurd42/regzbot/-/blob/main/docs/getting_started.md
+> > > >> > > >>>>>>>>>>> https://gitlab.com/knurd42/regzbot/-/blob/main/docs/reference.md
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> The last two documents will explain how you can interact with regzbot
+> > > >> > > >>>>>>>>>>> yourself if your want to.
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> Hint for reporters: when reporting a regression it's in your interest to
+> > > >> > > >>>>>>>>>>> CC the regression list and tell regzbot about the issue, as that ensures
+> > > >> > > >>>>>>>>>>> the regression makes it onto the radar of the Linux kernel's regression
+> > > >> > > >>>>>>>>>>> tracker -- that's in your interest, as it ensures your report won't fall
+> > > >> > > >>>>>>>>>>> through the cracks unnoticed.
+> > > >> > > >>>>>>>>>>>
+> > > >> > > >>>>>>>>>>> Hint for developers: you normally don't need to care about regzbot once
+> > > >> > > >>>>>>>>>>> it's involved. Fix the issue as you normally would, just remember to
+> > > >> > > >>>>>>>>>>> include 'Link:' tag in the patch descriptions pointing to all reports
+> > > >> > > >>>>>>>>>>> about the issue. This has been expected from developers even before
+> > > >> > > >>>>>>>>>>> regzbot showed up for reasons explained in
+> > > >> > > >>>>>>>>>>> 'Documentation/process/submitting-patches.rst' and
+> > > >> > > >>>>>>>>>>> 'Documentation/process/5.Posting.rst'.
+> > > >> > > >>>>>>>>>>
+> > > >> > > >>>>>>>>>>
+> > > >> > > >>>>>>>>>>
+> > > >> > > >>>>>>>>>> --
+> > > >> > > >>>>>>>>>> Thanks,
+> > > >> > > >>>>>>>>>>
+> > > >> > > >>>>>>>>>> Steve
+> > > >> > > >>>>>>
+> > > >> > > >>>>>> The DebugData shows that the connection and smb session are fine, but
+> > > >> > > >>>>>> the tree connect is not in a good state.
+> > > >> > > >>>>>> Similarly, the trace output shows that connection was reconnected
+> > > >> > > >>>>>> successfully, SMB session was reconnected as well. However, the tree
+> > > >> > > >>>>>> connect did not go over the wire.
+> > > >> > > >>>>>>
+> > > >> > > >>>>>>> The trace.dat file is attached, covering the period before suspend,
+> > > >> > > >>>>>>> and through wake several hours later, when the mount no longer worked,
+> > > >> > > >>>>>>> and showed the CIFS: VFS: cifs_tree_connect: could not find
+> > > >> > > >>>>>>> superblock: -22 message, and through when I unmounted and remounted
+> > > >> > > >>>>>>> the share, which then started working.
+> > > >> > > >>>>>>
+> > > >> > > >>>>>> This suggests to me that the cifs_tcp_get_super is failing.
+> > > >> > > >>>>>> This is odd, since it looks up the server as pointers.
+> > > >> > > >>>>>> Did we start undercounting the ref count somewhere?
+> > > >> > > >>>>>>
+> > > >> > > >>>>>> --
+> > > >> > > >>>>>> Regards,
+> > > >> > > >>>>>> Shyam
+> > > >> > > >>>>
+> > > >> > > >>>> Hi Satadru,
+> > > >> > > >>>>
+> > > >> > > >>>> The attached dmesg did not have cifsFYI enabled.
+> > > >> > > >>>> Please use the below steps to enable cifsFYI before the sleep:
+> > > >> > > >>>> # echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
+> > > >> > > >>>> # echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
+> > > >> > > >>>> # echo 7 > /proc/fs/cifs/cifsFYI
+> > > >> > > >>>>
+> > > >> > > >>>> You can disable it after the repro using this cmd:
+> > > >> > > >>>> # echo 0 > /proc/fs/cifs/cifsFYI
+> > > >> > > >>>>
+> > > >> > > >>>> --
+> > > >> > > >>>> Regards,
+> > > >> > > >>>> Shyam
+> > > >> > > >
+> > > >> >
+> > > >> >
+> > > >> >
+> > > >> > --
+> > > >> > Thanks,
+> > > >> >
+> > > >> > Steve
+
+
+
+-- 
+Regards,
+Shyam
