@@ -2,94 +2,76 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 985AAC433F5
-	for <linux-cifs@archiver.kernel.org>; Sat, 19 Mar 2022 18:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86F4C433EF
+	for <linux-cifs@archiver.kernel.org>; Sat, 19 Mar 2022 23:47:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243930AbiCSSgW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 19 Mar 2022 14:36:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50260 "EHLO
+        id S244383AbiCSXtP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 19 Mar 2022 19:49:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243929AbiCSSgV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 19 Mar 2022 14:36:21 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D47A92986DE
-        for <linux-cifs@vger.kernel.org>; Sat, 19 Mar 2022 11:34:59 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id s25so15143436lji.5
-        for <linux-cifs@vger.kernel.org>; Sat, 19 Mar 2022 11:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zNxu1T5tIYTeNaXB/2ss2NoCpCskC8zpCncNKeN8VpE=;
-        b=K+mWANBDO9AfP58DM08vpU64r0MS8DFRRAfhDK+B5ygmC8Z21/kzH9NPCQphXy2oiV
-         xEPA+Or5Z+kCTjmP+z6iElVIbXwxraLLl4lDnWj+8Wswe/kOsS1E1bmWJvyKw6rgkOO5
-         jwwIHWmGv4w9k5DL/WKr6k7H6lwCVTEz+kDOf+qeW+AVOCDHJS7smRb2YoRe3YZEK+06
-         1ixsNb58m9U8BL9P608ftbpQB+ZojvER6Pl2AU6ypTl1uot//ncrDuYMI+aH6eiQCBoM
-         WV3MXx9jbForzqCjLmW/Qb0D8yt6CUPiMNGI3jdO07UlH7X68ex3qXUWvvYMlcyvc6ql
-         v0ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zNxu1T5tIYTeNaXB/2ss2NoCpCskC8zpCncNKeN8VpE=;
-        b=YQ4LOWJjDmiBPUqb4I6qpBQ/1m8Ig6dyg9J2kLeaDknUMi3uFaLrmZSWxN8Dbiu/pi
-         PspGDn7xVFcZngrc33uDQkO4mk74YxZZDCLAs3R8M4fwbvn9ERZmVTjLSO6tmm5pjzKG
-         pHehLAYKFZoRD5xSISTe17vZ6tMT4nInsMpYxMHCSMATpN1J2J5kS+g2K3hs/+7c9SoF
-         bPBssaA5PBCF5w+TOMynYbarinGgNHSMT7ZOVm4ruhw3TOhKJeUqlN8j0DpPWbA3VZHw
-         wTnjmQh1i1iedKurgCRuD3VdadSVC4nO51fAKKPgXXOs3YVn7DwOuWH43JSIgOUNMgq6
-         SN8Q==
-X-Gm-Message-State: AOAM530hJPAoWIzKnNPa4VxeXlowh9Vkm4vHWj7dxTJWjgD00lKZAns+
-        oAuRa8YvVOmYBZBCfjxSEUy//yIkety0voiwgsg=
-X-Google-Smtp-Source: ABdhPJx3JpitaN00IUzbFVlpqPzRkk/zB6hyj4AUpEmVoxJaJxemNb+R0yvJTXPEbfI4dNaAaqWMP9wpuwBLtq25S3U=
-X-Received: by 2002:a2e:a58c:0:b0:249:7ecf:6075 with SMTP id
- m12-20020a2ea58c000000b002497ecf6075mr660153ljp.460.1647714897958; Sat, 19
- Mar 2022 11:34:57 -0700 (PDT)
+        with ESMTP id S243922AbiCSXtP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 19 Mar 2022 19:49:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9BEC82668
+        for <linux-cifs@vger.kernel.org>; Sat, 19 Mar 2022 16:47:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647733670;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6n/sDsvAuIPEifJSzKj64MzdJQCs8pJY1Y2N6jUReiU=;
+        b=XveLb+ieaeNF9YK+mYhANFKiWyBbxSQ7JFcfhHjidVECUuheVRgCoVAozSFHJjtQeKDVaX
+        hSzFQTxBUu2MHhLBlocMwrZBy/7wuJCBgYDz8RXLjvJnxiRnZ7Rn3Q8oxKn5Mz9iEqduZr
+        RYyIvG4omDfca+GuTjaAAIi9oyy4yLk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-313-CVtg9R1OMg6ffmTpYKYm1Q-1; Sat, 19 Mar 2022 19:47:47 -0400
+X-MC-Unique: CVtg9R1OMg6ffmTpYKYm1Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2A6B6811E76;
+        Sat, 19 Mar 2022 23:47:47 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E10C40CF8F2;
+        Sat, 19 Mar 2022 23:47:45 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAOi1vP_sEj7i8YbbwJibbSG=BCVp4E9BAo=JF0aC79xBNC8wcA@mail.gmail.com>
+References: <CAOi1vP_sEj7i8YbbwJibbSG=BCVp4E9BAo=JF0aC79xBNC8wcA@mail.gmail.com> <751829.1647648125@warthog.procyon.org.uk>
+To:     Ilya Dryomov <idryomov@gmail.com>
+Cc:     dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+        Xiubo Li <xiubli@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: Coordinating netfslib pull request with the ceph pull request
 MIME-Version: 1.0
-References: <CAH2r5mvG6jmUKVi4zqRouFgYSjYxJjTExjmPtH64PAjFahE8dQ@mail.gmail.com>
- <570f1f21-ecd2-6f88-e78f-7c57a22ba7e9@talpey.com> <283E0E80-BDAA-45B4-B627-C7BF44C0D126@cjr.nz>
-In-Reply-To: <283E0E80-BDAA-45B4-B627-C7BF44C0D126@cjr.nz>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 19 Mar 2022 13:34:47 -0500
-Message-ID: <CAH2r5mv2E=zQ+nVjMuLGvz3CGMLxM2Cq4aUEnLd3ieRCQTOM8Q@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix bad fids sent over wire
-To:     Paulo Alcantara <pc@cjr.nz>, Namjae Jeon <linkinjeon@kernel.org>
-Cc:     Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <824347.1647733664.1@warthog.procyon.org.uk>
+Date:   Sat, 19 Mar 2022 23:47:44 +0000
+Message-ID: <824348.1647733664@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-They probably should be always 'u64' everywhere (not le64) and change
-the code back in fs/smbfs_common/smb2pdu.h (was this due to ksmbd
-using the file and converting these fields in fs/smbfs_common) rather
-than the ones you changed
+Ilya Dryomov <idryomov@gmail.com> wrote:
 
+> Given how your branch is structured, it sounds like the easiest would
+> be for you to send the netfslib pull request after I send the ceph pull
+> request.  Or do you have some tighter coordination in mind?
 
-On Sat, Mar 19, 2022 at 11:01 AM Paulo Alcantara <pc@cjr.nz> wrote:
->
-> Yes, I agreed. Why not simply store them as le64 and avoid the byteswapping altogether?
->
-> On 19 March 2022 09:06:55 GMT-03:00, Tom Talpey <tom@talpey.com> wrote:
->>
->>
->> On 3/19/2022 12:23 AM, Steve French wrote:
->>>
->>> Any comments on Paulo's patch? It fixes an endian conversion problem
->>> that can affect file ids used on big endian archs.  I will add cc:
->>> stable
->>>
->>> https://git.cjr.nz/linux.git/commit/?h=cifs-bad-fid-fixes&id=a857bb6b15646a7946fafb281878ddf498107dc3
->>
->>
->> It seems a bad idea to be storing opaque fields in le64 integers, then
->> byteswapping them when they go back on the wire. Wouldn't it be better
->> to make them u8[8] arrays and just use memcpy/memcmp?
->>
->> Tom.
+I think that's sufficient - or if I sent mine first, I can put in a big note
+at the top saying it depends on yours, when you decide to post it.
 
+David
 
-
--- 
-Thanks,
-
-Steve
