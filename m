@@ -2,68 +2,74 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 237D9C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Mar 2022 19:39:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B1FC433FE
+	for <linux-cifs@archiver.kernel.org>; Sat, 19 Mar 2022 00:02:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240385AbiCRTkR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Mar 2022 15:40:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60708 "EHLO
+        id S241598AbiCSADe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Mar 2022 20:03:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240380AbiCRTkQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Mar 2022 15:40:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3E3610CF36;
-        Fri, 18 Mar 2022 12:38:57 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S241591AbiCSADc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Mar 2022 20:03:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B9D1D2BAE61
+        for <linux-cifs@vger.kernel.org>; Fri, 18 Mar 2022 17:02:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647648131;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=D0MtVS7HpAhECjf4TaM6P0isnx273sQNVdJ4DkQ+qeg=;
+        b=fgflBGjkuuQQCWGzhUzNpr/zTdlR7ymf8+An6g9rFJ2aYQ/d5+Koj2mknLKU6yWj8BZ5He
+        8zwyzyMUCFLgmuclmxYkvp6u0KKBaPLUXNMBlMwn+gtma1kmhHu2MtgOnjZ1MWNYGEmjRR
+        hhdz8K71zEZ4aKu4+S0pimiyQD1GiFU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-527-60I5wtiLNlGtzAK08sE7Eg-1; Fri, 18 Mar 2022 20:02:08 -0400
+X-MC-Unique: 60I5wtiLNlGtzAK08sE7Eg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8270061BC8;
-        Fri, 18 Mar 2022 19:38:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E5787C340ED;
-        Fri, 18 Mar 2022 19:38:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647632336;
-        bh=zxsdRYNoeRoXFVngk54VQB8LcDBO0SmY/oHX6wS907I=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=fpMNd9j3cmiyuKWT3RBXJlskdsN0019W6I62GxbuwwiECqc+ts/RhE0QKSbiKIGGn
-         capLjodVAoYwc5lSU4OVPk5MzNh2qTmH+XAQ6MutbU08HyeQNWm5VXUuLvhosNpaJp
-         VCEFA6ZUslvpmQMA+SegNcq5Yk/pmHsvimw1rJ3oRH+DsYVKz8JI/uCOB35b7oiQ17
-         UEDQfvPvuGwu+hZ8oJdJFwlFIsjODi5Aczn93c4CVKGx0JKSZeUt7z3yUawFFuAI+B
-         rCBuzom6XmXfIjl8WlNupnQfA+Oyyj7GX0AblmtBFadkcUEy3olH8p7oHQ/HhDgzFc
-         QgFnTFNfP6+AA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE8C8E6D44B;
-        Fri, 18 Mar 2022 19:38:56 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 fix
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvgGMBOXhSvDw67aUoHLoEeDFh-hAUfHmdFsEptMkT+LA@mail.gmail.com>
-References: <CAH2r5mvgGMBOXhSvDw67aUoHLoEeDFh-hAUfHmdFsEptMkT+LA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvgGMBOXhSvDw67aUoHLoEeDFh-hAUfHmdFsEptMkT+LA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc8-smb3-fix
-X-PR-Tracked-Commit-Id: e3ee9fb22652f228225c352bd4fabec330cac5f0
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 6e4069881a7f9dceb6dfb97e436d55e3c7f43e81
-Message-Id: <164763233684.31275.18111973779611415664.pr-tracker-bot@kernel.org>
-Date:   Fri, 18 Mar 2022 19:38:56 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2BC5180005D;
+        Sat, 19 Mar 2022 00:02:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8076F413721;
+        Sat, 19 Mar 2022 00:02:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Ilya Dryomov <idryomov@gmail.com>
+cc:     dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+        Xiubo Li <xiubli@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        ceph-devel@vger.kernel.org, linux-cachefs@redhat.com,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Coordinating netfslib pull request with the ceph pull request
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <751828.1647648125.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Sat, 19 Mar 2022 00:02:05 +0000
+Message-ID: <751829.1647648125@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 18 Mar 2022 12:14:45 -0500:
+Hi Ilya,
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.17-rc8-smb3-fix
+Since my fscache-next branch[1] is dependent on patches in the ceph/master
+branch, I think I need to coordinate my netfslib pull request with your ce=
+ph
+pull request for the upcoming merge window.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/6e4069881a7f9dceb6dfb97e436d55e3c7f43e81
+David
 
-Thank you!
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/=
+log/?h=3Dfscache-next
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
