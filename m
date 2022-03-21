@@ -2,344 +2,455 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BCAC433FE
-	for <linux-cifs@archiver.kernel.org>; Mon, 21 Mar 2022 16:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 347E4C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 21 Mar 2022 16:09:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350900AbiCUQLR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 21 Mar 2022 12:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
+        id S1350923AbiCUQLT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 21 Mar 2022 12:11:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350859AbiCUQKo (ORCPT
+        with ESMTP id S1350858AbiCUQKo (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Mon, 21 Mar 2022 12:10:44 -0400
 Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77A4C3193F
-        for <linux-cifs@vger.kernel.org>; Mon, 21 Mar 2022 09:09:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB5552A70D
+        for <linux-cifs@vger.kernel.org>; Mon, 21 Mar 2022 09:09:03 -0700 (PDT)
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 9A16180851;
-        Mon, 21 Mar 2022 16:08:57 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 7967880856;
+        Mon, 21 Mar 2022 16:09:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1647878939;
+        t=1647878942;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=gtahG5C2jWIq4vJ9FySEQNzX6X+Ihz9qutsozlv3T6I=;
-        b=wAPdOqzy8hIJPKk8+lUrVa1uiG5N5UDMk1v4toHMPVj28YlN99EAJsoDfMx1qAKrwIl4Vk
-        Zi/WURzcA8/8DsTQCYHG3/3IFalzxAWDpeNlPDL4BAeZiXLQn1NWLU5sf3XBKsjvbxkEwt
-        klXR1Gw3O5MyfX7B+uEKV4/bOStOeYYLge2suUCwYxIsv7jPGYkemSoaH84YVSHpevXUZc
-        w8CPbn3GNcezr2dhxWWo1qM06K8XoumNA6+pdziHoVpKdaZsBIv/0A9RSbohJkTD4uypXC
-        uDvVKNmmtX/tKRJAcCOX/xUcUmK4f1OntgBNRLPxXsCzXfTln4mwAoyrWNLsgA==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cIHWAy+JZfA9tY7r5wgHpS/4P++Vgjprz9D0JflokI8=;
+        b=LKiELS3cCv8KqR7sIS1om2/5kxPataohPRpkWMjxNA9HExdVDp2m4p40egvwezrkrlcHfO
+        LzEMCRIabwwhz/WyHOyWV9+bMblScHVoNt21jv0cOvopNwd8gLILRmsgFJwG9tpQGsHe1c
+        fYJvi9kHSPCZwq78gxaykcAWh7BvBqj6uVbLddQaUuy2rRjAQZBXzAE0MhK3+TbpqdINjB
+        YiqFvcEg2x1GDCmRqkICUX2pAlQLYLasus/S7m+5pvxn8nyvat871Gl9JXR2Zj/lPtGNK1
+        0nCmZEmOsF5KdW2qcLHWtUldlChD+BawPNwAiRfsqfbSyuQPFNVt0HmtvDFSiA==
 From:   Paulo Alcantara <pc@cjr.nz>
 To:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
         linkinjeon@kernel.org
 Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH 1/2] cifs: fix bad fids sent over wire
-Date:   Mon, 21 Mar 2022 13:08:25 -0300
-Message-Id: <20220321160826.30814-1-pc@cjr.nz>
+Subject: [PATCH 2/2] ksmbd: store fids as opaque u64 integers
+Date:   Mon, 21 Mar 2022 13:08:26 -0300
+Message-Id: <20220321160826.30814-2-pc@cjr.nz>
+In-Reply-To: <20220321160826.30814-1-pc@cjr.nz>
+References: <20220321160826.30814-1-pc@cjr.nz>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The client used to partially convert the fids to le64, while storing
-or sending them by using host endianness.  This broke the client on
-big-endian machines.  Instead of converting them to le64, store them
-as opaque integers and then avoid byteswapping when sending them over
-wire.
+There is no need to store the fids as le64 integers as they are opaque
+to the client and only used for equality.
 
 Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 ---
- fs/cifs/smb2misc.c        |  4 +--
- fs/cifs/smb2ops.c         |  8 ++---
- fs/cifs/smb2pdu.c         | 63 +++++++++++++++++----------------------
- fs/smbfs_common/smb2pdu.h | 24 +++++++--------
- 4 files changed, 46 insertions(+), 53 deletions(-)
+ fs/ksmbd/smb2pdu.c | 94 +++++++++++++++++++---------------------------
+ fs/ksmbd/smb2pdu.h | 34 ++++++++---------
+ 2 files changed, 56 insertions(+), 72 deletions(-)
 
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index b25623e3fe3d..3b7c636be377 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -832,8 +832,8 @@ smb2_handle_cancelled_mid(struct mid_q_entry *mid, struct TCP_Server_Info *serve
- 	rc = __smb2_handle_cancelled_cmd(tcon,
- 					 le16_to_cpu(hdr->Command),
- 					 le64_to_cpu(hdr->MessageId),
--					 le64_to_cpu(rsp->PersistentFileId),
--					 le64_to_cpu(rsp->VolatileFileId));
-+					 rsp->PersistentFileId,
-+					 rsp->VolatileFileId);
- 	if (rc)
- 		cifs_put_tcon(tcon);
- 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 0ecd6e1832a1..c122530e5043 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -900,8 +900,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	atomic_inc(&tcon->num_remote_opens);
- 
- 	o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
--	oparms.fid->persistent_fid = le64_to_cpu(o_rsp->PersistentFileId);
--	oparms.fid->volatile_fid = le64_to_cpu(o_rsp->VolatileFileId);
-+	oparms.fid->persistent_fid = o_rsp->PersistentFileId;
-+	oparms.fid->volatile_fid = o_rsp->VolatileFileId;
- #ifdef CONFIG_CIFS_DEBUG2
- 	oparms.fid->mid = le64_to_cpu(o_rsp->hdr.MessageId);
- #endif /* CIFS_DEBUG2 */
-@@ -2410,8 +2410,8 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
- 		cifs_dbg(FYI, "query_dir_first: open failed rc=%d\n", rc);
- 		goto qdf_free;
- 	}
--	fid->persistent_fid = le64_to_cpu(op_rsp->PersistentFileId);
--	fid->volatile_fid = le64_to_cpu(op_rsp->VolatileFileId);
-+	fid->persistent_fid = op_rsp->PersistentFileId;
-+	fid->volatile_fid = op_rsp->VolatileFileId;
- 
- 	/* Anything else than ENODATA means a genuine error */
- 	if (rc && rc != -ENODATA) {
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 7e7909b1ae11..7e15b0092243 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2734,13 +2734,10 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
- 		goto err_free_req;
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 67e8e28e3fc3..5440d61cea9f 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -377,12 +377,8 @@ static void init_chained_smb2_rsp(struct ksmbd_work *work)
+ 	 * command in the compound request
+ 	 */
+ 	if (req->Command == SMB2_CREATE && rsp->Status == STATUS_SUCCESS) {
+-		work->compound_fid =
+-			le64_to_cpu(((struct smb2_create_rsp *)rsp)->
+-				VolatileFileId);
+-		work->compound_pfid =
+-			le64_to_cpu(((struct smb2_create_rsp *)rsp)->
+-				PersistentFileId);
++		work->compound_fid = ((struct smb2_create_rsp *)rsp)->VolatileFileId;
++		work->compound_pfid = ((struct smb2_create_rsp *)rsp)->PersistentFileId;
+ 		work->compound_sid = le64_to_cpu(rsp->SessionId);
  	}
  
--	trace_smb3_posix_mkdir_done(xid, le64_to_cpu(rsp->PersistentFileId),
--				    tcon->tid,
--				    ses->Suid, CREATE_NOT_FILE,
--				    FILE_WRITE_ATTRIBUTES);
-+	trace_smb3_posix_mkdir_done(xid, rsp->PersistentFileId, tcon->tid, ses->Suid,
-+				    CREATE_NOT_FILE, FILE_WRITE_ATTRIBUTES);
+@@ -2129,7 +2125,7 @@ static noinline int create_smb2_pipe(struct ksmbd_work *work)
+ 	rsp->EndofFile = cpu_to_le64(0);
+ 	rsp->FileAttributes = FILE_ATTRIBUTE_NORMAL_LE;
+ 	rsp->Reserved2 = 0;
+-	rsp->VolatileFileId = cpu_to_le64(id);
++	rsp->VolatileFileId = id;
+ 	rsp->PersistentFileId = 0;
+ 	rsp->CreateContextsOffset = 0;
+ 	rsp->CreateContextsLength = 0;
+@@ -3157,8 +3153,8 @@ int smb2_open(struct ksmbd_work *work)
  
--	SMB2_close(xid, tcon, le64_to_cpu(rsp->PersistentFileId),
--		   le64_to_cpu(rsp->VolatileFileId));
-+	SMB2_close(xid, tcon, rsp->PersistentFileId, rsp->VolatileFileId);
+ 	rsp->Reserved2 = 0;
  
- 	/* Eventually save off posix specific response info and timestaps */
+-	rsp->PersistentFileId = cpu_to_le64(fp->persistent_id);
+-	rsp->VolatileFileId = cpu_to_le64(fp->volatile_id);
++	rsp->PersistentFileId = fp->persistent_id;
++	rsp->VolatileFileId = fp->volatile_id;
  
-@@ -3009,14 +3006,12 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	} else if (rsp == NULL) /* unlikely to happen, but safer to check */
- 		goto creat_exit;
- 	else
--		trace_smb3_open_done(xid, le64_to_cpu(rsp->PersistentFileId),
--				     tcon->tid,
--				     ses->Suid, oparms->create_options,
--				     oparms->desired_access);
-+		trace_smb3_open_done(xid, rsp->PersistentFileId, tcon->tid, ses->Suid,
-+				     oparms->create_options, oparms->desired_access);
+ 	rsp->CreateContextsOffset = 0;
+ 	rsp->CreateContextsLength = 0;
+@@ -3865,9 +3861,7 @@ int smb2_query_dir(struct ksmbd_work *work)
+ 		goto err_out2;
+ 	}
  
- 	atomic_inc(&tcon->num_remote_opens);
--	oparms->fid->persistent_fid = le64_to_cpu(rsp->PersistentFileId);
--	oparms->fid->volatile_fid = le64_to_cpu(rsp->VolatileFileId);
-+	oparms->fid->persistent_fid = rsp->PersistentFileId;
-+	oparms->fid->volatile_fid = rsp->VolatileFileId;
- 	oparms->fid->access = oparms->desired_access;
- #ifdef CONFIG_CIFS_DEBUG2
- 	oparms->fid->mid = le64_to_cpu(rsp->hdr.MessageId);
-@@ -3313,8 +3308,8 @@ SMB2_close_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 	if (rc)
- 		return rc;
+-	dir_fp = ksmbd_lookup_fd_slow(work,
+-				      le64_to_cpu(req->VolatileFileId),
+-				      le64_to_cpu(req->PersistentFileId));
++	dir_fp = ksmbd_lookup_fd_slow(work, req->VolatileFileId, req->PersistentFileId);
+ 	if (!dir_fp) {
+ 		rc = -EBADF;
+ 		goto err_out2;
+@@ -4088,12 +4082,12 @@ static int smb2_get_info_file_pipe(struct ksmbd_session *sess,
+ 	 * Windows can sometime send query file info request on
+ 	 * pipe without opening it, checking error condition here
+ 	 */
+-	id = le64_to_cpu(req->VolatileFileId);
++	id = req->VolatileFileId;
+ 	if (!ksmbd_session_rpc_method(sess, id))
+ 		return -ENOENT;
  
--	req->PersistentFileId = cpu_to_le64(persistent_fid);
--	req->VolatileFileId = cpu_to_le64(volatile_fid);
-+	req->PersistentFileId = persistent_fid;
-+	req->VolatileFileId = volatile_fid;
- 	if (query_attrs)
- 		req->Flags = SMB2_CLOSE_FLAG_POSTQUERY_ATTRIB;
- 	else
-@@ -3677,8 +3672,8 @@ SMB2_notify_init(const unsigned int xid, struct smb_rqst *rqst,
- 	if (rc)
- 		return rc;
+ 	ksmbd_debug(SMB, "FileInfoClass %u, FileId 0x%llx\n",
+-		    req->FileInfoClass, le64_to_cpu(req->VolatileFileId));
++		    req->FileInfoClass, req->VolatileFileId);
  
--	req->PersistentFileId = cpu_to_le64(persistent_fid);
--	req->VolatileFileId = cpu_to_le64(volatile_fid);
-+	req->PersistentFileId = persistent_fid;
-+	req->VolatileFileId = volatile_fid;
- 	/* See note 354 of MS-SMB2, 64K max */
- 	req->OutputBufferLength =
- 		cpu_to_le32(SMB2_MAX_BUFFER_SIZE - MAX_SMB2_HDR_SIZE);
-@@ -3951,8 +3946,8 @@ SMB2_flush_init(const unsigned int xid, struct smb_rqst *rqst,
- 	if (rc)
- 		return rc;
+ 	switch (req->FileInfoClass) {
+ 	case FILE_STANDARD_INFORMATION:
+@@ -4738,7 +4732,7 @@ static int smb2_get_info_file(struct ksmbd_work *work,
+ 	}
  
--	req->PersistentFileId = cpu_to_le64(persistent_fid);
--	req->VolatileFileId = cpu_to_le64(volatile_fid);
-+	req->PersistentFileId = persistent_fid;
-+	req->VolatileFileId = volatile_fid;
+ 	if (work->next_smb2_rcv_hdr_off) {
+-		if (!has_file_id(le64_to_cpu(req->VolatileFileId))) {
++		if (!has_file_id(req->VolatileFileId)) {
+ 			ksmbd_debug(SMB, "Compound request set FID = %llu\n",
+ 				    work->compound_fid);
+ 			id = work->compound_fid;
+@@ -4747,8 +4741,8 @@ static int smb2_get_info_file(struct ksmbd_work *work,
+ 	}
  
- 	iov[0].iov_base = (char *)req;
- 	iov[0].iov_len = total_len;
-@@ -4033,8 +4028,8 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 	shdr = &req->hdr;
- 	shdr->Id.SyncId.ProcessId = cpu_to_le32(io_parms->pid);
+ 	if (!has_file_id(id)) {
+-		id = le64_to_cpu(req->VolatileFileId);
+-		pid = le64_to_cpu(req->PersistentFileId);
++		id = req->VolatileFileId;
++		pid = req->PersistentFileId;
+ 	}
  
--	req->PersistentFileId = cpu_to_le64(io_parms->persistent_fid);
--	req->VolatileFileId = cpu_to_le64(io_parms->volatile_fid);
-+	req->PersistentFileId = io_parms->persistent_fid;
-+	req->VolatileFileId = io_parms->volatile_fid;
- 	req->ReadChannelInfoOffset = 0; /* reserved */
- 	req->ReadChannelInfoLength = 0; /* reserved */
- 	req->Channel = 0; /* reserved */
-@@ -4094,8 +4089,8 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 			 */
- 			shdr->SessionId = cpu_to_le64(0xFFFFFFFFFFFFFFFF);
- 			shdr->Id.SyncId.TreeId = cpu_to_le32(0xFFFFFFFF);
--			req->PersistentFileId = cpu_to_le64(0xFFFFFFFFFFFFFFFF);
--			req->VolatileFileId = cpu_to_le64(0xFFFFFFFFFFFFFFFF);
-+			req->PersistentFileId = (u64)-1;
-+			req->VolatileFileId = (u64)-1;
+ 	fp = ksmbd_lookup_fd_slow(work, id, pid);
+@@ -5113,7 +5107,7 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 	}
+ 
+ 	if (work->next_smb2_rcv_hdr_off) {
+-		if (!has_file_id(le64_to_cpu(req->VolatileFileId))) {
++		if (!has_file_id(req->VolatileFileId)) {
+ 			ksmbd_debug(SMB, "Compound request set FID = %llu\n",
+ 				    work->compound_fid);
+ 			id = work->compound_fid;
+@@ -5122,8 +5116,8 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 	}
+ 
+ 	if (!has_file_id(id)) {
+-		id = le64_to_cpu(req->VolatileFileId);
+-		pid = le64_to_cpu(req->PersistentFileId);
++		id = req->VolatileFileId;
++		pid = req->PersistentFileId;
+ 	}
+ 
+ 	fp = ksmbd_lookup_fd_slow(work, id, pid);
+@@ -5221,7 +5215,7 @@ static noinline int smb2_close_pipe(struct ksmbd_work *work)
+ 	struct smb2_close_req *req = smb2_get_msg(work->request_buf);
+ 	struct smb2_close_rsp *rsp = smb2_get_msg(work->response_buf);
+ 
+-	id = le64_to_cpu(req->VolatileFileId);
++	id = req->VolatileFileId;
+ 	ksmbd_session_rpc_close(work->sess, id);
+ 
+ 	rsp->StructureSize = cpu_to_le16(60);
+@@ -5280,7 +5274,7 @@ int smb2_close(struct ksmbd_work *work)
+ 	}
+ 
+ 	if (work->next_smb2_rcv_hdr_off &&
+-	    !has_file_id(le64_to_cpu(req->VolatileFileId))) {
++	    !has_file_id(req->VolatileFileId)) {
+ 		if (!has_file_id(work->compound_fid)) {
+ 			/* file already closed, return FILE_CLOSED */
+ 			ksmbd_debug(SMB, "file already closed\n");
+@@ -5299,7 +5293,7 @@ int smb2_close(struct ksmbd_work *work)
+ 			work->compound_pfid = KSMBD_NO_FID;
  		}
- 	}
- 	if (remaining_bytes > io_parms->length)
-@@ -4307,21 +4302,19 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 			cifs_stats_fail_inc(io_parms->tcon, SMB2_READ_HE);
- 			cifs_dbg(VFS, "Send error in read = %d\n", rc);
- 			trace_smb3_read_err(xid,
--					    le64_to_cpu(req->PersistentFileId),
-+					    req->PersistentFileId,
- 					    io_parms->tcon->tid, ses->Suid,
- 					    io_parms->offset, io_parms->length,
- 					    rc);
- 		} else
--			trace_smb3_read_done(xid,
--					     le64_to_cpu(req->PersistentFileId),
--					     io_parms->tcon->tid, ses->Suid,
--					     io_parms->offset, 0);
-+			trace_smb3_read_done(xid, req->PersistentFileId, io_parms->tcon->tid,
-+					     ses->Suid, io_parms->offset, 0);
- 		free_rsp_buf(resp_buftype, rsp_iov.iov_base);
- 		cifs_small_buf_release(req);
- 		return rc == -ENODATA ? 0 : rc;
- 	} else
- 		trace_smb3_read_done(xid,
--				     le64_to_cpu(req->PersistentFileId),
-+				    req->PersistentFileId,
- 				    io_parms->tcon->tid, ses->Suid,
- 				    io_parms->offset, io_parms->length);
- 
-@@ -4463,8 +4456,8 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 	shdr = (struct smb2_hdr *)req;
- 	shdr->Id.SyncId.ProcessId = cpu_to_le32(wdata->cfile->pid);
- 
--	req->PersistentFileId = cpu_to_le64(wdata->cfile->fid.persistent_fid);
--	req->VolatileFileId = cpu_to_le64(wdata->cfile->fid.volatile_fid);
-+	req->PersistentFileId = wdata->cfile->fid.persistent_fid;
-+	req->VolatileFileId = wdata->cfile->fid.volatile_fid;
- 	req->WriteChannelInfoOffset = 0;
- 	req->WriteChannelInfoLength = 0;
- 	req->Channel = 0;
-@@ -4562,7 +4555,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 
- 	if (rc) {
- 		trace_smb3_write_err(0 /* no xid */,
--				     le64_to_cpu(req->PersistentFileId),
-+				     req->PersistentFileId,
- 				     tcon->tid, tcon->ses->Suid, wdata->offset,
- 				     wdata->bytes, rc);
- 		kref_put(&wdata->refcount, release);
-@@ -4615,8 +4608,8 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- 
- 	req->hdr.Id.SyncId.ProcessId = cpu_to_le32(io_parms->pid);
- 
--	req->PersistentFileId = cpu_to_le64(io_parms->persistent_fid);
--	req->VolatileFileId = cpu_to_le64(io_parms->volatile_fid);
-+	req->PersistentFileId = io_parms->persistent_fid;
-+	req->VolatileFileId = io_parms->volatile_fid;
- 	req->WriteChannelInfoOffset = 0;
- 	req->WriteChannelInfoLength = 0;
- 	req->Channel = 0;
-@@ -4645,7 +4638,7 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- 
- 	if (rc) {
- 		trace_smb3_write_err(xid,
--				     le64_to_cpu(req->PersistentFileId),
-+				     req->PersistentFileId,
- 				     io_parms->tcon->tid,
- 				     io_parms->tcon->ses->Suid,
- 				     io_parms->offset, io_parms->length, rc);
-@@ -4654,7 +4647,7 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
  	} else {
- 		*nbytes = le32_to_cpu(rsp->DataLength);
- 		trace_smb3_write_done(xid,
--				      le64_to_cpu(req->PersistentFileId),
-+				      req->PersistentFileId,
- 				      io_parms->tcon->tid,
- 				      io_parms->tcon->ses->Suid,
- 				      io_parms->offset, *nbytes);
-diff --git a/fs/smbfs_common/smb2pdu.h b/fs/smbfs_common/smb2pdu.h
-index 38b8fc514860..6653b4be4556 100644
---- a/fs/smbfs_common/smb2pdu.h
-+++ b/fs/smbfs_common/smb2pdu.h
-@@ -608,8 +608,8 @@ struct smb2_close_req {
- 	__le16 StructureSize;	/* Must be 24 */
- 	__le16 Flags;
+-		volatile_id = le64_to_cpu(req->VolatileFileId);
++		volatile_id = req->VolatileFileId;
+ 	}
+ 	ksmbd_debug(SMB, "volatile_id = %llu\n", volatile_id);
+ 
+@@ -5988,7 +5982,7 @@ int smb2_set_info(struct ksmbd_work *work)
+ 	if (work->next_smb2_rcv_hdr_off) {
+ 		req = ksmbd_req_buf_next(work);
+ 		rsp = ksmbd_resp_buf_next(work);
+-		if (!has_file_id(le64_to_cpu(req->VolatileFileId))) {
++		if (!has_file_id(req->VolatileFileId)) {
+ 			ksmbd_debug(SMB, "Compound request set FID = %llu\n",
+ 				    work->compound_fid);
+ 			id = work->compound_fid;
+@@ -6000,8 +5994,8 @@ int smb2_set_info(struct ksmbd_work *work)
+ 	}
+ 
+ 	if (!has_file_id(id)) {
+-		id = le64_to_cpu(req->VolatileFileId);
+-		pid = le64_to_cpu(req->PersistentFileId);
++		id = req->VolatileFileId;
++		pid = req->PersistentFileId;
+ 	}
+ 
+ 	fp = ksmbd_lookup_fd_slow(work, id, pid);
+@@ -6079,7 +6073,7 @@ static noinline int smb2_read_pipe(struct ksmbd_work *work)
+ 	struct smb2_read_req *req = smb2_get_msg(work->request_buf);
+ 	struct smb2_read_rsp *rsp = smb2_get_msg(work->response_buf);
+ 
+-	id = le64_to_cpu(req->VolatileFileId);
++	id = req->VolatileFileId;
+ 
+ 	inc_rfc1001_len(work->response_buf, 16);
+ 	rpc_resp = ksmbd_rpc_read(work->sess, id);
+@@ -6215,8 +6209,7 @@ int smb2_read(struct ksmbd_work *work)
+ 			goto out;
+ 	}
+ 
+-	fp = ksmbd_lookup_fd_slow(work, le64_to_cpu(req->VolatileFileId),
+-				  le64_to_cpu(req->PersistentFileId));
++	fp = ksmbd_lookup_fd_slow(work, req->VolatileFileId, req->PersistentFileId);
+ 	if (!fp) {
+ 		err = -ENOENT;
+ 		goto out;
+@@ -6335,7 +6328,7 @@ static noinline int smb2_write_pipe(struct ksmbd_work *work)
+ 	size_t length;
+ 
+ 	length = le32_to_cpu(req->Length);
+-	id = le64_to_cpu(req->VolatileFileId);
++	id = req->VolatileFileId;
+ 
+ 	if (le16_to_cpu(req->DataOffset) ==
+ 	    offsetof(struct smb2_write_req, Buffer)) {
+@@ -6471,8 +6464,7 @@ int smb2_write(struct ksmbd_work *work)
+ 		goto out;
+ 	}
+ 
+-	fp = ksmbd_lookup_fd_slow(work, le64_to_cpu(req->VolatileFileId),
+-				  le64_to_cpu(req->PersistentFileId));
++	fp = ksmbd_lookup_fd_slow(work, req->VolatileFileId, req->PersistentFileId);
+ 	if (!fp) {
+ 		err = -ENOENT;
+ 		goto out;
+@@ -6584,12 +6576,9 @@ int smb2_flush(struct ksmbd_work *work)
+ 
+ 	WORK_BUFFERS(work, req, rsp);
+ 
+-	ksmbd_debug(SMB, "SMB2_FLUSH called for fid %llu\n",
+-		    le64_to_cpu(req->VolatileFileId));
++	ksmbd_debug(SMB, "SMB2_FLUSH called for fid %llu\n", req->VolatileFileId);
+ 
+-	err = ksmbd_vfs_fsync(work,
+-			      le64_to_cpu(req->VolatileFileId),
+-			      le64_to_cpu(req->PersistentFileId));
++	err = ksmbd_vfs_fsync(work, req->VolatileFileId, req->PersistentFileId);
+ 	if (err)
+ 		goto out;
+ 
+@@ -6804,12 +6793,9 @@ int smb2_lock(struct ksmbd_work *work)
+ 	int prior_lock = 0;
+ 
+ 	ksmbd_debug(SMB, "Received lock request\n");
+-	fp = ksmbd_lookup_fd_slow(work,
+-				  le64_to_cpu(req->VolatileFileId),
+-				  le64_to_cpu(req->PersistentFileId));
++	fp = ksmbd_lookup_fd_slow(work, req->VolatileFileId, req->PersistentFileId);
+ 	if (!fp) {
+-		ksmbd_debug(SMB, "Invalid file id for lock : %llu\n",
+-			    le64_to_cpu(req->VolatileFileId));
++		ksmbd_debug(SMB, "Invalid file id for lock : %llu\n", req->VolatileFileId);
+ 		err = -ENOENT;
+ 		goto out2;
+ 	}
+@@ -7164,8 +7150,8 @@ static int fsctl_copychunk(struct ksmbd_work *work,
+ 
+ 	ci_rsp = (struct copychunk_ioctl_rsp *)&rsp->Buffer[0];
+ 
+-	rsp->VolatileFileId = cpu_to_le64(volatile_id);
+-	rsp->PersistentFileId = cpu_to_le64(persistent_id);
++	rsp->VolatileFileId = volatile_id;
++	rsp->PersistentFileId = persistent_id;
+ 	ci_rsp->ChunksWritten =
+ 		cpu_to_le32(ksmbd_server_side_copy_max_chunk_count());
+ 	ci_rsp->ChunkBytesWritten =
+@@ -7379,8 +7365,8 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 	if (nii_rsp)
+ 		nii_rsp->Next = 0;
+ 
+-	rsp->PersistentFileId = cpu_to_le64(SMB2_NO_FID);
+-	rsp->VolatileFileId = cpu_to_le64(SMB2_NO_FID);
++	rsp->PersistentFileId = SMB2_NO_FID;
++	rsp->VolatileFileId = SMB2_NO_FID;
+ 	return nbytes;
+ }
+ 
+@@ -7547,9 +7533,7 @@ static int fsctl_request_resume_key(struct ksmbd_work *work,
+ {
+ 	struct ksmbd_file *fp;
+ 
+-	fp = ksmbd_lookup_fd_slow(work,
+-				  le64_to_cpu(req->VolatileFileId),
+-				  le64_to_cpu(req->PersistentFileId));
++	fp = ksmbd_lookup_fd_slow(work, req->VolatileFileId, req->PersistentFileId);
+ 	if (!fp)
+ 		return -ENOENT;
+ 
+@@ -7579,7 +7563,7 @@ int smb2_ioctl(struct ksmbd_work *work)
+ 	if (work->next_smb2_rcv_hdr_off) {
+ 		req = ksmbd_req_buf_next(work);
+ 		rsp = ksmbd_resp_buf_next(work);
+-		if (!has_file_id(le64_to_cpu(req->VolatileFileId))) {
++		if (!has_file_id(req->VolatileFileId)) {
+ 			ksmbd_debug(SMB, "Compound request set FID = %llu\n",
+ 				    work->compound_fid);
+ 			id = work->compound_fid;
+@@ -7590,7 +7574,7 @@ int smb2_ioctl(struct ksmbd_work *work)
+ 	}
+ 
+ 	if (!has_file_id(id))
+-		id = le64_to_cpu(req->VolatileFileId);
++		id = req->VolatileFileId;
+ 
+ 	if (req->Flags != cpu_to_le32(SMB2_0_IOCTL_IS_FSCTL)) {
+ 		rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+@@ -7656,8 +7640,8 @@ int smb2_ioctl(struct ksmbd_work *work)
+ 			goto out;
+ 
+ 		nbytes = sizeof(struct validate_negotiate_info_rsp);
+-		rsp->PersistentFileId = cpu_to_le64(SMB2_NO_FID);
+-		rsp->VolatileFileId = cpu_to_le64(SMB2_NO_FID);
++		rsp->PersistentFileId = SMB2_NO_FID;
++		rsp->VolatileFileId = SMB2_NO_FID;
+ 		break;
+ 	case FSCTL_QUERY_NETWORK_INTERFACE_INFO:
+ 		ret = fsctl_query_iface_info_ioctl(conn, rsp, out_buf_len);
+@@ -7705,8 +7689,8 @@ int smb2_ioctl(struct ksmbd_work *work)
+ 				(struct copychunk_ioctl_req *)&req->Buffer[0],
+ 				le32_to_cpu(req->CntCode),
+ 				le32_to_cpu(req->InputCount),
+-				le64_to_cpu(req->VolatileFileId),
+-				le64_to_cpu(req->PersistentFileId),
++				req->VolatileFileId,
++				req->PersistentFileId,
+ 				rsp);
+ 		break;
+ 	case FSCTL_SET_SPARSE:
+diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
+index 725b800c29c8..fd3df8b71687 100644
+--- a/fs/ksmbd/smb2pdu.h
++++ b/fs/ksmbd/smb2pdu.h
+@@ -116,8 +116,8 @@ struct create_durable_reconn_req {
+ 	union {
+ 		__u8  Reserved[16];
+ 		struct {
+-			__le64 PersistentFileId;
+-			__le64 VolatileFileId;
++			__u64 PersistentFileId;
++			__u64 VolatileFileId;
+ 		} Fid;
+ 	} Data;
+ } __packed;
+@@ -126,8 +126,8 @@ struct create_durable_reconn_v2_req {
+ 	struct create_context ccontext;
+ 	__u8   Name[8];
+ 	struct {
+-		__le64 PersistentFileId;
+-		__le64 VolatileFileId;
++		__u64 PersistentFileId;
++		__u64 VolatileFileId;
+ 	} Fid;
+ 	__u8 CreateGuid[16];
+ 	__le32 Flags;
+@@ -269,8 +269,8 @@ struct smb2_ioctl_req {
+ 	__le16 StructureSize; /* Must be 57 */
+ 	__le16 Reserved; /* offset from start of SMB2 header to write data */
+ 	__le32 CntCode;
+-	__le64  PersistentFileId;
+-	__le64  VolatileFileId;
++	__u64  PersistentFileId;
++	__u64  VolatileFileId;
+ 	__le32 InputOffset; /* Reserved MBZ */
+ 	__le32 InputCount;
+ 	__le32 MaxInputResponse;
+@@ -287,8 +287,8 @@ struct smb2_ioctl_rsp {
+ 	__le16 StructureSize; /* Must be 49 */
+ 	__le16 Reserved; /* offset from start of SMB2 header to write data */
+ 	__le32 CntCode;
+-	__le64  PersistentFileId;
+-	__le64  VolatileFileId;
++	__u64  PersistentFileId;
++	__u64  VolatileFileId;
+ 	__le32 InputOffset; /* Reserved MBZ */
+ 	__le32 InputCount;
+ 	__le32 OutputOffset;
+@@ -357,7 +357,7 @@ struct file_object_buf_type1_ioctl_rsp {
+ } __packed;
+ 
+ struct resume_key_ioctl_rsp {
+-	__le64 ResumeKey[3];
++	__u64 ResumeKey[3];
+ 	__le32 ContextLength;
+ 	__u8 Context[4]; /* ignored, Windows sets to 4 bytes of zero */
+ } __packed;
+@@ -432,8 +432,8 @@ struct smb2_lock_req {
+ 	__le16 StructureSize; /* Must be 48 */
+ 	__le16 LockCount;
  	__le32 Reserved;
--	__le64  PersistentFileId; /* opaque endianness */
--	__le64  VolatileFileId; /* opaque endianness */
-+	__u64  PersistentFileId; /* opaque endianness */
-+	__u64  VolatileFileId; /* opaque endianness */
- } __packed;
- 
- /*
-@@ -653,8 +653,8 @@ struct smb2_read_req {
- 	__u8   Flags; /* MBZ unless SMB3.02 or later */
- 	__le32 Length;
- 	__le64 Offset;
 -	__le64  PersistentFileId;
 -	__le64  VolatileFileId;
 +	__u64  PersistentFileId;
 +	__u64  VolatileFileId;
- 	__le32 MinimumCount;
- 	__le32 Channel; /* MBZ except for SMB3 or later */
- 	__le32 RemainingBytes;
-@@ -692,8 +692,8 @@ struct smb2_write_req {
- 	__le16 DataOffset; /* offset from start of SMB2 header to write data */
- 	__le32 Length;
- 	__le64 Offset;
--	__le64  PersistentFileId; /* opaque endianness */
--	__le64  VolatileFileId; /* opaque endianness */
-+	__u64  PersistentFileId; /* opaque endianness */
-+	__u64  VolatileFileId; /* opaque endianness */
- 	__le32 Channel; /* MBZ unless SMB3.02 or later */
- 	__le32 RemainingBytes;
- 	__le16 WriteChannelInfoOffset;
-@@ -722,8 +722,8 @@ struct smb2_flush_req {
- 	__le16 StructureSize;	/* Must be 24 */
- 	__le16 Reserved1;
- 	__le32 Reserved2;
+ 	/* Followed by at least one */
+ 	struct smb2_lock_element locks[1];
+ } __packed;
+@@ -468,8 +468,8 @@ struct smb2_query_directory_req {
+ 	__u8   FileInformationClass;
+ 	__u8   Flags;
+ 	__le32 FileIndex;
 -	__le64  PersistentFileId;
 -	__le64  VolatileFileId;
 +	__u64  PersistentFileId;
 +	__u64  VolatileFileId;
- } __packed;
- 
- struct smb2_flush_rsp {
-@@ -769,8 +769,8 @@ struct smb2_change_notify_req {
- 	__le16	StructureSize;
- 	__le16	Flags;
- 	__le32	OutputBufferLength;
--	__le64	PersistentFileId; /* opaque endianness */
--	__le64	VolatileFileId; /* opaque endianness */
-+	__u64	PersistentFileId; /* opaque endianness */
-+	__u64	VolatileFileId; /* opaque endianness */
- 	__le32	CompletionFilter;
- 	__u32	Reserved;
- } __packed;
-@@ -978,8 +978,8 @@ struct smb2_create_rsp {
- 	__le64 EndofFile;
- 	__le32 FileAttributes;
- 	__le32 Reserved2;
+ 	__le16 FileNameOffset;
+ 	__le16 FileNameLength;
+ 	__le32 OutputBufferLength;
+@@ -515,8 +515,8 @@ struct smb2_query_info_req {
+ 	__le32 InputBufferLength;
+ 	__le32 AdditionalInformation;
+ 	__le32 Flags;
 -	__le64  PersistentFileId;
 -	__le64  VolatileFileId;
 +	__u64  PersistentFileId;
 +	__u64  VolatileFileId;
- 	__le32 CreateContextsOffset;
- 	__le32 CreateContextsLength;
  	__u8   Buffer[1];
+ } __packed;
+ 
+@@ -537,8 +537,8 @@ struct smb2_set_info_req {
+ 	__le16 BufferOffset;
+ 	__u16  Reserved;
+ 	__le32 AdditionalInformation;
+-	__le64  PersistentFileId;
+-	__le64  VolatileFileId;
++	__u64  PersistentFileId;
++	__u64  VolatileFileId;
+ 	__u8   Buffer[1];
+ } __packed;
+ 
 -- 
 2.35.1
 
