@@ -2,74 +2,64 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4BEC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Mar 2022 22:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2899CC433FE
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Mar 2022 23:38:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237075AbiCVW3e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Mar 2022 18:29:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34652 "EHLO
+        id S240577AbiCVXkG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Mar 2022 19:40:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbiCVW3d (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Mar 2022 18:29:33 -0400
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E3048E49;
-        Tue, 22 Mar 2022 15:28:04 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id g21so20648760vsp.6;
-        Tue, 22 Mar 2022 15:28:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=HjP+WYgkuquMP9HLNm0D3kb+9NTb8P2x7yQwd4RNgpQ=;
-        b=aH3Em2Ln7Yyh931WTdExYFWl/LYNVEPDi2+0dPgdzm8nrlyrNGgYU6uiYnJHMg1OcI
-         zzlWkhTVpGKj7MKenfW0CQVLGGCqIzE08ozETz/ruaR8RdPsabJzPK1VJrxzcwzKXb8q
-         5zh1I5Ufw0j/KhViKfNfAYx2sPcQJy2Z74wX7iMFnR/TY+qayywwWnI+jmk3nU7B7RWG
-         0XCxHBZ3DfC0xrTJ0JP565aQJ8lt2TuShs8wdf8IusCQ4wQe3BzHehCq9MnXD0pEvXXx
-         viPERF716BvAe2iuwhRFFJDg0ZRC/W1fTeuFd+ROFz5C1YMnu+ntnaDd6uSWLoKRUhI1
-         EfRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=HjP+WYgkuquMP9HLNm0D3kb+9NTb8P2x7yQwd4RNgpQ=;
-        b=LfW17BYBXKpum6kTD8U0KvBR5yVoVieAh/3GC9ccrUgaHnw/74bJNIg/Fyu8hpzHxR
-         MQ17RWEhcZdo1SgrFFTSq6mxggQVzvMeWGC3QE/SLxRlG9mI1aTynwcJw3srI6cdZrbW
-         xEHiznau9dlTqNhWHpVxL9wGsdcVXUYPL+qSGrcjfaBKVFcPYx4OJfXTHPpjyxdZz2lC
-         Jt58mujCFTD5sgRr2JALDj6vrxwH+/+wAfYMkNaM8M7Gf4HCscBurT7cjwNkKsoNisk2
-         Bi1Gdg9vKfh1ZopELEJG1hB3hVkNlbwpGWOpxvYT3Yg6XmNHNjfn2tBhnjB9ytyPxDAF
-         6Rgg==
-X-Gm-Message-State: AOAM530v3cBcvL36WgzI8uvWs2rR6DE28Whh1p6m4BxFQllcqJKq6RYN
-        Svt5bJGTzP/aVByQFuIkhcGSq0+zYvtGJt3gwf0=
-X-Google-Smtp-Source: ABdhPJxavs/AEHRq5EzJNKwgi55bRPwWQ4fu9Cx2wzgWmN9Ra3rM6mqBRbogaT7+kB58XPj3D8U2s3nmDbUhuxLxmtc=
-X-Received: by 2002:a05:6102:83c:b0:324:e435:eb01 with SMTP id
- k28-20020a056102083c00b00324e435eb01mr8046903vsb.13.1647988083767; Tue, 22
- Mar 2022 15:28:03 -0700 (PDT)
+        with ESMTP id S241442AbiCVXjv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Mar 2022 19:39:51 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044B432996;
+        Tue, 22 Mar 2022 16:38:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 903A261252;
+        Tue, 22 Mar 2022 23:38:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F08B1C340F2;
+        Tue, 22 Mar 2022 23:38:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647992301;
+        bh=Rl6UbQHgIDuIZXTEr3KxFphz2xVsXFACCwsYJCc9Foc=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=RMkO1k1uRrd3MYz1fVVoo8rvu6nTTwWo663BI3cKuT52leGP+D0YnSctOwlj21wZu
+         o+oAFV22egqV5SDCINjimBkejMfAd5tZz4FE05WN65Jgumb933lMsxuxyN+9P58iuR
+         9O5/gtgSS3oM3/AnB8jDcBb7FVMeNj44bhEp6ipa5Xm13MgGv9XHEgn12f21SswIlw
+         u9oNU59NRqSG+grclBXTDtRZ8uwMxqX/baYRfLQYGgpjpPlH15jXBSwb2oEqQdJrzt
+         mJ7ThjNTXVHz9oyrZGrPnp2gYtN20Kq8MSziJnyhwGnbDmr6PSno50pbp3PY6d/DD1
+         HUN5LWQuQv0tA==
+Received: by mail-wr1-f42.google.com with SMTP id u3so2414976wrg.3;
+        Tue, 22 Mar 2022 16:38:20 -0700 (PDT)
+X-Gm-Message-State: AOAM531DmzxbkmYjBslnNSfrQa4e8zTS7i6KZ8Ur1eYXRhkgvqrrzT9x
+        aAW3oU+EsS3ZeY8/EmPKdvcKkcMV5U7ECEsx5kY=
+X-Google-Smtp-Source: ABdhPJzcg278ZxDjnI+PAPQsTD7HvxcDXuSxkbmldiXfC2g12QTbS7y7QzXW7ZoN8ScCP1YK8myMYXNVUavbho2ce9I=
+X-Received: by 2002:a5d:47a5:0:b0:203:d4fd:4653 with SMTP id
+ 5-20020a5d47a5000000b00203d4fd4653mr24623747wrb.229.1647992299262; Tue, 22
+ Mar 2022 16:38:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <f8f1f383c4533a91a6025b1db5827ed6aaab002f.1647980983.git.christophe.jaillet@wanadoo.fr>
+Received: by 2002:a05:6000:2c1:0:0:0:0 with HTTP; Tue, 22 Mar 2022 16:38:18
+ -0700 (PDT)
 In-Reply-To: <f8f1f383c4533a91a6025b1db5827ed6aaab002f.1647980983.git.christophe.jaillet@wanadoo.fr>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Wed, 23 Mar 2022 07:27:52 +0900
-Message-ID: <CANFS6bZGXA_9eMo=Wv=H6BG4kt5-mKuK8A=m-P3VqKKxamnK2w@mail.gmail.com>
+References: <f8f1f383c4533a91a6025b1db5827ed6aaab002f.1647980983.git.christophe.jaillet@wanadoo.fr>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 23 Mar 2022 08:38:18 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9uGsASkCSuKS7NW0MsME2n9Bhk8Sf=L0_uvs1qXU1wLg@mail.gmail.com>
+Message-ID: <CAKYAXd9uGsASkCSuKS7NW0MsME2n9Bhk8Sf=L0_uvs1qXU1wLg@mail.gmail.com>
 Subject: Re: [PATCH] ksmbd: Remove a redundant zeroing of memory
 To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
         Steve French <sfrench@samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org,
-        linux-cifs <linux-cifs@vger.kernel.org>
+        Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Acked-by: Hyunchul Lee <hyc.lee@gmail.com>
-
-2022=EB=85=84 3=EC=9B=94 23=EC=9D=BC (=EC=88=98) =EC=98=A4=EC=A0=84 5:29, C=
-hristophe JAILLET
-<christophe.jaillet@wanadoo.fr>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
+2022-03-23 5:29 GMT+09:00, Christophe JAILLET <christophe.jaillet@wanadoo.fr>:
 > fill_transform_hdr() already call memset(0) on its 1st argument, so there
 > is no need to clear it explicitly before calling this function.
 >
@@ -79,6 +69,9 @@ hristophe JAILLET
 > ---
 > Alternatively, fill_transform_hdr() has only one caller. So its memset()
 > could be removed instead and this kzalloc() left as is.
+I prefer this. Could you update the patch ?
+
+Thanks!
 > ---
 >  fs/ksmbd/smb2pdu.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -88,21 +81,17 @@ hristophe JAILLET
 > --- a/fs/ksmbd/smb2pdu.c
 > +++ b/fs/ksmbd/smb2pdu.c
 > @@ -8434,7 +8434,7 @@ int smb3_encrypt_resp(struct ksmbd_work *work)
->         if (ARRAY_SIZE(iov) < rq_nvec)
->                 return -ENOMEM;
+>  	if (ARRAY_SIZE(iov) < rq_nvec)
+>  		return -ENOMEM;
 >
-> -       work->tr_buf =3D kzalloc(sizeof(struct smb2_transform_hdr) + 4, G=
-FP_KERNEL);
-> +       work->tr_buf =3D kmalloc(sizeof(struct smb2_transform_hdr) + 4, G=
-FP_KERNEL);
->         if (!work->tr_buf)
->                 return rc;
+> -	work->tr_buf = kzalloc(sizeof(struct smb2_transform_hdr) + 4,
+> GFP_KERNEL);
+> +	work->tr_buf = kmalloc(sizeof(struct smb2_transform_hdr) + 4,
+> GFP_KERNEL);
+>  	if (!work->tr_buf)
+>  		return rc;
 >
 > --
 > 2.32.0
 >
-
-
---=20
-Thanks,
-Hyunchul
+>
