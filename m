@@ -2,118 +2,160 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32BB5C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Mar 2022 06:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 936B6C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Mar 2022 06:29:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236882AbiCVGJI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Mar 2022 02:09:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33394 "EHLO
+        id S236978AbiCVGao (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Mar 2022 02:30:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236972AbiCVGJD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Mar 2022 02:09:03 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7890EDFA5;
-        Mon, 21 Mar 2022 23:07:21 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id yy13so34047660ejb.2;
-        Mon, 21 Mar 2022 23:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1hm+docfkUVqEam48lSJ/XtpRGXyQocEIR0nX5W2ZtM=;
-        b=VywcMOvEZFwLhpkST2+FlCVyLxNDV0cChbksFCwU8GKcB0RIFZRTZXsWrBSl6KqT4i
-         PUZ/EeRnH/koriftEd/z89xhuf5wo4Gi68p05x221zllgBBYSPBJOIKmIXMSojLsMiId
-         o8B7fswqMyzlAUiGzX0vV4RmxVFy9NlZ3gkU0q6A1mwwXEgh0sQ6uYaPasUq32rMX12j
-         ugAmGJ9ZCyKPg+Sb496yHdkwhcf+o+vDVaAc09v423HDsALdDWOfUiN+mag7XnedL8HI
-         8HnZx5Jokft+D06Yj9NVXOvUYH5kKRYeJER9UFZZe4UNoxMwUeK7IGZX60BtL4bZxHlF
-         0mMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1hm+docfkUVqEam48lSJ/XtpRGXyQocEIR0nX5W2ZtM=;
-        b=NzdpHmFTkVUPcdnfNEFcjrTC4RyDmP1+wmJRktXTv9CitynRNCL9EloNmj5QJdaWvd
-         pFTIrPSC8xoSAqmlQ9T76+xvMx5eJkl+CAxamrGyO4EUq2tmsmMA1hXMn5LX1P6it/1N
-         jcduJbYuPzsh1aImYmx/igixd+yWu40JZefGpzPjIztdyBfHPRPqDKC9ckmPHrWnwdjO
-         H8wP5TnDJXx4KusAKRn5f/vCltRXFvmm4RVKusn1I/qmQpjg3Ft81rnTlfhsY7jYIbtO
-         zmTkceqojijpcKKtI5vt3Jq44+hN3iAhDUFtS5LXozQb+9gH6jEujY4se34edsSNYM/y
-         1pvQ==
-X-Gm-Message-State: AOAM531S+YIJcUwvol0hXt8utE5asJJ06EC67SzhRyPlBISO83Elbq1n
-        vGT2/ja+yBzHREnOZ+fURft4b3j/BSIPLqjYSjGe8qr4
-X-Google-Smtp-Source: ABdhPJyK/wsqhsSQyJvOrciSXA3uBP98YcKlsmdsB31Cxv9jYH4FgXeH3iTdG9GXePOmDPRombY3tIpaa9KFnEDxPSs=
-X-Received: by 2002:a17:907:2ce3:b0:6df:d80f:ca1 with SMTP id
- hz3-20020a1709072ce300b006dfd80f0ca1mr13595196ejc.61.1647929239809; Mon, 21
- Mar 2022 23:07:19 -0700 (PDT)
+        with ESMTP id S237189AbiCVGan (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Mar 2022 02:30:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC7FC366B1
+        for <linux-cifs@vger.kernel.org>; Mon, 21 Mar 2022 23:29:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647930553;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xMkf1+J3U2a6dnGL985X0alDThsEqdVprXCeUFSpJBg=;
+        b=hnYTucgmyykLVgu0QfxtAgTESpQoJj7QfL6JYzQKmlQbAccw2bMx6WWlvXGhyTxwWyj0g8
+        sJiqYGAR54MYgkw6hUmHiOOVYiaLKVP2X83mkTOA/Pgd0eZCYLKP9WyULQVtlTqYaom7yn
+        7DcBiC9Para4vXu6WWdTjIZWZDbCxWE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-644-9QrHuVpTPbWXqlKS_Nmwgw-1; Tue, 22 Mar 2022 02:29:11 -0400
+X-MC-Unique: 9QrHuVpTPbWXqlKS_Nmwgw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2BBFF185A7B2;
+        Tue, 22 Mar 2022 06:29:11 +0000 (UTC)
+Received: from thinkpad (vpn2-54-164.bne.redhat.com [10.64.54.164])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 32D9140D2821;
+        Tue, 22 Mar 2022 06:29:09 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH 1/2] cifs: convert the path to utf16 in smb2_query_info_compound
+Date:   Tue, 22 Mar 2022 16:29:02 +1000
+Message-Id: <20220322062903.849005-1-lsahlber@redhat.com>
 MIME-Version: 1.0
-References: <20220320135015.19794-1-xiam0nd.tong@gmail.com>
-In-Reply-To: <20220320135015.19794-1-xiam0nd.tong@gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Tue, 22 Mar 2022 11:37:08 +0530
-Message-ID: <CANT5p=qEmVtgC5gD5G3D1o+7mxLMpQawnh0DSY+dLD-Dyrw5Uw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix incorrect use of list iterator after the loop
-To:     Xiaomeng Tong <xiam0nd.tong@gmail.com>
-Cc:     Steven French <sfrench@samba.org>, sprasad@microsoft.com,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>, jakobkoschel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Mar 21, 2022 at 3:50 PM Xiaomeng Tong <xiam0nd.tong@gmail.com> wrote:
->
-> The bug is here:
-> if (!tcon) {
->         resched = true;
->         list_del_init(&ses->rlist);
->         cifs_put_smb_ses(ses);
->
-> Because the list_for_each_entry() never exits early (without any
-> break/goto/return inside the loop), the iterator 'ses' after the
-> loop will always be an pointer to a invalid struct containing the
-> HEAD (&pserver->smb_ses_list). As a result, the uses of 'ses' above
-> will lead to a invalid memory access.
->
-> The original intention should have been to walk each entry 'ses' in
-> '&tmp_ses_list', delete '&ses->rlist' and put 'ses'. So fix it with
-> a list_for_each_entry_safe().
->
-> Fixes: 3663c9045f51a ("cifs: check reconnects for channels of active tcons too")
-> Signed-off-by: Xiaomeng Tong <xiam0nd.tong@gmail.com>
-> ---
->  fs/cifs/smb2pdu.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 7e7909b1ae11..f82d6fcb5c64 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -3858,8 +3858,10 @@ void smb2_reconnect_server(struct work_struct *work)
->         tcon = kzalloc(sizeof(struct cifs_tcon), GFP_KERNEL);
->         if (!tcon) {
->                 resched = true;
-> -               list_del_init(&ses->rlist);
-> -               cifs_put_smb_ses(ses);
-> +               list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
-> +                       list_del_init(&ses->rlist);
-> +                       cifs_put_smb_ses(ses);
-> +               }
->                 goto done;
->         }
->
->
-> base-commit: 14702b3b2438e2f2d07ae93b5d695c166e5c83d1
-> --
-> 2.17.1
->
+and not in the callers.
 
-Hi Xiaomeng,
-Good catch.
-Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/smb2ops.c   | 23 ++++++++++++-----------
+ fs/cifs/smb2proto.h |  2 +-
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
-Steve, This one needs to be marked for CC stable 5.17+
-
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 891b11576e55..024adb91dd57 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1192,17 +1192,12 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+ 	       struct cifs_sb_info *cifs_sb)
+ {
+ 	int rc;
+-	__le16 *utf16_path;
+ 	struct kvec rsp_iov = {NULL, 0};
+ 	int buftype = CIFS_NO_BUFFER;
+ 	struct smb2_query_info_rsp *rsp;
+ 	struct smb2_file_full_ea_info *info = NULL;
+ 
+-	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
+-	if (!utf16_path)
+-		return -ENOMEM;
+-
+-	rc = smb2_query_info_compound(xid, tcon, utf16_path,
++	rc = smb2_query_info_compound(xid, tcon, path,
+ 				      FILE_READ_EA,
+ 				      FILE_FULL_EA_INFORMATION,
+ 				      SMB2_O_INFO_FILE,
+@@ -1235,7 +1230,6 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+ 			le32_to_cpu(rsp->OutputBufferLength), ea_name);
+ 
+  qeas_exit:
+-	kfree(utf16_path);
+ 	free_rsp_buf(buftype, rsp_iov.iov_base);
+ 	return rc;
+ }
+@@ -1295,7 +1289,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 			 * the new EA. If not we should not add it since we
+ 			 * would not be able to even read the EAs back.
+ 			 */
+-			rc = smb2_query_info_compound(xid, tcon, utf16_path,
++			rc = smb2_query_info_compound(xid, tcon, path,
+ 				      FILE_READ_EA,
+ 				      FILE_FULL_EA_INFORMATION,
+ 				      SMB2_O_INFO_FILE,
+@@ -2646,7 +2640,7 @@ smb2_set_next_command(struct cifs_tcon *tcon, struct smb_rqst *rqst)
+  */
+ int
+ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+-			 __le16 *utf16_path, u32 desired_access,
++			 const char *path, u32 desired_access,
+ 			 u32 class, u32 type, u32 output_len,
+ 			 struct kvec *rsp, int *buftype,
+ 			 struct cifs_sb_info *cifs_sb)
+@@ -2664,6 +2658,13 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_fid fid;
+ 	int rc;
++	__le16 *utf16_path;
++
++	if (!path)
++		path = "";
++	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
++	if (!utf16_path)
++		return -ENOMEM;
+ 
+ 	if (smb3_encryption_required(tcon))
+ 		flags |= CIFS_TRANSFORM_REQ;
+@@ -2729,6 +2730,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	*buftype = resp_buftype[1];
+ 
+  qic_exit:
++	kfree(utf16_path);
+ 	SMB2_open_free(&rqst[0]);
+ 	SMB2_query_info_free(&rqst[1]);
+ 	SMB2_close_free(&rqst[2]);
+@@ -2743,13 +2745,12 @@ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+ {
+ 	struct smb2_query_info_rsp *rsp;
+ 	struct smb2_fs_full_size_info *info = NULL;
+-	__le16 utf16_path = 0; /* Null - open root of share */
+ 	struct kvec rsp_iov = {NULL, 0};
+ 	int buftype = CIFS_NO_BUFFER;
+ 	int rc;
+ 
+ 
+-	rc = smb2_query_info_compound(xid, tcon, &utf16_path,
++	rc = smb2_query_info_compound(xid, tcon, "",
+ 				      FILE_READ_ATTRIBUTES,
+ 				      FS_FULL_SIZE_INFORMATION,
+ 				      SMB2_O_INFO_FILESYSTEM,
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 4a7062fd1c26..a69f1eed1cfe 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -283,7 +283,7 @@ extern int smb311_update_preauth_hash(struct cifs_ses *ses,
+ 				      struct kvec *iov, int nvec);
+ extern int smb2_query_info_compound(const unsigned int xid,
+ 				    struct cifs_tcon *tcon,
+-				    __le16 *utf16_path, u32 desired_access,
++				    const char *path, u32 desired_access,
+ 				    u32 class, u32 type, u32 output_len,
+ 				    struct kvec *rsp, int *buftype,
+ 				    struct cifs_sb_info *cifs_sb);
 -- 
-Regards,
-Shyam
+2.30.2
+
