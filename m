@@ -2,87 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB81EC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Mar 2022 17:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE94C433FE
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Mar 2022 17:29:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239489AbiCWROW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 23 Mar 2022 13:14:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43324 "EHLO
+        id S1343599AbiCWRav (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Mar 2022 13:30:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239480AbiCWROV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Mar 2022 13:14:21 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 704D67892B
-        for <linux-cifs@vger.kernel.org>; Wed, 23 Mar 2022 10:12:50 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id r22so4154108ejs.11
-        for <linux-cifs@vger.kernel.org>; Wed, 23 Mar 2022 10:12:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=ybO+7jKaWQ2q5Tv4hGub6AuE0+2NNErvZkabb1Tma7Q=;
-        b=DNm6UvN6csfjwtIFfMWp3ooSDba8acDQyPRpgiiIPln8fHEs2OGfA8XTRKqpYZQs9G
-         L8Z8M+trOaolRMGhVwCQzIXqGlYnnYmiuZxaFQ8cMiFufqqQmnYj2QBXc4d6cw4iP9rK
-         W6+r0fb362gXQ5isyy/JhsmOCPNzac1rjzlwOhtehMitA/sl0g6cUgKIQecmVeB/h8RX
-         W1fQZNzPYEUe8Gkm790nF8owPf0LZXpQN+Qk/tMqqn0u6NM0wP8Uql0pPRwpu4SVMzU8
-         /UHcQzsEUfK9BBoajlgVbIct+CUfJWcXQPmYM4rs7i1mkHMgRGurIaWBrkwcehpkEmHE
-         6fLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=ybO+7jKaWQ2q5Tv4hGub6AuE0+2NNErvZkabb1Tma7Q=;
-        b=4cj85VgDxBVekvy7NudWEkZyQF94Oy2jDO+Fq9s16oGqBqJhbozBcn0QqQP7oID+mY
-         7ZRquCaH/DmPLgAWfV8/y/Q7QBk234sW5Hj7xtqseGXn1MsEWQE3FI5SrOxUnVLZo2p/
-         4R+KfLSnOTwHPEBu1MqLbUuw1NIFm2c/dtIWANWSbbVPr5rHJ/QQ2vqLoo5tsZOF2dWo
-         RyCTnDPymxFXvg7bwLFoRBsF5BkW7CLnZdX9tTed09/M2rstWVXPEqYj+nYfXGutOsLa
-         C0zSvBP2Y0o/bF3EkuonbMZ2Sl+9daMoPm5/xzvX6WL8NH32zWTfWuqR2KeThKMloV2r
-         HzkA==
-X-Gm-Message-State: AOAM530TtFpfnMDwiGLc6pGH9lnkkJkAmJqfDElL9fJaxcVyvUu+kFIO
-        OtAmg1QmUw0paWcmCRUKfShztP7YprXY8uzMHnc=
-X-Google-Smtp-Source: ABdhPJzRArYfYhTXqNanqT44CqvVGfPL8hEFpztE6iYCg8kw5arkRVhu6JaYvF9coWDs607CA4PCVr+RQruufNKtmDc=
-X-Received: by 2002:a17:906:d1c4:b0:6d5:83bb:f58a with SMTP id
- bs4-20020a170906d1c400b006d583bbf58amr1157647ejb.672.1648055568843; Wed, 23
- Mar 2022 10:12:48 -0700 (PDT)
+        with ESMTP id S1343573AbiCWRau (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Mar 2022 13:30:50 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEB2F2AB
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Mar 2022 10:29:20 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 77BA7210F2;
+        Wed, 23 Mar 2022 17:29:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1648056559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AHzoRkdZ9DkeqlqLLClJe2hiyc9kFW7w3+leG3o3sS0=;
+        b=NIiCU+1EniCjCXMObV7y7nyZZXeLf8AlinwI/2XT6X/ShJbcYgrGTIyn/kgyJ3vp6K4ANr
+        9vEEVIKrHGd/ppxFef2hZh4EJb7Zu0PDZCbV3wY3hhsIiZDVv9C1smTfA3S0sbvrKZJYBM
+        CV9JpFGyTIVbj9G1izwmioon2N33n4U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1648056559;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AHzoRkdZ9DkeqlqLLClJe2hiyc9kFW7w3+leG3o3sS0=;
+        b=WZ4Br85JnJgZ7zjkfXbkPXRLCy8L/7a5qxWZzjQP+/ghVGS9Q8mGuods7gGIR1ndVtbwTP
+        cHfesVrbzi/z3EAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0753813302;
+        Wed, 23 Mar 2022 17:29:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id fBn1MO5YO2LxIgAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Wed, 23 Mar 2022 17:29:18 +0000
+Date:   Wed, 23 Mar 2022 14:29:13 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Tom Talpey <tom@talpey.com>
+Cc:     samba-technical@lists.samba.org, linux-cifs@vger.kernel.org,
+        smfrench@gmail.com
+Subject: Re: Signature check for LOGOFF response
+Message-ID: <20220323172913.56cr2atzfcunv5kf@cyberdelia>
+References: <20220319032012.46ezg2pxjlrsdlpq@cyberdelia>
+ <a0972fb5-38d3-5990-7c8e-0b7dd61d1abb@talpey.com>
 MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 23 Mar 2022 22:42:37 +0530
-Message-ID: <CANT5p=oU3E6v639bXKQd4ssEvWmAWEDD0qUOixcwONzJyLYgOg@mail.gmail.com>
-Subject: Regarding EKEYEXPIRED error during dns_query
-To:     David Howells <dhowells@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        Bharath SM <bharathsm.hsk@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <a0972fb5-38d3-5990-7c8e-0b7dd61d1abb@talpey.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi David,
+Hi Tom,
 
-I was recently working on validating the recent fixes in cifs.ko and
-key.dns_resolver.
-However, I've stumbled on a different issue now.
+On 03/19, Tom Talpey wrote:
+>What server is returning this unsigned response? Assuming it's Windows,
+>that is either a doc bug or (arguably) a server bug, and should be
+>reported before deciding how to address it here.
 
-The call to dns_query from cifs initially upcalls into userspace and
-key.dns_resolver seems to resolve the name to IPv4 address. This comes
-back with an expiry value of 5 sec; so the key is set a timeout of 5s.
+It's a NetApp ONTAP 9.5P13. We've identified it's also setting wrong
+signatures on READ responses with STATUS_END_OF_FILE.
 
-However, at some later point, the IPv4 address changes for this DNS
-name. The resolution in userspace happens just fine, and I get the new
-IP address. However, I can see that the dns_query call from cifs is
-not upcalling to userspace anymore. And the dns_query calls are
-returning -127 (EKEYEXPIRED).
+Our tests against Windows Server 2019 showed it to behave ok, so it
+looks like something on NetApp side.
 
-I also tried to "keyctl describe KEY", and it also says "Key has expired".
+Thanks anyway.
 
-1. How can I debug this further?
-2. Is this a known issue? If so, what's the issue?
-3. I see that afs.ko calls dns_query with invalidate passed in as
-true. What was the reason for not using the dns cache in the kernel
-keyring? Was it once used and later changed? If so, can you please
-explain why? cifs.ko does not set invalidate=true during dns_query
-calls today. I'd like to understand if there are any risks associated
-with this?
 
--- 
-Regards,
-Shyam
+Enzo
