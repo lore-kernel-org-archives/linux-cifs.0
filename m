@@ -2,134 +2,71 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF2FC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Mar 2022 04:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31815C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Mar 2022 06:32:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241773AbiCWEWD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 23 Mar 2022 00:22:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50080 "EHLO
+        id S241973AbiCWGdk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Mar 2022 02:33:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbiCWEWC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Mar 2022 00:22:02 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFC8470870;
-        Tue, 22 Mar 2022 21:20:33 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id w7so701405lfd.6;
-        Tue, 22 Mar 2022 21:20:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pc/hvVo0/6NKpglRsU7c5DEB6PgMyaUIQfdPH5do0+I=;
-        b=B8/vZ43epAmy3zm8teeKI/qHOROvXFw2pqqi7vPAPsEBeqdMz8Pt+h2wZ75zku3TYT
-         WbFHYje2B7Eya5XOrU0sGzEfJjtzxRE93umNgv0tFao6nRnN/QmNlr5CwVxFsI93yrko
-         Tpmsc2fYdj/G7lzLS+knpFvtAmnbzsj+rXPPPleQHeB5Pa3NzRK0le7btPS3JN/L+pZw
-         IOSWaV0xPtckwXx7Uy0KFi2gzLl5BdtQGDcuUwWzJzvnS/byEQ1G1I1gaNI6gGDZQfhe
-         S6slYlZOiCR/YWzOPr6PtjElWmwZTS/9TPCEJswqoTSI7biWZ6b0VX8poP9b2E5q/tY4
-         xQMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pc/hvVo0/6NKpglRsU7c5DEB6PgMyaUIQfdPH5do0+I=;
-        b=CwL6vMt4k1eBANIpumMOIhKspY49mT2f1bjjJE3QBim+jrLAbYKLcqih4gwPqb6sWz
-         kD5GZV/sxd4ML0FhqcfHnyE+NnsfQpI/Yso/57pXI0L5xwJTcMHPZCogZymTpOEB1yuh
-         I3I5tWnNVH54dkJiWAWl5dvAhD8VJJkjcZV4ZQbFfKlADm50g/Z296viatEmgZL/nF/0
-         zFll4jE8/2wafDZLrFyFegh1ilZGQiizE2a35hHYWbwEBQ6MFKvrMNGjbmfsAOQU//JC
-         3YCStg4r+iJZiB1dSufxaeYTS6QLzv0BsswTPAkAM2hEH/rNnVZ+5nj4PLKHx0Y0JMhg
-         AtoQ==
-X-Gm-Message-State: AOAM532wSEqb1MHbasdLodBGxYjNn0IgBx7x+jpL833TJ9NLjoDaXKDC
-        pNRD/beV9NPDFMcSMzoY4WKihT619y4V+fI+U/k=
-X-Google-Smtp-Source: ABdhPJwYUD5lEyXExITlf9Ho8r5Y0Xi7y7bkZfLHtNb1ieORDpPSd1WYv2KM4NKaeou5qsHbZLInXFMrkn3nqTaCftY=
-X-Received: by 2002:a05:6512:b19:b0:446:f1c6:81bd with SMTP id
- w25-20020a0565120b1900b00446f1c681bdmr20966035lfu.320.1648009232002; Tue, 22
- Mar 2022 21:20:32 -0700 (PDT)
+        with ESMTP id S241971AbiCWGdk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Mar 2022 02:33:40 -0400
+Received: from smtp.smtpout.orange.fr (smtp04.smtpout.orange.fr [80.12.242.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 891C671A02
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Mar 2022 23:32:10 -0700 (PDT)
+Received: from pop-os.home ([90.126.236.122])
+        by smtp.orange.fr with ESMTPA
+        id WuXPnSkMs9VRxWuXPnBGAk; Wed, 23 Mar 2022 07:32:08 +0100
+X-ME-Helo: pop-os.home
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Wed, 23 Mar 2022 07:32:08 +0100
+X-ME-IP: 90.126.236.122
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH v2] ksmbd: Remove a redundant zeroing of memory
+Date:   Wed, 23 Mar 2022 07:32:05 +0100
+Message-Id: <577b4601aa5d62d222fa9387c5036f2504f40318.1648017112.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-References: <20220320135015.19794-1-xiam0nd.tong@gmail.com> <CANT5p=qEmVtgC5gD5G3D1o+7mxLMpQawnh0DSY+dLD-Dyrw5Uw@mail.gmail.com>
-In-Reply-To: <CANT5p=qEmVtgC5gD5G3D1o+7mxLMpQawnh0DSY+dLD-Dyrw5Uw@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 22 Mar 2022 23:20:21 -0500
-Message-ID: <CAH2r5mu-Ci=HL+BkeEYVkW8Qc9jCW7ma7a_yK4-70MgoJgJkhA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix incorrect use of list iterator after the loop
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Xiaomeng Tong <xiam0nd.tong@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Steven French <sfrench@samba.org>, jakobkoschel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending additional testing
+fill_transform_hdr() has only one caller that already clears tr_buf (it is
+kzalloc'ed).
 
-Also added cc:stable 5.17
+So there is no need to clear it another time here.
 
-On Tue, Mar 22, 2022 at 1:09 AM Shyam Prasad N via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> On Mon, Mar 21, 2022 at 3:50 PM Xiaomeng Tong <xiam0nd.tong@gmail.com> wrote:
-> >
-> > The bug is here:
-> > if (!tcon) {
-> >         resched = true;
-> >         list_del_init(&ses->rlist);
-> >         cifs_put_smb_ses(ses);
-> >
-> > Because the list_for_each_entry() never exits early (without any
-> > break/goto/return inside the loop), the iterator 'ses' after the
-> > loop will always be an pointer to a invalid struct containing the
-> > HEAD (&pserver->smb_ses_list). As a result, the uses of 'ses' above
-> > will lead to a invalid memory access.
-> >
-> > The original intention should have been to walk each entry 'ses' in
-> > '&tmp_ses_list', delete '&ses->rlist' and put 'ses'. So fix it with
-> > a list_for_each_entry_safe().
-> >
-> > Fixes: 3663c9045f51a ("cifs: check reconnects for channels of active tcons too")
-> > Signed-off-by: Xiaomeng Tong <xiam0nd.tong@gmail.com>
-> > ---
-> >  fs/cifs/smb2pdu.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> > index 7e7909b1ae11..f82d6fcb5c64 100644
-> > --- a/fs/cifs/smb2pdu.c
-> > +++ b/fs/cifs/smb2pdu.c
-> > @@ -3858,8 +3858,10 @@ void smb2_reconnect_server(struct work_struct *work)
-> >         tcon = kzalloc(sizeof(struct cifs_tcon), GFP_KERNEL);
-> >         if (!tcon) {
-> >                 resched = true;
-> > -               list_del_init(&ses->rlist);
-> > -               cifs_put_smb_ses(ses);
-> > +               list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
-> > +                       list_del_init(&ses->rlist);
-> > +                       cifs_put_smb_ses(ses);
-> > +               }
-> >                 goto done;
-> >         }
-> >
-> >
-> > base-commit: 14702b3b2438e2f2d07ae93b5d695c166e5c83d1
-> > --
-> > 2.17.1
-> >
->
-> Hi Xiaomeng,
-> Good catch.
-> Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
->
-> Steve, This one needs to be marked for CC stable 5.17+
->
-> --
-> Regards,
-> Shyam
->
+Remove the superfluous memset() and add a comment to remind that the caller
+must clear the buffer.
 
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+v2: keep kzalloc in the caller and remove the memset here
+---
+ fs/ksmbd/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index bcb98109bac9..bcd1bb7e2856 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -8410,7 +8410,7 @@ static void fill_transform_hdr(void *tr_buf, char *old_buf, __le16 cipher_type)
+ 	struct smb2_hdr *hdr = smb2_get_msg(old_buf);
+ 	unsigned int orig_len = get_rfc1002_len(old_buf);
+ 
+-	memset(tr_buf, 0, sizeof(struct smb2_transform_hdr) + 4);
++	/* tr_buf must be cleared by the caller */
+ 	tr_hdr->ProtocolId = SMB2_TRANSFORM_PROTO_NUM;
+ 	tr_hdr->OriginalMessageSize = cpu_to_le32(orig_len);
+ 	tr_hdr->Flags = cpu_to_le16(TRANSFORM_FLAG_ENCRYPTED);
 -- 
-Thanks,
+2.32.0
 
-Steve
