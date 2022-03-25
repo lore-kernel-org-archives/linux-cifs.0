@@ -2,84 +2,175 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B45C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Mar 2022 05:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D60C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Mar 2022 06:58:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345780AbiCYFtv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Mar 2022 01:49:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52912 "EHLO
+        id S1354326AbiCYHAB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Mar 2022 03:00:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbiCYFtt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Mar 2022 01:49:49 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BD83115F
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Mar 2022 22:48:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 531C2B827D9
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Mar 2022 05:48:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2A2DC340EE
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Mar 2022 05:48:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648187291;
-        bh=q8Sm+cIiQRf2Va0NH64WDs9kj+p2mjlFAIMs+HkYNT0=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=jbnYSDjIfbc4Dzn/LqXh8uAQL9DZaW3nMB7IMSQ/Omp1WeCUof/m88HZ39ySkgKCV
-         bH6RXwluWUwqwRuZMO2fJnKm2OpHjge4XplL1u0SYJWuDRY0NtvQLqMnLhw6//l5f9
-         F+0VBSlwoZbidk8QBeJPKRHB7NvIA7uAioyekmYdtFeK66YXncFFreiwlLaZsSjiWw
-         KA/4GDdfxGHqazXHIHmr0GraeR/sWdNdvhw6ugnlwHR5uUTj86vVjT8hawponygJR8
-         +uVG1Drhwd8ZsLxT0wUqWQ+TAXNHGFp6HajlBhocNit8t85uPudv402ryY2OG4yNr1
-         +j/LKhRHPq9+Q==
-Received: by mail-wr1-f42.google.com with SMTP id w21so4844922wra.2
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Mar 2022 22:48:10 -0700 (PDT)
-X-Gm-Message-State: AOAM531XURKT26xbB0/eIaCYWDDZsTljTkrvqDwEdCPENUp3JreHrWhQ
-        xnOZdIpuY+5jClP54tARq3xQJhwuro7mkVTAbmk=
-X-Google-Smtp-Source: ABdhPJyEjJsJ0mCDsNkyKEEAPtLI+GIqW5cYMh+Z1MIzkobGeGpzjlOFIK94T6/9P8AJrdJyDQ7DG+LDyF40vXFMpUA=
-X-Received: by 2002:a05:6000:1184:b0:203:ff46:1d72 with SMTP id
- g4-20020a056000118400b00203ff461d72mr7599147wrx.165.1648187289236; Thu, 24
- Mar 2022 22:48:09 -0700 (PDT)
+        with ESMTP id S234014AbiCYHAA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Mar 2022 03:00:00 -0400
+Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3CE535DED;
+        Thu, 24 Mar 2022 23:58:25 -0700 (PDT)
+Received: by mail-vk1-xa34.google.com with SMTP id w189so3755972vke.10;
+        Thu, 24 Mar 2022 23:58:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=bZQjBiTCWibkRDP7e4BTH2l7xdqhYCGD2WZveNtlQNY=;
+        b=qNO1EB3ivsl79XhRFIYQFVbfyN/Gc9nWCh3/WvbAdUtfCY9pxrPkjKGrZLec5wXd8e
+         AB9ycniZgHSF+sfW2BFLR8847waNpRCgKia2kqXx0DKQCdpWbrcchMShM5yBGWdyjLw0
+         zhBIcKxfNcU5JpxG/OFXGB+2yrGK2BQIs7DYqWCOzzDdC7CPIsw5ArXX861JQo6QRyVT
+         PejoSgM02fSUg4CA/gTQGq6xm/kdPyJp7CyVkc5MoloR05WRQkGqJ21ykwh0ck4nQa+n
+         mCqrRw908pMbGtT5cbIQO+o5RItxHGxmvwvIGCxjRqQcfvfXlUttMtrgz9P46UPoplKw
+         gRAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bZQjBiTCWibkRDP7e4BTH2l7xdqhYCGD2WZveNtlQNY=;
+        b=TusMgOC/XC/BUC76rXptUD+J1RyZxyFuBRsyRgPsrqWwfyjoJ5e4+76meWvQ3U0Mp+
+         4uvSzUpqLyYy0YMwmA1BXEZoErlg6Px52GVgKzQXd2+lz3iCryrN+UPN9c8JUGulqJpq
+         1kWOS0Iw6aklBCwHcJtXaVUiP7dn2VOZKjDQPKbvYke3OP/fXtFrfs1faabfl0p3rxKm
+         nJYphy9CDA2xPFQ8wIdkxfFvNKEayyqdCAd0i24HhRAYVCOWhlS6woS9rA7zKGZlHpxf
+         I2+GLrdoRElkKpxaZk5/Hsbn9Y4y8Al0kkbIRk+GXosJbXMzH92vOJZXzXWxp/ZOyV/W
+         +gbA==
+X-Gm-Message-State: AOAM530UkfEf9BxZ7YU6q8tHjuTR059KEEfyuk8nBan0d57Jd796X/n4
+        hb5QUMPNrFejResuxJ4LPS4WeWdZ+rX4jumUoo1q+kvqssc=
+X-Google-Smtp-Source: ABdhPJxMtjRqxgyytDOkIzCPeFWfNw6IFKXnJmecl8iaw6rO8VmfvUP268d+qLGxOyDDChQeggSRaiDld12/O67kuTA=
+X-Received: by 2002:a05:6122:1311:b0:338:39b4:2cf5 with SMTP id
+ e17-20020a056122131100b0033839b42cf5mr4441424vkp.9.1648191504736; Thu, 24 Mar
+ 2022 23:58:24 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a05:6000:2c1:0:0:0:0 with HTTP; Thu, 24 Mar 2022 22:48:08
- -0700 (PDT)
-In-Reply-To: <CAH2r5msDEuUecVkm-Wikp19mbK7hyix0oRn+HJMOvKNsEhkDwQ@mail.gmail.com>
-References: <CAH2r5msDEuUecVkm-Wikp19mbK7hyix0oRn+HJMOvKNsEhkDwQ@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 25 Mar 2022 14:48:08 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-wnuG+2wfqQD3SZ97=pabb2ZDcy3rn6yWku1OG1TYW0w@mail.gmail.com>
-Message-ID: <CAKYAXd-wnuG+2wfqQD3SZ97=pabb2ZDcy3rn6yWku1OG1TYW0w@mail.gmail.com>
-Subject: Re: [PATCH][smbfs_common] move various duplicated protocol header
- structures to smbfs_common
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Hyeoncheol Lee <hyc.lee@gmail.com>
+References: <20220324071301.60228-1-jakobkoschel@gmail.com>
+In-Reply-To: <20220324071301.60228-1-jakobkoschel@gmail.com>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Fri, 25 Mar 2022 15:58:13 +0900
+Message-ID: <CANFS6banUM8ycVyjTz2rHQCbNFttX6HkDHo-2eEwAei9XEu1XQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: replace usage of found with dedicated list
+ iterator variable
+To:     Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <sfrench@samba.org>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-03-25 12:16 GMT+09:00, Steve French <smfrench@gmail.com>:
->     We have duplicated definitions for various SMB3 PDUs in
->     fs/ksmbd/smb2pdu.h and fs/cifs/smbpdu.h.  Some had already
->     been moved to fs/smbfs_common/smb2pdu.h but there are more
->     to move.
->
->     Move SMB3 definitions for
->     - error response
->     - query info request and response and various related protocol flags
->     - various lease handling flags and the create lease context
->
->     to smbfs_common/smb2pdu.h to reduce code duplication
->
-> (see attached patch)
-Looks good to me!
+Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
 
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+2022=EB=85=84 3=EC=9B=94 24=EC=9D=BC (=EB=AA=A9) =EC=98=A4=ED=9B=84 4:13, J=
+akob Koschel <jakobkoschel@gmail.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
 
-Thanks!
 >
+> To move the list iterator variable into the list_for_each_entry_*()
+> macro in the future it should be avoided to use the list iterator
+> variable after the loop body.
+>
+> To *never* use the list iterator variable after the loop it was
+> concluded to use a separate iterator variable instead of a
+> found boolean [1].
+>
+> This removes the need to use a found variable and simply checking if
+> the variable was set, can determine if the break/goto was hit.
+>
+> Link: https://lore.kernel.org/all/CAHk-=3DwgRr_D8CB-D9Kg-c=3DEHreAsk5SqXP=
+wr9Y7k9sA6cWXJ6w@mail.gmail.com/
+> Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
+> ---
+>  fs/ksmbd/smb2pdu.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+>
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index 67e8e28e3fc3..be9606b9a944 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -6618,8 +6618,7 @@ int smb2_cancel(struct ksmbd_work *work)
+>         struct ksmbd_conn *conn =3D work->conn;
+>         struct smb2_hdr *hdr =3D smb2_get_msg(work->request_buf);
+>         struct smb2_hdr *chdr;
+> -       struct ksmbd_work *cancel_work =3D NULL;
+> -       int canceled =3D 0;
+> +       struct ksmbd_work *cancel_work =3D NULL, *iter;
+>         struct list_head *command_list;
+>
+>         ksmbd_debug(SMB, "smb2 cancel called on mid %llu, async flags 0x%=
+x\n",
+> @@ -6629,11 +6628,11 @@ int smb2_cancel(struct ksmbd_work *work)
+>                 command_list =3D &conn->async_requests;
+>
+>                 spin_lock(&conn->request_lock);
+> -               list_for_each_entry(cancel_work, command_list,
+> +               list_for_each_entry(iter, command_list,
+>                                     async_request_entry) {
+> -                       chdr =3D smb2_get_msg(cancel_work->request_buf);
+> +                       chdr =3D smb2_get_msg(iter->request_buf);
+>
+> -                       if (cancel_work->async_id !=3D
+> +                       if (iter->async_id !=3D
+>                             le64_to_cpu(hdr->Id.AsyncId))
+>                                 continue;
+>
+> @@ -6641,7 +6640,7 @@ int smb2_cancel(struct ksmbd_work *work)
+>                                     "smb2 with AsyncId %llu cancelled com=
+mand =3D 0x%x\n",
+>                                     le64_to_cpu(hdr->Id.AsyncId),
+>                                     le16_to_cpu(chdr->Command));
+> -                       canceled =3D 1;
+> +                       cancel_work =3D iter;
+>                         break;
+>                 }
+>                 spin_unlock(&conn->request_lock);
+> @@ -6649,24 +6648,24 @@ int smb2_cancel(struct ksmbd_work *work)
+>                 command_list =3D &conn->requests;
+>
+>                 spin_lock(&conn->request_lock);
+> -               list_for_each_entry(cancel_work, command_list, request_en=
+try) {
+> -                       chdr =3D smb2_get_msg(cancel_work->request_buf);
+> +               list_for_each_entry(iter, command_list, request_entry) {
+> +                       chdr =3D smb2_get_msg(iter->request_buf);
+>
+>                         if (chdr->MessageId !=3D hdr->MessageId ||
+> -                           cancel_work =3D=3D work)
+> +                           iter =3D=3D work)
+>                                 continue;
+>
+>                         ksmbd_debug(SMB,
+>                                     "smb2 with mid %llu cancelled command=
+ =3D 0x%x\n",
+>                                     le64_to_cpu(hdr->MessageId),
+>                                     le16_to_cpu(chdr->Command));
+> -                       canceled =3D 1;
+> +                       cancel_work =3D iter;
+>                         break;
+>                 }
+>                 spin_unlock(&conn->request_lock);
+>         }
+>
+> -       if (canceled) {
+> +       if (cancel_work) {
+>                 cancel_work->state =3D KSMBD_WORK_CANCELLED;
+>                 if (cancel_work->cancel_fn)
+>                         cancel_work->cancel_fn(cancel_work->cancel_argv);
+>
+> base-commit: f443e374ae131c168a065ea1748feac6b2e76613
 > --
-> Thanks,
+> 2.25.1
 >
-> Steve
->
+
+
+--
+Thanks,
+Hyunchul
