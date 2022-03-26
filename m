@@ -2,175 +2,149 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D60C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Mar 2022 06:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D0CC433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 26 Mar 2022 00:36:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354326AbiCYHAB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Mar 2022 03:00:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55604 "EHLO
+        id S229832AbiCZAhu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Mar 2022 20:37:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234014AbiCYHAA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Mar 2022 03:00:00 -0400
-Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3CE535DED;
-        Thu, 24 Mar 2022 23:58:25 -0700 (PDT)
-Received: by mail-vk1-xa34.google.com with SMTP id w189so3755972vke.10;
-        Thu, 24 Mar 2022 23:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=bZQjBiTCWibkRDP7e4BTH2l7xdqhYCGD2WZveNtlQNY=;
-        b=qNO1EB3ivsl79XhRFIYQFVbfyN/Gc9nWCh3/WvbAdUtfCY9pxrPkjKGrZLec5wXd8e
-         AB9ycniZgHSF+sfW2BFLR8847waNpRCgKia2kqXx0DKQCdpWbrcchMShM5yBGWdyjLw0
-         zhBIcKxfNcU5JpxG/OFXGB+2yrGK2BQIs7DYqWCOzzDdC7CPIsw5ArXX861JQo6QRyVT
-         PejoSgM02fSUg4CA/gTQGq6xm/kdPyJp7CyVkc5MoloR05WRQkGqJ21ykwh0ck4nQa+n
-         mCqrRw908pMbGtT5cbIQO+o5RItxHGxmvwvIGCxjRqQcfvfXlUttMtrgz9P46UPoplKw
-         gRAA==
+        with ESMTP id S229823AbiCZAht (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Mar 2022 20:37:49 -0400
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B363124059B
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Mar 2022 17:36:14 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id g3so9902993plo.6
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Mar 2022 17:36:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=bZQjBiTCWibkRDP7e4BTH2l7xdqhYCGD2WZveNtlQNY=;
-        b=TusMgOC/XC/BUC76rXptUD+J1RyZxyFuBRsyRgPsrqWwfyjoJ5e4+76meWvQ3U0Mp+
-         4uvSzUpqLyYy0YMwmA1BXEZoErlg6Px52GVgKzQXd2+lz3iCryrN+UPN9c8JUGulqJpq
-         1kWOS0Iw6aklBCwHcJtXaVUiP7dn2VOZKjDQPKbvYke3OP/fXtFrfs1faabfl0p3rxKm
-         nJYphy9CDA2xPFQ8wIdkxfFvNKEayyqdCAd0i24HhRAYVCOWhlS6woS9rA7zKGZlHpxf
-         I2+GLrdoRElkKpxaZk5/Hsbn9Y4y8Al0kkbIRk+GXosJbXMzH92vOJZXzXWxp/ZOyV/W
-         +gbA==
-X-Gm-Message-State: AOAM530UkfEf9BxZ7YU6q8tHjuTR059KEEfyuk8nBan0d57Jd796X/n4
-        hb5QUMPNrFejResuxJ4LPS4WeWdZ+rX4jumUoo1q+kvqssc=
-X-Google-Smtp-Source: ABdhPJxMtjRqxgyytDOkIzCPeFWfNw6IFKXnJmecl8iaw6rO8VmfvUP268d+qLGxOyDDChQeggSRaiDld12/O67kuTA=
-X-Received: by 2002:a05:6122:1311:b0:338:39b4:2cf5 with SMTP id
- e17-20020a056122131100b0033839b42cf5mr4441424vkp.9.1648191504736; Thu, 24 Mar
- 2022 23:58:24 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QRCYkz5YrdDXSuXYTfd/gIieEY3mYZp96ooO/tNqClg=;
+        b=vky/ZpWFMhMDioUquwMjscv3oQyNXKNkBLoqtFDq6lKBkei4DNCP1EYYeVbiWBGviQ
+         CF1FicnTjXu/PV09StdNDf5MAbgl5EHHihvckb3jV4x2mwn8ahtNL7/8QYbvOk2dohKS
+         eV0mI/+r5LayN3SZoMgwWOfSUkdz2RUgfw76V8AyYZdW7cEtOUZ0JmTK8UL8SXpJeWWG
+         NpKO0klgZqPAzavFfl6I5OiVToVhCircGB0870jzu6jru1AvJoObvCjkAZnR8NzBUb1s
+         7hH1PEuWahuRk3bfPXZcZ3E8bN+lqjDd05nv8XHZwW54s4CN9FLWIZ90+MtrKAKiSAIc
+         MrLA==
+X-Gm-Message-State: AOAM533MMLWWHWPEFZQ3fNsqsY7k2tjBgwz0rlr20orR8oqmN9ddW0ZX
+        v6YUopVLUxejeWhwiWq212Tsndeuztk=
+X-Google-Smtp-Source: ABdhPJwLG37x6XWcfhkX5UYyKTVeaGtNKkLp50uVd2sSNa92qyuMt7/8Utcwllub4L9Y5PCm/5Bt8w==
+X-Received: by 2002:a17:90b:4c44:b0:1c7:109c:b419 with SMTP id np4-20020a17090b4c4400b001c7109cb419mr15672436pjb.113.1648254973842;
+        Fri, 25 Mar 2022 17:36:13 -0700 (PDT)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id y16-20020a637d10000000b00381268f2c6fsm6574866pgc.4.2022.03.25.17.36.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Mar 2022 17:36:13 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     "Leonidas P. Papadakos" <papadakospan@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH 1/2] ksmbd-tools: add .gitignore
+Date:   Sat, 26 Mar 2022 09:35:58 +0900
+Message-Id: <20220326003559.5608-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220324071301.60228-1-jakobkoschel@gmail.com>
-In-Reply-To: <20220324071301.60228-1-jakobkoschel@gmail.com>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Fri, 25 Mar 2022 15:58:13 +0900
-Message-ID: <CANFS6banUM8ycVyjTz2rHQCbNFttX6HkDHo-2eEwAei9XEu1XQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: replace usage of found with dedicated list
- iterator variable
-To:     Jakob Koschel <jakobkoschel@gmail.com>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        "Bos, H.J." <h.j.bos@vu.nl>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
+From: "Leonidas P. Papadakos" <papadakospan@gmail.com>
 
-2022=EB=85=84 3=EC=9B=94 24=EC=9D=BC (=EB=AA=A9) =EC=98=A4=ED=9B=84 4:13, J=
-akob Koschel <jakobkoschel@gmail.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+Signed-off-by: Leonidas P. Papadakos <papadakospan@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ .gitignore | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
+ create mode 100644 .gitignore
 
->
-> To move the list iterator variable into the list_for_each_entry_*()
-> macro in the future it should be avoided to use the list iterator
-> variable after the loop body.
->
-> To *never* use the list iterator variable after the loop it was
-> concluded to use a separate iterator variable instead of a
-> found boolean [1].
->
-> This removes the need to use a found variable and simply checking if
-> the variable was set, can determine if the break/goto was hit.
->
-> Link: https://lore.kernel.org/all/CAHk-=3DwgRr_D8CB-D9Kg-c=3DEHreAsk5SqXP=
-wr9Y7k9sA6cWXJ6w@mail.gmail.com/
-> Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
-> ---
->  fs/ksmbd/smb2pdu.c | 21 ++++++++++-----------
->  1 file changed, 10 insertions(+), 11 deletions(-)
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index 67e8e28e3fc3..be9606b9a944 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -6618,8 +6618,7 @@ int smb2_cancel(struct ksmbd_work *work)
->         struct ksmbd_conn *conn =3D work->conn;
->         struct smb2_hdr *hdr =3D smb2_get_msg(work->request_buf);
->         struct smb2_hdr *chdr;
-> -       struct ksmbd_work *cancel_work =3D NULL;
-> -       int canceled =3D 0;
-> +       struct ksmbd_work *cancel_work =3D NULL, *iter;
->         struct list_head *command_list;
->
->         ksmbd_debug(SMB, "smb2 cancel called on mid %llu, async flags 0x%=
-x\n",
-> @@ -6629,11 +6628,11 @@ int smb2_cancel(struct ksmbd_work *work)
->                 command_list =3D &conn->async_requests;
->
->                 spin_lock(&conn->request_lock);
-> -               list_for_each_entry(cancel_work, command_list,
-> +               list_for_each_entry(iter, command_list,
->                                     async_request_entry) {
-> -                       chdr =3D smb2_get_msg(cancel_work->request_buf);
-> +                       chdr =3D smb2_get_msg(iter->request_buf);
->
-> -                       if (cancel_work->async_id !=3D
-> +                       if (iter->async_id !=3D
->                             le64_to_cpu(hdr->Id.AsyncId))
->                                 continue;
->
-> @@ -6641,7 +6640,7 @@ int smb2_cancel(struct ksmbd_work *work)
->                                     "smb2 with AsyncId %llu cancelled com=
-mand =3D 0x%x\n",
->                                     le64_to_cpu(hdr->Id.AsyncId),
->                                     le16_to_cpu(chdr->Command));
-> -                       canceled =3D 1;
-> +                       cancel_work =3D iter;
->                         break;
->                 }
->                 spin_unlock(&conn->request_lock);
-> @@ -6649,24 +6648,24 @@ int smb2_cancel(struct ksmbd_work *work)
->                 command_list =3D &conn->requests;
->
->                 spin_lock(&conn->request_lock);
-> -               list_for_each_entry(cancel_work, command_list, request_en=
-try) {
-> -                       chdr =3D smb2_get_msg(cancel_work->request_buf);
-> +               list_for_each_entry(iter, command_list, request_entry) {
-> +                       chdr =3D smb2_get_msg(iter->request_buf);
->
->                         if (chdr->MessageId !=3D hdr->MessageId ||
-> -                           cancel_work =3D=3D work)
-> +                           iter =3D=3D work)
->                                 continue;
->
->                         ksmbd_debug(SMB,
->                                     "smb2 with mid %llu cancelled command=
- =3D 0x%x\n",
->                                     le64_to_cpu(hdr->MessageId),
->                                     le16_to_cpu(chdr->Command));
-> -                       canceled =3D 1;
-> +                       cancel_work =3D iter;
->                         break;
->                 }
->                 spin_unlock(&conn->request_lock);
->         }
->
-> -       if (canceled) {
-> +       if (cancel_work) {
->                 cancel_work->state =3D KSMBD_WORK_CANCELLED;
->                 if (cancel_work->cancel_fn)
->                         cancel_work->cancel_fn(cancel_work->cancel_argv);
->
-> base-commit: f443e374ae131c168a065ea1748feac6b2e76613
-> --
-> 2.25.1
->
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..44f1d29
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,80 @@
++# automake
++
++Makefile.in
++/ar-lib
++/mdate-sh
++/py-compile
++/test-driver
++/ylwrap
++.deps/
++.dirstamp
++
++# autoconf
++
++autom4te.cache
++build-aux
++/autoscan.log
++/autoscan-*.log
++/aclocal.m4
++/compile
++/config.cache
++/config.guess
++/config.h.in
++/config.h
++/config.log
++/config.status
++/config.sub
++/configure
++/configure.scan
++/depcomp
++/install-sh
++/missing
++/stamp-h1
++
++# libtool
++
++/libtool
++/ltmain.sh
++
++# texinfo
++
++/texinfo.tex
++
++# m4
++
++m4/libtool.m4
++m4/ltoptions.m4
++m4/ltsugar.m4
++m4/ltversion.m4
++m4/lt~obsolete.m4
++
++# Generated by autotools
++Makefile
++
++# Prerequisites
++*.d
++
++# Object files
++*.o
++*.ko
++*.obj
++*.elf
++
++# Linker output
++*.ilk
++*.map
++*.exp
++
++# Precompiled Headers
++*.gch
++*.pch
++
++# Libraries
++*.lib
++*.a
++*.la
++*.lo
++
++# Executables
++ksmbd.*
++ksmbdctl
+-- 
+2.25.1
 
-
---
-Thanks,
-Hyunchul
