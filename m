@@ -2,119 +2,115 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F45C43217
-	for <linux-cifs@archiver.kernel.org>; Mon, 28 Mar 2022 19:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10649C433FE
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Mar 2022 22:12:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344058AbiC1Tuk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 28 Mar 2022 15:50:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50400 "EHLO
+        id S229701AbiC1WOA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 28 Mar 2022 18:14:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343927AbiC1Trv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Mar 2022 15:47:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B09B694AF;
-        Mon, 28 Mar 2022 12:43:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4D83F612B4;
-        Mon, 28 Mar 2022 19:43:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFECEC36AE3;
-        Mon, 28 Mar 2022 19:43:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648496600;
-        bh=LZjNhn3D34oGf+si0xSo0xnRlHAG8AJ4KOgRDUwCSYk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=j+InaUQs3LEdXP5Z1bjPBTsmGJYt0oap7+ikyICXaXNczSc4GW8QMoML5R6wf2kbZ
-         YqXJfK7D83adh3pt+aM1gS+5TIGxrvloifLkeCfGR63Mny/V+chNN1x91zOdCnb0XB
-         /jRXU43YHe8sY+WsKO5ltQt5bjEbHXSIj8SeIIrNWaGKGtas6fGqcDSVRHM2gIa555
-         7AeHxnU9A941BBFg/sfMIsKgPpuuCUC+m1XHi0YYCPHe+i+kJsnYN4y+FLnfsjQxX2
-         vDJyv36pF0ntpyEYlRjVGuCMck9PHGg7C9EobkYEzbRNJrpg83JxUx3o20p4qfox5t
-         VDxCmMKFtMsWw==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Rohith Surabattula <rohiths@microsoft.com>,
-        Paulo Alcantara <pc@cjr.nz>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.15 15/16] Adjust cifssb maximum read size
-Date:   Mon, 28 Mar 2022 15:42:58 -0400
-Message-Id: <20220328194300.1586178-15-sashal@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220328194300.1586178-1-sashal@kernel.org>
-References: <20220328194300.1586178-1-sashal@kernel.org>
+        with ESMTP id S229705AbiC1WNw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Mar 2022 18:13:52 -0400
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6991180211
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Mar 2022 15:03:36 -0700 (PDT)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-2e6ceb45174so124921027b3.8
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Mar 2022 15:03:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7FHAZ8S7LPQD/oxAjssWALknO1+bYyZdp0Z+a4ZiiJU=;
+        b=DbC2D5aoK6IlOlhRB96tUyujk0j8UnXPRqI4DlbQuFMZpVug8O5GnlorK8BwuFj7Hx
+         hIqflxI+A7WcmiYZFNOzIHBBmOe+BdWSIXINd6NIRa+6F4ZvI+bXiJKetF3TwrFIRzh0
+         cTvlA/mBFQX+J07T9Z8EGWDPmP/gJm9fyQ//zlXdepkcHcb3xNob2qMeXnSQAlrrjBoE
+         36q64DcvzqsX2i2ROBYHqkoSzxW9HGSF8yAkTp34klRUubXnSE7FdVPwUl00iUQ0HQQy
+         Vm1Mlx0dTGb/fMOgwn8K+DT/rooIgelKgBKaq+pvdXdZZ6aiqxOmY9/WtHwB5qmP9+e+
+         5LQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7FHAZ8S7LPQD/oxAjssWALknO1+bYyZdp0Z+a4ZiiJU=;
+        b=YbfBbDFJPfCXBqKv9HQvTVKQPucb+98+gMsbP5/mcCA26pQ5UQzSmdQuzDf/xoKHoa
+         zUsrVNhCNrN/rywLnFDEuSrIRqa06DxIy0kcbmYSORD/OsTfhDrccTBT1hip4B8WfLy9
+         rzmtbXegpzlahpoejihZ46OAsitiZj/ejM90+xY8qmtU/d7D05YbNrS/4Nfesr6JeQz0
+         RZP7iILrsO8SAvdBwPYXLofIBzX4UhkXkwFaXoJd15kK8yNmFVROYelC4oucSpHSOfpB
+         BcUzLWH/rV4Jy3Wc5/Wrm+C7BMSxDutnMY6st67Y/Dz0Z9TiFHe8DD/1c163zcQBRTyJ
+         //2g==
+X-Gm-Message-State: AOAM530+/uYqJe54Y1QqSJMEdrg2d70wlxy/gjHeXXc3mbs8ahZpZukw
+        NMAQAEtiKZuqR46vTcDx/0/wGN4Pv2oPgAwJFM7x2aTp
+X-Google-Smtp-Source: ABdhPJxTVdEViNtuBXYMMGYeMu0h5q06T2mKcNaYypkrjlnprFbHz/+2oNhNxEWZyBnLws98wdi2rs/W3JL25hqCprY=
+X-Received: by 2002:a81:ad67:0:b0:2e5:8466:322a with SMTP id
+ l39-20020a81ad67000000b002e58466322amr27481812ywk.54.1648505015584; Mon, 28
+ Mar 2022 15:03:35 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <CAH2r5msLJ166+yuHWQnV7_10_SZ3R1RmMwgLyGMBbggcYks1hQ@mail.gmail.com>
+ <CAH2r5mu7q4yUO-qgY+A=Gjv4cDWGZrhHi0Yr01Zx-W1nE36Rvg@mail.gmail.com>
+In-Reply-To: <CAH2r5mu7q4yUO-qgY+A=Gjv4cDWGZrhHi0Yr01Zx-W1nE36Rvg@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Tue, 29 Mar 2022 08:03:24 +1000
+Message-ID: <CAN05THS9TJMh7DtDxcqG3MFd+PhASRfZBaCEJd6Gyja+QEOapw@mail.gmail.com>
+Subject: Re: [PATCH][CIFS] cleanup and clarify status of tree connections
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Rohith Surabattula <rohiths@microsoft.com>
+Looks good to me.
 
-[ Upstream commit 06a466565d54a1a42168f9033a062a3f5c40e73b ]
+Reviewed-by me
 
-When session gets reconnected during mount then read size in super block fs context
-gets set to zero and after negotiate, rsize is not modified which results in
-incorrect read with requested bytes as zero. Fixes intermittent failure
-of xfstest generic/240
-
-Note that stable requires a different version of this patch which will be
-sent to the stable mailing list.
-
-Signed-off-by: Rohith Surabattula <rohiths@microsoft.com>
-Acked-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/cifsfs.c |  3 +++
- fs/cifs/file.c   | 10 ++++++++++
- 2 files changed, 13 insertions(+)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 21bf82fc2278..ba6f536d76de 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -210,6 +210,9 @@ cifs_read_super(struct super_block *sb)
- 	if (rc)
- 		goto out_no_root;
- 	/* tune readahead according to rsize if readahead size not set on mount */
-+	if (cifs_sb->ctx->rsize == 0)
-+		cifs_sb->ctx->rsize =
-+			tcon->ses->server->ops->negotiate_rsize(tcon, cifs_sb->ctx);
- 	if (cifs_sb->ctx->rasize)
- 		sb->s_bdi->ra_pages = cifs_sb->ctx->rasize / PAGE_SIZE;
- 	else
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 82bbaf8e92b7..b23f6b489bb9 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3734,6 +3734,11 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
- 				break;
- 		}
- 
-+		if (cifs_sb->ctx->rsize == 0)
-+			cifs_sb->ctx->rsize =
-+				server->ops->negotiate_rsize(tlink_tcon(open_file->tlink),
-+							     cifs_sb->ctx);
-+
- 		rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
- 						   &rsize, credits);
- 		if (rc)
-@@ -4512,6 +4517,11 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 				break;
- 		}
- 
-+		if (cifs_sb->ctx->rsize == 0)
-+			cifs_sb->ctx->rsize =
-+				server->ops->negotiate_rsize(tlink_tcon(open_file->tlink),
-+							     cifs_sb->ctx);
-+
- 		rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
- 						   &rsize, credits);
- 		if (rc)
--- 
-2.34.1
-
+On Mon, Mar 28, 2022 at 12:49 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Updated patch to fix one place I missed pointed out by the kernel test robot.
+>
+> See attached.
+>
+> On Sun, Mar 27, 2022 at 4:14 PM Steve French <smfrench@gmail.com> wrote:
+> >
+> > Currently the way the tid (tree connection) status is tracked
+> > is confusing.  The same enum is used for structs cifs_tcon
+> > and cifs_ses and TCP_Server_info, but each of these three has
+> > different states that they transition among.  The current
+> > code also unnecessarily uses camelCase.
+> >
+> > Convert from use of statusEnum to a new tid_status_enum for
+> > tree connections.  The valid states for a tid are:
+> >
+> >             TID_NEW = 0,
+> >             TID_GOOD,
+> >             TID_EXITING,
+> >             TID_NEED_RECON,
+> >             TID_NEED_TCON,
+> >             TID_IN_TCON,
+> >             TID_NEED_FILES_INVALIDATE, /* unused, considering removing
+> > in future */
+> >             TID_IN_FILES_INVALIDATE
+> >
+> > It also removes CifsNeedTcon CifsInTcon CifsNeedFilesInvalidate and
+> > CifsInFilesInvalidate from the statusEnum used for session and
+> > TCP_Server_Info since they are not relevant for those.
+> >
+> > A follow on patch will fix the places where we use the
+> > tcon->need_reconnect flag to be more consistent with the tid->status
+> >
+> > See attached.
+> >
+> > Also FYI - Shyam had a work in progress patch to fix and clarify the
+> > ses->status enum
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
