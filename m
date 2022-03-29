@@ -2,86 +2,247 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3402C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Mar 2022 02:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18580C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Mar 2022 05:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229765AbiC2CGg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 28 Mar 2022 22:06:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49890 "EHLO
+        id S231437AbiC2FOU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Mar 2022 01:14:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230038AbiC2CGg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Mar 2022 22:06:36 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2786557B25
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Mar 2022 19:04:54 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B2A48B81218
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 02:04:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7614EC34110
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 02:04:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648519491;
-        bh=oTTYfbPo8OqFN+B6VdFdWktfA4HFlEodPPjJ1kB4S84=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=AF1Ed9c1j9N1P2Dvj0fF1WwuV0USXZ+fbP6l9GkK+CxHFhIY2sKE9RGwR7KHTZNAk
-         g7Crmnuyd6LUk2dSst7swVGpV7c8Ba7QZCp2c6EMiifhumu6/z6i5g420xbQU2ZakM
-         kevTJOtSJvh82+Oq7bB89NcfUTGXT/HaIqWzE7zXdJKsqV9LNtHa6Yj6YrQI57pvb/
-         oSB34xRMGgNVjshuUSgGlCWfUC0+jQEut2hD0Nf5xmjQX0KVuXvaBlCgopV7c67z+Q
-         7ylJj4r9/A1tZdxqmA2b6nl6Jgu7XFtVhmt5AT/F+E6vWf8ETgIRtdNq59qr2UemFH
-         M5x2o6Hx3Pk2A==
-Received: by mail-wm1-f47.google.com with SMTP id r7so9397208wmq.2
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Mar 2022 19:04:51 -0700 (PDT)
-X-Gm-Message-State: AOAM532jNOWSqxp6hQqII/2PHIwetIjkiTj3FJTk1DlPmSRxp3EISobx
-        iYB9AuVnsroiMHbZmFipM3u5s4h581Pl3iyrdYc=
-X-Google-Smtp-Source: ABdhPJwgIxq4IdCmZmHLX9/ZYIZ7O1duyDb0mzhZxS6YYMxRhDqqPZ0baTTnIFEVZNI/rF4d3reqkDJ/AKNsrfCTlGE=
-X-Received: by 2002:a05:600c:214a:b0:38c:aa5d:1872 with SMTP id
- v10-20020a05600c214a00b0038caa5d1872mr3254948wml.9.1648519489667; Mon, 28 Mar
- 2022 19:04:49 -0700 (PDT)
+        with ESMTP id S231225AbiC2FOT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Mar 2022 01:14:19 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C25E30F50
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Mar 2022 22:12:37 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id w7so28306047lfd.6
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Mar 2022 22:12:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=rcE4dlO/r/LBx/VuDzntxwx7U1uRH4xX1ELddUVECqw=;
+        b=ZK/L/ggx9Xltku8c6GcTrBbYA/JC1cdTbcm2/F4oD9ii35MJ0j0v2vP8M1stTrb3Gp
+         NFdjrPpI87c7GZJX1rzl6WVIWMtWL0L+OqTcpTGDb/h7xz5g9ykdCkRh7mRqnCK0SUvv
+         V7PRPueBwd64i7ohDc5/9akkFSSIUcE92dFyPOXvwBNPK/AfM19WsWKtpkAc+Gl6FQ1S
+         M+Sf8naHTERieEkWu97m5f2GpY6acGgFtuVE9R7z5CzVpnrYdEfSuRPuP2gc3JOp8rhK
+         Wtlk5khI1ripb/YaLaBM8SwdiydbrWvyhzLcfSdShM0q9pmCabxInAg8ZnsUiuxIhfL3
+         rXEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=rcE4dlO/r/LBx/VuDzntxwx7U1uRH4xX1ELddUVECqw=;
+        b=kRmftXvJBkF2GgXUr8UDa0Q3RJ4MmD4+wtADZGPYeheQ8ECcV92sSUj/t2kyjYSdam
+         CEV7Eo2hhCaqxlUQKGEFxC1hVN8oQcml+1rPCkE8kd8bNSKW5MYNq0fmiaS67O+Eno/C
+         NqmE3a3Uf9IJ4vkZhmp8y+ulL9jM2RiufzFNJey1Uk1xd7//6xgkCL/h7UTkAaO1+vb2
+         QA6QisP4aEZSE2Gc5szT63zoaQo3BDxXswHpacK620Fv+1CNm6Jgdat03yKXtG/rUpd+
+         glg3I6yqd+ykNdjtU6opLQVbn1RE8lRwm07VYrmJsT0+JUfxb7nnvbjRJo/hMHkEMO0t
+         z50w==
+X-Gm-Message-State: AOAM5331V6qRlY7D6D191UZ+SWc8unsZ7Z10aDRy+uU58VOpla44738v
+        OPBthXAT+Etw1sEcu6Qs+/ZkTwJpzjFR3zpUJqcWneG3Ldg=
+X-Google-Smtp-Source: ABdhPJyOe6xzoBvRIeO7UdUMa9zU+NtgN5+CbLU+UvAwLvm62sxRXfGpUe1+vKJNwsgG/gzRyvvZ8+kz1RUhTll23vo=
+X-Received: by 2002:a05:6512:130c:b0:44a:2dd3:91d0 with SMTP id
+ x12-20020a056512130c00b0044a2dd391d0mr1035595lfu.234.1648530754994; Mon, 28
+ Mar 2022 22:12:34 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a05:6000:2c1:0:0:0:0 with HTTP; Mon, 28 Mar 2022 19:04:49
- -0700 (PDT)
-In-Reply-To: <CAH2r5mvDREEnghECdF3Okj6bwi1B6Dk=oM2tyxP=weYsZ7Am1g@mail.gmail.com>
-References: <CAH2r5mvDREEnghECdF3Okj6bwi1B6Dk=oM2tyxP=weYsZ7Am1g@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 29 Mar 2022 11:04:49 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_qFQRr79=AX=oF4Qi1x4+gC6wijhJzL3CG3yo1mMnUCg@mail.gmail.com>
-Message-ID: <CAKYAXd_qFQRr79=AX=oF4Qi1x4+gC6wijhJzL3CG3yo1mMnUCg@mail.gmail.com>
-Subject: Re: [PATCH] fix ksmbd bigendian bug in oplock break, and move its
- struct and a few others to smbfs_common
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 29 Mar 2022 00:12:24 -0500
+Message-ID: <CAH2r5mudrWoDMz_mLQtBxE5baEU2M-9G8n+LM0roDc=C=XVBfQ@mail.gmail.com>
+Subject: Detailed analysis of how tree connect state is handled in cifs.ko
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-03-29 8:04 GMT+09:00, Steve French <smfrench@gmail.com>:
-> Fix an endian bug in ksmbd for one remaining use of
-> Persistent/VolatileFid that unnecessarily converted it (it is an
-> opaque endian field that does not need to be and should not
-> be converted) in oplock_break for ksmbd, and move the definitions
-> for the oplock and lease break protocol requests and responses
-> to fs/smbfs_common/smb2pdu.h
->
-> Also move a few more definitions for various protocol requests
-> that were duplicated (in fs/cifs/smb2pdu.h and fs/ksmbd/smb2pdu.h)
-> into fs/smbfs_common/smb2pdu.h including:
->
-> - various ioctls and reparse structures
-> - validate negotiate request and response structs
-> - duplicate extents structs
->
-> See attachedcifs
-Look good to me:)
+Did a detailed analysis of the 24 functions where we set or check the
+tcon status (or need_reconnect).   Detailed analysis below.  There is
+some overlap between TID_NEED_RECON and need_reconnect,
+but generally the "TID_NEED_RECON" and "TID_NEED_FILES_INVALIDATE"
+status are set more
+generally by the equivalent boolean, but other status changes are
+handled by the tid status enum.
 
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Eight tree connect struct status values are defined for tcon->status
+cifsglob.h:122: TID_NEW = 0,
+cifsglob.h:123: TID_GOOD,
+cifsglob.h:124: TID_EXITING,
+cifsglob.h:125: TID_NEED_RECON,
+cifsglob.h:126: TID_NEED_TCON,
+cifsglob.h:127: TID_IN_TCON,
+cifsglob.h:128: TID_NEED_FILES_INVALIDATE, /* currently unused */
+cifsglob.h:129: TID_IN_FILES_INVALIDATE
 
-Thanks!
->
-> --
-> Thanks,
->
-> Steve
->
+and also a partially overlapping bool tcon->need_reconnect is defined,
+and another one called tcon->need_reopen_files
+
+The 23 functions which set or check these statuses are listed below:
+
+1) cifs_umount_begin()
+checks if other umount in progress, holds tcp_ses_lock
+cifsfs.c:702: if ((tcon->tc_count > 1) || (tcon->status == TID_EXITING)) {
+cifsfs.c:709: tcon->status = TID_EXITING;
+
+2) cifs_mark_open_files_invalid()
+holds tcp_set_lock
+returns if TID_NEED_RECON already set, or if session status not CifsGood
+otherwise sets TID_IN_FILES_INVALIDATE, marks the files as invalidHandle
+unlocks then locks again to check if TID_IN_FILES_INVALIDATE is still set
+then sets TID_NEED_TCON.  May be missing call to invalidate inodes on the sb
+cifssmb.c:82: tcon->status = TID_IN_FILES_INVALIDATE;
+cifssmb.c:102: if (tcon->status == TID_IN_FILES_INVALIDATE)
+cifssmb.c:103: tcon->status = TID_NEED_TCON;
+
+3) cifs_reconnect_tcon()
+if TID_EXITING then doesn't allow Write or Open or Tree Disconnect
+to be sent (holding tcp_ses_lock), and later it checks tcon->need_reconnect
+(and exits without sending the tcon if it is not set).
+Before sending negotiate, it checks if chan_needs_reconnect is not set
+but no tcon needs to be sent (tcon->need_reconnect not set). And finally
+after session setup (if it needed to be sent), before sending the tcon
+(and marking the open files invalid) it checks need_reconnect once more
+to see if it is really needed
+cifssmb.c:138: if (tcon->status == TID_EXITING) {
+cifssmb.c:191: if (!cifs_chan_needs_reconnect(ses, server) &&
+!tcon->need_reconnect) {
+cifssmb.c:221: if (tcon->need_reconnect)
+cifssmb.c:235: if (rc || !tcon->need_reconnect) {
+
+4) smb_init_no_reconnect()
+if tcon->need_reconnect set then it doesn't do the __smb_init and
+just returns EHOSTDOWN
+cifssmb.c:382:     tcon->need_reconnect) {
+
+5) CIFSSMBTDis()
+while holding the chan lock it sees if tcon->need_reconnect and
+if so returns EIO instead of sending the tree disconnect
+cifssmb.c:650: if ((tcon->need_reconnect) ||
+CIFS_ALL_CHANS_NEED_RECONNECT(tcon->ses)) {
+
+6) cifs_mark_tcp_ses_conns_for_reconnect()
+while holding tcp_ses_lock marks all ses structs as CifsNeedReconnect
+and also marks all of the tcon structs they contain as TID_NEED_RECON
+and need_reconnect
+connect.c:247: tcon->need_reconnect = true;
+connect.c:248: tcon->status = TID_NEED_RECON;
+connect.c:251: ses->tcon_ipc->need_reconnect = true;
+
+
+7) match_tcon()
+Returns immediately (no match) if TID_EXITING set
+connect.c:2210: if (tcon->status == TID_EXITING)
+
+8) __tree_connect_dfs_target()
+If ipc$ needs reconnect it connects that before doing the DFS share connect
+connect.c:4402: if (ipc->need_reconnect) {
+
+9) cifs_tree_connect()   [DFS enabled version]
+While holding tcp_ses_lock sets tcon status as TID_IN_TCON
+and if tree connect fails, sets tcon status again as TID_NEED_TCON
+else if status is still TID_IN_TCON (presumably to see if reconnect
+occurred after tcon in other thread) sets TID_GOOD and also
+sets tcon->need_reconnect false
+(holding the tcp_ses_lock)
+connect.c:4494: tcon->status = TID_IN_TCON;
+connect.c:4535: if (tcon->status == TID_IN_TCON)
+connect.c:4536: tcon->status = TID_NEED_TCON;
+connect.c:4540: if (tcon->status == TID_IN_TCON)
+connect.c:4541: tcon->status = TID_GOOD;
+connect.c:4543: tcon->need_reconnect = false;
+
+10) cifs_tree_connect()  [non-DFS version]
+similar logic to above other version of cifs_tree_connect
+connect.c:4562: tcon->status = TID_IN_TCON;
+connect.c:4568: if (tcon->status == TID_IN_TCON)
+connect.c:4569: tcon->status = TID_NEED_TCON;
+connect.c:4573: if (tcon->status == TID_IN_TCON)
+connect.c:4574: tcon->status = TID_GOOD;
+connect.c:4576: tcon->need_reconnect = false;
+
+11) tconInfoAlloc()
+sets TID_NEW when tcon buffer created, no lock needed since not in list yet
+misc.c:119: ret_buf->status = TID_NEW;
+
+12) smb2_compound_op()
+if error EREMCHG returned from sending compound op then set need_reconnect
+(EREMCHG is mapped from STATUS_NETWORK_NAME_DELETED)
+smb2inode.c:384: tcon->need_reconnect = true;
+
+13) open_cached_dir()
+if error EREMCHG returned from sending compound op then set need_reconnect
+smb2ops.c:890: tcon->need_reconnect = true;
+
+14) smb2_is_network_name_deleted()
+if STATUS_NETWORK_NAME_DELETED then set need_reconnect to true
+(can be called from demultiplex_thread on error e.g.)
+smb2ops.c:2541: tcon->need_reconnect = true;
+
+15) smb2_query_info_compound()
+similar to the above 3 examples
+smb2ops.c:2746: tcon->need_reconnect = true;
+
+16) smb2_reconnect()
+checks if TID_EXITING, if so doesn't allow WRITE, CREATE, or TDIS
+if tcon->need_reconnect not needed will return 0 (early)
+if chan_needs_reconnect_not_set and tcon->need_reconnect can
+skip session session setup, and finally just before marking files
+invalid (and setting need_reopen_files to true) and sending the
+tree_connect if tcon->need_reconnect not set then can exit
+without having to send the tcon
+smb2pdu.c:166: if (tcon->status == TID_EXITING) {
+smb2pdu.c:243: if (!cifs_chan_needs_reconnect(ses, server) &&
+!tcon->need_reconnect) {
+smb2pdu.c:250: cifs_dbg(FYI, "tcon reconnect: %d", tcon->need_reconnect);
+smb2pdu.c:276: if (tcon->need_reconnect)
+smb2pdu.c:300: if (!tcon->need_reconnect) {
+smb2pdu.c:306:          tcon->need_reopen_files = true;
+
+17) SMB2_tcon()
+if sending tree connect failed mark tcon->need_reconnect as true
+smb2pdu.c:1891: tcon->need_reconnect = true;
+
+18) SMB2_tdis()
+If need_reconnect set, no need to send tree disconnect request
+smb2pdu.c:1961: if ((tcon->need_reconnect) ||
+
+19) SMB2_open()
+if error EREMCHG (STATUS_NETWORK_NAME_DELETED) returned from open
+then set need_reconnect to true
+smb2pdu.c:3003: tcon->need_reconnect = true;
+
+20) smb2_reconnect_server()
+tcons with need_reconnect or need_reopen_files set are added to
+tmp_list with the tcon->rlist (the tree connection's reconnect list).
+Then allocates a dummy tcon used for reconnect, and sets it to TID_GOOD,
+and its need_reconnect to false then frees it (doesn't hold
+tcp_ses_lock but probably not needed)
+smb2pdu.c:3799: if (tcon->need_reconnect || tcon->need_reopen_files) {
+smb2pdu.c:3809: if (ses->tcon_ipc && ses->tcon_ipc->need_reconnect) {
+smb2pdu.c:3863: tcon->status = TID_GOOD;
+smb2pdu.c:3865: tcon->need_reconnect = false;
+
+21) cifs_debug_tcon() and cifs_stats_proc_show()
+Prints DISCONNECTED if need_reconnect is set to aid debugging
+cifs_debug.c:120: if (tcon->need_reconnect)
+cifs_debug.c:624: if (tcon->need_reconnect)
+
+22) refresh_mounts()
+goes through all sockets, servers and tcons, and if tcon doesn't
+need_reconnect then adds it to tail of cache update list (tcon->ulist)
+dfs_cache.c:1518: if (!tcon->ipc && !tcon->need_reconnect) {
+
+23) _cifsFileInfo_put()
+if tcon->need_reconnect set then don't need to close the file
+file.c:489: if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
+
+24) cifs_reopen_persistent_handles()
+if need_reopen_files set then returns immediately, else sets
+need_reopen_files to false
+(unless error returned reopening a file)
+file.c:936:     if (!tcon->use_persistent || !tcon->need_reopen_files)
+file.c:939:     tcon->need_reopen_files = false;
+file.c:958:                     tcon->need_reopen_files = true;
+
+-- 
+Thanks,
+
+Steve
