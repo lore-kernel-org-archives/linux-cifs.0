@@ -2,111 +2,121 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBB6C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Mar 2022 02:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1384DC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Mar 2022 07:53:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233751AbiC3CZZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 29 Mar 2022 22:25:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43068 "EHLO
+        id S241229AbiC3HzY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 30 Mar 2022 03:55:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiC3CZY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Mar 2022 22:25:24 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C23CD3A195
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 19:23:39 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id r22so25851766ljd.4
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 19:23:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xmE2B0KqajgiiBd6cZk1SV9UJHZuFPaj2pvt9v+n5VA=;
-        b=ZUaJlUBPKUh5Cu7A8Rcew5FOgBY6lQnMw4Cu0Lgru4a3y791MjVdZMYtpXAPN+oy5l
-         9uOYPLTHkCommFKc4kdBn1lpTJlICoff8/tuBmfKDAb/rqGb3GCkXI/xn/E8JrklIRep
-         evg2AiHR4/XbKIuXDooc2x6/uFmIxSDuOOxNM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xmE2B0KqajgiiBd6cZk1SV9UJHZuFPaj2pvt9v+n5VA=;
-        b=tIBzb2Owd6S8LVpRVpDYBcUbL8A8jM5IXSTlW/4A4lk7IePsSJvz2/0mmZp19utOkq
-         SxVldOrVw04NitnQh3/AXePQTYRqybxqZyDPlKCCDSN0jMoGL1AxPeOGQHjZRIJHQGyw
-         PtWcR9w6eKfMAgvz/a2XJ1UpyxWyVlX0v2xFf3wwk1VVHSL19zVXVb3pCIiiSXk2aDSV
-         PDbnOeZl25WNGTT2fE2RZGQgIW8wtOQQxXkNcq+DcDaIkbW9zSHjTJSDVdL4gpS7KkPG
-         fAmhdVtWWK8h6iY29AHssEock/8xoUaO0Njtuv2YNI7AWn4fZEddm+HBBn0i3WVIZu46
-         fvIQ==
-X-Gm-Message-State: AOAM530zfSBVz/A6gaiqMT7noCIkkpfnHev6TCRMSjzdW1Y9invtkmFJ
-        BRXHPUiDTKqgiUEj9s6rtEaqUglVZ05u+Vl8
-X-Google-Smtp-Source: ABdhPJzBYjfKmsnJYwqb0Jm5N+KpgtC3EON4paLC+xX0m5A7MXP6ORctmMMb4z3U9TMpR9ColCr6/g==
-X-Received: by 2002:a2e:b746:0:b0:249:6f44:16c0 with SMTP id k6-20020a2eb746000000b002496f4416c0mr4948633ljo.133.1648607016908;
-        Tue, 29 Mar 2022 19:23:36 -0700 (PDT)
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
-        by smtp.gmail.com with ESMTPSA id g12-20020a05651222cc00b0044a1065ca5fsm2164998lfu.304.2022.03.29.19.23.35
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Mar 2022 19:23:35 -0700 (PDT)
-Received: by mail-lj1-f182.google.com with SMTP id bn33so25855404ljb.6
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 19:23:35 -0700 (PDT)
-X-Received: by 2002:a2e:9b10:0:b0:247:f28c:ffd3 with SMTP id
- u16-20020a2e9b10000000b00247f28cffd3mr4963210lji.152.1648607015230; Tue, 29
- Mar 2022 19:23:35 -0700 (PDT)
+        with ESMTP id S243123AbiC3HzW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Mar 2022 03:55:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A0321832
+        for <linux-cifs@vger.kernel.org>; Wed, 30 Mar 2022 00:53:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F3048617E3
+        for <linux-cifs@vger.kernel.org>; Wed, 30 Mar 2022 07:53:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64DA8C34111
+        for <linux-cifs@vger.kernel.org>; Wed, 30 Mar 2022 07:53:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648626815;
+        bh=YRcFa58DUkKe3XYT5crbDATOZa4uCoXnyOx3yR1M/Sc=;
+        h=From:Date:Subject:To:Cc:From;
+        b=ihn46zkENmvaM5aeXEGAf9poSoxoCgEvUEMwF1OEi3Iv5OOk9NyaB/FY7lHRgr9Ww
+         0uSfDPc4KVIT2oraU5wobair32SzhSfGTOm794rJYsTxSpJ78eFO8ljIi3Ujzt1PVX
+         RlxEK5wnxwU1WDlRv2LvhjiKz77owg8XfgdxudXppde0SmtJ8shRlQWbZWHY1xvdMH
+         ZiVjYKtGDNzFdc5WqWwBXIsbjc53vGDFf0x5dxo3fWxsrEdeBA0tcRvwajEQl7HXwT
+         ezsF3SwJjzcz1/hhXEWnMNFp0uHuRbOWjCk+NwD9SkIjwqcBZ5Drz/A+d4vKPvyLE9
+         JgjaINiDwefrg==
+Received: by mail-wm1-f53.google.com with SMTP id v64-20020a1cac43000000b0038cfd1b3a6dso659349wme.5
+        for <linux-cifs@vger.kernel.org>; Wed, 30 Mar 2022 00:53:35 -0700 (PDT)
+X-Gm-Message-State: AOAM5329X/MifQEHc2rOQH1I4rFJCSwiiQu9wBMVwWOAjmU3HvxtADwv
+        xXydCcqJxCCF2WTpxPsP1USK5N+KyM0N1+SGcaY=
+X-Google-Smtp-Source: ABdhPJyNOT0QJ1rMWF5Bi9rJc3C3J4MsO8bOq84px9v7SNkSfavw1F/tCmFhd2xwXImA9hY7LTQH20mwadoxYa5VMgk=
+X-Received: by 2002:a05:600c:4fcd:b0:38c:7495:e644 with SMTP id
+ o13-20020a05600c4fcd00b0038c7495e644mr3244185wmq.102.1648626813594; Wed, 30
+ Mar 2022 00:53:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvmUjSpb0hPjMguq8aFKi11JUDMN5JADFqxw5xhNDELCA@mail.gmail.com>
- <CAHk-=whvfwQdpHv0E6UmaSeYKRYFL_CmaiGa8beCXdtX93U32w@mail.gmail.com>
-In-Reply-To: <CAHk-=whvfwQdpHv0E6UmaSeYKRYFL_CmaiGa8beCXdtX93U32w@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 29 Mar 2022 19:23:19 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wg8CFSfu8bSs1ggiX6gW0Qx_MdZAbxC6bWHi-GQRyErAw@mail.gmail.com>
-Message-ID: <CAHk-=wg8CFSfu8bSs1ggiX6gW0Qx_MdZAbxC6bWHi-GQRyErAw@mail.gmail.com>
-Subject: Re: [GIT PULL] ksmbd server fixes
-To:     Steve French <smfrench@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+Received: by 2002:a05:6000:2c1:0:0:0:0 with HTTP; Wed, 30 Mar 2022 00:53:32
+ -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 30 Mar 2022 16:53:32 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_XMW1-VSLwB=k3ypqgqjsux5OFNnr=Ri3B+-8w4aNHjw@mail.gmail.com>
+Message-ID: <CAKYAXd_XMW1-VSLwB=k3ypqgqjsux5OFNnr=Ri3B+-8w4aNHjw@mail.gmail.com>
+Subject: Regarding to how ksmbd handles sector size request from windows cllient
+To:     Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Hyeoncheol Lee <hyc.lee@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Mar 29, 2022 at 6:48 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> I'd be even happier if we could actually have some common helper
-> starting at that
->
->         trap = lock_rename(...);
->
-> because that whole locking and 'trap' logic is kind of a big deal, and
-> the locking is the only thing that makes __lookup_hash() work.
+Hi Christoph,
 
-Hmm. The cachefiles and ecryptfs code seems to have a fair amount of
-this pattern.
+I have a question about the problem of poking into the block layer in ksmbd.
 
-None of it is exactly the same, and maybe it's hard to really have a
-common helper, but it does look like that sequence from
+There is FileFsSectorSizeInformation command in SMB. And MS-FSCC
+Specification describe it like the following.
 
-        trap = lock_rename(...)
+FileFsSectorSizeInformation : This information class is used to query
+for the extended sector size and alignment information for a volume.
 
-leading up to the eventual
+------------------------------------------------>8----------------------------------------------------------------
+/* sector size info struct */
+struct smb3_fs_ss_info {
+        __le32 LogicalBytesPerSector;
+        __le32 PhysicalBytesPerSectorForAtomicity;
+        __le32 PhysicalBytesPerSectorForPerf;
+        __le32 FSEffPhysicalBytesPerSectorForAtomicity;
+        __le32 Flags;
+        __le32 ByteOffsetForSectorAlignment;
+        __le32 ByteOffsetForPartitionAlignment;
+} __packed;
 
-        ret = vfs_rename(&renamedata);
+LogicalBytesPerSector (4 bytes): A 32-bit unsigned integer that
+contains the number of bytes in a logical sector for the device
+backing the volume. This field is the unit of logical addressing for
+the device and is not the unit of atomic write. Applications SHOULD
+NOT utilize this value for operations requiring physical sector
+alignment.
 
-would be really nice to capture some way.
+PhysicalBytesPerSectorForAtomicity (4 bytes): A 32-bit unsigned
+integer that contains the
+number of bytes in a physical sector for the device backing the
+volume. Note that this is the
+reported physical sector size of the device and is the unit of atomic
+write. Applications
+SHOULD<152> utilize this value for operations requiring sector alignment.
+---------------------------------------------------------------------------------------------------------------------
 
-But maybe there just isn't any actual code commonality outside of the
-general pattern.
+I have received a report that the problem occurs when mounting an iso
+file through windows client on ksmbd & zfs share.
 
-I was curious, and that "trap = lock_rename()" pattern including those
-"exit5" labels is _ancient_, btw.
+https://github.com/cifsd-team/ksmbd-tools/issues/233
 
-It goes back to a commit by Al back in 2002, best seen in Thomas' BK
-history conversion:
+More detailed error message can be obtained using Mount-DiskImage
+command, the error is:
+"Mount-DiskImage : The sector size of the physical disk on which the
+virtual disk resides is not supported."
 
-    https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git/commit/?id=1b3d7c93c6d1927540120bafb08fa60c0d96cbee
+zfs block size is 128KB, and there is a problem when ksmbd responds to
+this value as a sector size to the windows client.
+This seems to judge as an error when a Windows client requests sector
+size information from the server and receives a value larger than 4KB.
 
-so it's not like this is a pattern that has seen a lot of changes.
+If the logical/physical_block_size is obtained from the block layer in
+ksmbd, You might think of this as a layer violation.
+e.g. i_sb->s_bdev->bd_disk->queue->limits.logical_block_size.
 
-Maybe it's ok to just have various copies of it, but let's see if Al
-has any ideas.
+So I am confused as to how to fix this issue. and I'd like to hear
+your thoughts on how to fix this correctly.
 
-             Linus
+Thanks!
