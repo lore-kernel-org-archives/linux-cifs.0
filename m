@@ -2,100 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A6CC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Mar 2022 01:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBB6C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Mar 2022 02:23:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238077AbiC3B7n (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 29 Mar 2022 21:59:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34632 "EHLO
+        id S233751AbiC3CZZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Mar 2022 22:25:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241775AbiC3B7l (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Mar 2022 21:59:41 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20870181B16
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 18:57:57 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id p10so27446518lfa.12
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 18:57:57 -0700 (PDT)
+        with ESMTP id S229496AbiC3CZY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Mar 2022 22:25:24 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C23CD3A195
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 19:23:39 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id r22so25851766ljd.4
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 19:23:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=c9wgvCG6ehSqVvhld+97BlPKmw2SYKXfrIztdHxFD+g=;
-        b=fFg2nGAzXQWDFCRiScLnAPEM/iEXBEwfa46BaahhYw8yxYDpAzUyIaUGvBchnnVtJy
-         ML1Z2rh1T9miUSPfNlZwNHm+j6vZD7dkf2JlbBGhYKyx6UtQSHj+yh3YmRo1biXJM9gh
-         4NMu6QiTlccRHDrrBok1YjlmW+X7h2ELT6Mz8WyrKvRN7uNYPhFymsmWBwYmSqbjHFfh
-         AqldBGcYm3zkYUiXZquxtc3/1wNgW2UF/Z3PFiqic96g3nipIPRCnO+262jkuBJ+7zbC
-         7dXMxUM3dmqiUyN2LxTL9Mp8F69mb/a6QOF5NGw3r/tW3jkartKG/DUfpTnIPNA/kl4h
-         tfQA==
+        bh=xmE2B0KqajgiiBd6cZk1SV9UJHZuFPaj2pvt9v+n5VA=;
+        b=ZUaJlUBPKUh5Cu7A8Rcew5FOgBY6lQnMw4Cu0Lgru4a3y791MjVdZMYtpXAPN+oy5l
+         9uOYPLTHkCommFKc4kdBn1lpTJlICoff8/tuBmfKDAb/rqGb3GCkXI/xn/E8JrklIRep
+         evg2AiHR4/XbKIuXDooc2x6/uFmIxSDuOOxNM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=c9wgvCG6ehSqVvhld+97BlPKmw2SYKXfrIztdHxFD+g=;
-        b=0QeUTQ1fTkLqL5ThD2l+b/C13gvBmdZoA85BGfCl57/3fsqS2ni6dNB7GRtjv1uN6o
-         gFe8dmXt6v2HPOfVHzlMPVsixcJoY/n/6occv2e1/uE5fQ+SVoTjHkdHAwaDMnrWpjgz
-         8cjKKxX4C7At3Q3Lstg8UMF3Y0O/AviAh3Sel2kriHUsZIGgZZgM80w74Kr0osko1nIE
-         zYYC5NfEqjiUK6W1IMguxf0b9NJAdJvizxngm/cbLkZy3R8lRS2RvUaFEk071ZjGLIJI
-         HStSafpcuzqpAsKNbwgt45i7XyVHAP8z12HAmXJywn9QDJSoZt+IhrVgBWOfbnGLIpvn
-         u6xQ==
-X-Gm-Message-State: AOAM530sBwEhL0HcgdaxdxtFzY8kKFO1b1eLoCKKJ+OhWCCGhlgJxymC
-        XEdVIED/56PM9Shbq20AMumiwemxosjTn+qFGgI=
-X-Google-Smtp-Source: ABdhPJz972+rSxlJVotrEg2X2T42xaZWsWCMqJEY4ez7Hiqe24nIPKegazp60jYIKhGSG3gBlm4G1gE+qJuGQ3MER3A=
-X-Received: by 2002:a05:6512:3a83:b0:44a:b79:6988 with SMTP id
- q3-20020a0565123a8300b0044a0b796988mr4819812lfu.595.1648605475133; Tue, 29
- Mar 2022 18:57:55 -0700 (PDT)
+        bh=xmE2B0KqajgiiBd6cZk1SV9UJHZuFPaj2pvt9v+n5VA=;
+        b=tIBzb2Owd6S8LVpRVpDYBcUbL8A8jM5IXSTlW/4A4lk7IePsSJvz2/0mmZp19utOkq
+         SxVldOrVw04NitnQh3/AXePQTYRqybxqZyDPlKCCDSN0jMoGL1AxPeOGQHjZRIJHQGyw
+         PtWcR9w6eKfMAgvz/a2XJ1UpyxWyVlX0v2xFf3wwk1VVHSL19zVXVb3pCIiiSXk2aDSV
+         PDbnOeZl25WNGTT2fE2RZGQgIW8wtOQQxXkNcq+DcDaIkbW9zSHjTJSDVdL4gpS7KkPG
+         fAmhdVtWWK8h6iY29AHssEock/8xoUaO0Njtuv2YNI7AWn4fZEddm+HBBn0i3WVIZu46
+         fvIQ==
+X-Gm-Message-State: AOAM530zfSBVz/A6gaiqMT7noCIkkpfnHev6TCRMSjzdW1Y9invtkmFJ
+        BRXHPUiDTKqgiUEj9s6rtEaqUglVZ05u+Vl8
+X-Google-Smtp-Source: ABdhPJzBYjfKmsnJYwqb0Jm5N+KpgtC3EON4paLC+xX0m5A7MXP6ORctmMMb4z3U9TMpR9ColCr6/g==
+X-Received: by 2002:a2e:b746:0:b0:249:6f44:16c0 with SMTP id k6-20020a2eb746000000b002496f4416c0mr4948633ljo.133.1648607016908;
+        Tue, 29 Mar 2022 19:23:36 -0700 (PDT)
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
+        by smtp.gmail.com with ESMTPSA id g12-20020a05651222cc00b0044a1065ca5fsm2164998lfu.304.2022.03.29.19.23.35
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Mar 2022 19:23:35 -0700 (PDT)
+Received: by mail-lj1-f182.google.com with SMTP id bn33so25855404ljb.6
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Mar 2022 19:23:35 -0700 (PDT)
+X-Received: by 2002:a2e:9b10:0:b0:247:f28c:ffd3 with SMTP id
+ u16-20020a2e9b10000000b00247f28cffd3mr4963210lji.152.1648607015230; Tue, 29
+ Mar 2022 19:23:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAH2r5mvmUjSpb0hPjMguq8aFKi11JUDMN5JADFqxw5xhNDELCA@mail.gmail.com>
  <CAHk-=whvfwQdpHv0E6UmaSeYKRYFL_CmaiGa8beCXdtX93U32w@mail.gmail.com>
 In-Reply-To: <CAHk-=whvfwQdpHv0E6UmaSeYKRYFL_CmaiGa8beCXdtX93U32w@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 29 Mar 2022 20:57:44 -0500
-Message-ID: <CAH2r5msiQh6mM1o7QFhaaQq9vVqL60z_YyEZzosBcrGsgR2uhA@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 29 Mar 2022 19:23:19 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg8CFSfu8bSs1ggiX6gW0Qx_MdZAbxC6bWHi-GQRyErAw@mail.gmail.com>
+Message-ID: <CAHk-=wg8CFSfu8bSs1ggiX6gW0Qx_MdZAbxC6bWHi-GQRyErAw@mail.gmail.com>
 Subject: Re: [GIT PULL] ksmbd server fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        CIFS <linux-cifs@vger.kernel.org>,
+To:     Steve French <smfrench@gmail.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
         Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Mar 29, 2022 at 8:49 PM Linus Torvalds
+On Tue, Mar 29, 2022 at 6:48 PM Linus Torvalds
 <torvalds@linux-foundation.org> wrote:
 >
-> On Mon, Mar 28, 2022 at 6:39 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > - four patches relating to dentry race
-<...>
->
-> This all makes me _very_ uncomfortable.
->
-> I really get the feeling that we'd be much better off exporting
-> something that is just a bigger part of that rename logic, not that
-> really low-level __lookup_hash() thing.
->
-<...>
-> I'd be even happier if we could actually hjave some common helper
+> I'd be even happier if we could actually have some common helper
 > starting at that
 >
 >         trap = lock_rename(...);
 >
 > because that whole locking and 'trap' logic is kind of a big deal, and
 > the locking is the only thing that makes __lookup_hash() work.
->
-> Adding Al to the cc in case he has any ideas. Maybe he's ok with this
-> whole thing, and with his blessing I'll take this pull as-is, but as
-> it is I'm not comfortable with it.
 
-Depending on what Al's opinion is, we can remove those four and resubmit.
+Hmm. The cachefiles and ecryptfs code seems to have a fair amount of
+this pattern.
 
-Also FYI - I have some cleanup patches for ksmbd/cifs common code
-(that will be in the next cifs.ko P/R) that I am holding off
-on for a few days to reduce change of merge conflict.
+None of it is exactly the same, and maybe it's hard to really have a
+common helper, but it does look like that sequence from
 
+        trap = lock_rename(...)
 
--- 
-Thanks,
+leading up to the eventual
 
-Steve
+        ret = vfs_rename(&renamedata);
+
+would be really nice to capture some way.
+
+But maybe there just isn't any actual code commonality outside of the
+general pattern.
+
+I was curious, and that "trap = lock_rename()" pattern including those
+"exit5" labels is _ancient_, btw.
+
+It goes back to a commit by Al back in 2002, best seen in Thomas' BK
+history conversion:
+
+    https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git/commit/?id=1b3d7c93c6d1927540120bafb08fa60c0d96cbee
+
+so it's not like this is a pattern that has seen a lot of changes.
+
+Maybe it's ok to just have various copies of it, but let's see if Al
+has any ideas.
+
+             Linus
