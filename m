@@ -2,77 +2,124 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF54AC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 23:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1039AC433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 23:53:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243002AbiCaXYk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 31 Mar 2022 19:24:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51594 "EHLO
+        id S242657AbiCaXyt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 31 Mar 2022 19:54:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242937AbiCaXYh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 19:24:37 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9E5D5C353;
-        Thu, 31 Mar 2022 16:22:49 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229912AbiCaXyt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 19:54:49 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABD0E24A8BD
+        for <linux-cifs@vger.kernel.org>; Thu, 31 Mar 2022 16:52:59 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5C2C2B82297;
-        Thu, 31 Mar 2022 23:22:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EDC5BC340ED;
-        Thu, 31 Mar 2022 23:22:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648768967;
-        bh=cFAMfnRYRwexlQ80k5xK4/bktdJv0fyhc/nvasOcLSo=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=pTcM+bxBZsVhEHBrY6ebu5Cmk1+aCXLsOgWp/mU2iRlmn57LuxoT7dzpXi9j5fAvD
-         CIaUqPpOMCUXBffm2HoFE6HC46X9o2R40nzA4yU6Af5l56QBJUKWRl1RciX8DFAg2Z
-         xlTV0sOIhiHR05VPVfdbgYMf6ugOdwJZOkdk3qiA2P6NG2wcTRpYK+PhBa8XupZ7am
-         MNlnvupN2x8gNOeAF5RuVUoRIoETnY4RuO28YZMkfpQEPP9CGF1hXZRkWOUoRP1Wd1
-         lJr8tCu8ivfq6ga8dP5t2DEJkMILo0M4DDaAFHvhFcwtNHIYtZrHNi9Z23HKk0oHnn
-         bXEQbw+m+CCkg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D7C76E7BB0B;
-        Thu, 31 Mar 2022 23:22:46 +0000 (UTC)
-Subject: Re: [GIT PULL] netfs: Prep for write helpers
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <2639515.1648483225@warthog.procyon.org.uk>
-References: <2639515.1648483225@warthog.procyon.org.uk>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <2639515.1648483225@warthog.procyon.org.uk>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/netfs-prep-20220318
-X-PR-Tracked-Commit-Id: ab487a4cdfca3d1ef12795a49eafe1144967e617
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f008b1d6e1e06bb61e9402aa8a1cfa681510e375
-Message-Id: <164876896687.28012.3947884678367341659.pr-tracker-bot@kernel.org>
-Date:   Thu, 31 Mar 2022 23:22:46 +0000
-To:     David Howells <dhowells@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Steve French <sfrench@samba.org>, ceph-devel@vger.kernel.org,
-        dhowells@redhat.com, linux-afs@lists.infradead.org,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 4EBDB1F7AC;
+        Thu, 31 Mar 2022 23:52:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1648770778; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=9tTS7Z4WAu0Fen7w1wgaZ5bVLFlVnx0mYtU9iLCktQ4=;
+        b=KobdTOFV+Hr8re6I35R4r2EoMQ4c1YBbYj3/gO9QSxDLZf/Bf05bO0fwzzBHSnMiBs0hrX
+        CLk0WmE/yjxI9XX+TvBysfdjB39Ya7ORWy8qznOB5bW3fFzplhZ0fHHbIqU8URK4wcy/go
+        EjqPdzz04WXNJJWDnEf9+7Ni/Ah8fjE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1648770778;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=9tTS7Z4WAu0Fen7w1wgaZ5bVLFlVnx0mYtU9iLCktQ4=;
+        b=35jTFHR1prXBCx8neIQgD6/R5X1Sh5bbtFuaHnXJpzBRUkH71sxQQui67DK4CuHSthMrOT
+        hmM3eoPR1aECvMAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C3F24132DC;
+        Thu, 31 Mar 2022 23:52:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id +X1pIdk+RmL4KgAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Thu, 31 Mar 2022 23:52:57 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     pshilovsky@samba.org, smfrench@gmail.com, pc@cjr.nz,
+        Enzo Matsumiya <ematsumiya@suse.de>
+Subject: [PATCH] mount.cifs.rst: add FIPS information
+Date:   Thu, 31 Mar 2022 20:52:51 -0300
+Message-Id: <20220331235251.4753-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Mon, 28 Mar 2022 17:00:25 +0100:
+Add FIPS 140-2 compliance information regarding mounting SMB shares.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/netfs-prep-20220318
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ mount.cifs.rst | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f008b1d6e1e06bb61e9402aa8a1cfa681510e375
-
-Thank you!
-
+diff --git a/mount.cifs.rst b/mount.cifs.rst
+index 9d4446f035b6..4ca46976fee6 100644
+--- a/mount.cifs.rst
++++ b/mount.cifs.rst
+@@ -376,6 +376,10 @@ sec=arg
+   may be enabled automatically. Packet signing may also be enabled
+   automatically if it's enabled in */proc/fs/cifs/SecurityFlags*.
+ 
++  For environments that requires FIPS 140-2 compliance, only ``sec=krb5`` and
++  ``sec=krb5i`` are valid. See also ``vers``. See section `SECURITY`_
++  for more information.
++
+ seal
+   Request encryption at the SMB layer. The encryption algorithm used
+   is AES-128-CCM. Requires SMB3 or above (see ``vers``).
+@@ -624,6 +628,9 @@ vers=arg
+   kernels prior to v4.13, the default was ``1.0``. For kernels
+   between v4.13 and v4.13.5 the default is ``3.0``.
+ 
++  For environments that requires FIPS 140-2 compliance, only version ``2.0`` or
++  or newer is allowed. See section `SECURITY`_ for more information.
++
+ --verbose
+   Print additional debugging information for the mount. Note that this
+   parameter must be specified before the ``-o`` . For example::
+@@ -923,6 +930,29 @@ by default at mount time. Old dialects such as CIFS (SMB1, ie vers=1.0)
+ have much weaker security. Use of CIFS (SMB1) can be disabled by
+ modprobe cifs disable_legacy_dialects=y.
+ 
++For environments that requires FIPS 140-2 compliance, the following applies:
++
++- SMB1 (``vers=1.0``) is not allowed
++- SMB2 and newer are only allowed with ``sec=krb5`` or ``sec=krb5i`` security
++  modes
++
++This is because FIPS 140-2 does not approve MD4/MD5 hashing algorithms, which
++are used either by SMB1 or the other security modes.
++
++When running a kernel in FIPS mode (i.e. with ``fips=1`` in boot command line),
++the above will be enforced, and running ``mount.cifs`` might fail.
++In the failing cases, the following error message (or similar, depending on the
++security mode) will appear in the ring buffer:
++
++  "CIFS VFS: could not allocate crypto hmacmd5"
++
++When not running a kernel in FIPS mode, the above serves only as informational
++purpose as ``mount.cifs`` does not enforce any of that.
++
++References:
++FIPS 140-2 Implementation Guide, G.6
++`https://csrc.nist.gov/csrc/media/projects/cryptographic-module-validation-program/documents/fips140-2/fips1402ig.pdf<https://csrc.nist.gov/csrc/media/projects/cryptographic-module-validation-program/documents/fips140-2/fips1402ig.pdf>`_
++
+ ****
+ BUGS
+ ****
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.34.1
+
