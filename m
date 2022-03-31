@@ -2,95 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C20FC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 19:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB79C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 21:57:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232587AbiCaTvi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 31 Mar 2022 15:51:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59578 "EHLO
+        id S242122AbiCaV6s (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 31 Mar 2022 17:58:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236600AbiCaTvh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 15:51:37 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF8B749FA2
-        for <linux-cifs@vger.kernel.org>; Thu, 31 Mar 2022 12:49:48 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 3EC101F7AC;
-        Thu, 31 Mar 2022 19:49:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1648756187; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5EL/WnqW5laWvmfUCycNog8Hkiu92ekliRyKz4/+yHY=;
-        b=hHGZYQXJX2N/uYUoo4qTuJ0/Z0vOKx0B4WhIj0xfYvbmIfi8yqlrsUNkLNfZrYqjf1iPjR
-        j2a/gds2UpGdYUmcU8HXootif5qOd9YaxL0fAyj0ruMgltAklCRgpsUzhfOExmg/YDoW1r
-        pUxsLJrjT+c+ucmiikZ/0mTRBEZb+kg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1648756187;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5EL/WnqW5laWvmfUCycNog8Hkiu92ekliRyKz4/+yHY=;
-        b=FGie9ipXbIdsJvQMfoGpXkjBTBBB/QmOXcKTcHZlkuo2bBWUKyI189v6+AzR51J4C3f4en
-        wBSW/WaXrhJEd8Cw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C2CCC133D4;
-        Thu, 31 Mar 2022 19:49:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 7KbhItoFRmLjXQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Thu, 31 Mar 2022 19:49:46 +0000
-Date:   Thu, 31 Mar 2022 16:49:44 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com
-Subject: Re: [PATCH 2/2] cifs: force new session setup and tcon for dfs
-Message-ID: <20220331194944.72cpzns6hako7lcx@cyberdelia>
-References: <20220331180151.5301-1-pc@cjr.nz>
- <20220331180151.5301-2-pc@cjr.nz>
+        with ESMTP id S241964AbiCaV6r (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 17:58:47 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A56630F7A;
+        Thu, 31 Mar 2022 14:56:44 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id a17so830699edm.9;
+        Thu, 31 Mar 2022 14:56:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KeYUo5Rxtop2eZuKjtBKuva+XDteBCoX0CO2d3I1o2A=;
+        b=Yk9NZ/50RFQdHnGdTItCs5XLEfu2j/9wx2Krv1F8waDIhUFBxkcr/3u7D3n2vmQpLN
+         V2UnoOLGBqi25p94TtB1OOu9wOKMfcLiCDq0pBNS/gZJFJO+mZhP3oAMMNmEUQhiQfKO
+         YrlZEIDX9qqd0I9rbolh4TrcqbhhBcRrcmjIS8O5pyeXnZarS485ZWAKJosEqGO3BG/u
+         e10q8Fi21AM2ICtCEzO+UBOM7VqAeGfetXl6bKWIi4Kx7vIMWd2H4YF6SZzcgX6t1ppE
+         SwLL98IGJEfdjwC7pEiVHGcdu0ifUs0467RFiVvQDXEc+MkRI6DG3e57KyfQhpuz2iPa
+         SdAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KeYUo5Rxtop2eZuKjtBKuva+XDteBCoX0CO2d3I1o2A=;
+        b=rvUdgoevuJjnK2BSr+8H6gCM/FnJ7UrEWUkaA7JjmfiSH1qfq4wE+kQj8BefAYSSDr
+         Y0Ay45csXMM4GzJiwlCqNMhGSBTF5KfjjVsCaQ8AxqmsR9qt7HcRV6Jvj4CV6kFxUaHN
+         BH1Vwe8KWUYjvkhbLvjtx2gEVC1Kj4CZgJzq5ZY9GLdG8gOHYY9Y7T9AUE7oUWrBZYTn
+         z40xMmNS6S/+0vl6iQbi02gx060bYsQZr40PCzi/nd1DQXSOJWgPK/lTvqAO2pBXR1iJ
+         9SSBdnKUl7hvh7aLdFhK9zSBKegYR6YigZUBSxam64z293lHJFqjg2kknP1oQTXLXDV7
+         wGGQ==
+X-Gm-Message-State: AOAM532YX5QNIa8zk+mtDyc5CKvUDv0Wxbih8UdicL0MoIla+HTmFJsH
+        bPqGW7bvb4SvKv/Y5F/KwIE=
+X-Google-Smtp-Source: ABdhPJyONxCDb77pIW8ufJNOJ90VzxBr+yTgi+Y1i1NLHsjGazEEm2WeSQZh+WzkZH5N9StrRYvzkQ==
+X-Received: by 2002:aa7:d398:0:b0:419:d011:fe8b with SMTP id x24-20020aa7d398000000b00419d011fe8bmr18763741edq.168.1648763802902;
+        Thu, 31 Mar 2022 14:56:42 -0700 (PDT)
+Received: from localhost.localdomain (i130160.upc-i.chello.nl. [62.195.130.160])
+        by smtp.googlemail.com with ESMTPSA id s24-20020a1709066c9800b006e490a8cf71sm251434ejr.4.2022.03.31.14.56.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 14:56:42 -0700 (PDT)
+From:   Jakob Koschel <jakobkoschel@gmail.com>
+To:     Steve French <sfrench@samba.org>
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, Mike Rapoport <rppt@kernel.org>,
+        "Brian Johannesmeyer" <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>, Jakob Koschel <jakobkoschel@gmail.com>
+Subject: [PATCH 1/2] cifs: replace unnecessary use of list iterator variable with head
+Date:   Thu, 31 Mar 2022 23:55:40 +0200
+Message-Id: <20220331215541.883746-1-jakobkoschel@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220331180151.5301-2-pc@cjr.nz>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 03/31, Paulo Alcantara wrote:
->Do not reuse existing sessions and tcons in DFS failover as it might
->connect to different servers and shares.
->
->Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
->---
-> fs/cifs/connect.c | 7 +++++--
-> 1 file changed, 5 insertions(+), 2 deletions(-)
->
->diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->index 3ca06bd88b6e..3956672a11ae 100644
->--- a/fs/cifs/connect.c
->+++ b/fs/cifs/connect.c
->@@ -536,8 +536,11 @@ int cifs_reconnect(struct TCP_Server_Info *server, bool mark_smb_session)
-> 		return __cifs_reconnect(server, mark_smb_session);
-> 	}
-> 	spin_unlock(&cifs_tcp_ses_lock);
->-
->-	return reconnect_dfs_server(server, mark_smb_session);
->+	/*
->+	 * Ignore @mark_smb_session and invalidate all sessions & tcons as we might be connecting to
->+	 * a different server or share during failover.
->+	 */
->+	return reconnect_dfs_server(server, true);
+When list_for_each_entry() completes the iteration over the whole list
+without breaking the loop, the iterator variable will *always* be a
+bogus pointer computed based on the head element.
 
-If you're ignoring @mark_smb_session, why not just leave @server for
-reconnect_dfs_server()?
+To avoid type confusion use the actual list head directly instead of
+the last iterator value.
 
+Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
+---
+ fs/cifs/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 7e7909b1ae11..4ac86b77a7c9 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3858,7 +3858,7 @@ void smb2_reconnect_server(struct work_struct *work)
+ 	tcon = kzalloc(sizeof(struct cifs_tcon), GFP_KERNEL);
+ 	if (!tcon) {
+ 		resched = true;
+-		list_del_init(&ses->rlist);
++		list_del_init(&pserver->smb_ses_list);
+ 		cifs_put_smb_ses(ses);
+ 		goto done;
+ 	}
 
-Enzo
+base-commit: f82da161ea75dc4db21b2499e4b1facd36dab275
+-- 
+2.25.1
+
