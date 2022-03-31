@@ -2,115 +2,77 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B1B4C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 21:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF54AC433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 23:22:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242154AbiCaV6t (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 31 Mar 2022 17:58:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48282 "EHLO
+        id S243002AbiCaXYk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 31 Mar 2022 19:24:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242077AbiCaV6r (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 17:58:47 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EB20241B5C;
-        Thu, 31 Mar 2022 14:56:45 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id pv16so2192630ejb.0;
-        Thu, 31 Mar 2022 14:56:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Xkr0PQO//o59RSxUJyyli+qBLYdHF3Dtr2QvlIoMNhs=;
-        b=g5npxspDJVN7vb08r1+5lxuzHg3UsjA7ebp65WyBPtjQCXFAmTeuarZxWgLvAYOO/U
-         D/IHYWdDBm7ZJc+/wt0/tVICYbQcsJRkDUXJEp+1JD9KGiZyoBw2JN+NdDoly1zRDmQ2
-         gUSlVc0bccrCX4+DXGcE9CY3iGyRzN4JZUQzlHAajrcbfmMj1IhynbNKYu+4s1yDauqu
-         NOuze66qApXULkhoSjOktm3IgP8GIAH11VHz+kDI8y9/q0E/Woyjku78qxk4rr5RfsPP
-         rQze4WaYJSptnA/NcWCml/S6DN2YU012spFZlQYDuYT7sAb+lkBnKWypCyNryrtkPTkH
-         4HDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Xkr0PQO//o59RSxUJyyli+qBLYdHF3Dtr2QvlIoMNhs=;
-        b=pNVDlhQCHOYu07+0cHbKnVtgtk7QNzYGUvfi/yRa8Q+nYe6s73iXTzPrlnX4iR4dg6
-         PkYoTIoYHwxd3jFqCdOBUFNe64Plf1XaY+332L3NFeRSvYmfRZOnWZYuZVR+azPZpQt1
-         Ovmj9SHWkLID0jThzwPncLg32uJBf7W42GMrzwTKlvCCpK+H//4Ru++P4Hk9Y3uzBFHc
-         mWbnStbOTm+Y5+xJPO5oGq+YF7ihnSeZejo4Nh+fyRbNxdzUsV8zNgf4cr3DKm5OZ+L4
-         /566tUbHQ8Q5d3kF+sJeLmXmL1eHpe2vPX+x+7hqBGNz1YSQUgr348+dqkvLhY1Zr3xq
-         fHOw==
-X-Gm-Message-State: AOAM532Xlr0JWovyEBiiFUavs1XBsp98UmAVVfgR3nCki4/R+DJ8E4Z8
-        0n+epgP+hSRXguXMUwjK0f0=
-X-Google-Smtp-Source: ABdhPJwCu1E99glbIhrkJCTMPbFw5eaA1LSX9HxIKQqeRbbdCExVGLRsjJ+QkySEmU9Sepx/PUTYaw==
-X-Received: by 2002:a17:906:5ad6:b0:6e0:1799:4a15 with SMTP id x22-20020a1709065ad600b006e017994a15mr6950703ejs.594.1648763803671;
-        Thu, 31 Mar 2022 14:56:43 -0700 (PDT)
-Received: from localhost.localdomain (i130160.upc-i.chello.nl. [62.195.130.160])
-        by smtp.googlemail.com with ESMTPSA id s24-20020a1709066c9800b006e490a8cf71sm251434ejr.4.2022.03.31.14.56.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 14:56:43 -0700 (PDT)
-From:   Jakob Koschel <jakobkoschel@gmail.com>
-To:     Steve French <sfrench@samba.org>
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, Mike Rapoport <rppt@kernel.org>,
-        "Brian Johannesmeyer" <bjohannesmeyer@gmail.com>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        "Bos, H.J." <h.j.bos@vu.nl>, Jakob Koschel <jakobkoschel@gmail.com>
-Subject: [PATCH 2/2] cifs: remove check of list iterator against head past the loop body
-Date:   Thu, 31 Mar 2022 23:55:41 +0200
-Message-Id: <20220331215541.883746-2-jakobkoschel@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220331215541.883746-1-jakobkoschel@gmail.com>
-References: <20220331215541.883746-1-jakobkoschel@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S242937AbiCaXYh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 19:24:37 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9E5D5C353;
+        Thu, 31 Mar 2022 16:22:49 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5C2C2B82297;
+        Thu, 31 Mar 2022 23:22:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EDC5BC340ED;
+        Thu, 31 Mar 2022 23:22:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648768967;
+        bh=cFAMfnRYRwexlQ80k5xK4/bktdJv0fyhc/nvasOcLSo=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=pTcM+bxBZsVhEHBrY6ebu5Cmk1+aCXLsOgWp/mU2iRlmn57LuxoT7dzpXi9j5fAvD
+         CIaUqPpOMCUXBffm2HoFE6HC46X9o2R40nzA4yU6Af5l56QBJUKWRl1RciX8DFAg2Z
+         xlTV0sOIhiHR05VPVfdbgYMf6ugOdwJZOkdk3qiA2P6NG2wcTRpYK+PhBa8XupZ7am
+         MNlnvupN2x8gNOeAF5RuVUoRIoETnY4RuO28YZMkfpQEPP9CGF1hXZRkWOUoRP1Wd1
+         lJr8tCu8ivfq6ga8dP5t2DEJkMILo0M4DDaAFHvhFcwtNHIYtZrHNi9Z23HKk0oHnn
+         bXEQbw+m+CCkg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D7C76E7BB0B;
+        Thu, 31 Mar 2022 23:22:46 +0000 (UTC)
+Subject: Re: [GIT PULL] netfs: Prep for write helpers
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <2639515.1648483225@warthog.procyon.org.uk>
+References: <2639515.1648483225@warthog.procyon.org.uk>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <2639515.1648483225@warthog.procyon.org.uk>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/netfs-prep-20220318
+X-PR-Tracked-Commit-Id: ab487a4cdfca3d1ef12795a49eafe1144967e617
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: f008b1d6e1e06bb61e9402aa8a1cfa681510e375
+Message-Id: <164876896687.28012.3947884678367341659.pr-tracker-bot@kernel.org>
+Date:   Thu, 31 Mar 2022 23:22:46 +0000
+To:     David Howells <dhowells@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Steve French <sfrench@samba.org>, ceph-devel@vger.kernel.org,
+        dhowells@redhat.com, linux-afs@lists.infradead.org,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When list_for_each_entry() completes the iteration over the whole list
-without breaking the loop, the iterator value will be a bogus pointer
-computed based on the head element.
+The pull request you sent on Mon, 28 Mar 2022 17:00:25 +0100:
 
-While it is safe to use the pointer to determine if it was computed
-based on the head element, either with list_entry_is_head() or
-&pos->member == head, using the iterator variable after the loop should
-be avoided.
+> git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/netfs-prep-20220318
 
-In preparation to limit the scope of a list iterator to the list
-traversal loop, use a dedicated pointer to point to the found element [1].
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/f008b1d6e1e06bb61e9402aa8a1cfa681510e375
 
-Link: https://lore.kernel.org/all/CAHk-=wgRr_D8CB-D9Kg-c=EHreAsk5SqXPwr9Y7k9sA6cWXJ6w@mail.gmail.com/ [1]
-Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
----
- fs/cifs/smb2misc.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Thank you!
 
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index b25623e3fe3d..2d862291fab9 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -150,16 +150,18 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *srvr)
- 		struct smb2_transform_hdr *thdr =
- 			(struct smb2_transform_hdr *)buf;
- 		struct cifs_ses *ses = NULL;
-+		struct cifs_ses *iter;
- 
- 		/* decrypt frame now that it is completely read in */
- 		spin_lock(&cifs_tcp_ses_lock);
--		list_for_each_entry(ses, &srvr->smb_ses_list, smb_ses_list) {
--			if (ses->Suid == le64_to_cpu(thdr->SessionId))
-+		list_for_each_entry(iter, &srvr->smb_ses_list, smb_ses_list) {
-+			if (iter->Suid == le64_to_cpu(thdr->SessionId)) {
-+				ses = iter;
- 				break;
-+			}
- 		}
- 		spin_unlock(&cifs_tcp_ses_lock);
--		if (list_entry_is_head(ses, &srvr->smb_ses_list,
--				       smb_ses_list)) {
-+		if (!ses) {
- 			cifs_dbg(VFS, "no decryption - session id not found\n");
- 			return 1;
- 		}
 -- 
-2.25.1
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
