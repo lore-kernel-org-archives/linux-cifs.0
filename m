@@ -2,97 +2,78 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEECC433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  1 Apr 2022 16:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A23C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 23:25:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349547AbiDAQzh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 1 Apr 2022 12:55:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56584 "EHLO
+        id S232706AbiCaX1d (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 31 Mar 2022 19:27:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349698AbiDAQz2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 1 Apr 2022 12:55:28 -0400
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F9651AF2C
-        for <linux-cifs@vger.kernel.org>; Fri,  1 Apr 2022 09:51:48 -0700 (PDT)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 6AD797FC23;
-        Fri,  1 Apr 2022 16:51:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1648831906;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bIM8RhEWB60yYRj8uXGhOauFpbX6RHPFm2z9rnnY87s=;
-        b=NPaQ9f11OUUKx4nquY8YvEWe8SlgYte8+cLpiSeqIkFVCtCyKwjP8cPB9Zto/rD+5bHZqt
-        35AIephbPmBiVVB2i4EW49zWxiNc2ebjqtjAl9dMKkMi+1GVt7PS/tDTsuakPUwqaoYthB
-        wdYbAEkLsalrDzfkYPsxwmadZ2QQLGQcEs7yNlNjZSSjBN1iV6u9E8eNfr/1WjMEE4uisz
-        X0NMYTMBTLjaXd9yAVBDUq0zgFxvK2xSwXXZ/4HMaZtIN+0CmuvXWiaHBgJaBEWOjrUIbY
-        zkC2gx77wiVbeQy1IHSDlkEBk8vwqMokRjITv0i0mbNZUnyWzJ+qZzO5d+LGaw==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
-Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH v2] cifs: force new session setup and tcon for dfs
-Date:   Fri,  1 Apr 2022 13:51:34 -0300
-Message-Id: <20220401165134.25471-1-pc@cjr.nz>
-In-Reply-To: <20220331180151.5301-2-pc@cjr.nz>
-References: <20220331180151.5301-2-pc@cjr.nz>
+        with ESMTP id S229576AbiCaX1c (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 19:27:32 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0338166656
+        for <linux-cifs@vger.kernel.org>; Thu, 31 Mar 2022 16:25:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Date:To:From:CC;
+        bh=osikR6rTJTKFRCibKajJj4uWjRWx4LhBv/Xri3wcykI=; b=YNvbmMGwlQz71rNGnxuxt7HlO9
+        1QhZwXGbtVlk960Cf8sxO75i1AKEfUfXT2nKTGqnXQwf+jE0eBNLoVuy9qKhg6lEeQUinDzqgUfoW
+        +/WNC7Lu61yfm2g3JO9XcBzD7hjaWGqIlXeE+o3o9KKuizCJeUe181Gr0WKLV+NIIvHGFXIBUFq0n
+        iEq4CIB8SxrZ2DFfC9+t5Wo8Z+S4obcSdxJMA1btFf8HiegU/TjSdz61KhSj3aryR0UIKD/6oX8cA
+        8kWFxUxwjjmbe5HcxZ42LUEbWEjcmKszCbNcaXyo0z6AbRL0KTsR5yttcn6kjJbdnPh0p0WQS5nLK
+        Tx97YRj3jenuNAzgLzpZ5tqI13etiv83+9TLDaxTp0I6tMWU6HeeQe+jMBtMNWVtkWBPJG8fUlTCM
+        mO5v7A2O+JGr3vjEVwGIiifSOb2iBbRANgfa73TYdqnEgVSiXUNnvuvdP1YhR9AGKjKsZ+ZNYWAKt
+        If2nnrlNK9bsCemxIe3hiN0V;
+Received: from [2a01:4f8:192:486::6:0] (port=57748 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1na4Af-004fRe-0h
+        for cifs-qa@samba.org; Thu, 31 Mar 2022 23:25:41 +0000
+Received: from www-data by hr6.samba.org with local (Exim 4.93)
+        (envelope-from <www-data@samba.org>)
+        id 1na4Ae-002ikj-DX
+        for cifs-qa@samba.org; Thu, 31 Mar 2022 23:25:40 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 15025] CVE-2022-27239: Buffer overflow in mount.cifs options
+ parser
+Date:   Thu, 31 Mar 2022 23:25:39 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: user space tools
+X-Bugzilla-Version: 5.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sfrench@samba.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: ddiss@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_group
+Message-ID: <bug-15025-10630-lVLlGk6zZR@https.bugzilla.samba.org/>
+In-Reply-To: <bug-15025-10630@https.bugzilla.samba.org/>
+References: <bug-15025-10630@https.bugzilla.samba.org/>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Do not reuse existing sessions and tcons in DFS failover as it might
-connect to different servers and shares.
+https://bugzilla.samba.org/show_bug.cgi?id=3D15025
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
----
- fs/cifs/connect.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+Steve French <sfrench@samba.org> changed:
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 3ca06bd88b6e..54155eb4faac 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -453,9 +453,7 @@ static int reconnect_target_unlocked(struct TCP_Server_Info *server, struct dfs_
- 	return rc;
- }
- 
--static int
--reconnect_dfs_server(struct TCP_Server_Info *server,
--		     bool mark_smb_session)
-+static int reconnect_dfs_server(struct TCP_Server_Info *server)
- {
- 	int rc = 0;
- 	const char *refpath = server->current_fullpath + 1;
-@@ -479,7 +477,12 @@ reconnect_dfs_server(struct TCP_Server_Info *server,
- 	if (!cifs_tcp_ses_needs_reconnect(server, num_targets))
- 		return 0;
- 
--	cifs_mark_tcp_ses_conns_for_reconnect(server, mark_smb_session);
-+	/*
-+	 * Unconditionally mark all sessions & tcons for reconnect as we might be connecting to a
-+	 * different server or share during failover.  It could be improved by adding some logic to
-+	 * only do that in case it connects to a different server or share, though.
-+	 */
-+	cifs_mark_tcp_ses_conns_for_reconnect(server, true);
- 
- 	cifs_abort_connection(server);
- 
-@@ -537,7 +540,7 @@ int cifs_reconnect(struct TCP_Server_Info *server, bool mark_smb_session)
- 	}
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
--	return reconnect_dfs_server(server, mark_smb_session);
-+	return reconnect_dfs_server(server);
- }
- #else
- int cifs_reconnect(struct TCP_Server_Info *server, bool mark_smb_session)
--- 
-2.35.1
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+              Group|                            |cifsvfs-devel
 
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
