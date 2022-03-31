@@ -2,86 +2,77 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36FB3C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 18:02:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE43CC433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 18:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232579AbiCaSDx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 31 Mar 2022 14:03:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59784 "EHLO
+        id S233017AbiCaSDy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 31 Mar 2022 14:03:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232021AbiCaSDw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 14:03:52 -0400
+        with ESMTP id S232021AbiCaSDx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 14:03:53 -0400
 Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B99EA231ACC
-        for <linux-cifs@vger.kernel.org>; Thu, 31 Mar 2022 11:02:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A62BE231ACC
+        for <linux-cifs@vger.kernel.org>; Thu, 31 Mar 2022 11:02:06 -0700 (PDT)
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id E46E07FC23;
-        Thu, 31 Mar 2022 18:02:00 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 756377FC3F;
+        Thu, 31 Mar 2022 18:02:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1648749722;
+        t=1648749725;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=6ZRNqUNZ5+aAR4/Vo+9KeTJ7WySX9CmsFcJzGKnO9H0=;
-        b=c/YHwfEnRFNjF/7MkhNjHPIemi+mgIphe4mbAKQFZz4tsvfISlf3nvKcqqzEAmg/fuxUY2
-        Erw2qbRaoGDfANTad6c87c4Rda6FnqlHrleFC2bWXcL185cbMkWWVzENrZeJW3tnhuXBFl
-        nEpXf7oi22u1M4mdxX7z3duXbZw1iI+aSG0lc70CbtXDcjqBA8y219tNoYu5de/3ngLnd4
-        o75xbTSlhKl83O6cnPu7VdimCgoXNwaZcIRjKO40VsJy62qPI/2wtDT2blY3DBAwQtluP7
-        ecrVN/0JWJf8Qo/OoxhYEKsJvSoNBT7mcQ4wzukqbOczdd+5x2Yq1v1mb2mHMA==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AWPm2z/4sdwJiYL6bBabrHeDSTgx8PxueplbbfeQAXA=;
+        b=XnhlryZ3XX+XUg0Tr9BnTasL7HYL+b0I1HNql0S2tAfls8oThBTs6HEg9QXaq6bR/cxeh5
+        Ei8teiB16b1BubI5AypFITrW0Ceu0OnrmDsoXCVRqp8lcC/mJVx1FMGE2BHoMmCgDBpLxA
+        vyg/+ybA6qvKNLeTqok3w6vrwSnCD55skt+7s+b6XK+DnREIxKA2G7nLTH3ZdEQHbawvBh
+        1oPksdy/IWkp5tgAz6bhPkGOKKj/DO43RHeEl/HDMxw9iytyb9L7hs2GEM1gAEEr9UDFJ+
+        jFUvPRUIZgz2KaVzCdbfb/bx8lq7BwjpcWiyYUXehr/wMB9NTC73wQUW0pW6yQ==
 From:   Paulo Alcantara <pc@cjr.nz>
 To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
 Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH 1/2] cifs: fix potential race with cifsd thread
-Date:   Thu, 31 Mar 2022 15:01:50 -0300
-Message-Id: <20220331180151.5301-1-pc@cjr.nz>
+Subject: [PATCH 2/2] cifs: force new session setup and tcon for dfs
+Date:   Thu, 31 Mar 2022 15:01:51 -0300
+Message-Id: <20220331180151.5301-2-pc@cjr.nz>
+In-Reply-To: <20220331180151.5301-1-pc@cjr.nz>
+References: <20220331180151.5301-1-pc@cjr.nz>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-To avoid racing with demultiplex thread while it is handling data on
-socket, use cifs_signal_cifsd_for_reconnect() helper for marking
-current server to reconnect and let the demultiplex thread handle the
-rest.
+Do not reuse existing sessions and tcons in DFS failover as it might
+connect to different servers and shares.
 
-Fixes: dca65818c80c ("cifs: use a different reconnect helper for non-cifsd threads")
 Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 ---
- fs/cifs/connect.c | 2 +-
- fs/cifs/netmisc.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/connect.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index ee3b7c15e884..3ca06bd88b6e 100644
+index 3ca06bd88b6e..3956672a11ae 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -4465,7 +4465,7 @@ static int tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *tco
- 	 */
- 	if (rc && server->current_fullpath != server->origin_fullpath) {
- 		server->current_fullpath = server->origin_fullpath;
--		cifs_reconnect(tcon->ses->server, true);
-+		cifs_signal_cifsd_for_reconnect(server, true);
+@@ -536,8 +536,11 @@ int cifs_reconnect(struct TCP_Server_Info *server, bool mark_smb_session)
+ 		return __cifs_reconnect(server, mark_smb_session);
  	}
- 
- 	dfs_cache_free_tgts(tl);
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index ebe236b9d9f5..235aa1b395eb 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -896,7 +896,7 @@ map_and_check_smb_error(struct mid_q_entry *mid, bool logErr)
- 		if (class == ERRSRV && code == ERRbaduid) {
- 			cifs_dbg(FYI, "Server returned 0x%x, reconnecting session...\n",
- 				code);
--			cifs_reconnect(mid->server, false);
-+			cifs_signal_cifsd_for_reconnect(mid->server, false);
- 		}
- 	}
- 
+ 	spin_unlock(&cifs_tcp_ses_lock);
+-
+-	return reconnect_dfs_server(server, mark_smb_session);
++	/*
++	 * Ignore @mark_smb_session and invalidate all sessions & tcons as we might be connecting to
++	 * a different server or share during failover.
++	 */
++	return reconnect_dfs_server(server, true);
+ }
+ #else
+ int cifs_reconnect(struct TCP_Server_Info *server, bool mark_smb_session)
 -- 
 2.35.1
 
