@@ -2,68 +2,135 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 594CCC4332F
-	for <linux-cifs@archiver.kernel.org>; Fri,  1 Apr 2022 21:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 320FCC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  1 Apr 2022 22:44:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353037AbiDAVrK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 1 Apr 2022 17:47:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56426 "EHLO
+        id S236941AbiDAWqj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 1 Apr 2022 18:46:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353078AbiDAVrI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 1 Apr 2022 17:47:08 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DC910F6D2;
-        Fri,  1 Apr 2022 14:45:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 12C21B82680;
-        Fri,  1 Apr 2022 21:45:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C03B1C340F3;
-        Fri,  1 Apr 2022 21:45:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648849515;
-        bh=8WxsSKYXfHI+ZwEAmEi6yiRFZWVkJ6ThU6B6MiPl+4k=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=F0T5wWfkRwuUuxjW491OHVSIArlFkLwtAVg4/lDNUeqW8Hlr5QC7JyYJpb0z4KkRs
-         HDl3xRAcfrQ3weaP2BlkA/0R1JexQ8L/joqZJO1uzf8/NYUXzq9XCRrFwPh5ygIGUU
-         xHz9aE14Kq0+t3/ylS2E1iWDAzQD3fJs6LMs0zH1DbQJO7oo6gdRfu0QpBK2buHl59
-         tOfM0TP/kriKbgX2L7jDIShbYed0BYWarS9BF6jIzdehiKCZrIjGaDzjuEhS2i9c5g
-         SyPDrpPBup9PFFq4DEt6SQrCbq0/5q0IwLZIoXJUQU18WlbrYC8pGt6KoIbztChpWQ
-         WE5MPUWe8RWuQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ADA36EAC09C;
-        Fri,  1 Apr 2022 21:45:15 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvE6YuhkO0AaPtmzA4V22T_T-bz7ttKbvgtqo0My68Kgg@mail.gmail.com>
-References: <CAH2r5mvE6YuhkO0AaPtmzA4V22T_T-bz7ttKbvgtqo0My68Kgg@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvE6YuhkO0AaPtmzA4V22T_T-bz7ttKbvgtqo0My68Kgg@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/5.18-rc-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: edf5f0548fbb77e20b898460dc25281b0f4d974d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 7a3ecddc571cc3294e5d6bb5948ff2b0cfa12735
-Message-Id: <164884951570.9554.13950030052291928613.pr-tracker-bot@kernel.org>
-Date:   Fri, 01 Apr 2022 21:45:15 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        with ESMTP id S235963AbiDAWqj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 1 Apr 2022 18:46:39 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB80663CD;
+        Fri,  1 Apr 2022 15:44:48 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id m3so7368377lfj.11;
+        Fri, 01 Apr 2022 15:44:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ibv7hjPooUg+cfvEtghGL5hSRPahsD9zFXXRzSZ+XoY=;
+        b=PeGRrVIRDfksKrlCQFDeVeOo5EG4l/ke4QBxquqnC2URzOjxADt3EAKpBASnA24wWH
+         4lujpUtOex3q36ISwLA7GqkE9FSVvTW6A72DIzt0EbRFJEUFialbBrrcyC/jVoNYqxon
+         z66CEDQU8NfACq9o3OFhQ+j4JR0pjpSyK08adU82V7TaudcbmUfil4eXkuP/y6qfJff9
+         zv288j4MbHmoHxzhBzM8Q1O8d4nIOBQ/Bh4kK0j+CBdDjgxvNy6/jWUq+VvHmy0PmI4n
+         3xcLw4/LGxekXH/3Y8NEBiZcjFFyCof+wOguwC2XdcyC24srKC6Iz3IzZYPVRApWaq7K
+         ZnUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ibv7hjPooUg+cfvEtghGL5hSRPahsD9zFXXRzSZ+XoY=;
+        b=VRPWdNGn/FTzahUrGtPTXVtjA7LBBGZ1xIkI2yGsjsw9Dy3eB6sIf3jurqEHGCiSQb
+         hnutQH+/UcE8Re8Sv0HqkK+K6Pc6piKJO3Av5b7MbnhUw637t39rBhUzl+2laKMgjML3
+         7vrfVs6mFVuOp6PbQaW8AQUS9rOnJRoA/jnxK92sNhU3XnDg0bA8Css3zi5pGY5GaWfE
+         db5BTzq4vBEaafWZiR4az+dbt7XZ7kwJZYYhlAmU3q9u7eCeWYn5HCaMhBKQGCTQ+m7/
+         e9Pd7oSwfe+UuSQ+Tx87V8ZRDnAIUowVxetCkpVBF21WHLXjNDNX5YT0H+0RsE2tnjYx
+         7eiw==
+X-Gm-Message-State: AOAM530W0xq0Ooz5YDZxHYlB7h4vg0I2NZpoT0jJ0hdQBVc3l9W/tMRT
+        T1YJmmdzqsWIbYK1DzsNBpkQxBmPwVrTMk9uYPQ=
+X-Google-Smtp-Source: ABdhPJxrs5fSlNWnALwwUXR0mZMrAGAzRjdfOA/LjAHNqmMD9l69PAjCiqYAQtSdEHps123SkZCho3qgOEMHwfgdG9E=
+X-Received: by 2002:ac2:5444:0:b0:44a:846e:ad2b with SMTP id
+ d4-20020ac25444000000b0044a846ead2bmr15448715lfn.545.1648853087123; Fri, 01
+ Apr 2022 15:44:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220331215541.883746-1-jakobkoschel@gmail.com>
+In-Reply-To: <20220331215541.883746-1-jakobkoschel@gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 1 Apr 2022 17:44:36 -0500
+Message-ID: <CAH2r5mv-GCwR74QEv4WncTN6KMHceCT+YcLX7SnmuZwO67DuFQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] cifs: replace unnecessary use of list iterator
+ variable with head
+To:     Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        Mike Rapoport <rppt@kernel.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 1 Apr 2022 13:40:40 -0500:
+It looks like this no longer applies cleanly.   Can you recheck
+fs/cifs/smb2pdu.c (function smb2_reconnect_server) and see if it
+applies now that it has changed e.g.
 
-> git://git.samba.org/ksmbd.git tags/5.18-rc-ksmbd-server-fixes
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/7a3ecddc571cc3294e5d6bb5948ff2b0cfa12735
+/* allocate a dummy tcon struct used for reconnect */
+tcon = kzalloc(sizeof(struct cifs_tcon), GFP_KERNEL);
+if (!tcon) {
+resched = true;
+list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
+list_del_init(&ses->rlist);
+cifs_put_smb_ses(ses);
+}
+goto done;
+}
 
-Thank you!
+You had this:
+
+--- fs/cifs/smb2pdu.c
++++ fs/cifs/smb2pdu.c
+@@ -3858,7 +3858,7 @@ void smb2_reconnect_server(struct work_struct *work)
+  tcon = kzalloc(sizeof(struct cifs_tcon), GFP_KERNEL);
+  if (!tcon) {
+  resched = true;
+- list_del_init(&ses->rlist);
++ list_del_init(&pserver->smb_ses_list);
+  cifs_put_smb_ses(ses);
+  goto done;
+  }
+
+On Fri, Apr 1, 2022 at 2:23 AM Jakob Koschel <jakobkoschel@gmail.com> wrote:
+>
+> When list_for_each_entry() completes the iteration over the whole list
+> without breaking the loop, the iterator variable will *always* be a
+> bogus pointer computed based on the head element.
+>
+> To avoid type confusion use the actual list head directly instead of
+> the last iterator value.
+>
+> Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
+> ---
+>  fs/cifs/smb2pdu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 7e7909b1ae11..4ac86b77a7c9 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -3858,7 +3858,7 @@ void smb2_reconnect_server(struct work_struct *work)
+>         tcon = kzalloc(sizeof(struct cifs_tcon), GFP_KERNEL);
+>         if (!tcon) {
+>                 resched = true;
+> -               list_del_init(&ses->rlist);
+> +               list_del_init(&pserver->smb_ses_list);
+>                 cifs_put_smb_ses(ses);
+>                 goto done;
+>         }
+>
+> base-commit: f82da161ea75dc4db21b2499e4b1facd36dab275
+> --
+> 2.25.1
+>
+
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
