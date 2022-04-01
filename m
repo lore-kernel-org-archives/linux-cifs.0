@@ -2,78 +2,125 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A23C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Mar 2022 23:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF074C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri,  1 Apr 2022 17:41:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232706AbiCaX1d (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 31 Mar 2022 19:27:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34636 "EHLO
+        id S244827AbiDARnj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 1 Apr 2022 13:43:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiCaX1c (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Mar 2022 19:27:32 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0338166656
-        for <linux-cifs@vger.kernel.org>; Thu, 31 Mar 2022 16:25:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Message-ID:Date:To:From:CC;
-        bh=osikR6rTJTKFRCibKajJj4uWjRWx4LhBv/Xri3wcykI=; b=YNvbmMGwlQz71rNGnxuxt7HlO9
-        1QhZwXGbtVlk960Cf8sxO75i1AKEfUfXT2nKTGqnXQwf+jE0eBNLoVuy9qKhg6lEeQUinDzqgUfoW
-        +/WNC7Lu61yfm2g3JO9XcBzD7hjaWGqIlXeE+o3o9KKuizCJeUe181Gr0WKLV+NIIvHGFXIBUFq0n
-        iEq4CIB8SxrZ2DFfC9+t5Wo8Z+S4obcSdxJMA1btFf8HiegU/TjSdz61KhSj3aryR0UIKD/6oX8cA
-        8kWFxUxwjjmbe5HcxZ42LUEbWEjcmKszCbNcaXyo0z6AbRL0KTsR5yttcn6kjJbdnPh0p0WQS5nLK
-        Tx97YRj3jenuNAzgLzpZ5tqI13etiv83+9TLDaxTp0I6tMWU6HeeQe+jMBtMNWVtkWBPJG8fUlTCM
-        mO5v7A2O+JGr3vjEVwGIiifSOb2iBbRANgfa73TYdqnEgVSiXUNnvuvdP1YhR9AGKjKsZ+ZNYWAKt
-        If2nnrlNK9bsCemxIe3hiN0V;
-Received: from [2a01:4f8:192:486::6:0] (port=57748 helo=hr6.samba.org) 
-        by hr2.samba.org with esmtps (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1na4Af-004fRe-0h
-        for cifs-qa@samba.org; Thu, 31 Mar 2022 23:25:41 +0000
-Received: from www-data by hr6.samba.org with local (Exim 4.93)
-        (envelope-from <www-data@samba.org>)
-        id 1na4Ae-002ikj-DX
-        for cifs-qa@samba.org; Thu, 31 Mar 2022 23:25:40 +0000
-From:   samba-bugs@samba.org
-To:     cifs-qa@samba.org
-Subject: [Bug 15025] CVE-2022-27239: Buffer overflow in mount.cifs options
- parser
-Date:   Thu, 31 Mar 2022 23:25:39 +0000
-X-Bugzilla-Reason: QAcontact
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: CifsVFS
-X-Bugzilla-Component: user space tools
-X-Bugzilla-Version: 5.x
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sfrench@samba.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P5
-X-Bugzilla-Assigned-To: ddiss@samba.org
-X-Bugzilla-Target-Milestone: ---
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_group
-Message-ID: <bug-15025-10630-lVLlGk6zZR@https.bugzilla.samba.org/>
-In-Reply-To: <bug-15025-10630@https.bugzilla.samba.org/>
-References: <bug-15025-10630@https.bugzilla.samba.org/>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-X-Bugzilla-URL: https://bugzilla.samba.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S238038AbiDARnj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 1 Apr 2022 13:43:39 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9188411436C
+        for <linux-cifs@vger.kernel.org>; Fri,  1 Apr 2022 10:41:49 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3EA0D210EC;
+        Fri,  1 Apr 2022 17:41:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1648834908; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YffL2htPiHircpdKU3GEGMdIgTCPBYrAI/HK81ZuL8k=;
+        b=DftZ8Q6Ktb8EBQRsWn/Tgj89I/il0igI1qOZ46BYKKzdKrYnl6VTtsdsdEfEoq1xGu82LL
+        Ijxj80qM7uhXSxrXjjUCSoAKdBmngXLWSxphcQbAJQU4ANmK5ae/doJ+kc6NbwHOyb69Gn
+        oC7BwIFjWtQ9YaCVLqD70VVOpT1FsGQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1648834908;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YffL2htPiHircpdKU3GEGMdIgTCPBYrAI/HK81ZuL8k=;
+        b=Me7r3L9cwb5vg91RVHmT20I8Oo+s0d4lkY4SRSFT9TmoOF99Eiufj2bAtGxIX5iTXFCH0/
+        8IqcrZVF5wWFsgBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BD3A5132C1;
+        Fri,  1 Apr 2022 17:41:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id VrjtIFs5R2KWUwAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Fri, 01 Apr 2022 17:41:47 +0000
+Date:   Fri, 1 Apr 2022 14:41:45 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Tom Talpey <tom@talpey.com>
+Cc:     linux-cifs@vger.kernel.org, pshilovsky@samba.org,
+        smfrench@gmail.com, pc@cjr.nz
+Subject: Re: [PATCH] mount.cifs.rst: add FIPS information
+Message-ID: <20220401174145.6x443h555ch7kspd@cyberdelia>
+References: <20220331235251.4753-1-ematsumiya@suse.de>
+ <efb1d822-4fcf-dc3b-2861-8394f50aedbe@talpey.com>
+ <20220401152508.edovgwz5pxn6gnhn@cyberdelia>
+ <d5648e12-c5b9-07de-a20b-afd49adc5f56@talpey.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <d5648e12-c5b9-07de-a20b-afd49adc5f56@talpey.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-https://bugzilla.samba.org/show_bug.cgi?id=3D15025
+On 04/01, Tom Talpey wrote:
+>On 4/1/2022 11:25 AM, Enzo Matsumiya wrote:
+>>On 04/01, Tom Talpey wrote:
+>>>Is SMB2 really FIPS compliant? Even if it is, a server that doesn't
+>>>support anything higher is obviously far out of date.
+>>
+>>It's more that the crypto stuff used by SMB1 is *not* compliant.
+>
+>Sure, but that's not the point here. It's time to simply state
+>"don't use SMB1".
 
-Steve French <sfrench@samba.org> changed:
+I 100% agree.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-              Group|                            |cifsvfs-devel
+But, actually, that's the whole point of my commit. I just wanted to add
+what will work with mount.cifs on a FIPS compliant environment. Nothing
+else.
 
---=20
-You are receiving this mail because:
-You are the QA Contact for the bug.=
+Stating "don't use SMB1" (either FIPS or not) could come in a different
+commit.
+
+(Personally, I would've nuked all SMB1 from the kernel altogether :P)
+
+>I don't think the crypto algorithm is enough. SMB2 is vulnerable
+>to man-in-the-middle attacks and therefore the crypto type is
+>only a part of the picture. SMB3 is much stronger, even with the
+>same crypto algs.
+
+Again, I agree. But I'd say it's up to FIPS to mandate that. Even
+because their requirements only cover the crypto modules, not
+filesystems and/or versions as a whole AFAIK.
+
+>The Microsoft FIPS statement only refers to SMB3, for example:
+>
+>
+>https://docs.microsoft.com/en-us/windows/security/threat-protection/fips-140-validation
+>
+>  Is SMB3 (Server Message Block) FIPS 140 compliant in Windows?
+>
+>  SMB3 can be FIPS 140 compliant, if Windows is configured to operate in
+>  FIPS 140 mode on both client and server. In FIPS mode, SMB3 relies on
+>  the underlying Windows FIPS 140 validated cryptographic modules for
+>  cryptographic operations.
+
+But that's on a product (OS) level. We're preparing similar
+documentation for SUSE as well, for example.
+
+>I think anyone who is serious enough to want FIPS should darn well
+>be advised that the best security means running the strongest version
+>of the protocol, and the doc should not waffle around with discussion
+>of SMB1 or SMB2.
+
+And again, I also agree. My intent was to rather have specified in the
+docs what's supported in FIPS mode. Suggesting/enforcing a particular
+version or security mode was out of scope of my patch.
+
+
+Cheers,
+
+Enzo
