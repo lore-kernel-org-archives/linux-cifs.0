@@ -2,137 +2,184 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C9CC4167B
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Apr 2022 23:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2294C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Apr 2022 06:08:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233841AbiDEXUD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Apr 2022 19:20:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49076 "EHLO
+        id S232029AbiDFGKV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Apr 2022 02:10:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1448489AbiDEPsU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Apr 2022 11:48:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 174CA1A8C0A
-        for <linux-cifs@vger.kernel.org>; Tue,  5 Apr 2022 07:28:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649168893;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=2HftyXrFUGXnaP4rfcZb6D7hK+A7IkfBIMeUs8IzsCc=;
-        b=EfmgJOqrTPXw3YBmhgliZl2Ysi8EciRmyxFYT5HbutHRzU0ESq0igKPfHlVEHqCXtHMBit
-        qJi1TxhEPTmhcdFRmymWoF3cPztStCkyhOBNpYUIgazDdru/+dNLKEELV49bRUbtLymZjx
-        cAcaVR9vtLT+iKI8A2aTXJvEVOb+fpc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-661-UpPub7RhNRWdgV9xlcureQ-1; Tue, 05 Apr 2022 10:28:12 -0400
-X-MC-Unique: UpPub7RhNRWdgV9xlcureQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AD0921010360;
-        Tue,  5 Apr 2022 14:28:11 +0000 (UTC)
-Received: from dwysocha.rdu.csb (unknown [10.22.11.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D6B9141512B;
-        Tue,  5 Apr 2022 14:28:11 +0000 (UTC)
-From:   Dave Wysochanski <dwysocha@redhat.com>
-To:     dhowells@redhat.com
-Cc:     linux-cachefs@redhat.com, jlayton@kernel.org, smfrench@gmail.com,
-        linux-cifs@vger.kernel.org
-Subject: [PATCH v2] cachefiles: Fix KASAN slab-out-of-bounds in cachefiles_set_volume_xattr
-Date:   Tue,  5 Apr 2022 10:28:10 -0400
-Message-Id: <20220405142810.8208-1-dwysocha@redhat.com>
+        with ESMTP id S1847721AbiDFCUP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Apr 2022 22:20:15 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2040.outbound.protection.outlook.com [40.107.212.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54EEA269378;
+        Tue,  5 Apr 2022 16:37:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eJMHFDb385Pk1INiFJy/jKPgalLqLf2lNzGcBdnP5uLd9ofJuWSuarwNUH2bpcv1m/GdQIl9fiFnL09rY6rVL1UMEsMn1MS7sq4xcOeI6vbbOrUzDf3IzSauTJ9eYhe08rUHlNUDZZf1zabClOLrnm0VlM2oEfVAPJP0+Jko1yemQ+wPcpNGQ6EyV6l+jUvw2qH6sqKLjWPW05S2uVOh17qyuGSkc2U6itgKI6+qq8PsTtLd/C8+o65W0StKSkWK5K9BSfz51PVvf9XqOhos+3/QZtGR+gcIAJL4tS7Ce/4lkhgPr0+AYbvlCbT9Mmm6Ntn8ko412myyuic1ikV92g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mJ8fkqQRyvccGEjfChcVHQG6wLPS1HHzdhMQ9kB0mN4=;
+ b=GiltZAq4YGpmmdVYNgkZFYFDX7NSqpMsaTL+q/4lrWH631TkfXU2ovTLZRp9UzNuhvTUPLcqyX1R4rYmyjiVmm0urZmvG/lz8gXXeTgMA9UgxAETWZPoGUG1XRlAixRnTHH10+ZqT4lZkmhlCedqnUFNJuGxqFvUFoZCkKsJXlQPfFp8Rsc0aMf4nxBbevdV5/ETCIvgZoDm3Em7lSnbDOTdzRt2UMVFLcMD8XR1QD9URqSUXtd9/BRYdkWNNwv9K2wWr+71JVJ8u2wP+yFZRvCd6zauEexe/v+vG2yUXmtiTLk89J7b3g33njMlDJBOfOkGb+lc1qIZhY4UiriTBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mJ8fkqQRyvccGEjfChcVHQG6wLPS1HHzdhMQ9kB0mN4=;
+ b=dYpE+BB/+QfGiZN1QE+46xVgkxjBT5HT8WvjLHAEgEtv/taaJRvldZb8/j4w6zRnlm5pKYx7uj+Dmjcf5xFI+3ZsfaC4ZxGPGNcCycmnb5UBPP6IHPNTph7EdpzGgs+/dsCfZXFEF5O4QZmHztEaabFbtPwMU9gM9RVNxPWrvqgEduQhG9jA/wT/fYn8LIXB6kQAeGdHGIrrTXCueJCRzmbOHV+4A9a1nz4NQDLy0IOKW0MNS4fBLIdeYaRDuG5bCtCC5fNZJmsq6OYZJPcp5Z6dzyHl+xguOPUP71WP7eCF0Btp3pM3m2B1tBvL6JaFB4WV3GLXzxEzLSllGYGvpA==
+Received: from BN8PR12MB3426.namprd12.prod.outlook.com (2603:10b6:408:4a::14)
+ by CY4PR12MB1688.namprd12.prod.outlook.com (2603:10b6:910:8::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.31; Tue, 5 Apr
+ 2022 23:37:28 +0000
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN8PR12MB3426.namprd12.prod.outlook.com (2603:10b6:408:4a::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.31; Tue, 5 Apr
+ 2022 23:37:27 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::cdfb:f88e:410b:9374]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::cdfb:f88e:410b:9374%5]) with mapi id 15.20.5123.031; Tue, 5 Apr 2022
+ 23:37:27 +0000
+Date:   Tue, 5 Apr 2022 20:37:25 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Ariel Elior <aelior@marvell.com>, Anna Schumaker <anna@kernel.org>,
+        Jens Axboe <axboe@fb.com>,
+        Christian Benvenuti <benve@cisco.com>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Leon Romanovsky <leon@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mustafa Ismail <mustafa.ismail@intel.com>,
+        Nelson Escobar <neescoba@cisco.com>, netdev@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, rds-devel@oss.oracle.com,
+        Sagi Grimberg <sagi@grimberg.me>,
+        samba-technical@lists.samba.org,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
+        Steve French <sfrench@samba.org>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        target-devel@vger.kernel.org,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>,
+        Xiao Yang <yangx.jy@fujitsu.com>
+Subject: Re: [PATCH] RDMA: Split kernel-only global device caps from uvers
+ device caps
+Message-ID: <20220405233725.GY2120790@nvidia.com>
+References: <0-v1-47e161ac2db9+80f-kern_caps_jgg@nvidia.com>
+ <20220405044331.GA22322@lst.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220405044331.GA22322@lst.de>
+X-ClientProxiedBy: CH0PR03CA0407.namprd03.prod.outlook.com
+ (2603:10b6:610:11b::34) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7e110783-3c5c-4ab9-6add-08da175d3e25
+X-MS-TrafficTypeDiagnostic: BN8PR12MB3426:EE_|CY4PR12MB1688:EE_
+X-Microsoft-Antispam-PRVS: <BN8PR12MB34262BBA6A0C4A4A389A602CC2E49@BN8PR12MB3426.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UPwiVvLTw6Qw6p80buxNeQNC0wVMbAHRUpjjyKYq5/+OMFjQmjM4nH6K7wrTQFHNf8eJW7pW9RABaM7gQpdsSYFEsdcaQLZuIhJCZhASDkOWGqwQKfFfmvN3te/DRG9mBuz/e833tP3fhJCrjIzOf1JH/XKiB9b9KVAXE1OPOMDHlkQi9smHESoCs8KuRTvnw2OGP0JZS84sLbkvJ3qUDIc50IhvPjp0f9bK/e0SAxs5q+lVoKldthXpE2ZxDXwWUoMwf3P9ywrDQ9YyHtU1YW5CoeYHlHd502dvqL7o8wxBWIxSd+A8pL32/dAlr70D4e5C/FbPOJDgSMKCcbl0f5bRQsYhoRKzaf6D9QuMG3OzJrvPjn2yrOdo4v9/jHBsb67O+NShYDXlEXSHXCKBwZI8scCdR/y3urU4DxFZNknbAMtLQgu4acOGQTAMUKaueGDO/2aFxb9Nc4KoopCNIZLclstjaGOgXA8+KpJX3AenMah/imx80n6DPdV/klLJYXsCvh6dEMqAFOFRGw+g03eSn875cQYEsQR/IIXE00MPwmNb+PfhdbvlhdgssltNmTHYs8LafelVnzqEvJApNIzoVvu3Dx6Jq2rZkKghL3ut/n5SIkbpo7twRfXybPv0p40rhh8ldimGhskFTtI6LQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3426.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8936002)(36756003)(1076003)(6486002)(5660300002)(83380400001)(2906002)(26005)(508600001)(7416002)(7406005)(2616005)(38100700002)(4326008)(66946007)(8676002)(33656002)(316002)(66556008)(66476007)(86362001)(54906003)(6506007)(6512007)(186003)(6916009);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Lao9NZvIpLqgmWrkf1RuQ1CaTOkjzxQnRf/hbeY5sn38rBp+xyky79tnkug9?=
+ =?us-ascii?Q?P5o71mA/QpNJ1d+Zoxq2Z9jlBPbdOhFWDTpy2o5g+eodMCnxtjQdKkvFCA4Y?=
+ =?us-ascii?Q?/o+IDKHc79ZhPtNQjeq/UU/DoVfTP/wJsUbVrTQU/5u2WAGYoLOSDNKUF31B?=
+ =?us-ascii?Q?6pyUgYFquHnsHnGXivBua4iOmByWUIvP2gIB6ML9BNhiNC3s73vBiD338Px5?=
+ =?us-ascii?Q?FRCQiRtA5h3NkFp0GHwKKgMg57DZKzh65R5tH46JukAYP9BMgeJHoqiCV+js?=
+ =?us-ascii?Q?bulw5cWXGw5UKKK2w3HFxUf5jFmEwSCdtS3YPMofDNfw6ePULsSe4BUrAsfE?=
+ =?us-ascii?Q?AjO/qiu1rGn8rUG3AUtbHCXeszeWSRNI9PO+OuNeWlBSHykktQj2DPOBaMCB?=
+ =?us-ascii?Q?YWEFxtaIg04VC1eoKos533u6b9Yb6XLpzayEk3+51CJ2D593Q8Th5nBos+Ti?=
+ =?us-ascii?Q?KbaUl4amf0JJJ7ugpm5nBCOb42V2Xoe6rnmVfN9Dt6kCJv4mT2MG8qqstL2B?=
+ =?us-ascii?Q?eb5x3vYo4TqaDzg7Ai9oS+8vDdfa5FYAzWvpRb+0ZP2dQAXHVGD4fu5KDLy1?=
+ =?us-ascii?Q?kbcJTDjoUV7nWrzzyUyqLj0M+Y/MuvGbhqhUfj1Hyj+Z3pQwqA4uiUj8sAWV?=
+ =?us-ascii?Q?217UHGVOHrQtybGS3ORFlLirgXnJ3rnv0gtzSJIwNz9l1+cjO2XRNJiMd5WD?=
+ =?us-ascii?Q?f2oJQTTzoK/pDqoPT03QnvnDEi585LP0DenMTb9ruWubH6kqZAiq3+vSM1Z+?=
+ =?us-ascii?Q?rD+i8SNoHY6DskxKtmtndB2zXVLzHly8hoVrHX+xUmlGezVinyj4Xi4Ynt4o?=
+ =?us-ascii?Q?X7WDpDovhXnMKq4/OYxPOWgxpbOPIoD6C59fadWCWlWsB1nnusQIQRqWMHRm?=
+ =?us-ascii?Q?x9fBFPUrz23+x2lAlxmJNaL0JhebT2ASFP7m7DwgP1RqYIznXc2EUgV8lAb7?=
+ =?us-ascii?Q?qy+FNdVlG03aen86BoWXbHt0b2EWJKJ4cSJGs33nxIrxSpKcPdcmsG2+XdOa?=
+ =?us-ascii?Q?vXRu6ROZG9PB7cE1CCi0HBmmyb+SwMtuSGT1BRFMKZplCtmzMQ9Wh9pDBcoI?=
+ =?us-ascii?Q?y5a75B8+aeNjKfjcFc3zeA6GrF2B6j1ZSlP0EeHa9xHhCstyYcJ3NOBGTyIl?=
+ =?us-ascii?Q?eKjJSS2Fex/TAsneViQt7XYZ16R9ZxNHXNhDQmmM8tijOwZ7hmTieCPRk1wA?=
+ =?us-ascii?Q?szSh11GeIKeHIqFPnGNGkFgIhex7kWtm/hFTV7rl5kYOcJQTJSPUVecN5Osx?=
+ =?us-ascii?Q?SrxrO/hPvxA2423u8RDynqQ7ePyk0hwvmEHLv0PF36gPTBB7/heLfBho17qx?=
+ =?us-ascii?Q?uzS+GrWQCqrZJ+XotbPlImTMVpMgzEYGNcdUrIHD4IDM0XXP4HP51ey6e9Uy?=
+ =?us-ascii?Q?5kd1UGwxN+Wps4cI7QgNqvGcH6UdgbFMQxg6WadC7Z5XrDB0dGfTQMorZjKp?=
+ =?us-ascii?Q?i1BqF7m+hdQQIsyDuEaKQgn/iIf+m6D4+urOyMteWVY8Rrj/FbZLL3GsAZaB?=
+ =?us-ascii?Q?BnF+82EJ+UXQhI+sI3hKtQEoeQ2xb5ay650yGmJV773EM7XNwSmUo0Lg11mn?=
+ =?us-ascii?Q?lWBFP4AKqZxxpY4hmD42x5TMVURhFOO+0KXL1ap61d5I6L7kJ3WloP7OTavP?=
+ =?us-ascii?Q?1eaiguMuVHWZDtfskWWtkogQbuLEo0lt7Ron1DivPGnGpxIZBYKUkRRroSS7?=
+ =?us-ascii?Q?D3QZrkk3p/OjWM54S82envn0dNyLE++LZk8Kuxg9WJEytnjdroTTr2EERBC4?=
+ =?us-ascii?Q?SL359FARMQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e110783-3c5c-4ab9-6add-08da175d3e25
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2022 23:37:27.0258
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hULMmrwIXqJVIB82KVPbe3UZEVQ8HOMSeJYD0tz0vb2BuiIns3rnG+hLGkBMjBqO
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1688
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use the actual length of volume coherency data when setting the
-xattr to avoid the following KASAN report.
+On Tue, Apr 05, 2022 at 06:43:31AM +0200, Christoph Hellwig wrote:
 
- BUG: KASAN: slab-out-of-bounds in cachefiles_set_volume_xattr+0xa0/0x350 [cachefiles]
- Write of size 4 at addr ffff888101e02af4 by task kworker/6:0/1347
+> > -	if (!(device->attrs.device_cap_flags & IB_DEVICE_ALLOW_USER_UNREG)) {
+> > +	if (!(device->attrs.kernel_cap_flags & IB_KDEVICE_ALLOW_USER_UNREG)) {
+> 
+> Maybe shorten the prefix to IBD_ ?
 
- CPU: 6 PID: 1347 Comm: kworker/6:0 Kdump: loaded Not tainted 5.18.0-rc1-nfs-fscache-netfs+ #13
- Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-4.fc34 04/01/2014
- Workqueue: events fscache_create_volume_work [fscache]
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x45/0x5a
-  print_report.cold+0x5e/0x5db
-  ? __lock_text_start+0x8/0x8
-  ? cachefiles_set_volume_xattr+0xa0/0x350 [cachefiles]
-  kasan_report+0xab/0x120
-  ? cachefiles_set_volume_xattr+0xa0/0x350 [cachefiles]
-  kasan_check_range+0xf5/0x1d0
-  memcpy+0x39/0x60
-  cachefiles_set_volume_xattr+0xa0/0x350 [cachefiles]
-  cachefiles_acquire_volume+0x2be/0x500 [cachefiles]
-  ? __cachefiles_free_volume+0x90/0x90 [cachefiles]
-  fscache_create_volume_work+0x68/0x160 [fscache]
-  process_one_work+0x3b7/0x6a0
-  worker_thread+0x2c4/0x650
-  ? process_one_work+0x6a0/0x6a0
-  kthread+0x16c/0x1a0
-  ? kthread_complete_and_exit+0x20/0x20
-  ret_from_fork+0x22/0x30
-  </TASK>
-
- Allocated by task 1347:
-  kasan_save_stack+0x1e/0x40
-  __kasan_kmalloc+0x81/0xa0
-  cachefiles_set_volume_xattr+0x76/0x350 [cachefiles]
-  cachefiles_acquire_volume+0x2be/0x500 [cachefiles]
-  fscache_create_volume_work+0x68/0x160 [fscache]
-  process_one_work+0x3b7/0x6a0
-  worker_thread+0x2c4/0x650
-  kthread+0x16c/0x1a0
-  ret_from_fork+0x22/0x30
-
- The buggy address belongs to the object at ffff888101e02af0
- which belongs to the cache kmalloc-8 of size 8
- The buggy address is located 4 bytes inside of
- 8-byte region [ffff888101e02af0, ffff888101e02af8)
-
- The buggy address belongs to the physical page:
- page:00000000a2292d70 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x101e02
- flags: 0x17ffffc0000200(slab|node=0|zone=2|lastcpupid=0x1fffff)
- raw: 0017ffffc0000200 0000000000000000 dead000000000001 ffff888100042280
- raw: 0000000000000000 0000000080660066 00000001ffffffff 0000000000000000
- page dumped because: kasan: bad access detected
-
- Memory state around the buggy address:
- ffff888101e02980: fc 00 fc fc fc fc 00 fc fc fc fc 00 fc fc fc fc
- ffff888101e02a00: 00 fc fc fc fc 00 fc fc fc fc 00 fc fc fc fc 00
- >ffff888101e02a80: fc fc fc fc 00 fc fc fc fc 00 fc fc fc fc 04 fc
-                                                            ^
- ffff888101e02b00: fc fc fc 00 fc fc fc fc 00 fc fc fc fc 00 fc fc
- ffff888101e02b80: fc fc 00 fc fc fc fc 00 fc fc fc fc 00 fc fc fc
- ==================================================================
-
-Fixes: 413a4a6b0b55 "cachefiles: Fix volume coherency attribute"
-Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
----
- fs/cachefiles/xattr.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
-index 35465109d9c4..f13b642c1d14 100644
---- a/fs/cachefiles/xattr.c
-+++ b/fs/cachefiles/xattr.c
-@@ -198,8 +198,7 @@ bool cachefiles_set_volume_xattr(struct cachefiles_volume *volume)
+Sure
  
- 	_enter("%x,#%d", volume->vcookie->debug_id, len);
- 
--	len += sizeof(*buf);
--	buf = kmalloc(len, GFP_KERNEL);
-+	buf = kmalloc(sizeof(*buf) + len, GFP_KERNEL);
- 	if (!buf)
- 		return false;
- 	buf->reserved = cpu_to_be32(0);
--- 
-2.27.1
+> > +enum ib_kernel_cap_flags {
+> > +	/*
+> > +	 * This device supports a per-device lkey or stag that can be
+> > +	 * used without performing a memory registration for the local
+> > +	 * memory.  Note that ULPs should never check this flag, but
+> > +	 * instead of use the local_dma_lkey flag in the ib_pd structure,
+> > +	 * which will always contain a usable lkey.
+> > +	 */
+> > +	IB_KDEVICE_LOCAL_DMA_LKEY = 1 << 0,
+> > +	IB_KDEVICE_UD_TSO = 1 << 1,
+> > +	IB_KDEVICE_BLOCK_MULTICAST_LOOPBACK = 1 << 2,
+> > +	IB_KDEVICE_INTEGRITY_HANDOVER = 1 << 3,
+> > +	IB_KDEVICE_ON_DEMAND_PAGING = 1ULL << 4,
+> > +	IB_KDEVICE_SG_GAPS_REG = 1ULL << 5,
+> > +	IB_KDEVICE_VIRTUAL_FUNCTION = 1ULL << 6,
+> > +	IB_KDEVICE_RDMA_NETDEV_OPA = 1ULL << 7,
+> > +	IB_KDEVICE_ALLOW_USER_UNREG = 1ULL << 8,
+> > +};
+> 
+> And maybe not in this patch, but if you touch this anyway please add
+> comments to document allthe flags.
 
+Wouldn't that be nice.. I know what some of these do at least and can
+try
+
+The 'ULL' should go away too..
+
+Jason
