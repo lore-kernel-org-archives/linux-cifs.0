@@ -2,133 +2,122 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0F0C433FE
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Apr 2022 23:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A7BC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Apr 2022 23:03:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237492AbiDFXFA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 6 Apr 2022 19:05:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39634 "EHLO
+        id S237544AbiDFXFV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Apr 2022 19:05:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237481AbiDFXE7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Apr 2022 19:04:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 40978F32BF
-        for <linux-cifs@vger.kernel.org>; Wed,  6 Apr 2022 16:03:02 -0700 (PDT)
+        with ESMTP id S237539AbiDFXFR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Apr 2022 19:05:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E170E143C76
+        for <linux-cifs@vger.kernel.org>; Wed,  6 Apr 2022 16:03:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649286181;
+        s=mimecast20190719; t=1649286193;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=TVUTDEn4ajQnJg0xbfI7sdT5Px6RGo8oRV8kyeHSPWk=;
-        b=aEX+ukw0/od0NU0JlLOMYyNK8v8/OfRD7UMa+4AjsEj2FpqqQcxor0Ry3SevIJOhHjkIbc
-        TjwS/jtQB33aRsdGGdXXjDZREuHrqqUUXE2ZTbDnERtnCf5gMKMIRODXtpZ0kkO60Kkuys
-        xGGIZvkdhg3n4KFSCoC/FFIt5lRTI0I=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OkQROJZ9xFEDjhFgCoOAdsvXUZoPyUf8F0k5ysSvSEo=;
+        b=e7nmWFFtItCxtz2oJmva1zDfADxbq9MPoyKAIU94xLg2L9UMOsUDOy6D/Sw+l9XgJ7ew1S
+        a1Op/p4ulhR6AFuCW9HM3U1KjWsa/ai6tx3ZLHzTSQkjYFLE7VjesSTwuscGg8dEnEKzHc
+        0TLkxzm8iaoIcCv4Kg5VCXl3Bv5FM10=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-554-kFMLqPKjMCOt5JMsgkA9fg-1; Wed, 06 Apr 2022 19:02:58 -0400
-X-MC-Unique: kFMLqPKjMCOt5JMsgkA9fg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-365-kqmGcfx0ONC_B7F1jw4NGg-1; Wed, 06 Apr 2022 19:03:09 -0400
+X-MC-Unique: kqmGcfx0ONC_B7F1jw4NGg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DAA103C00135;
-        Wed,  6 Apr 2022 23:02:41 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4C69E3804098;
+        Wed,  6 Apr 2022 23:03:09 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.37.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EFCC2024CBB;
-        Wed,  6 Apr 2022 23:02:31 +0000 (UTC)
-Subject: [PATCH 00/14] cifs: Iterators, netfslib and folios
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D80297AE5;
+        Wed,  6 Apr 2022 23:03:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 02/14] cifs: Add a function to read into an iter from a socket
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
-Cc:     Matthew Wilcox <willy@infradead.org>, linux-cifs@vger.kernel.org,
+Cc:     Steve French <sfrench@samba.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <sfrench@samba.org>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
-        dhowells@redhat.com, Steve French <sfrench@samba.org>,
+        linux-cifs@vger.kernel.org, dhowells@redhat.com,
+        Steve French <sfrench@samba.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         Jeff Layton <jlayton@redhat.com>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org
-Date:   Thu, 07 Apr 2022 00:02:30 +0100
-Message-ID: <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk>
+Date:   Thu, 07 Apr 2022 00:02:58 +0100
+Message-ID: <164928617874.457102.10021662143234315566.stgit@warthog.procyon.org.uk>
+In-Reply-To: <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk>
+References: <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.4
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-
-Here's a set of patches to make the following changes to the cifs
-filesystem driver:
-
- (1) Convert cifs to use I/O iterators to pass data/buffers from the the VM
-     interface layer down to the socket rather than passing page lists
-     about.
-
- (2) Convert cifs to use netfslib for buffered and direct read operations.
-
- (3) A partial conversion to folios.
-
-This branch is built on top of my netfs-lib branch[1].
-
-The patches can be found here also:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-experimental
-
-
-David
-
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-lib [1]
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: linux-cifs@vger.kernel.org
 ---
-David Howells (14):
-      cifs: Add some helper functions
-      cifs: Add a function to read into an iter from a socket
-      cifs: Check the IOCB_DIRECT flag, not O_DIRECT
-      cifs: Change the I/O paths to use an iterator rather than a page list
-      cifs: Remove unused code
-      cifs: Use netfslib to handle reads
-      cifs: Share server EOF pos with netfslib
-      netfs: Allow the netfs to make the io (sub)request alloc larger
-      cifs: Put credits into cifs_io_subrequest, not on the stack
-      cifs: Hold the open file on netfs_io_request, not netfs_io_subrequest
-      cifs: Clamp length according to credits and rsize
-      cifs: Expose netfs subrequest debug ID and index in read tracepoints
-      cifs: Split the smb3_add_credits tracepoint
-      mm, netfs, fscache: Stop read optimisation when folio removed from pagecache
 
+ fs/cifs/cifsproto.h |    3 +++
+ fs/cifs/connect.c   |   16 ++++++++++++++++
+ 2 files changed, 19 insertions(+)
 
- fs/afs/file.c           |    1 +
- fs/afs/inode.c          |    1 +
- fs/afs/internal.h       |    2 +
- fs/cifs/Kconfig         |    1 +
- fs/cifs/cifsencrypt.c   |   40 +-
- fs/cifs/cifsfs.c        |   11 +-
- fs/cifs/cifsfs.h        |    6 +-
- fs/cifs/cifsglob.h      |   53 +-
- fs/cifs/cifsproto.h     |   13 +-
- fs/cifs/cifssmb.c       |  252 +++--
- fs/cifs/connect.c       |   18 +-
- fs/cifs/file.c          | 2096 ++++++++++-----------------------------
- fs/cifs/fscache.c       |  120 +--
- fs/cifs/fscache.h       |   70 --
- fs/cifs/inode.c         |   22 +-
- fs/cifs/misc.c          |  109 --
- fs/cifs/smb2ops.c       |  387 ++++----
- fs/cifs/smb2pdu.c       |   85 +-
- fs/cifs/smb2proto.h     |    2 +-
- fs/cifs/trace.h         |  151 ++-
- fs/cifs/transport.c     |   41 +-
- fs/netfs/internal.h     |    1 +
- fs/netfs/io.c           |    7 +-
- fs/netfs/misc.c         |   13 +-
- fs/netfs/stats.c        |    9 +-
- include/linux/fs.h      |    2 +
- include/linux/netfs.h   |    1 +
- include/linux/pagemap.h |    1 +
- mm/filemap.c            |   15 +
- 29 files changed, 1203 insertions(+), 2327 deletions(-)
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 0df3b24a0bf4..dd4931308ea6 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -245,6 +245,9 @@ extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
+ 					unsigned int page_offset,
+ 					unsigned int to_read);
+ extern int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb);
++extern int cifs_read_iter_from_socket(struct TCP_Server_Info *server,
++				      struct iov_iter *iter,
++				      unsigned int to_read);
+ extern int cifs_match_super(struct super_block *, void *);
+ extern int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx);
+ extern void cifs_umount(struct cifs_sb_info *);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index ee3b7c15e884..080e19e9ee47 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -754,6 +754,22 @@ cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *page,
+ 	return cifs_readv_from_socket(server, &smb_msg);
+ }
+ 
++int
++cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct iov_iter *iter,
++			   unsigned int to_read)
++{
++	struct msghdr smb_msg;
++	int ret;
++
++	smb_msg.msg_iter = *iter;
++	if (smb_msg.msg_iter.count > to_read)
++		smb_msg.msg_iter.count = to_read;
++	ret = cifs_readv_from_socket(server, &smb_msg);
++	if (ret > 0)
++		iov_iter_advance(iter, ret);
++	return ret;
++}
++
+ static bool
+ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+ {
 
 
