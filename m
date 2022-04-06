@@ -2,46 +2,47 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B760C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Apr 2022 23:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A67E8C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Apr 2022 23:05:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237556AbiDFXGb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 6 Apr 2022 19:06:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44464 "EHLO
+        id S237860AbiDFXHK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Apr 2022 19:07:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237698AbiDFXG1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Apr 2022 19:06:27 -0400
+        with ESMTP id S231290AbiDFXGf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Apr 2022 19:06:35 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A57B434A4
-        for <linux-cifs@vger.kernel.org>; Wed,  6 Apr 2022 16:04:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C95B7BF76
+        for <linux-cifs@vger.kernel.org>; Wed,  6 Apr 2022 16:04:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649286268;
+        s=mimecast20190719; t=1649286275;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8gGGx4j17Pm6hFmcJTfM5+MTyF6+SQ6U0EyOzVOx73M=;
-        b=FqbNvfNLjSNRIlQGus4fb0ufiFtw8hOSYTbHb5SPmSIbHJtvZTWQeASiIw9MJCC2nQyB31
-        nIAqQq3TLWGLmXihOhMjFZy/tAVceHDGqMsAbFtQD+lX0m1EBN/cktVXlpu/pWnzG2fD0+
-        DwdX1lLgQp1g6rJxaAUfW2C8uLg9qm4=
+        bh=q1tSsE6QNgYZ78bN7KiJubCT50PcBaB/EJFk09P7vaY=;
+        b=BYMrTjQ7iBqdvoaEOMjjz9f9cmJ54D/rMfKI2g7G7P3f7PBTwRrR54sKBYEBNVD7G0oSnj
+        j1FE5v/ByzAPKrI6YzrsJa14XY89v89lbOMs+aEsf6R8lIysExm0pOMY1ihT5chlqZkpRZ
+        s0RBvzOOCBe0dWOjEPHNqZw2ZF74ULs=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-569-XOse0Vh5PfCL4aMrkWNkvg-1; Wed, 06 Apr 2022 19:04:24 -0400
-X-MC-Unique: XOse0Vh5PfCL4aMrkWNkvg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-363-tq_9NYBMMFGQEmOalP5MjA-1; Wed, 06 Apr 2022 19:04:31 -0400
+X-MC-Unique: tq_9NYBMMFGQEmOalP5MjA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8068A811E90;
-        Wed,  6 Apr 2022 23:04:18 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4C36C100BAA6;
+        Wed,  6 Apr 2022 23:04:31 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.37.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 31FB640D1B98;
-        Wed,  6 Apr 2022 23:04:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 065CCC28102;
+        Wed,  6 Apr 2022 23:04:29 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 07/14] cifs: Share server EOF pos with netfslib
+Subject: [PATCH 09/14] cifs: Put credits into cifs_io_subrequest,
+ not on the stack
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
 Cc:     Steve French <sfrench@samba.org>,
@@ -54,21 +55,22 @@ Cc:     Steve French <sfrench@samba.org>,
         Jeff Layton <jlayton@redhat.com>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org
-Date:   Thu, 07 Apr 2022 00:04:05 +0100
-Message-ID: <164928624528.457102.12296775035063756098.stgit@warthog.procyon.org.uk>
+Date:   Thu, 07 Apr 2022 00:04:29 +0100
+Message-ID: <164928626929.457102.8462570553817391746.stgit@warthog.procyon.org.uk>
 In-Reply-To: <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk>
 References: <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.4
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use cifsi->netfs_ctx.remote_i_size instead of cifsi->server_eof so that
-netfslib can refer to it to.
+Move the credits into the cifs_io_subrequest struct rather than placing them
+on the stack.  They are then allocated by netfslib when it allocates its
+netfs_io_subrequest.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
@@ -77,134 +79,59 @@ cc: Rohith Surabattula <rohiths.msft@gmail.com>
 cc: linux-cifs@vger.kernel.org
 ---
 
- fs/cifs/cifsfs.c   |    2 +-
- fs/cifs/cifsglob.h |    1 -
- fs/cifs/file.c     |    8 ++++----
- fs/cifs/inode.c    |    6 +++---
- fs/cifs/smb2ops.c  |   10 ++++------
- 5 files changed, 12 insertions(+), 15 deletions(-)
+ fs/cifs/file.c |   12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index b33f5eb3233c..d07cb28652f2 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -376,7 +376,7 @@ cifs_alloc_inode(struct super_block *sb)
- 	spin_lock_init(&cifs_inode->writers_lock);
- 	cifs_inode->writers = 0;
- 	cifs_inode->vfs_inode.i_blkbits = 14;  /* 2**14 = CIFS_MAX_MSGSIZE */
--	cifs_inode->server_eof = 0;
-+	cifs_inode->netfs_ctx.remote_i_size = 0;
- 	cifs_inode->uniqueid = 0;
- 	cifs_inode->createtime = 0;
- 	cifs_inode->epoch = 0;
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index e7db00396391..49eb86ebbdfb 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1416,7 +1416,6 @@ struct cifsInodeInfo {
- 	spinlock_t writers_lock;
- 	unsigned int writers;		/* Number of writers on this inode */
- 	unsigned long time;		/* jiffies of last update of inode */
--	u64  server_eof;		/* current file size on server -- protected by i_lock */
- 	u64  uniqueid;			/* server inode number */
- 	u64  createtime;		/* creation time on server */
- 	__u8 lease_key[SMB2_LEASE_KEY_SIZE];	/* lease key for this inode */
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 200280be064d..fcf92c25bc8f 100644
+index fb2885134154..fc3a46f7e2cf 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1913,8 +1913,8 @@ cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
- {
- 	loff_t end_of_write = offset + bytes_written;
- 
--	if (end_of_write > cifsi->server_eof)
--		cifsi->server_eof = end_of_write;
-+	if (end_of_write > cifsi->netfs_ctx.remote_i_size)
-+		cifsi->netfs_ctx.remote_i_size = end_of_write;
- }
- 
- static ssize_t
-@@ -2862,8 +2862,8 @@ cifs_uncached_writev_complete(struct work_struct *work)
- 
- 	spin_lock(&inode->i_lock);
- 	cifs_update_eof(cifsi, wdata->offset, wdata->bytes);
--	if (cifsi->server_eof > inode->i_size)
--		i_size_write(inode, cifsi->server_eof);
-+	if (cifsi->netfs_ctx.remote_i_size > inode->i_size)
-+		i_size_write(inode, cifsi->netfs_ctx.remote_i_size);
- 	spin_unlock(&inode->i_lock);
- 
- 	complete(&wdata->done);
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 40c6f04f7521..9ebb806c63d5 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -117,7 +117,7 @@ cifs_revalidate_cache(struct inode *inode, struct cifs_fattr *fattr)
- 	 /* revalidate if mtime or size have changed */
- 	fattr->cf_mtime = timestamp_truncate(fattr->cf_mtime, inode);
- 	if (timespec64_equal(&inode->i_mtime, &fattr->cf_mtime) &&
--	    cifs_i->server_eof == fattr->cf_eof) {
-+	    cifs_i->netfs_ctx.remote_i_size == fattr->cf_eof) {
- 		cifs_dbg(FYI, "%s: inode %llu is unchanged\n",
- 			 __func__, cifs_i->uniqueid);
- 		return;
-@@ -206,7 +206,7 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
- 	else
- 		clear_bit(CIFS_INO_DELETE_PENDING, &cifs_i->flags);
- 
--	cifs_i->server_eof = fattr->cf_eof;
-+	cifs_i->netfs_ctx.remote_i_size = fattr->cf_eof;
- 	/*
- 	 * Can't safely change the file size here if the client is writing to
- 	 * it due to potential races.
-@@ -2642,7 +2642,7 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
- 
- set_size_out:
- 	if (rc == 0) {
--		cifsInode->server_eof = attrs->ia_size;
-+		cifsInode->netfs_ctx.remote_i_size = attrs->ia_size;
- 		cifs_setsize(inode, attrs->ia_size);
- 		/*
- 		 * i_blocks is not related to (i_size / i_blksize), but instead
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index b0485706e07c..2caac8696100 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -3833,7 +3833,7 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 				  cfile->fid.volatile_fid, cfile->pid, &eof);
- 		if (rc == 0) {
--			cifsi->server_eof = off + len;
-+			cifsi->netfs_ctx.remote_i_size = off + len;
- 			cifs_setsize(inode, off + len);
- 			cifs_truncate_page(inode->i_mapping, inode->i_size);
- 			truncate_setsize(inode, off + len);
-@@ -3926,13 +3926,11 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
+@@ -3450,7 +3450,6 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+ 	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
+ 	struct cifsFileInfo *open_file = rreq->netfs_priv;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
+-	struct cifs_credits credits_on_stack, *credits = &credits_on_stack;
  	unsigned int xid;
- 	struct inode *inode;
- 	struct cifsFileInfo *cfile = file->private_data;
--	struct cifsInodeInfo *cifsi;
- 	__le64 eof;
+ 	pid_t pid;
+ 	int rc = 0;
+@@ -3482,7 +3481,8 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+ 			server->ops->negotiate_rsize(tlink_tcon(open_file->tlink),
+ 						     cifs_sb->ctx);
  
- 	xid = get_xid();
+-	rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize, &rsize, credits);
++	rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize, &rsize,
++					   &rdata->credits);
+ 	if (rc)
+ 		goto out;
  
- 	inode = d_inode(cfile->dentry);
--	cifsi = CIFS_I(inode);
+@@ -3492,7 +3492,6 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+ 	rdata->offset	= subreq->start + subreq->transferred;
+ 	rdata->bytes	= subreq->len   - subreq->transferred;
+ 	rdata->pid	= pid;
+-	rdata->credits	= credits_on_stack;
  
- 	if (off >= i_size_read(inode) ||
- 	    off + len >= i_size_read(inode)) {
-@@ -3953,9 +3951,9 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
+ 	rc = adjust_credits(server, &rdata->credits, rdata->bytes);
+ 	if (!rc) {
+@@ -3502,11 +3501,6 @@ static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
+ 			rc = server->ops->async_readv(rdata);
+ 	}
  
- 	rc = 0;
- 
--	cifsi->server_eof = i_size_read(inode) - len;
--	truncate_setsize(inode, cifsi->server_eof);
--	fscache_resize_cookie(cifs_inode_cookie(inode), cifsi->server_eof);
-+	netfs_resize_file(inode, eof);
-+	truncate_setsize(inode, eof);
-+	fscache_resize_cookie(cifs_inode_cookie(inode), eof);
-  out:
+-	if (rc) {
+-		add_credits_and_wake_if(server, &rdata->credits, 0);
+-		/* Fallback to the readpage in error/reconnect cases */
+-	}
+-
+ out:
  	free_xid(xid);
- 	return rc;
+ 	if (rc)
+@@ -3584,6 +3578,8 @@ static void cifs_free_subrequest(struct netfs_io_subrequest *subreq)
+ 			rdata->mr = NULL;
+ 		}
+ #endif
++
++		add_credits_and_wake_if(rdata->server, &rdata->credits, 0);
+ 		if (rdata->cfile)
+ 			cifsFileInfo_put(rdata->cfile);
+ 	}
 
 
