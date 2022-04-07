@@ -2,67 +2,98 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAADC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Apr 2022 05:37:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C443FC433F5
+	for <linux-cifs@archiver.kernel.org>; Thu,  7 Apr 2022 06:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231190AbiDGFjq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 7 Apr 2022 01:39:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36780 "EHLO
+        id S237006AbiDGGoE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Apr 2022 02:44:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230486AbiDGFjq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Apr 2022 01:39:46 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAAF117941B;
-        Wed,  6 Apr 2022 22:37:45 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1528B68AFE; Thu,  7 Apr 2022 07:37:39 +0200 (CEST)
-Date:   Thu, 7 Apr 2022 07:37:39 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Ariel Elior <aelior@marvell.com>, Anna Schumaker <anna@kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        Christian Benvenuti <benve@cisco.com>,
-        Potnuri Bharat Teja <bharat@chelsio.com>,
-        Bernard Metzler <bmt@zurich.ibm.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Leon Romanovsky <leon@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
-        Michal Kalderon <mkalderon@marvell.com>,
-        Mustafa Ismail <mustafa.ismail@intel.com>,
-        Nelson Escobar <neescoba@cisco.com>, netdev@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>, rds-devel@oss.oracle.com,
-        Sagi Grimberg <sagi@grimberg.me>,
-        samba-technical@lists.samba.org,
-        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-        Selvin Xavier <selvin.xavier@broadcom.com>,
+        with ESMTP id S236430AbiDGGoE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Apr 2022 02:44:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3583C11BD9B
+        for <linux-cifs@vger.kernel.org>; Wed,  6 Apr 2022 23:42:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649313724;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ghX0s+qnM0zTWcdVKam262S3A8knYr1UnlFhPf0e+YY=;
+        b=VFiNnRWi1NcGMCujg3ydJvn5O9/GB5O91eNT4Q8hVL01LubHGoCltJ+ja7GT6O71hRmV8A
+        TVgxdmnoOjnH6rVj52W9E4aAqUzNAfmF7p7B1o+3vsHAh2wxgn4OZCJxWZOBBJ6fDex3EH
+        n6Zbpsv9SFL/5l+BCZEX4FB88npX1Fc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-79-HESEfiTVOlu5reogbnkCLQ-1; Thu, 07 Apr 2022 02:42:01 -0400
+X-MC-Unique: HESEfiTVOlu5reogbnkCLQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9B4DA811E80;
+        Thu,  7 Apr 2022 06:41:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.37.45])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E753D401E2B;
+        Thu,  7 Apr 2022 06:41:48 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <Yk5W6zvvftOB+80D@casper.infradead.org>
+References: <Yk5W6zvvftOB+80D@casper.infradead.org> <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk> <164928630577.457102.8519251179327601178.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
         Steve French <sfrench@samba.org>,
-        Shiraz Saleem <shiraz.saleem@intel.com>,
-        target-devel@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: Re: [PATCH v2] RDMA: Split kernel-only global device caps from
- uverbs device caps
-Message-ID: <20220407053739.GA13500@lst.de>
-References: <0-v2-22c19e565eef+139a-kern_caps_jgg@nvidia.com>
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-cifs@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 14/14] mm, netfs, fscache: Stop read optimisation when folio removed from pagecache
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0-v2-22c19e565eef+139a-kern_caps_jgg@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <469868.1649313707.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 07 Apr 2022 07:41:47 +0100
+Message-ID: <469869.1649313707@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good:
+Matthew Wilcox <willy@infradead.org> wrote:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> On Thu, Apr 07, 2022 at 12:05:05AM +0100, David Howells wrote:
+> > Fix this by adding an extra address_space operation, ->removing folio(=
+),
+> > and flag, AS_NOTIFY_REMOVING_FOLIO.  The operation is called if the fl=
+ag is
+> > set when a folio is removed from the pagecache.  The flag should be se=
+t if
+> > a non-NULL cookie is obtained from fscache and cleared in ->evict_inod=
+e()
+> > before truncate_inode_pages_final() is called.
+> =
+
+> What's wrong with ->freepage?
+
+It's too late.  The optimisation must be cancelled before there's a chance
+that a new page can be allocated and attached to the pagecache - but
+->freepage() is called after the folio has been removed.  Doing it in
+->freepage() would allow ->readahead(), ->readpage() or ->write_begin() to
+jump in and start a new read (which gets skipped because the optimisation =
+is
+still in play).
+
+Another possibility could be that the FSCACHE_COOKIE_HAVE_DATA and
+FSCACHE_COOKIE_NO_DATA_TO_READ flags could be moved from cookie->flags to
+mapping->flags and the VM could do the twiddling itself (no aop required) =
+-
+except that fscache can't currently then find them (maybe use an aop for
+that?).
+
+David
+
