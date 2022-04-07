@@ -2,90 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C817CC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Apr 2022 21:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B932C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu,  7 Apr 2022 22:44:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231151AbiDGVYQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 7 Apr 2022 17:24:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52510 "EHLO
+        id S232269AbiDGWqV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Apr 2022 18:46:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231161AbiDGVYQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Apr 2022 17:24:16 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC0E74DCE;
-        Thu,  7 Apr 2022 14:22:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=AP3ckG/WzqkXC8+7CiECPH3yRSiA3cIEW4UGrQf10jo=; b=VHt28AgNNEbERQekujzfAhepuF
-        yRUYEupZiZ63Q+FrJIO2VhPpxfdNELTdKXP3+AqQFnU7rCKdEJdALxf3FU3evxIYXSXF5qigkZrCN
-        hJ2PkDlk56mtFwIBQt+Wcm+whEwtTQzXVP8sPrwHhvwiWDHePrly6T//aWyDaG0AMqR6tqsYcNBW6
-        EE3PuIlV9s7etoCXhZEscei648aysaUd70wbuBhBsYUk0CEv30is5bj5UILJer52psJMA5shwPTWh
-        2TTpNIKotN1lTBYaXzA74xnVD6UIwQMzFY6+9u0c0nb4dBiv2sKLiNcqA/zijCmh3M/ZERhyo/oUa
-        ITnXj9yA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ncZZv-009Ciz-Cj; Thu, 07 Apr 2022 21:22:07 +0000
-Date:   Thu, 7 Apr 2022 22:22:07 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-cachefs@redhat.com,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cifs@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 14/14] mm, netfs, fscache: Stop read optimisation when
- folio removed from pagecache
-Message-ID: <Yk9V/03wgdYi65Lb@casper.infradead.org>
-References: <Yk5W6zvvftOB+80D@casper.infradead.org>
- <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk>
- <164928630577.457102.8519251179327601178.stgit@warthog.procyon.org.uk>
- <469869.1649313707@warthog.procyon.org.uk>
+        with ESMTP id S232274AbiDGWqT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Apr 2022 18:46:19 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825B0158BAE;
+        Thu,  7 Apr 2022 15:44:12 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id d40so4560204lfv.11;
+        Thu, 07 Apr 2022 15:44:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=HJlepzhu6kFGZpNUHD7UiyAi5m7cYQlLKseVVvUSnro=;
+        b=YiKpP19xF/xjxsB3QDngc/pUeSy7Uept25JrcxpKlB7+HQMQ1Q3xtyvfx5uTDdpSjk
+         Oo3IbUoZw12BBW8OSr8lvDZWdOq+xrlE1Mkvwbxq8gxvasUNVuE9b7sFMLuzZ1OgqrCF
+         en2M1UrDMmNnF8EZAECtv0bkfjNumsJRZOGsgfvWHKaEGgUQmTrMNrRKezTgI/V8yrRt
+         ZqG4lxreBLjRhEf5zdAoGD4VvwSt6bWY5WUG9j9BoWchFuZQ6r8ivcKEx8QYWHBNk5wb
+         8EqmRBvLmCnS9lET7gE1UBOY6bhJTd4z9IWXtm/LEFB3wIsBikZBt7J2BXGMrVgnlzf8
+         qgrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=HJlepzhu6kFGZpNUHD7UiyAi5m7cYQlLKseVVvUSnro=;
+        b=aORBu8O9zqWr8Y+ZEOVTtbt8lqh9qVRlZw4bcUKShGuZfJpVS7QKdYIoMvGfh2C1fz
+         blZFteCXGxOieImI9Oqv6gFMG53aBzpURk8ItJscoMVgEsZBEjpZYWxaE/oKkMJ/3Cf/
+         xVwn6isF6Kbg2rNMMYrFxYOhNsIWgwDQhvvhZJbIe/IQ+g/TR28ib+7b+7kt+ioL0cvA
+         VnQKJzEoE0Ozaq70vXdOuIP1fnIRxkdiwXQMIJP6RRNubgQJaleKEWEqsUcIKjN3XBZs
+         XjBRuPD7tFXY8mKgU4pZrxXjHCDvQX/jcWjw9CdUYsSsCJ0aJk2kPoYobij5L9foGYFn
+         Cf5g==
+X-Gm-Message-State: AOAM532E/13layVUxBtayjNClUQFeIm58+PHwBTlY5dDIbJoQ5c5hXsY
+        WIfRuFaCEgFUzWryyB5UBwFlVjbqCweSMI5XR/dm0tqkmLk=
+X-Google-Smtp-Source: ABdhPJygsDfgRZwIwSLLoUDCDuI+ITQaOst6G50fUoYW1pUGkUlqwb4oIu2z6TJRTUlc8JNrFLKUyIQ3hLrl4hSXtm4=
+X-Received: by 2002:ac2:5444:0:b0:44a:846e:ad2b with SMTP id
+ d4-20020ac25444000000b0044a846ead2bmr11086962lfn.545.1649371450768; Thu, 07
+ Apr 2022 15:44:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <469869.1649313707@warthog.procyon.org.uk>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 7 Apr 2022 17:43:59 -0500
+Message-ID: <CAH2r5mtTvgsopF33=mxKxMW5WJDs_ErLGG4p-PPofDEM-cwwkQ@mail.gmail.com>
+Subject: [GIT PULL] cifs client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Apr 07, 2022 at 07:41:47AM +0100, David Howells wrote:
-> Matthew Wilcox <willy@infradead.org> wrote:
-> 
-> > On Thu, Apr 07, 2022 at 12:05:05AM +0100, David Howells wrote:
-> > > Fix this by adding an extra address_space operation, ->removing folio(),
-> > > and flag, AS_NOTIFY_REMOVING_FOLIO.  The operation is called if the flag is
-> > > set when a folio is removed from the pagecache.  The flag should be set if
-> > > a non-NULL cookie is obtained from fscache and cleared in ->evict_inode()
-> > > before truncate_inode_pages_final() is called.
-> > 
-> > What's wrong with ->freepage?
-> 
-> It's too late.  The optimisation must be cancelled before there's a chance
-> that a new page can be allocated and attached to the pagecache - but
-> ->freepage() is called after the folio has been removed.  Doing it in
-> ->freepage() would allow ->readahead(), ->readpage() or ->write_begin() to
-> jump in and start a new read (which gets skipped because the optimisation is
-> still in play).
+Please pull the following changes since commit
+3123109284176b1532874591f7c81f3837bbdc17:
 
-OK.  You suggested that releasepage was an acceptable place to call it.
-How about we have AS_RELEASE_ALL (... or something ...) and then
-page_has_private() becomes a bit more complicated ... to the point
-where we should probably get rid of it (by embedding it into
-filemap_release_folio():
+  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
 
-+++ b/mm/filemap.c
-@@ -3981,6 +3981,9 @@ bool filemap_release_folio(struct folio *folio, gfp_t gfp)
-        struct address_space * const mapping = folio->mapping;
+are available in the Git repository at:
 
-        BUG_ON(!folio_test_locked(folio));
-+       if (!mapping_needs_release(mapping) && !folio_test_private(folio) &&
-+           !folio_test_private_2(folio))
-+               return false;
-        if (folio_test_writeback(folio))
-                return false;
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.18-rc1-smb3-fixes
 
+for you to fetch changes up to 7cd1cc415dd8d0dca7244c9eafb9a0adc8036805:
 
+  cifs: update internal module number (2022-04-04 22:40:14 -0500)
 
+----------------------------------------------------------------
+4 small fixes to cifs client, 1 for stable
+- 2 reconnect fixes, one for DFS and one to avoid a reconnect race
+- Small change to deal with upcoming behavior change of list iterators
+
+----------------------------------------------------------------
+Jakob Koschel (1):
+      cifs: remove check of list iterator against head past the loop body
+
+Paulo Alcantara (2):
+      cifs: fix potential race with cifsd thread
+      cifs: force new session setup and tcon for dfs
+
+Steve French (1):
+      cifs: update internal module number
+
+ fs/cifs/cifsfs.h   |  2 +-
+ fs/cifs/connect.c  | 15 +++++++++------
+ fs/cifs/netmisc.c  |  2 +-
+ fs/cifs/smb2misc.c | 10 ++++++----
+ 4 files changed, 17 insertions(+), 12 deletions(-)
+
+-- 
+Thanks,
+
+Steve
