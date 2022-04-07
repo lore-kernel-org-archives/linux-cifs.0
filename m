@@ -2,58 +2,67 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E02C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Apr 2022 03:14:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAADC433F5
+	for <linux-cifs@archiver.kernel.org>; Thu,  7 Apr 2022 05:37:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235165AbiDGDQA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 6 Apr 2022 23:16:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35806 "EHLO
+        id S231190AbiDGFjq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Apr 2022 01:39:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232672AbiDGDP7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Apr 2022 23:15:59 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1B231923;
-        Wed,  6 Apr 2022 20:14:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=a+/6IHa8J2ibYiY7PsEo03ecQN3sZog+lPT2RUEfmQU=; b=XiY2rlMpWwSz+W6TCaFdXuEU90
-        B3wVZ3teCDo6niE97uSEv6VN/Qn4+b6hZs4HHpREIo3Z1ADoaKyVeipKQhZGjheHUZqQuhGNUy02y
-        44vMr3KV6IqI7w08utLuSRafzs8CygGmbGyhCSRgdauKwspKoEO46Uo3X3ot3sD2csuGq6oaOD49j
-        HPGRctd+JHA1gfUiqu8yAVIbmCaqThOUuVlph+TEtdjwe80lbFuJVm1LQ6wtJQbToNmjs4OUioz4F
-        oHs093V9QAbVKXbJmR0qFp6K2ISohuumBm09EShIuplcqcyVGxf5wrk6Y8rZCasfhTsJLVc7dtDuc
-        7xIGki7g==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ncIah-008Qzd-Fd; Thu, 07 Apr 2022 03:13:47 +0000
-Date:   Thu, 7 Apr 2022 04:13:47 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-cachefs@redhat.com,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
+        with ESMTP id S230486AbiDGFjq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Apr 2022 01:39:46 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAAF117941B;
+        Wed,  6 Apr 2022 22:37:45 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 1528B68AFE; Thu,  7 Apr 2022 07:37:39 +0200 (CEST)
+Date:   Thu, 7 Apr 2022 07:37:39 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Ariel Elior <aelior@marvell.com>, Anna Schumaker <anna@kernel.org>,
+        Jens Axboe <axboe@fb.com>,
+        Christian Benvenuti <benve@cisco.com>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Leon Romanovsky <leon@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mustafa Ismail <mustafa.ismail@intel.com>,
+        Nelson Escobar <neescoba@cisco.com>, netdev@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, rds-devel@oss.oracle.com,
+        Sagi Grimberg <sagi@grimberg.me>,
+        samba-technical@lists.samba.org,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
         Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cifs@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 14/14] mm, netfs, fscache: Stop read optimisation when
- folio removed from pagecache
-Message-ID: <Yk5W6zvvftOB+80D@casper.infradead.org>
-References: <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk>
- <164928630577.457102.8519251179327601178.stgit@warthog.procyon.org.uk>
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        target-devel@vger.kernel.org,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [PATCH v2] RDMA: Split kernel-only global device caps from
+ uverbs device caps
+Message-ID: <20220407053739.GA13500@lst.de>
+References: <0-v2-22c19e565eef+139a-kern_caps_jgg@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <164928630577.457102.8519251179327601178.stgit@warthog.procyon.org.uk>
+In-Reply-To: <0-v2-22c19e565eef+139a-kern_caps_jgg@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Apr 07, 2022 at 12:05:05AM +0100, David Howells wrote:
-> Fix this by adding an extra address_space operation, ->removing folio(),
-> and flag, AS_NOTIFY_REMOVING_FOLIO.  The operation is called if the flag is
-> set when a folio is removed from the pagecache.  The flag should be set if
-> a non-NULL cookie is obtained from fscache and cleared in ->evict_inode()
-> before truncate_inode_pages_final() is called.
+Looks good:
 
-What's wrong with ->freepage?
+Reviewed-by: Christoph Hellwig <hch@lst.de>
