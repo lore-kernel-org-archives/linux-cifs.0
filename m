@@ -2,93 +2,96 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B932C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Apr 2022 22:44:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09F5AC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Apr 2022 02:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232269AbiDGWqV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 7 Apr 2022 18:46:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42548 "EHLO
+        id S229940AbiDHCEO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Apr 2022 22:04:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232274AbiDGWqT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Apr 2022 18:46:19 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825B0158BAE;
-        Thu,  7 Apr 2022 15:44:12 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id d40so4560204lfv.11;
-        Thu, 07 Apr 2022 15:44:12 -0700 (PDT)
+        with ESMTP id S229726AbiDHCEN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Apr 2022 22:04:13 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 144AB1B29CF;
+        Thu,  7 Apr 2022 19:02:11 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id t25so12661258lfg.7;
+        Thu, 07 Apr 2022 19:02:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=HJlepzhu6kFGZpNUHD7UiyAi5m7cYQlLKseVVvUSnro=;
-        b=YiKpP19xF/xjxsB3QDngc/pUeSy7Uept25JrcxpKlB7+HQMQ1Q3xtyvfx5uTDdpSjk
-         Oo3IbUoZw12BBW8OSr8lvDZWdOq+xrlE1Mkvwbxq8gxvasUNVuE9b7sFMLuzZ1OgqrCF
-         en2M1UrDMmNnF8EZAECtv0bkfjNumsJRZOGsgfvWHKaEGgUQmTrMNrRKezTgI/V8yrRt
-         ZqG4lxreBLjRhEf5zdAoGD4VvwSt6bWY5WUG9j9BoWchFuZQ6r8ivcKEx8QYWHBNk5wb
-         8EqmRBvLmCnS9lET7gE1UBOY6bhJTd4z9IWXtm/LEFB3wIsBikZBt7J2BXGMrVgnlzf8
-         qgrA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4KtR1xob/thiGszD7KEJLex0sFRI1srTBLEogfW0iec=;
+        b=Vg2taqVGF4Xd7tLv0zJDWPPnSKr28FcypPGkp7IayrblHDpZydfv4ZgzJLE00i49TV
+         7kXsBAafkcxIGS7Mq54E8sKp710IxQqQrqC1Aa+AvWCXuqMmE4t0iAO0dsclFrYLEXVb
+         yrW4GWontyYiLF0PjN7NXAHIqiRHLr9gY8iAXFjsm7WjCFTfMzl5aSIvIZWybp5kCWNs
+         Kcz1dZXdM0Sx+Hrtxdkmwg3olKAmA8i+vC9o5fXhmATZb+rKbbAbs84sFVTwM6tSLk/B
+         acDf62XMBcKrpE6EJ9obKEWOHtRGlmaDR+QO5SN1vyrayZJpgevcflTeV06FbgaprRJM
+         gNxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=HJlepzhu6kFGZpNUHD7UiyAi5m7cYQlLKseVVvUSnro=;
-        b=aORBu8O9zqWr8Y+ZEOVTtbt8lqh9qVRlZw4bcUKShGuZfJpVS7QKdYIoMvGfh2C1fz
-         blZFteCXGxOieImI9Oqv6gFMG53aBzpURk8ItJscoMVgEsZBEjpZYWxaE/oKkMJ/3Cf/
-         xVwn6isF6Kbg2rNMMYrFxYOhNsIWgwDQhvvhZJbIe/IQ+g/TR28ib+7b+7kt+ioL0cvA
-         VnQKJzEoE0Ozaq70vXdOuIP1fnIRxkdiwXQMIJP6RRNubgQJaleKEWEqsUcIKjN3XBZs
-         XjBRuPD7tFXY8mKgU4pZrxXjHCDvQX/jcWjw9CdUYsSsCJ0aJk2kPoYobij5L9foGYFn
-         Cf5g==
-X-Gm-Message-State: AOAM532E/13layVUxBtayjNClUQFeIm58+PHwBTlY5dDIbJoQ5c5hXsY
-        WIfRuFaCEgFUzWryyB5UBwFlVjbqCweSMI5XR/dm0tqkmLk=
-X-Google-Smtp-Source: ABdhPJygsDfgRZwIwSLLoUDCDuI+ITQaOst6G50fUoYW1pUGkUlqwb4oIu2z6TJRTUlc8JNrFLKUyIQ3hLrl4hSXtm4=
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4KtR1xob/thiGszD7KEJLex0sFRI1srTBLEogfW0iec=;
+        b=LQQCVR6tWFQIhIqGoJXOzAoF8HQjITyIa2o4Px+11oo0FdNj+lfZKV1ymVKXgw23TB
+         118ugKMOFoTnO4WIGywUKGBxopI1MHCHo8uY29kAJz8MX4kwoBqco6UIOM5FgJSFgwx7
+         D6WpdcphKofsTzuv9WkOK6Px+KEkgSpUjZlMnVGvPXCtBdcyhhz9b2Nu+hptWjiu2cwY
+         FDsz6VBiwiuduKosODJFKG3edBmXptlE3fl68WlW0L18tkzkJCvQ7ahwmhO6VEPYi87k
+         O9p/xX3jutwh3DngPq6zqN0BQ3JwiqgzMfIMcLOAYbMN3rOXIT1OC6Kmb2DxQ2XGayeO
+         BXwA==
+X-Gm-Message-State: AOAM531lnrOSJJLa9Y2E+5AlPCphsxK8rpFbpYAC9Ix0w1zcESTm8Xfy
+        sIFQ6eFTCCKGcxaBOz1vrKu7SO7wToj0laR8+As=
+X-Google-Smtp-Source: ABdhPJx4wgH4soMsHaepHsZdxc8tN13YUhVhevnldLA5FTyOT15xrA0CD3CWhY85U+zic/4auO+KTNtQWj+tMpTPZK0=
 X-Received: by 2002:ac2:5444:0:b0:44a:846e:ad2b with SMTP id
- d4-20020ac25444000000b0044a846ead2bmr11086962lfn.545.1649371450768; Thu, 07
- Apr 2022 15:44:10 -0700 (PDT)
+ d4-20020ac25444000000b0044a846ead2bmr11533423lfn.545.1649383329104; Thu, 07
+ Apr 2022 19:02:09 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAH2r5muFq-4J=uedVF9qdYmFzgDDPwuYD+zrLytjUJE+APcBow@mail.gmail.com>
+ <20220406044447.GD1609613@dread.disaster.area>
+In-Reply-To: <20220406044447.GD1609613@dread.disaster.area>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 7 Apr 2022 17:43:59 -0500
-Message-ID: <CAH2r5mtTvgsopF33=mxKxMW5WJDs_ErLGG4p-PPofDEM-cwwkQ@mail.gmail.com>
-Subject: [GIT PULL] cifs client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu, 7 Apr 2022 21:01:57 -0500
+Message-ID: <CAH2r5mt8a1uD3CCvErUZdFR+kUi5a66hES+7XSmTtzEB0D1hCg@mail.gmail.com>
+Subject: Re: cross mount reflink and xfstest generic/373
+To:     Dave Chinner <david@fromorbit.com>
 Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-3123109284176b1532874591f7c81f3837bbdc17:
+This works - thx.
 
-  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/940
 
-are available in the Git repository at:
+On Tue, Apr 5, 2022 at 11:44 PM Dave Chinner <david@fromorbit.com> wrote:
+>
+> On Tue, Apr 05, 2022 at 11:48:29AM -0500, Steve French wrote:
+> > I like the patch which allows cross mount reflink (since in some cases
+> > like SMB3 mounts, cross mount reflink can now work depending on the
+> > volumes exported by the server) but was wondering if that means test
+> > generic/373 is getting any changes.  In our test setup the btrfs
+> > directories we export over SMB3.1.1 for SCRATCH and TEST were on the
+> > partition on the server so reflink now works where test 373 expected
+> > them to fail.  I can change our test setup to make sure SCRATCH and
+> > TEST are different volumes or server but was wondering if any recent
+> > changes to reflink related xfstests
+> >
+> > commit 9f5710bbfd3031dd7ce244fa26fba896d35f5342
+> > Author: Josef Bacik <josef@toxicpanda.com>
+> > Date:   Fri Feb 18 09:38:14 2022 -0500
+> >
+> >     fs: allow cross-vfsmount reflink/dedupe
+>
+> https://lore.kernel.org/fstests/cover.1648153387.git.josef@toxicpanda.com/
+>
+> -Dave.
+> --
+> Dave Chinner
+> david@fromorbit.com
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.18-rc1-smb3-fixes
 
-for you to fetch changes up to 7cd1cc415dd8d0dca7244c9eafb9a0adc8036805:
-
-  cifs: update internal module number (2022-04-04 22:40:14 -0500)
-
-----------------------------------------------------------------
-4 small fixes to cifs client, 1 for stable
-- 2 reconnect fixes, one for DFS and one to avoid a reconnect race
-- Small change to deal with upcoming behavior change of list iterators
-
-----------------------------------------------------------------
-Jakob Koschel (1):
-      cifs: remove check of list iterator against head past the loop body
-
-Paulo Alcantara (2):
-      cifs: fix potential race with cifsd thread
-      cifs: force new session setup and tcon for dfs
-
-Steve French (1):
-      cifs: update internal module number
-
- fs/cifs/cifsfs.h   |  2 +-
- fs/cifs/connect.c  | 15 +++++++++------
- fs/cifs/netmisc.c  |  2 +-
- fs/cifs/smb2misc.c | 10 ++++++----
- 4 files changed, 17 insertions(+), 12 deletions(-)
 
 -- 
 Thanks,
