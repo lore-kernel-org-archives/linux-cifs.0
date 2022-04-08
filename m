@@ -2,145 +2,86 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B43E1C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 Apr 2022 10:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA8EEC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Apr 2022 14:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229651AbiDHKK3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 8 Apr 2022 06:10:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
+        id S236682AbiDHOEO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 8 Apr 2022 10:04:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbiDHKK2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 8 Apr 2022 06:10:28 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13623BA50;
-        Fri,  8 Apr 2022 03:08:24 -0700 (PDT)
-Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1nclXN-0003iK-As; Fri, 08 Apr 2022 12:08:17 +0200
-Message-ID: <715d745d-5a85-092a-68c2-b9b1dd8ad53e@leemhuis.info>
-Date:   Fri, 8 Apr 2022 12:08:16 +0200
+        with ESMTP id S236424AbiDHOEN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 8 Apr 2022 10:04:13 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95FC334BAE;
+        Fri,  8 Apr 2022 07:02:07 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 33FF9215FD;
+        Fri,  8 Apr 2022 14:02:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1649426526;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NntcuTEBNLs2a5PoQyJ5XTqfafqQKLdTMOol7WzzX0s=;
+        b=IOyS+CY4mKgPgZ8USr3nF2sek6nsoLhx0cr5TMVaaAs4Ag4bKj8Vi2sptagRUXESVfNODS
+        Ln94gENJtPAW0xwa1YTvXkhHuvtN+PZVtUN04bIOD5Gb1FPiPxXvY9276x42sDgCevWU0p
+        F0xk4+Bz9XncCGMfKPV4nKJOLviw8CE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1649426526;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NntcuTEBNLs2a5PoQyJ5XTqfafqQKLdTMOol7WzzX0s=;
+        b=YyECzpdo2dp1JJsJWW+9IUjgVDYVcTRsNKLbGqCSM7UYLC06N2gtmpywFUAHkgPWFPstwI
+        YstMAkxeXK3nzLCA==
+Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
+        by relay2.suse.de (Postfix) with ESMTP id C18F6A3B87;
+        Fri,  8 Apr 2022 14:02:05 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 03176DA80E; Fri,  8 Apr 2022 15:58:02 +0200 (CEST)
+Date:   Fri, 8 Apr 2022 15:58:02 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     cgel.zte@gmail.com
+Cc:     dsterba@suse.com, tytso@mit.edu, clm@fb.com, josef@toxicpanda.com,
+        sfrench@samba.org, matthew.garrett@nebula.com, jk@ozlabs.org,
+        ardb@kernel.org, adilger.kernel@dilger.ca, rpeterso@redhat.com,
+        agruenba@redhat.com, viro@zeniv.linux.org.uk,
+        linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-efi@vger.kernel.org, linux-ext4@vger.kernel.org,
+        cluster-devel@redhat.com, linux-fsdevel@vger.kernel.org,
+        Lv Ruyi <lv.ruyi@zte.com.cn>, Zeal Robot <zealci@zte.com.cn>
+Subject: Re: [PATCH v2] fs: remove unnecessary conditional
+Message-ID: <20220408135802.GQ15609@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, cgel.zte@gmail.com, dsterba@suse.com,
+        tytso@mit.edu, clm@fb.com, josef@toxicpanda.com, sfrench@samba.org,
+        matthew.garrett@nebula.com, jk@ozlabs.org, ardb@kernel.org,
+        adilger.kernel@dilger.ca, rpeterso@redhat.com, agruenba@redhat.com,
+        viro@zeniv.linux.org.uk, linux-btrfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-efi@vger.kernel.org,
+        linux-ext4@vger.kernel.org, cluster-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org, Lv Ruyi <lv.ruyi@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+References: <20220408021136.2493147-1-lv.ruyi@zte.com.cn>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Content-Language: en-US
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-Cc:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Moritz Duge <duge@pre-sense.de>,
-        Aurelien Aptel <aaptel@suse.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Steve French <stfrench@microsoft.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-To:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-Subject: Regression: CIFS umount fails since 14302ee33 with some servers (exit
- code 32)
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1649412504;6f8dbe02;
-X-HE-SMSGID: 1nclXN-0003iK-As
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220408021136.2493147-1-lv.ruyi@zte.com.cn>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi, this is your Linux kernel regression tracker.
+On Fri, Apr 08, 2022 at 02:11:36AM +0000, cgel.zte@gmail.com wrote:
+> From: Lv Ruyi <lv.ruyi@zte.com.cn>
+> 
+> iput() has already handled null and non-null parameter, so it is no
+> need to use if().
+> 
+> This patch remove all unnecessary conditional in fs subsystem.
+> No functional changes.
 
-Paul, it seems a commit authored by you causes a regression:
-
-I noticed a regression report in bugzilla.kernel.org that afaics nobody
-acted upon since it was reported about a week ago, that's why I decided
-to forward it to the lists and all people that seemed to be relevant
-here. To quote from
-https://bugzilla.kernel.org/show_bug.cgi?id=215782
-
->  Moritz Duge 2022-03-31 16:47:35 UTC
-> 
-> With upstream kernel 5.16.9 CIFS umount fails when using certain SMB servers.
-> 
-> "umount" returns exit code 32 and the "mount" command still lists the mount as being present.
-> See below for the bad commit I've bisected.
-> 
-> The bug has been reproduced multiple times with upstream kernel 5.16.9!
-> But additionally I've done much testing with openSUSE kernels.
-> Here's the openSUSE bugreport:
-> https://bugzilla.opensuse.org/show_bug.cgi?id=1194945
-> Additionally with the same servers there's a problem showing the free space with the "df" command. But I haven't been able to find out if this is really related to the umount problem.
-> 
-> 
-> 
-> 
-> = SMB Server =
-> 
-> I haven't been able to identify the exact server side settings. But this problem occured with at least this SMB server (with upstream kernel 5.16.9):
-> NetApp (Release 9.7P12) with dfs and CIFS mount options "vers=3.1.1,seal"
-> (quota state unknown)
-> 
-> Additionally I've verified the bug with the openSUSE kernel 5.3.18-lp152.72-default and this SMB server:
-> Windows Server 2019 with dfs and quota enabled
-> (no explicit "vers" or "seal" mount options)
-> 
-> Additionally the bug appeared with another NetApp SMB server (tested upstream 5.16.9) and two unknown servers (tested only openSUSE-15.2 kernels).
-> 
-> Also it looks like the bug may need a setup where the user can only read //server/share/username/ but has no permissions to read //server/share/.
-> 
-> 
-> 
-> 
-> = Bad Commit =
-> 
-> With the openSUSE kernel I bisected the problem down to this commit (6ae27f2b2) between openSUSE-15.2 kernels 5.3.18-lp152.69.1 and 5.3.18-lp152.72.1.
-> https://github.com/SUSE/kernel/commit/6ae27f2b260e91f16583bbc1ded3147e0f7c5d94
-> 
-> This commit is also present in the upstream kernel (14302ee33).
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=14302ee3301b3a77b331cc14efb95bf7184c73cc
-> And it has been merged between 5.11 and 5.12.
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=d0df9aabefda4d0a64730087f939f53f91e29ee6
-> 
-> As said I can't reproduce this with arbitrary SMB servers. And it's always a time consuming procedure for me to do a test with the affected production SMB servers. But if you're really unhappy with the bisect search on the openSUSE kernel, I can repeat the test with the upstream commit 14302ee33 and it's predecessor.
-
-
-Could somebody take a look into this? Or was this discussed somewhere
-else already? Or even fixed?
-
-Anyway, to get this tracked:
-
-#regzbot introduced: 14302ee3301b3a77b331cc14
-#regzbot from: Moritz Duge <duge@pre-sense.de>
-#regzbot title: CIFS: umount fails with some servers (exit code 32)
-#regzbot link: https://bugzilla.kernel.org/show_bug.cgi?id=215782
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-
-P.S.: As the Linux kernel's regression tracker I'm getting a lot of
-reports on my table. I can only look briefly into most of them and lack
-knowledge about most of the areas they concern. I thus unfortunately
-will sometimes get things wrong or miss something important. I hope
-that's not the case here; if you think it is, don't hesitate to tell me
-in a public reply, it's in everyone's interest to set the public record
-straight.
-
--- 
-Additional information about regzbot:
-
-If you want to know more about regzbot, check out its web-interface, the
-getting start guide, and the references documentation:
-
-https://linux-regtracking.leemhuis.info/regzbot/
-https://gitlab.com/knurd42/regzbot/-/blob/main/docs/getting_started.md
-https://gitlab.com/knurd42/regzbot/-/blob/main/docs/reference.md
-
-The last two documents will explain how you can interact with regzbot
-yourself if your want to.
-
-Hint for reporters: when reporting a regression it's in your interest to
-CC the regression list and tell regzbot about the issue, as that ensures
-the regression makes it onto the radar of the Linux kernel's regression
-tracker -- that's in your interest, as it ensures your report won't fall
-through the cracks unnoticed.
-
-Hint for developers: you normally don't need to care about regzbot once
-it's involved. Fix the issue as you normally would, just remember to
-include 'Link:' tag in the patch descriptions pointing to all reports
-about the issue. This has been expected from developers even before
-regzbot showed up for reasons explained in
-'Documentation/process/submitting-patches.rst' and
-'Documentation/process/5.Posting.rst'.
+You'd need to split i by subsystem under fs/, each subdirectory has a
+differnt maintainer. I can take only the btrfs part.
