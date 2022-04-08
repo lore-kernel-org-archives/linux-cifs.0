@@ -2,147 +2,145 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E879EC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 Apr 2022 09:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B43E1C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Apr 2022 10:08:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229503AbiDHJMT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 8 Apr 2022 05:12:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39660 "EHLO
+        id S229651AbiDHKK3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 8 Apr 2022 06:10:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233020AbiDHJMD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 8 Apr 2022 05:12:03 -0400
-Received: from mail.sernet.de (mail.sernet.de [IPv6:2a0a:a3c0:0:25::217:2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2E11E7A7A
-        for <linux-cifs@vger.kernel.org>; Fri,  8 Apr 2022 02:09:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sernet.de;
-         s=20210621-rsa; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=aBArbqz3OvKQKOmAVAWjT2sNWTveG1Mo8tpAZ1JOcao=; b=px57545eZmH1t7ADVUaMOOJOzA
-        tnOA9T8G/WsQ4Ww/cObURjOLr2TS1l5gOFYK4TImtTfJmhqEmv9vjI4aF5psiSyefUyhACuDiafrj
-        OaQplP232osc/oHJ7lcZlPab6K+Z1eJKYRnlJmUbfb1HFYjjbc+2+vql5PpTJHju2Z6fSIgk99i39
-        wvW0NrMsYIc9X8i5D81nMk4QiTdR5Oj9/5hWqGrYl1NyUxweG+RY83DPLYQO2kvoPWd0oeP1Rtaln
-        fXgSYmo9jcnVJ3c2yDJPF1RYtspZuFHxIrEW3/jnRKPzCfU7W/x/6CPJF3WcrclNeJyf9c49+cuKy
-        /RfA7fcA==;
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sernet.de; s=20210621-ed25519; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=aBArbqz3OvKQKOmAVAWjT2sNWTveG1Mo8tpAZ1JOcao=; b=LA/lG1Rky67lLx5jVIXxXPH9pG
-        A12KTt3vxfIAZYwWafdybUhSL4lBOopfOPUBUukCVfJPnfG6uKPkZdfqIbDg==;
-Received: from intern.sernet.de by mail.sernet.de
-        with esmtps (Exim Mail Transfer Agent)
-        id 1nckc2-0003Gq-Ro; Fri, 08 Apr 2022 11:09:02 +0200
-Received: by intern.sernet.de
-        id 1nckc2-0003Nb-PO; Fri, 08 Apr 2022 11:09:02 +0200
-Received: from bjacke by pell.sernet.de with local (Exim 4.93)
-        (envelope-from <bjacke@sernet.de>)
-        id 1nckc2-005cUm-Ky; Fri, 08 Apr 2022 11:09:02 +0200
-Date:   Fri, 8 Apr 2022 11:09:02 +0200
-From:   =?iso-8859-1?Q?Bj=F6rn?= JACKE <bjacke@SerNet.DE>
-To:     Steve French <smfrench@gmail.com>
-Cc:     samba@lists.samba.org, linux-cifs@vger.kernel.org
-Subject: Re: [Samba] samba-ad linux clients random access denied to network
- share
-Message-ID: <20220408090902.GA1328207@sernet.de>
-Mail-Followup-To: Steve French <smfrench@gmail.com>, samba@lists.samba.org,
-        linux-cifs@vger.kernel.org
-References: <20220406231135.024f1ea5@jeeg20151223.verlata.it>
- <48371ac062c13d0acb1ac4266e46ac65a49af023.camel@samba.org>
- <20220407115146.GA1277129@sernet.de>
- <CAH2r5mv9uS3=YJsRB=GPAebTSY+-oZ3nQQuNs5gAxknmMM-UVQ@mail.gmail.com>
+        with ESMTP id S229565AbiDHKK2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 8 Apr 2022 06:10:28 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13623BA50;
+        Fri,  8 Apr 2022 03:08:24 -0700 (PDT)
+Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1nclXN-0003iK-As; Fri, 08 Apr 2022 12:08:17 +0200
+Message-ID: <715d745d-5a85-092a-68c2-b9b1dd8ad53e@leemhuis.info>
+Date:   Fri, 8 Apr 2022 12:08:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAH2r5mv9uS3=YJsRB=GPAebTSY+-oZ3nQQuNs5gAxknmMM-UVQ@mail.gmail.com>
-X-Q:    Die Schriftsteller koennen nicht so schnell schreiben, wie die
- Regierungen Kriege machen; denn das Schreiben verlangt Denkarbeit. - Brecht
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Content-Language: en-US
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        Moritz Duge <duge@pre-sense.de>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <stfrench@microsoft.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+To:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>
+Subject: Regression: CIFS umount fails since 14302ee33 with some servers (exit
+ code 32)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1649412504;6f8dbe02;
+X-HE-SMSGID: 1nclXN-0003iK-As
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello Steve and other cifs developers,
+Hi, this is your Linux kernel regression tracker.
 
-On 2022-04-07 at 16:25 -0500 Steve French via samba sent off:
-> If you have particular hot bugs for cifs.ko that you need fixed - please
-> let me know.
+Paul, it seems a commit authored by you causes a regression:
 
-back in 2020 we've added the cifs mailing list as qa contact in bugzilla, so
-that bugzilla bugs get more visible to the developers.
+I noticed a regression report in bugzilla.kernel.org that afaics nobody
+acted upon since it was reported about a week ago, that's why I decided
+to forward it to the lists and all people that seemed to be relevant
+here. To quote from
+https://bugzilla.kernel.org/show_bug.cgi?id=215782
 
-At the same point I also went through all the open bug reports of cifs vfs,
-which had partly been very old. I also closed a bunch of them as they had b=
-een
-fixed a while after they were reported there - but not because they were
-reported in bugzilla obviously. I was hoping to improve that situation with=
- bug
-reports getting not enough attention my adding the cifs mailinglist as qa
-contact, this was my motivation.
-
-Just pointing out those bugs that I myself reported in bugzilla.samba.org in
-2020, all stayed uncommented till today; except for the "better error messa=
-ge"
-bug all of them are important for enterprise customers, this is also where =
-they
-popped up:
-
-14398  	cifs vfs should pause if krb5 ticket is not valid=20
-14440   creator owner (S-1-3-0) ACE not honored=20
-14506   cifs mount with missing krb5 key should give better error message=
-=20
-14507   cifs ACL exec permission granted where it should be denied=20
-
-And last but not least a big topic:
-
-14499   expose NT ACLs via system.nfs4_acl EA=20
-
-This idea popped up in the discussion of the 2020 SambaXP discussion after =
-your
-talk. Having a standardized permission management tool like the nfs4-acl-to=
-ols
-is really something that is important.
-
-Also the fact that Linux still has no standardized ACL implementation (NFS4=
- ACL
-are the only standardized ones) in the kernel is preventing many enterprise
-customers to use Linux on client machines. Without that, permission managem=
-ent
-is such a pain that they usually give up any client installation efforts so=
-oner
-or later.  I think the cifs vfs developers would have the power to convince=
- the
-responsible kernel developers to add this to the kernel.
-
-I can say from my experience at various customer sites very clearly that ci=
-fs
-vfs will *not* be accepted widely in the enterprise world, without generic =
-NFS4
-ACLs implemented in the kernel alongside.
+>  Moritz Duge 2022-03-31 16:47:35 UTC
+> 
+> With upstream kernel 5.16.9 CIFS umount fails when using certain SMB servers.
+> 
+> "umount" returns exit code 32 and the "mount" command still lists the mount as being present.
+> See below for the bad commit I've bisected.
+> 
+> The bug has been reproduced multiple times with upstream kernel 5.16.9!
+> But additionally I've done much testing with openSUSE kernels.
+> Here's the openSUSE bugreport:
+> https://bugzilla.opensuse.org/show_bug.cgi?id=1194945
+> Additionally with the same servers there's a problem showing the free space with the "df" command. But I haven't been able to find out if this is really related to the umount problem.
+> 
+> 
+> 
+> 
+> = SMB Server =
+> 
+> I haven't been able to identify the exact server side settings. But this problem occured with at least this SMB server (with upstream kernel 5.16.9):
+> NetApp (Release 9.7P12) with dfs and CIFS mount options "vers=3.1.1,seal"
+> (quota state unknown)
+> 
+> Additionally I've verified the bug with the openSUSE kernel 5.3.18-lp152.72-default and this SMB server:
+> Windows Server 2019 with dfs and quota enabled
+> (no explicit "vers" or "seal" mount options)
+> 
+> Additionally the bug appeared with another NetApp SMB server (tested upstream 5.16.9) and two unknown servers (tested only openSUSE-15.2 kernels).
+> 
+> Also it looks like the bug may need a setup where the user can only read //server/share/username/ but has no permissions to read //server/share/.
+> 
+> 
+> 
+> 
+> = Bad Commit =
+> 
+> With the openSUSE kernel I bisected the problem down to this commit (6ae27f2b2) between openSUSE-15.2 kernels 5.3.18-lp152.69.1 and 5.3.18-lp152.72.1.
+> https://github.com/SUSE/kernel/commit/6ae27f2b260e91f16583bbc1ded3147e0f7c5d94
+> 
+> This commit is also present in the upstream kernel (14302ee33).
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=14302ee3301b3a77b331cc14efb95bf7184c73cc
+> And it has been merged between 5.11 and 5.12.
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=d0df9aabefda4d0a64730087f939f53f91e29ee6
+> 
+> As said I can't reproduce this with arbitrary SMB servers. And it's always a time consuming procedure for me to do a test with the affected production SMB servers. But if you're really unhappy with the bisect search on the openSUSE kernel, I can repeat the test with the upstream commit 14302ee33 and it's predecessor.
 
 
-> SMB3.1.1 is simpler in some ways than NFS (no SunRPC to deal with) and
-> should be easier to fix bugs in many cases.
+Could somebody take a look into this? Or was this discussed somewhere
+else already? Or even fixed?
 
-maybe it is simpler, but for the above mentioned reasons, SMB on the Linux
-client side is no option for most enterprise environments. They prefer NFS =
-and
-I understand why. I really wish this would change, this is why I write these
-lines so bluntly.
+Anyway, to get this tracked:
 
-Bj=F6rn
---=20
-SerNet GmbH - Bahnhofsallee 1b - 37081 G=F6ttingen
-phone: +495513700000  mailto:contact@sernet.com
-AG G=F6ttingen: HR-B 2816 - https://www.sernet.com
-Manag. Directors Johannes Loxen and Reinhild Jung
-data privacy policy https://www.sernet.de/privacy
+#regzbot introduced: 14302ee3301b3a77b331cc14
+#regzbot from: Moritz Duge <duge@pre-sense.de>
+#regzbot title: CIFS: umount fails with some servers (exit code 32)
+#regzbot link: https://bugzilla.kernel.org/show_bug.cgi?id=215782
 
-Samba eXPerience 2022 - online edition!
-=66rom May 31st to June 2nd, 2022 at Zoom
-sponsored by Google, Microsoft & SerNet
-more information at https://sambaXP.org
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+
+P.S.: As the Linux kernel's regression tracker I'm getting a lot of
+reports on my table. I can only look briefly into most of them and lack
+knowledge about most of the areas they concern. I thus unfortunately
+will sometimes get things wrong or miss something important. I hope
+that's not the case here; if you think it is, don't hesitate to tell me
+in a public reply, it's in everyone's interest to set the public record
+straight.
+
+-- 
+Additional information about regzbot:
+
+If you want to know more about regzbot, check out its web-interface, the
+getting start guide, and the references documentation:
+
+https://linux-regtracking.leemhuis.info/regzbot/
+https://gitlab.com/knurd42/regzbot/-/blob/main/docs/getting_started.md
+https://gitlab.com/knurd42/regzbot/-/blob/main/docs/reference.md
+
+The last two documents will explain how you can interact with regzbot
+yourself if your want to.
+
+Hint for reporters: when reporting a regression it's in your interest to
+CC the regression list and tell regzbot about the issue, as that ensures
+the regression makes it onto the radar of the Linux kernel's regression
+tracker -- that's in your interest, as it ensures your report won't fall
+through the cracks unnoticed.
+
+Hint for developers: you normally don't need to care about regzbot once
+it's involved. Fix the issue as you normally would, just remember to
+include 'Link:' tag in the patch descriptions pointing to all reports
+about the issue. This has been expected from developers even before
+regzbot showed up for reasons explained in
+'Documentation/process/submitting-patches.rst' and
+'Documentation/process/5.Posting.rst'.
