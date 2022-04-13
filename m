@@ -2,124 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C58C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Apr 2022 03:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81946C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Apr 2022 11:43:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231185AbiDMDZ5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 12 Apr 2022 23:25:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56550 "EHLO
+        id S230358AbiDMLp5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 Apr 2022 07:45:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229873AbiDMDZ4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Apr 2022 23:25:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448452E097
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Apr 2022 20:23:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D2C5161A6D
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Apr 2022 03:23:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32804C385AD
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Apr 2022 03:23:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649820216;
-        bh=ZZ6sD3LcgQ4UQnuLILFUZP+1xY20ef7WvzKDro8i2jY=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Qe+CSgRldsVgtUV+S0a+O23KZZJ6uIwsH3dikmdOpudSUy6SM9hZqDWZCEqAz/cEH
-         QdVvlE/DDiv6+VkiCEXh48yCi5eDNTOs30ftm6Y9m0Z5qJEp3YMIlLMzhtUjh2qi2G
-         sCOm+imHsgz6IqGshV2MemZFOKK/MvQ78Kzm8nJOEtOhsBoeMKEXj54ri1Zslk218u
-         wYk/2vQ9upLh4WzMtUOlHpTVJDwUJoaab0V6m6v9wG+nUoEF3k90I9pFqDPNYGCSeM
-         UGxmcAX/W8mOawtS1YSvtp9oUYoqNxxkYfP1cpCkI9m7FVT30qbxSpGJGtmkAxsUKD
-         6zRXRZVFNBv+g==
-Received: by mail-wr1-f51.google.com with SMTP id b19so684754wrh.11
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Apr 2022 20:23:36 -0700 (PDT)
-X-Gm-Message-State: AOAM530OfSFa/zsaU3pTLI80/BlHXcNOqPrLJVY+zCv+o5bDricb2nc3
-        kH6sRmxKRPQQFVcpLZ0bMBaOPOc+2+iyPpJ7vCw=
-X-Google-Smtp-Source: ABdhPJwUKkmjbKgjSlE2BhssZHeMIHP0Hoapgy/Uqz5YqGestJ7iAvUVrVh8wO3rsy13Wd1bSInhxDgb+KdylMczBx4=
-X-Received: by 2002:adf:eb07:0:b0:207:8534:2ef6 with SMTP id
- s7-20020adfeb07000000b0020785342ef6mr22924602wrn.62.1649820214376; Tue, 12
- Apr 2022 20:23:34 -0700 (PDT)
+        with ESMTP id S229481AbiDMLp5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Apr 2022 07:45:57 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D63F25B3F5;
+        Wed, 13 Apr 2022 04:43:32 -0700 (PDT)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23D9xvYW032238;
+        Wed, 13 Apr 2022 11:43:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2021-07-09; bh=snGXKT5n6XDtwCnQA9MLkATepstbNlkspFrk9ndNi6U=;
+ b=BdRk1rkD6rINJkZWx1YEFObZL3ohwLy3ETlWjYD74GLgaRxfePw6HROebBZ38+h6xO/8
+ Ptu3sw4vsoBLLqSjblsLcS3yUp9VtzIashOTd04ncEcijRplK3TH1mbfdvOVESj/LK3W
+ bWkquRBU5NcDAP8OLgUXnjON/VP77pvrTe1S2BFj0D5E6cXx/IWheuWkw0BzqGxfgvw0
+ eaM1a+JJnqHpss1lytLXAvbG+gJLXbtO7h4fib1g3IoQB2CPLVuWGmdXIn/9uE2LmZjI
+ STOAEaWjxJE1FjEjQ4POeQa5qZamYPoK9Z27XcY8RmxLvvrrZZA+789h5iJUhHL7FGEM BA== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3fb0jd9da7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Apr 2022 11:43:17 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 23DBfRRL010353;
+        Wed, 13 Apr 2022 11:43:16 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3fb0k3wau6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Apr 2022 11:43:16 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 23DBhG65016664;
+        Wed, 13 Apr 2022 11:43:16 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.147.25.63])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3fb0k3watn-1;
+        Wed, 13 Apr 2022 11:43:16 +0000
+From:   Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Cc:     harshit.m.mogalapalli@oracle.com, dan.carpenter@oracle.com,
+        smfrench@gmail.com, Steve French <sfrench@samba.org>,
+        Stefan Metzmacher <metze@samba.org>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] cifs: potential buffer overflow in handling symlinks
+Date:   Wed, 13 Apr 2022 04:42:51 -0700
+Message-Id: <20220413114251.73083-1-harshit.m.mogalapalli@oracle.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Received: by 2002:a5d:64aa:0:0:0:0:0 with HTTP; Tue, 12 Apr 2022 20:23:33
- -0700 (PDT)
-In-Reply-To: <d7771443-f935-357f-3606-c09920a2341f@talpey.com>
-References: <20220412225806.5647-1-linkinjeon@kernel.org> <d7771443-f935-357f-3606-c09920a2341f@talpey.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 13 Apr 2022 12:23:33 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_Esmq__t6JCYCYT0rFS5EdrvUOtGitX-b9MV4ogg3dAw@mail.gmail.com>
-Message-ID: <CAKYAXd_Esmq__t6JCYCYT0rFS5EdrvUOtGitX-b9MV4ogg3dAw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: set fixed sector size to FS_SECTOR_SIZE_INFORMATION
-To:     Tom Talpey <tom@talpey.com>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, hyc.lee@gmail.com,
-        senozhatsky@chromium.org, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: pmHfV1bQBRIjOkb1odkxWsvclPwJw5bw
+X-Proofpoint-GUID: pmHfV1bQBRIjOkb1odkxWsvclPwJw5bw
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-04-13 10:40 GMT+09:00, Tom Talpey <tom@talpey.com>:
-> On 4/12/2022 6:58 PM, Namjae Jeon wrote:
->> Currently ksmbd is using ->f_bsize from vfs_statfs() as sector size.
->> If fat/exfat is a local share, ->f_bsize is a cluster size that is too
->> large to be used as a sector size. Sector sizes larger than 4K cause
->> problem occurs when mounting an iso file through windows client.
->>
->> The error message can be obtained using Mount-DiskImage command,
->>   the error is:
->> "Mount-DiskImage : The sector size of the physical disk on which the
->> virtual disk resides is not supported."
->>
->> This patch reports fixed sector size as 512B logical/4K physical to
->> windows client to avoid poking into the block device.
->>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>   fs/ksmbd/smb2pdu.c | 9 ++++-----
->>   1 file changed, 4 insertions(+), 5 deletions(-)
->>
->> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->> index 62cc0f95ab87..28ff7c058bc4 100644
->> --- a/fs/ksmbd/smb2pdu.c
->> +++ b/fs/ksmbd/smb2pdu.c
->> @@ -4998,12 +4998,11 @@ static int smb2_get_info_filesystem(struct
->> ksmbd_work *work,
->>
->>   		info = (struct smb3_fs_ss_info *)(rsp->Buffer);
->>
->> -		info->LogicalBytesPerSector = cpu_to_le32(stfs.f_bsize);
->> -		info->PhysicalBytesPerSectorForAtomicity =
->> -				cpu_to_le32(stfs.f_bsize);
->> -		info->PhysicalBytesPerSectorForPerf = cpu_to_le32(stfs.f_bsize);
->> +		info->LogicalBytesPerSector = cpu_to_le32(512);
->> +		info->PhysicalBytesPerSectorForAtomicity = cpu_to_le32(4096);
->> +		info->PhysicalBytesPerSectorForPerf = cpu_to_le32(4096);
->>   		info->FSEffPhysicalBytesPerSectorForAtomicity =
->> -				cpu_to_le32(stfs.f_bsize);
->> +				cpu_to_le32(4096);
->
-Hi Tom,
-> So, this sounds like a great approach, much better than returning 128K.
-Thanks:)
->
-> However, it's not at all universally true that 4K is going to be atomic.
-Could you please elaborate more ? Is the atomic size not 4K for 4K
-native storage?
+Smatch printed a warning:
+	arch/x86/crypto/poly1305_glue.c:198 poly1305_update_arch() error:
+	__memcpy() 'dctx->buf' too small (16 vs u32max)
 
-> And min(stfs.f_bsize, 4096) might be problematic too. Is there any better
-> option??
-There is no option than to poke into block layer, but Christoph
-pointed out that this will also give the wrong answer for file systems
-with multiple device support (btrfs, f2fs, xfs).
-So we need to select fixed size as between 512B ~ 4KB. I think the v2
-patch looks a bit better...
+It's caused because Smatch marks 'link_len' as untrusted since it comes
+from sscanf(). Add a check to ensure that 'link_len' is not larger than
+the size of the 'link_str' buffer.
 
-Thanks!
->
-> Tom.
->
->
->>   		info->Flags = cpu_to_le32(SSINFO_FLAGS_ALIGNED_DEVICE |
->>   				    SSINFO_FLAGS_PARTITION_ALIGNED_ON_DEVICE);
->>   		info->ByteOffsetForSectorAlignment = 0;
->
+Fixes: c69c1b6eaea1 ("cifs: implement CIFSParseMFSymlink()")
+Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+---
+v2: make use of CIFS_MF_SYMLINK_LINK_MAXLEN (same but cleaner).
+
+ fs/cifs/link.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index 852e54e..bbdf328 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -85,6 +85,9 @@
+ 	if (rc != 1)
+ 		return -EINVAL;
+ 
++	if (link_len > CIFS_MF_SYMLINK_LINK_MAXLEN)
++		return -EINVAL;
++
+ 	rc = symlink_hash(link_len, link_str, md5_hash);
+ 	if (rc) {
+ 		cifs_dbg(FYI, "%s: MD5 hash failure: %d\n", __func__, rc);
+-- 
+1.8.3.1
+
