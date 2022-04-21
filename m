@@ -2,61 +2,61 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2129C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Apr 2022 02:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A597C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Apr 2022 02:39:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383781AbiDUClY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Apr 2022 22:41:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42012 "EHLO
+        id S1383807AbiDUCmg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Apr 2022 22:42:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354824AbiDUClX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Apr 2022 22:41:23 -0400
+        with ESMTP id S229462AbiDUCmX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Apr 2022 22:42:23 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F3EFC7B
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Apr 2022 19:38:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A60C8DDB
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Apr 2022 19:39:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650508714;
+        s=mimecast20190719; t=1650508774;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=1vMZkUpRiO/IIsV/DaU3mXEnWx2QK6rrTlA34gyv38Q=;
-        b=AThg6UBXBY1AyndV7I5WcdClO1T4/iWrJADmdOa/Xhktfmd4ZtH0ILAtxaYI9ZX26jDFfa
-        9cFJYkft1XsE9RBD1z1AD+vVzyMEABK5kxaWWKo44mGDXKlQEGM1RQVc7zeJGnguwl65KK
-        9FDMeXFBBGWNyD6DvWK7GTVMO9ariiQ=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=u5jXq0ikUBbT7BOBDMlxZS3HQ2vIua6Sd4Ddv3mL8QU=;
+        b=L0p74zrltDjXeZ44WFVtyPHS1AZ3h8e9pInEwj/sQLNe4L+wCbjxepICOiaTxq+8JZn01s
+        99pMigsqFA8K6uTz8CmFFwcdluVTTTmea3Cn0wxC6OlJl+AnCkCHGA56iGkK3lqs965sKj
+        U6WMq9TNUUTrDKaU6wVfQSfQQ6knVpA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-558-sKTaKm4lOdG8fPKsevmZJQ-1; Wed, 20 Apr 2022 22:38:33 -0400
-X-MC-Unique: sKTaKm4lOdG8fPKsevmZJQ-1
-Received: by mail-ed1-f70.google.com with SMTP id ee36-20020a056402292400b0041d836b664cso2326920edb.6
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Apr 2022 19:38:32 -0700 (PDT)
+ us-mta-668-nG2x6wzhM2KLySmxnyxMRg-1; Wed, 20 Apr 2022 22:39:33 -0400
+X-MC-Unique: nG2x6wzhM2KLySmxnyxMRg-1
+Received: by mail-ed1-f69.google.com with SMTP id eg29-20020a056402289d00b0041d6db0fbc9so2302743edb.9
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Apr 2022 19:39:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=1vMZkUpRiO/IIsV/DaU3mXEnWx2QK6rrTlA34gyv38Q=;
-        b=eg9RjED9/MUe5wIQKWTsOOMgeLeQUCeHrcqi0f/Wdq3YMOX/+EepoWb+P57LmdZch/
-         em4KJC69IF4mPw+v+whMMl0fps53tvoKwrl9iHrNEs6BdKA41/JPN9oV7xJtzznIMcCO
-         VyMC2GxTtL+9WKmGSQgILtUrwRPnw5TjguRCQ4nFve3YGNH0Mp7Yk32OV/SRgSHvI74U
-         TKf58NaVVMaM4qvXkGpUBpOz1DOjV/0EF29jvpQUnHOzFccoqhwlKCmhSxiCi0GAkFc/
-         rc3jB5gtC5Uj66EGumqgFuaenYfTR7ca3a1MEbsyqC07h9/QVQ79JeUJ+AmrgNOvvomL
-         k3bg==
-X-Gm-Message-State: AOAM530I/aCC2swZB9YMw+fmArpWWBhmWjLorTQCD11pZlB4XyjJFm9O
-        XWHae25l/F4Bf8hrg5Yq9wvYNIiCENy8kfknpCqZjLxSiPTHFblwuN5583IrWaGujvO4lgDecdJ
-        tAgw1+nFAeUMeZ1WlVcDQSIO85p8HXjxayKijHw==
-X-Received: by 2002:a17:906:79c4:b0:6cf:5489:da57 with SMTP id m4-20020a17090679c400b006cf5489da57mr20559631ejo.48.1650508711665;
-        Wed, 20 Apr 2022 19:38:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxgjzy9ZBjvK3A8/0zy2uLpYguOGMZCkoSO+igoHJ4SajOaGl/jwyaHRJiyS/EvkVdArBxdUIcv4slPknUvmdU=
-X-Received: by 2002:a17:906:79c4:b0:6cf:5489:da57 with SMTP id
- m4-20020a17090679c400b006cf5489da57mr20559620ejo.48.1650508711430; Wed, 20
- Apr 2022 19:38:31 -0700 (PDT)
+        bh=u5jXq0ikUBbT7BOBDMlxZS3HQ2vIua6Sd4Ddv3mL8QU=;
+        b=fOcE8u/nyvo8TabQ2FU+iCovowWvwQQr6iiu6EI+kBUApUz+wtpx8wPUYeho4vrR6u
+         hg6bsBLay3qELCX+grVW4pMFwWRhDGUfMTM7qoJ4Ea8J1JBnB6jEeFqRfuT/mgctaneb
+         smpUq+44taxp7wvMQ0hVMncoMqDs5pW9KGYd5250zlq+S7gc8NTdV2uVlLX/ZZewtofh
+         GGuuQD1PEsKFcBnoAQFE6Y+m9ExHgNe1rXvSYAlf8LLyzPzGDpcedmnzL8RgKj0zKBmd
+         xy7D5lkbKDKHT52UFBr2XNswAx7Old1r/rTXoIBysQUjZILTrPyDFuYNl6BTFZkrubnt
+         I/Fg==
+X-Gm-Message-State: AOAM530NQ5gjHHrsoxPYCj/kMLI/u3IugDtcYIn9FL8BfvuaLYqxCegy
+        4DzeX2RU7P4iuTGluQInPOML0HRLC1wZPPcxwjnshikDzgtLd2g/oRanum9Z1aR+Y/JOTPRxobu
+        jSL2s62nvELH26f+sEoKhuqm9PpvkcvgGqOh6ww==
+X-Received: by 2002:aa7:c40b:0:b0:41d:9886:90a0 with SMTP id j11-20020aa7c40b000000b0041d988690a0mr26088301edq.275.1650508772246;
+        Wed, 20 Apr 2022 19:39:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxDjJb/72uZ3+xnQSh0+4s9Q1p+EabYl0myy/V7P8P0W9WRErw3nmEfDHPnR4EqgFm3vZNqnDa+9VIsUBKKFmY=
+X-Received: by 2002:aa7:c40b:0:b0:41d:9886:90a0 with SMTP id
+ j11-20020aa7c40b000000b0041d988690a0mr26088292edq.275.1650508772121; Wed, 20
+ Apr 2022 19:39:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220421000546.5129-1-pc@cjr.nz>
-In-Reply-To: <20220421000546.5129-1-pc@cjr.nz>
+References: <20220421000546.5129-1-pc@cjr.nz> <20220421000546.5129-2-pc@cjr.nz>
+In-Reply-To: <20220421000546.5129-2-pc@cjr.nz>
 From:   Leif Sahlberg <lsahlber@redhat.com>
-Date:   Thu, 21 Apr 2022 12:38:20 +1000
-Message-ID: <CAGvGhF6DSORkrWc0hL53zRikJCwc0vaYJHMReWbiDcCPCmA3mQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] cifs: fix NULL ptr dereference in refresh_mounts()
+Date:   Thu, 21 Apr 2022 12:39:21 +1000
+Message-ID: <CAGvGhF7R4dyohbTg1+zVNiLpHp2x_oe3E+uFQZSr8fK0cspagA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] cifs: use correct lock type in cifs_reconnect()
 To:     Paulo Alcantara <pc@cjr.nz>
 Cc:     CIFS <linux-cifs@vger.kernel.org>,
         "French, Steve" <smfrench@gmail.com>
@@ -65,131 +65,45 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good.   Reviewed-by me
-
+looks good to me.
+Reviewed-by me
 
 On Thu, Apr 21, 2022 at 10:06 AM Paulo Alcantara <pc@cjr.nz> wrote:
 >
-> Either mount(2) or automount might not have server->origin_fullpath
-> set yet while refresh_cache_worker() is attempting to refresh DFS
-> referrals.  Add missing NULL check and locking around it.
->
-> This fixes bellow crash:
->
-> [ 1070.276835] general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> [ 1070.277676] KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> [ 1070.278219] CPU: 1 PID: 8506 Comm: kworker/u8:1 Not tainted 5.18.0-rc3 #10
-> [ 1070.278701] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.15.0-0-g2dd4b9b-rebuilt.opensuse.org 04/01/2014
-> [ 1070.279495] Workqueue: cifs-dfscache refresh_cache_worker [cifs]
-> [ 1070.280044] RIP: 0010:strcasecmp+0x34/0x150
-> [ 1070.280359] Code: 00 00 00 fc ff df 41 54 55 48 89 fd 53 48 83 ec 10 eb 03 4c 89 fe 48 89 ef 48 83 c5 01 48 89 f8 48 89 fa 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28 38 d0 7f 08 84 c0 0f 85 bc 00 00 00 0f b6 45 ff 44
-> [ 1070.281729] RSP: 0018:ffffc90008367958 EFLAGS: 00010246
-> [ 1070.282114] RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 0000000000000000
-> [ 1070.282691] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> [ 1070.283273] RBP: 0000000000000001 R08: 0000000000000000 R09: ffffffff873eda27
-> [ 1070.283857] R10: ffffc900083679a0 R11: 0000000000000001 R12: ffff88812624c000
-> [ 1070.284436] R13: dffffc0000000000 R14: ffff88810e6e9a88 R15: ffff888119bb9000
-> [ 1070.284990] FS:  0000000000000000(0000) GS:ffff888151200000(0000) knlGS:0000000000000000
-> [ 1070.285625] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 1070.286100] CR2: 0000561a4d922418 CR3: 000000010aecc000 CR4: 0000000000350ee0
-> [ 1070.286683] Call Trace:
-> [ 1070.286890]  <TASK>
-> [ 1070.287070]  refresh_cache_worker+0x895/0xd20 [cifs]
-> [ 1070.287475]  ? __refresh_tcon.isra.0+0xfb0/0xfb0 [cifs]
-> [ 1070.287905]  ? __lock_acquire+0xcd1/0x6960
-> [ 1070.288247]  ? is_dynamic_key+0x1a0/0x1a0
-> [ 1070.288591]  ? lockdep_hardirqs_on_prepare+0x410/0x410
-> [ 1070.289012]  ? lock_downgrade+0x6f0/0x6f0
-> [ 1070.289318]  process_one_work+0x7bd/0x12d0
-> [ 1070.289637]  ? worker_thread+0x160/0xec0
-> [ 1070.289970]  ? pwq_dec_nr_in_flight+0x230/0x230
-> [ 1070.290318]  ? _raw_spin_lock_irq+0x5e/0x90
-> [ 1070.290619]  worker_thread+0x5ac/0xec0
-> [ 1070.290891]  ? process_one_work+0x12d0/0x12d0
-> [ 1070.291199]  kthread+0x2a5/0x350
-> [ 1070.291430]  ? kthread_complete_and_exit+0x20/0x20
-> [ 1070.291770]  ret_from_fork+0x22/0x30
-> [ 1070.292050]  </TASK>
-> [ 1070.292223] Modules linked in: bpfilter cifs cifs_arc4 cifs_md4
-> [ 1070.292765] ---[ end trace 0000000000000000 ]---
-> [ 1070.293108] RIP: 0010:strcasecmp+0x34/0x150
-> [ 1070.293471] Code: 00 00 00 fc ff df 41 54 55 48 89 fd 53 48 83 ec 10 eb 03 4c 89 fe 48 89 ef 48 83 c5 01 48 89 f8 48 89 fa 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28 38 d0 7f 08 84 c0 0f 85 bc 00 00 00 0f b6 45 ff 44
-> [ 1070.297718] RSP: 0018:ffffc90008367958 EFLAGS: 00010246
-> [ 1070.298622] RAX: 0000000000000000 RBX: dffffc0000000000 RCX: 0000000000000000
-> [ 1070.299428] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> [ 1070.300296] RBP: 0000000000000001 R08: 0000000000000000 R09: ffffffff873eda27
-> [ 1070.301204] R10: ffffc900083679a0 R11: 0000000000000001 R12: ffff88812624c000
-> [ 1070.301932] R13: dffffc0000000000 R14: ffff88810e6e9a88 R15: ffff888119bb9000
-> [ 1070.302645] FS:  0000000000000000(0000) GS:ffff888151200000(0000) knlGS:0000000000000000
-> [ 1070.303462] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 1070.304131] CR2: 0000561a4d922418 CR3: 000000010aecc000 CR4: 0000000000350ee0
-> [ 1070.305004] Kernel panic - not syncing: Fatal exception
-> [ 1070.305711] Kernel Offset: disabled
-> [ 1070.305971] ---[ end Kernel panic - not syncing: Fatal exception ]---
+> TCP_Server_Info::origin_fullpath and TCP_Server_Info::leaf_fullpath
+> are protected by refpath_lock mutex and not cifs_tcp_ses_lock
+> spinlock.
 >
 > Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 > ---
->  fs/cifs/connect.c   |  2 ++
->  fs/cifs/dfs_cache.c | 19 ++++++++++++-------
->  2 files changed, 14 insertions(+), 7 deletions(-)
+>  fs/cifs/connect.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 >
 > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 902e8c6c0f9c..2c24d433061a 100644
+> index 2c24d433061a..42e14f408856 100644
 > --- a/fs/cifs/connect.c
 > +++ b/fs/cifs/connect.c
-> @@ -3675,9 +3675,11 @@ static void setup_server_referral_paths(struct mount_ctx *mnt_ctx)
+> @@ -534,12 +534,19 @@ int cifs_reconnect(struct TCP_Server_Info *server, bool mark_smb_session)
 >  {
->         struct TCP_Server_Info *server = mnt_ctx->server;
+>         /* If tcp session is not an dfs connection, then reconnect to last target server */
+>         spin_lock(&cifs_tcp_ses_lock);
+> -       if (!server->is_dfs_conn || !server->origin_fullpath || !server->leaf_fullpath) {
+> +       if (!server->is_dfs_conn) {
+>                 spin_unlock(&cifs_tcp_ses_lock);
+>                 return __cifs_reconnect(server, mark_smb_session);
+>         }
+>         spin_unlock(&cifs_tcp_ses_lock);
 >
 > +       mutex_lock(&server->refpath_lock);
->         server->origin_fullpath = mnt_ctx->origin_fullpath;
->         server->leaf_fullpath = mnt_ctx->leaf_fullpath;
->         server->current_fullpath = mnt_ctx->leaf_fullpath;
-> +       mutex_unlock(&server->refpath_lock);
->         mnt_ctx->origin_fullpath = mnt_ctx->leaf_fullpath = NULL;
->  }
->
-> diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-> index 30e040da4f09..956f8e5cf3e7 100644
-> --- a/fs/cifs/dfs_cache.c
-> +++ b/fs/cifs/dfs_cache.c
-> @@ -1422,12 +1422,14 @@ static int refresh_tcon(struct cifs_ses **sessions, struct cifs_tcon *tcon, bool
->         struct TCP_Server_Info *server = tcon->ses->server;
->
->         mutex_lock(&server->refpath_lock);
-> -       if (strcasecmp(server->leaf_fullpath, server->origin_fullpath))
-> -               __refresh_tcon(server->leaf_fullpath + 1, sessions, tcon, force_refresh);
-> +       if (server->origin_fullpath) {
-> +               if (server->leaf_fullpath && strcasecmp(server->leaf_fullpath,
-> +                                                       server->origin_fullpath))
-> +                       __refresh_tcon(server->leaf_fullpath + 1, sessions, tcon, force_refresh);
-> +               __refresh_tcon(server->origin_fullpath + 1, sessions, tcon, force_refresh);
+> +       if (!server->origin_fullpath || !server->leaf_fullpath) {
+> +               mutex_unlock(&server->refpath_lock);
+> +               return __cifs_reconnect(server, mark_smb_session);
 > +       }
->         mutex_unlock(&server->refpath_lock);
->
-> -       __refresh_tcon(server->origin_fullpath + 1, sessions, tcon, force_refresh);
-> -
->         return 0;
+> +       mutex_unlock(&server->refpath_lock);
+> +
+>         return reconnect_dfs_server(server);
 >  }
->
-> @@ -1530,11 +1532,14 @@ static void refresh_mounts(struct cifs_ses **sessions)
->                 list_del_init(&tcon->ulist);
->
->                 mutex_lock(&server->refpath_lock);
-> -               if (strcasecmp(server->leaf_fullpath, server->origin_fullpath))
-> -                       __refresh_tcon(server->leaf_fullpath + 1, sessions, tcon, false);
-> +               if (server->origin_fullpath) {
-> +                       if (server->leaf_fullpath && strcasecmp(server->leaf_fullpath,
-> +                                                               server->origin_fullpath))
-> +                               __refresh_tcon(server->leaf_fullpath + 1, sessions, tcon, false);
-> +                       __refresh_tcon(server->origin_fullpath + 1, sessions, tcon, false);
-> +               }
->                 mutex_unlock(&server->refpath_lock);
->
-> -               __refresh_tcon(server->origin_fullpath + 1, sessions, tcon, false);
->                 cifs_put_tcon(tcon);
->         }
->  }
+>  #else
 > --
 > 2.35.3
 >
