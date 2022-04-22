@@ -2,88 +2,99 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44E83C433FE
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Apr 2022 07:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF0FC433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 22 Apr 2022 17:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbiDUHkt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 21 Apr 2022 03:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32922 "EHLO
+        id S232209AbiDVRDN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 22 Apr 2022 13:03:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385972AbiDUHkC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Apr 2022 03:40:02 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C7813E25;
-        Thu, 21 Apr 2022 00:36:43 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id F23031F752;
-        Thu, 21 Apr 2022 07:36:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1650526601; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q69hhjwT+kSjonv8QFdlTZVMurQeV1T2PIMjNcz8AUM=;
-        b=mdjgoTvvaDF2Ag3Zqw5TpPk8QcQaYVhO//4b31iouM4Py+LJ8/mKSsHLid3sdz5izLLiuV
-        FJOEjfr3iZbWnFgzUZOrI8zg2EmQlQZ/fZbz0ZYrUz9xd1bM/so3O7+P061vM1FOGZkhUX
-        6rX/AoD0+63e10bLXr/B1SvAgvRnF5w=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1650526601;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q69hhjwT+kSjonv8QFdlTZVMurQeV1T2PIMjNcz8AUM=;
-        b=id70+zebsG7sOnXb7k6LKxwA4b2EWX+tw6TAKsYoO3Nuz8qXpKPs60Q4dMW3heqjNf8wew
-        nMDfQuXCV2JR9tBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B535113A84;
-        Thu, 21 Apr 2022 07:36:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id D/ZFK4kJYWIwEgAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 21 Apr 2022 07:36:41 +0000
-Message-ID: <2683c56f-62c3-987a-72c4-0df5a97368f7@suse.de>
-Date:   Thu, 21 Apr 2022 09:36:41 +0200
+        with ESMTP id S229699AbiDVRDN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 22 Apr 2022 13:03:13 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E400D66CBB;
+        Fri, 22 Apr 2022 10:00:18 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id bu29so15396970lfb.0;
+        Fri, 22 Apr 2022 10:00:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=b3rzewQaFS9vbFCc+2pNDGoiMD/tDWvRJp+Iv+4ibzQ=;
+        b=OJbSTCCH7f0gs4zpXBpUWTWDyRyojWE1fqnoIgW4mQRGw4iWiu5zhcoOjDsLsxGtd5
+         a0UDxwNx4DAM0J8VMggu0ELLdfZY5Adsz04bAHu0dX5UuVls9GefMeZ6QAiuMd/D40hg
+         yGcjpi+8BS94X0tFPVyxFYNJTPoDlsTbGzZ3ZjEQ2zF/0aEy9YKqykDFNUkM32NirCEJ
+         cwxUrMSxoZp6bOqe3G/mnUiI84xlvyLNWjkS/NcV79WBLYGoSyD/DFZrdDrdmU3aUKoh
+         qJ6tanDoeMpl5BmyAOMECLGf+Hsd+Hktpm59n0YYtevuvXCdxp7gdCQd8vyuVW/dl0BQ
+         U8BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=b3rzewQaFS9vbFCc+2pNDGoiMD/tDWvRJp+Iv+4ibzQ=;
+        b=RF8nGwZcTop2efp1+mzsA90qd+OhFpHfZ7CGRTvuyyrOM1xkgmq6TfhUnzt8KVRZzE
+         tZbIj6JN3d/YYTpOI6Kq++cR4nBiR5m+AjZBi5Bg4F3gyVLFNiwLbNUffL+MxY9RFhF8
+         fdwlr4zOFfJIfsrUC0fAFFmfJrdmDKHpUrbPu0L2p7XN+PUKUT3vguFgR7WfLE7VI/6Y
+         +HUPp1q5+Ml67fJ8aPjLumvwyu8iFiGzdCw4FIoCiPRkmyhtWAuqCMWFKr7VcD+WxP1c
+         1AB4Ih8vdGe57zKG+gT5K1fxLDtjmhaMkShYuRoEnTE6IVgJOSvdyTiANGatZPsjzm1y
+         MjYg==
+X-Gm-Message-State: AOAM533n1J1BzjD9O6BbCdGkAKdCCFVWXBCJbG9b3rtYr7Jej60NBvjR
+        kiYNWTyQE4lvGhW/jI46WzUTqnGQNgKZFVEQUYRgOr6BgsM=
+X-Google-Smtp-Source: ABdhPJxqaaRy/JZruhaWvB9UILg3fAIDDSCmfUblFNOvQUJdfNVXCuRtN3Ic+LP0KpNSF3IzrtGHWFG6WUS2GNmA9c8=
+X-Received: by 2002:ac2:4bd0:0:b0:46b:c3ea:ea04 with SMTP id
+ o16-20020ac24bd0000000b0046bc3eaea04mr3572867lfq.537.1650646816871; Fri, 22
+ Apr 2022 10:00:16 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH RFC 5/5] net/tls: Add observability for AF_TLSH sockets
-Content-Language: en-US
-To:     Chuck Lever <chuck.lever@oracle.com>, netdev@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     ak@tempesta-tech.com, borisp@nvidia.com, simo@redhat.com
-References: <165030051838.5073.8699008789153780301.stgit@oracle-102.nfsv4.dev>
- <165030059773.5073.6168640435213548957.stgit@oracle-102.nfsv4.dev>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <165030059773.5073.6168640435213548957.stgit@oracle-102.nfsv4.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 22 Apr 2022 12:00:06 -0500
+Message-ID: <CAH2r5mtNyRzY2zxrS9Qgoj-NxAEyOEHjrWc1a6bingt61=xWHA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 4/18/22 18:49, Chuck Lever wrote:
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->   net/tls/af_tlsh.c |   50 +++++++
->   net/tls/trace.c   |    3
->   net/tls/trace.h   |  355 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 402 insertions(+), 6 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Please pull the following changes since commit
+b2d229d4ddb17db541098b83524d901257e93845:
 
-Cheers,
+  Linux 5.18-rc3 (2022-04-17 13:57:31 -0700)
 
-Hannes
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.18-rc3-smb3-fixes
+
+for you to fetch changes up to f5d0f921ea362636e4a2efb7c38d1ead373a8700:
+
+  cifs: destage any unwritten data to the server before calling
+copychunk_write (2022-04-20 22:54:54 -0500)
+
+----------------------------------------------------------------
+4 fixes to cifs client, 2 for stable
+- fcollapse fix
+- reconnect lock fix
+- DFS oops fix
+- minor cleanup patch
+----------------------------------------------------------------
+Haowen Bai (1):
+      cifs: Use kzalloc instead of kmalloc/memset
+
+Paulo Alcantara (2):
+      cifs: fix NULL ptr dereference in refresh_mounts()
+      cifs: use correct lock type in cifs_reconnect()
+
+Ronnie Sahlberg (1):
+      cifs: destage any unwritten data to the server before calling
+copychunk_write
+
+ fs/cifs/connect.c   | 11 ++++++++++-
+ fs/cifs/dfs_cache.c | 19 ++++++++++++-------
+ fs/cifs/smb2ops.c   |  8 ++++++++
+ fs/cifs/transport.c |  3 +--
+ 4 files changed, 31 insertions(+), 10 deletions(-)
+
+
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Thanks,
+
+Steve
