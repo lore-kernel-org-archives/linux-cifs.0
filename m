@@ -2,69 +2,106 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD77EC433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 24 Apr 2022 00:32:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5D4C433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 24 Apr 2022 09:54:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235622AbiDXAff (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 23 Apr 2022 20:35:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51572 "EHLO
+        id S236291AbiDXJ5C (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 24 Apr 2022 05:57:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234377AbiDXAfe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 23 Apr 2022 20:35:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6463DCE15;
-        Sat, 23 Apr 2022 17:32:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1CA8261163;
-        Sun, 24 Apr 2022 00:32:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B8C1C385A5;
-        Sun, 24 Apr 2022 00:32:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650760355;
-        bh=cY0UoqIWTmuADg+9JqpKHIbTPULIffXlLvBrQtecscY=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=S1LfJaF9LKB53KDFq5pfY0vyHBz8Z9MIqYDYoaVczpg4HNVqZmuIcCmAcYFTTZpER
-         NkDxHHWmemZNsQTLGNngKM7ByI27gX4tRgTNLiWoml9hkMPkQ0Cy3zIfRk7EoQZUGC
-         AxTWTd0kb/XoHc4RG3R0E9E9SuPfA7uXormxOG8QtmL3sk4EMy9OA9mgW8SFEyYTWr
-         fGMEQRBpbtoYF8aytQP7niAIb/e7WstfqgXL2ShCqWE6ey4CvUqMgYqM8HPbvMG2wN
-         yRAwzPEaAH+KP01+nFUx+wygs+5+Y5wTxYamR0r9GxorK2GecPzkeSga87HzYseZuT
-         2VXEfgzBhHo8A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 67853E8DBD4;
-        Sun, 24 Apr 2022 00:32:35 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5muyG8HZJvOYi+wPa_Qj6Yce8Q4MR-Oh28DrT1j8iH8FuQ@mail.gmail.com>
-References: <CAH2r5muyG8HZJvOYi+wPa_Qj6Yce8Q4MR-Oh28DrT1j8iH8FuQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5muyG8HZJvOYi+wPa_Qj6Yce8Q4MR-Oh28DrT1j8iH8FuQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/5.18-rc3-ksmbd-fixes
-X-PR-Tracked-Commit-Id: 02655a70b7cc0f534531ee65fa72692f4d31a944
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 22da5264abf497a10a4ed629f07f4ba28a7ed5eb
-Message-Id: <165076035541.3271.12557705507165091328.pr-tracker-bot@kernel.org>
-Date:   Sun, 24 Apr 2022 00:32:35 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+        with ESMTP id S237588AbiDXJ5C (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 24 Apr 2022 05:57:02 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4481F644F8
+        for <linux-cifs@vger.kernel.org>; Sun, 24 Apr 2022 02:54:02 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id bv16so16874949wrb.9
+        for <linux-cifs@vger.kernel.org>; Sun, 24 Apr 2022 02:54:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
+         :subject:content-transfer-encoding;
+        bh=PcnLo2ZjkPEzVs6ib0TY9iY3U327dNI+ekq4lJHhKmE=;
+        b=ITRhOWxT0EzndKoub5QjUtx+4bMU/HqghN7hr9Sfeb3yZTJN4ZUrnCHOSA40vwW+Da
+         U6FSQx+zmmTuRKPOnyN4yo5hzaNZSaGyfL8s69ZToi3Z7bZc3bUCWA8zVXQ7tnMF2Fiu
+         m1SBLUZmIlzt8rI1o97s7q4uvb/YPYc7htQAz+QK19WKiCaL3BaY+xlcGnkX+MtTx0o2
+         la0Z8T6DIQTHcSpTNfx54o4/auKms4BET4inRL2RW4SVt36PIdsyjbu3dKZDkMLJAE5x
+         04QfUlT3V1bPxkp++b2pXIaCV1876UCwUyRnlC7PkdlwuGD5HHkIIKvlUpaAUCStsTrJ
+         B0Lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:from:subject:content-transfer-encoding;
+        bh=PcnLo2ZjkPEzVs6ib0TY9iY3U327dNI+ekq4lJHhKmE=;
+        b=Ur6xHenbj+v+W98FCI1TDyPKGn3mPKyyeSKPJDnsnJiIpbxyjirM327/HFOFWUEd9n
+         Vq+jbYV7lo9P3JhlhSfX1okokbv88v/kAgKq2OzrLKxHPcWfDzBy9nWO33dK/3mH4Ig1
+         RSNX4su0jUgDeXDSpIjUc+vxCh8N5yUW/Ab/7pVsqmCCWCjA7FuU9WSczjmnVeT73Yan
+         ArYwf0Rj1yq27DBQrjtroa/xo3NBzoOIkeHui+orTKVlqop9UiLl8nUwuo5w62/CDr5C
+         HBeWqghZnvZV1B68SyUA0Rp5AVwSXsD92YmI0BsvRhmiNygEJC1Fr6y9R3/3ekorg195
+         3JkA==
+X-Gm-Message-State: AOAM531yqwqqVQfUeq0xqd6GSZlvjBO/QuVBGmnRBBTgHr66RxxLjdlv
+        6pgOPKSWJkLw0ZL1AGrJaOE=
+X-Google-Smtp-Source: ABdhPJz3WtBia9lsYiNtP36ly6C5/Spq+H8YUwiJhjB8D2sUUWuQU9zyuKAz/2H82/3raStSnz0L6A==
+X-Received: by 2002:a5d:6d8b:0:b0:20a:97c4:bdc6 with SMTP id l11-20020a5d6d8b000000b0020a97c4bdc6mr10055827wrs.156.1650794040804;
+        Sun, 24 Apr 2022 02:54:00 -0700 (PDT)
+Received: from [0.0.0.0] ([95.179.233.4])
+        by smtp.gmail.com with ESMTPSA id r6-20020a1c4406000000b0039229d3c4eesm5993941wma.12.2022.04.24.02.53.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 24 Apr 2022 02:54:00 -0700 (PDT)
+Message-ID: <0663e8e2-8c09-eee4-159a-f82c67eba80e@gmail.com>
+Date:   Sun, 24 Apr 2022 17:53:55 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:100.0)
+ Gecko/20100101 Thunderbird/100.0
+Content-Language: en-US
+To:     Steve French <sfrench@samba.org>
+Cc:     kinglongmee@gmail.com, linux-cifs@vger.kernel.org
+From:   Kinglong Mee <kinglongmee@gmail.com>
+Subject: cifsFileInfo leak when doing cifs_atomic_open on a symlink file
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 23 Apr 2022 19:10:23 -0500:
+Hi steve,
 
-> git://git.samba.org/ksmbd.git tags/5.18-rc3-ksmbd-fixes
+Recently I've started running LTP tests with mfsymlinks mount option.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/22da5264abf497a10a4ed629f07f4ba28a7ed5eb
+The LTP test "fs_racer" triggers the cifsFileInfo leak when doing
+cifs_atomic_open on a symlink file.
 
-Thank you!
+After testing and umounting cifs mount, there are some files exist in
+/proc/fs/cifs/open_files as,
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+#cat /proc/fs/cifs/open_files
+# Version:1
+# Format:
+# <tree id> <persistent fid> <flags> <count> <pid> <uid> <filename>
+0x2 0x94c08 0x8401 1 1554873 0 11
+0x2 0x94b5f 0x8401 1 1554808 0 7
+0x2 0x947cf 0x8401 1 1554365 0 0
+0x2 0x9470a 0x8401 1 1554339 0 0
+
+and the tcp socket also left,
+
+# netstat -an |grep 445
+tcp        0      0 192.168.123.123:38050    192.168.123.124:445 
+ESTABLISHED
+
+and the cifsd left too.
+
+# ps -ajx |grep cifsd
+       2   34030       0       0 ?             -1 S        0   2:20 [cifsd]
+
+I found the fs_racer cause cifs doing cifs_atomic_open on symlink file,
+but the symlink file does not contain a valid i_fop setting, it means,
+the cifsFileInfo allocated for the symlink file never be un-referenced.
+
+I'd wanna know, is cifs_atomic_open on symlink file allowed?
+If allowed,  a cifs_close for symlink file is needed.
+Otherwise, cifs_atomic_open needs return error for symlink file.
+
+Any comments are welcome.
+
+Thanks,
+Kinglong Mee
