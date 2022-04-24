@@ -2,97 +2,69 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A87C433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 24 Apr 2022 00:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD77EC433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 24 Apr 2022 00:32:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236929AbiDXANg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 23 Apr 2022 20:13:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56130 "EHLO
+        id S235622AbiDXAff (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 23 Apr 2022 20:35:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237577AbiDXANf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 23 Apr 2022 20:13:35 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 260603FDBE;
-        Sat, 23 Apr 2022 17:10:36 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id q14so13739103ljc.12;
-        Sat, 23 Apr 2022 17:10:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=KGwY3w/LUk+p3Q5uLCT6SYX2S/12e2zbleAJeZwrDYg=;
-        b=G3fienA+ez19EBrR2L/csO/MP0X8ecN5glUBPwTMLXUKzqG9OUvMbiBfNHQQ7AFb3D
-         wtw15LVMt5GFE+R3iabH0Xe4j8nAfWnKTjA3t33OOY66P22lI90+R9nw3pStZb6821eI
-         uzWY/Wd8rJpQaycR1Rr5t28Kwmx+j0mjPXptXLWYJECBVWd3hG+SyOf/trj27uqFKCfZ
-         A6VsKNPnrpLwSSy6DVMKqNXBKSo2KlX4VAMupObiKBT/SvX1pB8s/lVhCZid0snDP+V4
-         mxice+nMrHabfvjHywciadTQ/cbgwy5w4x4TxnqJ+Jc++4pl0INOsEd6Lr2DrDN4/0WW
-         U0dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=KGwY3w/LUk+p3Q5uLCT6SYX2S/12e2zbleAJeZwrDYg=;
-        b=uIEZx3pRP8M9do2jKDbZQcdTTHk9pfMH0YdXAYCZoy5a6aPqJuYbZxEBEzYkxhh2e9
-         /K6vSqDXoapwAlR69Es0KB2w395CD/aWOFH4TkxnbtQDEEHFKG9gH3G9bs+V3vnPEFNr
-         19ZBcTM08Nb1ZDZmwm5PlZQ4JtRr9s62HIBkdOYbFmrzS2uBI3RW7kF77DUEABoFzcZ9
-         43g3321zn9GngiAUIPPX9qRE/kt+2vFwCIsZ5H0WlmfPcD9V3IJVfmwjhrdy2pkMAkOG
-         5rCwZElKr4QwBf3c8hKZVFsGikbtHKUGLRFds4SHVXHpnpuu+r9zDCaIKJnZAL+Qndjb
-         9Hhg==
-X-Gm-Message-State: AOAM530seIKOK/9Yxv5MVk40KsRb91dj2T4Fapf1+5Au6sOTKW3uJwVD
-        rK3DJiYOWXdaCsb8eoZBOgW3uzXGs5xtRTm24hTEZhdU0Nw=
-X-Google-Smtp-Source: ABdhPJznNOSlpjE1X3V5T70Dkcg9tAL96reP0179VZxiy6c2HoiT4NCTh2KLQ5GMQlEVB9yZVKoUz5le3e6rvCEIWCo=
-X-Received: by 2002:a2e:bf08:0:b0:247:f79c:5794 with SMTP id
- c8-20020a2ebf08000000b00247f79c5794mr6633811ljr.398.1650759034242; Sat, 23
- Apr 2022 17:10:34 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 23 Apr 2022 19:10:23 -0500
-Message-ID: <CAH2r5muyG8HZJvOYi+wPa_Qj6Yce8Q4MR-Oh28DrT1j8iH8FuQ@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        with ESMTP id S234377AbiDXAfe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 23 Apr 2022 20:35:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6463DCE15;
+        Sat, 23 Apr 2022 17:32:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1CA8261163;
+        Sun, 24 Apr 2022 00:32:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B8C1C385A5;
+        Sun, 24 Apr 2022 00:32:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650760355;
+        bh=cY0UoqIWTmuADg+9JqpKHIbTPULIffXlLvBrQtecscY=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=S1LfJaF9LKB53KDFq5pfY0vyHBz8Z9MIqYDYoaVczpg4HNVqZmuIcCmAcYFTTZpER
+         NkDxHHWmemZNsQTLGNngKM7ByI27gX4tRgTNLiWoml9hkMPkQ0Cy3zIfRk7EoQZUGC
+         AxTWTd0kb/XoHc4RG3R0E9E9SuPfA7uXormxOG8QtmL3sk4EMy9OA9mgW8SFEyYTWr
+         fGMEQRBpbtoYF8aytQP7niAIb/e7WstfqgXL2ShCqWE6ey4CvUqMgYqM8HPbvMG2wN
+         yRAwzPEaAH+KP01+nFUx+wygs+5+Y5wTxYamR0r9GxorK2GecPzkeSga87HzYseZuT
+         2VXEfgzBhHo8A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 67853E8DBD4;
+        Sun, 24 Apr 2022 00:32:35 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5muyG8HZJvOYi+wPa_Qj6Yce8Q4MR-Oh28DrT1j8iH8FuQ@mail.gmail.com>
+References: <CAH2r5muyG8HZJvOYi+wPa_Qj6Yce8Q4MR-Oh28DrT1j8iH8FuQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5muyG8HZJvOYi+wPa_Qj6Yce8Q4MR-Oh28DrT1j8iH8FuQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/5.18-rc3-ksmbd-fixes
+X-PR-Tracked-Commit-Id: 02655a70b7cc0f534531ee65fa72692f4d31a944
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 22da5264abf497a10a4ed629f07f4ba28a7ed5eb
+Message-Id: <165076035541.3271.12557705507165091328.pr-tracker-bot@kernel.org>
+Date:   Sun, 24 Apr 2022 00:32:35 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
         Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-ce522ba9ef7e2d9fb22a39eb3371c0c64e2a433e:
+The pull request you sent on Sat, 23 Apr 2022 19:10:23 -0500:
 
-  Linux 5.18-rc2 (2022-04-10 14:21:36 -1000)
+> git://git.samba.org/ksmbd.git tags/5.18-rc3-ksmbd-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/22da5264abf497a10a4ed629f07f4ba28a7ed5eb
 
-  git://git.samba.org/ksmbd.git tags/5.18-rc3-ksmbd-fixes
-
-for you to fetch changes up to 02655a70b7cc0f534531ee65fa72692f4d31a944:
-
-  ksmbd: set fixed sector size to FS_SECTOR_SIZE_INFORMATION
-(2022-04-14 20:56:13 -0500)
-
-----------------------------------------------------------------
-3 fixes to ksmbd server
-- cap maximum sector size reported to avoid mount problems
-- reference count fix
-- fix filename rename race
-
-----------------------------------------------------------------
-Namjae Jeon (3):
-      ksmbd: remove filename in ksmbd_file
-      ksmbd: increment reference count of parent fp
-      ksmbd: set fixed sector size to FS_SECTOR_SIZE_INFORMATION
-
- fs/ksmbd/misc.c      | 40 +++++++++++++++++++++++++++++++---------
- fs/ksmbd/misc.h      |  3 ++-
- fs/ksmbd/oplock.c    | 30 ------------------------------
- fs/ksmbd/oplock.h    |  2 --
- fs/ksmbd/smb2pdu.c   | 34 ++++++++++++++++------------------
- fs/ksmbd/vfs.c       |  6 ++----
- fs/ksmbd/vfs_cache.c |  2 +-
- fs/ksmbd/vfs_cache.h |  1 -
- 8 files changed, 52 insertions(+), 66 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
