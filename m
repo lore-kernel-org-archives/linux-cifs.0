@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB48BC4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 19:02:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DC6C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 19:03:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353818AbiDZTFy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Apr 2022 15:05:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42510 "EHLO
+        id S1351951AbiDZTGR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Apr 2022 15:06:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353772AbiDZTFk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 15:05:40 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7061999D1;
-        Tue, 26 Apr 2022 12:02:28 -0700 (PDT)
+        with ESMTP id S1353798AbiDZTFr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 15:05:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77B61999D4;
+        Tue, 26 Apr 2022 12:02:39 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 74B64B82252;
-        Tue, 26 Apr 2022 19:02:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD25C385AF;
-        Tue, 26 Apr 2022 19:02:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6706C619C0;
+        Tue, 26 Apr 2022 19:02:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B43B0C385C0;
+        Tue, 26 Apr 2022 19:02:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650999746;
-        bh=Gzzt0waAa8K+0dMB3qQiJ0MfV9GnsZLefeXzHn4bzdI=;
+        s=k20201202; t=1650999758;
+        bh=Fibnfz6UKMUBj//0u9tJTPvRAWqgcl6ZhEU2wPNikR0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Wchi+Td9d95kWU4iG3/qqc7cQtFQLtLNvtxWEXcRoey4d4mB0pkxt8/pakAm1T/DF
-         Dw/vOHalH5BmXmj1lvzjiLyx+raeqC4GwV+EAoQd6avrTufij6aqKDWZtOC88mEaSO
-         YlRpJ/BMeQhLb+GKDBDVhsPlzIkBoun9W0mFNcihKi2NKfimRSyxr8tJ+Piu7YMC/3
-         Yh/tcIyD4KWBbtawMD+9AvSZbCGBhgSdYDpC08akWjwQ7AYwwwlHXNDdgbmiws0bUi
-         F6I7w5KT6LK6EH47APc0MSxWah4kCkI38LVhf8dL3Na0AdZzEK44/uJYFdvnJ+1mSl
-         VVsSpi8Fjv8Nw==
+        b=Lub7iSDHdAVPAxBmSK4C7cmvLZyXsWzUfpjEwKPQKyQhZn4yTDCh9eYDFF797i06c
+         i47FV6GLRutgeWfBuHf8r1s2QGuXuMRB3bk2HprZhz5cUMPgCCWjZu5Ek6wrK+SUY3
+         02o8f76l/7JubbHr/b35QwkKqUIDBaJrT6k1SEKzrsFNn6ivPz7qtVOp9akDRrGLJ6
+         mTaRjCEeGKdBF6Pa8Zj7Ot0JhFtt2Pg/4wAIPQTsxaeUcOGImvZKmaXRHKRf4c146x
+         WK5j3VcQyeZqQc5YUAb40PIykJv201ecPngq3kXErdr5DTqYm7OIEA2FAhhDSpJcV5
+         YGLdFP9ia4bpg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
@@ -38,12 +38,12 @@ Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.15 10/15] cifs: destage any unwritten data to the server before calling copychunk_write
-Date:   Tue, 26 Apr 2022 15:02:09 -0400
-Message-Id: <20220426190216.2351413-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 6/9] cifs: destage any unwritten data to the server before calling copychunk_write
+Date:   Tue, 26 Apr 2022 15:02:27 -0400
+Message-Id: <20220426190232.2351606-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220426190216.2351413-1-sashal@kernel.org>
-References: <20220426190216.2351413-1-sashal@kernel.org>
+In-Reply-To: <20220426190232.2351606-1-sashal@kernel.org>
+References: <20220426190232.2351606-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -81,10 +81,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+)
 
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index db3ead52ec7c..0c1af2dd9069 100644
+index 0e8f484031da..c758ff41b638 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -1849,9 +1849,17 @@ smb2_copychunk_range(const unsigned int xid,
+@@ -1744,9 +1744,17 @@ smb2_copychunk_range(const unsigned int xid,
  	int chunks_copied = 0;
  	bool chunk_sizes_updated = false;
  	ssize_t bytes_written, total_bytes_written = 0;
