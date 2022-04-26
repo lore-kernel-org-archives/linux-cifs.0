@@ -2,106 +2,137 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B9EC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 19:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 115A7C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 23:47:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354017AbiDZTGt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Apr 2022 15:06:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44852 "EHLO
+        id S1356195AbiDZXu0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Apr 2022 19:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353887AbiDZTGP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 15:06:15 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03895199817;
-        Tue, 26 Apr 2022 12:03:04 -0700 (PDT)
+        with ESMTP id S242818AbiDZXu0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 19:50:26 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F1333E88;
+        Tue, 26 Apr 2022 16:47:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4939BB8224F;
-        Tue, 26 Apr 2022 19:03:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D70A8C385C0;
-        Tue, 26 Apr 2022 19:03:01 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 53BBCB82111;
+        Tue, 26 Apr 2022 23:47:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A101DC385A0;
+        Tue, 26 Apr 2022 23:47:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650999782;
-        bh=KR943c8CFkXLKMhnK9yAbS4g5Lha2CsC/opzgmgUJ6o=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qXcj/APqDlgo35PF2YjIDIDTzb29tFWyTROA37lcjVoJohX1LH7b0rqv9xNFkGSYT
-         m5XdtHA6vuaA4+6gycQu9xlPBpfGjRxL7aiPNCVhtd26wvwGGPjZdwLrpCpDDRRbJT
-         dUAPALrh7OyGbxICrzUkKudd7t9ku8fNhmOonkAtKhkL4pxPDa3AxG4RZO/ETvTo9i
-         aBCPQo2lpl68MIHYCCVW12/r+6QK19T4ZXOijQa61Hn9VKpKnT6ddFpoWFdc42F23p
-         y9xMyyg1YNLZuQPfsuHwsEPcJeSgiY7GpzKX7ih3efm9AnxK20Hwujka/+PMU0CNzk
-         zTgboskxRCgoQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Xiaoli Feng <xifeng@redhat.com>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.14 3/5] cifs: destage any unwritten data to the server before calling copychunk_write
-Date:   Tue, 26 Apr 2022 15:02:54 -0400
-Message-Id: <20220426190258.2351902-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220426190258.2351902-1-sashal@kernel.org>
-References: <20220426190258.2351902-1-sashal@kernel.org>
+        s=k20201202; t=1651016834;
+        bh=aldCnNd4EyeN6oO79S0ufp4A5mLgFgvG7eBHbO6bp0Y=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=YV/uvMOOQZ+SOpxLMocOmVBQQRUgAcb+25R4Avl1bprJuYj4xUDMDANomomg7Kq17
+         PXYMW1oXzKkztaE6Kh0K1gA3a5pw+VSPKIOcxxF58ITApQhovH43NSB3azVyDnvjPJ
+         8HxFU+4TQisTlylymFg2gpNC/LCgCBL592Cp85+/wUhTOUrQKC0r7PfpWi1BrP/Jp1
+         EZDIDzrGPsg+Kwgc9Tg4CiaNJ0ALZ/iV4JJ2cQmu3HeKQI7/8wS7B9T3cdZhBoFIUv
+         1lTxjBcstBNgeHUvJt0EX5W1WLw4cuGfeq2SzQLlun5JrKE1gcwJWDnmlnsocRIRfL
+         9CB+n91A6+MZg==
+Date:   Tue, 26 Apr 2022 16:47:12 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Chuck Lever III <chuck.lever@oracle.com>
+Cc:     netdev <netdev@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "ak@tempesta-tech.com" <ak@tempesta-tech.com>,
+        "borisp@nvidia.com" <borisp@nvidia.com>,
+        "simo@redhat.com" <simo@redhat.com>
+Subject: Re: [PATCH RFC 4/5] net/tls: Add support for PF_TLSH (a TLS
+ handshake listener)
+Message-ID: <20220426164712.068e365c@kernel.org>
+In-Reply-To: <BA6BB8F6-3A2A-427B-A5D7-30B5F778B7E0@oracle.com>
+References: <165030051838.5073.8699008789153780301.stgit@oracle-102.nfsv4.dev>
+        <165030059051.5073.16723746870370826608.stgit@oracle-102.nfsv4.dev>
+        <20220425101459.15484d17@kernel.org>
+        <E8809EC2-D49A-4171-8C88-D5E24FFA4079@oracle.com>
+        <20220426075504.18be4ee2@kernel.org>
+        <BA6BB8F6-3A2A-427B-A5D7-30B5F778B7E0@oracle.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Ronnie Sahlberg <lsahlber@redhat.com>
+On Tue, 26 Apr 2022 15:58:29 +0000 Chuck Lever III wrote:
+> > On Apr 26, 2022, at 10:55 AM, Jakub Kicinski <kuba@kernel.org> wrote:
+> >> The RPC-with-TLS standard allows unencrypted RPC traffic on the connection
+> >> before sending ClientHello. I think we'd like to stick with creating the
+> >> socket in the kernel, for this reason and for the reasons Hannes mentions
+> >> in his reply.  
+> > 
+> > Umpf, I presume that's reviewed by security people in IETF so I guess
+> > it's done right this time (tm).  
+> 
+> > Your wording seems careful not to imply that you actually need that,
+> > tho. Am I over-interpreting?  
+> 
+> RPC-with-TLS requires one RPC as a "starttls" token. That could be
+> done in user space as part of the handshake, but it is currently
+> done in the kernel to enable the user agent to be shared with other
+> kernel consumers of TLS. Keep in mind that we already have two
+> real consumers: NVMe and RPC-with-TLS; and possibly QUIC.
+> 
+> You asserted earlier that creating sockets in user space "scales
+> better" but did not provide any data. Can we see some? How well
+> does it need to scale for storage protocols that use long-lived
+> connections?
 
-[ Upstream commit f5d0f921ea362636e4a2efb7c38d1ead373a8700 ]
+I meant scale with the number of possible crypto protocols, 
+I mentioned three there.
 
-because the copychunk_write might cover a region of the file that has not yet
-been sent to the server and thus fail.
+> Also, why has no-one mentioned the NBD on TLS implementation to
+> us before? I will try to review that code soon.
 
-A simple way to reproduce this is:
-truncate -s 0 /mnt/testfile; strace -f -o x -ttT xfs_io -i -f -c 'pwrite 0k 128k' -c 'fcollapse 16k 24k' /mnt/testfile
+Oops, maybe that thing had never seen the light of a public mailing
+list then :S Dave Watson was working on it at Facebook, but he since
+moved to greener pastures.
 
-the issue is that the 'pwrite 0k 128k' becomes rearranged on the wire with
-the 'fcollapse 16k 24k' due to write-back caching.
+> > This set does not even have selftests.  
+> 
+> I can include unit tests with the prototype. Someone needs to
+> educate me on what is the preferred unit test paradigm for this
+> type of subsystem. Examples in the current kernel code base would
+> help too.
 
-fcollapse is implemented in cifs.ko as a SMB2 IOCTL(COPYCHUNK_WRITE) call
-and it will fail serverside since the file is still 0b in size serverside
-until the writes have been destaged.
-To avoid this we must ensure that we destage any unwritten data to the
-server before calling COPYCHUNK_WRITE.
+Whatever level of testing makes you as an engineer comfortable
+with saying "this test suite is sufficient"? ;)
 
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1997373
-Reported-by: Xiaoli Feng <xifeng@redhat.com>
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/smb2ops.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+For TLS we have tools/testing/selftests/net/tls.c - it's hardly
+an example of excellence but, you know, it catches bugs here and 
+there.
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index ba56c00f2650..3280a801b1d7 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -855,9 +855,17 @@ smb2_copychunk_range(const unsigned int xid,
- 	int chunks_copied = 0;
- 	bool chunk_sizes_updated = false;
- 	ssize_t bytes_written, total_bytes_written = 0;
-+	struct inode *inode;
- 
- 	pcchunk = kmalloc(sizeof(struct copychunk_ioctl), GFP_KERNEL);
- 
-+	/*
-+	 * We need to flush all unwritten data before we can send the
-+	 * copychunk ioctl to the server.
-+	 */
-+	inode = d_inode(trgtfile->dentry);
-+	filemap_write_and_wait(inode->i_mapping);
-+
- 	if (pcchunk == NULL)
- 		return -ENOMEM;
- 
--- 
-2.35.1
+> > Plus there are more protocols being actively worked on (QUIC, PSP etc.)
+> > Having per ULP special sauce to invoke a user space helper is not the
+> > paradigm we chose, and the time as inopportune as ever to change that.  
+> 
+> When we started discussing TLS handshake requirements with some
+> community members several years ago, creating the socket in
+> kernel and passing it up to a user agent was the suggested design.
+> Has that recommendation changed since then?
 
+Hm, do you remember who you discussed it with? Would be good 
+to loop those folks in. I wasn't involved at the beginning of the 
+TLS work, I know second hand that HW offload and nbd were involved 
+and that the design went thru some serious re-architecting along 
+the way. In the beginning there was a separate socket for control
+records, and that was nacked.
+
+But also (and perhaps most importantly) I'm not really objecting 
+to creating the socket in the kernel. I'm primarily objecting to 
+a second type of a special TLS socket which has TLS semantics.
+
+> I'd prefer an in-kernel handshake implementation over a user
+> space one (even one that is sharable amongst transports and ULPs
+> as my proposal is intended to be). However, so far we've been told
+> that an in-kernel handshake implementation is a non-starter.
+> 
+> But in the abstract, we agree that having a single TLS handshake
+> mechanism for kernel consumers is preferable.
+
+For some definition of "we" which doesn't not include me?
