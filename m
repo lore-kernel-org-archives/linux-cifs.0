@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF2AC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 19:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 292E2C43217
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 19:02:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353591AbiDZTFS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Apr 2022 15:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40228 "EHLO
+        id S1353758AbiDZTFo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Apr 2022 15:05:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352919AbiDZTFM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 15:05:12 -0400
+        with ESMTP id S1353754AbiDZTFc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 15:05:32 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7319319916C;
-        Tue, 26 Apr 2022 12:02:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A101999D5;
+        Tue, 26 Apr 2022 12:02:23 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0DE72619C0;
-        Tue, 26 Apr 2022 19:02:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5839CC385BE;
-        Tue, 26 Apr 2022 19:02:03 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E2D99619C4;
+        Tue, 26 Apr 2022 19:02:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E848C385AD;
+        Tue, 26 Apr 2022 19:02:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650999723;
-        bh=Q9u6Gz6M80SVS5hvS/h6zXfSYjFBtPvZlCANhhT/kOc=;
+        s=k20201202; t=1650999742;
+        bh=pH8kHLg29q84DA3lAKF1knzAlPKUewGQtsmALlQhDkw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pg18GbcoTZ/GI5rYwNzq5GCVZgTBFUF32g84TP8TfOEtLMGsfSGn92sGVk6eLwfmd
-         Sl71eUq7kKzc24GRTSP/fos6Hn4wQqzCrbSDChZlJkE38GEbmxdvIHZRTs131mRQLY
-         MB3dzFI0TOOHaHQXYjGbYp6tJRRRpt91y/uNywmN8dgprZEo/4moQCCidKosARejPe
-         UFErS+rdMSpmrh4hdc50vBmMIINMOuPCX/pQ1kX/dnrq7mDa65u/Cb0oZ2cHDSV7Ds
-         TIkDttUIsbYHxhx/clLtSGKRm1F572lrpzB0xj7KWKW3TWThMRT5scJ7eHNlVMOYgU
-         CbwZB3tbxIHug==
+        b=sUv44KYMyRgUcmKqs/27GHZ/Y71e5ZCVC0uIqBeuSRj5yiVapBrKYFQC5UhGzBuQZ
+         wZhD/aovSLGSI3C7awdN+oSxT/82X3XMgC2icnNsRPjICN2vU/uHYA2U2aSaCrt2J1
+         Ebrk4YfaeVho8QM14xJZE8Y5ptU4tQX0U5PZXM92XbPIDxsmIYyu/OZQxnSx6GgtO4
+         7VIvV1QgLWQKtwGICLStKG3WLJvXUG1twJA7M1teO/NpiKE6ih+bqTkG/rtSpM9DKr
+         g0utMUEQE3Ce+OnN+qexbY2aftP7Q1JPJKCEhGsnpjM5Jb7eRirplsiUA2b6fOk3c/
+         HoW6nwRe5+ilA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>,
@@ -38,12 +38,12 @@ Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.17 10/22] ksmbd: increment reference count of parent fp
-Date:   Tue, 26 Apr 2022 15:01:33 -0400
-Message-Id: <20220426190145.2351135-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 05/15] ksmbd: increment reference count of parent fp
+Date:   Tue, 26 Apr 2022 15:02:04 -0400
+Message-Id: <20220426190216.2351413-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220426190145.2351135-1-sashal@kernel.org>
-References: <20220426190145.2351135-1-sashal@kernel.org>
+In-Reply-To: <20220426190216.2351413-1-sashal@kernel.org>
+References: <20220426190216.2351413-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -69,10 +69,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 3 insertions(+)
 
 diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 67e8e28e3fc3..a19a2b9c1e56 100644
+index 192d8308afc2..a9fdb47c2791 100644
 --- a/fs/ksmbd/smb2pdu.c
 +++ b/fs/ksmbd/smb2pdu.c
-@@ -5771,8 +5771,10 @@ static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
+@@ -5768,8 +5768,10 @@ static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
  	if (parent_fp) {
  		if (parent_fp->daccess & FILE_DELETE_LE) {
  			pr_err("parent dir is opened with delete access\n");
