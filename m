@@ -2,44 +2,45 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78265C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB48BC4332F
 	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 19:02:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353813AbiDZTFx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Apr 2022 15:05:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41778 "EHLO
+        id S1353818AbiDZTFy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Apr 2022 15:05:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353770AbiDZTFk (ORCPT
+        with ESMTP id S1353772AbiDZTFk (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 15:05:40 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD2419981E;
-        Tue, 26 Apr 2022 12:02:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7061999D1;
+        Tue, 26 Apr 2022 12:02:28 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EF014B82252;
-        Tue, 26 Apr 2022 19:02:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD5CC385A0;
-        Tue, 26 Apr 2022 19:02:22 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 74B64B82252;
+        Tue, 26 Apr 2022 19:02:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD25C385AF;
+        Tue, 26 Apr 2022 19:02:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650999742;
-        bh=9NY7USzhuSlp779ziJCCibr/+WvkaizSECqK6XQIv0w=;
+        s=k20201202; t=1650999746;
+        bh=Gzzt0waAa8K+0dMB3qQiJ0MfV9GnsZLefeXzHn4bzdI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UILMLzfXJhWbX3YQIfNVPVEMHKMJgp91vhXSYXm/7qnsu7+9XoGB9wEVHFwtaqnyx
-         eWUcxR79bdaBRTyONPkVy1E3z097XRzWecCamMIZ9GwKPHynzGTVG9NZ/uhZW9QbuJ
-         PhcRMJ58mRvJTDjoWKik6ZMrH4LmCv3p9lRWtsTCfqmMOXzwcpMqieS9rESC4KdZDR
-         ShqCPQuS3lZqjMtr47x7XhHbEPntjKRcpouQobllZMqp0H6hGDPjE+ZBdArYKovLxo
-         KpPXL3M8jG58IY0ludU/Xzl6/Cxd7h4maARMhQAKd4VS8lPW3G/s9q+UnZpg5WGnG2
-         LH8M3noefuNpA==
+        b=Wchi+Td9d95kWU4iG3/qqc7cQtFQLtLNvtxWEXcRoey4d4mB0pkxt8/pakAm1T/DF
+         Dw/vOHalH5BmXmj1lvzjiLyx+raeqC4GwV+EAoQd6avrTufij6aqKDWZtOC88mEaSO
+         YlRpJ/BMeQhLb+GKDBDVhsPlzIkBoun9W0mFNcihKi2NKfimRSyxr8tJ+Piu7YMC/3
+         Yh/tcIyD4KWBbtawMD+9AvSZbCGBhgSdYDpC08akWjwQ7AYwwwlHXNDdgbmiws0bUi
+         F6I7w5KT6LK6EH47APc0MSxWah4kCkI38LVhf8dL3Na0AdZzEK44/uJYFdvnJ+1mSl
+         VVsSpi8Fjv8Nw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        Xiaoli Feng <xifeng@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        hyc.lee@gmail.com, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 06/15] ksmbd: set fixed sector size to FS_SECTOR_SIZE_INFORMATION
-Date:   Tue, 26 Apr 2022 15:02:05 -0400
-Message-Id: <20220426190216.2351413-6-sashal@kernel.org>
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 5.15 10/15] cifs: destage any unwritten data to the server before calling copychunk_write
+Date:   Tue, 26 Apr 2022 15:02:09 -0400
+Message-Id: <20220426190216.2351413-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220426190216.2351413-1-sashal@kernel.org>
 References: <20220426190216.2351413-1-sashal@kernel.org>
@@ -51,64 +52,56 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-[ Upstream commit 02655a70b7cc0f534531ee65fa72692f4d31a944 ]
+[ Upstream commit f5d0f921ea362636e4a2efb7c38d1ead373a8700 ]
 
-Currently ksmbd is using ->f_bsize from vfs_statfs() as sector size.
-If fat/exfat is a local share, ->f_bsize is a cluster size that is too
-large to be used as a sector size. Sector sizes larger than 4K cause
-problem occurs when mounting an iso file through windows client.
+because the copychunk_write might cover a region of the file that has not yet
+been sent to the server and thus fail.
 
-The error message can be obtained using Mount-DiskImage command,
- the error is:
-"Mount-DiskImage : The sector size of the physical disk on which the
-virtual disk resides is not supported."
+A simple way to reproduce this is:
+truncate -s 0 /mnt/testfile; strace -f -o x -ttT xfs_io -i -f -c 'pwrite 0k 128k' -c 'fcollapse 16k 24k' /mnt/testfile
 
-This patch reports fixed 4KB sector size if ->s_blocksize is bigger
-than 4KB.
+the issue is that the 'pwrite 0k 128k' becomes rearranged on the wire with
+the 'fcollapse 16k 24k' due to write-back caching.
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+fcollapse is implemented in cifs.ko as a SMB2 IOCTL(COPYCHUNK_WRITE) call
+and it will fail serverside since the file is still 0b in size serverside
+until the writes have been destaged.
+To avoid this we must ensure that we destage any unwritten data to the
+server before calling COPYCHUNK_WRITE.
+
+Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1997373
+Reported-by: Xiaoli Feng <xifeng@redhat.com>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/ksmbd/smb2pdu.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ fs/cifs/smb2ops.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index a9fdb47c2791..1ed3046dd5b3 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -11,6 +11,7 @@
- #include <linux/statfs.h>
- #include <linux/ethtool.h>
- #include <linux/falloc.h>
-+#include <linux/mount.h>
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index db3ead52ec7c..0c1af2dd9069 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1849,9 +1849,17 @@ smb2_copychunk_range(const unsigned int xid,
+ 	int chunks_copied = 0;
+ 	bool chunk_sizes_updated = false;
+ 	ssize_t bytes_written, total_bytes_written = 0;
++	struct inode *inode;
  
- #include "glob.h"
- #include "smb2pdu.h"
-@@ -4997,15 +4998,17 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
- 	case FS_SECTOR_SIZE_INFORMATION:
- 	{
- 		struct smb3_fs_ss_info *info;
-+		unsigned int sector_size =
-+			min_t(unsigned int, path.mnt->mnt_sb->s_blocksize, 4096);
+ 	pcchunk = kmalloc(sizeof(struct copychunk_ioctl), GFP_KERNEL);
  
- 		info = (struct smb3_fs_ss_info *)(rsp->Buffer);
++	/*
++	 * We need to flush all unwritten data before we can send the
++	 * copychunk ioctl to the server.
++	 */
++	inode = d_inode(trgtfile->dentry);
++	filemap_write_and_wait(inode->i_mapping);
++
+ 	if (pcchunk == NULL)
+ 		return -ENOMEM;
  
--		info->LogicalBytesPerSector = cpu_to_le32(stfs.f_bsize);
-+		info->LogicalBytesPerSector = cpu_to_le32(sector_size);
- 		info->PhysicalBytesPerSectorForAtomicity =
--				cpu_to_le32(stfs.f_bsize);
--		info->PhysicalBytesPerSectorForPerf = cpu_to_le32(stfs.f_bsize);
-+				cpu_to_le32(sector_size);
-+		info->PhysicalBytesPerSectorForPerf = cpu_to_le32(sector_size);
- 		info->FSEffPhysicalBytesPerSectorForAtomicity =
--				cpu_to_le32(stfs.f_bsize);
-+				cpu_to_le32(sector_size);
- 		info->Flags = cpu_to_le32(SSINFO_FLAGS_ALIGNED_DEVICE |
- 				    SSINFO_FLAGS_PARTITION_ALIGNED_ON_DEVICE);
- 		info->ByteOffsetForSectorAlignment = 0;
 -- 
 2.35.1
 
