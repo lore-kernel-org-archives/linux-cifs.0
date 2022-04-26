@@ -2,45 +2,44 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB511C4167D
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 19:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E2DC43217
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 19:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353690AbiDZTFT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S1353660AbiDZTFT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Tue, 26 Apr 2022 15:05:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40464 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353581AbiDZTFS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 15:05:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C57719980B;
-        Tue, 26 Apr 2022 12:02:10 -0700 (PDT)
+        with ESMTP id S1353529AbiDZTFR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 15:05:17 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1BE1597AB;
+        Tue, 26 Apr 2022 12:02:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E54FEB8224A;
-        Tue, 26 Apr 2022 19:02:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95CE5C385AF;
-        Tue, 26 Apr 2022 19:02:07 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id B212DCE1CA4;
+        Tue, 26 Apr 2022 19:02:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCFC9C385AD;
+        Tue, 26 Apr 2022 19:02:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650999727;
-        bh=xZZ2i1Rlmt1chjOQcZ+PBoeIkXNP2liprcvgy86RiRc=;
+        s=k20201202; t=1650999723;
+        bh=0Y5QnMd8T87CITmK3jIabf6VdsS8nJNvvvMpL+BzWVI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=U4R1oAaatDF0AbaBReudTiZuTFQUtsrhqM5jMUIi/7r2PgLeaKzKL59wUGvdeCzK2
-         GJdTSReQvN87gz1Nrii4WIESlHUikEQTgjm4GEq9JXx3Krvtx0lBBhRWHRLgkbNfRT
-         s7gec9HoMTYsem05wfoEVOpkyjJM5qria9CAcVh2JmQx8fYNw6oMFzsB5pqKTnk7CS
-         X7hnsW2bcRi66IupQGZYucbZjToVty2xpGV09Ecbbf3k7Mien47PYVyIZAfC6XuD3v
-         nZxL6OwkzkVPf4fYqmFKKjPTfO418n+/AmWTWcj0uWgjsTihb8q8qRmtnkXBrinGzS
-         KoPg1DjNVvXnQ==
+        b=Jus7NBhfOgoqKSHgGH5n9UBgiVjYPqIC4PtEh1oP+vMhI1WgbTzPJEd+f/uiG7LBq
+         edGDqCjj4hxcAUKLeVhsvuzJdTW9Qz2h5Xk4FXqvDzzLHRODDVwkXkCBlxa97ofYcD
+         xpytaYgt3ReoxiT/WnQJzEIvnFFOKxikcbguQepFlDUTzicrAj+g+DX14HJadc58kG
+         hSiNEs6NdLzkQb6Y0tJA9sGBSLMDDJAY9MzE+q7tPN8F+KCkhJPYUGoLLk2cFChn4V
+         DzJq2x3jkX0kzMKKKPOh0yLZwbqqV/FDbg4xMkdhLd10f97n+AuDNwZky0t5jA2HdT
+         sazf36O8eTwsw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Xiaoli Feng <xifeng@redhat.com>,
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.17 16/22] cifs: destage any unwritten data to the server before calling copychunk_write
-Date:   Tue, 26 Apr 2022 15:01:39 -0400
-Message-Id: <20220426190145.2351135-16-sashal@kernel.org>
+        hyc.lee@gmail.com, linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.17 11/22] ksmbd: set fixed sector size to FS_SECTOR_SIZE_INFORMATION
+Date:   Tue, 26 Apr 2022 15:01:34 -0400
+Message-Id: <20220426190145.2351135-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220426190145.2351135-1-sashal@kernel.org>
 References: <20220426190145.2351135-1-sashal@kernel.org>
@@ -52,56 +51,64 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Ronnie Sahlberg <lsahlber@redhat.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit f5d0f921ea362636e4a2efb7c38d1ead373a8700 ]
+[ Upstream commit 02655a70b7cc0f534531ee65fa72692f4d31a944 ]
 
-because the copychunk_write might cover a region of the file that has not yet
-been sent to the server and thus fail.
+Currently ksmbd is using ->f_bsize from vfs_statfs() as sector size.
+If fat/exfat is a local share, ->f_bsize is a cluster size that is too
+large to be used as a sector size. Sector sizes larger than 4K cause
+problem occurs when mounting an iso file through windows client.
 
-A simple way to reproduce this is:
-truncate -s 0 /mnt/testfile; strace -f -o x -ttT xfs_io -i -f -c 'pwrite 0k 128k' -c 'fcollapse 16k 24k' /mnt/testfile
+The error message can be obtained using Mount-DiskImage command,
+ the error is:
+"Mount-DiskImage : The sector size of the physical disk on which the
+virtual disk resides is not supported."
 
-the issue is that the 'pwrite 0k 128k' becomes rearranged on the wire with
-the 'fcollapse 16k 24k' due to write-back caching.
+This patch reports fixed 4KB sector size if ->s_blocksize is bigger
+than 4KB.
 
-fcollapse is implemented in cifs.ko as a SMB2 IOCTL(COPYCHUNK_WRITE) call
-and it will fail serverside since the file is still 0b in size serverside
-until the writes have been destaged.
-To avoid this we must ensure that we destage any unwritten data to the
-server before calling COPYCHUNK_WRITE.
-
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1997373
-Reported-by: Xiaoli Feng <xifeng@redhat.com>
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/smb2ops.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ fs/ksmbd/smb2pdu.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 5d120cd8bc78..13080d6a140b 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1861,9 +1861,17 @@ smb2_copychunk_range(const unsigned int xid,
- 	int chunks_copied = 0;
- 	bool chunk_sizes_updated = false;
- 	ssize_t bytes_written, total_bytes_written = 0;
-+	struct inode *inode;
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index a19a2b9c1e56..83ffa73c9348 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -11,6 +11,7 @@
+ #include <linux/statfs.h>
+ #include <linux/ethtool.h>
+ #include <linux/falloc.h>
++#include <linux/mount.h>
  
- 	pcchunk = kmalloc(sizeof(struct copychunk_ioctl), GFP_KERNEL);
+ #include "glob.h"
+ #include "smbfsctl.h"
+@@ -5005,15 +5006,17 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 	case FS_SECTOR_SIZE_INFORMATION:
+ 	{
+ 		struct smb3_fs_ss_info *info;
++		unsigned int sector_size =
++			min_t(unsigned int, path.mnt->mnt_sb->s_blocksize, 4096);
  
-+	/*
-+	 * We need to flush all unwritten data before we can send the
-+	 * copychunk ioctl to the server.
-+	 */
-+	inode = d_inode(trgtfile->dentry);
-+	filemap_write_and_wait(inode->i_mapping);
-+
- 	if (pcchunk == NULL)
- 		return -ENOMEM;
+ 		info = (struct smb3_fs_ss_info *)(rsp->Buffer);
  
+-		info->LogicalBytesPerSector = cpu_to_le32(stfs.f_bsize);
++		info->LogicalBytesPerSector = cpu_to_le32(sector_size);
+ 		info->PhysicalBytesPerSectorForAtomicity =
+-				cpu_to_le32(stfs.f_bsize);
+-		info->PhysicalBytesPerSectorForPerf = cpu_to_le32(stfs.f_bsize);
++				cpu_to_le32(sector_size);
++		info->PhysicalBytesPerSectorForPerf = cpu_to_le32(sector_size);
+ 		info->FSEffPhysicalBytesPerSectorForAtomicity =
+-				cpu_to_le32(stfs.f_bsize);
++				cpu_to_le32(sector_size);
+ 		info->Flags = cpu_to_le32(SSINFO_FLAGS_ALIGNED_DEVICE |
+ 				    SSINFO_FLAGS_PARTITION_ALIGNED_ON_DEVICE);
+ 		info->ByteOffsetForSectorAlignment = 0;
 -- 
 2.35.1
 
