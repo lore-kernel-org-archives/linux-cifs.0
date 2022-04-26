@@ -2,32 +2,32 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EE9C4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 08:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB3A3C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Apr 2022 08:26:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344600AbiDZI0D (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Apr 2022 04:26:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33176 "EHLO
+        id S243724AbiDZI3j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Apr 2022 04:29:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344602AbiDZIZx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 04:25:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7073A5E0;
-        Tue, 26 Apr 2022 01:22:47 -0700 (PDT)
+        with ESMTP id S1344692AbiDZI2k (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 04:28:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A123135B19;
+        Tue, 26 Apr 2022 01:24:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AD36D617E7;
-        Tue, 26 Apr 2022 08:22:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBA45C385A4;
-        Tue, 26 Apr 2022 08:22:45 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AA1F8617F1;
+        Tue, 26 Apr 2022 08:24:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7CD2C385A0;
+        Tue, 26 Apr 2022 08:24:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1650961366;
-        bh=EosSNH8QIq0HX0UFhXMnJQen0qV3zQiLsp4EowtHQFI=;
+        s=korg; t=1650961456;
+        bh=IZI1pv8Ex4cfr00pOxZe1myvfnxTKl2H2WTiS4ekVeI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XoTJFyFCsfpO1LsUvguGtcHE8iHjrFjd47oBfEXOLmJ4AgS8k9YYQDwor41fDItLO
-         Ae6McYkgJzdyR/WC0VPDi2XukDtDDpk8Z4fjIbT0zqAZ7efTKzduVDn74WdcOCCUqE
-         sst2bY4e7TknA4XbfPdVHhLv6ujISaKD2H197Uc4=
+        b=bL3ij8jUPa3PMEix5AcEq6F4kCBfwV9mI5DfBVcLhXR99Oq64qLwnutlKkLX16pxF
+         fn7OcWafOdNzEGBBQz6OpzySWe3lgxPSftG5OBE1b+XUVYQbdaNpprGK3RC0vq1CoJ
+         QYOms8PdH+z/UQULbiVwsJ241vq5LnCEnmEgBwa0=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -37,12 +37,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         linux-cifs@vger.kernel.org, Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 4.9 12/24] cifs: Check the IOCB_DIRECT flag, not O_DIRECT
-Date:   Tue, 26 Apr 2022 10:21:06 +0200
-Message-Id: <20220426081731.735802262@linuxfoundation.org>
+Subject: [PATCH 4.14 17/43] cifs: Check the IOCB_DIRECT flag, not O_DIRECT
+Date:   Tue, 26 Apr 2022 10:20:59 +0200
+Message-Id: <20220426081735.026599886@linuxfoundation.org>
 X-Mailer: git-send-email 2.36.0
-In-Reply-To: <20220426081731.370823950@linuxfoundation.org>
-References: <20220426081731.370823950@linuxfoundation.org>
+In-Reply-To: <20220426081734.509314186@linuxfoundation.org>
+References: <20220426081734.509314186@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 95e4f074b766..b85c283ad08b 100644
+index dba0d12c3db1..1d3f98572068 100644
 --- a/fs/cifs/cifsfs.c
 +++ b/fs/cifs/cifsfs.c
-@@ -766,7 +766,7 @@ cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+@@ -773,7 +773,7 @@ cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
  	ssize_t rc;
  	struct inode *inode = file_inode(iocb->ki_filp);
  
