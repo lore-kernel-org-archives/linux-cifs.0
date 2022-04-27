@@ -2,111 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E67C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Apr 2022 00:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D896C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Apr 2022 02:33:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356305AbiD0AGt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Apr 2022 20:06:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44206 "EHLO
+        id S1357191AbiD0CgX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Apr 2022 22:36:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356297AbiD0AGs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 20:06:48 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1FE9177CB9;
-        Tue, 26 Apr 2022 17:03:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 62BA5B823EB;
-        Wed, 27 Apr 2022 00:03:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85A68C385A4;
-        Wed, 27 Apr 2022 00:03:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651017816;
-        bh=t0zawJnlOyXwzS6WK1c2yglNRvFTH/XaDhjC3G/cH0U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=UJPV/z8jzqRLnklprH9L/Jwnm39U4CizfBZ0c4Z3BZbNdwNnIstnX8wMb91JanmsQ
-         Ytcvpg38EFUfZjIb86PFIdAyfXXFKimzD7vLv3698oCFMqB8JoV1YjmlJSbEy1+JrI
-         QMBcMpJR5O3vDRJhfRdPykZGx60YPhX1dyOmJt7GZqvrGweohyhqFBLSI0bZbvZr5h
-         y++QVEpjNWy8+ioJBvifR0EbZ5IEvHPQvMwITWeEJfvXj8NE19INresRfLChWBAPMp
-         A7Jip0KdZL6OCNHPMYhh2DbLlZ4IjVTWWVOP83S91lHcv8eAEOTEDRwKglOYRh6kT3
-         DUamUXmWnJdGA==
-Date:   Tue, 26 Apr 2022 17:03:34 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>,
-        Chuck Lever <chuck.lever@oracle.com>, netdev@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        ak@tempesta-tech.com, borisp@nvidia.com, simo@redhat.com
-Subject: Re: [PATCH RFC 4/5] net/tls: Add support for PF_TLSH (a TLS
- handshake listener)
-Message-ID: <20220426170334.3781cd0e@kernel.org>
-In-Reply-To: <40bc060f-f359-081d-9ba7-fae531cf2cd6@suse.de>
-References: <165030051838.5073.8699008789153780301.stgit@oracle-102.nfsv4.dev>
-        <165030059051.5073.16723746870370826608.stgit@oracle-102.nfsv4.dev>
-        <20220425101459.15484d17@kernel.org>
-        <66077b73-c1a4-d2ae-c8e4-3e19e9053171@suse.de>
-        <1fca2eda-83e4-fe39-13c8-0e5e7553689b@grimberg.me>
-        <20220426080247.19bbb64e@kernel.org>
-        <40bc060f-f359-081d-9ba7-fae531cf2cd6@suse.de>
+        with ESMTP id S234542AbiD0CgU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Apr 2022 22:36:20 -0400
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C590A65D0D;
+        Tue, 26 Apr 2022 19:33:10 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id h1so398208pfv.12;
+        Tue, 26 Apr 2022 19:33:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KI2OXoDSI4Jfk05XGM6BWGfsrNlJaKDwvdIstImWDWQ=;
+        b=UOerIdgK2gi9kl+79xQLCOUSiJ7uexPx1O1n/5GihdTT7qc79au3JQpIYacQ22N3ed
+         bqpnXjDJ1YZZbdc/SyG0rVvlYa+3boJR0psn0VmpQLz9i7ONNVHUtubB4DZTsh2vBdta
+         o+M5JWQM4/urDiI5FnKszFXpO3zS21TYzSS9b1tsBGJxStLIhyzsukEM3ICx8b6j3opv
+         ol1KXb9CbrNXjbFQ8JP8iUhFa+PYJ/W6ubmC1ozvLpklyLlY6gWK78Ci9wijdI8Jvxs6
+         mcF95v5ucQaC4NDpDD2IqQp3MbZCwIFPRjPWm6w1E5aeX2yIQrrKxGm2coIAl539uIXg
+         SZaw==
+X-Gm-Message-State: AOAM532hUXpZ++T/aTFqXCW9WEpy4+xERrtvn7SZnQEDSZlud2RggHwU
+        a4yTmMiFDw1tmuimOrdsquGaj/fdf6M=
+X-Google-Smtp-Source: ABdhPJyUWAYHf9/HLoqpz4GCZed+tg2AqSi/FeiFTP/2ojK8IsoiTXzed0HFHooUzqd+DNpuRYMa7Q==
+X-Received: by 2002:a63:257:0:b0:3aa:a481:9159 with SMTP id 84-20020a630257000000b003aaa4819159mr22103321pgc.1.1651026789868;
+        Tue, 26 Apr 2022 19:33:09 -0700 (PDT)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id t1-20020a628101000000b0050d47199857sm7338564pfd.73.2022.04.26.19.33.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Apr 2022 19:33:09 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Steve French <stfrench@microsoft.com>
+Subject: [PATCH 1/3] ksmbd: remove internal.h include
+Date:   Wed, 27 Apr 2022 11:32:43 +0900
+Message-Id: <20220427023245.7327-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 26 Apr 2022 17:58:39 +0200 Hannes Reinecke wrote:
-> > Plus there are more protocols being actively worked on (QUIC, PSP etc.)
-> > Having per ULP special sauce to invoke a user space helper is not the
-> > paradigm we chose, and the time as inopportune as ever to change that.  
-> 
-> Which is precisely what we hope to discuss at LSF.
-> (Yes, I know, probably not the best venue to discuss network stuff ...)
+Since vfs_path_lookup is exported, It should not be internal.
+Move vfs_path_lookup prototype in internal.h to linux/namei.h.
 
-Indeed.
+Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/internal.h         | 2 --
+ fs/ksmbd/vfs.c        | 2 --
+ include/linux/namei.h | 2 ++
+ 3 files changed, 2 insertions(+), 4 deletions(-)
 
-> Each approach has its drawbacks:
-> 
-> - Establishing sockets from userspace will cause issues during 
-> reconnection, as then someone (aka the kernel) will have to inform 
-> userspace that a new connection will need to be established.
-> (And that has to happen while the root filesystem is potentially 
-> inaccessible, so you can't just call arbitrary commands here)
-> (Especially call_usermodehelper() is out of the game)
+diff --git a/fs/internal.h b/fs/internal.h
+index 08503dc68d2b..a73eda6f9f63 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -58,8 +58,6 @@ extern int finish_clean_context(struct fs_context *fc);
+  */
+ extern int filename_lookup(int dfd, struct filename *name, unsigned flags,
+ 			   struct path *path, struct path *root);
+-extern int vfs_path_lookup(struct dentry *, struct vfsmount *,
+-			   const char *, unsigned int, struct path *);
+ int do_rmdir(int dfd, struct filename *name);
+ int do_unlinkat(int dfd, struct filename *name);
+ int may_linkat(struct user_namespace *mnt_userns, struct path *link);
+diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
+index dcdd07c6efff..f79dfcebe480 100644
+--- a/fs/ksmbd/vfs.c
++++ b/fs/ksmbd/vfs.c
+@@ -18,8 +18,6 @@
+ #include <linux/sched/xacct.h>
+ #include <linux/crc32c.h>
+ 
+-#include "../internal.h"	/* for vfs_path_lookup */
+-
+ #include "glob.h"
+ #include "oplock.h"
+ #include "connection.h"
+diff --git a/include/linux/namei.h b/include/linux/namei.h
+index e89329bb3134..4858c3cdf7c6 100644
+--- a/include/linux/namei.h
++++ b/include/linux/namei.h
+@@ -63,6 +63,8 @@ extern struct dentry *kern_path_create(int, const char *, struct path *, unsigne
+ extern struct dentry *user_path_create(int, const char __user *, struct path *, unsigned int);
+ extern void done_path_create(struct path *, struct dentry *);
+ extern struct dentry *kern_path_locked(const char *, struct path *);
++int vfs_path_lookup(struct dentry *, struct vfsmount *, const char *,
++		    unsigned int, struct path *);
+ 
+ extern struct dentry *try_lookup_one_len(const char *, struct dentry *, int);
+ extern struct dentry *lookup_one_len(const char *, struct dentry *, int);
+-- 
+2.25.1
 
-Indeed, we may need _some_ form of a notification mechanism and that's
-okay. Can be a (more generic) socket, can be something based on existing
-network storage APIs (IDK what you have there).
-
-My thinking was that establishing the session in user space would be
-easiest. We wouldn't need all the special getsockopt()s which AFAIU
-work around part of the handshake being done in the kernel, and which,
-I hope we can agree, are not beautiful.
-
-> - Having ULP helpers (as with this design) mitigates that problem 
-> somewhat in the sense that you can mlock() that daemon and having it 
-> polling on an intermediate socket; that solves the notification problem.
-> But you have to have ULP special sauce here to make it work.
-
-TBH I don't see how this is much different to option 1 in terms of
-constraints & requirements on the user space agent. We can implement
-option 1 over a socket-like interface, too, and that'll carry
-notifications all the same.
-
-> - Moving everything in kernel is ... possible. But then you have yet 
-> another security-relevant piece of code in the kernel which needs to be 
-> audited, CVEd etc. Not to mention the usual policy discussion whether it 
-> really belongs into the kernel.
-
-Yeah, if that gets posted it'd be great if it includes removing me from
-the TLS maintainers 'cause I want to sleep at night ;)
-
-> So I don't really see any obvious way to go; best we can do is to pick 
-> the least ugly :-(
-
-True, I'm sure we can find some middle ground between 1 and 2.
-Preferably implemented in a way where the mechanism is separated 
-from the fact it's carrying TLS handshake requests, so that it can
-carry something else tomorrow.
