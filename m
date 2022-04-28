@@ -2,118 +2,224 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E2ABC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Apr 2022 14:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E50F8C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Apr 2022 14:48:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345843AbiD1OMj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Apr 2022 10:12:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55338 "EHLO
+        id S232636AbiD1OvP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Apr 2022 10:51:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240550AbiD1OMi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Apr 2022 10:12:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 740AD27148
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Apr 2022 07:09:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651154962;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=r89Z/7oHso894jLgFkyp7GZ9nOpRmCTTiW/mUMGcSaU=;
-        b=JqjD+JZHPKkHfD4Kn3K4uBjONeHBzA3dPJBbsfK6Z6m8F+Mz42xhx9G1V+JVVf4HBJsFW2
-        8YQKkf/KLKfs3/Ez+FQU3UZrGCnC/qZIpqcE79wHOkfVKMYJi64r3gTDRxqXi4pNquiGib
-        OMaufqfdaEmB+wAaxgJ0nJ4l0WBMGI0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-531-_Aap0-ndPQmMqh42lv3zmw-1; Thu, 28 Apr 2022 10:09:19 -0400
-X-MC-Unique: _Aap0-ndPQmMqh42lv3zmw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8C873811E7A;
-        Thu, 28 Apr 2022 14:09:18 +0000 (UTC)
-Received: from [172.16.176.1] (ovpn-64-2.rdu2.redhat.com [10.10.64.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B093463EF5;
-        Thu, 28 Apr 2022 14:09:18 +0000 (UTC)
-From:   "Benjamin Coddington" <bcodding@redhat.com>
-To:     "Hannes Reinecke" <hare@suse.de>
-Cc:     "Jakub Kicinski" <kuba@kernel.org>,
-        "Sagi Grimberg" <sagi@grimberg.me>,
-        "Chuck Lever" <chuck.lever@oracle.com>, netdev@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        ak@tempesta-tech.com, borisp@nvidia.com, simo@redhat.com
-Subject: Re: [PATCH RFC 4/5] net/tls: Add support for PF_TLSH (a TLS handshake
- listener)
-Date:   Thu, 28 Apr 2022 10:09:17 -0400
-Message-ID: <E2BF9CFF-9361-400B-BDEE-CF5E0AFDCA63@redhat.com>
-In-Reply-To: <be7e3c4b-8bb5-e818-1402-ac24cbbcb38c@suse.de>
-References: <165030051838.5073.8699008789153780301.stgit@oracle-102.nfsv4.dev>
- <165030059051.5073.16723746870370826608.stgit@oracle-102.nfsv4.dev>
- <20220425101459.15484d17@kernel.org>
- <66077b73-c1a4-d2ae-c8e4-3e19e9053171@suse.de>
- <1fca2eda-83e4-fe39-13c8-0e5e7553689b@grimberg.me>
- <20220426080247.19bbb64e@kernel.org>
- <40bc060f-f359-081d-9ba7-fae531cf2cd6@suse.de>
- <20220426170334.3781cd0e@kernel.org>
- <23f497ab-08e3-3a25-26d9-56d94ee92cde@suse.de>
- <20220428063009.0a63a7f9@kernel.org>
- <be7e3c4b-8bb5-e818-1402-ac24cbbcb38c@suse.de>
+        with ESMTP id S231773AbiD1OvO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Apr 2022 10:51:14 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A63B0D12
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Apr 2022 07:47:59 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id x33so9107793lfu.1
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Apr 2022 07:47:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DcUuB+IvXL4budKrIbxbTPAn+gJvdZqYuiSmYz4Gp1E=;
+        b=bZoZk1eK+7wuTJvDFRA6nv2RyX55B/iu7yfJNNUiUO/IvtjfbMIrceVCx0YVF3+cHd
+         LXrYsDKaxPJ5o4JKNRh5jO09X85VSo9x7dpjgWl1bGHkFelR8aTaJjZA5p9D64VhCvxp
+         wrhNrm0lVigXQ9Lg6W5xTPaZ0WdKx0r6ybCx6djLxWSo1PXVklPv7jVGQ+ehoemwrlL1
+         ChJpMevCIn267SXyMYyoGC7GJIHZ2L0S6GI22qGXdjzPi1blI6+x9lk64ElxEKFg8Iuk
+         qZPqNzwEYOSz3sJPzdYArWkMBrSTfZZ0l0vuLLaVIxdGo2AkYVQUVTfFn46oO/YLUlFo
+         HFRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DcUuB+IvXL4budKrIbxbTPAn+gJvdZqYuiSmYz4Gp1E=;
+        b=2EOGziTpv8IiaKZFtBqOsaZULaDczFeVXgUlmqLZHU7cqdLIkUS0LGEg3L/N/0iTpz
+         VzOj3lnOR+fg6mDH3PBurfqYVvFa718fCI0zThpmvop0vOH9lGYejuGkwfaDUPfDyO1o
+         VesKgduDPsc/d53EP3kUdn0O7mEy2+XDSNe9Wu0GqErjqMpobB9AJpPn+7myVdEfxJYH
+         c9xKAlBKW/n1zlDlkCj73uLWyzB2jjjLInSeaaMrrqwZH5HFOITNb3YUKlk6eeq6UMeQ
+         T/fQqNhr1IhSQu8aZ9xdIV1ahLtkJmEESTF3XAlGrRP1zjU49h/LQ+rmCDO+aQ7IQrYS
+         mdwA==
+X-Gm-Message-State: AOAM5315CEQo4MuIMbirULIYM9Av+y/GPpzJKip0PbWDi+XHDX6YpylB
+        xLC0AFQgTAGb2XtRB/Y9ZONOAiFL+i070+9iE28=
+X-Google-Smtp-Source: ABdhPJxsNCmlX2ux9wFhgLpAgdrLFuPsicDZ3Oe13sjRGiFul6/yj+jLehekUgoSRGYPdmp1ANz2yxjF3t0+Mpy6ar0=
+X-Received: by 2002:a05:6512:1389:b0:471:a7fa:d5d3 with SMTP id
+ p9-20020a056512138900b00471a7fad5d3mr24053823lfa.667.1651157277471; Thu, 28
+ Apr 2022 07:47:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+References: <DDB2AB1F-38C5-4295-97AA-2C55616E7CFB@gmail.com>
+ <CAB6yy367MHRdxNCBUp9zWf1dJ2oOsJ6NZrLXja4GYfq0QnfjBg@mail.gmail.com> <CAH2r5muxKEQxu1NFsjW1pSQyJyUF-upek300iUNJYSU8_EU3WA@mail.gmail.com>
+In-Reply-To: <CAH2r5muxKEQxu1NFsjW1pSQyJyUF-upek300iUNJYSU8_EU3WA@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 28 Apr 2022 09:47:46 -0500
+Message-ID: <CAH2r5msU2oHWoEQhaAGRm6Ob67btPTfvpHXHAwpAae==EFypAw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: flush all dirty pages to server before read/write
+To:     Kinglong Mee <kinglongmee@gmail.com>
+Cc:     Steve French <sfrench@samba.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 28 Apr 2022, at 9:51, Hannes Reinecke wrote:
+Got some additional review comments/questions about this patch.
 
-> On 4/28/22 15:30, Jakub Kicinski wrote:
->> On Thu, 28 Apr 2022 09:26:41 +0200 Hannes Reinecke wrote:
->>> The whole thing started off with the problem on _how_ sockets could be
->>> passed between kernel and userspace and vice versa.
->>> While there is fd passing between processes via AF_UNIX, there is no
->>> such mechanism between kernel and userspace.
->>
->> Noob question - the kernel <> user space FD sharing is just
->> not implemented yet, or somehow fundamentally hard because kernel
->> fds are "special"?
+In __cifs_writev isn't it likely that the write will be async and now
+become synchronous and also could we now have a duplicated write
+(flushing the write, then calling write again on that range)?
+
+For example, the change you added
+
++       if (CIFS_CACHE_WRITE(CIFS_I(inode)) &&
++           inode->i_mapping && inode->i_mapping->nrpages != 0) {
++               rc = filemap_write_and_wait(inode->i_mapping);
+
+will write synchronously all dirty pages but then proceed to call the async
+
+        rc = cifs_write_from_iter(iocb->ki_pos, ctx->len, &saved_from,
+                                  cfile, cifs_sb, &ctx->list, ctx);
+
+a few lines later.  Won't this kill performance?
+
+What was the reason for this part of the patch?  Doesn't the original
+code end up in the same place around line 678 in mm/filemap.c
+
+                        int err2 = filemap_fdatawait_range(mapping,
+                                                lstart, lend);
+
+called from:
+
+@@ -2440,7 +2440,7 @@ int cifs_getattr(struct user_namespace
+*mnt_userns, const struct path *path,
+        if ((request_mask & (STATX_CTIME | STATX_MTIME | STATX_SIZE |
+STATX_BLOCKS)) &&
+            !CIFS_CACHE_READ(CIFS_I(inode)) &&
+            inode->i_mapping && inode->i_mapping->nrpages != 0) {
+-               rc = filemap_fdatawait(inode->i_mapping);
++               rc = filemap_write_and_wait(inode->i_mapping);
+
+On Wed, Apr 27, 2022 at 10:10 PM Steve French <smfrench@gmail.com> wrote:
 >
-> Noob reply: wish I knew.  (I somewhat hoped _you_ would've been able to
-> tell me.)
+> merged into cifs-2.6.git for-next pending testing
 >
-> Thing is, the only method I could think of for fd passing is the POSIX fd
-> passing via unix_attach_fds()/unix_detach_fds().  But that's AF_UNIX,
-> which really is designed for process-to-process communication, not
-> process-to-kernel.  So you probably have to move a similar logic over to
-> AF_NETLINK. And design a new interface on how fds should be passed over
-> AF_NETLINK.
+> On Sun, Apr 24, 2022 at 10:41 PM Kinglong Mee <kinglongmee@gmail.com> wrote:
+> >
+> > ping...
+> >
+> > On Mon, Apr 11, 2022 at 3:39 PM Kinglong Mee <kinglongmee@gmail.com> wrote:
+> > >
+> > > Testing with ltp, fsx-linux fail as,
+> > >
+> > > # mount -t cifs -ocache=none,nobrl,guest //cifsserverip/test /mnt/cifs/
+> > > # dd if=/dev/zero of=/mnt/cifs//junkfile bs=8192 count=19200 conv=block
+> > > # ./testcases/bin/fsx-linux -l 500000 -r 4096 -t 4096 -w 4096 -N 10000 /mnt/cifs/junkfile
+> > > skipping zero size read
+> > > truncating to largest ever: 0x2c000
+> > > READ BAD DATA: offset = 0x1c000, size = 0x9cc0
+> > > OFFSET  GOOD    BAD     RANGE
+> > > 0x1c000 0x09d2  000000  0x22ed
+> > > operation# (mod 256) for the bad dataunknown, check HOLE and EXTEND ops
+> > > LOG DUMP (10 total operations):
+> > > 1: 1649662377.404010 SKIPPED (no operation)
+> > > 2: 1649662377.413729 WRITE    0x3000 thru 0xdece (0xaecf bytes) HOLE
+> > > 3: 1649662377.424961 WRITE    0x19000 thru 0x1b410 (0x2411 bytes) HOLE
+> > > 4: 1649662377.435135 TRUNCATE UP        from 0x1b411 to 0x2c000 ******WWWW
+> > > 5: 1649662377.487010 MAPWRITE 0x5000 thru 0x13077 (0xe078 bytes)
+> > > 6: 1649662377.495006 MAPREAD  0x8000 thru 0xe16c (0x616d bytes)
+> > > 7: 1649662377.500638 MAPREAD  0x1e000 thru 0x2054d (0x254e bytes)       ***RRRR***
+> > > 8: 1649662377.506165 WRITE    0x76000 thru 0x7993f (0x3940 bytes) HOLE
+> > > 9: 1649662377.516674 MAPWRITE 0x1a000 thru 0x1e2fe (0x42ff bytes)       ******WWWW
+> > > 10: 1649662377.535312 READ     0x1c000 thru 0x25cbf (0x9cc0 bytes)      ***RRRR***
+> > > Correct content saved for comparison
+> > > (maybe hexdump "/mnt/cifs/junkfile" vs "/mnt/cifs/junkfile.fsxgood")
+> > >
+> > > Those data written at MAPWRITE is not flush to smb server,
+> > > but the fallowing read gets data from the backend.
+> > >
+> > > Signed-off-by: Kinglong Mee <kinglongmee@gmail.com>
+> > > ---
+> > >  fs/cifs/file.c  | 22 ++++++++++++++++++++++
+> > >  fs/cifs/inode.c |  2 +-
+> > >  2 files changed, 23 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> > > index d511a78383c3..11912474563e 100644
+> > > --- a/fs/cifs/file.c
+> > > +++ b/fs/cifs/file.c
+> > > @@ -3222,6 +3222,7 @@ static ssize_t __cifs_writev(
+> > >         struct kiocb *iocb, struct iov_iter *from, bool direct)
+> > >  {
+> > >         struct file *file = iocb->ki_filp;
+> > > +       struct inode *inode = file_inode(iocb->ki_filp);
+> > >         ssize_t total_written = 0;
+> > >         struct cifsFileInfo *cfile;
+> > >         struct cifs_tcon *tcon;
+> > > @@ -3249,6 +3250,16 @@ static ssize_t __cifs_writev(
+> > >         cfile = file->private_data;
+> > >         tcon = tlink_tcon(cfile->tlink);
+> > >
+> > > +       /* We need to be sure that all dirty pages are written to the server. */
+> > > +       if (CIFS_CACHE_WRITE(CIFS_I(inode)) &&
+> > > +           inode->i_mapping && inode->i_mapping->nrpages != 0) {
+> > > +               rc = filemap_write_and_wait(inode->i_mapping);
+> > > +               if (rc) {
+> > > +                       mapping_set_error(inode->i_mapping, rc);
+> > > +                       return rc;
+> > > +               }
+> > > +       }
+> > > +
+> > >         if (!tcon->ses->server->ops->async_writev)
+> > >                 return -ENOSYS;
+> > >
+> > > @@ -3961,6 +3972,7 @@ static ssize_t __cifs_readv(
+> > >  {
+> > >         size_t len;
+> > >         struct file *file = iocb->ki_filp;
+> > > +       struct inode *inode = file_inode(iocb->ki_filp);
+> > >         struct cifs_sb_info *cifs_sb;
+> > >         struct cifsFileInfo *cfile;
+> > >         struct cifs_tcon *tcon;
+> > > @@ -3986,6 +3998,16 @@ static ssize_t __cifs_readv(
+> > >         cfile = file->private_data;
+> > >         tcon = tlink_tcon(cfile->tlink);
+> > >
+> > > +       /* We need to be sure that all dirty pages are written to the server. */
+> > > +       if (CIFS_CACHE_WRITE(CIFS_I(inode)) &&
+> > > +           inode->i_mapping && inode->i_mapping->nrpages != 0) {
+> > > +               rc = filemap_write_and_wait(inode->i_mapping);
+> > > +               if (rc) {
+> > > +                       mapping_set_error(inode->i_mapping, rc);
+> > > +                       return rc;
+> > > +               }
+> > > +       }
+> > > +
+> > >         if (!tcon->ses->server->ops->async_readv)
+> > >                 return -ENOSYS;
+> > >
+> > > diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> > > index 2f9e7d2f81b6..d5c07196a81e 100644
+> > > --- a/fs/cifs/inode.c
+> > > +++ b/fs/cifs/inode.c
+> > > @@ -2440,7 +2440,7 @@ int cifs_getattr(struct user_namespace *mnt_userns, const struct path *path,
+> > >         if ((request_mask & (STATX_CTIME | STATX_MTIME | STATX_SIZE | STATX_BLOCKS)) &&
+> > >             !CIFS_CACHE_READ(CIFS_I(inode)) &&
+> > >             inode->i_mapping && inode->i_mapping->nrpages != 0) {
+> > > -               rc = filemap_fdatawait(inode->i_mapping);
+> > > +               rc = filemap_write_and_wait(inode->i_mapping);
+> > >                 if (rc) {
+> > >                         mapping_set_error(inode->i_mapping, rc);
+> > >                         return rc;
+> > > --
+> > > 2.35.1
+> > >
 >
-> But then you have to face the issue that AF_NELINK is essentially UDP, and
-> you have _no_ idea if and how many processes do listen on the other end.
-> Thing is, you (as the sender) have to copy the fd over to the receiving
-> process, so you'd better _hope_ there is a receiving process.  Not to
-> mention that there might be several processes listening in...
 >
-> And that's something I _definitely_ don't feel comfortable with without
-> guidance from the networking folks, so I didn't pursue it further and we
-> went with the 'accept()' mechanism Chuck implemented.
 >
-> I'm open to suggestions, though.
+> --
+> Thanks,
+>
+> Steve
 
-EXPORT_SYMBOL(receive_fd) would allow interesting implementations.
 
-The kernel keyring facilities have a good API for creating various key_types
-which are able to perform work such as this from userspace contexts.
 
-I have a working prototype for a keyring key instantiation which allows a
-userspace process to install a kernel fd on its file table.  The problem
-here is how to match/route such fd passing to appropriate processes in
-appropriate namespaces.  I think this problem is shared by all
-kernel-to-userspace upcalls, which I hope we can discuss at LSF/MM.
+-- 
+Thanks,
 
-I don't think kernel fds are very special as compared to userspace fds.
-
-Ben
-
+Steve
