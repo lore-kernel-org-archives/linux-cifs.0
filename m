@@ -2,70 +2,76 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9577DC433F5
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 Apr 2022 04:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9724FC433FE
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Apr 2022 04:15:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240437AbiD3EOz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 30 Apr 2022 00:14:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
+        id S240856AbiD3ESo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 30 Apr 2022 00:18:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239650AbiD3EOy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Apr 2022 00:14:54 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C222E6AC
-        for <linux-cifs@vger.kernel.org>; Fri, 29 Apr 2022 21:11:34 -0700 (PDT)
+        with ESMTP id S1382221AbiD3ESU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Apr 2022 00:18:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46C1AD1150;
+        Fri, 29 Apr 2022 21:14:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1484BB838AF
-        for <linux-cifs@vger.kernel.org>; Sat, 30 Apr 2022 04:11:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDEB5C385AF
-        for <linux-cifs@vger.kernel.org>; Sat, 30 Apr 2022 04:11:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D8EAE60AC5;
+        Sat, 30 Apr 2022 04:14:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45EC0C385AA;
+        Sat, 30 Apr 2022 04:14:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651291891;
-        bh=BugBkKJ/ZCJK2loc3bAyDQUpGKo2rK8nmyxvKRlHazI=;
+        s=k20201202; t=1651292092;
+        bh=pxmizclQyQseBkms6UHURmopQWes8Htr4kJkCw7niB8=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=s3SSA+JdFFBaw8Z4IH+EokP/qqrTGaZWv+1jtr6Y8HyXOY4KrVC202CftSu3YwjzW
-         Dmmy+Li64QsMZ6wAzJRz+Jpvvqo4fQbUxp5qlruzYcNkWgTe6qQefA9AjihJvf5v3T
-         9qSAOwPGPZopnDMXBlpO9XNDZNV7UjSTlAoqM+J6uRFLHGTyBYFiHQzjxKTNz9wTv6
-         ipFh5+lZqBWC21YUoqbHxdoaqg0nLZa8RDHH+/5tKEC5LWvQij7nZf444Vhf2ZaZXo
-         jD3cyEpRZpIqmKfGTc6HagJYPwIS9XC90cxF11LF8UaZd2poSuVBF0G+kI2Cj9OUQA
-         wgPyf+GMOO54A==
-Received: by mail-wm1-f51.google.com with SMTP id v64-20020a1cac43000000b0038cfd1b3a6dso7995406wme.5
-        for <linux-cifs@vger.kernel.org>; Fri, 29 Apr 2022 21:11:31 -0700 (PDT)
-X-Gm-Message-State: AOAM5317vuG0RdBiZt+plUpOXhvI8PA09Q2nwgXG7Hmo9gOMNOnKW1MT
-        Ha2VkhkX0ff4UQHvdFB6SVC8DtczekVTqj9mYUA=
-X-Google-Smtp-Source: ABdhPJzKZlt/W0rcm57NpADskuzTs2t+PzwxeoElmdPVZ4+OfDIeINx32I5/gAuvYdij/iG0e62Lc2EqDxP1EJpxo6Y=
-X-Received: by 2002:a05:600c:3494:b0:390:8a95:1b95 with SMTP id
- a20-20020a05600c349400b003908a951b95mr5922735wmq.15.1651291889989; Fri, 29
- Apr 2022 21:11:29 -0700 (PDT)
+        b=Jl9SDI0keR5b/6tvEX7iksxIpsoBMSGA9i75+vxZdvUKUg4tXVkWMHC8Gbk44Ygxe
+         qLR+S0eTN0qXqZzpPH18MXRh20KkBO0RnLoghUbHOVKPaHShXDhyPUypppBSAiNC5Z
+         3OiXRUvUfJCp9FUHgUpvn+NTaWdU3ovvJbn3b+4p1Agw1n3tz/yHvv9jv6dfjnFAIO
+         qRQnZyJ3ZVnq2BGVaMkMj/xN7Kox5x3z2bJM9/A18sQmkTCFQdqN09PXNdkicveNGi
+         8ur3qe2x28uJ7B4WDWpGxTXVvr7xoM3AaTpwMVMd0amrUXk3iq78K4IhQv/kDnZUjX
+         Qf29PQBpYswyg==
+Received: by mail-wr1-f49.google.com with SMTP id t6so13055167wra.4;
+        Fri, 29 Apr 2022 21:14:52 -0700 (PDT)
+X-Gm-Message-State: AOAM533phI2oOT+qQN82s1LMsDvNUPahWdebKPRAJ3v2tzHKISOcbYKw
+        lFidz53TX+fOFiSVOZsjQJR4QCqa7ujzV80fSsk=
+X-Google-Smtp-Source: ABdhPJzokjuR05pG2AP2sTlYSOO1c5Wjnn5XONVcKecKBlo2GaPW2LTz70JKCARB7kyXtop2/AcMNJF+orTw2EEIxZw=
+X-Received: by 2002:a5d:5889:0:b0:20c:4ad9:3510 with SMTP id
+ n9-20020a5d5889000000b0020c4ad93510mr1639271wrf.62.1651292090561; Fri, 29 Apr
+ 2022 21:14:50 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a5d:64e7:0:0:0:0:0 with HTTP; Fri, 29 Apr 2022 21:11:29
+Received: by 2002:a5d:64e7:0:0:0:0:0 with HTTP; Fri, 29 Apr 2022 21:14:50
  -0700 (PDT)
-In-Reply-To: <20220429233029.42741-5-hyc.lee@gmail.com>
-References: <20220429233029.42741-1-hyc.lee@gmail.com> <20220429233029.42741-5-hyc.lee@gmail.com>
+In-Reply-To: <20220429081121.1640-1-xiongx18@fudan.edu.cn>
+References: <20220429081121.1640-1-xiongx18@fudan.edu.cn>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sat, 30 Apr 2022 13:11:29 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8uS62jrWxGTYXqHmcXAibMWDdxHGfc=+K3UFWgAvXudw@mail.gmail.com>
-Message-ID: <CAKYAXd8uS62jrWxGTYXqHmcXAibMWDdxHGfc=+K3UFWgAvXudw@mail.gmail.com>
-Subject: Re: [PATCH v4 5/5] ksmbd: smbd: handle multiple Buffer descriptors
-To:     Hyunchul Lee <hyc.lee@gmail.com>
-Cc:     linux-cifs@vger.kernel.org,
+Date:   Sat, 30 Apr 2022 13:14:50 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9SdLAB_=P_4L47Gfo_uAE_i98292Rut6=dfBr-zy3nGQ@mail.gmail.com>
+Message-ID: <CAKYAXd9SdLAB_=P_4L47Gfo_uAE_i98292Rut6=dfBr-zy3nGQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix reference count leak in smb_check_perm_dacl()
+To:     Xin Xiong <xiongx18@fudan.edu.cn>
+Cc:     Steve French <sfrench@samba.org>, Hyunchul Lee <hyc.lee@gmail.com>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>,
-        Yufan Chen <wiz.chen@gmail.com>
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yuanxzhang@fudan.edu.cn, Xin Tan <tanxin.ctf@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-04-30 8:30 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> Make ksmbd handle multiple buffer descriptors
-> when reading and writing files using SMB direct:
-> Post the work requests of rdma_rw_ctx for
-> RDMA read/write in smb_direct_rdma_xmit(), and
-> the work request for the READ/WRITE response
-> with a remote invalidation in smb_direct_writev().
+2022-04-29 17:11 GMT+09:00, Xin Xiong <xiongx18@fudan.edu.cn>:
+> The issue happens in a specific path in smb_check_perm_dacl(). When
+> "id" and "uid" have the same value, the function simply jumps out of
+> the loop without decrementing the reference count of the object
+> "posix_acls", which is increased by get_acl() earlier. This may
+> result in memory leaks.
 >
-> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+> Fix it by decreasing the reference count of "posix_acls" before
+> jumping to label "check_access_bits".
+>
+> Fixes: 777cad1604d6 ("ksmbd: remove select FS_POSIX_ACL in Kconfig")
+> Signed-off-by: Xin Xiong <xiongx18@fudan.edu.cn>
+> Signed-off-by: Xin Tan <tanxin.ctf@gmail.com>
 Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+
+Thanks!
