@@ -2,150 +2,132 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E786BC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 May 2022 23:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 479D3C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 May 2022 23:55:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240423AbiECXRJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 May 2022 19:17:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58624 "EHLO
+        id S230255AbiECX7Z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 May 2022 19:59:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237266AbiECXRI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 May 2022 19:17:08 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D5B4163C
-        for <linux-cifs@vger.kernel.org>; Tue,  3 May 2022 16:13:34 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id w4so25176184wrg.12
-        for <linux-cifs@vger.kernel.org>; Tue, 03 May 2022 16:13:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4orKuiPB2ax1I4aEqfTCLk+8DHMUb5raivwQJLdVUJ8=;
-        b=Sul6t8sKgqzY7gqm+dZZJlezkzCimUrK+I2Ik7VFexMrYY6/8SVic64EgIxosdPneC
-         4ZQdgcFCoHmt7ndDTw8Y0s9a9bOfuW19obrj2HZ8e6JNA/sIMGGZdhGc1AzqRPGK7jOG
-         jIQTBHIDw5nlTgTfGwkjuvhNglikUuNNPzihIuO5LsqnMm4n4cujbgPOto2pjzpgs7bk
-         NmCJEZ0XIfizLSeyv7ERlaTL2QPhzkyzZ8W4u6uPkGJoYhJk00JUZOxmRlzT8ui30FXu
-         4ni5BDVlG3PQ1ivpgR3pXUnDI5rxbGHv6Q1xw3oarKRmszAan1ZeiSMfKgwjjWDo11Me
-         UVKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4orKuiPB2ax1I4aEqfTCLk+8DHMUb5raivwQJLdVUJ8=;
-        b=njDy0HWJ6SmC5IP1tXqVtF05Z/P2t/7bIWPRvFZis7oCTzcBNezcmEeUlNtOlEHmW9
-         O96dyRpGe9m2whwEoxdA174W9IuwVkc9Ihyfp9iCIXP+aS/y0FaRd2EhmSqPat72ssIY
-         WvlW2VGmaWuhQRZzNvBgkoBmulqx0SSXQ2F4yAAFNtvRjczoYnMNO78kNL/zdx4J2yoG
-         x+KeQ33jz8jr9PmsiHYZ4ryPLj3se96TiKzfyCrESDIFcJ4tR/ieLmO7Vl7n74L3+VMo
-         lNuqawma2HZp2lZNoWmWV5WLBUbLu/O3ABHCrWEQIZyuvxjQL+6yeQuHeJw8asBppORg
-         XUdw==
-X-Gm-Message-State: AOAM530MivkJkSaN2sL1ES+7HYjoxORJt8fSWk+0r2WgbUVIT+S71XMn
-        GX2vM7oki9umi5Ss1A9iKLgh2XZakqHXAvUg
-X-Google-Smtp-Source: ABdhPJy0abvMJNhfokmLL/sjKTvcQFIyzdBAUxpzXolQvQY1Meg9p89Im9lxn1+s+ZUJNs5NCAnY3Q==
-X-Received: by 2002:a5d:6d0b:0:b0:20c:4ecb:1113 with SMTP id e11-20020a5d6d0b000000b0020c4ecb1113mr14138501wrq.203.1651619612693;
-        Tue, 03 May 2022 16:13:32 -0700 (PDT)
-Received: from marios-t5500.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
-        by smtp.gmail.com with ESMTPSA id m21-20020a05600c3b1500b003942a244f4bsm2789368wms.36.2022.05.03.16.13.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 May 2022 16:13:32 -0700 (PDT)
-From:   Marios Makassikis <mmakassikis@freebox.fr>
-To:     linux-cifs@vger.kernel.org
-Cc:     Marios Makassikis <mmakassikis@freebox.fr>
-Subject: [PATCH] ksmbd: validate length in smb2_write()
-Date:   Wed,  4 May 2022 01:13:23 +0200
-Message-Id: <20220503231323.740251-1-mmakassikis@freebox.fr>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S230087AbiECX7V (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 May 2022 19:59:21 -0400
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F312A1AA
+        for <linux-cifs@vger.kernel.org>; Tue,  3 May 2022 16:55:46 -0700 (PDT)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 27F487FC20;
+        Tue,  3 May 2022 23:55:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1651622145;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=OB17PS86umE8Lzurri+ELnsu000t2609mjV1pbwg12M=;
+        b=0d2cxk1GeJaT18TeZM0/MamcLdvTLLzyEVPacNQB5e2V0OtdIdr3WaDwqas4w05UqUts6t
+        HQVSv9IsqqoLyq9rEpoeRcW+c6gCowtTmpixZyqwqNwC3cmybVnkh14D8/ZduAiqVfF3re
+        cvhSeuFXaZU3pRItCxByHqLzJyQcifTP+QcSA26zNOLQ5rXqXPS1Z0IlW2Su7l8Ooe0YkV
+        5FbfawERb2jbIw6Ag5VPg99731t54Wlvv4XpbfrHDg9AjFnh8piQ7OwmwCGr4/xcuvfDgE
+        R7FS+ldQYBqMie3FYWfLmGHQXL23M8qcVjoCIUj9z2TFL3V58K9se4PmEoAi0g==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] cifs: cache dirent names for cached directories
+In-Reply-To: <20220503070959.2276616-2-lsahlber@redhat.com>
+References: <20220503070959.2276616-1-lsahlber@redhat.com>
+ <20220503070959.2276616-2-lsahlber@redhat.com>
+Date:   Tue, 03 May 2022 20:55:40 -0300
+Message-ID: <87bkwe2mtf.fsf@cjr.nz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The SMB2 Write packet contains data that is to be written
-to a file or to a pipe. Depending on the client, there may
-be padding between the header and the data field.
-Currently, the length is validated only in the case padding
-is present.
+Hi Ronnie,
 
-Since the DataOffset field always points to the beginning
-of the data, there is no need to have a special case for
-padding. By removing this, the length is validated in both
-cases.
+Ronnie Sahlberg <lsahlber@redhat.com> writes:
 
-Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
----
- smb2pdu.c | 49 +++++++++++++++++++------------------------------
- 1 file changed, 19 insertions(+), 30 deletions(-)
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index 1929e80c09ee..8b3fbe6b3580 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -840,9 +840,112 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
+>  	return rc;
+>  }
+>  
+> +static bool emit_cached_dirents(struct cached_dirents *cde,
+> +				struct dir_context *ctx)
+> +{
+> +	struct list_head *tmp;
+> +	struct cached_dirent *dirent;
+> +	int rc;
+> +
+> +	list_for_each(tmp, &cde->entries) {
+> +		dirent = list_entry(tmp, struct cached_dirent, entry);
 
-diff --git a/smb2pdu.c b/smb2pdu.c
-index 1caf0d4..cd7b4fb 100644
---- a/smb2pdu.c
-+++ b/smb2pdu.c
-@@ -6408,23 +6408,18 @@ static noinline int smb2_write_pipe(struct ksmbd_work *work)
- 	length = le32_to_cpu(req->Length);
- 	id = req->VolatileFileId;
- 
--	if (le16_to_cpu(req->DataOffset) ==
--	    offsetof(struct smb2_write_req, Buffer)) {
--		data_buf = (char *)&req->Buffer[0];
--	} else {
--		if ((u64)le16_to_cpu(req->DataOffset) + length >
--		    get_rfc1002_len(work->request_buf)) {
--			pr_err("invalid write data offset %u, smb_len %u\n",
--			       le16_to_cpu(req->DataOffset),
--			       get_rfc1002_len(work->request_buf));
--			err = -EINVAL;
--			goto out;
--		}
--
--		data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
--				le16_to_cpu(req->DataOffset));
-+	if ((u64)le16_to_cpu(req->DataOffset) + length >
-+	    get_rfc1002_len(work->request_buf)) {
-+		pr_err("invalid write data offset %u, smb_len %u\n",
-+		       le16_to_cpu(req->DataOffset),
-+		       get_rfc1002_len(work->request_buf));
-+		err = -EINVAL;
-+		goto out;
- 	}
- 
-+	data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
-+			   le16_to_cpu(req->DataOffset));
-+
- 	rpc_resp = ksmbd_rpc_write(work->sess, id, data_buf, length);
- 	if (rpc_resp) {
- 		if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
-@@ -6565,22 +6560,16 @@ int smb2_write(struct ksmbd_work *work)
- 
- 	if (req->Channel != SMB2_CHANNEL_RDMA_V1 &&
- 	    req->Channel != SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
--		if (le16_to_cpu(req->DataOffset) ==
--		    offsetof(struct smb2_write_req, Buffer)) {
--			data_buf = (char *)&req->Buffer[0];
--		} else {
--			if ((u64)le16_to_cpu(req->DataOffset) + length >
--			    get_rfc1002_len(work->request_buf)) {
--				pr_err("invalid write data offset %u, smb_len %u\n",
--				       le16_to_cpu(req->DataOffset),
--				       get_rfc1002_len(work->request_buf));
--				err = -EINVAL;
--				goto out;
--			}
--
--			data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
--					le16_to_cpu(req->DataOffset));
-+		if ((u64)le16_to_cpu(req->DataOffset) + length >
-+		    get_rfc1002_len(work->request_buf)) {
-+			pr_err("invalid write data offset %u, smb_len %u\n",
-+			       le16_to_cpu(req->DataOffset),
-+			       get_rfc1002_len(work->request_buf));
-+			err = -EINVAL;
-+			goto out;
- 		}
-+		data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
-+				    le16_to_cpu(req->DataOffset));
- 
- 		ksmbd_debug(SMB, "flags %u\n", le32_to_cpu(req->Flags));
- 		if (le32_to_cpu(req->Flags) & SMB2_WRITEFLAG_WRITE_THROUGH)
--- 
-2.25.1
+What about list_for_each_entry()?
 
+> +static void add_cached_dirent(struct cached_dirents *cde,
+> +			      struct dir_context *ctx,
+> +			      const char *name, int namelen,
+> +			      struct cifs_fattr *fattr)
+> +{
+> +	struct cached_dirent *de;
+> +
+> +	if (cde->ctx != ctx)
+> +		return;
+> +	if (cde->is_valid || cde->is_failed)
+> +		return;
+> +	if (ctx->pos != cde->pos) {
+> +		cde->is_failed = 1;
+> +		return;
+> +	}
+> +	de = kzalloc(sizeof(*de), GFP_ATOMIC);
+> +	if (de == NULL) {
+> +		cde->is_failed = 1;
+> +		return;
+> +	}
+> +	de->name = kzalloc(namelen + 1, GFP_ATOMIC);
+> +	if (de->name == NULL) {
+> +		kfree(de);
+> +		cde->is_failed = 1;
+> +		return;
+> +	}
+> +	memcpy(de->name, name, namelen);
+
+Replace the above kzalloc() & memcpy() with kstrndup()?
+
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index d6aaeff4a30a..10170266f44b 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -699,6 +699,8 @@ smb2_close_cached_fid(struct kref *ref)
+>  {
+>  	struct cached_fid *cfid = container_of(ref, struct cached_fid,
+>  					       refcount);
+> +	struct list_head *pos, *q;
+> +	struct cached_dirent *dirent;
+>  
+>  	if (cfid->is_valid) {
+>  		cifs_dbg(FYI, "clear cached root file handle\n");
+> @@ -718,6 +720,21 @@ smb2_close_cached_fid(struct kref *ref)
+>  		dput(cfid->dentry);
+>  		cfid->dentry = NULL;
+>  	}
+> +	/*
+> +	 * Delete all cached dirent names
+> +	 */
+> +	mutex_lock(&cfid->dirents.de_mutex);
+> +	list_for_each_safe(pos, q, &cfid->dirents.entries) {
+> +		dirent = list_entry(pos, struct cached_dirent, entry);
+
+list_for_each_entry_safe()?
+
+Nice job!  Looks good to me,
+
+Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
