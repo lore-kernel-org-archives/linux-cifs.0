@@ -2,132 +2,56 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 479D3C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 May 2022 23:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1DAC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 01:44:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230255AbiECX7Z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 May 2022 19:59:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40758 "EHLO
+        id S234308AbiEDBr5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 May 2022 21:47:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230087AbiECX7V (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 May 2022 19:59:21 -0400
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F312A1AA
-        for <linux-cifs@vger.kernel.org>; Tue,  3 May 2022 16:55:46 -0700 (PDT)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 27F487FC20;
-        Tue,  3 May 2022 23:55:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1651622145;
+        with ESMTP id S233223AbiEDBr4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 May 2022 21:47:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E4C0228E3D
+        for <linux-cifs@vger.kernel.org>; Tue,  3 May 2022 18:44:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651628657;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OB17PS86umE8Lzurri+ELnsu000t2609mjV1pbwg12M=;
-        b=0d2cxk1GeJaT18TeZM0/MamcLdvTLLzyEVPacNQB5e2V0OtdIdr3WaDwqas4w05UqUts6t
-        HQVSv9IsqqoLyq9rEpoeRcW+c6gCowtTmpixZyqwqNwC3cmybVnkh14D8/ZduAiqVfF3re
-        cvhSeuFXaZU3pRItCxByHqLzJyQcifTP+QcSA26zNOLQ5rXqXPS1Z0IlW2Su7l8Ooe0YkV
-        5FbfawERb2jbIw6Ag5VPg99731t54Wlvv4XpbfrHDg9AjFnh8piQ7OwmwCGr4/xcuvfDgE
-        R7FS+ldQYBqMie3FYWfLmGHQXL23M8qcVjoCIUj9z2TFL3V58K9se4PmEoAi0g==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JG4nQbhkIb1QoHfZI8Py7ylnm1ydXNGoEWttGn5gVhE=;
+        b=Phsq+t118G8QlKJHfqFvB7Cc/tm5J9eWemSvelJCz1arxKhMeZdy7/yLQII++CFXcO/Rb6
+        ezqQSit2VFsBC8oipI6upGtSmfPxSQ00Uoz7vjyeHVgHd3u1K/m0bPyLXN0RU1FUsBs+U5
+        1fuk4ZIvzVjae3HbG9QXNJHJfVymKE4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-314-HN9uw2cQPN-KdWf0KZO5WQ-1; Tue, 03 May 2022 21:44:16 -0400
+X-MC-Unique: HN9uw2cQPN-KdWf0KZO5WQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 12C19811E76;
+        Wed,  4 May 2022 01:44:16 +0000 (UTC)
+Received: from thinkpad (vpn2-54-170.bne.redhat.com [10.64.54.170])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6CFCBC27D8F;
+        Wed,  4 May 2022 01:44:15 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] cifs: cache dirent names for cached directories
-In-Reply-To: <20220503070959.2276616-2-lsahlber@redhat.com>
-References: <20220503070959.2276616-1-lsahlber@redhat.com>
- <20220503070959.2276616-2-lsahlber@redhat.com>
-Date:   Tue, 03 May 2022 20:55:40 -0300
-Message-ID: <87bkwe2mtf.fsf@cjr.nz>
+Subject: cache dirent names for the cached directory while we hold a lease
+Date:   Wed,  4 May 2022 11:44:06 +1000
+Message-Id: <20220504014407.2301906-1-lsahlber@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Ronnie,
+List, Steve, Paulo,
 
-Ronnie Sahlberg <lsahlber@redhat.com> writes:
+v2: Update with Paulos suggestions.
 
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index 1929e80c09ee..8b3fbe6b3580 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -840,9 +840,112 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
->  	return rc;
->  }
->  
-> +static bool emit_cached_dirents(struct cached_dirents *cde,
-> +				struct dir_context *ctx)
-> +{
-> +	struct list_head *tmp;
-> +	struct cached_dirent *dirent;
-> +	int rc;
-> +
-> +	list_for_each(tmp, &cde->entries) {
-> +		dirent = list_entry(tmp, struct cached_dirent, entry);
 
-What about list_for_each_entry()?
 
-> +static void add_cached_dirent(struct cached_dirents *cde,
-> +			      struct dir_context *ctx,
-> +			      const char *name, int namelen,
-> +			      struct cifs_fattr *fattr)
-> +{
-> +	struct cached_dirent *de;
-> +
-> +	if (cde->ctx != ctx)
-> +		return;
-> +	if (cde->is_valid || cde->is_failed)
-> +		return;
-> +	if (ctx->pos != cde->pos) {
-> +		cde->is_failed = 1;
-> +		return;
-> +	}
-> +	de = kzalloc(sizeof(*de), GFP_ATOMIC);
-> +	if (de == NULL) {
-> +		cde->is_failed = 1;
-> +		return;
-> +	}
-> +	de->name = kzalloc(namelen + 1, GFP_ATOMIC);
-> +	if (de->name == NULL) {
-> +		kfree(de);
-> +		cde->is_failed = 1;
-> +		return;
-> +	}
-> +	memcpy(de->name, name, namelen);
-
-Replace the above kzalloc() & memcpy() with kstrndup()?
-
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index d6aaeff4a30a..10170266f44b 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -699,6 +699,8 @@ smb2_close_cached_fid(struct kref *ref)
->  {
->  	struct cached_fid *cfid = container_of(ref, struct cached_fid,
->  					       refcount);
-> +	struct list_head *pos, *q;
-> +	struct cached_dirent *dirent;
->  
->  	if (cfid->is_valid) {
->  		cifs_dbg(FYI, "clear cached root file handle\n");
-> @@ -718,6 +720,21 @@ smb2_close_cached_fid(struct kref *ref)
->  		dput(cfid->dentry);
->  		cfid->dentry = NULL;
->  	}
-> +	/*
-> +	 * Delete all cached dirent names
-> +	 */
-> +	mutex_lock(&cfid->dirents.de_mutex);
-> +	list_for_each_safe(pos, q, &cfid->dirents.entries) {
-> +		dirent = list_entry(pos, struct cached_dirent, entry);
-
-list_for_each_entry_safe()?
-
-Nice job!  Looks good to me,
-
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
