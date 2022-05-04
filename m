@@ -2,67 +2,66 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DB5C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 16:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B93AC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 16:43:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353147AbiEDQ3j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 4 May 2022 12:29:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34018 "EHLO
+        id S1345266AbiEDQrb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 4 May 2022 12:47:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353501AbiEDQ25 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 May 2022 12:28:57 -0400
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 878411EEDC;
-        Wed,  4 May 2022 09:25:18 -0700 (PDT)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id C24FF7FC20;
-        Wed,  4 May 2022 16:25:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1651681515;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uf4eGE5X5hRNqb7V6XorN5LCEocRZ06jz0PJinqpv1U=;
-        b=ciqlHnm0OgJ/Uq6Dvd5+wYCx4KStv0UmKA0rwkDH7DhYZUAkKfVg0EyeBdTaR7uO2YI4hZ
-        HRI7Q8x245lQP+6OQwJaYD5OYx/rUBTKg7pdPVELOk9vAxejZ1XpqKEAEY4MWoJCkR0qqZ
-        OD6zI0fQljcNHxPij2ZhdbH8kLuZ7t5XY0AHNAfp+q2ktfxLeFsh8nItzBPqVjJnE5IY3E
-        2ujkdv81Jt/FF9HIplAlmD/WzzOSc91bvyz7JgiowZIA8npq3wdTtvhABXePpQMEnkgLjG
-        uMPfy+nMX2t7w7CDmRz+o7BBgTl3SF56Cf8p5Sgqwsf12cJwNS7sYEfogeJibg==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Moritz Duge <duge@pre-sense.de>,
-        Thorsten Leemhuis <regressions@leemhuis.info>
+        with ESMTP id S1353588AbiEDQra (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 May 2022 12:47:30 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C475546B14;
+        Wed,  4 May 2022 09:43:53 -0700 (PDT)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1nmI6O-0001sG-7M; Wed, 04 May 2022 18:43:48 +0200
+Message-ID: <29f90334-53dc-4926-fc38-420b4d024f1b@leemhuis.info>
+Date:   Wed, 4 May 2022 18:43:47 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: Regression: CIFS umount fails since 14302ee33 with some servers
+ (exit code 32)
+Content-Language: en-US
+To:     Paulo Alcantara <pc@cjr.nz>, Moritz Duge <duge@pre-sense.de>
 Cc:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
         Aurelien Aptel <aaptel@suse.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: Re: Regression: CIFS umount fails since 14302ee33 with some servers
- (exit code 32)
-In-Reply-To: <64a7de55-8f93-8e7a-4102-26f7d4dbe1dc@pre-sense.de>
 References: <715d745d-5a85-092a-68c2-b9b1dd8ad53e@leemhuis.info>
  <5fc82f02-be3a-6bb4-0800-aaf19a782655@leemhuis.info>
- <64a7de55-8f93-8e7a-4102-26f7d4dbe1dc@pre-sense.de>
-Date:   Wed, 04 May 2022 13:25:10 -0300
-Message-ID: <87zgjx1d09.fsf@cjr.nz>
-MIME-Version: 1.0
-Content-Type: text/plain
+ <64a7de55-8f93-8e7a-4102-26f7d4dbe1dc@pre-sense.de> <87zgjx1d09.fsf@cjr.nz>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <87zgjx1d09.fsf@cjr.nz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1651682633;2b562ad7;
+X-HE-SMSGID: 1nmI6O-0001sG-7M
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Moritz Duge <duge@pre-sense.de> writes:
+On 04.05.22 18:25, Paulo Alcantara wrote:
+> Moritz Duge <duge@pre-sense.de> writes:
+> 
+>> I'm still waiting for a reply from Paul.
+> 
+> The bug is currently being handled at [1].  Enzo has also asked you to
+> send us network traces in [2] and you haven't sent any, yet.
 
-> I'm still waiting for a reply from Paul.
+Many thx for the update.
 
-The bug is currently being handled at [1].  Enzo has also asked you to
-send us network traces in [2] and you haven't sent any, yet.
+> I'm not "Paul", BTW.
 
-I'm not "Paul", BTW.
+Paulo, please accept my apologies, that was my fault.
 
-[1] https://bugzilla.opensuse.org/show_bug.cgi?id=1194945
-[2] https://bugzilla.opensuse.org/show_bug.cgi?id=1194945#c13
+> [1] https://bugzilla.opensuse.org/show_bug.cgi?id=1194945
+> [2] https://bugzilla.opensuse.org/show_bug.cgi?id=1194945#c13
+
+#regzbot link: https://bugzilla.opensuse.org/show_bug.cgi?id=1194945
+
+Ciao, Thorsten
