@@ -2,64 +2,90 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EDAC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 01:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EFBC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 05:43:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343866AbiEDCAV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 May 2022 22:00:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
+        id S1343940AbiEDFrY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 4 May 2022 01:47:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344196AbiEDB7T (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 May 2022 21:59:19 -0400
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A007B397
-        for <linux-cifs@vger.kernel.org>; Tue,  3 May 2022 18:55:07 -0700 (PDT)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 0758F7FC20;
-        Wed,  4 May 2022 01:55:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1651629305;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dwNFwCRChxlF1KBbAXAX4++Fz1Y4biDFvUf4yQwdrfU=;
-        b=m2WfpqzPHFL4/HL0RpBO6/sKPv5f4pIw2JcDW7FW/XzG8ktGFDUUaMdDLHcaSE1p7B+SoO
-        Y6yMM/gZDLp/cOeHjIbFIpFi03GSsg5cCLUdTiIgcDyidEl3JZIRTbKPDXphqQI3369fRg
-        oE9N3HE6yF1vdOUp/KwELsyF12wPYd/WiclSJpgyvBCJogqs0hyFiHEzDk1uq+41e/6hLe
-        bDn92IJOtDFjT/yrOeulHirT0xJFD6T9+zzu3vD5w7fxmZc0kGOti7F40OJFqq0I8TvXI/
-        P1jga+ijvwAKd5GqpWoTJ9C71TWYKeOToiJtT1YcPZWa4N9CYLq3T4tDeIl5vw==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] cifs: cache dirent names for cached directories
-In-Reply-To: <20220504014407.2301906-2-lsahlber@redhat.com>
-References: <20220504014407.2301906-1-lsahlber@redhat.com>
- <20220504014407.2301906-2-lsahlber@redhat.com>
-Date:   Tue, 03 May 2022 22:55:01 -0300
-Message-ID: <8735hq2hai.fsf@cjr.nz>
+        with ESMTP id S230474AbiEDFrX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 May 2022 01:47:23 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38F7726112;
+        Tue,  3 May 2022 22:43:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=TatprxO4xZzU4ESyGnkidUF+o4GoftI+QmBq5qqUcsk=; b=XFBowGi34o1WrJgRi8WIGJb6Xf
+        z4i5namwqTAY6ynnqw6+qyOLfpof0m1jFPULcaHDe2qwps9gntBlaaWi/DPMTlOj/b+9CaPYJh0LE
+        NImUPO3O9FJ3oDvG/RP3aFIYmJoC3GrhkPjyuj+Bcl4q01L8Eaewif7dX5tVUCX+C6bo5PX+xqsqE
+        Ngy/fm+pegLfkDLIENYThIw0b2zlnFgjGFex033aJACY0tnNDl9DdURaRnm78To35TK4M+vsqd4Rn
+        QwvkZFC9PGg2uK0F9qAjOlaEGXHhhY48OSbZUb0QeR1nEly/jMalCfMyFEkhDpspOamNiTX0k1ZuX
+        8Wxuuxe/LaX2lS7wAgdo8JEJ3Ush3rel8qwz/COwRogyTHtCSdPwbUyhThktUFsRCckss7KDowuNa
+        PY1WHXF2r0BA9A50ZKwL513eqEiQuU2zcH4McVbI3pSAcJtmVHg7o097JfwFoe8GRaCBBBJVei1OE
+        +INE1IHAFkOGhRJ3zINWpB61;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1nm7nd-0041Oj-8c; Wed, 04 May 2022 05:43:45 +0000
+Message-ID: <7dc6c729-73cd-74be-eec7-ac4a0013f60f@samba.org>
+Date:   Wed, 4 May 2022 00:43:42 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: CIFS regression mounting vers=1.0 NTLMSSP when hostname is too
+ long
+Content-Language: en-US
+To:     Paulo Alcantara <pc@cjr.nz>, Byron Stanoszek <gandalf@winds.org>
+Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <e6837098-15d9-acb6-7e34-1923cf8c6fe1@winds.org>
+ <878rri2i6o.fsf@cjr.nz>
+From:   Steven French <sfrench@samba.org>
+In-Reply-To: <878rri2i6o.fsf@cjr.nz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ronnie Sahlberg <lsahlber@redhat.com> writes:
+makes sense - do you see anything related in the NTLMSSP doc?
 
-> Cache the names of entries for cached-directories while we have a lease held.
-> This allows us to avoid expensive calls to the server when re-scanning
-> a cached directory.
+Want to spin up a patch for SMB1 for this?
+
+On 5/3/22 20:35, Paulo Alcantara wrote:
+> Byron Stanoszek <gandalf@winds.org> writes:
 >
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/cifsglob.h |  84 ++++++++++++++--------
->  fs/cifs/misc.c     |   2 +
->  fs/cifs/readdir.c  | 173 ++++++++++++++++++++++++++++++++++++++++++---
->  fs/cifs/smb2ops.c  |  18 ++++-
->  4 files changed, 236 insertions(+), 41 deletions(-)
-
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+>> I would like to report a regression in the CIFS fs. Sometime between Linux 4.14
+>> and 5.16, mounting CIFS with option vers=1.0 (and
+>> CONFIG_CIFS_ALLOW_INSECURE_LEGACY=y set appropriately) with security type
+>> NTLMSSP stopped working for me. The server side is a Windows 2003 Server.
+>>
+>> I found that this behavior depends on the length of the Linux client's
+>> host+domain name (e.g. utsname()->nodename), where the mount works as long as
+>> the name is 16 characters or less. Anything 17 or above returns -EIO, per the
+>> following example:
+> Looks like your server is expecting the WorkstationName field in
+> AUTHENTICATE_MESSAGE payload to be 16 bytes long.  That is, NetBIOS name
+> length as per rfc1001.
+>
+>> I implemented a workaround using the following patch:
+>>
+>> Signed-off-by: Byron Stanoszek <gandalf@winds.org>
+>> ---
+>> --- a/fs/cifs/cifsglob.h
+>> +++ b/fs/cifs/cifsglob.h
+>> @@ -101,7 +101,7 @@
+>>    #define XATTR_DOS_ATTRIB "user.DOSATTRIB"
+>>    #endif
+>>
+>> -#define CIFS_MAX_WORKSTATION_LEN  (__NEW_UTS_LEN + 1)  /* reasonable max for client */
+>> +#define CIFS_MAX_WORKSTATION_LEN 16
+>>
+>>    /*
+>>     * CIFS vfs client Status information (based on what we know.)
+>>
+>> I don't know if this patch is correct or will have any real effect outside of
+>> the NTLMSSP session connect sequence, but it worked in my case.
+> Perhaps we should be use TCP_Server_Info::workstation_RFC1001_name in
+> fs/cifs/sess.c:build_ntlmssp_auth_blob() instead only when connecting to
+> old servers by using insecure dialects -- like SMB1, in your case.
