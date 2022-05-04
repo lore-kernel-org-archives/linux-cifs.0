@@ -2,154 +2,236 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CDDFC433FE
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 13:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 652E2C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 16:22:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347485AbiEDNo3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 4 May 2022 09:44:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33358 "EHLO
+        id S1353046AbiEDQ0C (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 4 May 2022 12:26:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235194AbiEDNo3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 May 2022 09:44:29 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C511615700
-        for <linux-cifs@vger.kernel.org>; Wed,  4 May 2022 06:40:52 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id k126-20020a1ca184000000b003943fd07180so853097wme.3
-        for <linux-cifs@vger.kernel.org>; Wed, 04 May 2022 06:40:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3Qlk9s81S/TU40LcE0QlCxCmDQs/ITviUVCm9ssWplo=;
-        b=VuURli4/43kfRfAc4HxdNl21EBfZTtMpBP0QmcdgFHtlbPEwXuzz6YcC9X+a3wEDFT
-         s0z4sOcLzIPV/v/Nqj3wuuU38MVhcK9NWQSiDNDcfwK3O0V8c9xm6OjwDu1J9yAfhBM3
-         t/Hpoz0CWXnKM/ROAhs++ZaSrcgaZuqUyMWp7n7WPoiKFqJwF3Zdwag4MpW/9tXPM/ZE
-         9t7GYlUKvi0ZlhH7sUZ5NOBIXvpOpvyzdtwqBFBbwUO/g1aIkSU9C7WfC20o3NyhxmFw
-         0hDgVMWjkOc8gDN6jaivb/Q78Sdo/heIDUxSBXkHSdS+3NSuKabXUPkHSG/4UKVWhuF5
-         i6Ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3Qlk9s81S/TU40LcE0QlCxCmDQs/ITviUVCm9ssWplo=;
-        b=uErfLX2FgxZqC1d6U8B3wP6cIBRmhot2DxvZ6DkVpMcqQsZtMCUvX4f5rUmjlvGtS8
-         yY483XQLJbTHAAgbZz05/l6yQHUDd8dxo57ZYOtJiH5Q4vv6roZparYAzeRZkJmZwim1
-         QcBlE2o8sJq9v2pQqdmwL/t5hwgOY6EK/Ox5HaYZlIE3okJkhlXGedMBwLoCyqb5h4H5
-         NP2uGaqAuey3GKJ+aQtlUWmeurq/gFGmS6INo18fSSwpKXSXovx4P1G9BzO+gjRwsrcb
-         EQTMwlzwVyxIDzLyo1mOq48v9UIUeewV+f5Gg5fn9OYbWv0aaAUE9kGLenuPHdimGEiJ
-         n7PQ==
-X-Gm-Message-State: AOAM531wxzreCY9ppnPz3VkAWM7uy2FCC+jmQMTRerXtomAONbt2aESv
-        ZPezdJ4Ym47fKSf8nlpF/4Lk/K6BJho7YUEj
-X-Google-Smtp-Source: ABdhPJwajQx+hslnS72AQDbJpz+2meKyVEAC6VcwUnYqpPoVLaIgcmw9LB6awtEv6uxY/LwsUSzI+A==
-X-Received: by 2002:a1c:f207:0:b0:38e:9aac:df41 with SMTP id s7-20020a1cf207000000b0038e9aacdf41mr7700179wmc.14.1651671651044;
-        Wed, 04 May 2022 06:40:51 -0700 (PDT)
-Received: from marios-t5500.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
-        by smtp.gmail.com with ESMTPSA id n21-20020a7bc5d5000000b003942a244f47sm4542217wmk.32.2022.05.04.06.40.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 06:40:50 -0700 (PDT)
-From:   Marios Makassikis <mmakassikis@freebox.fr>
-To:     linux-cifs@vger.kernel.org
-Cc:     Marios Makassikis <mmakassikis@freebox.fr>,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2] ksmbd: validate length in smb2_write()
-Date:   Wed,  4 May 2022 15:40:10 +0200
-Message-Id: <20220504134009.2586828-1-mmakassikis@freebox.fr>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S234286AbiEDQ0B (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 May 2022 12:26:01 -0400
+X-Greylist: delayed 598 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 May 2022 09:22:24 PDT
+Received: from mail.pre-sense.de (blockout.pre-sense.de [213.238.39.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1CCC366B4;
+        Wed,  4 May 2022 09:22:24 -0700 (PDT)
+Received: from smtp.pre-sense.de (tetris_b.pre-sense.de [10.9.0.76])
+        by mail.pre-sense.de (Postfix) with ESMTP id C76CC5E5EC;
+        Wed,  4 May 2022 18:12:23 +0200 (CEST)
+Received: from [192.168.37.21] (84.242.30.158.dynamic-pppoe.dt.ipv4.wtnet.de [84.242.30.158])
+        by smtp.pre-sense.de (Postfix) with ESMTPS id 0BD191DF2;
+        Wed,  4 May 2022 18:12:24 +0200 (CEST)
+Message-ID: <64a7de55-8f93-8e7a-4102-26f7d4dbe1dc@pre-sense.de>
+Date:   Wed, 4 May 2022 18:12:22 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: Regression: CIFS umount fails since 14302ee33 with some servers
+ (exit code 32)
+Content-Language: en-US
+To:     Thorsten Leemhuis <regressions@leemhuis.info>,
+        "Paulo Alcantara (SUSE)" <pc@cjr.nz>
+Cc:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <stfrench@microsoft.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+References: <715d745d-5a85-092a-68c2-b9b1dd8ad53e@leemhuis.info>
+ <5fc82f02-be3a-6bb4-0800-aaf19a782655@leemhuis.info>
+From:   Moritz Duge <duge@pre-sense.de>
+Autocrypt: addr=duge@pre-sense.de; keydata=
+ xsFNBFd2ig0BEADEaxkuIxg5kHS9mR5PbKoveWUz/m0xE77TuNYK75l7hN20r0efC1ENJ2N6
+ Rmvn8ufq/lOZ8Lc9kJ16tSNYydorZL85/yTrUJI2llROlZI326PPfs3K+4yIlY7q0EqaPjNN
+ Ta5vD4PgZAztTeo+85IGANI2pn9c+aciTfmjZHFEkR/AsenUGJHxtGch5hM0ZrSKR55jjIO7
+ 8ZvGaYnLQVeyWeP1kjbxdoZLqewRUD2JbEGCiLBt/q4tXMygvcJ2OHdssxNUjNFkxllVs80c
+ BDXQm5Koxx+SEF925iFUDy7Ziw/JCbzwJFVAtZjMUb/rnrrBpZ1lgE0+E7lGyN4NX3CY8G88
+ 3fi+ZRWhxJeGkXBFENSWCNriDxnWZLzGkTilBFNQANSx2m4BkW9NIJnwyaCQxVj/vbfD4gSD
+ ltaH6jl3obTdH1GZ9kyUNHqW6jFggcXKAlRdYfR9UWZvfkb9CIyRNzRUrx2vKRdL16+TSvKe
+ Vzb2X/3j+Xvu/U+dXLOtfoRbNzf5tahHy3bwM8p7MCm5oQM6FwO5lMZsa7eQRof51/krwSWA
+ r+reHZe06INy9ngxbA8YTWmzB1dlKPj5ZTZ2QPgyZD4hce5Kjo/+Xqgybagdlu3jb4xMWRFJ
+ Qhyz6Ma/M7k14M1Ehj5N59MGL8DZXJuQZOlwfU7stAZX5BAqVQARAQABzUFNb3JpdHogRHVn
+ ZSAod29yayByZWxhdGVkIGNvbW11bmljYXRpb24gb25seSkgPGR1Z2VAcHJlLXNlbnNlLmRl
+ PsLBlgQTAQoAQAIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAFiEEGkJ4nJCHkYc10aoW
+ j4gxDRbNuS4FAmASjc4FCQ4/nkEACgkQj4gxDRbNuS7ooxAApvLAq9LXHaegYJ3dSlPM2qqK
+ hMhOer89dMcRQ+9QIRqHN7AeAMkxxa+H1bfrFefMg6Kk2lwhDopkrbJR6vWUNspRG2kVOsED
+ ExtvKZ7KImtgM1udu4mKdRS8QJbYe+qV4m6gHU3IrPiA23t/kUzpkk8tmCr2zoA/9RdJu+BN
+ uSQFb2bRN4YtM8w8wAAXOQAXFrlqnNbJZTC8EiFs/A/RpdIBPolTvX1FCFROC2A+cZby1Wu8
+ NnJjWyTKb+WktmS866Dubdvdgvd4IjXARY8qxsCnIsy3hzImVKs4qAEpwVD7r/lqa3aR8bsh
+ UN2SAMWHktA+brzRPbYk7lZkxuU6kAdtQQLTFVWoDndBkHKxBB3rP9xobiL0Htv6fOdVzbTq
+ BMs142aWTMX7PabAO9AcDwdXaMbHQXx1j+J5hBUpIRahDFeZv4vH+uCL5nB6Yl5iqHLr9dtv
+ ttnQq34UOX3cqopKO1sW1cI0a2d3lQPP/bnANzZ72vXnkIG4a9QAVQt/9O/vRuiSGanjlRkq
+ FeFh8JsyyUcMubx7rUeTolHKHTtBvi5bjY/qgRwnR+iXjkdfh8NoYl9n6dpsdQag3SAz3jbc
+ js/QdenrcOTQzsmw7SjLmkQ77ks7yoL10YdGaqGdXck71twhUjBN70QeUsvhAfp+erJ/ywWM
+ fRpO17q2zZ3OwU0EV3aKDQEQALuAZikBlL9W5sP2l5nZdOZufNLvUC1SHg8EGJEdzej0dEIk
+ K8vFFkImJ9w9izfYvWSHCquUOPiXK60RKHwjG/2x5IFRVTsaxSEnCrJcOjjtzk1VQtz6YTjQ
+ NsJJg2aptvPoaYGJXZQi0AjBnJ+vwurcQZHee5CZsdUI0fcmuF41XmwScYbjqB2SUegy3Tza
+ I5gH5hG0P1CYQIvFD3gBbvzIUGL8/pUYgrpalYa8AyyB5CglmmlOPXWorMRILYFSnm2LqQpJ
+ Si4ufgoItqdcVygrP/Jgn6bJIREDyZroaoW3mJeW+U11aqxQUeEF64fZ0x7piJospTLqjU6t
+ lmjjOihHKPXLVKt+qjYxz/G30TEr8n2iPA8ElXrUNOVper70aor43LLD35mcIh6/NBPWzXPi
+ 7Jf6PLLYk76RRpSD288g1FClodI6IIVzauFUWbdl9K7OM2L0lTzR5mkooRhXdpzfw4sA/NR0
+ rQvWOSYyv+VbhYodChFybxaHmz3wOkCh7w22Rcz9neTo1FFFZfX+tbu7UN5DYIZAQrDP/1NY
+ +fowASBkOkLRUllWbTKLwD9VHKCIDEsVSqHFZgL/wgSnvg9UXXMxeHvkDHmfIY+PWpvkiltw
+ lhNri2lu7LwwDuqAYrubRQ82KYKBagcey53H7dMXJ9JeaEeKmjfO+1ikuKwxABEBAAHCwXwE
+ GAEKACYCGwwWIQQaQnickIeRhzXRqhaPiDENFs25LgUCYBKN0wUJDj+eRgAKCRCPiDENFs25
+ Ll4HEACthTVfAjRC+z1VXHqM4prAMFxl0zd9A5UTicCqk5/kMG1rrFtpBaf0PbEnmZsgjBCp
+ pcX4ozIM+5KtHpZss3EnuRXfNObXGI2fbeLAqQQWv01R5rgrJKoafYomTPmfmfJS7FdtzzHN
+ vrRe7MFBAqUtC7SGX7Q2/DSnMBDi6jZMN+wk5xUHmcK+H6jW5v7m2HOCOM95QV4q13FLjWVh
+ hs5Sytm7BgMgLD+/GN92u9DtIsogNNgRUR2A7ugq4p3E1JqJZOyMQaa/E8eAcrmAE09gGr8L
+ bSKSo4b6Td0pOjzMYfOmfFzaSd/G7pYfKgMIKTungATntkbBWVBnRdGvAHRdwK6fsIpulNei
+ dQSJhF3PnVa9+oQgrpAVCaE4L40kAyxUOMzBB6KuSO6/IuDoiFAc3IfZh5/RS2MvIULn0nSA
+ jDdTVY7LROI8xKrVQL21HPbfHb/pV7KaiS/HwAfM0Msb/+3aJJsp8CEqNe4eOqr5Dnj5AP9r
+ rxeWgTaQaZ5mwinBvbnnKNKESFsdNi8hEYXhHYs+Gu1rKHMv5vY4M9+GT4tCRs7C/v3sxWN+
+ 2kJAUQtAQMIpSSaPIFQt0onAVrJZX680qQEzfBT0Xh93iMVuUbcSzSk6QFDUagaDy0lvsfti
+ jxz8YwP79RngG2xGM9kI9AgLt7T/S/Ei8x1yBkHyVw==
+Organization: PRESENSE Technologies GmbH
+In-Reply-To: <5fc82f02-be3a-6bb4-0800-aaf19a782655@leemhuis.info>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------osYFDXJN0RTZ0crL0W29qUCY"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The SMB2 Write packet contains data that is to be written
-to a file or to a pipe. Depending on the client, there may
-be padding between the header and the data field.
-Currently, the length is validated only in the case padding
-is present.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------osYFDXJN0RTZ0crL0W29qUCY
+Content-Type: multipart/mixed; boundary="------------kXnQYx9Zcl0OZkoyqBmrGBUI";
+ protected-headers="v1"
+From: Moritz Duge <duge@pre-sense.de>
+To: Thorsten Leemhuis <regressions@leemhuis.info>,
+ "Paulo Alcantara (SUSE)" <pc@cjr.nz>
+Cc: "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+ Aurelien Aptel <aaptel@suse.com>, Ronnie Sahlberg <lsahlber@redhat.com>,
+ Steve French <stfrench@microsoft.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Message-ID: <64a7de55-8f93-8e7a-4102-26f7d4dbe1dc@pre-sense.de>
+Subject: Re: Regression: CIFS umount fails since 14302ee33 with some servers
+ (exit code 32)
+References: <715d745d-5a85-092a-68c2-b9b1dd8ad53e@leemhuis.info>
+ <5fc82f02-be3a-6bb4-0800-aaf19a782655@leemhuis.info>
+In-Reply-To: <5fc82f02-be3a-6bb4-0800-aaf19a782655@leemhuis.info>
 
-Since the DataOffset field always points to the beginning
-of the data, there is no need to have a special case for
-padding. By removing this, the length is validated in both
-cases.
+--------------kXnQYx9Zcl0OZkoyqBmrGBUI
+Content-Type: multipart/mixed; boundary="------------HP1rgS1mHeAAOMygkmDQckEr"
 
-Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
----
-The previous patch did not apply cleanly with git-am.
+--------------HP1rgS1mHeAAOMygkmDQckEr
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
- fs/ksmbd/smb2pdu.c | 49 ++++++++++++++++++----------------------------
- 1 file changed, 19 insertions(+), 30 deletions(-)
+SGkgVGhvcnN0ZW4sDQoNCkknbSBzdGlsbCB3YWl0aW5nIGZvciBhIHJlcGx5IGZyb20gUGF1
+bC4NCg0KSSdtIG5vdCBhIGtlcm5lbCBkZXZlbG9wZXIgYW5kIEkgcmVwb3J0ZWQgZXZlcnl0
+aGluZyBJIGtub3cgYWJvdXQNCnRoZSBidWcuIEluY2x1ZGluZyB0aGUgcmVzdWx0IG9mIGEg
+R2l0IGJpc2VjdCwgc2hvd2luZyB0aGUNCnByb2JsZW1hdGljIGNvbW1pdC4NCg0KU28gY3Vy
+cmVudGx5IEkgZG9uJ3Qgc2VlIG11Y2ggZWxzZSBJIGNhbiBkby4NCg0KDQpLaW5kIHJlZ2Fy
+ZHMsDQpNb3JpdHoNCg0KDQpBbSAwNC4wNS4yMiB1bSAxNToxOSBzY2hyaWViIFRob3JzdGVu
+IExlZW1odWlzOg0KPiBIaSwgdGhpcyBpcyB5b3VyIExpbnV4IGtlcm5lbCByZWdyZXNzaW9u
+IHRyYWNrZXIuIFRvcC1wb3N0aW5nIGZvciBvbmNlLA0KPiB0byBtYWtlIHRoaXMgZWFzaWx5
+IGFjY2Vzc2libGUgdG8gZXZlcnlvbmUuDQo+IA0KPiBQYXVsLCBNb3JpdHosIHdoYXQncyB0
+aGUgc3RhdHVzIGhlcmU/IEl0IHNlZW1zIG5vdGhpbmcgaGFwcGVuZWQgYXQgYWxsDQo+IHNp
+bmNlIGJlbG93IG1haWwuIFdhcyB0aGUgaXNzdWUgZml4ZWQ/IE9yIGRpZCBpdCBmYWxsIHRo
+cm91Z2ggdGhlIGNyYWNrcz8NCj4gDQo+IENpYW8sIFRob3JzdGVuICh3ZWFyaW5nIGhpcyAn
+dGhlIExpbnV4IGtlcm5lbCdzIHJlZ3Jlc3Npb24gdHJhY2tlcicgaGF0KQ0KPiANCj4gUC5T
+LjogQXMgdGhlIExpbnV4IGtlcm5lbCdzIHJlZ3Jlc3Npb24gdHJhY2tlciBJIGRlYWwgd2l0
+aCBhIGxvdCBvZg0KPiByZXBvcnRzIGFuZCBzb21ldGltZXMgbWlzcyBzb21ldGhpbmcgaW1w
+b3J0YW50IHdoZW4gd3JpdGluZyBtYWlscyBsaWtlDQo+IHRoaXMuIElmIHRoYXQncyB0aGUg
+Y2FzZSBoZXJlLCBkb24ndCBoZXNpdGF0ZSB0byB0ZWxsIG1lIGluIGEgcHVibGljDQo+IHJl
+cGx5LCBpdCdzIGluIGV2ZXJ5b25lJ3MgaW50ZXJlc3QgdG8gc2V0IHRoZSBwdWJsaWMgcmVj
+b3JkIHN0cmFpZ2h0Lg0KPiANCj4gI3JlZ3pib3QgcG9rZQ0K
+--------------HP1rgS1mHeAAOMygkmDQckEr
+Content-Type: application/pgp-keys; name="OpenPGP_0x8F88310D16CDB92E.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x8F88310D16CDB92E.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 16c803a9d996..2bdfe449b2da 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -6328,23 +6328,18 @@ static noinline int smb2_write_pipe(struct ksmbd_work *work)
- 	length = le32_to_cpu(req->Length);
- 	id = req->VolatileFileId;
- 
--	if (le16_to_cpu(req->DataOffset) ==
--	    offsetof(struct smb2_write_req, Buffer)) {
--		data_buf = (char *)&req->Buffer[0];
--	} else {
--		if ((u64)le16_to_cpu(req->DataOffset) + length >
--		    get_rfc1002_len(work->request_buf)) {
--			pr_err("invalid write data offset %u, smb_len %u\n",
--			       le16_to_cpu(req->DataOffset),
--			       get_rfc1002_len(work->request_buf));
--			err = -EINVAL;
--			goto out;
--		}
--
--		data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
--				le16_to_cpu(req->DataOffset));
-+	if ((u64)le16_to_cpu(req->DataOffset) + length >
-+	    get_rfc1002_len(work->request_buf)) {
-+		pr_err("invalid write data offset %u, smb_len %u\n",
-+		       le16_to_cpu(req->DataOffset),
-+		       get_rfc1002_len(work->request_buf));
-+		err = -EINVAL;
-+		goto out;
- 	}
- 
-+	data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
-+			   le16_to_cpu(req->DataOffset));
-+
- 	rpc_resp = ksmbd_rpc_write(work->sess, id, data_buf, length);
- 	if (rpc_resp) {
- 		if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
-@@ -6489,22 +6484,16 @@ int smb2_write(struct ksmbd_work *work)
- 
- 	if (req->Channel != SMB2_CHANNEL_RDMA_V1 &&
- 	    req->Channel != SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
--		if (le16_to_cpu(req->DataOffset) ==
--		    offsetof(struct smb2_write_req, Buffer)) {
--			data_buf = (char *)&req->Buffer[0];
--		} else {
--			if ((u64)le16_to_cpu(req->DataOffset) + length >
--			    get_rfc1002_len(work->request_buf)) {
--				pr_err("invalid write data offset %u, smb_len %u\n",
--				       le16_to_cpu(req->DataOffset),
--				       get_rfc1002_len(work->request_buf));
--				err = -EINVAL;
--				goto out;
--			}
--
--			data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
--					le16_to_cpu(req->DataOffset));
-+		if ((u64)le16_to_cpu(req->DataOffset) + length >
-+		    get_rfc1002_len(work->request_buf)) {
-+			pr_err("invalid write data offset %u, smb_len %u\n",
-+			       le16_to_cpu(req->DataOffset),
-+			       get_rfc1002_len(work->request_buf));
-+			err = -EINVAL;
-+			goto out;
- 		}
-+		data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
-+				    le16_to_cpu(req->DataOffset));
- 
- 		ksmbd_debug(SMB, "flags %u\n", le32_to_cpu(req->Flags));
- 		if (le32_to_cpu(req->Flags) & SMB2_WRITEFLAG_WRITE_THROUGH)
--- 
-2.25.1
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
+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
+S/Ei8x1yBkHyVw=3D=3D
+=3D2jFE
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------HP1rgS1mHeAAOMygkmDQckEr--
+
+--------------kXnQYx9Zcl0OZkoyqBmrGBUI--
+
+--------------osYFDXJN0RTZ0crL0W29qUCY
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEEGkJ4nJCHkYc10aoWj4gxDRbNuS4FAmJypeYFAwAAAAAACgkQj4gxDRbNuS4i
+DBAAtS4dEFOKgztnvEKebd6AoMPGjAsU/39ODmoImxlZoiKS8YGHtqpU7yNdMWjoVyvadEZHP7DU
+ItbmdlIC/EqizC7vbkDAgC/lT42AkKESVDInfcZRHoIJCzECE9wmyHhbwidtJjGiJZA+duI1uSVZ
+MdXzcAGBdG40jmunUSgJ626+0jp+H17SFxmE7PTKcI3+pFjIcWnNC0ktSLg0mRBgRs2M65FKplvq
+A3hxRk+ZxrnMwKTiOamlJucQIAIcpbB5E0BlvqnV0LkPQzUqGpjY3W7Kbu2PspFEeUvUrFOMqLLU
+3+Vcv86L9MWz5/7zKuC49DO+030prWaKCy4W3pvzGZKWxFG2cz+Ley1ZHIbfCdWPfEtL/QcbjJSk
+WjxDgFNPYqRchk1DY1+uqa60wLEaFkU+s5pttHapCqAfWh1spIaOmbzpWcSSbDQo8zXXqqUZFrTp
+qMhDXSam0syuc5/vvpMaeeOz6ccwdY2uV76o+Fi7olJVdX/Zh60SQe/XiiuvMt2aRQOqRk/7Tg5H
+vA8OEX+yELM6JxheZ3D5kUWQ4D9kSqSTk90EDjDaj5jIpmCdOPqAq26DaOT7v2g+mWQrGXaO7G4z
+j+6C5NvxmomuL0ko1uu4/CGFdqzaWNYMKN+qUGhL+TsKGW21i/AXANN9fbbpwqBnu85eC4ydi5/H
+mUE=
+=C5AZ
+-----END PGP SIGNATURE-----
+
+--------------osYFDXJN0RTZ0crL0W29qUCY--
