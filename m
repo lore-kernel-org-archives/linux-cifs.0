@@ -2,66 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B93AC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 16:43:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0912C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 May 2022 17:08:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345266AbiEDQrb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 4 May 2022 12:47:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47786 "EHLO
+        id S1355490AbiEDRML (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 4 May 2022 13:12:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353588AbiEDQra (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 May 2022 12:47:30 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C475546B14;
-        Wed,  4 May 2022 09:43:53 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1nmI6O-0001sG-7M; Wed, 04 May 2022 18:43:48 +0200
-Message-ID: <29f90334-53dc-4926-fc38-420b4d024f1b@leemhuis.info>
-Date:   Wed, 4 May 2022 18:43:47 +0200
+        with ESMTP id S1356127AbiEDRJD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 May 2022 13:09:03 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A697352B18
+        for <linux-cifs@vger.kernel.org>; Wed,  4 May 2022 09:54:53 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 37595210E3;
+        Wed,  4 May 2022 16:54:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1651683292; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NjN/lUtV32poi40Mde6s1+Ego1F2aRYyyKZNQkMdBn0=;
+        b=U7ray3+cmCDyaAMLS8bR0tWB4ZknsuvqmXOl95CGsh02bvv7F2jtkUeU9yJGzGxv2aeJHs
+        04WI3OCdemBzpvYwyWOQS6WNnyfJImkjDBmWU4O+rIFEAH8ftCLzGtHDFd1yfAUrvjU7Ko
+        GoqKRuIRbHAarl9qSNthRPX3ykkkG84=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1651683292;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NjN/lUtV32poi40Mde6s1+Ego1F2aRYyyKZNQkMdBn0=;
+        b=i4iKn3sB1PI22fRvgEUo+bIVhpi7HNjaG4s23uMwTfTK9JxPQcp4ZJm3tkHRTNWUjkO2Oo
+        Zf5HXKQm+R44YZBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A5FCE131BD;
+        Wed,  4 May 2022 16:54:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id GsFNGduvcmK4VAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Wed, 04 May 2022 16:54:51 +0000
+Date:   Wed, 4 May 2022 13:54:30 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] cifs: cache dirent names for cached directories
+Message-ID: <20220504165430.xptspu37vmhwwesj@cyberdelia>
+References: <20220504014407.2301906-1-lsahlber@redhat.com>
+ <20220504014407.2301906-2-lsahlber@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: Regression: CIFS umount fails since 14302ee33 with some servers
- (exit code 32)
-Content-Language: en-US
-To:     Paulo Alcantara <pc@cjr.nz>, Moritz Duge <duge@pre-sense.de>
-Cc:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Aurelien Aptel <aaptel@suse.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Steve French <stfrench@microsoft.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-References: <715d745d-5a85-092a-68c2-b9b1dd8ad53e@leemhuis.info>
- <5fc82f02-be3a-6bb4-0800-aaf19a782655@leemhuis.info>
- <64a7de55-8f93-8e7a-4102-26f7d4dbe1dc@pre-sense.de> <87zgjx1d09.fsf@cjr.nz>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <87zgjx1d09.fsf@cjr.nz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1651682633;2b562ad7;
-X-HE-SMSGID: 1nmI6O-0001sG-7M
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220504014407.2301906-2-lsahlber@redhat.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 04.05.22 18:25, Paulo Alcantara wrote:
-> Moritz Duge <duge@pre-sense.de> writes:
-> 
->> I'm still waiting for a reply from Paul.
-> 
-> The bug is currently being handled at [1].  Enzo has also asked you to
-> send us network traces in [2] and you haven't sent any, yet.
+On 05/04, Ronnie Sahlberg wrote:
+>+struct cached_dirents {
+>+	bool is_valid:1;
+>+	bool is_failed:1;
 
-Many thx for the update.
+Does it make sense to have both? Do you expect a situation where
+is_valid && is_failed happens? From the patch, I don't see such case and
+the code could be adjusted to use !is_valid where appropriate.
+But let me know if I missed something.
 
-> I'm not "Paul", BTW.
+This is just a cosmetic nitpick, but other than that,
 
-Paulo, please accept my apologies, that was my fault.
+Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
 
-> [1] https://bugzilla.opensuse.org/show_bug.cgi?id=1194945
-> [2] https://bugzilla.opensuse.org/show_bug.cgi?id=1194945#c13
 
-#regzbot link: https://bugzilla.opensuse.org/show_bug.cgi?id=1194945
+Cheers,
 
-Ciao, Thorsten
+Enzo
