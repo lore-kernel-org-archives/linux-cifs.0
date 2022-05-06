@@ -2,181 +2,114 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB061C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  5 May 2022 23:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C1CC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  6 May 2022 02:03:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379004AbiEEXqB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 May 2022 19:46:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51978 "EHLO
+        id S1376482AbiEFCHf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 5 May 2022 22:07:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242876AbiEEXp6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 May 2022 19:45:58 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBF9F40A02
-        for <linux-cifs@vger.kernel.org>; Thu,  5 May 2022 16:42:16 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id r1so5958296oie.4
-        for <linux-cifs@vger.kernel.org>; Thu, 05 May 2022 16:42:16 -0700 (PDT)
+        with ESMTP id S233914AbiEFCHe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 May 2022 22:07:34 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 172856350B;
+        Thu,  5 May 2022 19:03:53 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id j4so10311225lfh.8;
+        Thu, 05 May 2022 19:03:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=TNkAiDLy7yvi5kWoVx96VZzuPUA7t015YwxU4+KFc8w=;
-        b=BRXge4BMM6B1281/LfDtwsprecUPyum3pT44ZPV43EiQ6cugPtTyLR283aAX4mrAo+
-         XZZkJ9pVuxBKUn6gJgB/rnUqMBrdAVT9/6EFxaBO2uddfsJmngXQ7PHOa6ebIyVRA3Ra
-         7idg+8Mvrlp3O/XJ1li7ugjBZH4uv+YqpnkaCCLZiOPt9LHmifiFUVfYfnqkTl1cW9c0
-         kOpD/Ji6UPFQgalRpcIOD/F0ofEEhPiiRniSMwNDQodC6ZQcBUlQVhbmbZ/GWWyo03xR
-         xSKzkl0F72nyoa/oGFqEPNT7nwtCG4ccmDHLOH78pQDeGKDdOV95B/evRy8z62UfZvs3
-         xZGQ==
+         :cc;
+        bh=eKYi26TVId4XJ3rsFQFXxxa0VYH2bEQs/T3TVCsZyWY=;
+        b=Ec7uqiRrmNflD7XqE8xKtpAd0dVTt4z2hC/Q/3cghEDYu9nQ4WBbIvclw4XhXP0I+9
+         JSwNtdxvcAv1pw0Jxq14r+m6b9aV3t/eqB7TQKvUDXZ7LlpInSqdKfD6021JRpDfCgDf
+         AQGGhJW3W7krV/IYrcJjKCKAppOIxPot5Gu+mb47sonPFRHsiN4o6RPoSxFFaLq1c929
+         C1w6cG1OKjerJIPtIGwvIHE4K1owOAvfS5PROutCiy6LVMwjPdIOVTpRrrNad0EneWuD
+         jrvWnvZq4fbBKRLTFACvdrlnAOBIwK9RFF3O4cKq3dUrToKBsCkk7IWNbMo8KS0wIfh2
+         TTrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=TNkAiDLy7yvi5kWoVx96VZzuPUA7t015YwxU4+KFc8w=;
-        b=tIpMkiYZlNHE8ADFvAVlyKq94FcKDRmwqZEAqllU8uTjy0oDyFVWs91gyISNo5uNFs
-         gy1q0wbJpIw94j7wS0ar92urrIvvU+bvVnn7hZebtU/tz3NtK6nhmzII7yec6UxBfyTY
-         rmT2PQHJWh2Me5lbV/PsPPrgGdKYHqW9cmavV3iTEbvntZFFRpVYhd7eKQauMvl9XtrB
-         +D8IWrGtNlbYv9lN6OXH9umSunS5PhlHAo7DJsY/F60+vsk5/xcUpLXSzlWb46J+DLGo
-         TaLSOblK17U3Eb4qX6a6aZClKPVrJTbY5LTJjyFAFO1UT5LuRHXsJWfi1gHhcWz/Ow1Q
-         EBpQ==
-X-Gm-Message-State: AOAM531/JQ6k0w429ieiaFFtpjEOqmCefA47FlW/k1n3Bgv0KpH0WH+g
-        UzMWc1GxKWL58unNU+TEavqUbgRgTuBLaepufV4VayiD
-X-Google-Smtp-Source: ABdhPJyYoYDfVDioH8DGL8gc9EbhzzMkojrrpDzM3xXnUKWPfB/ejhQzedbSMuVAjToaN55qknqrks6uXxYyJR1Toaw=
-X-Received: by 2002:a05:6808:1645:b0:325:5182:a9ca with SMTP id
- az5-20020a056808164500b003255182a9camr326242oib.104.1651794136108; Thu, 05
- May 2022 16:42:16 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=eKYi26TVId4XJ3rsFQFXxxa0VYH2bEQs/T3TVCsZyWY=;
+        b=IuWCopFf/Z+muKyIVeqdqACmWB33+vDcTpJ1/kjKk0s+SjdtKYtqYHvZLIbp6yIJZz
+         4cX2A1TzCmNVbDKaogS75fmS1pXoUzRZtC9QHrIGHFaVx5pwZA0R8dPVXAf4O1wp7+AE
+         qUrTt1/mKDomkE7YVxisSQyW72mbjWiIdylA2xPF63N+MjYqO+6vXnMOpX/XmUa+G9Wp
+         kwzHnFwGJN1pNQZKlN8pT4G1CzsSrl45T1uv7wHErcYXLbnhtlQqDXCtVXxPeksBia+1
+         81pFu/VFgmzDIoKiKfgHaEX1VStTIrOawJWiz7KZdfdPi8G3kDjxcc60n2VkA7NZO71Y
+         dEsw==
+X-Gm-Message-State: AOAM533qi2O0RWpzJQzf4F8xVCVauXo8m16+YYW7OKLhcNZGhM3daRIC
+        Kzwokrb5I5Hm3dm91I27oxTkfD38lNLq2FPRLA4OwLfA
+X-Google-Smtp-Source: ABdhPJwjcMAWpkvBThGpXT7YvOw+TK0nsJdmb/BHZdjmLt7kzH/aqY2LEkptClKfUTR54oxy5V0+/uZO+AFcT7Ns8T8=
+X-Received: by 2002:ac2:484c:0:b0:472:357:f8fb with SMTP id
+ 12-20020ac2484c000000b004720357f8fbmr860295lfy.601.1651802631156; Thu, 05 May
+ 2022 19:03:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220504224640.2865787-1-mmakassikis@freebox.fr>
-In-Reply-To: <20220504224640.2865787-1-mmakassikis@freebox.fr>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Fri, 6 May 2022 08:42:04 +0900
-Message-ID: <CANFS6baVjD13+DyWOve2ng=dKdySBWkZxDtywGECnQ5yNYQFdQ@mail.gmail.com>
-Subject: Re: [PATCH v3] ksmbd: validate length in smb2_write()
-To:     Marios Makassikis <mmakassikis@freebox.fr>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+References: <e6837098-15d9-acb6-7e34-1923cf8c6fe1@winds.org>
+ <878rri2i6o.fsf@cjr.nz> <7dc6c729-73cd-74be-eec7-ac4a0013f60f@samba.org>
+ <87tua51550.fsf@cjr.nz> <df763cb0-83f2-35a5-a381-57cfd040becf@talpey.com> <87r15910c1.fsf@cjr.nz>
+In-Reply-To: <87r15910c1.fsf@cjr.nz>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 5 May 2022 21:03:40 -0500
+Message-ID: <CAH2r5muEMNZ8opMrkR4O5Od3W7oYmSgi9-ytQJqegF=XVJ757w@mail.gmail.com>
+Subject: Re: CIFS regression mounting vers=1.0 NTLMSSP when hostname is too long
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     Tom Talpey <tom@talpey.com>, Byron Stanoszek <gandalf@winds.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello Marios,
+Yes - this makes sense.  Patch would be appreciated (just got back
+from LSF/MM, so catching up after travel)
 
-2022=EB=85=84 5=EC=9B=94 5=EC=9D=BC (=EB=AA=A9) =EC=98=A4=ED=9B=84 4:00, Ma=
-rios Makassikis <mmakassikis@freebox.fr>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=
-=B1:
-
+On Thu, May 5, 2022 at 8:59 PM Paulo Alcantara <pc@cjr.nz> wrote:
 >
-> The SMB2 Write packet contains data that is to be written
-> to a file or to a pipe. Depending on the client, there may
-> be padding between the header and the data field.
-> Currently, the length is validated only in the case padding
-> is present.
+> Tom Talpey <tom@talpey.com> writes:
 >
-> Since the DataOffset field always points to the beginning
-> of the data, there is no need to have a special case for
-> padding. By removing this, the length is validated in both
-> cases.
+> > I think the most conservative and spec-compliant choice should be made.
+> > SMB1 should not be pushing the envelope of interoperability, in this day
+> > and age.
 >
-> Additionally, fix the length check: DataOffset and Length
-> fields are relative to the SMB header start, while the packet
-> length returned by get_rfc1002_len() includes 4 additional
-> bytes.
+> OK.
 >
-
-get_rfc1002_len doesn't include additional 4 bytes.
-Can you check it again?
-
-> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-> ---
-> Change since v2:
->  - the length check was wrong, as it did not account for the rfc1002
->  header in work->request_buf.
+> > I believe the NetBIOS name is a fixed array of 16 octets, right? So, if
+> > the nodename is shorter, it needs to be padded with 0's.
 >
->  fs/ksmbd/smb2pdu.c | 49 ++++++++++++++++++----------------------------
->  1 file changed, 19 insertions(+), 30 deletions(-)
+> Right.
 >
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index 16c803a9d996..23b47e505e2b 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -6328,23 +6328,18 @@ static noinline int smb2_write_pipe(struct ksmbd_=
-work *work)
->         length =3D le32_to_cpu(req->Length);
->         id =3D req->VolatileFileId;
+> > Did this code change recently? Why???
 >
-> -       if (le16_to_cpu(req->DataOffset) =3D=3D
-> -           offsetof(struct smb2_write_req, Buffer)) {
-> -               data_buf =3D (char *)&req->Buffer[0];
-> -       } else {
-> -               if ((u64)le16_to_cpu(req->DataOffset) + length >
-> -                   get_rfc1002_len(work->request_buf)) {
-> -                       pr_err("invalid write data offset %u, smb_len %u\=
-n",
-> -                              le16_to_cpu(req->DataOffset),
-> -                              get_rfc1002_len(work->request_buf));
-> -                       err =3D -EINVAL;
-> -                       goto out;
-> -               }
-> -
-> -               data_buf =3D (char *)(((char *)&req->hdr.ProtocolId) +
-> -                               le16_to_cpu(req->DataOffset));
-> +       if ((u64)le16_to_cpu(req->DataOffset) + length >
-> +           get_rfc1002_len(work->request_buf) - 4) {
-> +               pr_err("invalid write data offset %u, smb_len %u\n",
-> +                      le16_to_cpu(req->DataOffset),
-> +                      get_rfc1002_len(work->request_buf));
-> +               err =3D -EINVAL;
-> +               goto out;
->         }
+> We used to not send the WorkstationName during NTLMSSP until recent
+> patch from Shyam:
 >
-> +       data_buf =3D (char *)(((char *)&req->hdr.ProtocolId) +
-> +                          le16_to_cpu(req->DataOffset));
-> +
->         rpc_resp =3D ksmbd_rpc_write(work->sess, id, data_buf, length);
->         if (rpc_resp) {
->                 if (rpc_resp->flags =3D=3D KSMBD_RPC_ENOTIMPLEMENTED) {
-> @@ -6489,22 +6484,16 @@ int smb2_write(struct ksmbd_work *work)
+>         commit 49bd49f983b5026e4557d31c5d737d9657c4113e
+>         Author: Shyam Prasad N <sprasad@microsoft.com>
+>         Date:   Fri Nov 5 19:03:57 2021 +0000
 >
->         if (req->Channel !=3D SMB2_CHANNEL_RDMA_V1 &&
->             req->Channel !=3D SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
-> -               if (le16_to_cpu(req->DataOffset) =3D=3D
-> -                   offsetof(struct smb2_write_req, Buffer)) {
-> -                       data_buf =3D (char *)&req->Buffer[0];
-> -               } else {
-> -                       if ((u64)le16_to_cpu(req->DataOffset) + length >
-> -                           get_rfc1002_len(work->request_buf)) {
-> -                               pr_err("invalid write data offset %u, smb=
-_len %u\n",
-> -                                      le16_to_cpu(req->DataOffset),
-> -                                      get_rfc1002_len(work->request_buf)=
-);
-> -                               err =3D -EINVAL;
-> -                               goto out;
-> -                       }
-> -
-> -                       data_buf =3D (char *)(((char *)&req->hdr.Protocol=
-Id) +
-> -                                       le16_to_cpu(req->DataOffset));
-> +               if ((u64)le16_to_cpu(req->DataOffset) + length >
-> +                   get_rfc1002_len(work->request_buf) - 4) {
-> +                       pr_err("invalid write data offset %u, smb_len %u\=
-n",
-> +                              le16_to_cpu(req->DataOffset),
-> +                              get_rfc1002_len(work->request_buf));
-> +                       err =3D -EINVAL;
-> +                       goto out;
->                 }
-> +               data_buf =3D (char *)(((char *)&req->hdr.ProtocolId) +
-> +                                   le16_to_cpu(req->DataOffset));
+>             cifs: send workstation name during ntlmssp session setup
 >
->                 ksmbd_debug(SMB, "flags %u\n", le32_to_cpu(req->Flags));
->                 if (le32_to_cpu(req->Flags) & SMB2_WRITEFLAG_WRITE_THROUG=
-H)
-> --
-> 2.25.1
+>             During the ntlmssp session setup (authenticate phases)
+>             send the client workstation info. This can make debugging easier on
+>             servers.
 >
+>             Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+>             Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+>             Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
+>             Signed-off-by: Steve French <stfrench@microsoft.com>
+>
+> Unfortunately some servers did not seem to enforce it to be 16 bytes
+> long, so the reason why we didn't catch it earlier.
+>
+> Steve, Shyam, let me know if it does make sense to you and then I can
+> work on a patch to fix it properly.
 
 
---
+
+-- 
 Thanks,
-Hyunchul
+
+Steve
