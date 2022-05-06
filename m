@@ -2,71 +2,69 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C1CC433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 May 2022 02:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C99C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  6 May 2022 02:20:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376482AbiEFCHf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 May 2022 22:07:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59040 "EHLO
+        id S241640AbiEFCXm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 5 May 2022 22:23:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233914AbiEFCHe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 May 2022 22:07:34 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 172856350B;
-        Thu,  5 May 2022 19:03:53 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id j4so10311225lfh.8;
-        Thu, 05 May 2022 19:03:53 -0700 (PDT)
+        with ESMTP id S235604AbiEFCXm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 May 2022 22:23:42 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3BC4633A1;
+        Thu,  5 May 2022 19:19:59 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id h10so10665476ybc.4;
+        Thu, 05 May 2022 19:19:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=eKYi26TVId4XJ3rsFQFXxxa0VYH2bEQs/T3TVCsZyWY=;
-        b=Ec7uqiRrmNflD7XqE8xKtpAd0dVTt4z2hC/Q/3cghEDYu9nQ4WBbIvclw4XhXP0I+9
-         JSwNtdxvcAv1pw0Jxq14r+m6b9aV3t/eqB7TQKvUDXZ7LlpInSqdKfD6021JRpDfCgDf
-         AQGGhJW3W7krV/IYrcJjKCKAppOIxPot5Gu+mb47sonPFRHsiN4o6RPoSxFFaLq1c929
-         C1w6cG1OKjerJIPtIGwvIHE4K1owOAvfS5PROutCiy6LVMwjPdIOVTpRrrNad0EneWuD
-         jrvWnvZq4fbBKRLTFACvdrlnAOBIwK9RFF3O4cKq3dUrToKBsCkk7IWNbMo8KS0wIfh2
-         TTrg==
+        bh=kqeaKt4VHSC0M6Q7xTIrEAfecmkELADSzjUpCKB9s4E=;
+        b=hxftpkK7H1BhuEkJMKp3T5iT7qVqTe6yWfanW9MMHeAY5I8Q3HqYuAManaLZW2aOtk
+         mZz4Ua8yc2IWXS1jn1cGawbcUvEng4uYgQXBKwWwPKDsvjcRTEFnTTcYV4r+ucj2Ev61
+         E7ZQEk1Ef4dGjyJOR4jn3QWtuYFbZef6u95i+9V4+chneKgtGB9HxpBbtGavLVBPVevh
+         3yq75CLogf7jiEibqcReZq2SC8Ydx9ndCSMhE2iw+w5zfHjkMSTEp/3sB2R6xks2RzGf
+         dNV30IwxoKzCuxR6e3LvYEimqurvOHlsFFr4sZNl/TY37UeiubrxjQ72rdXBfpxswvyf
+         E5rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=eKYi26TVId4XJ3rsFQFXxxa0VYH2bEQs/T3TVCsZyWY=;
-        b=IuWCopFf/Z+muKyIVeqdqACmWB33+vDcTpJ1/kjKk0s+SjdtKYtqYHvZLIbp6yIJZz
-         4cX2A1TzCmNVbDKaogS75fmS1pXoUzRZtC9QHrIGHFaVx5pwZA0R8dPVXAf4O1wp7+AE
-         qUrTt1/mKDomkE7YVxisSQyW72mbjWiIdylA2xPF63N+MjYqO+6vXnMOpX/XmUa+G9Wp
-         kwzHnFwGJN1pNQZKlN8pT4G1CzsSrl45T1uv7wHErcYXLbnhtlQqDXCtVXxPeksBia+1
-         81pFu/VFgmzDIoKiKfgHaEX1VStTIrOawJWiz7KZdfdPi8G3kDjxcc60n2VkA7NZO71Y
-         dEsw==
-X-Gm-Message-State: AOAM533qi2O0RWpzJQzf4F8xVCVauXo8m16+YYW7OKLhcNZGhM3daRIC
-        Kzwokrb5I5Hm3dm91I27oxTkfD38lNLq2FPRLA4OwLfA
-X-Google-Smtp-Source: ABdhPJwjcMAWpkvBThGpXT7YvOw+TK0nsJdmb/BHZdjmLt7kzH/aqY2LEkptClKfUTR54oxy5V0+/uZO+AFcT7Ns8T8=
-X-Received: by 2002:ac2:484c:0:b0:472:357:f8fb with SMTP id
- 12-20020ac2484c000000b004720357f8fbmr860295lfy.601.1651802631156; Thu, 05 May
- 2022 19:03:51 -0700 (PDT)
+        bh=kqeaKt4VHSC0M6Q7xTIrEAfecmkELADSzjUpCKB9s4E=;
+        b=cIdz2usn9e7eLATRCFlhJ1YtMrwN/4PklZy6dOmXH2Et2ooHDxOxLsLre6RNoTSN5s
+         nNtd0whFr1ABIvn5XdWU6K7NBQdZA9RM5/IJ65oGgV96AYdQF6ow/+7OCL5QNiEHhNe+
+         dYaQkw8bEH9scgIsvGlHSEH4F2v6t10v9tKWjYllP/7wfEZWbmk6Qir00SCdsEeQSqml
+         mTZpiqNEzAoN+C1BAjwIym5ur9j+E77QEB0dcCOx5bf95DHW2RkBm1JGWTWoVfXGNYOV
+         2a+iJKtZ0fvuYbCusc/YxMAyX3oQZBD/6wmLSXFs4pj07kOxORZ+NciJ602QKmaxUUON
+         3DaA==
+X-Gm-Message-State: AOAM532DDhBibjrogNPAnnW7vvo7mAY+mhia2a4w3H9kEpt25TSiDcHe
+        LJztUioZhaxJThcaHN93Z0Q/A7h7Mav54URZfAk=
+X-Google-Smtp-Source: ABdhPJxWMxRqJMwszC6ij/Lonrz/SOBQuzMp415ZfJ7BImUVq9Nl4xXNeCwom+1baZVS9TAARDAtSK19VpeVqy93vqc=
+X-Received: by 2002:a05:6902:709:b0:64a:99b:3594 with SMTP id
+ k9-20020a056902070900b0064a099b3594mr837242ybt.493.1651803599053; Thu, 05 May
+ 2022 19:19:59 -0700 (PDT)
 MIME-Version: 1.0
 References: <e6837098-15d9-acb6-7e34-1923cf8c6fe1@winds.org>
  <878rri2i6o.fsf@cjr.nz> <7dc6c729-73cd-74be-eec7-ac4a0013f60f@samba.org>
  <87tua51550.fsf@cjr.nz> <df763cb0-83f2-35a5-a381-57cfd040becf@talpey.com> <87r15910c1.fsf@cjr.nz>
 In-Reply-To: <87r15910c1.fsf@cjr.nz>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 5 May 2022 21:03:40 -0500
-Message-ID: <CAH2r5muEMNZ8opMrkR4O5Od3W7oYmSgi9-ytQJqegF=XVJ757w@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Fri, 6 May 2022 12:19:48 +1000
+Message-ID: <CAN05THQYKRChdR_4T86dGtCO=xY+cWpfa6_fOVNh9WSB=RNE-A@mail.gmail.com>
 Subject: Re: CIFS regression mounting vers=1.0 NTLMSSP when hostname is too long
 To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     Tom Talpey <tom@talpey.com>, Byron Stanoszek <gandalf@winds.org>,
+Cc:     Tom Talpey <tom@talpey.com>, Steven French <sfrench@samba.org>,
+        Byron Stanoszek <gandalf@winds.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Yes - this makes sense.  Patch would be appreciated (just got back
-from LSF/MM, so catching up after travel)
-
-On Thu, May 5, 2022 at 8:59 PM Paulo Alcantara <pc@cjr.nz> wrote:
+On Fri, 6 May 2022 at 11:59, Paulo Alcantara <pc@cjr.nz> wrote:
 >
 > Tom Talpey <tom@talpey.com> writes:
 >
@@ -107,9 +105,12 @@ On Thu, May 5, 2022 at 8:59 PM Paulo Alcantara <pc@cjr.nz> wrote:
 > Steve, Shyam, let me know if it does make sense to you and then I can
 > work on a patch to fix it properly.
 
+This regression should be easy to fix, but maybe we should not have
+done the initial change in the first place.
+If things is broken and do not work under SMB1, that is a good thing.
+Instead of adding features or fixing
+missing parts to SMB1 we should just tell people to switch to SMB2 instead.
 
-
--- 
-Thanks,
-
-Steve
+I think if things do not work correctly or things are missing in smb1,
+that is a GOOD THING.
+:-)
