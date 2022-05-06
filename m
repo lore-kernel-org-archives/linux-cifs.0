@@ -2,115 +2,99 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C99C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 May 2022 02:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A05C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri,  6 May 2022 05:35:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241640AbiEFCXm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 May 2022 22:23:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38640 "EHLO
+        id S236039AbiEFFip (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 6 May 2022 01:38:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235604AbiEFCXm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 May 2022 22:23:42 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3BC4633A1;
-        Thu,  5 May 2022 19:19:59 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id h10so10665476ybc.4;
-        Thu, 05 May 2022 19:19:59 -0700 (PDT)
+        with ESMTP id S241516AbiEFFio (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 6 May 2022 01:38:44 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB6463AA4B
+        for <linux-cifs@vger.kernel.org>; Thu,  5 May 2022 22:35:01 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id i27so12383329ejd.9
+        for <linux-cifs@vger.kernel.org>; Thu, 05 May 2022 22:35:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kqeaKt4VHSC0M6Q7xTIrEAfecmkELADSzjUpCKB9s4E=;
-        b=hxftpkK7H1BhuEkJMKp3T5iT7qVqTe6yWfanW9MMHeAY5I8Q3HqYuAManaLZW2aOtk
-         mZz4Ua8yc2IWXS1jn1cGawbcUvEng4uYgQXBKwWwPKDsvjcRTEFnTTcYV4r+ucj2Ev61
-         E7ZQEk1Ef4dGjyJOR4jn3QWtuYFbZef6u95i+9V4+chneKgtGB9HxpBbtGavLVBPVevh
-         3yq75CLogf7jiEibqcReZq2SC8Ydx9ndCSMhE2iw+w5zfHjkMSTEp/3sB2R6xks2RzGf
-         dNV30IwxoKzCuxR6e3LvYEimqurvOHlsFFr4sZNl/TY37UeiubrxjQ72rdXBfpxswvyf
-         E5rw==
+         :cc:content-transfer-encoding;
+        bh=cd9kPbTL9j8D2DT9jMe8S8r7on0aTJL06Yy5MBtXKIE=;
+        b=inG7JIF4p7G/cPA6PGkgl5bPFuvBTvEZ729KcB3uAFvJnL5cMhn3YL4VGDkCYav3BW
+         0KmMo6X4HRm3dmk/DeCAabAFkKbsAePyA8B8aULvL042O6wkoFw9lci/spWi7Y4ZFT6m
+         67z0tsXG7lAOcbV5EucoDI7MV1amRvMzVXZaqvVfXVliHGrOGKBRZgzFVlbeHYGe2yVU
+         cMecvUtO9ONhZx8+/iT+1SOXsUt+68uCY0+Kpo5bbA5es+YSNI/tsD3VUJC1tt93ifA/
+         5s8iKtwvYsdgP2fLeAjgjSHyBKcLkJrBqC9nmnPfPK35QivYQTFme4WakfmAxA7JpjGS
+         RJOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kqeaKt4VHSC0M6Q7xTIrEAfecmkELADSzjUpCKB9s4E=;
-        b=cIdz2usn9e7eLATRCFlhJ1YtMrwN/4PklZy6dOmXH2Et2ooHDxOxLsLre6RNoTSN5s
-         nNtd0whFr1ABIvn5XdWU6K7NBQdZA9RM5/IJ65oGgV96AYdQF6ow/+7OCL5QNiEHhNe+
-         dYaQkw8bEH9scgIsvGlHSEH4F2v6t10v9tKWjYllP/7wfEZWbmk6Qir00SCdsEeQSqml
-         mTZpiqNEzAoN+C1BAjwIym5ur9j+E77QEB0dcCOx5bf95DHW2RkBm1JGWTWoVfXGNYOV
-         2a+iJKtZ0fvuYbCusc/YxMAyX3oQZBD/6wmLSXFs4pj07kOxORZ+NciJ602QKmaxUUON
-         3DaA==
-X-Gm-Message-State: AOAM532DDhBibjrogNPAnnW7vvo7mAY+mhia2a4w3H9kEpt25TSiDcHe
-        LJztUioZhaxJThcaHN93Z0Q/A7h7Mav54URZfAk=
-X-Google-Smtp-Source: ABdhPJxWMxRqJMwszC6ij/Lonrz/SOBQuzMp415ZfJ7BImUVq9Nl4xXNeCwom+1baZVS9TAARDAtSK19VpeVqy93vqc=
-X-Received: by 2002:a05:6902:709:b0:64a:99b:3594 with SMTP id
- k9-20020a056902070900b0064a099b3594mr837242ybt.493.1651803599053; Thu, 05 May
- 2022 19:19:59 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=cd9kPbTL9j8D2DT9jMe8S8r7on0aTJL06Yy5MBtXKIE=;
+        b=8FeiS48mTb1us4bbdI9dqVqJqtzDPBYDUOIysK4fu4hdMvnIKMN9QYW5cvqi6/FH0G
+         FO+je10V21/g6UdHfNlF4XfsfoZ/fq8xXs41hv3A9Nka3Pij5BNMa0yPF0U+2OOMW4or
+         m5u6m1XCjYqAOHfl2YnMbI21EisfE3bZMADEoGvjbM/LgeQTOqr6f1VWeGpi5GeEyem7
+         tLi6h70UftTVShDRwxx0lKvDkZY+Zolv7KegLHyef77lo1dyvb7Epx30rvF1PESCmdgz
+         Ca3G1ONirGKo27YYedzkehBgdZFvpbnMYfhYZDxRVuDiuQdBQUTZaV8vGXLM0TQYF4l0
+         Cd8Q==
+X-Gm-Message-State: AOAM530rsQjM2cluKzfjlQ1c/AZBzYSSTOlSMiHx5HjV7mbY4/owpWKV
+        vEUMhWOpb9DgS3Ap5ZN61ZUDSeTJNn421SUUjkNy3bDnxrKLzw==
+X-Google-Smtp-Source: ABdhPJxJj8jwwOxsysdhoT+xQRNVWvftvuXbeKogSGKWCJ7QXedkjj9HLW07B2psZQD62neBFzpF9OLHAZUtp1WwgeM=
+X-Received: by 2002:a17:907:3f19:b0:6f5:6b2:9615 with SMTP id
+ hq25-20020a1709073f1900b006f506b29615mr1494978ejc.659.1651815300387; Thu, 05
+ May 2022 22:35:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <e6837098-15d9-acb6-7e34-1923cf8c6fe1@winds.org>
- <878rri2i6o.fsf@cjr.nz> <7dc6c729-73cd-74be-eec7-ac4a0013f60f@samba.org>
- <87tua51550.fsf@cjr.nz> <df763cb0-83f2-35a5-a381-57cfd040becf@talpey.com> <87r15910c1.fsf@cjr.nz>
-In-Reply-To: <87r15910c1.fsf@cjr.nz>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 6 May 2022 12:19:48 +1000
-Message-ID: <CAN05THQYKRChdR_4T86dGtCO=xY+cWpfa6_fOVNh9WSB=RNE-A@mail.gmail.com>
-Subject: Re: CIFS regression mounting vers=1.0 NTLMSSP when hostname is too long
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     Tom Talpey <tom@talpey.com>, Steven French <sfrench@samba.org>,
-        Byron Stanoszek <gandalf@winds.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <20220504224640.2865787-1-mmakassikis@freebox.fr> <CANFS6baVjD13+DyWOve2ng=dKdySBWkZxDtywGECnQ5yNYQFdQ@mail.gmail.com>
+In-Reply-To: <CANFS6baVjD13+DyWOve2ng=dKdySBWkZxDtywGECnQ5yNYQFdQ@mail.gmail.com>
+From:   Marios Makassikis <mmakassikis@freebox.fr>
+Date:   Fri, 6 May 2022 07:34:48 +0200
+Message-ID: <CAF6XXKX17-1D3YMyr_mdCC5nt-zy3fsBpQduVrWPxnLWcdYxDg@mail.gmail.com>
+Subject: Re: [PATCH v3] ksmbd: validate length in smb2_write()
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 6 May 2022 at 11:59, Paulo Alcantara <pc@cjr.nz> wrote:
+On Fri, May 6, 2022 at 1:42 AM Hyunchul Lee <hyc.lee@gmail.com> wrote:
 >
-> Tom Talpey <tom@talpey.com> writes:
+> Hello Marios,
 >
-> > I think the most conservative and spec-compliant choice should be made.
-> > SMB1 should not be pushing the envelope of interoperability, in this day
-> > and age.
+> 2022=EB=85=84 5=EC=9B=94 5=EC=9D=BC (=EB=AA=A9) =EC=98=A4=ED=9B=84 4:00, =
+Marios Makassikis <mmakassikis@freebox.fr>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=
+=84=B1:
 >
-> OK.
+> >
+> > The SMB2 Write packet contains data that is to be written
+> > to a file or to a pipe. Depending on the client, there may
+> > be padding between the header and the data field.
+> > Currently, the length is validated only in the case padding
+> > is present.
+> >
+> > Since the DataOffset field always points to the beginning
+> > of the data, there is no need to have a special case for
+> > padding. By removing this, the length is validated in both
+> > cases.
+> >
+> > Additionally, fix the length check: DataOffset and Length
+> > fields are relative to the SMB header start, while the packet
+> > length returned by get_rfc1002_len() includes 4 additional
+> > bytes.
+> >
 >
-> > I believe the NetBIOS name is a fixed array of 16 octets, right? So, if
-> > the nodename is shorter, it needs to be padded with 0's.
+> get_rfc1002_len doesn't include additional 4 bytes.
+> Can you check it again?
 >
-> Right.
->
-> > Did this code change recently? Why???
->
-> We used to not send the WorkstationName during NTLMSSP until recent
-> patch from Shyam:
->
->         commit 49bd49f983b5026e4557d31c5d737d9657c4113e
->         Author: Shyam Prasad N <sprasad@microsoft.com>
->         Date:   Fri Nov 5 19:03:57 2021 +0000
->
->             cifs: send workstation name during ntlmssp session setup
->
->             During the ntlmssp session setup (authenticate phases)
->             send the client workstation info. This can make debugging easier on
->             servers.
->
->             Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
->             Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
->             Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
->             Signed-off-by: Steve French <stfrench@microsoft.com>
->
-> Unfortunately some servers did not seem to enforce it to be 16 bytes
-> long, so the reason why we didn't catch it earlier.
->
-> Steve, Shyam, let me know if it does make sense to you and then I can
-> work on a patch to fix it properly.
 
-This regression should be easy to fix, but maybe we should not have
-done the initial change in the first place.
-If things is broken and do not work under SMB1, that is a good thing.
-Instead of adding features or fixing
-missing parts to SMB1 we should just tell people to switch to SMB2 instead.
+Hello Hyunchul, Namjae,
 
-I think if things do not work correctly or things are missing in smb1,
-that is a GOOD THING.
-:-)
+You are both right, v3 is not necessary. My confusion came from
+looking at earlier code (without the changes to smb2_hdr) rather
+than the latest tree.
+
+Thanks for checking it.
+
+Marios
