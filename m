@@ -2,69 +2,123 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 144EEC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 May 2022 14:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34058C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat,  7 May 2022 02:19:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232486AbiEFOJT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 6 May 2022 10:09:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60008 "EHLO
+        id S1356890AbiEGCXA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 6 May 2022 22:23:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1441985AbiEFOI5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 6 May 2022 10:08:57 -0400
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8757356762;
-        Fri,  6 May 2022 07:05:14 -0700 (PDT)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 77F3E7FD1E;
-        Fri,  6 May 2022 14:05:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1651845912;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=D8PQ6ZppMbJK9YEvYymT3s+2KUmz/2wUmtRG/KrTmGs=;
-        b=CJBM90vLK6FF2svC+lLCwWg2iAirFM6fOiHi8TIVN3G2nxHPaSNWMyImI0bPdsMmbL6twx
-        4x2+2Cpv6RQThUO5mVPNz015VONId9XpbLlkc2Tf7Atjrr+ITArrDaehUNbU+O+0pZxysW
-        I4mxs9P5l5ubHiTJ2MgoKt+6Ho/RGVtCQXHWbA+MEjrhnifN3Ja704P0b20oPnrg91Gmvt
-        Lnrih5mC2eqtNraXIct3IjViODxkbqLGNlGoth5lKqFW7KWaUHcCvn1YrxCgLqFqG0c0RC
-        nCtNNhSOYaKArFODDeDqMY7nbQjPsQz6eRTAnj1/2SVbeD3XfF0KeLUpjZSfew==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Tom Talpey <tom@talpey.com>, Steven French <sfrench@samba.org>,
-        Byron Stanoszek <gandalf@winds.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: CIFS regression mounting vers=1.0 NTLMSSP when hostname is too
- long
-In-Reply-To: <CAN05THQYKRChdR_4T86dGtCO=xY+cWpfa6_fOVNh9WSB=RNE-A@mail.gmail.com>
-References: <e6837098-15d9-acb6-7e34-1923cf8c6fe1@winds.org>
- <878rri2i6o.fsf@cjr.nz> <7dc6c729-73cd-74be-eec7-ac4a0013f60f@samba.org>
- <87tua51550.fsf@cjr.nz> <df763cb0-83f2-35a5-a381-57cfd040becf@talpey.com>
- <87r15910c1.fsf@cjr.nz>
- <CAN05THQYKRChdR_4T86dGtCO=xY+cWpfa6_fOVNh9WSB=RNE-A@mail.gmail.com>
-Date:   Fri, 06 May 2022 11:05:06 -0300
-Message-ID: <87wneyah9p.fsf@cjr.nz>
+        with ESMTP id S245684AbiEGCW7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 6 May 2022 22:22:59 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF86B69700
+        for <linux-cifs@vger.kernel.org>; Fri,  6 May 2022 19:19:13 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id k27so10534218edk.4
+        for <linux-cifs@vger.kernel.org>; Fri, 06 May 2022 19:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0rc1iRJ23vuI+LNL7tsvrCNLhd/F2RTpsTz08f1Oknc=;
+        b=Yo3QDvgLdw9z/ZnHxY2VPJ/19wSuEvsvjHSgns4LgsRSY/Wrhnbv2s9OHBYwEY2wnj
+         dcQZCGz0h9QJlXeLrTKFfXX3r5CPlgYLJ8+DLOESSfOHA1KTKf70BulHo9Orz1wrGbVG
+         BHIs/cNFB9OIys9OUGro4MYalWrNirviJSJSZVukxlF7X2H6DkrVw2FGiZVJEvpgeuVp
+         r5S0zn4++ztuW28fXbQx9QqQgV6f8+9EkZmivG6rcIKkjsm/q3OUGALvJ66BBW0b60FB
+         4Awg8oJ7dTX0SrkKf2ZsmZw7pKavH/gY3UxAHMZiiNoE6xxCH7Xg+ROKQ+rphRCIlTBB
+         wD9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0rc1iRJ23vuI+LNL7tsvrCNLhd/F2RTpsTz08f1Oknc=;
+        b=AxEwU+5ZHkq9wkTP/GiPJewrSH8N1IX1JmDAWtaV8iXesSSP3Ug+483l/09Z2vyT+E
+         rt0jT7lDJWokjXNyrosuVw24pQSKlWmxkpqlG8uBrJX8GWBLveJH1QrBEpK3Z6M4+0VH
+         1JtcGhcxN/c5KRwtEL28r0ihdty2gKTXZ++E59gjGEGFm5P5Vd3lBGs6ESVrznuWCzoH
+         Moc+lWLKBRmU75QeE4EANJoCrJETxS3idUwewh8Oq7MoybH3xvVQU3CUeDk1eb/btY/l
+         Z8KrubDW64vi1jffHebiN0Lr9bL9Yd/0CPiib0I8Xly0kdxpg1iCmiHxcwNZreJuxP8l
+         KlZQ==
+X-Gm-Message-State: AOAM533c4VimHLUeJTun+tGlJwF7FOxzW/gtFacpHN0vvKAJFgxACZP6
+        dljrk+sMZVjPhrGFy20BBj+WdUyd4N8j6JdZUfs=
+X-Google-Smtp-Source: ABdhPJzfEM05KIzYsdAyF67mUA8Pd0EP4ufEIrv8G70whGUK+BZY7bnBUY6E7KRDK+U5q6DWWyCKsJuUuiODIv+QpBQ=
+X-Received: by 2002:a05:6402:4249:b0:427:cfac:fd43 with SMTP id
+ g9-20020a056402424900b00427cfacfd43mr6575117edb.92.1651889952181; Fri, 06 May
+ 2022 19:19:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <CANT5p=rgt8bcy4PrEP8r-KXFwu2msTk2pRNFSbHrpVSFrAYkaQ@mail.gmail.com>
+ <efb4251a-d203-2783-7590-afc25580e9ce@talpey.com>
+In-Reply-To: <efb4251a-d203-2783-7590-afc25580e9ce@talpey.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Sat, 7 May 2022 07:49:00 +0530
+Message-ID: <CANT5p=p=oatzKNdo8DwxXnBDNxZQRjh7k5rPws9UCVRwvecHAA@mail.gmail.com>
+Subject: Re: Improving perf for async i/o path
+To:     Tom Talpey <tom@talpey.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-ronnie sahlberg <ronniesahlberg@gmail.com> writes:
-
-> This regression should be easy to fix, but maybe we should not have
-> done the initial change in the first place.
-> If things is broken and do not work under SMB1, that is a good thing.
-> Instead of adding features or fixing
-> missing parts to SMB1 we should just tell people to switch to SMB2 instead.
+On Fri, May 6, 2022 at 5:44 PM Tom Talpey <tom@talpey.com> wrote:
 >
-> I think if things do not work correctly or things are missing in smb1,
-> that is a GOOD THING.
-> :-)
+> On 5/6/2022 7:28 AM, Shyam Prasad N wrote:
+> > Hi,
+> >
+> > This is a question for anyone who understands the async I/O codepath
+> > better than I do:
+> >
+> > Today, we have the esize mount option, which delegates the task of
+> > decryption to worker threads. But the task of encryption still happens
+> > in the context of the i/o thread.
+> >
+> > If the i/o process does synchronous read/write, it isn't such a big
+> > deal. But if it's an async i/o, there is a potentially significant
+> > perf gain that we can make if we can offload the heavy lifting to
+> > worker threads, and let the main thread move on to the next request.
+>
+> How do you measure "perf gain"? Won't the extra context switching
+> increase the client CPU load? Generally speaking, an application
+> doing async i/o is already carefully managing parallelism. Are you
+> certain that adding more will always be a win? Will the application
+> performance overall actually improve?
+>
 
-LOL - couldn't agree more :-)
+Hi Tom,
+
+I'm actually profiling cifs.ko performance for a customer who's
+running a set of benchmark tests which tries to capture their actual
+workloads.
+One such workload is the one with a single application process that is
+pumping random async writes to a handful of files on the system.
+So the app expects that the request is queued asap before being
+unblocked, so that it can move on to the next request. Seems like a
+fair ask.
+
+On profiling cifs.ko, I found that all the other CPUs are fairly idle,
+when one cpu is kept busy in queuing up requests.
+And because it does encryption and tcp send as a part of queuing up
+requests, I feel that it is not as fast as it should be.
+I feel that if this task is spread out across the other CPUs (by the
+way of delegation), the I/Os can unblock much more quickly, thereby
+keeping many more requests in-flight quickly,
+
+Note that this is only theoretical so far. I will try it out and see
+if that is actually what happens, but I wanted to collect opinions on
+whether there are any down-sides to this approach.
+
+> > What do you all feel about moving the server->ops->async_writev (and
+> > async_readv) to a worker thread? Do you see any potential challenges
+> > if we go that route?
+>
+> Need more data.
+>
+> Tom.
+
+
+
+-- 
+Regards,
+Shyam
