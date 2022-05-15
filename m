@@ -2,551 +2,866 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5AB5C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 May 2022 15:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED812C433F5
+	for <linux-cifs@archiver.kernel.org>; Sun, 15 May 2022 11:09:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382317AbiEMP7g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 May 2022 11:59:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37954 "EHLO
+        id S236483AbiEOLJQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 15 May 2022 07:09:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381614AbiEMP7f (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 May 2022 11:59:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4658313DC2
-        for <linux-cifs@vger.kernel.org>; Fri, 13 May 2022 08:59:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652457573;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=h9oCOXRPG0g6PpjFTfCJDhjwOb8P4DxoHY+MR0WqL1E=;
-        b=A1OrJ9VQP+rcxDdby2ishtY0KwnRLTEuMkxawVmbFlt2aQemB9lGG1+D2W755Acj9CLaV+
-        dNypmFeNtCUXoKcc1oEKbfMwbB35pLDaKackKYMv2c+uaHCXMfLvvNI5MRC3XrkDul0tCl
-        3eSzPBaB3Rb3cqlP1qGrtpSo5X5L0BI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-459-7g0V2bhNOeiIalRoepJNbQ-1; Fri, 13 May 2022 11:59:30 -0400
-X-MC-Unique: 7g0V2bhNOeiIalRoepJNbQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229570AbiEOLJP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 15 May 2022 07:09:15 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02D632B1A7;
+        Sun, 15 May 2022 04:09:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 97827185A7B2;
-        Fri, 13 May 2022 15:59:29 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.37.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DF36AC50944;
-        Fri, 13 May 2022 15:59:27 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <165211416682.3154751.17287804906832979514.stgit@warthog.procyon.org.uk>
-References: <165211416682.3154751.17287804906832979514.stgit@warthog.procyon.org.uk>
-To:     Steve French <smfrench@gmail.com>
-Cc:     dhowells@redhat.com, Steve French <sfrench@samba.org>,
-        linux-cifs@vger.kernel.org,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 7/6] cifs: Make the cifs RDMA code use iterators 
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2A002B80BFA;
+        Sun, 15 May 2022 11:09:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC8C2C34119;
+        Sun, 15 May 2022 11:09:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652612949;
+        bh=kw6RNfpNF5scL/cTqv6JZxYei1eGdtqSlr+HmTvU4Eg=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=IMdgrRpcAhbWCAh1t4nbum/HpPHbYNovUcgwN4PKgTcDZZms38A7jzBEq2ZjKdll7
+         l5oOc9ljBeXZGJEnsfnAiKXLPMoGFHvoDqPbD27BF+PGnqr+YNZKx+xuXnh5yM0iGJ
+         L0iqUh83XM8itB2qrKEj9OrNuL3JWBehMTs8vaP7bsyKf5G4maLR6U0/r7zrajAhpW
+         pSQynv3dIsqgcLErxbNqSkfWFdaOHu3JgQfVG+i7tfmt4158+zqrKnP/h0oDc4ZpSS
+         CwtKGa9sN4D5doMUtmY7dq+DXDZsK6uJe7/oi8pjFuwQakmx2JygZ/ViY7GFPFTVw8
+         Zq+n2aUW863rw==
+Received: by mail-wm1-f45.google.com with SMTP id i20-20020a05600c355400b0039456976dcaso6611768wmq.1;
+        Sun, 15 May 2022 04:09:09 -0700 (PDT)
+X-Gm-Message-State: AOAM531SZA1oieoLvU6BTw85/tJBU2j4i0S5wl20eJJ98GKuHPHWyo44
+        BK4Jb8xZFNSrbd51ZoZBGqwH8tT/DvjJKSs+oKo=
+X-Google-Smtp-Source: ABdhPJz8El5Z0X6jN4MCRfxXtPMK/Gslny6x9B+GbZluBnTAXIZUwpd7+JL1xP4xj3hxQXdfe9yum5uzJFzW4QSyxfs=
+X-Received: by 2002:a05:600c:3512:b0:394:7c3b:53c0 with SMTP id
+ h18-20020a05600c351200b003947c3b53c0mr12153419wmq.170.1652612947661; Sun, 15
+ May 2022 04:09:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1663521.1652457567.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 13 May 2022 16:59:27 +0100
-Message-ID: <1663522.1652457567@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+Received: by 2002:adf:f344:0:0:0:0:0 with HTTP; Sun, 15 May 2022 04:09:06
+ -0700 (PDT)
+In-Reply-To: <20220427023245.7327-3-linkinjeon@kernel.org>
+References: <20220427023245.7327-1-linkinjeon@kernel.org> <20220427023245.7327-3-linkinjeon@kernel.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sun, 15 May 2022 20:09:06 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8kxmKUaJp0wcN6yBbpYS2wNWgw7krZnkk5_L9pMYa9Bg@mail.gmail.com>
+Message-ID: <CAKYAXd8kxmKUaJp0wcN6yBbpYS2wNWgw7krZnkk5_L9pMYa9Bg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] ksmbd: fix racy issue from using ->d_parent and ->d_name
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Convert the cifs RDMA code to use iterators rather than page lists and
-transcribe the iterators into scatterlists.
+2022-04-27 11:32 GMT+09:00, Namjae Jeon <linkinjeon@kernel.org>:
+Hi Al,
 
-NOTE!  This compiles, but is untested (I don't know how to set up RDMA in
-Samba and cifs).  It also wants merging into a previous patch to avoid
-build errors there.
+Could you please review this patch-set ?
 
-Signed-off-by: David Howells <dhowells@redhat.com>
----
- fs/cifs/smb2pdu.c   |   23 +---
- fs/cifs/smbdirect.c |  284 +++++++++++++++++-----------------------------=
-------
- fs/cifs/smbdirect.h |    4 =
-
- 3 files changed, 106 insertions(+), 205 deletions(-)
-
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6bb9a90b018f..d9a06704daa8 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -4054,10 +4054,8 @@ smb2_new_read_req(void **buf, unsigned int *total_l=
-en,
- 		struct smbd_buffer_descriptor_v1 *v1;
- 		bool need_invalidate =3D server->dialect =3D=3D SMB30_PROT_ID;
- =
-
--		rdata->mr =3D smbd_register_mr(
--				server->smbd_conn, rdata->pages,
--				rdata->nr_pages, rdata->page_offset,
--				rdata->tailsz, true, need_invalidate);
-+		rdata->mr =3D smbd_register_mr(server->smbd_conn, &rdata->iter,
-+					     true, need_invalidate);
- 		if (!rdata->mr)
- 			return -EAGAIN;
- =
-
-@@ -4477,24 +4475,15 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 		struct smbd_buffer_descriptor_v1 *v1;
- 		bool need_invalidate =3D server->dialect =3D=3D SMB30_PROT_ID;
- =
-
--		wdata->mr =3D smbd_register_mr(
--				server->smbd_conn, wdata->pages,
--				wdata->nr_pages, wdata->page_offset,
--				wdata->tailsz, false, need_invalidate);
-+		wdata->mr =3D smbd_register_mr(server->smbd_conn, &wdata->iter,
-+					     false, need_invalidate);
- 		if (!wdata->mr) {
- 			rc =3D -EAGAIN;
- 			goto async_writev_out;
- 		}
- 		req->Length =3D 0;
- 		req->DataOffset =3D 0;
--		if (wdata->nr_pages > 1)
--			req->RemainingBytes =3D
--				cpu_to_le32(
--					(wdata->nr_pages - 1) * wdata->pagesz -
--					wdata->page_offset + wdata->tailsz
--				);
--		else
--			req->RemainingBytes =3D cpu_to_le32(wdata->tailsz);
-+		req->RemainingBytes =3D cpu_to_le32(iov_iter_count(&wdata->iter));
- 		req->Channel =3D SMB2_CHANNEL_RDMA_V1_INVALIDATE;
- 		if (need_invalidate)
- 			req->Channel =3D SMB2_CHANNEL_RDMA_V1;
-@@ -4517,7 +4506,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 	if (wdata->mr) {
- 		iov[0].iov_len +=3D sizeof(struct smbd_buffer_descriptor_v1);
--		rqst.rq_npages =3D 0;
-+		iov_iter_advance(&wdata->iter, iov_iter_count(&wdata->iter));
- 	}
- #endif
- 	cifs_dbg(FYI, "async write at %llu %u bytes\n",
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 31ef64eb7fbb..5c311de5c9ac 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -34,12 +34,6 @@ static int smbd_post_recv(
- 		struct smbd_response *response);
- =
-
- static int smbd_post_send_empty(struct smbd_connection *info);
--static int smbd_post_send_data(
--		struct smbd_connection *info,
--		struct kvec *iov, int n_vec, int remaining_data_length);
--static int smbd_post_send_page(struct smbd_connection *info,
--		struct page *page, unsigned long offset,
--		size_t size, int remaining_data_length);
- =
-
- static void destroy_mr_list(struct smbd_connection *info);
- static int allocate_mr_list(struct smbd_connection *info);
-@@ -975,24 +969,6 @@ static int smbd_post_send_sgl(struct smbd_connection =
-*info,
- 	return rc;
- }
- =
-
--/*
-- * Send a page
-- * page: the page to send
-- * offset: offset in the page to send
-- * size: length in the page to send
-- * remaining_data_length: remaining data to send in this payload
-- */
--static int smbd_post_send_page(struct smbd_connection *info, struct page =
-*page,
--		unsigned long offset, size_t size, int remaining_data_length)
--{
--	struct scatterlist sgl;
--
--	sg_init_table(&sgl, 1);
--	sg_set_page(&sgl, page, size, offset);
--
--	return smbd_post_send_sgl(info, &sgl, size, remaining_data_length);
--}
--
- /*
-  * Send an empty message
-  * Empty message is used to extend credits to peer to for keep live
-@@ -1004,35 +980,6 @@ static int smbd_post_send_empty(struct smbd_connecti=
-on *info)
- 	return smbd_post_send_sgl(info, NULL, 0, 0);
- }
- =
-
--/*
-- * Send a data buffer
-- * iov: the iov array describing the data buffers
-- * n_vec: number of iov array
-- * remaining_data_length: remaining data to send following this packet
-- * in segmented SMBD packet
-- */
--static int smbd_post_send_data(
--	struct smbd_connection *info, struct kvec *iov, int n_vec,
--	int remaining_data_length)
--{
--	int i;
--	u32 data_length =3D 0;
--	struct scatterlist sgl[SMBDIRECT_MAX_SGE];
--
--	if (n_vec > SMBDIRECT_MAX_SGE) {
--		cifs_dbg(VFS, "Can't fit data to SGL, n_vec=3D%d\n", n_vec);
--		return -EINVAL;
--	}
--
--	sg_init_table(sgl, n_vec);
--	for (i =3D 0; i < n_vec; i++) {
--		data_length +=3D iov[i].iov_len;
--		sg_set_buf(&sgl[i], iov[i].iov_base, iov[i].iov_len);
--	}
--
--	return smbd_post_send_sgl(info, sgl, data_length, remaining_data_length)=
-;
--}
--
- /*
-  * Post a receive request to the transport
-  * The remote peer can only send data when a receive request is posted
-@@ -1976,6 +1923,42 @@ int smbd_recv(struct smbd_connection *info, struct =
-msghdr *msg)
- 	return rc;
- }
- =
-
-+/*
-+ * Send the contents of an iterator
-+ * @iter: The iterator to send
-+ * @_remaining_data_length: remaining data to send in this payload
-+ */
-+static int smbd_post_send_iter(struct smbd_connection *info,
-+			       struct iov_iter *iter,
-+			       int *_remaining_data_length)
-+{
-+	struct scatterlist sgl;
-+	struct page *page;
-+	ssize_t len;
-+	size_t offset, maxlen;
-+	int i =3D 0, rc;
-+
-+	do {
-+		maxlen =3D min_t(size_t, *_remaining_data_length, PAGE_SIZE);
-+		len =3D iov_iter_get_pages(iter, &page, maxlen, 1, &offset);
-+		if (len <=3D 0)
-+			return len;
-+
-+		sg_init_table(&sgl, 1);
-+		sg_set_page(&sgl, page, len, offset);
-+
-+		iov_iter_advance(iter, len);
-+		*_remaining_data_length -=3D len;
-+
-+		log_write(INFO, "sending page i=3D%d offset=3D%zu size=3D%zu remaining_=
-data_length=3D%d\n",
-+			  i, offset, len, *_remaining_data_length);
-+		rc =3D smbd_post_send_sgl(info, &sgl, len, *_remaining_data_length);
-+		put_page(page);
-+	} while (rc =3D=3D 0);
-+
-+	return rc;
-+}
-+
- /*
-  * Send data to transport
-  * Each rqst is transported as a SMBDirect payload
-@@ -1986,17 +1969,10 @@ int smbd_send(struct TCP_Server_Info *server,
- 	int num_rqst, struct smb_rqst *rqst_array)
- {
- 	struct smbd_connection *info =3D server->smbd_conn;
--	struct kvec vec;
--	int nvecs;
--	int size;
--	unsigned int buflen, remaining_data_length;
--	int start, i, j;
--	int max_iov_size =3D
--		info->max_send_size - sizeof(struct smbd_data_transfer);
--	struct kvec *iov;
--	int rc;
- 	struct smb_rqst *rqst;
--	int rqst_idx;
-+	struct iov_iter iter;
-+	unsigned int remaining_data_length;
-+	int rc, i, rqst_idx;
- =
-
- 	if (info->transport_status !=3D SMBD_CONNECTED) {
- 		rc =3D -EAGAIN;
-@@ -2025,108 +2001,30 @@ int smbd_send(struct TCP_Server_Info *server,
- 	rqst_idx =3D 0;
- next_rqst:
- 	rqst =3D &rqst_array[rqst_idx];
--	iov =3D rqst->rq_iov;
- =
-
- 	cifs_dbg(FYI, "Sending smb (RDMA): idx=3D%d smb_len=3D%lu\n",
- 		rqst_idx, smb_rqst_len(server, rqst));
- 	for (i =3D 0; i < rqst->rq_nvec; i++)
--		dump_smb(iov[i].iov_base, iov[i].iov_len);
--
--
--	log_write(INFO, "rqst_idx=3D%d nvec=3D%d rqst->rq_npages=3D%d rq_pagesz=3D=
-%d rq_tailsz=3D%d buflen=3D%lu\n",
--		  rqst_idx, rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
--		  rqst->rq_tailsz, smb_rqst_len(server, rqst));
--
--	start =3D i =3D 0;
--	buflen =3D 0;
--	while (true) {
--		buflen +=3D iov[i].iov_len;
--		if (buflen > max_iov_size) {
--			if (i > start) {
--				remaining_data_length -=3D
--					(buflen-iov[i].iov_len);
--				log_write(INFO, "sending iov[] from start=3D%d i=3D%d nvecs=3D%d rema=
-ining_data_length=3D%d\n",
--					  start, i, i - start,
--					  remaining_data_length);
--				rc =3D smbd_post_send_data(
--					info, &iov[start], i-start,
--					remaining_data_length);
--				if (rc)
--					goto done;
--			} else {
--				/* iov[start] is too big, break it */
--				nvecs =3D (buflen+max_iov_size-1)/max_iov_size;
--				log_write(INFO, "iov[%d] iov_base=3D%p buflen=3D%d break to %d vector=
-s\n",
--					  start, iov[start].iov_base,
--					  buflen, nvecs);
--				for (j =3D 0; j < nvecs; j++) {
--					vec.iov_base =3D
--						(char *)iov[start].iov_base +
--						j*max_iov_size;
--					vec.iov_len =3D max_iov_size;
--					if (j =3D=3D nvecs-1)
--						vec.iov_len =3D
--							buflen -
--							max_iov_size*(nvecs-1);
--					remaining_data_length -=3D vec.iov_len;
--					log_write(INFO,
--						"sending vec j=3D%d iov_base=3D%p iov_len=3D%zu remaining_data_leng=
-th=3D%d\n",
--						  j, vec.iov_base, vec.iov_len,
--						  remaining_data_length);
--					rc =3D smbd_post_send_data(
--						info, &vec, 1,
--						remaining_data_length);
--					if (rc)
--						goto done;
--				}
--				i++;
--				if (i =3D=3D rqst->rq_nvec)
--					break;
--			}
--			start =3D i;
--			buflen =3D 0;
--		} else {
--			i++;
--			if (i =3D=3D rqst->rq_nvec) {
--				/* send out all remaining vecs */
--				remaining_data_length -=3D buflen;
--				log_write(INFO, "sending iov[] from start=3D%d i=3D%d nvecs=3D%d rema=
-ining_data_length=3D%d\n",
--					  start, i, i - start,
--					  remaining_data_length);
--				rc =3D smbd_post_send_data(info, &iov[start],
--					i-start, remaining_data_length);
--				if (rc)
--					goto done;
--				break;
--			}
--		}
--		log_write(INFO, "looping i=3D%d buflen=3D%d\n", i, buflen);
--	}
--
--	/* now sending pages if there are any */
--	for (i =3D 0; i < rqst->rq_npages; i++) {
--		unsigned int offset;
--
--		rqst_page_get_length(rqst, i, &buflen, &offset);
--		nvecs =3D (buflen + max_iov_size - 1) / max_iov_size;
--		log_write(INFO, "sending pages buflen=3D%d nvecs=3D%d\n",
--			buflen, nvecs);
--		for (j =3D 0; j < nvecs; j++) {
--			size =3D max_iov_size;
--			if (j =3D=3D nvecs-1)
--				size =3D buflen - j*max_iov_size;
--			remaining_data_length -=3D size;
--			log_write(INFO, "sending pages i=3D%d offset=3D%d size=3D%d remaining_=
-data_length=3D%d\n",
--				  i, j * max_iov_size + offset, size,
--				  remaining_data_length);
--			rc =3D smbd_post_send_page(
--				info, rqst->rq_pages[i],
--				j*max_iov_size + offset,
--				size, remaining_data_length);
--			if (rc)
--				goto done;
--		}
--	}
-+		dump_smb(rqst->rq_iov[i].iov_base, rqst->rq_iov[i].iov_len);
-+
-+
-+	log_write(INFO, "rqst_idx=3D%d nvec=3D%d rqst->rq_iter=3D%zd buflen=3D%l=
-u\n",
-+		  rqst_idx, rqst->rq_nvec, iov_iter_count(&rqst->rq_iter),
-+		  smb_rqst_len(server, rqst));
-+
-+	/* Send the metadata pages. */
-+	iov_iter_kvec(&iter, WRITE, rqst->rq_iov, rqst->rq_nvec,
-+		      rqst->rq_iov[0].iov_len +
-+		      (rqst->rq_nvec > 1 ? rqst->rq_iov[1].iov_len : 0));
-+
-+	rc =3D smbd_post_send_iter(info, &iter, &remaining_data_length);
-+	if (rc < 0)
-+		goto done;
-+
-+	/* And then the data pages if there are any */
-+	rc =3D smbd_post_send_iter(info, &rqst->rq_iter, &remaining_data_length)=
-;
-+	if (rc < 0)
-+		goto done;
- =
-
- 	rqst_idx++;
- 	if (rqst_idx < num_rqst)
-@@ -2336,6 +2234,35 @@ static struct smbd_mr *get_mr(struct smbd_connectio=
-n *info)
- 	goto again;
- }
- =
-
-+/*
-+ * Transcribe the pages from an iterator into an MR scatterlist.
-+ * @iter: The iterator to transcribe
-+ * @_remaining_data_length: remaining data to send in this payload
-+ */
-+static int smbd_iter_to_mr(struct smbd_connection *info,
-+			   struct iov_iter *iter,
-+			   struct scatterlist *sgl,
-+			   unsigned int num_pages)
-+{
-+	struct page *page;
-+	ssize_t len;
-+	size_t offset, maxlen;
-+
-+	sg_init_table(sgl, num_pages);
-+
-+	for (;;) {
-+		maxlen =3D min_t(size_t, iov_iter_count(iter), PAGE_SIZE);
-+		len =3D iov_iter_get_pages(iter, &page, maxlen, 1, &offset);
-+		if (len <=3D 0)
-+			return len;
-+
-+		sg_set_page(sgl, page, len, offset);
-+		sgl++;
-+		put_page(page);
-+		iov_iter_advance(iter, len);
-+	}
-+}
-+
- /*
-  * Register memory for RDMA read/write
-  * pages[]: the list of pages to register memory with
-@@ -2346,14 +2273,15 @@ static struct smbd_mr *get_mr(struct smbd_connecti=
-on *info)
-  * return value: the MR registered, NULL if failed.
-  */
- struct smbd_mr *smbd_register_mr(
--	struct smbd_connection *info, struct page *pages[], int num_pages,
--	int offset, int tailsz, bool writing, bool need_invalidate)
-+	struct smbd_connection *info, struct iov_iter *iter,
-+	bool writing, bool need_invalidate)
- {
- 	struct smbd_mr *smbdirect_mr;
--	int rc, i;
-+	int rc, num_pages;
- 	enum dma_data_direction dir;
- 	struct ib_reg_wr *reg_wr;
- =
-
-+	num_pages =3D iov_iter_npages(iter, info->max_frmr_depth + 1);
- 	if (num_pages > info->max_frmr_depth) {
- 		log_rdma_mr(ERR, "num_pages=3D%d max_frmr_depth=3D%d\n",
- 			num_pages, info->max_frmr_depth);
-@@ -2365,32 +2293,16 @@ struct smbd_mr *smbd_register_mr(
- 		log_rdma_mr(ERR, "get_mr returning NULL\n");
- 		return NULL;
- 	}
-+
-+	dir =3D writing ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
-+	smbdirect_mr->dir =3D dir;
- 	smbdirect_mr->need_invalidate =3D need_invalidate;
- 	smbdirect_mr->sgl_count =3D num_pages;
--	sg_init_table(smbdirect_mr->sgl, num_pages);
--
--	log_rdma_mr(INFO, "num_pages=3D0x%x offset=3D0x%x tailsz=3D0x%x\n",
--			num_pages, offset, tailsz);
--
--	if (num_pages =3D=3D 1) {
--		sg_set_page(&smbdirect_mr->sgl[0], pages[0], tailsz, offset);
--		goto skip_multiple_pages;
--	}
- =
-
--	/* We have at least two pages to register */
--	sg_set_page(
--		&smbdirect_mr->sgl[0], pages[0], PAGE_SIZE - offset, offset);
--	i =3D 1;
--	while (i < num_pages - 1) {
--		sg_set_page(&smbdirect_mr->sgl[i], pages[i], PAGE_SIZE, 0);
--		i++;
--	}
--	sg_set_page(&smbdirect_mr->sgl[i], pages[i],
--		tailsz ? tailsz : PAGE_SIZE, 0);
-+	log_rdma_mr(INFO, "num_pages=3D0x%x count=3D0x%zx\n",
-+		    num_pages, iov_iter_count(iter));
-+	smbd_iter_to_mr(info, iter, smbdirect_mr->sgl, num_pages);
- =
-
--skip_multiple_pages:
--	dir =3D writing ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
--	smbdirect_mr->dir =3D dir;
- 	rc =3D ib_dma_map_sg(info->id->device, smbdirect_mr->sgl, num_pages, dir=
-);
- 	if (!rc) {
- 		log_rdma_mr(ERR, "ib_dma_map_sg num_pages=3D%x dir=3D%x rc=3D%x\n",
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index a87fca82a796..3a0d39e148e8 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -298,8 +298,8 @@ struct smbd_mr {
- =
-
- /* Interfaces to register and deregister MR for RDMA read/write */
- struct smbd_mr *smbd_register_mr(
--	struct smbd_connection *info, struct page *pages[], int num_pages,
--	int offset, int tailsz, bool writing, bool need_invalidate);
-+	struct smbd_connection *info, struct iov_iter *iter,
-+	bool writing, bool need_invalidate);
- int smbd_deregister_mr(struct smbd_mr *mr);
- =
-
- #else
-
+Thanks!
+> Al pointed out that ksmbd has racy issue from using ->d_parent and ->d_name
+> in ksmbd_vfs_unlink and smb2_vfs_rename(). and use new lock_rename_child()
+> to lock stable parent while underlying rename racy.
+> Introduce vfs_path_parent_lookup helper to avoid out of share access and
+> export vfs functions like the following ones to use
+> vfs_path_parent_lookup().
+>  - export __lookup_hash().
+>  - export getname_kernel() and putname().
+>
+> vfs_path_parent_lookup() is used for parent lookup of destination file
+> using absolute pathname given from FILE_RENAME_INFORMATION request.
+>
+> Cc: Al Viro <viro@zeniv.linux.org.uk>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  fs/ksmbd/smb2pdu.c    | 105 ++-------------
+>  fs/ksmbd/vfs.c        | 302 ++++++++++++++++--------------------------
+>  fs/ksmbd/vfs.h        |  10 +-
+>  fs/ksmbd/vfs_cache.c  |   5 +-
+>  fs/namei.c            |  41 +++++-
+>  include/linux/namei.h |   5 +
+>  6 files changed, 172 insertions(+), 296 deletions(-)
+>
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index 16c803a9d996..d3e29f60fa2e 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -5362,44 +5362,19 @@ int smb2_echo(struct ksmbd_work *work)
+>
+>  static int smb2_rename(struct ksmbd_work *work,
+>  		       struct ksmbd_file *fp,
+> -		       struct user_namespace *user_ns,
+>  		       struct smb2_file_rename_info *file_info,
+>  		       struct nls_table *local_nls)
+>  {
+>  	struct ksmbd_share_config *share = fp->tcon->share_conf;
+> -	char *new_name = NULL, *abs_oldname = NULL, *old_name = NULL;
+> -	char *pathname = NULL;
+> -	struct path path;
+> -	bool file_present = true;
+> -	int rc;
+> +	char *new_name = NULL;
+> +	int rc, flags = 0;
+>
+>  	ksmbd_debug(SMB, "setting FILE_RENAME_INFO\n");
+> -	pathname = kmalloc(PATH_MAX, GFP_KERNEL);
+> -	if (!pathname)
+> -		return -ENOMEM;
+> -
+> -	abs_oldname = d_path(&fp->filp->f_path, pathname, PATH_MAX);
+> -	if (IS_ERR(abs_oldname)) {
+> -		rc = -EINVAL;
+> -		goto out;
+> -	}
+> -	old_name = strrchr(abs_oldname, '/');
+> -	if (old_name && old_name[1] != '\0') {
+> -		old_name++;
+> -	} else {
+> -		ksmbd_debug(SMB, "can't get last component in path %s\n",
+> -			    abs_oldname);
+> -		rc = -ENOENT;
+> -		goto out;
+> -	}
+> -
+>  	new_name = smb2_get_name(file_info->FileName,
+>  				 le32_to_cpu(file_info->FileNameLength),
+>  				 local_nls);
+> -	if (IS_ERR(new_name)) {
+> -		rc = PTR_ERR(new_name);
+> -		goto out;
+> -	}
+> +	if (IS_ERR(new_name))
+> +		return PTR_ERR(new_name);
+>
+>  	if (strchr(new_name, ':')) {
+>  		int s_type;
+> @@ -5425,7 +5400,7 @@ static int smb2_rename(struct ksmbd_work *work,
+>  		if (rc)
+>  			goto out;
+>
+> -		rc = ksmbd_vfs_setxattr(user_ns,
+> +		rc = ksmbd_vfs_setxattr(file_mnt_user_ns(fp->filp),
+>  					fp->filp->f_path.dentry,
+>  					xattr_stream_name,
+>  					NULL, 0, 0);
+> @@ -5440,47 +5415,18 @@ static int smb2_rename(struct ksmbd_work *work,
+>  	}
+>
+>  	ksmbd_debug(SMB, "new name %s\n", new_name);
+> -	rc = ksmbd_vfs_kern_path(work, new_name, LOOKUP_NO_SYMLINKS, &path, 1);
+> -	if (rc) {
+> -		if (rc != -ENOENT)
+> -			goto out;
+> -		file_present = false;
+> -	} else {
+> -		path_put(&path);
+> -	}
+> -
+>  	if (ksmbd_share_veto_filename(share, new_name)) {
+>  		rc = -ENOENT;
+>  		ksmbd_debug(SMB, "Can't rename vetoed file: %s\n", new_name);
+>  		goto out;
+>  	}
+>
+> -	if (file_info->ReplaceIfExists) {
+> -		if (file_present) {
+> -			rc = ksmbd_vfs_remove_file(work, new_name);
+> -			if (rc) {
+> -				if (rc != -ENOTEMPTY)
+> -					rc = -EINVAL;
+> -				ksmbd_debug(SMB, "cannot delete %s, rc %d\n",
+> -					    new_name, rc);
+> -				goto out;
+> -			}
+> -		}
+> -	} else {
+> -		if (file_present &&
+> -		    strncmp(old_name, path.dentry->d_name.name, strlen(old_name))) {
+> -			rc = -EEXIST;
+> -			ksmbd_debug(SMB,
+> -				    "cannot rename already existing file\n");
+> -			goto out;
+> -		}
+> -	}
+> +	if (!file_info->ReplaceIfExists)
+> +		flags = RENAME_NOREPLACE;
+>
+> -	rc = ksmbd_vfs_fp_rename(work, fp, new_name);
+> +	rc = ksmbd_vfs_rename(work, &fp->filp->f_path, new_name, flags);
+>  out:
+> -	kfree(pathname);
+> -	if (!IS_ERR(new_name))
+> -		kfree(new_name);
+> +	kfree(new_name);
+>  	return rc;
+>  }
+>
+> @@ -5728,12 +5674,6 @@ static int set_rename_info(struct ksmbd_work *work,
+> struct ksmbd_file *fp,
+>  			   struct smb2_file_rename_info *rename_info,
+>  			   unsigned int buf_len)
+>  {
+> -	struct user_namespace *user_ns;
+> -	struct ksmbd_file *parent_fp;
+> -	struct dentry *parent;
+> -	struct dentry *dentry = fp->filp->f_path.dentry;
+> -	int ret;
+> -
+>  	if (!(fp->daccess & FILE_DELETE_LE)) {
+>  		pr_err("no right to delete : 0x%x\n", fp->daccess);
+>  		return -EACCES;
+> @@ -5743,32 +5683,7 @@ static int set_rename_info(struct ksmbd_work *work,
+> struct ksmbd_file *fp,
+>  			le32_to_cpu(rename_info->FileNameLength))
+>  		return -EINVAL;
+>
+> -	user_ns = file_mnt_user_ns(fp->filp);
+> -	if (ksmbd_stream_fd(fp))
+> -		goto next;
+> -
+> -	parent = dget_parent(dentry);
+> -	ret = ksmbd_vfs_lock_parent(user_ns, parent, dentry);
+> -	if (ret) {
+> -		dput(parent);
+> -		return ret;
+> -	}
+> -
+> -	parent_fp = ksmbd_lookup_fd_inode(d_inode(parent));
+> -	inode_unlock(d_inode(parent));
+> -	dput(parent);
+> -
+> -	if (parent_fp) {
+> -		if (parent_fp->daccess & FILE_DELETE_LE) {
+> -			pr_err("parent dir is opened with delete access\n");
+> -			ksmbd_fd_put(work, parent_fp);
+> -			return -ESHARE;
+> -		}
+> -		ksmbd_fd_put(work, parent_fp);
+> -	}
+> -next:
+> -	return smb2_rename(work, fp, user_ns, rename_info,
+> -			   work->sess->conn->local_nls);
+> +	return smb2_rename(work, fp, rename_info, work->sess->conn->local_nls);
+>  }
+>
+>  static int set_file_disposition_info(struct ksmbd_file *fp,
+> diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
+> index f79dfcebe480..93d3625bf6d1 100644
+> --- a/fs/ksmbd/vfs.c
+> +++ b/fs/ksmbd/vfs.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/vmalloc.h>
+>  #include <linux/sched/xacct.h>
+>  #include <linux/crc32c.h>
+> +#include <linux/namei.h>
+>
+>  #include "glob.h"
+>  #include "oplock.h"
+> @@ -34,19 +35,6 @@
+>  #include "mgmt/user_session.h"
+>  #include "mgmt/user_config.h"
+>
+> -static char *extract_last_component(char *path)
+> -{
+> -	char *p = strrchr(path, '/');
+> -
+> -	if (p && p[1] != '\0') {
+> -		*p = '\0';
+> -		p++;
+> -	} else {
+> -		p = NULL;
+> -	}
+> -	return p;
+> -}
+> -
+>  static void ksmbd_vfs_inherit_owner(struct ksmbd_work *work,
+>  				    struct inode *parent_inode,
+>  				    struct inode *inode)
+> @@ -60,38 +48,20 @@ static void ksmbd_vfs_inherit_owner(struct ksmbd_work
+> *work,
+>
+>  /**
+>   * ksmbd_vfs_lock_parent() - lock parent dentry if it is stable
+> - *
+> - * the parent dentry got by dget_parent or @parent could be
+> - * unstable, we try to lock a parent inode and lookup the
+> - * child dentry again.
+> - *
+> - * the reference count of @parent isn't incremented.
+>   */
+> -int ksmbd_vfs_lock_parent(struct user_namespace *user_ns, struct dentry
+> *parent,
+> -			  struct dentry *child)
+> +struct dentry *ksmbd_vfs_lock_parent(struct dentry *child)
+>  {
+> -	struct dentry *dentry;
+> -	int ret = 0;
+> +	struct dentry *parent;
+>
+> +	parent = dget(child->d_parent);
+>  	inode_lock_nested(d_inode(parent), I_MUTEX_PARENT);
+> -	dentry = lookup_one(user_ns, child->d_name.name, parent,
+> -			    child->d_name.len);
+> -	if (IS_ERR(dentry)) {
+> -		ret = PTR_ERR(dentry);
+> -		goto out_err;
+> -	}
+> -
+> -	if (dentry != child) {
+> -		ret = -ESTALE;
+> -		dput(dentry);
+> -		goto out_err;
+> +	if (child->d_parent != parent) {
+> +		dput(parent);
+> +		inode_unlock(d_inode(parent));
+> +		return ERR_PTR(-EINVAL);
+>  	}
+>
+> -	dput(dentry);
+> -	return 0;
+> -out_err:
+> -	inode_unlock(d_inode(parent));
+> -	return ret;
+> +	return parent;
+>  }
+>
+>  int ksmbd_vfs_may_delete(struct user_namespace *user_ns,
+> @@ -100,12 +70,9 @@ int ksmbd_vfs_may_delete(struct user_namespace
+> *user_ns,
+>  	struct dentry *parent;
+>  	int ret;
+>
+> -	parent = dget_parent(dentry);
+> -	ret = ksmbd_vfs_lock_parent(user_ns, parent, dentry);
+> -	if (ret) {
+> -		dput(parent);
+> -		return ret;
+> -	}
+> +	parent = ksmbd_vfs_lock_parent(dentry);
+> +	if (IS_ERR(parent))
+> +		return PTR_ERR(parent);
+>
+>  	ret = inode_permission(user_ns, d_inode(parent),
+>  			       MAY_EXEC | MAY_WRITE);
+> @@ -135,12 +102,9 @@ int ksmbd_vfs_query_maximal_access(struct
+> user_namespace *user_ns,
+>  	if (!inode_permission(user_ns, d_inode(dentry), MAY_OPEN | MAY_EXEC))
+>  		*daccess |= FILE_EXECUTE_LE;
+>
+> -	parent = dget_parent(dentry);
+> -	ret = ksmbd_vfs_lock_parent(user_ns, parent, dentry);
+> -	if (ret) {
+> -		dput(parent);
+> -		return ret;
+> -	}
+> +	parent = ksmbd_vfs_lock_parent(dentry);
+> +	if (IS_ERR(parent))
+> +		return PTR_ERR(parent);
+>
+>  	if (!inode_permission(user_ns, d_inode(parent), MAY_EXEC | MAY_WRITE))
+>  		*daccess |= FILE_DELETE_LE;
+> @@ -599,14 +563,11 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work,
+> char *name)
+>  		return err;
+>  	}
+>
+> -	user_ns = mnt_user_ns(path.mnt);
+> -	parent = dget_parent(path.dentry);
+> -	err = ksmbd_vfs_lock_parent(user_ns, parent, path.dentry);
+> -	if (err) {
+> -		dput(parent);
+> +	parent = ksmbd_vfs_lock_parent(path.dentry);
+> +	if (IS_ERR(parent)) {
+>  		path_put(&path);
+>  		ksmbd_revert_fsids(work);
+> -		return err;
+> +		return PTR_ERR(parent);
+>  	}
+>
+>  	if (!d_inode(path.dentry)->i_nlink) {
+> @@ -614,6 +575,7 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, char
+> *name)
+>  		goto out_err;
+>  	}
+>
+> +	user_ns = mnt_user_ns(path.mnt);
+>  	if (S_ISDIR(d_inode(path.dentry)->i_mode)) {
+>  		err = vfs_rmdir(user_ns, d_inode(parent), path.dentry);
+>  		if (err && err != -ENOTEMPTY)
+> @@ -688,149 +650,114 @@ int ksmbd_vfs_link(struct ksmbd_work *work, const
+> char *oldname,
+>  	return err;
+>  }
+>
+> -static int ksmbd_validate_entry_in_use(struct dentry *src_dent)
+> +int ksmbd_vfs_rename(struct ksmbd_work *work, struct path *old_path,
+> +		     char *newname, int flags)
+>  {
+> -	struct dentry *dst_dent;
+> -
+> -	spin_lock(&src_dent->d_lock);
+> -	list_for_each_entry(dst_dent, &src_dent->d_subdirs, d_child) {
+> -		struct ksmbd_file *child_fp;
+> +	struct dentry *old_parent, *new_dentry, *trap;
+> +	struct dentry *old_child = old_path->dentry;
+> +	struct path new_path;
+> +	struct qstr new_last;
+> +	struct renamedata rd;
+> +	struct filename *to;
+> +	struct ksmbd_share_config *share_conf = work->tcon->share_conf;
+> +	struct ksmbd_file *parent_fp;
+> +	int new_type;
+> +	int err, lookup_flags = LOOKUP_NO_SYMLINKS;
+>
+> -		if (d_really_is_negative(dst_dent))
+> -			continue;
+> +	if (ksmbd_override_fsids(work))
+> +		return -ENOMEM;
+>
+> -		child_fp = ksmbd_lookup_fd_inode(d_inode(dst_dent));
+> -		if (child_fp) {
+> -			spin_unlock(&src_dent->d_lock);
+> -			ksmbd_debug(VFS, "Forbid rename, sub file/dir is in use\n");
+> -			return -EACCES;
+> -		}
+> +	to = getname_kernel(newname);
+> +	if (IS_ERR(to)) {
+> +		err = PTR_ERR(to);
+> +		goto revert_fsids;
+>  	}
+> -	spin_unlock(&src_dent->d_lock);
+>
+> -	return 0;
+> -}
+> +retry:
+> +	err = vfs_path_parent_lookup(to, lookup_flags | LOOKUP_BENEATH,
+> +				     &new_path, &new_last, &new_type,
+> +				     &share_conf->vfs_path);
+> +	if (err)
+> +		goto out1;
+>
+> -static int __ksmbd_vfs_rename(struct ksmbd_work *work,
+> -			      struct user_namespace *src_user_ns,
+> -			      struct dentry *src_dent_parent,
+> -			      struct dentry *src_dent,
+> -			      struct user_namespace *dst_user_ns,
+> -			      struct dentry *dst_dent_parent,
+> -			      struct dentry *trap_dent,
+> -			      char *dst_name)
+> -{
+> -	struct dentry *dst_dent;
+> -	int err;
+> +	if (old_path->mnt != new_path.mnt) {
+> +		err = -EXDEV;
+> +		goto out2;
+> +	}
+>
+> -	if (!work->tcon->posix_extensions) {
+> -		err = ksmbd_validate_entry_in_use(src_dent);
+> -		if (err)
+> -			return err;
+> +	trap = lock_rename_child(old_child, new_path.dentry);
+> +
+> +	old_parent = dget(old_child->d_parent);
+> +	if (d_unhashed(old_child)) {
+> +		err = -EINVAL;
+> +		goto out3;
+>  	}
+>
+> -	if (d_really_is_negative(src_dent_parent))
+> -		return -ENOENT;
+> -	if (d_really_is_negative(dst_dent_parent))
+> -		return -ENOENT;
+> -	if (d_really_is_negative(src_dent))
+> -		return -ENOENT;
+> -	if (src_dent == trap_dent)
+> -		return -EINVAL;
+> +	parent_fp = ksmbd_lookup_fd_inode(d_inode(old_child->d_parent));
+> +	if (parent_fp) {
+> +		if (parent_fp->daccess & FILE_DELETE_LE) {
+> +			pr_err("parent dir is opened with delete access\n");
+> +			err = -ESHARE;
+> +			ksmbd_fd_put(work, parent_fp);
+> +			goto out3;
+> +		}
+> +		ksmbd_fd_put(work, parent_fp);
+> +	}
+>
+> -	if (ksmbd_override_fsids(work))
+> -		return -ENOMEM;
+> +	new_dentry = __lookup_hash(&new_last, new_path.dentry,
+> +				   lookup_flags | LOOKUP_RENAME_TARGET);
+> +	if (IS_ERR(new_dentry)) {
+> +		err = PTR_ERR(new_dentry);
+> +		goto out3;
+> +	}
+>
+> -	dst_dent = lookup_one(dst_user_ns, dst_name, dst_dent_parent,
+> -			      strlen(dst_name));
+> -	err = PTR_ERR(dst_dent);
+> -	if (IS_ERR(dst_dent)) {
+> -		pr_err("lookup failed %s [%d]\n", dst_name, err);
+> -		goto out;
+> +	if (d_is_symlink(new_dentry)) {
+> +		err = -EACCES;
+> +		goto out4;
+>  	}
+>
+> -	err = -ENOTEMPTY;
+> -	if (dst_dent != trap_dent && !d_really_is_positive(dst_dent)) {
+> -		struct renamedata rd = {
+> -			.old_mnt_userns	= src_user_ns,
+> -			.old_dir	= d_inode(src_dent_parent),
+> -			.old_dentry	= src_dent,
+> -			.new_mnt_userns	= dst_user_ns,
+> -			.new_dir	= d_inode(dst_dent_parent),
+> -			.new_dentry	= dst_dent,
+> -		};
+> -		err = vfs_rename(&rd);
+> +	if ((flags & RENAME_NOREPLACE) && d_is_positive(new_dentry)) {
+> +		err = -EEXIST;
+> +		goto out4;
+>  	}
+> -	if (err)
+> -		pr_err("vfs_rename failed err %d\n", err);
+> -	if (dst_dent)
+> -		dput(dst_dent);
+> -out:
+> -	ksmbd_revert_fsids(work);
+> -	return err;
+> -}
+>
+> -int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
+> -			char *newname)
+> -{
+> -	struct user_namespace *user_ns;
+> -	struct path dst_path;
+> -	struct dentry *src_dent_parent, *dst_dent_parent;
+> -	struct dentry *src_dent, *trap_dent, *src_child;
+> -	char *dst_name;
+> -	int err;
+> +	if (old_child == trap) {
+> +		err = -EINVAL;
+> +		goto out4;
+> +	}
+>
+> -	dst_name = extract_last_component(newname);
+> -	if (!dst_name) {
+> -		dst_name = newname;
+> -		newname = "";
+> +	if (new_dentry == trap) {
+> +		err = -ENOTEMPTY;
+> +		goto out4;
+>  	}
+>
+> -	src_dent_parent = dget_parent(fp->filp->f_path.dentry);
+> -	src_dent = fp->filp->f_path.dentry;
+> +	rd.old_mnt_userns	= mnt_user_ns(old_path->mnt),
+> +	rd.old_dir		= d_inode(old_parent),
+> +	rd.old_dentry		= old_child,
+> +	rd.new_mnt_userns	= mnt_user_ns(new_path.mnt),
+> +	rd.new_dir		= new_path.dentry->d_inode,
+> +	rd.new_dentry		= new_dentry,
+> +	rd.flags		= flags,
+> +	err = vfs_rename(&rd);
+> +	if (err)
+> +		ksmbd_debug(VFS, "vfs_rename failed err %d\n", err);
+>
+> -	err = ksmbd_vfs_kern_path(work, newname,
+> -				  LOOKUP_NO_SYMLINKS | LOOKUP_DIRECTORY,
+> -				  &dst_path, false);
+> -	if (err) {
+> -		ksmbd_debug(VFS, "Cannot get path for %s [%d]\n", newname, err);
+> -		goto out;
+> +out4:
+> +	dput(new_dentry);
+> +out3:
+> +	dput(old_parent);
+> +	unlock_rename(old_parent, new_path.dentry);
+> +out2:
+> +	path_put(&new_path);
+> +
+> +	if (retry_estale(err, lookup_flags)) {
+> +		lookup_flags |= LOOKUP_REVAL;
+> +		goto retry;
+>  	}
+> -	dst_dent_parent = dst_path.dentry;
+> -
+> -	trap_dent = lock_rename(src_dent_parent, dst_dent_parent);
+> -	dget(src_dent);
+> -	dget(dst_dent_parent);
+> -	user_ns = file_mnt_user_ns(fp->filp);
+> -	src_child = lookup_one(user_ns, src_dent->d_name.name, src_dent_parent,
+> -			       src_dent->d_name.len);
+> -	if (IS_ERR(src_child)) {
+> -		err = PTR_ERR(src_child);
+> -		goto out_lock;
+> -	}
+> -
+> -	if (src_child != src_dent) {
+> -		err = -ESTALE;
+> -		dput(src_child);
+> -		goto out_lock;
+> -	}
+> -	dput(src_child);
+> -
+> -	err = __ksmbd_vfs_rename(work,
+> -				 user_ns,
+> -				 src_dent_parent,
+> -				 src_dent,
+> -				 mnt_user_ns(dst_path.mnt),
+> -				 dst_dent_parent,
+> -				 trap_dent,
+> -				 dst_name);
+> -out_lock:
+> -	dput(src_dent);
+> -	dput(dst_dent_parent);
+> -	unlock_rename(src_dent_parent, dst_dent_parent);
+> -	path_put(&dst_path);
+> -out:
+> -	dput(src_dent_parent);
+> +out1:
+> +	putname(to);
+> +revert_fsids:
+> +	ksmbd_revert_fsids(work);
+>  	return err;
+>  }
+>
+> @@ -1079,14 +1006,17 @@ int ksmbd_vfs_remove_xattr(struct user_namespace
+> *user_ns,
+>  	return vfs_removexattr(user_ns, dentry, attr_name);
+>  }
+>
+> -int ksmbd_vfs_unlink(struct user_namespace *user_ns,
+> -		     struct dentry *dir, struct dentry *dentry)
+> +int ksmbd_vfs_unlink(struct file *filp)
+>  {
+>  	int err = 0;
+> +	struct dentry *dir, *dentry = filp->f_path.dentry;
+> +	struct user_namespace *user_ns = file_mnt_user_ns(filp);
+>
+> -	err = ksmbd_vfs_lock_parent(user_ns, dir, dentry);
+> -	if (err)
+> -		return err;
+> +	dir = ksmbd_vfs_lock_parent(dentry);
+> +	if (IS_ERR(dir)) {
+> +		err = PTR_ERR(dir);
+> +		goto out;
+> +	}
+>  	dget(dentry);
+>
+>  	if (S_ISDIR(d_inode(dentry)->i_mode))
+> @@ -1098,6 +1028,8 @@ int ksmbd_vfs_unlink(struct user_namespace *user_ns,
+>  	inode_unlock(d_inode(dir));
+>  	if (err)
+>  		ksmbd_debug(VFS, "failed to delete, err %d\n", err);
+> +out:
+> +	dput(dir);
+>
+>  	return err;
+>  }
+> diff --git a/fs/ksmbd/vfs.h b/fs/ksmbd/vfs.h
+> index 8c37aaf936ab..f79e73b6f01b 100644
+> --- a/fs/ksmbd/vfs.h
+> +++ b/fs/ksmbd/vfs.h
+> @@ -69,8 +69,7 @@ struct ksmbd_kstat {
+>  	__le32			file_attributes;
+>  };
+>
+> -int ksmbd_vfs_lock_parent(struct user_namespace *user_ns, struct dentry
+> *parent,
+> -			  struct dentry *child);
+> +struct dentry *ksmbd_vfs_lock_parent(struct dentry *child);
+>  int ksmbd_vfs_may_delete(struct user_namespace *user_ns, struct dentry
+> *dentry);
+>  int ksmbd_vfs_query_maximal_access(struct user_namespace *user_ns,
+>  				   struct dentry *dentry, __le32 *daccess);
+> @@ -86,8 +85,8 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, char
+> *name);
+>  int ksmbd_vfs_link(struct ksmbd_work *work,
+>  		   const char *oldname, const char *newname);
+>  int ksmbd_vfs_getattr(struct path *path, struct kstat *stat);
+> -int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
+> -			char *newname);
+> +int ksmbd_vfs_rename(struct ksmbd_work *work, struct path *old_path,
+> +		     char *newname, int flags);
+>  int ksmbd_vfs_truncate(struct ksmbd_work *work,
+>  		       struct ksmbd_file *fp, loff_t size);
+>  struct srv_copychunk;
+> @@ -129,8 +128,7 @@ struct file_allocated_range_buffer;
+>  int ksmbd_vfs_fqar_lseek(struct ksmbd_file *fp, loff_t start, loff_t
+> length,
+>  			 struct file_allocated_range_buffer *ranges,
+>  			 unsigned int in_count, unsigned int *out_count);
+> -int ksmbd_vfs_unlink(struct user_namespace *user_ns,
+> -		     struct dentry *dir, struct dentry *dentry);
+> +int ksmbd_vfs_unlink(struct file *filp);
+>  void *ksmbd_vfs_init_kstat(char **p, struct ksmbd_kstat *ksmbd_kstat);
+>  int ksmbd_vfs_fill_dentry_attrs(struct ksmbd_work *work,
+>  				struct user_namespace *user_ns,
+> diff --git a/fs/ksmbd/vfs_cache.c b/fs/ksmbd/vfs_cache.c
+> index c4d59d2735f0..df600eb04552 100644
+> --- a/fs/ksmbd/vfs_cache.c
+> +++ b/fs/ksmbd/vfs_cache.c
+> @@ -243,7 +243,6 @@ void ksmbd_release_inode_hash(void)
+>
+>  static void __ksmbd_inode_close(struct ksmbd_file *fp)
+>  {
+> -	struct dentry *dir, *dentry;
+>  	struct ksmbd_inode *ci = fp->f_ci;
+>  	int err;
+>  	struct file *filp;
+> @@ -262,11 +261,9 @@ static void __ksmbd_inode_close(struct ksmbd_file *fp)
+>  	if (atomic_dec_and_test(&ci->m_count)) {
+>  		write_lock(&ci->m_lock);
+>  		if (ci->m_flags & (S_DEL_ON_CLS | S_DEL_PENDING)) {
+> -			dentry = filp->f_path.dentry;
+> -			dir = dentry->d_parent;
+>  			ci->m_flags &= ~(S_DEL_ON_CLS | S_DEL_PENDING);
+>  			write_unlock(&ci->m_lock);
+> -			ksmbd_vfs_unlink(file_mnt_user_ns(filp), dir, dentry);
+> +			ksmbd_vfs_unlink(filp);
+>  			write_lock(&ci->m_lock);
+>  		}
+>  		write_unlock(&ci->m_lock);
+> diff --git a/fs/namei.c b/fs/namei.c
+> index 516b8d147744..1c0de16f9cb9 100644
+> --- a/fs/namei.c
+> +++ b/fs/namei.c
+> @@ -252,6 +252,7 @@ getname_kernel(const char * filename)
+>
+>  	return result;
+>  }
+> +EXPORT_SYMBOL(getname_kernel);
+>
+>  void putname(struct filename *name)
+>  {
+> @@ -269,6 +270,7 @@ void putname(struct filename *name)
+>  	} else
+>  		__putname(name);
+>  }
+> +EXPORT_SYMBOL(putname);
+>
+>  /**
+>   * check_acl - perform ACL permission checking
+> @@ -1587,8 +1589,8 @@ static struct dentry *lookup_dcache(const struct qstr
+> *name,
+>   * when directory is guaranteed to have no in-lookup children
+>   * at all.
+>   */
+> -static struct dentry *__lookup_hash(const struct qstr *name,
+> -		struct dentry *base, unsigned int flags)
+> +struct dentry *__lookup_hash(const struct qstr *name, struct dentry *base,
+> +			     unsigned int flags)
+>  {
+>  	struct dentry *dentry = lookup_dcache(name, base, flags);
+>  	struct dentry *old;
+> @@ -1612,6 +1614,7 @@ static struct dentry *__lookup_hash(const struct qstr
+> *name,
+>  	}
+>  	return dentry;
+>  }
+> +EXPORT_SYMBOL(__lookup_hash);
+>
+>  static struct dentry *lookup_fast(struct nameidata *nd,
+>  				  struct inode **inode,
+> @@ -2556,16 +2559,17 @@ static int path_parentat(struct nameidata *nd,
+> unsigned flags,
+>  }
+>
+>  /* Note: this does not consume "name" */
+> -static int filename_parentat(int dfd, struct filename *name,
+> -			     unsigned int flags, struct path *parent,
+> -			     struct qstr *last, int *type)
+> +static int __filename_parentat(int dfd, struct filename *name,
+> +			       unsigned int flags, struct path *parent,
+> +			       struct qstr *last, int *type,
+> +			       const struct path *root)
+>  {
+>  	int retval;
+>  	struct nameidata nd;
+>
+>  	if (IS_ERR(name))
+>  		return PTR_ERR(name);
+> -	set_nameidata(&nd, dfd, name, NULL);
+> +	set_nameidata(&nd, dfd, name, root);
+>  	retval = path_parentat(&nd, flags | LOOKUP_RCU, parent);
+>  	if (unlikely(retval == -ECHILD))
+>  		retval = path_parentat(&nd, flags, parent);
+> @@ -2580,6 +2584,13 @@ static int filename_parentat(int dfd, struct filename
+> *name,
+>  	return retval;
+>  }
+>
+> +static int filename_parentat(int dfd, struct filename *name,
+> +			     unsigned int flags, struct path *parent,
+> +			     struct qstr *last, int *type)
+> +{
+> +	return __filename_parentat(dfd, name, flags, parent, last, type, NULL);
+> +}
+> +
+>  /* does lookup, returns the object with parent locked */
+>  static struct dentry *__kern_path_locked(struct filename *name, struct path
+> *path)
+>  {
+> @@ -2623,6 +2634,24 @@ int kern_path(const char *name, unsigned int flags,
+> struct path *path)
+>  }
+>  EXPORT_SYMBOL(kern_path);
+>
+> +/**
+> + * vfs_path_parent_lookup - lookup a parent path relative to a
+> dentry-vfsmount pair
+> + * @filename: filename structure
+> + * @flags: lookup flags
+> + * @parent: pointer to struct path to fill
+> + * @last: last component
+> + * @type: type of the last component
+> + * @root: pointer to struct path of the base directory
+> + */
+> +int vfs_path_parent_lookup(struct filename *filename, unsigned int flags,
+> +			   struct path *parent, struct qstr *last, int *type,
+> +			   const struct path *root)
+> +{
+> +	return  __filename_parentat(AT_FDCWD, filename, flags, parent, last,
+> +				    type, root);
+> +}
+> +EXPORT_SYMBOL(vfs_path_parent_lookup);
+> +
+>  /**
+>   * vfs_path_lookup - lookup a file path relative to a dentry-vfsmount pair
+>   * @dentry:  pointer to dentry of the base directory
+> diff --git a/include/linux/namei.h b/include/linux/namei.h
+> index e6949d4ba188..f9be815f12b0 100644
+> --- a/include/linux/namei.h
+> +++ b/include/linux/namei.h
+> @@ -57,12 +57,17 @@ static inline int user_path_at(int dfd, const char
+> __user *name, unsigned flags,
+>  	return user_path_at_empty(dfd, name, flags, path, NULL);
+>  }
+>
+> +struct dentry *__lookup_hash(const struct qstr *name, struct dentry *base,
+> +			     unsigned int flags);
+>  extern int kern_path(const char *, unsigned, struct path *);
+>
+>  extern struct dentry *kern_path_create(int, const char *, struct path *,
+> unsigned int);
+>  extern struct dentry *user_path_create(int, const char __user *, struct
+> path *, unsigned int);
+>  extern void done_path_create(struct path *, struct dentry *);
+>  extern struct dentry *kern_path_locked(const char *, struct path *);
+> +int vfs_path_parent_lookup(struct filename *filename, unsigned int flags,
+> +			   struct path *parent, struct qstr *last, int *type,
+> +			   const struct path *root);
+>  int vfs_path_lookup(struct dentry *, struct vfsmount *, const char *,
+>  		    unsigned int, struct path *);
+>
+> --
+> 2.25.1
+>
+>
