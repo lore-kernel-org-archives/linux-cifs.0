@@ -2,89 +2,65 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A20C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 May 2022 13:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842CFC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 17 May 2022 01:11:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242845AbiEPNCg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 16 May 2022 09:02:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34040 "EHLO
+        id S233967AbiEQBL1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 16 May 2022 21:11:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233013AbiEPNCf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 May 2022 09:02:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77BAD39B8A;
-        Mon, 16 May 2022 06:02:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 14F13612B4;
-        Mon, 16 May 2022 13:02:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EB71C36AE3;
-        Mon, 16 May 2022 13:02:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652706153;
-        bh=QxrYnzxLkpBboiWbk+tZIWKBZNB1aGowNNS2JwNCBZY=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=eECbBPbd/CwUGSHea5TMEEiO7RapzXxStNpbfSByJLhUUerce3Eqt5rk1+4EyBgWd
-         J8Lfq+S86WuE8+Glx49oeOitauYLsnxlm3oX8qD2hT0m8E1px5uSaf4spe+61vMrdo
-         C4udux4s1uotPACaR6Z8jR7Dk8Ibi+1Hh883MJd7s9Wv33VpWyADMuWIxJtYTJszgL
-         eARUl1C5s+RMHC5bCPQdLwpkvsd52ywuwXp2SN27ujdefo2Fn90Y5BYS55/dxYIjFU
-         vSq1ENMFTZFzDfXYse1eZkWQOIfGTqpYD92MbobQrg29OhnyZPMhkQPI92PO4yfjDi
-         dHw4muV+AIdIQ==
-Received: by mail-wr1-f46.google.com with SMTP id j25so19412769wrc.9;
-        Mon, 16 May 2022 06:02:33 -0700 (PDT)
-X-Gm-Message-State: AOAM531AylIOox6ltyUvDBpjIk1MmqEHQj+CIfcQBl0pYf0OxpdA2LMH
-        wt5UkEOBCcmFYRLusW62qeBeY0qDazwYWhM3cOU=
-X-Google-Smtp-Source: ABdhPJyppBouNKjqRj9f/zuZU9s1i4dLd2e/drF3XJg3+HmjYs+p3oQblbVJf1G8KltxMRgiQcwslacmFaYs8RlwNz4=
-X-Received: by 2002:a5d:584a:0:b0:20c:5bad:11c1 with SMTP id
- i10-20020a5d584a000000b0020c5bad11c1mr14323809wrf.62.1652706151753; Mon, 16
- May 2022 06:02:31 -0700 (PDT)
+        with ESMTP id S240813AbiEQBLV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 May 2022 21:11:21 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36615369FE
+        for <linux-cifs@vger.kernel.org>; Mon, 16 May 2022 18:11:20 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id v4so20073024ljd.10
+        for <linux-cifs@vger.kernel.org>; Mon, 16 May 2022 18:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=npUul0ZkF4DiqZyxM/QDxgoc2Q+eTH7b6S+ofS3UumM=;
+        b=jfF7WK59c8R9oPZWRapIw6nxt6A7wfjuuAkeSNM3ieT1q3tGrxokLjtHGF9Rveu3lW
+         wi94PFDukIxVTX5/V07fifZoI0Z5vlSq54CHA3AN9WCeo8eCXn0mxurYHmgqiqtCnRW/
+         ZYurgL2usZupl10Myr/BTgG07lCC6FxG2yY4ZqnTyl384mRgJ1ab5jP/v6Val5PQOtIQ
+         I0OEJrazJhruGHaRu7FulUV4iDu+uCeI7dojbXcXSE6f5r/pFnWl8p40gzYD67FaPHfq
+         0aUOZ2bbe3nC4vZMk3HzQdQyLg1GQ7Hf7JfIEVGv6ZgHlmPgM6XDXSNI4/rbo5O3oEcC
+         N4RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=npUul0ZkF4DiqZyxM/QDxgoc2Q+eTH7b6S+ofS3UumM=;
+        b=z3bYvzqFmH20looDcIEWisXwerkC4q8uNKfK0YNCYQx7znDHrPsDZ4je2O8LiClMRa
+         3jma8KIIYDaNA/wtVt0XYzjGkz9U6OWl6EbT39yGtDV0j3IPrnGj4SPR2ByVam/zZ4tp
+         hGMqTv5iwDiI5PwwiONm1PSbgp7dUQP+lexU5Q/641clzQJb3p2qHp98eKv082O0ctBE
+         xgxvtBEXqUxigu1sOVjO3UwpSnSNha/1E+sPS/6IIXBOH/Vu6xqrrT+dF+u9c2eOKkMG
+         xlmJxn86WJnLmyIo7hRlqObF665fZtkLjLxTM4seNhQElhDG3hBTrMKRdUIUdBvWevs4
+         ULXg==
+X-Gm-Message-State: AOAM533w1oL4khUKerrmWhYBfFA07oPDPlZSR4XBeEtbGKclkrG6jdf7
+        9r8ktnGjCZjRrMSKhKzoqP+UntViOpVHz31e1xLkf+8uMVg=
+X-Google-Smtp-Source: ABdhPJxqxrF3tgF9bk3XQR5papcb9tYQ5MS9E8OyGEu4sDavqwB2vvFlYiggg36Ubrj3vMCv7z+WfLxEyc1mpv4XNOA=
+X-Received: by 2002:a2e:a17c:0:b0:250:c47e:3d5a with SMTP id
+ u28-20020a2ea17c000000b00250c47e3d5amr12846699ljl.314.1652749878108; Mon, 16
+ May 2022 18:11:18 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:adf:f344:0:0:0:0:0 with HTTP; Mon, 16 May 2022 06:02:31
- -0700 (PDT)
-In-Reply-To: <20220512075605.34240-1-yang.lee@linux.alibaba.com>
-References: <20220512075605.34240-1-yang.lee@linux.alibaba.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Mon, 16 May 2022 22:02:31 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9wzMPn0MWYDSveg2rdpaAWyg7RD5TOyyzbcu7nvUXHmg@mail.gmail.com>
-Message-ID: <CAKYAXd9wzMPn0MWYDSveg2rdpaAWyg7RD5TOyyzbcu7nvUXHmg@mail.gmail.com>
-Subject: Re: [PATCH -next] ksmbd: Fix some kernel-doc comments
-To:     Yang Li <yang.lee@linux.alibaba.com>
-Cc:     sfrench@samba.org, hyc.lee@gmail.com, senozhatsky@chromium.org,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Abaci Robot <abaci@linux.alibaba.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 16 May 2022 20:11:07 -0500
+Message-ID: <CAH2r5mu1cWEuHAJiY4T6zNKgWNwaoVevpnT7hrHwbbPa=AQiDw@mail.gmail.com>
+Subject: non-cifs change post 5.18-rc4 causing buildbot regressions
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-05-12 16:56 GMT+09:00, Yang Li <yang.lee@linux.alibaba.com>:
-> Remove some warnings found by running scripts/kernel-doc,
-> which is caused by using 'make W=1'.
->
-> fs/ksmbd/misc.c:30: warning: Function parameter or member 'str' not
-> described in 'match_pattern'
-> fs/ksmbd/misc.c:30: warning: Excess function parameter 'string'
-> description in 'match_pattern'
-> fs/ksmbd/misc.c:163: warning: Function parameter or member 'share' not
-> described in 'convert_to_nt_pathname'
-> fs/ksmbd/misc.c:163: warning: Function parameter or member 'path' not
-> described in 'convert_to_nt_pathname'
-> fs/ksmbd/misc.c:163: warning: Excess function parameter 'filename'
-> description in 'convert_to_nt_pathname'
-> fs/ksmbd/misc.c:163: warning: Excess function parameter 'sharepath'
-> description in 'convert_to_nt_pathname'
-> fs/ksmbd/misc.c:259: warning: Function parameter or member 'share' not
-> described in 'convert_to_unix_name'
-> fs/ksmbd/misc.c:259: warning: Function parameter or member 'name' not
-> described in 'convert_to_unix_name'
-> fs/ksmbd/misc.c:259: warning: Excess function parameter 'path'
-> description in 'convert_to_unix_name'
-> fs/ksmbd/misc.c:259: warning: Excess function parameter 'tid'
-> description in 'convert_to_unix_name'
->
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Noticed various xfstests failing (see e.g.
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/11/builds/220)
+in 5.18-rc7 but not in 5.18-rc4.   Anyone else noticing this?  No
+cifs.ko changes during this time period so could be unrelated to
+cifs.ko (e.g. mm or VFS change)
 
-Thanks for your patch!
+-- 
+Thanks,
+
+Steve
