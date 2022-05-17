@@ -2,165 +2,116 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 974C3C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 17 May 2022 21:21:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C998FC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 17 May 2022 21:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234113AbiEQVVT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 May 2022 17:21:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53546 "EHLO
+        id S229487AbiEQVq3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 17 May 2022 17:46:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231980AbiEQVVS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 May 2022 17:21:18 -0400
-Received: from zeniv-ca.linux.org.uk (zeniv-ca.linux.org.uk [IPv6:2607:5300:60:148a::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF0013CFD;
-        Tue, 17 May 2022 14:21:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7zVHATLZvCvX/Loq86FBQ/HmlWcb+p8XBkQhP8bWrmI=; b=WCjUokD/ioHilp3AAYc+o1JMLL
-        L9H0TdmzK3+YQqzTD/ZNet6K/pdFTE9Cq+zaynfxIDhFgc3bN5UOVAqcJU+VjZNv3JzhYUW0Sd3Y6
-        mSPC+LloUjTGp6N/pVRiIcIuMx0sNpofS0A93n2392xxvNWH7NNY4Rsq3gez1mZTWCr6kQOMWwimT
-        R3hThm/igjPRyBDiFCRtTa7rbH+TOacY+iEzyjaFcXB7taWQUX4PfSZy/ipCXT7a47rh8Elru46nW
-        gR4a9xETMqUUNZhl/KaBjsyqIcPGK2cq9cAzef5lqFBnd5MBtNxEa3Mc44m7YcntJ3BVuTUARTxQY
-        KFEpW60g==;
-Received: from viro by zeniv-ca.linux.org.uk with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nr4d0-00FpuK-Dq; Tue, 17 May 2022 21:21:14 +0000
-Date:   Tue, 17 May 2022 21:21:14 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org
-Subject: Re: [PATCH 3/3] ksmbd: fix racy issue from using ->d_parent and
- ->d_name
-Message-ID: <YoQRypdyLcN60F+X@zeniv-ca.linux.org.uk>
-References: <20220427023245.7327-1-linkinjeon@kernel.org>
- <20220427023245.7327-3-linkinjeon@kernel.org>
+        with ESMTP id S229502AbiEQVq2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 May 2022 17:46:28 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B6DA12D06
+        for <linux-cifs@vger.kernel.org>; Tue, 17 May 2022 14:46:27 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id gg20so129612pjb.1
+        for <linux-cifs@vger.kernel.org>; Tue, 17 May 2022 14:46:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6oXgoy8FMD/jCvY029l1jP4ZI0t4F7mesEct5xA3FuE=;
+        b=n7nEXMlWTWZ4Z3N2E47KeSuP09VsyUI6zMU0rDiv22lfhi4wJ+ijWf//w+I2F4qJiK
+         0QJwuWWBpify+gQ/CZfhKIBNgiBzSiehMGyWPDWtRjHDb7TFROMHhOKkijUqc63SiCqP
+         TzHOzEl0/Xt8RGjxTE6PiGsAW7JB0tt7/Xiyj3gWQBsJlOJ1dIKYstWCG9ZGtsdv+oGD
+         9EB+Dh6PO/c52Y0cyt1Wh1pQR0AQ/Fdmc9LOWDGYazfIeI9vDChmKaDvLL8VUGq/pX8a
+         QHXhxBEjgfxpxH4C2LK1bHXsdeZGV87tnhlpSvO9GffHfjj0tNnbGnly0BW9VzC+Vdqo
+         xaaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6oXgoy8FMD/jCvY029l1jP4ZI0t4F7mesEct5xA3FuE=;
+        b=dCUSlVsjanpTPTqtJwkxZ+0bB9A7oGBqGxG0/2EoXXMknPJJYRHfI1V2Lw8PLM4Xk+
+         /v8gfYxu3XwGyr8ViW628A5r+xnWlveqmC2niaC0+l1cxsC4hKHkj28SvsRh9euFT6Ty
+         EAdmtNhJgd9GmUKg4OHz5yutexRchrwAqtk5vb8eQi9QQtuA7Jegtg3GHqAIVp+BBqzB
+         2teoTz1qgXP3g58yJCgtwAWcZvS7Ide8Wi6xVh6FJaJ8vYhRYB9PQ9jv2O0UJWXc9XuQ
+         iH5V/+xjPpy/6l4N7ojVTl4r6SMtRwjPumtYCGI+69/mEageo9nqrIA6/1q3szJ5euex
+         CRuA==
+X-Gm-Message-State: AOAM531Xc4Mp1U0Aa6h0mYumlRDc8d/Re17nbjQkyMR2psiph/9O2NPl
+        FS4+0jvQQ+K+rBb1gMxq7yrW0/M/mCohmw==
+X-Google-Smtp-Source: ABdhPJxz7INAnTS+Q/oPkY1+Rg54mxFoTH82B+DTWk7kcjBI1Emn60+hsRNe9GOzciIghhlOSUMV4w==
+X-Received: by 2002:a17:90b:1650:b0:1df:a92d:c614 with SMTP id il16-20020a17090b165000b001dfa92dc614mr1189757pjb.205.1652823986772;
+        Tue, 17 May 2022 14:46:26 -0700 (PDT)
+Received: from localhost.localdomain ([125.177.232.58])
+        by smtp.googlemail.com with ESMTPSA id r2-20020a17090a0ac200b001cd498dc153sm2764145pje.3.2022.05.17.14.46.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 May 2022 14:46:26 -0700 (PDT)
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Yufan Chen <wiz.chen@gmail.com>
+Subject: [PATCH 1/2] ksmbd: fix outstanding credits related bugs
+Date:   Wed, 18 May 2022 06:46:07 +0900
+Message-Id: <20220517214608.283538-1-hyc.lee@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220427023245.7327-3-linkinjeon@kernel.org>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 11:32:45AM +0900, Namjae Jeon wrote:
-> Al pointed out that ksmbd has racy issue from using ->d_parent and ->d_name
-> in ksmbd_vfs_unlink and smb2_vfs_rename(). and use new lock_rename_child()
-> to lock stable parent while underlying rename racy.
-> Introduce vfs_path_parent_lookup helper to avoid out of share access and
-> export vfs functions like the following ones to use
-> vfs_path_parent_lookup().
->  - export __lookup_hash().
->  - export getname_kernel() and putname().
-> 
-> vfs_path_parent_lookup() is used for parent lookup of destination file
-> using absolute pathname given from FILE_RENAME_INFORMATION request.
+outstanding credits must be initialized to 0,
+because it means the sum of credits consumed by
+in-flight requests.
+And outstanding credits must be compared with
+total credits in smb2_validate_credit_charge(),
+because total credits are the sum of credits
+granted by ksmbd.
 
-First of all, this is seriously broken:
+This patch fix the following error,
+while frametest with Windows clients:
 
-> -int ksmbd_vfs_lock_parent(struct user_namespace *user_ns, struct dentry *parent,
-> -			  struct dentry *child)
-> +struct dentry *ksmbd_vfs_lock_parent(struct dentry *child)
->  {
-> -	struct dentry *dentry;
-> -	int ret = 0;
-> +	struct dentry *parent;
->  
-> +	parent = dget(child->d_parent);
->  	inode_lock_nested(d_inode(parent), I_MUTEX_PARENT);
+Limits exceeding the maximum allowable outstanding requests,
+given : 128, pending : 8065
 
-Do that in parallel with host rename() and you are risking this:
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+Reported-by: Yufan Chen <wiz.chen@gmail.com>
+Tested-by: Yufan Chen <wiz.chen@gmail.com>
+---
+ fs/ksmbd/connection.c | 2 +-
+ fs/ksmbd/smb2misc.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-you: fetch child->d_parent
-	get preempted away
-another thread: move child elsewhere
-another thread: drop (the last) reference to old parent
-	memory pressure evicts that dentry and reuses memory
-you: regain the timeslice and bump what you think is parent->d_count.
-	In reality, it's 4 bytes in completely different data structure.
-	At that point you already have a memory corruptor.  Worse,
-	there's a decent chance that subsequent code will revert the
-	corruption, so it would be hell to debug - you need a race
-	to reproduce the thing in the first place *and* you need
-	something else to notice the temporary memory corruption.
+diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
+index 7db87771884a..e8f476c5f189 100644
+--- a/fs/ksmbd/connection.c
++++ b/fs/ksmbd/connection.c
+@@ -62,7 +62,7 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
+ 	atomic_set(&conn->req_running, 0);
+ 	atomic_set(&conn->r_count, 0);
+ 	conn->total_credits = 1;
+-	conn->outstanding_credits = 1;
++	conn->outstanding_credits = 0;
+ 
+ 	init_waitqueue_head(&conn->req_running_q);
+ 	INIT_LIST_HEAD(&conn->conns_list);
+diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+index 4a9460153b59..f8f456377a51 100644
+--- a/fs/ksmbd/smb2misc.c
++++ b/fs/ksmbd/smb2misc.c
+@@ -338,7 +338,7 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
+ 		ret = 1;
+ 	}
+ 
+-	if ((u64)conn->outstanding_credits + credit_charge > conn->vals->max_credits) {
++	if ((u64)conn->outstanding_credits + credit_charge > conn->total_credits) {
+ 		ksmbd_debug(SMB, "Limits exceeding the maximum allowable outstanding requests, given : %u, pending : %u\n",
+ 			    credit_charge, conn->outstanding_credits);
+ 		ret = 1;
+-- 
+2.25.1
 
-you: fetch what you think is ->d_inode of that dentry.  It actually
-	isn't anything of that sort.
-you: grab rwsem at hell knows what address (might or might not point
-	to an rwsem).  Here's another chance to get something
-	reproducible - e.g. if what you thought was ->d_inode actually
-	points to unmapped memory, you'll get an oops here.  Won't
-	be consistent, though.
-
-> +	if (child->d_parent != parent) {
-you:	->d_parent doesn't point there anymore
-
-> +		dput(parent);
-
-you:	decrement those 4 bytes in whatever object it is; if you are
-	lucky, it won't hit zero and nobody had noticed the temporary
-	increment.  If you are not, well...
-
-> +		inode_unlock(d_inode(parent));
-
-you:	fetch ->d_inode of parent (mind you, it's a bug in its own right -
-	even if parent hadn't gotten freed before your dget(), after dput()
-	above it's fair game for getting freed; placing that dput()
-	before unlocking d_inode() is wrong).  Assuming you've got
-	the same pointer as the first time around, you proceed to
-	drop rwsem at the same address where you've grabbed it.
-
-IOW, you really don't want that in the tree in this form.
-
-It *might* be partially recoverable if you replace the first dget() with
-dget_parent() and reorder dput() and inode_unlock() in failure case, but...
-some of the callers of that thing are also rather dubious.
-
-Look: you have smb2_open() calling ksmbd_vfs_may_delete(), which calls
-that thing.  Downstream of this:
-	if (!file_present) {
-	...
-	} else if (!already_permitted) {
-
-If the parent is *NOT* already locked by that point, just how much is
-your 'file_present' worth?  And if it is, you'd obviously deadlock
-right there and then...
-
-I'm not sure I like what you've done with added exports - e.g.
-__lookup_hash had been OK as a name of static function, but exporting
-it is asking for clashes.  And honestly, what would you say when running
-into a name like that?  OK, it sounds like it's a (probably low-level)
-lookup in some hash table.  _Maybe_ it would've been fine if we had one
-and only implementation of hash tables in the entire tree and that
-had been a part of it, but it's nothing of that sort.  And "hash" in
-the name is not about doing a hash lookup as opposed to some other
-work (it *does* handle hash misses, allocating dentry, asking filesystem
-to do real on-disk lookup, etc.) - it's actually about "hash function
-of the name is already calculated".  My fault, that - predecessor of
-that thing had been called lookup_one(); it took a string, calculated
-its length and computed hash, then proceeded to do lookups.  The latter
-part could be reused in handling of rmdir et.al., where we already had
-the component length and hash precalculated, so the tail of lookup_one()
-had been carved out into a separate helper.  Circa 2.3.99...
-
-Anyway, the name is _not_ fit for an export; I'm not sure what to call
-it - lookup_one_qstr(), perhaps?  Additional fun is due to the fact
-that these days it is slightly different from the lookup_one() et.al.
-Those can be called with directory held shared; that allows parallel
-lookups, but it's not free of cost - if we run into a cache miss and need
-to allocate a new dentry and talk to filesystem, we have to recheck the
-hash table after allocation.  __lookup_hash() is called only with parent
-held exclusive and it can skip that fun - hash miss is going to remain
-a miss; nobody else will be able to insert stuff into dcache in that
-directory until we unlock it.
-
-What I'm worried about is that renaming it to lookup_one_qstr() will
-be an invitation for "oh, we happen to have hash/len already known by the
-time of that lookup_one() call; let's just convert it to lookup_one_qsrt()"
-and if that happens in a place where the parent is held only shared, we'll
-be in trouble.  OTOH, lookup_one_qstr_excl() sounds like an invitation to
-do something painful to whoever's responsible for such name...
-
-Suggestions, anyone?
