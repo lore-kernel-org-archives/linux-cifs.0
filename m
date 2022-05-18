@@ -2,116 +2,100 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F06C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 May 2022 14:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE00C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 May 2022 14:42:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238768AbiEROm0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 18 May 2022 10:42:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49302 "EHLO
+        id S238746AbiEROme (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 18 May 2022 10:42:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238718AbiEROmX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 May 2022 10:42:23 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B361C15D8
-        for <linux-cifs@vger.kernel.org>; Wed, 18 May 2022 07:42:21 -0700 (PDT)
+        with ESMTP id S238718AbiEROmd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 May 2022 10:42:33 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B5BB36CD
+        for <linux-cifs@vger.kernel.org>; Wed, 18 May 2022 07:42:32 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 81C0221AA3;
-        Wed, 18 May 2022 14:42:20 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 30C791F8C9;
+        Wed, 18 May 2022 14:42:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1652884940; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=tSQNei5NjtYiobKuvdGd+72BEPbPztjZq6AqyBPb560=;
-        b=KxLaWv/hrvak26Pf6ERYdlwPBNdjMCYd7Sks8qarR4e0yYINt1T8Dg64K8gmPjf9VVPWzF
-        Dsx5maLw7wn/SqreDXL1KLDZm8G40137pNL9Gy5pWdvsW64sPIjesEGiusN3/dhkvTBApH
-        wt+iTyesMWk8CA16nB6xIQZbkAIfAqY=
+        t=1652884951; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3EPCYhVjr8csqpAQ8Tp8LE6Z9p75mfTNxEtuuYLlEsA=;
+        b=brj7UxNRH0z1HGiD6fGvfpfXmHuqmvtuY+ZNAGyaHCp35dViwcmZANPc77XI9WBhssI4xr
+        i4T16ODYyojBQzWMB0TQ2cD/tM+MyiLOKRRWyILK8ZGRf83fgKVFXJNeGJG7EBWH0WP4wJ
+        wT9AQqOgaCpqKJpSBu0zeYPPf5B6njA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1652884940;
+        s=susede2_ed25519; t=1652884951;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=tSQNei5NjtYiobKuvdGd+72BEPbPztjZq6AqyBPb560=;
-        b=b6YkqZKjICqI6Ry/h4i2W/UZZSIi3gg2GVs14bVio99tXR0zgDLdvzZOuZwvE1tu16E/b/
-        O35dZ3E67hCyjOAQ==
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3EPCYhVjr8csqpAQ8Tp8LE6Z9p75mfTNxEtuuYLlEsA=;
+        b=IurJBhAx6wp9RcbmBGDglkxtI7gBWKXeCVdIRVc4lNTt0rqVNg5PfaH6nRHGfhSSZUzJ0I
+        1/5h+UnOJ9yA3iDw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F0117133F5;
-        Wed, 18 May 2022 14:42:19 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9E1C7133F5;
+        Wed, 18 May 2022 14:42:30 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 89bTK8sFhWJdNQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Wed, 18 May 2022 14:42:19 +0000
+        id sT4gF9YFhWJ2NQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Wed, 18 May 2022 14:42:30 +0000
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
         nspmangalore@gmail.com, Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH] cifs: don't call cifs_dfs_query_info_nonascii_quirk() if nodfs was set
-Date:   Wed, 18 May 2022 11:41:03 -0300
-Message-Id: <20220518144105.21913-1-ematsumiya@suse.de>
+Subject: [PATCH] cifs: print TIDs as hex
+Date:   Wed, 18 May 2022 11:41:04 -0300
+Message-Id: <20220518144105.21913-2-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220518144105.21913-1-ematsumiya@suse.de>
+References: <20220518144105.21913-1-ematsumiya@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Also return EOPNOTSUPP if path is remote but nodfs was set.
-
-Fixes: a2809d0e1696 ("cifs: quirk for STATUS_OBJECT_NAME_INVALID returned for non-ASCII dfs refs")
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/cifs/connect.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ fs/cifs/connect.c  | 2 +-
+ fs/cifs/smb2misc.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 42e14f408856..1ef3d16a8bda 100644
+index 9cd866d929a9..f3b165413ab7 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -3432,6 +3432,7 @@ static int is_path_remote(struct mount_ctx *mnt_ctx)
- 	struct cifs_tcon *tcon = mnt_ctx->tcon;
- 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
- 	char *full_path;
-+	bool nodfs = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS;
- 
- 	if (!server->ops->is_path_accessible)
- 		return -EOPNOTSUPP;
-@@ -3449,14 +3450,20 @@ static int is_path_remote(struct mount_ctx *mnt_ctx)
- 	rc = server->ops->is_path_accessible(xid, tcon, cifs_sb,
- 					     full_path);
- #ifdef CONFIG_CIFS_DFS_UPCALL
--	if (rc == -ENOENT && is_tcon_dfs(tcon))
-+	if (nodfs) {
-+		if (rc == -EREMOTE)
-+			rc = -EOPNOTSUPP;
-+		goto out;
-+	}
-+
-+	/* path *might* exist with non-ASCII characters in DFS root
-+	 * try again with full path (only if nodfs is not set) */
-+	if (rc == -ENOENT && is_tcon_dfs(tcon) && !nodfs)
- 		rc = cifs_dfs_query_info_nonascii_quirk(xid, tcon, cifs_sb,
- 							full_path);
- #endif
--	if (rc != 0 && rc != -EREMOTE) {
--		kfree(full_path);
--		return rc;
--	}
-+	if (rc != 0 && rc != -EREMOTE)
-+		goto out;
- 
- 	if (rc != -EREMOTE) {
- 		rc = cifs_are_all_path_components_accessible(server, xid, tcon,
-@@ -3468,6 +3475,7 @@ static int is_path_remote(struct mount_ctx *mnt_ctx)
- 		}
+@@ -1789,7 +1789,7 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+ 		goto out;
  	}
  
-+out:
- 	kfree(full_path);
- 	return rc;
- }
+-	cifs_dbg(FYI, "IPC tcon rc = %d ipc tid = %d\n", rc, tcon->tid);
++	cifs_dbg(FYI, "IPC tcon rc=%d ipc tid=0x%x\n", rc, tcon->tid);
+ 
+ 	ses->tcon_ipc = tcon;
+ out:
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 3fe47a88f47d..15b5d2565e79 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -798,7 +798,7 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
+ 		if (tcon->ses)
+ 			server = tcon->ses->server;
+ 
+-		cifs_server_dbg(FYI, "tid=%u: tcon is closing, skipping async close retry of fid %llu %llu\n",
++		cifs_server_dbg(FYI, "tid=0x%x: tcon is closing, skipping async close retry of fid %llu %llu\n",
+ 				tcon->tid, persistent_fid, volatile_fid);
+ 
+ 		return 0;
 -- 
 2.36.1
 
