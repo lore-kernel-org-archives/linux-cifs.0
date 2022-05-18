@@ -2,181 +2,116 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 195DDC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 May 2022 14:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F06C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 May 2022 14:42:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238556AbiERO1S (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 18 May 2022 10:27:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44790 "EHLO
+        id S238768AbiEROm0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 18 May 2022 10:42:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238551AbiERO1R (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 May 2022 10:27:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3CA49F81;
-        Wed, 18 May 2022 07:27:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S238718AbiEROmX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 May 2022 10:42:23 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B361C15D8
+        for <linux-cifs@vger.kernel.org>; Wed, 18 May 2022 07:42:21 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 000F3B82123;
-        Wed, 18 May 2022 14:27:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A895C385A9;
-        Wed, 18 May 2022 14:27:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652884033;
-        bh=dWbiYmzDlDpe+Wd/fdPPNVJYD6Bvgi+M/GAVIlSrzyA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BsZWgGnWc7nne2hpsLOjiDRW9+IHUQQiaWV6STJHGB4qb3Av7d3MwhuqMd2dCX56V
-         h3o+KE+6+gUg4dTVQJbdmQNyJi7Bi1B0OGvxtwDxUIFoKO6qMCTl7hBmVp+sQ2ltuL
-         8s22b2dR8wxmvIXuqZsVZZk7m4MzKWdGtExNujaHUulE5fW2nRvm41Ug69X/Au3WoA
-         foRrDGh5xY6FQMzGXvTRWmhxBWjHewXyGdzrhhCh7vEUjsG/RwOAVloedZzHdackBf
-         d5SWCNNW4DFjab75z1TK+7rQxIo55Tb/JGFYOE2fOQKxv29aUuLVrZE+HjgpDZtPs0
-         p5zZ60YdUDwkQ==
-Date:   Wed, 18 May 2022 16:27:09 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, smfrench@gmail.com,
-        hyc.lee@gmail.com, senozhatsky@chromium.org
-Subject: Re: [PATCH 3/3] ksmbd: fix racy issue from using ->d_parent and
- ->d_name
-Message-ID: <20220518142709.iewhrubtqiowdago@wittgenstein>
-References: <20220427023245.7327-1-linkinjeon@kernel.org>
- <20220427023245.7327-3-linkinjeon@kernel.org>
- <YoQRypdyLcN60F+X@zeniv-ca.linux.org.uk>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 81C0221AA3;
+        Wed, 18 May 2022 14:42:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1652884940; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=tSQNei5NjtYiobKuvdGd+72BEPbPztjZq6AqyBPb560=;
+        b=KxLaWv/hrvak26Pf6ERYdlwPBNdjMCYd7Sks8qarR4e0yYINt1T8Dg64K8gmPjf9VVPWzF
+        Dsx5maLw7wn/SqreDXL1KLDZm8G40137pNL9Gy5pWdvsW64sPIjesEGiusN3/dhkvTBApH
+        wt+iTyesMWk8CA16nB6xIQZbkAIfAqY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1652884940;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=tSQNei5NjtYiobKuvdGd+72BEPbPztjZq6AqyBPb560=;
+        b=b6YkqZKjICqI6Ry/h4i2W/UZZSIi3gg2GVs14bVio99tXR0zgDLdvzZOuZwvE1tu16E/b/
+        O35dZ3E67hCyjOAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F0117133F5;
+        Wed, 18 May 2022 14:42:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 89bTK8sFhWJdNQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Wed, 18 May 2022 14:42:19 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com, Enzo Matsumiya <ematsumiya@suse.de>
+Subject: [PATCH] cifs: don't call cifs_dfs_query_info_nonascii_quirk() if nodfs was set
+Date:   Wed, 18 May 2022 11:41:03 -0300
+Message-Id: <20220518144105.21913-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YoQRypdyLcN60F+X@zeniv-ca.linux.org.uk>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, May 17, 2022 at 09:21:14PM +0000, Al Viro wrote:
-> On Wed, Apr 27, 2022 at 11:32:45AM +0900, Namjae Jeon wrote:
-> > Al pointed out that ksmbd has racy issue from using ->d_parent and ->d_name
-> > in ksmbd_vfs_unlink and smb2_vfs_rename(). and use new lock_rename_child()
-> > to lock stable parent while underlying rename racy.
-> > Introduce vfs_path_parent_lookup helper to avoid out of share access and
-> > export vfs functions like the following ones to use
-> > vfs_path_parent_lookup().
-> >  - export __lookup_hash().
-> >  - export getname_kernel() and putname().
-> > 
-> > vfs_path_parent_lookup() is used for parent lookup of destination file
-> > using absolute pathname given from FILE_RENAME_INFORMATION request.
-> 
-> First of all, this is seriously broken:
-> 
-> > -int ksmbd_vfs_lock_parent(struct user_namespace *user_ns, struct dentry *parent,
-> > -			  struct dentry *child)
-> > +struct dentry *ksmbd_vfs_lock_parent(struct dentry *child)
-> >  {
-> > -	struct dentry *dentry;
-> > -	int ret = 0;
-> > +	struct dentry *parent;
-> >  
-> > +	parent = dget(child->d_parent);
-> >  	inode_lock_nested(d_inode(parent), I_MUTEX_PARENT);
-> 
-> Do that in parallel with host rename() and you are risking this:
-> 
-> you: fetch child->d_parent
-> 	get preempted away
-> another thread: move child elsewhere
-> another thread: drop (the last) reference to old parent
-> 	memory pressure evicts that dentry and reuses memory
-> you: regain the timeslice and bump what you think is parent->d_count.
-> 	In reality, it's 4 bytes in completely different data structure.
-> 	At that point you already have a memory corruptor.  Worse,
-> 	there's a decent chance that subsequent code will revert the
-> 	corruption, so it would be hell to debug - you need a race
-> 	to reproduce the thing in the first place *and* you need
-> 	something else to notice the temporary memory corruption.
-> 
-> you: fetch what you think is ->d_inode of that dentry.  It actually
-> 	isn't anything of that sort.
-> you: grab rwsem at hell knows what address (might or might not point
-> 	to an rwsem).  Here's another chance to get something
-> 	reproducible - e.g. if what you thought was ->d_inode actually
-> 	points to unmapped memory, you'll get an oops here.  Won't
-> 	be consistent, though.
-> 
-> > +	if (child->d_parent != parent) {
-> you:	->d_parent doesn't point there anymore
-> 
-> > +		dput(parent);
-> 
-> you:	decrement those 4 bytes in whatever object it is; if you are
-> 	lucky, it won't hit zero and nobody had noticed the temporary
-> 	increment.  If you are not, well...
-> 
-> > +		inode_unlock(d_inode(parent));
-> 
-> you:	fetch ->d_inode of parent (mind you, it's a bug in its own right -
-> 	even if parent hadn't gotten freed before your dget(), after dput()
-> 	above it's fair game for getting freed; placing that dput()
-> 	before unlocking d_inode() is wrong).  Assuming you've got
-> 	the same pointer as the first time around, you proceed to
-> 	drop rwsem at the same address where you've grabbed it.
-> 
-> IOW, you really don't want that in the tree in this form.
-> 
-> It *might* be partially recoverable if you replace the first dget() with
-> dget_parent() and reorder dput() and inode_unlock() in failure case, but...
-> some of the callers of that thing are also rather dubious.
-> 
-> Look: you have smb2_open() calling ksmbd_vfs_may_delete(), which calls
-> that thing.  Downstream of this:
-> 	if (!file_present) {
-> 	...
-> 	} else if (!already_permitted) {
-> 
-> If the parent is *NOT* already locked by that point, just how much is
-> your 'file_present' worth?  And if it is, you'd obviously deadlock
-> right there and then...
-> 
-> I'm not sure I like what you've done with added exports - e.g.
-> __lookup_hash had been OK as a name of static function, but exporting
-> it is asking for clashes.  And honestly, what would you say when running
-> into a name like that?  OK, it sounds like it's a (probably low-level)
-> lookup in some hash table.  _Maybe_ it would've been fine if we had one
-> and only implementation of hash tables in the entire tree and that
-> had been a part of it, but it's nothing of that sort.  And "hash" in
-> the name is not about doing a hash lookup as opposed to some other
-> work (it *does* handle hash misses, allocating dentry, asking filesystem
-> to do real on-disk lookup, etc.) - it's actually about "hash function
-> of the name is already calculated".  My fault, that - predecessor of
-> that thing had been called lookup_one(); it took a string, calculated
-> its length and computed hash, then proceeded to do lookups.  The latter
-> part could be reused in handling of rmdir et.al., where we already had
-> the component length and hash precalculated, so the tail of lookup_one()
-> had been carved out into a separate helper.  Circa 2.3.99...
-> 
-> Anyway, the name is _not_ fit for an export; I'm not sure what to call
-> it - lookup_one_qstr(), perhaps?  Additional fun is due to the fact
-> that these days it is slightly different from the lookup_one() et.al.
-> Those can be called with directory held shared; that allows parallel
-> lookups, but it's not free of cost - if we run into a cache miss and need
-> to allocate a new dentry and talk to filesystem, we have to recheck the
-> hash table after allocation.  __lookup_hash() is called only with parent
-> held exclusive and it can skip that fun - hash miss is going to remain
-> a miss; nobody else will be able to insert stuff into dcache in that
-> directory until we unlock it.
-> 
-> What I'm worried about is that renaming it to lookup_one_qstr() will
-> be an invitation for "oh, we happen to have hash/len already known by the
-> time of that lookup_one() call; let's just convert it to lookup_one_qsrt()"
-> and if that happens in a place where the parent is held only shared, we'll
-> be in trouble.  OTOH, lookup_one_qstr_excl() sounds like an invitation to
-> do something painful to whoever's responsible for such name...
-> 
-> Suggestions, anyone?
+Also return EOPNOTSUPP if path is remote but nodfs was set.
 
-Plus, __lookup_hash() doesn't do permission checking so naming it
-lookup_one_qstr() seems problematic from that perspective as well...
+Fixes: a2809d0e1696 ("cifs: quirk for STATUS_OBJECT_NAME_INVALID returned for non-ASCII dfs refs")
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/cifs/connect.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-Don't kill me but:
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 42e14f408856..1ef3d16a8bda 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3432,6 +3432,7 @@ static int is_path_remote(struct mount_ctx *mnt_ctx)
+ 	struct cifs_tcon *tcon = mnt_ctx->tcon;
+ 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
+ 	char *full_path;
++	bool nodfs = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS;
+ 
+ 	if (!server->ops->is_path_accessible)
+ 		return -EOPNOTSUPP;
+@@ -3449,14 +3450,20 @@ static int is_path_remote(struct mount_ctx *mnt_ctx)
+ 	rc = server->ops->is_path_accessible(xid, tcon, cifs_sb,
+ 					     full_path);
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-	if (rc == -ENOENT && is_tcon_dfs(tcon))
++	if (nodfs) {
++		if (rc == -EREMOTE)
++			rc = -EOPNOTSUPP;
++		goto out;
++	}
++
++	/* path *might* exist with non-ASCII characters in DFS root
++	 * try again with full path (only if nodfs is not set) */
++	if (rc == -ENOENT && is_tcon_dfs(tcon) && !nodfs)
+ 		rc = cifs_dfs_query_info_nonascii_quirk(xid, tcon, cifs_sb,
+ 							full_path);
+ #endif
+-	if (rc != 0 && rc != -EREMOTE) {
+-		kfree(full_path);
+-		return rc;
+-	}
++	if (rc != 0 && rc != -EREMOTE)
++		goto out;
+ 
+ 	if (rc != -EREMOTE) {
+ 		rc = cifs_are_all_path_components_accessible(server, xid, tcon,
+@@ -3468,6 +3475,7 @@ static int is_path_remote(struct mount_ctx *mnt_ctx)
+ 		}
+ 	}
+ 
++out:
+ 	kfree(full_path);
+ 	return rc;
+ }
+-- 
+2.36.1
 
-__excl_qstr_lookup_noperm()
-
-?
