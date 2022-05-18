@@ -2,234 +2,181 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2239DC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 May 2022 03:56:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 195DDC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 May 2022 14:27:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229742AbiERD4Z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 May 2022 23:56:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47786 "EHLO
+        id S238556AbiERO1S (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 18 May 2022 10:27:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbiERD4Y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 May 2022 23:56:24 -0400
-Received: from d.mail.sonic.net (d.mail.sonic.net [64.142.111.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD128B10
-        for <linux-cifs@vger.kernel.org>; Tue, 17 May 2022 20:56:18 -0700 (PDT)
-Received: from ocelot (157-131-248-104.fiber.dynamic.sonic.net [157.131.248.104])
-        (authenticated bits=0)
-        by d.mail.sonic.net (8.16.1/8.16.1) with ESMTPA id 24I3u9QW029006;
-        Tue, 17 May 2022 20:56:09 -0700
-From:   Forest <forestix@sonic.net>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Paulo Alcantara <pc@cjr.nz>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        linux-cifs@vger.kernel.org
-Subject: Re: getxattr() on cifs sometimes hangs since kernel 5.14
-Date:   Tue, 17 May 2022 20:56:09 -0700
-Message-ID: <jcr88hdgn3k3i12tcm4a74bcel2bf27o1m@4ax.com>
-References: <91188ht5vqi7kq3ml5d3a48sjo9ltqjko3@4ax.com> <CAH2r5muJYFQ7FutNP_WWCHPE+dDSi6=_x27P81+FN7QGQKyzFA@mail.gmail.com>
-In-Reply-To: <CAH2r5muJYFQ7FutNP_WWCHPE+dDSi6=_x27P81+FN7QGQKyzFA@mail.gmail.com>
-X-Mailer: Forte Agent 3.3/32.846
+        with ESMTP id S238551AbiERO1R (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 May 2022 10:27:17 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3CA49F81;
+        Wed, 18 May 2022 07:27:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 000F3B82123;
+        Wed, 18 May 2022 14:27:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A895C385A9;
+        Wed, 18 May 2022 14:27:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652884033;
+        bh=dWbiYmzDlDpe+Wd/fdPPNVJYD6Bvgi+M/GAVIlSrzyA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BsZWgGnWc7nne2hpsLOjiDRW9+IHUQQiaWV6STJHGB4qb3Av7d3MwhuqMd2dCX56V
+         h3o+KE+6+gUg4dTVQJbdmQNyJi7Bi1B0OGvxtwDxUIFoKO6qMCTl7hBmVp+sQ2ltuL
+         8s22b2dR8wxmvIXuqZsVZZk7m4MzKWdGtExNujaHUulE5fW2nRvm41Ug69X/Au3WoA
+         foRrDGh5xY6FQMzGXvTRWmhxBWjHewXyGdzrhhCh7vEUjsG/RwOAVloedZzHdackBf
+         d5SWCNNW4DFjab75z1TK+7rQxIo55Tb/JGFYOE2fOQKxv29aUuLVrZE+HjgpDZtPs0
+         p5zZ60YdUDwkQ==
+Date:   Wed, 18 May 2022 16:27:09 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, smfrench@gmail.com,
+        hyc.lee@gmail.com, senozhatsky@chromium.org
+Subject: Re: [PATCH 3/3] ksmbd: fix racy issue from using ->d_parent and
+ ->d_name
+Message-ID: <20220518142709.iewhrubtqiowdago@wittgenstein>
+References: <20220427023245.7327-1-linkinjeon@kernel.org>
+ <20220427023245.7327-3-linkinjeon@kernel.org>
+ <YoQRypdyLcN60F+X@zeniv-ca.linux.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Sonic-CAuth: UmFuZG9tSVbzj2P6imEcvv37gcfZwTn+DMo2UY85au2lUkF8vRqjII+lRQHFNNdmdnkf1UU1QiCPXpNvdBbGh8iNpoFKA4BU
-X-Sonic-ID: C;frnHc17W7BGh2Z0guulSsA== M;QBnOc17W7BGh2Z0guulSsA==
-X-Sonic-Spam-Details: -2.1/5.0 by cerberusd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YoQRypdyLcN60F+X@zeniv-ca.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-/*
-Attempt to reproduce a cifs xattr problem from kernel commit 9e992755be8f.
+On Tue, May 17, 2022 at 09:21:14PM +0000, Al Viro wrote:
+> On Wed, Apr 27, 2022 at 11:32:45AM +0900, Namjae Jeon wrote:
+> > Al pointed out that ksmbd has racy issue from using ->d_parent and ->d_name
+> > in ksmbd_vfs_unlink and smb2_vfs_rename(). and use new lock_rename_child()
+> > to lock stable parent while underlying rename racy.
+> > Introduce vfs_path_parent_lookup helper to avoid out of share access and
+> > export vfs functions like the following ones to use
+> > vfs_path_parent_lookup().
+> >  - export __lookup_hash().
+> >  - export getname_kernel() and putname().
+> > 
+> > vfs_path_parent_lookup() is used for parent lookup of destination file
+> > using absolute pathname given from FILE_RENAME_INFORMATION request.
+> 
+> First of all, this is seriously broken:
+> 
+> > -int ksmbd_vfs_lock_parent(struct user_namespace *user_ns, struct dentry *parent,
+> > -			  struct dentry *child)
+> > +struct dentry *ksmbd_vfs_lock_parent(struct dentry *child)
+> >  {
+> > -	struct dentry *dentry;
+> > -	int ret = 0;
+> > +	struct dentry *parent;
+> >  
+> > +	parent = dget(child->d_parent);
+> >  	inode_lock_nested(d_inode(parent), I_MUTEX_PARENT);
+> 
+> Do that in parallel with host rename() and you are risking this:
+> 
+> you: fetch child->d_parent
+> 	get preempted away
+> another thread: move child elsewhere
+> another thread: drop (the last) reference to old parent
+> 	memory pressure evicts that dentry and reuses memory
+> you: regain the timeslice and bump what you think is parent->d_count.
+> 	In reality, it's 4 bytes in completely different data structure.
+> 	At that point you already have a memory corruptor.  Worse,
+> 	there's a decent chance that subsequent code will revert the
+> 	corruption, so it would be hell to debug - you need a race
+> 	to reproduce the thing in the first place *and* you need
+> 	something else to notice the temporary memory corruption.
+> 
+> you: fetch what you think is ->d_inode of that dentry.  It actually
+> 	isn't anything of that sort.
+> you: grab rwsem at hell knows what address (might or might not point
+> 	to an rwsem).  Here's another chance to get something
+> 	reproducible - e.g. if what you thought was ->d_inode actually
+> 	points to unmapped memory, you'll get an oops here.  Won't
+> 	be consistent, though.
+> 
+> > +	if (child->d_parent != parent) {
+> you:	->d_parent doesn't point there anymore
+> 
+> > +		dput(parent);
+> 
+> you:	decrement those 4 bytes in whatever object it is; if you are
+> 	lucky, it won't hit zero and nobody had noticed the temporary
+> 	increment.  If you are not, well...
+> 
+> > +		inode_unlock(d_inode(parent));
+> 
+> you:	fetch ->d_inode of parent (mind you, it's a bug in its own right -
+> 	even if parent hadn't gotten freed before your dget(), after dput()
+> 	above it's fair game for getting freed; placing that dput()
+> 	before unlocking d_inode() is wrong).  Assuming you've got
+> 	the same pointer as the first time around, you proceed to
+> 	drop rwsem at the same address where you've grabbed it.
+> 
+> IOW, you really don't want that in the tree in this form.
+> 
+> It *might* be partially recoverable if you replace the first dget() with
+> dget_parent() and reorder dput() and inode_unlock() in failure case, but...
+> some of the callers of that thing are also rather dubious.
+> 
+> Look: you have smb2_open() calling ksmbd_vfs_may_delete(), which calls
+> that thing.  Downstream of this:
+> 	if (!file_present) {
+> 	...
+> 	} else if (!already_permitted) {
+> 
+> If the parent is *NOT* already locked by that point, just how much is
+> your 'file_present' worth?  And if it is, you'd obviously deadlock
+> right there and then...
+> 
+> I'm not sure I like what you've done with added exports - e.g.
+> __lookup_hash had been OK as a name of static function, but exporting
+> it is asking for clashes.  And honestly, what would you say when running
+> into a name like that?  OK, it sounds like it's a (probably low-level)
+> lookup in some hash table.  _Maybe_ it would've been fine if we had one
+> and only implementation of hash tables in the entire tree and that
+> had been a part of it, but it's nothing of that sort.  And "hash" in
+> the name is not about doing a hash lookup as opposed to some other
+> work (it *does* handle hash misses, allocating dentry, asking filesystem
+> to do real on-disk lookup, etc.) - it's actually about "hash function
+> of the name is already calculated".  My fault, that - predecessor of
+> that thing had been called lookup_one(); it took a string, calculated
+> its length and computed hash, then proceeded to do lookups.  The latter
+> part could be reused in handling of rmdir et.al., where we already had
+> the component length and hash precalculated, so the tail of lookup_one()
+> had been carved out into a separate helper.  Circa 2.3.99...
+> 
+> Anyway, the name is _not_ fit for an export; I'm not sure what to call
+> it - lookup_one_qstr(), perhaps?  Additional fun is due to the fact
+> that these days it is slightly different from the lookup_one() et.al.
+> Those can be called with directory held shared; that allows parallel
+> lookups, but it's not free of cost - if we run into a cache miss and need
+> to allocate a new dentry and talk to filesystem, we have to recheck the
+> hash table after allocation.  __lookup_hash() is called only with parent
+> held exclusive and it can skip that fun - hash miss is going to remain
+> a miss; nobody else will be able to insert stuff into dcache in that
+> directory until we unlock it.
+> 
+> What I'm worried about is that renaming it to lookup_one_qstr() will
+> be an invitation for "oh, we happen to have hash/len already known by the
+> time of that lookup_one() call; let's just convert it to lookup_one_qsrt()"
+> and if that happens in a place where the parent is held only shared, we'll
+> be in trouble.  OTOH, lookup_one_qstr_excl() sounds like an invitation to
+> do something painful to whoever's responsible for such name...
+> 
+> Suggestions, anyone?
 
-When running on recent kernel versions, this system call on a cifs-mounted
-file sometimes takes an unusually long time:
+Plus, __lookup_hash() doesn't do permission checking so naming it
+lookup_one_qstr() seems problematic from that perspective as well...
 
-getxattr("/cifsmount/dir/image.jpg", "user.baloo.rating", NULL, 0)
+Don't kill me but:
 
-The call normally returns in under 10 milliseconds, but on kernel 5.14+, it
-sometimes takes over 30 seconds with no significant client or server load.
+__excl_qstr_lookup_noperm()
 
-Discovered while using gwenview to browse 100+ 1.5 MiB images on a samba share
-mounted via /etc/fstab. While quickly flipping through the images, the problem
-often occurs within 20 seconds. Gwenview freezes until the call completes.
-
-Client:
-  kernel versions 5.14 and later
-  mount.cifs 6.11
-  Gwenview 20.12.3
-  Debian Bullseye
-  4-core amd64
-Server:
-  Samba 4.13.13-Debian
-  Debian Bullseye
-  6-core arm64 
-
-A git bisect identified kernel commit 9e992755be8f as the problematic change.
-The problem does not occur when any of the following are true:
-- Client is running a kernel from before that commit.
-- The nouser_xattr mount option is used on the cifs share.
-- Gwenview accesses the files via smb:// URL instead of a cifs mount.
-
-This program tries to reproduce the problem by making system calls seen in
-strace output from a stuck gwenview instance. It expects its arguments to be
-file paths on a cifs mount. It will loop over the named files, applying the
-system calls to each one in sequence. The -i option is available to run
-several iterations of the loop. For example, with -i 2 and 10 files, the system
-calls will be made 20 times. This normally completes quickly.
-
-The -t option runs the same loop in multiple threads, which seems to trigger
-the problem: getxattr() takes over 100 times as long when more than one thread
-is running.
-
-Curiously, the call never seems to be as slow in this reproducer (~1 second) as
-it sometimes is in gwenview (30+ seconds), so perhaps this code does not model
-gwenview's triggering behavior well. Nevertheless, it reproduces a significant
-delay under the same conditions, so it might still help track down the problem.
-
-Build with:
-gcc -pthread
-
-*/
-
-#include <alloca.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/xattr.h>
-#include <unistd.h>
-
-
-int test_file(char *path)
-    {
-    int fd;
-
-    fd = openat(AT_FDCWD, path, O_RDONLY);
-    if (fd == -1)
-        {
-        perror("openat");
-        return -1;
-        }
-    close(fd);
-    getxattr(path, "user.baloo.rating", NULL, 0); /* sometimes slow */
-
-    return 0;
-    }
-
-
-int test_files(char **paths)
-    {
-    for (; *paths; paths++)
-        if (test_file(*paths))
-            return -1;
-    return 0;
-    }
-
-
-int test_files_repeatedly(char **paths, int itercount)
-    {
-    while (itercount--)
-        if (test_files(paths))
-            return -1;
-    return 0;
-    }
-
-
-struct thread_params
-    {
-    char **paths;
-    int itercount;
-    };
-
-
-void *thread_main(void *thread_arg)
-    {
-    struct thread_params params = *(struct thread_params *)thread_arg;
-
-    while (params.itercount--)
-        if (test_files(params.paths))
-            return "failure in test thread";
-
-    return 0;
-    }
-
-
-int test_files_threaded(char **paths, int itercount, int threadcount)
-    {
-    struct thread_params params = {paths, itercount};
-    pthread_t *threadids;
-    int i;
-
-    threadcount--; /* the main thread will do one thread's work */
-
-    threadids = alloca(sizeof(*threadids) * threadcount);
-
-    for (i = 0; i < threadcount; i++)
-        if (pthread_create(&threadids[i], NULL, thread_main, &params))
-            {
-            printf("pthread_create failed\n");
-            return -1;
-            }
-
-    /* do one thread's work in the main thread */
-    if (test_files_repeatedly(paths, itercount))
-        {
-        printf("failure in main thread");
-        return -1;
-        }
-
-    for (i = 0; i < threadcount; i++)
-        {
-        void *thread_result;
-        if (pthread_join(threadids[i], &thread_result))
-            {
-            printf("pthread_join failed\n");
-            return -1;
-            }
-        if (thread_result)
-            {
-            printf("%s\n", (char *)thread_result);
-            return -1;
-            }
-        }
-
-    return 0;
-    }
-
-
-void usage(const char *cmd)
-    {
-    printf("usage: %s [-i iterations] [-t threads] <files>\n", cmd);
-    }
-
-
-int main(int argc, char *argv[])
-    {
-    int itercount = 1, threadcount=1, opt;
-    char **paths;
-
-    while ((opt = getopt(argc, argv, "i:t:h")) != -1)
-        {
-        switch (opt)
-            {
-            case 'i':
-                itercount = atoi(optarg);
-                break;
-            case 't':
-                threadcount = atoi(optarg);
-                break;
-            default:
-                usage(argv[0]);
-                return 2;
-            }
-        }
-    if (optind == argc)
-        {
-        usage(argv[0]);
-        return 2;
-        }
-    paths = &argv[optind];
-
-    return test_files_threaded(paths, itercount, threadcount);
-    }
+?
