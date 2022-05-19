@@ -2,82 +2,126 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F11B8C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 May 2022 23:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0037C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 May 2022 23:35:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245673AbiESXG3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 May 2022 19:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38144 "EHLO
+        id S1343634AbiESXfL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 May 2022 19:35:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245672AbiESXGW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 May 2022 19:06:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD60F22BE2
-        for <linux-cifs@vger.kernel.org>; Thu, 19 May 2022 16:06:18 -0700 (PDT)
+        with ESMTP id S236252AbiESXfK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 May 2022 19:35:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88052111BAA;
+        Thu, 19 May 2022 16:35:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1C7A16181A
-        for <linux-cifs@vger.kernel.org>; Thu, 19 May 2022 23:06:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F589C385B8
-        for <linux-cifs@vger.kernel.org>; Thu, 19 May 2022 23:06:17 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 225566194E;
+        Thu, 19 May 2022 23:35:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F4ABC34113;
+        Thu, 19 May 2022 23:35:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653001577;
-        bh=oTBS4KrODMGY1py9GtHvpnSUmTFgrYs/LvftQswIdh0=;
+        s=k20201202; t=1653003308;
+        bh=JTKD7lDzN+7WJEF3W1PJ08Q0Pi2VzLP5ieKWHMWYS0s=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=uY1/y9L1HAFHflEBu78WRouADtmDD3fbYIH3ZzCFaBuW3KDuoNpHEOtFvrofVfyqI
-         H8ivYSMyJbAJTvBDTnogQDKud+drwqjbTQ8D8ZL/ejfxW0Z8netzakGoB4BKVXuS06
-         mAx25aY+MS0glG/W/wO47J4bFys/pn8CWgs3ckjGeuCRqnBN2qq6TUuFJF6dVV7bY1
-         53rMpwdoN0dQG+FpckLKarwxwLccEnFwF2K4liI7iGtMB+02qGtoPUErFzI9I7FUqo
-         ue3gcrZ5kL6004UYfNT55jdKBnF1A6Tgcbl3sZRLXaeJHJiaV5l38+CymAWWHzstJT
-         wh5FX2766ayBw==
-Received: by mail-wm1-f43.google.com with SMTP id k26so3694052wms.1
-        for <linux-cifs@vger.kernel.org>; Thu, 19 May 2022 16:06:17 -0700 (PDT)
-X-Gm-Message-State: AOAM532iJtvf6KTZjCHauhjIo4zwnVrQOJqfBimVqY4hRH+opuvJAllZ
-        1GQfI8we9GK4izng0UbXRdR5L1B6CtVnoSh4Ig0=
-X-Google-Smtp-Source: ABdhPJzv3oYnrewbDf6j1fWYhLKkK+CknPJCAxF0lNXeOLqnpeqJBV2+oJqszmvTUsb+CdKxp2FWVjWntxncNGG+Oqs=
-X-Received: by 2002:a05:600c:3b11:b0:394:57eb:c58b with SMTP id
- m17-20020a05600c3b1100b0039457ebc58bmr6175766wms.3.1653001575733; Thu, 19 May
- 2022 16:06:15 -0700 (PDT)
+        b=Y+efLnCyyITbboBHSDH4hMjueqOQOw7iLy/8y1hcRucyr+LQ7FWvCijvx+p5PDgkK
+         dwsd5vnsQgcG47viXcwqu5FD0Ozbx2YHEQuBbTQru5Q2em2v/byJ3K/2SAG+GfhMIP
+         GvL3ohB2EMf2qi1CjqvOptkROp6Q3BVRCn2FGbGNIa95xBiP1t4mk/p1jE8Sse4LFm
+         zzmuuAA60/B64vPwStraUC7nDiHeTCub5PPXuceocmT8eGnYgdCGjsMR5aaHLRFJqu
+         HNiQbd9NHveplKP/eaYnW17sbMlEDwDsJ+hZbmSfI7JQNexJR0mxEZje7kCfkEy4Vk
+         LpfXGnuP4RnmA==
+Received: by mail-wm1-f49.google.com with SMTP id k126so3719792wme.2;
+        Thu, 19 May 2022 16:35:08 -0700 (PDT)
+X-Gm-Message-State: AOAM533j6W8WQMYevRmjyC3gLyD69seK3fJkhAlbtdZA5EObzRmvbw1K
+        ReqoXlmmKz/Hd2Stgk0ThI0UerTwUkvA5XVq6Xk=
+X-Google-Smtp-Source: ABdhPJwk1rjCfjD4r8fAEM0eJPfx9vTdw06IQ2xHud/uzUEVRTLFn+5e7stmRxfG9FPdZi2mQATSa5hleL+Px7OmPJ8=
+X-Received: by 2002:a05:600c:1906:b0:394:5365:6720 with SMTP id
+ j6-20020a05600c190600b0039453656720mr6412247wmq.102.1653003306709; Thu, 19
+ May 2022 16:35:06 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:adf:f344:0:0:0:0:0 with HTTP; Thu, 19 May 2022 16:06:14
+Received: by 2002:adf:f344:0:0:0:0:0 with HTTP; Thu, 19 May 2022 16:35:06
  -0700 (PDT)
-In-Reply-To: <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
-References: <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
+In-Reply-To: <20220519130055.305767-1-hyc.lee@gmail.com>
+References: <20220519130055.305767-1-hyc.lee@gmail.com>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 20 May 2022 08:06:14 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
-Message-ID: <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
-Subject: Re: RDMA (smbdirect) testing
-To:     Steve French <smfrench@gmail.com>
-Cc:     Hyeoncheol Lee <hyc.lee@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Long Li <longli@microsoft.com>
+Date:   Fri, 20 May 2022 08:35:06 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd__mL760Maq4Lh2SQ=JfDMi+9SyGg4LSaTakNqyMcVfsA@mail.gmail.com>
+Message-ID: <CAKYAXd__mL760Maq4Lh2SQ=JfDMi+9SyGg4LSaTakNqyMcVfsA@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: fix outstanding credits related bugs
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-cifs@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>, stable@vger.kernel.org,
+        Yufan Chen <wiz.chen@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-05-20 5:41 GMT+09:00, Steve French <smfrench@gmail.com>:
-Hi Steve,
-> Namjae and Hyeoncheol,
-> Have you had any luck setting up virtual RDMA devices for testing ksmbd
-> RDMA?
-You seem to be asking about soft-ROCE(or soft-iWARP). Hyunchul had
-been testing RDMA
- of ksmbd with it before.
-Hyunchul, please explain how to set-up it.
+2022-05-19 22:00 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> outstanding credits must be initialized to 0,
+> because it means the sum of credits consumed by
+> in-flight requests.
+> And outstanding credits must be compared with
+> total credits in smb2_validate_credit_charge(),
+> because total credits are the sum of credits
+> granted by ksmbd.
+>
+> This patch fix the following error,
+> while frametest with Windows clients:
+>
+> Limits exceeding the maximum allowable outstanding requests,
+> given : 128, pending : 8065
+>
+> Fixes: b589f5db6d4a ("ksmbd: limits exceeding the maximum allowable
+> outstanding requests")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+> Reported-by: Yufan Chen <wiz.chen@gmail.com>
+> Tested-by: Yufan Chen <wiz.chen@gmail.com>
+> ---
+> changes from v1:
+>  - Add "Fixes" and stable tags
+>
+>  fs/ksmbd/connection.c | 2 +-
+>  fs/ksmbd/smb2misc.c   | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
+> index 7db87771884a..e8f476c5f189 100644
+> --- a/fs/ksmbd/connection.c
+> +++ b/fs/ksmbd/connection.c
+> @@ -62,7 +62,7 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
+>  	atomic_set(&conn->req_running, 0);
+>  	atomic_set(&conn->r_count, 0);
+>  	conn->total_credits = 1;
+> -	conn->outstanding_credits = 1;
+> +	conn->outstanding_credits = 0;
+You need to consider auto negotiation from windows client connection.
+So it will cause integer underflow issue.
 
-Thanks!
 >
-> (similar to "/usr/sbin/rdma link add siw0 type siw netdev etho" then
-> mount with "rdma" mount option)
+>  	init_waitqueue_head(&conn->req_running_q);
+>  	INIT_LIST_HEAD(&conn->conns_list);
+> diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+> index 4a9460153b59..f8f456377a51 100644
+> --- a/fs/ksmbd/smb2misc.c
+> +++ b/fs/ksmbd/smb2misc.c
+> @@ -338,7 +338,7 @@ static int smb2_validate_credit_charge(struct ksmbd_conn
+> *conn,
+>  		ret = 1;
+>  	}
 >
->
->
+> -	if ((u64)conn->outstanding_credits + credit_charge >
+> conn->vals->max_credits) {
+> +	if ((u64)conn->outstanding_credits + credit_charge > conn->total_credits)
+> {
+>  		ksmbd_debug(SMB, "Limits exceeding the maximum allowable outstanding
+> requests, given : %u, pending : %u\n",
+>  			    credit_charge, conn->outstanding_credits);
+>  		ret = 1;
 > --
-> Thanks,
+> 2.25.1
 >
-> Steve
 >
