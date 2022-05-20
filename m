@@ -2,114 +2,72 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8C6C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 May 2022 06:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEA2C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 May 2022 06:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229782AbiETGGO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 20 May 2022 02:06:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52808 "EHLO
+        id S236403AbiETGUY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 20 May 2022 02:20:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345726AbiETGGH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 May 2022 02:06:07 -0400
-X-Greylist: delayed 1797 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 19 May 2022 23:06:04 PDT
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3E568DECA
-        for <linux-cifs@vger.kernel.org>; Thu, 19 May 2022 23:06:01 -0700 (PDT)
-Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
-        by 156.147.23.53 with ESMTP; 20 May 2022 14:36:00 +0900
-X-Original-SENDERIP: 156.147.1.127
-X-Original-MAILFROM: hyc.lee@gmail.com
-Received: from unknown (HELO localhost.localdomain) (10.177.245.62)
-        by 156.147.1.127 with ESMTP; 20 May 2022 14:36:00 +0900
-X-Original-SENDERIP: 10.177.245.62
-X-Original-MAILFROM: hyc.lee@gmail.com
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        stable@vger.kernel.org
-Subject: [PATCH v3] ksmbd: fix outstanding credits related bugs
-Date:   Fri, 20 May 2022 14:35:47 +0900
-Message-Id: <20220520053547.29034-1-hyc.lee@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        with ESMTP id S1345791AbiETGUS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 May 2022 02:20:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29F7414C764
+        for <linux-cifs@vger.kernel.org>; Thu, 19 May 2022 23:20:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653027616;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QAvrBXcqA1u/Q5DFwXZOWE06I0j8Giurss8RKXKHuxA=;
+        b=GDCP8Tu6rx4ho6cK9O29FsDjil2rcQ8YYGNZGpdVugGdIEuv/UbSDSljr18BdUtLcQLJk0
+        2dvftrfWFvJrfmUt4XV3c6y8sBr/vq3x7n/gKXG9qDMwRfZ8iqzskEhm1W9vxHZSrcNa9R
+        FpgWYqGzWeS8qwrNdBYhXIyvRfmMimM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-597-BVUIwVYpP_uVelSv8VN4jw-1; Fri, 20 May 2022 02:20:13 -0400
+X-MC-Unique: BVUIwVYpP_uVelSv8VN4jw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D42A63C0218B;
+        Fri, 20 May 2022 06:20:12 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DBD672026D6A;
+        Fri, 20 May 2022 06:20:11 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
+References: <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com> <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        Hyeoncheol Lee <hyc.lee@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>, Long Li <longli@microsoft.com>
+Subject: Re: RDMA (smbdirect) testing
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3738076.1653027611.1@warthog.procyon.org.uk>
+Date:   Fri, 20 May 2022 07:20:11 +0100
+Message-ID: <3738077.1653027611@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-outstanding credits must be initialized to 0,
-because it means the sum of credits consumed by
-in-flight requests.
-And outstanding credits must be compared with
-total credits in smb2_validate_credit_charge(),
-because total credits are the sum of credits
-granted by ksmbd.
+Namjae Jeon <linkinjeon@kernel.org> wrote:
 
-This patch fix the following error,
-while frametest with Windows clients:
+> You seem to be asking about soft-ROCE(or soft-iWARP). Hyunchul had been
+> testing RDMA of ksmbd with it before.
 
-Limits exceeding the maximum allowable outstanding requests,
-given : 128, pending : 8065
+Yep.  I don't have any RDMA-capable cards.  I have managed to use soft-IWarp
+with NFS.
 
-Fixes: b589f5db6d4a ("ksmbd: limits exceeding the maximum allowable outstanding requests")
-Cc: stable@vger.kernel.org
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-Reported-by: Yufan Chen <wiz.chen@gmail.com>
-Tested-by: Yufan Chen <wiz.chen@gmail.com>
----
-changes from v2:
- - fix underflow issue of outstanding credits while mutli-protocol negotiation
-   with an Windows client
-changes from v1:
- - Add "Fixes" and stable tags
+Also, if you know how to make Samba do RDMA, that would be useful.
 
- fs/ksmbd/connection.c | 2 +-
- fs/ksmbd/smb2misc.c   | 2 +-
- fs/ksmbd/smb_common.c | 4 +++-
- 3 files changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
-index 7db87771884a..e8f476c5f189 100644
---- a/fs/ksmbd/connection.c
-+++ b/fs/ksmbd/connection.c
-@@ -62,7 +62,7 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
- 	atomic_set(&conn->req_running, 0);
- 	atomic_set(&conn->r_count, 0);
- 	conn->total_credits = 1;
--	conn->outstanding_credits = 1;
-+	conn->outstanding_credits = 0;
- 
- 	init_waitqueue_head(&conn->req_running_q);
- 	INIT_LIST_HEAD(&conn->conns_list);
-diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
-index 4a9460153b59..f8f456377a51 100644
---- a/fs/ksmbd/smb2misc.c
-+++ b/fs/ksmbd/smb2misc.c
-@@ -338,7 +338,7 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
- 		ret = 1;
- 	}
- 
--	if ((u64)conn->outstanding_credits + credit_charge > conn->vals->max_credits) {
-+	if ((u64)conn->outstanding_credits + credit_charge > conn->total_credits) {
- 		ksmbd_debug(SMB, "Limits exceeding the maximum allowable outstanding requests, given : %u, pending : %u\n",
- 			    credit_charge, conn->outstanding_credits);
- 		ret = 1;
-diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
-index 9a7e211dbf4f..a336715e35e5 100644
---- a/fs/ksmbd/smb_common.c
-+++ b/fs/ksmbd/smb_common.c
-@@ -140,8 +140,10 @@ int ksmbd_verify_smb_message(struct ksmbd_work *work)
- 
- 	hdr = work->request_buf;
- 	if (*(__le32 *)hdr->Protocol == SMB1_PROTO_NUMBER &&
--	    hdr->Command == SMB_COM_NEGOTIATE)
-+	    hdr->Command == SMB_COM_NEGOTIATE) {
-+		work->conn->outstanding_credits += 1;
- 		return 0;
-+	}
- 
- 	return -EINVAL;
- }
--- 
-2.17.1
+Thanks,
+David
 
