@@ -2,311 +2,109 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E9E5C433F5
-	for <linux-cifs@archiver.kernel.org>; Sun, 22 May 2022 04:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BCFC433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 22 May 2022 05:47:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234404AbiEVEkU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 22 May 2022 00:40:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53450 "EHLO
+        id S230091AbiEVFrQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 22 May 2022 01:47:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233151AbiEVEkS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 May 2022 00:40:18 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8910140A0B;
-        Sat, 21 May 2022 21:40:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=7ihJWPodsu4HoFFfUGbAyKnFOLBpvhPdC/j8qB/xhqs=; b=hJ3vcSDnGvepDitO4g6Nf1Gplv
-        Tbf7ejH3Owq5rndd0R6dVOnFfK5p5noKcBgViPP8rgJcyjuaKz18zvHvjLsYV4Z6n/cRLeJObT1JN
-        cySHYIcZOts5xrwHRnZ/SdQ3av/QPksAnynj4QHxhiQQX+cnFP8x6n00jWwzePn1HmlIoB/UkDjla
-        LXBfZxdMJii3vFjeZ/t3GkRn9u3koUFVLPOW2IWtKoQKz3kiTG+9k9FgX8L/95G7SiTxZ9nRwOrhh
-        3i4cB4QtxdA+AppUIn8rfMxlmpJAg7aOBfJkyIXESN2DP2hCwPN8cfAl7v0tguFCzX8CVOMVVVKA/
-        2fMKr0m9JwYVxACxQVE/Q22SvTbdluhvVs4vU008EqQXsihOG5HLgaTJ0wzuF3y9Ms5uUL4P8F29v
-        hgaPnSo9gaboKeKJm0+0VlfXf/26nQdvVedl5ctLAK8S6zuSz9Jstt/flL8HariWg6KncdC9tv5nl
-        cqKKd81GSTC9Zdk8pX4W8vvy;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1nsdNz-001xw6-9A; Sun, 22 May 2022 04:40:12 +0000
-Message-ID: <1c766d88-6130-1523-26d4-fefebc15af27@samba.org>
-Date:   Sat, 21 May 2022 23:40:08 -0500
+        with ESMTP id S238064AbiEVFrP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 May 2022 01:47:15 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B90B3AA79
+        for <linux-cifs@vger.kernel.org>; Sat, 21 May 2022 22:47:12 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id p4so19149094lfg.4
+        for <linux-cifs@vger.kernel.org>; Sat, 21 May 2022 22:47:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=uyjYxEVvx39n6G7aDyqQEIHvxLR3HMfTdiZTXIr8Aiw=;
+        b=DbTf5TcMiNLtCuMFizUilEe0gxfGpU/9lc8Je8MbXXLKO4Nq4Np3RE04v0yhI1tbXj
+         5ZeNLPVVt3cs4Sz1SuXgq0WgXOD8GlYsBgzn38Sr4ayWzyoA/mvd0Tf9tJ/A2BkSDKrT
+         TYl9rPQnpaOMUo/oBVIVhbh/krarU4QINyQgRsFuNFkiGkoYBOdaV93gQRxYQ5vzp9Sq
+         ywQfoos5IbMS7VzcpnIfp9q7huqrWaOY9AQL5XIHTtmMKDOCR8OCEHx+R4yQAZH0hoNT
+         YXR6EgvqLr83pKE1KPhVe1xzD2WoTPICad4bmVnwDjea7AmpUT/tmARhmJO3h91Blmkn
+         DEng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=uyjYxEVvx39n6G7aDyqQEIHvxLR3HMfTdiZTXIr8Aiw=;
+        b=DpXFQH4ihxTrdFOgyaBrTV9b55oDTY2FEtrFumqPrje9yOobS0GaWNj62kykPS/xO8
+         WXFE5+YxXh6Bv+nJGRiRNp1NW6t+8AbRGVjRUv1VVXa9qhgjukobNjr39ZXjEcLRESc8
+         AVmeoqOBtFWR5mzvar8lWUf+7V5OBcUXuCrhotf62kzjv0zKe0mUHs25m9J4T6bmwkN2
+         3kGgIeAnsWhIXUnBe8B0OdVXY8T9xVb6FB9geDT512zCqlX9ud8eNV7ifUFTopmqfbwp
+         u1tEpqeZG5kJyNMoAtRRM4zTHSPl0fYU0eb3l7SVFFWNKtXOHQqRUd2Nnsvro8h4ErTC
+         22NA==
+X-Gm-Message-State: AOAM5326Q7FhzdadYAh7RGTJjJ5qWfODoXXRb5TxwJJfLLGpnnnsPhSd
+        z29gxMdQ4HSE83CKA0QLP1TZG7339nth6QF0FOy+T0X1sTU=
+X-Google-Smtp-Source: ABdhPJx2/mLCanAl7vWgGdHXZlXVOdUfPzK1Oc+Gq8Ey8afzrFb9jStVYNWSRNm9RRq7tmCm+NYiVfJHvwndJ7rqoHA=
+X-Received: by 2002:a05:6512:1583:b0:477:cc34:4a6c with SMTP id
+ bp3-20020a056512158300b00477cc344a6cmr9980868lfb.595.1653198430052; Sat, 21
+ May 2022 22:47:10 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: CIFS regression mounting vers=1.0 NTLMSSP when hostname is too
- long
-Content-Language: en-US
-To:     Paulo Alcantara <pc@cjr.nz>, Byron Stanoszek <gandalf@winds.org>,
-        Steve French <smfrench@gmail.com>
-Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <e6837098-15d9-acb6-7e34-1923cf8c6fe1@winds.org>
- <874k1nj3p4.fsf@cjr.nz>
-From:   Steven French <sfrench@samba.org>
-In-Reply-To: <874k1nj3p4.fsf@cjr.nz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 22 May 2022 00:46:58 -0500
+Message-ID: <CAH2r5ms+KeC7U4E0DnggAL587EHb45F-34-u4bVeqRR7o_GC4g@mail.gmail.com>
+Subject: [PATCH][SMB2] Add tracepoint for oplock break file not found
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000002ad15d05df9341b2"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Yes - please let us know if this worked.
+--0000000000002ad15d05df9341b2
+Content-Type: text/plain; charset="UTF-8"
 
-On 5/17/22 15:37, Paulo Alcantara wrote:
-> Hi Byron,
->
-> Byron Stanoszek <gandalf@winds.org> writes:
->
->> I would like to report a regression in the CIFS fs. Sometime between Linux 4.14
->> and 5.16, mounting CIFS with option vers=1.0 (and
->> CONFIG_CIFS_ALLOW_INSECURE_LEGACY=y set appropriately) with security type
->> NTLMSSP stopped working for me. The server side is a Windows 2003 Server.
->>
->> I found that this behavior depends on the length of the Linux client's
->> host+domain name (e.g. utsname()->nodename), where the mount works as long as
->> the name is 16 characters or less. Anything 17 or above returns -EIO, per the
->> following example:
->>
->> /etc/fstab entry:
->>
->> //10.0.0.12/xxxxxxxxx /ext0     cifs    vers=1.0,user=xxxxx,pass=xxxxxxxxxxx,dom=xxxxxxxxxxx,dir_mode=0755,file_mode=0644,noauto 0 0
->>
->> # hostname 12345678901234567;mount /ext0
->> mount error(5): Input/output error
->> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and kernel log messages (dmesg)
->> # hostname 1234567890123456;mount /ext0
->> #
-> Could you please try below patch?
->
-> Let me know if I missed something else.  Thanks.
->
->  From bf63fb30ac90c06f45e40acbd3bbd2284d8ffffb Mon Sep 17 00:00:00 2001
-> From: Paulo Alcantara <pc@cjr.nz>
-> Date: Tue, 17 May 2022 17:23:23 -0300
-> Subject: [PATCH] cifs: fix ntlmssp on old servers
->
-> Some older servers seem to require the workstation name during ntlmssp
-> to be at most 15 chars (RFC1001 name length), so truncate it before
-> sending when using insecure dialects.
->
-> Link: https://lore.kernel.org/r/e6837098-15d9-acb6-7e34-1923cf8c6fe1@winds.org
-> Reported-by: Byron Stanoszek <gandalf@winds.org>
-> Fixes: 49bd49f983b5 ("cifs: send workstation name during ntlmssp session setup")
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> ---
->   fs/cifs/cifsglob.h   | 15 ++++++++++++++-
->   fs/cifs/connect.c    | 22 ++++------------------
->   fs/cifs/fs_context.c | 29 ++++-------------------------
->   fs/cifs/fs_context.h |  2 +-
->   fs/cifs/misc.c       |  1 -
->   fs/cifs/sess.c       |  6 +++---
->   6 files changed, 26 insertions(+), 49 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 8de977c359b1..5024b6792dab 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -944,7 +944,7 @@ struct cifs_ses {
->   				   and after mount option parsing we fill it */
->   	char *domainName;
->   	char *password;
-> -	char *workstation_name;
-> +	char workstation_name[CIFS_MAX_WORKSTATION_LEN];
->   	struct session_key auth_key;
->   	struct ntlmssp_auth *ntlmssp; /* ciphertext, flags, server challenge */
->   	enum securityEnum sectype; /* what security flavor was specified? */
-> @@ -1979,4 +1979,17 @@ static inline bool cifs_is_referral_server(struct cifs_tcon *tcon,
->   	return is_tcon_dfs(tcon) || (ref && (ref->flags & DFSREF_REFERRAL_SERVER));
->   }
->   
-> +static inline size_t ntlmssp_workstation_name_size(const struct cifs_ses *ses)
-> +{
-> +	if (WARN_ON_ONCE(!ses || !ses->server))
-> +		return 0;
-> +	/*
-> +	 * Make workstation name no more than 15 chars when using insecure dialects as some legacy
-> +	 * servers do require it during NTLMSSP.
-> +	 */
-> +	if (ses->server->dialect <= SMB20_PROT_ID)
-> +		return min_t(size_t, sizeof(ses->workstation_name), RFC1001_NAME_LEN_WITH_NULL);
-> +	return sizeof(ses->workstation_name);
-> +}
-> +
->   #endif	/* _CIFS_GLOB_H */
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 42e14f408856..6ae5193fb562 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2037,18 +2037,7 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
->   		}
->   	}
->   
-> -	ctx->workstation_name = kstrdup(ses->workstation_name, GFP_KERNEL);
-> -	if (!ctx->workstation_name) {
-> -		cifs_dbg(FYI, "Unable to allocate memory for workstation_name\n");
-> -		rc = -ENOMEM;
-> -		kfree(ctx->username);
-> -		ctx->username = NULL;
-> -		kfree_sensitive(ctx->password);
-> -		ctx->password = NULL;
-> -		kfree(ctx->domainname);
-> -		ctx->domainname = NULL;
-> -		goto out_key_put;
-> -	}
-> +	strscpy(ctx->workstation_name, ses->workstation_name, sizeof(ctx->workstation_name));
->   
->   out_key_put:
->   	up_read(&key->sem);
-> @@ -2157,12 +2146,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
->   		if (!ses->domainName)
->   			goto get_ses_fail;
->   	}
-> -	if (ctx->workstation_name) {
-> -		ses->workstation_name = kstrdup(ctx->workstation_name,
-> -						GFP_KERNEL);
-> -		if (!ses->workstation_name)
-> -			goto get_ses_fail;
-> -	}
-> +
-> +	strscpy(ses->workstation_name, ctx->workstation_name, sizeof(ses->workstation_name));
-> +
->   	if (ctx->domainauto)
->   		ses->domainAuto = ctx->domainauto;
->   	ses->cred_uid = ctx->cred_uid;
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index a92e9eec521f..fbb0e98c7d2c 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -312,7 +312,6 @@ smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx
->   	new_ctx->password = NULL;
->   	new_ctx->server_hostname = NULL;
->   	new_ctx->domainname = NULL;
-> -	new_ctx->workstation_name = NULL;
->   	new_ctx->UNC = NULL;
->   	new_ctx->source = NULL;
->   	new_ctx->iocharset = NULL;
-> @@ -327,7 +326,6 @@ smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx
->   	DUP_CTX_STR(UNC);
->   	DUP_CTX_STR(source);
->   	DUP_CTX_STR(domainname);
-> -	DUP_CTX_STR(workstation_name);
->   	DUP_CTX_STR(nodename);
->   	DUP_CTX_STR(iocharset);
->   
-> @@ -766,8 +764,7 @@ static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
->   		cifs_errorf(fc, "can not change domainname during remount\n");
->   		return -EINVAL;
->   	}
-> -	if (new_ctx->workstation_name &&
-> -	    (!old_ctx->workstation_name || strcmp(new_ctx->workstation_name, old_ctx->workstation_name))) {
-> +	if (strcmp(new_ctx->workstation_name, old_ctx->workstation_name)) {
->   		cifs_errorf(fc, "can not change workstation_name during remount\n");
->   		return -EINVAL;
->   	}
-> @@ -814,7 +811,6 @@ static int smb3_reconfigure(struct fs_context *fc)
->   	STEAL_STRING(cifs_sb, ctx, username);
->   	STEAL_STRING(cifs_sb, ctx, password);
->   	STEAL_STRING(cifs_sb, ctx, domainname);
-> -	STEAL_STRING(cifs_sb, ctx, workstation_name);
->   	STEAL_STRING(cifs_sb, ctx, nodename);
->   	STEAL_STRING(cifs_sb, ctx, iocharset);
->   
-> @@ -1467,22 +1463,15 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
->   
->   int smb3_init_fs_context(struct fs_context *fc)
->   {
-> -	int rc;
->   	struct smb3_fs_context *ctx;
->   	char *nodename = utsname()->nodename;
->   	int i;
->   
->   	ctx = kzalloc(sizeof(struct smb3_fs_context), GFP_KERNEL);
-> -	if (unlikely(!ctx)) {
-> -		rc = -ENOMEM;
-> -		goto err_exit;
-> -	}
-> +	if (unlikely(!ctx))
-> +		return -ENOMEM;
->   
-> -	ctx->workstation_name = kstrdup(nodename, GFP_KERNEL);
-> -	if (unlikely(!ctx->workstation_name)) {
-> -		rc = -ENOMEM;
-> -		goto err_exit;
-> -	}
-> +	strscpy(ctx->workstation_name, nodename, sizeof(ctx->workstation_name));
->   
->   	/*
->   	 * does not have to be perfect mapping since field is
-> @@ -1555,14 +1544,6 @@ int smb3_init_fs_context(struct fs_context *fc)
->   	fc->fs_private = ctx;
->   	fc->ops = &smb3_fs_context_ops;
->   	return 0;
-> -
-> -err_exit:
-> -	if (ctx) {
-> -		kfree(ctx->workstation_name);
-> -		kfree(ctx);
-> -	}
-> -
-> -	return rc;
->   }
->   
->   void
-> @@ -1588,8 +1569,6 @@ smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx)
->   	ctx->source = NULL;
->   	kfree(ctx->domainname);
->   	ctx->domainname = NULL;
-> -	kfree(ctx->workstation_name);
-> -	ctx->workstation_name = NULL;
->   	kfree(ctx->nodename);
->   	ctx->nodename = NULL;
->   	kfree(ctx->iocharset);
-> diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
-> index e54090d9ef36..3a156c143925 100644
-> --- a/fs/cifs/fs_context.h
-> +++ b/fs/cifs/fs_context.h
-> @@ -170,7 +170,7 @@ struct smb3_fs_context {
->   	char *server_hostname;
->   	char *UNC;
->   	char *nodename;
-> -	char *workstation_name;
-> +	char workstation_name[CIFS_MAX_WORKSTATION_LEN];
->   	char *iocharset;  /* local code page for mapping to and from Unicode */
->   	char source_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* clnt nb name */
->   	char target_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* srvr nb name */
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index afaf59c22193..114810e563a9 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -95,7 +95,6 @@ sesInfoFree(struct cifs_ses *buf_to_free)
->   	kfree_sensitive(buf_to_free->password);
->   	kfree(buf_to_free->user_name);
->   	kfree(buf_to_free->domainName);
-> -	kfree(buf_to_free->workstation_name);
->   	kfree_sensitive(buf_to_free->auth_key.response);
->   	kfree(buf_to_free->iface_list);
->   	kfree_sensitive(buf_to_free);
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index 32f478c7a66d..1a0995bb5d90 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -714,9 +714,9 @@ static int size_of_ntlmssp_blob(struct cifs_ses *ses, int base_size)
->   	else
->   		sz += sizeof(__le16);
->   
-> -	if (ses->workstation_name)
-> +	if (ses->workstation_name[0])
->   		sz += sizeof(__le16) * strnlen(ses->workstation_name,
-> -			CIFS_MAX_WORKSTATION_LEN);
-> +					       ntlmssp_workstation_name_size(ses));
->   	else
->   		sz += sizeof(__le16);
->   
-> @@ -960,7 +960,7 @@ int build_ntlmssp_auth_blob(unsigned char **pbuffer,
->   
->   	cifs_security_buffer_from_str(&sec_blob->WorkstationName,
->   				      ses->workstation_name,
-> -				      CIFS_MAX_WORKSTATION_LEN,
-> +				      ntlmssp_workstation_name_size(ses),
->   				      *pbuffer, &tmp,
->   				      nls_cp);
->   
+Similar to the earlier patch I sent out for lease not found, this patch handles
+the oplock case
+
+In order to debug problems with server potentially sending us an oplock
+that we don't recognize (or a race with close and oplock break) it would
+be helpful to have a dynamic trace point for this case.  New tracepoint
+called trace_smb3_oplock_not_found
+
+
+-- 
+Thanks,
+
+Steve
+
+--0000000000002ad15d05df9341b2
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-add-trace-point-for-oplock-not-found.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-add-trace-point-for-oplock-not-found.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_l3gvncm10>
+X-Attachment-Id: f_l3gvncm10
+
+RnJvbSBiMjMxYzVmNjhiOWZkYTQ0NjAyY2Q4ZTI2NmRiNmY0ZWI4ZjZkOGE3IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFN1biwgMjIgTWF5IDIwMjIgMDA6NDE6NDEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBhZGQgdHJhY2UgcG9pbnQgZm9yIG9wbG9jayBub3QgZm91bmQKCkluIG9yZGVyIHRvIGRl
+YnVnIHByb2JsZW1zIHdpdGggc2VydmVyIHBvdGVudGlhbGx5CnNlbmRpbmcgdXMgYW4gb3Bsb2Nr
+IHRoYXQgd2UgZG9uJ3QgcmVjb2duaXplIChvciBhIHJhY2UKd2l0aCBjbG9zZSBhbmQgb3Bsb2Nr
+IGJyZWFrKSBpdCB3b3VsZCBiZSBoZWxwZnVsIHRvIGhhdmUKYSBkeW5hbWljIHRyYWNlIHBvaW50
+IGZvciB0aGlzIGNhc2UuICBOZXcgdHJhY2Vwb2ludAppcyBjYWxsZWQgdHJhY2Vfc21iM19vcGxv
+Y2tfbm90X2ZvdW5kCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jv
+c29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIybWlzYy5jIHwgNCArKysrCiBmcy9jaWZzL3RyYWNl
+LmggICAgfCAxICsKIDIgZmlsZXMgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0
+IGEvZnMvY2lmcy9zbWIybWlzYy5jIGIvZnMvY2lmcy9zbWIybWlzYy5jCmluZGV4IGYyMzZiZWFm
+Zjk2ZC4uMTc4MTNjM2QwYzZlIDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJtaXNjLmMKKysrIGIv
+ZnMvY2lmcy9zbWIybWlzYy5jCkBAIC03MzIsNiArNzMyLDEwIEBAIHNtYjJfaXNfdmFsaWRfb3Bs
+b2NrX2JyZWFrKGNoYXIgKmJ1ZmZlciwgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQog
+CX0KIAlzcGluX3VubG9jaygmY2lmc190Y3Bfc2VzX2xvY2spOwogCWNpZnNfZGJnKEZZSSwgIk5v
+IGZpbGUgaWQgbWF0Y2hlZCwgb3Bsb2NrIGJyZWFrIGlnbm9yZWRcbiIpOworCXRyYWNlX3NtYjNf
+b3Bsb2NrX25vdF9mb3VuZCgwIC8qIG5vIHhpZCAqLywgcnNwLT5QZXJzaXN0ZW50RmlkLAorCQkJ
+CSAgbGUzMl90b19jcHUocnNwLT5oZHIuSWQuU3luY0lkLlRyZWVJZCksCisJCQkJICBsZTY0X3Rv
+X2NwdShyc3AtPmhkci5TZXNzaW9uSWQpKTsKKwogCXJldHVybiB0cnVlOwogfQogCmRpZmYgLS1n
+aXQgYS9mcy9jaWZzL3RyYWNlLmggYi9mcy9jaWZzL3RyYWNlLmgKaW5kZXggMDlkM2RmZWQ4NmQ5
+Li4yYmU1ZTBjODU2NGQgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvdHJhY2UuaAorKysgYi9mcy9jaWZz
+L3RyYWNlLmgKQEAgLTE1OCw2ICsxNTgsNyBAQCBERUZJTkVfU01CM19GRF9FVkVOVChmbHVzaF9l
+bnRlcik7CiBERUZJTkVfU01CM19GRF9FVkVOVChmbHVzaF9kb25lKTsKIERFRklORV9TTUIzX0ZE
+X0VWRU5UKGNsb3NlX2VudGVyKTsKIERFRklORV9TTUIzX0ZEX0VWRU5UKGNsb3NlX2RvbmUpOwor
+REVGSU5FX1NNQjNfRkRfRVZFTlQob3Bsb2NrX25vdF9mb3VuZCk7CiAKIERFQ0xBUkVfRVZFTlRf
+Q0xBU1Moc21iM19mZF9lcnJfY2xhc3MsCiAJVFBfUFJPVE8odW5zaWduZWQgaW50IHhpZCwKLS0g
+CjIuMzQuMQoK
+--0000000000002ad15d05df9341b2--
