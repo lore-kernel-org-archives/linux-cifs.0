@@ -2,109 +2,80 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BCFC433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 22 May 2022 05:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0CEC433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 22 May 2022 21:09:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230091AbiEVFrQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 22 May 2022 01:47:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39472 "EHLO
+        id S232594AbiEVVJS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 22 May 2022 17:09:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238064AbiEVFrP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 May 2022 01:47:15 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B90B3AA79
-        for <linux-cifs@vger.kernel.org>; Sat, 21 May 2022 22:47:12 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id p4so19149094lfg.4
-        for <linux-cifs@vger.kernel.org>; Sat, 21 May 2022 22:47:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=uyjYxEVvx39n6G7aDyqQEIHvxLR3HMfTdiZTXIr8Aiw=;
-        b=DbTf5TcMiNLtCuMFizUilEe0gxfGpU/9lc8Je8MbXXLKO4Nq4Np3RE04v0yhI1tbXj
-         5ZeNLPVVt3cs4Sz1SuXgq0WgXOD8GlYsBgzn38Sr4ayWzyoA/mvd0Tf9tJ/A2BkSDKrT
-         TYl9rPQnpaOMUo/oBVIVhbh/krarU4QINyQgRsFuNFkiGkoYBOdaV93gQRxYQ5vzp9Sq
-         ywQfoos5IbMS7VzcpnIfp9q7huqrWaOY9AQL5XIHTtmMKDOCR8OCEHx+R4yQAZH0hoNT
-         YXR6EgvqLr83pKE1KPhVe1xzD2WoTPICad4bmVnwDjea7AmpUT/tmARhmJO3h91Blmkn
-         DEng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=uyjYxEVvx39n6G7aDyqQEIHvxLR3HMfTdiZTXIr8Aiw=;
-        b=DpXFQH4ihxTrdFOgyaBrTV9b55oDTY2FEtrFumqPrje9yOobS0GaWNj62kykPS/xO8
-         WXFE5+YxXh6Bv+nJGRiRNp1NW6t+8AbRGVjRUv1VVXa9qhgjukobNjr39ZXjEcLRESc8
-         AVmeoqOBtFWR5mzvar8lWUf+7V5OBcUXuCrhotf62kzjv0zKe0mUHs25m9J4T6bmwkN2
-         3kGgIeAnsWhIXUnBe8B0OdVXY8T9xVb6FB9geDT512zCqlX9ud8eNV7ifUFTopmqfbwp
-         u1tEpqeZG5kJyNMoAtRRM4zTHSPl0fYU0eb3l7SVFFWNKtXOHQqRUd2Nnsvro8h4ErTC
-         22NA==
-X-Gm-Message-State: AOAM5326Q7FhzdadYAh7RGTJjJ5qWfODoXXRb5TxwJJfLLGpnnnsPhSd
-        z29gxMdQ4HSE83CKA0QLP1TZG7339nth6QF0FOy+T0X1sTU=
-X-Google-Smtp-Source: ABdhPJx2/mLCanAl7vWgGdHXZlXVOdUfPzK1Oc+Gq8Ey8afzrFb9jStVYNWSRNm9RRq7tmCm+NYiVfJHvwndJ7rqoHA=
-X-Received: by 2002:a05:6512:1583:b0:477:cc34:4a6c with SMTP id
- bp3-20020a056512158300b00477cc344a6cmr9980868lfb.595.1653198430052; Sat, 21
- May 2022 22:47:10 -0700 (PDT)
+        with ESMTP id S230346AbiEVVJS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 May 2022 17:09:18 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F2AA1C13F;
+        Sun, 22 May 2022 14:09:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=2Jd8D6LlVwyQIF5MhwULEnlbv5yF/fdM6oUbi3IJ0cw=; b=3iGTtByKIRA7QyvS4dd4AshWPX
+        1BC4lTnpddbu2zGBwNdw09nGQvmUNNJhuWqzavPYKh3K1r9tdFXG9hJ5WpToeBg2FIexobk3+TJmV
+        HL8a40cW8UorB6vX8Cwfm8+Ir857J7zE0sRIsL2cJB9JCj9iH27aD4xPc5T1W0QsBEP1nbl7rIk9P
+        hjbEHT1njK2K01moXaSkSp4SCTlOZVahdfDm5alJL8O7LPdYsj5aPdo7U4ZY1fj+kWp4y/6zBnYul
+        JuaCgWoZ8FLsJK1EKYC6TE/MffJHSpl9HzIEGe1cdvWQwTFt0m3EDaU/PHlQPwzG2nB1ym6txQQp2
+        buzRIWz22Y1kLR9gvMqi30r3PubKKu1la/gaoeALsa8kQvp6WASVOzEEZjwYoBgjfzrK+mm13Q9SD
+        WGRPULme67H0md10yj6jl/VUqraZZZILLDSbUjWzgvsB6+kwxGQnwW0hv2YU4wghhehjLpGWC0exC
+        Hctnre+3BLlvv7nyEWyvrXOj;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1nssp7-0022cK-HA; Sun, 22 May 2022 21:09:13 +0000
+Message-ID: <679693c4-8c4c-85b0-e4f2-7f34be3bad12@samba.org>
+Date:   Sun, 22 May 2022 16:09:10 -0500
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 22 May 2022 00:46:58 -0500
-Message-ID: <CAH2r5ms+KeC7U4E0DnggAL587EHb45F-34-u4bVeqRR7o_GC4g@mail.gmail.com>
-Subject: [PATCH][SMB2] Add tracepoint for oplock break file not found
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000002ad15d05df9341b2"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH -next] cifs: Return true/false (not 1/0) from bool
+ functions
+Content-Language: en-US
+To:     Yang Li <yang.lee@linux.alibaba.com>,
+        David Howells <dhowells@redhat.com>
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
+References: <20220504130634.101239-1-yang.lee@linux.alibaba.com>
+From:   Steven French <sfrench@samba.org>
+In-Reply-To: <20220504130634.101239-1-yang.lee@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000002ad15d05df9341b2
-Content-Type: text/plain; charset="UTF-8"
+Do you remember which patch caused this? Perhaps one of Dave Howell's 
+iov_iter cifs patches that was temporarily in for-next? I don't see it 
+anymore
 
-Similar to the earlier patch I sent out for lease not found, this patch handles
-the oplock case
-
-In order to debug problems with server potentially sending us an oplock
-that we don't recognize (or a race with close and oplock break) it would
-be helpful to have a dynamic trace point for this case.  New tracepoint
-called trace_smb3_oplock_not_found
-
-
--- 
-Thanks,
-
-Steve
-
---0000000000002ad15d05df9341b2
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-add-trace-point-for-oplock-not-found.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-add-trace-point-for-oplock-not-found.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l3gvncm10>
-X-Attachment-Id: f_l3gvncm10
-
-RnJvbSBiMjMxYzVmNjhiOWZkYTQ0NjAyY2Q4ZTI2NmRiNmY0ZWI4ZjZkOGE3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgMjIgTWF5IDIwMjIgMDA6NDE6NDEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiBhZGQgdHJhY2UgcG9pbnQgZm9yIG9wbG9jayBub3QgZm91bmQKCkluIG9yZGVyIHRvIGRl
-YnVnIHByb2JsZW1zIHdpdGggc2VydmVyIHBvdGVudGlhbGx5CnNlbmRpbmcgdXMgYW4gb3Bsb2Nr
-IHRoYXQgd2UgZG9uJ3QgcmVjb2duaXplIChvciBhIHJhY2UKd2l0aCBjbG9zZSBhbmQgb3Bsb2Nr
-IGJyZWFrKSBpdCB3b3VsZCBiZSBoZWxwZnVsIHRvIGhhdmUKYSBkeW5hbWljIHRyYWNlIHBvaW50
-IGZvciB0aGlzIGNhc2UuICBOZXcgdHJhY2Vwb2ludAppcyBjYWxsZWQgdHJhY2Vfc21iM19vcGxv
-Y2tfbm90X2ZvdW5kCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jv
-c29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIybWlzYy5jIHwgNCArKysrCiBmcy9jaWZzL3RyYWNl
-LmggICAgfCAxICsKIDIgZmlsZXMgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0
-IGEvZnMvY2lmcy9zbWIybWlzYy5jIGIvZnMvY2lmcy9zbWIybWlzYy5jCmluZGV4IGYyMzZiZWFm
-Zjk2ZC4uMTc4MTNjM2QwYzZlIDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJtaXNjLmMKKysrIGIv
-ZnMvY2lmcy9zbWIybWlzYy5jCkBAIC03MzIsNiArNzMyLDEwIEBAIHNtYjJfaXNfdmFsaWRfb3Bs
-b2NrX2JyZWFrKGNoYXIgKmJ1ZmZlciwgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQog
-CX0KIAlzcGluX3VubG9jaygmY2lmc190Y3Bfc2VzX2xvY2spOwogCWNpZnNfZGJnKEZZSSwgIk5v
-IGZpbGUgaWQgbWF0Y2hlZCwgb3Bsb2NrIGJyZWFrIGlnbm9yZWRcbiIpOworCXRyYWNlX3NtYjNf
-b3Bsb2NrX25vdF9mb3VuZCgwIC8qIG5vIHhpZCAqLywgcnNwLT5QZXJzaXN0ZW50RmlkLAorCQkJ
-CSAgbGUzMl90b19jcHUocnNwLT5oZHIuSWQuU3luY0lkLlRyZWVJZCksCisJCQkJICBsZTY0X3Rv
-X2NwdShyc3AtPmhkci5TZXNzaW9uSWQpKTsKKwogCXJldHVybiB0cnVlOwogfQogCmRpZmYgLS1n
-aXQgYS9mcy9jaWZzL3RyYWNlLmggYi9mcy9jaWZzL3RyYWNlLmgKaW5kZXggMDlkM2RmZWQ4NmQ5
-Li4yYmU1ZTBjODU2NGQgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvdHJhY2UuaAorKysgYi9mcy9jaWZz
-L3RyYWNlLmgKQEAgLTE1OCw2ICsxNTgsNyBAQCBERUZJTkVfU01CM19GRF9FVkVOVChmbHVzaF9l
-bnRlcik7CiBERUZJTkVfU01CM19GRF9FVkVOVChmbHVzaF9kb25lKTsKIERFRklORV9TTUIzX0ZE
-X0VWRU5UKGNsb3NlX2VudGVyKTsKIERFRklORV9TTUIzX0ZEX0VWRU5UKGNsb3NlX2RvbmUpOwor
-REVGSU5FX1NNQjNfRkRfRVZFTlQob3Bsb2NrX25vdF9mb3VuZCk7CiAKIERFQ0xBUkVfRVZFTlRf
-Q0xBU1Moc21iM19mZF9lcnJfY2xhc3MsCiAJVFBfUFJPVE8odW5zaWduZWQgaW50IHhpZCwKLS0g
-CjIuMzQuMQoK
---0000000000002ad15d05df9341b2--
+On 5/4/22 08:06, Yang Li wrote:
+> Return boolean values ("true" or "false") instead of 1 or 0 from bool
+> functions. This fixes the following warnings from coccicheck:
+>
+> ./fs/cifs/file.c:4764:9-10: WARNING: return of 0/1 in function
+> cifs_release_folio() with return type bool
+>
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+> ---
+>   fs/cifs/file.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 580a847aa8b5..a9123cefd84f 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -4761,7 +4761,7 @@ static int cifs_write_begin(struct file *file, struct address_space *mapping,
+>   static bool cifs_release_folio(struct folio *folio, gfp_t gfp)
+>   {
+>   	if (folio_test_private(folio))
+> -		return 0;
+> +		return false;
+>   	if (folio_test_fscache(folio)) {
+>   		if (current_is_kswapd() || !(gfp & __GFP_FS))
+>   			return false;
