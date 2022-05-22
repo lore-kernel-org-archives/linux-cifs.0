@@ -2,96 +2,125 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFCB4C433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 22 May 2022 23:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F26A2C433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 22 May 2022 23:06:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229732AbiEVXAR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 22 May 2022 19:00:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38932 "EHLO
+        id S242683AbiEVXG4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 22 May 2022 19:06:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231364AbiEVXAP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 May 2022 19:00:15 -0400
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97D7238DB0;
-        Sun, 22 May 2022 16:00:14 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id z6so13207151vsp.0;
-        Sun, 22 May 2022 16:00:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SF8GydDc0GrVQnk8HXDQAYHPmkcAYm0hZkZSE4F+/Mk=;
-        b=lm6jR8+5QtZGNHO23qu0pS/uTGBdJ2p35Nn8Z9bH9jQ8UyxD6ID9QrQ805maUkbdpu
-         ydZlalnPYIQm7CHX4GqxdFIgDcZPiJwxaEGGz2PzPdC9WjfgLqYYYXUpJfgJI6+dEONr
-         KuAFLY1sp0WJmhuWo37nmVtdtSbRYrY+cKQpPLGJEuglOB11GxW+dtqxvBycMJljkT8s
-         G8yZJvyhfPnVkJ3U9sWmswQhvlD6GIpVz1pC0XyFfAjVmxV4tN6UQ85SeAiz9Qth1YnF
-         1enGrNGSs7YTuep8oIdgFIQivYCQKWyyHh76xcgjpdanOZTNO3ECitixu6kD4GPSt+Bk
-         34sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SF8GydDc0GrVQnk8HXDQAYHPmkcAYm0hZkZSE4F+/Mk=;
-        b=YFkvDdR9Zs9bgLeXbR8HrI5mkapTOACqG/c71Htl12z4Sf5bbIQzwn1toEEVz7xnFZ
-         84/n4LtszfkhYbrxOr7q3dkb8o2NT93gIGmCqZ+4eiQZYZfBNB0cnkXhd8qf/ukOMNRP
-         lNmp84k1fnyWp/tJCYqCpZT85KKx+EIyh0mXL6vTx6Xi/HYEwzzhnbfC5tecGVwv6Cdm
-         M++5XBx+pWSWsexJh0SfUJH4qqJgTTqkaIAE8aeVPB62Q1LxuRNFgWHwP5q4BHYXUnx0
-         PcknXq3wDleuKyWEzQGaZk2ognJbG2s0GNEkd+31phJ/uHwJCH6q/UKJR0mazM6V5I+u
-         3iDg==
-X-Gm-Message-State: AOAM531ILwSBDXNBO7nz5kfmxKwJzxjHe3tJsGq4lyMOrAPlVawQJJ3O
-        Z44+vF/VGe79tMOMThP09DZLXsfHW7FYzSxam7Xwlb84
-X-Google-Smtp-Source: ABdhPJyWO8zf5D/YhtV5FcffI/x394ipbzxX+5SQUfl7UuxsZe4dKs6EW3pHTnZHlQaVb72Vj4c9jNDoPjE2A7uE2ao=
-X-Received: by 2002:a05:6102:3a0e:b0:337:ab1f:3a8c with SMTP id
- b14-20020a0561023a0e00b00337ab1f3a8cmr1272232vsu.61.1653260413547; Sun, 22
- May 2022 16:00:13 -0700 (PDT)
+        with ESMTP id S231491AbiEVXGz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 May 2022 19:06:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DFD220F7
+        for <linux-cifs@vger.kernel.org>; Sun, 22 May 2022 16:06:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 289E760F40
+        for <linux-cifs@vger.kernel.org>; Sun, 22 May 2022 23:06:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 850AEC36AE5
+        for <linux-cifs@vger.kernel.org>; Sun, 22 May 2022 23:06:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653260813;
+        bh=WfzbAzVM4yhmfa8AkBRKaXK6LOOF4lRrak11382+y2E=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=pnGhY//tPKNhutBPJMCd2sKk7c3iwzWhY+DtBb/DeGCdH0PIXqCJzJUCcgPQG67m9
+         vP6YRfChik/AcdgwEPLhwbaNS+1suFGsp9ioTdNgsKsk5JaSZsroEch3R4A4/5h32V
+         OZJZweAnsejjiqbjUpmW3lYIL5HJYNf9mOCFirqvnGllXiw7Y5vndQsnWELWC7AImq
+         qV/r4cZWHz8d/HAVu8VUwH/kPuVMEoHceqRl0DsvLvPZyFnF7EzvcQ47V6LF9NzlUq
+         HaGpLP390wP+blat1UwlRLMY93hZEw8Mg1/Url8zFB951wOIm9JZ544IyxBofGbJgp
+         sqH4ekreGhK/g==
+Received: by mail-wr1-f46.google.com with SMTP id k30so18921778wrd.5
+        for <linux-cifs@vger.kernel.org>; Sun, 22 May 2022 16:06:53 -0700 (PDT)
+X-Gm-Message-State: AOAM530eEaGsiiIVSHwMv6MXeFpYpDemIekJzs1eJct4MTl0MiXEzbbw
+        hy7nfC8N0j457atj81OPmFb0vtWjbcdlkwBqb8o=
+X-Google-Smtp-Source: ABdhPJwj56Jnp26j8iWtNCIEc5qG16Bp2hj5u2rAbjTIwc6TC2T4hAKWUe2Nt5GdIEOYrvciHk5XlqVGX8uDyW/lECg=
+X-Received: by 2002:adf:ee52:0:b0:20f:de1d:9fda with SMTP id
+ w18-20020adfee52000000b0020fde1d9fdamr2000669wro.62.1653260811710; Sun, 22
+ May 2022 16:06:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220521111145.81697-69-Julia.Lawall@inria.fr>
-In-Reply-To: <20220521111145.81697-69-Julia.Lawall@inria.fr>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 22 May 2022 18:00:01 -0500
-Message-ID: <CAH2r5msEi=DrdQfJ0LJmft_w2rMio8e2hn+qznOHuywV_2iSqw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: smbd: fix typo in comment
-To:     Julia Lawall <Julia.Lawall@inria.fr>
-Cc:     Steve French <sfrench@samba.org>,
-        kernel-janitors <kernel-janitors@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
+Received: by 2002:adf:f344:0:0:0:0:0 with HTTP; Sun, 22 May 2022 16:06:50
+ -0700 (PDT)
+In-Reply-To: <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
+References: <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com>
+ <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
+ <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
+ <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com>
+ <84589.1653070372@warthog.procyon.org.uk> <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Mon, 23 May 2022 08:06:50 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
+Message-ID: <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
+Subject: Re: RDMA (smbdirect) testing
+To:     Tom Talpey <tom@talpey.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Long Li <longli@microsoft.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+2022-05-21 20:54 GMT+09:00, Tom Talpey <tom@talpey.com>:
+>
+> On 5/20/2022 2:12 PM, David Howells wrote:
+>> Tom Talpey <tom@talpey.com> wrote:
+>>
+>>> SoftROCE is a bit of a hot mess in upstream right now. It's
+>>> getting a lot of attention, but it's still pretty shaky.
+>>> If you're testing, I'd STRONGLY recommend SoftiWARP.
+>>
+>> I'm having problems getting that working.  I'm setting the client up
+>> with:
+>>
+>> rdma link add siw0 type siw netdev enp6s0
+>> mount //192.168.6.1/scratch /xfstest.scratch -o rdma,user=shares,pass=...
+>>
+>> and then see:
+>>
+>> CIFS: Attempting to mount \\192.168.6.1\scratch
+>> CIFS: VFS: _smbd_get_connection:1513 warning: device max_send_sge = 6 too
+>> small
+>> CIFS: VFS: _smbd_get_connection:1516 Queue Pair creation may fail
+>> CIFS: VFS: _smbd_get_connection:1519 warning: device max_recv_sge = 6 too
+>> small
+>> CIFS: VFS: _smbd_get_connection:1522 Queue Pair creation may fail
+>> CIFS: VFS: _smbd_get_connection:1559 rdma_create_qp failed -22
+>> CIFS: VFS: _smbd_get_connection:1513 warning: device max_send_sge = 6 too
+>> small
+>> CIFS: VFS: _smbd_get_connection:1516 Queue Pair creation may fail
+>> CIFS: VFS: _smbd_get_connection:1519 warning: device max_recv_sge = 6 too
+>> small
+>> CIFS: VFS: _smbd_get_connection:1522 Queue Pair creation may fail
+>> CIFS: VFS: _smbd_get_connection:1559 rdma_create_qp failed -22
+>> CIFS: VFS: cifs_mount failed w/return code = -2
+>>
+>> in dmesg.
+>>
+>> Problem is, I don't know what to do about it:-/
+>
+> It looks like the client is hardcoding 16 sge's, and has no option to
+> configure a smaller value, or reduce its requested number. That's bad,
+> because providers all have their own limits - and SIW_MAX_SGE is 6. I
+> thought I'd seen this working (metze?), but either the code changed or
+> someone built a custom version.
+I also fully agree that we should provide users with the path to
+configure this value.
+>
+> Namjae/Long, have you used siw successfully?
+No. I was able to reproduce the same problem that David reported. I
+and Hyunchul will take a look. I also confirmed that RDMA work well
+without any problems with soft-ROCE. Until this problem is fixed, I'd
+like to say David to use soft-ROCE.
 
-On Sun, May 22, 2022 at 2:51 PM Julia Lawall <Julia.Lawall@inria.fr> wrote:
+> Why does the code require
+> 16 sge's, regardless of other size limits? Normally, if the lower layer
+> supports fewer, the upper layer will simply reduce its operation sizes.
+This should be answered by Long Li. It seems that he set the optimized
+value for the NICs he used to implement RDMA in cifs.
 >
-> Spelling mistake (triple letters) in comment.
-> Detected with the help of Coccinelle.
+> Tom.
 >
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
->
-> ---
->  fs/cifs/smbdirect.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> index b3a1265711cc..c3278db1cade 100644
-> --- a/fs/cifs/smbdirect.c
-> +++ b/fs/cifs/smbdirect.c
-> @@ -1350,7 +1350,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
->         wait_event(info->wait_send_pending,
->                 atomic_read(&info->send_pending) == 0);
->
-> -       /* It's not posssible for upper layer to get to reassembly */
-> +       /* It's not possible for upper layer to get to reassembly */
->         log_rdma_event(INFO, "drain the reassembly queue\n");
->         do {
->                 spin_lock_irqsave(&info->reassembly_queue_lock, flags);
->
-
-
--- 
-Thanks,
-
-Steve
