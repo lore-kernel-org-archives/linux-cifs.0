@@ -2,75 +2,62 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E3BC433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 23 May 2022 06:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0517C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 23 May 2022 10:14:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229706AbiEWGMj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 23 May 2022 02:12:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43516 "EHLO
+        id S233928AbiEWKOB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 23 May 2022 06:14:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236790AbiEWGMK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 23 May 2022 02:12:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A17F71DA40
-        for <linux-cifs@vger.kernel.org>; Sun, 22 May 2022 23:12:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653286323;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zdXvbxe9TBvQlL5k5IXJSGdtX0v6lNlLaY17sAtSeoo=;
-        b=DxgxXviYrTJ/lZA6Z72kBitugwo4ZfbPWYN8Bl0Vd0Gxz/KVtDINQXGzyfRVSkRmYmE7GR
-        mtBhYIBt2/IhVGRfUpGX605paH4fxFjaAIX/tRoqL1FQJzlPsmlErWOK6ZrwwajlXlCwyf
-        d55U5j9PsLTir+/PJLLvGPIXXkx3568=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-520--Ln86PXDPeW6kkOhtvqsjg-1; Mon, 23 May 2022 02:08:52 -0400
-X-MC-Unique: -Ln86PXDPeW6kkOhtvqsjg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9F6C7384F801;
-        Mon, 23 May 2022 06:08:51 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C42B2C27E97;
-        Mon, 23 May 2022 06:08:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <e5f6fee5518ce8e1b4fc5aa7038de1617a341c2f.camel@kernel.org>
-References: <e5f6fee5518ce8e1b4fc5aa7038de1617a341c2f.camel@kernel.org> <165296980082.3595490.3561111064004493810.stgit@warthog.procyon.org.uk>
-To:     Jeff Layton <jlayton@kernel.org>, Xiubo Li <xiubli@redhat.com>
-Cc:     dhowells@redhat.com, Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] netfs: ->cleanup() op is always given a rreq pointer now
+        with ESMTP id S231636AbiEWKN7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 23 May 2022 06:13:59 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9DB221A9
+        for <linux-cifs@vger.kernel.org>; Mon, 23 May 2022 03:13:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Cc:To:From:Date;
+        bh=mBuqr4Xysnbts/387iae8Z7cheTZBoyBd5m7Gq72ZU8=; b=N32MaajTAgBZ9DLrXoDHzrLT+V
+        Mm4RiSqqAVC1aPSCUflg0URC8guVgNAx1jN3FPmO7MxdiCW8qgtehJY/MG/S3gDmU9b94BwUkBGa4
+        VRWS2sYLiKz5oJo/rFY7DWUk2E2VYJ7Uc+Gy1sdSB9dQANYLkH8ID4GJNP+iNloCIuOk3NL05mO9R
+        /mQbg7cAp/R0snv4Mg8rXQgMelf6pnrlkCBpJqhpeSEg8Sg4OV2dVciwrzANPbcHeg/d27Xj+h83S
+        Gbdx03YHNFPyw+pjEYnH31KBOccBNa77RbqIwuebdJ4MdTQ7Ch2Q64MgnLlpqehnjfXjahjDj3GRt
+        gcncL2i6/oXmenp5j0oZwBIwLh/VVpjqj1brem5EoEaMAYLG46EL2UhGJsHxYUDmLM/jeQ4uT/Kj6
+        e57b2z3H6HtbnwLA8nTmTlw4+uuBdpiYqFR4txTm9BKXTqaayqCVXkNTM9alq+QUq3WqHXNCj4Gol
+        Mvy6OJv9mg+ORWlB9+/EOwu4;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1nt54O-0027bs-DS; Mon, 23 May 2022 10:13:48 +0000
+Date:   Mon, 23 May 2022 12:13:47 +0200
+From:   David Disseldorp <ddiss@samba.org>
+To:     Steve French via samba-technical <samba-technical@lists.samba.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Samba Technical <samba-technical@lists.samba.org>
+Subject: Re: [PATCH][SMB3] Add defines for various newer FSCTLs
+Message-ID: <20220523121347.46d2b764@samba.org>
+In-Reply-To: <CAH2r5mveWTtio_Aei3VEht6KaxU6quSgwgopvXbFfMtE40q0YQ@mail.gmail.com>
+References: <CAH2r5muiMW76Xt2zRNJWTcQVuewEj3Qs3p4oc8tvEyw5f6528g@mail.gmail.com>
+        <CAH2r5mveWTtio_Aei3VEht6KaxU6quSgwgopvXbFfMtE40q0YQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <460692.1653286129.1@warthog.procyon.org.uk>
-Date:   Mon, 23 May 2022 07:08:49 +0100
-Message-ID: <460693.1653286129@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Jeff Layton <jlayton@kernel.org> wrote:
+Patch looks fine to me:
+Reviewed-by: David Disseldorp <ddiss@suse.de>
 
-> Do we need free_subrequest? It looks like nothing defines it in this
-> series.
+On Sun, 22 May 2022 19:09:34 -0500, Steve French via samba-technical wrote:
 
-These two patches add stuff that's used by stuff on my netfs-lib branch, but
-that's not going to be pushed this window, so I won't push these two patches
-for now.
+>  #define FSCTL_DUPLICATE_EXTENTS_TO_FILE 0x00098344
+> +#define FSCTL_DUPLICATE_EXTENTS_TO_FILE_EX 0x000983E8
 
-David
+This one looks interesting - I wonder what kind of client use it gets.
+FICLONERANGE / BTRFS_IOC_CLONE_RANGE is atomic, so it should be possible
+to extend Samba's current dup-extents support to handle the new flag
+(DUPLICATE_EXTENTS_DATA_EX_SOURCE_ATOMIC) without needing any lower
+level changes.
 
+Cheers, David
