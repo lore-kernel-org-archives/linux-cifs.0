@@ -2,333 +2,155 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D23DC433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 23 May 2022 12:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B04AC433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 23 May 2022 13:37:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235567AbiEWMid (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 23 May 2022 08:38:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52900 "EHLO
+        id S236297AbiEWNhh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 23 May 2022 09:37:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235562AbiEWMiG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 23 May 2022 08:38:06 -0400
-Received: from smtp1.axis.com (smtp1.axis.com [195.60.68.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA9004CD68
-        for <linux-cifs@vger.kernel.org>; Mon, 23 May 2022 05:38:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=axis.com; q=dns/txt; s=axis-central1; t=1653309485;
-  x=1684845485;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QPKgmtpPaeFAur9eeIUpWRFa61NcsUjXuXl7iMDl1Ck=;
-  b=DfY1ihzzNNq4lqCuGz1SnCdhkDLnyWRro23q7GNESxxPrD0YEBkr2N8Q
-   h4IdJL2NcoaSrcmAVKKgUv861s1KiduqgB9T69mXPSd3LzpNG4vXEQ6LB
-   /y9LEcY8qVE9V4L5d9IvD3fzbUyAqiOzUFqDzFUkLBCkkoICmVeygJKhO
-   fpTHbMCX+CcM4eyo7x5dUEtxUA24+e1s/cSXXlQqsvaaUOM66bh44Rvgz
-   CdZGxTz3lxiTQ+pgwSNrOqUa8ZHzaHEv4LFoYpWElg4oXK+FrtRDwDW/x
-   UCoSl6QcaTvKKYw6VEq8SX8grlV+lptjgoa+B+ie2K6iEh3JkPJS0ZlZ8
-   g==;
-Date:   Mon, 23 May 2022 14:38:02 +0200
-From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-CC:     Steve French <smfrench@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: lockdep deadlock warning
-Message-ID: <20220523123755.GA13668@axis.com>
-References: <CANT5p=rqcYfYMVHirqvdnnca4Mo+JQSw5Qu12v=kPfpk5yhhmg@mail.gmail.com>
+        with ESMTP id S236324AbiEWNhf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 23 May 2022 09:37:35 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2083.outbound.protection.outlook.com [40.107.94.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C60F85403D
+        for <linux-cifs@vger.kernel.org>; Mon, 23 May 2022 06:37:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E+QyoWrDE20uuDgH1bP65pFaklzLYzeWCn7zeAxaoYkizhPsgGcCeMqqieVt/XnyGPoMNxff6QeI76lY9bL4hsmrF+4HNBNHGySvwy5vQcA7Z1yUhnSTVlr62yKmLcngVpsW+SZyKe5oiAh2heNRF7I5s0RpWhFnRNhL+Q8xMq6mm/qM4spSW9FSHUNlfcWyb3WY9b6pGVKo2TuH4R8E7ZWQq/WD/DL82x1+C942dSCpenMtwEFxCXXFqpuw29g05h9ysDLy+QCkCb75kHicFOw1/wI6gFTqMQOQOt1rDT/y3ayPGJnroLsUK24oBfCtSuCAxbBT9IfygCJh747GWw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xm7XndwcohLYGbJJTwbTAn8nKjwM4KLVynBfwBLotwI=;
+ b=Ol1t5zSGZ7ludmFGZI4sJZfLWVvdzMDDA27VXUNypvsUDu4V8g1Aw2dHtfrdccOAqoSg23vvqrR20Bgu61A64O7xUhdFo0+Wshlv8+gm88O9+XdEB4Dfwzy3SrADIZeGaqSzxgzvwo57d0abCWv+uElCamSD6JIP2xwAqknLwA40JjeK0IAfho3ktKz5YsZwnyjYtp6ICLI5Lph8t/ippuyJZXr/p22tadT2tIlV/nh4AAbyHwcTT9noCz8nDeHlGQQDVYjamYy9+M1VNefPisXC8dLPpMMLZyCSlJ6AU9smS7OEkWEtD2tfQ+n+5729npDCVvg0WSJSlP3IVybPZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ SN6PR01MB3631.prod.exchangelabs.com (2603:10b6:805:21::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5273.14; Mon, 23 May 2022 13:37:32 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::f135:e76f:7ddd:f21]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::f135:e76f:7ddd:f21%3]) with mapi id 15.20.5273.023; Mon, 23 May 2022
+ 13:37:32 +0000
+Message-ID: <9cd02802-c593-0246-43f4-43047eb06fda@talpey.com>
+Date:   Mon, 23 May 2022 09:37:31 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: RDMA (smbdirect) testing
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>,
+        Namjae Jeon <linkinjeon@kernel.org>
+Cc:     Long Li <longli@microsoft.com>, Hyunchul Lee <hyc.lee@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+References: <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
+ <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com>
+ <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
+ <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
+ <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com>
+ <84589.1653070372@warthog.procyon.org.uk>
+ <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
+ <747882.1653311226@warthog.procyon.org.uk>
+From:   Tom Talpey <tom@talpey.com>
+In-Reply-To: <747882.1653311226@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1PR13CA0077.namprd13.prod.outlook.com
+ (2603:10b6:208:2b8::22) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CANT5p=rqcYfYMVHirqvdnnca4Mo+JQSw5Qu12v=kPfpk5yhhmg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3bd4d8a3-5f53-4b9e-b3ea-08da3cc1637a
+X-MS-TrafficTypeDiagnostic: SN6PR01MB3631:EE_
+X-Microsoft-Antispam-PRVS: <SN6PR01MB363122C54828018EE54BC22BD6D49@SN6PR01MB3631.prod.exchangelabs.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EvCAj72s3Bs0n2jW7/K69eMeNwPqLy2M0fRZgE50DxpDoxFYE6kcpmy8E/nS89BpdfIAXDSvKTx/HFEPky95j1r2oYRyBdkl2e+RzaWFfRRE4yvLpYBKObNFy5f7MKQqjZt7SIaVqu+Ly5xD6Ix/rwruFWF5YK1MAx3MjhI3zONmy8f4cNBd9jcjBUi1hd8DYTm8yEGDv8VPbRBLc4kILrWhl6MNc+0nQMmnC35JJGihdAm+9/gCv4GDDLXiDb7Vt7QP1cZf8MJmHHgcrwG7lJrd8BI6fRfOjgAEc4mGvj1IgHzge19pxZKQlSwpp1pxZBq6TqD4QOyc3mJuJR/hckalYmmkURwbK3gPjxqcem52vx/oeiq7cuG5sD/3vVCNT/2y6BsTdqyaWAupSw2z8lVKwXz76npGKjecAoIZikhUL3xLY4kJReNZvWntqKrjSvTT2RAqEUhxrbykRkr0EEoQ2eg1Qorzlbn0ggC+O/1VDOMbmCYl+k64Il708/InUe6F0RI9C02ll4xHpSQLNCwEN30Mnlb5eshna68WQDnq+kYvSg2ZolfGkqD0LprUgdFDoqx9O4A5h1JWNUEFej2Pae+1joefTF6FCUszQycpJkc+Q2rXMDTbu1T7cI9NPlva5+ZebqOkZHuw0SyMKIDhAojnjHkzQ8c6cwMv8xIaNL02TYrIRpWU7lDMv/vu8e69Y4LDKTV8wtF0GHqKFDnUb5ChpJe3I1fjyw2s0y0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230001)(396003)(366004)(376002)(39830400003)(136003)(346002)(86362001)(508600001)(6512007)(8936002)(6486002)(38350700002)(38100700002)(26005)(36756003)(316002)(54906003)(110136005)(31686004)(186003)(5660300002)(41300700001)(2616005)(52116002)(4326008)(8676002)(66946007)(53546011)(6506007)(2906002)(31696002)(66556008)(66476007)(83380400001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U2R3RTdJdGlYVGp5VHRrVit6b2RwY3JPZ1FidUlUTEM4Y1ZMY09la1NBaXZG?=
+ =?utf-8?B?aGordWp4ZWdPYkhwK2ljK0hpR2ZJcHhKcUV1NmVqcjIwK2ZlMWV2RE55NzNL?=
+ =?utf-8?B?TmU0RmROMGNXOHhqczVIb29QNDI2ZFZsYXl4UktDaXdjOXFiM2VYN2YyMk9W?=
+ =?utf-8?B?bEJ6emY0Y3B2L05DYmR3WUFzV2ZjUEpTZWxsd2E5YjdZYW9UbjYwVVp4cHM3?=
+ =?utf-8?B?eFA0ZFBGR3AxZXlOeEdZQnJXU0x1dWxoWWFldndhYkVsYi9pa0dpSlRJZndW?=
+ =?utf-8?B?RGFiN1Z2djh6bEJXRjFXZCtXMFZRd24vRGxMK0RmZ3puSUhUNjZEVmdWWWE4?=
+ =?utf-8?B?SnFqZ25WbG5BTUxUeXl6bEJUYmNZUVYrYUN0VmJkczJoSE5tc0N0SFF2R2s2?=
+ =?utf-8?B?cW14WWJsZXppaGhqRGpxdVpQZjV2NXVGMWZ1cHl0dHhHdy9KTmN3Y29YQ2t3?=
+ =?utf-8?B?clJiVlppNnB3NDlyUlFHdWc1Rm1wSEpZZUVOR2d4VTVGVTN3VDMweXJrUmNO?=
+ =?utf-8?B?U1NwaFRveVFDaC9XVTNKL1JWSkxrSjFGM0Y3YkY1SGZqQTJFS20rbXJDR0Fm?=
+ =?utf-8?B?MHV6Rms1aVRlakZMUUtjeFhnRXVSSmpsWkI3enBOU213c09HelR0VndJYjBr?=
+ =?utf-8?B?VGhaTURGTG5NTlRNdFdkdEx5TWhwQ2RtalhFSWpsSEh0SENHbE5WRE04aXZH?=
+ =?utf-8?B?MjNOK3hyY2h5Ykd2bnNXY2tZVnZteWtxQlRsOFBkSG8rSnFWNU1lWXVja3VB?=
+ =?utf-8?B?OFJzRUtIYlc3cHArZkMrUmF2Z2hBbk5DUkhObzBUUHdxUzV3NTJSa3orcWtw?=
+ =?utf-8?B?aUp4eCtYYWJ0eFJiT3Zqc2JXdDc5UTB2L3ZVa2pSYS9DYUZvNXR2TUMrL08y?=
+ =?utf-8?B?REc1cTVFaWNLNkJzOURncWlsQisxdWdzV01ScHNmU25hZW83YXhDYXZvVW9T?=
+ =?utf-8?B?cUJkdm5vOGFvQ01qU3RJaytFQUNUVXdxUE1nUUtzY0Z2a2o1UkJMaGZVclZX?=
+ =?utf-8?B?czRkSkVIbms4aGV2ZnhUWWxhZStaS0pLdERLUW1hOE5CeHh6cndIZWZXT3h0?=
+ =?utf-8?B?OWtRZk9YNkxzSmwzdzVpa25CNjNtQThvV0hqK3A4NlFaUnV3MG9hM244djl0?=
+ =?utf-8?B?UVA0VGZUYVdqYzVuMXJ6THNyYnlUaE0wd3BLWHpPNlNHSTN5QWQ5SzVQVTln?=
+ =?utf-8?B?dmhHeUVTbFRCSWY5aEdaUDNPOWp5cFU5clhKMjMySjNpOFpkQXdjT3p3akhQ?=
+ =?utf-8?B?NU1CWDJJOTZabmMzRmVVbS9mb1ozSDVTYmdHanJiV0l0TE9aN3dhd3QwNFh4?=
+ =?utf-8?B?MFRSdjZYQmZhalBONzg0RnQ5RDRhbkVCMFZWMlhSWGtCQzl2UlY5RzFUeWJB?=
+ =?utf-8?B?VW1GY2RJWDZ3ZVBQc0RQdVpURm5uTEJKMjFHM0Jsb3NYWVljenlUckJEL2Mz?=
+ =?utf-8?B?MzBFVkJGcXJZQzl4UFJDQVVqSUlXcld2V09IY2o1c0VWQmpkamptL2t6QjBq?=
+ =?utf-8?B?TWF4TFRQV1Yva0VYelZPRVpUa2JjYVk4ZEloYkFqQWVrUksvT3ZWQVQzbDg3?=
+ =?utf-8?B?VmJ0NDdGYUNMYkx5ekxFUzBYTTlnTUg0TjVZRVNhaGRPWUR5RFZnYkJtL0JI?=
+ =?utf-8?B?Nk9PZzdSb1U1UmVsMmJzS05UM25sZXY3cU4xTTN5M2N2eFNxcjBvME9qMFM3?=
+ =?utf-8?B?cTlxZlFBVXc3M3ZiNEk2bkFabnlVKzJYRThRNjl6Yy9hTnROT0NhdGJpMnpy?=
+ =?utf-8?B?UFJmdHp2Ym1INDh5TFdwZnZFVTcrYmtRaG1IZHhpcFBFT1lNQmJsNytiUVcr?=
+ =?utf-8?B?NGd5QUNpOEVmaXJDYm04cXdnajRTeklRSzBWalQ3QjB2N3pwQ2lEWm5mN1k0?=
+ =?utf-8?B?VFVwTWRLem5rc1JHWW9ONkdlalhpc3RSanRyWkI5VHhlbCtiWG5FRndKbldO?=
+ =?utf-8?B?Z0JMb3Mra2FrNlVvTFV5WEk5SFFCWGx5TmhqZXJaR1N4T2RKcTJNUXZlQ0E2?=
+ =?utf-8?B?VFVaOSswdjYwcytJQXhsNTdlZjFEZGd6ejVJRnZtSGE4Mk9SQTBzL3piSlpx?=
+ =?utf-8?B?UVJITmZucjFiL04wZytjaGo0QXZjalkvUFVsNWpPcU9lTk16VFMvVXh4QmFB?=
+ =?utf-8?B?SXJ1eHdRL2liM2pnbXJhRzI3NmNuQWUrQU1VVUEvMzNCMDRmNlJ5eTcxV1Bk?=
+ =?utf-8?B?WmFQNTJmZ1ZQSFJnWmxsNFdWWkl5VkxEUm5BOGphWnFwSUZZSSs1Q25tMzZN?=
+ =?utf-8?B?M05kdlhsLzZTZVB4VThRTnF6THNNL1F4ei9mSHZMeTlQaU5mMy9YTkhjLzcx?=
+ =?utf-8?Q?FN2mZEPkrI7OZp3c5n?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bd4d8a3-5f53-4b9e-b3ea-08da3cc1637a
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 May 2022 13:37:32.3405
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GVsqPiLgBVPxOquGblGTqP7BllAN0V/tSCQkM2xfLgPxJdVxozGh/aXbP8cbJMjz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR01MB3631
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Feb 14, 2022 at 10:19:30PM +0530, Shyam Prasad N wrote:
-> I was trying some experiments on 5.17-rc4 with lockdep enabled.
-> And I noticed this deadlock warning.
 
-This is trivially reproducible by triggering reclaim (eg. by having a
-process allocate a lot of memory) while someone is wring to a CIFS
-mount.
-
-> [Mon Feb 14 16:31:14 2022] ======================================================
-> [Mon Feb 14 16:31:14 2022] WARNING: possible circular locking dependency detected
-> [Mon Feb 14 16:31:14 2022] 5.17.0-rc3+ #4 Tainted: G           OE
-> [Mon Feb 14 16:31:14 2022] ------------------------------------------------------
-> [Mon Feb 14 16:31:14 2022] kswapd0/48 is trying to acquire lock:
-> [Mon Feb 14 16:31:14 2022] ffff888113aca2e0 (&tcp_ses->srv_mutex){+.+.}-{3:3}, at: compound_send_recv+0x2e8/0x12c0 [cifs]
-> [Mon Feb 14 16:31:14 2022]
->                            but task is already holding lock:
-> [Mon Feb 14 16:31:14 2022] ffffffffae4162a0 (fs_reclaim){+.+.}-{0:0}, at: balance_pgdat+0xa36/0xb20
-> [Mon Feb 14 16:31:14 2022]
->                            which lock already depends on the new lock.
+On 5/23/2022 9:07 AM, David Howells wrote:
+> Namjae Jeon <linkinjeon@kernel.org> wrote:
 > 
-> [Mon Feb 14 16:31:14 2022]
->                            the existing dependency chain (in reverse order) is:
-> [Mon Feb 14 16:31:14 2022]
->                            -> #1 (fs_reclaim){+.+.}-{0:0}:
-> [Mon Feb 14 16:31:14 2022]        fs_reclaim_acquire+0xc2/0xf0
-> [Mon Feb 14 16:31:14 2022]        __kmalloc_node+0x61/0x4a0
-> [Mon Feb 14 16:31:14 2022]        crypto_create_tfm_node+0x53/0x180
-> [Mon Feb 14 16:31:14 2022]        crypto_alloc_tfm_node+0x98/0x130
-> [Mon Feb 14 16:31:14 2022]        crypto_alloc_shash+0x1f/0x30
-> [Mon Feb 14 16:31:14 2022]        cifs_alloc_hash+0x46/0x140 [cifs]
-> [Mon Feb 14 16:31:14 2022]        smb311_crypto_shash_allocate+0x39/0xc0 [cifs]
-> [Mon Feb 14 16:31:14 2022]        smb311_update_preauth_hash+0xb5/0x240 [cifs]
-> [Mon Feb 14 16:31:14 2022]        compound_send_recv+0xdc2/0x12c0 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_send_recv+0x22/0x30 [cifs]
-> [Mon Feb 14 16:31:14 2022]        SMB2_negotiate+0x56d/0x1a40 [cifs]
-> [Mon Feb 14 16:31:14 2022]        smb2_negotiate+0x57/0x70 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_negotiate_protocol+0x10b/0x180 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_get_smb_ses+0x627/0x10d0 [cifs]
-> [Mon Feb 14 16:31:14 2022]        mount_get_conns+0x8c/0x660 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_mount+0xf8/0xe20 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_smb3_do_mount+0x1dd/0xbe0 [cifs]
-> [Mon Feb 14 16:31:14 2022]        smb3_get_tree+0x1a0/0x2e0 [cifs]
-> [Mon Feb 14 16:31:14 2022]        vfs_get_tree+0x52/0x140
-> [Mon Feb 14 16:31:14 2022]        path_mount+0x635/0x10c0
-> [Mon Feb 14 16:31:14 2022]        __x64_sys_mount+0x1bf/0x210
-> [Mon Feb 14 16:31:14 2022]        do_syscall_64+0x5c/0xc0
-> [Mon Feb 14 16:31:14 2022]        entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [Mon Feb 14 16:31:14 2022]
->                            -> #0 (&tcp_ses->srv_mutex){+.+.}-{3:3}:
-> [Mon Feb 14 16:31:14 2022]        __lock_acquire+0x1c7a/0x30a0
-> [Mon Feb 14 16:31:14 2022]        lock_acquire+0x18c/0x430
-> [Mon Feb 14 16:31:14 2022]        __mutex_lock+0x11f/0xc70
-> [Mon Feb 14 16:31:14 2022]        mutex_lock_nested+0x1b/0x20
-> [Mon Feb 14 16:31:14 2022]        compound_send_recv+0x2e8/0x12c0 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_send_recv+0x22/0x30 [cifs]
-> [Mon Feb 14 16:31:14 2022]        SMB2_write+0x45f/0x6e0 [cifs]
-> [Mon Feb 14 16:31:14 2022]        smb2_sync_write+0x7e/0x90 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_write+0x2cf/0x7b0 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_writepage_locked+0x59c/0x730 [cifs]
-> [Mon Feb 14 16:31:14 2022]        cifs_writepage+0x15/0x30 [cifs]
-> [Mon Feb 14 16:31:14 2022]        pageout+0x23b/0x650
-> [Mon Feb 14 16:31:14 2022]        shrink_page_list+0x152d/0x19f0
-> [Mon Feb 14 16:31:14 2022]        shrink_lruvec+0xa89/0x14d0
-> [Mon Feb 14 16:31:14 2022]        shrink_node+0x518/0xd40
-> [Mon Feb 14 16:31:14 2022]        balance_pgdat+0x58c/0xb20
-> [Mon Feb 14 16:31:14 2022]        kswapd+0x40f/0x7b0
-> [Mon Feb 14 16:31:14 2022]        kthread+0x174/0x1b0
-> [Mon Feb 14 16:31:14 2022]        ret_from_fork+0x22/0x30
-> [Mon Feb 14 16:31:14 2022]
->                            other info that might help us debug this:
+>> No. I was able to reproduce the same problem that David reported. I
+>> and Hyunchul will take a look. I also confirmed that RDMA work well
+>> without any problems with soft-ROCE. Until this problem is fixed, I'd
+>> like to say David to use soft-ROCE.
 > 
-> [Mon Feb 14 16:31:14 2022]  Possible unsafe locking scenario:
+> I managed to set up soft-RoCE and get cifs working over that.
 > 
-> [Mon Feb 14 16:31:14 2022]        CPU0                    CPU1
-> [Mon Feb 14 16:31:14 2022]        ----                    ----
-> [Mon Feb 14 16:31:14 2022]   lock(fs_reclaim);
-> [Mon Feb 14 16:31:14 2022]                                lock(&tcp_ses->srv_mutex);
-> [Mon Feb 14 16:31:14 2022]                                lock(fs_reclaim);
-> [Mon Feb 14 16:31:14 2022]   lock(&tcp_ses->srv_mutex);
-> [Mon Feb 14 16:31:14 2022]
->                             *** DEADLOCK ***
+> One thing I'm not sure about: on my server, I see the roce device with
+> ibv_devices, but on my test client, I don't.  I'm wondering if there's
+> something I need to configure to get that.
 
-> It's about a circular dependency locking fs_reclaim lock with srv_mutex held.
-> Does someone here understand this dependency?
+Probably not, but I'd recommend to avoid wading into that if your
+testing is going ok. Send a report to linux-rdma and let them know,
+if so?
 
-The crypto shash allocation does allocations with GFP_KERNEL (i.e.,
-GFP_NOFS is not set and so fs reclaim can be triggered) and this is
-called under the CIFS srv_mutex.  However, the CIFS srv_mutex is also
-used in the reclaim path as the splat shows.  This is the dependency
-which lockdep is complaining about.
+We are told that RedHat is removing SoftRoCE from RHEL9, this too might
+affect your future testing plans...
 
-A way to remove this particular dependency is to make CIFS do a
-memalloc_nofs_save/restore() around the places it takes the srv_mutex.
-However, doing this does not solve the lockdep splats completely since
-there is another dependency via some internal locks in crypto, see the
-log below.
+Tom.
 
-The only solution I see (short of changing all GFP_KERNEL to GFP_NOFS in
-crypto) is to not perform crypto shash allocations under the srv_mutex.
-That was how the code was before 95dc8dd14e2e84cc3ada ("Limit allocation
-of crypto mechanisms to dialect which requires"), and that would likely
-solve other lockdep splats in CIFS too as noted earlier:
-
- https://lore.kernel.org/linux-cifs/20210908142729.GA6873@axis.com/
-
-[   64.988063] ======================================================
-[   64.988640] WARNING: possible circular locking dependency detected
-[   64.989202] 5.18.0+ #49 Not tainted
-[   64.989534] ------------------------------------------------------
-[   64.990103] kswapd0/49 is trying to acquire lock:
-[   64.990541] ffff888005d282e0 (&tcp_ses->_srv_mutex){+.+.}-{3:3}, at: compound_send_recv+0x308/0x12e0 [cifs]
-[   64.991547] 
-[   64.991547] but task is already holding lock:
-[   64.992068] ffffffffa8ce6d40 (fs_reclaim){+.+.}-{0:0}, at: balance_pgdat+0x811/0x8a0
-[   64.992779] 
-[   64.992779] which lock already depends on the new lock.
-[   64.992779] 
-[   64.993520] 
-[   64.993520] the existing dependency chain (in reverse order) is:
-[   64.994174] 
-[   64.994174] -> #2 (fs_reclaim){+.+.}-{0:0}:
-[   64.994692]        fs_reclaim_acquire+0x7a/0xb0
-[   64.995089]        kmem_cache_alloc_trace+0x33/0x220
-[   64.995520]        crypto_larval_alloc+0x35/0xf0
-[   64.995953]        __crypto_register_alg+0x115/0x250
-[   64.996417]        crypto_register_alg+0x44/0xb0
-[   64.996852]        rsa_init+0x15/0x50
-[   64.997189]        do_one_initcall+0xbb/0x3d0
-[   64.997581]        kernel_init_freeable+0x335/0x38e
-[   64.998039]        kernel_init+0x19/0x140
-[   64.998399]        ret_from_fork+0x22/0x30
-[   64.998764] 
-[   64.998764] -> #1 (crypto_alg_sem){++++}-{3:3}:
-[   64.999307]        down_read+0x9c/0x300
-[   64.999643]        crypto_alg_lookup+0x40/0x120
-[   65.000038]        crypto_alg_mod_lookup+0x41/0x250
-[   65.000460]        crypto_alloc_tfm_node+0x73/0x120
-[   65.000901]        cifs_alloc_hash+0x3f/0x140 [cifs]
-[   65.001490]        smb311_crypto_shash_allocate+0x34/0xc0 [cifs]
-[   65.002155]        smb311_update_preauth_hash+0xaa/0x230 [cifs]
-[   65.002812]        compound_send_recv+0xd5e/0x12e0 [cifs]
-[   65.003407]        cifs_send_recv+0x1f/0x30 [cifs]
-[   65.003962]        SMB2_negotiate+0x4ec/0x1c10 [cifs]
-[   65.004559]        smb2_negotiate+0x50/0x70 [cifs]
-[   65.005132]        cifs_negotiate_protocol+0xfe/0x170 [cifs]
-[   65.005779]        cifs_get_smb_ses+0x612/0x1010 [cifs]
-[   65.006389]        cifs_mount+0x70/0xc80 [cifs]
-[   65.006939]        cifs_smb3_do_mount+0x1dd/0xcc0 [cifs]
-[   65.007536]        smb3_get_tree+0x18f/0x2c0 [cifs]
-[   65.008115]        vfs_get_tree+0x4c/0x140
-[   65.008499]        path_mount+0x3a9/0xfb0
-[   65.008869]        __x64_sys_mount+0x190/0x1d0
-[   65.009289]        do_syscall_64+0x3b/0x90
-[   65.009650]        entry_SYSCALL_64_after_hwframe+0x44/0xae
-[   65.010161] 
-[   65.010161] -> #0 (&tcp_ses->_srv_mutex){+.+.}-{3:3}:
-[   65.010733]        __lock_acquire+0x1bc5/0x3460
-[   65.011139]        lock_acquire+0x165/0x3f0
-[   65.011874]        __mutex_lock+0x10d/0xcd0
-[   65.012318]        compound_send_recv+0x308/0x12e0 [cifs]
-[   65.013060]        cifs_send_recv+0x1f/0x30 [cifs]
-[   65.013646]        SMB2_write+0x3e2/0x910 [cifs]
-[   65.014370]        cifs_write+0x2cc/0x790 [cifs]
-[   65.014907]        cifs_writepage_locked+0x502/0x890 [cifs]
-[   65.015553]        cifs_writepage+0x10/0x30 [cifs]
-[   65.016159]        shrink_page_list+0x1695/0x25e0
-[   65.016568]        shrink_lruvec+0x7b1/0xe50
-[   65.016943]        shrink_node+0x335/0x810
-[   65.017326]        balance_pgdat+0x3e4/0x8a0
-[   65.017719]        kswapd+0x3ac/0x720
-[   65.018059]        kthread+0x17d/0x1b0
-[   65.018389]        ret_from_fork+0x22/0x30
-[   65.018747] 
-[   65.018747] other info that might help us debug this:
-[   65.018747] 
-[   65.019434] Chain exists of:
-[   65.019434]   &tcp_ses->_srv_mutex --> crypto_alg_sem --> fs_reclaim
-[   65.019434] 
-[   65.020410]  Possible unsafe locking scenario:
-[   65.020410] 
-[   65.020955]        CPU0                    CPU1
-[   65.021384]        ----                    ----
-[   65.021803]   lock(fs_reclaim);
-[   65.022102]                                lock(crypto_alg_sem);
-[   65.022658]                                lock(fs_reclaim);
-[   65.023320]   lock(&tcp_ses->_srv_mutex);
-[   65.023873] 
-[   65.023873]  *** DEADLOCK ***
-[   65.023873] 
-[   65.024388] 1 lock held by kswapd0/49:
-[   65.024858]  #0: ffffffffa8ce6d40 (fs_reclaim){+.+.}-{0:0}, at: balance_pgdat+0x811/0x8a0
-[   65.025606] 
-[   65.025606] stack backtrace:
-[   65.026010] CPU: 2 PID: 49 Comm: kswapd0 Not tainted 5.18.0+ #49
-[   65.026751] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.14.0-2 04/01/2014
-[   65.027499] Call Trace:
-[   65.027729]  <TASK>
-[   65.027934]  dump_stack_lvl+0x45/0x59
-[   65.028307]  check_noncircular+0x1d6/0x200
-[   65.028703]  ? print_circular_bug+0x220/0x220
-[   65.029114]  ? __orc_find+0x68/0xc0
-[   65.029454]  ? lock_chain_count+0x20/0x20
-[   65.029834]  ? __orc_find+0x68/0xc0
-[   65.030168]  ? add_chain_block+0x1f3/0x2b0
-[   65.030535]  __lock_acquire+0x1bc5/0x3460
-[   65.030988]  ? lockdep_hardirqs_on_prepare+0x220/0x220
-[   65.031559]  ? __orc_find+0x68/0xc0
-[   65.031999]  ? preempt_count_sub+0x14/0xc0
-[   65.032507]  lock_acquire+0x165/0x3f0
-[   65.032855]  ? compound_send_recv+0x308/0x12e0 [cifs]
-[   65.033452]  ? lock_release+0x430/0x430
-[   65.033793]  ? wait_for_free_credits+0x6bd/0xc40 [cifs]
-[   65.034412]  ? lock_downgrade+0x3b0/0x3b0
-[   65.035101]  ? lock_is_held_type+0xd7/0x130
-[   65.035525]  __mutex_lock+0x10d/0xcd0
-[   65.035979]  ? compound_send_recv+0x308/0x12e0 [cifs]
-[   65.036555]  ? compound_send_recv+0x308/0x12e0 [cifs]
-[   65.037131]  ? mutex_lock_io_nested+0xbd0/0xbd0
-[   65.037648]  ? trace_smb3_credit_timeout+0x170/0x170 [cifs]
-[   65.038553]  ? lock_downgrade+0x3b0/0x3b0
-[   65.038915]  ? do_raw_spin_lock+0x119/0x1b0
-[   65.039375]  ? rwlock_bug.part.0+0x60/0x60
-[   65.039791]  compound_send_recv+0x308/0x12e0 [cifs]
-[   65.040351]  ? cifs_pick_channel+0x90/0x90 [cifs]
-[   65.041000]  ? lock_is_held_type+0xd7/0x130
-[   65.041402]  ? find_held_lock+0x85/0xa0
-[   65.041757]  ? lock_release+0x241/0x430
-[   65.042109]  ? __smb2_plain_req_init+0x12d/0x400 [cifs]
-[   65.042878]  ? lock_downgrade+0x3b0/0x3b0
-[   65.043263]  ? do_raw_spin_lock+0x119/0x1b0
-[   65.043649]  ? do_raw_spin_unlock+0x93/0xf0
-[   65.044045]  cifs_send_recv+0x1f/0x30 [cifs]
-[   65.044571]  SMB2_write+0x3e2/0x910 [cifs]
-[   65.045394]  ? lock_is_held_type+0xd7/0x130
-[   65.045859]  ? smb2_async_writev+0x890/0x890 [cifs]
-[   65.046417]  ? lock_downgrade+0x3b0/0x3b0
-[   65.046882]  ? do_raw_spin_lock+0x119/0x1b0
-[   65.047250]  ? lock_is_held_type+0xd7/0x130
-[   65.047639]  ? smb2_sync_write+0x56/0x80 [cifs]
-[   65.048207]  cifs_write+0x2cc/0x790 [cifs]
-[   65.048879]  ? __cifs_writev+0x630/0x630 [cifs]
-[   65.049510]  ? do_raw_spin_lock+0x119/0x1b0
-[   65.049882]  ? rwlock_bug.part.0+0x60/0x60
-[   65.050244]  ? do_raw_spin_unlock+0x93/0xf0
-[   65.050628]  ? preempt_count_sub+0x14/0xc0
-[   65.051347]  cifs_writepage_locked+0x502/0x890 [cifs]
-[   65.051942]  ? cifs_writepages+0x1560/0x1560 [cifs]
-[   65.052567]  ? __page_set_anon_rmap+0x150/0x150
-[   65.052983]  ? invalid_folio_referenced_vma+0x10/0x10
-[   65.053463]  ? preempt_count_sub+0x14/0xc0
-[   65.053839]  ? percpu_counter_add_batch+0x66/0xe0
-[   65.054258]  cifs_writepage+0x10/0x30 [cifs]
-[   65.054782]  shrink_page_list+0x1695/0x25e0
-[   65.055182]  ? shrink_active_list+0xa40/0xa40
-[   65.055600]  ? lock_is_held_type+0xd7/0x130
-[   65.056236]  ? find_held_lock+0x85/0xa0
-[   65.056656]  ? shrink_lruvec+0x771/0xe50
-[   65.057018]  ? mark_held_locks+0x65/0x90
-[   65.057389]  ? lockdep_hardirqs_on_prepare+0x124/0x220
-[   65.057952]  shrink_lruvec+0x7b1/0xe50
-[   65.058315]  ? reclaim_throttle+0x540/0x540
-[   65.058779]  ? mark_lock.part.0+0xfa/0x1a00
-[   65.059170]  ? lockdep_hardirqs_on_prepare+0x220/0x220
-[   65.059654]  ? __up_read+0x15d/0x450
-[   65.059994]  ? __lock_acquire+0x850/0x3460
-[   65.060389]  ? find_held_lock+0x85/0xa0
-[   65.060923]  ? shrink_node+0x18c/0x810
-[   65.061283]  ? lock_is_held_type+0xd7/0x130
-[   65.061684]  shrink_node+0x335/0x810
-[   65.062175]  balance_pgdat+0x3e4/0x8a0
-[   65.062522]  ? __node_reclaim+0x530/0x530
-[   65.062880]  ? lock_is_held_type+0xd7/0x130
-[   65.063447]  ? _raw_spin_lock_irqsave+0x53/0x60
-[   65.063948]  ? lock_is_held_type+0xd7/0x130
-[   65.064386]  ? lock_is_held_type+0xd7/0x130
-[   65.064875]  kswapd+0x3ac/0x720
-[   65.065222]  ? balance_pgdat+0x8a0/0x8a0
-[   65.065573]  ? mark_held_locks+0x24/0x90
-[   65.065931]  ? destroy_sched_domains_rcu+0x30/0x30
-[   65.066648]  ? _raw_spin_unlock_irqrestore+0x2d/0x50
-[   65.067141]  ? lockdep_hardirqs_on+0x79/0x100
-[   65.067539]  ? preempt_count_sub+0x14/0xc0
-[   65.068037]  ? balance_pgdat+0x8a0/0x8a0
-[   65.068408]  kthread+0x17d/0x1b0
-[   65.068716]  ? kthread_complete_and_exit+0x20/0x20
-[   65.069314]  ret_from_fork+0x22/0x30
-[   65.069753]  </TASK>
+> I've attached the config for reference.  Note that I build a monolithic kernel
+> so that I can PXE boot it directly out of the build dir rather than building
+> and installing a fresh rpm each time.
+> 
+> David
