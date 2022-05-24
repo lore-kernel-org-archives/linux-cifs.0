@@ -2,65 +2,114 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E03EC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 May 2022 09:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE3C5C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 May 2022 09:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235219AbiEXJQd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 May 2022 05:16:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43072 "EHLO
+        id S235894AbiEXJvN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 24 May 2022 05:51:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231261AbiEXJQc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 May 2022 05:16:32 -0400
+        with ESMTP id S235896AbiEXJvK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 May 2022 05:51:10 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9B01812AB0
-        for <linux-cifs@vger.kernel.org>; Tue, 24 May 2022 02:16:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2FF26642D
+        for <linux-cifs@vger.kernel.org>; Tue, 24 May 2022 02:51:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653383790;
+        s=mimecast20190719; t=1653385867;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=99hKCjXRT0pB1MVSlsjAQkxWtG1Zv3Y2HE+riwAtc+8=;
-        b=YQrSneO1y3BwQRyqKRFxKTsgMdZwLENG1Bf8J5n1G3/Ps2mmRpx2y+6z1ypb4nmJ78Cu6z
-        8raCgYGiHKMtrggEamldKDig/Uw6pGaBO04j9+OXtcU27fWWfWQM+foC7ZflM3tTfA/wRO
-        1YVaNS55jisQRcjDYLIyUPGLln51qDQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HROxCg3THyAWJg+stBN26H1YCc49DJ6h7IjqQesEu3w=;
+        b=d5S1PqZE2PsAmxmE+QKoUpaO3U1yDdyBdtEvrsr66oLzUM7lWvOBMexNAh0nDiI3VjoD46
+        m/Jdrsopj2TG9QI2rqSqJI/npv0GR1mWe7OvKgKQ7LY0RZ3SvpCGPp38KG9PSP9E7qDXuW
+        t2FMnKX1TbgpkpQcyxa7Yt2ZwXWUl68=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-20-68SprKreMtCIz9gvA8nbRg-1; Tue, 24 May 2022 05:16:27 -0400
-X-MC-Unique: 68SprKreMtCIz9gvA8nbRg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A76CA85A5AA;
-        Tue, 24 May 2022 09:16:26 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B663C1410DD5;
-        Tue, 24 May 2022 09:16:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <307f1f2c-900b-8158-78a8-a3dd7564f2f8@talpey.com>
-References: <307f1f2c-900b-8158-78a8-a3dd7564f2f8@talpey.com> <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com> <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com> <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com> <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com> <84589.1653070372@warthog.procyon.org.uk> <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com> <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com> <dba1ce95-8a72-11ec-ee29-3643623c9928@talpey.com> <CAKYAXd-PezRG4i-7DCiNAMQ0H9DsX-aDxD1rJavEzCmMa179xg@mail.gmail.com>
-To:     Tom Talpey <tom@talpey.com>
-Cc:     dhowells@redhat.com, Namjae Jeon <linkinjeon@kernel.org>,
-        Long Li <longli@microsoft.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
+ us-mta-494-dzwx2lefNMemU-wP9qErDw-1; Tue, 24 May 2022 05:51:06 -0400
+X-MC-Unique: dzwx2lefNMemU-wP9qErDw-1
+Received: by mail-pf1-f197.google.com with SMTP id z24-20020a056a001d9800b0051868682940so4538311pfw.1
+        for <linux-cifs@vger.kernel.org>; Tue, 24 May 2022 02:51:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=HROxCg3THyAWJg+stBN26H1YCc49DJ6h7IjqQesEu3w=;
+        b=A9x2lox51hLK07bzxnIlSIUSxT6XWUtx2XYOgJeRTaXGy4sASffgMj089MqPwWOxjR
+         it0NKYbP/Sw0GWnRBnRwrLfYeYM5DnMyJjj/w8/Ioild31Ejrm6ClnpLrfIu4azfarKH
+         2oiEPtYr49wHyBcEIfYfsWkbvGmu4H9lcBquIeKdUPx6zxxKVZv+rd+QLlsT9sebCFNY
+         DAlL32QnzSG5IPwxwr0ae1b5E57hZfouvJKgiWFFLUwEfHj2+QM98M+Lb+fHfXUUySny
+         WoWVHFkRGd2GaKLJ1j+aAcIzFIH/kc/TuilUhf+2Jgpm/WgqwYaRNvFDPuG+ey3PgLQU
+         HYSQ==
+X-Gm-Message-State: AOAM530bt0GYusImdznS5ANagT39IRsUOQVEfhyuBX7Kw4bsPWoc7zgM
+        YV0necj+Q0Uf18kpb1nJmdWCfePPXXDZDuYLgqrnkzVZQz9kGvL2ItoK0zTblzAJZTZuyiVGAKz
+        Eh3WYl8nxLWn5htbmBwuAkQ==
+X-Received: by 2002:a17:90a:c682:b0:1df:c4a8:5db6 with SMTP id n2-20020a17090ac68200b001dfc4a85db6mr3684399pjt.43.1653385865314;
+        Tue, 24 May 2022 02:51:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxdBOH+gVDMrgyZ041wJ5jZ+2lLXtmmTzIxw/fZE8mPGpSF9hC5I1Teh6Xt19AWnXqr7+s+0w==
+X-Received: by 2002:a17:90a:c682:b0:1df:c4a8:5db6 with SMTP id n2-20020a17090ac68200b001dfc4a85db6mr3684372pjt.43.1653385865116;
+        Tue, 24 May 2022 02:51:05 -0700 (PDT)
+Received: from [10.72.12.81] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id z12-20020a17090a7b8c00b001df2f8f0a45sm1308834pjc.1.2022.05.24.02.50.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 May 2022 02:51:04 -0700 (PDT)
+Subject: Re: [PATCH v2] netfs: Fix gcc-12 warning by embedding vfs inode in
+ netfs_i_context
+To:     Jeff Layton <jlayton@kernel.org>,
+        David Howells <dhowells@redhat.com>
+Cc:     keescook@chromium.org, Jonathan Corbet <corbet@lwn.net>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
         Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: RDMA (smbdirect) testing
+        William Kucharski <william.kucharski@oracle.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-doc@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1b5daa4695b62795b617049e32c784052deabad4.camel@kernel.org>
+ <165305805651.4094995.7763502506786714216.stgit@warthog.procyon.org.uk>
+ <658391.1653302817@warthog.procyon.org.uk>
+ <e4fcdf88a9b35a9f1ca6e75fdf75ad469f824380.camel@kernel.org>
+From:   Xiubo Li <xiubli@redhat.com>
+Message-ID: <9945711f-c786-2300-9854-ee7734024a2c@redhat.com>
+Date:   Tue, 24 May 2022 17:50:54 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1502010.1653383785.1@warthog.procyon.org.uk>
-Date:   Tue, 24 May 2022 10:16:25 +0100
-Message-ID: <1502011.1653383785@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+In-Reply-To: <e4fcdf88a9b35a9f1ca6e75fdf75ad469f824380.camel@kernel.org>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Is there some way for cifs to ask the RDMA layer what it supports?
 
-David
+On 5/23/22 7:05 PM, Jeff Layton wrote:
+> On Mon, 2022-05-23 at 11:46 +0100, David Howells wrote:
+>> Jeff Layton <jlayton@kernel.org> wrote:
+>>
+>>> Note that there are some conflicts between this patch and some of the
+>>> patches in the current ceph-client/testing branch. Depending on the
+>>> order of merge, one or the other will need to be fixed.
+>> Do you think it could be taken through the ceph tree?
+>>
+>> David
+>>
+> Since this touches a lot of non-ceph code, it may be best to just plan
+> to merge it ASAP, and we'll just base our merge branch on top of it.
+>
+> Ilya/Xiubo, do you have an opinion here?
+>   
+
+Yeah, agree with Jeff.
+
 
