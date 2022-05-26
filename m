@@ -2,58 +2,91 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59ACBC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 May 2022 23:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A36CC433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 May 2022 23:51:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238886AbiEZX0Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 26 May 2022 19:26:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59678 "EHLO
+        id S1343847AbiEZXvL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 26 May 2022 19:51:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238521AbiEZX0P (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 May 2022 19:26:15 -0400
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D68849925;
-        Thu, 26 May 2022 16:26:11 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VEUGXJR_1653607568;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VEUGXJR_1653607568)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 27 May 2022 07:26:08 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     sfrench@samba.org
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, Yang Li <yang.lee@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next] cifs: Remove duplicated include in cifssmb.c
-Date:   Fri, 27 May 2022 07:26:06 +0800
-Message-Id: <20220526232606.64174-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S245709AbiEZXvL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 May 2022 19:51:11 -0400
+Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6F239D76
+        for <linux-cifs@vger.kernel.org>; Thu, 26 May 2022 16:51:10 -0700 (PDT)
+Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
+        by 156.147.23.53 with ESMTP; 27 May 2022 08:51:08 +0900
+X-Original-SENDERIP: 156.147.1.151
+X-Original-MAILFROM: hyc.lee@gmail.com
+Received: from unknown (HELO localhost.localdomain) (10.177.245.62)
+        by 156.147.1.151 with ESMTP; 27 May 2022 08:51:08 +0900
+X-Original-SENDERIP: 10.177.245.62
+X-Original-MAILFROM: hyc.lee@gmail.com
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH] ksmbd: smbd: relax the count of sges required
+Date:   Fri, 27 May 2022 08:50:54 +0900
+Message-Id: <20220526235054.29434-1-hyc.lee@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix following includecheck warning:
-./fs/cifs/cifssmb.c: cifsfs.h is included more than once.
+Remove the condition that the count of sges
+must be greater than or equal to
+SMB_DIRECT_MAX_SEND_SGES(8).
+Because ksmbd needs sges only for SMB direct
+header, SMB2 transform header, SMB2 response,
+and optional payload.
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
 ---
- fs/cifs/cifssmb.c | 1 -
- 1 file changed, 1 deletion(-)
+ fs/ksmbd/transport_rdma.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index e3457356ec11..193009f1421b 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -28,7 +28,6 @@
- #include "cifsglob.h"
- #include "cifsacl.h"
- #include "cifsproto.h"
--#include "cifsfs.h"
- #include "cifs_unicode.h"
- #include "cifs_debug.h"
- #include "smb2proto.h"
+diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
+index 0281c185892d..ff82852aa0fd 100644
+--- a/fs/ksmbd/transport_rdma.c
++++ b/fs/ksmbd/transport_rdma.c
+@@ -1709,11 +1709,11 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 	int max_send_sges, max_rw_wrs, max_send_wrs;
+ 	unsigned int max_sge_per_wr, wrs_per_credit;
+ 
+-	/* need 2 more sge. because a SMB_DIRECT header will be mapped,
+-	 * and maybe a send buffer could be not page aligned.
++	/* need 3 more sge. because a SMB_DIRECT header, SMB2 header,
++	 * SMB2 response could be mapped.
+ 	 */
+ 	t->max_send_size = smb_direct_max_send_size;
+-	max_send_sges = DIV_ROUND_UP(t->max_send_size, PAGE_SIZE) + 2;
++	max_send_sges = DIV_ROUND_UP(t->max_send_size, PAGE_SIZE) + 3;
+ 	if (max_send_sges > SMB_DIRECT_MAX_SEND_SGES) {
+ 		pr_err("max_send_size %d is too large\n", t->max_send_size);
+ 		return -EINVAL;
+@@ -1734,6 +1734,8 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 
+ 	max_sge_per_wr = min_t(unsigned int, device->attrs.max_send_sge,
+ 			       device->attrs.max_sge_rd);
++	max_sge_per_wr = max_t(unsigned int, max_sge_per_wr,
++			       max_send_sges);
+ 	wrs_per_credit = max_t(unsigned int, 4,
+ 			       DIV_ROUND_UP(t->pages_per_rw_credit,
+ 					    max_sge_per_wr) + 1);
+@@ -1758,11 +1760,6 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
+ 		return -EINVAL;
+ 	}
+ 
+-	if (device->attrs.max_send_sge < SMB_DIRECT_MAX_SEND_SGES) {
+-		pr_err("warning: device max_send_sge = %d too small\n",
+-		       device->attrs.max_send_sge);
+-		return -EINVAL;
+-	}
+ 	if (device->attrs.max_recv_sge < SMB_DIRECT_MAX_RECV_SGES) {
+ 		pr_err("warning: device max_recv_sge = %d too small\n",
+ 		       device->attrs.max_recv_sge);
 -- 
-2.20.1.7.g153144c
+2.17.1
 
