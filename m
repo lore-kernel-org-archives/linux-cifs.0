@@ -2,91 +2,71 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4996C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 20:45:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CBBC433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 22:22:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354627AbiE0UpL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 May 2022 16:45:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47700 "EHLO
+        id S229610AbiE0WWf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 May 2022 18:22:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354620AbiE0UpK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 16:45:10 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 477091339E3
-        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 13:45:07 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id o7-20020a17090a0a0700b001e29dcba8faso249929pjo.3
-        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 13:45:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+uKoFrA1MB7Px4Hceb9HtqBEm7hxyzDunzaSFZdZ65E=;
-        b=JpMHO7nYYfFDaaxxq/wzIXsc4I/Z9xgwdZE0rzhnywmrdGZcUtKA/KrIyU0IeU6GnG
-         6cD89RcSRO+j9Xoo1ueLijOKuYZGA2nzUwHP9WwPfga0WnX/xc0QfCNn6vNII/OoLrWD
-         KIRjgDhUVv807X+e9rHfxUjNc4U8RMrb5BBBA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+uKoFrA1MB7Px4Hceb9HtqBEm7hxyzDunzaSFZdZ65E=;
-        b=7mxRH6URooftHtgB/g+ZqOba7bOAh1gf7DYM99rwEnMV8xw+dg46Jec5X/cnBFHFxd
-         Ci5uJw22d89v1JZm0FaIW3JUTHyl96jg1wQc+LngkD9X5xIke/gm43O3azIgzP0gCfAo
-         nVUFNRnxngBoUrGEGzMhJvIq8BD9KfmkhycxHpqGNuhvfDgGkmRDjUsw1vafnCJ+ZcnJ
-         lxTI8txkklxhWKZ4SbqnLRvTYc7LSPSkeXAqkpr2pj090tlLyfxY/HzDDYen3PYKNALH
-         xFnSocN3FHIB1nD00jBtKIQE3effryEQJvNn06O1MmCTzUKWyDr9fjVAEhHsqX7JsDAi
-         fwYQ==
-X-Gm-Message-State: AOAM533eojENrfESFTVPGPQGAj3KNCVs7TeKgC0ab2kWtAspxMkzfk7l
-        sy3HdTjT41LNkYcv050Zyj/qFg==
-X-Google-Smtp-Source: ABdhPJwQP43RMakt2LwIAl78pe4ca3GgoTmEwDTY2EZSPcZfvlKlZeVTUOXcUXS3K+fJrEcGQhpsnQ==
-X-Received: by 2002:a17:90b:1c8f:b0:1b8:c6dc:ca61 with SMTP id oo15-20020a17090b1c8f00b001b8c6dcca61mr10068623pjb.13.1653684306778;
-        Fri, 27 May 2022 13:45:06 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id o1-20020a170902d4c100b0015e8d4eb20esm141656plg.88.2022.05.27.13.45.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 May 2022 13:45:06 -0700 (PDT)
-Date:   Fri, 27 May 2022 13:45:05 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     jlayton@kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
+        with ESMTP id S229690AbiE0WWf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 18:22:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E7DB3D102
+        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 15:22:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653690152;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZyZh7kMMDiV5p7EUHZZ5XQC9jbplTlndFgnk9mW7UFM=;
+        b=WPYBrZtod8qKePjllaUJwQeR+ZU3UwXXpgTnUVLBoYUuhoYDcOhKwXtdn4bE6yLggQXvGF
+        UMCD+znKAZhyvw8HWKzus6InmTZmUh5BlAjlX27zO7mgtPdIx9+B00HRGcUWTmi/k/x+oO
+        l2uR6vMVqSJX/CA9Jg2ajwyq+Msyui4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-641-wq_hZJySO_qWw-DAma3_AA-1; Fri, 27 May 2022 18:22:30 -0400
+X-MC-Unique: wq_hZJySO_qWw-DAma3_AA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EA73D1C16B44;
+        Fri, 27 May 2022 22:22:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BAB62C27E92;
+        Fri, 27 May 2022 22:22:28 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <33483e99-a127-02e9-aee4-0d6690a6d934@samba.org>
+References: <33483e99-a127-02e9-aee4-0d6690a6d934@samba.org> <69922c7e-d463-1f98-d0a0-7c7822fae1dc@samba.org> <b8850e44-2772-73c0-8998-a961538b9525@samba.org> <1922487.1653470999@warthog.procyon.org.uk> <CAKYAXd-PezRG4i-7DCiNAMQ0H9DsX-aDxD1rJavEzCmMa179xg@mail.gmail.com> <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com> <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com> <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com> <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com> <84589.1653070372@warthog.procyon.org.uk> <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com> <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com> <dba1ce95-8a72-11ec-ee29-3643623c9928@talpey.com> <1922995.1653471687@warthog.procyon.org.uk> <1963315.1653474049@warthog.procyon.org.uk> <7841d1f6-a650-2c62-1518-baecf55cea39@samba.org> <3d0f1538-629e-d4a7-8ac4-500f908b0c2a@talpey.com> <3505924.1653651977@warthog.procyon.org.uk>
+To:     Stefan Metzmacher <metze@samba.org>
+Cc:     dhowells@redhat.com, Tom Talpey <tom@talpey.com>,
         Steve French <smfrench@gmail.com>,
-        William Kucharski <william.kucharski@oracle.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-doc@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevek@vger.kernel.org, linux-hardening@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfs: Fix gcc-12 warning by embedding vfs inode in
- netfs_i_context
-Message-ID: <202205271344.75AC356A5@keescook>
-References: <202205190704.1DC660E5E@keescook>
- <165296786831.3591209.12111293034669289733.stgit@warthog.procyon.org.uk>
- <3598052.1653654453@warthog.procyon.org.uk>
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Long Li <longli@microsoft.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: RDMA (smbdirect) testing
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3598052.1653654453@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3801207.1653690148.1@warthog.procyon.org.uk>
+Date:   Fri, 27 May 2022 23:22:28 +0100
+Message-ID: <3801208.1653690148@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, May 27, 2022 at 01:27:33PM +0100, David Howells wrote:
-> Hi Kees,
-> 
-> Is v2 good for you?  I realise I left your R-b attached to it when I posted
-> it, but I can remove that if you don't have time to review it.
+Stefan Metzmacher <metze@samba.org> wrote:
 
-Oh! Yes, it's good. Since you kept the R-b, I didn't reply. It looks
-good to me. Thanks!
+> I found that it's needed to set the
+> tcp.try_heuristic_first preference to TRUE
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+That works, thanks.
 
--- 
-Kees Cook
+Tested-by: David Howells <dhowells@redhat.com>
+
