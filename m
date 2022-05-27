@@ -2,109 +2,207 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85307C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 08:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B245C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 09:58:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343699AbiE0I1X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 May 2022 04:27:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54270 "EHLO
+        id S238840AbiE0J6B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 May 2022 05:58:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231844AbiE0I1W (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 04:27:22 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D34FC13E09
-        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 01:27:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=wA+QRPwWDL8TeBSlWF8Ks8D9x4+BRwtPICLxu7fcMkE=; b=xMNe4UriHHeGOAN+c9CWmyz9j1
-        WIwPgItTNNDDe/aigt62MetopcHi1vG6U2mAAuVvrCa+RKZLzC8AkYaStsi/upn17bhdgbsFSFhbF
-        z0i69b0+TwWThUA37u/RmpXd6ARnh4emcJZYO1uE5Ara/5w6dok9FiMMjGa1pB4F3h1zcR8tK8Rla
-        K8AKtrjJ+5vHtZky38nstdQjlPltgcWBDpZfs7f4jbhjhyp7Hwnm8tNLBJj+XbMmAIvCbzFDE6oSw
-        PabgJTYAeND5wA8CBFT2z3tWgf3Va9qJ3bU/IPCliMkM+FGECG5D6ODNb78/lLPhzYf5hJz/s1MZH
-        YDX/PltwmQUjEIULBHoLBsPBd82bA6SV2qDAgbXQ5N1IuvwzISVCPVoAHToxUlzBXspb/R8rTIcMK
-        KJ6JCmyk7ihiUl/dwOU8s7+k1iICqx3pOE8tZIaq+L2Vi+a8eUkxdpr6WqksvoFZyTCklUp58vJee
-        sdr1056wvLDK/6KUVhrZjsmn;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1nuVJW-002j0T-G0; Fri, 27 May 2022 08:27:18 +0000
-Message-ID: <69922c7e-d463-1f98-d0a0-7c7822fae1dc@samba.org>
-Date:   Fri, 27 May 2022 10:27:18 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Content-Language: en-US
-To:     Tom Talpey <tom@talpey.com>, David Howells <dhowells@redhat.com>
-Cc:     Steve French <smfrench@gmail.com>,
+        with ESMTP id S234298AbiE0J6A (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 05:58:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1070F35DF9
+        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 02:57:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653645478;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=g70eeQab0Dc/APhWo7A5wxlMInbPG1Rn3g7zC/mVZsg=;
+        b=IbjQx0wJKjRxQIQTvMc93oTXbL3YfpMlND9ttphMUFoUjLTfHLMPqrHWY6S7UnUNaZMjVI
+        lXUyxwjkM0y36nVAp5/OyPMdhHZh7iyo9waYUMPqAowwqm34e57Y5RmyrIn+XXVTCTXpWo
+        u6wOM1W57ohC/aFLjSpg5KEqVgRDnGE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-605-4f9NXIa7NfCf9z4YGM0pqw-1; Fri, 27 May 2022 05:57:55 -0400
+X-MC-Unique: 4f9NXIa7NfCf9z4YGM0pqw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6CCDF3803907;
+        Fri, 27 May 2022 09:57:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2DBF2026D64;
+        Fri, 27 May 2022 09:57:52 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Zhu Yanjun <zyjzyj2000@gmail.com>,
+        Bob Pearson <rpearsonhpe@gmail.com>,
+        Steve French <smfrench@gmail.com>
+cc:     dhowells@redhat.com, willy@infradead.org,
+        Tom Talpey <tom@talpey.com>,
         Namjae Jeon <linkinjeon@kernel.org>,
-        Long Li <longli@microsoft.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-References: <b8850e44-2772-73c0-8998-a961538b9525@samba.org>
- <1922487.1653470999@warthog.procyon.org.uk>
- <CAKYAXd-PezRG4i-7DCiNAMQ0H9DsX-aDxD1rJavEzCmMa179xg@mail.gmail.com>
- <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com>
- <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
- <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
- <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com>
- <84589.1653070372@warthog.procyon.org.uk>
- <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
- <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
- <dba1ce95-8a72-11ec-ee29-3643623c9928@talpey.com>
- <1922995.1653471687@warthog.procyon.org.uk>
- <1963315.1653474049@warthog.procyon.org.uk>
- <7841d1f6-a650-2c62-1518-baecf55cea39@samba.org>
- <3d0f1538-629e-d4a7-8ac4-500f908b0c2a@talpey.com>
-From:   Stefan Metzmacher <metze@samba.org>
-Subject: Re: RDMA (smbdirect) testing
-In-Reply-To: <3d0f1538-629e-d4a7-8ac4-500f908b0c2a@talpey.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        linux-rdma@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Lockdep splat in RXE (softRoCE) driver in xarray accesses
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3301351.1653645472.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 27 May 2022 10:57:52 +0100
+Message-ID: <3301352.1653645472@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Hi Zhu, Bob, Steve,
 
-Hi Tom,
+There seems to be a locking bug in the softRoCE driver when mounting a cif=
+s
+share.  See attached trace.  I'm guessing the problem is that a softirq
+handler is accessing the xarray, but other accesses to the xarray aren't
+guarded by _bh or _irq markers on the lock primitives.
 
->>>> Can you share the capture file?
->>>
->>> See attached.
->>>
->>>> What version of wireshark are you using?
->>>
->>> wireshark-3.6.2-1.fc35.x86_64
->>> Wireshark 3.7.0 (v3.7.0rc0-1686-g64dfed53330f)
->>
->> Works fine for me with 3.6.2-2 on ubuntu and also a recent wireshark master version.
->>
->> I just fixed a minor problem with fragmented iwrap_ddp_rdma_send messages in
->> frames 91-96. Which seem to happen because ksmbd.ko negotiated a preferred send size of 8192,
->> which is accepted by the cifs.ko. Windows only uses 1364, which means each send operation fits into
->> a single ethernet frame...
-> 
-> That was not an accident. :)
-> 
-> There's a talk somewhere in which I mentioned how we tried to optimize
-> the smbdirect fragment size and always landed back on 1364.
+I wonder if rxe_pool_get_index() should just rely on the RCU read lock and=
+ not
+take the spinlock.
 
-Yes, I remember 4096/3 :-)
+Alternatively, __rxe_add_to_pool() should be using xa_alloc_cyclic_bh() or
+xa_alloc_cyclic_irq().
 
-> However, this is only an implementation choice, the protocol supports a wide
-> range. So it's appropriate for wireshark to be accommodating.
+I used the following commands:
 
-Yes, but the past 20 years showed more than once that, everything but matching
-Windows just leads to bugs, because of untested code paths.
+   rdma link add rxe0 type rxe netdev enp6s0 # andromeda, softRoCE
+   mount //192.168.6.1/scratch /xfstest.scratch -o user=3Dshares,rdma,pass=
+=3D...
 
->> See https://gitlab.com/wireshark/wireshark/-/merge_requests/7025
-> 
-> I get a blank frame when I view both changes on this link. Do I need
-> a gitlab account??
+talking to ksmbd on the other side.
 
-I don't think so, I'm seeing it even without being logged in.
+Kernel is v5.18-rc6.
 
-Does https://gitlab.com/wireshark/wireshark/-/merge_requests/7025.patch
-or https://gitlab.com/wireshark/wireshark/-/merge_requests/7025/diffs
-work?
+David
+---
+infiniband rxe0: set active
+infiniband rxe0: added enp6s0
+RDS/IB: rxe0: added
+CIFS: No dialect specified on mount. Default has changed to a more secure =
+dialect, SMB2.1 or later (e.g. SMB3.1.1), from CIFS (SMB1). To use the les=
+s secure SMB1 dialect to access old servers which do not support SMB3.1.1 =
+(or even SMB3 or SMB2.1) specify vers=3D1.0 on mount.
+CIFS: Attempting to mount \\192.168.6.1\scratch
 
-metze
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+WARNING: inconsistent lock state
+5.18.0-rc6-build2+ #465 Not tainted
+--------------------------------
+inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+ksoftirqd/1/20 [HC0[0]:SC1[1]:HE0:SE0] takes:
+ffff888134d11310 (&xa->xa_lock#12){+.?.}-{2:2}, at: rxe_pool_get_index+0x1=
+9/0x69
+{SOFTIRQ-ON-W} state was registered at:
+  mark_usage+0x169/0x17b
+  __lock_acquire+0x50c/0x96a
+  lock_acquire+0x2f4/0x37b
+  _raw_spin_lock+0x2f/0x39
+  xa_alloc_cyclic.constprop.0+0x20/0x55
+  __rxe_add_to_pool+0xe3/0xf2
+  __ib_alloc_pd+0xa2/0x26b
+  ib_mad_port_open+0x1ac/0x4a1
+  ib_mad_init_device+0x9b/0x1b9
+  add_client_context+0x133/0x1b3
+  enable_device_and_get+0x129/0x248
+  ib_register_device+0x256/0x2fd
+  rxe_register_device+0x18e/0x1b7
+  rxe_net_add+0x57/0x71
+  rxe_newlink+0x71/0x8e
+  nldev_newlink+0x200/0x26a
+  rdma_nl_rcv_msg+0x260/0x2ab
+  rdma_nl_rcv+0x108/0x1a7
+  netlink_unicast+0x1fc/0x2b3
+  netlink_sendmsg+0x4ce/0x51b
+  sock_sendmsg_nosec+0x41/0x4f
+  __sys_sendto+0x157/0x1cc
+  __x64_sys_sendto+0x76/0x82
+  do_syscall_64+0x39/0x46
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
+irq event stamp: 194111
+hardirqs last  enabled at (194110): [<ffffffff81094eb2>] __local_bh_enable=
+_ip+0xb8/0xcc
+hardirqs last disabled at (194111): [<ffffffff82040077>] _raw_spin_lock_ir=
+qsave+0x1b/0x51
+softirqs last  enabled at (194100): [<ffffffff8240043a>] __do_softirq+0x43=
+a/0x489
+softirqs last disabled at (194105): [<ffffffff81094d30>] run_ksoftirqd+0x3=
+1/0x56
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&xa->xa_lock#12);
+  <Interrupt>
+    lock(&xa->xa_lock#12);
+
+ *** DEADLOCK ***
+
+no locks held by ksoftirqd/1/20.
+
+stack backtrace:
+CPU: 1 PID: 20 Comm: ksoftirqd/1 Not tainted 5.18.0-rc6-build2+ #465
+Hardware name: ASUS All Series/H97-PLUS, BIOS 2306 10/09/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x45/0x59
+ valid_state+0x56/0x61
+ mark_lock_irq+0x9b/0x2ec
+ ? ret_from_fork+0x1f/0x30
+ ? valid_state+0x61/0x61
+ ? stack_trace_save+0x8f/0xbe
+ ? filter_irq_stacks+0x58/0x58
+ ? jhash.constprop.0+0x1ad/0x202
+ ? save_trace+0x17c/0x196
+ mark_lock.part.0+0x10c/0x164
+ mark_usage+0xe6/0x17b
+ __lock_acquire+0x50c/0x96a
+ lock_acquire+0x2f4/0x37b
+ ? rxe_pool_get_index+0x19/0x69
+ ? rcu_read_unlock+0x52/0x52
+ ? jhash.constprop.0+0x1ad/0x202
+ ? lockdep_unlock+0xde/0xe6
+ ? validate_chain+0x44a/0x4a8
+ ? req_next_wqe+0x312/0x363
+ _raw_spin_lock_irqsave+0x41/0x51
+ ? rxe_pool_get_index+0x19/0x69
+ rxe_pool_get_index+0x19/0x69
+ rxe_get_av+0xbe/0x14b
+ rxe_requester+0x6b5/0xbb0
+ ? rnr_nak_timer+0x16/0x16
+ ? lock_downgrade+0xad/0xad
+ ? rcu_read_lock_bh_held+0xab/0xab
+ ? __wake_up+0xf/0xf
+ ? mark_held_locks+0x1f/0x78
+ ? __local_bh_enable_ip+0xb8/0xcc
+ ? rnr_nak_timer+0x16/0x16
+ rxe_do_task+0xb5/0x13d
+ ? rxe_detach_mcast+0x1d6/0x1d6
+ tasklet_action_common.constprop.0+0xda/0x145
+ __do_softirq+0x202/0x489
+ ? __irq_exit_rcu+0x108/0x108
+ ? _local_bh_enable+0x1c/0x1c
+ run_ksoftirqd+0x31/0x56
+ smpboot_thread_fn+0x35c/0x376
+ ? sort_range+0x1c/0x1c
+ kthread+0x164/0x173
+ ? kthread_complete_and_exit+0x20/0x20
+ ret_from_fork+0x1f/0x30
+ </TASK>
+CIFS: VFS: RDMA transport established
+
