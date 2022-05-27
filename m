@@ -2,169 +2,109 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74CB4C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 06:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85307C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 08:27:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233668AbiE0GxF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 May 2022 02:53:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36492 "EHLO
+        id S1343699AbiE0I1X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 May 2022 04:27:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231913AbiE0GxF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 02:53:05 -0400
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 234BB631A;
-        Thu, 26 May 2022 23:53:04 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id j7so3444262vsj.7;
-        Thu, 26 May 2022 23:53:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=gVT2+H6zyIakz/UAu5QzrweZZcue1nrsnDfliOy/bQY=;
-        b=ZWR4uRcH/37PhBE9lMQte0rU686WET1ynrPOzj9fzztJUt3B6vfDCnVZzO996dPPgD
-         M949X6ez39wcIWItUp0zaVt/OcKrKyCQo+GpYDnFHKOMzdih275OEvLe8ycO83/0YS7t
-         BjyZfXkbilye/EukOpEVPu3BODovj+ADevH294XyTq+olXe7ViiUVOE6N+ALmWXfG4DP
-         /d/Ju0cqfO8/UH+j/AF/9+daK6N3T5mMuQmmINIeVG4JWqcEYnSVejGeZ/7oQaA+Dno2
-         so6Q7U6CDZpRz53sFTyVcHeMwjf2m5bXWhs/OGHAzGppJReIDPP3N67XOV0JGZJZ5bGc
-         QlqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=gVT2+H6zyIakz/UAu5QzrweZZcue1nrsnDfliOy/bQY=;
-        b=YoWMNpy6+wFVY6JyJb4Vie5IVnT5MCBfzRolHqk+dwhJRmUqTO6fA4TEj71Co4alAH
-         56B2WskJvI2TlpYg1kNy5it8pK3af6Xt3AQGk8knBTum6DCILFKD16Gfg3WrfpjFSGu8
-         QdomS1CmoZG1Szu4cud8WJEcbKwusSUEC5e40aOP3v3sMqKu8FG1H2FgPbKf8H2aTJ4k
-         Oiwwc98qVjfqjApYVXuF3AfiM8y+Shn5kqzGIsL3fkfeXtmpNLAPwyJEg7kW8HlKTJPr
-         OEJfWsP7h1hkZ7Vf6w96aIn1xhejCSywXvUn26MJ4HNSpSzvgneJsUfhGYWI6M6fDRwJ
-         biYg==
-X-Gm-Message-State: AOAM532M6l27zsKE3hzi7CIP0o8+vM4k/8D+ZVbCDP9o3VUpjgDYst+A
-        Im/ASKRRKjNnglhIfvsVJ2IcyfyXkNZEtuHMlhHYbf0LmFA=
-X-Google-Smtp-Source: ABdhPJw9Zy8z+7QhQRtgaQkZNdZDw80Rrd2UwgvhaW6ojTPkzHzMRPNtz/ungVM4MULyegijtz8kbpPevFeINS+UfmM=
-X-Received: by 2002:a05:6102:2137:b0:338:f898:8bbd with SMTP id
- f23-20020a056102213700b00338f8988bbdmr4783224vsg.60.1653634383120; Thu, 26
- May 2022 23:53:03 -0700 (PDT)
+        with ESMTP id S231844AbiE0I1W (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 04:27:22 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D34FC13E09
+        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 01:27:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=wA+QRPwWDL8TeBSlWF8Ks8D9x4+BRwtPICLxu7fcMkE=; b=xMNe4UriHHeGOAN+c9CWmyz9j1
+        WIwPgItTNNDDe/aigt62MetopcHi1vG6U2mAAuVvrCa+RKZLzC8AkYaStsi/upn17bhdgbsFSFhbF
+        z0i69b0+TwWThUA37u/RmpXd6ARnh4emcJZYO1uE5Ara/5w6dok9FiMMjGa1pB4F3h1zcR8tK8Rla
+        K8AKtrjJ+5vHtZky38nstdQjlPltgcWBDpZfs7f4jbhjhyp7Hwnm8tNLBJj+XbMmAIvCbzFDE6oSw
+        PabgJTYAeND5wA8CBFT2z3tWgf3Va9qJ3bU/IPCliMkM+FGECG5D6ODNb78/lLPhzYf5hJz/s1MZH
+        YDX/PltwmQUjEIULBHoLBsPBd82bA6SV2qDAgbXQ5N1IuvwzISVCPVoAHToxUlzBXspb/R8rTIcMK
+        KJ6JCmyk7ihiUl/dwOU8s7+k1iICqx3pOE8tZIaq+L2Vi+a8eUkxdpr6WqksvoFZyTCklUp58vJee
+        sdr1056wvLDK/6KUVhrZjsmn;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1nuVJW-002j0T-G0; Fri, 27 May 2022 08:27:18 +0000
+Message-ID: <69922c7e-d463-1f98-d0a0-7c7822fae1dc@samba.org>
+Date:   Fri, 27 May 2022 10:27:18 +0200
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 27 May 2022 01:52:52 -0500
-Message-ID: <CAH2r5mug2=wOYp-mwRKWJPRiyh2xtdP06A-i3fVL=JuidMsReQ@mail.gmail.com>
-Subject: [GIT PULL] SMB3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Content-Language: en-US
+To:     Tom Talpey <tom@talpey.com>, David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Long Li <longli@microsoft.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+References: <b8850e44-2772-73c0-8998-a961538b9525@samba.org>
+ <1922487.1653470999@warthog.procyon.org.uk>
+ <CAKYAXd-PezRG4i-7DCiNAMQ0H9DsX-aDxD1rJavEzCmMa179xg@mail.gmail.com>
+ <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com>
+ <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
+ <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
+ <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com>
+ <84589.1653070372@warthog.procyon.org.uk>
+ <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
+ <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
+ <dba1ce95-8a72-11ec-ee29-3643623c9928@talpey.com>
+ <1922995.1653471687@warthog.procyon.org.uk>
+ <1963315.1653474049@warthog.procyon.org.uk>
+ <7841d1f6-a650-2c62-1518-baecf55cea39@samba.org>
+ <3d0f1538-629e-d4a7-8ac4-500f908b0c2a@talpey.com>
+From:   Stefan Metzmacher <metze@samba.org>
+Subject: Re: RDMA (smbdirect) testing
+In-Reply-To: <3d0f1538-629e-d4a7-8ac4-500f908b0c2a@talpey.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-42226c989789d8da4af1de0c31070c96726d990c:
 
-  Linux 5.18-rc7 (2022-05-15 18:08:58 -0700)
+Hi Tom,
 
-are available in the Git repository at:
+>>>> Can you share the capture file?
+>>>
+>>> See attached.
+>>>
+>>>> What version of wireshark are you using?
+>>>
+>>> wireshark-3.6.2-1.fc35.x86_64
+>>> Wireshark 3.7.0 (v3.7.0rc0-1686-g64dfed53330f)
+>>
+>> Works fine for me with 3.6.2-2 on ubuntu and also a recent wireshark master version.
+>>
+>> I just fixed a minor problem with fragmented iwrap_ddp_rdma_send messages in
+>> frames 91-96. Which seem to happen because ksmbd.ko negotiated a preferred send size of 8192,
+>> which is accepted by the cifs.ko. Windows only uses 1364, which means each send operation fits into
+>> a single ethernet frame...
+> 
+> That was not an accident. :)
+> 
+> There's a talk somewhere in which I mentioned how we tried to optimize
+> the smbdirect fragment size and always landed back on 1364.
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc-smb3-client-fixes-part1
+Yes, I remember 4096/3 :-)
 
-for you to fetch changes up to 9f114d7bfc6c35ca23a82efce60e0db535a186f1:
+> However, this is only an implementation choice, the protocol supports a wide
+> range. So it's appropriate for wireshark to be accommodating.
 
-  smb3: remove unneeded null check in cifs_readdir (2022-05-26 11:15:14 -0500)
+Yes, but the past 20 years showed more than once that, everything but matching
+Windows just leads to bugs, because of untested code paths.
 
-----------------------------------------------------------------
-Twenty eight cifs/smb3 client fixes, including:
-- a series of fixes for multichannel fixes to improve reconnect after
-network failure
-- improved caching of root directory contents (extending benefit of
-directory leases)
-- 2 DFS fixes
-- 3 fixes for improved debugging
-- an NTLMSSP fix for mounts t0 older servers
-- new mount parm to allow disabling creating sparse files
-- various cleanup fixes and minor fixes pointed out by coverity
-- the first part of Dave's updates for iov_iter support
+>> See https://gitlab.com/wireshark/wireshark/-/merge_requests/7025
+> 
+> I get a blank frame when I view both changes on this link. Do I need
+> a gitlab account??
 
-Not included in this P/R are the last two patches in Dave's series
-converting i/o paths in cifs.ko to use iterators,
-as well as some RDMA (smbdirect) fixes and a patch to dynamically
-requery and adjust the network interfaces on the
-fly - all of which are still being tested.
-----------------------------------------------------------------
-ChenXiaoSong (1):
-      cifs: return the more nuanced writeback error on close()
+I don't think so, I'm seeing it even without being logged in.
 
-David Howells (4):
-      iov_iter: Add a function to extract an iter's buffers to a bvec iter
-      iov_iter: Add a general purpose iteration function
-      cifs: Add some helper functions
-      cifs: Add a function to read into an iter from a socket
+Does https://gitlab.com/wireshark/wireshark/-/merge_requests/7025.patch
+or https://gitlab.com/wireshark/wireshark/-/merge_requests/7025/diffs
+work?
 
-Enzo Matsumiya (3):
-      cifs: don't call cifs_dfs_query_info_nonascii_quirk() if nodfs was set
-      cifs: return ENOENT for DFS lookup_cache_entry()
-      cifs: print TIDs as hex
-
-Julia Lawall (1):
-      cifs: smbd: fix typo in comment
-
-Paulo Alcantara (2):
-      cifs: fix signed integer overflow when fl_end is OFFSET_MAX
-      cifs: fix ntlmssp on old servers
-
-Ronnie Sahlberg (4):
-      cifs: move definition of cifs_fattr earlier in cifsglob.h
-      cifs: check for smb1 in open_cached_dir()
-      cifs: set the CREATE_NOT_FILE when opening the directory in
-use_cached_dir()
-      cifs: cache the dirents for entries in a cached directory
-
-Shyam Prasad N (3):
-      cifs: do not use tcpStatus after negotiate completes
-      cifs: use new enum for ses_status
-      cifs: avoid parallel session setups on same channel
-
-Steve French (10):
-      SMB3: EBADF/EIO errors in rename/open caused by race condition
-in smb2_compound_op
-      smb3: add trace point for lease not found issue
-      smb3: add trace point for oplock not found
-      Add defines for various newer FSCTLs
-      Add various fsctl structs
-      cifs: fix minor compile warning
-      smb3: check for null tcon
-      smb3: don't set rc when used and unneeded in query_info_compound
-      smb3: add mount parm nosparse
-      smb3: remove unneeded null check in cifs_readdir
-
- fs/cifs/cifs_debug.c       |  11 +++-
- fs/cifs/cifsfs.c           |   2 +
- fs/cifs/cifsfs.h           |   3 +
- fs/cifs/cifsglob.h         | 124 +++++++++++++++++++++++++++------------
- fs/cifs/cifsproto.h        |  12 ++++
- fs/cifs/cifssmb.c          |  99 ++++++++++++++++++++++++++++++-
- fs/cifs/connect.c          | 123 +++++++++++++++++++++++----------------
- fs/cifs/dfs_cache.c        |   6 +-
- fs/cifs/file.c             |  13 +++--
- fs/cifs/fs_context.c       |  33 +++--------
- fs/cifs/fs_context.h       |   4 +-
- fs/cifs/misc.c             |  11 ++--
- fs/cifs/readdir.c          | 179
-++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- fs/cifs/sess.c             |  33 ++++++++++-
- fs/cifs/smb2inode.c        |   7 ++-
- fs/cifs/smb2misc.c         |  12 +++-
- fs/cifs/smb2ops.c          |  32 +++++++++--
- fs/cifs/smb2pdu.c          |   5 +-
- fs/cifs/smb2pdu.h          |  22 -------
- fs/cifs/smb2transport.c    |   7 ++-
- fs/cifs/smbdirect.c        |   2 +-
- fs/cifs/trace.h            |   2 +
- fs/cifs/transport.c        |   8 +--
- fs/smbfs_common/smb2pdu.h  | 108 +++++++++++++++++++++++++++++++---
- fs/smbfs_common/smbfsctl.h |   6 ++
- include/linux/uio.h        |   8 +++
- lib/iov_iter.c             | 133 ++++++++++++++++++++++++++++++++++++++++++
- 27 files changed, 816 insertions(+), 189 deletions(-)
-
-
--- 
-Thanks,
-
-Steve
+metze
