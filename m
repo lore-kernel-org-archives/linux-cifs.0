@@ -2,80 +2,88 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DDE5C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 12:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A86AC433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 13:46:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346349AbiE0MkV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 May 2022 08:40:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54362 "EHLO
+        id S1351547AbiE0NqD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 May 2022 09:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352147AbiE0Mjz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 08:39:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 278A311CA33
-        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 05:27:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653654463;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RJxrf4ooyTqpiAItg7I/Q/q7XnsebEkQQNQ2A5YOD9I=;
-        b=Co1tSshUMCi3FjIl3T0V4I6phbN7o0O2EuWQrOy5KdBQr8SAi7iiToXeOpmgclAAIo5ko+
-        ofRWtrkEW6pdyB2gdAOoNTWGKCQ9gurXP9Kozl2pDcRPQezKhzPnVlyUxx/VbDeNljka0D
-        qeWs5+0w7ZzZ4l72Be4JkHUr9aOEPC8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-251-jXjVmR17Pi2O2lmDWrKoXw-1; Fri, 27 May 2022 08:27:38 -0400
-X-MC-Unique: jXjVmR17Pi2O2lmDWrKoXw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 29875101AA45;
-        Fri, 27 May 2022 12:27:37 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2504E1410DD5;
-        Fri, 27 May 2022 12:27:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <202205190704.1DC660E5E@keescook>
-References: <202205190704.1DC660E5E@keescook> <165296786831.3591209.12111293034669289733.stgit@warthog.procyon.org.uk>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     dhowells@redhat.com, jlayton@kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        William Kucharski <william.kucharski@oracle.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-doc@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevek@vger.kernel.org, linux-hardening@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfs: Fix gcc-12 warning by embedding vfs inode in netfs_i_context
+        with ESMTP id S238218AbiE0NqC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 09:46:02 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DBF15AA4A
+        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 06:46:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=LoJkDtqsg3x5Yd4TVVP+f2TwF5w3WDLFCaoPxLRg+NE=; b=HI3gQMzHUvt2fnYJx8u+hxGkZK
+        9+CgN362Tx+aWp8i26Ertozr45HmrvS2ZxVhlGWfkjSrTJI8v9Q1lkZGgEBOh5qC2lqOygYc28A0D
+        Xr7ko6xDaECUb1M8Sv5/5u1Z8GUCKtJAM1QZcfgBfSbOJ/dU/kqij8gmsqZOSx+ihZfjA7l+F4r0E
+        99vff+LRmk3LeT/La+FvVL8ZM2Jt5Ug5OhAnZt1b3iMCGBBIrupBpTZVxiyZxaGkaA5iiyPZzMIxM
+        jf6znLx0CdcTanWsoG6Be20VmrmjsIbLCaAIEW869iAvx0j+nTanH9wrDkIDnw3rCUEmzUlLfCIR8
+        xpvCHpLEXZ3fZsVqRip4ohZ/4rhZYfwyGlh16hP2+EHM7vsFi+tBwNYM2Ovd3JV6tegPT5xtOIEMS
+        j5sUafN/l9S6ZtlxEI45p1rPG+KWvShIaPrxEskP1c/4hab9eI3r0xNtTi58gm1/1/eG3zQOKWjkx
+        nTuTMQ+9e7c1AGdf8wfi/2pE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1nuaHu-002lUg-3P; Fri, 27 May 2022 13:45:58 +0000
+Message-ID: <33483e99-a127-02e9-aee4-0d6690a6d934@samba.org>
+Date:   Fri, 27 May 2022 15:45:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3598051.1653654453.1@warthog.procyon.org.uk>
-Date:   Fri, 27 May 2022 13:27:33 +0100
-Message-ID: <3598052.1653654453@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>
+Cc:     Tom Talpey <tom@talpey.com>, Steve French <smfrench@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Long Li <longli@microsoft.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+References: <69922c7e-d463-1f98-d0a0-7c7822fae1dc@samba.org>
+ <b8850e44-2772-73c0-8998-a961538b9525@samba.org>
+ <1922487.1653470999@warthog.procyon.org.uk>
+ <CAKYAXd-PezRG4i-7DCiNAMQ0H9DsX-aDxD1rJavEzCmMa179xg@mail.gmail.com>
+ <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com>
+ <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
+ <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
+ <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com>
+ <84589.1653070372@warthog.procyon.org.uk>
+ <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
+ <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
+ <dba1ce95-8a72-11ec-ee29-3643623c9928@talpey.com>
+ <1922995.1653471687@warthog.procyon.org.uk>
+ <1963315.1653474049@warthog.procyon.org.uk>
+ <7841d1f6-a650-2c62-1518-baecf55cea39@samba.org>
+ <3d0f1538-629e-d4a7-8ac4-500f908b0c2a@talpey.com>
+ <3505924.1653651977@warthog.procyon.org.uk>
+From:   Stefan Metzmacher <metze@samba.org>
+Subject: Re: RDMA (smbdirect) testing
+In-Reply-To: <3505924.1653651977@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Kees,
 
-Is v2 good for you?  I realise I left your R-b attached to it when I posted
-it, but I can remove that if you don't have time to review it.
+Am 27.05.22 um 13:46 schrieb David Howells:
+> Stefan Metzmacher <metze@samba.org> wrote:
+> 
+>> Does https://gitlab.com/wireshark/wireshark/-/merge_requests/7025.patch
+> 
+> I tried applying it (there appear to be two patches therein), but it doesn't
+> seem to have any effect when viewing the pcap file I posted.  It says it
+> should decode the port as Artemis.
 
-David
+I found that it's needed to set the
+tcp.try_heuristic_first preference to TRUE
 
+Check this:
+
+grep '^tcp' preferences
+tcp.try_heuristic_first: TRUE
+
+For ~/.config/wireshark/ (or ~/.wireshark/' as fallback)
+
+metze
