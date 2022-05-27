@@ -2,102 +2,140 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F9DC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 19:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F5EC433FE
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 20:05:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245318AbiE0Tcs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 May 2022 15:32:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52564 "EHLO
+        id S1350077AbiE0UFo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 May 2022 16:05:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237348AbiE0Tcr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 15:32:47 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34FD613C095
-        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 12:32:46 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id t13so3522332ljd.6
-        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 12:32:46 -0700 (PDT)
+        with ESMTP id S239686AbiE0UFm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 16:05:42 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C12E46140
+        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 13:05:39 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id n124-20020a1c2782000000b003972dfca96cso3319206wmn.4
+        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 13:05:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=YbNlXe87qNc6h67+KP/ggEhHQmBaOtSGUnOsKzPXQyw=;
-        b=cQJY+P6rcRGZZ5r3c7oRqG5V7iGSoJNJfKBfuZfO15LxSEWMkzAtA54lu7Hp/tYWBV
-         wWSVEi3BgDrSqtNbmMqXIV9tPidA0qwutEe5J6bEx6R78si5RkSYCzVzWoyTDMtRlldU
-         DZy13KPSObcqjZC20xf9UDfblSOqjoP6xPruYdMlBDSh/Rj/CWl+4G4TkODCM2vsTIjW
-         Ofqstgp/HJlVo9uKP1+4DyCRvGnLZkps8yxzz07y6GsvLCzo5o1FfyVqKcEq21v9Fywx
-         8WPNqYNKpyUzjKwQImhtgUQ2Dag5bdTNucqQQFvxEtU5kZuVoVNmllkponQWwR+Ri0Sb
-         71Mw==
+        bh=3hDs5pMehEzS9JtBcciO3du/140ZEedg4Xg+u6dsQZw=;
+        b=oihAaWbcG7Yr9p0y5ULTKT7tU46NohvPTW+4VGetJ03GHSZRqq4LU+CPKg0Z2PrH5R
+         b7AoPxPSIySEEsBuGcjzbeg273gPzUDiuDgPQe8t+O97X7MaFFmZxPWkqR1LY9W4beoO
+         n00RsO520VB1zU12ITOAw5pKWroS+wVFZbCpC2euQgZwg2TwOVdcJe/hm29p06XZbpk9
+         Sux3vMrXw4iwBHlCbOLNQjWoRtlyXEU5R6srtHjt5qRoh4UhA0D6F4jCnsUI6KqRNPOo
+         yBXjUTB2xOyeoHGBTQdQEu/248CfGEyYoUye03xA0p2HIRWz4ulUElW6T5at8G4x+QOH
+         iljg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=YbNlXe87qNc6h67+KP/ggEhHQmBaOtSGUnOsKzPXQyw=;
-        b=kk/K5F9mSoXBhg1Umx60cQ23nnNDmP8UiI7yi7azy36hftEo+odySxiuMXaTxS3uCJ
-         QevjC1lhMdRKqfqGvtitjwbzIedRn3a4pa2TpksOpYA/mR5l8LiZOBP6OxxL75BmoOpq
-         PQUq+3MdXx/axuAzpdscZz/SJoB1UaheOWrhkVHfhxaeLs8bCjnGlLdDFULKGQPXq816
-         dXhmdvISww7dbf+R9ShKrGMGZdnkyh3HPWQ6iBlePULJnFCml3as/tP0aIXUET+QKtiQ
-         VXYTFla1I/OAH0PRYNUsj8NrzCz2j2lfBzkKgKN7bOnZLyxQLXMQRjA2RR0JBxBaCijg
-         Y/5Q==
-X-Gm-Message-State: AOAM530ueL+0jdKiZquLwjE82lOQNsZg++EjqLqegL5W6UxN5szJ7Tc4
-        Y6IxYntMLdDNI/8Td+7+vK0CvhBfFUyQaRm3iUXLjw==
-X-Google-Smtp-Source: ABdhPJzAxhlMSalFK9CVX5KwiMg/9AV2qQCnCCuSa8PGqm8A4zOvp5d8SiUYeHr7aft7fDHizNRyejsH6FF624ole3c=
-X-Received: by 2002:a2e:b98f:0:b0:254:1e41:6aae with SMTP id
- p15-20020a2eb98f000000b002541e416aaemr5939903ljp.493.1653679964237; Fri, 27
- May 2022 12:32:44 -0700 (PDT)
+        bh=3hDs5pMehEzS9JtBcciO3du/140ZEedg4Xg+u6dsQZw=;
+        b=Td1rE82ZGD87PxWS7k3UV/I9TbWZpp1dblDVr2dVrHWvSBLOmTmPFBgncl4EmbPKx9
+         GrhbNl/pT5iH3ln9oUzs0nds6UvbUjGyckTQX+WVQXRs67IOAdVly2LyvneoPxFs/+Ls
+         5wDuz0xtHEL+MoXb6CuqKJE1meARzLuxR+KOWN20m/Uh+1r1y8Ac4Wm8lzxGZarjlCPB
+         u+pExvzWO4VxKogiJ3LnBcQteyy1hLUxpImUiV5l6voupyB2vTmUMna9VbZTWHiPZB0s
+         DcruWogVqIE5tkGMVHc3Q2pHejb3mAughqAeJamAYz7X1cS/R+YbgCG10vLC4JJxb6nj
+         xP7A==
+X-Gm-Message-State: AOAM532z5NCVR5hrYV/qA87Lnj3KGP/WKo1VtUZpgoEw6MgCElrIS0B4
+        CWmwaglaQZAm7ziKKM7J2kAekTF2ytD1nQ87Y9rR
+X-Google-Smtp-Source: ABdhPJzSQiwbwdo8FqZ111McYTLFv4bwIxxTTbHCjxtpHRnG+P00gPgVzRWa/5Bdb55lusFwlbu3a5oOnOFQ3+tgAU8=
+X-Received: by 2002:a05:600c:3b05:b0:397:54ce:896 with SMTP id
+ m5-20020a05600c3b0500b0039754ce0896mr8458182wms.3.1653681937794; Fri, 27 May
+ 2022 13:05:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220526140226.2648689-1-trix@redhat.com>
-In-Reply-To: <20220526140226.2648689-1-trix@redhat.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Fri, 27 May 2022 12:32:32 -0700
-Message-ID: <CAKwvOdmPZXiMZRKyMfZVMmw-95XVocSZn3VVi3yJh0Bx1ONbJQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: set length when cifs_copy_pages_to_iter is successful
-To:     Steve French <stfrench@microsoft.com>
-Cc:     nathan@kernel.org, dhowells@redhat.com, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev, Tom Rix <trix@redhat.com>, sfrench@samba.org
+References: <20220525183703.466936-1-fred@cloudflare.com>
+In-Reply-To: <20220525183703.466936-1-fred@cloudflare.com>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Fri, 27 May 2022 16:05:26 -0400
+Message-ID: <CAHC9VhS=_RvB66J9D5AZ+XnyDKupvTQpFzni2uvz348REPUT5A@mail.gmail.com>
+Subject: Re: [PATCH v2] cred: Propagate security_prepare_creds() error code
+To:     Frederick Lawler <fred@cloudflare.com>
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+        linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+        keyrings@vger.kernel.org, selinux@vger.kernel.org,
+        serge@hallyn.com, amir73il@gmail.com, kernel-team@cloudflare.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-+ Steve's @microsoft.com email addr.
-
-On Thu, May 26, 2022 at 7:02 AM Tom Rix <trix@redhat.com> wrote:
+On Wed, May 25, 2022 at 2:37 PM Frederick Lawler <fred@cloudflare.com> wrote:
 >
-> clang build fails with
-> fs/cifs/smb2ops.c:4984:7: error: variable 'length' is used uninitialized whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
->   if (rdata->result != 0) {
->       ^~~~~~~~~~~~~~~~~~
+> While experimenting with the security_prepare_creds() LSM hook, we
+> noticed that our EPERM error code was not propagated up the callstack.
+> Instead ENOMEM is always returned.  As a result, some tools may send a
+> confusing error message to the user:
 >
-> handle_read_data() returns the number of bytes handled by setting the length variable.
-> This only happens in the copy_to_iter() branch, it needs to also happen in the
-> cifs_copy_pages_to_iter() branch.  When cifs_copy_pages_to_iter() is successful,
-> its parameter data_len is how many bytes were handled, so set length to data_len.
+> $ unshare -rU
+> unshare: unshare failed: Cannot allocate memory
 >
-> Fixes: 67fd8cff2b0f ("cifs: Change the I/O paths to use an iterator rather than a page list")
-> Signed-off-by: Tom Rix <trix@redhat.com>
+> A user would think that the system didn't have enough memory, when
+> instead the action was denied.
+>
+> This problem occurs because prepare_creds() and prepare_kernel_cred()
+> return NULL when security_prepare_creds() returns an error code. Later,
+> functions calling prepare_creds() and prepare_kernel_cred() return
+> ENOMEM because they assume that a NULL meant there was no memory
+> allocated.
+>
+> Fix this by propagating an error code from security_prepare_creds() up
+> the callstack.
+>
+> Signed-off-by: Frederick Lawler <fred@cloudflare.com>
+>
 > ---
->  fs/cifs/smb2ops.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 3630e132781f..bfad482ec186 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -4988,7 +4988,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
->                                 dequeue_mid(mid, rdata->result);
->                         return 0;
->                 }
-> -               rdata->got_bytes = pages_len;
-> +               length = rdata->got_bytes = pages_len;
->
->         } else if (buf_len >= data_offset + data_len) {
->                 /* read response payload is in buf */
-> --
-> 2.27.0
->
+> Changes since v1:
+> - Revert style churn in ovl_create_or_link() noted by Amir
+> - Revert style churn in prepare_nsset() noted by Serge
+> - Update documentation for prepare_creds()
+> - Set ofs->creator_cred in ovl_fill_super() and req->creds in aio_fsync()
+>   to NULL on error noted by Amir
+> ---
+>  Documentation/security/credentials.rst |  6 +++---
+>  fs/aio.c                               |  9 +++++++--
+>  fs/cachefiles/security.c               |  8 ++++----
+>  fs/cifs/cifs_spnego.c                  |  4 ++--
+>  fs/cifs/cifsacl.c                      |  4 ++--
+>  fs/coredump.c                          |  2 +-
+>  fs/exec.c                              | 14 ++++++++-----
+>  fs/ksmbd/smb_common.c                  |  4 ++--
+>  fs/nfs/flexfilelayout/flexfilelayout.c |  7 +++++--
+>  fs/nfs/nfs4idmap.c                     |  4 ++--
+>  fs/nfsd/auth.c                         |  4 ++--
+>  fs/nfsd/nfs4callback.c                 | 10 ++++-----
+>  fs/nfsd/nfs4recover.c                  |  4 ++--
+>  fs/nfsd/nfsfh.c                        |  4 ++--
+>  fs/open.c                              |  8 ++++----
+>  fs/overlayfs/dir.c                     |  6 ++++--
+>  fs/overlayfs/super.c                   |  6 ++++--
+>  kernel/capability.c                    |  4 ++--
+>  kernel/cred.c                          | 28 +++++++++++++++-----------
+>  kernel/groups.c                        |  4 ++--
+>  kernel/nsproxy.c                       |  9 ++++++++-
+>  kernel/sys.c                           | 28 +++++++++++++-------------
+>  kernel/trace/trace_events_user.c       |  4 ++--
+>  kernel/umh.c                           |  5 +++--
+>  kernel/user_namespace.c                |  6 ++++--
+>  net/dns_resolver/dns_key.c             |  4 ++--
+>  security/apparmor/task.c               | 12 +++++------
+>  security/commoncap.c                   | 20 +++++++++---------
+>  security/keys/keyctl.c                 |  8 ++++----
+>  security/keys/process_keys.c           | 16 +++++++--------
+>  security/landlock/syscalls.c           |  4 ++--
+>  security/selinux/hooks.c               |  8 ++++----
+>  security/smack/smack_lsm.c             |  8 ++++----
+>  security/smack/smackfs.c               |  4 ++--
+>  34 files changed, 153 insertions(+), 123 deletions(-)
 
+The SELinux bits look fine to me.
+
+Acked-by: Paul Moore <paul@paul-moore.com> (SELinux)
 
 -- 
-Thanks,
-~Nick Desaulniers
+paul-moore.com
