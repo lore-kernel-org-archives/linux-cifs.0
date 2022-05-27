@@ -2,124 +2,229 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7337C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 10:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15858C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 May 2022 10:45:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245164AbiE0Kop (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 May 2022 06:44:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47674 "EHLO
+        id S231932AbiE0KpO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 May 2022 06:45:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351046AbiE0Koc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 06:44:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 820B44C409
-        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 03:44:31 -0700 (PDT)
+        with ESMTP id S1351124AbiE0KpG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 May 2022 06:45:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CC33F12B021
+        for <linux-cifs@vger.kernel.org>; Fri, 27 May 2022 03:44:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653648270;
+        s=mimecast20190719; t=1653648298;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JPjH9LzUL2EEkZyPk4S7m1LZ52Vs/cmjg6eI3uOHDjw=;
-        b=Ls98ddAfAL6cgryuybGF+aAoGHpzMFqnKRlpLvFd4pWdVBdZAbEVXQYr0TQ/EpjNkjN/N2
-        MjwgMjMOTYhPysgMdr4x7ti1+q3XBWT/+/m1WqWtAn4LqsqH5imTe3DAV/2R1jOj1S5Emj
-        H0/C0+fovjYp82i5sMTqGXNFL9xH7gw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=DAV6pMb6APpzl8FwwZsp5/XKJg/uKvWgpysM7Nubv6I=;
+        b=OYZmNpVyzlNseGe9DIZabpK704tjxuZ1wUVOsyvQhVhQQOJYATPIQAAVpMCwSgtaccXkZR
+        5ijPibY3P30e0Si8sP/FlSSjWEvPW357IbVPXNmQ2JCwOnLzL+hx01DWrtZevKllOD5WJr
+        5LdpsH5GB0jk4ukIFzV+Vqwi4MxqLE0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-550-BRMLVPihOmCQ4QFxvgp8Fw-1; Fri, 27 May 2022 06:44:26 -0400
-X-MC-Unique: BRMLVPihOmCQ4QFxvgp8Fw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-373-h7qV_O6tM6icjr2PkdiWBg-1; Fri, 27 May 2022 06:44:55 -0400
+X-MC-Unique: h7qV_O6tM6icjr2PkdiWBg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7F068032E5;
-        Fri, 27 May 2022 10:44:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 503C83C10221;
+        Fri, 27 May 2022 10:44:55 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A252D492CA2;
-        Fri, 27 May 2022 10:44:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0BD4A406AD44;
+        Fri, 27 May 2022 10:44:53 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v3 4/9] cifs: Add a function to read into an iter from a
- socket
+Subject: [PATCH v3 8/9] cifs: Add some RDMA send tracepoints
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
-Cc:     Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        linux-cifs@vger.kernel.org, dhowells@redhat.com,
-        Shyam Prasad N <nspmangalore@gmail.com>,
+Cc:     dhowells@redhat.com, Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         Jeff Layton <jlayton@kernel.org>,
         Al Viro <viro@zeniv.linux.org.uk>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 27 May 2022 11:44:23 +0100
-Message-ID: <165364826398.3334034.12541600783145647319.stgit@warthog.procyon.org.uk>
+Date:   Fri, 27 May 2022 11:44:53 +0100
+Message-ID: <165364829336.3334034.4053390268201499872.stgit@warthog.procyon.org.uk>
 In-Reply-To: <165364823513.3334034.11209090728654641458.stgit@warthog.procyon.org.uk>
 References: <165364823513.3334034.11209090728654641458.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.4
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper function to read data from a socket into the given iterator.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: linux-cifs@vger.kernel.org
 ---
 
- fs/cifs/cifsproto.h |    3 +++
- fs/cifs/connect.c   |   16 ++++++++++++++++
- 2 files changed, 19 insertions(+)
+ fs/cifs/smbdirect.c |   15 +++++++-
+ fs/cifs/trace.h     |   95 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 108 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 0df3b24a0bf4..dd4931308ea6 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -245,6 +245,9 @@ extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
- 					unsigned int page_offset,
- 					unsigned int to_read);
- extern int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb);
-+extern int cifs_read_iter_from_socket(struct TCP_Server_Info *server,
-+				      struct iov_iter *iter,
-+				      unsigned int to_read);
- extern int cifs_match_super(struct super_block *, void *);
- extern int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx);
- extern void cifs_umount(struct cifs_sb_info *);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 42e14f408856..0d532d559f70 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -764,6 +764,22 @@ cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *page,
- 	return cifs_readv_from_socket(server, &smb_msg);
- }
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 6894fa9c062d..df75ad7a85de 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1945,6 +1945,8 @@ static ssize_t smbd_post_send_iter_scanner(struct iov_iter *iter, const void *p,
+ 	ctx->len += len;
+ 	log_write(INFO, "sending page i=%d offset=%zu size=%zu remaining_data_length=%d\n",
+ 		  ix, offset, len, *ctx->_remaining_data_length);
++	trace_smb3_rdma_page(ctx->num_rqst, ctx->rqst_idx, ix, offset, len,
++			     iov_iter_count(iter), *ctx->_remaining_data_length);
+ 	*ctx->_remaining_data_length -= len;
+ 	ctx->nsg++;
+ 	return len;
+@@ -2043,19 +2045,27 @@ int smbd_send(struct TCP_Server_Info *server,
+ 		klen += rqst->rq_iov[i].iov_len;
+ 	iov_iter_kvec(&iter, WRITE, rqst->rq_iov, rqst->rq_nvec, klen);
  
-+int
-+cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct iov_iter *iter,
-+			   unsigned int to_read)
-+{
-+	struct msghdr smb_msg;
-+	int ret;
++	trace_smb3_rdma_send(num_rqst, rqst_idx, rqst->rq_nvec, klen,
++			     iov_iter_count(&rqst->rq_iter), remaining_data_length);
 +
-+	smb_msg.msg_iter = *iter;
-+	if (smb_msg.msg_iter.count > to_read)
-+		smb_msg.msg_iter.count = to_read;
-+	ret = cifs_readv_from_socket(server, &smb_msg);
-+	if (ret > 0)
-+		iov_iter_advance(iter, ret);
-+	return ret;
-+}
+ 	rc = smbd_post_send_iter(info, &iter, num_rqst, rqst_idx,
+ 				 &remaining_data_length);
+-	if (rc < 0)
++	if (rc < 0) {
++		trace_smb3_rdma_fail(num_rqst, rqst_idx, 1, rc);
+ 		goto done;
++	}
+ 
+ 	if (iov_iter_count(&rqst->rq_iter) > 0) {
+ 		/* And then the data pages if there are any */
+ 		rc = smbd_post_send_iter(info, &rqst->rq_iter, num_rqst, rqst_idx,
+ 					 &remaining_data_length);
+-		if (rc < 0)
++		if (rc < 0) {
++			trace_smb3_rdma_fail(num_rqst, rqst_idx, 2, rc);
+ 			goto done;
++		}
+ 	}
+ 
++	trace_smb3_rdma_done(num_rqst, rqst_idx, 3);
+ 	rqst_idx++;
+ 	if (rqst_idx < num_rqst)
+ 		goto next_rqst;
+@@ -2282,6 +2292,7 @@ static ssize_t smbd_iter_to_mr_scanner(struct iov_iter *iter, const void *p,
+ 	sg_set_buf(&ctx->sgl[ix], p, len);
+ 	log_write(INFO, "sending page i=%d offset=%zu size=%zu\n",
+ 		  ix, offset, len);
++	trace_smb3_rdma_page(0, 0, ix, offset, len, iov_iter_count(iter), 0);
+ 	ctx->nsg++;
+ 	return len;
+ }
+diff --git a/fs/cifs/trace.h b/fs/cifs/trace.h
+index d73d3093b67b..5a8fc6645e8d 100644
+--- a/fs/cifs/trace.h
++++ b/fs/cifs/trace.h
+@@ -1081,6 +1081,101 @@ TRACE_EVENT(smb3_pages_write_requeue,
+ 		  __entry->wdata_debug_id2)
+ )
+ 
++TRACE_EVENT(smb3_rdma_send,
++	    TP_PROTO(unsigned int nr_rqst, unsigned int sub_rqst,
++		     unsigned int nr_kvec, unsigned int kvec_len,
++		     unsigned int iter_len, unsigned int remaining_len),
++	    TP_ARGS(nr_rqst, sub_rqst, nr_kvec, kvec_len, iter_len, remaining_len),
++	    TP_STRUCT__entry(
++		    __field(u8, nr_rqst)
++		    __field(u8, sub_rqst)
++		    __field(u8, nr_kvec)
++		    __field(unsigned int, kvec_len)
++		    __field(unsigned int, iter_len)
++		    __field(unsigned int, remaining_len)
++			     ),
++	    TP_fast_assign(
++		    __entry->nr_rqst = nr_rqst;
++		    __entry->sub_rqst = sub_rqst;
++		    __entry->nr_kvec = nr_kvec;
++		    __entry->kvec_len = kvec_len;
++		    __entry->iter_len = iter_len;
++		    __entry->remaining_len = remaining_len;
++			   ),
++	    TP_printk("nrq=%u/%u nkv=%u kvl=%u iter=%u rem=%u",
++		      __entry->sub_rqst + 1, __entry->nr_rqst,
++		      __entry->nr_kvec, __entry->kvec_len,
++		      __entry->iter_len, __entry->remaining_len)
++	    )
 +
- static bool
- is_smb_response(struct TCP_Server_Info *server, unsigned char type)
- {
++TRACE_EVENT(smb3_rdma_page,
++	    TP_PROTO(unsigned int nr_rqst, unsigned int sub_rqst,
++		     unsigned int i, size_t offset, ssize_t len,
++		     unsigned int iter_len, unsigned int remaining_len),
++	    TP_ARGS(nr_rqst, sub_rqst, i, offset, len, iter_len, remaining_len),
++	    TP_STRUCT__entry(
++		    __field(u8, nr_rqst)
++		    __field(u8, sub_rqst)
++		    __field(unsigned int, iter_len)
++		    __field(unsigned int, remaining_len)
++		    __field(unsigned int, i)
++		    __field(size_t, offset)
++		    __field(ssize_t, len)
++			     ),
++	    TP_fast_assign(
++		    __entry->nr_rqst = nr_rqst;
++		    __entry->sub_rqst = sub_rqst;
++		    __entry->i = i;
++		    __entry->offset = offset;
++		    __entry->len = len;
++		    __entry->iter_len = iter_len;
++		    __entry->remaining_len = remaining_len;
++			   ),
++	    TP_printk("nrq=%u/%u pg=%u o=%zx l=%zx iter=%u rem=%u",
++		      __entry->sub_rqst + 1, __entry->nr_rqst,
++		      __entry->i, __entry->offset, __entry->len,
++		      __entry->iter_len, __entry->remaining_len)
++	    )
++
++TRACE_EVENT(smb3_rdma_done,
++	    TP_PROTO(unsigned int nr_rqst, unsigned int sub_rqst,
++		     unsigned int where),
++	    TP_ARGS(nr_rqst, sub_rqst, where),
++	    TP_STRUCT__entry(
++		    __field(u8, nr_rqst)
++		    __field(u8, sub_rqst)
++		    __field(u8, where)
++			     ),
++	    TP_fast_assign(
++		    __entry->nr_rqst = nr_rqst;
++		    __entry->sub_rqst = sub_rqst;
++		    __entry->where = where;
++			   ),
++	    TP_printk("nrq=%u/%u where=%u",
++		      __entry->sub_rqst + 1, __entry->nr_rqst, __entry->where)
++	    )
++
++TRACE_EVENT(smb3_rdma_fail,
++	    TP_PROTO(unsigned int nr_rqst, unsigned int sub_rqst,
++		     unsigned int where, int rc),
++	    TP_ARGS(nr_rqst, sub_rqst, where, rc),
++	    TP_STRUCT__entry(
++		    __field(u8, nr_rqst)
++		    __field(u8, sub_rqst)
++		    __field(u8, where)
++		    __field(short, rc)
++			     ),
++	    TP_fast_assign(
++		    __entry->nr_rqst = nr_rqst;
++		    __entry->sub_rqst = sub_rqst;
++		    __entry->where = where;
++		    __entry->rc = rc;
++			   ),
++	    TP_printk("nrq=%u/%u where=%u rc=%d",
++		      __entry->sub_rqst + 1, __entry->nr_rqst,
++		      __entry->where, __entry->rc)
++	    )
++
+ #endif /* _CIFS_TRACE_H */
+ 
+ #undef TRACE_INCLUDE_PATH
 
 
