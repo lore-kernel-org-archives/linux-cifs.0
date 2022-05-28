@@ -2,120 +2,121 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D19C433EF
-	for <linux-cifs@archiver.kernel.org>; Sat, 28 May 2022 22:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C574C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 28 May 2022 23:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229526AbiE1WiU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 28 May 2022 18:38:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44212 "EHLO
+        id S230162AbiE1Xbp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 28 May 2022 19:31:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbiE1WiT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 28 May 2022 18:38:19 -0400
-Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BED4939C5
-        for <linux-cifs@vger.kernel.org>; Sat, 28 May 2022 15:38:18 -0700 (PDT)
-Received: by mail-vs1-xe2f.google.com with SMTP id i186so7476907vsc.9
-        for <linux-cifs@vger.kernel.org>; Sat, 28 May 2022 15:38:18 -0700 (PDT)
+        with ESMTP id S230161AbiE1Xbo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 28 May 2022 19:31:44 -0400
+Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40F33D11D;
+        Sat, 28 May 2022 16:31:42 -0700 (PDT)
+Received: by mail-vs1-xe35.google.com with SMTP id h4so7554076vsr.13;
+        Sat, 28 May 2022 16:31:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=uiS9SmfmKYaMiJrRetIgon5Dn/KyHXhXz2mf7RVxhs0=;
-        b=OBS3d4Mk7Je+8M6EWiFdsRB9ips+5heYdTg0Z3SZ+3+00svdkDhUnLsQ0Hi8aqLlHQ
-         2KHRoBbv4j10i3IhVBuAhZJwRsjRr2ycnozoCYyBq2W7vEoOMweex9qo7aPVYRpsJ247
-         peluyuSMvQZ6x5edoADrErztUXtXksb1X2iqRRw+0glMPrQu/6sgbV/1FlkOAnhgwi6w
-         aGKad2DDJfLFRi7gpho3u+orKKygxhYmJSxXtcp3x65VJpwCQQrYsA1lZkTr8K3uGpwu
-         Wx89ZnKN31O3VC4pIRYAvBWfgAn1IvrSQ2VGClohvG5sVSeAJJBJGSjcGCT5VSpSbJ+i
-         7woQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZHkspVi7hYgWPjrkicA2Ka1cNGl3qopvOnZQ16mob5o=;
+        b=Gg3IQ+lg74QPdhRPZFKypPilx6JqlFfPJ+wKJjuWc7dfiDeqz7Ej4ejDTuBIvmfY8K
+         hOPfs9pNrSleU0crFRqa6VRLjFrpYl9twi0nfDuxYmDDujG/2/5YXwGWAjuH8NoAXpxO
+         4KwH2a3MSZ8Oy4R4BPM9eeIVbbVnkOYgnWq5DycK3dnUzRosv8FiZBFGZhP7eatjkt1N
+         Lh8kNIipt6Smw86Rqn42AIjJVfoxqkE024CI1V3uE2nYTV284vfqkAU+yx1kvh2R2KPh
+         TyVQMuWvodkAsmpi/mx3igk3w0kIrCQP0XviVaAwqzUtZHJOv94NUnqWo3/gvHpaLGXf
+         R4sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=uiS9SmfmKYaMiJrRetIgon5Dn/KyHXhXz2mf7RVxhs0=;
-        b=mOGBXkLp8HElGzc1wy8JLy1LFgvrl4Abj+DQw6BRz7yyA2m/EKA2uRXfJMkvxX2AmW
-         pJ+Q/GUYa8rXoT4Ik00CiAmFFMUxmGVKj09xIgryetS8S4CRVm3Pc5e9RW82bTadHtp4
-         TiU0eMsle39Ou1UIfmZ1WJIILNO1Jr4Rpux9HWM27afuup/UgoUdOH4HGCPAE8rnMavn
-         tRwohbqpWE+L5vOEs9dbo9WyLXBhO+zp4cZO3wUYQqzaNbtN3LDWsyQjma0T3JyWkJql
-         rdTK68+Y+grL4J1Kyee0lfXjDXelEyhDpoTquN06gUnZIzW7tCT7efGEyIq5U2/nGI+8
-         VpbA==
-X-Gm-Message-State: AOAM530rJE+qgmG64w0i71EAE16fc+1wc5KM4dF938O8ZajbH7vmrnBJ
-        3GTY06zf8bvGviHgpHvhsNgIc9BYJ797mFoh/lXAJqIX
-X-Google-Smtp-Source: ABdhPJw3pvo3jz4PphfDLsVz0NdN5c0mUupeTBFYNbxBtzncLxawxhAxOoZVDAp1lHlqX5vaieFTyoUOvHC+Q+oMFQk=
-X-Received: by 2002:a67:fe57:0:b0:335:ef50:1b94 with SMTP id
- m23-20020a67fe57000000b00335ef501b94mr18251959vsr.6.1653777497158; Sat, 28
- May 2022 15:38:17 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZHkspVi7hYgWPjrkicA2Ka1cNGl3qopvOnZQ16mob5o=;
+        b=OE0qujIKrM4iNT4caroX7zfNvYf0Qo4FRHIpN7sL3ey5ty9qZQhZPJhAOU/DdXSmxL
+         DRDO52ZhyvVPd5jIevGqKsAu2u9D4mPlE6vJkttokRoFEVjPf1JDKdp31F0JyeO1046b
+         xuom7v3nud8/sqxM9o7LTabQrOAui5MOVnw8glPJimzJaT7TgIe8anXxtbTQBKzSYW5w
+         IHogOHbN53xsrkO5m5rRQRN4EYkNXb0qTrXJeENNjF7r7/jx5cWvJr8/s2PGdml6zjzi
+         iVdAwbPocHZiDMt1dXySnKEc8CvTWMcWL+9Iwyrbi4KMOKk9mkL/MlvrtKDhVR61WL5I
+         N4uA==
+X-Gm-Message-State: AOAM532eLzxWcivt0WSAimJySdOYkL3bAYT/A/e+9jJgpqfXEH8rVkKN
+        2eE7mm3cgT8A4gbp5NzkR+lVjs6Uj55CV6V6ugs=
+X-Google-Smtp-Source: ABdhPJy0Acb1c3xSDsjiqAa+wurlHniC7DTliHnSjCHwZc1KOpXXeNt8sWJjTYXpw40/HtDl5zk/Uq4lxuGzoAoQ188=
+X-Received: by 2002:a67:b607:0:b0:337:b5b7:adc9 with SMTP id
+ d7-20020a67b607000000b00337b5b7adc9mr13395803vsm.17.1653780701218; Sat, 28
+ May 2022 16:31:41 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220526140226.2648689-1-trix@redhat.com> <CAKwvOdmPZXiMZRKyMfZVMmw-95XVocSZn3VVi3yJh0Bx1ONbJQ@mail.gmail.com>
+In-Reply-To: <CAKwvOdmPZXiMZRKyMfZVMmw-95XVocSZn3VVi3yJh0Bx1ONbJQ@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 28 May 2022 17:38:05 -0500
-Message-ID: <CAH2r5msE-duSk+O2PJoBKzo2ip9y9e1TiYB1pvX3TY6R9Rq21Q@mail.gmail.com>
-Subject: Suspicious xfstest failures to ksmbd
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sat, 28 May 2022 18:31:30 -0500
+Message-ID: <CAH2r5mumSyxP8XUJjKwv9exh__NkCtG2HSiO-USqGo_7ZTb0yQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: set length when cifs_copy_pages_to_iter is successful
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Steve French <stfrench@microsoft.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev,
+        Tom Rix <trix@redhat.com>, Steve French <sfrench@samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Noticed a few differences between ksmbd test results and other servers
-that may be server bugs:
-generic/615 22s ... - output mismatch (see
-/home/smfrench/xfstests-dev/results//generic/615.out.bad)
-    --- tests/generic/615.out   2022-01-30 15:05:53.495186894 -0600
-    +++ /home/smfrench/xfstests-dev/results//generic/615.out.bad
- 2022-05-28 16:29:12.603177975 -0500
-    @@ -1,3 +1,4 @@
-     QA output created by 615
-     Testing buffered writes
-    +error: stat(2) reported zero blocks
-     Testing direct IO writes
-    ...
-    (Run 'diff -u /home/smfrench/xfstests-dev/tests/generic/615.out
-/home/smfrench/xfstests-dev/results//generic/615.out.bad'  to see the
-entire diff)
+Presumably this was in Dave Howell's patch set which we took out of
+for-next to restructure in some of Al's feedback and some things found
+during testing. So nothing to fix in current mainline or for-next ...
+right?
 
-also test 208 fails:
-generic/208 201s ... [failed, exit status 1]- output mismatch (see
-/home/smfrench/xfstests-dev/results//generic/208.out.bad)
-    --- tests/generic/208.out   2020-01-24 17:11:18.720859829 -0600
-    +++ /home/smfrench/xfstests-dev/results//generic/208.out.bad
- 2022-05-27 21:43:43.204933555 -0500
-    @@ -1,2 +1,2 @@
-     QA output created by 208
-    -ran for 200 seconds without error, passing
-    +buffered write returned 12582912
-    \ No newline at end of file
-
-Tests generic/472, generic/497 and generic/554 (swapfile tests) are
-skipped to ksmbd (with "swapfile not supported") but not to Samba
-
-
-Also would be interesting to see why test generic/586 fails (although
-this fails to multiple servers, could be client bug):
-generic/586 11s ... - output mismatch (see
-/home/smfrench/xfstests-dev/results//generic/586.out.bad)
-    --- tests/generic/586.out   2020-06-14 15:13:59.924160846 -0500
-    +++ /home/smfrench/xfstests-dev/results//generic/586.out.bad
- 2022-05-28 16:28:54.723201574 -0500
-    @@ -1,2 +1,101 @@
-     QA output created by 586
-    +[0]: sbuf.st_size=1048576, expected 2097152.
-    +[1]: sbuf.st_size=1048576, expected 2097152.
-
-
-Test 213 should also correctly return no space on disk (could be client bug)
-generic/213 0s ... - output mismatch (see
-/home/smfrench/xfstests-dev/results//generic/213.out.bad)
-    --- tests/generic/213.out   2020-01-24 17:11:18.720859829 -0600
-    +++ /home/smfrench/xfstests-dev/results//generic/213.out.bad
- 2022-05-27 18:50:38.984025733 -0500
-    @@ -1,4 +1,3 @@
-     QA output created by 213
-     We should get: fallocate: No space left on device
-     Strangely, xfs_io sometimes says "Success" when something went wrong, FYI
-    -fallocate: No space left on device
+On Sat, May 28, 2022 at 3:40 PM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
+>
+> + Steve's @microsoft.com email addr.
+>
+> On Thu, May 26, 2022 at 7:02 AM Tom Rix <trix@redhat.com> wrote:
+> >
+> > clang build fails with
+> > fs/cifs/smb2ops.c:4984:7: error: variable 'length' is used uninitialized whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
+> >   if (rdata->result != 0) {
+> >       ^~~~~~~~~~~~~~~~~~
+> >
+> > handle_read_data() returns the number of bytes handled by setting the length variable.
+> > This only happens in the copy_to_iter() branch, it needs to also happen in the
+> > cifs_copy_pages_to_iter() branch.  When cifs_copy_pages_to_iter() is successful,
+> > its parameter data_len is how many bytes were handled, so set length to data_len.
+> >
+> > Fixes: 67fd8cff2b0f ("cifs: Change the I/O paths to use an iterator rather than a page list")
+> > Signed-off-by: Tom Rix <trix@redhat.com>
+> > ---
+> >  fs/cifs/smb2ops.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> > index 3630e132781f..bfad482ec186 100644
+> > --- a/fs/cifs/smb2ops.c
+> > +++ b/fs/cifs/smb2ops.c
+> > @@ -4988,7 +4988,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+> >                                 dequeue_mid(mid, rdata->result);
+> >                         return 0;
+> >                 }
+> > -               rdata->got_bytes = pages_len;
+> > +               length = rdata->got_bytes = pages_len;
+> >
+> >         } else if (buf_len >= data_offset + data_len) {
+> >                 /* read response payload is in buf */
+> > --
+> > 2.27.0
+> >
+>
+>
+> --
+> Thanks,
+> ~Nick Desaulniers
 
 
--
 
---
+-- 
 Thanks,
 
 Steve
