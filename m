@@ -2,61 +2,67 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B028C433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 29 May 2022 03:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A463DC433F5
+	for <linux-cifs@archiver.kernel.org>; Sun, 29 May 2022 04:04:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230178AbiE2Dxo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 28 May 2022 23:53:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48916 "EHLO
+        id S229784AbiE2EEp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 May 2022 00:04:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230272AbiE2Dxj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 28 May 2022 23:53:39 -0400
-Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93BC460B89
-        for <linux-cifs@vger.kernel.org>; Sat, 28 May 2022 20:53:38 -0700 (PDT)
-Received: by mail-vs1-xe35.google.com with SMTP id m2so7831590vsr.8
-        for <linux-cifs@vger.kernel.org>; Sat, 28 May 2022 20:53:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=giHaGcrnS96RQDZzPa4m01m6+h3jecgHXpJNe+dYIBc=;
-        b=i45UUAr8myc6PEZyDBHGu6sE38KbmeuNMXysdpziY3FmLdllrMf/XFwXRq/Fqhxy8p
-         B1zyFmsb3ZsEdXI1OQfQqRn/CCeB0SEwhg/CHldGbAXktnAvY3mIkczJNnHa4dztEuSM
-         7w6j34Nwh1WK8XNTbYN7PYQxtONYORqsdTHAwCA90EYxFD3bPavqpoGuf+pGAlbD6jbn
-         ljjxf9S4hrVMNGnbzCDzsAxolTzJmX+RS28PtfcXakzRAkGu4osm2pSeMS5vqhVbnu9T
-         3KNATQp41R4cUXCNKi/RtuVYCVnIIc6EHUqQ4SQp1EeIWD9UIYRNWZ06MVtzLBOdrJ2H
-         s+Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=giHaGcrnS96RQDZzPa4m01m6+h3jecgHXpJNe+dYIBc=;
-        b=NF3rZhXNg+e+J/NkHNMvYsI2eqDq+PCiafVVZ0if6MpxBRn3m/BxRNlXuu0qb3xoXn
-         gKLfgGEN6ryJHYEcnC1+mv8xpYpRTo/fjC4y3WgsSeHYcrbWnSNKHymo3xiwXHy6IgVT
-         6rEBAu1znIR8SZVhrloFwlwYpaFWX9CBjmy/b8gJmV/bXqNJT4Veg6L9wnszTMgJ77V2
-         u+pAOZg2mXlXv05GeT6BzxobrbaLkFoU3Vim1AIwxLQz3GHPoB91pu3ztetq4ZUXIS9S
-         Wr3JqjaW8IfA3rpaMu3BqNdCKgYw8ZIsrSYHgER2FSAIi1qHRUOqkWn7dl8/OJQq0vs4
-         u6PA==
-X-Gm-Message-State: AOAM5337evAOinFURNPxeOYQG3cIpL5mpNdPK+WylQn7ThkEu4MeTXM/
-        0MIKR+vBEBZZtwz1dWr284YJQYBxlqJI7HQKeyXcNRtPq0g=
-X-Google-Smtp-Source: ABdhPJwY4H6q7NaupupMQTIeIYFuOnPAWRU6SZyi84r/xgkUkAWCoo535sBbw7ix1tNQYx2sUxFetIodOwEZPEBhCj8=
-X-Received: by 2002:a67:d601:0:b0:337:e4b9:d2e0 with SMTP id
- n1-20020a67d601000000b00337e4b9d2e0mr8407504vsj.61.1653796417473; Sat, 28 May
- 2022 20:53:37 -0700 (PDT)
+        with ESMTP id S229646AbiE2EEn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 May 2022 00:04:43 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C868BD11
+        for <linux-cifs@vger.kernel.org>; Sat, 28 May 2022 21:04:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DAE32B80919
+        for <linux-cifs@vger.kernel.org>; Sun, 29 May 2022 04:04:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79AA5C385B8
+        for <linux-cifs@vger.kernel.org>; Sun, 29 May 2022 04:04:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653797078;
+        bh=zpQs0ENfYbn/W5NOj2uq+Xd7KdwzgnuIiMljYaRvyU8=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=Hu/tAaWsQIvil6kLfeuZxi2s2G1UWcrEQwHujG81cvnaJvqPTvYx6P3galgn+Ov+u
+         2eBYOYe3+rVulkuSDYX6JM+7AFRrQ/P8htp5eoaBkOn0tVMmCl51gq/hptm3yZ7HhI
+         yOikWD94584czUdxEFlK5LeG8YhieB9DVNXGqglbh8aME1Fq8pcdarmo4rJaupJnBH
+         8Tai8o4d5R618sWSGNomTkKUaN219C8UMZhlMhJXWtb3KGYxOZXVHAqEsUiaHEU2sh
+         LOGg4HznaKk3skrNjEKcGyT4gY5xdmSrNtafRIYV0aJI2DDPsN+63JZTxxar3kgfWV
+         a7BiRwxLoQOFw==
+Received: by mail-wr1-f49.google.com with SMTP id i6so2901706wrw.5
+        for <linux-cifs@vger.kernel.org>; Sat, 28 May 2022 21:04:38 -0700 (PDT)
+X-Gm-Message-State: AOAM533XeAo8yMy+/mObLvVtjPV6AsmxZEmNugD4P4sr75lnBCZCYt8r
+        xQ56N1kYuE1U7Pd3nI3cN617mF/bRUa/MopSW/g=
+X-Google-Smtp-Source: ABdhPJw/qsczTBYEMMDbZA56pOuJL5GcNhldu/9lLHJVtM/kr69wPWrvzuXHM9YLoFoET/CxXUoR/Joj1UcMDKMEg90=
+X-Received: by 2002:adf:d1c4:0:b0:210:1935:3dd8 with SMTP id
+ b4-20020adfd1c4000000b0021019353dd8mr8312048wrd.229.1653797076692; Sat, 28
+ May 2022 21:04:36 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 28 May 2022 22:53:26 -0500
-Message-ID: <CAH2r5muLr-UKAhcoP-s2Hn=U=Hbe2PtTLKODD+biSzQS8FkfZg@mail.gmail.com>
-Subject: xfstests passed for current mainline against current ksmbd-for-next
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+Received: by 2002:adf:ee4e:0:0:0:0:0 with HTTP; Sat, 28 May 2022 21:04:36
+ -0700 (PDT)
+In-Reply-To: <CAH2r5muLr-UKAhcoP-s2Hn=U=Hbe2PtTLKODD+biSzQS8FkfZg@mail.gmail.com>
+References: <CAH2r5muLr-UKAhcoP-s2Hn=U=Hbe2PtTLKODD+biSzQS8FkfZg@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sun, 29 May 2022 13:04:36 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-k6t+CL3DiZCPNyW6F10JbGnBrXmddAEMsVxaBrzbsBw@mail.gmail.com>
+Message-ID: <CAKYAXd-k6t+CL3DiZCPNyW6F10JbGnBrXmddAEMsVxaBrzbsBw@mail.gmail.com>
+Subject: Re: xfstests passed for current mainline against current ksmbd-for-next
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/108
+2022-05-29 12:53 GMT+09:00, Steve French <smfrench@gmail.com>:
+> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/108
+Thanks for your test!
 
--- 
-Thanks,
-
-Steve
+>
+> --
+> Thanks,
+>
+> Steve
+>
