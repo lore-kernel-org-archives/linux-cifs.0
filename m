@@ -2,122 +2,93 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E40C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Jun 2022 06:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45625C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Jun 2022 08:40:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239951AbiFAGUn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Jun 2022 02:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45878 "EHLO
+        id S1348797AbiFAIks (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Jun 2022 04:40:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239823AbiFAGUm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Jun 2022 02:20:42 -0400
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E472A6A066;
-        Tue, 31 May 2022 23:20:40 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id j11so412060vka.6;
-        Tue, 31 May 2022 23:20:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=Cvoj+RO+skmK4uotN8SSFJtBNUiO3qHrHDUxMlyGe68=;
-        b=ReCnqqVWMgsH8NHsHeRUZMnyYPK+cJT2cJqru+YdqevmRTxovqxSK0UebMccFQOQ0g
-         iCiArqo1k58Tv4ZXshEHyJRXekOn7uiA1GepUNHb8844UO3lVOV63XbF4H29lgVce8a+
-         ZzF/mLA9/4HjtTFsw6zbGARUsuVs4J3krS4KrIdnVEOtiqxF+QFG2JKBeXyr4rFwOl7x
-         2G8dIodHNcWtmoSR47gL99e99qfnswMs85D7U8ocMJfNYcoaEwJlZofUeLPmt0ztQwA6
-         C74SSo3UQ92G44WDTfcVNpJiwQ34WdM6sd3bN3o520jHvuGXfhgDjCr4203ZsdI+TTRM
-         hNsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=Cvoj+RO+skmK4uotN8SSFJtBNUiO3qHrHDUxMlyGe68=;
-        b=jpKryiXgtTl4fPH3ra4380KaLz6XkLD97sJuzSJPajndXSdv6rPBVdjo0+jR6Jm6IH
-         CpsDyM+IJclVz8dgKHSDiDM4vCjEx4Vs8pBRe1o0mCEsRMi+Nto2EqBK5oWdOd/EonH9
-         AqKeWcRhQR7tfex3gvHkMstc7W5/HK5PTHkUF2Dta8L8QL01IqobWHtNdLp56ZThCtUl
-         kJ0IdZuYh3HGVWvDDkrHA2nfF+bQc/o/Esc6CzSgm53RvXYg3gWvBsYEXbv1a9bodOHL
-         CzdMbt9n/HuG9+3YQtS7uQTsV4wcGAJT2X7m2ytUn3eeZJ2kM+MmhvRbUWgBjfoQhvrm
-         0ziA==
-X-Gm-Message-State: AOAM530wQEpCB+rS9jZTXIzdFL1B18Ny2FvarHT0g6t4lYOBWEf0c24i
-        4B4FiuRfFWga5GLwRUYQGGNkLunf5gQShgTd7xI=
-X-Google-Smtp-Source: ABdhPJwc2LZwvyEvJkHYDLJIbdgmwanNMcS6f8KRwVS1eR82zJxzIHucJWQhiJkwtRkxaMq3pnqZMmjSc8LEOTtsQ20=
-X-Received: by 2002:a05:6122:14e:b0:358:4f5b:f65c with SMTP id
- r14-20020a056122014e00b003584f5bf65cmr12758277vko.3.1654064439940; Tue, 31
- May 2022 23:20:39 -0700 (PDT)
+        with ESMTP id S241561AbiFAIkr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Jun 2022 04:40:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 923904A3E4
+        for <linux-cifs@vger.kernel.org>; Wed,  1 Jun 2022 01:40:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654072845;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sH1BtnUqb9tIQDLvd8F3V7DhKRqXLiChvQY80QUu680=;
+        b=EynyP3KJq8sxsTdZvoPB+ZSky2wJ5o4oF4uB67cMOkUARRfte0YMezPTtXY7b1K8LkZVLH
+        owzrsJKF553uOFscJSHlAQzTsAyUeOTW6uvYggyVpEpYAF6hpvx3bzv7ROyo16LA5xNipO
+        02WTK4oHav5BeOvpQGOJeVI0LjPFDbY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-639-ytC6kgrYM_qctSBIOpmqGA-1; Wed, 01 Jun 2022 04:40:43 -0400
+X-MC-Unique: ytC6kgrYM_qctSBIOpmqGA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E9A54858EFE;
+        Wed,  1 Jun 2022 08:40:41 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 58D4B492C3B;
+        Wed,  1 Jun 2022 08:40:41 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAKYAXd_9jw69iKPBvuE4DxdpwcH2H90h3NQDQ7nyxzbTnEcirg@mail.gmail.com>
+References: <CAKYAXd_9jw69iKPBvuE4DxdpwcH2H90h3NQDQ7nyxzbTnEcirg@mail.gmail.com> <833010.1654031136@warthog.procyon.org.uk>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: ksmbd threads eating masses of cputime
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 1 Jun 2022 01:20:28 -0500
-Message-ID: <CAH2r5ms4eeQy-2bu_5BxFAW=GUR7T4VWM9khi7F0Hc-RSb8Uew@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <928535.1654072840.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 01 Jun 2022 09:40:40 +0100
+Message-ID: <928536.1654072840@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-c5eb0a61238dd6faf37f58c9ce61c9980aaffd7a:
+Namjae Jeon <linkinjeon@kernel.org> wrote:
 
-  Linux 5.18-rc6 (2022-05-08 13:54:17 -0700)
+> Okay, How do you reproduce this problem ? Did you run xfsftests
+> against ksmbd RDMA ?
 
-are available in the Git repository at:
+Yeah - I've been making sure my cifs filesystem changes work with RDMA.
+There've been a lot of connections that haven't been taken down cleanly, d=
+ue
+to oopses, lockups and stuff.
 
-  git://git.samba.org/ksmbd.git tags/5.19-rc-ksmbd-server-fixes
+One thing that could be useful is, say, /proc/fs/ksmbd/
 
-for you to fetch changes up to 621433b7e25d6d42e5f75bd8c4a62d6c7251511b:
+> Okay, we need to add maximum retry count for that case.
+> but when I check kernel thread name in your top message, It is RDMA conn=
+ection.
+> So smb_direct_read() is used in ksmbd_conn_handler_loop().
+> I'd like to reproduce the problem to figure out where the problem is.
+> Can I try to reproduce it with soft-iWARP and xfstests?
 
-  ksmbd: smbd: relax the count of sges required (2022-05-27 21:31:20 -0500)
+Note that I only noticed the issue when I switched to working on another
+filesystem and found that performance was unexpectedly down by 80%.
 
-----------------------------------------------------------------
-fourteen smb3 server fixes:
-- 8 RDMA (smbdirect) fixes, cleanup and optimizations
-- crediting (flow control) fix for mounts from Windows client
-- ACL fix
-- 2 cleanup fix
-- Windows client query dir fix
-- Write validation fix
-----------------------------------------------------------------
-Hyunchul Lee (8):
-      ksmbd: smbd: change prototypes of RDMA read/write related functions
-      ksmbd: smbd: introduce read/write credits for RDMA read/write
-      ksmbd: smbd: simplify tracking pending packets
-      ksmbd: smbd: change the return value of get_sg_list
-      ksmbd: smbd: handle multiple Buffer descriptors
-      ksmbd: smbd: fix connection dropped issue
-      ksmbd: fix outstanding credits related bugs
-      ksmbd: smbd: relax the count of sges required
+I was using softRoCE, though it may well be causable with softIWarp also,
+since that's not really a detail visible to cifs/ksmbd, I think.
 
-Marios Makassikis (1):
-      ksmbd: validate length in smb2_write()
+I've just had a quick go at trying to reproduce this, hard-resetting the t=
+est
+client in the middle of performing an xfstest run, but it didn't seem to c=
+ause
+the single ksmbd:r5445 thread to explode.
 
-Namjae Jeon (3):
-      ksmbd: handle smb2 query dir request for OutputBufferLength that
-is too small
-      ksmbd: add smbd max io size parameter
-      ksmbd: fix wrong smbd max read/write size check
+David
 
-Xin Xiong (1):
-      ksmbd: fix reference count leak in smb_check_perm_dacl()
-
-Yang Li (1):
-      ksmbd: Fix some kernel-doc comments
-
- fs/ksmbd/connection.c     |  22 ++--
- fs/ksmbd/connection.h     |  27 ++--
- fs/ksmbd/ksmbd_netlink.h  |   3 +-
- fs/ksmbd/misc.c           |  10 +-
- fs/ksmbd/smb2misc.c       |   2 +-
- fs/ksmbd/smb2pdu.c        | 126 ++++++++++---------
- fs/ksmbd/smb_common.c     |   4 +-
- fs/ksmbd/smbacl.c         |   1 +
- fs/ksmbd/transport_ipc.c  |   3 +
- fs/ksmbd/transport_rdma.c | 363
-++++++++++++++++++++++++++++++++----------------------
- fs/ksmbd/transport_rdma.h |   8 ++
- 11 files changed, 325 insertions(+), 244 deletions(-)
-
--- 
-Thanks,
-
-Steve
