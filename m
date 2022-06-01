@@ -2,44 +2,44 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3A3CCA470
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Jun 2022 14:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 293AECCA468
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Jun 2022 14:01:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354029AbiFAOBq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Jun 2022 10:01:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51752 "EHLO
+        id S1354030AbiFAOBr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Jun 2022 10:01:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354208AbiFAOAG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Jun 2022 10:00:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88308A3382;
-        Wed,  1 Jun 2022 06:56:23 -0700 (PDT)
+        with ESMTP id S1354525AbiFAOA3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Jun 2022 10:00:29 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7652511A06;
+        Wed,  1 Jun 2022 06:57:03 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DB629615CD;
-        Wed,  1 Jun 2022 13:55:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D5E8C385A5;
-        Wed,  1 Jun 2022 13:55:47 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5729AB81B07;
+        Wed,  1 Jun 2022 13:56:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F37F6C385A5;
+        Wed,  1 Jun 2022 13:56:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654091748;
-        bh=kGzeiVBfGM4Xs0vqQEuCoPASUVQyswjYSK386OEbxt8=;
+        s=k20201202; t=1654091776;
+        bh=0ao9rCtXzF+E1mhOIXSzAMgWHTlay5M9C7gXZhzBtCg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GyeZZbxy7Kf9b6e4S+0Kz0Xcf2Ul+X4r5s5syuWOR8GYMd3ZgukhRUoWb1wNyxNBN
-         inGF945w1NIb0Ak21UX6wfG8JhStHxNtPOCfTYGq015seNHnq/mCQPHcuAFJpLxnjw
-         37+Cx/ZYe9fgUS8gc2Xlr2rgIgkHsH3fC9LA3N6i2FK7OewoOSUZCovp67XhXXyIE5
-         JzMBn5dc1iNUYTDAQlbaMoTRZe2z8DVtWO2LPbBouS8hGe5NsHwmNe9VZDRm33kKRI
-         vbtu2V8AGeogZRp6buqjQvqSq3a4M47/5BNATFAxkOY8MA1xNpVenLMbz1UbwkxbCn
-         sPtat+iOPIZ3Q==
+        b=Y5P/g24FoPmBzO63+/rkOSUwdOFEYOQrl3ea2BXlizbkSJ7b5yIqiVjCl+Wd6wPzR
+         lvKIaw2idaa58VowoVkpHy7BHhEtuf5OC2eWBOg1T4PxmRVico6f9F6Yjw9fIaxq8P
+         054fwl5RR0Vb/HUINO19dPEU8c02laArckEdrViPRHaUOky4ZfZzTYs5Kv3zj/imGq
+         4C44XP/E0l0VBZtGtwhWutG5+4r+qLSSAgiUZ0qG+JDlWaPqPqh5+r6AoUuwxtoWrH
+         xtr93NtuhRnOD8Ei4/dQHswePnVGqGmWmHDkCml4v2JyAj9PHu9DNWR95ji70YkmUT
+         bZ2788vPQI70w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Enzo Matsumiya <ematsumiya@suse.de>, Paulo Alcantara <pc@cjr.nz>,
+Cc:     Shyam Prasad N <sprasad@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.17 37/48] cifs: return ENOENT for DFS lookup_cache_entry()
-Date:   Wed,  1 Jun 2022 09:54:10 -0400
-Message-Id: <20220601135421.2003328-37-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.17 46/48] cifs: do not use tcpStatus after negotiate completes
+Date:   Wed,  1 Jun 2022 09:54:19 -0400
+Message-Id: <20220601135421.2003328-46-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220601135421.2003328-1-sashal@kernel.org>
 References: <20220601135421.2003328-1-sashal@kernel.org>
@@ -51,104 +51,113 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Enzo Matsumiya <ematsumiya@suse.de>
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-[ Upstream commit 337b8b0e4343567221ef8d88aac5e418208d4ac1 ]
+[ Upstream commit 1a6a41d4cedd9b302e2200e6f0e3c44dbbe13689 ]
 
-EEXIST didn't make sense to use when dfs_cache_find() couldn't find a
-cache entry nor retrieve a referral target.
+Recent changes to multichannel to allow channel reconnects to
+work in parallel and independent of each other did so by
+making use of tcpStatus for the connection, and status for the
+session. However, this did not take into account the multiuser
+scenario, where same connection is used by multiple connections.
 
-It also doesn't make sense cifs_dfs_query_info_nonascii_quirk() to
-emulate ENOENT anymore.
+However, tcpStatus should be tracked only till the end of
+negotiate exchange, and not used for session setup. This change
+fixes this.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/connect.c   | 6 ++++--
- fs/cifs/dfs_cache.c | 6 +++---
- fs/cifs/misc.c      | 6 +-----
- 3 files changed, 8 insertions(+), 10 deletions(-)
+ fs/cifs/connect.c       | 23 +++++++++++------------
+ fs/cifs/smb2pdu.c       |  3 ++-
+ fs/cifs/smb2transport.c |  3 ++-
+ 3 files changed, 15 insertions(+), 14 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index c3a26f06fdaa..1ec77ebc71a0 100644
+index 1ec77ebc71a0..9aae410a17f8 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -3420,8 +3420,9 @@ cifs_are_all_path_components_accessible(struct TCP_Server_Info *server,
- }
+@@ -3962,7 +3962,7 @@ cifs_negotiate_protocol(const unsigned int xid, struct cifs_ses *ses,
+ 	if (rc == 0) {
+ 		spin_lock(&cifs_tcp_ses_lock);
+ 		if (server->tcpStatus == CifsInNegotiate)
+-			server->tcpStatus = CifsNeedSessSetup;
++			server->tcpStatus = CifsGood;
+ 		else
+ 			rc = -EHOSTDOWN;
+ 		spin_unlock(&cifs_tcp_ses_lock);
+@@ -3985,19 +3985,18 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 	bool is_binding = false;
  
- /*
-- * Check if path is remote (e.g. a DFS share). Return -EREMOTE if it is,
-- * otherwise 0.
-+ * Check if path is remote (i.e. a DFS share).
-+ *
-+ * Return -EREMOTE if it is, otherwise 0 or -errno.
-  */
- static int is_path_remote(struct mount_ctx *mnt_ctx)
- {
-@@ -3703,6 +3704,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
- 	if (!isdfs)
- 		goto out;
- 
-+	/* proceed as DFS mount */
- 	uuid_gen(&mnt_ctx.mount_id);
- 	rc = connect_dfs_root(&mnt_ctx, &tl);
- 	dfs_cache_free_tgts(&tl);
-diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-index 956f8e5cf3e7..c5dd6f7305bd 100644
---- a/fs/cifs/dfs_cache.c
-+++ b/fs/cifs/dfs_cache.c
-@@ -654,7 +654,7 @@ static struct cache_entry *__lookup_cache_entry(const char *path, unsigned int h
- 			return ce;
- 		}
+ 	/* only send once per connect */
++	spin_lock(&ses->chan_lock);
++	is_binding = !CIFS_ALL_CHANS_NEED_RECONNECT(ses);
++	spin_unlock(&ses->chan_lock);
++
+ 	spin_lock(&cifs_tcp_ses_lock);
+-	if ((server->tcpStatus != CifsNeedSessSetup) &&
+-	    (ses->status == CifsGood)) {
++	if (ses->status == CifsExiting) {
+ 		spin_unlock(&cifs_tcp_ses_lock);
+ 		return 0;
  	}
--	return ERR_PTR(-EEXIST);
-+	return ERR_PTR(-ENOENT);
- }
+-	server->tcpStatus = CifsInSessSetup;
++	ses->status = CifsInSessSetup;
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
- /*
-@@ -662,7 +662,7 @@ static struct cache_entry *__lookup_cache_entry(const char *path, unsigned int h
-  *
-  * Use whole path components in the match.  Must be called with htable_rw_lock held.
-  *
-- * Return ERR_PTR(-EEXIST) if the entry is not found.
-+ * Return ERR_PTR(-ENOENT) if the entry is not found.
-  */
- static struct cache_entry *lookup_cache_entry(const char *path)
- {
-@@ -710,7 +710,7 @@ static struct cache_entry *lookup_cache_entry(const char *path)
- 		while (e > s && *e != sep)
- 			e--;
- 	}
--	return ERR_PTR(-EEXIST);
-+	return ERR_PTR(-ENOENT);
- }
- 
- /**
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index afaf59c22193..a5b5b15e658a 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -1309,7 +1309,7 @@ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix)
-  * for "\<server>\<dfsname>\<linkpath>" DFS reference,
-  * where <dfsname> contains non-ASCII unicode symbols.
-  *
-- * Check such DFS reference and emulate -ENOENT if it is actual.
-+ * Check such DFS reference.
-  */
- int cifs_dfs_query_info_nonascii_quirk(const unsigned int xid,
- 				       struct cifs_tcon *tcon,
-@@ -1341,10 +1341,6 @@ int cifs_dfs_query_info_nonascii_quirk(const unsigned int xid,
- 		cifs_dbg(FYI, "DFS ref '%s' is found, emulate -EREMOTE\n",
- 			 dfspath);
- 		rc = -EREMOTE;
--	} else if (rc == -EEXIST) {
--		cifs_dbg(FYI, "DFS ref '%s' is not found, emulate -ENOENT\n",
--			 dfspath);
--		rc = -ENOENT;
+-	spin_lock(&ses->chan_lock);
+-	is_binding = !CIFS_ALL_CHANS_NEED_RECONNECT(ses);
+-	spin_unlock(&ses->chan_lock);
+-
+ 	if (!is_binding) {
+ 		ses->capabilities = server->capabilities;
+ 		if (!linuxExtEnabled)
+@@ -4021,13 +4020,13 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "Send error in SessSetup = %d\n", rc);
+ 		spin_lock(&cifs_tcp_ses_lock);
+-		if (server->tcpStatus == CifsInSessSetup)
+-			server->tcpStatus = CifsNeedSessSetup;
++		if (ses->status == CifsInSessSetup)
++			ses->status = CifsNeedSessSetup;
+ 		spin_unlock(&cifs_tcp_ses_lock);
  	} else {
- 		cifs_dbg(FYI, "%s: dfs_cache_find returned %d\n", __func__, rc);
+ 		spin_lock(&cifs_tcp_ses_lock);
+-		if (server->tcpStatus == CifsInSessSetup)
+-			server->tcpStatus = CifsGood;
++		if (ses->status == CifsInSessSetup)
++			ses->status = CifsGood;
+ 		/* Even if one channel is active, session is in good state */
+ 		ses->status = CifsGood;
+ 		spin_unlock(&cifs_tcp_ses_lock);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 1704fd358b85..55e6879ef18b 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3904,7 +3904,8 @@ SMB2_echo(struct TCP_Server_Info *server)
+ 	cifs_dbg(FYI, "In echo request for conn_id %lld\n", server->conn_id);
+ 
+ 	spin_lock(&cifs_tcp_ses_lock);
+-	if (server->tcpStatus == CifsNeedNegotiate) {
++	if (server->ops->need_neg &&
++	    server->ops->need_neg(server)) {
+ 		spin_unlock(&cifs_tcp_ses_lock);
+ 		/* No need to send echo on newly established connections */
+ 		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 2af79093b78b..01b732641edb 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -641,7 +641,8 @@ smb2_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	if (!is_signed)
+ 		return 0;
+ 	spin_lock(&cifs_tcp_ses_lock);
+-	if (server->tcpStatus == CifsNeedNegotiate) {
++	if (server->ops->need_neg &&
++	    server->ops->need_neg(server)) {
+ 		spin_unlock(&cifs_tcp_ses_lock);
+ 		return 0;
  	}
 -- 
 2.35.1
