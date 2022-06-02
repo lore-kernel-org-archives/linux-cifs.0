@@ -2,48 +2,48 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5B8C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jun 2022 01:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 077E9C43334
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jun 2022 01:14:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232995AbiFBBNc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Jun 2022 21:13:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58310 "EHLO
+        id S232996AbiFBBOZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Jun 2022 21:14:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232994AbiFBBNb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Jun 2022 21:13:31 -0400
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADB8228539F
-        for <linux-cifs@vger.kernel.org>; Wed,  1 Jun 2022 18:13:30 -0700 (PDT)
-Received: by mail-pg1-f176.google.com with SMTP id q123so3413222pgq.6
-        for <linux-cifs@vger.kernel.org>; Wed, 01 Jun 2022 18:13:30 -0700 (PDT)
+        with ESMTP id S232994AbiFBBOX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Jun 2022 21:14:23 -0400
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2E428DC2C
+        for <linux-cifs@vger.kernel.org>; Wed,  1 Jun 2022 18:14:22 -0700 (PDT)
+Received: by mail-pj1-f46.google.com with SMTP id v11-20020a17090a4ecb00b001e2c5b837ccso7910925pjl.3
+        for <linux-cifs@vger.kernel.org>; Wed, 01 Jun 2022 18:14:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=5FKYB/uafDr/WcN+eisRYxdwTLdWLD/Bm7+ncB95258=;
-        b=VO4q3pGSNm4GSiRlRRyzMfCPbzbZ+GnvSJKWoaIOOvEepXpq+/HOHgsrPGu+PQ5uNr
-         pwZZrhbi+TAbkjrK7+kVlJ4QWupQ3n2EaZxoOAOfomXD9leDesaW/GboIEpq2k6SYE+O
-         /vFtVtPqQFF6KTDHtH3KT5HW3jbrfzL0uBmL43IAcZnh+AB3Y40qU55ueDV20vvAmNeY
-         fA+DxBgihM+EvheC3JTDL+wJkDKwyrSEQ9ie7NidIx+E2ES06PS6M6JzLD9m9VujETCi
-         lZ8p8+HXF8m6Wt5kpbtERjbSc8e0JYanGQTad3T090A/Ugdv0BP/ZSNZUq0H8Oe9miYr
-         vHXg==
-X-Gm-Message-State: AOAM5323F0HAbuVpYFRz2sMG+Y7tVXSGOFC4sAMlcGz5+IsdMTnTJnAU
-        53mKxSIa13sd77BC1hlskMb8hDIblj/Oog==
-X-Google-Smtp-Source: ABdhPJw2oIVqv+0F2lXgDwNwi2SY6Uy7Nkci7Ak92Xh4i67sA1nmrGeSs/zvh93wiaVQ/EzuVbTptQ==
-X-Received: by 2002:a63:5506:0:b0:3fc:3706:5505 with SMTP id j6-20020a635506000000b003fc37065505mr1852804pgb.383.1654132409780;
-        Wed, 01 Jun 2022 18:13:29 -0700 (PDT)
+        bh=zMmwggPC79nvr+PapSRkahq0fTeeRRyMjGuaFsyiMec=;
+        b=wkndDvcUBughshZHSrXBTQw+rnke3KDXIBp1HDXMpd1Xb5x9nHieLK1EiP/O6Wovdw
+         In5jF8Q/Bc9q+ScA6wEda0NSgnm9q8XvigysLHCZt/UjktriJNUn2JwNHg+MRXQwRXa5
+         oh87gapKumMvnrQcA95Vl3kJdvZqwTNBD2JN2EPzaISMXhBPDyOy5nHFTBg6yrwQxVPp
+         sodXsDMRac47lUsZuNG5Z8TCM7KUu20hvL9GKu1IupRLEzzkur/Th4A+CToON//0Dd6/
+         8DzDm9Je48vIP61ej67Khc8R93kFARkZ1NXml5ZqBfO5ZqAHNzdF6ukltsXp7Ib9CAov
+         kDqA==
+X-Gm-Message-State: AOAM531ImDbE22uGa6A7W0tfT72q1xLiHKolb3eyBgRpEsnv5ai88Hmj
+        aFCVsw64CEAz5LBCsrBy7UIAVcBd1SdFJg==
+X-Google-Smtp-Source: ABdhPJxb0a/++58BcsMwP+yA3lwKTQlndqnfnMOX+WSkrCD2q2mhkjL9mBlXa79cHiqN2G35UVykug==
+X-Received: by 2002:a17:903:290:b0:15c:1c87:e66c with SMTP id j16-20020a170903029000b0015c1c87e66cmr2267654plr.61.1654132461516;
+        Wed, 01 Jun 2022 18:14:21 -0700 (PDT)
 Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id j189-20020a6380c6000000b003fc32f8e030sm1958961pgd.79.2022.06.01.18.13.27
+        by smtp.gmail.com with ESMTPSA id e15-20020a056a001a8f00b0050dc762818dsm2086679pfv.103.2022.06.01.18.14.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 18:13:29 -0700 (PDT)
+        Wed, 01 Jun 2022 18:14:21 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     hyc.lee@gmail.com, sfrench@samba.org, senozhatsky@chromium.org,
         smfrench@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
         David Howells <dhowells@redhat.com>
-Subject: [PATCH] ksmbd: use SOCK_NONBLOCK type for kernel_accept()
-Date:   Thu,  2 Jun 2022 10:13:13 +0900
-Message-Id: <20220602011313.56110-1-linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd-tools: add missing long option in adduser/addshare/control
+Date:   Thu,  2 Jun 2022 10:14:10 +0900
+Message-Id: <20220602011410.56202-1-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -51,38 +51,102 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I found that normally it is O_NONBLOCK but there are different value
-for some arch.
+Add missing long option in adduser/addshare/control.
 
-/include/linux/net.h:
-#ifndef SOCK_NONBLOCK
-#define SOCK_NONBLOCK   O_NONBLOCK
-#endif
-
-/arch/alpha/include/asm/socket.h:
-#define SOCK_NONBLOCK   0x40000000
-
-Use SOCK_NONBLOCK instead of O_NONBLOCK for kernel_accept().
-
-Suggested-by: David Howells <dhowells@redhat.com>
+Reported-by: David Howells <dhowells@redhat.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/ksmbd/transport_tcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ addshare/addshare.c | 11 ++++++++++-
+ adduser/adduser.c   | 12 +++++++++++-
+ control/control.c   |  9 ++++++++-
+ 3 files changed, 29 insertions(+), 3 deletions(-)
 
-diff --git a/fs/ksmbd/transport_tcp.c b/fs/ksmbd/transport_tcp.c
-index 8fef9de787d3..143bba4e4db8 100644
---- a/fs/ksmbd/transport_tcp.c
-+++ b/fs/ksmbd/transport_tcp.c
-@@ -230,7 +230,7 @@ static int ksmbd_kthread_fn(void *p)
- 			break;
- 		}
- 		ret = kernel_accept(iface->ksmbd_socket, &client_sk,
--				    O_NONBLOCK);
-+				    SOCK_NONBLOCK);
- 		mutex_unlock(&iface->sock_release_lock);
- 		if (ret) {
- 			if (ret == -EAGAIN)
+diff --git a/addshare/addshare.c b/addshare/addshare.c
+index 4d25047..a8ba71a 100644
+--- a/addshare/addshare.c
++++ b/addshare/addshare.c
+@@ -54,6 +54,15 @@ static void usage(void)
+ 	exit(EXIT_FAILURE);
+ }
+ 
++static const struct option opts[] = {
++	{"add-share",		required_argument,	NULL,	'a' },
++	{"del-share",		required_argument,	NULL,	'd' },
++	{"update-share",	required_argument,	NULL,	'u' },
++	{"options",		required_argument,	NULL,	'o' },
++	{"version",		no_argument,		NULL,	'V' },
++	{"verbose",		no_argument,		NULL,	'v' },
++};
++
+ static void show_version(void)
+ {
+ 	printf("ksmbd-tools version : %s\n", KSMBD_TOOLS_VERSION);
+@@ -102,7 +111,7 @@ int main(int argc, char *argv[])
+ 	set_logger_app_name("ksmbd.addshare");
+ 
+ 	opterr = 0;
+-	while ((c = getopt(argc, argv, "c:a:d:u:p:o:Vvh")) != EOF)
++	while ((c = getopt_long(argc, argv, "c:a:d:u:p:o:Vvh", opts, NULL)) != EOF)
+ 		switch (c) {
+ 		case 'a':
+ 			arg_name = g_ascii_strdown(optarg, strlen(optarg));
+diff --git a/adduser/adduser.c b/adduser/adduser.c
+index 88b12db..60a059d 100644
+--- a/adduser/adduser.c
++++ b/adduser/adduser.c
+@@ -50,6 +50,16 @@ static void usage(void)
+ 	exit(EXIT_FAILURE);
+ }
+ 
++static const struct option opts[] = {
++	{"add-user",		required_argument,	NULL,	'a' },
++	{"del-user",		required_argument,	NULL,	'd' },
++	{"update-user",		required_argument,	NULL,	'u' },
++	{"password",		required_argument,	NULL,	'p' },
++	{"import-users",	required_argument,	NULL,	'i' },
++	{"version",		no_argument,		NULL,	'V' },
++	{"verbose",		no_argument,		NULL,	'v' },
++};
++
+ static void show_version(void)
+ {
+ 	printf("ksmbd-tools version : %s\n", KSMBD_TOOLS_VERSION);
+@@ -102,7 +112,7 @@ int main(int argc, char *argv[])
+ 	set_logger_app_name("ksmbd.adduser");
+ 
+ 	opterr = 0;
+-	while ((c = getopt(argc, argv, "c:i:a:d:u:p:Vvh")) != EOF)
++	while ((c = getopt_long(argc, argv, "c:i:a:d:u:p:Vvh", opts, NULL)) != EOF)
+ 		switch (c) {
+ 		case 'a':
+ 			arg_account = g_strdup(optarg);
+diff --git a/control/control.c b/control/control.c
+index 780a48a..3dc8c7e 100644
+--- a/control/control.c
++++ b/control/control.c
+@@ -23,6 +23,13 @@ static void usage(void)
+ 	exit(EXIT_FAILURE);
+ }
+ 
++static const struct option opts[] = {
++	{"shutdown",		no_argument,		NULL,	's' },
++	{"debug",		required_argument,	NULL,	'd' },
++	{"ksmbd-version",	no_argument,		NULL,	'c' },
++	{"version",		no_argument,		NULL,	'V' },
++};
++
+ static void show_version(void)
+ {
+ 	printf("ksmbd-tools version : %s\n", KSMBD_TOOLS_VERSION);
+@@ -101,7 +108,7 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ 	opterr = 0;
+-	while ((c = getopt(argc, argv, "sd:cVh")) != EOF)
++	while ((c = getopt_long(argc, argv, "sd:cVh", opts, NULL)) != EOF)
+ 		switch (c) {
+ 		case 's':
+ 			ret = ksmbd_control_shutdown();
 -- 
 2.25.1
 
