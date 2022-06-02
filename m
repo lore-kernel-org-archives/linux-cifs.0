@@ -2,177 +2,150 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5955AC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jun 2022 10:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A978C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jun 2022 18:39:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232686AbiFBKwc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 2 Jun 2022 06:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
+        id S234831AbiFBSjk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 Jun 2022 14:39:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232042AbiFBKwb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Jun 2022 06:52:31 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079CBD9EB0;
-        Thu,  2 Jun 2022 03:52:28 -0700 (PDT)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 252AOga7008735;
-        Thu, 2 Jun 2022 10:52:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : content-type : mime-version; s=corp-2021-07-09;
- bh=g6gPqMEmdk+gtR1TwrOMRh0WiHJukuXeoBMiK1KlaDE=;
- b=qm0h0g/R3sye464En0a9SH8M+5ak9v1scJJpdHf7+84rwZmb2vIg1D1sgWQB/Wx4FCqi
- 4Gs5a/4445N7LFscDi+XydwB9wskC4FM65D+D3lFAzF7kseN4TtokloF4rPl+5/SNo52
- t0ayO75+FgpDFXnt3PKju0hELWGqlutVrQ1iDSu0zXDikMPFFfeLBbNXzrSZakjJU4+O
- sYXd52oBiqruj9CJWg7qMLS7fQ7sB3Pf0H5uvrEO0UZT4sMm53DGn4aivopX/seP0lvu
- ELH2HyZHxK+mWM6otwpoppG646JfsIFWNz8eHeF2KKIkTY9ZNfqbtyrMYFPPDST3Xb0t Fg== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3gbc4xt6gv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Jun 2022 10:52:08 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 252AoBBx023639;
-        Thu, 2 Jun 2022 10:52:07 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com with ESMTP id 3gc8p4s50c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 Jun 2022 10:52:07 +0000
+        with ESMTP id S233727AbiFBSjj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Jun 2022 14:39:39 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2063.outbound.protection.outlook.com [40.107.223.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482FDDF6
+        for <linux-cifs@vger.kernel.org>; Thu,  2 Jun 2022 11:39:38 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LIByqt0GRr1iof+yrUmdMQGs32STJay9zPhUBLxyggwb3JUgZegD4/gEKN0D91dupSgfiLOvnu89PLuil4N4VQjxG20Q6M6S7bzL4ob+K5uUm+wXNd02lYUQjhhwx/sxFcDll+1Spy2kjMaU6Mahby8JdPsZO2xF1fF3HR5MS2ZtuS6WvPoyP+iAFEaQpfK3B/YR9lnavk8nWigwC9DYC+44mImWMy5DGuIRmJg9sxrEEo5H1uT2aqz+6OIT80LwJofdd/+5bqw7/XjmtRnzUlKjvpR0KfW9n5JdfXBIw2dM3NzfkRwbOQBA+qd97e45LWc55ylDvBU6fAoQBAOnKQ==
+ b=ar+B2y/kDE9rRwmgjSvf8zLhtkLnNKS5NU4CJFqhQV9s+q9epFM3hk3DRD4Jav2GNihAicZ4/ntAUe8TmwNvyoDYTgUGHPDFK1s8+CCKXxPacE06V3BGw27CvzJgHBENUn534c17vKEciWqA3YmRb0N1yozZQQ0Qo7lFho9FOHlMcEj5gvoLfBHiv/zqBBQg0sNYnZOm+ZWibyBNAV1MIZKPBaCrqwFGmAbuFjpc7qyjEMhnGt7OBETmX0tF3peuZCs21JMRgtDziONrSQAHeIrKWjDEcWSDQSYQsKxvf7VsOccQ5NKXUqGoDrGMtbYQ4UpC5ssk/1KOVCwW2Uvujg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g6gPqMEmdk+gtR1TwrOMRh0WiHJukuXeoBMiK1KlaDE=;
- b=Rex/k6QMDBOK/Xf2g+KviGwnbPbTQRLjkYhMLrjyYFpdW4FuJE0tE4bMDnFEQNKojCOcj+iGk8JWSgM4m1JpuNLUOylcqKbHMU7sxng4lsyAR+QISU+KLtysdVZA+2kXlHh174AQGzYRPFfYTuzltGYQqBePE/TsYquJ5vbkUh+WEo+DyXf0kFC2oHoclG+INMoQiw4xvVRvsPYbZ3XnCnH5XnoS4eryXZ7D06TfPOAHiA1zUWB2+PrUuIqddl+SR0TlCYtrZCXZlv+hx8D88nabkEt2Ou0THUWbukIb/C0gVZmwO0orOcGWtw8RMh0ZbOUfes8o0plCZiwl14Xy/w==
+ bh=F34sJY98foH5SRmj/Y0oxdI7BUFaFUDlJ7NVNLmuqwg=;
+ b=TF+UgJWkbLXBQ8Hptm+Brzc4S9ky8EhkjFxN2Gjfwn8lmq3W4eaI5phnOluKpQa/tuDwA8UUD3GB41ES/r2rQPmAduA4jpCpSMztZyaq0B/DuibpUsDrJ+CQjW1X18cVMWHOevv8GeZPvf0j7lB8Xfx7qfJOp8hGT4/YWmtNz+Wtmz/yBLa2+R9oDH29EQP51h8/BwBQoYAD/TKvSM47w0WOfoOjehhWbHtnZ0pJt6+6HL4yIYaeNDIdz+4z4pi8SjbUOEbbWo9qz8CGy+49SgOyNovcH4SO1pPhRRcyPVCldM/svKTgiwbkJPgvSun3gRCPBvGZP87NjAp76TsglA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g6gPqMEmdk+gtR1TwrOMRh0WiHJukuXeoBMiK1KlaDE=;
- b=xMhx9bT5OzuA3dk9blRF8N852ckdXrRZKVz5Ni6qCDwEsDL6ACjjOPAPOj5ZGWEO5dQedWr/lIloLw/zJGHrrENQO0h3L+GKPVE+wTBc2fG9GeBlTsDCeeH1QWnWRA56zZYWlwVQg4cUR1FBlmsYiaQ6T9eHfK6eKTcM4l3/QqU=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by MWHPR10MB1549.namprd10.prod.outlook.com
- (2603:10b6:300:26::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.13; Thu, 2 Jun
- 2022 10:52:06 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::86f:81ba:9951:5a7e]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::86f:81ba:9951:5a7e%2]) with mapi id 15.20.5293.019; Thu, 2 Jun 2022
- 10:52:06 +0000
-Date:   Thu, 2 Jun 2022 13:51:55 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     Steve French <sfrench@samba.org>, Hyunchul Lee <hyc.lee@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        linux-cifs@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] ksmbd: clean up a type in ksmbd_vfs_stream_write()
-Message-ID: <YpiWS/WQr2qMidvA@kili>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-ClientProxiedBy: ZR0P278CA0166.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:45::13) To MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28)
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ DM5PR01MB2585.prod.exchangelabs.com (2603:10b6:3:41::10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5314.13; Thu, 2 Jun 2022 18:39:36 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::d478:8cfd:21ee:776f]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::d478:8cfd:21ee:776f%7]) with mapi id 15.20.5314.013; Thu, 2 Jun 2022
+ 18:39:36 +0000
+Message-ID: <359a28c9-1d6e-6908-6502-ffb29bcadca4@talpey.com>
+Date:   Thu, 2 Jun 2022 14:39:35 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH][CIFS] Do not build smb1ops.c if legacy support is
+ disabled
+Content-Language: en-US
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     samba-technical <samba-technical@lists.samba.org>
+References: <CAH2r5mtUe2f0xi5zu0Np0bkyv7K9BKKgUkUJp2b25BteHBFjeg@mail.gmail.com>
+ <CAH2r5mufZdKWrUGbp0Pha5C6YrYqUR-=vT2Pw8TixtzVaQuk0Q@mail.gmail.com>
+From:   Tom Talpey <tom@talpey.com>
+In-Reply-To: <CAH2r5mufZdKWrUGbp0Pha5C6YrYqUR-=vT2Pw8TixtzVaQuk0Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1P222CA0006.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c7::11) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 415942f3-489d-4381-b0a5-08da4485eeb0
-X-MS-TrafficTypeDiagnostic: MWHPR10MB1549:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR10MB154959555FCB4110206396B28EDE9@MWHPR10MB1549.namprd10.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: b84cf55b-83d0-483f-ecae-08da44c73e86
+X-MS-TrafficTypeDiagnostic: DM5PR01MB2585:EE_
+X-Microsoft-Antispam-PRVS: <DM5PR01MB2585B2E2BE06A1160E359D94D6DE9@DM5PR01MB2585.prod.exchangelabs.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5P4jCBeG1IL9o4z+rkZxsnuY7pN11h14AlyaWx7+dLWHD/YM0DOscOJ7UJO02VAzD0BFB/O0SmD5tkeED70jZiGqy/bk2DRgFNhf5zVwZH6fqYufOX0w8o/eR5fCB/kq0v14FZINTHc6z8KX2Jc7vJccdXcRhSB1GDY8vEitOeGR5D1R2BzB5veO3r588RW/QT3C4cN2UnWfNzWKqF0fKst83gry1gyPYm8tKuvKvy3deDmgcllsg3Cr2+7YjUavmwM0F0UruqVWn9KCCnVw+ZYEWDGDwXr/A5T5Q3rD89fXBIDN2ouHFarCfIBckkmVd/wU4XjC1CTiufqiXHBLHrl6Fd6VpxAHTIwD0MUYN3RvexfG2hbBtU3B3B4vqpyV1lzQdMv61I3VOjr42w8r+0UzGy4dEQrM3OFLKii7x6uo0/ZjVC0iZZBY2+i9uCa6LZDbtY5elNHqO1zr241Ziw2IFSQHQC3zgF7lpNHdc1XqVvkJD2WxYtEu4yeOWbpUrdlJa9yK7tTdbe+lZ8+yEgiz6UviXEz7Xlp6yKCJxM+oY5XWczhJfsTXxFxEkMA6ytYJ1Kt519FS+kVS8KtuXxZOCeXwI048h+x6lO5SdTxOOWj2qI5I4kyWg8uPc0CwIpmIOxjl5h/T+VK7z01WF7d2A0dYPmlpS0MDHz+XrT4zVuooz/MHUu6zvPVuBrpwCLbFihj9pQwpy0OgMH84QA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(7916004)(366004)(52116002)(38100700002)(33716001)(508600001)(38350700002)(6666004)(2906002)(8676002)(5660300002)(44832011)(186003)(83380400001)(54906003)(26005)(9686003)(316002)(66556008)(6512007)(66476007)(4326008)(86362001)(8936002)(6486002)(6506007)(66946007)(6916009);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ZVJKe9oz3IjqKAufNnZOnz44fDxfS1/Zln8BR/Bx6bPOcaURdnNGdsiR4jbGcUuHjZktrFPEME7Rs/vbzEn8Fewm0EZ0/ufCo3otn4uRb7r6NOemZV6IykEsyN48HmfprVtRLTrKbh3uglYdgGHV5nFItScV2Pkdh6VET49haF1O7X0lIzFsPigynJZ3a6d8eTDny+aZHzBOozVVZkmDeNd+LtQ/JaIYWQCB752eos89McdMVi+X/uTDjSqCi7Qj968LbTpA6/xBD94SJzkNeulys7tjo+0zMydOccYNoQZe+k/Al0Ijkqwr7LUZafRmEgXnmfpm+ETg7FrxvWWUf2QO866umPu9B3l/5qtfg39AFDaZKCaHbRAdAEeECki7HYmOt6bev9hfjCnQdAhZz7+/GzlROrCjBRSpK+4wqHLW4tujOkMXsYe0DYahZ0lVRhfPUGU+eTTKuPbeBfn6jmp0Jp1tu0a7NL7oFMZTGtnvXsBdYF7bGV+reB6A2okaAauOcqvyyJv2HLkTy95eqQttc85aAf9TkkcjFsexjp38mtHJHGMRt/xV9XfvaaB+FIkJ0XeoXbrWy67kYHJlVLa6RMtwTa7wTp0QiVNngec6tYqIavjh5uIzTjxKCRAdkXEllDalCzpWm+UtBgC4Ehz8LqOd/QUYNpDKlok6BT2DdnzhSjl7ZVC8lJ5Q/0i2JLUbjzAP/E8bRYmeByF0R7z4S3ECJMWN6p9bLZt2qj3nB8ySgoDp9X4vRYjtFuD5cV6+j1t6iUzUpwYIan07Vg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230001)(39830400003)(136003)(346002)(376002)(396003)(366004)(2616005)(110136005)(41300700001)(5660300002)(4744005)(66476007)(66556008)(8676002)(4326008)(38350700002)(38100700002)(6506007)(8936002)(31686004)(186003)(26005)(316002)(86362001)(83380400001)(6512007)(36756003)(31696002)(2906002)(66946007)(508600001)(52116002)(53546011)(6486002)(32563001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tlVkIpeSi0g6KYSB0GyX2/pZH0TxZMiPxqRjcSUH82eXtq8vgF/GA2HshbGW?=
- =?us-ascii?Q?liWpQJqVeW9HTIeopkcr0pkJxNeqG7bMYIoB4ExYPmB+VMLCqKOcU7ay2klF?=
- =?us-ascii?Q?X+PHNGWod4hgHjpUwPuQK2gke1OnPdAPRus4+QN9XHQWydVf1OZ36QJ6uykV?=
- =?us-ascii?Q?r//CFxuaQgUrpCiiuPhGaSl05aQuMO+oOVIcD+P+uyfKwYKFpBHkaPiZx3aQ?=
- =?us-ascii?Q?7tKePpi/eybWtjxxMNmbgtwl7hFV+KqPwtjhTycHQurRPv2h6JrqcrtOSidf?=
- =?us-ascii?Q?FNMPuigYGA22uYERZSfwlENdzm1vAHh8B1YEvL8IqIp4IyuBj7aaHSVtl3cz?=
- =?us-ascii?Q?jGPxJQBs5FE1hZomQVMVsv5KaFYBtPik+gxX+Fh/RDthQ/y5yg4f/kSvm5GR?=
- =?us-ascii?Q?WpOKZnx7lvLphuAPw8BonzAnIBTR0e6pCEM/g5sh6IMUlmgJ1heCFYCfwKia?=
- =?us-ascii?Q?9qaTrai8/B45zw6eFjcaIq8Kg8PuJ7BvohCvzRCYv20ATj3wDFKV9lXtwZzp?=
- =?us-ascii?Q?B05cey9RaE9sL2u8YU637C5e+EAt3Yu6qka6toL21aALoUc9x1rgOwctMKQt?=
- =?us-ascii?Q?dqbKlGeTB45Q0BpDDAh204RWb8uij7FzXgeXJIJ0z3jlPqU2JNHVqcM4Y9q+?=
- =?us-ascii?Q?Tn3EI6k9yshxiDE5E7qiSURBAYkHtpD78inkbkGtXy1HmQCd0ONDU5OENBp7?=
- =?us-ascii?Q?+4iH2+U4aBk/HzZBbkPIfDpycZSzvTsPHxw9KBnQx1LBwu48JLsgD1aWHvZk?=
- =?us-ascii?Q?HBGz04qF6SU1kc2nZtlMRTJ7f9wZD9YuZmK0hEEuTgDCzib/WCQ/9Dlf3Sta?=
- =?us-ascii?Q?mCbGer03QyO7H1Qn2p23Nn+svXLIU7wDRLvXPDPo7wSFPz1TumF6VMzdLGBg?=
- =?us-ascii?Q?g68qMY+WBHCIy46wWDZKK/tncsVBCGmaaYWmh+VRpyetTnCPeDUsJ0W2zmO1?=
- =?us-ascii?Q?VQlOe7TFpFZGWGBnrHAShbBNipOFiSjqOvSiCMMQhrPf6h4+QxtTcW3vl+/n?=
- =?us-ascii?Q?IUeax3cksqAoqZ0XR72IV2UbxNb5JlspEjyT7QtCOm5zRnJLhyf22ji2ZFgW?=
- =?us-ascii?Q?OLxfRyZ3GbS3EGaDtzxdlmHMK3GLzV9M5DGDjWaLjjFTDIBf8SLYoeOfiM4S?=
- =?us-ascii?Q?HLB6t4K6MmFCiI1EL+xTPCZOVVQGobRFfrbBPPsfUm/PVYJUJhgrC9f4+dlS?=
- =?us-ascii?Q?pCZbsACwCUK6YnyFKVsoRDvyP5ozCBwAtVZEtGsvw5qQYN+ZMG+iKEfbr0FG?=
- =?us-ascii?Q?Ly3omigNMWd7+Cbge7YddepdTZo6xqOlH2c/VOZ2U+EjcEsfxb4mPMLgo/eO?=
- =?us-ascii?Q?neMkSr8dZnuRU8MtgHUAcKLppvH+iejCwX1aPPAVQScI2vlYzoVexXjrwCqU?=
- =?us-ascii?Q?KEJSLsfDeL4czZFwgauV6ZY7r2S4nNZcHjs4/pe2OSfUosmmbCGXHPHzgTDd?=
- =?us-ascii?Q?5o+QLdbL00L6ux4Xx34UGpp92q1xXE3lE+fmcK9m2u8vkXmDtDh2vxft8hL4?=
- =?us-ascii?Q?znoiyX5wrFpJZpFTin/gTv+K4svyh+lxQMxx6L12Rn3PwwMX10Xxa65lasxW?=
- =?us-ascii?Q?gWY3APldG65a2TzapNJOSzQ9x1SNGpQrkyQFhFWq9cTIu+94yw/remBLhIAB?=
- =?us-ascii?Q?IktLe0W0vBEj4r0iYqULk5d737jbMr0GvE9lsv8pMEkRG/OUSWbsYUfOuGr4?=
- =?us-ascii?Q?civcci4Vwd+gYhSalqFhoj4nI0DcpdE+9hFqrQJ4eeeDPJzfVgpXuVBHNPpX?=
- =?us-ascii?Q?ppbTI4zNWumY3drnNltweytqnVgPOxc=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 415942f3-489d-4381-b0a5-08da4485eeb0
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZkNGMzNZT2ZuQXVPT3pISjNkR0R3d2NiVjZ4UjlYMDFwZWZQdnVYMCtjZGtJ?=
+ =?utf-8?B?eW4rV29VVjVqREVSeXNIQ0hFT2NZSTJyTEsvUDR4SkJ6YTZiTVdsb3paSnM3?=
+ =?utf-8?B?YllDckhIQStmTGNCOWIxbmJETFUwdGdwUm9Uc3FIM1ZCZy9vNlF0SitQa1Zs?=
+ =?utf-8?B?aS9RdHVidFdNTFNScWNhQmdvZDJMb0x6WnZoNy9nSWFZTlIzd0hxSGY3RnFo?=
+ =?utf-8?B?QnNRVWVWRmRPb3VxT2N0djdQS2UxYXZpUXV3dktyaTRjejVWT1Y1ai8vWDlz?=
+ =?utf-8?B?Q2JnRklyWTdRNTBCTUJsQWNXMGNqLzlRWFhucTU5OXV5Tnh4QlVYS1ZzZ0or?=
+ =?utf-8?B?c1NqeHYzS1pSQ2xyZGVUVU5zYlkwMDlHNUdVRU9QMUFuaTdXZStKSGpkUHFk?=
+ =?utf-8?B?V3crTk9qUGRqODVtS1c0cVFNa2pEU3ZNQmpSYW1ncmFPa2dKSkJXUllOOWNZ?=
+ =?utf-8?B?Nk9vdXRLWWhFU2hvTFZoa3Y4UEE3bXdVcmZ3Tll0cXk0d2Rmai9pS1orUURF?=
+ =?utf-8?B?R2owR1QzcjlVeWV5YTl6N3NjL2FBV01sMDBHUFlZOHJNTFQ2MnRTZytXRkFT?=
+ =?utf-8?B?S1dOZXozRlZoUmNRaElDNExpZmtyMmVCMjEwdlp4WjVqSy9XRTUxaUVaTUhZ?=
+ =?utf-8?B?d3BmNU0xZzkyK0toV3hlTlVtNVdMd09TeU41NytPK1JqRmNoT05iUEFPSFNo?=
+ =?utf-8?B?Sk5FdVVsM2QrZjJ1WUlmbmRMaFRSbHdaSEQwY0sya3ZzS2FaUU1IU2VrYXZh?=
+ =?utf-8?B?ZE8wdTY5U0poZ1hyWDNQazVpQU0zaEhydHR3UmxhMy9GK2ZReFU3Q1pFeEo5?=
+ =?utf-8?B?VVIxdm9Oa3VxUlZpeWwvQUZOTnJZK29CQlpZeWJydUpqVkZJeGR5c3krWlR0?=
+ =?utf-8?B?T1pkaC9TQW85VWJwRDhqaG1sRlhaaXRuZjZkTGVKUUZFZ056NXQvYTE4aFVz?=
+ =?utf-8?B?VnZPb2tBandzbkhnd2JRemViVHpHSC9jbXpIQiswc3V6cExJbk40UTVFSUgr?=
+ =?utf-8?B?VVM3TGNLK0Yxamw1SlpjdG11THhUNlUrZHY1bk1tMzZRWnpmR3NlTGk5bXhn?=
+ =?utf-8?B?a0tSQXl2YzJIZWp0TVJObFdlSUdwa01wV2lTVm5JcFB3Sm5LNjd3cnROSlpa?=
+ =?utf-8?B?Vlg1Q3hENHNORTJxZ3d5eVhOUkM3eUN0MWZoTnByVVdyZmpjcGc4cUVaamhu?=
+ =?utf-8?B?V20zdGRmdEg2SjZPS2N0SUREM2VXdkUwZ3NnS21JdDNTeDB2TkhjQjFZQS80?=
+ =?utf-8?B?ZU5xVHk3eHU3MEh0MUFsdjF2LzBWQ0NWekxRbHVBaHQ4YlNWUEJ0K3hpZ205?=
+ =?utf-8?B?NldkQjllT0puRWlTRXdXYjlSMHJMbjMweHVTRlB5cDFNTnU1ZDFMYXdGMWhR?=
+ =?utf-8?B?YjVyeVY4RDlZWGwrb0tLY3lYMmxHUGRJeGhDSVV2TTE0TjlhTDYwL0R3OHFv?=
+ =?utf-8?B?ZlQvbXg4OGdkaGFKYjFOY3hyRms2VGhIY1lPM3ZuWGFmZ1ZGZWhZbnBwYXVH?=
+ =?utf-8?B?ZXNhZkp5ZWxiZ3krWlBxVG1OVWM2aWhJaFp0VmVvbnZkKzBCdmk3TFNnUUJ5?=
+ =?utf-8?B?bkpEa0hOUG40TVYwL041K01mdCt2YTNBVzdqR3VqNG16V2Uyd0ROL2d1SlFT?=
+ =?utf-8?B?UWl6MkxUUFhIMHY2WG5sN2VlT3F1Y1Y1RDNNTCtXM3cvN09RRnZsVjluSUNl?=
+ =?utf-8?B?aVlUc2F1SVVJbW1uWTJQQVVSWERQWExMT0tWaTBjUVFoNWx5L2pQakwxSUMr?=
+ =?utf-8?B?bW9IalkwTGxOTGxIbjNrNGZrSWNoM05vZ3ZscjZqaFZEYm83bi9vTzNjWnQy?=
+ =?utf-8?B?TlREbkVhTEgxOU1UK1JxY3F5b0pWc1FNY2ZUeXM5Qk5Uc2cvcTJzaUFnd0t2?=
+ =?utf-8?B?b0dRUmFQakJRSWRCZHNId2VOZkh0ei8rb1A2Nkt6RFJIVWw4VUxqZUcrbnEw?=
+ =?utf-8?B?Tmdzbi9nWk5vbXpaM2w0ajh1b0tyL3JqTE80QUdQWnUyNUtiWTZNNzF5c2Qx?=
+ =?utf-8?B?akRDaXRRT2RGa0VkSkJRRFlQTFczT3FnamlGV0lFYVFYU0l2ZTVtOEVFNTNx?=
+ =?utf-8?B?am55Q0VzTmhUOVV5NjBDaEx1VU5waVl6VGhPZzVIdENBTFhPbWhDam9XLzVl?=
+ =?utf-8?B?dWVvODdyUDZadS9uc3BRYWNlSjVDR0NDNDhnc0ozbHN0VXJPNjJJTkNkbXJP?=
+ =?utf-8?B?bTFhK0NoeEt5TnZvaHlLVjZUZzFmWFVaMXBNQmJnN0xZQ1hPSjhoeEdGZlRP?=
+ =?utf-8?B?bG5QcWNSZ1dPYjhMUzd6dVJVMWVUOUtLOEJRT2JxZnhzaGpJaUpQVVY4SWU3?=
+ =?utf-8?B?WXdMWGNDS1JBcnRFRXpoK3FuZ3hhcU81Rnk1bE53WCtNQ1BMQVZBZz09?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b84cf55b-83d0-483f-ecae-08da44c73e86
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2022 10:52:05.9273
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2022 18:39:36.7838
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DZZvz0uy3F2shITJJ8fTwtbJ0u8s/CGnys6COasLHABsXR43ivY2Vx6v/3KdGBl/rtk6Pq3tDFEHXsSVM/5So10mZj1XqHL/xoePKiNJSkA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR10MB1549
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.517,18.0.874
- definitions=2022-06-02_02:2022-06-02,2022-06-02 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- phishscore=0 suspectscore=0 malwarescore=0 mlxscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206020046
-X-Proofpoint-GUID: dZ9A5hTuwABGJ-x9CoO-rVVOKT3h46Rm
-X-Proofpoint-ORIG-GUID: dZ9A5hTuwABGJ-x9CoO-rVVOKT3h46Rm
+X-MS-Exchange-CrossTenant-UserPrincipalName: lus49uR24006tFbqyZhez59GjrssOA1oCcTp8eOaXZElh3fAsMZ2Ln6QyRgPncur
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR01MB2585
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The existing code works fine because ksmbd_vfs_getcasexattr() isn't
-going to return values greater than INT_MAX.  But it's ugly to do
-the casting and using a ssize_t makes everything cleaner.
+LGTM, but I had some additional suggestions that I found when
+researching how to yank the entire SMB1 code into a module.
+Which actually looks quite possible, but for another day.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- fs/ksmbd/vfs.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+This patch doesn't actually stop building smb1ops.c and cifssmb.c
+however. Don't you want to deselect them in the kconfig?
 
-diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
-index dcdd07c6efff..efdc35717f6d 100644
---- a/fs/ksmbd/vfs.c
-+++ b/fs/ksmbd/vfs.c
-@@ -411,7 +411,8 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *fp, char *buf, loff_t *pos,
- {
- 	char *stream_buf = NULL, *wbuf;
- 	struct user_namespace *user_ns = file_mnt_user_ns(fp->filp);
--	size_t size, v_len;
-+	ssize_t v_len;
-+	size_t size;
- 	int err = 0;
- 
- 	ksmbd_debug(VFS, "write stream data pos : %llu, count : %zd\n",
-@@ -428,9 +429,9 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *fp, char *buf, loff_t *pos,
- 				       fp->stream.name,
- 				       fp->stream.size,
- 				       &stream_buf);
--	if ((int)v_len < 0) {
-+	if (v_len < 0) {
- 		pr_err("not found stream in xattr : %zd\n", v_len);
--		err = (int)v_len;
-+		err = v_len;
- 		goto out;
- 	}
- 
--- 
-2.35.1
+Feel free to add my
+Reviewed-by: Tom Talpey <tom@talpey.com>
 
+
+On 6/1/2022 11:45 PM, Steve French wrote:
+> Another minor one to remove some unneeded SMB20 code when legacy is disabled
+> 
+> 
+> On Wed, Jun 1, 2022 at 9:39 PM Steve French <smfrench@gmail.com> wrote:
+>>
+>> We should not be including unused SMB1/CIFS functions when legacy
+>> support is disabled (CONFIG_CIFS_ALLOW_INSECURE_LEGACY turned
+>> off), but especially obvious is not needing to build smb1ops.c
+>> at all when legacy support is disabled. Over time we can move
+>> more SMB1/CIFS and SMB2.0 legacy functions into ifdefs but this
+>> is a good start (and shrinks the module size a few percent).
+>>
+>> --
+>> Thanks,
+>>
+>> Steve
+> 
+> 
+> 
