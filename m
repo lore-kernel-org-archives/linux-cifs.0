@@ -2,89 +2,110 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE67C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jun 2022 03:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CC5C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jun 2022 04:49:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbiFBDuw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Jun 2022 23:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41146 "EHLO
+        id S229647AbiFBEtR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 Jun 2022 00:49:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiFBDuv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Jun 2022 23:50:51 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 043792A3069
-        for <linux-cifs@vger.kernel.org>; Wed,  1 Jun 2022 20:50:50 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id e184so6235297ybf.8
-        for <linux-cifs@vger.kernel.org>; Wed, 01 Jun 2022 20:50:49 -0700 (PDT)
+        with ESMTP id S229621AbiFBEtQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Jun 2022 00:49:16 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DDF82838C4
+        for <linux-cifs@vger.kernel.org>; Wed,  1 Jun 2022 21:49:15 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id k19so4854737wrd.8
+        for <linux-cifs@vger.kernel.org>; Wed, 01 Jun 2022 21:49:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IBdNYD60efGATnwpUuCo8jNHsQwHl2PtmLe075HGPb0=;
-        b=Pr49W4Xjh8gto8paMDyhQwa/LU689IVKzqSXy8dFqbzGFK53amCPZPGLPX6ShMLPy5
-         jgOU8DLUteOd1fF9b5z07z0eUIa080Yod8816PFBvCHZuP86nUMwoJfP+x5JarEsgZ4d
-         3lfLgB1q6O6ftEa3vM69SrA5CJ38ZH6raAPwg/RwUgNBCoExy5J0BZ14R9cMvIT51kfh
-         F4xBBTCeLr8zFoJqayR5lt+zFj9+g53MvleMcuPCx7IXfJLW2J5FaeCLXDLPFlnJQ/g9
-         GGmGw2xJsQiUmSCnAyhbXYDvj5AVbUb6NxTrie68vXkyIsFOhuqmBlAhW5aEiZ3XHLE2
-         4lTQ==
+         :cc:content-transfer-encoding;
+        bh=ImzeGOjmlS56yZozKHVae+J8y7xLXmmIu+c2HjehkgA=;
+        b=kgGlxZ0Ymu43SE3/ua8/vMf9+brBYJ6FOmhbu31Po0ogCRa8Hw1EQ5wWwLOrgLVEOv
+         IG2bYMtumsS49vFxLLZ2vHy1qbMj7DRlQ7Tf0jBORkivBbBD0223O/QisYoPDLlSw+OV
+         8Y3D5mj3KYl6YD0S7l2tlfsIRX070UbYjs0YWLmqBeZFvQ0uFUrx/7hDQtSejjFc00yP
+         aoKlBUVyhhpKXayztJHiAXW25k4hnOpuEzCxCd2V/R3Ft4Eq39FO4A0RaNwnBdVnGHrQ
+         mF9cVqrTU3BghkS7yxsxV11p7g9xgZjOQMMhwBbF9Q8KioIDm90Y7ZvCtKHDwVKOxret
+         1cfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IBdNYD60efGATnwpUuCo8jNHsQwHl2PtmLe075HGPb0=;
-        b=muRjMjlePBWfw+VhKfh2G0jf314vRlUvndwkHpWgeIi6TN5DRbWQbbEBhyfwltRLYG
-         SPTmQfRo4EWC8srjIiw8UBHvq2sXx0VjEiwglxFQkiCbGs7kqYUdDH0Fds68INNbbBav
-         fA2RW5QMhcUh6Hce4Z3m9TuJ+qAO8d1gJt7i8ZH5IFLES2NCrKgZiRmg2cOrzwlTZOM9
-         ICtAO24BgsEgWShXNzznpChSZ1BYJhsZTFVsBdzapOdApWR+3U49ggdM5HfKz2FiagoT
-         gfr33oa5eMlgZScCbZIgaan6PrNdEIS9WyTPBfP0hrqnlB//aKfig90Uk0b/hOg0IdF0
-         2k/A==
-X-Gm-Message-State: AOAM5332y2BMBPaVYdIUB7zYnePTMYc2e+VMlNMSRezmLKg8oDC3O+Mr
-        Io2lDNf2h0i/+sjWDo5/72CTrZjpBcYx5blWMYBzon/9
-X-Google-Smtp-Source: ABdhPJzDB+OHYG9BwcCexRyKhjKP/8O8uLhNZEeYaPbqIeyKQGYCVqb4ZE8N9IfzdV9Zta4ZRV77q0S2S920LHuswn8=
-X-Received: by 2002:a25:fe08:0:b0:655:85c6:af82 with SMTP id
- k8-20020a25fe08000000b0065585c6af82mr3153036ybe.150.1654141849171; Wed, 01
- Jun 2022 20:50:49 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ImzeGOjmlS56yZozKHVae+J8y7xLXmmIu+c2HjehkgA=;
+        b=L6zVI7QpzNlyHDvSbTiYXgUNG/wpqnJc/UpziRPDPzSKI/TIFsOgws8nKOVSBLI3e+
+         o9TV01BlfKYImO+PAdASZSArLtLd1sQGP3DezCiEP4SQj/r/srzPwKkRNqHE4HVX9XgW
+         doigGcRAXOiLMPRASDpbVcTNgXFwhhb77plAftx+vvla2AHiYd4u80imlP2W7f1wa1/y
+         eIrdWL1I6o8PVd7XdnMJbxKY2LMf3itQqsyrdKmZirbl80UaL89jmhUR8D9CanbJBq2E
+         E306LSvdZ+vkQjUq4Qle3mwq3aUWSrD3OUUwJ96WMBP3T4kpKdqjBOa674+hpuujMhy1
+         trpw==
+X-Gm-Message-State: AOAM533ysH4/W61yPyHOREZ8Aq7L5FYPKO23sbi+V0aZaL/ggaQSxUVc
+        9bOsvoG9IdanFa/C0I0uQsdtzldD+T+nZ72wJTI=
+X-Google-Smtp-Source: ABdhPJwO7QmEu9MWLJ+KQA2WPgVYAuO4GoVe3w4eyGD4iO1Kl090mpGTAqod4Cvgo83lbKctycEx6vEQ8YypuBTfAPg=
+X-Received: by 2002:a5d:6da7:0:b0:20f:eb44:f3c3 with SMTP id
+ u7-20020a5d6da7000000b0020feb44f3c3mr1947825wrs.621.1654145353812; Wed, 01
+ Jun 2022 21:49:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mtUe2f0xi5zu0Np0bkyv7K9BKKgUkUJp2b25BteHBFjeg@mail.gmail.com>
- <CAH2r5mufZdKWrUGbp0Pha5C6YrYqUR-=vT2Pw8TixtzVaQuk0Q@mail.gmail.com>
-In-Reply-To: <CAH2r5mufZdKWrUGbp0Pha5C6YrYqUR-=vT2Pw8TixtzVaQuk0Q@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 2 Jun 2022 13:50:37 +1000
-Message-ID: <CAN05THSsPTYBfKyxvO7eO3mOViEi+KFG3a_V9qhwG0yu02OX3Q@mail.gmail.com>
-Subject: Re: [PATCH][CIFS] Do not build smb1ops.c if legacy support is disabled
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+References: <20220602011313.56110-1-linkinjeon@kernel.org>
+In-Reply-To: <20220602011313.56110-1-linkinjeon@kernel.org>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Thu, 2 Jun 2022 13:49:02 +0900
+Message-ID: <CANFS6bbYeNP1WWyVGJXc5SBoyZ4Gx=F1Rx3XZZt_erkW0tr8RQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: use SOCK_NONBLOCK type for kernel_accept()
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>,
+        David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-looks good   reviewed by me
+2022=EB=85=84 6=EC=9B=94 2=EC=9D=BC (=EB=AA=A9) =EC=98=A4=EC=A0=84 10:13, N=
+amjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> I found that normally it is O_NONBLOCK but there are different value
+> for some arch.
+>
+> /include/linux/net.h:
+> #ifndef SOCK_NONBLOCK
+> #define SOCK_NONBLOCK   O_NONBLOCK
+> #endif
+>
+> /arch/alpha/include/asm/socket.h:
+> #define SOCK_NONBLOCK   0x40000000
+>
+> Use SOCK_NONBLOCK instead of O_NONBLOCK for kernel_accept().
+>
+> Suggested-by: David Howells <dhowells@redhat.com>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
 
-On Thu, 2 Jun 2022 at 13:47, Steve French via samba-technical
-<samba-technical@lists.samba.org> wrote:
+Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
+
+>  fs/ksmbd/transport_tcp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Another minor one to remove some unneeded SMB20 code when legacy is disabled
->
->
-> On Wed, Jun 1, 2022 at 9:39 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > We should not be including unused SMB1/CIFS functions when legacy
-> > support is disabled (CONFIG_CIFS_ALLOW_INSECURE_LEGACY turned
-> > off), but especially obvious is not needing to build smb1ops.c
-> > at all when legacy support is disabled. Over time we can move
-> > more SMB1/CIFS and SMB2.0 legacy functions into ifdefs but this
-> > is a good start (and shrinks the module size a few percent).
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
+> diff --git a/fs/ksmbd/transport_tcp.c b/fs/ksmbd/transport_tcp.c
+> index 8fef9de787d3..143bba4e4db8 100644
+> --- a/fs/ksmbd/transport_tcp.c
+> +++ b/fs/ksmbd/transport_tcp.c
+> @@ -230,7 +230,7 @@ static int ksmbd_kthread_fn(void *p)
+>                         break;
+>                 }
+>                 ret =3D kernel_accept(iface->ksmbd_socket, &client_sk,
+> -                                   O_NONBLOCK);
+> +                                   SOCK_NONBLOCK);
+>                 mutex_unlock(&iface->sock_release_lock);
+>                 if (ret) {
+>                         if (ret =3D=3D -EAGAIN)
 > --
-> Thanks,
+> 2.25.1
 >
-> Steve
+
+
+--=20
+Thanks,
+Hyunchul
