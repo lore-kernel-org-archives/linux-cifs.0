@@ -2,181 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D81C43334
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jun 2022 23:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D596AC433EF
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jun 2022 23:50:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239401AbiFBXcJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 2 Jun 2022 19:32:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50150 "EHLO
+        id S230170AbiFBXuz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 Jun 2022 19:50:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230134AbiFBXcJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Jun 2022 19:32:09 -0400
+        with ESMTP id S230134AbiFBXuy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Jun 2022 19:50:54 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D414DF7F
-        for <linux-cifs@vger.kernel.org>; Thu,  2 Jun 2022 16:32:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC29437A19
+        for <linux-cifs@vger.kernel.org>; Thu,  2 Jun 2022 16:50:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7C84FB821AB
-        for <linux-cifs@vger.kernel.org>; Thu,  2 Jun 2022 23:32:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45CAAC36AE5
-        for <linux-cifs@vger.kernel.org>; Thu,  2 Jun 2022 23:32:05 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 52BC9B821AA
+        for <linux-cifs@vger.kernel.org>; Thu,  2 Jun 2022 23:50:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 022CAC3411D
+        for <linux-cifs@vger.kernel.org>; Thu,  2 Jun 2022 23:50:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654212725;
-        bh=Wum5MGT+eCgGoPWLH0pNqDh+MEe6GJ9p6o0D4qDMCns=;
+        s=k20201202; t=1654213851;
+        bh=lLNfFMNq7q0yNVFq60A4e11hnAt0Z9q1ANzHvBS7DTg=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=n59hkbeR4rxiYVoNpJ16DNrarVYM46g3AGPOrczIncgsZvKlXXCyY3gXMs122UcUa
-         FMWRCmruJVsrc1viFSihA6iImsy5LK9VaL3n24brlIzilMp4XL6Ta/AexKUzzISiSI
-         +ni35UhMUTPUwdDWpF9sdLIbvIwCjiW4SHjM0uqBWoIkZ8Nk3tEMWc624GdWcp2t8R
-         aCYpMWCg9id6PBEAYOGcs6ZkBfCTT9G/fKy8q8T8Q04FYPEnLvef5x80QfKu52DVJe
-         k28tMdhzkqQE86CVpcFPlltOYW4D+ayctyvp2ZrzVACMxSeTyNBVhh1KjcDjOsxuV/
-         lFcsbVQWZrkiw==
-Received: by mail-wr1-f47.google.com with SMTP id x17so8303915wrg.6
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Jun 2022 16:32:05 -0700 (PDT)
-X-Gm-Message-State: AOAM533A++txIsvD11ObB4Rp/K8l8GfTNT5BtKhuPV9dGOp34X++93M/
-        4ZqSMUTGWa33XfRplMIuMePW1avBmJgtifL8RtA=
-X-Google-Smtp-Source: ABdhPJwA7FXeYFCM9ru8A9h0VHdN2wWl6miIyPWdOLd6EnMDj1x2+XDAnGun1WYChOLEjK8OBTrZJ+ltybiTKHIvWnU=
-X-Received: by 2002:a05:6000:1882:b0:20f:de1d:9fb9 with SMTP id
- a2-20020a056000188200b0020fde1d9fb9mr5526741wri.504.1654212723427; Thu, 02
- Jun 2022 16:32:03 -0700 (PDT)
+        b=R5n66vu/Dd/uz/DIwpmciSy9FdWL0rKXegPmsR1gKkdNt88a47m8F0MApnAEvD7Yz
+         90NyY+bFmDOLeFau60+/pokHlPhF9vQ9ypWDiIk1vzOp8ZI7nwfzXRZEZGL0Gd1TJF
+         teuYMZF+27SLvJ2AVdPKKm9y0JR/Mvgm8CGwhMx27K7w5O25fBguqIqhv/unQJn9Tv
+         u8HsOQBizCRmn5sKxOxMUlWqolAT49FI5vzUKavi30Qg5usaBFQrlfm9NfwCZ7uMNd
+         ymNFkHQLXW+iW+ZaHoxBMNaZydCwAj+Ietl9ZWmOgaNzQdB4/Ior4AgQYth9FwDx23
+         OV8olejGY09JA==
+Received: by mail-wr1-f44.google.com with SMTP id h5so8390540wrb.0
+        for <linux-cifs@vger.kernel.org>; Thu, 02 Jun 2022 16:50:50 -0700 (PDT)
+X-Gm-Message-State: AOAM533cCGU/qssyjPkndMQUzosEctdeTjoFVaNhCJ77dLNVSlvziStZ
+        DkNWKACSLXc2PBCbxeI/aIf91IeHMkVmOp2zYts=
+X-Google-Smtp-Source: ABdhPJzydyN+Sgq/BGo5N0FjrO69uuEVb5ztlLW4Vrt1MyZTxnNO9qBb1OE9uAL7DVtxl87889+rq+jhc9iKO5rCq+0=
+X-Received: by 2002:a5d:4e48:0:b0:210:18bb:6aa1 with SMTP id
+ r8-20020a5d4e48000000b0021018bb6aa1mr5769957wrt.62.1654213849139; Thu, 02 Jun
+ 2022 16:50:49 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:adf:ee4e:0:0:0:0:0 with HTTP; Thu, 2 Jun 2022 16:32:02 -0700 (PDT)
-In-Reply-To: <PH7PR21MB3263E3978006A32714AE5357CED79@PH7PR21MB3263.namprd21.prod.outlook.com>
-References: <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com>
- <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
- <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
- <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com>
- <84589.1653070372@warthog.procyon.org.uk> <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
- <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
- <dba1ce95-8a72-11ec-ee29-3643623c9928@talpey.com> <CAKYAXd-PezRG4i-7DCiNAMQ0H9DsX-aDxD1rJavEzCmMa179xg@mail.gmail.com>
- <307f1f2c-900b-8158-78a8-a3dd7564f2f8@talpey.com> <PH7PR21MB326344B83D7B4300683D2CEACED49@PH7PR21MB3263.namprd21.prod.outlook.com>
- <CAKYAXd861-sVicu3L-7QdctEZYfDtV5p=1t5E=gpr3e2Y3s2dQ@mail.gmail.com> <PH7PR21MB3263E3978006A32714AE5357CED79@PH7PR21MB3263.namprd21.prod.outlook.com>
+Received: by 2002:adf:ee4e:0:0:0:0:0 with HTTP; Thu, 2 Jun 2022 16:50:48 -0700 (PDT)
+In-Reply-To: <928536.1654072840@warthog.procyon.org.uk>
+References: <833010.1654031136@warthog.procyon.org.uk> <CAKYAXd_9jw69iKPBvuE4DxdpwcH2H90h3NQDQ7nyxzbTnEcirg@mail.gmail.com>
+ <928536.1654072840@warthog.procyon.org.uk>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 3 Jun 2022 08:32:02 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9SZQPkxO9TshgbHGbwzaDN1Hz6dhT-pNDYpD3icjB4HA@mail.gmail.com>
-Message-ID: <CAKYAXd9SZQPkxO9TshgbHGbwzaDN1Hz6dhT-pNDYpD3icjB4HA@mail.gmail.com>
-Subject: Re: RDMA (smbdirect) testing
-To:     Long Li <longli@microsoft.com>
-Cc:     tom <tom@talpey.com>, David Howells <dhowells@redhat.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        Steve French <smfrench@gmail.com>,
+Date:   Fri, 3 Jun 2022 08:50:48 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9xbs5oiCeEonTDUGh01229ta+roq5fKEcn5+AeTwqddQ@mail.gmail.com>
+Message-ID: <CAKYAXd9xbs5oiCeEonTDUGh01229ta+roq5fKEcn5+AeTwqddQ@mail.gmail.com>
+Subject: Re: ksmbd threads eating masses of cputime
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-05-25 6:08 GMT+09:00, Long Li <longli@microsoft.com>:
->> Subject: Re: RDMA (smbdirect) testing
->>
->> 2022-05-24 4:17 GMT+09:00, Long Li <longli@microsoft.com>:
->> >> Subject: Re: RDMA (smbdirect) testing
->> >>
->> >> On 5/23/2022 11:05 AM, Namjae Jeon wrote:
->> >> > 2022-05-23 22:45 GMT+09:00, Tom Talpey <tom@talpey.com>:
->> >> >> On 5/22/2022 7:06 PM, Namjae Jeon wrote:
->> >> >>> 2022-05-21 20:54 GMT+09:00, Tom Talpey <tom@talpey.com>:
->> >> >>>> ...
->> >> >>>> Why does the code require
->> >> >>>> 16 sge's, regardless of other size limits? Normally, if the
->> >> >>>> lower layer supports fewer, the upper layer will simply reduce
->> >> >>>> its operation sizes.
->> >> >>> This should be answered by Long Li. It seems that he set the
->> >> >>> optimized value for the NICs he used to implement RDMA in cifs.
->> >> >>
->> >> >> "Optimized" is a funny choice of words. If the provider doesn't
->> >> >> support the value, it's not much of an optimization to insist on
->> >> >> 16.
->> >> >> :)
->> >> > Ah, It's obvious that cifs haven't been tested with soft-iWARP. And
->> >> > the same with ksmbd...
->> >> >>
->> >> >> Personally, I'd try building a kernel with smbdirect.h changed to
->> >> >> have SMBDIRECT_MAX_SGE set to 6, and see what happens. You
->> might
->> >> >> have to reduce the r/w sizes in mount, depending on any other
->> >> >> issues this may reveal.
->> >> > Agreed, and ksmbd should also be changed as well as cifs for test.
->> >> > We are preparing the patches to improve this in ksmbd, rather than
->> >> > changing/building this hardcoding every time.
->> >>
->> >> So, the patch is just for this test, right? Because I don't think any
->> >> kernel-based storage upper layer should ever need more than 2 or 3.
->> >> How many memory regions are you doing per operation? I would expect
->> >> one for the SMB3 headers, and another, if needed, for data.
->> >> These would all be lmr-type and would not require actual new memreg's.
->> >>
->> >> And for bulk data, I would hope you're using fast-register, which
->> >> takes a different path and doesn't use the same sge's.
->> >>
->> >> Getting this right, and keeping things efficient both in SGE
->> >> bookkeeping as well as memory registration efficiency, is the rocket
->> >> science behind RDMA performance and correctness. Slapping "16" or "6"
->> >> or whatever isn't the
->> >> long-
->> >> term fix.
->> >
->> Hi Long,
->> > I found max_sge is extremely large on Mellanox hardware, but smaller
->> > on other iWARP hardware.
->> >
->> > Hardcoding it to 16 is certainly not a good choice. I think we should
->> > set it to the smaller value of 1) a predefined value (e.g. 8), and the
->> > 2) the max_sge the hardware reports.
->> Okay, Could you please send the patch for cifs.ko ?
-Long, My Chelsio(iWARP) NIC reports this value as 4. When I set it
-with hw report value in cifs.ko, There is kernel oops in cifs.ko. Have
-you checked smb-direct of cifs.ko with Chelsio and any iWARP NICs
-before ? or only Mellanox NICs ?
+2022-06-01 17:40 GMT+09:00, David Howells <dhowells@redhat.com>:
+> Namjae Jeon <linkinjeon@kernel.org> wrote:
+>
+>> Okay, How do you reproduce this problem ? Did you run xfsftests
+>> against ksmbd RDMA ?
+>
+> Yeah - I've been making sure my cifs filesystem changes work with RDMA.
+> There've been a lot of connections that haven't been taken down cleanly,
+> due
+> to oopses, lockups and stuff.
+>
+> One thing that could be useful is, say, /proc/fs/ksmbd/
+>
+>> Okay, we need to add maximum retry count for that case.
+>> but when I check kernel thread name in your top message, It is RDMA
+>> connection.
+>> So smb_direct_read() is used in ksmbd_conn_handler_loop().
+>> I'd like to reproduce the problem to figure out where the problem is.
+>> Can I try to reproduce it with soft-iWARP and xfstests?
+>
+> Note that I only noticed the issue when I switched to working on another
+> filesystem and found that performance was unexpectedly down by 80%.
+>
+> I was using softRoCE, though it may well be causable with softIWarp also,
+> since that's not really a detail visible to cifs/ksmbd, I think.
+>
+> I've just had a quick go at trying to reproduce this, hard-resetting the
+> test
+> client in the middle of performing an xfstest run, but it didn't seem to
+> cause
+> the single ksmbd:r5445 thread to explode.
+Thanks for your check!
+We also try to reproduce it but can't reproduce it yet. Let's check
+whether an infinite loop can occur in smb_direct_read().
 
-Thanks!
 >
-> Yes, will do.
+> David
 >
-> Long
->
->>
->> Thanks.
->> >
->> > If the CIFS upper layer ever sends data with larger number of SGEs,
->> > the send will fail.
->> >
->> > Long
->> >
->> >>
->> >> Tom.
->> >>
->> >> > diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h index
->> >> > a87fca82a796..7003722ab004 100644
->> >> > --- a/fs/cifs/smbdirect.h
->> >> > +++ b/fs/cifs/smbdirect.h
->> >> > @@ -226,7 +226,7 @@ struct smbd_buffer_descriptor_v1 {
->> >> >   } __packed;
->> >> >
->> >> >   /* Default maximum number of SGEs in a RDMA send/recv */
->> >> > -#define SMBDIRECT_MAX_SGE      16
->> >> > +#define SMBDIRECT_MAX_SGE      6
->> >> >   /* The context for a SMBD request */
->> >> >   struct smbd_request {
->> >> >          struct smbd_connection *info; diff --git
->> >> > a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c index
->> >> > e646d79554b8..70662b3bd590 100644
->> >> > --- a/fs/ksmbd/transport_rdma.c
->> >> > +++ b/fs/ksmbd/transport_rdma.c
->> >> > @@ -42,7 +42,7 @@
->> >> >   /* SMB_DIRECT negotiation timeout in seconds */
->> >> >   #define SMB_DIRECT_NEGOTIATE_TIMEOUT           120
->> >> >
->> >> > -#define SMB_DIRECT_MAX_SEND_SGES               8
->> >> > +#define SMB_DIRECT_MAX_SEND_SGES               6
->> >> >   #define SMB_DIRECT_MAX_RECV_SGES               1
->> >> >
->> >> >   /*
->> >> >
->> >> > Thanks!
->> >> >>
->> >> >> Tom.
->> >> >>
->> >> >
->> >
 >
