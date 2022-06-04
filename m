@@ -2,86 +2,166 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D67AC43334
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Jun 2022 20:35:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD06C43334
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Jun 2022 05:01:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231550AbiFCUfV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Jun 2022 16:35:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57550 "EHLO
+        id S243476AbiFDFBT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 4 Jun 2022 01:01:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbiFCUfV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Jun 2022 16:35:21 -0400
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B6E517C0
-        for <linux-cifs@vger.kernel.org>; Fri,  3 Jun 2022 13:35:18 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 253KZIUq003077
-        for <linux-cifs@vger.kernel.org>; Fri, 3 Jun 2022 15:35:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1654288518;
-        bh=gDcnU4MEw0cJQkHHeLdmO6TIrrCVdNPzvwd7My4An/o=;
-        h=From:To:CC:Subject:Date;
-        b=ii6n8Kx/BZCn3rb7wFtpcaHeCpN0CG6s5E055t0endfL6z6r8+i+L8pisrhyzYx2o
-         xDv2YOx96F8YOeUyLOzNew5aGXfa3r00kIQeIqAgVDCful9jFbPudd7nuNDr/0SbUJ
-         0pO7mASXH4pXcKqhfpPZUgaq1/JF4l3oRTdw2EAA=
-Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 253KZIVY114780
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-cifs@vger.kernel.org>; Fri, 3 Jun 2022 15:35:18 -0500
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Fri, 3
- Jun 2022 15:35:17 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14 via
- Frontend Transport; Fri, 3 Jun 2022 15:35:17 -0500
-Received: from uda0500628.dal.design.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 253KZHlU004709;
-        Fri, 3 Jun 2022 15:35:17 -0500
-From:   Daniel Parks <danielrparks@ti.com>
-To:     <linux-cifs@vger.kernel.org>
-CC:     Daniel Parks <danielrparks@ti.com>
-Subject: [PATCH] cifs-utils: Make automake treat /sbin as exec, not data
-Date:   Fri, 3 Jun 2022 15:34:59 -0500
-Message-ID: <20220603203459.21422-1-danielrparks@ti.com>
-X-Mailer: git-send-email 2.17.1
+        with ESMTP id S230285AbiFDFBS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 4 Jun 2022 01:01:18 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CA8C59970
+        for <linux-cifs@vger.kernel.org>; Fri,  3 Jun 2022 22:01:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1654318876; x=1685854876;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=rr0nprWAXUpegr/ZWzpAxrOUkhKhyXAxrf90w7RL+G4=;
+  b=IddpiB/Pgc+R5B0RT1sxwg5r2d8GONOu/yZ0OfxYqfGn1XT/I06qUu+j
+   T3oYW+8NY0d2ySmbV76iehLhdVuMpDqNpaMOx2C3dWcHu9VlgZwQzC91I
+   +pio4ESnGYTlH4DUgIIE8t6GB0u8jEwl7KblihEdbsC0LxI1AeSDzWrCp
+   +BGTPebYuJxa3vBa3LbYQ6dm6XZMwXO1ZJJjEFA5RVLhi0U+ydHTMMgg6
+   o87/I0JWAp7ps2O6O+e9CGJdKYguAkFrgib/4WoxojQF7YnxUA05GohRQ
+   G30/hJdZc/REwBtghI46iIBzEhT8avrSMhj8i2M9otLXUkqbTe62/Os73
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10367"; a="337074922"
+X-IronPort-AV: E=Sophos;i="5.91,276,1647327600"; 
+   d="scan'208";a="337074922"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2022 22:01:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,276,1647327600"; 
+   d="scan'208";a="578338629"
+Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 03 Jun 2022 22:01:14 -0700
+Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nxLuT-000AER-LN;
+        Sat, 04 Jun 2022 05:01:13 +0000
+Date:   Sat, 4 Jun 2022 13:00:31 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        Steve French <stfrench@microsoft.com>
+Subject: [cifs:for-next 8/8] fs/cifs/dfs_cache.c:1294:2: warning: variable
+ 'ppath' is used uninitialized whenever 'if' condition is false
+Message-ID: <202206041223.Kx81JSQt-lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Otherwise, $(DESTDIR)/sbin doesn't get created until install-data on a
--j1 build and install-exec-hook can fail because it might not exist.
+tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+head:   ef605e86821253d16d47a02ce1f766a461614fef
+commit: ef605e86821253d16d47a02ce1f766a461614fef [8/8] cifs: skip trailing separators of prefix paths
+config: arm-randconfig-c002-20220603 (https://download.01.org/0day-ci/archive/20220604/202206041223.Kx81JSQt-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project b364c76683f8ef241025a9556300778c07b590c2)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm cross compiling tool for clang build
+        # apt-get install binutils-arm-linux-gnueabi
+        git remote add cifs git://git.samba.org/sfrench/cifs-2.6.git
+        git fetch --no-tags cifs for-next
+        git checkout ef605e86821253d16d47a02ce1f766a461614fef
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash fs/cifs/
 
-Steps to reproduce this bug:
-$ autoreconf -i
-$ ./configure
-$ mkdir image
-$ make DESTDIR=image install -j1
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-Signed-off-by: Daniel Parks <danielrparks@ti.com>
----
- Makefile.am | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+All warnings (new ones prefixed by >>):
 
-diff --git a/Makefile.am b/Makefile.am
-index 84dd119..b1444f6 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -1,8 +1,8 @@
- AM_CFLAGS = -Wall -Wextra -D_FORTIFY_SOURCE=2 $(PIE_CFLAGS) $(RELRO_CFLAGS)
- ACLOCAL_AMFLAGS = -I aclocal
- 
--root_sbindir = $(ROOTSBINDIR)
--root_sbin_PROGRAMS = mount.cifs
-+root_exec_sbindir = $(ROOTSBINDIR)
-+root_exec_sbin_PROGRAMS = mount.cifs
- mount_cifs_SOURCES = mount.cifs.c mtab.c resolve_host.c util.c
- mount_cifs_LDADD = $(LIBCAP) $(CAPNG_LDADD) $(RT_LDADD)
- include_HEADERS = cifsidmap.h
+>> fs/cifs/dfs_cache.c:1294:2: warning: variable 'ppath' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+           if (target_pplen || dfsref_pplen) {
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:56:28: note: expanded from macro 'if'
+   #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:58:30: note: expanded from macro '__trace_if_var'
+   #define __trace_if_var(cond) (__builtin_constant_p(cond) ? (cond) : __trace_if_value(cond))
+                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   fs/cifs/dfs_cache.c:1307:12: note: uninitialized use occurs here
+           *prefix = ppath;
+                     ^~~~~
+   fs/cifs/dfs_cache.c:1294:2: note: remove the 'if' if its condition is always true
+           if (target_pplen || dfsref_pplen) {
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler.h:56:23: note: expanded from macro 'if'
+   #define if(cond, ...) if ( __trace_if_var( !!(cond , ## __VA_ARGS__) ) )
+                         ^
+   fs/cifs/dfs_cache.c:1270:28: note: initialize the variable 'ppath' to silence this warning
+           char *target_share, *ppath;
+                                     ^
+                                      = NULL
+   1 warning generated.
+
+
+vim +1294 fs/cifs/dfs_cache.c
+
+  1255	
+  1256	/**
+  1257	 * dfs_cache_get_tgt_share - parse a DFS target
+  1258	 *
+  1259	 * @path: DFS full path
+  1260	 * @it: DFS target iterator.
+  1261	 * @share: tree name.
+  1262	 * @prefix: prefix path.
+  1263	 *
+  1264	 * Return zero if target was parsed correctly, otherwise non-zero.
+  1265	 */
+  1266	int dfs_cache_get_tgt_share(char *path, const struct dfs_cache_tgt_iterator *it, char **share,
+  1267				    char **prefix)
+  1268	{
+  1269		char sep;
+  1270		char *target_share, *ppath;
+  1271		const char *target_ppath, *dfsref_ppath;
+  1272		size_t target_pplen, dfsref_pplen;
+  1273		size_t len, c;
+  1274	
+  1275		if (!it || !path || !share || !prefix || strlen(path) < it->it_path_consumed)
+  1276			return -EINVAL;
+  1277	
+  1278		sep = it->it_name[0];
+  1279		if (sep != '\\' && sep != '/')
+  1280			return -EINVAL;
+  1281	
+  1282		target_ppath = parse_target_share(it->it_name, &target_share);
+  1283		if (IS_ERR(target_ppath))
+  1284			return PTR_ERR(target_ppath);
+  1285	
+  1286		/* point to prefix in DFS referral path */
+  1287		dfsref_ppath = path + it->it_path_consumed;
+  1288		dfsref_ppath += strspn(dfsref_ppath, "/\\");
+  1289	
+  1290		target_pplen = strlen(target_ppath);
+  1291		dfsref_pplen = strlen(dfsref_ppath);
+  1292	
+  1293		/* merge prefix paths from DFS referral path and target node */
+> 1294		if (target_pplen || dfsref_pplen) {
+  1295			len = target_pplen + dfsref_pplen + 2;
+  1296			ppath = kzalloc(len, GFP_KERNEL);
+  1297			if (!ppath) {
+  1298				kfree(target_share);
+  1299				return -ENOMEM;
+  1300			}
+  1301			c = strscpy(ppath, target_ppath, len);
+  1302			if (c && dfsref_pplen)
+  1303				ppath[c] = sep;
+  1304			strlcat(ppath, dfsref_ppath, len);
+  1305		}
+  1306		*share = target_share;
+  1307		*prefix = ppath;
+  1308		return 0;
+  1309	}
+  1310	
+
 -- 
-2.17.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
