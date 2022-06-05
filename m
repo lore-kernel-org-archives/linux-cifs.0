@@ -2,140 +2,130 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D49C43334
-	for <linux-cifs@archiver.kernel.org>; Sun,  5 Jun 2022 11:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B03C43334
+	for <linux-cifs@archiver.kernel.org>; Sun,  5 Jun 2022 22:55:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241156AbiFELB0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 5 Jun 2022 07:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43118 "EHLO
+        id S1348554AbiFEWzA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 5 Jun 2022 18:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232695AbiFELBZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 5 Jun 2022 07:01:25 -0400
-Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B56322FE4E
-        for <linux-cifs@vger.kernel.org>; Sun,  5 Jun 2022 04:01:23 -0700 (PDT)
-Received: by mail-vs1-xe2f.google.com with SMTP id k4so11387339vsp.3
-        for <linux-cifs@vger.kernel.org>; Sun, 05 Jun 2022 04:01:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=T57DzE1a+rfHF5vwDlZCSjEzhalOom7Y2d/yaDhAOXg=;
-        b=nhmjt3/5UkoVNe0yRgNoH4HALatrcvrtokQSksaQy824x8qi6oMjW2lSZ3i3pT1YIM
-         Wu5+KXgoygidyhF22vroer152RlGd6oIBpr74VCe1jX2vyc3a8KpTiOqGqamXPvtKcos
-         Lk32zGXioR9CBe55GR5jGgijHa+pVfhWmc6mP9ML6ijCNkeYJd7hLOJMdd95y5lyRsR1
-         UUQ2fPGTEInpj/i+4hh+sRztEJECqR9vJA/JgTU+6GsYZ3zH2Fyz1TQyAnc41idvEkR2
-         Hak90lFb/cizHbsgleFXuwRm/8u6LiDJ7lJ4NuVKDBmtB4KJ9yWlPELSt0wluqhyCX5g
-         T0hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=T57DzE1a+rfHF5vwDlZCSjEzhalOom7Y2d/yaDhAOXg=;
-        b=55QX+J2u6hPjXhnGiriNgWZLOeWu9l3xjwzDCui+ze2zHiMqvMVPd2aIL8laUlKVpr
-         mw3lxzXSbgjDIBTuTNwBIB7YMJwykF2asGzeTkzqHn2rIHGo5frLUaagqd8bwxH3HbhY
-         TpjHb7xcz/AZxNxNF7VSZp4pn8WRm2cPFmbgE9M3A4ALamlA9TfqRwTtHwF0kNOG9mJa
-         MNX9nO9/YQJxFriy2o4XYfJL7cB9i4a0r2UKJ+8nEtBnPM8PJxn78tEXSNd1p0RmPOH3
-         TUFG/lwTd06Vsl90WIIS8JLC9EnJkLaQvP15aCBcXuQZALc9ohd3K6aj60K8jkkLhxoV
-         IgdQ==
-X-Gm-Message-State: AOAM531EnGfYjrPa/OC6jmleztz3QDpRblw3wg0Ob5qn5l0XN9RdkSEU
-        Zfq7cfVPxu9nKdLX7T2kQowhOiLgaFCsmqSfRUw=
-X-Google-Smtp-Source: ABdhPJyVyIS3nOKCqX5thnZgmcpLDJkLRQ7w20lDFFUYm+9mr8W1CFAWvPgAK859/Is9UCCxD08O1V/jkU6BQCirZg4=
-X-Received: by 2002:a67:df98:0:b0:320:8446:7c6d with SMTP id
- x24-20020a67df98000000b0032084467c6dmr35264162vsk.16.1654426882308; Sun, 05
- Jun 2022 04:01:22 -0700 (PDT)
+        with ESMTP id S234832AbiFEWy7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 5 Jun 2022 18:54:59 -0400
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E072E4EDD9
+        for <linux-cifs@vger.kernel.org>; Sun,  5 Jun 2022 15:54:57 -0700 (PDT)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 1D6E57FC20;
+        Sun,  5 Jun 2022 22:54:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1654469695;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=e+5HFztMcF2H4tNI9LMWNI/bz5LaJU8OGJLFN8iLSJ0=;
+        b=hK2CVFyoD/ZsTZuHosl0M3smMOWOqDGqso8pNm4m3Ik70sTwvAGyWzTPsFENelU2DtU0Ng
+        hAv1Z0EY8hpgxAt2t5wh7DuOVutDDsLLTNa4F/s+u9NIqV0iJEj7xFXwHIN4HyTDus7B9s
+        Cvbmo5cLoiiH/dIO1tAP39yyDI+YZK7474ZdU0fmWvnxh32lKb8x8AMI8pKd5TRPJzNJgT
+        05pDY1bnp723O/IfRwwO8xIHVWqjEEyJa0RQpDlSh3gU4DQRIl26yXlfG5rugmoJkCuWQJ
+        dhmJ8to3Kycxdg/RIqz4W11Cfi/1wc1uaDWdmtUMxU6yV3PVBoDq9WnLWKXg7A==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>,
+        Satadru Pramanik <satadru@gmail.com>
+Subject: [PATCH] cifs: fix reconnect on smb3 mount types
+Date:   Sun,  5 Jun 2022 19:54:26 -0300
+Message-Id: <20220605225426.8558-1-pc@cjr.nz>
 MIME-Version: 1.0
-References: <CAFrh3J9soC36+BVuwHB=g9z_KB5Og2+p2_W+BBoBOZveErz14w@mail.gmail.com>
- <87k09wz0ec.fsf@cjr.nz> <CAFrh3J9Mrnw0bhJ-S3wYoZfNkKB-QjcLa5=r+vXMNudZ+zATFA@mail.gmail.com>
-In-Reply-To: <CAFrh3J9Mrnw0bhJ-S3wYoZfNkKB-QjcLa5=r+vXMNudZ+zATFA@mail.gmail.com>
-From:   Satadru Pramanik <satadru@gmail.com>
-Date:   Sun, 5 Jun 2022 07:01:10 -0400
-Message-ID: <CAFrh3J8c5cLhDpbDxOCL0XOx_UAN23_hnhMRy+NLqmRSC46rGQ@mail.gmail.com>
-Subject: Re: Failure to access cifs mount of samba share after resume from
- sleep with 5.17-rc5
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Thorsten Leemhuis <regressions@leemhuis.info>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I can confirm that the patch fixes the issue on 5.18.1 as well.
+cifs.ko defines two file system types: cifs & smb3, and
+__cifs_get_super() was not including smb3 file system type when
+looking up superblocks, therefore failing to reconnect tcons in
+cifs_tree_connect().
 
-Thanks again!
+Fix this by calling iterate_supers_type() on both file system types.
 
-Satadru
+Link: https://lore.kernel.org/r/CAFrh3J9soC36+BVuwHB=g9z_KB5Og2+p2_W+BBoBOZveErz14w@mail.gmail.com
+Reported-by: Satadru Pramanik <satadru@gmail.com>
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+---
+ fs/cifs/cifsfs.c |  2 +-
+ fs/cifs/cifsfs.h |  2 +-
+ fs/cifs/misc.c   | 27 ++++++++++++++++-----------
+ 3 files changed, 18 insertions(+), 13 deletions(-)
 
-On Sat, Jun 4, 2022 at 10:31 PM Satadru Pramanik <satadru@gmail.com> wrote:
->
-> The patch appears to fix the issue on the problematic bisected
-> pre-5.16 kernel. (I let the machine sleep for 3 hours and the mount
-> still worked after resume.)
->
-> I'm now booted into a 5.18.1 kernel with this patch, and I'll be able
-> to tell tomorrow morning if this also resolves the issue with this
-> newer kernel.
->
-> Thanks for the help in getting this issue resolved!
->
-> Regards,
->
-> Satadru
->
-> On Sat, Jun 4, 2022 at 3:36 PM Paulo Alcantara <pc@cjr.nz> wrote:
-> >
-> > Hi Satadru,
-> >
-> > Thanks for providing all requested files off-list.  With that, I ended
-> > up with below changes that should fix your issue.  Please let us if it
-> > works.
-> >
-> > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> > index 12c872800326..325423180fd2 100644
-> > --- a/fs/cifs/cifsfs.c
-> > +++ b/fs/cifs/cifsfs.c
-> > @@ -1086,7 +1086,7 @@ struct file_system_type cifs_fs_type = {
-> >  };
-> >  MODULE_ALIAS_FS("cifs");
-> >
-> > -static struct file_system_type smb3_fs_type = {
-> > +struct file_system_type smb3_fs_type = {
-> >         .owner = THIS_MODULE,
-> >         .name = "smb3",
-> >         .init_fs_context = smb3_init_fs_context,
-> > diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-> > index dd7e070ca243..b17be47a8e59 100644
-> > --- a/fs/cifs/cifsfs.h
-> > +++ b/fs/cifs/cifsfs.h
-> > @@ -38,7 +38,7 @@ static inline unsigned long cifs_get_time(struct dentry *dentry)
-> >         return (unsigned long) dentry->d_fsdata;
-> >  }
-> >
-> > -extern struct file_system_type cifs_fs_type;
-> > +extern struct file_system_type cifs_fs_type, smb3_fs_type;
-> >  extern const struct address_space_operations cifs_addr_ops;
-> >  extern const struct address_space_operations cifs_addr_ops_smallbuf;
-> >
-> > diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> > index 35962a1a23b9..eeb2a2957a68 100644
-> > --- a/fs/cifs/misc.c
-> > +++ b/fs/cifs/misc.c
-> > @@ -1211,8 +1211,12 @@ static struct super_block *__cifs_get_super(void (*f)(struct super_block *, void
-> >                 .data = data,
-> >                 .sb = NULL,
-> >         };
-> > +       struct file_system_type **fs_type = (struct file_system_type *[]) {
-> > +               &cifs_fs_type, &smb3_fs_type, NULL,
-> > +       };
-> >
-> > -       iterate_supers_type(&cifs_fs_type, f, &sd);
-> > +       for (; *fs_type; fs_type++)
-> > +               iterate_supers_type(*fs_type, f, &sd);
-> >
-> >         if (!sd.sb)
-> >                 return ERR_PTR(-EINVAL);
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 12c872800326..325423180fd2 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1086,7 +1086,7 @@ struct file_system_type cifs_fs_type = {
+ };
+ MODULE_ALIAS_FS("cifs");
+ 
+-static struct file_system_type smb3_fs_type = {
++struct file_system_type smb3_fs_type = {
+ 	.owner = THIS_MODULE,
+ 	.name = "smb3",
+ 	.init_fs_context = smb3_init_fs_context,
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index dd7e070ca243..b17be47a8e59 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -38,7 +38,7 @@ static inline unsigned long cifs_get_time(struct dentry *dentry)
+ 	return (unsigned long) dentry->d_fsdata;
+ }
+ 
+-extern struct file_system_type cifs_fs_type;
++extern struct file_system_type cifs_fs_type, smb3_fs_type;
+ extern const struct address_space_operations cifs_addr_ops;
+ extern const struct address_space_operations cifs_addr_ops_smallbuf;
+ 
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 35962a1a23b9..8e67a2d406ab 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1211,18 +1211,23 @@ static struct super_block *__cifs_get_super(void (*f)(struct super_block *, void
+ 		.data = data,
+ 		.sb = NULL,
+ 	};
++	struct file_system_type **fs_type = (struct file_system_type *[]) {
++		&cifs_fs_type, &smb3_fs_type, NULL,
++	};
+ 
+-	iterate_supers_type(&cifs_fs_type, f, &sd);
+-
+-	if (!sd.sb)
+-		return ERR_PTR(-EINVAL);
+-	/*
+-	 * Grab an active reference in order to prevent automounts (DFS links)
+-	 * of expiring and then freeing up our cifs superblock pointer while
+-	 * we're doing failover.
+-	 */
+-	cifs_sb_active(sd.sb);
+-	return sd.sb;
++	for (; *fs_type; fs_type++) {
++		iterate_supers_type(*fs_type, f, &sd);
++		if (sd.sb) {
++			/*
++			 * Grab an active reference in order to prevent automounts (DFS links)
++			 * of expiring and then freeing up our cifs superblock pointer while
++			 * we're doing failover.
++			 */
++			cifs_sb_active(sd.sb);
++			return sd.sb;
++		}
++	}
++	return ERR_PTR(-EINVAL);
+ }
+ 
+ static void __cifs_put_super(struct super_block *sb)
+-- 
+2.36.1
+
