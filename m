@@ -2,47 +2,47 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A85DCCA481
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jun 2022 18:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 416B8CCA47C
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jun 2022 18:52:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353945AbiFGSsw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 Jun 2022 14:48:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58434 "EHLO
+        id S1353477AbiFGSv6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 Jun 2022 14:51:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354489AbiFGSrE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Jun 2022 14:47:04 -0400
+        with ESMTP id S1354131AbiFGSqg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Jun 2022 14:46:36 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0486D85C;
-        Tue,  7 Jun 2022 11:01:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2575E11E1D1;
+        Tue,  7 Jun 2022 11:00:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 51F3DB82354;
-        Tue,  7 Jun 2022 18:01:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EDE9C341C0;
-        Tue,  7 Jun 2022 18:01:28 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3EC74B81F38;
+        Tue,  7 Jun 2022 18:00:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09635C341C0;
+        Tue,  7 Jun 2022 18:00:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654624889;
-        bh=8XodZh5sCr/MfT0L5lf3vACVky82khXDRn8yFleVMQg=;
+        s=k20201202; t=1654624806;
+        bh=zv3owzUG00DKulByraUxelOJux4WspHORee8slLRpPU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OD3o1WcN1UvUCdrLdvPpqdONNURHqUPs51AvHuA75WnwfugfPDD5M4Mtwj1zfC3DC
-         GkOAiFWm+Dox2UxiAbQmHtUCKUUFy0QVirV3CerBhQZ06G9VnFxPk9trG5e5E9G7Sk
-         FLrPzkgspY3T8groDOBUNyUO7edF7wlTDGl5VDv9qk2pB1oB6GIRijkwrwK2fzrVL3
-         peJhKH2/qLhP3muZf6c041ZFVX71DYBEfQL1ySG+3POPM58BUrzIWwHwgyqlO3GPKH
-         uByRdBTM1ai+zdeuz/T9MdTgXLO24egXNxk2SK5KoTIxMt8xPwqrGA3ZlXaq2dACM7
-         rV72Hq6m9aOcA==
+        b=mgNvY3sVikg/dLGCrncvscQssptZkYAXW9/hH73G30Zwcsj93CSIaZWiEOknp0sI5
+         q1Zbxjsjjw1BA76KgtY2LJw0zuKGoNI3n5XRAxIROfJFKMe/eM1K8RBfO9yoBJmsBw
+         R84tzgPBDa3BfGFIQRU4UY2IppdVbxfI2bfdNW0qtBxJX09sz06fRz1quEPTLr/RK8
+         bgC3vEgpWnd8EPMx8sUgKBwrsCoLATTxjn4qS4BK72ON1NF2AnV/YdmBcMCWm4N1VK
+         K+Cn6Jy/3yA8dBVx8OF/StuWWIZzSekm89bP8xm0WNDmgOaZkgKMdZ/UG2R3CobcCg
+         QZqrlv2HBcKiQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Steve French <stfrench@microsoft.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 33/34] cifs: version operations for smb20 unneeded when legacy support disabled
-Date:   Tue,  7 Jun 2022 14:00:08 -0400
-Message-Id: <20220607180011.481266-33-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 37/38] cifs: version operations for smb20 unneeded when legacy support disabled
+Date:   Tue,  7 Jun 2022 13:58:32 -0400
+Message-Id: <20220607175835.480735-37-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220607180011.481266-1-sashal@kernel.org>
-References: <20220607180011.481266-1-sashal@kernel.org>
+In-Reply-To: <20220607175835.480735-1-sashal@kernel.org>
+References: <20220607175835.480735-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 9c0e348cb00f..414936989255 100644
+index 6599069be690..196285b0fe46 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -1930,11 +1930,13 @@ extern mempool_t *cifs_mid_poolp;
+@@ -1982,11 +1982,13 @@ extern mempool_t *cifs_mid_poolp;
  
  /* Operations for different SMB versions */
  #define SMB1_VERSION_STRING	"1.0"
@@ -89,10 +89,10 @@ index 9c0e348cb00f..414936989255 100644
  extern struct smb_version_operations smb21_operations;
  extern struct smb_version_values smb21_values;
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 7985fe25850b..57164563eec6 100644
+index c758ff41b638..ece8969de850 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -3487,11 +3487,13 @@ smb3_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
+@@ -4032,11 +4032,13 @@ smb3_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
  	}
  }
  
@@ -106,7 +106,7 @@ index 7985fe25850b..57164563eec6 100644
  
  static bool
  smb21_is_read_op(__u32 oplock)
-@@ -4573,7 +4575,7 @@ smb2_make_node(unsigned int xid, struct inode *inode,
+@@ -5122,7 +5124,7 @@ smb2_make_node(unsigned int xid, struct inode *inode,
  	return rc;
  }
  
@@ -115,23 +115,23 @@ index 7985fe25850b..57164563eec6 100644
  struct smb_version_operations smb20_operations = {
  	.compare_fids = smb2_compare_fids,
  	.setup_request = smb2_setup_request,
-@@ -4670,6 +4672,7 @@ struct smb_version_operations smb20_operations = {
- 	.fiemap = smb3_fiemap,
+@@ -5220,6 +5222,7 @@ struct smb_version_operations smb20_operations = {
  	.llseek = smb3_llseek,
+ 	.is_status_io_timeout = smb2_is_status_io_timeout,
  };
 +#endif /* CIFS_ALLOW_INSECURE_LEGACY */
  
  struct smb_version_operations smb21_operations = {
  	.compare_fids = smb2_compare_fids,
-@@ -4987,6 +4990,7 @@ struct smb_version_operations smb311_operations = {
- 	.llseek = smb3_llseek,
+@@ -5548,6 +5551,7 @@ struct smb_version_operations smb311_operations = {
+ 	.is_status_io_timeout = smb2_is_status_io_timeout,
  };
  
 +#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
  struct smb_version_values smb20_values = {
  	.version_string = SMB20_VERSION_STRING,
  	.protocol_id = SMB20_PROT_ID,
-@@ -5007,6 +5011,7 @@ struct smb_version_values smb20_values = {
+@@ -5568,6 +5572,7 @@ struct smb_version_values smb20_values = {
  	.signing_required = SMB2_NEGOTIATE_SIGNING_REQUIRED,
  	.create_lease_size = sizeof(struct create_lease),
  };
