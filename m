@@ -2,147 +2,197 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA21C3F2D4
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jun 2022 14:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E052C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jun 2022 17:33:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245292AbiFGOWc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 Jun 2022 10:22:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57360 "EHLO
+        id S1347085AbiFGRc5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 Jun 2022 13:32:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238699AbiFGOWb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Jun 2022 10:22:31 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45468C9655;
-        Tue,  7 Jun 2022 07:22:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8D455B82024;
-        Tue,  7 Jun 2022 14:22:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32A7EC36AFE;
-        Tue,  7 Jun 2022 14:22:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654611747;
-        bh=cdW6Y4w/Alw2MtSKkp2MAQF/yoWm8bl718vnVRc2CbY=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=bW/FLgr1LyhV3jDbHxzsrvCo4c0sgFl1RlLreeNJ94XDaY0R2juLz5c6aU66y+pqd
-         YI85rwNd49jnBrmgaJsFDeXMRC8G8L3TMUluWMlCK5l0vwBbvr9ariZ/agcqwoMPUS
-         zebvvWklShjshP/h6qFsn/fbY9bednjgc1++mUCbA4laS3flarG5b9v8oaHTdZoOgC
-         HlaioDJyKxqa/9Sbiib7zNunrLv/XPtkQMIxwGWHS5CU6D/FsoNl40otFpVMLlVUUr
-         EObl+mpzXagwyC6EV8k8sTp4WYp1hKUCYuJ4zboACApQNCOZKCegxlcjOGeT7NxvzN
-         FJbis+kWnT77A==
-Received: by mail-wr1-f47.google.com with SMTP id q26so14034573wra.1;
-        Tue, 07 Jun 2022 07:22:27 -0700 (PDT)
-X-Gm-Message-State: AOAM530UgUzsfDR35bNSomB+WmLQMab2Dx0CdJi4koO2JJCo5QIZUCeI
-        XSWq7nYLqBBxqBUpdM77PduQCJzSBKbSbUV9zJY=
-X-Google-Smtp-Source: ABdhPJx+rv87thEe0EVZFgAZYv9Q7r/BhNorSt4RG0j/nTusqQT2mh9ZwbUgh+4BipT2bndYTCgds2+cXyAAxgI3gZc=
-X-Received: by 2002:a5d:4a85:0:b0:215:ae89:5925 with SMTP id
- o5-20020a5d4a85000000b00215ae895925mr19144535wrq.401.1654611745462; Tue, 07
- Jun 2022 07:22:25 -0700 (PDT)
+        with ESMTP id S1347465AbiFGRaq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Jun 2022 13:30:46 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2089.outbound.protection.outlook.com [40.107.220.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C761A1116FE
+        for <linux-cifs@vger.kernel.org>; Tue,  7 Jun 2022 10:26:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CRh2hjKc4Ib0hrh1I0r9ixMv3R/kAl9ZePILqIsdZ1JaE5DRxplhT5kp5achNdycCCnCDIbB+H81LrLbW6GPMjNApYGfYzDChhvW8dlcWzBDQkO3N0NAqZbcw2S5e3yUnyz8U/lalGMjMjjhXMOugn8A+SzsA71j1b0Sv0QRizQ/xa/ZicKkBeC5/i94xIonW1OMbKQRFpVMSTLRNrgPXECC2a7FjuluRFd39XsXPYYDdCoV38ZcidNfe9KUpGVWYWJjmSXSYgla1nN/kXYPkq+HZKLry4EssvZU9RhN/G4ywLD9f9fHeKx1YZFDH51TNrf4wfRm9GdJAMmHzQDBqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=55U4ARvbI+wY/8JmFZTRWqBBz7kI5FxyMKY9uAUHWdM=;
+ b=UKN8U5/qtVKgThDB7XW7YGdVMPVxzV+x0CvD2fLASYiGN2rNZ119H6C0YvnefoZnfUZRylm91XJNfZ2Pi2XBYQmTMbNMbv6eDHF34YI0IlF9NAs+cia4ljcEpUiBvwrPyiFCF8yrK0GlqDIt2pG2j8KOI4wLj0nGof/Br7LYcPLTZtkURlqxOf9xkAj+T/bgbhRZZJzcCykd72G/Zwdy+Qujo/IJLIrVyZfKsN/v/DcVTuX3LZC1qMcsqUyBi7H1TcAOpyYFnrPio5Z88W3DtJ7HhkMWbGmtke+Gj/PzAwOHZRv3mSZwLqOIlQRHWM9lFD4jjDtR+2q1HvbxP1kRhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ MWHPR01MB2813.prod.exchangelabs.com (2603:10b6:300:f4::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5314.12; Tue, 7 Jun 2022 17:26:48 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::d478:8cfd:21ee:776f]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::d478:8cfd:21ee:776f%7]) with mapi id 15.20.5314.019; Tue, 7 Jun 2022
+ 17:26:48 +0000
+Message-ID: <82a4f87f-202f-2032-1380-8d58c6af9761@talpey.com>
+Date:   Tue, 7 Jun 2022 13:26:46 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: RDMA (smbdirect) testing
+Content-Language: en-US
+To:     Long Li <longli@microsoft.com>, linkinjeon <linkinjeon@kernel.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+References: <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com>
+ <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
+ <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
+ <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com>
+ <84589.1653070372@warthog.procyon.org.uk>
+ <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
+ <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
+ <dba1ce95-8a72-11ec-ee29-3643623c9928@talpey.com>
+ <CAKYAXd-PezRG4i-7DCiNAMQ0H9DsX-aDxD1rJavEzCmMa179xg@mail.gmail.com>
+ <307f1f2c-900b-8158-78a8-a3dd7564f2f8@talpey.com>
+ <PH7PR21MB326344B83D7B4300683D2CEACED49@PH7PR21MB3263.namprd21.prod.outlook.com>
+ <CAKYAXd861-sVicu3L-7QdctEZYfDtV5p=1t5E=gpr3e2Y3s2dQ@mail.gmail.com>
+ <PH7PR21MB3263E3978006A32714AE5357CED79@PH7PR21MB3263.namprd21.prod.outlook.com>
+ <CAKYAXd9SZQPkxO9TshgbHGbwzaDN1Hz6dhT-pNDYpD3icjB4HA@mail.gmail.com>
+ <PH7PR21MB32638DEF77D5B541B3F0858CCEA19@PH7PR21MB3263.namprd21.prod.outlook.com>
+From:   Tom Talpey <tom@talpey.com>
+In-Reply-To: <PH7PR21MB32638DEF77D5B541B3F0858CCEA19@PH7PR21MB3263.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1PR13CA0432.namprd13.prod.outlook.com
+ (2603:10b6:208:2c3::17) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
 MIME-Version: 1.0
-Received: by 2002:a5d:4c4a:0:0:0:0:0 with HTTP; Tue, 7 Jun 2022 07:22:24 -0700 (PDT)
-In-Reply-To: <20220606134608.684131-1-amir73il@gmail.com>
-References: <20220606134608.684131-1-amir73il@gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 7 Jun 2022 23:22:24 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_JguZBb51LCdR8OAUmKuCtKOTJFw1WLE8J2Y_ajXXa5Q@mail.gmail.com>
-Message-ID: <CAKYAXd_JguZBb51LCdR8OAUmKuCtKOTJFw1WLE8J2Y_ajXXa5Q@mail.gmail.com>
-Subject: Re: [PATCH v14] vfs: fix copy_file_range() regression in cross-fs copies
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
-        Luis Henriques <lhenriques@suse.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        He Zhe <zhe.he@windriver.com>,
-        Paul Gortmaker <paul.gortmaker@windriver.com>,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Luis Henriques <lhenriques@suse.de>,
-        Nicolas Boichat <drinkcat@chromium.org>,
-        kernel test robot <oliver.sang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 281c85a4-a90d-4bb6-a9aa-08da48aae6f4
+X-MS-TrafficTypeDiagnostic: MWHPR01MB2813:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR01MB281396373B7CB6C7BD5BFFF2D6A59@MWHPR01MB2813.prod.exchangelabs.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IJZmIfgiqmNWxc/RXCvJNBAfOw5lNBMq8z2G9o5GGxBODgiUbD5AvpaIauRhbHLPC3WgT9qKRUoOq6vK0Ni3TVYbLQPsVHdJb3Nwm4zLxJoweH0+W3mgBgd/CDCO1f/Yn0ifWnfu6w25kveA+x/s3EprzDgfsx4yKnhqsP7E3GLDieIV8DifaXyINCpKGRDr/TLToNFMwmBrNYntPS5tYnrWvcdoSAFudLCYO/uJJnDNw+wxoMvizPxoOTn/iIRuEMUTQHKNKUzNrBcBQ6uDcxJVEIVEnaCWn12Fu0+YBeJ2o7JllnkBnY56+Aubcg7J5/CJ1w/r5wmcbejIIsMjuAHAJIlRxZprYCLjE5YU1QdhxjzvPKOOUFEJTlbSqay0wdor7mA1imzr5a8cWj41lUC5vQ/mYHlt7UthsXUf+ec8jNcfjCTbmhFIBsYq1d8NCFxOY/PP2JhhVMJg3ghxVVY2f1A6K9FLiJAEySTs87Nj0YgZiRvjnvCtbXZP9kw3mGIDkbk2yE+Wh4dVQZATrFTyO2BWjMKgqjvaShCag2S9+fWapKfNfL5HDU1G0a/LbCaMmuMARJshxKx6DYBHiOYrk5xNX8pDyLU+qFl724LZjDd0YxFjbjGt0cNkl4g/J4tXHgtlWBkiOQGEzr6r6vLfxylA2Oe6p1Q/SNSUpukN8htIPliHjXhQG+3RZ2fvEeR9IrxhdrTYq5kS8nFEu8NK1Q7dQZcJ8W/tYMHqw9I=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230001)(39830400003)(396003)(346002)(136003)(366004)(8936002)(6486002)(110136005)(316002)(54906003)(66946007)(8676002)(4326008)(31696002)(52116002)(66476007)(2906002)(86362001)(53546011)(36756003)(66556008)(83380400001)(6506007)(6512007)(26005)(5660300002)(38350700002)(31686004)(2616005)(186003)(41300700001)(38100700002)(508600001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TC9NaUd1YTA1RTVSUUNyOFNhWHRRaHV3WGtHTDlHdFMyWWJHUDJKRnhCRjVn?=
+ =?utf-8?B?ZmxQRERueFF0MUI0Rkx4TGdUUXVrVnBmT2xoQUt6UitFWDhJY2ZVdFRBSnpL?=
+ =?utf-8?B?VXhvMzV6WjAvem9FVi9RVkFMT0ZIU3ZRWUl1Q29qMFpJRmRPRjRmbWU3QXU0?=
+ =?utf-8?B?enRObktJNk5IaUthK2k1S3FOZC9KR1ZsSFlrQ2s0TVJ5RGRXU1llMlZwa0tY?=
+ =?utf-8?B?QUdhUjFEeSsxVk56R29ob1BXSFFtZmpaUDB0eWdnWlpjSkVpOElDcWsxMW12?=
+ =?utf-8?B?OFlDVkJHejY2UmNoOFBqZjh4QTFRWVdWZlVkSjkreDZ3VEhnRzZXbmRPd1R1?=
+ =?utf-8?B?UWlaQm1nV1FNYVM4cFdrbmVTamRnaE5URGVCcUtEa3ZjQllNQWw5YzZrOXdT?=
+ =?utf-8?B?UGhoVjhtQ0hBTFNzWmdhOVdSTi9NaTZPanF6S3FBVHYrL0kvMUhMSUN1SWdp?=
+ =?utf-8?B?S0oyUTdtdXZObHhXNllndDgwRzF2Y2lkNmRGUWJSOXNaS09lQU1UK3plTVlH?=
+ =?utf-8?B?andaL1pUaFFTbXprdFp0RDROeHpFZHdYMkJMVWRHcE9XT3EwWm5iRGJ1RVBF?=
+ =?utf-8?B?bDdyTEQxMUFKT3pEWEM4ZUo0R0g2dkt2K3JYN1Y0YVZ4eDk5OWhnb09uY2JN?=
+ =?utf-8?B?YlNEeDFrNWIwejVhYjB1ekJBaHVFdTRnYlp5VjcvS2RRTHg3eUExZmVHWDlY?=
+ =?utf-8?B?K0FTYko0WkJxUzgwWThORW1EV0F3Szl1cDgrdHkzaW5BU3RrOVNEbHVCaWZ0?=
+ =?utf-8?B?cnpuUHZTUjBmV29MaklVUTdLV2QyOWdrNTh3K3RqUU53R1l5NTVLa056TEJW?=
+ =?utf-8?B?SHhXbzQ0YmxZdUxSc01DRFVxaFFuMHRyRmV2VFlFRW5HNTJtWWFhdElwWXA1?=
+ =?utf-8?B?UkpKRm84aW5GVi9EdHFWODNKNGZGUnFpSUxlWjJnR3A3VHEzRkFiK1dKV2My?=
+ =?utf-8?B?bXBYNlZkTWlSVldxZEtZdWY3dHpjc09XQ2pWbDdPaFdmZTExOVdYMlZGWThO?=
+ =?utf-8?B?aVF6RWFRbjRIcTBYR2JLTndRcGxKTnlOY0dqbTZ5N2VqYlN4eDg4b2N1M3Zj?=
+ =?utf-8?B?SVptVkQ5anc4cE1IY0ZqNVBUSk5OYTJ4SGMxT3BNWStPQ2Fhcm5NMkdoTmtN?=
+ =?utf-8?B?ZW5sbnNpaXprZmNzSS9La0xLdmxMemNDL2w4YXVjMFpzQndtYi9KOTY1TmMz?=
+ =?utf-8?B?eE9CU3d5Y1dQUnpYM051NURQWjlmRHF2MGFOcnFnanhhQno2YzlSYjBoSmZy?=
+ =?utf-8?B?YkM0cGJZRWpaTmRnZnFFaktycVdpekFxTFNlRG5pdFhZMkh4WUhaN3B2OWlX?=
+ =?utf-8?B?djVKd2ppWUxiOWJ0ckZzTnJKd0VnMlJWdzFSeGhBUHJ5OVFVTmJFNlVYN0dk?=
+ =?utf-8?B?cnVSdi9Jd0l0ZVJvQ2JoRFNyNG5GM3Yvb0I3bEVDQThYZUZncm1tamN2bHJM?=
+ =?utf-8?B?dGswZjZEdGo5TlN3Mk9pR3l1aVY5MGg2UDV5QUxMZ3NzQ0F0eUFna2tBbWp5?=
+ =?utf-8?B?S2hTQisxblVwLytLSDJtaXFjakxMaUIzRFMyRVh5Q1llTHJvdjhtZURydmJO?=
+ =?utf-8?B?QnVjMkF4cndSTGlqVjRhdDhGL1lSNmkwdXNISjk3K0RkaDlaQkFPZEpDWEN2?=
+ =?utf-8?B?Nzd2c3Z1VFJIVEozRlQxSTljS1lkRHlwMEJMTHgzRHlQd3pJTTFyNENleFBL?=
+ =?utf-8?B?akV3c1VGZ2xpWWcxWUtkbGRoQXk5VVIvVTVSOElBTUViOEpYemRVT01KcmJy?=
+ =?utf-8?B?anhCWFV2eEhJd1ducTVmYmdWN0M0NGIwNUNZZzF1SXpRT0VnVm1ad09lZFRH?=
+ =?utf-8?B?blF5a2hzUEYrbmdpVVhtRUpQMjVpbm5WU3IvMldOVklTY2l5U3FjMGNFeWs2?=
+ =?utf-8?B?amF0amxSaVYrY1p2aEUxdHpkbnN6WjlSbzBndkNwQ2x4Nk9qcVprY2czdmJ1?=
+ =?utf-8?B?Mk5lUC9lUzltVmEvTlVDc2dPWm1YRkZiZUI0dVlBU3NRdkloS2NrcXJpRDhw?=
+ =?utf-8?B?aVlsWXQrZnlrQ200M3dpcTFNWkpma2JJelFkbGJDWEQ5eXA4ZE9ad05NVDZQ?=
+ =?utf-8?B?RjF3WEFCbmVXM01KWGFESnZTZTI3SERyd05tK0lWakNoRCtCdzZ4eWFnSExm?=
+ =?utf-8?B?NkxMSlIvK3k0bVA4UTlHalB0NVhKaGRQRTFKWklVTXU0eUJQbzBWWmlQbWZH?=
+ =?utf-8?B?TUVoWGYzVzdmbXp2MThVdTA2eDBwZUM5TFRqNnRkaGRVWEk3RVJGQXRIWkNZ?=
+ =?utf-8?B?bjZ5UEJhczFTblUvUDEwZ2lXNDVoZTUvTm5JNzh1dFVSMHhCc1RlNkN2M1di?=
+ =?utf-8?Q?IxOLOuguDp5ad7X8ir?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 281c85a4-a90d-4bb6-a9aa-08da48aae6f4
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2022 17:26:48.5436
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Nrm1+sAgp2l2sEIN/JZzIdU4oeufF1q+fOtJgr8TlCLagIe8l1CbD8rVdcfictcV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR01MB2813
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-06-06 22:46 GMT+09:00, Amir Goldstein <amir73il@gmail.com>:
-> From: Luis Henriques <lhenriques@suse.de>
->
-> A regression has been reported by Nicolas Boichat, found while using the
-> copy_file_range syscall to copy a tracefs file.  Before commit
-> 5dae222a5ff0 ("vfs: allow copy_file_range to copy across devices") the
-> kernel would return -EXDEV to userspace when trying to copy a file across
-> different filesystems.  After this commit, the syscall doesn't fail anymore
-> and instead returns zero (zero bytes copied), as this file's content is
-> generated on-the-fly and thus reports a size of zero.
->
-> Another regression has been reported by He Zhe - the assertion of
-> WARN_ON_ONCE(ret == -EOPNOTSUPP) can be triggered from userspace when
-> copying from a sysfs file whose read operation may return -EOPNOTSUPP.
->
-> Since we do not have test coverage for copy_file_range() between any
-> two types of filesystems, the best way to avoid these sort of issues
-> in the future is for the kernel to be more picky about filesystems that
-> are allowed to do copy_file_range().
->
-> This patch restores some cross-filesystem copy restrictions that existed
-> prior to commit 5dae222a5ff0 ("vfs: allow copy_file_range to copy across
-> devices"), namely, cross-sb copy is not allowed for filesystems that do
-> not implement ->copy_file_range().
->
-> Filesystems that do implement ->copy_file_range() have full control of
-> the result - if this method returns an error, the error is returned to
-> the user.  Before this change this was only true for fs that did not
-> implement the ->remap_file_range() operation (i.e. nfsv3).
->
-> Filesystems that implement only ->remap_file_range() (i.e. xfs) may still
-> fall-back to the generic_copy_file_range() implementation when the copy
-> is within the same sb, but filesystem cannot handle the reuqested copied
-> range.  This helps the kernel can maintain a more consistent story about
-> which filesystems support copy_file_range().
->
-> nfsd and ksmbd servers are modified to fall-back to the
-> generic_copy_file_range() implementation in case vfs_copy_file_range()
-> fails with -EOPNOTSUPP or -EXDEV, which preserves behavior of
-> server-side-copy.
->
-> fall-back to generic_copy_file_range() is not implemented for the smb
-> operation FSCTL_DUPLICATE_EXTENTS_TO_FILE, which is arguably a correct
-> change of behavior.
->
-> Fixes: 5dae222a5ff0 ("vfs: allow copy_file_range to copy across devices")
-> Link:
-> https://lore.kernel.org/linux-fsdevel/20210212044405.4120619-1-drinkcat@chromium.org/
-> Link:
-> https://lore.kernel.org/linux-fsdevel/CANMq1KDZuxir2LM5jOTm0xx+BnvW=ZmpsG47CyHFJwnw7zSX6Q@mail.gmail.com/
-> Link:
-> https://lore.kernel.org/linux-fsdevel/20210126135012.1.If45b7cdc3ff707bc1efa17f5366057d60603c45f@changeid/
-> Link:
-> https://lore.kernel.org/linux-fsdevel/20210630161320.29006-1-lhenriques@suse.de/
-> Reported-by: Nicolas Boichat <drinkcat@chromium.org>
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> Signed-off-by: Luis Henriques <lhenriques@suse.de>
-> Fixes: 64bf5ff58dff ("vfs: no fallback for ->copy_file_range")
-> Link:
-> https://lore.kernel.org/linux-fsdevel/20f17f64-88cb-4e80-07c1-85cb96c83619@windriver.com/
-> Reported-by: He Zhe <zhe.he@windriver.com>
-> Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-> ---
->
-> Hi Steve, Namje,
->
-> I was going to ping Al about this patch when I remembered that we have
-> another kernel file server that supports server side copy and needs to
-> be adjusted. I also realized that v13 wrongly (?) falls back to
-> generic_copy_file_range() in nfs/smb client code.
->
-> It would be great if you could review my ksmbd change and run the fstests
-> as below in your test setup.
-I have run xfstests against ksmbd. All tests are passed.
-You can add my tags for ksmbd.
+On 6/2/2022 8:07 PM, Long Li wrote:
+>> Long, My Chelsio(iWARP) NIC reports this value as 4. When I set it with hw
+>> report value in cifs.ko, There is kernel oops in cifs.ko. Have you checked smb-
+>> direct of cifs.ko with Chelsio and any iWARP NICs before ? or only Mellanox
+>> NICs ?
+>>
+>> Thanks!
+> 
+> Yes, I have tested on Chelsio. I didn't see kernel panic. In fact, I can pass a larger value (8) and successfully create a QP on Chelsio.
 
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Tested-by: Namjae Jeon <linkinjeon@kernel.org>
+There are many generations of Chelsio RDMA adapters, and this number
+is very likely to be different. You both should be sure you're testing
+with multiple configurations (and don't forget all the other in-kernel
+RDMA NICs). But a constant value of "8" is still arbitrary.
 
-Thanks!
+The kernel should definitely not throw an oops when the NIC doesn't
+support some precompiled constant value. Namjae, what oops, exactly?
+
+Tom.
+
+> Can you paste your kernel panic trace?
+> 
+>>>>> If the CIFS upper layer ever sends data with larger number of SGEs,
+>>>>> the send will fail.
+>>>>>
+>>>>> Long
+>>>>>
+>>>>>>
+>>>>>> Tom.
+>>>>>>
+>>>>>>> diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h index
+>>>>>>> a87fca82a796..7003722ab004 100644
+>>>>>>> --- a/fs/cifs/smbdirect.h
+>>>>>>> +++ b/fs/cifs/smbdirect.h
+>>>>>>> @@ -226,7 +226,7 @@ struct smbd_buffer_descriptor_v1 {
+>>>>>>>    } __packed;
+>>>>>>>
+>>>>>>>    /* Default maximum number of SGEs in a RDMA send/recv */
+>>>>>>> -#define SMBDIRECT_MAX_SGE      16
+>>>>>>> +#define SMBDIRECT_MAX_SGE      6
+>>>>>>>    /* The context for a SMBD request */
+>>>>>>>    struct smbd_request {
+>>>>>>>           struct smbd_connection *info; diff --git
+>>>>>>> a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c index
+>>>>>>> e646d79554b8..70662b3bd590 100644
+>>>>>>> --- a/fs/ksmbd/transport_rdma.c
+>>>>>>> +++ b/fs/ksmbd/transport_rdma.c
+>>>>>>> @@ -42,7 +42,7 @@
+>>>>>>>    /* SMB_DIRECT negotiation timeout in seconds */
+>>>>>>>    #define SMB_DIRECT_NEGOTIATE_TIMEOUT           120
+>>>>>>>
+>>>>>>> -#define SMB_DIRECT_MAX_SEND_SGES               8
+>>>>>>> +#define SMB_DIRECT_MAX_SEND_SGES               6
+>>>>>>>    #define SMB_DIRECT_MAX_RECV_SGES               1
+>>>>>>>
+>>>>>>>    /*
+>>>>>>>
+>>>>>>> Thanks!
+>>>>>>>>
+>>>>>>>> Tom.
+>>>>>>>>
+>>>>>>>
+>>>>>
+>>>
