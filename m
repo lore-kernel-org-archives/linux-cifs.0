@@ -2,369 +2,234 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC2E0C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jun 2022 22:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9FF4C43334
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jun 2022 22:44:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233185AbiFIWMK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 9 Jun 2022 18:12:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44976 "EHLO
+        id S1344955AbiFIWoj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 9 Jun 2022 18:44:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231266AbiFIWMI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Jun 2022 18:12:08 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9EFE1FF60F
-        for <linux-cifs@vger.kernel.org>; Thu,  9 Jun 2022 15:12:06 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id x5so27860040edi.2
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Jun 2022 15:12:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nEoo9nf6uoR86Ps06V8ScDCUYmvkWwacynGHe7RF+ws=;
-        b=ghk7xzjGGy/Dz/HTRD96htdkv+0frxmQazCf9uMvgNp1Z1wLEcG5ERbmUjxEESzPQp
-         yRM8fjscWfp5jmsENIatZmPJ+qs576kPyOyIvWF+++ET4ShZ1UWYcLDhHWzwT6KNJU9Z
-         XlPAcP5otspGV9g6xU4a4P4/9+4XRpzNWEgiM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nEoo9nf6uoR86Ps06V8ScDCUYmvkWwacynGHe7RF+ws=;
-        b=D/aZbcuP53ml/D6/+dWcdbcpOeXfplzf7ARqODdqaIwrXlZHg6+9meMjIlRE1J8SAw
-         Le3+3CfiMgduhqq/VfFe009JPzIypwej8QkCB7dBtI8r/7MlL7S+9buBxFkMEV3Uxnro
-         soloywhhLNHWq8ij1nccr6UTUlPbKI5JYIIq2iJ6kpg9OY8D43wwXLEI1QPElRVgE05j
-         pVqZAZoc5B8wQGTsr8pX3LEpNslkxNO8zA/MuJwpFZAyQNZ5C3F959pmef6vDutAQV1X
-         G/Vzio7rqtGBNGkD26JuZJdBzBuZmRDWpCN8j175lkC6VjzulNwnyY7KJHERYpSLd4Sg
-         KJOg==
-X-Gm-Message-State: AOAM5312eJFSAedrT4GER86ldmIxGjquBLI4E5+rNm2bYg3tuOLUSbsg
-        M7C5PtHbQxiJVH3ebHXmFx4J9GQEQfgfrC00KD0=
-X-Google-Smtp-Source: ABdhPJxN/lbOOxHQrx3SBF58dWfszR7G5hBn2blMYW3RhdShkWDvwlsgvoYZPtONA6mkZ5IHvtuO3Q==
-X-Received: by 2002:a05:6402:329b:b0:431:3143:5ced with SMTP id f27-20020a056402329b00b0043131435cedmr33318696eda.257.1654812725058;
-        Thu, 09 Jun 2022 15:12:05 -0700 (PDT)
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com. [209.85.218.43])
-        by smtp.gmail.com with ESMTPSA id i10-20020a17090639ca00b007030c97ae62sm11183034eje.191.2022.06.09.15.12.04
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jun 2022 15:12:04 -0700 (PDT)
-Received: by mail-ej1-f43.google.com with SMTP id kq6so37075081ejb.11
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Jun 2022 15:12:04 -0700 (PDT)
-X-Received: by 2002:a05:6000:1b0f:b0:210:313a:ef2a with SMTP id
- f15-20020a0560001b0f00b00210313aef2amr39748721wrz.281.1654812258016; Thu, 09
- Jun 2022 15:04:18 -0700 (PDT)
+        with ESMTP id S242329AbiFIWoi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Jun 2022 18:44:38 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F27E1B587B
+        for <linux-cifs@vger.kernel.org>; Thu,  9 Jun 2022 15:44:36 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 1745B220C7;
+        Thu,  9 Jun 2022 22:44:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1654814675; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=F8vuIGPU/7MehW9wLqTE/QEmYFUjGTgkeNHWEPAgp1g=;
+        b=PT82M6W0pStfllgRJv1wlLfNcMmHFe8AqSJOmTGhaUmkJxLPKybLesy8vgUttJMIGbg5W6
+        9dJ9+HINRFnxpJPcPLVJRqUxtJ6+FZGA2d3KXegnqJ9PekiQGPAk8TNk/sy0qrZYBYmnGH
+        DYbKpc0GS706wYv8kMntUogE0qyFQew=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1654814675;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=F8vuIGPU/7MehW9wLqTE/QEmYFUjGTgkeNHWEPAgp1g=;
+        b=iV1c+uL/XdOjOl1PWMxPsZ9OkE4b76y7mUC4ckhyXliRKkfao7dElTA4ZSrAADTZDFVVTj
+        4fDtGEK1e6hdQeCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 89F2313456;
+        Thu,  9 Jun 2022 22:44:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id RsXXEtJ3omLOHwAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Thu, 09 Jun 2022 22:44:34 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com, Enzo Matsumiya <ematsumiya@suse.de>
+Subject: [PATCH] cifs: introduce dns_interval mount option
+Date:   Thu,  9 Jun 2022 19:43:42 -0300
+Message-Id: <20220609224342.892-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-References: <40676.1654807564@warthog.procyon.org.uk>
-In-Reply-To: <40676.1654807564@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 9 Jun 2022 15:04:01 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgkwKyNmNdKpQkqZ6DnmUL-x9hp0YBnUGjaPFEAdxDTbw@mail.gmail.com>
-Message-ID: <CAHk-=wgkwKyNmNdKpQkqZ6DnmUL-x9hp0YBnUGjaPFEAdxDTbw@mail.gmail.com>
-Subject: Re: [PATCH] netfs: Fix gcc-12 warning by embedding vfs inode in netfs_i_context
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jeff Layton <jlayton@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        William Kucharski <william.kucharski@oracle.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Dave Chinner <david@fromorbit.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical@lists.samba.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-hardening@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000cf586f05e10b00da"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000cf586f05e10b00da
-Content-Type: text/plain; charset="UTF-8"
+This patch introduces a `dns_interval' mount option, used to configure
+the interval that the DNS resolve worker should be run.
 
-On Thu, Jun 9, 2022 at 1:46 PM David Howells <dhowells@redhat.com> wrote:
->
->         struct my_inode {
-> -               struct {
-> -                       /* These must be contiguous */
-> -                       struct inode            vfs_inode;
-> -                       struct netfs_i_context  netfs_ctx;
-> -               };
-> +               struct netfs_inode netfs; /* Netfslib context and vfs inode */
->                 ...
+Enforces the minimum value SMB_DNS_RESOLVE_INTERVAL_MIN (currently 120s),
+or uses the default SMB_DNS_RESOLVE_INTERVAL_DEFAULT (currently 600s).
 
-Side note: I think this could have been done with an unnamed union as
+Since this is a mount option, each derived connection from it, e.g. DFS
+root targets, will share the same DNS interval from the primary server
+since the TCP session options are passed down to them.
 
-        struct my_inode {
-                union {
-                        struct inode            vfs_inode;
-                        struct netfs_inode netfs_inode;
-                };
-        [...]
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/cifs/cifsfs.c     |  3 +++
+ fs/cifs/cifsglob.h   |  1 +
+ fs/cifs/connect.c    | 20 ++++++++++++++------
+ fs/cifs/fs_context.c | 11 +++++++++++
+ fs/cifs/fs_context.h |  2 ++
+ fs/cifs/sess.c       |  1 +
+ 6 files changed, 32 insertions(+), 6 deletions(-)
 
-instead, with the rule that 'netfs_inode' always starts with a 'struct inode'.
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 325423180fd2..ad980b235699 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -665,6 +665,9 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+ 	if (tcon->ses->server->max_credits != SMB2_MAX_CREDITS_AVAILABLE)
+ 		seq_printf(s, ",max_credits=%u", tcon->ses->server->max_credits);
+ 
++	if (tcon->ses->server->dns_interval != SMB_DNS_RESOLVE_INTERVAL_DEFAULT)
++		seq_printf(s, ",dns_interval=%u", tcon->ses->server->dns_interval);
++
+ 	if (tcon->snapshot_time)
+ 		seq_printf(s, ",snapshot=%llu", tcon->snapshot_time);
+ 	if (tcon->handle_timeout)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index f873379066c7..e28a23b617ef 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -679,6 +679,7 @@ struct TCP_Server_Info {
+ 	struct smbd_connection *smbd_conn;
+ 	struct delayed_work	echo; /* echo ping workqueue job */
+ 	struct delayed_work	resolve; /* dns resolution workqueue job */
++	unsigned int dns_interval; /* interval for resolve worker */
+ 	char	*smallbuf;	/* pointer to current "small" buffer */
+ 	char	*bigbuf;	/* pointer to current "big" buffer */
+ 	/* Total size of this PDU. Only valid from cifs_demultiplex_thread */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 06bafba9c3ff..e6bedced576a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -92,7 +92,7 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
+ 	int len;
+ 	char *unc, *ipaddr = NULL;
+ 	time64_t expiry, now;
+-	unsigned long ttl = SMB_DNS_RESOLVE_INTERVAL_DEFAULT;
++	unsigned int ttl = server->dns_interval;
+ 
+ 	if (!server->hostname ||
+ 	    server->hostname[0] == '\0')
+@@ -129,13 +129,15 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
+ 			/*
+ 			 * To make sure we don't use the cached entry, retry 1s
+ 			 * after expiry.
++			 *
++			 * dns_interval is guaranteed to be >= SMB_DNS_RESOLVE_INTERVAL_MIN
+ 			 */
+-			ttl = max_t(unsigned long, expiry - now, SMB_DNS_RESOLVE_INTERVAL_MIN) + 1;
++			ttl = max_t(unsigned long, expiry - now, server->dns_interval) + 1;
+ 	}
+ 	rc = !rc ? -1 : 0;
+ 
+ requeue_resolve:
+-	cifs_dbg(FYI, "%s: next dns resolution scheduled for %lu seconds in the future\n",
++	cifs_dbg(FYI, "%s: next dns resolution scheduled for %u seconds in the future\n",
+ 		 __func__, ttl);
+ 	mod_delayed_work(cifsiod_wq, &server->resolve, (ttl * HZ));
+ 
+@@ -1608,6 +1610,12 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+ 		tcp_ses->echo_interval = ctx->echo_interval * HZ;
+ 	else
+ 		tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
++
++	if (ctx->dns_interval >= SMB_DNS_RESOLVE_INTERVAL_MIN)
++		tcp_ses->dns_interval = ctx->dns_interval;
++	else
++		tcp_ses->dns_interval = SMB_DNS_RESOLVE_INTERVAL_DEFAULT;
++
+ 	if (tcp_ses->rdma) {
+ #ifndef CONFIG_CIFS_SMB_DIRECT
+ 		cifs_dbg(VFS, "CONFIG_CIFS_SMB_DIRECT is not enabled\n");
+@@ -1670,10 +1678,10 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+ 	queue_delayed_work(cifsiod_wq, &tcp_ses->echo, tcp_ses->echo_interval);
+ 
+ 	/* queue dns resolution delayed work */
+-	cifs_dbg(FYI, "%s: next dns resolution scheduled for %d seconds in the future\n",
+-		 __func__, SMB_DNS_RESOLVE_INTERVAL_DEFAULT);
++	cifs_dbg(FYI, "%s: next dns resolution scheduled for %u seconds in the future\n",
++		 __func__, tcp_ses->dns_interval);
+ 
+-	queue_delayed_work(cifsiod_wq, &tcp_ses->resolve, (SMB_DNS_RESOLVE_INTERVAL_DEFAULT * HZ));
++	queue_delayed_work(cifsiod_wq, &tcp_ses->resolve, (tcp_ses->dns_interval * HZ));
+ 
+ 	return tcp_ses;
+ 
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 8dc0d923ef6a..91b3424ba722 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -152,6 +152,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
+ 	fsparam_u32("handletimeout", Opt_handletimeout),
+ 	fsparam_u64("snapshot", Opt_snapshot),
+ 	fsparam_u32("max_channels", Opt_max_channels),
++	fsparam_u32("dns_interval", Opt_dns_interval),
+ 
+ 	/* Mount options which take string value */
+ 	fsparam_string("source", Opt_source),
+@@ -1099,6 +1100,14 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		if (result.uint_32 > 1)
+ 			ctx->multichannel = true;
+ 		break;
++	case Opt_dns_interval:
++		if (result.uint_32 < SMB_DNS_RESOLVE_INTERVAL_MIN) {
++			cifs_errorf(fc, "%s: Minimum value for dns_interval is %u\n",
++					__func__, SMB_DNS_RESOLVE_INTERVAL_MIN);
++			goto cifs_parse_mount_err;
++		}
++		ctx->dns_interval = result.uint_32;
++		break;
+ 	case Opt_handletimeout:
+ 		ctx->handle_timeout = result.uint_32;
+ 		if (ctx->handle_timeout > SMB3_MAX_HANDLE_TIMEOUT) {
+@@ -1535,6 +1544,8 @@ int smb3_init_fs_context(struct fs_context *fc)
+ 	ctx->multichannel = false;
+ 	ctx->max_channels = 1;
+ 
++	ctx->dns_interval = SMB_DNS_RESOLVE_INTERVAL_DEFAULT;
++
+ 	ctx->backupuid_specified = false; /* no backup intent for a user */
+ 	ctx->backupgid_specified = false; /* no backup intent for a group */
+ 
+diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
+index 5f093cb7e9b9..567a2dde6333 100644
+--- a/fs/cifs/fs_context.h
++++ b/fs/cifs/fs_context.h
+@@ -130,6 +130,7 @@ enum cifs_param {
+ 	Opt_snapshot,
+ 	Opt_max_channels,
+ 	Opt_handletimeout,
++	Opt_dns_interval,
+ 
+ 	/* Mount options which take string value */
+ 	Opt_source,
+@@ -258,6 +259,7 @@ struct smb3_fs_context {
+ 	__u32 handle_timeout; /* persistent and durable handle timeout in ms */
+ 	unsigned int max_credits; /* smb3 max_credits 10 < credits < 60000 */
+ 	unsigned int max_channels;
++	unsigned int dns_interval; /* interval to resolve server hostname */
+ 	__u16 compression; /* compression algorithm 0xFFFF default 0=disabled */
+ 	bool rootfs:1; /* if it's a SMB root file system */
+ 	bool witness:1; /* use witness protocol */
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 0bece97547d4..d3dad612e2a4 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -325,6 +325,7 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
+ 	ctx.sockopt_tcp_nodelay = ses->server->tcp_nodelay;
+ 	ctx.echo_interval = ses->server->echo_interval / HZ;
+ 	ctx.max_credits = ses->server->max_credits;
++	ctx.dns_interval = ses->server->dns_interval;
+ 
+ 	/*
+ 	 * This will be used for encoding/decoding user/domain/pw
+-- 
+2.36.1
 
-The advantage would have been that the old 'vfs_inode' syntax would
-have continued to work, and much less of the ugliness.
-
-So a fair amount of the noise in this patch could have been avoided.
-
-That said, I think the end result is fine (and maybe less complicated
-than using that union trick), so that's not the big deal.
-
-But what I actually *really* detest in this patch is that
-
-        struct netfs_inode *ctx = netfs_inode(file_inode(file));
-
-pattern.
-
-In several cases that's just a different syntax for almost the same
-problem that gcc-12 already complained about.
-
-And yes, in some cases you do need it - particularly in the
-"mapping->host" situation, you really have lost sight of the fact that
-you really have a "struct netfs_inode *", and all you have is the
-"struct inode *".
-
-But in a lot of cases you really could do so much better: you *have* a
-"struct netfs_inode" to begin with, but you converted it to just
-"struct inode *", and now you're converting it back.
-
-Look at that AFS code, for example, where we have afs_vnode_cache() doing
-
-        return netfs_i_cookie(&vnode->netfs.inode);
-
-and look how it *had* a netfs structure, and it was passing it to a
-netfs function, but it explicitly passed the WRONG TYPE, so now we've
-lost the type information and it is using that cast to fake it all
-back.
-
-So I think the 'netfs' functions should take a 'struct netfs_inode
-*ctx' as their argument.
-
-Because the callers know what kind of inode they have, and they can -
-and should - then pass the proper netfs context down.
-
-IOW, I think you really should do something like the attached on top
-of this all.
-
-Only *very* lightly build-tested, but let me quote part of the diff to explain:
-
-  -static inline struct fscache_cookie *netfs_i_cookie(struct inode *inode)
-  +static inline struct fscache_cookie *netfs_i_cookie(struct netfs_inode *ctx)
-   {
-   #if IS_ENABLED(CONFIG_FSCACHE)
-  -       struct netfs_inode *ctx = netfs_inode(inode);
-          return ctx->cache;
-   #else
-
-
-look, this part is obvious. If you are doing a "netfs_i_cookie()"
-call, you had *better* know that you actually have a netfs_inode, not
-some random "inode".
-
-And most of the users already knew exactly that, so other paths of the
-patch actually get cleaner too:
-
-  -       return netfs_i_cookie(&v9inode->netfs.inode);
-  +       return netfs_i_cookie(&v9inode->netfs);
-
-but even when that wasn't the case, as in netfs_inode_init() use, we have:
-
-   static void v9fs_set_netfs_context(struct inode *inode)
-   {
-  -       netfs_inode_init(inode, &v9fs_req_ops);
-  +       struct v9fs_inode *v9inode = V9FS_I(inode);
-  +       netfs_inode_init(&v9inode->netfs, &v9fs_req_ops);
-   }
-
-and now we're basically doing that same "taek inode pointer, convert
-it to someting else" that I'm complaining about wrt the netfs code,
-but notice how we are now doing it within the context of the 9p
-filesystem.
-
-So now we're converting not a 'random inode pointer that could come
-from many different filesystems', but an *actual* well-defined 'this
-is a 9p inode, so doing that V9FS_I(inode) conversion is normal' kind
-of situation.
-
-And at that point, we now have that 'struct netfs_inode' directly, and
-don't need to play any other games.
-
-Yes, a few 'netfs_inode()' users still remain. I don't love them
-either, but they tend to be places where we really did get just the
-raw inode pointer from the VFS layer (eg netfs_readahead is just used
-directly as the ".readahead" function for filesystems).
-
-Hmm?
-
-                    Linus
-
---000000000000cf586f05e10b00da
-Content-Type: text/x-patch; charset="US-ASCII"; name="patch.diff"
-Content-Disposition: attachment; filename="patch.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l47k1pzq0>
-X-Attachment-Id: f_l47k1pzq0
-
-IGZzLzlwL3Y5ZnMuaCAgICAgICAgICAgICB8ICAyICstCiBmcy85cC92ZnNfYWRkci5jICAgICAg
-ICAgfCAgMiArLQogZnMvOXAvdmZzX2lub2RlLmMgICAgICAgIHwgIDMgKystCiBmcy9hZnMvZHlu
-cm9vdC5jICAgICAgICAgfCAgMiArLQogZnMvYWZzL2lub2RlLmMgICAgICAgICAgIHwgIDIgKy0K
-IGZzL2Fmcy9pbnRlcm5hbC5oICAgICAgICB8ICAyICstCiBmcy9hZnMvd3JpdGUuYyAgICAgICAg
-ICAgfCAgMiArLQogZnMvY2VwaC9hZGRyLmMgICAgICAgICAgIHwgIDMgKystCiBmcy9jZXBoL2Nh
-Y2hlLmggICAgICAgICAgfCAgMiArLQogZnMvY2VwaC9pbm9kZS5jICAgICAgICAgIHwgIDIgKy0K
-IGZzL2NpZnMvZnNjYWNoZS5oICAgICAgICB8ICAyICstCiBmcy9uZXRmcy9idWZmZXJlZF9yZWFk
-LmMgfCAgNCArKy0tCiBpbmNsdWRlL2xpbnV4L25ldGZzLmggICAgfCAxNiArKysrKystLS0tLS0t
-LS0tCiAxMyBmaWxlcyBjaGFuZ2VkLCAyMSBpbnNlcnRpb25zKCspLCAyMyBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9mcy85cC92OWZzLmggYi9mcy85cC92OWZzLmgKaW5kZXggMWIyMTljMjFk
-MTVlLi42YWNhYmMyZTdkYzkgMTAwNjQ0Ci0tLSBhL2ZzLzlwL3Y5ZnMuaAorKysgYi9mcy85cC92
-OWZzLmgKQEAgLTEyNCw3ICsxMjQsNyBAQCBzdGF0aWMgaW5saW5lIHN0cnVjdCB2OWZzX2lub2Rl
-ICpWOUZTX0koY29uc3Qgc3RydWN0IGlub2RlICppbm9kZSkKIHN0YXRpYyBpbmxpbmUgc3RydWN0
-IGZzY2FjaGVfY29va2llICp2OWZzX2lub2RlX2Nvb2tpZShzdHJ1Y3Qgdjlmc19pbm9kZSAqdjlp
-bm9kZSkKIHsKICNpZmRlZiBDT05GSUdfOVBfRlNDQUNIRQotCXJldHVybiBuZXRmc19pX2Nvb2tp
-ZSgmdjlpbm9kZS0+bmV0ZnMuaW5vZGUpOworCXJldHVybiBuZXRmc19pX2Nvb2tpZSgmdjlpbm9k
-ZS0+bmV0ZnMpOwogI2Vsc2UKIAlyZXR1cm4gTlVMTDsKICNlbmRpZgpkaWZmIC0tZ2l0IGEvZnMv
-OXAvdmZzX2FkZHIuYyBiL2ZzLzlwL3Zmc19hZGRyLmMKaW5kZXggOTBjNmMxYmEwM2FiLi5jMDA0
-YjlhNzNhOTIgMTAwNjQ0Ci0tLSBhL2ZzLzlwL3Zmc19hZGRyLmMKKysrIGIvZnMvOXAvdmZzX2Fk
-ZHIuYwpAQCAtMjc0LDcgKzI3NCw3IEBAIHN0YXRpYyBpbnQgdjlmc193cml0ZV9iZWdpbihzdHJ1
-Y3QgZmlsZSAqZmlscCwgc3RydWN0IGFkZHJlc3Nfc3BhY2UgKm1hcHBpbmcsCiAJICogZmlsZS4g
-IFdlIG5lZWQgdG8gZG8gdGhpcyBiZWZvcmUgd2UgZ2V0IGEgbG9jayBvbiB0aGUgcGFnZSBpbiBj
-YXNlCiAJICogdGhlcmUncyBtb3JlIHRoYW4gb25lIHdyaXRlciBjb21wZXRpbmcgZm9yIHRoZSBz
-YW1lIGNhY2hlIGJsb2NrLgogCSAqLwotCXJldHZhbCA9IG5ldGZzX3dyaXRlX2JlZ2luKGZpbHAs
-IG1hcHBpbmcsIHBvcywgbGVuLCAmZm9saW8sIGZzZGF0YSk7CisJcmV0dmFsID0gbmV0ZnNfd3Jp
-dGVfYmVnaW4oJnY5aW5vZGUtPm5ldGZzLCBmaWxwLCBtYXBwaW5nLCBwb3MsIGxlbiwgJmZvbGlv
-LCBmc2RhdGEpOwogCWlmIChyZXR2YWwgPCAwKQogCQlyZXR1cm4gcmV0dmFsOwogCmRpZmYgLS1n
-aXQgYS9mcy85cC92ZnNfaW5vZGUuYyBiL2ZzLzlwL3Zmc19pbm9kZS5jCmluZGV4IGU2NjBjNjM0
-OGI5ZC4uNDE5ZDJmM2NmMmMyIDEwMDY0NAotLS0gYS9mcy85cC92ZnNfaW5vZGUuYworKysgYi9m
-cy85cC92ZnNfaW5vZGUuYwpAQCAtMjUyLDcgKzI1Miw4IEBAIHZvaWQgdjlmc19mcmVlX2lub2Rl
-KHN0cnVjdCBpbm9kZSAqaW5vZGUpCiAgKi8KIHN0YXRpYyB2b2lkIHY5ZnNfc2V0X25ldGZzX2Nv
-bnRleHQoc3RydWN0IGlub2RlICppbm9kZSkKIHsKLQluZXRmc19pbm9kZV9pbml0KGlub2RlLCAm
-djlmc19yZXFfb3BzKTsKKwlzdHJ1Y3Qgdjlmc19pbm9kZSAqdjlpbm9kZSA9IFY5RlNfSShpbm9k
-ZSk7CisJbmV0ZnNfaW5vZGVfaW5pdCgmdjlpbm9kZS0+bmV0ZnMsICZ2OWZzX3JlcV9vcHMpOwog
-fQogCiBpbnQgdjlmc19pbml0X2lub2RlKHN0cnVjdCB2OWZzX3Nlc3Npb25faW5mbyAqdjlzZXMs
-CmRpZmYgLS1naXQgYS9mcy9hZnMvZHlucm9vdC5jIGIvZnMvYWZzL2R5bnJvb3QuYwppbmRleCAz
-YTViYmZmZGYwNTMuLmQ3ZDk0MDJmZjcxOCAxMDA2NDQKLS0tIGEvZnMvYWZzL2R5bnJvb3QuYwor
-KysgYi9mcy9hZnMvZHlucm9vdC5jCkBAIC03Niw3ICs3Niw3IEBAIHN0cnVjdCBpbm9kZSAqYWZz
-X2lnZXRfcHNldWRvX2RpcihzdHJ1Y3Qgc3VwZXJfYmxvY2sgKnNiLCBib29sIHJvb3QpCiAJLyog
-dGhlcmUgc2hvdWxkbid0IGJlIGFuIGV4aXN0aW5nIGlub2RlICovCiAJQlVHX09OKCEoaW5vZGUt
-Pmlfc3RhdGUgJiBJX05FVykpOwogCi0JbmV0ZnNfaW5vZGVfaW5pdChpbm9kZSwgTlVMTCk7CisJ
-bmV0ZnNfaW5vZGVfaW5pdCgmdm5vZGUtPm5ldGZzLCBOVUxMKTsKIAlpbm9kZS0+aV9zaXplCQk9
-IDA7CiAJaW5vZGUtPmlfbW9kZQkJPSBTX0lGRElSIHwgU19JUlVHTyB8IFNfSVhVR087CiAJaWYg
-KHJvb3QpIHsKZGlmZiAtLWdpdCBhL2ZzL2Fmcy9pbm9kZS5jIGIvZnMvYWZzL2lub2RlLmMKaW5k
-ZXggMjI4MTFlOWVhY2Y1Li44OTYzMGFjYmMyY2MgMTAwNjQ0Ci0tLSBhL2ZzL2Fmcy9pbm9kZS5j
-CisrKyBiL2ZzL2Fmcy9pbm9kZS5jCkBAIC01OCw3ICs1OCw3IEBAIHN0YXRpYyBub2lubGluZSB2
-b2lkIGR1bXBfdm5vZGUoc3RydWN0IGFmc192bm9kZSAqdm5vZGUsIHN0cnVjdCBhZnNfdm5vZGUg
-KnBhcmVuCiAgKi8KIHN0YXRpYyB2b2lkIGFmc19zZXRfbmV0ZnNfY29udGV4dChzdHJ1Y3QgYWZz
-X3Zub2RlICp2bm9kZSkKIHsKLQluZXRmc19pbm9kZV9pbml0KCZ2bm9kZS0+bmV0ZnMuaW5vZGUs
-ICZhZnNfcmVxX29wcyk7CisJbmV0ZnNfaW5vZGVfaW5pdCgmdm5vZGUtPm5ldGZzLCAmYWZzX3Jl
-cV9vcHMpOwogfQogCiAvKgpkaWZmIC0tZ2l0IGEvZnMvYWZzL2ludGVybmFsLmggYi9mcy9hZnMv
-aW50ZXJuYWwuaAppbmRleCA5ODRiMTEzYTkxMDcuLmE2ZjI1ZDllNzViNSAxMDA2NDQKLS0tIGEv
-ZnMvYWZzL2ludGVybmFsLmgKKysrIGIvZnMvYWZzL2ludGVybmFsLmgKQEAgLTY3MCw3ICs2NzAs
-NyBAQCBzdHJ1Y3QgYWZzX3Zub2RlIHsKIHN0YXRpYyBpbmxpbmUgc3RydWN0IGZzY2FjaGVfY29v
-a2llICphZnNfdm5vZGVfY2FjaGUoc3RydWN0IGFmc192bm9kZSAqdm5vZGUpCiB7CiAjaWZkZWYg
-Q09ORklHX0FGU19GU0NBQ0hFCi0JcmV0dXJuIG5ldGZzX2lfY29va2llKCZ2bm9kZS0+bmV0ZnMu
-aW5vZGUpOworCXJldHVybiBuZXRmc19pX2Nvb2tpZSgmdm5vZGUtPm5ldGZzKTsKICNlbHNlCiAJ
-cmV0dXJuIE5VTEw7CiAjZW5kaWYKZGlmZiAtLWdpdCBhL2ZzL2Fmcy93cml0ZS5jIGIvZnMvYWZz
-L3dyaXRlLmMKaW5kZXggZjgwYTYwOTZkOTFjLi4yYzg4NWIyMmRlMzQgMTAwNjQ0Ci0tLSBhL2Zz
-L2Fmcy93cml0ZS5jCisrKyBiL2ZzL2Fmcy93cml0ZS5jCkBAIC02MCw3ICs2MCw3IEBAIGludCBh
-ZnNfd3JpdGVfYmVnaW4oc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBhZGRyZXNzX3NwYWNlICpt
-YXBwaW5nLAogCSAqIGZpbGUuICBXZSBuZWVkIHRvIGRvIHRoaXMgYmVmb3JlIHdlIGdldCBhIGxv
-Y2sgb24gdGhlIHBhZ2UgaW4gY2FzZQogCSAqIHRoZXJlJ3MgbW9yZSB0aGFuIG9uZSB3cml0ZXIg
-Y29tcGV0aW5nIGZvciB0aGUgc2FtZSBjYWNoZSBibG9jay4KIAkgKi8KLQlyZXQgPSBuZXRmc193
-cml0ZV9iZWdpbihmaWxlLCBtYXBwaW5nLCBwb3MsIGxlbiwgJmZvbGlvLCBmc2RhdGEpOworCXJl
-dCA9IG5ldGZzX3dyaXRlX2JlZ2luKCZ2bm9kZS0+bmV0ZnMsIGZpbGUsIG1hcHBpbmcsIHBvcywg
-bGVuLCAmZm9saW8sIGZzZGF0YSk7CiAJaWYgKHJldCA8IDApCiAJCXJldHVybiByZXQ7CiAKZGlm
-ZiAtLWdpdCBhL2ZzL2NlcGgvYWRkci5jIGIvZnMvY2VwaC9hZGRyLmMKaW5kZXggZjVmMTE2ZWQx
-YjllLi45NzYzZTdlYTgxNDggMTAwNjQ0Ci0tLSBhL2ZzL2NlcGgvYWRkci5jCisrKyBiL2ZzL2Nl
-cGgvYWRkci5jCkBAIC0xMzIyLDEwICsxMzIyLDExIEBAIHN0YXRpYyBpbnQgY2VwaF93cml0ZV9i
-ZWdpbihzdHJ1Y3QgZmlsZSAqZmlsZSwgc3RydWN0IGFkZHJlc3Nfc3BhY2UgKm1hcHBpbmcsCiAJ
-CQkgICAgc3RydWN0IHBhZ2UgKipwYWdlcCwgdm9pZCAqKmZzZGF0YSkKIHsKIAlzdHJ1Y3QgaW5v
-ZGUgKmlub2RlID0gZmlsZV9pbm9kZShmaWxlKTsKKwlzdHJ1Y3QgY2VwaF9pbm9kZV9pbmZvICpj
-aSA9IGNlcGhfaW5vZGUoaW5vZGUpOwogCXN0cnVjdCBmb2xpbyAqZm9saW8gPSBOVUxMOwogCWlu
-dCByOwogCi0JciA9IG5ldGZzX3dyaXRlX2JlZ2luKGZpbGUsIGlub2RlLT5pX21hcHBpbmcsIHBv
-cywgbGVuLCAmZm9saW8sIE5VTEwpOworCXIgPSBuZXRmc193cml0ZV9iZWdpbigmY2ktPm5ldGZz
-LCBmaWxlLCBpbm9kZS0+aV9tYXBwaW5nLCBwb3MsIGxlbiwgJmZvbGlvLCBOVUxMKTsKIAlpZiAo
-ciA9PSAwKQogCQlmb2xpb193YWl0X2ZzY2FjaGUoZm9saW8pOwogCWlmIChyIDwgMCkgewpkaWZm
-IC0tZ2l0IGEvZnMvY2VwaC9jYWNoZS5oIGIvZnMvY2VwaC9jYWNoZS5oCmluZGV4IDI2YzZhZTA2
-ZTJmNC4uZGM1MDJkYWFjNDlhIDEwMDY0NAotLS0gYS9mcy9jZXBoL2NhY2hlLmgKKysrIGIvZnMv
-Y2VwaC9jYWNoZS5oCkBAIC0yOCw3ICsyOCw3IEBAIHZvaWQgY2VwaF9mc2NhY2hlX2ludmFsaWRh
-dGUoc3RydWN0IGlub2RlICppbm9kZSwgYm9vbCBkaW9fd3JpdGUpOwogCiBzdGF0aWMgaW5saW5l
-IHN0cnVjdCBmc2NhY2hlX2Nvb2tpZSAqY2VwaF9mc2NhY2hlX2Nvb2tpZShzdHJ1Y3QgY2VwaF9p
-bm9kZV9pbmZvICpjaSkKIHsKLQlyZXR1cm4gbmV0ZnNfaV9jb29raWUoJmNpLT5uZXRmcy5pbm9k
-ZSk7CisJcmV0dXJuIG5ldGZzX2lfY29va2llKCZjaS0+bmV0ZnMpOwogfQogCiBzdGF0aWMgaW5s
-aW5lIHZvaWQgY2VwaF9mc2NhY2hlX3Jlc2l6ZShzdHJ1Y3QgaW5vZGUgKmlub2RlLCBsb2ZmX3Qg
-dG8pCmRpZmYgLS1naXQgYS9mcy9jZXBoL2lub2RlLmMgYi9mcy9jZXBoL2lub2RlLmMKaW5kZXgg
-NjUwNzQ2YjNiYTk5Li41NmM1M2FiMzYxOGUgMTAwNjQ0Ci0tLSBhL2ZzL2NlcGgvaW5vZGUuYwor
-KysgYi9mcy9jZXBoL2lub2RlLmMKQEAgLTQ2MCw3ICs0NjAsNyBAQCBzdHJ1Y3QgaW5vZGUgKmNl
-cGhfYWxsb2NfaW5vZGUoc3RydWN0IHN1cGVyX2Jsb2NrICpzYikKIAlkb3V0KCJhbGxvY19pbm9k
-ZSAlcFxuIiwgJmNpLT5uZXRmcy5pbm9kZSk7CiAKIAkvKiBTZXQgcGFyYW1ldGVycyBmb3IgdGhl
-IG5ldGZzIGxpYnJhcnkgKi8KLQluZXRmc19pbm9kZV9pbml0KCZjaS0+bmV0ZnMuaW5vZGUsICZj
-ZXBoX25ldGZzX29wcyk7CisJbmV0ZnNfaW5vZGVfaW5pdCgmY2ktPm5ldGZzLCAmY2VwaF9uZXRm
-c19vcHMpOwogCiAJc3Bpbl9sb2NrX2luaXQoJmNpLT5pX2NlcGhfbG9jayk7CiAKZGlmZiAtLWdp
-dCBhL2ZzL2NpZnMvZnNjYWNoZS5oIGIvZnMvY2lmcy9mc2NhY2hlLmgKaW5kZXggYWI5YTUxZDAx
-MjVjLi5hYTNiOTQxYTU1NTUgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvZnNjYWNoZS5oCisrKyBiL2Zz
-L2NpZnMvZnNjYWNoZS5oCkBAIC02MSw3ICs2MSw3IEBAIHZvaWQgY2lmc19mc2NhY2hlX2ZpbGxf
-Y29oZXJlbmN5KHN0cnVjdCBpbm9kZSAqaW5vZGUsCiAKIHN0YXRpYyBpbmxpbmUgc3RydWN0IGZz
-Y2FjaGVfY29va2llICpjaWZzX2lub2RlX2Nvb2tpZShzdHJ1Y3QgaW5vZGUgKmlub2RlKQogewot
-CXJldHVybiBuZXRmc19pX2Nvb2tpZShpbm9kZSk7CisJcmV0dXJuIG5ldGZzX2lfY29va2llKCZD
-SUZTX0koaW5vZGUpLT5uZXRmcyk7CiB9CiAKIHN0YXRpYyBpbmxpbmUgdm9pZCBjaWZzX2ludmFs
-aWRhdGVfY2FjaGUoc3RydWN0IGlub2RlICppbm9kZSwgdW5zaWduZWQgaW50IGZsYWdzKQpkaWZm
-IC0tZ2l0IGEvZnMvbmV0ZnMvYnVmZmVyZWRfcmVhZC5jIGIvZnMvbmV0ZnMvYnVmZmVyZWRfcmVh
-ZC5jCmluZGV4IGQzN2UwMTIzODZmMy4uMmFjY2JhNmVlOWE3IDEwMDY0NAotLS0gYS9mcy9uZXRm
-cy9idWZmZXJlZF9yZWFkLmMKKysrIGIvZnMvbmV0ZnMvYnVmZmVyZWRfcmVhZC5jCkBAIC0zMjYs
-MTIgKzMyNiwxMiBAQCBzdGF0aWMgYm9vbCBuZXRmc19za2lwX2ZvbGlvX3JlYWQoc3RydWN0IGZv
-bGlvICpmb2xpbywgbG9mZl90IHBvcywgc2l6ZV90IGxlbiwKICAqCiAgKiBUaGlzIGlzIHVzYWJs
-ZSB3aGV0aGVyIG9yIG5vdCBjYWNoaW5nIGlzIGVuYWJsZWQuCiAgKi8KLWludCBuZXRmc193cml0
-ZV9iZWdpbihzdHJ1Y3QgZmlsZSAqZmlsZSwgc3RydWN0IGFkZHJlc3Nfc3BhY2UgKm1hcHBpbmcs
-CitpbnQgbmV0ZnNfd3JpdGVfYmVnaW4oc3RydWN0IG5ldGZzX2lub2RlICpjdHgsCisJCSAgICAg
-IHN0cnVjdCBmaWxlICpmaWxlLCBzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGluZywKIAkJICAg
-ICAgbG9mZl90IHBvcywgdW5zaWduZWQgaW50IGxlbiwgc3RydWN0IGZvbGlvICoqX2ZvbGlvLAog
-CQkgICAgICB2b2lkICoqX2ZzZGF0YSkKIHsKIAlzdHJ1Y3QgbmV0ZnNfaW9fcmVxdWVzdCAqcnJl
-cTsKLQlzdHJ1Y3QgbmV0ZnNfaW5vZGUgKmN0eCA9IG5ldGZzX2lub2RlKGZpbGVfaW5vZGUoZmls
-ZSApKTsKIAlzdHJ1Y3QgZm9saW8gKmZvbGlvOwogCXVuc2lnbmVkIGludCBmZ3BfZmxhZ3MgPSBG
-R1BfTE9DSyB8IEZHUF9XUklURSB8IEZHUF9DUkVBVCB8IEZHUF9TVEFCTEU7CiAJcGdvZmZfdCBp
-bmRleCA9IHBvcyA+PiBQQUdFX1NISUZUOwpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9uZXRm
-cy5oIGIvaW5jbHVkZS9saW51eC9uZXRmcy5oCmluZGV4IDZkYmI0YzljZTUwZC4uZDBlNjBiMmFi
-NWJjIDEwMDY0NAotLS0gYS9pbmNsdWRlL2xpbnV4L25ldGZzLmgKKysrIGIvaW5jbHVkZS9saW51
-eC9uZXRmcy5oCkBAIC0yNzcsNyArMjc3LDggQEAgc3RydWN0IG5ldGZzX2NhY2hlX29wcyB7CiBz
-dHJ1Y3QgcmVhZGFoZWFkX2NvbnRyb2w7CiBleHRlcm4gdm9pZCBuZXRmc19yZWFkYWhlYWQoc3Ry
-dWN0IHJlYWRhaGVhZF9jb250cm9sICopOwogaW50IG5ldGZzX3JlYWRfZm9saW8oc3RydWN0IGZp
-bGUgKiwgc3RydWN0IGZvbGlvICopOwotZXh0ZXJuIGludCBuZXRmc193cml0ZV9iZWdpbihzdHJ1
-Y3QgZmlsZSAqLCBzdHJ1Y3QgYWRkcmVzc19zcGFjZSAqLAorZXh0ZXJuIGludCBuZXRmc193cml0
-ZV9iZWdpbihzdHJ1Y3QgbmV0ZnNfaW5vZGUgKiwKKwkJCSAgICAgc3RydWN0IGZpbGUgKiwgc3Ry
-dWN0IGFkZHJlc3Nfc3BhY2UgKiwKIAkJCSAgICAgbG9mZl90LCB1bnNpZ25lZCBpbnQsIHN0cnVj
-dCBmb2xpbyAqKiwKIAkJCSAgICAgdm9pZCAqKik7CiAKQEAgLTMwOCwxMyArMzA5LDExIEBAIHN0
-YXRpYyBpbmxpbmUgc3RydWN0IG5ldGZzX2lub2RlICpuZXRmc19pbm9kZShzdHJ1Y3QgaW5vZGUg
-Kmlub2RlKQogICogSW5pdGlhbGlzZSB0aGUgbmV0ZnMgbGlicmFyeSBjb250ZXh0IHN0cnVjdC4g
-IFRoaXMgaXMgZXhwZWN0ZWQgdG8gZm9sbG93IG9uCiAgKiBkaXJlY3RseSBmcm9tIHRoZSBWRlMg
-aW5vZGUgc3RydWN0LgogICovCi1zdGF0aWMgaW5saW5lIHZvaWQgbmV0ZnNfaW5vZGVfaW5pdChz
-dHJ1Y3QgaW5vZGUgKmlub2RlLAorc3RhdGljIGlubGluZSB2b2lkIG5ldGZzX2lub2RlX2luaXQo
-c3RydWN0IG5ldGZzX2lub2RlICpjdHgsCiAJCQkJICAgIGNvbnN0IHN0cnVjdCBuZXRmc19yZXF1
-ZXN0X29wcyAqb3BzKQogewotCXN0cnVjdCBuZXRmc19pbm9kZSAqY3R4ID0gbmV0ZnNfaW5vZGUo
-aW5vZGUpOwotCiAJY3R4LT5vcHMgPSBvcHM7Ci0JY3R4LT5yZW1vdGVfaV9zaXplID0gaV9zaXpl
-X3JlYWQoaW5vZGUpOworCWN0eC0+cmVtb3RlX2lfc2l6ZSA9IGlfc2l6ZV9yZWFkKCZjdHgtPmlu
-b2RlKTsKICNpZiBJU19FTkFCTEVEKENPTkZJR19GU0NBQ0hFKQogCWN0eC0+Y2FjaGUgPSBOVUxM
-OwogI2VuZGlmCkBAIC0zMjcsMTAgKzMyNiw4IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBuZXRmc19p
-bm9kZV9pbml0KHN0cnVjdCBpbm9kZSAqaW5vZGUsCiAgKgogICogSW5mb3JtIHRoZSBuZXRmcyBs
-aWIgdGhhdCBhIGZpbGUgZ290IHJlc2l6ZWQgc28gdGhhdCBpdCBjYW4gYWRqdXN0IGl0cyBzdGF0
-ZS4KICAqLwotc3RhdGljIGlubGluZSB2b2lkIG5ldGZzX3Jlc2l6ZV9maWxlKHN0cnVjdCBpbm9k
-ZSAqaW5vZGUsIGxvZmZfdCBuZXdfaV9zaXplKQorc3RhdGljIGlubGluZSB2b2lkIG5ldGZzX3Jl
-c2l6ZV9maWxlKHN0cnVjdCBuZXRmc19pbm9kZSAqY3R4LCBsb2ZmX3QgbmV3X2lfc2l6ZSkKIHsK
-LQlzdHJ1Y3QgbmV0ZnNfaW5vZGUgKmN0eCA9IG5ldGZzX2lub2RlKGlub2RlKTsKLQogCWN0eC0+
-cmVtb3RlX2lfc2l6ZSA9IG5ld19pX3NpemU7CiB9CiAKQEAgLTM0MCwxMCArMzM3LDkgQEAgc3Rh
-dGljIGlubGluZSB2b2lkIG5ldGZzX3Jlc2l6ZV9maWxlKHN0cnVjdCBpbm9kZSAqaW5vZGUsIGxv
-ZmZfdCBuZXdfaV9zaXplKQogICoKICAqIEdldCB0aGUgY2FjaGluZyBjb29raWUgKGlmIGVuYWJs
-ZWQpIGZyb20gdGhlIG5ldHdvcmsgZmlsZXN5c3RlbSdzIGlub2RlLgogICovCi1zdGF0aWMgaW5s
-aW5lIHN0cnVjdCBmc2NhY2hlX2Nvb2tpZSAqbmV0ZnNfaV9jb29raWUoc3RydWN0IGlub2RlICpp
-bm9kZSkKK3N0YXRpYyBpbmxpbmUgc3RydWN0IGZzY2FjaGVfY29va2llICpuZXRmc19pX2Nvb2tp
-ZShzdHJ1Y3QgbmV0ZnNfaW5vZGUgKmN0eCkKIHsKICNpZiBJU19FTkFCTEVEKENPTkZJR19GU0NB
-Q0hFKQotCXN0cnVjdCBuZXRmc19pbm9kZSAqY3R4ID0gbmV0ZnNfaW5vZGUoaW5vZGUpOwogCXJl
-dHVybiBjdHgtPmNhY2hlOwogI2Vsc2UKIAlyZXR1cm4gTlVMTDsK
---000000000000cf586f05e10b00da--
