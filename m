@@ -2,137 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F6CC43334
-	for <linux-cifs@archiver.kernel.org>; Fri, 10 Jun 2022 18:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D8BCCA47B
+	for <linux-cifs@archiver.kernel.org>; Fri, 10 Jun 2022 19:56:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347484AbiFJSGp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 10 Jun 2022 14:06:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59326 "EHLO
+        id S1350511AbiFJT44 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 10 Jun 2022 15:56:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349758AbiFJSGo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 10 Jun 2022 14:06:44 -0400
+        with ESMTP id S1350216AbiFJT4z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 10 Jun 2022 15:56:55 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BBFFEB1FF
-        for <linux-cifs@vger.kernel.org>; Fri, 10 Jun 2022 11:06:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 61B6511C00
+        for <linux-cifs@vger.kernel.org>; Fri, 10 Jun 2022 12:56:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654884401;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PMsjmdghjftZcHJYxe23lhIe8tlheZvEV884DJ3XaMQ=;
-        b=hFAyWA42f1/5pvbsGWSpXO1dsYj6wlEllNPGHyGnRKSfqZs8T4yEBtEOZkOukgDS1ai2j0
-        9llwQFhzNyYujqFDdvhx59mCg+VVm/gU4mMVt8Z1RVYFjWln63VwW2SZtqHlsCl0iqFn7l
-        Mo4fqh1XQxzu6YlQ1hRK/lNI1+I6zzM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        s=mimecast20190719; t=1654891013;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=irp9I7bg5aP2EcRerJx9k5cqapFEVHVDaAOauS4ZbRQ=;
+        b=R+yJn//DGcC2QZ8zP+pxEiY1ngyqFKu7Pe9BcEWWTfz7KyBaF9myRJ96IgCjBp/KCUR2Xo
+        uUJKCmNoLnkTYmUz5UN/mZCOZazTXEW5x1X1+WhM36gSrt1lAK77/vHAvOCSPSWd/yFkwy
+        t+qgyJRZe+gIzZ2PuK3rxrFa3+fN25g=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-517-RurBROcsP7ulDRyRjKQieg-1; Fri, 10 Jun 2022 14:06:40 -0400
-X-MC-Unique: RurBROcsP7ulDRyRjKQieg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-121----5JlC7Nga4prmah_EWXw-1; Fri, 10 Jun 2022 15:56:49 -0400
+X-MC-Unique: ---5JlC7Nga4prmah_EWXw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 055FD1C01B20;
-        Fri, 10 Jun 2022 18:06:39 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6B090801756;
+        Fri, 10 Jun 2022 19:56:48 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A360018EA7;
-        Fri, 10 Jun 2022 18:06:35 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B1B6F40CF8EF;
+        Fri, 10 Jun 2022 19:56:46 +0000 (UTC)
+Subject: [RFC][PATCH 0/3] netfs, afs: Cleanups
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wgkwKyNmNdKpQkqZ6DnmUL-x9hp0YBnUGjaPFEAdxDTbw@mail.gmail.com>
-References: <CAHk-=wgkwKyNmNdKpQkqZ6DnmUL-x9hp0YBnUGjaPFEAdxDTbw@mail.gmail.com> <40676.1654807564@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        William Kucharski <william.kucharski@oracle.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Dave Chinner <david@fromorbit.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical@lists.samba.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-hardening@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] netfs: Fix gcc-12 warning by embedding vfs inode in netfs_i_context
+Cc:     linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, linux-erofs@lists.ozlabs.org,
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Fri, 10 Jun 2022 20:56:45 +0100
+Message-ID: <165489100590.703883.11054313979289027590.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <652127.1654884394.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 10 Jun 2022 19:06:34 +0100
-Message-ID: <652128.1654884394@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-> Side note: I think this could have been done with an unnamed union as
-> =
+Hi Linus,
 
->         struct my_inode {
->                 union {
->                         struct inode            vfs_inode;
->                         struct netfs_inode netfs_inode;
->                 };
->         [...]
-> =
+Here are some cleanups, one for afs and a couple for netfs:
 
-> instead, with the rule that 'netfs_inode' always starts with a 'struct i=
-node'.
+ (1) The afs patch cleans up a checker complaint.
 
-I'm slightly wary of that, lest struct netfs_inode gets randomised.  I'm n=
-ot
-sure how likely that would be without netfs_inode getting explicitly marke=
-d.
+ (2) The first netfs patch is your netfs_inode changes plus the requisite
+     documentation changes.
 
-> But in a lot of cases you really could do so much better: you *have* a
-> "struct netfs_inode" to begin with, but you converted it to just
-> "struct inode *", and now you're converting it back.
-> =
+ (3) The second netfs patch replaces the ->cleanup op with a ->free_request
+     op.  This is possible as the I/O request is now always available at
+     the cleanup point as the stuff to be cleaned up is no longer passed
+     into the API functions, but rather obtained by ->init_request.
 
-> Look at that AFS code, for example, where we have afs_vnode_cache() doin=
-g
-> =
+I've run the patches through xfstests with -g quick on afs.
 
->         return netfs_i_cookie(&vnode->netfs.inode);
-> =
+The patches are on a branch here:
 
-> and look how it *had* a netfs structure, and it was passing it to a
-> netfs function, but it explicitly passed the WRONG TYPE, so now we've
-> lost the type information and it is using that cast to fake it all
-> back.
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-fixes
 
-Yeah, I didn't look at those as they didn't cause warnings, but you're rig=
-ht -
-those should take struct netfs_inode pointers in some cases, rather than
-struct inode.
-
-Note that some functions, such as netfs_readpage() and netfs_readpages() d=
-o
-need to take struct inode pointers as I'm trying to get the VFS ops to jum=
-p
-into netfslib and get all the VM interface stuff out of the network
-filesystems - the idea being that the network filesystem will provide netf=
-slib
-primarily with two functions: do a read op and do a write op.
-
-I'll have a look at your patch in a bit.
-
-Thanks,
 David
+
+---
+David Howells (2):
+      afs: Fix some checker issues
+      netfs: Rename the netfs_io_request cleanup op and give it an op pointer
+
+Linus Torvalds (1):
+      netfs: Further cleanups after struct netfs_inode wrapper introduced
+
+
+ Documentation/filesystems/netfs_library.rst | 33 +++++++++++----------
+ fs/9p/v9fs.h                                |  2 +-
+ fs/9p/vfs_addr.c                            | 13 ++++----
+ fs/9p/vfs_inode.c                           |  3 +-
+ fs/afs/dynroot.c                            |  2 +-
+ fs/afs/file.c                               |  6 ++--
+ fs/afs/inode.c                              |  2 +-
+ fs/afs/internal.h                           |  2 +-
+ fs/afs/volume.c                             |  3 +-
+ fs/afs/write.c                              |  2 +-
+ fs/ceph/addr.c                              | 12 ++++----
+ fs/ceph/cache.h                             |  2 +-
+ fs/ceph/inode.c                             |  2 +-
+ fs/cifs/fscache.h                           |  2 +-
+ fs/netfs/buffered_read.c                    |  5 ++--
+ fs/netfs/objects.c                          |  6 ++--
+ include/linux/netfs.h                       | 25 +++++++---------
+ 17 files changed, 60 insertions(+), 62 deletions(-)
+
 
