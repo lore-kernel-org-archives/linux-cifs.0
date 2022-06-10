@@ -2,175 +2,137 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5461EC43334
-	for <linux-cifs@archiver.kernel.org>; Fri, 10 Jun 2022 17:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F6CC43334
+	for <linux-cifs@archiver.kernel.org>; Fri, 10 Jun 2022 18:06:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344979AbiFJRQY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 10 Jun 2022 13:16:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60614 "EHLO
+        id S1347484AbiFJSGp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 10 Jun 2022 14:06:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237145AbiFJRQX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 10 Jun 2022 13:16:23 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9401556B2B
-        for <linux-cifs@vger.kernel.org>; Fri, 10 Jun 2022 10:16:20 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6D721220C4;
-        Fri, 10 Jun 2022 17:16:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1654881379; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        with ESMTP id S1349758AbiFJSGo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 10 Jun 2022 14:06:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BBFFEB1FF
+        for <linux-cifs@vger.kernel.org>; Fri, 10 Jun 2022 11:06:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654884401;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2DVaI6rEA63rGIEdxd92jUBDvsFBwokSnWyoiTymKnQ=;
-        b=lcPIRFTOSjCtGGG04OKGskKK0S9IjnvZYyy31wnKmlRqADEIbFSjA5HWBjX+dXZoverG5k
-        WpbHTmx48gy7B6rjT4BKudpIxmikMQlALOSGO/x9JNHyIgXdDhWOFGlrJWGJbQFvdTaGiv
-        dzvEpo59V6QDSCeriBfKqttzHbr3FVM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1654881379;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2DVaI6rEA63rGIEdxd92jUBDvsFBwokSnWyoiTymKnQ=;
-        b=mO5N6sG5r4WMBRLkhs2kfbb7wqtvpd0lwzVdkRr4EjTdUSCzdAPrXgP4Zk0A/fpGooizDz
-        Bh74g/6GVJ2yyQBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=PMsjmdghjftZcHJYxe23lhIe8tlheZvEV884DJ3XaMQ=;
+        b=hFAyWA42f1/5pvbsGWSpXO1dsYj6wlEllNPGHyGnRKSfqZs8T4yEBtEOZkOukgDS1ai2j0
+        9llwQFhzNyYujqFDdvhx59mCg+VVm/gU4mMVt8Z1RVYFjWln63VwW2SZtqHlsCl0iqFn7l
+        Mo4fqh1XQxzu6YlQ1hRK/lNI1+I6zzM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-517-RurBROcsP7ulDRyRjKQieg-1; Fri, 10 Jun 2022 14:06:40 -0400
+X-MC-Unique: RurBROcsP7ulDRyRjKQieg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DF76A13941;
-        Fri, 10 Jun 2022 17:16:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id R9f6J2J8o2JBJgAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Fri, 10 Jun 2022 17:16:18 +0000
-Date:   Fri, 10 Jun 2022 14:16:16 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Subject: Re: [PATCH] cifs: introduce dns_interval mount option
-Message-ID: <20220610171616.op43k3b76o4wqna3@cyberdelia>
-References: <20220609224342.892-1-ematsumiya@suse.de>
- <CANT5p=pWqH=1LhakCyfkwDjUCUvkcy2PcNGK0SsR+04v32=KtQ@mail.gmail.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 055FD1C01B20;
+        Fri, 10 Jun 2022 18:06:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A360018EA7;
+        Fri, 10 Jun 2022 18:06:35 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wgkwKyNmNdKpQkqZ6DnmUL-x9hp0YBnUGjaPFEAdxDTbw@mail.gmail.com>
+References: <CAHk-=wgkwKyNmNdKpQkqZ6DnmUL-x9hp0YBnUGjaPFEAdxDTbw@mail.gmail.com> <40676.1654807564@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        William Kucharski <william.kucharski@oracle.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Dave Chinner <david@fromorbit.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical@lists.samba.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-hardening@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] netfs: Fix gcc-12 warning by embedding vfs inode in netfs_i_context
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CANT5p=pWqH=1LhakCyfkwDjUCUvkcy2PcNGK0SsR+04v32=KtQ@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <652127.1654884394.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 10 Jun 2022 19:06:34 +0100
+Message-ID: <652128.1654884394@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 06/10, Shyam Prasad N wrote:
->On Fri, Jun 10, 2022 at 4:14 AM Enzo Matsumiya <ematsumiya@suse.de> wrote:
->>
->> This patch introduces a `dns_interval' mount option, used to configure
->> the interval that the DNS resolve worker should be run.
->>
->> Enforces the minimum value SMB_DNS_RESOLVE_INTERVAL_MIN (currently 120s),
->> or uses the default SMB_DNS_RESOLVE_INTERVAL_DEFAULT (currently 600s).
->>
->> Since this is a mount option, each derived connection from it, e.g. DFS
->> root targets, will share the same DNS interval from the primary server
->> since the TCP session options are passed down to them.
->>
->> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
->> ---
->>  fs/cifs/cifsfs.c     |  3 +++
->>  fs/cifs/cifsglob.h   |  1 +
->>  fs/cifs/connect.c    | 20 ++++++++++++++------
->>  fs/cifs/fs_context.c | 11 +++++++++++
->>  fs/cifs/fs_context.h |  2 ++
->>  fs/cifs/sess.c       |  1 +
->>  6 files changed, 32 insertions(+), 6 deletions(-)
->>
->> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
->> index 325423180fd2..ad980b235699 100644
->> --- a/fs/cifs/cifsfs.c
->> +++ b/fs/cifs/cifsfs.c
->> @@ -665,6 +665,9 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
->>         if (tcon->ses->server->max_credits != SMB2_MAX_CREDITS_AVAILABLE)
->>                 seq_printf(s, ",max_credits=%u", tcon->ses->server->max_credits);
->>
->> +       if (tcon->ses->server->dns_interval != SMB_DNS_RESOLVE_INTERVAL_DEFAULT)
->> +               seq_printf(s, ",dns_interval=%u", tcon->ses->server->dns_interval);
->> +
->>         if (tcon->snapshot_time)
->>                 seq_printf(s, ",snapshot=%llu", tcon->snapshot_time);
->>         if (tcon->handle_timeout)
->> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> index f873379066c7..e28a23b617ef 100644
->> --- a/fs/cifs/cifsglob.h
->> +++ b/fs/cifs/cifsglob.h
->> @@ -679,6 +679,7 @@ struct TCP_Server_Info {
->>         struct smbd_connection *smbd_conn;
->>         struct delayed_work     echo; /* echo ping workqueue job */
->>         struct delayed_work     resolve; /* dns resolution workqueue job */
->> +       unsigned int dns_interval; /* interval for resolve worker */
->>         char    *smallbuf;      /* pointer to current "small" buffer */
->>         char    *bigbuf;        /* pointer to current "big" buffer */
->>         /* Total size of this PDU. Only valid from cifs_demultiplex_thread */
->> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> index 06bafba9c3ff..e6bedced576a 100644
->> --- a/fs/cifs/connect.c
->> +++ b/fs/cifs/connect.c
->> @@ -92,7 +92,7 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
->>         int len;
->>         char *unc, *ipaddr = NULL;
->>         time64_t expiry, now;
->> -       unsigned long ttl = SMB_DNS_RESOLVE_INTERVAL_DEFAULT;
->> +       unsigned int ttl = server->dns_interval;
->>
->>         if (!server->hostname ||
->>             server->hostname[0] == '\0')
->> @@ -129,13 +129,15 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
->>                         /*
->>                          * To make sure we don't use the cached entry, retry 1s
->>                          * after expiry.
->> +                        *
->> +                        * dns_interval is guaranteed to be >= SMB_DNS_RESOLVE_INTERVAL_MIN
->>                          */
->> -                       ttl = max_t(unsigned long, expiry - now, SMB_DNS_RESOLVE_INTERVAL_MIN) + 1;
->> +                       ttl = max_t(unsigned long, expiry - now, server->dns_interval) + 1;
->>         }
->>         rc = !rc ? -1 : 0;
->>
->>  requeue_resolve:
->> -       cifs_dbg(FYI, "%s: next dns resolution scheduled for %lu seconds in the future\n",
->> +       cifs_dbg(FYI, "%s: next dns resolution scheduled for %u seconds in the future\n",
->>                  __func__, ttl);
->>         mod_delayed_work(cifsiod_wq, &server->resolve, (ttl * HZ));
->>
->> @@ -1608,6 +1610,12 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
->>                 tcp_ses->echo_interval = ctx->echo_interval * HZ;
->>         else
->>                 tcp_ses->echo_interval = SMB_ECHO_INTERVAL_DEFAULT * HZ;
->> +
->> +       if (ctx->dns_interval >= SMB_DNS_RESOLVE_INTERVAL_MIN)
->> +               tcp_ses->dns_interval = ctx->dns_interval;
->> +       else
->> +               tcp_ses->dns_interval = SMB_DNS_RESOLVE_INTERVAL_DEFAULT;
->> +
->Hi Enzo,
->
->Is the above line a mistake? Shouldn't that be set to
->SMB_DNS_RESOLVE_INTERVAL_MIN value in the else case?
->Rest looks good to me. You can add my RB.
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-Hy Shyam,
+> Side note: I think this could have been done with an unnamed union as
+> =
 
-SMB_DNS_RESOLVE_INTERVAL_MIN is just for boundary-checking. In case
-dns_interval is < than that, we fallback to the default value (I've copied
-echo_interval behaviour, and also the current behaviour).
+>         struct my_inode {
+>                 union {
+>                         struct inode            vfs_inode;
+>                         struct netfs_inode netfs_inode;
+>                 };
+>         [...]
+> =
 
-IMHO we shouldn't use SMB_DNS_RESOLVE_INTERVAL_MIN as a fallback value
-because it's too far from the default values used by the servers I've
-checked (Windows Server 2019, 600s, samba "name cache timeout" = 660s).
+> instead, with the rule that 'netfs_inode' always starts with a 'struct i=
+node'.
 
+I'm slightly wary of that, lest struct netfs_inode gets randomised.  I'm n=
+ot
+sure how likely that would be without netfs_inode getting explicitly marke=
+d.
+
+> But in a lot of cases you really could do so much better: you *have* a
+> "struct netfs_inode" to begin with, but you converted it to just
+> "struct inode *", and now you're converting it back.
+> =
+
+> Look at that AFS code, for example, where we have afs_vnode_cache() doin=
+g
+> =
+
+>         return netfs_i_cookie(&vnode->netfs.inode);
+> =
+
+> and look how it *had* a netfs structure, and it was passing it to a
+> netfs function, but it explicitly passed the WRONG TYPE, so now we've
+> lost the type information and it is using that cast to fake it all
+> back.
+
+Yeah, I didn't look at those as they didn't cause warnings, but you're rig=
+ht -
+those should take struct netfs_inode pointers in some cases, rather than
+struct inode.
+
+Note that some functions, such as netfs_readpage() and netfs_readpages() d=
+o
+need to take struct inode pointers as I'm trying to get the VFS ops to jum=
+p
+into netfslib and get all the VM interface stuff out of the network
+filesystems - the idea being that the network filesystem will provide netf=
+slib
+primarily with two functions: do a read op and do a write op.
+
+I'll have a look at your patch in a bit.
 
 Thanks,
+David
 
-Enzo
