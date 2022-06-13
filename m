@@ -2,122 +2,89 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D53EC43334
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jun 2022 21:15:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFEFC433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jun 2022 23:02:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235001AbiFMVO0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 13 Jun 2022 17:14:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37172 "EHLO
+        id S236752AbiFMXCF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 Jun 2022 19:02:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352094AbiFMVNI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 Jun 2022 17:13:08 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9626396BA
-        for <linux-cifs@vger.kernel.org>; Mon, 13 Jun 2022 13:52:41 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id k24so9207898oij.2
-        for <linux-cifs@vger.kernel.org>; Mon, 13 Jun 2022 13:52:41 -0700 (PDT)
+        with ESMTP id S234344AbiFMXB7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 Jun 2022 19:01:59 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 506E03205E
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Jun 2022 16:01:53 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id e9so6939051pju.5
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Jun 2022 16:01:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Ie2xrfdugqSnUY/lUmZJBYqEw/Jj5HQgDROYZDI7Ljg=;
-        b=q8Sos2zHH2cqeJpqAWGopwq4BFpy5d162ZHvWsGBGzD8dXmnX4TsH4oGd9xtjxFj3k
-         kkiT7ORHTaWO7TVdzrFrUtvSJwyodFHKf3kDLk5zfyB6+Q4t7bACoSZoThK4QulFXt66
-         4eu47sTHknmVkiiSbjTEY+HxauLbTxzPeZ3t8=
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GW0YonjkueH+047BxZsXnZQD3obnI59nyCsoVaQzIBs=;
+        b=ERCvJsd70F2QgRNcdd3c3xeW6tb7SslxyMl223LZBxj9MMtAObMJ0slr3uCV1zGnHb
+         /20vioUeXGuRJ91PAIYghzGP1P3Qzu0+05w8G7TyZZjCBCpZ9aE5xsUwvb7kH1F6htmb
+         KwsNM+qY4q+WKLD53MMO2Ol/V5nVJ9hpksNa59y61+hXGWXne5DHWGr+432zZp1dHgb7
+         5VLALscF1jIFTQCwPZOA04VQZtSAbMZLxaueYiVW+4LdWBn6SaWXxWc52bWYggncfReq
+         3EJMfp3slJibfBoSZbS2EEP7DUZLDAhYxj0OEasfdpm4FZMxXOi+tTUOWeQSe/le8N6h
+         Nvvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=Ie2xrfdugqSnUY/lUmZJBYqEw/Jj5HQgDROYZDI7Ljg=;
-        b=LNEvCQWuVGR1A6XEMl7kVbT9iMi+8bfti1RoPGUCSNqEAAG070x01e0+WpD16Brnwk
-         53S9r2f0yNXfmqHZdv3UUkwzrr60Wuyy+KmyVzg56oiVHy+Hts868Ho/PLyYOvqGJjnk
-         385o6Mhr/XQb9IdcUNaq3zGmTWEPr8C3iAflICDc3TiU4Fb0l6mN7SWCx0JDl2wlyKji
-         rwdQVN/mEYHY6P2qN9tIwwVUX5d2BuRFcZiL2E82QMdM+JFXzh/qUvhp3xY/J+TibtMo
-         hPt0OglFyUejounBbcZNKjsA6NDsmtFFcYVeRy7I/ovUUKCf99G2aupG8dtVBnFA+wvZ
-         AQDg==
-X-Gm-Message-State: AOAM530zcM+wifKBwgYXqrjwTM2x+SCTKGaQypQ6/q9mBT6nj+5y0bEX
-        Wn5an87iRY4N0GdWW2GIFEOiAA==
-X-Google-Smtp-Source: ABdhPJxwqO943xteTGAgFieA/vZp5/Zn/6Qxyj5rF6Le0Sf8rKMQHGa/+OpWxWOapQGjDXa0MQVMLw==
-X-Received: by 2002:a05:6808:2394:b0:326:d5d6:a4ba with SMTP id bp20-20020a056808239400b00326d5d6a4bamr321996oib.67.1655153561069;
-        Mon, 13 Jun 2022 13:52:41 -0700 (PDT)
-Received: from [192.168.0.41] ([184.4.90.121])
-        by smtp.gmail.com with ESMTPSA id dv8-20020a056870d88800b000f5eb6b409bsm4444747oab.45.2022.06.13.13.52.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jun 2022 13:52:40 -0700 (PDT)
-Message-ID: <e1b62234-9b8a-e7c2-2946-5ef9f6f23a08@cloudflare.com>
-Date:   Mon, 13 Jun 2022 15:52:38 -0500
+        bh=GW0YonjkueH+047BxZsXnZQD3obnI59nyCsoVaQzIBs=;
+        b=iN247aUIQtms+bCYlUzgjanje1ROCeOetWSWecobUikBA16INOtrK2JoqOoaONdIXO
+         xiUThyCL/he/NxNCtH5znZ+d5VBBaw4MZJALvNSRW4JyO0jRHwfTKEWZfAF36r4wVlsQ
+         DpoDZOv3pFUw3WjjXJU9zXQxtaGW10FyzR3nw/HAjC499LV+hd0jS/7LhCdcYgXiWd1v
+         9xApfYEcE5lp3BUeGo2aIkBbxGK81NOo4QCZOSpDcriS5QAlpu20GdhDpeURvggy6szC
+         XFXStFNPDAf/Po8rgKEI2k+lVA6xFm4J7n/GPGMV0oZqZO21/PGI73bJYlYP07sv0fGc
+         0KTQ==
+X-Gm-Message-State: AJIora/uk2ZSoax8I02Nzy2+9VLk4omvScVZmaawd0Mbx8rmzEKyHNg4
+        M2iRiJjm6lVjnI37eEUQdril6AmtdBM=
+X-Google-Smtp-Source: AGRyM1tCyRhKGSgHvah67bvynXvbD66XLT0/qv2/2Z4bfGGvKJL7wPICaoQj7UGj0YtLR2n24CSooQ==
+X-Received: by 2002:a17:90a:cc0d:b0:1e3:1256:faa3 with SMTP id b13-20020a17090acc0d00b001e31256faa3mr1113481pju.107.1655161312031;
+        Mon, 13 Jun 2022 16:01:52 -0700 (PDT)
+Received: from localhost.localdomain ([210.217.8.148])
+        by smtp.googlemail.com with ESMTPSA id o186-20020a62cdc3000000b0051c78a77702sm6097603pfg.176.2022.06.13.16.01.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jun 2022 16:01:51 -0700 (PDT)
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>
+Subject: [PATCH 1/2] ksmbd: remove duplicate flag set in smb2_write
+Date:   Tue, 14 Jun 2022 08:01:18 +0900
+Message-Id: <20220613230119.73475-1-hyc.lee@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v3] cred: Propagate security_prepare_creds() error code
-Content-Language: en-US
-To:     "Eric W. Biederman" <ebiederm@xmission.com>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-        keyrings@vger.kernel.org, selinux@vger.kernel.org,
-        serge@hallyn.com, amir73il@gmail.com, kernel-team@cloudflare.com,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Paul Moore <paul@paul-moore.com>
-References: <20220608150942.776446-1-fred@cloudflare.com>
- <87tu8oze94.fsf@email.froward.int.ebiederm.org>
-From:   Frederick Lawler <fred@cloudflare.com>
-In-Reply-To: <87tu8oze94.fsf@email.froward.int.ebiederm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Eric,
+The writethrough flag is set again if
+is_rdma_channel is false.
 
-On 6/13/22 12:04 PM, Eric W. Biederman wrote:
-> Frederick Lawler <fred@cloudflare.com> writes:
-> 
->> While experimenting with the security_prepare_creds() LSM hook, we
->> noticed that our EPERM error code was not propagated up the callstack.
->> Instead ENOMEM is always returned.  As a result, some tools may send a
->> confusing error message to the user:
->>
->> $ unshare -rU
->> unshare: unshare failed: Cannot allocate memory
->>
->> A user would think that the system didn't have enough memory, when
->> instead the action was denied.
->>
->> This problem occurs because prepare_creds() and prepare_kernel_cred()
->> return NULL when security_prepare_creds() returns an error code. Later,
->> functions calling prepare_creds() and prepare_kernel_cred() return
->> ENOMEM because they assume that a NULL meant there was no memory
->> allocated.
->>
->> Fix this by propagating an error code from security_prepare_creds() up
->> the callstack.
-> 
-> Why would it make sense for security_prepare_creds to return an error
-> code other than ENOMEM?
->  > That seems a bit of a violation of what that function is supposed to do
->
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+---
+ fs/ksmbd/smb2pdu.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-The API allows LSM authors to decide what error code is returned from 
-the cred_prepare hook. security_task_alloc() is a similar hook, and has 
-its return code propagated.
-
-I'm proposing we follow security_task_allocs() pattern, and add 
-visibility for failure cases in prepare_creds().
-
-> I have probably missed a very interesting discussion where that was
-> mentioned but I don't see link to the discussion or anything explaining
-> why we want to do that in this change.
-> 
-
-AFAIK, this is the start of the discussion.
-
-> Eric
-> 
-
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index e6f4ccc12f49..553aad4ca6fa 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -6506,9 +6506,6 @@ int smb2_write(struct ksmbd_work *work)
+ 				    le16_to_cpu(req->DataOffset));
+ 
+ 		ksmbd_debug(SMB, "flags %u\n", le32_to_cpu(req->Flags));
+-		if (le32_to_cpu(req->Flags) & SMB2_WRITEFLAG_WRITE_THROUGH)
+-			writethrough = true;
+-
+ 		ksmbd_debug(SMB, "filename %pd, offset %lld, len %zu\n",
+ 			    fp->filp->f_path.dentry, offset, length);
+ 		err = ksmbd_vfs_write(work, fp, data_buf, length, &offset,
+-- 
+2.25.1
 
