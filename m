@@ -2,127 +2,115 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC932CCA47E
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Jun 2022 04:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E84DC43334
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Jun 2022 08:55:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229671AbiFNEoj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Jun 2022 00:44:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57280 "EHLO
+        id S1355896AbiFNIy7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Jun 2022 04:54:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbiFNEoi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Jun 2022 00:44:38 -0400
-Received: from out01.mta.xmission.com (out01.mta.xmission.com [166.70.13.231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 032D52E9E4;
-        Mon, 13 Jun 2022 21:44:37 -0700 (PDT)
-Received: from in02.mta.xmission.com ([166.70.13.52]:60056)
-        by out01.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <ebiederm@xmission.com>)
-        id 1o0yPs-002t3o-D4; Mon, 13 Jun 2022 22:44:36 -0600
-Received: from ip68-227-174-4.om.om.cox.net ([68.227.174.4]:40374 helo=email.froward.int.ebiederm.org.xmission.com)
-        by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <ebiederm@xmission.com>)
-        id 1o0yPr-008Y07-9H; Mon, 13 Jun 2022 22:44:36 -0600
-From:   "Eric W. Biederman" <ebiederm@xmission.com>
-To:     Frederick Lawler <fred@cloudflare.com>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-        keyrings@vger.kernel.org, selinux@vger.kernel.org,
-        serge@hallyn.com, amir73il@gmail.com, kernel-team@cloudflare.com,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Paul Moore <paul@paul-moore.com>
-References: <20220608150942.776446-1-fred@cloudflare.com>
-        <87tu8oze94.fsf@email.froward.int.ebiederm.org>
-        <e1b62234-9b8a-e7c2-2946-5ef9f6f23a08@cloudflare.com>
-Date:   Mon, 13 Jun 2022 23:44:28 -0500
-In-Reply-To: <e1b62234-9b8a-e7c2-2946-5ef9f6f23a08@cloudflare.com> (Frederick
-        Lawler's message of "Mon, 13 Jun 2022 15:52:38 -0500")
-Message-ID: <87y1xzyhub.fsf@email.froward.int.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+        with ESMTP id S1355971AbiFNIy6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Jun 2022 04:54:58 -0400
+Received: from mail.nfschina.com (unknown [IPv6:2400:dd01:100f:2:72e2:84ff:fe10:5f45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 88E182314C;
+        Tue, 14 Jun 2022 01:54:56 -0700 (PDT)
+Received: from localhost (unknown [127.0.0.1])
+        by mail.nfschina.com (Postfix) with ESMTP id 5990C1E80D90;
+        Tue, 14 Jun 2022 16:53:36 +0800 (CST)
+X-Virus-Scanned: amavisd-new at test.com
+Received: from mail.nfschina.com ([127.0.0.1])
+        by localhost (mail.nfschina.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id AoZYzFdfq0Ln; Tue, 14 Jun 2022 16:53:33 +0800 (CST)
+Received: from ubuntu.localdomain (unknown [101.228.248.65])
+        (Authenticated sender: yuzhe@nfschina.com)
+        by mail.nfschina.com (Postfix) with ESMTPA id 9E1771E80D0E;
+        Tue, 14 Jun 2022 16:53:32 +0800 (CST)
+From:   Yu Zhe <yuzhe@nfschina.com>
+To:     sfrench@samba.org
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, liqiong@nfschina.com,
+        Yu Zhe <yuzhe@nfschina.com>
+Subject: [PATCH] cifs: remove unnecessary (void*) conversions.
+Date:   Tue, 14 Jun 2022 01:54:49 -0700
+Message-Id: <20220614085449.794181-1-yuzhe@nfschina.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-XM-SPF: eid=1o0yPr-008Y07-9H;;;mid=<87y1xzyhub.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.174.4;;;frm=ebiederm@xmission.com;;;spf=softfail
-X-XM-AID: U2FsdGVkX1+prA+7T4gv0KWu4+rCykKSU9Ye39R87hA=
-X-SA-Exim-Connect-IP: 68.227.174.4
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-Subject: Re: [PATCH v3] cred: Propagate security_prepare_creds() error code
-X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
-X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Frederick Lawler <fred@cloudflare.com> writes:
+remove unnecessary void* type castings.
 
-> Hi Eric,
->
-> On 6/13/22 12:04 PM, Eric W. Biederman wrote:
->> Frederick Lawler <fred@cloudflare.com> writes:
->> 
->>> While experimenting with the security_prepare_creds() LSM hook, we
->>> noticed that our EPERM error code was not propagated up the callstack.
->>> Instead ENOMEM is always returned.  As a result, some tools may send a
->>> confusing error message to the user:
->>>
->>> $ unshare -rU
->>> unshare: unshare failed: Cannot allocate memory
->>>
->>> A user would think that the system didn't have enough memory, when
->>> instead the action was denied.
->>>
->>> This problem occurs because prepare_creds() and prepare_kernel_cred()
->>> return NULL when security_prepare_creds() returns an error code. Later,
->>> functions calling prepare_creds() and prepare_kernel_cred() return
->>> ENOMEM because they assume that a NULL meant there was no memory
->>> allocated.
->>>
->>> Fix this by propagating an error code from security_prepare_creds() up
->>> the callstack.
->> Why would it make sense for security_prepare_creds to return an error
->> code other than ENOMEM?
->>  > That seems a bit of a violation of what that function is supposed to do
->>
->
-> The API allows LSM authors to decide what error code is returned from the
-> cred_prepare hook. security_task_alloc() is a similar hook, and has its return
-> code propagated.
+Signed-off-by: Yu Zhe <yuzhe@nfschina.com>
+---
+ fs/cifs/cifs_debug.c | 2 +-
+ fs/cifs/connect.c    | 2 +-
+ fs/cifs/inode.c      | 4 ++--
+ fs/cifs/netmisc.c    | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-It is not an api.  It is an implementation detail of the linux kernel.
-It is a set of convenient functions that do a job.
-
-The general rule is we don't support cases without an in-tree user.  I
-don't see an in-tree user.
-
-> I'm proposing we follow security_task_allocs() pattern, and add visibility for
-> failure cases in prepare_creds().
-
-I am asking why we would want to.  Especially as it is not an API, and I
-don't see any good reason for anything but an -ENOMEM failure to be
-supported.
-
-Without an in-tree user that cares it is probably better to go the
-opposite direction and remove the possibility of return anything but
-memory allocation failure.  That will make it clearer to implementors
-that a general error code is not supported and this is not a location
-to implement policy, this is only a hook to allocate state for the LSM.
-
->> I have probably missed a very interesting discussion where that was
->> mentioned but I don't see link to the discussion or anything explaining
->> why we want to do that in this change.
->> 
->
-> AFAIK, this is the start of the discussion.
-
-You were on v3 and had an out of tree piece of code so I assumed someone
-had at least thought about why you want to implement policy in a piece
-of code whose only purpose is to allocate memory to store state.
-
-Eric
-
-
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 1dd995efd5b8..c4dc8dbf755b 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -36,7 +36,7 @@ cifs_dump_mem(char *label, void *data, int length)
+ void cifs_dump_detail(void *buf, struct TCP_Server_Info *server)
+ {
+ #ifdef CONFIG_CIFS_DEBUG2
+-	struct smb_hdr *smb = (struct smb_hdr *)buf;
++	struct smb_hdr *smb = buf;
+ 
+ 	cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d\n",
+ 		 smb->Command, smb->Status.CifsError,
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 1849e3411487..0fcb8fb0be85 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2603,7 +2603,7 @@ match_prepath(struct super_block *sb, struct cifs_mnt_data *mnt_data)
+ int
+ cifs_match_super(struct super_block *sb, void *data)
+ {
+-	struct cifs_mnt_data *mnt_data = (struct cifs_mnt_data *)data;
++	struct cifs_mnt_data *mnt_data = data;
+ 	struct smb3_fs_context *ctx;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct TCP_Server_Info *tcp_srv;
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 81da81e18553..3ad303dd5e5a 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1223,7 +1223,7 @@ static const struct inode_operations cifs_ipc_inode_ops = {
+ static int
+ cifs_find_inode(struct inode *inode, void *opaque)
+ {
+-	struct cifs_fattr *fattr = (struct cifs_fattr *) opaque;
++	struct cifs_fattr *fattr = opaque;
+ 
+ 	/* don't match inode with different uniqueid */
+ 	if (CIFS_I(inode)->uniqueid != fattr->cf_uniqueid)
+@@ -1247,7 +1247,7 @@ cifs_find_inode(struct inode *inode, void *opaque)
+ static int
+ cifs_init_inode(struct inode *inode, void *opaque)
+ {
+-	struct cifs_fattr *fattr = (struct cifs_fattr *) opaque;
++	struct cifs_fattr *fattr = opaque;
+ 
+ 	CIFS_I(inode)->uniqueid = fattr->cf_uniqueid;
+ 	CIFS_I(inode)->createtime = fattr->cf_createtime;
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index 235aa1b395eb..28caae7aed1b 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -911,7 +911,7 @@ map_and_check_smb_error(struct mid_q_entry *mid, bool logErr)
+ unsigned int
+ smbCalcSize(void *buf, struct TCP_Server_Info *server)
+ {
+-	struct smb_hdr *ptr = (struct smb_hdr *)buf;
++	struct smb_hdr *ptr = buf;
+ 	return (sizeof(struct smb_hdr) + (2 * ptr->WordCount) +
+ 		2 /* size of the bcc field */ + get_bcc(ptr));
+ }
+-- 
+2.25.1
 
