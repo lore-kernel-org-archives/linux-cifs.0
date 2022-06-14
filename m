@@ -2,155 +2,172 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B56C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Jun 2022 11:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A924C43334
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Jun 2022 14:44:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236054AbiFNL4T (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Jun 2022 07:56:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46944 "EHLO
+        id S1350563AbiFNOjh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Jun 2022 10:39:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356182AbiFNL4R (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Jun 2022 07:56:17 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2078.outbound.protection.outlook.com [40.107.244.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A1346B3D
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Jun 2022 04:56:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y4HJt8tJO1ixwJdUGGlJeF4+aREpfeohr+yzWQ2ts8kZOiH/GnfUq3Q+jBKiM/VDghP9BVxyGt3Yi0lvGLW+3p7z/PdpYJqbsats7VbYSZSugE0AK+9mqXy7cfxO4vN0QJqUQNNTPo/RXo4GI4UIPAEASjjGJAMPh1oAF2vv1CJyQJXmebJwA1Cbjw69Ai3kKQfBq4n9Jb2h4CfjyaocQYp1YQAvtB98SyGftoanCd45gAvX/moLSbBmXcgOlfwJgkwZ00CAzukwWm1KudGAfvN0onbpbTjLziyyXiXdKotewUjfpjJzuqbfyedt6iosLQq9A5Fb9WZ3h9jEfMYB1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DCa4paZFr/v+uIvIHpezR9/OHAcBva6TydMkmFbo7FI=;
- b=fTYa9pNuCKeZPbvmmejddqWmnKr8+su9d31EgQMxPQKs74vqsnRw+fywpLLO59XwtU/wj/fP4SF9egIP6+4NfxzGPti86xlrg7CtJCL1WHim6npn3jGM+fWNMx3mCsVrpcah9fUlfDAMw/XVF5d8Dw9UOt9ClVt5kwcAEQL1UKvanDDkHt+Pz2vyBl4p6dae9DoNHpRGxQapE4g0VMrNVSWZQGStlPyFB89eivoBFXiG3Ly8gk22taiBcaFcfr6q2bkifYizxd16DEgJrElB39klBXXXHM36y+yybN3KXp1Ziorm37asukT149M2VC90qOS/Rym80+HQ4b+Xnl1x9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- CY4PR01MB2790.prod.exchangelabs.com (2603:10b6:903:eb::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5332.20; Tue, 14 Jun 2022 11:56:14 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::1883:4cf0:e35d:b6f]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::1883:4cf0:e35d:b6f%6]) with mapi id 15.20.5332.022; Tue, 14 Jun 2022
- 11:56:13 +0000
-Message-ID: <6b74f448-947b-0b42-f22d-8f3e5db10e50@talpey.com>
-Date:   Tue, 14 Jun 2022 07:56:11 -0400
+        with ESMTP id S1348440AbiFNOjf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Jun 2022 10:39:35 -0400
+Received: from sonic316-26.consmr.mail.ne1.yahoo.com (sonic316-26.consmr.mail.ne1.yahoo.com [66.163.187.152])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D7A23524A
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Jun 2022 07:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1655217569; bh=Gk+oETTOXCvl6hKJwiKfVQx247tk4GOZsL6eS8rtiko=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=fRFIaqLcfobn1LNVl0zrObgmf1hRdINcfRrUmpLcvSg3N0XuqRqgsWlZn5KxMH8l49l0D/abHlPhyAMUUO2GGCDJesuNH8Kpmaa3YgqX0v4VvY06jPrF5HScxPs366YY2ONTePIsLO6+bsIrz/oFE0ETMPJwiL5Fc7l9A5O52eqlUVEn2u6Hv446oiu3mS7Em6viRQw0Eerb2KZ/WLQFgjnvwinwyVZgUZqVxvTHUHjPZlUOcpmI7z+3pcZ+UkItKYPlyw2PX6J4h25WWNn2cNwE4TCrQ8Jlmq2H+Rgpn+lDH1kZESTNcLpJSjPABDc+86KBFATzQZC91mBFay1TDw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1655217569; bh=lRUBSB76OG5uRwjsyAtEUmfLb2iPR7sDD1HFxFWV66b=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=Qf8RR/99yPxdxlUs+k9WbY66HCWw5zL3eg/AG/d8PaF2ZW7sRQsWq6gmO9A/l7NZTWI7UdRqKM5bDHbs6wupQkeVNnPnRU2E5aJ02Zk+dMR4zD7/s5cNknCyMX/GityW/LiHFvSd/XM7aartsEujYu09UY1GhHeq1D712AxFIJsY8aK/OlILZVF6egzn6sq8A7407LfIYkuACSJL8g1M/mmbhUgbiOsQ+CYK1mUY0RpwWvYX8gqa2sPB3WEOxqty1MukDjP2FW6rxr1jRuQBeQgVCqktKQ2g163zpXEobbQtJYRhHhj9nK4BnkDO+kDP4JBwDWeJ+g1U93EjktSC1Q==
+X-YMail-OSG: l34EP_4VM1mCZNS.V_eCLpRm9dh5I1CsXixH4kuccuVcaljnubvC2j4A6MMQ129
+ Y2Pi1pBZKWkGXaXj27i38I8ExPjiKP1Xgpcl4tm9xqnMiwV4KKbA3RIP0pHjrVRzdj7MRxTx9iBG
+ YkdEQiInROMc3joMrXGCf9wmezHz6P8mJ.fFwD3SDeBlElgidwY8jLECc4hnW5TJm2DZ.k.jf483
+ xuskZUVuBZ_.7nYZM3Q6oMDqD16BRAXdGDrt0RJ_foeLdgA5bonrmkWFCR3gASY_oflWZvXQixlq
+ UF1m.qP9YXbSsWZFj812VhzLVpyQ.9F32n9h1HmEh69jx_hRtAaRIdgwaAfngbVWVJSKavMjVMfQ
+ XSXz0eYuXsWCwdfhD196BTPVVtMbrJkHzY6Xk9iE5UHCsUBamqZuh8ubo3QILsuwtLsCNFKyzrlY
+ vF4UN_H53gUTXszFFk2yLOyY55uNmgcqWwzFBPIfnM150R3f0Jfb8fh5Mzo_Cg0qaQvSchBKjCXj
+ nTjHJJOq.fI2fCTCBN3A870QDzGDAkOKrM.MsNpsLweC7IaQy.BbmtdwUXg3AQDgxaX8sTWqySH_
+ YK5rjqHBdeevCU9nZl2LemqBf.vLuvTdVi3q0_6s36rQkUJeC8EDY4s_ity57vDuikZT8YgGAV2k
+ GQo4ZHWmnm4lDk7xTd50gp0t_DJ.Hafgjqy64gvtibxS1SHL0D9MqZg76zZNAcQl5zu0Exhv4OcW
+ mDH5_kPytoYBvgcpDzUXj5OtiUT.rs03EresI6Qrd1muzCGUw99JUhwVKK40RSvSZXMM815o3TH6
+ fIwQnXzwajujE9szKg5ZCG.oh8QawNsxRxn.qck.uP4fzRlaBP9DE545T2hkZSFslMoNmyD9YjDu
+ DPyG49HGFuxQy6RMUV5D6tgRq2Jopfx_d.mJpEqNoUiuIWnKil4PEXFovbbhpvuyUhOL3VE2GmDX
+ VDBVqCAZbiZhRu7UKrQLPpAf4FtH9tiEdWyHvyrkqbXg__AQJ_N3sxY4nnv6lAtDCk3xv8g4zA7q
+ br.dMb13NA4a2TtcCtBHvVIzzWlvGv4U9JfN73FVEuv77CejNVNcPQ8XO0e3i2_eBbyDtuzTowpF
+ r7tocTWs53b.gwK4kDv_pTqO0hkqXLBV9X.I0Z6r8V3u504t5eb2cOQisOd4Mhos8dnXyaAN9cvu
+ 7acgLpOpZcWqyW9UMNNm1ShkpPPdBQprBadtvMrLPJFHbWwRyzdUL1sXWTpogylt3tdIon.0FUKm
+ rYQHTIZKXN0FbJz4FKuZgtnj76nzxXdow3yqiqKvKnjZ5MSJnwK0MtpYhCeyLNxltgJfN4K5iM2N
+ 7_UXaTuwcmiKL82RDIrVJ_m4tLhQSD0TMdB.C2.RuC3DLR6EZjR8icmJ5Pcyp1FBSAS.nzoMlvyG
+ wQetEXAUX6UnRnxz4Y.joRItG62ICV6zPRT7DkNFqhLrhD49oEyY7OTpUAHfUzW96T3TjU.z.xtX
+ BRJ59.VxAXDse4eqIhZpOo67ruAxITzCz2bwWgj9_3BVGoKrKa2hdF1EbK_wrXYCphFhgdP591BM
+ 8Dx4nw.OvDUtcFSmwaX38z91xvkNg2gGzURgEg.1aIahIoxGy.8HwC2Lo.9sDMjQ0LoYEOVKAezC
+ pGYewkGVTBsGHmpazBNDJ2yGdk1YnZ2RsxVQ6cVhAQ9oSC.UcB_QDBHfOgxJ0tQNNGx1hsc2BMQ7
+ fEPpEXJ8GKjioBsLIWpvl67R9boFpyk8B0YFa.DQk0VZ10896guGPPSX8tQw0bHPw998u2wOlfFK
+ r4iYVN6y2wwWwSC6Fp.DmjY5e6rtZVgjns0R9CrneHrhI2xoZjTxHqHrwpBEtqFrzK3GFPPTQtAK
+ 8hT6WRqTR8iJ_lz5fcEMBfDgXpLb2mzq7IppLiwFTDPN0ML7c0cKS8RDnYr0QMe9gdGZvRZcaZ81
+ oYqSjE5Ttah8mMWG6l3Obhj.YZXwg55XNndIG65ct.wK5BmQd6aYUN9KcjQYh._prdA3e2KLlb8V
+ tqRYdouhudJUpS29Eru77mKyHJcKeNct9WUI81o1XVVm1AGD8KRjrhBrE7_R.Nf_EiTNWlcVA8hx
+ BP.uDsYOJpVvf8mbQloJ5acD1I.TpGP2NfRbjr1FwYfk8z6l8gQUDe39HzYrWKeDUt_IRlNJ7_gD
+ KwvB64DCfDs5Yr2pbiRmfb0WwIP2scfxv4AA1X3gcjY0nFjSemkRJmqKpJEA2xu5VIOqoZ9kt3Fy
+ lGpmYgJNyn592qSxpIAHi28oenfQQFZhXz4JO5sR.3hWwhS2Z
+X-Sonic-MF: <casey@schaufler-ca.com>
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic316.consmr.mail.ne1.yahoo.com with HTTP; Tue, 14 Jun 2022 14:39:29 +0000
+Received: by hermes--canary-production-bf1-856dbf94db-nwd6f (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 047d13c43786ba81a547ff9186866ac4;
+          Tue, 14 Jun 2022 14:39:27 +0000 (UTC)
+Message-ID: <b9d27b14-3b45-470d-9c7b-c6f7fb0ca8a5@schaufler-ca.com>
+Date:   Tue, 14 Jun 2022 07:39:24 -0700
+MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH 2/2] ksmbd: smbd: handle RDMA CM time wait event
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3] cred: Propagate security_prepare_creds() error code
 Content-Language: en-US
-To:     Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>
-References: <20220613230119.73475-1-hyc.lee@gmail.com>
- <20220613230119.73475-2-hyc.lee@gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <20220613230119.73475-2-hyc.lee@gmail.com>
+To:     "Eric W. Biederman" <ebiederm@xmission.com>,
+        Frederick Lawler <fred@cloudflare.com>
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+        linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+        keyrings@vger.kernel.org, selinux@vger.kernel.org,
+        serge@hallyn.com, amir73il@gmail.com, kernel-team@cloudflare.com,
+        Jeff Moyer <jmoyer@redhat.com>,
+        Paul Moore <paul@paul-moore.com>,
+        Casey Schaufler <casey@schaufler-ca.com>
+References: <20220608150942.776446-1-fred@cloudflare.com>
+ <87tu8oze94.fsf@email.froward.int.ebiederm.org>
+ <e1b62234-9b8a-e7c2-2946-5ef9f6f23a08@cloudflare.com>
+ <87y1xzyhub.fsf@email.froward.int.ebiederm.org>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <87y1xzyhub.fsf@email.froward.int.ebiederm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR19CA0031.namprd19.prod.outlook.com
- (2603:10b6:208:178::44) To SN6PR01MB4445.prod.exchangelabs.com
- (2603:10b6:805:e2::33)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8351b8ff-74ee-455d-547a-08da4dfce189
-X-MS-TrafficTypeDiagnostic: CY4PR01MB2790:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR01MB27907B6F32A9BCAECE2BFA14D6AA9@CY4PR01MB2790.prod.exchangelabs.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: e0eyIcVmVfWPpXfy56936HwnzOOmVa5/WauJeT8wUQ4LRQfJICqZkslxLADTOFjpvNyXvwVGCwJpDY3UH4HwixeJK53hSDMuDV8Jgmjb9/56AW0cl1g8sqqdOn3dkJaWqUGgDA90pM390oPZO8ZmMOgaIiU5NOYz+wOR0FBZssMPw/MhzZ/u6zwTGjQibfE5ukmeKXURpyLoE5T7CCeWuH1tipRFQLdbEvexrE1Op9gLJkcOd1+05YM2RTbQkTIyIRSghvr2nFBbvMvRNLRTY52wwosTkmFqMfpzn4xjXvEDAjlhy+bnuWyeq0pTtCIjxJE09C7baLaxDfJKCR+xiqzM4ySCv85HIlcAEIssY++K1goVdonNsQQ8+JkoLjoqtBQCitVfXCV5unhbAh2qp20iqGyuzROfSg91FBU1Q7oZHZ9WswST2Lo6gA+PTzzIqMJxc2kwZPqDNYVIw8ATj0MUl2OAFjAqX5kpYgCK7YCY/lZENjSeIN8EA31MVizgWRwgqv+T93B/QURCZlPXxSrewRwJyjy6vmUVPGB41XHM+aUTVOuJwgwlN/Tau9miKB4FL4FqJ/6D0j2GMnVmGml08jGMyhNhvZ8O1Iq+WjP7jFGPjy/LDUhI1u4+kICq5qm4r64TT/UPlx18qq7iPeEk6CK/3WiNREcLsQNKq2u7R73SWIkPzQ/fj0GY1T52nGdjZ4IEeRvCCEuHOB+kgYCmsPoIEa00T8R5J/q82wc=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230016)(346002)(39830400003)(366004)(396003)(136003)(8676002)(4326008)(36756003)(86362001)(31686004)(5660300002)(38350700002)(2906002)(66556008)(66946007)(6486002)(316002)(8936002)(31696002)(66476007)(2616005)(41300700001)(54906003)(508600001)(186003)(53546011)(52116002)(6506007)(38100700002)(26005)(6512007)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZzRjRkgvbS9FdTlPNkcvM0tlZkRJU2V1c1ljUlFrVmROUHVqQWdoWHJrUHZh?=
- =?utf-8?B?WldjSm1zbEtQNUgrWWZoS0xJU1ltQmZwQ3BidURIZTQrRENmNW9paURSQXBK?=
- =?utf-8?B?enBQUXZ3Zm5xOXhvNzlKMXJyclN5Qk9PMVpxbFFpTTJqUDM1UjhYZ0dNUVp0?=
- =?utf-8?B?Y0Uxc0hyZnlqTTJOS29WT1U5OGM5UUQyNHlzZ0cxM091WDdNNVByeENhaUdz?=
- =?utf-8?B?ZVpIQlUvRDZPZHJuYzdtY1B1RmV6M3hpbHUyWlQwZUZ3M2hLaGF6bTVlWFc5?=
- =?utf-8?B?aVNPN3NLcjdLZ1ZYaHlPWkdrdC9TSGVoQ0ptbEZNWCtXSXhsRlBQY0pOZVdV?=
- =?utf-8?B?Yi9qRTFrTENEWVhtckFVTXI4VVFKOVhud2RqSTU1SkpNZFRjTVJXd0w0aDRX?=
- =?utf-8?B?R2NUM3ZtczJLS25sam02b01CcGJucU84bHIvWlgzOXM3WXRGQmdvc2dKWWNB?=
- =?utf-8?B?VHNNOTFzbXRDK1d4OEhva2Z2Z1hFM291TEtObUVjWUs5bWtlVGtqRXh6Ym9X?=
- =?utf-8?B?VnpNTnQ5WlRhTmVVVGx6QXRrUlFTM3QwK0h4OXNuaE5PU0hPNEJFaUllZHd5?=
- =?utf-8?B?cnBZdFRtMVVDelFEMXk1dys5NXgxKzVmVEoxT2w3OVhBYmdlQUVzSlJLcFJ4?=
- =?utf-8?B?Zk1INlB1UmR6QWw1THN3TmtzcE03bk5CMkt0MUI5ZFJzdkNSeGJqU2c3R1Fx?=
- =?utf-8?B?dEFqb09TLys4enhmR2Q5Z3RLOTVBa2lJSU92eUVxUjMwVG9CcitRdUtadXFa?=
- =?utf-8?B?NFFuMVZadXBrcmd5RDVKUXFPbEsxakEzSHM1UllnUzUrdjdjL3FPckVob0l5?=
- =?utf-8?B?NURBTXJ6WkJBdU5MalFKa1RaeUlqenp3RzdSaUtoNE1ZWGJNRjRJUTcyUTBC?=
- =?utf-8?B?Z2d4KzI2TTNXWk5kV2d2TVRQLzBHM3ArS0QrOEZGZi9Fd1duNmRwTW4rVENk?=
- =?utf-8?B?cHdvdFVlbUc5ZWM4eGs1VytiNUpnd0pLSDluVU5BaU1HUkFqL3RwZmY4MDZz?=
- =?utf-8?B?VEpCblJ4TmpHV1RSeXdVbkVTYVQ5YzlCSG04UXpjY1VHa3R1S1RaQzhaL2JS?=
- =?utf-8?B?VldLWFlldWV5WVp1KzNEMjNjaGtFR1FZc1hMNlRSeXpYMTA3YTVqVkpzcUxC?=
- =?utf-8?B?QnlnSVpLYWJEN29tNEtJVXFKbC9YbjVoUXRxdnFZbHhJMzhjRjVUTnhzR3o5?=
- =?utf-8?B?dHZMVzRjdkxVaGlZTFhTSmxucm5wY0dTYnlBUUdrSVNCM1BaV3lwQzFpS0dm?=
- =?utf-8?B?NERHaTdIc2ZuWU4veGNudTVnNGU1aVpxUUxiV3ZnaktVR3lCVVd2cytCZkYz?=
- =?utf-8?B?QWRKenUxUVRqSHc5dTFjUVZ0WTdLUWxrUXJLZytXcS9kL2gzMnJHemp4bHZi?=
- =?utf-8?B?QnkyZlE2L1RLOHdSR2ttaUVnSmpvcGxpaEszSGJRRi84TnlhRVF1bGxzcWpL?=
- =?utf-8?B?V045MUZSRVVlNUVFWnRyRmYvaGtwQ0xaeTFNZVNPS0YxZGFodWxBQ3VPajhH?=
- =?utf-8?B?dEcrWGxsUWlnZU5lR0Q4VFhocXN3RkpjTW1RWThqOXcvS1JnWHhMNy83TlJH?=
- =?utf-8?B?dUxnN2kvNUsyOTJHZlZrN1lyV2pzL3daNW5FV01tQzFPWHYrVVZXbU4wOUVt?=
- =?utf-8?B?bFFKQXRYcTdhYlBFZnJidzdNUmQ1T0F5SDVwS09YNjI3NVkxbVZqZmVvYTZW?=
- =?utf-8?B?bldaQUZHZG1CdnZLaW5LVk54cWNDeEx1VWw2SkNudkluSnloRUo5WmpqY2lG?=
- =?utf-8?B?eEJ5SlEzWllkMDRXQVlSLy9vaDR6WUMrWnZaNS9WZWxwYVc3bzZRVTVwL0N0?=
- =?utf-8?B?ZTlJN1BmeGYzU01aejd2YnVOSm5xazVXRkVobUg3SWR5MDJlTE51bU9CM1B2?=
- =?utf-8?B?VFF4VEJweUNMTk9YbnMwb2ZGSXNnbElMUi9HYkxjUTFZVC9RckNqRkIybkVI?=
- =?utf-8?B?WkJkSjNpcWsyVndacXJzb1pPWWtSMFBCa3AzUGFMZXRMcHNORU9uZU5yU0tr?=
- =?utf-8?B?blJ2T0hWajJYOFBLaUVxTkpBdkhidEtlejBhenYvNm15L2tuVGhmS293YmFl?=
- =?utf-8?B?N0tZa2gya2dJb3NrL2lUVytsdVdjMVprS0xFNXhVMHlVV0FGZnZBeXFxdnBG?=
- =?utf-8?B?WTNmUXZTU1RhczRpellWV3ozL3BhN0NwVnFvODlITk4zSXU1aElNbFVadjhr?=
- =?utf-8?B?ZnlIMnYxTE1GNnZlTFl2SlZXRHNPT0RPSkU4ck5sa0Nva2YveTdob1V4WENt?=
- =?utf-8?B?aUdmTnFCcXA2enc0bVAxQ3lSYlJRWGFKTTBvdU1kZkhmTW9BMm5iU2oyTi9x?=
- =?utf-8?Q?70+HjIIw/8z0DO0yYX?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8351b8ff-74ee-455d-547a-08da4dfce189
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2022 11:56:13.9036
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ohJ9NjJTSdmUWVnCw0aDuaoKPvMiYIKbkUOavwXkBVw5Tz17xmobk+YepAtC0oXF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR01MB2790
+X-Mailer: WebService/1.1.20280 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+On 6/13/2022 9:44 PM, Eric W. Biederman wrote:
+> Frederick Lawler <fred@cloudflare.com> writes:
+>
+>> Hi Eric,
+>>
+>> On 6/13/22 12:04 PM, Eric W. Biederman wrote:
+>>> Frederick Lawler <fred@cloudflare.com> writes:
+>>>
+>>>> While experimenting with the security_prepare_creds() LSM hook, we
+>>>> noticed that our EPERM error code was not propagated up the callstack.
+>>>> Instead ENOMEM is always returned.  As a result, some tools may send a
+>>>> confusing error message to the user:
+>>>>
+>>>> $ unshare -rU
+>>>> unshare: unshare failed: Cannot allocate memory
+>>>>
+>>>> A user would think that the system didn't have enough memory, when
+>>>> instead the action was denied.
+>>>>
+>>>> This problem occurs because prepare_creds() and prepare_kernel_cred()
+>>>> return NULL when security_prepare_creds() returns an error code. Later,
+>>>> functions calling prepare_creds() and prepare_kernel_cred() return
+>>>> ENOMEM because they assume that a NULL meant there was no memory
+>>>> allocated.
+>>>>
+>>>> Fix this by propagating an error code from security_prepare_creds() up
+>>>> the callstack.
+>>> Why would it make sense for security_prepare_creds to return an error
+>>> code other than ENOMEM?
+>>>   > That seems a bit of a violation of what that function is supposed to do
+>>>
+>> The API allows LSM authors to decide what error code is returned from the
+>> cred_prepare hook. security_task_alloc() is a similar hook, and has its return
+>> code propagated.
+> It is not an api.  It is an implementation detail of the linux kernel.
+> It is a set of convenient functions that do a job.
 
-On 6/13/2022 7:01 PM, Hyunchul Lee wrote:
-> After a QP has been disconnected, it stays
-> in a timewait state for in flight packets.
-> After the state has completed,
-> RDMA_CM_EVENT_TIMEWAIT_EXIT is reported.
-> Disconnect on RDMA_CM_EVENT_TIMEWAIT_EXIT
-> so that ksmbd can restart.
-> 
-> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-> ---
->   fs/ksmbd/transport_rdma.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-> index d035e060c2f0..4b1a471afcd0 100644
-> --- a/fs/ksmbd/transport_rdma.c
-> +++ b/fs/ksmbd/transport_rdma.c
-> @@ -1535,6 +1535,7 @@ static int smb_direct_cm_handler(struct rdma_cm_id *cm_id,
->   		wake_up_interruptible(&t->wait_status);
->   		break;
->   	}
-> +	case RDMA_CM_EVENT_TIMEWAIT_EXIT:
->   	case RDMA_CM_EVENT_DEVICE_REMOVAL:
->   	case RDMA_CM_EVENT_DISCONNECTED: {
->   		t->status = SMB_DIRECT_CS_DISCONNECTED;
+Yeah, sort of. We still don't want to change it willy-nilly as it
+has multiple users from both ends.
 
-Is this issue seen on all RDMA providers? Because I would normally
-expect that an RDMA_CM_EVENT_DISCONNECTED will precede the TIMEWAIT
-event. What scenarios have you seen this not occur?
+>
+> The general rule is we don't support cases without an in-tree user.  I
+> don't see an in-tree user.
 
-Unless ksmbd wishes to reuse its QP's, which is not currently the
-case (right?), there's pretty much no reason to manage QP state and
-hang around for TIMEWAIT.
+Unfortunately, the BPF security module allows arbitrary out-of-tree programs
+in any hook. While returns other than -ENOMEM may be nonsensical, they are
+possible. This is driving the LSM infrastructure in the direction of being
+an API, in that users of BPF need to know what they are allowed to do in
+their hook programs.
 
-Tom.
+> I'm proposing we follow security_task_allocs() pattern, and add visibility for
+> failure cases in prepare_creds().
+> I am asking why we would want to.  Especially as it is not an API, and I
+> don't see any good reason for anything but an -ENOMEM failure to be
+> supported.
+>
+> Without an in-tree user that cares it is probably better to go the
+> opposite direction and remove the possibility of return anything but
+> memory allocation failure.  That will make it clearer to implementors
+> that a general error code is not supported and this is not a location
+> to implement policy, this is only a hook to allocate state for the LSM.
+
+The more clearly we define how a function is to be used the more it looks
+like an API. The LSM security_ interfaces are not well designed. They have
+appeared, changed and disappeared organically. This was fine when there was
+one user and tolerable when there were a few, but is getting to be painful
+as the number of security modules increases and their assumptions and
+behavior diverges from subject/object mandatory access control.
+
+
+>>> I have probably missed a very interesting discussion where that was
+>>> mentioned but I don't see link to the discussion or anything explaining
+>>> why we want to do that in this change.
+>>>
+>> AFAIK, this is the start of the discussion.
+> You were on v3 and had an out of tree piece of code so I assumed someone
+> had at least thought about why you want to implement policy in a piece
+> of code whose only purpose is to allocate memory to store state.
+
+I agree with both sides to some extent. The caller shouldn't assume that
+the only possible error is -ENOMEM, but the LSM hook should never do anything
+else, either. If there is a legitimate case where an different error may
+be returned and a reasonable, different action the caller(s) would take in
+that case, the change makes sense. Otherwise, no.
+
+> Eric
+>
