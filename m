@@ -2,190 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC045C43334
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Jun 2022 19:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A58FAC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 15 Jun 2022 01:17:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241415AbiFNTBX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Jun 2022 15:01:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37408 "EHLO
+        id S245517AbiFOBRt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Jun 2022 21:17:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357202AbiFNTBM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Jun 2022 15:01:12 -0400
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74B96E0D4
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Jun 2022 11:59:13 -0700 (PDT)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-f2a4c51c45so13663643fac.9
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Jun 2022 11:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=P/zvL47bzMX9zv6R9Iu19Vam9aHyZ/GbOGpqtXAWqMc=;
-        b=YbrS1rTCXkBCIbh142yEwubaBQ2XkSJH/0xKf0lf6tUumEJSdjOkNie1Nx61lojoXo
-         7ghRJ4k9WRR4jECQ0Dr2ZPBq/WU7t6xV2yqW0HATlcT/2Yl8k5zRPz4Fct1kN9ZfM/ig
-         wiY+zF/49Otr9jZ/sUBro5DEDVmoThVwMV6c4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=P/zvL47bzMX9zv6R9Iu19Vam9aHyZ/GbOGpqtXAWqMc=;
-        b=43YiwQ3bT0wRBnUufG+oBx6bEkDHYLGswpRG1kjHzRNGTdDwlgO3K8u2aPO+HY50pY
-         CFE9anome43sFuwC8mIbdDk43LcmR3JdtpknVEYpcT6LJVSoxZSXXX7tHAq/Jj6QNQmn
-         quRuVjnXssvTMsjbgSTVWhcUoP+9OsHDrhmTkBsjGRTLo9qQZC/9/aFOLNXCwW2DDg/v
-         TMscPBgO4NrIyRGqfmL/2CWdCBnn6vKZiq7jq4wtgedgFU/LiE2MgEX0Y+isgh3Z2k5U
-         aalaJTzcgPIMqGOyxIDy5RB4b9I3buDxm4Gyt2DvYBE/JV/MwJGTpGcCjnHKl8j0dJmm
-         SNcA==
-X-Gm-Message-State: AJIora/+RCYC4SG1NZnRQhpz8qCXNbCqf2Oup7W3ovSD3oYw0Pu1Oqzm
-        bXvj2m0CWiFXjgGCb5tED3JduQ==
-X-Google-Smtp-Source: AGRyM1ufL5MDqjvHIo4wa13zoHeLqce3gwGBqjZkT/cfGeJacNorGFZd87ZD1rOQxbOuCm8UywPhnQ==
-X-Received: by 2002:a05:6870:c151:b0:fe:251b:804c with SMTP id g17-20020a056870c15100b000fe251b804cmr3187763oad.15.1655233152767;
-        Tue, 14 Jun 2022 11:59:12 -0700 (PDT)
-Received: from [192.168.0.41] ([184.4.90.121])
-        by smtp.gmail.com with ESMTPSA id x64-20020acae043000000b0032ecb7370ffsm5017316oig.41.2022.06.14.11.59.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Jun 2022 11:59:10 -0700 (PDT)
-Message-ID: <9ed91f15-420c-3db6-8b3b-85438b02bf97@cloudflare.com>
-Date:   Tue, 14 Jun 2022 13:59:08 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v3] cred: Propagate security_prepare_creds() error code
-Content-Language: en-US
-To:     "Eric W. Biederman" <ebiederm@xmission.com>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-        keyrings@vger.kernel.org, selinux@vger.kernel.org,
-        serge@hallyn.com, amir73il@gmail.com, kernel-team@cloudflare.com,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Paul Moore <paul@paul-moore.com>
-References: <20220608150942.776446-1-fred@cloudflare.com>
- <87tu8oze94.fsf@email.froward.int.ebiederm.org>
- <e1b62234-9b8a-e7c2-2946-5ef9f6f23a08@cloudflare.com>
- <87y1xzyhub.fsf@email.froward.int.ebiederm.org>
- <859cb593-9e96-5846-2191-6613677b07c5@cloudflare.com>
- <87o7yvxl4x.fsf@email.froward.int.ebiederm.org>
-From:   Frederick Lawler <fred@cloudflare.com>
-In-Reply-To: <87o7yvxl4x.fsf@email.froward.int.ebiederm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S240272AbiFOBRh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Jun 2022 21:17:37 -0400
+X-Greylist: delayed 302 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 14 Jun 2022 18:17:29 PDT
+Received: from so254-40.mailgun.net (so254-40.mailgun.net [198.61.254.40])
+        by lindbergh.monkeyblade.net (Postfix) with UTF8SMTPS id 2CAC15FD1
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Jun 2022 18:17:28 -0700 (PDT)
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.flux-g.com; q=dns/txt;
+ s=pic; t=1655255848; x=1655464648; h=Content-Type:
+ Content-Transfer-Encoding: Message-Id: Reply-To: To: To: From: From:
+ Subject: Subject: Mime-Version: Date: Sender: Sender;
+ bh=P6ttQC9Nc8Oxo9vq21a6Xlfh6oY6uibIE60UHpXwRPU=; b=EaYSBvWZm3/zJYE9W6WkaHvNMK72e/RAuqUUpxe1CF9crCXU7s0VpElZe2GHo0KO2+z9meT9
+ 1qVbWD7WSf4iD0ZVzxIvuok5WfSxC+2DB8sUamess0mRRI8gWKFaoiXf4jXOFBTiLThSXEkN
+ VgZ1f7Ao2hgy7obNbh7nUIl8Z4JEOC+vaZf48rXvMf65eIdpgkzemeHNAVO6d/3G2pAweBNG
+ MGYpJR6Ji79Dopa6w4I3mO1ncgpHqcxV6pplnJGnIBFqe6O0AKrVHxcg54TVNMTG8KzN1nzr
+ nQreMYSDx8thxqYcSgpwyQA1BKB7wD0mhiexSMgcT3vhbNhInjugtA==
+X-Mailgun-Sending-Ip: 198.61.254.40
+X-Mailgun-Sid: WyJkZGExMCIsICJsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZyIsICI3OWNmYjhjIl0=
+Received: from <unknown> (<unknown> []) by
+ api-n09.prod.us-east-1.postgun.com with HTTP id 62a931f8449dbbfd397f84df;
+ Wed, 15 Jun 2022 01:12:24 GMT
+Sender: noreply=flux-g.com@mg.flux-g.com
+Date:   Wed, 15 Jun 2022 01:12:24 +0000
+Mime-Version: 1.0
+Subject: =?UTF-8?b?5qCq5byP5Lya56S+RkxVWCDjgYrllY/jgYTlkIjjgo/jgZvjgpLmib/jgoo=?=
+ =?UTF-8?b?44G+44GX44Gf?=
+From:   =?utf-8?b?5qCq5byP5Lya56S+RkxVWA==?= <noreply@flux-g.com>
+To:     linux-cifs@vger.kernel.org
+Reply-To: r.washida@flux-g.com
+X-Mailer: WPMailSMTP/Mailer/mailgun 3.4.0
+Message-Id: <20220615011224.9b80101cee09466c@mg.flux-g.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 6/14/22 11:30 AM, Eric W. Biederman wrote:
-> Frederick Lawler <fred@cloudflare.com> writes:
-> 
->> On 6/13/22 11:44 PM, Eric W. Biederman wrote:
->>> Frederick Lawler <fred@cloudflare.com> writes:
->>>
->>>> Hi Eric,
->>>>
->>>> On 6/13/22 12:04 PM, Eric W. Biederman wrote:
->>>>> Frederick Lawler <fred@cloudflare.com> writes:
->>>>>
->>>>>> While experimenting with the security_prepare_creds() LSM hook, we
->>>>>> noticed that our EPERM error code was not propagated up the callstack.
->>>>>> Instead ENOMEM is always returned.  As a result, some tools may send a
->>>>>> confusing error message to the user:
->>>>>>
->>>>>> $ unshare -rU
->>>>>> unshare: unshare failed: Cannot allocate memory
->>>>>>
->>>>>> A user would think that the system didn't have enough memory, when
->>>>>> instead the action was denied.
->>>>>>
->>>>>> This problem occurs because prepare_creds() and prepare_kernel_cred()
->>>>>> return NULL when security_prepare_creds() returns an error code. Later,
->>>>>> functions calling prepare_creds() and prepare_kernel_cred() return
->>>>>> ENOMEM because they assume that a NULL meant there was no memory
->>>>>> allocated.
->>>>>>
->>>>>> Fix this by propagating an error code from security_prepare_creds() up
->>>>>> the callstack.
->>>>> Why would it make sense for security_prepare_creds to return an error
->>>>> code other than ENOMEM?
->>>>>    > That seems a bit of a violation of what that function is supposed to do
->>>>>
->>>>
->>>> The API allows LSM authors to decide what error code is returned from the
->>>> cred_prepare hook. security_task_alloc() is a similar hook, and has its return
->>>> code propagated.
->>> It is not an api.  It is an implementation detail of the linux kernel.
->>> It is a set of convenient functions that do a job.
->>> The general rule is we don't support cases without an in-tree user.  I
->>> don't see an in-tree user.
->>>
->>>> I'm proposing we follow security_task_allocs() pattern, and add visibility for
->>>> failure cases in prepare_creds().
->>> I am asking why we would want to.  Especially as it is not an API, and I
->>> don't see any good reason for anything but an -ENOMEM failure to be
->>> supported.
->>>
->> We're writing a LSM BPF policy, and not a new LSM. Our policy aims to solve
->> unprivileged unshare, similar to Debian's patch [1]. We're in a position such
->> that we can't use that patch because we can't block _all_ of our applications
->> from performing an unshare. We prefer a granular approach. LSM BPF seems like a
->> good choice.
-> 
-> I am quite puzzled why doesn't /proc/sys/user/max_user_namespaces work
-> for you?
-> 
+=E3=81=8A=E5=95=8F=E3=81=84=E5=90=88=E3=82=8F=E3=81=9B=E7=A8=AE=E5=88=A5=20
+=E3=81=9D=E3=81=AE=E4=BB=96
 
-We have the following requirements:
+=E4=BC=9A=E7=A4=BE=E5=90=8D
+=F0=9F=92=98 Kelly sent you a private message! View Message: https://sweet2=
+2.page.link/photos?l5a =F0=9F=92=98
 
-1. Allow list criteria
-2. root user must be able to create namespaces whenever
-3. Everything else not in 1 & 2 must be denied
+=E3=81=8A=E5=90=8D=E5=89=8D
+vislrv
 
-We use per task attributes to determine whether or not we allow/deny the 
-current call to unshare().
+=E9=9B=BB=E8=A9=B1=E7=95=AA=E5=8F=B7=20
+063463581251
 
-/proc/sys/user/max_user_namespaces limits are a bit broad for this level 
-of detail.
+=E3=83=A1=E3=83=BC=E3=83=AB=E3=82=A2=E3=83=89=E3=83=AC=E3=82=B9
+linux-cifs@vger.kernel.org
 
->> Because LSM BPF exposes these hooks, we should probably treat them as an
->> API. From that perspective, userspace expects unshare to return a EPERM
->> when the call is denied permissions.
-> 
-> The BPF code gets to be treated as a out of tree kernel module.
-> 
->>> Without an in-tree user that cares it is probably better to go the
->>> opposite direction and remove the possibility of return anything but
->>> memory allocation failure.  That will make it clearer to implementors
->>> that a general error code is not supported and this is not a location
->>> to implement policy, this is only a hook to allocate state for the LSM.
->>>
->>
->> That's a good point, and it's possible we're using the wrong hook for the
->> policy. Do you know of other hooks we can look into?
-> 
-> Not off the top of my head.
-> 
->>>>> I have probably missed a very interesting discussion where that was
->>>>> mentioned but I don't see link to the discussion or anything explaining
->>>>> why we want to do that in this change.
->>>>>
->>>>
->>>> AFAIK, this is the start of the discussion.
->>> You were on v3 and had an out of tree piece of code so I assumed someone
->>> had at least thought about why you want to implement policy in a piece
->>> of code whose only purpose is to allocate memory to store state.
->>>
->>
->> No worries.
->>
->>> Eric
->>>
->>>
->>
->> Links:
->> 1:
->> https://sources.debian.org/patches/linux/3.16.56-1+deb8u1/debian/add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by-default.patch/
-> 
-> Eric
+=E3=81=8A=E5=95=8F=E3=81=84=E5=90=88=E3=82=8F=E3=81=9B=E5=86=85=E5=AE=B9
+j4mj0o
 
+--=20
+=E3=81=93=E3=81=AE=E3=83=A1=E3=83=BC=E3=83=AB=E3=81=AF =E6=A0=AA=E5=BC=8F=
+=E4=BC=9A=E7=A4=BEFLUX (https://flux.jp) =E3=81=AE=E3=81=8A=E5=95=8F=E3=81=
+=84=E5=90=88=E3=82=8F=E3=81=9B=E3=83=95=E3=82=A9=E3=83=BC=E3=83=A0=E3=81=8B=
+=E3=82=89=E9=80=81=E4=BF=A1=E3=81=95=E3=82=8C=E3=81=BE=E3=81=97=E3=81=9F
