@@ -2,68 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A48DC433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 19 Jun 2022 03:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160DCC43334
+	for <linux-cifs@archiver.kernel.org>; Sun, 19 Jun 2022 14:11:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231161AbiFSDC2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 18 Jun 2022 23:02:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44710 "EHLO
+        id S231712AbiFSOLc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 19 Jun 2022 10:11:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231950AbiFSDCZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Jun 2022 23:02:25 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB03EE05;
-        Sat, 18 Jun 2022 20:02:24 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 212E2B8068D;
-        Sun, 19 Jun 2022 03:02:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DE9F0C341C0;
-        Sun, 19 Jun 2022 03:02:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655607741;
-        bh=gCcWfmX5YoxFjVKMAgaNE1dtoZEMfcprUTP4IEHGKTg=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=sfqFSPwxCkV6W6+GvnLK7LYP1wXQLRwqlWG2b8/SeR5xIa6erFTSlRAN5MMryI3Ks
-         IW16Jm+jdU4qD1udXGIfXYcXYdjLVaDveYn9WpMP5hvL1oc6z8azS7uiAJKh4DnZPb
-         5DpiXRGTfX+eRTOtEV0bSLGnPl3XOnKy50dSEW5/IxbVXC6La8yePeH+q6igeSGuM3
-         bMK9odPoLP6dDZcvmG2vADqQICVnCckt0pRbb7UKY5utnrkkafGFLAzSnOoerTUW8d
-         WN05MRqs35Gsqpug7yn8s/7mNMx4UYyp3Sh6g2ZObfEloFJBwUX2JXBs9iOrS+u2xB
-         dGnBzEctf6OpQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CBABAE73856;
-        Sun, 19 Jun 2022 03:02:21 +0000 (UTC)
-Subject: Re: [GIT PULL] SMB3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtJnW8Uq2Dk2xjid4Au9rM=g9_oBJC5ojJMd-Qksne+6g@mail.gmail.com>
-References: <CAH2r5mtJnW8Uq2Dk2xjid4Au9rM=g9_oBJC5ojJMd-Qksne+6g@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtJnW8Uq2Dk2xjid4Au9rM=g9_oBJC5ojJMd-Qksne+6g@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc2-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 5d24968f5b7e00bae564b1646c3b9e0e3750aabe
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ace2045ed56f9b00beb4cd23c76a5b6cae69f2fe
-Message-Id: <165560774182.16247.637044880710976675.pr-tracker-bot@kernel.org>
-Date:   Sun, 19 Jun 2022 03:02:21 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        with ESMTP id S229637AbiFSOLa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Jun 2022 10:11:30 -0400
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFEC4B7E9;
+        Sun, 19 Jun 2022 07:11:29 -0700 (PDT)
+Received: by mail-pj1-f51.google.com with SMTP id 73-20020a17090a0fcf00b001eaee69f600so8024782pjz.1;
+        Sun, 19 Jun 2022 07:11:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FX9OqpFe7Pfnfmb+wnGlyvrvJuLGJWbixl9jf/rQVVM=;
+        b=gZ88wRysS2SirnaGIh01KSdkNPmDcMiFSL1OaWRj6Kog1WUxwNg8p/A/h+c29/+1O/
+         2WAQdRGARxmBXP1FieISekfFbI9eCx5Q38o5p8YmQXCpoUW3Ec7Kf/l9R/65hbgn/C10
+         kAXEziistHTk6tzEtoDCRixhh05cB8wQnhdvaZ48GFDzOS/4l92iKIk+6KPTQbcXMHuF
+         xIAEHZVznRBTt/y/dsy4KeSzjrKer/RR+1usPYp0FWP7WavIYfYlyedntc6RqQGBkWRe
+         ubHDH8sjS/98Q6PKvww82p5n6Id8n5fSFWHkS/SNBmneXyTrROyX8mjEjE11ryohIlVl
+         Fi1g==
+X-Gm-Message-State: AJIora+roOD+x45SCGWFrIOknQVH8AdIy07DEAduQP6n055GxsH10kvp
+        QIgG+ZScfoJNmQqMvo0AFyBwfixpwJlXWw==
+X-Google-Smtp-Source: AGRyM1vg8ExynVihVHvkTNCfjkxiSq1+kmn6k80B3CXsRXBPwmH6Z4yNK0ICQxlXrz3u6+2eGdXCTg==
+X-Received: by 2002:a17:90a:1c02:b0:1e0:df7:31f2 with SMTP id s2-20020a17090a1c0200b001e00df731f2mr33089602pjs.222.1655647888799;
+        Sun, 19 Jun 2022 07:11:28 -0700 (PDT)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id o17-20020a170903301100b0016223016d79sm3473156pla.90.2022.06.19.07.11.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Jun 2022 07:11:27 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
+        Namjae Jeon <linkinjeon@kernel.org>, stable@vger.kernel.org
+Subject: [PATCH 1/2] ksmbd: set the range of bytes to zero without extending file size in FSCTL_ZERO_DATA
+Date:   Sun, 19 Jun 2022 23:11:19 +0900
+Message-Id: <20220619141120.12760-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 18 Jun 2022 17:38:54 -0500:
+generic/091, 263 test failed since commit f66f8b94e7f2 ("cifs: when
+extending a file with falloc we should make files not-sparse").
+FSCTL_ZERO_DATA sets the range of bytes to zero without extending file
+size. The VFS_FALLOCATE_FL_KEEP_SIZE flag should be used even on
+non-sparse files.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc2-smb3-client-fixes
+Cc: stable@vger.kernel.org
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/vfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ace2045ed56f9b00beb4cd23c76a5b6cae69f2fe
-
-Thank you!
-
+diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
+index dcdd07c6efff..f194bf764f9f 100644
+--- a/fs/ksmbd/vfs.c
++++ b/fs/ksmbd/vfs.c
+@@ -1015,7 +1015,9 @@ int ksmbd_vfs_zero_data(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 				     FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+ 				     off, len);
+ 
+-	return vfs_fallocate(fp->filp, FALLOC_FL_ZERO_RANGE, off, len);
++	return vfs_fallocate(fp->filp,
++			     FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE,
++			     off, len);
+ }
+ 
+ int ksmbd_vfs_fqar_lseek(struct ksmbd_file *fp, loff_t start, loff_t length,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.25.1
+
