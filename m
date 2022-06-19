@@ -2,114 +2,113 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D531C433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 19 Jun 2022 14:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4454AC43334
+	for <linux-cifs@archiver.kernel.org>; Sun, 19 Jun 2022 18:38:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231833AbiFSOLg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 19 Jun 2022 10:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51582 "EHLO
+        id S233983AbiFSSiR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 19 Jun 2022 14:38:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbiFSOLf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Jun 2022 10:11:35 -0400
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1651B7F0;
-        Sun, 19 Jun 2022 07:11:34 -0700 (PDT)
-Received: by mail-pj1-f45.google.com with SMTP id x1-20020a17090abc8100b001ec7f8a51f5so4506065pjr.0;
-        Sun, 19 Jun 2022 07:11:34 -0700 (PDT)
+        with ESMTP id S229902AbiFSSiQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Jun 2022 14:38:16 -0400
+Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEEA16265
+        for <linux-cifs@vger.kernel.org>; Sun, 19 Jun 2022 11:38:15 -0700 (PDT)
+Received: by mail-vs1-xe2f.google.com with SMTP id g6so8707186vsb.2
+        for <linux-cifs@vger.kernel.org>; Sun, 19 Jun 2022 11:38:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=WD1tJoTlVO8iMOFUha8+Jc8kIyGKD6D97x7uiglNq4I=;
+        b=Gp03q5DjC1fX3IT0d5X8eDwOPUBVsPQa7lPbWLCj7z4qmRRAmrK6asFqm7SM4LuoHK
+         XFRrjeln5r49JyM82lOroHiuai2pxblz0GPNozyzRmNnMwv/+hwadSaOPz2PHsFUhuAq
+         18xb7tjVhbDwSCaR9V14ty4RjTHUHnhgKEVrotXzZ5Kxh4umfFndjgDwk19gbhFFnTez
+         BNtWhRh4/Q4a6jfnZk3qltPig2zR8+onH3iFKEcXGEMUga5m/SsYBzbU2W299GYVvPE8
+         JR5DmnnwBHWp0yURPAMdmRAw2+O9Jub61n9Y3ryW+/Q6mZzNxxU8hRcECV8yaPkvx8Zi
+         h6wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=qG1X/R0Mxy/riJeZK+qqMQXzwBuz+EMM+/jJlX4ZTUs=;
-        b=BKfnkSpfrLhI1nMd90XmlpnKoHIybD5KmJsW8G3Om6vHN45vUgb7tVYC30zuIdojn9
-         sqdJ7YSshYZ+7tM49cBhXH5ZcKh8iKGePB/Zrh6t24JnCaLCfziptp8Znu4NTvoxJavD
-         F/BEpmEm4cVrpV8Bz0mLfh4PWBtgJWfrd+zRGL1bJPUXaoMCEzp1EPExnb0a12mn7iOD
-         XaS3XeyS63/osukI+o1g4myD2NdZ+em12k3lvwnxM29t2iJT5z5CXgjFdPWXJbhusGam
-         ypLVQe+uLBkEcAAbTqDzL65vQsLkk8/lPS84jSBKI8UNK+E4t7ocMStaeVsKGg7/B5N7
-         6XbA==
-X-Gm-Message-State: AJIora+yQvIGc6sfAfR+QhKXPptHv2mffKd8ZbsQ1yvGBpQdHQkM3hWl
-        iR7pninlk7kM+uZuHNR0kTcx5lcrxruSDQ==
-X-Google-Smtp-Source: AGRyM1swdaRn/1F1a1jX4QwaPecpLN+Fz5BPA4FS08bwtRnY6IxwsOpC1n44Km0KbnAkT8Aur4jOfg==
-X-Received: by 2002:a17:90b:4b83:b0:1e3:3ad3:612c with SMTP id lr3-20020a17090b4b8300b001e33ad3612cmr31930832pjb.87.1655647893871;
-        Sun, 19 Jun 2022 07:11:33 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id o17-20020a170903301100b0016223016d79sm3473156pla.90.2022.06.19.07.11.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Jun 2022 07:11:33 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
-        Namjae Jeon <linkinjeon@kernel.org>, stable@vger.kernel.org
-Subject: [PATCH 2/2] ksmbd: check invalid FileOffset and BeyondFinalZero in FSCTL_ZERO_DATA
-Date:   Sun, 19 Jun 2022 23:11:20 +0900
-Message-Id: <20220619141120.12760-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220619141120.12760-1-linkinjeon@kernel.org>
-References: <20220619141120.12760-1-linkinjeon@kernel.org>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=WD1tJoTlVO8iMOFUha8+Jc8kIyGKD6D97x7uiglNq4I=;
+        b=wqS/TPPp9kir991mQ3raND7A1+2Jb4ZGdvjhbtM0vYLcPcYb3CZpZIiacMHiEEdObz
+         htnLyLKWI1vw1wfqlHK2KFeSnIbcJUrWKGzsNG8fSmsCLocmqaIIWY0shwXj4eq96JQM
+         wIDrmw9U7BYfc2z9MANYylgwaYfdTQbhMKe9ST0Ah12k+KT2+M3cLnHeB0tMTfdbgV7b
+         JtabG3V39TFUNJhjJ4SVoYb0JYnZSHvx5GT0hQBR/6wrHKHb1jLzsLkZg1GlD5iF7tGe
+         Q7o9fiOmVG3veHM9Ervg4WKVp9CJh2xLketx3FIVThL4NwryTKvagw7QHuPknChJOXO2
+         OGuQ==
+X-Gm-Message-State: AJIora83LnXzQ8kcqVA8u3bbvg72FC7Uz8XpvNeFGdysiPFuQktU2l6w
+        pamn4TOv52GzBJtFtalM2Q2dSSbTh5U8WX6iuXAC0dmdE8E=
+X-Google-Smtp-Source: AGRyM1ufrdEzNruYTJm8XjiHaE2uY9isBZVWxWv7hRdWQvoPF8qIfie7RW9RGW3UFiyqhp660U9hwjltFQmiPgoKWqI=
+X-Received: by 2002:a05:6102:1052:b0:34b:8a41:b963 with SMTP id
+ h18-20020a056102105200b0034b8a41b963mr8214622vsq.17.1655663894600; Sun, 19
+ Jun 2022 11:38:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 19 Jun 2022 13:38:03 -0500
+Message-ID: <CAH2r5mvXJ6cjpeHPJY+V4iHVUUFckYvFQ-CjHf-fAb9ZLjRrfw@mail.gmail.com>
+Subject: [PATCH][SMB3 cient] fix error connecting to channels (negprot failure)
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>
+Content-Type: multipart/mixed; boundary="0000000000004e319205e1d14a44"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-FileOffset should not be greater than BeyondFinalZero in FSCTL_ZERO_DATA.
-And don't call ksmbd_vfs_zero_data() if length is zero.
+--0000000000004e319205e1d14a44
+Content-Type: text/plain; charset="UTF-8"
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/ksmbd/smb2pdu.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+smb3: fix empty netname context on secondary channels
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index e35930867893..94ab1dcd80e7 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -7700,7 +7700,7 @@ int smb2_ioctl(struct ksmbd_work *work)
- 	{
- 		struct file_zero_data_information *zero_data;
- 		struct ksmbd_file *fp;
--		loff_t off, len;
-+		loff_t off, len, bfz;
- 
- 		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
- 			ksmbd_debug(SMB,
-@@ -7717,19 +7717,26 @@ int smb2_ioctl(struct ksmbd_work *work)
- 		zero_data =
- 			(struct file_zero_data_information *)&req->Buffer[0];
- 
--		fp = ksmbd_lookup_fd_fast(work, id);
--		if (!fp) {
--			ret = -ENOENT;
-+		off = le64_to_cpu(zero_data->FileOffset);
-+		bfz = le64_to_cpu(zero_data->BeyondFinalZero);
-+		if (off > bfz) {
-+			ret = -EINVAL;
- 			goto out;
- 		}
- 
--		off = le64_to_cpu(zero_data->FileOffset);
--		len = le64_to_cpu(zero_data->BeyondFinalZero) - off;
-+		len = bfz - off;
-+		if (len) {
-+			fp = ksmbd_lookup_fd_fast(work, id);
-+			if (!fp) {
-+				ret = -ENOENT;
-+				goto out;
-+			}
- 
--		ret = ksmbd_vfs_zero_data(work, fp, off, len);
--		ksmbd_fd_put(work, fp);
--		if (ret < 0)
--			goto out;
-+			ret = ksmbd_vfs_zero_data(work, fp, off, len);
-+			ksmbd_fd_put(work, fp);
-+			if (ret < 0)
-+				goto out;
-+		}
- 		break;
- 	}
- 	case FSCTL_QUERY_ALLOCATED_RANGES:
+Some servers do not allow null netname contexts, which would cause
+multichannel to revert to single channel when mounting to some
+servers (e.g. Azure xSMB).
+
+Fixes: 4c14d7043fede ("cifs: populate empty hostnames for extra channels")
+
+See attached patch
+
 -- 
-2.25.1
+Thanks,
 
+Steve
+
+--0000000000004e319205e1d14a44
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-fix-empty-netname-context-on-secondary-channels.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-fix-empty-netname-context-on-secondary-channels.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_l4lnh4iz0>
+X-Attachment-Id: f_l4lnh4iz0
+
+RnJvbSA4Mjk4ZjM4Y2UwYjk1ZjlhM2I1ZjdkODNkYmViN2EzMmM3NTU0MGNiIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFNhdCwgMTggSnVuIDIwMjIgMTc6MjQ6MjMgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBmaXggZW1wdHkgbmV0bmFtZSBjb250ZXh0IG9uIHNlY29uZGFyeSBjaGFubmVscwoKU29t
+ZSBzZXJ2ZXJzIGRvIG5vdCBhbGxvdyBudWxsIG5ldG5hbWUgY29udGV4dHMsIHdoaWNoIHdvdWxk
+IGNhdXNlCm11bHRpY2hhbm5lbCB0byByZXZlcnQgdG8gc2luZ2xlIGNoYW5uZWwgd2hlbiBtb3Vu
+dGluZyB0byBzb21lCnNlcnZlcnMgKGUuZy4gQXp1cmUgeFNNQikuCgpGaXhlczogNGMxNGQ3MDQz
+ZmVkZSAoImNpZnM6IHBvcHVsYXRlIGVtcHR5IGhvc3RuYW1lcyBmb3IgZXh0cmEgY2hhbm5lbHMi
+KQpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0t
+LQogZnMvY2lmcy9zbWIycGR1LmMgfCAxNCArKysrKysrKy0tLS0tLQogMSBmaWxlIGNoYW5nZWQs
+IDggaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3Nt
+YjJwZHUuYyBiL2ZzL2NpZnMvc21iMnBkdS5jCmluZGV4IGI1MTUxNDBiYWQ4ZC4uNWU4YzQ3Mzdi
+MTgzIDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJwZHUuYworKysgYi9mcy9jaWZzL3NtYjJwZHUu
+YwpAQCAtNTcwLDE2ICs1NzAsMTggQEAgYXNzZW1ibGVfbmVnX2NvbnRleHRzKHN0cnVjdCBzbWIy
+X25lZ290aWF0ZV9yZXEgKnJlcSwKIAkqdG90YWxfbGVuICs9IGN0eHRfbGVuOwogCXBuZWdfY3R4
+dCArPSBjdHh0X2xlbjsKIAotCWN0eHRfbGVuID0gYnVpbGRfbmV0bmFtZV9jdHh0KChzdHJ1Y3Qg
+c21iMl9uZXRuYW1lX25lZ19jb250ZXh0ICopcG5lZ19jdHh0LAotCQkJCQlzZXJ2ZXItPmhvc3Ru
+YW1lKTsKLQkqdG90YWxfbGVuICs9IGN0eHRfbGVuOwotCXBuZWdfY3R4dCArPSBjdHh0X2xlbjsK
+LQogCWJ1aWxkX3Bvc2l4X2N0eHQoKHN0cnVjdCBzbWIyX3Bvc2l4X25lZ19jb250ZXh0ICopcG5l
+Z19jdHh0KTsKIAkqdG90YWxfbGVuICs9IHNpemVvZihzdHJ1Y3Qgc21iMl9wb3NpeF9uZWdfY29u
+dGV4dCk7CiAJcG5lZ19jdHh0ICs9IHNpemVvZihzdHJ1Y3Qgc21iMl9wb3NpeF9uZWdfY29udGV4
+dCk7CiAKLQluZWdfY29udGV4dF9jb3VudCA9IDQ7CisJaWYgKHNlcnZlci0+aG9zdG5hbWUgJiYg
+KHNlcnZlci0+aG9zdG5hbWVbMF0gIT0gMCkpIHsKKwkJY3R4dF9sZW4gPSBidWlsZF9uZXRuYW1l
+X2N0eHQoKHN0cnVjdCBzbWIyX25ldG5hbWVfbmVnX2NvbnRleHQgKilwbmVnX2N0eHQsCisJCQkJ
+CXNlcnZlci0+aG9zdG5hbWUpOworCQkqdG90YWxfbGVuICs9IGN0eHRfbGVuOworCQlwbmVnX2N0
+eHQgKz0gY3R4dF9sZW47CisJCW5lZ19jb250ZXh0X2NvdW50ID0gNDsKKwl9IGVsc2UgLyogc2Vj
+b25kIGNoYW5uZWxzIGRvIG5vdCBoYXZlIGEgaG9zdG5hbWUgKi8KKwkJbmVnX2NvbnRleHRfY291
+bnQgPSAzOwogCiAJaWYgKHNlcnZlci0+Y29tcHJlc3NfYWxnb3JpdGhtKSB7CiAJCWJ1aWxkX2Nv
+bXByZXNzaW9uX2N0eHQoKHN0cnVjdCBzbWIyX2NvbXByZXNzaW9uX2NhcGFiaWxpdGllc19jb250
+ZXh0ICopCi0tIAoyLjM0LjEKCg==
+--0000000000004e319205e1d14a44--
