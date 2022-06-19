@@ -2,96 +2,68 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C071FC43334
-	for <linux-cifs@archiver.kernel.org>; Sat, 18 Jun 2022 22:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A48DC433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 19 Jun 2022 03:02:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231538AbiFRWjJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 18 Jun 2022 18:39:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
+        id S231161AbiFSDC2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 18 Jun 2022 23:02:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231506AbiFRWjJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Jun 2022 18:39:09 -0400
-Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6031B845;
-        Sat, 18 Jun 2022 15:39:06 -0700 (PDT)
-Received: by mail-vk1-xa2d.google.com with SMTP id c11so3547211vkn.5;
-        Sat, 18 Jun 2022 15:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=mWm3075zUyjZdm5Pr3I4IXYgBYEeEKabUfevN6De2+c=;
-        b=SeU09hxP6cWVa5NOL8KUaKNDu2/W3aC9MAFhCe53ZTzDl6O8eWQj7PjKf6j8Bc52dT
-         PoIpodjM7QxRTppxqUeTYN5yydJ7xw8YUQfaow2D5h6xxGP1V8ZqktTlXqqfLvdFhWuj
-         oHqeatWhsWRIZP2zfBQMZj2HhGMjVmcYq38dP4W6Zbz7ABXeSvjLzxXlZnces2xLADuB
-         7VOGJM9l+W+1NGlsCEcuhAu2UhYXxjKDFy8krXuRevA7LRJSIWxDeTBFJtmko/wkRB7b
-         KLloUysSm2ADs4Bzq6edvqIHxBqlgG+4HtdTKdL0kEVwF7AbZQQ66hAVU0qIQ3YvQYWi
-         470w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=mWm3075zUyjZdm5Pr3I4IXYgBYEeEKabUfevN6De2+c=;
-        b=PDTdweLd+EEqzvhrz9K9Py0z4l9EdaC5l1ZR52I06y5fH+mAUjDHYihDVueH8/Y/wH
-         mLfuQBZgVLqFS+u0LB6q2JlBM4CmIFy5vVjfDmnCmT5zQWzc934Q746ZtcdoHHNMDzrI
-         BgzcWDTlKN2o/cz1Lpx3+Ljcxf+SOc3eJvPH7LcUkpO1pWaXi2XKGdhRVp9VdSilUvPo
-         Z51UFrmVwzrosua4tqgYNklrQjtXK175XT6s0ueClU4t8/euh2JnyhPZEXjeSOwX0jKu
-         voF6voOiTuWMmm/LHiHnTrIuTQNNTPzCD9X0QgKL79nC6s29SkbFEX9fPQxIVZvn0uOC
-         VDeg==
-X-Gm-Message-State: AJIora/tdY0N7yi60C1odeGYEN69VxNr0+53fDSG4eYPsSJTqlrzvG6p
-        TAWl3D3QXXcl1pOzK0cyJla0kZSTuvfLNhYwZwrFe7n3DeM=
-X-Google-Smtp-Source: AGRyM1uCZJ225/VpReNjFcSZlrd2YXp/8Ij7WF2q0FMHRLjn5v41CMcCG1Jj/ozGFj3K14m+TEOrTUTfiNiFuO9Wxr4=
-X-Received: by 2002:a1f:6d04:0:b0:36c:125:2edf with SMTP id
- i4-20020a1f6d04000000b0036c01252edfmr63817vkc.38.1655591945548; Sat, 18 Jun
- 2022 15:39:05 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 18 Jun 2022 17:38:54 -0500
-Message-ID: <CAH2r5mtJnW8Uq2Dk2xjid4Au9rM=g9_oBJC5ojJMd-Qksne+6g@mail.gmail.com>
-Subject: [GIT PULL] SMB3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        with ESMTP id S231950AbiFSDCZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Jun 2022 23:02:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB03EE05;
+        Sat, 18 Jun 2022 20:02:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 212E2B8068D;
+        Sun, 19 Jun 2022 03:02:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DE9F0C341C0;
+        Sun, 19 Jun 2022 03:02:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655607741;
+        bh=gCcWfmX5YoxFjVKMAgaNE1dtoZEMfcprUTP4IEHGKTg=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=sfqFSPwxCkV6W6+GvnLK7LYP1wXQLRwqlWG2b8/SeR5xIa6erFTSlRAN5MMryI3Ks
+         IW16Jm+jdU4qD1udXGIfXYcXYdjLVaDveYn9WpMP5hvL1oc6z8azS7uiAJKh4DnZPb
+         5DpiXRGTfX+eRTOtEV0bSLGnPl3XOnKy50dSEW5/IxbVXC6La8yePeH+q6igeSGuM3
+         bMK9odPoLP6dDZcvmG2vADqQICVnCckt0pRbb7UKY5utnrkkafGFLAzSnOoerTUW8d
+         WN05MRqs35Gsqpug7yn8s/7mNMx4UYyp3Sh6g2ZObfEloFJBwUX2JXBs9iOrS+u2xB
+         dGnBzEctf6OpQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CBABAE73856;
+        Sun, 19 Jun 2022 03:02:21 +0000 (UTC)
+Subject: Re: [GIT PULL] SMB3 client fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mtJnW8Uq2Dk2xjid4Au9rM=g9_oBJC5ojJMd-Qksne+6g@mail.gmail.com>
+References: <CAH2r5mtJnW8Uq2Dk2xjid4Au9rM=g9_oBJC5ojJMd-Qksne+6g@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mtJnW8Uq2Dk2xjid4Au9rM=g9_oBJC5ojJMd-Qksne+6g@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc2-smb3-client-fixes
+X-PR-Tracked-Commit-Id: 5d24968f5b7e00bae564b1646c3b9e0e3750aabe
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ace2045ed56f9b00beb4cd23c76a5b6cae69f2fe
+Message-Id: <165560774182.16247.637044880710976675.pr-tracker-bot@kernel.org>
+Date:   Sun, 19 Jun 2022 03:02:21 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-b13baccc3850ca8b8cccbf8ed9912dbaa0fdf7f3:
+The pull request you sent on Sat, 18 Jun 2022 17:38:54 -0500:
 
-  Linux 5.19-rc2 (2022-06-12 16:11:37 -0700)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc2-smb3-client-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ace2045ed56f9b00beb4cd23c76a5b6cae69f2fe
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc2-smb3-client-fixes
-
-for you to fetch changes up to 5d24968f5b7e00bae564b1646c3b9e0e3750aabe:
-
-  cifs: when a channel is not found for server, log its connection id
-(2022-06-18 14:55:06 -0500)
-
-----------------------------------------------------------------
-2 smb3 debugging improvements
-- one found to deal with debugging a multichannel problem and one for
-a recent fallocate issue
-
-Did not include the two larger multichannel reconnect (dynamically
-adjusting interfaces on reconnect) patches in this P/R, because
-recently found an additional problem with multichannel  to one server
-type that I want to include at the same time.
-----------------------------------------------------------------
-Shyam Prasad N (1):
-      cifs: when a channel is not found for server, log its connection id
-
-Steve French (1):
-      smb3: add trace point for SMB2_set_eof
-
- fs/cifs/sess.c    |  3 +++
- fs/cifs/smb2pdu.c |  2 ++
- fs/cifs/trace.h   | 38 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 43 insertions(+)
-
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
