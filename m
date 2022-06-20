@@ -2,138 +2,89 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA57CC43334
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Jun 2022 00:10:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EEEC43334
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Jun 2022 06:13:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232400AbiFTAKa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 19 Jun 2022 20:10:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56796 "EHLO
+        id S234123AbiFTGNn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Jun 2022 02:13:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231266AbiFTAK3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Jun 2022 20:10:29 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 035CBDB1;
-        Sun, 19 Jun 2022 17:10:28 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id i81-20020a1c3b54000000b0039c76434147so6985777wma.1;
-        Sun, 19 Jun 2022 17:10:28 -0700 (PDT)
+        with ESMTP id S238265AbiFTGNl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Jun 2022 02:13:41 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 035836146
+        for <linux-cifs@vger.kernel.org>; Sun, 19 Jun 2022 23:13:41 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id o9so4358173edt.12
+        for <linux-cifs@vger.kernel.org>; Sun, 19 Jun 2022 23:13:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=MOgkmt4hoY1NuTD36wu+KkCXhIYC/5pF/wBvdmvGfkI=;
-        b=fEftjZz9xOfRte/5Vn/z6uNJF5TeH7mcqAdtIpGU7vMdvK8RppSemCqOMg65gCdPwn
-         +hna0kFogrLD6wE3HkG9QoytTHgoPWIjN0fLyJbo8ce1hz4HUefLzX8MCk6pmvCMmkc0
-         vKmMeoC6aLNEbhzTSdfKTuQvN8pmKIgR94J/RCnlQ6Ij+dww31cfRdlGDKwdkvoT6QR2
-         /nUiuvDGR/s1SJTERb0d3l76NdpEtcoUrVNqe23nrFLCjvPdiXSksnFpVUFSiZhkRBca
-         fV/mCqNbbGkf9n94lk0sSHYeKKdXEF5GYdiU0i9FHlvd5ZXFxWLwetlg34DOxZ5pHWZc
-         P9pw==
+         :cc;
+        bh=TQ4cnfsz5QzuT8KE3wqBmVlwzjpzu0jxQviuj06Q0Vc=;
+        b=GeBKO1Xik+i0k0rALB7H0AVvNn4UnckHPTPF0uO9rT3IaaxNQPjmgTdgDWWxyfP62s
+         E1jmP/e3GC+f6QFMXvFf4WiQLIGRFffdtP1P539Z+9HolPAnPL+jgNpqzHnJgYA0JePW
+         a20QjqQ6qInQ6FXXh/wpC7hZvCWoauY0NVj9KcSLWdp7zHfeNJtU8hhRP4idfsxvFs6/
+         CNfV5NfN8P45H9zf7vBKPe/1jLSHVhgJm/M+a37RZqmtgiyisQfWDWAVN4NTkyZMkwrP
+         0cBkkBJ7M1vUVzUFBLc4v35Y6mpDvvrdc9p3A7qo4sO9SfBdHe2xeoSUOAgJAN5o0Qtj
+         h4XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=MOgkmt4hoY1NuTD36wu+KkCXhIYC/5pF/wBvdmvGfkI=;
-        b=XL79tC2QloRQ3u/lnnLjSzlPYaUvlkWhaPhtDQmSAq8rfsJLWSQkb3jRFVfEEIjVNl
-         USoyehg0Ama20C3F4mf/iIEWInTN8FjdyRYMr6hZN/wkcXhCyWRv77czYuA/gZ1yJcZf
-         OMY5g7DkE2z7x5cTz1Scpe0cR8U/LNWUv+lgB2AvnC9vyImBNI4fkeudKUOOIuTS8mad
-         gsS7AE2KW9PKoB8vG6JQQvp+UToeTGw1AWh2bHnb1vUs11gMGq9UTOqhSR8+QlgE4Hyf
-         meM+oYpzNQ9xgzJexe96NvJhGtj6wWWC2UURhhFiBKACmjqJYiiYwefupt2Gk9YpmO1C
-         gknw==
-X-Gm-Message-State: AJIora9pORUJdZnwAoqzBebUbaNxe/A99PSfxcQSyqTHSpUu8Nyw+vpt
-        mvHIjIVyg9N6AUba+xydGGBJxRZ7D9ydRa6dBiU=
-X-Google-Smtp-Source: AGRyM1uSHE60zzO0/gPy8Fr1bzhj/uEOzf7E9aPvCjleJw0Gl57hEYYoqZ0byCMvu+NarDwU1ZXwEBF8Ekbupp4cwV4=
-X-Received: by 2002:a7b:c392:0:b0:39c:4d27:e698 with SMTP id
- s18-20020a7bc392000000b0039c4d27e698mr21804143wmj.57.1655683827478; Sun, 19
- Jun 2022 17:10:27 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=TQ4cnfsz5QzuT8KE3wqBmVlwzjpzu0jxQviuj06Q0Vc=;
+        b=6OkT865kuNqI1pokmzrjwvLgcqY354uhQdp1+E0eIsh3asfj5pg96KpzIkqsycsxyh
+         sDRT35ibTEekRDLfOmROW+DvlK98iMtyxleHMJRIKXJ3JHwP97mI2uc7zzPcIX0+mxY+
+         lAIh4lllYAdmYwDSOR0+gPhEut2jTE0eIF9ie3OmB/zxfTcN54fWV5zX3CndzyBMd5Gk
+         wAw+mJNr6/hZVdZ+Ji3KUFP1FuR+KK3ITbqrKctwDma0HGRERjMvABDaz3pRV30tNYLd
+         fCe/4tDI0LRmtm9D4260v068dzySjR+e3tdLjwCB4PIB2Fj9OZxLqmvciXIsdUf+Ifwc
+         gMAw==
+X-Gm-Message-State: AJIora/4uxqQTaVtTgiUyx+MtjOU83o7Y9sVnrZSrXgPU/sVNkFCcshk
+        G6JT6ADxt7QDo8Sz6E4sIkBm05GqlTkdOknanwsPEMlJsGs=
+X-Google-Smtp-Source: AGRyM1to17XgIm9FwTFtdW3yXtND+nChwsLmye/BlVLZVHV/2Qy28NOFxHuNsLNtjiMWkKfmTWxd0adqfl9b9LCo43Q=
+X-Received: by 2002:a05:6402:e9f:b0:435:644e:4a7d with SMTP id
+ h31-20020a0564020e9f00b00435644e4a7dmr17907827eda.114.1655705619461; Sun, 19
+ Jun 2022 23:13:39 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220619141120.12760-1-linkinjeon@kernel.org> <20220619141120.12760-2-linkinjeon@kernel.org>
-In-Reply-To: <20220619141120.12760-2-linkinjeon@kernel.org>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Mon, 20 Jun 2022 09:10:16 +0900
-Message-ID: <CANFS6bZz353HN_7-dSdZEtPxEYTeyAX7YHYe5N_=wLS2Z1ua8g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] ksmbd: check invalid FileOffset and BeyondFinalZero
- in FSCTL_ZERO_DATA
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        stable@vger.kernel.org
+References: <CAH2r5mvXJ6cjpeHPJY+V4iHVUUFckYvFQ-CjHf-fAb9ZLjRrfw@mail.gmail.com>
+In-Reply-To: <CAH2r5mvXJ6cjpeHPJY+V4iHVUUFckYvFQ-CjHf-fAb9ZLjRrfw@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Mon, 20 Jun 2022 11:43:28 +0530
+Message-ID: <CANT5p=rBWA1t2T9MAfJYLbdg+eY9wy3-WH3CnWXGw2imH8nV1Q@mail.gmail.com>
+Subject: Re: [PATCH][SMB3 cient] fix error connecting to channels (negprot failure)
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022=EB=85=84 6=EC=9B=94 19=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 11:11, =
-Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+On Mon, Jun 20, 2022 at 12:08 AM Steve French <smfrench@gmail.com> wrote:
 >
-> FileOffset should not be greater than BeyondFinalZero in FSCTL_ZERO_DATA.
-> And don't call ksmbd_vfs_zero_data() if length is zero.
+> smb3: fix empty netname context on secondary channels
 >
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-> ---
-
-Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
-
->  fs/ksmbd/smb2pdu.c | 27 +++++++++++++++++----------
->  1 file changed, 17 insertions(+), 10 deletions(-)
+> Some servers do not allow null netname contexts, which would cause
+> multichannel to revert to single channel when mounting to some
+> servers (e.g. Azure xSMB).
 >
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index e35930867893..94ab1dcd80e7 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -7700,7 +7700,7 @@ int smb2_ioctl(struct ksmbd_work *work)
->         {
->                 struct file_zero_data_information *zero_data;
->                 struct ksmbd_file *fp;
-> -               loff_t off, len;
-> +               loff_t off, len, bfz;
+> Fixes: 4c14d7043fede ("cifs: populate empty hostnames for extra channels")
 >
->                 if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG=
-_WRITABLE)) {
->                         ksmbd_debug(SMB,
-> @@ -7717,19 +7717,26 @@ int smb2_ioctl(struct ksmbd_work *work)
->                 zero_data =3D
->                         (struct file_zero_data_information *)&req->Buffer=
-[0];
+> See attached patch
 >
-> -               fp =3D ksmbd_lookup_fd_fast(work, id);
-> -               if (!fp) {
-> -                       ret =3D -ENOENT;
-> +               off =3D le64_to_cpu(zero_data->FileOffset);
-> +               bfz =3D le64_to_cpu(zero_data->BeyondFinalZero);
-> +               if (off > bfz) {
-> +                       ret =3D -EINVAL;
->                         goto out;
->                 }
->
-> -               off =3D le64_to_cpu(zero_data->FileOffset);
-> -               len =3D le64_to_cpu(zero_data->BeyondFinalZero) - off;
-> +               len =3D bfz - off;
-> +               if (len) {
-> +                       fp =3D ksmbd_lookup_fd_fast(work, id);
-> +                       if (!fp) {
-> +                               ret =3D -ENOENT;
-> +                               goto out;
-> +                       }
->
-> -               ret =3D ksmbd_vfs_zero_data(work, fp, off, len);
-> -               ksmbd_fd_put(work, fp);
-> -               if (ret < 0)
-> -                       goto out;
-> +                       ret =3D ksmbd_vfs_zero_data(work, fp, off, len);
-> +                       ksmbd_fd_put(work, fp);
-> +                       if (ret < 0)
-> +                               goto out;
-> +               }
->                 break;
->         }
->         case FSCTL_QUERY_ALLOCATED_RANGES:
 > --
-> 2.25.1
+> Thanks,
 >
+> Steve
 
+Hi Steve,
 
---=20
-Thanks,
-Hyunchul
+Thanks for handling this when I was away.
+
+Regarding the change, it looks good to me.
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+
+Was this the cause for failure of cifs/104 test in buildbot?
+Is that test passing after this change?
+
+-- 
+Regards,
+Shyam
