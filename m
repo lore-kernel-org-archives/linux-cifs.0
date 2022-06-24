@@ -2,85 +2,73 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 209D8C43334
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jun 2022 23:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A618CCA473
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Jun 2022 04:54:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbiFVXj7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 22 Jun 2022 19:39:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50418 "EHLO
+        id S229498AbiFXEyy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 24 Jun 2022 00:54:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbiFVXj6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Jun 2022 19:39:58 -0400
-Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38222EA33;
-        Wed, 22 Jun 2022 16:39:57 -0700 (PDT)
-Received: by mail-vs1-xe2f.google.com with SMTP id o190so1445345vsc.5;
-        Wed, 22 Jun 2022 16:39:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fXbi+L+NkZbRlKgcqfJAgJsUF1nNxwKZOCLWcU+nmAE=;
-        b=XQUS7Df/bBAuizAHoQu+LA8em3uvsxxvFrdbARCbpS133hVguFrig2TAJcNPlp5UEr
-         EgTeOaYdu74/ND+AhbNgt6EZjWLgNRBvIYB/7L8vgqSYICyjjieVTc7iSUABgfMO+2pL
-         BkTXCc2RtppZsgypyPl8uuq4uEJRux0BQK1lzhh8qXP5XVl+/Lcqa7rTJuxDAs6oVM8T
-         81GwU1CwUKyxBxNPWFAV4J90mSXFmZeWctfFlmRSb81pa4L86+Bpk0dwFxF/XdZ4HCAn
-         DA7iTpWVxpEfVnn0/qyu8CUbCcw3H3h3XqAFFr6OaRrp2OOCsHn4uGWkf9Mhwru43DDd
-         Axug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fXbi+L+NkZbRlKgcqfJAgJsUF1nNxwKZOCLWcU+nmAE=;
-        b=i7G76ErT/jENCUvByN5Q99OwB4HttApEsguRiKhzq4KmuXpFWfrCzRNVgG/IklR1OC
-         DspYUdsRmJObJpri/swJ5OmeyptyrWLLSZi1nZBXegrPnwHLduhW9AWJXRohGjPZj7R4
-         /S82Nj2MLHk+fPdN3UU9gB0wornWI3MtAgMWjXjHZ5kjIvRRhHb1z/DJ9C0BlycWpOO7
-         iq9Z0/vVBjsQRTxlM5NtJO8P04OYLa6XNYWGx/5ej0ykCv/RN0UvvI49nVbUkFwOOLEv
-         Q0QI+YWbl2w3y3er4ICB/cMf9GEAGD5yz8HHU9jA8fJBJ1uUci3OQH+UlNYA35dEUWT8
-         8VMg==
-X-Gm-Message-State: AJIora/OdylhNqASiRiQ16LGc9/oQRt3vXpepBCAxqufkozXuNWH2ZDQ
-        nLOhTHFK/F2yjYiepZ3mjt9p+xmVuGS7dzhis4HCvK77
-X-Google-Smtp-Source: AGRyM1sYH4MvxuOccbW4jhOcD6WNYrHm8xEa3ZbzpVv2MZHPH0Y/fmqoH3L4Ipx2nh1dtnImz+/VLQvcVHN7C/SpiRE=
-X-Received: by 2002:a05:6102:15a4:b0:354:6370:333b with SMTP id
- g36-20020a05610215a400b003546370333bmr2755572vsv.29.1655941196781; Wed, 22
- Jun 2022 16:39:56 -0700 (PDT)
+        with ESMTP id S231965AbiFXEyp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 24 Jun 2022 00:54:45 -0400
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [IPv6:2001:470:ea4a:1:5054:ff:fec7:86e4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17CF2AC60
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Jun 2022 21:54:43 -0700 (PDT)
+From:   Sam James <sam@gentoo.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     Sam James <sam@gentoo.org>
+Subject: [PATCH 1/2] getcifsacl, setcifsacl: add missing <linux/limits.h> include for XATTR_SIZE_MAX
+Date:   Fri, 24 Jun 2022 05:54:31 +0100
+Message-Id: <20220624045432.991655-1-sam@gentoo.org>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-References: <20220623033347.55c86333@canb.auug.org.au>
-In-Reply-To: <20220623033347.55c86333@canb.auug.org.au>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 22 Jun 2022 18:39:45 -0500
-Message-ID: <CAH2r5mvtjzQfaZJFET-Ux1SU-tL9Q5s6fsH4wNikbja5acJmfQ@mail.gmail.com>
-Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-fixed
+Needed to build on musl. It only works on glibc because of transitive includes
+(which could break in future).
 
-On Wed, Jun 22, 2022 at 6:21 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> Commits
->
->   cf1f97ccd084 ("cifs: periodically query network interfaces from server")
->   3864f0cfa996 ("cifs: during reconnect, update interface if necessary")
->   e0a746e20c4f ("cifs: change iface_list from array to sorted linked list")
->
-> are missing a Signed-off-by from their committer.
->
-> --
-> Cheers,
-> Stephen Rothwell <sfr@canb.auug.org.au>
+Example failure:
+```
+getcifsacl.c: In function 'getcifsacl':
+getcifsacl.c:429:24: error: 'XATTR_SIZE_MAX' undeclared (first use in this function)
+  429 |         if (bufsize >= XATTR_SIZE_MAX) {
+      |                        ^~~~~~~~~~~~~~
+```
 
+Bug: https://bugs.gentoo.org/842195
+Signed-off-by: Sam James <sam@gentoo.org>
+---
+ getcifsacl.c | 1 +
+ setcifsacl.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-
+diff --git a/getcifsacl.c b/getcifsacl.c
+index 1c01062..d69d40a 100644
+--- a/getcifsacl.c
++++ b/getcifsacl.c
+@@ -34,6 +34,7 @@
+ #include <errno.h>
+ #include <limits.h>
+ #include <ctype.h>
++#include <linux/limits.h>
+ #include <sys/xattr.h>
+ #include "cifsacl.h"
+ #include "idmap_plugin.h"
+diff --git a/setcifsacl.c b/setcifsacl.c
+index 9840b14..e925d59 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -48,6 +48,7 @@
+ #include <errno.h>
+ #include <limits.h>
+ #include <ctype.h>
++#include <linux/limits.h>
+ #include <sys/xattr.h>
+ 
+ #include "cifsacl.h"
 -- 
-Thanks,
+2.36.1
 
-Steve
