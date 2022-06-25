@@ -2,58 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA58C43334
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Jun 2022 21:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA54FCCA479
+	for <linux-cifs@archiver.kernel.org>; Sat, 25 Jun 2022 04:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbiFXV4K (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 24 Jun 2022 17:56:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49156 "EHLO
+        id S230205AbiFYEKb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 25 Jun 2022 00:10:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbiFXV4K (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 24 Jun 2022 17:56:10 -0400
-X-Greylist: delayed 1200 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 24 Jun 2022 14:56:09 PDT
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448D287B7A
-        for <linux-cifs@vger.kernel.org>; Fri, 24 Jun 2022 14:56:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=SUgKVs7/jGpSheyNCdz1EXXAE1ML6F++Sd+H1f8ytmI=; b=M0xPDd0kpxH31Z+9AznHLvJ8i5
-        zH8g7c0LrB8nY1Xat6Pkm99puJdkFashMSuD5+kB29DS3PPh9bsdQWzV/w8pcIFronN7/JS/s+xrZ
-        i7MwI+N0GKGbbtBLrX+09Mzzf3J0Tjee35AfXJvbg2cD9NCJ3vurUtN/kaBTzFNSsZqzteqhcE3Kw
-        2GNrkBMlvgF/9l3axE+kCy/PrA3DDnZk1Bw+gwwgqhVRz3LIHNAe/Gmy/DJiuJhJrlZvkZ3ADJLhK
-        VfQHh42RY9uuWA0kH3hYl8iAgIo6iD81OTPI9hADxYZbpDhK4HiMqNANBOMM09c6hHtjUhp4rY19v
-        ZGzogQiA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.95 #2 (Red Hat Linux))
-        id 1o4qjH-0044TB-Lp;
-        Fri, 24 Jun 2022 21:20:40 +0000
-Date:   Fri, 24 Jun 2022 22:20:39 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
+        with ESMTP id S230025AbiFYEKa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 25 Jun 2022 00:10:30 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 801AC506D9;
+        Fri, 24 Jun 2022 21:10:26 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2BE60B819AC;
+        Sat, 25 Jun 2022 04:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C28E8C385A5;
+        Sat, 25 Jun 2022 04:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656130223;
+        bh=KvntBsRQ+a7tqPYKKwPyELxC4uT2n0mXrSnlbdOBc4c=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=rReh3Ji7zZ3ymGFB4HyvC8gVtlkIRV7wvwSa9bEfCuyEtck2pHM5Xv+CBYtctTBJl
+         UcqLiMQm4NMofJOZRv3oCWg8FuixiSRQwCSOER/S1kWO7J41SlCAnJ8HdhTfoYjv2Y
+         Mm3beuXQib+yQIEVY4Ctq+AesgrtrlchO2iOTKy3WSbje9UjggOcXzAImWKat+I5WL
+         1OhBwYjpJnWebojLDDsxlfdodeXNOjqKXJRJA1Au+EWUtU2lVcMps/ehN9YpszjOto
+         Bp/emvhmnGPomM0aCvmJiVNIr3BdWyYETyJKqDsVv4lRyWiMoExIoqlOUp8TQwQyXK
+         otPbzT/H3Erag==
+Received: by mail-wm1-f44.google.com with SMTP id m184so2280064wme.1;
+        Fri, 24 Jun 2022 21:10:23 -0700 (PDT)
+X-Gm-Message-State: AJIora9G00skNE9pYq+PNtN1TqrRlG9B5BFf42g7nbGErEYBGQclTNHL
+        CBMlRmItuYgaF6Yx1UW96QeV7iGHvIxsOwf47AA=
+X-Google-Smtp-Source: AGRyM1taOVgJS6yKa1ur8skTuwbJGXAo87WjdcLBFPHrJVL2bmqRfL9e4MLKFR65JkrcoylEqd7a+SwtvU144eYw5fw=
+X-Received: by 2002:a05:600c:1d96:b0:3a0:30b6:bb1a with SMTP id
+ p22-20020a05600c1d9600b003a030b6bb1amr7127566wms.93.1656130222011; Fri, 24
+ Jun 2022 21:10:22 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:adf:f805:0:0:0:0:0 with HTTP; Fri, 24 Jun 2022 21:10:21
+ -0700 (PDT)
+In-Reply-To: <20220624165631.2124632-2-Jason@zx2c4.com>
+References: <20220624165631.2124632-1-Jason@zx2c4.com> <20220624165631.2124632-2-Jason@zx2c4.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sat, 25 Jun 2022 13:10:21 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_Lc9+HUuVD-UDvk4ff0KAtMLqEWBs2syFzUszpSDb_Sw@mail.gmail.com>
+Message-ID: <CAKYAXd_Lc9+HUuVD-UDvk4ff0KAtMLqEWBs2syFzUszpSDb_Sw@mail.gmail.com>
+Subject: Re: [PATCH 1/6] ksmbd: use vfs_llseek instead of dereferencing NULL
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-fsdevel@vger.kernel.org, stable@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Namjae Jeon <namjae.jeon@samsung.com>,
+Cc:     linux-kernel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        stable@vger.kernel.org, linux-cifs@vger.kernel.org,
+        Namjae Jeon <namjae.jeon@samsung.com>,
         Steve French <stfrench@microsoft.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Hyunchul Lee <hyc.lee@gmail.com>,
         Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Subject: Re: [PATCH 1/6] ksmbd: use vfs_llseek instead of dereferencing NULL
-Message-ID: <YrYqp1eaxEcQxIeo@ZenIV>
-References: <20220624165631.2124632-1-Jason@zx2c4.com>
- <20220624165631.2124632-2-Jason@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220624165631.2124632-2-Jason@zx2c4.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Jun 24, 2022 at 06:56:26PM +0200, Jason A. Donenfeld wrote:
+2022-06-25 1:56 GMT+09:00, Jason A. Donenfeld <Jason@zx2c4.com>:
 > By not checking whether llseek is NULL, this might jump to NULL. Also,
 > it doesn't check FMODE_LSEEK. Fix this by using vfs_llseek(), which
 > always does the right thing.
+>
+> Fixes: f44158485826 ("cifsd: add file operations")
+> Cc: stable@vger.kernel.org
+> Cc: linux-cifs@vger.kernel.org
+> Cc: Namjae Jeon <namjae.jeon@samsung.com>
+> Cc: Steve French <stfrench@microsoft.com>
+> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+> Cc: Hyunchul Lee <hyc.lee@gmail.com>
+> Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-Acked-by: Al Viro <viro@zeniv.linux.org.uk>
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+
+Thanks!
