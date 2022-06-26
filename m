@@ -2,111 +2,68 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 192AFC43334
-	for <linux-cifs@archiver.kernel.org>; Sat, 25 Jun 2022 21:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 871ADC433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 26 Jun 2022 17:36:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230246AbiFYVix (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 25 Jun 2022 17:38:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57640 "EHLO
+        id S232024AbiFZRgX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 26 Jun 2022 13:36:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbiFYViw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 25 Jun 2022 17:38:52 -0400
-Received: from mail-vk1-xa2b.google.com (mail-vk1-xa2b.google.com [IPv6:2607:f8b0:4864:20::a2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C6613DFB;
-        Sat, 25 Jun 2022 14:38:51 -0700 (PDT)
-Received: by mail-vk1-xa2b.google.com with SMTP id b5so2781756vkp.4;
-        Sat, 25 Jun 2022 14:38:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=BbwHVtDC3wfcy6qW4/JHuwflwwFO4Gor8K2bRgHCz+8=;
-        b=S1MmapeV/AyncM6GanNSYWXsaV4c0+KCrMjMK+C2iOhSN9FT0RJEr3FRKge83XEyhu
-         a8qDLOSi3NV6SM3C7vLJKwJSlvXassSK5VDPy6/l+wB1l9Rk1GN3rdCYBdQPVQIX7vR4
-         9ra7p/UEs+0ivkazpQQa3eeJ0+yRVHmx33Kk7rmF5Hd5V8xANCVMGjntJ3Qa9WUdtvGj
-         VlV9i4E90if2tsQozbMB3kk+XD3l8d0NeUnCXnBI+Ttrw+n6oNjl9AS1LKF0UITWzeD8
-         wqvrbS32eihR5CDVXP3ufvalr4Vzz4z303vVdNkmib+J9qTql9k1xt0krkpmSg3feRDv
-         ZcQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=BbwHVtDC3wfcy6qW4/JHuwflwwFO4Gor8K2bRgHCz+8=;
-        b=y7dOvikfkKny4cT8/X8UwpcTqJB78lY7zUu4ufm2kcSLTOerM/wQ1RWLsrc8NDAHlB
-         QO6LeLnDWR/l4+EjTjIeco3IjzfLqUPTBfFYQ550A3PICGBWgaazyMZmvpoFnn6xqPBN
-         I3T1Y6q53B+51iOpTqEPRlxUDIZuMpZATLzNl6ECAT/KFrHBid4bS993R+xcN5vw+8LB
-         SnvGrN/NiMbGt3AS2bxFQo/HlbVfptFZR8XAvrQVspblxry22BHUCCCOykQj0Lg6usqC
-         0urukCz5OtwsQvS7TAX+dIknfJyJQWqjNQBtUvjTfO0Yx6sDivwVLra3DOutvSJFVL0z
-         ZGRg==
-X-Gm-Message-State: AJIora8P/NyVsrGwipMWJFID4ugeiuNYUxI/wZ1FcIqtI6Qc+QKwcXRZ
-        y3p7A702ejZjnT0ChrWJYHZAiMUuDUhWJhXYwvOF8mdTtrg=
-X-Google-Smtp-Source: AGRyM1sMucNe20GAaizEts0fYD+M0OX29pCgrJnJIuZ9Z6eQVW8kfJG/4Sh2mibm9kA1xHjw7+cJDK8jKatyDxP4noE=
-X-Received: by 2002:a1f:45d2:0:b0:36b:fa17:d542 with SMTP id
- s201-20020a1f45d2000000b0036bfa17d542mr2093543vka.4.1656193130687; Sat, 25
- Jun 2022 14:38:50 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 25 Jun 2022 16:38:40 -0500
-Message-ID: <CAH2r5muuxg3iDXMkcasnRoCfi8WeE1i3Y=GTgBB8qMQShFppdQ@mail.gmail.com>
-Subject: [GIT PULL] SMB3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        with ESMTP id S232011AbiFZRgT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 26 Jun 2022 13:36:19 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A38BE0A4;
+        Sun, 26 Jun 2022 10:36:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F169CB80DF4;
+        Sun, 26 Jun 2022 17:36:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AB3E5C341CB;
+        Sun, 26 Jun 2022 17:36:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656264972;
+        bh=S/p+uHopoJlNaQZMjUi/yJtD1lLoTo6HlzPDOlPvvRw=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=ReF+K77CGVoccto7Bwq5pcOAaJLCZqq6hexcTnENDvT8+PpHuVefv4xSyIgveNdF7
+         +S284dwuLv5Sfy7GhetMW4g9oGpuoaHBjtn6xf6k/pXwMsUXzxX4ypft12anJHCuiW
+         3va8vRpnZSBLLL4nVpnQmvhyaarS0ualbgf54FkuTZS2afDfEQ5Yae7XtVJ6p632K7
+         vcGkrpRtvfzPCcPg+0NlmYnLHOaH/Cv2d+REf5fZilXc1Xmc0rWuQ8IoXRgrStAnsM
+         LWu5sElY09Xoere3NhV33Xfx2+I4TCsxYa7Fq1DRX8N9LrRPZJYdzhtFRgNL1C/j62
+         GLA0ez8PPRCgQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9A0C4E8DBCB;
+        Sun, 26 Jun 2022 17:36:12 +0000 (UTC)
+Subject: Re: [GIT PULL] SMB3 client fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5muuxg3iDXMkcasnRoCfi8WeE1i3Y=GTgBB8qMQShFppdQ@mail.gmail.com>
+References: <CAH2r5muuxg3iDXMkcasnRoCfi8WeE1i3Y=GTgBB8qMQShFppdQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5muuxg3iDXMkcasnRoCfi8WeE1i3Y=GTgBB8qMQShFppdQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc3-smb3-client-fixes
+X-PR-Tracked-Commit-Id: af3a6d1018f02c6dc8388f1f3785a559c7ab5961
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 918c30dffd14cd3f4af1e67cb40db91a008fc4fe
+Message-Id: <165626497262.22456.3866543276672314634.pr-tracker-bot@kernel.org>
+Date:   Sun, 26 Jun 2022 17:36:12 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-a111daf0c53ae91e71fd2bfe7497862d14132e3e:
+The pull request you sent on Sat, 25 Jun 2022 16:38:40 -0500:
 
-  Linux 5.19-rc3 (2022-06-19 15:06:47 -0500)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc3-smb3-client-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/918c30dffd14cd3f4af1e67cb40db91a008fc4fe
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.19-rc3-smb3-client-fixes
-
-for you to fetch changes up to af3a6d1018f02c6dc8388f1f3785a559c7ab5961:
-
-  cifs: update cifs_ses::ip_addr after failover (2022-06-24 13:34:28 -0500)
-
-----------------------------------------------------------------
-7 SMB3 fixes, addressing important multichannel, reconnect issues.
-Multichannel mounts when the server network interfaces changed, or
-ip addresses changed, uncovered problems, especially in reconnect, but
-the patches for this were held up until recently due to some lock conflicts
-that are now addressed.   Included in this set of fixes:
-
-- 3 fixes relating to multichannel reconnect, dynamically adjusting the list of
-server interfaces to avoid problems during reconnect
-- a lock conflict fix related to the above
-- 2 important fixes for negotiate on secondary channels (null netname can
-unintentionally cause multichannel to be disabled to some servers)
-- a reconnect fix (reporting incorrect IP address in some cases)
-
-----------------------------------------------------------------
-Paulo Alcantara (1):
-      cifs: update cifs_ses::ip_addr after failover
-
-Shyam Prasad N (5):
-      smb3: use netname when available on secondary channels
-      cifs: change iface_list from array to sorted linked list
-      cifs: during reconnect, update interface if necessary
-      cifs: periodically query network interfaces from server
-      cifs: avoid deadlocks while updating iface
-
-Steve French (1):
-      smb3: fix empty netname context on secondary channels
-
- fs/cifs/cifs_debug.c |  12 ++--
- fs/cifs/cifsglob.h   |  58 ++++++++++++++++-
- fs/cifs/cifsproto.h  |   7 +++
- fs/cifs/connect.c    |  59 ++++++++++++++++--
- fs/cifs/misc.c       |   9 ++-
- fs/cifs/sess.c       | 166 +++++++++++++++++++++++++++++++++++++-----------
- fs/cifs/smb2ops.c    | 173 +++++++++++++++++++++++++++------------------------
- fs/cifs/smb2pdu.c    |  21 +++++--
- 8 files changed, 366 insertions(+), 139 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
