@@ -2,59 +2,92 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 252D9C43334
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jun 2022 06:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78647C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jun 2022 21:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343837AbiF1GyM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Jun 2022 02:54:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33860 "EHLO
+        id S230398AbiF1Vcf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Jun 2022 17:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343821AbiF1GyK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Jun 2022 02:54:10 -0400
-X-Greylist: delayed 314 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 27 Jun 2022 23:54:09 PDT
-Received: from mail.privatemain.com (mail.privatemain.com [45.86.209.156])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C6A21EEE2
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Jun 2022 23:54:09 -0700 (PDT)
-Received: by mail.privatemain.com (Postfix, from userid 1001)
-        id 6A9FD82C91; Tue, 28 Jun 2022 02:46:42 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=privatemain.com;
-        s=mail; t=1656398935;
-        bh=ydItAdwWOyX5wABuTqD9n+VESLmlWw/YxTJchbbqnDQ=;
-        h=Date:From:To:Subject:From;
-        b=myj7+xkX5MJpjjQUCdatVj8htt9VJ3fYxrB9L1txLpu8CEuEEnYt5MgHv3valAp++
-         7v965zpAFgtVATBYQ7NYI3vlCWGYsnuxkqLrAgDrDQJ+/PqaKtJLGtD9sqghwCNk+X
-         Ji3UTi0ktGCVXBF9K1mIukXP5EbgkdZJpH9blaaeRV06J7ddywwtlAOPF7t12VdQ2Z
-         d13A9h9WVzsjRLtJc5AOV600amlZBTmKN1CIB3h37RnLXbF5VTsgx0aK4DBQHydew3
-         1gacGWyX2mAal2bRdlp7vy9/iGreQ9CnxnxVaUDEnAIkOtHilp57W0Jhgetks48yAA
-         UT1QaMqHSyt3w==
-Received: by mail.privatemain.com for <linux-cifs@vger.kernel.org>; Tue, 28 Jun 2022 06:46:40 GMT
-Message-ID: <20220628024500-0.1.26.1g4h.0.5pnh9d40ta@privatemain.com>
-Date:   Tue, 28 Jun 2022 06:46:40 GMT
-From:   "Maciej Kielar" <maciej.kielar@privatemain.com>
-To:     <linux-cifs@vger.kernel.org>
-Subject: Prawne zabezpieczenie firmy
-X-Mailer: mail.privatemain.com
+        with ESMTP id S230498AbiF1Vce (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Jun 2022 17:32:34 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D63783AA7B;
+        Tue, 28 Jun 2022 14:32:33 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id i67-20020a1c3b46000000b003a03567d5e9so8577696wma.1;
+        Tue, 28 Jun 2022 14:32:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e5o0RO1o3C2mILdamTa9jqoyqij/R5DqmgtFxZkmgvw=;
+        b=Drpq6Jf622qVqtSLedzPOxD+wUODaRpZDIhCGppz8csCq4zAI7/cEo1l672ZkxgTiz
+         YoF/6VKbiIbYc+3WgO/Hh3s0s4ALEIWGkghEKPMvsArtenCrct2kCP7bAn9eTGSFxEA1
+         9EYgOhbwxfVvUd4ZbR9pV9aQNwB6gVWNFn2uUbtjFbw/2stSok1f69wjN5iv2tDs+/QU
+         aJgwskEzDZ2tZBJztzeQ4qosRs6qWbr5ZmrdDl2se1KJ8o57R/5syVElbhUm6ra5KKo5
+         OW/QsLaif+Hrkyq4BwcswkLzw3l7uJRc9bPDr54UwEwdAQ/UGUOtJX1IUDh/ilF4AcwH
+         1gPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e5o0RO1o3C2mILdamTa9jqoyqij/R5DqmgtFxZkmgvw=;
+        b=6WEulTvATxQWYdhnQTrzdxas3xV0odx12xQpVeHEZW9EtOy/ELAVIljEO8IDBBMYLN
+         GTacmdebRZs+w7lhd57SoBHVppJR2YzR19gs/qXZ9B/mbwlUpX10UY4rSUNgy2ySzWhr
+         qaLXbfrEbdZOajptuJzsF+IG6iT16GkGPNplbhedXx/X21cczuzdKhIr5cl2MMptDdKw
+         rO2hCBzf+hU/46kB6Xrsy4JxX/zuonM/4FzxUyuSY+eDW8p96u4/VL+Jm8VbexQMH0c/
+         DZ0lnOnydl9e05zP+KsLYOriS6xY/DK/XsywiTTpiqpPNe/yAjbBvriV4XaSrz1XLTJc
+         GdDA==
+X-Gm-Message-State: AJIora+Cv2fmoQYca0NkGxIdkebCV3BmWVGqEl+jNYJTD+RT/cX6cQ0A
+        MAXB7qA2iSZXCcjh85DDUoRqseJsbRyrMb8MCxM=
+X-Google-Smtp-Source: AGRyM1vhq0vdwiaKnwcWI+wpOY5hAe08ANlKQlH12nQAhOH/I4LRm+G9d+QWw/hSUh+0Zs1ozUM7xQ==
+X-Received: by 2002:a05:600c:3c8a:b0:3a0:4ad8:d3c4 with SMTP id bg10-20020a05600c3c8a00b003a04ad8d3c4mr1816767wmb.43.1656451952303;
+        Tue, 28 Jun 2022 14:32:32 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id h5-20020a5d4305000000b00210bac248c8sm14672384wrq.11.2022.06.28.14.32.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jun 2022 14:32:31 -0700 (PDT)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: remove redundant initialization to variable mnt_sign_enabled
+Date:   Tue, 28 Jun 2022 22:32:29 +0100
+Message-Id: <20220628213229.354032-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Variable mnt_sign_enabled is being initialized with a value that
+is never read, it is being reassigned later on with a different
+value. The initialization is redundant and can be removed.
 
-czy s=C4=85 Pa=C5=84stwo otwarci na rozmowe o wsp=C3=B3=C5=82pracy z nasz=
-a Kancelari=C4=85?
+Cleans up clang scan-build warning:
+fs/cifs/cifssmb.c:465:7: warning: Value stored to 'mnt_sign_enabled
+ during its initialization is never read
 
-Obs=C5=82ugujemy firmy z wojew=C3=B3dztwa pomorskiego w zakresie kompleks=
-owego wsparcia prawnego w rozszerzonym zakresie.=20
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ fs/cifs/cifssmb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Dzi=C4=99ki wieloletniej praktyce i wsp=C3=B3=C5=82pracy z dzia=C5=82alno=
-=C5=9Bciami Pa=C5=84stwa formatu jestem w stanie wypracowa=C4=87 korzystn=
-e rozwi=C4=85zania pod wzgl=C4=99dem podatkowym i organizacyjnym.
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 6371b9eebdad..9ed21752f2df 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -462,7 +462,7 @@ cifs_enable_signing(struct TCP_Server_Info *server, bool mnt_sign_required)
+ {
+ 	bool srv_sign_required = server->sec_mode & server->vals->signing_required;
+ 	bool srv_sign_enabled = server->sec_mode & server->vals->signing_enabled;
+-	bool mnt_sign_enabled = global_secflags & CIFSSEC_MAY_SIGN;
++	bool mnt_sign_enabled;
+ 
+ 	/*
+ 	 * Is signing required by mnt options? If not then check
+-- 
+2.35.3
 
-Mo=C5=BCemy si=C4=99 spotka=C4=87 b=C4=85d=C5=BA porozmawia=C4=87 telefon=
-icznie?
-
-Pozdrawiam,
-Mec. Maciej Kielar
