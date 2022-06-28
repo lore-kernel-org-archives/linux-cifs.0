@@ -2,92 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78647C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jun 2022 21:32:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99FDDC43334
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jun 2022 22:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbiF1Vcf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Jun 2022 17:32:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42048 "EHLO
+        id S229447AbiF1WHX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Jun 2022 18:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230498AbiF1Vce (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Jun 2022 17:32:34 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D63783AA7B;
-        Tue, 28 Jun 2022 14:32:33 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id i67-20020a1c3b46000000b003a03567d5e9so8577696wma.1;
-        Tue, 28 Jun 2022 14:32:33 -0700 (PDT)
+        with ESMTP id S229436AbiF1WHW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Jun 2022 18:07:22 -0400
+Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3BE62F01D;
+        Tue, 28 Jun 2022 15:07:21 -0700 (PDT)
+Received: by mail-vs1-xe35.google.com with SMTP id i186so13360741vsc.9;
+        Tue, 28 Jun 2022 15:07:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=e5o0RO1o3C2mILdamTa9jqoyqij/R5DqmgtFxZkmgvw=;
-        b=Drpq6Jf622qVqtSLedzPOxD+wUODaRpZDIhCGppz8csCq4zAI7/cEo1l672ZkxgTiz
-         YoF/6VKbiIbYc+3WgO/Hh3s0s4ALEIWGkghEKPMvsArtenCrct2kCP7bAn9eTGSFxEA1
-         9EYgOhbwxfVvUd4ZbR9pV9aQNwB6gVWNFn2uUbtjFbw/2stSok1f69wjN5iv2tDs+/QU
-         aJgwskEzDZ2tZBJztzeQ4qosRs6qWbr5ZmrdDl2se1KJ8o57R/5syVElbhUm6ra5KKo5
-         OW/QsLaif+Hrkyq4BwcswkLzw3l7uJRc9bPDr54UwEwdAQ/UGUOtJX1IUDh/ilF4AcwH
-         1gPg==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=LUjXKFEC3NAgTcs0sbn5hRul2LA26MWo4XxKS40nHYc=;
+        b=GnfZLmRXDn6Wv3sxJtGsA5jITqI70oZOVNcua2QTwFr7eTfaXr9mweDOOYqhUhL/FU
+         vz0eBs9SZiLwPZoZOToeO4KCb9mzaEz9r+PIq42a4A53OEDn291ghr5WvIabk0zXdGVf
+         ynVFYB9zlQxUK/qrBj7KCxZ6nLjLYnDl4Tf87FJKH4RvDTNc9EZ5JkrkiVKUuSivlTjO
+         hAUzN/TkILdp+0ktlwT5oxp//083EClM7nQGiprbFIjBGGmOWFHywXNRJ1/DdWk6wvMT
+         KsaWA6rkGq7nA6xcigLpuVrXf75pPEPpy4p7GvlJLPBQZ+zzdJxe+ttVC1/u7z3A/LQb
+         Ovdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=e5o0RO1o3C2mILdamTa9jqoyqij/R5DqmgtFxZkmgvw=;
-        b=6WEulTvATxQWYdhnQTrzdxas3xV0odx12xQpVeHEZW9EtOy/ELAVIljEO8IDBBMYLN
-         GTacmdebRZs+w7lhd57SoBHVppJR2YzR19gs/qXZ9B/mbwlUpX10UY4rSUNgy2ySzWhr
-         qaLXbfrEbdZOajptuJzsF+IG6iT16GkGPNplbhedXx/X21cczuzdKhIr5cl2MMptDdKw
-         rO2hCBzf+hU/46kB6Xrsy4JxX/zuonM/4FzxUyuSY+eDW8p96u4/VL+Jm8VbexQMH0c/
-         DZ0lnOnydl9e05zP+KsLYOriS6xY/DK/XsywiTTpiqpPNe/yAjbBvriV4XaSrz1XLTJc
-         GdDA==
-X-Gm-Message-State: AJIora+Cv2fmoQYca0NkGxIdkebCV3BmWVGqEl+jNYJTD+RT/cX6cQ0A
-        MAXB7qA2iSZXCcjh85DDUoRqseJsbRyrMb8MCxM=
-X-Google-Smtp-Source: AGRyM1vhq0vdwiaKnwcWI+wpOY5hAe08ANlKQlH12nQAhOH/I4LRm+G9d+QWw/hSUh+0Zs1ozUM7xQ==
-X-Received: by 2002:a05:600c:3c8a:b0:3a0:4ad8:d3c4 with SMTP id bg10-20020a05600c3c8a00b003a04ad8d3c4mr1816767wmb.43.1656451952303;
-        Tue, 28 Jun 2022 14:32:32 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id h5-20020a5d4305000000b00210bac248c8sm14672384wrq.11.2022.06.28.14.32.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 14:32:31 -0700 (PDT)
-From:   Colin Ian King <colin.i.king@gmail.com>
-To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: remove redundant initialization to variable mnt_sign_enabled
-Date:   Tue, 28 Jun 2022 22:32:29 +0100
-Message-Id: <20220628213229.354032-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.35.3
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=LUjXKFEC3NAgTcs0sbn5hRul2LA26MWo4XxKS40nHYc=;
+        b=g/KKeEaPRg/95fJwfqLabxGIGI6hbuKTKNxksiUwcdIkveJpmY6h4RudC3cUuPjVKB
+         bxKwRUmMLcBSNvm/fDDtnM76iruhuo0ebUezRZg+Mr5zQYF5avZa4LJc8aJ9lpxrN9kP
+         /QvqGKbqwdZf/E+a1J0bDfjc4OqGQd6kj7sW9u/OAZszUiExdPUzedgjV2ZmHFtfvLKB
+         juNPV23KAbqfCVRCaQZJwAJ89RN63Azv5Q+p0bqFaRB10jsVXU+xpQMyhOoZVNN2uipM
+         Yu9xLjL1nS/gKSuyElRY3oQlsQKsbfNK1ct9u28NYWCvqXWi3qTvQ40swqWiu3dfEMd0
+         hELQ==
+X-Gm-Message-State: AJIora87BjXWqyEFLrMB75Gr1er3DvrQCCUjqD4cImtU56rOt6Ud8wBM
+        MOvVnDK5ombEjvQzdkSrXzUeWzD3toj3fIbCbEicoGyFvarFiA==
+X-Google-Smtp-Source: AGRyM1vXzvTFf2YC/lNUMS7WLKOQdHSVucGJhiVwqhxpF0oSRBetS/yrZt4dNOmxsWyZj7igbIM0F9fBwsfRA1fZk5Y=
+X-Received: by 2002:a05:6102:2407:b0:356:2318:b743 with SMTP id
+ j7-20020a056102240700b003562318b743mr3012735vsi.61.1656454040675; Tue, 28 Jun
+ 2022 15:07:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 28 Jun 2022 17:07:09 -0500
+Message-ID: <CAH2r5ms0EHq5zqwjE6PXVC_NCydY7d6+=NSnQcdjtNhbA6bf=A@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Variable mnt_sign_enabled is being initialized with a value that
-is never read, it is being reassigned later on with a different
-value. The initialization is redundant and can be removed.
+Please pull the following changes since commit
+f2906aa863381afb0015a9eb7fefad885d4e5a56:
 
-Cleans up clang scan-build warning:
-fs/cifs/cifssmb.c:465:7: warning: Value stored to 'mnt_sign_enabled
- during its initialization is never read
+  Linux 5.19-rc1 (2022-06-05 17:18:54 -0700)
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- fs/cifs/cifssmb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+are available in the Git repository at:
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 6371b9eebdad..9ed21752f2df 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -462,7 +462,7 @@ cifs_enable_signing(struct TCP_Server_Info *server, bool mnt_sign_required)
- {
- 	bool srv_sign_required = server->sec_mode & server->vals->signing_required;
- 	bool srv_sign_enabled = server->sec_mode & server->vals->signing_enabled;
--	bool mnt_sign_enabled = global_secflags & CIFSSEC_MAY_SIGN;
-+	bool mnt_sign_enabled;
- 
- 	/*
- 	 * Is signing required by mnt options? If not then check
+  git://git.samba.org/ksmbd.git tags/5.19-rc4-ksmbd-server-fixes
+
+for you to fetch changes up to 067baa9a37b32b95fdeabccde4b0cb6a2cf95f96:
+
+  ksmbd: use vfs_llseek instead of dereferencing NULL (2022-06-25
+19:52:49 -0500)
+
+----------------------------------------------------------------
+Six ksmbd server fixes, including 3 for stable fixing:
+
+- seek null check
+- offset validation in FSCTL_SET_ZERO_DATA
+- fallocate fix (relates e.g. to xfstests generic/091 and 263)
+- two cleanup fixes
+- fix socket settings on some arch
+
+----------------------------------------------------------------
+Christophe JAILLET (1):
+      ksmbd: smbd: Remove useless license text when
+SPDX-License-Identifier is already used
+
+Hyunchul Lee (1):
+      ksmbd: remove duplicate flag set in smb2_write
+
+Jason A. Donenfeld (1):
+      ksmbd: use vfs_llseek instead of dereferencing NULL
+
+Namjae Jeon (3):
+      ksmbd: use SOCK_NONBLOCK type for kernel_accept()
+      ksmbd: set the range of bytes to zero without extending file
+size in FSCTL_ZERO_DATA
+      ksmbd: check invalid FileOffset and BeyondFinalZero in FSCTL_ZERO_DATA
+
+ fs/ksmbd/smb2pdu.c        | 32 ++++++++++++++++++--------------
+ fs/ksmbd/transport_rdma.c | 10 ----------
+ fs/ksmbd/transport_tcp.c  |  2 +-
+ fs/ksmbd/vfs.c            |  8 +++++---
+ 4 files changed, 24 insertions(+), 28 deletions(-)
+
 -- 
-2.35.3
+Thanks,
 
+Steve
