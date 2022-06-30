@@ -2,84 +2,84 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DBCCC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jun 2022 16:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03620C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jun 2022 17:03:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235536AbiF3Qrs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 30 Jun 2022 12:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50526 "EHLO
+        id S236377AbiF3RDB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Jun 2022 13:03:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233892AbiF3Qrr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Jun 2022 12:47:47 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A573B3EAA1
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Jun 2022 09:47:45 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id fd6so27337540edb.5
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Jun 2022 09:47:45 -0700 (PDT)
+        with ESMTP id S235901AbiF3RDA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Jun 2022 13:03:00 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A85ED25E82
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Jun 2022 10:02:59 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id a2so34860144lfg.5
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Jun 2022 10:02:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:from
-         :subject:content-transfer-encoding;
-        bh=eWhlUAODLliCaPdkAJ6yvBfMxEMIJrmIDhYvvoZuKnc=;
-        b=n9aabjHb2U96BjQLmUUdvOJvCbEppbD/i1OvIt883kjuVfx2NFxuuTOhUVqyCkJJMz
-         UxRDWIvFWXSDXakcuIDRX1PeLEtPQm0hi9NMZNMeGM6ZblTeRLT7AoW7g7cMprGeSqne
-         LY8Q2KXO/V9Cx1tGhookxufhVJrKN4p1mHKmSf1E4YHsJEZLZDwo2js3z/DeuZ1BQMLt
-         YgPKLHFdOh3emueV0bH0Ij7yxCJi42aa2BYvdQtThEvO3A/7aR8oWHH1NOsEYdBKm64f
-         FpG3MP32oI9vJjgGesqpZ5lNrUCSDGCmUbCE14fC+VnTGwKWMh29Dt5aUyuFu5Gnkg4a
-         AwSA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jS/Cz+fUX/o36nQdvoTPwjRe7hBmv/VVAWFDzy79Z84=;
+        b=QjrKPS/ht2kIleIPk7V0LQRWNsrYVvJz/ZPGWXv9B/cr0BdhNB76XV5+p4k6F6x/K3
+         gli7P4HkQyPWo+Kk9MhUTX3YC0n8l0gmVlPLmP8sC0pEG3cGoqsHOCGVaJR3Z5yWWStR
+         VwbjFeWiBlk4lzr8Ui8HKwXifNIzP1DUpaWlPGWfEt3On539NdrgTHfp/CoM9F2gRrb2
+         GDY9Y01YX9VasIPTyzXBzsKPCyMb/jJKqQVVBPIAQUjAhX+gtQcRd4o+advKv6boeTqB
+         vHZ9mMVUq0oxR1siBn/ilzTvT1meT6+Dst8zuyYF74M33iTiDkr5+9AeTdvnOZLxQMJu
+         V/xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:from:subject:content-transfer-encoding;
-        bh=eWhlUAODLliCaPdkAJ6yvBfMxEMIJrmIDhYvvoZuKnc=;
-        b=xfjuVfV08VLWRRAxLbEp+cRI8biqqgaoOjhQuEAhPyGIjPYuFDVcwfI4dVEp7/o1VG
-         Ikj1NBlcUsR0zMLwNkIo0JjJaQzZTl9l2ep4unyKjZq1lSUmj3qIY/We/8w1/2x6nM8D
-         uub7vdYVjGktA9UArxtnqKaM4Jz/LFZzYC/r1lJd4U7mlpydP83us6XMaP6+rKWCHIHM
-         wsA5o0SWRHfV3UCsUZpNr9aOJUClYDUaPfFg7o8zH6gJHOqMKbZP+CGfgjE1xVBuFPPm
-         x9PnQHqcKiu1+fl9NR1Fuv/Y+cf+WM1wMX0JY8NzuTkkkCgLcJp8xQEIpJEZAHOMRgNe
-         4qag==
-X-Gm-Message-State: AJIora96QtBEw0esi2IUtwQqlRM9II4d/asOmm22TOP/EudXywlrea58
-        /RA804207P8PcojjgR5iiG1EJN0oBfRzNg==
-X-Google-Smtp-Source: AGRyM1urVcFbyGBI4o50jRk1nxcoLEu91BwSl8mqOKdKwNvMw7uEpHKmEFaIWxRuuDvW9EYogVbeiQ==
-X-Received: by 2002:a05:6402:3220:b0:435:8b50:e995 with SMTP id g32-20020a056402322000b004358b50e995mr13083019eda.293.1656607663945;
-        Thu, 30 Jun 2022 09:47:43 -0700 (PDT)
-Received: from ?IPV6:2a02:908:1987:1a80::a7fd? ([2a02:908:1987:1a80::a7fd])
-        by smtp.gmail.com with ESMTPSA id h1-20020a1709063c0100b006feec47dae9sm9260245ejg.157.2022.06.30.09.47.43
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jun 2022 09:47:43 -0700 (PDT)
-Message-ID: <211885e7-1823-9118-836b-169c7163d7c2@gmail.com>
-Date:   Thu, 30 Jun 2022 18:47:42 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jS/Cz+fUX/o36nQdvoTPwjRe7hBmv/VVAWFDzy79Z84=;
+        b=rHQkRu56dTjMsIDlBjmz6+s/6u2flbytvXcxFdKV1uKAAmW2HN9QMmHtbwiHswtb+E
+         LjPnoXFMsCWBDaKiOD+GctEshTyHZZF8ZW6FGNlmD2Sd75xjNYr0fjBmi/KCYn0RBTIS
+         jmEDDxvb8qNI2AZK8mQNDoBxBX88nbXMA4aFSXiv42P1BU/kIrC8H3Otqo6xDeoSs+6X
+         GFBLCdtvRPxSN/Sj/QYVW1NSRfgmRVhuiLMpphy2fVMzHGqUd3zQYIh/t/5NuJzyoIjl
+         KC5sNLBwWwny7j1nB1Yl/jwz0wbdXNG+eB7miJAY/yRdSCmvSZsuG05FOEVYuXwT5Qk5
+         2sjA==
+X-Gm-Message-State: AJIora/CsXBurmTiYkKahVWfud1iVlQii/5D1bg6+0VMEIlXAYN638Yx
+        hN26xyLoCBbtyg0kuE/NbLIRdk09X54WqTBXbe9mvGIEsSU=
+X-Google-Smtp-Source: AGRyM1ve60VrC114RBnc52PeIb6X4atBVpzF/kIlQ9shghhU8a/K4jEfk61gBL7ZLfoy2dfHSZ7jRv+GPIEvpX3Ofig=
+X-Received: by 2002:a05:6512:314e:b0:47f:8341:2099 with SMTP id
+ s14-20020a056512314e00b0047f83412099mr6106162lfi.367.1656608577977; Thu, 30
+ Jun 2022 10:02:57 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Content-Language: en-US
-To:     CIFS <linux-cifs@vger.kernel.org>
-From:   Julian Sikorski <belegdol@gmail.com>
-Subject: kernel-5.18.8 breaks cifs mounts
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <211885e7-1823-9118-836b-169c7163d7c2@gmail.com>
+In-Reply-To: <211885e7-1823-9118-836b-169c7163d7c2@gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Fri, 1 Jul 2022 03:02:45 +1000
+Message-ID: <CAN05THTbuBSF6HXh5TAThchJZycU1AwiQkA0W7hDwCwKOF+4kw@mail.gmail.com>
+Subject: Re: kernel-5.18.8 breaks cifs mounts
+To:     Julian Sikorski <belegdol@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi list,
+On Fri, 1 Jul 2022 at 03:00, Julian Sikorski <belegdol@gmail.com> wrote:
+>
+> Hi list,
+>
+> it appears that kernel 5.18.8 breaks cifs mounts on my machine. With
+> 5.18.7, everything works fine. With 5.18.8, I am getting:
+>
+> $ sudo mount /mnt/openmediavault/
+> mount error(22): Invalid argument
+> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and kernel
+> log messages (dmesg)
+>
+> The relevant /etc/fstab line is:
+>
+> //odroidxu4.local/julian /mnt/openmediavault    cifs
+> credentials=/home/julas/.credentials,uid=julas,gid=julas,vers=3.1.1,nobrl,_netdev,auto
+> 0 0
+>
+> Is this a known problem?
 
-it appears that kernel 5.18.8 breaks cifs mounts on my machine. With 
-5.18.7, everything works fine. With 5.18.8, I am getting:
+What is the output in dmesg ?
 
-$ sudo mount /mnt/openmediavault/
-mount error(22): Invalid argument
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and kernel 
-log messages (dmesg)
-
-The relevant /etc/fstab line is:
-
-//odroidxu4.local/julian /mnt/openmediavault    cifs 
-credentials=/home/julas/.credentials,uid=julas,gid=julas,vers=3.1.1,nobrl,_netdev,auto 
-0 0
-
-Is this a known problem?
-
-Best regards,
-Julian
+>
+> Best regards,
+> Julian
