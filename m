@@ -2,69 +2,127 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4613CC43334
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Jun 2022 16:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BDBC433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jun 2022 09:31:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230286AbiF2Qol (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Jun 2022 12:44:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53782 "EHLO
+        id S233152AbiF3JbZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Jun 2022 05:31:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbiF2Qok (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Jun 2022 12:44:40 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D1A2CCAC;
-        Wed, 29 Jun 2022 09:44:40 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 02C9EB825D3;
-        Wed, 29 Jun 2022 16:44:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BE380C341C8;
-        Wed, 29 Jun 2022 16:44:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656521077;
-        bh=m15YOLBCQzWiMbd2XCpklYoAw02Jy5jbBvqg6MsHPe4=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=J1CmNhxIzOQxiKmcJfN5jFIrnd4iG905LqVA307jluRYPy8BA4Fo5B8EW16LIZyZ4
-         zGAYDABlv5Ezltpg4kzP6jfLX1cHqAECIEu+CunluJXmo4AUWkNCPtHAWNy8G/WmfL
-         beyT/xqkDdeyVsgQ8I/Cp6UxcfPv7GyX9+GEKJGj+JdaHqBac2dCLe9wXQ60zE3C7E
-         InJ3nVqOEz0/gfXA2Sx6kE9OgMTAeDYtWwqU+GNE7rI+9efn1Hqi5QR7kFnRrYgaDB
-         cdRmcP8HDLZqHGJgwawLUbl7sQYlEXAbLXe/2Lzr3R3h5OUag523IaF6Pl1qIowECx
-         M3ZeY0I11pKFA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AA5D2E49BBA;
-        Wed, 29 Jun 2022 16:44:37 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5ms0EHq5zqwjE6PXVC_NCydY7d6+=NSnQcdjtNhbA6bf=A@mail.gmail.com>
-References: <CAH2r5ms0EHq5zqwjE6PXVC_NCydY7d6+=NSnQcdjtNhbA6bf=A@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5ms0EHq5zqwjE6PXVC_NCydY7d6+=NSnQcdjtNhbA6bf=A@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/5.19-rc4-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: 067baa9a37b32b95fdeabccde4b0cb6a2cf95f96
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 732f30694325ab586a4d90412ace81e50dfe448e
-Message-Id: <165652107768.8432.1861360584555780047.pr-tracker-bot@kernel.org>
-Date:   Wed, 29 Jun 2022 16:44:37 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+        with ESMTP id S233020AbiF3JbY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Jun 2022 05:31:24 -0400
+Received: from mail.nfschina.com (unknown [IPv6:2400:dd01:100f:2:72e2:84ff:fe10:5f45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 47FC442A33;
+        Thu, 30 Jun 2022 02:31:22 -0700 (PDT)
+Received: from localhost (unknown [127.0.0.1])
+        by mail.nfschina.com (Postfix) with ESMTP id 7339D1E80D11;
+        Thu, 30 Jun 2022 17:30:01 +0800 (CST)
+X-Virus-Scanned: amavisd-new at test.com
+Received: from mail.nfschina.com ([127.0.0.1])
+        by localhost (mail.nfschina.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id tcSNZRmyGWA2; Thu, 30 Jun 2022 17:29:58 +0800 (CST)
+Received: from localhost.localdomain (unknown [180.167.10.98])
+        (Authenticated sender: yuzhe@nfschina.com)
+        by mail.nfschina.com (Postfix) with ESMTPA id 53F231E80CB6;
+        Thu, 30 Jun 2022 17:29:58 +0800 (CST)
+From:   Yu Zhe <yuzhe@nfschina.com>
+To:     sfrench@samba.org
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, liqiong@nfschina.com,
+        Yu Zhe <yuzhe@nfschina.com>
+Subject: [PATCH] cifs: remove unnecessary type castings
+Date:   Thu, 30 Jun 2022 17:30:27 +0800
+Message-Id: <20220630093027.26200-1-yuzhe@nfschina.com>
+X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Tue, 28 Jun 2022 17:07:09 -0500:
+remove unnecessary void* type castings.
 
-> git://git.samba.org/ksmbd.git tags/5.19-rc4-ksmbd-server-fixes
+Signed-off-by: Yu Zhe <yuzhe@nfschina.com>
+---
+ fs/cifs/connect.c  | 2 +-
+ fs/cifs/inode.c    | 4 ++--
+ fs/cifs/netmisc.c  | 2 +-
+ fs/cifs/smb2misc.c | 2 +-
+ fs/cifs/smb2pdu.c  | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/732f30694325ab586a4d90412ace81e50dfe448e
-
-Thank you!
-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index fa29c9aae24b..90863b3b5204 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2646,7 +2646,7 @@ match_prepath(struct super_block *sb, struct cifs_mnt_data *mnt_data)
+ int
+ cifs_match_super(struct super_block *sb, void *data)
+ {
+-	struct cifs_mnt_data *mnt_data = (struct cifs_mnt_data *)data;
++	struct cifs_mnt_data *mnt_data = data;
+ 	struct smb3_fs_context *ctx;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct TCP_Server_Info *tcp_srv;
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 81da81e18553..3ad303dd5e5a 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1223,7 +1223,7 @@ static const struct inode_operations cifs_ipc_inode_ops = {
+ static int
+ cifs_find_inode(struct inode *inode, void *opaque)
+ {
+-	struct cifs_fattr *fattr = (struct cifs_fattr *) opaque;
++	struct cifs_fattr *fattr = opaque;
+ 
+ 	/* don't match inode with different uniqueid */
+ 	if (CIFS_I(inode)->uniqueid != fattr->cf_uniqueid)
+@@ -1247,7 +1247,7 @@ cifs_find_inode(struct inode *inode, void *opaque)
+ static int
+ cifs_init_inode(struct inode *inode, void *opaque)
+ {
+-	struct cifs_fattr *fattr = (struct cifs_fattr *) opaque;
++	struct cifs_fattr *fattr = opaque;
+ 
+ 	CIFS_I(inode)->uniqueid = fattr->cf_uniqueid;
+ 	CIFS_I(inode)->createtime = fattr->cf_createtime;
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index 235aa1b395eb..28caae7aed1b 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -911,7 +911,7 @@ map_and_check_smb_error(struct mid_q_entry *mid, bool logErr)
+ unsigned int
+ smbCalcSize(void *buf, struct TCP_Server_Info *server)
+ {
+-	struct smb_hdr *ptr = (struct smb_hdr *)buf;
++	struct smb_hdr *ptr = buf;
+ 	return (sizeof(struct smb_hdr) + (2 * ptr->WordCount) +
+ 		2 /* size of the bcc field */ + get_bcc(ptr));
+ }
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 17813c3d0c6e..db0f27fd373b 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -402,7 +402,7 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
+ unsigned int
+ smb2_calc_size(void *buf, struct TCP_Server_Info *srvr)
+ {
+-	struct smb2_pdu *pdu = (struct smb2_pdu *)buf;
++	struct smb2_pdu *pdu = buf;
+ 	struct smb2_hdr *shdr = &pdu->hdr;
+ 	int offset; /* the offset from the beginning of SMB to data area */
+ 	int data_length; /* the length of the variable length data area */
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 12b4dddaedb0..92fb513e5478 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -354,7 +354,7 @@ fill_small_buf(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	       void *buf,
+ 	       unsigned int *total_len)
+ {
+-	struct smb2_pdu *spdu = (struct smb2_pdu *)buf;
++	struct smb2_pdu *spdu = buf;
+ 	/* lookup word count ie StructureSize from table */
+ 	__u16 parmsize = smb2_req_struct_sizes[le16_to_cpu(smb2_command)];
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.11.0
+
