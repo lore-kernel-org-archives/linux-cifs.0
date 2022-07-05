@@ -2,32 +2,32 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5C6C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Jul 2022 12:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 526D5CCA47B
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Jul 2022 12:20:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235262AbiGEMQ1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Jul 2022 08:16:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35976 "EHLO
+        id S232565AbiGEMUz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 5 Jul 2022 08:20:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235199AbiGEMOZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Jul 2022 08:14:25 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B5C18E3C;
-        Tue,  5 Jul 2022 05:11:37 -0700 (PDT)
+        with ESMTP id S237826AbiGEMTv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Jul 2022 08:19:51 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE13F1E3D7;
+        Tue,  5 Jul 2022 05:16:19 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 198C8B817D6;
-        Tue,  5 Jul 2022 12:11:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5864DC341C8;
-        Tue,  5 Jul 2022 12:11:34 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 27E5AB817DA;
+        Tue,  5 Jul 2022 12:16:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 967BAC341C7;
+        Tue,  5 Jul 2022 12:16:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1657023094;
-        bh=tXppN8BcPgQ4XAzOGRUOpzB7tCna+gCnSSASx3UTd4I=;
+        s=korg; t=1657023377;
+        bh=mOqRNwz0TUiWDgJe7M7bvOcRYGgbk2oCDD/rVT4Nwa8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=s7JLUr8VKGBed3yfF2d9fNSVJZHxKZZ8Sc6yE0TYqJteIJqrddqDZuYM/ImeAQGqb
-         XPA5AARg3MBGrN9A0jZE7DvPNPsz4wN5A2z43KGe6gNTCyps9quQgrJVBpsinqytvg
-         Z27XeXRr3ovHfLdWHY5FFYrnfLnknXwzDXTZdr0Q=
+        b=D1+K8CiPXikYk5PLqMRXr0VFZoY3Pn3l3qvgYYWcitQtD8VvLlFf9gRAj2ZaweL6m
+         mnEdlfM53e0Pl8LvlMeCaUsRWzdzXRgwPWdprxSe9sTa+gBCdMWq7nU6flH2/MkROf
+         JzypPlWOxPpDqiexZiIT55P/nywZLQ65sla/F+SM=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -39,12 +39,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Steve French <stfrench@microsoft.com>
-Subject: [PATCH 5.15 05/98] ksmbd: use vfs_llseek instead of dereferencing NULL
-Date:   Tue,  5 Jul 2022 13:57:23 +0200
-Message-Id: <20220705115617.728426832@linuxfoundation.org>
+Subject: [PATCH 5.18 006/102] ksmbd: use vfs_llseek instead of dereferencing NULL
+Date:   Tue,  5 Jul 2022 13:57:32 +0200
+Message-Id: <20220705115618.595468433@linuxfoundation.org>
 X-Mailer: git-send-email 2.37.0
-In-Reply-To: <20220705115617.568350164@linuxfoundation.org>
-References: <20220705115617.568350164@linuxfoundation.org>
+In-Reply-To: <20220705115618.410217782@linuxfoundation.org>
+References: <20220705115618.410217782@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -78,7 +78,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/fs/ksmbd/vfs.c
 +++ b/fs/ksmbd/vfs.c
-@@ -1051,7 +1051,7 @@ int ksmbd_vfs_fqar_lseek(struct ksmbd_fi
+@@ -1048,7 +1048,7 @@ int ksmbd_vfs_fqar_lseek(struct ksmbd_fi
  	*out_count = 0;
  	end = start + length;
  	while (start < end && *out_count < in_count) {
@@ -87,7 +87,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  		if (extent_start < 0) {
  			if (extent_start != -ENXIO)
  				ret = (int)extent_start;
-@@ -1061,7 +1061,7 @@ int ksmbd_vfs_fqar_lseek(struct ksmbd_fi
+@@ -1058,7 +1058,7 @@ int ksmbd_vfs_fqar_lseek(struct ksmbd_fi
  		if (extent_start >= end)
  			break;
  
