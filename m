@@ -2,156 +2,158 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2A1C43334
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Jul 2022 10:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7E2C43334
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Jul 2022 11:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232815AbiGEK4z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Jul 2022 06:56:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47532 "EHLO
+        id S230106AbiGEL2s (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 5 Jul 2022 07:28:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232783AbiGEK4V (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Jul 2022 06:56:21 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44A3A167E5
-        for <linux-cifs@vger.kernel.org>; Tue,  5 Jul 2022 03:56:00 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id lg18so1143314ejb.0
-        for <linux-cifs@vger.kernel.org>; Tue, 05 Jul 2022 03:56:00 -0700 (PDT)
+        with ESMTP id S229575AbiGEL2r (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Jul 2022 07:28:47 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2549013E3A
+        for <linux-cifs@vger.kernel.org>; Tue,  5 Jul 2022 04:28:47 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id z16so8414700qkj.7
+        for <linux-cifs@vger.kernel.org>; Tue, 05 Jul 2022 04:28:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Q31He0N/yEzVpT1tCN0ycgAoynpjToL2FMOU6dBZlyk=;
-        b=qpjnsscCqdRZTWBYTV4rdvUPMXKTnFSJQj6StfF7816blvZQb52pWnm6zQ/z+WbNSM
-         lstx/cshmchCWQp+xvSbfv5zHhqd2fEzEQzSsPm+CTfHSGT2tdNakLVp4v+oeW7EfVp5
-         trd8BuR0XOpWW2gIGUdyFQkDVK2Adiriv+SnNDa+MV5dtlq1Jn93IZ8PE3CPkfk+x6c9
-         sBOcRMPnto0hrhBWjHvu4wTQDtpPa8s/ZfHrY1ovGh06lGSs+5Qb4lcoKJ3AbGPBgKPr
-         +aphlk7ADlmU6oBpxoZvXW5CJ86wV6lUQEyFqjCGm35NTpK5uFYePwGrUuk2ybbbiQhZ
-         HCAg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WhFSlvpuk9a/0AOEzgVFi1ms8C8N0bMJmyd4ZViqQJ0=;
+        b=g4+1+VKYNOr8OGfCq6WZnnBahsLWgpwqs7QO3Amdm95oTI3e38CiFuqauYoOdUi4uZ
+         C85LbG0ls1AI1fqenn3E91uH8ksAXLB8j8k9mZeZn9I1mwbdY2a92rl1Wpe0M2JGF8bW
+         tcff7PwuxVyqPE0th5m4MBJura9jMBhDFvL/kiE5Xoph56VGOTbRH7QLAdr6JXNLsDXT
+         egVvwah3syzXqc9gbbcXpGoTn1vfgET3etsikZTNHgJ7o5O5STr1meDmQ/SUu67YSxkk
+         Vczy7BOG9xJyepWsO+wur12Kg+txhtCOvscyvQvH6pdbq+7jW0HUXYJ7a2b89q3YVjNv
+         2rLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Q31He0N/yEzVpT1tCN0ycgAoynpjToL2FMOU6dBZlyk=;
-        b=B7pd+vZ2CaVcBKzJywtFEthK/7a7pQ09PBBPx6gxvQNVEKRBcmVM6qY+FQ/B+BCinY
-         Cr9v+SHGzsFsHT40tpMKWbJbNXwPJyAOtjKctkw6a5q36hxy1SgygIyTomGMPhxk968J
-         0qCAB/7OwBKRGpyYNUSyaQcQdhLPo7Yv50e8ATqtjmz7AeRfCB23i1YGF1TjIH7nKzHS
-         HBonyFhMQVI4vmdKfo0rIlmuj5dmz77cWkLXBi3j5zhTJgHi43PNZIIs6ZqeUGuuM4VC
-         anOM4gBc+MezX4FD+OJ8CWFN+MlKRDg/5IGk7X1tB+5vMiAW1B2RM02DO4MRd4cEVQO+
-         mrvQ==
-X-Gm-Message-State: AJIora9K4axhm//ZcHEUKNOAuUSI46VURhY5exIWJF0BV/45m3WLYfEc
-        YaqoIa40LFgJA8/dK5KgN8k=
-X-Google-Smtp-Source: AGRyM1tuJavDaw2ZeB5uJ0MHKMNqboTFs62CD95DkaZOXlPzjryT/Zc+5J9PrnHXUmyjkWrAfUiKYw==
-X-Received: by 2002:a17:906:8292:b0:723:5473:b2cf with SMTP id h18-20020a170906829200b007235473b2cfmr33329397ejx.378.1657018558713;
-        Tue, 05 Jul 2022 03:55:58 -0700 (PDT)
-Received: from ?IPV6:2a02:908:1987:1a80::835b? ([2a02:908:1987:1a80::835b])
-        by smtp.gmail.com with ESMTPSA id d11-20020a170906304b00b0072abb95c9f4sm3238352ejd.193.2022.07.05.03.55.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Jul 2022 03:55:58 -0700 (PDT)
-Message-ID: <8ccad303-7489-d90a-2255-ca36b7253810@gmail.com>
-Date:   Tue, 5 Jul 2022 12:55:56 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WhFSlvpuk9a/0AOEzgVFi1ms8C8N0bMJmyd4ZViqQJ0=;
+        b=dmYf4VjczWLyOWbBTPtNhHqpqyMbf8NRKPJj9g47/FoJA27mXcqMBVvIq+2fprwkCV
+         X8T0AaM0jub4SP50/vmsenZjKFEDIL4g4LaXvljbTWjOTvhCc75C0J33LoaewiZg/+Fo
+         xUGrT3Y2ayd1+iiwe7yo3mJmV77TErs3lI7i1n20ZH7pq86eXbwIIX1KOkJsuBRJ2iMp
+         yTFA7l1ygxqjQ4qciZUCZxQVbMnxKVgMAYGscYZyEiWmPC6Ydg20cBqQMq6CZ+xSslAl
+         rrfGpJzYH9A0MjqiG1Ltw0lv5+LppV3epoYttRztZYDI1PJmg+N4uxMmEmjGKamZAr/W
+         ksGQ==
+X-Gm-Message-State: AJIora9jRzbZl7moECKUnRZekt5OW5Pyn18R8rH3a935rmb9aE1Q5m7R
+        wpV9zMddoWFeS+HwJm341fArAz5X5i3j6JP9cC4=
+X-Google-Smtp-Source: AGRyM1v30/spfulcIMC3XqO/iDKK+fusrK1qNnmPcfNe4lFWkE/ya7OCeE56BfcVoaZC41PLotl06ubCM3ya2xpqcLU=
+X-Received: by 2002:a05:620a:2943:b0:6af:f2e:b4ec with SMTP id
+ n3-20020a05620a294300b006af0f2eb4ecmr22893788qkp.320.1657020526184; Tue, 05
+ Jul 2022 04:28:46 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: kernel-5.18.8 breaks cifs mounts
-Content-Language: en-US
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Stefan Metzmacher <metze@samba.org>,
-        Steve French <smfrench@gmail.com>,
-        Jeremy Allison <jra@samba.org>,
-        Enzo Matsumiya <ematsumiya@suse.de>,
-        Paulo Alcantara <pc@cjr.nz>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-References: <211885e7-1823-9118-836b-169c7163d7c2@gmail.com>
- <CAN05THTbuBSF6HXh5TAThchJZycU1AwiQkA0W7hDwCwKOF+4kw@mail.gmail.com>
- <fee59438-7b4a-0a24-f116-07c2ac39a3ad@gmail.com> <87h7423ukh.fsf@cjr.nz>
- <10efd255-16ea-6993-5e58-2d70e452a019@gmail.com> <87edz63t11.fsf@cjr.nz>
- <4c28c2f8-cda6-d9b4-d80f-1ffa3a3be14c@gmail.com>
- <20220630203207.ewmdgnzzjauofgru@cyberdelia>
- <CAH2r5mtVwZggJ9Fi0zsK5hCci4uxee-kOSC3brb56xpb0_xn7w@mail.gmail.com>
- <56afe80b-bf6a-2508-063a-7b091cdbbe0f@gmail.com>
- <CAH2r5mvoyhZGjf_wgvjgmkCz=+2iDxCSpbyJ79NMtpE1Ecjdnw@mail.gmail.com>
- <fccdb4af-697e-b7fc-6421-f16e9b35bb8e@samba.org>
- <11b3feeb-7ddb-1297-5080-7c2fc986475a@gmail.com>
- <CANT5p=oG9je_uY+6O6qdm_4HPKpZs0ZNZFrNFvSkeL+W4Gb67Q@mail.gmail.com>
-From:   Julian Sikorski <belegdol@gmail.com>
-In-Reply-To: <CANT5p=oG9je_uY+6O6qdm_4HPKpZs0ZNZFrNFvSkeL+W4Gb67Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CANT5p=pfEF91j3frZFJgxMLU6XmaC-pn=_oQnOF2BQPaj7Bh+Q@mail.gmail.com>
+ <874k1m3b56.fsf@cjr.nz> <CANT5p=rRTWpBR6MKiXrMtH0r_PD_jKyLhUhM_Of_oev=7rybDA@mail.gmail.com>
+ <CANT5p=rw=JamyDwYby1VVgMXAANMCou_aMhcw0vB48gggDWJQQ@mail.gmail.com>
+ <CANT5p=q6xyaaqqNizp1HsXhLFTnwezJ267SJDqr5WwyG8KZO+g@mail.gmail.com> <CAH2r5mt6A616063ZigfPBBKFjsV5AhNG3ifk-1HQOcgwb_i0kg@mail.gmail.com>
+In-Reply-To: <CAH2r5mt6A616063ZigfPBBKFjsV5AhNG3ifk-1HQOcgwb_i0kg@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Tue, 5 Jul 2022 16:58:35 +0530
+Message-ID: <CANT5p=okGAJCow=+BLGTHf3BqhmHijA1FK-XNVuLNHVRVhficA@mail.gmail.com>
+Subject: Re: Multichannel fixes
+To:     Steve French <smfrench@gmail.com>
+Cc:     Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+On Fri, Jun 24, 2022 at 8:14 PM Steve French <smfrench@gmail.com> wrote:
+>
+> FYI - the last one includes the fix for the lock ordering problem that
+> Coverity spotted.
+>
+> On Fri, Jun 24, 2022 at 9:43 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> >
+> > On Mon, Jun 6, 2022 at 3:57 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> > >
+> > > On Mon, Jun 6, 2022 at 11:12 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> > > >
+> > > > Hi Paulo,
+> > > >
+> > > > Sorry for the late reply.
+> > > > Good point. Tested basic DFS mounts. I was facing setup issues while
+> > > > setting up DFS for failover.
+> > > > Steve will be running the buildbot DFS tests anyway, which will
+> > > > contain DFS failover.
+> > > >
+> > > > On Thu, May 19, 2022 at 12:45 AM Paulo Alcantara <pc@cjr.nz> wrote:
+> > > > >
+> > > > > Shyam Prasad N <nspmangalore@gmail.com> writes:
+> > > > >
+> > > > > > This time, I've verified that it does not break the multiuser
+> > > > > > scenario. :)
+> > > > >
+> > > > > Thanks!  What about DFS failover scenario?  :-)
+> > > >
+> > > >
+> > > >
+> > > > --
+> > > > Regards,
+> > > > Shyam
+> > >
+> > > More fixes for multichannel:
+> > >
+> > > [PATCH] cifs: populate empty hostnames for extra channels
+> > > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/fb231a3e148e7537c899f4e145fc0dd876c2b195.patch
+> > >
+> > > [PATCH] cifs: change iface_list from array to sorted linked list
+> > > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/94363021b50edb86813ae280526d7f33d6903703.patch
+> > >
+> > > [PATCH] cifs: during reconnect, update interface if necessary
+> > > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/7610df44d276634a51155e6314ee159b7618013f.patch
+> > >
+> > > [PATCH] cifs: periodically query network interfaces from server
+> > > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/7dad71410514232501f921a8c3ad389d3344fddb.patch
+> > >
+> > > First one is a fix for ensuring that reconnect does not resolve extra
+> > > channels to possibly wrong IP address.
+> > > Rest three enable periodic query of server interfaces. This is
+> > > important for Azure service, where the server can change the IP
+> > > addresses of secondary channels.
+> > >
+> > > Reviews will be appreciated.
+> > >
+> > > --
+> > > Regards,
+> > > Shyam
+> >
+> > Updated the last set of patches to the below set after fixing some
+> > coverity warnings.
+> >
+> > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/37d488b3d38c04f9f4caf1fab2b58301f0c20227.patch
+> > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/a21e72b2a9599482739884329523ed91cfabf8db.patch
+> > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/ad8f403ac707cf326371d1361ef5880d89b9bbe6.patch
+> > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/85ede3abb8348d3b9b5a2548c9773ed0fec0f157.patch
+> > https://github.com/sprasad-microsoft/smb3-kernel-client/commit/8577d17e605634f297e1be71f602c8027737fefc.patch
+> >
+> > --
+> > Regards,
+> > Shyam
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
+Hi all,
 
-Am 05.07.22 um 07:28 schrieb Shyam Prasad N:
-> On Mon, Jul 4, 2022 at 10:03 PM Julian Sikorski <belegdol@gmail.com> wrote:
->>
->>
->>
->> Am 03.07.22 um 19:51 schrieb Stefan Metzmacher:
->>> Am 03.07.22 um 07:01 schrieb Steve French:
->>>> I lean toward thinking that this is a Samba bug (although I don't see
->>>> it on my local system - it works to samba for me, although I was
->>>> trying against a slightly different version, Samba 4.15.5-Ubuntu).
->>>>
->>>> Looking at the traces in more detail they look the same (failing vs.
->>>> working) other than the order of the negotiate context, which fails
->>>> with POSIX as the 3rd context, and netname as the 4th, but works with
->>>> the order reversed (although same contexts, and same overall length)
->>>> ie with POSIX context as the fourth one and netname context as the
->>>> third one.
->>>>
->>>> The failing server code in Samba is in
->>>> smbd_smb2_request_process_negprot but I don't see changes to it
->>>> recently around this error.
->>>>
->>>> Does this fail to anyone else's Samba version?
->>>>
->>>> This is probably a Samba server bug but ... seems odd since it doesn't
->>>> fail to Samba for me.
->>>>
->>>> Jeremy/Metze,
->>>> Does this look familiar?
->>>
->>> Maybe this one:
->>>
->>> https://git.samba.org/?p=samba.git;a=commitdiff;h=147dd9d58a429695a3b6c6e45c8b0eaafc67908a
->>>
->>>
->>> that went only into 4.15 and higher.
->>>
->>> metze
->>
->> Nice catch, I can confirm that adding this patch to debian samba
->> 2:4.13.13+dfsg-1~deb11u3 package makes the mounts work again. How do we
->> get this patch into debian?
->>
->> Best regards,
->> Julian
-> 
-> Hi Metze,
-> I went through the above patch, and it looks like an issue with
-> parsing garbage at the end of the buffer, rather than negotiate count.
-> I'm not sure how the netname negotiate context patches above are being
-> affected by this samba server patch. The only difference from the
-> client side for single channel is that the netname context appears as
-> the 4th element in the list of 4, rather than the 3rd element in the
-> list of 4. Do you have a possible explanation?
-> 
-> Julian,
-> Thanks for the repro attempt. So I assume that with the latest samba
-> server, things work as expected without reverting any changes in
-> 5.18.8 kernel, correct?
-> 
-I have no way of testing a newer samba server unfortunately, but several 
-people in this email discussion have mentioned that newer servers work 
-for them:
-- Paulo with W22
-- Enzo and Steve with 4.15
-- Steve with 4.16 without 
-https://git.samba.org/?p=samba.git;a=commitdiff;h=147dd9d58a429695a3b6c6e45c8b0eaafc67908a
+Found a race condition between the delayed workers when there's a
+failure to add a channel to a session.
+This was causing occasional failures on the buildbot due to a warning
+being logged.
 
-Best regards,
-Julian
+Fixed it with the below patch:
+https://github.com/sprasad-microsoft/smb3-kernel-client/commit/ff9ba549b08b8a54bd951e74dae7a1e74f8e7db6.patch
+
+Please review the fix.
+
+-- 
+Regards,
+Shyam
