@@ -2,166 +2,156 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C98DDC43334
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Jul 2022 22:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8561CC43334
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Jul 2022 05:37:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230251AbiGEW0m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Jul 2022 18:26:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33888 "EHLO
+        id S231717AbiGFFh0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Jul 2022 01:37:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229797AbiGEW0i (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Jul 2022 18:26:38 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C766414020
-        for <linux-cifs@vger.kernel.org>; Tue,  5 Jul 2022 15:26:37 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id q8so3832771ljj.10
-        for <linux-cifs@vger.kernel.org>; Tue, 05 Jul 2022 15:26:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nvhA6QGuH/9Ca5AWv+XJgENCzjeCQ64n1KPkndplBJA=;
-        b=L9Hphgy7gVDb2KjbUuCgFOD4VGDwWg7YBcu5nd0yaAQ2k+SqIq/Bxln1lRIma3P+E5
-         OUykZvrb95BfrXerieapbjOZwmjCjXDJ9op7XayaotV+nnV7mk1v5qCmI97IUbnpEBYY
-         SKz4wBxwknZTdqXXRzGIb1KCYjn3M6iDEEfW0YXJbHre3x8/GCfTvKUb3dkByns6rmE4
-         4LSatTH3JL957YwRo2yUZyaGpAKk6D+wp22HOsFA3M9wEyPv4efgXV1oHur7x7QgA7g0
-         pN42vQclsBtMiKpOr3B28c+84Q8c9nTlHpCvcwJbtNPhlOQWWSjKWl3PlB/Mxr70bwpr
-         vn5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nvhA6QGuH/9Ca5AWv+XJgENCzjeCQ64n1KPkndplBJA=;
-        b=15MQdmUzbvbfOthE/b+iyuJabZUfqlUmDU2ytYhrR/pxZH4qW2HAFm7mzcKeX1cUm6
-         dzQ17xC9IFvXee3PhK+XUQM0jt/RoaEQxu8g42bS46J9a2fTjq/pxVIlFa82zZaRD4/I
-         uSRkfr8P/sjBTOfBzkaWKgSUdw/9xE0M2zb1LMNjK8lpmYdWBgxHmZdx7yGZ9mj4S7ND
-         9HCYNHgiPkPW34Lo1XN1J8L6uh6KILyigASkL6RwRChCn26UctTmQuqh/jA140WExO3o
-         VqIWvTrCXh2kMLfHjCWcVwIPqPNe/voK1Uhm3G6f/aLKmquEaJG1a5cEh4j+fP/JSdJU
-         OIzw==
-X-Gm-Message-State: AJIora9jAB/HN/wwtRqj5ZS4m5wJdZb0nrjvTI1IMOVdCMjsqE8auzF0
-        njFg9Y2to3dUDSM7Kn/xz86SxKsE2nAx4RkYnhI=
-X-Google-Smtp-Source: AGRyM1vwQOOUdkXsnOuZHqXvL3pQW1N14XhtHPIrmqQ6yRqIVXNa/HCzs1sZUcS4Z+rwL0LZemvk9myUbwV6SUMG/fA=
-X-Received: by 2002:a2e:8ec1:0:b0:25a:94fb:f9e6 with SMTP id
- e1-20020a2e8ec1000000b0025a94fbf9e6mr20825328ljl.401.1657059995995; Tue, 05
- Jul 2022 15:26:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAGypqWyKzYL+MKwsmStP=brsxYCE9MNq=2o-8QoywFX4oPSdTw@mail.gmail.com>
- <75e51680-f6b1-d83e-0832-bc384b7157be@talpey.com> <CANT5p=rhUvsrveJDA+AsJ6=j=sWC97LiTH+HcTFxbqRtFKqkAw@mail.gmail.com>
- <CAN05THSaD5JbdkjfEzQDtNOL-M+ZQhm-yrz6n1ystJKXOsJArw@mail.gmail.com>
- <CANT5p=pXXfou2H0pTX+yorFTkJ-AryhhDeaAuVzxoDb4-=U69Q@mail.gmail.com>
- <CAN05THTyNW6mw=arsDd5PCNvX_PwV2xijghe_MDFvbz_hMC-Nw@mail.gmail.com>
- <35b03fb9-1500-865f-f67a-c24817531ca1@talpey.com> <CANT5p=qetdByFLOV0=1VXXa0xMukAggaDtjaQ=K0KH4upVRa1A@mail.gmail.com>
-In-Reply-To: <CANT5p=qetdByFLOV0=1VXXa0xMukAggaDtjaQ=K0KH4upVRa1A@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Wed, 6 Jul 2022 08:26:23 +1000
-Message-ID: <CAN05THSW5Yb0bRkEnU1iYVu=nbHriUm=PW2oHcx1WP1m2Z61bA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Add mount parameter to control deferred close timeout
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm.hsk@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
+        with ESMTP id S230208AbiGFFhZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Jul 2022 01:37:25 -0400
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2098.outbound.protection.outlook.com [40.107.255.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1057021E32;
+        Tue,  5 Jul 2022 22:37:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IZCyCR4Dbv996TAel0gMo5VH+5Vk5nOqUHvQugLXr4ErsA6xD/TnbtcuKjoVTvM2K1I4KZuowNzGKEvZxfOLPbXAu7Mr9hZFYTgpCPdQL1ihKFM+87EZwcJ94SxkSqXRBskLxwfiyJM/pS60VQLxPJp8S5MO9vXjAlIjHGxdPqrgZtvBxLTkuENs8/VpKc8bLd3D0ZZWuqasjnUuJ/3VXzS0KuL8Exg5uvlX8GM9wCIke3U2iTlo7ZPAhVpZrjZNMaKYv5yp890rT9j8AgCyuIGHzAcI5tIY5oPjqwqXozwAOPMe+FJOK7S0xmtPq69nS6HL+b7Kyv6NPuAjRevegw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+3tV/3QfZgKMNXKcAAFrG3js9FthYHEO9H3CkToWcgI=;
+ b=IGyBsxMF/sC5Nw/m+7AV/e2lY9tXERpbk0OIOXzZhqEtTwhI+Rg1uqEi/D5eP3q1OK4tfs8VFMyiwaRz6evTFiSERZXrA+aQgGXveHBq6BjOWkJaPDGvhHanrHZlIrj/EyCPe+vRAkVl88n9QGWJOQmvwJ4tet6msqapw3x14Orjtj1ca9Me+jZnGFzkEak7cHmWT4/PBRLHXRHX2MTd4muZHL9i8IhdO+lf33cq0uOfA06afpuaABNzBNlmrJONIgYoJ68U/KMOG6KO31m1nGqbXIA2Rg5Iz1k1ZpKmmbKfooKfktWFS6umqbhSC8ZBuvoeh+dyAhDSGgFhlU8olA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+3tV/3QfZgKMNXKcAAFrG3js9FthYHEO9H3CkToWcgI=;
+ b=HUyOR9CUjQ6ImBiuOJ+ausYOuiCpHIwDof+EkFP0uHgT2LPxd06uEiNvleXIkYHQP+s/I+ldZTXkZsiZGlQLLa6elJv5Pt0QBa8c+fu1HGWjIUFZnrP39WH1ukDvNAq1SG4cfQGlHVDdkjXDjAQNzqT34TsoKqfmQZkPX/saCyY=
+Received: from TY2P153MB0238.APCP153.PROD.OUTLOOK.COM (2603:1096:404:e4::23)
+ by HKAP153MB0355.APCP153.PROD.OUTLOOK.COM (2603:1096:203:d9::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.1; Wed, 6 Jul
+ 2022 05:37:18 +0000
+Received: from TY2P153MB0238.APCP153.PROD.OUTLOOK.COM
+ ([fe80::71c2:9c27:b23c:5282]) by TY2P153MB0238.APCP153.PROD.OUTLOOK.COM
+ ([fe80::71c2:9c27:b23c:5282%7]) with mapi id 15.20.5438.003; Wed, 6 Jul 2022
+ 05:37:18 +0000
+From:   Shyam Prasad <Shyam.Prasad@microsoft.com>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
         Steve French <smfrench@gmail.com>,
-        rohiths msft <rohiths.msft@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        CIFS <linux-cifs@vger.kernel.org>
+CC:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: RE: [EXTERNAL] linux-next: Fixes tag needs some work in the cifs tree
+Thread-Topic: [EXTERNAL] linux-next: Fixes tag needs some work in the cifs
+ tree
+Thread-Index: AQHYkLw/nkY32AlJc0u/i8tN8fVyoq1w0uug
+Date:   Wed, 6 Jul 2022 05:37:17 +0000
+Message-ID: <TY2P153MB0238EBC99422B2008BA0916C94809@TY2P153MB0238.APCP153.PROD.OUTLOOK.COM>
+References: <20220706080615.11c5ede3@canb.auug.org.au>
+In-Reply-To: <20220706080615.11c5ede3@canb.auug.org.au>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=f7e702a2-baf7-4740-8692-2cc9beb7bc84;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-07-06T05:35:26Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0d589d84-f621-4190-48d9-08da5f11970e
+x-ms-traffictypediagnostic: HKAP153MB0355:EE_
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: RjOum0UIRN7gkraQbXOtt0K6rOZxRoA+RG1Ol/z4oseEjRfdfVnsog/SHKbOrWzrTfWwwkTnl2SMqYAVcfsVC156zM+83T2NKm+x5mPp8Fx/3Fy5b5DfeglANhgwlapcw3g9xuAkRj0YN8DkSIpyHguW8PEv+hBkE34gmF27rHyF0yvfime0x1r1SewsTD6f0eXhsv80tAvkABSZXmcwm/pp7voMs5mBMa8qd7LWEjkVj6DXqXSlAYuHraYpVTYQjIzXH9/2ckpYxSdLPjqHVjPXJvRPD4rLo/vjNHpdAamecOQqma5OYX5Ge6dA1Oih7eN1Y/LwMWqPKccuuwdQwPKM1i7OK/yH8OpygiU9Sl9vkuE2AIyN77k6e4rub6oNN/EStrtBhg+8+P+wPq9W5iuLElAaVYhEwS/vOHulkKbFNUYF26KutbELfC5VZQgv3gUDgKIIDuruc7CeXtCzYxbdCZ05j22aNlGIYUimWZGdmDgSpZnEHQnEm75pw0q14Y3CrPu+o8JlOs1e2SadfyembqvJHc0Dv67DlaeY3RdZ/wBNnJxWpEUgxOPCMTGw8S4eLz66reJ3azeZ+pzWMD1u02a9lmC7A0eenDqKAgPxZu3xxWDEwaY3x8Za7KGQVQG84JtQLe3wfvbgp1G2f9FwRA8LutMFhf/KZez3UMvdlqe23YdYcvpolFH/pLholQwYurRMuaVrie6oBVAtUBn2eWQyUy/oPcWFb6xtvGlIN///J+owqTb6KDxK4beb936OzZmLJEcsguGQiadViLZvYIx1+puS0rfnlgmJXMgBEBNkfzpuFiOY+3dD2X/QN88BGEX87CI/zqe5epJdx6ua/k/eG1a2LbUrJWwr9YfBe/CH4N8P6FdpN5okclfJ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY2P153MB0238.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(346002)(376002)(136003)(366004)(39860400002)(451199009)(316002)(38070700005)(55016003)(82950400001)(122000001)(82960400001)(41300700001)(53546011)(110136005)(54906003)(6506007)(38100700002)(10290500003)(7696005)(8676002)(4326008)(66946007)(71200400001)(2906002)(5660300002)(83380400001)(66556008)(66476007)(64756008)(76116006)(66446008)(86362001)(478600001)(8990500004)(9686003)(52536014)(33656002)(8936002)(186003)(4744005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?j9NyCW6Ozg7wyKpbcCo/w+wKHgyLuB20zGNuYmKs/aC30UuxHen+3Ad32o/5?=
+ =?us-ascii?Q?B4U9SNmMI1hGqU8xC5kEIdk8VLWn8gvyw0SuaBAJYa6gx9a6TvmTb/F8Lc9s?=
+ =?us-ascii?Q?zw+uoqu3jmzjFNwxyEwguhsY/N2VJW3aeclqumwdGUH1PJZTislTPL8jCJ1l?=
+ =?us-ascii?Q?d/dQDYf8HcLg3K+d9u8vK5167FZThURmtWgvtmQ36U33+a2UAYlKHNHFXBVz?=
+ =?us-ascii?Q?NVUswIokItUiU9adGTav8kvzBTegGdkworhds4WUQ5SumclF0gWJ/80RMHzE?=
+ =?us-ascii?Q?h1+trYqeaO4jETfZXIgYDbjqIMNkoJT2ekuV30hldrQpK+6Hx/EXkFYZk261?=
+ =?us-ascii?Q?aGNuSyBxGOZjAjLz73tcl4cjflpvB0n1EMb1wQFb4msblxJtaAEAQ8Z7/FRz?=
+ =?us-ascii?Q?+h1aBXQHtzMrYp0rpHRW8C44AbGZh+7IW3oT1l12PLsCuQCFQONEt6sMHroK?=
+ =?us-ascii?Q?lBTz7Iozh7v+1btdfbcQgjSOAXcuXAUQTIZBjm8jfMg+BHChaN6Fc56bVsNg?=
+ =?us-ascii?Q?WI+/h+fKJ/ZiR1gX4m/52SGwKK4bHN/os4JFrJqq2ySIZkJpHTyyUhRc+bl1?=
+ =?us-ascii?Q?CVCtzauCAJagWQHkEsBVFU44Vem0akCcHranDeJ/s40v2qHHoXg0V7rOnEw+?=
+ =?us-ascii?Q?2SKkPowvbES/i7PXOSiG+7eMFZU5PuU6MSDHcROqKjBgz7rkzbdCvOIuv9fv?=
+ =?us-ascii?Q?Bjb3ZawP+g9xkMxy7iCHuDF7PLZeli4+ZxE9WE6WfpJpdcCKrIQD8+xY39W+?=
+ =?us-ascii?Q?1dBPafHMibk3NWFwZzcHWs0WHqxfT1bv3hVczHyEi5F0vKzC/O8z/b/VwmEr?=
+ =?us-ascii?Q?RgmJIlzFI2XvLApxT94qjlaXWo5dfmMTMyQXgrcxtU6kTNKIw6Ut4Y4OUfqg?=
+ =?us-ascii?Q?srtYsOBoh5TZ/wI/BsnuHtqNYaYEZ70F0MjIXcoOBZD4eVqF3nyKvbcehIKf?=
+ =?us-ascii?Q?eXKU0r/gofreQjn5Ob6tTNw8j0ufV2z9/v20+cCNCLsO0SirP+x3cqALGhFG?=
+ =?us-ascii?Q?PGNQRz0LHs4WXYgwG/iRg4yLtZ+3NdOWqf8ROAqc/8V/FEdTnNzqWWr1ztN0?=
+ =?us-ascii?Q?+1xGVPE7v37Y8MSqAfMoIAy+Ayw+GUvqTUN9QMD6CajOfpnroEI5K6zLH0uZ?=
+ =?us-ascii?Q?SMHDPAZCUTfRShWd9eEdYKV5PMGQRd3+gIWj4u6xY24tw+mtISF57E9AflOZ?=
+ =?us-ascii?Q?o8xGoR3orycekpUA4Id9bCtXRtsVdbk6ZGJ0CqYo3Mv9sjQiUDwjyOG0gveK?=
+ =?us-ascii?Q?yQce6iq4lCJaHTwk0MSF3NF5byjRUuTqTPBX1RJBniOsb3v5LdaSG9U71ooV?=
+ =?us-ascii?Q?E+xF4pTpXEwfofpDm5eFRPHVFzTaYjClUWgnwvGz5epWum3EkP7H/s2JJ5Of?=
+ =?us-ascii?Q?1K31sPqae+ParEsAxPSTqy08F4BEWJ5HoX+adO/Svtef2X0g3rRvrxqnX8yZ?=
+ =?us-ascii?Q?RFqQ1mFqF1n1CS6xY7L+2FgG04U9ZchSmGIiaOX5J4rcg6hB2RI6yGyB61Bu?=
+ =?us-ascii?Q?P/mluIBbiSYssgOc6WzN5Ax6tmvSK3PT/O3aPZukbZNAA7APN1Br0vrk3Flb?=
+ =?us-ascii?Q?LaBS8OhYK5+Gus2MePCewlU5IBQL30Xnx0+BagFw1fSujj7RO2wbZqpPi0wC?=
+ =?us-ascii?Q?y3mrSPuBGA9rbctF7mmg5CLZzM844EFvF0MyV9Y4qu9N?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY2P153MB0238.APCP153.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d589d84-f621-4190-48d9-08da5f11970e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2022 05:37:17.9568
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TCH6Rb1ucCKb2+ktj8ipGYa0aFNDW9jkOzqkykVH+aSowPfVj4pbbzJecj/ZEWhIMfEAzaIfzCnWwyc/AZ4YTw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HKAP153MB0355
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 4 Jul 2022 at 23:52, Shyam Prasad N <nspmangalore@gmail.com> wrote:
->
-> On Fri, Jul 1, 2022 at 9:00 PM Tom Talpey <tom@talpey.com> wrote:
-> >
-> > On 7/1/2022 7:00 AM, ronnie sahlberg wrote:
-> > > On Fri, 1 Jul 2022 at 18:44, Shyam Prasad N <nspmangalore@gmail.com> wrote:
-> > >>
-> > >> On Fri, Jul 1, 2022 at 12:07 PM ronnie sahlberg
-> > >> <ronniesahlberg@gmail.com> wrote:
-> > >>>
-> > >>> On Fri, 1 Jul 2022 at 16:03, Shyam Prasad N <nspmangalore@gmail.com> wrote:
-> > >>>>
-> > >>>> On Fri, Jul 1, 2022 at 3:23 AM Tom Talpey <tom@talpey.com> wrote:
-> > >>>>>
-> > >>>>> Is there a justification for why this is necessary?
-> > >>>>>
-> > >>>>> When and how are admins expected to use it, and with what values?
-> > >>>>>
-> > >>>>
-> > >>>> Hi Tom,
-> > >>>>
-> > >>>> This came up specifically when a customer reported an issue with lease break.
-> > >>>> We wanted to rule out (or confirm) if deferred close is playing any
-> > >>>> part in this by disabling it.
-> > >>>> However, to disable it today, we will need to set acregmax to 0, which
-> > >>>> will also disable attribute caching.
-> > >>>>
-> > >>>> So Bharath now submitted a patch for this to be able to tune this
-> > >>>> parameter separately.
-> > >>>
-> > >>> Ok,  will the option be removed later once the investigation is done?
-> > >>> We shouldn't add options that are difficult/impossible to use
-> > >>> correctly by normal users.
-> > >> We didn't intend to. We thought that this could be a useful tunable
-> > >> parameter that the basic users need not even worry about, but advanced
-> > >> users / developers could suggest changing it to tune / troubleshoot
-> > >> specific scenarios.
-> > >
-> > > If it is just for developers needing it to debug specific issues  it
-> > > should absolutely not be a mount option in upstream.
-> > > Maybe have it as a /proc/fs/cifs/Debug thing or just provide custom
-> > > builds for the customer when debugging specific issues.
-> >
-> > Absolutely agree. Upstream isn't a developer sandbox.
-> >
-> > I'll point out that this patch:
-> > 1) Doesn't change any behavior as-is
-> > 2) Doesn't give any guidance on values
-> > 3) Doesn't update the userspace mount command
-> > 4) Doesn't ever go away because it changes the ABI
-> > 5) Increases the total number of cifs.ko mount options to 102.
-> >
-> > I'm not sure about that last one. It might be 103.
-> >
-> I understand that the concern is mainly around this being a mount option.
-> So let's discuss what's the correct place for tuning such configurations?
-> It could be a module parameter. It would make it global. But I guess
-> that's okay.
-> Thoughts?
+-----Original Message-----
+From: Stephen Rothwell <sfr@canb.auug.org.au>=20
+Sent: Wednesday, July 6, 2022 3:36 AM
+To: Steve French <smfrench@gmail.com>; CIFS <linux-cifs@vger.kernel.org>
+Cc: Shyam Prasad <Shyam.Prasad@microsoft.com>; Linux Kernel Mailing List <l=
+inux-kernel@vger.kernel.org>; Linux Next Mailing List <linux-next@vger.kern=
+el.org>
+Subject: [EXTERNAL] linux-next: Fixes tag needs some work in the cifs tree
 
-I think /proc/fs/cifs/Debug would be an appropriate place since it
-would make it obvious that it
-is just a debugging option and not something normal users should use.
-Perhaps something like making it writeable by root and be able to do :
-echo "dclosetomeo:55" >> /proc/fs/cifs/Debug
+Hi all,
 
+In commit
 
->
-> > > Once they become mount options they need to be documented, what they
-> > > do and why you would use them and exactly how to determine what to set
-> > > them to.
-> > >
-> > >
-> > >
-> > >>>
-> > >>>
-> > >>>>
-> > >>>>> On 6/29/2022 4:26 AM, Bharath SM wrote:
-> > >>>>>> Adding a new mount parameter to specifically control timeout for deferred close.
-> > >>>>
-> > >>>>
-> > >>>>
-> > >>>> --
-> > >>>> Regards,
-> > >>>> Shyam
-> > >>
-> > >>
-> > >>
-> > >> --
-> > >> Regards,
-> > >> Shyam
-> > >
->
->
->
-> --
-> Regards,
-> Shyam
+  37c1ad516f2c ("cifs: fix race condition with delayed threads")
+
+Fixes tag
+
+  Fixes: 37d488b3d38c ("cifs: change iface_list from array to sorted linked=
+ list")
+
+has these problem(s):
+
+  - Target SHA1 does not exist
+
+Maybe you meant
+
+Fixes: aa45dadd34e4 ("cifs: change iface_list from array to sorted linked l=
+ist")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+-------------------------------------
+
+Good catch. I must have used a different branch.
+Steve, can you please fix the SHA1 in your branch?
+
+Regards,
+Shyam
