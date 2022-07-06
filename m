@@ -2,158 +2,129 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9038FC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Jul 2022 05:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28822C43334
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Jul 2022 11:18:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbiGFFn3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 6 Jul 2022 01:43:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33284 "EHLO
+        id S232190AbiGFLSR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Jul 2022 07:18:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230041AbiGFFn1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Jul 2022 01:43:27 -0400
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F9F621B1;
-        Tue,  5 Jul 2022 22:43:25 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id k2so4451538vsc.5;
-        Tue, 05 Jul 2022 22:43:25 -0700 (PDT)
+        with ESMTP id S231251AbiGFLSQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Jul 2022 07:18:16 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CFBA27FC8
+        for <linux-cifs@vger.kernel.org>; Wed,  6 Jul 2022 04:18:16 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id v16so10140291wrd.13
+        for <linux-cifs@vger.kernel.org>; Wed, 06 Jul 2022 04:18:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qIOkUw7/dlHm3PcGuFymF+vCzjdxBhtSSgiqGtBYXiQ=;
-        b=I3Iz+MxDdhm373RRIJcbmItmN/ua36cpm/BeKMPN5VyAT5jbIzp8HWa9fWpICvcLWd
-         AOnocrViL9yt5l5vUHDfWTsC17LC4iC6HrKFAFtctTvRH2M6p3c/t2cRdVix+WaaRpYH
-         jXbZbeaYNJHpYbwaXvuFBLbtdWqj70Ix/6zWEyIrbOWSkFDzk1WUkOnuaF6+F4/z3bMh
-         fqpXuC1h0Q38suR5lEOqJSsn5wfYlecBSG5D/jesJ4a+8cIB4Cpw95tDjqt6VrH3pLqX
-         XYAsmzlwndRoYUHhkq8pITwrB3x6uLe/dWbFf80ZiSJzlfPz5DPN/MIbtjyIZBo+vhST
-         Y0lw==
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:in-reply-to:content-transfer-encoding;
+        bh=BPDCCNOkuTCgcYg/RqnixstMMzarWd4yVjUrwP32HsY=;
+        b=bQAzTC6Q1/XBs7Ftb9eUpfOxHpK8s53TXaW6kuAcscq+1UKU8PhPD/IlXmalmY/K1e
+         aVan+mdoy2Cru+F2gN0NUCTd8ysuM4/4LadNyvGdWVLnYmsduQEQm1i+o+mTEk/iBavZ
+         L/R742epZoXQBIBloDmrVf9qq4n2iErpsL11DfpHKczRFB0sqY8/cJpsas1NBPmaH4wM
+         fMJPi1ew6O4Gt/Ttuip5Sl6hsRG9AGp65Z86vApdgSmTSC0vJ4nNKvm2EwzTEnxAs4qW
+         +gUOmUr4ws01405kCnU66CjCZLBgQBtwTMXTNO1KIFYqJ6n5FsDGWAXLSaozXPTsFSIw
+         Du0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qIOkUw7/dlHm3PcGuFymF+vCzjdxBhtSSgiqGtBYXiQ=;
-        b=I08c2Ajxdm26NzDpqJeiMPwTEr5fIWjYsLPZyO3AvpEiRjMNC+YoHfKWISJYQkOOhH
-         RLIA+sjP3vIUjadlkQJe44pM7i8RMafXw4bSDicIdcMjNoKbOdZCVZNqD7X/7Q9M7h0g
-         mkgTU3VMUP/vaOb7Jg67DuUhLaXeqgGc6futMjgFMyVRz5IKXUCST14HE0qE/BOiAJlu
-         2UUd70vcwAYo9BqUftp1u7FvQV0QMFe2Kzr1mCI/o6DWJ3dPUJzZzxXAs3grPitGBADm
-         AgGKGfNsroRBmUtbntlcgF1bvFjQ8RFVWB88A8cfnJL+uKpuXz55+45edm5ccvXrTboB
-         H/bQ==
-X-Gm-Message-State: AJIora+rDQ94SsO8DUfziwzwbXw38/C2mWw+VPmB6rnMG2xroY8g1aXH
-        1ZKWyKFEQAIwabFExywCSyu2qFuQbzVxxFGK/Ho=
-X-Google-Smtp-Source: AGRyM1vtEv36+/l3kyHi4TrW3Gt1AiE+ohsURl/fFHhJfmeE1mCtzV4wy5I6XK8KydJAHLVlBB6cGRfJSKXPrQLoXoU=
-X-Received: by 2002:a67:fe50:0:b0:356:a09d:afe4 with SMTP id
- m16-20020a67fe50000000b00356a09dafe4mr11184102vsr.6.1657086204563; Tue, 05
- Jul 2022 22:43:24 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:in-reply-to
+         :content-transfer-encoding;
+        bh=BPDCCNOkuTCgcYg/RqnixstMMzarWd4yVjUrwP32HsY=;
+        b=QmqwqnHZcwq8KtjPAO7fx1P1d2g08Am5MrD6ofYWwTGRUI+ZI2GNgwsrWDzfrn72W+
+         7lGDJCCbHBmcqBt/husEpGAp4RSSV0+LVQcPlV2sAkq3xx2Ij08JPBeksc7pQWZpslQb
+         PQ7M0aEKx8RxXfNMjJjGgjv8wX66nUV9CUIMVbXzjJPxXpfWJleq0opmwapWAda2QdPu
+         rSqAL9bUnyeKePPKiwO/7DWrkva+6aB/e45NeFGOc1SH/eTM2oxwIGORWTBlISQC0jdE
+         PqZRJsfXJ1xIixJ+8dJcKqjic0QJdr71MBZgXj1siteVjX6ZCyEWKr6Opfbkzae+93GN
+         uDag==
+X-Gm-Message-State: AJIora8l/vQYFibbqey7GuN5FMYa0+OmHTjZv3JkPSwSumrxsmU3pXl6
+        bLPh3bq1dOrhf9RJhZ1RJ10=
+X-Google-Smtp-Source: AGRyM1tpXkVAsdWa7rEw/Yboq+3a7L3V/XQF5bnluuhjBBdtJh+HBXovlYWqrttfh1Ac8IMLaXHBLg==
+X-Received: by 2002:a5d:4344:0:b0:21d:578a:d8b7 with SMTP id u4-20020a5d4344000000b0021d578ad8b7mr21155420wrr.108.1657106294443;
+        Wed, 06 Jul 2022 04:18:14 -0700 (PDT)
+Received: from ?IPV6:2a02:908:1987:1a80::835b? ([2a02:908:1987:1a80::835b])
+        by smtp.gmail.com with ESMTPSA id f2-20020a7bcd02000000b003a0499df21asm26590930wmj.25.2022.07.06.04.18.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Jul 2022 04:18:13 -0700 (PDT)
+Message-ID: <5936fdc6-3ab2-35d7-ff79-19a4a3768f19@gmail.com>
+Date:   Wed, 6 Jul 2022 13:18:12 +0200
 MIME-Version: 1.0
-References: <20220706080615.11c5ede3@canb.auug.org.au> <TY2P153MB0238EBC99422B2008BA0916C94809@TY2P153MB0238.APCP153.PROD.OUTLOOK.COM>
-In-Reply-To: <TY2P153MB0238EBC99422B2008BA0916C94809@TY2P153MB0238.APCP153.PROD.OUTLOOK.COM>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 6 Jul 2022 00:43:13 -0500
-Message-ID: <CAH2r5mswhV-0b2R4jaxXC1LoRGc7DjpB0ezxGWdJ3Me5=01Wpg@mail.gmail.com>
-Subject: Re: [EXTERNAL] linux-next: Fixes tag needs some work in the cifs tree
-To:     Shyam Prasad <Shyam.Prasad@microsoft.com>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000095e97a05e31c721b"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: kernel-5.18.8 breaks cifs mounts
+Content-Language: en-US
+From:   Julian Sikorski <belegdol@gmail.com>
+To:     Stefan Metzmacher <metze@samba.org>,
+        Steve French <smfrench@gmail.com>,
+        Jeremy Allison <jra@samba.org>
+Cc:     Enzo Matsumiya <ematsumiya@suse.de>, Paulo Alcantara <pc@cjr.nz>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+References: <211885e7-1823-9118-836b-169c7163d7c2@gmail.com>
+ <CAN05THTbuBSF6HXh5TAThchJZycU1AwiQkA0W7hDwCwKOF+4kw@mail.gmail.com>
+ <fee59438-7b4a-0a24-f116-07c2ac39a3ad@gmail.com> <87h7423ukh.fsf@cjr.nz>
+ <10efd255-16ea-6993-5e58-2d70e452a019@gmail.com> <87edz63t11.fsf@cjr.nz>
+ <4c28c2f8-cda6-d9b4-d80f-1ffa3a3be14c@gmail.com>
+ <20220630203207.ewmdgnzzjauofgru@cyberdelia>
+ <CAH2r5mtVwZggJ9Fi0zsK5hCci4uxee-kOSC3brb56xpb0_xn7w@mail.gmail.com>
+ <56afe80b-bf6a-2508-063a-7b091cdbbe0f@gmail.com>
+ <CAH2r5mvoyhZGjf_wgvjgmkCz=+2iDxCSpbyJ79NMtpE1Ecjdnw@mail.gmail.com>
+ <fccdb4af-697e-b7fc-6421-f16e9b35bb8e@samba.org>
+ <11b3feeb-7ddb-1297-5080-7c2fc986475a@gmail.com>
+In-Reply-To: <11b3feeb-7ddb-1297-5080-7c2fc986475a@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000095e97a05e31c721b
-Content-Type: text/plain; charset="UTF-8"
+Am 04.07.22 um 18:29 schrieb Julian Sikorski:
+> 
+> 
+> Am 03.07.22 um 19:51 schrieb Stefan Metzmacher:
+>> Am 03.07.22 um 07:01 schrieb Steve French:
+>>> I lean toward thinking that this is a Samba bug (although I don't see
+>>> it on my local system - it works to samba for me, although I was
+>>> trying against a slightly different version, Samba 4.15.5-Ubuntu).
+>>>
+>>> Looking at the traces in more detail they look the same (failing vs.
+>>> working) other than the order of the negotiate context, which fails
+>>> with POSIX as the 3rd context, and netname as the 4th, but works with
+>>> the order reversed (although same contexts, and same overall length)
+>>> ie with POSIX context as the fourth one and netname context as the
+>>> third one.
+>>>
+>>> The failing server code in Samba is in
+>>> smbd_smb2_request_process_negprot but I don't see changes to it
+>>> recently around this error.
+>>>
+>>> Does this fail to anyone else's Samba version?
+>>>
+>>> This is probably a Samba server bug but ... seems odd since it doesn't
+>>> fail to Samba for me.
+>>>
+>>> Jeremy/Metze,
+>>> Does this look familiar?
+>>
+>> Maybe this one:
+>>
+>> https://git.samba.org/?p=samba.git;a=commitdiff;h=147dd9d58a429695a3b6c6e45c8b0eaafc67908a 
+>>
+>>
+>> that went only into 4.15 and higher.
+>>
+>> metze
+> 
+> Nice catch, I can confirm that adding this patch to debian samba 
+> 2:4.13.13+dfsg-1~deb11u3 package makes the mounts work again. How do we 
+> get this patch into debian?
+> 
+> Best regards,
+> Julian
+I have now filed a bug against debian samba package:
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1014453
 
-Fixed
-
-(updated patch also attached)
-
-On Wed, Jul 6, 2022 at 12:37 AM Shyam Prasad <Shyam.Prasad@microsoft.com> wrote:
->
-> -----Original Message-----
-> From: Stephen Rothwell <sfr@canb.auug.org.au>
-> Sent: Wednesday, July 6, 2022 3:36 AM
-> To: Steve French <smfrench@gmail.com>; CIFS <linux-cifs@vger.kernel.org>
-> Cc: Shyam Prasad <Shyam.Prasad@microsoft.com>; Linux Kernel Mailing List <linux-kernel@vger.kernel.org>; Linux Next Mailing List <linux-next@vger.kernel.org>
-> Subject: [EXTERNAL] linux-next: Fixes tag needs some work in the cifs tree
->
-> Hi all,
->
-> In commit
->
->   37c1ad516f2c ("cifs: fix race condition with delayed threads")
->
-> Fixes tag
->
->   Fixes: 37d488b3d38c ("cifs: change iface_list from array to sorted linked list")
->
-> has these problem(s):
->
->   - Target SHA1 does not exist
->
-> Maybe you meant
->
-> Fixes: aa45dadd34e4 ("cifs: change iface_list from array to sorted linked list")
->
-> --
-> Cheers,
-> Stephen Rothwell
->
-> -------------------------------------
->
-> Good catch. I must have used a different branch.
-> Steve, can you please fix the SHA1 in your branch?
->
-> Regards,
-> Shyam
-
-
-
--- 
-Thanks,
-
-Steve
-
---00000000000095e97a05e31c721b
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-fix-race-condition-with-delayed-threads.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-fix-race-condition-with-delayed-threads.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l596bzsh0>
-X-Attachment-Id: f_l596bzsh0
-
-RnJvbSBhYzEyNWQ5M2FlOTJkOWE1NWRiMzVjNTZlODYwNjU4YjUzMjA4ZjAxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-PgpEYXRlOiBUdWUsIDUgSnVsIDIwMjIgMTE6MTY6MjQgKzAwMDAKU3ViamVjdDogW1BBVENIIDEv
-Ml0gY2lmczogZml4IHJhY2UgY29uZGl0aW9uIHdpdGggZGVsYXllZCB0aHJlYWRzCgpPbiBmYWls
-dXJlIHRvIGNyZWF0ZSBhIG5ldyBjaGFubmVsLCBmaXJzdCBjYW5jZWwgdGhlCmRlbGF5ZWQgdGhy
-ZWFkcywgd2hpY2ggY291bGQgdHJ5IHRvIHNlYXJjaCBmb3IgdGhpcwpjaGFubmVsLCBhbmQgbm90
-IGZpbmQgaXQuCgpUaGUgb3RoZXIgb3B0aW9uIHdhcyB0byBwdXQgdGhlIHRjcCBzZXNzaW9uIGZv
-ciB0aGUKY2hhbm5lbCBmaXJzdCwgYmVmb3JlIGRlY3JlbWVudGluZyBjaGFuX2NvdW50LiBCdXQK
-dGhhdCB3b3VsZCBsZWF2ZSBhIHJlZmVyZW5jZSB0byB0aGUgdGNwIHNlc3Npb24sIHdoZW4KaXQg
-aGFzIGJlZW4gZnJlZWQgYWxyZWFkeS4KClNvIGdvaW5nIHdpdGggdGhlIGZvcm1lciBvcHRpb24g
-YW5kIGNhbmNlbGxpbmcgdGhlCmRlbGF5ZWQgd29ya3MgZmlyc3QsIGJlZm9yZSByb2xsaW5nIGJh
-Y2sgdGhlIGNoYW5uZWwuCgpGaXhlczogYWE0NWRhZGQzNGU0ICgiY2lmczogY2hhbmdlIGlmYWNl
-X2xpc3QgZnJvbSBhcnJheSB0byBzb3J0ZWQgbGlua2VkIGxpc3QiKQpTaWduZWQtb2ZmLWJ5OiBT
-aHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2
-ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9zZXNzLmMgfCAx
-MSArKysrKysrKystLQogMSBmaWxlIGNoYW5nZWQsIDkgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlv
-bnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3Nlc3MuYyBiL2ZzL2NpZnMvc2Vzcy5jCmluZGV4
-IGI4NTcxOGYzMmI1My4uMDJjOGIyOTA2MTk2IDEwMDY0NAotLS0gYS9mcy9jaWZzL3Nlc3MuYwor
-KysgYi9mcy9jaWZzL3Nlc3MuYwpAQCAtNDc0LDYgKzQ3NCwxNCBAQCBjaWZzX3Nlc19hZGRfY2hh
-bm5lbChzdHJ1Y3QgY2lmc19zYl9pbmZvICpjaWZzX3NiLCBzdHJ1Y3QgY2lmc19zZXMgKnNlcywK
-IAogb3V0OgogCWlmIChyYyAmJiBjaGFuLT5zZXJ2ZXIpIHsKKwkJLyoKKwkJICogd2Ugc2hvdWxk
-IGF2b2lkIHJhY2Ugd2l0aCB0aGVzZSBkZWxheWVkIHdvcmtzIGJlZm9yZSB3ZQorCQkgKiByZW1v
-dmUgdGhpcyBjaGFubmVsCisJCSAqLworCQljYW5jZWxfZGVsYXllZF93b3JrX3N5bmMoJmNoYW4t
-PnNlcnZlci0+ZWNobyk7CisJCWNhbmNlbF9kZWxheWVkX3dvcmtfc3luYygmY2hhbi0+c2VydmVy
-LT5yZXNvbHZlKTsKKwkJY2FuY2VsX2RlbGF5ZWRfd29ya19zeW5jKCZjaGFuLT5zZXJ2ZXItPnJl
-Y29ubmVjdCk7CisKIAkJc3Bpbl9sb2NrKCZzZXMtPmNoYW5fbG9jayk7CiAJCS8qIHdlIHJlbHkg
-b24gYWxsIGJpdHMgYmV5b25kIGNoYW5fY291bnQgdG8gYmUgY2xlYXIgKi8KIAkJY2lmc19jaGFu
-X2NsZWFyX25lZWRfcmVjb25uZWN0KHNlcywgY2hhbi0+c2VydmVyKTsKQEAgLTQ4NCwxMCArNDky
-LDkgQEAgY2lmc19zZXNfYWRkX2NoYW5uZWwoc3RydWN0IGNpZnNfc2JfaW5mbyAqY2lmc19zYiwg
-c3RydWN0IGNpZnNfc2VzICpzZXMsCiAJCSAqLwogCQlXQVJOX09OKHNlcy0+Y2hhbl9jb3VudCA8
-IDEpOwogCQlzcGluX3VubG9jaygmc2VzLT5jaGFuX2xvY2spOwotCX0KIAotCWlmIChyYyAmJiBj
-aGFuLT5zZXJ2ZXIpCiAJCWNpZnNfcHV0X3RjcF9zZXNzaW9uKGNoYW4tPnNlcnZlciwgMCk7CisJ
-fQogCiAJcmV0dXJuIHJjOwogfQotLSAKMi4zNC4xCgo=
---00000000000095e97a05e31c721b--
+Best regards,
+Julian
