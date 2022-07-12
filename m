@@ -2,61 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95BF1C43334
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Jul 2022 04:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 983ADC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 12 Jul 2022 04:36:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229476AbiGLEgZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 12 Jul 2022 00:36:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50546 "EHLO
+        id S231259AbiGLEgp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 12 Jul 2022 00:36:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiGLEgY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Jul 2022 00:36:24 -0400
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8712C6111E
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Jul 2022 21:36:23 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id 189so6787806vsh.2
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Jul 2022 21:36:23 -0700 (PDT)
+        with ESMTP id S229451AbiGLEgo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Jul 2022 00:36:44 -0400
+Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CBC06111E
+        for <linux-cifs@vger.kernel.org>; Mon, 11 Jul 2022 21:36:43 -0700 (PDT)
+Received: by mail-ua1-x935.google.com with SMTP id l7so2598755ual.9
+        for <linux-cifs@vger.kernel.org>; Mon, 11 Jul 2022 21:36:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=zg71DT+CtPAYRZHwxiYX7QhCy5jOMJpa6qh2mWWf8Xc=;
-        b=auzCWdpdv1QDYXLr4Nlmeue79WVoX3vZYqZIfdYV3szvgIHNNUsmZhzVMO8EjPzkZS
-         Df0i0gOCxZBmnlh90GvIa4+bAtFi+3hwOdIziJyaHcykrOp3FclAQe8RdSBXgSjPVrFJ
-         9IkQ7zXCTGnX+oLKdfn+ei7szHIDL41iT5o4H8+5dsYC+SAufS8OFsUj2ZaAKdOnLqib
-         2XPFLXoUnDcVxGspaLZGqXYRrbzRvQq4lCPTRPQ85uZ7/hFN49/2IA8ZOhk6QqCeX4yC
-         Ctnmjf0ZSl0VV0c1UlJdxYTa5XS9Boe/UUvM5oWkRiYpyA91yjitKF/VOBukmVI7hjSu
-         dHNg==
+        bh=S8AYsxfTcGcdenkm7zwg9J+JLVEb6TdOJ1Z+dqsWO9k=;
+        b=IiGy+QDwsL1tuSe5qXy+9v9B2YMpAxkZ3st5RWpi6e49cnJPmKHD8QjXr9CslGOf08
+         mlBq6ZQFO7FkdY6FY3k8iHxX5BEvWSWchtBcGpBK2RFd3M+ZIy4FJz5+N+gETkEoCt5n
+         HqljT6GT/sWJVuhi69rmCcQHKU+XxEIYuiPYUIN16yY6qB7UK4RCrwZZTw5QsVi2ubQm
+         A5411YfLkid3X8mm4ZylFXcqyKvcVBvTRdIC7VOuOCd6U07dn81Csa2wBWbA9Qu2ypEa
+         IBq202fxDfxBK3wtdTM9DIs+ZqFzhNX9bi+soqF2nH+XfuQynvIumnUX0dswxNBhGmM8
+         3lzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=zg71DT+CtPAYRZHwxiYX7QhCy5jOMJpa6qh2mWWf8Xc=;
-        b=0JOGEWFag5+rUMj0Lz07NkXJVMSpdP6zCmWKYMsENNwNH28c9cIqJ+H6EyWLFax67Y
-         1SSV3lRSbdlSmaOBEPkNTIpazpdcoTQbAIVHCr4ypowZK8kwMTAdSDU3z44wcZkJ4sHq
-         TTbkGjylJe5j3O32UvPiHCDBC6DSEVDJ9byBNvzVQo3g3Sz8Peg/ji0tW87EttJJYGIr
-         wDbK6ERWGXottyNcdSR77RguKjv7zhV6yIpvga0fvahIleRcar7VjsbDIkxUks+RqL3E
-         P5UldTf6CFkFTp6sb1GR9YrYpBGbX9cU9U8NmY+amdnKqogz14SsA4gk7V7nbYRv7Amr
-         imIw==
-X-Gm-Message-State: AJIora94OOTdxxf5mskeuZAa4+ukX/ZnLXLKNw9yZSuBIFSmMjYTaAH+
-        XLwKC3T5pxCQGbRCuppTt65klXUvw2CHQUuf13JgVkgULo0=
-X-Google-Smtp-Source: AGRyM1vORKBLp9BaEtBDWZ5ippGl9FKsKKvUQawvX2NV/CexjaFtLVqOXeKWUyxOTD42ug6tLG6DChW+Q4VHAjoiDcg=
-X-Received: by 2002:a67:6d86:0:b0:357:3d99:ec77 with SMTP id
- i128-20020a676d86000000b003573d99ec77mr6852993vsc.6.1657600582202; Mon, 11
- Jul 2022 21:36:22 -0700 (PDT)
+        bh=S8AYsxfTcGcdenkm7zwg9J+JLVEb6TdOJ1Z+dqsWO9k=;
+        b=WB+hlmx1tox7MRp0ziKynZpmgGmB0GjfKZzPqdDkVXeiJHJ3VuI7kkLBn8Q1ZyRdnx
+         s4G5muyPBICo2nskh3y+2qB/SHfdXyqsb1pSbmx6HMlgplcH301AE1WeSzKKLRiO3ATH
+         07VY1bX0gs8x1z47ldpmPoBiCtXZfi7A15KJcEIdURvkn0TUqKLtXGZwiTTEWzztInTA
+         1S9SqC/vIrPoDJsL4WUEVoyKfVUWy6pRhzVz8p5Tq3FPtYdIEp/1LBllqzDGcxPTbnLz
+         kkGV8WevVXQgInVvQv/++hov9a5J+n6FnKSgDis4b44vMhumuzD/CGxWDZCIV/l37Slk
+         YCdA==
+X-Gm-Message-State: AJIora+vtHI4xcfFP8uls/uDX8DwHMdGiwQ5qyeFvPiFwpFAXrcwptp8
+        Mp13YFYjRYB2d8Vgd7EoFXQffJAKYo1g50/sgdo=
+X-Google-Smtp-Source: AGRyM1udYjPQxuT7IFR2MTrJMjelzZ5rkZ4gZyAj2pH+6IPNpwNmhFEYzd3D8aDWvg6gbDv0j5aKMdZRhtje7HW7q58=
+X-Received: by 2002:a05:6130:10b:b0:37f:a52:99fd with SMTP id
+ h11-20020a056130010b00b0037f0a5299fdmr7183834uag.96.1657600602556; Mon, 11
+ Jul 2022 21:36:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAARpZ=_WCZhEZ2DzR3jRNLNLx28duH2iSn7WwRVezGKpjX0LDA@mail.gmail.com>
- <CAH2r5mtYzhd9EpzJAFLH+AHvKB0CaUtVBTP+UP4PDgg686-SFA@mail.gmail.com>
-In-Reply-To: <CAH2r5mtYzhd9EpzJAFLH+AHvKB0CaUtVBTP+UP4PDgg686-SFA@mail.gmail.com>
+References: <211885e7-1823-9118-836b-169c7163d7c2@gmail.com>
+ <CAN05THTbuBSF6HXh5TAThchJZycU1AwiQkA0W7hDwCwKOF+4kw@mail.gmail.com>
+ <fee59438-7b4a-0a24-f116-07c2ac39a3ad@gmail.com> <87h7423ukh.fsf@cjr.nz>
+ <10efd255-16ea-6993-5e58-2d70e452a019@gmail.com> <87edz63t11.fsf@cjr.nz>
+ <4c28c2f8-cda6-d9b4-d80f-1ffa3a3be14c@gmail.com> <20220630203207.ewmdgnzzjauofgru@cyberdelia>
+ <CAH2r5mtVwZggJ9Fi0zsK5hCci4uxee-kOSC3brb56xpb0_xn7w@mail.gmail.com>
+ <56afe80b-bf6a-2508-063a-7b091cdbbe0f@gmail.com> <CAH2r5mvoyhZGjf_wgvjgmkCz=+2iDxCSpbyJ79NMtpE1Ecjdnw@mail.gmail.com>
+ <fccdb4af-697e-b7fc-6421-f16e9b35bb8e@samba.org> <11b3feeb-7ddb-1297-5080-7c2fc986475a@gmail.com>
+ <5936fdc6-3ab2-35d7-ff79-19a4a3768f19@gmail.com>
+In-Reply-To: <5936fdc6-3ab2-35d7-ff79-19a4a3768f19@gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 11 Jul 2022 23:36:11 -0500
-Message-ID: <CAH2r5mueC4gXgjq7wN9S+y2-=_vqmGKai_4DWWy7CJ1s4m0J0Q@mail.gmail.com>
-Subject: Re: mount.cifs broken after update, advice?
-To:     Brian Caine <brian.d.caine@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        "Stefan (metze) Metzmacher" <metze@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Mon, 11 Jul 2022 23:36:31 -0500
+Message-ID: <CAH2r5mv5bFG2tAEtbft-Zo+2jOqFfpr9B9TtWpgc5jhR-OiaZQ@mail.gmail.com>
+Subject: Re: kernel-5.18.8 breaks cifs mounts
+To:     Julian Sikorski <belegdol@gmail.com>
+Cc:     Stefan Metzmacher <metze@samba.org>,
+        Jeremy Allison <jra@samba.org>,
+        Enzo Matsumiya <ematsumiya@suse.de>,
+        Paulo Alcantara <pc@cjr.nz>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
@@ -68,79 +77,56 @@ the client (which won't do anything different since it is not
 supported but  interestingly it avoids the problem by adding another
 context at the end).
 
-On Sun, Jul 10, 2022 at 11:08 PM Steve French <smfrench@gmail.com> wrote:
+On Wed, Jul 6, 2022 at 6:18 AM Julian Sikorski <belegdol@gmail.com> wrote:
 >
-> This looks like the Samba server bug pointed out in an earlier email
-> thread by Metze (fixed by
-> https://git.samba.org/?p=samba.git;a=commitdiff;h=147dd9d58a429695a3b6c6e45c8b0eaafc67908a)
+> Am 04.07.22 um 18:29 schrieb Julian Sikorski:
+> >
+> >
+> > Am 03.07.22 um 19:51 schrieb Stefan Metzmacher:
+> >> Am 03.07.22 um 07:01 schrieb Steve French:
+> >>> I lean toward thinking that this is a Samba bug (although I don't see
+> >>> it on my local system - it works to samba for me, although I was
+> >>> trying against a slightly different version, Samba 4.15.5-Ubuntu).
+> >>>
+> >>> Looking at the traces in more detail they look the same (failing vs.
+> >>> working) other than the order of the negotiate context, which fails
+> >>> with POSIX as the 3rd context, and netname as the 4th, but works with
+> >>> the order reversed (although same contexts, and same overall length)
+> >>> ie with POSIX context as the fourth one and netname context as the
+> >>> third one.
+> >>>
+> >>> The failing server code in Samba is in
+> >>> smbd_smb2_request_process_negprot but I don't see changes to it
+> >>> recently around this error.
+> >>>
+> >>> Does this fail to anyone else's Samba version?
+> >>>
+> >>> This is probably a Samba server bug but ... seems odd since it doesn't
+> >>> fail to Samba for me.
+> >>>
+> >>> Jeremy/Metze,
+> >>> Does this look familiar?
+> >>
+> >> Maybe this one:
+> >>
+> >> https://git.samba.org/?p=samba.git;a=commitdiff;h=147dd9d58a429695a3b6c6e45c8b0eaafc67908a
+> >>
+> >>
+> >> that went only into 4.15 and higher.
+> >>
+> >> metze
+> >
+> > Nice catch, I can confirm that adding this patch to debian samba
+> > 2:4.13.13+dfsg-1~deb11u3 package makes the mounts work again. How do we
+> > get this patch into debian?
+> >
+> > Best regards,
+> > Julian
+> I have now filed a bug against debian samba package:
+> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1014453
 >
-> I had trouble reproducing it on my systems but it looks like (based on
-> Julian Sikorski's testing) when we fixed the netname context to not be
-> null in some multichannel cases, the reordering of the contexts
-> (putting netname context after the posix negotiate context) triggered
-> this bug in some versions of Samba (which was fixed earlier by the
-> Samba server commit above).
->
-> On Sun, Jul 10, 2022 at 10:35 PM Brian Caine <brian.d.caine@gmail.com> wrote:
-> >
-> > Hey all,
-> >
-> > So I recently updated my kernel and my previously-working CIFS
-> > mountpoints are broken. The server hasn't changed.
-> >
-> > I can successfully access it via smbclient. Only mount.cifs is broken.
-> >
-> > On the server:
-> >
-> > % /usr/local/sbin/smbd --version
-> > Version 4.12.15
-> >
-> > On the client:
-> >
-> > $ mount.cifs --version
-> > mount.cifs version: 6.15
-> >
-> > $ smbclient --version
-> > Version 4.16.2
-> >
-> > $ uname -r
-> > 5.18.9-arch1-1
-> >
-> > (I know it's not a vanilla kernel, so I wanted to ask for advice here
-> > before making a bug report.)
-> >
-> > As mentioned, smbclient still works:
-> >
-> > $ smbclient -U brian //192.168.1.131/backup -c ls
-> > Password for [WORKGROUP\brian]:
-> >   .                                   D        0  Sat Apr 24 16:01:23 2021
-> >   ..                                  D        0  Tue Dec  1 20:18:28 2020
-> >   brian                               D        0  Sat Apr 24 16:09:46 2021
-> >
-> > 15119769681 blocks of size 1024. 12418540722 blocks available
-> >
-> > This doesn't though:
-> >
-> > # mount.cifs --verbose --verbose -o username=brian
-> > //192.168.1.131/backup /tmp/foo
-> > Password for brian@//192.168.1.131/backup:
-> > mount error(22): Invalid argument
-> > Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and
-> > kernel log messages (dmesg)
-> >
-> > I attached my kernel output. Is there anything there that jumps out at
-> > anyone? Any easy fixes or should I look into opening a bug report?
-> > Anything else I can provide, just ask.
-> >
-> > Thanks,
-> > Brian
->
->
->
-> --
-> Thanks,
->
-> Steve
+> Best regards,
+> Julian
 
 
 
