@@ -2,126 +2,155 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0391EC43334
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Jul 2022 04:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FFC7C43334
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Jul 2022 11:00:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbiGMErE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 Jul 2022 00:47:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42360 "EHLO
+        id S234820AbiGMLAp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 Jul 2022 07:00:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229770AbiGMErD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Jul 2022 00:47:03 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E09C7657;
-        Tue, 12 Jul 2022 21:46:59 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id q5-20020a17090a304500b001efcc885cc4so1666320pjl.4;
-        Tue, 12 Jul 2022 21:46:59 -0700 (PDT)
+        with ESMTP id S230510AbiGMLAo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Jul 2022 07:00:44 -0400
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F649F788C
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Jul 2022 04:00:44 -0700 (PDT)
+Received: by mail-qt1-x831.google.com with SMTP id h22so1165058qta.3
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Jul 2022 04:00:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=gBaYkCq2UOecKkI/ZcXaXDVPy+SEFxbUDpVc4bdCZmM=;
-        b=h1H/+uf4FxW4bgT2t3lI+XGqdPLgtl0u4V9II5sch1nlT+lMFHYXepqKt3obshgGQr
-         3HvlRGfLhGGuN/cLDAW+qlK3KCK5YFGagFcXTsXxI41AZhR0UvNjIOlpluv73F4bxF/g
-         pFWma2sdbuCLVJtI9XiLV2fs42bsQjkzpvmWkN4oCL2sNl7r9G1b+YQyRp08KueMfFes
-         c4o+4R1l23aSWaIKGanMB/60uX0VmGGgtKiBWNxIHEkc06LPSYVDvoQbvR1B5UwEmIHV
-         dw1B4Nb9a9I4T9YxMEAxznmpehRy31heyuhIqdWkyGOAybIB3VCVbIEOmwToNh5BrTu+
-         lr5g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=BfZxnwY/QU/ckAlFlOyUo3NhskFbgSE0bBECB1BZfsA=;
+        b=S6uCCRCipysuZzmD0mdMy4aCV+8P3v1vrhgbVSzX4bs6hN4KKK5+OboYYEXgoaoRRD
+         8idREtdCdD37FgOe6xgnJzSCC2eU6Nh/ndwiHVLU+PmtIicXJDMDkYqVd9mhReq/GGgj
+         nwcBJk33OrErCW05Ta9fFFSHrC9FHAuKrczFOEEidYQELAIVzxvxTuT8dsWuBeqOf6Wz
+         71cDGYuls00A3WqPDq/c2hNovSVQxAhfLLeeoGtHQoC37MflMKABlLwEaiuGjdhtfWOC
+         dUYpoGYnSI1z+4yIZtCL7G+t0+sYSYsJFVjhiUPReIzUhntXTWbCKp0841a3Co+L0gRo
+         pFrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=gBaYkCq2UOecKkI/ZcXaXDVPy+SEFxbUDpVc4bdCZmM=;
-        b=oItuH4RaAJAToFdOZg68Nl6CFB7yOzmRhia1WTM0+k1sZYzgvZ2onMK0Rt/wT7DV6e
-         WkEe1az71KF8Tc2pM1PE6UVj/dFuziESIjpSTJrLnbdo2F4HyjXmjefv6xdJ8y0MJX22
-         2NALsgE+cPYCwzTpvTQPpsh2r0lnruX/gg0Ex29951w43SRlC5EFoh84qgfBAZ06GLEk
-         3AJSzFn210fBTuKzYpBnxsfhTEePzJQxkOEV22fZ293/iibFJ31/aeuTpjfMadkZnXV8
-         NUt3f7gzO0PGyjoyXXutjYNb5nHLTBFB+k5/ddPvxcOwSvLskllQocdTdEyMipwjko3/
-         w9Cg==
-X-Gm-Message-State: AJIora8vIO4Rl93VFsNmuXQSKLL+MlH9+2EnW8T0Y0kWUZ5NAQJggsq+
-        WXdI/56OsfqkiNwaeMvU650=
-X-Google-Smtp-Source: AGRyM1t4Kvp3+MPAFYCpd5hlmg5MlCU8bpPTtIXAtIiqdQtJ+Yzx2cYW2gylT+SNs6NaoePwv/3tlQ==
-X-Received: by 2002:a17:90b:1d02:b0:1f0:1c2c:cc64 with SMTP id on2-20020a17090b1d0200b001f01c2ccc64mr1836081pjb.52.1657687618757;
-        Tue, 12 Jul 2022 21:46:58 -0700 (PDT)
-Received: from localhost.localdomain (pcd364232.netvigator.com. [203.218.154.232])
-        by smtp.gmail.com with ESMTPSA id fr14-20020a17090ae2ce00b001f0097c2fb2sm469316pjb.28.2022.07.12.21.46.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 21:46:58 -0700 (PDT)
-From:   Hawkins Jiawei <yin31149@gmail.com>
-To:     hare@suse.de
-Cc:     ak@tempesta-tech.com, borisp@nvidia.com, chuck.lever@oracle.com,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        netdev@vger.kernel.org, simo@redhat.com, kuba@kernel.org,
-        18801353760@163.com, paskripkin@gmail.com,
-        skhan@linuxfoundation.org,
-        linux-kernel-mentees@lists.linuxfoundation.org
-Subject: [PATCH RFC 1/5] net: Add distinct sk_psock field
-Date:   Wed, 13 Jul 2022 12:46:37 +0800
-Message-Id: <20220713044637.106017-1-yin31149@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <325938d3-bb82-730b-046c-451dde8cc14c@suse.de>
-References: <325938d3-bb82-730b-046c-451dde8cc14c@suse.de>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=BfZxnwY/QU/ckAlFlOyUo3NhskFbgSE0bBECB1BZfsA=;
+        b=EPvAkvYxNqiZQIYraLwR/5jeeVF2QeGUPEzI2IdES1yZ7EK0R5WYE9djn4aBrCoft6
+         nrUrx825qAhNps94/RQQW1uTGwxZSnZd4IhHSjDq9gnp/OPy/myxeg1TOcZpQzRKvJTe
+         8+mpL15iJWWyS3LrZIobeuJMywubzMSl5o7B0nCdhhVo6tsemGZj4H1gZHj2Zeup/EPa
+         ZON+zGxC9s0OeybkZUOg0e/WoFi4IRUwN73qNg/+ITKQ3lERiqYl1VU680UgT7n05sxh
+         CqUMUZJVPJ6ebFApY/d2JCYzWzPSWLTy4DSy9hFEvJTzGtS4sYjSQ6LwqBs/gtVbf6Ek
+         z62A==
+X-Gm-Message-State: AJIora+7hWT78FtK6zZyWOd2zxLAYtZMiaHHQ3cbKPH/vczhWq7D1rYa
+        Sc72HDarspsMmCkNwVB6ITDc4i1ARUjstBINlGGh1XZSIH+fHI4p
+X-Google-Smtp-Source: AGRyM1upoZBVmgcUcQ/GDjVy5fOEFjx9VHGPu2e6pZU0CSaC+a9Ywyk0GMiBPUygSE9Y8OgzGX+IVaxe4BydqeM80Y4=
+X-Received: by 2002:ac8:7fce:0:b0:31d:34bd:66b4 with SMTP id
+ b14-20020ac87fce000000b0031d34bd66b4mr2228894qtk.673.1657710043224; Wed, 13
+ Jul 2022 04:00:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CANT5p=pamwCmYC3pFHPmg1QGNTEpNdqp9aoE=8w++BEVk+8nbQ@mail.gmail.com>
+ <CANT5p=pPdY_-gUQUamOJ2p79riyJ++h2V2HJ7mGm9+OHPQ2L7w@mail.gmail.com>
+ <CAN05THSk6UKeTGo3=2kg3pJcHTz+DB2K9h4ijg7c9Ep=XsVqeQ@mail.gmail.com> <CAH2r5mvoi=8dgdjQG46-Hz=QaT7w+jNXn_nRqX0foriqxrfj2A@mail.gmail.com>
+In-Reply-To: <CAH2r5mvoi=8dgdjQG46-Hz=QaT7w+jNXn_nRqX0foriqxrfj2A@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 13 Jul 2022 16:30:32 +0530
+Message-ID: <CANT5p=pB=-G65UhKxmNtEFMpwUeVQ8meRLsNY8SvMU1Q79mpwQ@mail.gmail.com>
+Subject: Re: Problem with deferred close after umount
+To:     Steve French <smfrench@gmail.com>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        rohiths msft <rohiths.msft@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
->On 4/18/22 18:49, Chuck Lever wrote:
->> The sk_psock facility populates the sk_user_data field with the
->> address of an extra bit of metadata. User space sockets never
->> populate the sk_user_data field, so this has worked out fine.
->> 
->> However, kernel consumers such as the RPC client and server do
->> populate the sk_user_data field. The sk_psock() function cannot tell
->> that the content of sk_user_data does not point to psock metadata,
->> so it will happily return a pointer to something else, cast to a
->> struct sk_psock.
->> 
->> Thus kernel consumers and psock currently cannot co-exist.
->> 
->> We could educate sk_psock() to return NULL if sk_user_data does
->> not point to a struct sk_psock. However, a more general solution
->> that enables full co-existence psock and other uses of sk_user_data
->> might be more interesting.
->> 
->> Move the struct sk_psock address to its own pointer field so that
->> the contents of the sk_user_data field is preserved.
->> 
->> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
->> ---
->>   include/linux/skmsg.h |    2 +-
->>   include/net/sock.h    |    4 +++-
->>   net/core/skmsg.c      |    6 +++---
->>   3 files changed, 7 insertions(+), 5 deletions(-)
->> 
->Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Wed, Jul 13, 2022 at 3:17 AM Steve French <smfrench@gmail.com> wrote:
 >
->Cheers,
+> Looks like the patch Shyam had for force unmount doesn't help regular unm=
+ount case but fixing the reference count on super lock could fix it. When f=
+ile is closed locally but not over smb (deferred close) we can probably dec=
+rement the reference count so unmount would work
 >
->Hannes
+> On Tue, Jul 12, 2022, 16:40 ronnie sahlberg <ronniesahlberg@gmail.com> wr=
+ote:
+>>
+>> On Sat, 9 Jul 2022 at 16:48, Shyam Prasad N <nspmangalore@gmail.com> wro=
+te:
+>> >
+>> > On Sat, Jul 9, 2022 at 11:45 AM Shyam Prasad N <nspmangalore@gmail.com=
+> wrote:
+>> > >
+>> > > Hi Steve/Ronnie,
+>> > >
+>> > > I'm seeing a strange problem with deferred close.
+>> > > This is the test that I'm running:
+>> > > 1. mount a share with actime=3D600
+>> > > 2. open a file in the share so that a handle is opened, and it gets
+>> > > scheduled for deferred close.
+>> > > 3. umount the share. That works.
+>> > > 4. rmmod cifs does not seem to work. It says module cifs is in use.
+>> > > DebugData shows that tcon/ses/connections are all active for the
+>> > > unmounted share.
+>> > >
+>> > > I think I understand why this happens, but need help understanding h=
+ow
+>> > > to fix this.
+>> > >
+>> > > Each handle open takes a reference on tcon, and also on the
+>> > > superblock. So even when the mount point is umounted, tcon does not
+>> > > get freed. I see that it gets freed when all handles that are deferr=
+ed
+>> > > for close are actually closed.
+>> > >
+>> > > I tried calling cifs_close_all_deferred_files for the tcon in
+>> > > cifs_umount_begin. I even tried printing a log there. I did not see
+>> > > that getting logged during umount. Does that mean umount_begin is no=
+t
+>> > > getting called?
+>> > >
+>> > > Wondering what is the correct way to fix this? Ideally, we should ca=
+ll
+>> > > cifs_close_all_deferred_files as soon as the share is umounted. Whic=
+h
+>> > > is the first callback in cifs.ko for this. I was assuming that
+>> > > umount_begin is that callback. But my experiments are not seeing tha=
+t
+>> > > getting called.
+>> > >
+>> > > --
+>> > > Regards,
+>> > > Shyam
+>> >
+>> > I checked the VFS code. It looks like the umount_begin callback gets
+>> > called only when called with "umount --force" option.
+>> > I tested that. It seems to work.
+>> >
+>> > Is it the expected though without force? Doesn't seem right to me.
+>>
+>>
+>>  umount_begin() is a special callback just for network filesystems
+>> that need to do something special
+>> if/when a forced umount is attempted so this would be the wrong place
+>> for the normal deferred close
+>> handling.  It is poorly documented though :-(
+>>
+>> Maybe cifs_kill_sb() would be the right place to use?
+>>
+>>
+>> >
+>> > --
+>> > Regards,
+>> > Shyam
 
-In Patchwork website, this patch fails the checks on
-netdev/cc_maintainers.
+Thanks Ronnie and Steve.
 
-So maybe you need CC folks pointed out by
-scripts/get_maintainer.pl script, which is suggested
-by Jakub Kicinski <kuba@kernel.org>.
+This seems to work:
+https://github.com/sprasad-microsoft/smb3-kernel-client/commit/c1aa4ca2231a=
+247abcf948dd7411ea5a1a0330b8.patch
 
-What's more, Syskaller reports
-refcount bug in sk_psock_get (2).
+Please review the changes.
+Tested some basic test cases. Seems to work.
+I don't see this change affecting any other mount options. Do you?
 
-In this bug, the problem is that smc and psock, 
-both use sk_user_data field to save their 
-private data. So they will treat field in their own way.
-
-> in smc_switch_to_fallback(), and set smc->clcsock->sk_user_data
-> to origin smc in smc_fback_replace_callbacks().
-> 
-> Later, sk_psock_get() will treat the smc->clcsock->sk_user_data
-> as sk_psock type, which triggers the refcnt warning.
-
-I have tested this patch and the reproducer did not trigger any issue.
-For more details, you can check the email
-[PATCH] smc: fix refcount bug in sk_psock_get (2)
+--=20
+Regards,
+Shyam
