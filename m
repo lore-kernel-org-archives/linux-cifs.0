@@ -2,44 +2,43 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40ECBC43334
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Jul 2022 21:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3F9C43334
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Jul 2022 21:23:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229975AbiGOVRV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 Jul 2022 17:17:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56314 "EHLO
+        id S229968AbiGOVXn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 Jul 2022 17:23:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbiGOVRU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Jul 2022 17:17:20 -0400
+        with ESMTP id S229532AbiGOVXl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Jul 2022 17:23:41 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B597D2B620
-        for <linux-cifs@vger.kernel.org>; Fri, 15 Jul 2022 14:17:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E601D5F
+        for <linux-cifs@vger.kernel.org>; Fri, 15 Jul 2022 14:23:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
         s=42; h=Message-ID:Date:To:From:CC;
-        bh=dxlkVL8wwNOvU05BDPZcA5cCL/1fc/XL2Z8r0ODW3Aw=; b=rPzZ0BoUEbsmjS4eeqNbwseLhA
-        3nzcmavW08OU09qipOQvNWGfCsdFwyFZ7R0TSB42rOPeJcVo9WNhK0usrjWLZeCu+3FxmxGlvE+xV
-        SDo9ZB7TPJA9GzNGgoVWiFahWPHRMXfeqTV7naGA0IP7mZ1vHLPlXDQD0D/36+VGt0LNEF5+h/TOl
-        dQkiaA5ssFlLLRGIwuDZ/Yh3VY1tXJeutQAybvCCVxWb+U4F9s2LJbwhTS3wmKuT1xcLBrls3VpMk
-        kO/wWy/RwmWJUxPjDbS9ZLaVa30p2e0JEUAyRryxq7+pYnkCHKqL2QgiPDtXFQJq2d6JbjY+xdWs8
-        mizm/IFZg/8QsvkXDcCE6SgWHBKhbD87bjgVc/pxlLgTdsEgz4wccEYwO/OAj8v6Bq/U+6Vw0ZbCe
-        kWVsPIOyflPzfZeC+TswSc3mSrlfxqq3mYcsQWzR5qt2Wpj36QNHpkjD/+Bms3W9fXwKk6AYHKgtD
-        uErTsKuwbq/2MYnKrXJuzFaw;
-Received: from [2a01:4f8:192:486::6:0] (port=53614 helo=hr6.samba.org) 
+        bh=bp29qAa2qOJAUxeu4WGuK0Br0K+CnhGvQtYwx2rhC1g=; b=XlcYf2R5mZIWHyHBxLdZXs34Ex
+        MzOVHW0qqREym+aQEnfgVU+UOU5CbiQs47Bvgmu5Jrjt+eb8LYMXbWID2vRb86b/s/IfIzZ0BfdhY
+        FTBJjThE0uLwfjc+pDn+uRkChWr8vSJOs2oPWonkhvzF1+69USoHQBZHVN/IVgmzicnFomG5ozolB
+        VlfaksRdVBZ35fiANt1zMP2evwpqOw8CbvRG9r8b9x6bvQ7QB/q9uJWnu22yigFnzxAaen2cihb1r
+        pn8Bwu46EtDbk1+PIeejaLETC+ZWf5ZKGLXy7h8M06xRGu1Y2vpOMQD0sSsqidamMbH/yrSFQhtdp
+        UCTs4pL7tcIJ/FGrJE3b7ejURtcOsnPNCGnzPRQCL6ALkS1imWuGYNHmAPJnS58rLVRn+S5k22zbs
+        3cddadRTfbbceGop7iE1nODgJbnjUB3RI+VUjbn04Ht4iZWE2AhwRfpAufK1ezEhJ4L+hxD7ySqAu
+        Hl9eJeuycSx6aJb0jIydnwR6;
+Received: from [2a01:4f8:192:486::6:0] (port=53618 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
         (Exim)
-        id 1oCSgW-004veL-1h
-        for cifs-qa@samba.org; Fri, 15 Jul 2022 21:17:16 +0000
+        id 1oCSmd-004vgk-W9
+        for cifs-qa@samba.org; Fri, 15 Jul 2022 21:23:36 +0000
 Received: from www-data by hr6.samba.org with local (Exim 4.93)
         (envelope-from <www-data@samba.org>)
-        id 1oCSgR-000tfd-9j
-        for cifs-qa@samba.org; Fri, 15 Jul 2022 21:17:11 +0000
+        id 1oCSmd-000tg8-DB
+        for cifs-qa@samba.org; Fri, 15 Jul 2022 21:23:35 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
-Subject: [Bug 15123] New: getxattr() on cifs sometimes hangs since kernel
- 5.14
-Date:   Fri, 15 Jul 2022 21:17:10 +0000
+Subject: [Bug 15123] getxattr() on cifs sometimes hangs since kernel 5.14
+Date:   Fri, 15 Jul 2022 21:23:35 +0000
 X-Bugzilla-Reason: QAcontact
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: CifsVFS
 X-Bugzilla-Component: kernel fs
@@ -53,10 +52,10 @@ X-Bugzilla-Priority: P5
 X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- qa_contact target_milestone attachments.created
-Message-ID: <bug-15123-10630@https.bugzilla.samba.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-15123-10630-zpEHmlqsiC@https.bugzilla.samba.org/>
+In-Reply-To: <bug-15123-10630@https.bugzilla.samba.org/>
+References: <bug-15123-10630@https.bugzilla.samba.org/>
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="UTF-8"
 X-Bugzilla-URL: https://bugzilla.samba.org/
@@ -68,66 +67,46 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 https://bugzilla.samba.org/show_bug.cgi?id=3D15123
 
-            Bug ID: 15123
-           Summary: getxattr() on cifs sometimes hangs since kernel 5.14
-           Product: CifsVFS
-           Version: 5.x
-          Hardware: All
-                OS: All
-            Status: NEW
-          Severity: normal
-          Priority: P5
-         Component: kernel fs
-          Assignee: sfrench@samba.org
-          Reporter: forestix@sonic.net
-        QA Contact: cifs-qa@samba.org
-  Target Milestone: ---
+--- Comment #1 from Forest <forestix@sonic.net> ---
+I can reliably reproduce it booting from this live USB image:
+kubuntu-22.04-desktop-amd64.iso
 
-Created attachment 17423
-  --> https://bugzilla.samba.org/attachment.cgi?id=3D17423&action=3Dedit
-possible reproducer
+My setup steps when using that live USB environment:
 
-When running on recent kernel versions, this system call on a cifs-mounted
-file sometimes takes an unusually long time:
+sudo mount.cifs //myserver/dir ~/mnt/dir -o username=3Dmyuser,uid=3D999,gid=
+=3D999
+touch ~/mnt/dir/test{1..5}
 
-getxattr("/cifsmount/dir/image.jpg", "user.baloo.rating", NULL, 0)
+Tests and results:
+(My reproducer program is called xattrtest in these command lines.)
 
-The call normally returns in under 10 milliseconds, but on kernel 5.14+, it
-sometimes takes over 30 seconds with no significant client or server load.
+# 1 thread is fast
+# (note the system call duration reported by strace in <> brackets)
+$ time ./xattrtest ~/mnt/dir/test{1..5}
+real    0m0.079s
+user    0m0.003s
+sys     0m0.000s
+$ strace -Te getxattr ./xattrtest ~/mnt/dir/test1
+getxattr("/home/myuser/mnt/dir/test1", "user.baloo.rating", NULL, 0) =3D -1
+ENODATA (No data available) <0.008482>
 
-Discovered while using gwenview to browse 100+ 1.5 MiB images on a samba sh=
-are
-mounted via /etc/fstab. While quickly flipping through the images, the prob=
-lem
-often occurs within 20 seconds. Gwenview freezes until the call completes.
+# 2+ threads are slow
+$ time ./xattrtest -t 2 ~/mnt/dir/test{1..5}
+real    0m5.118s
+user    0m0.005s
+sys     0m0.000s
+$ strace -Te getxattr ./xattrtest -t 2 ~/mnt/dir/test1
+getxattr("/home/myuser/mnt/dir/test1", "user.baloo.rating", NULL, 0) =3D -1
+ENODATA (No data available) <1.018507>
 
-Client:
-  kernel versions 5.14 and later
-  mount.cifs 6.11
-  Gwenview 20.12.3
-  Debian Bullseye
-  4-core amd64
-Server:
-  Samba 4.13.13-Debian
-  Debian Bullseye
-  6-core arm64=20
-
-A git bisect identified kernel commit 9e992755be8f as the problematic chang=
-e.
-The problem does not occur when any of the following are true:
-- Client is running a kernel from before that commit.
-- The nouser_xattr mount option is used on the cifs share.
-- Gwenview accesses the files via smb:// URL instead of a cifs mount.
-
-I don't know Gwenview's internals, but using its strace output as a guide, I
-have written a potential reproducer. It succeeds at triggering slow getxatt=
-r()
-calls, though not nearly as slow as those triggered by Gwenview. I will att=
-ach
-it to this report.
-
-Originally reported in May 2022 on the linux-cifs mailing list:
-https://www.spinics.net/lists/linux-cifs/msg25316.html
+# 2+ threads are fast if I remount with the nouser_xattr option
+$ time ./xattrtest -t 2 ~/mnt/dir/test{1..5}
+real    0m0.061s
+user    0m0.002s
+sys     0m0.000s
+$ strace -Te getxattr ./xattrtest -t 2 ~/mnt/dir/test1
+getxattr("/home/myuser/mnt/dir/test1", "user.baloo.rating", NULL, 0) =3D -1
+EOPNOTSUPP (Operation not supported) <0.000048>
 
 --=20
 You are receiving this mail because:
