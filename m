@@ -2,52 +2,160 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33F6C43334
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Jul 2022 21:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE6F3C433EF
+	for <linux-cifs@archiver.kernel.org>; Sat, 16 Jul 2022 03:47:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231728AbiGOVk0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 Jul 2022 17:40:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44932 "EHLO
+        id S229588AbiGPDr1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 Jul 2022 23:47:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231347AbiGOVkZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Jul 2022 17:40:25 -0400
-X-Greylist: delayed 639 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 15 Jul 2022 14:40:24 PDT
-Received: from c.mail.sonic.net (c.mail.sonic.net [64.142.111.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B342E8149B
-        for <linux-cifs@vger.kernel.org>; Fri, 15 Jul 2022 14:40:24 -0700 (PDT)
-Received: from ocelot (157-131-251-247.fiber.dynamic.sonic.net [157.131.251.247])
-        (authenticated bits=0)
-        by c.mail.sonic.net (8.16.1/8.16.1) with ESMTPA id 26FLTem5032435;
-        Fri, 15 Jul 2022 14:29:40 -0700
-From:   Forest <forestix@sonic.net>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>
-Subject: Re: getxattr() on cifs sometimes hangs since kernel 5.14
-Date:   Fri, 15 Jul 2022 14:29:40 -0700
-Message-ID: <5fm3dhtbeenvgekqbgc6u4dsrjahq9m08p@4ax.com>
-References: <91188ht5vqi7kq3ml5d3a48sjo9ltqjko3@4ax.com> <CAN05THT8uZiDC_PS+HYyLAytGOze_nrVkzq9zbHSMiHYpB+3ug@mail.gmail.com>
-In-Reply-To: <CAN05THT8uZiDC_PS+HYyLAytGOze_nrVkzq9zbHSMiHYpB+3ug@mail.gmail.com>
-X-Mailer: Forte Agent 3.3/32.846
+        with ESMTP id S229548AbiGPDr1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Jul 2022 23:47:27 -0400
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88B2B186EF;
+        Fri, 15 Jul 2022 20:47:26 -0700 (PDT)
+Received: by mail-vs1-xe2e.google.com with SMTP id l190so5884803vsc.0;
+        Fri, 15 Jul 2022 20:47:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QGWfWYXPfiLvd3vbWyevJ7CNG70A+KKafGnsLWBzmhQ=;
+        b=BJLdSuZMAjyLFWccG4cfKkDk0+ocVeQ4ngluR72PnJWHGuQ68HvDDHXgAt+Mmxe6WC
+         EIS1FaeHTDxK2PdJmnHW9HTt+3xHifpUqw2dXV1z09C0Lksupe+oV0kj2X+CsjDxZCyP
+         h3riAwmShyLV7PqCvnYHWjNv0C106qMNfHQlNTJouHGWc+LGqs1U8H4saJbHeJQhscqu
+         TBRfJ+OGNDTkq+byEQ0KhOBHgQW+gNqxxp7rlNX3eb6lwlEW40AwCbcIFDoMJOWuTRqZ
+         XZEBnJjzHwQ6ceycVctxbyy1oM8BBFMcz8hkz0y1v9EvAjvI6Jylc9NTCu/WkoqIJeiK
+         27wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QGWfWYXPfiLvd3vbWyevJ7CNG70A+KKafGnsLWBzmhQ=;
+        b=mosrsgomkVXqcBzS/jBZR8Oop2ImQaz+8RN1IYNZb4g3qwbtXdW5VzvKB1RCeTbKQy
+         +W2GAc3A0AzAGO8m7xMVYPOvnUGr6QAV1KCyuCEeCP506EwzF+HGwPEXGo5FcpGR4rpr
+         ugHqR0tvaHyuJVsm2aRldTsF34BKY54mXQXcpZNbGIacLXZSvWKdI0w0Etd5LpYpA2Fn
+         i0eE5hwmtn9GX5XKNui7Y21b6c+62wqgI3FYnC69UheOCrlhLtZXKl6T7PKuADnHR9//
+         QIOwbZdvqoGjrhzvV/mz7chRQnT3ap5RHdsyuS9HF5CUf+cksVIGARizrCugB5wKKTLF
+         DfPw==
+X-Gm-Message-State: AJIora/HuDUvSCAohqBU0+9SzuisPSR2Xm6trVNXtYqVSXziFIxMVhoA
+        zb/1f4JLXWS6RbraG6dhMaA2SwcgXGK0UmTmaM5o7AvcD5E=
+X-Google-Smtp-Source: AGRyM1tx8tFiDZjLT1QTBMByoqYqfgK/aCT2vNiHoLT+Auh0f4oSTW1bdA3gdqAvJcKRxQ5iW/k8xJ/vRG5ugDNkMMQ=
+X-Received: by 2002:a67:c98e:0:b0:356:fb90:f729 with SMTP id
+ y14-20020a67c98e000000b00356fb90f729mr7377409vsk.17.1657943245480; Fri, 15
+ Jul 2022 20:47:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Sonic-CAuth: UmFuZG9tSVaukvjo6y8q0RBfZ1Rx8aMd6FETEovNiRPsGgDVSth1c6U5ggEaKQZbilDS5LPY425aUOw02hrSvlUxmWiY7Ssl
-X-Sonic-ID: C;nq0TPIUE7RGlUPU2He8XJw== M;Fk8dPIUE7RGlUPU2He8XJw==
-X-Sonic-Spam-Details: 0.0/5.0 by cerberusd
+References: <20220630093027.26200-1-yuzhe@nfschina.com>
+In-Reply-To: <20220630093027.26200-1-yuzhe@nfschina.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 15 Jul 2022 22:47:14 -0500
+Message-ID: <CAH2r5mvOwRH_N8NuouK=N0yDqcCZD2chxZM=52y11a5-yrZAeg@mail.gmail.com>
+Subject: Re: [PATCH] cifs: remove unnecessary type castings
+To:     Yu Zhe <yuzhe@nfschina.com>
+Cc:     Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>, liqiong@nfschina.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 18 May 2022 13:18:02 +1000, ronnie sahlberg wrote:
+merged into cifs-2.6.git for-next
 
->Please post the reproducer. It will be useful for testing as well as
->verifying if a potential fix.
+On Thu, Jun 30, 2022 at 4:38 AM Yu Zhe <yuzhe@nfschina.com> wrote:
+>
+> remove unnecessary void* type castings.
+>
+> Signed-off-by: Yu Zhe <yuzhe@nfschina.com>
+> ---
+>  fs/cifs/connect.c  | 2 +-
+>  fs/cifs/inode.c    | 4 ++--
+>  fs/cifs/netmisc.c  | 2 +-
+>  fs/cifs/smb2misc.c | 2 +-
+>  fs/cifs/smb2pdu.c  | 2 +-
+>  5 files changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index fa29c9aae24b..90863b3b5204 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2646,7 +2646,7 @@ match_prepath(struct super_block *sb, struct cifs_mnt_data *mnt_data)
+>  int
+>  cifs_match_super(struct super_block *sb, void *data)
+>  {
+> -       struct cifs_mnt_data *mnt_data = (struct cifs_mnt_data *)data;
+> +       struct cifs_mnt_data *mnt_data = data;
+>         struct smb3_fs_context *ctx;
+>         struct cifs_sb_info *cifs_sb;
+>         struct TCP_Server_Info *tcp_srv;
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index 81da81e18553..3ad303dd5e5a 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -1223,7 +1223,7 @@ static const struct inode_operations cifs_ipc_inode_ops = {
+>  static int
+>  cifs_find_inode(struct inode *inode, void *opaque)
+>  {
+> -       struct cifs_fattr *fattr = (struct cifs_fattr *) opaque;
+> +       struct cifs_fattr *fattr = opaque;
+>
+>         /* don't match inode with different uniqueid */
+>         if (CIFS_I(inode)->uniqueid != fattr->cf_uniqueid)
+> @@ -1247,7 +1247,7 @@ cifs_find_inode(struct inode *inode, void *opaque)
+>  static int
+>  cifs_init_inode(struct inode *inode, void *opaque)
+>  {
+> -       struct cifs_fattr *fattr = (struct cifs_fattr *) opaque;
+> +       struct cifs_fattr *fattr = opaque;
+>
+>         CIFS_I(inode)->uniqueid = fattr->cf_uniqueid;
+>         CIFS_I(inode)->createtime = fattr->cf_createtime;
+> diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+> index 235aa1b395eb..28caae7aed1b 100644
+> --- a/fs/cifs/netmisc.c
+> +++ b/fs/cifs/netmisc.c
+> @@ -911,7 +911,7 @@ map_and_check_smb_error(struct mid_q_entry *mid, bool logErr)
+>  unsigned int
+>  smbCalcSize(void *buf, struct TCP_Server_Info *server)
+>  {
+> -       struct smb_hdr *ptr = (struct smb_hdr *)buf;
+> +       struct smb_hdr *ptr = buf;
+>         return (sizeof(struct smb_hdr) + (2 * ptr->WordCount) +
+>                 2 /* size of the bcc field */ + get_bcc(ptr));
+>  }
+> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+> index 17813c3d0c6e..db0f27fd373b 100644
+> --- a/fs/cifs/smb2misc.c
+> +++ b/fs/cifs/smb2misc.c
+> @@ -402,7 +402,7 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
+>  unsigned int
+>  smb2_calc_size(void *buf, struct TCP_Server_Info *srvr)
+>  {
+> -       struct smb2_pdu *pdu = (struct smb2_pdu *)buf;
+> +       struct smb2_pdu *pdu = buf;
+>         struct smb2_hdr *shdr = &pdu->hdr;
+>         int offset; /* the offset from the beginning of SMB to data area */
+>         int data_length; /* the length of the variable length data area */
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 12b4dddaedb0..92fb513e5478 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -354,7 +354,7 @@ fill_small_buf(__le16 smb2_command, struct cifs_tcon *tcon,
+>                void *buf,
+>                unsigned int *total_len)
+>  {
+> -       struct smb2_pdu *spdu = (struct smb2_pdu *)buf;
+> +       struct smb2_pdu *spdu = buf;
+>         /* lookup word count ie StructureSize from table */
+>         __u16 parmsize = smb2_req_struct_sizes[le16_to_cpu(smb2_command)];
+>
+> --
+> 2.11.0
+>
 
-I sent the reproducer to you guys back in May, but forgot to cc: the list.
-There is now a report in bugzilla, with the reproducer attached:
 
-https://bugzilla.samba.org/show_bug.cgi?id=15123
+-- 
+Thanks,
 
-I'm dropping off the mailing list, but updates to the bug report should
-still reach me.
+Steve
