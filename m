@@ -2,114 +2,78 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE66EC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Jul 2022 03:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECBF6C43334
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Jul 2022 04:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234935AbiGSD4j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 18 Jul 2022 23:56:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48730 "EHLO
+        id S236409AbiGSEDt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Jul 2022 00:03:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbiGSD4j (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 18 Jul 2022 23:56:39 -0400
-Received: from mail-ua1-x936.google.com (mail-ua1-x936.google.com [IPv6:2607:f8b0:4864:20::936])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963312AC5D
-        for <linux-cifs@vger.kernel.org>; Mon, 18 Jul 2022 20:56:38 -0700 (PDT)
-Received: by mail-ua1-x936.google.com with SMTP id 94so816081uau.8
-        for <linux-cifs@vger.kernel.org>; Mon, 18 Jul 2022 20:56:38 -0700 (PDT)
+        with ESMTP id S231158AbiGSEDs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Jul 2022 00:03:48 -0400
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B39E2F028
+        for <linux-cifs@vger.kernel.org>; Mon, 18 Jul 2022 21:03:47 -0700 (PDT)
+Received: by mail-ua1-x932.google.com with SMTP id n3so6308059uak.13
+        for <linux-cifs@vger.kernel.org>; Mon, 18 Jul 2022 21:03:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=G6vm9VhEQECVzCHJ5bvtM3Etmi/GIEoN7gVN+t1KeLk=;
-        b=BJ/lPyKzs65eG17qwdzg3U06qjhoJdgZtAElS6XyAeR97KpMara22C3PmrKLEYVgmw
-         2gdPW0yDhlQ/vSmv2hcTliANbZ4kQBs6iwWFOWSUJBUF8WojiMGp/3bdF3Eu+etQrLXv
-         f8ohe7SFKlXXeIDZIUy5+R6Ef3+PB9pGD7kLFK0KvIm9TdPEpui2vBFAQfdw0zxjyUNb
-         vY1wtdvWXqYxzOqlSKBhrXxdNDx5w6iYuVH4PerDPKkmgCq34nKOydml4/YSkq/I03Tf
-         128jMyNqYRJp+C5LcQFA3beaGXw0RIjypl1TPbncjr2D9FS70Bv+WZazXYL/+NrcQPbJ
-         /F7A==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=cjMoIqHDxFN1qKUowl/83nrzSi/ZR7l2NMedkDr+Xw0=;
+        b=lXtlVNHkrp43gnOKmxhF+KmFyD4O+CCOf5C1q/+5kMiIg7LuS3Mxxf5eKNBtHDPSD+
+         foge/5N8jqueC7RMuyJkLUjuJ9VNoerh1T9nPWocKh981u3ONNP2Z/Com84ftKypTNmM
+         wL5TtOMxrhRzuC0djcr8CY1ENQaXn5fofruOI7F1vMvqvIW2ArJPdD/dFkWAUzQ0p3Oq
+         p4DaEdJsAhVKs7H/wD2Sv1UASXDX2sHiD+hqueVgrHFelTeqdmiVU9EZnbb8ayJYMI06
+         c9Pa6uKBxlXsC5diSBZsXC96xyNHGyXJn6aqdRnXhyuwKUaFnWLm7ZDkDLtq4boE7iHq
+         kToA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=G6vm9VhEQECVzCHJ5bvtM3Etmi/GIEoN7gVN+t1KeLk=;
-        b=LW7WyM3y8jYTLLH81OtOMWk6zoxiy3ldC61dMFVUuVyX7a5R3c0x+2T9QkazFkruAh
-         xJ55NokpJZcToIPcvL8ya6/MDiDvy3b0B1p/404xlDrHj0+EPmrsBCv1vGRandhYlbFc
-         OUvPLVCiv6jXJrP3FTyVDzNNrAAUGmvSqDh0VQZTYxy6XdZ2zl866qFLS7laJPAmKxls
-         Wovro5oHCYWT1oJR42a97oCbB6HIGC0U+GJfl5stPzyqxaXZkvvtDq7uD8d2q8i0AwuK
-         xLR+8xi45xoy2iU3KsvqxpJU10C+1NQm8lHGj3keeTNP3yKkzbMMOxpCfiubAFLCf/wD
-         Y7Sw==
-X-Gm-Message-State: AJIora8IkcaeQYDvbami5CRqZjbaPf0xpO5mCwE/clZsowsA0v6eNLya
-        aG6yc0iEW0Jtt4kNeAiNHzl8eUR6e4Qn/L7XY6Y=
-X-Google-Smtp-Source: AGRyM1sLSORz/v6WRCbeJBp4yV6zuPEdwe1Zp1utkzYchs0BqQN7SfxYMo8IYlhuqydIDJMgIDh6cFO85Sa2jj7Cyvw=
-X-Received: by 2002:ab0:3f0c:0:b0:383:f357:9c02 with SMTP id
- bt12-20020ab03f0c000000b00383f3579c02mr3240866uab.19.1658202997491; Mon, 18
- Jul 2022 20:56:37 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=cjMoIqHDxFN1qKUowl/83nrzSi/ZR7l2NMedkDr+Xw0=;
+        b=YSr0a3CYB7PcfhuLCuj1bJfgW5xN/KFBSGpaHLWC3nJoUHRH9BM6QlKMNns1l2BgF/
+         MlpfZlZagrrF+1t0ryd9uuMB6/jg/RyXGhy3/x7FP339eUX1r5FIHQaLJ+NINpVn8JGm
+         AQXlE+wL/wjiIu4DIsS1CM07zQ1KoGXpM5T+SoOdw4TmUnGobBUFUz5J+ZkKY/QuveAI
+         CvpDYlndCKFcgU+mEPJyshsem6KMtOzs39HOgLKs99jKzKGgTaGZsXjulECjuiHsE7N8
+         1EJ/ujgb0Es8xFbB/sHZPAeDUIxb0btZvy4UoRztoBJGynuWGo7Xj6HU9BSOZKfxNPQc
+         w7oQ==
+X-Gm-Message-State: AJIora/NwqMOiXZizO+LQqyV5QirhAYNdbkE4Ru0r9A4OEfCtg2eTd9j
+        Gh44OfVdxfH9HtryuHQgY9NbcsqKxCPziFwQs54O7TO1OkKQ1w==
+X-Google-Smtp-Source: AGRyM1tAGUJ8NNdu7SV48XqXPepSDend/xIe2NSvs7XGL6mgpiWQB3r0SLlCquubE1mozTkq+FPjiN7tXsR0zgOc/qE=
+X-Received: by 2002:ab0:35d9:0:b0:379:1b79:cf48 with SMTP id
+ x25-20020ab035d9000000b003791b79cf48mr10872117uat.4.1658203426226; Mon, 18
+ Jul 2022 21:03:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220718190624.3087569-1-willy@infradead.org>
-In-Reply-To: <20220718190624.3087569-1-willy@infradead.org>
 From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 18 Jul 2022 22:56:26 -0500
-Message-ID: <CAH2r5mtS8sWvygbYHTrE39rRH1eurqqogBNYefWcbsjOSHDxAQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Fix memory leak when using fscache
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Jeff Layton <jlayton@kernel.org>
+Date:   Mon, 18 Jul 2022 23:03:35 -0500
+Message-ID: <CAH2r5mvuaWJp1=UT=TYmMSPgGZ6M-UsDtMVWT7PhXBwnHzdnbA@mail.gmail.com>
+Subject: 5.13 backport of all current cifs/smb3 client fixes/features
+To:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending testing
+I recently updated the "full cifs backport" from current cifs
+(5.18-rc7) to 5.13.  It includes 268 of the 295 cifs/smb3 changesets
+since 5.13.
 
-On Mon, Jul 18, 2022 at 2:07 PM Matthew Wilcox (Oracle)
-<willy@infradead.org> wrote:
->
-> If we hit the 'index == next_cached' case, we leak a refcount on the
-> struct page.  Fix this by using readahead_folio() which takes care of
-> the refcount for you.
->
-> Fixes: 0174ee9947bd ("cifs: Implement cache I/O by accessing the cache directly")
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Jeff Layton <jlayton@kernel.org>
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> ---
->  fs/cifs/file.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index e64cda7a7610..6985710e14c2 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -4459,10 +4459,10 @@ static void cifs_readahead(struct readahead_control *ractl)
->                                  * TODO: Send a whole batch of pages to be read
->                                  * by the cache.
->                                  */
-> -                               page = readahead_page(ractl);
-> -                               last_batch_size = 1 << thp_order(page);
-> +                               struct folio *folio = readahead_folio(ractl);
-> +                               last_batch_size = folio_nr_pages(folio);
->                                 if (cifs_readpage_from_fscache(ractl->mapping->host,
-> -                                                              page) < 0) {
-> +                                                              &folio->page) < 0) {
->                                         /*
->                                          * TODO: Deal with cache read failure
->                                          * here, but for the moment, delegate
-> @@ -4470,7 +4470,7 @@ static void cifs_readahead(struct readahead_control *ractl)
->                                          */
->                                         caching = false;
->                                 }
-> -                               unlock_page(page);
-> +                               folio_unlock(folio);
->                                 next_cached++;
->                                 cache_nr_pages--;
->                                 if (cache_nr_pages == 0)
-> --
-> 2.35.1
->
+See
 
+https://git.samba.org/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/5.13-backport
 
+It passes the buildbot:
+
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/11/builds/267
+and
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/3
+and even passed the larger cifs-testing group (it did have one
+expected) failure in test generic/373 due to the VFS behavior change
+in clone_range).   I did sometimes see intermittent failures in
+git/0000 when rerunning the tests although not sure if that is a
+concern yet.
+
+Feedback welcome.   Let me know if any problems found with testing or
+if any updates needed.
 -- 
 Thanks,
 
