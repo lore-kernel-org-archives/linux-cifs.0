@@ -2,681 +2,316 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A528C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jul 2022 03:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37093C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jul 2022 05:44:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbiGUD0Z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Jul 2022 23:26:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48842 "EHLO
+        id S229778AbiGUFo1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 21 Jul 2022 01:44:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiGUD0Z (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Jul 2022 23:26:25 -0400
-Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E64961D97
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Jul 2022 20:26:22 -0700 (PDT)
-Received: by mail-vs1-xe31.google.com with SMTP id t15so381351vsr.12
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Jul 2022 20:26:22 -0700 (PDT)
+        with ESMTP id S229718AbiGUFo0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Jul 2022 01:44:26 -0400
+Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C3A046D92
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Jul 2022 22:44:25 -0700 (PDT)
+Received: by mail-vs1-xe30.google.com with SMTP id k129so603457vsk.2
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Jul 2022 22:44:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7/RCHeAbVCOqD0cHfs1FX4yxEvm18Od2ZjvELduD4Zo=;
-        b=XssK8YRteQzMVB4d55bp9wyqtR/aDzDqjGAoC0IT4dfn/DbWNUMh3ryYm5fTKASwDw
-         E+MSRcKQHrjLYaN0LGXpsaLu6+NU0QLbvOwcSlA7e8lVBvzRFHatIqFxviNiw2x+Z/k9
-         6/71d89v/WcX/eScB/58Jdj7g4GkY2i2mIHc8MN63LKaHArfKvuKsxObtsagpAk8PyYY
-         vYslebjslmXWEc6XFwjUbdba00nCE/zCiXK7gbCP3kU3yfiAC3n1a1XNEy1VnvKSIRrE
-         iafDUcGOQ2ZAb0DH18fGl74tvNHjkki+2YAd/o/hbqBpAVOQPzexgZuwUg0RLIpx7dD6
-         z2bQ==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=nPRLl0FXefiix2bimgU7SElgLIjyurdEVPxXszxzCXo=;
+        b=ivPAnX8jN4algWB7sY9AEGhu7IPNCHdGAzyNXmwV87gQe6yY/YL69vwvYltDCO1pZ6
+         dzKFKGADWzvzQaVnFviwGCknEwZwkx7sBME0JbMCtln7PWR5b0wFKXgV2X+aahH6T18I
+         aVPBokc1AiKfSn9ianHNwctMRFeoGAsXRk7G9tTB8e7llMCIBWKIxQz3PFtvDLF32k5D
+         iJ5RIQoN1mFCkStd8c0JMaYhHmh/zFT1GGbujS9wNHbz2oqs7dT1wjggnJTlqvX74Jqv
+         4+kCRL64KxeR65+QBDwFC4C7vpAJw4YLFsd4X0/HzKTpF3lrXtm8iHOHCXcsX6QbYfyK
+         8E0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7/RCHeAbVCOqD0cHfs1FX4yxEvm18Od2ZjvELduD4Zo=;
-        b=WyAPMt8WdJFCW9O9qtYC9jKe4Rjv25VuiQaLs5lcW6YgRThELvuBMcT1mZTAs7NS8P
-         Ain/mR2Xu70YbqvDL4h0p1b/b3TVCvHLz5jBILjjJC/K7EKbcyyMNSq3ERXsIe7lTSRp
-         R7c4yQcr+39yKXTwGll/bbfo0bS5m6i614vrwdHKrF9+VaSUmLoxYn9xPrBzPWtFTgNV
-         wSzf5IDPjv+0Qh0jKL/25ZLy2XPNdk39gYr9RloyjRJNylru5e4k4wCZb/1jv07j+DWm
-         PML1NE7iByjB2G7D3Pmlf5/8OC8C9lAyterzRWazKNUTKX/KTTzVQ8GTeBydHH6txPDy
-         zCNQ==
-X-Gm-Message-State: AJIora+XtZIEtSYbjgh/97htmSPnrPZ1A03LZ0Ng70D4WTGgIq9tmVTo
-        Fq/xoUnPSVHhAww0Lhdu6Wg/DWOftNJLc8zRb74=
-X-Google-Smtp-Source: AGRyM1vSQTMwnXr1TV/WrZ2pB+20AoTcOXyLbHo5qLyPauL0fwN1KbybYYbQ9EFTQrlgqG2X3eA3whGDliQRIETJuEc=
-X-Received: by 2002:a05:6102:c94:b0:357:c72d:b7b3 with SMTP id
- f20-20020a0561020c9400b00357c72db7b3mr8302817vst.17.1658373981185; Wed, 20
- Jul 2022 20:26:21 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=nPRLl0FXefiix2bimgU7SElgLIjyurdEVPxXszxzCXo=;
+        b=RYR7XDwUjAjVHp1Yzy2MHfO7KIiH3dykRKTdmViS0iQebmRhfjszBTy8DppzIgoOW4
+         kJDVwaW36prZ+quiGb1OMyh9bX8jMUUfWXD7/0KDPZZtBdU7OERtTkrLDfLj7O0Vcrcq
+         WiNaYVf8AF7eqktIq/9HB/dYl6uoTRpcSVUwoJyWk6hA0rn2DEYhRICJlfUoipoYFS+2
+         fsFsvhzQb1yqkpKVH9IM56XQGBQm2bl+BdlYGyb+CDQtG584bSf5uQpUSR5Y5QWaF42d
+         gTwxzGSlL33d8W4bouZePRDrb4JFI25EO2Bv9WGB7MK5n4MsCvE/GMXLpI30iFU97WSx
+         eGIA==
+X-Gm-Message-State: AJIora/2nuePOk60afdWCDOp2kGFxiV/FOnbnneA2zv15E11Ae5krmsF
+        D8lVEVj7rpyET50TM0U/oAIHr96zj1rESR7K4CXAl+XD4F88jA==
+X-Google-Smtp-Source: AGRyM1ufXkY1DKSzKqZLc0gWxHIsi+eeQZecb9XVxoJyjTtFg6ZgyNwDsWzXJb0HaWR9R46YnNDDoxrDHN1O5AwRx/s=
+X-Received: by 2002:a67:6d86:0:b0:357:3d99:ec77 with SMTP id
+ i128-20020a676d86000000b003573d99ec77mr14098482vsc.6.1658382264439; Wed, 20
+ Jul 2022 22:44:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220719173151.12068-1-ematsumiya@suse.de>
-In-Reply-To: <20220719173151.12068-1-ematsumiya@suse.de>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 20 Jul 2022 22:26:10 -0500
-Message-ID: <CAH2r5mtgMdFqqopgKDXOnGR0zAEcOB-wW_1OxZRmix78WTdfkQ@mail.gmail.com>
-Subject: Re: [PATCH] smb2: simplify mid handling/dequeueing code
-To:     Enzo Matsumiya <ematsumiya@suse.de>
-Cc:     rohiths msft <rohiths.msft@gmail.com>,
+Date:   Thu, 21 Jul 2022 00:44:13 -0500
+Message-ID: <CAH2r5mtdA_qsH+Oc47R4+Uc9yMN8gWiELNdiSiBz8THkF_fJJw@mail.gmail.com>
+Subject: Full backport to 5.15 of all fixes up to 5.19 kernel
+To:     Bharath S M <bharathsm@microsoft.com>,
+        rohiths msft <rohiths.msft@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="000000000000c6567805e44a35b0"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Can you give some context as to why only smb2_find_dequeue_mid()
-set the "dequeue" flag to true and why it doesn't need to be
-distinguished from the other find_mid cases?
-I think Rohith wrote this - Rohith does the change make sense to you? Thoughts?
+--000000000000c6567805e44a35b0
+Content-Type: text/plain; charset="UTF-8"
 
-Also Enzo can you explain a little what the callers were who set
-"malformed" (and why it now no longer needs to be used)?
+Updated backport:
 
-On Tue, Jul 19, 2022 at 12:32 PM Enzo Matsumiya <ematsumiya@suse.de> wrote:
->
-> Mostly a code cleanup, aiming to simplify handle_mid(), dequeue_mid(),
-> and smb2_find_mid(), and their callers.
->
-> Also remove the @malformed parameter from those and their callers, since
-> the mid_state was already known beforehand.
->
-> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-> ---
->  fs/cifs/cifsglob.h  |   3 +-
->  fs/cifs/cifsproto.h |   2 +-
->  fs/cifs/cifssmb.c   |  33 ++++-----
->  fs/cifs/connect.c   |  46 ++++++------
->  fs/cifs/smb1ops.c   |  12 ++--
->  fs/cifs/smb2misc.c  |  18 +++--
->  fs/cifs/smb2ops.c   | 168 +++++++++++++++++---------------------------
->  7 files changed, 118 insertions(+), 164 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index a643c84ff1e9..ae57ede51cd3 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -283,8 +283,7 @@ struct smb_version_operations {
->                                  struct cifsInodeInfo *cinode, __u32 oplock,
->                                  unsigned int epoch, bool *purge_cache);
->         /* process transaction2 response */
-> -       bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
-> -                            char *, int);
-> +       bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *, char *);
->         /* check if we need to negotiate */
->         bool (*need_neg)(struct TCP_Server_Info *);
->         /* negotiate to the server */
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index d59aebefa71c..9e34ea9c7b2a 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -235,7 +235,7 @@ extern unsigned int setup_authusers_ACE(struct cifs_ace *pace);
->  extern unsigned int setup_special_mode_ACE(struct cifs_ace *pace, __u64 nmode);
->  extern unsigned int setup_special_user_owner_ACE(struct cifs_ace *pace);
->
-> -extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
-> +extern void dequeue_mid(struct mid_q_entry *mid);
->  extern int cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
->                                  unsigned int to_read);
->  extern ssize_t cifs_discard_from_socket(struct TCP_Server_Info *server,
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 6371b9eebdad..33513b4ee0b3 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -1406,26 +1406,17 @@ cifs_discard_remaining_data(struct TCP_Server_Info *server)
->  }
->
->  static int
-> -__cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid,
-> -                    bool malformed)
-> +cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  {
->         int length;
->
->         length = cifs_discard_remaining_data(server);
-> -       dequeue_mid(mid, malformed);
-> +       dequeue_mid(mid);
->         mid->resp_buf = server->smallbuf;
->         server->smallbuf = NULL;
->         return length;
->  }
->
-> -static int
-> -cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
-> -{
-> -       struct cifs_readdata *rdata = mid->callback_data;
-> -
-> -       return  __cifs_readv_discard(server, mid, rdata->result);
-> -}
-> -
->  int
->  cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  {
-> @@ -1483,7 +1474,8 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->                 cifs_dbg(FYI, "%s: server returned error %d\n",
->                          __func__, rdata->result);
->                 /* normal error on read response */
-> -               return __cifs_readv_discard(server, mid, false);
-> +               mid->mid_state = MID_RESPONSE_RECEIVED;
-> +               return cifs_readv_discard(server, mid);
->         }
->
->         /* Is there enough to get to the rest of the READ_RSP header? */
-> @@ -1491,8 +1483,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->                 cifs_dbg(FYI, "%s: server returned short header. got=%u expected=%zu\n",
->                          __func__, server->total_read,
->                          server->vals->read_rsp_size);
-> -               rdata->result = -EIO;
-> -               return cifs_readv_discard(server, mid);
-> +               goto err_discard;
->         }
->
->         data_offset = server->ops->read_data_offset(buf) +
-> @@ -1510,8 +1501,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->                 /* data_offset is beyond the end of smallbuf */
->                 cifs_dbg(FYI, "%s: data offset (%u) beyond end of smallbuf\n",
->                          __func__, data_offset);
-> -               rdata->result = -EIO;
-> -               return cifs_readv_discard(server, mid);
-> +               goto err_discard;
->         }
->
->         cifs_dbg(FYI, "%s: total_read=%u data_offset=%u\n",
-> @@ -1534,8 +1524,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->         data_len = server->ops->read_data_length(buf, use_rdma_mr);
->         if (!use_rdma_mr && (data_offset + data_len > buflen)) {
->                 /* data_len is corrupt -- discard frame */
-> -               rdata->result = -EIO;
-> -               return cifs_readv_discard(server, mid);
-> +               goto err_discard;
->         }
->
->         length = rdata->read_into_pages(server, rdata, data_len);
-> @@ -1551,10 +1540,16 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->         if (server->total_read < buflen)
->                 return cifs_readv_discard(server, mid);
->
-> -       dequeue_mid(mid, false);
-> +       mid->mid_state = MID_RESPONSE_RECEIVED;
-> +       dequeue_mid(mid);
->         mid->resp_buf = server->smallbuf;
->         server->smallbuf = NULL;
->         return length;
-> +
-> +err_discard:
-> +       rdata->result = -EIO;
-> +       mid->mid_state = MID_RESPONSE_MALFORMED;
-> +       return cifs_readv_discard(server, mid);
->  }
->
->  static void
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 057237c9cb30..dd15e14bd433 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -844,28 +844,20 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
->  }
->
->  void
-> -dequeue_mid(struct mid_q_entry *mid, bool malformed)
-> +dequeue_mid(struct mid_q_entry *mid)
->  {
->  #ifdef CONFIG_CIFS_STATS2
->         mid->when_received = jiffies;
->  #endif
-> -       spin_lock(&GlobalMid_Lock);
-> -       if (!malformed)
-> -               mid->mid_state = MID_RESPONSE_RECEIVED;
-> -       else
-> -               mid->mid_state = MID_RESPONSE_MALFORMED;
-> -       /*
-> -        * Trying to handle/dequeue a mid after the send_recv()
-> -        * function has finished processing it is a bug.
-> -        */
->         if (mid->mid_flags & MID_DELETED) {
-> -               spin_unlock(&GlobalMid_Lock);
->                 pr_warn_once("trying to dequeue a deleted mid\n");
-> -       } else {
-> -               list_del_init(&mid->qhead);
-> -               mid->mid_flags |= MID_DELETED;
-> -               spin_unlock(&GlobalMid_Lock);
-> +               return;
->         }
-> +
-> +       spin_lock(&GlobalMid_Lock);
-> +       list_del_init(&mid->qhead);
-> +       mid->mid_flags |= MID_DELETED;
-> +       spin_unlock(&GlobalMid_Lock);
->  }
->
->  static unsigned int
-> @@ -883,15 +875,16 @@ smb2_get_credits_from_hdr(char *buffer, struct TCP_Server_Info *server)
->  }
->
->  static void
-> -handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
-> -          char *buf, int malformed)
-> +handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server, char *buf)
->  {
->         if (server->ops->check_trans2 &&
-> -           server->ops->check_trans2(mid, server, buf, malformed))
-> +           server->ops->check_trans2(mid, server, buf))
->                 return;
-> +
->         mid->credits_received = smb2_get_credits_from_hdr(buf, server);
->         mid->resp_buf = buf;
->         mid->large_buf = server->large_buf;
-> +
->         /* Was previous buf put in mpx struct for multi-rsp? */
->         if (!mid->multiRsp) {
->                 /* smb buffer will be freed by user thread */
-> @@ -900,7 +893,8 @@ handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
->                 else
->                         server->smallbuf = NULL;
->         }
-> -       dequeue_mid(mid, malformed);
-> +
-> +       dequeue_mid(mid);
->  }
->
->  static void clean_demultiplex_info(struct TCP_Server_Info *server)
-> @@ -1050,9 +1044,6 @@ cifs_handle_standard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->          * into the payload for debugging purposes.
->          */
->         rc = server->ops->check_message(buf, server->total_read, server);
-> -       if (rc)
-> -               cifs_dump_mem("Bad SMB: ", buf,
-> -                       min_t(unsigned int, server->total_read, 48));
->
->         if (server->ops->is_session_expired &&
->             server->ops->is_session_expired(buf)) {
-> @@ -1067,7 +1058,16 @@ cifs_handle_standard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->         if (!mid)
->                 return rc;
->
-> -       handle_mid(mid, server, buf, rc);
-> +       if (unlikely(rc)) {
-> +               cifs_dump_mem("Bad SMB: ", buf,
-> +                             min_t(unsigned int, server->total_read, 48));
-> +               /* mid is malformed */
-> +               mid->mid_state = MID_RESPONSE_MALFORMED;
-> +       } else {
-> +               mid->mid_state = MID_RESPONSE_RECEIVED;
-> +       }
-> +
-> +       handle_mid(mid, server, buf);
->         return 0;
->  }
->
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 2e20ee4dab7b..416293fe14fb 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -384,21 +384,21 @@ cifs_downgrade_oplock(struct TCP_Server_Info *server,
->
->  static bool
->  cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
-> -                 char *buf, int malformed)
-> +                 char *buf)
->  {
-> -       if (malformed)
-> -               return false;
->         if (check2ndT2(buf) <= 0)
->                 return false;
->         mid->multiRsp = true;
->         if (mid->resp_buf) {
-> +               int rc;
->                 /* merge response - fix up 1st*/
-> -               malformed = coalesce_t2(buf, mid->resp_buf);
-> -               if (malformed > 0)
-> +               rc = coalesce_t2(buf, mid->resp_buf);
-> +               if (rc > 0)
->                         return true;
->                 /* All parts received or packet is malformed. */
->                 mid->multiEnd = true;
-> -               dequeue_mid(mid, malformed);
-> +               mid->mid_state = MID_RESPONSE_RECEIVED;
-> +               dequeue_mid(mid);
->                 return true;
->         }
->         if (!server->large_buf) {
-> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-> index 562064fe9668..0d57341e4f4a 100644
-> --- a/fs/cifs/smb2misc.c
-> +++ b/fs/cifs/smb2misc.c
-> @@ -26,17 +26,15 @@ check_smb2_hdr(struct smb2_hdr *shdr, __u64 mid)
->          * Make sure that this really is an SMB, that it is a response,
->          * and that the message ids match.
->          */
-> -       if ((shdr->ProtocolId == SMB2_PROTO_NUMBER) &&
-> -           (mid == wire_mid)) {
-> +       if ((shdr->ProtocolId == SMB2_PROTO_NUMBER) && (mid == wire_mid)) {
->                 if (shdr->Flags & SMB2_FLAGS_SERVER_TO_REDIR)
->                         return 0;
-> -               else {
-> -                       /* only one valid case where server sends us request */
-> -                       if (shdr->Command == SMB2_OPLOCK_BREAK)
-> -                               return 0;
-> -                       else
-> -                               cifs_dbg(VFS, "Received Request not response\n");
-> -               }
-> +
-> +               /* only one valid case where server sends us request */
-> +               if (shdr->Command == SMB2_OPLOCK_BREAK)
-> +                       return 0;
-> +
-> +               cifs_dbg(VFS, "Received Request not response\n");
->         } else { /* bad signature or mid */
->                 if (shdr->ProtocolId != SMB2_PROTO_NUMBER)
->                         cifs_dbg(VFS, "Bad protocol string signature header %x\n",
-> @@ -45,7 +43,7 @@ check_smb2_hdr(struct smb2_hdr *shdr, __u64 mid)
->                         cifs_dbg(VFS, "Mids do not match: %llu and %llu\n",
->                                  mid, wire_mid);
->         }
-> -       cifs_dbg(VFS, "Bad SMB detected. The Mid=%llu\n", wire_mid);
-> +       cifs_dbg(VFS, "Bad SMB detected, mid=%llu\n", wire_mid);
->         return 1;
->  }
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 8802995b2d3d..f63139015afa 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -335,7 +335,7 @@ smb2_revert_current_mid(struct TCP_Server_Info *server, const unsigned int val)
->  }
->
->  static struct mid_q_entry *
-> -__smb2_find_mid(struct TCP_Server_Info *server, char *buf, bool dequeue)
-> +smb2_find_mid(struct TCP_Server_Info *server, char *buf)
->  {
->         struct mid_q_entry *mid;
->         struct smb2_hdr *shdr = (struct smb2_hdr *)buf;
-> @@ -352,10 +352,6 @@ __smb2_find_mid(struct TCP_Server_Info *server, char *buf, bool dequeue)
->                     (mid->mid_state == MID_REQUEST_SUBMITTED) &&
->                     (mid->command == shdr->Command)) {
->                         kref_get(&mid->refcount);
-> -                       if (dequeue) {
-> -                               list_del_init(&mid->qhead);
-> -                               mid->mid_flags |= MID_DELETED;
-> -                       }
->                         spin_unlock(&GlobalMid_Lock);
->                         return mid;
->                 }
-> @@ -364,18 +360,6 @@ __smb2_find_mid(struct TCP_Server_Info *server, char *buf, bool dequeue)
->         return NULL;
->  }
->
-> -static struct mid_q_entry *
-> -smb2_find_mid(struct TCP_Server_Info *server, char *buf)
-> -{
-> -       return __smb2_find_mid(server, buf, false);
-> -}
-> -
-> -static struct mid_q_entry *
-> -smb2_find_dequeue_mid(struct TCP_Server_Info *server, char *buf)
-> -{
-> -       return __smb2_find_mid(server, buf, true);
-> -}
-> -
->  static void
->  smb2_dump_detail(void *buf, struct TCP_Server_Info *server)
->  {
-> @@ -4912,7 +4896,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
->         }
->
->         if (server->ops->is_status_pending &&
-> -                       server->ops->is_status_pending(buf, server))
-> +           server->ops->is_status_pending(buf, server))
->                 return -1;
->
->         /* set up first two iov to get credits */
-> @@ -4931,11 +4915,9 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
->                 cifs_dbg(FYI, "%s: server returned error %d\n",
->                          __func__, rdata->result);
->                 /* normal error on read response */
-> -               if (is_offloaded)
-> -                       mid->mid_state = MID_RESPONSE_RECEIVED;
-> -               else
-> -                       dequeue_mid(mid, false);
-> -               return 0;
-> +               mid->mid_state = MID_RESPONSE_RECEIVED;
-> +               length = 0;
-> +               goto err_out;
->         }
->
->         data_offset = server->ops->read_data_offset(buf);
-> @@ -4958,11 +4940,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
->                 cifs_dbg(FYI, "%s: data offset (%u) beyond end of smallbuf\n",
->                          __func__, data_offset);
->                 rdata->result = -EIO;
-> -               if (is_offloaded)
-> -                       mid->mid_state = MID_RESPONSE_MALFORMED;
-> -               else
-> -                       dequeue_mid(mid, rdata->result);
-> -               return 0;
-> +               goto err_malformed;
->         }
->
->         pad_len = data_offset - server->vals->read_rsp_size;
-> @@ -4977,32 +4955,19 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
->                         cifs_dbg(FYI, "%s: data offset (%u) beyond 1st page of response\n",
->                                  __func__, data_offset);
->                         rdata->result = -EIO;
-> -                       if (is_offloaded)
-> -                               mid->mid_state = MID_RESPONSE_MALFORMED;
-> -                       else
-> -                               dequeue_mid(mid, rdata->result);
-> -                       return 0;
-> +                       goto err_malformed;
->                 }
->
->                 if (data_len > page_data_size - pad_len) {
->                         /* data_len is corrupt -- discard frame */
->                         rdata->result = -EIO;
-> -                       if (is_offloaded)
-> -                               mid->mid_state = MID_RESPONSE_MALFORMED;
-> -                       else
-> -                               dequeue_mid(mid, rdata->result);
-> -                       return 0;
-> +                       goto err_malformed;
->                 }
->
->                 rdata->result = init_read_bvec(pages, npages, page_data_size,
->                                                cur_off, &bvec);
-> -               if (rdata->result != 0) {
-> -                       if (is_offloaded)
-> -                               mid->mid_state = MID_RESPONSE_MALFORMED;
-> -                       else
-> -                               dequeue_mid(mid, rdata->result);
-> -                       return 0;
-> -               }
-> +               if (rdata->result != 0)
-> +                       goto err_malformed;
->
->                 iov_iter_bvec(&iter, WRITE, bvec, npages, data_len);
->         } else if (buf_len >= data_offset + data_len) {
-> @@ -5015,24 +4980,26 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
->                 /* read response payload cannot be in both buf and pages */
->                 WARN_ONCE(1, "buf can not contain only a part of read data");
->                 rdata->result = -EIO;
-> -               if (is_offloaded)
-> -                       mid->mid_state = MID_RESPONSE_MALFORMED;
-> -               else
-> -                       dequeue_mid(mid, rdata->result);
-> -               return 0;
-> +               goto err_malformed;
->         }
->
->         length = rdata->copy_into_pages(server, rdata, &iter);
->
->         kfree(bvec);
->
-> -       if (length < 0)
-> +err_out:
-> +       if (length <= 0)
->                 return length;
->
-> -       if (is_offloaded)
-> -               mid->mid_state = MID_RESPONSE_RECEIVED;
-> +err_malformed:
-> +       if (rdata->result != 0)
-> +               mid->mid_state = MID_RESPONSE_MALFORMED;
->         else
-> -               dequeue_mid(mid, false);
-> +               mid->mid_state = MID_RESPONSE_RECEIVED;
-> +
-> +       if (!is_offloaded)
-> +               dequeue_mid(mid);
-> +
->         return length;
->  }
->
-> @@ -5061,44 +5028,45 @@ static void smb2_decrypt_offload(struct work_struct *work)
->         }
->
->         dw->server->lstrp = jiffies;
-> -       mid = smb2_find_dequeue_mid(dw->server, dw->buf);
-> -       if (mid == NULL)
-> +       mid = smb2_find_mid(dw->server, dw->buf);
-> +       if (mid == NULL) {
->                 cifs_dbg(FYI, "mid not found\n");
-> -       else {
-> -               mid->decrypted = true;
-> -               rc = handle_read_data(dw->server, mid, dw->buf,
-> -                                     dw->server->vals->read_rsp_size,
-> -                                     dw->ppages, dw->npages, dw->len,
-> -                                     true);
-> -               if (rc >= 0) {
-> +               goto free_pages;
-> +       }
-> +
-> +       dequeue_mid(mid);
-> +
-> +       mid->decrypted = true;
-> +       rc = handle_read_data(dw->server, mid, dw->buf,
-> +                             dw->server->vals->read_rsp_size, dw->ppages,
-> +                             dw->npages, dw->len, true);
-> +       if (rc >= 0) {
->  #ifdef CONFIG_CIFS_STATS2
-> -                       mid->when_received = jiffies;
-> +               mid->when_received = jiffies;
->  #endif
-> -                       if (dw->server->ops->is_network_name_deleted)
-> -                               dw->server->ops->is_network_name_deleted(dw->buf,
-> -                                                                        dw->server);
-> +               if (dw->server->ops->is_network_name_deleted)
-> +                       dw->server->ops->is_network_name_deleted(dw->buf, dw->server);
->
-> -                       mid->callback(mid);
-> +               mid->callback(mid);
-> +       } else {
-> +               spin_lock(&cifs_tcp_ses_lock);
-> +               spin_lock(&GlobalMid_Lock);
-> +               if (dw->server->tcpStatus == CifsNeedReconnect) {
-> +                       mid->mid_state = MID_RETRY_NEEDED;
->                 } else {
-> -                       spin_lock(&cifs_tcp_ses_lock);
-> -                       spin_lock(&GlobalMid_Lock);
-> -                       if (dw->server->tcpStatus == CifsNeedReconnect) {
-> -                               mid->mid_state = MID_RETRY_NEEDED;
-> -                               spin_unlock(&GlobalMid_Lock);
-> -                               spin_unlock(&cifs_tcp_ses_lock);
-> -                               mid->callback(mid);
-> -                       } else {
-> -                               mid->mid_state = MID_REQUEST_SUBMITTED;
-> -                               mid->mid_flags &= ~(MID_DELETED);
-> -                               list_add_tail(&mid->qhead,
-> -                                       &dw->server->pending_mid_q);
-> -                               spin_unlock(&GlobalMid_Lock);
-> -                               spin_unlock(&cifs_tcp_ses_lock);
-> -                       }
-> +                       mid->mid_state = MID_REQUEST_SUBMITTED;
-> +                       mid->mid_flags &= ~(MID_DELETED);
-> +                       list_add_tail(&mid->qhead, &dw->server->pending_mid_q);
->                 }
-> -               cifs_mid_q_entry_release(mid);
-> +               spin_unlock(&GlobalMid_Lock);
-> +               spin_unlock(&cifs_tcp_ses_lock);
-> +
-> +               if (mid->mid_state == MID_RETRY_NEEDED)
-> +                       mid->callback(mid);
->         }
->
-> +       cifs_mid_q_entry_release(mid);
-> +
->  free_pages:
->         for (i = dw->npages-1; i >= 0; i--)
->                 put_page(dw->ppages[i]);
-> @@ -5191,22 +5159,18 @@ receive_encrypted_read(struct TCP_Server_Info *server, struct mid_q_entry **mid,
->                 goto free_pages;
->
->         *mid = smb2_find_mid(server, buf);
-> -       if (*mid == NULL)
-> +       if (*mid == NULL) {
->                 cifs_dbg(FYI, "mid not found\n");
-> -       else {
-> -               cifs_dbg(FYI, "mid found\n");
-> -               (*mid)->decrypted = true;
-> -               rc = handle_read_data(server, *mid, buf,
-> -                                     server->vals->read_rsp_size,
-> -                                     pages, npages, len, false);
-> -               if (rc >= 0) {
-> -                       if (server->ops->is_network_name_deleted) {
-> -                               server->ops->is_network_name_deleted(buf,
-> -                                                               server);
-> -                       }
-> -               }
-> +               goto free_pages;
->         }
->
-> +       (*mid)->decrypted = true;
-> +       rc = handle_read_data(server, *mid, buf, server->vals->read_rsp_size,
-> +                             pages, npages, len, false);
-> +       if (rc >= 0)
-> +               if (server->ops->is_network_name_deleted)
-> +                       server->ops->is_network_name_deleted(buf, server);
-> +
->  free_pages:
->         for (i = i - 1; i >= 0; i--)
->                 put_page(pages[i]);
-> @@ -5253,7 +5217,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
->                 return length;
->
->         next_is_large = server->large_buf;
-> -one_more:
-> +next:
->         shdr = (struct smb2_hdr *)buf;
->         if (shdr->NextCommand) {
->                 if (next_is_large)
-> @@ -5266,10 +5230,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
->         }
->
->         mid_entry = smb2_find_mid(server, buf);
-> -       if (mid_entry == NULL)
-> -               cifs_dbg(FYI, "mid not found\n");
-> -       else {
-> -               cifs_dbg(FYI, "mid found\n");
-> +       if (mid_entry) {
->                 mid_entry->decrypted = true;
->                 mid_entry->resp_buf_size = server->pdu_size;
->         }
-> @@ -5278,6 +5239,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
->                 cifs_server_dbg(VFS, "too many PDUs in compound\n");
->                 return -1;
->         }
-> +
->         bufs[*num_mids] = buf;
->         mids[(*num_mids)++] = mid_entry;
->
-> @@ -5293,7 +5255,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
->                         server->bigbuf = buf = next_buffer;
->                 else
->                         server->smallbuf = buf = next_buffer;
-> -               goto one_more;
-> +               goto next;
->         } else if (ret != 0) {
->                 /*
->                  * ret != 0 here means that we didn't get to handle_mid() thus
-> --
-> 2.35.3
->
+https://git.samba.org/?p=sfrench/cifs-2.6.git;a=shortlog;h=refs/heads/5.15-backport
+
+175 patches backported, 24 not backported (e.g. due to dependencies on
+newer VFS features like folios). See attached
+
+Passed multichannel Azure:
+   http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/11/builds/269
+ Running other test groups now
+
+Unsure about perf yet (need more data to see how it compares to 5.15
+without these patches, and how it compares to Shyam's 5.13
+multichannel runs and comparison with current 5.19-rc7 mainline runs.
+
+Feedback welcome.
+
 
 
 -- 
 Thanks,
 
 Steve
+
+--000000000000c6567805e44a35b0
+Content-Type: application/octet-stream; name="5.15-full-backport-list"
+Content-Disposition: attachment; filename="5.15-full-backport-list"
+Content-Transfer-Encoding: base64
+Content-ID: <f_l5uly9pt0>
+X-Attachment-Id: f_l5uly9pt0
+
+QmVsb3cgaXMgdGhlIGZ1bGwgbGlzdCBvZiAxNzUgcGF0Y2hlcyBiYWNrcG9ydGVkIHRvIDUuMTUg
+KGZyb20gNS4xOSkKZm9yIGNpZnMua28gKGZzL2NpZnMvIGZzL3NtYmZzX2NvbW1vbiBzdWJkaXJl
+Y3RvcmllcykuCgo0ZDRiZDY1ZWRmOGIgY2lmczogZGVzdGFnZSBhbnkgdW53cml0dGVuIGRhdGEg
+dG8gdGhlIHNlcnZlciBiZWZvcmUgY2FsbGluZyBjb3B5Y2h1bmtfd3JpdGUKNjNmMjJhZGUzNzRi
+IGNpZnM6IHVzZSBjb3JyZWN0IGxvY2sgdHlwZSBpbiBjaWZzX3JlY29ubmVjdCgpCmU3MjE0YTFh
+ODE3MyBjaWZzOiBmaXggTlVMTCBwdHIgZGVyZWZlcmVuY2UgaW4gcmVmcmVzaF9tb3VudHMoKQoy
+YzcwMDllMzczOTQgY2lmczogVXNlIGt6YWxsb2MgaW5zdGVhZCBvZiBrbWFsbG9jL21lbXNldAoy
+ZDQzZTU4MTI3OTggY2lmczogdmVyaWZ5IHRoYXQgdGNvbiBpcyB2YWxpZCBiZWZvcmUgZGVyZWZl
+cmVuY2UgaW4gY2lmc19raWxsX3NiCmQ1MGYxODU0ZGEzMyBjaWZzOiBwb3RlbnRpYWwgYnVmZmVy
+IG92ZXJmbG93IGluIGhhbmRsaW5nIHN5bWxpbmtzCjYxZjQ2MThjNWI5MSBjaWZzOiBTcGxpdCB0
+aGUgc21iM19hZGRfY3JlZGl0cyB0cmFjZXBvaW50CmFiNTFmN2Q1ZmI1YSBjaWZzOiByZWxlYXNl
+IGNhY2hlZCBkZW50cmllcyBvbmx5IGlmIG1vdW50IGlzIGNvbXBsZXRlCjg4MjE1YWFkMjVkNSBj
+aWZzOiBDaGVjayB0aGUgSU9DQl9ESVJFQ1QgZmxhZywgbm90IE9fRElSRUNUCjRiMjRhNDQ4M2M5
+OCBjaWZzOiB1cGRhdGUgaW50ZXJuYWwgbW9kdWxlIG51bWJlcgowZWZhMDFiM2JhYzcgY2lmczog
+Zm9yY2UgbmV3IHNlc3Npb24gc2V0dXAgYW5kIHRjb24gZm9yIGRmcwo0NzVmM2YwOWU3OWEgY2lm
+czogcmVtb3ZlIGNoZWNrIG9mIGxpc3QgaXRlcmF0b3IgYWdhaW5zdCBoZWFkIHBhc3QgdGhlIGxv
+b3AgYm9keQoyMzk4NTIwMDdiZDIgY2lmczogZml4IHBvdGVudGlhbCByYWNlIHdpdGggY2lmc2Qg
+dGhyZWFkCjE4MmRmMmIzOTY4MiBmczogUmVtb3ZlIC0+cmVhZHBhZ2VzIGFkZHJlc3Mgc3BhY2Ug
+b3BlcmF0aW9uCjhkZDU3MzIzZWQ4OCBjaWZzOiBmaXggTlVMTCBwdHIgZGVyZWZlcmVuY2UgaW4g
+c21iMl9pb2N0bF9xdWVyeV9pbmZvKCkKYWIxMjJlMjRmOWM0IGNpZnM6IHByZXZlbnQgYmFkIG91
+dHB1dCBsZW5ndGhzIGluIHNtYjJfaW9jdGxfcXVlcnlfaW5mbygpCjkzM2ZjMzhhZDNhZSBzbWIz
+OiBmaXgga3NtYmQgYmlnZW5kaWFuIGJ1ZyBpbiBvcGxvY2sgYnJlYWssIGFuZCBtb3ZlIGl0cyBz
+dHJ1Y3QgdG8gc21iZnNfY29tbW9uCmM1MjE3OTYxYzdlZiBzbWIzOiBjbGVhbnVwIGFuZCBjbGFy
+aWZ5IHN0YXR1cyBvZiB0cmVlIGNvbm5lY3Rpb25zCjUwNDljOWFjZDdkNCBzbWIzOiBtb3ZlIGRl
+ZmluZXMgZm9yIHF1ZXJ5IGluZm8gYW5kIHF1ZXJ5IGZzaW5mbyB0byBzbWJmc19jb21tb24KMmY1
+NWU2NWU3MzNhIHNtYjM6IG1vdmUgZGVmaW5lcyBmb3IgaW9jdGwgcHJvdG9jb2wgaGVhZGVyIGFu
+ZCBTTUIyIHNpemVzIHRvIHNtYmZzX2NvbW1vbgozNmQxNzBhMDU2NGIgbW92ZSBtb3JlIGNvbW1v
+biBwcm90b2NvbCBoZWFkZXIgZGVmaW5pdGlvbnMgdG8gc21iZnNfY29tbW9uCjY1ZTZiMjVjMWZj
+YyBjaWZzOiBmaXggaW5jb3JyZWN0IHVzZSBvZiBsaXN0IGl0ZXJhdG9yIGFmdGVyIHRoZSBsb29w
+CmY5NGUyYzhjOTE5ZSBjaWZzOiBmaXggYmFkIGZpZHMgc2VudCBvdmVyIHdpcmUKYTYzYjM0ZTg4
+NDE3IGNpZnM6IGNoYW5nZSBzbWIyX3F1ZXJ5X2luZm9fY29tcG91bmQgdG8gdXNlIGEgY2FjaGVk
+IGZpZCwgaWYgYXZhaWxhYmxlCmE3M2Q4ZjRhNTdhNCBjaWZzOiBjb252ZXJ0IHRoZSBwYXRoIHRv
+IHV0ZjE2IGluIHNtYjJfcXVlcnlfaW5mb19jb21wb3VuZApiNjQ4MWJmZTk0NWUgY2lmczogZG8g
+bm90IHNraXAgbGluayB0YXJnZXRzIHdoZW4gYW4gSS9PIGZhaWxzCjYyMWFiMDczYjhlZSBjaWZz
+OiB1c2UgYSBkaWZmZXJlbnQgcmVjb25uZWN0IGhlbHBlciBmb3Igbm9uLWNpZnNkIHRocmVhZHMK
+NWY4ZjBjM2UwYjE1IGNpZnM6IHdlIGRvIG5vdCBuZWVkIGEgc3BpbmxvY2sgYXJvdW5kIHRoZSB0
+cmVlIGFjY2VzcyBkdXJpbmcgdW1vdW50CmQ5OTE2NWE3MzBjYyBBZGp1c3QgY2lmc3NiIG1heGlt
+dW0gcmVhZCBzaXplCjQ2ZDQ3MjY2YTAzMiBjaWZzOiB0cnVuY2F0ZSB0aGUgaW5vZGUgYW5kIG1h
+cHBpbmcgd2hlbiB3ZSBzaW11bGF0ZSBmY29sbGFwc2UKYjVhZThjODEwNWRmIGNpZnM6IGZpeCBo
+YW5kbGVjYWNoZSBhbmQgbXVsdGl1c2VyCjIzY2QzMjRkNTJlOCBzbWIzOiBmaXggaW5jb3JyZWN0
+IHNlc3Npb24gc2V0dXAgY2hlY2sgZm9yIG11bHRpdXNlciBtb3VudHMKOTJmMDY5N2VjZDY2IHRy
+ZWV3aWRlOiBSZXBsYWNlIHplcm8tbGVuZ3RoIGFycmF5cyB3aXRoIGZsZXhpYmxlLWFycmF5IG1l
+bWJlcnMKZjBkMmNiOTg0NWZkIGNpZnM6IGZpeCBjb25mdXNpbmcgdW5uZWVkZWQgd2FybmluZyBt
+ZXNzYWdlIG9uIHNtYjIuMSBhbmQgZWFybGllcgowZWM4NzgyOGNhNzQgY2lmczogbW9kZWZyb21z
+aWRzIG11c3QgYWRkIGFuIEFDRSBmb3IgYXV0aGVudGljYXRlZCB1c2VycwpjYjg5NGM5ZmNiODMg
+Y2lmczogZml4IGRvdWJsZSBmcmVlIHJhY2Ugd2hlbiBtb3VudCBmYWlscyBpbiBjaWZzX2dldF9y
+b290KCkKYWM2MDJmMjhjNzBjIGNpZnM6IGRvIG5vdCB1c2UgdW5pbml0aWFsaXplZCBkYXRhIGlu
+IHRoZSBvd25lci9ncm91cCBzaWQKNWY0M2RjYzg0MmU2IGNpZnM6IGZpeCBzZXQgb2YgZ3JvdXAg
+U0lEIHZpYSBOVFNEIHhhdHRycwpkZTcxZDEwY2Q5ZWMgc21iMzogZml4IHNuYXBzaG90IG1vdW50
+IG9wdGlvbgpjYzdmYTA1OWMzZTkgY2lmczogbWFyayBzZXNzaW9ucyBmb3IgcmVjb25uZWN0aW9u
+IGluIGhlbHBlciBmdW5jdGlvbgpjZWY4YjMwNDk1MjQgY2lmczogY2FsbCBoZWxwZXIgZnVuY3Rp
+b25zIGZvciBtYXJraW5nIGNoYW5uZWxzIGZvciByZWNvbm5lY3QKYzRmZTFkMTViZDRhIGNpZnM6
+IGNhbGwgY2lmc19yZWNvbm5lY3Qgd2hlbiBhIGNvbm5lY3Rpb24gaXMgbWFya2VkCjI5NTMyOTY1
+ZmYwMCBpbXByb3ZlIGVycm9yIG1lc3NhZ2Ugd2hlbiBtb3VudCBvcHRpb25zIGNvbmZsaWN0IHdp
+dGggcG9zaXgKYzhmNjUyZjk2YWUxIGNpZnM6IGZpeCB3b3Jrc3RhdGlvbl9uYW1lIGZvciBtdWx0
+aXVzZXIgbW91bnRzCmFhOWUyNzAwOTc5MSBjaWZzOiB1bmxvY2sgY2hhbl9sb2NrIGJlZm9yZSBj
+YWxsaW5nIGNpZnNfcHV0X3RjcF9zZXNzaW9uCjAwYTYxNmYxMzNhNiBGaXggYSB3YXJuaW5nIGFi
+b3V0IGEgbWFsZm9ybWVkIGtlcm5lbCBkb2MgY29tbWVudCBpbiBjaWZzCjRmMTJiZTljOTRlMCBj
+aWZzOiB1cGRhdGUgaW50ZXJuYWwgbW9kdWxlIG51bWJlcgpkNjA0NjdlYmJmODAgc21iMzogc2Vu
+ZCBOVExNU1NQIHZlcnNpb24gaW5mb3JtYXRpb24KNmNhOGRkZWEwZmIzIGNpZnM6IGNpZnNfc2Vz
+X21hcmtfZm9yX3JlY29ubmVjdCBzaG91bGQgYWxzbyB1cGRhdGUgcmVjb25uZWN0IGJpdHMKZDE0
+NjJmMTUwNTBlIGNpZnM6IHVwZGF0ZSB0Y3BTdGF0dXMgZHVyaW5nIG5lZ290aWF0ZSBhbmQgc2Vz
+cyBzZXR1cAo4MjMzODc1YmRjZDEgY2lmczogbWFrZSBzdGF0dXMgY2hlY2tzIGluIHZlcnNpb24g
+aW5kZXBlbmRlbnQgY2FsbGVycwo3ODJlNjNiOGJjZGYgY2lmczogcmVtb3ZlIHJlcGVhdGVkIHN0
+YXRlIGNoYW5nZSBpbiBkZnMgdHJlZSBjb25uZWN0Cjg4MDI1NWI5YjkxZSBjaWZzOiBmaXggdGhl
+IGNpZnNfcmVjb25uZWN0IHBhdGggZm9yIERGUwo2YWMxZDBkODk0NWMgY2lmczogcmVtb3ZlIHVu
+dXNlZCB2YXJpYWJsZSBzZXNfc2VsZWN0ZWQKODJhZWYyZDkwNjNiIGNpZnM6IHByb3RlY3QgYWxs
+IGFjY2Vzc2VzIHRvIGNoYW5fKiB3aXRoIGNoYW5fbG9jawpiNTUzNGU2ODQyYjEgY2lmczogZml4
+IHRoZSBjb25uZWN0aW9uIHN0YXRlIHRyYW5zaXRpb25zIHdpdGggbXVsdGljaGFubmVsCjU0ZTAy
+ZTMyOTM3MCBjaWZzOiBjaGVjayByZWNvbm5lY3RzIGZvciBjaGFubmVscyBvZiBhY3RpdmUgdGNv
+bnMgdG9vCjc2NWJjNDMyM2U2ZiBzbWIzOiBhZGQgbmV3IGRlZmluZXMgZnJvbSBwcm90b2NvbCBz
+cGVjaWZpY2F0aW9uCmI3MTQ4YTY2OWI3MiBjaWZzOiBzZXJpYWxpemUgYWxsIG1vdW50IGF0dGVt
+cHRzCjg1MWNhODEzZDc3MyBjaWZzOiBxdWlyayBmb3IgU1RBVFVTX09CSkVDVF9OQU1FX0lOVkFM
+SUQgcmV0dXJuZWQgZm9yIG5vbi1BU0NJSSBkZnMgcmVmcwo3YTAyNmJiMzJjNGEgY2lmczogYWxs
+b2NfcGF0aF93aXRoX3RyZWVfcHJlZml4OiBkbyBub3QgYXBwZW5kIHNlcC4gaWYgdGhlIHBhdGgg
+aXMgZW1wdHkKNGEwNDljNTcwYzZhIGNpZnM6IGNsZWFuIHVwIGFuIGluY29uc2lzdGVudCBpbmRl
+bnRpbmcKMGE5ZTQ0ZDNiOGJjIGNpZnM6IGZyZWUgbnRsbXNzcGJsb2IgYWxsb2NhdGVkIGluIG5l
+Z290aWF0ZQplOGM0MDE5MTk0YmYgY2lmczogZml4IEZJTEVfQk9USF9ESVJFQ1RPUllfSU5GTyBk
+ZWZpbml0aW9uCmIyZGEyNmM3MWZkNiBjaWZzOiBtb3ZlIHN1cGVyYmxvY2sgbWFnaWMgZGVmaXRp
+b25zIHRvIG1hZ2ljLmgKOTBmZGM3OGZjNDE4IGNpZnM6IEZpeCBzbWIzMTFfdXBkYXRlX3ByZWF1
+dGhfaGFzaCgpIGtlcm5lbC1kb2MgY29tbWVudAowMGVlYjU4OTZjZWEgY2lmczogYXZvaWQgcmFj
+ZSBkdXJpbmcgc29ja2V0IHJlY29ubmVjdCBiZXR3ZWVuIHNlbmQgYW5kIHJlY3YKNDJlNjQwMTBk
+YmEyIGNpZnM6IG1haW50YWluIGEgc3RhdGUgbWFjaGluZSBmb3IgdGNwL3NtYi90Y29uIHNlc3Np
+b25zCjFkODZhNWI1MzBiYiBjaWZzOiBmaXggaGFuZyBvbiBjaWZzX2dldF9uZXh0X21pZCgpCmQ1
+Njg4OTc1NWRlOSBjaWZzOiB0YWtlIGNpZnNfdGNwX3Nlc19sb2NrIGZvciBzdGF0dXMgY2hlY2tz
+CjU1MmE3N2JmMTQxNSBjaWZzOiByZWNvbm5lY3Qgb25seSB0aGUgY29ubmVjdGlvbiBhbmQgbm90
+IHNtYiBzZXNzaW9uIHdoZXJlIHBvc3NpYmxlCmNlNzE4Njk0NDA3OSBjaWZzOiBhZGQgV0FSTl9P
+TiBmb3Igd2hlbiBjaGFuX2NvdW50IGdvZXMgYmVsb3cgbWluaW11bQo1ZWUxMDc1ZDc5MzkgY2lm
+czogYWRqdXN0IERlYnVnRGF0YSB0byB1c2UgY2hhbnNfbmVlZF9yZWNvbm5lY3QgZm9yIGNvbm4g
+c3RhdHVzCjhlMWM0N2M3OTQ5MSBjaWZzOiB1c2UgdGhlIGNoYW5zX25lZWRfcmVjb25uZWN0IGJp
+dG1hcCBmb3IgcmVjb25uZWN0IHN0YXR1cwo4NzRkYjhlMDNhYWQgY2lmczogdHJhY2sgaW5kaXZp
+ZHVhbCBjaGFubmVsIHN0YXR1cyB1c2luZyBjaGFuc19uZWVkX3JlY29ubmVjdApjMTZkYTk1NDFi
+NTEgY2lmczogcmVtb3ZlIHJlZHVuZGFudCBhc3NpZ25tZW50IHRvIHBvaW50ZXIgcApjZWRiNzFj
+MDIyZjAgY2lmczogc2FuaXRpemUgbXVsdGlwbGUgZGVsaW1pdGVycyBpbiBwcmVwYXRoCmU0ZTk4
+ZGQ1NjdlZCBjaWZzOiBpZ25vcmUgcmVzb3VyY2VfaWQgd2hpbGUgZ2V0dGluZyBmc2NhY2hlIHN1
+cGVyIGNvb2tpZQoxYmMzMWRhMjI4NjIgY2lmczogZml4IG50bG1zc3AgYXV0aCB3aGVuIHRoZXJl
+IGlzIG5vIGtleSBleGNoYW5nZQoyZDliZDlhYmI4ZDIgY2lmczogRml4IGNyYXNoIG9uIHVubG9h
+ZCBvZiBjaWZzX2FyYzQua28KNDMyYjgwN2U1YjBkIGNpZnM6IGF2b2lkIHVzZSBvZiBkc3RhZGRy
+IGFzIGtleSBmb3IgZnNjYWNoZSBjbGllbnQgY29va2llCmFiMDExNWM2YzE5YyBjaWZzOiBhZGQg
+c2VydmVyIGNvbm5faWQgdG8gZnNjYWNoZSBjbGllbnQgY29va2llCjE5NGYyMjRlMjYxYyBjaWZz
+OiB3YWl0IGZvciB0Y29uIHJlc291cmNlX2lkIGJlZm9yZSBnZXR0aW5nIGZzY2FjaGUgc3VwZXIK
+NDc5NzZlMGQxMmI4IGNpZnM6IGZpeCBtaXNzZWQgcmVmY291bnRpbmcgb2YgaXBjIHRjb24KM2Q5
+MzE2YjZhODliIGNpZnM6IHVwZGF0ZSBpbnRlcm5hbCB2ZXJzaW9uIG51bWJlcgowM2RhZDI0Yzdl
+NTYgc21iMjogY2xhcmlmeSByYyBpbml0aWFsaXphdGlvbiBpbiBzbWIyX3JlY29ubmVjdAo0ZTc2
+N2I5ZDg1NWIgY2lmczogcG9wdWxhdGUgc2VydmVyX2hvc3RuYW1lIGZvciBleHRyYSBjaGFubmVs
+cwpmMDEyN2NiZDMxNmIgY2lmczogbm9zaGFyZXNvY2sgc2hvdWxkIGJlIHNldCBvbiBuZXcgc2Vy
+dmVyCmZkNDU3NzNiMjgyMCBjaWZzOiBpbnRyb2R1Y2UgY2lmc19zZXNfbWFya19mb3JfcmVjb25u
+ZWN0KCkgaGVscGVyCmZiNWIxYjE4MWQ1OCBjaWZzOiBwcm90ZWN0IHNydl9jb3VudCB3aXRoIGNp
+ZnNfdGNwX3Nlc19sb2NrCjcwZTI0Y2ViZjQ2NyBjaWZzOiBtb3ZlIGRlYnVnIHByaW50IG91dCBv
+ZiBzcGlubG9jawo2YmZlMTg4ZDE1ZjcgY2lmczogZG8gbm90IGR1cGxpY2F0ZSBmc2NhY2hlIGNv
+b2tpZSBmb3Igc2Vjb25kYXJ5IGNoYW5uZWxzCjdiZGJlM2Q5Y2YyYSBjaWZzOiBjb25uZWN0IGlu
+ZGl2aWR1YWwgY2hhbm5lbCBzZXJ2ZXJzIHRvIHByaW1hcnkgY2hhbm5lbCBzZXJ2ZXIKMTBjYTUy
+YjE4MjUwIGNpZnM6IHByb3RlY3Qgc2Vzc2lvbiBjaGFubmVsIGZpZWxkcyB3aXRoIGNoYW5fbG9j
+awoxZjRiN2QzNDgxMDggY2lmczogZG8gbm90IG5lZ290aWF0ZSBzZXNzaW9uIGlmIHNlc3Npb24g
+YWxyZWFkeSBleGlzdHMKMmY3Zjk5YmIzNDhlIHNtYjM6IGRvIG5vdCBzZXR1cCB0aGUgZnNjYWNo
+ZV9zdXBlcl9jb29raWUgdW50aWwgZnNpbmZvIGluaXRpYWxpemVkCjdlNTdlMzc0MmQ3OCBjaWZz
+OiBmaXggcG90ZW50aWFsIHVzZS1hZnRlci1mcmVlIGJ1Z3MKNzQwZWIwM2FjZThhIGNpZnM6IGZp
+eCBtZW1vcnkgbGVhayBvZiBzbWIzX2ZzX2NvbnRleHRfZHVwOjpzZXJ2ZXJfaG9zdG5hbWUKYmI2
+ZDA1OTc4YjNlIHNtYjM6IGFkZCBhZGRpdGlvbmFsIG51bGwgY2hlY2sgaW4gU01CMzExX3Bvc2l4
+X21rZGlyCjlhYTM0MTlhNWFhOSBjaWZzOiByZWxlYXNlIGxvY2sgZWFybGllciBpbiBkZXF1ZXVl
+X21pZCBlcnJvciBjYXNlCmNiYjZjOTRkYTA3MSBzbWIzOiBhZGQgYWRkaXRpb25hbCBudWxsIGNo
+ZWNrIGluIFNNQjJfdGNvbgoyY2U1MDQxOTE4NjAgc21iMzogYWRkIGFkZGl0aW9uYWwgbnVsbCBj
+aGVjayBpbiBTTUIyX29wZW4KYTA4ZjgzNjRkOGE2IHNtYjM6IGFkZCBhZGRpdGlvbmFsIG51bGwg
+Y2hlY2sgaW4gU01CMl9pb2N0bApiNDc4ZjhkZTYyN2Mgc21iMzogcmVtb3ZlIHRyaXZpYWwgZGZz
+IGNvbXBpbGUgd2FybmluZwo1MmFlMmIzNmJmNjIgY2lmczogc3VwcG9ydCBuZXN0ZWQgZGZzIGxp
+bmtzIG92ZXIgcmVjb25uZWN0CmZmMzMwNzdmOWQxNiBzbWIzOiBkbyBub3QgZXJyb3Igb24gZnN5
+bmMgd2hlbiByZWFkb25seQplZjVjYjlmMjBiYzEgY2lmczogZm9yIGNvbXBvdW5kIHJlcXVlc3Rz
+LCB1c2Ugb3BlbiBoYW5kbGUgaWYgcG9zc2libGUKODcyODk1MDU5NmFhIGNpZnM6IHNldCBhIG1p
+bmltdW0gb2YgMTIwcyBmb3IgbmV4dCBkbnMgcmVzb2x1dGlvbgo4ZmNlMmJjNGU0MTMgY2lmczog
+c3BsaXQgb3V0IGRmcyBjb2RlIGZyb20gY2lmc19yZWNvbm5lY3QoKQpkMDlkZjI3M2FhMGEgY2lm
+czogY29udmVydCBsaXN0X2Zvcl9lYWNoIHRvIGVudHJ5IHZhcmlhbnQKNjIyNDE1ZDg2MTJkIGNp
+ZnM6IGludHJvZHVjZSBuZXcgaGVscGVyIGZvciBjaWZzX3JlY29ubmVjdCgpCjU2ZWYyMzFkZDZi
+OSBjaWZzOiBmaXggcHJpbnQgb2YgaGRyX2ZsYWdzIGluIGRmc2NhY2hlX3Byb2Nfc2hvdygpCjU4
+ZTEzY2QyZjdmMSBjaWZzOiBzZW5kIHdvcmtzdGF0aW9uIG5hbWUgZHVyaW5nIG50bG1zc3Agc2Vz
+c2lvbiBzZXR1cAo3MmE3ODMyZjRmMDMgY2lmczogbm9zaGFyZXNvY2sgc2hvdWxkIG5vdCBzaGFy
+ZSBzb2NrZXQgd2l0aCBmdXR1cmUgc2Vzc2lvbnMKZGJlMjkxYjk3OTU4IHNtYjM6IGFkZCBkeW5h
+bWljIHRyYWNlIHBvaW50cyBmb3Igc29ja2V0IGNvbm5lY3Rpb24KMDljNDY4MzAzZjIzIGNpZnM6
+IE1vdmUgU01CMl9DcmVhdGUgZGVmaW5pdGlvbnMgdG8gdGhlIHNoYXJlZCBhcmVhCjJjODA3YWIx
+NGMwMSBjaWZzOiBNb3ZlIG1vcmUgZGVmaW5pdGlvbnMgaW50byB0aGUgc2hhcmVkIGFyZWEKZjdk
+YzA0YzYzN2JkIGNpZnM6IG1vdmUgTkVHT1RJQVRFX1BST1RPQ09MIGRlZmluaXRpb25zIG91dCBp
+bnRvIHRoZSBjb21tb24gYXJlYQo2MWY1MGQyZDM2OTMgY2lmczogQ3JlYXRlIGEgbmV3IHNoYXJl
+ZCBmaWxlIGhvbGRpbmcgc21iMiBwZHUgZGVmaW5pdGlvbnMKNTU4OTg1NmUzZGFkIGNpZnM6IGFk
+ZCBtb3VudCBwYXJhbWV0ZXIgdGNwbm9kZWxheQpmZTMyZTI5ZDI0OWEgY2lmczogVG8gbWF0Y2gg
+ZmlsZSBzZXJ2ZXJzLCBtYWtlIHN1cmUgdGhlIHNlcnZlciBob3N0bmFtZSBtYXRjaGVzCgpSZWNl
+bnRseSBhZGRlZCBwYXRjaGVzOgowMTQ0LVNNQjMtRUJBREYtRUlPLWVycm9ycy1pbi1yZW5hbWUt
+b3Blbi1jYXVzZWQtYnktcmFjZS0ucGF0Y2gKMDE0NS1jaWZzLWZpeC1zaWduZWQtaW50ZWdlci1v
+dmVyZmxvdy13aGVuLWZsX2VuZC1pcy1PRkZTLnBhdGNoCjAxNDYtY2lmcy1kb24tdC1jYWxsLWNp
+ZnNfZGZzX3F1ZXJ5X2luZm9fbm9uYXNjaWlfcXVpcmstaS5wYXRjaAowMTQ3LWNpZnMtcmV0dXJu
+LUVOT0VOVC1mb3ItREZTLWxvb2t1cF9jYWNoZV9lbnRyeS5wYXRjaAowMTQ4LWNpZnMtcHJpbnQt
+VElEcy1hcy1oZXgucGF0Y2gKMDE0OS1jaWZzLW1vdmUtZGVmaW5pdGlvbi1vZi1jaWZzX2ZhdHRy
+LWVhcmxpZXItaW4tY2lmc2dsLnBhdGNoCjAxNTAtY2lmcy1jaGVjay1mb3Itc21iMS1pbi1vcGVu
+X2NhY2hlZF9kaXIucGF0Y2gKMDE1MS1jaWZzLXNldC10aGUtQ1JFQVRFX05PVF9GSUxFLXdoZW4t
+b3BlbmluZy10aGUtZGlyZWN0LnBhdGNoCjAxNTItY2lmcy1zbWJkLWZpeC10eXBvLWluLWNvbW1l
+bnQucGF0Y2gKMDE1My1zbWIzLWFkZC10cmFjZS1wb2ludC1mb3ItbGVhc2Utbm90LWZvdW5kLWlz
+c3VlLnBhdGNoCjAxNTQtY2lmcy1yZXR1cm4tdGhlLW1vcmUtbnVhbmNlZC13cml0ZWJhY2stZXJy
+b3Itb24tY2xvcy5wYXRjaAowMTU1LXNtYjMtYWRkLXRyYWNlLXBvaW50LWZvci1vcGxvY2stbm90
+LWZvdW5kLnBhdGNoCjAxNTYtQWRkLWRlZmluZXMtZm9yLXZhcmlvdXMtbmV3ZXItRlNDVExzLnBh
+dGNoCjAxNTctQWRkLXZhcmlvdXMtZnNjdGwtc3RydWN0cy5wYXRjaAowMTU4LWNpZnMtZml4LW1p
+bm9yLWNvbXBpbGUtd2FybmluZy5wYXRjaAowMTU5LXNtYjMtY2hlY2stZm9yLW51bGwtdGNvbi5w
+YXRjaAowMTYwLXNtYjMtZG9uLXQtc2V0LXJjLXdoZW4tdXNlZC1hbmQtdW5uZWVkZWQtaW4tcXVl
+cnlfaW4ucGF0Y2gKMDE2MS1zbWIzLWFkZC1tb3VudC1wYXJtLW5vc3BhcnNlLnBhdGNoCjAxNjIt
+Y2lmcy1kby1ub3QtdXNlLXRjcFN0YXR1cy1hZnRlci1uZWdvdGlhdGUtY29tcGxldGVzLnBhdGNo
+CjAxNjMtY2lmcy11c2UtbmV3LWVudW0tZm9yLXNlc19zdGF0dXMucGF0Y2gKMDE2NC1jaWZzLWF2
+b2lkLXBhcmFsbGVsLXNlc3Npb24tc2V0dXBzLW9uLXNhbWUtY2hhbm5lbC5wYXRjaAowMTY1LWNp
+ZnMtY2FjaGUtdGhlLWRpcmVudHMtZm9yLWVudHJpZXMtaW4tYS1jYWNoZWQtZGlyZWMucGF0Y2gK
+MDE2Ni1jaWZzLWZpeC1udGxtc3NwLW9uLW9sZC1zZXJ2ZXJzLnBhdGNoCjAxNjctc21iMy1yZW1v
+dmUtdW5uZWVkZWQtbnVsbC1jaGVjay1pbi1jaWZzX3JlYWRkaXIucGF0Y2gKMDE2OC1jaWZzLWZp
+eC1wb3RlbnRpYWwtZG91YmxlLWZyZWUtZHVyaW5nLWZhaWxlZC1tb3VudC5wYXRjaAowMTY5LWNp
+ZnMtcmVtb3ZlLXJlcGVhdGVkLWRlYnVnLW1lc3NhZ2Utb24tY2lmc19wdXRfc21iX3MucGF0Y2gK
+MDE3MC1jaWZzLXdoZW4tZXh0ZW5kaW5nLWEtZmlsZS13aXRoLWZhbGxvYy13ZS1zaG91bGQtbWFr
+LnBhdGNoCjAxNzEtY2lmcy1maXgtcG90ZW50aWFsLWRlYWRsb2NrLWluLWRpcmVjdC1yZWNsYWlt
+LnBhdGNoCjAxNzItY2lmcy1kby1ub3QtYnVpbGQtc21iMW9wcy1pZi1sZWdhY3ktc3VwcG9ydC1p
+cy1kaXNhYi5wYXRjaAowMTczLWNpZnMtdmVyc2lvbi1vcGVyYXRpb25zLWZvci1zbWIyMC11bm5l
+ZWRlZC13aGVuLWxlZ2EucGF0Y2gKMDE3NC1jaWZzLXVwZGF0ZS1pbnRlcm5hbC1tb2R1bGUtbnVt
+YmVyLnBhdGNoCjAxNzUtY2lmcy1za2lwLXRyYWlsaW5nLXNlcGFyYXRvcnMtb2YtcHJlZml4LXBh
+dGhzLnBhdGNoCjAxNzYtY2lmcy1maXgtdW5pbml0aWFsaXplZC1wb2ludGVyLWluLWVycm9yLWNh
+c2UtaW4tZGZzXy5wYXRjaAowMTc3LWNpZnMtZml4LXJlY29ubmVjdC1vbi1zbWIzLW1vdW50LXR5
+cGVzLnBhdGNoCjAxNzgtY2lmcy1yZXR1cm4tZXJyb3JzLWR1cmluZy1zZXNzaW9uLXNldHVwLWR1
+cmluZy1yZWNvbi5wYXRjaAowMTgxLWNpZnMtcG9wdWxhdGUtZW1wdHktaG9zdG5hbWVzLWZvci1l
+eHRyYS1jaGFubmVscy5wYXRjaAowMTgyLXNtYjMtYWRkLXRyYWNlLXBvaW50LWZvci1TTUIyX3Nl
+dF9lb2YucGF0Y2gKMDE4My1jaWZzLXdoZW4tYS1jaGFubmVsLWlzLW5vdC1mb3VuZC1mb3Itc2Vy
+dmVyLWxvZy1pdHMtLnBhdGNoCjAxODQtc21iMy1maXgtZW1wdHktbmV0bmFtZS1jb250ZXh0LW9u
+LXNlY29uZGFyeS1jaGFubmVscy5wYXRjaAowMTg1LXNtYjMtdXNlLW5ldG5hbWUtd2hlbi1hdmFp
+bGFibGUtb24tc2Vjb25kYXJ5LWNoYW5uZWwucGF0Y2gKMDE4Ni1jaWZzLWNoYW5nZS1pZmFjZV9s
+aXN0LWZyb20tYXJyYXktdG8tc29ydGVkLWxpbmtlZC1sLnBhdGNoCjAxODctY2lmcy1kdXJpbmct
+cmVjb25uZWN0LXVwZGF0ZS1pbnRlcmZhY2UtaWYtbmVjZXNzYXJ5LnBhdGNoCjAxODgtY2lmcy1w
+ZXJpb2RpY2FsbHktcXVlcnktbmV0d29yay1pbnRlcmZhY2VzLWZyb20tc2Vydi5wYXRjaAowMTg5
+LWNpZnMtYXZvaWQtZGVhZGxvY2tzLXdoaWxlLXVwZGF0aW5nLWlmYWNlLnBhdGNoCjAxOTAtY2lm
+cy11cGRhdGUtY2lmc19zZXMtaXBfYWRkci1hZnRlci1mYWlsb3Zlci5wYXRjaAowMTkxLWNpZnMt
+Zml4LXJhY2UtY29uZGl0aW9uLXdpdGgtZGVsYXllZC10aHJlYWRzLnBhdGNoCjAxOTItY2lmcy1y
+ZW1vdmUtdW5uZWNlc3NhcnktbG9ja2luZy1vZi1jaGFuX2xvY2std2hpbGUtZi5wYXRjaAowMTkz
+LXNtYjMtd29ya2Fyb3VuZC1uZWdwcm90LWJ1Zy1pbi1zb21lLVNhbWJhLXNlcnZlcnMucGF0Y2gK
+MDE5NC1zbWIzLWNoZWNrLXhhdHRyLXZhbHVlLWxlbmd0aC1lYXJsaWVyLnBhdGNoCjAxOTUtY2lm
+cy1yZW1vdmUtcmVkdW5kYW50LWluaXRpYWxpemF0aW9uLXRvLXZhcmlhYmxlLW1udC5wYXRjaAow
+MTk2LWNpZnMtcmVtb3ZlLXVubmVjZXNzYXJ5LXR5cGUtY2FzdGluZ3MucGF0Y2gKMDE5Ny1jaWZz
+LXJlbW92ZS11bm5lY2Vzc2FyeS12b2lkLWNvbnZlcnNpb25zLnBhdGNoCjAxOTgtY2lmcy1yZW1v
+dmUtc29tZS1jYW1lbENhc2UtYW5kLWFsc28tc29tZS1zdGF0aWMtYnVpbC5wYXRjaAowMTk5LWNp
+ZnMtcmVtb3ZlLW1pbm9yLWJ1aWxkLXdhcm5pbmcucGF0Y2gKCkJlbG93IGlzIHRoZSBsaXN0IG9m
+IHRoZSAyNCBwYXRjaGVzIG5vdCBiYWNrcG9ydGVkIChtb3N0bHkgZHVlIHRvCmRlcGVuZGVuY2ll
+cyBvbiBvdGhlciBnbG9iYWwgY2hhbmdlcyBub3QgaW4gNS4xNSwgc3VjaCBhcyBmb2xpb3MpOgow
+MDAxLWZzLWdldC1yaWQtb2YtdGhlLXJlczItaW9jYi1raV9jb21wbGV0ZS1hcmd1bWVudC5wYXRj
+aAowMDQ1LWV4aXQtUmVuYW1lLW1vZHVsZV9wdXRfYW5kX2V4aXQtdG8tbW9kdWxlX3B1dF9hbmRf
+a3QucGF0Y2gKMDA1NC1mc2NhY2hlLWNhY2hlZmlsZXMtRGlzYWJsZS1jb25maWd1cmF0aW9uLnBh
+dGNoCjAwNzctY2lmcy1TdXBwb3J0LWZzY2FjaGUtaW5kZXhpbmctcmV3cml0ZS5wYXRjaAowMDgy
+LWNpZnMtVHJhbnNpdGlvbi1mcm9tLXJlYWRwYWdlcy10by1yZWFkYWhlYWQucGF0Y2gKMDA4My1j
+aWZzLUltcGxlbWVudC1jYWNoZS1JLU8tYnktYWNjZXNzaW5nLXRoZS1jYWNoZS1kaXJlLnBhdGNo
+CjAwODQtY2lmcy1GaXgtdGhlLXJlYWRhaGVhZC1jb252ZXJzaW9uLXRvLW1hbmFnZS10aGUtYmF0
+Yy5wYXRjaAowMDg1LUludmFsaWRhdGUtZnNjYWNoZS1jb29raWUtb25seS13aGVuLWlub2RlLWF0
+dHJpYnV0ZXMucGF0Y2gKMDA5OC1jaWZzLUNvbnZlcnQtZnJvbS1pbnZhbGlkYXRlcGFnZS10by1p
+bnZhbGlkYXRlX2ZvbGlvLnBhdGNoCjAwOTktY2lmcy1Db252ZXJ0LWZyb20tbGF1bmRlcl9wYWdl
+LXRvLWxhdW5kZXJfZm9saW8ucGF0Y2gKMDEwMC1mc2NhY2hlLUNvbnZlcnQtZnNjYWNoZV9zZXRf
+cGFnZV9kaXJ0eS10by1mc2NhY2hlX2RpLnBhdGNoCjAxMDItZnNjYWNoZS1leHBvcnQtZnNjYWNo
+ZV9lbmRfb3BlcmF0aW9uLnBhdGNoCjAxMDMtbmV0ZnMtQWRkLWEtbmV0ZnMtaW5vZGUtY29udGV4
+dC5wYXRjaAowMTEwLWNpZnMtd3JpdGViYWNrLWZpeC5wYXRjaAowMTExLWZzLWFsbG9jYXRlLWlu
+b2RlLWJ5LXVzaW5nLWFsbG9jX2lub2RlX3NiLnBhdGNoCjAxMjgtUkRNQS1TcGxpdC1rZXJuZWwt
+b25seS1nbG9iYWwtZGV2aWNlLWNhcHMtZnJvbS11dmVyYi5wYXRjaAowMTM4LWZzLVJlbW92ZS1h
+b3AtZmxhZ3MtcGFyYW1ldGVyLWZyb20tZ3JhYl9jYWNoZV9wYWdlX3cucGF0Y2gKMDEzOS1mcy1S
+ZW1vdmUtZmxhZ3MtcGFyYW1ldGVyLWZyb20tYW9wcy13cml0ZV9iZWdpbi5wYXRjaAowMTQwLWNp
+ZnMtQ29udmVydC1jaWZzLXRvLXJlYWRfZm9saW8ucGF0Y2gKMDE0MS1tbS1tb3ZlLXJlc3BvbnNp
+YmlsaXR5LWZvci1zZXR0aW5nLVNXUF9GU19PUFMtdG8tc3dhLnBhdGNoCjAxNDItbW0taW50cm9k
+dWNlLXN3YXBfcnctYW5kLXVzZS1pdC1mb3ItcmVhZHMtZnJvbS1TV1BfRi5wYXRjaAowMTQzLWNp
+ZnMtQ29udmVydC10by1yZWxlYXNlX2ZvbGlvLnBhdGNoCjAxNzktbmV0ZnMtRml4LWdjYy0xMi13
+YXJuaW5nLWJ5LWVtYmVkZGluZy12ZnMtaW5vZGUtaW4tbi5wYXRjaAowMTgwLW5ldGZzLUZ1cnRo
+ZXItY2xlYW51cHMtYWZ0ZXItc3RydWN0LW5ldGZzX2lub2RlLXdyYXAucGF0Y2gK
+--000000000000c6567805e44a35b0--
