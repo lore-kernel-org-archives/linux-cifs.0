@@ -2,99 +2,98 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CEA6C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jul 2022 15:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DAFC43334
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jul 2022 20:47:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229658AbiGUP2U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 21 Jul 2022 11:28:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41170 "EHLO
+        id S229498AbiGUUra (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 21 Jul 2022 16:47:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiGUP2T (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Jul 2022 11:28:19 -0400
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC24A7E834;
-        Thu, 21 Jul 2022 08:28:18 -0700 (PDT)
-Received: by mail-vk1-xa33.google.com with SMTP id o10so879923vkl.3;
-        Thu, 21 Jul 2022 08:28:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=2ABOAhbNUvDmFBr5+kPISE8py0yDxYD2k6gjXgSabzw=;
-        b=dBP3D2j7Zbfyd9lBMrfA3+rBVYUf1xyi3KeCVbhGycv18vrz+uD2EUIG/ljS0fQ5ii
-         gQGN18QnCtOtTaoNVF24jzmPKWWy41TxcwDAA2KtIRtKSufoN7g+HcUk1VAUF4iQqS/l
-         QOfxLMMChEtlQaS37rk0/fRxItkRu/6XKXWWgqEyDuns5jC72HuKUCBp6Wc+6tWhs1fy
-         oea4UuyrjTpJAGftjfEgY+nhUHLAR2ZJyC9mrNRm4sC0YSyxucCfkCs8SH7+n0CPUBer
-         b6Gm1PSZJB9mqbBgPITOkYAsCavkWlwU62tvQUb+x5um7PczfjyFyG9zgjg4xojJIbFp
-         x1tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=2ABOAhbNUvDmFBr5+kPISE8py0yDxYD2k6gjXgSabzw=;
-        b=TP7WSfPjcB/mQddHl8by3Cbgm83pAwgyHHTah4KqXEh8wvQwKMumjs3s/yAY3nCwyS
-         xtRse0wAsmwDp2F9Q7eGMPIOWxgsk5f7qog9CifCv1nYiWnWoYPYriYxcO4kjkGaaTeF
-         22W5RhqRlbghOprwaqFZ+ZSN9uqqyuYkEEojpFrix6nIRmSJdcMvgR61x6XeM5R+SPx5
-         RBqHGov9yQbgK3zgyNU5zvuK+r/O1qFRp198lC1u57qEhGdRraho5338x2XnrgisyzT1
-         w/lexvR82aMfmD04+8fxxFlOattXabCacJZFknx8p/IKJT0uWP9kU4QaafD0KBV2SAlo
-         W+QQ==
-X-Gm-Message-State: AJIora9fvqJhtq0jQ0jaHI+jRm+/mLMrdz2Z/vc5leCJKThg9IcTCFnQ
-        Gj+om3pd2f4KzFkBIgR9p+ODxBXAjDmHgkv2AcfDn1MurIPA4A==
-X-Google-Smtp-Source: AGRyM1vNMcqyiN2b4w6Eng0CYE9EaMj0cXEOhZIVlptz/ytKraa77603uWNjtnllPoz3OreWA3lwHzbbHZ0gcAFn0mo=
-X-Received: by 2002:a05:6122:11a9:b0:374:8a3d:ba60 with SMTP id
- y9-20020a05612211a900b003748a3dba60mr15397442vkn.24.1658417297616; Thu, 21
- Jul 2022 08:28:17 -0700 (PDT)
+        with ESMTP id S231548AbiGUUr3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Jul 2022 16:47:29 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F230F8F510
+        for <linux-cifs@vger.kernel.org>; Thu, 21 Jul 2022 13:47:28 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8A4851FD9B;
+        Thu, 21 Jul 2022 20:47:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1658436447; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=73lzAwXRSv0ZF6TFI5a9UkyHtnxsNhLwNEDLV+y9pTw=;
+        b=d5CTtu9+FbsqaBl8PWKWw78oPWsO6aVvtie3agg+F58NR8FvwhSygiZ1O28CXPiJeXa3oq
+        56TUHDOE/2GNlqD9+Ub4srsbxS7Ibzw8EMB/j+ZTyCHeUWf5Q0QGTpnB7S8SarA9w+VNfd
+        oJ4Q2ofPt4FYW5csB+8ynyPlIDuQKP4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1658436447;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=73lzAwXRSv0ZF6TFI5a9UkyHtnxsNhLwNEDLV+y9pTw=;
+        b=FBNvopexkYuTisW3mxh5K3jyh2I6jqeMnrVWia83TWQuuhDuuHjEovVWMgIqGBnkGx0sx9
+        ktlCpG3ddsEyTfCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0C2B513A1B;
+        Thu, 21 Jul 2022 20:47:26 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id SOMvMF672WICVQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Thu, 21 Jul 2022 20:47:26 +0000
+Date:   Thu, 21 Jul 2022 17:47:24 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>
+Subject: Re: [PATCH] smb2: small refactor in smb2_check_message()
+Message-ID: <20220721204548.vkuxqyx3qpyruvme@cyberdelia>
+References: <20220719173151.12068-1-ematsumiya@suse.de>
+ <20220719173151.12068-2-ematsumiya@suse.de>
+ <CAH2r5msRkJLLL2my8PstV=MatuY-6dWmqmEZFEuJq-mfRDz7qQ@mail.gmail.com>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 21 Jul 2022 10:28:06 -0500
-Message-ID: <CAH2r5msxJU+nTN14LSd6tmFtpgRY4o+-SVktHoqoeD03XepUPw@mail.gmail.com>
-Subject: [PATCH][CIFS] update MAINTAINERS files with reviewers for cifs.ko
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000ea5d4205e4525dba"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAH2r5msRkJLLL2my8PstV=MatuY-6dWmqmEZFEuJq-mfRDz7qQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000ea5d4205e4525dba
-Content-Type: text/plain; charset="UTF-8"
+On 07/20, Steve French wrote:
+>I don't have any objections to this but wondering what prompted the
+>patch? Did you see an error logged with ioctls? You mention:
+>
+>"SMB2_IOCTL, OutputLength and OutputContext are optional and can be zero"
 
-And also correct the URL for the project web site. See attached.
+No errors, it's just that when the IOCTL have a 0 len, there can be
+several messages printed when debugging. It wasn't that much, but enough
+to get me confused several times.
+
+Since they were completely unnecessary, I thought it was ok to not print it.
+
+>And did you want to change the pr_warn_once to a pr_warn on the
+>mismatch since you had a case where server was frequently returning
+>frame with bad length and you want to debug it?
+
+Yes. I'm always getting a lot of those mismatched length calculations
+(Windows Server 2019). After investigating, I found that they were not
+real mismatches (see below).
+
+>I am a little worried that it could cause log spam if some server has
+>a bug in smb3 response length.
+
+Yes, it could, but as I mention in the commit message, this would only
+happen on the *real* mismatched cases, i.e. after passing all the checks
+inside the "if (len != calc_len)" check. In those cases, I'd prefer to
+really be aware of them then risk it getting lost in dmesg.
 
 
+Cheers,
 
--- 
-Thanks,
-
-Steve
-
---000000000000ea5d4205e4525dba
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-update-MAINTAINERS-file-with-reviewers.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-update-MAINTAINERS-file-with-reviewers.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l5v6tt6s0>
-X-Attachment-Id: f_l5v6tt6s0
-
-RnJvbSA1NzY1NjQ4NzQ2M2IzN2E5MzE0ZjM5ZDczY2QwZmNlNjM3MTM3NzIyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFRodSwgMjEgSnVsIDIwMjIgMTA6MjI6NDggLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiB1cGRhdGUgTUFJTlRBSU5FUlMgZmlsZSB3aXRoIHJldmlld2VycwoKQW5kIGFsc28gY29y
-cmVjdCB0aGUgVVJMIGZvciB0aGUgcHJvamVjdCB3ZWIgc2l0ZS4KClNpZ25lZC1vZmYtYnk6IFN0
-ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBNQUlOVEFJTkVSUyB8IDcg
-KysrKystLQogMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9NQUlOVEFJTkVSUyBiL01BSU5UQUlORVJTCmluZGV4IDY1MTYxNmVkOGFl
-Mi4uODVmMWRkODUxODEyIDEwMDY0NAotLS0gYS9NQUlOVEFJTkVSUworKysgYi9NQUlOVEFJTkVS
-UwpAQCAtNTA1NSwxMiArNTA1NSwxNSBAQCBGOglpbmNsdWRlL2xpbnV4L2Nsay8KIEY6CWluY2x1
-ZGUvbGludXgvb2ZfY2xrLmgKIFg6CWRyaXZlcnMvY2xrL2Nsa2Rldi5jCiAKLUNPTU1PTiBJTlRF
-Uk5FVCBGSUxFIFNZU1RFTSBDTElFTlQgKENJRlMpCitDT01NT04gSU5URVJORVQgRklMRSBTWVNU
-RU0gQ0xJRU5UIChDSUZTIGFuZCBTTUIzKQogTToJU3RldmUgRnJlbmNoIDxzZnJlbmNoQHNhbWJh
-Lm9yZz4KK1I6CVBhdWxvIEFsY2FudGFyYSA8cGNAY2pyLm56PiAoREZTLCBnbG9iYWwgbmFtZSBz
-cGFjZSkKK1I6CVJvbm5pZSBTYWhsYmVyZyA8bHNhaGxiZXJAcmVkaGF0LmNvbT4gKGRpcmVjdG9y
-eSBsZWFzZXMsIHNwYXJzZSBmaWxlcykKK1I6CVNoeWFtIFByYXNhZCBOIDxzcHJhc2FkQG1pY3Jv
-c29mdC5jb20+IChtdWx0aWNoYW5uZWwpCiBMOglsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZwog
-TDoJc2FtYmEtdGVjaG5pY2FsQGxpc3RzLnNhbWJhLm9yZyAobW9kZXJhdGVkIGZvciBub24tc3Vi
-c2NyaWJlcnMpCiBTOglTdXBwb3J0ZWQKLVc6CWh0dHA6Ly9saW51eC1jaWZzLnNhbWJhLm9yZy8K
-K1c6CWh0dHBzOi8vd2lraS5zYW1iYS5vcmcvaW5kZXgucGhwL0xpbnV4Q0lGUwogVDoJZ2l0IGdp
-dDovL2dpdC5zYW1iYS5vcmcvc2ZyZW5jaC9jaWZzLTIuNi5naXQKIEY6CURvY3VtZW50YXRpb24v
-YWRtaW4tZ3VpZGUvY2lmcy8KIEY6CWZzL2NpZnMvCi0tIAoyLjM0LjEKCg==
---000000000000ea5d4205e4525dba--
+Enzo
