@@ -2,59 +2,59 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4368DC43334
-	for <linux-cifs@archiver.kernel.org>; Sun, 24 Jul 2022 15:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5812C43334
+	for <linux-cifs@archiver.kernel.org>; Sun, 24 Jul 2022 15:12:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231613AbiGXPMh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 24 Jul 2022 11:12:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57066 "EHLO
+        id S229711AbiGXPMq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 24 Jul 2022 11:12:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230469AbiGXPMf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 24 Jul 2022 11:12:35 -0400
+        with ESMTP id S229640AbiGXPMp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 24 Jul 2022 11:12:45 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A993211159
-        for <linux-cifs@vger.kernel.org>; Sun, 24 Jul 2022 08:12:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0F010FC4
+        for <linux-cifs@vger.kernel.org>; Sun, 24 Jul 2022 08:12:41 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 624C235066;
-        Sun, 24 Jul 2022 15:12:31 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B28CF35066;
+        Sun, 24 Jul 2022 15:12:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1658675551; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1658675559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PoJyoQlq3v7CZoZ//ozFrg6ZGBUlW2BmspGsQ1fHQFA=;
-        b=P9pzXy0IO4hLRJfv1pUPe64SFOhTO9IEBythge7lAgi83nTA4qw12scfgRuY2pQ+WwzYzj
-        UTtf4XHlV7pcJhgvNSoskjeYsC1Jf5QZ6yV3ZZFJ10iUtNuuDqszyBsjqbTVviRiPXhveI
-        rI65ZsYp4iuntn+N7TdSVy6at0QnXo0=
+        bh=WBZdal7gGPsSY+bH8sEouahPuMrwOtVXUYueC3vp5LQ=;
+        b=l/LTQadWazmpY2oHGz94av2qbPKwrxM0JlFNo57gCO8IvqcSA9IN4rZkkeryxhEVdTWRCT
+        7is3GeSZS6l3aA2ES0HdYhFCABVJcTRiRMK/1hIPHpXdidknMURK0wuCRXP544tEDdmzEq
+        I3t/uMG/CbRpo8xDnYpZk8n4HR4VCO0=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1658675551;
+        s=susede2_ed25519; t=1658675559;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PoJyoQlq3v7CZoZ//ozFrg6ZGBUlW2BmspGsQ1fHQFA=;
-        b=G95GeYp9vzzmkM2V3LW6qDNtrajp4Gx+f/KUdLSYNSa6AfjTR0psxKYVToA2oeJ7YQW4sv
-        m9kK+5b6XQ6HiADw==
+        bh=WBZdal7gGPsSY+bH8sEouahPuMrwOtVXUYueC3vp5LQ=;
+        b=O7trB1VnufiDko/9+J0ItZxMo17TjJJZXoDADXvU9MtHlhreXinXzTd0uh5K1fftJ4ZrBN
+        iTeaf5q9DdTc2FCg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 58A6513A8D;
-        Sun, 24 Jul 2022 15:12:30 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A763213A8D;
+        Sun, 24 Jul 2022 15:12:38 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id G4ChBl5h3WJkMQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Sun, 24 Jul 2022 15:12:30 +0000
+        id kQOyGWZh3WJxMQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Sun, 24 Jul 2022 15:12:38 +0000
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
         nspmangalore@gmail.com
-Subject: [RFC PATCH 12/14] cifs: rename list_head fields
-Date:   Sun, 24 Jul 2022 12:11:35 -0300
-Message-Id: <20220724151137.7538-13-ematsumiya@suse.de>
+Subject: [RFC PATCH 14/14] cifs: rename more list_heads, remove redundant prefixes
+Date:   Sun, 24 Jul 2022 12:11:37 -0300
+Message-Id: <20220724151137.7538-15-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20220724151137.7538-1-ematsumiya@suse.de>
 References: <20220724151137.7538-1-ematsumiya@suse.de>
@@ -64,1964 +64,2316 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Rename list_head fields for several structs to give more meaning and/or
-set some standard for all cifs.ko structs.
+Rename more list_heads to better represent whether they're a list entry
+or a "real" list.
+
+Remove smb_rqst "rq_" field prefixes.
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/cifs/cifs_debug.c    |  38 ++++----
- fs/cifs/cifsfs.c        |   6 +-
- fs/cifs/cifsglob.h      |  68 +++++++--------
- fs/cifs/cifssmb.c       |  10 +--
- fs/cifs/connect.c       |  48 +++++-----
- fs/cifs/dfs_cache.c     |   6 +-
- fs/cifs/file.c          | 188 ++++++++++++++++++++--------------------
- fs/cifs/ioctl.c         |   4 +-
- fs/cifs/misc.c          |  65 +++++++-------
- fs/cifs/readdir.c       |   4 +-
- fs/cifs/sess.c          |   8 +-
- fs/cifs/smb1ops.c       |   4 +-
- fs/cifs/smb2file.c      |  14 +--
- fs/cifs/smb2misc.c      |  32 +++----
- fs/cifs/smb2ops.c       |  31 ++++---
- fs/cifs/smb2pdu.c       |   4 +-
- fs/cifs/smb2transport.c |  10 +--
- fs/cifs/transport.c     |   8 +-
- 18 files changed, 273 insertions(+), 275 deletions(-)
+ fs/cifs/cifsencrypt.c   |  30 +++----
+ fs/cifs/cifsglob.h      |  14 +--
+ fs/cifs/cifssmb.c       |  36 ++++----
+ fs/cifs/connect.c       |   8 +-
+ fs/cifs/dfs_cache.c     | 158 ++++++++++++++++----------------
+ fs/cifs/dfs_cache.h     |  40 ++++-----
+ fs/cifs/misc.c          |  10 +--
+ fs/cifs/smb1ops.c       |   2 +-
+ fs/cifs/smb2inode.c     |  52 +++++------
+ fs/cifs/smb2ops.c       | 184 ++++++++++++++++++-------------------
+ fs/cifs/smb2pdu.c       | 194 ++++++++++++++++++++--------------------
+ fs/cifs/smb2transport.c |  28 +++---
+ fs/cifs/smbdirect.c     |  18 ++--
+ fs/cifs/transport.c     |  64 ++++++-------
+ 14 files changed, 419 insertions(+), 419 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 0c08166f8f30..8c8e33642fdd 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -56,7 +56,7 @@ void cifs_dump_mids(struct cifs_server_info *server)
- 
- 	cifs_dbg(VFS, "Dump pending requests:\n");
- 	spin_lock(&g_mid_lock);
--	list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
-+	list_for_each_entry(mid_entry, &server->pending_mid_q, head) {
- 		cifs_dbg(VFS, "State: %d Cmd: %d Pid: %d Cbdata: %p Mid %llu\n",
- 			 mid_entry->mid_state,
- 			 le16_to_cpu(mid_entry->command),
-@@ -182,11 +182,12 @@ static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
- 	seq_printf(m, " <filename>\n");
- #endif /* CIFS_DEBUG2 */
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(server, &g_servers_list, server_head) {
--		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
--				spin_lock(&tcon->open_file_lock);
--				list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-+	list_for_each_entry(server, &g_servers_list, head) {
-+		list_for_each_entry(ses, &server->ses_list, head) {
-+			list_for_each_entry(tcon, &ses->tcon_list, head) {
-+				spin_lock(&tcon->open_files_lock);
-+				list_for_each_entry(cfile, &tcon->open_files_list,
-+						    tcon_head) {
- 					seq_printf(m,
- 						"0x%x 0x%llx 0x%x %d %d %d %pd",
- 						tcon->tid,
-@@ -202,7 +203,7 @@ static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
- 					seq_printf(m, "\n");
- #endif /* CIFS_DEBUG2 */
- 				}
--				spin_unlock(&tcon->open_file_lock);
-+				spin_unlock(&tcon->open_files_lock);
- 			}
- 		}
- 	}
-@@ -268,7 +269,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 
- 	c = 0;
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(server, &g_servers_list, server_head) {
-+	list_for_each_entry(server, &g_servers_list, head) {
- 		/* channel info will be printed as a part of sessions below */
- 		if (CIFS_SERVER_IS_CHAN(server))
- 			continue;
-@@ -375,7 +376,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 
- 		seq_printf(m, "\n\n\tSessions: ");
- 		i = 0;
--		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+		list_for_each_entry(ses, &server->ses_list, head) {
- 			i++;
- 			if ((ses->serverDomain == NULL) ||
- 				(ses->serverOS == NULL) ||
-@@ -439,7 +440,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			else
- 				seq_puts(m, "none\n");
- 
--			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+			list_for_each_entry(tcon, &ses->tcon_list, head) {
- 				++j;
- 				seq_printf(m, "\n\t%d) ", j);
- 				cifs_debug_tcon(m, tcon);
-@@ -450,8 +451,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 				seq_printf(m, "\n\n\tServer interfaces: %zu",
- 					   ses->iface_count);
- 			j = 0;
--			list_for_each_entry(iface, &ses->iface_list,
--						 iface_head) {
-+			list_for_each_entry(iface, &ses->iface_list, head) {
- 				seq_printf(m, "\n\t%d)", ++j);
- 				cifs_dump_iface(m, iface);
- 				if (is_ses_using_iface(ses, iface))
-@@ -464,7 +464,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 
- 		seq_puts(m, "\n\n\tMIDs: ");
- 		spin_lock(&g_mid_lock);
--		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
-+		list_for_each_entry(mid_entry, &server->pending_mid_q, head) {
- 			seq_printf(m, "\n\tState: %d com: %d pid:"
- 					" %d cbdata: %p mid %llu\n",
- 					mid_entry->mid_state,
-@@ -512,7 +512,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- 		g_current_xid = 0;
- 		spin_unlock(&g_mid_lock);
- 		spin_lock(&g_servers_lock);
--		list_for_each_entry(server, &g_servers_list, server_head) {
-+		list_for_each_entry(server, &g_servers_list, head) {
- 			server->max_in_flight = 0;
- #ifdef CONFIG_CIFS_STATS2
- 			for (i = 0; i < NUMBER_OF_SMB2_COMMANDS; i++) {
-@@ -523,8 +523,8 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- 				server->fastest_cmd[0] = 0;
- 			}
- #endif /* CONFIG_CIFS_STATS2 */
--			list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--				list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+			list_for_each_entry(ses, &server->ses_list, head) {
-+				list_for_each_entry(tcon, &ses->tcon_list, head) {
- 					atomic_set(&tcon->num_smbs_sent, 0);
- 					spin_lock(&tcon->stat_lock);
- 					tcon->bytes_read = 0;
-@@ -579,7 +579,7 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
- 
- 	i = 0;
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(server, &g_servers_list, server_head) {
-+	list_for_each_entry(server, &g_servers_list, head) {
- 		seq_printf(m, "\nMax requests in flight: %d", server->max_in_flight);
- #ifdef CONFIG_CIFS_STATS2
- 		seq_puts(m, "\nTotal time spent processing by command. Time ");
-@@ -598,8 +598,8 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
- 					atomic_read(&server->smb2slowcmd[j]),
- 					server->hostname, j);
- #endif /* STATS2 */
--		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+		list_for_each_entry(ses, &server->ses_list, head) {
-+			list_for_each_entry(tcon, &ses->tcon_list, head) {
- 				i++;
- 				seq_printf(m, "\n%d) %s", i, tcon->treeName);
- 				if (tcon->need_reconnect)
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 5bb51b8cd3bd..497b64acf899 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -391,7 +391,7 @@ cifs_alloc_inode(struct super_block *sb)
- 	cinode->uniqueid = 0;
- 	cinode->createtime = 0;
- 	cinode->epoch = 0;
--	spin_lock_init(&cinode->open_file_lock);
-+	spin_lock_init(&cinode->open_files_lock);
- 	generate_random_uuid(cinode->lease_key);
- 
- 	/*
-@@ -399,8 +399,8 @@ cifs_alloc_inode(struct super_block *sb)
- 	 * by the VFS.
- 	 */
- 	/* cinode->netfs.inode.i_flags = S_NOATIME | S_NOCMTIME; */
--	INIT_LIST_HEAD(&cinode->openFileList);
--	INIT_LIST_HEAD(&cinode->llist);
-+	INIT_LIST_HEAD(&cinode->open_files_list);
-+	INIT_LIST_HEAD(&cinode->fid_locks_list);
- 	INIT_LIST_HEAD(&cinode->deferred_closes);
- 	spin_lock_init(&cinode->deferred_lock);
- 	return &cinode->netfs.inode;
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index e2c6cbacb6d5..03837f5781db 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -603,8 +603,8 @@ inc_rfc1001_len(void *buf, int count)
- }
- 
- struct cifs_server_info {
--	struct list_head server_head;
--	struct list_head smb_ses_list;
-+	struct list_head head;
-+	struct list_head ses_list;
- 	__u64 conn_id; /* connection identifier (useful for debugging) */
- 	int srv_count; /* reference counter */
- 	/* 15 character server name + 0x20 16th byte indicating type = srv */
-@@ -936,7 +936,7 @@ static inline void cifs_set_net_ns(struct cifs_server_info *srv, struct net *net
- #endif
- 
- struct cifs_server_iface {
--	struct list_head iface_head;
-+	struct list_head head;
- 	struct kref refcount;
- 	size_t speed;
- 	unsigned int rdma_capable : 1;
-@@ -952,7 +952,7 @@ release_iface(struct kref *ref)
- 	struct cifs_server_iface *iface = container_of(ref,
- 						       struct cifs_server_iface,
- 						       refcount);
--	list_del_init(&iface->iface_head);
-+	list_del_init(&iface->head);
- 	kfree(iface);
- }
- 
-@@ -1004,7 +1004,7 @@ struct cifs_chan {
-  * Session structure.  One of these for each uid session with a particular host
-  */
- struct cifs_ses {
--	struct list_head smb_ses_list;
-+	struct list_head head;
- 	struct list_head rlist; /* reconnect list */
- 	struct list_head tcon_list;
- 	struct cifs_tcon *tcon_ipc;
-@@ -1126,7 +1126,7 @@ struct cifs_fattr {
- };
- 
- struct cached_dirent {
--	struct list_head entry;
-+	struct list_head head;
- 	char *name;
- 	int namelen;
- 	loff_t pos;
-@@ -1166,13 +1166,13 @@ struct cached_fid {
-  * session
-  */
- struct cifs_tcon {
--	struct list_head tcon_list;
-+	struct list_head head;
- 	int tc_count;
- 	struct list_head rlist; /* reconnect list */
- 	atomic_t num_local_opens;  /* num of all opens including disconnected */
- 	atomic_t num_remote_opens; /* num of all network opens on server */
--	struct list_head openFileList;
--	spinlock_t open_file_lock; /* protects list above */
-+	struct list_head open_files_list;
-+	spinlock_t open_files_lock; /* protects list above */
- 	struct cifs_ses *ses;	/* pointer to session associated with */
- 	char treeName[MAX_TREE_SIZE + 1]; /* UNC name of resource in ASCII */
- 	char *nativeFileSystem;
-@@ -1310,14 +1310,14 @@ extern struct cifs_tcon *cifs_sb_master_tcon(struct cifs_sb_info *cifs_sb);
- #define CIFS_OPLOCK_NO_CHANGE 0xfe
- 
- struct cifs_pending_open {
--	struct list_head olist;
-+	struct list_head head;
- 	struct tcon_link *tlink;
- 	__u8 lease_key[16];
- 	__u32 oplock;
- };
- 
- struct cifs_deferred_close {
--	struct list_head dlist;
-+	struct list_head head;
- 	struct tcon_link *tlink;
- 	__u16  netfid;
- 	__u64  persistent_fid;
-@@ -1325,11 +1325,11 @@ struct cifs_deferred_close {
- };
- 
- /*
-- * This info hangs off the cifs_file_info structure, pointed to by llist.
-+ * This info hangs off the cifs_file_info structure.
-  * This is used to track byte stream locks on the file
-  */
- struct cifs_lock_info {
--	struct list_head llist;	/* pointer to next cifs_lock_info */
-+	struct list_head head;	/* pointer to next cifs_lock_info */
- 	struct list_head blist; /* pointer to locks blocked on this */
- 	wait_queue_head_t block_q;
- 	__u64 offset;
-@@ -1387,27 +1387,27 @@ struct cifs_fid {
- };
- 
- struct cifs_fid_locks {
--	struct list_head llist;
-+	struct list_head head;
- 	struct cifs_file_info *cfile;	/* fid that owns locks */
- 	struct list_head locks;		/* locks held by fid above */
- };
- 
- struct cifs_file_info {
--	/* following two lists are protected by tcon->open_file_lock */
--	struct list_head tlist;	/* pointer to next fid owned by tcon */
--	struct list_head flist;	/* next fid (file instance) for this inode */
-+	/* following two lists are protected by tcon->open_files_lock */
-+	struct list_head tcon_head; /* pointer to next fid owned by tcon */
-+	struct list_head fid_head; /* next fid (file instance) for this inode */
- 	/* lock list below protected by cinode->lock_sem */
--	struct cifs_fid_locks *llist;	/* brlocks held by this fid */
--	kuid_t uid;		/* allows finding which FileInfo structure */
--	__u32 pid;		/* process id who opened file */
--	struct cifs_fid fid;	/* file id from remote */
-+	struct cifs_fid_locks *fid_locks; /* brlocks held by this fid */
-+	kuid_t uid; /* allows finding which FileInfo structure */
-+	__u32 pid; /* process id who opened file */
-+	struct cifs_fid fid; /* file id from remote */
- 	struct list_head rlist; /* reconnect list */
- 	/* BB add lock scope info here if needed */ ;
- 	/* lock scope id (0 if none) */
- 	struct dentry *dentry;
- 	struct tcon_link *tlink;
- 	unsigned int f_flags;
--	bool invalidHandle:1;	/* file closed via session abend */
-+	bool invalidHandle:1; /* file closed via session abend */
- 	bool swapfile:1;
- 	bool oplock_break_cancelled:1;
- 	unsigned int oplock_epoch; /* epoch from the lease break */
-@@ -1435,7 +1435,7 @@ struct cifs_io_parms {
- 
- struct cifs_aio_ctx {
- 	struct kref		refcount;
--	struct list_head	list;
-+	struct list_head	rw_list;
- 	struct mutex		aio_mutex;
- 	struct completion	done;
- 	struct iov_iter		iter;
-@@ -1458,7 +1458,7 @@ struct cifs_aio_ctx {
- /* asynchronous read support */
- struct cifs_readdata {
- 	struct kref			refcount;
--	struct list_head		list;
-+	struct list_head		head;
- 	struct completion		done;
- 	struct cifs_file_info		*cfile;
- 	struct address_space		*mapping;
-@@ -1491,7 +1491,7 @@ struct cifs_readdata {
- /* asynchronous write support */
- struct cifs_writedata {
- 	struct kref			refcount;
--	struct list_head		list;
-+	struct list_head		head;
- 	struct completion		done;
- 	enum writeback_sync_modes	sync_mode;
- 	struct work_struct		work;
-@@ -1546,7 +1546,7 @@ void cifs_file_info_put(struct cifs_file_info *cifs_file);
- struct cifs_inode_info {
- 	struct netfs_inode netfs; /* Netfslib context and vfs inode */
- 	bool can_cache_brlcks;
--	struct list_head llist;	/* locks helb by this inode */
-+	struct list_head fid_locks_list; /* locks helb by this inode */
- 	/*
- 	 * NOTE: Some code paths call down_read(lock_sem) twice, so
- 	 * we must always use cifs_down_write() instead of down_write()
-@@ -1554,8 +1554,8 @@ struct cifs_inode_info {
- 	 */
- 	struct rw_semaphore lock_sem;	/* protect the fields above */
- 	/* BB add in lists for dirty pages i.e. write caching info for oplock */
--	struct list_head openFileList;
--	spinlock_t	open_file_lock;	/* protects openFileList */
-+	struct list_head open_files_list;
-+	spinlock_t open_files_lock; /* protects open_files_list */
- 	__u32 cifs_attrs; /* e.g. DOS archive bit, sparse, compressed, system */
- 	unsigned int oplock;		/* oplock/lease level we have */
- 	unsigned int epoch;		/* used to track lease state changes */
-@@ -1676,7 +1676,7 @@ typedef int (mid_handle_t)(struct cifs_server_info *server,
- 
- /* one of these for every pending CIFS request to the server */
- struct mid_q_entry {
--	struct list_head qhead;	/* mids waiting on reply from this server */
-+	struct list_head head;	/* mids waiting on reply from this server */
- 	struct kref refcount;
- 	struct cifs_server_info *server;	/* server corresponding to this mid */
- 	__u64 mid;		/* multiplex id */
-@@ -1912,14 +1912,14 @@ require use of the stronger protocol */
-  *      updates to server->current_mid
-  *  g_servers_lock protects:
-  *	list operations on tcp and SMB session lists
-- *  tcon->open_file_lock protects the list of open files hanging off the tcon
-- *  inode->open_file_lock protects the openFileList hanging off the inode
-+ *  tcon->open_files_lock protects the list of open files hanging off the tcon
-+ *  inode->open_files_lock protects the open_files_list hanging off the inode
-  *  cfile->file_info_lock protects counters and fields in cifs file struct
-  *  f_owner.lock protects certain per file struct operations
-  *  mapping->page_lock protects certain per page operations
-  *
-- *  Note that the cifs_tcon.open_file_lock should be taken before
-- *  not after the cifs_inode_info.open_file_lock
-+ *  Note that the cifs_tcon.open_files_lock should be taken before
-+ *  not after the cifs_inode_info.open_files_lock
-  *
-  *  Semaphores
-  *  ----------
-@@ -1950,7 +1950,7 @@ extern struct list_head		g_servers_list;
-  * protects some fields in the cifs_server_info struct such as dstaddr. Finally,
-  * changes to the tcon->tidStatus should be done while holding this lock.
-  * generally the locks should be taken in order g_servers_lock before
-- * tcon->open_file_lock and that before file->file_info_lock since the
-+ * tcon->open_files_lock and that before file->file_info_lock since the
-  * structure order is cifs_socket-->cifs_ses-->cifs_tcon-->cifs_file
-  */
- extern spinlock_t		g_servers_lock;
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index bd987f4042ca..52bbbf7274af 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -84,13 +84,13 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
- 	spin_unlock(&g_servers_lock);
- 
- 	/* list all files open on tree connection and mark them invalid */
--	spin_lock(&tcon->open_file_lock);
--	list_for_each_safe(tmp, tmp1, &tcon->openFileList) {
--		open_file = list_entry(tmp, struct cifs_file_info, tlist);
-+	spin_lock(&tcon->open_files_lock);
-+	list_for_each_safe(tmp, tmp1, &tcon->open_files_list) {
-+		open_file = list_entry(tmp, struct cifs_file_info, tcon_head);
- 		open_file->invalidHandle = true;
- 		open_file->oplock_break_cancelled = true;
- 	}
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&tcon->open_files_lock);
- 
- 	mutex_lock(&tcon->crfid.fid_mutex);
- 	tcon->crfid.is_valid = false;
-@@ -2080,7 +2080,7 @@ cifs_writedata_direct_alloc(struct page **pages, work_func_t complete)
- 	if (wdata != NULL) {
- 		wdata->pages = pages;
- 		kref_init(&wdata->refcount);
--		INIT_LIST_HEAD(&wdata->list);
-+		INIT_LIST_HEAD(&wdata->head);
- 		init_completion(&wdata->done);
- 		INIT_WORK(&wdata->work, complete);
- 	}
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0d0bbd2aa880..1f4fa32b7f89 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -212,7 +212,7 @@ cifs_signal_cifsd_for_reconnect(struct cifs_server_info *server,
- 		return;
- 	}
- 
--	list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
-+	list_for_each_entry(ses, &pserver->ses_list, head) {
- 		spin_lock(&ses->chan_lock);
- 		for (i = 0; i < ses->chan_count; i++)
- 			ses->chans[i].server->status = SERVER_STATUS_NEED_RECONNECT;
-@@ -250,7 +250,7 @@ cifs_mark_server_conns_for_reconnect(struct cifs_server_info *server,
- 
- 
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry_safe(ses, nses, &pserver->smb_ses_list, smb_ses_list) {
-+	list_for_each_entry_safe(ses, nses, &pserver->ses_list, head) {
- 		/* check if iface is still active */
- 		if (!cifs_chan_is_iface_active(ses, server)) {
- 			/*
-@@ -279,7 +279,7 @@ cifs_mark_server_conns_for_reconnect(struct cifs_server_info *server,
- 
- 		ses->status = SES_STATUS_NEED_RECONNECT;
- 
--		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+		list_for_each_entry(tcon, &ses->tcon_list, head) {
- 			tcon->need_reconnect = true;
- 			tcon->status = TCON_STATUS_NEED_RECONNECT;
- 		}
-@@ -324,19 +324,19 @@ cifs_abort_connection(struct cifs_server_info *server)
- 	INIT_LIST_HEAD(&retry_list);
- 	cifs_dbg(FYI, "%s: moving mids to private list\n", __func__);
- 	spin_lock(&g_mid_lock);
--	list_for_each_entry_safe(mid, nmid, &server->pending_mid_q, qhead) {
-+	list_for_each_entry_safe(mid, nmid, &server->pending_mid_q, head) {
- 		kref_get(&mid->refcount);
- 		if (mid->mid_state == MID_REQUEST_SUBMITTED)
- 			mid->mid_state = MID_RETRY_NEEDED;
--		list_move(&mid->qhead, &retry_list);
-+		list_move(&mid->head, &retry_list);
- 		mid->mid_flags |= MID_DELETED;
- 	}
- 	spin_unlock(&g_mid_lock);
- 	cifs_server_unlock(server);
- 
- 	cifs_dbg(FYI, "%s: issuing mid callbacks\n", __func__);
--	list_for_each_entry_safe(mid, nmid, &retry_list, qhead) {
--		list_del_init(&mid->qhead);
-+	list_for_each_entry_safe(mid, nmid, &retry_list, head) {
-+		list_del_init(&mid->head);
- 		mid->callback(mid);
- 		cifs_mid_q_entry_release(mid);
- 	}
-@@ -862,7 +862,7 @@ dequeue_mid(struct mid_q_entry *mid, bool malformed)
- 		spin_unlock(&g_mid_lock);
- 		pr_warn_once("trying to dequeue a deleted mid\n");
- 	} else {
--		list_del_init(&mid->qhead);
-+		list_del_init(&mid->head);
- 		mid->mid_flags |= MID_DELETED;
- 		spin_unlock(&g_mid_lock);
- 	}
-@@ -909,7 +909,7 @@ static void clean_demultiplex_info(struct cifs_server_info *server)
- 
- 	/* take it off the list, if it's not already */
- 	spin_lock(&g_servers_lock);
--	list_del_init(&server->server_head);
-+	list_del_init(&server->head);
- 	spin_unlock(&g_servers_lock);
- 
- 	cancel_delayed_work_sync(&server->echo);
-@@ -950,20 +950,20 @@ static void clean_demultiplex_info(struct cifs_server_info *server)
- 		INIT_LIST_HEAD(&dispose_list);
- 		spin_lock(&g_mid_lock);
- 		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
--			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
-+			mid_entry = list_entry(tmp, struct mid_q_entry, head);
- 			cifs_dbg(FYI, "Clearing mid %llu\n", mid_entry->mid);
- 			kref_get(&mid_entry->refcount);
- 			mid_entry->mid_state = MID_SHUTDOWN;
--			list_move(&mid_entry->qhead, &dispose_list);
-+			list_move(&mid_entry->head, &dispose_list);
- 			mid_entry->mid_flags |= MID_DELETED;
- 		}
- 		spin_unlock(&g_mid_lock);
- 
- 		/* now walk dispose list and issue callbacks */
- 		list_for_each_safe(tmp, tmp2, &dispose_list) {
--			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
-+			mid_entry = list_entry(tmp, struct mid_q_entry, head);
- 			cifs_dbg(FYI, "Callback mid %llu\n", mid_entry->mid);
--			list_del_init(&mid_entry->qhead);
-+			list_del_init(&mid_entry->head);
- 			mid_entry->callback(mid_entry);
- 			cifs_mid_q_entry_release(mid_entry);
- 		}
-@@ -1469,7 +1469,7 @@ cifs_find_server(struct smb3_fs_context *ctx)
- 	struct cifs_server_info *server;
- 
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(server, &g_servers_list, server_head) {
-+	list_for_each_entry(server, &g_servers_list, head) {
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 		/*
- 		 * DFS failover implementation in cifs_reconnect() requires unique tcp sessions for
-@@ -1512,7 +1512,7 @@ cifs_put_server(struct cifs_server_info *server, int from_reconnect)
- 
- 	put_net(cifs_net_ns(server));
- 
--	list_del_init(&server->server_head);
-+	list_del_init(&server->head);
- 	spin_unlock(&g_servers_lock);
- 
- 	/* For secondary channels, we pick up ref-count on the primary server */
-@@ -1611,8 +1611,8 @@ cifs_get_server(struct smb3_fs_context *ctx,
- 	server->lstrp = jiffies;
- 	server->compress_algorithm = cpu_to_le16(ctx->compression);
- 	spin_lock_init(&server->req_lock);
--	INIT_LIST_HEAD(&server->server_head);
--	INIT_LIST_HEAD(&server->smb_ses_list);
-+	INIT_LIST_HEAD(&server->head);
-+	INIT_LIST_HEAD(&server->ses_list);
- 	INIT_DELAYED_WORK(&server->echo, cifs_echo_request);
- 	INIT_DELAYED_WORK(&server->resolve, cifs_resolve_server);
- 	INIT_DELAYED_WORK(&server->reconnect, smb2_reconnect_server);
-@@ -1697,7 +1697,7 @@ cifs_get_server(struct smb3_fs_context *ctx,
- 	server->ignore_signature = ctx->ignore_signature;
- 	/* thread spawned, put it on the list */
- 	spin_lock(&g_servers_lock);
--	list_add(&server->server_head, &g_servers_list);
-+	list_add(&server->head, &g_servers_list);
- 	spin_unlock(&g_servers_lock);
- 
- 	/* queue echo request delayed work */
-@@ -1862,7 +1862,7 @@ cifs_find_smb_ses(struct cifs_server_info *server, struct smb3_fs_context *ctx)
- 	struct cifs_ses *ses;
- 
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+	list_for_each_entry(ses, &server->ses_list, head) {
- 		if (ses->status == SES_STATUS_EXITING)
- 			continue;
- 		if (!match_session(ses, ctx))
-@@ -1914,7 +1914,7 @@ void cifs_put_smb_ses(struct cifs_ses *ses)
- 	}
- 
- 	spin_lock(&g_servers_lock);
--	list_del_init(&ses->smb_ses_list);
-+	list_del_init(&ses->head);
- 	spin_unlock(&g_servers_lock);
- 
- 	chan_count = ses->chan_count;
-@@ -2220,7 +2220,7 @@ cifs_get_smb_ses(struct cifs_server_info *server, struct smb3_fs_context *ctx)
- 	 * need to lock before changing something in the session.
- 	 */
- 	spin_lock(&g_servers_lock);
--	list_add(&ses->smb_ses_list, &server->smb_ses_list);
-+	list_add(&ses->head, &server->ses_list);
- 	spin_unlock(&g_servers_lock);
- 
- 	free_xid(xid);
-@@ -2260,7 +2260,7 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 	struct cifs_tcon *tcon;
- 
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+	list_for_each_entry(tcon, &ses->tcon_list, head) {
- 		if (!match_tcon(tcon, ctx))
- 			continue;
- 		++tcon->tc_count;
-@@ -2295,7 +2295,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 	/* tc_count can never go negative */
- 	WARN_ON(tcon->tc_count < 0);
- 
--	list_del_init(&tcon->tcon_list);
-+	list_del_init(&tcon->head);
- 	spin_unlock(&g_servers_lock);
- 
- 	/* cancel polling of interfaces */
-@@ -2545,7 +2545,7 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 			   (SMB_INTERFACE_POLL_INTERVAL * HZ));
- 
- 	spin_lock(&g_servers_lock);
--	list_add(&tcon->tcon_list, &ses->tcon_list);
-+	list_add(&tcon->head, &ses->tcon_list);
- 	spin_unlock(&g_servers_lock);
- 
- 	return tcon;
-diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-index c864ca4432f0..14288096d555 100644
---- a/fs/cifs/dfs_cache.c
-+++ b/fs/cifs/dfs_cache.c
-@@ -1525,12 +1525,12 @@ static void refresh_mounts(struct cifs_ses **sessions)
- 	INIT_LIST_HEAD(&tcons);
- 
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(server, &g_servers_list, server_head) {
-+	list_for_each_entry(server, &g_servers_list, head) {
- 		if (!server->is_dfs_conn)
- 			continue;
- 
--		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+		list_for_each_entry(ses, &server->ses_list, head) {
-+			list_for_each_entry(tcon, &ses->tcon_list, head) {
- 				if (!tcon->ipc && !tcon->need_reconnect) {
- 					tcon->tc_count++;
- 					list_add_tail(&tcon->ulist, &tcons);
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index c3561ac3c6d8..b4e171c6f4f6 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -259,7 +259,7 @@ cifs_has_mand_locks(struct cifs_inode_info *cinode)
- 	bool has_locks = false;
- 
- 	down_read(&cinode->lock_sem);
--	list_for_each_entry(cur, &cinode->llist, llist) {
-+	list_for_each_entry(cur, &cinode->fid_locks_list, head) {
- 		if (!list_empty(&cur->locks)) {
- 			has_locks = true;
- 			break;
-@@ -302,7 +302,7 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
- 
- 	INIT_LIST_HEAD(&fdlocks->locks);
- 	fdlocks->cfile = cfile;
--	cfile->llist = fdlocks;
-+	cfile->fid_locks = fdlocks;
- 
- 	cfile->count = 1;
- 	cfile->pid = current->tgid;
-@@ -330,28 +330,28 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
- 	}
- 
- 	cifs_down_write(&cinode->lock_sem);
--	list_add(&fdlocks->llist, &cinode->llist);
-+	list_add(&fdlocks->head, &cinode->fid_locks_list);
- 	up_write(&cinode->lock_sem);
- 
--	spin_lock(&tcon->open_file_lock);
-+	spin_lock(&tcon->open_files_lock);
- 	if (fid->pending_open->oplock != CIFS_OPLOCK_NO_CHANGE && oplock)
- 		oplock = fid->pending_open->oplock;
--	list_del(&fid->pending_open->olist);
-+	list_del(&fid->pending_open->head);
- 
- 	fid->purge_cache = false;
- 	server->ops->set_fid(cfile, fid, oplock);
- 
--	list_add(&cfile->tlist, &tcon->openFileList);
-+	list_add(&cfile->tcon_head, &tcon->open_files_list);
- 	atomic_inc(&tcon->num_local_opens);
- 
- 	/* if readable file instance put first in list*/
--	spin_lock(&cinode->open_file_lock);
-+	spin_lock(&cinode->open_files_lock);
- 	if (file->f_mode & FMODE_READ)
--		list_add(&cfile->flist, &cinode->openFileList);
-+		list_add(&cfile->fid_head, &cinode->open_files_list);
- 	else
--		list_add_tail(&cfile->flist, &cinode->openFileList);
--	spin_unlock(&cinode->open_file_lock);
--	spin_unlock(&tcon->open_file_lock);
-+		list_add_tail(&cfile->fid_head, &cinode->open_files_list);
-+	spin_unlock(&cinode->open_files_lock);
-+	spin_unlock(&tcon->open_files_lock);
- 
- 	if (fid->purge_cache)
- 		cifs_zap_mapping(inode);
-@@ -381,13 +381,13 @@ static void cifs_file_info_put_final(struct cifs_file_info *cifs_file)
- 	 * is closed anyway.
- 	 */
- 	cifs_down_write(&cinode->lock_sem);
--	list_for_each_entry_safe(li, tmp, &cifs_file->llist->locks, llist) {
--		list_del(&li->llist);
-+	list_for_each_entry_safe(li, tmp, &cifs_file->fid_locks->locks, head) {
-+		list_del(&li->head);
- 		cifs_del_lock_waiters(li);
- 		kfree(li);
- 	}
--	list_del(&cifs_file->llist->llist);
--	kfree(cifs_file->llist);
-+	list_del(&cifs_file->fid_locks->head);
-+	kfree(cifs_file->fid_locks);
- 	up_write(&cinode->lock_sem);
- 
- 	cifs_put_tlink(cifs_file->tlink);
-@@ -420,8 +420,8 @@ void cifs_file_info_put(struct cifs_file_info *cifs_file)
-  * _cifs_file_info_put - release a reference of file priv data
-  *
-  * This may involve closing the filehandle @cifs_file out on the
-- * server. Must be called without holding tcon->open_file_lock,
-- * cinode->open_file_lock and cifs_file->file_info_lock.
-+ * server. Must be called without holding tcon->open_files_lock,
-+ * cinode->open_files_lock and cifs_file->file_info_lock.
-  *
-  * If @wait_for_oplock_handler is true and we are releasing the last
-  * reference, wait for any running oplock break handler of the file
-@@ -445,13 +445,13 @@ void _cifs_file_info_put(struct cifs_file_info *cifs_file,
- 	struct cifs_pending_open open;
- 	bool oplock_break_cancelled;
- 
--	spin_lock(&tcon->open_file_lock);
--	spin_lock(&cinode->open_file_lock);
-+	spin_lock(&tcon->open_files_lock);
-+	spin_lock(&cinode->open_files_lock);
- 	spin_lock(&cifs_file->file_info_lock);
- 	if (--cifs_file->count > 0) {
- 		spin_unlock(&cifs_file->file_info_lock);
--		spin_unlock(&cinode->open_file_lock);
--		spin_unlock(&tcon->open_file_lock);
-+		spin_unlock(&cinode->open_files_lock);
-+		spin_unlock(&tcon->open_files_lock);
- 		return;
- 	}
- 	spin_unlock(&cifs_file->file_info_lock);
-@@ -463,11 +463,11 @@ void _cifs_file_info_put(struct cifs_file_info *cifs_file,
- 	cifs_add_pending_open_locked(&fid, cifs_file->tlink, &open);
- 
- 	/* remove it from the lists */
--	list_del(&cifs_file->flist);
--	list_del(&cifs_file->tlist);
-+	list_del(&cifs_file->fid_head);
-+	list_del(&cifs_file->tcon_head);
- 	atomic_dec(&tcon->num_local_opens);
- 
--	if (list_empty(&cinode->openFileList)) {
-+	if (list_empty(&cinode->open_files_list)) {
- 		cifs_dbg(FYI, "closing last open instance for inode %p\n",
- 			 d_inode(cifs_file->dentry));
- 		/*
-@@ -480,8 +480,8 @@ void _cifs_file_info_put(struct cifs_file_info *cifs_file,
- 		cifs_set_oplock_level(cinode, 0);
- 	}
- 
--	spin_unlock(&cinode->open_file_lock);
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&cinode->open_files_lock);
-+	spin_unlock(&tcon->open_files_lock);
- 
- 	oplock_break_cancelled = wait_oplock_handler ?
- 		cancel_work_sync(&cifs_file->oplock_break) : false;
-@@ -940,14 +940,14 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
- 	INIT_LIST_HEAD(&tmp_list);
- 
- 	/* list all files open on tree connection, reopen resilient handles  */
--	spin_lock(&tcon->open_file_lock);
--	list_for_each_entry(open_file, &tcon->openFileList, tlist) {
-+	spin_lock(&tcon->open_files_lock);
-+	list_for_each_entry(open_file, &tcon->open_files_list, tcon_head) {
- 		if (!open_file->invalidHandle)
- 			continue;
- 		cifs_file_info_get(open_file);
- 		list_add_tail(&open_file->rlist, &tmp_list);
- 	}
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&tcon->open_files_lock);
- 
- 	list_for_each_entry_safe(open_file, tmp, &tmp_list, rlist) {
- 		if (cifs_reopen_file(open_file, false /* do not flush */))
-@@ -1050,7 +1050,7 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
- 	struct cifs_file_info *cur_cfile = fdlocks->cfile;
- 	struct cifs_server_info *server = tlink_tcon(cfile->tlink)->ses->server;
- 
--	list_for_each_entry(li, &fdlocks->locks, llist) {
-+	list_for_each_entry(li, &fdlocks->locks, head) {
- 		if (offset + length <= li->offset ||
- 		    offset >= li->offset + li->length)
- 			continue;
-@@ -1085,7 +1085,7 @@ cifs_find_lock_conflict(struct cifs_file_info *cfile, __u64 offset, __u64 length
- 	struct cifs_fid_locks *cur;
- 	struct cifs_inode_info *cinode = CIFS_I(d_inode(cfile->dentry));
- 
--	list_for_each_entry(cur, &cinode->llist, llist) {
-+	list_for_each_entry(cur, &cinode->fid_locks_list, head) {
- 		rc = cifs_find_fid_lock_conflict(cur, offset, length, type,
- 						 flags, cfile, conf_lock,
- 						 rw_check);
-@@ -1140,7 +1140,7 @@ cifs_lock_add(struct cifs_file_info *cfile, struct cifs_lock_info *lock)
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 8a2b882de76d..f653d42ff936 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -30,8 +30,8 @@ int __cifs_calc_signature(struct smb_rqst *rqst,
  {
- 	struct cifs_inode_info *cinode = CIFS_I(d_inode(cfile->dentry));
- 	cifs_down_write(&cinode->lock_sem);
--	list_add_tail(&lock->llist, &cfile->llist->locks);
-+	list_add_tail(&lock->head, &cfile->fid_locks->locks);
- 	up_write(&cinode->lock_sem);
- }
+ 	int i;
+ 	int rc;
+-	struct kvec *iov = rqst->rq_iov;
+-	int n_vec = rqst->rq_nvec;
++	struct kvec *iov = rqst->iov;
++	int n_vec = rqst->nvec;
+ 	int is_smb2 = server->vals->header_preamble_size == 0;
  
-@@ -1167,7 +1167,7 @@ cifs_lock_add_if(struct cifs_file_info *cfile, struct cifs_lock_info *lock,
- 					lock->type, lock->flags, &conf_lock,
- 					CIFS_LOCK_OP);
- 	if (!exist && cinode->can_cache_brlcks) {
--		list_add_tail(&lock->llist, &cfile->llist->locks);
-+		list_add_tail(&lock->head, &cfile->fid_locks->locks);
- 		up_write(&cinode->lock_sem);
- 		return rc;
+ 	/* iov[0] is actual data and not the rfc1002 length for SMB2+ */
+@@ -63,23 +63,23 @@ int __cifs_calc_signature(struct smb_rqst *rqst,
  	}
-@@ -1291,7 +1291,7 @@ cifs_push_mandatory_locks(struct cifs_file_info *cfile)
- 	for (i = 0; i < 2; i++) {
- 		cur = buf;
- 		num = 0;
--		list_for_each_entry_safe(li, tmp, &cfile->llist->locks, llist) {
-+		list_for_each_entry_safe(li, tmp, &cfile->fid_locks->locks, head) {
- 			if (li->type != types[i])
- 				continue;
- 			cur->Pid = cpu_to_le16(li->pid);
-@@ -1332,7 +1332,7 @@ hash_lockowner(fl_owner_t owner)
- }
  
- struct lock_to_push {
--	struct list_head llist;
-+	struct list_head head;
- 	__u64 offset;
- 	__u64 length;
- 	__u32 pid;
-@@ -1377,7 +1377,7 @@ cifs_push_posix_locks(struct cifs_file_info *cfile)
- 			rc = -ENOMEM;
- 			goto err_out;
+ 	/* now hash over the rq_pages array */
+-	for (i = 0; i < rqst->rq_npages; i++) {
++	for (i = 0; i < rqst->npages; i++) {
+ 		void *kaddr;
+ 		unsigned int len, offset;
+ 
+ 		rqst_page_get_length(rqst, i, &len, &offset);
+ 
+-		kaddr = (char *) kmap(rqst->rq_pages[i]) + offset;
++		kaddr = (char *) kmap(rqst->pages[i]) + offset;
+ 
+ 		rc = crypto_shash_update(shash, kaddr, len);
+ 		if (rc) {
+ 			cifs_dbg(VFS, "%s: Could not update with payload\n",
+ 				 __func__);
+-			kunmap(rqst->rq_pages[i]);
++			kunmap(rqst->pages[i]);
+ 			return rc;
  		}
--		list_add_tail(&lck->llist, &locks_to_send);
-+		list_add_tail(&lck->head, &locks_to_send);
+ 
+-		kunmap(rqst->rq_pages[i]);
++		kunmap(rqst->pages[i]);
  	}
  
- 	el = locks_to_send.next;
-@@ -1396,7 +1396,7 @@ cifs_push_posix_locks(struct cifs_file_info *cfile)
- 			type = CIFS_RDLCK;
- 		else
- 			type = CIFS_WRLCK;
--		lck = list_entry(el, struct lock_to_push, llist);
-+		lck = list_entry(el, struct lock_to_push, head);
- 		lck->pid = hash_lockowner(flock->fl_owner);
- 		lck->netfid = cfile->fid.netfid;
- 		lck->length = length;
-@@ -1405,7 +1405,7 @@ cifs_push_posix_locks(struct cifs_file_info *cfile)
- 	}
- 	spin_unlock(&flctx->flc_lock);
- 
--	list_for_each_entry_safe(lck, tmp, &locks_to_send, llist) {
-+	list_for_each_entry_safe(lck, tmp, &locks_to_send, head) {
- 		int stored_rc;
- 
- 		stored_rc = CIFSSMBPosixLock(xid, tcon, lck->netfid, lck->pid,
-@@ -1413,7 +1413,7 @@ cifs_push_posix_locks(struct cifs_file_info *cfile)
- 					     lck->type, 0);
- 		if (stored_rc)
- 			rc = stored_rc;
--		list_del(&lck->llist);
-+		list_del(&lck->head);
- 		kfree(lck);
- 	}
- 
-@@ -1421,8 +1421,8 @@ cifs_push_posix_locks(struct cifs_file_info *cfile)
- 	free_xid(xid);
- 	return rc;
- err_out:
--	list_for_each_entry_safe(lck, tmp, &locks_to_send, llist) {
--		list_del(&lck->llist);
-+	list_for_each_entry_safe(lck, tmp, &locks_to_send, head) {
-+		list_del(&lck->head);
- 		kfree(lck);
- 	}
- 	goto out;
-@@ -1583,9 +1583,9 @@ void
- cifs_free_llist(struct list_head *llist)
+ 	rc = crypto_shash_final(shash, signature);
+@@ -101,7 +101,7 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
  {
- 	struct cifs_lock_info *li, *tmp;
--	list_for_each_entry_safe(li, tmp, llist, llist) {
-+	list_for_each_entry_safe(li, tmp, llist, head) {
- 		cifs_del_lock_waiters(li);
--		list_del(&li->llist);
-+		list_del(&li->head);
- 		kfree(li);
- 	}
- }
-@@ -1632,7 +1632,7 @@ cifs_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 	for (i = 0; i < 2; i++) {
- 		cur = buf;
- 		num = 0;
--		list_for_each_entry_safe(li, tmp, &cfile->llist->locks, llist) {
-+		list_for_each_entry_safe(li, tmp, &cfile->fid_locks->locks, head) {
- 			if (flock->fl_start > li->offset ||
- 			    (flock->fl_start + length) <
- 			    (li->offset + li->length))
-@@ -1646,7 +1646,7 @@ cifs_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 				 * We can cache brlock requests - simply remove
- 				 * a lock from the file's list.
- 				 */
--				list_del(&li->llist);
-+				list_del(&li->head);
- 				cifs_del_lock_waiters(li);
- 				kfree(li);
- 				continue;
-@@ -1661,7 +1661,7 @@ cifs_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 			 * the file's list if the unlock range request fails on
- 			 * the server.
- 			 */
--			list_move(&li->llist, &tmp_llist);
-+			list_move(&li->head, &tmp_llist);
- 			if (++num == max_num) {
- 				stored_rc = cifs_lockv(xid, tcon,
- 						       cfile->fid.netfid,
-@@ -1673,7 +1673,7 @@ cifs_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 					 * list to the head of the file's list.
- 					 */
- 					cifs_move_llist(&tmp_llist,
--							&cfile->llist->locks);
-+							&cfile->fid_locks->locks);
- 					rc = stored_rc;
- 				} else
- 					/*
-@@ -1691,7 +1691,7 @@ cifs_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 					       types[i], num, 0, buf);
- 			if (stored_rc) {
- 				cifs_move_llist(&tmp_llist,
--						&cfile->llist->locks);
-+						&cfile->fid_locks->locks);
- 				rc = stored_rc;
- 			} else
- 				cifs_free_llist(&tmp_llist);
-@@ -2006,11 +2006,11 @@ struct cifs_file_info *find_readable_file(struct cifs_inode_info *cinode,
- 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
- 		fsuid_only = false;
- 
--	spin_lock(&cinode->open_file_lock);
-+	spin_lock(&cinode->open_files_lock);
- 	/* we could simply get the first_list_entry since write-only entries
- 	   are always at the end of the list but since the first entry might
- 	   have a close pending, we go through the whole list */
--	list_for_each_entry(open_file, &cinode->openFileList, flist) {
-+	list_for_each_entry(open_file, &cinode->open_files_list, fid_head) {
- 		if (fsuid_only && !uid_eq(open_file->uid, current_fsuid()))
- 			continue;
- 		if (OPEN_FMODE(open_file->f_flags) & FMODE_READ) {
-@@ -2018,7 +2018,7 @@ struct cifs_file_info *find_readable_file(struct cifs_inode_info *cinode,
- 				/* found a good file */
- 				/* lock it so it will not be closed on us */
- 				cifs_file_info_get(open_file);
--				spin_unlock(&cinode->open_file_lock);
-+				spin_unlock(&cinode->open_files_lock);
- 				return open_file;
- 			} /* else might as well continue, and look for
- 			     another, or simply have the caller reopen it
-@@ -2026,7 +2026,7 @@ struct cifs_file_info *find_readable_file(struct cifs_inode_info *cinode,
- 		} else /* write only file */
- 			break; /* write only files are last so must be done */
- 	}
--	spin_unlock(&cinode->open_file_lock);
-+	spin_unlock(&cinode->open_files_lock);
- 	return NULL;
- }
- 
-@@ -2062,13 +2062,13 @@ cifs_get_writable_file(struct cifs_inode_info *cinode, int flags,
- 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
- 		fsuid_only = false;
- 
--	spin_lock(&cinode->open_file_lock);
-+	spin_lock(&cinode->open_files_lock);
- refind_writable:
- 	if (refind > MAX_REOPEN_ATT) {
--		spin_unlock(&cinode->open_file_lock);
-+		spin_unlock(&cinode->open_files_lock);
- 		return rc;
- 	}
--	list_for_each_entry(open_file, &cinode->openFileList, flist) {
-+	list_for_each_entry(open_file, &cinode->open_files_list, fid_head) {
- 		if (!any_available && open_file->pid != current->tgid)
- 			continue;
- 		if (fsuid_only && !uid_eq(open_file->uid, current_fsuid()))
-@@ -2079,7 +2079,7 @@ cifs_get_writable_file(struct cifs_inode_info *cinode, int flags,
- 			if (!open_file->invalidHandle) {
- 				/* found a good writable file */
- 				cifs_file_info_get(open_file);
--				spin_unlock(&cinode->open_file_lock);
-+				spin_unlock(&cinode->open_files_lock);
- 				*ret_file = open_file;
- 				return 0;
- 			} else {
-@@ -2099,7 +2099,7 @@ cifs_get_writable_file(struct cifs_inode_info *cinode, int flags,
- 		cifs_file_info_get(inv_file);
- 	}
- 
--	spin_unlock(&cinode->open_file_lock);
-+	spin_unlock(&cinode->open_files_lock);
- 
- 	if (inv_file) {
- 		rc = cifs_reopen_file(inv_file, false);
-@@ -2108,13 +2108,13 @@ cifs_get_writable_file(struct cifs_inode_info *cinode, int flags,
- 			return 0;
- 		}
- 
--		spin_lock(&cinode->open_file_lock);
--		list_move_tail(&inv_file->flist, &cinode->openFileList);
--		spin_unlock(&cinode->open_file_lock);
-+		spin_lock(&cinode->open_files_lock);
-+		list_move_tail(&inv_file->fid_head, &cinode->open_files_list);
-+		spin_unlock(&cinode->open_files_lock);
- 		cifs_file_info_put(inv_file);
- 		++refind;
- 		inv_file = NULL;
--		spin_lock(&cinode->open_file_lock);
-+		spin_lock(&cinode->open_files_lock);
- 		goto refind_writable;
- 	}
- 
-@@ -2144,12 +2144,12 @@ cifs_get_writable_path(struct cifs_tcon *tcon, const char *name,
- 
- 	*ret_file = NULL;
- 
--	spin_lock(&tcon->open_file_lock);
--	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-+	spin_lock(&tcon->open_files_lock);
-+	list_for_each_entry(cfile, &tcon->open_files_list, tcon_head) {
- 		struct cifs_inode_info *cinode;
- 		const char *full_path = build_path_from_dentry(cfile->dentry, page);
- 		if (IS_ERR(full_path)) {
--			spin_unlock(&tcon->open_file_lock);
-+			spin_unlock(&tcon->open_files_lock);
- 			free_dentry_path(page);
- 			return PTR_ERR(full_path);
- 		}
-@@ -2157,12 +2157,12 @@ cifs_get_writable_path(struct cifs_tcon *tcon, const char *name,
- 			continue;
- 
- 		cinode = CIFS_I(d_inode(cfile->dentry));
--		spin_unlock(&tcon->open_file_lock);
-+		spin_unlock(&tcon->open_files_lock);
- 		free_dentry_path(page);
- 		return cifs_get_writable_file(cinode, flags, ret_file);
- 	}
- 
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&tcon->open_files_lock);
- 	free_dentry_path(page);
- 	return -ENOENT;
- }
-@@ -2176,12 +2176,12 @@ cifs_get_readable_path(struct cifs_tcon *tcon, const char *name,
- 
- 	*ret_file = NULL;
- 
--	spin_lock(&tcon->open_file_lock);
--	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-+	spin_lock(&tcon->open_files_lock);
-+	list_for_each_entry(cfile, &tcon->open_files_list, tcon_head) {
- 		struct cifs_inode_info *cinode;
- 		const char *full_path = build_path_from_dentry(cfile->dentry, page);
- 		if (IS_ERR(full_path)) {
--			spin_unlock(&tcon->open_file_lock);
-+			spin_unlock(&tcon->open_files_lock);
- 			free_dentry_path(page);
- 			return PTR_ERR(full_path);
- 		}
-@@ -2189,13 +2189,13 @@ cifs_get_readable_path(struct cifs_tcon *tcon, const char *name,
- 			continue;
- 
- 		cinode = CIFS_I(d_inode(cfile->dentry));
--		spin_unlock(&tcon->open_file_lock);
-+		spin_unlock(&tcon->open_files_lock);
- 		free_dentry_path(page);
- 		*ret_file = find_readable_file(cinode, 0);
- 		return *ret_file ? 0 : -ENOENT;
- 	}
- 
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&tcon->open_files_lock);
- 	free_dentry_path(page);
- 	return -ENOENT;
- }
-@@ -2956,7 +2956,7 @@ cifs_resend_wdata(struct cifs_writedata *wdata, struct list_head *wdata_list,
- 
- 		/* If the write was successfully sent, we are done */
- 		if (!rc) {
--			list_add_tail(&wdata->list, wdata_list);
-+			list_add_tail(&wdata->head, wdata_list);
- 			return 0;
- 		}
- 
-@@ -3126,7 +3126,7 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
- 			break;
- 		}
- 
--		list_add_tail(&wdata->list, wdata_list);
-+		list_add_tail(&wdata->head, wdata_list);
- 		offset += cur_len;
- 		len -= cur_len;
- 	} while (len > 0);
-@@ -3148,7 +3148,7 @@ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx)
- 
- 	mutex_lock(&ctx->aio_mutex);
- 
--	if (list_empty(&ctx->list)) {
-+	if (list_empty(&ctx->rw_list)) {
- 		mutex_unlock(&ctx->aio_mutex);
- 		return;
- 	}
-@@ -3160,7 +3160,7 @@ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx)
- 	 * for any more replies.
- 	 */
- restart_loop:
--	list_for_each_entry_safe(wdata, tmp, &ctx->list, list) {
-+	list_for_each_entry_safe(wdata, tmp, &ctx->rw_list, head) {
- 		if (!rc) {
- 			if (!try_wait_for_completion(&wdata->done)) {
- 				mutex_unlock(&ctx->aio_mutex);
-@@ -3178,7 +3178,7 @@ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx)
- 				struct iov_iter tmp_from = ctx->iter;
- 
- 				INIT_LIST_HEAD(&tmp_list);
--				list_del_init(&wdata->list);
-+				list_del_init(&wdata->head);
- 
- 				if (ctx->direct_io)
- 					rc = cifs_resend_wdata(
-@@ -3196,11 +3196,11 @@ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx)
- 						cifs_uncached_writedata_release);
- 				}
- 
--				list_splice(&tmp_list, &ctx->list);
-+				list_splice(&tmp_list, &ctx->rw_list);
- 				goto restart_loop;
- 			}
- 		}
--		list_del_init(&wdata->list);
-+		list_del_init(&wdata->head);
- 		kref_put(&wdata->refcount, cifs_uncached_writedata_release);
- 	}
- 
-@@ -3278,7 +3278,7 @@ static ssize_t __cifs_writev(
- 	mutex_lock(&ctx->aio_mutex);
- 
- 	rc = cifs_write_from_iter(iocb->ki_pos, ctx->len, &saved_from,
--				  cfile, cifs_sb, &ctx->list, ctx);
-+				  cfile, cifs_sb, &ctx->rw_list, ctx);
- 
- 	/*
- 	 * If at least one write was successfully sent, then discard any rc
-@@ -3286,7 +3286,7 @@ static ssize_t __cifs_writev(
- 	 * we'll end up returning whatever was written. If it fails, then
- 	 * we'll get a new rc value from that.
- 	 */
--	if (!list_empty(&ctx->list))
-+	if (!list_empty(&ctx->rw_list))
- 		rc = 0;
- 
- 	mutex_unlock(&ctx->aio_mutex);
-@@ -3426,7 +3426,7 @@ cifs_readdata_direct_alloc(struct page **pages, work_func_t complete)
- 	if (rdata != NULL) {
- 		rdata->pages = pages;
- 		kref_init(&rdata->refcount);
--		INIT_LIST_HEAD(&rdata->list);
-+		INIT_LIST_HEAD(&rdata->head);
- 		init_completion(&rdata->done);
- 		INIT_WORK(&rdata->work, complete);
- 	}
-@@ -3690,7 +3690,7 @@ static int cifs_resend_rdata(struct cifs_readdata *rdata,
- 		/* If the read was successfully sent, we are done */
- 		if (!rc) {
- 			/* Add to aio pending list */
--			list_add_tail(&rdata->list, rdata_list);
-+			list_add_tail(&rdata->head, rdata_list);
- 			return 0;
- 		}
- 
-@@ -3842,7 +3842,7 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifs_file_info *open_file
- 			break;
- 		}
- 
--		list_add_tail(&rdata->list, rdata_list);
-+		list_add_tail(&rdata->head, rdata_list);
- 		offset += cur_len;
- 		len -= cur_len;
- 	} while (len > 0);
-@@ -3862,7 +3862,7 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- 
- 	mutex_lock(&ctx->aio_mutex);
- 
--	if (list_empty(&ctx->list)) {
-+	if (list_empty(&ctx->rw_list)) {
- 		mutex_unlock(&ctx->aio_mutex);
- 		return;
- 	}
-@@ -3870,7 +3870,7 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- 	rc = ctx->rc;
- 	/* the loop below should proceed in the order of increasing offsets */
- again:
--	list_for_each_entry_safe(rdata, tmp, &ctx->list, list) {
-+	list_for_each_entry_safe(rdata, tmp, &ctx->rw_list, head) {
- 		if (!rc) {
- 			if (!try_wait_for_completion(&rdata->done)) {
- 				mutex_unlock(&ctx->aio_mutex);
-@@ -3882,7 +3882,7 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- 				struct list_head tmp_list;
- 				unsigned int got_bytes = rdata->got_bytes;
- 
--				list_del_init(&rdata->list);
-+				list_del_init(&rdata->head);
- 				INIT_LIST_HEAD(&tmp_list);
- 
- 				/*
-@@ -3920,7 +3920,7 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- 						cifs_uncached_readdata_release);
- 				}
- 
--				list_splice(&tmp_list, &ctx->list);
-+				list_splice(&tmp_list, &ctx->rw_list);
- 
- 				goto again;
- 			} else if (rdata->result)
-@@ -3934,7 +3934,7 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- 
- 			ctx->total_len += rdata->got_bytes;
- 		}
--		list_del_init(&rdata->list);
-+		list_del_init(&rdata->head);
- 		kref_put(&rdata->refcount, cifs_uncached_readdata_release);
- 	}
- 
-@@ -4020,10 +4020,10 @@ static ssize_t __cifs_readv(
- 	/* grab a lock here due to read response handlers can access ctx */
- 	mutex_lock(&ctx->aio_mutex);
- 
--	rc = cifs_send_async_read(offset, len, cfile, cifs_sb, &ctx->list, ctx);
-+	rc = cifs_send_async_read(offset, len, cfile, cifs_sb, &ctx->rw_list, ctx);
- 
- 	/* if at least one read request send succeeded, then reset rc */
--	if (!list_empty(&ctx->list))
-+	if (!list_empty(&ctx->rw_list))
- 		rc = 0;
- 
- 	mutex_unlock(&ctx->aio_mutex);
-@@ -4639,14 +4639,14 @@ static int is_inode_writable(struct cifs_inode_info *cinode)
- {
- 	struct cifs_file_info *open_file;
- 
--	spin_lock(&cinode->open_file_lock);
--	list_for_each_entry(open_file, &cinode->openFileList, flist) {
-+	spin_lock(&cinode->open_files_lock);
-+	list_for_each_entry(open_file, &cinode->open_files_list, fid_head) {
- 		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
--			spin_unlock(&cinode->open_file_lock);
-+			spin_unlock(&cinode->open_files_lock);
- 			return 1;
- 		}
- 	}
--	spin_unlock(&cinode->open_file_lock);
-+	spin_unlock(&cinode->open_files_lock);
- 	return 0;
- }
- 
-diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-index 326c2b4cc9e2..55f4e15f876a 100644
---- a/fs/cifs/ioctl.c
-+++ b/fs/cifs/ioctl.c
-@@ -230,8 +230,8 @@ static int cifs_dump_full_key(struct cifs_tcon *tcon, struct smb3_full_key_debug
- 		struct cifs_server_info *server_it = NULL;
- 
- 		spin_lock(&g_servers_lock);
--		list_for_each_entry(server_it, &g_servers_list, server_head) {
--			list_for_each_entry(ses_it, &server_it->smb_ses_list, smb_ses_list) {
-+		list_for_each_entry(server_it, &g_servers_list, head) {
-+			list_for_each_entry(ses_it, &server_it->ses_list, head) {
- 				if (ses_it->Suid == out.session_id) {
- 					ses = ses_it;
- 					/*
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index c37ad2bb3ac4..706e47893345 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -71,7 +71,7 @@ sesInfoAlloc(void)
- 		atomic_inc(&g_ses_alloc_count);
- 		ret_buf->status = SES_STATUS_NEW;
- 		++ret_buf->ses_count;
--		INIT_LIST_HEAD(&ret_buf->smb_ses_list);
-+		INIT_LIST_HEAD(&ret_buf->head);
- 		INIT_LIST_HEAD(&ret_buf->tcon_list);
- 		mutex_init(&ret_buf->session_mutex);
- 		spin_lock_init(&ret_buf->iface_lock);
-@@ -100,8 +100,7 @@ sesInfoFree(struct cifs_ses *buf_to_free)
- 	kfree(buf_to_free->domainName);
- 	kfree_sensitive(buf_to_free->auth_key.response);
- 	spin_lock(&buf_to_free->iface_lock);
--	list_for_each_entry_safe(iface, niface, &buf_to_free->iface_list,
--				 iface_head)
-+	list_for_each_entry_safe(iface, niface, &buf_to_free->iface_list, head)
- 		kref_put(&iface->refcount, release_iface);
- 	spin_unlock(&buf_to_free->iface_lock);
- 	kfree_sensitive(buf_to_free);
-@@ -126,9 +125,9 @@ tconInfoAlloc(void)
- 	atomic_inc(&g_tcon_alloc_count);
- 	ret_buf->status = TCON_STATUS_NEW;
- 	++ret_buf->tc_count;
--	INIT_LIST_HEAD(&ret_buf->openFileList);
--	INIT_LIST_HEAD(&ret_buf->tcon_list);
--	spin_lock_init(&ret_buf->open_file_lock);
-+	INIT_LIST_HEAD(&ret_buf->open_files_list);
-+	INIT_LIST_HEAD(&ret_buf->head);
-+	spin_lock_init(&ret_buf->open_files_lock);
- 	mutex_init(&ret_buf->crfid.fid_mutex);
- 	spin_lock_init(&ret_buf->stat_lock);
- 	atomic_set(&ret_buf->num_local_opens, 0);
-@@ -466,14 +465,14 @@ is_valid_oplock_break(char *buffer, struct cifs_server_info *srv)
- 
- 	/* look up tcon based on tid & uid */
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(ses, &srv->smb_ses_list, smb_ses_list) {
--		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+	list_for_each_entry(ses, &srv->ses_list, head) {
-+		list_for_each_entry(tcon, &ses->tcon_list, head) {
- 			if (tcon->tid != buf->Tid)
- 				continue;
- 
- 			cifs_stats_inc(&tcon->stats.cifs_stats.num_oplock_brks);
--			spin_lock(&tcon->open_file_lock);
--			list_for_each_entry(netfile, &tcon->openFileList, tlist) {
-+			spin_lock(&tcon->open_files_lock);
-+			list_for_each_entry(netfile, &tcon->open_files_list, tcon_head) {
- 				if (pSMB->Fid != netfile->fid.netfid)
- 					continue;
- 
-@@ -488,11 +487,11 @@ is_valid_oplock_break(char *buffer, struct cifs_server_info *srv)
- 				netfile->oplock_break_cancelled = false;
- 				cifs_queue_oplock_break(netfile);
- 
--				spin_unlock(&tcon->open_file_lock);
-+				spin_unlock(&tcon->open_files_lock);
- 				spin_unlock(&g_servers_lock);
- 				return true;
- 			}
--			spin_unlock(&tcon->open_file_lock);
-+			spin_unlock(&tcon->open_files_lock);
- 			spin_unlock(&g_servers_lock);
- 			cifs_dbg(FYI, "No matching file for oplock break\n");
- 			return true;
-@@ -598,14 +597,14 @@ void cifs_put_writer(struct cifs_inode_info *cinode)
-  * This function is called from the demultiplex thread when it
-  * receives an oplock break for @cfile.
-  *
-- * Assumes the tcon->open_file_lock is held.
-+ * Assumes the tcon->open_files_lock is held.
-  * Assumes cfile->file_info_lock is NOT held.
-  */
- void cifs_queue_oplock_break(struct cifs_file_info *cfile)
- {
- 	/*
- 	 * Bump the handle refcount now while we hold the
--	 * open_file_lock to enforce the validity of it for the oplock
-+	 * open_files_lock to enforce the validity of it for the oplock
- 	 * break handler. The matching put is done at the end of the
- 	 * handler.
- 	 */
-@@ -638,9 +637,9 @@ backup_cred(struct cifs_sb_info *cifs_sb)
- void
- cifs_del_pending_open(struct cifs_pending_open *open)
- {
--	spin_lock(&tlink_tcon(open->tlink)->open_file_lock);
--	list_del(&open->olist);
--	spin_unlock(&tlink_tcon(open->tlink)->open_file_lock);
-+	spin_lock(&tlink_tcon(open->tlink)->open_files_lock);
-+	list_del(&open->head);
-+	spin_unlock(&tlink_tcon(open->tlink)->open_files_lock);
- }
- 
- void
-@@ -651,16 +650,16 @@ cifs_add_pending_open_locked(struct cifs_fid *fid, struct tcon_link *tlink,
- 	open->oplock = CIFS_OPLOCK_NO_CHANGE;
- 	open->tlink = tlink;
- 	fid->pending_open = open;
--	list_add_tail(&open->olist, &tlink_tcon(tlink)->pending_opens);
-+	list_add_tail(&open->head, &tlink_tcon(tlink)->pending_opens);
- }
- 
- void
- cifs_add_pending_open(struct cifs_fid *fid, struct tcon_link *tlink,
- 		      struct cifs_pending_open *open)
- {
--	spin_lock(&tlink_tcon(tlink)->open_file_lock);
-+	spin_lock(&tlink_tcon(tlink)->open_files_lock);
- 	cifs_add_pending_open_locked(fid, tlink, open);
--	spin_unlock(&tlink_tcon(open->tlink)->open_file_lock);
-+	spin_unlock(&tlink_tcon(open->tlink)->open_files_lock);
- }
- 
- /*
-@@ -673,7 +672,7 @@ cifs_is_deferred_close(struct cifs_file_info *cfile, struct cifs_deferred_close
- {
- 	struct cifs_deferred_close *dclose;
- 
--	list_for_each_entry(dclose, &CIFS_I(d_inode(cfile->dentry))->deferred_closes, dlist) {
-+	list_for_each_entry(dclose, &CIFS_I(d_inode(cfile->dentry))->deferred_closes, head) {
- 		if ((dclose->netfid == cfile->fid.netfid) &&
- 			(dclose->persistent_fid == cfile->fid.persistent_fid) &&
- 			(dclose->volatile_fid == cfile->fid.volatile_fid)) {
-@@ -703,7 +702,7 @@ cifs_add_deferred_close(struct cifs_file_info *cfile, struct cifs_deferred_close
- 	dclose->netfid = cfile->fid.netfid;
- 	dclose->persistent_fid = cfile->fid.persistent_fid;
- 	dclose->volatile_fid = cfile->fid.volatile_fid;
--	list_add_tail(&dclose->dlist, &CIFS_I(d_inode(cfile->dentry))->deferred_closes);
-+	list_add_tail(&dclose->head, &CIFS_I(d_inode(cfile->dentry))->deferred_closes);
- }
- 
- /*
-@@ -718,7 +717,7 @@ cifs_del_deferred_close(struct cifs_file_info *cfile)
- 	is_deferred = cifs_is_deferred_close(cfile, &dclose);
- 	if (!is_deferred)
- 		return;
--	list_del(&dclose->dlist);
-+	list_del(&dclose->head);
- 	kfree(dclose);
- }
- 
-@@ -733,8 +732,8 @@ cifs_close_deferred_file(struct cifs_inode_info *cinode)
- 		return;
- 
- 	INIT_LIST_HEAD(&file_head);
--	spin_lock(&cinode->open_file_lock);
--	list_for_each_entry(cfile, &cinode->openFileList, flist) {
-+	spin_lock(&cinode->open_files_lock);
-+	list_for_each_entry(cfile, &cinode->open_files_list, fid_head) {
- 		if (delayed_work_pending(&cfile->deferred)) {
- 			if (cancel_delayed_work(&cfile->deferred)) {
- 				tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
-@@ -745,7 +744,7 @@ cifs_close_deferred_file(struct cifs_inode_info *cinode)
- 			}
- 		}
- 	}
--	spin_unlock(&cinode->open_file_lock);
-+	spin_unlock(&cinode->open_files_lock);
- 
- 	list_for_each_entry_safe(tmp_list, tmp_next_list, &file_head, list) {
- 		_cifs_file_info_put(tmp_list->cfile, true, false);
-@@ -762,8 +761,8 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
- 	struct list_head file_head;
- 
- 	INIT_LIST_HEAD(&file_head);
--	spin_lock(&tcon->open_file_lock);
--	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-+	spin_lock(&tcon->open_files_lock);
-+	list_for_each_entry(cfile, &tcon->open_files_list, tcon_head) {
- 		if (delayed_work_pending(&cfile->deferred)) {
- 			if (cancel_delayed_work(&cfile->deferred)) {
- 				tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
-@@ -774,7 +773,7 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
- 			}
- 		}
- 	}
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&tcon->open_files_lock);
- 
- 	list_for_each_entry_safe(tmp_list, tmp_next_list, &file_head, list) {
- 		_cifs_file_info_put(tmp_list->cfile, true, false);
-@@ -793,8 +792,8 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
- 
- 	INIT_LIST_HEAD(&file_head);
- 	page = alloc_dentry_path();
--	spin_lock(&tcon->open_file_lock);
--	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-+	spin_lock(&tcon->open_files_lock);
-+	list_for_each_entry(cfile, &tcon->open_files_list, fid_head) {
- 		full_path = build_path_from_dentry(cfile->dentry, page);
- 		if (strstr(full_path, path)) {
- 			if (delayed_work_pending(&cfile->deferred)) {
-@@ -808,7 +807,7 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
- 			}
- 		}
- 	}
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&tcon->open_files_lock);
- 
- 	list_for_each_entry_safe(tmp_list, tmp_next_list, &file_head, list) {
- 		_cifs_file_info_put(tmp_list->cfile, true, false);
-@@ -939,7 +938,7 @@ cifs_aio_ctx_alloc(void)
- 	if (!ctx)
- 		return NULL;
- 
--	INIT_LIST_HEAD(&ctx->list);
-+	INIT_LIST_HEAD(&ctx->rw_list);
- 	mutex_init(&ctx->aio_mutex);
- 	init_completion(&ctx->done);
- 	kref_init(&ctx->refcount);
-diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index dbdabb83ea03..a64490c88bbd 100644
---- a/fs/cifs/readdir.c
-+++ b/fs/cifs/readdir.c
-@@ -846,7 +846,7 @@ static bool emit_cached_dirents(struct cached_dirents *cde,
- 	struct cached_dirent *dirent;
  	int rc;
  
--	list_for_each_entry(dirent, &cde->entries, entry) {
-+	list_for_each_entry(dirent, &cde->entries, head) {
- 		if (ctx->pos >= dirent->pos)
- 			continue;
- 		ctx->pos = dirent->pos;
-@@ -914,7 +914,7 @@ static void add_cached_dirent(struct cached_dirents *cde,
+-	if (!rqst->rq_iov || !signature || !server)
++	if (!rqst->iov || !signature || !server)
+ 		return -EINVAL;
  
- 	memcpy(&de->fattr, fattr, sizeof(struct cifs_fattr));
+ 	rc = cifs_alloc_hash("md5", &server->secmech.md5,
+@@ -132,10 +132,10 @@ int cifs_sign_rqst(struct smb_rqst *rqst, struct cifs_server_info *server,
+ {
+ 	int rc = 0;
+ 	char smb_signature[20];
+-	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
++	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->iov[0].iov_base;
  
--	list_add_tail(&de->entry, &cde->entries);
-+	list_add_tail(&de->head, &cde->entries);
+-	if (rqst->rq_iov[0].iov_len != 4 ||
+-	    rqst->rq_iov[0].iov_base + 4 != rqst->rq_iov[1].iov_base)
++	if (rqst->iov[0].iov_len != 4 ||
++	    rqst->iov[0].iov_base + 4 != rqst->iov[1].iov_base)
+ 		return -EIO;
+ 
+ 	if ((cifs_pdu == NULL) || (server == NULL))
+@@ -173,8 +173,8 @@ int cifs_sign_rqst(struct smb_rqst *rqst, struct cifs_server_info *server,
+ int cifs_sign_smbv(struct kvec *iov, int n_vec, struct cifs_server_info *server,
+ 		   __u32 *pexpected_response_sequence)
+ {
+-	struct smb_rqst rqst = { .rq_iov = iov,
+-				 .rq_nvec = n_vec };
++	struct smb_rqst rqst = { .iov = iov,
++				 .nvec = n_vec };
+ 
+ 	return cifs_sign_rqst(&rqst, server, pexpected_response_sequence);
  }
+@@ -201,10 +201,10 @@ int cifs_verify_signature(struct smb_rqst *rqst,
+ 	unsigned int rc;
+ 	char server_response_sig[8];
+ 	char what_we_think_sig_should_be[20];
+-	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
++	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->iov[0].iov_base;
  
- static bool cifs_dir_emit(struct dir_context *ctx,
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index dd34b73eea97..57061394032e 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -199,7 +199,7 @@ int cifs_try_adding_channels(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses)
- 	 */
- 	spin_lock(&ses->iface_lock);
- 	iface = list_first_entry(&ses->iface_list, struct cifs_server_iface,
--				 iface_head);
-+				 head);
- 	spin_unlock(&ses->iface_lock);
+-	if (rqst->rq_iov[0].iov_len != 4 ||
+-	    rqst->rq_iov[0].iov_base + 4 != rqst->rq_iov[1].iov_base)
++	if (rqst->iov[0].iov_len != 4 ||
++	    rqst->iov[0].iov_base + 4 != rqst->iov[1].iov_base)
+ 		return -EIO;
  
- 	while (left > 0) {
-@@ -218,7 +218,7 @@ int cifs_try_adding_channels(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses)
- 		}
+ 	if (cifs_pdu == NULL || server == NULL)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 5ead24f9965b..0bb343c86fdf 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -208,13 +208,13 @@ struct cifs_cred {
+  * to start at the beginning of the first page.
+  */
+ struct smb_rqst {
+-	struct kvec	*rq_iov;	/* array of kvecs */
+-	unsigned int	rq_nvec;	/* number of kvecs in array */
+-	struct page	**rq_pages;	/* pointer to array of page ptrs */
+-	unsigned int	rq_offset;	/* the offset to the 1st page */
+-	unsigned int	rq_npages;	/* number pages in array */
+-	unsigned int	rq_pagesz;	/* page size to use */
+-	unsigned int	rq_tailsz;	/* length of last page */
++	struct kvec	*iov;		/* array of kvecs */
++	unsigned int	nvec;		/* number of kvecs in array */
++	struct page	**pages;	/* pointer to array of page ptrs */
++	unsigned int	offset;		/* the offset to the 1st page */
++	unsigned int	npages;		/* number pages in array */
++	unsigned int	pagesz;		/* page size to use */
++	unsigned int	tailsz;		/* length of last page */
+ };
  
- 		list_for_each_entry_safe_from(iface, niface, &ses->iface_list,
--				    iface_head) {
-+				    head) {
- 			/* skip ifaces that are unusable */
- 			if (!iface->is_active ||
- 			    (is_ses_using_iface(ses, iface) &&
-@@ -285,7 +285,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct cifs_server_info *server)
+ struct mid_q_entry;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index dcad67d8f165..7ee1838de8f3 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -695,8 +695,8 @@ CIFSSMBEcho(struct cifs_server_info *server)
+ 	ECHO_REQ *smb;
+ 	int rc = 0;
+ 	struct kvec iov[2];
+-	struct smb_rqst rqst = { .rq_iov = iov,
+-				 .rq_nvec = 2 };
++	struct smb_rqst rqst = { .iov = iov,
++				 .nvec = 2 };
  
- 	spin_lock(&ses->iface_lock);
- 	/* then look for a new one */
--	list_for_each_entry(iface, &ses->iface_list, iface_head) {
-+	list_for_each_entry(iface, &ses->iface_list, head) {
- 		if (!iface->is_active ||
- 		    (is_ses_using_iface(ses, iface) &&
- 		     !iface->rss_capable)) {
-@@ -294,7 +294,7 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct cifs_server_info *server)
- 		kref_get(&iface->refcount);
+ 	cifs_dbg(FYI, "In echo request\n");
+ 
+@@ -1564,13 +1564,13 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 	struct cifs_readdata *rdata = mid->callback_data;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	struct cifs_server_info *server = tcon->ses->server;
+-	struct smb_rqst rqst = { .rq_iov = rdata->iov,
+-				 .rq_nvec = 2,
+-				 .rq_pages = rdata->pages,
+-				 .rq_offset = rdata->page_offset,
+-				 .rq_npages = rdata->nr_pages,
+-				 .rq_pagesz = rdata->pagesz,
+-				 .rq_tailsz = rdata->tailsz };
++	struct smb_rqst rqst = { .iov = rdata->iov,
++				 .nvec = 2,
++				 .pages = rdata->pages,
++				 .offset = rdata->page_offset,
++				 .npages = rdata->nr_pages,
++				 .pagesz = rdata->pagesz,
++				 .tailsz = rdata->tailsz };
+ 	struct cifs_credits credits = { .value = 1, .instance = 0 };
+ 
+ 	cifs_dbg(FYI, "%s: mid=%llu state=%d result=%d bytes=%u\n",
+@@ -1620,8 +1620,8 @@ cifs_async_readv(struct cifs_readdata *rdata)
+ 	READ_REQ *smb = NULL;
+ 	int wct;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+-	struct smb_rqst rqst = { .rq_iov = rdata->iov,
+-				 .rq_nvec = 2 };
++	struct smb_rqst rqst = { .iov = rdata->iov,
++				 .nvec = 2 };
+ 
+ 	cifs_dbg(FYI, "%s: offset=%llu bytes=%u\n",
+ 		 __func__, rdata->offset, rdata->bytes);
+@@ -2184,13 +2184,13 @@ cifs_async_writev(struct cifs_writedata *wdata,
+ 	iov[1].iov_len = get_rfc1002_length(smb) + 1;
+ 	iov[1].iov_base = (char *)smb + 4;
+ 
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 2;
+-	rqst.rq_pages = wdata->pages;
+-	rqst.rq_offset = wdata->page_offset;
+-	rqst.rq_npages = wdata->nr_pages;
+-	rqst.rq_pagesz = wdata->pagesz;
+-	rqst.rq_tailsz = wdata->tailsz;
++	rqst.iov = iov;
++	rqst.nvec = 2;
++	rqst.pages = wdata->pages;
++	rqst.offset = wdata->page_offset;
++	rqst.npages = wdata->nr_pages;
++	rqst.pagesz = wdata->pagesz;
++	rqst.tailsz = wdata->tailsz;
+ 
+ 	cifs_dbg(FYI, "async write at %llu %u bytes\n",
+ 		 wdata->offset, wdata->bytes);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 18b343389a9d..b4688c11ec06 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -551,7 +551,7 @@ static int reconnect_dfs_server(struct cifs_server_info *server)
+ 	} while (server->status == SERVER_STATUS_NEED_RECONNECT);
+ 
+ 	if (target_hint)
+-		dfs_cache_noreq_update_tgthint(refpath, target_hint);
++		dfs_cache_noreq_update_tgt_hint(refpath, target_hint);
+ 
+ 	dfs_cache_free_tgts(&tl);
+ 
+@@ -3580,7 +3580,7 @@ static int connect_dfs_target(struct mount_ctx *mnt_ctx, const char *full_path,
+ 	if (!rc) {
+ 		if (cifs_is_referral_server(mnt_ctx->tcon, &ref))
+ 			set_root_ses(mnt_ctx);
+-		rc = dfs_cache_update_tgthint(mnt_ctx->xid, mnt_ctx->root_ses, cifs_sb->local_nls,
++		rc = dfs_cache_update_tgt_hint(mnt_ctx->xid, mnt_ctx->root_ses, cifs_sb->local_nls,
+ 					      cifs_remap(cifs_sb), ref_path, tit);
  	}
  
--	if (!list_entry_is_head(iface, &ses->iface_list, iface_head)) {
-+	if (!list_entry_is_head(iface, &ses->iface_list, head)) {
- 		rc = 1;
- 		iface = NULL;
- 		cifs_dbg(FYI, "unable to find a suitable iface\n");
+@@ -4496,7 +4496,7 @@ static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *t
+ 			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, cifs_sb->local_nls);
+ 			if (rc)
+ 				continue;
+-			rc = dfs_cache_noreq_update_tgthint(server->current_fullpath + 1, tit);
++			rc = dfs_cache_noreq_update_tgt_hint(server->current_fullpath + 1, tit);
+ 			if (!rc)
+ 				rc = cifs_update_super_prepath(cifs_sb, prefix);
+ 		} else {
+@@ -4506,7 +4506,7 @@ static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *t
+ 
+ 			if (!rc) {
+ 				rc = -EREMOTE;
+-				list_replace_init(&ntl.tl_list, &tl->tl_list);
++				list_replace_init(&ntl.list, &tl->list);
+ 			} else
+ 				dfs_cache_free_tgts(&ntl);
+ 		}
+diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+index eb5539b32d74..4d2cf8719a6b 100644
+--- a/fs/cifs/dfs_cache.c
++++ b/fs/cifs/dfs_cache.c
+@@ -32,11 +32,11 @@
+ struct cache_dfs_tgt {
+ 	char *name;
+ 	int path_consumed;
+-	struct list_head list;
++	struct list_head head;
+ };
+ 
+ struct cache_entry {
+-	struct hlist_node hlist;
++	struct hlist_node node;
+ 	const char *path;
+ 	int hdr_flags; /* RESP_GET_DFS_REFERRAL.ReferralHeaderFlags */
+ 	int ttl; /* DFS_REREFERRAL_V3.TimeToLive */
+@@ -44,14 +44,14 @@ struct cache_entry {
+ 	int ref_flags; /* DFS_REREFERRAL_V3.ReferralEntryFlags */
+ 	struct timespec64 etime;
+ 	int path_consumed; /* RESP_GET_DFS_REFERRAL.PathConsumed */
+-	int numtgts;
+-	struct list_head tlist;
+-	struct cache_dfs_tgt *tgthint;
++	int num_tgts;
++	struct list_head tgt_list;
++	struct cache_dfs_tgt *tgt_hint;
+ };
+ 
+ /* List of referral server sessions per dfs mount */
+ struct mount_group {
+-	struct list_head list;
++	struct list_head head;
+ 	uuid_t id;
+ 	struct cifs_ses *sessions[CACHE_MAX_ENTRIES];
+ 	int num_sessions;
+@@ -118,7 +118,7 @@ static void mount_group_release(struct kref *kref)
+ 	struct mount_group *mg = container_of(kref, struct mount_group, refcount);
+ 
+ 	mutex_lock(&mount_group_list_lock);
+-	list_del(&mg->list);
++	list_del(&mg->head);
+ 	mutex_unlock(&mount_group_list_lock);
+ 	__mount_group_release(mg);
+ }
+@@ -127,7 +127,7 @@ static struct mount_group *find_mount_group_locked(const uuid_t *id)
+ {
+ 	struct mount_group *mg;
+ 
+-	list_for_each_entry(mg, &mount_group_list, list) {
++	list_for_each_entry(mg, &mount_group_list, head) {
+ 		if (uuid_equal(&mg->id, id))
+ 			return mg;
+ 	}
+@@ -149,7 +149,7 @@ static struct mount_group *__get_mount_group_locked(const uuid_t *id)
+ 	uuid_copy(&mg->id, id);
+ 	mg->num_sessions = 0;
+ 	spin_lock_init(&mg->lock);
+-	list_add(&mg->list, &mount_group_list);
++	list_add(&mg->head, &mount_group_list);
+ 	return mg;
+ }
+ 
+@@ -170,8 +170,8 @@ static void free_mount_group_list(void)
+ {
+ 	struct mount_group *mg, *tmp_mg;
+ 
+-	list_for_each_entry_safe(mg, tmp_mg, &mount_group_list, list) {
+-		list_del_init(&mg->list);
++	list_for_each_entry_safe(mg, tmp_mg, &mount_group_list, head) {
++		list_del_init(&mg->head);
+ 		__mount_group_release(mg);
+ 	}
+ }
+@@ -229,8 +229,8 @@ static inline void free_tgts(struct cache_entry *ce)
+ {
+ 	struct cache_dfs_tgt *t, *n;
+ 
+-	list_for_each_entry_safe(t, n, &ce->tlist, list) {
+-		list_del(&t->list);
++	list_for_each_entry_safe(t, n, &ce->tgt_list, head) {
++		list_del(&t->head);
+ 		kfree(t->name);
+ 		kfree(t);
+ 	}
+@@ -238,7 +238,7 @@ static inline void free_tgts(struct cache_entry *ce)
+ 
+ static inline void flush_cache_ent(struct cache_entry *ce)
+ {
+-	hlist_del_init(&ce->hlist);
++	hlist_del_init(&ce->node);
+ 	kfree(ce->path);
+ 	free_tgts(ce);
+ 	atomic_dec(&cache_count);
+@@ -254,8 +254,8 @@ static void flush_cache_ents(void)
+ 		struct hlist_node *n;
+ 		struct cache_entry *ce;
+ 
+-		hlist_for_each_entry_safe(ce, n, l, hlist) {
+-			if (!hlist_unhashed(&ce->hlist))
++		hlist_for_each_entry_safe(ce, n, l, node) {
++			if (!hlist_unhashed(&ce->node))
+ 				flush_cache_ent(ce);
+ 		}
+ 	}
+@@ -276,8 +276,8 @@ static int dfscache_proc_show(struct seq_file *m, void *v)
+ 	for (i = 0; i < CACHE_HTABLE_SIZE; i++) {
+ 		struct hlist_head *l = &cache_htable[i];
+ 
+-		hlist_for_each_entry(ce, l, hlist) {
+-			if (hlist_unhashed(&ce->hlist))
++		hlist_for_each_entry(ce, l, node) {
++			if (hlist_unhashed(&ce->node))
+ 				continue;
+ 
+ 			seq_printf(m,
+@@ -287,10 +287,10 @@ static int dfscache_proc_show(struct seq_file *m, void *v)
+ 				   IS_DFS_INTERLINK(ce->hdr_flags) ? "yes" : "no",
+ 				   ce->path_consumed, cache_entry_expired(ce) ? "yes" : "no");
+ 
+-			list_for_each_entry(t, &ce->tlist, list) {
++			list_for_each_entry(t, &ce->tgt_list, head) {
+ 				seq_printf(m, "  %s%s\n",
+ 					   t->name,
+-					   ce->tgthint == t ? " (target hint)" : "");
++					   ce->tgt_hint == t ? " (target hint)" : "");
+ 			}
+ 		}
+ 	}
+@@ -340,9 +340,9 @@ static inline void dump_tgts(const struct cache_entry *ce)
+ 	struct cache_dfs_tgt *t;
+ 
+ 	cifs_dbg(FYI, "target list:\n");
+-	list_for_each_entry(t, &ce->tlist, list) {
++	list_for_each_entry(t, &ce->tgt_list, head) {
+ 		cifs_dbg(FYI, "  %s%s\n", t->name,
+-			 ce->tgthint == t ? " (target hint)" : "");
++			 ce->tgt_hint == t ? " (target hint)" : "");
+ 	}
+ }
+ 
+@@ -448,7 +448,7 @@ static int cache_entry_hash(const void *data, int size, unsigned int *hash)
+ /* Return target hint of a DFS cache entry */
+ static inline char *get_tgt_name(const struct cache_entry *ce)
+ {
+-	struct cache_dfs_tgt *t = ce->tgthint;
++	struct cache_dfs_tgt *t = ce->tgt_hint;
+ 
+ 	return t ? t->name : ERR_PTR(-ENOENT);
+ }
+@@ -480,7 +480,7 @@ static struct cache_dfs_tgt *alloc_target(const char *name, int path_consumed)
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 	t->path_consumed = path_consumed;
+-	INIT_LIST_HEAD(&t->list);
++	INIT_LIST_HEAD(&t->head);
+ 	return t;
+ }
+ 
+@@ -489,7 +489,7 @@ static struct cache_dfs_tgt *alloc_target(const char *name, int path_consumed)
+  * target hint.
+  */
+ static int copy_ref_data(const struct dfs_info3_param *refs, int numrefs,
+-			 struct cache_entry *ce, const char *tgthint)
++			 struct cache_entry *ce, const char *tgt_hint)
+ {
+ 	int i;
+ 
+@@ -508,17 +508,17 @@ static int copy_ref_data(const struct dfs_info3_param *refs, int numrefs,
+ 			free_tgts(ce);
+ 			return PTR_ERR(t);
+ 		}
+-		if (tgthint && !strcasecmp(t->name, tgthint)) {
+-			list_add(&t->list, &ce->tlist);
+-			tgthint = NULL;
++		if (tgt_hint && !strcasecmp(t->name, tgt_hint)) {
++			list_add(&t->head, &ce->tgt_list);
++			tgt_hint = NULL;
+ 		} else {
+-			list_add_tail(&t->list, &ce->tlist);
++			list_add_tail(&t->head, &ce->tgt_list);
+ 		}
+-		ce->numtgts++;
++		ce->num_tgts++;
+ 	}
+ 
+-	ce->tgthint = list_first_entry_or_null(&ce->tlist,
+-					       struct cache_dfs_tgt, list);
++	ce->tgt_hint = list_first_entry_or_null(&ce->tgt_list,
++					       struct cache_dfs_tgt, head);
+ 
+ 	return 0;
+ }
+@@ -536,8 +536,8 @@ static struct cache_entry *alloc_cache_entry(struct dfs_info3_param *refs, int n
+ 	ce->path = refs[0].path_name;
+ 	refs[0].path_name = NULL;
+ 
+-	INIT_HLIST_NODE(&ce->hlist);
+-	INIT_LIST_HEAD(&ce->tlist);
++	INIT_HLIST_NODE(&ce->node);
++	INIT_LIST_HEAD(&ce->tgt_list);
+ 
+ 	rc = copy_ref_data(refs, numrefs, ce, NULL);
+ 	if (rc) {
+@@ -559,8 +559,8 @@ static void remove_oldest_entry_locked(void)
+ 	for (i = 0; i < CACHE_HTABLE_SIZE; i++) {
+ 		struct hlist_head *l = &cache_htable[i];
+ 
+-		hlist_for_each_entry(ce, l, hlist) {
+-			if (hlist_unhashed(&ce->hlist))
++		hlist_for_each_entry(ce, l, node) {
++			if (hlist_unhashed(&ce->node))
+ 				continue;
+ 			if (!to_del || timespec64_compare(&ce->etime,
+ 							  &to_del->etime) < 0)
+@@ -610,7 +610,7 @@ static int add_cache_entry_locked(struct dfs_info3_param *refs, int numrefs)
+ 	}
+ 	spin_unlock(&cache_ttl_lock);
+ 
+-	hlist_add_head(&ce->hlist, &cache_htable[hash]);
++	hlist_add_head(&ce->node, &cache_htable[hash]);
+ 	dump_ce(ce);
+ 
+ 	atomic_inc(&cache_count);
+@@ -648,7 +648,7 @@ static struct cache_entry *__lookup_cache_entry(const char *path, unsigned int h
+ {
+ 	struct cache_entry *ce;
+ 
+-	hlist_for_each_entry(ce, &cache_htable[hash], hlist) {
++	hlist_for_each_entry(ce, &cache_htable[hash], node) {
+ 		if (dfs_path_equal(ce->path, strlen(ce->path), path, len)) {
+ 			dump_ce(ce);
+ 			return ce;
+@@ -737,15 +737,15 @@ static int update_cache_entry_locked(struct cache_entry *ce, const struct dfs_in
+ 
+ 	WARN_ON(!rwsem_is_locked(&htable_rw_lock));
+ 
+-	if (ce->tgthint) {
+-		s = ce->tgthint->name;
++	if (ce->tgt_hint) {
++		s = ce->tgt_hint->name;
+ 		th = kstrdup(s, GFP_ATOMIC);
+ 		if (!th)
+ 			return -ENOMEM;
+ 	}
+ 
+ 	free_tgts(ce);
+-	ce->numtgts = 0;
++	ce->num_tgts = 0;
+ 
+ 	rc = copy_ref_data(refs, numrefs, ce, th);
+ 
+@@ -878,42 +878,42 @@ static int setup_referral(const char *path, struct cache_entry *ce,
+ static int get_targets(struct cache_entry *ce, struct dfs_cache_tgt_list *tl)
+ {
+ 	int rc;
+-	struct list_head *head = &tl->tl_list;
++	struct list_head *tgt_list = &tl->list;
+ 	struct cache_dfs_tgt *t;
+ 	struct dfs_cache_tgt_iterator *it, *nit;
+ 
+ 	memset(tl, 0, sizeof(*tl));
+-	INIT_LIST_HEAD(head);
++	INIT_LIST_HEAD(tgt_list);
+ 
+-	list_for_each_entry(t, &ce->tlist, list) {
++	list_for_each_entry(t, &ce->tgt_list, head) {
+ 		it = kzalloc(sizeof(*it), GFP_ATOMIC);
+ 		if (!it) {
+ 			rc = -ENOMEM;
+ 			goto err_free_it;
+ 		}
+ 
+-		it->it_name = kstrdup(t->name, GFP_ATOMIC);
+-		if (!it->it_name) {
++		it->name = kstrdup(t->name, GFP_ATOMIC);
++		if (!it->name) {
+ 			kfree(it);
+ 			rc = -ENOMEM;
+ 			goto err_free_it;
+ 		}
+-		it->it_path_consumed = t->path_consumed;
++		it->path_consumed = t->path_consumed;
+ 
+-		if (ce->tgthint == t)
+-			list_add(&it->it_list, head);
++		if (ce->tgt_hint == t)
++			list_add(&it->head, tgt_list);
+ 		else
+-			list_add_tail(&it->it_list, head);
++			list_add_tail(&it->head, tgt_list);
+ 	}
+ 
+-	tl->tl_numtgts = ce->numtgts;
++	tl->num_tgts = ce->num_tgts;
+ 
+ 	return 0;
+ 
+ err_free_it:
+-	list_for_each_entry_safe(it, nit, head, it_list) {
+-		list_del(&it->it_list);
+-		kfree(it->it_name);
++	list_for_each_entry_safe(it, nit, tgt_list, head) {
++		list_del(&it->head);
++		kfree(it->name);
+ 		kfree(it);
+ 	}
+ 	return rc;
+@@ -1025,7 +1025,7 @@ int dfs_cache_noreq_find(const char *path, struct dfs_info3_param *ref,
+ }
+ 
+ /**
+- * dfs_cache_update_tgthint - update target hint of a DFS cache entry
++ * dfs_cache_update_tgt_hint - update target hint of a DFS cache entry
+  *
+  * If it doesn't find the cache entry, then it will get a DFS referral for @path
+  * and create a new entry.
+@@ -1042,7 +1042,7 @@ int dfs_cache_noreq_find(const char *path, struct dfs_info3_param *ref,
+  *
+  * Return zero if the target hint was updated successfully, otherwise non-zero.
+  */
+-int dfs_cache_update_tgthint(const unsigned int xid, struct cifs_ses *ses,
++int dfs_cache_update_tgt_hint(const unsigned int xid, struct cifs_ses *ses,
+ 			     const struct nls_table *cp, int remap, const char *path,
+ 			     const struct dfs_cache_tgt_iterator *it)
+ {
+@@ -1069,16 +1069,16 @@ int dfs_cache_update_tgthint(const unsigned int xid, struct cifs_ses *ses,
+ 		goto out_unlock;
+ 	}
+ 
+-	t = ce->tgthint;
++	t = ce->tgt_hint;
+ 
+-	if (likely(!strcasecmp(it->it_name, t->name)))
++	if (likely(!strcasecmp(it->name, t->name)))
+ 		goto out_unlock;
+ 
+-	list_for_each_entry(t, &ce->tlist, list) {
+-		if (!strcasecmp(t->name, it->it_name)) {
+-			ce->tgthint = t;
++	list_for_each_entry(t, &ce->tgt_list, head) {
++		if (!strcasecmp(t->name, it->name)) {
++			ce->tgt_hint = t;
+ 			cifs_dbg(FYI, "%s: new target hint: %s\n", __func__,
+-				 it->it_name);
++				 it->name);
+ 			break;
+ 		}
+ 	}
+@@ -1091,7 +1091,7 @@ int dfs_cache_update_tgthint(const unsigned int xid, struct cifs_ses *ses,
+ }
+ 
+ /**
+- * dfs_cache_noreq_update_tgthint - update target hint of a DFS cache entry
++ * dfs_cache_noreq_update_tgt_hint - update target hint of a DFS cache entry
+  * without sending any requests to the currently connected server.
+  *
+  * NOTE: This function will neither update a cache entry in case it was
+@@ -1104,7 +1104,7 @@ int dfs_cache_update_tgthint(const unsigned int xid, struct cifs_ses *ses,
+  *
+  * Return zero if the target hint was updated successfully, otherwise non-zero.
+  */
+-int dfs_cache_noreq_update_tgthint(const char *path, const struct dfs_cache_tgt_iterator *it)
++int dfs_cache_noreq_update_tgt_hint(const char *path, const struct dfs_cache_tgt_iterator *it)
+ {
+ 	int rc;
+ 	struct cache_entry *ce;
+@@ -1124,16 +1124,16 @@ int dfs_cache_noreq_update_tgthint(const char *path, const struct dfs_cache_tgt_
+ 	}
+ 
+ 	rc = 0;
+-	t = ce->tgthint;
++	t = ce->tgt_hint;
+ 
+-	if (unlikely(!strcasecmp(it->it_name, t->name)))
++	if (unlikely(!strcasecmp(it->name, t->name)))
+ 		goto out_unlock;
+ 
+-	list_for_each_entry(t, &ce->tlist, list) {
+-		if (!strcasecmp(t->name, it->it_name)) {
+-			ce->tgthint = t;
++	list_for_each_entry(t, &ce->tgt_list, head) {
++		if (!strcasecmp(t->name, it->name)) {
++			ce->tgt_hint = t;
+ 			cifs_dbg(FYI, "%s: new target hint: %s\n", __func__,
+-				 it->it_name);
++				 it->name);
+ 			break;
+ 		}
+ 	}
+@@ -1172,9 +1172,9 @@ int dfs_cache_get_tgt_referral(const char *path, const struct dfs_cache_tgt_iter
+ 		goto out_unlock;
+ 	}
+ 
+-	cifs_dbg(FYI, "%s: target name: %s\n", __func__, it->it_name);
++	cifs_dbg(FYI, "%s: target name: %s\n", __func__, it->name);
+ 
+-	rc = setup_referral(path, ce, ref, it->it_name);
++	rc = setup_referral(path, ce, ref, it->name);
+ 
+ out_unlock:
+ 	up_read(&htable_rw_lock);
+@@ -1273,19 +1273,19 @@ int dfs_cache_get_tgt_share(char *path, const struct dfs_cache_tgt_iterator *it,
+ 	size_t target_pplen, dfsref_pplen;
+ 	size_t len, c;
+ 
+-	if (!it || !path || !share || !prefix || strlen(path) < it->it_path_consumed)
++	if (!it || !path || !share || !prefix || strlen(path) < it->path_consumed)
+ 		return -EINVAL;
+ 
+-	sep = it->it_name[0];
++	sep = it->name[0];
+ 	if (sep != '\\' && sep != '/')
+ 		return -EINVAL;
+ 
+-	target_ppath = parse_target_share(it->it_name, &target_share);
++	target_ppath = parse_target_share(it->name, &target_share);
+ 	if (IS_ERR(target_ppath))
+ 		return PTR_ERR(target_ppath);
+ 
+ 	/* point to prefix in DFS referral path */
+-	dfsref_ppath = path + it->it_path_consumed;
++	dfsref_ppath = path + it->path_consumed;
+ 	dfsref_ppath += strspn(dfsref_ppath, "/\\");
+ 
+ 	target_pplen = strlen(target_ppath);
+@@ -1578,10 +1578,10 @@ static void refresh_cache(struct cifs_ses **sessions)
+ 	for (i = 0; i < CACHE_HTABLE_SIZE; i++) {
+ 		struct hlist_head *l = &cache_htable[i];
+ 
+-		hlist_for_each_entry(ce, l, hlist) {
++		hlist_for_each_entry(ce, l, node) {
+ 			if (count == ARRAY_SIZE(ref_paths))
+ 				goto out_unlock;
+-			if (hlist_unhashed(&ce->hlist) || !cache_entry_expired(ce) ||
++			if (hlist_unhashed(&ce->node) || !cache_entry_expired(ce) ||
+ 			    IS_ERR(find_ipc_from_server_path(sessions, ce->path)))
+ 				continue;
+ 			ref_paths[count++] = kstrdup(ce->path, GFP_ATOMIC);
+@@ -1642,7 +1642,7 @@ static void refresh_cache_worker(struct work_struct *work)
+ 
+ 	/* Get refereces of mount groups */
+ 	mutex_lock(&mount_group_list_lock);
+-	list_for_each_entry(mg, &mount_group_list, list) {
++	list_for_each_entry(mg, &mount_group_list, head) {
+ 		kref_get(&mg->refcount);
+ 		list_add(&mg->refresh_list, &mglist);
+ 	}
+diff --git a/fs/cifs/dfs_cache.h b/fs/cifs/dfs_cache.h
+index 52070d1df189..9243d87ec198 100644
+--- a/fs/cifs/dfs_cache.h
++++ b/fs/cifs/dfs_cache.h
+@@ -13,17 +13,17 @@
+ #include <linux/uuid.h>
+ #include "cifsglob.h"
+ 
+-#define DFS_CACHE_TGT_LIST_INIT(var) { .tl_numtgts = 0, .tl_list = LIST_HEAD_INIT((var).tl_list), }
++#define DFS_CACHE_TGT_LIST_INIT(var) { .num_tgts = 0, .list = LIST_HEAD_INIT((var).list), }
+ 
+ struct dfs_cache_tgt_list {
+-	int tl_numtgts;
+-	struct list_head tl_list;
++	int num_tgts;
++	struct list_head list;
+ };
+ 
+ struct dfs_cache_tgt_iterator {
+-	char *it_name;
+-	int it_path_consumed;
+-	struct list_head it_list;
++	char *name;
++	int path_consumed;
++	struct list_head head;
+ };
+ 
+ int dfs_cache_init(void);
+@@ -35,10 +35,10 @@ int dfs_cache_find(const unsigned int xid, struct cifs_ses *ses, const struct nl
+ 		   struct dfs_cache_tgt_list *tgt_list);
+ int dfs_cache_noreq_find(const char *path, struct dfs_info3_param *ref,
+ 			 struct dfs_cache_tgt_list *tgt_list);
+-int dfs_cache_update_tgthint(const unsigned int xid, struct cifs_ses *ses,
++int dfs_cache_update_tgt_hint(const unsigned int xid, struct cifs_ses *ses,
+ 			     const struct nls_table *cp, int remap, const char *path,
+ 			     const struct dfs_cache_tgt_iterator *it);
+-int dfs_cache_noreq_update_tgthint(const char *path, const struct dfs_cache_tgt_iterator *it);
++int dfs_cache_noreq_update_tgt_hint(const char *path, const struct dfs_cache_tgt_iterator *it);
+ int dfs_cache_get_tgt_referral(const char *path, const struct dfs_cache_tgt_iterator *it,
+ 			       struct dfs_info3_param *ref);
+ int dfs_cache_get_tgt_share(char *path, const struct dfs_cache_tgt_iterator *it, char **share,
+@@ -52,10 +52,10 @@ static inline struct dfs_cache_tgt_iterator *
+ dfs_cache_get_next_tgt(struct dfs_cache_tgt_list *tl,
+ 		       struct dfs_cache_tgt_iterator *it)
+ {
+-	if (!tl || list_empty(&tl->tl_list) || !it ||
+-	    list_is_last(&it->it_list, &tl->tl_list))
++	if (!tl || list_empty(&tl->list) || !it ||
++	    list_is_last(&it->head, &tl->list))
+ 		return NULL;
+-	return list_next_entry(it, it_list);
++	return list_next_entry(it, head);
+ }
+ 
+ static inline struct dfs_cache_tgt_iterator *
+@@ -63,35 +63,35 @@ dfs_cache_get_tgt_iterator(struct dfs_cache_tgt_list *tl)
+ {
+ 	if (!tl)
+ 		return NULL;
+-	return list_first_entry_or_null(&tl->tl_list,
++	return list_first_entry_or_null(&tl->list,
+ 					struct dfs_cache_tgt_iterator,
+-					it_list);
++					head);
+ }
+ 
+ static inline void dfs_cache_free_tgts(struct dfs_cache_tgt_list *tl)
+ {
+ 	struct dfs_cache_tgt_iterator *it, *nit;
+ 
+-	if (!tl || list_empty(&tl->tl_list))
++	if (!tl || list_empty(&tl->list))
+ 		return;
+-	list_for_each_entry_safe(it, nit, &tl->tl_list, it_list) {
+-		list_del(&it->it_list);
+-		kfree(it->it_name);
++	list_for_each_entry_safe(it, nit, &tl->list, head) {
++		list_del(&it->head);
++		kfree(it->name);
+ 		kfree(it);
+ 	}
+-	tl->tl_numtgts = 0;
++	tl->num_tgts = 0;
+ }
+ 
+ static inline const char *
+ dfs_cache_get_tgt_name(const struct dfs_cache_tgt_iterator *it)
+ {
+-	return it ? it->it_name : NULL;
++	return it ? it->name : NULL;
+ }
+ 
+ static inline int
+ dfs_cache_get_nr_tgts(const struct dfs_cache_tgt_list *tl)
+ {
+-	return tl ? tl->tl_numtgts : 0;
++	return tl ? tl->num_tgts : 0;
+ }
+ 
+ #endif /* _CIFS_DFS_CACHE_H */
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 0f7315b00d34..67ce599401e2 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1130,13 +1130,13 @@ cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
+ void rqst_page_get_length(struct smb_rqst *rqst, unsigned int page,
+ 				unsigned int *len, unsigned int *offset)
+ {
+-	*len = rqst->rq_pagesz;
+-	*offset = (page == 0) ? rqst->rq_offset : 0;
++	*len = rqst->pagesz;
++	*offset = (page == 0) ? rqst->offset : 0;
+ 
+-	if (rqst->rq_npages == 1 || page == rqst->rq_npages-1)
+-		*len = rqst->rq_tailsz;
++	if (rqst->npages == 1 || page == rqst->npages-1)
++		*len = rqst->tailsz;
+ 	else if (page == 0)
+-		*len = rqst->rq_pagesz - rqst->rq_offset;
++		*len = rqst->pagesz - rqst->offset;
+ }
+ 
+ void extract_unc_hostname(const char *unc, const char **h, size_t *len)
 diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 9d63099ad26a..9a7b85e79cc8 100644
+index b51454d95f71..704c7632ee00 100644
 --- a/fs/cifs/smb1ops.c
 +++ b/fs/cifs/smb1ops.c
-@@ -93,7 +93,7 @@ cifs_find_mid(struct cifs_server_info *server, char *buffer)
- 	struct mid_q_entry *mid;
+@@ -30,7 +30,7 @@ send_nt_cancel(struct cifs_server_info *server, struct smb_rqst *rqst,
+ 	       struct mid_q_entry *mid)
+ {
+ 	int rc = 0;
+-	struct smb_hdr *in_buf = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
++	struct smb_hdr *in_buf = (struct smb_hdr *)rqst->iov[0].iov_base;
  
- 	spin_lock(&g_mid_lock);
--	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
-+	list_for_each_entry(mid, &server->pending_mid_q, head) {
- 		if (compare_mid(mid->mid, buf) &&
- 		    mid->mid_state == MID_REQUEST_SUBMITTED &&
- 		    le16_to_cpu(mid->command) == buf->Command) {
-@@ -195,7 +195,7 @@ cifs_get_next_mid(struct cifs_server_info *server)
- 			cur_mid++;
+ 	/* -4 for RFC1001 length and +2 for BCC field */
+ 	in_buf->smb_buf_length = cpu_to_be32(sizeof(struct smb_hdr) - 4  + 2);
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index adbaac71b433..817dbf9abef3 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -27,9 +27,9 @@
+ static void
+ free_set_inf_compound(struct smb_rqst *rqst)
+ {
+-	if (rqst[1].rq_iov)
++	if (rqst[1].iov)
+ 		SMB2_set_info_free(&rqst[1]);
+-	if (rqst[2].rq_iov)
++	if (rqst[2].iov)
+ 		SMB2_close_free(&rqst[2]);
+ }
  
- 		num_mids = 0;
--		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
-+		list_for_each_entry(mid_entry, &server->pending_mid_q, head) {
- 			++num_mids;
- 			if (mid_entry->mid == cur_mid &&
- 			    mid_entry->mid_state == MID_REQUEST_SUBMITTED) {
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index 79b28a52f67e..31c1bad2e713 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -133,7 +133,7 @@ smb2_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 	cur = buf;
+@@ -108,8 +108,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 	vars->oparms.mode = mode;
+ 	vars->oparms.cifs_sb = cifs_sb;
  
- 	cifs_down_write(&cinode->lock_sem);
--	list_for_each_entry_safe(li, tmp, &cfile->llist->locks, llist) {
-+	list_for_each_entry_safe(li, tmp, &cfile->fid_locks->locks, head) {
- 		if (flock->fl_start > li->offset ||
- 		    (flock->fl_start + length) <
- 		    (li->offset + li->length))
-@@ -150,7 +150,7 @@ smb2_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 			 * We can cache brlock requests - simply remove a lock
- 			 * from the file's list.
- 			 */
--			list_del(&li->llist);
-+			list_del(&li->head);
- 			cifs_del_lock_waiters(li);
- 			kfree(li);
- 			continue;
-@@ -162,7 +162,7 @@ smb2_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 		 * We need to save a lock here to let us add it again to the
- 		 * file's list if the unlock range request fails on the server.
- 		 */
--		list_move(&li->llist, &tmp_llist);
-+		list_move(&li->head, &tmp_llist);
- 		if (++num == max_num) {
- 			stored_rc = smb2_lockv(xid, tcon,
- 					       cfile->fid.persistent_fid,
-@@ -175,7 +175,7 @@ smb2_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 				 * the file's list.
- 				 */
- 				cifs_move_llist(&tmp_llist,
--						&cfile->llist->locks);
-+						&cfile->fid_locks->locks);
- 				rc = stored_rc;
- 			} else
- 				/*
-@@ -193,7 +193,7 @@ smb2_unlock_range(struct cifs_file_info *cfile, struct file_lock *flock,
- 				       cfile->fid.volatile_fid, current->tgid,
- 				       num, buf);
- 		if (stored_rc) {
--			cifs_move_llist(&tmp_llist, &cfile->llist->locks);
-+			cifs_move_llist(&tmp_llist, &cfile->fid_locks->locks);
- 			rc = stored_rc;
- 		} else
- 			cifs_free_llist(&tmp_llist);
-@@ -215,7 +215,7 @@ smb2_push_mand_fdlocks(struct cifs_fid_locks *fdlocks, const unsigned int xid,
- 	struct smb2_lock_element *cur = buf;
- 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+-	rqst[num_rqst].rq_iov = &vars->open_iov[0];
+-	rqst[num_rqst].rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst[num_rqst].iov = &vars->open_iov[0];
++	rqst[num_rqst].nvec = SMB2_CREATE_IOV_SIZE;
+ 	rc = SMB2_open_init(tcon, server,
+ 			    &rqst[num_rqst], &oplock, &vars->oparms,
+ 			    utf16_path);
+@@ -125,8 +125,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 	/* Operation */
+ 	switch (command) {
+ 	case SMB2_OP_QUERY_INFO:
+-		rqst[num_rqst].rq_iov = &vars->qi_iov[0];
+-		rqst[num_rqst].rq_nvec = 1;
++		rqst[num_rqst].iov = &vars->qi_iov[0];
++		rqst[num_rqst].nvec = 1;
  
--	list_for_each_entry(li, &fdlocks->locks, llist) {
-+	list_for_each_entry(li, &fdlocks->locks, head) {
- 		cur->Length = cpu_to_le64(li->length);
- 		cur->Offset = cpu_to_le64(li->offset);
- 		cur->Flags = cpu_to_le32(li->type |
-@@ -275,7 +275,7 @@ smb2_push_mandatory_locks(struct cifs_file_info *cfile)
- 		return -ENOMEM;
- 	}
+ 		if (cfile)
+ 			rc = SMB2_query_info_init(tcon, server,
+@@ -159,8 +159,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 						     full_path);
+ 		break;
+ 	case SMB2_OP_POSIX_QUERY_INFO:
+-		rqst[num_rqst].rq_iov = &vars->qi_iov[0];
+-		rqst[num_rqst].rq_nvec = 1;
++		rqst[num_rqst].iov = &vars->qi_iov[0];
++		rqst[num_rqst].nvec = 1;
  
--	list_for_each_entry(fdlocks, &cinode->llist, llist) {
-+	list_for_each_entry(fdlocks, &cinode->fid_locks_list, head) {
- 		stored_rc = smb2_push_mand_fdlocks(fdlocks, xid, buf, max_num);
- 		if (stored_rc)
- 			rc = stored_rc;
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index 587362124842..6ce44c16adb1 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -154,7 +154,7 @@ smb2_check_message(char *buf, unsigned int len, struct cifs_server_info *server)
+ 		if (cfile)
+ 			rc = SMB2_query_info_init(tcon, server,
+@@ -203,8 +203,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		trace_smb3_mkdir_enter(xid, ses->id, tcon->tid, full_path);
+ 		break;
+ 	case SMB2_OP_RMDIR:
+-		rqst[num_rqst].rq_iov = &vars->si_iov[0];
+-		rqst[num_rqst].rq_nvec = 1;
++		rqst[num_rqst].iov = &vars->si_iov[0];
++		rqst[num_rqst].nvec = 1;
  
- 		/* decrypt frame now that it is completely read in */
- 		spin_lock(&g_servers_lock);
--		list_for_each_entry(iter, &server->smb_ses_list, smb_ses_list) {
-+		list_for_each_entry(iter, &server->ses_list, head) {
- 			if (iter->Suid == le64_to_cpu(thdr->SessionId)) {
- 				ses = iter;
- 				break;
-@@ -549,7 +549,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp)
+ 		size[0] = 1; /* sizeof __u8 See MS-FSCC section 2.4.11 */
+ 		data[0] = &delete_pending[0];
+@@ -221,8 +221,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		trace_smb3_rmdir_enter(xid, ses->id, tcon->tid, full_path);
+ 		break;
+ 	case SMB2_OP_SET_EOF:
+-		rqst[num_rqst].rq_iov = &vars->si_iov[0];
+-		rqst[num_rqst].rq_nvec = 1;
++		rqst[num_rqst].iov = &vars->si_iov[0];
++		rqst[num_rqst].nvec = 1;
  
- 	lease_state = le32_to_cpu(rsp->NewLeaseState);
+ 		size[0] = 8; /* sizeof __le64 */
+ 		data[0] = ptr;
+@@ -239,8 +239,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		trace_smb3_set_eof_enter(xid, ses->id, tcon->tid, full_path);
+ 		break;
+ 	case SMB2_OP_SET_INFO:
+-		rqst[num_rqst].rq_iov = &vars->si_iov[0];
+-		rqst[num_rqst].rq_nvec = 1;
++		rqst[num_rqst].iov = &vars->si_iov[0];
++		rqst[num_rqst].nvec = 1;
  
--	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-+	list_for_each_entry(cfile, &tcon->open_files_list, tcon_head) {
- 		cinode = CIFS_I(d_inode(cfile->dentry));
  
- 		if (memcmp(cinode->lease_key, rsp->LeaseKey,
-@@ -587,7 +587,7 @@ smb2_tcon_find_pending_open_lease(struct cifs_tcon *tcon,
- 	struct cifs_pending_open *open;
- 	struct cifs_pending_open *found = NULL;
+ 		size[0] = sizeof(FILE_BASIC_INFO);
+@@ -273,8 +273,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 						   full_path);
+ 		break;
+ 	case SMB2_OP_RENAME:
+-		rqst[num_rqst].rq_iov = &vars->si_iov[0];
+-		rqst[num_rqst].rq_nvec = 2;
++		rqst[num_rqst].iov = &vars->si_iov[0];
++		rqst[num_rqst].nvec = 2;
  
--	list_for_each_entry(open, &tcon->pending_opens, olist) {
-+	list_for_each_entry(open, &tcon->pending_opens, head) {
- 		if (memcmp(open->lease_key, rsp->LeaseKey,
- 			   SMB2_LEASE_KEY_SIZE))
- 			continue;
-@@ -619,14 +619,14 @@ smb2_is_valid_lease_break(char *buffer)
+ 		len = (2 * UniStrnlen((wchar_t *)ptr, PATH_MAX));
  
- 	/* look up tcon based on tid & uid */
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(server, &g_servers_list, server_head) {
--		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
--				spin_lock(&tcon->open_file_lock);
-+	list_for_each_entry(server, &g_servers_list, head) {
-+		list_for_each_entry(ses, &server->ses_list, head) {
-+			list_for_each_entry(tcon, &ses->tcon_list, head) {
-+				spin_lock(&tcon->open_files_lock);
- 				cifs_stats_inc(
- 				    &tcon->stats.cifs_stats.num_oplock_brks);
- 				if (smb2_tcon_has_lease(tcon, rsp)) {
--					spin_unlock(&tcon->open_file_lock);
-+					spin_unlock(&tcon->open_files_lock);
- 					spin_unlock(&g_servers_lock);
- 					return true;
- 				}
-@@ -639,14 +639,14 @@ smb2_is_valid_lease_break(char *buffer)
- 					tlink = cifs_get_tlink(open->tlink);
- 					memcpy(lease_key, open->lease_key,
- 					       SMB2_LEASE_KEY_SIZE);
--					spin_unlock(&tcon->open_file_lock);
-+					spin_unlock(&tcon->open_files_lock);
- 					spin_unlock(&g_servers_lock);
- 					smb2_queue_pending_open_break(tlink,
- 								      lease_key,
- 								      rsp->NewLeaseState);
- 					return true;
- 				}
--				spin_unlock(&tcon->open_file_lock);
-+				spin_unlock(&tcon->open_files_lock);
+@@ -312,8 +312,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		trace_smb3_rename_enter(xid, ses->id, tcon->tid, full_path);
+ 		break;
+ 	case SMB2_OP_HARDLINK:
+-		rqst[num_rqst].rq_iov = &vars->si_iov[0];
+-		rqst[num_rqst].rq_nvec = 2;
++		rqst[num_rqst].iov = &vars->si_iov[0];
++		rqst[num_rqst].nvec = 2;
  
- 				if (tcon->crfid.is_valid &&
- 				    !memcmp(rsp->LeaseKey,
-@@ -700,11 +700,11 @@ smb2_is_valid_oplock_break(char *buffer, struct cifs_server_info *server)
+ 		len = (2 * UniStrnlen((wchar_t *)ptr, PATH_MAX));
  
- 	/* look up tcon based on tid & uid */
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+	list_for_each_entry(ses, &server->ses_list, head) {
-+		list_for_each_entry(tcon, &ses->tcon_list, head) {
- 
--			spin_lock(&tcon->open_file_lock);
--			list_for_each_entry(cfile, &tcon->openFileList, tlist) {
-+			spin_lock(&tcon->open_files_lock);
-+			list_for_each_entry(cfile, &tcon->open_files_list, tcon_head) {
- 				if (rsp->PersistentFid !=
- 				    cfile->fid.persistent_fid ||
- 				    rsp->VolatileFid !=
-@@ -732,11 +732,11 @@ smb2_is_valid_oplock_break(char *buffer, struct cifs_server_info *server)
- 
- 				cifs_queue_oplock_break(cfile);
- 
--				spin_unlock(&tcon->open_file_lock);
-+				spin_unlock(&tcon->open_files_lock);
- 				spin_unlock(&g_servers_lock);
- 				return true;
- 			}
--			spin_unlock(&tcon->open_file_lock);
-+			spin_unlock(&tcon->open_files_lock);
+@@ -350,8 +350,8 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		goto after_close;
+ 	/* Close */
+ 	flags |= CIFS_CP_CREATE_CLOSE_OP;
+-	rqst[num_rqst].rq_iov = &vars->close_iov[0];
+-	rqst[num_rqst].rq_nvec = 1;
++	rqst[num_rqst].iov = &vars->close_iov[0];
++	rqst[num_rqst].nvec = 1;
+ 	rc = SMB2_close_init(tcon, server,
+ 			     &rqst[num_rqst], COMPOUND_FID,
+ 			     COMPOUND_FID, false);
+@@ -393,9 +393,9 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				&rsp_iov[1], sizeof(struct smb2_file_all_info),
+ 				ptr);
  		}
- 	}
- 	spin_unlock(&g_servers_lock);
+-		if (rqst[1].rq_iov)
++		if (rqst[1].iov)
+ 			SMB2_query_info_free(&rqst[1]);
+-		if (rqst[2].rq_iov)
++		if (rqst[2].iov)
+ 			SMB2_close_free(&rqst[2]);
+ 		if (rc)
+ 			trace_smb3_query_info_compound_err(xid,  ses->id,
+@@ -413,9 +413,9 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 				le32_to_cpu(qi_rsp->OutputBufferLength),
+ 				&rsp_iov[1], sizeof(struct smb311_posix_qinfo) /* add SIDs */, ptr);
+ 		}
+-		if (rqst[1].rq_iov)
++		if (rqst[1].iov)
+ 			SMB2_query_info_free(&rqst[1]);
+-		if (rqst[2].rq_iov)
++		if (rqst[2].iov)
+ 			SMB2_close_free(&rqst[2]);
+ 		if (rc)
+ 			trace_smb3_posix_query_info_compound_err(xid,  ses->id, tcon->tid, rc);
+@@ -427,7 +427,7 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 			trace_smb3_delete_err(xid,  ses->id, tcon->tid, rc);
+ 		else
+ 			trace_smb3_delete_done(xid, ses->id, tcon->tid);
+-		if (rqst[1].rq_iov)
++		if (rqst[1].iov)
+ 			SMB2_close_free(&rqst[1]);
+ 		break;
+ 	case SMB2_OP_MKDIR:
+@@ -435,7 +435,7 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 			trace_smb3_mkdir_err(xid,  ses->id, tcon->tid, rc);
+ 		else
+ 			trace_smb3_mkdir_done(xid, ses->id, tcon->tid);
+-		if (rqst[1].rq_iov)
++		if (rqst[1].iov)
+ 			SMB2_close_free(&rqst[1]);
+ 		break;
+ 	case SMB2_OP_HARDLINK:
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 9d2064cf44d8..83856024fb79 100644
+index 884bf9061715..4b2bdc4a50bb 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -347,13 +347,13 @@ __smb2_find_mid(struct cifs_server_info *server, char *buf, bool dequeue)
+@@ -847,8 +847,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Open */
+ 	memset(&open_iov, 0, sizeof(open_iov));
+-	rqst[0].rq_iov = open_iov;
+-	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst[0].iov = open_iov;
++	rqst[0].nvec = SMB2_CREATE_IOV_SIZE;
+ 
+ 	oparms.tcon = tcon;
+ 	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_FILE);
+@@ -864,8 +864,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 	smb2_set_next_command(tcon, &rqst[0]);
+ 
+ 	memset(&qi_iov, 0, sizeof(qi_iov));
+-	rqst[1].rq_iov = qi_iov;
+-	rqst[1].rq_nvec = 1;
++	rqst[1].iov = qi_iov;
++	rqst[1].nvec = 1;
+ 
+ 	rc = SMB2_query_info_init(tcon, server,
+ 				  &rqst[1], COMPOUND_FID,
+@@ -1351,8 +1351,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Open */
+ 	memset(&open_iov, 0, sizeof(open_iov));
+-	rqst[0].rq_iov = open_iov;
+-	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst[0].iov = open_iov;
++	rqst[0].nvec = SMB2_CREATE_IOV_SIZE;
+ 
+ 	memset(&oparms, 0, sizeof(oparms));
+ 	oparms.tcon = tcon;
+@@ -1371,8 +1371,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Set Info */
+ 	memset(&si_iov, 0, sizeof(si_iov));
+-	rqst[1].rq_iov = si_iov;
+-	rqst[1].rq_nvec = 1;
++	rqst[1].iov = si_iov;
++	rqst[1].nvec = 1;
+ 
+ 	len = sizeof(*ea) + ea_name_len + ea_value_len + 1;
+ 	ea = kzalloc(len, GFP_KERNEL);
+@@ -1400,8 +1400,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Close */
+ 	memset(&close_iov, 0, sizeof(close_iov));
+-	rqst[2].rq_iov = close_iov;
+-	rqst[2].rq_nvec = 1;
++	rqst[2].iov = close_iov;
++	rqst[2].nvec = 1;
+ 	rc = SMB2_close_init(tcon, server,
+ 			     &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
+ 	smb2_set_related(&rqst[2]);
+@@ -1704,8 +1704,8 @@ smb2_ioctl_query_info(const unsigned int xid,
  	}
  
- 	spin_lock(&g_mid_lock);
--	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
-+	list_for_each_entry(mid, &server->pending_mid_q, head) {
- 		if ((mid->mid == wire_mid) &&
- 		    (mid->mid_state == MID_REQUEST_SUBMITTED) &&
- 		    (mid->command == shdr->Command)) {
- 			kref_get(&mid->refcount);
- 			if (dequeue) {
--				list_del_init(&mid->qhead);
-+				list_del_init(&mid->head);
- 				mid->mid_flags |= MID_DELETED;
- 			}
- 			spin_unlock(&g_mid_lock);
-@@ -536,7 +536,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	 * when the last user calls a kref_put on it
- 	 */
- 	list_for_each_entry_safe(iface, niface, &ses->iface_list,
--				 iface_head) {
-+				 head) {
- 		iface->is_active = 0;
- 		kref_put(&iface->refcount, release_iface);
- 	}
-@@ -595,8 +595,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 		 */
- 		spin_lock(&ses->iface_lock);
- 		iface = niface = NULL;
--		list_for_each_entry_safe(iface, niface, &ses->iface_list,
--					 iface_head) {
-+		list_for_each_entry_safe(iface, niface, &ses->iface_list, head) {
- 			ret = iface_cmp(iface, &tmp_iface);
- 			if (!ret) {
- 				/* just get a ref so that it doesn't get picked/freed */
-@@ -631,11 +630,11 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 			 le32_to_cpu(p->Capability));
+ 	/* Open */
+-	rqst[0].rq_iov = &vars->open_iov[0];
+-	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst[0].iov = &vars->open_iov[0];
++	rqst[0].nvec = SMB2_CREATE_IOV_SIZE;
  
- 		spin_lock(&ses->iface_lock);
--		if (!list_entry_is_head(iface, &ses->iface_list, iface_head)) {
--			list_add_tail(&info->iface_head, &iface->iface_head);
-+		if (!list_entry_is_head(iface, &ses->iface_list, head)) {
-+			list_add_tail(&info->head, &iface->head);
- 			kref_put(&iface->refcount, release_iface);
- 		} else
--			list_add_tail(&info->iface_head, &ses->iface_list);
-+			list_add_tail(&info->head, &ses->iface_list);
- 		spin_unlock(&ses->iface_lock);
+ 	memset(&oparms, 0, sizeof(oparms));
+ 	oparms.tcon = tcon;
+@@ -1748,8 +1748,8 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 			rc = -EPERM;
+ 			goto free_open_req;
+ 		}
+-		rqst[1].rq_iov = &vars->io_iov[0];
+-		rqst[1].rq_nvec = SMB2_IOCTL_IOV_SIZE;
++		rqst[1].iov = &vars->io_iov[0];
++		rqst[1].nvec = SMB2_IOCTL_IOV_SIZE;
  
- 		ses->iface_count++;
-@@ -730,8 +729,8 @@ smb2_close_cached_fid(struct kref *ref)
- 	 * Delete all cached dirent names
- 	 */
- 	mutex_lock(&cfid->dirents.de_mutex);
--	list_for_each_entry_safe(dirent, q, &cfid->dirents.entries, entry) {
--		list_del(&dirent->entry);
-+	list_for_each_entry_safe(dirent, q, &cfid->dirents.entries, head) {
-+		list_del(&dirent->head);
- 		kfree(dirent->name);
- 		kfree(dirent);
- 	}
-@@ -2582,8 +2581,8 @@ smb2_is_network_name_deleted(char *buf, struct cifs_server_info *server)
+ 		rc = SMB2_ioctl_init(tcon, server, &rqst[1], COMPOUND_FID, COMPOUND_FID,
+ 				     qi.info_type, true, buffer, qi.output_buffer_length,
+@@ -1766,8 +1766,8 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 			rc = -EINVAL;
+ 			goto free_open_req;
+ 		}
+-		rqst[1].rq_iov = &vars->si_iov[0];
+-		rqst[1].rq_nvec = 1;
++		rqst[1].iov = &vars->si_iov[0];
++		rqst[1].nvec = 1;
+ 
+ 		/* MS-FSCC 2.4.13 FileEndOfFileInformation */
+ 		size[0] = 8;
+@@ -1778,8 +1778,8 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 					SMB2_O_INFO_FILE, 0, data, size);
+ 		free_req1_func = SMB2_set_info_free;
+ 	} else if (qi.flags == PASSTHRU_QUERY_INFO) {
+-		rqst[1].rq_iov = &vars->qi_iov[0];
+-		rqst[1].rq_nvec = 1;
++		rqst[1].iov = &vars->qi_iov[0];
++		rqst[1].nvec = 1;
+ 
+ 		rc = SMB2_query_info_init(tcon, server,
+ 				  &rqst[1], COMPOUND_FID,
+@@ -1800,8 +1800,8 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	smb2_set_related(&rqst[1]);
+ 
+ 	/* Close */
+-	rqst[2].rq_iov = &vars->close_iov[0];
+-	rqst[2].rq_nvec = 1;
++	rqst[2].iov = &vars->close_iov[0];
++	rqst[2].nvec = 1;
+ 
+ 	rc = SMB2_close_init(tcon, server,
+ 			     &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
+@@ -2403,8 +2403,8 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Open */
+ 	memset(&open_iov, 0, sizeof(open_iov));
+-	rqst[0].rq_iov = open_iov;
+-	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst[0].iov = open_iov;
++	rqst[0].nvec = SMB2_CREATE_IOV_SIZE;
+ 
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES | FILE_READ_DATA;
+@@ -2424,8 +2424,8 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 	search_info->last_entry_index = 2;
+ 
+ 	memset(&qd_iov, 0, sizeof(qd_iov));
+-	rqst[1].rq_iov = qd_iov;
+-	rqst[1].rq_nvec = SMB2_QUERY_DIRECTORY_IOV_SIZE;
++	rqst[1].iov = qd_iov;
++	rqst[1].nvec = SMB2_QUERY_DIRECTORY_IOV_SIZE;
+ 
+ 	rc = SMB2_query_directory_init(xid, tcon, server,
+ 				       &rqst[1],
+@@ -2613,7 +2613,7 @@ smb2_set_related(struct smb_rqst *rqst)
+ {
+ 	struct smb2_hdr *shdr;
+ 
+-	shdr = (struct smb2_hdr *)(rqst->rq_iov[0].iov_base);
++	shdr = (struct smb2_hdr *)(rqst->iov[0].iov_base);
+ 	if (shdr == NULL) {
+ 		cifs_dbg(FYI, "shdr NULL in smb2_set_related\n");
  		return;
+@@ -2632,7 +2632,7 @@ smb2_set_next_command(struct cifs_tcon *tcon, struct smb_rqst *rqst)
+ 	unsigned long len = smb_rqst_len(server, rqst);
+ 	int i, num_padding;
  
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+	list_for_each_entry(ses, &server->ses_list, head) {
-+		list_for_each_entry(tcon, &ses->tcon_list, head) {
- 			if (tcon->tid == le32_to_cpu(shdr->Id.SyncId.TreeId)) {
- 				tcon->need_reconnect = true;
- 				spin_unlock(&g_servers_lock);
-@@ -2942,7 +2941,7 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 		spin_lock(&g_servers_lock);
- 		tcon = list_first_entry_or_null(&ses->tcon_list,
- 						struct cifs_tcon,
--						tcon_list);
-+						head);
- 		if (tcon)
- 			tcon->tc_count++;
- 		spin_unlock(&g_servers_lock);
-@@ -4558,8 +4557,8 @@ smb2_get_enc_key(struct cifs_server_info *server, __u64 ses_id, int enc, u8 *key
- 	u8 *ses_enc_key;
+-	shdr = (struct smb2_hdr *)(rqst->rq_iov[0].iov_base);
++	shdr = (struct smb2_hdr *)(rqst->iov[0].iov_base);
+ 	if (shdr == NULL) {
+ 		cifs_dbg(FYI, "shdr NULL in smb2_set_next_command\n");
+ 		return;
+@@ -2650,9 +2650,9 @@ smb2_set_next_command(struct cifs_tcon *tcon, struct smb_rqst *rqst)
+ 		 * If we do not have encryption then we can just add an extra
+ 		 * iov for the padding.
+ 		 */
+-		rqst->rq_iov[rqst->rq_nvec].iov_base = smb2_padding;
+-		rqst->rq_iov[rqst->rq_nvec].iov_len = num_padding;
+-		rqst->rq_nvec++;
++		rqst->iov[rqst->nvec].iov_base = smb2_padding;
++		rqst->iov[rqst->nvec].iov_len = num_padding;
++		rqst->nvec++;
+ 		len += num_padding;
+ 	} else {
+ 		/*
+@@ -2662,18 +2662,18 @@ smb2_set_next_command(struct cifs_tcon *tcon, struct smb_rqst *rqst)
+ 		 * We have to flatten this into a single buffer and add
+ 		 * the padding to it.
+ 		 */
+-		for (i = 1; i < rqst->rq_nvec; i++) {
+-			memcpy(rqst->rq_iov[0].iov_base +
+-			       rqst->rq_iov[0].iov_len,
+-			       rqst->rq_iov[i].iov_base,
+-			       rqst->rq_iov[i].iov_len);
+-			rqst->rq_iov[0].iov_len += rqst->rq_iov[i].iov_len;
++		for (i = 1; i < rqst->nvec; i++) {
++			memcpy(rqst->iov[0].iov_base +
++			       rqst->iov[0].iov_len,
++			       rqst->iov[i].iov_base,
++			       rqst->iov[i].iov_len);
++			rqst->iov[0].iov_len += rqst->iov[i].iov_len;
+ 		}
+-		memset(rqst->rq_iov[0].iov_base + rqst->rq_iov[0].iov_len,
++		memset(rqst->iov[0].iov_base + rqst->iov[0].iov_len,
+ 		       0, num_padding);
+-		rqst->rq_iov[0].iov_len += num_padding;
++		rqst->iov[0].iov_len += num_padding;
+ 		len += num_padding;
+-		rqst->rq_nvec = 1;
++		rqst->nvec = 1;
+ 	}
  
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(server, &g_servers_list, server_head) {
--		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+	list_for_each_entry(server, &g_servers_list, head) {
-+		list_for_each_entry(ses, &server->ses_list, head) {
- 			if (ses->Suid == ses_id) {
- 				ses_enc_key = enc ? ses->smb3encryptionkey :
- 					ses->smb3decryptionkey;
-@@ -5088,7 +5087,7 @@ static void smb2_decrypt_offload(struct work_struct *work)
- 			} else {
- 				mid->mid_state = MID_REQUEST_SUBMITTED;
- 				mid->mid_flags &= ~(MID_DELETED);
--				list_add_tail(&mid->qhead,
-+				list_add_tail(&mid->head,
- 					&dw->server->pending_mid_q);
- 				spin_unlock(&g_mid_lock);
- 				spin_unlock(&g_servers_lock);
+  finished:
+@@ -2724,8 +2724,8 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 		open_cached_dir(xid, tcon, path, cifs_sb, &cfid); /* cfid null if open dir failed */
+ 
+ 	memset(&open_iov, 0, sizeof(open_iov));
+-	rqst[0].rq_iov = open_iov;
+-	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst[0].iov = open_iov;
++	rqst[0].nvec = SMB2_CREATE_IOV_SIZE;
+ 
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = desired_access;
+@@ -2741,8 +2741,8 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	smb2_set_next_command(tcon, &rqst[0]);
+ 
+ 	memset(&qi_iov, 0, sizeof(qi_iov));
+-	rqst[1].rq_iov = qi_iov;
+-	rqst[1].rq_nvec = 1;
++	rqst[1].iov = qi_iov;
++	rqst[1].nvec = 1;
+ 
+ 	if (cfid) {
+ 		rc = SMB2_query_info_init(tcon, server,
+@@ -2769,8 +2769,8 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	}
+ 
+ 	memset(&close_iov, 0, sizeof(close_iov));
+-	rqst[2].rq_iov = close_iov;
+-	rqst[2].rq_nvec = 1;
++	rqst[2].iov = close_iov;
++	rqst[2].nvec = 1;
+ 
+ 	rc = SMB2_close_init(tcon, server,
+ 			     &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
+@@ -3160,8 +3160,8 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Open */
+ 	memset(&open_iov, 0, sizeof(open_iov));
+-	rqst[0].rq_iov = open_iov;
+-	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst[0].iov = open_iov;
++	rqst[0].nvec = SMB2_CREATE_IOV_SIZE;
+ 
+ 	memset(&oparms, 0, sizeof(oparms));
+ 	oparms.tcon = tcon;
+@@ -3180,8 +3180,8 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* IOCTL */
+ 	memset(&io_iov, 0, sizeof(io_iov));
+-	rqst[1].rq_iov = io_iov;
+-	rqst[1].rq_nvec = SMB2_IOCTL_IOV_SIZE;
++	rqst[1].iov = io_iov;
++	rqst[1].nvec = SMB2_IOCTL_IOV_SIZE;
+ 
+ 	rc = SMB2_ioctl_init(tcon, server,
+ 			     &rqst[1], fid.persistent_fid,
+@@ -3199,8 +3199,8 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Close */
+ 	memset(&close_iov, 0, sizeof(close_iov));
+-	rqst[2].rq_iov = close_iov;
+-	rqst[2].rq_nvec = 1;
++	rqst[2].iov = close_iov;
++	rqst[2].nvec = 1;
+ 
+ 	rc = SMB2_close_init(tcon, server,
+ 			     &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
+@@ -3341,8 +3341,8 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+ 	 * to see if there is a handle already open that we can use
+ 	 */
+ 	memset(&open_iov, 0, sizeof(open_iov));
+-	rqst[0].rq_iov = open_iov;
+-	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst[0].iov = open_iov;
++	rqst[0].nvec = SMB2_CREATE_IOV_SIZE;
+ 
+ 	memset(&oparms, 0, sizeof(oparms));
+ 	oparms.tcon = tcon;
+@@ -3361,8 +3361,8 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* IOCTL */
+ 	memset(&io_iov, 0, sizeof(io_iov));
+-	rqst[1].rq_iov = io_iov;
+-	rqst[1].rq_nvec = SMB2_IOCTL_IOV_SIZE;
++	rqst[1].iov = io_iov;
++	rqst[1].nvec = SMB2_IOCTL_IOV_SIZE;
+ 
+ 	rc = SMB2_ioctl_init(tcon, server,
+ 			     &rqst[1], COMPOUND_FID,
+@@ -3380,8 +3380,8 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Close */
+ 	memset(&close_iov, 0, sizeof(close_iov));
+-	rqst[2].rq_iov = close_iov;
+-	rqst[2].rq_nvec = 1;
++	rqst[2].iov = close_iov;
++	rqst[2].nvec = 1;
+ 
+ 	rc = SMB2_close_init(tcon, server,
+ 			     &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
+@@ -4471,7 +4471,7 @@ fill_transform_hdr(struct smb2_transform_hdr *tr_hdr, unsigned int orig_len,
+ 		   struct smb_rqst *old_rq, __le16 cipher_type)
+ {
+ 	struct smb2_hdr *shdr =
+-			(struct smb2_hdr *)old_rq->rq_iov[0].iov_base;
++			(struct smb2_hdr *)old_rq->iov[0].iov_base;
+ 
+ 	memset(tr_hdr, 0, sizeof(struct smb2_transform_hdr));
+ 	tr_hdr->ProtocolId = SMB2_TRANSFORM_PROTO_NUM;
+@@ -4504,9 +4504,9 @@ static inline void smb2_sg_set_buf(struct scatterlist *sg, const void *buf,
+ 
+ /* Assumes the first rqst has a transform header as the first iov.
+  * I.e.
+- * rqst[0].rq_iov[0]  is transform header
+- * rqst[0].rq_iov[1+] data to be encrypted/decrypted
+- * rqst[1+].rq_iov[0+] data to be encrypted/decrypted
++ * rqst[0].iov[0]  is transform header
++ * rqst[0].iov[1+] data to be encrypted/decrypted
++ * rqst[1+].iov[0+] data to be encrypted/decrypted
+  */
+ static struct scatterlist *
+ init_sg(int num_rqst, struct smb_rqst *rqst, u8 *sign)
+@@ -4520,7 +4520,7 @@ init_sg(int num_rqst, struct smb_rqst *rqst, u8 *sign)
+ 
+ 	sg_len = 1;
+ 	for (i = 0; i < num_rqst; i++)
+-		sg_len += rqst[i].rq_nvec + rqst[i].rq_npages;
++		sg_len += rqst[i].nvec + rqst[i].npages;
+ 
+ 	sg = kmalloc_array(sg_len, sizeof(struct scatterlist), GFP_KERNEL);
+ 	if (!sg)
+@@ -4528,22 +4528,22 @@ init_sg(int num_rqst, struct smb_rqst *rqst, u8 *sign)
+ 
+ 	sg_init_table(sg, sg_len);
+ 	for (i = 0; i < num_rqst; i++) {
+-		for (j = 0; j < rqst[i].rq_nvec; j++) {
++		for (j = 0; j < rqst[i].nvec; j++) {
+ 			/*
+ 			 * The first rqst has a transform header where the
+ 			 * first 20 bytes are not part of the encrypted blob
+ 			 */
+ 			skip = (i == 0) && (j == 0) ? 20 : 0;
+ 			smb2_sg_set_buf(&sg[idx++],
+-					rqst[i].rq_iov[j].iov_base + skip,
+-					rqst[i].rq_iov[j].iov_len - skip);
++					rqst[i].iov[j].iov_base + skip,
++					rqst[i].iov[j].iov_len - skip);
+ 			}
+ 
+-		for (j = 0; j < rqst[i].rq_npages; j++) {
++		for (j = 0; j < rqst[i].npages; j++) {
+ 			unsigned int len, offset;
+ 
+ 			rqst_page_get_length(&rqst[i], j, &len, &offset);
+-			sg_set_page(&sg[idx++], rqst[i].rq_pages[j], len, offset);
++			sg_set_page(&sg[idx++], rqst[i].pages[j], len, offset);
+ 		}
+ 	}
+ 	smb2_sg_set_buf(&sg[idx], sign, SMB2_SIGNATURE_SIZE);
+@@ -4584,7 +4584,7 @@ crypt_message(struct cifs_server_info *server, int num_rqst,
+ 	      struct smb_rqst *rqst, int enc)
+ {
+ 	struct smb2_transform_hdr *tr_hdr =
+-		(struct smb2_transform_hdr *)rqst[0].rq_iov[0].iov_base;
++		(struct smb2_transform_hdr *)rqst[0].iov[0].iov_base;
+ 	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 20;
+ 	int rc = 0;
+ 	struct scatterlist *sg;
+@@ -4690,10 +4690,10 @@ smb3_free_compound_rqst(int num_rqst, struct smb_rqst *rqst)
+ 	int i, j;
+ 
+ 	for (i = 0; i < num_rqst; i++) {
+-		if (rqst[i].rq_pages) {
+-			for (j = rqst[i].rq_npages - 1; j >= 0; j--)
+-				put_page(rqst[i].rq_pages[j]);
+-			kfree(rqst[i].rq_pages);
++		if (rqst[i].pages) {
++			for (j = rqst[i].npages - 1; j >= 0; j--)
++				put_page(rqst[i].pages[j]);
++			kfree(rqst[i].pages);
+ 		}
+ 	}
+ }
+@@ -4708,34 +4708,34 @@ smb3_free_compound_rqst(int num_rqst, struct smb_rqst *rqst)
+  * only contains a single iov for the transform header which we then can pass
+  * to crypt_message().
+  *
+- * new_rq[0].rq_iov[0] :  smb2_transform_hdr pre-allocated by the caller
+- * new_rq[1+].rq_iov[*] == old_rq[0+].rq_iov[*] : SMB2/3 requests
++ * new_rq[0].iov[0] :  smb2_transform_hdr pre-allocated by the caller
++ * new_rq[1+].iov[*] == old_rq[0+].iov[*] : SMB2/3 requests
+  */
+ static int
+ smb3_init_transform_rq(struct cifs_server_info *server, int num_rqst,
+ 		       struct smb_rqst *new_rq, struct smb_rqst *old_rq)
+ {
+ 	struct page **pages;
+-	struct smb2_transform_hdr *tr_hdr = new_rq[0].rq_iov[0].iov_base;
++	struct smb2_transform_hdr *tr_hdr = new_rq[0].iov[0].iov_base;
+ 	unsigned int npages;
+ 	unsigned int orig_len = 0;
+ 	int i, j;
+ 	int rc = -ENOMEM;
+ 
+ 	for (i = 1; i < num_rqst; i++) {
+-		npages = old_rq[i - 1].rq_npages;
++		npages = old_rq[i - 1].npages;
+ 		pages = kmalloc_array(npages, sizeof(struct page *),
+ 				      GFP_KERNEL);
+ 		if (!pages)
+ 			goto err_free;
+ 
+-		new_rq[i].rq_pages = pages;
+-		new_rq[i].rq_npages = npages;
+-		new_rq[i].rq_offset = old_rq[i - 1].rq_offset;
+-		new_rq[i].rq_pagesz = old_rq[i - 1].rq_pagesz;
+-		new_rq[i].rq_tailsz = old_rq[i - 1].rq_tailsz;
+-		new_rq[i].rq_iov = old_rq[i - 1].rq_iov;
+-		new_rq[i].rq_nvec = old_rq[i - 1].rq_nvec;
++		new_rq[i].pages = pages;
++		new_rq[i].npages = npages;
++		new_rq[i].offset = old_rq[i - 1].offset;
++		new_rq[i].pagesz = old_rq[i - 1].pagesz;
++		new_rq[i].tailsz = old_rq[i - 1].tailsz;
++		new_rq[i].iov = old_rq[i - 1].iov;
++		new_rq[i].nvec = old_rq[i - 1].nvec;
+ 
+ 		orig_len += smb_rqst_len(server, &old_rq[i - 1]);
+ 
+@@ -4752,12 +4752,12 @@ smb3_init_transform_rq(struct cifs_server_info *server, int num_rqst,
+ 
+ 			rqst_page_get_length(&new_rq[i], j, &len, &offset);
+ 
+-			dst = (char *) kmap(new_rq[i].rq_pages[j]) + offset;
+-			src = (char *) kmap(old_rq[i - 1].rq_pages[j]) + offset;
++			dst = (char *) kmap(new_rq[i].pages[j]) + offset;
++			src = (char *) kmap(old_rq[i - 1].pages[j]) + offset;
+ 
+ 			memcpy(dst, src, len);
+-			kunmap(new_rq[i].rq_pages[j]);
+-			kunmap(old_rq[i - 1].rq_pages[j]);
++			kunmap(new_rq[i].pages[j]);
++			kunmap(old_rq[i - 1].pages[j]);
+ 		}
+ 	}
+ 
+@@ -4799,12 +4799,12 @@ decrypt_raw_data(struct cifs_server_info *server, char *buf,
+ 	iov[1].iov_base = buf + sizeof(struct smb2_transform_hdr);
+ 	iov[1].iov_len = buf_data_size;
+ 
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 2;
+-	rqst.rq_pages = pages;
+-	rqst.rq_npages = npages;
+-	rqst.rq_pagesz = PAGE_SIZE;
+-	rqst.rq_tailsz = (page_data_size % PAGE_SIZE) ? : PAGE_SIZE;
++	rqst.iov = iov;
++	rqst.nvec = 2;
++	rqst.pages = pages;
++	rqst.npages = npages;
++	rqst.pagesz = PAGE_SIZE;
++	rqst.tailsz = (page_data_size % PAGE_SIZE) ? : PAGE_SIZE;
+ 
+ 	rc = crypt_message(server, 1, &rqst, 0);
+ 	cifs_dbg(FYI, "Decrypt message returned %d\n", rc);
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index c514d405f9d0..a5e8c1ec3f92 100644
+index 405c42f09484..85c454774a3f 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -3804,11 +3804,11 @@ void smb2_reconnect_server(struct work_struct *work)
- 	cifs_dbg(FYI, "Reconnecting tcons and channels\n");
+@@ -947,8 +947,8 @@ SMB2_negotiate(const unsigned int xid,
+ 	iov[0].iov_len = total_len;
  
- 	spin_lock(&g_servers_lock);
--	list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
-+	list_for_each_entry(ses, &pserver->ses_list, head) {
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
  
- 		tcon_selected = false;
+ 	rc = cifs_send_recv(xid, ses, server,
+ 			    &rqst, &resp_buftype, flags, &rsp_iov);
+@@ -1360,8 +1360,8 @@ SMB2_sess_sendreceive(struct SMB2_sess_data *sess_data)
+ 	req->SecurityBufferLength = cpu_to_le16(sess_data->iov[1].iov_len);
  
--		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+		list_for_each_entry(tcon, &ses->tcon_list, head) {
- 			if (tcon->need_reconnect || tcon->need_reopen_files) {
- 				tcon->tc_count++;
- 				list_add_tail(&tcon->rlist, &tmp_list);
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 5ac2dbffb939..2fa4f6d9fe7e 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -88,8 +88,8 @@ int smb2_get_sign_key(__u64 ses_id, struct cifs_server_info *server, u8 *key)
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = sess_data->iov;
+-	rqst.rq_nvec = 2;
++	rqst.iov = sess_data->iov;
++	rqst.nvec = 2;
  
- 	spin_lock(&g_servers_lock);
+ 	/* BB add code to build os and lm fields */
+ 	rc = cifs_send_recv(sess_data->xid, sess_data->ses,
+@@ -1785,8 +1785,8 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
+ 	iov[0].iov_len = total_len;
  
--	list_for_each_entry(it, &g_servers_list, server_head) {
--		list_for_each_entry(ses, &it->smb_ses_list, smb_ses_list) {
-+	list_for_each_entry(it, &g_servers_list, head) {
-+		list_for_each_entry(ses, &it->ses_list, head) {
- 			if (ses->Suid == ses_id)
- 				goto found;
- 		}
-@@ -142,7 +142,7 @@ smb2_find_smb_ses_unlocked(struct cifs_server_info *server, __u64 ses_id)
- {
- 	struct cifs_ses *ses;
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
  
--	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+	list_for_each_entry(ses, &server->ses_list, head) {
- 		if (ses->Suid != ses_id)
- 			continue;
- 		++ses->ses_count;
-@@ -169,7 +169,7 @@ smb2_find_smb_sess_tcon_unlocked(struct cifs_ses *ses, __u32  tid)
- {
- 	struct cifs_tcon *tcon;
+ 	rc = cifs_send_recv(xid, ses, ses->server,
+ 			    &rqst, &resp_buf_type, flags, &rsp_iov);
+@@ -1888,8 +1888,8 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 		req->hdr.Flags |= SMB2_FLAGS_SIGNED;
  
--	list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-+	list_for_each_entry(tcon, &ses->tcon_list, head) {
- 		if (tcon->tid != tid)
- 			continue;
- 		++tcon->tc_count;
-@@ -802,7 +802,7 @@ smb2_get_mid_entry(struct cifs_ses *ses, struct cifs_server_info *server,
- 	if (*mid == NULL)
- 		return -ENOMEM;
- 	spin_lock(&g_mid_lock);
--	list_add_tail(&(*mid)->qhead, &server->pending_mid_q);
-+	list_add_tail(&(*mid)->head, &server->pending_mid_q);
- 	spin_unlock(&g_mid_lock);
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 2;
++	rqst.iov = iov;
++	rqst.nvec = 2;
  
- 	return 0;
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 74ddf1201ab1..be2da4444731 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -169,7 +169,7 @@ cifs_delete_mid(struct mid_q_entry *mid)
- {
- 	spin_lock(&g_mid_lock);
- 	if (!(mid->mid_flags & MID_DELETED)) {
--		list_del_init(&mid->qhead);
-+		list_del_init(&mid->head);
- 		mid->mid_flags |= MID_DELETED;
+ 	/* Need 64 for max size write so ask for more in case not there yet */
+ 	req->hdr.CreditRequest = cpu_to_le16(64);
+@@ -1995,8 +1995,8 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
+ 	iov[0].iov_len = total_len;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
+ 
+ 	rc = cifs_send_recv(xid, ses, ses->server,
+ 			    &rqst, &resp_buf_type, flags, &rsp_iov);
+@@ -2718,8 +2718,8 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
+ 
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = n_iov;
++	rqst.iov = iov;
++	rqst.nvec = n_iov;
+ 
+ 	/* no need to inc num_remote_opens because we close it just below */
+ 	trace_smb3_posix_mkdir_enter(xid, tcon->tid, ses->id, CREATE_NOT_FILE,
+@@ -2775,7 +2775,7 @@ SMB2_open_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ 	int copy_size;
+ 	int uni_path_len;
+ 	unsigned int total_len;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	__le16 *copy_path;
+ 	int rc;
+ 
+@@ -2938,7 +2938,7 @@ SMB2_open_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
  	}
- 	spin_unlock(&g_mid_lock);
-@@ -749,7 +749,7 @@ static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
- 	if (*ppmidQ == NULL)
- 		return -ENOMEM;
- 	spin_lock(&g_mid_lock);
--	list_add_tail(&(*ppmidQ)->qhead, &ses->server->pending_mid_q);
-+	list_add_tail(&(*ppmidQ)->head, &ses->server->pending_mid_q);
- 	spin_unlock(&g_mid_lock);
+ 	add_query_id_context(iov, &n_iov);
+ 
+-	rqst->rq_nvec = n_iov;
++	rqst->nvec = n_iov;
  	return 0;
  }
-@@ -850,7 +850,7 @@ cifs_call_async(struct cifs_server_info *server, struct smb_rqst *rqst,
  
- 	/* put it on the pending_mid_q */
- 	spin_lock(&g_mid_lock);
--	list_add_tail(&mid->qhead, &server->pending_mid_q);
-+	list_add_tail(&mid->head, &server->pending_mid_q);
- 	spin_unlock(&g_mid_lock);
+@@ -2950,11 +2950,11 @@ SMB2_open_free(struct smb_rqst *rqst)
+ {
+ 	int i;
  
- 	/*
-@@ -928,7 +928,7 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct cifs_server_info *server)
- 		break;
- 	default:
- 		if (!(mid->mid_flags & MID_DELETED)) {
--			list_del_init(&mid->qhead);
-+			list_del_init(&mid->head);
- 			mid->mid_flags |= MID_DELETED;
+-	if (rqst && rqst->rq_iov) {
+-		cifs_small_buf_release(rqst->rq_iov[0].iov_base);
+-		for (i = 1; i < rqst->rq_nvec; i++)
+-			if (rqst->rq_iov[i].iov_base != smb2_padding)
+-				kfree(rqst->rq_iov[i].iov_base);
++	if (rqst && rqst->iov) {
++		cifs_small_buf_release(rqst->iov[0].iov_base);
++		for (i = 1; i < rqst->nvec; i++)
++			if (rqst->iov[i].iov_base != smb2_padding)
++				kfree(rqst->iov[i].iov_base);
+ 	}
+ }
+ 
+@@ -2984,8 +2984,8 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+ 	memset(&iov, 0, sizeof(iov));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = SMB2_CREATE_IOV_SIZE;
++	rqst.iov = iov;
++	rqst.nvec = SMB2_CREATE_IOV_SIZE;
+ 
+ 	rc = SMB2_open_init(tcon, server,
+ 			    &rqst, oplock, oparms, path);
+@@ -3059,7 +3059,7 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ 		__u32 max_response_size)
+ {
+ 	struct smb2_ioctl_req *req;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	unsigned int total_len;
+ 	int rc;
+ 	char *in_data_buf;
+@@ -3099,12 +3099,12 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ 		/* do not set InputOffset if no input data */
+ 		req->InputOffset =
+ 		       cpu_to_le32(offsetof(struct smb2_ioctl_req, Buffer));
+-		rqst->rq_nvec = 2;
++		rqst->nvec = 2;
+ 		iov[0].iov_len = total_len - 1;
+ 		iov[1].iov_base = in_data_buf;
+ 		iov[1].iov_len = indatalen;
+ 	} else {
+-		rqst->rq_nvec = 1;
++		rqst->nvec = 1;
+ 		iov[0].iov_len = total_len;
+ 	}
+ 
+@@ -3146,11 +3146,11 @@ void
+ SMB2_ioctl_free(struct smb_rqst *rqst)
+ {
+ 	int i;
+-	if (rqst && rqst->rq_iov) {
+-		cifs_small_buf_release(rqst->rq_iov[0].iov_base); /* request */
+-		for (i = 1; i < rqst->rq_nvec; i++)
+-			if (rqst->rq_iov[i].iov_base != smb2_padding)
+-				kfree(rqst->rq_iov[i].iov_base);
++	if (rqst && rqst->iov) {
++		cifs_small_buf_release(rqst->iov[0].iov_base); /* request */
++		for (i = 1; i < rqst->nvec; i++)
++			if (rqst->iov[i].iov_base != smb2_padding)
++				kfree(rqst->iov[i].iov_base);
+ 	}
+ }
+ 
+@@ -3199,8 +3199,8 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+ 	memset(&iov, 0, sizeof(iov));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = SMB2_IOCTL_IOV_SIZE;
++	rqst.iov = iov;
++	rqst.nvec = SMB2_IOCTL_IOV_SIZE;
+ 
+ 	rc = SMB2_ioctl_init(tcon, server,
+ 			     &rqst, persistent_fid, volatile_fid, opcode,
+@@ -3312,7 +3312,7 @@ SMB2_close_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ 		u64 persistent_fid, u64 volatile_fid, bool query_attrs)
+ {
+ 	struct smb2_close_req *req;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	unsigned int total_len;
+ 	int rc;
+ 
+@@ -3336,8 +3336,8 @@ SMB2_close_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ void
+ SMB2_close_free(struct smb_rqst *rqst)
+ {
+-	if (rqst && rqst->rq_iov)
+-		cifs_small_buf_release(rqst->rq_iov[0].iov_base); /* request */
++	if (rqst && rqst->iov)
++		cifs_small_buf_release(rqst->iov[0].iov_base); /* request */
+ }
+ 
+ int
+@@ -3366,8 +3366,8 @@ __SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+ 	memset(&iov, 0, sizeof(iov));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
+ 
+ 	/* check if need to ask server to return timestamps in close response */
+ 	if (pbuf)
+@@ -3488,7 +3488,7 @@ SMB2_query_info_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ 		     size_t output_len, size_t input_len, void *input)
+ {
+ 	struct smb2_query_info_req *req;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	unsigned int total_len;
+ 	int rc;
+ 
+@@ -3520,8 +3520,8 @@ SMB2_query_info_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ void
+ SMB2_query_info_free(struct smb_rqst *rqst)
+ {
+-	if (rqst && rqst->rq_iov)
+-		cifs_small_buf_release(rqst->rq_iov[0].iov_base); /* request */
++	if (rqst && rqst->iov)
++		cifs_small_buf_release(rqst->iov[0].iov_base); /* request */
+ }
+ 
+ static int
+@@ -3554,8 +3554,8 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+ 	memset(&iov, 0, sizeof(iov));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
+ 
+ 	rc = SMB2_query_info_init(tcon, server,
+ 				  &rqst, persistent_fid, volatile_fid,
+@@ -3676,7 +3676,7 @@ SMB2_notify_init(const unsigned int xid, struct smb_rqst *rqst,
+ 		 u32 completion_filter, bool watch_tree)
+ {
+ 	struct smb2_change_notify_req *req;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	unsigned int total_len;
+ 	int rc;
+ 
+@@ -3725,8 +3725,8 @@ SMB2_change_notify(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+ 	memset(&iov, 0, sizeof(iov));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
+ 
+ 	rc = SMB2_notify_init(xid, &rqst, tcon, server,
+ 			      persistent_fid, volatile_fid,
+@@ -3748,8 +3748,8 @@ SMB2_change_notify(const unsigned int xid, struct cifs_tcon *tcon,
+ 				ses->id, (u8)watch_tree, completion_filter);
+ 
+  cnotify_exit:
+-	if (rqst.rq_iov)
+-		cifs_small_buf_release(rqst.rq_iov[0].iov_base); /* request */
++	if (rqst.iov)
++		cifs_small_buf_release(rqst.iov[0].iov_base); /* request */
+ 	free_rsp_buf(resp_buftype, rsp_iov.iov_base);
+ 	return rc;
+ }
+@@ -3905,8 +3905,8 @@ SMB2_echo(struct cifs_server_info *server)
+ 	struct smb2_echo_req *req;
+ 	int rc = 0;
+ 	struct kvec iov[1];
+-	struct smb_rqst rqst = { .rq_iov = iov,
+-				 .rq_nvec = 1 };
++	struct smb_rqst rqst = { .iov = iov,
++				 .nvec = 1 };
+ 	unsigned int total_len;
+ 
+ 	cifs_dbg(FYI, "In echo request for conn_id %lld\n", server->conn_id);
+@@ -3943,8 +3943,8 @@ SMB2_echo(struct cifs_server_info *server)
+ void
+ SMB2_flush_free(struct smb_rqst *rqst)
+ {
+-	if (rqst && rqst->rq_iov)
+-		cifs_small_buf_release(rqst->rq_iov[0].iov_base); /* request */
++	if (rqst && rqst->iov)
++		cifs_small_buf_release(rqst->iov[0].iov_base); /* request */
+ }
+ 
+ int
+@@ -3953,7 +3953,7 @@ SMB2_flush_init(const unsigned int xid, struct smb_rqst *rqst,
+ 		u64 persistent_fid, u64 volatile_fid)
+ {
+ 	struct smb2_flush_req *req;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	unsigned int total_len;
+ 	int rc;
+ 
+@@ -3993,8 +3993,8 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+ 	memset(&iov, 0, sizeof(iov));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
+ 
+ 	rc = SMB2_flush_init(xid, &rqst, tcon, server,
+ 			     persistent_fid, volatile_fid);
+@@ -4127,13 +4127,13 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 	struct smb2_hdr *shdr =
+ 				(struct smb2_hdr *)rdata->iov[0].iov_base;
+ 	struct cifs_credits credits = { .value = 0, .instance = 0 };
+-	struct smb_rqst rqst = { .rq_iov = &rdata->iov[1],
+-				 .rq_nvec = 1,
+-				 .rq_pages = rdata->pages,
+-				 .rq_offset = rdata->page_offset,
+-				 .rq_npages = rdata->nr_pages,
+-				 .rq_pagesz = rdata->pagesz,
+-				 .rq_tailsz = rdata->tailsz };
++	struct smb_rqst rqst = { .iov = &rdata->iov[1],
++				 .nvec = 1,
++				 .pages = rdata->pages,
++				 .offset = rdata->page_offset,
++				 .npages = rdata->nr_pages,
++				 .pagesz = rdata->pagesz,
++				 .tailsz = rdata->tailsz };
+ 
+ 	WARN_ONCE(rdata->server != mid->server,
+ 		  "rdata server %p != mid server %p",
+@@ -4213,8 +4213,8 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 	char *buf;
+ 	struct smb2_hdr *shdr;
+ 	struct cifs_io_parms io_parms;
+-	struct smb_rqst rqst = { .rq_iov = rdata->iov,
+-				 .rq_nvec = 1 };
++	struct smb_rqst rqst = { .iov = rdata->iov,
++				 .nvec = 1 };
+ 	struct cifs_server_info *server;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	unsigned int total_len;
+@@ -4306,8 +4306,8 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	iov[0].iov_len = total_len;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
+ 
+ 	rc = cifs_send_recv(xid, ses, io_parms->server,
+ 			    &rqst, &resp_buftype, flags, &rsp_iov);
+@@ -4529,17 +4529,17 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	iov[0].iov_len = total_len - 1;
+ 	iov[0].iov_base = (char *)req;
+ 
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
+-	rqst.rq_pages = wdata->pages;
+-	rqst.rq_offset = wdata->page_offset;
+-	rqst.rq_npages = wdata->nr_pages;
+-	rqst.rq_pagesz = wdata->pagesz;
+-	rqst.rq_tailsz = wdata->tailsz;
++	rqst.iov = iov;
++	rqst.nvec = 1;
++	rqst.pages = wdata->pages;
++	rqst.offset = wdata->page_offset;
++	rqst.npages = wdata->nr_pages;
++	rqst.pagesz = wdata->pagesz;
++	rqst.tailsz = wdata->tailsz;
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	if (wdata->mr) {
+ 		iov[0].iov_len += sizeof(struct smbd_buffer_descriptor_v1);
+-		rqst.rq_npages = 0;
++		rqst.npages = 0;
+ 	}
+ #endif
+ 	cifs_dbg(FYI, "async write at %llu %u bytes\n",
+@@ -4644,8 +4644,8 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	iov[0].iov_len = total_len - 1;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = n_vec + 1;
++	rqst.iov = iov;
++	rqst.nvec = n_vec + 1;
+ 
+ 	rc = cifs_send_recv(xid, io_parms->tcon->ses, server,
+ 			    &rqst,
+@@ -4835,7 +4835,7 @@ int SMB2_query_directory_init(const unsigned int xid,
+ 		MAX_SMB2_CREATE_RESPONSE_SIZE -
+ 		MAX_SMB2_CLOSE_RESPONSE_SIZE;
+ 	unsigned int total_len;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	int len, rc;
+ 
+ 	rc = smb2_plain_req_init(SMB2_QUERY_DIRECTORY, tcon, server,
+@@ -4893,8 +4893,8 @@ int SMB2_query_directory_init(const unsigned int xid,
+ 
+ void SMB2_query_directory_free(struct smb_rqst *rqst)
+ {
+-	if (rqst && rqst->rq_iov) {
+-		cifs_small_buf_release(rqst->rq_iov[0].iov_base); /* request */
++	if (rqst && rqst->iov) {
++		cifs_small_buf_release(rqst->iov[0].iov_base); /* request */
+ 	}
+ }
+ 
+@@ -4993,8 +4993,8 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+ 	memset(&iov, 0, sizeof(iov));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = SMB2_QUERY_DIRECTORY_IOV_SIZE;
++	rqst.iov = iov;
++	rqst.nvec = SMB2_QUERY_DIRECTORY_IOV_SIZE;
+ 
+ 	rc = SMB2_query_directory_init(xid, tcon, server,
+ 				       &rqst, persistent_fid,
+@@ -5048,7 +5048,7 @@ SMB2_set_info_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ 		   void **data, unsigned int *size)
+ {
+ 	struct smb2_set_info_req *req;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	unsigned int i, total_len;
+ 	int rc;
+ 
+@@ -5075,7 +5075,7 @@ SMB2_set_info_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ 	/* 1 for Buffer */
+ 	iov[0].iov_len = total_len - 1;
+ 
+-	for (i = 1; i < rqst->rq_nvec; i++) {
++	for (i = 1; i < rqst->nvec; i++) {
+ 		le32_add_cpu(&req->BufferLength, size[i]);
+ 		iov[i].iov_base = (char *)data[i];
+ 		iov[i].iov_len = size[i];
+@@ -5087,8 +5087,8 @@ SMB2_set_info_init(struct cifs_tcon *tcon, struct cifs_server_info *server,
+ void
+ SMB2_set_info_free(struct smb_rqst *rqst)
+ {
+-	if (rqst && rqst->rq_iov)
+-		cifs_buf_release(rqst->rq_iov[0].iov_base); /* request */
++	if (rqst && rqst->iov)
++		cifs_buf_release(rqst->iov[0].iov_base); /* request */
+ }
+ 
+ static int
+@@ -5121,8 +5121,8 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		return -ENOMEM;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = num;
++	rqst.iov = iov;
++	rqst.nvec = num;
+ 
+ 	rc = SMB2_set_info_init(tcon, server,
+ 				&rqst, persistent_fid, volatile_fid, pid,
+@@ -5227,8 +5227,8 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
+ 	iov[0].iov_len = total_len;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
+ 
+ 	rc = cifs_send_recv(xid, ses, server,
+ 			    &rqst, &resp_buf_type, flags, &rsp_iov);
+@@ -5334,8 +5334,8 @@ SMB311_posix_qfs_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		flags |= CIFS_TRANSFORM_REQ;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = &iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = &iov;
++	rqst.nvec = 1;
+ 
+ 	rc = cifs_send_recv(xid, ses, server,
+ 			    &rqst, &resp_buftype, flags, &rsp_iov);
+@@ -5385,8 +5385,8 @@ SMB2_QFS_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		flags |= CIFS_TRANSFORM_REQ;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = &iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = &iov;
++	rqst.nvec = 1;
+ 
+ 	rc = cifs_send_recv(xid, ses, server,
+ 			    &rqst, &resp_buftype, flags, &rsp_iov);
+@@ -5452,8 +5452,8 @@ SMB2_QFS_attr(const unsigned int xid, struct cifs_tcon *tcon,
+ 		flags |= CIFS_TRANSFORM_REQ;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = &iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = &iov;
++	rqst.nvec = 1;
+ 
+ 	rc = cifs_send_recv(xid, ses, server,
+ 			    &rqst, &resp_buftype, flags, &rsp_iov);
+@@ -5537,8 +5537,8 @@ smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
+ 	cifs_stats_inc(&tcon->stats.cifs.locks);
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 2;
++	rqst.iov = iov;
++	rqst.nvec = 2;
+ 
+ 	rc = cifs_send_recv(xid, tcon->ses, server,
+ 			    &rqst, &resp_buf_type, flags,
+@@ -5610,8 +5610,8 @@ SMB2_lease_break(const unsigned int xid, struct cifs_tcon *tcon,
+ 	iov[0].iov_len = total_len;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = iov;
+-	rqst.rq_nvec = 1;
++	rqst.iov = iov;
++	rqst.nvec = 1;
+ 
+ 	rc = cifs_send_recv(xid, ses, server,
+ 			    &rqst, &resp_buf_type, flags, &rsp_iov);
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 2b6ffd255d75..53ef472342ec 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -216,7 +216,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct cifs_server_info *server,
+ 	int rc;
+ 	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
+ 	unsigned char *sigptr = smb2_signature;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+ 	struct cifs_ses *ses;
+ 	struct shash_desc *shash;
+@@ -269,7 +269,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct cifs_server_info *server,
+ 	 * __cifs_calc_signature().
+ 	 */
+ 	drqst = *rqst;
+-	if (drqst.rq_nvec >= 2 && iov[0].iov_len == 4) {
++	if (drqst.nvec >= 2 && iov[0].iov_len == 4) {
+ 		rc = crypto_shash_update(shash, iov[0].iov_base,
+ 					 iov[0].iov_len);
+ 		if (rc) {
+@@ -278,8 +278,8 @@ smb2_calc_signature(struct smb_rqst *rqst, struct cifs_server_info *server,
+ 					__func__);
+ 			goto out;
  		}
- 		cifs_server_dbg(VFS, "%s: invalid mid state mid=%llu state=%d\n",
+-		drqst.rq_iov++;
+-		drqst.rq_nvec--;
++		drqst.iov++;
++		drqst.nvec--;
+ 	}
+ 
+ 	rc = __cifs_calc_signature(&drqst, server, sigptr, shash);
+@@ -548,7 +548,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct cifs_server_info *server,
+ 	int rc;
+ 	unsigned char smb3_signature[SMB2_CMACAES_SIZE];
+ 	unsigned char *sigptr = smb3_signature;
+-	struct kvec *iov = rqst->rq_iov;
++	struct kvec *iov = rqst->iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+ 	struct shash_desc *shash;
+ 	struct crypto_shash *hash;
+@@ -599,7 +599,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct cifs_server_info *server,
+ 	 * __cifs_calc_signature().
+ 	 */
+ 	drqst = *rqst;
+-	if (drqst.rq_nvec >= 2 && iov[0].iov_len == 4) {
++	if (drqst.nvec >= 2 && iov[0].iov_len == 4) {
+ 		rc = crypto_shash_update(shash, iov[0].iov_base,
+ 					 iov[0].iov_len);
+ 		if (rc) {
+@@ -607,8 +607,8 @@ smb3_calc_signature(struct smb_rqst *rqst, struct cifs_server_info *server,
+ 				 __func__);
+ 			goto out;
+ 		}
+-		drqst.rq_iov++;
+-		drqst.rq_nvec--;
++		drqst.iov++;
++		drqst.nvec--;
+ 	}
+ 
+ 	rc = __cifs_calc_signature(&drqst, server, sigptr, shash);
+@@ -631,7 +631,7 @@ smb2_sign_rqst(struct smb_rqst *rqst, struct cifs_server_info *server)
+ 	bool is_binding;
+ 	bool is_signed;
+ 
+-	shdr = (struct smb2_hdr *)rqst->rq_iov[0].iov_base;
++	shdr = (struct smb2_hdr *)rqst->iov[0].iov_base;
+ 	ssr = (struct smb2_sess_setup_req *)shdr;
+ 
+ 	is_binding = shdr->Command == SMB2_SESSION_SETUP &&
+@@ -663,7 +663,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct cifs_server_info *server)
+ 	unsigned int rc;
+ 	char server_response_sig[SMB2_SIGNATURE_SIZE];
+ 	struct smb2_hdr *shdr =
+-			(struct smb2_hdr *)rqst->rq_iov[0].iov_base;
++			(struct smb2_hdr *)rqst->iov[0].iov_base;
+ 
+ 	if ((shdr->Command == SMB2_NEGOTIATE) ||
+ 	    (shdr->Command == SMB2_SESSION_SETUP) ||
+@@ -814,8 +814,8 @@ smb2_check_receive(struct mid_q_entry *mid, struct cifs_server_info *server,
+ {
+ 	unsigned int len = mid->resp_buf_size;
+ 	struct kvec iov[1];
+-	struct smb_rqst rqst = { .rq_iov = iov,
+-				 .rq_nvec = 1 };
++	struct smb_rqst rqst = { .iov = iov,
++				 .nvec = 1 };
+ 
+ 	iov[0].iov_base = (char *)mid->resp_buf;
+ 	iov[0].iov_len = len;
+@@ -840,7 +840,7 @@ smb2_setup_request(struct cifs_ses *ses, struct cifs_server_info *server,
+ {
+ 	int rc;
+ 	struct smb2_hdr *shdr =
+-			(struct smb2_hdr *)rqst->rq_iov[0].iov_base;
++			(struct smb2_hdr *)rqst->iov[0].iov_base;
+ 	struct mid_q_entry *mid;
+ 
+ 	smb2_seq_num_into_buf(server, shdr);
+@@ -866,7 +866,7 @@ smb2_setup_async_request(struct cifs_server_info *server, struct smb_rqst *rqst)
+ {
+ 	int rc;
+ 	struct smb2_hdr *shdr =
+-			(struct smb2_hdr *)rqst->rq_iov[0].iov_base;
++			(struct smb2_hdr *)rqst->iov[0].iov_base;
+ 	struct mid_q_entry *mid;
+ 
+ 	spin_lock(&g_servers_lock);
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index f897af5d5fef..67852fa831c5 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -2025,17 +2025,17 @@ int smbd_send(struct cifs_server_info *server,
+ 	rqst_idx = 0;
+ next_rqst:
+ 	rqst = &rqst_array[rqst_idx];
+-	iov = rqst->rq_iov;
++	iov = rqst->iov;
+ 
+ 	cifs_dbg(FYI, "Sending smb (RDMA): idx=%d smb_len=%lu\n",
+ 		rqst_idx, smb_rqst_len(server, rqst));
+-	for (i = 0; i < rqst->rq_nvec; i++)
++	for (i = 0; i < rqst->nvec; i++)
+ 		dump_smb(iov[i].iov_base, iov[i].iov_len);
+ 
+ 
+-	log_write(INFO, "rqst_idx=%d nvec=%d rqst->rq_npages=%d rq_pagesz=%d rq_tailsz=%d buflen=%lu\n",
+-		  rqst_idx, rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
+-		  rqst->rq_tailsz, smb_rqst_len(server, rqst));
++	log_write(INFO, "rqst_idx=%d nvec=%d rqst->npages=%d rq_pagesz=%d rq_tailsz=%d buflen=%lu\n",
++		  rqst_idx, rqst->nvec, rqst->npages, rqst->pagesz,
++		  rqst->tailsz, smb_rqst_len(server, rqst));
+ 
+ 	start = i = 0;
+ 	buflen = 0;
+@@ -2080,14 +2080,14 @@ int smbd_send(struct cifs_server_info *server,
+ 						goto done;
+ 				}
+ 				i++;
+-				if (i == rqst->rq_nvec)
++				if (i == rqst->nvec)
+ 					break;
+ 			}
+ 			start = i;
+ 			buflen = 0;
+ 		} else {
+ 			i++;
+-			if (i == rqst->rq_nvec) {
++			if (i == rqst->nvec) {
+ 				/* send out all remaining vecs */
+ 				remaining_data_length -= buflen;
+ 				log_write(INFO, "sending iov[] from start=%d i=%d nvecs=%d remaining_data_length=%d\n",
+@@ -2104,7 +2104,7 @@ int smbd_send(struct cifs_server_info *server,
+ 	}
+ 
+ 	/* now sending pages if there are any */
+-	for (i = 0; i < rqst->rq_npages; i++) {
++	for (i = 0; i < rqst->npages; i++) {
+ 		unsigned int offset;
+ 
+ 		rqst_page_get_length(rqst, i, &buflen, &offset);
+@@ -2120,7 +2120,7 @@ int smbd_send(struct cifs_server_info *server,
+ 				  i, j * max_iov_size + offset, size,
+ 				  remaining_data_length);
+ 			rc = smbd_post_send_page(
+-				info, rqst->rq_pages[i],
++				info, rqst->pages[i],
+ 				j*max_iov_size + offset,
+ 				size, remaining_data_length);
+ 			if (rc)
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 0849f96ee580..a2d83952626e 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -264,12 +264,12 @@ smb_rqst_len(struct cifs_server_info *server, struct smb_rqst *rqst)
+ 	unsigned long buflen = 0;
+ 
+ 	if (server->vals->header_preamble_size == 0 &&
+-	    rqst->rq_nvec >= 2 && rqst->rq_iov[0].iov_len == 4) {
+-		iov = &rqst->rq_iov[1];
+-		nvec = rqst->rq_nvec - 1;
++	    rqst->nvec >= 2 && rqst->iov[0].iov_len == 4) {
++		iov = &rqst->iov[1];
++		nvec = rqst->nvec - 1;
+ 	} else {
+-		iov = rqst->rq_iov;
+-		nvec = rqst->rq_nvec;
++		iov = rqst->iov;
++		nvec = rqst->nvec;
+ 	}
+ 
+ 	/* total up iov array first */
+@@ -282,17 +282,17 @@ smb_rqst_len(struct cifs_server_info *server, struct smb_rqst *rqst)
+ 	 * multiple pages ends at page boundary, rq_tailsz needs to be set to
+ 	 * PAGE_SIZE.
+ 	 */
+-	if (rqst->rq_npages) {
+-		if (rqst->rq_npages == 1)
+-			buflen += rqst->rq_tailsz;
++	if (rqst->npages) {
++		if (rqst->npages == 1)
++			buflen += rqst->tailsz;
+ 		else {
+ 			/*
+ 			 * If there is more than one page, calculate the
+ 			 * buffer length based on rq_offset and rq_tailsz
+ 			 */
+-			buflen += rqst->rq_pagesz * (rqst->rq_npages - 1) -
+-					rqst->rq_offset;
+-			buflen += rqst->rq_tailsz;
++			buflen += rqst->pagesz * (rqst->npages - 1) -
++					rqst->offset;
++			buflen += rqst->tailsz;
+ 		}
+ 	}
+ 
+@@ -365,8 +365,8 @@ __smb_send_rqst(struct cifs_server_info *server, int num_rqst,
+ 	cifs_dbg(FYI, "Sending smb: smb_len=%u\n", send_length);
+ 
+ 	for (j = 0; j < num_rqst; j++) {
+-		iov = rqst[j].rq_iov;
+-		n_vec = rqst[j].rq_nvec;
++		iov = rqst[j].iov;
++		n_vec = rqst[j].nvec;
+ 
+ 		size = 0;
+ 		for (i = 0; i < n_vec; i++) {
+@@ -383,10 +383,10 @@ __smb_send_rqst(struct cifs_server_info *server, int num_rqst,
+ 		total_len += sent;
+ 
+ 		/* now walk the page array and send each page in it */
+-		for (i = 0; i < rqst[j].rq_npages; i++) {
++		for (i = 0; i < rqst[j].npages; i++) {
+ 			struct bio_vec bvec;
+ 
+-			bvec.bv_page = rqst[j].rq_pages[i];
++			bvec.bv_page = rqst[j].pages[i];
+ 			rqst_page_get_length(&rqst[j], i, &bvec.bv_len,
+ 					     &bvec.bv_offset);
+ 
+@@ -473,8 +473,8 @@ smb_send_rqst(struct cifs_server_info *server, int num_rqst,
+ 
+ 	iov.iov_base = tr_hdr;
+ 	iov.iov_len = sizeof(*tr_hdr);
+-	cur_rqst[0].rq_iov = &iov;
+-	cur_rqst[0].rq_nvec = 1;
++	cur_rqst[0].iov = &iov;
++	cur_rqst[0].nvec = 1;
+ 
+ 	rc = server->ops->init_transform_rq(server, num_rqst + 1,
+ 					    &cur_rqst[0], rqst);
+@@ -493,8 +493,8 @@ smb_send(struct cifs_server_info *server, struct smb_hdr *smb_buffer,
+ 	 unsigned int smb_buf_length)
+ {
+ 	struct kvec iov[2];
+-	struct smb_rqst rqst = { .rq_iov = iov,
+-				 .rq_nvec = 2 };
++	struct smb_rqst rqst = { .iov = iov,
++				 .nvec = 2 };
+ 
+ 	iov[0].iov_base = smb_buffer;
+ 	iov[0].iov_len = 4;
+@@ -771,11 +771,11 @@ struct mid_q_entry *
+ cifs_setup_async_request(struct cifs_server_info *server, struct smb_rqst *rqst)
+ {
+ 	int rc;
+-	struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
++	struct smb_hdr *hdr = (struct smb_hdr *)rqst->iov[0].iov_base;
+ 	struct mid_q_entry *mid;
+ 
+-	if (rqst->rq_iov[0].iov_len != 4 ||
+-	    rqst->rq_iov[0].iov_base + 4 != rqst->rq_iov[1].iov_base)
++	if (rqst->iov[0].iov_len != 4 ||
++	    rqst->iov[0].iov_base + 4 != rqst->iov[1].iov_base)
+ 		return ERR_PTR(-EIO);
+ 
+ 	/* enable signing if server requires it */
+@@ -961,8 +961,8 @@ cifs_check_receive(struct mid_q_entry *mid, struct cifs_server_info *server,
+ 	if (server->sign) {
+ 		struct kvec iov[2];
+ 		int rc = 0;
+-		struct smb_rqst rqst = { .rq_iov = iov,
+-					 .rq_nvec = 2 };
++		struct smb_rqst rqst = { .iov = iov,
++					 .nvec = 2 };
+ 
+ 		iov[0].iov_base = mid->resp_buf;
+ 		iov[0].iov_len = 4;
+@@ -985,11 +985,11 @@ cifs_setup_request(struct cifs_ses *ses, struct cifs_server_info *ignored,
+ 		   struct smb_rqst *rqst)
+ {
+ 	int rc;
+-	struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
++	struct smb_hdr *hdr = (struct smb_hdr *)rqst->iov[0].iov_base;
+ 	struct mid_q_entry *mid;
+ 
+-	if (rqst->rq_iov[0].iov_len != 4 ||
+-	    rqst->rq_iov[0].iov_base + 4 != rqst->rq_iov[1].iov_base)
++	if (rqst->iov[0].iov_len != 4 ||
++	    rqst->iov[0].iov_base + 4 != rqst->iov[1].iov_base)
+ 		return ERR_PTR(-EIO);
+ 
+ 	rc = allocate_mid(ses, hdr, &mid);
+@@ -1191,7 +1191,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		spin_unlock(&g_servers_lock);
+ 
+ 		cifs_server_lock(server);
+-		smb311_update_preauth_hash(ses, server, rqst[0].rq_iov, rqst[0].rq_nvec);
++		smb311_update_preauth_hash(ses, server, rqst[0].iov, rqst[0].nvec);
+ 		cifs_server_unlock(server);
+ 
+ 		spin_lock(&g_servers_lock);
+@@ -1327,8 +1327,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	new_iov[1].iov_len -= 4;
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+-	rqst.rq_iov = new_iov;
+-	rqst.rq_nvec = n_vec + 1;
++	rqst.iov = new_iov;
++	rqst.nvec = n_vec + 1;
+ 
+ 	rc = cifs_send_recv(xid, ses, ses->server,
+ 			    &rqst, resp_buf_type, flags, resp_iov);
+@@ -1346,7 +1346,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	struct mid_q_entry *midQ;
+ 	unsigned int len = be32_to_cpu(in_buf->smb_buf_length);
+ 	struct kvec iov = { .iov_base = in_buf, .iov_len = len };
+-	struct smb_rqst rqst = { .rq_iov = &iov, .rq_nvec = 1 };
++	struct smb_rqst rqst = { .iov = &iov, .nvec = 1 };
+ 	struct cifs_credits credits = { .value = 1, .instance = 0 };
+ 	struct cifs_server_info *server;
+ 
+@@ -1489,7 +1489,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_ses *ses;
+ 	unsigned int len = be32_to_cpu(in_buf->smb_buf_length);
+ 	struct kvec iov = { .iov_base = in_buf, .iov_len = len };
+-	struct smb_rqst rqst = { .rq_iov = &iov, .rq_nvec = 1 };
++	struct smb_rqst rqst = { .iov = &iov, .nvec = 1 };
+ 	unsigned int instance;
+ 	struct cifs_server_info *server;
+ 
 -- 
 2.35.3
 
