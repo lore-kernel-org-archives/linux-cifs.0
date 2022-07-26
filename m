@@ -2,68 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D735ECCA489
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Jul 2022 09:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5B5C43334
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Jul 2022 07:33:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238231AbiGZJo7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Jul 2022 05:44:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46582 "EHLO
+        id S238503AbiGZHds (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Jul 2022 03:33:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230152AbiGZJo6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Jul 2022 05:44:58 -0400
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18F231391
-        for <linux-cifs@vger.kernel.org>; Tue, 26 Jul 2022 02:44:57 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id v2so27094qvs.12
-        for <linux-cifs@vger.kernel.org>; Tue, 26 Jul 2022 02:44:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=FHGUzKmZ0uw6/+29Eqiy2YbZDIOJkhs2A8bSr/a08+o=;
-        b=MdMz1Pq9sh/rTGAfwtIXPSMselPOSSDys5vFqmggJPyf3nA3U/VZ24VRHj0ROlZ0Kj
-         vLMAIDF/M/Oq6cSlq/fIxkMKN5G/e/fUT5aXw8Nawet2DkvjWsmi2nywTKiEmnBrqQnB
-         6EQVAD4t9vzn8LUMT+pc9hqYANOqoWIInOxgeydlHkaV4FRuq/9CqxLFX2pd+we/hz1N
-         JTWPzUKwBL8mBC6uESGVkpVoeq6HrGWCgnkbFYcHlSGHQUGExBDwdqNiSgVXHI0pFkY4
-         ZwAeodc+rSCjTOeGJDHpsEF16hcIWjDkLLeBiWJ5mkwWkJWk4apix0uhumxan7eDpQsm
-         UT2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=FHGUzKmZ0uw6/+29Eqiy2YbZDIOJkhs2A8bSr/a08+o=;
-        b=pN4JIwz8PqlBbtI6zskX6tukWZD2AqljfOAR6PBVcHPRFT7quu8MyILmOJ5yVDVHbd
-         3JtXKqvoA/sged2HDTll4tDfRkpdq0Nr2cBARXYEjQiNBZDW/uDKOWpJytjK1igJ10aI
-         qYwGznj5IIwej20oDDMzFIyeqkTBD08Ue6UR8ihH2fvHGqadYtVINf3uTPjgrU4Ks/PN
-         O4RViqEKVm5tzMqDyDs4pEfdKHWuZrdv4ujS4v96zjdbSCjklRwQ1uV4ZWMjNg61XUZx
-         E4B7eiJAGwyfTdHM5spIpNXrBKtc3016zcVESP7sbfmUwADXoysCfFI89JMr8kTN+o+S
-         dRrg==
-X-Gm-Message-State: AJIora/rsXS4dTT13OZAlgwWKkPElIc3S+UVyLQikBpIERi30reAZcmc
-        2BUM02d+OgkvxwogLivw9n6IoyHGvrqcw3lqJptHuyV+1rA=
-X-Google-Smtp-Source: AGRyM1uspLOT3XCSzQ5LAXbtu+kZWmohmsiqcZQ76cTvOuRPXkSM6Y4c1UMmz0urnjyqyXjC8H+LvthFrMo8g863XIg=
-X-Received: by 2002:a05:6214:5096:b0:474:4c82:a907 with SMTP id
- kk22-20020a056214509600b004744c82a907mr6825160qvb.81.1658828696714; Tue, 26
- Jul 2022 02:44:56 -0700 (PDT)
-MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Tue, 26 Jul 2022 15:14:46 +0530
-Message-ID: <CANT5p=qSoPWqBmLGDNOj3fiWVPCBn_MvwC59wbdU861uc7Ejdg@mail.gmail.com>
-Subject: Winbind active directory without domain join
-To:     samba@lists.samba.org, CIFS <linux-cifs@vger.kernel.org>
+        with ESMTP id S238504AbiGZHdf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Jul 2022 03:33:35 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A7C22B25B
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Jul 2022 00:29:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Date:To:From:CC;
+        bh=XPVv6bCTwttyoRCVVFeI8DBZQdzKU7o2+p3VpCm/gp8=; b=h47NJ/SEkIfnJzU7eZFsglIeQr
+        0Blr2anX8jUoJZuv6X59Q2TT6f0VjGBJ7wjNIZTcT05XZU/QXaGiQrqDaLRRDop+wzHF4T1VRYyWu
+        +9qe6l8exuYkADjpDt4kelp/W22eQnS1m+XWP/zycDzsKURCX8JLPd5DyF/3+o3A21E5ouZ0jxgl7
+        E+2nsoMAUBm7DQoRn7nLxGGeYranaUjCtVcboWhaTY/0W/jv2DKOPxf62O80J4BXiJTzeSBBGRhLE
+        p8TUBgBR0Rl4jjVkDI3etPzJyQi7n7U5jhYV4mmIuVFNYIAJhmt1v39hu8K9AoMlC3nBwEE6ANNaD
+        d0b1W9OlpYJxDyODZBlCaKsT582Oz1SsTrr7H7OinzOEOAIjC5VwGOq6khUhLnWsy4gavHq7KbPSQ
+        3uc9Wy3xGjBTrFtm6wvs5kGKUKmTIciXpGsU9ilK7Wv5jW1J7GjZrz19F64zx5K2zSgKZ22CeVTPg
+        Qlqro2uDxbQZKVGIp7w+cFEn;
+Received: from [2a01:4f8:192:486::6:0] (port=54752 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1oGF0M-006XNP-TP
+        for cifs-qa@samba.org; Tue, 26 Jul 2022 07:29:22 +0000
+Received: from www-data by hr6.samba.org with local (Exim 4.93)
+        (envelope-from <www-data@samba.org>)
+        id 1oGF0L-001rFP-Uk
+        for cifs-qa@samba.org; Tue, 26 Jul 2022 07:29:22 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 14201] DFS mount does not pass context option to actual share
+ mounts
+Date:   Tue, 26 Jul 2022 07:29:21 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 3.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: patrick.boeker@haltec.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: sfrench@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-14201-10630-pfTx0HAj8J@https.bugzilla.samba.org/>
+In-Reply-To: <bug-14201-10630@https.bugzilla.samba.org/>
+References: <bug-14201-10630@https.bugzilla.samba.org/>
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="UTF-8"
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi all,
+https://bugzilla.samba.org/show_bug.cgi?id=3D14201
 
-I'm wondering if I can use winbind services without having to domain
-join the active directory?
-i.e. to login as AD users (with the help of pam-winbind) and to map
-UID/GID to SID and back (using wbclient.h).
+--- Comment #2 from Patrick B=C3=B6ker <patrick.boeker@haltec.de> ---
+Hi Paulo,
 
-Searching on the internet leads me to believe that domain join is
-mandatory to avail these services, but no conclusive answer.
-I Wanted to confirm the same.
+have there been patches that could have fixed this? I'm willing to do the
+testing. I just looked up what mainline kernel means. Is there a simpler wa=
+y to
+test mainline than compiling my own? (It's been more than 10 years since I =
+last
+compiled my own Linux kernel.)
 
--- 
-Regards,
-Shyam
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
