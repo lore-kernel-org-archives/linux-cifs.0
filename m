@@ -2,82 +2,108 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A56C0C00140
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Jul 2022 13:56:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9F3C04A68
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jul 2022 06:57:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239088AbiGZN4u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Jul 2022 09:56:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39176 "EHLO
+        id S229606AbiG0G5B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Jul 2022 02:57:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239279AbiGZN42 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Jul 2022 09:56:28 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B502870E
-        for <linux-cifs@vger.kernel.org>; Tue, 26 Jul 2022 06:56:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Message-ID:Date:To:From:CC;
-        bh=I1BXhPCDW3D68OMFx5FiotuTRbykGmO6EhXNHfi8WgU=; b=3v9IwLWZCbqgmgKTJaWg5bly7u
-        YNZeYH+942xItVMHAxS/GKzhkECgOlTKzilkdpOMwiBfUCn6N/ZiLz83AyujAe+70t+RRuaoQghVo
-        NupuJoxCK5/K3qjWVUghyUWDolGEQmntp8EbW6HU0txPy+aRCPJ4z1ouOR7iLwWPKYsSVOFBKrDQz
-        6kYSWO2qyl/llu2OTYPJDCLGI6z0R+hhwFb3GIzkjOHMeOy3imloUjkPoKAwc7ScOsMz7ObbjJW0q
-        ziFDCTniBTK8j0wWf/DVQpeQBEvVyEbFGhE3zcgHAV2cshPseCrILBHL9b6Y3QhyqPe0Ub3YJ7+lA
-        JNNeAroqzDBHUHIWx4UnLtt7Mba9R+l0glo28nkLkSxTvqeenjm3FlLpZAn6h+bt+XLCfNUMo3dWM
-        fsH7GzUnC13SPfRnTK3HW0WiDPKIkvBg7KkEBBJbUUWnIP9ts7ic/q0cuDIPH9IrdyFDFfjem/B4O
-        yb4CBQwA5ughZ2kDHa9Hrfm/;
-Received: from [2a01:4f8:192:486::6:0] (port=54782 helo=hr6.samba.org) 
-        by hr2.samba.org with esmtps (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1oGL2U-006aMl-4r
-        for cifs-qa@samba.org; Tue, 26 Jul 2022 13:55:58 +0000
-Received: from www-data by hr6.samba.org with local (Exim 4.93)
-        (envelope-from <www-data@samba.org>)
-        id 1oGL2T-001rdr-Lg
-        for cifs-qa@samba.org; Tue, 26 Jul 2022 13:55:57 +0000
-From:   samba-bugs@samba.org
-To:     cifs-qa@samba.org
-Subject: [Bug 14201] DFS mount does not pass context option to actual share
- mounts
-Date:   Tue, 26 Jul 2022 13:55:57 +0000
-X-Bugzilla-Reason: QAcontact
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: CifsVFS
-X-Bugzilla-Component: kernel fs
-X-Bugzilla-Version: 3.x
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: patrick.boeker@haltec.de
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: FIXED
-X-Bugzilla-Priority: P5
-X-Bugzilla-Assigned-To: sfrench@samba.org
-X-Bugzilla-Target-Milestone: ---
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: resolution bug_status
-Message-ID: <bug-14201-10630-8Hdh6HrhVa@https.bugzilla.samba.org/>
-In-Reply-To: <bug-14201-10630@https.bugzilla.samba.org/>
-References: <bug-14201-10630@https.bugzilla.samba.org/>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-X-Bugzilla-URL: https://bugzilla.samba.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S229507AbiG0G5A (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Jul 2022 02:57:00 -0400
+X-Greylist: delayed 232 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 26 Jul 2022 23:56:57 PDT
+Received: from s1.jo-so.de (jo-so.de [IPv6:2a03:4000:8:213::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D5123BD9
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Jul 2022 23:56:57 -0700 (PDT)
+Received: from mail-relay (helo=jo-so.de)
+        by s1.jo-so.de with local-bsmtp (Exim 4.94.2)
+        (envelope-from <joerg@jo-so.de>)
+        id 1oGayV-000u6a-Vx
+        for linux-cifs@vger.kernel.org; Wed, 27 Jul 2022 08:56:55 +0200
+Received: from joerg by zenbook.jo-so.de with local (Exim 4.96)
+        (envelope-from <joerg@jo-so.de>)
+        id 1oGayV-000eqR-1R
+        for linux-cifs@vger.kernel.org;
+        Wed, 27 Jul 2022 08:56:55 +0200
+Date:   Wed, 27 Jul 2022 08:56:55 +0200
+From:   =?utf-8?B?SsO2cmc=?= Sommer <joerg@jo-so.de>
+To:     linux-cifs@vger.kernel.org
+Subject: Re: Stale file handle with cat -- AVM Fritzbox
+Message-ID: <20220727065655.zk3pvh4jynj6hbym@jo-so.de>
+OpenPGP: id=7D2C9A23D1AEA375; url=https://jo-so.de/pgp-key.txt;
+ preference=signencrypt
+References: <20220727065301.afmn7ui3zzre7nem@jo-so.de>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="g6whaureyuiszabd"
+Content-Disposition: inline
+In-Reply-To: <20220727065301.afmn7ui3zzre7nem@jo-so.de>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-https://bugzilla.samba.org/show_bug.cgi?id=3D14201
 
-Patrick B=C3=B6ker <patrick.boeker@haltec.de> changed:
+--g6whaureyuiszabd
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: Stale file handle with cat -- AVM Fritzbox
+MIME-Version: 1.0
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-         Resolution|---                         |FIXED
-             Status|NEW                         |RESOLVED
+J=C3=B6rg Sommer schrieb am Wed 27. Jul, 08:53 (+0200):
+> Hi,
+>=20
+> I'm trying to access a USB disk attached to a Fritzbox from AVM. The
+> Fritzbox is a router, but can also export USB disks as NAS. With smbfs I
+> can't access any files, but smbclient works.
+>=20
+>   # mount //192.168.178.1/fritzi /mnt/fritzi -o user=3Dpublic,password=3D=
+=E2=80=A6
+>   # cat /mnt/fritzi/WD_blau/Public/J=C3=B6rg-Backup/Archiv/keys/63b0d55eb=
+795822facba850363d5148ce657db559552ef3a5cdf6623d110bb98 >/dev/null
+>   cat: /mnt/fritzi/WD_blau/Public/J=C3=B6rg-Backup/Archiv/keys/63b0d55eb7=
+95822facba850363d5148ce657db559552ef3a5cdf6623d110bb98: Stale file handle
+>=20
+> But smbclient works:
+>=20
+>   # smbclient -U public%=E2=80=A6 //192.168.178.1/fritzi -c 'get WD_blau\=
+Public\J=C3=B6rg-Backup\Archiv\keys\63b0d55eb795822facba850363d5148ce657db5=
+59552ef3a5cdf6623d110bb98'
+>   # file WD_blau\\Public\\J=C3=B6rg-Backup\\Archiv\\keys\\63b0d55eb795822=
+facba850363d5148ce657db559552ef3a5cdf6623d110bb98=20
+>   WD_blau\Public\J=C3=B6rg-Backup\Archiv\keys\63b0d55eb795822facba850363d=
+5148ce657db559552ef3a5cdf6623d110bb98: JSON data
+>=20
+> So, what does the Kernel do different? How can I debug this?
 
---- Comment #5 from Patrick B=C3=B6ker <patrick.boeker@haltec.de> ---
-Works on 5.17.5. So I assume it got fixed in the meantime.
+Oh, sorry. I missed the versions:
+
+% uname -r
+5.19.0-rc6-amd64
+
+The kernel is from Debian. https://packages.debian.org/experimental/linux-i=
+mage-5.19.0-rc6-amd64
+
+% smbclient --version
+Version 4.16.3-Debian
+
+
+
 
 --=20
-You are receiving this mail because:
-You are the QA Contact for the bug.=
+Viele Leute glauben, dass sie denken, wenn sie lediglich
+ihre Vorurteile neu ordnen.
+
+--g6whaureyuiszabd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iJMEAREIADsWIQS1pYxd0T/67YejVyF9LJoj0a6jdQUCYuDhth0YaHR0cHM6Ly9q
+by1zby5kZS9wZ3Ata2V5LnR4dAAKCRB9LJoj0a6jdfp5APwOxd0v4YHRI0GKVrW/
+W7r3x/3zh5bgZXYgL09Z7iK0+AD9F+0Zud9e0TynNngE3XBty3BLNS6SHUKhkWnW
+vGDuFD0=
+=oY/I
+-----END PGP SIGNATURE-----
+
+--g6whaureyuiszabd--
