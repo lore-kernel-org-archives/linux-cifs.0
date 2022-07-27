@@ -2,137 +2,117 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35412C04A68
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jul 2022 19:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB71BC04A68
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jul 2022 20:04:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232362AbiG0TYM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Jul 2022 15:24:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44462 "EHLO
+        id S231322AbiG0UEi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Jul 2022 16:04:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234913AbiG0TYL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Jul 2022 15:24:11 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05E21D7
-        for <linux-cifs@vger.kernel.org>; Wed, 27 Jul 2022 12:24:10 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B1F66203CF;
-        Wed, 27 Jul 2022 19:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1658949849; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5mlm3xx4QFbBTsErOqFzgXML5nFhMiLzkMNjVePo4Qo=;
-        b=HmudG/OJqGXfru6GJfUiYTyEjPZ5g0BgLoCgjemXLcxGfuaCj5DiuVZzpuPdGHwVeoObzC
-        vgfb5c8trF1f0LHRvH76NbqthxPe/ETP7nh/VSfO7A28enprA8QEvTPCabach+QNh9qhav
-        38+/GbNnkggQJJbrde3Eu8iFp0hX7qM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1658949849;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5mlm3xx4QFbBTsErOqFzgXML5nFhMiLzkMNjVePo4Qo=;
-        b=SMSK26Tj3zOr5LbL+xdr8y0DAnbqDwwbjFHnhiVNpXFMQCn69ztZB7kcb8k0Iw1QHkwAna
-        OOma3Vsz7/BJFZAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3377D13A8E;
-        Wed, 27 Jul 2022 19:24:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Tn2bOdiQ4WLSRwAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Wed, 27 Jul 2022 19:24:08 +0000
-Date:   Wed, 27 Jul 2022 16:24:06 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Fwd: [RFC PATCH v2 03/10] cifs: rename "TCP_Server_Info" struct
- to "cifs_server_info"
-Message-ID: <20220727192406.a3oqszjap5cpmmed@cyberdelia>
-References: <20220725223707.14477-1-ematsumiya@suse.de>
- <20220725223707.14477-4-ematsumiya@suse.de>
- <CAH2r5msHgxzC6HYhj70cMce+=t6Fz2p1C5X3HCM1WKFEq7rnhQ@mail.gmail.com>
- <20220727153836.sllbblfagnstcza7@cyberdelia>
+        with ESMTP id S229508AbiG0UEh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Jul 2022 16:04:37 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DAE85A3D2;
+        Wed, 27 Jul 2022 13:04:36 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id h9so25973419wrm.0;
+        Wed, 27 Jul 2022 13:04:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:from:subject:to:cc
+         :references:content-language:in-reply-to:content-transfer-encoding;
+        bh=sHSYPh+AzLsps9tMRYbaXtGOiqgNNXGNW2LnpSImx9w=;
+        b=gdfObkFU00csidxmtnvdCsZOg+Utjxek0TzgURzVqzjZZNEYByr525hTX0retfxoBt
+         Pf7vF6rRabT1BzLjSJgV9I0+zl5Gh+VIJX4MNQFKKQP87uqmqvrIpOXqT+STaXjbtS2x
+         oqqQYlmY8PvUEe3FTTz3MFAByTMedA2uWEvDTtw+vMzMv7xgNzN1pOfi6cd8vGXz4w79
+         jaQE0rtyEnDQT7VCQIaN35jwIxaw8oKys11iofrqnjuirYj9wU8ePWHiOmeFNtt3h7gN
+         QRCMofJey4qXd3haYwVPmtYxvSzc+kcGORqaSp8bnR+P9NeJf5TxsPtMtGGJMeLXA9gM
+         829g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:cc:references:content-language:in-reply-to
+         :content-transfer-encoding;
+        bh=sHSYPh+AzLsps9tMRYbaXtGOiqgNNXGNW2LnpSImx9w=;
+        b=fOAxuKvfjAT+vzVa0y2oTLe1UEzAMtMOwND7GcxRKs1qmAkcmystbAV+gvnZg3Iz+6
+         tRCBXwKbvh0YCula6udWA6c44sEPa2a6A75gITyDwtbx17PA9eciP336fUU57GOobCSk
+         UEyIEXpNL0VEOqaWeFRt2FFDtYSdU6UlzmL006KyQRzqeprszdIyXjJWOcxHg6pHDJwP
+         /d09yEXHNMHcAoNk4//DVOxydl19wyt8NkH2j9SVhTjblCF9mK3xJyHe64sWNIHVFuVO
+         GVbRWB+6IYoXSOAc0z5hGcuHwniGROihRe1r4wH//xKnZ6r7vbhcHlzaIcKrMa8nkrqT
+         hGOg==
+X-Gm-Message-State: AJIora9G6vY1ENhogEfXBgPGLEjthYuYlzCGkK4wBbeNMr5J1XDNS0n9
+        Qfuj9yuht5F9n6Vv4+02KdBFpAq63PDGe5lU
+X-Google-Smtp-Source: AGRyM1vT0QKNPP3iCub94Ad7gX8jOUbrbOyQltTjzQCrW3c7Sc8OGcbJKhSbOLboO7IACvqCN1fllw==
+X-Received: by 2002:a05:6000:1549:b0:21d:bdce:1d01 with SMTP id 9-20020a056000154900b0021dbdce1d01mr15880551wry.373.1658952274837;
+        Wed, 27 Jul 2022 13:04:34 -0700 (PDT)
+Received: from [192.168.2.21] (178-83-161-42.dynamic.hispeed.ch. [178.83.161.42])
+        by smtp.gmail.com with ESMTPSA id i3-20020a05600c354300b003a2e92edeccsm3717174wmq.46.2022.07.27.13.04.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Jul 2022 13:04:34 -0700 (PDT)
+Message-ID: <fda96c5c-9007-4147-3be1-8c9deca0442c@gmail.com>
+Date:   Wed, 27 Jul 2022 22:04:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220727153836.sllbblfagnstcza7@cyberdelia>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+From:   Clemens Leu <clemens.leu@gmail.com>
+Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
+ machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
+To:     torvalds@linux-foundation.org
+Cc:     davydm@gmail.com, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, regressions@leemhuis.info,
+        regressions@lists.linux.dev, ronniesahlberg@gmail.com,
+        smfrench@gmail.com
+References: <CAHk-=wjSBvRk-ksUBOiQzJd=e19UZKvOSZs1UHahK5U0QVh6RQ@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CAHk-=wjSBvRk-ksUBOiQzJd=e19UZKvOSZs1UHahK5U0QVh6RQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-[ resending this as the other one bounced ]
+Hi all
 
-On 07/27, Steve French wrote:
->Of the first three patches, I think this one makes the most sense, but
->the rename should be "TCP_Server_Info" to something like
->"tcp_server_info" (or TCP_server_info) or something that indicates it
->is for the transport level info, info related to the network
->connection, the socket etc.
+Here follows now another practical reason why it is at the moment a 
+quite unhappy decision to ditch the NTLM/CIFS 1.0 support entirely.
 
-Noted.
+I am on Kubuntu 20.04 LTS and the access to my Apple Time Capsule worked 
+fine. This changed when kernel 5.15.0-41-generic was installed some time 
+ago. Since then I have in dmesg the known "kernel: bad security option: 
+ntlm" and "kernel: CIFS: VFS: bad security option: ntlm" messages and no 
+access is possible any longer to the Time Capsule.
 
->(and not using the word "cifs" unless
->related to SMB1)
+So it looks that commit "[76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c] 
+cifs: remove support for NTLM and weaker authentication algorithms" has 
+completely broken my Time Capsule access.
 
-The "cifs" prefix is for the bigger picture (SMB1 isolation and/or
-module renaming) so I can later on do something like:
-"sed -i 's/cifs_/<newname>_/g' *.c"
+Yes, I know, ntlm is more than 20 years old and a quite insecure 
+protocol. It is absolutely understandable to disable it as default. 
+However, it should be also regarded that there exist companies which 
+decided because of narrow-minded reasons to implement only the old SMB1 
+protocol also on not so old hardware. Apple is such an example, they 
+really implemented on all of their Time Capsule models (which were using 
+a special Samba implementation) only the stone-age variant of SMB/NTLM. 
+This is true even for the last 2013 variant which was discontinued on 
+April 26, 2018. Apple could for sure support a more recent SMB version 
+but they didn't do it most likely to make their own AFP3 protocol look 
+and perform better.
 
->---------- Forwarded message ---------
->From: Enzo Matsumiya <ematsumiya@suse.de>
->Date: Mon, Jul 25, 2022 at 5:37 PM
->Subject: [RFC PATCH v2 03/10] cifs: rename "TCP_Server_Info" struct to
->"cifs_server_info"
->To: <linux-cifs@vger.kernel.org>
->Cc: <smfrench@gmail.com>, <pc@cjr.nz>, <ronniesahlberg@gmail.com>,
-><nspmangalore@gmail.com>
->
->
->Rename the TCP_Server_Info struct to "cifs_server_info",
->making it look more like a cifs.ko struct by using the standard "cifs_"
->prefix.
->
->Also upgrades from Camel_Case to snake_case.
->
->Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
->---
->fs/cifs/asn1.c          |   4 +-
->fs/cifs/cifs_debug.c    |  14 ++--
->fs/cifs/cifs_debug.h    |   4 +-
->fs/cifs/cifs_spnego.c   |   2 +-
->fs/cifs/cifs_spnego.h   |   2 +-
->fs/cifs/cifs_swn.h      |   8 +--
->fs/cifs/cifsencrypt.c   |  14 ++--
->fs/cifs/cifsfs.c        |   6 +-
->fs/cifs/cifsglob.h      | 140 ++++++++++++++++++++--------------------
->fs/cifs/cifsproto.h     | 114 ++++++++++++++++----------------
->fs/cifs/cifssmb.c       |  24 +++----
->fs/cifs/connect.c       | 134 +++++++++++++++++++-------------------
->fs/cifs/dfs_cache.c     |  10 +--
->fs/cifs/dir.c           |   6 +-
->fs/cifs/file.c          |  60 ++++++++---------
->fs/cifs/fscache.c       |   2 +-
->fs/cifs/inode.c         |  22 +++----
->fs/cifs/ioctl.c         |   2 +-
->fs/cifs/link.c          |   4 +-
->fs/cifs/misc.c          |  10 +--
->fs/cifs/netmisc.c       |   2 +-
->fs/cifs/ntlmssp.h       |   6 +-
->fs/cifs/readdir.c       |   4 +-
->fs/cifs/sess.c          |  52 +++++++--------
->fs/cifs/smb1ops.c       |  26 ++++----
->fs/cifs/smb2inode.c     |   2 +-
->fs/cifs/smb2misc.c      |  14 ++--
->fs/cifs/smb2ops.c       |  86 ++++++++++++------------
->fs/cifs/smb2pdu.c       | 122 +++++++++++++++++-----------------
->fs/cifs/smb2proto.h     |  58 ++++++++---------
->fs/cifs/smb2transport.c |  44 ++++++-------
->fs/cifs/smbdirect.c     |  10 +--
->fs/cifs/smbdirect.h     |  16 ++---
->fs/cifs/transport.c     |  48 +++++++-------
->34 files changed, 536 insertions(+), 536 deletions(-)
+So the alternative would be AFP in my case, unfortunately it's not so 
+easy. While we have thanks to Netatalk a rock-solid AFP support in Linux 
+at the server side, this is unfortunately not true for the client one. 
+The corresponding "afpfs-ng" (Apple Filing Protocol Library, a client 
+implementation of the Apple Filing Protocol) project is unmaintained and 
+dormant for years.
+
+Long story short, the current situation in this topic is as I said quite 
+unhappy. While I fully agree to disable NTLM/CIFS 1.0 as default, it 
+shouldn't be removed entirely. Maybe it is possible to enable it only 
+for accessing older network volumes/shares while on the same time block 
+the possibility to create insecure NTLM network shares? I am aware that 
+the risk in enabling this old and flawed protocol will be my own 
+problem. I won't complain if I get into trouble because of it. ;-) 
+Unfortunately I have no alternative other than buying a new NAS or 
+downgrading to an older kernel which is also not a really practical option.
+
+Whatever, many thanks for all your great work!
+
