@@ -2,125 +2,86 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83730C04A68
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Jul 2022 02:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FACC04A68
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Jul 2022 13:33:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232985AbiG1C11 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Jul 2022 22:27:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56100 "EHLO
+        id S229489AbiG1NdV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Jul 2022 09:33:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232427AbiG1C10 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Jul 2022 22:27:26 -0400
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E040731348;
-        Wed, 27 Jul 2022 19:27:25 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id k129so430034vsk.2;
-        Wed, 27 Jul 2022 19:27:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cZFlsUJOaADCOjobBXWN+Ry6rplJfP66zaPfTmczUmE=;
-        b=XT6C+CtssjABaCZvXmadnHkws66JxdUFWFpS9Ci/f99W/0HcTl0nVrjqUaQ/YOahZH
-         viPF0LtQxBhvgUqVpWoGic3U+usnS04aUEqxsPFCjRnHrc/cBYegoHrnzGTRimb17peB
-         L9F0+7FeuS4ihTtFTP5sUuwy/WlWwvxHto457qIscz3b7xbIV/hqYbzS6vhdtjkmkWy2
-         ca3KxotxpYdewZFlhWWK7vTKkYcIBS23UzQSurFIsw1i4IbDtcBLU+AfjoGHEjaTNtNG
-         Hz8/uPV1Pf5JOXr/jZdCH3baRG2duH7NOEI3lVq6JdU+GFCNjegDLhpcLMtJRXqyKJNI
-         c8tA==
+        with ESMTP id S229915AbiG1NdU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Jul 2022 09:33:20 -0400
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13AAD14095
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Jul 2022 06:33:20 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id iw1so1817524plb.6
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Jul 2022 06:33:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cZFlsUJOaADCOjobBXWN+Ry6rplJfP66zaPfTmczUmE=;
-        b=2WljqwR/vB/yBrRZO4eSCGahAyPAvn6cCQ+4Z6o6asRoWSoS+bOxrwspm2XVP6Ggmg
-         NkeBboOXBNeteIQS11fhkL3Bfh6kC4Q847mFiIaks/Y4Mwfwepu8SdtTsl86D0cgjPV5
-         V7r0jmV2wvKJIB4gQkInHg53M6/kIFodcHmjsf5jN8yCg1vE2kR20sZlq9jEuuil7exp
-         67pedricdopkdSUDdxAB8/pMqqvY13/F/jiVJuAnK4U/VvopiuMInNkl0FOd/vTO7535
-         2vNWzSCX/2pqRZPJKcVnciDW2qWmeh3O+f8NRu2UTsWSuagkyKWCz98ZX6iHMJX97c3s
-         mYlQ==
-X-Gm-Message-State: AJIora9ah8t/B7rgvnLId2ue7fqzFeIU1HQ8I7dkvDCF3SM3rXxiIoDt
-        Zd00E/Ve2wBqcH3gjMSLryWo8hjUzcJ14g+fB5i3YJPA
-X-Google-Smtp-Source: AGRyM1svemPRfB9LuqoREtDBGyHsaC9y38k6KATXp0QjoGbrPCj2bOAvpTi7rIqC+53WbHRV2PqRFuwflXEdY9VzgAk=
-X-Received: by 2002:a67:ef07:0:b0:358:611e:9105 with SMTP id
- j7-20020a67ef07000000b00358611e9105mr5084670vsr.61.1658975244833; Wed, 27 Jul
- 2022 19:27:24 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yEn7DCgaxfbQ3fzKRUT6yNBskpKs/LDAn68uZ/rxk28=;
+        b=xlCa7R6ZdMZ+P84gYOw4lBBBmV83LUn1htB+GzQ5CJs0+aYqIwRFnWd1lI1p4NAIYj
+         VtbIx17y8eN+2WJXq+NgnI6WSF3gyqo9IpMd10DLmAgHJ0nnRJK4THs8ZNI7a3r2ZmzE
+         OQApzqcBKaqGsZ078REGlE57wSidwd2AraX7R/Fd+dME1CEbPv+9PEZBV4kh1RuK/jUf
+         eWimrLlwW1430ZSvbN/M7TUiaR0TuGDHFVg7hVE1hvealhCWVxfj7toNMNh8LZCWlVI0
+         yR6+8B7gCsCtqj+ogux6zy5bcB9MpIJHX4Fa+ajB+dPSFx3dJEYU1/7GeOc0KwGedpry
+         +DEg==
+X-Gm-Message-State: AJIora9YvFbQMxoTLoMDeo76BYSNtF4hFFMejqLEmx5dMCDMCRSvltKx
+        86wjyZIVXm956uFsoc5xoe6iN2G7KDY=
+X-Google-Smtp-Source: AGRyM1v+CiYOOdv5JI8CC6OxKBXUqoeUGbgmIRMee6f4XToTwmt+SGwBGPMTZ/kB6pPJKcEytiCOvw==
+X-Received: by 2002:a17:903:1ca:b0:16c:4e2f:9294 with SMTP id e10-20020a17090301ca00b0016c4e2f9294mr26900968plh.30.1659015199352;
+        Thu, 28 Jul 2022 06:33:19 -0700 (PDT)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id m14-20020a63710e000000b0041b667a1b69sm960078pgc.36.2022.07.28.06.33.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jul 2022 06:33:18 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
+        gregkh@linuxfoundation.org, Namjae Jeon <linkinjeon@kernel.org>,
+        zdi-disclosures@trendmicro.com
+Subject: [PATCH 1/5] ksmbd: fix memory leak in smb2_handle_negotiate
+Date:   Thu, 28 Jul 2022 22:28:18 +0900
+Message-Id: <20220728132822.6311-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <CAHk-=wjSBvRk-ksUBOiQzJd=e19UZKvOSZs1UHahK5U0QVh6RQ@mail.gmail.com>
- <fda96c5c-9007-4147-3be1-8c9deca0442c@gmail.com>
-In-Reply-To: <fda96c5c-9007-4147-3be1-8c9deca0442c@gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 27 Jul 2022 21:27:13 -0500
-Message-ID: <CAH2r5ms+uCF-sC1Hw6izmMhCb2jR55jB0pf8rK8OkkUh0hNGfg@mail.gmail.com>
-Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
- machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
-To:     Clemens Leu <clemens.leu@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Davyd McColl <davydm@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thorsten Leemhuis <regressions@leemhuis.info>,
-        regressions@lists.linux.dev,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Is using userspace tools (like Samba's "ftp like" smbclient tool) an
-option to migrate these files?
+The allocated memory didn't free under an error
+path in smb2_handle_negotiate().
 
-On Wed, Jul 27, 2022 at 3:04 PM Clemens Leu <clemens.leu@gmail.com> wrote:
->
-> Hi all
->
-> Here follows now another practical reason why it is at the moment a
-> quite unhappy decision to ditch the NTLM/CIFS 1.0 support entirely.
->
-> I am on Kubuntu 20.04 LTS and the access to my Apple Time Capsule worked
-> fine. This changed when kernel 5.15.0-41-generic was installed some time
-> ago. Since then I have in dmesg the known "kernel: bad security option:
-> ntlm" and "kernel: CIFS: VFS: bad security option: ntlm" messages and no
-> access is possible any longer to the Time Capsule.
->
-> So it looks that commit "[76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c]
-> cifs: remove support for NTLM and weaker authentication algorithms" has
-> completely broken my Time Capsule access.
->
-> Yes, I know, ntlm is more than 20 years old and a quite insecure
-> protocol. It is absolutely understandable to disable it as default.
-> However, it should be also regarded that there exist companies which
-> decided because of narrow-minded reasons to implement only the old SMB1
-> protocol also on not so old hardware. Apple is such an example, they
-> really implemented on all of their Time Capsule models (which were using
-> a special Samba implementation) only the stone-age variant of SMB/NTLM.
-> This is true even for the last 2013 variant which was discontinued on
-> April 26, 2018. Apple could for sure support a more recent SMB version
-> but they didn't do it most likely to make their own AFP3 protocol look
-> and perform better.
->
-> So the alternative would be AFP in my case, unfortunately it's not so
-> easy. While we have thanks to Netatalk a rock-solid AFP support in Linux
-> at the server side, this is unfortunately not true for the client one.
-> The corresponding "afpfs-ng" (Apple Filing Protocol Library, a client
-> implementation of the Apple Filing Protocol) project is unmaintained and
-> dormant for years.
->
-> Long story short, the current situation in this topic is as I said quite
-> unhappy. While I fully agree to disable NTLM/CIFS 1.0 as default, it
-> shouldn't be removed entirely. Maybe it is possible to enable it only
-> for accessing older network volumes/shares while on the same time block
-> the possibility to create insecure NTLM network shares? I am aware that
-> the risk in enabling this old and flawed protocol will be my own
-> problem. I won't complain if I get into trouble because of it. ;-)
-> Unfortunately I have no alternative other than buying a new NAS or
-> downgrading to an older kernel which is also not a really practical option.
->
-> Whatever, many thanks for all your great work!
->
+Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-17815
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
+---
+ fs/ksmbd/smb2pdu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 1f4f2d5217a6..41ef076af072 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -1142,12 +1142,16 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 			       status);
+ 			rsp->hdr.Status = status;
+ 			rc = -EINVAL;
++			kfree(conn->preauth_info);
++			conn->preauth_info = NULL;
+ 			goto err_out;
+ 		}
+ 
+ 		rc = init_smb3_11_server(conn);
+ 		if (rc < 0) {
+ 			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			kfree(conn->preauth_info);
++			conn->preauth_info = NULL;
+ 			goto err_out;
+ 		}
+ 
 -- 
-Thanks,
+2.25.1
 
-Steve
