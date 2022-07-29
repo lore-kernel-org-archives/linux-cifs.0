@@ -2,47 +2,48 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF139C00140
-	for <linux-cifs@archiver.kernel.org>; Fri, 29 Jul 2022 01:01:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C98B8C00140
+	for <linux-cifs@archiver.kernel.org>; Fri, 29 Jul 2022 01:13:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232005AbiG2BBj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Jul 2022 21:01:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48046 "EHLO
+        id S233400AbiG2BNh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Jul 2022 21:13:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232976AbiG2BBU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Jul 2022 21:01:20 -0400
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC5D42AEB
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Jul 2022 18:01:18 -0700 (PDT)
-Received: by mail-pj1-f41.google.com with SMTP id 15-20020a17090a098f00b001f305b453feso6922769pjo.1
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Jul 2022 18:01:18 -0700 (PDT)
+        with ESMTP id S229535AbiG2BNg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Jul 2022 21:13:36 -0400
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BBEB6BD40;
+        Thu, 28 Jul 2022 18:13:32 -0700 (PDT)
+Received: by mail-pg1-f170.google.com with SMTP id 6so2829275pgb.13;
+        Thu, 28 Jul 2022 18:13:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=Z8uVhYLqAh5DklynNlwyMATmPnanaKzNb0Q2ljuGZrI=;
-        b=LlcYadp5LvsOhATk5ncIGUCFC9UiD2Z4m0lI/Q8Nb4qj737cqWsuGoPzdh+ZDuFlvu
-         8z5ELXkph6jVzvefa+o1q7JKgTj0Au1fbB6hKgF3nN3Jt4IglhQ4qwE3dZeUou/GPd2M
-         AJrIAwcqBVYb2i3zu5mBZM5v3fdX8zfolHjGZCTTfxiKj9K0MJGi7vsSW03IWDWvXqhA
-         oVJ83JBxdBRsjH1gS4H/to2NT3aCsF1b+RC7fhPauZILOnitVYzshyPXovh3sD2HMUt2
-         RSyIc4rFJpCzZDzy6qk0yEoWYD3ptYmJWt6PIOsuIpWy6/QEEu8pBzKyzM8poxcrXjVs
-         Sv/g==
-X-Gm-Message-State: ACgBeo0HNEEC/FXHqLOyhT4ydOE2H1CuaKuRyvknJw1JJK5cliKWu28K
-        PamCk8jMjVvkzoJW2V3c6U+UF1ID9Zk=
-X-Google-Smtp-Source: AA6agR6GwfXxBQqch7kd9lY9iS5Yy7rMGXq6tHaSzDbZahPCVxoY7MPMCJhy0IIr2Vk1vTO6nLwE6Q==
-X-Received: by 2002:a17:90a:540c:b0:1f2:26f1:6a37 with SMTP id z12-20020a17090a540c00b001f226f16a37mr1394027pjh.68.1659056477773;
-        Thu, 28 Jul 2022 18:01:17 -0700 (PDT)
+        bh=nWX8earIdDVsBRHDmC8mWA0KRrT14T7sOCqzUxZsmpc=;
+        b=dbQJnzLn/XY0EOMhN9+SvKvdalpA61CDHkOApoHafcsM1VTJYxHlGtV1KJu7flk5ui
+         x5LthH6Z7jB7V30Ik/wtSGpLwNnkF+oqwD0W8MUYLYR0OjG5k7oPrSzgs/T9QKxdHFcZ
+         KVtATv7bLk9pdl0p0oHNCUVcO7nVbczJDTLmPLnrLyvLpYWsMXiwcIXhYpHA4wmn8urR
+         MG0r63aCGVhACsCA0tNY8V3iVrvo2YzRS8v5z61C2NZOx+i9uCkhzNdD1H6/G5ZbC1Ba
+         4QTGwcqLXNaErKPhTHmh9QwY9g11TFPg7UH9RFFh5mO8ysB7rXhW/HY1iuqufxVrUbj/
+         0OKw==
+X-Gm-Message-State: AJIora9fbfHhIMpjxLApl5E7v2YEXEatptBaKehT+Rud5fJesHsHRvL6
+        pp7R/vhLGkEmisai/IUErh7FiMSHFXo=
+X-Google-Smtp-Source: AGRyM1vogZlzFRFSU+3ZEJOjZG+2fCWK/dgX/N1bYZyquDNCmATqsNJk+xAJThoNtn9g2tmYtftD2g==
+X-Received: by 2002:a63:6c83:0:b0:419:aa0d:216c with SMTP id h125-20020a636c83000000b00419aa0d216cmr1072865pgc.328.1659057211092;
+        Thu, 28 Jul 2022 18:13:31 -0700 (PDT)
 Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id i11-20020a170902c94b00b0016d81098d9asm728354pla.34.2022.07.28.18.01.15
+        by smtp.gmail.com with ESMTPSA id mn17-20020a17090b189100b001f23db09351sm1642673pjb.46.2022.07.28.18.13.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 18:01:17 -0700 (PDT)
+        Thu, 28 Jul 2022 18:13:30 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v3] ksmbd: use wait_event instead of schedule_timeout()
-Date:   Fri, 29 Jul 2022 10:00:32 +0900
-Message-Id: <20220729010032.15226-1-linkinjeon@kernel.org>
+        gregkh@linuxfoundation.org, Namjae Jeon <linkinjeon@kernel.org>,
+        stable@vger.kernel.org, zdi-disclosures@trendmicro.com
+Subject: [PATCH v3] ksmbd: prevent out of bound read for SMB2_WRITE
+Date:   Fri, 29 Jul 2022 10:13:20 +0900
+Message-Id: <20220729011321.15663-1-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -50,162 +51,125 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-ksmbd threads eating masses of cputime when connection is disconnected.
-If connection is disconnected, ksmbd thread waits for pending requests
-to be processed using schedule_timeout. schedule_timeout() incorrectly
-is used, and it is more efficient to use wait_event/wake_up than to check
-r_count every time with timeout.
+OOB read memory can be written to a file,
+if DataOffset is 0 and Length is too large
+in SMB2_WRITE request of compound request.
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
+To prevent this, when checking the length of
+the data area of SMB2_WRITE in smb2_get_data_area_len(),
+let the minimum of DataOffset be the size of
+SMB2 header + the size of SMB2_WRITE header.
+
+This bug can lead an oops looking something like:
+
+[  798.008715] BUG: KASAN: slab-out-of-bounds in copy_page_from_iter_atomic+0xd3d/0x14b0
+[  798.008724] Read of size 252 at addr ffff88800f863e90 by task kworker/0:2/2859
+...
+[  798.008754] Call Trace:
+[  798.008756]  <TASK>
+[  798.008759]  dump_stack_lvl+0x49/0x5f
+[  798.008764]  print_report.cold+0x5e/0x5cf
+[  798.008768]  ? __filemap_get_folio+0x285/0x6d0
+[  798.008774]  ? copy_page_from_iter_atomic+0xd3d/0x14b0
+[  798.008777]  kasan_report+0xaa/0x120
+[  798.008781]  ? copy_page_from_iter_atomic+0xd3d/0x14b0
+[  798.008784]  kasan_check_range+0x100/0x1e0
+[  798.008788]  memcpy+0x24/0x60
+[  798.008792]  copy_page_from_iter_atomic+0xd3d/0x14b0
+[  798.008795]  ? pagecache_get_page+0x53/0x160
+[  798.008799]  ? iov_iter_get_pages_alloc+0x1590/0x1590
+[  798.008803]  ? ext4_write_begin+0xfc0/0xfc0
+[  798.008807]  ? current_time+0x72/0x210
+[  798.008811]  generic_perform_write+0x2c8/0x530
+[  798.008816]  ? filemap_fdatawrite_wbc+0x180/0x180
+[  798.008820]  ? down_write+0xb4/0x120
+[  798.008824]  ? down_write_killable+0x130/0x130
+[  798.008829]  ext4_buffered_write_iter+0x137/0x2c0
+[  798.008833]  ext4_file_write_iter+0x40b/0x1490
+[  798.008837]  ? __fsnotify_parent+0x275/0xb20
+[  798.008842]  ? __fsnotify_update_child_dentry_flags+0x2c0/0x2c0
+[  798.008846]  ? ext4_buffered_write_iter+0x2c0/0x2c0
+[  798.008851]  __kernel_write+0x3a1/0xa70
+[  798.008855]  ? __x64_sys_preadv2+0x160/0x160
+[  798.008860]  ? security_file_permission+0x4a/0xa0
+[  798.008865]  kernel_write+0xbb/0x360
+[  798.008869]  ksmbd_vfs_write+0x27e/0xb90 [ksmbd]
+[  798.008881]  ? ksmbd_vfs_read+0x830/0x830 [ksmbd]
+[  798.008892]  ? _raw_read_unlock+0x2a/0x50
+[  798.008896]  smb2_write+0xb45/0x14e0 [ksmbd]
+[  798.008909]  ? __kasan_check_write+0x14/0x20
+[  798.008912]  ? _raw_spin_lock_bh+0xd0/0xe0
+[  798.008916]  ? smb2_read+0x15e0/0x15e0 [ksmbd]
+[  798.008927]  ? memcpy+0x4e/0x60
+[  798.008931]  ? _raw_spin_unlock+0x19/0x30
+[  798.008934]  ? ksmbd_smb2_check_message+0x16af/0x2350 [ksmbd]
+[  798.008946]  ? _raw_spin_lock_bh+0xe0/0xe0
+[  798.008950]  handle_ksmbd_work+0x30e/0x1020 [ksmbd]
+[  798.008962]  process_one_work+0x778/0x11c0
+[  798.008966]  ? _raw_spin_lock_irq+0x8e/0xe0
+[  798.008970]  worker_thread+0x544/0x1180
+[  798.008973]  ? __cpuidle_text_end+0x4/0x4
+[  798.008977]  kthread+0x282/0x320
+[  798.008982]  ? process_one_work+0x11c0/0x11c0
+[  798.008985]  ? kthread_complete_and_exit+0x30/0x30
+[  798.008989]  ret_from_fork+0x1f/0x30
+[  798.008995]  </TASK>
+
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-17817
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
  v2:
-   - When r_count is zero, call wake_up event.
+   - add missing fixes and stable tags.
  v3:
-   - change wake_up_all with wake_up().
-   - add the comments to fix waitqueue_active() warnings from checkpatch.pl
+   - fix sparse warnings reported from kernel test robot.
 
- fs/ksmbd/connection.c |  6 +++---
- fs/ksmbd/connection.h |  1 +
- fs/ksmbd/oplock.c     | 35 ++++++++++++++++++++++-------------
- fs/ksmbd/server.c     |  8 +++++++-
- 4 files changed, 33 insertions(+), 17 deletions(-)
+ fs/ksmbd/smb2misc.c | 7 +++++--
+ fs/ksmbd/smb2pdu.c  | 8 +++-----
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
-index ce23cc89046e..756ad631c019 100644
---- a/fs/ksmbd/connection.c
-+++ b/fs/ksmbd/connection.c
-@@ -66,6 +66,7 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
- 	conn->outstanding_credits = 0;
+diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+index f8f456377a51..aa1e663d9deb 100644
+--- a/fs/ksmbd/smb2misc.c
++++ b/fs/ksmbd/smb2misc.c
+@@ -136,8 +136,11 @@ static int smb2_get_data_area_len(unsigned int *off, unsigned int *len,
+ 		*len = le16_to_cpu(((struct smb2_read_req *)hdr)->ReadChannelInfoLength);
+ 		break;
+ 	case SMB2_WRITE:
+-		if (((struct smb2_write_req *)hdr)->DataOffset) {
+-			*off = le16_to_cpu(((struct smb2_write_req *)hdr)->DataOffset);
++		if (((struct smb2_write_req *)hdr)->DataOffset ||
++		    ((struct smb2_write_req *)hdr)->Length) {
++			*off = max_t(unsigned int,
++				     le16_to_cpu(((struct smb2_write_req *)hdr)->DataOffset),
++				     offsetof(struct smb2_write_req, Buffer));
+ 			*len = le32_to_cpu(((struct smb2_write_req *)hdr)->Length);
+ 			break;
+ 		}
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 7ecb6d87ae3e..ea47aa0262ee 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -6514,14 +6514,12 @@ int smb2_write(struct ksmbd_work *work)
+ 		writethrough = true;
  
- 	init_waitqueue_head(&conn->req_running_q);
-+	init_waitqueue_head(&conn->r_count_q);
- 	INIT_LIST_HEAD(&conn->conns_list);
- 	INIT_LIST_HEAD(&conn->requests);
- 	INIT_LIST_HEAD(&conn->async_requests);
-@@ -165,7 +166,6 @@ int ksmbd_conn_write(struct ksmbd_work *work)
- 	struct kvec iov[3];
- 	int iov_idx = 0;
- 
--	ksmbd_conn_try_dequeue_request(work);
- 	if (!work->response_buf) {
- 		pr_err("NULL response header\n");
- 		return -EINVAL;
-@@ -347,8 +347,8 @@ int ksmbd_conn_handler_loop(void *p)
- 
- out:
- 	/* Wait till all reference dropped to the Server object*/
--	while (atomic_read(&conn->r_count) > 0)
--		schedule_timeout(HZ);
-+	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);
+ 	if (is_rdma_channel == false) {
+-		if ((u64)le16_to_cpu(req->DataOffset) + length >
+-		    get_rfc1002_len(work->request_buf)) {
+-			pr_err("invalid write data offset %u, smb_len %u\n",
+-			       le16_to_cpu(req->DataOffset),
+-			       get_rfc1002_len(work->request_buf));
++		if (le16_to_cpu(req->DataOffset) <
++		    offsetof(struct smb2_write_req, Buffer)) {
+ 			err = -EINVAL;
+ 			goto out;
+ 		}
 +
+ 		data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
+ 				    le16_to_cpu(req->DataOffset));
  
- 	unload_nls(conn->local_nls);
- 	if (default_conn_ops.terminate_fn)
-diff --git a/fs/ksmbd/connection.h b/fs/ksmbd/connection.h
-index 5b39f0bdeff8..2e4730457c92 100644
---- a/fs/ksmbd/connection.h
-+++ b/fs/ksmbd/connection.h
-@@ -65,6 +65,7 @@ struct ksmbd_conn {
- 	unsigned int			outstanding_credits;
- 	spinlock_t			credits_lock;
- 	wait_queue_head_t		req_running_q;
-+	wait_queue_head_t		r_count_q;
- 	/* Lock to protect requests list*/
- 	spinlock_t			request_lock;
- 	struct list_head		requests;
-diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
-index 8b5560574d4c..3ef33ed4cdba 100644
---- a/fs/ksmbd/oplock.c
-+++ b/fs/ksmbd/oplock.c
-@@ -615,18 +615,13 @@ static void __smb2_oplock_break_noti(struct work_struct *wk)
- 	struct ksmbd_file *fp;
- 
- 	fp = ksmbd_lookup_durable_fd(br_info->fid);
--	if (!fp) {
--		atomic_dec(&conn->r_count);
--		ksmbd_free_work_struct(work);
--		return;
--	}
-+	if (!fp)
-+		goto out;
- 
- 	if (allocate_oplock_break_buf(work)) {
- 		pr_err("smb2_allocate_rsp_buf failed! ");
--		atomic_dec(&conn->r_count);
- 		ksmbd_fd_put(work, fp);
--		ksmbd_free_work_struct(work);
--		return;
-+		goto out;
- 	}
- 
- 	rsp_hdr = smb2_get_msg(work->response_buf);
-@@ -667,8 +662,16 @@ static void __smb2_oplock_break_noti(struct work_struct *wk)
- 
- 	ksmbd_fd_put(work, fp);
- 	ksmbd_conn_write(work);
-+
-+out:
- 	ksmbd_free_work_struct(work);
--	atomic_dec(&conn->r_count);
-+	/*
-+	 * Checking waitqueue to dropping pending requests on
-+	 * disconnection. waitqueue_active is safe because it
-+	 * uses atomic operation for condition.
-+	 */
-+	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
-+		wake_up(&conn->r_count_q);
- }
- 
- /**
-@@ -731,9 +734,7 @@ static void __smb2_lease_break_noti(struct work_struct *wk)
- 
- 	if (allocate_oplock_break_buf(work)) {
- 		ksmbd_debug(OPLOCK, "smb2_allocate_rsp_buf failed! ");
--		ksmbd_free_work_struct(work);
--		atomic_dec(&conn->r_count);
--		return;
-+		goto out;
- 	}
- 
- 	rsp_hdr = smb2_get_msg(work->response_buf);
-@@ -771,8 +772,16 @@ static void __smb2_lease_break_noti(struct work_struct *wk)
- 	inc_rfc1001_len(work->response_buf, 44);
- 
- 	ksmbd_conn_write(work);
-+
-+out:
- 	ksmbd_free_work_struct(work);
--	atomic_dec(&conn->r_count);
-+	/*
-+	 * Checking waitqueue to dropping pending requests on
-+	 * disconnection. waitqueue_active is safe because it
-+	 * uses atomic operation for condition.
-+	 */
-+	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
-+		wake_up(&conn->r_count_q);
- }
- 
- /**
-diff --git a/fs/ksmbd/server.c b/fs/ksmbd/server.c
-index 4cd03d661df0..ce42bff42ef9 100644
---- a/fs/ksmbd/server.c
-+++ b/fs/ksmbd/server.c
-@@ -261,7 +261,13 @@ static void handle_ksmbd_work(struct work_struct *wk)
- 
- 	ksmbd_conn_try_dequeue_request(work);
- 	ksmbd_free_work_struct(work);
--	atomic_dec(&conn->r_count);
-+	/*
-+	 * Checking waitqueue to dropping pending requests on
-+	 * disconnection. waitqueue_active is safe because it
-+	 * uses atomic operation for condition.
-+	 */
-+	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
-+		wake_up(&conn->r_count_q);
- }
- 
- /**
 -- 
 2.25.1
 
