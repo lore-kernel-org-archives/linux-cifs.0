@@ -2,486 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39471C00140
-	for <linux-cifs@archiver.kernel.org>; Fri, 29 Jul 2022 01:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B11AC00140
+	for <linux-cifs@archiver.kernel.org>; Fri, 29 Jul 2022 02:47:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbiG2BNk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Jul 2022 21:13:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54768 "EHLO
+        id S232177AbiG2Crg convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Jul 2022 22:47:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233436AbiG2BNk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Jul 2022 21:13:40 -0400
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A0AC76457;
-        Thu, 28 Jul 2022 18:13:35 -0700 (PDT)
-Received: by mail-pj1-f50.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so3849164pjf.2;
-        Thu, 28 Jul 2022 18:13:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=U5PYfUySvIYVONcOoCaNuJqSNpNcdRUV4E3EsyjFpMs=;
-        b=vfFEkBCnB+c/KIVoHTcqTZ4GDp00jQz1fPfyZq8nr+6Q/p0go1+Sb5Frm+czqcnbEc
-         5s3gV96iXW3p/Qhy+gmDJkW3xBt2zFVASzRSJpDUkL3xp3yoglEHtK1vuSmXZW/ScSDg
-         rKnqqdmybbjuWdNDFgxn2T5AlkXxlhi/3b6Re5aHWLFR6d5ouhApQDmqr5ZMfUKU99bq
-         xVqZroISK3jS41ZbSVKwGmeKcNlXPBiMhmCWTCLotW/LdMS+MEVsL1phH+IRd9VA14Lt
-         3R+m6nf331Imm9ooZJhGXSSRgcWEjEbaHrP61CIsByAlvhr1cgGtC85vEwwtxLt3JFLO
-         lq0w==
-X-Gm-Message-State: ACgBeo2HjXRleobzYeorDkC5qONllhUAqVFJ3rk1XpOHHypHptd3SAz3
-        dNSY7e85VbpNfllNL+N45vBVpgj5u7g=
-X-Google-Smtp-Source: AA6agR7yf7hgY9wVMv+zFH9Gg+BeFNVwreK5oVTyVNamkPqOSTj/mYnD7EFmu1u42griuYaPkzIGdg==
-X-Received: by 2002:a17:902:8bcb:b0:16c:a264:77ae with SMTP id r11-20020a1709028bcb00b0016ca26477aemr1501585plo.130.1659057214518;
-        Thu, 28 Jul 2022 18:13:34 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id mn17-20020a17090b189100b001f23db09351sm1642673pjb.46.2022.07.28.18.13.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 18:13:34 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
-        gregkh@linuxfoundation.org, Namjae Jeon <linkinjeon@kernel.org>,
-        stable@vger.kernel.org, zdi-disclosures@trendmicro.com
-Subject: [PATCH v3] ksmbd: fix heap-based overflow in set_ntacl_dacl()
-Date:   Fri, 29 Jul 2022 10:13:21 +0900
-Message-Id: <20220729011321.15663-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220729011321.15663-1-linkinjeon@kernel.org>
-References: <20220729011321.15663-1-linkinjeon@kernel.org>
+        with ESMTP id S229559AbiG2Crf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Jul 2022 22:47:35 -0400
+Received: from smtp.polymtl.ca (smtp.polymtl.ca [132.207.4.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E77561723
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Jul 2022 19:47:34 -0700 (PDT)
+Received: from comms3.kousu.ca (comms3.kousu.ca [46.23.90.174])
+        by smtp.polymtl.ca (8.14.7/8.14.7) with ESMTP id 26T2lPTW021275
+        (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Jul 2022 22:47:30 -0400
+DKIM-Filter: OpenDKIM Filter v2.11.0 smtp.polymtl.ca 26T2lPTW021275
+Received: from comms.kousu.ca (localhost [127.0.0.1])
+        by comms3.kousu.ca (OpenSMTPD) with ESMTP id e29833f1
+        for <linux-cifs@vger.kernel.org>;
+        Fri, 29 Jul 2022 04:47:24 +0200 (CEST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date:   Fri, 29 Jul 2022 02:47:24 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+X-Mailer: RainLoop/1.16.0
+From:   "Nick Guenther" <nick.guenther@polymtl.ca>
+Message-ID: <0371d16e831be9cd9595c443d142e5fc@polymtl.ca>
+Subject: Re: pam_cifscreds, tmux and session keyrings
+To:     linux-cifs@vger.kernel.org
+In-Reply-To: <705265ea-37a3-6029-362a-572bbaab6639@gmail.com>
+References: <705265ea-37a3-6029-362a-572bbaab6639@gmail.com>
+ <774233f766bf26976c0d923cc1dc53c7@polymtl.ca>
+X-Poly-FromMTA: (comms3.kousu.ca [46.23.90.174]) at Fri, 29 Jul 2022 02:47:25 +0000
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The testcase use SMB2_SET_INFO_HE command to set a malformed file attribute
-under the label `security.NTACL`. SMB2_QUERY_INFO_HE command in testcase
-trigger the following overflow.
+July 22, 2022 2:38 PM, "Mantas Mikulėnas" <grawity@gmail.com> wrote:
 
-[ 4712.003781] ==================================================================
-[ 4712.003790] BUG: KASAN: slab-out-of-bounds in build_sec_desc+0x842/0x1dd0 [ksmbd]
-[ 4712.003807] Write of size 1060 at addr ffff88801e34c068 by task kworker/0:0/4190
+> On 2022-07-21 23:45, Nick Guenther wrote:
+> 
+>> [...]
+>> I see in this old thread https://www.spinics.net/lists/linux-cifs/msg18249.html that you actually
+>> want to go the _other_ direction, and isolate your sessions even more:
+>> multiuser SMB connections should also be initiated per session, same like the
+>> keyring. Currently the cifs SMB connections are accessible also from other all
+>> sessions.
+>>> That needs to be implemented indeed.
+>> 
+>> but that doesn't sound like it would make my users happy. In their perspective, tmux should be the
+>> same environment as ssh or as the GUI, just more persistent. And I tend to agree.
+>> Anyway, I hope this isn't too intricate or confusing for you. I would really appreciate a second
+>> opinion, and maybe a consideration of that patch, if that patch is actually the right answer.
+> 
+> As another user, I'd expect the keyring search to be done recursively -- start from the session
+> keyring as now, but follow the link into the user keyring, which is usually present (and isn't that
+> its whole purpose?)
+> 
+> Then pam_cifscreds could be told which one to insert keys to, allowing it to be used both ways
+> depending on needs -- just like how Kerberos or AFS can also have either isolated credentials or
+> user-wide ones.
 
-[ 4712.003813] CPU: 0 PID: 4190 Comm: kworker/0:0 Not tainted 5.19.0-rc5 #1
-[ 4712.003850] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
-[ 4712.003867] Call Trace:
-[ 4712.003870]  <TASK>
-[ 4712.003873]  dump_stack_lvl+0x49/0x5f
-[ 4712.003935]  print_report.cold+0x5e/0x5cf
-[ 4712.003972]  ? ksmbd_vfs_get_sd_xattr+0x16d/0x500 [ksmbd]
-[ 4712.003984]  ? cmp_map_id+0x200/0x200
-[ 4712.003988]  ? build_sec_desc+0x842/0x1dd0 [ksmbd]
-[ 4712.004000]  kasan_report+0xaa/0x120
-[ 4712.004045]  ? build_sec_desc+0x842/0x1dd0 [ksmbd]
-[ 4712.004056]  kasan_check_range+0x100/0x1e0
-[ 4712.004060]  memcpy+0x3c/0x60
-[ 4712.004064]  build_sec_desc+0x842/0x1dd0 [ksmbd]
-[ 4712.004076]  ? parse_sec_desc+0x580/0x580 [ksmbd]
-[ 4712.004088]  ? ksmbd_acls_fattr+0x281/0x410 [ksmbd]
-[ 4712.004099]  smb2_query_info+0xa8f/0x6110 [ksmbd]
-[ 4712.004111]  ? psi_group_change+0x856/0xd70
-[ 4712.004148]  ? update_load_avg+0x1c3/0x1af0
-[ 4712.004152]  ? asym_cpu_capacity_scan+0x5d0/0x5d0
-[ 4712.004157]  ? xas_load+0x23/0x300
-[ 4712.004162]  ? smb2_query_dir+0x1530/0x1530 [ksmbd]
-[ 4712.004173]  ? _raw_spin_lock_bh+0xe0/0xe0
-[ 4712.004179]  handle_ksmbd_work+0x30e/0x1020 [ksmbd]
-[ 4712.004192]  process_one_work+0x778/0x11c0
-[ 4712.004227]  ? _raw_spin_lock_irq+0x8e/0xe0
-[ 4712.004231]  worker_thread+0x544/0x1180
-[ 4712.004234]  ? __cpuidle_text_end+0x4/0x4
-[ 4712.004239]  kthread+0x282/0x320
-[ 4712.004243]  ? process_one_work+0x11c0/0x11c0
-[ 4712.004246]  ? kthread_complete_and_exit+0x30/0x30
-[ 4712.004282]  ret_from_fork+0x1f/0x30
 
-This patch add the buffer validation for security descriptor that is
-stored by malformed SMB2_SET_INFO_HE command. and allocate large
-response buffer about SMB2_O_INFO_SECURITY file info class.
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Cc: stable@vger.kernel.org
-Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-17771
-Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- v2:
-   - add missing fixes and stable tags.
- v3:
-   - change goto statement with break for smb_ace buffer validation
-     check.
+I've figured out a workaround, but I'm unsure about it and I could really use some advice from people with more insight.
 
- fs/ksmbd/smb2pdu.c |  37 ++++++++-----
- fs/ksmbd/smbacl.c  | 130 ++++++++++++++++++++++++++++++---------------
- fs/ksmbd/smbacl.h  |   2 +-
- fs/ksmbd/vfs.c     |   5 ++
- 4 files changed, 118 insertions(+), 56 deletions(-)
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index ea47aa0262ee..c2c25e50cec6 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -535,9 +535,10 @@ int smb2_allocate_rsp_buf(struct ksmbd_work *work)
- 		struct smb2_query_info_req *req;
- 
- 		req = smb2_get_msg(work->request_buf);
--		if (req->InfoType == SMB2_O_INFO_FILE &&
--		    (req->FileInfoClass == FILE_FULL_EA_INFORMATION ||
--		     req->FileInfoClass == FILE_ALL_INFORMATION))
-+		if ((req->InfoType == SMB2_O_INFO_FILE &&
-+		     (req->FileInfoClass == FILE_FULL_EA_INFORMATION ||
-+		     req->FileInfoClass == FILE_ALL_INFORMATION)) ||
-+		    req->InfoType == SMB2_O_INFO_SECURITY)
- 			sz = large_sz;
- 	}
- 
-@@ -2988,7 +2989,7 @@ int smb2_open(struct ksmbd_work *work)
- 						goto err_out;
- 
- 					rc = build_sec_desc(user_ns,
--							    pntsd, NULL,
-+							    pntsd, NULL, 0,
- 							    OWNER_SECINFO |
- 							    GROUP_SECINFO |
- 							    DACL_SECINFO,
-@@ -3833,6 +3834,15 @@ static int verify_info_level(int info_level)
- 	return 0;
- }
- 
-+static int smb2_resp_buf_len(struct ksmbd_work *work, unsigned short hdr2_len)
-+{
-+	int free_len;
-+
-+	free_len = (int)(work->response_sz -
-+		(get_rfc1002_len(work->response_buf) + 4)) - hdr2_len;
-+	return free_len;
-+}
-+
- static int smb2_calc_max_out_buf_len(struct ksmbd_work *work,
- 				     unsigned short hdr2_len,
- 				     unsigned int out_buf_len)
-@@ -3842,9 +3852,7 @@ static int smb2_calc_max_out_buf_len(struct ksmbd_work *work,
- 	if (out_buf_len > work->conn->vals->max_trans_size)
- 		return -EINVAL;
- 
--	free_len = (int)(work->response_sz -
--			 (get_rfc1002_len(work->response_buf) + 4)) -
--		hdr2_len;
-+	free_len = smb2_resp_buf_len(work, hdr2_len);
- 	if (free_len < 0)
- 		return -EINVAL;
- 
-@@ -5110,7 +5118,7 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
- 	__u32 secdesclen;
- 	unsigned int id = KSMBD_NO_FID, pid = KSMBD_NO_FID;
- 	int addition_info = le32_to_cpu(req->AdditionalInformation);
--	int rc;
-+	int rc = 0, ppntsd_size = 0;
- 
- 	if (addition_info & ~(OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO |
- 			      PROTECTED_DACL_SECINFO |
-@@ -5156,11 +5164,14 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
- 
- 	if (test_share_config_flag(work->tcon->share_conf,
- 				   KSMBD_SHARE_FLAG_ACL_XATTR))
--		ksmbd_vfs_get_sd_xattr(work->conn, user_ns,
--				       fp->filp->f_path.dentry, &ppntsd);
--
--	rc = build_sec_desc(user_ns, pntsd, ppntsd, addition_info,
--			    &secdesclen, &fattr);
-+		ppntsd_size = ksmbd_vfs_get_sd_xattr(work->conn, user_ns,
-+						     fp->filp->f_path.dentry,
-+						     &ppntsd);
-+
-+	/* Check if sd buffer size exceeds response buffer size */
-+	if (smb2_resp_buf_len(work, 8) > ppntsd_size)
-+		rc = build_sec_desc(user_ns, pntsd, ppntsd, ppntsd_size,
-+				    addition_info, &secdesclen, &fattr);
- 	posix_acl_release(fattr.cf_acls);
- 	posix_acl_release(fattr.cf_dacls);
- 	kfree(ppntsd);
-diff --git a/fs/ksmbd/smbacl.c b/fs/ksmbd/smbacl.c
-index 38f23bf981ac..e9cd96f0bc44 100644
---- a/fs/ksmbd/smbacl.c
-+++ b/fs/ksmbd/smbacl.c
-@@ -690,6 +690,7 @@ static void set_posix_acl_entries_dacl(struct user_namespace *user_ns,
- static void set_ntacl_dacl(struct user_namespace *user_ns,
- 			   struct smb_acl *pndacl,
- 			   struct smb_acl *nt_dacl,
-+			   unsigned int aces_size,
- 			   const struct smb_sid *pownersid,
- 			   const struct smb_sid *pgrpsid,
- 			   struct smb_fattr *fattr)
-@@ -703,9 +704,19 @@ static void set_ntacl_dacl(struct user_namespace *user_ns,
- 	if (nt_num_aces) {
- 		ntace = (struct smb_ace *)((char *)nt_dacl + sizeof(struct smb_acl));
- 		for (i = 0; i < nt_num_aces; i++) {
--			memcpy((char *)pndace + size, ntace, le16_to_cpu(ntace->size));
--			size += le16_to_cpu(ntace->size);
--			ntace = (struct smb_ace *)((char *)ntace + le16_to_cpu(ntace->size));
-+			unsigned short nt_ace_size;
-+
-+			if (offsetof(struct smb_ace, access_req) > aces_size)
-+				break;
-+
-+			nt_ace_size = le16_to_cpu(ntace->size);
-+			if (nt_ace_size > aces_size)
-+				break;
-+
-+			memcpy((char *)pndace + size, ntace, nt_ace_size);
-+			size += nt_ace_size;
-+			aces_size -= nt_ace_size;
-+			ntace = (struct smb_ace *)((char *)ntace + nt_ace_size);
- 			num_aces++;
- 		}
- 	}
-@@ -878,7 +889,7 @@ int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
- /* Convert permission bits from mode to equivalent CIFS ACL */
- int build_sec_desc(struct user_namespace *user_ns,
- 		   struct smb_ntsd *pntsd, struct smb_ntsd *ppntsd,
--		   int addition_info, __u32 *secdesclen,
-+		   int ppntsd_size, int addition_info, __u32 *secdesclen,
- 		   struct smb_fattr *fattr)
- {
- 	int rc = 0;
-@@ -938,15 +949,25 @@ int build_sec_desc(struct user_namespace *user_ns,
- 
- 		if (!ppntsd) {
- 			set_mode_dacl(user_ns, dacl_ptr, fattr);
--		} else if (!ppntsd->dacloffset) {
--			goto out;
- 		} else {
- 			struct smb_acl *ppdacl_ptr;
-+			unsigned int dacl_offset = le32_to_cpu(ppntsd->dacloffset);
-+			int ppdacl_size, ntacl_size = ppntsd_size - dacl_offset;
-+
-+			if (!dacl_offset ||
-+			    (dacl_offset + sizeof(struct smb_acl) > ppntsd_size))
-+				goto out;
-+
-+			ppdacl_ptr = (struct smb_acl *)((char *)ppntsd + dacl_offset);
-+			ppdacl_size = le16_to_cpu(ppdacl_ptr->size);
-+			if (ppdacl_size > ntacl_size ||
-+			    ppdacl_size < sizeof(struct smb_acl))
-+				goto out;
- 
--			ppdacl_ptr = (struct smb_acl *)((char *)ppntsd +
--						le32_to_cpu(ppntsd->dacloffset));
- 			set_ntacl_dacl(user_ns, dacl_ptr, ppdacl_ptr,
--				       nowner_sid_ptr, ngroup_sid_ptr, fattr);
-+				       ntacl_size - sizeof(struct smb_acl),
-+				       nowner_sid_ptr, ngroup_sid_ptr,
-+				       fattr);
- 		}
- 		pntsd->dacloffset = cpu_to_le32(offset);
- 		offset += le16_to_cpu(dacl_ptr->size);
-@@ -980,24 +1001,31 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
- 	struct smb_sid owner_sid, group_sid;
- 	struct dentry *parent = path->dentry->d_parent;
- 	struct user_namespace *user_ns = mnt_user_ns(path->mnt);
--	int inherited_flags = 0, flags = 0, i, ace_cnt = 0, nt_size = 0;
--	int rc = 0, num_aces, dacloffset, pntsd_type, acl_len;
-+	int inherited_flags = 0, flags = 0, i, ace_cnt = 0, nt_size = 0, pdacl_size;
-+	int rc = 0, num_aces, dacloffset, pntsd_type, pntsd_size, acl_len, aces_size;
- 	char *aces_base;
- 	bool is_dir = S_ISDIR(d_inode(path->dentry)->i_mode);
- 
--	acl_len = ksmbd_vfs_get_sd_xattr(conn, user_ns,
--					 parent, &parent_pntsd);
--	if (acl_len <= 0)
-+	pntsd_size = ksmbd_vfs_get_sd_xattr(conn, user_ns,
-+					    parent, &parent_pntsd);
-+	if (pntsd_size <= 0)
- 		return -ENOENT;
- 	dacloffset = le32_to_cpu(parent_pntsd->dacloffset);
--	if (!dacloffset) {
-+	if (!dacloffset || (dacloffset + sizeof(struct smb_acl) > pntsd_size)) {
- 		rc = -EINVAL;
- 		goto free_parent_pntsd;
- 	}
- 
- 	parent_pdacl = (struct smb_acl *)((char *)parent_pntsd + dacloffset);
-+	acl_len = pntsd_size - dacloffset;
- 	num_aces = le32_to_cpu(parent_pdacl->num_aces);
- 	pntsd_type = le16_to_cpu(parent_pntsd->type);
-+	pdacl_size = le16_to_cpu(parent_pdacl->size);
-+
-+	if (pdacl_size > acl_len || pdacl_size < sizeof(struct smb_acl)) {
-+		rc = -EINVAL;
-+		goto free_parent_pntsd;
-+	}
- 
- 	aces_base = kmalloc(sizeof(struct smb_ace) * num_aces * 2, GFP_KERNEL);
- 	if (!aces_base) {
-@@ -1008,11 +1036,23 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
- 	aces = (struct smb_ace *)aces_base;
- 	parent_aces = (struct smb_ace *)((char *)parent_pdacl +
- 			sizeof(struct smb_acl));
-+	aces_size = acl_len - sizeof(struct smb_acl);
- 
- 	if (pntsd_type & DACL_AUTO_INHERITED)
- 		inherited_flags = INHERITED_ACE;
- 
- 	for (i = 0; i < num_aces; i++) {
-+		int pace_size;
-+
-+		if (offsetof(struct smb_ace, access_req) > aces_size)
-+			break;
-+
-+		pace_size = le16_to_cpu(parent_aces->size);
-+		if (pace_size > aces_size)
-+			break;
-+
-+		aces_size -= pace_size;
-+
- 		flags = parent_aces->flags;
- 		if (!smb_inherit_flags(flags, is_dir))
- 			goto pass;
-@@ -1057,8 +1097,7 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
- 		aces = (struct smb_ace *)((char *)aces + le16_to_cpu(aces->size));
- 		ace_cnt++;
- pass:
--		parent_aces =
--			(struct smb_ace *)((char *)parent_aces + le16_to_cpu(parent_aces->size));
-+		parent_aces = (struct smb_ace *)((char *)parent_aces + pace_size);
- 	}
- 
- 	if (nt_size > 0) {
-@@ -1153,7 +1192,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, struct path *path,
- 	struct smb_ntsd *pntsd = NULL;
- 	struct smb_acl *pdacl;
- 	struct posix_acl *posix_acls;
--	int rc = 0, acl_size;
-+	int rc = 0, pntsd_size, acl_size, aces_size, pdacl_size, dacl_offset;
- 	struct smb_sid sid;
- 	int granted = le32_to_cpu(*pdaccess & ~FILE_MAXIMAL_ACCESS_LE);
- 	struct smb_ace *ace;
-@@ -1162,37 +1201,33 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, struct path *path,
- 	struct smb_ace *others_ace = NULL;
- 	struct posix_acl_entry *pa_entry;
- 	unsigned int sid_type = SIDOWNER;
--	char *end_of_acl;
-+	unsigned short ace_size;
- 
- 	ksmbd_debug(SMB, "check permission using windows acl\n");
--	acl_size = ksmbd_vfs_get_sd_xattr(conn, user_ns,
--					  path->dentry, &pntsd);
--	if (acl_size <= 0 || !pntsd || !pntsd->dacloffset) {
--		kfree(pntsd);
--		return 0;
--	}
-+	pntsd_size = ksmbd_vfs_get_sd_xattr(conn, user_ns,
-+					    path->dentry, &pntsd);
-+	if (pntsd_size <= 0)
-+		goto err_out;
-+
-+	dacl_offset = le32_to_cpu(pntsd->dacloffset);
-+	if (!pntsd || !pntsd->dacloffset ||
-+	    (dacl_offset + sizeof(struct smb_acl) > pntsd_size))
-+		goto err_out;
- 
- 	pdacl = (struct smb_acl *)((char *)pntsd + le32_to_cpu(pntsd->dacloffset));
--	end_of_acl = ((char *)pntsd) + acl_size;
--	if (end_of_acl <= (char *)pdacl) {
--		kfree(pntsd);
--		return 0;
--	}
-+	acl_size = pntsd_size - dacl_offset;
-+	pdacl_size = le16_to_cpu(pdacl->size);
- 
--	if (end_of_acl < (char *)pdacl + le16_to_cpu(pdacl->size) ||
--	    le16_to_cpu(pdacl->size) < sizeof(struct smb_acl)) {
--		kfree(pntsd);
--		return 0;
--	}
-+	if (pdacl_size > acl_size || pdacl_size < sizeof(struct smb_acl))
-+		goto err_out;
- 
- 	if (!pdacl->num_aces) {
--		if (!(le16_to_cpu(pdacl->size) - sizeof(struct smb_acl)) &&
-+		if (!(pdacl_size - sizeof(struct smb_acl)) &&
- 		    *pdaccess & ~(FILE_READ_CONTROL_LE | FILE_WRITE_DAC_LE)) {
- 			rc = -EACCES;
- 			goto err_out;
- 		}
--		kfree(pntsd);
--		return 0;
-+		goto err_out;
- 	}
- 
- 	if (*pdaccess & FILE_MAXIMAL_ACCESS_LE) {
-@@ -1200,11 +1235,16 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, struct path *path,
- 			DELETE;
- 
- 		ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
-+		aces_size = acl_size - sizeof(struct smb_acl);
- 		for (i = 0; i < le32_to_cpu(pdacl->num_aces); i++) {
-+			if (offsetof(struct smb_ace, access_req) > aces_size)
-+				break;
-+			ace_size = le16_to_cpu(ace->size);
-+			if (ace_size > aces_size)
-+				break;
-+			aces_size -= ace_size;
- 			granted |= le32_to_cpu(ace->access_req);
- 			ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
--			if (end_of_acl < (char *)ace)
--				goto err_out;
- 		}
- 
- 		if (!pdacl->num_aces)
-@@ -1216,7 +1256,15 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, struct path *path,
- 	id_to_sid(uid, sid_type, &sid);
- 
- 	ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
-+	aces_size = acl_size - sizeof(struct smb_acl);
- 	for (i = 0; i < le32_to_cpu(pdacl->num_aces); i++) {
-+		if (offsetof(struct smb_ace, access_req) > aces_size)
-+			break;
-+		ace_size = le16_to_cpu(ace->size);
-+		if (ace_size > aces_size)
-+			break;
-+		aces_size -= ace_size;
-+
- 		if (!compare_sids(&sid, &ace->sid) ||
- 		    !compare_sids(&sid_unix_NFS_mode, &ace->sid)) {
- 			found = 1;
-@@ -1226,8 +1274,6 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, struct path *path,
- 			others_ace = ace;
- 
- 		ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
--		if (end_of_acl < (char *)ace)
--			goto err_out;
- 	}
- 
- 	if (*pdaccess & FILE_MAXIMAL_ACCESS_LE && found) {
-diff --git a/fs/ksmbd/smbacl.h b/fs/ksmbd/smbacl.h
-index 811af3309429..fcb2c83f2992 100644
---- a/fs/ksmbd/smbacl.h
-+++ b/fs/ksmbd/smbacl.h
-@@ -193,7 +193,7 @@ struct posix_acl_state {
- int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
- 		   int acl_len, struct smb_fattr *fattr);
- int build_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
--		   struct smb_ntsd *ppntsd, int addition_info,
-+		   struct smb_ntsd *ppntsd, int ppntsd_size, int addition_info,
- 		   __u32 *secdesclen, struct smb_fattr *fattr);
- int init_acl_state(struct posix_acl_state *state, int cnt);
- void free_acl_state(struct posix_acl_state *state);
-diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
-index 4f75b1436eab..7af7e0853f06 100644
---- a/fs/ksmbd/vfs.c
-+++ b/fs/ksmbd/vfs.c
-@@ -1539,6 +1539,11 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 	}
- 
- 	*pntsd = acl.sd_buf;
-+	if (acl.sd_size < sizeof(struct smb_ntsd)) {
-+		pr_err("sd size is invalid\n");
-+		goto out_free;
-+	}
-+
- 	(*pntsd)->osidoffset = cpu_to_le32(le32_to_cpu((*pntsd)->osidoffset) -
- 					   NDR_NTSD_OFFSETOF);
- 	(*pntsd)->gsidoffset = cpu_to_le32(le32_to_cpu((*pntsd)->gsidoffset) -
--- 
-2.25.1
+I said before that my servers (and yours too) have
 
+# cat /etc/pam.d/sshd | grep keyinit
+session    optional     pam_keyinit.so revoke force
+
+And the problem shows up when I detach tmux, **log out**, log back in and reattach tmux; then I see
+
+
+p115628@davis:~$ keyctl list @s
+keyctl_read_alloc: Key has been revoked
+
+The word 'revoked' was the obvious clue I: just to remove the 'revoke' option and the problem goes away:
+
+# cat /etc/pam.d/sshd | grep keyinit
+session    optional     pam_keyinit.so force
+
+
+This keeps the session-keyring(7) working even after reattaching. Because it's the **log out** that is disabling the keyring; per pam_keyinit(8) [1]:
+
+>   revoke
+>           Causes the session keyring of the invoking process to be revoked when the invoking
+>           process exits if the session keyring was created for this process in the first place.
+
+
+This change seems to have solved the immediate complaints from my users. But I don't like overriding the default like this; I assume there's a series of good reasons for using 'revoke' that I don't understand.
+
+Would there be interest in switching to KEY_SPEC_USER_KEYRING? Would it be a good idea? Can I assume the kernel CIFS code would need a matching change?
+
+
+[1] https://manpages.ubuntu.com/manpages/focal/man8/pam_keyinit.8.html
