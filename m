@@ -2,494 +2,1082 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEFACC00140
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Aug 2022 17:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF75C00140
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Aug 2022 17:56:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234509AbiHBRnt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Aug 2022 13:43:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37098 "EHLO
+        id S233620AbiHBR4m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Aug 2022 13:56:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234258AbiHBRnj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 13:43:39 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2046.outbound.protection.outlook.com [40.107.243.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701A44F68D
-        for <linux-cifs@vger.kernel.org>; Tue,  2 Aug 2022 10:43:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QylKKjuJkelyAzW0Q1j6gPEj41/B2i8k3pvFsCo7+a9+uIEMbVnsq9Mvz4hi3luQCcfh4Bj9yZNWjPDwnWLCyVE9jkNRXni1BjuezcViqFWnoQjnsb3MpE9WgM9a3tK6WrCiGhZmh509pBT/cFWu0wlzf2ZblSo73scpthkAEseBI+oGkjTiZ4Q3OZhJkbejHUo0XvjVyPIuqoDILnoSiUn9WXOaiemjqeOeiE9s/SeCI3kue57ZhcTdStPXjWzDgt64SCMpdp019SDVF6vfK+kn/DHmk7SBycBW5pevXPIfbeP6tu3F/sat+aChygmw5PtyFISOFOCPLeh+7l+G5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WiO0bmxo9xw0ho/PDAhIyVkk/o0uQrtLES5cyBiwIg8=;
- b=AdPsXyfkDSZyXbyK+1K9P4E3VJ2lvkif3hHKzOf5pOyOKNyd4kRsnWcxtkEvI1bmdZUZyUd4AmAwrvflrmIpHIqzF8LIR0RVMNh65izMf1gtb7sVm+4JbBc5+LhOjxlcqHgoAcrnHE1i0pEZ44zi/DvjNnfmmQFFMG4xqJCDvyoVGIpHvRmmZJoQIW92amh9JTngnuy+QeBPGAQJgdGWArzgeXOxkvmZRJ6VILJIr1eYWy79HdMUsNP0AvZEEVOuzEov0Kv2pW7OSt2DDNR+u9f1XJDjfiV8+oyOfCUsxI6sleFoMxzw4ojsstwdKiKw/uVDbQFiTJrkcw/DZ6acQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- BN0PR01MB7215.prod.exchangelabs.com (2603:10b6:408:15a::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5504.14; Tue, 2 Aug 2022 17:43:34 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::21e9:8dbb:6e40:5073]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::21e9:8dbb:6e40:5073%2]) with mapi id 15.20.5482.016; Tue, 2 Aug 2022
- 17:43:33 +0000
-Message-ID: <fedc9cc2-4fc5-b7ed-081f-85a13d821fa1@talpey.com>
-Date:   Tue, 2 Aug 2022 13:43:33 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.3
-Subject: Re: [RFC PATCH 0/3] Rename "cifs" module to "smbfs"
-Content-Language: en-US
-To:     Enzo Matsumiya <ematsumiya@suse.de>,
-        Steve French <smfrench@gmail.com>
-Cc:     Rowland Penny <rpenny@samba.org>, CIFS <linux-cifs@vger.kernel.org>
-References: <20220801190933.27197-1-ematsumiya@suse.de>
- <012fa69c76bac824c2e2dcc8dfaf9250723e502b.camel@samba.org>
- <20220801201438.5db6emf6iddawrfl@cyberdelia>
- <cc925d11-df62-fd92-f21f-4aca10e3a68d@talpey.com>
- <20220802135201.4vm36drd5mp57nvv@cyberdelia>
- <CAH2r5muSREEiwehp0c0V0OFBbicJceiBxTBjasNyL36rQLqK6g@mail.gmail.com>
- <20220802155852.ae77gkacfrlmiv4t@cyberdelia>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <20220802155852.ae77gkacfrlmiv4t@cyberdelia>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BL0PR02CA0106.namprd02.prod.outlook.com
- (2603:10b6:208:51::47) To SN6PR01MB4445.prod.exchangelabs.com
- (2603:10b6:805:e2::33)
+        with ESMTP id S229675AbiHBR4l (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 13:56:41 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D03222B0
+        for <linux-cifs@vger.kernel.org>; Tue,  2 Aug 2022 10:56:39 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 304B238144;
+        Tue,  2 Aug 2022 17:56:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1659462998; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NkqQx2a0aSsdfdjzhGriDJmjOkJaAA0/t5GDPfRNyWk=;
+        b=M3wgEU89rnkkh4DX/H+fm+z07nn1RDFHZA9HtjLxv65lR7SBzASzGz7Wi4jZRHEEYIZNAF
+        f447FCnnLaM9zuoR8V+AxRCcqxEtQyJlucAzvrbMlOreMGll9XpL/eslQjPhHr58FXmm24
+        61O/RxUlTnARgiR6TOFOWObnF5c/kk4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1659462998;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NkqQx2a0aSsdfdjzhGriDJmjOkJaAA0/t5GDPfRNyWk=;
+        b=iSlcr27dUzcSSbiglH+pMcxDICdICLG/TvGuhuhVJkESVfQGGJ7SeoxJO3S1HNl+CFWqtz
+        6/QT44WkY0VIVPDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 659911345B;
+        Tue,  2 Aug 2022 17:56:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id fU8CClVl6WKDSQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Tue, 02 Aug 2022 17:56:37 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com
+Subject: [PATCH] cifs: distribute some bloat out of cifsglob.h
+Date:   Tue,  2 Aug 2022 14:55:08 -0300
+Message-Id: <20220802175507.15708-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e08b4358-7fa1-48e6-08e3-08da74ae856a
-X-MS-TrafficTypeDiagnostic: BN0PR01MB7215:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zvmtqVoNlwPh6Hj/IKeWbPPphti5OoU5doaXZAswryAqQ2BsuEn766TbHSkJw+g4ZBVgNASpsICKBv1i4+3N2zJNQ2nJfi3xbu4wvm0fapEqFGXrvY1HA/7fodQecgzmOWkqFF2Ecy86RSkd/6PpsXTTf1qVqOUBT6zmMYPYfZsv5P9zqluunwnGa9ErN6eYFs6BnurBayopIW4yG+3HJ1+9ORY2oL3OsN5OotxxXAD1GIGrhFwCn8sjA1MRnPheKVzM8xvVba8Vio5z7SuI9ZyUFzB+Hl6ykENLfGmld8NUPyf4eeG3H2sl9Q4oIU1CaRv7R+c/dYjU9ZN7UyhfAdhc9Dy/Nhdfn0sVREc2nHVM1a4UY6xrQa3QaPXfYz8cbmQ6Q0GySib/lorHUA/V2dnVZsDOeQW5NeUXVcsXBmTvEuQys3rLX+l5PySJ9xKeBzVPsaL/PEMm8B2sGQ9zfeFd1NI2FJ1aS7VcD/DsYllFg02RrNcBlCft6luVIOEIDJ2wxKxRRVtip7YJEhFcSXXifpkPZhw+vgvAqb5OyxO0uEhHOl27RWX1N6fmnGP9FuTkW4jaB7/nM+Qa/PypyQYO7iRdtlBb+Q9plXRF8/oVjNq7Z83OF4LMAeWXwcvI4RRns/WD35VcjPggnqgOKGKML6q+yqzDAnHT7+/YQP6KbAkB5753pQa38ODGeXuIBNp97qpXLHr6PkYXiai/Dtv82n+FvhNyprHccZ0Y15ouS+Zn/qNcSiokYsydsr4OLU0hLLko1KyRte2hY4YGRH3ZIByPyCe3JkB/xWeI99caTUuvVCBlIJiQNrnztPmvs3hNEWbtaOEwjneWQNDD6A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230016)(396003)(366004)(39830400003)(136003)(346002)(376002)(66476007)(38100700002)(316002)(38350700002)(66556008)(54906003)(66946007)(4326008)(8676002)(5660300002)(30864003)(41300700001)(2906002)(8936002)(6486002)(83380400001)(186003)(86362001)(478600001)(36756003)(31686004)(26005)(6512007)(31696002)(110136005)(53546011)(52116002)(2616005)(6506007)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Tzk3b0lTc0ZkY0FFVFgyWUNSaXFOQ2N6QXRBek9URmxMQWEvZGlQY1lUakRz?=
- =?utf-8?B?TGF6MkMybnREcE5NNDRNTDZONTdwajFJdTB4SlUwdzBNTnFrT085ZURtSitG?=
- =?utf-8?B?K1VSOVAxZXd4Nm9ZYXp3WERpaUljUkQ5S1lTVEVoTGVFU3JqWGRld2pGQS9H?=
- =?utf-8?B?MlhlMS9pNVBqYWJ1RnF2NDhzUkpkR0xJT1pBbFZtanVlalFRay9BUGNaTlpl?=
- =?utf-8?B?QVAwc1NZbmhFWUdBeFNlVU1NNnpCbEpVeWZsdWVBbWwySnk4eCs2ZTc1N05a?=
- =?utf-8?B?ODZOT0ZsTHpxNmRGcnh1NmdNb0Y0cnVaRU5ZYytQeUhGeU0vM3JWWk9RTFJC?=
- =?utf-8?B?TEsvL0lsYWxMYUVyNWdjUnNIRzZxSjN0cnUrN2xHZDIzeStSemNNa1NuL0dm?=
- =?utf-8?B?cHlzOEdRdkQxU2dBQll5MTdMU3RPOEJrNlZNSUtWb09hMGlxdlF2NGFmZU1t?=
- =?utf-8?B?MTFFV3cxWnJyZEpyT1MrTUUzcTR0SXN1b0JrdVhNclJtb2RicDBsc2JyMmtk?=
- =?utf-8?B?TmJaVzlqRTdGc2E3SDhTUFV0dFF0cm1MeHd4YVo5aUZaeFJYZ3ZrWXJJTU9B?=
- =?utf-8?B?WERWQ0hFQjhPQ1QzS0loYWpydU9TNGRnaFVxV0owNzBLN094RGt5M2cwYXU3?=
- =?utf-8?B?a3FUVTBhbWJIMGJaMjRiUkx4bk9rNTNMT0pzS21jOVNoa1lpQlo3V25RVkxT?=
- =?utf-8?B?N2xvbkFkemlHeEIzUE9Td0IwSVhVVmJYUVluMnZGNDFNQ2s5M21qbnRtZ05x?=
- =?utf-8?B?d1c5R0xycjFVSURVRUNCT0Y3TFZaNVY1MWxjRjJPRDVHc0VMYW1TdXBMM3hW?=
- =?utf-8?B?ZFJHNE5PK29PTFNITVovQXZRZ2VNdDZkQWtWOERQUXhJbVZoVHNJMy9IeWdi?=
- =?utf-8?B?RFlLSU5kT0M2QjBzQTdUb3VIUDhQd0VTNUdHYjRtVDhXMUFhOW1RWWNFK1kv?=
- =?utf-8?B?cVZhY2tjL1ZyV0l2dHhuMXVsNml6T28rY2YzWkZSNGZxc3NCOVVnN3FTV25v?=
- =?utf-8?B?dmdXaXM1dTVhVDdLR0ZZcW90NEczaHJjZmZYNjIxWUJGK2RDK1NpR0NqbnAr?=
- =?utf-8?B?am5NQXpHN3dkWnVEOGdDcGdoMWNyekJ3aldIWDFXRnR1dEkwM2RPQjBPZWp1?=
- =?utf-8?B?Sm5SL0RlMUJlY1BNY1NPMTA0N202L252bjBITkhSTHJaNko1QjRlNEQyUXha?=
- =?utf-8?B?M2tNM21qdllKMVVQMDhvNllQbFQySEhIU0M5QnQ4aFZhdWNsUGozb0NSdGE3?=
- =?utf-8?B?bUwzbVZudEZRMDdrWFhWYk1BcndFcElxaU1tV2xQTk1uYzBMRDlPQndMZVlI?=
- =?utf-8?B?c2tPSzJkR1dlMkRvSElPd0hvRGhOM2hlK3JIem9ST1lxV25MNEJxNHpYcW5a?=
- =?utf-8?B?b2QxY1I1OEtxTjAwL3VxZDJzQmc5bktySDFTQUpleXkzTGxiM2RkQmxsdWNu?=
- =?utf-8?B?T0FRT1dldHN6ajNHQ0ZDWUphSm1Scm02czZLeWRRNjNONEtHakY0VzJKNXFw?=
- =?utf-8?B?bEVKall3Y1NKRVRrS1ZuaVRWSnBBNnM3V2hTTnRNTzdpNzN3ZVo5L0F2S2lu?=
- =?utf-8?B?WHJqc0VRbGVjNzFrWnlNV3RMUXJSRFVPRHlJOXExR0VSWDdKSGROYUV4RFA5?=
- =?utf-8?B?dDFrMGZXZFNvUkZHbTk1R2dUYWVibXRDcGZFNklzNTU0bzFic0R0ZTJ3ZXhF?=
- =?utf-8?B?Vm1nVGFiSXhpR3Vkc2t2QysyNlQ5S1g5bVJqcWlkSTVnR3RlTXBLMms0VEtp?=
- =?utf-8?B?d3gzRnRFNXU0YW03dWJ6UjZQdkhqajY2SzNDUm5rK29RTW0xT1JWalllSXRi?=
- =?utf-8?B?OUljR05oTlNPaVNkbFRsbUJoNmhXcW5aTldxKzJsb2l5MVVMeE9xeHRJYTNJ?=
- =?utf-8?B?MUxrK1F6d0RtYUFGdktOODF6OFNrcnBsT09ZbnhLenZVVmpCUDBVUi9KUWxU?=
- =?utf-8?B?aDhEVHVDUkIrOHA1bFNVeVpSUi9aRGIvbDNaSFgzbmlWNnVoUytVODIxMi9p?=
- =?utf-8?B?ZW5pN3NUWmtHVFBscGxiUWhpNSt0ZVo4b200bzVsZE0vbGFIOXVmamhBS012?=
- =?utf-8?B?NVZHN3pFVWRwUzI0SDRWSTM1ekttZkFUVUtFbDRGVm1pajNXdmw3R3NXNVlK?=
- =?utf-8?Q?yJEk=3D?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e08b4358-7fa1-48e6-08e3-08da74ae856a
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2022 17:43:33.9359
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GSKNksrGaCLEhdMWZD8DUY5/i1uqWeDDiHB7nxoYX/RtSiIBQGPdbSLZv7dXpz7m
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR01MB7215
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-MHO, yes and yes.
+Distribute structs, prototypes, and inline functions into file.h,
+inode.h, and the new dir.h.
 
-On 8/2/2022 11:58 AM, Enzo Matsumiya wrote:
-> On 08/02, Steve French wrote:
->> What about just "fs/smb" but "fs/smb_client" is also a possibility -
->> but I agree "fs/smbfs" could get confusing due to the very old module
->> that was removed more than 10 years ago
-> 
-> IMHO "fs/smb" is better than "fs/smb_client".
-> 
-> Let me know if it's ok to resubmit a v2 of this rename series.
-> 
-> Also, do we keep the module name as smbfs.ko?
-> 
->> On Tue, Aug 2, 2022 at 8:52 AM Enzo Matsumiya <ematsumiya@suse.de> wrote:
->>>
->>> On 08/01, Tom Talpey wrote:
->>> >On 8/1/2022 4:14 PM, Enzo Matsumiya wrote:
->>> >>On 08/01, Rowland Penny wrote:
->>> >>>On Mon, 2022-08-01 at 16:09 -0300, Enzo Matsumiya via samba-technical
->>> >>>wrote:
->>> >>>>Hi,
->>> >>>>
->>> >>>>As part of the ongoing effort to remove the "cifs" nomenclature from
->>> >>>>the
->>> >>>>Linux SMB client, I'm proposing the rename of the module to "smbfs".
->>> >>>
->>> >>>Hi, this has absolutely nothing to do with myself, but Linux used
->>> >>>'smbfs' before it started to use 'cifs', so you are going back to an
->>> >>>old term. This could be confusing.
->>> >>
->>> >>Hi Rowland, I'm aware of that. I had nothing to do with either
->>> >>(choosing initial "smbfs" nor "cifs"), but, IMHO, I think it should've
->>> >>stayed "smbfs". And TBH this is the most coherent name, of all
->>> >
->>> >I dug around the old tarballs and it looks like fs/smbfs was pulled 
->>> from
->>> >the kernel after 2.6.36, in early 2011. This was different from 
->>> fs/cifs,
->>> >which entered the kernel much earlier, so they previously coexisted.
->>> >
->>> >I don't think the name ambiguity is very important, but I do wonder if
->>> >git might uncover some conflicts, when a previously removed directory
->>> >suddenly reappears with new content? There wasn't a lot in fs/smbfs
->>> >though.
->>>
->>> I haven't considered that.
->>> Doing a "git log --follow -- fs/smbfs" does show the older commits for
->>> before the previous migration/rename:
->>>
->>> ----
->>> commit 1e20c73a2935be2d9f19ebc63ddee1afccc42b07
->>> Author: Enzo Matsumiya <ematsumiya@suse.de>
->>> Date:   Mon Aug 1 15:05:23 2022 -0300
->>>
->>>      smbfs: rename directory "fs/cifs" -> "fs/smbfs"
->>>
->>>      Update fs/Kconfig and fs/Makefile to reflect the change.
->>>
->>>      Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
->>>
->>> commit be9eee2e8b87e335531a3ae13abb8d26e834c438
->>> Author: Christoph Hellwig <hch@infradead.org>
->>> Date:   Sun Oct 10 05:36:29 2010 -0400
->>>
->>>      smbfs: use dget_parent
->>>
->>>      Use dget_parent instead of opencoding it.  This simplifies the 
->>> code, but
->>>      more importanly prepares for the more complicated locking for a 
->>> parent
->>>      dget in the dcache scale patch series.
->>>
->>>      Note that the d_time assignment in smb_renew_times moves out of 
->>> d_lock,
->>>      but it's a single atomic 32-bit value, and that's what other sites
->>>      setting it do already.
->>>
->>>      Signed-off-by: Christoph Hellwig <hch@lst.de>
->>>      Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
->>> ...
->>> ----
->>>
->>> I don't know if that would cause a real problem though, someone more
->>> experienced with renaming modules/directories could provide their
->>> opinion.
->>>
->>> Could we have an empty commit between old commits and the new rename to
->>> serve as a marker maybe?
->>>
->>> >Either way, I think the module name is the question here, and it 
->>> doesn't
->>> >have to be the same as the directory. I still prefer smbfs.
->>> >
->>> >Another possibility for the directory is "ksmb", which might rhyme with
->>> >the server, and keep it close alphabetically too? OTOH it might be
->>> >confusing to have two similar names.
->>>
->>> My original idea of "ideal" was to have:
->>>
->>> fs/smbfs/
->>> fs/smbfs/common
->>> fs/smbfs/client
->>> fs/smbfs/server
->>>
->>> Which aligns with e.g., drivers/nvme/ that has host/ and target/ subdirs
->>> to accomodate client and server code. This would make things way more
->>> manageable given the quantity of shared code between cifs.ko and
->>> ksmbd.ko.
->>>
->>> Another option is:
->>> fs/smbfs_client/
->>> fs/smbfs_common/ (already existing)
->>> fs/smbfs_server/
->>>
->>> But, personally, I'm not really a fan of the underscores.
->>>
->>> My 2c only though.
->>> Thoughts?
->>>
->>> >And sorry but I hate the idea of adding "-client". Should we rename
->>> >ksmbd to smb-server?? I don't think so.
->>>
->>> Agreed.
->>>
->>> >Tom.
->>>
->>> Cheers,
->>>
->>> Enzo
->>>
->>> >>available/known choices; you know the protocol (SMB), you know it 
->>> isn't
->>> >>tied to any SMB version ("cifs", or "smb3" as sometimes suggested or
->>> >>used (as a module alias)), it's a Linux filesystem module ("FS").
->>> >>
->>> >>Also the "fs/smbfs_common" directory was renamed as recent as last 
->>> year
->>> >>(from "cifs_common") (cf. commit 23e91d8b7).
->>> >>
->>> >>>Rowland
->>> >>
->>> >>Thanks for the input, though. As an RFC patch, I'm waiting for more
->>> >>feedback and suggestions.
->>> >>
->>> >>
->>> >>Cheers,
->>> >>
->>> >>Enzo
->>> >>
->>> >>>>
->>> >>>>As it's widely known, CIFS is associated to SMB1.0, which, in turn,
->>> >>>>is
->>> >>>>associated with the security issues it presented in the past. Using
->>> >>>>"SMBFS" makes clear what's the protocol in use for outsiders, but
->>> >>>>also
->>> >>>>unties it from any particular protocol version. It also fits in the
->>> >>>>already existing "fs/smbfs_common" and "fs/ksmbd" naming scheme.
->>> >>>>
->>> >>>>This short patch series only changes directory names and
->>> >>>>includes/ifdefs in
->>> >>>>headers and source code, and updates docs to reflect the rename.
->>> >>>>Other
->>> >>>>than that, no source code/functionality is modified (WIP though).
->>> >>>>
->>> >>>>Patch 1/3: effectively changes the module name to "smbfs" and create
->>> >>>>a
->>> >>>>       "cifs" module alias to maintain compatibility (a warning
->>> >>>>       should be added to indicate the complete removal/isolation
->>> >>>>of
->>> >>>>       CIFS/SMB1.0 code).
->>> >>>>Patch 2/3: rename the source-code directory to align with the new
->>> >>>>module
->>> >>>>       name
->>> >>>>Patch 3/3: update documentation references to "fs/cifs" or "cifs.ko"
->>> >>>>or
->>> >>>>       "cifs module" to use the new name
->>> >>>>
->>> >>>>Enzo Matsumiya (3):
->>> >>>>  cifs: change module name to "smbfs.ko"
->>> >>>>  smbfs: rename directory "fs/cifs" -> "fs/smbfs"
->>> >>>>  smbfs: update doc references
->>> >>>>
->>> >>>> Documentation/admin-guide/index.rst           |   2 +-
->>> >>>> .../admin-guide/{cifs => smbfs}/authors.rst   |   0
->>> >>>> .../admin-guide/{cifs => smbfs}/changes.rst   |   4 +-
->>> >>>> .../admin-guide/{cifs => smbfs}/index.rst     |   0
->>> >>>> .../{cifs => smbfs}/introduction.rst          |   0
->>> >>>> .../admin-guide/{cifs => smbfs}/todo.rst      |  12 +-
->>> >>>> .../admin-guide/{cifs => smbfs}/usage.rst     | 168 
->>> +++++++++-------
->>> >>>>--
->>> >>>> .../{cifs => smbfs}/winucase_convert.pl       |   0
->>> >>>> Documentation/filesystems/index.rst           |   2 +-
->>> >>>> .../filesystems/{cifs => smbfs}/cifsroot.rst  |  14 +-
->>> >>>> .../filesystems/{cifs => smbfs}/index.rst     |   0
->>> >>>> .../filesystems/{cifs => smbfs}/ksmbd.rst     |   2 +-
->>> >>>> Documentation/networking/dns_resolver.rst     |   2 +-
->>> >>>> .../translations/zh_CN/admin-guide/index.rst  |   2 +-
->>> >>>> .../translations/zh_TW/admin-guide/index.rst  |   2 +-
->>> >>>> fs/Kconfig                                    |   6 +-
->>> >>>> fs/Makefile                                   |   2 +-
->>> >>>> fs/cifs/Makefile                              |  34 ----
->>> >>>> fs/{cifs => smbfs}/Kconfig                    | 108 +++++------
->>> >>>> fs/smbfs/Makefile                             |  34 ++++
->>> >>>> fs/{cifs => smbfs}/asn1.c                     |   0
->>> >>>> fs/{cifs => smbfs}/cifs_debug.c               |  72 ++++----
->>> >>>> fs/{cifs => smbfs}/cifs_debug.h               |   4 +-
->>> >>>> fs/{cifs => smbfs}/cifs_dfs_ref.c             |   2 +-
->>> >>>> fs/{cifs => smbfs}/cifs_fs_sb.h               |   0
->>> >>>> fs/{cifs => smbfs}/cifs_ioctl.h               |   0
->>> >>>> fs/{cifs => smbfs}/cifs_spnego.c              |   4 +-
->>> >>>> fs/{cifs => smbfs}/cifs_spnego.h              |   0
->>> >>>> .../cifs_spnego_negtokeninit.asn1             |   0
->>> >>>> fs/{cifs => smbfs}/cifs_swn.c                 |   0
->>> >>>> fs/{cifs => smbfs}/cifs_swn.h                 |   4 +-
->>> >>>> fs/{cifs => smbfs}/cifs_unicode.c             |   0
->>> >>>> fs/{cifs => smbfs}/cifs_unicode.h             |   0
->>> >>>> fs/{cifs => smbfs}/cifs_uniupr.h              |   0
->>> >>>> fs/{cifs => smbfs}/cifsacl.c                  |   6 +-
->>> >>>> fs/{cifs => smbfs}/cifsacl.h                  |   0
->>> >>>> fs/{cifs => smbfs}/cifsencrypt.c              |   0
->>> >>>> fs/{cifs => smbfs}/cifsglob.h                 |  26 +--
->>> >>>> fs/{cifs => smbfs}/cifspdu.h                  |   6 +-
->>> >>>> fs/{cifs => smbfs}/cifsproto.h                |  10 +-
->>> >>>> fs/{cifs => smbfs}/cifsroot.c                 |   0
->>> >>>> fs/{cifs => smbfs}/cifssmb.c                  |  14 +-
->>> >>>> fs/{cifs => smbfs}/connect.c                  |  36 ++--
->>> >>>> fs/{cifs/cifsfs.c => smbfs/core.c}            |  49 ++---
->>> >>>> fs/{cifs => smbfs}/dfs_cache.c                |   2 +-
->>> >>>> fs/{cifs => smbfs}/dfs_cache.h                |   0
->>> >>>> fs/{cifs => smbfs}/dir.c                      |   2 +-
->>> >>>> fs/{cifs => smbfs}/dns_resolve.c              |   0
->>> >>>> fs/{cifs => smbfs}/dns_resolve.h              |   0
->>> >>>> fs/{cifs => smbfs}/export.c                   |   8 +-
->>> >>>> fs/{cifs => smbfs}/file.c                     |  16 +-
->>> >>>> fs/{cifs => smbfs}/fs_context.c               |  20 +--
->>> >>>> fs/{cifs => smbfs}/fs_context.h               |   0
->>> >>>> fs/{cifs => smbfs}/fscache.c                  |   0
->>> >>>> fs/{cifs => smbfs}/fscache.h                  |   6 +-
->>> >>>> fs/{cifs => smbfs}/inode.c                    |  10 +-
->>> >>>> fs/{cifs => smbfs}/ioctl.c                    |   6 +-
->>> >>>> fs/{cifs => smbfs}/link.c                     |   2 +-
->>> >>>> fs/{cifs => smbfs}/misc.c                     |  14 +-
->>> >>>> fs/{cifs => smbfs}/netlink.c                  |   0
->>> >>>> fs/{cifs => smbfs}/netlink.h                  |   0
->>> >>>> fs/{cifs => smbfs}/netmisc.c                  |   2 +-
->>> >>>> fs/{cifs => smbfs}/nterr.c                    |   0
->>> >>>> fs/{cifs => smbfs}/nterr.h                    |   0
->>> >>>> fs/{cifs => smbfs}/ntlmssp.h                  |   2 +-
->>> >>>> fs/{cifs => smbfs}/readdir.c                  |   4 +-
->>> >>>> fs/{cifs => smbfs}/rfc1002pdu.h               |   0
->>> >>>> fs/{cifs => smbfs}/sess.c                     |  10 +-
->>> >>>> fs/{cifs => smbfs}/smb1ops.c                  |   4 +-
->>> >>>> fs/{cifs => smbfs}/smb2file.c                 |   2 +-
->>> >>>> fs/{cifs => smbfs}/smb2glob.h                 |   0
->>> >>>> fs/{cifs => smbfs}/smb2inode.c                |   2 +-
->>> >>>> fs/{cifs => smbfs}/smb2maperror.c             |   0
->>> >>>> fs/{cifs => smbfs}/smb2misc.c                 |   0
->>> >>>> fs/{cifs => smbfs}/smb2ops.c                  |  32 ++--
->>> >>>> fs/{cifs => smbfs}/smb2pdu.c                  |  22 +--
->>> >>>> fs/{cifs => smbfs}/smb2pdu.h                  |   0
->>> >>>> fs/{cifs => smbfs}/smb2proto.h                |   0
->>> >>>> fs/{cifs => smbfs}/smb2status.h               |   0
->>> >>>> fs/{cifs => smbfs}/smb2transport.c            |   2 +-
->>> >>>> fs/{cifs => smbfs}/smbdirect.c                |   0
->>> >>>> fs/{cifs => smbfs}/smbdirect.h                |   2 +-
->>> >>>> fs/{cifs => smbfs}/smbencrypt.c               |   0
->>> >>>> fs/{cifs => smbfs}/smberr.h                   |   0
->>> >>>> fs/{cifs/cifsfs.h => smbfs/smbfs.h}           |  12 +-
->>> >>>> fs/{cifs => smbfs}/trace.c                    |   0
->>> >>>> fs/{cifs => smbfs}/trace.h                    |   0
->>> >>>> fs/{cifs => smbfs}/transport.c                |   4 +-
->>> >>>> fs/{cifs => smbfs}/unc.c                      |   0
->>> >>>> fs/{cifs => smbfs}/winucase.c                 |   0
->>> >>>> fs/{cifs => smbfs}/xattr.c                    |  18 +-
->>> >>>> 91 files changed, 414 insertions(+), 417 deletions(-)
->>> >>>> rename Documentation/admin-guide/{cifs => smbfs}/authors.rst (100%)
->>> >>>> rename Documentation/admin-guide/{cifs => smbfs}/changes.rst (73%)
->>> >>>> rename Documentation/admin-guide/{cifs => smbfs}/index.rst (100%)
->>> >>>> rename Documentation/admin-guide/{cifs => smbfs}/introduction.rst
->>> >>>>(100%)
->>> >>>> rename Documentation/admin-guide/{cifs => smbfs}/todo.rst (95%)
->>> >>>> rename Documentation/admin-guide/{cifs => smbfs}/usage.rst (87%)
->>> >>>> rename Documentation/admin-guide/{cifs => 
->>> smbfs}/winucase_convert.pl
->>> >>>>(100%)
->>> >>>> rename Documentation/filesystems/{cifs => smbfs}/cifsroot.rst (85%)
->>> >>>> rename Documentation/filesystems/{cifs => smbfs}/index.rst (100%)
->>> >>>> rename Documentation/filesystems/{cifs => smbfs}/ksmbd.rst (99%)
->>> >>>> delete mode 100644 fs/cifs/Makefile
->>> >>>> rename fs/{cifs => smbfs}/Kconfig (72%)
->>> >>>> create mode 100644 fs/smbfs/Makefile
->>> >>>> rename fs/{cifs => smbfs}/asn1.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_debug.c (96%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_debug.h (98%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_dfs_ref.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_fs_sb.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_ioctl.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_spnego.c (98%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_spnego.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_spnego_negtokeninit.asn1 (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_swn.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_swn.h (95%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_unicode.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_unicode.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifs_uniupr.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifsacl.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/cifsacl.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifsencrypt.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifsglob.h (99%)
->>> >>>> rename fs/{cifs => smbfs}/cifspdu.h (99%)
->>> >>>> rename fs/{cifs => smbfs}/cifsproto.h (99%)
->>> >>>> rename fs/{cifs => smbfs}/cifsroot.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/cifssmb.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/connect.c (99%)
->>> >>>> rename fs/{cifs/cifsfs.c => smbfs/core.c} (98%)
->>> >>>> rename fs/{cifs => smbfs}/dfs_cache.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/dfs_cache.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/dir.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/dns_resolve.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/dns_resolve.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/export.c (91%)
->>> >>>> rename fs/{cifs => smbfs}/file.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/fs_context.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/fs_context.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/fscache.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/fscache.h (98%)
->>> >>>> rename fs/{cifs => smbfs}/inode.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/ioctl.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/link.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/misc.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/netlink.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/netlink.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/netmisc.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/nterr.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/nterr.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/ntlmssp.h (98%)
->>> >>>> rename fs/{cifs => smbfs}/readdir.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/rfc1002pdu.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/sess.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/smb1ops.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/smb2file.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/smb2glob.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/smb2inode.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/smb2maperror.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/smb2misc.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/smb2ops.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/smb2pdu.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/smb2pdu.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/smb2proto.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/smb2status.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/smb2transport.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/smbdirect.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/smbdirect.h (99%)
->>> >>>> rename fs/{cifs => smbfs}/smbencrypt.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/smberr.h (100%)
->>> >>>> rename fs/{cifs/cifsfs.h => smbfs/smbfs.h} (97%)
->>> >>>> rename fs/{cifs => smbfs}/trace.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/trace.h (100%)
->>> >>>> rename fs/{cifs => smbfs}/transport.c (99%)
->>> >>>> rename fs/{cifs => smbfs}/unc.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/winucase.c (100%)
->>> >>>> rename fs/{cifs => smbfs}/xattr.c (98%)
->>> >>>>
->>> >>>
->>> >>
->>
->>
->>
->> -- 
->> Thanks,
->>
->> Steve
-> 
+Delete unused "dir_notify_req" struct from cifsglob.h
+
+dir.h holds functions and structs related to dir operations.
+cifs_fattr was moved in there for convenience, but it should be
+moved to somewhere else once a proper directory structure is in place.
+
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+In hindsight, I should've sent this as a series to my previous patch
+"cifs: distribute some bloat out of cifsfs.{c,h}", as this one depends
+on that previous one.
+
+Let me know if it's better doing that.
+
+ fs/cifs/cifsacl.c  |   1 +
+ fs/cifs/cifsglob.h | 397 +--------------------------------------------
+ fs/cifs/connect.c  |   2 +
+ fs/cifs/dir.h      |  77 +++++++++
+ fs/cifs/file.h     | 239 +++++++++++++++++++++++++++
+ fs/cifs/inode.c    |   1 +
+ fs/cifs/inode.h    |  69 ++++++++
+ fs/cifs/readdir.c  |   1 +
+ fs/cifs/smb1ops.c  |   2 +
+ fs/cifs/smb2misc.c |   2 +
+ fs/cifs/smb2ops.c  |   1 +
+ fs/cifs/smb2pdu.h  |   1 +
+ 12 files changed, 401 insertions(+), 392 deletions(-)
+ create mode 100644 fs/cifs/dir.h
+
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index fa480d62f313..5d311eead824 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -20,6 +20,7 @@
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ #include "fs_context.h"
++#include "inode.h"
+ 
+ /* security id for everyone/world system group */
+ static const struct cifs_sid sid_everyone = {
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 3070407cafa7..b9f449fd9cf0 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -17,14 +17,15 @@
+ #include <linux/workqueue.h>
+ #include <linux/utsname.h>
+ #include <linux/sched/mm.h>
+-#include <linux/netfs.h>
+-#include "cifs_fs_sb.h"
+-#include "cifsacl.h"
+ #include <crypto/internal/hash.h>
+ #include <linux/scatterlist.h>
+ #include <uapi/linux/cifs/cifs_mount.h>
+-#include "../smbfs_common/smb2pdu.h"
++#include "cifs_fs_sb.h"
++#include "cifsacl.h"
+ #include "smb2pdu.h"
++#include "file.h"
++#include "inode.h"
++#include "dir.h"
+ 
+ #define SMB_PATH_MAX 260
+ #define CIFS_PORT 445
+@@ -219,20 +220,10 @@ struct smb_rqst {
+ 
+ struct mid_q_entry;
+ struct TCP_Server_Info;
+-struct cifsFileInfo;
+ struct cifs_ses;
+ struct cifs_tcon;
+ struct dfs_info3_param;
+-struct cifs_fattr;
+ struct smb3_fs_context;
+-struct cifs_fid;
+-struct cifs_readdata;
+-struct cifs_writedata;
+-struct cifs_io_parms;
+-struct cifs_search_info;
+-struct cifsInodeInfo;
+-struct cifs_open_parms;
+-struct cifs_credits;
+ 
+ struct smb_version_operations {
+ 	int (*send_cancel)(struct TCP_Server_Info *, struct smb_rqst *,
+@@ -766,11 +757,6 @@ static inline void cifs_server_unlock(struct TCP_Server_Info *server)
+ 	memalloc_nofs_restore(nofs_flag);
+ }
+ 
+-struct cifs_credits {
+-	unsigned int value;
+-	unsigned int instance;
+-};
+-
+ static inline unsigned int
+ in_flight(struct TCP_Server_Info *server)
+ {
+@@ -1097,73 +1083,6 @@ cap_unix(struct cifs_ses *ses)
+ 	return ses->server->vals->cap_unix & ses->capabilities;
+ }
+ 
+-/*
+- * common struct for holding inode info when searching for or updating an
+- * inode with new info
+- */
+-
+-#define CIFS_FATTR_DFS_REFERRAL		0x1
+-#define CIFS_FATTR_DELETE_PENDING	0x2
+-#define CIFS_FATTR_NEED_REVAL		0x4
+-#define CIFS_FATTR_INO_COLLISION	0x8
+-#define CIFS_FATTR_UNKNOWN_NLINK	0x10
+-#define CIFS_FATTR_FAKE_ROOT_INO	0x20
+-
+-struct cifs_fattr {
+-	u32		cf_flags;
+-	u32		cf_cifsattrs;
+-	u64		cf_uniqueid;
+-	u64		cf_eof;
+-	u64		cf_bytes;
+-	u64		cf_createtime;
+-	kuid_t		cf_uid;
+-	kgid_t		cf_gid;
+-	umode_t		cf_mode;
+-	dev_t		cf_rdev;
+-	unsigned int	cf_nlink;
+-	unsigned int	cf_dtype;
+-	struct timespec64 cf_atime;
+-	struct timespec64 cf_mtime;
+-	struct timespec64 cf_ctime;
+-	u32             cf_cifstag;
+-};
+-
+-struct cached_dirent {
+-	struct list_head entry;
+-	char *name;
+-	int namelen;
+-	loff_t pos;
+-
+-	struct cifs_fattr fattr;
+-};
+-
+-struct cached_dirents {
+-	bool is_valid:1;
+-	bool is_failed:1;
+-	struct dir_context *ctx; /*
+-				  * Only used to make sure we only take entries
+-				  * from a single context. Never dereferenced.
+-				  */
+-	struct mutex de_mutex;
+-	int pos;		 /* Expected ctx->pos */
+-	struct list_head entries;
+-};
+-
+-struct cached_fid {
+-	bool is_valid:1;	/* Do we have a useable root fid */
+-	bool file_all_info_is_valid:1;
+-	bool has_lease:1;
+-	unsigned long time; /* jiffies of when lease was taken */
+-	struct kref refcount;
+-	struct cifs_fid *fid;
+-	struct mutex fid_mutex;
+-	struct cifs_tcon *tcon;
+-	struct dentry *dentry;
+-	struct work_struct lease_break;
+-	struct smb2_file_all_info file_all_info;
+-	struct cached_dirents dirents;
+-};
+-
+ /*
+  * there is one of these for each connection to a resource on a particular
+  * session
+@@ -1311,285 +1230,6 @@ cifs_get_tlink(struct tcon_link *tlink)
+ /* This function is always expected to succeed */
+ extern struct cifs_tcon *cifs_sb_master_tcon(struct cifs_sb_info *cifs_sb);
+ 
+-#define CIFS_OPLOCK_NO_CHANGE 0xfe
+-
+-struct cifs_pending_open {
+-	struct list_head olist;
+-	struct tcon_link *tlink;
+-	__u8 lease_key[16];
+-	__u32 oplock;
+-};
+-
+-struct cifs_deferred_close {
+-	struct list_head dlist;
+-	struct tcon_link *tlink;
+-	__u16  netfid;
+-	__u64  persistent_fid;
+-	__u64  volatile_fid;
+-};
+-
+-/*
+- * This info hangs off the cifsFileInfo structure, pointed to by llist.
+- * This is used to track byte stream locks on the file
+- */
+-struct cifsLockInfo {
+-	struct list_head llist;	/* pointer to next cifsLockInfo */
+-	struct list_head blist; /* pointer to locks blocked on this */
+-	wait_queue_head_t block_q;
+-	__u64 offset;
+-	__u64 length;
+-	__u32 pid;
+-	__u16 type;
+-	__u16 flags;
+-};
+-
+-/*
+- * One of these for each open instance of a file
+- */
+-struct cifs_search_info {
+-	loff_t index_of_last_entry;
+-	__u16 entries_in_buffer;
+-	__u16 info_level;
+-	__u32 resume_key;
+-	char *ntwrk_buf_start;
+-	char *srch_entries_start;
+-	char *last_entry;
+-	const char *presume_name;
+-	unsigned int resume_name_len;
+-	bool endOfSearch:1;
+-	bool emptyDir:1;
+-	bool unicode:1;
+-	bool smallBuf:1; /* so we know which buf_release function to call */
+-};
+-
+-#define ACL_NO_MODE	((umode_t)(-1))
+-struct cifs_open_parms {
+-	struct cifs_tcon *tcon;
+-	struct cifs_sb_info *cifs_sb;
+-	int disposition;
+-	int desired_access;
+-	int create_options;
+-	const char *path;
+-	struct cifs_fid *fid;
+-	umode_t mode;
+-	bool reconnect:1;
+-};
+-
+-struct cifs_fid {
+-	__u16 netfid;
+-	__u64 persistent_fid;	/* persist file id for smb2 */
+-	__u64 volatile_fid;	/* volatile file id for smb2 */
+-	__u8 lease_key[SMB2_LEASE_KEY_SIZE];	/* lease key for smb2 */
+-	__u8 create_guid[16];
+-	__u32 access;
+-	struct cifs_pending_open *pending_open;
+-	unsigned int epoch;
+-#ifdef CONFIG_CIFS_DEBUG2
+-	__u64 mid;
+-#endif /* CIFS_DEBUG2 */
+-	bool purge_cache;
+-};
+-
+-struct cifs_fid_locks {
+-	struct list_head llist;
+-	struct cifsFileInfo *cfile;	/* fid that owns locks */
+-	struct list_head locks;		/* locks held by fid above */
+-};
+-
+-struct cifsFileInfo {
+-	/* following two lists are protected by tcon->open_file_lock */
+-	struct list_head tlist;	/* pointer to next fid owned by tcon */
+-	struct list_head flist;	/* next fid (file instance) for this inode */
+-	/* lock list below protected by cifsi->lock_sem */
+-	struct cifs_fid_locks *llist;	/* brlocks held by this fid */
+-	kuid_t uid;		/* allows finding which FileInfo structure */
+-	__u32 pid;		/* process id who opened file */
+-	struct cifs_fid fid;	/* file id from remote */
+-	struct list_head rlist; /* reconnect list */
+-	/* BB add lock scope info here if needed */ ;
+-	/* lock scope id (0 if none) */
+-	struct dentry *dentry;
+-	struct tcon_link *tlink;
+-	unsigned int f_flags;
+-	bool invalidHandle:1;	/* file closed via session abend */
+-	bool swapfile:1;
+-	bool oplock_break_cancelled:1;
+-	unsigned int oplock_epoch; /* epoch from the lease break */
+-	__u32 oplock_level; /* oplock/lease level from the lease break */
+-	int count;
+-	spinlock_t file_info_lock; /* protects four flag/count fields above */
+-	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
+-	struct cifs_search_info srch_inf;
+-	struct work_struct oplock_break; /* work for oplock breaks */
+-	struct work_struct put; /* work for the final part of _put */
+-	struct delayed_work deferred;
+-	bool deferred_close_scheduled; /* Flag to indicate close is scheduled */
+-};
+-
+-struct cifs_io_parms {
+-	__u16 netfid;
+-	__u64 persistent_fid;	/* persist file id for smb2 */
+-	__u64 volatile_fid;	/* volatile file id for smb2 */
+-	__u32 pid;
+-	__u64 offset;
+-	unsigned int length;
+-	struct cifs_tcon *tcon;
+-	struct TCP_Server_Info *server;
+-};
+-
+-struct cifs_aio_ctx {
+-	struct kref		refcount;
+-	struct list_head	list;
+-	struct mutex		aio_mutex;
+-	struct completion	done;
+-	struct iov_iter		iter;
+-	struct kiocb		*iocb;
+-	struct cifsFileInfo	*cfile;
+-	struct bio_vec		*bv;
+-	loff_t			pos;
+-	unsigned int		npages;
+-	ssize_t			rc;
+-	unsigned int		len;
+-	unsigned int		total_len;
+-	bool			should_dirty;
+-	/*
+-	 * Indicates if this aio_ctx is for direct_io,
+-	 * If yes, iter is a copy of the user passed iov_iter
+-	 */
+-	bool			direct_io;
+-};
+-
+-/* asynchronous read support */
+-struct cifs_readdata {
+-	struct kref			refcount;
+-	struct list_head		list;
+-	struct completion		done;
+-	struct cifsFileInfo		*cfile;
+-	struct address_space		*mapping;
+-	struct cifs_aio_ctx		*ctx;
+-	__u64				offset;
+-	unsigned int			bytes;
+-	unsigned int			got_bytes;
+-	pid_t				pid;
+-	int				result;
+-	struct work_struct		work;
+-	int (*read_into_pages)(struct TCP_Server_Info *server,
+-				struct cifs_readdata *rdata,
+-				unsigned int len);
+-	int (*copy_into_pages)(struct TCP_Server_Info *server,
+-				struct cifs_readdata *rdata,
+-				struct iov_iter *iter);
+-	struct kvec			iov[2];
+-	struct TCP_Server_Info		*server;
+-#ifdef CONFIG_CIFS_SMB_DIRECT
+-	struct smbd_mr			*mr;
+-#endif
+-	unsigned int			pagesz;
+-	unsigned int			page_offset;
+-	unsigned int			tailsz;
+-	struct cifs_credits		credits;
+-	unsigned int			nr_pages;
+-	struct page			**pages;
+-};
+-
+-/* asynchronous write support */
+-struct cifs_writedata {
+-	struct kref			refcount;
+-	struct list_head		list;
+-	struct completion		done;
+-	enum writeback_sync_modes	sync_mode;
+-	struct work_struct		work;
+-	struct cifsFileInfo		*cfile;
+-	struct cifs_aio_ctx		*ctx;
+-	__u64				offset;
+-	pid_t				pid;
+-	unsigned int			bytes;
+-	int				result;
+-	struct TCP_Server_Info		*server;
+-#ifdef CONFIG_CIFS_SMB_DIRECT
+-	struct smbd_mr			*mr;
+-#endif
+-	unsigned int			pagesz;
+-	unsigned int			page_offset;
+-	unsigned int			tailsz;
+-	struct cifs_credits		credits;
+-	unsigned int			nr_pages;
+-	struct page			**pages;
+-};
+-
+-/*
+- * Take a reference on the file private data. Must be called with
+- * cfile->file_info_lock held.
+- */
+-static inline void
+-cifsFileInfo_get_locked(struct cifsFileInfo *cifs_file)
+-{
+-	++cifs_file->count;
+-}
+-
+-struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file);
+-void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_hdlr,
+-		       bool offload);
+-void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+-
+-#define CIFS_CACHE_READ_FLG	1
+-#define CIFS_CACHE_HANDLE_FLG	2
+-#define CIFS_CACHE_RH_FLG	(CIFS_CACHE_READ_FLG | CIFS_CACHE_HANDLE_FLG)
+-#define CIFS_CACHE_WRITE_FLG	4
+-#define CIFS_CACHE_RW_FLG	(CIFS_CACHE_READ_FLG | CIFS_CACHE_WRITE_FLG)
+-#define CIFS_CACHE_RHW_FLG	(CIFS_CACHE_RW_FLG | CIFS_CACHE_HANDLE_FLG)
+-
+-#define CIFS_CACHE_READ(cinode) ((cinode->oplock & CIFS_CACHE_READ_FLG) || (CIFS_SB(cinode->netfs.inode.i_sb)->mnt_cifs_flags & CIFS_MOUNT_RO_CACHE))
+-#define CIFS_CACHE_HANDLE(cinode) (cinode->oplock & CIFS_CACHE_HANDLE_FLG)
+-#define CIFS_CACHE_WRITE(cinode) ((cinode->oplock & CIFS_CACHE_WRITE_FLG) || (CIFS_SB(cinode->netfs.inode.i_sb)->mnt_cifs_flags & CIFS_MOUNT_RW_CACHE))
+-
+-/*
+- * One of these for each file inode
+- */
+-
+-struct cifsInodeInfo {
+-	struct netfs_inode netfs; /* Netfslib context and vfs inode */
+-	bool can_cache_brlcks;
+-	struct list_head llist;	/* locks helb by this inode */
+-	/*
+-	 * NOTE: Some code paths call down_read(lock_sem) twice, so
+-	 * we must always use cifs_down_write() instead of down_write()
+-	 * for this semaphore to avoid deadlocks.
+-	 */
+-	struct rw_semaphore lock_sem;	/* protect the fields above */
+-	/* BB add in lists for dirty pages i.e. write caching info for oplock */
+-	struct list_head openFileList;
+-	spinlock_t	open_file_lock;	/* protects openFileList */
+-	__u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, system */
+-	unsigned int oplock;		/* oplock/lease level we have */
+-	unsigned int epoch;		/* used to track lease state changes */
+-#define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) /* oplock break in progress */
+-#define CIFS_INODE_PENDING_WRITERS	  (1) /* Writes in progress */
+-#define CIFS_INODE_FLAG_UNUSED		  (2) /* Unused flag */
+-#define CIFS_INO_DELETE_PENDING		  (3) /* delete pending on server */
+-#define CIFS_INO_INVALID_MAPPING	  (4) /* pagecache is invalid */
+-#define CIFS_INO_LOCK			  (5) /* lock bit for synchronization */
+-#define CIFS_INO_MODIFIED_ATTR            (6) /* Indicate change in mtime/ctime */
+-#define CIFS_INO_CLOSE_ON_LOCK            (7) /* Not to defer the close when lock is set */
+-	unsigned long flags;
+-	spinlock_t writers_lock;
+-	unsigned int writers;		/* Number of writers on this inode */
+-	unsigned long time;		/* jiffies of last update of inode */
+-	u64  server_eof;		/* current file size on server -- protected by i_lock */
+-	u64  uniqueid;			/* server inode number */
+-	u64  createtime;		/* creation time on server */
+-	__u8 lease_key[SMB2_LEASE_KEY_SIZE];	/* lease key for this inode */
+-	struct list_head deferred_closes; /* list of deferred closes */
+-	spinlock_t deferred_lock; /* protection on deferred list */
+-	bool lease_granted; /* Flag to indicate whether lease or oplock is granted. */
+-};
+-
+-static inline struct cifsInodeInfo *
+-CIFS_I(struct inode *inode)
+-{
+-	return container_of(inode, struct cifsInodeInfo, netfs.inode);
+-}
+-
+ static inline struct cifs_sb_info *
+ CIFS_SB(struct super_block *sb)
+ {
+@@ -1710,14 +1350,6 @@ struct mid_q_entry {
+ 	bool decrypted:1;	/* decrypted entry */
+ };
+ 
+-struct close_cancelled_open {
+-	struct cifs_fid         fid;
+-	struct cifs_tcon        *tcon;
+-	struct work_struct      work;
+-	__u64 mid;
+-	__u16 cmd;
+-};
+-
+ /*	Make code in transport.c a little cleaner by moving
+ 	update of optional stats into function below */
+ static inline void cifs_in_send_inc(struct TCP_Server_Info *server)
+@@ -1751,20 +1383,6 @@ static inline void cifs_save_when_sent(struct mid_q_entry *mid)
+ }
+ #endif
+ 
+-/* for pending dnotify requests */
+-struct dir_notify_req {
+-	struct list_head lhead;
+-	__le16 Pid;
+-	__le16 PidHigh;
+-	__u16 Mid;
+-	__u16 Tid;
+-	__u16 Uid;
+-	__u16 netfid;
+-	__u32 filter; /* CompletionFilter (for multishot) */
+-	int multishot;
+-	struct file *pfile;
+-};
+-
+ struct dfs_info3_param {
+ 	int flags; /* DFSREF_REFERRAL_SERVER, DFSREF_STORAGE_SERVER*/
+ 	int path_consumed;
+@@ -1775,11 +1393,6 @@ struct dfs_info3_param {
+ 	int ttl;
+ };
+ 
+-struct file_list {
+-	struct list_head list;
+-	struct cifsFileInfo *cfile;
+-};
+-
+ static inline void free_dfs_info_param(struct dfs_info3_param *param)
+ {
+ 	if (param) {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index abb65dd7471f..cf393e97e44b 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -34,6 +34,8 @@
+ #include <linux/bvec.h>
+ #include "cifspdu.h"
+ #include "cifsglob.h"
++#include "file.h"
++#include "inode.h"
+ #include "cifsproto.h"
+ #include "cifs_unicode.h"
+ #include "cifs_debug.h"
+diff --git a/fs/cifs/dir.h b/fs/cifs/dir.h
+new file mode 100644
+index 000000000000..df6997e2886a
+--- /dev/null
++++ b/fs/cifs/dir.h
+@@ -0,0 +1,77 @@
++/* SPDX-License-Identifier: LGPL-2.1 */
++/*
++ * Routines related to dir operations
++ */
++#ifndef _CIFS_DIR_H
++#define _CIFS_DIR_H
++
++#include <linux/fs.h>
++
++/*
++ * common struct for holding inode info when searching for or updating an
++ * inode with new info
++ */
++
++#define CIFS_FATTR_DFS_REFERRAL		0x1
++#define CIFS_FATTR_DELETE_PENDING	0x2
++#define CIFS_FATTR_NEED_REVAL		0x4
++#define CIFS_FATTR_INO_COLLISION	0x8
++#define CIFS_FATTR_UNKNOWN_NLINK	0x10
++#define CIFS_FATTR_FAKE_ROOT_INO	0x20
++
++/* XXX: this probably doesn't belong here */
++struct cifs_fattr {
++	u32		cf_flags;
++	u32		cf_cifsattrs;
++	u64		cf_uniqueid;
++	u64		cf_eof;
++	u64		cf_bytes;
++	u64		cf_createtime;
++	kuid_t		cf_uid;
++	kgid_t		cf_gid;
++	umode_t		cf_mode;
++	dev_t		cf_rdev;
++	unsigned int	cf_nlink;
++	unsigned int	cf_dtype;
++	struct timespec64 cf_atime;
++	struct timespec64 cf_mtime;
++	struct timespec64 cf_ctime;
++	u32             cf_cifstag;
++};
++
++struct cached_dirent {
++	struct list_head entry;
++	char *name;
++	int namelen;
++	loff_t pos;
++
++	struct cifs_fattr fattr;
++};
++
++struct cached_dirents {
++	bool is_valid:1;
++	bool is_failed:1;
++	struct dir_context *ctx; /*
++				  * Only used to make sure we only take entries
++				  * from a single context. Never dereferenced.
++				  */
++	struct mutex de_mutex;
++	int pos;		 /* Expected ctx->pos */
++	struct list_head entries;
++};
++
++struct cached_fid {
++	bool is_valid:1;	/* Do we have a useable root fid */
++	bool file_all_info_is_valid:1;
++	bool has_lease:1;
++	unsigned long time; /* jiffies of when lease was taken */
++	struct kref refcount;
++	struct cifs_fid *fid;
++	struct mutex fid_mutex;
++	struct cifs_tcon *tcon;
++	struct dentry *dentry;
++	struct work_struct lease_break;
++	struct smb2_file_all_info file_all_info;
++	struct cached_dirents dirents;
++};
++#endif /* _CIFS_DIR_H */
+diff --git a/fs/cifs/file.h b/fs/cifs/file.h
+index 943dfa512f41..09fd31d3c8bd 100644
+--- a/fs/cifs/file.h
++++ b/fs/cifs/file.h
+@@ -5,6 +5,236 @@
+ #ifndef _CIFS_FILE_H
+ #define _CIFS_FILE_H
+ 
++#include <linux/scatterlist.h>
++#include <linux/writeback.h>
++#include <linux/uio.h>
++#include "../smbfs_common/smb2pdu.h"
++
++#define CIFS_OPLOCK_NO_CHANGE 0xfe
++
++struct cifs_pending_open {
++	struct list_head olist;
++	struct tcon_link *tlink;
++	__u8 lease_key[16];
++	__u32 oplock;
++};
++
++struct cifs_deferred_close {
++	struct list_head dlist;
++	struct tcon_link *tlink;
++	__u16  netfid;
++	__u64  persistent_fid;
++	__u64  volatile_fid;
++};
++
++struct cifs_fid {
++	__u16 netfid;
++	__u64 persistent_fid;	/* persist file id for smb2 */
++	__u64 volatile_fid;	/* volatile file id for smb2 */
++	__u8 lease_key[SMB2_LEASE_KEY_SIZE];	/* lease key for smb2 */
++	__u8 create_guid[16];
++	__u32 access;
++	struct cifs_pending_open *pending_open;
++	unsigned int epoch;
++#ifdef CONFIG_CIFS_DEBUG2
++	__u64 mid;
++#endif /* CIFS_DEBUG2 */
++	bool purge_cache;
++};
++
++struct close_cancelled_open {
++	struct cifs_fid         fid;
++	struct cifs_tcon        *tcon;
++	struct work_struct      work;
++	__u64 mid;
++	__u16 cmd;
++};
++
++/*
++ * One of these for each open instance of a file
++ */
++struct cifs_search_info {
++	loff_t index_of_last_entry;
++	__u16 entries_in_buffer;
++	__u16 info_level;
++	__u32 resume_key;
++	char *ntwrk_buf_start;
++	char *srch_entries_start;
++	char *last_entry;
++	const char *presume_name;
++	unsigned int resume_name_len;
++	bool endOfSearch:1;
++	bool emptyDir:1;
++	bool unicode:1;
++	bool smallBuf:1; /* so we know which buf_release function to call */
++};
++
++struct cifsFileInfo {
++	/* following two lists are protected by tcon->open_file_lock */
++	struct list_head tlist;	/* pointer to next fid owned by tcon */
++	struct list_head flist;	/* next fid (file instance) for this inode */
++	/* lock list below protected by cifsi->lock_sem */
++	struct cifs_fid_locks *llist;	/* brlocks held by this fid */
++	kuid_t uid;		/* allows finding which FileInfo structure */
++	__u32 pid;		/* process id who opened file */
++	struct cifs_fid fid;	/* file id from remote */
++	struct list_head rlist; /* reconnect list */
++	/* BB add lock scope info here if needed */ ;
++	/* lock scope id (0 if none) */
++	struct dentry *dentry;
++	struct tcon_link *tlink;
++	unsigned int f_flags;
++	bool invalidHandle:1;	/* file closed via session abend */
++	bool swapfile:1;
++	bool oplock_break_cancelled:1;
++	unsigned int oplock_epoch; /* epoch from the lease break */
++	__u32 oplock_level; /* oplock/lease level from the lease break */
++	int count;
++	spinlock_t file_info_lock; /* protects four flag/count fields above */
++	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
++	struct cifs_search_info srch_inf;
++	struct work_struct oplock_break; /* work for oplock breaks */
++	struct work_struct put; /* work for the final part of _put */
++	struct delayed_work deferred;
++	bool deferred_close_scheduled; /* Flag to indicate close is scheduled */
++};
++
++struct cifs_fid_locks {
++	struct list_head llist;
++	struct cifsFileInfo *cfile;	/* fid that owns locks */
++	struct list_head locks;		/* locks held by fid above */
++};
++
++struct cifs_io_parms {
++	__u16 netfid;
++	__u64 persistent_fid;	/* persist file id for smb2 */
++	__u64 volatile_fid;	/* volatile file id for smb2 */
++	__u32 pid;
++	__u64 offset;
++	unsigned int length;
++	struct cifs_tcon *tcon;
++	struct TCP_Server_Info *server;
++};
++
++struct cifs_aio_ctx {
++	struct kref		refcount;
++	struct list_head	list;
++	struct mutex		aio_mutex;
++	struct completion	done;
++	struct iov_iter		iter;
++	struct kiocb		*iocb;
++	struct cifsFileInfo	*cfile;
++	struct bio_vec		*bv;
++	loff_t			pos;
++	unsigned int		npages;
++	ssize_t			rc;
++	unsigned int		len;
++	unsigned int		total_len;
++	bool			should_dirty;
++	/*
++	 * Indicates if this aio_ctx is for direct_io,
++	 * If yes, iter is a copy of the user passed iov_iter
++	 */
++	bool			direct_io;
++};
++
++/* XXX: move this to something server-related later */
++struct cifs_credits {
++	unsigned int value;
++	unsigned int instance;
++};
++
++/* asynchronous read support */
++struct cifs_readdata {
++	struct kref			refcount;
++	struct list_head		list;
++	struct completion		done;
++	struct cifsFileInfo		*cfile;
++	struct address_space		*mapping;
++	struct cifs_aio_ctx		*ctx;
++	__u64				offset;
++	unsigned int			bytes;
++	unsigned int			got_bytes;
++	pid_t				pid;
++	int				result;
++	struct work_struct		work;
++	int (*read_into_pages)(struct TCP_Server_Info *server,
++				struct cifs_readdata *rdata,
++				unsigned int len);
++	int (*copy_into_pages)(struct TCP_Server_Info *server,
++				struct cifs_readdata *rdata,
++				struct iov_iter *iter);
++	struct kvec			iov[2];
++	struct TCP_Server_Info		*server;
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	struct smbd_mr			*mr;
++#endif
++	unsigned int			pagesz;
++	unsigned int			page_offset;
++	unsigned int			tailsz;
++	struct cifs_credits		credits;
++	unsigned int			nr_pages;
++	struct page			**pages;
++};
++
++/* asynchronous write support */
++struct cifs_writedata {
++	struct kref			refcount;
++	struct list_head		list;
++	struct completion		done;
++	enum writeback_sync_modes	sync_mode;
++	struct work_struct		work;
++	struct cifsFileInfo		*cfile;
++	struct cifs_aio_ctx		*ctx;
++	__u64				offset;
++	pid_t				pid;
++	unsigned int			bytes;
++	int				result;
++	struct TCP_Server_Info		*server;
++#ifdef CONFIG_CIFS_SMB_DIRECT
++	struct smbd_mr			*mr;
++#endif
++	unsigned int			pagesz;
++	unsigned int			page_offset;
++	unsigned int			tailsz;
++	struct cifs_credits		credits;
++	unsigned int			nr_pages;
++	struct page			**pages;
++};
++
++struct file_list {
++	struct list_head list;
++	struct cifsFileInfo *cfile;
++};
++
++/*
++ * This info hangs off the cifsFileInfo structure, pointed to by llist.
++ * This is used to track byte stream locks on the file
++ */
++struct cifsLockInfo {
++	struct list_head llist;	/* pointer to next cifsLockInfo */
++	struct list_head blist; /* pointer to locks blocked on this */
++	wait_queue_head_t block_q;
++	__u64 offset;
++	__u64 length;
++	__u32 pid;
++	__u16 type;
++	__u16 flags;
++};
++
++#define ACL_NO_MODE	((umode_t)(-1))
++struct cifs_open_parms {
++	struct cifs_tcon *tcon;
++	struct cifs_sb_info *cifs_sb;
++	int disposition;
++	int desired_access;
++	int create_options;
++	const char *path;
++	struct cifs_fid *fid;
++	umode_t mode;
++	bool reconnect:1;
++};
++
+ extern const struct file_operations cifs_file_ops;
+ extern const struct file_operations cifs_file_direct_ops; /* if directio mnt */
+ extern const struct file_operations cifs_file_strict_ops; /* if strictio mnt */
+@@ -35,4 +265,13 @@ ssize_t cifs_user_readv(struct kiocb *, struct iov_iter *);
+ ssize_t cifs_strict_readv(struct kiocb *, struct iov_iter *);
+ int cifs_file_strict_mmap(struct file *, struct vm_area_struct *);
+ int cifs_file_mmap(struct file *, struct vm_area_struct *);
++
++/*
++ * Take a reference on the file private data. Must be called with
++ * cfile->file_info_lock held.
++ */
++static inline void cifsFileInfo_get_locked(struct cifsFileInfo *cifs_file)
++{
++	++cifs_file->count;
++}
+ #endif /* _CIFS_FILE_H */
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 9c20e09cf00f..746754903fc0 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -26,6 +26,7 @@
+ #include "fs_context.h"
+ #include "cifs_ioctl.h"
+ #include "inode.h"
++#include "dir.h"
+ 
+ extern const struct inode_operations cifs_dfs_referral_inode_operations;
+ 
+diff --git a/fs/cifs/inode.h b/fs/cifs/inode.h
+index 5fe93ae79232..febddffd8b01 100644
+--- a/fs/cifs/inode.h
++++ b/fs/cifs/inode.h
+@@ -4,7 +4,66 @@
+  */
+ #ifndef _CIFS_INODE_H
+ #define _CIFS_INODE_H
++
+ #include <linux/fs.h>
++#include <linux/netfs.h>
++#include "../smbfs_common/smb2pdu.h"
++
++#define CIFS_CACHE_READ_FLG	1
++#define CIFS_CACHE_HANDLE_FLG	2
++#define CIFS_CACHE_RH_FLG	(CIFS_CACHE_READ_FLG | CIFS_CACHE_HANDLE_FLG)
++#define CIFS_CACHE_WRITE_FLG	4
++#define CIFS_CACHE_RW_FLG	(CIFS_CACHE_READ_FLG | CIFS_CACHE_WRITE_FLG)
++#define CIFS_CACHE_RHW_FLG	(CIFS_CACHE_RW_FLG | CIFS_CACHE_HANDLE_FLG)
++
++#define CIFS_CACHE_READ(cinode) \
++	((cinode->oplock & CIFS_CACHE_READ_FLG) || \
++	 (CIFS_SB(cinode->netfs.inode.i_sb)->mnt_cifs_flags & CIFS_MOUNT_RO_CACHE))
++#define CIFS_CACHE_HANDLE(cinode) \
++	(cinode->oplock & CIFS_CACHE_HANDLE_FLG)
++#define CIFS_CACHE_WRITE(cinode) \
++	((cinode->oplock & CIFS_CACHE_WRITE_FLG) || \
++	 (CIFS_SB(cinode->netfs.inode.i_sb)->mnt_cifs_flags & CIFS_MOUNT_RW_CACHE))
++
++/*
++ * One of these for each file inode
++ */
++struct cifsInodeInfo {
++	struct netfs_inode netfs; /* Netfslib context and vfs inode */
++	bool can_cache_brlcks;
++	struct list_head llist;	/* locks helb by this inode */
++	/*
++	 * NOTE: Some code paths call down_read(lock_sem) twice, so
++	 * we must always use cifs_down_write() instead of down_write()
++	 * for this semaphore to avoid deadlocks.
++	 */
++	struct rw_semaphore lock_sem;	/* protect the fields above */
++	/* BB add in lists for dirty pages i.e. write caching info for oplock */
++	struct list_head openFileList;
++	spinlock_t	open_file_lock;	/* protects openFileList */
++	__u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, system */
++	unsigned int oplock;		/* oplock/lease level we have */
++	unsigned int epoch;		/* used to track lease state changes */
++#define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) /* oplock break in progress */
++#define CIFS_INODE_PENDING_WRITERS	  (1) /* Writes in progress */
++#define CIFS_INODE_FLAG_UNUSED		  (2) /* Unused flag */
++#define CIFS_INO_DELETE_PENDING		  (3) /* delete pending on server */
++#define CIFS_INO_INVALID_MAPPING	  (4) /* pagecache is invalid */
++#define CIFS_INO_LOCK			  (5) /* lock bit for synchronization */
++#define CIFS_INO_MODIFIED_ATTR            (6) /* Indicate change in mtime/ctime */
++#define CIFS_INO_CLOSE_ON_LOCK            (7) /* Not to defer the close when lock is set */
++	unsigned long flags;
++	spinlock_t writers_lock;
++	unsigned int writers;		/* Number of writers on this inode */
++	unsigned long time;		/* jiffies of last update of inode */
++	u64  server_eof;		/* current file size on server -- protected by i_lock */
++	u64  uniqueid;			/* server inode number */
++	u64  createtime;		/* creation time on server */
++	__u8 lease_key[SMB2_LEASE_KEY_SIZE];	/* lease key for this inode */
++	struct list_head deferred_closes; /* list of deferred closes */
++	spinlock_t deferred_lock; /* protection on deferred list */
++	bool lease_granted; /* Flag to indicate whether lease or oplock is granted. */
++};
+ 
+ extern void cifs_setsize(struct inode *, loff_t);
+ extern int cifs_truncate_page(struct address_space *, loff_t);
+@@ -29,4 +88,14 @@ int cifs_create(struct user_namespace *, struct inode *, struct dentry *,
+ 		umode_t, bool);
+ int cifs_atomic_open(struct inode *, struct dentry *, struct file *,
+ 		     unsigned, umode_t);
++
++struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file);
++void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_hdlr,
++		       bool offload);
++void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
++
++static inline struct cifsInodeInfo *CIFS_I(struct inode *inode)
++{
++	return container_of(inode, struct cifsInodeInfo, netfs.inode);
++}
+ #endif /* _CIFS_INODE_H */
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 384cabdf47ca..5c92970e9312 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -21,6 +21,7 @@
+ #include "cifsfs.h"
+ #include "smb2proto.h"
+ #include "fs_context.h"
++#include "dir.h"
+ 
+ /*
+  * To be safe - for UCS to UTF-8 with strings loaded with the rare long
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index f36b2d2d40ca..7b5b62815a0d 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -14,6 +14,8 @@
+ #include "cifspdu.h"
+ #include "cifs_unicode.h"
+ #include "fs_context.h"
++#include "file.h"
++#include "inode.h"
+ 
+ /*
+  * An NT cancel request header looks just like the original request except:
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 818cc4dee0e2..cf57e85a3e69 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -16,6 +16,8 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
+ #include "nterr.h"
++#include "file.h"
++#include "inode.h"
+ 
+ static int
+ check_smb2_hdr(struct smb2_hdr *shdr, __u64 mid)
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 82dd2e973753..7ccacefdab3b 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -27,6 +27,7 @@
+ #include "smbdirect.h"
+ #include "fscache.h"
+ #include "fs_context.h"
++#include "dir.h"
+ 
+ /* Change credits for different ops and return the total number of credits */
+ static int
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index f57881b8464f..ef19306c52a1 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -12,6 +12,7 @@
+ #define _SMB2PDU_H
+ 
+ #include <net/sock.h>
++#include "../smbfs_common/smb2pdu.h"
+ #include "cifsacl.h"
+ 
+ /* 52 transform hdr + 64 hdr + 88 create rsp */
+-- 
+2.35.3
+
