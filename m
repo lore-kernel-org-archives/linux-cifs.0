@@ -2,177 +2,318 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44398C00140
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Aug 2022 20:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F1DC19F29
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Aug 2022 21:11:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233658AbiHBUHa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Aug 2022 16:07:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50456 "EHLO
+        id S232519AbiHBVLm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Aug 2022 17:11:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233510AbiHBUH2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 16:07:28 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CEB154640;
-        Tue,  2 Aug 2022 13:07:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S232094AbiHBVLl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 17:11:41 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E4346D86
+        for <linux-cifs@vger.kernel.org>; Tue,  2 Aug 2022 14:11:38 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 80787B820BC;
-        Tue,  2 Aug 2022 20:07:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CD79C433C1;
-        Tue,  2 Aug 2022 20:07:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659470842;
-        bh=aRjcPgT3PZNuFEyvFjyZ4vab6bdQ6W52MV2WjeBkq4M=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=MgHL2/D6pXPgUKWakoT3B0+cYFJkPAwPicUFUgcQqHzymvq7CFPuSO0zZtcdbYtkc
-         QIuk1oUebpF/bM4EemMZHeT4b0KxG458k5Fr/LWkNwjzyr+ADwvkz71WIVE26PfWm7
-         HOGTPve84hsG1gmhsikjwRNF9s2EjIzHhji7QDZYu4nu/YUvEVWfhrY+e52tJdr1FQ
-         c1bHzA5lRBo3xSnM7lkD5PGmu8SiMaTUds8qMiKnqtAgZQLlvywoDFHLqodsQROi/R
-         QgTOmg//rhGPJOYPND5sC/zxm6KqOdaFWMjYs9hTm5slVUz44F87Y3jf4EQMr+ivYu
-         NxJyICHaayGAw==
-Message-ID: <6f3479265b446d180d71832fd0c12650b908ebe2.camel@kernel.org>
-Subject: Re: [RFC PATCH 0/3] Rename "cifs" module to "smbfs"
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Enzo Matsumiya <ematsumiya@suse.de>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@cjr.nz,
-        ronniesahlberg@gmail.com, nspmangalore@gmail.com,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        tom@talpey.com, samba-technical@lists.samba.org,
-        pshilovsky@samba.org
-Date:   Tue, 02 Aug 2022 16:07:19 -0400
-In-Reply-To: <20220802193620.dyvt5qiszm2pobsr@cyberdelia>
-References: <20220801190933.27197-1-ematsumiya@suse.de>
-         <c05f4fc668fa97e737758ab03030d7170c0edbd9.camel@kernel.org>
-         <20220802193620.dyvt5qiszm2pobsr@cyberdelia>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C374E20BF3;
+        Tue,  2 Aug 2022 21:11:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1659474696; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=V6EBumGn1zm2isCTZ9PaqYpDmAcaUataJjFLh6wxnro=;
+        b=kXkyymrDREYNGAn+NxJvjPTB+h2srl+sbmDgWoeuwUjWUq1IN0ir3CvLMiWr7Ppk2G6qnI
+        eFcyBQDdMW2NrbZUogmFW+qFw23BwkImGZrtsxQUL7dwgzapymU6BvpM4DqAhGM2EJ0D8l
+        HzH4xSjmyK27DceMAJ/++QSJUK0etXA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1659474696;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=V6EBumGn1zm2isCTZ9PaqYpDmAcaUataJjFLh6wxnro=;
+        b=tJOpv4SRkhbXM3RTiIzfVm4lmqVip+pGmZ7MRTtqtnEn7JO+nO2i4Iokepm4LTije+sdLR
+        JKcHxZffHxchdeAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4381113A8E;
+        Tue,  2 Aug 2022 21:11:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 33yYAQiT6WIZDAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Tue, 02 Aug 2022 21:11:36 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com
+Subject: [PATCH] cifs: remove useless DeleteMidQEntry()
+Date:   Tue,  2 Aug 2022 18:11:24 -0300
+Message-Id: <20220802211124.4014-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 2022-08-02 at 16:36 -0300, Enzo Matsumiya wrote:
-> On 08/02, Jeff Layton wrote:
-> > On Mon, 2022-08-01 at 16:09 -0300, Enzo Matsumiya wrote:
-> > > Hi,
-> > >=20
-> > > As part of the ongoing effort to remove the "cifs" nomenclature from =
-the
-> > > Linux SMB client, I'm proposing the rename of the module to "smbfs".
-> > >=20
-> > > As it's widely known, CIFS is associated to SMB1.0, which, in turn, i=
-s
-> > > associated with the security issues it presented in the past. Using
-> > > "SMBFS" makes clear what's the protocol in use for outsiders, but als=
-o
-> > > unties it from any particular protocol version. It also fits in the
-> > > already existing "fs/smbfs_common" and "fs/ksmbd" naming scheme.
-> > >=20
-> > > This short patch series only changes directory names and includes/ifd=
-efs in
-> > > headers and source code, and updates docs to reflect the rename. Othe=
-r
-> > > than that, no source code/functionality is modified (WIP though).
-> > >=20
-> > > Patch 1/3: effectively changes the module name to "smbfs" and create =
-a
-> > > 	   "cifs" module alias to maintain compatibility (a warning
-> > > 	   should be added to indicate the complete removal/isolation of
-> > > 	   CIFS/SMB1.0 code).
-> > > Patch 2/3: rename the source-code directory to align with the new mod=
-ule
-> > > 	   name
-> > > Patch 3/3: update documentation references to "fs/cifs" or "cifs.ko" =
-or
-> > > 	   "cifs module" to use the new name
-> > >=20
-> > > Enzo Matsumiya (3):
-> > >   cifs: change module name to "smbfs.ko"
-> > >   smbfs: rename directory "fs/cifs" -> "fs/smbfs"
-> > >   smbfs: update doc references
-> > > ...
-> >=20
-> > Why do this? My inclination is to say NAK here.
-> >=20
-> > This seems like a lot of change for not a lot of benefit. Renaming the
-> > directory like this pretty much guarantees that backporting patches
-> > after this change to kernels that existed before it will be very
-> > difficult.
->=20
-> Hi Jeff, yes that's a big concern that I've discussed internally with my
-> team as well, since we'll also suffer from those future backports.
->=20
-> But, as stated in the commit message, and from what I gathered from
-> Steve, it has been an ongoing wish to have the "cifs" name no longer
-> associated with a module handling SMB2.0 and SMB3.0, as the name brings
-> back old bad memories for several users.
->=20
-> There really is no functional benefit for this change, and I have no
-> argument against that.
->=20
+DeleteMidQEntry() was just a proxy for cifs_mid_q_entry_release().
 
-If the concern is "branding" then I don't see how this really helps.
-Very few users interact with the kernel modules directly.
+Remove DeleteMidQEntry(), rename cifs_mid_q_entry_release() to
+cifs_release_mid().
 
-FWIW, I just called "modprobe smb3" on my workstation and got this:
+Also rename the kref_put() callback _cifs_mid_q_entry_release to
+__cifs_release_mid.
 
-[ 1223.581583] Key type cifs.spnego registered
-[ 1223.582523] Key type cifs.idmap registered
-[ 1230.411422] Key type cifs.idmap unregistered
-[ 1230.412542] Key type cifs.spnego unregistered
+Update callers to cifs_mid_q_entry_release and DeleteMidQEntry to use
+cifs_release_mid.
 
-Are you going to rename the keyrings too? That will have implications
-for userland helper programs like cifs.upcall. There's also
-/proc/fs/cifs/*.
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/cifs/cifsproto.h     |  3 +--
+ fs/cifs/cifssmb.c       |  6 +++---
+ fs/cifs/connect.c       |  8 ++++----
+ fs/cifs/smb2ops.c       |  2 +-
+ fs/cifs/smb2pdu.c       |  6 +++---
+ fs/cifs/smb2transport.c |  2 +-
+ fs/cifs/transport.c     | 25 ++++++++++---------------
+ 7 files changed, 23 insertions(+), 29 deletions(-)
 
-These are a "stable interfaces" that you can't just rename at will.=A0If
-you want to change these interfaces then you need to do a formal
-deprecation announcement, and probably a period with /proc/fs/smbfs and
-/proc/fs/cifs coexisting.
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index de167e3af015..853ea4c8d88e 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -81,9 +81,8 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+ /* extern void renew_parental_timestamps(struct dentry *direntry);*/
+ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
+-extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+ extern void cifs_delete_mid(struct mid_q_entry *mid);
+-extern void cifs_mid_q_entry_release(struct mid_q_entry *midEntry);
++extern void cifs_release_mid(struct mid_q_entry *mid);
+ extern void cifs_wake_up_task(struct mid_q_entry *mid);
+ extern int cifs_handle_standard(struct TCP_Server_Info *server,
+ 				struct mid_q_entry *mid);
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 26b9d2438228..f0d72575e3c0 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -591,7 +591,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
+ 	struct TCP_Server_Info *server = mid->callback_data;
+ 	struct cifs_credits credits = { .value = 1, .instance = 0 };
+ 
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ 	add_credits(server, &credits, CIFS_ECHO_OP);
+ }
+ 
+@@ -1336,7 +1336,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 	}
+ 
+ 	queue_work(cifsiod_wq, &rdata->work);
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ 	add_credits(server, &credits, 0);
+ }
+ 
+@@ -1684,7 +1684,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
+ 	}
+ 
+ 	queue_work(cifsiod_wq, &wdata->work);
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ 	add_credits(tcon->ses->server, &credits, 0);
+ }
+ 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index abb65dd7471f..eb7e75deb9d2 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -334,7 +334,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
+ 	list_for_each_entry_safe(mid, nmid, &retry_list, qhead) {
+ 		list_del_init(&mid->qhead);
+ 		mid->callback(mid);
+-		cifs_mid_q_entry_release(mid);
++		cifs_release_mid(mid);
+ 	}
+ 
+ 	if (cifs_rdma_enabled(server)) {
+@@ -1007,7 +1007,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 			cifs_dbg(FYI, "Callback mid %llu\n", mid_entry->mid);
+ 			list_del_init(&mid_entry->qhead);
+ 			mid_entry->callback(mid_entry);
+-			cifs_mid_q_entry_release(mid_entry);
++			cifs_release_mid(mid_entry);
+ 		}
+ 		/* 1/8th of sec is more than enough time for them to exit */
+ 		msleep(125);
+@@ -1246,7 +1246,7 @@ cifs_demultiplex_thread(void *p)
+ 		if (length < 0) {
+ 			for (i = 0; i < num_mids; i++)
+ 				if (mids[i])
+-					cifs_mid_q_entry_release(mids[i]);
++					cifs_release_mid(mids[i]);
+ 			continue;
+ 		}
+ 
+@@ -1273,7 +1273,7 @@ cifs_demultiplex_thread(void *p)
+ 				if (!mids[i]->multiRsp || mids[i]->multiEnd)
+ 					mids[i]->callback(mids[i]);
+ 
+-				cifs_mid_q_entry_release(mids[i]);
++				cifs_release_mid(mids[i]);
+ 			} else if (server->ops->is_oplock_break &&
+ 				   server->ops->is_oplock_break(bufs[i],
+ 								server)) {
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 82dd2e973753..ad3b13283717 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -5099,7 +5099,7 @@ static void smb2_decrypt_offload(struct work_struct *work)
+ 				spin_unlock(&dw->server->srv_lock);
+ 			}
+ 		}
+-		cifs_mid_q_entry_release(mid);
++		cifs_release_mid(mid);
+ 	}
+ 
+ free_pages:
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 131bec79d6fd..a24e05586d5c 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3776,7 +3776,7 @@ smb2_echo_callback(struct mid_q_entry *mid)
+ 		credits.instance = server->reconnect_instance;
+ 	}
+ 
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ 	add_credits(server, &credits, CIFS_ECHO_OP);
+ }
+ 
+@@ -4201,7 +4201,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 				     rdata->offset, rdata->got_bytes);
+ 
+ 	queue_work(cifsiod_wq, &rdata->work);
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ 	add_credits(server, &credits, 0);
+ }
+ 
+@@ -4440,7 +4440,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
+ 				      wdata->offset, wdata->bytes);
+ 
+ 	queue_work(cifsiod_wq, &wdata->work);
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ 	add_credits(server, &credits, 0);
+ }
+ 
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index f64922f340b3..f3068786a199 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -890,7 +890,7 @@ smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	rc = smb2_sign_rqst(rqst, server);
+ 	if (rc) {
+ 		revert_current_mid_from_hdr(server, shdr);
+-		DeleteMidQEntry(mid);
++		cifs_release_mid(mid);
+ 		return ERR_PTR(rc);
+ 	}
+ 
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 914a7aaf9fa7..24caf1fb7213 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -74,7 +74,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 	return temp;
+ }
+ 
+-static void _cifs_mid_q_entry_release(struct kref *refcount)
++static void __cifs_release_mid(struct kref *refcount)
+ {
+ 	struct mid_q_entry *midEntry =
+ 			container_of(refcount, struct mid_q_entry, refcount);
+@@ -153,20 +153,15 @@ static void _cifs_mid_q_entry_release(struct kref *refcount)
+ 	mempool_free(midEntry, cifs_mid_poolp);
+ }
+ 
+-void cifs_mid_q_entry_release(struct mid_q_entry *midEntry)
++void cifs_release_mid(struct mid_q_entry *mid)
+ {
+-	struct TCP_Server_Info *server = midEntry->server;
++	struct TCP_Server_Info *server = mid->server;
+ 
+ 	spin_lock(&server->mid_lock);
+-	kref_put(&midEntry->refcount, _cifs_mid_q_entry_release);
++	kref_put(&mid->refcount, __cifs_release_mid);
+ 	spin_unlock(&server->mid_lock);
+ }
+ 
+-void DeleteMidQEntry(struct mid_q_entry *midEntry)
+-{
+-	cifs_mid_q_entry_release(midEntry);
+-}
+-
+ void
+ cifs_delete_mid(struct mid_q_entry *mid)
+ {
+@@ -177,7 +172,7 @@ cifs_delete_mid(struct mid_q_entry *mid)
+ 	}
+ 	spin_unlock(&mid->server->mid_lock);
+ 
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ }
+ 
+ /*
+@@ -791,7 +786,7 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 
+ 	rc = cifs_sign_rqst(rqst, server, &mid->sequence_number);
+ 	if (rc) {
+-		DeleteMidQEntry(mid);
++		cifs_release_mid(mid);
+ 		return ERR_PTR(rc);
+ 	}
+ 
+@@ -940,7 +935,7 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+ 	}
+ 	spin_unlock(&server->mid_lock);
+ 
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ 	return rc;
+ }
+ 
+@@ -1029,7 +1024,7 @@ static void
+ cifs_cancelled_callback(struct mid_q_entry *mid)
+ {
+ 	cifs_compound_callback(mid);
+-	DeleteMidQEntry(mid);
++	cifs_release_mid(mid);
+ }
+ 
+ /*
+@@ -1425,7 +1420,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 		spin_lock(&server->mid_lock);
+ 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 			/* no longer considered to be "in-flight" */
+-			midQ->callback = DeleteMidQEntry;
++			midQ->callback = cifs_release_mid;
+ 			spin_unlock(&server->mid_lock);
+ 			add_credits(server, &credits, 0);
+ 			return rc;
+@@ -1606,7 +1601,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 			spin_lock(&server->mid_lock);
+ 			if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 				/* no longer considered to be "in-flight" */
+-				midQ->callback = DeleteMidQEntry;
++				midQ->callback = cifs_release_mid;
+ 				spin_unlock(&server->mid_lock);
+ 				return rc;
+ 			}
+-- 
+2.35.3
 
-There are also a ton of printk's and such that have "CIFS" in them that
-will need to be changed.
-
-These costs do not seem worth the perceived benefit to me. You could
-probably hide a lot of what users see by just renaming (or symlinking)
-mount.cifs to mount.smb3.
-
-I think if you guys are serious about this, you should probably start
-somewhere else besides renaming the directory and module. This is going
-to impact developers (and people who make their living doing backports)
-far more than it will users.
-
-> > Also, bear in mind that there used to be an smbfs in the kernel that
-> > predated cifs.ko. That was removed ~2010 though, which is long enough
-> > ago that it shouldn't produce conflicts in currently shipping releases.=
-=A0
->=20
-> Yes, I was aware of this before sending v1, and it got raised again in
-> https://lore.kernel.org/all/20220802135201.4vm36drd5mp57nvv@cyberdelia/
->=20
-> I have no experience on what kind of issues/problems could arise of
-> that, aside from the git commit history being weird. If you ever seen
-> any problems with that happening, please do share.
->=20
-
-I doubt it'd be a problem in practice. If we hadn't ripped out smbfs so
-long ago I'd be more concerned, but that's pretty much ancient history
-now.
-
->=20
-> I sent a v2 with a new "fs/smb" directory name, but kept "smbfs" as the
-> module name.
->=20
-
-That's a little nicer, but really the problem is the "big rename"
-itself.
-
-> Sorry I didn't reply to you before that, I got confused as the thread
-> replies all went to different folders in my mailbox.
->=20
-
-No worries.
---=20
-Jeff Layton <jlayton@kernel.org>
