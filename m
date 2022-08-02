@@ -2,348 +2,312 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC97BC00144
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Aug 2022 00:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C99AEC00140
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Aug 2022 04:48:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231449AbiHBAnH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 1 Aug 2022 20:43:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58840 "EHLO
+        id S233231AbiHBEsK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Aug 2022 00:48:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231290AbiHBAnG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 1 Aug 2022 20:43:06 -0400
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3E06193CB
-        for <linux-cifs@vger.kernel.org>; Mon,  1 Aug 2022 17:43:04 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id 125so13033682vsd.5
-        for <linux-cifs@vger.kernel.org>; Mon, 01 Aug 2022 17:43:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LWWYr28czfw+bXxOV1I/HYKobD+nw65mPR7JUy86+Jg=;
-        b=Qd2PEY6tkzBCFGEBbY5WbcfWJrIrxAUzOdOWzvEj8tmKkAkoN9h3OQQvOpMfj5etUU
-         OyDbyYPJPy/vW66l32Tyk3fnumpeQNEk9zVG8/21oDcKTCtmwT5Uyc8avhWA4D23o0q/
-         LDUQIOgVvoDeBUbgRSrvsHS/vTxCqaeY63dm4Hu3BDfBmeavUP3PtLjh9jTMMs5M0Nuh
-         4Lch5qSmQuWqD5MaQbrtVBu6qeKUqFuYcRkaRS5rrh82HjJm8jYsaMy/cx2SvdJuI36N
-         ABYoJZjMTUL5ncYFLEkhi9QHhFdC7HjWe7QA0x6HZEQuAnoSBPfoNOmc/a7pRzv4PIA0
-         vO9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LWWYr28czfw+bXxOV1I/HYKobD+nw65mPR7JUy86+Jg=;
-        b=UBjytZoM872L3pDp/ZHWoCRibxb0GyQsv9Ws/2o8LdQqSI1iQLOaeAJscjh4HRkrN2
-         fzonpUcPSuOnMPV2+Q73vlCtQMGnV2sE6SLpiWZDa1T8WK+z8cmGm+VBFU9x/0krF/QQ
-         Vh/JHet0okr0pKwdvhbm2isoB7NVLAhNhba1oxlNHI/m/laWfooUWl02Bs3ypUVa/p4t
-         UhuB7SQwz6dn0Ipi9VijbT4Z2g6pBfw76/UR8zgW8QscmrxQMsCIvCEiK0CCpNLrNKMW
-         C1Cj6AS9/vkyVMf3/LPDCNWeK2sZ4tk08ktLJZH4ErhaaRpDQsoVQsB2ta+IFhTmXgAR
-         nqOA==
-X-Gm-Message-State: ACgBeo0PpZr8C4hWC3AA3b8odrGWHYIMlYzz7JvFHDZul8iI3mSPvyuC
-        A462psqTPkWlMdjuQ+UYNc8Y4+i+e9f/ie4r+LLcLlWs
-X-Google-Smtp-Source: AA6agR6snOzEjzYuWQU4togqTV4sFaj/w4TzGiKexqbMC8VgNQ3GkhRc40XUYIEGH2Pe7/82gM5B14Xt0JSN3IXAyck=
-X-Received: by 2002:a67:b401:0:b0:387:8734:a09 with SMTP id
- x1-20020a67b401000000b0038787340a09mr989372vsl.61.1659400983797; Mon, 01 Aug
- 2022 17:43:03 -0700 (PDT)
+        with ESMTP id S232111AbiHBEsJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 00:48:09 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B90B5E010
+        for <linux-cifs@vger.kernel.org>; Mon,  1 Aug 2022 21:48:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659415687; x=1690951687;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cmvWDelvajwuS0R/wan8vHLEblYgIj33UX79yEux5lg=;
+  b=CEOnYQBRLxAubebDY49Tbnz7GFBO/FQ0UTrk3bI0shQv2Kbx3ozwmmHH
+   D2Jky1zfrUpQZ6U8/vywQTyhmDsHNpnMphphCZZ1SfLE2jvcL3AQx4MkU
+   NSg4uP00OFdmf+pqS6ajiP9UAHbzOWYxqkdt4+TfCPn3+PbI5bb59lasx
+   7QhDAbtHfTznwQG3fZieJFmumZ7dJYPOT+viXqmVtIT7uz5KWB4QvrsQg
+   ONjR+6FhM3NTmABy5iDEYyH9ySkZclsm+jx+Zy3AeJAfbyIY/nGqr3lO1
+   Iz8QGzw/JCtPw92DBQVZEG40N4cBXW5UM/QwxK9BX7dVsalW6T6GmiG9w
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="272362596"
+X-IronPort-AV: E=Sophos;i="5.93,210,1654585200"; 
+   d="scan'208";a="272362596"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 21:48:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,210,1654585200"; 
+   d="scan'208";a="578065396"
+Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 01 Aug 2022 21:48:04 -0700
+Received: from kbuild by e0eace57cfef with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oIjp6-000FhP-0T;
+        Tue, 02 Aug 2022 04:48:04 +0000
+Date:   Tue, 2 Aug 2022 12:47:11 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Enzo Matsumiya <ematsumiya@suse.de>, linux-cifs@vger.kernel.org
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, smfrench@gmail.com,
+        pc@cjr.nz, ronniesahlberg@gmail.com, nspmangalore@gmail.com
+Subject: Re: [PATCH] cifs: move some bloat out of cifsfs.c to
+ inode.c/file.c/dir.c
+Message-ID: <202208021251.F3onzjl6-lkp@intel.com>
+References: <20220801213622.18805-1-ematsumiya@suse.de>
 MIME-Version: 1.0
-References: <20220801190933.27197-1-ematsumiya@suse.de> <012fa69c76bac824c2e2dcc8dfaf9250723e502b.camel@samba.org>
- <20220801201438.5db6emf6iddawrfl@cyberdelia> <cc925d11-df62-fd92-f21f-4aca10e3a68d@talpey.com>
-In-Reply-To: <cc925d11-df62-fd92-f21f-4aca10e3a68d@talpey.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 1 Aug 2022 19:42:52 -0500
-Message-ID: <CAH2r5msDPE+7c15i1qP9DPmTgz9kfaFASq_ZbqWzHjkySd_Bwg@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] Rename "cifs" module to "smbfs"
-To:     Tom Talpey <tom@talpey.com>
-Cc:     Enzo Matsumiya <ematsumiya@suse.de>,
-        Rowland Penny <rpenny@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220801213622.18805-1-ematsumiya@suse.de>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We don't have to rename the directory in this release.  Linus suggested doing it
-in a "quiet" merge window, but there are a lot of lines of code
-changed in this one
-so we can wait to 5.21 kernel (or 6.1 kernel or whatever the release after
-next is called) to do the fs/cifs --> fs/smb-something
+Hi Enzo,
 
-On Mon, Aug 1, 2022 at 7:40 PM Tom Talpey <tom@talpey.com> wrote:
->
-> On 8/1/2022 4:14 PM, Enzo Matsumiya wrote:
-> > On 08/01, Rowland Penny wrote:
-> >> On Mon, 2022-08-01 at 16:09 -0300, Enzo Matsumiya via samba-technical
-> >> wrote:
-> >>> Hi,
-> >>>
-> >>> As part of the ongoing effort to remove the "cifs" nomenclature from
-> >>> the
-> >>> Linux SMB client, I'm proposing the rename of the module to "smbfs".
-> >>
-> >> Hi, this has absolutely nothing to do with myself, but Linux used
-> >> 'smbfs' before it started to use 'cifs', so you are going back to an
-> >> old term. This could be confusing.
-> >
-> > Hi Rowland, I'm aware of that. I had nothing to do with either
-> > (choosing initial "smbfs" nor "cifs"), but, IMHO, I think it should've
-> > stayed "smbfs". And TBH this is the most coherent name, of all
->
-> I dug around the old tarballs and it looks like fs/smbfs was pulled from
-> the kernel after 2.6.36, in early 2011. This was different from fs/cifs,
-> which entered the kernel much earlier, so they previously coexisted.
->
-> I don't think the name ambiguity is very important, but I do wonder if
-> git might uncover some conflicts, when a previously removed directory
-> suddenly reappears with new content? There wasn't a lot in fs/smbfs
-> though.
->
-> Either way, I think the module name is the question here, and it doesn't
-> have to be the same as the directory. I still prefer smbfs.
->
-> Another possibility for the directory is "ksmb", which might rhyme with
-> the server, and keep it close alphabetically too? OTOH it might be
-> confusing to have two similar names.
->
-> And sorry but I hate the idea of adding "-client". Should we rename
-> ksmbd to smb-server?? I don't think so.
->
-> Tom.
->
-> > available/known choices; you know the protocol (SMB), you know it isn't
-> > tied to any SMB version ("cifs", or "smb3" as sometimes suggested or
-> > used (as a module alias)), it's a Linux filesystem module ("FS").
-> >
-> > Also the "fs/smbfs_common" directory was renamed as recent as last year
-> > (from "cifs_common") (cf. commit 23e91d8b7).
-> >
-> >> Rowland
-> >
-> > Thanks for the input, though. As an RFC patch, I'm waiting for more
-> > feedback and suggestions.
-> >
-> >
-> > Cheers,
-> >
-> > Enzo
-> >
-> >>>
-> >>> As it's widely known, CIFS is associated to SMB1.0, which, in turn,
-> >>> is
-> >>> associated with the security issues it presented in the past. Using
-> >>> "SMBFS" makes clear what's the protocol in use for outsiders, but
-> >>> also
-> >>> unties it from any particular protocol version. It also fits in the
-> >>> already existing "fs/smbfs_common" and "fs/ksmbd" naming scheme.
-> >>>
-> >>> This short patch series only changes directory names and
-> >>> includes/ifdefs in
-> >>> headers and source code, and updates docs to reflect the rename.
-> >>> Other
-> >>> than that, no source code/functionality is modified (WIP though).
-> >>>
-> >>> Patch 1/3: effectively changes the module name to "smbfs" and create
-> >>> a
-> >>>        "cifs" module alias to maintain compatibility (a warning
-> >>>        should be added to indicate the complete removal/isolation
-> >>> of
-> >>>        CIFS/SMB1.0 code).
-> >>> Patch 2/3: rename the source-code directory to align with the new
-> >>> module
-> >>>        name
-> >>> Patch 3/3: update documentation references to "fs/cifs" or "cifs.ko"
-> >>> or
-> >>>        "cifs module" to use the new name
-> >>>
-> >>> Enzo Matsumiya (3):
-> >>>   cifs: change module name to "smbfs.ko"
-> >>>   smbfs: rename directory "fs/cifs" -> "fs/smbfs"
-> >>>   smbfs: update doc references
-> >>>
-> >>>  Documentation/admin-guide/index.rst           |   2 +-
-> >>>  .../admin-guide/{cifs => smbfs}/authors.rst   |   0
-> >>>  .../admin-guide/{cifs => smbfs}/changes.rst   |   4 +-
-> >>>  .../admin-guide/{cifs => smbfs}/index.rst     |   0
-> >>>  .../{cifs => smbfs}/introduction.rst          |   0
-> >>>  .../admin-guide/{cifs => smbfs}/todo.rst      |  12 +-
-> >>>  .../admin-guide/{cifs => smbfs}/usage.rst     | 168 +++++++++-------
-> >>> --
-> >>>  .../{cifs => smbfs}/winucase_convert.pl       |   0
-> >>>  Documentation/filesystems/index.rst           |   2 +-
-> >>>  .../filesystems/{cifs => smbfs}/cifsroot.rst  |  14 +-
-> >>>  .../filesystems/{cifs => smbfs}/index.rst     |   0
-> >>>  .../filesystems/{cifs => smbfs}/ksmbd.rst     |   2 +-
-> >>>  Documentation/networking/dns_resolver.rst     |   2 +-
-> >>>  .../translations/zh_CN/admin-guide/index.rst  |   2 +-
-> >>>  .../translations/zh_TW/admin-guide/index.rst  |   2 +-
-> >>>  fs/Kconfig                                    |   6 +-
-> >>>  fs/Makefile                                   |   2 +-
-> >>>  fs/cifs/Makefile                              |  34 ----
-> >>>  fs/{cifs => smbfs}/Kconfig                    | 108 +++++------
-> >>>  fs/smbfs/Makefile                             |  34 ++++
-> >>>  fs/{cifs => smbfs}/asn1.c                     |   0
-> >>>  fs/{cifs => smbfs}/cifs_debug.c               |  72 ++++----
-> >>>  fs/{cifs => smbfs}/cifs_debug.h               |   4 +-
-> >>>  fs/{cifs => smbfs}/cifs_dfs_ref.c             |   2 +-
-> >>>  fs/{cifs => smbfs}/cifs_fs_sb.h               |   0
-> >>>  fs/{cifs => smbfs}/cifs_ioctl.h               |   0
-> >>>  fs/{cifs => smbfs}/cifs_spnego.c              |   4 +-
-> >>>  fs/{cifs => smbfs}/cifs_spnego.h              |   0
-> >>>  .../cifs_spnego_negtokeninit.asn1             |   0
-> >>>  fs/{cifs => smbfs}/cifs_swn.c                 |   0
-> >>>  fs/{cifs => smbfs}/cifs_swn.h                 |   4 +-
-> >>>  fs/{cifs => smbfs}/cifs_unicode.c             |   0
-> >>>  fs/{cifs => smbfs}/cifs_unicode.h             |   0
-> >>>  fs/{cifs => smbfs}/cifs_uniupr.h              |   0
-> >>>  fs/{cifs => smbfs}/cifsacl.c                  |   6 +-
-> >>>  fs/{cifs => smbfs}/cifsacl.h                  |   0
-> >>>  fs/{cifs => smbfs}/cifsencrypt.c              |   0
-> >>>  fs/{cifs => smbfs}/cifsglob.h                 |  26 +--
-> >>>  fs/{cifs => smbfs}/cifspdu.h                  |   6 +-
-> >>>  fs/{cifs => smbfs}/cifsproto.h                |  10 +-
-> >>>  fs/{cifs => smbfs}/cifsroot.c                 |   0
-> >>>  fs/{cifs => smbfs}/cifssmb.c                  |  14 +-
-> >>>  fs/{cifs => smbfs}/connect.c                  |  36 ++--
-> >>>  fs/{cifs/cifsfs.c => smbfs/core.c}            |  49 ++---
-> >>>  fs/{cifs => smbfs}/dfs_cache.c                |   2 +-
-> >>>  fs/{cifs => smbfs}/dfs_cache.h                |   0
-> >>>  fs/{cifs => smbfs}/dir.c                      |   2 +-
-> >>>  fs/{cifs => smbfs}/dns_resolve.c              |   0
-> >>>  fs/{cifs => smbfs}/dns_resolve.h              |   0
-> >>>  fs/{cifs => smbfs}/export.c                   |   8 +-
-> >>>  fs/{cifs => smbfs}/file.c                     |  16 +-
-> >>>  fs/{cifs => smbfs}/fs_context.c               |  20 +--
-> >>>  fs/{cifs => smbfs}/fs_context.h               |   0
-> >>>  fs/{cifs => smbfs}/fscache.c                  |   0
-> >>>  fs/{cifs => smbfs}/fscache.h                  |   6 +-
-> >>>  fs/{cifs => smbfs}/inode.c                    |  10 +-
-> >>>  fs/{cifs => smbfs}/ioctl.c                    |   6 +-
-> >>>  fs/{cifs => smbfs}/link.c                     |   2 +-
-> >>>  fs/{cifs => smbfs}/misc.c                     |  14 +-
-> >>>  fs/{cifs => smbfs}/netlink.c                  |   0
-> >>>  fs/{cifs => smbfs}/netlink.h                  |   0
-> >>>  fs/{cifs => smbfs}/netmisc.c                  |   2 +-
-> >>>  fs/{cifs => smbfs}/nterr.c                    |   0
-> >>>  fs/{cifs => smbfs}/nterr.h                    |   0
-> >>>  fs/{cifs => smbfs}/ntlmssp.h                  |   2 +-
-> >>>  fs/{cifs => smbfs}/readdir.c                  |   4 +-
-> >>>  fs/{cifs => smbfs}/rfc1002pdu.h               |   0
-> >>>  fs/{cifs => smbfs}/sess.c                     |  10 +-
-> >>>  fs/{cifs => smbfs}/smb1ops.c                  |   4 +-
-> >>>  fs/{cifs => smbfs}/smb2file.c                 |   2 +-
-> >>>  fs/{cifs => smbfs}/smb2glob.h                 |   0
-> >>>  fs/{cifs => smbfs}/smb2inode.c                |   2 +-
-> >>>  fs/{cifs => smbfs}/smb2maperror.c             |   0
-> >>>  fs/{cifs => smbfs}/smb2misc.c                 |   0
-> >>>  fs/{cifs => smbfs}/smb2ops.c                  |  32 ++--
-> >>>  fs/{cifs => smbfs}/smb2pdu.c                  |  22 +--
-> >>>  fs/{cifs => smbfs}/smb2pdu.h                  |   0
-> >>>  fs/{cifs => smbfs}/smb2proto.h                |   0
-> >>>  fs/{cifs => smbfs}/smb2status.h               |   0
-> >>>  fs/{cifs => smbfs}/smb2transport.c            |   2 +-
-> >>>  fs/{cifs => smbfs}/smbdirect.c                |   0
-> >>>  fs/{cifs => smbfs}/smbdirect.h                |   2 +-
-> >>>  fs/{cifs => smbfs}/smbencrypt.c               |   0
-> >>>  fs/{cifs => smbfs}/smberr.h                   |   0
-> >>>  fs/{cifs/cifsfs.h => smbfs/smbfs.h}           |  12 +-
-> >>>  fs/{cifs => smbfs}/trace.c                    |   0
-> >>>  fs/{cifs => smbfs}/trace.h                    |   0
-> >>>  fs/{cifs => smbfs}/transport.c                |   4 +-
-> >>>  fs/{cifs => smbfs}/unc.c                      |   0
-> >>>  fs/{cifs => smbfs}/winucase.c                 |   0
-> >>>  fs/{cifs => smbfs}/xattr.c                    |  18 +-
-> >>>  91 files changed, 414 insertions(+), 417 deletions(-)
-> >>>  rename Documentation/admin-guide/{cifs => smbfs}/authors.rst (100%)
-> >>>  rename Documentation/admin-guide/{cifs => smbfs}/changes.rst (73%)
-> >>>  rename Documentation/admin-guide/{cifs => smbfs}/index.rst (100%)
-> >>>  rename Documentation/admin-guide/{cifs => smbfs}/introduction.rst
-> >>> (100%)
-> >>>  rename Documentation/admin-guide/{cifs => smbfs}/todo.rst (95%)
-> >>>  rename Documentation/admin-guide/{cifs => smbfs}/usage.rst (87%)
-> >>>  rename Documentation/admin-guide/{cifs => smbfs}/winucase_convert.pl
-> >>> (100%)
-> >>>  rename Documentation/filesystems/{cifs => smbfs}/cifsroot.rst (85%)
-> >>>  rename Documentation/filesystems/{cifs => smbfs}/index.rst (100%)
-> >>>  rename Documentation/filesystems/{cifs => smbfs}/ksmbd.rst (99%)
-> >>>  delete mode 100644 fs/cifs/Makefile
-> >>>  rename fs/{cifs => smbfs}/Kconfig (72%)
-> >>>  create mode 100644 fs/smbfs/Makefile
-> >>>  rename fs/{cifs => smbfs}/asn1.c (100%)
-> >>>  rename fs/{cifs => smbfs}/cifs_debug.c (96%)
-> >>>  rename fs/{cifs => smbfs}/cifs_debug.h (98%)
-> >>>  rename fs/{cifs => smbfs}/cifs_dfs_ref.c (99%)
-> >>>  rename fs/{cifs => smbfs}/cifs_fs_sb.h (100%)
-> >>>  rename fs/{cifs => smbfs}/cifs_ioctl.h (100%)
-> >>>  rename fs/{cifs => smbfs}/cifs_spnego.c (98%)
-> >>>  rename fs/{cifs => smbfs}/cifs_spnego.h (100%)
-> >>>  rename fs/{cifs => smbfs}/cifs_spnego_negtokeninit.asn1 (100%)
-> >>>  rename fs/{cifs => smbfs}/cifs_swn.c (100%)
-> >>>  rename fs/{cifs => smbfs}/cifs_swn.h (95%)
-> >>>  rename fs/{cifs => smbfs}/cifs_unicode.c (100%)
-> >>>  rename fs/{cifs => smbfs}/cifs_unicode.h (100%)
-> >>>  rename fs/{cifs => smbfs}/cifs_uniupr.h (100%)
-> >>>  rename fs/{cifs => smbfs}/cifsacl.c (99%)
-> >>>  rename fs/{cifs => smbfs}/cifsacl.h (100%)
-> >>>  rename fs/{cifs => smbfs}/cifsencrypt.c (100%)
-> >>>  rename fs/{cifs => smbfs}/cifsglob.h (99%)
-> >>>  rename fs/{cifs => smbfs}/cifspdu.h (99%)
-> >>>  rename fs/{cifs => smbfs}/cifsproto.h (99%)
-> >>>  rename fs/{cifs => smbfs}/cifsroot.c (100%)
-> >>>  rename fs/{cifs => smbfs}/cifssmb.c (99%)
-> >>>  rename fs/{cifs => smbfs}/connect.c (99%)
-> >>>  rename fs/{cifs/cifsfs.c => smbfs/core.c} (98%)
-> >>>  rename fs/{cifs => smbfs}/dfs_cache.c (99%)
-> >>>  rename fs/{cifs => smbfs}/dfs_cache.h (100%)
-> >>>  rename fs/{cifs => smbfs}/dir.c (99%)
-> >>>  rename fs/{cifs => smbfs}/dns_resolve.c (100%)
-> >>>  rename fs/{cifs => smbfs}/dns_resolve.h (100%)
-> >>>  rename fs/{cifs => smbfs}/export.c (91%)
-> >>>  rename fs/{cifs => smbfs}/file.c (99%)
-> >>>  rename fs/{cifs => smbfs}/fs_context.c (99%)
-> >>>  rename fs/{cifs => smbfs}/fs_context.h (100%)
-> >>>  rename fs/{cifs => smbfs}/fscache.c (100%)
-> >>>  rename fs/{cifs => smbfs}/fscache.h (98%)
-> >>>  rename fs/{cifs => smbfs}/inode.c (99%)
-> >>>  rename fs/{cifs => smbfs}/ioctl.c (99%)
-> >>>  rename fs/{cifs => smbfs}/link.c (99%)
-> >>>  rename fs/{cifs => smbfs}/misc.c (99%)
-> >>>  rename fs/{cifs => smbfs}/netlink.c (100%)
-> >>>  rename fs/{cifs => smbfs}/netlink.h (100%)
-> >>>  rename fs/{cifs => smbfs}/netmisc.c (99%)
-> >>>  rename fs/{cifs => smbfs}/nterr.c (100%)
-> >>>  rename fs/{cifs => smbfs}/nterr.h (100%)
-> >>>  rename fs/{cifs => smbfs}/ntlmssp.h (98%)
-> >>>  rename fs/{cifs => smbfs}/readdir.c (99%)
-> >>>  rename fs/{cifs => smbfs}/rfc1002pdu.h (100%)
-> >>>  rename fs/{cifs => smbfs}/sess.c (99%)
-> >>>  rename fs/{cifs => smbfs}/smb1ops.c (99%)
-> >>>  rename fs/{cifs => smbfs}/smb2file.c (99%)
-> >>>  rename fs/{cifs => smbfs}/smb2glob.h (100%)
-> >>>  rename fs/{cifs => smbfs}/smb2inode.c (99%)
-> >>>  rename fs/{cifs => smbfs}/smb2maperror.c (100%)
-> >>>  rename fs/{cifs => smbfs}/smb2misc.c (100%)
-> >>>  rename fs/{cifs => smbfs}/smb2ops.c (99%)
-> >>>  rename fs/{cifs => smbfs}/smb2pdu.c (99%)
-> >>>  rename fs/{cifs => smbfs}/smb2pdu.h (100%)
-> >>>  rename fs/{cifs => smbfs}/smb2proto.h (100%)
-> >>>  rename fs/{cifs => smbfs}/smb2status.h (100%)
-> >>>  rename fs/{cifs => smbfs}/smb2transport.c (99%)
-> >>>  rename fs/{cifs => smbfs}/smbdirect.c (100%)
-> >>>  rename fs/{cifs => smbfs}/smbdirect.h (99%)
-> >>>  rename fs/{cifs => smbfs}/smbencrypt.c (100%)
-> >>>  rename fs/{cifs => smbfs}/smberr.h (100%)
-> >>>  rename fs/{cifs/cifsfs.h => smbfs/smbfs.h} (97%)
-> >>>  rename fs/{cifs => smbfs}/trace.c (100%)
-> >>>  rename fs/{cifs => smbfs}/trace.h (100%)
-> >>>  rename fs/{cifs => smbfs}/transport.c (99%)
-> >>>  rename fs/{cifs => smbfs}/unc.c (100%)
-> >>>  rename fs/{cifs => smbfs}/winucase.c (100%)
-> >>>  rename fs/{cifs => smbfs}/xattr.c (98%)
-> >>>
-> >>
-> >
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on cifs/for-next]
+[also build test WARNING on linus/master v5.19 next-20220728]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Enzo-Matsumiya/cifs-move-some-bloat-out-of-cifsfs-c-to-inode-c-file-c-dir-c/20220802-053657
+base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+config: i386-randconfig-r031-20220801 (https://download.01.org/0day-ci/archive/20220802/202208021251.F3onzjl6-lkp@intel.com/config)
+compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 52cd00cabf479aa7eb6dbb063b7ba41ea57bce9e)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/d7e7fe7f0c75e89b86ce07dfb26774fc11330b61
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Enzo-Matsumiya/cifs-move-some-bloat-out-of-cifsfs-c-to-inode-c-file-c-dir-c/20220802-053657
+        git checkout d7e7fe7f0c75e89b86ce07dfb26774fc11330b61
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash fs/cifs/
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> fs/cifs/file.c:5375:8: warning: no previous prototype for function 'cifs_remap_file_range' [-Wmissing-prototypes]
+   loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
+          ^
+   fs/cifs/file.c:5375:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
+   ^
+   static 
+>> fs/cifs/file.c:5502:9: warning: no previous prototype for function 'cifs_copy_file_range' [-Wmissing-prototypes]
+   ssize_t cifs_copy_file_range(struct file *src_file, loff_t off,
+           ^
+   fs/cifs/file.c:5502:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   ssize_t cifs_copy_file_range(struct file *src_file, loff_t off,
+   ^
+   static 
+   2 warnings generated.
+--
+>> fs/cifs/inode.c:3087:15: warning: no previous prototype for function 'cifs_alloc_inode' [-Wmissing-prototypes]
+   struct inode *cifs_alloc_inode(struct super_block *sb)
+                 ^
+   fs/cifs/inode.c:3087:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   struct inode *cifs_alloc_inode(struct super_block *sb)
+   ^
+   static 
+>> fs/cifs/inode.c:3123:6: warning: no previous prototype for function 'cifs_free_inode' [-Wmissing-prototypes]
+   void cifs_free_inode(struct inode *inode)
+        ^
+   fs/cifs/inode.c:3123:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void cifs_free_inode(struct inode *inode)
+   ^
+   static 
+>> fs/cifs/inode.c:3128:6: warning: no previous prototype for function 'cifs_evict_inode' [-Wmissing-prototypes]
+   void cifs_evict_inode(struct inode *inode)
+        ^
+   fs/cifs/inode.c:3128:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void cifs_evict_inode(struct inode *inode)
+   ^
+   static 
+>> fs/cifs/inode.c:3137:5: warning: no previous prototype for function 'cifs_write_inode' [-Wmissing-prototypes]
+   int cifs_write_inode(struct inode *inode, struct writeback_control *wbc)
+       ^
+   fs/cifs/inode.c:3137:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int cifs_write_inode(struct inode *inode, struct writeback_control *wbc)
+   ^
+   static 
+>> fs/cifs/inode.c:3143:5: warning: no previous prototype for function 'cifs_drop_inode' [-Wmissing-prototypes]
+   int cifs_drop_inode(struct inode *inode)
+       ^
+   fs/cifs/inode.c:3143:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int cifs_drop_inode(struct inode *inode)
+   ^
+   static 
+>> fs/cifs/inode.c:3161:12: warning: no previous prototype for function 'cifs_init_inodecache' [-Wmissing-prototypes]
+   int __init cifs_init_inodecache(void)
+              ^
+   fs/cifs/inode.c:3161:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int __init cifs_init_inodecache(void)
+   ^
+   static 
+>> fs/cifs/inode.c:3174:6: warning: no previous prototype for function 'cifs_destroy_inodecache' [-Wmissing-prototypes]
+   void cifs_destroy_inodecache(void)
+        ^
+   fs/cifs/inode.c:3174:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void cifs_destroy_inodecache(void)
+   ^
+   static 
+   7 warnings generated.
 
 
+vim +/cifs_remap_file_range +5375 fs/cifs/file.c
+
+  5374	
+> 5375	loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
+  5376				     struct file *dst_file, loff_t destoff, loff_t len,
+  5377				     unsigned int remap_flags)
+  5378	{
+  5379		struct inode *src_inode = file_inode(src_file);
+  5380		struct inode *target_inode = file_inode(dst_file);
+  5381		struct cifsFileInfo *smb_file_src = src_file->private_data;
+  5382		struct cifsFileInfo *smb_file_target;
+  5383		struct cifs_tcon *target_tcon;
+  5384		unsigned int xid;
+  5385		int rc;
+  5386	
+  5387		if (remap_flags & ~(REMAP_FILE_DEDUP | REMAP_FILE_ADVISORY))
+  5388			return -EINVAL;
+  5389	
+  5390		cifs_dbg(FYI, "clone range\n");
+  5391	
+  5392		xid = get_xid();
+  5393	
+  5394		if (!src_file->private_data || !dst_file->private_data) {
+  5395			rc = -EBADF;
+  5396			cifs_dbg(VFS, "missing cifsFileInfo on copy range src file\n");
+  5397			goto out;
+  5398		}
+  5399	
+  5400		smb_file_target = dst_file->private_data;
+  5401		target_tcon = tlink_tcon(smb_file_target->tlink);
+  5402	
+  5403		/*
+  5404		 * Note: cifs case is easier than btrfs since server responsible for
+  5405		 * checks for proper open modes and file type and if it wants
+  5406		 * server could even support copy of range where source = target
+  5407		 */
+  5408		lock_two_nondirectories(target_inode, src_inode);
+  5409	
+  5410		if (len == 0)
+  5411			len = src_inode->i_size - off;
+  5412	
+  5413		cifs_dbg(FYI, "about to flush pages\n");
+  5414		/* should we flush first and last page first */
+  5415		truncate_inode_pages_range(&target_inode->i_data, destoff,
+  5416					   PAGE_ALIGN(destoff + len)-1);
+  5417	
+  5418		if (target_tcon->ses->server->ops->duplicate_extents)
+  5419			rc = target_tcon->ses->server->ops->duplicate_extents(xid,
+  5420				smb_file_src, smb_file_target, off, len, destoff);
+  5421		else
+  5422			rc = -EOPNOTSUPP;
+  5423	
+  5424		/* force revalidate of size and timestamps of target file now
+  5425		   that target is updated on the server */
+  5426		CIFS_I(target_inode)->time = 0;
+  5427		/* although unlocking in the reverse order from locking is not
+  5428		   strictly necessary here it is a little cleaner to be consistent */
+  5429		unlock_two_nondirectories(src_inode, target_inode);
+  5430	out:
+  5431		free_xid(xid);
+  5432		return rc < 0 ? rc : len;
+  5433	}
+  5434	
+  5435	ssize_t cifs_file_copychunk_range(unsigned int xid,
+  5436					struct file *src_file, loff_t off,
+  5437					struct file *dst_file, loff_t destoff,
+  5438					size_t len, unsigned int flags)
+  5439	{
+  5440		struct inode *src_inode = file_inode(src_file);
+  5441		struct inode *target_inode = file_inode(dst_file);
+  5442		struct cifsFileInfo *smb_file_src;
+  5443		struct cifsFileInfo *smb_file_target;
+  5444		struct cifs_tcon *src_tcon;
+  5445		struct cifs_tcon *target_tcon;
+  5446		ssize_t rc;
+  5447	
+  5448		cifs_dbg(FYI, "copychunk range\n");
+  5449	
+  5450		if (!src_file->private_data || !dst_file->private_data) {
+  5451			rc = -EBADF;
+  5452			cifs_dbg(VFS, "missing cifsFileInfo on copy range src file\n");
+  5453			goto out;
+  5454		}
+  5455	
+  5456		rc = -EXDEV;
+  5457		smb_file_target = dst_file->private_data;
+  5458		smb_file_src = src_file->private_data;
+  5459		src_tcon = tlink_tcon(smb_file_src->tlink);
+  5460		target_tcon = tlink_tcon(smb_file_target->tlink);
+  5461	
+  5462		if (src_tcon->ses != target_tcon->ses) {
+  5463			cifs_dbg(VFS, "source and target of copy not on same server\n");
+  5464			goto out;
+  5465		}
+  5466	
+  5467		rc = -EOPNOTSUPP;
+  5468		if (!target_tcon->ses->server->ops->copychunk_range)
+  5469			goto out;
+  5470	
+  5471		/*
+  5472		 * Note: cifs case is easier than btrfs since server responsible for
+  5473		 * checks for proper open modes and file type and if it wants
+  5474		 * server could even support copy of range where source = target
+  5475		 */
+  5476		lock_two_nondirectories(target_inode, src_inode);
+  5477	
+  5478		cifs_dbg(FYI, "about to flush pages\n");
+  5479		/* should we flush first and last page first */
+  5480		truncate_inode_pages(&target_inode->i_data, 0);
+  5481	
+  5482		rc = file_modified(dst_file);
+  5483		if (!rc)
+  5484			rc = target_tcon->ses->server->ops->copychunk_range(xid,
+  5485				smb_file_src, smb_file_target, off, len, destoff);
+  5486	
+  5487		file_accessed(src_file);
+  5488	
+  5489		/* force revalidate of size and timestamps of target file now
+  5490		 * that target is updated on the server
+  5491		 */
+  5492		CIFS_I(target_inode)->time = 0;
+  5493		/* although unlocking in the reverse order from locking is not
+  5494		 * strictly necessary here it is a little cleaner to be consistent
+  5495		 */
+  5496		unlock_two_nondirectories(src_inode, target_inode);
+  5497	
+  5498	out:
+  5499		return rc;
+  5500	}
+  5501	
+> 5502	ssize_t cifs_copy_file_range(struct file *src_file, loff_t off,
+  5503				     struct file *dst_file, loff_t destoff,
+  5504				     size_t len, unsigned int flags)
+  5505	{
+  5506		unsigned int xid = get_xid();
+  5507		ssize_t rc;
+  5508		struct cifsFileInfo *cfile = dst_file->private_data;
+  5509	
+  5510		if (cfile->swapfile)
+  5511			return -EOPNOTSUPP;
+  5512	
+  5513		rc = cifs_file_copychunk_range(xid, src_file, off, dst_file, destoff,
+  5514						len, flags);
+  5515		free_xid(xid);
+  5516	
+  5517		if (rc == -EOPNOTSUPP || rc == -EXDEV)
+  5518			rc = generic_copy_file_range(src_file, off, dst_file,
+  5519						     destoff, len, flags);
+  5520		return rc;
+  5521	}
+  5522	
 
 -- 
-Thanks,
-
-Steve
+0-DAY CI Kernel Test Service
+https://01.org/lkp
