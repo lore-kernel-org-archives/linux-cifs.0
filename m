@@ -2,318 +2,83 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F1DC19F29
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Aug 2022 21:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5000C00140
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 Aug 2022 00:55:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232519AbiHBVLm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Aug 2022 17:11:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57578 "EHLO
+        id S233568AbiHCAz0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Aug 2022 20:55:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232094AbiHBVLl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 17:11:41 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E4346D86
-        for <linux-cifs@vger.kernel.org>; Tue,  2 Aug 2022 14:11:38 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        with ESMTP id S229863AbiHCAz0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 20:55:26 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A2A35FC4
+        for <linux-cifs@vger.kernel.org>; Tue,  2 Aug 2022 17:55:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C374E20BF3;
-        Tue,  2 Aug 2022 21:11:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1659474696; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=V6EBumGn1zm2isCTZ9PaqYpDmAcaUataJjFLh6wxnro=;
-        b=kXkyymrDREYNGAn+NxJvjPTB+h2srl+sbmDgWoeuwUjWUq1IN0ir3CvLMiWr7Ppk2G6qnI
-        eFcyBQDdMW2NrbZUogmFW+qFw23BwkImGZrtsxQUL7dwgzapymU6BvpM4DqAhGM2EJ0D8l
-        HzH4xSjmyK27DceMAJ/++QSJUK0etXA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1659474696;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=V6EBumGn1zm2isCTZ9PaqYpDmAcaUataJjFLh6wxnro=;
-        b=tJOpv4SRkhbXM3RTiIzfVm4lmqVip+pGmZ7MRTtqtnEn7JO+nO2i4Iokepm4LTije+sdLR
-        JKcHxZffHxchdeAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4381113A8E;
-        Tue,  2 Aug 2022 21:11:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 33yYAQiT6WIZDAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Tue, 02 Aug 2022 21:11:36 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com
-Subject: [PATCH] cifs: remove useless DeleteMidQEntry()
-Date:   Tue,  2 Aug 2022 18:11:24 -0300
-Message-Id: <20220802211124.4014-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.35.3
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4BEA8B82012
+        for <linux-cifs@vger.kernel.org>; Wed,  3 Aug 2022 00:55:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F13DCC433D7
+        for <linux-cifs@vger.kernel.org>; Wed,  3 Aug 2022 00:55:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659488123;
+        bh=wSi44aMGHDVvDR7izB29i6aCNKPMdqAeBDRPr+wCS6M=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=ZJdO7S2bQT5clzh+t9h0z9xxf62i21mBguoLZ6rx7KZMv89+E3CtlVhqekIMz4gti
+         X8L8DBrRZL8Owi1J7UKWBRZP/WTfxnj7AyVEfG+8kK6KHjuqCkFZgcOELF2qbPb5RW
+         uQoXLVsEzaYvan4sygjfkyz7Xh2KyrP+xvc/tOjpmNNB9/SKTPTj7DrmIp+uDm+mnk
+         H/qDpBS85G61xFb2vdaRVVlPRK7OyT8d0xjq4kE+1ey/0bozdRd26j8vkqmBSzkpkQ
+         PlPFiDMCxMVkyrzITtuldS47gLYrAqAtUodzYjpE7fGepnnYKAIuY0fan9J2G9veve
+         wAJaBw0h10tBg==
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-10dc1b16c12so19162874fac.6
+        for <linux-cifs@vger.kernel.org>; Tue, 02 Aug 2022 17:55:22 -0700 (PDT)
+X-Gm-Message-State: ACgBeo1pb5X6gsPGkAJ+1AstYyfu5X40zxcwE7qktFoKkfhkSZOrIfqe
+        CT3R2i8yA70FP6wmM981C9aRz2LXBzWexiaTvC4=
+X-Google-Smtp-Source: AA6agR559jT8xHot4e9UtA9QbzL7HCucasTcZZp5bfObDf0ydI+TkYqkKjCujL0L6kzzVYkakKqX63mhR64MVjN4Ca0=
+X-Received: by 2002:a05:6870:f69d:b0:10d:81ea:3540 with SMTP id
+ el29-20020a056870f69d00b0010d81ea3540mr906972oab.257.1659488122075; Tue, 02
+ Aug 2022 17:55:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a05:6839:41a4:0:0:0:0 with HTTP; Tue, 2 Aug 2022 17:55:21
+ -0700 (PDT)
+In-Reply-To: <3343812.1659453040@warthog.procyon.org.uk>
+References: <CAKYAXd-PezRG4i-7DCiNAMQ0H9DsX-aDxD1rJavEzCmMa179xg@mail.gmail.com>
+ <fcbf34e9-11d2-05eb-2cad-1beb5c400ec5@talpey.com> <CAH2r5muPyxpBwKyka4NDJa+dLdxgj5BoU=h-_UT0-FdKxvLyRA@mail.gmail.com>
+ <CAKYAXd8X2nYzSqm9=hAtdaDZ=z7fRsUe2T41HQ_zK9JX2=mwVA@mail.gmail.com>
+ <CANFS6bb_jYLznTOpCm=wvRCTBg2GnoUu8+O4Cs6Wa_=MML=9Nw@mail.gmail.com>
+ <84589.1653070372@warthog.procyon.org.uk> <dc1dff3e-d19e-4300-41b8-ccb7459eacde@talpey.com>
+ <CAKYAXd-AKPyDQCYbQw+eA32MsMqFTFE8Z=iUvb4JOK+pbdiZjA@mail.gmail.com>
+ <dba1ce95-8a72-11ec-ee29-3643623c9928@talpey.com> <1922487.1653470999@warthog.procyon.org.uk>
+ <3343812.1659453040@warthog.procyon.org.uk>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 3 Aug 2022 09:55:21 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-sWDpGKZpns=yW-TcOytbVZXdFK9h2BGdmP4g0+p6v-g@mail.gmail.com>
+Message-ID: <CAKYAXd-sWDpGKZpns=yW-TcOytbVZXdFK9h2BGdmP4g0+p6v-g@mail.gmail.com>
+Subject: Re: RDMA (smbdirect) testing
+To:     David Howells <dhowells@redhat.com>
+Cc:     Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-DeleteMidQEntry() was just a proxy for cifs_mid_q_entry_release().
+2022-08-03 0:10 GMT+09:00, David Howells <dhowells@redhat.com>:
+> David Howells <dhowells@redhat.com> wrote:
+>
+>> With that, iWarp works for me.  You can add:
+>>
+>> Tested-by: David Howells <dhowells@redhat.com>
+>
+> Would it be possible to get this pushed upstream as a stopgap fix?  iWarp
+> still doesn't work in 5.19 with cifs.
+I will try this.
 
-Remove DeleteMidQEntry(), rename cifs_mid_q_entry_release() to
-cifs_release_mid().
-
-Also rename the kref_put() callback _cifs_mid_q_entry_release to
-__cifs_release_mid.
-
-Update callers to cifs_mid_q_entry_release and DeleteMidQEntry to use
-cifs_release_mid.
-
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/cifs/cifsproto.h     |  3 +--
- fs/cifs/cifssmb.c       |  6 +++---
- fs/cifs/connect.c       |  8 ++++----
- fs/cifs/smb2ops.c       |  2 +-
- fs/cifs/smb2pdu.c       |  6 +++---
- fs/cifs/smb2transport.c |  2 +-
- fs/cifs/transport.c     | 25 ++++++++++---------------
- 7 files changed, 23 insertions(+), 29 deletions(-)
-
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index de167e3af015..853ea4c8d88e 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -81,9 +81,8 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
- /* extern void renew_parental_timestamps(struct dentry *direntry);*/
- extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
- 					struct TCP_Server_Info *server);
--extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
- extern void cifs_delete_mid(struct mid_q_entry *mid);
--extern void cifs_mid_q_entry_release(struct mid_q_entry *midEntry);
-+extern void cifs_release_mid(struct mid_q_entry *mid);
- extern void cifs_wake_up_task(struct mid_q_entry *mid);
- extern int cifs_handle_standard(struct TCP_Server_Info *server,
- 				struct mid_q_entry *mid);
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 26b9d2438228..f0d72575e3c0 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -591,7 +591,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
- 	struct TCP_Server_Info *server = mid->callback_data;
- 	struct cifs_credits credits = { .value = 1, .instance = 0 };
- 
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- 	add_credits(server, &credits, CIFS_ECHO_OP);
- }
- 
-@@ -1336,7 +1336,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 	}
- 
- 	queue_work(cifsiod_wq, &rdata->work);
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- 	add_credits(server, &credits, 0);
- }
- 
-@@ -1684,7 +1684,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
- 	}
- 
- 	queue_work(cifsiod_wq, &wdata->work);
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- 	add_credits(tcon->ses->server, &credits, 0);
- }
- 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index abb65dd7471f..eb7e75deb9d2 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -334,7 +334,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
- 	list_for_each_entry_safe(mid, nmid, &retry_list, qhead) {
- 		list_del_init(&mid->qhead);
- 		mid->callback(mid);
--		cifs_mid_q_entry_release(mid);
-+		cifs_release_mid(mid);
- 	}
- 
- 	if (cifs_rdma_enabled(server)) {
-@@ -1007,7 +1007,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
- 			cifs_dbg(FYI, "Callback mid %llu\n", mid_entry->mid);
- 			list_del_init(&mid_entry->qhead);
- 			mid_entry->callback(mid_entry);
--			cifs_mid_q_entry_release(mid_entry);
-+			cifs_release_mid(mid_entry);
- 		}
- 		/* 1/8th of sec is more than enough time for them to exit */
- 		msleep(125);
-@@ -1246,7 +1246,7 @@ cifs_demultiplex_thread(void *p)
- 		if (length < 0) {
- 			for (i = 0; i < num_mids; i++)
- 				if (mids[i])
--					cifs_mid_q_entry_release(mids[i]);
-+					cifs_release_mid(mids[i]);
- 			continue;
- 		}
- 
-@@ -1273,7 +1273,7 @@ cifs_demultiplex_thread(void *p)
- 				if (!mids[i]->multiRsp || mids[i]->multiEnd)
- 					mids[i]->callback(mids[i]);
- 
--				cifs_mid_q_entry_release(mids[i]);
-+				cifs_release_mid(mids[i]);
- 			} else if (server->ops->is_oplock_break &&
- 				   server->ops->is_oplock_break(bufs[i],
- 								server)) {
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 82dd2e973753..ad3b13283717 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -5099,7 +5099,7 @@ static void smb2_decrypt_offload(struct work_struct *work)
- 				spin_unlock(&dw->server->srv_lock);
- 			}
- 		}
--		cifs_mid_q_entry_release(mid);
-+		cifs_release_mid(mid);
- 	}
- 
- free_pages:
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 131bec79d6fd..a24e05586d5c 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3776,7 +3776,7 @@ smb2_echo_callback(struct mid_q_entry *mid)
- 		credits.instance = server->reconnect_instance;
- 	}
- 
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- 	add_credits(server, &credits, CIFS_ECHO_OP);
- }
- 
-@@ -4201,7 +4201,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 				     rdata->offset, rdata->got_bytes);
- 
- 	queue_work(cifsiod_wq, &rdata->work);
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- 	add_credits(server, &credits, 0);
- }
- 
-@@ -4440,7 +4440,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
- 				      wdata->offset, wdata->bytes);
- 
- 	queue_work(cifsiod_wq, &wdata->work);
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- 	add_credits(server, &credits, 0);
- }
- 
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index f64922f340b3..f3068786a199 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -890,7 +890,7 @@ smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	rc = smb2_sign_rqst(rqst, server);
- 	if (rc) {
- 		revert_current_mid_from_hdr(server, shdr);
--		DeleteMidQEntry(mid);
-+		cifs_release_mid(mid);
- 		return ERR_PTR(rc);
- 	}
- 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 914a7aaf9fa7..24caf1fb7213 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -74,7 +74,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
- 	return temp;
- }
- 
--static void _cifs_mid_q_entry_release(struct kref *refcount)
-+static void __cifs_release_mid(struct kref *refcount)
- {
- 	struct mid_q_entry *midEntry =
- 			container_of(refcount, struct mid_q_entry, refcount);
-@@ -153,20 +153,15 @@ static void _cifs_mid_q_entry_release(struct kref *refcount)
- 	mempool_free(midEntry, cifs_mid_poolp);
- }
- 
--void cifs_mid_q_entry_release(struct mid_q_entry *midEntry)
-+void cifs_release_mid(struct mid_q_entry *mid)
- {
--	struct TCP_Server_Info *server = midEntry->server;
-+	struct TCP_Server_Info *server = mid->server;
- 
- 	spin_lock(&server->mid_lock);
--	kref_put(&midEntry->refcount, _cifs_mid_q_entry_release);
-+	kref_put(&mid->refcount, __cifs_release_mid);
- 	spin_unlock(&server->mid_lock);
- }
- 
--void DeleteMidQEntry(struct mid_q_entry *midEntry)
--{
--	cifs_mid_q_entry_release(midEntry);
--}
--
- void
- cifs_delete_mid(struct mid_q_entry *mid)
- {
-@@ -177,7 +172,7 @@ cifs_delete_mid(struct mid_q_entry *mid)
- 	}
- 	spin_unlock(&mid->server->mid_lock);
- 
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- }
- 
- /*
-@@ -791,7 +786,7 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 
- 	rc = cifs_sign_rqst(rqst, server, &mid->sequence_number);
- 	if (rc) {
--		DeleteMidQEntry(mid);
-+		cifs_release_mid(mid);
- 		return ERR_PTR(rc);
- 	}
- 
-@@ -940,7 +935,7 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
- 	}
- 	spin_unlock(&server->mid_lock);
- 
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- 	return rc;
- }
- 
-@@ -1029,7 +1024,7 @@ static void
- cifs_cancelled_callback(struct mid_q_entry *mid)
- {
- 	cifs_compound_callback(mid);
--	DeleteMidQEntry(mid);
-+	cifs_release_mid(mid);
- }
- 
- /*
-@@ -1425,7 +1420,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 		spin_lock(&server->mid_lock);
- 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
- 			/* no longer considered to be "in-flight" */
--			midQ->callback = DeleteMidQEntry;
-+			midQ->callback = cifs_release_mid;
- 			spin_unlock(&server->mid_lock);
- 			add_credits(server, &credits, 0);
- 			return rc;
-@@ -1606,7 +1601,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 			spin_lock(&server->mid_lock);
- 			if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
- 				/* no longer considered to be "in-flight" */
--				midQ->callback = DeleteMidQEntry;
-+				midQ->callback = cifs_release_mid;
- 				spin_unlock(&server->mid_lock);
- 				return rc;
- 			}
--- 
-2.35.3
-
+Thanks.
+>
+> David
+>
+>
