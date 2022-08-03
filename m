@@ -2,102 +2,136 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A08AC3F6B0
-	for <linux-cifs@archiver.kernel.org>; Wed,  3 Aug 2022 01:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D7AC00140
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 Aug 2022 02:21:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233637AbiHCB5D (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Aug 2022 21:57:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33872 "EHLO
+        id S230348AbiHCCVF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Aug 2022 22:21:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232742AbiHCB5C (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 21:57:02 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD903342B;
-        Tue,  2 Aug 2022 18:57:01 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 4C172388B5;
-        Wed,  3 Aug 2022 01:56:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1659491818; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wh75L2JsVC1g81tvfqGvYtL7ba9GfSXXnDr3TvdiG8Y=;
-        b=W5I15y8WWes3gGdcZFkcLTH3E2+GgV6LMxURgLk7fTyTu6Ydjcf6Vm1EA0WSizcrkO/pkE
-        //A+lu+gzaZvyWF/WAAs7gF4A6Hm0OQhtxCbpNAGo6FWRnkqjYzlNLfsPdQQik+hOQB0fl
-        BEXndnuHTx+OnOYgdGdo5fTIBN1vkxg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1659491818;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wh75L2JsVC1g81tvfqGvYtL7ba9GfSXXnDr3TvdiG8Y=;
-        b=itYdiCYy4kINUIGYcNd2PMJbHJVLBwsb6mzIMJbVKx2v/s59ZfR6YXrbA7CLv7oBu2J+DB
-        cL9ps0bCXB6ZYdCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BFA5813A94;
-        Wed,  3 Aug 2022 01:56:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id sRmZH+nV6WKdYwAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Wed, 03 Aug 2022 01:56:57 +0000
-Date:   Tue, 2 Aug 2022 22:56:55 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Tom Talpey <tom@talpey.com>
-Cc:     Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, samba-technical@lists.samba.org,
-        pshilovsky@samba.org
-Subject: Re: [RFC PATCH 0/3] Rename "cifs" module to "smbfs"
-Message-ID: <20220803015655.7u5b6i4eo5sfnryb@cyberdelia>
-References: <20220801190933.27197-1-ematsumiya@suse.de>
- <c05f4fc668fa97e737758ab03030d7170c0edbd9.camel@kernel.org>
- <20220802193620.dyvt5qiszm2pobsr@cyberdelia>
- <6f3479265b446d180d71832fd0c12650b908ebe2.camel@kernel.org>
- <1c2e8880-3efe-b55d-ee50-87d57efc3130@talpey.com>
+        with ESMTP id S229940AbiHCCVE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Aug 2022 22:21:04 -0400
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB2FD13D1F
+        for <linux-cifs@vger.kernel.org>; Tue,  2 Aug 2022 19:21:01 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id 17so15286542pfy.0
+        for <linux-cifs@vger.kernel.org>; Tue, 02 Aug 2022 19:21:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=rC3zQsZfWm5bW1BEJKTadmY+68a4s0T8rp+0fJrSbmI=;
+        b=R3hVEgh0/IY9iAs+3JsIItKSRL9QsB2yQKxkniDUgp3rscCOYDevrLOmhw3sGyftaX
+         UXYUiyvio7w8dVjPLNjbj1QbrrU8twnMyYcKp+0SGfZzadn96iPt4oxVO1DqbUvv1Mvg
+         xMXGHwefPkci07wCXmfOkqRCziHTIThbhdLkDSJhBw2eO2jGDZ+6tKcNn3s9ev23RaXh
+         RewcICk44LGDVVMKZ1Fi5BcZNj5axT5kYzBv2+nKwn6QqLzHuCIX/EOyLHSpsITP42gv
+         GNSj5OO/n4AXGLVNlpa/t12QYl0UT0b+9u2CgbPH3Ud1e470jLDu9t/8nHEfyHRUMtlE
+         W4GA==
+X-Gm-Message-State: AJIora9D6rmtGM0JimEKlod2sST0PNak7aQHjvK4OqIvf2BFbcyvVhUi
+        7kN9CNdVfAPEnFpBlgnRRPGGfZHN2Ds=
+X-Google-Smtp-Source: AGRyM1s1v6MItuuhHRBo362ts7DY4LFu1Yudl6kEnUJ32dX00d/eZVJkVj+TXyZmK513yyLHYdOxtg==
+X-Received: by 2002:a05:6a02:205:b0:41b:96dc:bb2a with SMTP id bh5-20020a056a02020500b0041b96dcbb2amr17916692pgb.116.1659493260818;
+        Tue, 02 Aug 2022 19:21:00 -0700 (PDT)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id w126-20020a626284000000b0052b7f0ff197sm11575321pfb.49.2022.08.02.19.20.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Aug 2022 19:21:00 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
+        Tom Talpey <tom@talpey.com>,
+        David Howells <dhowells@redhat.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Long Li <longli@microsoft.com>
+Subject: [PATCH] cifs: smbdirect: use the max_sge the hw reports
+Date:   Wed,  3 Aug 2022 11:20:42 +0900
+Message-Id: <20220803022042.10543-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <1c2e8880-3efe-b55d-ee50-87d57efc3130@talpey.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 08/02, Tom Talpey wrote:
->The initial goal is to modularize the SMB1 code, so it can be completely
->removed from a running system. The extensive refactoring logically leads
->to this directory renaming, but renaming is basically a side effect.
->
->Stamping out the four-letter word C-I-F-S is a secondary goal. At this
->point, the industry has stopped using it. You make a good point that
->it's still visible outside the kernel source though.
->
->It makes good sense to do the refactoring in place, at first. Splitting
->the {smb1,cifs}*.[ch] files will be more complex, but maybe easier to
->review and merge, without folding in a new directory tree and git rm/mv.
->Either way, there will be at least two modules, maybe three if we split
->out generic subroutines.
->
->Enzo, you're up to your elbows in this code now, is it too ugly without
->the new directories?
+In Soft-iWARP, smbdirect does not work in cifs client.
+The hardcoding max_sge is large in cifs, but need smaller value for
+soft-iWARP. Add SMBDIRECT_MIN_SGE macro as 6 and use the max_sge
+the hw reports instead of hardcoding 16 sge's.
 
-Having things in separate directories and code appropriately distributed
-in coherently named headers/sources certainly makes things easier to
-work with.
+Cc: Tom Talpey <tom@talpey.com>
+Cc: David Howells <dhowells@redhat.com>
+Cc: Hyunchul Lee <hyc.lee@gmail.com>
+Cc: Long Li <longli@microsoft.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/cifs/smbdirect.c | 15 ++++++++++-----
+ fs/cifs/smbdirect.h |  3 ++-
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-Of course this patch is not important, by far, but from what I
-gathered, it was some people's wish to move away from "cifs" name.
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 5fbbec22bcc8..bb68702362f7 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1518,7 +1518,7 @@ static int allocate_caches_and_workqueue(struct smbd_connection *info)
+ static struct smbd_connection *_smbd_get_connection(
+ 	struct TCP_Server_Info *server, struct sockaddr *dstaddr, int port)
+ {
+-	int rc;
++	int rc, max_sge;
+ 	struct smbd_connection *info;
+ 	struct rdma_conn_param conn_param;
+ 	struct ib_qp_init_attr qp_attr;
+@@ -1562,13 +1562,13 @@ static struct smbd_connection *_smbd_get_connection(
+ 	info->max_receive_size = smbd_max_receive_size;
+ 	info->keep_alive_interval = smbd_keep_alive_interval;
+ 
+-	if (info->id->device->attrs.max_send_sge < SMBDIRECT_MAX_SGE) {
++	if (info->id->device->attrs.max_send_sge < SMBDIRECT_MIN_SGE) {
+ 		log_rdma_event(ERR,
+ 			"warning: device max_send_sge = %d too small\n",
+ 			info->id->device->attrs.max_send_sge);
+ 		log_rdma_event(ERR, "Queue Pair creation may fail\n");
+ 	}
+-	if (info->id->device->attrs.max_recv_sge < SMBDIRECT_MAX_SGE) {
++	if (info->id->device->attrs.max_recv_sge < SMBDIRECT_MIN_SGE) {
+ 		log_rdma_event(ERR,
+ 			"warning: device max_recv_sge = %d too small\n",
+ 			info->id->device->attrs.max_recv_sge);
+@@ -1593,13 +1593,18 @@ static struct smbd_connection *_smbd_get_connection(
+ 		goto alloc_cq_failed;
+ 	}
+ 
++	max_sge = min3(info->id->device->attrs.max_send_sge,
++		       info->id->device->attrs.max_recv_sge,
++		       SMBDIRECT_MAX_SGE);
++	max_sge = max(max_sge, SMBDIRECT_MIN_SGE);
++
+ 	memset(&qp_attr, 0, sizeof(qp_attr));
+ 	qp_attr.event_handler = smbd_qp_async_error_upcall;
+ 	qp_attr.qp_context = info;
+ 	qp_attr.cap.max_send_wr = info->send_credit_target;
+ 	qp_attr.cap.max_recv_wr = info->receive_credit_max;
+-	qp_attr.cap.max_send_sge = SMBDIRECT_MAX_SGE;
+-	qp_attr.cap.max_recv_sge = SMBDIRECT_MAX_SGE;
++	qp_attr.cap.max_send_sge = max_sge;
++	qp_attr.cap.max_recv_sge = max_sge;
+ 	qp_attr.cap.max_inline_data = 0;
+ 	qp_attr.sq_sig_type = IB_SIGNAL_REQ_WR;
+ 	qp_attr.qp_type = IB_QPT_RC;
+diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
+index a87fca82a796..8b81301e4d4c 100644
+--- a/fs/cifs/smbdirect.h
++++ b/fs/cifs/smbdirect.h
+@@ -225,7 +225,8 @@ struct smbd_buffer_descriptor_v1 {
+ 	__le32 length;
+ } __packed;
+ 
+-/* Default maximum number of SGEs in a RDMA send/recv */
++/* Default maximum/minimum number of SGEs in a RDMA send/recv */
++#define SMBDIRECT_MIN_SGE	6
+ #define SMBDIRECT_MAX_SGE	16
+ /* The context for a SMBD request */
+ struct smbd_request {
+-- 
+2.25.1
 
-Answering your question (IIUC), Tom, I'm ok with postponing this change.
-
->Tom.
-
-Cheers,
-
-Enzo
