@@ -2,58 +2,58 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78A7C25B06
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Aug 2022 16:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C012C19F2A
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Aug 2022 16:46:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232643AbiHDQ1h (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Aug 2022 12:27:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43270 "EHLO
+        id S230177AbiHDQq3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Aug 2022 12:46:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231665AbiHDQ1g (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Aug 2022 12:27:36 -0400
+        with ESMTP id S234319AbiHDQq2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Aug 2022 12:46:28 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FFCF1EAEB
-        for <linux-cifs@vger.kernel.org>; Thu,  4 Aug 2022 09:27:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 704B41CFDF
+        for <linux-cifs@vger.kernel.org>; Thu,  4 Aug 2022 09:46:25 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E01E820046;
-        Thu,  4 Aug 2022 16:27:33 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 757035BDDB;
+        Thu,  4 Aug 2022 16:46:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1659630453; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1659631575; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Yi6SG8aMFQEqcDx2rrrN2alC952SXgSWAYrtDx0//ZQ=;
-        b=Bcq2+wWtH2DhA1ozbHUw/WyC7OVSF1DQ31/NsNp5D6IIpE7F4abjJo6yvHLf85BN/nreCh
-        X5oNs7eSSK+OjYw2+r7p6s5sHrBmZ+SQWLyelTuSvZwntP0EOOZIBx5mvoEwjwHofJ8gxS
-        Q+bWy5uGq9A7c0MmjbRkjT2puWcLQ+U=
+        bh=xiYZuhWulvYIipelfl3DkD7azUCYn2kGk4c74XNBZ7c=;
+        b=oJyNTLgohnyTkFJWiKMAawQJgzmPTJaWQ5LuKAP726YSZg4eXF9+TmOvTihCUMc82nDSN0
+        Ovh9MgZy8fBCWJtDzCDrMprt7SSIK+4WOjW0MrD8055H0eY+z1VrTw0Wt8iUJxIPp/D9Qu
+        LY4sCUULk2pIAgS1UufiWw/31b3NRJk=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1659630453;
+        s=susede2_ed25519; t=1659631575;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Yi6SG8aMFQEqcDx2rrrN2alC952SXgSWAYrtDx0//ZQ=;
-        b=gLZnX6VNDtU5EJW5brnIHJNHIOrgKxK3euYlWcYxHD/Z++4eDU8tPfn0wDEQ9RvuNDxV+v
-        p5Gh+tb7SM2bmECQ==
+        bh=xiYZuhWulvYIipelfl3DkD7azUCYn2kGk4c74XNBZ7c=;
+        b=FyMTqTrCLrfkJBpO3UHqGa9cG9FqNxpqdv2KOXsqr2AOqNYR1mvsRw+IyzogKY73X+OD7Q
+        cXUSpHP01aJyQ3Bw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 58D8713434;
-        Thu,  4 Aug 2022 16:27:33 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EF08E13434;
+        Thu,  4 Aug 2022 16:46:14 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id biPIBnXz62KkKQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Thu, 04 Aug 2022 16:27:33 +0000
-Date:   Thu, 4 Aug 2022 13:27:30 -0300
+        id mcqCLNb362KKMAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Thu, 04 Aug 2022 16:46:14 +0000
+Date:   Thu, 4 Aug 2022 13:46:12 -0300
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     Steve French <smfrench@gmail.com>
 Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>,
         ronnie sahlberg <ronniesahlberg@gmail.com>,
         Shyam Prasad N <nspmangalore@gmail.com>
 Subject: Re: [PATCH] cifs: remove useless DeleteMidQEntry()
-Message-ID: <20220804162730.ij3fzy74ahjlzo3o@cyberdelia>
+Message-ID: <20220804164612.nwtuoy7lm4wbp6xy@cyberdelia>
 References: <20220802211124.4014-1-ematsumiya@suse.de>
  <CAH2r5mtMrSyNUbcFRyOOwq38mvp2WY6LsYAT28Lsz2JWeNx3Fw@mail.gmail.com>
 MIME-Version: 1.0
@@ -74,12 +74,11 @@ On 08/04, Steve French wrote:
 >only used in 3 places) to be more consistent, easier to read:
 >   "alloc_mid_q_entry" (or "mid_q_entry_alloc")
 
-Ack. Will send v2.
+Could go a bit further and also remove "cifs_" from
+cifs_{init,destroy}_mids() in cifsfs.c, leaving the generic mid
+functions all with the same style.
 
-
-Cheers,
-
-Enzo
+Let me know if I should do that too.
 
 >On Tue, Aug 2, 2022 at 4:11 PM Enzo Matsumiya <ematsumiya@suse.de> wrote:
 >>
