@@ -2,227 +2,337 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9238FC19F2A
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Aug 2022 14:33:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AEDDC19F2A
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Aug 2022 15:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239650AbiHDOda (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Aug 2022 10:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46830 "EHLO
+        id S234790AbiHDPnm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Aug 2022 11:43:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234188AbiHDOd3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Aug 2022 10:33:29 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5381C2613B
-        for <linux-cifs@vger.kernel.org>; Thu,  4 Aug 2022 07:33:28 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 274EX9Oh006150;
-        Thu, 4 Aug 2022 14:33:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : content-type : mime-version; s=corp-2022-7-12;
- bh=Z+l+nfwbz4muR+julzC9YxhfXZ2CxRCK7gjchPz+Suk=;
- b=SGvvXLXS7JpaA043Bbg9A/8uW/2r4XHca5c6T5k23b463z2f/aRBF2elQcGPMxAMwu2t
- d/YQVxGgn9S5sIJ71K3lV/DVYu3XNBVknU0G3X03Ytna+ImrSPjWJxqEtZ5gWmtaq3/3
- bwQ6U+GGQsOgp4ps15aRdw9q2UOGqppmACijQFtpXsn9WT5fmke1BGPXNyWNR07s//Dz
- wL/AcGmvmJUd5eph1vae7EZupuooA8MIGQZ6gj/OtGH1jiLZ0ULjhYCzICB/ZYPIi+e9
- WOwrj0qgT7aazDT0O7mi0nIlC9TT6Q60SjaUVvtwAV5vKYBbEkezykt/jbLzzSbhVVle Ow== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3hmu2ccta2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 04 Aug 2022 14:33:24 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 274E82vV003017;
-        Thu, 4 Aug 2022 14:33:17 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2175.outbound.protection.outlook.com [104.47.59.175])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3hmu34by6u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 04 Aug 2022 14:33:17 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a3+a8VwRlRHozRHWFuOkuyr7l1e1oI68rFDBdhnXSjVruotBfdudK0+vFdx/gxR4nbKLXIJdb+UtZL7zPovfLsXkN+C9I/HMaH0o3ZmlhuxXB6aifE4gCaw9r2fR2Z/ga1cIf3bmi6RIaJarsqfNGc7kiSLz+avadXomtjWgkCWz4C9O/IoqEEIOaSKdrc0MpNOrnBrm2JUsG2tm7/WXstxAEOO+DaEBych5Ai8vwctK97Fv9hGqkZbptAAOfY4vbNuSMDxKhFXdmkCZtHPZPrjohXicqr/jheJNwdhLvUZ/zJcsmHPRtDjURvd5UTISCOtXMSETlMOemAkfeVTaTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z+l+nfwbz4muR+julzC9YxhfXZ2CxRCK7gjchPz+Suk=;
- b=JWbOcOqJU/YoBy6TH13ILwJEhW7/kg0cuhl+jIVGf10dfEOXF9TaeY0jj+0MaQgOf9j2YVW9teamDgjgkNIfbxtlc8gwUAx0p5M5lu1jBEuji7OPeC5uhM0DBmMs9LEOo5nYyjAhjKVAVmrL8zprh7u/fUcRfKj5eCZnIIv4/032rT4KGqoURBBi8/YZF8QDWrPha0mKpfWfxmaBCvo2nMz7fuQSgQ3FgJi7BsEa+5KoKbXsD4MoOyrjZX5xTZGho0+4qdiAPcV+YkkHYpy7eYu/hzn/K+QGhmYw+xCjjUXSLx4PSIEUiJjCyzovPq6bBQ79xW1MHA24ULRi4Da8LA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        with ESMTP id S237266AbiHDPnl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Aug 2022 11:43:41 -0400
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D62C426119
+        for <linux-cifs@vger.kernel.org>; Thu,  4 Aug 2022 08:43:38 -0700 (PDT)
+Received: by mail-vs1-xe2c.google.com with SMTP id 129so21498003vsq.8
+        for <linux-cifs@vger.kernel.org>; Thu, 04 Aug 2022 08:43:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z+l+nfwbz4muR+julzC9YxhfXZ2CxRCK7gjchPz+Suk=;
- b=L6I8e3QtjtqXnjKu2m+0eZR+o7MC574GjNK7eSGR7EbHpaaKIrpvq2ZPyImwAJt6u7SAZStpczB/EUXj607oFvkG3Yauo0pekqhmDtO3sdpoQpF4vmks9Q8NICP66w1Zpf0tms3aD6ZpDTroWMNPchI/UpzHIw03IkxLgKZ52Bw=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by MWHPR10MB1967.namprd10.prod.outlook.com
- (2603:10b6:300:10b::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5482.15; Thu, 4 Aug
- 2022 14:33:15 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::209e:de4d:68ea:c026]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::209e:de4d:68ea:c026%3]) with mapi id 15.20.5504.014; Thu, 4 Aug 2022
- 14:33:15 +0000
-Date:   Thu, 4 Aug 2022 17:33:04 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     linkinjeon@kernel.org
-Cc:     linux-cifs@vger.kernel.org
-Subject: [bug report] ksmbd: fix heap-based overflow in set_ntacl_dacl()
-Message-ID: <YuvYoM5nknSDxJFj@kili>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-ClientProxiedBy: ZR0P278CA0094.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:23::9) To MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28)
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OvdNUhOOPbILr6C5fNY57TbihqekypTpqn2mG9RnyjE=;
+        b=MlkgURjPdBKxdLv0JHI/GNojUzGdw5Cy1rGKxhtKHKiPd2WHPjoYUfdyCe8LE1JZx+
+         fbQMvBJWCbVYq7B7m1jJwUw0ZlMpsIlbkK/nvIcyKx31NQzpBwci4owvylnrJ2SPN5Gv
+         0Gp9qYTlEQpIyyGoIQlE3LJdkSjs8kLqqR+m5fHoHXpHeV5F5HGoeUS7W+/iOPfbuwPa
+         bFlUxkfb/R1oZrlQKh3G3hpMVRUCDTwIVePxLxlXhgo587XE97/KIs/95r57hYntaEJU
+         XJXO1lthUqrAQklp/Gx7jb2GFywxdaGRUDuqXKW5a2YgCrhsw7YXJJGSBhfpsHnQ7Pkd
+         9qqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OvdNUhOOPbILr6C5fNY57TbihqekypTpqn2mG9RnyjE=;
+        b=lf3hY9po5jJNjvI42aCKIv8MC9sVNLJfva/V0nspzgRUJ3EhaaYv8vWKJVVXoDMSwv
+         ObdHnO5a/PxS2YdsMgUuPYjPJlxQKEikupl5Uoc6H8VyVmeG3JH3gs02yXaRgei7Oh6O
+         4cJ+v3jcN0Kwil6wx0/SrqF4bj7C3pojIHyzXayCO9ybVRpEEKuE3+93ReDrD+lGmINe
+         J/Ys7cUafKKlLvS6aiXhl733Agt7e15/R66l5lq2qb6z3JB3EHRK/S0P5Gylq9JcYI55
+         l0o7BOQcM99umJCTG4MpQ+UsMysWS6b9oqczost/tM7o7GE32sVSed0MKGnuZOm5x/0a
+         sJYQ==
+X-Gm-Message-State: ACgBeo17w8eqlbJt3NbJUc1JlbrT4cco5Qi1T8bV/bWHHjHx8swb72gC
+        dgVdof+xL8SzQWoLSfGQCfHzyt5L1JAoU4+Xiyo=
+X-Google-Smtp-Source: AA6agR7GzPE2RRbA8X94J0kf3MkyaCev6v69ENA2HmabyJIGl/P1xKhueyhYl2ZCZFTTedq9LfqdLxW70gdnuB86tZ4=
+X-Received: by 2002:a67:ce90:0:b0:388:4905:1533 with SMTP id
+ c16-20020a67ce90000000b0038849051533mr1262792vse.17.1659627817657; Thu, 04
+ Aug 2022 08:43:37 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: aeddd097-ed46-43f3-f2f8-08da76264421
-X-MS-TrafficTypeDiagnostic: MWHPR10MB1967:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sqlRqgH7ruNd1NjiQ+Q1ihJzuF23cCwiTcWnualXyniv6Mq83VnDueYhTKxzJbu7zyMVYEsEaiGjboZs3EoWKAcwBrpdF1X88S+axKDCVIqjtZK845hFsatjw9WGiEvVSXWJXXbgu08oFgSXkn1TQvLIRsJEakvmuSmH02v2pnKunf6Jaxhf3DAPXBARtAA0UoPOWm8AppTmt6uHCSnm6yH05uW2/H8xcFYsYe7ymmkaeXSRRTFArM6dM7kxteOLdYNmm1k68FE7Ah5RtemW+ZQOCuFw6q+DFgHqDU1hrbGyv24FWWW5qTRj5nqKUAr4TWMWzOCoB1ZNfglrWCTksBQE1SN7ZZu9P6qvYkh7xG42OdqxqDOGG0stOHgSbj+UxKw9CzCL4+C3RmEM8DihcwwwRrsLo+qUsVr3YeRpJE0puBla1p6G6PSpvAwCcC5SFH3YCCmZWJtdNAunkawVN6192iqOWc8zpSSAmURbaCzS6ztFOgtVx3AHfWTc4LSFWoEQyCiIF92Ufu3lQ0yzy26kfLGmndU6B6FanAFvdjnVbEACOyEPejCQJAniiaIAPqZ0/CDk9VT7WQS8rGt9M1uvFPFtZiZshtife9/dYpwo2+QSnKetkMzrRqwvrGIrzeM0tPsVbD6SDvc5HPM8xZEoiAoCMckSmRmodFs/0uQN7Q6zfFuJbQHUUaQf45dBjVdf6iaWVYt/3sEgFKK6MH2nhgiWz/96U3Nir/Ss5m0aJ0wWBYScstY1YEUVoVMoeq+GJxmxMhmnjk/XQRpy4Pb9ZSz03eC9BQ5LU3TnsCaWIa87sZz+ooWvHX8iZXqx
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(39860400002)(136003)(376002)(366004)(396003)(346002)(6916009)(44832011)(83380400001)(33716001)(38100700002)(52116002)(316002)(186003)(6506007)(38350700002)(2906002)(5660300002)(9686003)(6666004)(26005)(478600001)(6512007)(66946007)(6486002)(66556008)(66476007)(4326008)(8676002)(8936002)(86362001)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5llKaLoSjNr2MYE8IdbX6Zlav14A8qHDRiYKJbmCp3WBaHUXHQHia4iZfJNE?=
- =?us-ascii?Q?vASYnxPLL5GSdilydYJfw5PWPOqI1WUgJQ2VHSAEHRuQ3vZyLvFoRtm1fW5X?=
- =?us-ascii?Q?bcxzi9d+YCdFTgnEj3aw7gN8txB+lkDJjd6ZfD7PTbQINZpzundLrXTQSVhu?=
- =?us-ascii?Q?l6TJUG6v6CHeiRhRjf5Z9+kU+yeikowP+NQGEnPIfgDc96CMHVENnIDzuxZ/?=
- =?us-ascii?Q?XfmUUmXdfYhK0tdTHiQ/q0CFB70Et+K5sZED1m5YHn5UIqGjL/2FbxcfcUn2?=
- =?us-ascii?Q?IGmOF5M0qIhCKNLrnFAXbGSveF/0wt9Qr1W9JCU8XmE14NJqOMDWKS0ixb3e?=
- =?us-ascii?Q?yGmKWPKB0W9tZqiuYXjn3r30PW1ugZw+lrIzCm07Aphj+1YzI1Vz2BGR/dJm?=
- =?us-ascii?Q?j5QpUT8cr2PIlVAJeQb7pGeOITPpgplez9yGx8yHdaE9WSi3IJ5ac98NUdJh?=
- =?us-ascii?Q?/laz/HvFxdrtLHxDdmQpMW5ZYma4UZCzos9RXYIris+sPQt5HD8IK/0mWfQ+?=
- =?us-ascii?Q?d5WBGA4IdXpZEu89YAc7gxVemN/MwJtXC+ldUexEl+jmXgnqtD6wS7mGA1ij?=
- =?us-ascii?Q?bhdOtUEeLYF97D4elR4RfiHuJRK48MvRCxx4OsEJU/Pb4fwcFE6yzAcBmVEN?=
- =?us-ascii?Q?QAXWB6+bY4mJ7H0LlECzsPchpeNtCgOFncUWiFIBmOENzooIazp010Th4BXd?=
- =?us-ascii?Q?1tpBOaJpC3Mg5B7o5K0WsdN8LYoFuxiQapBSda0mapPvCXGtMe5NQ6+5iJUp?=
- =?us-ascii?Q?eAS5593yo2ZmiWaAREIoJF3ww6bN0W3U66KLdalEqBYf3WnARtsUusLiyDoE?=
- =?us-ascii?Q?maTXhP3spO4+zV8ExFS0bIW5qagTR8CW29T55Y4PeMS6xwbJ8ub7AV7HG8Wr?=
- =?us-ascii?Q?8ORDJWtwD0dyGyIvsbBwZ63K0Fd1f8hXT4pfH1QMRdYTEvpGX/RIjYJQimdI?=
- =?us-ascii?Q?doy1Yaod7RTC7RiLmR83aY8juW09AfhSg3ojIcaRKfslHjEe/XuQC7qLXqd8?=
- =?us-ascii?Q?fJRYtSTWypzWnTUqxNbN22n7n6keext/hPuOLWw6Ft/wED6eRvSM2QzhqA3K?=
- =?us-ascii?Q?ihxsAllRX2xiiWGl3ZCWHsJSaQ7n3MJDn7nLmxWy8fTo/HAyMHqnsbjO5MGe?=
- =?us-ascii?Q?jYzLTGHP7EWYoyR29aC5MC67yQjTewfitKQ4l3iDlglauD8M0UJWORe3vRx2?=
- =?us-ascii?Q?+T+QPAHpP8vwVXAf4H7GA7By16jKMsV0q0rbK0dpeeSdq3A8576LUygrjzMr?=
- =?us-ascii?Q?hySgg87cR7kbgYIKCzYngvLz+nUC9qzQx8G6qVooy35pS4pnm5L4gUn/ctyk?=
- =?us-ascii?Q?r4EH5tju1xzabd0IhkGT2RYYdqmni7T/CkUvDiARGmeAC3C1b7A0Gur2Iypj?=
- =?us-ascii?Q?fPKcagCehTz3QqiE62KxRpS+iEpBH9qekJQxRyBz4XaLHffh3sR90snnsEtR?=
- =?us-ascii?Q?Ubt9VdHMOhP6bfFBqZ4cWcS+PSwOgyYkevsjvP2s/0E2vs/z4umyR9k3IqTo?=
- =?us-ascii?Q?1vuEFtELMWr2WjB+iPjWmzwp+iFQDwzAzMbKzHYWZlolBUBakQu+RtdXaK2t?=
- =?us-ascii?Q?m0zZlaQ1SsbkMVQeB5EENr2DasdL08qJZZ9uXe2MlbfriD7vf8q7KfoKIMeK?=
- =?us-ascii?Q?1Q=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aeddd097-ed46-43f3-f2f8-08da76264421
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2022 14:33:15.1194
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: myXn/YefRhp/tI0Z7JOZdBQ73GLvloYTQT7eriqoJR+4TSzDIvNExwXZ/8yW7a4SHdLfTYLG0l///Ur87UazbfWL5bnrVIpL8AZ9AoQgjoc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR10MB1967
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-04_03,2022-08-04_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
- mlxlogscore=999 bulkscore=0 mlxscore=0 phishscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2208040064
-X-Proofpoint-GUID: DB4lr9m1mJ0tbMZbIWoK00eXgo6unC9O
-X-Proofpoint-ORIG-GUID: DB4lr9m1mJ0tbMZbIWoK00eXgo6unC9O
+References: <20220802211124.4014-1-ematsumiya@suse.de>
+In-Reply-To: <20220802211124.4014-1-ematsumiya@suse.de>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 4 Aug 2022 10:43:26 -0500
+Message-ID: <CAH2r5mtMrSyNUbcFRyOOwq38mvp2WY6LsYAT28Lsz2JWeNx3Fw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: remove useless DeleteMidQEntry()
+To:     Enzo Matsumiya <ematsumiya@suse.de>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello Namjae Jeon,
+How about simple change to this to remove "cifs" (since not smb1
+specific) and call it something like:
+  "release_mid_q_entry" or "mid_q_entry_release" ?
 
-The patch 982979772f2b: "ksmbd: fix heap-based overflow in
-set_ntacl_dacl()" from Jul 28, 2022, leads to the following Smatch
-static checker warning:
+could also change AllocMidQEntry to something similar in the same
+patch (it is trivial,
+only used in 3 places) to be more consistent, easier to read:
+   "alloc_mid_q_entry" (or "mid_q_entry_alloc")
 
-	fs/ksmbd/smb2pdu.c:5182 smb2_get_info_sec()
-	error: uninitialized symbol 'secdesclen'.
+On Tue, Aug 2, 2022 at 4:11 PM Enzo Matsumiya <ematsumiya@suse.de> wrote:
+>
+> DeleteMidQEntry() was just a proxy for cifs_mid_q_entry_release().
+>
+> Remove DeleteMidQEntry(), rename cifs_mid_q_entry_release() to
+> cifs_release_mid().
+>
+> Also rename the kref_put() callback _cifs_mid_q_entry_release to
+> __cifs_release_mid.
+>
+> Update callers to cifs_mid_q_entry_release and DeleteMidQEntry to use
+> cifs_release_mid.
+>
+> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> ---
+>  fs/cifs/cifsproto.h     |  3 +--
+>  fs/cifs/cifssmb.c       |  6 +++---
+>  fs/cifs/connect.c       |  8 ++++----
+>  fs/cifs/smb2ops.c       |  2 +-
+>  fs/cifs/smb2pdu.c       |  6 +++---
+>  fs/cifs/smb2transport.c |  2 +-
+>  fs/cifs/transport.c     | 25 ++++++++++---------------
+>  7 files changed, 23 insertions(+), 29 deletions(-)
+>
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index de167e3af015..853ea4c8d88e 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -81,9 +81,8 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+>  /* extern void renew_parental_timestamps(struct dentry *direntry);*/
+>  extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+>                                         struct TCP_Server_Info *server);
+> -extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+>  extern void cifs_delete_mid(struct mid_q_entry *mid);
+> -extern void cifs_mid_q_entry_release(struct mid_q_entry *midEntry);
+> +extern void cifs_release_mid(struct mid_q_entry *mid);
+>  extern void cifs_wake_up_task(struct mid_q_entry *mid);
+>  extern int cifs_handle_standard(struct TCP_Server_Info *server,
+>                                 struct mid_q_entry *mid);
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 26b9d2438228..f0d72575e3c0 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -591,7 +591,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
+>         struct TCP_Server_Info *server = mid->callback_data;
+>         struct cifs_credits credits = { .value = 1, .instance = 0 };
+>
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>         add_credits(server, &credits, CIFS_ECHO_OP);
+>  }
+>
+> @@ -1336,7 +1336,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+>         }
+>
+>         queue_work(cifsiod_wq, &rdata->work);
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>         add_credits(server, &credits, 0);
+>  }
+>
+> @@ -1684,7 +1684,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
+>         }
+>
+>         queue_work(cifsiod_wq, &wdata->work);
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>         add_credits(tcon->ses->server, &credits, 0);
+>  }
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index abb65dd7471f..eb7e75deb9d2 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -334,7 +334,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
+>         list_for_each_entry_safe(mid, nmid, &retry_list, qhead) {
+>                 list_del_init(&mid->qhead);
+>                 mid->callback(mid);
+> -               cifs_mid_q_entry_release(mid);
+> +               cifs_release_mid(mid);
+>         }
+>
+>         if (cifs_rdma_enabled(server)) {
+> @@ -1007,7 +1007,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+>                         cifs_dbg(FYI, "Callback mid %llu\n", mid_entry->mid);
+>                         list_del_init(&mid_entry->qhead);
+>                         mid_entry->callback(mid_entry);
+> -                       cifs_mid_q_entry_release(mid_entry);
+> +                       cifs_release_mid(mid_entry);
+>                 }
+>                 /* 1/8th of sec is more than enough time for them to exit */
+>                 msleep(125);
+> @@ -1246,7 +1246,7 @@ cifs_demultiplex_thread(void *p)
+>                 if (length < 0) {
+>                         for (i = 0; i < num_mids; i++)
+>                                 if (mids[i])
+> -                                       cifs_mid_q_entry_release(mids[i]);
+> +                                       cifs_release_mid(mids[i]);
+>                         continue;
+>                 }
+>
+> @@ -1273,7 +1273,7 @@ cifs_demultiplex_thread(void *p)
+>                                 if (!mids[i]->multiRsp || mids[i]->multiEnd)
+>                                         mids[i]->callback(mids[i]);
+>
+> -                               cifs_mid_q_entry_release(mids[i]);
+> +                               cifs_release_mid(mids[i]);
+>                         } else if (server->ops->is_oplock_break &&
+>                                    server->ops->is_oplock_break(bufs[i],
+>                                                                 server)) {
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 82dd2e973753..ad3b13283717 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -5099,7 +5099,7 @@ static void smb2_decrypt_offload(struct work_struct *work)
+>                                 spin_unlock(&dw->server->srv_lock);
+>                         }
+>                 }
+> -               cifs_mid_q_entry_release(mid);
+> +               cifs_release_mid(mid);
+>         }
+>
+>  free_pages:
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 131bec79d6fd..a24e05586d5c 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -3776,7 +3776,7 @@ smb2_echo_callback(struct mid_q_entry *mid)
+>                 credits.instance = server->reconnect_instance;
+>         }
+>
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>         add_credits(server, &credits, CIFS_ECHO_OP);
+>  }
+>
+> @@ -4201,7 +4201,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+>                                      rdata->offset, rdata->got_bytes);
+>
+>         queue_work(cifsiod_wq, &rdata->work);
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>         add_credits(server, &credits, 0);
+>  }
+>
+> @@ -4440,7 +4440,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
+>                                       wdata->offset, wdata->bytes);
+>
+>         queue_work(cifsiod_wq, &wdata->work);
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>         add_credits(server, &credits, 0);
+>  }
+>
+> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+> index f64922f340b3..f3068786a199 100644
+> --- a/fs/cifs/smb2transport.c
+> +++ b/fs/cifs/smb2transport.c
+> @@ -890,7 +890,7 @@ smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+>         rc = smb2_sign_rqst(rqst, server);
+>         if (rc) {
+>                 revert_current_mid_from_hdr(server, shdr);
+> -               DeleteMidQEntry(mid);
+> +               cifs_release_mid(mid);
+>                 return ERR_PTR(rc);
+>         }
+>
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 914a7aaf9fa7..24caf1fb7213 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -74,7 +74,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+>         return temp;
+>  }
+>
+> -static void _cifs_mid_q_entry_release(struct kref *refcount)
+> +static void __cifs_release_mid(struct kref *refcount)
+>  {
+>         struct mid_q_entry *midEntry =
+>                         container_of(refcount, struct mid_q_entry, refcount);
+> @@ -153,20 +153,15 @@ static void _cifs_mid_q_entry_release(struct kref *refcount)
+>         mempool_free(midEntry, cifs_mid_poolp);
+>  }
+>
+> -void cifs_mid_q_entry_release(struct mid_q_entry *midEntry)
+> +void cifs_release_mid(struct mid_q_entry *mid)
+>  {
+> -       struct TCP_Server_Info *server = midEntry->server;
+> +       struct TCP_Server_Info *server = mid->server;
+>
+>         spin_lock(&server->mid_lock);
+> -       kref_put(&midEntry->refcount, _cifs_mid_q_entry_release);
+> +       kref_put(&mid->refcount, __cifs_release_mid);
+>         spin_unlock(&server->mid_lock);
+>  }
+>
+> -void DeleteMidQEntry(struct mid_q_entry *midEntry)
+> -{
+> -       cifs_mid_q_entry_release(midEntry);
+> -}
+> -
+>  void
+>  cifs_delete_mid(struct mid_q_entry *mid)
+>  {
+> @@ -177,7 +172,7 @@ cifs_delete_mid(struct mid_q_entry *mid)
+>         }
+>         spin_unlock(&mid->server->mid_lock);
+>
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>  }
+>
+>  /*
+> @@ -791,7 +786,7 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+>
+>         rc = cifs_sign_rqst(rqst, server, &mid->sequence_number);
+>         if (rc) {
+> -               DeleteMidQEntry(mid);
+> +               cifs_release_mid(mid);
+>                 return ERR_PTR(rc);
+>         }
+>
+> @@ -940,7 +935,7 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+>         }
+>         spin_unlock(&server->mid_lock);
+>
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>         return rc;
+>  }
+>
+> @@ -1029,7 +1024,7 @@ static void
+>  cifs_cancelled_callback(struct mid_q_entry *mid)
+>  {
+>         cifs_compound_callback(mid);
+> -       DeleteMidQEntry(mid);
+> +       cifs_release_mid(mid);
+>  }
+>
+>  /*
+> @@ -1425,7 +1420,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+>                 spin_lock(&server->mid_lock);
+>                 if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+>                         /* no longer considered to be "in-flight" */
+> -                       midQ->callback = DeleteMidQEntry;
+> +                       midQ->callback = cifs_release_mid;
+>                         spin_unlock(&server->mid_lock);
+>                         add_credits(server, &credits, 0);
+>                         return rc;
+> @@ -1606,7 +1601,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+>                         spin_lock(&server->mid_lock);
+>                         if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+>                                 /* no longer considered to be "in-flight" */
+> -                               midQ->callback = DeleteMidQEntry;
+> +                               midQ->callback = cifs_release_mid;
+>                                 spin_unlock(&server->mid_lock);
+>                                 return rc;
+>                         }
+> --
+> 2.35.3
+>
 
-fs/ksmbd/smb2pdu.c
-    5109 static int smb2_get_info_sec(struct ksmbd_work *work,
-    5110                              struct smb2_query_info_req *req,
-    5111                              struct smb2_query_info_rsp *rsp)
-    5112 {
-    5113         struct ksmbd_file *fp;
-    5114         struct user_namespace *user_ns;
-    5115         struct smb_ntsd *pntsd = (struct smb_ntsd *)rsp->Buffer, *ppntsd = NULL;
-    5116         struct smb_fattr fattr = {{0}};
-    5117         struct inode *inode;
-    5118         __u32 secdesclen;
-    5119         unsigned int id = KSMBD_NO_FID, pid = KSMBD_NO_FID;
-    5120         int addition_info = le32_to_cpu(req->AdditionalInformation);
-    5121         int rc = 0, ppntsd_size = 0;
-    5122 
-    5123         if (addition_info & ~(OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO |
-    5124                               PROTECTED_DACL_SECINFO |
-    5125                               UNPROTECTED_DACL_SECINFO)) {
-    5126                 ksmbd_debug(SMB, "Unsupported addition info: 0x%x)\n",
-    5127                        addition_info);
-    5128 
-    5129                 pntsd->revision = cpu_to_le16(1);
-    5130                 pntsd->type = cpu_to_le16(SELF_RELATIVE | DACL_PROTECTED);
-    5131                 pntsd->osidoffset = 0;
-    5132                 pntsd->gsidoffset = 0;
-    5133                 pntsd->sacloffset = 0;
-    5134                 pntsd->dacloffset = 0;
-    5135 
-    5136                 secdesclen = sizeof(struct smb_ntsd);
-    5137                 rsp->OutputBufferLength = cpu_to_le32(secdesclen);
-    5138                 inc_rfc1001_len(work->response_buf, secdesclen);
-    5139 
-    5140                 return 0;
-    5141         }
-    5142 
-    5143         if (work->next_smb2_rcv_hdr_off) {
-    5144                 if (!has_file_id(req->VolatileFileId)) {
-    5145                         ksmbd_debug(SMB, "Compound request set FID = %llu\n",
-    5146                                     work->compound_fid);
-    5147                         id = work->compound_fid;
-    5148                         pid = work->compound_pfid;
-    5149                 }
-    5150         }
-    5151 
-    5152         if (!has_file_id(id)) {
-    5153                 id = req->VolatileFileId;
-    5154                 pid = req->PersistentFileId;
-    5155         }
-    5156 
-    5157         fp = ksmbd_lookup_fd_slow(work, id, pid);
-    5158         if (!fp)
-    5159                 return -ENOENT;
-    5160 
-    5161         user_ns = file_mnt_user_ns(fp->filp);
-    5162         inode = file_inode(fp->filp);
-    5163         ksmbd_acls_fattr(&fattr, user_ns, inode);
-    5164 
-    5165         if (test_share_config_flag(work->tcon->share_conf,
-    5166                                    KSMBD_SHARE_FLAG_ACL_XATTR))
-    5167                 ppntsd_size = ksmbd_vfs_get_sd_xattr(work->conn, user_ns,
-    5168                                                      fp->filp->f_path.dentry,
-    5169                                                      &ppntsd);
-    5170 
-    5171         /* Check if sd buffer size exceeds response buffer size */
-    5172         if (smb2_resp_buf_len(work, 8) > ppntsd_size)
-    5173                 rc = build_sec_desc(user_ns, pntsd, ppntsd, ppntsd_size,
-    5174                                     addition_info, &secdesclen, &fattr);
 
-"secdesclen" is not initialized on else path.
+-- 
+Thanks,
 
-    5175         posix_acl_release(fattr.cf_acls);
-    5176         posix_acl_release(fattr.cf_dacls);
-    5177         kfree(ppntsd);
-    5178         ksmbd_fd_put(work, fp);
-    5179         if (rc)
-    5180                 return rc;
-    5181 
---> 5182         rsp->OutputBufferLength = cpu_to_le32(secdesclen);
-    5183         inc_rfc1001_len(work->response_buf, secdesclen);
-    5184         return 0;
-    5185 }
-
-regards,
-dan carpenter
+Steve
