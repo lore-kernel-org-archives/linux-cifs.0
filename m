@@ -2,161 +2,473 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D93C00140
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Aug 2022 11:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1ECC00140
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Aug 2022 14:47:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235249AbiHELm0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Aug 2022 07:42:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60098 "EHLO
+        id S237817AbiHEOrw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Aug 2022 10:47:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbiHELmY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Aug 2022 07:42:24 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAE5E22BD9
-        for <linux-cifs@vger.kernel.org>; Fri,  5 Aug 2022 04:42:23 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 275A5RcN030748;
-        Fri, 5 Aug 2022 11:42:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2022-7-12;
- bh=P6vh1DpvH7Fuh67YABHRxZlVFqSzCsAbJuG87GYst3g=;
- b=z8BqDXpTROetbsbVlY2qw4K2zK8YZrWFbLg4phcRkbnuF0NfV4REnAUN+dDZGJIFhCQb
- t9xv/3YAxnKI88cgqoF7fxXWLjR1cIa9yJjS2Cw/6NOmEo2hoi3u04p3ZeS888f4aT5h
- zUtDNA5tTBr8djTHbmLxQTIh+jvbswd6xKetrgcw+HGf2cu9BHyiK7pYwea2/udInMWw
- DCOCv5FZLhsGLI2pnqiaJt1ylw4AyvrXeQZOq+UipM4c2Ss5HAFC0kBGebeU6Sbj7dB+
- ZPzoXfuQL4ro02D1YFVnUdKBkdbHUzsn2DHdv8JK246V/BholvU5vX54D4s1tifRRQWD PQ== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3hmu817h63-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 05 Aug 2022 11:42:20 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 275BD0Kl003140;
-        Fri, 5 Aug 2022 11:42:19 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2049.outbound.protection.outlook.com [104.47.66.49])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3hmu35abk3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 05 Aug 2022 11:42:18 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GIQzlk4zrYAh8q5nmE40/cXcisFFntaUmkNfKjiu8Z8QgHLNrNzzZMH4SiE1fgUyHnJHeB8kXiDzqke2U2MncMgeDB1IBzq52D3UZPcHmbI5fpxT5T4xDIUgcmijbxNYA3q3TPZdvQtwQo0ZWRTN06iAPAPchmEFhQ92RfttL0FFun8vitiG8MuCxUtajPZKEvRDoZeeoBs2d6nSJAAiOdhBrj7MC1OnJ5x8u85V6S+k4sSKxHal/azCJ0ObxEJ44WYrHur8oHKFtoNXUwSvJTidB3HnDlYQIx7I603GF9H4qs6vA36hfXkIC2fScOvqZQS6SNfqhxDBOA6bwRQ5QQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=P6vh1DpvH7Fuh67YABHRxZlVFqSzCsAbJuG87GYst3g=;
- b=AH3cIMYe866aWQnoVsFL8zqC0ITGuMB1kfMZjO509H14GdBNXexPpb77tGheO+7rGIi+/H+if/Ym1F2VN/NgxLb1xEodTlE5+tNfewOdjh1YE3q4X1wXwVC8+An3Tt8mudp34bSTJCnUliHKx8ZXknrUOLj6AyifHfBgjLYgA4wdA7vWaLS+l981R2p4jSAUFDZkMX5iskwdPThnOWAOwSxTnr5vgaR3hju9SiaAge2DYfj9OV5gqLWB+nIihy2jQz7hs6Nn28JQXy6kyYe/M6uNaFLfuPciRQ4lStcpPoKU4qDhNgxFAwVNsAeXKyefleNo0517IQCIn/Ol002UAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P6vh1DpvH7Fuh67YABHRxZlVFqSzCsAbJuG87GYst3g=;
- b=haNlXa/FbQHFvf6RZKwC8y0IMpVztzDeER9o7SJ7S1EbWc1qtCLpNYMHCFxrhnN69CzzgXMdxubdsRWEOkVd+Ip1qGR4V1VGr+QRp1jDPmthTkM7W5VzTH2HIPBkbVZzp8GDPbPCuq2CQsnSzZI1x+ot3vd72kWMbQ5CMCudllQ=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by CH0PR10MB4857.namprd10.prod.outlook.com
- (2603:10b6:610:c2::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5504.14; Fri, 5 Aug
- 2022 11:42:16 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::209e:de4d:68ea:c026]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::209e:de4d:68ea:c026%3]) with mapi id 15.20.5504.016; Fri, 5 Aug 2022
- 11:42:16 +0000
-Date:   Fri, 5 Aug 2022 14:42:00 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org
-Subject: Re: [bug report] ksmbd: fix heap-based overflow in set_ntacl_dacl()
-Message-ID: <20220805114200.GM3460@kadam>
-References: <YuvYoM5nknSDxJFj@kili>
- <CAKYAXd9PDUBLvoZqS26mMKqdS6J1b-MQ6LNgy=W7POjXu_+L4Q@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKYAXd9PDUBLvoZqS26mMKqdS6J1b-MQ6LNgy=W7POjXu_+L4Q@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: JNAP275CA0016.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4c::21)
- To MWHPR1001MB2365.namprd10.prod.outlook.com (2603:10b6:301:2d::28)
+        with ESMTP id S237177AbiHEOrv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Aug 2022 10:47:51 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60DCC1EC56
+        for <linux-cifs@vger.kernel.org>; Fri,  5 Aug 2022 07:47:49 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 110A820286;
+        Fri,  5 Aug 2022 14:47:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1659710868; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=ahGO4U7+OJIiITxV/zXRet/cEqv1T0oZzr+gkHD14nA=;
+        b=H2D+dMZTPwWw85PLdyxep0PU/m/tw4R9wuwfAzuMkQUxzlcNBCeqUTIYHvSeCiH+al8RNw
+        Oc/fQ5LJBePIzPjuO7LOREmgmxyCBve8dY7H2NqM7vtbCJF+EZlReclmN9Prc3ovPulEMI
+        0gRKj35AQNLH/tP0VZXsRL5hSbDs8Qo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1659710868;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=ahGO4U7+OJIiITxV/zXRet/cEqv1T0oZzr+gkHD14nA=;
+        b=8ZaZrvY91dhtc08xGSsjF+mv6L6lg2UrXO6f6GMBEwXnuZtZV+3amiN0putDgw/v1zInMa
+        +7+Npk3r56KWh6Aw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 83F5D13A9C;
+        Fri,  5 Aug 2022 14:47:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id AVW/EpMt7WIFTwAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Fri, 05 Aug 2022 14:47:47 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com
+Subject: [PATCH v2 1/2] cifs: remove useless DeleteMidQEntry()
+Date:   Fri,  5 Aug 2022 11:47:38 -0300
+Message-Id: <20220805144739.27641-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cc0664f1-511d-4aa0-41a4-08da76d78bd7
-X-MS-TrafficTypeDiagnostic: CH0PR10MB4857:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zFCTql162BDzZfx6/UApoaBn4NCGheeFtmCYrR7R2zaCss8MGPWrdgDaTAX/AkbIWFh9ZOR8Dp0ASahTlCMTJc1Wt5ZxtPUQrecFixVaIe6VNZXLWhNZgW5xm8oAdwh1afgJi3QVG4J09/DjBOhzxERgHVDHtDhuONswG7NYPGeWRtzQYdUGJv7TJfmffxbdePsNU88D+wzhaCaZLIELFDvAF4jK0JoJorSVRm7hwtaEhvpfnZwAiYJM9ySo9wjEu5E9Rel7dGVsXcoaczS1Ys9BmzjBgBTKZ7f+fDsA73eS3ZjFw+oDqigZT/efj7BjrJi3n3lVn1i93YsMqjxbLwfsZgN9FoXeh/QwZDKNeQNFiJyBo4ESsbGG96TWeuzUMsDMW3hkBabwpSn3o5OaZbSScH8sqfiYoVPUmnZoIifQBW+aZsX1pqLsDNcwIJv42fXmbx+p2hmxuAIzovHG5H1gqWDBaLTeGZkm8/+uq4LSAfhsLQjXDmB4uPdSctx5LOrjgyMxXyaKi535Xq3WsA3HN1+89KmDE/Hh9M7lXw3+wCUq5G4Nai1juZDWVxsSsd6AUdABFzk1AFa3riGkk0Tm4lYxoUBjaH0NmH6jYMm5r43pcacrcXUkzg3x4i1rhyYu+Rxk4bysPzQSJRWfiNWMQZOTOLS1SCcu1kFy+g7AMm3KIoZu6z58CSHGQar5kuNOUBoPWmjhYSAo6a4a59j8VvZ5VoClxxxMJiaKZK5GA+uWL1FagZz4x3YK0Rhfx8waPqWAyI/VnKHMFzoJs32wKdaSM1kv7E3QFuzdx1i/yWoiV5Q+PUIzv69MxTNIQ3cGFZZq4YonKh0O/Owgrg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(136003)(39860400002)(396003)(346002)(376002)(366004)(966005)(6486002)(478600001)(86362001)(4326008)(8676002)(66946007)(66556008)(66476007)(316002)(6916009)(83380400001)(33716001)(38100700002)(38350700002)(26005)(52116002)(6506007)(9686003)(6512007)(6666004)(41300700001)(1076003)(186003)(8936002)(4744005)(2906002)(44832011)(5660300002)(33656002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BF0AIz+ckN64P5Xdk9EAWgCtbTrqJTL5xIKOZOVYRcF3FDHHdf15YDnfnaA7?=
- =?us-ascii?Q?p3ddaIMVe0gk9+WdHExCtRVC83oSeaf5w9FX4JXFBPjuxwai+R49MsClQGUz?=
- =?us-ascii?Q?g1DbqWB5LjEpoBvUuDjvA0eVHhNQqAOtHW7b6eO/bFF5D/7h0IoWA8m+HD9D?=
- =?us-ascii?Q?WCdlBj1R1cNIYKyWvWcfZ2U4+lSOhhnusLKnvPv6/Xvt5xNaDGr2mEMHf+17?=
- =?us-ascii?Q?Z+xqiouKFEZnFOYSZaAUplYjSgIkmnuOp8lGTq5XYx4tsE/pNDJ0TyoSXElR?=
- =?us-ascii?Q?RuFiiVp47j63VUWiPBN1Vydu4grDA6krm0vxqvcv3gfB2+pcpLOzI6OqMzAc?=
- =?us-ascii?Q?l/OTlO3gkePlfAYTNNyYqmYxSPMXYBX21GKcxgenhnwhwb8Kkc9c7U4UneJO?=
- =?us-ascii?Q?cxJPXUmK6C3HhjUJfkl68v7VoH9TI/VvmXBc5A6IsgcpEcHGwJVbp66YnSKM?=
- =?us-ascii?Q?vRwwN0n82io9lRikAWTO4tBakjrF7Lbh4ovZ83ukjxB5ouKqa2OmrzsgBL+2?=
- =?us-ascii?Q?CX/M1a5bpZ00rkfetaceiN/mBmaU/UzVjUcuzYCYdKBr7rP6YowHsOQnY7R9?=
- =?us-ascii?Q?WHpGrs1Zw7nY+2hmZ05t/BYR5/cOKR0tzEOYysmt8v0woym0jKj/DaYtENtx?=
- =?us-ascii?Q?RW42aNXHMdSZBkfzWd10iIJdgBl5rs+i/6HF1rxrCPMbNTb080ARLFfFApRG?=
- =?us-ascii?Q?+V/sKwxNaO3C5dFd6TxVzplP55vZlx7x+K1UUHqb7X6O00OfZUwOQ1vddrad?=
- =?us-ascii?Q?JfEXhlVqT3X4ZY1bm3ADiGikHNXoEqzlIZbEf/emiy/ifc2Cmxss/tNon5CT?=
- =?us-ascii?Q?UyMpzBVabQy/BaK5jgyCmEZED0TiXhctIQWk+1ZqNrxKMp8QP7JWEYmrLQcP?=
- =?us-ascii?Q?vQNj+lk62463W2MiefD8t5dxxxJ1Aow81ViKXNeAm3rObvIRmEJtiKsMTvx6?=
- =?us-ascii?Q?Iwz42sWD4ypWujl1ulMzr+T0BlJj6ErpwNhDwtZWvplL03yZQgIpmrw/35Cz?=
- =?us-ascii?Q?eunyAIkP8Fq9DjdCYg8cYETWerpmfGlqhcBkYq18Sipw0sBcqEYqa5pEcewO?=
- =?us-ascii?Q?LB92wP8GIunIdmY6tul/HgCOa0zk6CWrAhiTltimWctvyfAMGZG5xDCyg9mS?=
- =?us-ascii?Q?E5PGkBBi8aRFqtmcQyuA1e43ynDPHPLWEF3gb/6e4497AhMqpSxR5WuZdcwh?=
- =?us-ascii?Q?/H1U82V/UXyDABFfChERDVtaUhX2plcMKyetswpAzzx9DBEh273Ja9XOwFbB?=
- =?us-ascii?Q?8cejFn5irk76lNpwiNBGLcKzDCHONStlpKFGVjqWomYzJNpTRSZd2fxFhYxR?=
- =?us-ascii?Q?kZvNnytADdEtTccffyU+Wy4ZfM9JZfExyLEDOY9zVDAJ+yRFkkKF9uag31tX?=
- =?us-ascii?Q?OBVcHz3BiezIlIG4D8n/O/Z+ggnrySCgcRwIX3SGfDcXRyIEiXINZIVdgQwa?=
- =?us-ascii?Q?Tp7LOl4ATbNJM8jhmSkRW5PE05Oi/yNDZWdvuqjnB81kWgn2BaiERqTlbDb3?=
- =?us-ascii?Q?+A0HKZC5hUwgfuYsLQ1y4Jak2utJGJqDf/tcCMyiRimHJVm2p1Z+8FksbfeW?=
- =?us-ascii?Q?z55KEWSp1w5kquVHC0bSSgvsLmKIrp8DA1E9Rce7v+OPrjOJF4RUI2gCrIin?=
- =?us-ascii?Q?+A=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc0664f1-511d-4aa0-41a4-08da76d78bd7
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2022 11:42:16.5188
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fSqLlpuPxItOex3HA29k6zs43twCAnFfJxmby2wlboGbiwYHtLowdewHEKOYQ2K2eBWCa59nX2wamSCndCKsyexdcH53A1C1DV7MqyJUZ4o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB4857
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-05_05,2022-08-05_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
- mlxlogscore=999 bulkscore=0 mlxscore=0 phishscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2208050058
-X-Proofpoint-ORIG-GUID: BvdTApAailyj_inTUlQ4DKZ5fIPl1gK2
-X-Proofpoint-GUID: BvdTApAailyj_inTUlQ4DKZ5fIPl1gK2
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Aug 05, 2022 at 08:03:04AM +0900, Namjae Jeon wrote:
-> 2022-08-04 23:33 GMT+09:00, Dan Carpenter <dan.carpenter@oracle.com>:
-> > Hello Namjae Jeon,
-> Hi Dan,
-> >
-> > The patch 982979772f2b: "ksmbd: fix heap-based overflow in
-> > set_ntacl_dacl()" from Jul 28, 2022, leads to the following Smatch
-> > static checker warning:
-> >
-> > 	fs/ksmbd/smb2pdu.c:5182 smb2_get_info_sec()
-> > 	error: uninitialized symbol 'secdesclen'.
-> This was fixed on v4 patch :
->   https://marc.info/?l=linux-cifs&m=165939383203779&w=2 
-> 
-> Thanks for your report!
+DeleteMidQEntry() was just a proxy for cifs_mid_q_entry_release().
 
-Oops.  Sorry, I didn't realize it was part of the kbuild warning...  The
-kbuild warning didn't include that code so this was the first time I
-was seeing the code myself.
+- remove DeleteMidQEntry()
+- rename cifs_mid_q_entry_release() to release_mid()
+- rename kref_put() callback _cifs_mid_q_entry_release to __release_mid
+- rename AllocMidQEntry() to alloc_mid()
+- rename cifs_delete_mid() to delete_mid()
 
-regards,
-dan carpenter
+Update callers to use new names.
+
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+v2:
+- remove "cifs_" prefix from generic mid functions
+- rename AllocMidQEntry() and cifs_delete_mid() as well
+- add a follow-up patch to rename cifs_{init,destroy}_mids() in cifsfs.c
+
+@Steve: since most mid handling code treats "mid_q_entry" as the mid per
+se, I went with "release_mid()" instead of "release_mid_q_entry()" to
+keep a standard.
+
+ fs/cifs/cifsproto.h     |  9 +++----
+ fs/cifs/cifssmb.c       |  6 ++---
+ fs/cifs/connect.c       |  8 +++---
+ fs/cifs/smb2ops.c       |  2 +-
+ fs/cifs/smb2pdu.c       |  6 ++---
+ fs/cifs/smb2transport.c |  4 +--
+ fs/cifs/transport.c     | 57 +++++++++++++++++++----------------------
+ 7 files changed, 43 insertions(+), 49 deletions(-)
+
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index de167e3af015..a3cb47619a0a 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -79,11 +79,10 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+ 		const char *fullpath, const struct dfs_info3_param *ref,
+ 		char **devname);
+ /* extern void renew_parental_timestamps(struct dentry *direntry);*/
+-extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+-					struct TCP_Server_Info *server);
+-extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+-extern void cifs_delete_mid(struct mid_q_entry *mid);
+-extern void cifs_mid_q_entry_release(struct mid_q_entry *midEntry);
++extern struct mid_q_entry *alloc_mid(const struct smb_hdr *,
++				     struct TCP_Server_Info *);
++extern void delete_mid(struct mid_q_entry *mid);
++extern void release_mid(struct mid_q_entry *mid);
+ extern void cifs_wake_up_task(struct mid_q_entry *mid);
+ extern int cifs_handle_standard(struct TCP_Server_Info *server,
+ 				struct mid_q_entry *mid);
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 26b9d2438228..7aa91e272027 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -591,7 +591,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
+ 	struct TCP_Server_Info *server = mid->callback_data;
+ 	struct cifs_credits credits = { .value = 1, .instance = 0 };
+ 
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ 	add_credits(server, &credits, CIFS_ECHO_OP);
+ }
+ 
+@@ -1336,7 +1336,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 	}
+ 
+ 	queue_work(cifsiod_wq, &rdata->work);
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ 	add_credits(server, &credits, 0);
+ }
+ 
+@@ -1684,7 +1684,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
+ 	}
+ 
+ 	queue_work(cifsiod_wq, &wdata->work);
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ 	add_credits(tcon->ses->server, &credits, 0);
+ }
+ 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index abb65dd7471f..7f205a9a2de4 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -334,7 +334,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
+ 	list_for_each_entry_safe(mid, nmid, &retry_list, qhead) {
+ 		list_del_init(&mid->qhead);
+ 		mid->callback(mid);
+-		cifs_mid_q_entry_release(mid);
++		release_mid(mid);
+ 	}
+ 
+ 	if (cifs_rdma_enabled(server)) {
+@@ -1007,7 +1007,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 			cifs_dbg(FYI, "Callback mid %llu\n", mid_entry->mid);
+ 			list_del_init(&mid_entry->qhead);
+ 			mid_entry->callback(mid_entry);
+-			cifs_mid_q_entry_release(mid_entry);
++			release_mid(mid_entry);
+ 		}
+ 		/* 1/8th of sec is more than enough time for them to exit */
+ 		msleep(125);
+@@ -1246,7 +1246,7 @@ cifs_demultiplex_thread(void *p)
+ 		if (length < 0) {
+ 			for (i = 0; i < num_mids; i++)
+ 				if (mids[i])
+-					cifs_mid_q_entry_release(mids[i]);
++					release_mid(mids[i]);
+ 			continue;
+ 		}
+ 
+@@ -1273,7 +1273,7 @@ cifs_demultiplex_thread(void *p)
+ 				if (!mids[i]->multiRsp || mids[i]->multiEnd)
+ 					mids[i]->callback(mids[i]);
+ 
+-				cifs_mid_q_entry_release(mids[i]);
++				release_mid(mids[i]);
+ 			} else if (server->ops->is_oplock_break &&
+ 				   server->ops->is_oplock_break(bufs[i],
+ 								server)) {
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 82dd2e973753..c0039dc0715a 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -5099,7 +5099,7 @@ static void smb2_decrypt_offload(struct work_struct *work)
+ 				spin_unlock(&dw->server->srv_lock);
+ 			}
+ 		}
+-		cifs_mid_q_entry_release(mid);
++		release_mid(mid);
+ 	}
+ 
+ free_pages:
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 131bec79d6fd..590a1d4ac140 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -3776,7 +3776,7 @@ smb2_echo_callback(struct mid_q_entry *mid)
+ 		credits.instance = server->reconnect_instance;
+ 	}
+ 
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ 	add_credits(server, &credits, CIFS_ECHO_OP);
+ }
+ 
+@@ -4201,7 +4201,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 				     rdata->offset, rdata->got_bytes);
+ 
+ 	queue_work(cifsiod_wq, &rdata->work);
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ 	add_credits(server, &credits, 0);
+ }
+ 
+@@ -4440,7 +4440,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
+ 				      wdata->offset, wdata->bytes);
+ 
+ 	queue_work(cifsiod_wq, &wdata->work);
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ 	add_credits(server, &credits, 0);
+ }
+ 
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index f64922f340b3..1a5fc3314dbf 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -856,7 +856,7 @@ smb2_setup_request(struct cifs_ses *ses, struct TCP_Server_Info *server,
+ 	rc = smb2_sign_rqst(rqst, server);
+ 	if (rc) {
+ 		revert_current_mid_from_hdr(server, shdr);
+-		cifs_delete_mid(mid);
++		delete_mid(mid);
+ 		return ERR_PTR(rc);
+ 	}
+ 
+@@ -890,7 +890,7 @@ smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	rc = smb2_sign_rqst(rqst, server);
+ 	if (rc) {
+ 		revert_current_mid_from_hdr(server, shdr);
+-		DeleteMidQEntry(mid);
++		release_mid(mid);
+ 		return ERR_PTR(rc);
+ 	}
+ 
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 914a7aaf9fa7..dc69ac9dad60 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -39,12 +39,12 @@ cifs_wake_up_task(struct mid_q_entry *mid)
+ }
+ 
+ struct mid_q_entry *
+-AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
++alloc_mid(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ {
+ 	struct mid_q_entry *temp;
+ 
+ 	if (server == NULL) {
+-		cifs_dbg(VFS, "Null TCP session in AllocMidQEntry\n");
++		cifs_dbg(VFS, "%s: null TCP session\n", __func__);
+ 		return NULL;
+ 	}
+ 
+@@ -74,7 +74,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 	return temp;
+ }
+ 
+-static void _cifs_mid_q_entry_release(struct kref *refcount)
++static void __release_mid(struct kref *refcount)
+ {
+ 	struct mid_q_entry *midEntry =
+ 			container_of(refcount, struct mid_q_entry, refcount);
+@@ -153,22 +153,17 @@ static void _cifs_mid_q_entry_release(struct kref *refcount)
+ 	mempool_free(midEntry, cifs_mid_poolp);
+ }
+ 
+-void cifs_mid_q_entry_release(struct mid_q_entry *midEntry)
++void release_mid(struct mid_q_entry *mid)
+ {
+-	struct TCP_Server_Info *server = midEntry->server;
++	struct TCP_Server_Info *server = mid->server;
+ 
+ 	spin_lock(&server->mid_lock);
+-	kref_put(&midEntry->refcount, _cifs_mid_q_entry_release);
++	kref_put(&mid->refcount, __release_mid);
+ 	spin_unlock(&server->mid_lock);
+ }
+ 
+-void DeleteMidQEntry(struct mid_q_entry *midEntry)
+-{
+-	cifs_mid_q_entry_release(midEntry);
+-}
+-
+ void
+-cifs_delete_mid(struct mid_q_entry *mid)
++delete_mid(struct mid_q_entry *mid)
+ {
+ 	spin_lock(&mid->server->mid_lock);
+ 	if (!(mid->mid_flags & MID_DELETED)) {
+@@ -177,7 +172,7 @@ cifs_delete_mid(struct mid_q_entry *mid)
+ 	}
+ 	spin_unlock(&mid->server->mid_lock);
+ 
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ }
+ 
+ /*
+@@ -748,7 +743,7 @@ static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
+ 	}
+ 	spin_unlock(&ses->ses_lock);
+ 
+-	*ppmidQ = AllocMidQEntry(in_buf, ses->server);
++	*ppmidQ = alloc_mid(in_buf, ses->server);
+ 	if (*ppmidQ == NULL)
+ 		return -ENOMEM;
+ 	spin_lock(&ses->server->mid_lock);
+@@ -785,13 +780,13 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	if (server->sign)
+ 		hdr->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
+ 
+-	mid = AllocMidQEntry(hdr, server);
++	mid = alloc_mid(hdr, server);
+ 	if (mid == NULL)
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	rc = cifs_sign_rqst(rqst, server, &mid->sequence_number);
+ 	if (rc) {
+-		DeleteMidQEntry(mid);
++		release_mid(mid);
+ 		return ERR_PTR(rc);
+ 	}
+ 
+@@ -868,7 +863,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+ 	if (rc < 0) {
+ 		revert_current_mid(server, mid->credits);
+ 		server->sequence_number -= 2;
+-		cifs_delete_mid(mid);
++		delete_mid(mid);
+ 	}
+ 
+ 	cifs_server_unlock(server);
+@@ -940,7 +935,7 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+ 	}
+ 	spin_unlock(&server->mid_lock);
+ 
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ 	return rc;
+ }
+ 
+@@ -1000,7 +995,7 @@ cifs_setup_request(struct cifs_ses *ses, struct TCP_Server_Info *ignored,
+ 		return ERR_PTR(rc);
+ 	rc = cifs_sign_rqst(rqst, ses->server, &mid->sequence_number);
+ 	if (rc) {
+-		cifs_delete_mid(mid);
++		delete_mid(mid);
+ 		return ERR_PTR(rc);
+ 	}
+ 	return mid;
+@@ -1029,7 +1024,7 @@ static void
+ cifs_cancelled_callback(struct mid_q_entry *mid)
+ {
+ 	cifs_compound_callback(mid);
+-	DeleteMidQEntry(mid);
++	release_mid(mid);
+ }
+ 
+ /*
+@@ -1133,7 +1128,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		if (IS_ERR(midQ[i])) {
+ 			revert_current_mid(server, i);
+ 			for (j = 0; j < i; j++)
+-				cifs_delete_mid(midQ[j]);
++				delete_mid(midQ[j]);
+ 			cifs_server_unlock(server);
+ 
+ 			/* Update # of requests on wire to server */
+@@ -1253,7 +1248,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		rc = server->ops->check_receive(midQ[i], server,
+ 						     flags & CIFS_LOG_ERROR);
+ 
+-		/* mark it so buf will not be freed by cifs_delete_mid */
++		/* mark it so buf will not be freed by delete_mid */
+ 		if ((flags & CIFS_NO_RSP_BUF) == 0)
+ 			midQ[i]->resp_buf = NULL;
+ 
+@@ -1285,7 +1280,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	 */
+ 	for (i = 0; i < num_rqst; i++) {
+ 		if (!cancelled_mid[i])
+-			cifs_delete_mid(midQ[i]);
++			delete_mid(midQ[i]);
+ 	}
+ 
+ 	return rc;
+@@ -1425,7 +1420,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 		spin_lock(&server->mid_lock);
+ 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 			/* no longer considered to be "in-flight" */
+-			midQ->callback = DeleteMidQEntry;
++			midQ->callback = release_mid;
+ 			spin_unlock(&server->mid_lock);
+ 			add_credits(server, &credits, 0);
+ 			return rc;
+@@ -1450,7 +1445,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
+ 	rc = cifs_check_receive(midQ, server, 0);
+ out:
+-	cifs_delete_mid(midQ);
++	delete_mid(midQ);
+ 	add_credits(server, &credits, 0);
+ 
+ 	return rc;
+@@ -1543,7 +1538,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	rc = cifs_sign_smb(in_buf, server, &midQ->sequence_number);
+ 	if (rc) {
+-		cifs_delete_mid(midQ);
++		delete_mid(midQ);
+ 		cifs_server_unlock(server);
+ 		return rc;
+ 	}
+@@ -1560,7 +1555,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 	cifs_server_unlock(server);
+ 
+ 	if (rc < 0) {
+-		cifs_delete_mid(midQ);
++		delete_mid(midQ);
+ 		return rc;
+ 	}
+ 
+@@ -1583,7 +1578,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 			   blocking lock to return. */
+ 			rc = send_cancel(server, &rqst, midQ);
+ 			if (rc) {
+-				cifs_delete_mid(midQ);
++				delete_mid(midQ);
+ 				return rc;
+ 			}
+ 		} else {
+@@ -1595,7 +1590,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 			/* If we get -ENOLCK back the lock may have
+ 			   already been removed. Don't exit in this case. */
+ 			if (rc && rc != -ENOLCK) {
+-				cifs_delete_mid(midQ);
++				delete_mid(midQ);
+ 				return rc;
+ 			}
+ 		}
+@@ -1606,7 +1601,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 			spin_lock(&server->mid_lock);
+ 			if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 				/* no longer considered to be "in-flight" */
+-				midQ->callback = DeleteMidQEntry;
++				midQ->callback = release_mid;
+ 				spin_unlock(&server->mid_lock);
+ 				return rc;
+ 			}
+@@ -1634,7 +1629,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 	memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
+ 	rc = cifs_check_receive(midQ, server, 0);
+ out:
+-	cifs_delete_mid(midQ);
++	delete_mid(midQ);
+ 	if (rstart && rc == -EACCES)
+ 		return -ERESTARTSYS;
+ 	return rc;
+-- 
+2.35.3
 
