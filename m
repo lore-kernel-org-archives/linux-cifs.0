@@ -2,114 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 159F8C00140
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Aug 2022 14:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBCB4C00140
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Aug 2022 14:51:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243455AbiHHOd7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Aug 2022 10:33:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59348 "EHLO
+        id S242026AbiHHOvi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Aug 2022 10:51:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235514AbiHHOd6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Aug 2022 10:33:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3A4CA10FFF
-        for <linux-cifs@vger.kernel.org>; Mon,  8 Aug 2022 07:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659969236;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=vZrPp9M6+vQgqOZFpLy5S17BII/izqfOFe7C4MphlAA=;
-        b=VJmLqDJdox+zS2uCCbmz3BWBUVEtX6Xi5n9pYwUMacvk4eKDsXidHYm51DBFc1iJ7V7Ozb
-        Vnmkd3Dzx9zBH9ohVouCFNlRngV9rCVvPn90wHZOMlpUVHP4Ezh4adan/9QGvpVvI4off2
-        lyzNI/a4MJligSwzlriexnPFcseH7Pk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-73-Q4GmpSw3PZm0JNiAEKFwlQ-1; Mon, 08 Aug 2022 10:33:53 -0400
-X-MC-Unique: Q4GmpSw3PZm0JNiAEKFwlQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S236566AbiHHOvh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Aug 2022 10:51:37 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5EA1627C;
+        Mon,  8 Aug 2022 07:51:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B75E738173C3;
-        Mon,  8 Aug 2022 14:33:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C997D2026D4C;
-        Mon,  8 Aug 2022 14:33:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH] cifs: Remove {cifs,nfs}_fscache_release_page()
-From:   David Howells <dhowells@redhat.com>
-To:     willy@infradead.org
-Cc:     Jeff Layton <jlayton@redhat.com>,
-        Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2A117B80EE8;
+        Mon,  8 Aug 2022 14:51:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30B98C433D6;
+        Mon,  8 Aug 2022 14:51:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659970291;
+        bh=zYRnrfeP8ogVaktIwQGSynPL2OROqygzFRr2pMdrg6o=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=Y+2dHbFA6NZ6XTuU30AuLcH3/K1GnydqX3Xm837AxSdIKo3JGwx/NmwHT+fugMZAO
+         CinpdBDGYzZW2zkjFCarnqfINvIA6Tl2TABH+cXpr8agO2C8n+quWpxpAh5J2fOrAs
+         pTx6hJpMGUcIgzTG04F8sN+rCN1N9S/rpmoWtM0syuXlEXGzx8mCKN+mqMpLqzh3CU
+         Y1D5g4HDCsZ5k0/uKRKw7bElRkYj1phtbtnwPAH+rPVtxepwwP31So1Y7Eq7OgdV+K
+         FC4Btm1ZsxkmCeDcCyplyqI91kAL0hpF4T28o5zD86aLKTIcbqzdiEeBtgGFmEZgXm
+         iv6jPfuGcXDfA==
+Message-ID: <c4e26f69d38c4294038430487bf10e88fa980e0b.camel@kernel.org>
+Subject: Re: [PATCH] cifs: Remove {cifs,nfs}_fscache_release_page()
+From:   Jeff Layton <jlayton@kernel.org>
+To:     David Howells <dhowells@redhat.com>, willy@infradead.org
+Cc:     Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org,
-        dhowells@redhat.com, linux-kernel@vger.kernel.org
-Date:   Mon, 08 Aug 2022 15:33:51 +0100
-Message-ID: <165996923111.209242.10532553567023183407.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/1.4
+        linux-kernel@vger.kernel.org
+Date:   Mon, 08 Aug 2022 10:51:29 -0400
+In-Reply-To: <165996923111.209242.10532553567023183407.stgit@warthog.procyon.org.uk>
+References: <165996923111.209242.10532553567023183407.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Remove {cifs,nfs}_fscache_release_page() from fs/cifs/fscache.h.  This
-functionality got built directly into cifs_release_folio() and will
-hopefully be replaced with netfs_release_folio() at some point.
+On Mon, 2022-08-08 at 15:33 +0100, David Howells wrote:
+> Remove {cifs,nfs}_fscache_release_page() from fs/cifs/fscache.h.  This
+> functionality got built directly into cifs_release_folio() and will
+> hopefully be replaced with netfs_release_folio() at some point.
+>=20
+> The "nfs_" version is a copy and paste error and should've been altered t=
+o
+> read "cifs_".  That can also be removed.
+>=20
+> Reported-by: Matthew Wilcox <willy@infradead.org>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Jeff Layton <jlayton@redhat.com>
+> cc: Steve French <smfrench@gmail.com>
+> cc: linux-cifs@vger.kernel.org
+> cc: samba-technical@lists.samba.org
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+>=20
+>  fs/cifs/fscache.h |   16 ----------------
+>  1 file changed, 16 deletions(-)
+>=20
+> diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
+> index aa3b941a5555..67b601041f0a 100644
+> --- a/fs/cifs/fscache.h
+> +++ b/fs/cifs/fscache.h
+> @@ -108,17 +108,6 @@ static inline void cifs_readpage_to_fscache(struct i=
+node *inode,
+>  		__cifs_readpage_to_fscache(inode, page);
+>  }
+> =20
+> -static inline int cifs_fscache_release_page(struct page *page, gfp_t gfp=
+)
+> -{
+> -	if (PageFsCache(page)) {
+> -		if (current_is_kswapd() || !(gfp & __GFP_FS))
+> -			return false;
+> -		wait_on_page_fscache(page);
+> -		fscache_note_page_release(cifs_inode_cookie(page->mapping->host));
+> -	}
+> -	return true;
+> -}
+> -
+>  #else /* CONFIG_CIFS_FSCACHE */
+>  static inline
+>  void cifs_fscache_fill_coherency(struct inode *inode,
+> @@ -154,11 +143,6 @@ cifs_readpage_from_fscache(struct inode *inode, stru=
+ct page *page)
+>  static inline
+>  void cifs_readpage_to_fscache(struct inode *inode, struct page *page) {}
+> =20
+> -static inline int nfs_fscache_release_page(struct page *page, gfp_t gfp)
+> -{
+> -	return true; /* May release page */
+> -}
+> -
+>  #endif /* CONFIG_CIFS_FSCACHE */
+> =20
+>  #endif /* _CIFS_FSCACHE_H */
+>=20
+>=20
 
-The "nfs_" version is a copy and paste error and should've been altered to
-read "cifs_".  That can also be removed.
-
-Reported-by: Matthew Wilcox <willy@infradead.org>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@redhat.com>
-cc: Steve French <smfrench@gmail.com>
-cc: linux-cifs@vger.kernel.org
-cc: samba-technical@lists.samba.org
-cc: linux-fsdevel@vger.kernel.org
----
-
- fs/cifs/fscache.h |   16 ----------------
- 1 file changed, 16 deletions(-)
-
-diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-index aa3b941a5555..67b601041f0a 100644
---- a/fs/cifs/fscache.h
-+++ b/fs/cifs/fscache.h
-@@ -108,17 +108,6 @@ static inline void cifs_readpage_to_fscache(struct inode *inode,
- 		__cifs_readpage_to_fscache(inode, page);
- }
- 
--static inline int cifs_fscache_release_page(struct page *page, gfp_t gfp)
--{
--	if (PageFsCache(page)) {
--		if (current_is_kswapd() || !(gfp & __GFP_FS))
--			return false;
--		wait_on_page_fscache(page);
--		fscache_note_page_release(cifs_inode_cookie(page->mapping->host));
--	}
--	return true;
--}
--
- #else /* CONFIG_CIFS_FSCACHE */
- static inline
- void cifs_fscache_fill_coherency(struct inode *inode,
-@@ -154,11 +143,6 @@ cifs_readpage_from_fscache(struct inode *inode, struct page *page)
- static inline
- void cifs_readpage_to_fscache(struct inode *inode, struct page *page) {}
- 
--static inline int nfs_fscache_release_page(struct page *page, gfp_t gfp)
--{
--	return true; /* May release page */
--}
--
- #endif /* CONFIG_CIFS_FSCACHE */
- 
- #endif /* _CIFS_FSCACHE_H */
-
-
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
