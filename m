@@ -2,112 +2,118 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBCB4C00140
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Aug 2022 14:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F91C00140
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Aug 2022 20:01:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242026AbiHHOvi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Aug 2022 10:51:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43672 "EHLO
+        id S230396AbiHHUBL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Aug 2022 16:01:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236566AbiHHOvh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Aug 2022 10:51:37 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5EA1627C;
-        Mon,  8 Aug 2022 07:51:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2A117B80EE8;
-        Mon,  8 Aug 2022 14:51:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30B98C433D6;
-        Mon,  8 Aug 2022 14:51:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659970291;
-        bh=zYRnrfeP8ogVaktIwQGSynPL2OROqygzFRr2pMdrg6o=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=Y+2dHbFA6NZ6XTuU30AuLcH3/K1GnydqX3Xm837AxSdIKo3JGwx/NmwHT+fugMZAO
-         CinpdBDGYzZW2zkjFCarnqfINvIA6Tl2TABH+cXpr8agO2C8n+quWpxpAh5J2fOrAs
-         pTx6hJpMGUcIgzTG04F8sN+rCN1N9S/rpmoWtM0syuXlEXGzx8mCKN+mqMpLqzh3CU
-         Y1D5g4HDCsZ5k0/uKRKw7bElRkYj1phtbtnwPAH+rPVtxepwwP31So1Y7Eq7OgdV+K
-         FC4Btm1ZsxkmCeDcCyplyqI91kAL0hpF4T28o5zD86aLKTIcbqzdiEeBtgGFmEZgXm
-         iv6jPfuGcXDfA==
-Message-ID: <c4e26f69d38c4294038430487bf10e88fa980e0b.camel@kernel.org>
-Subject: Re: [PATCH] cifs: Remove {cifs,nfs}_fscache_release_page()
-From:   Jeff Layton <jlayton@kernel.org>
-To:     David Howells <dhowells@redhat.com>, willy@infradead.org
-Cc:     Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Mon, 08 Aug 2022 10:51:29 -0400
-In-Reply-To: <165996923111.209242.10532553567023183407.stgit@warthog.procyon.org.uk>
-References: <165996923111.209242.10532553567023183407.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        with ESMTP id S229782AbiHHUBK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Aug 2022 16:01:10 -0400
+Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA853C61
+        for <linux-cifs@vger.kernel.org>; Mon,  8 Aug 2022 13:01:09 -0700 (PDT)
+Received: by mail-vk1-xa2f.google.com with SMTP id r4so4929317vkf.0
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Aug 2022 13:01:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=71PuA6jDhNE+lD3WTQjWUyC7Vw1h5/nkYqjkXqze6nY=;
+        b=MAJQd8666xlCEle9wa5HH2CIV8K06/kCbWNUKfjkUlzBuDxgkVwP+25sdde+9kL0XZ
+         OlS8s0NH9bd0q9Y4GLZAuzS6my7OniQ4fbELDki2mXnnXOtPCgsBoC7SbZwwstLNGUJg
+         3GfRyjeWP8vIrW59qD+IF4df4dMsOkaOk1mBb6w4e11WefvOC42z3fQUKghSLtfEcU74
+         /8UZGzuWUNBE8HU0PQ+jjEkCaA/stERl+DXcJwr+EN/g6SsElIz1MnYYlcCTO/iw/vMb
+         J8Ubn4P5i4DSffvj5geXUQIBJ0CgXswJQYnp8BITwlY1com32F5gC2s+1njlV3cl+Fo4
+         8e6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=71PuA6jDhNE+lD3WTQjWUyC7Vw1h5/nkYqjkXqze6nY=;
+        b=hLp3b5iSjiytN17bC1uppAxQ3JQKR1UYunZqUnU309/E743z72EimIJ3DHhy3ixM3F
+         K2SeDIoGK9AVjpzSXz4Li6eQf+mb6GCw/j5EumlS7KTNPvpVa/Y/KSiq++bgj9tMmEoB
+         dZfMJdmXszgjcips7q1tDfqFv06kCplSX1uAgB4ruibnzXr4A9WjW3TkAHnOpj5ORfc3
+         +FUdRkTGlKys6Of/9LbATsgPHaCsBf/J80oLxDZvJRzcH9ejwSKaEJ1G5WmcB+JeDmS9
+         8bUzqK3EPRMUia37quqwRfP2ywuNhx1m6x+ZmLz4rllGP9BPZZXn60ijQdp4u3sH0NrX
+         JE9w==
+X-Gm-Message-State: ACgBeo2aKUBUDQ5lKbmVuh+bKaSRHGNuj5nboLf53RT7nkXJ5/hGOyNQ
+        FuP4iloJZ/Fsg3Y1FVvKAWLSjetYE2VjYC1jZQ6kTjLL2fsruQ==
+X-Google-Smtp-Source: AA6agR7mD5tx3EN93ae2ot3MStNbYdgTlFlzILYrxzRZlWRnzua8581bNidO9UYkeVj0iobCTSGXhJrULwo1Ab+CU+A=
+X-Received: by 2002:a1f:9407:0:b0:377:668e:c2a0 with SMTP id
+ w7-20020a1f9407000000b00377668ec2a0mr8167405vkd.38.1659988868760; Mon, 08 Aug
+ 2022 13:01:08 -0700 (PDT)
 MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 8 Aug 2022 15:00:58 -0500
+Message-ID: <CAH2r5ms0RwBabutvhVrMWYrepeYuH=8_Fv5jHqLCtgCGj9vehg@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 2022-08-08 at 15:33 +0100, David Howells wrote:
-> Remove {cifs,nfs}_fscache_release_page() from fs/cifs/fscache.h.  This
-> functionality got built directly into cifs_release_folio() and will
-> hopefully be replaced with netfs_release_folio() at some point.
->=20
-> The "nfs_" version is a copy and paste error and should've been altered t=
-o
-> read "cifs_".  That can also be removed.
->=20
-> Reported-by: Matthew Wilcox <willy@infradead.org>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@redhat.com>
-> cc: Steve French <smfrench@gmail.com>
-> cc: linux-cifs@vger.kernel.org
-> cc: samba-technical@lists.samba.org
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->=20
->  fs/cifs/fscache.h |   16 ----------------
->  1 file changed, 16 deletions(-)
->=20
-> diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-> index aa3b941a5555..67b601041f0a 100644
-> --- a/fs/cifs/fscache.h
-> +++ b/fs/cifs/fscache.h
-> @@ -108,17 +108,6 @@ static inline void cifs_readpage_to_fscache(struct i=
-node *inode,
->  		__cifs_readpage_to_fscache(inode, page);
->  }
-> =20
-> -static inline int cifs_fscache_release_page(struct page *page, gfp_t gfp=
-)
-> -{
-> -	if (PageFsCache(page)) {
-> -		if (current_is_kswapd() || !(gfp & __GFP_FS))
-> -			return false;
-> -		wait_on_page_fscache(page);
-> -		fscache_note_page_release(cifs_inode_cookie(page->mapping->host));
-> -	}
-> -	return true;
-> -}
-> -
->  #else /* CONFIG_CIFS_FSCACHE */
->  static inline
->  void cifs_fscache_fill_coherency(struct inode *inode,
-> @@ -154,11 +143,6 @@ cifs_readpage_from_fscache(struct inode *inode, stru=
-ct page *page)
->  static inline
->  void cifs_readpage_to_fscache(struct inode *inode, struct page *page) {}
-> =20
-> -static inline int nfs_fscache_release_page(struct page *page, gfp_t gfp)
-> -{
-> -	return true; /* May release page */
-> -}
-> -
->  #endif /* CONFIG_CIFS_FSCACHE */
-> =20
->  #endif /* _CIFS_FSCACHE_H */
->=20
->=20
+Please pull the following changes since commit
+ff6992735ade75aae3e35d16b17da1008d753d28:
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+  Linux 5.19-rc7 (2022-07-17 13:30:22 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/5.20-rc-ksmbd-server-fixes
+
+for you to fetch changes up to 8f0541186e9ad1b62accc9519cc2b7a7240272a7:
+
+  ksmbd: fix heap-based overflow in set_ntacl_dacl() (2022-08-04 09:51:38 -0500)
+
+----------------------------------------------------------------
+12 ksmbd server fixes
+- six fixes for memory access bugs (out of bounds access, oops, leak)
+- two multichannel fixes
+- session disconnect performance improvement, and session register improvement
+- cleanup
+----------------------------------------------------------------
+Hyunchul Lee (2):
+      ksmbd: prevent out of bound read for SMB2_WRITE
+      ksmbd: prevent out of bound read for SMB2_TREE_CONNNECT
+
+Namjae Jeon (10):
+      ksmbd: remove unused ksmbd_share_configs_cleanup function
+      MAINTAINERS: ksmbd: add entry for documentation
+      ksmbd: replace sessions list in connection with xarray
+      ksmbd: add channel rwlock
+      ksmbd: fix kernel oops from idr_remove()
+      ksmbd: use wait_event instead of schedule_timeout()
+      ksmbd: fix racy issue while destroying session on multichannel
+      ksmbd: fix memory leak in smb2_handle_negotiate
+      ksmbd: fix use-after-free bug in smb2_tree_disconect
+      ksmbd: fix heap-based overflow in set_ntacl_dacl()
+
+ MAINTAINERS                  |   1 +
+ fs/ksmbd/auth.c              |  56 ++++++++++---------
+ fs/ksmbd/auth.h              |  11 ++--
+ fs/ksmbd/connection.c        |   9 +--
+ fs/ksmbd/connection.h        |  10 +---
+ fs/ksmbd/mgmt/share_config.c |  14 -----
+ fs/ksmbd/mgmt/share_config.h |   2 -
+ fs/ksmbd/mgmt/tree_connect.c |   5 +-
+ fs/ksmbd/mgmt/tree_connect.h |   4 +-
+ fs/ksmbd/mgmt/user_session.c |  95 +++++++++++++++++--------------
+ fs/ksmbd/mgmt/user_session.h |  13 ++---
+ fs/ksmbd/oplock.c            |  46 +++++++++------
+ fs/ksmbd/server.c            |   8 ++-
+ fs/ksmbd/smb2misc.c          |  12 ++--
+ fs/ksmbd/smb2pdu.c           | 112 ++++++++++++++++++++++++-------------
+ fs/ksmbd/smb_common.h        |   2 +-
+ fs/ksmbd/smbacl.c            | 130 +++++++++++++++++++++++++++++--------------
+ fs/ksmbd/smbacl.h            |   2 +-
+ fs/ksmbd/vfs.c               |   8 ++-
+ fs/ksmbd/vfs_cache.c         |   2 +-
+ 20 files changed, 322 insertions(+), 220 deletions(-)
+
+-- 
+Thanks,
+
+Steve
