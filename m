@@ -2,74 +2,114 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F5CC00140
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Aug 2022 00:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 817F4C3F6B0
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Aug 2022 02:10:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244628AbiHIAiY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Aug 2022 20:38:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39792 "EHLO
+        id S230105AbiHICKn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Aug 2022 22:10:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229881AbiHIAiX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Aug 2022 20:38:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E57BD12AB3
-        for <linux-cifs@vger.kernel.org>; Mon,  8 Aug 2022 17:38:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8387361156
-        for <linux-cifs@vger.kernel.org>; Tue,  9 Aug 2022 00:38:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA168C433D7
-        for <linux-cifs@vger.kernel.org>; Tue,  9 Aug 2022 00:38:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660005501;
-        bh=UgCWKi3Gn9PIdsPgmiUACOtwyuGqJ5PCZQ1o3z7AwFo=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=ONiWAMo5AGkJlum3Axo5lfipd59HVP/LdRHQfONPd9seBQWm83/DhDqo7XrNoL0Q/
-         vsRbSOqda9aiBPExeefaONbcHttdVW/ADq+AFZzOzyfXpYc5pvIwNMiVAbmAV+VySv
-         AdsdIv79nqgXITbx/r+Ixr7jDNJUnFIW1sfs38pZrEQIINH9wK/C+nd2QVOgW53K3p
-         6/JxFsnskZByJcdI0EOEsEMzFKEQAcQRyHRdj7Iu4YKlDZx/MggTPpH8mBdYIYSDkR
-         w1gbhSPTqsi8XLn7RftBCRDtwdtkHCiV8zel8zGqEZv4FMv1xnvMdY+k0QIqjlUkYq
-         RLYGCut3k9Pfw==
-Received: by mail-ot1-f43.google.com with SMTP id q6-20020a05683033c600b0061d2f64df5dso7549574ott.13
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Aug 2022 17:38:21 -0700 (PDT)
-X-Gm-Message-State: ACgBeo1yKoj5tPjhcoCyb+zgCMzPyzWHaWxKeqRgKKQjVKdylaWLmXac
-        PqHBVTgxBcbozXIwL+43+s68BxEHIVmlrtowqAE=
-X-Google-Smtp-Source: AA6agR4OyX17F5e0p0c64jSq6NN0llF4EaaCyQHdIedVc6iss7FG2bgPVT6nuBi3wFlm8spu4NYxEE4m3LXECY52K+E=
-X-Received: by 2002:a9d:5619:0:b0:617:3dd:f32b with SMTP id
- e25-20020a9d5619000000b0061703ddf32bmr7748969oti.187.1660005500968; Mon, 08
- Aug 2022 17:38:20 -0700 (PDT)
+        with ESMTP id S234163AbiHICG1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Aug 2022 22:06:27 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4723F1BE93
+        for <linux-cifs@vger.kernel.org>; Mon,  8 Aug 2022 19:06:26 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id l4so12749562wrm.13
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Aug 2022 19:06:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc;
+        bh=FABDv85tGTWhH1lOcerQEg81catxTbmKNhI0usVruF4=;
+        b=gFF9ZEgpWGcNXj1ywscLuWLgpsVGwcfk8NT86/+O0/GEN1HfuN9/nKHuNP8LHyWB4q
+         qevOL9PKEa14Fc3Z/+6PR9jdFEt321j/R9CoRGO+PLsOmMQa/87uprhAFw9RWAfH9Hky
+         iHlK6V0edGmgLGUxjaAnaiefN3Pdd+WMO3oMQUKubdK5UT0lunSmZHllEBsPPfNVPhv7
+         x76/xxJ+7/zTnolHrzdbdSO8Tt+DqnxLoyc8f/gYWbt8iMg6ZREQ5499v+QzlSCG+6+j
+         k3b2VEYRaIMZQWvL91JLfLSZHnsttBObWyt6b0d8vPdEoBu4BcF6bSwDZyE45HkkEwYf
+         vsFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
+        bh=FABDv85tGTWhH1lOcerQEg81catxTbmKNhI0usVruF4=;
+        b=wlTyAGC7e/UyNiKJu/mj9lM+GB+YcU8hSnO4e/nG5fmYyxAbKdh8TiL7rm5arL5WA5
+         RPXyndvRwJR6DL7OpY/83GfU8GIrxM/oxDCg5lLHZO6ousKbQ8AiDPK22uQ+lTxTU378
+         nR4LCLJjYDZJp+wsRywpyrLOHodf9zQMwMd1D0NZZSrVDhIsP4B13TfphBRutAUOwZH6
+         1CA+b7qhNaauwBC8/QT+txb90tlTEEpIor8dbHuhtvd7vLhcRyNqlEXwapwGaF9ZdEGg
+         xNH6skx8NgsBjUlghSlpn/eO8g+mYpwFGQ7qL1kZty2KSWjSJljd6UXO4QKyRZUk49P1
+         9rDQ==
+X-Gm-Message-State: ACgBeo0y3J3nrt9qMzFKYciE/JH27pkmTMwFEMIctitfpX0khpW1NFnL
+        Ic44/HKeTPC97Ib1gHWDWU/YWpgpyZsl8i+79fY=
+X-Google-Smtp-Source: AA6agR7enNGnTzYp7BKBuRJ52zc5gS9uTN5NYXJlKo0Aycow/pEgfvQGi/OvFaH+tjVe4dpACo9BWY9WENIDzBIT3CA=
+X-Received: by 2002:a05:6000:15c5:b0:220:727a:24bf with SMTP id
+ y5-20020a05600015c500b00220727a24bfmr13303352wry.621.1660010784866; Mon, 08
+ Aug 2022 19:06:24 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Mon, 8 Aug 2022 17:38:20
- -0700 (PDT)
-In-Reply-To: <20220808220216.17235-1-atteh.mailbox@gmail.com>
-References: <20220808220216.17235-1-atteh.mailbox@gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 9 Aug 2022 09:38:20 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9CBR92ydiBj+1u7hEnmahOK9V4qorJVzO0D1+iXJ4qzQ@mail.gmail.com>
-Message-ID: <CAKYAXd9CBR92ydiBj+1u7hEnmahOK9V4qorJVzO0D1+iXJ4qzQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] ksmbd: request update to stale share config
-To:     atheik <atteh.mailbox@gmail.com>
-Cc:     linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
-        Hyeoncheol Lee <hyc.lee@gmail.com>
+References: <20220808125648.10919-1-linkinjeon@kernel.org>
+In-Reply-To: <20220808125648.10919-1-linkinjeon@kernel.org>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Tue, 9 Aug 2022 11:06:13 +0900
+Message-ID: <CANFS6banXVvi1O3WX7maBujz0HvUbsT7H-Qun3GETHme8HvhYA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: return STATUS_BAD_NETWORK_NAME error status if
+ share is not configured
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
+        senozhatsky@chromium.org, atteh.mailbox@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-08-09 7:02 GMT+09:00, atheik <atteh.mailbox@gmail.com>:
-> ksmbd_share_config_get() retrieves the cached share config as long
-> as there is at least one connection to the share. This is an issue when
-> the user space utilities are used to update share configs. In that case
-> there is a need to inform ksmbd that it should not use the cached share
-> config for a new connection to the share. With these changes the tree
-> connection flag KSMBD_TREE_CONN_FLAG_UPDATE indicates this. When this
-> flag is set, ksmbd removes the share config from the shares hash table
-> meaning that ksmbd_share_config_get() ends up requesting a share config
-> from user space.
+2022=EB=85=84 8=EC=9B=94 8=EC=9D=BC (=EC=9B=94) =EC=98=A4=ED=9B=84 9:57, Na=
+mjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
 >
-> Signed-off-by: Atte Heikkil=C3=A4 <atteh.mailbox@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+> If share is not configured in smb.conf, smb2 tree connect should return
+> STATUS_BAD_NETWORK_NAME instead of STATUS_BAD_NETWORK_PATH.
+>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 
-Thanks for your patch!
+Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
+
+> ---
+>  fs/ksmbd/mgmt/tree_connect.c | 2 +-
+>  fs/ksmbd/smb2pdu.c           | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/ksmbd/mgmt/tree_connect.c b/fs/ksmbd/mgmt/tree_connect.c
+> index b35ea6a6abc5..dd262daa2c4a 100644
+> --- a/fs/ksmbd/mgmt/tree_connect.c
+> +++ b/fs/ksmbd/mgmt/tree_connect.c
+> @@ -19,7 +19,7 @@ struct ksmbd_tree_conn_status
+>  ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *s=
+ess,
+>                         char *share_name)
+>  {
+> -       struct ksmbd_tree_conn_status status =3D {-EINVAL, NULL};
+> +       struct ksmbd_tree_conn_status status =3D {-ENOENT, NULL};
+>         struct ksmbd_tree_connect_response *resp =3D NULL;
+>         struct ksmbd_share_config *sc;
+>         struct ksmbd_tree_connect *tree_conn =3D NULL;
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index 4c3c840df455..d478c3ea4215 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -1944,8 +1944,9 @@ int smb2_tree_connect(struct ksmbd_work *work)
+>                 rsp->hdr.Status =3D STATUS_SUCCESS;
+>                 rc =3D 0;
+>                 break;
+> +       case -ENOENT:
+>         case KSMBD_TREE_CONN_STATUS_NO_SHARE:
+> -               rsp->hdr.Status =3D STATUS_BAD_NETWORK_PATH;
+> +               rsp->hdr.Status =3D STATUS_BAD_NETWORK_NAME;
+>                 break;
+>         case -ENOMEM:
+>         case KSMBD_TREE_CONN_STATUS_NOMEM:
+> --
+> 2.25.1
+>
+
+
+--=20
+Thanks,
+Hyunchul
