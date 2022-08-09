@@ -2,68 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A60AEC00140
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Aug 2022 03:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6232C19F2D
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Aug 2022 04:22:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233844AbiHIDWF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Aug 2022 23:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33544 "EHLO
+        id S233793AbiHIEWV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 Aug 2022 00:22:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235985AbiHIDVK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Aug 2022 23:21:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836D11EC6C
-        for <linux-cifs@vger.kernel.org>; Mon,  8 Aug 2022 20:20:11 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C5E2A60F98
-        for <linux-cifs@vger.kernel.org>; Tue,  9 Aug 2022 03:20:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 241D0C433D6;
-        Tue,  9 Aug 2022 03:20:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660015210;
-        bh=j8XUpcj0gZXSh39T7wDuBOogjV2N7h8PS388d5w0JWw=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Pz3TvMGZOpPFpeUtU79bCyYHQU5WJUcIokkQFbX6FjT5TXW2q8DU9eq3R96Br4si9
-         GVywgxByZtC/+r9pOqEVzOnFckhKX37vjIZpB7WEaWe8cRPpkRy+HEOcjmh7929WS9
-         UV01/T0gqaYCh490L0a7GN2yLk3HgGeIEPrTBp/TTp4Wjak86sY8g/z/d8mgIAbKpG
-         0a7hwD6Czl5kSPRJk9rYlmu0nZDJwOZ9bwtz58L9HXtnZu9jAlnTEtktjW5ZWb5LUt
-         AXy+Lg4P2nS422jT1br5x44k9w2PIjp+VIrRhMxbF3AU2p0z5In5CR9dscAhwZuT+O
-         rbmRfr/qmep+Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0E432C43142;
-        Tue,  9 Aug 2022 03:20:10 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5ms0RwBabutvhVrMWYrepeYuH=8_Fv5jHqLCtgCGj9vehg@mail.gmail.com>
-References: <CAH2r5ms0RwBabutvhVrMWYrepeYuH=8_Fv5jHqLCtgCGj9vehg@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5ms0RwBabutvhVrMWYrepeYuH=8_Fv5jHqLCtgCGj9vehg@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/5.20-rc-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: 8f0541186e9ad1b62accc9519cc2b7a7240272a7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: eb555cb5b794f4e12a9897f3d46d5a72104cd4a7
-Message-Id: <166001521004.18352.9625120421666569004.pr-tracker-bot@kernel.org>
-Date:   Tue, 09 Aug 2022 03:20:10 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        with ESMTP id S233685AbiHIEWU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Aug 2022 00:22:20 -0400
+Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD1A192AF
+        for <linux-cifs@vger.kernel.org>; Mon,  8 Aug 2022 21:22:18 -0700 (PDT)
+Received: by mail-vs1-xe2a.google.com with SMTP id m67so10757315vsc.12
+        for <linux-cifs@vger.kernel.org>; Mon, 08 Aug 2022 21:22:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Y+QjLpklbyTw/CQHOBH32LIoi1KNzBohuIjfYBsQtCk=;
+        b=bSEB+Ams+4H1nSTQBbe9Gi1eqzZ6O/Q0IkHdqDcUDmYUCE0LbkG9yENeQNYezRvCF8
+         uPau6b9omIS6K/dTIUf2QePIePOmPilLlWsm6ZBwGhqlk3pgj+VAtbaaZ+BfgWiL8tsr
+         UqX9GTBcmNykM50lLzLQvBganOUwziRsXEZxl5qprPjMW9oxdTFoLKfG75TWvtneZ+3N
+         YwyT8NFot3Rw/pUTpLTQFXN41FgXdkqXi/ULollaNgR60+6mbsC2yQqxUascvQ+z1Ruz
+         Jj7N5bT5D2S4Q7mcQBq0B2rnNvIUHgQYdW1qaXjWucvfpVLT8Y3WZuazwKgdLWodIusV
+         Nbhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Y+QjLpklbyTw/CQHOBH32LIoi1KNzBohuIjfYBsQtCk=;
+        b=MbW42+YJOdm5q1OlzeM48sWVVYrHIFkRz13uZDSnn3I+8T0wZHfRq+ghXixMc9fMfE
+         eBYsRH+U0ZLStAuU4dHXMxxpzMGTtnc2jjukGy05maa/zdwasMJx2Ziu7l3+wSrElizJ
+         /8wWd7X2cNCCujG3+Rnlx2ndcHZFI5rvJ8WzPB71hFAhpLM1hDTwmS2zeKZLUT6QHz/b
+         9U3ZKvDXr3hwRsIX4sZScVGnKuJ7bIz9N2zbXX6S+VD/cLKgUJ4ofoJlm7ovcy6YSf6t
+         LQcjQSMeH9jPbeSlJvhB3nUlBqsmj/BcQ9D0X6sxJp4FQCq+q7s8kYwS7nXgvb72SYwt
+         qMEw==
+X-Gm-Message-State: ACgBeo1C6d0ZS9A+5zubuFcRP2zMiZETLI3U7RG/s1jVCGotjsMX00ZA
+        uBanfXYdNxgmH8oyBceazt94wLPzt4KDMCx7aRGk38CzbMg=
+X-Google-Smtp-Source: AA6agR5iYPUdHt2Yyy0WG8uT6RxVlH4iqDgvSHCocxFTzp6RAnW9U3qv0qewBeUYEd9dIwcRciGlotNhFxqEirL1Hlc=
+X-Received: by 2002:a67:b401:0:b0:387:8734:a09 with SMTP id
+ x1-20020a67b401000000b0038787340a09mr8193348vsl.61.1660018937126; Mon, 08 Aug
+ 2022 21:22:17 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220809021156.3086869-1-lsahlber@redhat.com> <20220809021156.3086869-3-lsahlber@redhat.com>
+In-Reply-To: <20220809021156.3086869-3-lsahlber@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 8 Aug 2022 23:22:04 -0500
+Message-ID: <CAH2r5muyuaCmi18XU7PHzGZS5CmqNDuPhe_Yc5UhyS=DDxcx9Q@mail.gmail.com>
+Subject: Re: [PATCH 2/9] cifs: Do not use tcon->cfid directly, use the cfid we
+ get from open_cached_dir
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Mon, 8 Aug 2022 15:00:58 -0500:
+This looks harmless if it makes future patches easier
 
-> git://git.samba.org/ksmbd.git tags/5.20-rc-ksmbd-server-fixes
+On Mon, Aug 8, 2022 at 9:12 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>
+> They are the same right now but tcon-> will later point to a different
+> type of struct containing a list of cfids.
+>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/smb2inode.c | 4 ++--
+>  fs/cifs/smb2pdu.c   | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+> index f6f9fc3f2e2d..09f01f70e020 100644
+> --- a/fs/cifs/smb2inode.c
+> +++ b/fs/cifs/smb2inode.c
+> @@ -519,9 +519,9 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>                 rc = open_cached_dir(xid, tcon, full_path, cifs_sb, &cfid);
+>         /* If it is a root and its handle is cached then use it */
+>         if (!rc) {
+> -               if (tcon->cfid.file_all_info_is_valid) {
+> +               if (cfid->file_all_info_is_valid) {
+>                         move_smb2_info_to_cifs(data,
+> -                                              &tcon->cfid.file_all_info);
+> +                                              &cfid->file_all_info);
+>                 } else {
+>                         rc = SMB2_query_info(xid, tcon,
+>                                              cfid->fid->persistent_fid,
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 9ee1b6225619..5dbd2cac470c 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -1979,7 +1979,7 @@ SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
+>         }
+>         spin_unlock(&ses->chan_lock);
+>
+> -       close_cached_dir_lease(&tcon->cfid);
+> +       invalidate_all_cached_dirs(tcon);
+>
+>         rc = smb2_plain_req_init(SMB2_TREE_DISCONNECT, tcon, ses->server,
+>                                  (void **) &req,
+> --
+> 2.35.3
+>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/eb555cb5b794f4e12a9897f3d46d5a72104cd4a7
-
-Thank you!
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
