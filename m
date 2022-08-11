@@ -2,166 +2,134 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A601C00140
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Aug 2022 23:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EE61C00140
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Aug 2022 02:27:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233706AbiHJXSt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Aug 2022 19:18:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44054 "EHLO
+        id S233420AbiHKC1O (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Aug 2022 22:27:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233705AbiHJXSs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Aug 2022 19:18:48 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73277C191
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Aug 2022 16:18:47 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id j7so19490183wrh.3
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Aug 2022 16:18:47 -0700 (PDT)
+        with ESMTP id S231424AbiHKC1N (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Aug 2022 22:27:13 -0400
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45576DF93;
+        Wed, 10 Aug 2022 19:27:12 -0700 (PDT)
+Received: by mail-vs1-xe36.google.com with SMTP id 125so17039401vsd.5;
+        Wed, 10 Aug 2022 19:27:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc;
-        bh=uzHleytK8ZmMv6n4+gWW+FC3gRJPjRtdoXy23uTNdhc=;
-        b=OuxIRUCawIpL71GlE3P+cOybBr5XtZvJi1Cdl6HZG/h30B9vG0P4UD/lAIN9z07c3n
-         BaSLP8VtSehjIKy7ptQB0nAAHGcXLMapvFKPWsh5+Kc4Uf4i/7zIzh2jHY58JZXMRco1
-         GZfl9AncZqzO3XPI+5QryKJ/mUCNxzdT6sEdoGDdzL8e+FlAjJvv1Kt+T5VR3Y+NlBeb
-         Get2MOo3mVyO5e1NGt5SNgal4NZnsG5wyuSb+RyDTJx/qOtrR3kcfGwnQbKWllcLriDR
-         Aj95BfdLKhaQOKpln0ViO86RR575vDsgjkRdaQNrfBastaCkAj3ei0Krumf+kgC8HKjg
-         m1IQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=VJM36uWLDxfeJQlAFkEV/QezYqkubDOj56Ng+gg+/7E=;
+        b=Ej9pFI8Q7kvV+CFv37XGsy/NEn86Qcpx0Xv7otEUvny412pfSUyQLt6QwEemb6ohKT
+         gEhShEl6cVmN0KBYH5L9xLPajyTkKF74oFnEGOigX3kA/etAbo9mBUUiEp1hVRD8lZfj
+         0LaSFMbj3PZXhK4VwCIEPhqpO2OxATZQ8/2DeqJKRLVjzk/Sdrny8+YJ3EghO6hjAioA
+         NaMGbRwvxcl0Losi2omS9ClpLT8qkEG396YP3d4LXWibELjNgYVU7rBjcwBMvEipJxdo
+         UQOj/BlYI6m2ueYLgQ5c8TGzKoBLlN3jWoYwqZsSHVOLH8PbMl5ySuPXVlB7MUHxvBwL
+         /nqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=uzHleytK8ZmMv6n4+gWW+FC3gRJPjRtdoXy23uTNdhc=;
-        b=Zv00HNOoLneW5fLK/QNmssQrC49M41lEi8Sn4+cE3TiDLtJ1zVRLvv/uzmopYA+gCb
-         lquymPYXB4to2BulAoO1p+kEuP4fTD50gbJDScXZd8ahs7t2IrFl1JtqnyJKF8ODHB9D
-         VUJabo1cL/UIS/j7hQtQUeTIHq2ZOhyDA9BDgGjTt8N145EeDGR5pLp8jS4QR26QNj//
-         +Q9e4OA0fCHIYoHe+iQjyGtqvNUUpHPPfPniRPFctV58aXyfMqphbPAiJTgP2ki2SIna
-         5WhsOSABlO17d+lYddIxEOD+7HD6kfnjErjoCl9YVyjIl/1Sa9ENh1pTvrXqERvuykYS
-         cC4g==
-X-Gm-Message-State: ACgBeo3Z5Y2O1tlMTedzlTyL9n7yzmq42uWFRZ3/DWHwIUM3+2hyBaYK
-        gt1F4zcv9Qg0Uuna7QgwG4xJh0kd1Ijspj7HkeA=
-X-Google-Smtp-Source: AA6agR4xuKmrMSgpeN0ZigxG+C975SjQ4/ybGYSgnCWh7QFDiVoULYgsY5zqE6tucz6bmsFC05HdLNHNctqpvReJN3A=
-X-Received: by 2002:a05:6000:15c5:b0:220:727a:24bf with SMTP id
- y5-20020a05600015c500b00220727a24bfmr19079373wry.621.1660173526409; Wed, 10
- Aug 2022 16:18:46 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=VJM36uWLDxfeJQlAFkEV/QezYqkubDOj56Ng+gg+/7E=;
+        b=pg1mGsdgknODg5tKoFt7oYKYVBHtzeO6R+0GgE+HBirZa0kydDWHxsqJGvD44iG+57
+         OjIneC3oVjOc5DosymAa0cNhUVSsPp1Yd9isaS0hm3yRSmaqEhkheTVhN994k3emSFp6
+         ABkTuQ/dLvoCli0JLW9SfSf5xNht4vZagJxLsxALNrf6Q22o+UU3bsObVCz+xNK3Fr3K
+         zIA/h4qaxmbQjUdEeOTqnTFIUOfBzQYj/zk0VsbuaKBfeX8MSFxM6tn2kJjhiNmtqaJP
+         G9Enwxc1zPWJDHXtjRdM/lKqupE/rhg6E2P0lXpF6MDSNN7xJIvxNG4NtXvcutEuHVBL
+         nR6Q==
+X-Gm-Message-State: ACgBeo1XMzSy6T9IMA3bjKlnUGkgmtScn2bAqFWvFecM4nT/VrI94HhA
+        yBqNo9nlqXPk9c62bq4tWiYuVMvxmdZHj7bk1Pg=
+X-Google-Smtp-Source: AA6agR6ydFsGzmNajdFj2oPokfsZ87P0NQSCiy1h2s6ZTRZ6d5WPYinPuMD4H76wcmQfpSvGcKNJwFsM3Pw1+r24Y4s=
+X-Received: by 2002:a67:b24b:0:b0:357:31a6:1767 with SMTP id
+ s11-20020a67b24b000000b0035731a61767mr12620416vsh.29.1660184831703; Wed, 10
+ Aug 2022 19:27:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220810010446.9229-1-hyc.lee@gmail.com> <CAKYAXd8vXKY2mp58zc3epFxS7Pp4AZ+ggKh0Rv-rXCLAaQAW1w@mail.gmail.com>
- <CAKYAXd9vaV2dqt=OBP2B_gWHmG16ZYwe0Gts2xxjJto3PuZk6Q@mail.gmail.com>
-In-Reply-To: <CAKYAXd9vaV2dqt=OBP2B_gWHmG16ZYwe0Gts2xxjJto3PuZk6Q@mail.gmail.com>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Thu, 11 Aug 2022 08:18:35 +0900
-Message-ID: <CANFS6bZd5E395Vdfa8Wh2DZkFdxgUxsO=M4kCEpJ2s6OUKW73A@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: remove unnecessary generic_fillattr in smb2_open
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
+References: <165996923111.209242.10532553567023183407.stgit@warthog.procyon.org.uk>
+ <c4e26f69d38c4294038430487bf10e88fa980e0b.camel@kernel.org>
+In-Reply-To: <c4e26f69d38c4294038430487bf10e88fa980e0b.camel@kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 10 Aug 2022 21:27:00 -0500
+Message-ID: <CAH2r5mubvk83SkDmiw0YUW2W6g0o7-Q3hr1KKtOC1DRRP6yOcQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Remove {cifs,nfs}_fscache_release_page()
+To:     Jeff Layton <jlayton@kernel.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022=EB=85=84 8=EC=9B=94 10=EC=9D=BC (=EC=88=98) =EC=98=A4=ED=9B=84 5:00, N=
-amjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+merged into cifs-2.6.git for-next
+
+On Mon, Aug 8, 2022 at 9:51 AM Jeff Layton <jlayton@kernel.org> wrote:
 >
-> 2022-08-10 16:58 GMT+09:00, Namjae Jeon <linkinjeon@kernel.org>:
-> > 2022-08-10 10:04 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> >> Move the call of ksmbd_vfs_getattr above the place
-> >> where stat is needed, and remove unnecessary
-> >> the call of generic_fillattr.
-> >>
-> >> This patch fixes wrong AllocationSize of SMB2_CREATE
-> >> response. Because ext4 updates inode->i_blocks only
-> >> when disk space is allocated, generic_fillattr does
-> >> not set stat.blocks properly for delayed allocation.
-> And how can I reproduce problem and make sure that it is improved?
-
-This issue can be reproduce with commands below:
-
-touch ${FILENAME}
-xfs_io -c "pwrite -S 0xAB 0 40k" ${FILENAME}
-xfs_io -c "stat" ${FILENAME}
-
-40KB are written, but the number of blocks are 8
-stat.size =3D 40960
-stat.blocks =3D 8
-
-> > So what causes delay allocation between the lines you moved this code?
-
-For the example above, the second command writes 40KB but
-inode->i_blocks is not  updated because of delayed allocation.
-And when the third command is executed, in smb2_open
-ksmbd_vfs_getattr returns stat.blocks which is 80, but
-the following generic_fillattr returns stat.blocks which
-8.
-
-With this patch applied, the third command returns stat.blocks
-which is 88, not 80.
-I will look into this.
-
-
-
+> On Mon, 2022-08-08 at 15:33 +0100, David Howells wrote:
+> > Remove {cifs,nfs}_fscache_release_page() from fs/cifs/fscache.h.  This
+> > functionality got built directly into cifs_release_folio() and will
+> > hopefully be replaced with netfs_release_folio() at some point.
 > >
-> >> But ext4 returns the blocks that include the delayed
-> >> allocation blocks when getattr is called.
-> >>
-> >> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-> >> ---
-> >> Changes from v1:
-> >>  - Update the commit description.
-> >>
-> >>  fs/ksmbd/smb2pdu.c | 15 ++++++---------
-> >>  1 file changed, 6 insertions(+), 9 deletions(-)
-> >>
-> >> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> >> index e6f4ccc12f49..7b4bd0d81133 100644
-> >> --- a/fs/ksmbd/smb2pdu.c
-> >> +++ b/fs/ksmbd/smb2pdu.c
-> >> @@ -3022,12 +3022,6 @@ int smb2_open(struct ksmbd_work *work)
-> >>      list_add(&fp->node, &fp->f_ci->m_fp_list);
-> >>      write_unlock(&fp->f_ci->m_lock);
-> >>
-> >> -    rc =3D ksmbd_vfs_getattr(&path, &stat);
-> >> -    if (rc) {
-> >> -            generic_fillattr(user_ns, d_inode(path.dentry), &stat);
-> >> -            rc =3D 0;
-> >> -    }
-> >> -
-> >>      /* Check delete pending among previous fp before oplock break */
-> >>      if (ksmbd_inode_pending_delete(fp)) {
-> >>              rc =3D -EBUSY;
-> >> @@ -3114,6 +3108,12 @@ int smb2_open(struct ksmbd_work *work)
-> >>              }
-> >>      }
-> >>
-> >> +    rc =3D ksmbd_vfs_getattr(&path, &stat);
-> >> +    if (rc) {
-> >> +            generic_fillattr(user_ns, d_inode(path.dentry), &stat);
-> >> +            rc =3D 0;
-> >> +    }
-> >> +
-> >>      if (stat.result_mask & STATX_BTIME)
-> >>              fp->create_time =3D ksmbd_UnixTimeToNT(stat.btime);
-> >>      else
-> >> @@ -3129,9 +3129,6 @@ int smb2_open(struct ksmbd_work *work)
-> >>
-> >>      memcpy(fp->client_guid, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
-> >>
-> >> -    generic_fillattr(user_ns, file_inode(fp->filp),
-> >> -                     &stat);
-> >> -
-> >>      rsp->StructureSize =3D cpu_to_le16(89);
-> >>      rcu_read_lock();
-> >>      opinfo =3D rcu_dereference(fp->f_opinfo);
-> >> --
-> >> 2.17.1
-> >>
-> >>
+> > The "nfs_" version is a copy and paste error and should've been altered to
+> > read "cifs_".  That can also be removed.
 > >
+> > Reported-by: Matthew Wilcox <willy@infradead.org>
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > cc: Jeff Layton <jlayton@redhat.com>
+> > cc: Steve French <smfrench@gmail.com>
+> > cc: linux-cifs@vger.kernel.org
+> > cc: samba-technical@lists.samba.org
+> > cc: linux-fsdevel@vger.kernel.org
+> > ---
+> >
+> >  fs/cifs/fscache.h |   16 ----------------
+> >  1 file changed, 16 deletions(-)
+> >
+> > diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
+> > index aa3b941a5555..67b601041f0a 100644
+> > --- a/fs/cifs/fscache.h
+> > +++ b/fs/cifs/fscache.h
+> > @@ -108,17 +108,6 @@ static inline void cifs_readpage_to_fscache(struct inode *inode,
+> >               __cifs_readpage_to_fscache(inode, page);
+> >  }
+> >
+> > -static inline int cifs_fscache_release_page(struct page *page, gfp_t gfp)
+> > -{
+> > -     if (PageFsCache(page)) {
+> > -             if (current_is_kswapd() || !(gfp & __GFP_FS))
+> > -                     return false;
+> > -             wait_on_page_fscache(page);
+> > -             fscache_note_page_release(cifs_inode_cookie(page->mapping->host));
+> > -     }
+> > -     return true;
+> > -}
+> > -
+> >  #else /* CONFIG_CIFS_FSCACHE */
+> >  static inline
+> >  void cifs_fscache_fill_coherency(struct inode *inode,
+> > @@ -154,11 +143,6 @@ cifs_readpage_from_fscache(struct inode *inode, struct page *page)
+> >  static inline
+> >  void cifs_readpage_to_fscache(struct inode *inode, struct page *page) {}
+> >
+> > -static inline int nfs_fscache_release_page(struct page *page, gfp_t gfp)
+> > -{
+> > -     return true; /* May release page */
+> > -}
+> > -
+> >  #endif /* CONFIG_CIFS_FSCACHE */
+> >
+> >  #endif /* _CIFS_FSCACHE_H */
+> >
+> >
+>
+> Reviewed-by: Jeff Layton <jlayton@kernel.org>
 
 
 
---
+-- 
 Thanks,
-Hyunchul
+
+Steve
