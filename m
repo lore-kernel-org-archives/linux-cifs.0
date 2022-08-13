@@ -2,114 +2,127 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73865C3F6B0
-	for <linux-cifs@archiver.kernel.org>; Sat, 13 Aug 2022 20:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C7BC19F2D
+	for <linux-cifs@archiver.kernel.org>; Sat, 13 Aug 2022 21:45:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230457AbiHMUHf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 13 Aug 2022 16:07:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44082 "EHLO
+        id S237399AbiHMVpM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 13 Aug 2022 17:45:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbiHMUHe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 13 Aug 2022 16:07:34 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 188A9140D3
-        for <linux-cifs@vger.kernel.org>; Sat, 13 Aug 2022 13:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660421252; x=1691957252;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wKHoS7iXCJBY4h2Yt6v4jky9mKwCbmnbXKYwStWXKmc=;
-  b=e2P88f78UCndgskYNhMIoVYIV2e4CTiqv3zpyQbAADKGOc+k6+NwkYdC
-   b+guI0CNh1l4fvk/y5AkCcs1x56C306e3sa5kwQxvbB8LiZ9TeW0lIHf3
-   x6ba4MxnGat1rx275Lc+zIrDhU8zD0o7HaDQkKmqiaEoeYM4AX7bMe7Qb
-   gNPmmyBf67XWIllG1eUcay5NZh3B27mfGUBtl81d4xJ/fJjKKKEsRobiH
-   OpvRwpwoA+DJGsdKA/3KIC+i7szl28ZbPM1IXl6p4TNUKRiINSR6tmJY+
-   nuVqkuHyTUfJzVjEnK4gaSE5oVnQmZpJGPJVPQBK1pv7ReYGqdsjJ1qYV
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10437"; a="293044716"
-X-IronPort-AV: E=Sophos;i="5.93,236,1654585200"; 
-   d="scan'208";a="293044716"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2022 13:07:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,236,1654585200"; 
-   d="scan'208";a="602808106"
-Received: from lkp-server02.sh.intel.com (HELO 8745164cafc7) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 13 Aug 2022 13:07:29 -0700
-Received: from kbuild by 8745164cafc7 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oMxPt-00023d-0B;
-        Sat, 13 Aug 2022 20:07:29 +0000
-Date:   Sun, 14 Aug 2022 04:06:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Enzo Matsumiya <ematsumiya@suse.de>, linux-cifs@vger.kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, smfrench@gmail.com,
-        pc@cjr.nz, ronniesahlberg@gmail.com, nspmangalore@gmail.com
-Subject: Re: [PATCH v2] cifs: distribute some bloat out of cifsfs.{c,h}
-Message-ID: <202208140432.tekRJ3MS-lkp@intel.com>
-References: <20220802162009.5688-1-ematsumiya@suse.de>
+        with ESMTP id S233786AbiHMVpL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 13 Aug 2022 17:45:11 -0400
+Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F74E1A3AE;
+        Sat, 13 Aug 2022 14:45:10 -0700 (PDT)
+Received: by mail-vs1-xe34.google.com with SMTP id q190so3984061vsb.7;
+        Sat, 13 Aug 2022 14:45:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc;
+        bh=2LaJ+HSf5Wo05084gkL82LU3w+Nr0TU5q/ddOuveLoc=;
+        b=cyVGZydgHtT8TR/T52xw69rHFlvJsEEiWMpqaAq/Y/y5dU/GADpUHj/94c4WFXJuAf
+         1PdN9swPhDfCzicM+87VQmwuHLWPcAvNJ032lvGTl0zLZz5s1vOKE/fTInhPY+CTqylQ
+         KICa0aDVI+8SYjEwvYAGebzIsp3+7IrXRSwpbKZzGy4Oaaxk+8tNr0adVqxbrWgQTKpF
+         M8FOcOfGONdZ09c4WORkShC62MvPyf0pIJ2/7rQaOhRUWbf39Z8K98/BBT6Vv18od3mB
+         y58u2DPe7IVhlUk0uemiyCm1kBpGlI8aHGYGQt5yEOpL0mOI7756LLrkZld1ORfwjm+h
+         a33w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc;
+        bh=2LaJ+HSf5Wo05084gkL82LU3w+Nr0TU5q/ddOuveLoc=;
+        b=5w6ToDo/K01OrtWe6dBelbPjqyLzlFSjcM3d19cUoulhHRDHQJiGl0vQjFDvNvrzww
+         KKJBqNmqfFvEznGEDiqd9aPaSpkTIhsKzmq4iO8n9VghaMHmTAVI6i9EgC1SzJOJfyw0
+         koF65aUDgy3cQow0oVa9VItRkLwx6TJaDSUV+h646AkDILwAu8xba/T+95KSahJIXzHR
+         /qW10+At9SoO694qhKn5+CtrOzVAdxwT3ixxkNJ5ug4kZigCu2HsPi4TNWg6nSks6COK
+         VmUFfETDWORsN6RvBQJ9M0NFVwIyuOoQvUIDArq96UH3sk8XkeT7ZwxIZaVnU2zx/CAw
+         /GgQ==
+X-Gm-Message-State: ACgBeo1O3vECdMEvnM0xP3KODnEsHnx7csA0P9BCvZr5ElABv1qfUB+V
+        54l2WIqNucYOknZ9WhSEGf2RyO+XCwe7/lmjcpOYqIpxZq0=
+X-Google-Smtp-Source: AA6agR7I3+uxMwW4hTZxX9Mjn8u3IxZ6A6bWS0JxDuSRterADevpIu4vvF+1i9cTbGWAYfnWA0PufhAP6/V0eBFp8zI=
+X-Received: by 2002:a05:6102:3e82:b0:38a:ab1a:2702 with SMTP id
+ m2-20020a0561023e8200b0038aab1a2702mr3056953vsv.29.1660427109342; Sat, 13 Aug
+ 2022 14:45:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220802162009.5688-1-ematsumiya@suse.de>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 13 Aug 2022 16:44:58 -0500
+Message-ID: <CAH2r5msY4JmT5aZ_zAC9bMozQ=R4iTaa5SPF5JWpR73OcbUDZA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Enzo,
+Please pull the following changes since commit
+0d168a58fca34806b575c7cba87afb11208acb54:
 
-Thank you for the patch! Perhaps something to improve:
+  cifs: update internal module number (2022-08-05 11:24:17 -0500)
 
-[auto build test WARNING on cifs/for-next]
-[cannot apply to linus/master v5.19 next-20220812]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+are available in the Git repository at:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Enzo-Matsumiya/cifs-distribute-some-bloat-out-of-cifsfs-c-h/20220803-002506
-base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-config: x86_64-randconfig-a001 (https://download.01.org/0day-ci/archive/20220814/202208140432.tekRJ3MS-lkp@intel.com/config)
-compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 495519e5f8232d144ed26e9c18dbcbac6a5f25eb)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/ea8b8b846e20b620293cc6b0c18da500ab45fe97
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Enzo-Matsumiya/cifs-distribute-some-bloat-out-of-cifsfs-c-h/20220803-002506
-        git checkout ea8b8b846e20b620293cc6b0c18da500ab45fe97
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash fs/cifs/
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.20-rc-smb3-client-fixes-part2
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+for you to fetch changes up to 7eb59a98701d3113671b513593bb489cc76f58d2:
 
-All warnings (new ones prefixed by >>):
+  cifs: Do not access tcon->cfids->cfid directly from
+is_path_accessible (2022-08-12 17:40:15 -0500)
 
->> fs/cifs/ioctl.c:326:10: warning: unused variable 'caps' [-Wunused-variable]
-           __u64   caps;
-                   ^
-   1 warning generated.
+----------------------------------------------------------------
+8 cifs/smb3 fixes:
+- two fixes for stable, one for a lock length miscalculation, and
+another fixes a lease break timeout bug
+- improvement to handle leases, allows the close timeout to be
+configured more safely
+- five restructuring/cleanup patches
+----------------------------------------------------------------
+Bharath SM (1):
+      SMB3: fix lease break timeout when multiple deferred close
+handles for the same file.
+
+David Howells (1):
+      cifs: Remove {cifs,nfs}_fscache_release_page()
+
+Paulo Alcantara (1):
+      cifs: fix lock length calculation
+
+Ronnie Sahlberg (4):
+      cifs: Move cached-dir functions into a separate file
+      cifs: Do not use tcon->cfid directly, use the cfid we get from
+open_cached_dir
+      cifs: Add constructor/destructors for tcon->cfid
+      cifs: Do not access tcon->cfids->cfid directly from is_path_accessible
+
+Steve French (1):
+      smb3: allow deferred close timeout to be configurable
+
+ fs/cifs/Makefile     |   2 +-
+ fs/cifs/cached_dir.c | 388 +++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cached_dir.h |  64 ++++++++
+ fs/cifs/cifsfs.c     |  21 +--
+ fs/cifs/cifsglob.h   |  42 +-----
+ fs/cifs/cifsproto.h  |   1 -
+ fs/cifs/connect.c    |   2 +
+ fs/cifs/file.c       |  39 +----
+ fs/cifs/fs_context.c |   9 ++
+ fs/cifs/fs_context.h |   8 +
+ fs/cifs/fscache.h    |  16 --
+ fs/cifs/inode.c      |   1 +
+ fs/cifs/misc.c       |  20 ++-
+ fs/cifs/readdir.c    |   5 +-
+ fs/cifs/smb2inode.c  |  11 +-
+ fs/cifs/smb2misc.c   |  11 +-
+ fs/cifs/smb2ops.c    | 320 +++-------------------------------------
+ fs/cifs/smb2pdu.c    |   3 +-
+ fs/cifs/smb2proto.h  |  10 --
+ 19 files changed, 528 insertions(+), 445 deletions(-)
+ create mode 100644 fs/cifs/cached_dir.c
+ create mode 100644 fs/cifs/cached_dir.h
 
 
-vim +/caps +326 fs/cifs/ioctl.c
+--
+Thanks,
 
-7ba3d1cdb7988c Steve French    2021-05-02  313  
-f9ddcca4cf7d95 Steve French    2008-05-15  314  long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
-^1da177e4c3f41 Linus Torvalds  2005-04-16  315  {
-496ad9aa8ef448 Al Viro         2013-01-23  316  	struct inode *inode = file_inode(filep);
-7e7db86c7e1088 Steve French    2019-09-19  317  	struct smb3_key_debug_info pkey_inf;
-^1da177e4c3f41 Linus Torvalds  2005-04-16  318  	int rc = -ENOTTY; /* strange error - but the precedent */
-6d5786a34d98bf Pavel Shilovsky 2012-06-20  319  	unsigned int xid;
-ba00ba64cf0895 Jeff Layton     2010-09-20  320  	struct cifsFileInfo *pSMBFile = filep->private_data;
-96daf2b09178d8 Steve French    2011-05-27  321  	struct cifs_tcon *tcon;
-a77592a70081ed Ronnie Sahlberg 2020-07-09  322  	struct tcon_link *tlink;
-d26c2ddd335696 Steve French    2020-02-06  323  	struct cifs_sb_info *cifs_sb;
-f654bac2227adc Steve French    2005-04-28  324  	__u64	ExtAttrBits = 0;
-ea8b8b846e20b6 Enzo Matsumiya  2022-08-02  325  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
-618763958b2291 Jeff Layton     2010-11-08 @326  	__u64   caps;
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Steve
