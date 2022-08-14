@@ -2,102 +2,98 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C17C8C25B0F
-	for <linux-cifs@archiver.kernel.org>; Sun, 14 Aug 2022 13:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35476C25B0F
+	for <linux-cifs@archiver.kernel.org>; Sun, 14 Aug 2022 16:26:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231397AbiHNNxe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 14 Aug 2022 09:53:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44882 "EHLO
+        id S230382AbiHNQ0O (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 14 Aug 2022 12:26:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbiHNNxd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 14 Aug 2022 09:53:33 -0400
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F81D1CB3C;
-        Sun, 14 Aug 2022 06:53:31 -0700 (PDT)
-Received: by mail-pf1-f173.google.com with SMTP id 130so4532372pfy.6;
-        Sun, 14 Aug 2022 06:53:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=utZ1rRS2VelBBcZCNQ0k31JiYpajbtip7iGwxaNmv2Q=;
-        b=BOf/cD/U5CI/m/fQcjh73aL0WDn2NG9s427nx3RLu2DV2WqckzcD8r2K18K0YPO0eJ
-         VoRjXoyUORLltNPCaM63x4o3U7Qn7VcqFoJa24HMNogSRwxyGDshs143djVyvlw5GXXl
-         KPQYrgJciX3fGduo9y/8M0NEfP1sCoaXHmJw/OTH5wLJo/dHVNf6pGDFhVExP/tVm6oY
-         heda9kazn2pJPS1aN/5z1YCRF3T/7+C5ABqj5cUhwUZ6BeiDVsofDGBeHQjHRttFLvpI
-         DCsw05bB7cr7f00qZJci5rP+q4+PBemBbk0ihfJHjAtyN8F31NdCHS26tj4tPQOjzr/a
-         zQ4Q==
-X-Gm-Message-State: ACgBeo3qnGMPXBFN6lERP3k0aVsS2eVX5sWNjZSWRqodw/tCvNzpBYST
-        zEQAYyYbeFePS407nROkcRHoQy2ptZ4=
-X-Google-Smtp-Source: AA6agR4x0e1X08iqk7P8KjSQg4jEyVwwZsnOfkigty/2/bgUu6z/xCrnJGpSGXHuO3/1qQnkFU48Kw==
-X-Received: by 2002:a05:6a02:286:b0:422:f1ba:745 with SMTP id bk6-20020a056a02028600b00422f1ba0745mr7176652pgb.569.1660485210728;
-        Sun, 14 Aug 2022 06:53:30 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id e7-20020a17090a4a0700b001f327021900sm3161814pjh.1.2022.08.14.06.53.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Aug 2022 06:53:30 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
-        Namjae Jeon <linkinjeon@kernel.org>, stable@vger.kernel.org
-Subject: [PATCH v3] ksmbd: don't remove dos attribute xattr on O_TRUNC open
-Date:   Sun, 14 Aug 2022 22:52:56 +0900
-Message-Id: <20220814135256.5247-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S241026AbiHNQZS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 14 Aug 2022 12:25:18 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 571981901B;
+        Sun, 14 Aug 2022 09:23:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id AFA64CE0B6B;
+        Sun, 14 Aug 2022 16:23:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41372C43140;
+        Sun, 14 Aug 2022 16:23:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660494185;
+        bh=vtUXON8ZPY2JWNUwIGTSBD4cwQhMoCHe7RqNx/KHnSw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=LY0AQ9nDheh8kxxaSObkLvC5duFOFR/wG1iNiPmoGWlNM+9hjnk1c5MQNIfQPlj4F
+         DJoWorLW5VxB3dCD9DEQuoKfdvU/ec6SITropKwh0jPNyWva4YkrOKUOTGV72uDCO5
+         NfiVfY2Er7mfZNIM/3/K1b4CzJLKd7u06c+wzIeQZY4sve22fE5L51DGjlJ7O9uyG9
+         EstJc2qxSbx2Itxc2sWdv4QYmdKvpw9oDAMbhH9OwjjQuvk78Ti/cRGJr6vWHOchg3
+         JnpAMsC1ZqB7ZxdKMZinGRM9dxeye0dXbc6Nccdt8efINQn7pq/Hd23e3Pd2cKG8RC
+         9HTWakZxjrv6Q==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Steve French <stfrench@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 5.19 42/48] smb3: check xattr value length earlier
+Date:   Sun, 14 Aug 2022 12:19:35 -0400
+Message-Id: <20220814161943.2394452-42-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220814161943.2394452-1-sashal@kernel.org>
+References: <20220814161943.2394452-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When smb client open file in ksmbd share with O_TRUNC, dos attribute
-xattr is removed as well as data in file. This cause the FSCTL_SET_SPARSE
-request from the client fails because ksmbd can't update the dos attribute
-after setting ATTR_SPARSE_FILE. And this patch fix xfstests generic/469
-test also.
+From: Steve French <stfrench@microsoft.com>
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Cc: stable@vger.kernel.org
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+[ Upstream commit 5fa2cffba0b82336a2244d941322eb1627ff787b ]
+
+Coverity complains about assigning a pointer based on
+value length before checking that value length goes
+beyond the end of the SMB.  Although this is even more
+unlikely as value length is a single byte, and the
+pointer is not dereferenced until laterm, it is clearer
+to check the lengths first.
+
+Addresses-Coverity: 1467704 ("Speculative execution data leak")
+Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- v2:
-   - don't remove other xattr class also.
-   - add fixes and stable tags.
- v3:
-   - Change to more simpler check.
+ fs/cifs/smb2ops.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
- fs/ksmbd/smb2pdu.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index a136d5e4943b..19412ac701a6 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -2330,15 +2330,15 @@ static int smb2_remove_smb_xattrs(struct path *path)
- 			name += strlen(name) + 1) {
- 		ksmbd_debug(SMB, "%s, len %zd\n", name, strlen(name));
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 8802995b2d3d..aa4c1d403708 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1145,9 +1145,7 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+ 	size_t name_len, value_len, user_name_len;
  
--		if (strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN) &&
--		    strncmp(&name[XATTR_USER_PREFIX_LEN], DOS_ATTRIBUTE_PREFIX,
--			    DOS_ATTRIBUTE_PREFIX_LEN) &&
--		    strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX, STREAM_PREFIX_LEN))
--			continue;
--
--		err = ksmbd_vfs_remove_xattr(user_ns, path->dentry, name);
--		if (err)
--			ksmbd_debug(SMB, "remove xattr failed : %s\n", name);
-+		if (!strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN) &&
-+		    !strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX,
-+			     STREAM_PREFIX_LEN)) {
-+			err = ksmbd_vfs_remove_xattr(user_ns, path->dentry,
-+						     name);
-+			if (err)
-+				ksmbd_debug(SMB, "remove xattr failed : %s\n",
-+					    name);
-+		}
- 	}
- out:
- 	kvfree(xattr_list);
+ 	while (src_size > 0) {
+-		name = &src->ea_data[0];
+ 		name_len = (size_t)src->ea_name_length;
+-		value = &src->ea_data[src->ea_name_length + 1];
+ 		value_len = (size_t)le16_to_cpu(src->ea_value_length);
+ 
+ 		if (name_len == 0)
+@@ -1159,6 +1157,9 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+ 			goto out;
+ 		}
+ 
++		name = &src->ea_data[0];
++		value = &src->ea_data[src->ea_name_length + 1];
++
+ 		if (ea_name) {
+ 			if (ea_name_len == name_len &&
+ 			    memcmp(ea_name, name, name_len) == 0) {
 -- 
-2.25.1
+2.35.1
 
