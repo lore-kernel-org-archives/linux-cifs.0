@@ -2,47 +2,47 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 121B9C25B06
-	for <linux-cifs@archiver.kernel.org>; Sun, 14 Aug 2022 16:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8385C28B2B
+	for <linux-cifs@archiver.kernel.org>; Sun, 14 Aug 2022 16:42:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243233AbiHNQkJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 14 Aug 2022 12:40:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57202 "EHLO
+        id S243044AbiHNQme (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 14 Aug 2022 12:42:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242961AbiHNQjt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 14 Aug 2022 12:39:49 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E22C91D336;
-        Sun, 14 Aug 2022 09:29:52 -0700 (PDT)
+        with ESMTP id S243173AbiHNQj7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 14 Aug 2022 12:39:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55BC4DF9;
+        Sun, 14 Aug 2022 09:30:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 441B1CE0B12;
-        Sun, 14 Aug 2022 16:29:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F86C433D6;
-        Sun, 14 Aug 2022 16:29:48 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E7A7560FC3;
+        Sun, 14 Aug 2022 16:30:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88F28C433D7;
+        Sun, 14 Aug 2022 16:30:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660494589;
-        bh=Syn49+GFPMqD0AC+qtGcAiSRfizHIhpdfBenoWSbbRE=;
+        s=k20201202; t=1660494621;
+        bh=aYnBnfGUaEEa3RlKev2F+dQui8GePYWC7nN4kwgsqF0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BR5xGRD5uCa13ORDQicDLA6GBPJKpNJHeNLTiymFtBj0DV8NUUKLjMQpLE54MImQE
-         RA0BJalEipqA0D1yjf7odG+GsiVJwMrLtRuS7B2EfWo+BwdvLVOQ6LIR5FLV2mH8hj
-         HyPvZaMySsmcwemy0qm4FWvJW1sOATtrpJgdvMhKc30OvDJBHwNMWdFfizis2B3uk8
-         0jcau3v7Q6UZiv35+hic8jPXS01TDDuIwszxfz9iSMd5Uq/pMDQL3I0VVM6cA4n6CI
-         eaX73pdoXRHZrc7cPfJOeIjJeonuh+GEzfygMYkyUw9vs1sBetnjfqAuSJCBo7g1Rh
-         H9sZt8sCzRJdA==
+        b=Qry4xrR6M4scGz76EXgyNxRDsIxC9YZFGvPZYeS+CQN1k9zPM6DQ/gxmv1teeNdb9
+         i5Dc12M23ZSyCG3NYhTaphN50O+I5oW1C49ewKThXKsUkQ/+YzQ/+QWHrDDq67Qmr/
+         UUDUFpag5EWGiNkl45a6DIGXqHpQfU4AIxWulaEgDvLzc99Ai71KOS/dJlt+UOeGnz
+         /Hj5QqV48g2J/I/I7Grd2Jygbb66JmVUqvomma5clq59KxJKw0RjIeLOicBvRs+bL8
+         T1uRipWGPCF7WWWUn1XznWHi9h6iTHGvF+ia39lLwMdxWN/rgBSyZb8wl2xkSogiCA
+         w5Mt5uh1n0oWA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Steve French <stfrench@microsoft.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.19 11/14] smb3: check xattr value length earlier
-Date:   Sun, 14 Aug 2022 12:29:17 -0400
-Message-Id: <20220814162922.2398723-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 6/9] smb3: check xattr value length earlier
+Date:   Sun, 14 Aug 2022 12:29:56 -0400
+Message-Id: <20220814162959.2399011-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220814162922.2398723-1-sashal@kernel.org>
-References: <20220814162922.2398723-1-sashal@kernel.org>
+In-Reply-To: <20220814162959.2399011-1-sashal@kernel.org>
+References: <20220814162959.2399011-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -71,10 +71,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index cc34a28aecbc..f906984eb25b 100644
+index 3280a801b1d7..069eb2533e7f 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -762,9 +762,7 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+@@ -463,9 +463,7 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
  	size_t name_len, value_len, user_name_len;
  
  	while (src_size > 0) {
@@ -84,7 +84,7 @@ index cc34a28aecbc..f906984eb25b 100644
  		value_len = (size_t)le16_to_cpu(src->ea_value_length);
  
  		if (name_len == 0) {
-@@ -777,6 +775,9 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+@@ -478,6 +476,9 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
  			goto out;
  		}
  
