@@ -2,133 +2,73 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC98C00140
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Aug 2022 11:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93545C25B0D
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Aug 2022 04:12:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbiHOLQY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Aug 2022 07:16:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34966 "EHLO
+        id S229505AbiHPEMQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Aug 2022 00:12:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229763AbiHOLQY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 15 Aug 2022 07:16:24 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4253D1054A;
-        Mon, 15 Aug 2022 04:16:23 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id m3-20020a05600c3b0300b003a5e0557150so1206189wms.0;
-        Mon, 15 Aug 2022 04:16:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc;
-        bh=F0dnHKYenUjScO0kkTeRtnGleMrVXt0Z0uMEQ9MJy4c=;
-        b=UxoMQ/kg6tX53RXH/AzON8eRe8REAeZ1gCePmJWlome+TzjV1lZAG1o2CDWOqpcp14
-         WteqEYSIWMB8tNIir8o5zN402NF00unkisr9STroDDXQACmSD6q8i+ZmBsPcYBL8ISXx
-         Cv7YY+PgVFFB2Lvjy9R8WDb/K+lMIBtFy4JXnw5Nuf/i1h7ngGXkj4WKu8obL+K6CRFc
-         GtY3KtckAcLekSGAc1rC2ktfGpT/5fb8P4hx0MsRdUaz1+WZhTUinxml0kwICvQhHKbO
-         6jSNGlVVdoLZ0tsMudAeQlNyVrtswBrT5LTRWaJ81tjiECC8QnyF0R54+hopzFHna3qL
-         gCiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=F0dnHKYenUjScO0kkTeRtnGleMrVXt0Z0uMEQ9MJy4c=;
-        b=0y66V7mi1w79DaG9yR+s1Fh1kX71GgFZuNKnf2SGZvIVCgn9h6ukWWHJXaaExdvkSp
-         buuYc1NogBLEu/zHYtn6qT7yRe72qkUGRuH/WZStWSnIcUboHn0vFE+wAYW0ucDly06u
-         ViUDm3lQC9XfBftiVsO5gWHArOn3FhGSmNzBdYpqTnJtCXzW///GSsp+lT/dcVsrTde4
-         Z7taO2roIKS3znbypSLIDwtu7hxG1+txd4AQemHs3GWLYK329HPxBFYv01aWCYXmTU3s
-         sbrQXHMfA9rFWucj7hL9/LQ3S5aNv3EB71g+/Z70OQANC9WNky1CTh9JpThYkNiHXttp
-         3mkw==
-X-Gm-Message-State: ACgBeo055FsSVYLQEY1EpPBhr87boDvgj9j8QipvhWDb7YpAW6h+EqRD
-        mAW65qdDv4LywGPQ4Dw/XDPSq+OsODVh75XfaaI=
-X-Google-Smtp-Source: AA6agR7PenWqKD/K2C6wqlDoY2FBRy46Bu4zFul42kcY2ePYyXtqmn2pfn40RhYY7pXy5EaJrD0U575Lqa0/Bv7kpE0=
-X-Received: by 2002:a05:600c:1f08:b0:3a5:e8d6:ddd2 with SMTP id
- bd8-20020a05600c1f0800b003a5e8d6ddd2mr4549938wmb.57.1660562181790; Mon, 15
- Aug 2022 04:16:21 -0700 (PDT)
+        with ESMTP id S229500AbiHPELo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Aug 2022 00:11:44 -0400
+Received: from smtp.gentoo.org (mail.gentoo.org [IPv6:2001:470:ea4a:1:5054:ff:fec7:86e4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BDDE361302
+        for <linux-cifs@vger.kernel.org>; Mon, 15 Aug 2022 17:43:59 -0700 (PDT)
+From:   Sam James <sam@gentoo.org>
+To:     Pavel Shilovsky <pshilovsky@samba.org>, linux-cifs@vger.kernel.org
+Cc:     Pavel Shilovsky <piastryyy@gmail.com>, Sam James <sam@gentoo.org>
+Subject: [PATCH 1/2] getcifsacl, setcifsacl: add missing <linux/limits.h> include for XATTR_SIZE_MAX
+Date:   Tue, 16 Aug 2022 01:43:34 +0100
+Message-Id: <20220816004335.2634169-1-sam@gentoo.org>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-References: <20220814135256.5247-1-linkinjeon@kernel.org>
-In-Reply-To: <20220814135256.5247-1-linkinjeon@kernel.org>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Mon, 15 Aug 2022 20:16:10 +0900
-Message-ID: <CANFS6bZGdXf19im4qmVi1YUC7TYH8T-oTnrxDekrozAEvU6WHg@mail.gmail.com>
-Subject: Re: [PATCH v3] ksmbd: don't remove dos attribute xattr on O_TRUNC open
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022=EB=85=84 8=EC=9B=94 14=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 10:53, =
-Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> When smb client open file in ksmbd share with O_TRUNC, dos attribute
-> xattr is removed as well as data in file. This cause the FSCTL_SET_SPARSE
-> request from the client fails because ksmbd can't update the dos attribut=
-e
-> after setting ATTR_SPARSE_FILE. And this patch fix xfstests generic/469
-> test also.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Needed to build on musl. It only works on glibc because of transitive includes
+(which could break in future).
 
-Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
+Example failure:
+```
+getcifsacl.c: In function 'getcifsacl':
+getcifsacl.c:429:24: error: 'XATTR_SIZE_MAX' undeclared (first use in this function)
+  429 |         if (bufsize >= XATTR_SIZE_MAX) {
+      |                        ^~~~~~~~~~~~~~
+```
 
-> ---
->  v2:
->    - don't remove other xattr class also.
->    - add fixes and stable tags.
->  v3:
->    - Change to more simpler check.
->
->  fs/ksmbd/smb2pdu.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index a136d5e4943b..19412ac701a6 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -2330,15 +2330,15 @@ static int smb2_remove_smb_xattrs(struct path *pa=
-th)
->                         name +=3D strlen(name) + 1) {
->                 ksmbd_debug(SMB, "%s, len %zd\n", name, strlen(name));
->
-> -               if (strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LE=
-N) &&
-> -                   strncmp(&name[XATTR_USER_PREFIX_LEN], DOS_ATTRIBUTE_P=
-REFIX,
-> -                           DOS_ATTRIBUTE_PREFIX_LEN) &&
-> -                   strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX, =
-STREAM_PREFIX_LEN))
-> -                       continue;
-> -
-> -               err =3D ksmbd_vfs_remove_xattr(user_ns, path->dentry, nam=
-e);
-> -               if (err)
-> -                       ksmbd_debug(SMB, "remove xattr failed : %s\n", na=
-me);
-> +               if (!strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_L=
-EN) &&
-> +                   !strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX,
-> +                            STREAM_PREFIX_LEN)) {
-> +                       err =3D ksmbd_vfs_remove_xattr(user_ns, path->den=
-try,
-> +                                                    name);
-> +                       if (err)
-> +                               ksmbd_debug(SMB, "remove xattr failed : %=
-s\n",
-> +                                           name);
-> +               }
->         }
->  out:
->         kvfree(xattr_list);
-> --
-> 2.25.1
->
+Bug: https://bugs.gentoo.org/842195
+Signed-off-by: Sam James <sam@gentoo.org>
+---
+ getcifsacl.c | 1 +
+ setcifsacl.c | 1 +
+ 2 files changed, 2 insertions(+)
 
+diff --git a/getcifsacl.c b/getcifsacl.c
+index 1c01062..d69d40a 100644
+--- a/getcifsacl.c
++++ b/getcifsacl.c
+@@ -34,6 +34,7 @@
+ #include <errno.h>
+ #include <limits.h>
+ #include <ctype.h>
++#include <linux/limits.h>
+ #include <sys/xattr.h>
+ #include "cifsacl.h"
+ #include "idmap_plugin.h"
+diff --git a/setcifsacl.c b/setcifsacl.c
+index d832cec..b7079ab 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -48,6 +48,7 @@
+ #include <errno.h>
+ #include <limits.h>
+ #include <ctype.h>
++#include <linux/limits.h>
+ #include <sys/xattr.h>
+ 
+ #include "cifsacl.h"
+-- 
+2.37.2
 
---=20
-Thanks,
-Hyunchul
