@@ -2,327 +2,87 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87048C25B08
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Aug 2022 19:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA76C32772
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Aug 2022 19:33:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240845AbiHQTIy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Aug 2022 15:08:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40088 "EHLO
+        id S240476AbiHQTdF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 Aug 2022 15:33:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238882AbiHQTIv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Aug 2022 15:08:51 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A89248E9
-        for <linux-cifs@vger.kernel.org>; Wed, 17 Aug 2022 12:08:46 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 24EB92074D;
-        Wed, 17 Aug 2022 19:08:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1660763325; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=ZCE1SpgmhmopKNedBVZp0OitKW051IpwwLTYxD/U+Mo=;
-        b=OnKOmJLKKYdiGJ6PjoEQeCGygn7CvxpEszDmbSKnbi/3me5/9FIPk+TCT8ebs900yuyAmK
-        ZsHMFC8bCemnKsNYcl4iyFBkGvQ/oyeOuNEa8CABZ/nyYQdUonnM+5Dw3IRIPBex1pNo1l
-        QVVJdMI9lp3o4UyA317QhUtBbq+Ceq8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1660763325;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=ZCE1SpgmhmopKNedBVZp0OitKW051IpwwLTYxD/U+Mo=;
-        b=kWHzZaQR5z24xB9TbkcxwT22a6jfhflMHOQk/I0gUdP0jDoKBdAjZnZbBqGxUASiLT9gqM
-        rpUqJZq3ApaoBeBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9F7E513428;
-        Wed, 17 Aug 2022 19:08:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id hvUpGbw8/WJRYQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Wed, 17 Aug 2022 19:08:44 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com
-Subject: [PATCH] cifs: remove useless parameter 'is_fsctl' from SMB2_ioctl()
-Date:   Wed, 17 Aug 2022 16:08:34 -0300
-Message-Id: <20220817190834.15137-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.35.3
+        with ESMTP id S241579AbiHQTch (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Aug 2022 15:32:37 -0400
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F6DA59A0
+        for <linux-cifs@vger.kernel.org>; Wed, 17 Aug 2022 12:31:50 -0700 (PDT)
+Received: by mail-vs1-xe2e.google.com with SMTP id 67so14157886vsv.2
+        for <linux-cifs@vger.kernel.org>; Wed, 17 Aug 2022 12:31:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=aVRH2fPH0vzaAO/Gh7suh8W+U70pmd1XAjtLFnBaX7o=;
+        b=W0earXwqL3shmLph+ygU63vtk1RwiNmrp8yX5PGBtYuONpJfMfkOuvuG4vUIvESzLM
+         fdvPFllAlNwv1YbKkC0BHYoAsh4Q82NQ2r5UZCWd5Birv8ybdKuvhBaU4jU7gTHi55pP
+         pmzWEBzVVPu682HIHDvaqeHJr6gdGnT5hKCfjDnJsRWV98By7ShK6/3ymMTbch8pAdXs
+         CSicyB+U1PQaMRH8FhsyQPvsRIpsIR5Mgtj1MxPdUASDtrxwyZL5Q5cd+S2eogQWPJ7a
+         Qak/vGRKb2fUENampYDgQXwsOn0AhHJOezAD8A8HOQgqCBZ3DodeJtbk2Ratxt9DLLRL
+         WP7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=aVRH2fPH0vzaAO/Gh7suh8W+U70pmd1XAjtLFnBaX7o=;
+        b=Z+dwpEEnEIEKCiq0dODr2iUrYbPYJOe6ILfI2We9HJHU7HCi38K3UXXUNEq/sAVdQa
+         yGAYRfZEYu36xWBbP3GwECXI6DDTdFKiN2j//K4bKQuYqCl72Lsftd4tcIVR9YR8YJNC
+         ryp/U+9sIqPIqMbHXRBvuD4i6PWJzv6E8/ALgzTt1trkUyMybEuRouWY8wILQtixCzzh
+         L+MuOhJXiXqqO1wbSZ6XWb8SoAYZrbRSHDarqK5C35/QUBFG0A0nKN2sX4Lz/jLK6qPN
+         gRVP0XMG7ewo1oPj9YDfTkhSsMh/5pNlA//03Rjs+GF/Z0XSQHxyLdlRNBwwJ2l19NPn
+         rx7g==
+X-Gm-Message-State: ACgBeo3hLy/dUjCoZOwzYJ89u8H/fscuq7Vhmo49a8Cz8LC+xJe7jVy9
+        ZneEH8+cmIC0qZkkdC82sK3y1WQEiOtapxWH8nDlFdDkRPI=
+X-Google-Smtp-Source: AA6agR7ZXmOwtwgJU67e/VfVU17KZ30JpK8V3ljugF7jVEdjJGvjLPW2KgH0EysgrKeUgYOIb5o8p1JXpK4TZZLBQGM=
+X-Received: by 2002:a67:ce90:0:b0:388:4905:1533 with SMTP id
+ c16-20020a67ce90000000b0038849051533mr12037876vse.17.1660764700792; Wed, 17
+ Aug 2022 12:31:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220817171402.7984-1-ematsumiya@suse.de> <87wnb67lcg.fsf@cjr.nz>
+In-Reply-To: <87wnb67lcg.fsf@cjr.nz>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 17 Aug 2022 14:31:29 -0500
+Message-ID: <CAH2r5mt6QuADNGZffvdSzod7zd=4m2S2tsrjbPAB2YM+bdHi-w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: remove unused server parameter from calc_smb_size()
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     Enzo Matsumiya <ematsumiya@suse.de>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-SMB2_ioctl() is always called with is_fsctl = true, so doesn't make any
-sense to have it at all.
+updated with RB tag and pushed to cifs-2.6.git for-next
 
-Thus, always set SMB2_0_IOCTL_IS_FSCTL flag on the request.
+On Wed, Aug 17, 2022 at 1:53 PM Paulo Alcantara <pc@cjr.nz> wrote:
+>
+> Enzo Matsumiya <ematsumiya@suse.de> writes:
+>
+> > Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> > ---
+> >  fs/cifs/cifs_debug.c | 2 +-
+> >  fs/cifs/cifsglob.h   | 2 +-
+> >  fs/cifs/cifsproto.h  | 2 +-
+> >  fs/cifs/misc.c       | 2 +-
+> >  fs/cifs/netmisc.c    | 2 +-
+> >  fs/cifs/readdir.c    | 6 ++----
+> >  fs/cifs/smb2misc.c   | 4 ++--
+> >  fs/cifs/smb2ops.c    | 2 +-
+> >  fs/cifs/smb2proto.h  | 2 +-
+> >  9 files changed, 11 insertions(+), 13 deletions(-)
+>
+> Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 
-Also, as per MS-SMB2 3.3.5.15 "Receiving an SMB2 IOCTL Request", servers
-must fail the request if the request flags is zero anyway.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/cifs/smb2file.c  |  1 -
- fs/cifs/smb2ops.c   | 35 +++++++++++++----------------------
- fs/cifs/smb2pdu.c   | 20 +++++++++-----------
- fs/cifs/smb2proto.h |  4 ++--
- 4 files changed, 24 insertions(+), 36 deletions(-)
 
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index f5dcc4940b6d..9dfd2dd612c2 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -61,7 +61,6 @@ smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 		nr_ioctl_req.Reserved = 0;
- 		rc = SMB2_ioctl(xid, oparms->tcon, fid->persistent_fid,
- 			fid->volatile_fid, FSCTL_LMR_REQUEST_RESILIENCY,
--			true /* is_fsctl */,
- 			(char *)&nr_ioctl_req, sizeof(nr_ioctl_req),
- 			CIFSMaxBufSize, NULL, NULL /* no return info */);
- 		if (rc == -EOPNOTSUPP) {
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index f406af596887..c8ada000de7f 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -681,7 +681,7 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon)
- 	struct cifs_ses *ses = tcon->ses;
- 
- 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
--			FSCTL_QUERY_NETWORK_INTERFACE_INFO, true /* is_fsctl */,
-+			FSCTL_QUERY_NETWORK_INTERFACE_INFO,
- 			NULL /* no data input */, 0 /* no data input */,
- 			CIFSMaxBufSize, (char **)&out_buf, &ret_data_len);
- 	if (rc == -EOPNOTSUPP) {
-@@ -1323,9 +1323,8 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
- 	struct resume_key_req *res_key;
- 
- 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
--			FSCTL_SRV_REQUEST_RESUME_KEY, true /* is_fsctl */,
--			NULL, 0 /* no input */, CIFSMaxBufSize,
--			(char **)&res_key, &ret_data_len);
-+			FSCTL_SRV_REQUEST_RESUME_KEY, NULL, 0 /* no input */,
-+			CIFSMaxBufSize, (char **)&res_key, &ret_data_len);
- 
- 	if (rc == -EOPNOTSUPP) {
- 		pr_warn_once("Server share %s does not support copy range\n", tcon->treeName);
-@@ -1467,7 +1466,7 @@ smb2_ioctl_query_info(const unsigned int xid,
- 		rqst[1].rq_nvec = SMB2_IOCTL_IOV_SIZE;
- 
- 		rc = SMB2_ioctl_init(tcon, server, &rqst[1], COMPOUND_FID, COMPOUND_FID,
--				     qi.info_type, true, buffer, qi.output_buffer_length,
-+				     qi.info_type, buffer, qi.output_buffer_length,
- 				     CIFSMaxBufSize - MAX_SMB2_CREATE_RESPONSE_SIZE -
- 				     MAX_SMB2_CLOSE_RESPONSE_SIZE);
- 		free_req1_func = SMB2_ioctl_free;
-@@ -1643,9 +1642,8 @@ smb2_copychunk_range(const unsigned int xid,
- 		retbuf = NULL;
- 		rc = SMB2_ioctl(xid, tcon, trgtfile->fid.persistent_fid,
- 			trgtfile->fid.volatile_fid, FSCTL_SRV_COPYCHUNK_WRITE,
--			true /* is_fsctl */, (char *)pcchunk,
--			sizeof(struct copychunk_ioctl),	CIFSMaxBufSize,
--			(char **)&retbuf, &ret_data_len);
-+			(char *)pcchunk, sizeof(struct copychunk_ioctl),
-+			CIFSMaxBufSize, (char **)&retbuf, &ret_data_len);
- 		if (rc == 0) {
- 			if (ret_data_len !=
- 					sizeof(struct copychunk_ioctl_rsp)) {
-@@ -1805,7 +1803,6 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
--			true /* is_fctl */,
- 			&setsparse, 1, CIFSMaxBufSize, NULL, NULL);
- 	if (rc) {
- 		tcon->broken_sparse_sup = true;
-@@ -1888,7 +1885,6 @@ smb2_duplicate_extents(const unsigned int xid,
- 	rc = SMB2_ioctl(xid, tcon, trgtfile->fid.persistent_fid,
- 			trgtfile->fid.volatile_fid,
- 			FSCTL_DUPLICATE_EXTENTS_TO_FILE,
--			true /* is_fsctl */,
- 			(char *)&dup_ext_buf,
- 			sizeof(struct duplicate_extents_to_file),
- 			CIFSMaxBufSize, NULL,
-@@ -1923,7 +1919,6 @@ smb3_set_integrity(const unsigned int xid, struct cifs_tcon *tcon,
- 	return SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid,
- 			FSCTL_SET_INTEGRITY_INFORMATION,
--			true /* is_fsctl */,
- 			(char *)&integr_info,
- 			sizeof(struct fsctl_set_integrity_information_req),
- 			CIFSMaxBufSize, NULL,
-@@ -1976,7 +1971,6 @@ smb3_enum_snapshots(const unsigned int xid, struct cifs_tcon *tcon,
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid,
- 			FSCTL_SRV_ENUMERATE_SNAPSHOTS,
--			true /* is_fsctl */,
- 			NULL, 0 /* no input data */, max_response_size,
- 			(char **)&retbuf,
- 			&ret_data_len);
-@@ -2699,7 +2693,6 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 	do {
- 		rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
- 				FSCTL_DFS_GET_REFERRALS,
--				true /* is_fsctl */,
- 				(char *)dfs_req, dfs_req_size, CIFSMaxBufSize,
- 				(char **)&dfs_rsp, &dfs_rsp_size);
- 		if (!is_retryable_error(rc))
-@@ -2906,8 +2899,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	rc = SMB2_ioctl_init(tcon, server,
- 			     &rqst[1], fid.persistent_fid,
--			     fid.volatile_fid, FSCTL_GET_REPARSE_POINT,
--			     true /* is_fctl */, NULL, 0,
-+			     fid.volatile_fid, FSCTL_GET_REPARSE_POINT, NULL, 0,
- 			     CIFSMaxBufSize -
- 			     MAX_SMB2_CREATE_RESPONSE_SIZE -
- 			     MAX_SMB2_CLOSE_RESPONSE_SIZE);
-@@ -3087,8 +3079,7 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	rc = SMB2_ioctl_init(tcon, server,
- 			     &rqst[1], COMPOUND_FID,
--			     COMPOUND_FID, FSCTL_GET_REPARSE_POINT,
--			     true /* is_fctl */, NULL, 0,
-+			     COMPOUND_FID, FSCTL_GET_REPARSE_POINT, NULL, 0,
- 			     CIFSMaxBufSize -
- 			     MAX_SMB2_CREATE_RESPONSE_SIZE -
- 			     MAX_SMB2_CLOSE_RESPONSE_SIZE);
-@@ -3358,7 +3349,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	fsctl_buf.BeyondFinalZero = cpu_to_le64(offset + len);
- 
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
--			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA, true,
-+			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA,
- 			(char *)&fsctl_buf,
- 			sizeof(struct file_zero_data_information),
- 			0, NULL, NULL);
-@@ -3421,7 +3412,7 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid, FSCTL_SET_ZERO_DATA,
--			true /* is_fctl */, (char *)&fsctl_buf,
-+			(char *)&fsctl_buf,
- 			sizeof(struct file_zero_data_information),
- 			CIFSMaxBufSize, NULL, NULL);
- 	free_xid(xid);
-@@ -3481,7 +3472,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
- 	in_data.length = cpu_to_le64(len);
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid,
--			FSCTL_QUERY_ALLOCATED_RANGES, true,
-+			FSCTL_QUERY_ALLOCATED_RANGES,
- 			(char *)&in_data, sizeof(in_data),
- 			1024 * sizeof(struct file_allocated_range_buffer),
- 			(char **)&out_data, &out_data_len);
-@@ -3802,7 +3793,7 @@ static loff_t smb3_llseek(struct file *file, struct cifs_tcon *tcon, loff_t offs
- 
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid,
--			FSCTL_QUERY_ALLOCATED_RANGES, true,
-+			FSCTL_QUERY_ALLOCATED_RANGES,
- 			(char *)&in_data, sizeof(in_data),
- 			sizeof(struct file_allocated_range_buffer),
- 			(char **)&out_data, &out_data_len);
-@@ -3862,7 +3853,7 @@ static int smb3_fiemap(struct cifs_tcon *tcon,
- 
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid,
--			FSCTL_QUERY_ALLOCATED_RANGES, true,
-+			FSCTL_QUERY_ALLOCATED_RANGES,
- 			(char *)&in_data, sizeof(in_data),
- 			1024 * sizeof(struct file_allocated_range_buffer),
- 			(char **)&out_data, &out_data_len);
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 9b31ea946d45..918152fb8582 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1173,7 +1173,7 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
- 	}
- 
- 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
--		FSCTL_VALIDATE_NEGOTIATE_INFO, true /* is_fsctl */,
-+		FSCTL_VALIDATE_NEGOTIATE_INFO,
- 		(char *)pneg_inbuf, inbuflen, CIFSMaxBufSize,
- 		(char **)&pneg_rsp, &rsplen);
- 	if (rc == -EOPNOTSUPP) {
-@@ -3056,7 +3056,7 @@ int
- SMB2_ioctl_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 		struct smb_rqst *rqst,
- 		u64 persistent_fid, u64 volatile_fid, u32 opcode,
--		bool is_fsctl, char *in_data, u32 indatalen,
-+		char *in_data, u32 indatalen,
- 		__u32 max_response_size)
- {
- 	struct smb2_ioctl_req *req;
-@@ -3131,10 +3131,8 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 	req->hdr.CreditCharge =
- 		cpu_to_le16(DIV_ROUND_UP(max(indatalen, max_response_size),
- 					 SMB2_MAX_BUFFER_SIZE));
--	if (is_fsctl)
--		req->Flags = cpu_to_le32(SMB2_0_IOCTL_IS_FSCTL);
--	else
--		req->Flags = 0;
-+	/* always an FSCTL (for now) */
-+	req->Flags = cpu_to_le32(SMB2_0_IOCTL_IS_FSCTL);
- 
- 	/* validate negotiate request must be signed - see MS-SMB2 3.2.5.5 */
- 	if (opcode == FSCTL_VALIDATE_NEGOTIATE_INFO)
-@@ -3161,9 +3159,9 @@ SMB2_ioctl_free(struct smb_rqst *rqst)
-  */
- int
- SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
--	   u64 volatile_fid, u32 opcode, bool is_fsctl,
--	   char *in_data, u32 indatalen, u32 max_out_data_len,
--	   char **out_data, u32 *plen /* returned data len */)
-+	   u64 volatile_fid, u32 opcode, char *in_data, u32 indatalen,
-+	   u32 max_out_data_len, char **out_data,
-+	   u32 *plen /* returned data len */)
- {
- 	struct smb_rqst rqst;
- 	struct smb2_ioctl_rsp *rsp = NULL;
-@@ -3205,7 +3203,7 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 
- 	rc = SMB2_ioctl_init(tcon, server,
- 			     &rqst, persistent_fid, volatile_fid, opcode,
--			     is_fsctl, in_data, indatalen, max_out_data_len);
-+			     in_data, indatalen, max_out_data_len);
- 	if (rc)
- 		goto ioctl_exit;
- 
-@@ -3297,7 +3295,7 @@ SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
- 			cpu_to_le16(COMPRESSION_FORMAT_DEFAULT);
- 
- 	rc = SMB2_ioctl(xid, tcon, persistent_fid, volatile_fid,
--			FSCTL_SET_COMPRESSION, true /* is_fsctl */,
-+			FSCTL_SET_COMPRESSION,
- 			(char *)&fsctl_input /* data input */,
- 			2 /* in data len */, CIFSMaxBufSize /* max out data */,
- 			&ret_data /* out data */, NULL);
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 51c5bf4a338a..7001317de9dc 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -137,13 +137,13 @@ extern int SMB2_open_init(struct cifs_tcon *tcon,
- extern void SMB2_open_free(struct smb_rqst *rqst);
- extern int SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon,
- 		     u64 persistent_fid, u64 volatile_fid, u32 opcode,
--		     bool is_fsctl, char *in_data, u32 indatalen, u32 maxoutlen,
-+		     char *in_data, u32 indatalen, u32 maxoutlen,
- 		     char **out_data, u32 *plen /* returned data len */);
- extern int SMB2_ioctl_init(struct cifs_tcon *tcon,
- 			   struct TCP_Server_Info *server,
- 			   struct smb_rqst *rqst,
- 			   u64 persistent_fid, u64 volatile_fid, u32 opcode,
--			   bool is_fsctl, char *in_data, u32 indatalen,
-+			   char *in_data, u32 indatalen,
- 			   __u32 max_response_size);
- extern void SMB2_ioctl_free(struct smb_rqst *rqst);
- extern int SMB2_change_notify(const unsigned int xid, struct cifs_tcon *tcon,
 -- 
-2.35.3
+Thanks,
 
+Steve
