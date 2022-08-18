@@ -2,102 +2,66 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A36FCC00140
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Aug 2022 12:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA23C00140
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Aug 2022 16:24:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244491AbiHRMvp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Aug 2022 08:51:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40444 "EHLO
+        id S1344738AbiHRQYU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Aug 2022 12:24:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244699AbiHRMvo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Aug 2022 08:51:44 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81BA77C52D
-        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 05:51:42 -0700 (PDT)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4M7l6p2B2fz1N7LP;
-        Thu, 18 Aug 2022 20:48:18 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 18 Aug 2022 20:51:32 +0800
-From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-To:     <linux-cifs@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
-        <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>,
-        <sprasad@microsoft.com>, <rohiths@microsoft.com>
-Subject: [PATCH] cifs: Fix memory leak on the deferred close
-Date:   Thu, 18 Aug 2022 21:50:44 +0800
-Message-ID: <20220818135044.2251342-1-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S1344773AbiHRQX6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Aug 2022 12:23:58 -0400
+Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FEA5C5786
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 09:21:22 -0700 (PDT)
+Received: by mail-ua1-x92f.google.com with SMTP id cd25so836985uab.8
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 09:21:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc;
+        bh=AEqOwroMB9DrIpzZbrcXQrY+3mRzpaNkX6QZ74Bceuk=;
+        b=EwTfJWv0LqcKjNNl5GP4hgiu7OHdYVld0dAGmPBl77tC++H0C0UEzhzDxRwDWkFgcJ
+         VNhms85yjF1/cVTWgltZuNZJXQql1OgUGr66O+A682sC9MC1tlq+6pyw/R51dJbZNmBE
+         7H04ZoIAqfN738ioP3IWhpnEtwlRvKyC92J8OzvgyMU1fwgbE+suf5NX1AZm+kXfKJ4C
+         37UEL4MBtlha1RzgX4IuxLm+iUKR3ZYlOxueCwWMkA1eZrr3G7yA6nX3g+74j5nSjVG3
+         H9Zkmxh5R+9XuuCcJDmjODtsrfgsP0jsIFHbf7cQ3RN1d0DuHHeY4g7pEtTJfsvbF9bR
+         suKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc;
+        bh=AEqOwroMB9DrIpzZbrcXQrY+3mRzpaNkX6QZ74Bceuk=;
+        b=QM+xogAF8lt8cGDQHRfcLVfjnXvY/rAfAzBMU7/eeDRwF1JNBbOPEaOVnCu9d16i9v
+         TSYXr3klNd86HkUdRBRKBgX9eQNL42RQ5HJhd9HBMbk47oQsbIFD1xKzMnP2gEVH6eQ7
+         0/5HZABE1GpWVdXOL01QX9rxVcvzkqPUiZBL+Upb/UuP3L5ezWO0mgHntB0C9tFaPqj1
+         lHPpm7pMkT0wQK6cJ7biF5TZrYMebBl1nxQo2oC4JVICuv7Xj4ThAgPFSjeustU4LHME
+         u72lPvBQJSkm3yqTou7OxOB+z7AucTiitV653BfGdN67XiY3NxIM6b7jY8WYTTrMyZ60
+         1GFg==
+X-Gm-Message-State: ACgBeo2wkZKgTfcQuK2jZhUGpA/bBdVb5KSfIg/0fgofdKBLX41T4DAV
+        Vl1E97jQ1rPwJyXoeO55ti+W4+IIqRiOX4JgioY8Fpbp+pw=
+X-Google-Smtp-Source: AA6agR5vn5KLb3sueUZ8LCnN0BmzADGmJtktDxrb8AFOZ3DNdoCbZvF+hu4vJqkUsLOBC8USXPK3M1fkJssNLQYUKRE=
+X-Received: by 2002:a05:6130:10b:b0:37f:a52:99fd with SMTP id
+ h11-20020a056130010b00b0037f0a5299fdmr1385264uag.96.1660839660692; Thu, 18
+ Aug 2022 09:21:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500023.china.huawei.com (7.185.36.114)
-X-CFilter-Loop: Reflected
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 18 Aug 2022 11:20:49 -0500
+Message-ID: <CAH2r5mupcJD89SP4SqOmTLSABQ0kStyWF9EU-eMEuyZ_uA7G9w@mail.gmail.com>
+Subject: mount.cifs man page
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-xfstests on smb21 report kmemleak as below:
+I was looking at the mount.cifs man page, which is missing
+documentation for some mount options, and also could be made less
+confusing by moving some of the less commonly needed mount options.
 
-  unreferenced object 0xffff8881767d6200 (size 64):
-    comm "xfs_io", pid 1284, jiffies 4294777434 (age 20.789s)
-    hex dump (first 32 bytes):
-      80 5a d0 11 81 88 ff ff 78 8a aa 63 81 88 ff ff  .Z......x..c....
-      00 71 99 76 81 88 ff ff 00 00 00 00 00 00 00 00  .q.v............
-    backtrace:
-      [<00000000ad04e6ea>] cifs_close+0x92/0x2c0
-      [<0000000028b93c82>] __fput+0xff/0x3f0
-      [<00000000d8116851>] task_work_run+0x85/0xc0
-      [<0000000027e14f9e>] do_exit+0x5e5/0x1240
-      [<00000000fb492b95>] do_group_exit+0x58/0xe0
-      [<00000000129a32d9>] __x64_sys_exit_group+0x28/0x30
-      [<00000000e3f7d8e9>] do_syscall_64+0x35/0x80
-      [<00000000102e8a0b>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
+Are there good examples (of better written man pages) that we could
+borrow ideas for a a breakdown by section, etc. ?
 
-When cancel the deferred close work, we should also cleanup the struct
-cifs_deferred_close.
-
-Fixes: 9e992755be8f2 ("cifs: Call close synchronously during unlink/rename/lease break.")
-Fixes: e3fc065682ebb ("cifs: Deferred close performance improvements")
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
----
- fs/cifs/misc.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 1f2628ffe9d7..87f60f736731 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -737,6 +737,8 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode)
- 	list_for_each_entry(cfile, &cifs_inode->openFileList, flist) {
- 		if (delayed_work_pending(&cfile->deferred)) {
- 			if (cancel_delayed_work(&cfile->deferred)) {
-+				cifs_del_deferred_close(cfile);
-+
- 				tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
- 				if (tmp_list == NULL)
- 					break;
-@@ -766,6 +768,8 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
- 	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
- 		if (delayed_work_pending(&cfile->deferred)) {
- 			if (cancel_delayed_work(&cfile->deferred)) {
-+				cifs_del_deferred_close(cfile);
-+
- 				tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
- 				if (tmp_list == NULL)
- 					break;
-@@ -799,6 +803,8 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
- 		if (strstr(full_path, path)) {
- 			if (delayed_work_pending(&cfile->deferred)) {
- 				if (cancel_delayed_work(&cfile->deferred)) {
-+					cifs_del_deferred_close(cfile);
-+
- 					tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
- 					if (tmp_list == NULL)
- 						break;
 -- 
-2.31.1
+Thanks,
 
+Steve
