@@ -2,28 +2,28 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A8FC00140
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Aug 2022 21:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E14C25B0E
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Aug 2022 21:11:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346539AbiHRVLR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Aug 2022 17:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50314 "EHLO
+        id S1346627AbiHRVLS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Aug 2022 17:11:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346649AbiHRVKL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Aug 2022 17:10:11 -0400
+        with ESMTP id S1346686AbiHRVKG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Aug 2022 17:10:06 -0400
 Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA28BD86F6
-        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 14:04:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1EE5DB07E
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 14:04:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple; d=sang-engineering.com; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=k1; bh=9/ea9VxVWR0AeSflWZ3qtYaxvrG
-        4JVxZl/dPiyOWJ0A=; b=LxJlu+PfpH5jEb3fXKFwfv7z2QchTF6fEoanesqcq2/
-        BktGeQwGTAyGoZB9W5hn29v9BfWgWlMdVeNtQDN6zuZlrU4S8lL/5/wMK/6CnNeQ
-        gLXSuw7hW48ot8TFCLnqHgGTx9k/HPmbmdMw4JT48gMRSy4V38ghaqxJV0rxcn7I
-        =
-Received: (qmail 3962295 invoked from network); 18 Aug 2022 23:01:42 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 18 Aug 2022 23:01:42 +0200
-X-UD-Smtp-Session: l3s3148p1@o3DVSYrmnY8ucref
+        from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding; s=k1; bh=9/ea9VxVWR0AeS
+        flWZ3qtYaxvrG4JVxZl/dPiyOWJ0A=; b=xyHxyOFp3WwiViEpV8MAS3PVZ+2Cup
+        y6xMkijDO3tLMxXM9/Irwbht90R1If6zslnmdhQanqEw25bUv5gtGz2gqS/ms3Rx
+        NCueTKMW6QB+Yy3E5O6AxwPN8BErW2KfEKFfyryJn9BfXQNZGkd+8/iefDD1qTqo
+        v/v2HRVdGMuqY=
+Received: (qmail 3962158 invoked from network); 18 Aug 2022 23:01:35 +0200
+Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 18 Aug 2022 23:01:35 +0200
+X-UD-Smtp-Session: l3s3148p1@O9VpSYrmu9Iucref
 From:   Wolfram Sang <wsa+renesas@sang-engineering.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Wolfram Sang <wsa+renesas@sang-engineering.com>,
@@ -31,10 +31,12 @@ Cc:     Wolfram Sang <wsa+renesas@sang-engineering.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH] cifs: move from strlcpy with unused retval to strscpy
-Date:   Thu, 18 Aug 2022 23:01:41 +0200
-Message-Id: <20220818210142.7867-1-wsa+renesas@sang-engineering.com>
+Subject: [PATCH 11/14] cifs: move from strlcpy with unused retval to strscpy
+Date:   Thu, 18 Aug 2022 23:01:20 +0200
+Message-Id: <20220818210123.7637-11-wsa+renesas@sang-engineering.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220818210123.7637-1-wsa+renesas@sang-engineering.com>
+References: <20220818210123.7637-1-wsa+renesas@sang-engineering.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
