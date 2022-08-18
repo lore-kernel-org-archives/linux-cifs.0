@@ -2,93 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 214C8C00140
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Aug 2022 06:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A36FCC00140
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Aug 2022 12:51:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241695AbiHRGTh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Aug 2022 02:19:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36874 "EHLO
+        id S244491AbiHRMvp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Aug 2022 08:51:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233179AbiHRGTh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Aug 2022 02:19:37 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2686367477;
-        Wed, 17 Aug 2022 23:19:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 68AA1CE1FC4;
-        Thu, 18 Aug 2022 06:19:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96D59C433D7;
-        Thu, 18 Aug 2022 06:19:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660803572;
-        bh=hM1mBVLqbFsDP5tgvV4YmWcCLqFBhCnzo6UTUeNmQDo=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=mEv6NfFYVoSdIwb8atzrvqGLvmWgbcRIWv7lJ6KpRzgn5bPzSEKKBr4xBo0xmf3Y2
-         IzdkDdFlgwjQNpRWm4imudEgu4D2HioJisnLN9vGJwd8BAJAfyurlS1LvTGd7xeyjy
-         qMeyGc/+/hClxttZww39er6UFJX1g7OwdRhj+v2ZpL+TBNJhIMrNQo5mIUyovEmsop
-         uNP7QhXQaufrRx+toXjG7Gvn5Tyju1YNhsBRsy/G5xBsZpEda0Tey54V4/b4vV3Fn+
-         6jQV47Gv0nEVEcJVct+J6X3IkMmFRIAg3HtFfG1XneyrvWvt0K0vsjKQXYw+rXeLEg
-         9ERQGh6kyJ+zA==
-Received: by mail-oi1-f176.google.com with SMTP id c185so611311oia.7;
-        Wed, 17 Aug 2022 23:19:32 -0700 (PDT)
-X-Gm-Message-State: ACgBeo15IHyIRFcLjH/y+8h6E3btK6TS462yAM2VXQ2J8gyeUteQ+Bls
-        4yjabm/+qL95Klydtqq00lUHhrjPtWpcs3FI1Bs=
-X-Google-Smtp-Source: AA6agR4A7YMR8rdH+T3to9r6ulvjKEH1r7K5iASABwfYd4uwUNu0EtoocSVHyFy50wklDI4ktWK10Yw5TNuM64q+dhg=
-X-Received: by 2002:a05:6808:14d5:b0:344:8f50:1f0f with SMTP id
- f21-20020a05680814d500b003448f501f0fmr700783oiw.257.1660803571711; Wed, 17
- Aug 2022 23:19:31 -0700 (PDT)
+        with ESMTP id S244699AbiHRMvo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Aug 2022 08:51:44 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81BA77C52D
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 05:51:42 -0700 (PDT)
+Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4M7l6p2B2fz1N7LP;
+        Thu, 18 Aug 2022 20:48:18 +0800 (CST)
+Received: from localhost.localdomain (10.175.101.6) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 18 Aug 2022 20:51:32 +0800
+From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+To:     <linux-cifs@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
+        <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>,
+        <sprasad@microsoft.com>, <rohiths@microsoft.com>
+Subject: [PATCH] cifs: Fix memory leak on the deferred close
+Date:   Thu, 18 Aug 2022 21:50:44 +0800
+Message-ID: <20220818135044.2251342-1-zhangxiaoxu5@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Wed, 17 Aug 2022 23:19:31
- -0700 (PDT)
-In-Reply-To: <Yv2qyayq+Jo/+Uvs@ZenIV>
-References: <Yv2qoNQg48rtymGE@ZenIV> <Yv2qyayq+Jo/+Uvs@ZenIV>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 18 Aug 2022 15:19:31 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-8v8KGofNjCwMeH9Sq-WGK0roRdiTLZ42eUdkpkPnOHw@mail.gmail.com>
-Message-ID: <CAKYAXd-8v8KGofNjCwMeH9Sq-WGK0roRdiTLZ42eUdkpkPnOHw@mail.gmail.com>
-Subject: Re: [PATCH 2/5] ksmbd: don't open-code file_path()
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500023.china.huawei.com (7.185.36.114)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-08-18 11:58 GMT+09:00, Al Viro <viro@zeniv.linux.org.uk>:
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+xfstests on smb21 report kmemleak as below:
 
-Thanks!
-> ---
->  fs/ksmbd/smb2pdu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index 9751cc92c111..0e1924a6476d 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -5416,7 +5416,7 @@ static int smb2_rename(struct ksmbd_work *work,
->  	if (!pathname)
->  		return -ENOMEM;
->
-> -	abs_oldname = d_path(&fp->filp->f_path, pathname, PATH_MAX);
-> +	abs_oldname = file_path(fp->filp, pathname, PATH_MAX);
->  	if (IS_ERR(abs_oldname)) {
->  		rc = -EINVAL;
->  		goto out;
-> @@ -5551,7 +5551,7 @@ static int smb2_create_link(struct ksmbd_work *work,
->  	}
->
->  	ksmbd_debug(SMB, "link name is %s\n", link_name);
-> -	target_name = d_path(&filp->f_path, pathname, PATH_MAX);
-> +	target_name = file_path(filp, pathname, PATH_MAX);
->  	if (IS_ERR(target_name)) {
->  		rc = -EINVAL;
->  		goto out;
-> --
-> 2.30.2
->
->
+  unreferenced object 0xffff8881767d6200 (size 64):
+    comm "xfs_io", pid 1284, jiffies 4294777434 (age 20.789s)
+    hex dump (first 32 bytes):
+      80 5a d0 11 81 88 ff ff 78 8a aa 63 81 88 ff ff  .Z......x..c....
+      00 71 99 76 81 88 ff ff 00 00 00 00 00 00 00 00  .q.v............
+    backtrace:
+      [<00000000ad04e6ea>] cifs_close+0x92/0x2c0
+      [<0000000028b93c82>] __fput+0xff/0x3f0
+      [<00000000d8116851>] task_work_run+0x85/0xc0
+      [<0000000027e14f9e>] do_exit+0x5e5/0x1240
+      [<00000000fb492b95>] do_group_exit+0x58/0xe0
+      [<00000000129a32d9>] __x64_sys_exit_group+0x28/0x30
+      [<00000000e3f7d8e9>] do_syscall_64+0x35/0x80
+      [<00000000102e8a0b>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
+
+When cancel the deferred close work, we should also cleanup the struct
+cifs_deferred_close.
+
+Fixes: 9e992755be8f2 ("cifs: Call close synchronously during unlink/rename/lease break.")
+Fixes: e3fc065682ebb ("cifs: Deferred close performance improvements")
+Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+---
+ fs/cifs/misc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 1f2628ffe9d7..87f60f736731 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -737,6 +737,8 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode)
+ 	list_for_each_entry(cfile, &cifs_inode->openFileList, flist) {
+ 		if (delayed_work_pending(&cfile->deferred)) {
+ 			if (cancel_delayed_work(&cfile->deferred)) {
++				cifs_del_deferred_close(cfile);
++
+ 				tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
+ 				if (tmp_list == NULL)
+ 					break;
+@@ -766,6 +768,8 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
+ 	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+ 		if (delayed_work_pending(&cfile->deferred)) {
+ 			if (cancel_delayed_work(&cfile->deferred)) {
++				cifs_del_deferred_close(cfile);
++
+ 				tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
+ 				if (tmp_list == NULL)
+ 					break;
+@@ -799,6 +803,8 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
+ 		if (strstr(full_path, path)) {
+ 			if (delayed_work_pending(&cfile->deferred)) {
+ 				if (cancel_delayed_work(&cfile->deferred)) {
++					cifs_del_deferred_close(cfile);
++
+ 					tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
+ 					if (tmp_list == NULL)
+ 						break;
+-- 
+2.31.1
+
