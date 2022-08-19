@@ -2,129 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A36C25B0E
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 Aug 2022 05:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AFBC25B0E
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Aug 2022 05:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242980AbiHSFAs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 Aug 2022 01:00:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39716 "EHLO
+        id S229973AbiHSFED (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 Aug 2022 01:04:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230077AbiHSFAr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Aug 2022 01:00:47 -0400
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582C11DA6E;
-        Thu, 18 Aug 2022 22:00:46 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id b81so1773737vkf.1;
-        Thu, 18 Aug 2022 22:00:46 -0700 (PDT)
+        with ESMTP id S229972AbiHSFEC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Aug 2022 01:04:02 -0400
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04AED43E7E;
+        Thu, 18 Aug 2022 22:04:01 -0700 (PDT)
+Received: by mail-vs1-xe2c.google.com with SMTP id l7so3231935vsc.0;
+        Thu, 18 Aug 2022 22:04:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :mime-version:from:to:cc;
-        bh=0KoTScIC7XKvx310KN0v9F7ZwulzGHm2HwEwg7svJe0=;
-        b=FdY8v7jr0moe/4RznEj7CYmQBDRzeerk4eAozh/OA5/dQiYzCdAVa/K2ethdYrjbb8
-         v2ZHM2FldV5wp0ZwVogkTZSliZszKhxQ0YG1Z411fZJ+dojjIuvYJPJr1a3l4fyKa21H
-         8QMDI8y4Wu3eJndEHEH1kVEuwOOBu56kbKR7YEZL+liZE+8I6DzfyQ2ItSUWn/b1U3/k
-         UuKpZ7jSipyt7yJwONR4zAXQhi05i9zUNLiQ1wnZBPwvTm9sE6E2yPFU+rHJPBJDAkR6
-         2uWyQ7X3Fh1vzRNGY2M6mmh+pX/cGFJE0iK6qsJd97tuA2B2W5ETsfOMA9VDHfH6YhXi
-         0QFQ==
+        bh=CdbKXW75g+zxbPdeaovDkK4CZBW+NEQi8jRJBmf9Ixs=;
+        b=M6beXsMvrlGTm+80ywyxl/8CpD/mkss2ZDrNaYfPfcF1twcqj0jcC4Y+lAyv++qCBG
+         qXReWiySSFv3BTFdJz6/nIenzQ4RULPcVtq1LM0ZOJycJUv8C4y2oT0Gk4FKkdGBClNF
+         racQ8BieVu5QDKxLxijf5EbIAVjZNshLY4rtFXk2rrx82/ufMhhjKQWc7Vrxaxzznhe8
+         e9JSevmmnFjRRImg6ADngN3Xj9dM7VqwyxdtiAUVKJAOSY113G5YNMigq8HTyCUBYubX
+         QC5DZaNgsgSL4LzUEjHpriyTg54PHNwRQVuvVJ9xlfMYFxsrvWcYwODCTK4ZMkAOZEVM
+         cVHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=0KoTScIC7XKvx310KN0v9F7ZwulzGHm2HwEwg7svJe0=;
-        b=mewaDKYRJWDpPgT5MoIn/T48d6FD2a1NGdHisaMDVr2xWkmNGsum/kAtInNzwzVrxj
-         rVOMCyKVq9ge7SvELwHsWKnGXanwd+AiOkCNaTkLHLcDdWrgJR+SqpSvLuEfV5iWol5j
-         cqCs4iuB7NoV7Z2JYBcmU3nvzXJ+RWYvKKfYJvxFA5WFOYAJs49IVV5VwhXKVVMD0nKa
-         cpPLDMq9B6bj/yCNmYlwqwK2SNGDOyF7FMbuQVeIqUABXO6ETprNzlpbyhSYxOVMvyJY
-         ACnP7VJ4S+EXFKeY3NUWj0+7B9h8Y7pYqTFakw+xeAhjpi30K9ME/4t4ijC0GMSow/O3
-         wuMQ==
-X-Gm-Message-State: ACgBeo3DP6mSbkdX99FaDNqZ6vbdT6e6ZJweG+h18edyEkSyPimIbsSn
-        adpbeo2BayVwaDFHfbKqpRqdgh/logYUkvvpwzY=
-X-Google-Smtp-Source: AA6agR4svtgvAfl4R3I3WZgQD9UTOtc+XojuuodEDOo2vl5rRt4vzm6oB1jYo5db0+cicUfOgr+PgtInxzDGeL2gB7A=
-X-Received: by 2002:a05:6122:311:b0:383:2f10:47f6 with SMTP id
- c17-20020a056122031100b003832f1047f6mr2308991vko.3.1660885245104; Thu, 18 Aug
- 2022 22:00:45 -0700 (PDT)
+        bh=CdbKXW75g+zxbPdeaovDkK4CZBW+NEQi8jRJBmf9Ixs=;
+        b=cexmdNcF36HQWx5cIwa+6uIRB40CuUOm+38EdmAxg1isLRP6dh/+mjzIg4EjFCC+R/
+         nd6gdBeVRkim3JzPAUI/u2mCcb1daY3ihR4EeoPvXQyMOERApj/rF2WocSpda4RwRVAZ
+         RKiSFuVX3TQ5CT7L3Y39cbxJ4aVk8JXq+eY5eG334vbtsxeM7Akw5zaeEfj+gsEC96VF
+         tqQy6/zY2O9AcgtgYWkB6F/apoG1la8Ly+WQQ+39zIJL5ccMrzCiAcY+zYCyZjxaIBiX
+         mKjDSQPhxJyoc0xvyz/uxRcMHip6A/JtN33vVPEoBUvbPRQkz1QB4dduJhU73CdHR/xK
+         EMwA==
+X-Gm-Message-State: ACgBeo3pJgoX5c+Xn6MqeP8EUb6sW6bMnC3olWKYwOro4SYtn6oOT1Qr
+        Y+vFJ3Ujl1EvaUgXMCof11vtN8o4SqlclsehJRsIO+rDO8lM3g==
+X-Google-Smtp-Source: AA6agR6URLbPjWEBpixlGOAJ/yCwoBwFCWVI827oHz6DfJvC6kCyOWmac89CiJStrWasp1/9vl73iXmOPiNHXEJ/p8k=
+X-Received: by 2002:a67:b401:0:b0:387:8734:a09 with SMTP id
+ x1-20020a67b401000000b0038787340a09mr2151401vsl.61.1660885439827; Thu, 18 Aug
+ 2022 22:03:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220818210142.7867-1-wsa+renesas@sang-engineering.com>
-In-Reply-To: <20220818210142.7867-1-wsa+renesas@sang-engineering.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 19 Aug 2022 00:00:34 -0500
-Message-ID: <CAH2r5muBD8AV51ZQMapGoXyF=5Mk0GW2tYz2ng9XrhKRp_b96g@mail.gmail.com>
-Subject: Re: [PATCH] cifs: move from strlcpy with unused retval to strscpy
-To:     Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+Date:   Fri, 19 Aug 2022 00:03:49 -0500
+Message-ID: <CAH2r5mso_xy2RpCcez+NuR91nCUkv7R6Dffs6yT32zjzymRz=w@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks fine.   Do you want this merged through my tree?
+Please pull the following changes since commit
+eb555cb5b794f4e12a9897f3d46d5a72104cd4a7:
 
-On Thu, Aug 18, 2022 at 4:11 PM Wolfram Sang
-<wsa+renesas@sang-engineering.com> wrote:
->
-> Follow the advice of the below link and prefer 'strscpy' in this
-> subsystem. Conversion is 1:1 because the return value is not used.
-> Generated by a coccinelle script.
->
-> Link: https://lore.kernel.org/r/CAHk-=wgfRnXz0W3D37d01q3JFkr_i_uTL=V6A6G1oUZcprmknw@mail.gmail.com/
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> ---
->  fs/cifs/cifsroot.c | 2 +-
->  fs/cifs/connect.c  | 2 +-
->  fs/cifs/smb2pdu.c  | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/cifs/cifsroot.c b/fs/cifs/cifsroot.c
-> index 9e91a5a40aae..56ec1b233f52 100644
-> --- a/fs/cifs/cifsroot.c
-> +++ b/fs/cifs/cifsroot.c
-> @@ -59,7 +59,7 @@ static int __init cifs_root_setup(char *line)
->                         pr_err("Root-CIFS: UNC path too long\n");
->                         return 1;
->                 }
-> -               strlcpy(root_dev, line, len);
-> +               strscpy(root_dev, line, len);
->                 srvaddr = parse_srvaddr(&line[2], s);
->                 if (*s) {
->                         int n = snprintf(root_opts,
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 9111c025bcb8..3da5da9f16b0 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3994,7 +3994,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
->                 }
->                 bcc_ptr += length + 1;
->                 bytes_left -= (length + 1);
-> -               strlcpy(tcon->treeName, tree, sizeof(tcon->treeName));
-> +               strscpy(tcon->treeName, tree, sizeof(tcon->treeName));
->
->                 /* mostly informational -- no need to fail on error here */
->                 kfree(tcon->nativeFileSystem);
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 9b31ea946d45..9958b5f1c12f 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1928,7 +1928,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
->         tcon->capabilities = rsp->Capabilities; /* we keep caps little endian */
->         tcon->maximal_access = le32_to_cpu(rsp->MaximalAccess);
->         tcon->tid = le32_to_cpu(rsp->hdr.Id.SyncId.TreeId);
-> -       strlcpy(tcon->treeName, tree, sizeof(tcon->treeName));
-> +       strscpy(tcon->treeName, tree, sizeof(tcon->treeName));
->
->         if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
->             ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
-> --
-> 2.35.1
->
+  Merge tag '5.20-rc-ksmbd-server-fixes' of git://git.samba.org/ksmbd
+(2022-08-08 20:15:13 -0700)
 
+are available in the Git repository at:
 
--- 
+  git://git.samba.org/ksmbd.git tags/5.20-rc2-ksmbd-smb3-server-fixes
+
+for you to fetch changes up to 17661ecf6a64eb11ae7f1108fe88686388b2acd5:
+
+  ksmbd: don't remove dos attribute xattr on O_TRUNC open (2022-08-15
+21:07:01 -0500)
+
+----------------------------------------------------------------
+4 ksmbd server fixes:
+- important sparse file fix
+- allocation size fix
+- fix incorrect rc on bad share
+- share config fix
+
+----------------------------------------------------------------
+Atte Heikkil=C3=A4 (1):
+      ksmbd: request update to stale share config
+
+Hyunchul Lee (1):
+      ksmbd: remove unnecessary generic_fillattr in smb2_open
+
+Namjae Jeon (2):
+      ksmbd: return STATUS_BAD_NETWORK_NAME error status if share is
+not configured
+      ksmbd: don't remove dos attribute xattr on O_TRUNC open
+
+ fs/ksmbd/ksmbd_netlink.h     |  2 ++
+ fs/ksmbd/mgmt/share_config.c |  6 +++++-
+ fs/ksmbd/mgmt/share_config.h |  1 +
+ fs/ksmbd/mgmt/tree_connect.c | 16 +++++++++++++++-
+ fs/ksmbd/smb2pdu.c           | 35 ++++++++++++++++-------------------
+ 5 files changed, 39 insertions(+), 21 deletions(-)
+
+--=20
 Thanks,
 
 Steve
