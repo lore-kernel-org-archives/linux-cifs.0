@@ -2,190 +2,117 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A23C00140
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Aug 2022 23:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3456EC00140
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Aug 2022 01:24:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236468AbiHRX1A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Aug 2022 19:27:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37164 "EHLO
+        id S238882AbiHSBYh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Aug 2022 21:24:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230183AbiHRX07 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Aug 2022 19:26:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E32D758F;
-        Thu, 18 Aug 2022 16:26:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DB27C61701;
-        Thu, 18 Aug 2022 23:26:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B7BDC433C1;
-        Thu, 18 Aug 2022 23:26:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660865217;
-        bh=gZgBPW61TBJ2Ot43zC9FdlpHSeteHeF8IwtKZ9jm7m8=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=gjg5J/6TIYsYsHsV8CaVUSv1+hW3RQlbxTfu8rRxi3SRskXUUUJMBnjI2bHeVmqBW
-         WfcRs6tIOlsGCiBgD9JfwisM4jlefyL6Za7zhhJKg3y4Y+RYpRxNgORrQz+IyHE5cv
-         LiSWNkVxa5npvjh9q9BUAqmlgTga+UTnYl0cT6ILEiAhDHqNQLOvpSdtWSWovGTCmT
-         G0EagtnPIkvH8W1DH12NzQcmLQT62oOsGqRXPQUnXBcsrEaxJGJhkK0/fmPR1lCqB9
-         G8945tT88KMTjQf88X/8eXzqISo82AgEKvm5yDULsWh+CAv1pNeAvzgsYL4xkj+KOq
-         5P5N16o1MQ6AQ==
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-11cc7698a18so454919fac.4;
-        Thu, 18 Aug 2022 16:26:57 -0700 (PDT)
-X-Gm-Message-State: ACgBeo3RIE7X62HEphbL3yLiIGyuIxke58G6rpKR1ykubDJ21cUM9OsK
-        S8BWEwBcpE04ke6jRx/lX3lAgnGQEFpAC2YT+Lc=
-X-Google-Smtp-Source: AA6agR5Q9/tNFJCIePNKcBLmFFr4N+oPIg2BFG7h0whQAVZ7K3GeWKtNi73Zc2oIYIbUL/t5F1dodbVWrEi2pKb6ChU=
-X-Received: by 2002:a05:6870:f69d:b0:10d:81ea:3540 with SMTP id
- el29-20020a056870f69d00b0010d81ea3540mr2594259oab.257.1660865216257; Thu, 18
- Aug 2022 16:26:56 -0700 (PDT)
+        with ESMTP id S229584AbiHSBYg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Aug 2022 21:24:36 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0079816AD
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 18:24:33 -0700 (PDT)
+Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4M83sY1mp0zGpdp;
+        Fri, 19 Aug 2022 09:22:57 +0800 (CST)
+Received: from [10.174.176.83] (10.174.176.83) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 19 Aug 2022 09:24:31 +0800
+Subject: Re: [PATCH] cifs: Fix memory leak on the deferred close
+To:     Steve French <smfrench@gmail.com>
+CC:     CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>, <rohiths@microsoft.com>
+References: <20220818135044.2251342-1-zhangxiaoxu5@huawei.com>
+ <CAH2r5muzC3oSXKBO=p8b5e_MFTvLhitZrcMeqocyBZfidRd+fQ@mail.gmail.com>
+From:   "zhangxiaoxu (A)" <zhangxiaoxu5@huawei.com>
+Message-ID: <489b6c7f-0290-9eb7-621e-45e785b3f5b9@huawei.com>
+Date:   Fri, 19 Aug 2022 09:24:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Thu, 18 Aug 2022 16:26:55
- -0700 (PDT)
-In-Reply-To: <Yv6igFDtDa0vmq6H@ZenIV>
-References: <Yv2qoNQg48rtymGE@ZenIV> <Yv2rCqD7M8fAhq5v@ZenIV>
- <CAKYAXd-Xsih1TKTbM0kTGmjQfpkbpp7d3u9E7USuwmiSXLVvBw@mail.gmail.com> <Yv6igFDtDa0vmq6H@ZenIV>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 19 Aug 2022 08:26:55 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-6fT5qG2VmVG6Q51Z8-_79cjKhERHDatR_z62w19+p1Q@mail.gmail.com>
-Message-ID: <CAKYAXd-6fT5qG2VmVG6Q51Z8-_79cjKhERHDatR_z62w19+p1Q@mail.gmail.com>
-Subject: Re: [PATCH 4/5] ksmbd: don't open-code %pf
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-fsdevel@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAH2r5muzC3oSXKBO=p8b5e_MFTvLhitZrcMeqocyBZfidRd+fQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.83]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500023.china.huawei.com (7.185.36.114)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-08-19 5:35 GMT+09:00, Al Viro <viro@zeniv.linux.org.uk>:
-> On Thu, Aug 18, 2022 at 03:08:36PM +0900, Namjae Jeon wrote:
->> 2022-08-18 11:59 GMT+09:00, Al Viro <viro@zeniv.linux.org.uk>:
->> > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
->> > ---
->> >  fs/ksmbd/vfs.c | 4 ++--
->> >  1 file changed, 2 insertions(+), 2 deletions(-)
->> >
->> > diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
->> > index 78d01033604c..a0fafba8b5d0 100644
->> > --- a/fs/ksmbd/vfs.c
->> > +++ b/fs/ksmbd/vfs.c
->> > @@ -1743,11 +1743,11 @@ int ksmbd_vfs_copy_file_ranges(struct
->> > ksmbd_work
->> > *work,
->> >  	*total_size_written = 0;
->> >
->> >  	if (!(src_fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE))) {
->> > -		pr_err("no right to read(%pd)\n", src_fp->filp->f_path.dentry);
->> > +		pr_err("no right to read(%pf)\n", src_fp->filp);
->> Isn't this probably %pD?
->
-> *blink*
->
-> It certainly is; thanks for catching that braino...  While we are at it,
-> there's several more places of the same form these days, so fixed and
-> updated variant follows:
-Thanks for updating the patch!
->
-> ksmbd: don't open-code %pD
->
-> a bunch of places used %pd with file->f_path.dentry; shorter (and saner)
-> way to spell that is %pD with file...
->
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+running generic/029 and scan kmemleak on backend report this issue.
 
-Thanks!
-> ---
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index 0e1924a6476d..bed670410c37 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -3897,8 +3897,7 @@ int smb2_query_dir(struct ksmbd_work *work)
->  	    inode_permission(file_mnt_user_ns(dir_fp->filp),
->  			     file_inode(dir_fp->filp),
->  			     MAY_READ | MAY_EXEC)) {
-> -		pr_err("no right to enumerate directory (%pd)\n",
-> -		       dir_fp->filp->f_path.dentry);
-> +		pr_err("no right to enumerate directory (%pD)\n", dir_fp->filp);
->  		rc = -EACCES;
->  		goto err_out2;
->  	}
-> @@ -6269,8 +6268,8 @@ int smb2_read(struct ksmbd_work *work)
->  		goto out;
->  	}
->
-> -	ksmbd_debug(SMB, "filename %pd, offset %lld, len %zu\n",
-> -		    fp->filp->f_path.dentry, offset, length);
-> +	ksmbd_debug(SMB, "filename %pD, offset %lld, len %zu\n",
-> +		    fp->filp, offset, length);
->
->  	work->aux_payload_buf = kvmalloc(length, GFP_KERNEL | __GFP_ZERO);
->  	if (!work->aux_payload_buf) {
-> @@ -6534,8 +6533,8 @@ int smb2_write(struct ksmbd_work *work)
->  		data_buf = (char *)(((char *)&req->hdr.ProtocolId) +
->  				    le16_to_cpu(req->DataOffset));
->
-> -		ksmbd_debug(SMB, "filename %pd, offset %lld, len %zu\n",
-> -			    fp->filp->f_path.dentry, offset, length);
-> +		ksmbd_debug(SMB, "filename %pD, offset %lld, len %zu\n",
-> +			    fp->filp, offset, length);
->  		err = ksmbd_vfs_write(work, fp, data_buf, length, &offset,
->  				      writethrough, &nbytes);
->  		if (err < 0)
-> diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
-> index 78d01033604c..0c04a59cbe60 100644
-> --- a/fs/ksmbd/vfs.c
-> +++ b/fs/ksmbd/vfs.c
-> @@ -377,8 +377,7 @@ int ksmbd_vfs_read(struct ksmbd_work *work, struct
-> ksmbd_file *fp, size_t count,
->
->  	if (work->conn->connection_type) {
->  		if (!(fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE))) {
-> -			pr_err("no right to read(%pd)\n",
-> -			       fp->filp->f_path.dentry);
-> +			pr_err("no right to read(%pD)\n", fp->filp);
->  			return -EACCES;
->  		}
->  	}
-> @@ -487,8 +486,7 @@ int ksmbd_vfs_write(struct ksmbd_work *work, struct
-> ksmbd_file *fp,
->
->  	if (work->conn->connection_type) {
->  		if (!(fp->daccess & FILE_WRITE_DATA_LE)) {
-> -			pr_err("no right to write(%pd)\n",
-> -			       fp->filp->f_path.dentry);
-> +			pr_err("no right to write(%pD)\n", fp->filp);
->  			err = -EACCES;
->  			goto out;
->  		}
-> @@ -527,8 +525,8 @@ int ksmbd_vfs_write(struct ksmbd_work *work, struct
-> ksmbd_file *fp,
->  	if (sync) {
->  		err = vfs_fsync_range(filp, offset, offset + *written, 0);
->  		if (err < 0)
-> -			pr_err("fsync failed for filename = %pd, err = %d\n",
-> -			       fp->filp->f_path.dentry, err);
-> +			pr_err("fsync failed for filename = %pD, err = %d\n",
-> +			       fp->filp, err);
->  	}
->
->  out:
-> @@ -1743,11 +1741,11 @@ int ksmbd_vfs_copy_file_ranges(struct ksmbd_work
-> *work,
->  	*total_size_written = 0;
->
->  	if (!(src_fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE))) {
-> -		pr_err("no right to read(%pd)\n", src_fp->filp->f_path.dentry);
-> +		pr_err("no right to read(%pD)\n", src_fp->filp);
->  		return -EACCES;
->  	}
->  	if (!(dst_fp->daccess & (FILE_WRITE_DATA_LE | FILE_APPEND_DATA_LE))) {
-> -		pr_err("no right to write(%pd)\n", dst_fp->filp->f_path.dentry);
-> +		pr_err("no right to write(%pD)\n", dst_fp->filp);
->  		return -EACCES;
->  	}
->
->
+在 2022/8/19 0:28, Steve French 写道:
+> looks promising - am reviewing this now.  Which xfstest did you see
+> this when runnign?
+> 
+> On Thu, Aug 18, 2022 at 8:01 AM Zhang Xiaoxu <zhangxiaoxu5@huawei.com> wrote:
+>>
+>> xfstests on smb21 report kmemleak as below:
+>>
+>>    unreferenced object 0xffff8881767d6200 (size 64):
+>>      comm "xfs_io", pid 1284, jiffies 4294777434 (age 20.789s)
+>>      hex dump (first 32 bytes):
+>>        80 5a d0 11 81 88 ff ff 78 8a aa 63 81 88 ff ff  .Z......x..c....
+>>        00 71 99 76 81 88 ff ff 00 00 00 00 00 00 00 00  .q.v............
+>>      backtrace:
+>>        [<00000000ad04e6ea>] cifs_close+0x92/0x2c0
+>>        [<0000000028b93c82>] __fput+0xff/0x3f0
+>>        [<00000000d8116851>] task_work_run+0x85/0xc0
+>>        [<0000000027e14f9e>] do_exit+0x5e5/0x1240
+>>        [<00000000fb492b95>] do_group_exit+0x58/0xe0
+>>        [<00000000129a32d9>] __x64_sys_exit_group+0x28/0x30
+>>        [<00000000e3f7d8e9>] do_syscall_64+0x35/0x80
+>>        [<00000000102e8a0b>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
+>>
+>> When cancel the deferred close work, we should also cleanup the struct
+>> cifs_deferred_close.
+>>
+>> Fixes: 9e992755be8f2 ("cifs: Call close synchronously during unlink/rename/lease break.")
+>> Fixes: e3fc065682ebb ("cifs: Deferred close performance improvements")
+>> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+>> ---
+>>   fs/cifs/misc.c | 6 ++++++
+>>   1 file changed, 6 insertions(+)
+>>
+>> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+>> index 1f2628ffe9d7..87f60f736731 100644
+>> --- a/fs/cifs/misc.c
+>> +++ b/fs/cifs/misc.c
+>> @@ -737,6 +737,8 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode)
+>>          list_for_each_entry(cfile, &cifs_inode->openFileList, flist) {
+>>                  if (delayed_work_pending(&cfile->deferred)) {
+>>                          if (cancel_delayed_work(&cfile->deferred)) {
+>> +                               cifs_del_deferred_close(cfile);
+>> +
+>>                                  tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
+>>                                  if (tmp_list == NULL)
+>>                                          break;
+>> @@ -766,6 +768,8 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
+>>          list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+>>                  if (delayed_work_pending(&cfile->deferred)) {
+>>                          if (cancel_delayed_work(&cfile->deferred)) {
+>> +                               cifs_del_deferred_close(cfile);
+>> +
+>>                                  tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
+>>                                  if (tmp_list == NULL)
+>>                                          break;
+>> @@ -799,6 +803,8 @@ cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon, const char *path)
+>>                  if (strstr(full_path, path)) {
+>>                          if (delayed_work_pending(&cfile->deferred)) {
+>>                                  if (cancel_delayed_work(&cfile->deferred)) {
+>> +                                       cifs_del_deferred_close(cfile);
+>> +
+>>                                          tmp_list = kmalloc(sizeof(struct file_list), GFP_ATOMIC);
+>>                                          if (tmp_list == NULL)
+>>                                                  break;
+>> --
+>> 2.31.1
+>>
+> 
+> 
