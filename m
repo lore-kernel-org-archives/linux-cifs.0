@@ -2,86 +2,140 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC87BC25B0E
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 Aug 2022 05:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F05C25B0E
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Aug 2022 06:20:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346073AbiHSFsW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 Aug 2022 01:48:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42750 "EHLO
+        id S1346040AbiHSGU2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 Aug 2022 02:20:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241528AbiHSFsQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Aug 2022 01:48:16 -0400
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A037DC3
-        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 22:48:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple; d=sang-engineering.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=k1; bh=U5coVC/zGS6DWIvCheW2Ak7LyT3S
-        RdDMZFsyY6wUQM0=; b=mOhiFL0HLxl0NhNx0gBTqq0IK4H4EArtu/PeGPM0jQgQ
-        ZPsPLUMoQDvNTauOdt+9+GE5/+RYYfhjktxDp9Sm3PXn0Teal9vz+VqOoAi7FM2X
-        OaMPWcFrnU6nqDhsEunTsOWOaDTwSgzXoDXBZyjCoxFmlO6iESQyTPBvAYOZcdg=
-Received: (qmail 4113229 invoked from network); 19 Aug 2022 07:48:09 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 19 Aug 2022 07:48:09 +0200
-X-UD-Smtp-Session: l3s3148p1@i/mVpJHm+L8ucrTL
-Date:   Fri, 19 Aug 2022 07:48:09 +0200
-From:   Wolfram Sang <wsa+renesas@sang-engineering.com>
-To:     Steve French <smfrench@gmail.com>
+        with ESMTP id S1345865AbiHSGU1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Aug 2022 02:20:27 -0400
+Received: from mail-ua1-x936.google.com (mail-ua1-x936.google.com [IPv6:2607:f8b0:4864:20::936])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BEE60686;
+        Thu, 18 Aug 2022 23:20:27 -0700 (PDT)
+Received: by mail-ua1-x936.google.com with SMTP id s18so1448984uac.10;
+        Thu, 18 Aug 2022 23:20:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=0MSWc7wdb4JmTnyiY3TNYUbqrM+fW7halymViKhckH0=;
+        b=ldS6CT+CSIK1ONsRd4HFvX5zLNhbwOSmfYXGXtouMr+obCzSyvKuevfrvhdq9568Tf
+         rfa6MxqeABVgMEcTGyshxoXuxXa9gl4AuwAaPLNZ3ekA0qZKoig9MT8Go5qMKM0vtu/K
+         uR6ifXy80K0kwL3BXvLdZnJiY+LiGdkInUmrd3D1WtZaOvhhare2mc707N79qXaHATAA
+         sDsEORXOqx8O+GCqes40t2SC+n8f82bIjnV9w30Jwr3Id/5O54G1eDQV8ebxdKEsKdwz
+         UHdZaGW09CuOHSCJ6ZA2LD7GHZ3ICNYjW4k9XSi2AYnK4ADMLbiKN8IbpslU7chE6epU
+         dwNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=0MSWc7wdb4JmTnyiY3TNYUbqrM+fW7halymViKhckH0=;
+        b=ExgFVR0H9aNY8KJYfyuWcelPfVZCQMXsJeuxzG/2EP0lQGfQEwaL1UmXB0j6+MNp/m
+         sXOsjbsWn6ee/D918nRAh8QcgG5+SMSF7/CKuFmymaINi7NJ0i844AARYF7w9HdHa/fp
+         kPaZz8KuVNC/AKKv1dL2f9DMIWbqQqJ3MvheN33Nv8PL4ncVRvDJ2HXMz85nnCLm+l+C
+         J/PkwI6c0tWnXeqhoLDBpkW5UeRd38DNrlCg40agv+vlbtlVs1MJdNXWw9Fdkx8CEjJ/
+         KEdWSAuTpgpzXZYm1B+5kVXlDP3RCtpW3SNiyyttMNPjUq0JdHGltHKKO74t37zeCmHd
+         GHrg==
+X-Gm-Message-State: ACgBeo0kOJezQRQCkRyHLzB2P5YY+MxA3Aho96r5jKNPUwQFsYrsCFNY
+        3sO+23hCBOWjeCNF+vRHxJe0h/rErHUeVZP2e8w22hg38nc=
+X-Google-Smtp-Source: AA6agR6FNSsP/9mrdqwlhKF+kOZqYewx8f9uLyJBK/GqLrNmGE86ASbR883Y2sokThy2rEEDu1AZojaH4LFG/Bxwwgg=
+X-Received: by 2002:ab0:3bc6:0:b0:381:c4db:ef5 with SMTP id
+ q6-20020ab03bc6000000b00381c4db0ef5mr2542135uaw.81.1660890025731; Thu, 18 Aug
+ 2022 23:20:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220818210142.7867-1-wsa+renesas@sang-engineering.com> <CAH2r5muBD8AV51ZQMapGoXyF=5Mk0GW2tYz2ng9XrhKRp_b96g@mail.gmail.com>
+In-Reply-To: <CAH2r5muBD8AV51ZQMapGoXyF=5Mk0GW2tYz2ng9XrhKRp_b96g@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 19 Aug 2022 01:20:14 -0500
+Message-ID: <CAH2r5mt9Qs+Mb5Fj6xSOADcDZdggxALuxdDr6bd5HHzi2Z6WHw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: move from strlcpy with unused retval to strscpy
+To:     Wolfram Sang <wsa+renesas@sang-engineering.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
         CIFS <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>
-Subject: Re: [PATCH] cifs: move from strlcpy with unused retval to strscpy
-Message-ID: <Yv8kGdt8e/VgLRxY@shikoro>
-Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Steve French <smfrench@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-References: <20220818210142.7867-1-wsa+renesas@sang-engineering.com>
- <CAH2r5muBD8AV51ZQMapGoXyF=5Mk0GW2tYz2ng9XrhKRp_b96g@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="hqqaMmxIJ06FJ7g5"
-Content-Disposition: inline
-In-Reply-To: <CAH2r5muBD8AV51ZQMapGoXyF=5Mk0GW2tYz2ng9XrhKRp_b96g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+tentatively merged into cifs-2.6.git for-next pending testing
 
---hqqaMmxIJ06FJ7g5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Fri, Aug 19, 2022 at 12:00:34AM -0500, Steve French wrote:
+On Fri, Aug 19, 2022 at 12:00 AM Steve French <smfrench@gmail.com> wrote:
+>
 > Looks fine.   Do you want this merged through my tree?
+>
+> On Thu, Aug 18, 2022 at 4:11 PM Wolfram Sang
+> <wsa+renesas@sang-engineering.com> wrote:
+> >
+> > Follow the advice of the below link and prefer 'strscpy' in this
+> > subsystem. Conversion is 1:1 because the return value is not used.
+> > Generated by a coccinelle script.
+> >
+> > Link: https://lore.kernel.org/r/CAHk-=wgfRnXz0W3D37d01q3JFkr_i_uTL=V6A6G1oUZcprmknw@mail.gmail.com/
+> > Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+> > ---
+> >  fs/cifs/cifsroot.c | 2 +-
+> >  fs/cifs/connect.c  | 2 +-
+> >  fs/cifs/smb2pdu.c  | 2 +-
+> >  3 files changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/fs/cifs/cifsroot.c b/fs/cifs/cifsroot.c
+> > index 9e91a5a40aae..56ec1b233f52 100644
+> > --- a/fs/cifs/cifsroot.c
+> > +++ b/fs/cifs/cifsroot.c
+> > @@ -59,7 +59,7 @@ static int __init cifs_root_setup(char *line)
+> >                         pr_err("Root-CIFS: UNC path too long\n");
+> >                         return 1;
+> >                 }
+> > -               strlcpy(root_dev, line, len);
+> > +               strscpy(root_dev, line, len);
+> >                 srvaddr = parse_srvaddr(&line[2], s);
+> >                 if (*s) {
+> >                         int n = snprintf(root_opts,
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> > index 9111c025bcb8..3da5da9f16b0 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -3994,7 +3994,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+> >                 }
+> >                 bcc_ptr += length + 1;
+> >                 bytes_left -= (length + 1);
+> > -               strlcpy(tcon->treeName, tree, sizeof(tcon->treeName));
+> > +               strscpy(tcon->treeName, tree, sizeof(tcon->treeName));
+> >
+> >                 /* mostly informational -- no need to fail on error here */
+> >                 kfree(tcon->nativeFileSystem);
+> > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> > index 9b31ea946d45..9958b5f1c12f 100644
+> > --- a/fs/cifs/smb2pdu.c
+> > +++ b/fs/cifs/smb2pdu.c
+> > @@ -1928,7 +1928,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+> >         tcon->capabilities = rsp->Capabilities; /* we keep caps little endian */
+> >         tcon->maximal_access = le32_to_cpu(rsp->MaximalAccess);
+> >         tcon->tid = le32_to_cpu(rsp->hdr.Id.SyncId.TreeId);
+> > -       strlcpy(tcon->treeName, tree, sizeof(tcon->treeName));
+> > +       strscpy(tcon->treeName, tree, sizeof(tcon->treeName));
+> >
+> >         if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
+> >             ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
+> > --
+> > 2.35.1
+> >
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-Yes, please.
 
 
---hqqaMmxIJ06FJ7g5
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
+Thanks,
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmL/JBkACgkQFA3kzBSg
-KbbAbg//QVHmt/y7zDwyraqBCXaN7RgJoNT8iXiv2JmkGcmRDVQmzKYjfawD4uFA
-ytO8JVkX56psgiPzb8JOMT5tfdDbGDq6rxJvByWiMcJ4x4FcVMiEvh0l2usCpWaR
-zjvFYIeU+CpV/j7dOJ3JGa+KV/PcvKd+R9MVrcaV0ZxtE6pgIsLpVC6TAAxD/uRW
-U2213dAc3QG0qcvIrZe86X0ZJOKGc9zl8bwjW2rqRQLEizAIAlKvjwCwHd7pMcDr
-20wv/pVDEjQCYzUe+L0tV7S41oM7hr2GsrFS9D3UuyRLc7JhGCMMJYrAqDMb5fsA
-x1s/SLqYH1AE6eziiSSelEpFoEyHtvDHnnN0j8lsTwn1BcP08h+EbU8xleT2XJAE
-XU2J/UDXV6wU3lXN7coG4Tjb8EiKtCQ4Box9B6V0osvJwYYiKgbKmk8z/3UcNxyn
-NMj1tGoSg6N9V+rnM5mENCLoQAPXR3ysHVkPqW+aKwQZLIDtsiISsM83VjQX/QTx
-XIoqTlbrLAdWwM32XYkvFuxsBYU/bOmIY12SUPM0N8ZybcU1sTtwvCavX0Wkdgtl
-GkLAFnSdl4Gg9o7Nr25G42IW8+m6zb/qP3o7VKegjQjG8EF3QQ9RJPLqVgJSBETF
-7Fiq9UmD+SZBAczpaYa6IVZGDs6OOGIe3fcZU2+X8jlGV618Cpk=
-=GNvn
------END PGP SIGNATURE-----
-
---hqqaMmxIJ06FJ7g5--
+Steve
