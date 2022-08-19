@@ -2,78 +2,129 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E479EC25B0E
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 Aug 2022 04:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A36C25B0E
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Aug 2022 05:00:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344650AbiHSEig (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 Aug 2022 00:38:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38916 "EHLO
+        id S242980AbiHSFAs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 Aug 2022 01:00:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243004AbiHSEig (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Aug 2022 00:38:36 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 282FA2D1EB
-        for <linux-cifs@vger.kernel.org>; Thu, 18 Aug 2022 21:38:33 -0700 (PDT)
-Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
-        by 156.147.23.51 with ESMTP; 19 Aug 2022 13:38:31 +0900
-X-Original-SENDERIP: 156.147.1.125
-X-Original-MAILFROM: hyc.lee@gmail.com
-Received: from unknown (HELO localhost.localdomain) (10.177.245.62)
-        by 156.147.1.125 with ESMTP; 19 Aug 2022 13:38:31 +0900
-X-Original-SENDERIP: 10.177.245.62
-X-Original-MAILFROM: hyc.lee@gmail.com
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH] ksmbd: fix incorrect handling of iterate_dir
-Date:   Fri, 19 Aug 2022 13:35:57 +0900
-Message-Id: <20220819043557.26745-1-hyc.lee@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        with ESMTP id S230077AbiHSFAr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Aug 2022 01:00:47 -0400
+Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582C11DA6E;
+        Thu, 18 Aug 2022 22:00:46 -0700 (PDT)
+Received: by mail-vk1-xa2f.google.com with SMTP id b81so1773737vkf.1;
+        Thu, 18 Aug 2022 22:00:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=0KoTScIC7XKvx310KN0v9F7ZwulzGHm2HwEwg7svJe0=;
+        b=FdY8v7jr0moe/4RznEj7CYmQBDRzeerk4eAozh/OA5/dQiYzCdAVa/K2ethdYrjbb8
+         v2ZHM2FldV5wp0ZwVogkTZSliZszKhxQ0YG1Z411fZJ+dojjIuvYJPJr1a3l4fyKa21H
+         8QMDI8y4Wu3eJndEHEH1kVEuwOOBu56kbKR7YEZL+liZE+8I6DzfyQ2ItSUWn/b1U3/k
+         UuKpZ7jSipyt7yJwONR4zAXQhi05i9zUNLiQ1wnZBPwvTm9sE6E2yPFU+rHJPBJDAkR6
+         2uWyQ7X3Fh1vzRNGY2M6mmh+pX/cGFJE0iK6qsJd97tuA2B2W5ETsfOMA9VDHfH6YhXi
+         0QFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=0KoTScIC7XKvx310KN0v9F7ZwulzGHm2HwEwg7svJe0=;
+        b=mewaDKYRJWDpPgT5MoIn/T48d6FD2a1NGdHisaMDVr2xWkmNGsum/kAtInNzwzVrxj
+         rVOMCyKVq9ge7SvELwHsWKnGXanwd+AiOkCNaTkLHLcDdWrgJR+SqpSvLuEfV5iWol5j
+         cqCs4iuB7NoV7Z2JYBcmU3nvzXJ+RWYvKKfYJvxFA5WFOYAJs49IVV5VwhXKVVMD0nKa
+         cpPLDMq9B6bj/yCNmYlwqwK2SNGDOyF7FMbuQVeIqUABXO6ETprNzlpbyhSYxOVMvyJY
+         ACnP7VJ4S+EXFKeY3NUWj0+7B9h8Y7pYqTFakw+xeAhjpi30K9ME/4t4ijC0GMSow/O3
+         wuMQ==
+X-Gm-Message-State: ACgBeo3DP6mSbkdX99FaDNqZ6vbdT6e6ZJweG+h18edyEkSyPimIbsSn
+        adpbeo2BayVwaDFHfbKqpRqdgh/logYUkvvpwzY=
+X-Google-Smtp-Source: AA6agR4svtgvAfl4R3I3WZgQD9UTOtc+XojuuodEDOo2vl5rRt4vzm6oB1jYo5db0+cicUfOgr+PgtInxzDGeL2gB7A=
+X-Received: by 2002:a05:6122:311:b0:383:2f10:47f6 with SMTP id
+ c17-20020a056122031100b003832f1047f6mr2308991vko.3.1660885245104; Thu, 18 Aug
+ 2022 22:00:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220818210142.7867-1-wsa+renesas@sang-engineering.com>
+In-Reply-To: <20220818210142.7867-1-wsa+renesas@sang-engineering.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 19 Aug 2022 00:00:34 -0500
+Message-ID: <CAH2r5muBD8AV51ZQMapGoXyF=5Mk0GW2tYz2ng9XrhKRp_b96g@mail.gmail.com>
+Subject: Re: [PATCH] cifs: move from strlcpy with unused retval to strscpy
+To:     Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-if iterate_dir() returns non-negative value,
-caller has to treat it as normal and
-check there is any error while populating
-dentry information. ksmbd doesn't have to
-do anything because ksmbd already
-checks too small OutputBufferLength to
-store one file information.
+Looks fine.   Do you want this merged through my tree?
 
-And because ctx->pos is set to file->f_pos
-when iterative_dir is called, remove
-restart_ctx().
+On Thu, Aug 18, 2022 at 4:11 PM Wolfram Sang
+<wsa+renesas@sang-engineering.com> wrote:
+>
+> Follow the advice of the below link and prefer 'strscpy' in this
+> subsystem. Conversion is 1:1 because the return value is not used.
+> Generated by a coccinelle script.
+>
+> Link: https://lore.kernel.org/r/CAHk-=wgfRnXz0W3D37d01q3JFkr_i_uTL=V6A6G1oUZcprmknw@mail.gmail.com/
+> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+> ---
+>  fs/cifs/cifsroot.c | 2 +-
+>  fs/cifs/connect.c  | 2 +-
+>  fs/cifs/smb2pdu.c  | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/cifs/cifsroot.c b/fs/cifs/cifsroot.c
+> index 9e91a5a40aae..56ec1b233f52 100644
+> --- a/fs/cifs/cifsroot.c
+> +++ b/fs/cifs/cifsroot.c
+> @@ -59,7 +59,7 @@ static int __init cifs_root_setup(char *line)
+>                         pr_err("Root-CIFS: UNC path too long\n");
+>                         return 1;
+>                 }
+> -               strlcpy(root_dev, line, len);
+> +               strscpy(root_dev, line, len);
+>                 srvaddr = parse_srvaddr(&line[2], s);
+>                 if (*s) {
+>                         int n = snprintf(root_opts,
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 9111c025bcb8..3da5da9f16b0 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -3994,7 +3994,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+>                 }
+>                 bcc_ptr += length + 1;
+>                 bytes_left -= (length + 1);
+> -               strlcpy(tcon->treeName, tree, sizeof(tcon->treeName));
+> +               strscpy(tcon->treeName, tree, sizeof(tcon->treeName));
+>
+>                 /* mostly informational -- no need to fail on error here */
+>                 kfree(tcon->nativeFileSystem);
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 9b31ea946d45..9958b5f1c12f 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -1928,7 +1928,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+>         tcon->capabilities = rsp->Capabilities; /* we keep caps little endian */
+>         tcon->maximal_access = le32_to_cpu(rsp->MaximalAccess);
+>         tcon->tid = le32_to_cpu(rsp->hdr.Id.SyncId.TreeId);
+> -       strlcpy(tcon->treeName, tree, sizeof(tcon->treeName));
+> +       strscpy(tcon->treeName, tree, sizeof(tcon->treeName));
+>
+>         if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
+>             ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
+> --
+> 2.35.1
+>
 
-This patch fixes some failure of
-SMB2_QUERY_DIRECTORY, which happens when
-ntfs3 is local filesystem.
 
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
----
- fs/ksmbd/smb2pdu.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 53c91ab02be2..6716c4e3c16d 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -3970,11 +3970,9 @@ int smb2_query_dir(struct ksmbd_work *work)
- 	 */
- 	if (!d_info.out_buf_len && !d_info.num_entry)
- 		goto no_buf_len;
--	if (rc == 0)
--		restart_ctx(&dir_fp->readdir_data.ctx);
--	if (rc == -ENOSPC)
-+	if (rc > 0 || rc == -ENOSPC)
- 		rc = 0;
--	if (rc)
-+	else if (rc)
- 		goto err_out;
- 
- 	d_info.wptr = d_info.rptr;
 -- 
-2.17.1
+Thanks,
 
+Steve
