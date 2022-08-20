@@ -2,90 +2,113 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D18C25B08
-	for <linux-cifs@archiver.kernel.org>; Sat, 20 Aug 2022 16:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB8CC25B08
+	for <linux-cifs@archiver.kernel.org>; Sat, 20 Aug 2022 22:34:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345671AbiHTQJA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 20 Aug 2022 12:09:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45474 "EHLO
+        id S234882AbiHTWeo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 20 Aug 2022 18:34:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345651AbiHTQI7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 Aug 2022 12:08:59 -0400
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F8E926566
-        for <linux-cifs@vger.kernel.org>; Sat, 20 Aug 2022 09:08:58 -0700 (PDT)
-Received: by mail-vs1-xe32.google.com with SMTP id q190so7187680vsb.7
-        for <linux-cifs@vger.kernel.org>; Sat, 20 Aug 2022 09:08:58 -0700 (PDT)
+        with ESMTP id S229536AbiHTWem (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 Aug 2022 18:34:42 -0400
+Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D4024F1A;
+        Sat, 20 Aug 2022 15:34:42 -0700 (PDT)
+Received: by mail-ua1-x92c.google.com with SMTP id m21so3013797uab.13;
+        Sat, 20 Aug 2022 15:34:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=/q6MLPjCGTaP4hzwbXh1fVszSQAdc6LEr4ZNoHsKr/E=;
-        b=DCcGcnDPVfCclMOM/nZwBD6k0BExKrB01u9OTiCR4IGIDeSd4IAgIB7l48Lc+Qz/T8
-         1XgsCuf2hyaVkYxyKGskRWp+/mLMt7wYGM4Z3hQHwLy+wiUu6ykrcJP0Psxs0KI2pemj
-         FVsiHgqOmfmtuQ5I0wgs0tTfPmVmxVNurFH3X93MwHPftSdXBHxFxwRHQGMA+A0w+HAA
-         5dNq9Rt7upvLbnIeUSUh1Ut/4OU7oO9yzY6XaF4A+E4yTJXu3my6bdNnynPld527mUSZ
-         0VjGlFwhHZXsvEn/VSJ8Tvd3eJ2Mp8ejzq2xfh9iBHZJPXEvLZs3Hv42oMlBIvPfMwX2
-         HoVg==
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc;
+        bh=by7P29WzyDQZWKMc3u1rTd95KTpSR/76OJDe1maH1Fg=;
+        b=d1OiDBBhsLaV7ul3MoPkk8c3Pl56vvQM3un9tAmHhJ4rwX4n6Glv/Pq2XqqrFrm1V0
+         26p/nsV2Ca2D7vMvKBeAbf8OPLdxfFgv8cnu33gThS0xuRO/OAkoir/Z8S88AeG/sbx7
+         YYe7zNdcBVEgcGhIbeSLlsezLTME58KKh8NmUaPqaSqJ+x9D88hJi1OaOAit9p8NBIvS
+         oVwHtE3fkur9GfX9i8YArSOO8oKaIoefeXg6vaEfq7qSqKxBxbipt/G9g4lLb9Ok4IFv
+         drWBqCcvlq1bB1xTPKidJtlVUPlTc3CntdWJeb4QzzyVXEgD7pQ3bdPuPvHt8s805/rt
+         x8HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=/q6MLPjCGTaP4hzwbXh1fVszSQAdc6LEr4ZNoHsKr/E=;
-        b=MtNN/dX0UrJtjyWDV2sEtPdJJwbMu+H5DjSPBrOolSz4UWGHtqPR6VXrks/GEeL2Rg
-         BhFDGeWpNCGzM1i6S+fxSlZkEWg7K+YCwFfWTV0dMZmXHN2DizW1QbRwHQqyAg6dnP+u
-         0LTnxLbfSDjM0H+LVYIiu2gT/IzdqptCaLuvd3C4ka7dYIq4Vbgq20ydEBk8lu0BNATu
-         J8vp7qExkXbsoe4vwss3PldgGGhcP3bWQ/mt1RskkU3Qe41HysNUQ9JFCSf6eu9eJStu
-         Q0YRzSNwNqD9DQLZYCKvnHCMiPtbrMhc2XtsFf+RxbBLA1+kO474WuIwTZoR16N0Inj5
-         Ry2Q==
-X-Gm-Message-State: ACgBeo0N38s8DAhvuxRNjy7tUoLbOj0ubnTgK8iuTztraypgXbRIU+9T
-        prrU2Cmlkd9hB4QfOLNZZOo82XV5LlDjjoq9ITI=
-X-Google-Smtp-Source: AA6agR4MIOaOr7h7wOTe3aYLVocq926+R0rOhHlr0KM0xBLT5DOdq4JD4PZpI5XhsAUkpC7c9AHSEqXFAEqzZEKCXz8=
-X-Received: by 2002:a67:b401:0:b0:387:8734:a09 with SMTP id
- x1-20020a67b401000000b0038787340a09mr4359154vsl.61.1661011737417; Sat, 20 Aug
- 2022 09:08:57 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc;
+        bh=by7P29WzyDQZWKMc3u1rTd95KTpSR/76OJDe1maH1Fg=;
+        b=wBJi2cyUosmyvJa5dii/6qKypDU2FuuiOW/XnMYIsW5ILbnOeCsidhVWbZFtFVMxZZ
+         KwkkIiEjrZVhx1fahe2pe+xDXVBOynQVZuqDGP1PY3WqDgJi5VUljhUaFb8DRAhJvX5f
+         38NngAxgcNgYNVTVwWsDJG7so7OYV7c4EJCIgSiVS5mF5CiTpwu9I7/+4hMuQAVAgA7V
+         9Dtkyze0vUuM7L1lJf6zQomvDT7UG2eIuI6AQEpXao+m1B/Tp/nLoCvImWRUdc0eY41T
+         E3/28pMHdHEhp6KGQHwpyFmQo+w8f9vBUFSa6jk9wvmXkvnUfwfrV4E6rBzp8KS+KORP
+         qqrQ==
+X-Gm-Message-State: ACgBeo3OvznMPSFeuOvewfxRsk6/SxeDuxh2HmM4nBoFBV4J2nTCgis9
+        A+VekgJ+Hwlu71ME57vJXqMSv/vLETikZCKFLCVnAkv0hDAHCQ==
+X-Google-Smtp-Source: AA6agR4H5KnetTaZ4vP+233a5Hc7j9AIgFd0JU5vzNQmXoB82Z4vgMoYBOBCbIUmFp3LOgOhRFWJy1xAo+W+RPzTDnM=
+X-Received: by 2002:ab0:3bc6:0:b0:381:c4db:ef5 with SMTP id
+ q6-20020ab03bc6000000b00381c4db0ef5mr5270608uaw.81.1661034880960; Sat, 20 Aug
+ 2022 15:34:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mtVOKN-8ET1oYC0L+ihAWpmwFY3=Q=-KP+qwcaAb002_A@mail.gmail.com>
- <36140.1661008981@warthog.procyon.org.uk>
-In-Reply-To: <36140.1661008981@warthog.procyon.org.uk>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 20 Aug 2022 11:08:45 -0500
-Message-ID: <CAH2r5ms+UJntZ=F4AP1SPmrKDfHHer0JhZO4qroGPAJ5HR-kEg@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] fix temporary data corruption in collapse range
-To:     David Howells <dhowells@redhat.com>
+Date:   Sat, 20 Aug 2022 17:34:30 -0500
+Message-ID: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If it is moved earlier it will have the effect of throwing away these
-pages even if the copychunk fails (and thus if the collapse range
-fails we end up still discarding).
+Please pull the following changes since commit
+568035b01cfb107af8d2e4bd2fb9aea22cf5b868:
 
-Any thoughts?
+  Linux 6.0-rc1 (2022-08-14 15:50:18 -0700)
 
-On Sat, Aug 20, 2022 at 10:23 AM David Howells <dhowells@redhat.com> wrote:
->
-> Steve French <smfrench@gmail.com> wrote:
->
-> > +     truncate_pagecache_range(inode, off, old_eof);
->
-> Upon further consideration, I think this should perhaps be before:
->
-> >       rc = smb2_copychunk_range(xid, cfile, cfile, off + len,
->
-> so that any outstanding shared-writable mmap can be made to wait.
->
-> Also the invalidation in smb3_zero_range() only covers the hole, so
-> smb3_insert_range() also needs to invalidate from the bottom of the hole to
-> the EOF - and, again, I think it needs to do this before making changes to the
-> file contents.
->
-> David
->
+are available in the Git repository at:
 
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.0-rc1-smb3-client-fixes
+
+for you to fetch changes up to 13609a8b3ac6b0af38127a2b97fe62c0d06a8282:
+
+  cifs: move from strlcpy with unused retval to strscpy (2022-08-19
+11:02:26 -0500)
+
+----------------------------------------------------------------
+5 cifs/smb3 fixes, one for stable
+- memory leak fix
+- two small cleanup
+- trivial strlcpy removal
+- update missing entry for cifs headers in MAINTAINERS file
+
+There are a pair of important fixes for insert range and collapse
+range that are being tested
+now that I plan to send next week.
+----------------------------------------------------------------
+Enzo Matsumiya (2):
+      cifs: remove unused server parameter from calc_smb_size()
+      cifs: remove useless parameter 'is_fsctl' from SMB2_ioctl()
+
+Steve French (1):
+      cifs: missing directory in MAINTAINERS file
+
+Wolfram Sang (1):
+      cifs: move from strlcpy with unused retval to strscpy
+
+Zhang Xiaoxu (1):
+      cifs: Fix memory leak on the deferred close
+
+ MAINTAINERS          |  1 +
+ fs/cifs/cifs_debug.c |  2 +-
+ fs/cifs/cifsglob.h   |  2 +-
+ fs/cifs/cifsproto.h  |  2 +-
+ fs/cifs/cifsroot.c   |  2 +-
+ fs/cifs/connect.c    |  2 +-
+ fs/cifs/misc.c       |  8 +++++++-
+ fs/cifs/netmisc.c    |  2 +-
+ fs/cifs/readdir.c    |  6 ++----
+ fs/cifs/smb2file.c   |  1 -
+ fs/cifs/smb2misc.c   |  4 ++--
+ fs/cifs/smb2ops.c    | 37 ++++++++++++++-----------------------
+ fs/cifs/smb2pdu.c    | 22 ++++++++++------------
+ fs/cifs/smb2proto.h  |  6 +++---
+ 14 files changed, 45 insertions(+), 52 deletions(-)
 
 -- 
 Thanks,
