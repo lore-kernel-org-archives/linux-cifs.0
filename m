@@ -2,68 +2,101 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3196FC32789
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 Aug 2022 18:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF75C00140
+	for <linux-cifs@archiver.kernel.org>; Sun, 21 Aug 2022 21:40:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231387AbiHUSmm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 21 Aug 2022 14:42:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45682 "EHLO
+        id S231815AbiHUVkY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 21 Aug 2022 17:40:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiHUSmm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Aug 2022 14:42:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68DD517589;
-        Sun, 21 Aug 2022 11:42:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EF1C960A67;
-        Sun, 21 Aug 2022 18:42:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55FD3C43140;
-        Sun, 21 Aug 2022 18:42:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661107360;
-        bh=De5Vnxd6xWWT+usTN3xck2FR4fVpjzVxn/cdXzh5Q1M=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=rGLUlD+mD1yRA/lyYiPb64RzNulgYuumnvFzFk3ayKDPpdQgf0AhW7ymGqUb3N0MT
-         DQq6BJUvhxCnbYkQka4bbN3FP/tFsCxyuDcydGgXQyFaeE6TCTXtlj5m2E4Stf63Y+
-         JhOx3Jg53AahMfkl/Ll6Tadsu9ijg6ruOUzwaa3k8eJFFlV4v4bQy4I1tWpW2jkrw8
-         bYUCA6JWsxOdstTWkoTFI4N4Zxnxk5Mwh52/tFo8Z4cjetGFBvCzE9EFxPjMFpPOX6
-         r2xp4rxBAlnuJeZ1Am51YGUWh1RlbMCH6pn8YEz3nvqHMOHRCl203FXNS4aG3zXaP4
-         zTpHvHv/5u/zQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 42CBCC43142;
-        Sun, 21 Aug 2022 18:42:40 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
-References: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.0-rc1-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 13609a8b3ac6b0af38127a2b97fe62c0d06a8282
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 367bcbc5b5ffc7164fb6ce1547e84dbf21795562
-Message-Id: <166110736027.1794.11382703436922944063.pr-tracker-bot@kernel.org>
-Date:   Sun, 21 Aug 2022 18:42:40 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        with ESMTP id S231589AbiHUVkX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Aug 2022 17:40:23 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A211EAC0;
+        Sun, 21 Aug 2022 14:40:22 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id gi31so11396623ejc.5;
+        Sun, 21 Aug 2022 14:40:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc;
+        bh=/HVT7GUvY6+TC++f6Cv4hO1tp2O629oMpPfXSVwaQLA=;
+        b=RYc25A5JuGfMMVdJ6ZPp2v1vj1ITYYM40su+Mx8AMDH/71qTY8ertOPlK0AAIQ2IDu
+         8/dGm43sd2YkwsiE1cblpWSTCdyR8ljhEq9x0nb8aTGYgIsizbjtePqiThGgWWXSpvD5
+         Xc+zXXpDtFy2Iuspm1xaSe3W/GGiWfERC+9c5/wWQRo44jfDSJ+kfVUSDz0Wu/EfB+x5
+         S5IzCDwvRd9bG5EzYtRDwGCiA7Orxynr0gGASF+K90rXZr+8AuwIyaTLZZvFkzRLihdy
+         xJoTVeOuMBcr+QzSJmuiCD/UVPc6fFTPQP0mJ5b0uMb2Ip1jgxPHNfQfnsOCv21tANN1
+         4ynw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc;
+        bh=/HVT7GUvY6+TC++f6Cv4hO1tp2O629oMpPfXSVwaQLA=;
+        b=Pbuk+0sN83YiKYkfEct4uYPHqoSQt+wh94B63xsSzBDot7DRKmsu1jpNfdQmd959cq
+         tG80d+v+KXC/IceNqLC6kO4aFGILv2PBofPbXsX93qlAqxZ4Ph9na/OyoINNsvrbxmpv
+         x6oxlmUKeWLlwCr47M4Sce683an0E2fs4T7f04NuO7oMGVwDJdUl2EbAM50tky6c4JUV
+         lFQjZhFlFlLPdUVSeg7TXG41OR1IK1ofWRCaN07rkLkFJKvQYEp/aHg5QyqKPfglQDU1
+         c+sWzqVbymdVt3gt8Kj35M7QCCxG6eoe9bUbFJWej2NPf8Llgz5fg839WW3dlJayLoE7
+         XoIg==
+X-Gm-Message-State: ACgBeo09KbXLg2IVntqIcGj6PxVExo2pV4rGYK01V1XzJEDSKgrczvi2
+        nGI1+7bp5QJP1P3W7W7hK5w=
+X-Google-Smtp-Source: AA6agR7jraIuXtLvUo9DatL3q0vu1JyYpWqVhby3TIbGuvaloPALXZSVzPnBmWMoAWvzQF0bKesIHw==
+X-Received: by 2002:a17:906:d550:b0:733:8e1a:f7 with SMTP id cr16-20020a170906d55000b007338e1a00f7mr11155721ejc.580.1661118021173;
+        Sun, 21 Aug 2022 14:40:21 -0700 (PDT)
+Received: from gmail.com (195-38-113-151.pool.digikabel.hu. [195.38.113.151])
+        by smtp.gmail.com with ESMTPSA id b2-20020aa7dc02000000b0043a7c24a669sm6959977edu.91.2022.08.21.14.40.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Aug 2022 14:40:20 -0700 (PDT)
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date:   Sun, 21 Aug 2022 23:40:18 +0200
+From:   Ingo Molnar <mingo@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>
+Subject: Re: strlcpy() notes (was Re: [GIT PULL] smb3 client fixes)
+Message-ID: <YwKmQllm8Thr3scO@gmail.com>
+References: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
+ <CAHk-=wi+xbVq++uqW9YgWpHjyBHNB8a-xad+Xp23-B+eodLCEA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wi+xbVq++uqW9YgWpHjyBHNB8a-xad+Xp23-B+eodLCEA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 20 Aug 2022 17:34:30 -0500:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.0-rc1-smb3-client-fixes
+* Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/367bcbc5b5ffc7164fb6ce1547e84dbf21795562
+> So I despise strlcpy(), but I think strscpy() is kind of broken too.
+> For the generic case, it really should have two separate buffer sizes.
+> 
+>  (2) if you expect the destination buffer contents to be untouched
+> past the terminating NUL character, you're simply out of luck
+> 
+> The strscpy() assumption is that it can arbitrarily write to the
+> destination buffer.
+> 
+> So the best way to think of "strscpy()" is really as a "optimized
+> memcpy for strings". That's almost exactly how it acts. It will do a
+> memcpy(), but stop when it notices that it has copied a NUL character.
 
-Thank you!
+Not to shed-paint this too much, but would it help if the naming reflected 
+that property of chunk-size NUL-(over)write a bit better?
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+- memcpy_str(), memstrcpy(), memscpy(), etc.?
+
+Developers do tend to think differently about operations that are named 
+after memcpy(). Here the argument order and semantics are pretty close to 
+memcpy() - if the naming is similar, we'd want people to think of it as a 
+memcpy(), not a string-copy.
+
+[ Personally I'd prefer memcpy_str(): it's a variant of memcpy() that stops 
+  earlier if possible, and does the 'early stop' safely & robustly. ]
+
+Thanks,
+
+	Ingo
