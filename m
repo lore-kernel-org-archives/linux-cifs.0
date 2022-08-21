@@ -2,120 +2,236 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F065EC25B08
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 Aug 2022 02:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 396EEC3F6B0
+	for <linux-cifs@archiver.kernel.org>; Sun, 21 Aug 2022 18:13:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236422AbiHUCGX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 20 Aug 2022 22:06:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54674 "EHLO
+        id S231633AbiHUSNy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 21 Aug 2022 14:13:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233554AbiHUCGW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 Aug 2022 22:06:22 -0400
-Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10198186FE;
-        Sat, 20 Aug 2022 19:06:22 -0700 (PDT)
-Received: by mail-vs1-xe31.google.com with SMTP id o123so7958328vsc.3;
-        Sat, 20 Aug 2022 19:06:22 -0700 (PDT)
+        with ESMTP id S231618AbiHUSNw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Aug 2022 14:13:52 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60D651A820
+        for <linux-cifs@vger.kernel.org>; Sun, 21 Aug 2022 11:13:48 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id ce26so1657953ejb.11
+        for <linux-cifs@vger.kernel.org>; Sun, 21 Aug 2022 11:13:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=linux-foundation.org; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc;
-        bh=1a9o11nrbt8l9Dxa/LaB4FbQcO2jVF1njMU4jgfxm10=;
-        b=jGjRAf+/Zn4r3ujXn4UvUUVpAX5jvYKaTvbrmkGU2XKN1L3ikzvepj9LTAyhVhfRNG
-         bAJzOraVqNEZewDYYgrv7/tg9rv4mStI+XBRdE/xIqJ28tciheGtSYEUpM2KvdnR6HY9
-         162Eq8VnLusezz7ecYmVZhQryNI1o8tlNph6UZSMpDIzIKQy5rwX5yxgOFpAcTK050HP
-         A2GxM2TSGySBjRtYPrbFbUxNtTSO7zL8z6Rh1BwlR81Ne3PUOArkYhkEBHge8vXQ67et
-         s45mPXf0QG0FusKgInmaxQUBshUU8jKtb8FctphrbNvF4DMe+WMXK2pQRwwat5z94RAC
-         gaZQ==
+        bh=T2tAc2srxcwVlb+HTpoFgLBwizFpdGoX6kNWCxIqAx4=;
+        b=Sb1mkjtKamB89FkwMkOmYcEpPsJ9G+rEZCuFjECQJyE5OHdIYo3sCSlmpjxltFmKmL
+         EwLLI2CzPzoEICDC6JsoOvE1DjILnky1onp8Yaw17oGdMUtGBH0kRj+XtAd0nxJMkFlA
+         aOUvUJfRXf02j3LTQlfS72zHjtQixpjn09QDw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=1a9o11nrbt8l9Dxa/LaB4FbQcO2jVF1njMU4jgfxm10=;
-        b=HkviydYWHEOUsgTVwDO5gKvnwzjplChYbtgvMPCDqq5Y/yANOIJcJstRa+dsHRGSn0
-         Jrr9u2zugySIfDyiUPH6NwufsD4sRIbNNBaAow6fQAlR6YKpWqLYmqqogVw22cyH5Oqg
-         1xVEsTDV0SlGeMzssbApRh6aCBGxzg62IrD/OgzqQw8lGP2rm4iV7rflSlaTwcFLIGag
-         DlRRn73Up2DwYA8OR1fHJRZU/VJgcqsp79kaJx+//LQcT6mkzWrYWXcP/zrvT05Md7Gr
-         t3kHRxBCzJ0q6t31FjmXommo80qvN47JWx+BrJQi+ExcNEPj3ry/f/MaNo8w7c+gP8OF
-         p7aQ==
-X-Gm-Message-State: ACgBeo30VOg2CqWejUUzoHAI2weUi2yUR7695SmR6umOV1p4C3hBm0wx
-        5xLrx5dJhpZVwvDZJuh+f8kV7TIeDS4NUUz8RBU=
-X-Google-Smtp-Source: AA6agR5K87YPtaxh3q3HxU04dWcBu+cE//vPS9Jl1hznEx/UtUZNy7IWOBFYRoYLq2johEBaMsV0IlXkTrCPapAhANU=
-X-Received: by 2002:a05:6102:3e82:b0:38a:ab1a:2702 with SMTP id
- m2-20020a0561023e8200b0038aab1a2702mr5195779vsv.29.1661047580975; Sat, 20 Aug
- 2022 19:06:20 -0700 (PDT)
+        bh=T2tAc2srxcwVlb+HTpoFgLBwizFpdGoX6kNWCxIqAx4=;
+        b=r1zAJ0Q56iIaxXBvv0BbtAYCjlh7iH/0KlJM0f0t6Z5NiQUF9GblU7B/wIFRs/R928
+         1rBXkAFNHlR2I5LLEIhR1jUtE8/83ymuBwKK+yRxYKkEfJ3MABvuYbKYI0bNSLKytK5g
+         f6t2t0slsFJYdv9p3r2E71b7nuCeALqdWjeh1rWhgWPG+C/VISKvPuNrPJc/MfiECL07
+         tr6VQy5epKHyqpdgan2ta7VbD39ad8WV4PCKEZu9lJur3XRUK9idCFavzcY5fhgVJT1L
+         WGEG6ZZ0MgScjyvCLS8f3T4m/fVgfo8LAokFfN/8mLTEUSSo2Rte8c94Mas9goM6bPNv
+         n/VA==
+X-Gm-Message-State: ACgBeo1GIpzlvo+to8lRw/sAts2xYhxZwP1O+fOSxBIEIbZ+IjGgwQFD
+        8VTPN5HHfTDQvCgc49JRrfnWicfG/d3QrAah
+X-Google-Smtp-Source: AA6agR64jIyobq2+gZzjo7/E+i3rah6NigCPC+Z5hDNFTmNvGFOsGsKQOPG+fwCs9hL18rZfO/73wA==
+X-Received: by 2002:a17:906:5a5a:b0:73d:732c:79ea with SMTP id my26-20020a1709065a5a00b0073d732c79eamr2501951ejc.693.1661105626582;
+        Sun, 21 Aug 2022 11:13:46 -0700 (PDT)
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com. [209.85.221.46])
+        by smtp.gmail.com with ESMTPSA id u18-20020a1709061db200b00726c0e63b94sm5106171ejh.27.2022.08.21.11.13.45
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Aug 2022 11:13:45 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id r16so10727444wrm.6
+        for <linux-cifs@vger.kernel.org>; Sun, 21 Aug 2022 11:13:45 -0700 (PDT)
+X-Received: by 2002:a05:6000:136f:b0:225:2fad:dde7 with SMTP id
+ q15-20020a056000136f00b002252faddde7mr8866613wrz.274.1661105624483; Sun, 21
+ Aug 2022 11:13:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <Yv2qoNQg48rtymGE@ZenIV> <Yv2rCqD7M8fAhq5v@ZenIV>
- <CAKYAXd-Xsih1TKTbM0kTGmjQfpkbpp7d3u9E7USuwmiSXLVvBw@mail.gmail.com>
- <Yv6igFDtDa0vmq6H@ZenIV> <CAKYAXd-6fT5qG2VmVG6Q51Z8-_79cjKhERHDatR_z62w19+p1Q@mail.gmail.com>
- <YwBZPCy0RBc9hwIk@ZenIV> <CAKYAXd9DGgLJ=-hcdADXVZUqp2aYRkGr2YKpfUND6S_GuaWgWQ@mail.gmail.com>
- <YwD+y2cXpcenIHlW@ZenIV>
-In-Reply-To: <YwD+y2cXpcenIHlW@ZenIV>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 20 Aug 2022 21:06:09 -0500
-Message-ID: <CAH2r5msb_n2LxUAPGRzDfFRfJ7HFv2SrAb1N5_nKJVscJH04bQ@mail.gmail.com>
-Subject: Re: [PATCH 4/5] ksmbd: don't open-code %pf
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
+In-Reply-To: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun, 21 Aug 2022 11:13:28 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wi+xbVq++uqW9YgWpHjyBHNB8a-xad+Xp23-B+eodLCEA@mail.gmail.com>
+Message-ID: <CAHk-=wi+xbVq++uqW9YgWpHjyBHNB8a-xad+Xp23-B+eodLCEA@mail.gmail.com>
+Subject: strlcpy() notes (was Re: [GIT PULL] smb3 client fixes)
+To:     Steve French <smfrench@gmail.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into ksmbd-for-next
+[ Adding Catalin Marinas because of that final note at the end of this
+email, and because of the potential sub-page faults on arm64 ]
 
-On Sat, Aug 20, 2022 at 10:34 AM Al Viro <viro@zeniv.linux.org.uk> wrote:
+On Sat, Aug 20, 2022 at 3:34 PM Steve French <smfrench@gmail.com> wrote:
 >
-> On Sat, Aug 20, 2022 at 02:44:29PM +0900, Namjae Jeon wrote:
-> > > OK...  FWIW, I've another ksmbd patch hanging around and it might be
-> > > less PITA if I put it + those two patches into never-rebased branch
-> > > (for-ksmbd) for ksmbd folks to pull from.  Fewer pointless conflicts
-> > > that way...
-> > Okay, Thanks for this. I'm trying to resend "ksmbd: fix racy issue
-> > from using ->d_parent and ->d_name" patch to you, but It conflict with
-> > these patches:)
-> > We will pull them from that branch if you create it.
->
-> OK, pull request follows:
->
-> The following changes since commit 568035b01cfb107af8d2e4bd2fb9aea22cf5b868:
->
->   Linux 6.0-rc1 (2022-08-14 15:50:18 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git tags/pull-ksmbd
->
-> for you to fetch changes up to f2ea6d96500dd8947467f774d70700c1ba3ed8ef:
->
->   ksmbd: constify struct path (2022-08-20 10:54:48 -0400)
->
-> ----------------------------------------------------------------
-> assorted ksmbd cleanups
->
-> Al Viro <viro@zeniv.linux.org.uk>
->
-> ----------------------------------------------------------------
-> Al Viro (3):
->       ksmbd: don't open-code file_path()
->       ksmbd: don't open-code %pD
->       ksmbd: constify struct path
->
->  fs/ksmbd/misc.c    |  2 +-
->  fs/ksmbd/misc.h    |  2 +-
->  fs/ksmbd/smb2pdu.c | 33 ++++++++++++++++-----------------
->  fs/ksmbd/smbacl.c  |  6 +++---
->  fs/ksmbd/smbacl.h  |  6 +++---
->  fs/ksmbd/vfs.c     | 18 ++++++++----------
->  fs/ksmbd/vfs.h     |  2 +-
->  7 files changed, 33 insertions(+), 36 deletions(-)
+> - trivial strlcpy removal
 
+Note that while I encourage this, in that thread I forgot to mention a
+very subtle difference between strlcpy and strscpy.
 
+Now strlcpy() is a completely broken interface, since it fundamentally
+cannot work on untrusted source strings (which is the alleged main
+reason to use it!). It's more than "the return value is broken", it's
+literally "since strscpy is designed to return the length of the
+source string, it can walk arbitrarily far past the end of it, if it
+doesn't have a terminating NUL character".
 
--- 
-Thanks,
+BOOM! SIGSEGV in user space, random kernel oopses in the kernel.
 
-Steve
+So strlcpy() is completely broken-by-design, and should never be used
+for anything but trusted strings, which imnsho makes it largely
+pointless. It is an inefficient way to copy trusted strings into
+limited destination buffers. That's all it is good for, and that's
+simply not a good reason to exist.
+
+In the kernel implementation, it is also racy wrt the data it copies,
+and the return value may not even match the actual returned data in
+case the source buffer changes under you.
+
+That second thing is fixable, but it's just not worth fixing since the
+first issue is fundamental.
+
+So the source buffer has to be not only properly NUL-terminated, it
+also has to be stable. Of the two, the first one is a bigger issue,
+the second is not worth even worrying about at that point.
+
+End result: strlcpy() does need to go.
+
+But it's worth mentioning that 'strscpy()' not only fixes that "source
+overrun" issue and the data race issue (the returned length is
+guaranteed to actually match the returned buffer), it also has another
+subtle semantic change to fix a performance issue.
+
+strlcpy() is a broken interface not just because of the broken
+interface - even if the actual design problems don't matter for you
+from a correctness standpoint because your string is properly
+terminated AND stable, it can also *perform* badly.
+
+Why? Again, strlcpy() will walk the whole source string, even if you
+just asked it to copy the first few bytes of it. For that same
+original "this interface is completely broken" reason.
+
+"strscpy()" doesn't do that - the maximum length also limits how far
+strscpy will walk in the source string. Which is very much what you
+want when you may not trust the source - you just have a buffer size,
+you don't know the size of the string (and if you did know it, you'd
+never use either strscpy or strlcpy, of course).
+
+BUT.
+
+And this is where the subtle semantic difference comes in.
+
+"strscpy()" goes one step further, since it could start from a clean
+slate with no legacy semantics. The function is defined to do copies
+in "chunks" (typically one whole word at a time).
+
+In particular, the *destination* is also written not one byte at a
+time, but one "chunk" at a time. It will not overrun the destination
+buffer (as defined by the size argument), but it basically does *not*
+guarantee that it won't write to bytes after the final terminating NUL
+character.
+
+In other words, strscpy() may - and in the default implementation
+*will* - potentially write more than one terminating NUL character in
+an effort to avoid the whole "byte at a time" loop at the end.
+
+Now, no sane user will ever care - the destination buffer is by
+definition overwritten, after all. But this does mean that if you do
+things like this:
+
+        unsigned char dest[5];
+
+        strscpy(dest, "hi", 8);
+
+then strscpy() may actually overrun your five-byte destination buffer,
+even though your source string is only three bytes in size.
+
+You basically told it that it can access up to 8 bytes (from both
+source and destination), and that is what it does (if the chunk size
+is 8 - as it would be on x86-64).
+
+So the above will basically do a single word-size load, find a zero
+byte in it, clear the subsequent bytes, and do a single word-sized
+store.
+
+Efficient, yes. Also very different from what the other 'str*cpy()"
+functions do.
+
+So when you tell strscpy() that you have a maximum of N bytes, then
+strscpy() really does assume that
+
+ (a) it can always read up to N bytes from the source
+
+ (b) it can always write up to N bytes (zero-padded) to the destination
+
+Both of those assumption are quite reasonable and sane on their own,
+but they are *different*.
+
+In contrast, "strncpy()" basically has the rule that
+
+ (a) it can read up to the terminating NUL but at *most* N bytes from the source
+
+ (b) it will *always* write exactly N bytes to the destination
+
+and "strlcpy()" has the rules
+
+ (a) it can read up to the terminating NULL with *no* regard to N from
+the source
+
+ (b) it can write up to N bytes to the destination, but stop at the NUL
+
+See? Very different rules, although the differences don't matter most
+of the time (except for strlcpy() rule (a), which has that "no regard
+for N at all" issue).
+
+Why do I mention this? It doesn't matter for 99% of all uses, but
+there are some gotchas:
+
+ (1) sometimes "source buffer" and "destination buffer" sizes are
+simply different.
+
+The strscpy() assumption is simply that you gave the smaller of the
+two buffers, but that's *different* from the traditional meaning,
+which is that N is basically the destination buffer size.
+
+So I despise strlcpy(), but I think strscpy() is kind of broken too.
+For the generic case, it really should have two separate buffer sizes.
+
+ (2) if you expect the destination buffer contents to be untouched
+past the terminating NUL character, you're simply out of luck
+
+The strscpy() assumption is that it can arbitrarily write to the
+destination buffer.
+
+So the best way to think of "strscpy()" is really as a "optimized
+memcpy for strings". That's almost exactly how it acts. It will do a
+memcpy(), but stop when it notices that it has copied a NUL character.
+
+(It's a *bit* better than that, in that it will not copy random data
+from beyond the string for security purposes - when it stops copying,
+it *will* zeropad any excess, it won't actually copy possibly
+sensitive data from past the source string, but if you think of it as
+a string-optimized memcpy, you really have the right mental model).
+
+It's also worth pointing out that the kernel implementation of
+'strscpy()' will not do the chunk-sized accesses across an unaligned
+page boundary. So it won't actually take a page fault past the
+terminating NUL character, but if you pass it an 'N' that is bigger
+than the source buffer, and you have sub-page faults in the kernel, we
+might need to do some further work in this are. Catalin?
+
+Of course, the easy solution is "don't pass a bigger N than the source
+buffer size", but if you come from a 'strlcpy()' model where N only
+affects the destination buffer and the NUL in the source is a cap on
+the source, this may cause problems.
+
+                   Linus
