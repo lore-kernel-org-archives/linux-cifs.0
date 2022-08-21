@@ -2,113 +2,118 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB8CC25B08
-	for <linux-cifs@archiver.kernel.org>; Sat, 20 Aug 2022 22:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F065EC25B08
+	for <linux-cifs@archiver.kernel.org>; Sun, 21 Aug 2022 02:06:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234882AbiHTWeo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 20 Aug 2022 18:34:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52360 "EHLO
+        id S236422AbiHUCGX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 20 Aug 2022 22:06:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbiHTWem (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 Aug 2022 18:34:42 -0400
-Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D4024F1A;
-        Sat, 20 Aug 2022 15:34:42 -0700 (PDT)
-Received: by mail-ua1-x92c.google.com with SMTP id m21so3013797uab.13;
-        Sat, 20 Aug 2022 15:34:42 -0700 (PDT)
+        with ESMTP id S233554AbiHUCGW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 Aug 2022 22:06:22 -0400
+Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10198186FE;
+        Sat, 20 Aug 2022 19:06:22 -0700 (PDT)
+Received: by mail-vs1-xe31.google.com with SMTP id o123so7958328vsc.3;
+        Sat, 20 Aug 2022 19:06:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc;
-        bh=by7P29WzyDQZWKMc3u1rTd95KTpSR/76OJDe1maH1Fg=;
-        b=d1OiDBBhsLaV7ul3MoPkk8c3Pl56vvQM3un9tAmHhJ4rwX4n6Glv/Pq2XqqrFrm1V0
-         26p/nsV2Ca2D7vMvKBeAbf8OPLdxfFgv8cnu33gThS0xuRO/OAkoir/Z8S88AeG/sbx7
-         YYe7zNdcBVEgcGhIbeSLlsezLTME58KKh8NmUaPqaSqJ+x9D88hJi1OaOAit9p8NBIvS
-         oVwHtE3fkur9GfX9i8YArSOO8oKaIoefeXg6vaEfq7qSqKxBxbipt/G9g4lLb9Ok4IFv
-         drWBqCcvlq1bB1xTPKidJtlVUPlTc3CntdWJeb4QzzyVXEgD7pQ3bdPuPvHt8s805/rt
-         x8HA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=1a9o11nrbt8l9Dxa/LaB4FbQcO2jVF1njMU4jgfxm10=;
+        b=jGjRAf+/Zn4r3ujXn4UvUUVpAX5jvYKaTvbrmkGU2XKN1L3ikzvepj9LTAyhVhfRNG
+         bAJzOraVqNEZewDYYgrv7/tg9rv4mStI+XBRdE/xIqJ28tciheGtSYEUpM2KvdnR6HY9
+         162Eq8VnLusezz7ecYmVZhQryNI1o8tlNph6UZSMpDIzIKQy5rwX5yxgOFpAcTK050HP
+         A2GxM2TSGySBjRtYPrbFbUxNtTSO7zL8z6Rh1BwlR81Ne3PUOArkYhkEBHge8vXQ67et
+         s45mPXf0QG0FusKgInmaxQUBshUU8jKtb8FctphrbNvF4DMe+WMXK2pQRwwat5z94RAC
+         gaZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc;
-        bh=by7P29WzyDQZWKMc3u1rTd95KTpSR/76OJDe1maH1Fg=;
-        b=wBJi2cyUosmyvJa5dii/6qKypDU2FuuiOW/XnMYIsW5ILbnOeCsidhVWbZFtFVMxZZ
-         KwkkIiEjrZVhx1fahe2pe+xDXVBOynQVZuqDGP1PY3WqDgJi5VUljhUaFb8DRAhJvX5f
-         38NngAxgcNgYNVTVwWsDJG7so7OYV7c4EJCIgSiVS5mF5CiTpwu9I7/+4hMuQAVAgA7V
-         9Dtkyze0vUuM7L1lJf6zQomvDT7UG2eIuI6AQEpXao+m1B/Tp/nLoCvImWRUdc0eY41T
-         E3/28pMHdHEhp6KGQHwpyFmQo+w8f9vBUFSa6jk9wvmXkvnUfwfrV4E6rBzp8KS+KORP
-         qqrQ==
-X-Gm-Message-State: ACgBeo3OvznMPSFeuOvewfxRsk6/SxeDuxh2HmM4nBoFBV4J2nTCgis9
-        A+VekgJ+Hwlu71ME57vJXqMSv/vLETikZCKFLCVnAkv0hDAHCQ==
-X-Google-Smtp-Source: AA6agR4H5KnetTaZ4vP+233a5Hc7j9AIgFd0JU5vzNQmXoB82Z4vgMoYBOBCbIUmFp3LOgOhRFWJy1xAo+W+RPzTDnM=
-X-Received: by 2002:ab0:3bc6:0:b0:381:c4db:ef5 with SMTP id
- q6-20020ab03bc6000000b00381c4db0ef5mr5270608uaw.81.1661034880960; Sat, 20 Aug
- 2022 15:34:40 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=1a9o11nrbt8l9Dxa/LaB4FbQcO2jVF1njMU4jgfxm10=;
+        b=HkviydYWHEOUsgTVwDO5gKvnwzjplChYbtgvMPCDqq5Y/yANOIJcJstRa+dsHRGSn0
+         Jrr9u2zugySIfDyiUPH6NwufsD4sRIbNNBaAow6fQAlR6YKpWqLYmqqogVw22cyH5Oqg
+         1xVEsTDV0SlGeMzssbApRh6aCBGxzg62IrD/OgzqQw8lGP2rm4iV7rflSlaTwcFLIGag
+         DlRRn73Up2DwYA8OR1fHJRZU/VJgcqsp79kaJx+//LQcT6mkzWrYWXcP/zrvT05Md7Gr
+         t3kHRxBCzJ0q6t31FjmXommo80qvN47JWx+BrJQi+ExcNEPj3ry/f/MaNo8w7c+gP8OF
+         p7aQ==
+X-Gm-Message-State: ACgBeo30VOg2CqWejUUzoHAI2weUi2yUR7695SmR6umOV1p4C3hBm0wx
+        5xLrx5dJhpZVwvDZJuh+f8kV7TIeDS4NUUz8RBU=
+X-Google-Smtp-Source: AA6agR5K87YPtaxh3q3HxU04dWcBu+cE//vPS9Jl1hznEx/UtUZNy7IWOBFYRoYLq2johEBaMsV0IlXkTrCPapAhANU=
+X-Received: by 2002:a05:6102:3e82:b0:38a:ab1a:2702 with SMTP id
+ m2-20020a0561023e8200b0038aab1a2702mr5195779vsv.29.1661047580975; Sat, 20 Aug
+ 2022 19:06:20 -0700 (PDT)
 MIME-Version: 1.0
+References: <Yv2qoNQg48rtymGE@ZenIV> <Yv2rCqD7M8fAhq5v@ZenIV>
+ <CAKYAXd-Xsih1TKTbM0kTGmjQfpkbpp7d3u9E7USuwmiSXLVvBw@mail.gmail.com>
+ <Yv6igFDtDa0vmq6H@ZenIV> <CAKYAXd-6fT5qG2VmVG6Q51Z8-_79cjKhERHDatR_z62w19+p1Q@mail.gmail.com>
+ <YwBZPCy0RBc9hwIk@ZenIV> <CAKYAXd9DGgLJ=-hcdADXVZUqp2aYRkGr2YKpfUND6S_GuaWgWQ@mail.gmail.com>
+ <YwD+y2cXpcenIHlW@ZenIV>
+In-Reply-To: <YwD+y2cXpcenIHlW@ZenIV>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 20 Aug 2022 17:34:30 -0500
-Message-ID: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+Date:   Sat, 20 Aug 2022 21:06:09 -0500
+Message-ID: <CAH2r5msb_n2LxUAPGRzDfFRfJ7HFv2SrAb1N5_nKJVscJH04bQ@mail.gmail.com>
+Subject: Re: [PATCH 4/5] ksmbd: don't open-code %pf
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-568035b01cfb107af8d2e4bd2fb9aea22cf5b868:
+merged into ksmbd-for-next
 
-  Linux 6.0-rc1 (2022-08-14 15:50:18 -0700)
+On Sat, Aug 20, 2022 at 10:34 AM Al Viro <viro@zeniv.linux.org.uk> wrote:
+>
+> On Sat, Aug 20, 2022 at 02:44:29PM +0900, Namjae Jeon wrote:
+> > > OK...  FWIW, I've another ksmbd patch hanging around and it might be
+> > > less PITA if I put it + those two patches into never-rebased branch
+> > > (for-ksmbd) for ksmbd folks to pull from.  Fewer pointless conflicts
+> > > that way...
+> > Okay, Thanks for this. I'm trying to resend "ksmbd: fix racy issue
+> > from using ->d_parent and ->d_name" patch to you, but It conflict with
+> > these patches:)
+> > We will pull them from that branch if you create it.
+>
+> OK, pull request follows:
+>
+> The following changes since commit 568035b01cfb107af8d2e4bd2fb9aea22cf5b868:
+>
+>   Linux 6.0-rc1 (2022-08-14 15:50:18 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git tags/pull-ksmbd
+>
+> for you to fetch changes up to f2ea6d96500dd8947467f774d70700c1ba3ed8ef:
+>
+>   ksmbd: constify struct path (2022-08-20 10:54:48 -0400)
+>
+> ----------------------------------------------------------------
+> assorted ksmbd cleanups
+>
+> Al Viro <viro@zeniv.linux.org.uk>
+>
+> ----------------------------------------------------------------
+> Al Viro (3):
+>       ksmbd: don't open-code file_path()
+>       ksmbd: don't open-code %pD
+>       ksmbd: constify struct path
+>
+>  fs/ksmbd/misc.c    |  2 +-
+>  fs/ksmbd/misc.h    |  2 +-
+>  fs/ksmbd/smb2pdu.c | 33 ++++++++++++++++-----------------
+>  fs/ksmbd/smbacl.c  |  6 +++---
+>  fs/ksmbd/smbacl.h  |  6 +++---
+>  fs/ksmbd/vfs.c     | 18 ++++++++----------
+>  fs/ksmbd/vfs.h     |  2 +-
+>  7 files changed, 33 insertions(+), 36 deletions(-)
 
-are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.0-rc1-smb3-client-fixes
-
-for you to fetch changes up to 13609a8b3ac6b0af38127a2b97fe62c0d06a8282:
-
-  cifs: move from strlcpy with unused retval to strscpy (2022-08-19
-11:02:26 -0500)
-
-----------------------------------------------------------------
-5 cifs/smb3 fixes, one for stable
-- memory leak fix
-- two small cleanup
-- trivial strlcpy removal
-- update missing entry for cifs headers in MAINTAINERS file
-
-There are a pair of important fixes for insert range and collapse
-range that are being tested
-now that I plan to send next week.
-----------------------------------------------------------------
-Enzo Matsumiya (2):
-      cifs: remove unused server parameter from calc_smb_size()
-      cifs: remove useless parameter 'is_fsctl' from SMB2_ioctl()
-
-Steve French (1):
-      cifs: missing directory in MAINTAINERS file
-
-Wolfram Sang (1):
-      cifs: move from strlcpy with unused retval to strscpy
-
-Zhang Xiaoxu (1):
-      cifs: Fix memory leak on the deferred close
-
- MAINTAINERS          |  1 +
- fs/cifs/cifs_debug.c |  2 +-
- fs/cifs/cifsglob.h   |  2 +-
- fs/cifs/cifsproto.h  |  2 +-
- fs/cifs/cifsroot.c   |  2 +-
- fs/cifs/connect.c    |  2 +-
- fs/cifs/misc.c       |  8 +++++++-
- fs/cifs/netmisc.c    |  2 +-
- fs/cifs/readdir.c    |  6 ++----
- fs/cifs/smb2file.c   |  1 -
- fs/cifs/smb2misc.c   |  4 ++--
- fs/cifs/smb2ops.c    | 37 ++++++++++++++-----------------------
- fs/cifs/smb2pdu.c    | 22 ++++++++++------------
- fs/cifs/smb2proto.h  |  6 +++---
- 14 files changed, 45 insertions(+), 52 deletions(-)
 
 -- 
 Thanks,
