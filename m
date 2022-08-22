@@ -2,101 +2,108 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF75C00140
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 Aug 2022 21:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE202C00140
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Aug 2022 00:51:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231815AbiHUVkY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 21 Aug 2022 17:40:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33526 "EHLO
+        id S231921AbiHVAv6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 21 Aug 2022 20:51:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231589AbiHUVkX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Aug 2022 17:40:23 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A211EAC0;
-        Sun, 21 Aug 2022 14:40:22 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id gi31so11396623ejc.5;
-        Sun, 21 Aug 2022 14:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc;
-        bh=/HVT7GUvY6+TC++f6Cv4hO1tp2O629oMpPfXSVwaQLA=;
-        b=RYc25A5JuGfMMVdJ6ZPp2v1vj1ITYYM40su+Mx8AMDH/71qTY8ertOPlK0AAIQ2IDu
-         8/dGm43sd2YkwsiE1cblpWSTCdyR8ljhEq9x0nb8aTGYgIsizbjtePqiThGgWWXSpvD5
-         Xc+zXXpDtFy2Iuspm1xaSe3W/GGiWfERC+9c5/wWQRo44jfDSJ+kfVUSDz0Wu/EfB+x5
-         S5IzCDwvRd9bG5EzYtRDwGCiA7Orxynr0gGASF+K90rXZr+8AuwIyaTLZZvFkzRLihdy
-         xJoTVeOuMBcr+QzSJmuiCD/UVPc6fFTPQP0mJ5b0uMb2Ip1jgxPHNfQfnsOCv21tANN1
-         4ynw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc;
-        bh=/HVT7GUvY6+TC++f6Cv4hO1tp2O629oMpPfXSVwaQLA=;
-        b=Pbuk+0sN83YiKYkfEct4uYPHqoSQt+wh94B63xsSzBDot7DRKmsu1jpNfdQmd959cq
-         tG80d+v+KXC/IceNqLC6kO4aFGILv2PBofPbXsX93qlAqxZ4Ph9na/OyoINNsvrbxmpv
-         x6oxlmUKeWLlwCr47M4Sce683an0E2fs4T7f04NuO7oMGVwDJdUl2EbAM50tky6c4JUV
-         lFQjZhFlFlLPdUVSeg7TXG41OR1IK1ofWRCaN07rkLkFJKvQYEp/aHg5QyqKPfglQDU1
-         c+sWzqVbymdVt3gt8Kj35M7QCCxG6eoe9bUbFJWej2NPf8Llgz5fg839WW3dlJayLoE7
-         XoIg==
-X-Gm-Message-State: ACgBeo09KbXLg2IVntqIcGj6PxVExo2pV4rGYK01V1XzJEDSKgrczvi2
-        nGI1+7bp5QJP1P3W7W7hK5w=
-X-Google-Smtp-Source: AA6agR7jraIuXtLvUo9DatL3q0vu1JyYpWqVhby3TIbGuvaloPALXZSVzPnBmWMoAWvzQF0bKesIHw==
-X-Received: by 2002:a17:906:d550:b0:733:8e1a:f7 with SMTP id cr16-20020a170906d55000b007338e1a00f7mr11155721ejc.580.1661118021173;
-        Sun, 21 Aug 2022 14:40:21 -0700 (PDT)
-Received: from gmail.com (195-38-113-151.pool.digikabel.hu. [195.38.113.151])
-        by smtp.gmail.com with ESMTPSA id b2-20020aa7dc02000000b0043a7c24a669sm6959977edu.91.2022.08.21.14.40.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Aug 2022 14:40:20 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date:   Sun, 21 Aug 2022 23:40:18 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>
-Subject: Re: strlcpy() notes (was Re: [GIT PULL] smb3 client fixes)
-Message-ID: <YwKmQllm8Thr3scO@gmail.com>
-References: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
- <CAHk-=wi+xbVq++uqW9YgWpHjyBHNB8a-xad+Xp23-B+eodLCEA@mail.gmail.com>
+        with ESMTP id S231737AbiHVAv6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Aug 2022 20:51:58 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21864201A8
+        for <linux-cifs@vger.kernel.org>; Sun, 21 Aug 2022 17:51:57 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B81C060E06
+        for <linux-cifs@vger.kernel.org>; Mon, 22 Aug 2022 00:51:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B29CC433D7
+        for <linux-cifs@vger.kernel.org>; Mon, 22 Aug 2022 00:51:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661129516;
+        bh=p1u/xQfh0QPsuyqRxgZxxuQITOj73htf/ky+Z+YZU1w=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=Jel03JGvLmokWcOlhtZ2L09jwUeCHp+Xv3JDhACwCV85dl7F63ckGapvdNtv/dAIv
+         UkJz/T/Lx9W4wx6ymCG7X8p0qEQGEKRMyculL+bGH7wwabd6u4xZ/GZiTZGWXNRUnA
+         Vs+dsgybvlnofDPPRsvb/PDTSKdkArH+39wjaigke33KfH1QGiBV2t/L7ddGrdzCuA
+         AGMODVedB/3DqdkHfNurwN4D6TlGGhIDJzaU2oh98MqI7BhzZYd1BjlAKfm3pfteDX
+         g9oO6TKl76zsd/a2kFjVod3h7Ec93Suwus4RZKy56osMLX2COjcXUrBkBdN/+keW+P
+         nICjPEbMkkhNg==
+Received: by mail-ot1-f49.google.com with SMTP id m21-20020a9d6ad5000000b00638df677850so6747735otq.5
+        for <linux-cifs@vger.kernel.org>; Sun, 21 Aug 2022 17:51:56 -0700 (PDT)
+X-Gm-Message-State: ACgBeo2HyOMHZFoPT6pnUX6xirbXZoUKPI32Ek09ka2wPZ655EHSTUCW
+        b81vBKjvUiZlub9KOh3b7SVUB4H6R+ifaznv3Lg=
+X-Google-Smtp-Source: AA6agR7S8/a2H99aOQhT7fT+oN/QZ4NIMwKVSh7EuwN8fxihduj+OlicQ3CRUKZJkXULSxbTqN7rWuyfymRasYEBZJE=
+X-Received: by 2002:a9d:5619:0:b0:617:3dd:f32b with SMTP id
+ e25-20020a9d5619000000b0061703ddf32bmr6891401oti.187.1661129515215; Sun, 21
+ Aug 2022 17:51:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wi+xbVq++uqW9YgWpHjyBHNB8a-xad+Xp23-B+eodLCEA@mail.gmail.com>
+Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Sun, 21 Aug 2022 17:51:54
+ -0700 (PDT)
+In-Reply-To: <20220819043557.26745-1-hyc.lee@gmail.com>
+References: <20220819043557.26745-1-hyc.lee@gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Mon, 22 Aug 2022 09:51:54 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-18=_Yv1LAG=cqAQMORVD3mdA=9OP1t6+PxM+bUxLM2Q@mail.gmail.com>
+Message-ID: <CAKYAXd-18=_Yv1LAG=cqAQMORVD3mdA=9OP1t6+PxM+bUxLM2Q@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix incorrect handling of iterate_dir
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+2022-08-19 13:35 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> if iterate_dir() returns non-negative value,
+> caller has to treat it as normal and
+> check there is any error while populating
+> dentry information. ksmbd doesn't have to
+> do anything because ksmbd already
+> checks too small OutputBufferLength to
+> store one file information.
+>
+> And because ctx->pos is set to file->f_pos
+> when iterative_dir is called, remove
+> restart_ctx().
+Shouldn't we get rid of the useless restart_ctx() ?
 
-* Linus Torvalds <torvalds@linux-foundation.org> wrote:
+>
+> This patch fixes some failure of
+> SMB2_QUERY_DIRECTORY, which happens when
+> ntfs3 is local filesystem.
+>
+> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+> ---
+>  fs/ksmbd/smb2pdu.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index 53c91ab02be2..6716c4e3c16d 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -3970,11 +3970,9 @@ int smb2_query_dir(struct ksmbd_work *work)
+>  	 */
+>  	if (!d_info.out_buf_len && !d_info.num_entry)
+>  		goto no_buf_len;
+> -	if (rc == 0)
+> -		restart_ctx(&dir_fp->readdir_data.ctx);
+> -	if (rc == -ENOSPC)
+> +	if (rc > 0 || rc == -ENOSPC)
+Do you know why -ENOSPC error is ignored ?
 
-> So I despise strlcpy(), but I think strscpy() is kind of broken too.
-> For the generic case, it really should have two separate buffer sizes.
-> 
->  (2) if you expect the destination buffer contents to be untouched
-> past the terminating NUL character, you're simply out of luck
-> 
-> The strscpy() assumption is that it can arbitrarily write to the
-> destination buffer.
-> 
-> So the best way to think of "strscpy()" is really as a "optimized
-> memcpy for strings". That's almost exactly how it acts. It will do a
-> memcpy(), but stop when it notices that it has copied a NUL character.
-
-Not to shed-paint this too much, but would it help if the naming reflected 
-that property of chunk-size NUL-(over)write a bit better?
-
-- memcpy_str(), memstrcpy(), memscpy(), etc.?
-
-Developers do tend to think differently about operations that are named 
-after memcpy(). Here the argument order and semantics are pretty close to 
-memcpy() - if the naming is similar, we'd want people to think of it as a 
-memcpy(), not a string-copy.
-
-[ Personally I'd prefer memcpy_str(): it's a variant of memcpy() that stops 
-  earlier if possible, and does the 'early stop' safely & robustly. ]
-
-Thanks,
-
-	Ingo
+Thanks.
+>  		rc = 0;
+> -	if (rc)
+> +	else if (rc)
+>  		goto err_out;
+>
+>  	d_info.wptr = d_info.rptr;
+> --
+> 2.17.1
+>
+>
