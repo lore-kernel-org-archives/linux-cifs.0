@@ -2,116 +2,201 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E94BC32772
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Aug 2022 17:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891B5C38142
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Aug 2022 17:01:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244673AbiHWRBj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Aug 2022 13:01:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33820 "EHLO
+        id S245706AbiHWRBp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Aug 2022 13:01:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343891AbiHWRAd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Aug 2022 13:00:33 -0400
+        with ESMTP id S1343763AbiHWRAU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Aug 2022 13:00:20 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8899E9E685
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Aug 2022 07:12:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63F7086B78
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Aug 2022 07:12:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661263933;
+        s=mimecast20190719; t=1661263956;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=kYvU0b08zm/V0xwR5oEjOP2aPgvABHjHuDzOrfSOpNM=;
-        b=W2nl2DCx8AZO9DepOOW2xzLTTK4eNjMaJjE4nX8SHMFFf7AXpZ6YB0hkEKl7jQf8admegt
-        Tsghc+vP2LD9CnqHwfiugQVlFE6dR9TOqYDGT/5zCtBZcnA3lHuwQgVPaNyIp+iYZ1BCZc
-        km9POfH6zvB4u7LAkLN5LcIIkXhFLOI=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P183HfthAts50D8fWVytaERlozP35z9ACI09QEFtgmY=;
+        b=VFbJkjbwETYdlYGnoLdQjPw5hFsDklYrqHxy2ZBFXJ31wIzORaaBLJp6R6Ug/ZYG6sMIRH
+        o/cp/yA8eSvjyWwAEwxCllPHYASaGy7TAh4gh/a1WmBQPB+6z/VYUIAJlBW3Xf0ITaEUce
+        E2DkH+A5OuMnB3TDJyarc1rbI7Z+Op4=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-453-IILv1f45PVWyhyOEee0mzQ-1; Tue, 23 Aug 2022 10:12:10 -0400
-X-MC-Unique: IILv1f45PVWyhyOEee0mzQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-549-2FsjouFkOsWoKSyaGlTn3A-1; Tue, 23 Aug 2022 10:12:32 -0400
+X-MC-Unique: 2FsjouFkOsWoKSyaGlTn3A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E47CC3C0D85A;
-        Tue, 23 Aug 2022 14:12:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C5ACD3C0E218;
+        Tue, 23 Aug 2022 14:12:29 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C00AC40CF8E7;
-        Tue, 23 Aug 2022 14:12:07 +0000 (UTC)
-Subject: [PATCH 0/7] smb3: Add iter helpers and use iov_iters down to the
- network transport
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B3B3C15BB3;
+        Tue, 23 Aug 2022 14:12:28 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 3/7] cifs: Add some helper functions
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>,
         Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>,
+Cc:     Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>, dhowells@redhat.com,
+        linux-cifs@vger.kernel.org, dhowells@redhat.com,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 23 Aug 2022 15:12:07 +0100
-Message-ID: <166126392703.708021.14465850073772688008.stgit@warthog.procyon.org.uk>
+Date:   Tue, 23 Aug 2022 15:12:28 +0100
+Message-ID: <166126394799.708021.10637797063862600488.stgit@warthog.procyon.org.uk>
+In-Reply-To: <166126392703.708021.14465850073772688008.stgit@warthog.procyon.org.uk>
+References: <166126392703.708021.14465850073772688008.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.5
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Add some helper functions to manipulate the folio marks by iterating
+through a list of folios held in an xarray rather than using a page list.
 
-Hi Steve, Al,
-
-Here's an updated version of a subset of my branch to make the cifs/smb3
-driver pass iov_iters down to the lowest layers where they can be passed to
-the network transport.
-
-Al: Could you look at the first two patches, that add extract_iter_to_iter()
-to see about decanting iterators of various types (but that might have to be
-lost) into iterators that can be held on to (pinning pages in the process),
-and iov_iter_scan() which passes each partial page of an iterator to a scanner
-function to do something with (such as create an sglist element for).
-
-Possibly I should add an extract_iter_to_sglist() - I'm doing that in a number
-of places.
-
-Steve: assuming Al is okay with the iov_iter patches, can you look at taking
-this into your tree (or should it go through mine?)?
-
-I've pushed the patches here also:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-for-viro
-
-David
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: linux-cifs@vger.kernel.org
 ---
-David Howells (7):
-      iov_iter: Add a function to extract an iter's buffers to a bvec iter
-      iov_iter: Add a general purpose iteration function
-      cifs: Add some helper functions
-      cifs: Add a function to read into an iter from a socket
-      cifs: Change the I/O paths to use an iterator rather than a page list
-      cifs: Remove unused code
-      cifs: Add some RDMA send tracepoints
 
+ fs/cifs/cifsfs.h |    3 ++
+ fs/cifs/file.c   |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 96 insertions(+)
 
- fs/cifs/cifsencrypt.c |   40 +-
- fs/cifs/cifsfs.h      |    3 +
- fs/cifs/cifsglob.h    |   28 +-
- fs/cifs/cifsproto.h   |   11 +-
- fs/cifs/cifssmb.c     |   13 +-
- fs/cifs/connect.c     |   16 +
- fs/cifs/file.c        | 1653 ++++++++++++++++++-----------------------
- fs/cifs/fscache.c     |   22 +-
- fs/cifs/fscache.h     |   10 +-
- fs/cifs/misc.c        |  108 ---
- fs/cifs/smb2ops.c     |  369 +++++----
- fs/cifs/smb2pdu.c     |   44 +-
- fs/cifs/smbdirect.c   |  335 ++++-----
- fs/cifs/smbdirect.h   |    4 +-
- fs/cifs/trace.h       |   95 +++
- fs/cifs/transport.c   |   54 +-
- include/linux/uio.h   |    8 +
- lib/iov_iter.c        |  159 +++-
- 18 files changed, 1391 insertions(+), 1581 deletions(-)
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 81f4c15936d0..bbc7aa31cc94 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -110,6 +110,9 @@ extern int cifs_file_strict_mmap(struct file * , struct vm_area_struct *);
+ extern const struct file_operations cifs_dir_ops;
+ extern int cifs_dir_open(struct inode *inode, struct file *file);
+ extern int cifs_readdir(struct file *file, struct dir_context *ctx);
++extern void cifs_pages_written_back(struct inode *inode, loff_t start, unsigned int len);
++extern void cifs_pages_write_failed(struct inode *inode, loff_t start, unsigned int len);
++extern void cifs_pages_write_redirty(struct inode *inode, loff_t start, unsigned int len);
+ 
+ /* Functions related to dir entries */
+ extern const struct dentry_operations cifs_dentry_ops;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index fa738adc031f..6dfd96715274 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -36,6 +36,99 @@
+ #include "cifs_ioctl.h"
+ #include "cached_dir.h"
+ 
++/*
++ * Completion of write to server.
++ */
++void cifs_pages_written_back(struct inode *inode, loff_t start, unsigned int len)
++{
++	struct address_space *mapping = inode->i_mapping;
++	struct folio *folio;
++	pgoff_t end;
++
++	XA_STATE(xas, &mapping->i_pages, start / PAGE_SIZE);
++
++	if (!len)
++		return;
++
++	rcu_read_lock();
++
++	end = (start + len - 1) / PAGE_SIZE;
++	xas_for_each(&xas, folio, end) {
++		if (!folio_test_writeback(folio)) {
++			WARN_ONCE(1, "bad %x @%llx page %lx %lx\n",
++				  len, start, folio_index(folio), end);
++			continue;
++		}
++
++		folio_detach_private(folio);
++		folio_end_writeback(folio);
++	}
++
++	rcu_read_unlock();
++}
++
++/*
++ * Failure of write to server.
++ */
++void cifs_pages_write_failed(struct inode *inode, loff_t start, unsigned int len)
++{
++	struct address_space *mapping = inode->i_mapping;
++	struct folio *folio;
++	pgoff_t end;
++
++	XA_STATE(xas, &mapping->i_pages, start / PAGE_SIZE);
++
++	if (!len)
++		return;
++
++	rcu_read_lock();
++
++	end = (start + len - 1) / PAGE_SIZE;
++	xas_for_each(&xas, folio, end) {
++		if (!folio_test_writeback(folio)) {
++			WARN_ONCE(1, "bad %x @%llx page %lx %lx\n",
++				  len, start, folio_index(folio), end);
++			continue;
++		}
++
++		folio_set_error(folio);
++		folio_end_writeback(folio);
++	}
++
++	rcu_read_unlock();
++}
++
++/*
++ * Redirty pages after a temporary failure.
++ */
++void cifs_pages_write_redirty(struct inode *inode, loff_t start, unsigned int len)
++{
++	struct address_space *mapping = inode->i_mapping;
++	struct folio *folio;
++	pgoff_t end;
++
++	XA_STATE(xas, &mapping->i_pages, start / PAGE_SIZE);
++
++	if (!len)
++		return;
++
++	rcu_read_lock();
++
++	end = (start + len - 1) / PAGE_SIZE;
++	xas_for_each(&xas, folio, end) {
++		if (!folio_test_writeback(folio)) {
++			WARN_ONCE(1, "bad %x @%llx page %lx %lx\n",
++				  len, start, folio_index(folio), end);
++			continue;
++		}
++
++		filemap_dirty_folio(folio->mapping, folio);
++		folio_end_writeback(folio);
++	}
++
++	rcu_read_unlock();
++}
++
+ /*
+  * Mark as invalid, all open files on tree connections since they
+  * were closed when session to server was lost.
 
 
