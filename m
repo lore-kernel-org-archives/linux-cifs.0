@@ -2,65 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D33C3F6B0
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Aug 2022 17:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 402A7C48BEA
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Aug 2022 17:11:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343778AbiHWREf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Aug 2022 13:04:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35744 "EHLO
+        id S1344022AbiHWRLx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Aug 2022 13:11:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343884AbiHWRDl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Aug 2022 13:03:41 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9397988DF3;
-        Tue, 23 Aug 2022 07:08:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=cXTGuxSdX3IqLUmH1xbDUEImxUv/M3WOTk/NqLmVJjw=; b=EeRLYkQD0wkNgun3h/DzzNnT3X
-        pU/T+Neiz84rBoUVVwFG1YXhN+K3/RjJy6SlAGY8mR3Cfd7k7pr9Tsv1Vo1fdy9I+094beQZ/2SFS
-        RGtv4IG9s2MZXamHw24chpE1zevVSJBzwVgQIQeAjWUdDcmYjM45slA7bkWJ8/lPLmv8T5W6qDW9y
-        ecav6TnG2ggCHc0SfSMoOBwEc4pNOPvGrpwxb4KgmkgcFoIQVu9T9UaZdeDDyHI4P/DuABZ5tMRgU
-        ZsSLNjEgjl9eDjUwNdPWlyUsUXnN+CQ7ZPHf2hJeK3rGYnMOzSmHslRKo2liGi98rRAag5EEQtqbF
-        ELYVJBdA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oQUZR-00FLAT-W7; Tue, 23 Aug 2022 14:07:58 +0000
-Date:   Tue, 23 Aug 2022 15:07:57 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     sfrench@samba.org, linux-cifs@vger.kernel.org, lsahlber@redhat.com,
-        jlayton@kernel.org, dchinner@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: Re: [PATCH 3/5] smb3: fix temporary data corruption in collapse range
-Message-ID: <YwTfPRDq04/DGTVT@casper.infradead.org>
-References: <166126004083.548536.11195647088995116235.stgit@warthog.procyon.org.uk>
- <166126006184.548536.12909933168251738646.stgit@warthog.procyon.org.uk>
+        with ESMTP id S1344980AbiHWRLa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Aug 2022 13:11:30 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C15C914C1C9
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Aug 2022 06:38:42 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 6DA921FA73;
+        Tue, 23 Aug 2022 13:38:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1661261921; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hDaQsBTUWEkkehsddUTs6KnXw/aHNGcJbqwIl/FuaWQ=;
+        b=lL+XcKG+IUsyKRcvVHEqRHUbiODHzANsCfqSVaa21TfXzpzk1tIAbGxQzrCM6fjVwzTIWG
+        xpeLivFI+7X70kjSlVGvaBiWBAHhkl9ctkbsrNfolaOsuQEVoL4S9EvbxEgai9jbDVOlPP
+        mj2JCydRFDNUOZnLOmuNqKYCefsm2D4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1661261921;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hDaQsBTUWEkkehsddUTs6KnXw/aHNGcJbqwIl/FuaWQ=;
+        b=IOJY6z0GIW5ue3P9z7omq9PGruESnRGkFXfA42roq5H2ix17xBAzLjrEvfgWSkiWCoYeaM
+        wsBnbBo9D4ernDAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E3FE913A89;
+        Tue, 23 Aug 2022 13:38:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id O1BnKWDYBGNLaQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Tue, 23 Aug 2022 13:38:40 +0000
+Date:   Tue, 23 Aug 2022 10:38:38 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
+Subject: Re: [PATCH][SMB3] skip extra NULL byte in filenames
+Message-ID: <20220823133838.3egvvzarknwtwbfp@cyberdelia>
+References: <CAH2r5msk4Jc1HM=3ynEAYOAYYZZtM90Z9_c4myDeDbrQ3ecmCQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <166126006184.548536.12909933168251738646.stgit@warthog.procyon.org.uk>
+In-Reply-To: <CAH2r5msk4Jc1HM=3ynEAYOAYYZZtM90Z9_c4myDeDbrQ3ecmCQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Aug 23, 2022 at 02:07:41PM +0100, David Howells wrote:
->  
-> +	filemap_invalidate_lock(inode->i_mapping);
->  	filemap_write_and_wait(inode->i_mapping);
-> +	truncate_pagecache_range(inode, off, old_eof);
+On 08/23, Steve French wrote:
+>Any comments on Paulo's recent patch below?
+>
+>    Since commit:
+>     cifs: alloc_path_with_tree_prefix: do not append sep. if the path is empty
+>    alloc_path_with_tree_prefix() function was no longer including the
+>    trailing separator when @path is empty, although @out_len was still
+>    assuming a path separator thus adding an extra byte to the final
+>    filename.
+>
+>    This has caused mount issues in some Synology servers due to the extra
+>    NULL byte in filenames when sending SMB2_CREATE requests with
+>    SMB2_FLAGS_DFS_OPERATIONS set.
+>
+>    Fix this by checking if @path is not empty and then add extra byte for
+>    separator.  Also, do not include any trailing NULL bytes in filename
+>    as MS-SMB2 requires it to be 8-byte aligned and not NULL terminated.
 
-It's a bit odd to writeback the entire file but then truncate only part
-of it.  XFS does the same part:
+Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
 
-        error = filemap_write_and_wait_range(inode->i_mapping, start, end);
-        if (error)
-                return error;
-        truncate_pagecache_range(inode, start, end);
 
-... and presumably, you'd also want the error check?
+Cheers,
 
->  	rc = smb2_copychunk_range(xid, cfile, cfile, off + len,
-> -				  i_size_read(inode) - off - len, off);
-> +				  old_eof - off - len, off);
+Enzo
+
+>--
+>Thanks,
+>
+>Steve
+
+
+
