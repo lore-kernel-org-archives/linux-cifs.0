@@ -2,45 +2,45 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 242C9C6498F
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Aug 2022 01:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89358C04AA5
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Aug 2022 01:41:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232848AbiHYBkE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Aug 2022 21:40:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50862 "EHLO
+        id S233810AbiHYBlY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Aug 2022 21:41:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233468AbiHYBjN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Aug 2022 21:39:13 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D44099A9A1;
-        Wed, 24 Aug 2022 18:37:45 -0700 (PDT)
+        with ESMTP id S234548AbiHYBki (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Aug 2022 21:40:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE8E97EE4;
+        Wed, 24 Aug 2022 18:37:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8C28FB826E5;
-        Thu, 25 Aug 2022 01:37:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1D11C433B5;
-        Thu, 25 Aug 2022 01:37:40 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9700E61ACA;
+        Thu, 25 Aug 2022 01:37:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5E93C433D7;
+        Thu, 25 Aug 2022 01:37:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661391462;
-        bh=1hTJ+i7CRXp6k4ueEOEQNa/eL9kfOAhCiJRCjs92a1Y=;
+        s=k20201202; t=1661391472;
+        bh=L4MKQTQwym98xpmAY4yKswzZFnAkBnYHc0eAUQZ+gkM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IySs2A/kymWT6gHCxTyzK8UTbM8XbhUQNO7Xu2jy8yoh9VKs3E8a5mugwA/wuAe8U
-         tDiBdyWMdVaZ/pzbkQq4Qz7FZ5sbh/hI5NmkFJP0UMhgZcaBWDNkeV4jxL6YH1MmxH
-         wsGW3gjrEusmw6TpH7l+b7qTajtGWKC4ZK+6Og3OgHVPRe32P1e3Mvh/SGaQ1HAVuO
-         +7xZmi92cgEwlsYppD35ZiCuF7KVFtGJIMaw1Mo9CNlZ1k1BHLGgfM+ONFJUKp1keJ
-         H1DG3rGaJPhEmiDalmxLItkyKz/hRF0G2jBEr4Brfy7HB3yDlsPVf1MJsMbuRbGW2r
-         IDweg/Nj5KBaA==
+        b=S4SderldP4B2ACzK4N0BsgWApUlcMJEpIK+SyNKQIhupVCRqt3X9/U2GAzOi0jWcp
+         hxvgMHIWFTpFXG3lG97ss2kOMIUZ7COI3Nz8PGjL0+lwpk67nIhvPnnxyrML4qk7B+
+         ol0mW3woGghtOUPPK5pJ2VRUa/9TyeMEq7dvxUTbGV7KSiCR5tyR8S6TgSwoYpuIZa
+         LfM3WlWdiZJ/tvjodEhcMLHjX6PH1LluCpd4XVV8k6Jho3R287oYwirpKESVUAMBz1
+         +u9pu9kQ0FtF3WqbxNgkINHba2Higxps4bL58M45eNmkHLm90iDQOHvm0FB6P2rcFo
+         FC15QIzlSdVaA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         Hyunchul Lee <hyc.lee@gmail.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        atteh.mailbox@gmail.com, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 07/20] ksmbd: return STATUS_BAD_NETWORK_NAME error status if share is not configured
-Date:   Wed, 24 Aug 2022 21:36:59 -0400
-Message-Id: <20220825013713.22656-7-sashal@kernel.org>
+        linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 10/20] ksmbd: don't remove dos attribute xattr on O_TRUNC open
+Date:   Wed, 24 Aug 2022 21:37:02 -0400
+Message-Id: <20220825013713.22656-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220825013713.22656-1-sashal@kernel.org>
 References: <20220825013713.22656-1-sashal@kernel.org>
@@ -54,48 +54,51 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit fe54833dc8d97ef387e86f7c80537d51c503ca75 ]
+[ Upstream commit 17661ecf6a64eb11ae7f1108fe88686388b2acd5 ]
 
-If share is not configured in smb.conf, smb2 tree connect should return
-STATUS_BAD_NETWORK_NAME instead of STATUS_BAD_NETWORK_PATH.
+When smb client open file in ksmbd share with O_TRUNC, dos attribute
+xattr is removed as well as data in file. This cause the FSCTL_SET_SPARSE
+request from the client fails because ksmbd can't update the dos attribute
+after setting ATTR_SPARSE_FILE. And this patch fix xfstests generic/469
+test also.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Reviewed-by: Hyunchul Lee <hyc.lee@gmail.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/ksmbd/mgmt/tree_connect.c | 2 +-
- fs/ksmbd/smb2pdu.c           | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ fs/ksmbd/smb2pdu.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/fs/ksmbd/mgmt/tree_connect.c b/fs/ksmbd/mgmt/tree_connect.c
-index 0d28e723a28c..940385c6a913 100644
---- a/fs/ksmbd/mgmt/tree_connect.c
-+++ b/fs/ksmbd/mgmt/tree_connect.c
-@@ -18,7 +18,7 @@
- struct ksmbd_tree_conn_status
- ksmbd_tree_conn_connect(struct ksmbd_session *sess, char *share_name)
- {
--	struct ksmbd_tree_conn_status status = {-EINVAL, NULL};
-+	struct ksmbd_tree_conn_status status = {-ENOENT, NULL};
- 	struct ksmbd_tree_connect_response *resp = NULL;
- 	struct ksmbd_share_config *sc;
- 	struct ksmbd_tree_connect *tree_conn = NULL;
 diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 28b5d20c8766..824f17a101a9 100644
+index 824f17a101a9..55ee639703ff 100644
 --- a/fs/ksmbd/smb2pdu.c
 +++ b/fs/ksmbd/smb2pdu.c
-@@ -1932,8 +1932,9 @@ int smb2_tree_connect(struct ksmbd_work *work)
- 		rsp->hdr.Status = STATUS_SUCCESS;
- 		rc = 0;
- 		break;
-+	case -ENOENT:
- 	case KSMBD_TREE_CONN_STATUS_NO_SHARE:
--		rsp->hdr.Status = STATUS_BAD_NETWORK_PATH;
-+		rsp->hdr.Status = STATUS_BAD_NETWORK_NAME;
- 		break;
- 	case -ENOMEM:
- 	case KSMBD_TREE_CONN_STATUS_NOMEM:
+@@ -2319,15 +2319,15 @@ static int smb2_remove_smb_xattrs(struct path *path)
+ 			name += strlen(name) + 1) {
+ 		ksmbd_debug(SMB, "%s, len %zd\n", name, strlen(name));
+ 
+-		if (strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN) &&
+-		    strncmp(&name[XATTR_USER_PREFIX_LEN], DOS_ATTRIBUTE_PREFIX,
+-			    DOS_ATTRIBUTE_PREFIX_LEN) &&
+-		    strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX, STREAM_PREFIX_LEN))
+-			continue;
+-
+-		err = ksmbd_vfs_remove_xattr(user_ns, path->dentry, name);
+-		if (err)
+-			ksmbd_debug(SMB, "remove xattr failed : %s\n", name);
++		if (!strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN) &&
++		    !strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX,
++			     STREAM_PREFIX_LEN)) {
++			err = ksmbd_vfs_remove_xattr(user_ns, path->dentry,
++						     name);
++			if (err)
++				ksmbd_debug(SMB, "remove xattr failed : %s\n",
++					    name);
++		}
+ 	}
+ out:
+ 	kvfree(xattr_list);
 -- 
 2.35.1
 
