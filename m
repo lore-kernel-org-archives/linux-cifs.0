@@ -2,79 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8698ECAAA3
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Aug 2022 17:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43ADFC001B5
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Aug 2022 21:21:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234607AbiHZRKe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Aug 2022 13:10:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59124 "EHLO
+        id S1343782AbiHZVVn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Aug 2022 17:21:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344452AbiHZRKb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Aug 2022 13:10:31 -0400
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C82386FF3
-        for <linux-cifs@vger.kernel.org>; Fri, 26 Aug 2022 10:10:29 -0700 (PDT)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 701248026A;
-        Fri, 26 Aug 2022 17:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1661533828;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1EvCv8yYylZ1MEgnr9abVG9LpgvMTyVXSykOjjjqk1s=;
-        b=PFfSC5PmQb8o/OT53+xNXAmsWH6ta+xL4SXc4NSh4RJq26W32AJUMyYeHqwl4WgbPBUBZY
-        s8VDgF6/lqPn78BZ2sB01DaLEPp/HBAn0Ak6Y61j0Wy/SMnoiXpOv5m9VovaxUQkdB/oAz
-        gwe91X/3lsY2IjyF7vMLloHze3ujsVpmA6Z8DZVY88Q0yXObHgxIwyzrqFgDtE2MON9Usb
-        bBpDcpkBKzymt10oWHTAYI1oZtNS0iq4mWIbb7PNFTAW9JLf7NXeKMI8LVE21Qek1OAfhm
-        SHxQ5c5MYGC+EUib9NR1c2BulIbG8vhQGkyrcmZtXBt0tMXokKgiSiYFGoFqIA==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org
-Subject: Re: SMB client testing wiki
-In-Reply-To: <165e9b10-2f3e-dc88-029a-c8157a98f095@talpey.com>
-References: <8bcbba74-d6ce-3c40-4655-e67bf75f3b3f@talpey.com>
- <878rnb3vkw.fsf@cjr.nz> <93e55661-ea4e-7205-d310-59105bc767ed@talpey.com>
- <8735dj3sem.fsf@cjr.nz> <165e9b10-2f3e-dc88-029a-c8157a98f095@talpey.com>
-Date:   Fri, 26 Aug 2022 14:10:46 -0300
-Message-ID: <87zgfr2and.fsf@cjr.nz>
+        with ESMTP id S239997AbiHZVVm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Aug 2022 17:21:42 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CF51403E;
+        Fri, 26 Aug 2022 14:21:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=jA15Q1AsL1CdeNBKwMd0iWzOfyNlFoAbN16yRdeZrpU=; b=LHSaq3B7n9zwAdH9ODgDMjlqwn
+        pjU/9JXzHBahjJC0FYcCwoRYqTxYpCn/xNGWrJC4SLynDeTpnGzeoS/Nck/2rj6607nBucn8yacCu
+        yQo21WQcSJhTEXZKxQX6Z+Xl8g5/cKhU85KHPkdi0i1+R/LmpfIgSd8rlI0adT68dA02HWEM0orva
+        bkPH5ONKMT8KRMZicpgd6wzOOpDg8W9MWF30oRIAsYBPbQB29699Ekvz3j5BdHU40hcelBIGKrxum
+        SOBYPUtgJkjQgIfMN8Nrz4Qsd/Ca/ouvP7NVByTqVp8qH6YE/xsAR5cmQyfVOKvpW5evjpaVjt0i2
+        ZwKUJdDg==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.95 #2 (Red Hat Linux))
+        id 1oRglg-008f84-Nw;
+        Fri, 26 Aug 2022 21:21:32 +0000
+Date:   Fri, 26 Aug 2022 22:21:32 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/7] iov_iter: Add a function to extract an iter's
+ buffers to a bvec iter
+Message-ID: <Ywk5XE6FvP5pI5d4@ZenIV>
+References: <166126392703.708021.14465850073772688008.stgit@warthog.procyon.org.uk>
+ <166126393409.708021.16165278011941496946.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <166126393409.708021.16165278011941496946.stgit@warthog.procyon.org.uk>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Tom Talpey <tom@talpey.com> writes:
+On Tue, Aug 23, 2022 at 03:12:14PM +0100, David Howells wrote:
+> +		ret = iov_iter_get_pages2(orig, pages, count, max_pages - npages,
+> +					  &start);
+> +		if (ret < 0) {
+> +			pr_err("Couldn't get user pages (rc=%zd)\n", ret);
+> +			break;
+> +		}
+> +
+> +		if (ret > count) {
+> +			pr_err("get_pages rc=%zd more than %zu\n", ret, count);
+> +			break;
+> +		}
+> +
+> +		iov_iter_advance(orig, ret);
 
->
-> On 8/26/2022 12:01 PM, Paulo Alcantara wrote:
->> Tom Talpey <tom@talpey.com> writes:
->> 
->>> Easy enough! How do I know if it "passes" though? My understanding
->>> is that a bunch of tests are expected to fail, or at least warn.
->>> Do I need to test a clean client, then compare results? Or am I
->>> misunderstanding, and FSTYP=cifs is taking care of it?
->> 
->> That's a really good question.  We have a pre-defined list of tests that
->> get run by a specfic SMB version, server, if multichannel, etc.
->
-> Yeah, there are a few exclusion files on the wiki, but they look
-> really old. Also, I cannot believe that "vers=3.0" is the proper
-> default, as linked there!!!
+Have you even tested that?  iov_iter_get_pages2() advances the iterator it had been
+given.  And no, it does *not* return more than it had been asked to, so the second
+check is complete BS.
 
-Yeah :-(  We should definitely update it.
-
->> Steve might send you the list of pre-defined tests that get run on our
->> buildbot so you can try it out.  He usually keeps those lists
->> up-to-date.
->
-> The buildbot doesn't do RDMA, or I'd consider that. But it's a lot
-> more convenient to have a local harness either way.
-
-It currently doesn't, unfortunately.  You could at least get the same
-set of tests that run over 3.1.1 against samba and/or ksmbd and then
-change mount options to get RDMA enabled.  And of course, let us know
-when you get it working and let's add it to our buildbot as well ;-)
+That's aside of the usefulness of the primitive in question...
