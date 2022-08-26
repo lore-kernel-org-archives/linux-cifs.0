@@ -2,159 +2,126 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7291BECAA25
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Aug 2022 19:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D56F1ECAAA3
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Aug 2022 07:40:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241625AbiHYTWF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Aug 2022 15:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33882 "EHLO
+        id S245518AbiHZHkl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Aug 2022 03:40:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241530AbiHYTWF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Aug 2022 15:22:05 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BF437859F
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Aug 2022 12:22:03 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id w196so24208724oiw.10
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Aug 2022 12:22:03 -0700 (PDT)
+        with ESMTP id S245394AbiHZHk0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Aug 2022 03:40:26 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8056DFA3
+        for <linux-cifs@vger.kernel.org>; Fri, 26 Aug 2022 00:40:24 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id s6so925640lfo.11
+        for <linux-cifs@vger.kernel.org>; Fri, 26 Aug 2022 00:40:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=j11I9jJbBdP2EsV8zm8vGrZ8to2ALD+DZiEMfyWlhf4=;
-        b=KjzVxnhpw6QKMn5c7oLhZ2YXfy0o0q7ppQDDA/IUG9Tba1CyII5IegLq2jiOsTx6sf
-         9PktWYsvLhv6OduPZa78FKjas33U49IxO+UttcDOMAdp3MTlGJvDXLmU3ofAZEoFFqZT
-         pafvPKdLl3l0hKSE9VWBcm6msZs1UGsFX0W0WhRtsci35MLKycrvSxbg6GiEiXprLSDz
-         35gtzDXDspqbKE6U1rd+mL/P+1w92XWlGqtbdRRUw9gw3+q3FfhdBiDfZom+YIwlZBrE
-         iSIuTPlKIwHdWrtxWrdA/Tch392Qi6e4omMMHzm85TUdvnZFdOZSQACivsWz9KW0c6uk
-         JDjQ==
+        d=rasmusvillemoes.dk; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=SWG+AYYaD3CGqVmhJUkc0npDBvTLvT/qXBQNeQdRPPI=;
+        b=VavM614ow0Wq5WTGNBaTek9R2gSqCSK2LowLKioZCjH9fi0rLESL9gU51h6u1ICdVM
+         O54wO0xGy8NLlu+JxKeFrsTK5D6TMHGLwWPXbcToifiej4CvHspsXtqeC5ShKEruaDem
+         2VWI9zZ+ad+AeT/jOq3cAhJOGxL7TuGKXf1GA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=j11I9jJbBdP2EsV8zm8vGrZ8to2ALD+DZiEMfyWlhf4=;
-        b=zDTiC5Qc2413Ml7bgELWi4WorXdlsTuuV2Mf7wuLk3HrsuRffzAVIHAhuZA6YfJi0a
-         2wL1WNyGR6nVy6hN+Ma+GHdPUzZ00axh8tZ+I63ksBPKz86uCN3p/uwtQe7vhz814UeN
-         Vo9WRt2gDrZOMdl/UGq4uiCedkctJ6ZALSCaX4WfIOvFIwwp9BuKZ1WfA6a59ny5yYa6
-         7oq/NFKdwnkbGy2Z5CGq8wsrDkjWl83Izdd9YARKoM553zp2d1H+ORMAkHm8hRJ0h0mc
-         FIyFReR0weB5721h3Hg6QH6zVuUt5WxgFR7cR93leRZwxEpwgqW4yBzCus1Mr8W9rJrP
-         tcjw==
-X-Gm-Message-State: ACgBeo3dmB6lkGJ/7AMYoSUO1cBQWs5HZPYavefZ7VFyH730C2Cn7hlY
-        8rXlWAJNzHsvVmCN7gvWqJyelpBcAthmBMtVk3PR
-X-Google-Smtp-Source: AA6agR5+NrNDgFeVEqQOH6xO8KzleveZvD24+0ma4hp6CR5I88pcrQbnickGgaR7sl54W0OczwK1VkCsRh+9Rsqv/HQ=
-X-Received: by 2002:a05:6808:3a9:b0:343:4b14:ccce with SMTP id
- n9-20020a05680803a900b003434b14cccemr243316oie.41.1661455322788; Thu, 25 Aug
- 2022 12:22:02 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=SWG+AYYaD3CGqVmhJUkc0npDBvTLvT/qXBQNeQdRPPI=;
+        b=ACvAHj3kxW0w7hjjr1kir+Kz0BBF1jt0vFDvnhXYdbdg+/WSA48FuI+oV0qRG+1u2S
+         6ROtUke2O7EslANxI8marprHhiPwBui+ZUxDveb50km1Tdl7uE5PiMv2QK4P8+LArEGK
+         hx4lgJFDDMlmOiamswxmTFiyrKoNuPTcBqld+YwlI8DAyOSE5sjeCYYNMwcckQV5Nsy0
+         XxS5mX1yZFXVUVs9WjaBq3p5L1MbRhsXLQrgKPb93VdxjplPNMa6HfGNK93BZyXOx8dc
+         owKWPeVEy7L+2iDBKHyD4tMTl+DWduc6ZBwBEa6W1NkIhPGCenx6soBoNR+XM7EH4Q0Q
+         8UAw==
+X-Gm-Message-State: ACgBeo0R9bBAOqj6Tt8OIX1sHaubMF/Jj8rPEMcXpn/prwaNV2YLIug5
+        ArcedEkbKXok7DAZhL6jVTgtag==
+X-Google-Smtp-Source: AA6agR5Wm1zWSG4SC+mpBPzTyeIPT/0fZuyJYI07D9p9QGCLhhs/GEofhI1B8Us/Ffey/8A1d/hh1Q==
+X-Received: by 2002:a19:645c:0:b0:492:cf78:62de with SMTP id b28-20020a19645c000000b00492cf7862demr1925671lfj.263.1661499622588;
+        Fri, 26 Aug 2022 00:40:22 -0700 (PDT)
+Received: from [172.16.11.74] ([81.216.59.226])
+        by smtp.gmail.com with ESMTPSA id q15-20020ac24a6f000000b0048b3926351bsm293857lfp.56.2022.08.26.00.40.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Aug 2022 00:40:21 -0700 (PDT)
+Message-ID: <527eee19-532f-b2e7-a42f-a1e199094fbe@rasmusvillemoes.dk>
+Date:   Fri, 26 Aug 2022 09:40:20 +0200
 MIME-Version: 1.0
-References: <20220825001830.1911524-1-kuba@kernel.org>
-In-Reply-To: <20220825001830.1911524-1-kuba@kernel.org>
-From:   Paul Moore <paul@paul-moore.com>
-Date:   Thu, 25 Aug 2022 15:21:52 -0400
-Message-ID: <CAHC9VhSxesi0TSSvcQSr1kDhP3Vce4+O3w2diEExGEGnjGpmiw@mail.gmail.com>
-Subject: Re: [PATCH net-next] genetlink: start to validate reserved header bytes
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-        pabeni@redhat.com, jiri@resnulli.us, johannes@sipsolutions.net,
-        linux-block@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org,
-        linux-wpan@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-pm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
-        mptcp@lists.linux.dev, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, dev@openvswitch.org,
-        linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: strlcpy() notes (was Re: [GIT PULL] smb3 client fixes)
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>
+References: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
+ <CAHk-=wi+xbVq++uqW9YgWpHjyBHNB8a-xad+Xp23-B+eodLCEA@mail.gmail.com>
+ <YwSWLH4Wp6yDMeKf@arm.com>
+ <CAHk-=whU7QiwWeO81Rf+KGh0rGS9CEfKUXc5eik+Z0GaVJgu4A@mail.gmail.com>
+From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
+In-Reply-To: <CAHk-=whU7QiwWeO81Rf+KGh0rGS9CEfKUXc5eik+Z0GaVJgu4A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 8:18 PM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> We had historically not checked that genlmsghdr.reserved
-> is 0 on input which prevents us from using those precious
-> bytes in the future.
->
-> One use case would be to extend the cmd field, which is
-> currently just 8 bits wide and 256 is not a lot of commands
-> for some core families.
->
-> To make sure that new families do the right thing by default
-> put the onus of opting out of validation on existing families.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: jiri@resnulli.us
-> CC: johannes@sipsolutions.net
-> CC: linux-block@vger.kernel.org
-> CC: osmocom-net-gprs@lists.osmocom.org
-> CC: linux-wpan@vger.kernel.org
-> CC: wireguard@lists.zx2c4.com
-> CC: linux-wireless@vger.kernel.org
-> CC: linux-scsi@vger.kernel.org
-> CC: target-devel@vger.kernel.org
-> CC: linux-pm@vger.kernel.org
-> CC: virtualization@lists.linux-foundation.org
-> CC: linux-cifs@vger.kernel.org
-> CC: cluster-devel@redhat.com
-> CC: mptcp@lists.linux.dev
-> CC: lvs-devel@vger.kernel.org
-> CC: netfilter-devel@vger.kernel.org
-> CC: linux-security-module@vger.kernel.org
-> CC: dev@openvswitch.org
-> CC: linux-s390@vger.kernel.org
-> CC: tipc-discussion@lists.sourceforge.net
-> ---
->  drivers/block/nbd.c                      | 1 +
->  drivers/net/gtp.c                        | 1 +
->  drivers/net/ieee802154/mac802154_hwsim.c | 1 +
->  drivers/net/macsec.c                     | 1 +
->  drivers/net/team/team.c                  | 1 +
->  drivers/net/wireguard/netlink.c          | 1 +
->  drivers/net/wireless/mac80211_hwsim.c    | 1 +
->  drivers/target/target_core_user.c        | 1 +
->  drivers/thermal/thermal_netlink.c        | 1 +
->  drivers/vdpa/vdpa.c                      | 1 +
->  fs/cifs/netlink.c                        | 1 +
->  fs/dlm/netlink.c                         | 1 +
->  fs/ksmbd/transport_ipc.c                 | 1 +
->  include/linux/genl_magic_func.h          | 1 +
->  include/net/genetlink.h                  | 3 +++
->  kernel/taskstats.c                       | 1 +
->  net/batman-adv/netlink.c                 | 1 +
->  net/core/devlink.c                       | 1 +
->  net/core/drop_monitor.c                  | 1 +
->  net/ethtool/netlink.c                    | 1 +
->  net/hsr/hsr_netlink.c                    | 1 +
->  net/ieee802154/netlink.c                 | 1 +
->  net/ieee802154/nl802154.c                | 1 +
->  net/ipv4/fou.c                           | 1 +
->  net/ipv4/tcp_metrics.c                   | 1 +
->  net/ipv6/ila/ila_main.c                  | 1 +
->  net/ipv6/ioam6.c                         | 1 +
->  net/ipv6/seg6.c                          | 1 +
->  net/l2tp/l2tp_netlink.c                  | 1 +
->  net/mptcp/pm_netlink.c                   | 1 +
->  net/ncsi/ncsi-netlink.c                  | 1 +
->  net/netfilter/ipvs/ip_vs_ctl.c           | 1 +
->  net/netlabel/netlabel_calipso.c          | 1 +
->  net/netlabel/netlabel_cipso_v4.c         | 1 +
->  net/netlabel/netlabel_mgmt.c             | 1 +
->  net/netlabel/netlabel_unlabeled.c        | 1 +
->  net/netlink/genetlink.c                  | 4 ++++
->  net/nfc/netlink.c                        | 1 +
->  net/openvswitch/conntrack.c              | 1 +
->  net/openvswitch/datapath.c               | 3 +++
->  net/openvswitch/meter.c                  | 1 +
->  net/psample/psample.c                    | 1 +
->  net/smc/smc_netlink.c                    | 3 ++-
->  net/smc/smc_pnet.c                       | 3 ++-
->  net/tipc/netlink.c                       | 1 +
->  net/tipc/netlink_compat.c                | 1 +
->  net/wireless/nl80211.c                   | 1 +
->  47 files changed, 56 insertions(+), 2 deletions(-)
+On 23/08/2022 19.37, Linus Torvalds wrote:
+> On Tue, Aug 23, 2022 at 1:56 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
+>>
+>> With load_unaligned_zeropad(), the arm64 implementation disables tag
+>> checking temporarily. We could do the same with read_word_at_a_time()
+>> (there is a kasan_check_read() in this function but it wrongly uses a
+>> size of 1).
+> 
+> The "size of 1" is not wrong, it's intentional, exactly because people
+> do things like
+> 
+>     strscpy(dst, "string", sizeof(dst));
+> 
+> which is a bit unfortunate, but very understandable and intended to
+> work. So that thing may over-read the string by up to a word. And
+> KASAN ends up being unhappy.
 
-Acked-by: Paul Moore <paul@paul-moore.com> (NetLabel)
+So, while we're doing all the churn of replacing strlcpy anyway, may I
+once again suggest we add (name can be bikeshedded) literal_strcpy():
 
--- 
-paul-moore.com
+#define literal_strcpy(d, s) ({ \
+  static_assert(__same_type(d, char[]), "destination must be char array"); \
+  static_assert(__same_type(s, const char[]), "source must be a string
+literal"); \
+  static_assert(sizeof(d) >= sizeof("" s ""), "source does not fit in
+destination"); \
+  strcpy(d, s); \
+})
+
+That interface _cannot_ be misused, because all the checking happens at
+build time, including enforcement that the source really is a string
+literal (the "" s "" trick - but for nicer error message the
+static_assert on the previous line is there as well). So unlike all the
+uses of str[ls]cpy which don't check the return value, we cannot
+silently do a truncated copy. Also, if somebody down the line changes
+the size of the destination or the literal string, again it will be
+caught at build time.
+
+And since gcc knows the semantics of strcpy(), it will also generate
+better code, because it will usually not emit a call at all (or even put
+the string in .rodata); it will simply emit a series of "mov immediate"
+instructions.
+
+Sloppy grepping for places where that could be used shows around ~800
+places.
+
+Btw, Steve, since you're incidentally on cc here anyway, perhaps you
+want to take a look at
+
+  strscpy(extension, "___", strlen("___"));
+
+and see if this really just wants two underscores copied to extension.
+
+Rasmus
