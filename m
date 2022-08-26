@@ -2,126 +2,129 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D56F1ECAAA3
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Aug 2022 07:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81EE9ECAAA3
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Aug 2022 08:21:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245518AbiHZHkl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Aug 2022 03:40:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39458 "EHLO
+        id S245244AbiHZIVz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Aug 2022 04:21:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245394AbiHZHk0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Aug 2022 03:40:26 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8056DFA3
-        for <linux-cifs@vger.kernel.org>; Fri, 26 Aug 2022 00:40:24 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id s6so925640lfo.11
-        for <linux-cifs@vger.kernel.org>; Fri, 26 Aug 2022 00:40:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=SWG+AYYaD3CGqVmhJUkc0npDBvTLvT/qXBQNeQdRPPI=;
-        b=VavM614ow0Wq5WTGNBaTek9R2gSqCSK2LowLKioZCjH9fi0rLESL9gU51h6u1ICdVM
-         O54wO0xGy8NLlu+JxKeFrsTK5D6TMHGLwWPXbcToifiej4CvHspsXtqeC5ShKEruaDem
-         2VWI9zZ+ad+AeT/jOq3cAhJOGxL7TuGKXf1GA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=SWG+AYYaD3CGqVmhJUkc0npDBvTLvT/qXBQNeQdRPPI=;
-        b=ACvAHj3kxW0w7hjjr1kir+Kz0BBF1jt0vFDvnhXYdbdg+/WSA48FuI+oV0qRG+1u2S
-         6ROtUke2O7EslANxI8marprHhiPwBui+ZUxDveb50km1Tdl7uE5PiMv2QK4P8+LArEGK
-         hx4lgJFDDMlmOiamswxmTFiyrKoNuPTcBqld+YwlI8DAyOSE5sjeCYYNMwcckQV5Nsy0
-         XxS5mX1yZFXVUVs9WjaBq3p5L1MbRhsXLQrgKPb93VdxjplPNMa6HfGNK93BZyXOx8dc
-         owKWPeVEy7L+2iDBKHyD4tMTl+DWduc6ZBwBEa6W1NkIhPGCenx6soBoNR+XM7EH4Q0Q
-         8UAw==
-X-Gm-Message-State: ACgBeo0R9bBAOqj6Tt8OIX1sHaubMF/Jj8rPEMcXpn/prwaNV2YLIug5
-        ArcedEkbKXok7DAZhL6jVTgtag==
-X-Google-Smtp-Source: AA6agR5Wm1zWSG4SC+mpBPzTyeIPT/0fZuyJYI07D9p9QGCLhhs/GEofhI1B8Us/Ffey/8A1d/hh1Q==
-X-Received: by 2002:a19:645c:0:b0:492:cf78:62de with SMTP id b28-20020a19645c000000b00492cf7862demr1925671lfj.263.1661499622588;
-        Fri, 26 Aug 2022 00:40:22 -0700 (PDT)
-Received: from [172.16.11.74] ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id q15-20020ac24a6f000000b0048b3926351bsm293857lfp.56.2022.08.26.00.40.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Aug 2022 00:40:21 -0700 (PDT)
-Message-ID: <527eee19-532f-b2e7-a42f-a1e199094fbe@rasmusvillemoes.dk>
-Date:   Fri, 26 Aug 2022 09:40:20 +0200
+        with ESMTP id S244988AbiHZIVv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Aug 2022 04:21:51 -0400
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C128C120F;
+        Fri, 26 Aug 2022 01:21:50 -0700 (PDT)
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+        by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 4A96643549;
+        Fri, 26 Aug 2022 10:21:47 +0200 (CEST)
+Message-ID: <3ea2a6b3-d64d-744f-894b-66fee1242597@proxmox.com>
+Date:   Fri, 26 Aug 2022 10:21:41 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: strlcpy() notes (was Re: [GIT PULL] smb3 client fixes)
+From:   Fiona Ebner <f.ebner@proxmox.com>
+Subject: Re: Problematic interaction of io_uring and CIFS
+To:     Shyam Prasad N <nspmangalore@gmail.com>,
+        Enzo Matsumiya <ematsumiya@suse.de>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org, CIFS <linux-cifs@vger.kernel.org>,
+        Thomas Lamprecht <t.lamprecht@proxmox.com>
+References: <af573afc-8f6a-d69e-24ab-970b33df45d9@proxmox.com>
+ <20220708174815.3g4atpcu6u6icrhp@cyberdelia>
+ <CANT5p=rSKRe_EXFmKS+qRyBo4i9Ko1pcgwxy-B1gugJtKjVAMA@mail.gmail.com>
+ <CANT5p=qxYh+VxXpVGd2GO=WJoZ5J_p0oodN+wcFqC43t49pRqA@mail.gmail.com>
+ <560586b2-8cd6-7a62-86f2-90e8968d0ad4@proxmox.com>
 Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>
-References: <CAH2r5mtDFpaAWeGCtrfm_WPM6j-Gkt_O80=nKfp6y39aXaBr6w@mail.gmail.com>
- <CAHk-=wi+xbVq++uqW9YgWpHjyBHNB8a-xad+Xp23-B+eodLCEA@mail.gmail.com>
- <YwSWLH4Wp6yDMeKf@arm.com>
- <CAHk-=whU7QiwWeO81Rf+KGh0rGS9CEfKUXc5eik+Z0GaVJgu4A@mail.gmail.com>
-From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
-In-Reply-To: <CAHk-=whU7QiwWeO81Rf+KGh0rGS9CEfKUXc5eik+Z0GaVJgu4A@mail.gmail.com>
+In-Reply-To: <560586b2-8cd6-7a62-86f2-90e8968d0ad4@proxmox.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 23/08/2022 19.37, Linus Torvalds wrote:
-> On Tue, Aug 23, 2022 at 1:56 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
->>
->> With load_unaligned_zeropad(), the arm64 implementation disables tag
->> checking temporarily. We could do the same with read_word_at_a_time()
->> (there is a kasan_check_read() in this function but it wrongly uses a
->> size of 1).
+Am 11.07.22 um 15:40 schrieb Fabian Ebner:
+> Am 09.07.22 um 05:39 schrieb Shyam Prasad N:
+>> On Sat, Jul 9, 2022 at 9:00 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+>>>
+>>> On Fri, Jul 8, 2022 at 11:22 PM Enzo Matsumiya <ematsumiya@suse.de> wrote:
+>>>>
+>>>> On 07/08, Fabian Ebner wrote:
+>>>>> (Re-sending without the log from the older kernel, because the mail hit
+>>>>> the 100000 char limit with that)
+>>>>>
+>>>>> Hi,
+>>>>> it seems that in kernels >= 5.15, io_uring and CIFS don't interact
+>>>>> nicely sometimes, leading to IO errors. Unfortunately, my reproducer is
+>>>>> a QEMU VM with a disk on CIFS (original report by one of our users [0]),
+>>>>> but I can try to cook up something simpler if you want.
+>>>>>
+>>>>> Bisecting got me to 8ef12efe26c8 ("io_uring: run regular file
+>>>>> completions from task_work") being the first bad commit.
+>>>>>
+
+I finally got around to taking another look at this issue (still present
+in 5.19.3) and I think I've finally figured out the root cause:
+
+After commit 8ef12efe26c8, for my reproducer, the write completion is
+added to task_work with notify_method being TWA_SIGNAL and thus
+TIF_NOTIFY_SIGNAL is set for the task.
+
+After that, if we end up in sk_stream_wait_memory() via sock_sendmsg(),
+signal_pending(current) will evaluate to true and thus -EINTR is
+returned all the way up to sock_sendmsg() in smb_send_kvec().
+
+Related: in __smb_send_rqst() there too is a signal_pending(current)
+check leading to the -ERESTARTSYS return value.
+
+To verify that this is the cause, I wasn't able to trigger the issue
+anymore with this hack applied (i.e. excluding the TIF_NOTIFY_SIGNAL check):
+
+> diff --git a/net/core/stream.c b/net/core/stream.c
+> index 06b36c730ce8..58e3825930bb 100644
+> --- a/net/core/stream.c
+> +++ b/net/core/stream.c
+> @@ -134,7 +134,7 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
+>                         goto do_error;
+>                 if (!*timeo_p)
+>                         goto do_eagain;
+> -               if (signal_pending(current))
+> +               if (task_sigpending(current))
+>                         goto do_interrupted;
+>                 sk_clear_bit(SOCKWQ_ASYNC_NOSPACE, sk);
+>                 if (sk_stream_memory_free(sk) && !vm_wait)
+
+
+In __cifs_writev() we have
+
+>     /*
+>      * If at least one write was successfully sent, then discard any rc
+>      * value from the later writes. If the other write succeeds, then
+>      * we'll end up returning whatever was written. If it fails, then
+>      * we'll get a new rc value from that.
+>      */
+
+so it can happen that collect_uncached_write_data() will (correctly)
+report a short write when calling ctx->iocb->ki_complete().
+
+But QEMU's io_uring backend treats a short write as an -ENOSPC error,
+which also is a bug? Or does the kernel give any guarantees in that
+direction?
+
+Still, it doesn't seem ideal that the "interrupt" happens and in fact
+__smb_send_rqst() tries to avoid it, but fails to do so, because of the
+unexpected TIF_NOTIFY_SIGNAL:
+>     /*
+>      * We should not allow signals to interrupt the network send because
+>      * any partial send will cause session reconnects thus increasing
+>      * latency of system calls and overload a server with unnecessary
+>      * requests.
+>      */
 > 
-> The "size of 1" is not wrong, it's intentional, exactly because people
-> do things like
-> 
->     strscpy(dst, "string", sizeof(dst));
-> 
-> which is a bit unfortunate, but very understandable and intended to
-> work. So that thing may over-read the string by up to a word. And
-> KASAN ends up being unhappy.
+>     sigfillset(&mask);
+>     sigprocmask(SIG_BLOCK, &mask, &oldmask);
 
-So, while we're doing all the churn of replacing strlcpy anyway, may I
-once again suggest we add (name can be bikeshedded) literal_strcpy():
+Do you have any suggestions for how to proceed?
 
-#define literal_strcpy(d, s) ({ \
-  static_assert(__same_type(d, char[]), "destination must be char array"); \
-  static_assert(__same_type(s, const char[]), "source must be a string
-literal"); \
-  static_assert(sizeof(d) >= sizeof("" s ""), "source does not fit in
-destination"); \
-  strcpy(d, s); \
-})
+Best Regards,
+Fiona
 
-That interface _cannot_ be misused, because all the checking happens at
-build time, including enforcement that the source really is a string
-literal (the "" s "" trick - but for nicer error message the
-static_assert on the previous line is there as well). So unlike all the
-uses of str[ls]cpy which don't check the return value, we cannot
-silently do a truncated copy. Also, if somebody down the line changes
-the size of the destination or the literal string, again it will be
-caught at build time.
-
-And since gcc knows the semantics of strcpy(), it will also generate
-better code, because it will usually not emit a call at all (or even put
-the string in .rodata); it will simply emit a series of "mov immediate"
-instructions.
-
-Sloppy grepping for places where that could be used shows around ~800
-places.
-
-Btw, Steve, since you're incidentally on cc here anyway, perhaps you
-want to take a look at
-
-  strscpy(extension, "___", strlen("___"));
-
-and see if this really just wants two underscores copied to extension.
-
-Rasmus
