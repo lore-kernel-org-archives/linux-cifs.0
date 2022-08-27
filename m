@@ -2,97 +2,104 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68011ECAAD1
-	for <linux-cifs@archiver.kernel.org>; Sat, 27 Aug 2022 21:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20901ECAAD1
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 Aug 2022 21:44:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229884AbiH0VLy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 27 Aug 2022 17:11:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41004 "EHLO
+        id S229717AbiH0VoE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 27 Aug 2022 17:44:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbiH0VLw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 Aug 2022 17:11:52 -0400
-Received: from sonic306-25.consmr.mail.ne1.yahoo.com (sonic306-25.consmr.mail.ne1.yahoo.com [66.163.189.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A99357C4
-        for <linux-cifs@vger.kernel.org>; Sat, 27 Aug 2022 14:11:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=att.net; s=s1024; t=1661634711; bh=bRoXnu9P5Jo1/X2hFBqVJjRsMel2ZDZTO3RzEcBhYCw=; h=Date:From:Subject:To:References:From:Subject:Reply-To; b=iBjHyAobsryUW3oiaHAjtTDPlVkEAGYlZ75SLPBe1Ut70xu7HIfe10KV2X9AAB73ua+dvy8fbE9gn/enACW0EH5si6UOPcqdEuqRdS/9p76krbZU0wdHrsZ6R7TBDXvY3MnE9O753yN9qy5KsRqLuMQLVcLED0yJwRerZ22iAhw=
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1661634711; bh=gE6KD49Dohomklnx1LIzULPdK4Zu9q6oGLvGwfN80+6=; h=X-Sonic-MF:Date:From:Subject:To:From:Subject; b=J3HxlnUAkGZHqDhN4lKvW0yjMztonKuHH5ecdd/6xanwXY+Ds68UORsHuFD0j3bVd289Lcyx7Qk6ettgSl+PibqFOV2t+rJKKrsPYCX0yQm58R4m4h1MO30bJGc3KG+G2rL+sDiOdRJOIKcYPBndfFhllqdYX/7z2xfA39iRS7sF+XGToo1/VB06lhYjBgHGWEzMAwzVqIEbZqmoYVNX7Ll/sAq0Sd2NFMuJFtSGZkWgoXh5AGiwsPqb1YU0XQQtPGdAyfGh3juEnJWOn+IVThPe4W34eFqRj56WL/0qXAPkuH3KBXCE1r7/MlZIo7MZjbemP8t2CsE+y/HfofoFGQ==
-X-YMail-OSG: n6fw5VEVM1ms5OQ.DU4smAWaDF.phTF2WB4zAieIpq09jr.L20v1mCq2j7YYDmJ
- m68Q5yQpIbwm.0gVuaEh4.jW6F.sajC7dtn4k3RN_5PkESEEV1kuq6WcysdbPjchd.SlYTcZ2GP5
- 1wYBc0w79X_P1rGH_hmPUR1_Slg7MqBwNikfkwjrOFaw8XejfqRv9RzR8hUxtAmR.hOths1Q8dGf
- TI8lDxttPrZzz9TMMFxQAn0V1NrcV6xNZ93CfC_ExPGY0ILkFYkUCAkZTVugzQAaW2Spu3aHjjLi
- SpY8zO_QaAJpwU6O1_73QlwSpfliQgDY8ghm0O0VLeZwQ9UiqilsQF18NleD2oIzuewgcSHVVPMI
- 6h8GLyEvUoFXGfNoTAv8.zk1kxidrxcSOsBZzElWSK_jOSBIC8mxYI1hmKTBIofAYj2mDuUkjHae
- Zp8tPDxrCbeERLNiPLkFfCk5CPwur2Csi1eXsrawdEDn2oh895UQzNq7Osr0jwja5xn5h1Sj4TKc
- J.54czGSQz7gZI9J.GIesdgdFf8RBQCvmQ10bkgRBGLHgr4y9VuO_rjupsfXFhwN7TOveCW5tEJy
- 7a8JJeMALkZKLFFJc0nHEpN7pkzEF1pQu3jAIJ0upjbgwsmVWkisru.G4jz8A6i8WLHS4pE4.6n3
- ofnNpmR4JwiJno97EeqUsimmzgSyzXiqW92ZD8UVJeVila6QiS1akw1Tn7h8ZRTDs4qLEwtQKulj
- nKzS3YqT8_oxFPaVOlTiOOxJJLBa44rBQguk1gvobGjcghmWNhjNa9zWYdJMjQxF1h_GIEa6ivbb
- yHe1g_6T2g7E_5m.vtcNHDKrkWqeW5xsI.yzu78wa5rizxOOo31lP.xSyNh9tnb3L33e5gsxIrJi
- etaqh3p8FnS5j3I1JuI9mRUiqY9htrhed29nCRsOTzqPHeX8OC9sEuatQ_eWLQDE_NkwOnSrd9p0
- .vwe61BDaR2KkNovNoeLWT0fqrBEJnN23LtWJIDJOjfQ9HNgb4e_RI_XDQgJp89ftyScALgPkw6o
- .VTQh96m0s2myGbIgLAu2hqGKEme.b.MRd3NvWrdIn2hE0L0WCYTnBy0q.dpfnHFyaM0RFKV26LZ
- saYsS1kXRCdGPhk9v.1kFZNpMb7HqRol_2MMvShz5aQ9iTRs6NBgg8j4mUkwlfzOQTbfQVBQq3gL
- XgbytAf7AWrQhBdAehJe04R4MQFOpgPkVKfAlEuuiaTmsFs0lm3lX2ha0A49bIy79n1AFYWpjLpT
- N0jiyUyjo5hfniKCapa3Td4OD1nrcSlCBQzzF.M2Tu50sitmEkHLFq_zfqzfDDp_aObbHRkBYBhx
- jKTGJNX02ju2gWBnvEBP4l_Ds3bVhhoJtJt5fWCtEEI9xYFE66D3meL.KPX7RdYJgFQQG2xODtFd
- HOYFbg_gw6oj6NSEQVt9lxmy50sFXwE3elhx1x3h_6CyozXztiLy1.ti8MshyiMWxCWlQlO1kpDH
- EVaJ5EqLQ0yZDIcQpueNvREuVaER68ZGUOQMZB5.oxYKfRG2riexuGXKsenA8UuD5y_SJgK.xGst
- 8EEVre1Mq2rNRvQ0UgTHxmXINEtMneY0qk_hbOZ9Fl6jKXASIOrpmKTJbgK2MSSJiZFJX5ay46pz
- wljzX06ymH0g6RdErpMOpTdnrmq3_SD8cR_4.cKWuk1CcOp46ph7ok61pFRk2ygoAImWAghnh4cG
- PtaIjjBMGgKzZFykGN9bGjM1U0646.MnLbkmCdItdRDsXHaNtjtDGHCtUoFhs6Pp2Q2BDQ0EoTpM
- 1N1_6IyZb02aJCxg8plRZW1Y8Z3FVtGwtf16oQr1UcU1Wnw31q7evo28OB_l6sT4mrZRBFV7Ooej
- Kcg8UjON5vta6IRzOYxIBAlCUdWErGW4LXhysC0RIEdoeXNlzLuVF_QtTCaSnb6VU24384Qipvdm
- GQAjUhuTb9u8xpX4rWPB5X0IjAzAHXTPb1Twvw9KHTDBfyrrPulq8YJ_PhOcEBcF2vAlfH.wwzR.
- xeVILQ5pb_NsECkDccfNp0MR4eCpBt.wPAbNo1x3LXwVysvq4maLgmZfAhdLmX8G5QLKSbSbqmRm
- vgFfM.cXGkuCArm4CdnwkwtN0ijFeUfrAuET8u6AtUwmnAm3cj5z6Liepqu4qLg52HTev1BsJO27
- 2QlRyBWy2jEvP4ChAa4efc_vbUV5TzJJ4QgpMKaVl4Q6hlyKFX9.NVkUiyh9d0HHvqkcMSMKtBim
- thwec
-X-Sonic-MF: <pheonix.sja@att.net>
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic306.consmr.mail.ne1.yahoo.com with HTTP; Sat, 27 Aug 2022 21:11:51 +0000
-Received: by hermes--production-ne1-6649c47445-q2mtq (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 265b3daa514bd42976b8e75dee2158a9;
-          Sat, 27 Aug 2022 21:11:47 +0000 (UTC)
-Date:   Sat, 27 Aug 2022 17:11:41 -0400
-From:   Steven J Abner <pheonix.sja@att.net>
-Subject: possible patch to mount.cifs.c
-To:     linux-cifs@vger.kernel.org
-Message-Id: <HJLAHR.KUPF9GW209YS@att.net>
-X-Mailer: geary/3.36.1
+        with ESMTP id S229445AbiH0VoD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 Aug 2022 17:44:03 -0400
+Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A954A83B;
+        Sat, 27 Aug 2022 14:44:02 -0700 (PDT)
+Received: by mail-vk1-xa34.google.com with SMTP id j4so2228263vki.0;
+        Sat, 27 Aug 2022 14:44:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc;
+        bh=4NM+stoN5Dc3SGPld/SqpCYaP0qnQoboXzTlMHom+QM=;
+        b=FCgBK45gNST9ZGGp7Ocmb8PKbqlT6GBuAZkSCHCIOkyr1wJye+fejeY+k4rl/NUrbQ
+         LTcYRMD6R0PUSP1VAwdrvHL4DYEX9VmohR6+XX5SrG+2jWNn5R4Vl+Zhxkj17CZ75h0E
+         PXIx2R8/A2cU6Qh+kAtWPDUq0St3pi+YvWyxGhgAvt2St2ayh4WdMLORYALhTGGei0UL
+         Qp2vKSvtXmL4aihQLfdJf8SJk8XCKxNc995zpX+ow1Jrz+nSIhkVpyJgIWH0oZ2F2jBb
+         TMv2FnZ84FUdIu67A5Yt/s7JoBvsenLSeGkO3UOjoHxo8Fx8yU1sjvGDjV3xmvy8AB+6
+         qhqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc;
+        bh=4NM+stoN5Dc3SGPld/SqpCYaP0qnQoboXzTlMHom+QM=;
+        b=uyG0RqQT/4q5h2i3Pv1f+3ABQ01Iqx2VJVUMifYu3jVDPnc/l480JprBQuh2FDbU4c
+         YrIC9obwtAfrsmxb8kGI2vSbVTqwACtD3xEALTXWqJvlZg5CnyV1+RIjgYVhi2IocZTi
+         Wd6r4B5EpVENWEhJ7DlEdxt7bs32EI4zs6M+mPdMS5Rxqz8GJgdpJ8QxBeNQbV0d9/K7
+         NdqgewWW7Odu1qydZY8/922dlKv2rpZnqb52yDNNKqepcGUOsNptAal7WnuEjHDALDXq
+         G20zW+v6UFH0iZ+Mi03nJKptUVg5tHQbZkBh3A6YNkhHFc4iUjqZOgeeyOuO63fPoI7I
+         I1gA==
+X-Gm-Message-State: ACgBeo3LepMNjX3EokiFBcGSx+zT0qxZRjRqGKkYqz36ODZ02PaRAJGe
+        X4382YQLmEMy9jH70W7210Z1wNW8V37UW5Y5T0cNny0J/KhbSw==
+X-Google-Smtp-Source: AA6agR5qugbEIuI0XrX9PanbeqDgXSoCLyzD4gxuK6cG+apOb1srdpEaHEr3+tQGqNw40DpArlPydzI7axxBaJie8GE=
+X-Received: by 2002:a05:6122:635:b0:389:9ad6:f974 with SMTP id
+ g21-20020a056122063500b003899ad6f974mr1681356vkp.4.1661636641675; Sat, 27 Aug
+ 2022 14:44:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-References: <HJLAHR.KUPF9GW209YS.ref@att.net>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 27 Aug 2022 16:43:51 -0500
+Message-ID: <CAH2r5muNM-NJOc0pehkN8gh3=UZtq4P1N_baW4sdZHB7FyPHCQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
-  long story short: updated to ubuntu 20.04, postponed so long because 
-of broken networking,
-among other things. Finally got it to work with resolved names, which I 
-used in conjunction
-with mounting my old mac mini, lots of data/back-up data retained 
-there. In using:
-sudo mount.cifs '//stevens-mac-mini.local/steven' /mnt/steven -o 
-user=steven,vers=1.0
-I get 'mount error(111): could not connect to (ipv6 address)' with 
-forgotten '\n'.
-However, it does mount, regardless of error.
-  Purposed patch is replacement at mount.cifs.c:2268 with:
-  case EHOSTUNREACH:
-   fprintf(stderr, "could not connect to %s\n", currentaddress);
-   currentaddress = nextaddress;
-   if ((nextaddress == NULL) || (*nextaddress == 0))
-    break;
-   nextaddress = strchr(currentaddress, ',');
-   if (nextaddress)
-    *nextaddress++ = '\0';
-   goto mount_retry;
+Please pull the following changes since commit
+1c23f9e627a7b412978b4e852793c5e3c3efc555:
 
-Sorry about not in normal patch format, but gun shy when it comes to 
-developers that
-are unknown to me and apologies for bothering you if this a waste of 
-email.
-I wish to be personally CC'ed the answers/comments posted to the list
-in response to this posting, please :)
-  Steve
+  Linux 6.0-rc2 (2022-08-21 17:32:54 -0700)
 
+are available in the Git repository at:
 
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.0-rc2-smb3-client-fixes
+
+for you to fetch changes up to d291e703f420d5f8f999fe54f360d54d213bddb4:
+
+  cifs: Add helper function to check smb1+ server (2022-08-24 22:30:09 -0500)
+
+----------------------------------------------------------------
+6 cifs/smb3 fixes, three for stable:
+- two locking fixes (zero range, punch hole)
+- DFS 9 fix (padding),  affecting some servers
+- three minor cleanup changes
+
+There are a few additional important fixes (collapse range, insert range) that
+are not included since still being tested.
+----------------------------------------------------------------
+David Howells (2):
+      smb3: missing inode locks in zero range
+      smb3: missing inode locks in punch hole
+
+Paulo Alcantara (1):
+      cifs: skip extra NULL byte in filenames
+
+Zhang Xiaoxu (3):
+      cifs: Use help macro to get the header preamble size
+      cifs: Use help macro to get the mid header size
+      cifs: Add helper function to check smb1+ server
+
+ fs/cifs/cifsencrypt.c |  3 +--
+ fs/cifs/cifsglob.h    |  7 ++++++
+ fs/cifs/connect.c     | 23 ++++++++----------
+ fs/cifs/smb2ops.c     | 67 +++++++++++++++++++++++++++------------------------
+ fs/cifs/smb2pdu.c     | 16 +++++-------
+ fs/cifs/transport.c   | 21 ++++++++--------
+ 6 files changed, 70 insertions(+), 67 deletions(-)
+
+-- 
+Thanks,
+
+Steve
