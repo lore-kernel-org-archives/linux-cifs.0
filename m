@@ -2,47 +2,40 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B0EC0502C
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Aug 2022 12:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0736ECAAD5
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Aug 2022 16:33:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231400AbiH2M0y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Aug 2022 08:26:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44904 "EHLO
+        id S229518AbiH2QdI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Aug 2022 12:33:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbiH2M00 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Aug 2022 08:26:26 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8968C30F55;
-        Mon, 29 Aug 2022 05:10:23 -0700 (PDT)
+        with ESMTP id S229488AbiH2QdH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Aug 2022 12:33:07 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7E2252B6;
+        Mon, 29 Aug 2022 09:33:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AE09BB80F93;
-        Mon, 29 Aug 2022 12:10:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5EA1FC433D6;
-        Mon, 29 Aug 2022 12:10:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661775017;
-        bh=fK7S2U9FH3Mh1H4KPhuYrCAu21172KjX+5QYn8bZxhw=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=TBIvehqlXAnaUEIBMGrGtucuAxZHCjYUbH9gZTzp39B5ATUAioe8WO3EhAjb3uXxe
-         dMkxYY6hb+WC6eHZyS/cPa8r2CKTI01EB9MGyg1IsF1/oZT7KJghqNmyKNC9XH8ves
-         Cj3pIf4EmX/G+vS/jKdpHZhOleUGsARHnbS9xEcHQZhYvclYHJsMAatPyh4hKIzTRv
-         ajwmDjfIKqrpsF4i7DFIPFPAdyZsb0nMzw3IdNk/hNCLbimS7UVtlTLrinQs2UaKDw
-         YTwmujROS5OWbAtqbFtveKef90uGKF6IuQSib+pIDDHdy0cvO/DcGODQekO/LzgUrc
-         qkbrfSs4DNb4A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4809AE924D7;
-        Mon, 29 Aug 2022 12:10:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] genetlink: start to validate reserved header bytes
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <166177501728.22813.10790787483082655487.git-patchwork-notify@kernel.org>
-Date:   Mon, 29 Aug 2022 12:10:17 +0000
-References: <20220825001830.1911524-1-kuba@kernel.org>
-In-Reply-To: <20220825001830.1911524-1-kuba@kernel.org>
+        by sin.source.kernel.org (Postfix) with ESMTPS id 1EE6FCE130F;
+        Mon, 29 Aug 2022 16:33:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EF56C433D6;
+        Mon, 29 Aug 2022 16:32:59 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kNQTi4K8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1661790778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3F5bs6wEmRDmdIQe96V5iwCeWjK5YoVTeKEuPdxSfN4=;
+        b=kNQTi4K8egLdu1zNarBL47SQOYWe4WMkhvHrAwskcAG/1adfCVQBMB0gvduSpWFDbav2Tj
+        2LIfVOx4v++zHCwTjVPKSR+kizVUx5w5Af4coUKZm2ZWFtmVrqoa79XBz+/8OYj2RpZKfG
+        GTXOi7IPk9NkM/oVEZTI4HyRLLvuSmE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1de32b3b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 29 Aug 2022 16:32:58 +0000 (UTC)
+Date:   Mon, 29 Aug 2022 12:32:54 -0400
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Jakub Kicinski <kuba@kernel.org>
 Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
         pabeni@redhat.com, jiri@resnulli.us, johannes@sipsolutions.net,
@@ -56,33 +49,35 @@ Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
         netfilter-devel@vger.kernel.org,
         linux-security-module@vger.kernel.org, dev@openvswitch.org,
         linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+Subject: Re: [PATCH net-next] genetlink: start to validate reserved header
+ bytes
+Message-ID: <YwzqNgj/bJoawrwh@zx2c4.com>
+References: <20220825001830.1911524-1-kuba@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220825001830.1911524-1-kuba@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello:
+Hi Jakub,
 
-This patch was applied to netdev/net-next.git (master)
-by David S. Miller <davem@davemloft.net>:
+On Wed, Aug 24, 2022 at 05:18:30PM -0700, Jakub Kicinski wrote:
+> diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
+> index d0f3b6d7f408..0c0644e762e5 100644
+> --- a/drivers/net/wireguard/netlink.c
+> +++ b/drivers/net/wireguard/netlink.c
+> @@ -621,6 +621,7 @@ static const struct genl_ops genl_ops[] = {
+>  static struct genl_family genl_family __ro_after_init = {
+>  	.ops = genl_ops,
+>  	.n_ops = ARRAY_SIZE(genl_ops),
+> +	.resv_start_op = WG_CMD_SET_DEVICE + 1,
+>  	.name = WG_GENL_NAME,
+>  	.version = WG_GENL_VERSION,
+>  	.maxattr = WGDEVICE_A_MAX,
 
-On Wed, 24 Aug 2022 17:18:30 -0700 you wrote:
-> We had historically not checked that genlmsghdr.reserved
-> is 0 on input which prevents us from using those precious
-> bytes in the future.
-> 
-> One use case would be to extend the cmd field, which is
-> currently just 8 bits wide and 256 is not a lot of commands
-> for some core families.
-> 
-> [...]
+FWIW, I wouldn't object to just leaving this at zero. I don't know of
+any wireguard userspaces doing anything with the reserved header field.
 
-Here is the summary with links:
-  - [net-next] genetlink: start to validate reserved header bytes
-    https://git.kernel.org/netdev/net-next/c/9c5d03d36251
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Jason
