@@ -2,219 +2,60 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 492F4ECAAA2
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Aug 2022 05:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF76C0502C
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Aug 2022 07:44:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229481AbiH2FGz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Aug 2022 01:06:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38180 "EHLO
+        id S229556AbiH2Hon (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Aug 2022 03:44:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiH2FGy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Aug 2022 01:06:54 -0400
-Received: from mail-vk1-xa30.google.com (mail-vk1-xa30.google.com [IPv6:2607:f8b0:4864:20::a30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E9341D28;
-        Sun, 28 Aug 2022 22:06:53 -0700 (PDT)
-Received: by mail-vk1-xa30.google.com with SMTP id l20so940589vka.5;
-        Sun, 28 Aug 2022 22:06:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=qDOlBO8M3knCdtBqq7VFSNn3zWVTBCbhwMXpQDGbaKs=;
-        b=JhSp8ZCo+u+70xYvY2SqqvQM3/P9g9rt/QRhkPlFs/LoMzTZCynWIQSkKKSukx0vS+
-         GRRbeRKut0oQs3veOJ9ZvYaD2/0z8nHbTMGLsM1spGRgkrGsvEzQMTJm7UbZMbBiC7NO
-         aSlQPpC8YxBzDTxy2ohnWGkVhuXfUgKEmhvBnzuRCgPOhTPG+cKlxuPjTEERIdy2E6xh
-         mWa4VtkkKAQX4YRRvM4uCHHxUYEfELg4OJVh/b4s7Ga9eMhFLpyo+sfzZvf2R+1bkX0k
-         SzYO8KJRiFHz8T1xe8kzKGSXeDQvVgDgpyhswzPB4pVCEq0N00Q5tFBnF9duLRMs0uDg
-         hKBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=qDOlBO8M3knCdtBqq7VFSNn3zWVTBCbhwMXpQDGbaKs=;
-        b=CyvX7SzJ6X86UmlLO7KO4a3qK6mUN/Fh2qtFhN9+LfGoaCQncxK80aW01hiDY8bSaR
-         QpPio7ceKLFiA7jmH2qSoTnHx4hZGJKNVRizoge+Ap63uloHoAUtfn9y3CjmZqVfu7Qr
-         EXCSQUqNhC93TQF8rw23YBkP/2vrf/kTI67bxpKNPccXlDPSsJNWXe1XwJmIme2krjqC
-         XoOaeqVtwFgtj+2D3nbNMvA0pFlu9Hm1HyoE3bobqaMN4IhPnbsC6G2gny90J1y78RTt
-         cxVKGkpi8vQmtypUopGdwQ2nouch49mwlPZrKByfKQ+jLwqYnCwKF4OAhbfseX5GLj9V
-         kahA==
-X-Gm-Message-State: ACgBeo0Ns/YvNN3kPdmnGZFZ7rfkygnVkalrrub46e77vBRphGI+KTj+
-        M/gu5h7kzLH16XSKMaJsDFgh9xD61bMq9IpLV7S+OSW4it2+HQ==
-X-Google-Smtp-Source: AA6agR6bESZQgt0/NGDHgpqg2YlxlXfqv9MlFaFbcYHqbBuUnSse2j2x0UU6+2ThpJ/ZPE4VL1/WDlmd8KxaNM/eqrk=
-X-Received: by 2002:a1f:ab4e:0:b0:394:5af3:c490 with SMTP id
- u75-20020a1fab4e000000b003945af3c490mr938940vke.24.1661749612187; Sun, 28 Aug
- 2022 22:06:52 -0700 (PDT)
+        with ESMTP id S229493AbiH2Hom (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Aug 2022 03:44:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36FB24F1B7;
+        Mon, 29 Aug 2022 00:44:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C7C666112E;
+        Mon, 29 Aug 2022 07:44:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B814DC433D6;
+        Mon, 29 Aug 2022 07:44:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1661759080;
+        bh=00t5wHTvz51utbPGJygEKXuRE1eRby5ZijJFCGeaNTM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KcA/15zh/W7l4v1oIx0UXNFWTUmIxGgChJttuUHo9+PBOL0LkrffSqEGwp5+hs4iE
+         /fFeiIcXJ4XNmLEH/HPh2PaZenMZ3gkm6wLK/cTx3Teo+KMOQvOafxP+Dgb9FMbRTH
+         Ql63gugv1TeR1DWay+DJeRDSnt+HDgBjFlmL69oM=
+Date:   Mon, 29 Aug 2022 09:44:37 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     stable@vger.kernel.org, linux-cifs@vger.kernel.org,
+        Steve French <smfrench@gmail.com>
+Subject: Re: cifs backport request
+Message-ID: <YwxuZfeLJV7IEidp@kroah.com>
+References: <87r110nocu.fsf@cjr.nz>
 MIME-Version: 1.0
-References: <166126004083.548536.11195647088995116235.stgit@warthog.procyon.org.uk>
- <166126004796.548536.8555773200873112505.stgit@warthog.procyon.org.uk>
-In-Reply-To: <166126004796.548536.8555773200873112505.stgit@warthog.procyon.org.uk>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 29 Aug 2022 00:06:41 -0500
-Message-ID: <CAH2r5mt5iXtarkUAY7PSMGOLhkQd5LFcEz-rAnTkayxQMq_ppA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] smb3: Move the flush out of smb2_copychunk_range()
- into its callers
-To:     David Howells <dhowells@redhat.com>
-Cc:     sfrench@samba.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, jlayton@kernel.org,
-        linux-kernel@vger.kernel.org, willy@infradead.org,
-        lsahlber@redhat.com, dchinner@redhat.com,
-        linux-fsdevel@vger.kernel.org
-Content-Type: multipart/mixed; boundary="000000000000573bac05e75a3b91"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r110nocu.fsf@cjr.nz>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000573bac05e75a3b91
-Content-Type: text/plain; charset="UTF-8"
+On Sun, Aug 28, 2022 at 04:45:53PM -0300, Paulo Alcantara wrote:
+> Hi Greg,
+> 
+> Could you please pick these commits for >= linux-5.7.y
+> 
+>         ef605e868212 ("cifs: skip trailing separators of prefix paths")
+>         ee3c8019cce2 ("cifs: fix uninitialized pointer in error case in dfs_cache_get_tgt_share")
 
-Shouldn't this be using filemap_write_and_wait_range() not
-filemap_write_and_wait as we see in similar code in ext4 (and
-shouldn't it check rc in some of these cases)?   For example for the
-copychunk_range example shouldn't the patch be modified similar to the
-following:
+These do not apply at all to any of those kernels.  Please provide a
+backported and tested set of patches and we will be glad to queue them
+up.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index e9fb338b8e7e..51963e83daf7 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1219,8 +1219,6 @@ ssize_t cifs_file_copychunk_range(unsigned int xid,
+thanks,
 
-        cifs_dbg(FYI, "copychunk range\n");
-
--       filemap_write_and_wait(src_inode->i_mapping);
--
-        if (!src_file->private_data || !dst_file->private_data) {
-                rc = -EBADF;
-                cifs_dbg(VFS, "missing cifsFileInfo on copy range src file\n");
-@@ -1250,6 +1248,12 @@ ssize_t cifs_file_copychunk_range(unsigned int xid,
-        lock_two_nondirectories(target_inode, src_inode);
-
-        cifs_dbg(FYI, "about to flush pages\n");
-+
-+       rc = filemap_write_and_wait_range(src_inode->i_mapping, off,
-+                                         off + len - 1);
-+        if (rc)
-+               goto out;
-+
-        /* should we flush first and last page first */
-        truncate_inode_pages(&target_inode->i_data, 0);
-
-On Tue, Aug 23, 2022 at 8:09 AM David Howells via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> Move the flush out of smb2_copychunk_range() into its callers.  This will
-> allow the pagecache to be invalidated between the flush and the operation
-> in smb3_collapse_range() and smb3_insert_range().
->
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Steve French <stfrench@microsoft.com>
-> cc: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->
->  fs/cifs/cifsfs.c  |    2 ++
->  fs/cifs/smb2ops.c |   20 ++++++++------------
->  2 files changed, 10 insertions(+), 12 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index f54d8bf2732a..e9fb338b8e7e 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -1219,6 +1219,8 @@ ssize_t cifs_file_copychunk_range(unsigned int xid,
->
->         cifs_dbg(FYI, "copychunk range\n");
->
-> +       filemap_write_and_wait(src_inode->i_mapping);
-> +
->         if (!src_file->private_data || !dst_file->private_data) {
->                 rc = -EBADF;
->                 cifs_dbg(VFS, "missing cifsFileInfo on copy range src file\n");
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 96f3b0573606..7e3de6a0e1dc 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1600,17 +1600,8 @@ smb2_copychunk_range(const unsigned int xid,
->         int chunks_copied = 0;
->         bool chunk_sizes_updated = false;
->         ssize_t bytes_written, total_bytes_written = 0;
-> -       struct inode *inode;
->
->         pcchunk = kmalloc(sizeof(struct copychunk_ioctl), GFP_KERNEL);
-> -
-> -       /*
-> -        * We need to flush all unwritten data before we can send the
-> -        * copychunk ioctl to the server.
-> -        */
-> -       inode = d_inode(trgtfile->dentry);
-> -       filemap_write_and_wait(inode->i_mapping);
-> -
->         if (pcchunk == NULL)
->                 return -ENOMEM;
->
-> @@ -3689,6 +3680,8 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
->                 goto out;
->         }
->
-> +       filemap_write_and_wait(inode->i_mapping);
-> +
->         rc = smb2_copychunk_range(xid, cfile, cfile, off + len,
->                                   i_size_read(inode) - off - len, off);
->         if (rc < 0)
-> @@ -3716,18 +3709,21 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
->         int rc;
->         unsigned int xid;
->         struct cifsFileInfo *cfile = file->private_data;
-> +       struct inode *inode = file_inode(file);
->         __le64 eof;
->         __u64  count;
->
->         xid = get_xid();
->
-> -       if (off >= i_size_read(file->f_inode)) {
-> +       if (off >= i_size_read(inode)) {
->                 rc = -EINVAL;
->                 goto out;
->         }
->
-> -       count = i_size_read(file->f_inode) - off;
-> -       eof = cpu_to_le64(i_size_read(file->f_inode) + len);
-> +       count = i_size_read(inode) - off;
-> +       eof = cpu_to_le64(i_size_read(inode) + len);
-> +
-> +       filemap_write_and_wait(inode->i_mapping);
->
->         rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
->                           cfile->fid.volatile_fid, cfile->pid, &eof);
->
->
->
-
-
--- 
-Thanks,
-
-Steve
-
---000000000000573bac05e75a3b91
-Content-Type: text/x-patch; charset="US-ASCII"; name="use-filemap_write_and_wait_range.patch"
-Content-Disposition: attachment; 
-	filename="use-filemap_write_and_wait_range.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l7easojh0>
-X-Attachment-Id: f_l7easojh0
-
-ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2ZzLmMgYi9mcy9jaWZzL2NpZnNmcy5jCmluZGV4IGU5
-ZmIzMzhiOGU3ZS4uNTE5NjNlODNkYWY3IDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNmcy5jCisr
-KyBiL2ZzL2NpZnMvY2lmc2ZzLmMKQEAgLTEyMTksOCArMTIxOSw2IEBAIHNzaXplX3QgY2lmc19m
-aWxlX2NvcHljaHVua19yYW5nZSh1bnNpZ25lZCBpbnQgeGlkLAogCiAJY2lmc19kYmcoRllJLCAi
-Y29weWNodW5rIHJhbmdlXG4iKTsKIAotCWZpbGVtYXBfd3JpdGVfYW5kX3dhaXQoc3JjX2lub2Rl
-LT5pX21hcHBpbmcpOwotCiAJaWYgKCFzcmNfZmlsZS0+cHJpdmF0ZV9kYXRhIHx8ICFkc3RfZmls
-ZS0+cHJpdmF0ZV9kYXRhKSB7CiAJCXJjID0gLUVCQURGOwogCQljaWZzX2RiZyhWRlMsICJtaXNz
-aW5nIGNpZnNGaWxlSW5mbyBvbiBjb3B5IHJhbmdlIHNyYyBmaWxlXG4iKTsKQEAgLTEyNTAsNiAr
-MTI0OCwxMiBAQCBzc2l6ZV90IGNpZnNfZmlsZV9jb3B5Y2h1bmtfcmFuZ2UodW5zaWduZWQgaW50
-IHhpZCwKIAlsb2NrX3R3b19ub25kaXJlY3Rvcmllcyh0YXJnZXRfaW5vZGUsIHNyY19pbm9kZSk7
-CiAKIAljaWZzX2RiZyhGWUksICJhYm91dCB0byBmbHVzaCBwYWdlc1xuIik7CisKKwlyYyA9IGZp
-bGVtYXBfd3JpdGVfYW5kX3dhaXRfcmFuZ2Uoc3JjX2lub2RlLT5pX21hcHBpbmcsIG9mZiwKKwkJ
-CQkJICBvZmYgKyBsZW4gLSAxKTsKKyAgICAgICAgaWYgKHJjKQorCQlnb3RvIG91dDsKKwogCS8q
-IHNob3VsZCB3ZSBmbHVzaCBmaXJzdCBhbmQgbGFzdCBwYWdlIGZpcnN0ICovCiAJdHJ1bmNhdGVf
-aW5vZGVfcGFnZXMoJnRhcmdldF9pbm9kZS0+aV9kYXRhLCAwKTsKIAo=
---000000000000573bac05e75a3b91--
+greg k-h-
