@@ -2,104 +2,128 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA57ECAAD1
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Aug 2022 14:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30513ECAAA1
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Aug 2022 14:30:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229620AbiH3OSB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Aug 2022 10:18:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59514 "EHLO
+        id S229620AbiH3OaM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Aug 2022 10:30:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbiH3OSA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 10:18:00 -0400
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF03849B5F
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 07:17:58 -0700 (PDT)
-Received: by mail-pj1-f41.google.com with SMTP id h13-20020a17090a648d00b001fdb9003787so6648059pjj.4
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 07:17:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=tjihmA9Q0aLI3sXupqXaO8n7eAVqAPtfjuh0IVpik00=;
-        b=QR++IB7OiqRdM3jrdXSpaRu/2tOSG1HYh+Q3jz2aAnOju17UI3ZJN8JoeIuMSlOBWx
-         gInF0p5pR7iG9gCKGpJ9HAtP503pOpkPj5dDf7mGWcU/aRvDN0orlMytwDKM55Rd0NY5
-         EhBgRllC4H5osvR46u+nazqMF0SIfFaUEOmB6ol027h/yZX6C6oP1YMnPn4vIYdQ8HpJ
-         Vb1su06NkIC57e0FHRDjNFdNowBwxOjGFdmSmWsA2GWfmeDqkb91jSdF/kVf35V0fOWZ
-         cJOMGHCLJLaaKe6RNYRafGaRp54hHtSQ9WcI1YOeeD6Q2sPA9YPjwjdtigZWJzegmWDn
-         v0gA==
-X-Gm-Message-State: ACgBeo3n8pkbLch6SVNnU6+y5AZzZDDPg/EI6jQNMhj0y8b+WX0iHNqx
-        J7N3Nvhvuq0jNvqsu4jkv41OLXlPTj4=
-X-Google-Smtp-Source: AA6agR53l4cI1b2EqMOhUpib1jVWhiDIKGY1cIs0Idd8eCNrDDQ+vs7ayTru+dRqZ73jTjZ8c4slwg==
-X-Received: by 2002:a17:902:ceca:b0:174:c224:826 with SMTP id d10-20020a170902ceca00b00174c2240826mr10065258plg.132.1661869077506;
-        Tue, 30 Aug 2022 07:17:57 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id i72-20020a62874b000000b0052e987c64efsm9671172pfe.174.2022.08.30.07.17.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 07:17:57 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, hyc.lee@gmail.com, senozhatsky@chromium.org,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 2/2] ksmbd: remove generic_fillattr use in smb2_open()
-Date:   Tue, 30 Aug 2022 23:17:32 +0900
-Message-Id: <20220830141732.9982-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220830141732.9982-1-linkinjeon@kernel.org>
-References: <20220830141732.9982-1-linkinjeon@kernel.org>
+        with ESMTP id S229557AbiH3OaL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 10:30:11 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABA2B2DA91
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 07:30:09 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MH8n53Ltbzl8QM
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 22:28:41 +0800 (CST)
+Received: from [10.174.176.83] (unknown [10.174.176.83])
+        by APP2 (Coremail) with SMTP id Syh0CgCnQmztHg5j7q+OAA--.28645S2;
+        Tue, 30 Aug 2022 22:30:07 +0800 (CST)
+Message-ID: <3215c221-1c88-28f9-20f1-e492bb62cc50@huaweicloud.com>
+Date:   Tue, 30 Aug 2022 22:30:05 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH] cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO
+ message
+To:     Tom Talpey <tom@talpey.com>, stfrench@microsoft.com
+Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, lsahlber@redhat.com,
+        sprasad@microsoft.com, rohiths@microsoft.com, pc@cjr.nz
+References: <20220824085732.1928010-1-zhangxiaoxu5@huawei.com>
+ <495c09a3-003f-7852-ef14-ba7e26984743@huaweicloud.com>
+ <4d6633a3-43a5-8a4b-991c-d8148ce949b1@talpey.com>
+From:   huaweicloud <zhangxiaoxu@huaweicloud.com>
+In-Reply-To: <4d6633a3-43a5-8a4b-991c-d8148ce949b1@talpey.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgCnQmztHg5j7q+OAA--.28645S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw47XrW5Ar1kGryxZrWfGrg_yoW5XF15pF
+        4vqFyUGFZ3Wr18Aw1UAF1kC345Kw1rW3WUGrs8Ca4rJFWFvFnFgF48X3s0grnYyr48AF1j
+        qw1Uta4jvr15Ar7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1j6r18M7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: x2kd0wp0ld053x6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Removed the use of unneeded generic_fillattr() in smb2_open().
+I think the struct validate_negotiate_info_req is an variable-length array,
+just for implement simple, defind as 4 in here.
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/ksmbd/smb2pdu.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+According MS-SMB2, there really not define the length of the package, just
+define the count of the dialects, but just send the needed data maybe more
+appropriate.
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index c49f65146ab3..ad6410874b95 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -2761,7 +2761,6 @@ int smb2_open(struct ksmbd_work *work)
- 	} else {
- 		file_present = true;
- 		user_ns = mnt_user_ns(path.mnt);
--		generic_fillattr(user_ns, d_inode(path.dentry), &stat);
- 	}
- 	if (stream_name) {
- 		if (req->CreateOptions & FILE_DIRECTORY_FILE_LE) {
-@@ -2770,7 +2769,8 @@ int smb2_open(struct ksmbd_work *work)
- 				rsp->hdr.Status = STATUS_NOT_A_DIRECTORY;
- 			}
- 		} else {
--			if (S_ISDIR(stat.mode) && s_type == DATA_STREAM) {
-+			if (file_present && S_ISDIR(d_inode(path.dentry)->i_mode) &&
-+			    s_type == DATA_STREAM) {
- 				rc = -EIO;
- 				rsp->hdr.Status = STATUS_FILE_IS_A_DIRECTORY;
- 			}
-@@ -2787,7 +2787,8 @@ int smb2_open(struct ksmbd_work *work)
- 	}
- 
- 	if (file_present && req->CreateOptions & FILE_NON_DIRECTORY_FILE_LE &&
--	    S_ISDIR(stat.mode) && !(req->CreateOptions & FILE_DELETE_ON_CLOSE_LE)) {
-+	    S_ISDIR(d_inode(path.dentry)->i_mode) &&
-+	    !(req->CreateOptions & FILE_DELETE_ON_CLOSE_LE)) {
- 		ksmbd_debug(SMB, "open() argument is a directory: %s, %x\n",
- 			    name, req->CreateOptions);
- 		rsp->hdr.Status = STATUS_FILE_IS_A_DIRECTORY;
-@@ -2797,7 +2798,7 @@ int smb2_open(struct ksmbd_work *work)
- 
- 	if (file_present && (req->CreateOptions & FILE_DIRECTORY_FILE_LE) &&
- 	    !(req->CreateDisposition == FILE_CREATE_LE) &&
--	    !S_ISDIR(stat.mode)) {
-+	    !S_ISDIR(d_inode(path.dentry)->i_mode)) {
- 		rsp->hdr.Status = STATUS_NOT_A_DIRECTORY;
- 		rc = -EIO;
- 		goto err_out;
--- 
-2.25.1
+Thanks.
+
+在 2022/8/30 22:03, Tom Talpey 写道:
+> Wouldn't it be safer to just set the size, instead of implicitly
+> assuming that there are 4 array elements?
+> 
+>    inbuflen = sizeof(*pneg_inbuf) - sizeof(pneg_inbuf.Dialects) + sizeof(pneg_inbuf.Dialects[0]);
+> 
+> Or, because it obviously works to send the extra bytes even
+> though the DialectCount is just 1, just zero them out?
+> 
+>    memset(pneg_inbuf.Dialects, 0, sizeof(pneg_inbuf.Dialects));
+>    pneg_inbuf.Dialects[0] = cpu_to_le16(server->vals->protocol_id);
+> 
+> Tom.
+> 
+> On 8/30/2022 3:06 AM, huaweicloud wrote:
+>> Hi Steve,
+>>
+>> Could you help to review this patch.
+>>
+>> Thanks,
+>> Zhang Xiaoxu
+>>
+>> 在 2022/8/24 16:57, Zhang Xiaoxu 写道:
+>>> Commit d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+>>> extend the dialects from 3 to 4, but forget to decrease the extended
+>>> length when specific the dialect, then the message length is larger
+>>> than expected.
+>>>
+>>> This maybe leak some info through network because not initialize the
+>>> message body.
+>>>
+>>> After apply this patch, the VALIDATE_NEGOTIATE_INFO message length is
+>>> reduced from 28 bytes to 26 bytes.
+>>>
+>>> Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+>>> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+>>> Cc: <stable@vger.kernel.org>
+>>> ---
+>>>   fs/cifs/smb2pdu.c | 4 ++--
+>>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>>> index 1ecc2501c56f..3df7adc01fe5 100644
+>>> --- a/fs/cifs/smb2pdu.c
+>>> +++ b/fs/cifs/smb2pdu.c
+>>> @@ -1162,9 +1162,9 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>>>           pneg_inbuf->Dialects[0] =
+>>>               cpu_to_le16(server->vals->protocol_id);
+>>>           pneg_inbuf->DialectCount = cpu_to_le16(1);
+>>> -        /* structure is big enough for 3 dialects, sending only 1 */
+>>> +        /* structure is big enough for 4 dialects, sending only 1 */
+>>>           inbuflen = sizeof(*pneg_inbuf) -
+>>> -                sizeof(pneg_inbuf->Dialects[0]) * 2;
+>>> +                sizeof(pneg_inbuf->Dialects[0]) * 3;
+>>>       }
+>>>       rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+>>
+>>
 
