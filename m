@@ -2,139 +2,101 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2065EECAAD3
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Aug 2022 02:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F5EEC0502A
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Aug 2022 07:07:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229644AbiH3CP5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Aug 2022 22:15:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60804 "EHLO
+        id S230455AbiH3HH3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Aug 2022 03:07:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229749AbiH3CP4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Aug 2022 22:15:56 -0400
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0BFE73304;
-        Mon, 29 Aug 2022 19:15:55 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id 190so10147379vsz.7;
-        Mon, 29 Aug 2022 19:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc;
-        bh=Oj3S4mz1YMZqLTYMLdQERsT0bL7qohRFCPvLzIXkMZQ=;
-        b=Ikyv6bOJubYNpo+C1FAItktJeI1UHoFTE9cCOE+S6L2N3M9fcgX6VA0RDr3J7aLUea
-         ky5YOmLiYCDwmANn/DzDCycz4gprWbJ5H2mMyt/a1r2pjq8v7479J5rDjINDn6VhYVEv
-         o18kFIE/Hsa6NVU99DJ8qXQ0ZFcO8vJ/yQZ4Ww7uejrStRNUQsGQe07gkIjKtkwr/xF3
-         4iRVeD5yu3MpKj68cXIxgAOySEdJynmeJ3PQ23xvOEIRnR5RgxpHS/OcEgTXCjMp3V3f
-         /g0rJCn2cheWV2BZAkhtfXiyvK4dbbhIjWDaNTiXI1/OVWamtNKH0Xct33vL0QeCYp7i
-         fWLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc;
-        bh=Oj3S4mz1YMZqLTYMLdQERsT0bL7qohRFCPvLzIXkMZQ=;
-        b=mg5m1N/6oEdKA0bAPiHCAzN9FtUZMgM3ky+Icv8w2TRU/7tuYjSC0kB12887YMlfW4
-         F/CrGzYiF/IKP7Am5omno8cqubs5H29ndmk+DDGitveflf/KQe9XsMyIZGNVpMXPRx6f
-         ypN1lrPx5mbLZYXbXKxnX9yKxOW5qp0PiYO3vCg4DpZc8Obd4LNSWgur+PCifygDoWYt
-         LVUC/KVvQTKTn0XTL+cWRFMUZrHGIVaOdnI3YQVKbiJcvUKIMy3FeA8gbC/NBha1E8IH
-         N2hl1DGdpvzfpFQ2f60t38CBaGe+VwqQ3AhdDpAauX0aPH4zXa+FuVKFiW9shHRMm+dT
-         owNQ==
-X-Gm-Message-State: ACgBeo0cM+x4C5YOc+nChkmn/WOXX2ZTIQdPU9JdM3UZWP8ADR1YrD2I
-        lSsXV7ci0ZsRr5FbbSNCdNEA6J9bG6vDXZav0vejO9fBkaUrLA==
-X-Google-Smtp-Source: AA6agR59sBMJEFng0G5tKDLfd505T3Z7CG+Vi7pAjb8Sex9HrM2H1ZJuKnpjfmtPFbs+lYew25EQlfbDTObJ4uIPRro=
-X-Received: by 2002:a67:b205:0:b0:390:7910:aae6 with SMTP id
- b5-20020a67b205000000b003907910aae6mr4026430vsf.61.1661825754556; Mon, 29 Aug
- 2022 19:15:54 -0700 (PDT)
+        with ESMTP id S230452AbiH3HHM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 03:07:12 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BDCC6CDD
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 00:06:47 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MGyxF4SpyzKHrj
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 15:05:05 +0800 (CST)
+Received: from [10.174.176.83] (unknown [10.174.176.83])
+        by APP2 (Coremail) with SMTP id Syh0CgBHmXIEtw1j4i2BAA--.32422S2;
+        Tue, 30 Aug 2022 15:06:45 +0800 (CST)
+Message-ID: <495c09a3-003f-7852-ef14-ba7e26984743@huaweicloud.com>
+Date:   Tue, 30 Aug 2022 15:06:44 +0800
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 29 Aug 2022 21:15:43 -0500
-Message-ID: <CAH2r5muT-nX+tgk6wm=L1qjWNhc2c5GDBaQXBGbrE-hNkPr3cw@mail.gmail.com>
-Subject: [PATCH v2][SMB3 client] smb3: use filemap_write_and_wait_range
- instead of filemap_write_and_wait
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: multipart/mixed; boundary="000000000000c7807f05e76bf543"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH] cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO
+ message
+To:     stfrench@microsoft.com
+References: <20220824085732.1928010-1-zhangxiaoxu5@huawei.com>
+From:   huaweicloud <zhangxiaoxu@huaweicloud.com>
+Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, lsahlber@redhat.com,
+        sprasad@microsoft.com, rohiths@microsoft.com, pc@cjr.nz
+In-Reply-To: <20220824085732.1928010-1-zhangxiaoxu5@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgBHmXIEtw1j4i2BAA--.32422S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur4UAryrJFW3ZFW7AF17trb_yoW8XrWrpr
+        4vga48GFZ3XrW8Cw17K3Wkua98Kwn5Ww47urs8C345JF1rZasFkF1v93s5W34FkFWYya1j
+        qr4Yqa45twn0kaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1j6r18M7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+        6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+X-CM-SenderInfo: x2kd0wp0ld053x6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000c7807f05e76bf543
-Content-Type: text/plain; charset="UTF-8"
+Hi Steve,
 
-When doing insert range and collapse range we should be
-writing out the cached pages for the ranges affected but not
-the whole file (and also checking for errors if writing them out
-fails)
+Could you help to review this patch.
 
-See attached
-
--- 
 Thanks,
+Zhang Xiaoxu
 
-Steve
+在 2022/8/24 16:57, Zhang Xiaoxu 写道:
+> Commit d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+> extend the dialects from 3 to 4, but forget to decrease the extended
+> length when specific the dialect, then the message length is larger
+> than expected.
+> 
+> This maybe leak some info through network because not initialize the
+> message body.
+> 
+> After apply this patch, the VALIDATE_NEGOTIATE_INFO message length is
+> reduced from 28 bytes to 26 bytes.
+> 
+> Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+> Cc: <stable@vger.kernel.org>
+> ---
+>   fs/cifs/smb2pdu.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 1ecc2501c56f..3df7adc01fe5 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -1162,9 +1162,9 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>   		pneg_inbuf->Dialects[0] =
+>   			cpu_to_le16(server->vals->protocol_id);
+>   		pneg_inbuf->DialectCount = cpu_to_le16(1);
+> -		/* structure is big enough for 3 dialects, sending only 1 */
+> +		/* structure is big enough for 4 dialects, sending only 1 */
+>   		inbuflen = sizeof(*pneg_inbuf) -
+> -				sizeof(pneg_inbuf->Dialects[0]) * 2;
+> +				sizeof(pneg_inbuf->Dialects[0]) * 3;
+>   	}
+>   
+>   	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
 
---000000000000c7807f05e76bf543
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-use-filemap_write_and_wait_range-instead-of-fil.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-use-filemap_write_and_wait_range-instead-of-fil.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l7fk486b0>
-X-Attachment-Id: f_l7fk486b0
-
-RnJvbSA5MGNhMDhiM2VlNjlmMTVjNWE2ZTNkOGQ3NmQ1MTZkOGYwM2NjZjE1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IE1vbiwgMjkgQXVnIDIwMjIgMTE6NTM6NDEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiB1c2UgZmlsZW1hcF93cml0ZV9hbmRfd2FpdF9yYW5nZSBpbnN0ZWFkIG9mCiBmaWxlbWFw
-X3dyaXRlX2FuZF93YWl0CgpXaGVuIGRvaW5nIGluc2VydCByYW5nZSBhbmQgY29sbGFwc2UgcmFu
-Z2Ugd2Ugc2hvdWxkIGJlCndyaXRpbmcgb3V0IHRoZSBjYWNoZWQgcGFnZXMgZm9yIHRoZSByYW5n
-ZXMgYWZmZWN0ZWQgYnV0IG5vdAp0aGUgd2hvbGUgZmlsZS4KCkNjOiBzdGFibGVAdmdlci5rZXJu
-ZWwub3JnClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNv
-bT4KLS0tCiBmcy9jaWZzL2NpZnNmcy5jICB8ICA4ICsrKysrKy0tCiBmcy9jaWZzL3NtYjJvcHMu
-YyB8IDEzICsrKysrKysrKy0tLS0KIDIgZmlsZXMgY2hhbmdlZCwgMTUgaW5zZXJ0aW9ucygrKSwg
-NiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9j
-aWZzZnMuYwppbmRleCBlOWZiMzM4YjhlN2UuLjgwNDJkNzI4MGRlYyAxMDA2NDQKLS0tIGEvZnMv
-Y2lmcy9jaWZzZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC0xMjE5LDggKzEyMTksNiBA
-QCBzc2l6ZV90IGNpZnNfZmlsZV9jb3B5Y2h1bmtfcmFuZ2UodW5zaWduZWQgaW50IHhpZCwKIAog
-CWNpZnNfZGJnKEZZSSwgImNvcHljaHVuayByYW5nZVxuIik7CiAKLQlmaWxlbWFwX3dyaXRlX2Fu
-ZF93YWl0KHNyY19pbm9kZS0+aV9tYXBwaW5nKTsKLQogCWlmICghc3JjX2ZpbGUtPnByaXZhdGVf
-ZGF0YSB8fCAhZHN0X2ZpbGUtPnByaXZhdGVfZGF0YSkgewogCQlyYyA9IC1FQkFERjsKIAkJY2lm
-c19kYmcoVkZTLCAibWlzc2luZyBjaWZzRmlsZUluZm8gb24gY29weSByYW5nZSBzcmMgZmlsZVxu
-Iik7CkBAIC0xMjUwLDYgKzEyNDgsMTIgQEAgc3NpemVfdCBjaWZzX2ZpbGVfY29weWNodW5rX3Jh
-bmdlKHVuc2lnbmVkIGludCB4aWQsCiAJbG9ja190d29fbm9uZGlyZWN0b3JpZXModGFyZ2V0X2lu
-b2RlLCBzcmNfaW5vZGUpOwogCiAJY2lmc19kYmcoRllJLCAiYWJvdXQgdG8gZmx1c2ggcGFnZXNc
-biIpOworCisJcmMgPSBmaWxlbWFwX3dyaXRlX2FuZF93YWl0X3JhbmdlKHNyY19pbm9kZS0+aV9t
-YXBwaW5nLCBvZmYsCisJCQkJCSAgb2ZmICsgbGVuIC0gMSk7CisJaWYgKHJjKQorCQlnb3RvIG91
-dDsKKwogCS8qIHNob3VsZCB3ZSBmbHVzaCBmaXJzdCBhbmQgbGFzdCBwYWdlIGZpcnN0ICovCiAJ
-dHJ1bmNhdGVfaW5vZGVfcGFnZXMoJnRhcmdldF9pbm9kZS0+aV9kYXRhLCAwKTsKIApkaWZmIC0t
-Z2l0IGEvZnMvY2lmcy9zbWIyb3BzLmMgYi9mcy9jaWZzL3NtYjJvcHMuYwppbmRleCA3Yzk0MWNl
-MWU3YTkuLmYxZDM2YjcwY2VmNyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIyb3BzLmMKKysrIGIv
-ZnMvY2lmcy9zbWIyb3BzLmMKQEAgLTM2ODcsNyArMzY4NywxMCBAQCBzdGF0aWMgbG9uZyBzbWIz
-X2NvbGxhcHNlX3JhbmdlKHN0cnVjdCBmaWxlICpmaWxlLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29u
-LAogCX0KIAogCWZpbGVtYXBfaW52YWxpZGF0ZV9sb2NrKGlub2RlLT5pX21hcHBpbmcpOwotCWZp
-bGVtYXBfd3JpdGVfYW5kX3dhaXQoaW5vZGUtPmlfbWFwcGluZyk7CisJcmMgPSBmaWxlbWFwX3dy
-aXRlX2FuZF93YWl0X3JhbmdlKGlub2RlLT5pX21hcHBpbmcsIG9mZiwgb2xkX2VvZiAtIDEpOwor
-CWlmIChyYyA8IDApCisJCWdvdG8gb3V0XzI7CisKIAl0cnVuY2F0ZV9wYWdlY2FjaGVfcmFuZ2Uo
-aW5vZGUsIG9mZiwgb2xkX2VvZik7CiAKIAlyYyA9IHNtYjJfY29weWNodW5rX3JhbmdlKHhpZCwg
-Y2ZpbGUsIGNmaWxlLCBvZmYgKyBsZW4sCkBAIC0zNzA4LDcgKzM3MTEsNyBAQCBzdGF0aWMgbG9u
-ZyBzbWIzX2NvbGxhcHNlX3JhbmdlKHN0cnVjdCBmaWxlICpmaWxlLCBzdHJ1Y3QgY2lmc190Y29u
-ICp0Y29uLAogCWZzY2FjaGVfcmVzaXplX2Nvb2tpZShjaWZzX2lub2RlX2Nvb2tpZShpbm9kZSks
-IGNpZnNpLT5zZXJ2ZXJfZW9mKTsKIG91dF8yOgogCWZpbGVtYXBfaW52YWxpZGF0ZV91bmxvY2so
-aW5vZGUtPmlfbWFwcGluZyk7Ci0gb3V0Ogorb3V0OgogCWlub2RlX3VubG9jayhpbm9kZSk7CiAJ
-ZnJlZV94aWQoeGlkKTsKIAlyZXR1cm4gcmM7CkBAIC0zNzM4LDcgKzM3NDEsOSBAQCBzdGF0aWMg
-bG9uZyBzbWIzX2luc2VydF9yYW5nZShzdHJ1Y3QgZmlsZSAqZmlsZSwgc3RydWN0IGNpZnNfdGNv
-biAqdGNvbiwKIAllb2YgPSBjcHVfdG9fbGU2NChvbGRfZW9mICsgbGVuKTsKIAogCWZpbGVtYXBf
-aW52YWxpZGF0ZV9sb2NrKGlub2RlLT5pX21hcHBpbmcpOwotCWZpbGVtYXBfd3JpdGVfYW5kX3dh
-aXQoaW5vZGUtPmlfbWFwcGluZyk7CisJcmMgPSBmaWxlbWFwX3dyaXRlX2FuZF93YWl0X3Jhbmdl
-KGlub2RlLT5pX21hcHBpbmcsIG9mZiwgb2xkX2VvZiArIGxlbiAtIDEpOworCWlmIChyYyA8IDAp
-CisJCWdvdG8gb3V0XzI7CiAJdHJ1bmNhdGVfcGFnZWNhY2hlX3JhbmdlKGlub2RlLCBvZmYsIG9s
-ZF9lb2YpOwogCiAJcmMgPSBTTUIyX3NldF9lb2YoeGlkLCB0Y29uLCBjZmlsZS0+ZmlkLnBlcnNp
-c3RlbnRfZmlkLApAQCAtMzc1Nyw3ICszNzYyLDcgQEAgc3RhdGljIGxvbmcgc21iM19pbnNlcnRf
-cmFuZ2Uoc3RydWN0IGZpbGUgKmZpbGUsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJcmMgPSAw
-Owogb3V0XzI6CiAJZmlsZW1hcF9pbnZhbGlkYXRlX3VubG9jayhpbm9kZS0+aV9tYXBwaW5nKTsK
-LSBvdXQ6CitvdXQ6CiAJaW5vZGVfdW5sb2NrKGlub2RlKTsKIAlmcmVlX3hpZCh4aWQpOwogCXJl
-dHVybiByYzsKLS0gCjIuMzQuMQoK
---000000000000c7807f05e76bf543--
