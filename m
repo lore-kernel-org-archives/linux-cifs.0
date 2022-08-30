@@ -2,97 +2,126 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA58ECAAA1
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Aug 2022 22:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0882ECAAD4
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Aug 2022 22:52:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230012AbiH3WLC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Aug 2022 18:11:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41726 "EHLO
+        id S230162AbiH3WwA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Aug 2022 18:52:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbiH3WLB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 18:11:01 -0400
-Received: from mail-vk1-xa31.google.com (mail-vk1-xa31.google.com [IPv6:2607:f8b0:4864:20::a31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 710C54C601;
-        Tue, 30 Aug 2022 15:10:59 -0700 (PDT)
-Received: by mail-vk1-xa31.google.com with SMTP id b81so5945639vkf.1;
-        Tue, 30 Aug 2022 15:10:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=leKLJzHs8uZWkvtY7eIUy5dp8f7s29BRffRzphxIp1A=;
-        b=SDMhPai0I4WEgO8cPsu8tEJ/y/zJBv3TY0/TsDAH49nmJ8YRjv4bnPbFhn0XSI3REn
-         QRDYbuaIgFuTpbDWwB0ROCKxEgcTMeMcUVytNMHnwF2aJl47Rf4rjiQhsOOoFG3dFl9Y
-         peGhGjl1clM9uizjj1ZL8abbpD9t9RVRgaJnJQUGBelxVo2yglCEiDc/D8KFEDgB35JE
-         c/4QZZXOvve3zVg9L/KQ7xcQMFuoZh146SgVTnyAaRDBuwAW2EWhQHJ0PRNBZXaLvFPX
-         BdLKimfaaHIW+vpixZnkQId80Q8cHf5YPhQBjQwk9b0LFpgN0+JMpuyt5rOd42jVNHhc
-         a0KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=leKLJzHs8uZWkvtY7eIUy5dp8f7s29BRffRzphxIp1A=;
-        b=LD8aOHOzze6npk+fb7SXYCwzlL/leOYwsLOaU27Okg9ympFbz/JjDf0mrX8qfhXZUO
-         NzhQKHCEBJKAjXPr5OSKN4SzuwWVlHczM2tgZOrHfLLDCoIFjfgejqQm9AzlQpw/0+st
-         QLIt22hbBagcJ+SLIqxqEiucCIwLWhFSmrJ1832nIdO3w2fbzp/g/K1xIdWCKcl6fW9f
-         v/COY14affGUM2vD+ynUiJMF7kzehvhVEBC9JF/vF+BpBiNgshQTfujABlhdIEUHbjp5
-         HRIO9VLgTt8CBepWt7eR/JkcObtSDAWLM5JJGafRho30WBn2Mj6Yoo/fk/HTEuABMNsF
-         Ni4Q==
-X-Gm-Message-State: ACgBeo3e85hg6sJFbTZ9mXSaaH99v6mW1Jg+OX5Z2YrzmfBOnVdT+hdK
-        yNvnFIx+lh2WXkvw0ZNW/J/FHwmwiJbaFlxLJ4fHKD1kStI=
-X-Google-Smtp-Source: AA6agR4zQ1I1seEH9HNBSdTd7Zbneffor1ohNA5t41exvIyTWSKYvzKoUr4lqASO6oUFEPzk/zaRccBk1/EwLN5+JXM=
-X-Received: by 2002:a1f:ab4e:0:b0:394:5af3:c490 with SMTP id
- u75-20020a1fab4e000000b003945af3c490mr4012825vke.24.1661897458362; Tue, 30
- Aug 2022 15:10:58 -0700 (PDT)
+        with ESMTP id S230273AbiH3Wv7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 18:51:59 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D3A17677F
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 15:51:58 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3378221E21;
+        Tue, 30 Aug 2022 22:51:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1661899917; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=rd2oE4E7U1bdlSo2fFNd9xGlUJk87gBLliZEqZQIaJU=;
+        b=uxc7j+3Pt1fzW/AarHfK/Fak9Wco99EeLcU4+GtlkppZNosuIwJ9aKqBm4PdKsZ76hR9QP
+        KmH2+jC2r8P+N8YOccGHZuPTgao70q3rLdoWsZyKlzOoSDWpYVUoboGa7ucyQggXGCewO9
+        yhMZ+tpVGX5s6t0SQaN0MI3xFj/bubg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1661899917;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=rd2oE4E7U1bdlSo2fFNd9xGlUJk87gBLliZEqZQIaJU=;
+        b=+iqyXaSBJjINMVSeO/GN11XUDOlre9MqgFk6yBIyUffxLK9a6tyLt47ZYKSapZkURN0Jzy
+        FeoBJ6r1ec+MliBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AE7AB13ACF;
+        Tue, 30 Aug 2022 22:51:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vYK+HIyUDmNGcQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Tue, 30 Aug 2022 22:51:56 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com
+Subject: [PATCH] cifs: fix small mempool leak in SMB2_negotiate()
+Date:   Tue, 30 Aug 2022 19:51:51 -0300
+Message-Id: <20220830225151.26201-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-References: <20220831074247.5ae119a3@canb.auug.org.au>
-In-Reply-To: <20220831074247.5ae119a3@canb.auug.org.au>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 30 Aug 2022 17:10:47 -0500
-Message-ID: <CAH2r5muWkiYDNXUibC6RR9s0rTYda2zDGpJhTpnpG7PMBXhh-Q@mail.gmail.com>
-Subject: Re: linux-next: Fixes tag needs some work in the cifs tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-sorry about the cut-n-paste error
+In some cases of failure (dialect mismatches) in SMB2_negotiate(), after
+the request is sent, the checks would return -EIO when they should be
+rather setting rc = -EIO and jumping to neg_exit to free the response
+buffer from mempool.
 
-fixed
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/cifs/smb2pdu.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-On Tue, Aug 30, 2022 at 4:42 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> In commit
->
->   ebcc8ccc13e0 ("smb3: use filemap_write_and_wait_range instead of filemap_write_and_wait")
->
-> Fixes tag
->
->   Fixes: c3a72bb21320 ("Reviewed-by: David Howells <dhowells@redhat.com>")
->
-> has these problem(s):
->
->   - Subject does not match target commit subject
->     Just use
->         git log -1 --format='Fixes: %h ("%s")'
->
-> So,
->
-> Fixes: c3a72bb21320 ("smb3: Move the flush out of smb2_copychunk_range() into its callers")
->
-> --
-> Cheers,
-> Stephen Rothwell
-
-
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 128e44e57528..6352ab32c7e7 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -965,16 +965,17 @@ SMB2_negotiate(const unsigned int xid,
+ 	} else if (rc != 0)
+ 		goto neg_exit;
+ 
++	rc = -EIO;
+ 	if (strcmp(server->vals->version_string,
+ 		   SMB3ANY_VERSION_STRING) == 0) {
+ 		if (rsp->DialectRevision == cpu_to_le16(SMB20_PROT_ID)) {
+ 			cifs_server_dbg(VFS,
+ 				"SMB2 dialect returned but not requested\n");
+-			return -EIO;
++			goto neg_exit;
+ 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
+ 			cifs_server_dbg(VFS,
+ 				"SMB2.1 dialect returned but not requested\n");
+-			return -EIO;
++			goto neg_exit;
+ 		} else if (rsp->DialectRevision == cpu_to_le16(SMB311_PROT_ID)) {
+ 			/* ops set to 3.0 by default for default so update */
+ 			server->ops = &smb311_operations;
+@@ -985,7 +986,7 @@ SMB2_negotiate(const unsigned int xid,
+ 		if (rsp->DialectRevision == cpu_to_le16(SMB20_PROT_ID)) {
+ 			cifs_server_dbg(VFS,
+ 				"SMB2 dialect returned but not requested\n");
+-			return -EIO;
++			goto neg_exit;
+ 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
+ 			/* ops set to 3.0 by default for default so update */
+ 			server->ops = &smb21_operations;
+@@ -999,7 +1000,7 @@ SMB2_negotiate(const unsigned int xid,
+ 		/* if requested single dialect ensure returned dialect matched */
+ 		cifs_server_dbg(VFS, "Invalid 0x%x dialect returned: not requested\n",
+ 				le16_to_cpu(rsp->DialectRevision));
+-		return -EIO;
++		goto neg_exit;
+ 	}
+ 
+ 	cifs_dbg(FYI, "mode 0x%x\n", rsp->SecurityMode);
+@@ -1017,9 +1018,10 @@ SMB2_negotiate(const unsigned int xid,
+ 	else {
+ 		cifs_server_dbg(VFS, "Invalid dialect returned by server 0x%x\n",
+ 				le16_to_cpu(rsp->DialectRevision));
+-		rc = -EIO;
+ 		goto neg_exit;
+ 	}
++
++	rc = 0;
+ 	server->dialect = le16_to_cpu(rsp->DialectRevision);
+ 
+ 	/*
 -- 
-Thanks,
+2.35.3
 
-Steve
