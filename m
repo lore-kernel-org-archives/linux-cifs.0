@@ -2,214 +2,198 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEDDFECAAA1
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 02:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFBDECAAD8
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 03:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229601AbiHaCu3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Aug 2022 22:50:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49134 "EHLO
+        id S232195AbiHaDjU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Aug 2022 23:39:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231496AbiHaCu2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 22:50:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCD0B7B1FD
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 19:50:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661914226;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eKaTUYsQM2h5VssGAi4SRp8bg725rn2ZamEr4+OK8zQ=;
-        b=MKcJj7TI5vAIm7vzn4f6Z0YakLYBuJagNLGQq3voHaJMrHkTdDdrKFY7zsB8kKUSbc8snO
-        UQW5KYfUm90WvVv3psk7iCc/LNZ4riCKA7QyleGND+5Yj5VbaKZqNUdcqqUHNYz5yuHMiD
-        momAryOOPC+AZpz+hyMZPZGkOd1a5+4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-393-q2mL9GvtPlCBymv7Y5OFuw-1; Tue, 30 Aug 2022 22:50:17 -0400
-X-MC-Unique: q2mL9GvtPlCBymv7Y5OFuw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D882A3C01DF3;
-        Wed, 31 Aug 2022 02:50:16 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-52-20.bne.redhat.com [10.64.52.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D1349909FF;
-        Wed, 31 Aug 2022 02:50:15 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH 3/6] cifs: store a pointer to a fid in the cfid structure instead of the struct
-Date:   Wed, 31 Aug 2022 12:49:44 +1000
-Message-Id: <20220831024947.3917507-4-lsahlber@redhat.com>
-In-Reply-To: <20220831024947.3917507-1-lsahlber@redhat.com>
-References: <20220831024947.3917507-1-lsahlber@redhat.com>
+        with ESMTP id S229908AbiHaDjT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 23:39:19 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F29269F78
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 20:39:15 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MHVHc1xsqzl92C
+        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 11:37:48 +0800 (CST)
+Received: from [10.174.176.83] (unknown [10.174.176.83])
+        by APP1 (Coremail) with SMTP id cCh0CgA3BSng1w5jL7+gAA--.58726S2;
+        Wed, 31 Aug 2022 11:39:14 +0800 (CST)
+Message-ID: <3aa9c4f7-6d25-db42-e98c-44960e98eb06@huaweicloud.com>
+Date:   Wed, 31 Aug 2022 11:39:12 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+From:   huaweicloud <zhangxiaoxu@huaweicloud.com>
+Subject: Re: [PATCH] cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO
+ message
+To:     Tom Talpey <tom@talpey.com>, stfrench@microsoft.com
+Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, lsahlber@redhat.com,
+        sprasad@microsoft.com, rohiths@microsoft.com, pc@cjr.nz
+References: <20220824085732.1928010-1-zhangxiaoxu5@huawei.com>
+ <495c09a3-003f-7852-ef14-ba7e26984743@huaweicloud.com>
+ <4d6633a3-43a5-8a4b-991c-d8148ce949b1@talpey.com>
+ <3215c221-1c88-28f9-20f1-e492bb62cc50@huaweicloud.com>
+ <e62b79c6-762c-2d4e-cca6-181eb1520409@talpey.com>
+ <d317cfcb-222a-8f2c-0ad6-de2a21db8926@huaweicloud.com>
+In-Reply-To: <d317cfcb-222a-8f2c-0ad6-de2a21db8926@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-CM-TRANSID: cCh0CgA3BSng1w5jL7+gAA--.58726S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3Jw48WF43AFyDAFy8ur48WFg_yoW7Cw18pr
+        18tF1UGry5Jr18Jr1Utr1UJryUKw1UJw1UWr1DJa4UJr1Dtr1jgF48Xryqgr1UAr48Jr1U
+        Jr1Utry7Zr1UJr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1j6r18M7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: x2kd0wp0ld053x6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-also create a constructor that takes a path name and stores it in the fid.
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/cached_dir.c | 63 ++++++++++++++++++++++++++++++++++++++------
- fs/cifs/cached_dir.h |  4 ++-
- 2 files changed, 58 insertions(+), 9 deletions(-)
 
-diff --git a/fs/cifs/cached_dir.c b/fs/cifs/cached_dir.c
-index 4f3d88f3351b..0036ba6e0ab0 100644
---- a/fs/cifs/cached_dir.c
-+++ b/fs/cifs/cached_dir.c
-@@ -11,6 +11,8 @@
- #include "smb2proto.h"
- #include "cached_dir.h"
- 
-+struct cached_fid *init_cached_dir(const char *path);
-+
- /*
-  * Open the and cache a directory handle.
-  * If error then *cfid is not initialized.
-@@ -52,7 +54,14 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	else
- 		return -ENOENT;
- 
--	cfid = &tcon->cfids->cfid;
-+	cfid = tcon->cfids->cfid;
-+	if (cfid == NULL) {
-+		cfid = init_cached_dir(path);
-+		tcon->cfids->cfid = cfid;
-+	}
-+	if (cfid == NULL)
-+		return -ENOMEM;
-+
- 	mutex_lock(&cfid->fid_mutex);
- 	if (cfid->is_valid) {
- 		cifs_dbg(FYI, "found a cached root file handle\n");
-@@ -227,7 +236,9 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
- {
- 	struct cached_fid *cfid;
- 
--	cfid = &tcon->cfids->cfid;
-+	cfid = tcon->cfids->cfid;
-+	if (cfid == NULL)
-+		return -ENOENT;
- 
- 	mutex_lock(&cfid->fid_mutex);
- 	if (cfid->dentry == dentry) {
-@@ -321,7 +332,9 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
- 		tcon = tlink_tcon(tlink);
- 		if (IS_ERR(tcon))
- 			continue;
--		cfid = &tcon->cfids->cfid;
-+		cfid = tcon->cfids->cfid;
-+		if (cfid == NULL)
-+			continue;
- 		mutex_lock(&cfid->fid_mutex);
- 		if (cfid->dentry) {
- 			dput(cfid->dentry);
-@@ -337,7 +350,10 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
-  */
- void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
- {
--	struct cached_fid *cfid = &tcon->cfids->cfid;
-+	struct cached_fid *cfid = tcon->cfids->cfid;
-+
-+	if (cfid == NULL)
-+		return;
- 
- 	mutex_lock(&cfid->fid_mutex);
- 	cfid->is_valid = false;
-@@ -358,7 +374,10 @@ smb2_cached_lease_break(struct work_struct *work)
- 
- int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
- {
--	struct cached_fid *cfid = &tcon->cfids->cfid;
-+	struct cached_fid *cfid = tcon->cfids->cfid;
-+
-+	if (cfid == NULL)
-+		return false;
- 
- 	if (cfid->is_valid &&
- 	    !memcmp(lease_key,
-@@ -374,6 +393,32 @@ int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
- 	return false;
- }
- 
-+struct cached_fid *init_cached_dir(const char *path)
-+{
-+	struct cached_fid *cfid;
-+
-+	cfid = kzalloc(sizeof(*cfid), GFP_KERNEL);
-+	if (!cfid)
-+		return NULL;
-+	cfid->path = kstrdup(path, GFP_KERNEL);
-+	if (!cfid->path) {
-+		kfree(cfid);
-+		return NULL;
-+	}
-+
-+	INIT_LIST_HEAD(&cfid->dirents.entries);
-+	mutex_init(&cfid->dirents.de_mutex);
-+	mutex_init(&cfid->fid_mutex);
-+	return cfid;
-+}
-+
-+void free_cached_dir(struct cached_fid *cfid)
-+{
-+	kfree(cfid->path);
-+	cfid->path = NULL;
-+	kfree(cfid);
-+}
-+
- struct cached_fids *init_cached_dirs(void)
- {
- 	struct cached_fids *cfids;
-@@ -381,13 +426,15 @@ struct cached_fids *init_cached_dirs(void)
- 	cfids = kzalloc(sizeof(*cfids), GFP_KERNEL);
- 	if (!cfids)
- 		return NULL;
--	INIT_LIST_HEAD(&cfids->cfid.dirents.entries);
--	mutex_init(&cfids->cfid.dirents.de_mutex);
--	mutex_init(&cfids->cfid.fid_mutex);
-+	mutex_init(&cfids->cfid_list_mutex);
- 	return cfids;
- }
- 
- void free_cached_dirs(struct cached_fids *cfids)
- {
-+	if (cfids->cfid) {
-+		free_cached_dir(cfids->cfid);
-+		cfids->cfid = NULL;
-+	}
- 	kfree(cfids);
- }
-diff --git a/fs/cifs/cached_dir.h b/fs/cifs/cached_dir.h
-index e430e1102296..bdf6c3866653 100644
---- a/fs/cifs/cached_dir.h
-+++ b/fs/cifs/cached_dir.h
-@@ -31,6 +31,7 @@ struct cached_dirents {
- };
- 
- struct cached_fid {
-+	const char *path;
- 	bool is_valid:1;	/* Do we have a useable root fid */
- 	bool file_all_info_is_valid:1;
- 	bool has_lease:1;
-@@ -46,7 +47,8 @@ struct cached_fid {
- };
- 
- struct cached_fids {
--	struct cached_fid cfid;
-+	struct mutex cfid_list_mutex;
-+	struct cached_fid *cfid;
- };
- 
- extern struct cached_fids *init_cached_dirs(void);
--- 
-2.35.3
+在 2022/8/31 10:03, huaweicloud 写道:
+> 
+> 
+> 在 2022/8/31 0:19, Tom Talpey 写道:
+>> On 8/30/2022 10:30 AM, huaweicloud wrote:
+>>> I think the struct validate_negotiate_info_req is an variable-length array,
+>>> just for implement simple, defind as 4 in here.
+>>
+>> But that's my point. The code picks "4" arbitrarily, and that
+>> number can change - as you discovered, it already did since
+>> it used to be "3".
+>>
+>> smb2pdu.h:
+>> struct validate_negotiate_info_req {
+>>      __le32 Capabilities;
+>>      __u8   Guid[SMB2_CLIENT_GUID_SIZE];
+>>      __le16 SecurityMode;
+>>      __le16 DialectCount;
+>>      __le16 Dialects[4]; /* BB expand this if autonegotiate > 4 dialects */
+>> } __packed;
+
+>>
+>> I repeat my suggestion.
+>>
+>> Alternatively, change tqhe code to make it a variable array and
+>> allocate it properly.
+> Agreed with change it to variable-length array.
+> 
+> Since the struct validate_negotiate_info_req also used by ksmbd and it not
+> treat it as the variable-length array:
+> 
+> int smb2_ioctl(struct ksmbd_work *work)
+> {
+>          case FSCTL_VALIDATE_NEGOTIATE_INFO:
+> 
+>                 if (in_buf_len < sizeof(struct validate_negotiate_info_req))
+>                         return -EINVAL;
+> }
+Before commit c7803b05f74b ("smb3: fix ksmbd bigendian bug in oplock break, and move its struct to smbfs_common"),
+ksmbd also treat it as variable-length array.
+> 
+> But in samba, treat it as the variable-length array:
+> 
+> static NTSTATUS fsctl_validate_neg_info(TALLOC_CTX *mem_ctx,
+>                                          struct tevent_context *ev,
+>                                          struct smbXsrv_connection *conn,
+>                                          DATA_BLOB *in_input,
+>                                          uint32_t in_max_output,
+>                                          DATA_BLOB *out_output,
+>                                          bool *disconnect)
+> {
+>      in_num_dialects = SVAL(in_input->data, 0x16);
+> 
+>      if (in_input->length < (0x18 + in_num_dialects*2)) {
+>          return NT_STATUS_INVALID_PARAMETER;
+>      }
+> }
+> 
+> now, I'm trying to make it to variable-length array,
+> but this patch, just fix the wrong message length sent by cifs client.
+> 
+> Thanks.
+>>
+>> Tom.
+>>
+>>> According MS-SMB2, there really not define the length of the package, just
+>>> define the count of the dialects, but just send the needed data maybe more
+>>> appropriate.
+>>>
+>>> Thanks.
+>>>
+>>> 在 2022/8/30 22:03, Tom Talpey 写道:
+>>>> Wouldn't it be safer to just set the size, instead of implicitly
+>>>> assuming that there are 4 array elements?
+>>>>
+>>>>    inbuflen = sizeof(*pneg_inbuf) - sizeof(pneg_inbuf.Dialects) + sizeof(pneg_inbuf.Dialects[0]);
+>>>>
+>>>> Or, because it obviously works to send the extra bytes even
+>>>> though the DialectCount is just 1, just zero them out?
+>>>>
+>>>>    memset(pneg_inbuf.Dialects, 0, sizeof(pneg_inbuf.Dialects));
+>>>>    pneg_inbuf.Dialects[0] = cpu_to_le16(server->vals->protocol_id);
+>>>>
+>>>> Tom.
+>>>>
+>>>> On 8/30/2022 3:06 AM, huaweicloud wrote:
+>>>>> Hi Steve,
+>>>>>
+>>>>> Could you help to review this patch.
+>>>>>
+>>>>> Thanks,
+>>>>> Zhang Xiaoxu
+>>>>>
+>>>>> 在 2022/8/24 16:57, Zhang Xiaoxu 写道:
+>>>>>> Commit d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+>>>>>> extend the dialects from 3 to 4, but forget to decrease the extended
+>>>>>> length when specific the dialect, then the message length is larger
+>>>>>> than expected.
+>>>>>>
+>>>>>> This maybe leak some info through network because not initialize the
+>>>>>> message body.
+>>>>>>
+>>>>>> After apply this patch, the VALIDATE_NEGOTIATE_INFO message length is
+>>>>>> reduced from 28 bytes to 26 bytes.
+>>>>>>
+>>>>>> Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+>>>>>> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+>>>>>> Cc: <stable@vger.kernel.org>
+>>>>>> ---
+>>>>>>   fs/cifs/smb2pdu.c | 4 ++--
+>>>>>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>>>>>> index 1ecc2501c56f..3df7adc01fe5 100644
+>>>>>> --- a/fs/cifs/smb2pdu.c
+>>>>>> +++ b/fs/cifs/smb2pdu.c
+>>>>>> @@ -1162,9 +1162,9 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>>>>>>           pneg_inbuf->Dialects[0] =
+>>>>>>               cpu_to_le16(server->vals->protocol_id);
+>>>>>>           pneg_inbuf->DialectCount = cpu_to_le16(1);
+>>>>>> -        /* structure is big enough for 3 dialects, sending only 1 */
+>>>>>> +        /* structure is big enough for 4 dialects, sending only 1 */
+>>>>>>           inbuflen = sizeof(*pneg_inbuf) -
+>>>>>> -                sizeof(pneg_inbuf->Dialects[0]) * 2;
+>>>>>> +                sizeof(pneg_inbuf->Dialects[0]) * 3;
+>>>>>>       }
+>>>>>>       rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+>>>>>
+>>>>>
+>>>
+>>>
+> 
 
