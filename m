@@ -2,94 +2,175 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 351AAC0502A
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 06:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 123CBECAAD3
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 07:07:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230328AbiHaGvy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 31 Aug 2022 02:51:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58130 "EHLO
+        id S230035AbiHaHHB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 31 Aug 2022 03:07:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbiHaGvw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 Aug 2022 02:51:52 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB56BFC53
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 23:51:49 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MHZYW07Q9z6S3JW
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 14:50:07 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.170])
-        by APP2 (Coremail) with SMTP id Syh0CgAnenP+BA9jfDauAA--.16581S5;
-        Wed, 31 Aug 2022 14:51:47 +0800 (CST)
-From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-To:     linux-cifs@vger.kernel.org, zhangxiaoxu5@huawei.com,
-        sfrench@samba.org, pc@cjr.nz, lsahlber@redhat.com,
-        sprasad@microsoft.com, rohiths@microsoft.com, smfrench@gmail.com
-Subject: [PATCH v2 1/3] cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO message
-Date:   Wed, 31 Aug 2022 15:52:53 +0800
-Message-Id: <20220831075255.2667077-2-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220831075255.2667077-1-zhangxiaoxu5@huawei.com>
-References: <20220831075255.2667077-1-zhangxiaoxu5@huawei.com>
+        with ESMTP id S229954AbiHaHHA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 Aug 2022 03:07:00 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A2B66A57
+        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 00:06:59 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id v7-20020a1cac07000000b003a6062a4f81so11146723wme.1
+        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 00:06:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc;
+        bh=t6WIQe5xgioTGCnI0aV0P92uGo3UVb2tWSIHWk3zcmA=;
+        b=RahmbWWNT7eDZuezqqwOJLFIvGslm8SoQz8r6CfTD5kmGjWnx0lnFEYY0PeFRMevCB
+         k/rByHprVP84yde5cxdO2DaZDznjvzi9SyGW64upq/B4BMd7hYzODr6Wje4K7U9jZKbV
+         ty/PsRXvnLowLQ4GYp5S3xqQuZKIw+PdJ7D6AwI0NhBxnvmkv5IgjSt/1BFSq9dmkoeS
+         vO9o8TsSfOZJgy9EIUC12jctesBYcECmllqGCsH/qz9iAi8C7O9qX+zrVaHpkLIUzl0h
+         7pT9Lb8OscUD2riCMubWgZ0ggYi8/Lqh2lIvAVWt22VbkaD36J+De0fu63ATIbqLDKS0
+         fvjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
+        bh=t6WIQe5xgioTGCnI0aV0P92uGo3UVb2tWSIHWk3zcmA=;
+        b=MAOvFJZ3JYSNdkNSs39xs86AHvlZh3c1kxUk0z1W52LcxmeojMBeEbS2U0PFDJ9wJH
+         GcZ6sDN3QCQF9X2ruA77V3QyUJHdXb3s5UoeA+RQio8IOpWmOnGqwXyoCg9WkOlUK+AA
+         5jMd23nYmu/OKKptM0woxLuF31rDt00T6xSMx+U69QbQ8AgGCJyD8gdgPi0kUAVci8pG
+         KFAH72GGCU7KMr0KCqzhDjQj0vWss2NepT0hbHoH82SUuFIYgvaRQNPpTMw0r5M+fboj
+         qLelGfJoXirbvZO8KeNLNYvfpJ3jNYOlQd6J0xAX8nDRvPPFJBOyDfPWat4rGSuF1KBN
+         13/g==
+X-Gm-Message-State: ACgBeo1cqO3O5C6YlBmxrGbuFLzELW9WUvNU4hT+hSLh1zAuA4jppicq
+        RBBIBylZkvOAVJdaJqxihfulTgoBRg5SfXjdUxs=
+X-Google-Smtp-Source: AA6agR7KgVMQvgkPE+Ka3gJTjKrXnrSfdvBpGXczA9ePTKaTuGsUySL24GUvbkNCMD6ER/mzrvG4g/52jg47e+77LtI=
+X-Received: by 2002:a05:600c:657:b0:3a5:e4e6:ee24 with SMTP id
+ p23-20020a05600c065700b003a5e4e6ee24mr959414wmm.68.1661929617734; Wed, 31 Aug
+ 2022 00:06:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgAnenP+BA9jfDauAA--.16581S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW8tr47GF13tryDAw4fKrg_yoW8Gr4xpr
-        nagry8GFZ3Xry8Cw1UC3Wkuas5Kwn5WF129r4qkw13J3WFvFn0gF1v93s5W3yrKayFkayj
-        qr42va45twn0yaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6r106r1rM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGw
-        A2048vs2IY020Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-        w2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-        W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-        6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-        Ij6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-        Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l42xK82IY64kExVAvwVAq07
-        x20xyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUzb18DUUUU
-Sender: zhangxiaoxu@huaweicloud.com
-X-CM-SenderInfo: x2kd0wp0ld053x6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
+References: <20220819043557.26745-1-hyc.lee@gmail.com> <CAKYAXd-18=_Yv1LAG=cqAQMORVD3mdA=9OP1t6+PxM+bUxLM2Q@mail.gmail.com>
+ <CANFS6bZ1Xh+BTFDpWQdChcoY_5t5MwT5UMQ=tQupXmEeSO3kPw@mail.gmail.com>
+ <CAKYAXd_Qd3jf_GwvzmZ+V+s--k-+T8HBD9HfvDvAesuv1vth2g@mail.gmail.com>
+ <CANFS6ba3zUFW3Cju6zXiAoQ0jU_-oq=1EZLfwBCf9uGyqVzOKA@mail.gmail.com>
+ <CAKYAXd9iP8h-rxju-JG9=9QJbVTpMqsMhySGMeZzHrkA4JnC_g@mail.gmail.com>
+ <CANFS6bbMYjn9kw574vpKPj74Zs6oQYiCdPEknMbCQf77_30v6Q@mail.gmail.com>
+ <CAKYAXd9yiTOg2FPtCtyZn+4fdCbXOU2edDk2L-9Vv5ehJ+w=jA@mail.gmail.com>
+ <CANFS6bbwZDGhB4Dp+A192U=S1VfWa0091OBvmxhTB_C4BPz7sA@mail.gmail.com> <CAKYAXd_7p1gmV+3HZE9v+biUxRPzoNL7-cqRpfY8yCFHik7M5g@mail.gmail.com>
+In-Reply-To: <CAKYAXd_7p1gmV+3HZE9v+biUxRPzoNL7-cqRpfY8yCFHik7M5g@mail.gmail.com>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Wed, 31 Aug 2022 16:06:46 +0900
+Message-ID: <CANFS6bYYEtXPDQnmAKFujLPu_xO7zhtwhQ+kJqdkjjgKcvZLjQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix incorrect handling of iterate_dir
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Commit d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
-extend the dialects from 3 to 4, but forget to decrease the extended
-length when specific the dialect, then the message length is larger
-than expected.
+2022=EB=85=84 8=EC=9B=94 24=EC=9D=BC (=EC=88=98) =EC=98=A4=EC=A0=84 9:10, N=
+amjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> 2022-08-23 17:26 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> > 2022=EB=85=84 8=EC=9B=94 23=EC=9D=BC (=ED=99=94) =EC=98=A4=EC=A0=84 11:=
+45, Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=
+=B1:
+> >>
+> >> >> >> >> > diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> >> >> >> >> > index 53c91ab02be2..6716c4e3c16d 100644
+> >> >> >> >> > --- a/fs/ksmbd/smb2pdu.c
+> >> >> >> >> > +++ b/fs/ksmbd/smb2pdu.c
+> >> >> >> >> > @@ -3970,11 +3970,9 @@ int smb2_query_dir(struct ksmbd_work
+> >> >> >> >> > *work)
+> >> >> >> >> >        */
+> >> >> >> >> >       if (!d_info.out_buf_len && !d_info.num_entry)
+> >> >> >> >> >               goto no_buf_len;
+> >> >> >> >> > -     if (rc =3D=3D 0)
+> >> >> >> >> > -             restart_ctx(&dir_fp->readdir_data.ctx);
+> >> >> >> >> > -     if (rc =3D=3D -ENOSPC)
+> >> >> >> >> > +     if (rc > 0 || rc =3D=3D -ENOSPC)
+> >> >> >> >> Do you know why -ENOSPC error is ignored ?
+> >> >> >> >>
+> >> >> >> >
+> >> >> >> > I don't know why and can't find the commit history
+> >> >> >> > for this.
+> >> >> >> After checking if -ENOSPC error is returned, there is no need to
+> >> >> >> leave
+> >> >> >> it if it is not needed.
+> >> >> >
+> >> >> > In most cases, -ENOSPC is not returned. Because the value
+> >> >> > is set to the return value from filesystems' iterate or
+> >> >> > iterate_share,
+> >> >> > and most file systems don't allocate disk space for this operatio=
+n.
+> >> >> >
+> >> >> > But we cannot guarantee this. So how about changing handling
+> >> >> > iterate_dir
+> >> >> > like gendents system call. Even if an error code is returned by
+> >> >> > iterate_dir,
+> >> >> > it treats as normal if several child files are iterated and the
+> >> >> > buffer
+> >> >> > is filled with
+> >> >> > information about those.
+> >> >> Among the errors of the smb2 query directory in the specification,
+> >> >> there is a file corruption error response
+> >> >> type(STATUS_FILE_CORRUPT_ERROR).
+> >> >> Can you check when smb server return that error response for smb2
+> >> >> query directory?
+> >> >>
+> >> >
+> >> > According to MS-REREF, it means "The file or directory is corrupt an=
+d
+> >> > unreadable.
+> >> > Run the chkdsk utility". And there is no function to return the erro=
+r
+> >> > in
+> >> > Samba.
+> >> Is samba not able to know corruption errors using getdents syscall as =
+you
+> >> said?
+> >
+> > If iterate_dir returns an error and there are files iterated, getdents
+> > syscall will succeed.
+> > But if a client requests SMB2_QUERY_DIR again due to STATUS_NO_MORE_FIL=
+ES
+> > absence of the last response, iterate_dir returns an error again and
+> > there are no
+> > files iterated, getdents syscall will fail. Samba can send a response
+> > with an error.
+> Sorry, can't understand. What error ?
 
-This maybe leak some info through network because not initialize the
-message body.
 
-After apply this patch, the VALIDATE_NEGOTIATE_INFO message length is
-reduced from 28 bytes to 26 bytes.
+When I set the last entry of directory FAT chain to be invalid value in exF=
+AT,
+the last getdents returns -EIO, but Samba sends responses without an error
 
-Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-Cc: <stable@vger.kernel.org>
----
- fs/cifs/smb2pdu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> >> There is no reason to follow it. I think that ksmbd is able to return
+> >> this error.
+> >
+> > Can we determine we should return a response with STATUS_FILE_CORRUPT_E=
+RROR
+> > if iterate_dir returns -EIO?
+> STATUS_FILE_CORRUPT_ERROR is still not cleared. want to know how
+> windows server handle it.
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 128e44e57528..37f422eb3876 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1167,9 +1167,9 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
- 		pneg_inbuf->Dialects[0] =
- 			cpu_to_le16(server->vals->protocol_id);
- 		pneg_inbuf->DialectCount = cpu_to_le16(1);
--		/* structure is big enough for 3 dialects, sending only 1 */
-+		/* structure is big enough for 4 dialects, sending only 1 */
- 		inbuflen = sizeof(*pneg_inbuf) -
--				sizeof(pneg_inbuf->Dialects[0]) * 2;
-+				sizeof(pneg_inbuf->Dialects[0]) * 3;
- 	}
- 
- 	rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
--- 
-2.31.1
+In the above example, Windows server sends an empty SMB2_QUERY_DIRECTORY
+response with STATUS_FILE_CORRUPT_ERROR.
 
+And when executing "dir <directory>" in Windows terminal for the local
+exFAT filesystem,
+there are no files iterated and DirIOError is generated.
+
+
+> >
+> > --
+> > Thanks,
+> > Hyunchul
+> >
+
+
+
+--
+Thanks,
+Hyunchul
