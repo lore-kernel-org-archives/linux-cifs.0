@@ -2,165 +2,190 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CE8ECAAA1
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 01:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87D7ECAAD5
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 02:03:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229456AbiHaBhE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Aug 2022 21:37:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37146 "EHLO
+        id S229989AbiHaCDn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Aug 2022 22:03:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiHaBhD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 21:37:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173A8FC
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 18:37:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AB2C3618CF
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 01:37:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 164C1C433D6
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 01:37:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661909821;
-        bh=tOovBkgiPYBjR2vWj/I8zucODmJYrvlTjlDNwDBNwCg=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=paijKlUsLERUKlCjlkOg+uPVyVTY/yby63mi6m59JsWpjWc/C3WCuTca0sZ7ap0oZ
-         0nRcU8h8AqBpO381zcw/RMT+FC6CXL53Xd88b0sHvTc3tYL70AvVI9c0LvfC9/8XUp
-         2ImlSTNpIyKHoI0uoI9/jZGj1/ZFBj0T3+NDbOlVPeaMokmiFr93F/Aw+GaXeEhNCc
-         G1XohFehNUv+CBrtCmBR8lb7fB7reUgDXjMD0ApnaK5ZMOP7qkHEhPw/B8PIPa9hQ+
-         fwvcdXWJp+GQkoWx8kPzMGv+nQ/FTC6yztwtEhDpV6aGTNaPfKGrk63Dy3rwirS/CF
-         CnWQQILwTJwLg==
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-11c4d7d4683so21003260fac.8
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 18:37:01 -0700 (PDT)
-X-Gm-Message-State: ACgBeo2ulAsiSuWtpMT5TQSJYwIYz/bU/yyMsZ6Tfth4QW/Rm44pGps5
-        NPukmgc8X/Xw2mpw32mGch+MrDzqpQ5f7EaQTYk=
-X-Google-Smtp-Source: AA6agR6C3HgvGvjgcNosdB22RVBL6uX5uxrE+uo0Ag7qr3jWowhLummFckllWsk3aSC8BkSEWRbD46/L7UmN1/0h1iE=
-X-Received: by 2002:a54:4696:0:b0:343:46c5:9b2c with SMTP id
- k22-20020a544696000000b0034346c59b2cmr346176oic.8.1661909820190; Tue, 30 Aug
- 2022 18:37:00 -0700 (PDT)
+        with ESMTP id S231709AbiHaCDh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 22:03:37 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C576EB3B01
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 19:03:33 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MHS8v3fBjz6S3M8
+        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 10:01:51 +0800 (CST)
+Received: from [10.174.176.83] (unknown [10.174.176.83])
+        by APP4 (Coremail) with SMTP id gCh0CgC3eopywQ5jIZuhAA--.56473S2;
+        Wed, 31 Aug 2022 10:03:31 +0800 (CST)
+Message-ID: <d317cfcb-222a-8f2c-0ad6-de2a21db8926@huaweicloud.com>
+Date:   Wed, 31 Aug 2022 10:03:29 +0800
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Tue, 30 Aug 2022 18:36:59
- -0700 (PDT)
-In-Reply-To: <47dbb75a-b299-066c-61cc-2b21ca96173f@talpey.com>
-References: <20220830141732.9982-1-linkinjeon@kernel.org> <47dbb75a-b299-066c-61cc-2b21ca96173f@talpey.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 31 Aug 2022 10:36:59 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd94kt+SY+Qs6ohXwWYEpXYd26WNFEOEft0bs6zuEEp6aQ@mail.gmail.com>
-Message-ID: <CAKYAXd94kt+SY+Qs6ohXwWYEpXYd26WNFEOEft0bs6zuEEp6aQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] ksmbd: update documentation
-To:     Tom Talpey <tom@talpey.com>, atteh.mailbox@gmail.com
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, hyc.lee@gmail.com,
-        senozhatsky@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH] cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO
+ message
+To:     Tom Talpey <tom@talpey.com>, stfrench@microsoft.com
+Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, lsahlber@redhat.com,
+        sprasad@microsoft.com, rohiths@microsoft.com, pc@cjr.nz
+References: <20220824085732.1928010-1-zhangxiaoxu5@huawei.com>
+ <495c09a3-003f-7852-ef14-ba7e26984743@huaweicloud.com>
+ <4d6633a3-43a5-8a4b-991c-d8148ce949b1@talpey.com>
+ <3215c221-1c88-28f9-20f1-e492bb62cc50@huaweicloud.com>
+ <e62b79c6-762c-2d4e-cca6-181eb1520409@talpey.com>
+From:   huaweicloud <zhangxiaoxu@huaweicloud.com>
+In-Reply-To: <e62b79c6-762c-2d4e-cca6-181eb1520409@talpey.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgC3eopywQ5jIZuhAA--.56473S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxuF45GryfJr4DuFWUWF4xXrb_yoWrZFWfpF
+        yvqFyDKrWrJr18Cw12yr1UW345Kw18Ww1DWr1DKa43J3Z0yF12gF48Wr90grnayr48Jr1j
+        qw4UtFy3Zry3Ar7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1j6r18M7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: x2kd0wp0ld053x6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-08-31 1:13 GMT+09:00, Tom Talpey <tom@talpey.com>:
-> On 8/30/2022 10:17 AM, Namjae Jeon wrote:
->> configuration.txt in ksmbd-tools moved to smb.conf(5ksmbd) manpage.
->> update it and more detailed ksmbd-tools build method.
->>
->> Cc: Tom Talpey <tom@talpey.com>
->> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>   Documentation/filesystems/cifs/ksmbd.rst | 10 ++++++++--
->>   1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/Documentation/filesystems/cifs/ksmbd.rst
->> b/Documentation/filesystems/cifs/ksmbd.rst
->> index 1af600db2e70..767e12d2045a 100644
->> --- a/Documentation/filesystems/cifs/ksmbd.rst
->> +++ b/Documentation/filesystems/cifs/ksmbd.rst
->> @@ -121,20 +121,26 @@ How to run
->>   1. Download ksmbd-tools and compile them.
->>   	- https://github.com/cifsd-team/ksmbd-tools
->>
->> +        # ./autogen.sh
->> +        # ./configure --sysconfdir=/etc --with-rundir=/run
->> +        # make & sudo make install
->
-> I believe you mean "make && sudo make install"? The single & will
-> kick off two make's in parallel.
-Will fix it.
->
->>   2. Create user/password for SMB share.
->>
->>   	# mkdir /etc/ksmbd/
->>   	# ksmbd.adduser -a <Enter USERNAME for SMB share access>
->
-> It may be worth mentioning that it's not just single-user access, and
-> that additional users can be configured.
-Ah, Okay. Let me think more..
->
->>   3. Create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
->> -	- Refer smb.conf.example and
->> -
->> https://github.com/cifsd-team/ksmbd-tools/blob/master/Documentation/configuration.txt
->> +	- Refer smb.conf.example, See smb.conf(5ksmbd) for details.
->> +
->> +        # man smb.conf.5ksmbd
->
-> I like the new manpage, but that's a strange path. Are you sure
-> the various maintainers will deploy it that way?
-I was sure there won't be any strong comments, as We've used the MIT
-Kerberos (krb5-doc) case as an example. If samba is not installed, man
-smb.conf show ksmbd's one.
->
-> Also, it has always bothered me that the name "smb.conf" is the
-> same as the Samba server's configuration file, just in a different
-> directory. If someone enters "man smb.conf", there may be confusion.
-> I really wish the file was called "ksmbd.conf".
-The initial idea was to make the configuration compatible with samba.
-Users copy it to ksmbd directory and reuse the smb.conf file they used
-in samba as it is. And I have no strong opinion to renaming it to
-ksmbd.conf(i.e. man ksmb.conf).  Atte, Any thought about this ?
 
->
-> Why not putting this under a simpler manpage title "man ksmbd"?
-> To me, that's much more logical and it avoids both the confusion
-> and having to somehow know that weird manpath.
-Is it possible to add it to manpage even though a utility or
-configuration file named ksmbd doesn't exist? That is, as if there is
-no "man nfs".
->
->>   4. Insert ksmbd.ko module
->>
->>   	# insmod ksmbd.ko
->
-> Well, it's worth mentioning that a properly configured and built
-> kernel is a prerequisite here...
-Okay.
->
-> Also, sudo.
->
->>   5. Start ksmbd user space daemon
->> +
->>   	# ksmbd.mountd
->
-> FYI, Ubuntu Jammy pre-configures ksmbd as a service, and there it's
-> as simple as "sudo service ksmbd start".
-Is this command available on all distributions?
 
->
-> Do you not want to mention the other ksmbd.<foo> helpers here?
-Other ksmbd utils are described in README of ksmbd-tools github, so I
-did not list them here.
->
->>   6. Access share from Windows or Linux using CIFS
->
-> Pointer to cifs.ko how-to page?
-Do you know of a page link for cifs.ko?
->
-> Basically, I'm encouraging these pages to be (much) more user
-> friendly! They're fine for developers, but way too fiddly IMO
-> for naive users, or even for admins. It has taken me days to get
-> this all going on my fresh machines.
-okay..
->
-> Either way, thanks for the cleanup so far!!
-Thanks!
->
+在 2022/8/31 0:19, Tom Talpey 写道:
+> On 8/30/2022 10:30 AM, huaweicloud wrote:
+>> I think the struct validate_negotiate_info_req is an variable-length array,
+>> just for implement simple, defind as 4 in here.
+> 
+> But that's my point. The code picks "4" arbitrarily, and that
+> number can change - as you discovered, it already did since
+> it used to be "3".
+> 
+> smb2pdu.h:
+> struct validate_negotiate_info_req {
+>      __le32 Capabilities;
+>      __u8   Guid[SMB2_CLIENT_GUID_SIZE];
+>      __le16 SecurityMode;
+>      __le16 DialectCount;
+>      __le16 Dialects[4]; /* BB expand this if autonegotiate > 4 dialects */
+> } __packed;
+> 
+> I repeat my suggestion.
+> 
+> Alternatively, change the code to make it a variable array and
+> allocate it properly.
+Agreed with change it to variable-length array.
+
+Since the struct validate_negotiate_info_req also used by ksmbd and it not
+treat it as the variable-length array:
+
+int smb2_ioctl(struct ksmbd_work *work)
+{
+         case FSCTL_VALIDATE_NEGOTIATE_INFO:
+
+                if (in_buf_len < sizeof(struct validate_negotiate_info_req))
+                        return -EINVAL;
+}
+
+But in samba, treat it as the variable-length array:
+
+static NTSTATUS fsctl_validate_neg_info(TALLOC_CTX *mem_ctx,
+                                         struct tevent_context *ev,
+                                         struct smbXsrv_connection *conn,
+                                         DATA_BLOB *in_input,
+                                         uint32_t in_max_output,
+                                         DATA_BLOB *out_output,
+                                         bool *disconnect)
+{
+	in_num_dialects = SVAL(in_input->data, 0x16);
+
+	if (in_input->length < (0x18 + in_num_dialects*2)) {
+		return NT_STATUS_INVALID_PARAMETER;
+	}
+}
+
+now, I'm trying to make it to variable-length array,
+but this patch, just fix the wrong message length sent by cifs client.
+
+Thanks.
+> 
 > Tom.
->
+> 
+>> According MS-SMB2, there really not define the length of the package, just
+>> define the count of the dialects, but just send the needed data maybe more
+>> appropriate.
+>>
+>> Thanks.
+>>
+>> 在 2022/8/30 22:03, Tom Talpey 写道:
+>>> Wouldn't it be safer to just set the size, instead of implicitly
+>>> assuming that there are 4 array elements?
+>>>
+>>>    inbuflen = sizeof(*pneg_inbuf) - sizeof(pneg_inbuf.Dialects) + sizeof(pneg_inbuf.Dialects[0]);
+>>>
+>>> Or, because it obviously works to send the extra bytes even
+>>> though the DialectCount is just 1, just zero them out?
+>>>
+>>>    memset(pneg_inbuf.Dialects, 0, sizeof(pneg_inbuf.Dialects));
+>>>    pneg_inbuf.Dialects[0] = cpu_to_le16(server->vals->protocol_id);
+>>>
+>>> Tom.
+>>>
+>>> On 8/30/2022 3:06 AM, huaweicloud wrote:
+>>>> Hi Steve,
+>>>>
+>>>> Could you help to review this patch.
+>>>>
+>>>> Thanks,
+>>>> Zhang Xiaoxu
+>>>>
+>>>> 在 2022/8/24 16:57, Zhang Xiaoxu 写道:
+>>>>> Commit d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+>>>>> extend the dialects from 3 to 4, but forget to decrease the extended
+>>>>> length when specific the dialect, then the message length is larger
+>>>>> than expected.
+>>>>>
+>>>>> This maybe leak some info through network because not initialize the
+>>>>> message body.
+>>>>>
+>>>>> After apply this patch, the VALIDATE_NEGOTIATE_INFO message length is
+>>>>> reduced from 28 bytes to 26 bytes.
+>>>>>
+>>>>> Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+>>>>> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+>>>>> Cc: <stable@vger.kernel.org>
+>>>>> ---
+>>>>>   fs/cifs/smb2pdu.c | 4 ++--
+>>>>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>>>>> index 1ecc2501c56f..3df7adc01fe5 100644
+>>>>> --- a/fs/cifs/smb2pdu.c
+>>>>> +++ b/fs/cifs/smb2pdu.c
+>>>>> @@ -1162,9 +1162,9 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>>>>>           pneg_inbuf->Dialects[0] =
+>>>>>               cpu_to_le16(server->vals->protocol_id);
+>>>>>           pneg_inbuf->DialectCount = cpu_to_le16(1);
+>>>>> -        /* structure is big enough for 3 dialects, sending only 1 */
+>>>>> +        /* structure is big enough for 4 dialects, sending only 1 */
+>>>>>           inbuflen = sizeof(*pneg_inbuf) -
+>>>>> -                sizeof(pneg_inbuf->Dialects[0]) * 2;
+>>>>> +                sizeof(pneg_inbuf->Dialects[0]) * 3;
+>>>>>       }
+>>>>>       rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+>>>>
+>>>>
+>>
+>>
+
