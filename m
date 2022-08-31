@@ -2,190 +2,132 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C87D7ECAAD5
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 02:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10485ECAAA1
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 02:04:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbiHaCDn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Aug 2022 22:03:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48680 "EHLO
+        id S230056AbiHaCE6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Aug 2022 22:04:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231709AbiHaCDh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 22:03:37 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C576EB3B01
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 19:03:33 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MHS8v3fBjz6S3M8
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 10:01:51 +0800 (CST)
-Received: from [10.174.176.83] (unknown [10.174.176.83])
-        by APP4 (Coremail) with SMTP id gCh0CgC3eopywQ5jIZuhAA--.56473S2;
-        Wed, 31 Aug 2022 10:03:31 +0800 (CST)
-Message-ID: <d317cfcb-222a-8f2c-0ad6-de2a21db8926@huaweicloud.com>
-Date:   Wed, 31 Aug 2022 10:03:29 +0800
-MIME-Version: 1.0
+        with ESMTP id S229549AbiHaCE5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Aug 2022 22:04:57 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2077.outbound.protection.outlook.com [40.107.244.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201BDCE3D
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Aug 2022 19:04:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fk3vFuGKB2JZXGTwwz3PUBdgfOp0gYOAGQ+seMOHTh/czL9TbZZf//+66mlkbx/CGHrDiKuA6F06sOh1WC8Znpq6CzJap3RowsMme/k5uFteXFH74bUDj3UkAK/42AynLkZFKzUr/OiPZYU+MyKoH/XaM/MlFsdvLR4ucGPU5gQ7z0KfxkhPGlcCRWTWRVVACgIh1W4sEMjhZzElraVxMPOAo1TBeMw/45reuminQEW0bfhfHlvqB0vHeMPzuAYnVSEJ3Q+eAMrg8Fh/8uVmTMNeSdkWMiNUrnCAD4tE6FktWJa66/FBX0x1fw5V9HEg8XwNb82lveTlpYDpeYzXVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rYorY18CsV4lajJbQOqe2ofeL8PuOj+A5YieLGVWT1c=;
+ b=cfIhsmmY7qJYHSy4fkz06+w5lwCqjItkwe2oh1teNnIguMNB6LmqojTAS+WoyC3LBdAKgNnZReI90E6Um4FQWhkN5jycQE/gQenboo1tLctDUvZTY3TaqhjpSkE6Oc/c9Gf39kA1+tyWLStLUaf2u1wlrK7t4un99Sf3BjXaOWI5/rqmAmCYQTSI4r5jZZ8V7PGRL126bx0VgGfDE+Nk8k00ONpksKTQbY8IyEcS82ZT/Tn1PR+wlSDydnV+RWrl+z5xx42fEr4PuLXEy+cdepwI2oE9if+Qi2GFHDHE+MGW3Vjhxy7TNRWkXFDAIrOIg5yo3JiUJhQJEtsnUHuFXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ DM6PR01MB4619.prod.exchangelabs.com (2603:10b6:5:6e::16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5588.10; Wed, 31 Aug 2022 02:04:54 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::701d:e406:dcfa:118b]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::701d:e406:dcfa:118b%4]) with mapi id 15.20.5566.021; Wed, 31 Aug 2022
+ 02:04:54 +0000
+Message-ID: <54374c8c-4a16-1c18-a295-c5ea229e67ea@talpey.com>
+Date:   Tue, 30 Aug 2022 22:04:52 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.0
-Subject: Re: [PATCH] cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO
- message
-To:     Tom Talpey <tom@talpey.com>, stfrench@microsoft.com
-Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, lsahlber@redhat.com,
-        sprasad@microsoft.com, rohiths@microsoft.com, pc@cjr.nz
-References: <20220824085732.1928010-1-zhangxiaoxu5@huawei.com>
- <495c09a3-003f-7852-ef14-ba7e26984743@huaweicloud.com>
- <4d6633a3-43a5-8a4b-991c-d8148ce949b1@talpey.com>
- <3215c221-1c88-28f9-20f1-e492bb62cc50@huaweicloud.com>
- <e62b79c6-762c-2d4e-cca6-181eb1520409@talpey.com>
-From:   huaweicloud <zhangxiaoxu@huaweicloud.com>
-In-Reply-To: <e62b79c6-762c-2d4e-cca6-181eb1520409@talpey.com>
+Subject: Re: smbd_max_receive_size == 8192?
+Content-Language: en-US
+From:   Tom Talpey <tom@talpey.com>
+To:     Long Li <longli@microsoft.com>
+References: <4a349c98-0359-acc9-0d6f-0ccac6f53377@talpey.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+In-Reply-To: <4a349c98-0359-acc9-0d6f-0ccac6f53377@talpey.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgC3eopywQ5jIZuhAA--.56473S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxuF45GryfJr4DuFWUWF4xXrb_yoWrZFWfpF
-        yvqFyDKrWrJr18Cw12yr1UW345Kw18Ww1DWr1DKa43J3Z0yF12gF48Wr90grnayr48Jr1j
-        qw4UtFy3Zry3Ar7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6r1j6r18M7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
-X-CM-SenderInfo: x2kd0wp0ld053x6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL0PR02CA0045.namprd02.prod.outlook.com
+ (2603:10b6:207:3d::22) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 65a809e9-95be-4712-f27b-08da8af53286
+X-MS-TrafficTypeDiagnostic: DM6PR01MB4619:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: silf4jt1JaxXVO1+R31h4EA1uCROcEeM4nwdL91omW3dAfq2wR5pyzFn5ZfxLLUlQATU+k4rGo7vGBrO/mHqwWXXLARIs1zxm6UYOrHyrhadHySGFwcEylnNzNvavm9jAeAdi1PFILKT7REI1HfqAZp+PorQwdqlv4VRhQMtlJFRFJp3+ZZzuggVpRlL1gsOVEx9Iwkf0Xz6fovgVcv/xdWxLa7C9EhyMjHPqA2vf04dvXOZj5Wm6vbH+6IWQBH5AjYl34oLAuK6ldl8ozS4lydft1G0AE9emaG9nEYW/RLZjUj572kO7gMdZHnK0nXGFOPjjVe7ebRO9d/N1mMQexaZ2kdiOKo48I+DYaLioSS8QWfYx4nZcsqLiVKTmDf98zYO1Ndk+6XIruQ/XMC14Sd7fdp1oETitcZjet34GwZHsNff6PvaDf6Go68hegFRXagZWeHtuVOvnWYScTeClW9/D+lOnyXyFm3PCCIAVrM7Cgo8UTjJke0mdC/7h42895nBBAxOkf/WB+IOecQ8Zazfc6X/5swcEFI5E7ygA3fGRzrfHOacAR8yBhgAKk58YIQPUlsWEq/Sw7bt6U5+s9KaTzarcHnz+OLGqqiuDAh3qm0zp7O5ZVqqUQtc1+GygwgX8Ocp2gFr7mBMupgHuEQ+antTjye/zWRI9um7KbnuliYPjL9TZLtVf40uPifrhxNjHDq49N0CkxOYVLVAtwIypeYhO5g30sG/57HXtZTrB/XvNhZedfrz9rpHFgfPCc8YVz+wGP0mlgZPt9DFKnpOecSeRMvX3SJ9pR0Tbvs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230016)(366004)(136003)(346002)(376002)(396003)(39830400003)(4326008)(8676002)(83380400001)(66556008)(66946007)(6486002)(316002)(478600001)(6916009)(66476007)(5660300002)(8936002)(2906002)(4744005)(31686004)(38100700002)(38350700002)(86362001)(31696002)(53546011)(36756003)(52116002)(26005)(6506007)(186003)(2616005)(41300700001)(6512007)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SjRpN1hoUG05TkZQakE1a0JrWXp2YjRZdmFENXM1NlV5czgwY1R3citpTUJF?=
+ =?utf-8?B?czJQdW9YbjNVd3dYbG9sTVpRUjNhc3dxUWxsNm5SaWZ4dHI3NEZEODcyNERn?=
+ =?utf-8?B?cE9MRC96WVY4cjZxZmU4OFk3aGlub1R6M3U0MVdTM1RENTlseW03UWRnUVlB?=
+ =?utf-8?B?ME01ME5CbmU2SEpJS0hWdzNXV2E4SVcrUTlzSHFXdTBzVU1CblliNE95UnNE?=
+ =?utf-8?B?QUFkZktnd0hSQVpCU0F1cUtPNVBQcGd6dHc5cFpUZGptV0lzTHlWWS83cVZM?=
+ =?utf-8?B?a1NLR0srdGxMMzQwQmVQQ0VML2dScmIwS2pvUUduT1VmcGtKaDNqKzFmM0Vj?=
+ =?utf-8?B?TzZvU1hITktYZTlFZ29ReXE1Ky94UUVVa3Rab3FDaTZMZkhrS0cvQTRkU0ZL?=
+ =?utf-8?B?aStHSmxScm1rQjB1VWFnc1Rlb3JnYWVDN3N4RTlVNlBRUXBSZXBFY1dGam5L?=
+ =?utf-8?B?bkVtSEcyZXorYTl3THNoYUNNeXowa1RoT3VSekw3WHllbE4rQ0VSbmFONG9i?=
+ =?utf-8?B?L0JVcEZmNTdTbDlJZko3YjVZNGRaaldVNzhxcEtLK1RkUDY1d0lJSyt1Z3JO?=
+ =?utf-8?B?elR3U1NrQTg4Ukl2SEo1WElCaEIxNzFKTTFoc2xlTURkL0J6bU9sOGpNSGw5?=
+ =?utf-8?B?em4wd2lLR0txblBkTnZXcTdFMzlkVE9JdVcyM0hHRFYrbGpGd1VzSHJ4Ni9C?=
+ =?utf-8?B?RExEM2R2ZVpzNC9nNEQ4Z1VRUUttMnNxMjdlamFZOWlPWTNFQ0NaZlNGbmNw?=
+ =?utf-8?B?eTNmN21PdVhpRnZzVmxZaEFHRkNwY0lsYkxicW1mVGUrYjZveDNZS09LaHRF?=
+ =?utf-8?B?VE1oSFdaVjA3aHVNVjJUd3F5ejZscVlRTktGRGh2RWVMcEExMEM2QkV0NzB0?=
+ =?utf-8?B?RUJNUkM5YzFxK21GUUUxRDY2V056UmZwRVI5QmszaFo1bW1TT0lUei9zdDh3?=
+ =?utf-8?B?ZGJyMGQzUEZWMUpoZUg2VmZYcHk2b3EyTmRGbGZWcitDT2R4RTY0VTNsQ2p4?=
+ =?utf-8?B?QktERHNwZklIa1lnUUV3L3RSWjE3eHpEVEJXSDVaR05WSTQ5QVI1QStNMTBi?=
+ =?utf-8?B?ZXhqcXBrL2hCdXVPYWYvRVQ4blFoN1FEeHROWGRjN3M5MEt1QU4rT2J3MEdZ?=
+ =?utf-8?B?UTNTVWZYa3JrTFh0OC8zYTBRc0RNZXhxL090OEdFK2R5aHh3STJzNUwvRDJ6?=
+ =?utf-8?B?ekN2NmdJdGVSM2hCcm1RNXlpejZGNTVPRFFNSCtDWEpNSkZHeW1LWndyQ2gw?=
+ =?utf-8?B?Wk5RSmsyVXA3L1B0R2pxejdBcWRxZjgvVFpwc0xjc2RUOERIdk5UbDhaMDdE?=
+ =?utf-8?B?R3ozbWJoK1Bud1BFQ0QwY0JNL0VPWnNVRFk0Q0ZTaVFmcGhhOHdYUHBXRUtG?=
+ =?utf-8?B?eGYwV0I5TzRDcm5ZUWhROHluWGZSbDhVc1NrUjBVMGJJMGRCREhXOGxsTDNJ?=
+ =?utf-8?B?d0tCQ3JiTnN0UFpvK2NvRHRhb0h5dEJjanR5Z05WbVR2MUpQLzN2Vm02OTlJ?=
+ =?utf-8?B?SlNmUVZVYTMrclc4RFkyR2xISzhlL2duUGZyd01DMFgxd3h2SWdlb09WbTNp?=
+ =?utf-8?B?b3haSXVBRGo3Y2JiYlpSWEtVWGtRZVhtdVp0ZEF5bkJ1dUMwTzVCWTdCVXlQ?=
+ =?utf-8?B?YlRQWURMbHBMTUZxdFByb0R5b09ma3VRZWhpaXFRVmJ5c1RPYms3aEEybFlt?=
+ =?utf-8?B?dno2c0tPUkFKY1pKM1c2STI1YURWNkVYZC9iU3ZpWjIrMXYwbXhIaitrRk1Q?=
+ =?utf-8?B?cm5vVjJaQmFiS1d3VldpYUF4U0pWMDAxSEpOeWd2RUQ1YStaRTF1N0xrRTEz?=
+ =?utf-8?B?ZUVBWVFWR0prZVZhWmswb2YyNzMxR0pYUmpPZnFnREZ2TjRrZ3hWUVZqRTEx?=
+ =?utf-8?B?RjRhdWZCTWtmMzNVR2c2ZEF3WHdxZDFvU1R6STRHb1Fxd2JIRlkwaHN1emQw?=
+ =?utf-8?B?WjJORnptVnVHV3lHSUkvcHFya25CZFpHTXJHZXJBTXJmVnJGVTltU0pqQVFO?=
+ =?utf-8?B?V1J1STlwckxUZkhNbWdyRUV3R0FmVi9na000c1JQcUFHZ3ZidmJ1ZFV5TEZ2?=
+ =?utf-8?B?M043MTdkbG1mRWQzMVNvZU9ncFI2OEV4Si9VQnp2NTEvYUtIbXYxVGhPd2p3?=
+ =?utf-8?Q?RW5g=3D?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 65a809e9-95be-4712-f27b-08da8af53286
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2022 02:04:54.7390
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zYQ1ox3GpTdDhxwXPU5YAr5tlCkHGp6xMcQGvzl/CT2RyPpBLBaaRLMbvmm+KplG
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB4619
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+...ping?
 
+I have since noticed that the smbdirect default max send size is 1364,
+so I'm even more confused on the 8192. And, ksmbd sets both sizes
+to 8192.
 
-在 2022/8/31 0:19, Tom Talpey 写道:
-> On 8/30/2022 10:30 AM, huaweicloud wrote:
->> I think the struct validate_negotiate_info_req is an variable-length array,
->> just for implement simple, defind as 4 in here.
+On 8/24/2022 11:44 AM, Tom Talpey wrote:
+> Long, I notice that smbdirect.c sets the max receive size to 8192.
+> It's tunable, but I'm curious why the default is so large. The
+> SMBDirect protocol normally limits its packets to 1364 bytes.
 > 
-> But that's my point. The code picks "4" arbitrarily, and that
-> number can change - as you discovered, it already did since
-> it used to be "3".
+> With an SMBDirect credit limit of 255, the present default allocates
+> over 500 pages/connection, in O(2) granularity, when 85 O(1) pages
+> would suffice. Kernel virtual mapping would also be greatly reduced
+> as buffers can be arranged to share, and never extend beyond, a page.
 > 
-> smb2pdu.h:
-> struct validate_negotiate_info_req {
->      __le32 Capabilities;
->      __u8   Guid[SMB2_CLIENT_GUID_SIZE];
->      __le16 SecurityMode;
->      __le16 DialectCount;
->      __le16 Dialects[4]; /* BB expand this if autonegotiate > 4 dialects */
-> } __packed;
-> 
-> I repeat my suggestion.
-> 
-> Alternatively, change the code to make it a variable array and
-> allocate it properly.
-Agreed with change it to variable-length array.
-
-Since the struct validate_negotiate_info_req also used by ksmbd and it not
-treat it as the variable-length array:
-
-int smb2_ioctl(struct ksmbd_work *work)
-{
-         case FSCTL_VALIDATE_NEGOTIATE_INFO:
-
-                if (in_buf_len < sizeof(struct validate_negotiate_info_req))
-                        return -EINVAL;
-}
-
-But in samba, treat it as the variable-length array:
-
-static NTSTATUS fsctl_validate_neg_info(TALLOC_CTX *mem_ctx,
-                                         struct tevent_context *ev,
-                                         struct smbXsrv_connection *conn,
-                                         DATA_BLOB *in_input,
-                                         uint32_t in_max_output,
-                                         DATA_BLOB *out_output,
-                                         bool *disconnect)
-{
-	in_num_dialects = SVAL(in_input->data, 0x16);
-
-	if (in_input->length < (0x18 + in_num_dialects*2)) {
-		return NT_STATUS_INVALID_PARAMETER;
-	}
-}
-
-now, I'm trying to make it to variable-length array,
-but this patch, just fix the wrong message length sent by cifs client.
-
-Thanks.
+> Any insight into the 8192? Thanks.
 > 
 > Tom.
 > 
->> According MS-SMB2, there really not define the length of the package, just
->> define the count of the dialects, but just send the needed data maybe more
->> appropriate.
->>
->> Thanks.
->>
->> 在 2022/8/30 22:03, Tom Talpey 写道:
->>> Wouldn't it be safer to just set the size, instead of implicitly
->>> assuming that there are 4 array elements?
->>>
->>>    inbuflen = sizeof(*pneg_inbuf) - sizeof(pneg_inbuf.Dialects) + sizeof(pneg_inbuf.Dialects[0]);
->>>
->>> Or, because it obviously works to send the extra bytes even
->>> though the DialectCount is just 1, just zero them out?
->>>
->>>    memset(pneg_inbuf.Dialects, 0, sizeof(pneg_inbuf.Dialects));
->>>    pneg_inbuf.Dialects[0] = cpu_to_le16(server->vals->protocol_id);
->>>
->>> Tom.
->>>
->>> On 8/30/2022 3:06 AM, huaweicloud wrote:
->>>> Hi Steve,
->>>>
->>>> Could you help to review this patch.
->>>>
->>>> Thanks,
->>>> Zhang Xiaoxu
->>>>
->>>> 在 2022/8/24 16:57, Zhang Xiaoxu 写道:
->>>>> Commit d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
->>>>> extend the dialects from 3 to 4, but forget to decrease the extended
->>>>> length when specific the dialect, then the message length is larger
->>>>> than expected.
->>>>>
->>>>> This maybe leak some info through network because not initialize the
->>>>> message body.
->>>>>
->>>>> After apply this patch, the VALIDATE_NEGOTIATE_INFO message length is
->>>>> reduced from 28 bytes to 26 bytes.
->>>>>
->>>>> Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
->>>>> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
->>>>> Cc: <stable@vger.kernel.org>
->>>>> ---
->>>>>   fs/cifs/smb2pdu.c | 4 ++--
->>>>>   1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
->>>>> index 1ecc2501c56f..3df7adc01fe5 100644
->>>>> --- a/fs/cifs/smb2pdu.c
->>>>> +++ b/fs/cifs/smb2pdu.c
->>>>> @@ -1162,9 +1162,9 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->>>>>           pneg_inbuf->Dialects[0] =
->>>>>               cpu_to_le16(server->vals->protocol_id);
->>>>>           pneg_inbuf->DialectCount = cpu_to_le16(1);
->>>>> -        /* structure is big enough for 3 dialects, sending only 1 */
->>>>> +        /* structure is big enough for 4 dialects, sending only 1 */
->>>>>           inbuflen = sizeof(*pneg_inbuf) -
->>>>> -                sizeof(pneg_inbuf->Dialects[0]) * 2;
->>>>> +                sizeof(pneg_inbuf->Dialects[0]) * 3;
->>>>>       }
->>>>>       rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
->>>>
->>>>
->>
->>
-
