@@ -2,108 +2,96 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD98ECAAD1
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 Aug 2022 23:36:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D37ECAAD1
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Sep 2022 03:24:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230480AbiHaXgZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 31 Aug 2022 19:36:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42192 "EHLO
+        id S229601AbiIADYB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 31 Aug 2022 23:24:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232069AbiHaXgX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 Aug 2022 19:36:23 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77696792F5
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 16:36:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 15055B823C0
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 23:36:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D34C433D7
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 23:36:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661988978;
-        bh=gWpkGeHSqfat7J3HJNSoiVixCVKafiPpsCxtK+zv5Qc=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=VKfaw2dCZgT8Bg4l7TpGFbxCuVYji8ZmUEkQkpsG++OUL0nt0PO86fnnls5CyG4N5
-         KtdH9OYYNw/Rojsg6TbPDou3txxrg6bBgzZTCAs1YCBZW1F+iwK2O2wa45AyXo/Zg3
-         DApCOQZ2BtDZFUMyB3jwQpgf0y5mvUPDaIUwwPgy8Qse73dY9ZoaM/uKQpl+rJvhSc
-         E6Jvq/c+eIWxUAdi6tPPo9qVFw9hlVKUbTqWtnUzYDRpDm+SugwhqGpQikzJuVWwVd
-         IBdTPXbVwRG6jLjg25xLFJDQzYuF9M1Y88U6oNHZx0btyx3NnHdSrIKCPWlyMfkjV7
-         Tu0KsNL9XTwWw==
-Received: by mail-oo1-f49.google.com with SMTP id t15-20020a4a96cf000000b0044e0142ec24so1504366ooi.8
-        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 16:36:18 -0700 (PDT)
-X-Gm-Message-State: ACgBeo1HiWkk2QkEyti4JTAglvFCkxsJGMQKBGoJCTsWi5uwAFyJ71JH
-        hKiwri+eLwC78jdvF8AJfuekUefZIcbp86ibiBU=
-X-Google-Smtp-Source: AA6agR6q1kg8YBdMBt4r9sVm9Sm+WR+T89ql4+I+Xg4diGwJ7Rhu5qjrxRRfd4VfP+H9vECLKqql40pl0Ah+naIz6OI=
-X-Received: by 2002:a05:6820:812:b0:44a:a398:893c with SMTP id
- bg18-20020a056820081200b0044aa398893cmr9813650oob.84.1661988977852; Wed, 31
- Aug 2022 16:36:17 -0700 (PDT)
+        with ESMTP id S229720AbiIADYA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 Aug 2022 23:24:00 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B1C155D73
+        for <linux-cifs@vger.kernel.org>; Wed, 31 Aug 2022 20:23:58 -0700 (PDT)
+Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MJ5r421tCzYcpg;
+        Thu,  1 Sep 2022 11:19:32 +0800 (CST)
+Received: from [10.174.176.83] (10.174.176.83) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 1 Sep 2022 11:23:56 +0800
+Message-ID: <f41f9dd3-e4b4-5a45-be58-799c1bf7271d@huawei.com>
+Date:   Thu, 1 Sep 2022 11:23:56 +0800
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Wed, 31 Aug 2022 16:36:17
- -0700 (PDT)
-In-Reply-To: <CANFS6bYYEtXPDQnmAKFujLPu_xO7zhtwhQ+kJqdkjjgKcvZLjQ@mail.gmail.com>
-References: <20220819043557.26745-1-hyc.lee@gmail.com> <CAKYAXd-18=_Yv1LAG=cqAQMORVD3mdA=9OP1t6+PxM+bUxLM2Q@mail.gmail.com>
- <CANFS6bZ1Xh+BTFDpWQdChcoY_5t5MwT5UMQ=tQupXmEeSO3kPw@mail.gmail.com>
- <CAKYAXd_Qd3jf_GwvzmZ+V+s--k-+T8HBD9HfvDvAesuv1vth2g@mail.gmail.com>
- <CANFS6ba3zUFW3Cju6zXiAoQ0jU_-oq=1EZLfwBCf9uGyqVzOKA@mail.gmail.com>
- <CAKYAXd9iP8h-rxju-JG9=9QJbVTpMqsMhySGMeZzHrkA4JnC_g@mail.gmail.com>
- <CANFS6bbMYjn9kw574vpKPj74Zs6oQYiCdPEknMbCQf77_30v6Q@mail.gmail.com>
- <CAKYAXd9yiTOg2FPtCtyZn+4fdCbXOU2edDk2L-9Vv5ehJ+w=jA@mail.gmail.com>
- <CANFS6bbwZDGhB4Dp+A192U=S1VfWa0091OBvmxhTB_C4BPz7sA@mail.gmail.com>
- <CAKYAXd_7p1gmV+3HZE9v+biUxRPzoNL7-cqRpfY8yCFHik7M5g@mail.gmail.com> <CANFS6bYYEtXPDQnmAKFujLPu_xO7zhtwhQ+kJqdkjjgKcvZLjQ@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 1 Sep 2022 08:36:17 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8tAtfEN9DTwAAUrwDn24tA=+jCPzsZMg32kwmftkg=hA@mail.gmail.com>
-Message-ID: <CAKYAXd8tAtfEN9DTwAAUrwDn24tA=+jCPzsZMg32kwmftkg=hA@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix incorrect handling of iterate_dir
-To:     Hyunchul Lee <hyc.lee@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH v2 0/3] Fix some bug in FSCTL_VALIDATE_NEGOTIATE_INFO
+ handler
+To:     Tom Talpey <tom@talpey.com>, <linux-cifs@vger.kernel.org>,
+        <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>,
+        <sprasad@microsoft.com>, <rohiths@microsoft.com>,
+        <smfrench@gmail.com>
+References: <20220831075255.2667077-1-zhangxiaoxu5@huawei.com>
+ <3b13302f-28b4-60b2-7f3e-0c62703ee7b7@talpey.com>
+From:   "zhangxiaoxu (A)" <zhangxiaoxu5@huawei.com>
+In-Reply-To: <3b13302f-28b4-60b2-7f3e-0c62703ee7b7@talpey.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.83]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500023.china.huawei.com (7.185.36.114)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
->
-> When I set the last entry of directory FAT chain to be invalid value in
-> exFAT,
-> the last getdents returns -EIO, but Samba sends responses without an error
-There seems to be an attempt to improve this in Samba as well.
-https://bugzilla.samba.org/show_bug.cgi?id=13718
 
->
->> >
->> >> There is no reason to follow it. I think that ksmbd is able to return
->> >> this error.
->> >
->> > Can we determine we should return a response with
->> > STATUS_FILE_CORRUPT_ERROR
->> > if iterate_dir returns -EIO?
->> STATUS_FILE_CORRUPT_ERROR is still not cleared. want to know how
->> windows server handle it.
->
-> In the above example, Windows server sends an empty SMB2_QUERY_DIRECTORY
-> response with STATUS_FILE_CORRUPT_ERROR.
->
-> And when executing "dir <directory>" in Windows terminal for the local
-> exFAT filesystem,
-> there are no files iterated and DirIOError is generated.
-This is the behavior I was expecting. ksmbd can handle this as well.
 
-Thanks.
->
->
->> >
->> > --
->> > Thanks,
->> > Hyunchul
->> >
->
->
->
-> --
-> Thanks,
-> Hyunchul
->
+在 2022/8/31 22:50, Tom Talpey 写道:
+> On 8/31/2022 3:52 AM, Zhang Xiaoxu wrote:
+>> v1->v2: fix some bug in ksmbd when handle FSCTL_VALIDATE_NEGOTIATE_INFO
+>>     message
+>>
+>> Zhang Xiaoxu (3):
+>>    cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO message
+>>    ksmbd: Remove the wrong message length check of
+>>      FSCTL_VALIDATE_NEGOTIATE_INFO
+>>    ksmbd: Fix wrong return value in smb2_ioctl() when wrong out_buf_len
+>>
+>>   fs/cifs/smb2pdu.c  | 4 ++--
+>>   fs/ksmbd/smb2pdu.c | 9 ++++-----
+>>   2 files changed, 6 insertions(+), 7 deletions(-)
+>>
+> 
+> Sorry but these are a NAK from me - they don't actually change
+> the definition to a variable-length array, they just attempt
+> to undo the broken "4", in several places. The real fix begins
+> in smbpdu.h in this line:
+>          __le16 Dialects[4]; --> Dialects[]
+This patchset just for fix the problems, the patches for refactor to
+variable-length array is on the way.
+> 
+> Also, the change to ksmbd is incorrect, it is critical to check
+> that the inbound buffer holds at least enough data to be able
+> to dereference the DialectCount, followed by a second check
+> that all the counted array elements are present. Also that
+> the outbound buffer is large enough to return a single dialect.
+The 'fsctl_validate_negotiate_info' function already check the inbound
+buffer length, so remove the wrong inbound check in 'smb2_ioctl',
+do you mean move the inbound check from 'fsctl_validate_negotiate_info'
+to 'smb2_ioctl'?
+
+7387 static int fsctl_validate_negotiate_info(struct ksmbd_conn *conn,                                                                                                                                                                         │  ksmbd_spnego_negtokeninit.as
+7388                                          struct validate_negotiate_info_req *neg_req,                                                                                                                                                     │  ksmbd_spnego_negtokeninit.as
+7389                                          struct validate_negotiate_info_rsp *neg_rsp,                                                                                                                                                     │  ksmbd_spnego_negtokentarg.as
+7390                                          unsigned int in_buf_len)                                                                                                                                                                         │  ksmbd_spnego_negtokentarg.as
+7391 {                                                                                                                                                                                                                                         │  ksmbd_spnego_negtokentarg.as
+7392         int ret = 0;                                                                                                                                                                                                                      │  ksmbd_spnego_negtokentarg.as
+7393         int dialect;                                                                                                                                                                                                                      │  ksmbd_work.c
+7394                                                                                                                                                                                                                                           │  ksmbd_work.h
+7395         if (in_buf_len < offsetof(struct validate_negotiate_info_req, Dialects) +                                                                                                                                                         │  ksmbd_work.o
+7396                         le16_to_cpu(neg_req->DialectCount) * sizeof(__le16))                                                                                                                                                              │  Makefile
+7397                 return -EINVAL;
+> 
+> Tom.
