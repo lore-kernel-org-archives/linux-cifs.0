@@ -2,126 +2,226 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04693C6FA8F
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Sep 2022 15:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D102C001B5
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Sep 2022 16:22:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236407AbiIBPPw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 2 Sep 2022 11:15:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37508 "EHLO
+        id S230257AbiIBQWO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 2 Sep 2022 12:22:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236409AbiIBPPc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Sep 2022 11:15:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390764333D
-        for <linux-cifs@vger.kernel.org>; Fri,  2 Sep 2022 07:47:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S234554AbiIBQWM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Sep 2022 12:22:12 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60D9FBFEA1
+        for <linux-cifs@vger.kernel.org>; Fri,  2 Sep 2022 09:22:11 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 355C861732
-        for <linux-cifs@vger.kernel.org>; Fri,  2 Sep 2022 14:47:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C61BC433C1
-        for <linux-cifs@vger.kernel.org>; Fri,  2 Sep 2022 14:47:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662130033;
-        bh=dQpkKtUxp10l09+3SexlkrIxFZH+TQLFA8wV2Iw+hTM=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=vBJuASqJqcKuBKfgFLTLo9d78AMxLoznPoUuEvawOfMWiXs10GID7CAVXhEnR6ogu
-         Gofc3HSNXI8Lgtmf9ChqHLQJyLcp+U/U01qKk/YwXBYs+CxAfgk6kmrG0esRV5gV2R
-         ZxyU1z/bmQFdqimEE4/N+/a5aWkifaxB7wW1IAhXXN7JOQUOaqCVY/eSVhxu4uh7hC
-         0saI2zlLaPTPAMeU7n4Ewp5NIkkSbtuxU1EefxPG7R1fG1BrBQ6K6Vdlu/ucucMrC+
-         GYM1msKOHQs7QEHG5BvSuNFZOrD2H3/9aw9KHA2ACUgBx5sSmH0PeS6MVTcwdZX6uW
-         HpRcDLYgwTFoQ==
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-11e9a7135easo5228358fac.6
-        for <linux-cifs@vger.kernel.org>; Fri, 02 Sep 2022 07:47:13 -0700 (PDT)
-X-Gm-Message-State: ACgBeo3b+t69sehYeL0izg8NGLg5Cre/G1fQymejtqnbOCFJJ3CffVN+
-        4tHFZsO86M6TRyS3zWCP0qatkF9fHGJvEgcA+fQ=
-X-Google-Smtp-Source: AA6agR6vBDX/R+UZGFhiQKf8A+COjg73boAaVbHdXQdiasQLQS2tggz5Ldbd1ZGo2NAb+6rWGrj7ctcBPv5IH/FwjHc=
-X-Received: by 2002:a05:6870:f69d:b0:10d:81ea:3540 with SMTP id
- el29-20020a056870f69d00b0010d81ea3540mr2461092oab.257.1662130032782; Fri, 02
- Sep 2022 07:47:12 -0700 (PDT)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id C46F434928;
+        Fri,  2 Sep 2022 16:22:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1662135729; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=XU1Jiv9EGrUx+9JG+mV2gvFKKJX5F7BNZUsA1nYY0bw=;
+        b=cinlv+0dIJOc+HPCSyAieJnX4XmBL2uWAavRJdXT1bxYEEcptyu7Ub7V5Jpj09r5p2R2EE
+        crlE3ID4Ekb9apv6113zAIl0ywW7VM6XAHuLcodwpEu6U0BQdRI+Bz8bm5M2F6+YiI7rDB
+        KKsA+m6fZThEO4uxO6xBAXGab9wlDz8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1662135729;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=XU1Jiv9EGrUx+9JG+mV2gvFKKJX5F7BNZUsA1nYY0bw=;
+        b=ZngOLMBCAe6fABH9iHiFrZwSmZb3DUeAE8G732WXzsu+GwbDwtyUh+PveOSXGcEus/lsad
+        yjIpoIgjGwUupPCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4860913328;
+        Fri,  2 Sep 2022 16:22:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 6ipeA7EtEmNtSQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Fri, 02 Sep 2022 16:22:09 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com
+Subject: [PATCH] cifs: fix some build warnings in file.c and smbencrypt.c
+Date:   Fri,  2 Sep 2022 13:21:55 -0300
+Message-Id: <20220902162155.8310-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Fri, 2 Sep 2022 07:47:12
- -0700 (PDT)
-In-Reply-To: <6cf00762-f446-490c-5e88-79382962e985@talpey.com>
-References: <20220901142413.3351804-1-zhangxiaoxu5@huawei.com>
- <20220901142413.3351804-3-zhangxiaoxu5@huawei.com> <6cf00762-f446-490c-5e88-79382962e985@talpey.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 2 Sep 2022 23:47:12 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_FioX1ivG_cv=QTehaTw0ecAQA_-H0Y13Aqbaq=hB=Zg@mail.gmail.com>
-Message-ID: <CAKYAXd_FioX1ivG_cv=QTehaTw0ecAQA_-H0Y13Aqbaq=hB=Zg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/5] ksmbd: Remove the wrong message length check of FSCTL_VALIDATE_NEGOTIATE_INFO
-To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-Cc:     Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        sfrench@samba.org, pc@cjr.nz, lsahlber@redhat.com,
-        sprasad@microsoft.com, rohiths@microsoft.com, smfrench@gmail.com,
-        hyc.lee@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-09-02 22:28 GMT+09:00, Tom Talpey <tom@talpey.com>:
-> On 9/1/2022 10:24 AM, Zhang Xiaoxu wrote:
->> The struct validate_negotiate_info_req change from variable-length array
->> to reguler array, but the message length check is unchanged.
->>
->> The fsctl_validate_negotiate_info() already check the message length, so
->> remove it from smb2_ioctl().
->>
->> Fixes: c7803b05f74b ("smb3: fix ksmbd bigendian bug in oplock break, and
-I think the fixes tag is wrong. Isn't the below correct?
-Fixes: f7db8fd03a4bc ("ksmbd: add validation in smb2_ioctl")
+Variable server is already declared in the beginning of
+_cifsFileInfo_put() and then again in the close case:
 
->> move its struct to smbfs_common")
->> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
->> Cc: <stable@vger.kernel.org>
->> ---
->>   fs/ksmbd/smb2pdu.c | 3 ---
->>   1 file changed, 3 deletions(-)
->>
->> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->> index c49f65146ab3..c9f400bbb814 100644
->> --- a/fs/ksmbd/smb2pdu.c
->> +++ b/fs/ksmbd/smb2pdu.c
->> @@ -7640,9 +7640,6 @@ int smb2_ioctl(struct ksmbd_work *work)
->>   			goto out;
->>   		}
->>
->> -		if (in_buf_len < sizeof(struct validate_negotiate_info_req))
->> -			return -EINVAL;
->> -
+> fs/cifs/file.c: In function ‘_cifsFileInfo_put’:
+> fs/cifs/file.c:537:41: error: declaration of ‘server’ shadows a previous local [-Werror=shadow]
+>   537 |                 struct TCP_Server_Info *server = tcon->ses->server;
+>       |                                         ^~~~~~
+> fs/cifs/file.c:487:33: note: shadowed declaration is here
+>   487 |         struct TCP_Server_Info *server = tcon->ses->server;
+
+Remove that second declaration since it has the same value.
+
+Also in cifs_setlk(), a struct cifsLockInfo is declared as "lock", same
+name as the function parameter:
+
+> fs/cifs/file.c:1815:38: error: declaration of ‘lock’ shadows a parameter [-Werror=shadow]
+> 1815 |                 struct cifsLockInfo *lock;
 >
-> This actually fixes a different bug, which the comment needs to mention.
-> The structure size includes 4 dialect slots, but the protocol does not
-> require the client to send all 4. So this allows the negotiation to not
-> fail. Which is good.
->
-> But there are two other issues now.
->
-> 1) The code no longer checks that a complete validate negotiate header
-> is present before dereferencing neg_req->DialectCount. This code will
-> fetch the DialectCount potentially beyond the end of an invalid short
-> packet:
->
->    fsctl_validate_negotiate_info():
->
->          if (in_buf_len < offsetof(struct validate_negotiate_info_req,
-> Dialects) +
->                          le16_to_cpu(neg_req->DialectCount) *
-> sizeof(__le16))
->                  return -EINVAL;
->
->          dialect = ksmbd_lookup_dialect_by_id(neg_req->Dialects,
->                                               neg_req->DialectCount);
->
-> 2) The DialectCount is an le16, which can be negative. A small invalid
-> negative value may pass this test and proceed to process the array,
-> which would be bad. This is an existing issue, but should be fixed
-> since you now need to correct the test anyway.
->
-> Tom.
->
->
->>   		if (out_buf_len < sizeof(struct validate_negotiate_info_rsp))
->>   			return -EINVAL; >
->
+> fs/cifs/file.c:1781:48: note: shadowed declaration is here
+>  1781 |            bool wait_flag, bool posix_lck, int lock, int unlock,
+>       |                                            ~~~~^~~~
+
+Rename the struct to "lock_info", move its declaration to top of
+function, and reverse the order of the lock/unlock checks, since in the
+unlock case, it's a single line call, and we can goto out earlier. No
+functional modifications though.
+
+Also remove the defines in top of smbencrypt.c
+(CVAL/SSVALX/SSVAL/true/false) since they're unused.
+
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/cifs/file.c       | 72 +++++++++++++++++++++-----------------------
+ fs/cifs/smbencrypt.c | 12 --------
+ 2 files changed, 34 insertions(+), 50 deletions(-)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index fa738adc031f..1af16d112967 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -534,7 +534,6 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
+ 		cancel_work_sync(&cifs_file->oplock_break) : false;
+ 
+ 	if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
+-		struct TCP_Server_Info *server = tcon->ses->server;
+ 		unsigned int xid;
+ 
+ 		xid = get_xid();
+@@ -1787,6 +1786,7 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
+ 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	struct inode *inode = d_inode(cfile->dentry);
++	struct cifsLockInfo *lock_info;
+ 
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+ 	if (posix_lck) {
+@@ -1811,48 +1811,44 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
+ 		goto out;
+ 	}
+ #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+-	if (lock) {
+-		struct cifsLockInfo *lock;
+-
+-		lock = cifs_lock_init(flock->fl_start, length, type,
+-				      flock->fl_flags);
+-		if (!lock)
+-			return -ENOMEM;
++	if (unlock) {
++		rc = server->ops->mand_unlock_range(cfile, flock, xid);
++		goto out;
++	}
+ 
+-		rc = cifs_lock_add_if(cfile, lock, wait_flag);
+-		if (rc < 0) {
+-			kfree(lock);
+-			return rc;
+-		}
+-		if (!rc)
+-			goto out;
++	/* lock == true */
++	lock_info = cifs_lock_init(flock->fl_start, length, type, flock->fl_flags);
++	if (!lock_info)
++		return -ENOMEM;
+ 
+-		/*
+-		 * Windows 7 server can delay breaking lease from read to None
+-		 * if we set a byte-range lock on a file - break it explicitly
+-		 * before sending the lock to the server to be sure the next
+-		 * read won't conflict with non-overlapted locks due to
+-		 * pagereading.
+-		 */
+-		if (!CIFS_CACHE_WRITE(CIFS_I(inode)) &&
+-					CIFS_CACHE_READ(CIFS_I(inode))) {
+-			cifs_zap_mapping(inode);
+-			cifs_dbg(FYI, "Set no oplock for inode=%p due to mand locks\n",
+-				 inode);
+-			CIFS_I(inode)->oplock = 0;
+-		}
++	rc = cifs_lock_add_if(cfile, lock_info, wait_flag);
++	if (rc < 0) {
++		kfree(lock_info);
++		return rc;
++	}
++	if (!rc)
++		goto out;
+ 
+-		rc = server->ops->mand_lock(xid, cfile, flock->fl_start, length,
+-					    type, 1, 0, wait_flag);
+-		if (rc) {
+-			kfree(lock);
+-			return rc;
+-		}
++	/*
++	 * Windows 7 server can delay breaking lease from read to None
++	 * if we set a byte-range lock on a file - break it explicitly
++	 * before sending the lock to the server to be sure the next
++	 * read won't conflict with non-overlapted locks due to
++	 * pagereading.
++	 */
++	if (!CIFS_CACHE_WRITE(CIFS_I(inode)) && CIFS_CACHE_READ(CIFS_I(inode))) {
++		cifs_zap_mapping(inode);
++		cifs_dbg(FYI, "Set no oplock for inode=%p due to mand locks\n", inode);
++		CIFS_I(inode)->oplock = 0;
++	}
+ 
+-		cifs_lock_add(cfile, lock);
+-	} else if (unlock)
+-		rc = server->ops->mand_unlock_range(cfile, flock, xid);
++	rc = server->ops->mand_lock(xid, cfile, flock->fl_start, length, type, 1, 0, wait_flag);
++	if (rc) {
++		kfree(lock_info);
++		return rc;
++	}
+ 
++	cifs_lock_add(cfile, lock_info);
+ out:
+ 	if ((flock->fl_flags & FL_POSIX) || (flock->fl_flags & FL_FLOCK)) {
+ 		/*
+diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+index 4a0487753869..0214092d2714 100644
+--- a/fs/cifs/smbencrypt.c
++++ b/fs/cifs/smbencrypt.c
+@@ -26,18 +26,6 @@
+ #include "cifsproto.h"
+ #include "../smbfs_common/md4.h"
+ 
+-#ifndef false
+-#define false 0
+-#endif
+-#ifndef true
+-#define true 1
+-#endif
+-
+-/* following came from the other byteorder.h to avoid include conflicts */
+-#define CVAL(buf,pos) (((unsigned char *)(buf))[pos])
+-#define SSVALX(buf,pos,val) (CVAL(buf,pos)=(val)&0xFF,CVAL(buf,pos+1)=(val)>>8)
+-#define SSVAL(buf,pos,val) SSVALX((buf),(pos),((__u16)(val)))
+-
+ /* produce a md4 message digest from data of length n bytes */
+ static int
+ mdfour(unsigned char *md4_hash, unsigned char *link_str, int link_len)
+-- 
+2.35.3
+
