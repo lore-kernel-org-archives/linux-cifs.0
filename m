@@ -2,226 +2,280 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D102C001B5
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Sep 2022 16:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3295BECAAD5
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Sep 2022 20:16:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230257AbiIBQWO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 2 Sep 2022 12:22:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33882 "EHLO
+        id S229565AbiIBUQb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 2 Sep 2022 16:16:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234554AbiIBQWM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Sep 2022 12:22:12 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60D9FBFEA1
-        for <linux-cifs@vger.kernel.org>; Fri,  2 Sep 2022 09:22:11 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id C46F434928;
-        Fri,  2 Sep 2022 16:22:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1662135729; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=XU1Jiv9EGrUx+9JG+mV2gvFKKJX5F7BNZUsA1nYY0bw=;
-        b=cinlv+0dIJOc+HPCSyAieJnX4XmBL2uWAavRJdXT1bxYEEcptyu7Ub7V5Jpj09r5p2R2EE
-        crlE3ID4Ekb9apv6113zAIl0ywW7VM6XAHuLcodwpEu6U0BQdRI+Bz8bm5M2F6+YiI7rDB
-        KKsA+m6fZThEO4uxO6xBAXGab9wlDz8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1662135729;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=XU1Jiv9EGrUx+9JG+mV2gvFKKJX5F7BNZUsA1nYY0bw=;
-        b=ZngOLMBCAe6fABH9iHiFrZwSmZb3DUeAE8G732WXzsu+GwbDwtyUh+PveOSXGcEus/lsad
-        yjIpoIgjGwUupPCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4860913328;
-        Fri,  2 Sep 2022 16:22:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 6ipeA7EtEmNtSQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Fri, 02 Sep 2022 16:22:09 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com
-Subject: [PATCH] cifs: fix some build warnings in file.c and smbencrypt.c
-Date:   Fri,  2 Sep 2022 13:21:55 -0300
-Message-Id: <20220902162155.8310-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.35.3
+        with ESMTP id S229468AbiIBUQa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Sep 2022 16:16:30 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735C4C12C9;
+        Fri,  2 Sep 2022 13:16:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662149789; x=1693685789;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=G1QyHL0Y+ZESOJ/0sIvIcNrwO+n+VamVBy4zwBJD12w=;
+  b=a1km6FVt1+hgzzgMPTdQ1MMR4hrOnDSimG7u3urvuPcuW8MW+1Je+a7/
+   ZnZIra4mt1mGvjdbpNZDk464XT1DiB4tm1m/JTeWGpXCcyFkH9T+W9RPX
+   t3Z2An2CVOW+dirRByJujyKyPQqtS9IQbeQsepfy0qH/kcDIKSYK/qZUq
+   kFqW9bNRYflc/L9fz5GiWADkkgIdnwNFmK9mY/iwjbhpF32DuKPHzlMpB
+   XLMFre6W9zCk0XDUqdQBfTyF/ZGGAApoo/Bwj/XEmddWVJ+Ig2Hux+REb
+   6XjakgbPGtVRJkELjK5D5CHDa1u24b5cB6vZfnYgKGkfo8/DeuHZnDu6h
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10458"; a="293662504"
+X-IronPort-AV: E=Sophos;i="5.93,285,1654585200"; 
+   d="scan'208";a="293662504"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 12:58:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,285,1654585200"; 
+   d="scan'208";a="643037848"
+Received: from lkp-server02.sh.intel.com (HELO 95dfd251caa2) ([10.239.97.151])
+  by orsmga008.jf.intel.com with ESMTP; 02 Sep 2022 12:58:20 -0700
+Received: from kbuild by 95dfd251caa2 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oUCnz-0000Yt-2J;
+        Fri, 02 Sep 2022 19:58:19 +0000
+Date:   Sat, 3 Sep 2022 03:57:42 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nilfs@vger.kernel.org, linux-mm@kvack.org,
+        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Subject: Re: [PATCH 14/23] f2fs: Convert f2fs_write_cache_pages() to use
+ filemap_get_folios_tag()
+Message-ID: <202209030346.t02z8VfY-lkp@intel.com>
+References: <20220901220138.182896-15-vishal.moola@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220901220138.182896-15-vishal.moola@gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Variable server is already declared in the beginning of
-_cifsFileInfo_put() and then again in the close case:
+Hi "Vishal,
 
-> fs/cifs/file.c: In function ‘_cifsFileInfo_put’:
-> fs/cifs/file.c:537:41: error: declaration of ‘server’ shadows a previous local [-Werror=shadow]
->   537 |                 struct TCP_Server_Info *server = tcon->ses->server;
->       |                                         ^~~~~~
-> fs/cifs/file.c:487:33: note: shadowed declaration is here
->   487 |         struct TCP_Server_Info *server = tcon->ses->server;
+Thank you for the patch! Yet something to improve:
 
-Remove that second declaration since it has the same value.
+[auto build test ERROR on jaegeuk-f2fs/dev-test]
+[also build test ERROR on kdave/for-next linus/master v6.0-rc3]
+[cannot apply to ceph-client/for-linus next-20220901]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Also in cifs_setlk(), a struct cifsLockInfo is declared as "lock", same
-name as the function parameter:
+url:    https://github.com/intel-lab-lkp/linux/commits/Vishal-Moola-Oracle/Convert-to-filemap_get_folios_tag/20220902-060430
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs.git dev-test
+config: hexagon-randconfig-r045-20220901 (https://download.01.org/0day-ci/archive/20220903/202209030346.t02z8VfY-lkp@intel.com/config)
+compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project c55b41d5199d2394dd6cdb8f52180d8b81d809d4)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/6c74320953cd3749db95f9f09c1fc7d044933635
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Vishal-Moola-Oracle/Convert-to-filemap_get_folios_tag/20220902-060430
+        git checkout 6c74320953cd3749db95f9f09c1fc7d044933635
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash fs/f2fs/
 
-> fs/cifs/file.c:1815:38: error: declaration of ‘lock’ shadows a parameter [-Werror=shadow]
-> 1815 |                 struct cifsLockInfo *lock;
->
-> fs/cifs/file.c:1781:48: note: shadowed declaration is here
->  1781 |            bool wait_flag, bool posix_lck, int lock, int unlock,
->       |                                            ~~~~^~~~
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-Rename the struct to "lock_info", move its declaration to top of
-function, and reverse the order of the lock/unlock checks, since in the
-unlock case, it's a single line call, and we can goto out earlier. No
-functional modifications though.
+All errors (new ones prefixed by >>):
 
-Also remove the defines in top of smbencrypt.c
-(CVAL/SSVALX/SSVAL/true/false) since they're unused.
+>> fs/f2fs/data.c:3016:18: error: use of undeclared identifier 'nr_pages'; did you mean 'dir_pages'?
+                                           &fbatch, i, nr_pages, true))
+                                                       ^~~~~~~~
+                                                       dir_pages
+   include/linux/pagemap.h:1404:29: note: 'dir_pages' declared here
+   static inline unsigned long dir_pages(struct inode *inode)
+                               ^
+>> fs/f2fs/data.c:3017:11: error: use of undeclared label 'lock_page'
+                                           goto lock_page;
+                                                ^
+   2 errors generated.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/cifs/file.c       | 72 +++++++++++++++++++++-----------------------
- fs/cifs/smbencrypt.c | 12 --------
- 2 files changed, 34 insertions(+), 50 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index fa738adc031f..1af16d112967 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -534,7 +534,6 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
- 		cancel_work_sync(&cifs_file->oplock_break) : false;
- 
- 	if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
--		struct TCP_Server_Info *server = tcon->ses->server;
- 		unsigned int xid;
- 
- 		xid = get_xid();
-@@ -1787,6 +1786,7 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
- 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct inode *inode = d_inode(cfile->dentry);
-+	struct cifsLockInfo *lock_info;
- 
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- 	if (posix_lck) {
-@@ -1811,48 +1811,44 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
- 		goto out;
- 	}
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
--	if (lock) {
--		struct cifsLockInfo *lock;
--
--		lock = cifs_lock_init(flock->fl_start, length, type,
--				      flock->fl_flags);
--		if (!lock)
--			return -ENOMEM;
-+	if (unlock) {
-+		rc = server->ops->mand_unlock_range(cfile, flock, xid);
-+		goto out;
-+	}
- 
--		rc = cifs_lock_add_if(cfile, lock, wait_flag);
--		if (rc < 0) {
--			kfree(lock);
--			return rc;
--		}
--		if (!rc)
--			goto out;
-+	/* lock == true */
-+	lock_info = cifs_lock_init(flock->fl_start, length, type, flock->fl_flags);
-+	if (!lock_info)
-+		return -ENOMEM;
- 
--		/*
--		 * Windows 7 server can delay breaking lease from read to None
--		 * if we set a byte-range lock on a file - break it explicitly
--		 * before sending the lock to the server to be sure the next
--		 * read won't conflict with non-overlapted locks due to
--		 * pagereading.
--		 */
--		if (!CIFS_CACHE_WRITE(CIFS_I(inode)) &&
--					CIFS_CACHE_READ(CIFS_I(inode))) {
--			cifs_zap_mapping(inode);
--			cifs_dbg(FYI, "Set no oplock for inode=%p due to mand locks\n",
--				 inode);
--			CIFS_I(inode)->oplock = 0;
--		}
-+	rc = cifs_lock_add_if(cfile, lock_info, wait_flag);
-+	if (rc < 0) {
-+		kfree(lock_info);
-+		return rc;
-+	}
-+	if (!rc)
-+		goto out;
- 
--		rc = server->ops->mand_lock(xid, cfile, flock->fl_start, length,
--					    type, 1, 0, wait_flag);
--		if (rc) {
--			kfree(lock);
--			return rc;
--		}
-+	/*
-+	 * Windows 7 server can delay breaking lease from read to None
-+	 * if we set a byte-range lock on a file - break it explicitly
-+	 * before sending the lock to the server to be sure the next
-+	 * read won't conflict with non-overlapted locks due to
-+	 * pagereading.
-+	 */
-+	if (!CIFS_CACHE_WRITE(CIFS_I(inode)) && CIFS_CACHE_READ(CIFS_I(inode))) {
-+		cifs_zap_mapping(inode);
-+		cifs_dbg(FYI, "Set no oplock for inode=%p due to mand locks\n", inode);
-+		CIFS_I(inode)->oplock = 0;
-+	}
- 
--		cifs_lock_add(cfile, lock);
--	} else if (unlock)
--		rc = server->ops->mand_unlock_range(cfile, flock, xid);
-+	rc = server->ops->mand_lock(xid, cfile, flock->fl_start, length, type, 1, 0, wait_flag);
-+	if (rc) {
-+		kfree(lock_info);
-+		return rc;
-+	}
- 
-+	cifs_lock_add(cfile, lock_info);
- out:
- 	if ((flock->fl_flags & FL_POSIX) || (flock->fl_flags & FL_FLOCK)) {
- 		/*
-diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-index 4a0487753869..0214092d2714 100644
---- a/fs/cifs/smbencrypt.c
-+++ b/fs/cifs/smbencrypt.c
-@@ -26,18 +26,6 @@
- #include "cifsproto.h"
- #include "../smbfs_common/md4.h"
- 
--#ifndef false
--#define false 0
--#endif
--#ifndef true
--#define true 1
--#endif
--
--/* following came from the other byteorder.h to avoid include conflicts */
--#define CVAL(buf,pos) (((unsigned char *)(buf))[pos])
--#define SSVALX(buf,pos,val) (CVAL(buf,pos)=(val)&0xFF,CVAL(buf,pos+1)=(val)>>8)
--#define SSVAL(buf,pos,val) SSVALX((buf),(pos),((__u16)(val)))
--
- /* produce a md4 message digest from data of length n bytes */
- static int
- mdfour(unsigned char *md4_hash, unsigned char *link_str, int link_len)
+vim +3016 fs/f2fs/data.c
+
+  2908	
+  2909	/*
+  2910	 * This function was copied from write_cche_pages from mm/page-writeback.c.
+  2911	 * The major change is making write step of cold data page separately from
+  2912	 * warm/hot data page.
+  2913	 */
+  2914	static int f2fs_write_cache_pages(struct address_space *mapping,
+  2915						struct writeback_control *wbc,
+  2916						enum iostat_type io_type)
+  2917	{
+  2918		int ret = 0;
+  2919		int done = 0, retry = 0;
+  2920		struct folio_batch fbatch;
+  2921		struct f2fs_sb_info *sbi = F2FS_M_SB(mapping);
+  2922		struct bio *bio = NULL;
+  2923		sector_t last_block;
+  2924	#ifdef CONFIG_F2FS_FS_COMPRESSION
+  2925		struct inode *inode = mapping->host;
+  2926		struct compress_ctx cc = {
+  2927			.inode = inode,
+  2928			.log_cluster_size = F2FS_I(inode)->i_log_cluster_size,
+  2929			.cluster_size = F2FS_I(inode)->i_cluster_size,
+  2930			.cluster_idx = NULL_CLUSTER,
+  2931			.rpages = NULL,
+  2932			.nr_rpages = 0,
+  2933			.cpages = NULL,
+  2934			.valid_nr_cpages = 0,
+  2935			.rbuf = NULL,
+  2936			.cbuf = NULL,
+  2937			.rlen = PAGE_SIZE * F2FS_I(inode)->i_cluster_size,
+  2938			.private = NULL,
+  2939		};
+  2940	#endif
+  2941		int nr_folios;
+  2942		pgoff_t index;
+  2943		pgoff_t end;		/* Inclusive */
+  2944		pgoff_t done_index;
+  2945		int range_whole = 0;
+  2946		xa_mark_t tag;
+  2947		int nwritten = 0;
+  2948		int submitted = 0;
+  2949		int i;
+  2950	
+  2951		folio_batch_init(&fbatch);
+  2952	
+  2953		if (get_dirty_pages(mapping->host) <=
+  2954					SM_I(F2FS_M_SB(mapping))->min_hot_blocks)
+  2955			set_inode_flag(mapping->host, FI_HOT_DATA);
+  2956		else
+  2957			clear_inode_flag(mapping->host, FI_HOT_DATA);
+  2958	
+  2959		if (wbc->range_cyclic) {
+  2960			index = mapping->writeback_index; /* prev offset */
+  2961			end = -1;
+  2962		} else {
+  2963			index = wbc->range_start >> PAGE_SHIFT;
+  2964			end = wbc->range_end >> PAGE_SHIFT;
+  2965			if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX)
+  2966				range_whole = 1;
+  2967		}
+  2968		if (wbc->sync_mode == WB_SYNC_ALL || wbc->tagged_writepages)
+  2969			tag = PAGECACHE_TAG_TOWRITE;
+  2970		else
+  2971			tag = PAGECACHE_TAG_DIRTY;
+  2972	retry:
+  2973		retry = 0;
+  2974		if (wbc->sync_mode == WB_SYNC_ALL || wbc->tagged_writepages)
+  2975			tag_pages_for_writeback(mapping, index, end);
+  2976		done_index = index;
+  2977		while (!done && !retry && (index <= end)) {
+  2978			nr_folios = filemap_get_folios_tag(mapping, &index, end,
+  2979					tag, &fbatch);
+  2980			if (nr_folios == 0)
+  2981				break;
+  2982	
+  2983			for (i = 0; i < nr_folios; i++) {
+  2984				struct folio *folio = fbatch.folios[i];
+  2985				bool need_readd;
+  2986	readd:
+  2987				need_readd = false;
+  2988	#ifdef CONFIG_F2FS_FS_COMPRESSION
+  2989				if (f2fs_compressed_file(inode)) {
+  2990					void *fsdata = NULL;
+  2991					struct page *pagep;
+  2992					int ret2;
+  2993	
+  2994					ret = f2fs_init_compress_ctx(&cc);
+  2995					if (ret) {
+  2996						done = 1;
+  2997						break;
+  2998					}
+  2999	
+  3000					if (!f2fs_cluster_can_merge_page(&cc,
+  3001									folio->index)) {
+  3002						ret = f2fs_write_multi_pages(&cc,
+  3003							&submitted, wbc, io_type);
+  3004						if (!ret)
+  3005							need_readd = true;
+  3006						goto result;
+  3007					}
+  3008	
+  3009					if (unlikely(f2fs_cp_error(sbi)))
+  3010						goto lock_folio;
+  3011	
+  3012					if (!f2fs_cluster_is_empty(&cc))
+  3013						goto lock_folio;
+  3014	
+  3015					if (f2fs_all_cluster_page_ready(&cc,
+> 3016						&fbatch, i, nr_pages, true))
+> 3017						goto lock_page;
+  3018	
+  3019					ret2 = f2fs_prepare_compress_overwrite(
+  3020								inode, &pagep,
+  3021								folio->index, &fsdata);
+  3022					if (ret2 < 0) {
+  3023						ret = ret2;
+  3024						done = 1;
+  3025						break;
+  3026					} else if (ret2 &&
+  3027						(!f2fs_compress_write_end(inode,
+  3028							fsdata, folio->index, 1) ||
+  3029						 !f2fs_all_cluster_page_ready(&cc,
+  3030							&fbatch, i, nr_folios,
+  3031							false))) {
+  3032						retry = 1;
+  3033						break;
+  3034					}
+  3035				}
+  3036	#endif
+  3037				/* give a priority to WB_SYNC threads */
+  3038				if (atomic_read(&sbi->wb_sync_req[DATA]) &&
+  3039						wbc->sync_mode == WB_SYNC_NONE) {
+  3040					done = 1;
+  3041					break;
+  3042				}
+  3043	#ifdef CONFIG_F2FS_FS_COMPRESSION
+  3044	lock_folio:
+  3045	#endif
+  3046				done_index = folio->index;
+  3047	retry_write:
+  3048				folio_lock(folio);
+  3049	
+  3050				if (unlikely(folio->mapping != mapping)) {
+  3051	continue_unlock:
+  3052					folio_unlock(folio);
+  3053					continue;
+  3054				}
+  3055	
+  3056				if (!folio_test_dirty(folio)) {
+  3057					/* someone wrote it for us */
+  3058					goto continue_unlock;
+  3059				}
+  3060	
+  3061				if (folio_test_writeback(folio)) {
+  3062					if (wbc->sync_mode != WB_SYNC_NONE)
+  3063						f2fs_wait_on_page_writeback(
+  3064								&folio->page,
+  3065								DATA, true, true);
+  3066					else
+  3067						goto continue_unlock;
+  3068				}
+  3069	
+  3070				if (!folio_clear_dirty_for_io(folio))
+  3071					goto continue_unlock;
+  3072	
+
 -- 
-2.35.3
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
