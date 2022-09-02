@@ -2,131 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07DEFECAAD3
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Sep 2022 00:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8209ECAAD2
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Sep 2022 00:44:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233222AbiIBAal (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 1 Sep 2022 20:30:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38336 "EHLO
+        id S234011AbiIBAom (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 1 Sep 2022 20:44:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbiIBAak (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Sep 2022 20:30:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A78C7E339
-        for <linux-cifs@vger.kernel.org>; Thu,  1 Sep 2022 17:30:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662078638;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rDZu8IIo6FPE/pW88XoO5299clxnp4rO8KLGZtj/WqU=;
-        b=SPnSpBmz3dWRGHk08CSHlBzjJDq7+mtW/d+7qLjJJnwGiidMm6scgqqe/YuddU+CId6PTe
-        vnZVtc+4KIiLzuUXXxlQoz6eD0FiAMT8MlvYSm11WfGJQA5pMi8B4vDvg6cgY8VYW7/QmX
-        p3+dscZ8DYZxxpYhhwgYMNmQNMXHmD0=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-539-CGcXKEc2OcGgEwhPzykCJQ-1; Thu, 01 Sep 2022 20:30:37 -0400
-X-MC-Unique: CGcXKEc2OcGgEwhPzykCJQ-1
-Received: by mail-io1-f71.google.com with SMTP id y10-20020a5d914a000000b00688fa7b2252so376618ioq.0
-        for <linux-cifs@vger.kernel.org>; Thu, 01 Sep 2022 17:30:37 -0700 (PDT)
+        with ESMTP id S234280AbiIBAol (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Sep 2022 20:44:41 -0400
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77A6A2237;
+        Thu,  1 Sep 2022 17:44:40 -0700 (PDT)
+Received: by mail-vk1-xa2a.google.com with SMTP id j11so303104vkl.12;
+        Thu, 01 Sep 2022 17:44:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc;
+        bh=fRLBFK8FTp9/th4AtAcZFMkcxHRqZ1ZriRJ83e9dXnw=;
+        b=DTfoXy/JvcwA1X3Zr91XtH6ZHn7GAS5vARVA2fF2otqdm34xh5tMiIz+1eMIdrEhTc
+         SbaESz9D16t98mDVdE0Xiyk8AiOzaZ/Av9CcPVnmQwxnzkLG47rj+Ox932Pr2QjRXoxQ
+         uN9/HU6c2wXgUel8fewcmS15U7eo5j+kNF3lhzPVK0Qx5OtR7COqjCtckX9oZTy96OeA
+         QSgjFImUQC+BN6kokeZg4ehl8G5I2ulFr1GIR1VTsSjr2o4O+P1Nu/3z640QHZwedK4U
+         Xb7aidlGfJzUdzqjHDQC1/SF9shYtdzPsvn8qu3NrHw7zD8TuXdoNOJKptdBs++AlvE4
+         tzUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=rDZu8IIo6FPE/pW88XoO5299clxnp4rO8KLGZtj/WqU=;
-        b=TjEywjLyxh/AAUTuN1KwyiKAaX+Lp4GdiYfq83wSPwo5f3MDLHqosSMlRwvA0Ol/Oz
-         0/E//FWbZNi6jsHILHp1Q7DFKCc+lnwdr1hq0WM4vCepV/1HZOI9CqKy1JJUGFQigeip
-         isTlPXtgtxKcYBHFdKxP0WoCDqGN1isoyo4MQZ0pl6zKizQSBPDe3GuZ7rW/j5BbZ+Bn
-         5kvyDRS4SROYbBUdBvo1sRyh1pok0x52P2d/QMhUNk7zjw0UHzmt8dk+9yCDq4weTO4W
-         cfw9h+L540F1LAq5oogNHGSchltkTAstc6tAxZ9oh8s+KRv/G9va8QinAB4b/ygaLjY6
-         XQWA==
-X-Gm-Message-State: ACgBeo25gYapbM+HpFEKblSmBNEszjh5G+JIhEk3MKItpWeviFtmC7rY
-        sQ8ZTAk6iMSkqq2kCwla3tyxpS+8hYee3r/PhBeQ8lGPOm2O0RBh4RESPQe6ruJlI1OmHGFouWD
-        mErUJzxbUBIeT626J5dAryIYozUhcZqNf1j9M5Q==
-X-Received: by 2002:a05:6e02:1566:b0:2e5:a1e7:7e15 with SMTP id k6-20020a056e02156600b002e5a1e77e15mr18070499ilu.122.1662078637323;
-        Thu, 01 Sep 2022 17:30:37 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6GNEbo0HFrxRlkS8cFvm/4EqoJtG46l3ycAfgK47CcGAB1FjQ4c1MCzUsZ6rBC4gPoPrJawBhcVFjyIgvAjTc=
-X-Received: by 2002:a05:6e02:1566:b0:2e5:a1e7:7e15 with SMTP id
- k6-20020a056e02156600b002e5a1e77e15mr18070485ilu.122.1662078637075; Thu, 01
- Sep 2022 17:30:37 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc;
+        bh=fRLBFK8FTp9/th4AtAcZFMkcxHRqZ1ZriRJ83e9dXnw=;
+        b=RZwuez+xtUSqlTOszdT5cADvo9fusdBNm2YdMh2hNy+TkTnQPOD9/x+JXPsy/LWIpO
+         DjvIfO0xQDmib1r1pfgQjoWwjuOxCZhFkqp8U2PlANVhh8pZCA8NjIMQkQvrYTIanIt6
+         43m0ZdJi/AboPBoYqxSjd/sFnlgegZW6hQehjblALrNQTQOXtCzbwJqcnyfEFMC5gNhz
+         K0maBCyD2qKSv+vn5ypXbfasppbEPy7uMKEHRtqp0GUt5hvmZb1h3au62UE6t2CK+LZ0
+         oXQQeJnEvW1Blb3IyAaAhHxqXsaDs3mj9KjPm7CkmJoEemgWuIYOAXQRcq/V8A/ZO/vR
+         rJQA==
+X-Gm-Message-State: ACgBeo0+XvXPLPKhKg5aPVUiZLgzHVK7yfGcSPNuXOEjuqV7WboYDVlW
+        R92ryrxrPGYIgWbIcyMBQ7p+ZgT8vQIMxj5WlNMxeqySZSI=
+X-Google-Smtp-Source: AA6agR4Ye51m7JdY4c4tfZt7S84Sa6CaPKtp2LwBLyVA77ithUcnK8sJI3qDhmSnFKzRpv2YO8OhEgJHjZ2gaE85Ht4=
+X-Received: by 2002:a1f:51c2:0:b0:37c:f131:e749 with SMTP id
+ f185-20020a1f51c2000000b0037cf131e749mr9234886vkb.38.1662079479624; Thu, 01
+ Sep 2022 17:44:39 -0700 (PDT)
 MIME-Version: 1.0
-References: <Yk9V/03wgdYi65Lb@casper.infradead.org> <Yk5W6zvvftOB+80D@casper.infradead.org>
- <164928615045.457102.10607899252434268982.stgit@warthog.procyon.org.uk>
- <164928630577.457102.8519251179327601178.stgit@warthog.procyon.org.uk>
- <469869.1649313707@warthog.procyon.org.uk> <3118843.1650888461@warthog.procyon.org.uk>
- <YmaUUezsM+AS5R4y@casper.infradead.org>
-In-Reply-To: <YmaUUezsM+AS5R4y@casper.infradead.org>
-From:   David Wysochanski <dwysocha@redhat.com>
-Date:   Thu, 1 Sep 2022 20:30:01 -0400
-Message-ID: <CALF+zOnWkEHAmGfEcGccgL8dJw1U3sPSQ1iYndqMB885k9f_eA@mail.gmail.com>
-Subject: Re: [PATCH 14/14] mm, netfs, fscache: Stop read optimisation when
- folio removed from pagecache
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        linux-cachefs <linux-cachefs@redhat.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, Daire Byrne <daire.byrne@gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 1 Sep 2022 19:44:29 -0500
+Message-ID: <CAH2r5mt_+2zK_y3mdqkbQQ9YSK_2cvKzzLTGWjx7Jd0w55gNFQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Apr 25, 2022 at 8:30 AM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Mon, Apr 25, 2022 at 01:07:41PM +0100, David Howells wrote:
-> > Matthew Wilcox <willy@infradead.org> wrote:
-> >
-> > > OK.  You suggested that releasepage was an acceptable place to call it.
-> > > How about we have AS_RELEASE_ALL (... or something ...) and then
-> > > page_has_private() becomes a bit more complicated ... to the point
-> > > where we should probably get rid of it (by embedding it into
-> > > filemap_release_folio():
-> >
-> > I'm not sure page_has_private() is quite so easy to get rid of.
-> > shrink_page_list() and collapse_file(), for example, use it to conditionalise
-> > a call to try_to_release_page() plus some other bits.
->
-> That's what I was saying.  Make the calls to try_to_release_page()
-> unconditional and delete page_has_private() because it only confuses
-> people who should actually be using PagePrivate().
->
-> > I think that, for the moment, I would need to add a check for AS_RELEASE_ALL
-> > to page_has_private().
-> >
-> > David
-> >
-> >
->
+Please pull the following changes since commit
+b90cb1053190353cc30f0fef0ef1f378ccc063c5:
 
-I am not sure what the next steps are here but I wanted to ping about
-this patch.  NFS also needs this patch or something like it.  David are
-you planning to submit an updated series with an updated patch?
+  Linux 6.0-rc3 (2022-08-28 15:05:29 -0700)
 
-A partial backport of David's original patch here on top of my v3 NFS
-netfs conversion patches [1] resolves one of my unit test failures
-where there were extra reads from the network instead of the cache.
-Also Daire Byrne indicates that he too was seeing the same thing
-and he tested my patches below and it resolved his issue as well.
-Note that I needed another netfs patch in this series,
-"netfs: Provide invalidatepage and releasepage calls"
-on top of this one, to resolve the problem.
+are available in the Git repository at:
 
-[1] https://github.com/DaveWysochanskiRH/kernel/commits/nfs-fscache-netfs-removing-folio
-$ git log --oneline | head
-ad90bddf6570 NFS: Add usage of new VFS API removing folio
-9e2a7c301564 mm,netfs: Add removing_folio() to stop netfs read
-optimization (TEST ONLY)
-776088910162 netfs: Provide invalidatepage and releasepage calls
-8aa1379ceb49 NFS: Convert buffered read paths to use netfs when
-fscache is enabled
-807808d87040 NFS: Configure support for netfs when NFS fscache is configured
-43a41cce491d NFS: Rename readpage_async_filler to nfs_pageio_add_page
-b90cb1053190 Linux 6.0-rc3
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.0-rc3-smb3-client-fixes
 
+for you to fetch changes up to 27893dfc1285f80f80f46b3b8c95f5d15d2e66d0:
+
+  cifs: fix small mempool leak in SMB2_negotiate() (2022-08-30 20:08:13 -0500)
+
+----------------------------------------------------------------
+5 cifs/smb3 fixes, all also for stable
+- fixes for collapse range and insert range (also fixes xfstest generic/031)
+- memory leak fix
+----------------------------------------------------------------
+David Howells (2):
+      smb3: Move the flush out of smb2_copychunk_range() into its callers
+      smb3: fix temporary data corruption in insert range
+
+Enzo Matsumiya (1):
+      cifs: fix small mempool leak in SMB2_negotiate()
+
+Steve French (2):
+      smb3: fix temporary data corruption in collapse range
+      smb3: use filemap_write_and_wait_range instead of filemap_write_and_wait
+
+ fs/cifs/cifsfs.c  |  6 +++++
+ fs/cifs/smb2ops.c | 69 +++++++++++++++++++++++++++++++++----------------------
+ fs/cifs/smb2pdu.c | 12 ++++++----
+ 3 files changed, 55 insertions(+), 32 deletions(-)
+
+-- 
+Thanks,
+
+Steve
