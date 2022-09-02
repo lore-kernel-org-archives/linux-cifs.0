@@ -2,95 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8209ECAAD2
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Sep 2022 00:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9608AECAAD2
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Sep 2022 00:57:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234011AbiIBAom (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 1 Sep 2022 20:44:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58156 "EHLO
+        id S234332AbiIBA5K (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 1 Sep 2022 20:57:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234280AbiIBAol (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Sep 2022 20:44:41 -0400
-Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77A6A2237;
-        Thu,  1 Sep 2022 17:44:40 -0700 (PDT)
-Received: by mail-vk1-xa2a.google.com with SMTP id j11so303104vkl.12;
-        Thu, 01 Sep 2022 17:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc;
-        bh=fRLBFK8FTp9/th4AtAcZFMkcxHRqZ1ZriRJ83e9dXnw=;
-        b=DTfoXy/JvcwA1X3Zr91XtH6ZHn7GAS5vARVA2fF2otqdm34xh5tMiIz+1eMIdrEhTc
-         SbaESz9D16t98mDVdE0Xiyk8AiOzaZ/Av9CcPVnmQwxnzkLG47rj+Ox932Pr2QjRXoxQ
-         uN9/HU6c2wXgUel8fewcmS15U7eo5j+kNF3lhzPVK0Qx5OtR7COqjCtckX9oZTy96OeA
-         QSgjFImUQC+BN6kokeZg4ehl8G5I2ulFr1GIR1VTsSjr2o4O+P1Nu/3z640QHZwedK4U
-         Xb7aidlGfJzUdzqjHDQC1/SF9shYtdzPsvn8qu3NrHw7zD8TuXdoNOJKptdBs++AlvE4
-         tzUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc;
-        bh=fRLBFK8FTp9/th4AtAcZFMkcxHRqZ1ZriRJ83e9dXnw=;
-        b=RZwuez+xtUSqlTOszdT5cADvo9fusdBNm2YdMh2hNy+TkTnQPOD9/x+JXPsy/LWIpO
-         DjvIfO0xQDmib1r1pfgQjoWwjuOxCZhFkqp8U2PlANVhh8pZCA8NjIMQkQvrYTIanIt6
-         43m0ZdJi/AboPBoYqxSjd/sFnlgegZW6hQehjblALrNQTQOXtCzbwJqcnyfEFMC5gNhz
-         K0maBCyD2qKSv+vn5ypXbfasppbEPy7uMKEHRtqp0GUt5hvmZb1h3au62UE6t2CK+LZ0
-         oXQQeJnEvW1Blb3IyAaAhHxqXsaDs3mj9KjPm7CkmJoEemgWuIYOAXQRcq/V8A/ZO/vR
-         rJQA==
-X-Gm-Message-State: ACgBeo0+XvXPLPKhKg5aPVUiZLgzHVK7yfGcSPNuXOEjuqV7WboYDVlW
-        R92ryrxrPGYIgWbIcyMBQ7p+ZgT8vQIMxj5WlNMxeqySZSI=
-X-Google-Smtp-Source: AA6agR4Ye51m7JdY4c4tfZt7S84Sa6CaPKtp2LwBLyVA77ithUcnK8sJI3qDhmSnFKzRpv2YO8OhEgJHjZ2gaE85Ht4=
-X-Received: by 2002:a1f:51c2:0:b0:37c:f131:e749 with SMTP id
- f185-20020a1f51c2000000b0037cf131e749mr9234886vkb.38.1662079479624; Thu, 01
- Sep 2022 17:44:39 -0700 (PDT)
+        with ESMTP id S234930AbiIBA5G (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Sep 2022 20:57:06 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5A95A4069
+        for <linux-cifs@vger.kernel.org>; Thu,  1 Sep 2022 17:57:01 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 213FCB82966
+        for <linux-cifs@vger.kernel.org>; Fri,  2 Sep 2022 00:57:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB814C433B5
+        for <linux-cifs@vger.kernel.org>; Fri,  2 Sep 2022 00:56:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662080218;
+        bh=iuto8mLG0kFMJVZHczUD1ADQgFGzSaJTYF8vQOTC/Gs=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=VQkNMI8SX59Rd0imQvPwrUwUZplulRDyZ0v1Gpi87SsrChTp7YGdD8Sk+qYVXoB4F
+         uFmdy7vDEhyhhPLRf0Td99Wf+/uDruFeTF1fRiWysBy1K7v9p7Y5dgUl9F98+zoWK9
+         hKwmYn8qdNgI0ixCQpzpkrJGSnMqAHMDwmmjuz0+fbk5rGVXMJrf7rEuOoOwVenbcv
+         UrJG1QZv4vr3mtyfYVqP8BV+bkA02g12zbi9idsSgQBbTZC7X1zu3gonfNf9uwkDP/
+         mseaMarHhvrNnwWhDSFytEP7+CiyvvJi0rhfB1OFnip2s5wzNgff4KCn5uNW4sHgzz
+         A6Mg0A6DWU2Ng==
+Received: by mail-oo1-f44.google.com with SMTP id q6-20020a4aa886000000b0044b06d0c453so134616oom.11
+        for <linux-cifs@vger.kernel.org>; Thu, 01 Sep 2022 17:56:58 -0700 (PDT)
+X-Gm-Message-State: ACgBeo0l1UPbcG3KO/6OHdEdwNOhsszDBFEjNaccfjvWmieBohNgwM7Q
+        ZWH+2M/gqAZoWl8o5utOt/txyu+Awk3bR1852vk=
+X-Google-Smtp-Source: AA6agR59RojMz500FY9wMkc+ZDTd6G4C7RpllKwE2pRYLUP/yeaNuBVMfPUG2iwbv/PAERq8xADzGEEGtpXeocXysuk=
+X-Received: by 2002:a4a:2243:0:b0:44a:e5cf:81e5 with SMTP id
+ z3-20020a4a2243000000b0044ae5cf81e5mr11797640ooe.44.1662080218037; Thu, 01
+ Sep 2022 17:56:58 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 1 Sep 2022 19:44:29 -0500
-Message-ID: <CAH2r5mt_+2zK_y3mdqkbQQ9YSK_2cvKzzLTGWjx7Jd0w55gNFQ@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Thu, 1 Sep 2022 17:56:57
+ -0700 (PDT)
+In-Reply-To: <YxEot6I5d4PWtrz9@jeremy-acer>
+References: <YxDaZxljVqC/4Riu@jeremy-acer> <20220901174108.24621-1-atteh.mailbox@gmail.com>
+ <YxD6SEN9/3rEWaNR@jeremy-acer> <CAN05THRgWMEejOMTozrf0F4sENxJEQYu2i-9CKWO+Qh0kvjveg@mail.gmail.com>
+ <CAH2r5mvUzbp8RcM7+XFbJsoiba964vpKQiMRmGeQovGabe+j=Q@mail.gmail.com> <YxEot6I5d4PWtrz9@jeremy-acer>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Fri, 2 Sep 2022 09:56:57 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8SSQ+GpL=Na0OSFxOGSy-r7TW8Q+X-ZLaH-uLZQ1XauQ@mail.gmail.com>
+Message-ID: <CAKYAXd8SSQ+GpL=Na0OSFxOGSy-r7TW8Q+X-ZLaH-uLZQ1XauQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ksmbd: update documentation
+To:     Jeremy Allison <jra@samba.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        atheik <atteh.mailbox@gmail.com>,
+        Hyeoncheol Lee <hyc.lee@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-b90cb1053190353cc30f0fef0ef1f378ccc063c5:
-
-  Linux 6.0-rc3 (2022-08-28 15:05:29 -0700)
-
-are available in the Git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.0-rc3-smb3-client-fixes
-
-for you to fetch changes up to 27893dfc1285f80f80f46b3b8c95f5d15d2e66d0:
-
-  cifs: fix small mempool leak in SMB2_negotiate() (2022-08-30 20:08:13 -0500)
-
-----------------------------------------------------------------
-5 cifs/smb3 fixes, all also for stable
-- fixes for collapse range and insert range (also fixes xfstest generic/031)
-- memory leak fix
-----------------------------------------------------------------
-David Howells (2):
-      smb3: Move the flush out of smb2_copychunk_range() into its callers
-      smb3: fix temporary data corruption in insert range
-
-Enzo Matsumiya (1):
-      cifs: fix small mempool leak in SMB2_negotiate()
-
-Steve French (2):
-      smb3: fix temporary data corruption in collapse range
-      smb3: use filemap_write_and_wait_range instead of filemap_write_and_wait
-
- fs/cifs/cifsfs.c  |  6 +++++
- fs/cifs/smb2ops.c | 69 +++++++++++++++++++++++++++++++++----------------------
- fs/cifs/smb2pdu.c | 12 ++++++----
- 3 files changed, 55 insertions(+), 32 deletions(-)
-
--- 
-Thanks,
-
-Steve
+2022-09-02 6:48 GMT+09:00, Jeremy Allison <jra@samba.org>:
+> On Thu, Sep 01, 2022 at 04:37:21PM -0500, Steve French wrote:
+>>
+>>I do like that Namjae et al made the format of the .conf file very similar
+>>to the format of Samba's smb.conf file though.   I realize there some
+>>users complain that there are too many smb.conf parameters for Samba,
+>>but he seemed to pick a reasonably subset of them for ksmbd.
+>>Samba is a much larger project with many more smb.conf parameters
+>>but it does reduce confusion making the parameter names similar
+>>where possible e.g. "workgroup", "guest account", (share) path, read only,
+>> etc.
+>>and fortunately the default directories for the two smb.conf files are
+>>different so at least the daemons don't use the same file.
+>
+> Sure, I think the formats and parameter names being as close
+> as possible is a great idea to allow users to move between
+> servers as they wish. But making the files the same name
+> is not a good idea.
+This is the first time I've heard that it is problem that ksmbd's
+config filename is same with samba's one. Reading the mail threads, I
+don't understand exactly what the real problem is... I thought that
+using same smb.conf name make users aware that it was forked from
+samba's one. I'm a little surprised, I thought that you will say that
+we should use the same name. This seems to contradict your previous
+opinion that ksmbd's dos attribute and stream xattr format should be
+the same with samba's one. It's not difficult to change config
+filename of ksmbd if you agree with it. If we think about adding the
+ksmbd integration feature in samba recently, I think it would be
+better to use the same name for future.
