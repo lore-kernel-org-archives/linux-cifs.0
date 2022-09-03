@@ -2,55 +2,56 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7082AC38145
-	for <linux-cifs@archiver.kernel.org>; Sat,  3 Sep 2022 17:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B72C38145
+	for <linux-cifs@archiver.kernel.org>; Sat,  3 Sep 2022 17:38:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231718AbiICRih (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 3 Sep 2022 13:38:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50682 "EHLO
+        id S231617AbiICRij (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 3 Sep 2022 13:38:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231867AbiICRiW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 3 Sep 2022 13:38:22 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F6C857264;
-        Sat,  3 Sep 2022 10:38:13 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id m7so7552773lfq.8;
-        Sat, 03 Sep 2022 10:38:13 -0700 (PDT)
+        with ESMTP id S232143AbiICRi0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 3 Sep 2022 13:38:26 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE9153D2B;
+        Sat,  3 Sep 2022 10:38:25 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id b19so5233073ljf.8;
+        Sat, 03 Sep 2022 10:38:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=Z1VGvcyPcxaVL7OhRrzeu9KO4THMsdUZs/+YFm2RijY=;
-        b=g2fHdxzAoAeKP5KVAxV0TRt4CMGPzwaKPOq9K1H43TxNUN7qx6e0EdQEhdSUX0KIc/
-         PpkV40H2pdOzFZnrqtKl4asBbiyXnCA0QTU2nPuVzDQwe0jpO9Mw2gtRAlz9nkilCH3H
-         LBi0okNtFk16pYaBWEvWGrtSqewJMJW6wgbC1J0MUYzwS7ZvZ/2k7Q4lrL9SnMad9f76
-         UEkIZPl1ryQa14KkcuS1lcJNfw0IHIDy+p5smTJlhOf/snvD8ouqd53byOlS4Cq1iDaw
-         bQ5BJS9c/ErnJpwhjKL4/aBwe6A1eIEcPPtQjNzPIchP1ouZInif6Qgxq7x1Z77qSIBE
-         rEeQ==
+        bh=xX2O58QMupv9rWIX/wz0TD9J8Ed7HqVnisBNPZl6V04=;
+        b=P/hsH1QKS4072Gai1EmOGCnjPTQWZiiOiE+P26T80mgV0tbTOnkDXKC3nEWi1Xoe/A
+         Hs7LLFSp+fCaJRWZVqv/8C2xzImMvLQoTDYUfx6u9PmIwXRQtB9n4gGmx+GH0S1f7zYT
+         EpKdDfbdqDAHgNmhwbrPGp06lVMfmsEbewBLDb/B+dQfW30xzF8F2l2F/gidKFJKBG6M
+         xlYX6S3WMrWsrSfVCDpCmKqprjSkUDidSKYHiXrhQ6jx9rWQ1os07RE+QbroswHSap0D
+         gOYyJOlFnRdNpKj+sEkb2UqwaGfM6EvoZTNoU3eDmRl2MoAiXkF/RCfX0IxvBDH8/V+n
+         XD8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=Z1VGvcyPcxaVL7OhRrzeu9KO4THMsdUZs/+YFm2RijY=;
-        b=xyHsbeWoQE3bjb5ZT5tqHWJhEh/EDKBQrsqaN1agmtWJoBU1Dru+mWV+82cjn640/A
-         RYtTVzmRA0OwqA2npAG4tCLUNAqk1a1WlrVlqkFVwZiMClhfPmaun5lYCy7e29YHF9m0
-         n9m4BGhQYJi8O6/5vEc/4GQO4flbKSOdpdUNeZ0L80Te8bQ3X9MmQvcruWRRCeEUaE0z
-         6yJh9DV/K956hX2MddAWO80T8LxlmLH1VZKe1heMdU7JPpkRpQNvdtvEq1y1EvrZ13Z6
-         OL+ujPi+xoE5HcnRfwXoDowGjT9wvYaS/m+09Tyl6kBXkDgSDrzoRumvHEngdgTBdEWE
-         tnUA==
-X-Gm-Message-State: ACgBeo1dY076TBuhSsZRL5XGOen2rX1THN5CPpYn5jw7Yj3gA/eX4TfU
-        I+ldNaAkz4On2TKryio16J68WUwH2e3YuHuDkQE=
-X-Google-Smtp-Source: AA6agR4lrNoGuI5rw96XeRPams7GLmC/xZVLf7HmyQGlHcfkfepnxT7a1h01PJ6LedVQXetRHT81hCJoOKKkAxZqFXI=
-X-Received: by 2002:a05:6512:1395:b0:48d:81b:4955 with SMTP id
- p21-20020a056512139500b0048d081b4955mr13309674lfa.307.1662226690740; Sat, 03
- Sep 2022 10:38:10 -0700 (PDT)
+        bh=xX2O58QMupv9rWIX/wz0TD9J8Ed7HqVnisBNPZl6V04=;
+        b=imTLFN8Eux+H9bfSleRewZH/5DsXR08iBnirAYp8x+S0JfQBmlHrGXNN1Nh3DlOYwp
+         iSeScOiatLAIcV2QQXWsycH5nExk+rxB7Gkx6Ev0k1BvXc21ku/gWYj5FLIY1t5mlZja
+         TSwe0rI583L76zVdWL3yggKQ37/9MuBrEevDRIVGFOno+Jhq5scwA/9LE8kAMCWjgaTj
+         PfK7Bok2vlWQQRKSOAMgPnfhlim5fcJjXBJ3UOt4hNNz76LLd0JTGIQj75rnqGhWgnF+
+         q7lscpM8EwUz1wAj239CIOgDRmwmY13nyjxc4Rx2pG73MR5Tn50WhfRZn4YPo818v1Vy
+         uf3w==
+X-Gm-Message-State: ACgBeo3Cc2Y2VegKEuKQ/9rp0/0ZPZVf1OZ2nGmHq1yGZ41nC/+3e2Gx
+        dLQxqi1fUAL/Rjn/aDiOfT5enZ6HDPLHglijCyY=
+X-Google-Smtp-Source: AA6agR7+UPXECkLr9xecEnlHY9jJP9Sk53/z1csaRMZh+iBcI4PkxC6eajktqUCZxUcf8SInATP1uw7iY4QjQlwWETk=
+X-Received: by 2002:a2e:b8d5:0:b0:25f:e94d:10a2 with SMTP id
+ s21-20020a2eb8d5000000b0025fe94d10a2mr13425885ljp.274.1662226704352; Sat, 03
+ Sep 2022 10:38:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220901220138.182896-1-vishal.moola@gmail.com> <20220901220138.182896-22-vishal.moola@gmail.com>
-In-Reply-To: <20220901220138.182896-22-vishal.moola@gmail.com>
+References: <20220901220138.182896-1-vishal.moola@gmail.com> <20220901220138.182896-19-vishal.moola@gmail.com>
+In-Reply-To: <20220901220138.182896-19-vishal.moola@gmail.com>
 From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Date:   Sun, 4 Sep 2022 02:37:53 +0900
-Message-ID: <CAKFNMok9qtqHkHzCGW2jckej3ZO47dvU2x+EQ1mJNwVHFHuzvw@mail.gmail.com>
-Subject: Re: [PATCH 21/23] nilfs2: Convert nilfs_copy_dirty_pages() to use filemap_get_folios_tag()
+Date:   Sun, 4 Sep 2022 02:38:06 +0900
+Message-ID: <CAKFNMo=YwdFOQNUuwNvYn6u41C8A2M905-nDkEFRejPZ2_svYg@mail.gmail.com>
+Subject: Re: [PATCH 18/23] nilfs2: Convert nilfs_lookup_dirty_data_buffers()
+ to use filemap_get_folios_tag()
 To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
 Cc:     linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
@@ -63,17 +64,90 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Sep 2, 2022 at 7:18 AM Vishal Moola (Oracle) wrote:
+On Fri, Sep 2, 2022 at 7:07 AM Vishal Moola (Oracle) wrote:
 >
 > Convert function to use folios throughout. This is in preparation for
 > the removal of find_get_pages_range_tag().
 >
 > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
 > ---
->  fs/nilfs2/page.c | 39 ++++++++++++++++++++-------------------
->  1 file changed, 20 insertions(+), 19 deletions(-)
+>  fs/nilfs2/segment.c | 29 ++++++++++++++++-------------
+>  1 file changed, 16 insertions(+), 13 deletions(-)
+>
+> diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
+> index 0afe0832c754..e95c667bdc8f 100644
+> --- a/fs/nilfs2/segment.c
+> +++ b/fs/nilfs2/segment.c
+> @@ -680,7 +680,7 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+>                                               loff_t start, loff_t end)
+>  {
+>         struct address_space *mapping = inode->i_mapping;
+> -       struct pagevec pvec;
+> +       struct folio_batch fbatch;
+>         pgoff_t index = 0, last = ULONG_MAX;
+>         size_t ndirties = 0;
+>         int i;
+> @@ -694,23 +694,26 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+>                 index = start >> PAGE_SHIFT;
+>                 last = end >> PAGE_SHIFT;
+>         }
+> -       pagevec_init(&pvec);
+> +       folio_batch_init(&fbatch);
+>   repeat:
+>         if (unlikely(index > last) ||
+> -           !pagevec_lookup_range_tag(&pvec, mapping, &index, last,
+> -                               PAGECACHE_TAG_DIRTY))
+> +             !filemap_get_folios_tag(mapping, &index, last,
+> +                     PAGECACHE_TAG_DIRTY, &fbatch))
+>                 return ndirties;
+>
+> -       for (i = 0; i < pagevec_count(&pvec); i++) {
+> +       for (i = 0; i < folio_batch_count(&fbatch); i++) {
+>                 struct buffer_head *bh, *head;
+> -               struct page *page = pvec.pages[i];
+> +               struct folio *folio = fbatch.folios[i];
+>
+> -               lock_page(page);
+> -               if (!page_has_buffers(page))
+> -                       create_empty_buffers(page, i_blocksize(inode), 0);
+> -               unlock_page(page);
 
-Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+> +               head = folio_buffers(folio);
+> +               folio_lock(folio);
+
+Could you please swap these two lines to keep the "head" check in the lock?
 
 Thanks,
 Ryusuke Konishi
+
+
+> +               if (!head) {
+> +                       create_empty_buffers(&folio->page, i_blocksize(inode), 0);
+> +                       head = folio_buffers(folio);
+> +               }
+> +               folio_unlock(folio);
+>
+> -               bh = head = page_buffers(page);
+> +               bh = head;
+>                 do {
+>                         if (!buffer_dirty(bh) || buffer_async_write(bh))
+>                                 continue;
+> @@ -718,13 +721,13 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+>                         list_add_tail(&bh->b_assoc_buffers, listp);
+>                         ndirties++;
+>                         if (unlikely(ndirties >= nlimit)) {
+> -                               pagevec_release(&pvec);
+> +                               folio_batch_release(&fbatch);
+>                                 cond_resched();
+>                                 return ndirties;
+>                         }
+>                 } while (bh = bh->b_this_page, bh != head);
+>         }
+> -       pagevec_release(&pvec);
+> +       folio_batch_release(&fbatch);
+>         cond_resched();
+>         goto repeat;
+>  }
+> --
+> 2.36.1
+>
