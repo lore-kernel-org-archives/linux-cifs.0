@@ -2,56 +2,55 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E43ECAAD4
-	for <linux-cifs@archiver.kernel.org>; Sat,  3 Sep 2022 17:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 903C5ECAAD4
+	for <linux-cifs@archiver.kernel.org>; Sat,  3 Sep 2022 17:38:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231799AbiICRid (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 3 Sep 2022 13:38:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51026 "EHLO
+        id S231876AbiICRii (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 3 Sep 2022 13:38:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232014AbiICRiV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 3 Sep 2022 13:38:21 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E2A5723B;
-        Sat,  3 Sep 2022 10:38:08 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id z29so7504798lfb.13;
-        Sat, 03 Sep 2022 10:38:08 -0700 (PDT)
+        with ESMTP id S231908AbiICRiX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 3 Sep 2022 13:38:23 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F88543FD;
+        Sat,  3 Sep 2022 10:38:18 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id b19so5232784ljf.8;
+        Sat, 03 Sep 2022 10:38:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=umA9pNWUzA7jidUk20/rQkICnueDyRo/bSzQh0Un5OQ=;
-        b=VyzRNIPerqW7I2eLeisbraYtMw+0LYm0zIpPAVWdKSSdHWT/xCWCsp0zWPwXoLJMh+
-         goWZU++QcdZPHEow/EbE3MCighBvzGVxClxj+OzcDeg7qVl++yunpPXNQ01tMimk9Nil
-         o3xjyWbouw8GEZ5rtVXpCeuyeOvZfUYvXih1iKUWZYS4B5zyr0rs+Qp7tMJsvv3NWnl0
-         0RaduV6sEHzrfBKsAnk/xWQvV3uUa4x+tn9f+zR5jX+WCCz3OtcEGQuCgvqQ1qtwV+4e
-         nsp1bSuMMrGMJHCG5Ru+yZt8lscOgM/sAHrlB6rqDFjTbCZDBlJetndoMkX0Uq4SD0cg
-         qr3g==
+        bh=XIAWHihpR6QwqgJNOUnH9+J9hxcC7HnY/D9h72CaivA=;
+        b=iwt/wbMtnp/q0jVwHZiE00ed484O19jfhyipFrnvrNDTORiNZ1YXFxifJnNfs+VIu9
+         ZTzJdY3uSO7qeUpTw2k1eYh0iMaaR6rQ8FuxoMwtiryw0IEKTNIkNHct1rD+slZ4Tw3r
+         2OJU6WtHfNa9JKbDME7ah4hIZPU0j1jGPO6PMrWVJGeSkDHa//D/ignX3illfN2ha+TJ
+         H+1EyPYXY67aUIRp/z/7mkQ/sL95sVYevI1LF1OzGgAjd0Pv/Gsr8c9VZ3+AuDk1sG2J
+         r1O9wMojCiVxZphiPxfZs3xs1ZBF71kfoIwvvHBoqJxzYkmzLzcX+xnqdBb0Y9xkMCKf
+         tUMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=umA9pNWUzA7jidUk20/rQkICnueDyRo/bSzQh0Un5OQ=;
-        b=dyl0MFsHz5WG1oEZjx+USnQNvwj3dbD40tLZnPe8DEM9qBXGAOR1NhZ3AWbDydVzI5
-         z6sn7iNcExGFPj5LoOHe/i6hdjsyquzegt1KEdqoVUnGMBoIutXWtTtpRBBopnvEYpH8
-         pcJqiIXQVj5oDxZ2NNnuA87PpqF+20k7+klDO5dpn3qKEno/gms/ORDeg3It3VCCKMhY
-         Bo8LeQjwq565SszVJFniIlPYZfzUPTfO+BP+/RmODCAvNS5i6PAEIGzYVRSOKIoJg+xd
-         K61oBupFRu0ChY1W81gDiRhvUG6JC0Xh+EnwtMHxuL4/eolzwYrMLu3swPpjogP2AZTe
-         CKjw==
-X-Gm-Message-State: ACgBeo3hmnw0GTYvZPoiFrI6Nn1K3fdmnMn/A5qjrfdIrPym6DR1/dAR
-        wVTTW00VNmkWlmv+E/ny52ImwXLxWLJwXyhWKT2J4vA/1hqSbQ==
-X-Google-Smtp-Source: AA6agR7Hs/+xwEowwLQe+sf+am2LMCCYbskcPVWg25l+bwBfAQC13YuN5kobnm2fSunCnRskcOjFYam9DiwtSafspBg=
-X-Received: by 2002:ac2:5510:0:b0:495:3773:f9fe with SMTP id
- j16-20020ac25510000000b004953773f9femr748646lfk.65.1662226686593; Sat, 03 Sep
- 2022 10:38:06 -0700 (PDT)
+        bh=XIAWHihpR6QwqgJNOUnH9+J9hxcC7HnY/D9h72CaivA=;
+        b=Nu+zhDqCmhMi9VPTwHh+HSK9AagjIffWUt4jptm83BIqLfWgD0uNTRgQX+2MfrCEpV
+         4MVrFq5zRcArzk5rEaFFE9QQivLs2MT0H1lUjrHRLHu0qFy8+IFxGOhFnnv+ZZc/2yHm
+         zSVqTK/L9Nd47gMysYIaQge0a8WXYq7TrU393VUDaaK/nKrqhiYdYtZae3eBr5fEtXet
+         ULcCBBtYWcV7sLaQdf3Uf2pM/effx5TjXEd/Xde4OjMjh7xb3mLAPUq1DDt3MpblWKKd
+         A3a55eG9/CCRtJsfrx+g93tfw1bXhQRPpaXfLu/9Yw4nU0xYv/50Er1G5SiuIeGTHJFx
+         Sh6Q==
+X-Gm-Message-State: ACgBeo3geEm1jnEreFmsuNN2vLvKzg0MWvTjMsv92WnecBifnznsvjPK
+        pHT1OUjxEnDXwxUz/Tw2S+JuAQIORoiONNrovko=
+X-Google-Smtp-Source: AA6agR40XmT8zh4h31HtNMSrlBjKkdISLmyOpZLVSDQyaRAj4ei/rdAVMIwBkrqkTVTS5Uf2en5n9Pvu5S7dwteMLrc=
+X-Received: by 2002:a2e:508:0:b0:263:32c3:9a32 with SMTP id
+ 8-20020a2e0508000000b0026332c39a32mr9959731ljf.315.1662226697047; Sat, 03 Sep
+ 2022 10:38:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220901220138.182896-1-vishal.moola@gmail.com> <20220901220138.182896-21-vishal.moola@gmail.com>
-In-Reply-To: <20220901220138.182896-21-vishal.moola@gmail.com>
+References: <20220901220138.182896-1-vishal.moola@gmail.com> <20220901220138.182896-23-vishal.moola@gmail.com>
+In-Reply-To: <20220901220138.182896-23-vishal.moola@gmail.com>
 From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Date:   Sun, 4 Sep 2022 02:37:49 +0900
-Message-ID: <CAKFNMo=TxJf=47DCnsscu7ZZuDNVi1LDoDHYZo_XscOSzOfi_g@mail.gmail.com>
-Subject: Re: [PATCH 20/23] nilfs2: Convert nilfs_btree_lookup_dirty_buffers()
- to use filemap_get_folios_tag()
+Date:   Sun, 4 Sep 2022 02:38:00 +0900
+Message-ID: <CAKFNMokhm5TTVn7yGEtwchpb5rk5pur6zog-uCWZGQJmAupoVQ@mail.gmail.com>
+Subject: Re: [PATCH 22/23] nilfs2: Convert nilfs_clear_dirty_pages() to use filemap_get_folios_tag()
 To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
 Cc:     linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
@@ -64,15 +63,15 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Sep 2, 2022 at 7:06 AM Vishal Moola (Oracle) wrote:
+On Fri, Sep 2, 2022 at 7:14 AM Vishal Moola (Oracle) wrote:
 >
 > Convert function to use folios throughout. This is in preparation for
 > the removal of find_get_pages_range_tag().
 >
 > Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
 > ---
->  fs/nilfs2/btree.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+>  fs/nilfs2/page.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 
 Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
 
