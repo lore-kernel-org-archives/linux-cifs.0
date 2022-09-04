@@ -2,294 +2,140 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 113CFECAAD4
-	for <linux-cifs@archiver.kernel.org>; Sun,  4 Sep 2022 10:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5EFECAAD3
+	for <linux-cifs@archiver.kernel.org>; Sun,  4 Sep 2022 14:15:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234122AbiIDKy3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 4 Sep 2022 06:54:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52846 "EHLO
+        id S229951AbiIDOPo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 4 Sep 2022 10:15:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234156AbiIDKy2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 4 Sep 2022 06:54:28 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CC941137;
-        Sun,  4 Sep 2022 03:54:25 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1oUnGh-0007F2-Tf; Sun, 04 Sep 2022 12:54:23 +0200
-Message-ID: <dcecfc3b-0fd9-b406-4123-d414432d0e49@leemhuis.info>
-Date:   Sun, 4 Sep 2022 12:54:23 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+        with ESMTP id S229754AbiIDOPn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 4 Sep 2022 10:15:43 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2067.outbound.protection.outlook.com [40.107.92.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DDA42DA93
+        for <linux-cifs@vger.kernel.org>; Sun,  4 Sep 2022 07:15:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZTj+Tr0n/9bKTXroJe0ADj+lC2dVEn5ZrFd12l5xHmMd3LPubK0yjqwtZcHq5x78r5kXYk1Av4TJvac+uW74+q+3mgSA/f/8zBxaQvJy/ZenxJ+6p7dq44ZVl33of/iDpyKCg/seeyLf8mQcUxBc2GUdW81rLti2HtHbDL/IGJ0/ISRfFR2nyUk0H5YA6AuO1UypPyD7zqJmW5PbUjMlp8bDsqc8Smfc3WR7HTFpqBEeAuId+lxToOblzsBXBcA6MDes/AuIsAVmTZ/IENVYJ2L5jM7coH+i65Ri6mq0cWoN81MWMfl3ngjRUn8a4IsXxQUaSHEtL5zIuL3AckKPIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xs1I/tM7bUwgaJ9wY6ZVo/5QRtMpEJXuH+kBxXyEjfQ=;
+ b=LmesF6CLHByWo9RGojtz0Wq1eCHPlq0NN4tdckVqzWwqPmr7ZYJVknxAzS0MQCMPF4h1t70CPTIaY9NKckfL8PbGyzEWzoDnFUlqgTD8btW8nc+e44mw3Vf6fJBtExc5u9M1CZxg8jj5WO8RuT4GXjVj6BNxt4PPqHTl/qsSN6QSMgQeWyabNJw93hLttDr8GDkccvk13RdgzyFJGVEpJ1Q9hxQiLgFOEZERifbybvNya05LFITvvEYefs84k/oFudecqCe3H3ILcQVYjdmfd69uyeCIrCJMfwSDkhwRhD7swZ8CFe+RnDsnw/OgQ6P+AbftGmNBhbayb+dj14yUKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ BL3PR01MB6817.prod.exchangelabs.com (2603:10b6:208:33c::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5588.10; Sun, 4 Sep 2022 14:15:40 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::701d:e406:dcfa:118b]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::701d:e406:dcfa:118b%4]) with mapi id 15.20.5588.018; Sun, 4 Sep 2022
+ 14:15:40 +0000
+Message-ID: <1ef69bf2-9532-8653-2d21-83beb8e14906@talpey.com>
+Date:   Sun, 4 Sep 2022 10:15:37 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.0
-Subject: Re: [smb3] 5efdd9122e: filebench.sum_operations/s -50.0% regression
-Content-Language: en-US, de-DE
-To:     regressions@lists.linux.dev
-Cc:     lkp@lists.01.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-References: <20220826022031.GA76590@inn2.lkp.intel.com>
- <c8310cba-36ef-2940-b2c2-07573e015185@intel.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <c8310cba-36ef-2940-b2c2-07573e015185@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Bug 13570] CIFS Mount Used Size descrepancy
+Content-Language: en-US
+From:   Tom Talpey <tom@talpey.com>
+To:     kato223@gmail.com, Enzo Matsumiya <ematsumiya@suse.de>,
+        CIFS <linux-cifs@vger.kernel.org>
+References: <bug-13570-10630@https.bugzilla.samba.org/>
+ <bug-13570-10630-SqsiUPsDTx@https.bugzilla.samba.org/>
+ <f5708177-ff94-c745-a191-4fdba33a2e06@talpey.com>
+In-Reply-To: <f5708177-ff94-c745-a191-4fdba33a2e06@talpey.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1662288865;49b557a6;
-X-HE-SMSGID: 1oUnGh-0007F2-Tf
+X-ClientProxiedBy: BL0PR1501CA0011.namprd15.prod.outlook.com
+ (2603:10b6:207:17::24) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6173a24f-efe2-4488-5839-08da8e7ff24f
+X-MS-TrafficTypeDiagnostic: BL3PR01MB6817:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oCvS3NBPAdrBT4/xqdLfOUb6C79lTV7Pr3cTYlJL0CrLrWgJnzbrmH5P1GqsPQvn+GsjH8zgfjxRuI3AVIfwq2F/jBj4+MGhZCGwYxCo921h1d+yps3sRN1QqFjAdaH0qM71i8MJ/qpHUuG9L4ukjE0kZwH6OYTvObewa+bQCS/+C/b3AaCYfi2i9+u3l4hOIhbT/EOcEQ5qyQYnodq0hxapuiQBiPMadPwRdYTC2XvlAkLFLbePm2ZrSQkSl6VxcSK7kDs43nstq5rXa8k8m87Y58ppaypfXr4IC3c8c4njiJQM8zW3IYLxxeb0moCnubCxEHvN1sn2HeUXas6/c+ohkheMG+jxZrl0siWfeFHQLVOb9br+GAqm0ZCmBiO8eo6zjEMo3L+lD5X+lmHlQja5qd8iuNvlQsCpyQS0WbVMfUewYo6ipeP6EOafrf6vxUmzNd/YFe6mw+cLqOeGTZ4YgeYgQ07EY4Ha16x2DgU7qxAPetqRUhisZw98unrsFKOn5Yaj3W0Wayqkyzz+IgfHPwZkgFH2ZJu0aPFqI07VOBvgOXE3FR41jMwFY2dhvGUXbHR/wyLenJ4ZF4WyWYjSrBpfPdhgrrgYw998dqFTK96S9H6IoYlCgVPlfNpUb4A2Q4IkagwDPag6OvN6O90KFVUjGyQOEBOodfv4uXTlrRZEKOj0g4HZyQC31+hGjOmWshODtUhsHyhUsjBw6zklDzbJzb8mtHCednU/sA0PyGMKPx0Eo2xrfdEwlnohinM38+Jy7mYgsG3f/sV8OiW+xcxWm8vvD5uGnGTSESZx4MAe7s2kcxAJRURD8jwzegJIpfkLj8PdkGTEj74uvA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230016)(136003)(376002)(346002)(39830400003)(396003)(366004)(26005)(52116002)(6512007)(186003)(2616005)(8936002)(53546011)(5660300002)(6506007)(4744005)(86362001)(6666004)(966005)(41300700001)(6486002)(36756003)(31686004)(478600001)(31696002)(83380400001)(316002)(2906002)(110136005)(38350700002)(38100700002)(8676002)(66476007)(66556008)(66946007)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZVZWUnIxWVhlTFBpSSs2S3dqNDNVMjVHSm11Q084d0V5T1ZBd3NXZ09UMENL?=
+ =?utf-8?B?ZHFLZ1Z0RFoyc2c0SjNWVTNWcXJCbmgxbVQ2ZS9ScytFQjUvckVwa2hYdDRP?=
+ =?utf-8?B?S3JUeDlvc0xwSXpjaEdUQVF1RnlVRWVOdU1ORXpnVVJTUEtlMnBDOEtBbHBa?=
+ =?utf-8?B?cDFXV3hhWHhsUEpRRzNSMG5QZW5wVVVmbFdxTjB5bEQxTDhwZ1BEOTFQbzBT?=
+ =?utf-8?B?bjdwVUVaVzJNMGZFYnNPN0FKZlFhbHk4UVhUaXpoTVl0MVNGR2paT3IvcFBu?=
+ =?utf-8?B?K1RoSXNiZzNTeng3WEpEREhIaGMrRTJhQmk0UmRBQTZvR3JGaTBKUHJSMTR2?=
+ =?utf-8?B?ZkxDNnRwNU9YcW5uR0pTSWo3aEhKTWEwcXA1dlZRS3k1UUNwSHVYak1mT01N?=
+ =?utf-8?B?aHdlZnFwTjdZRUtxVVZXM3l5SEtockc1RUdCQ0xCdGJLRVZxZ1d6UGo5MnR6?=
+ =?utf-8?B?R2pCd1FiS0NSMnAwVy9LOFV3VFdTcVo1RHNUeUF2bDZReFU4MTdaSC9iejBM?=
+ =?utf-8?B?WXYzcklaWGRteUwrM0piWVRncENPOWNqOXgvNkRHeGpCYlA5QzU2dEI0dTRD?=
+ =?utf-8?B?c2hhZkwxajZIVkNtQ0tlTGdReWVqT0Y4aW8wSVA3L0xTVXN3dDVVZkRmRHN1?=
+ =?utf-8?B?dGxLbkNxTTB6U0NQK1lIMnQzTDJZblFYbTZWM3ZJa2Fwak93eDNJbXZGZVdS?=
+ =?utf-8?B?SzBrekZmeVVpa2ltU3N1bENIOWZKa01vYzBadGdjVUtCekRlYWdyRWpTWVBY?=
+ =?utf-8?B?ZnRNWG1jbXFyOW1va0xUK0xhWko0OTRtdWErVWZPbm9tL3g4OWxSR0t1MkZN?=
+ =?utf-8?B?M3dwOTBWeHVwUTJ1alhoZkFSU3BqaXJpODUrYkVVM2VkanZnaU1aSXNkZGFF?=
+ =?utf-8?B?Uk9NdDVvYzVTQkxqdm5wa1lTZDRLa1pBR1N5dlZaaCt2WG9ZYUgvSGtZRXZp?=
+ =?utf-8?B?U0RlMWV6b0FWQ2RlbllNWE95ZHpkd0dmSGx4SzcxT3BZbjY1RUpZSmUvR1FR?=
+ =?utf-8?B?YVowNlBKM1JSaTVGNE93QzRydWNZTHNydmg4K0pBMVRBYklXOVF2Szg2bmhS?=
+ =?utf-8?B?TWhDdWlkdkhCZ0dDL04rZkVmcUp4ZENTa0pNK2M1cGt5UXd3Yk5XWWgwQ0pj?=
+ =?utf-8?B?MERINHdKL1daeXB6c1lEd2ZHU2dwSjJ0dFZyektGUGF5c2xMVjVvbDdHUi9C?=
+ =?utf-8?B?N2FXWXBZd2g1TWFWLzZPWmh5UTBFdGRtNjc3NTZ1eVYzSktwdk4vMzd2Mi9F?=
+ =?utf-8?B?QTUwa0VOeWl5WDVMN1lYcHF0U25jYTRuNFdjcVBzUmswcExTUzhXZ2tsQXpF?=
+ =?utf-8?B?dXp3OWYvMVlSNmVKSWs5NnNab3hKZ0R5VW1ub3h4c3hOenFLaXhnNEJzRGJx?=
+ =?utf-8?B?L3dmdHVlaDlpdjNlYlkzYkRFVEdEYUFKajVkd2NURE9VWUo2Tm9oN2VHSWVP?=
+ =?utf-8?B?c1grOWxNUU1KOUxzVk1RN2FNeWxqbXBtNklsSkY0SktPRzFWdUVmUHZmL25y?=
+ =?utf-8?B?SUp6eFM5QS9qdEhjRTZjNlpHUWJFUTJ4R1R3dElsbmtBa1JPeGVkK3ZiSlV2?=
+ =?utf-8?B?SmI5RDZFMnN2QlBmcjlVSm85SmZnOUxDSkg5T0FBb0wzN2tpSUFmaXhFclhR?=
+ =?utf-8?B?cnZydzVOaFpZNEpYWFBlYlNTZHdJRzdPbHhSNEZFSkx3cDBVZDBDYlR1L2pF?=
+ =?utf-8?B?N2E3dTEySmJORVZNN29ZSDcxWkpGTno2N2VwazF2MEZaUmJpTEpGY3RmcU02?=
+ =?utf-8?B?am5iYitkSDJtbjVUOFl2V21rNWdYa2NpWEUvRkRVZys4d2I3bEFQWDJjUzVI?=
+ =?utf-8?B?ZDNiSTE4ekMrMDVhMkIweUdYOTZndkpFbXFsZGFabnFJVTNieEVsS0lGTWFw?=
+ =?utf-8?B?dWoxbjFHWlZOOGNTWjdJRDc1QjFYNUMwMnZJcjgyOVVNZEdPc1JSOFZFYlRq?=
+ =?utf-8?B?UWVON1VkbG0vbTIwdVgxZnNieHdkeEtOVlR3bERjYm0vZDdPWnl0RFlFalk4?=
+ =?utf-8?B?bHllOURiaVVtbGFpMFg0SUxxKzFrVDVvYmZaaHNQYmdvNjJiS3ZKZ0g2dHpX?=
+ =?utf-8?B?d0ppQ2JwOXg3MVJqNG54Z21ZMFcxK25haWJqeTRrM3crVjlsWS9RMDd5dm5t?=
+ =?utf-8?Q?I+oyKUK2STeq7PDv+6iMxEvho?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6173a24f-efe2-4488-5839-08da8e7ff24f
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2022 14:15:40.5029
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vIDy1UTLnJ107od3eocbNopDWHGjfDAsFaORfECvfWjLfEAc6XUqIlVEqXTPu5Ws
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR01MB6817
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi, this is your Linux kernel regression tracker. Top-posting for once,
-to make this easily accessible to everyone.
+[resend including linux-cifs]
 
-As per recent general discussions with the 0-day folks, I'm dropping
-below regression from the list of tracked issues, as this report didn't
-gain any traction. That for example can happen if the developers
-considered the regression of no practical relevance, as they assume it
-only materializes in micro-benchmarks, is due to a broken test case, or
-some fluke.
-
-Not sure if that or something else is the reason why this particular
-report didn't gain any traction, but I lack the bandwidth to follow-up
-on each and every regression some CI system found and reported. At the
-same time I don't want to keep these reports in the list of tracked
-issues forever, as that creates noise and makes it harder to spot the
-important issues in regzbot's reports and lists. That's why I hereby
-remove it:
-
-#regzbot invalid: 0-day report that didn't get traction; might be of no
-relevance
-
-Ciao, Thorsten
-
-On 26.08.22 04:41, kernel test robot wrote:
-> Greeting,
+On 9/4/2022 10:13 AM, Tom Talpey wrote:
+> [I don't have a Samba-bugzilla account, so replying directly]
 > 
-> FYI, we noticed a -50.0% regression of filebench.sum_operations/s due to
-> commit:
+> This is clearly just a TB/TiB discrepancy in reporting.
 > 
+> 9.1 TB * 10e12 / 2e16 == 8.3 TiB
 > 
-> commit: 5efdd9122eff772eae2feae9f0fc0ec02d4846a3 ("smb3: allow deferred
-> close timeout to be configurable")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> Odd that the "Size" and "Avail" numbers are the same, that's maybe
+> worth looking into. I bet this is some sort of ancient compatibility
+> behavior for a Windows-style API.
 > 
-> in testcase: filebench
-> on test machine: 88 threads 2 sockets Intel(R) Xeon(R) Gold 6238M CPU @
-> 2.10GHz (Cascade Lake) with 128G memory
-> with following parameters:
-> 
->     disk: 1HDD
->     fs: ext4
->     fs2: cifs
->     test: filemicro_delete.f
->     cpufreq_governor: performance
->     ucode: 0x5003302
-> 
-> 
-> =========================================================================================
-> compiler/cpufreq_governor/disk/fs2/fs/kconfig/rootfs/tbox_group/test/testcase/ucode:
->  
-> gcc-11/performance/1HDD/cifs/ext4/x86_64-rhel-8.3/debian-11.1-x86_64-20220510.cgz/lkp-csl-2sp9/filemicro_delete.f/filebench/0x5003302
-> 
-> commit:
->   dcb45fd7f5 ("cifs: Do not use tcon->cfid directly, use the cfid we get
-> from open_cached_dir")
->   5efdd9122e ("smb3: allow deferred close timeout to be configurable")
-> 
-> dcb45fd7f501f864 5efdd9122eff772eae2feae9f0f
-> ---------------- ---------------------------
->          %stddev     %change         %stddev
->              \          |                \
->     515.95           -50.0%     257.98        filebench.sum_operations/s
->       4.81 ±  2%   +1038.4%      54.78 ±  6%  filebench.sum_time_ms/op
->      29.00 ±  8%    +212.1%      90.50 ±  3% 
-> filebench.time.percent_of_cpu_this_job_got
->      24629            +2.7%      25297       
-> filebench.time.voluntary_context_switches
->  7.685e+08           +19.3%  9.169e+08 ±  4%  cpuidle..time
->       2.53 ±  6%     -20.6%       2.00 ±  3%  iostat.cpu.iowait
->    1506141 ±  8%     +22.4%    1843256 ±  3%  turbostat.IRQ
->       2.00           -50.0%       1.00        vmstat.procs.b
->      21969 ±  2%      -9.5%      19885 ±  2%  vmstat.system.cs
->       3.06 ±  7%      -0.7        2.35 ±  4%  mpstat.cpu.all.iowait%
->       0.79 ±  5%      +0.5        1.27 ±  2%  mpstat.cpu.all.sys%
->       0.89 ±  3%      -0.1        0.79 ±  3%  mpstat.cpu.all.usr%
->      34.55 ± 14%     -34.8%      22.51 ± 27% 
-> sched_debug.cfs_rq:/.removed.runnable_avg.avg
->     119.64 ±  3%     -20.0%      95.69 ± 17% 
-> sched_debug.cfs_rq:/.removed.runnable_avg.stddev
->      34.55 ± 14%     -34.8%      22.51 ± 27% 
-> sched_debug.cfs_rq:/.removed.util_avg.avg
->     119.64 ±  3%     -20.0%      95.69 ± 17% 
-> sched_debug.cfs_rq:/.removed.util_avg.stddev
->       5249           +15.8%       6076        meminfo.Active
->       3866 ±  2%     +17.7%       4552        meminfo.Active(anon)
->       1382 ±  4%     +10.3%       1524 ±  4%  meminfo.Active(file)
->      69791 ± 14%     +39.8%      97553 ±  6%  meminfo.AnonHugePages
->      72709 ±  2%     +12.5%      81779 ±  3%  meminfo.Inactive(file)
->      23219           +13.5%      26352 ±  3%  meminfo.KernelStack
->     966.50 ±  2%     +17.7%       1137        proc-vmstat.nr_active_anon
->      74302            +6.3%      78977 ±  2%  proc-vmstat.nr_anon_pages
->      81133            +6.0%      85973        proc-vmstat.nr_inactive_anon
->      18172 ±  2%     +12.5%      20442 ±  3%  proc-vmstat.nr_inactive_file
->      23213           +13.5%      26348 ±  3%  proc-vmstat.nr_kernel_stack
->      17983            +2.3%      18400        proc-vmstat.nr_mapped
->       7446 ±  2%      +5.5%       7853 ±  3%  proc-vmstat.nr_shmem
->      26888            +1.6%      27306       
-> proc-vmstat.nr_slab_reclaimable
->      47220            +3.4%      48803       
-> proc-vmstat.nr_slab_unreclaimable
->     966.50 ±  2%     +17.7%       1137       
-> proc-vmstat.nr_zone_active_anon
->      81133            +6.0%      85973       
-> proc-vmstat.nr_zone_inactive_anon
->      18172 ±  2%     +12.5%      20442 ±  3% 
-> proc-vmstat.nr_zone_inactive_file
->     361460            +2.5%     370454        proc-vmstat.numa_hit
->     946.67           +18.6%       1122        proc-vmstat.pgactivate
->     361562            +2.5%     370553        proc-vmstat.pgalloc_normal
->     187906            +4.7%     196761        proc-vmstat.pgfault
->       8189            +2.5%       8395        proc-vmstat.pgreuse
->  1.097e+09           +15.5%  1.267e+09 ±  7% 
-> perf-stat.i.branch-instructions
->   39079265 ±  6%     -20.9%   30915354 ±  4%  perf-stat.i.branch-misses
->    5093263 ±  4%     -23.7%    3884752 ±  9%  perf-stat.i.cache-misses
->      29213           -18.7%      23764 ±  5%  perf-stat.i.context-switches
->  7.666e+09 ±  4%      +5.7%  8.106e+09 ±  2%  perf-stat.i.cpu-cycles
->       1877 ± 15%     +75.1%       3287 ± 12% 
-> perf-stat.i.cycles-between-cache-misses
->    1735450 ±  3%     -12.9%    1512060 ±  3%  perf-stat.i.iTLB-load-misses
->       2898 ±  3%     +34.4%       3895 ±  7% 
-> perf-stat.i.instructions-per-iTLB-miss
->       1493           -20.3%       1190 ±  7%  perf-stat.i.major-faults
->       0.09 ±  3%      +5.8%       0.09 ±  2%  perf-stat.i.metric.GHz
->      48.47 ± 11%      +8.4       56.83 ±  7% 
-> perf-stat.i.node-store-miss-rate%
->     283426 ±  4%     -21.6%     222190 ± 10%  perf-stat.i.node-stores
->       3.57 ±  7%      -1.1        2.44 ±  6% 
-> perf-stat.overall.branch-miss-rate%
->       1508 ±  3%     +39.8%       2108 ±  9% 
-> perf-stat.overall.cycles-between-cache-misses
->       3022 ±  3%     +23.6%       3736 ±  5% 
-> perf-stat.overall.instructions-per-iTLB-miss
->  9.585e+08           +18.8%  1.138e+09 ±  6% 
-> perf-stat.ps.branch-instructions
->   34151514 ±  6%     -18.8%   27725316 ±  4%  perf-stat.ps.branch-misses
->    4450329 ±  5%     -21.7%    3486409 ±  9%  perf-stat.ps.cache-misses
->      25524           -16.4%      21333 ±  4%  perf-stat.ps.context-switches
->      77139            +2.5%      79105        perf-stat.ps.cpu-clock
->  6.704e+09 ±  4%      +8.7%  7.287e+09        perf-stat.ps.cpu-cycles
->   1.06e+09           +11.3%   1.18e+09 ±  5%  perf-stat.ps.dTLB-loads
->    1517349 ±  3%     -10.5%    1357716 ±  2%  perf-stat.ps.iTLB-load-misses
->  4.582e+09           +10.8%  5.075e+09 ±  6%  perf-stat.ps.instructions
->       1296           -18.1%       1061 ±  6%  perf-stat.ps.major-faults
->     247613 ±  4%     -19.5%     199283 ±  9%  perf-stat.ps.node-stores
->      77139            +2.5%      79105        perf-stat.ps.task-clock
->  3.697e+10           +35.3%  5.003e+10        perf-stat.total.instructions
->       8.51 ± 91%      -6.9        1.59 ±223% 
-> perf-profile.calltrace.cycles-pp.getdents64
->       8.34 ± 83%      -6.7        1.67 ±141% 
-> perf-profile.calltrace.cycles-pp.exit_to_user_mode_loop.exit_to_user_mode_prepare.syscall_exit_to_user_mode.do_syscall_64.entry_SYSCALL_64_after_hwframe
->       6.25 ±107%      -6.2        0.00       
-> perf-profile.calltrace.cycles-pp.entry_SYSCALL_64_after_hwframe.open64
->       6.25 ±107%      -6.2        0.00       
-> perf-profile.calltrace.cycles-pp.do_syscall_64.entry_SYSCALL_64_after_hwframe.open64
->       6.25 ±107%      -6.2        0.00       
-> perf-profile.calltrace.cycles-pp.open64
->       7.63 ± 84%      -6.0        1.59 ±223% 
-> perf-profile.calltrace.cycles-pp.entry_SYSCALL_64_after_hwframe.getdents64
->       7.63 ± 84%      -6.0        1.59 ±223% 
-> perf-profile.calltrace.cycles-pp.do_syscall_64.entry_SYSCALL_64_after_hwframe.getdents64
->       7.63 ± 84%      -6.0        1.59 ±223% 
-> perf-profile.calltrace.cycles-pp.__x64_sys_getdents64.do_syscall_64.entry_SYSCALL_64_after_hwframe.getdents64
->       7.63 ± 84%      -6.0        1.59 ±223% 
-> perf-profile.calltrace.cycles-pp.iterate_dir.__x64_sys_getdents64.do_syscall_64.entry_SYSCALL_64_after_hwframe.getdents64
->       6.26 ±115%      -5.4        0.88 ±223% 
-> perf-profile.calltrace.cycles-pp.syscall_exit_to_user_mode.do_syscall_64.entry_SYSCALL_64_after_hwframe
->       6.26 ±115%      -5.4        0.88 ±223% 
-> perf-profile.calltrace.cycles-pp.exit_to_user_mode_prepare.syscall_exit_to_user_mode.do_syscall_64.entry_SYSCALL_64_after_hwframe
->       6.26 ±115%      -4.6        1.67 ±141% 
-> perf-profile.calltrace.cycles-pp.do_group_exit.get_signal.arch_do_signal_or_restart.exit_to_user_mode_loop.exit_to_user_mode_prepare
->       6.26 ±115%      -4.6        1.67 ±141% 
-> perf-profile.calltrace.cycles-pp.do_exit.do_group_exit.get_signal.arch_do_signal_or_restart.exit_to_user_mode_loop
->       6.26 ±115%      -4.6        1.67 ±141% 
-> perf-profile.calltrace.cycles-pp.arch_do_signal_or_restart.exit_to_user_mode_loop.exit_to_user_mode_prepare.syscall_exit_to_user_mode.do_syscall_64
->       6.26 ±115%      -4.6        1.67 ±141% 
-> perf-profile.calltrace.cycles-pp.get_signal.arch_do_signal_or_restart.exit_to_user_mode_loop.exit_to_user_mode_prepare.syscall_exit_to_user_mode
->       4.57 ± 73%      -3.8        0.76 ±223% 
-> perf-profile.calltrace.cycles-pp.asm_exc_page_fault.perf_mmap__read_head.perf_mmap__push.record__mmap_read_evlist.__cmd_record
->       4.57 ± 73%      -3.8        0.76 ±223% 
-> perf-profile.calltrace.cycles-pp.exc_page_fault.asm_exc_page_fault.perf_mmap__read_head.perf_mmap__push.record__mmap_read_evlist
->       4.57 ± 73%      -3.8        0.76 ±223% 
-> perf-profile.calltrace.cycles-pp.do_user_addr_fault.exc_page_fault.asm_exc_page_fault.perf_mmap__read_head.perf_mmap__push
->       4.57 ± 73%      -3.8        0.76 ±223% 
-> perf-profile.calltrace.cycles-pp.perf_mmap__read_head.perf_mmap__push.record__mmap_read_evlist.__cmd_record.cmd_record
->       3.38 ±103%      -3.4        0.00       
-> perf-profile.calltrace.cycles-pp.unmap_vmas.exit_mmap.mmput.exit_mm.do_exit
->       3.38 ±103%      -3.4        0.00       
-> perf-profile.calltrace.cycles-pp.unmap_page_range.unmap_vmas.exit_mmap.mmput.exit_mm
->       3.38 ±103%      -3.4        0.00       
-> perf-profile.calltrace.cycles-pp.zap_pmd_range.unmap_page_range.unmap_vmas.exit_mmap.mmput
->       3.38 ±103%      -3.4        0.00       
-> perf-profile.calltrace.cycles-pp.zap_pte_range.zap_pmd_range.unmap_page_range.unmap_vmas.exit_mmap
->       8.51 ± 91%      -6.9        1.59 ±223% 
-> perf-profile.children.cycles-pp.getdents64
->       8.34 ± 83%      -6.7        1.67 ±141% 
-> perf-profile.children.cycles-pp.exit_to_user_mode_prepare
->       8.34 ± 83%      -6.7        1.67 ±141% 
-> perf-profile.children.cycles-pp.exit_to_user_mode_loop
->       8.34 ± 83%      -6.7        1.67 ±141% 
-> perf-profile.children.cycles-pp.syscall_exit_to_user_mode
->       6.25 ±107%      -6.2        0.00       
-> perf-profile.children.cycles-pp.open64
->       7.63 ± 84%      -6.0        1.59 ±223% 
-> perf-profile.children.cycles-pp.__x64_sys_getdents64
->       7.63 ± 84%      -6.0        1.59 ±223% 
-> perf-profile.children.cycles-pp.iterate_dir
->       6.26 ±115%      -4.6        1.67 ±141% 
-> perf-profile.children.cycles-pp.arch_do_signal_or_restart
->       6.26 ±115%      -4.6        1.67 ±141% 
-> perf-profile.children.cycles-pp.get_signal
->       4.57 ± 73%      -3.8        0.76 ±223% 
-> perf-profile.children.cycles-pp.perf_mmap__read_head
->       3.38 ±103%      -3.4        0.00       
-> perf-profile.children.cycles-pp.unmap_vmas
->       3.38 ±103%      -3.4        0.00       
-> perf-profile.children.cycles-pp.unmap_page_range
->       3.38 ±103%      -3.4        0.00       
-> perf-profile.children.cycles-pp.zap_pmd_range
->       3.38 ±103%      -3.4        0.00       
-> perf-profile.children.cycles-pp.zap_pte_range
->       8.54 ± 43%      +8.6       17.19 ± 38% 
-> perf-profile.children.cycles-pp.asm_exc_page_fault
-> 
-> 
-> If you fix the issue, kindly add following tag
-> Reported-by: kernel test robot <yujie.liu@intel.com>
-> 
-> 
-> To reproduce:
-> 
->         git clone https://github.com/intel/lkp-tests.git
->         cd lkp-tests
->         sudo bin/lkp install job.yaml           # job file is attached
-> in this email
->         bin/lkp split-job --compatible job.yaml # generate the yaml file
-> for lkp run
->         sudo bin/lkp run generated-yaml-file
-> 
->         # if come across any failure that blocks the test,
->         # please remove ~/.lkp and /lkp dir to run from a clean state.
-> 
-> 
-> Disclaimer:
-> Results have been estimated based on internal Intel analysis and are
-> provided
-> for informational purposes only. Any difference in system hardware or
-> software
-> design or configuration may affect actual performance.
-> 
-> 
-> #regzbot introduced: 5efdd9122e
-> 
-> 
+> On 9/3/2022 5:55 PM, samba-bugs@samba.org wrote:
+>> https://bugzilla.samba.org/show_bug.cgi?id=13570
+>>
+>> --- Comment #8 from Terrance <kato223@gmail.com> ---
+>> Top line is the Samba mounted share and the bottom line is the exact 
+>> same share
+>> mounted on NFS.
+>>
+>> Filesystem                 Size  Used Avail Use% Mounted on
+>> {..}
+>> //10.0.0.220/storage        15T  9.1T  5.5T  63% /media/Samba
+>> 10.0.0.220:/media/storage   15T  8.3T  5.5T  61% /media/NAS
+>>
