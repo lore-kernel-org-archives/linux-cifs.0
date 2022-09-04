@@ -2,152 +2,294 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B72C38145
-	for <linux-cifs@archiver.kernel.org>; Sat,  3 Sep 2022 17:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 113CFECAAD4
+	for <linux-cifs@archiver.kernel.org>; Sun,  4 Sep 2022 10:54:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231617AbiICRij (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 3 Sep 2022 13:38:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50818 "EHLO
+        id S234122AbiIDKy3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 4 Sep 2022 06:54:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232143AbiICRi0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 3 Sep 2022 13:38:26 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE9153D2B;
-        Sat,  3 Sep 2022 10:38:25 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id b19so5233073ljf.8;
-        Sat, 03 Sep 2022 10:38:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=xX2O58QMupv9rWIX/wz0TD9J8Ed7HqVnisBNPZl6V04=;
-        b=P/hsH1QKS4072Gai1EmOGCnjPTQWZiiOiE+P26T80mgV0tbTOnkDXKC3nEWi1Xoe/A
-         Hs7LLFSp+fCaJRWZVqv/8C2xzImMvLQoTDYUfx6u9PmIwXRQtB9n4gGmx+GH0S1f7zYT
-         EpKdDfbdqDAHgNmhwbrPGp06lVMfmsEbewBLDb/B+dQfW30xzF8F2l2F/gidKFJKBG6M
-         xlYX6S3WMrWsrSfVCDpCmKqprjSkUDidSKYHiXrhQ6jx9rWQ1os07RE+QbroswHSap0D
-         gOYyJOlFnRdNpKj+sEkb2UqwaGfM6EvoZTNoU3eDmRl2MoAiXkF/RCfX0IxvBDH8/V+n
-         XD8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=xX2O58QMupv9rWIX/wz0TD9J8Ed7HqVnisBNPZl6V04=;
-        b=imTLFN8Eux+H9bfSleRewZH/5DsXR08iBnirAYp8x+S0JfQBmlHrGXNN1Nh3DlOYwp
-         iSeScOiatLAIcV2QQXWsycH5nExk+rxB7Gkx6Ev0k1BvXc21ku/gWYj5FLIY1t5mlZja
-         TSwe0rI583L76zVdWL3yggKQ37/9MuBrEevDRIVGFOno+Jhq5scwA/9LE8kAMCWjgaTj
-         PfK7Bok2vlWQQRKSOAMgPnfhlim5fcJjXBJ3UOt4hNNz76LLd0JTGIQj75rnqGhWgnF+
-         q7lscpM8EwUz1wAj239CIOgDRmwmY13nyjxc4Rx2pG73MR5Tn50WhfRZn4YPo818v1Vy
-         uf3w==
-X-Gm-Message-State: ACgBeo3Cc2Y2VegKEuKQ/9rp0/0ZPZVf1OZ2nGmHq1yGZ41nC/+3e2Gx
-        dLQxqi1fUAL/Rjn/aDiOfT5enZ6HDPLHglijCyY=
-X-Google-Smtp-Source: AA6agR7+UPXECkLr9xecEnlHY9jJP9Sk53/z1csaRMZh+iBcI4PkxC6eajktqUCZxUcf8SInATP1uw7iY4QjQlwWETk=
-X-Received: by 2002:a2e:b8d5:0:b0:25f:e94d:10a2 with SMTP id
- s21-20020a2eb8d5000000b0025fe94d10a2mr13425885ljp.274.1662226704352; Sat, 03
- Sep 2022 10:38:24 -0700 (PDT)
+        with ESMTP id S234156AbiIDKy2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 4 Sep 2022 06:54:28 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CC941137;
+        Sun,  4 Sep 2022 03:54:25 -0700 (PDT)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1oUnGh-0007F2-Tf; Sun, 04 Sep 2022 12:54:23 +0200
+Message-ID: <dcecfc3b-0fd9-b406-4123-d414432d0e49@leemhuis.info>
+Date:   Sun, 4 Sep 2022 12:54:23 +0200
 MIME-Version: 1.0
-References: <20220901220138.182896-1-vishal.moola@gmail.com> <20220901220138.182896-19-vishal.moola@gmail.com>
-In-Reply-To: <20220901220138.182896-19-vishal.moola@gmail.com>
-From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Date:   Sun, 4 Sep 2022 02:38:06 +0900
-Message-ID: <CAKFNMo=YwdFOQNUuwNvYn6u41C8A2M905-nDkEFRejPZ2_svYg@mail.gmail.com>
-Subject: Re: [PATCH 18/23] nilfs2: Convert nilfs_lookup_dirty_data_buffers()
- to use filemap_get_folios_tag()
-To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
-        linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [smb3] 5efdd9122e: filebench.sum_operations/s -50.0% regression
+Content-Language: en-US, de-DE
+To:     regressions@lists.linux.dev
+Cc:     lkp@lists.01.org, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+References: <20220826022031.GA76590@inn2.lkp.intel.com>
+ <c8310cba-36ef-2940-b2c2-07573e015185@intel.com>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <c8310cba-36ef-2940-b2c2-07573e015185@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1662288865;49b557a6;
+X-HE-SMSGID: 1oUnGh-0007F2-Tf
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Sep 2, 2022 at 7:07 AM Vishal Moola (Oracle) wrote:
->
-> Convert function to use folios throughout. This is in preparation for
-> the removal of find_get_pages_range_tag().
->
-> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
-> ---
->  fs/nilfs2/segment.c | 29 ++++++++++++++++-------------
->  1 file changed, 16 insertions(+), 13 deletions(-)
->
-> diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
-> index 0afe0832c754..e95c667bdc8f 100644
-> --- a/fs/nilfs2/segment.c
-> +++ b/fs/nilfs2/segment.c
-> @@ -680,7 +680,7 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
->                                               loff_t start, loff_t end)
->  {
->         struct address_space *mapping = inode->i_mapping;
-> -       struct pagevec pvec;
-> +       struct folio_batch fbatch;
->         pgoff_t index = 0, last = ULONG_MAX;
->         size_t ndirties = 0;
->         int i;
-> @@ -694,23 +694,26 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
->                 index = start >> PAGE_SHIFT;
->                 last = end >> PAGE_SHIFT;
->         }
-> -       pagevec_init(&pvec);
-> +       folio_batch_init(&fbatch);
->   repeat:
->         if (unlikely(index > last) ||
-> -           !pagevec_lookup_range_tag(&pvec, mapping, &index, last,
-> -                               PAGECACHE_TAG_DIRTY))
-> +             !filemap_get_folios_tag(mapping, &index, last,
-> +                     PAGECACHE_TAG_DIRTY, &fbatch))
->                 return ndirties;
->
-> -       for (i = 0; i < pagevec_count(&pvec); i++) {
-> +       for (i = 0; i < folio_batch_count(&fbatch); i++) {
->                 struct buffer_head *bh, *head;
-> -               struct page *page = pvec.pages[i];
-> +               struct folio *folio = fbatch.folios[i];
->
-> -               lock_page(page);
-> -               if (!page_has_buffers(page))
-> -                       create_empty_buffers(page, i_blocksize(inode), 0);
-> -               unlock_page(page);
+Hi, this is your Linux kernel regression tracker. Top-posting for once,
+to make this easily accessible to everyone.
 
-> +               head = folio_buffers(folio);
-> +               folio_lock(folio);
+As per recent general discussions with the 0-day folks, I'm dropping
+below regression from the list of tracked issues, as this report didn't
+gain any traction. That for example can happen if the developers
+considered the regression of no practical relevance, as they assume it
+only materializes in micro-benchmarks, is due to a broken test case, or
+some fluke.
 
-Could you please swap these two lines to keep the "head" check in the lock?
+Not sure if that or something else is the reason why this particular
+report didn't gain any traction, but I lack the bandwidth to follow-up
+on each and every regression some CI system found and reported. At the
+same time I don't want to keep these reports in the list of tracked
+issues forever, as that creates noise and makes it harder to spot the
+important issues in regzbot's reports and lists. That's why I hereby
+remove it:
 
-Thanks,
-Ryusuke Konishi
+#regzbot invalid: 0-day report that didn't get traction; might be of no
+relevance
 
+Ciao, Thorsten
 
-> +               if (!head) {
-> +                       create_empty_buffers(&folio->page, i_blocksize(inode), 0);
-> +                       head = folio_buffers(folio);
-> +               }
-> +               folio_unlock(folio);
->
-> -               bh = head = page_buffers(page);
-> +               bh = head;
->                 do {
->                         if (!buffer_dirty(bh) || buffer_async_write(bh))
->                                 continue;
-> @@ -718,13 +721,13 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
->                         list_add_tail(&bh->b_assoc_buffers, listp);
->                         ndirties++;
->                         if (unlikely(ndirties >= nlimit)) {
-> -                               pagevec_release(&pvec);
-> +                               folio_batch_release(&fbatch);
->                                 cond_resched();
->                                 return ndirties;
->                         }
->                 } while (bh = bh->b_this_page, bh != head);
->         }
-> -       pagevec_release(&pvec);
-> +       folio_batch_release(&fbatch);
->         cond_resched();
->         goto repeat;
->  }
-> --
-> 2.36.1
->
+On 26.08.22 04:41, kernel test robot wrote:
+> Greeting,
+> 
+> FYI, we noticed a -50.0% regression of filebench.sum_operations/s due to
+> commit:
+> 
+> 
+> commit: 5efdd9122eff772eae2feae9f0fc0ec02d4846a3 ("smb3: allow deferred
+> close timeout to be configurable")
+> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> 
+> in testcase: filebench
+> on test machine: 88 threads 2 sockets Intel(R) Xeon(R) Gold 6238M CPU @
+> 2.10GHz (Cascade Lake) with 128G memory
+> with following parameters:
+> 
+>     disk: 1HDD
+>     fs: ext4
+>     fs2: cifs
+>     test: filemicro_delete.f
+>     cpufreq_governor: performance
+>     ucode: 0x5003302
+> 
+> 
+> =========================================================================================
+> compiler/cpufreq_governor/disk/fs2/fs/kconfig/rootfs/tbox_group/test/testcase/ucode:
+>  
+> gcc-11/performance/1HDD/cifs/ext4/x86_64-rhel-8.3/debian-11.1-x86_64-20220510.cgz/lkp-csl-2sp9/filemicro_delete.f/filebench/0x5003302
+> 
+> commit:
+>   dcb45fd7f5 ("cifs: Do not use tcon->cfid directly, use the cfid we get
+> from open_cached_dir")
+>   5efdd9122e ("smb3: allow deferred close timeout to be configurable")
+> 
+> dcb45fd7f501f864 5efdd9122eff772eae2feae9f0f
+> ---------------- ---------------------------
+>          %stddev     %change         %stddev
+>              \          |                \
+>     515.95           -50.0%     257.98        filebench.sum_operations/s
+>       4.81 ±  2%   +1038.4%      54.78 ±  6%  filebench.sum_time_ms/op
+>      29.00 ±  8%    +212.1%      90.50 ±  3% 
+> filebench.time.percent_of_cpu_this_job_got
+>      24629            +2.7%      25297       
+> filebench.time.voluntary_context_switches
+>  7.685e+08           +19.3%  9.169e+08 ±  4%  cpuidle..time
+>       2.53 ±  6%     -20.6%       2.00 ±  3%  iostat.cpu.iowait
+>    1506141 ±  8%     +22.4%    1843256 ±  3%  turbostat.IRQ
+>       2.00           -50.0%       1.00        vmstat.procs.b
+>      21969 ±  2%      -9.5%      19885 ±  2%  vmstat.system.cs
+>       3.06 ±  7%      -0.7        2.35 ±  4%  mpstat.cpu.all.iowait%
+>       0.79 ±  5%      +0.5        1.27 ±  2%  mpstat.cpu.all.sys%
+>       0.89 ±  3%      -0.1        0.79 ±  3%  mpstat.cpu.all.usr%
+>      34.55 ± 14%     -34.8%      22.51 ± 27% 
+> sched_debug.cfs_rq:/.removed.runnable_avg.avg
+>     119.64 ±  3%     -20.0%      95.69 ± 17% 
+> sched_debug.cfs_rq:/.removed.runnable_avg.stddev
+>      34.55 ± 14%     -34.8%      22.51 ± 27% 
+> sched_debug.cfs_rq:/.removed.util_avg.avg
+>     119.64 ±  3%     -20.0%      95.69 ± 17% 
+> sched_debug.cfs_rq:/.removed.util_avg.stddev
+>       5249           +15.8%       6076        meminfo.Active
+>       3866 ±  2%     +17.7%       4552        meminfo.Active(anon)
+>       1382 ±  4%     +10.3%       1524 ±  4%  meminfo.Active(file)
+>      69791 ± 14%     +39.8%      97553 ±  6%  meminfo.AnonHugePages
+>      72709 ±  2%     +12.5%      81779 ±  3%  meminfo.Inactive(file)
+>      23219           +13.5%      26352 ±  3%  meminfo.KernelStack
+>     966.50 ±  2%     +17.7%       1137        proc-vmstat.nr_active_anon
+>      74302            +6.3%      78977 ±  2%  proc-vmstat.nr_anon_pages
+>      81133            +6.0%      85973        proc-vmstat.nr_inactive_anon
+>      18172 ±  2%     +12.5%      20442 ±  3%  proc-vmstat.nr_inactive_file
+>      23213           +13.5%      26348 ±  3%  proc-vmstat.nr_kernel_stack
+>      17983            +2.3%      18400        proc-vmstat.nr_mapped
+>       7446 ±  2%      +5.5%       7853 ±  3%  proc-vmstat.nr_shmem
+>      26888            +1.6%      27306       
+> proc-vmstat.nr_slab_reclaimable
+>      47220            +3.4%      48803       
+> proc-vmstat.nr_slab_unreclaimable
+>     966.50 ±  2%     +17.7%       1137       
+> proc-vmstat.nr_zone_active_anon
+>      81133            +6.0%      85973       
+> proc-vmstat.nr_zone_inactive_anon
+>      18172 ±  2%     +12.5%      20442 ±  3% 
+> proc-vmstat.nr_zone_inactive_file
+>     361460            +2.5%     370454        proc-vmstat.numa_hit
+>     946.67           +18.6%       1122        proc-vmstat.pgactivate
+>     361562            +2.5%     370553        proc-vmstat.pgalloc_normal
+>     187906            +4.7%     196761        proc-vmstat.pgfault
+>       8189            +2.5%       8395        proc-vmstat.pgreuse
+>  1.097e+09           +15.5%  1.267e+09 ±  7% 
+> perf-stat.i.branch-instructions
+>   39079265 ±  6%     -20.9%   30915354 ±  4%  perf-stat.i.branch-misses
+>    5093263 ±  4%     -23.7%    3884752 ±  9%  perf-stat.i.cache-misses
+>      29213           -18.7%      23764 ±  5%  perf-stat.i.context-switches
+>  7.666e+09 ±  4%      +5.7%  8.106e+09 ±  2%  perf-stat.i.cpu-cycles
+>       1877 ± 15%     +75.1%       3287 ± 12% 
+> perf-stat.i.cycles-between-cache-misses
+>    1735450 ±  3%     -12.9%    1512060 ±  3%  perf-stat.i.iTLB-load-misses
+>       2898 ±  3%     +34.4%       3895 ±  7% 
+> perf-stat.i.instructions-per-iTLB-miss
+>       1493           -20.3%       1190 ±  7%  perf-stat.i.major-faults
+>       0.09 ±  3%      +5.8%       0.09 ±  2%  perf-stat.i.metric.GHz
+>      48.47 ± 11%      +8.4       56.83 ±  7% 
+> perf-stat.i.node-store-miss-rate%
+>     283426 ±  4%     -21.6%     222190 ± 10%  perf-stat.i.node-stores
+>       3.57 ±  7%      -1.1        2.44 ±  6% 
+> perf-stat.overall.branch-miss-rate%
+>       1508 ±  3%     +39.8%       2108 ±  9% 
+> perf-stat.overall.cycles-between-cache-misses
+>       3022 ±  3%     +23.6%       3736 ±  5% 
+> perf-stat.overall.instructions-per-iTLB-miss
+>  9.585e+08           +18.8%  1.138e+09 ±  6% 
+> perf-stat.ps.branch-instructions
+>   34151514 ±  6%     -18.8%   27725316 ±  4%  perf-stat.ps.branch-misses
+>    4450329 ±  5%     -21.7%    3486409 ±  9%  perf-stat.ps.cache-misses
+>      25524           -16.4%      21333 ±  4%  perf-stat.ps.context-switches
+>      77139            +2.5%      79105        perf-stat.ps.cpu-clock
+>  6.704e+09 ±  4%      +8.7%  7.287e+09        perf-stat.ps.cpu-cycles
+>   1.06e+09           +11.3%   1.18e+09 ±  5%  perf-stat.ps.dTLB-loads
+>    1517349 ±  3%     -10.5%    1357716 ±  2%  perf-stat.ps.iTLB-load-misses
+>  4.582e+09           +10.8%  5.075e+09 ±  6%  perf-stat.ps.instructions
+>       1296           -18.1%       1061 ±  6%  perf-stat.ps.major-faults
+>     247613 ±  4%     -19.5%     199283 ±  9%  perf-stat.ps.node-stores
+>      77139            +2.5%      79105        perf-stat.ps.task-clock
+>  3.697e+10           +35.3%  5.003e+10        perf-stat.total.instructions
+>       8.51 ± 91%      -6.9        1.59 ±223% 
+> perf-profile.calltrace.cycles-pp.getdents64
+>       8.34 ± 83%      -6.7        1.67 ±141% 
+> perf-profile.calltrace.cycles-pp.exit_to_user_mode_loop.exit_to_user_mode_prepare.syscall_exit_to_user_mode.do_syscall_64.entry_SYSCALL_64_after_hwframe
+>       6.25 ±107%      -6.2        0.00       
+> perf-profile.calltrace.cycles-pp.entry_SYSCALL_64_after_hwframe.open64
+>       6.25 ±107%      -6.2        0.00       
+> perf-profile.calltrace.cycles-pp.do_syscall_64.entry_SYSCALL_64_after_hwframe.open64
+>       6.25 ±107%      -6.2        0.00       
+> perf-profile.calltrace.cycles-pp.open64
+>       7.63 ± 84%      -6.0        1.59 ±223% 
+> perf-profile.calltrace.cycles-pp.entry_SYSCALL_64_after_hwframe.getdents64
+>       7.63 ± 84%      -6.0        1.59 ±223% 
+> perf-profile.calltrace.cycles-pp.do_syscall_64.entry_SYSCALL_64_after_hwframe.getdents64
+>       7.63 ± 84%      -6.0        1.59 ±223% 
+> perf-profile.calltrace.cycles-pp.__x64_sys_getdents64.do_syscall_64.entry_SYSCALL_64_after_hwframe.getdents64
+>       7.63 ± 84%      -6.0        1.59 ±223% 
+> perf-profile.calltrace.cycles-pp.iterate_dir.__x64_sys_getdents64.do_syscall_64.entry_SYSCALL_64_after_hwframe.getdents64
+>       6.26 ±115%      -5.4        0.88 ±223% 
+> perf-profile.calltrace.cycles-pp.syscall_exit_to_user_mode.do_syscall_64.entry_SYSCALL_64_after_hwframe
+>       6.26 ±115%      -5.4        0.88 ±223% 
+> perf-profile.calltrace.cycles-pp.exit_to_user_mode_prepare.syscall_exit_to_user_mode.do_syscall_64.entry_SYSCALL_64_after_hwframe
+>       6.26 ±115%      -4.6        1.67 ±141% 
+> perf-profile.calltrace.cycles-pp.do_group_exit.get_signal.arch_do_signal_or_restart.exit_to_user_mode_loop.exit_to_user_mode_prepare
+>       6.26 ±115%      -4.6        1.67 ±141% 
+> perf-profile.calltrace.cycles-pp.do_exit.do_group_exit.get_signal.arch_do_signal_or_restart.exit_to_user_mode_loop
+>       6.26 ±115%      -4.6        1.67 ±141% 
+> perf-profile.calltrace.cycles-pp.arch_do_signal_or_restart.exit_to_user_mode_loop.exit_to_user_mode_prepare.syscall_exit_to_user_mode.do_syscall_64
+>       6.26 ±115%      -4.6        1.67 ±141% 
+> perf-profile.calltrace.cycles-pp.get_signal.arch_do_signal_or_restart.exit_to_user_mode_loop.exit_to_user_mode_prepare.syscall_exit_to_user_mode
+>       4.57 ± 73%      -3.8        0.76 ±223% 
+> perf-profile.calltrace.cycles-pp.asm_exc_page_fault.perf_mmap__read_head.perf_mmap__push.record__mmap_read_evlist.__cmd_record
+>       4.57 ± 73%      -3.8        0.76 ±223% 
+> perf-profile.calltrace.cycles-pp.exc_page_fault.asm_exc_page_fault.perf_mmap__read_head.perf_mmap__push.record__mmap_read_evlist
+>       4.57 ± 73%      -3.8        0.76 ±223% 
+> perf-profile.calltrace.cycles-pp.do_user_addr_fault.exc_page_fault.asm_exc_page_fault.perf_mmap__read_head.perf_mmap__push
+>       4.57 ± 73%      -3.8        0.76 ±223% 
+> perf-profile.calltrace.cycles-pp.perf_mmap__read_head.perf_mmap__push.record__mmap_read_evlist.__cmd_record.cmd_record
+>       3.38 ±103%      -3.4        0.00       
+> perf-profile.calltrace.cycles-pp.unmap_vmas.exit_mmap.mmput.exit_mm.do_exit
+>       3.38 ±103%      -3.4        0.00       
+> perf-profile.calltrace.cycles-pp.unmap_page_range.unmap_vmas.exit_mmap.mmput.exit_mm
+>       3.38 ±103%      -3.4        0.00       
+> perf-profile.calltrace.cycles-pp.zap_pmd_range.unmap_page_range.unmap_vmas.exit_mmap.mmput
+>       3.38 ±103%      -3.4        0.00       
+> perf-profile.calltrace.cycles-pp.zap_pte_range.zap_pmd_range.unmap_page_range.unmap_vmas.exit_mmap
+>       8.51 ± 91%      -6.9        1.59 ±223% 
+> perf-profile.children.cycles-pp.getdents64
+>       8.34 ± 83%      -6.7        1.67 ±141% 
+> perf-profile.children.cycles-pp.exit_to_user_mode_prepare
+>       8.34 ± 83%      -6.7        1.67 ±141% 
+> perf-profile.children.cycles-pp.exit_to_user_mode_loop
+>       8.34 ± 83%      -6.7        1.67 ±141% 
+> perf-profile.children.cycles-pp.syscall_exit_to_user_mode
+>       6.25 ±107%      -6.2        0.00       
+> perf-profile.children.cycles-pp.open64
+>       7.63 ± 84%      -6.0        1.59 ±223% 
+> perf-profile.children.cycles-pp.__x64_sys_getdents64
+>       7.63 ± 84%      -6.0        1.59 ±223% 
+> perf-profile.children.cycles-pp.iterate_dir
+>       6.26 ±115%      -4.6        1.67 ±141% 
+> perf-profile.children.cycles-pp.arch_do_signal_or_restart
+>       6.26 ±115%      -4.6        1.67 ±141% 
+> perf-profile.children.cycles-pp.get_signal
+>       4.57 ± 73%      -3.8        0.76 ±223% 
+> perf-profile.children.cycles-pp.perf_mmap__read_head
+>       3.38 ±103%      -3.4        0.00       
+> perf-profile.children.cycles-pp.unmap_vmas
+>       3.38 ±103%      -3.4        0.00       
+> perf-profile.children.cycles-pp.unmap_page_range
+>       3.38 ±103%      -3.4        0.00       
+> perf-profile.children.cycles-pp.zap_pmd_range
+>       3.38 ±103%      -3.4        0.00       
+> perf-profile.children.cycles-pp.zap_pte_range
+>       8.54 ± 43%      +8.6       17.19 ± 38% 
+> perf-profile.children.cycles-pp.asm_exc_page_fault
+> 
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kernel test robot <yujie.liu@intel.com>
+> 
+> 
+> To reproduce:
+> 
+>         git clone https://github.com/intel/lkp-tests.git
+>         cd lkp-tests
+>         sudo bin/lkp install job.yaml           # job file is attached
+> in this email
+>         bin/lkp split-job --compatible job.yaml # generate the yaml file
+> for lkp run
+>         sudo bin/lkp run generated-yaml-file
+> 
+>         # if come across any failure that blocks the test,
+>         # please remove ~/.lkp and /lkp dir to run from a clean state.
+> 
+> 
+> Disclaimer:
+> Results have been estimated based on internal Intel analysis and are
+> provided
+> for informational purposes only. Any difference in system hardware or
+> software
+> design or configuration may affect actual performance.
+> 
+> 
+> #regzbot introduced: 5efdd9122e
+> 
+> 
