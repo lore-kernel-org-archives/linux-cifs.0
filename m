@@ -2,166 +2,121 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67512ECAAA1
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Sep 2022 23:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 468CCECAAA1
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Sep 2022 23:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229461AbiIFXqs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Sep 2022 19:46:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56902 "EHLO
+        id S229485AbiIFXu1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Sep 2022 19:50:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiIFXqr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Sep 2022 19:46:47 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B58C91084
-        for <linux-cifs@vger.kernel.org>; Tue,  6 Sep 2022 16:46:46 -0700 (PDT)
+        with ESMTP id S229469AbiIFXu0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Sep 2022 19:50:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB7977F11B
+        for <linux-cifs@vger.kernel.org>; Tue,  6 Sep 2022 16:50:25 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F00C8B81A20
-        for <linux-cifs@vger.kernel.org>; Tue,  6 Sep 2022 23:46:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F122C433C1
-        for <linux-cifs@vger.kernel.org>; Tue,  6 Sep 2022 23:46:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5D56E61728
+        for <linux-cifs@vger.kernel.org>; Tue,  6 Sep 2022 23:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAD26C433B5
+        for <linux-cifs@vger.kernel.org>; Tue,  6 Sep 2022 23:50:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662508003;
-        bh=jGMQ541/HybnPHmogV8z+1O2X9QImOH7/rhWf+u3QG4=;
+        s=k20201202; t=1662508224;
+        bh=gpC7uXedF1XsIJGCu+uu58ITw26IluYtfZkipSNDJ+Y=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=MiIseyUEiWZS9dV5AX+Ph174K1Umb3TlG+WhmFm6qFvJ4AGj41toN/WOhRs4ySXKr
-         rDbpDI69ywXg0uJ6Qtn2DAfgvSbvxncI1pk6sVDAvqZWOTSKhCtaK8YrNTDLJsghBn
-         N9/1FGdVYjyqnkis0SqLuWRgfpdjfR7g4U0jkbHWzkKwqWHS3LFnTuuJlv1ZqVmlU7
-         bbxQJg1Kx476IGCY4qsGebFETDpj9LmWTMttifbyPPRYdeR722OZIXe6mT4fGKwjjk
-         Prl26qwzg/shRibYulSduvhg2YyMLxeC32zcCYdosDt1DOZopFGhKCAZVCxCetl0wa
-         P8+vAmFJjqQ0g==
-Received: by mail-ot1-f41.google.com with SMTP id l5-20020a05683004a500b0063707ff8244so9128186otd.12
-        for <linux-cifs@vger.kernel.org>; Tue, 06 Sep 2022 16:46:43 -0700 (PDT)
-X-Gm-Message-State: ACgBeo2BOqe85jsFAIxMMwPeTgeR/QRa7KkSsBMAhxqiz67I99LDfIeh
-        awgPVvJONIbmPZ2RUmHI0LYAG4PQoRPJJWEJefI=
-X-Google-Smtp-Source: AA6agR6I1442XVcH8xGZ78pm9Brvk8cEBtKf8PqQZTw5Cew0IutQBLuebwNa3YGoN5oWuFJ05MivKaS+QPuQzKknjRY=
-X-Received: by 2002:a9d:7519:0:b0:636:d935:ee8e with SMTP id
- r25-20020a9d7519000000b00636d935ee8emr384697otk.339.1662508002746; Tue, 06
- Sep 2022 16:46:42 -0700 (PDT)
+        b=Yc19ayT1QCNNAe6cgL1KwX/1XE1Jv60jw4yLs2W+9v2yQOh+7pr++WKgAmjiwnYYy
+         aQenNo1b3h1GDZOmurzEw/P+W1Vk1Oa0UJ8XBLo5o0lgDjikqRCFsK4JdcpZXLKN6R
+         pL/Rn1QK3SMP7rmRZXydVoIYkXjsBxV+yWkG9qq73p5OHflohC38gtyS8YaP/LA4SO
+         jrfeDOXJ3vqkJwgRI07qGR9z6ElHK34cHu5eR60RSh1c/+rB+Brc6r/IKOrlV16QcC
+         GyL5sadLX7q+IyGJjwtLU1ZR7XIj1Zvf9E+r0yc36+QpEa/DhprHxUwlP7URCPKwU8
+         LkQX1fm6X8jqA==
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-11ee4649dfcso32201645fac.1
+        for <linux-cifs@vger.kernel.org>; Tue, 06 Sep 2022 16:50:24 -0700 (PDT)
+X-Gm-Message-State: ACgBeo1G2f2xyaN0LGUdbPO29M9AgtSChiYdWznQGPDMs62LN1wD3UUL
+        ZsmEw49MTPWYrs3aln9/6AH2tMLVqfzI5AhTnik=
+X-Google-Smtp-Source: AA6agR65WgaHWvyWICxA+hSpOArTK+nFjevk+/Tkxt6EkRuMQX/ex6YcGfgQXDAWEsDAPEInndraDPab6rrkyLuEERg=
+X-Received: by 2002:aca:1106:0:b0:34b:89c9:f5f8 with SMTP id
+ 6-20020aca1106000000b0034b89c9f5f8mr4549414oir.8.1662508223888; Tue, 06 Sep
+ 2022 16:50:23 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Tue, 6 Sep 2022 16:46:42
+Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Tue, 6 Sep 2022 16:50:23
  -0700 (PDT)
-In-Reply-To: <356b6557-fa62-b611-8ef2-df9ca10a28c7@talpey.com>
-References: <20220906015823.12390-1-linkinjeon@kernel.org> <356b6557-fa62-b611-8ef2-df9ca10a28c7@talpey.com>
+In-Reply-To: <307b7cba-9c73-bcaf-d3f2-02c40ebaf836@huawei.com>
+References: <20220901142413.3351804-1-zhangxiaoxu5@huawei.com>
+ <20220901142413.3351804-3-zhangxiaoxu5@huawei.com> <6cf00762-f446-490c-5e88-79382962e985@talpey.com>
+ <CAKYAXd_FioX1ivG_cv=QTehaTw0ecAQA_-H0Y13Aqbaq=hB=Zg@mail.gmail.com> <307b7cba-9c73-bcaf-d3f2-02c40ebaf836@huawei.com>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 7 Sep 2022 08:46:42 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8bo2DS8HFpd=Gq3VFQ_P8rvBfSNAK08h6aSgKZ21cH1g@mail.gmail.com>
-Message-ID: <CAKYAXd8bo2DS8HFpd=Gq3VFQ_P8rvBfSNAK08h6aSgKZ21cH1g@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: update documentation
-To:     Tom Talpey <tom@talpey.com>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, hyc.lee@gmail.com,
-        senozhatsky@chromium.org, atteh.mailbox@gmail.com
+Date:   Wed, 7 Sep 2022 08:50:23 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9hnFeP7arBT75TdZ_gj=MCUiA3ebRYCFVWpsQZj6v+HQ@mail.gmail.com>
+Message-ID: <CAKYAXd9hnFeP7arBT75TdZ_gj=MCUiA3ebRYCFVWpsQZj6v+HQ@mail.gmail.com>
+Subject: Re: [PATCH v4 2/5] ksmbd: Remove the wrong message length check of FSCTL_VALIDATE_NEGOTIATE_INFO
+To:     "zhangxiaoxu (A)" <zhangxiaoxu5@huawei.com>
+Cc:     Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        sfrench@samba.org, pc@cjr.nz, lsahlber@redhat.com,
+        sprasad@microsoft.com, rohiths@microsoft.com, smfrench@gmail.com,
+        hyc.lee@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-09-07 2:09 GMT+09:00, Tom Talpey <tom@talpey.com>:
-> On 9/5/2022 9:58 PM, Namjae Jeon wrote:
->> configuration.txt in ksmbd-tools moved to ksmb.conf manpage.
->> update it and more detailed ksmbd-tools build method.
->>
->> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>   v2:
->>     - rename smb.conf to ksmbd.conf.
->>     - add how to set ksmbd module in menuconfig
->>     - remove --syscondir option for configure, instead change ksmbd
->>       directory to /usr/local/etc/ksmbd.
->>     - change the prompt to '$'.
->>
->>   Documentation/filesystems/cifs/ksmbd.rst | 32 ++++++++++++++++--------
->>   1 file changed, 22 insertions(+), 10 deletions(-)
->>
->> diff --git a/Documentation/filesystems/cifs/ksmbd.rst
->> b/Documentation/filesystems/cifs/ksmbd.rst
->> index 1af600db2e70..69d4a4c3313b 100644
->> --- a/Documentation/filesystems/cifs/ksmbd.rst
->> +++ b/Documentation/filesystems/cifs/ksmbd.rst
->> @@ -118,24 +118,36 @@ ksmbd/nfsd interoperability    Planned for future.
->> The features that ksmbd
->>   How to run
->>   ==========
->>
->> -1. Download ksmbd-tools and compile them.
->> -	- https://github.com/cifsd-team/ksmbd-tools
->> +1. Download
->> ksmbd-tools(https://github.com/cifsd-team/ksmbd-tools/releases) and
->> compile them.
->> +   - Refer
->> README(https://github.com/cifsd-team/ksmbd-tools/blob/master/README.md)
->> +     to know how to use ksmbd.<foo> utils
+2022-09-05 11:29 GMT+09:00, zhangxiaoxu (A) <zhangxiaoxu5@huawei.com>:
 >
-> I suggest typing out "<foo>" to include mountd, adduser and addshare.
-Okay.
 >
->> +
->> +     $ ./autogen.sh
->> +     $ ./configure --with-rundir=/run
->> +     $ make && sudo make install
->>
->>   2. Create user/password for SMB share.
->> +   - See ksmbd.adduser manpage.
->> +
->> +     $ man ksmbd.adduser
->> +     $ sudo ksmbd.adduser -a <Enter USERNAME for SMB share access>
->>
->> -	# mkdir /etc/ksmbd/
->> -	# ksmbd.adduser -a <Enter USERNAME for SMB share access>
->> +3. Create /usr/local/etc/ksmbd/ksmbd.conf file, add SMB share in smb.conf
->> file.
+> =E5=9C=A8 2022/9/2 22:47, Namjae Jeon =E5=86=99=E9=81=93:
+>> 2022-09-02 22:28 GMT+09:00, Tom Talpey <tom@talpey.com>:
+>>> On 9/1/2022 10:24 AM, Zhang Xiaoxu wrote:
+>>>> The struct validate_negotiate_info_req change from variable-length
+>>>> array
+>>>> to reguler array, but the message length check is unchanged.
+>>>>
+>>>> The fsctl_validate_negotiate_info() already check the message length,
+>>>> so
+>>>> remove it from smb2_ioctl().
+>>>>
+>>>> Fixes: c7803b05f74b ("smb3: fix ksmbd bigendian bug in oplock break,
+>>>> and
+>> I think the fixes tag is wrong. Isn't the below correct?
+>> Fixes: f7db8fd03a4bc ("ksmbd: add validation in smb2_ioctl")
 >
-> Typo - "ksmbd.conf" -------------------------------------------------^
-Will fix it.
+> Before commit c7803b05f74b ("smb3: fix ksmbd bigendian bug in oplock brea=
+k,
+> and
+> move its struct to smbfs_common"), the struct defined in
+> fs/ksmbd/smb2pdu.h:
 >
-> Wouldn't the ksmbd.addshare command be a safer way to do this?
-ksmbd.addshare can't update global section now. So I thought it seems
-appropriate to edit ksmbd.conf directly in the initial running. If you
-still need to add, please let me know.
+>    struct validate_negotiate_info_req {
+>           __le32 Capabilities;
+>           __u8   Guid[SMB2_CLIENT_GUID_SIZE];
+>           __le16 SecurityMode;
+>           __le16 DialectCount;
+>           __le16 Dialects[1]; /* dialect (someday maybe list) client aske=
+d
+> for */
+>    } __packed;
+>
+> After this commit, the struct defined in fs/smbfs_common/smb2pdu.h:
+>    struct validate_negotiate_info_req {
+>           __le32 Capabilities;
+>           __u8   Guid[SMB2_CLIENT_GUID_SIZE];
+>           __le16 SecurityMode;
+>           __le16 DialectCount;
+>           __le16 Dialects[4]; /* BB expand this if autonegotiate > 4
+> dialects */
+>    } __packed;
+>
+> The 'Dialects' array length from 1 change to 4.
+Okay, Do you think that your patch is not needed without commit c7803b05f74=
+b ?
+I understood that the InputCount check doesn't take the DialectCount
+into account and it's already a duplicate check, So you try to remove
+that.
 
 >
->> +   - Refer ksmbd.conf.example in ksmbd-utils, See ksmbd.conf manpage
->> +     for details to configure shares.
+> Before commit c7803b05f74b, the message should contain at lease 1 dialect=
+s,
+> but after this commit, it changed to should contain at lease 4 dialects.
 >
-> This way is fine too, but as an alternative for power users.
-Okay, I understood that there is no more update and sound fine.
->
->>
->> -3. Create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
->> -	- Refer smb.conf.example and
->> -
->> https://github.com/cifsd-team/ksmbd-tools/blob/master/Documentation/configuration.txt
->> +        $ man ksmbd.conf
->>
->> -4. Insert ksmbd.ko module
->> +4. Insert ksmbd.ko module after build your kernel.
->
-> Can't ksmbd be built-in as well?
-Probably add this comment for this.
-  4. Insert ksmbd.ko module (no need to load module if ksmbd is built
-into the kernel)
-
->
->> +   - Set ksmbd in menuconfig(e.g. $ make menuconfig)
->> +       [*] Network File Systems  --->
->> +           <M> SMB server support
->>
->> -	# insmod ksmbd.ko
->> +	$ sudo insmod ksmbd.ko
->>
->>   5. Start ksmbd user space daemon
->> -	# ksmbd.mountd
->> +
->> +	$ sudo ksmbd.mountd
->>
->>   6. Access share from Windows or Linux using CIFS
->
-> "SMB2 or SMB3" ----------------------------------^
-Okay, Will update like this.
- SMB3 client (cifs.ko or smbclient of samba)
-
-Thanks for your review!
->
-> Tom.
->
+> So the fixes tag should be c7803b05f74b.
