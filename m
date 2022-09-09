@@ -2,128 +2,212 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D2AECAAA1
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Sep 2022 09:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C91ECAAD3
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Sep 2022 10:51:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229825AbiIIJ25 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Sep 2022 05:28:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35992 "EHLO
+        id S229962AbiIIKvk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Sep 2022 06:51:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230249AbiIIJ14 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Sep 2022 05:27:56 -0400
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD295133A0D;
-        Fri,  9 Sep 2022 02:26:32 -0700 (PDT)
-Received: by mail-pj1-f41.google.com with SMTP id o4so979138pjp.4;
-        Fri, 09 Sep 2022 02:26:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=F6S9HUFtFHbXgTDeg7c9KYlUD/YQxZRLcxmv7Ib0sSQ=;
-        b=WPMS892kk8G8nSNtjpKm3TpY6T1I4oXQKBhUgbZ3ckQ7CELObjzJntr2OdPXVV4K7t
-         5Hi/gZ+25rquPVN+R8PNNy2uy+XzdzKwLhU2xln/VMZqgZ8B8+CKrBkD6hZMXZ44xRI6
-         eFuXH4sWTrZU6KuyLgHKU3JR5ZROk7KWQALhFaSJneZ9WetP5Sd1QHPij5knjM7Ly781
-         QiQy5egzaxWtlYWt/dy+uyZzkVIhULiW/Aq7T1juG85DjNEEYwdglmxOpdbCVpfhVtaO
-         cdX5xbvlA08vRaauWboEa/7Efb4GG0dOesX0xmZPvW/fxuiVpdYj0GIjSWjVheqP137P
-         eASw==
-X-Gm-Message-State: ACgBeo0tF7DCTAlA6qpgm/cIqu+ftZTxgNjjqbd5ASBgmIzdwtH8pPqC
-        1sbulfc+Nqoion4Hze9VvrlcDYE0Zds=
-X-Google-Smtp-Source: AA6agR4v7LLUZhMTqePQKqrYHW5Dv/zDwtgu/OYItdSezGGJzhaTeAUD7pSyilHCXBXDFKTgpaJqMw==
-X-Received: by 2002:a17:90a:c402:b0:1f2:ca71:93a5 with SMTP id i2-20020a17090ac40200b001f2ca7193a5mr8639862pjt.34.1662715591982;
-        Fri, 09 Sep 2022 02:26:31 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id e15-20020a17090a7c4f00b002008d0df002sm861874pjl.50.2022.09.09.02.26.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Sep 2022 02:26:31 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
-        stable@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>
-Subject: [PATCH v2] ksmbd: fix incorrect handling of iterate_dir
-Date:   Fri,  9 Sep 2022 18:25:57 +0900
-Message-Id: <20220909092558.9498-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S229974AbiIIKvg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Sep 2022 06:51:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09ED5D4BFA
+        for <linux-cifs@vger.kernel.org>; Fri,  9 Sep 2022 03:51:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4561B61F97
+        for <linux-cifs@vger.kernel.org>; Fri,  9 Sep 2022 10:51:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D02C4314B;
+        Fri,  9 Sep 2022 10:51:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662720691;
+        bh=tr54VAtkOub+ut6rxS/n3IKJNCLZc2z3a58rm9JqEok=;
+        h=From:To:Cc:Subject:Date:From;
+        b=sOx0yTeBwQ+G64pY5uxcZudfGhdiBNwYvbqdhbmCwfEOTeFCsastJ/zQUvMmoLZE8
+         dFTS7SM2WIKiBkvNpx6UOu8lyTK4rz4iNdKhK1NGiIlXjTEGrNJP4BoehQn38d4Jas
+         GjKk3RfxHCzIekAFKyOZcxp/rVxZNXxyKuX0SLnTDQoCq0btVmu/EpafdV1saRze0U
+         E2lzPuXChH0C9XxV6Q6ErKv0kKQVFtF29/6NlCLdzDgGSbq00WAzvBZG/KqLDp1smZ
+         IBH7BWnBRNpQOfcYCazNAkP5FtGCfRlQr5aKYZDgM6tfB9587fAkusEAZIUN9e12I3
+         axa5dHYPh3T1g==
+From:   Christian Brauner <brauner@kernel.org>
+To:     Steve French <sfrench@samba.org>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        Seth Forshee <sforshee@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, linux-cifs@vger.kernel.org
+Subject: [PATCH] ksmbd: port to vfs{g,u}id_t and associated helpers
+Date:   Fri,  9 Sep 2022 12:51:19 +0200
+Message-Id: <20220909105119.955332-1-brauner@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6099; i=brauner@kernel.org; h=from:subject; bh=tr54VAtkOub+ut6rxS/n3IKJNCLZc2z3a58rm9JqEok=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMSRLSy1malpyQNSstbTnT5Wm9K3dNnPebmJkfjmNJ2jntO+d U3VFO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbywoeR4fT3aHtWRn/bW5WTVhVeXZ ykc/X02c//jE6ums349ZLL4dsM/6t27Ou3dLEIevs3859ESJyGc8s8g/MRCisN+bf1vX4vxQIA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-if iterate_dir() returns non-negative value, caller has to treat it
-as normal and check there is any error while populating dentry
-information. ksmbd doesn't have to do anything because ksmbd already
-checks too small OutputBufferLength to store one file information.
+A while ago we introduced a dedicated vfs{g,u}id_t type in commit
+1e5267cd0895 ("mnt_idmapping: add vfs{g,u}id_t"). We already switched
+over a good part of the VFS. Ultimately we will remove all legacy
+idmapped mount helpers that operate only on k{g,u}id_t in favor of the
+new type safe helpers that operate on vfs{g,u}id_t.
 
-And because ctx->pos is set to file->f_pos when iterative_dir is called,
-remove restart_ctx(). And if iterate_dir() return -EIO, which mean
-directory entry is corrupted, return STATUS_FILE_CORRUPT_ERROR error
-response.
-
-This patch fixes some failure of SMB2_QUERY_DIRECTORY, which happens when
-ntfs3 is local filesystem.
-
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Cc: stable@vger.kernel.org
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Seth Forshee (Digital Ocean) <sforshee@kernel.org>
+Cc: Steve French <sfrench@samba.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Hyunchul Lee <hyc.lee@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Christian Brauner (Microsoft) <brauner@kernel.org>
 ---
- v2:
-   - remove unneeded restart_ctx().
-   - If directory entry is corrupted, return STATUS_FILE_CORRUPT_ERROR
-     error response.
+ fs/ksmbd/ndr.c     |  8 ++++++--
+ fs/ksmbd/oplock.c  |  8 ++++----
+ fs/ksmbd/smb2pdu.c |  7 +++++--
+ fs/ksmbd/smbacl.c  |  6 ++++--
+ fs/ksmbd/smbacl.h  | 12 ++++++------
+ 5 files changed, 25 insertions(+), 16 deletions(-)
 
- fs/ksmbd/smb2pdu.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index ba74aba2f1d3..634e21bba770 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -3809,11 +3809,6 @@ static int __query_dir(struct dir_context *ctx, const char *name, int namlen,
- 	return 0;
+diff --git a/fs/ksmbd/ndr.c b/fs/ksmbd/ndr.c
+index 5052be9261d9..0ae8d08d85a8 100644
+--- a/fs/ksmbd/ndr.c
++++ b/fs/ksmbd/ndr.c
+@@ -345,6 +345,8 @@ int ndr_encode_posix_acl(struct ndr *n,
+ {
+ 	unsigned int ref_id = 0x00020000;
+ 	int ret;
++	vfsuid_t vfsuid;
++	vfsgid_t vfsgid;
+ 
+ 	n->offset = 0;
+ 	n->length = 1024;
+@@ -372,10 +374,12 @@ int ndr_encode_posix_acl(struct ndr *n,
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = ndr_write_int64(n, from_kuid(&init_user_ns, i_uid_into_mnt(user_ns, inode)));
++	vfsuid = i_uid_into_vfsuid(user_ns, inode);
++	ret = ndr_write_int64(n, from_kuid(&init_user_ns, vfsuid_into_kuid(vfsuid)));
+ 	if (ret)
+ 		return ret;
+-	ret = ndr_write_int64(n, from_kgid(&init_user_ns, i_gid_into_mnt(user_ns, inode)));
++	vfsgid = i_gid_into_vfsgid(user_ns, inode);
++	ret = ndr_write_int64(n, from_kgid(&init_user_ns, vfsgid_into_kgid(vfsgid)));
+ 	if (ret)
+ 		return ret;
+ 	ret = ndr_write_int32(n, inode->i_mode);
+diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
+index 9046cff4374b..2e56dac1fa6e 100644
+--- a/fs/ksmbd/oplock.c
++++ b/fs/ksmbd/oplock.c
+@@ -1609,6 +1609,8 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
+ 	struct create_posix_rsp *buf;
+ 	struct inode *inode = file_inode(fp->filp);
+ 	struct user_namespace *user_ns = file_mnt_user_ns(fp->filp);
++	vfsuid_t vfsuid = i_uid_into_vfsuid(user_ns, inode);
++	vfsgid_t vfsgid = i_gid_into_vfsgid(user_ns, inode);
+ 
+ 	buf = (struct create_posix_rsp *)cc;
+ 	memset(buf, 0, sizeof(struct create_posix_rsp));
+@@ -1639,11 +1641,9 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
+ 	buf->nlink = cpu_to_le32(inode->i_nlink);
+ 	buf->reparse_tag = cpu_to_le32(fp->volatile_id);
+ 	buf->mode = cpu_to_le32(inode->i_mode);
+-	id_to_sid(from_kuid_munged(&init_user_ns,
+-				   i_uid_into_mnt(user_ns, inode)),
++	id_to_sid(from_kuid_munged(&init_user_ns, vfsuid_into_kuid(vfsuid)),
+ 		  SIDNFS_USER, (struct smb_sid *)&buf->SidBuffer[0]);
+-	id_to_sid(from_kgid_munged(&init_user_ns,
+-				   i_gid_into_mnt(user_ns, inode)),
++	id_to_sid(from_kgid_munged(&init_user_ns, vfsgid_into_kgid(vfsgid)),
+ 		  SIDNFS_GROUP, (struct smb_sid *)&buf->SidBuffer[20]);
  }
  
--static void restart_ctx(struct dir_context *ctx)
--{
--	ctx->pos = 0;
--}
--
- static int verify_info_level(int info_level)
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 19412ac701a6..b6d63d45ac62 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -2477,8 +2477,11 @@ static void ksmbd_acls_fattr(struct smb_fattr *fattr,
+ 			     struct user_namespace *mnt_userns,
+ 			     struct inode *inode)
  {
- 	switch (info_level) {
-@@ -3921,7 +3916,6 @@ int smb2_query_dir(struct ksmbd_work *work)
- 	if (srch_flag & SMB2_REOPEN || srch_flag & SMB2_RESTART_SCANS) {
- 		ksmbd_debug(SMB, "Restart directory scan\n");
- 		generic_file_llseek(dir_fp->filp, 0, SEEK_SET);
--		restart_ctx(&dir_fp->readdir_data.ctx);
- 	}
+-	fattr->cf_uid = i_uid_into_mnt(mnt_userns, inode);
+-	fattr->cf_gid = i_gid_into_mnt(mnt_userns, inode);
++	vfsuid_t vfsuid = i_uid_into_vfsuid(mnt_userns, inode);
++	vfsgid_t vfsgid = i_gid_into_vfsgid(mnt_userns, inode);
++
++	fattr->cf_uid = vfsuid_into_kuid(vfsuid);
++	fattr->cf_gid = vfsgid_into_kgid(vfsgid);
+ 	fattr->cf_mode = inode->i_mode;
+ 	fattr->cf_acls = NULL;
+ 	fattr->cf_dacls = NULL;
+diff --git a/fs/ksmbd/smbacl.c b/fs/ksmbd/smbacl.c
+index 3781bca2c8fc..93983e5880a9 100644
+--- a/fs/ksmbd/smbacl.c
++++ b/fs/ksmbd/smbacl.c
+@@ -275,7 +275,8 @@ static int sid_to_id(struct user_namespace *user_ns,
+ 		uid_t id;
  
- 	memset(&d_info, 0, sizeof(struct ksmbd_dir_info));
-@@ -3968,11 +3962,9 @@ int smb2_query_dir(struct ksmbd_work *work)
- 	 */
- 	if (!d_info.out_buf_len && !d_info.num_entry)
- 		goto no_buf_len;
--	if (rc == 0)
--		restart_ctx(&dir_fp->readdir_data.ctx);
--	if (rc == -ENOSPC)
-+	if (rc > 0 || rc == -ENOSPC)
- 		rc = 0;
--	if (rc)
-+	else if (rc)
- 		goto err_out;
+ 		id = le32_to_cpu(psid->sub_auth[psid->num_subauth - 1]);
+-		uid = mapped_kuid_user(user_ns, &init_user_ns, KUIDT_INIT(id));
++		uid = KUIDT_INIT(id);
++		uid = from_vfsuid(user_ns, &init_user_ns, VFSUIDT_INIT(uid));
+ 		if (uid_valid(uid)) {
+ 			fattr->cf_uid = uid;
+ 			rc = 0;
+@@ -285,7 +286,8 @@ static int sid_to_id(struct user_namespace *user_ns,
+ 		gid_t id;
  
- 	d_info.wptr = d_info.rptr;
-@@ -4029,6 +4021,8 @@ int smb2_query_dir(struct ksmbd_work *work)
- 		rsp->hdr.Status = STATUS_NO_MEMORY;
- 	else if (rc == -EFAULT)
- 		rsp->hdr.Status = STATUS_INVALID_INFO_CLASS;
-+	else if (rc == -EIO)
-+		rsp->hdr.Status = STATUS_FILE_CORRUPT_ERROR;
- 	if (!rsp->hdr.Status)
- 		rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+ 		id = le32_to_cpu(psid->sub_auth[psid->num_subauth - 1]);
+-		gid = mapped_kgid_user(user_ns, &init_user_ns, KGIDT_INIT(id));
++		gid = KGIDT_INIT(id);
++		gid = from_vfsgid(user_ns, &init_user_ns, VFSGIDT_INIT(gid));
+ 		if (gid_valid(gid)) {
+ 			fattr->cf_gid = gid;
+ 			rc = 0;
+diff --git a/fs/ksmbd/smbacl.h b/fs/ksmbd/smbacl.h
+index fcb2c83f2992..7e6e75e143ad 100644
+--- a/fs/ksmbd/smbacl.h
++++ b/fs/ksmbd/smbacl.h
+@@ -214,25 +214,25 @@ void ksmbd_init_domain(u32 *sub_auth);
+ static inline uid_t posix_acl_uid_translate(struct user_namespace *mnt_userns,
+ 					    struct posix_acl_entry *pace)
+ {
+-	kuid_t kuid;
++	vfsuid_t vfsuid;
  
+ 	/* If this is an idmapped mount, apply the idmapping. */
+-	kuid = mapped_kuid_fs(mnt_userns, &init_user_ns, pace->e_uid);
++	vfsuid = make_vfsuid(mnt_userns, &init_user_ns, pace->e_uid);
+ 
+ 	/* Translate the kuid into a userspace id ksmbd would see. */
+-	return from_kuid(&init_user_ns, kuid);
++	return from_kuid(&init_user_ns, vfsuid_into_kuid(vfsuid));
+ }
+ 
+ static inline gid_t posix_acl_gid_translate(struct user_namespace *mnt_userns,
+ 					    struct posix_acl_entry *pace)
+ {
+-	kgid_t kgid;
++	vfsgid_t vfsgid;
+ 
+ 	/* If this is an idmapped mount, apply the idmapping. */
+-	kgid = mapped_kgid_fs(mnt_userns, &init_user_ns, pace->e_gid);
++	vfsgid = make_vfsgid(mnt_userns, &init_user_ns, pace->e_gid);
+ 
+ 	/* Translate the kgid into a userspace id ksmbd would see. */
+-	return from_kgid(&init_user_ns, kgid);
++	return from_kgid(&init_user_ns, vfsgid_into_kgid(vfsgid));
+ }
+ 
+ #endif /* _SMBACL_H */
+
+base-commit: 7e18e42e4b280c85b76967a9106a13ca61c16179
 -- 
-2.25.1
+2.34.1
 
