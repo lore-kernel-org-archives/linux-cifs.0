@@ -2,140 +2,128 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CD1ECAAA1
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Sep 2022 09:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D2AECAAA1
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Sep 2022 09:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229437AbiIIJ24 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Sep 2022 05:28:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34692 "EHLO
+        id S229825AbiIIJ25 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Sep 2022 05:28:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231773AbiIIJ2G (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Sep 2022 05:28:06 -0400
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05782131EC1
-        for <linux-cifs@vger.kernel.org>; Fri,  9 Sep 2022 02:26:36 -0700 (PDT)
-Received: by mail-pl1-f179.google.com with SMTP id iw17so1280761plb.0
-        for <linux-cifs@vger.kernel.org>; Fri, 09 Sep 2022 02:26:36 -0700 (PDT)
+        with ESMTP id S230249AbiIIJ14 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Sep 2022 05:27:56 -0400
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD295133A0D;
+        Fri,  9 Sep 2022 02:26:32 -0700 (PDT)
+Received: by mail-pj1-f41.google.com with SMTP id o4so979138pjp.4;
+        Fri, 09 Sep 2022 02:26:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=LEbk7Xw+K91iRlZjEwuiCTLZdZtjHRjY5qK5vEnCgrg=;
-        b=hT6bmQS9CtHI7shcWOz4X65ay9RZshk7DegbmWZbWl0oyQybT9v1KxRYZVb95M4k+f
-         /75Tl8OX3T+c/Vz9yq33oJ1yRyCgZ+HBjIw3tbNzNFa2LnX2y8D/5LCCrsAZ6ieqyZmQ
-         fbSl8G+kcP/hOKdqbblOpwSIc7SkL4g5zP2yIGonm7qnYovxD90x6eZf8glaIpFefdjB
-         6Gxet3P2Cb4z2QA8q1xyhvZLpJI30+Be4DifupihPKu1GlBcKeCjbGpYrgFGmSRRDVkh
-         5IsneaNfnGljxnAq+8U4aDHO8JyhhpZr/qwB7RK+aNOjEb2HIF4NP/pcLQAr3fin6yaf
-         1SOg==
-X-Gm-Message-State: ACgBeo2nOnFbykbxhONXbOb3iO8kMnUalWK0MblG2m4CBgkSRzk+67EQ
-        drQinDqYOZ6LDfS1TGqeuM/nYPml6e0=
-X-Google-Smtp-Source: AA6agR4Dk6mqdgl+SMi0Us1uecaqxIGt6M0+pL/uCQ+nDpMrTPS7JkCY/MGjf49RDf4KD9T0JxfaAw==
-X-Received: by 2002:a17:90b:3b91:b0:202:91d7:6a5d with SMTP id pc17-20020a17090b3b9100b0020291d76a5dmr879962pjb.101.1662715595334;
-        Fri, 09 Sep 2022 02:26:35 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=F6S9HUFtFHbXgTDeg7c9KYlUD/YQxZRLcxmv7Ib0sSQ=;
+        b=WPMS892kk8G8nSNtjpKm3TpY6T1I4oXQKBhUgbZ3ckQ7CELObjzJntr2OdPXVV4K7t
+         5Hi/gZ+25rquPVN+R8PNNy2uy+XzdzKwLhU2xln/VMZqgZ8B8+CKrBkD6hZMXZ44xRI6
+         eFuXH4sWTrZU6KuyLgHKU3JR5ZROk7KWQALhFaSJneZ9WetP5Sd1QHPij5knjM7Ly781
+         QiQy5egzaxWtlYWt/dy+uyZzkVIhULiW/Aq7T1juG85DjNEEYwdglmxOpdbCVpfhVtaO
+         cdX5xbvlA08vRaauWboEa/7Efb4GG0dOesX0xmZPvW/fxuiVpdYj0GIjSWjVheqP137P
+         eASw==
+X-Gm-Message-State: ACgBeo0tF7DCTAlA6qpgm/cIqu+ftZTxgNjjqbd5ASBgmIzdwtH8pPqC
+        1sbulfc+Nqoion4Hze9VvrlcDYE0Zds=
+X-Google-Smtp-Source: AA6agR4v7LLUZhMTqePQKqrYHW5Dv/zDwtgu/OYItdSezGGJzhaTeAUD7pSyilHCXBXDFKTgpaJqMw==
+X-Received: by 2002:a17:90a:c402:b0:1f2:ca71:93a5 with SMTP id i2-20020a17090ac40200b001f2ca7193a5mr8639862pjt.34.1662715591982;
+        Fri, 09 Sep 2022 02:26:31 -0700 (PDT)
 Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id e15-20020a17090a7c4f00b002008d0df002sm861874pjl.50.2022.09.09.02.26.33
+        by smtp.gmail.com with ESMTPSA id e15-20020a17090a7c4f00b002008d0df002sm861874pjl.50.2022.09.09.02.26.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Sep 2022 02:26:34 -0700 (PDT)
+        Fri, 09 Sep 2022 02:26:31 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v3] ksmbd: update documentation
-Date:   Fri,  9 Sep 2022 18:25:58 +0900
-Message-Id: <20220909092558.9498-2-linkinjeon@kernel.org>
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
+        stable@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>
+Subject: [PATCH v2] ksmbd: fix incorrect handling of iterate_dir
+Date:   Fri,  9 Sep 2022 18:25:57 +0900
+Message-Id: <20220909092558.9498-1-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220909092558.9498-1-linkinjeon@kernel.org>
-References: <20220909092558.9498-1-linkinjeon@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-configuration.txt in ksmbd-tools moved to ksmbd.conf manpage.
-update it and more detailed ksmbd-tools build method.
+if iterate_dir() returns non-negative value, caller has to treat it
+as normal and check there is any error while populating dentry
+information. ksmbd doesn't have to do anything because ksmbd already
+checks too small OutputBufferLength to store one file information.
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+And because ctx->pos is set to file->f_pos when iterative_dir is called,
+remove restart_ctx(). And if iterate_dir() return -EIO, which mean
+directory entry is corrupted, return STATUS_FILE_CORRUPT_ERROR error
+response.
+
+This patch fixes some failure of SMB2_QUERY_DIRECTORY, which happens when
+ntfs3 is local filesystem.
+
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- v3:
-   - replace CIFS with SMB3 clients.
-   - update ksmbd built-in case.
-   - replace smb.conf leftover with ksmbd.conf.
-   - use full name of utils in ksmbd-tools instead of <foo>.
-   - fix the warnings from make htlmdocs build reported by kernel test
-     robot.
  v2:
-   - rename smb.conf to ksmbd.conf.
-   - add how to set ksmbd module in menuconfig
-   - remove --syscondir option for configure, instead change ksmbd
-     directory to /usr/local/etc/ksmbd.
-   - change the prompt to '$'.
+   - remove unneeded restart_ctx().
+   - If directory entry is corrupted, return STATUS_FILE_CORRUPT_ERROR
+     error response.
 
- Documentation/filesystems/cifs/ksmbd.rst | 40 +++++++++++++++++-------
- 1 file changed, 29 insertions(+), 11 deletions(-)
+ fs/ksmbd/smb2pdu.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/filesystems/cifs/ksmbd.rst b/Documentation/filesystems/cifs/ksmbd.rst
-index 1af600db2e70..4284341c89f3 100644
---- a/Documentation/filesystems/cifs/ksmbd.rst
-+++ b/Documentation/filesystems/cifs/ksmbd.rst
-@@ -118,26 +118,44 @@ ksmbd/nfsd interoperability    Planned for future. The features that ksmbd
- How to run
- ==========
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index ba74aba2f1d3..634e21bba770 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -3809,11 +3809,6 @@ static int __query_dir(struct dir_context *ctx, const char *name, int namlen,
+ 	return 0;
+ }
  
--1. Download ksmbd-tools and compile them.
--	- https://github.com/cifsd-team/ksmbd-tools
-+1. Download ksmbd-tools(https://github.com/cifsd-team/ksmbd-tools/releases) and
-+   compile them.
-+
-+   - Refer README(https://github.com/cifsd-team/ksmbd-tools/blob/master/README.md)
-+     to know how to use ksmbd.mountd/adduser/addshare/control utils
-+
-+     $ ./autogen.sh
-+     $ ./configure --with-rundir=/run
-+     $ make && sudo make install
+-static void restart_ctx(struct dir_context *ctx)
+-{
+-	ctx->pos = 0;
+-}
+-
+ static int verify_info_level(int info_level)
+ {
+ 	switch (info_level) {
+@@ -3921,7 +3916,6 @@ int smb2_query_dir(struct ksmbd_work *work)
+ 	if (srch_flag & SMB2_REOPEN || srch_flag & SMB2_RESTART_SCANS) {
+ 		ksmbd_debug(SMB, "Restart directory scan\n");
+ 		generic_file_llseek(dir_fp->filp, 0, SEEK_SET);
+-		restart_ctx(&dir_fp->readdir_data.ctx);
+ 	}
  
- 2. Create user/password for SMB share.
+ 	memset(&d_info, 0, sizeof(struct ksmbd_dir_info));
+@@ -3968,11 +3962,9 @@ int smb2_query_dir(struct ksmbd_work *work)
+ 	 */
+ 	if (!d_info.out_buf_len && !d_info.num_entry)
+ 		goto no_buf_len;
+-	if (rc == 0)
+-		restart_ctx(&dir_fp->readdir_data.ctx);
+-	if (rc == -ENOSPC)
++	if (rc > 0 || rc == -ENOSPC)
+ 		rc = 0;
+-	if (rc)
++	else if (rc)
+ 		goto err_out;
  
--	# mkdir /etc/ksmbd/
--	# ksmbd.adduser -a <Enter USERNAME for SMB share access>
-+   - See ksmbd.adduser manpage.
-+
-+     $ man ksmbd.adduser
-+     $ sudo ksmbd.adduser -a <Enter USERNAME for SMB share access>
-+
-+3. Create /usr/local/etc/ksmbd/ksmbd.conf file, add SMB share in ksmbd.conf file.
+ 	d_info.wptr = d_info.rptr;
+@@ -4029,6 +4021,8 @@ int smb2_query_dir(struct ksmbd_work *work)
+ 		rsp->hdr.Status = STATUS_NO_MEMORY;
+ 	else if (rc == -EFAULT)
+ 		rsp->hdr.Status = STATUS_INVALID_INFO_CLASS;
++	else if (rc == -EIO)
++		rsp->hdr.Status = STATUS_FILE_CORRUPT_ERROR;
+ 	if (!rsp->hdr.Status)
+ 		rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
  
--3. Create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
--	- Refer smb.conf.example and
--          https://github.com/cifsd-team/ksmbd-tools/blob/master/Documentation/configuration.txt
-+   - Refer ksmbd.conf.example in ksmbd-utils, See ksmbd.conf manpage
-+     for details to configure shares.
- 
--4. Insert ksmbd.ko module
-+        $ man ksmbd.conf
- 
--	# insmod ksmbd.ko
-+4. Insert ksmbd.ko module after build your kernel. No need to load module
-+   if ksmbd is built into the kernel.
-+
-+   - Set ksmbd in menuconfig(e.g. $ make menuconfig)
-+       [*] Network File Systems  --->
-+           <M> SMB3 server support (EXPERIMENTAL)
-+
-+	$ sudo modprobe ksmbd.ko
- 
- 5. Start ksmbd user space daemon
--	# ksmbd.mountd
- 
--6. Access share from Windows or Linux using CIFS
-+	$ sudo ksmbd.mountd
-+
-+6. Access share from Windows or Linux SMB3 clients (cifs.ko or smbclient of samba)
- 
- Shutdown KSMBD
- ==============
 -- 
 2.25.1
 
