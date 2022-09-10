@@ -2,212 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C91ECAAD3
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Sep 2022 10:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC505ECAAD3
+	for <linux-cifs@archiver.kernel.org>; Sat, 10 Sep 2022 15:20:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbiIIKvk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Sep 2022 06:51:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57124 "EHLO
+        id S229446AbiIJPUM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 10 Sep 2022 11:20:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229974AbiIIKvg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Sep 2022 06:51:36 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09ED5D4BFA
-        for <linux-cifs@vger.kernel.org>; Fri,  9 Sep 2022 03:51:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4561B61F97
-        for <linux-cifs@vger.kernel.org>; Fri,  9 Sep 2022 10:51:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D02C4314B;
-        Fri,  9 Sep 2022 10:51:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662720691;
-        bh=tr54VAtkOub+ut6rxS/n3IKJNCLZc2z3a58rm9JqEok=;
-        h=From:To:Cc:Subject:Date:From;
-        b=sOx0yTeBwQ+G64pY5uxcZudfGhdiBNwYvbqdhbmCwfEOTeFCsastJ/zQUvMmoLZE8
-         dFTS7SM2WIKiBkvNpx6UOu8lyTK4rz4iNdKhK1NGiIlXjTEGrNJP4BoehQn38d4Jas
-         GjKk3RfxHCzIekAFKyOZcxp/rVxZNXxyKuX0SLnTDQoCq0btVmu/EpafdV1saRze0U
-         E2lzPuXChH0C9XxV6Q6ErKv0kKQVFtF29/6NlCLdzDgGSbq00WAzvBZG/KqLDp1smZ
-         IBH7BWnBRNpQOfcYCazNAkP5FtGCfRlQr5aKYZDgM6tfB9587fAkusEAZIUN9e12I3
-         axa5dHYPh3T1g==
-From:   Christian Brauner <brauner@kernel.org>
-To:     Steve French <sfrench@samba.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        Seth Forshee <sforshee@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, linux-cifs@vger.kernel.org
-Subject: [PATCH] ksmbd: port to vfs{g,u}id_t and associated helpers
-Date:   Fri,  9 Sep 2022 12:51:19 +0200
-Message-Id: <20220909105119.955332-1-brauner@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S229505AbiIJPUL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 10 Sep 2022 11:20:11 -0400
+Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E6A731221
+        for <linux-cifs@vger.kernel.org>; Sat, 10 Sep 2022 08:20:10 -0700 (PDT)
+Received: by mail-vk1-xa2c.google.com with SMTP id i129so2150050vke.3
+        for <linux-cifs@vger.kernel.org>; Sat, 10 Sep 2022 08:20:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=NbRgJKCRWGQd/c19xH6FT1xuMFjXTuQq8SsfdtMUBb8=;
+        b=MVd1vmT8Ukpy4zxs0uRhiC606T1OrWOkhSAisZG49KH8YMNzf4WvaobUss0GhJ/O0V
+         83NOQ59oK7BfLuJb1VPWDq5mzKEy5QIAzyKoSMfTSy6DJtcaqNwa7R4KvOtY1E0HvJ/k
+         Qn90ZSKYFIRVzRDblq9X95Zgq7MeTbhBT08jZvDeV8y4N2gHaGPMQqES9iGSNTy61L/w
+         3v4bBZd4gR9D3s3w0bsTJVwytBnyyB/bxIjzC12CgA0PRvSANH5OsK64AEBRfYm3D0fZ
+         AbXQRmNOCJIkTMXVJE4MYeHs+zjpKjLoXjupok40sk9NgTye4CwuoOM9Y1CjpuIASO32
+         2Ykg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=NbRgJKCRWGQd/c19xH6FT1xuMFjXTuQq8SsfdtMUBb8=;
+        b=Ju31zATn1TluPMcBXSC4I0h6VKDF3Y9MPhweu6TBSwVlk6a3WB18ocmz9AqjCoajrj
+         M0lFpoDKSCUj1Mz32wJllykR69ThpHmMLnDEXEHbNgpYoQnqtV/YXhS+OvgAKSzr5mW7
+         iMsxm21nqFkWKwSyiNv5m0PMW832Idwa2dCJs7FiuSFTzJWM3kj1o6dcVRpY8BMDJhFz
+         Yo/i6m8DDUmNCixlMMdc6IYwPIRQHyKvxdcnIuWbFasIdu3rhhDeGffTIceJd++DWdze
+         ZmUUNttbhuxxI72fNG65EP7wRa2hOBjwmLsqYfkikDisDVw1w8M35UzJ8+gB8KcBZbKH
+         XBnQ==
+X-Gm-Message-State: ACgBeo1LHaBeXT2AX0LqQglI7d7n7XLir74PT/i0l3gu+V6dxZXRIvzc
+        q1FIFCNKX2alsYP7crfjTxb3bfdAwcX45TgcQJb9os4k
+X-Google-Smtp-Source: AA6agR6SAjfyGc7iDix0+g1c9fsHRO1WMKtQ20cpGMLfcwYr+oJIirZrA0bupHX+6Ilz+HhD9lKAovRfCkudYhoU4OU=
+X-Received: by 2002:ac5:cb0a:0:b0:3a2:2fa3:87d8 with SMTP id
+ r10-20020ac5cb0a000000b003a22fa387d8mr113439vkl.3.1662823209208; Sat, 10 Sep
+ 2022 08:20:09 -0700 (PDT)
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6099; i=brauner@kernel.org; h=from:subject; bh=tr54VAtkOub+ut6rxS/n3IKJNCLZc2z3a58rm9JqEok=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMSRLSy1malpyQNSstbTnT5Wm9K3dNnPebmJkfjmNJ2jntO+d U3VFO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbywoeR4fT3aHtWRn/bW5WTVhVeXZ ykc/X02c//jE6ums349ZLL4dsM/6t27Ou3dLEIevs3859ESJyGc8s8g/MRCisN+bf1vX4vxQIA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+References: <20220906054240.4148159-1-lsahlber@redhat.com>
+In-Reply-To: <20220906054240.4148159-1-lsahlber@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 10 Sep 2022 10:19:58 -0500
+Message-ID: <CAH2r5mu2sKKcf3H0wNYVUJgpVYLRSEPdu+PPiWZHJfNnV=aTNA@mail.gmail.com>
+Subject: Re: CIFS: attempt to fix kernel bugzilla 215375
+To:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        Davyd McColl <davydm@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-A while ago we introduced a dedicated vfs{g,u}id_t type in commit
-1e5267cd0895 ("mnt_idmapping: add vfs{g,u}id_t"). We already switched
-over a good part of the VFS. Ultimately we will remove all legacy
-idmapped mount helpers that operate only on k{g,u}id_t in favor of the
-new type safe helpers that operate on vfs{g,u}id_t.
+Any thoughts about setting up VMs for Win98 to try this?  Any luck
+trying to test with the fix?
 
-Cc: Seth Forshee (Digital Ocean) <sforshee@kernel.org>
-Cc: Steve French <sfrench@samba.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Hyunchul Lee <hyc.lee@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Christian Brauner (Microsoft) <brauner@kernel.org>
----
- fs/ksmbd/ndr.c     |  8 ++++++--
- fs/ksmbd/oplock.c  |  8 ++++----
- fs/ksmbd/smb2pdu.c |  7 +++++--
- fs/ksmbd/smbacl.c  |  6 ++++--
- fs/ksmbd/smbacl.h  | 12 ++++++------
- 5 files changed, 25 insertions(+), 16 deletions(-)
+On Tue, Sep 6, 2022 at 12:42 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>
+> Steve,
+> Here is an attempt to fix kernel bz 215375.
+> I can not test it, since I don't have access to servers this old but the change
+> should be safe for modern users as it only affects the password field for
+> "share mode" security, which we do not support anyway.
+>
+> It is only tested for regressions with user mode security on win98 and later systems, using ntlmssp
+> authentication.
+>
+>
+>
 
-diff --git a/fs/ksmbd/ndr.c b/fs/ksmbd/ndr.c
-index 5052be9261d9..0ae8d08d85a8 100644
---- a/fs/ksmbd/ndr.c
-+++ b/fs/ksmbd/ndr.c
-@@ -345,6 +345,8 @@ int ndr_encode_posix_acl(struct ndr *n,
- {
- 	unsigned int ref_id = 0x00020000;
- 	int ret;
-+	vfsuid_t vfsuid;
-+	vfsgid_t vfsgid;
- 
- 	n->offset = 0;
- 	n->length = 1024;
-@@ -372,10 +374,12 @@ int ndr_encode_posix_acl(struct ndr *n,
- 	if (ret)
- 		return ret;
- 
--	ret = ndr_write_int64(n, from_kuid(&init_user_ns, i_uid_into_mnt(user_ns, inode)));
-+	vfsuid = i_uid_into_vfsuid(user_ns, inode);
-+	ret = ndr_write_int64(n, from_kuid(&init_user_ns, vfsuid_into_kuid(vfsuid)));
- 	if (ret)
- 		return ret;
--	ret = ndr_write_int64(n, from_kgid(&init_user_ns, i_gid_into_mnt(user_ns, inode)));
-+	vfsgid = i_gid_into_vfsgid(user_ns, inode);
-+	ret = ndr_write_int64(n, from_kgid(&init_user_ns, vfsgid_into_kgid(vfsgid)));
- 	if (ret)
- 		return ret;
- 	ret = ndr_write_int32(n, inode->i_mode);
-diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
-index 9046cff4374b..2e56dac1fa6e 100644
---- a/fs/ksmbd/oplock.c
-+++ b/fs/ksmbd/oplock.c
-@@ -1609,6 +1609,8 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
- 	struct create_posix_rsp *buf;
- 	struct inode *inode = file_inode(fp->filp);
- 	struct user_namespace *user_ns = file_mnt_user_ns(fp->filp);
-+	vfsuid_t vfsuid = i_uid_into_vfsuid(user_ns, inode);
-+	vfsgid_t vfsgid = i_gid_into_vfsgid(user_ns, inode);
- 
- 	buf = (struct create_posix_rsp *)cc;
- 	memset(buf, 0, sizeof(struct create_posix_rsp));
-@@ -1639,11 +1641,9 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
- 	buf->nlink = cpu_to_le32(inode->i_nlink);
- 	buf->reparse_tag = cpu_to_le32(fp->volatile_id);
- 	buf->mode = cpu_to_le32(inode->i_mode);
--	id_to_sid(from_kuid_munged(&init_user_ns,
--				   i_uid_into_mnt(user_ns, inode)),
-+	id_to_sid(from_kuid_munged(&init_user_ns, vfsuid_into_kuid(vfsuid)),
- 		  SIDNFS_USER, (struct smb_sid *)&buf->SidBuffer[0]);
--	id_to_sid(from_kgid_munged(&init_user_ns,
--				   i_gid_into_mnt(user_ns, inode)),
-+	id_to_sid(from_kgid_munged(&init_user_ns, vfsgid_into_kgid(vfsgid)),
- 		  SIDNFS_GROUP, (struct smb_sid *)&buf->SidBuffer[20]);
- }
- 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 19412ac701a6..b6d63d45ac62 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -2477,8 +2477,11 @@ static void ksmbd_acls_fattr(struct smb_fattr *fattr,
- 			     struct user_namespace *mnt_userns,
- 			     struct inode *inode)
- {
--	fattr->cf_uid = i_uid_into_mnt(mnt_userns, inode);
--	fattr->cf_gid = i_gid_into_mnt(mnt_userns, inode);
-+	vfsuid_t vfsuid = i_uid_into_vfsuid(mnt_userns, inode);
-+	vfsgid_t vfsgid = i_gid_into_vfsgid(mnt_userns, inode);
-+
-+	fattr->cf_uid = vfsuid_into_kuid(vfsuid);
-+	fattr->cf_gid = vfsgid_into_kgid(vfsgid);
- 	fattr->cf_mode = inode->i_mode;
- 	fattr->cf_acls = NULL;
- 	fattr->cf_dacls = NULL;
-diff --git a/fs/ksmbd/smbacl.c b/fs/ksmbd/smbacl.c
-index 3781bca2c8fc..93983e5880a9 100644
---- a/fs/ksmbd/smbacl.c
-+++ b/fs/ksmbd/smbacl.c
-@@ -275,7 +275,8 @@ static int sid_to_id(struct user_namespace *user_ns,
- 		uid_t id;
- 
- 		id = le32_to_cpu(psid->sub_auth[psid->num_subauth - 1]);
--		uid = mapped_kuid_user(user_ns, &init_user_ns, KUIDT_INIT(id));
-+		uid = KUIDT_INIT(id);
-+		uid = from_vfsuid(user_ns, &init_user_ns, VFSUIDT_INIT(uid));
- 		if (uid_valid(uid)) {
- 			fattr->cf_uid = uid;
- 			rc = 0;
-@@ -285,7 +286,8 @@ static int sid_to_id(struct user_namespace *user_ns,
- 		gid_t id;
- 
- 		id = le32_to_cpu(psid->sub_auth[psid->num_subauth - 1]);
--		gid = mapped_kgid_user(user_ns, &init_user_ns, KGIDT_INIT(id));
-+		gid = KGIDT_INIT(id);
-+		gid = from_vfsgid(user_ns, &init_user_ns, VFSGIDT_INIT(gid));
- 		if (gid_valid(gid)) {
- 			fattr->cf_gid = gid;
- 			rc = 0;
-diff --git a/fs/ksmbd/smbacl.h b/fs/ksmbd/smbacl.h
-index fcb2c83f2992..7e6e75e143ad 100644
---- a/fs/ksmbd/smbacl.h
-+++ b/fs/ksmbd/smbacl.h
-@@ -214,25 +214,25 @@ void ksmbd_init_domain(u32 *sub_auth);
- static inline uid_t posix_acl_uid_translate(struct user_namespace *mnt_userns,
- 					    struct posix_acl_entry *pace)
- {
--	kuid_t kuid;
-+	vfsuid_t vfsuid;
- 
- 	/* If this is an idmapped mount, apply the idmapping. */
--	kuid = mapped_kuid_fs(mnt_userns, &init_user_ns, pace->e_uid);
-+	vfsuid = make_vfsuid(mnt_userns, &init_user_ns, pace->e_uid);
- 
- 	/* Translate the kuid into a userspace id ksmbd would see. */
--	return from_kuid(&init_user_ns, kuid);
-+	return from_kuid(&init_user_ns, vfsuid_into_kuid(vfsuid));
- }
- 
- static inline gid_t posix_acl_gid_translate(struct user_namespace *mnt_userns,
- 					    struct posix_acl_entry *pace)
- {
--	kgid_t kgid;
-+	vfsgid_t vfsgid;
- 
- 	/* If this is an idmapped mount, apply the idmapping. */
--	kgid = mapped_kgid_fs(mnt_userns, &init_user_ns, pace->e_gid);
-+	vfsgid = make_vfsgid(mnt_userns, &init_user_ns, pace->e_gid);
- 
- 	/* Translate the kgid into a userspace id ksmbd would see. */
--	return from_kgid(&init_user_ns, kgid);
-+	return from_kgid(&init_user_ns, vfsgid_into_kgid(vfsgid));
- }
- 
- #endif /* _SMBACL_H */
 
-base-commit: 7e18e42e4b280c85b76967a9106a13ca61c16179
 -- 
-2.34.1
+Thanks,
 
+Steve
