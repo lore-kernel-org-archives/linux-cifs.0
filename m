@@ -2,166 +2,208 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF6FC6FA83
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Sep 2022 21:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B1C2C6FA83
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Sep 2022 23:38:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229730AbiILVLv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Sep 2022 17:11:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41378 "EHLO
+        id S229538AbiILXia (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Sep 2022 19:38:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbiILVLk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Sep 2022 17:11:40 -0400
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA764A138
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 14:11:38 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id 134so4856616vkz.11
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 14:11:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=OCzUBFDjZ9LDdzFT/vq01ardY8WFuVe7fdACs/gZjGI=;
-        b=SQPxz6cF2tHwTiY2mY+R5z2Dcrlakc8plLsk1G3xMr/FSLXpt3qDSTVHHUaHZ2wBjf
-         sHSx4GNqFgyDv6e1qJNvpNSWB1ukpvXWJB6iidQ9D0wMTq0zopkmIMbcX0Xzs7w/p2zH
-         tM5Ne+aCy5rRwtUoGyEBhBqLkyFVSc4cvMc5tOFN/3KLeKBp8mB4XcbdgBot0975fO5f
-         WVwQRcGWcWzRJD7WFHZ7sOuycNe75VlETVG8/mx9+KICaTAH3d6fGZ1u2V3pIzu0s6R9
-         4LKu5BMOPxGZUff9fBmBYYsEyYcrlT23ZLZrKlVi+Pox0PB4zZlXi0M3qGL8TCk4xwck
-         zQLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=OCzUBFDjZ9LDdzFT/vq01ardY8WFuVe7fdACs/gZjGI=;
-        b=nIi8omsFFlPWiwfAWO4FC5oe3OA0d59Rb+RTuWz3PoenYJOZ+hC0tC2PX9/DvjY3Xp
-         2Injyh/s4RaWUwQH+jG7ktn0iufT5btfCFAP7GiBzdggpTfMOFbF8x2o71pc1iBMIBpR
-         rI2C8AofTSwWIVvbKLIhPKgmnTfiCB58L2LI/toMY7mtFnBO1cmTAUpGDdJzWuJvs4/k
-         wcFCJSIotmrcVmigqQd8+Arhk0f8OWLCCXFR5C4s1qkxl04HgZDMzemPw75d3gEfTTlS
-         FoLovA4pYNtxCNSr0W/ctiRHY8REP5W1BeT41GswcPkKKIGo98S0+Tx8pbfhD1Lua+nT
-         b+Jw==
-X-Gm-Message-State: ACgBeo2JI3zeIFvzf12KqgZu4a2q+hFNSDP7Gbd0MjutKdhs9ttACMrX
-        v/YXEJCwnOj4gA1km+QBgrIui4+5XT/z0qAbMAw=
-X-Google-Smtp-Source: AA6agR6IwwLmZBsGzfz65V1vWx8xt64MdJAMQX2IV+CShMb1M3QbAqvRy58sAYR6RLD/dBseJ74t/luJgzzrB87eGxc=
-X-Received: by 2002:a1f:918d:0:b0:3a1:e376:7463 with SMTP id
- t135-20020a1f918d000000b003a1e3767463mr6048642vkd.38.1663017097634; Mon, 12
- Sep 2022 14:11:37 -0700 (PDT)
+        with ESMTP id S229482AbiILXi2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Sep 2022 19:38:28 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2041.outbound.protection.outlook.com [40.107.237.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC691D0D6
+        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 16:38:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TxWczGLyp+dYPxZSpGlc7v4UfvMIU/DaeYXCpjYeyX4Qx5JcNC7olhdBLvNcJKsIlF2dLsykDLiEiHd3Z6NP2XvOPdfpn2YryRfRCShkHcwLCV5oOMt9fagCdTSaOVUhqkdCG1mfdtJ/Qvv4AEJrqmsk94VA+dqeBQ5JIQfnq2Ev07IZGnCg7YuopnyS86DZLd4Gju1Z4G/+di0+5VCqwsvuocNPLZrBGH4JutyW91HyNb7BqF+5E8E52DNg/pJWK3MqRGtOrKKC0lPT8aexvL4x39sMHaSwil0UrujqPE8b/kIud+rmDxRJUhmjT4madcw1wZauBMmA1F2vy5FHgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4ywoD8tClzZRvWBM7mjxcT3NQGMldLCf/zqIQPf0Tf0=;
+ b=dxqXcjqdgCRS7ir0LyoXGc4QqxgSCfzxKhaxuynJWKjDw9oCOAzc2SRbq5q8snmQXuKswTUwyWvGCQrZ+0oSN7h2DU+6/5IJUVkc0fSAsR0n22WGUarSWEc1ZkyjDdqCP1LrGm4y61tQxFTd1slJPZ9DNU6xTyTRASvgPC8JUhc2pl1P1bUASEP41TcMW5cQGzlEcm9gH5/FJgfZ+IDcpkouFxY9rWYahSVX0owxlnfPuPfLjJ90+Ab8FWNiogTCw3JsKMHYuBswce8d4XDgUwtyuy7YMG+KHL7rWSQSY2lGWcIaD+e2PUQmhhieX8oBRUGqFTtAshsJBxEQpdm0AQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ CY4PR01MB2440.prod.exchangelabs.com (2603:10b6:903:69::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5612.22; Mon, 12 Sep 2022 23:38:25 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::6566:9fdc:aac:8b51]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::6566:9fdc:aac:8b51%2]) with mapi id 15.20.5612.022; Mon, 12 Sep 2022
+ 23:38:25 +0000
+Message-ID: <a5f680f2-6dc3-1c0b-bfbb-51f740e09109@talpey.com>
+Date:   Mon, 12 Sep 2022 16:38:22 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH v3] ksmbd: update documentation
+Content-Language: en-US
+To:     Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org,
+        atteh.mailbox@gmail.com
+References: <20220909092558.9498-1-linkinjeon@kernel.org>
+ <20220909092558.9498-2-linkinjeon@kernel.org>
+From:   Tom Talpey <tom@talpey.com>
+In-Reply-To: <20220909092558.9498-2-linkinjeon@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0380.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1::25) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
 MIME-Version: 1.0
-References: <CAH2r5mvC5sqwuLyLt=3PXYvPegOm-8rqSMYcCpjM3+T64fv2sg@mail.gmail.com>
- <f19d2bf6-6b05-f782-fcfa-1c09c867dcb2@samba.org>
-In-Reply-To: <f19d2bf6-6b05-f782-fcfa-1c09c867dcb2@samba.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 12 Sep 2022 16:11:25 -0500
-Message-ID: <CAH2r5mucwiYKjVSOCggeNJCTor2krV7UneZaVuDvF7wB2WhZ4g@mail.gmail.com>
-Subject: Re: [PATCH][SMB3.1.1 client] fallback to query fs all info if posix
- query fs not supported
-To:     Stefan Metzmacher <metze@samba.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: multipart/mixed; boundary="0000000000005ca3b005e88157ad"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|CY4PR01MB2440:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4a558d1-890c-48d2-29c2-08da9517e2ce
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LVSMQVAubE/tRGNB3OIopkPFynM5iPENHngDB2iso9aIGu2RHYVp9BrhrF9BC1hjIN/rNKaQnL5hG1a0c586mOQgb2zTeUT2OvNk858cEOZszg9mUc+TwKoFMxX7g4coTuxg9v0z5/iIbXwOzxUbFZ5MYzCYyVUw1wsWKO+xxrKcAGhMc0LYmFNkZpzxVUGvj/djgyZxab16cFfwVUv9h+stbVrfCinib+9U6MNd3ekOERE2Ws8kRr/qgB7FG0eL6pzOfEucXyoMqM9kYSn3q4i4ylEdn/90BfH8iTPzUMUex9l4mZbmqtBeOAxsGHiVIE518hRtrG7HJadWkwJInCTRYgWnjBOepGXwdri62BjRQJyV2yn6glbj2qRpTv6sRviHoTQTQSJxGnKlVDOkMzG8GPfzvWexIt34JIeD6jZA29ufy2dwq2OHbOC97VhGcf5Z/in+2DNJi9kqdS6VTsusX3kv/75ar9cfFE6j9ew4siurK1wJYRs1KHH5YHRBbt5FTxlH9+YBHDEOeVyN/YZ/j7JSUrAVHY4NCKDRk+UjrZalNdfSIcNA6/pYdIjn5/Xtv3jSj6E3WBHTNbpEJ5AKYu4/b4/MaE1eR9U45ItxzYBkjrohS7lhwqRqZyDR6fLAmYbHI2eAQ6LPQSrtFQbGSJ7KN0l76Zqtb5lfTyhlnvL3Y46fStNN0SFBl4YMnPTj/8VBpJ3a3SJeMM61Nbik+kaeVzl2VlGftoAi0eYe2l/vmYSGMd0YKPC1fCOcvlGMpiLCmvgIR24a02QXzWpwFpZbGVlRovCGxxWLz166tSxxwJIGk8bKYzN2PICV
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(39830400003)(346002)(396003)(136003)(376002)(451199015)(6512007)(8676002)(26005)(15650500001)(8936002)(478600001)(52116002)(5660300002)(66476007)(86362001)(66946007)(38100700002)(2616005)(6666004)(6486002)(966005)(186003)(41300700001)(31686004)(6506007)(83380400001)(36756003)(2906002)(53546011)(31696002)(38350700002)(84970400001)(4326008)(66556008)(316002)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QnZJRWtrRUVXNTF6TmE4K1hkcEUrSno1Z2o4QnlIUVNjczZnVkFLWWl5SnRK?=
+ =?utf-8?B?dzFFcXNjTFc3RW9NdnR3MW0yQWFIYW5GSERnMm5ZWWZXM1NKblJYaFBBNW1B?=
+ =?utf-8?B?dUh3UjVPdnVMVWUzRmdNMERkbUtJSmpxNm1kYUJQcDgwMDdSQkJ2andHZ2F5?=
+ =?utf-8?B?OGRYTUcwRDRFRFgzdlRjWTZxL3RqeEFRRFlKWGNjdHNmVDV3MzhCZUs1Z1VG?=
+ =?utf-8?B?NXd6aXppNG4wK1FOQ1h1VWNUYm92SDQ2NGp3QmlJdHl6UXhSeUZzNmhRYVoz?=
+ =?utf-8?B?OXdjemwvS09jMXlVcmJFVkNQaWtlN1lRdXdvUFQvam1QZDM0UlFBUUxZSW1F?=
+ =?utf-8?B?ejk5UWFVQnQyNmpmRWxjTklqWkVqdUpZejRIeWJ2cCs4TTcyUTYza2RzUUVW?=
+ =?utf-8?B?bWtXV3VNbDQ0bDBpR000U0x0ZDlRNVJEbUQ1QlRySzAvamZ4bmZsOW1iMW1C?=
+ =?utf-8?B?SklFNklYb0lWcUZQZUcwY2xUOEkyU2NtUkhPM05ZTk00eGdLV0VVZS9IQkJt?=
+ =?utf-8?B?QjY4VUJvMGFrekpuZmc0ZTF3MlJ3ck1vYWVZY1JhMS9LUitrOUpKSklWYVM0?=
+ =?utf-8?B?TVVJYUVoeGlpK2lnRmV2YjA4bjhLSHV4WVlYMW5FN1pXQ1BzVzIzK3JhOG02?=
+ =?utf-8?B?VUR2OVlBWUlvRFJIakcvbTNCOEFTL2VJaVU3NEFEME45bG50VzNteTlUcUc4?=
+ =?utf-8?B?WktRWkFJeW5UM2NWNFRham1RaHF5K01NNmZrSmQ5dGVOYVdMMXhvdjd4S3g5?=
+ =?utf-8?B?QW9CUE1ZZDR0TWdZWWR1K0pFK2ZQNDNqL1BFTzhQUFVOY3NIclFKeDJPdkY5?=
+ =?utf-8?B?QnEvWVV2RFRyNTBUZjBDNG96U1Bwcm12UEdPWnJFVWtLaWp3S2g4RmxLV3BO?=
+ =?utf-8?B?RTJydERtSWZMSlZFanFaT1U4dzJXWndEYTlUenNZbDVoK2lwY0dSaTB6KzBt?=
+ =?utf-8?B?VjgySUhKTktZUGowTmxHM2F2Vk9OUnZmMTdBdi9vdE83VkswM2IxVHFhMjVy?=
+ =?utf-8?B?eHhjSXlNY1UvRmlMVlh0MVdLT3NPVEhsLzloK0VsMC9IVmJ3VnZsOE1odlVh?=
+ =?utf-8?B?aXRQbjR5YlMvRGRaUWh4bEt3QzlNdUdhajc5QURxemxaWkxacGxLN2RWN2Nr?=
+ =?utf-8?B?MzNnd2FLVlJPeW1GLzJJbnpQVzczdFl2bXBTbHZZMWR1RTJNMzVDcHN0cnVx?=
+ =?utf-8?B?R2Z2aDhZT3lGZ2ZGM2lucmZHQmQ4Q1JCc2lwTi90Y28xelpaS0lTczNKN1gv?=
+ =?utf-8?B?eWc2UHRiV0k1cC8xTTc4bEJpc1JVa2FBR3B3blR2QzhNdTFzdGZmQi9YU0Nt?=
+ =?utf-8?B?N1MwYUdIemMyM2tjZXpoay9LQkkwOTRublMxeXVScHpJSTA3Rm02MUtwamFU?=
+ =?utf-8?B?M04xUmZ4Ly91NWtlTXVMQlVCZ0pEMUNPWVFJZGprdzRmK2lFdnhvMU42c2hw?=
+ =?utf-8?B?eU55NUNSS2Z0N3BjK285Sk9TTCtTT1p3ZUw4dllJcEQ3RGFBSVY2ZklFUlZR?=
+ =?utf-8?B?Ykp3akRlU0lJMWpldzlYSjE2QzlBZElTeVN6OGFpMjloR21zQ29LQnhxRTly?=
+ =?utf-8?B?RzNUZlNIdWUrYi91RXlVaFFPSUJpMkQ4NDlIU2R3M1ArT0paTDYyVzJpVm9G?=
+ =?utf-8?B?NXM3NzZJNHdrbzlxRGVVSVNveHN1bnM5NjEwQkQyQTVqQm9EeGNoNjdpZ0xs?=
+ =?utf-8?B?YjQ2SkxZdW1BSDRYb3pnWnV4MlA5ek00MUlqa3VsUmE4R3JzMXdrbzQvSzY4?=
+ =?utf-8?B?ZEloTmpUZ255aU5ZUkZCTHpiS2tEUElyMWd1UStDOHFwRHFXejRuRTg2S2w3?=
+ =?utf-8?B?dk5zZERhcVRZeEM4ZDRnQmJZNjJCZWVDcng0Tm1jSkVzR1BWSlpZblV1N3gx?=
+ =?utf-8?B?UnZWbnk3NzNqMkZTZGlYWGVRMkFZVW1NOG5kOE5hM1hnQVIveldQWnBYenZh?=
+ =?utf-8?B?UzRyem9HQVEwaHdNQTYwbmhWZnVjR1lwZFhCUENrTWhuZzdUVjQzODQ3REt0?=
+ =?utf-8?B?NjRpbmd0SXcrTVlaaEpMTUpmK01xM1hWYk1XQVhQTTBTaURGWFdXbjFZbE5w?=
+ =?utf-8?B?c21VcG03enJVOU1yd0Y3OWs0SWc5SnRFSFFLdWpkM3IrWHBER2RmUEpMZHhJ?=
+ =?utf-8?Q?Pbrg=3D?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4a558d1-890c-48d2-29c2-08da9517e2ce
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2022 23:38:24.9857
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +7QdeDIhy/RUkKdmo8VPTsrZboO9lF1VzotpInoxNxQkdx2pBM4j44C2FCx5DUZY
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR01MB2440
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000005ca3b005e88157ad
-Content-Type: text/plain; charset="UTF-8"
+On 9/9/2022 5:25 AM, Namjae Jeon wrote:
+> configuration.txt in ksmbd-tools moved to ksmbd.conf manpage.
+> update it and more detailed ksmbd-tools build method.
+> 
+> Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>   v3:
+>     - replace CIFS with SMB3 clients.
+>     - update ksmbd built-in case.
+>     - replace smb.conf leftover with ksmbd.conf.
+>     - use full name of utils in ksmbd-tools instead of <foo>.
+>     - fix the warnings from make htlmdocs build reported by kernel test
+>       robot.
+>   v2:
+>     - rename smb.conf to ksmbd.conf.
+>     - add how to set ksmbd module in menuconfig
+>     - remove --syscondir option for configure, instead change ksmbd
+>       directory to /usr/local/etc/ksmbd.
+>     - change the prompt to '$'.
+> 
+>   Documentation/filesystems/cifs/ksmbd.rst | 40 +++++++++++++++++-------
+>   1 file changed, 29 insertions(+), 11 deletions(-)
+> 
+> diff --git a/Documentation/filesystems/cifs/ksmbd.rst b/Documentation/filesystems/cifs/ksmbd.rst
+> index 1af600db2e70..4284341c89f3 100644
+> --- a/Documentation/filesystems/cifs/ksmbd.rst
+> +++ b/Documentation/filesystems/cifs/ksmbd.rst
+> @@ -118,26 +118,44 @@ ksmbd/nfsd interoperability    Planned for future. The features that ksmbd
+>   How to run
+>   ==========
+>   
+> -1. Download ksmbd-tools and compile them.
+> -	- https://github.com/cifsd-team/ksmbd-tools
+> +1. Download ksmbd-tools(https://github.com/cifsd-team/ksmbd-tools/releases) and
+> +   compile them.
+> +
+> +   - Refer README(https://github.com/cifsd-team/ksmbd-tools/blob/master/README.md)
+> +     to know how to use ksmbd.mountd/adduser/addshare/control utils
+> +
+> +     $ ./autogen.sh
+> +     $ ./configure --with-rundir=/run
+> +     $ make && sudo make install
+>   
+>   2. Create user/password for SMB share.
+>   
+> -	# mkdir /etc/ksmbd/
+> -	# ksmbd.adduser -a <Enter USERNAME for SMB share access>
+> +   - See ksmbd.adduser manpage.
+> +
+> +     $ man ksmbd.adduser
+> +     $ sudo ksmbd.adduser -a <Enter USERNAME for SMB share access>
+> +
+> +3. Create /usr/local/etc/ksmbd/ksmbd.conf file, add SMB share in ksmbd.conf file.
 
-updated the patch to remove the fall back - and simply do the
-compounding for this code path (when statfs is posix query fs info) as
-we already do for the non-POSIX statfs code path.
+I missed this in the v2 match - are you intentionally moving the
+ksmbd.conf file to /usr/local/etc? That seems a very mysterious
+location. Nothing on my vanilla installed system places anything
+in there.
 
-On Mon, Sep 12, 2022 at 12:51 AM Stefan Metzmacher <metze@samba.org> wrote:
->
-> Am 12.09.22 um 07:36 schrieb Steve French via samba-technical:
-> > A version of Samba that I was testing, supported POSIX extensions, but
-> > not the query fs info
-> > level.  Fall back to query fs all info if POSIX query fs info not
-> > supported.
-> >
-> > Also fixes the problem that compounding wasn't being used for posix
-> > qfs info in this path (statfs) but was being used in others, so
-> > improves performance of posix query fs info.
->
-> I don't think having hacks to work with work in progress branches should be
-> added, instead the server should be fixed.
->
-> metze
->
+Also, doesn't this file need to exist before step 2??
+
+Tom.
 
 
--- 
-Thanks,
-
-Steve
-
---0000000000005ca3b005e88157ad
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb311-compound-SMB311-posix-query-fs-info-for-statf.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb311-compound-SMB311-posix-query-fs-info-for-statf.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l7z9filz0>
-X-Attachment-Id: f_l7z9filz0
-
-RnJvbSA0YzUzM2E4MjAwY2EyODg5MTE3YTYwNDU5OTcwMTlmMGVhM2UzZDE5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgMTEgU2VwIDIwMjIgMTk6NDk6MDQgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzMTE6IGNvbXBvdW5kIFNNQjMxMSBwb3NpeCBxdWVyeSBmcyBpbmZvIGZvciBzdGF0ZnMKCkZp
-eGVzIHRoZSBwcm9ibGVtIHRoYXQgY29tcG91bmRpbmcgd2Fzbid0IGJlaW5nIHVzZWQgZm9yIHBv
-c2l4CnFmcyBpbmZvIGluIHRoaXMgcGF0aCAoc3RhdGZzKSBidXQgd2FzIGJlaW5nIHVzZWQgaW4g
-b3RoZXJzLCBzbwppbXByb3ZlcyBwZXJmb3JtYW5jZSBvZiBwb3NpeCBxdWVyeSBmcyBpbmZvLgoK
-U2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0K
-IGZzL2NpZnMvc21iMm9wcy5jICAgfCA0MCArKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0t
-LS0tLS0tLS0tCiBmcy9jaWZzL3NtYjJwZHUuYyAgIHwgIDIgKy0KIGZzL2NpZnMvc21iMnByb3Rv
-LmggfCAgMiArKwogMyBmaWxlcyBjaGFuZ2VkLCAyNiBpbnNlcnRpb25zKCspLCAxOCBkZWxldGlv
-bnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJvcHMuYyBiL2ZzL2NpZnMvc21iMm9wcy5j
-CmluZGV4IDQyMWJlNDNhZjQyNS4uZDZkZDgzOWNhMWJiIDEwMDY0NAotLS0gYS9mcy9jaWZzL3Nt
-YjJvcHMuYworKysgYi9mcy9jaWZzL3NtYjJvcHMuYwpAQCAtMjU1NywzMSArMjU1NywzNyBAQCBz
-dGF0aWMgaW50CiBzbWIzMTFfcXVlcnlmcyhjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3Qg
-Y2lmc190Y29uICp0Y29uLAogCSAgICAgICBzdHJ1Y3QgY2lmc19zYl9pbmZvICpjaWZzX3NiLCBz
-dHJ1Y3Qga3N0YXRmcyAqYnVmKQogeworCXN0cnVjdCBzbWIyX3F1ZXJ5X2luZm9fcnNwICpyc3A7
-CisJc3RydWN0IGt2ZWMgcnNwX2lvdiA9IHtOVUxMLCAwfTsKKwlGSUxFX1NZU1RFTV9QT1NJWF9J
-TkZPICppbmZvID0gTlVMTDsKKwlpbnQgYnVmdHlwZSA9IENJRlNfTk9fQlVGRkVSOwogCWludCBy
-YzsKLQlfX2xlMTYgc3JjaF9wYXRoID0gMDsgLyogTnVsbCAtIG9wZW4gcm9vdCBvZiBzaGFyZSAq
-LwotCXU4IG9wbG9jayA9IFNNQjJfT1BMT0NLX0xFVkVMX05PTkU7Ci0Jc3RydWN0IGNpZnNfb3Bl
-bl9wYXJtcyBvcGFybXM7Ci0Jc3RydWN0IGNpZnNfZmlkIGZpZDsKIAogCWlmICghdGNvbi0+cG9z
-aXhfZXh0ZW5zaW9ucykKIAkJcmV0dXJuIHNtYjJfcXVlcnlmcyh4aWQsIHRjb24sIGNpZnNfc2Is
-IGJ1Zik7CiAKLQlvcGFybXMudGNvbiA9IHRjb247Ci0Jb3Bhcm1zLmRlc2lyZWRfYWNjZXNzID0g
-RklMRV9SRUFEX0FUVFJJQlVURVM7Ci0Jb3Bhcm1zLmRpc3Bvc2l0aW9uID0gRklMRV9PUEVOOwot
-CW9wYXJtcy5jcmVhdGVfb3B0aW9ucyA9IGNpZnNfY3JlYXRlX29wdGlvbnMoY2lmc19zYiwgMCk7
-Ci0Jb3Bhcm1zLmZpZCA9ICZmaWQ7Ci0Jb3Bhcm1zLnJlY29ubmVjdCA9IGZhbHNlOwotCi0JcmMg
-PSBTTUIyX29wZW4oeGlkLCAmb3Bhcm1zLCAmc3JjaF9wYXRoLCAmb3Bsb2NrLCBOVUxMLCBOVUxM
-LAotCQkgICAgICAgTlVMTCwgTlVMTCk7CisJcmMgPSBzbWIyX3F1ZXJ5X2luZm9fY29tcG91bmQo
-eGlkLCB0Y29uLCAiIiwKKwkJCQkgICAgICBGSUxFX1JFQURfQVRUUklCVVRFUywKKwkJCQkgICAg
-ICBGU19QT1NJWF9JTkZPUk1BVElPTiwKKwkJCQkgICAgICBTTUIyX09fSU5GT19GSUxFU1lTVEVN
-LAorCQkJCSAgICAgIHNpemVvZihGSUxFX1NZU1RFTV9QT1NJWF9JTkZPKSwKKwkJCQkgICAgICAm
-cnNwX2lvdiwgJmJ1ZnR5cGUsIGNpZnNfc2IpOwogCWlmIChyYykKLQkJcmV0dXJuIHJjOworCQln
-b3RvIHBxZnNfZXhpdDsKIAotCXJjID0gU01CMzExX3Bvc2l4X3Fmc19pbmZvKHhpZCwgdGNvbiwg
-ZmlkLnBlcnNpc3RlbnRfZmlkLAotCQkJCSAgIGZpZC52b2xhdGlsZV9maWQsIGJ1Zik7CisJcnNw
-ID0gKHN0cnVjdCBzbWIyX3F1ZXJ5X2luZm9fcnNwICopcnNwX2lvdi5pb3ZfYmFzZTsKIAlidWYt
-PmZfdHlwZSA9IFNNQjJfU1VQRVJfTUFHSUM7Ci0JU01CMl9jbG9zZSh4aWQsIHRjb24sIGZpZC5w
-ZXJzaXN0ZW50X2ZpZCwgZmlkLnZvbGF0aWxlX2ZpZCk7CisJaW5mbyA9IChGSUxFX1NZU1RFTV9Q
-T1NJWF9JTkZPICopKAorCQlsZTE2X3RvX2NwdShyc3AtPk91dHB1dEJ1ZmZlck9mZnNldCkgKyAo
-Y2hhciAqKXJzcCk7CisJcmMgPSBzbWIyX3ZhbGlkYXRlX2lvdihsZTE2X3RvX2NwdShyc3AtPk91
-dHB1dEJ1ZmZlck9mZnNldCksCisJCQkgICAgICAgbGUzMl90b19jcHUocnNwLT5PdXRwdXRCdWZm
-ZXJMZW5ndGgpLAorCQkJICAgICAgICZyc3BfaW92LAorCQkJICAgICAgIHNpemVvZihGSUxFX1NZ
-U1RFTV9QT1NJWF9JTkZPKSk7CisJaWYgKCFyYykKKwkJY29weV9wb3NpeF9mc19pbmZvX3RvX2tz
-dGF0ZnMoaW5mbywgYnVmKTsKKworcHFmc19leGl0OgorCWZyZWVfcnNwX2J1ZihidWZ0eXBlLCBy
-c3BfaW92Lmlvdl9iYXNlKTsKIAlyZXR1cm4gcmM7CiB9CiAKZGlmZiAtLWdpdCBhL2ZzL2NpZnMv
-c21iMnBkdS5jIGIvZnMvY2lmcy9zbWIycGR1LmMKaW5kZXggNjM1MmFiMzJjN2U3Li4wMWYwY2Mx
-NjIwYmQgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBkdS5jCisrKyBiL2ZzL2NpZnMvc21iMnBk
-dS5jCkBAIC01MjUxLDcgKzUyNTEsNyBAQCBzbWIyX2NvcHlfZnNfaW5mb190b19rc3RhdGZzKHN0
-cnVjdCBzbWIyX2ZzX2Z1bGxfc2l6ZV9pbmZvICpwZnNfaW5mLAogCXJldHVybjsKIH0KIAotc3Rh
-dGljIHZvaWQKK3ZvaWQKIGNvcHlfcG9zaXhfZnNfaW5mb190b19rc3RhdGZzKEZJTEVfU1lTVEVN
-X1BPU0lYX0lORk8gKnJlc3BvbnNlX2RhdGEsCiAJCQlzdHJ1Y3Qga3N0YXRmcyAqa3N0KQogewpk
-aWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIycHJvdG8uaCBiL2ZzL2NpZnMvc21iMnByb3RvLmgKaW5k
-ZXggM2Y3NDBmMjRiOTZhLi5jOTZjNmNhZDkwYTQgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBy
-b3RvLmgKKysrIGIvZnMvY2lmcy9zbWIycHJvdG8uaApAQCAtMjY3LDYgKzI2Nyw4IEBAIGV4dGVy
-biBpbnQgc21iMl92YWxpZGF0ZV9hbmRfY29weV9pb3YodW5zaWduZWQgaW50IG9mZnNldCwKIGV4
-dGVybiB2b2lkIHNtYjJfY29weV9mc19pbmZvX3RvX2tzdGF0ZnMoCiAJIHN0cnVjdCBzbWIyX2Zz
-X2Z1bGxfc2l6ZV9pbmZvICpwZnNfaW5mLAogCSBzdHJ1Y3Qga3N0YXRmcyAqa3N0KTsKK2V4dGVy
-biB2b2lkIGNvcHlfcG9zaXhfZnNfaW5mb190b19rc3RhdGZzKEZJTEVfU1lTVEVNX1BPU0lYX0lO
-Rk8gKnJlc3BvbnNlX2RhdGEsCisJCQkJCSAgc3RydWN0IGtzdGF0ZnMgKmtzdCk7CiBleHRlcm4g
-aW50IHNtYjMxMV9jcnlwdG9fc2hhc2hfYWxsb2NhdGUoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAq
-c2VydmVyKTsKIGV4dGVybiBpbnQgc21iMzExX3VwZGF0ZV9wcmVhdXRoX2hhc2goc3RydWN0IGNp
-ZnNfc2VzICpzZXMsCiAJCQkJICAgICAgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLAot
-LSAKMi4zNC4xCgo=
---0000000000005ca3b005e88157ad--
+> -3. Create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
+> -	- Refer smb.conf.example and
+> -          https://github.com/cifsd-team/ksmbd-tools/blob/master/Documentation/configuration.txt
+> +   - Refer ksmbd.conf.example in ksmbd-utils, See ksmbd.conf manpage
+> +     for details to configure shares.
+>   
+> -4. Insert ksmbd.ko module
+> +        $ man ksmbd.conf
+>   
+> -	# insmod ksmbd.ko
+> +4. Insert ksmbd.ko module after build your kernel. No need to load module
+> +   if ksmbd is built into the kernel.
+> +
+> +   - Set ksmbd in menuconfig(e.g. $ make menuconfig)
+> +       [*] Network File Systems  --->
+> +           <M> SMB3 server support (EXPERIMENTAL)
+> +
+> +	$ sudo modprobe ksmbd.ko
+>   
+>   5. Start ksmbd user space daemon
+> -	# ksmbd.mountd
+>   
+> -6. Access share from Windows or Linux using CIFS
+> +	$ sudo ksmbd.mountd
+> +
+> +6. Access share from Windows or Linux SMB3 clients (cifs.ko or smbclient of samba)
+>   
+>   Shutdown KSMBD
+>   ==============
