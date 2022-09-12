@@ -2,116 +2,147 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3365ECAAD5
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Sep 2022 16:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F7DC6FA8B
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Sep 2022 18:25:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbiILQPQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Sep 2022 12:15:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58392 "EHLO
+        id S230037AbiILSZX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Sep 2022 14:25:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbiILQPM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Sep 2022 12:15:12 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C5AB13D14
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 09:15:08 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id a14so9056147ljj.8
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 09:15:07 -0700 (PDT)
+        with ESMTP id S229801AbiILSZW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Sep 2022 14:25:22 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46B0A1276E;
+        Mon, 12 Sep 2022 11:25:21 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id q9-20020a17090a178900b0020265d92ae3so13181603pja.5;
+        Mon, 12 Sep 2022 11:25:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=sbnja3IcNLcJ541amIvmSAbP4Fs9AsojaNZk+Dm8M2s=;
-        b=GQ+/nowZEls0GDO0Kr3GPL5Xnm4rDc5BJtfPyi/UyLqzhtDQS1ZIRmMZGK7ziNuDlK
-         +OKctfh4KSd+xAD9tdCOOvcGr8o63/NjL9S1c+sBw2VOg1T8KurJ6czkoXkrPE6seU+E
-         ilvWVMkS2Ii8pvjgL/qfz1M6ZdyPlAVumSSB5217aQSEAbK+wdcToV8KHZ6ggpD4m44L
-         U9R4mqppysHdPX52DDFKKowJn8QK8uH7aF/o3CD4f+3Was9gCUG2ESvVUd5MxnouQ2UZ
-         OhhfnPv2W0G5C9B1Hu9F15ouFyGV83zhBCzyP8lMxyRKPEDRJhugDkAh2+wo4T7ZsRc2
-         LWsA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=jinrTf2dRXCM8P7beDGhcdymXhWilSgCNRAiFQeNJHI=;
+        b=mLMtjbzG1Kl+0NHJzKAxbllsuBufduMNF2LO9iIaeSIwdabQAHzY6k1ExlrHjBbQ3b
+         5Ek8x+gOY9qsai4wca5CayyELpfftgvEGk6LfP6oka3EzZll/EmV533QU3P7IFXouFCf
+         cJeJKlEzBYjyYGcPOEHfG0y3Jv1EYtZx06IidZtpY/PqdJm61eR+KtWvr0pNEQezNvEu
+         pFzkoOMvpUyHjk+sBH0Tjhr2kErcS9rXwIAF4/QuotmYMkJOC+XpiPqyqRRB177xZq4d
+         caSw8M6mKHirkEV6wHnYvUKeI8Qc2RnoK7f9RHWvkM+Feqcfmz5JThhG20mxA0JX18zd
+         681Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=sbnja3IcNLcJ541amIvmSAbP4Fs9AsojaNZk+Dm8M2s=;
-        b=ZNFfUParU9e3BjLmIWJFvqZgsF5I2ph8Ilc/r5uvt9KQ4BSGqa7hSkjwEd45IBq2R1
-         Jkh+X7CLMVHNkp1gsA/MR30xpNQhyKhoqiZDiNeYXcoaehvfhE6sVidVpBzrYHJ6hytZ
-         WoMthe0gn9UQnVa3dmyPgzOs7NCA2Akf1maCTHlQSUB//ofT0XoiG+ykNIv8POVpKyBy
-         bHiNxdt5ntxlvktFMuV/FvAkA9qyS0YqPtgHPJgI+e8FlqVQTfOwZvZNrJyA0T1nQpsr
-         DN9FUVzm9U2RymrUjcKuEQUmVDhHed3c7QbHSJcwKo407xscZYvRAvSgEUY/8ZNg/3Y5
-         t9Vw==
-X-Gm-Message-State: ACgBeo2v6T1QOaYAY0EbtmZcwcCc2Mw64agqY9vV9ZpGZSfT7nUtkvBq
-        hWrwX6nGheYLFub7lrckhPE=
-X-Google-Smtp-Source: AA6agR72ges3sfAOZ+VvliiejuHHgDX4aJF3bSORDB/bgKKZYYBUJeiNEzAw3Q2tfy9nZpsEyP2yqA==
-X-Received: by 2002:a2e:824c:0:b0:25f:de27:f013 with SMTP id j12-20020a2e824c000000b0025fde27f013mr7750336ljh.447.1662999306392;
-        Mon, 12 Sep 2022 09:15:06 -0700 (PDT)
-Received: from pohjola.lan (mobile-user-2e84bc-66.dhcp.inet.fi. [46.132.188.66])
-        by smtp.gmail.com with ESMTPSA id a19-20020a056512201300b0048a757d1303sm1145425lfb.217.2022.09.12.09.15.04
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=jinrTf2dRXCM8P7beDGhcdymXhWilSgCNRAiFQeNJHI=;
+        b=A4v3HuxOD3Z+JXbTX2pG4oWFlR/L2rYFmU1tpfhA96/DQCi+inUGnLEI2uBSM5QaWV
+         G2wnNv8C87mh8bYgtR6+3tHgidTAMZrW9tA1HNWKFp+sHZWRPCLO/Sc38J+marm4dKAF
+         3COF/32LflCEX+YDi+o0y+SygMa3nA23JlW5qhLHVP9IojeJhANfSm67YAdwT3E+LOWd
+         5D6Vnpsxyud1/noej1n5mx8vYvh7/FyIyCSO1BEPxbmmV1mKq8AwbWj31A5X+mE452mq
+         gXQ7KlAlpPqKeQie/cfCjAzXvpKsILBi2nG/8lS3LuH9zsKIT+9QtaJEj5jrlsVMn3fk
+         EcKA==
+X-Gm-Message-State: ACgBeo2a69zEp+6r3Ju6NMk1Qr7VfBXbNHTAv1NIoK8S8MoiMsgOwRQe
+        5M8W6ZoV+Qk8amDsxqBtURpWK2AJLSlyvg==
+X-Google-Smtp-Source: AA6agR7TErEeniLb8NygdX/YotrQEVmapgtPdEtpEWF/iOvuOSsfvdyhlVfrcnUmKBhBkPJIGioMFA==
+X-Received: by 2002:a17:90b:180e:b0:202:a0c3:6da with SMTP id lw14-20020a17090b180e00b00202a0c306damr14093608pjb.94.1663007120382;
+        Mon, 12 Sep 2022 11:25:20 -0700 (PDT)
+Received: from vmfolio.. (c-73-189-111-8.hsd1.ca.comcast.net. [73.189.111.8])
+        by smtp.googlemail.com with ESMTPSA id x127-20020a626385000000b0053b2681b0e0sm5916894pfb.39.2022.09.12.11.25.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Sep 2022 09:15:05 -0700 (PDT)
-From:   =?UTF-8?q?Atte=20Heikkil=C3=A4?= <atteh.mailbox@gmail.com>
-To:     linkinjeon@kernel.org
-Cc:     atteh.mailbox@gmail.com, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 1/2] ksmbd: casefold utf-8 share names and fix ascii
-Date:   Mon, 12 Sep 2022 19:14:59 +0300
-Message-Id: <20220912161459.23505-1-atteh.mailbox@gmail.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <CAKYAXd_ondWwEuHhVZnVp0dd6N5ZZzw=2EJXSicEYSjwdBB46A@mail.gmail.com>
-References: <CAKYAXd_ondWwEuHhVZnVp0dd6N5ZZzw=2EJXSicEYSjwdBB46A@mail.gmail.com>
+        Mon, 12 Sep 2022 11:25:19 -0700 (PDT)
+From:   "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nilfs@vger.kernel.org, linux-mm@kvack.org,
+        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Subject: [PATCH v2 00/23] Convert to filemap_get_folios_tag()
+Date:   Mon, 12 Sep 2022 11:22:01 -0700
+Message-Id: <20220912182224.514561-1-vishal.moola@gmail.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 12 Sep 2022 19:20:54 +0900, Namjae Jeon wrote:
->2022-09-12 5:57 GMT+09:00, Atte Heikkilä <atteh.mailbox@gmail.com>:
->Hi Atte,
->
->[snip]
->> +static char *casefold_sharename(struct unicode_map *um, const char *name>)
->> +{
->> +	char *cf_name;
->> +	int cf_len;
->> +
->> +	cf_name = kzalloc(KSMBD_REQ_MAX_SHARE_NAME, GFP_KERNEL);
->> +	if (!cf_name)
->> +		return ERR_PTR(-ENOMEM);
->> +
->> +	if (IS_ENABLED(CONFIG_UNICODE)) {
->> +		const struct qstr q_name = {.name = name, .len = strlen(name)};
->> +
->> +		if (!um)
->> +			goto out_ascii;
->Minor nit, Wouldn't it be simpler to change something like the one below?
->
->+	if (IS_ENABLED(CONFIG_UNICODE) && um) {
+This patch series replaces find_get_pages_range_tag() with
+filemap_get_folios_tag(). This also allows the removal of multiple
+calls to compound_head() throughout.
+It also makes a good chunk of the straightforward conversions to folios,
+and takes the opportunity to introduce a function that grabs a folio
+from the pagecache.
 
-This mailing list already has a v2 patch series. Please, reply to that one.
-As for your suggestion, I thought to keep the statements separate since the
-block with the IS_ENABLED() macro is optimized away when CONFIG_UNICODE is
-not set. I understand that the behavior is the same with your suggestion.
+F2fs and Ceph have quite alot of work to be done regarding folios, so
+for now those patches only have the changes necessary for the removal of
+find_get_pages_range_tag(), and only support folios of size 1 (which is
+all they use right now anyways).
 
-Thank you.
+I've run xfstests on btrfs, ext4, f2fs, and nilfs2, but more testing may be
+beneficial. The page-writeback and filemap changes implicitly work. Testing
+and review of the other changes (afs, ceph, cifs, gfs2) would be appreciated.
+---
+v2:
+  Got Acked-By tags for nilfs and btrfs changes
+  Fixed an error arising in f2fs
+  - Reported-by: kernel test robot <lkp@intel.com>
+   
+Vishal Moola (Oracle) (23):
+  pagemap: Add filemap_grab_folio()
+  filemap: Added filemap_get_folios_tag()
+  filemap: Convert __filemap_fdatawait_range() to use
+    filemap_get_folios_tag()
+  page-writeback: Convert write_cache_pages() to use
+    filemap_get_folios_tag()
+  afs: Convert afs_writepages_region() to use filemap_get_folios_tag()
+  btrfs: Convert btree_write_cache_pages() to use
+    filemap_get_folio_tag()
+  btrfs: Convert extent_write_cache_pages() to use
+    filemap_get_folios_tag()
+  ceph: Convert ceph_writepages_start() to use filemap_get_folios_tag()
+  cifs: Convert wdata_alloc_and_fillpages() to use
+    filemap_get_folios_tag()
+  ext4: Convert mpage_prepare_extent_to_map() to use
+    filemap_get_folios_tag()
+  f2fs: Convert f2fs_fsync_node_pages() to use filemap_get_folios_tag()
+  f2fs: Convert f2fs_flush_inline_data() to use filemap_get_folios_tag()
+  f2fs: Convert f2fs_sync_node_pages() to use filemap_get_folios_tag()
+  f2fs: Convert f2fs_write_cache_pages() to use filemap_get_folios_tag()
+  f2fs: Convert last_fsync_dnode() to use filemap_get_folios_tag()
+  f2fs: Convert f2fs_sync_meta_pages() to use filemap_get_folios_tag()
+  gfs2: Convert gfs2_write_cache_jdata() to use filemap_get_folios_tag()
+  nilfs2: Convert nilfs_lookup_dirty_data_buffers() to use
+    filemap_get_folios_tag()
+  nilfs2: Convert nilfs_lookup_dirty_node_buffers() to use
+    filemap_get_folios_tag()
+  nilfs2: Convert nilfs_btree_lookup_dirty_buffers() to use
+    filemap_get_folios_tag()
+  nilfs2: Convert nilfs_copy_dirty_pages() to use
+    filemap_get_folios_tag()
+  nilfs2: Convert nilfs_clear_dirty_pages() to use
+    filemap_get_folios_tag()
+  filemap: Remove find_get_pages_range_tag()
 
->
->Thanks!
->> +
->> +		cf_len = utf8_casefold(um, &q_name, cf_name,
->> +				       KSMBD_REQ_MAX_SHARE_NAME);
->> +		if (cf_len < 0)
->> +			goto out_ascii;
->> +
->> +		return cf_name;
->> +	}
->> +
->> +out_ascii:
->> +	cf_len = strscpy(cf_name, name, KSMBD_REQ_MAX_SHARE_NAME);
->> +	if (cf_len < 0)
->> +		return ERR_PTR(-E2BIG);
->> +
->> +	for (; *cf_name; ++cf_name)
->> +		*cf_name = isascii(*cf_name) ? tolower(*cf_name) : *cf_name;
->> +	return cf_name - cf_len;
->> +}
->> +
+ fs/afs/write.c          | 114 +++++++++++++++++----------------
+ fs/btrfs/extent_io.c    |  57 +++++++++--------
+ fs/ceph/addr.c          | 138 ++++++++++++++++++++--------------------
+ fs/cifs/file.c          |  33 +++++++++-
+ fs/ext4/inode.c         |  55 ++++++++--------
+ fs/f2fs/checkpoint.c    |  49 +++++++-------
+ fs/f2fs/compress.c      |  13 ++--
+ fs/f2fs/data.c          |  69 ++++++++++----------
+ fs/f2fs/f2fs.h          |   5 +-
+ fs/f2fs/node.c          |  72 +++++++++++----------
+ fs/gfs2/aops.c          |  64 ++++++++++---------
+ fs/nilfs2/btree.c       |  14 ++--
+ fs/nilfs2/page.c        |  59 ++++++++---------
+ fs/nilfs2/segment.c     |  44 +++++++------
+ include/linux/pagemap.h |  32 +++++++---
+ include/linux/pagevec.h |   8 ---
+ mm/filemap.c            |  87 ++++++++++++-------------
+ mm/page-writeback.c     |  44 +++++++------
+ mm/swap.c               |  10 ---
+ 19 files changed, 507 insertions(+), 460 deletions(-)
+
+-- 
+2.36.1
+
