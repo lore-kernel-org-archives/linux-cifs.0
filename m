@@ -2,239 +2,379 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7F7C54EE9
-	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 19:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28AE4C54EE9
+	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 19:48:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231953AbiIMTDw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 13 Sep 2022 15:03:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35456 "EHLO
+        id S229449AbiIMTs0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 13 Sep 2022 15:48:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231921AbiIMTDC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Sep 2022 15:03:02 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2076.outbound.protection.outlook.com [40.107.237.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 252B3DE5
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Sep 2022 12:02:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UGbKdrM+hoNc1tFYU6VIXdLg1QaXM5WR2QZk1XVu26eKwo4UXNcM+EfKqxK6mngzSeRaxPQVb9PcegoEyV/B+eL9FGf2JQMSamgyxtDGob7te/wJT/VrH/e6vArnAuwhpnickiTTrUWoqK4zOVn/VBN8+DR9W3Pomvr5qf3F2aoGeZ530FIgGDrGyfZAAUMrAi+gcsaEjbKux/kpxRrypu+/rrOADmMWVM63ed2qOaQRi/lpIr53pD0ZMjAbS64wCFet5qvmCyq7rdnFQliQh0EtsoJPc6obFZBc1lQ8Kxe/D44pTOZ9DcXepKQEWinrf6Jz6I1o9dagZ8aW/m9jGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wUo4KyXxg5iYtZN50T2OCaYrFc0bSVr67vDPC1e8iPg=;
- b=DwphQwjPrnUyj2ZQv9yVIqTr40o6ZQH6Iw77jZkN3BJnTeoqYQsXXYYvp5mikiQ3i/iEEr+TepzjKcENNsAN/xm0BQZyztI5lm5heih0a2NyICOE9ooJfkfcHfSlka4WJIdI4fvcPWv3kFc648hsnzEZUvsknaMjeIXnKWewMF8y8ATLdsgk7bOSNpoqOacMSKQCntyg/IGAFgyl+nygZXRcv5JMUtZsIiwOiE+tAvjAOE3D38FaO/vuCx9cmVOMbJ3zYe5bwOG/Vi+Px6iVh/PWMQiOhh5hKij/pOgaMD6y8I2NJD/vgXhi9KhNPJfP2xs/1lmACtew96COahXxNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- BN6PR01MB3250.prod.exchangelabs.com (2603:10b6:404:d7::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5612.22; Tue, 13 Sep 2022 19:02:49 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::6566:9fdc:aac:8b51]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::6566:9fdc:aac:8b51%2]) with mapi id 15.20.5612.022; Tue, 13 Sep 2022
- 19:02:49 +0000
-Message-ID: <388d1257-419e-f0c8-348f-587f5c0a51ee@talpey.com>
-Date:   Tue, 13 Sep 2022 12:02:47 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v3] ksmbd: update documentation
-Content-Language: en-US
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, atteh.mailbox@gmail.com
-References: <20220909092558.9498-1-linkinjeon@kernel.org>
- <20220909092558.9498-2-linkinjeon@kernel.org>
- <a5f680f2-6dc3-1c0b-bfbb-51f740e09109@talpey.com>
- <CAKYAXd_4gpMU_0z9ed7ktP3zQ0doUqsWi1QqiJ_1v6Y25C9MDg@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <CAKYAXd_4gpMU_0z9ed7ktP3zQ0doUqsWi1QqiJ_1v6Y25C9MDg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR05CA0199.namprd05.prod.outlook.com
- (2603:10b6:a03:330::24) To SN6PR01MB4445.prod.exchangelabs.com
- (2603:10b6:805:e2::33)
+        with ESMTP id S229511AbiIMTsY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Sep 2022 15:48:24 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 861B467470
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Sep 2022 12:48:23 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 2BA4C34E60;
+        Tue, 13 Sep 2022 19:48:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1663098502; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=u+cfWXz7m3hdetKIGOSOPGvdfQzac3Fv83mQjEeY3bs=;
+        b=PbPjzalFdoQfQfB8+tXrC0Nrorhl9lgDPMZzglHdLqLyrp2nSCTgWndQ2n32WaU97Y0CI+
+        s402hStWLOx5Q0gWfm2IxmtFsNu/DXRPczzue64xsumypD3WiyG57rnKbtvwjrnMSiASvX
+        /yuoVdbJBHQlOZlCHzEk5jImEoocwMs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1663098502;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=u+cfWXz7m3hdetKIGOSOPGvdfQzac3Fv83mQjEeY3bs=;
+        b=XkR7c/siHC2n2/cQHR0/yr2gx+IDGilVCrEy0vrPmEQGxJV1EBmbjHQaULcJ8bWJeTJrIQ
+        fd7N87MLmh+Ha2Ag==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A5514139B3;
+        Tue, 13 Sep 2022 19:48:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id mzyMGoXeIGPmKgAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Tue, 13 Sep 2022 19:48:21 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com
+Subject: [PATCH] cifs: replace kfree() with kfree_sensitive() for sensitive data
+Date:   Tue, 13 Sep 2022 16:48:11 -0300
+Message-Id: <20220913194811.10045-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|BN6PR01MB3250:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca014e35-4923-4e47-1cb2-08da95ba8d04
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vqc2KVqvSnG3SsJ+1+hhHhTxgowZof8CmB3vlUMG4aKWxLuKqyab5+DLshpnpFKjKazO8GwhhwdpcEwj/G6J42XJwg/DsglH64/KtKbWapUYtiJn05EANaYyGYLy9hFjjqt19VjQgNwAQKI11avruCtyvQSRfuoLqL5XW2CbTJFMOuryMaz8uKhsg6nfrjpq95XFoFEKjVAGBU52I0MK/xp28Nr6A25adeWUJTYs45O1DSY88iPqi05B6LTCGG/wODjSv/UbUU8pEcMxfX3SuNzl8P6gjQLxHHzcFfj31kDhCRCrePWJ8VfOSaRFwwsyyc3fCHovkbKspFxQrxQ3j/+q4k3Tll6VgENej1wLH12miKAbhY1xkey/i1DZs783aPnEHzdhFDjB54X2ORX7KHXSgQ6u7icCWHjNF/K3chadMKTUwzfZSXlE0AHpb138u27EWy0AfCARUl/orQcy04WO7a9O+gMjnsbun0u8/zpxT8uJnCYrioUw7aXVLwTErZbTmOGkZSGF9xZdiVaxeYeJclnOW+TEorZiGY2bDnIcr3jLCh47vrEIeu/HxH7YVY72TGYqv909krq0BIKxXk1LKlVKGxpEqgppd5qbapYkIlhlfpa7mZ1nws3PUfj5tONT3qArx8jz3r3w/a0z4Gy9J9PMjHJghEw7Kl0uAKGxi6OnNZNGVCqEu436Ja3B0xCJabA8twEt6RWNIt1jofZkCARmtLbFulTkwDPoLqYK8ohqKS5bMeoWPvk4WXYRqBYXrFuUI8RVCyG+BgpK/ZqMs+Oxq0zjsnsYpc+tVCk4zQ5rBD+SNswnlycqRGlEvlqJonWx7mBFP0OtsevJiQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(366004)(346002)(39830400003)(376002)(136003)(451199015)(38350700002)(31696002)(6916009)(966005)(2906002)(66556008)(52116002)(31686004)(5660300002)(86362001)(8676002)(478600001)(66946007)(316002)(26005)(4326008)(6486002)(84970400001)(186003)(8936002)(41300700001)(83380400001)(53546011)(36756003)(38100700002)(15650500001)(66476007)(6512007)(2616005)(6506007)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YVU5aWR2U2NoYUtvbWRhdTR6THRCNmkzTzNwajhsdFRtK253U0NiaERybDkr?=
- =?utf-8?B?L3NNdHUrVFNFOGZUQkRkd3c4Z1FXM29leU0zbGtBZjJhaGQ0YTFtRHZYcFNE?=
- =?utf-8?B?UFVneDV2SFJUYWtacks0MjUzUE84a0J5MytOZEN5bmZITjlrenBzRUpvakR2?=
- =?utf-8?B?U2JlVEo4cnpDTTFabjZsall6dmJ2M3dTa2FlQzF3MEZ4QjhydFhPUEhxR3FG?=
- =?utf-8?B?dWdyb1JiNyt6ekVUYm9yTVR4RGNiZFlYYjBtMDJlMmVHV0VoMXBHaW91THhN?=
- =?utf-8?B?VDVZVWJQaldtN2NsUXFIdzFad3pzZTdtMkJSV2Z4VkJjZTBlTWpoRVhzOFBx?=
- =?utf-8?B?UVlRNHo4OGlDTDU1RHN2OEowaDdTVktQY0ZnSTlDdXgxaFkxL0sxc1YweVp5?=
- =?utf-8?B?amxBZEs1Z1p6cGVmNGNsUEJqVmdDNGVMUkE3MDg2QmV2M2swM0ZRbUU1Nnd2?=
- =?utf-8?B?NG5YZzhKWFZJVUpab0RLb085V2NKNnVMQ2F4ZzNUc0wvemN3WEVYclNOY09H?=
- =?utf-8?B?b3B0eTUrSWVDQjRCUE8zdnVkenVTQ3B1V0dxSlNzK1o0U3NtamxNTE5BNitU?=
- =?utf-8?B?ZVovdFBYMlRHcWdVZWVsVzg3NDQ2NDBmR0M3c1N5TkxTaWJ1OTVFQjRIZTN5?=
- =?utf-8?B?OWVMYzBNUGxIV0ROZENyQnpFa1FSUFEwMW1xK2JBb3BwMXpVRkhRdWVTcklT?=
- =?utf-8?B?ejdkU1lMa1FCRFU4dnJPQXorclc4T1Y2dWUzL09FK3I2eTZCWlhCVjhxVWEz?=
- =?utf-8?B?YXM3b2NyanMvWE5OMEFIYnpoME9sV1dSYkZkbXdRM2dCa3BacVVidzVjekpQ?=
- =?utf-8?B?ek8xYzA3aHNUQW5iZ0F5bkRRcHRSVTdXRjhqakVsT0J6b3k5bTd5NzN0bjJL?=
- =?utf-8?B?anZ0c2djdHBwNjRHdE8xSUlYTytFdmpwQ0pxSFBQT01PelhGK3dHcXEycTF0?=
- =?utf-8?B?SUVUSDFVWHZGVTJLNEFIOGpKUElkekd4T01WYTNEenJvbjlya3pvcUVFeUpq?=
- =?utf-8?B?Q1dkTzhyNnM1VzZQb3E1cENvOVh3WGl3cFcyN3RIUkhWZVU1RXRZeVQ4Q05t?=
- =?utf-8?B?ZkdjNStaU0t5THZkcTU1U0wrQWhBNjFzZUtsa0JaMFBPc1JGSVVzczlVZ2lP?=
- =?utf-8?B?NzArdmZwK2ZXN1R6VXVPUEU4cnZlQUI0dDRuaHQ0WithbStSZWVKL2k0Tnhz?=
- =?utf-8?B?aVFNbkxEZEt4T2RSVkw3RlM5akdSRHNyNWI2eWRxR2RhamhjQmFvVUlNZGtq?=
- =?utf-8?B?RGsxRENyWkJoeDRTVmNSTlEvRW5Jd2oxS21ibWl4Q25qb2NjNGhhbUkxNzhz?=
- =?utf-8?B?L0hTS2UrMTB5UHBvbGlYK3hBWkJZN21UV2J0MzBva1g3MTRqbkd1V1NhMVo0?=
- =?utf-8?B?WEg2ZnV1NDFQWk1HcU42RUFSaGJxZEpkZmxSWllvL1lOcDk2dEhLRCtydVVS?=
- =?utf-8?B?MU1JQlVPU0RXSHgxZ2k4VzVFNS9Hb29RUTlLYWtxeHAxdE8wbTlQYUpMdG5E?=
- =?utf-8?B?dFRnQmtYcmNFWWdud25RVnl2MjFkNnAvODl0VHBrdzNNQ0pDZ2FIYUhlRnpG?=
- =?utf-8?B?NDZxWXFiZ3hMZUlubktERURLeHpJU2pjSWJYd1p1KzBheDhqRVVaRTkweXYw?=
- =?utf-8?B?cjNPTVJJY3pDME5KblROZkoyL0w2SkRsZFhRckRZRnRQd2owcUx5Q3I5YlQz?=
- =?utf-8?B?Tll5WGFKU2pnQ2NZcFd6MEpUM0EranVRb0hFalVoSCt0TFRza1piQUJWSUcr?=
- =?utf-8?B?ZUs1eU91eGpBaFhoYXpmQ0VmcC8vZEQ4ZnZuelhIc3lvZE1mTG8zMjdvVk9O?=
- =?utf-8?B?eDZPQnh3S3FETUtZTVBaK0diR2xwMGdLdmFLeXZJVmkxMno1ei93SXdodFVR?=
- =?utf-8?B?VndnQ3Q1Q01xVkVWRExwM2JUTFE1UTdvdUJpMTU5NFl0dHNybitnZFZ6UWZk?=
- =?utf-8?B?U0MwYmlsQ05ZejNPcG1HVVhsaHE1dXdVTmYwcDR6bGI0STJiU0NGSkZ1b2xN?=
- =?utf-8?B?cm9XYWYyNEcyOFBnYU9FZnhhMmlwdmhJS2IwdTNSSnpUUnQvVC9pMXdURzhU?=
- =?utf-8?B?QzZtRnZYTU9kTU04aVhKUzFHZVZ3TXBYN0JZRUM4Q0dINXFCU1NPZThEa2xq?=
- =?utf-8?Q?nQRs=3D?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca014e35-4923-4e47-1cb2-08da95ba8d04
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2022 19:02:49.0377
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D16BxqpO1QAS+w/aXdP0srfOSe5wYT7kD2pdwjwQdiHut6AkMSmdIp+90zokmcQA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR01MB3250
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 9/12/2022 4:54 PM, Namjae Jeon wrote:
-> 2022-09-13 8:38 GMT+09:00, Tom Talpey <tom@talpey.com>:
->> On 9/9/2022 5:25 AM, Namjae Jeon wrote:
->>> configuration.txt in ksmbd-tools moved to ksmbd.conf manpage.
->>> update it and more detailed ksmbd-tools build method.
->>>
->>> Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
->>> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->>> ---
->>>    v3:
->>>      - replace CIFS with SMB3 clients.
->>>      - update ksmbd built-in case.
->>>      - replace smb.conf leftover with ksmbd.conf.
->>>      - use full name of utils in ksmbd-tools instead of <foo>.
->>>      - fix the warnings from make htlmdocs build reported by kernel test
->>>        robot.
->>>    v2:
->>>      - rename smb.conf to ksmbd.conf.
->>>      - add how to set ksmbd module in menuconfig
->>>      - remove --syscondir option for configure, instead change ksmbd
->>>        directory to /usr/local/etc/ksmbd.
->>>      - change the prompt to '$'.
->>>
->>>    Documentation/filesystems/cifs/ksmbd.rst | 40 +++++++++++++++++-------
->>>    1 file changed, 29 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/Documentation/filesystems/cifs/ksmbd.rst
->>> b/Documentation/filesystems/cifs/ksmbd.rst
->>> index 1af600db2e70..4284341c89f3 100644
->>> --- a/Documentation/filesystems/cifs/ksmbd.rst
->>> +++ b/Documentation/filesystems/cifs/ksmbd.rst
->>> @@ -118,26 +118,44 @@ ksmbd/nfsd interoperability    Planned for future.
->>> The features that ksmbd
->>>    How to run
->>>    ==========
->>>
->>> -1. Download ksmbd-tools and compile them.
->>> -	- https://github.com/cifsd-team/ksmbd-tools
->>> +1. Download
->>> ksmbd-tools(https://github.com/cifsd-team/ksmbd-tools/releases) and
->>> +   compile them.
->>> +
->>> +   - Refer
->>> README(https://github.com/cifsd-team/ksmbd-tools/blob/master/README.md)
->>> +     to know how to use ksmbd.mountd/adduser/addshare/control utils
->>> +
->>> +     $ ./autogen.sh
->>> +     $ ./configure --with-rundir=/run
->>> +     $ make && sudo make install
->>>
->>>    2. Create user/password for SMB share.
->>>
->>> -	# mkdir /etc/ksmbd/
->>> -	# ksmbd.adduser -a <Enter USERNAME for SMB share access>
->>> +   - See ksmbd.adduser manpage.
->>> +
->>> +     $ man ksmbd.adduser
->>> +     $ sudo ksmbd.adduser -a <Enter USERNAME for SMB share access>
->>> +
->>> +3. Create /usr/local/etc/ksmbd/ksmbd.conf file, add SMB share in
->>> ksmbd.conf file.
->>
->> I missed this in the v2 match - are you intentionally moving the
->> ksmbd.conf file to /usr/local/etc? That seems a very mysterious
->> location. Nothing on my vanilla installed system places anything
->> in there.
-> To avoid conflicts with the existing distribution package, the default
-> location as far as I know is /usr/local/etc. And it can be changed
-> with --sysconfdir. It is same with samba.
+This patch is mosltly a s/kfree/kfree_sensitive/ for sensitive material
+that could still be left in memory.
 
-I totally disagree with this. The kernel server is part of, well,
-the kernel, and loading the kernel should not depend on a path like
-/usr/local/etc. Also, nothing I know, including Samba, is deployed
-with such a directory in my experience. I find smb.conf in /etc/samba.
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/cifs/cifsencrypt.c | 12 ++++++------
+ fs/cifs/connect.c     |  6 +++---
+ fs/cifs/fs_context.c  | 13 +++++++++++--
+ fs/cifs/misc.c        |  2 +-
+ fs/cifs/sess.c        | 24 +++++++++++++++---------
+ fs/cifs/smb2ops.c     |  6 +++---
+ fs/cifs/smb2pdu.c     | 22 +++++++++++++++++-----
+ 7 files changed, 56 insertions(+), 29 deletions(-)
 
-Where are the ksmbd.<foo> helpers installed by default? /usr/local/sbin?
-On my standard Ubuntu install (and presumably Debian?) they are in
-/sbin.
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 46f5718754f9..d848bc0aac27 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -679,7 +679,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ unlock:
+ 	cifs_server_unlock(ses->server);
+ setup_ntlmv2_rsp_ret:
+-	kfree(tiblob);
++	kfree_sensitive(tiblob);
+ 
+ 	return rc;
+ }
+@@ -753,14 +753,14 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
+ 		server->secmech.ccmaesdecrypt = NULL;
+ 	}
+ 
+-	kfree(server->secmech.sdesccmacaes);
++	kfree_sensitive(server->secmech.sdesccmacaes);
+ 	server->secmech.sdesccmacaes = NULL;
+-	kfree(server->secmech.sdeschmacsha256);
++	kfree_sensitive(server->secmech.sdeschmacsha256);
+ 	server->secmech.sdeschmacsha256 = NULL;
+-	kfree(server->secmech.sdeschmacmd5);
++	kfree_sensitive(server->secmech.sdeschmacmd5);
+ 	server->secmech.sdeschmacmd5 = NULL;
+-	kfree(server->secmech.sdescmd5);
++	kfree_sensitive(server->secmech.sdescmd5);
+ 	server->secmech.sdescmd5 = NULL;
+-	kfree(server->secmech.sdescsha512);
++	kfree_sensitive(server->secmech.sdescsha512);
+ 	server->secmech.sdescsha512 = NULL;
+ }
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 389127e21563..46da90dd2d15 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -311,7 +311,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
+ 	}
+ 	server->sequence_number = 0;
+ 	server->session_estab = false;
+-	kfree(server->session_key.response);
++	kfree_sensitive(server->session_key.response);
+ 	server->session_key.response = NULL;
+ 	server->session_key.len = 0;
+ 	server->lstrp = jiffies;
+@@ -1585,7 +1585,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+ 
+ 	cifs_crypto_secmech_release(server);
+ 
+-	kfree(server->session_key.response);
++	kfree_sensitive(server->session_key.response);
+ 	server->session_key.response = NULL;
+ 	server->session_key.len = 0;
+ 	kfree(server->hostname);
+@@ -4143,7 +4143,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 		if (ses->auth_key.response) {
+ 			cifs_dbg(FYI, "Free previous auth_key.response = %p\n",
+ 				 ses->auth_key.response);
+-			kfree(ses->auth_key.response);
++			kfree_sensitive(ses->auth_key.response);
+ 			ses->auth_key.response = NULL;
+ 			ses->auth_key.len = 0;
+ 		}
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 0e13dec86b25..95133b4078f2 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -791,6 +791,13 @@ do {									\
+ 	cifs_sb->ctx->field = NULL;					\
+ } while (0)
+ 
++#define STEAL_STRING_SENSITIVE(cifs_sb, ctx, field)			\
++do {									\
++	kfree_sensitive(ctx->field);					\
++	ctx->field = cifs_sb->ctx->field;				\
++	cifs_sb->ctx->field = NULL;					\
++} while (0)
++
+ static int smb3_reconfigure(struct fs_context *fc)
+ {
+ 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
+@@ -811,7 +818,7 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 	STEAL_STRING(cifs_sb, ctx, UNC);
+ 	STEAL_STRING(cifs_sb, ctx, source);
+ 	STEAL_STRING(cifs_sb, ctx, username);
+-	STEAL_STRING(cifs_sb, ctx, password);
++	STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
+ 	STEAL_STRING(cifs_sb, ctx, domainname);
+ 	STEAL_STRING(cifs_sb, ctx, nodename);
+ 	STEAL_STRING(cifs_sb, ctx, iocharset);
+@@ -1162,7 +1169,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		}
+ 		break;
+ 	case Opt_pass:
+-		kfree(ctx->password);
++		kfree_sensitive(ctx->password);
+ 		ctx->password = NULL;
+ 		if (strlen(param->string) == 0)
+ 			break;
+@@ -1470,6 +1477,8 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 	return 0;
+ 
+  cifs_parse_mount_err:
++	if (ctx->password)
++		kfree_sensitive(ctx->password);
+ 	return -EINVAL;
+ }
+ 
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 87f60f736731..85109a9a2146 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1119,7 +1119,7 @@ cifs_alloc_hash(const char *name,
+ void
+ cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
+ {
+-	kfree(*sdesc);
++	kfree_sensitive(*sdesc);
+ 	*sdesc = NULL;
+ 	if (*shash)
+ 		crypto_free_shash(*shash);
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 951874928d70..c9edec7081de 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -1208,6 +1208,12 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
+ static void
+ sess_free_buffer(struct sess_data *sess_data)
+ {
++	int i;
++
++	/* zero the session data before freeing, as it might contain sensitive info (keys, etc) */
++	for (i = 0; i < 3; i++)
++		if (sess_data->iov[i].iov_base)
++			memzero_explicit(sess_data->iov[i].iov_base, sess_data->iov[i].iov_len);
+ 
+ 	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
+ 	sess_data->buf0_type = CIFS_NO_BUFFER;
+@@ -1369,7 +1375,7 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+ 	sess_free_buffer(sess_data);
+-	kfree(ses->auth_key.response);
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = NULL;
+ }
+ 
+@@ -1507,7 +1513,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+ 	sess_free_buffer(sess_data);
+-	kfree(ses->auth_key.response);
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = NULL;
+ }
+ 
+@@ -1642,7 +1648,7 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
+ 	rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
+ 
+ out_free_ntlmsspblob:
+-	kfree(ntlmsspblob);
++	kfree_sensitive(ntlmsspblob);
+ out:
+ 	sess_free_buffer(sess_data);
+ 
+@@ -1652,9 +1658,9 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
+ 	}
+ 
+ 	/* Else error. Cleanup */
+-	kfree(ses->auth_key.response);
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = NULL;
+-	kfree(ses->ntlmssp);
++	kfree_sensitive(ses->ntlmssp);
+ 	ses->ntlmssp = NULL;
+ 
+ 	sess_data->func = NULL;
+@@ -1753,7 +1759,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+ 	}
+ 
+ out_free_ntlmsspblob:
+-	kfree(ntlmsspblob);
++	kfree_sensitive(ntlmsspblob);
+ out:
+ 	sess_free_buffer(sess_data);
+ 
+@@ -1761,9 +1767,9 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+ 		rc = sess_establish_session(sess_data);
+ 
+ 	/* Cleanup */
+-	kfree(ses->auth_key.response);
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = NULL;
+-	kfree(ses->ntlmssp);
++	kfree_sensitive(ses->ntlmssp);
+ 	ses->ntlmssp = NULL;
+ 
+ 	sess_data->func = NULL;
+@@ -1839,7 +1845,7 @@ int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+ 	rc = sess_data->result;
+ 
+ out:
+-	kfree(sess_data);
++	kfree_sensitive(sess_data);
+ 	return rc;
+ }
+ #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index d6dd839ca1bb..0b89259c72ac 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4416,11 +4416,11 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 	if (!rc && enc)
+ 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
+ 
+-	kfree(iv);
++	kfree_sensitive(iv);
+ free_sg:
+-	kfree(sg);
++	kfree_sensitive(sg);
+ free_req:
+-	kfree(req);
++	kfree_sensitive(req);
+ 	return rc;
+ }
+ 
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index ae0d07812954..5bae752fe9a8 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1341,6 +1341,13 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
+ static void
+ SMB2_sess_free_buffer(struct SMB2_sess_data *sess_data)
+ {
++	int i;
++
++	/* zero the session data before freeing, as it might contain sensitive info (keys, etc) */
++	for (i = 0; i < 2; i++)
++		if (sess_data->iov[i].iov_base)
++			memzero_explicit(sess_data->iov[i].iov_base, sess_data->iov[i].iov_len);
++
+ 	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
+ 	sess_data->buf0_type = CIFS_NO_BUFFER;
+ }
+@@ -1413,6 +1420,9 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
+ 	struct smb2_sess_setup_rsp *rsp = NULL;
+ 	bool is_binding = false;
+ 
++	/* initialize it to NULL so we can check/free it on exit */
++	ses->auth_key.response = NULL;
++
+ 	rc = SMB2_sess_alloc_buffer(sess_data);
+ 	if (rc)
+ 		goto out;
+@@ -1473,6 +1483,8 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
+ out_put_spnego_key:
+ 	key_invalidate(spnego_key);
+ 	key_put(spnego_key);
++	if (rc && ses->auth_key.response)
++		kfree_sensitive(ses->auth_key.response);
+ out:
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+@@ -1569,7 +1581,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
+ 	}
+ 
+ out:
+-	kfree(ntlmssp_blob);
++	kfree_sensitive(ntlmssp_blob);
+ 	SMB2_sess_free_buffer(sess_data);
+ 	if (!rc) {
+ 		sess_data->result = 0;
+@@ -1577,7 +1589,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
+ 		return;
+ 	}
+ out_err:
+-	kfree(ses->ntlmssp);
++	kfree_sensitive(ses->ntlmssp);
+ 	ses->ntlmssp = NULL;
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+@@ -1653,9 +1665,9 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
+ 	}
+ #endif
+ out:
+-	kfree(ntlmssp_blob);
++	kfree_sensitive(ntlmssp_blob);
+ 	SMB2_sess_free_buffer(sess_data);
+-	kfree(ses->ntlmssp);
++	kfree_sensitive(ses->ntlmssp);
+ 	ses->ntlmssp = NULL;
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+@@ -1733,7 +1745,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 		cifs_server_dbg(VFS, "signing requested but authenticated as guest\n");
+ 	rc = sess_data->result;
+ out:
+-	kfree(sess_data);
++	kfree_sensitive(sess_data);
+ 	return rc;
+ }
+ 
+-- 
+2.35.3
 
-Tom.
-
->> Also, doesn't this file need to exist before step 2??
-> Ah, Yes. Will switch them.
-> 
-> Thanks for your review!
->>
->> Tom.
->>
->>
->>> -3. Create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
->>> -	- Refer smb.conf.example and
->>> -
->>> https://github.com/cifsd-team/ksmbd-tools/blob/master/Documentation/configuration.txt
->>> +   - Refer ksmbd.conf.example in ksmbd-utils, See ksmbd.conf manpage
->>> +     for details to configure shares.
->>>
->>> -4. Insert ksmbd.ko module
->>> +        $ man ksmbd.conf
->>>
->>> -	# insmod ksmbd.ko
->>> +4. Insert ksmbd.ko module after build your kernel. No need to load
->>> module
->>> +   if ksmbd is built into the kernel.
->>> +
->>> +   - Set ksmbd in menuconfig(e.g. $ make menuconfig)
->>> +       [*] Network File Systems  --->
->>> +           <M> SMB3 server support (EXPERIMENTAL)
->>> +
->>> +	$ sudo modprobe ksmbd.ko
->>>
->>>    5. Start ksmbd user space daemon
->>> -	# ksmbd.mountd
->>>
->>> -6. Access share from Windows or Linux using CIFS
->>> +	$ sudo ksmbd.mountd
->>> +
->>> +6. Access share from Windows or Linux SMB3 clients (cifs.ko or smbclient
->>> of samba)
->>>
->>>    Shutdown KSMBD
->>>    ==============
->>
-> 
