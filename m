@@ -2,45 +2,45 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1569C6FA86
-	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 22:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6832CECAAD8
+	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 22:20:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229507AbiIMWUI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 13 Sep 2022 18:20:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
+        id S229632AbiIMWUJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 13 Sep 2022 18:20:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbiIMWUF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Sep 2022 18:20:05 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2080.outbound.protection.outlook.com [40.107.223.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0016A489
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Sep 2022 15:20:03 -0700 (PDT)
+        with ESMTP id S229723AbiIMWUG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Sep 2022 18:20:06 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82C8657226
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Sep 2022 15:20:04 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Dtn8Hqnt03YzpGuA88a+FhOeS0seTf+oVjokDwr5XXe+o++e5k5cNFGexBLEC36aKcZ7+0Jjz8pWNw1rFhzsKtkewPbnMuqK05X82MRmpxCD0QtFsb57FBnrJtm1ILoxX251bC5j9TF/AIs/bgPXn9D5CGQKVM4uI4VbC1tOvDSJCdlKQxV1aah8kuLMKSKc+JR7oDmMVn+eWnuut4JViLXoI81X1NdNCG9U3vRHoWmJY9EfCSpRZaTRZYZf03+89+P4WNn5e0oY7XxQkbQQOX68vPWKpaNxecIoFhljaL+X+oGeQcKOQbOZrZBLMGJPzsOoHcmRVBinw33nYTQFZw==
+ b=JpYZHCGxoYex9teH6WWVOdWu808MUvAlo3ZurlQuHwj1ij8zAVRNJFWkGJUSpcK5dQMyWgjmvVLH7xy1fpVk3Q8XVd68ldi3qGx3rh3s7Huk9JVA+fU5gHHzoLtzxAKopTl21KOKZ5RPCL+zoaOQIRt0xkBGDSgwiH5Ngv4RCovtkkLNWUq653dhHmp9AmSXw/nruSmrTvVyaCynBgm9xSXRC7wo1iQ0t8GvYXgVDAzICkMf79mgZW7EW9tS60muXKiaxflsYvP6q4nN0jjr6EKp1gFevHAJp5Cups8fl1p+gLqjtdsLiRpczwWO51oJWRcKmPRjjv9jp+DGpJ7rrQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=phnMl4ugC+e8OyWUA6WiuLa8GoD33pQPA9NWUYMuASQ=;
- b=bMSn/xn7vR4wPuK3aBPgCQZbAv15FXRZMBAlzLjjFVUP+cX0rh2nQ1u4C/cMGxir5DfmjxZb6kxbWnBmJj9fD6QezaPpfs74CEU0sp4/vgomyd1ytarj0hRhHf1C/DbpRIzzIZFQGD7gxwe/0wk3MxWyfYejFOGl+/QYWwBV/gntdUtDCQT2m/TWVbjSkmg2ior6zVwfM9vNGMIIIbjQPaH6YcC6dNyEMCD5yvdbE3oI3+g8FsOb06yFzW7NU84bdNGH8Tg6Pb2THTAqB39eNS1w98iltnbYe+n2hYDwEbvNq3YbF5P87o6yb+hs6EqqGBSoPqH8SdzCOKGEWFV9XQ==
+ bh=GWfD7j4oaagsHQyFIKvg/EfxuQXkKvKVNetOePjbQMc=;
+ b=En/MoIKL5+BAO6y9Sm4ddsqURM7/4YM/UFTNshr3yxVtOpyo5JTmDCwvNIFAeYHQEwA3PLqAWCAaaqQP8LtsWRWmI2dBduJBYMWGsFAGM5nsTS8q8gwo8WvHF4Vja4OU8Lv+J8tMZ0aOWcd2k2VxxmpSp0Y8U8dYjbxisdeyCikXOJ+UvNO1T2P9BXWR8qhcfjwMQlFLUFq1YlSesclM3XUX5E3ffOafFt0u9olwu61rQGIoByzITVK5WiSISz9F6mMuqqSrM5wFAyY/0OtfhG0hajD/Mktk2IuhOdHvARfQqWJ3FnFjKL/K8MawtPm4qmYaX0Kq7+slNZBWP8TP2Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
  dkim=pass header.d=talpey.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=talpey.com;
 Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- BL0PR0102MB3378.prod.exchangelabs.com (2603:10b6:207:19::27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5612.22; Tue, 13 Sep 2022 22:20:01 +0000
+ DM8PR01MB7159.prod.exchangelabs.com (2603:10b6:8:d::16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5612.19; Tue, 13 Sep 2022 22:20:03 +0000
 Received: from SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::6566:9fdc:aac:8b51]) by SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::6566:9fdc:aac:8b51%2]) with mapi id 15.20.5612.022; Tue, 13 Sep 2022
- 22:20:01 +0000
+ 22:20:03 +0000
 From:   Tom Talpey <tom@talpey.com>
 To:     smfrench@gmail.com, linux-cifs@vger.kernel.org
 Cc:     linkinjeon@kernel.org, senozhatsky@chromium.org,
         bmt@zurich.ibm.com, Tom Talpey <tom@talpey.com>
-Subject: [PATCH 4/6] Reduce server smbdirect max send/receive segment sizes
-Date:   Tue, 13 Sep 2022 22:19:35 +0000
-Message-Id: <27ad44f89fa239f69806241aa65869cd58a04d3d.1663103255.git.tom@talpey.com>
+Subject: [PATCH 5/6] Handle variable number of SGEs in client smbdirect send.
+Date:   Tue, 13 Sep 2022 22:19:36 +0000
+Message-Id: <95a265f5f5da14508359d692d50d45f82635d924.1663103255.git.tom@talpey.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1663103255.git.tom@talpey.com>
 References: <cover.1663103255.git.tom@talpey.com>
@@ -51,85 +51,294 @@ X-ClientProxiedBy: BYAPR08CA0047.namprd08.prod.outlook.com
  (2603:10b6:805:e2::33)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|BL0PR0102MB3378:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c13c911-1a38-496f-b20f-08da95d619bb
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|DM8PR01MB7159:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2117e103-bcb6-4b7f-031f-08da95d61ad5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3MOO5DX8X74QYjHtXhIJCGB8k0d7CcHYa3b+w/E4OcDm6FfqH78BlJ/TU7Wfu2JWXcpMPynz7C1Hujiv54n/OMQWrFI3poLt/Kyu3Cyz0e93rTOhypOwVS+RdHKKtdeOLVFz9FnwXb69tjVsAAj4AwOPhxCh8iv7PKk+hnlBL/Cwzx1Ik0YwB29z4EnXFcQrOPDAJDLzhxtTCaaAnxhg+/5zhxF+fbjPMy2Of3ToUPHsBVzIm/NMoXbFZDVFFa/7h5axhezDvKLHC061yzORB2o1ksG/gahAd0gN7A51X/Lj3MUBTqQXNtfzzlaI/GXq8DTwbvQVdeSBlfX2OPECp2V+ry69blEz/g9B5z+oTey25u8hARIJHzkH7QogNYc7CbP+Fu6/QJqOsDe794LdSmg2xcIBWGy/Wxx6SbVhMRhEwZi2keM4OV4gJGU47BECA6CeKhmi8i5PskvqZFk1UI5d9RlEcv9IkMKJwr8J8TMht7cqqUcP5WWWUIcMDII9OXLN0jwWZI+jVxjxeCAbMS35A/zv1NstuH8mg/07n7QCcdjOUpQjg5sgx/t2hhBlLJkXD6reaZSdeYwZzpXfPj0EAERDGD3tpIcHUL/fY2BQAA1toWNvo+p5dm9vnphj4fbys6usirr0C+MMFPFMBxOh2CCXUg9jTWJCDzCzkp4j38ZMBwvalBFwDW6oT9FZW2jRbOkyZyjsrNH648AOcueJMOQjeeVTtlV6/K2Qylx1scbTHXjBhfyG9MWYsPqYGWdb1QGVI4V5QLZC9ezcAQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(376002)(396003)(346002)(39830400003)(366004)(451199015)(5660300002)(8936002)(2906002)(36756003)(4326008)(66476007)(66556008)(66946007)(316002)(52116002)(478600001)(41300700001)(6506007)(6486002)(6666004)(107886003)(26005)(38100700002)(86362001)(2616005)(186003)(8676002)(83380400001)(6512007)(38350700002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: UWYq/Cb8+xjl5D2402rY3Mm4PrCaEf3dwHo+BhazV7hESVeQVrLrx+nWhR5twxApY8NaoHvZx04BYRkFmFXwladGIk5hgCQplbbfzUG4gdW7bxVN9gy/nayXJY8bCq+jBXUqvKrsNt3MUnugaD8MqfZZ8ctn1AcuzHbo8E8gpvABbZ6OhlanJowuHbZqHhU1IfX2nmHHUUMFJIHugEz9bzDdFSH77O3U3YahsH7u3OA8mpYsvxSMDhqTrM2IXYBUsndpui7k4R9o9N4krg/jujcEEJ5h9ip3tO5qR2F9R5AAilosS1TttkmcdNU94bxEEZp7icPvnLRWEXBpEVDdj7Zm2C3b4cZUhBT8TbBGgdssMrTVDFpI4FMJ3N+RlqAB31dUKiEpUZMLqBY6opvWZYPuJ6y4ZkyDX1klLt/VCijCQ3CPxp/iFrJa7noUrHwdnjl58Ka2YXmTW4bXgUkm4W8cIaecWuXfyQ284e+F4d6f0jDatwB5l8gjtaUTPEeKut6TDzT2u7iHyNaDtZDeLxGjjd8OIXGwMwGpM6V2WPYIVGPT79K/l7K/SkxWTMQ830fFnS8Jn7+JOV43LRHhGD17nrC/LC7myVAciFGszBY1ILzNUWxm39CTJoIiW+104nrg4vAdjuz4BKRI4b5liYz0FI18Nm3/XhbaqGBwwWKij+Qg7svRPMavE3uh908cHMixw5C4/+cDBiJNjIj4e5I8MQ9IIU0oENqyu4FJYx+g3LdHHOf6m0LSaheANSUBMJIup7si2FQycVmlyE9/1Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(366004)(376002)(346002)(39830400003)(396003)(451199015)(38350700002)(6506007)(316002)(6666004)(6486002)(2906002)(5660300002)(41300700001)(107886003)(478600001)(2616005)(6512007)(66556008)(38100700002)(8676002)(26005)(52116002)(8936002)(66476007)(186003)(83380400001)(66946007)(36756003)(4326008)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nOFEBR4KO6QZPdu4IRIUJu086V7bjVdrC1utqAuAwCdqaSUnq7yv2+0aYZ9M?=
- =?us-ascii?Q?VYE74fwMkkadoQMLuLNLHlQwcfuMGONqKrEs+uK54+ijhlGdxUptjdY9841V?=
- =?us-ascii?Q?J0JpL0T5mlfNFq8BAl91WkshThyKiZp4eUpgF6/cSa2PiPUm89fdUl6k7uk0?=
- =?us-ascii?Q?AaZv3ZC+NvIUd3V0PVCKPgHo4qhxYz9hghkZ9DyZBzsBibCo6t9aS6Hy3UBT?=
- =?us-ascii?Q?XH15gWM4gSQfv4PkxK35SfIefBZtzxV9me3lTSr3xZSVlbmXoaAvEQ6tD/SJ?=
- =?us-ascii?Q?sitNWsJ49cTJKDjrTWfxMa1rhclvkoIeuXsK+GD7nFaZCQ+3mrzg2RfONa1/?=
- =?us-ascii?Q?TgjtsdkrVZLwYUWHypx36MOYx5sPzQvcoOeOz57hcpstlvmhOr3lTHQAfTN+?=
- =?us-ascii?Q?G8Ds2G2Y24kV51fuBBs3/HzFTnoAYTqhqq/XARib0qnUSMP4uDnIa2X6A+Yp?=
- =?us-ascii?Q?As4kDeqW6jr5jerz5r2BL2cBK+LGGLDtrw8NUDU+wkbRpvXo03wWj0NgcXxY?=
- =?us-ascii?Q?0fqp28iQbIen+lYDEiYvf0f6vrdNt0EMctRbKFTrY7/7/DJtKFxCUtb7PGvc?=
- =?us-ascii?Q?yLflsmzQba7rXB3e/C4oApWwbGEEKNyeRgay2i5HTsnEmUySdf9QxUM4fxze?=
- =?us-ascii?Q?ZaKrAKdWoYz34tX/uQkgtf4HwdWv4HHDkbS8pQ8KTmdjUAC8O6UksJPsM7Uy?=
- =?us-ascii?Q?6ghiQHiFUiodr4Maf+iI8I/fzMDfLn81YmZx6PK4mLhQjXbEYbiJbEyp3xxR?=
- =?us-ascii?Q?sSdxPN77h0RUuqUsyc1Vq5Fir76Th3In89oILPWYyx754QL8FGoUJDYhwGy4?=
- =?us-ascii?Q?SgroI6t3HtGRxxTyQgsUrK27ydAg4XJZYNDsFphPvK2uuMXt5g97IvuvW8Wo?=
- =?us-ascii?Q?cSsHkQeBAn0y1aVt1gHhPmHklsbjvQ3KN6kM+QEmPsDXmiKA+virF33hLg2x?=
- =?us-ascii?Q?asNNmX9nlVIhAGrljIfQnrdmOPl3CWX8hQVIE1fzWXphzKS9fQ4COCif6hOM?=
- =?us-ascii?Q?VTX3MbNrqRprHW8xxr6TvAzQQbBrEtKqOf3gIFmZ7nYyAR/1p/HY2ji0DAhV?=
- =?us-ascii?Q?qj21fKONIdP1gJII8HfdReFXFBAxeuXVa2jaxBKDLlD1xaBR77kKCY50AVpV?=
- =?us-ascii?Q?hwSDUNZ9J85zWPcaULu3qfSPULlqX3EmhUxOOKV+9aRK/pKL+t1yQWzEUPGO?=
- =?us-ascii?Q?sadLq0xRW3OOt4meh5s/Gk7CrIgn/JYICU00ahKk+DbxD59QwL7XjaB2tBtd?=
- =?us-ascii?Q?O8PG4ewuiX/HqgpJkNB1uxj8di8o7Dc5Cn12JxduKZMums83GjutvZBfXYDx?=
- =?us-ascii?Q?J5hoN9vaqxL0cNwfgRsKbzkQkzCiEpcBB6phLMN3oUddBJIthYMsAH44e4JF?=
- =?us-ascii?Q?/yVkBB5BzhTTan/Lu5LRYDZk3PeGWMESNQIfbRHtjZ+uqUY97+ROTgEmJ2Om?=
- =?us-ascii?Q?hPAtMDqfyYCZWnPi++kc75HyiqC/tmH3YaNuBrVxxNEjiMmAw8pc/eq/HqqW?=
- =?us-ascii?Q?UONalqN1hT1rIJs+fJpaWLQ0XMqL61ShjZalEml9VHV92Yb+VBOxMUK0PTu6?=
- =?us-ascii?Q?1OlzhwC+5SFGT7E++n8dnPpC1HN9uZVn9MregmnI?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?68vUZBDmWdv6IQ0tWF2uF6JA1CViELsTCwrgEpuV0606SQ4A1X+u3KpO2CmW?=
+ =?us-ascii?Q?CfnKYf5rVvIhaMmoIWzKUfLb0cxD5Sep7VqMnYiVf3+QaVg8OFgm3cqy4xB4?=
+ =?us-ascii?Q?cFVcMPKmuZ3n8YVUawvxfvP90/fSRAyiMGWX4ELiZJjpwWv6BqQtZcb712yo?=
+ =?us-ascii?Q?D+9rl5UcRA59bEngsh5qUfm+VGM9znwYTrznXS1WVWPvwQjlY5IfzHB2fgmB?=
+ =?us-ascii?Q?gAzlhuwOToRx68g8374kln1YLofqKmquphlakgk+i8ZWpwDGEAoT0hX8lA6x?=
+ =?us-ascii?Q?tE09V+TOaRWyuu30JOx5qbljM+ND1XqVHmGOW14dRdnuDI1FPbeY6LojcPB3?=
+ =?us-ascii?Q?dGJOXLwk9sfj3g0lHbFRjThCclJ0fexbjkDVba+M5nX+lcNjxmglMAs87XYd?=
+ =?us-ascii?Q?FXc7bbLx1p5Arv8GRBOiump77vJ1xD+Hobsd1MerwZVeTWeXPYEZKffmMk92?=
+ =?us-ascii?Q?QgcFfV7p/NAKbZo4fVdgBGJrlRAOkFx7BOn7qN/nPH4cMOoDNLpAvCgB55zT?=
+ =?us-ascii?Q?INDiAj8vmLqQMJp85ovLOv9Xpx1jxLSspK4ebcAnaJYk/W1YfMHeP0HTRQtI?=
+ =?us-ascii?Q?O8CNZQ1f6ZgQfIuB/gc/dFSiIKZqDM1kv69yI4Cc/SJ2mbXLLL8tGuwQNNU6?=
+ =?us-ascii?Q?GIcTwCWssCMGZHWYdOXVrfDy817klCwvCAABl6cqTZK6xVbE4RnFSZUfFyaR?=
+ =?us-ascii?Q?XFcARbXzZYM+t0nv0QxChkbBmtzn4VOWDyzJVKMcIGSU0KzE63Z/k2ZW+zDD?=
+ =?us-ascii?Q?SSNOeEGk3qrwmlS64zoVjxNsGdbYUtOkpQcFrgz6k4mrf3y/d77QdJwb6An6?=
+ =?us-ascii?Q?L9/mjnzBLSUB0qpmhbQRcRsP1JuEuZcTf7ZCogV9moXUXgmus5IbsPDL00tg?=
+ =?us-ascii?Q?CE/RnYLIR7NNhEtMVcBRcg/NmN5cgTBXbg+h3z+tsh4jSipH85uabKH7Gwjl?=
+ =?us-ascii?Q?zy9HR7PiMX3zw7V6Zc7e6n45OfQ4hdkU4fjuTUEmQb2bH29YZu4CSQiflyBA?=
+ =?us-ascii?Q?nAPe6u7HuYF1Fk3z2kcq/Urg/d9/zhoVIVarub59wpnwOVMpHNB5WmiWmfvs?=
+ =?us-ascii?Q?6I1irAJJd7ROJzaHCH+PRXCvmWw2/j5lvttzN249kvViiGPs6a9lrIFUtb1A?=
+ =?us-ascii?Q?7hX6GrUFThKsHknE0Co0LKx67MLhXX2eoMqTHR1bEUODVe+8bDClVxpPaCTo?=
+ =?us-ascii?Q?MH2RqdbGpRLT1IL3TpgTt2p3dKvvLrrvUlid+ggXmt1VvCeukwd7uaXC6XZd?=
+ =?us-ascii?Q?Jl0Bz+HGvotQ3y1t9N+viVWjaQ/hj0YZXimUHb+iA1515nSER/ylXfy1oQtY?=
+ =?us-ascii?Q?2Bn+3ls3+W0ol0pNKVPVkQY3I6tlsRA60wPm0FkFjBT3LZeBz+ZJJYUh9otE?=
+ =?us-ascii?Q?oX0DrVunyFXu49YEdHqYoMjZiPwgvN3eQ0lKhPgAnuMkmjgAaG8rzaWgQdUi?=
+ =?us-ascii?Q?8UrbxyJXEc/zP8V91PmYSS5/5XjE+WcFPX3/lsz6czwocJ2htTT9yGdBq0VO?=
+ =?us-ascii?Q?aM55uuymnYIsWeyutG+SITOWUa5Gw6XvQ1Y5H4BHDzH/0TMssddUrmvZd+Gl?=
+ =?us-ascii?Q?rVMl0SsU3aP6q0EbrN2K+Fe2zmQA5kaqCOZ9hAt0?=
 X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c13c911-1a38-496f-b20f-08da95d619bb
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2117e103-bcb6-4b7f-031f-08da95d61ad5
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2022 22:20:01.5180
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2022 22:20:03.3147
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zHoO87RzM1OwNfsnmZ/hF5iWnOnKVtUFxXCxIFUEpMfrBR2B9jcMNhxHnuP+FELA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR0102MB3378
+X-MS-Exchange-CrossTenant-UserPrincipalName: CK4yREDBWP9N9PQE6BSuiko6OJgpx3mDTfQP53e+GbboV+bga1nInPM+pPZ0NTHs
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR01MB7159
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reduce ksmbd smbdirect max segment send and receive size to 1364
-to match protocol norms. Larger buffers are unnecessary and add
-significant memory overhead.
+If/when an outgoing request contains more scatter/gather segments
+than can be mapped in a single RDMA send work request, use smbdirect
+fragments to send it in multiple packets.
 
 Signed-off-by: Tom Talpey <tom@talpey.com>
 ---
- fs/ksmbd/transport_rdma.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/smbdirect.c | 185 ++++++++++++++++++--------------------------
+ 1 file changed, 77 insertions(+), 108 deletions(-)
 
-diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-index 494b8e5af4b3..0315bca3d53b 100644
---- a/fs/ksmbd/transport_rdma.c
-+++ b/fs/ksmbd/transport_rdma.c
-@@ -62,13 +62,13 @@ static int smb_direct_receive_credit_max = 255;
- static int smb_direct_send_credit_target = 255;
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 4908ca54610c..494ac916158f 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -1984,10 +1984,11 @@ int smbd_send(struct TCP_Server_Info *server,
+ 	int num_rqst, struct smb_rqst *rqst_array)
+ {
+ 	struct smbd_connection *info = server->smbd_conn;
+-	struct kvec vec;
++	struct kvec vecs[SMBDIRECT_MAX_SEND_SGE - 1];
+ 	int nvecs;
+ 	int size;
+ 	unsigned int buflen, remaining_data_length;
++	unsigned int offset, remaining_vec_data_length;
+ 	int start, i, j;
+ 	int max_iov_size =
+ 		info->max_send_size - sizeof(struct smbd_data_transfer);
+@@ -1996,10 +1997,8 @@ int smbd_send(struct TCP_Server_Info *server,
+ 	struct smb_rqst *rqst;
+ 	int rqst_idx;
  
- /* The maximum single message size can be sent to remote peer */
--static int smb_direct_max_send_size = 8192;
-+static int smb_direct_max_send_size = 1364;
+-	if (info->transport_status != SMBD_CONNECTED) {
+-		rc = -EAGAIN;
+-		goto done;
+-	}
++	if (info->transport_status != SMBD_CONNECTED)
++		return -EAGAIN;
  
- /*  The maximum fragmented upper-layer payload receive size supported */
- static int smb_direct_max_fragmented_recv_size = 1024 * 1024;
+ 	/*
+ 	 * Add in the page array if there is one. The caller needs to set
+@@ -2010,125 +2009,95 @@ int smbd_send(struct TCP_Server_Info *server,
+ 	for (i = 0; i < num_rqst; i++)
+ 		remaining_data_length += smb_rqst_len(server, &rqst_array[i]);
  
- /*  The maximum single-message size which can be received */
--static int smb_direct_max_receive_size = 8192;
-+static int smb_direct_max_receive_size = 1364;
+-	if (remaining_data_length > info->max_fragmented_send_size) {
++	if (unlikely(remaining_data_length > info->max_fragmented_send_size)) {
++		/* assertion: payload never exceeds negotiated maximum */
+ 		log_write(ERR, "payload size %d > max size %d\n",
+ 			remaining_data_length, info->max_fragmented_send_size);
+-		rc = -EINVAL;
+-		goto done;
++		return -EINVAL;
+ 	}
  
- static int smb_direct_max_read_write_size = SMBD_DEFAULT_IOSIZE;
+ 	log_write(INFO, "num_rqst=%d total length=%u\n",
+ 			num_rqst, remaining_data_length);
  
+ 	rqst_idx = 0;
+-next_rqst:
+-	rqst = &rqst_array[rqst_idx];
+-	iov = rqst->rq_iov;
+-
+-	cifs_dbg(FYI, "Sending smb (RDMA): idx=%d smb_len=%lu\n",
+-		rqst_idx, smb_rqst_len(server, rqst));
+-	for (i = 0; i < rqst->rq_nvec; i++)
+-		dump_smb(iov[i].iov_base, iov[i].iov_len);
+-
+-
+-	log_write(INFO, "rqst_idx=%d nvec=%d rqst->rq_npages=%d rq_pagesz=%d rq_tailsz=%d buflen=%lu\n",
+-		  rqst_idx, rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
+-		  rqst->rq_tailsz, smb_rqst_len(server, rqst));
+-
+-	start = i = 0;
+-	buflen = 0;
+-	while (true) {
+-		buflen += iov[i].iov_len;
+-		if (buflen > max_iov_size) {
+-			if (i > start) {
+-				remaining_data_length -=
+-					(buflen-iov[i].iov_len);
+-				log_write(INFO, "sending iov[] from start=%d i=%d nvecs=%d remaining_data_length=%d\n",
+-					  start, i, i - start,
+-					  remaining_data_length);
+-				rc = smbd_post_send_data(
+-					info, &iov[start], i-start,
+-					remaining_data_length);
+-				if (rc)
+-					goto done;
+-			} else {
+-				/* iov[start] is too big, break it */
+-				nvecs = (buflen+max_iov_size-1)/max_iov_size;
+-				log_write(INFO, "iov[%d] iov_base=%p buflen=%d break to %d vectors\n",
+-					  start, iov[start].iov_base,
+-					  buflen, nvecs);
+-				for (j = 0; j < nvecs; j++) {
+-					vec.iov_base =
+-						(char *)iov[start].iov_base +
+-						j*max_iov_size;
+-					vec.iov_len = max_iov_size;
+-					if (j == nvecs-1)
+-						vec.iov_len =
+-							buflen -
+-							max_iov_size*(nvecs-1);
+-					remaining_data_length -= vec.iov_len;
+-					log_write(INFO,
+-						"sending vec j=%d iov_base=%p iov_len=%zu remaining_data_length=%d\n",
+-						  j, vec.iov_base, vec.iov_len,
+-						  remaining_data_length);
+-					rc = smbd_post_send_data(
+-						info, &vec, 1,
+-						remaining_data_length);
+-					if (rc)
+-						goto done;
++	do {
++		rqst = &rqst_array[rqst_idx];
++		iov = rqst->rq_iov;
++
++		cifs_dbg(FYI, "Sending smb (RDMA): idx=%d smb_len=%lu\n",
++			rqst_idx, smb_rqst_len(server, rqst));
++		remaining_vec_data_length = 0;
++		for (i = 0; i < rqst->rq_nvec; i++) {
++			remaining_vec_data_length += iov[i].iov_len;
++			dump_smb(iov[i].iov_base, iov[i].iov_len);
++		}
++
++		log_write(INFO, "rqst_idx=%d nvec=%d rqst->rq_npages=%d rq_pagesz=%d rq_tailsz=%d buflen=%lu\n",
++			  rqst_idx, rqst->rq_nvec,
++			  rqst->rq_npages, rqst->rq_pagesz,
++			  rqst->rq_tailsz, smb_rqst_len(server, rqst));
++
++		start = 0;
++		offset = 0;
++		do {
++			buflen = 0;
++			i = start;
++			j = 0;
++			while (i < rqst->rq_nvec &&
++				j < SMBDIRECT_MAX_SEND_SGE - 1 &&
++				buflen < max_iov_size) {
++
++				vecs[j].iov_base = iov[i].iov_base + offset;
++				if (buflen + iov[i].iov_len > max_iov_size) {
++					vecs[j].iov_len =
++						max_iov_size - vecs[j].iov_len;
++					buflen = max_iov_size;
++					offset = vecs[j].iov_len;
++				} else {
++					vecs[j].iov_len =
++						iov[i].iov_len - offset;
++					buflen += vecs[j].iov_len;
++					offset = 0;
++					++i;
+ 				}
+-				i++;
+-				if (i == rqst->rq_nvec)
+-					break;
++				++j;
+ 			}
++
++			remaining_vec_data_length -= buflen;
++			remaining_data_length -= buflen;
++			log_write(INFO, "sending %s iov[%d] from start=%d nvecs=%d remaining_data_length=%d\n",
++					remaining_vec_data_length > 0 ?
++						"partial" : "complete",
++					rqst->rq_nvec, start, j,
++					remaining_data_length);
++
+ 			start = i;
+-			buflen = 0;
+-		} else {
+-			i++;
+-			if (i == rqst->rq_nvec) {
+-				/* send out all remaining vecs */
+-				remaining_data_length -= buflen;
+-				log_write(INFO, "sending iov[] from start=%d i=%d nvecs=%d remaining_data_length=%d\n",
+-					  start, i, i - start,
++			rc = smbd_post_send_data(info, vecs, j, remaining_data_length);
++			if (rc)
++				goto done;
++		} while (remaining_vec_data_length > 0);
++
++		/* now sending pages if there are any */
++		for (i = 0; i < rqst->rq_npages; i++) {
++			rqst_page_get_length(rqst, i, &buflen, &offset);
++			nvecs = (buflen + max_iov_size - 1) / max_iov_size;
++			log_write(INFO, "sending pages buflen=%d nvecs=%d\n",
++				buflen, nvecs);
++			for (j = 0; j < nvecs; j++) {
++				size = min_t(unsigned int, max_iov_size, remaining_data_length);
++				remaining_data_length -= size;
++				log_write(INFO, "sending pages i=%d offset=%d size=%d remaining_data_length=%d\n",
++					  i, j * max_iov_size + offset, size,
+ 					  remaining_data_length);
+-				rc = smbd_post_send_data(info, &iov[start],
+-					i-start, remaining_data_length);
++				rc = smbd_post_send_page(
++					info, rqst->rq_pages[i],
++					j*max_iov_size + offset,
++					size, remaining_data_length);
+ 				if (rc)
+ 					goto done;
+-				break;
+ 			}
+ 		}
+-		log_write(INFO, "looping i=%d buflen=%d\n", i, buflen);
+-	}
+-
+-	/* now sending pages if there are any */
+-	for (i = 0; i < rqst->rq_npages; i++) {
+-		unsigned int offset;
+-
+-		rqst_page_get_length(rqst, i, &buflen, &offset);
+-		nvecs = (buflen + max_iov_size - 1) / max_iov_size;
+-		log_write(INFO, "sending pages buflen=%d nvecs=%d\n",
+-			buflen, nvecs);
+-		for (j = 0; j < nvecs; j++) {
+-			size = max_iov_size;
+-			if (j == nvecs-1)
+-				size = buflen - j*max_iov_size;
+-			remaining_data_length -= size;
+-			log_write(INFO, "sending pages i=%d offset=%d size=%d remaining_data_length=%d\n",
+-				  i, j * max_iov_size + offset, size,
+-				  remaining_data_length);
+-			rc = smbd_post_send_page(
+-				info, rqst->rq_pages[i],
+-				j*max_iov_size + offset,
+-				size, remaining_data_length);
+-			if (rc)
+-				goto done;
+-		}
+-	}
+-
+-	rqst_idx++;
+-	if (rqst_idx < num_rqst)
+-		goto next_rqst;
++	} while (++rqst_idx < num_rqst);
+ 
+ done:
+ 	/*
 -- 
 2.34.1
 
