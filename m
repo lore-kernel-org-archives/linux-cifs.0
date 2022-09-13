@@ -2,80 +2,127 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5664AC6FA86
-	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 01:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7E6C6FA82
+	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 09:32:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229670AbiIMBJ2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Sep 2022 21:09:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42964 "EHLO
+        id S231211AbiIMJcj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 13 Sep 2022 05:32:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbiIMBJ2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Sep 2022 21:09:28 -0400
-Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6DD1EE;
-        Mon, 12 Sep 2022 18:09:26 -0700 (PDT)
-Received: by mail-vs1-xe2a.google.com with SMTP id j17so3418575vsp.5;
-        Mon, 12 Sep 2022 18:09:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=/XsoyqrT3QB1JAOnynnNk+cD1xAIdvUlxSJ4ed6XIdU=;
-        b=LCh/26aAbGHkKGewKjn73gLlX++zCf8OLBwVxFWLa64tYPDq/i2er1PmrVmMkGAwOI
-         L2JRUzDqv2lK9NaVniFYm7FpYuNBfqGBIhKFyEiUvFh3AU/Pe1+xUEezdDuC7oEtVTzK
-         z4RnpgRLFEs/kpx/XTpDhcz1YZja3m4TBuvwqk20rCqQfNxg0OTn6cKh89klQ8JdP/d5
-         mnV6dtRYDuEjIzD+gV8Sy+Z00atObjJcdT1rQhqSoQ9ZBHA1slMzLmqb42wvp3Fbbjrj
-         PcbYe5zgwlygD5zetriqBhKy83A9Y3Tj1nqXRBKeJ829uuOZ6L5Y1UNj+nuZ18uhaFr1
-         0FCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=/XsoyqrT3QB1JAOnynnNk+cD1xAIdvUlxSJ4ed6XIdU=;
-        b=smhry8Ohh3CAsDJCIuHX+g+kEYZDpKnGLPG5ueYx2dpA4FDu/7n8YoCNXJJi+9Cslh
-         sW64GTrh+lr/Pg0w23sgSAsF2RF8P0b3SAi9SV+8olqk4wPGru6G9gnfylRX5flnxfDo
-         R35kq0wsskD6fD9qkwaikUBV79617SETWliJMP9T+BiYJjqukD17LazLeUI4q90An0IS
-         ha9UkUclefFpZF07ZgzpguRfCfypVgRLQZqQDjmqO9iQAfiXHbgmcrplzUrf53JgrLAc
-         EFerFmJ31Pn+oK6ksIW3KmvFxM0RNsjWI7z0gZUfba3Is8YPLXtP9FnnyNv+mlLeySxY
-         0wNg==
-X-Gm-Message-State: ACgBeo0DVuYcr56hjzjG/0oHzgklLQJKgLhtdQCp/8pA8r8wbwP8e4T8
-        esqBGmFONurv/6HOrZZKfVTof0YHkb5LEsMTIGJhCL0DnPnQyw==
-X-Google-Smtp-Source: AA6agR4EqnqQ8u4MAgskdLzYc7FBqMGiJOS2HCVnpmnuXUvK+QJK2TMCY2lWLmDeQ8q/znqGKGcFd82tz2HFf86kF7E=
-X-Received: by 2002:a05:6102:5709:b0:390:e360:88e8 with SMTP id
- dg9-20020a056102570900b00390e36088e8mr9131856vsb.22.1663031365543; Mon, 12
- Sep 2022 18:09:25 -0700 (PDT)
+        with ESMTP id S230481AbiIMJcj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Sep 2022 05:32:39 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6C26EB5
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Sep 2022 02:32:36 -0700 (PDT)
+Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MRdSg3XskzmVFn;
+        Tue, 13 Sep 2022 17:28:51 +0800 (CST)
+Received: from [10.174.176.83] (10.174.176.83) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 13 Sep 2022 17:32:34 +0800
+Message-ID: <bf0f8145-9070-028d-544b-42b172c6e419@huawei.com>
+Date:   Tue, 13 Sep 2022 17:32:34 +0800
 MIME-Version: 1.0
-References: <20220912182224.514561-1-vishal.moola@gmail.com> <20220912182224.514561-19-vishal.moola@gmail.com>
-In-Reply-To: <20220912182224.514561-19-vishal.moola@gmail.com>
-From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Date:   Tue, 13 Sep 2022 10:09:08 +0900
-Message-ID: <CAKFNMokZ02Ax9J3Ns_Q2PO8oeg+G7kgqQS7kMJMxSiX92_Vwzg@mail.gmail.com>
-Subject: Re: [PATCH v2 18/23] nilfs2: Convert nilfs_lookup_dirty_data_buffers()
- to use filemap_get_folios_tag()
-To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
-        linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH v4 2/5] ksmbd: Remove the wrong message length check of
+ FSCTL_VALIDATE_NEGOTIATE_INFO
+To:     Tom Talpey <tom@talpey.com>, <linux-cifs@vger.kernel.org>,
+        <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>,
+        <sprasad@microsoft.com>, <rohiths@microsoft.com>,
+        <smfrench@gmail.com>, <linkinjeon@kernel.org>, <hyc.lee@gmail.com>
+References: <20220901142413.3351804-1-zhangxiaoxu5@huawei.com>
+ <20220901142413.3351804-3-zhangxiaoxu5@huawei.com>
+ <6cf00762-f446-490c-5e88-79382962e985@talpey.com>
+From:   "zhangxiaoxu (A)" <zhangxiaoxu5@huawei.com>
+In-Reply-To: <6cf00762-f446-490c-5e88-79382962e985@talpey.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.83]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500023.china.huawei.com (7.185.36.114)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Sep 13, 2022 at 3:30 AM Vishal Moola (Oracle) wrote:
->
-> Convert function to use folios throughout. This is in preparation for
-> the removal of find_get_pages_range_tag().
->
-> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
-> ---
->  fs/nilfs2/segment.c | 29 ++++++++++++++++-------------
->  1 file changed, 16 insertions(+), 13 deletions(-)
 
-Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
 
-Looks good.   Thank you for reflecting the previous comment.
+在 2022/9/2 21:28, Tom Talpey 写道:
+> On 9/1/2022 10:24 AM, Zhang Xiaoxu wrote:
+>> The struct validate_negotiate_info_req change from variable-length array
+>> to reguler array, but the message length check is unchanged.
+>>
+>> The fsctl_validate_negotiate_info() already check the message length, so
+>> remove it from smb2_ioctl().
+>>
+>> Fixes: c7803b05f74b ("smb3: fix ksmbd bigendian bug in oplock break, and move its struct to smbfs_common")
+>> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+>> Cc: <stable@vger.kernel.org>
+>> ---
+>>   fs/ksmbd/smb2pdu.c | 3 ---
+>>   1 file changed, 3 deletions(-)
+>>
+>> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+>> index c49f65146ab3..c9f400bbb814 100644
+>> --- a/fs/ksmbd/smb2pdu.c
+>> +++ b/fs/ksmbd/smb2pdu.c
+>> @@ -7640,9 +7640,6 @@ int smb2_ioctl(struct ksmbd_work *work)
+>>               goto out;
+>>           }
+>> -        if (in_buf_len < sizeof(struct validate_negotiate_info_req))
+>> -            return -EINVAL;
+>> -
+> 
+> This actually fixes a different bug, which the comment needs to mention.
+> The structure size includes 4 dialect slots, but the protocol does not
+> require the client to send all 4. So this allows the negotiation to not
+> fail. Which is good.
+> 
+> But there are two other issues now.
+> 
+> 1) The code no longer checks that a complete validate negotiate header
+> is present before dereferencing neg_req->DialectCount. This code will
+> fetch the DialectCount potentially beyond the end of an invalid short
+> packet:
+Yes, if no judgement the length before dereferencing 'DialectCount',
+OOB read will occur.>
+>    fsctl_validate_negotiate_info():
+> 
+>          if (in_buf_len < offsetof(struct validate_negotiate_info_req, Dialects) +
+>                          le16_to_cpu(neg_req->DialectCount) * sizeof(__le16))
+>                  return -EINVAL;
+> 
+>          dialect = ksmbd_lookup_dialect_by_id(neg_req->Dialects,
+>                                               neg_req->DialectCount);
+> 
+> 2) The DialectCount is an le16, which can be negative. A small invalid
+After precompile the smb2pdu.c:
+   typedef unsigned short __u16;     # include/uapi/asm-generic/int-ll64.h
+   typedef __u16 __le16;             # include/uapi/linux/types.h
 
-Ryusuke Konishi
+   struct validate_negotiate_info_req {
+    __le32 Capabilities;
+    __u8 Guid[16];
+    __le16 SecurityMode;
+    __le16 DialectCount;
+    __le16 Dialects[];
+   } __attribute__((__packed__));
+
+The DialectCount is unsigned, can't be negative.
+
+Even the 'DialectCount' is big enough to USHRT_MAX(65535), according
+integer promotions, it also can't be overflow to negative since the
+sizeof(__le16) is only 2.
+
+So, I think the expression is correct now.
+> negative value may pass this test and proceed to process the array,
+> which would be bad. This is an existing issue, but should be fixed
+> since you now need to correct the test anyway.
+> 
+> Tom.
+> 
+> 
+>>           if (out_buf_len < sizeof(struct validate_negotiate_info_rsp))
+>>               return -EINVAL; >
