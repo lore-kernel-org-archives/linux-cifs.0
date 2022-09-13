@@ -2,45 +2,45 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC9BBC6FA89
-	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 22:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1569C6FA86
+	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 22:20:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229601AbiIMWUI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S229507AbiIMWUI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Tue, 13 Sep 2022 18:20:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50276 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbiIMWUE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Sep 2022 18:20:04 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72046745C
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Sep 2022 15:20:02 -0700 (PDT)
+        with ESMTP id S229732AbiIMWUF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Sep 2022 18:20:05 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2080.outbound.protection.outlook.com [40.107.223.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0016A489
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Sep 2022 15:20:03 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CPwbL4C1uha7qaXcsJgsaw1QQGNM3I8zkRi0a5OABTpMBW6Uv1+oA9COL8Prnf2hccYf/GYEiV4McuwZMDzPJBsVPrA1DgkivJ205ix256I3yuUz3726YAU+NZmy+XoxdE2KD/Ji8MJy2fg0cwhXqvtKwBUW4NCRw7cLlTaF8szBEVIWue1hPIoHDswxDm6pfY4NVXmlzr79jeFM1LmNqDHEkuyBml8GLr1Py6g2TW7OjGWNragHaqxqFjyZD+tQOR75ypTXIcGei/R+7PSJfo7fyUE1ijdUe4l5aOuvVPLY7MaqS74+QS545I5Ryf+cETOnvQle+IClcdlU+oJjPg==
+ b=Dtn8Hqnt03YzpGuA88a+FhOeS0seTf+oVjokDwr5XXe+o++e5k5cNFGexBLEC36aKcZ7+0Jjz8pWNw1rFhzsKtkewPbnMuqK05X82MRmpxCD0QtFsb57FBnrJtm1ILoxX251bC5j9TF/AIs/bgPXn9D5CGQKVM4uI4VbC1tOvDSJCdlKQxV1aah8kuLMKSKc+JR7oDmMVn+eWnuut4JViLXoI81X1NdNCG9U3vRHoWmJY9EfCSpRZaTRZYZf03+89+P4WNn5e0oY7XxQkbQQOX68vPWKpaNxecIoFhljaL+X+oGeQcKOQbOZrZBLMGJPzsOoHcmRVBinw33nYTQFZw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zt3d8Oy1VfX+ugp+UOthZmnd/5vgHGAh5+SQqKRIXms=;
- b=ny/bq+XbA2nI5/m84KRiioyvhjqYiJb+nOnSFlr9h55v3IEvSqEDV4zTFOazCMW0g5E44/xR37IyA2u7mafUG1Z9LnSfOUst+6gM4jybwa/yfFTIPk7BWYZA9buk6zfx30SKLU/BqSQKOV29FG2WjQ0IhDKfiN9sWY0i2U0GUPA71TiNXZMSq992G9G1ADkFYnXbv9W1Eg0zvqAz+Vxjz1bvwe4BI9d0pbhqlbYCIYN6rznZD1NhdYzMXhgk0lHXBMJJFI+UK/LhKJa6BaZnUcKVOpT8/BVzp9bHy6/vpZ0IUOAKNpbp39BWmbfOS9g+ySbopbmls8ZcBNKCbJF64w==
+ bh=phnMl4ugC+e8OyWUA6WiuLa8GoD33pQPA9NWUYMuASQ=;
+ b=bMSn/xn7vR4wPuK3aBPgCQZbAv15FXRZMBAlzLjjFVUP+cX0rh2nQ1u4C/cMGxir5DfmjxZb6kxbWnBmJj9fD6QezaPpfs74CEU0sp4/vgomyd1ytarj0hRhHf1C/DbpRIzzIZFQGD7gxwe/0wk3MxWyfYejFOGl+/QYWwBV/gntdUtDCQT2m/TWVbjSkmg2ior6zVwfM9vNGMIIIbjQPaH6YcC6dNyEMCD5yvdbE3oI3+g8FsOb06yFzW7NU84bdNGH8Tg6Pb2THTAqB39eNS1w98iltnbYe+n2hYDwEbvNq3YbF5P87o6yb+hs6EqqGBSoPqH8SdzCOKGEWFV9XQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
  dkim=pass header.d=talpey.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=talpey.com;
 Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- DM8PR01MB7159.prod.exchangelabs.com (2603:10b6:8:d::16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5612.19; Tue, 13 Sep 2022 22:19:59 +0000
+ BL0PR0102MB3378.prod.exchangelabs.com (2603:10b6:207:19::27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5612.22; Tue, 13 Sep 2022 22:20:01 +0000
 Received: from SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::6566:9fdc:aac:8b51]) by SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::6566:9fdc:aac:8b51%2]) with mapi id 15.20.5612.022; Tue, 13 Sep 2022
- 22:19:59 +0000
+ 22:20:01 +0000
 From:   Tom Talpey <tom@talpey.com>
 To:     smfrench@gmail.com, linux-cifs@vger.kernel.org
 Cc:     linkinjeon@kernel.org, senozhatsky@chromium.org,
         bmt@zurich.ibm.com, Tom Talpey <tom@talpey.com>
-Subject: [PATCH 3/6] Reduce client smbdirect max receive segment size
-Date:   Tue, 13 Sep 2022 22:19:34 +0000
-Message-Id: <51241595d597712e4f12cfba521b861b37cbf43b.1663103255.git.tom@talpey.com>
+Subject: [PATCH 4/6] Reduce server smbdirect max send/receive segment sizes
+Date:   Tue, 13 Sep 2022 22:19:35 +0000
+Message-Id: <27ad44f89fa239f69806241aa65869cd58a04d3d.1663103255.git.tom@talpey.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1663103255.git.tom@talpey.com>
 References: <cover.1663103255.git.tom@talpey.com>
@@ -51,78 +51,85 @@ X-ClientProxiedBy: BYAPR08CA0047.namprd08.prod.outlook.com
  (2603:10b6:805:e2::33)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|DM8PR01MB7159:EE_
-X-MS-Office365-Filtering-Correlation-Id: f3053b5a-3fac-4eb7-6111-08da95d618a2
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|BL0PR0102MB3378:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c13c911-1a38-496f-b20f-08da95d619bb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NIhKad/UGBAndyn++cFV94++JmMEyooJ3tWYvj+BP5Rh69dbN+XY6rjJVYjYxHhq0JmVqodzHgwI+lH7wG4u9grrGtwC6BhF8C4X5a8P0TLBYIlR0RpxE0xhyBRY1FS7UheIG7eYY+MVoGRvejD4kB8JeCS7fZY0YWqXEsp/8asOqMuFu7Fv7UrrG/xZxu1lACsVl+3Ng7vy/DhrP9tKQCZMwxiRTNtdrbQV2m222q+5coaC1xclP6TBV5hxOlYeWs38f/RguzdsOTHqlv2gaq3pXhqM8wIB+6Zpc0nKiCr9W8zYAMx3J5neip/W9ErJPpfE9FicH4wBjHoGrHJs8qfoeA9Y+ObkjJpexsUdgd8xD8G+Kp87K5SvWk7WV7NwP1K0YhF7P75oT73Cm7sriCEu0q+jpb57va+9vbKv5N79GU+Lf6TSHFlC+46qqYwgT7fVKedk7R3O1Dl7JhsGtWo0SOmm4dN6U4CKZ5g/BPnh1mN/VrrCkmVtL6ZwVCoZLhkN1kbozF3CBVx9B3CQ4FZuKH4QGKxb6NUZMaPH5DEJUjXJXUDekML/kE65oR297gvDSIyuAzFn19eOYSWNTLMPBD+nlahHAomHbvrVy8onQXbb6WqFOei2EUgUIUXejezBtDacugyds35ph5yA+1wVmsNRNNen0fBoydK5EJ/1W31NzD0N+5H9eYA+Q+VbwPhW1jnsUHpYhS33joZ2YnamH60/l3ytfYfBpeJs9On8HQ7jb1IPxEgQN07DW0DooLHazZqkNTuQJ8wVLIjefQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(366004)(376002)(346002)(39830400003)(396003)(451199015)(38350700002)(6506007)(316002)(6666004)(6486002)(2906002)(5660300002)(41300700001)(107886003)(478600001)(2616005)(6512007)(66556008)(38100700002)(4744005)(8676002)(26005)(52116002)(8936002)(66476007)(186003)(83380400001)(66946007)(36756003)(4326008)(86362001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 3MOO5DX8X74QYjHtXhIJCGB8k0d7CcHYa3b+w/E4OcDm6FfqH78BlJ/TU7Wfu2JWXcpMPynz7C1Hujiv54n/OMQWrFI3poLt/Kyu3Cyz0e93rTOhypOwVS+RdHKKtdeOLVFz9FnwXb69tjVsAAj4AwOPhxCh8iv7PKk+hnlBL/Cwzx1Ik0YwB29z4EnXFcQrOPDAJDLzhxtTCaaAnxhg+/5zhxF+fbjPMy2Of3ToUPHsBVzIm/NMoXbFZDVFFa/7h5axhezDvKLHC061yzORB2o1ksG/gahAd0gN7A51X/Lj3MUBTqQXNtfzzlaI/GXq8DTwbvQVdeSBlfX2OPECp2V+ry69blEz/g9B5z+oTey25u8hARIJHzkH7QogNYc7CbP+Fu6/QJqOsDe794LdSmg2xcIBWGy/Wxx6SbVhMRhEwZi2keM4OV4gJGU47BECA6CeKhmi8i5PskvqZFk1UI5d9RlEcv9IkMKJwr8J8TMht7cqqUcP5WWWUIcMDII9OXLN0jwWZI+jVxjxeCAbMS35A/zv1NstuH8mg/07n7QCcdjOUpQjg5sgx/t2hhBlLJkXD6reaZSdeYwZzpXfPj0EAERDGD3tpIcHUL/fY2BQAA1toWNvo+p5dm9vnphj4fbys6usirr0C+MMFPFMBxOh2CCXUg9jTWJCDzCzkp4j38ZMBwvalBFwDW6oT9FZW2jRbOkyZyjsrNH648AOcueJMOQjeeVTtlV6/K2Qylx1scbTHXjBhfyG9MWYsPqYGWdb1QGVI4V5QLZC9ezcAQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(376002)(396003)(346002)(39830400003)(366004)(451199015)(5660300002)(8936002)(2906002)(36756003)(4326008)(66476007)(66556008)(66946007)(316002)(52116002)(478600001)(41300700001)(6506007)(6486002)(6666004)(107886003)(26005)(38100700002)(86362001)(2616005)(186003)(8676002)(83380400001)(6512007)(38350700002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?onkXsieBun3vH2+u8y00kWUQgP1fMIpXtku5cY4Pv3lR/vK5NDBNF+rRakU+?=
- =?us-ascii?Q?pU1iyqNrhOQPT0Htm9RfAF09UNbBdi3jU9gsa5vGM7Zac1uH0GqK+9OU1cLV?=
- =?us-ascii?Q?YTe9Pm+jtbxuVAThyiuEeO5Jp9f67wv0SSkG2A/mlfZ5tZn9aIINNYleEO3R?=
- =?us-ascii?Q?3p/aZzbIJjF5H9tjjD10WsqhQcDNlc0fwfolmX28C2BNVf+rIHgjZsWPGLfQ?=
- =?us-ascii?Q?7dHLCEEP3zzIYTbxoMY5X4pMHtSlPJl81ZkMViKinSbKG/Ifkmm+G9XoNo7c?=
- =?us-ascii?Q?E65KJWFKu55jJ1CUisG8LF0xdxgNg5+Af4RbKY4m/XZD8Y40ceIt2WQOdbZ2?=
- =?us-ascii?Q?1s8mL100pgwLdXiPkucmEleeNst3BHkbMDz/7GSk643vxZIvIB4MavwYuVcs?=
- =?us-ascii?Q?k5HyQmD6K0C+HfsVKfeeSi77AVOyuvhYjY+Q3DemyIHuCvA2wYrQiVsXO4ez?=
- =?us-ascii?Q?EFXBOg2BmxrPNorDn9HJasTgEtO2RBzuYX4t7kyB75PFRCIwon8aEJceKnyx?=
- =?us-ascii?Q?gy9LcHc3vei4hWvU94uy3ZEJ8jKxt2DXKfT4L6M+44fH10n3EWx8H+BqjHXH?=
- =?us-ascii?Q?LTUlcOXsc1S+DwMwUBC98R0pgw/H70WMlOu1vmSWJ3eYG+xAE+9JUTc110qN?=
- =?us-ascii?Q?Ht9lJktjDueHBUAH5O3hPLLLIf8x4PHZL49YiVipQqIStSn9iA8G0YMy/aRt?=
- =?us-ascii?Q?KYustpDV0qIH6b8341DO8YchG1BYh2OhkNW/CTG6BSv46XKkbKn1QbEVEWO6?=
- =?us-ascii?Q?LEto1/eTNSnvpeS9eyWQWwWIAa8djVRzur6wjokv4jwrafU6GDtYIJT8MwH7?=
- =?us-ascii?Q?TNlb2Sn499uIhuOBpDRdhpufmidLvbExSvdmuxTOrKV2xqG3d3DTuhiGuE5y?=
- =?us-ascii?Q?9uEAMhjzIcejtjzZT0+R3n/emxv4B9ytdP27i/SBVq66iRNuKKmT6l1QzZrG?=
- =?us-ascii?Q?FMtg2oEw3YQWfT0uVl1XOt8FYVoPou6L/rd+HAy3AJD5+whbrP9a1YN5uWaN?=
- =?us-ascii?Q?MnlgWF50sGKM5rKrx+lVmTY6f6Z/B6wcS8Q3dWHm+rLxY/vITiarrsJzM7Y2?=
- =?us-ascii?Q?mtoxo4MRXHDJs1qEc20Mqza4I8w26KBSYi4UpZKQazBVUbTBS23QaorR3LWu?=
- =?us-ascii?Q?XsgWxbq212zOvwAcSPfjTnwp2j3qhC9vOXXWLBHyt1M1exZD0um7pWsQScP0?=
- =?us-ascii?Q?IEDgT9jbZi/mEPp2up4MAMMUu2o1Lcbj8APP66Ajaxa1YhYc76q68CFEZ45Q?=
- =?us-ascii?Q?Tj8f8aFzRSUy7j9QEEugmweMxVYIeVEILYG0svllxZdz62gnQkBDT7C7oOT5?=
- =?us-ascii?Q?ldu12M+eVD6hhG9JmZLhWPxSrqi10/I49S0fYgjXrRFM7NIfDqIZTdIwy/or?=
- =?us-ascii?Q?3w4vdsZqgbA1xzCSCchd3cQpbG0TKYsQikr570U3sHBp3ocN24H059hYs9+5?=
- =?us-ascii?Q?Z4EtEskhZE+I8ansLJR1ZMDZGfbdAKIbFpNYSN4bH1ufNJ/IDa8eNemQXaD9?=
- =?us-ascii?Q?sG5UWxzHGRmKlCFuP04FsCjXp9Z/a6q2+h+wG8h4VFWEJgC724bJz5YK53k+?=
- =?us-ascii?Q?iYstdWtn0HCQp1I7PeIQEixFo+9BsPEtnlAi9qMM?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nOFEBR4KO6QZPdu4IRIUJu086V7bjVdrC1utqAuAwCdqaSUnq7yv2+0aYZ9M?=
+ =?us-ascii?Q?VYE74fwMkkadoQMLuLNLHlQwcfuMGONqKrEs+uK54+ijhlGdxUptjdY9841V?=
+ =?us-ascii?Q?J0JpL0T5mlfNFq8BAl91WkshThyKiZp4eUpgF6/cSa2PiPUm89fdUl6k7uk0?=
+ =?us-ascii?Q?AaZv3ZC+NvIUd3V0PVCKPgHo4qhxYz9hghkZ9DyZBzsBibCo6t9aS6Hy3UBT?=
+ =?us-ascii?Q?XH15gWM4gSQfv4PkxK35SfIefBZtzxV9me3lTSr3xZSVlbmXoaAvEQ6tD/SJ?=
+ =?us-ascii?Q?sitNWsJ49cTJKDjrTWfxMa1rhclvkoIeuXsK+GD7nFaZCQ+3mrzg2RfONa1/?=
+ =?us-ascii?Q?TgjtsdkrVZLwYUWHypx36MOYx5sPzQvcoOeOz57hcpstlvmhOr3lTHQAfTN+?=
+ =?us-ascii?Q?G8Ds2G2Y24kV51fuBBs3/HzFTnoAYTqhqq/XARib0qnUSMP4uDnIa2X6A+Yp?=
+ =?us-ascii?Q?As4kDeqW6jr5jerz5r2BL2cBK+LGGLDtrw8NUDU+wkbRpvXo03wWj0NgcXxY?=
+ =?us-ascii?Q?0fqp28iQbIen+lYDEiYvf0f6vrdNt0EMctRbKFTrY7/7/DJtKFxCUtb7PGvc?=
+ =?us-ascii?Q?yLflsmzQba7rXB3e/C4oApWwbGEEKNyeRgay2i5HTsnEmUySdf9QxUM4fxze?=
+ =?us-ascii?Q?ZaKrAKdWoYz34tX/uQkgtf4HwdWv4HHDkbS8pQ8KTmdjUAC8O6UksJPsM7Uy?=
+ =?us-ascii?Q?6ghiQHiFUiodr4Maf+iI8I/fzMDfLn81YmZx6PK4mLhQjXbEYbiJbEyp3xxR?=
+ =?us-ascii?Q?sSdxPN77h0RUuqUsyc1Vq5Fir76Th3In89oILPWYyx754QL8FGoUJDYhwGy4?=
+ =?us-ascii?Q?SgroI6t3HtGRxxTyQgsUrK27ydAg4XJZYNDsFphPvK2uuMXt5g97IvuvW8Wo?=
+ =?us-ascii?Q?cSsHkQeBAn0y1aVt1gHhPmHklsbjvQ3KN6kM+QEmPsDXmiKA+virF33hLg2x?=
+ =?us-ascii?Q?asNNmX9nlVIhAGrljIfQnrdmOPl3CWX8hQVIE1fzWXphzKS9fQ4COCif6hOM?=
+ =?us-ascii?Q?VTX3MbNrqRprHW8xxr6TvAzQQbBrEtKqOf3gIFmZ7nYyAR/1p/HY2ji0DAhV?=
+ =?us-ascii?Q?qj21fKONIdP1gJII8HfdReFXFBAxeuXVa2jaxBKDLlD1xaBR77kKCY50AVpV?=
+ =?us-ascii?Q?hwSDUNZ9J85zWPcaULu3qfSPULlqX3EmhUxOOKV+9aRK/pKL+t1yQWzEUPGO?=
+ =?us-ascii?Q?sadLq0xRW3OOt4meh5s/Gk7CrIgn/JYICU00ahKk+DbxD59QwL7XjaB2tBtd?=
+ =?us-ascii?Q?O8PG4ewuiX/HqgpJkNB1uxj8di8o7Dc5Cn12JxduKZMums83GjutvZBfXYDx?=
+ =?us-ascii?Q?J5hoN9vaqxL0cNwfgRsKbzkQkzCiEpcBB6phLMN3oUddBJIthYMsAH44e4JF?=
+ =?us-ascii?Q?/yVkBB5BzhTTan/Lu5LRYDZk3PeGWMESNQIfbRHtjZ+uqUY97+ROTgEmJ2Om?=
+ =?us-ascii?Q?hPAtMDqfyYCZWnPi++kc75HyiqC/tmH3YaNuBrVxxNEjiMmAw8pc/eq/HqqW?=
+ =?us-ascii?Q?UONalqN1hT1rIJs+fJpaWLQ0XMqL61ShjZalEml9VHV92Yb+VBOxMUK0PTu6?=
+ =?us-ascii?Q?1OlzhwC+5SFGT7E++n8dnPpC1HN9uZVn9MregmnI?=
 X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f3053b5a-3fac-4eb7-6111-08da95d618a2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c13c911-1a38-496f-b20f-08da95d619bb
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2022 22:19:59.6743
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2022 22:20:01.5180
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xZ9V+VQWrxzmuF2HYSebxkxtLo3BtYhEtcWc3AiGKhwVOSMSTumjEKEVwAe/Dci3
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR01MB7159
+X-MS-Exchange-CrossTenant-UserPrincipalName: zHoO87RzM1OwNfsnmZ/hF5iWnOnKVtUFxXCxIFUEpMfrBR2B9jcMNhxHnuP+FELA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR0102MB3378
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reduce client smbdirect max segment receive size to 1364 to match
-protocol norms. Larger buffers are unnecessary and add significant
-memory overhead.
+Reduce ksmbd smbdirect max segment send and receive size to 1364
+to match protocol norms. Larger buffers are unnecessary and add
+significant memory overhead.
 
 Signed-off-by: Tom Talpey <tom@talpey.com>
 ---
- fs/cifs/smbdirect.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/ksmbd/transport_rdma.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index f81229721b76..4908ca54610c 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -90,7 +90,7 @@ int smbd_max_send_size = 1364;
- int smbd_max_fragmented_recv_size = 1024 * 1024;
+diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
+index 494b8e5af4b3..0315bca3d53b 100644
+--- a/fs/ksmbd/transport_rdma.c
++++ b/fs/ksmbd/transport_rdma.c
+@@ -62,13 +62,13 @@ static int smb_direct_receive_credit_max = 255;
+ static int smb_direct_send_credit_target = 255;
+ 
+ /* The maximum single message size can be sent to remote peer */
+-static int smb_direct_max_send_size = 8192;
++static int smb_direct_max_send_size = 1364;
+ 
+ /*  The maximum fragmented upper-layer payload receive size supported */
+ static int smb_direct_max_fragmented_recv_size = 1024 * 1024;
  
  /*  The maximum single-message size which can be received */
--int smbd_max_receive_size = 8192;
-+int smbd_max_receive_size = 1364;
+-static int smb_direct_max_receive_size = 8192;
++static int smb_direct_max_receive_size = 1364;
  
- /* The timeout to initiate send of a keepalive message on idle */
- int smbd_keep_alive_interval = 120;
+ static int smb_direct_max_read_write_size = SMBD_DEFAULT_IOSIZE;
+ 
 -- 
 2.34.1
 
