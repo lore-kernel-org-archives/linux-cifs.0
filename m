@@ -2,169 +2,80 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDBB5C6FA82
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Sep 2022 23:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5664AC6FA86
+	for <linux-cifs@archiver.kernel.org>; Tue, 13 Sep 2022 01:09:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229942AbiILXyV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Sep 2022 19:54:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59810 "EHLO
+        id S229670AbiIMBJ2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Sep 2022 21:09:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbiILXyU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Sep 2022 19:54:20 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B6F751438
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 16:54:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 21A0CB80E04
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 23:54:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3BC9C433C1
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 23:54:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663026856;
-        bh=/qOYXCR2q3ybRtqFxiaBPpBQ62P/YqlQ6X/XHnpnd5c=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=dFGYQjJzxZt3vjAI3ArjlLL6MMk2VdKRxny8ZvNxQB/xkCHKKDiWddrphEogVjyjW
-         RZrU0LGwkPPFE1A6WURiQVNazYXY0qt6jgN0nHpujaaDn9KgXLETwvyguxRWpOecA2
-         J4eQ2nvQGcr0IjSfOjmKo4TsQqR9ibRei5LAg4HL5PoVhdcfxayHYSr87ov5hZy949
-         Z5OmJRdfL/vctC4d9jbxqua2Ijw5VofKKh1HZueyhNywHK/z/Jxw5PwxgjtMLBCo9h
-         /6KQRG56uJRn2LoouQoHh1j12LkAmLqHpELBf9r6UQAQh7Z2s/Kxc1sI6wUIIROHdp
-         kErEq319+YsSw==
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-127f5411b9cso27734812fac.4
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Sep 2022 16:54:16 -0700 (PDT)
-X-Gm-Message-State: ACgBeo2i6jtqrNAqkSz+mahjyFui0tSpk3UM6uThm5xV4lF/nLnlv2GA
-        ekcgiKF9w/i8y7hm+AqVJgakExR5ncWfJbblX18=
-X-Google-Smtp-Source: AA6agR5ErPUkzcEj/spehq+iMAyOY3Fr8Rb8ba8TrKZ9NaUYj8s4BI8ibjTqNbYd0eahaoIx6vwvFYtKBhtJmwdU4T8=
-X-Received: by 2002:a05:6870:b290:b0:127:4089:227a with SMTP id
- c16-20020a056870b29000b001274089227amr487263oao.8.1663026855722; Mon, 12 Sep
- 2022 16:54:15 -0700 (PDT)
+        with ESMTP id S229591AbiIMBJ2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Sep 2022 21:09:28 -0400
+Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6DD1EE;
+        Mon, 12 Sep 2022 18:09:26 -0700 (PDT)
+Received: by mail-vs1-xe2a.google.com with SMTP id j17so3418575vsp.5;
+        Mon, 12 Sep 2022 18:09:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=/XsoyqrT3QB1JAOnynnNk+cD1xAIdvUlxSJ4ed6XIdU=;
+        b=LCh/26aAbGHkKGewKjn73gLlX++zCf8OLBwVxFWLa64tYPDq/i2er1PmrVmMkGAwOI
+         L2JRUzDqv2lK9NaVniFYm7FpYuNBfqGBIhKFyEiUvFh3AU/Pe1+xUEezdDuC7oEtVTzK
+         z4RnpgRLFEs/kpx/XTpDhcz1YZja3m4TBuvwqk20rCqQfNxg0OTn6cKh89klQ8JdP/d5
+         mnV6dtRYDuEjIzD+gV8Sy+Z00atObjJcdT1rQhqSoQ9ZBHA1slMzLmqb42wvp3Fbbjrj
+         PcbYe5zgwlygD5zetriqBhKy83A9Y3Tj1nqXRBKeJ829uuOZ6L5Y1UNj+nuZ18uhaFr1
+         0FCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=/XsoyqrT3QB1JAOnynnNk+cD1xAIdvUlxSJ4ed6XIdU=;
+        b=smhry8Ohh3CAsDJCIuHX+g+kEYZDpKnGLPG5ueYx2dpA4FDu/7n8YoCNXJJi+9Cslh
+         sW64GTrh+lr/Pg0w23sgSAsF2RF8P0b3SAi9SV+8olqk4wPGru6G9gnfylRX5flnxfDo
+         R35kq0wsskD6fD9qkwaikUBV79617SETWliJMP9T+BiYJjqukD17LazLeUI4q90An0IS
+         ha9UkUclefFpZF07ZgzpguRfCfypVgRLQZqQDjmqO9iQAfiXHbgmcrplzUrf53JgrLAc
+         EFerFmJ31Pn+oK6ksIW3KmvFxM0RNsjWI7z0gZUfba3Is8YPLXtP9FnnyNv+mlLeySxY
+         0wNg==
+X-Gm-Message-State: ACgBeo0DVuYcr56hjzjG/0oHzgklLQJKgLhtdQCp/8pA8r8wbwP8e4T8
+        esqBGmFONurv/6HOrZZKfVTof0YHkb5LEsMTIGJhCL0DnPnQyw==
+X-Google-Smtp-Source: AA6agR4EqnqQ8u4MAgskdLzYc7FBqMGiJOS2HCVnpmnuXUvK+QJK2TMCY2lWLmDeQ8q/znqGKGcFd82tz2HFf86kF7E=
+X-Received: by 2002:a05:6102:5709:b0:390:e360:88e8 with SMTP id
+ dg9-20020a056102570900b00390e36088e8mr9131856vsb.22.1663031365543; Mon, 12
+ Sep 2022 18:09:25 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Mon, 12 Sep 2022 16:54:14
- -0700 (PDT)
-In-Reply-To: <a5f680f2-6dc3-1c0b-bfbb-51f740e09109@talpey.com>
-References: <20220909092558.9498-1-linkinjeon@kernel.org> <20220909092558.9498-2-linkinjeon@kernel.org>
- <a5f680f2-6dc3-1c0b-bfbb-51f740e09109@talpey.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 13 Sep 2022 08:54:14 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_4gpMU_0z9ed7ktP3zQ0doUqsWi1QqiJ_1v6Y25C9MDg@mail.gmail.com>
-Message-ID: <CAKYAXd_4gpMU_0z9ed7ktP3zQ0doUqsWi1QqiJ_1v6Y25C9MDg@mail.gmail.com>
-Subject: Re: [PATCH v3] ksmbd: update documentation
-To:     Tom Talpey <tom@talpey.com>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, atteh.mailbox@gmail.com
+References: <20220912182224.514561-1-vishal.moola@gmail.com> <20220912182224.514561-19-vishal.moola@gmail.com>
+In-Reply-To: <20220912182224.514561-19-vishal.moola@gmail.com>
+From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Date:   Tue, 13 Sep 2022 10:09:08 +0900
+Message-ID: <CAKFNMokZ02Ax9J3Ns_Q2PO8oeg+G7kgqQS7kMJMxSiX92_Vwzg@mail.gmail.com>
+Subject: Re: [PATCH v2 18/23] nilfs2: Convert nilfs_lookup_dirty_data_buffers()
+ to use filemap_get_folios_tag()
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
+        linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-09-13 8:38 GMT+09:00, Tom Talpey <tom@talpey.com>:
-> On 9/9/2022 5:25 AM, Namjae Jeon wrote:
->> configuration.txt in ksmbd-tools moved to ksmbd.conf manpage.
->> update it and more detailed ksmbd-tools build method.
->>
->> Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
->> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>   v3:
->>     - replace CIFS with SMB3 clients.
->>     - update ksmbd built-in case.
->>     - replace smb.conf leftover with ksmbd.conf.
->>     - use full name of utils in ksmbd-tools instead of <foo>.
->>     - fix the warnings from make htlmdocs build reported by kernel test
->>       robot.
->>   v2:
->>     - rename smb.conf to ksmbd.conf.
->>     - add how to set ksmbd module in menuconfig
->>     - remove --syscondir option for configure, instead change ksmbd
->>       directory to /usr/local/etc/ksmbd.
->>     - change the prompt to '$'.
->>
->>   Documentation/filesystems/cifs/ksmbd.rst | 40 +++++++++++++++++-------
->>   1 file changed, 29 insertions(+), 11 deletions(-)
->>
->> diff --git a/Documentation/filesystems/cifs/ksmbd.rst
->> b/Documentation/filesystems/cifs/ksmbd.rst
->> index 1af600db2e70..4284341c89f3 100644
->> --- a/Documentation/filesystems/cifs/ksmbd.rst
->> +++ b/Documentation/filesystems/cifs/ksmbd.rst
->> @@ -118,26 +118,44 @@ ksmbd/nfsd interoperability    Planned for future.
->> The features that ksmbd
->>   How to run
->>   ==========
->>
->> -1. Download ksmbd-tools and compile them.
->> -	- https://github.com/cifsd-team/ksmbd-tools
->> +1. Download
->> ksmbd-tools(https://github.com/cifsd-team/ksmbd-tools/releases) and
->> +   compile them.
->> +
->> +   - Refer
->> README(https://github.com/cifsd-team/ksmbd-tools/blob/master/README.md)
->> +     to know how to use ksmbd.mountd/adduser/addshare/control utils
->> +
->> +     $ ./autogen.sh
->> +     $ ./configure --with-rundir=/run
->> +     $ make && sudo make install
->>
->>   2. Create user/password for SMB share.
->>
->> -	# mkdir /etc/ksmbd/
->> -	# ksmbd.adduser -a <Enter USERNAME for SMB share access>
->> +   - See ksmbd.adduser manpage.
->> +
->> +     $ man ksmbd.adduser
->> +     $ sudo ksmbd.adduser -a <Enter USERNAME for SMB share access>
->> +
->> +3. Create /usr/local/etc/ksmbd/ksmbd.conf file, add SMB share in
->> ksmbd.conf file.
+On Tue, Sep 13, 2022 at 3:30 AM Vishal Moola (Oracle) wrote:
 >
-> I missed this in the v2 match - are you intentionally moving the
-> ksmbd.conf file to /usr/local/etc? That seems a very mysterious
-> location. Nothing on my vanilla installed system places anything
-> in there.
-To avoid conflicts with the existing distribution package, the default
-location as far as I know is /usr/local/etc. And it can be changed
-with --sysconfdir. It is same with samba.
+> Convert function to use folios throughout. This is in preparation for
+> the removal of find_get_pages_range_tag().
 >
-> Also, doesn't this file need to exist before step 2??
-Ah, Yes. Will switch them.
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> ---
+>  fs/nilfs2/segment.c | 29 ++++++++++++++++-------------
+>  1 file changed, 16 insertions(+), 13 deletions(-)
 
-Thanks for your review!
->
-> Tom.
->
->
->> -3. Create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
->> -	- Refer smb.conf.example and
->> -
->> https://github.com/cifsd-team/ksmbd-tools/blob/master/Documentation/configuration.txt
->> +   - Refer ksmbd.conf.example in ksmbd-utils, See ksmbd.conf manpage
->> +     for details to configure shares.
->>
->> -4. Insert ksmbd.ko module
->> +        $ man ksmbd.conf
->>
->> -	# insmod ksmbd.ko
->> +4. Insert ksmbd.ko module after build your kernel. No need to load
->> module
->> +   if ksmbd is built into the kernel.
->> +
->> +   - Set ksmbd in menuconfig(e.g. $ make menuconfig)
->> +       [*] Network File Systems  --->
->> +           <M> SMB3 server support (EXPERIMENTAL)
->> +
->> +	$ sudo modprobe ksmbd.ko
->>
->>   5. Start ksmbd user space daemon
->> -	# ksmbd.mountd
->>
->> -6. Access share from Windows or Linux using CIFS
->> +	$ sudo ksmbd.mountd
->> +
->> +6. Access share from Windows or Linux SMB3 clients (cifs.ko or smbclient
->> of samba)
->>
->>   Shutdown KSMBD
->>   ==============
->
+Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+
+Looks good.   Thank you for reflecting the previous comment.
+
+Ryusuke Konishi
