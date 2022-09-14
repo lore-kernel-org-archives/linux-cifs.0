@@ -2,81 +2,132 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C122FC6FA82
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Sep 2022 14:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD761C6FA82
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Sep 2022 18:54:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230045AbiINOsP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 14 Sep 2022 10:48:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55492 "EHLO
+        id S229521AbiINSyZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 14 Sep 2022 14:54:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbiINOsH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 14 Sep 2022 10:48:07 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C327330C
-        for <linux-cifs@vger.kernel.org>; Wed, 14 Sep 2022 07:48:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=iE/ShEPk6wg9KNeYBg6gGwKzvIEaCIhdT27wGu88Q10=; b=FwIjHQVYAEtq/9rOw02lb6huSJ
-        YOwZJWn14vD4NZx4ZvKiVwkRwEIGqqvNiP/BUgePFNzwTrx3xRAh9vaaDuAnufLFEJdDYhH0Og/JN
-        BPMmsQ3n4/ji+cVioTOM2KhzLCK5R130UaHUHsopm0oP6vNceWT0qKdwYuvOsVfSOYtJil5JT37v7
-        DwFq599BFS8evBrafn1ibj2xKB4PfowNaSgf7+ZvLNcQlLegVuw63Ymw5hb8+YUCLj9+10Gp8iv+6
-        JOmJU5QGwdJd5M4McoVYaTNY0Nppg9K6/crWLtwlwfyARG+f9kd5lDwBy3YuiJNUTa+Fuv7A9xfHO
-        9R2JK7QZOQl5wT/FkZhU8qQaD6kiChnxzNvKuv+s2al10dda2v5NmeSegnvOkpZ/IU2BzVU7p6fxb
-        +5I7aZ9S0ASqnsYWN626nHA/oVcCkkP4coJPcuKW3Nu27OkQyJVCYMqre8IqO46xgWsyXCo/cZMoQ
-        YOqLKcZbg/NtwHpBjPTC/tVS;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1oYTgH-000N3x-1j; Wed, 14 Sep 2022 14:48:01 +0000
-Message-ID: <59df1da8-a40e-3dfd-c071-e06c517972d4@samba.org>
-Date:   Wed, 14 Sep 2022 16:47:59 +0200
+        with ESMTP id S229493AbiINSyY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 14 Sep 2022 14:54:24 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01C744E847
+        for <linux-cifs@vger.kernel.org>; Wed, 14 Sep 2022 11:54:22 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 9B99E33E7E;
+        Wed, 14 Sep 2022 18:54:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1663181661; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=qsvqC+DE1Dty62ww5ICnSOA5/tp/INSgXRSzpDx6aoA=;
+        b=SJiHLcgXbw3tUECHxzAD7jRD1ROMUsIUTFD47KlP8IM/C+BUIWYY40BFNWFdQEvRLhL4JF
+        vpbSINMVo6Z+cOY9bWkhELN3aYFLOfoYbinE6VFIhLRt3a8av/5DbRpQtWlaufTMnzclZM
+        43vcMdO4EYvtQuXULkCALsdYIacJskM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1663181661;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=qsvqC+DE1Dty62ww5ICnSOA5/tp/INSgXRSzpDx6aoA=;
+        b=v8/swdjQTKOku2PleS1Y4iLbTpPrJV/ICFC+KLUor9ULIxgPikStfwefcllKCY0Vyqwa2m
+        mhqcEa5EG6DRRaAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1EDFC134B3;
+        Wed, 14 Sep 2022 18:54:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id KcLHNFwjImMWEwAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Wed, 14 Sep 2022 18:54:20 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com
+Subject: [PATCH] cifs: dump_stack() only when non-interrupt error in AIO
+Date:   Wed, 14 Sep 2022 15:54:17 -0300
+Message-Id: <20220914185417.32509-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Content-Language: en-US
-To:     Enzo Matsumiya <ematsumiya@suse.de>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@cjr.nz,
-        ronniesahlberg@gmail.com, nspmangalore@gmail.com
-References: <20220829213354.2714-1-ematsumiya@suse.de>
- <20220829213354.2714-2-ematsumiya@suse.de>
- <0f2d41bf-f0da-aa10-76a3-ced2a3cebba3@samba.org>
- <20220914143214.nsrssywog7xwtfv5@suse.de>
-From:   Stefan Metzmacher <metze@samba.org>
-Subject: Re: [RFC PATCH v2 1/3] cifs: introduce AES-GMAC signing support for
- SMB 3.1.1
-In-Reply-To: <20220914143214.nsrssywog7xwtfv5@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Int cifs_send_async_read() and cifs_write_from_iter(), check if rc is an
+interrupt code and only call dump_stack() if it's not.
 
-Hi Enzo,
+In SMB2_{read,write}, show a different error message if rc is an
+interrupt code, as it gives more context to the users, e.g. the
+operation was aborted by the user, so not really an error.
 
-> You mean as copying crypt_message() and adapt for AES-GMAC signing,
-> instead of having the common parts in a separate function? I'll change
-> that on v3, I just thought it'd be better to have less duplicate code.
-> 
-..
+This can be observed when, e.g., running xfstests generic/208, where the
+stack dump in ring buffer can be confusing, as the test actually passes.
 
->> Why wasting time to allocate/free a 12 byte buffer for every pdu?
->>
->> Can't we have a named structure and pass in a reference from the
->> caller, which has it on the stack?
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/cifs/file.c    |  8 ++++++--
+ fs/cifs/smb2pdu.c | 10 ++++++++--
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-> Got it. I'll fix this for v3.
-For both just see this from line 624 up to 963.
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 6f38b134a346..e54c0144b71d 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -3278,7 +3278,9 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
+ 					 "direct_writev couldn't get user pages (rc=%zd) iter type %d iov_offset %zd count %zd\n",
+ 					 result, iov_iter_type(from),
+ 					 from->iov_offset, from->count);
+-				dump_stack();
++
++				if (!is_interrupt_error(result))
++					dump_stack();
+ 
+ 				rc = result;
+ 				add_credits_and_wake_if(server, credits, 0);
+@@ -4018,7 +4020,9 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
+ 					 result, iov_iter_type(&direct_iov),
+ 					 direct_iov.iov_offset,
+ 					 direct_iov.count);
+-				dump_stack();
++
++				if (!is_interrupt_error(result))
++					dump_stack();
+ 
+ 				rc = result;
+ 				add_credits_and_wake_if(server, credits, 0);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6352ab32c7e7..c9f5adc0d0d0 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -4313,7 +4313,10 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	if (rc) {
+ 		if (rc != -ENODATA) {
+ 			cifs_stats_fail_inc(io_parms->tcon, SMB2_READ_HE);
+-			cifs_dbg(VFS, "Send error in read = %d\n", rc);
++			if (is_interrupt_error(rc))
++				cifs_dbg(VFS, "Read interrupted (%d), aborting\n", rc);
++			else
++				cifs_dbg(VFS, "Send error in read, rc=%d\n", rc);
+ 			trace_smb3_read_err(xid,
+ 					    req->PersistentFileId,
+ 					    io_parms->tcon->tid, ses->Suid,
+@@ -4656,7 +4659,10 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 				     io_parms->tcon->ses->Suid,
+ 				     io_parms->offset, io_parms->length, rc);
+ 		cifs_stats_fail_inc(io_parms->tcon, SMB2_WRITE_HE);
+-		cifs_dbg(VFS, "Send error in write = %d\n", rc);
++		if (is_interrupt_error(rc))
++			cifs_dbg(VFS, "Write interrupted (%d), aborting\n", rc);
++		else
++			cifs_dbg(VFS, "Send error in write, rc=%d\n", rc);
+ 	} else {
+ 		*nbytes = le32_to_cpu(rsp->DataLength);
+ 		trace_smb3_write_done(xid,
+-- 
+2.35.3
 
-> https://git.samba.org/sfrench/cifs-2.6.git/?p=sfrench/cifs-2.6.git;a=blob;f=fs/cifs/smb2transport.c;h=4b912c75caa32d8f66a21286c5c28b982ea8efa1;hb=4b912c75caa32d8f66a21286c5c28b982ea8efa1#l624
-
-I think smb2_sg_set_buf() should be moved to a header in order to avoid having it twice.
-
-The verify argument to smb311_calc_aes_gmac should be renamed to allocate_crypto
-in order match smb3_calc_aes_cmac(), and the logic related to allocate_crypto
-if most likely the fix, as you mentioned in the other mail.
-
-And all the huge comments should be removed, as it's now no longer mixed with signing and
-is relatively simple to follow...
-
-metze
