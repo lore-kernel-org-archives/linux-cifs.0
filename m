@@ -2,132 +2,78 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD761C6FA82
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Sep 2022 18:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CC9ECAAA1
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Sep 2022 13:29:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229521AbiINSyZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 14 Sep 2022 14:54:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35600 "EHLO
+        id S229462AbiION3t (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Sep 2022 09:29:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbiINSyY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 14 Sep 2022 14:54:24 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01C744E847
-        for <linux-cifs@vger.kernel.org>; Wed, 14 Sep 2022 11:54:22 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        with ESMTP id S229533AbiION3s (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Sep 2022 09:29:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BFB0BE3C
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 06:29:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9B99E33E7E;
-        Wed, 14 Sep 2022 18:54:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663181661; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=qsvqC+DE1Dty62ww5ICnSOA5/tp/INSgXRSzpDx6aoA=;
-        b=SJiHLcgXbw3tUECHxzAD7jRD1ROMUsIUTFD47KlP8IM/C+BUIWYY40BFNWFdQEvRLhL4JF
-        vpbSINMVo6Z+cOY9bWkhELN3aYFLOfoYbinE6VFIhLRt3a8av/5DbRpQtWlaufTMnzclZM
-        43vcMdO4EYvtQuXULkCALsdYIacJskM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663181661;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=qsvqC+DE1Dty62ww5ICnSOA5/tp/INSgXRSzpDx6aoA=;
-        b=v8/swdjQTKOku2PleS1Y4iLbTpPrJV/ICFC+KLUor9ULIxgPikStfwefcllKCY0Vyqwa2m
-        mhqcEa5EG6DRRaAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1EDFC134B3;
-        Wed, 14 Sep 2022 18:54:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id KcLHNFwjImMWEwAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Wed, 14 Sep 2022 18:54:20 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com
-Subject: [PATCH] cifs: dump_stack() only when non-interrupt error in AIO
-Date:   Wed, 14 Sep 2022 15:54:17 -0300
-Message-Id: <20220914185417.32509-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.35.3
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BD492623D8
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 13:29:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26157C433B5
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 13:29:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663248576;
+        bh=8Fzi5gyC0HOJ6bRDK0OgEwIHq8DogyDKTeFddFKR3rI=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=qL81RtpI4UfwGqnYY8U1nyEPtGWpacm8dd+ZCUv3nW9XJDMPv2EOWl/OiuNS64sRW
+         QnqiNNOxsTdKSBh4SzxGIZes9jUa5WFSwV1HpB3DmqTCsyNIf+4mXaBYnVqMWOokvF
+         hc2qRBBu3ZYQ5f6BF8QgWVMdlplUsNgR+eY6y29bIZIt0rBdyjyeGQeOLL0Kp7XhRq
+         YXBMqqhG3VTD5ghbFxp3zNu02W36PXTR++sLwEKdaHpOXywcxZQVAyw41sqnN//mEk
+         T3Q70QjUPBZ+KGD3Jq4xjf27ZDt4MGF+xzuHaaa4ToL3pClgz1V0z2lzkLOylW7PkC
+         +HdLEG4toXirQ==
+Received: by mail-oi1-f170.google.com with SMTP id n83so2209195oif.11
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 06:29:36 -0700 (PDT)
+X-Gm-Message-State: ACgBeo2ptaEwWvagY+POmGnwsbFjaVIJcpw/T04GTtQkrQnjkv1e0WEg
+        TuZJ3Nkk2/cqrJQmYxksNt5nsgdE/rppbsDqPNY=
+X-Google-Smtp-Source: AA6agR7kRmiFrBSM/HpIph+XdowSnIBh0NmTYRz5VDzU6XVu/cRLYFZdVFmj/taPxn1IOLjayXUq0Z7/EM8REtxIh3c=
+X-Received: by 2002:a05:6808:14d5:b0:344:8f50:1f0f with SMTP id
+ f21-20020a05680814d500b003448f501f0fmr4376250oiw.257.1663248575248; Thu, 15
+ Sep 2022 06:29:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Thu, 15 Sep 2022 06:29:34
+ -0700 (PDT)
+In-Reply-To: <20220909105119.955332-1-brauner@kernel.org>
+References: <20220909105119.955332-1-brauner@kernel.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 15 Sep 2022 22:29:34 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_kmaPz0R2p-U5x=Nk0dKYt70+Uu5CuNyc+-Oa7cPzYaQ@mail.gmail.com>
+Message-ID: <CAKYAXd_kmaPz0R2p-U5x=Nk0dKYt70+Uu5CuNyc+-Oa7cPzYaQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: port to vfs{g,u}id_t and associated helpers
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     Steve French <sfrench@samba.org>, Hyunchul Lee <hyc.lee@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Seth Forshee <sforshee@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Int cifs_send_async_read() and cifs_write_from_iter(), check if rc is an
-interrupt code and only call dump_stack() if it's not.
+2022-09-09 19:51 GMT+09:00, Christian Brauner <brauner@kernel.org>:
+> A while ago we introduced a dedicated vfs{g,u}id_t type in commit
+> 1e5267cd0895 ("mnt_idmapping: add vfs{g,u}id_t"). We already switched
+> over a good part of the VFS. Ultimately we will remove all legacy
+> idmapped mount helpers that operate only on k{g,u}id_t in favor of the
+> new type safe helpers that operate on vfs{g,u}id_t.
+>
+> Cc: Seth Forshee (Digital Ocean) <sforshee@kernel.org>
+> Cc: Steve French <sfrench@samba.org>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: Hyunchul Lee <hyc.lee@gmail.com>
+> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+> Cc: linux-cifs@vger.kernel.org
+> Signed-off-by: Christian Brauner (Microsoft) <brauner@kernel.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-In SMB2_{read,write}, show a different error message if rc is an
-interrupt code, as it gives more context to the users, e.g. the
-operation was aborted by the user, so not really an error.
-
-This can be observed when, e.g., running xfstests generic/208, where the
-stack dump in ring buffer can be confusing, as the test actually passes.
-
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/cifs/file.c    |  8 ++++++--
- fs/cifs/smb2pdu.c | 10 ++++++++--
- 2 files changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 6f38b134a346..e54c0144b71d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3278,7 +3278,9 @@ cifs_write_from_iter(loff_t offset, size_t len, struct iov_iter *from,
- 					 "direct_writev couldn't get user pages (rc=%zd) iter type %d iov_offset %zd count %zd\n",
- 					 result, iov_iter_type(from),
- 					 from->iov_offset, from->count);
--				dump_stack();
-+
-+				if (!is_interrupt_error(result))
-+					dump_stack();
- 
- 				rc = result;
- 				add_credits_and_wake_if(server, credits, 0);
-@@ -4018,7 +4020,9 @@ cifs_send_async_read(loff_t offset, size_t len, struct cifsFileInfo *open_file,
- 					 result, iov_iter_type(&direct_iov),
- 					 direct_iov.iov_offset,
- 					 direct_iov.count);
--				dump_stack();
-+
-+				if (!is_interrupt_error(result))
-+					dump_stack();
- 
- 				rc = result;
- 				add_credits_and_wake_if(server, credits, 0);
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6352ab32c7e7..c9f5adc0d0d0 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -4313,7 +4313,10 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	if (rc) {
- 		if (rc != -ENODATA) {
- 			cifs_stats_fail_inc(io_parms->tcon, SMB2_READ_HE);
--			cifs_dbg(VFS, "Send error in read = %d\n", rc);
-+			if (is_interrupt_error(rc))
-+				cifs_dbg(VFS, "Read interrupted (%d), aborting\n", rc);
-+			else
-+				cifs_dbg(VFS, "Send error in read, rc=%d\n", rc);
- 			trace_smb3_read_err(xid,
- 					    req->PersistentFileId,
- 					    io_parms->tcon->tid, ses->Suid,
-@@ -4656,7 +4659,10 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- 				     io_parms->tcon->ses->Suid,
- 				     io_parms->offset, io_parms->length, rc);
- 		cifs_stats_fail_inc(io_parms->tcon, SMB2_WRITE_HE);
--		cifs_dbg(VFS, "Send error in write = %d\n", rc);
-+		if (is_interrupt_error(rc))
-+			cifs_dbg(VFS, "Write interrupted (%d), aborting\n", rc);
-+		else
-+			cifs_dbg(VFS, "Send error in write, rc=%d\n", rc);
- 	} else {
- 		*nbytes = le32_to_cpu(rsp->DataLength);
- 		trace_smb3_write_done(xid,
--- 
-2.35.3
-
+Thanks!
