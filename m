@@ -2,78 +2,139 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C7E2ECAAD3
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Sep 2022 13:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29353C6FA8A
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Sep 2022 14:07:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229457AbiIONb7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Sep 2022 09:31:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43156 "EHLO
+        id S229562AbiIOOHT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Sep 2022 10:07:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiIONb6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Sep 2022 09:31:58 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD0876E8A8
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 06:31:57 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 498F2623D9
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 13:31:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B04BAC4347C
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 13:31:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663248716;
-        bh=svT3bFMkP3zxbP4CG8S6T9DpiBrqXAYWGcsRrlvA2bk=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=KYIp7oMS7Irdd2vDHpEFdf2iZNLNBSCrGR/flx/yZs3gDVFoTOxGFqVNRLdGL6YoR
-         6o/BFAvZ2dghWnXYOJRAMvuO8UeAlhhJb9dIm/t5jUDmHSiFtytZ7i9XnKNq9BWYmk
-         5KOWEiKYd0NNEPd8oezIpQ/xXIsToybxnW7yuUT3W6PGI7TQMzk/YQF/uEcGoK6fth
-         o/aIc5lByWF9V5kMWRaYJddQ59KoZPS/UsbKD45JcPraNXBuO7v84XbKf/bLzXhqkC
-         XqMUadRsAPIoO7YeSlthyFR83gR5uWRM3wqVRrjkfAIM5P7QcWmVV9hdARzXjuVLqC
-         d9XdteZSeqOLQ==
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-127dca21a7dso47443937fac.12
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 06:31:56 -0700 (PDT)
-X-Gm-Message-State: ACgBeo1TX5E1NjCrPLVEkfnybrxeM+k9+4CBgWmqXjj8nQa9xhakM1At
-        L7vc1aOa+kAauMX8qDX305mxKN9xzBYi3d3tc3M=
-X-Google-Smtp-Source: AA6agR6kpdeHLFKC5RZGrUqRf9iDKZw8Y6hQ7O6nj/fU+drDLZu8MJWQH0N0LT/q8NvJiRW/wDhE8WDFpx0hawG3er4=
-X-Received: by 2002:a05:6870:b290:b0:127:4089:227a with SMTP id
- c16-20020a056870b29000b001274089227amr5526906oao.8.1663248715815; Thu, 15 Sep
- 2022 06:31:55 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Thu, 15 Sep 2022 06:31:55
- -0700 (PDT)
-In-Reply-To: <20220911215542.104935-1-atteh.mailbox@gmail.com>
-References: <20220911215542.104935-1-atteh.mailbox@gmail.com>
+        with ESMTP id S229457AbiIOOHS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Sep 2022 10:07:18 -0400
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 744E79BB74
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 07:07:17 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id o70-20020a17090a0a4c00b00202f898fa86so8153628pjo.2
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Sep 2022 07:07:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=UkxXSZ6pqbqZEDuGjxgZtX0vmMtgqSwi1LDET41Gmtc=;
+        b=AwBXcny0fEaIek7BsxNXZ73rGQav0sUVoSBgvZBPBjAiV3nvTBBgIgByUS0EYijxWT
+         Xv4pWp6x3flb/fBGIG5uiRzhncGXILo3MmWGd+Ky4CgOsPY7/XAT7GrcJE3TvXj2tK4d
+         ZvitofmZJZBdh9yzyU/wI1DsKEra/xqT6dpsRujVy4oFs6QLId9nRclGRTwKLSObnwjE
+         bzylvM3FoG5sLFX+3L1rooaMkydDYHR8oUjiaNjwij5R57P1JNSNaESSxoMQnKK40XUH
+         zm6+IKKt0JyP4eWeexqU/voPI2LtvYW8oDOhMt/EER3VAA2IjxEZyhbEuZvXJY53kqUK
+         3t2g==
+X-Gm-Message-State: ACgBeo0tQy0QX54WpHMaw7E/PvegkcEPMI+y2gjJFYC8a/HnRQIqd2dn
+        d+R0Wr683sPu+uxSr8RbzJE+maL0bJ8=
+X-Google-Smtp-Source: AA6agR4yALJ3VmtAKlq29YtJeItuvXu8t+NG1Zl8nKiQD7Typ+MWVD1LVt+SO/GfCk23E0I+qTUkKw==
+X-Received: by 2002:a17:90a:908:b0:200:14d8:1ff9 with SMTP id n8-20020a17090a090800b0020014d81ff9mr10758117pjn.16.1663250836514;
+        Thu, 15 Sep 2022 07:07:16 -0700 (PDT)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id gv6-20020a17090b11c600b002002f9eb8c4sm1707190pjb.12.2022.09.15.07.07.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Sep 2022 07:07:15 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 15 Sep 2022 22:31:55 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9EWSH7sRTbCfZWGvzSQDeEg1KcmA81sWXqerYWUN2kFw@mail.gmail.com>
-Message-ID: <CAKYAXd9EWSH7sRTbCfZWGvzSQDeEg1KcmA81sWXqerYWUN2kFw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] ksmbd: casefold utf-8 share names and fix ascii
- lowercase conversion
-To:     =?UTF-8?Q?Atte_Heikkil=C3=A4?= <atteh.mailbox@gmail.com>
-Cc:     linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH v4] ksmbd: update documentation
+Date:   Thu, 15 Sep 2022 23:07:00 +0900
+Message-Id: <20220915140700.7953-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-09-12 6:55 GMT+09:00, Atte Heikkil=C3=A4 <atteh.mailbox@gmail.com>:
-> strtolower() corrupts all UTF-8 share names that have a byte in the C0
-> (=C3=80 ISO8859-1) to DE (=C3=9E ISO8859-1) range, since the non-ASCII pa=
-rt of
-> ISO8859-1 is incompatible with UTF-8. Prevent this by checking that a
-> byte is in the ASCII range with isascii(), before the conversion to
-> lowercase with tolower(). Properly handle case-insensitivity of UTF-8
-> share names by casefolding them, but fallback to ASCII lowercase
-> conversion on failure or if CONFIG_UNICODE is not set. Refactor to move
-> the share name casefolding immediately after the share name extraction.
-> Also, make the associated constness corrections.
->
-> Signed-off-by: Atte Heikkil=C3=A4 <atteh.mailbox@gmail.com>
-> ---
->  v2:
->    - added missing kfree() to -E2BIG error path of casefold_sharename()
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+configuration.txt in ksmbd-tools moved to ksmbd.conf manpage.
+update it and more detailed ksmbd-tools build method.
 
-Thanks!
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ v4:
+   - switch the order of 1 and 2.
+ v3:
+   - replace CIFS with SMB3 clients.
+   - update ksmbd built-in case.
+   - replace smb.conf leftover with ksmbd.conf.
+   - use full name of utils in ksmbd-tools instead of <foo>.
+   - fix the warnings from make htlmdocs build reported by kernel test
+     robot.
+ v2:
+   - rename smb.conf to ksmbd.conf.
+   - add how to set ksmbd module in menuconfig
+   - remove --syscondir option for configure, instead change ksmbd
+     directory to /usr/local/etc/ksmbd.
+   - change the prompt to '$'.
+
+ Documentation/filesystems/cifs/ksmbd.rst | 42 +++++++++++++++++-------
+ 1 file changed, 30 insertions(+), 12 deletions(-)
+
+diff --git a/Documentation/filesystems/cifs/ksmbd.rst b/Documentation/filesystems/cifs/ksmbd.rst
+index 1af600db2e70..7bed96d794fc 100644
+--- a/Documentation/filesystems/cifs/ksmbd.rst
++++ b/Documentation/filesystems/cifs/ksmbd.rst
+@@ -118,26 +118,44 @@ ksmbd/nfsd interoperability    Planned for future. The features that ksmbd
+ How to run
+ ==========
+ 
+-1. Download ksmbd-tools and compile them.
+-	- https://github.com/cifsd-team/ksmbd-tools
++1. Download ksmbd-tools(https://github.com/cifsd-team/ksmbd-tools/releases) and
++   compile them.
+ 
+-2. Create user/password for SMB share.
++   - Refer README(https://github.com/cifsd-team/ksmbd-tools/blob/master/README.md)
++     to know how to use ksmbd.mountd/adduser/addshare/control utils
+ 
+-	# mkdir /etc/ksmbd/
+-	# ksmbd.adduser -a <Enter USERNAME for SMB share access>
++     $ ./autogen.sh
++     $ ./configure --with-rundir=/run
++     $ make && sudo make install
+ 
+-3. Create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
+-	- Refer smb.conf.example and
+-          https://github.com/cifsd-team/ksmbd-tools/blob/master/Documentation/configuration.txt
++2. Create /usr/local/etc/ksmbd/ksmbd.conf file, add SMB share in ksmbd.conf file.
+ 
+-4. Insert ksmbd.ko module
++   - Refer ksmbd.conf.example in ksmbd-utils, See ksmbd.conf manpage
++     for details to configure shares.
+ 
+-	# insmod ksmbd.ko
++        $ man ksmbd.conf
++
++3. Create user/password for SMB share.
++
++   - See ksmbd.adduser manpage.
++
++     $ man ksmbd.adduser
++     $ sudo ksmbd.adduser -a <Enter USERNAME for SMB share access>
++
++4. Insert ksmbd.ko module after build your kernel. No need to load module
++   if ksmbd is built into the kernel.
++
++   - Set ksmbd in menuconfig(e.g. $ make menuconfig)
++       [*] Network File Systems  --->
++           <M> SMB3 server support (EXPERIMENTAL)
++
++	$ sudo modprobe ksmbd.ko
+ 
+ 5. Start ksmbd user space daemon
+-	# ksmbd.mountd
+ 
+-6. Access share from Windows or Linux using CIFS
++	$ sudo ksmbd.mountd
++
++6. Access share from Windows or Linux using SMB3 client (cifs.ko or smbclient of samba)
+ 
+ Shutdown KSMBD
+ ==============
+-- 
+2.25.1
+
