@@ -2,55 +2,55 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45732C6FA82
-	for <linux-cifs@archiver.kernel.org>; Sun, 18 Sep 2022 03:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB90C6FA82
+	for <linux-cifs@archiver.kernel.org>; Sun, 18 Sep 2022 03:44:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbiIRDgb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 17 Sep 2022 23:36:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52018 "EHLO
+        id S229471AbiIRDoF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 17 Sep 2022 23:44:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbiIRDg3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 17 Sep 2022 23:36:29 -0400
+        with ESMTP id S229498AbiIRDoC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 17 Sep 2022 23:44:02 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8980F237E6
-        for <linux-cifs@vger.kernel.org>; Sat, 17 Sep 2022 20:36:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB4F4237FE
+        for <linux-cifs@vger.kernel.org>; Sat, 17 Sep 2022 20:44:00 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id AA62C228A2;
-        Sun, 18 Sep 2022 03:36:26 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 81EE82295F;
+        Sun, 18 Sep 2022 03:43:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663472186; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1663472639; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=DkKHAe19o/Nf3+FBFsHAp334rshYF99cYJnsuv30mTQ=;
-        b=M95fPibRwBKvWCg0VupRLIM1tahQbvLlfj5RsN3nmssO7E+g2Igj34DilblyEvpeEmfmnE
-        aN3Qhp8HLnHOkWUffG1libiaDwleAwDQ5sq3A5bHbExIpQo6CtYyLmWPys2NXgr3iFwfOS
-        w95I7KwYjREhzYNBI36wp+1ezXFM/O0=
+        bh=CxlM/PJqLCIGr2uSo4pLtGM2a1nzIiV/M3H6ilREFuI=;
+        b=JEd/RQP6OpoAFktXoPlJMYK5RU6M9ERGiWGxFgwEhmuPwn261hFE5mUQ520jBDTK27qKEi
+        9VmbWMVHRb673kKuCRPw/DFUdfq7wog6V5qdHELQWW39NE8lofLiPB1Y+sBwbgdShvkKKa
+        Wgueq/b2aaWTmefLaLbN53pa/Fy/QRs=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663472186;
+        s=susede2_ed25519; t=1663472639;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=DkKHAe19o/Nf3+FBFsHAp334rshYF99cYJnsuv30mTQ=;
-        b=NQ+UiVxaDFZVS6xlwkaEe8VXSnkVMNjk3X/M3lI+rXfOOnnmQ6e+pLHCHHNPPlj45ibC1B
-        PqYJ/HMb/ds4WoDg==
+        bh=CxlM/PJqLCIGr2uSo4pLtGM2a1nzIiV/M3H6ilREFuI=;
+        b=dr9GCAsr+bV5Bf13QXr+icCc4D43BdLL0Qn6EEnKiWHKPTMeYZedIpdU55/nl+ddfQcbju
+        uHz2reZCyFpPH1Ag==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2D8C213A49;
-        Sun, 18 Sep 2022 03:36:25 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 02C4613A49;
+        Sun, 18 Sep 2022 03:43:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id ZmWiODmSJmMqYwAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Sun, 18 Sep 2022 03:36:25 +0000
+        id 2hcPLv6TJmPzZAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Sun, 18 Sep 2022 03:43:58 +0000
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
         nspmangalore@gmail.com
-Subject: [PATCH v2] cifs: replace kfree() with kfree_sensitive() for sensitive data
-Date:   Sun, 18 Sep 2022 00:36:19 -0300
-Message-Id: <20220918033619.16522-1-ematsumiya@suse.de>
+Subject: [PATCH v2] cifs: use ALIGN() and round_up() macros
+Date:   Sun, 18 Sep 2022 00:43:54 -0300
+Message-Id: <20220918034354.17836-1-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -58,324 +58,358 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This patch is mosltly a s/kfree/kfree_sensitive/ for sensitive material
-that could still be left in memory.
+Improve code readability by using existing macros:
+
+Replace hardcoded alignment computations (e.g. (len + 7) & ~0x7) by
+ALIGN()/IS_ALIGNED() macros.
+
+Also replace (DIV_ROUND_UP(len, 8) * 8) with ALIGN(len, 8), which, if
+not optimized by the compiler, has the overhead of a multiplication
+and a division. Do the same for roundup() by replacing it by round_up()
+(division-less version, but requires the multiple to be a power of 2,
+which is always the case for us).
+
+And remove some unnecessary checks where !IS_ALIGNED() would fit, but
+calling round_up() directly is fine as it's a no-op if the value is
+already aligned.
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
-v2: remove unnecessary NULL checks before kfree_sensitive()
+v2: drop performance claims, adjust commit title/message -- patch is the same
 
- fs/cifs/cifsencrypt.c | 12 ++++++------
- fs/cifs/connect.c     |  6 +++---
- fs/cifs/fs_context.c  | 12 ++++++++++--
- fs/cifs/misc.c        |  2 +-
- fs/cifs/sess.c        | 24 +++++++++++++++---------
- fs/cifs/smb2ops.c     |  6 +++---
- fs/cifs/smb2pdu.c     | 22 +++++++++++++++++-----
- 7 files changed, 55 insertions(+), 29 deletions(-)
+ fs/cifs/cifssmb.c   |  7 +++---
+ fs/cifs/connect.c   | 11 ++++++--
+ fs/cifs/sess.c      | 18 +++++--------
+ fs/cifs/smb2inode.c |  4 +--
+ fs/cifs/smb2misc.c  |  2 +-
+ fs/cifs/smb2pdu.c   | 61 +++++++++++++++++++--------------------------
+ 6 files changed, 47 insertions(+), 56 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 46f5718754f9..d848bc0aac27 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -679,7 +679,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- unlock:
- 	cifs_server_unlock(ses->server);
- setup_ntlmv2_rsp_ret:
--	kfree(tiblob);
-+	kfree_sensitive(tiblob);
- 
- 	return rc;
- }
-@@ -753,14 +753,14 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
- 		server->secmech.ccmaesdecrypt = NULL;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 7aa91e272027..addf3fc62aef 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -2305,7 +2305,7 @@ int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *pTcon,
+ 					remap);
  	}
+ 	rename_info->target_name_len = cpu_to_le32(2 * len_of_str);
+-	count = 12 /* sizeof(struct set_file_rename) */ + (2 * len_of_str);
++	count = sizeof(struct set_file_rename) + (2 * len_of_str);
+ 	byte_count += count;
+ 	pSMB->DataCount = cpu_to_le16(count);
+ 	pSMB->TotalDataCount = pSMB->DataCount;
+@@ -2796,7 +2796,7 @@ CIFSSMBQuerySymLink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		cifs_dbg(FYI, "Invalid return data count on get reparse info ioctl\n");
+ 		goto qreparse_out;
+ 	}
+-	end_of_smb = 2 + get_bcc(&pSMBr->hdr) + (char *)&pSMBr->ByteCount;
++	end_of_smb = sizeof(__le16) + get_bcc(&pSMBr->hdr) + (char *)&pSMBr->ByteCount;
+ 	reparse_buf = (struct reparse_symlink_data *)
+ 				((char *)&pSMBr->hdr.Protocol + data_offset);
+ 	if ((char *)reparse_buf >= end_of_smb) {
+@@ -3350,8 +3350,7 @@ validate_ntransact(char *buf, char **ppparm, char **ppdata,
+ 	pSMBr = (struct smb_com_ntransact_rsp *)buf;
  
--	kfree(server->secmech.sdesccmacaes);
-+	kfree_sensitive(server->secmech.sdesccmacaes);
- 	server->secmech.sdesccmacaes = NULL;
--	kfree(server->secmech.sdeschmacsha256);
-+	kfree_sensitive(server->secmech.sdeschmacsha256);
- 	server->secmech.sdeschmacsha256 = NULL;
--	kfree(server->secmech.sdeschmacmd5);
-+	kfree_sensitive(server->secmech.sdeschmacmd5);
- 	server->secmech.sdeschmacmd5 = NULL;
--	kfree(server->secmech.sdescmd5);
-+	kfree_sensitive(server->secmech.sdescmd5);
- 	server->secmech.sdescmd5 = NULL;
--	kfree(server->secmech.sdescsha512);
-+	kfree_sensitive(server->secmech.sdescsha512);
- 	server->secmech.sdescsha512 = NULL;
- }
+ 	bcc = get_bcc(&pSMBr->hdr);
+-	end_of_smb = 2 /* sizeof byte count */ + bcc +
+-			(char *)&pSMBr->ByteCount;
++	end_of_smb = sizeof(__le16) + bcc + (char *)&pSMBr->ByteCount;
+ 
+ 	data_offset = le32_to_cpu(pSMBr->DataOffset);
+ 	data_count = le32_to_cpu(pSMBr->DataCount);
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 7ae6f2c08153..a43d5686c302 100644
+index 7ae6f2c08153..8a26ba7fc707 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -311,7 +311,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
- 	}
- 	server->sequence_number = 0;
- 	server->session_estab = false;
--	kfree(server->session_key.response);
-+	kfree_sensitive(server->session_key.response);
- 	server->session_key.response = NULL;
- 	server->session_key.len = 0;
- 	server->lstrp = jiffies;
-@@ -1580,7 +1580,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
- 
- 	cifs_crypto_secmech_release(server);
- 
--	kfree(server->session_key.response);
-+	kfree_sensitive(server->session_key.response);
- 	server->session_key.response = NULL;
- 	server->session_key.len = 0;
- 	kfree(server->hostname);
-@@ -4134,7 +4134,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
- 		if (ses->auth_key.response) {
- 			cifs_dbg(FYI, "Free previous auth_key.response = %p\n",
- 				 ses->auth_key.response);
--			kfree(ses->auth_key.response);
-+			kfree_sensitive(ses->auth_key.response);
- 			ses->auth_key.response = NULL;
- 			ses->auth_key.len = 0;
- 		}
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index 0e13dec86b25..45119597c765 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -791,6 +791,13 @@ do {									\
- 	cifs_sb->ctx->field = NULL;					\
- } while (0)
- 
-+#define STEAL_STRING_SENSITIVE(cifs_sb, ctx, field)			\
-+do {									\
-+	kfree_sensitive(ctx->field);					\
-+	ctx->field = cifs_sb->ctx->field;				\
-+	cifs_sb->ctx->field = NULL;					\
-+} while (0)
+@@ -2831,9 +2831,12 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
+ 	 * sessinit is sent but no second negprot
+ 	 */
+ 	struct rfc1002_session_packet *ses_init_buf;
++	unsigned int req_noscope_len;
+ 	struct smb_hdr *smb_buf;
 +
- static int smb3_reconfigure(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-@@ -811,7 +818,7 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	STEAL_STRING(cifs_sb, ctx, UNC);
- 	STEAL_STRING(cifs_sb, ctx, source);
- 	STEAL_STRING(cifs_sb, ctx, username);
--	STEAL_STRING(cifs_sb, ctx, password);
-+	STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
- 	STEAL_STRING(cifs_sb, ctx, domainname);
- 	STEAL_STRING(cifs_sb, ctx, nodename);
- 	STEAL_STRING(cifs_sb, ctx, iocharset);
-@@ -1162,7 +1169,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		}
- 		break;
- 	case Opt_pass:
--		kfree(ctx->password);
-+		kfree_sensitive(ctx->password);
- 		ctx->password = NULL;
- 		if (strlen(param->string) == 0)
- 			break;
-@@ -1470,6 +1477,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 	return 0;
+ 	ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
+ 			       GFP_KERNEL);
++
+ 	if (ses_init_buf) {
+ 		ses_init_buf->trailer.session_req.called_len = 32;
  
-  cifs_parse_mount_err:
-+	kfree_sensitive(ctx->password);
- 	return -EINVAL;
- }
+@@ -2869,8 +2872,12 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
+ 		ses_init_buf->trailer.session_req.scope2 = 0;
+ 		smb_buf = (struct smb_hdr *)ses_init_buf;
  
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 87f60f736731..85109a9a2146 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -1119,7 +1119,7 @@ cifs_alloc_hash(const char *name,
- void
- cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
- {
--	kfree(*sdesc);
-+	kfree_sensitive(*sdesc);
- 	*sdesc = NULL;
- 	if (*shash)
- 		crypto_free_shash(*shash);
+-		/* sizeof RFC1002_SESSION_REQUEST with no scope */
+-		smb_buf->smb_buf_length = cpu_to_be32(0x81000044);
++		/* sizeof RFC1002_SESSION_REQUEST with no scopes */
++		req_noscope_len = sizeof(struct rfc1002_session_packet) - 2;
++
++		/* == cpu_to_be32(0x81000044) */
++		smb_buf->smb_buf_length =
++			cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | req_noscope_len);
+ 		rc = smb_send(server, smb_buf, 0x44);
+ 		kfree(ses_init_buf);
+ 		/*
 diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 3af3b05b6c74..f1c3c6d9146c 100644
+index 3af3b05b6c74..951874928d70 100644
 --- a/fs/cifs/sess.c
 +++ b/fs/cifs/sess.c
-@@ -1213,6 +1213,12 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
- static void
- sess_free_buffer(struct sess_data *sess_data)
- {
-+	int i;
-+
-+	/* zero the session data before freeing, as it might contain sensitive info (keys, etc) */
-+	for (i = 0; i < 3; i++)
-+		if (sess_data->iov[i].iov_base)
-+			memzero_explicit(sess_data->iov[i].iov_base, sess_data->iov[i].iov_len);
+@@ -601,11 +601,6 @@ static void unicode_ssetup_strings(char **pbcc_area, struct cifs_ses *ses,
+ 	/* BB FIXME add check that strings total less
+ 	than 335 or will need to send them as arrays */
  
- 	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
- 	sess_data->buf0_type = CIFS_NO_BUFFER;
-@@ -1374,7 +1380,7 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
- 	sess_free_buffer(sess_data);
--	kfree(ses->auth_key.response);
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
- }
- 
-@@ -1513,7 +1519,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
- 	sess_free_buffer(sess_data);
--	kfree(ses->auth_key.response);
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
- }
- 
-@@ -1648,7 +1654,7 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
- 	rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
- 
- out_free_ntlmsspblob:
--	kfree(ntlmsspblob);
-+	kfree_sensitive(ntlmsspblob);
- out:
- 	sess_free_buffer(sess_data);
- 
-@@ -1658,9 +1664,9 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
+-	/* unicode strings, must be word aligned before the call */
+-/*	if ((long) bcc_ptr % 2)	{
+-		*bcc_ptr = 0;
+-		bcc_ptr++;
+-	} */
+ 	/* copy user */
+ 	if (ses->user_name == NULL) {
+ 		/* null user mount */
+@@ -1318,7 +1313,7 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
  	}
  
- 	/* Else error. Cleanup */
--	kfree(ses->auth_key.response);
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
--	kfree(ses->ntlmssp);
-+	kfree_sensitive(ses->ntlmssp);
- 	ses->ntlmssp = NULL;
+ 	if (ses->capabilities & CAP_UNICODE) {
+-		if (sess_data->iov[0].iov_len % 2) {
++		if (!IS_ALIGNED(sess_data->iov[0].iov_len, 2)) {
+ 			*bcc_ptr = 0;
+ 			bcc_ptr++;
+ 		}
+@@ -1358,7 +1353,7 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
+ 		/* no string area to decode, do nothing */
+ 	} else if (smb_buf->Flags2 & SMBFLG2_UNICODE) {
+ 		/* unicode string area must be word-aligned */
+-		if (((unsigned long) bcc_ptr - (unsigned long) smb_buf) % 2) {
++		if (!IS_ALIGNED((unsigned long)bcc_ptr - (unsigned long)smb_buf, 2)) {
+ 			++bcc_ptr;
+ 			--bytes_remaining;
+ 		}
+@@ -1442,8 +1437,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
  
- 	sess_data->func = NULL;
-@@ -1759,7 +1765,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+ 	if (ses->capabilities & CAP_UNICODE) {
+ 		/* unicode strings must be word aligned */
+-		if ((sess_data->iov[0].iov_len
+-			+ sess_data->iov[1].iov_len) % 2) {
++		if (!IS_ALIGNED(sess_data->iov[0].iov_len + sess_data->iov[1].iov_len, 2)) {
+ 			*bcc_ptr = 0;
+ 			bcc_ptr++;
+ 		}
+@@ -1494,7 +1488,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
+ 		/* no string area to decode, do nothing */
+ 	} else if (smb_buf->Flags2 & SMBFLG2_UNICODE) {
+ 		/* unicode string area must be word-aligned */
+-		if (((unsigned long) bcc_ptr - (unsigned long) smb_buf) % 2) {
++		if (!IS_ALIGNED((unsigned long)bcc_ptr - (unsigned long)smb_buf, 2)) {
+ 			++bcc_ptr;
+ 			--bytes_remaining;
+ 		}
+@@ -1546,7 +1540,7 @@ _sess_auth_rawntlmssp_assemble_req(struct sess_data *sess_data)
+ 
+ 	bcc_ptr = sess_data->iov[2].iov_base;
+ 	/* unicode strings must be word aligned */
+-	if ((sess_data->iov[0].iov_len + sess_data->iov[1].iov_len) % 2) {
++	if (!IS_ALIGNED(sess_data->iov[0].iov_len + sess_data->iov[1].iov_len, 2)) {
+ 		*bcc_ptr = 0;
+ 		bcc_ptr++;
  	}
+@@ -1747,7 +1741,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+ 		/* no string area to decode, do nothing */
+ 	} else if (smb_buf->Flags2 & SMBFLG2_UNICODE) {
+ 		/* unicode string area must be word-aligned */
+-		if (((unsigned long) bcc_ptr - (unsigned long) smb_buf) % 2) {
++		if (!IS_ALIGNED((unsigned long)bcc_ptr - (unsigned long)smb_buf, 2)) {
+ 			++bcc_ptr;
+ 			--bytes_remaining;
+ 		}
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index b83f59051b26..4eefbe574b82 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -207,7 +207,7 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		rqst[num_rqst].rq_iov = &vars->si_iov[0];
+ 		rqst[num_rqst].rq_nvec = 1;
  
- out_free_ntlmsspblob:
--	kfree(ntlmsspblob);
-+	kfree_sensitive(ntlmsspblob);
- out:
- 	sess_free_buffer(sess_data);
+-		size[0] = 1; /* sizeof __u8 See MS-FSCC section 2.4.11 */
++		size[0] = sizeof(u8); /* See MS-FSCC section 2.4.11 */
+ 		data[0] = &delete_pending[0];
  
-@@ -1767,9 +1773,9 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
- 		rc = sess_establish_session(sess_data);
+ 		rc = SMB2_set_info_init(tcon, server,
+@@ -225,7 +225,7 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		rqst[num_rqst].rq_iov = &vars->si_iov[0];
+ 		rqst[num_rqst].rq_nvec = 1;
  
- 	/* Cleanup */
--	kfree(ses->auth_key.response);
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
--	kfree(ses->ntlmssp);
-+	kfree_sensitive(ses->ntlmssp);
- 	ses->ntlmssp = NULL;
+-		size[0] = 8; /* sizeof __le64 */
++		size[0] = sizeof(__le64);
+ 		data[0] = ptr;
  
- 	sess_data->func = NULL;
-@@ -1845,7 +1851,7 @@ int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
- 	rc = sess_data->result;
+ 		rc = SMB2_set_info_init(tcon, server,
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index d73e5672aac4..258b01306d85 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -248,7 +248,7 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
+ 		 * Some windows servers (win2016) will pad also the final
+ 		 * PDU in a compound to 8 bytes.
+ 		 */
+-		if (((calc_len + 7) & ~7) == len)
++		if (ALIGN(calc_len, 8) == len)
+ 			return 0;
  
- out:
--	kfree(sess_data);
-+	kfree_sensitive(sess_data);
- 	return rc;
- }
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 421be43af425..5094336cade6 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -4410,11 +4410,11 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
- 	if (!rc && enc)
- 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
- 
--	kfree(iv);
-+	kfree_sensitive(iv);
- free_sg:
--	kfree(sg);
-+	kfree_sensitive(sg);
- free_req:
--	kfree(req);
-+	kfree_sensitive(req);
- 	return rc;
- }
- 
+ 		/*
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6352ab32c7e7..8e531b8a09e6 100644
+index 6352ab32c7e7..5da0b596c8a0 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -1345,6 +1345,13 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
+@@ -466,15 +466,14 @@ build_signing_ctxt(struct smb2_signing_capabilities *pneg_ctxt)
+ 	/*
+ 	 * Context Data length must be rounded to multiple of 8 for some servers
+ 	 */
+-	pneg_ctxt->DataLength = cpu_to_le16(DIV_ROUND_UP(
+-				sizeof(struct smb2_signing_capabilities) -
+-				sizeof(struct smb2_neg_context) +
+-				(num_algs * 2 /* sizeof u16 */), 8) * 8);
++	pneg_ctxt->DataLength = cpu_to_le16(ALIGN(sizeof(struct smb2_signing_capabilities) -
++					    sizeof(struct smb2_neg_context) +
++					    (num_algs * sizeof(u16)), 8));
+ 	pneg_ctxt->SigningAlgorithmCount = cpu_to_le16(num_algs);
+ 	pneg_ctxt->SigningAlgorithms[0] = cpu_to_le16(SIGNING_ALG_AES_CMAC);
+ 
+-	ctxt_len += 2 /* sizeof le16 */ * num_algs;
+-	ctxt_len = DIV_ROUND_UP(ctxt_len, 8) * 8;
++	ctxt_len += sizeof(__le16) * num_algs;
++	ctxt_len = ALIGN(ctxt_len, 8);
+ 	return ctxt_len;
+ 	/* TBD add SIGNING_ALG_AES_GMAC and/or SIGNING_ALG_HMAC_SHA256 */
+ }
+@@ -511,8 +510,7 @@ build_netname_ctxt(struct smb2_netname_neg_context *pneg_ctxt, char *hostname)
+ 	/* copy up to max of first 100 bytes of server name to NetName field */
+ 	pneg_ctxt->DataLength = cpu_to_le16(2 * cifs_strtoUTF16(pneg_ctxt->NetName, hostname, 100, cp));
+ 	/* context size is DataLength + minimal smb2_neg_context */
+-	return DIV_ROUND_UP(le16_to_cpu(pneg_ctxt->DataLength) +
+-			sizeof(struct smb2_neg_context), 8) * 8;
++	return ALIGN(le16_to_cpu(pneg_ctxt->DataLength) + sizeof(struct smb2_neg_context), 8);
+ }
+ 
  static void
- SMB2_sess_free_buffer(struct SMB2_sess_data *sess_data)
- {
-+	int i;
-+
-+	/* zero the session data before freeing, as it might contain sensitive info (keys, etc) */
-+	for (i = 0; i < 2; i++)
-+		if (sess_data->iov[i].iov_base)
-+			memzero_explicit(sess_data->iov[i].iov_base, sess_data->iov[i].iov_len);
-+
- 	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
- 	sess_data->buf0_type = CIFS_NO_BUFFER;
+@@ -557,18 +555,18 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
+ 	 * round up total_len of fixed part of SMB3 negotiate request to 8
+ 	 * byte boundary before adding negotiate contexts
+ 	 */
+-	*total_len = roundup(*total_len, 8);
++	*total_len = ALIGN(*total_len, 8);
+ 
+ 	pneg_ctxt = (*total_len) + (char *)req;
+ 	req->NegotiateContextOffset = cpu_to_le32(*total_len);
+ 
+ 	build_preauth_ctxt((struct smb2_preauth_neg_context *)pneg_ctxt);
+-	ctxt_len = DIV_ROUND_UP(sizeof(struct smb2_preauth_neg_context), 8) * 8;
++	ctxt_len = ALIGN(sizeof(struct smb2_preauth_neg_context), 8);
+ 	*total_len += ctxt_len;
+ 	pneg_ctxt += ctxt_len;
+ 
+ 	build_encrypt_ctxt((struct smb2_encryption_neg_context *)pneg_ctxt);
+-	ctxt_len = DIV_ROUND_UP(sizeof(struct smb2_encryption_neg_context), 8) * 8;
++	ctxt_len = ALIGN(sizeof(struct smb2_encryption_neg_context), 8);
+ 	*total_len += ctxt_len;
+ 	pneg_ctxt += ctxt_len;
+ 
+@@ -595,9 +593,7 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
+ 	if (server->compress_algorithm) {
+ 		build_compression_ctxt((struct smb2_compression_capabilities_context *)
+ 				pneg_ctxt);
+-		ctxt_len = DIV_ROUND_UP(
+-			sizeof(struct smb2_compression_capabilities_context),
+-				8) * 8;
++		ctxt_len = ALIGN(sizeof(struct smb2_compression_capabilities_context), 8);
+ 		*total_len += ctxt_len;
+ 		pneg_ctxt += ctxt_len;
+ 		neg_context_count++;
+@@ -780,7 +776,7 @@ static int smb311_decode_neg_context(struct smb2_negotiate_rsp *rsp,
+ 		if (rc)
+ 			break;
+ 		/* offsets must be 8 byte aligned */
+-		clen = (clen + 7) & ~0x7;
++		clen = ALIGN(clen, 8);
+ 		offset += clen + sizeof(struct smb2_neg_context);
+ 		len_of_ctxts -= clen;
+ 	}
+@@ -2413,7 +2409,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
+ 	unsigned int group_offset = 0;
+ 	struct smb3_acl acl;
+ 
+-	*len = roundup(sizeof(struct crt_sd_ctxt) + (sizeof(struct cifs_ace) * 4), 8);
++	*len = round_up(sizeof(struct crt_sd_ctxt) + (sizeof(struct cifs_ace) * 4), 8);
+ 
+ 	if (set_owner) {
+ 		/* sizeof(struct owner_group_sids) is already multiple of 8 so no need to round */
+@@ -2487,7 +2483,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
+ 	memcpy(aclptr, &acl, sizeof(struct smb3_acl));
+ 
+ 	buf->ccontext.DataLength = cpu_to_le32(ptr - (__u8 *)&buf->sd);
+-	*len = roundup(ptr - (__u8 *)buf, 8);
++	*len = round_up((unsigned int)(ptr - (__u8 *)buf), 8);
+ 
+ 	return buf;
  }
-@@ -1417,6 +1424,9 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
- 	struct smb2_sess_setup_rsp *rsp = NULL;
- 	bool is_binding = false;
- 
-+	/* initialize it to NULL so we can check/free it on exit */
-+	ses->auth_key.response = NULL;
-+
- 	rc = SMB2_sess_alloc_buffer(sess_data);
- 	if (rc)
- 		goto out;
-@@ -1477,6 +1487,8 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
- out_put_spnego_key:
- 	key_invalidate(spnego_key);
- 	key_put(spnego_key);
-+	if (rc)
-+		kfree_sensitive(ses->auth_key.response);
- out:
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
-@@ -1573,7 +1585,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
+@@ -2581,7 +2577,7 @@ alloc_path_with_tree_prefix(__le16 **out_path, int *out_size, int *out_len,
+ 	 * final path needs to be 8-byte aligned as specified in
+ 	 * MS-SMB2 2.2.13 SMB2 CREATE Request.
+ 	 */
+-	*out_size = roundup(*out_len * sizeof(__le16), 8);
++	*out_size = round_up(*out_len * sizeof(__le16), 8);
+ 	*out_path = kzalloc(*out_size + sizeof(__le16) /* null */, GFP_KERNEL);
+ 	if (!*out_path)
+ 		return -ENOMEM;
+@@ -2687,20 +2683,17 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
+ 		uni_path_len = (2 * UniStrnlen((wchar_t *)utf16_path, PATH_MAX)) + 2;
+ 		/* MUST set path len (NameLength) to 0 opening root of share */
+ 		req->NameLength = cpu_to_le16(uni_path_len - 2);
+-		if (uni_path_len % 8 != 0) {
+-			copy_size = roundup(uni_path_len, 8);
+-			copy_path = kzalloc(copy_size, GFP_KERNEL);
+-			if (!copy_path) {
+-				rc = -ENOMEM;
+-				goto err_free_req;
+-			}
+-			memcpy((char *)copy_path, (const char *)utf16_path,
+-			       uni_path_len);
+-			uni_path_len = copy_size;
+-			/* free before overwriting resource */
+-			kfree(utf16_path);
+-			utf16_path = copy_path;
++		copy_size = round_up(uni_path_len, 8);
++		copy_path = kzalloc(copy_size, GFP_KERNEL);
++		if (!copy_path) {
++			rc = -ENOMEM;
++			goto err_free_req;
+ 		}
++		memcpy((char *)copy_path, (const char *)utf16_path, uni_path_len);
++		uni_path_len = copy_size;
++		/* free before overwriting resource */
++		kfree(utf16_path);
++		utf16_path = copy_path;
  	}
  
- out:
--	kfree(ntlmssp_blob);
-+	kfree_sensitive(ntlmssp_blob);
- 	SMB2_sess_free_buffer(sess_data);
- 	if (!rc) {
- 		sess_data->result = 0;
-@@ -1581,7 +1593,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
- 		return;
- 	}
- out_err:
--	kfree(ses->ntlmssp);
-+	kfree_sensitive(ses->ntlmssp);
- 	ses->ntlmssp = NULL;
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
-@@ -1657,9 +1669,9 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
- 	}
- #endif
- out:
--	kfree(ntlmssp_blob);
-+	kfree_sensitive(ntlmssp_blob);
- 	SMB2_sess_free_buffer(sess_data);
--	kfree(ses->ntlmssp);
-+	kfree_sensitive(ses->ntlmssp);
- 	ses->ntlmssp = NULL;
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
-@@ -1737,7 +1749,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
- 		cifs_server_dbg(VFS, "signing requested but authenticated as guest\n");
- 	rc = sess_data->result;
- out:
--	kfree(sess_data);
-+	kfree_sensitive(sess_data);
- 	return rc;
- }
- 
+ 	iov[1].iov_len = uni_path_len;
+@@ -2826,9 +2819,7 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 		uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
+ 		/* MUST set path len (NameLength) to 0 opening root of share */
+ 		req->NameLength = cpu_to_le16(uni_path_len - 2);
+-		copy_size = uni_path_len;
+-		if (copy_size % 8 != 0)
+-			copy_size = roundup(copy_size, 8);
++		copy_size = round_up(uni_path_len, 8);
+ 		copy_path = kzalloc(copy_size, GFP_KERNEL);
+ 		if (!copy_path)
+ 			return -ENOMEM;
+@@ -4090,7 +4081,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ 	if (request_type & CHAINED_REQUEST) {
+ 		if (!(request_type & END_OF_CHAIN)) {
+ 			/* next 8-byte aligned request */
+-			*total_len = DIV_ROUND_UP(*total_len, 8) * 8;
++			*total_len = ALIGN(*total_len, 8);
+ 			shdr->NextCommand = cpu_to_le32(*total_len);
+ 		} else /* END_OF_CHAIN */
+ 			shdr->NextCommand = 0;
 -- 
 2.35.3
 
