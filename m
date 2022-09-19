@@ -2,105 +2,123 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0653C54EE9
-	for <linux-cifs@archiver.kernel.org>; Mon, 19 Sep 2022 00:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3CCECAAD8
+	for <linux-cifs@archiver.kernel.org>; Mon, 19 Sep 2022 01:37:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229505AbiISAWH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 18 Sep 2022 20:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44656 "EHLO
+        id S229669AbiISBhv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 18 Sep 2022 21:37:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbiISAWG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 18 Sep 2022 20:22:06 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD484AE5A
-        for <linux-cifs@vger.kernel.org>; Sun, 18 Sep 2022 17:22:02 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7D555221B7;
-        Mon, 19 Sep 2022 00:22:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663546921; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uFZF6HYAGhWCnJz5eg+fvgoGzpVDEfWl7ILnqYwTdRM=;
-        b=Ua+YK51tUrskj1pBAhxhUj2hWsPuBYQ0uJq7wSvsItP0jucKdNB1FkpWx+gnM2AZBEyyBB
-        rGdiLcxldTqe5lze1JBgdmjsm149mm3kdtpVB0NKwRDLlZ3lRNAA0e7ZrMNJW9aoHzw3vf
-        JJ7qSYqH5O7A9lhytUHgtjEAN1tZAWA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663546921;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uFZF6HYAGhWCnJz5eg+fvgoGzpVDEfWl7ILnqYwTdRM=;
-        b=1/eigTDtW4EjfuQgov6na+8s+pt2xO3hOahhVrjmhHniDJOAO+2G7R1zuEnJBNwb6immfr
-        u2SEwLCOp7+Xj4Dg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EB68013A96;
-        Mon, 19 Sep 2022 00:22:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 4UCoKii2J2OZLgAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Mon, 19 Sep 2022 00:22:00 +0000
-Date:   Sun, 18 Sep 2022 21:21:58 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Tom Talpey <tom@talpey.com>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@cjr.nz,
-        ronniesahlberg@gmail.com, nspmangalore@gmail.com
-Subject: Re: [PATCH] cifs: verify signature only for valid responses
-Message-ID: <20220919002158.wgta4konh6c4wfjr@suse.de>
-References: <20220917020704.25181-1-ematsumiya@suse.de>
- <bf09670b-df76-7fcc-2c8c-8b049f82d41b@talpey.com>
- <20220917162827.g3c32bh62maw7da3@suse.de>
- <3e03b3ec-f733-06b1-3023-592801414ae8@talpey.com>
+        with ESMTP id S229587AbiISBhu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 18 Sep 2022 21:37:50 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69207186CC
+        for <linux-cifs@vger.kernel.org>; Sun, 18 Sep 2022 18:37:49 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id m3so19376351eda.12
+        for <linux-cifs@vger.kernel.org>; Sun, 18 Sep 2022 18:37:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=zdhG+gU+tfwk0TzORK7cIyaBok425mWzfX9sh//VqNE=;
+        b=j+0ub9iPC3r0L1zPpKa6n+RdxbMQhSnfx+S22/VeZN0JMdi7EtRcY3zcEhn0ahmBw2
+         EhGIaB7r6f52G7dhvnpduCXBRKeGhL2YSaQSt8b/b5CizUL+SckNKxvEtE+pKkta/R0I
+         RmTVWcM35GQ1k+tH7pygVvYQqi2nARiuj02WFJoBX7EkVE1wX7Dp2s1crmCponU36vW9
+         tpszp2GU6S8RVFEtikxeR6MWhQKJDh53qks3IGrC2Kwb8kMiVv15XYUyxTFUqDUV/7lI
+         sFoBsan5K6wBBV1YcUnJhlwYqVSFE1mtIfGsPivfaSQ+Zbyf3ohRPiGbD2tlDoJWAm/y
+         i07A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=zdhG+gU+tfwk0TzORK7cIyaBok425mWzfX9sh//VqNE=;
+        b=F5zbqVcD9RLKARdzDlpujnOB4tC5BjiGhIIeE0NvVlRuWQ8z0Hi0rWPlnaBLXdQ3aN
+         FSQLT1wSoeTEsy73Pl9Bn5A+HecxynvsqVt3FQVFFzDejcTfSgcym3qmu/7W2SqFUDgJ
+         y6WCH1mW5nwb3aE5jVZA/voXLH/1dYvWSsjOANqHhyolikbLIcUBPtceGiAAmpT7eSDQ
+         2ypHpGvdh2CjAAyycdcLRe2WudAqKrL72xdCB6wZu63EzrcI7HBSBwPo4A3VCDGWtnHQ
+         OH4xg9TIFrbtnLBEE1K5Q1k8WgvKt8WHyeCL44uNcgdQBgbw0GZwUn7EiYHflBfUayFa
+         v5Rw==
+X-Gm-Message-State: ACrzQf2BeMEYRkQojMMSQEN+Qg8yIJ75/9d+E9nECLTQaVcJ6tplrkiC
+        3WGuxLf0o116rfJjyUsXpYiumsYZL3iK0NpvUgA=
+X-Google-Smtp-Source: AMsMyM6svhdWHwsVSok7nd/DYfx/AvWce3fgqc1gk/UdXIiXhPbpT7LuwRvCH3HcAN+d4qNwS6LGenLwkYIVLrIWUbE=
+X-Received: by 2002:a05:6402:450c:b0:443:6279:774f with SMTP id
+ ez12-20020a056402450c00b004436279774fmr13995932edb.11.1663551467859; Sun, 18
+ Sep 2022 18:37:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <3e03b3ec-f733-06b1-3023-592801414ae8@talpey.com>
+References: <20220918235442.2981-1-ematsumiya@suse.de>
+In-Reply-To: <20220918235442.2981-1-ematsumiya@suse.de>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Mon, 19 Sep 2022 11:37:35 +1000
+Message-ID: <CAN05THRj6zPX6kf_rQCm5pA6Cfpb7z20_j9cEquW_b2ipUT4aQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: check if mid was deleted in async read callback
+To:     Enzo Matsumiya <ematsumiya@suse.de>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@cjr.nz,
+        nspmangalore@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Tom,
+LGTM
+reviewed-by me.
 
-On 09/17, Tom Talpey wrote:
-<snip>
->Wait, we process the message *before* we check the signature??? Apart
->from inspecting the MID and verifying it's a response to a request we
->made, there isn't a lot to cause such an error. See 3.2.5.1.3.
+Good catch about the race!
 
-You're right. By processing I actually meant "parsing" done right after
-receive, but even that doesn't have many failure spots.
-
-I found that the mids with STATUS_END_OF_FILE are being discarded,
-apparently as per 3.2.5.11:
-
-   If the Status field of the SMB2 header of the response indicates an
-   error, the client MUST return the received status code to the calling
-   application.
-
-What I found is that mid->callback() (smb2_readv_callback()) was being
-called from another thread, so even though the mid had been dequeued by
-mid->receive() earlier, smb2_readv_callback() was treating it as a
-valid (non-NULL), existing (mid_state == MID_RESPONSE_RECEIVED) mid.
-
- From this perspective, it makes sense to me to skip the signature
-verification when the mid wasn't supposed to be there in the first
-place, but if we consider that other messages with status !=
-STATUS_SUCCESS have their signatures correctly computed (apparently),
-then I'd guess there's something wrong with computing signatures for
-STATUS_END_OF_FILE responses.
-
-Sent this just now:
-https://lore.kernel.org/linux-cifs/20220918235442.2981-1-ematsumiya@suse.de/T/#u
-
-I'd appreciate your, and Cc'd folks', feedback.
-
-
-Cheers,
-
-Enzo
+On Mon, 19 Sept 2022 at 09:54, Enzo Matsumiya <ematsumiya@suse.de> wrote:
+>
+> There's a race when cifs_readv_receive() might dequeue the mid,
+> and mid->callback(), called from demultiplex thread, will try to
+> access it to verify the signature before the mid is actually
+> released/deleted.
+>
+> Currently the signature verification fails, but the verification
+> shouldn't have happened at all because the mid was deleted because
+> of an error, and hence not really supposed to be passed to
+> ->callback(). There are no further errors because the mid is
+> effectivelly gone by the end of the callback.
+>
+> This patch checks if the mid doesn't have the MID_DELETED flag set (by
+> dequeue_mid()) right before trying to verify the signature. According to
+> my tests, trying to check it earlier, e.g. after the ->receive() call in
+> cifs_demultiplex_thread, will fail most of the time as dequeue_mid()
+> might not have been called yet.
+>
+> This behaviour can be seen in xfstests generic/465, for example, where
+> mids with STATUS_END_OF_FILE (-ENODATA) are dequeued and supposed to be
+> discarded, but instead have their signature computed, but mismatched.
+>
+> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> ---
+>  fs/cifs/cifssmb.c | 2 +-
+>  fs/cifs/smb2pdu.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index addf3fc62aef..116f6afe33c6 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -1308,7 +1308,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+>         switch (mid->mid_state) {
+>         case MID_RESPONSE_RECEIVED:
+>                 /* result already set, check signature */
+> -               if (server->sign) {
+> +               if (server->sign && !(mid->mid_flags & MID_DELETED)) {
+>                         int rc = 0;
+>
+>                         rc = cifs_verify_signature(&rqst, server,
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 5da0b596c8a0..394996c4f729 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -4136,7 +4136,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+>                 credits.value = le16_to_cpu(shdr->CreditRequest);
+>                 credits.instance = server->reconnect_instance;
+>                 /* result already set, check signature */
+> -               if (server->sign && !mid->decrypted) {
+> +               if (server->sign && !mid->decrypted && !(mid->mid_flags & MID_DELETED)) {
+>                         int rc;
+>
+>                         rc = smb2_verify_signature(&rqst, server);
+> --
+> 2.35.3
+>
