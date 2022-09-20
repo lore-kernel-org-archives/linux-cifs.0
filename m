@@ -2,375 +2,172 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C508C54EE9
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Sep 2022 18:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7AFC6FA82
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Sep 2022 19:05:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbiITSKw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Sep 2022 14:10:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45900 "EHLO
+        id S230060AbiITTFB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 20 Sep 2022 15:05:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbiITSKu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Sep 2022 14:10:50 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79272C1B
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Sep 2022 11:10:49 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 1B1981F385;
-        Tue, 20 Sep 2022 18:10:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663697448; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=O7YGK2R/PU+QKSnwlCSkWPS3bfW2jGf9j8aPVylfTPg=;
-        b=WNyrYO4mdPpF8wBnG/2HkGbgOed3PhaHHtBxXb4D4IH/30ivoWgfh7MaGL8z5jc1LHNDR5
-        0Hz/u9URmvJ7Q/xacKtz5wsrrMx0avcU2If8iEuGfum+nhZChG9TT7wWu0hFMIsCPSqEkF
-        ir1ep70pQvGCD2A91p4doYBKNyx4j9c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663697448;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=O7YGK2R/PU+QKSnwlCSkWPS3bfW2jGf9j8aPVylfTPg=;
-        b=8YBdp+uIrHZ7GpN6ZbQVMkXQUxLdT3EM+P0NZXFtA/FlnDje3tMuoFN9zF4xEeXorP4Ywy
-        Iv+/IrdoHmoxpzBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 902B01346B;
-        Tue, 20 Sep 2022 18:10:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id PxKbFCcCKmOXdQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Tue, 20 Sep 2022 18:10:47 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com, kernel test robot <oliver.sang@intel.com>
-Subject: [PATCH v3] cifs: replace kfree() with kfree_sensitive() for sensitive data
-Date:   Tue, 20 Sep 2022 15:10:35 -0300
-Message-Id: <20220920181035.8845-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.35.3
-MIME-Version: 1.0
+        with ESMTP id S231126AbiITTE6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Sep 2022 15:04:58 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2083.outbound.protection.outlook.com [40.107.92.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABAB193CD
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Sep 2022 12:04:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bAuN4CErPJEY8HtmhRfCw4NmkehSE9YeXRfejUFGWnvAWGIL+vDgVYaAAPKPyf4cTx0CqZ7rP2wBj0ZL3SPk++O/weij7U4xtLrcvfsjCZndHxPaPJlKkpTabu2uWzVgpkdJ2YJ912HBi4qXjkNS46G2zti2rmX0CoSKcb8Y3rBXJ5r6IMXsNyO8hqyBxEcArvLZLT9uY2D81msrmrWN04BltaAG+QSbsuULxK6WE7hKUN9ULFXjg6+mFookhY5QhePJb8PjlbUaywvEwrSSgl+D0Ig3vLzaoUQlXzgxMbQvbsQedzShH83FrYTfumbZvGYN++Fo+KlV8f7aGxffYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LQHNY7qeBAS+ishr8lS9P7ZrlD2b6Ex8Ylr4yex9JMY=;
+ b=Rqu62CgcLBK3B1C8eJjBnC3VeP+nhhvfSddPUYWUSbCAM8voD/uJm7y48/2/pFrgl0x0K44CNbiq3Pc80hYHW8nrt1Xxr/ySDo6Cu3j0LAYO7H6s1iqcqTg4aUj9pGs0OW9dl3jheGLe/bRLmc+YdcVUdXNPJzK6E6sjD1V59zDnACMSKwn36hPrE2G88k/ihRKcykAaFWNqROjjKXxcaPFVvCnTV+Gnb5ooml6onrDL3pMIebnKLpMRafE4q6gyaKXTaoyXwC5rYey+Dsp/5klsch7sh27WYzyYqsRrxo9V5PvJa2EpGf3YSs80xr22avBSHq76JQ30qmApNco9Fw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from BYAPR01MB4438.prod.exchangelabs.com (2603:10b6:a03:98::12) by
+ MN2PR01MB5983.prod.exchangelabs.com (2603:10b6:208:188::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5654.14; Tue, 20 Sep 2022 19:04:54 +0000
+Received: from BYAPR01MB4438.prod.exchangelabs.com ([fe80::9219:212:e722:6c8])
+ by BYAPR01MB4438.prod.exchangelabs.com ([fe80::9219:212:e722:6c8%5]) with
+ mapi id 15.20.5632.021; Tue, 20 Sep 2022 19:04:54 +0000
+Message-ID: <6a8059e8-9757-afb7-8c06-b98a9877f30b@talpey.com>
+Date:   Tue, 20 Sep 2022 15:04:52 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH] cifs: verify signature only for valid responses
+Content-Language: en-US
+To:     Enzo Matsumiya <ematsumiya@suse.de>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@cjr.nz,
+        ronniesahlberg@gmail.com, nspmangalore@gmail.com
+References: <20220917020704.25181-1-ematsumiya@suse.de>
+ <bf09670b-df76-7fcc-2c8c-8b049f82d41b@talpey.com>
+ <20220917162827.g3c32bh62maw7da3@suse.de>
+ <3e03b3ec-f733-06b1-3023-592801414ae8@talpey.com>
+ <20220919002158.wgta4konh6c4wfjr@suse.de>
+From:   Tom Talpey <tom@talpey.com>
+In-Reply-To: <20220919002158.wgta4konh6c4wfjr@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MN2PR18CA0022.namprd18.prod.outlook.com
+ (2603:10b6:208:23c::27) To BYAPR01MB4438.prod.exchangelabs.com
+ (2603:10b6:a03:98::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR01MB4438:EE_|MN2PR01MB5983:EE_
+X-MS-Office365-Filtering-Correlation-Id: c4479d0c-b72f-4683-9a52-08da9b3b0085
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3D70tuC8JDNYdCb0/dyG181yNJdh8x2amjw1SHAA70cYZltWrsIBFV/JHcOSwI+/s4mmqDZSLc3HbaYIu90kDCXeApcozah1B/nuituMlFYldoJ8hPNIAZbgo/wqLwO6EBrQoE3GiNTDJr9oinifFn/sOdzHVY3zEPlcaazbvdEm63sFX3eyR6gtMKdcMkqsykZ1+Zl1Cpk57bP90bGsZ1MMntpq27ZWaii6NHiG9ctNzFJUxROQ4RBIr1Ouz9Ec+6KmsNF84BEHZZniGqq7p9W8dzwvg8qImKibYnpCpWWiDSoTVZx2d5BFvK/VMLUwwlHRADDkrCcYIJVOZBX2evPcnEZU71bDqhIIjgv+VJsnqyqadoxmM1YtxE3uvxsiiSstJe0NZlrXpT9dW5mr2BgzAyTHMOo8x2709IPfMkIbaK6xis9MZpBM3EFCfmzz4RDTPOiNa5lCt5XzhiRfSvSg7bWm5opFkJN7Ijdv2lN3Af2kWkyGSC3/9o48UCZSE0WAukjl+HOfiDUAGhTq1+ecOAXhCnB4LGMYvTbn6H9kjWeqFIBSlaUNF915wg7z1TAow8ZauttKzZTXSlARjwuzCsDJpkKao57LeW7VBWm36N7qP0pjxo1s9VF2AquJg52YbBmWULoEZwzNTf85vWYNNm1iLMciKEtaB9wo/N5EzSt1KpchHE26OJrQqT1jpDqVSSWTtbRoT9f11Bx74xVZ0TKiDN13GcwMVcT8ylhUcfLyY58RTtps+RYKbYoxaOpFAW9rtosT3MlvnU9UVVqAVm4KxHWHCHFR2c3buwZIeTe8/6eQICieLBhRJAfxC8nMhn2dk1FZ0nSNMtVYSg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR01MB4438.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(39830400003)(396003)(346002)(376002)(366004)(136003)(451199015)(86362001)(52116002)(53546011)(6506007)(8676002)(41300700001)(4326008)(66476007)(31696002)(8936002)(26005)(66556008)(966005)(6486002)(478600001)(36756003)(66946007)(6916009)(316002)(186003)(2906002)(15650500001)(2616005)(83380400001)(5660300002)(6512007)(38100700002)(38350700002)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SlpMNm5rZHJ0VklxUHlvNUJOWVgzbWs3cVl2TTgzc2I0NTlCTEJwY202a2RD?=
+ =?utf-8?B?cXBnb0dzUDhJUVN6aGc1bitXMjZlZUVVdEFUa3Q3aHlEaVNGdXNmNUV5YXdp?=
+ =?utf-8?B?RXJONWNlWWcvN2ZCd3pOcXRHVElOYUg4OVNjNjE2SnIyZ0FwMStwTHY2NytC?=
+ =?utf-8?B?bUxBaTMvWW5wakRMMSttYmpQK3BzWjdrbktEWjRQckRrMFJCVWM2ODk1ZVlI?=
+ =?utf-8?B?MmpRckdkbXo4L3U3Ymp4akYwVjhqcU5zcGp0T0R5bFRLQUswUTI4UHFyUFpG?=
+ =?utf-8?B?Y2JFbXRHb2NWZGN3em4wdUVzSzR1S0gvMVg1bUlMVVIrNzlNT3N5TjllOUhV?=
+ =?utf-8?B?OC83R1FERmk3RkZMU3pPc3AvYUxJSC8wblZXRVo3UFdmUXpIVFJRRDJUNjBN?=
+ =?utf-8?B?KzA4cFNDeWtKMjZQeFFyR2dpOEdrL2R4WEJ0Z2xvcEJ2WVFLOWhVejVMRlJx?=
+ =?utf-8?B?REJwbVdmc0RXUHZuQ0FTMlJjc09OSmhhblVTY2lwaUxVY0NWM3N4Y053b3BZ?=
+ =?utf-8?B?TkloUVlHMXZIR2FucThHWFlaQmY0c2Q3bVNxb2tkV0MxR2xXbHhSU0liUHNt?=
+ =?utf-8?B?MnU4QmdIR1hHUTBsS0VlWFRrV1lWMGpubWR2MElNWGJoU3ZYTGsydC83T3Fr?=
+ =?utf-8?B?eUY1WW9IVDBBTHBsSSs5SjAxTVF0RzIvRS9DREJwMGFhNjZ5YW1CYy9UZ3Zw?=
+ =?utf-8?B?Q1hZVEpLV3hYbGFCdjFrYjFqNzd2K0o4bHBTdEd2cFk3OHhXTjRjSmRUT3ZG?=
+ =?utf-8?B?bi9waWxESWZrRndwNXo4Z3B0dUdQUnF6QS9KNlpxNS9VYXNYazQxMGV2U3gx?=
+ =?utf-8?B?VC9LaFhYUDJrdTdLa0NPOWpFemZacXoxSFcwcGZsSVhER1ZET0gxVE11aFEr?=
+ =?utf-8?B?TGlFOHgxdjdZaVlRSHhOcktQOERYK0pLdnZWR2haaWJLNDcwUkw5ZUJXbVgv?=
+ =?utf-8?B?NnF6SWlkd2IzRDJxVENXS3N1WTBOeUU0NFlyZHo2bjVLdElFbW5QUVRFWlNB?=
+ =?utf-8?B?RzJjaHJ4YjRJYkU3ZWFrblJHdnZnYkw4NDRuazA5YzEyamp5VE9NRVBYZ1ZD?=
+ =?utf-8?B?OEJ0NjNZazhmVEVwUEFUelJUOGF3RHJXdDFYU1pwS0NoVnR4bmxVMGZFZXk0?=
+ =?utf-8?B?QkcxZldzT2YrblpnVmJUZXJ0OHVQc3k0YmRSb0UzOEJMNnEvbzhlNDlwYWEy?=
+ =?utf-8?B?NkZSY3NVcmZEWUxPY3N0bDBWK2ZYdDVPQmcyZ0ZJS0ZENHJFNnhJTWZKTXBZ?=
+ =?utf-8?B?RnFTY0l0NGxlU3ZjdGRwbm4wZ2JOVlZWUDh4VWhYVjZmSW1vNy9UblJqK0NJ?=
+ =?utf-8?B?MzI4NldlQnREMU9pdU9ZNHAzN2tPUnREVTlLbzVTdFRrdlh2UWxiM2ZaTFBI?=
+ =?utf-8?B?TnZOTmVSL1lTVnhIWWpuNDBYa0IxUTRLaC9TaEgyRXN5aHFKaXROOXVhdGlr?=
+ =?utf-8?B?eUd3N0cxbHFDeHVyUDBUOXpEQlY2THBHc1V0ZnhRVlpLcXBKMCtJRFlPTGdE?=
+ =?utf-8?B?ZUs3aENIdjQ5Z2NRcEJhallyVDhqKzZ0bHJQUCtvUCsyWXJxKzVIQjhiSE1p?=
+ =?utf-8?B?YkdqQ2Y3ZGYwMXZrR1JTSmRadGVXejFqSFJWV2taOFE2bzlCQkFqNGhrZlJZ?=
+ =?utf-8?B?bnE2S0haeW5pMXlWN3NaRWE2MHpyVDRIK3BGN0dzc0RtYVQzNk9qclpyd2dH?=
+ =?utf-8?B?bWJucVJKdEdMM0pGcUZjZ24wSzBsNzVuNkNFb1h6WlpRSzRvN08vR2tXOHYr?=
+ =?utf-8?B?RkhGUXhqdnpvelJUZFpGZWpuNEhyelhlT0FiV0xxTUcweWRMVWxqWHh5SWhC?=
+ =?utf-8?B?NjBOb251cjUwNXZDRUZDbFltRkY0Zk1CSTVLR2RETThtSUN0OXR1NTlBY1Iv?=
+ =?utf-8?B?YlV4QnlTWnFtNmVhbnpuNGpuK054K3NXTnkrWFlKbDJZTXExTXYzb3lSYkY3?=
+ =?utf-8?B?OWRMZlAzbHA4UGZySFJBZHpJMkRpZEdCc3NEOEMxZzdVd0VXMld3QmczUExj?=
+ =?utf-8?B?RzlzcmF2TzBXS2xOdGtRdzQ2K2NEb09wSndPSFVwY0V4dWV6eHJ1b3dRd2sx?=
+ =?utf-8?B?VzJoMWROODZ5bkZMeFhkNDBXM0RXNTc3QlJ3NG84Z0l5aExZRTVyc0tGbE1B?=
+ =?utf-8?Q?kXS4=3D?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c4479d0c-b72f-4683-9a52-08da9b3b0085
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR01MB4438.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2022 19:04:54.4696
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZCWmV7DZXIWKJzTly3lXwZt0X0+Kj35DQbwdYLZ53TPEbBLXDUC/l0THGFIWuUjv
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR01MB5983
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Replace kfree with kfree_sensitive, or prepend memzero_explicit() in
-other cases, when freeing sensitive material that could still be left
-in memory.
+On 9/18/2022 8:21 PM, Enzo Matsumiya wrote:
+> Hi Tom,
+> 
+> On 09/17, Tom Talpey wrote:
+> <snip>
+>> Wait, we process the message *before* we check the signature??? Apart
+>> from inspecting the MID and verifying it's a response to a request we
+>> made, there isn't a lot to cause such an error. See 3.2.5.1.3.
+> 
+> You're right. By processing I actually meant "parsing" done right after
+> receive, but even that doesn't have many failure spots.
+> 
+> I found that the mids with STATUS_END_OF_FILE are being discarded,
+> apparently as per 3.2.5.11:
+> 
+>    If the Status field of the SMB2 header of the response indicates an
+>    error, the client MUST return the received status code to the calling
+>    application.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Link: https://lore.kernel.org/r/202209201529.ec633796-oliver.sang@intel.com
----
-v3: fix use-after-free reported by kernel test robot (this UAF existed before this patch,
-    actually), adjust commit message slightly
-v2: remove unnecessary NULL checks before kfree_sensitive()
+I don't think it follows that the signature MUST NOT be validated.
+That processing is fundamental, and is independent of returning
+results. 3.2.5.1.3 has only three exceptions, and STATUS_END_OF_FILE
+isn't one of them.
 
- fs/cifs/cifsencrypt.c | 12 ++++++------
- fs/cifs/connect.c     |  6 +++---
- fs/cifs/fs_context.c  | 12 ++++++++++--
- fs/cifs/misc.c        |  2 +-
- fs/cifs/sess.c        | 24 +++++++++++++++---------
- fs/cifs/smb2ops.c     |  6 +++---
- fs/cifs/smb2pdu.c     | 19 ++++++++++++++-----
- 7 files changed, 52 insertions(+), 29 deletions(-)
+> What I found is that mid->callback() (smb2_readv_callback()) was being
+> called from another thread, so even though the mid had been dequeued by
+> mid->receive() earlier, smb2_readv_callback() was treating it as a
+> valid (non-NULL), existing (mid_state == MID_RESPONSE_RECEIVED) mid.
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 46f5718754f9..d848bc0aac27 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -679,7 +679,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- unlock:
- 	cifs_server_unlock(ses->server);
- setup_ntlmv2_rsp_ret:
--	kfree(tiblob);
-+	kfree_sensitive(tiblob);
- 
- 	return rc;
- }
-@@ -753,14 +753,14 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
- 		server->secmech.ccmaesdecrypt = NULL;
- 	}
- 
--	kfree(server->secmech.sdesccmacaes);
-+	kfree_sensitive(server->secmech.sdesccmacaes);
- 	server->secmech.sdesccmacaes = NULL;
--	kfree(server->secmech.sdeschmacsha256);
-+	kfree_sensitive(server->secmech.sdeschmacsha256);
- 	server->secmech.sdeschmacsha256 = NULL;
--	kfree(server->secmech.sdeschmacmd5);
-+	kfree_sensitive(server->secmech.sdeschmacmd5);
- 	server->secmech.sdeschmacmd5 = NULL;
--	kfree(server->secmech.sdescmd5);
-+	kfree_sensitive(server->secmech.sdescmd5);
- 	server->secmech.sdescmd5 = NULL;
--	kfree(server->secmech.sdescsha512);
-+	kfree_sensitive(server->secmech.sdescsha512);
- 	server->secmech.sdescsha512 = NULL;
- }
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 7ae6f2c08153..a43d5686c302 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -311,7 +311,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
- 	}
- 	server->sequence_number = 0;
- 	server->session_estab = false;
--	kfree(server->session_key.response);
-+	kfree_sensitive(server->session_key.response);
- 	server->session_key.response = NULL;
- 	server->session_key.len = 0;
- 	server->lstrp = jiffies;
-@@ -1580,7 +1580,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
- 
- 	cifs_crypto_secmech_release(server);
- 
--	kfree(server->session_key.response);
-+	kfree_sensitive(server->session_key.response);
- 	server->session_key.response = NULL;
- 	server->session_key.len = 0;
- 	kfree(server->hostname);
-@@ -4134,7 +4134,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
- 		if (ses->auth_key.response) {
- 			cifs_dbg(FYI, "Free previous auth_key.response = %p\n",
- 				 ses->auth_key.response);
--			kfree(ses->auth_key.response);
-+			kfree_sensitive(ses->auth_key.response);
- 			ses->auth_key.response = NULL;
- 			ses->auth_key.len = 0;
- 		}
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index 0e13dec86b25..45119597c765 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -791,6 +791,13 @@ do {									\
- 	cifs_sb->ctx->field = NULL;					\
- } while (0)
- 
-+#define STEAL_STRING_SENSITIVE(cifs_sb, ctx, field)			\
-+do {									\
-+	kfree_sensitive(ctx->field);					\
-+	ctx->field = cifs_sb->ctx->field;				\
-+	cifs_sb->ctx->field = NULL;					\
-+} while (0)
-+
- static int smb3_reconfigure(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-@@ -811,7 +818,7 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	STEAL_STRING(cifs_sb, ctx, UNC);
- 	STEAL_STRING(cifs_sb, ctx, source);
- 	STEAL_STRING(cifs_sb, ctx, username);
--	STEAL_STRING(cifs_sb, ctx, password);
-+	STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
- 	STEAL_STRING(cifs_sb, ctx, domainname);
- 	STEAL_STRING(cifs_sb, ctx, nodename);
- 	STEAL_STRING(cifs_sb, ctx, iocharset);
-@@ -1162,7 +1169,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		}
- 		break;
- 	case Opt_pass:
--		kfree(ctx->password);
-+		kfree_sensitive(ctx->password);
- 		ctx->password = NULL;
- 		if (strlen(param->string) == 0)
- 			break;
-@@ -1470,6 +1477,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 	return 0;
- 
-  cifs_parse_mount_err:
-+	kfree_sensitive(ctx->password);
- 	return -EINVAL;
- }
- 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 87f60f736731..85109a9a2146 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -1119,7 +1119,7 @@ cifs_alloc_hash(const char *name,
- void
- cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
- {
--	kfree(*sdesc);
-+	kfree_sensitive(*sdesc);
- 	*sdesc = NULL;
- 	if (*shash)
- 		crypto_free_shash(*shash);
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 3af3b05b6c74..f1c3c6d9146c 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -1213,6 +1213,12 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
- static void
- sess_free_buffer(struct sess_data *sess_data)
- {
-+	int i;
-+
-+	/* zero the session data before freeing, as it might contain sensitive info (keys, etc) */
-+	for (i = 0; i < 3; i++)
-+		if (sess_data->iov[i].iov_base)
-+			memzero_explicit(sess_data->iov[i].iov_base, sess_data->iov[i].iov_len);
- 
- 	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
- 	sess_data->buf0_type = CIFS_NO_BUFFER;
-@@ -1374,7 +1380,7 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
- 	sess_free_buffer(sess_data);
--	kfree(ses->auth_key.response);
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
- }
- 
-@@ -1513,7 +1519,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
- 	sess_free_buffer(sess_data);
--	kfree(ses->auth_key.response);
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
- }
- 
-@@ -1648,7 +1654,7 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
- 	rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
- 
- out_free_ntlmsspblob:
--	kfree(ntlmsspblob);
-+	kfree_sensitive(ntlmsspblob);
- out:
- 	sess_free_buffer(sess_data);
- 
-@@ -1658,9 +1664,9 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
- 	}
- 
- 	/* Else error. Cleanup */
--	kfree(ses->auth_key.response);
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
--	kfree(ses->ntlmssp);
-+	kfree_sensitive(ses->ntlmssp);
- 	ses->ntlmssp = NULL;
- 
- 	sess_data->func = NULL;
-@@ -1759,7 +1765,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
- 	}
- 
- out_free_ntlmsspblob:
--	kfree(ntlmsspblob);
-+	kfree_sensitive(ntlmsspblob);
- out:
- 	sess_free_buffer(sess_data);
- 
-@@ -1767,9 +1773,9 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
- 		rc = sess_establish_session(sess_data);
- 
- 	/* Cleanup */
--	kfree(ses->auth_key.response);
-+	kfree_sensitive(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
--	kfree(ses->ntlmssp);
-+	kfree_sensitive(ses->ntlmssp);
- 	ses->ntlmssp = NULL;
- 
- 	sess_data->func = NULL;
-@@ -1845,7 +1851,7 @@ int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
- 	rc = sess_data->result;
- 
- out:
--	kfree(sess_data);
-+	kfree_sensitive(sess_data);
- 	return rc;
- }
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 421be43af425..5094336cade6 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -4410,11 +4410,11 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
- 	if (!rc && enc)
- 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
- 
--	kfree(iv);
-+	kfree_sensitive(iv);
- free_sg:
--	kfree(sg);
-+	kfree_sensitive(sg);
- free_req:
--	kfree(req);
-+	kfree_sensitive(req);
- 	return rc;
- }
- 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6352ab32c7e7..722ebff05759 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1345,6 +1345,13 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
- static void
- SMB2_sess_free_buffer(struct SMB2_sess_data *sess_data)
- {
-+	int i;
-+
-+	/* zero the session data before freeing, as it might contain sensitive info (keys, etc) */
-+	for (i = 0; i < 2; i++)
-+		if (sess_data->iov[i].iov_base)
-+			memzero_explicit(sess_data->iov[i].iov_base, sess_data->iov[i].iov_len);
-+
- 	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
- 	sess_data->buf0_type = CIFS_NO_BUFFER;
- }
-@@ -1477,6 +1484,8 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
- out_put_spnego_key:
- 	key_invalidate(spnego_key);
- 	key_put(spnego_key);
-+	if (rc)
-+		kfree_sensitive(ses->auth_key.response);
- out:
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
-@@ -1573,7 +1582,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
- 	}
- 
- out:
--	kfree(ntlmssp_blob);
-+	memzero_explicit(ntlmssp_blob, blob_length);
- 	SMB2_sess_free_buffer(sess_data);
- 	if (!rc) {
- 		sess_data->result = 0;
-@@ -1581,7 +1590,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
- 		return;
- 	}
- out_err:
--	kfree(ses->ntlmssp);
-+	kfree_sensitive(ses->ntlmssp);
- 	ses->ntlmssp = NULL;
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
-@@ -1657,9 +1666,9 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
- 	}
- #endif
- out:
--	kfree(ntlmssp_blob);
-+	memzero_explicit(ntlmssp_blob, blob_length);
- 	SMB2_sess_free_buffer(sess_data);
--	kfree(ses->ntlmssp);
-+	kfree_sensitive(ses->ntlmssp);
- 	ses->ntlmssp = NULL;
- 	sess_data->result = rc;
- 	sess_data->func = NULL;
-@@ -1737,7 +1746,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
- 		cifs_server_dbg(VFS, "signing requested but authenticated as guest\n");
- 	rc = sess_data->result;
- out:
--	kfree(sess_data);
-+	kfree_sensitive(sess_data);
- 	return rc;
- }
- 
--- 
-2.35.3
+That certainly sounds like another bug. Why are two threads processing
+the MID? Is this an async response?
 
+>  From this perspective, it makes sense to me to skip the signature
+> verification when the mid wasn't supposed to be there in the first
+
+That's not what is documented. Only if the MID is 0xFFFFFFFFFFFFFFFF.
+
+> place, but if we consider that other messages with status !=
+> STATUS_SUCCESS have their signatures correctly computed (apparently),
+> then I'd guess there's something wrong with computing signatures for
+> STATUS_END_OF_FILE responses.
+
+I agree.
+
+Tom.
+
+> Sent this just now:
+> https://lore.kernel.org/linux-cifs/20220918235442.2981-1-ematsumiya@suse.de/T/#u
+> 
+> I'd appreciate your, and Cc'd folks', feedback.
+> 
+> 
+> Cheers,
+> 
+> Enzo
+> 
