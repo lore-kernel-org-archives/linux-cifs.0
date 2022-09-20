@@ -2,113 +2,128 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA902C6FA82
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Sep 2022 04:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6365ECAAD8
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Sep 2022 13:21:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229875AbiITEol (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Sep 2022 00:44:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54828 "EHLO
+        id S229801AbiITNVB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 20 Sep 2022 09:21:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbiITEoj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Sep 2022 00:44:39 -0400
-Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FFE860D6;
-        Mon, 19 Sep 2022 21:44:38 -0700 (PDT)
-Received: by mail-vs1-xe2a.google.com with SMTP id j17so1826681vsp.5;
-        Mon, 19 Sep 2022 21:44:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=tXGR021bV9JvSSgG+0qjXLX+nPkxl9Ea7FWm8xT3kpM=;
-        b=acpN0oyt9/ziZ3d4ynVlyaHAIuh/IKVIM8X1vEenO3z1hxuEMJZXPJ7EfBbdEI8u9u
-         3eLKhisalgomCaHvIusJ10jgNN3GCdWIPPY3QpUS9+rvPSth5RdT6rLK74DZC0+P9Jaj
-         opagpi2WjhxCjZpBsEjWivdXeehF9pEFnHC2+79adWFsi0QuBddWZFtfd+wDorjq0MDY
-         2abTgsuXukf10juUhOIe+Xy9r4Uw9EekghOFVGJN53X7pHPJfU96QKKOv3ABjTR7ZHPn
-         mmZuutMjn/tRkA6cn5TZ/AHEU36Lws93V0PDkX9OhpBVf5asmjNNJc5rHyxZq7/4vF4r
-         +VfA==
+        with ESMTP id S230133AbiITNVB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Sep 2022 09:21:01 -0400
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E90C3DBE8
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Sep 2022 06:21:00 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id iw17so2393619plb.0
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Sep 2022 06:21:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=tXGR021bV9JvSSgG+0qjXLX+nPkxl9Ea7FWm8xT3kpM=;
-        b=7z2REITvCwoVjijKMgwt4poJWw4KNU6w+zibZrn2eL1wre4BtnlOuqrwKUn614Jl/9
-         py82dEwih/LxHLRFQhwCAMoIfgL9Z8AcORmgHkQYQDqM7DnpAOPdPfhv29Aygqa8tmBn
-         G6yL0D4wgE00X5GTCVtV0fudqISyz/x2d8UfVOOgk5V69ql6Lm5E5wVj7DEFR4hS6VYb
-         bREGnLXltsV9hLFeIEVgzQBAV/XieRC4Tj9s1K9kPiBEPnxeZqyPwRwGlB+ZajHdn4zi
-         Lgv+2wXf6c+APZCsBKGmNphGxjh5KTtLvPrhpG3wTXe5+GWgkKLg94soZB4mapvJQ4wL
-         KRNQ==
-X-Gm-Message-State: ACrzQf3okrxamZSGpT76Ayl7I6/OxFGKFNNbxOBoJyX7YiWuzJ1mwGu3
-        vSuYrvZV7EArzcrg2dPoqfeXN+ThsP+tKrdR6cU=
-X-Google-Smtp-Source: AMsMyM5CXaqr9hSXGr5kLhzp1MN0GT0z+jDsgF0FIARd8gYBGzqZ2IXjDZZWg7/Q8KnTyQ7DLUW4GGPO7VEmdC241Sw=
-X-Received: by 2002:a05:6102:215a:b0:39a:c2c6:cc5d with SMTP id
- h26-20020a056102215a00b0039ac2c6cc5dmr5850352vsg.61.1663649077616; Mon, 19
- Sep 2022 21:44:37 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=OtTNvzDwdt8zM14tNoGDhevPuRdtk44YBNelmuHNpBI=;
+        b=1ZS03eSXzjDw0GG3SsP4UMSnlMKjZ0w8rFma74NmSaCT48s5EiHrpblnNkWpb3eDNg
+         OJ8/Y1+SU7kPsP9PBfgnnMYtyBvbI1Q8oHooMCMATcofrTnyOzsS4x2KkSwsyvNPizPr
+         cpUTriePDfZWBzDa62HvZvqAAGDCnZXyR+5ld2Sty+g70Wh/yzc8hQNWlSmtuIPsYo7p
+         2r/YJLtNwDNbVCl/z6r330Q5ZCdvHxNe3sFWu9IRf+f6SgIFn7/UNUkNg4Co+hvm3wAj
+         ow58H+Oy0PDsd16BDikXXw+6V/4VZ3/RHQOntxLnwEaURUupzZf4oqN+zPH2QlEhYoq2
+         O6XQ==
+X-Gm-Message-State: ACrzQf04Tg5frP+EOgOCvyCVpCgKWLO+QfUJppZFQ1oEqR+Wr7xJFM0k
+        F5zfKf+TXE5dE06k54iq/aV2YQVaoOI=
+X-Google-Smtp-Source: AMsMyM7367ENU1ndc6eyPGliPbY6jgekspR//11nh8FW+mbKUSihr1y7ZnwdcM1LC4n7fUrWdiovYg==
+X-Received: by 2002:a17:90a:db04:b0:203:6731:caf8 with SMTP id g4-20020a17090adb0400b002036731caf8mr3988361pjv.190.1663680059504;
+        Tue, 20 Sep 2022 06:20:59 -0700 (PDT)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id ix18-20020a170902f81200b001767f6f04efsm1360851plb.242.2022.09.20.06.20.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Sep 2022 06:20:58 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH 1/3] ksmbd: change security id to the one samba used for posix extension
+Date:   Tue, 20 Sep 2022 22:20:43 +0900
+Message-Id: <20220920132045.5055-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220920043202.503191-1-lsahlber@redhat.com>
-In-Reply-To: <20220920043202.503191-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 19 Sep 2022 23:44:26 -0500
-Message-ID: <CAH2r5mtY6fLkmZLMBGJwGzoSn=r36N++bZc=WyYJdkhag3HBZw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: destage dirty pages before re-reading them for cache=none
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>, stable@vger.kernel.org,
-        Paulo Alcantara <pc@cjr.nz>,
-        Enzo Matsumiya <ematsumiya@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending testing
+Samba set SIDOWNER and SIDUNIX_GROUP in create posix context and
+set SIDUNIX_USER/GROUP in other sids for posix extension.
+This patch change security id to the one samba used.
 
-Will be curious if this impacts performance of any of the buildbot
-tests and also curious if it addresses any of the buildbot tests which
-fail and are currently skipped
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/oplock.c  | 6 +++---
+ fs/ksmbd/smb2pdu.c | 4 ++--
+ fs/ksmbd/smb2pdu.h | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-On Mon, Sep 19, 2022 at 11:32 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> This is the opposite case of kernel bugzilla 216301.
-> If we mmap a file using cache=none and then proceed to update the mmapped
-> area these updates are not reflected in a later pread() of that part of the
-> file.
-> To fix this we must first destage any dirty pages in the range before
-> we allow the pread() to proceed.
->
-> Cc: stable@vger.kernel.org
-> Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/file.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 6f38b134a346..7d756721e1a6 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -4271,6 +4271,15 @@ static ssize_t __cifs_readv(
->                 len = ctx->len;
->         }
->
-> +       if (direct) {
-> +               rc = filemap_write_and_wait_range(file->f_inode->i_mapping,
-> +                                                 offset, offset + len - 1);
-> +               if (rc) {
-> +                       kref_put(&ctx->refcount, cifs_aio_ctx_release);
-> +                       return -EAGAIN;
-> +               }
-> +       }
-> +
->         /* grab a lock here due to read response handlers can access ctx */
->         mutex_lock(&ctx->aio_mutex);
->
-> --
-> 2.35.3
->
-
-
+diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
+index 2e56dac1fa6e..c26f02086783 100644
+--- a/fs/ksmbd/oplock.c
++++ b/fs/ksmbd/oplock.c
+@@ -1616,7 +1616,7 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
+ 	memset(buf, 0, sizeof(struct create_posix_rsp));
+ 	buf->ccontext.DataOffset = cpu_to_le16(offsetof
+ 			(struct create_posix_rsp, nlink));
+-	buf->ccontext.DataLength = cpu_to_le32(52);
++	buf->ccontext.DataLength = cpu_to_le32(56);
+ 	buf->ccontext.NameOffset = cpu_to_le16(offsetof
+ 			(struct create_posix_rsp, Name));
+ 	buf->ccontext.NameLength = cpu_to_le16(POSIX_CTXT_DATA_LEN);
+@@ -1642,9 +1642,9 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
+ 	buf->reparse_tag = cpu_to_le32(fp->volatile_id);
+ 	buf->mode = cpu_to_le32(inode->i_mode);
+ 	id_to_sid(from_kuid_munged(&init_user_ns, vfsuid_into_kuid(vfsuid)),
+-		  SIDNFS_USER, (struct smb_sid *)&buf->SidBuffer[0]);
++		  SIDOWNER, (struct smb_sid *)&buf->SidBuffer[0]);
+ 	id_to_sid(from_kgid_munged(&init_user_ns, vfsgid_into_kgid(vfsgid)),
+-		  SIDNFS_GROUP, (struct smb_sid *)&buf->SidBuffer[20]);
++		  SIDUNIX_GROUP, (struct smb_sid *)&buf->SidBuffer[28]);
+ }
+ 
+ /*
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index f33a04e9e458..bc6c7ce17ea8 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -3573,9 +3573,9 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+ 		if (d_info->hide_dot_file && d_info->name[0] == '.')
+ 			posix_info->DosAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
+ 		id_to_sid(from_kuid_munged(&init_user_ns, ksmbd_kstat->kstat->uid),
+-			  SIDNFS_USER, (struct smb_sid *)&posix_info->SidBuffer[0]);
++			  SIDUNIX_USER, (struct smb_sid *)&posix_info->SidBuffer[0]);
+ 		id_to_sid(from_kgid_munged(&init_user_ns, ksmbd_kstat->kstat->gid),
+-			  SIDNFS_GROUP, (struct smb_sid *)&posix_info->SidBuffer[20]);
++			  SIDUNIX_GROUP, (struct smb_sid *)&posix_info->SidBuffer[16]);
+ 		memcpy(posix_info->name, conv_name, conv_len);
+ 		posix_info->name_len = cpu_to_le32(conv_len);
+ 		posix_info->NextEntryOffset = cpu_to_le32(next_entry_offset);
+diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
+index af455278d005..32c525bf790a 100644
+--- a/fs/ksmbd/smb2pdu.h
++++ b/fs/ksmbd/smb2pdu.h
+@@ -158,7 +158,7 @@ struct create_posix_rsp {
+ 	__le32 nlink;
+ 	__le32 reparse_tag;
+ 	__le32 mode;
+-	u8 SidBuffer[40];
++	u8 SidBuffer[44];
+ } __packed;
+ 
+ struct smb2_buffer_desc_v1 {
+@@ -439,7 +439,7 @@ struct smb2_posix_info {
+ 	__le32 HardLinks;
+ 	__le32 ReparseTag;
+ 	__le32 Mode;
+-	u8 SidBuffer[40];
++	u8 SidBuffer[32];
+ 	__le32 name_len;
+ 	u8 name[1];
+ 	/*
 -- 
-Thanks,
+2.25.1
 
-Steve
