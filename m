@@ -2,105 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E12C54EE9
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Sep 2022 13:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB04C6FA8E
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Sep 2022 14:43:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbiITNVJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Sep 2022 09:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57212 "EHLO
+        id S230168AbiITOnj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 20 Sep 2022 10:43:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230238AbiITNVI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Sep 2022 09:21:08 -0400
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53A7B4B4B4
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Sep 2022 06:21:06 -0700 (PDT)
-Received: by mail-pl1-f172.google.com with SMTP id f23so2345410plr.6
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Sep 2022 06:21:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=1aawr18KpuWrUUAhjpSuzcNQ554sgmWs/WMiARBkcqs=;
-        b=2RPOluo3HVQ/f3yHNAfNWj6nvwdGWurxAopqL8QOc5P9cNPhkGzjmF2+aBxkyyThZy
-         9aTCYOX8WfLKs5EWV3Whf93c8hl8DeVNm0vdyWIwH8H3LspQBp1f5J4VMHuHtvSO1jer
-         buXpkccNzI8PVNRU/OoqyIiU2RmyTykAw5EzFFed8B/kldgVELrGbOquwefZREKcHIKK
-         rzqYNccky35w/LSwrK611mjBpfrZ3P+Y/cgWrWzZLyNhFkH/6BR/Ekk6x5HsbYUNurOy
-         zIraxvVCVkeL/3UTvdxsNL+4OGC65a5a+XSO+O23vQmFSSUuP9x2BCtCzDaQv17x2Brw
-         0U8w==
-X-Gm-Message-State: ACrzQf2Jw4dGGUN5CeOonupoC0AtTTFNJZbyohkbcjRXYaCi110LTR7V
-        27z4M08ZOa89lzJ32yaO114d6N7dmvY=
-X-Google-Smtp-Source: AMsMyM41e/co2s79H6hGflxZuuMfhoazU+IDqoC8ir6l6E++ICM7+LSNDZl9ia6I/OZjMqLVB8/qpg==
-X-Received: by 2002:a17:902:784d:b0:178:6946:3ff7 with SMTP id e13-20020a170902784d00b0017869463ff7mr4798357pln.133.1663680065582;
-        Tue, 20 Sep 2022 06:21:05 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id ix18-20020a170902f81200b001767f6f04efsm1360851plb.242.2022.09.20.06.21.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Sep 2022 06:21:05 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 3/3] ksmbd: fill sids in SMB_FIND_FILE_POSIX_INFO response
-Date:   Tue, 20 Sep 2022 22:20:45 +0900
-Message-Id: <20220920132045.5055-3-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220920132045.5055-1-linkinjeon@kernel.org>
-References: <20220920132045.5055-1-linkinjeon@kernel.org>
+        with ESMTP id S230193AbiITOn3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Sep 2022 10:43:29 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6289353D1D
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Sep 2022 07:43:27 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 44C7821AFA;
+        Tue, 20 Sep 2022 14:43:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1663685005; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bh5JhODSYX5KQDRBD9gBYyoTJZvU7Fw2I7XOBdRGgBc=;
+        b=pb0CKmYhXfDIZlHh+GCD4WBcI1ygj1WbIttk+OuT+ALOIMcFyS48FY9hwZu/zk5C5UMqZI
+        /bHX1pGaUkTftQVyyDwVs+oPUTZpRvIG8Dzf9+7vwvrY/Vj4g1ofnKwBR3Cfi32sxbFFD5
+        8erv518dvsDd0TtE2aZg8VDYrkE1oCk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1663685005;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bh5JhODSYX5KQDRBD9gBYyoTJZvU7Fw2I7XOBdRGgBc=;
+        b=nitLZjRqen8ug3dfExc4IABFQBZZFUwd6c40nhXZNfTIzN1gekg82V/fcJ2cziiO00gYPG
+        6BSreDuCReRQCbDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AAFF413ABB;
+        Tue, 20 Sep 2022 14:43:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id gLDBGozRKWONHQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Tue, 20 Sep 2022 14:43:24 +0000
+Date:   Tue, 20 Sep 2022 11:43:22 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     kernel test robot <oliver.sang@intel.com>
+Cc:     lkp@lists.01.org, lkp@intel.com, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, smfrench@gmail.com, pc@cjr.nz,
+        ronniesahlberg@gmail.com, nspmangalore@gmail.com
+Subject: Re: [cifs]  c9ba95b978:
+ BUG:KASAN:use-after-free_in_SMB2_sess_free_buffer[cifs]
+Message-ID: <20220920144322.tkd6eeezfeesva3r@suse.de>
+References: <20220918033619.16522-1-ematsumiya@suse.de>
+ <202209201529.ec633796-oliver.sang@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <202209201529.ec633796-oliver.sang@intel.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This patch fill missing sids in SMB_FIND_FILE_POSIX_INFO response.
+On 09/20, kernel test robot wrote:
+>
+>Greeting,
+>
+>FYI, we noticed the following commit (built with gcc-11):
+>
+>commit: c9ba95b978808970633b0221b70c5255ebc8630e ("[PATCH v2] cifs: replace kfree() with kfree_sensitive() for sensitive data")
+>url: https://github.com/intel-lab-lkp/linux/commits/Enzo-Matsumiya/cifs-replace-kfree-with-kfree_sensitive-for-sensitive-data/20220918-113758
+>base: git://git.samba.org/sfrench/cifs-2.6.git for-next
+>patch link: https://lore.kernel.org/linux-cifs/20220918033619.16522-1-ematsumiya@suse.de
+>
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/ksmbd/smb2pdu.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+snip
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 5c797cc09494..9dd6033bc4de 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -4717,6 +4717,9 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
- {
- 	struct smb311_posix_qinfo *file_info;
- 	struct inode *inode = file_inode(fp->filp);
-+	struct user_namespace *user_ns = file_mnt_user_ns(fp->filp);
-+	vfsuid_t vfsuid = i_uid_into_vfsuid(user_ns, inode);
-+	vfsgid_t vfsgid = i_gid_into_vfsgid(user_ns, inode);
- 	u64 time;
- 
- 	file_info = (struct smb311_posix_qinfo *)rsp->Buffer;
-@@ -4734,9 +4737,15 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
- 	file_info->HardLinks = cpu_to_le32(inode->i_nlink);
- 	file_info->Mode = cpu_to_le32(inode->i_mode & 0777);
- 	file_info->DeviceId = cpu_to_le32(inode->i_rdev);
-+
-+	id_to_sid(from_kuid_munged(&init_user_ns, vfsuid_into_kuid(vfsuid)),
-+		  SIDUNIX_USER, (struct smb_sid *)&file_info->Sids[0]);
-+	id_to_sid(from_kgid_munged(&init_user_ns, vfsgid_into_kgid(vfsgid)),
-+		  SIDUNIX_GROUP, (struct smb_sid *)&file_info->Sids[16]);
-+
- 	rsp->OutputBufferLength =
--		cpu_to_le32(sizeof(struct smb311_posix_qinfo));
--	inc_rfc1001_len(rsp_org, sizeof(struct smb311_posix_qinfo));
-+		cpu_to_le32(sizeof(struct smb311_posix_qinfo) + 32);
-+	inc_rfc1001_len(rsp_org, sizeof(struct smb311_posix_qinfo) + 32);
- 	return 0;
- }
- 
-@@ -4858,7 +4867,7 @@ static int smb2_get_info_file(struct ksmbd_work *work,
- 			rc = -EOPNOTSUPP;
- 		} else {
- 			rc = find_file_posix_info(rsp, fp, work->response_buf);
--			file_infoclass_size = sizeof(struct smb311_posix_qinfo);
-+			file_infoclass_size = sizeof(struct smb311_posix_qinfo) + 32;
- 		}
- 		break;
- 	default:
--- 
-2.25.1
+>If you fix the issue, kindly add following tag
+>| Reported-by: kernel test robot <oliver.sang@intel.com>
+>| Link: https://lore.kernel.org/r/202209201529.ec633796-oliver.sang@intel.com
 
+snip
+
+>kern  :info  : [   81.927031] CIFS: Attempting to mount \\localhost\fs
+>kern  :err   : [   81.949059] ==================================================================
+>kern  :err   : [   81.956956] BUG: KASAN: use-after-free in SMB2_sess_free_buffer+0xba/0x1c0 [cifs]
+>kern  :err   : [   81.965177] Write of size 44 at addr ffff8881219a3c00 by task mount.cifs/1530
+
+Will send v2.
+
+
+Enzo
