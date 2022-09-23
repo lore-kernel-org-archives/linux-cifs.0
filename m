@@ -2,170 +2,130 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BD9C6FA8B
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Sep 2022 15:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B72C07E9D
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Sep 2022 21:54:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231864AbiIWPW6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 23 Sep 2022 11:22:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39366 "EHLO
+        id S229949AbiIWVyg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Sep 2022 17:54:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231239AbiIWPW5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Sep 2022 11:22:57 -0400
-Received: from sonic302-27.consmr.mail.ne1.yahoo.com (sonic302-27.consmr.mail.ne1.yahoo.com [66.163.186.153])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68DC514356A
-        for <linux-cifs@vger.kernel.org>; Fri, 23 Sep 2022 08:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1663946565; bh=3VxwWnzu7YWE2ryyAcLAKetejBc3WVJs8HS6TEP/ktY=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=CU8Iml972Z56daluGOYcseQmreRbeZr8dXTbliicocZgcWDEQgojNYmHmJ6AXown7Ei5OvngpjCBJRrE13VGaZ+gwnpUgRX15N1BonAuE4a+iaM3GzQUzUsc7iCR91zMs8DQcVfw+dZzOuA3DSJj1aaCqMDGGNbU6UawzuRaKvQE0bBm8z8Jk3OVVlFkY69y7Yg5LuB/+O34L5gbOEOyVEW1tK3oBALQDRsG16SIp9Ae2Ay0Dgb0giddIQX+r13S7ucou+3omNNG50LXSNdTf6h+VHHxkTtuHjVKClAp5fZxMrTkU5Ti7wg4L4+LT4OV/4i4nQJoCCZyeXyjCuKFIA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1663946565; bh=KrMBHPaTvDwPP/yPGSrrf2Kkwv910eTOotFf7kLOYAP=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=VY8mWtAKt6DzcnXqiGEHZIFPYs8k7m8RHMOc1FqxAyRYIBawEPJ5Aj8d1lKIKlOATnEwgpto4j3ZA4opcw4BCo0L1mMmN9rv9wGOv7s2ZyI1SGwD6qpPJ0y8zVpQsyAyxjfRZJwi5Clb0Qi00afn4bHsixarzgNlvsVH+wlQN4V/ZIw74bqWXEolhd9earsmZxe/oja+yfag4mmp4RgH8T9l/qpNwIrY4nhUqW5b95P3121H3Y0mUEiI3704bS7QdCPnvKtOQOqzGB9nsscsRDlLEg845p2HULy/6Jahn/B4REdsCw1Ey7lmVQd0KALqiYaU0feoIbFc5z6L5wUtpw==
-X-YMail-OSG: UjubnTkVM1mv9.QXvDcRi9OOYAviJWPQcwa1QIvH8.gB7dBfClvmLaoIANx.llx
- oJFDDi2EbFvcAYM59VTvVVvRdjbxWFKjc9O2H1n.Ts7NG2CZQLMGqwOA3f0H1NZlvSMva.3974MO
- VAla3WEp2g6XPkcxaE3I.aZP1Hf_FIlbiXIdTSBJ7W2nFyTPCmel0ouF9hGIucM1HOIBvTppMz1y
- j9oPl4bqoKFFY_Te3oRjO41damiSx_i4mD2D4WAHGJAcyLa4rEvhP1Wm7w71ipRf_Smgxvr0mQGd
- 1WjqHwjpv3CfzoAmrRq5QRgfhXw_EYw1HcBflGEBxT4qQKrBsd2rlJz5WCpo6sCd4.EmW93jUAB7
- iTKw9ErbOtEc5ATv7yXGrUsc_Aejl3UHkSUVSBo5F_aRDlSmIs9OptGgqGjR4XzBFwOFMCqtt5EB
- kHk7Ia0vCgPGp83fdhR0TJBw1kEw0.f7WHPPdfy8i5CaHoACBO6xQNAq93oiAWnhSecD.OVrrx_U
- uc89XSFAdAxj2pDZAkm_kA0E3u2EjkWOUmkUTAD1zPAqmJEJaDkKgw_W0OJ8fXYYAl1Jeyjfn5l6
- Wj6pMWa1v6lDIXyuQtL29TrX2HzXMVc7Su7kDhq2RJjlbUzUVoFIZ7C8_6eYic28rVzK45jadMJ8
- bdIOqzXOkL.ljrV4gSQEt6WeQTCrvUvp1SkdLFPHzKSMMqiGeXhjxQ4RdKqS0Lq4nxLKFF.HYNW5
- Uarj3f3928vl72a3fWAPhOBTTtO2.3pWnwUq5zEIYUpzcxKBdBC9ExBsB1gBAnOiNquM73L2QnyD
- dP0RefWJdXpvFHmsbTPwfF1aJedBJluwAnYKyQx.ajNaqqRXtUmDkwbGTbZtBL3Px4SRocx8.fRV
- cglAoaHh_mgkUevrqhiuVBVL9DeWGLRHZlGixnkMGanE_Uh4iN.H6WZIOgRY2byx4KZ.c6GiycSK
- bvMDiEDiW2Z8qb29PUrhipbBCLAiNv.WenV2pPtfIZ0xhbsFMMiHyz5ElnQRdAL4lqucB2Xt7Wx6
- SvRsBK0IBiGm_pdNNHm8a_3.IPDYzW8B2KvS.nE4r2YjInQf4j62Vl7JJbEwYrURGXlqbvqTG7eh
- aKXYgSOLFUOkOwLzk4_4J31L2cOevqTd1f4_iFIiSzGgCrx8QuUMx_9_qByLN6PmpLm2cmKvPUvk
- 24.ReRielL8Ane5WYhuXdi4VJKknYuGur.QwvGktBtZaIvFvCQjn2k0FEpDRN2SJzeGR4G1ZvOKv
- GVgbbT5oHjzdmLEeos4uC5ANW63JZEJoasw6trrcmL.Caqbx_ADqEnxWzq3AxT5LdZ5MsB.uAkYE
- dqx1svhr1vomhBHZz60w6to6mvep9tkv09GX7v.Wn1Hkeh3B3JdFzjRFS9KHaAlN8ywqY2FJFlfW
- 0W.g8FykdXsI3uS0ODxEdU274RM8WOh6yv9p1hXdDr6OWoRAOquFggMbP4uLaXJ6ytGTSyYO3lVr
- FCZBRFHjSuiixXg28Yq..QerapSoLoyawg1De.etMNjcFRkx9LdZv0yRQVltONf8hqjXCHba91va
- Zbx3oi3m3MQ5gV8TSYAghqKtDXhopib5bVUOWOCu1SZYfROvhwnfxlrSANQ64qzim5BG_CkPZeOR
- DtS3Ve4jTBUyXZ0j88QDE1CUCWHLuVqZe36yTc6OyMJskVn48yDzHh5XrSl0RKDClwzb5A3zCasg
- bdgjYZMJ55g568PS3IXn1EQ8D5F5DqN6goF_QGLZGZTnCWGxOT01Fju7yVhFQpJ7DZKrqyQ2cwIU
- .w6IgUweMjvXYrdFQCtmnArq5zPIXo4X5js.OHzJfMCmDZ7A6.tqwtFjNa9iSsxvi3E1QNTyebJm
- a1HIcrtEakquUlEiA.m5glMSeTaVq1sHbCJDnMF9Lv4d1OcR9ojfAjlatpcj458clcBvY5fvW9.m
- .dce5Aw1Vbn3blUA7I3ZJWA.ayufs4gGi3txH_9wjxojPKFJ0DWVOCMMktkTwBi7PCbv.G0_L7PD
- lGrBNR4V3Q8uINN6v9TKbTuUHmWKRfcFjNRhaWR0tmzjblQ3nrTIwDR8DRnV3_AcuwmJYodfcHS_
- SepUeDTOi_dzn9jLxbo7XzV5cLmxrXhlGfTwSUav5qWC7e4IAjgHUv.27zGpaY5lNReDoSuQWPyQ
- gxKMe3QtAkaFF_r1mTfcUGMiVkY5N7f5qSxNtIJzCb9i6pd2jZ4AqXDmHbUmtvaUGLSg9V4J2ZDi
- KBdOWEZg83QkdYkMXUQkgvML_KwJEszpog.Tg22bNGlWH3zu__vUrLA--
-X-Sonic-MF: <casey@schaufler-ca.com>
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic302.consmr.mail.ne1.yahoo.com with HTTP; Fri, 23 Sep 2022 15:22:45 +0000
-Received: by hermes--production-bf1-759bcdd488-59t8g (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 2143238c51abfee5ab4b1faa5aa78f91;
-          Fri, 23 Sep 2022 15:22:40 +0000 (UTC)
-Message-ID: <5c702bc1-b976-fc99-f2ac-cc4e6025751b@schaufler-ca.com>
-Date:   Fri, 23 Sep 2022 08:22:36 -0700
+        with ESMTP id S229511AbiIWVyf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Sep 2022 17:54:35 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2053.outbound.protection.outlook.com [40.107.94.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36C7326EA
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Sep 2022 14:54:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AKCC3Th69AEorOv37Z8cpFDEpusIUwMlzzshBKFEdFqBefj7xlSL5HQkx8kudjRyahcRL6wTrRe7jgdS8KpfK3ZvLraITSkJxemEP4DVipIv+nqBW0DrQNue4ESFS3ku7kwEzh64dqpxfrn7GBv9nPMlvz0XuvbI9z9Pk6BxDGYvpxoVNX0P/xW5ssL8+utSncdfLpH1mxfVrGbISKMAvkEa7HjkzGV4t2Seiyxl89OV5oDwyB8KzC0qvaM/Hk4X8xa2ca8rsOo/bfcqqRSOXeJPp6yllcbAW38iQ+YNft4QSJrZ/pg7S8awNNxz4Z/jan+PJb78BE1aJNtXYGjxyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A1iSrmnBcqlokubU+hMlHCetYuRQmPIKMhO72f3H74s=;
+ b=LrKOCk93bDdaED+OINz4ZUABpxmvtHFjaaDQMBVHleWAGe+n2aW0Uen6S+YC2gZapWHZFwdfZo//5npcUIHdj4PbXPwaCzkDfP1C8OG8U0ty1TAdfn38Htd5w9ETCQl7FcgJZAbh5cSNbxHan+lCdz8drLfpjd6HOSg4LlgDkEk22u1IKpaVqZ3eAsNgIzmkjyzwX9tF0wE68so5F2IcrZlN08GJejMMwKrVKTH9RZp32s8q4uxj5uyFTz2u8awgO2lV2mT1RZ14D2Vu0dRzbr09hsfYrxIwDtqU2BCO26JtE8+SrT7JM61duHMbn1xGs95TpNUO1XGOCWY7IQ9muQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ MW2PR0102MB3481.prod.exchangelabs.com (2603:10b6:302:5::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5654.16; Fri, 23 Sep 2022 21:54:20 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::d99d:5143:a233:36a0]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::d99d:5143:a233:36a0%3]) with mapi id 15.20.5654.014; Fri, 23 Sep 2022
+ 21:54:20 +0000
+From:   Tom Talpey <tom@talpey.com>
+To:     smfrench@gmail.com, linux-cifs@vger.kernel.org
+Cc:     linkinjeon@kernel.org, senozhatsky@chromium.org,
+        bmt@zurich.ibm.com, longli@microsoft.com, dhowells@redhat.com,
+        Tom Talpey <tom@talpey.com>
+Subject: [PATCH v2 0/6] Reduce SMBDirect RDMA SGE counts and sizes
+Date:   Fri, 23 Sep 2022 21:53:54 +0000
+Message-Id: <cover.1663961449.git.tom@talpey.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-ClientProxiedBy: BL1PR13CA0074.namprd13.prod.outlook.com
+ (2603:10b6:208:2b8::19) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.1
-Subject: Re: [RFC PATCH 00/29] acl: add vfs posix acl api
-Content-Language: en-US
-To:     Christian Brauner <brauner@kernel.org>,
-        Paul Moore <paul@paul-moore.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, Seth Forshee <sforshee@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        v9fs-developer@lists.sourceforge.net, linux-cifs@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, casey@schaufler-ca.com
-References: <20220922151728.1557914-1-brauner@kernel.org>
- <d74030ae-4b9a-5b39-c203-4b813decd9eb@schaufler-ca.com>
- <CAHk-=whLbq9oX5HDaMpC59qurmwj6geteNcNOtQtb5JN9J0qFw@mail.gmail.com>
- <16ca7e4c-01df-3585-4334-6be533193ba6@schaufler-ca.com>
- <CAHC9VhQRST66pVuNM0WGJsh-W01mDD-bX=GpFxCceUJ1FMWrmg@mail.gmail.com>
- <20220922215731.GA28876@mail.hallyn.com>
- <CAHC9VhSBwavTLcgkgJ-AYwH9wzECi3B7BtwdKOx5FJ3n7M+WYg@mail.gmail.com>
- <20220923085256.2ic6ivf4iuacu5sg@wittgenstein>
-From:   Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <20220923085256.2ic6ivf4iuacu5sg@wittgenstein>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.20663 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|MW2PR0102MB3481:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3d6ee08e-1206-44e7-fc9c-08da9dae2b4f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6McRaqNQ+qDzvJcliWtbcEeZB9eyH3PFmSpFJXzofW9u0OOVR6Zk0K8akfgY9fXVtoMWk7m9/COaC6CfqCUJKH7SSVPY9X9oi6pjRMth2zRiFXD5XvyweKzRaVwr2TFVRasFOXfHHgZZSjxsi2HwiXMKV7WhSv0WRQ3bgiR82OUYd2LIRKSPZdAK7O1UnOSpFgFlvO+NRS2jARAOjPJtosTGdnEzsqLOsiXx1aTJDN8ILhx6YH0qbjcEc+6rEf6y7/IAqut8p7TldYWGbjAItgVr4K49UhpsJWf/LT3RovdNiOJke1vsMgT42DxJNb+TnLngifX+AZrpb2tz+hvrQQVcDd/xuRKsK2Xx4SCjfgYeQQdNZb+Rwl9MKNlfACh+yFnKPBolPdAxxTWocbBmrnF3s6cR2eaqeydhdSgwcGukuCaxq9cyN3YE5MkBfS/hk4lAeScvjN7KM3aNXXZp0l4MCBuGJBILncsL8lR8ygB3A8ZanwaexvwUOYaa8zk7bg9/GqLYmN9hJklKY7rZ0HBCfy3ArmU7SQWeFSZ8M+iNbokTH6OmM4cWU+if7KBTDg6r92RQ8AAnAjldlDbI0vtLvsz4eMFcjzqn3obY4QJDHQ3Yn4smv2Y63mRm59+WIUKvuTu3JuP+zzpvz9JMtR9ip0cG35SUS467j+VuJ9SH5ai6BVwbGsv74Mmw1IP/1PmrIwNMtA9YtKtXsJ539sxY+TIN6OZjLMEQbA5c4qwILE6NddvXDDqjaPc/faet
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(346002)(376002)(366004)(39830400003)(136003)(451199015)(8936002)(38100700002)(41300700001)(66556008)(8676002)(38350700002)(66946007)(66476007)(36756003)(5660300002)(2906002)(26005)(6512007)(6506007)(52116002)(4326008)(186003)(478600001)(6486002)(107886003)(6666004)(2616005)(316002)(83380400001)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?igj+YVMOfNV64SJ27MDF9for4MAAaUC+58G6MtW7iG9xal2lrVXPA85aZMfN?=
+ =?us-ascii?Q?XNE3gDxA43CGgnwhjAfM4eYJjL6crlQ2npLL+1uIcgd6gIn5UkQHkTy8nMbc?=
+ =?us-ascii?Q?vg/dmWQKML2EEP2Vo/hRpMFh+AgTbkmWav8/zFro4O8kfDcfXPcqfcQtjX8w?=
+ =?us-ascii?Q?ldcFnTePqpgqYE6MOAvVJmXUqiHPhYjJaqkGNgal5pZxkpFYHLkSTW3NIxn2?=
+ =?us-ascii?Q?JgWEQIsB9XDy3QM3ai01agiT+iq67qAicFNrPZVPsohQjMael16eR5dlK0iE?=
+ =?us-ascii?Q?16v9zDSrQprk45lLvSbTJDWdDHMRp21vfxqaCmMj32m1UwqOXwzsUvFkhP5G?=
+ =?us-ascii?Q?Y4kUJd9PUBMveIY0eUXRQE8WLg8iIROOMOxNNODDpLJ/Ps6chZAGqrMgoqHI?=
+ =?us-ascii?Q?0T193yPwk5b3++g7bAMPFRaOEFKX2p91cPUuY7ZqBJE/vcPru03e7WmrKQcB?=
+ =?us-ascii?Q?YGqbc3d7poz7vgxgJbqk9sihWmKbVjlb8fzPbA40t6hVExB4Dh8KxYWHx1/p?=
+ =?us-ascii?Q?j6WLkcOaj69/xiLhUAWzdI07ehyRrk8eMw3p2aGBC5FYVfPIUIYAh5h1monm?=
+ =?us-ascii?Q?ktosxS/9T0m6cdZYaKLkQ2q1g0iaWOiIEhohNj5IHwSdJSgddsBAtkKQz6p/?=
+ =?us-ascii?Q?XobEt7wgRn7TblmaTxi5nApo2aJnXm3c/Hj1KnH04munVKa1bIGbll0tsQVf?=
+ =?us-ascii?Q?ymPyMYVYu3dSk6KnCaPZgLg7lvhfRzROYkLeGwaCd86ncyhf4jlGByQYFREn?=
+ =?us-ascii?Q?z0MNzZdaQTgfDk/qL//sZHZyDRPFbJnDBlT5iFy0JZ5NXEySLpPANdcPk88Z?=
+ =?us-ascii?Q?xTrmeO894Gfs7/KiGMQ38SBr9jTlR3B5mxQviwlXhE+80efXeV9IfhDeSEKV?=
+ =?us-ascii?Q?vKD3+/FRO54N7rCt3fK4FmRkmMwjW/u/efE3aoQbobLzv066phYHquRZUuQ0?=
+ =?us-ascii?Q?fD6Tbjb+u9G+3Xf6CxoCIfSE1i588VJ0Pxk0J3Sxf/IETjXB82TukLPsX/m+?=
+ =?us-ascii?Q?i/zKTyDcpID75CfKdIwQlfCxTt0c92voWOI9xBEuPBt2Q57wHMlw7Puh28Ng?=
+ =?us-ascii?Q?1didSpIeQ5AMV6/KRWDT15/ScwRNXw8nhb73dpwrqMxlMUpC4fu/kq4lvMon?=
+ =?us-ascii?Q?S+gPy/7cOLIoCx8NZk+ETwWZQvZQuwo0wvxtxDAr4b1xqZ6SUpVOg8xHD+rD?=
+ =?us-ascii?Q?hZ9n2gsmCw7eSR3F5OtDyH3TLfFDMZEZ4OPEE+e1nIbpNgWjj5Eig/Da/Fgs?=
+ =?us-ascii?Q?z8/acZdOz2sbjacVXUJ0aUlFRrjDAZ0xCjY2L3B3Sya/AxVTxdX8gsgau6OR?=
+ =?us-ascii?Q?oZRXX0n0912CTgJr7Bcqjt8UKblh50KW4SZXvSqmRrZ4y2cMAM2+9ZC1i3C6?=
+ =?us-ascii?Q?e4VnALIk3sqzyYFCROdeGx7ypUOuxJVSp23BiWL9hsij+NtfwWJ7pYiR77a0?=
+ =?us-ascii?Q?vT2x2OUUqvqwgo3MbBwyvXabDPpkkuoTe2CFfUdfRrQ6PrMx7t5OEmW8sKoh?=
+ =?us-ascii?Q?zeLjSBX/+ypjRs9NS+tyBEO+RZAfOO7Ti9/U4ROhoTvbIktokw0NdM+1vQlf?=
+ =?us-ascii?Q?ZhjyBpU1KXk90Puc9ObRnbg+ag21lKfZNIFmh/sb?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d6ee08e-1206-44e7-fc9c-08da9dae2b4f
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2022 21:54:20.4910
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BNJ/HaiBIj5qbayZlKh462OhmD6I9mzWociihr6WNlq2FORzUluF7QrfBmhE5Mdp
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR0102MB3481
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 9/23/2022 1:52 AM, Christian Brauner wrote:
-> On Thu, Sep 22, 2022 at 06:13:44PM -0400, Paul Moore wrote:
->> On Thu, Sep 22, 2022 at 5:57 PM Serge E. Hallyn <serge@hallyn.com> wrote:
->>> On Thu, Sep 22, 2022 at 03:07:44PM -0400, Paul Moore wrote:
->>>> On Thu, Sep 22, 2022 at 2:54 PM Casey Schaufler <casey@schaufler-ca.com> wrote:
->>>>> On 9/22/2022 10:57 AM, Linus Torvalds wrote:
->>>>>> On Thu, Sep 22, 2022 at 9:27 AM Casey Schaufler <casey@schaufler-ca.com> wrote:
->>>>>>> Could we please see the entire patch set on the LSM list?
->>>>>> While I don't think that's necessarily wrong, I would like to point
->>>>>> out that the gitweb interface actually does make it fairly easy to
->>>>>> just see the whole patch-set.
->>>>>>
->>>>>> IOW, that
->>>>>>
->>>>>>   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/idmapping.git/log/?h=fs.acl.rework
->>>>>>
->>>>>> that Christian pointed to is not a horrible way to see it all. Go to
->>>>>> the top-most commit, and it's easy to follow the parent links.
->>>>> I understand that the web interface is fine for browsing the changes.
->>>>> It isn't helpful for making comments on the changes. The discussion
->>>>> on specific patches (e.g. selinux) may have impact on other parts of
->>>>> the system (e.g. integrity) or be relevant elsewhere (e.g. smack). It
->>>>> can be a real problem if the higher level mailing list (the LSM list
->>>>> in this case) isn't included.
->>>> This is probably one of those few cases where Casey and I are in
->>>> perfect agreement.  I'd much rather see the patches hit my inbox than
->>>> have to go hunting for them and then awkwardly replying to them (and
->>>> yes, I know there are ways to do that, I just personally find it
->>>> annoying).  I figure we are all deluged with email on a daily basis
->>>> and have developed mechanisms to deal with that in a sane way, what is
->>>> 29 more patches on the pile?
->>> Even better than the web interface, is find the message-id in any of the
->>> emails you did get, and run
->>>
->>> b4 mbox 20220922151728.1557914-1-brauner@kernel.org
->>>
->>> In general I'd agree with sending the whole set to the lsm list, but
->>> then one needs to start knowing which lists do and don't want the whole
->>> set...  b4 mbox and lei are now how I read all kernel related lists.
+Allocate fewer SGEs and standard packet sizes in both kernel SMBDirect
+implementations.
 
-Because of commonalities and interactions among the various security modules,
-along with the ongoing efforts to enhance the infrastructure and the close
-ties with the vfs and audit system, it's rare that the LSM crowd isn't going
-to want to see the whole of a change.
+The current maximum values (16 SGEs and 8192 bytes) cause failures on the
+SoftiWARP provider, and are suboptimal on others. Reduce these to 6 and
+1364. Additionally, recode smbd_send() to work with as few as 2 SGEs,
+and for debug sanity, reformat client-side logging to more clearly show
+addresses, lengths and flags in the appropriate base.
 
->> In my opinion, sending the entire patchset to the relevant lists
->> should be the default for all the reasons mentioned above.  All the
->> other methods are fine, and I don't want to stop anyone from using
->> their favorite tool, but *requiring* the use of a separate tool to
->> properly review and comment on patches gets us away from the
->> email-is-universal argument.  Yes, all the other tools mentioned are
->> still based in a world of email, but if you are not emailing the
->> relevant stakeholders directly (or indirectly via a list), you are
->> placing another hurdle in front of the reviewers by requiring them to
->> leave their email client based workflow and jump over to lore, b4,
->> etc. to review the patchset.
->>
->> The lore.kernel.org instance is wonderful, full stop, and the b4 tool
->> is equally wonderful, full stop, but they are tools intended to assist
->> and optimize; they should not replace the practice of sending patches,
->> with the full context, to the relevant parties.
-> I'm happy to send all of v2 to the security mailing list.
+Tested over SoftiWARP and SoftRoCE with shell, Connectathon basic and general.
 
-Thank you.
+v2: correct an uninitialized value issue found by Coverity
 
-> But for v1 could you compromise and just use b4?
+Tom Talpey (6):
+  Decrease the number of SMB3 smbdirect client SGEs
+  Decrease the number of SMB3 smbdirect server SGEs
+  Reduce client smbdirect max receive segment size
+  Reduce server smbdirect max send/receive segment sizes
+  Handle variable number of SGEs in client smbdirect send.
+  Fix formatting of client smbdirect RDMA logging
 
-I cringe whenever someone says "just".
+ fs/cifs/smbdirect.c       | 227 ++++++++++++++++----------------------
+ fs/cifs/smbdirect.h       |  14 ++-
+ fs/ksmbd/transport_rdma.c |   6 +-
+ 3 files changed, 109 insertions(+), 138 deletions(-)
 
-I'm sure b4 is a fine tool. I'm told mutt is useful. Gitweb is kewl.
-But adopting a new and exciting development methodology every few
-years since about 1978 has given me a real appreciation for the
-raw email approach. I'll wait for v2.
-
->
-> b4 mbox 20220922151728.1557914-1-brauner@kernel.org
->
-> This would mean you could provide reviews for v1 and we don't need to
-> fragment the v1 discussion because of a resend to include a mailing list.
-
-Right, but I would need to learn yet another development tool set.
-I fully expect you'd have v2 ready before I could be sufficiently
-proficient with b4+mutt to contribute.
+-- 
+2.34.1
 
