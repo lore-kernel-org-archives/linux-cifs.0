@@ -2,25 +2,25 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 109DEC04A95
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Sep 2022 21:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E79C04A95
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Sep 2022 21:54:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231387AbiIWVyi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 23 Sep 2022 17:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55646 "EHLO
+        id S232315AbiIWVyl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Sep 2022 17:54:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbiIWVyh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Sep 2022 17:54:37 -0400
+        with ESMTP id S230421AbiIWVyk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Sep 2022 17:54:40 -0400
 Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2053.outbound.protection.outlook.com [40.107.94.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D086327
-        for <linux-cifs@vger.kernel.org>; Fri, 23 Sep 2022 14:54:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02C810FCA
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Sep 2022 14:54:37 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QymDbH+nOCpkv26kex2GZh5NaTHIovaqdbf9b6yhGeQiylOEQ+rk7/onV0ocSgbKJACUhsAjwTtBfb7+ArF7noxU8B7TXgv4ZtDGmC3BAbF8OIWieMzPX4Rvohfi4L/mwMVxYh5TLwEVhlTrO74BXDVlF8N0A51Yk4zLOIQIHLh0fZBWR5Iq+1BJyHsmkTeBeGdATk53xjCgj+Tmb3kEOXCtkYhR71S0SmvbfMsRgY1T2BOLTN01BxxGi+glPO0ip+ILeHShtqwuRjTxUEYyqW2BpugmyRlFJGHhXthOQF47yHTvhTHAjaX9IRu1TZUexC9WzL65nVbttzd27m53Dg==
+ b=Vg9nJ0CdU+axka/OmTBvkZlnkt4GtLmeISltnwXoOlx+X1P4ra4rvGaK2ltteUWqCmGhN4WpizZRxh2LaQlp4uiw4ZvYjWE7wkNp/LtwBLPnIQuiVZaZQt3UNg0kpMRCJtj535nYiy2VLQUCFwCjaU+hD4k21rEpKTyQnlX80d9MH7vU0kY/ag9bdTuc6a9PvBS7dY/AfqfUMVljrtW/DbZMrI/F+/S60OdUSwsFVkjlpZro+TkLp01WzmZ2U+lMpQJGet4sZtPIVYLi3Qu+M4FylP45mmce715iaPgzwbNF1w0jH8Sm0gk6ZA48Rejm40HgjjKqMLrjy60d+iHk5g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ta9jH0CPNAcarRyFejg98tnimrtEnVbOqrhWWQc34SM=;
- b=n7tsQJhkk0WxoA2/sFC6JaV3VXKCzh3Gp8lJBbvY2CPNU/sLgUWBiwg0ECeNX2+00EY7mJCGHz7ekcabOSwVzEhd6H4kp10mnfoan6ioYPl03JIiZv81joU5GDEGl2Ryp8xwXJfB3412v2Lzl26ZjkJzQmfIQ81GQ7x90QW7D+9DfUtPME2lvK5eGT42fURxkw9HqJ2ErQtmoFK1B0tskzva/3mZzfA/ZrklmSREU7d1TL05db62EgGdJuFxNHggtIXV1PH5QmohaBb/FkJ2FiKfBCKL6tqdFiz08BlcOPh/W4tfHVFatu5VGtRO67RhjeNU3G8z5yTRpFtA2OTV1A==
+ bh=zt3d8Oy1VfX+ugp+UOthZmnd/5vgHGAh5+SQqKRIXms=;
+ b=CvnLaYfeghzHbRImaRr6xLvLgj7vusDeAJM0qnACQrjcFUORcgcwfqNqRmLl2i+qogHjvuvsaz0S8HvfelX/vsrLo1YWy121TdYHDqzZdQpTXKLI1V+gBY66RCHHy/QDDflrFkGdZX20AMC4YIUAsDAbRP9YHCVzZPhOxIsxfViUGy6RV/7bJwFg0AKN0zJmt7DrmlbL9uPjTDq6p/NokaVK6pXnAe9eNCXuiSzqcBEFOEqxhiDB3FeckaKikgCf3GQkk0tvLmt1LJ4Ue8bvjcsaMdsa9GGddrdLLYPVsW5E3Yb9bolnyERUmoYJ73DOCQBAFnBncP60VItMY5AiCw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
  dkim=pass header.d=talpey.com; arc=none
@@ -29,19 +29,19 @@ Authentication-Results: dkim=none (message not signed)
 Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
  MW2PR0102MB3481.prod.exchangelabs.com (2603:10b6:302:5::11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5654.16; Fri, 23 Sep 2022 21:54:28 +0000
+ 15.20.5654.16; Fri, 23 Sep 2022 21:54:33 +0000
 Received: from SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::d99d:5143:a233:36a0]) by SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::d99d:5143:a233:36a0%3]) with mapi id 15.20.5654.014; Fri, 23 Sep 2022
- 21:54:28 +0000
+ 21:54:33 +0000
 From:   Tom Talpey <tom@talpey.com>
 To:     smfrench@gmail.com, linux-cifs@vger.kernel.org
 Cc:     linkinjeon@kernel.org, senozhatsky@chromium.org,
         bmt@zurich.ibm.com, longli@microsoft.com, dhowells@redhat.com,
         Tom Talpey <tom@talpey.com>
-Subject: [PATCH v2 1/6] Decrease the number of SMB3 smbdirect client SGEs
-Date:   Fri, 23 Sep 2022 21:53:55 +0000
-Message-Id: <f361d643cebbf031a4dd272608dedd6a89d12aaf.1663961449.git.tom@talpey.com>
+Subject: [PATCH v2 3/6] Reduce client smbdirect max receive segment size
+Date:   Fri, 23 Sep 2022 21:53:57 +0000
+Message-Id: <695ca86038c26eb1c806050c365e22f5e8464f4e.1663961449.git.tom@talpey.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1663961449.git.tom@talpey.com>
 References: <cover.1663961449.git.tom@talpey.com>
@@ -53,173 +53,77 @@ X-ClientProxiedBy: BL1PR13CA0074.namprd13.prod.outlook.com
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|MW2PR0102MB3481:EE_
-X-MS-Office365-Filtering-Correlation-Id: 67e02447-0cb1-4759-4529-08da9dae2e2e
+X-MS-Office365-Filtering-Correlation-Id: a6f4ebb7-aeda-4f63-9808-08da9dae2f28
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hESARQ4bsoA1XwRu61OtFy2olMhq+T1zyIalPiptzA3LxDPFRdJlY4wQZ7aMn61EJQtuW0Qn5Qvj4aAX/ysR8E561BCQEO9T7IjvWjbbbGnnnJt6qJsCiWLvR/jDd05wgfp20+luBhAW87J3RzrZGnU9mlK72PCMPAaxzW9dt1OOXDHtqJUew3L/SgJdJ2hRyP5MaOFNGCoO/FJhvvnMumT4Fwvrj5h3GDQoDY06mT8ZV714joJ9BcHrn+q9m7voCFJcK1xjil9MxAvH5E/IirxFP5XJrroJNV7hJLbxsm3njMN5vLrTvl2B3j9IuAOhy6Omo2yTsuq3Dp7m+NmO1I1DsC3ytGlnLiCiPRBNkLLRqltEN0zm44aoaxjvijgRX76gMJNg3rMB3nTU9DYtiR9clGFGefPiIkmt82eqkujZiNW2VlE5CcjgQWUJO71sKkhJPVi3ujOUqBYDKrGSRzldQ1gQyuh8or43vZNeHyz5eBy6wKWYDIhrOdSYU4UUvMpWrTFljCfNSmnzS69GhkGxynww8yI6NRScn4ukDtA3Tmb+/uTwi/nd6dX6F0wvQ4lpRqaUEZdLVrN/tm0V/jLT6lXV0xcbYEWstK6OBH9j+Cv0LZH7Q8JK5NfXE+XJ8/thGy3C2b4ZFwdmsPLFBNwPEv4AAp9r3MgiTUqvLME+G7PpJRCJk6nBbat6OcPe1VXK9x8qOAourMTPMVPg/ii/XrHsdeI3M3NoYxAXlewZ338t13a2+Wr0p24DTKTywmkscCXb7C2ypCaaNGO5RQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(346002)(376002)(366004)(39830400003)(136003)(451199015)(8936002)(38100700002)(41300700001)(66556008)(8676002)(38350700002)(66946007)(66476007)(36756003)(5660300002)(2906002)(26005)(6512007)(6506007)(52116002)(4326008)(186003)(478600001)(6486002)(107886003)(6666004)(2616005)(316002)(83380400001)(86362001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Inl66A6JG9FC06CuVoivWYrQhZnnUciI45jGaosq6ztqm5fmSuTjuCwEDbCH4EMrw4bvp/upcItfWwIn/02EtyvUWsjAXo6PSi3LTmB8AT32Q6kDrizD2eolbClNSI3JPAIOGsV3CkEdWKs5uadISvElnuO6v6qFJUGKUbnF1B0sTYlibU61Ry6IBAGOt7ccMo4Sn8ktspwv90ZbTizbAn8xqWL9ZTc1Ja/b8qeQYrC0DyPmZmmmQW2jArhI6+GALZ/jvrST/Cz587UCwW1bhLOkpbVn/HZs48XeELloCn6ao1s+HsxIwUQosQdUPMQPKUmtMKCAWzrtOvdZIxvJA2OVho9MPO4ZwIK1B/a08W0cX+IpfUDBAU2uUVTeJSdei538OhPVQjJtOQvM8gH68DeMm3aQXZRIYoRGa222YgEbcf9hjKx8WZA3UlJX4Zu6O2tBNaI667fuYMhr/gJi10yr1+7L/f8iuKliswCYgG6YlKgH/o4B6J3/y8qimotCLAWu7ItD4y//aVyq1Rb/f/juVqZJHXB/45W6zK4Bwo+e8+9IWaQ9h1k57iMZBKCvtZ8qc44AvD/g7FBuoJp4YuV6qjQKsZAETyrSltXsi9B4FYAnPJ9Py1PRjDi1qVxe01BBhdLOXbjUyrn1zlY5GKTqa+Dm5kHeyDKJ0lra0YSyB4piqvTLMhCGatvU4jDWiTo4f0dYG6VBDC7sHOcSJbd/dM5lRqw+8mBeuEAcXChHTNZCW3Ms1j2gWiZwVvqqVb5KZfxLVQx7kHU1RaBG7w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(346002)(376002)(366004)(39830400003)(136003)(451199015)(8936002)(38100700002)(41300700001)(66556008)(8676002)(38350700002)(66946007)(66476007)(36756003)(4744005)(5660300002)(2906002)(26005)(6512007)(6506007)(52116002)(4326008)(186003)(478600001)(6486002)(107886003)(6666004)(2616005)(316002)(83380400001)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?C1Ey87hKRTzhYF7c+xhxA2uPdr7jKdA/zap6cqHMxFIPFWoPIbtCulbSd5gC?=
- =?us-ascii?Q?9Z/jnrvLnHaDQZfJO8MvYgiM3hiqAklWk0Y6UltZj2Br7V3aROxfOwYXU36D?=
- =?us-ascii?Q?Zt4ckoCITy5q3s1js9WL724KZ6MQ9l+ojhrPQT49xv24AHzA/oGWY/FUQqIW?=
- =?us-ascii?Q?kyG09N5KYSDUQ1tgAII6DXtWT6uuX5AeP2lxkQFei0ap69o9mVEPcp9+u5Ej?=
- =?us-ascii?Q?Xzz/rRXjDq0yNWxLQuEg16A0saoU+WpPaVsy49xF5Rr7kw/2b7xATiBLWvSF?=
- =?us-ascii?Q?2SNPp93xfwVM7vVPEsG6PhcF8b/s73PSK79e3LXok9f2jMuO9kw2VlyZhihw?=
- =?us-ascii?Q?lPdApYQN8Sc5dzZDtRe98KI486DiN9TIrS/Dpiq+FxIjhb5IVs/xEZvEFZmw?=
- =?us-ascii?Q?u8vzm0DVeH+5o4PMd7IIpeBNtMvhE51lbzC61twIME6rzs7+gL+YZ4JRVP+D?=
- =?us-ascii?Q?DUBryxecyoKm83iorDAeHA2rftgSXYtbDPE6oFEmjrCzkV1Eohz9AE6eCyCe?=
- =?us-ascii?Q?t+Y7aZrEq6RsBGe8UqfjF7qM7ysPIvxVSlZxvmrNUMCjqCwK3Tkh/JoTdg7g?=
- =?us-ascii?Q?tNd4XTq4Q16ATvWHvsD0rzzTOU+QTFIQAD1dizdzicpDVLbx9RFFD0/TCh+J?=
- =?us-ascii?Q?z4l8FdD/Qbc1McwnLg7l6YyU0hZ+VUGElSQl1P8pKTD0K4DZSDYIb6thy64n?=
- =?us-ascii?Q?Wv3grCX6SGapcZmPkrNe40Ctr1QZGZR6DZcrcXtahu8B04SSmKLO+jKEBgh+?=
- =?us-ascii?Q?7Q4/QwgqfDjLC3pMt+Gt4FVYWTantjLVfZLtApqNnPVrxjNxrPr/kWNqYE4O?=
- =?us-ascii?Q?Hw97GnE/wdh8VB/QzN6ZMWOliXkIKM0Sxv7nXVGKkY1KZjk6YVVgwkIpw3h0?=
- =?us-ascii?Q?uEIa/vJ56ohvMHewcd3phc1Bl0JoZR0HyfW27W6kkyOKRMdBP6OV8mtyIEaw?=
- =?us-ascii?Q?rkrflW3ZIUdsjZyB7VaA0lxql+0FysGX2q1pB02xFbxHRKmeoLyB6ntyGs6Y?=
- =?us-ascii?Q?VpYYnZqZt7ooFQpSdz3JpuULtRfIdV7KgJkzhC/lLMXzMuq0cigzk61i4d5g?=
- =?us-ascii?Q?xdPtisr/iuMZhLqmaAftp0jqMsqSJMBVeThOjUDbqUvY0qyYTOWgI9S0BHyE?=
- =?us-ascii?Q?Uws2Hik7l44qK4ODclQb1rTFETpvSR0J1VJDuXDo6J7rEnr2BPQ4ac8tGdi1?=
- =?us-ascii?Q?EgTyKIDNVJFSEmJOQK8n8Bmxy+csZrRiCwoTBFhXs44k5yGt+tWUaOK4j2WL?=
- =?us-ascii?Q?5o1+zpGhGTPd/OXFcdgbG9Riucv6uzX/iCTTwtHKCI3BsoX+eFT3mH2mmj/d?=
- =?us-ascii?Q?5d0OfkkTNXbJbOqd5miCuy15PYdVlQhMRXHTH7SKwz+rImQ82Es4+hBRLzYg?=
- =?us-ascii?Q?wkklrbTLK6SnHxqExbq6pVJ8sRJ8iZU7mrbn3s5HHpCQbEU4SQyBVLJreEBE?=
- =?us-ascii?Q?CmVozigPUDzY8gmbMuSjYKJ5+MaQ5B+WsGo4WeC6lU6VWx4DhREeNz3PP+uJ?=
- =?us-ascii?Q?OJJTFR5nN94DsaND8zH6J2MGtLwWvVumjSi3y6Azj/u1Jmvu1PvdVEvc7AB6?=
- =?us-ascii?Q?iX2nl6V8lhB4whgSo5IKf6ru6C7BKJLyf+QlyszF?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2Vzn6nfJnC8Yfw4rrP/GV2EH64kgZcACnp6sZZbrPQLhEaWHKXvyD95xRZwX?=
+ =?us-ascii?Q?GxbUhByFAg2mWka/UfveDwXYMZvIUmKgN/Oj/T2LcpSXphzDgMx0q97l/nPa?=
+ =?us-ascii?Q?33+1oQg0veM7PRkfXtr8N4Rwuw/60el33xmpSD3V8rYgObcYPkjEhVNJVYZq?=
+ =?us-ascii?Q?Npd9Ut0PxICneOC0KxS+gmF2Cf1ZklMRBqCvz6syW6j1aZ2yzPPvNi07B/p4?=
+ =?us-ascii?Q?FUjpBNuRhkKxuMMawYHdr6I5RLk3NgzjbjiedvzJKtpm2Uyfx1ovEreyUEho?=
+ =?us-ascii?Q?wtRHBAylJfGxt2MwKC2jQ1Tp1+JFnzhXnuSRPJME2pRgcCjVj/kd3daSHTVy?=
+ =?us-ascii?Q?dUpIjN1hQbmDN8k6wRVeSnK9XJeALCUbTfmzAr1SswBS3cF4vQG3t+YzSBIH?=
+ =?us-ascii?Q?Z/niIxEMRKabW/UNRDlMhKh8cuSVS+FWXv2rK9AyCyDZKVJGjBthPytZeOgL?=
+ =?us-ascii?Q?ECuYcNZgTthEUtyNrqNS82athbWodGiPJkIJz6M40zMnVHUbTfCRCdZXKgl5?=
+ =?us-ascii?Q?Q01lR9uN+5tQsckjp5iRa+6cRj8ubAT051gnlC7CAnqigh0y+v9jwX6zfOIQ?=
+ =?us-ascii?Q?RIWPdZSay0Q8EV0um6GYMaAslvTTATZIe3zAr2E/eCU2UHqwpHEAWqUHgeDu?=
+ =?us-ascii?Q?8lLV/XsJU/470+N44Wl9qnmIXaz48WnpeGx6zPHO3a6P98I5oEwv4hHtc9LR?=
+ =?us-ascii?Q?8rzNdnzGH9rhu3Ya/BZnkm/Q0EyoFL0OrbDte0LZu3OR60GiE/PKxZ07z4q2?=
+ =?us-ascii?Q?ovAKg/8p08VM7AaQWf4m//96En/a2O0OnxWKYhE/nP5L0FMP67+fBoptiZRX?=
+ =?us-ascii?Q?IOSknQlVzSx1T8ZwisGPA4Zr6PxNzFDP1mVdxob44Jt9WRUnF4I82E1Gvanc?=
+ =?us-ascii?Q?9S6wo8FmeQpyJoeBUCcuk5dH3clZY8D04SyLKUtPvq6TlhxJJ87jk/7E1sS9?=
+ =?us-ascii?Q?zbdxV32dtDIjKgzzwhNx5F100+mSVeNJ4cU0uYyDk61agoBAVj3pkSLjc0Us?=
+ =?us-ascii?Q?TZ5G5znculMrOIvJ8IE8ItNAobhXKcboz3FP66XyAz2vZ0wIBXgStJ9tnKhm?=
+ =?us-ascii?Q?W4vAXXYs6U9/43+9dc2hNI3egIui+HawTlMB0lrF1YpiirTjYtUyQZXe3gpg?=
+ =?us-ascii?Q?UKWUKWFwrmzOH2r8OB1vcS3ODD3PdtzkglGfvbS9Z0Yc8kGmIGD2MWnB0pD6?=
+ =?us-ascii?Q?SjsFa1hoWjTFSuRCKhhyw3ULBZIQ4lIt2gdb2G6SpYJGG+Zo/N/VvT4oAn4Q?=
+ =?us-ascii?Q?IeaB+DOpgzKGyWr8YdYOuMwEJDJF1tposEpoz9YZfjFWocr/C7W2eCjFc04a?=
+ =?us-ascii?Q?tQnBzpyQv8NbD3M1xlV66SYm3MLegZIs/30JYT931TDh8JlTH+qLOmhA3TFg?=
+ =?us-ascii?Q?5LUUipPEnj7s2uK7Ubp1k7/ERzvQxBsfcjnSQhhhM7TRv+Zj3mNY/BrkwXWd?=
+ =?us-ascii?Q?hS5oD6YJEn0HRPPgUUXtgrM7tEC5E87aeI1jabmisrEJQD3P0/xWGwog1aRm?=
+ =?us-ascii?Q?51TdWhsDVqcjdS6HTPiC4rR9wvAGkal6uXrkHmhjlDhYzmYltIasFRJzGaqB?=
+ =?us-ascii?Q?W5kIyLg1sxO9wgnCvP3+iD5nCWnJJewLz+Ra0JZy?=
 X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67e02447-0cb1-4759-4529-08da9dae2e2e
+X-MS-Exchange-CrossTenant-Network-Message-Id: a6f4ebb7-aeda-4f63-9808-08da9dae2f28
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2022 21:54:25.2251
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2022 21:54:26.9281
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ttmGzWPoC3gT4BtW077JUIpMpCqFIW9Mt7FsJXE1yHbZmnduSE1eehdTvnP2GtsJ
+X-MS-Exchange-CrossTenant-UserPrincipalName: DcFu/YZxJg1kvC2D/YL/lvpplDFPBz4Y4oHEinxyY0JP3Zs+A+hSgWVjWNHFskQc
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR0102MB3481
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The client-side SMBDirect layer requires no more than 6 send SGEs
-and 1 receive SGE. The previous default of 8 send and 8 receive
-causes smbdirect to fail on the SoftiWARP (siw) provider, and
-possibly others. Additionally, large numbers of SGEs reduces
-performance significantly on adapter implementations.
-
-Also correct the frmr page count comment (not an SGE count).
+Reduce client smbdirect max segment receive size to 1364 to match
+protocol norms. Larger buffers are unnecessary and add significant
+memory overhead.
 
 Signed-off-by: Tom Talpey <tom@talpey.com>
 ---
- fs/cifs/smbdirect.c | 26 ++++++++++++--------------
- fs/cifs/smbdirect.h | 14 +++++++++-----
- 2 files changed, 21 insertions(+), 19 deletions(-)
+ fs/cifs/smbdirect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 5fbbec22bcc8..f81229721b76 100644
+index f81229721b76..4908ca54610c 100644
 --- a/fs/cifs/smbdirect.c
 +++ b/fs/cifs/smbdirect.c
-@@ -99,7 +99,7 @@ int smbd_keep_alive_interval = 120;
-  * User configurable initial values for RDMA transport
-  * The actual values used may be lower and are limited to hardware capabilities
-  */
--/* Default maximum number of SGEs in a RDMA write/read */
-+/* Default maximum number of pages in a single RDMA write/read */
- int smbd_max_frmr_depth = 2048;
+@@ -90,7 +90,7 @@ int smbd_max_send_size = 1364;
+ int smbd_max_fragmented_recv_size = 1024 * 1024;
  
- /* If payload is less than this byte, use RDMA send/recv not read/write */
-@@ -1017,9 +1017,9 @@ static int smbd_post_send_data(
- {
- 	int i;
- 	u32 data_length = 0;
--	struct scatterlist sgl[SMBDIRECT_MAX_SGE];
-+	struct scatterlist sgl[SMBDIRECT_MAX_SEND_SGE - 1];
+ /*  The maximum single-message size which can be received */
+-int smbd_max_receive_size = 8192;
++int smbd_max_receive_size = 1364;
  
--	if (n_vec > SMBDIRECT_MAX_SGE) {
-+	if (n_vec > SMBDIRECT_MAX_SEND_SGE - 1) {
- 		cifs_dbg(VFS, "Can't fit data to SGL, n_vec=%d\n", n_vec);
- 		return -EINVAL;
- 	}
-@@ -1562,17 +1562,15 @@ static struct smbd_connection *_smbd_get_connection(
- 	info->max_receive_size = smbd_max_receive_size;
- 	info->keep_alive_interval = smbd_keep_alive_interval;
- 
--	if (info->id->device->attrs.max_send_sge < SMBDIRECT_MAX_SGE) {
-+	if (info->id->device->attrs.max_send_sge < SMBDIRECT_MAX_SEND_SGE ||
-+	    info->id->device->attrs.max_recv_sge < SMBDIRECT_MAX_RECV_SGE) {
- 		log_rdma_event(ERR,
--			"warning: device max_send_sge = %d too small\n",
--			info->id->device->attrs.max_send_sge);
--		log_rdma_event(ERR, "Queue Pair creation may fail\n");
--	}
--	if (info->id->device->attrs.max_recv_sge < SMBDIRECT_MAX_SGE) {
--		log_rdma_event(ERR,
--			"warning: device max_recv_sge = %d too small\n",
-+			"device %.*s max_send_sge/max_recv_sge = %d/%d too small\n",
-+			IB_DEVICE_NAME_MAX,
-+			info->id->device->name,
-+			info->id->device->attrs.max_send_sge,
- 			info->id->device->attrs.max_recv_sge);
--		log_rdma_event(ERR, "Queue Pair creation may fail\n");
-+		goto config_failed;
- 	}
- 
- 	info->send_cq = NULL;
-@@ -1598,8 +1596,8 @@ static struct smbd_connection *_smbd_get_connection(
- 	qp_attr.qp_context = info;
- 	qp_attr.cap.max_send_wr = info->send_credit_target;
- 	qp_attr.cap.max_recv_wr = info->receive_credit_max;
--	qp_attr.cap.max_send_sge = SMBDIRECT_MAX_SGE;
--	qp_attr.cap.max_recv_sge = SMBDIRECT_MAX_SGE;
-+	qp_attr.cap.max_send_sge = SMBDIRECT_MAX_SEND_SGE;
-+	qp_attr.cap.max_recv_sge = SMBDIRECT_MAX_RECV_SGE;
- 	qp_attr.cap.max_inline_data = 0;
- 	qp_attr.sq_sig_type = IB_SIGNAL_REQ_WR;
- 	qp_attr.qp_type = IB_QPT_RC;
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index a87fca82a796..207ef979cd51 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -91,7 +91,7 @@ struct smbd_connection {
- 	/* Memory registrations */
- 	/* Maximum number of RDMA read/write outstanding on this connection */
- 	int responder_resources;
--	/* Maximum number of SGEs in a RDMA write/read */
-+	/* Maximum number of pages in a single RDMA write/read on this connection */
- 	int max_frmr_depth;
- 	/*
- 	 * If payload is less than or equal to the threshold,
-@@ -225,21 +225,25 @@ struct smbd_buffer_descriptor_v1 {
- 	__le32 length;
- } __packed;
- 
--/* Default maximum number of SGEs in a RDMA send/recv */
--#define SMBDIRECT_MAX_SGE	16
-+/* Maximum number of SGEs used by smbdirect.c in any send work request */
-+#define SMBDIRECT_MAX_SEND_SGE	6
-+
- /* The context for a SMBD request */
- struct smbd_request {
- 	struct smbd_connection *info;
- 	struct ib_cqe cqe;
- 
--	/* the SGE entries for this packet */
--	struct ib_sge sge[SMBDIRECT_MAX_SGE];
-+	/* the SGE entries for this work request */
-+	struct ib_sge sge[SMBDIRECT_MAX_SEND_SGE];
- 	int num_sge;
- 
- 	/* SMBD packet header follows this structure */
- 	u8 packet[];
- };
- 
-+/* Maximum number of SGEs used by smbdirect.c in any receive work request */
-+#define SMBDIRECT_MAX_RECV_SGE	1
-+
- /* The context for a SMBD response */
- struct smbd_response {
- 	struct smbd_connection *info;
+ /* The timeout to initiate send of a keepalive message on idle */
+ int smbd_keep_alive_interval = 120;
 -- 
 2.34.1
 
