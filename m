@@ -2,54 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FD4C6FA86
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Sep 2022 05:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B590ECAAD8
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Sep 2022 08:38:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229794AbiIWF6g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 23 Sep 2022 01:58:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33772 "EHLO
+        id S229727AbiIWIiT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Sep 2022 04:38:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbiIWF6c (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Sep 2022 01:58:32 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1809912207B;
-        Thu, 22 Sep 2022 22:58:31 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 2241368AFE; Fri, 23 Sep 2022 07:58:27 +0200 (CEST)
-Date:   Fri, 23 Sep 2022 07:58:26 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     "Serge E. Hallyn" <serge@hallyn.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, Seth Forshee <sforshee@kernel.org>,
+        with ESMTP id S229637AbiIWIiS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Sep 2022 04:38:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B051166F9;
+        Fri, 23 Sep 2022 01:38:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8D70961760;
+        Fri, 23 Sep 2022 08:38:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0EC4C433D6;
+        Fri, 23 Sep 2022 08:38:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663922296;
+        bh=M8Ka5P9rFWMx/O/TJxBboZRCB7Mp5Vz0LaZwdoz5uw0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hMhQ37S0igkC+6D/o9a6VmWtcdzSofgz2HMTaQueuFMm8SLMjvz1h5Gzn3+5Il+im
+         pjnU2f5cBbm3l8LzPgRtAJbln5/rxtBd6I0g+B6Yz0eoltehiRdbgEvyNEH6KdSNiu
+         DEyppo52LeJpzZwRAJ8+YoXChuXid+6+zQvauEH465E25G/3Mw0xy4lZQx0zape9GB
+         I/Od/Db2HkGAP+dF3H/grZviFbRkVIKXZUjvaZEb6r4MugJ9POSodjzWrhFdMEh0wF
+         c6X2zYcecS/DaYqFq4GOdcBdjXQZnpG9sP4E4ZTAHjMuMUxqSK9davYF7enKhIX2+Y
+         eqO/jO9qWMJgw==
+Date:   Fri, 23 Sep 2022 10:38:10 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Steve French <smfrench@gmail.com>
+Cc:     linux-fsdevel@vger.kernel.org, Seth Forshee <sforshee@kernel.org>,
         Christoph Hellwig <hch@lst.de>,
         Al Viro <viro@zeniv.linux.org.uk>,
-        v9fs-developer@lists.sourceforge.net, linux-cifs@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [RFC PATCH 00/29] acl: add vfs posix acl api
-Message-ID: <20220923055826.GA15662@lst.de>
-References: <20220922151728.1557914-1-brauner@kernel.org> <d74030ae-4b9a-5b39-c203-4b813decd9eb@schaufler-ca.com> <CAHk-=whLbq9oX5HDaMpC59qurmwj6geteNcNOtQtb5JN9J0qFw@mail.gmail.com> <16ca7e4c-01df-3585-4334-6be533193ba6@schaufler-ca.com> <CAHC9VhQRST66pVuNM0WGJsh-W01mDD-bX=GpFxCceUJ1FMWrmg@mail.gmail.com> <20220922215731.GA28876@mail.hallyn.com> <CAHC9VhSBwavTLcgkgJ-AYwH9wzECi3B7BtwdKOx5FJ3n7M+WYg@mail.gmail.com>
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 04/29] cifs: implement get acl method
+Message-ID: <20220923083810.ff7jfaszl7qhoutd@wittgenstein>
+References: <20220922151728.1557914-1-brauner@kernel.org>
+ <20220922151728.1557914-5-brauner@kernel.org>
+ <CAH2r5mvkSW1FY2tP87mKGrOMkoN8tbOP9r=xJ4XnVbkcrE9guA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAHC9VhSBwavTLcgkgJ-AYwH9wzECi3B7BtwdKOx5FJ3n7M+WYg@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <CAH2r5mvkSW1FY2tP87mKGrOMkoN8tbOP9r=xJ4XnVbkcrE9guA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 06:13:44PM -0400, Paul Moore wrote:
-> In my opinion, sending the entire patchset to the relevant lists
-> should be the default for all the reasons mentioned above.
+On Thu, Sep 22, 2022 at 10:52:43PM -0500, Steve French wrote:
+> Looks like the SMB1 Protocol operations for get/set posix ACL were
+> removed in the companion patch (in SMB3, POSIX ACLs have to be handled
 
-Agreed.  I'm perfectly fine when people minimize the CCs to actual
-people (but then for the entire patch set), but having only the
-partial series in an mbox just makes it useful.  Either the list
-or person on everything or nothing.  I can't actually do anything
-with a partial CC except for either ignoring it or shoting at
-you that I need the entire series to do something useful with it.
+Sorry, what companion patch? Is a patch in this series or are you
+referring to something else?
 
-(although in this case I did get all of it anyway).
+> by mapping from rich acls).  Was this intentional or did I miss
+> something? I didn't see the functions for sending these over the wire
+> for SMB1 (which does support POSIX ACLs, not just RichACLs (SMB/NTFS
+> ACLs))
+
+I'm sorry, I don't understand. This is basically a 1:1 port of what you
+currently have in cifs_xattr_set() and cifs_xattr_get() under the
+XATTR_ACL_DEFAULT and XATTR_ACL_ACCESS switches. So basically, the
+patches in this series just add almost 1:1 copies of
+CIFSSMBSetPosixACL() and CIFSSMBGetPosixACL() just that instead of
+operating on void * they operate on a proper vfs struct posix acl. So
+nothing would've changed behavior wise. Ofc, there's always the chance
+that I missed sm especially bc I'm not a cifs developer. :)
+
+> 
+>         pSMB->SubCommand = cpu_to_le16(TRANS2_SET_PATH_INFORMATION);
+>         pSMB->InformationLevel = cpu_to_le16(SMB_SET_POSIX_ACL);
