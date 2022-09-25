@@ -2,212 +2,183 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E3C7C6FA82
-	for <linux-cifs@archiver.kernel.org>; Sun, 25 Sep 2022 12:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C681C04A95
+	for <linux-cifs@archiver.kernel.org>; Sun, 25 Sep 2022 13:18:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232435AbiIYMMM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 25 Sep 2022 08:12:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35962 "EHLO
+        id S229592AbiIYNSZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 25 Sep 2022 09:18:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232004AbiIYMML (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 25 Sep 2022 08:12:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23AD303D7;
-        Sun, 25 Sep 2022 05:12:10 -0700 (PDT)
+        with ESMTP id S229574AbiIYNSZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 25 Sep 2022 09:18:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED362D772
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Sep 2022 06:18:24 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6951161223;
-        Sun, 25 Sep 2022 12:12:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AEDCC433C1;
-        Sun, 25 Sep 2022 12:12:09 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BA449B80946
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Sep 2022 13:18:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4267DC433C1
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Sep 2022 13:18:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664107929;
-        bh=3QpOnBvdxL0+AZ41OUJ8Z8CAtbcfHcNF9j/3kuh7UJk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lz9HACjWXnyFes4+TEG3Arf2V68bAcMUyphkg4Llv+pb+zp36wX9Rz5y7xi5jtDZz
-         Qv9rYHiYGWufdfv65edKRBRMnsHuPrpBUIwalal9lh9I5n9ybpKOtQ1Q8IK8Fxwei/
-         N952N2z2tVxyr5EMlW24Qw7wBYvWhXJsfSAgj9IXe6Zqd4J8MIhWoQeFAKo/jTnlE9
-         Da9uhOaJaV0NU3ZM8S0974OyiRFq6/ZCqQwlF+j9tED7MSsYzhGAuPvWAjBsD1dn3k
-         Xy136JBposGdTKPbBeyGC4Mj43/VJftoEKb2VlqnFUKp0XRcoJi7hNo9go+w78z4Pc
-         KS9xTt0Voa8vQ==
-Received: by pali.im (Postfix)
-        id C06F2EE2; Sun, 25 Sep 2022 14:12:06 +0200 (CEST)
-Date:   Sun, 25 Sep 2022 14:12:06 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Viacheslav Dubeyko <slava@dubeyko.com>
-Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Marek =?utf-8?B?QmVow7pu?= <marek.behun@nic.cz>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC PATCH 13/20] hfsplus: Do not use broken utf8 NLS table for
- iocharset=utf8 mount option
-Message-ID: <20220925121206.glqeuptele746qsp@pali>
-References: <20210808162453.1653-1-pali@kernel.org>
- <20210808162453.1653-14-pali@kernel.org>
- <4D2445C9-7D4D-438A-964C-5B8F46BC15B5@dubeyko.com>
+        s=k20201202; t=1664111901;
+        bh=WBZelspSn21SqpiI2KUKRURUenQh2cfLAkW73b376sE=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=FK9A+uY90DMLQAl/eB0eQg9LTLb1BTDdoxF3RpT9Ms4rOPdZ3s4QHXP9/c9KCkKx4
+         W8u7Wzd22jZ4sZ0eKvrepFtbf++Rh0PCZLegiEXIHoEP0iVCPRaiV0Nl7XN9nA+8iz
+         H6baKqjCs/4yXLjvRDVlZtxsbJczgB1rFQiIyt2yuSzoa4yliMTgVSJayAWEiAfbnJ
+         MXgyK6v0TD9u5Rvf/Oxol5Q0nqGl7sWrUKfXkgEVwUAHOIHWJUiGoC9jXFE/Y/Qcn5
+         1WIY34QvEGO324WrNnt0/NoHjHv64goe3SVHeXklvexRb9ri2Dv+rqf/mscq6eO/ri
+         fEb+/Kkmq7evA==
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-12b542cb1d3so6164750fac.13
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Sep 2022 06:18:21 -0700 (PDT)
+X-Gm-Message-State: ACrzQf1ho4bx4Z0rk6gSPsQ5XjnnAVv2gkj05lsWSq0YUhZmbOp9x4/0
+        FEWa072w0O346GdU0XC1cA80pjo79tagtG6Bd8o=
+X-Google-Smtp-Source: AMsMyM4AbEBJETHNTOVPdcL1VQknIzEpLNn1i/LhVmDmNr4PD1JJGzZlMF/OrC3RkYKCTmJ5T2wXj3I+HIkzt0MDYzI=
+X-Received: by 2002:a05:6870:9a26:b0:12d:7e1:e9c7 with SMTP id
+ fo38-20020a0568709a2600b0012d07e1e9c7mr10573315oab.257.1664111900378; Sun, 25
+ Sep 2022 06:18:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4D2445C9-7D4D-438A-964C-5B8F46BC15B5@dubeyko.com>
-User-Agent: NeoMutt/20180716
+Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Sun, 25 Sep 2022 06:18:19
+ -0700 (PDT)
+In-Reply-To: <20220924022313.281318-1-atteh.mailbox@gmail.com>
+References: <20220924022313.281318-1-atteh.mailbox@gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sun, 25 Sep 2022 22:18:19 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8MtTXfzm16a1+f=dCR4VVLx5Hre9rQqh4Z5cA=B_hr0Q@mail.gmail.com>
+Message-ID: <CAKYAXd8MtTXfzm16a1+f=dCR4VVLx5Hre9rQqh4Z5cA=B_hr0Q@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: make utf-8 file name comparison work in __caseless_lookup()
+To:     =?UTF-8?Q?Atte_Heikkil=C3=A4?= <atteh.mailbox@gmail.com>
+Cc:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello!
+2022-09-24 11:23 GMT+09:00, Atte Heikkil=C3=A4 <atteh.mailbox@gmail.com>:
+> Case-insensitive file name lookups with __caseless_lookup() use
+> strncasecmp() for file name comparison. strncasecmp() assumes an
+> ISO8859-1-compatible encoding, which is not the case here as UTF-8
+> is always used. As such, use of strncasecmp() here produces correct
+> results only if both strings use characters in the ASCII range only.
+> Fix this by using utf8_strncasecmp() if CONFIG_UNICODE is set. On
+> failure or if CONFIG_UNICODE is not set, fallback to strncasecmp().
+> Also, as we are adding an include for `linux/unicode.h', include it
+> in `fs/ksmbd/connection.h' as well since it should be explicit there.
+>
+> Signed-off-by: Atte Heikkil=C3=A4 <atteh.mailbox@gmail.com>
+> ---
+>  fs/ksmbd/connection.h |  1 +
+>  fs/ksmbd/vfs.c        | 20 +++++++++++++++++---
+>  fs/ksmbd/vfs.h        |  2 ++
+>  3 files changed, 20 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/ksmbd/connection.h b/fs/ksmbd/connection.h
+> index 41d96f5cef06..3643354a3fa7 100644
+> --- a/fs/ksmbd/connection.h
+> +++ b/fs/ksmbd/connection.h
+> @@ -14,6 +14,7 @@
+>  #include <net/request_sock.h>
+>  #include <linux/kthread.h>
+>  #include <linux/nls.h>
+> +#include <linux/unicode.h>
+>
+>  #include "smb_common.h"
+>  #include "ksmbd_work.h"
+> diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
+> index 4fcf96a01c16..a3269df7c7b3 100644
+> --- a/fs/ksmbd/vfs.c
+> +++ b/fs/ksmbd/vfs.c
+> @@ -1145,12 +1145,23 @@ static int __caseless_lookup(struct dir_context
+> *ctx, const char *name,
+>  			     unsigned int d_type)
+>  {
+>  	struct ksmbd_readdir_data *buf;
+> +	int cmp;
+cmp should be initialized with -EINVAL to fallback strncasecmp() ?
 
-On Monday 09 August 2021 10:42:02 Viacheslav Dubeyko wrote:
-> > On Aug 8, 2021, at 9:24 AM, Pali Rohár <pali@kernel.org> wrote:
-> > 
-> > NLS table for utf8 is broken and cannot be fixed.
-> > 
-> > So instead of broken utf8 nls functions char2uni() and uni2char() use
-> > functions utf8_to_utf32() and utf32_to_utf8() which implements correct
-> > encoding and decoding between Unicode code points and UTF-8 sequence.
-> > 
-> > Note that this fs driver does not support full Unicode range, specially
-> > UTF-16 surrogate pairs are unsupported. This patch does not change this
-> > limitation and support for UTF-16 surrogate pairs stay unimplemented.
-> > 
-> > When iochatset=utf8 is used then set sbi->nls to NULL and use it for
-> > distinguish between the fact if NLS table or native UTF-8 functions should
-> > be used.
-> > 
-> > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > ---
-> > fs/hfsplus/dir.c            |  6 ++++--
-> > fs/hfsplus/options.c        | 32 ++++++++++++++++++--------------
-> > fs/hfsplus/super.c          |  7 +------
-> > fs/hfsplus/unicode.c        | 31 ++++++++++++++++++++++++++++---
-> > fs/hfsplus/xattr.c          | 14 +++++++++-----
-> > fs/hfsplus/xattr_security.c |  3 ++-
-> > 6 files changed, 62 insertions(+), 31 deletions(-)
-> > 
-> > diff --git a/fs/hfsplus/dir.c b/fs/hfsplus/dir.c
-> > index 84714bbccc12..2caf0cd82221 100644
-> > --- a/fs/hfsplus/dir.c
-> > +++ b/fs/hfsplus/dir.c
-> > @@ -144,7 +144,8 @@ static int hfsplus_readdir(struct file *file, struct dir_context *ctx)
-> > 	err = hfs_find_init(HFSPLUS_SB(sb)->cat_tree, &fd);
-> > 	if (err)
-> > 		return err;
-> > -	strbuf = kmalloc(NLS_MAX_CHARSET_SIZE * HFSPLUS_MAX_STRLEN + 1, GFP_KERNEL);
-> > +	strbuf = kmalloc((HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4) *
-> > +			HFSPLUS_MAX_STRLEN + 1, GFP_KERNEL);
-> 
-> Maybe, introduce some variable that will contain the length calculation?
+>
+>  	buf =3D container_of(ctx, struct ksmbd_readdir_data, ctx);
+>
+>  	if (buf->used !=3D namlen)
+>  		return 0;
+> -	if (!strncasecmp((char *)buf->private, name, namlen)) {
+> +	if (IS_ENABLED(CONFIG_UNICODE) && buf->um) {
+> +		const struct qstr q_buf =3D {.name =3D buf->private,
+> +					   .len =3D buf->used};
+> +		const struct qstr q_name =3D {.name =3D name,
+> +					    .len =3D namlen};
+> +
+> +		cmp =3D utf8_strncasecmp(buf->um, &q_buf, &q_name);
+> +	}
+> +	if (!(IS_ENABLED(CONFIG_UNICODE) && buf->um) || cmp < 0)
+I wonder why ->um is checked with CONFIG_UNICODE.
 
-Ok! I can introduce variable with calculated length into all places.
-
-> > 	if (!strbuf) {
-> > 		err = -ENOMEM;
-> > 		goto out;
-> > @@ -203,7 +204,8 @@ static int hfsplus_readdir(struct file *file, struct dir_context *ctx)
-> > 		hfs_bnode_read(fd.bnode, &entry, fd.entryoffset,
-> > 			fd.entrylength);
-> > 		type = be16_to_cpu(entry.type);
-> > -		len = NLS_MAX_CHARSET_SIZE * HFSPLUS_MAX_STRLEN;
-> > +		len = (HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4) *
-> > +		      HFSPLUS_MAX_STRLEN;
-> > 		err = hfsplus_uni2asc(sb, &fd.key->cat.name, strbuf, &len);
-> > 		if (err)
-> > 			goto out;
-> > diff --git a/fs/hfsplus/options.c b/fs/hfsplus/options.c
-> > index a975548f6b91..16c08cb5c4f8 100644
-> > --- a/fs/hfsplus/options.c
-> > +++ b/fs/hfsplus/options.c
-> > @@ -104,6 +104,9 @@ int hfsplus_parse_options(char *input, struct hfsplus_sb_info *sbi)
-> > 	char *p;
-> > 	substring_t args[MAX_OPT_ARGS];
-> > 	int tmp, token;
-> > +	int have_iocharset;
-> > +
-> > +	have_iocharset = 0;
-> 
-> What’s about boolean type and to use true/false?
-
-Ok. I can change type to "bool" and use "true"/"false" values.
-
-> > 
-> > 	if (!input)
-> > 		goto done;
-> > @@ -171,20 +174,24 @@ int hfsplus_parse_options(char *input, struct hfsplus_sb_info *sbi)
-> > 			pr_warn("option nls= is deprecated, use iocharset=\n");
-> > 			/* fallthrough */
-> > 		case opt_iocharset:
-> > -			if (sbi->nls) {
-> > +			if (have_iocharset) {
-> > 				pr_err("unable to change nls mapping\n");
-> > 				return 0;
-> > 			}
-> > 			p = match_strdup(&args[0]);
-> > -			if (p)
-> > -				sbi->nls = load_nls(p);
-> > -			if (!sbi->nls) {
-> > -				pr_err("unable to load nls mapping \"%s\"\n",
-> > -				       p);
-> > -				kfree(p);
-> > +			if (!p)
-> > 				return 0;
-> > +			if (strcmp(p, "utf8") != 0) {
-> > +				sbi->nls = load_nls(p);
-> > +				if (!sbi->nls) {
-> > +					pr_err("unable to load nls mapping "
-> > +						"\"%s\"\n", p);
-> > +					kfree(p);
-> > +					return 0;
-> > +				}
-> > 			}
-> > 			kfree(p);
-> > +			have_iocharset = 1;
-> 
-> Ditto. What’s about true here?
-> 
-> > 			break;
-> > 		case opt_decompose:
-> > 			clear_bit(HFSPLUS_SB_NODECOMPOSE, &sbi->flags);
-...
-> > @@ -256,7 +266,22 @@ int hfsplus_uni2asc(struct super_block *sb,
-> > static inline int asc2unichar(struct super_block *sb, const char *astr, int len,
-> > 			      wchar_t *uc)
-> > {
-> > -	int size = HFSPLUS_SB(sb)->nls->char2uni(astr, len, uc);
-> > +	struct nls_table *nls = HFSPLUS_SB(sb)->nls;
-> > +	unicode_t u;
-> > +	int size;
-> > +
-> > +	if (nls)
-> > +		size = nls->char2uni(astr, len, uc);
-> > +	else {
-> > +		size = utf8_to_utf32(astr, len, &u);
-> > +		if (size >= 0) {
-> > +			/* TODO: Add support for UTF-16 surrogate pairs */
-> 
-> Have you forgot to delete this string? Or do you plan to implement this?
-
-No. I have not forgot. In current version there is missing support for
-UTF-16 surrogate pairs and this my patch still does not implement it.
-
-So this is kind a issue / bug in the driver and at least it should be
-documented. So reader of this code would know it and maybe somebody in
-future will implement it.
-
-> > +			if (u <= MAX_WCHAR_T)
-> > +				*uc = u;
-> > +			else
-> > +				size = -EINVAL;
-> > +		}
-> > +	}
+Thanks.
+> +		cmp =3D strncasecmp((char *)buf->private, name, namlen);
+> +	if (!cmp) {
+>  		memcpy((char *)buf->private, name, namlen);
+>  		buf->dirent_count =3D 1;
+>  		return -EEXIST;
+> @@ -1166,7 +1177,8 @@ static int __caseless_lookup(struct dir_context *ct=
+x,
+> const char *name,
+>   *
+>   * Return:	0 on success, otherwise error
+>   */
+> -static int ksmbd_vfs_lookup_in_dir(const struct path *dir, char *name,
+> size_t namelen)
+> +static int ksmbd_vfs_lookup_in_dir(const struct path *dir, char *name,
+> +				   size_t namelen, struct unicode_map *um)
+>  {
+>  	int ret;
+>  	struct file *dfilp;
+> @@ -1176,6 +1188,7 @@ static int ksmbd_vfs_lookup_in_dir(const struct pat=
+h
+> *dir, char *name, size_t na
+>  		.private	=3D name,
+>  		.used		=3D namelen,
+>  		.dirent_count	=3D 0,
+> +		.um		=3D um,
+>  	};
+>
+>  	dfilp =3D dentry_open(dir, flags, current_cred());
+> @@ -1238,7 +1251,8 @@ int ksmbd_vfs_kern_path(struct ksmbd_work *work, ch=
+ar
+> *name,
+>  				break;
+>
+>  			err =3D ksmbd_vfs_lookup_in_dir(&parent, filename,
+> -						      filename_len);
+> +						      filename_len,
+> +						      work->conn->um);
+>  			path_put(&parent);
+>  			if (err)
+>  				goto out;
+> diff --git a/fs/ksmbd/vfs.h b/fs/ksmbd/vfs.h
+> index d7542a2dab52..593059ca8511 100644
+> --- a/fs/ksmbd/vfs.h
+> +++ b/fs/ksmbd/vfs.h
+> @@ -12,6 +12,7 @@
+>  #include <linux/namei.h>
+>  #include <uapi/linux/xattr.h>
+>  #include <linux/posix_acl.h>
+> +#include <linux/unicode.h>
+>
+>  #include "smbacl.h"
+>  #include "xattr.h"
+> @@ -60,6 +61,7 @@ struct ksmbd_readdir_data {
+>  	unsigned int		used;
+>  	unsigned int		dirent_count;
+>  	unsigned int		file_attr;
+> +	struct unicode_map	*um;
+>  };
+>
+>  /* ksmbd kstat wrapper to get valid create time when reading dir entry *=
+/
+> --
+> 2.37.3
+>
+>
