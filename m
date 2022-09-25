@@ -2,73 +2,121 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E464C6FA82
-	for <linux-cifs@archiver.kernel.org>; Sun, 25 Sep 2022 22:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97BF4C6FA82
+	for <linux-cifs@archiver.kernel.org>; Sun, 25 Sep 2022 22:53:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231895AbiIYWbv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 25 Sep 2022 18:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39466 "EHLO
+        id S229567AbiIYWxQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 25 Sep 2022 18:53:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232983AbiIYWbm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 25 Sep 2022 18:31:42 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C22C2CDF8
-        for <linux-cifs@vger.kernel.org>; Sun, 25 Sep 2022 15:31:42 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id 13so10597055ejn.3
-        for <linux-cifs@vger.kernel.org>; Sun, 25 Sep 2022 15:31:41 -0700 (PDT)
+        with ESMTP id S229722AbiIYWxP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 25 Sep 2022 18:53:15 -0400
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E49332A712;
+        Sun, 25 Sep 2022 15:53:14 -0700 (PDT)
+Received: by mail-vs1-xe2e.google.com with SMTP id 63so5001503vse.2;
+        Sun, 25 Sep 2022 15:53:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=3Ll/pVLkdT1bVWh7yn3N43sl9bxjylKfX4mgO44t6S4=;
-        b=R80JjQBn07Hu990f11X74a3KO0tfTwxCPCQgbVcbcEMmZWRBqG+aDE3/ATIDk8hFQb
-         e2QllSackr8tbAha7Dk5MThVWg2JoPFPe5ULfpCnZAGUjUmm+f479GKGZJkykv6Ul3Ou
-         9vd1Yeha4AFoaFEc8OhvNAni8Hyip9DpL/pv1vRkyxUoGA8zR/4Gsr6BrCRbXJKE4A8d
-         yF2DNuReeDW0OtacVoHkh3xALP8Y1yDE/rBZkkOt+Eg6Fvp54mZ+0fgl5wrm4hbsZrgj
-         6yDjd6iNXMt7L/dVPUzlELMZank4+E0Cd3uASoZowdBfIKTxOOUueWYfdcXHXvSsUqvI
-         5X1Q==
+        bh=6pp/I+EL+ZGpawFf74Dn6cDUTXmZe9ODqMPcA6Z+HGI=;
+        b=jPtfisITLAgBXutOTYnPEtR25wWSafODamyAJO4zz+ElcW+rgFb2K3CPLpwAF9vDzH
+         tyHCptr7GDRBHJZ53D3Nosfwmm59aPlC/fx9C5+1PMG9jwk8VvCh6Ih72EdibvANxAFs
+         +W8+oZQyfVG6jV5c4e05YzprFmwmHmG+CyVUZwNttUc7JtBTGcgRB/SAPbIzb5LZtaxu
+         77raljPNTc3p242/p3QUF0keFMrmFVn301DKDqIkxUWYsl53JzjMSMB+Vdk6pR6xUdx9
+         2q4qBHHd9aide3N7yc/p0NmWWorIHOhJsypYkNpF61MUBorx1a/gLe+O5jZcE+sE6Ntz
+         6HKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=3Ll/pVLkdT1bVWh7yn3N43sl9bxjylKfX4mgO44t6S4=;
-        b=AHsw7v/wdxOtnnSnZ10Kw1xUTEqVjBNsESlaIcJe7b2nUCViPJa0gDcuUDPRhyXm+W
-         V23KM7x5sCfL6cEm9TLM+X5NT2+0gPvrGlN4h1ZMn3WNo3fW57qHcp6+AG7F9a/Gcfxt
-         PMSPdmVIm4p/Gaq1/t4zyhC+Qz4bUOVje3LmzZJyJZ5U3FTWRP5JKWura1GNuG4kVr8S
-         vuDxHVRLrByGFXiMDfzq2rbA0Jd2ovnNCoj4WYoga5iKbdR/vrsfq9dm3LRqwuPUw8OI
-         dKJiCk6v1GxJTOBkPjKAuMl6qe624VUEISq3EhoCsdZjyc/MA2Wx6uVK7qK/OdgtE0Uy
-         vFVQ==
-X-Gm-Message-State: ACrzQf0dBS1HTX8C3lWAka4HOT4Cx8bm1OXQ/3wKS/hf5b6k0nrVg6ur
-        d+rMqKKgoiC3bEzgOzj8D+Rsu64ovUnoRR6rHkMdCB4K
-X-Google-Smtp-Source: AMsMyM4qpz4x9MERG20aVVJxHzuDzX61F8mm+i9XjKkRDnYlQPijTTJzf/gnv8tYDEE389Hnnx4Aip+Vjj9pFUDzKDE=
-X-Received: by 2002:a17:907:320a:b0:741:72ee:8f3 with SMTP id
- xg10-20020a170907320a00b0074172ee08f3mr16107308ejb.168.1664145100556; Sun, 25
- Sep 2022 15:31:40 -0700 (PDT)
+        bh=6pp/I+EL+ZGpawFf74Dn6cDUTXmZe9ODqMPcA6Z+HGI=;
+        b=CeZ7sefGFs2lmhv6xRN/mKqiOYReF41lHlmBX7FNDRZQvIgZ2lUUy9y1eVuJ6gqWlo
+         LiUPiscO2Cai+x7mFf6ZLEIi1TqLAQi7eXbtgIh39kJtaPij535KChCeS7RfqVCjcEfC
+         2k9+1qzKkx+6xtkSk2oVqw39xJNDSR+xUUHR5CbYFnJrnV8Oc1dbZyzGMoLvB19ns81+
+         iQCe6U2xuq/jjAggOQdzExkaUWsZ0VRv2GLnHCcLeqTklkLcGdAuCt2wgCRDkoAgBIPO
+         +1juoje2VnEguZXCS4SNYsVhA8Cd7YNMws/B6ouU8LJvCpKPkbJOwztkLg4sbmzLrgfA
+         uwuA==
+X-Gm-Message-State: ACrzQf28GKFNO7JHIOz99CF3jvt8+09ZfOlweBVcdU+rcLovJsZb8KJy
+        qJfMbQw8ND3WzCnVJzPwqxp7xEQIZvQ99P0bO+8=
+X-Google-Smtp-Source: AMsMyM6utbtVMOl6kMkXwYhwuTJ+moSzt6DvbS3TGArQXjGFGPxmDInP/aYGv+Z63tWH7ERx0t7rF2VO28VTQqOvk24=
+X-Received: by 2002:a67:ad15:0:b0:398:6aef:316b with SMTP id
+ t21-20020a67ad15000000b003986aef316bmr7864303vsl.17.1664146393908; Sun, 25
+ Sep 2022 15:53:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5msb_fCs_cZC8unPmwH94APeOWhGFjBy7mn-jY0Jh3nTgw@mail.gmail.com>
-In-Reply-To: <CAH2r5msb_fCs_cZC8unPmwH94APeOWhGFjBy7mn-jY0Jh3nTgw@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Mon, 26 Sep 2022 08:31:28 +1000
-Message-ID: <CAN05THRF4s88Cfm=63p0QdqW4KzqaD0mRq1=ptWRTGC6_9iyNg@mail.gmail.com>
-Subject: Re: dir lease service hangs xfstest
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+References: <20220922151728.1557914-1-brauner@kernel.org> <20220922151728.1557914-5-brauner@kernel.org>
+ <CAH2r5mvkSW1FY2tP87mKGrOMkoN8tbOP9r=xJ4XnVbkcrE9guA@mail.gmail.com> <20220923083810.ff7jfaszl7qhoutd@wittgenstein>
+In-Reply-To: <20220923083810.ff7jfaszl7qhoutd@wittgenstein>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 25 Sep 2022 17:53:03 -0500
+Message-ID: <CAH2r5mt2Em03zN+HgL0=YZ335PLyJoBf5z3H2_Mn7y3rF=xS=A@mail.gmail.com>
+Subject: Re: [PATCH 04/29] cifs: implement get acl method
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, Seth Forshee <sforshee@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, 24 Sept 2022 at 11:03, Steve French <smfrench@gmail.com> wrote:
+On Fri, Sep 23, 2022 at 3:38 AM Christian Brauner <brauner@kernel.org> wrote:
 >
-> Probably is due to patch 6 in the series but the dir lease series
-> seems to hang (starting from 2nd xfs subtest run).  See:
-> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/1035
-> vs. current for-next
+> On Thu, Sep 22, 2022 at 10:52:43PM -0500, Steve French wrote:
+> > Looks like the SMB1 Protocol operations for get/set posix ACL were
+> > removed in the companion patch (in SMB3, POSIX ACLs have to be handled
+>
+> Sorry, what companion patch? Is a patch in this series or are you
+> referring to something else?
 
-Hmm. Remove patch 6 for now and I will try to reproduce locally.
+I found it - the patch order was confusing (I saw patches 4 and 27,
+but patch 5 was
+missed).  The functions I was asking about were deleted in patch 27 in
+your series but readded in patch 5 which I had missed.
 
+On the more general topic of POSIX ACLs:
+- Note that they are supported for SMB1 (to some servers, including Samba)
+- But ... almost all servers (including modern ones, not just ancient
+SMB1 servers) support "RichACLs" (remember that RichACLs  were
+originally based on SMB/NTFS ACLs and include deny ACEs so cover use
+cases that primitive POSIX ACLs can't handle) but for cifs.ko we have
+to map the local UID to a global unique ID for each ACE (ie id to SID
+translation).  I am interested in the topic for how it is recommended
+to map "POSIX ACLs" to "RichACLs."  I am also interested in making
+sure that cifs.ko supports the recommended mechanism for exposing
+"richacls" - since there are various filesystems that support RichACLs
+(including NFS, cifs.ko, ntfs and presumably others) and there are
+even xfstests that test richacls.
+
+
+> > by mapping from rich acls).  Was this intentional or did I miss
+> > something? I didn't see the functions for sending these over the wire
+> > for SMB1 (which does support POSIX ACLs, not just RichACLs (SMB/NTFS
+> > ACLs))
 >
-> --
-> Thanks,
+> I'm sorry, I don't understand. This is basically a 1:1 port of what you
+> currently have in cifs_xattr_set() and cifs_xattr_get() under the
+> XATTR_ACL_DEFAULT and XATTR_ACL_ACCESS switches. So basically, the
+> patches in this series just add almost 1:1 copies of
+> CIFSSMBSetPosixACL() and CIFSSMBGetPosixACL() just that instead of
+> operating on void * they operate on a proper vfs struct posix acl. So
+> nothing would've changed behavior wise. Ofc, there's always the chance
+> that I missed sm especially bc I'm not a cifs developer. :)
 >
-> Steve
+> >
+> >         pSMB->SubCommand = cpu_to_le16(TRANS2_SET_PATH_INFORMATION);
+> >         pSMB->InformationLevel = cpu_to_le16(SMB_SET_POSIX_ACL);
+
+
+
+-- 
+Thanks,
+
+Steve
