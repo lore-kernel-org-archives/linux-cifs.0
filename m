@@ -2,274 +2,253 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE10C04A95
-	for <linux-cifs@archiver.kernel.org>; Wed, 28 Sep 2022 14:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF14C04A95
+	for <linux-cifs@archiver.kernel.org>; Wed, 28 Sep 2022 15:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229640AbiI1Oxu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Sep 2022 10:53:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54810 "EHLO
+        id S233247AbiI1PFO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Sep 2022 11:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232654AbiI1Oxt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Sep 2022 10:53:49 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2053.outbound.protection.outlook.com [40.107.102.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F38A07C33F
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 07:53:47 -0700 (PDT)
+        with ESMTP id S234087AbiI1PFN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Sep 2022 11:05:13 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26D724BEC
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 08:05:11 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G//Kb9J7NFjek/Otm/oGr8YCEAEQueKIK/O2UJ0Kx5qXHGroMwQYUWHttvnkyhmQy7hp/jf5wVpzWIHHPAv1u94TV6MszhvVBrEw20RPu8cZnW92shbrGEnKSanwYduCZJK3RoKi1b7fWuH78XPEGKNcXFvyvPlo+08vApQSQbKm8hgNrKdc8Si5ry/I6nhAW40eGcoaoMXHd477Ljux8e9Mphu3EDYJSnF/EnmDakfp+bF/74oQ7pbD02JkUMg8dQNiWDiwCu+SuJouEfZqPbwyeYK6RPQM5HU/b5YnbbSU34oLhTWqBhUIiDOWOU7k0/LrSR65SHd7yILzBwVsHQ==
+ b=gY6oBWLYChsN4je4JX6z5KFBZP2oqhe6m0px6JXkTa2z0bKUNiTPylbngZnBX/2bNPbfhboo9BLjwXuvRJos/h9hLj15AXK3aWqR28cjc2fQoFmka0w/17alu1sot1TIUzLj6NlNnzYdo8pktK72rVIKHmMGd+3qfxI9AwJ1Pt1EuTPN54dXpOieWNavjx3Sxm7XOgNA8G7Fjd3LM0E/30gix6sScJpHk8Y9mZhVjkU83ozNBaobd2zs/+R+2wGOrcnEN8dGl+05TD+Iv42juD5K5p4fzJk6OO2Oj9y5MdHlW/SL1M6xXg6ZRp8MkUjwchdJqVebw0O4NS7ed0YSiw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3ifORox+KYCW+FXp62FRFfn1ZH0szT3TVC/JmSnXNu4=;
- b=eOeWJnN1vNjN0+0syG3hKhk6mTvvv0bSaN1ZgR5wLjtVhocnwivnME+g8x9AmJCzkTDF3NrceIcJa5UwRbkq6Ps2hKi9VVna6iaggCFq71PnHtEVTbvIHNo78ShrDcqGRnNSo4ZkobtzS+EIaimDSgmRLQ6utOoIUGyUhv70L0aeQ+/7kd5k6O9YjmvjbApOpzM2PXWl7YSBLqO75H+2vnR3QeNT7OJJPSVFmaEKcL8nDnxurjoiauAToKvWCFxawjJNjg9X1P1/ccpgBzPePJpfPOcDjxFeVKDeaVudhmsarF54yvi+ZQyIL1MrU3NfDgPG9f83NEPnZ4cgJpy8DA==
+ bh=yG5F790Iy2F4iCbgOaaGClETkO5CzsGDuVFIi0nOyUw=;
+ b=mB1PGPOBDf+J/2vt+oDU6nECzT8HaM05DWVd8el7RFb/dPfzmUNiAuZn8Ble1u8ertylrOuSiaRqnfuTYatZU/wy10WSM4W2erdMGJZGguBFjCNNVycd6WWlkV2l9cn2vWtOXsL1ApMXJw6Dmk/6ea5eYumEMo/Twi2D9zBetKJelLGGKJwzoBXseg5nyhrEBzPbjA7zhmuhzP2a6xz4USt7J4BTcBC7h0aD+3Ce7lXPxx1xeRqRWUX5jwV1gJNrqmP/pLs5gJMUWOFHG/Aj0mZPUxDuliF3tpVzKP/GTM8oibuZBb/VCfZBLojFORxiQguwfCbMwwJR+Q/mVRhDVQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
  dkim=pass header.d=talpey.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=talpey.com;
 Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- MN2PR01MB5439.prod.exchangelabs.com (2603:10b6:208:113::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5676.18; Wed, 28 Sep 2022 14:53:43 +0000
+ PH0PR01MB6262.prod.exchangelabs.com (2603:10b6:510:b::10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5676.17; Wed, 28 Sep 2022 15:05:09 +0000
 Received: from SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::d99d:5143:a233:36a0]) by SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::d99d:5143:a233:36a0%3]) with mapi id 15.20.5654.014; Wed, 28 Sep 2022
- 14:53:43 +0000
-Message-ID: <8fa8a09e-599b-df31-d500-9c8b8bc7a7cc@talpey.com>
-Date:   Wed, 28 Sep 2022 10:53:42 -0400
+ 15:05:09 +0000
+Message-ID: <2cbf804b-a692-ad45-4ec4-4676f15d48f2@talpey.com>
+Date:   Wed, 28 Sep 2022 11:05:08 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.3.0
-Subject: Re: [PATCH v2 4/6] Reduce server smbdirect max send/receive segment
- sizes
+Subject: Re: [RFC PATCH] cifs: fix signature check for error responses
 Content-Language: en-US
-To:     Bernard Metzler <BMT@zurich.ibm.com>,
-        Namjae Jeon <linkinjeon@kernel.org>
-Cc:     "smfrench@gmail.com" <smfrench@gmail.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "longli@microsoft.com" <longli@microsoft.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>
-References: <cover.1663961449.git.tom@talpey.com>
- <f5fab678eedae83e79f25e4385bc1381ed554599.1663961449.git.tom@talpey.com>
- <CAKYAXd97ZrGVPj3astSWz3ESHKYFQ9JAxeq3z65mB6wmoiujrQ@mail.gmail.com>
- <11e7b888-460e-efd1-0a8c-3dbf594d9429@talpey.com>
- <CAKYAXd8JiF5N_Ve65=wHPyW+twRT5WOoHH=j6+u0YAAjCV-n2Q@mail.gmail.com>
- <80b2dae4-afe4-4d51-b198-09e2fdc9f10b@talpey.com>
- <SA0PR15MB39196C2A49C71FF1838B27D499559@SA0PR15MB3919.namprd15.prod.outlook.com>
+To:     Enzo Matsumiya <ematsumiya@suse.de>, linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com
+References: <20220922223216.4730-1-ematsumiya@suse.de>
 From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <SA0PR15MB39196C2A49C71FF1838B27D499559@SA0PR15MB3919.namprd15.prod.outlook.com>
+In-Reply-To: <20220922223216.4730-1-ematsumiya@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL0PR0102CA0036.prod.exchangelabs.com
- (2603:10b6:207:18::49) To SN6PR01MB4445.prod.exchangelabs.com
+X-ClientProxiedBy: MN2PR08CA0003.namprd08.prod.outlook.com
+ (2603:10b6:208:239::8) To SN6PR01MB4445.prod.exchangelabs.com
  (2603:10b6:805:e2::33)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|MN2PR01MB5439:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9d185a23-ed32-4739-73bd-08daa1613d08
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|PH0PR01MB6262:EE_
+X-MS-Office365-Filtering-Correlation-Id: b3fbcd81-09b6-427d-6c1b-08daa162d58f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qR7BQbO16nLNy02Nsqy8lOQi2nd9Id8UEOJjvfPGg6tL7Sfq0ukxAcdMv+DqZGAHDRVnUNcoVzlYff8Oln5BhGaXnEShHM7aQ+4xxcZwm/WLRKMjxJRRcZT9Mwnq0GsTjmJixHdGdH7tzhZ57kNLOTmDMu/d82zh/dGU18u1G9Zx7YRvSTMsmGPZ+jpKRKghz6gQm941nSv4nBiLVYcwDYNUsThE39UqKFFyz2oVvdGZdeNaUWdQfn6sdOkyOEMHe2AHZEuei5jgU8lLhgvWAV3rpsra/qHI6W83y18euSff26f/S4l1mItm7poHSMjStRnDsFe/SMaERU38RHha8hViiCQHNbb86ofI+Ri8/rMsrNWok2svcqChS4s+57EuVVJMY4RgrRlNtPq2WH9Z62uCfpdsAOTKjJraeXujH+GGSxJAE5eDgyj6yZg+X+9dG+ZX21jiaJRWvH1/d9Ud+adchYBW+1zBf2W4Em8JliQfnUZS9N/VTe8slVPfuboq6V53KNOReUEGDXsMlneSINr0TtnlKUofbVzckI3XvA3pK0bmavZSBH2aI7Nwl7EgdzVsyUm9nDeAj8JF4YXbGY3cLLc0Fgm4MxUqKMyjauij7ikRjK9G5yqz7MxlmjmkKhgNRKLvU0dkJXYD2KWjO3do+bgmci6axSviYvyTRaSBVgnkjjues4cBZyy0QvShnt0sM28yQ0rpAyUb6Kv5D+tYdqMtG/5YeoAgSfr34SQmlwAgLULbce5cFJPrE8vI1q4A7l3iqrRfv/Wrs1aoOP5vRv6zT9h+KFQdRTG57a4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(346002)(39830400003)(376002)(366004)(396003)(451199015)(86362001)(31696002)(31686004)(38100700002)(38350700002)(36756003)(2906002)(186003)(2616005)(8936002)(6512007)(478600001)(26005)(52116002)(53546011)(83380400001)(6506007)(6486002)(45080400002)(110136005)(316002)(54906003)(66556008)(66476007)(66946007)(8676002)(4326008)(5660300002)(41300700001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: UNhraUswyT6PiboNmR/bTsEGlY6lWizVkwWy/BBlvbxSzoCRVG/S1+dCc6clzKq4jZgjuqJvgTAUdTdj/4OXM2qZCBlQD7JaMukQL9N116eVMslzosZxSR3DDUOsP9s1A47gDOgniFDwmT1hCeNi6cUcP86ulBRvHwkkCwVkaIWjxhIAKZEtBRXTTlM90Dit0g/cmlsB7k71RSqZl0lj6Xpm+6b+hWIcLZ+2w14KuZq3aIYT+3Rz4TYSaD6wjnCTuOP0A3T7ZRI9/D2r5PnECfvmouBpX6kFTnSySYv3vTiCZBIdS6Oom3Idz4zYrQQ2Tbijo3qBs8En4K735oUZiC3zj6HgAWBsr320gdBRBPDA+2WlWY9iJXPJyklE26TFPrrPuD7q8sclEi53TkzKnLmWUqgqVwhzcgADY9aoBIMt3oaGbqZ/f+efGiT+H7k+Ubq5I6e0Zanuus3mUI0vGJQMHC7tRPFS1CXNcjNEXvEaYYOfT4zm21H/uZCfEvGgidrKbB9Ni+uZZGgYqlQhKhyKQE/5a1hgbgzTXlK53Qt6aBgiFzUTd+VAsN/kf+gpMGK/PuaXTw8qGdfMNYYh9Chk/mXnndQrWCgvPaC1r0EX4NqWgvZhKo/uiLfy7w7RMiC7Pz6jPW2CKfxhSJkE4AG/aq0szffcPTIJed+QXfM2emfayEMCEI9tzuDMeQatj6PeuRDuhgY36WRFR/38WFKh5f63f8bVfTgvpBr18DNVCBQZ0CplW3tSi3C8IdS+96Nqms+ZLamxUG/AaB3Ypp/f06ViAQ+KvpVR7oZWi47MRmRz5KfHKVLHX4ydM8Zlgsg19sgq2r6V8vXEvjILOQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(39830400003)(376002)(346002)(366004)(396003)(136003)(451199015)(186003)(2616005)(2906002)(31686004)(66476007)(66946007)(8676002)(4326008)(66556008)(41300700001)(36756003)(478600001)(316002)(966005)(86362001)(6486002)(6506007)(31696002)(26005)(6512007)(8936002)(53546011)(52116002)(5660300002)(38100700002)(38350700002)(83380400001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dFRudjQ4QmRnZzlrMDZjUi82bSt1VFZBN2ZaZ0IycUtia3VCT253ZUxqUkp1?=
- =?utf-8?B?SVllblo1OWdLT2FGTFJkQ2tKTnJJZ21QV09rbzhFUVFBeEN6OVU0TmdNWkJO?=
- =?utf-8?B?RjlSclA2dnkxbHYxalZrelozZEliU0VKaWNUbFpIMVgzb3hTRW1OVDZ1cU9V?=
- =?utf-8?B?aUhDUGYrNENsR0F1QnU3Y2l6YTB6ZStqU1FlZlJRRFdVTFNLMWR1MkMvUzhv?=
- =?utf-8?B?enJmZWJVdjlkOG5OMG1XcDd3RHhKK1hmdEpGZThpOHpoS3p5SVo5eVhiMEJq?=
- =?utf-8?B?TDE5dEJXSWJTTnZSU0hGMGxpSHhzSHM1azVPUy9VT2VsdVB5M2YybGN2Mmd2?=
- =?utf-8?B?aFYxenZFSkttK3ZLS3lSNWtQTmRtNld1Y2lxMFBYTnFsWG4ySmpXODN2UUtq?=
- =?utf-8?B?N3pNcjdndiswTlhxMkhtRkNIRzJrZHJjdzh1Ri9iK1ptZXNLU1NkTjNXZWhZ?=
- =?utf-8?B?NTBnVVkxWXZZYUI3b1RnWUZCSDVWMFVsL2ljOExkdGs4ZEpYRS81MmF2YjBZ?=
- =?utf-8?B?dGFnQkxGVjNsYkE0YjhEYmFNbEdjajdpLzZUMVM3cGYxNGpRWlQzWGlIem5n?=
- =?utf-8?B?aWlxTTlXUDBQaFVZT2Y4RllwdHBxNzRCZVptUWw5MkFaMnhqUm5jUFh3V2NL?=
- =?utf-8?B?cE4wQ1dMU1gzYWYydnZEOXJ3cHFlcFoyMnpnL2VtMEZaTlBGL0QwbWR1RTVX?=
- =?utf-8?B?M3NEd09LQk9ON1dScitwUTh0RUpUSW4zc2orRjZTZGhRTFNZWjRKN2xQd3VJ?=
- =?utf-8?B?djltbG5hYTErNC9UL2lySVBpM3pZUFVGeVZ4MWIxa1RnVWdPUlFUNjF4RnJR?=
- =?utf-8?B?cVdmT3dLOWdnNFErS29KeFJmNkpFSjhRdGkrUVIzOFZvRW1FREQwZFhsUkZy?=
- =?utf-8?B?V3I4NDYyM0JpeW9sVlQydU5MQml3bjV2eGZXSUtQYnpxOStIYUlQQzVyU3Rj?=
- =?utf-8?B?SEswRkJZemlmSS9jQk4zZEJQLy9HbnF3SmMvbVl5azhTUnljei9Yc295SjFt?=
- =?utf-8?B?Yk1Pb0dldVJkd2k1T2EvWENKY2lXRU9QclB2QkhROXFoUlZYd3dXdzhzVTY1?=
- =?utf-8?B?RTBEMjFmRlNGeURGbVNRc3VLeUVJUkRJVmd3eFd1U0l6Y0s2WWU2NFNVOFFR?=
- =?utf-8?B?eUpyT2M1M0NWbWc3czI4SHBMb3l4aURLQmI2ZnNGaGhILytHTml0d3gvOE5v?=
- =?utf-8?B?cWxYKzFLK2tWaGJUVDNnaUxNU3ZPMVZ4dldLbm5QeTMxeGU3dWZjNTdvcWxl?=
- =?utf-8?B?Z2laV3pMTnZaOTJXenhhV3JQd2lSV0RyVXd3NnVaVWFTcW9jSnNMWWtON1F4?=
- =?utf-8?B?cXVMQkxQZU9naG0zcGhQdHl0R2puY1RrdkNpMFgwWURPQSsxcjg1MlJWbHBW?=
- =?utf-8?B?OXc4SEFzMUxrUE00M3F5TmZWN0E5OFc2aVJDcmJ1cysrY0YzNmhvZDRjWm5Q?=
- =?utf-8?B?ZW92YlRSMjhEN1EyMEJLYmJQY2tsaWxlZEUxRVpyZzY4cnA5NllnNUFHZ0tK?=
- =?utf-8?B?T0dnL1hBdzNvRUZMSnd6VmNYYlpFcHVud3lNNjlINGcrd2VvYk43bHljMCtj?=
- =?utf-8?B?TVFYZHdOd2ZsRnhTWWNsR1BOM3kzUE5jZjZKMFV1bWUwVGgvazNJS0tub2xu?=
- =?utf-8?B?SDN4cTFrM25JZ0d0dDhEeUoxWjJxcVVkMTRDWmZ4Q2k4WnJjRXYvaGZTeDdj?=
- =?utf-8?B?Vis2bmQ0azRTNlVJaVJsM2NLOFJCTndtMHI4cHRDN1VPdHA3eGlLdS9HUVBm?=
- =?utf-8?B?a05xUTl6MUJoV0FTZnFyL2J2UndmSFZMQzhzR1NPVi93dEQwMnlPMmYvdEJF?=
- =?utf-8?B?clMrL2ttakk3QUI2VXhBNUJqYkVocVZabWpKcmkrZ2dyVmtqdHVJUm5TK2Rw?=
- =?utf-8?B?NDJuZHpGbmM2WG96eHJYeko1bmdzdnlxdnp4ZGdnY1ZQeGxjemRwUEp2cFlu?=
- =?utf-8?B?RFBiUThLa3FWcWxUakdsMzRJckZIT3BMbldXMDdpUzBWQ05Ob0M4RjhyZFd4?=
- =?utf-8?B?VlNVak9XRnFXSHdvZEhXb2J4NWpnL2VScGl4WEhwYkg1TUpqODdybThvb0hu?=
- =?utf-8?B?Y1liT0pZaG1YdFFqTkZ1aFVzVkU4Y0wwNFgwVGIyTDF4eHJ6MDF1S3B6R3l2?=
- =?utf-8?Q?rQSU=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y0F5OHM0dE5FT0ZBdDR0Mm5EdFhrdEJOWG53STd2ZExKMzhZTm84RTgxblUy?=
+ =?utf-8?B?Zmt3enpzQnpRSkJRNGRkRHRIYXlLVW50ajE1dDQ5RzZDYjVKVXlnTkNFWTZ4?=
+ =?utf-8?B?bHdMOWFnWUhxOGI2S3Vqd2x0WVpBTGJUMUwzek43QkJOWllmSjhNUHUzYzNH?=
+ =?utf-8?B?NmZHNUlFekhJdUZ0YnRmamlDSG5ucEFVbGFLWEsrTVJnMG5hUlVycmlEa1la?=
+ =?utf-8?B?UUNSUWVuYnVYSkt5UFhTVDdyTExtekRQODZjQVZudUYvLzkrUG9NNGE1ck81?=
+ =?utf-8?B?d29nQm4ybXk0VWV0azVVcDNPVGRiM0hBbklyaEI5VU4xeFkyZW1aUFhxU3Ft?=
+ =?utf-8?B?bUhJUVpxSENIaWVGYVlNNzFwdmZNNFZJT3A0ZFptcEVHN0Nob1ZXMXhoY3N3?=
+ =?utf-8?B?ZjZ3WHBGZGVCYmxzdytMKzBSeG91RS9XR1l6ODBCc2lIVGJKRXhkRXZ3bjNE?=
+ =?utf-8?B?Z3lNazlobVZhbWVkdmprTGNvczVCMGVLek9MN0Qxa2NKQWVqRU0wQWo4d0tJ?=
+ =?utf-8?B?MDdPY0RwNmlSU3h3L3R5K1p6S25ZRTVxd0JIUWJTcUtMWHZ3MHdqZ0loU3lO?=
+ =?utf-8?B?OTNLQklZUVpFNlNaL0lYOE1xWTNBQTFnMEZQYWppYjRQOUYxblFuNTc0aWFq?=
+ =?utf-8?B?RXFSNWcvUS9aUENuR1Z5c1hROXFNOFBIcE5zejZOdW5wUE1nOGtNVlY1bnBv?=
+ =?utf-8?B?YWxtbHBxMGQ3Slg2L1A2TnRiVlhWQStTcnhlRkdyWXVTdjZVK3d1Q1ozRnZN?=
+ =?utf-8?B?SWNWb3k3M3R4MzJkcGxiQndjMlBuWE9WeHpFbDVlUlByekJRTzhpSDQ1OWFG?=
+ =?utf-8?B?cGk5Mk5UTjNVZUVWZGIwcnlsUWhPV2lWUUE1eUMySVFiZlBjNFl0eVFCT0M4?=
+ =?utf-8?B?OTY2bkRvazZhdDZJSmZ1QTJORnRjdDB0am13bUVmK1ZPZFNEVHlROCtpRmJi?=
+ =?utf-8?B?SXNxLzBHY3hZekVGT3Z2OVdJckhZQWRoL2dCc0ZBSDZsbWRMWGt4eUhJLzRB?=
+ =?utf-8?B?MSsyNUVzWFZFbE5pcTN2V29qR1IvTEIzYXFrWkdUcjdzSDlkQTRVRUhoVU1B?=
+ =?utf-8?B?T25mTGVjbFNTR2RrelZDeFh2ajJyMkpnVVFuQllVRm0xc0JKNjhGbndUUUgy?=
+ =?utf-8?B?dU1ZQU5ncGJac1Ztd0tJZWNaY0xkM20vdS9GMzJSS1pCdXZZYTV6eGpEYzRl?=
+ =?utf-8?B?dmUwOFpzUEV5RkJNN3B3dUIwOGVkNjEzZFB2OFdqYm5tT0NyRk95OE4vWXFW?=
+ =?utf-8?B?WUFsWlBLVVpoQlNYaW5wN1FsdEdsOWhpTVpUbEVUSTR5ajgweUZRaGFUREJL?=
+ =?utf-8?B?VGxNdE1LdWFyQlpqZXdBMFh2M3NTeTVTWTFma2FHc2dLc0hmK0s3TVFLOHBw?=
+ =?utf-8?B?d3c2Sy9TKzV0dGxLbHNieE44c0xKc3piQzYyYWlRRVlBeXV6TmIyT3Nmc2tu?=
+ =?utf-8?B?U2k4alRoMks1emd1UHZCcU5DV1dNVlR0QlN1MFZKNG00OE5TdHpLaHJSRDI0?=
+ =?utf-8?B?OXdqWDJFNVl6dVo2WFhDV2daS3BPRzNIMUxGRmNpSkV3QlBoWDhyelBkR29F?=
+ =?utf-8?B?YUxkWVhzODFnRis1SVIyK2hYRGt5Y0VWRzFFOUV2NjM0WFJDUXphKytSK2VQ?=
+ =?utf-8?B?TWlzNEJ3blhCUEk1THNOZmlBNmEyV1dFUC9RQXh4QnhFUGExaEFzSUhmNjYy?=
+ =?utf-8?B?SXA0MTE3UWZ4UlVNWDFGRlc1TUkxSlh0WktVcmNQMDY4amp1Wm40c2VBYThS?=
+ =?utf-8?B?Qys4Wnl1N29jZWorOXBuNmtlQkE5aHpNL29xVDZWRWQ5NU5EVlJsdnd6bGVt?=
+ =?utf-8?B?dk1DNnc4dHlTN2VQMWRncDF1eU5jOC9vN2lSRnQ3VUI3ZGxlVnc1aDkwaDZ0?=
+ =?utf-8?B?YVdObDQ1eFd0bFkwbC80R09RRWFLQ3ZOZTdzZWNpT2V1TjhFRG9CZ3NldkRh?=
+ =?utf-8?B?RGp1RnRyVkE2L05hWDlsMUhzZGNZRUxqdEVYMWpRRGRXc3FDUUd0a1BESXhS?=
+ =?utf-8?B?NGZ1NG82Wmo2a1FpaG02djdhSHNjN3ZXaHBLWFR0ZldDd1I4WEJPZlN4MWZT?=
+ =?utf-8?B?MWI0WExINXhub1UvNmFZOG5hcnhRQXp1YjdZL0szdlhrOURuWEFxUk4reTN6?=
+ =?utf-8?Q?MPNteRVvNpE5CD+NMgbOg9dou?=
 X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d185a23-ed32-4739-73bd-08daa1613d08
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3fbcd81-09b6-427d-6c1b-08daa162d58f
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2022 14:53:43.6866
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2022 15:05:08.9878
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VCOmoru6ok6g8mA0uAwQNoqZ4du3hv/6BzYusLgiBC9eKZvZ3fr60w56BPxk2jFB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR01MB5439
+X-MS-Exchange-CrossTenant-UserPrincipalName: xWb10lk8MnNwvBQK7TRIK/t8WRlkHLrjy+cERvPtUWxRICWOt9e+Xlt7P5MCSM8G
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB6262
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 9/27/2022 10:59 AM, Bernard Metzler wrote:
+On 9/22/2022 6:32 PM, Enzo Matsumiya wrote:
+> Hi all,
 > 
+> This patch is the (apparent) correct way to fix the issues regarding some
+> messages with invalid signatures. My previous patch
+> https://lore.kernel.org/linux-cifs/20220918235442.2981-1-ematsumiya@suse.de/
+> was wrong because a) it covered up the real issue (*), and b) I could never
+> again "reproduce" the "race" -- I had other patches in place when I tested it,
+> and (thus?) the system memory was not in "pristine" conditions, so it's very
+> likely that there's no race at all.
 > 
->> -----Original Message-----
->> From: Tom Talpey <tom@talpey.com>
->> Sent: Monday, 26 September 2022 19:25
->> To: Namjae Jeon <linkinjeon@kernel.org>
->> Cc: smfrench@gmail.com; linux-cifs@vger.kernel.org;
->> senozhatsky@chromium.org; Bernard Metzler <BMT@zurich.ibm.com>;
->> longli@microsoft.com; dhowells@redhat.com
->> Subject: [EXTERNAL] Re: [PATCH v2 4/6] Reduce server smbdirect max
->> send/receive segment sizes
->>
->> On 9/25/2022 9:13 PM, Namjae Jeon wrote:
->>> 2022-09-26 0:41 GMT+09:00, Tom Talpey <tom@talpey.com>:
->>>> On 9/24/2022 11:40 PM, Namjae Jeon wrote:
->>>>> 2022-09-24 6:53 GMT+09:00, Tom Talpey <tom@talpey.com>:
->>>>>> Reduce ksmbd smbdirect max segment send and receive size to 1364
->>>>>> to match protocol norms. Larger buffers are unnecessary and add
->>>>>> significant memory overhead.
->>>>>>
->>>>>> Signed-off-by: Tom Talpey <tom@talpey.com>
->>>>>> ---
->>>>>>     fs/ksmbd/transport_rdma.c | 4 ++--
->>>>>>     1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
->>>>>> index 494b8e5af4b3..0315bca3d53b 100644
->>>>>> --- a/fs/ksmbd/transport_rdma.c
->>>>>> +++ b/fs/ksmbd/transport_rdma.c
->>>>>> @@ -62,13 +62,13 @@ static int smb_direct_receive_credit_max = 255;
->>>>>>     static int smb_direct_send_credit_target = 255;
->>>>>>
->>>>>>     /* The maximum single message size can be sent to remote peer */
->>>>>> -static int smb_direct_max_send_size = 8192;
->>>>>> +static int smb_direct_max_send_size = 1364;
->>>>>>
->>>>>>     /*  The maximum fragmented upper-layer payload receive size
->> supported
->>>>>> */
->>>>>>     static int smb_direct_max_fragmented_recv_size = 1024 * 1024;
->>>>>>
->>>>>>     /*  The maximum single-message size which can be received */
->>>>>> -static int smb_direct_max_receive_size = 8192;
->>>>>> +static int smb_direct_max_receive_size = 1364;
->>>>> Can I know what value windows server set to ?
->>>>>
->>>>> I can see the following settings for them in MS-SMBD.pdf
->>>>> Connection.MaxSendSize is set to 1364.
->>>>> Connection.MaxReceiveSize is set to 8192.
->>>>
->>>> Glad you asked, it's an interesting situation IMO.
->>>>
->>>> In MS-SMBD, the following are documented as behavior notes:
->>>>
->>>> Client-side (active connect):
->>>>     Connection.MaxSendSize is set to 1364.
->>>>     Connection.MaxReceiveSize is set to 8192.
->>>>
->>>> Server-side (passive listen):
->>>>     Connection.MaxSendSize is set to 1364.
->>>>     Connection.MaxReceiveSize is set to 8192.
->>>>
->>>> However, these are only the initial values. During SMBD
->>>> negotiation, the two sides adjust downward to the other's
->>>> maximum. Therefore, Windows connecting to Windows will use
->>>> 1364 on both sides.
->>>>
->>>> In cifs and ksmbd, the choices were messier:
->>>>
->>>> Client-side smbdirect.c:
->>>>     int smbd_max_send_size = 1364;
->>>>     int smbd_max_receive_size = 8192;
->>>>
->>>> Server-side transport_rdma.c:
->>>>     static int smb_direct_max_send_size = 8192;
->>>>     static int smb_direct_max_receive_size = 8192;
->>>>
->>>> Therefore, peers connecting to ksmbd would typically end up
->>>> negotiating 1364 for send and 8192 for receive.
->>>>
->>>> There is almost no good reason to use larger buffers. Because
->>>> RDMA is highly efficient, and the smbdirect protocol trivially
->>>> fragments longer messages, there is no significant performance
->>>> penalty.
->>>>
->>>> And, because not many SMB3 messages require 8192 bytes over
->>>> smbdirect, it's a colossal waste of virtually contiguous kernel
->>>> memory to allocate 8192 to all receives.
->>>>
->>>> By setting all four to the practical reality of 1364, it's a
->>>> consistent and efficient default, and aligns Linux smbdirect
->>>> with Windows.
->>> Thanks for your detailed explanation!  Agree to set both to 1364 by
->>> default, Is there any usage to increase it? I wonder if users need any
->>> configuration parameters to adjust them.
->>
->> In my opinion, probably not. I give some reasons why large fragments
->> aren't always helpful just above. It's the same number of packets! Just
->> a question of whether SMBDirect or Ethernet does the fragmentation, and
->> the buffer management.
->>
+> (*) Thanks a lot to Tom Talpey for pointing me to the right direction here.
 > 
-> One simple reason for larger buffers I am aware of is running
-> efficiently on software only RDMA providers like siw or rxe.
-> For siw I'd guess we cut to less than half the performance with
-> 1364 bytes buffers. But maybe that is no concern for the setups
-> you have in mind.
+> Since it sucks to be wrong twice, I'm sending this one as RFC because I
+> wanted to confirm some things:
+> 
+>    1) Can I rely on the fact that status != STATUS_SUCCESS means no variable
+>       data in the message?  I could only infer from the spec, but not really
+>       confirm.
 
-I'm skeptical of "less than half" the performance, and wonder why
-that might be, but...
+Technically, I think the answer is "no" but practically speaking maybe
+"yes".
 
-Again, it's rather uncommon that these inline messages are ever
-large. Bulk data (r/w >=4KB) is always carried by RDMA, and does
-not appear at all in these datagrams, for example.
+Not all errors are actually errors however, e.g. STOPPED_ON_SYMLINK and
+the additional error contexts which accompany it. We definitely don't
+want to skip validation of those.
 
-The code currently has a single system-wide default, which is not
-tunable per connection and requires both sides of the connection
-to do so. It's not reasonable to depend on Windows, cifs.ko and
-ksmbd.ko to all somehow magically do the same thing. So the best
-default is the most conservative, least wasteful setting.
+There's also STATUS_PENDING, but that's special because it isn't actually
+a response, it's just a "hang on I'm busy" that carries no other
+data.
+
+Finally, MS-SMB2 lists a few others in section 2.2.2.2, all of which
+need validation I think.
+
+>    2) (probably only in async cases) When the signature fails, for whatever
+>       reason, we don't take any action.  This doesn't seem right IMHO,
+>       e.g. if the message is spoofed, we show a warning that the signatures
+>       doesn't match, but I would expect at least for the operation to stop,
+>       or maybe even a complete dis/reconnect.
+
+I don't think so. The spec calls for dropping the message, and after
+all it could have been simple packet corruption. The retries will sort
+it out.
+
+Absolutely positively do not print a message for each received packet,
+good or bad.
+
+>    3) For SMB1, I couldn't really use generic/465 as a real confirmation for
+>       this because it says "O_DIRECT is not supported".  From reading the
+>       code and 'man mount.cifs' I understood that this is supported, so what
+>       gives?  Worth noting that I don't follow/use/test SMB1 too much.
+>       The patch does work for other cases I tried though.
+
+Honestly, I don't think we care. No amount of patching can possibly
+save SMB1.
 
 Tom.
 
-
-> Best,
-> Bernard.
+> I hope someone can address my questions/concerts above, and please let me
+> know if the patch is technically and semantically correct.
 > 
->> There might conceivably be a case for *smaller*, for example on IB when
->> it's cranked down to the minimum (256B) MTU. But it will work with this
->> default.
->>
->> I'd say let's don't over-engineer it until we address the many other
->> issues in this code. Merging the two smbdirect implementations is much
->> more important than adding tweaky little knobs to both. MHO.
->>
->> Tom.
->>
->>>>>
->>>>> Why does the specification describe setting it to 8192?
->>>>>>
->>>>>>     static int smb_direct_max_read_write_size = SMBD_DEFAULT_IOSIZE;
->>>>>>
->>>>>> --
->>>>>> 2.34.1
->>>>>>
->>>>>>
->>>>>
->>>>
->>>
+> Patch follows.
+> 
+> 
+> Enzo
+> 
+> --------
+> When verifying a response's signature, the computation will go through
+> the iov buffer (header + response structs) and the over the page data, to
+> verify any dynamic data appended to the message (usually on an SMB2 READ
+> response).
+> 
+> When the response is an error, however, specifically on async reads,
+> the page data is allocated before receiving the expected data.  Being
+> "valid" data (from the signature computation POV; non-NULL, >0 pages),
+> it's included in the parsing and generates an invalid signature for the
+> message.
+> 
+> Fix this by checking if the status is non-zero, and skip the page data
+> if it is.  The issue happens in all protocol versions, and this fix
+> applies to all.
+> 
+> This issue can be observed with xfstests generic/465.
+> 
+> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> ---
+>   fs/cifs/cifsencrypt.c | 17 +++++++++++++++++
+>   1 file changed, 17 insertions(+)
+> 
+> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> index 46f5718754f9..e3260bb436b3 100644
+> --- a/fs/cifs/cifsencrypt.c
+> +++ b/fs/cifs/cifsencrypt.c
+> @@ -32,15 +32,28 @@ int __cifs_calc_signature(struct smb_rqst *rqst,
+>   	int rc;
+>   	struct kvec *iov = rqst->rq_iov;
+>   	int n_vec = rqst->rq_nvec;
+> +	bool has_error = false;
+>   
+>   	/* iov[0] is actual data and not the rfc1002 length for SMB2+ */
+>   	if (!is_smb1(server)) {
+> +		struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+> +
+>   		if (iov[0].iov_len <= 4)
+>   			return -EIO;
+> +
+> +		if (shdr->Status != 0)
+> +			has_error = true;
+> +
+>   		i = 0;
+>   	} else {
+> +		struct smb_hdr *hdr = (struct smb_hdr *)iov[1].iov_base;
+> +
+>   		if (n_vec < 2 || iov[0].iov_len != 4)
+>   			return -EIO;
+> +
+> +		if (hdr->Status.CifsError != 0)
+> +			has_error = true;
+> +
+>   		i = 1; /* skip rfc1002 length */
+>   	}
+>   
+> @@ -61,6 +74,9 @@ int __cifs_calc_signature(struct smb_rqst *rqst,
+>   		}
+>   	}
+>   
+> +	if (has_error)
+> +		goto out_final;
+> +
+>   	/* now hash over the rq_pages array */
+>   	for (i = 0; i < rqst->rq_npages; i++) {
+>   		void *kaddr;
+> @@ -81,6 +97,7 @@ int __cifs_calc_signature(struct smb_rqst *rqst,
+>   		kunmap(rqst->rq_pages[i]);
+>   	}
+>   
+> +out_final:
+>   	rc = crypto_shash_final(shash, signature);
+>   	if (rc)
+>   		cifs_dbg(VFS, "%s: Could not generate hash\n", __func__);
