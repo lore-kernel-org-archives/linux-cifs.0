@@ -2,91 +2,145 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B14EBC6FA82
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 00:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FBEFC32771
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 01:57:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbiI2AHh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Sep 2022 20:07:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44530 "EHLO
+        id S234202AbiI2B5B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Sep 2022 21:57:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiI2AHf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Sep 2022 20:07:35 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00F91166EF
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 17:07:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S234105AbiI2B5A (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Sep 2022 21:57:00 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBA9B74B8A
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 18:56:59 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3B199B8222D
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 00:07:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD0CAC433D7
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 00:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664410051;
-        bh=CrCkF0WgXvXdALBalem2h67pPCTeKHRIVx7Ya6w6psU=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Mxb3AdqiffYKaEBbsHGzBjIXJmZO+OMKwfF2mGP9gX5pHiDg7svXEWdqlMyrkcVHj
-         lXIIJP3p+FMY4oYoRXVY+7sWrZvQMoRIraDpltaUF4f6viMqV5PqmSBeEZPS2eJ25N
-         PrkA2tYyL0rPPzLvy9jpR2hHN5JELySjbg/lRoVuu9GRy7LMze3UDYCMTa7xO/qm0M
-         YIxNKQK3+LljWbYTQwtq6DpFyXQQ7HmeB/ZMVpre7sVRExIPN+IDvgVs71zBD0hLn+
-         K3d88ost0NSTpzV3ziMbq2TKTFLiE+xLu+gP1X6y3EL8eBuOKnIMCNXB/3ut87VyTQ
-         emVXadjSaCXJA==
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-13175b79807so9269603fac.9
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 17:07:31 -0700 (PDT)
-X-Gm-Message-State: ACrzQf2YnhUHaLArDz2JA8OfY58k+bIFLWjKLKwXSW9X1gWTEAj+X/aM
-        BUhSfjTE7JMd9+1/mOon6qRDYaTuII6L8dl+o4U=
-X-Google-Smtp-Source: AMsMyM7DvX8Ygniep+txUwafdqg/LlbYoQxOLOK5wFjNKx5wbXwv7FCN7ROpuBym63EBYoz7+IeXSXdYPHe2VeXLyAg=
-X-Received: by 2002:a05:6870:b290:b0:127:4089:227a with SMTP id
- c16-20020a056870b29000b001274089227amr7175416oao.8.1664410051042; Wed, 28 Sep
- 2022 17:07:31 -0700 (PDT)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 670D721CAB;
+        Thu, 29 Sep 2022 01:56:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1664416618; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=HB9d3qG0ezv4bBJTZnke+hvZx+U80tR64mbEkesg+mU=;
+        b=rEV3OQxnIzrlCgBDdhaqAfrPRBmuGnlL2UkZVoir3h+nHfoVfM6BJuw2nBe3XivFR/xkoj
+        BJ38an7kmwoOyP3YYAnljIZqCafHJZ2o+xNKPhijNXNM+9jRjbiUHDeoweRqCQddOyr5go
+        20DE3uj0n/CGgmunP1dHYyqMEPueqzA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1664416618;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=HB9d3qG0ezv4bBJTZnke+hvZx+U80tR64mbEkesg+mU=;
+        b=RFO2tfKMLtBlUVb2BjXUw0gkMHzVbWYt4trL+EusSPlhXev7qfer47CFJFEIa7iQSz2bsa
+        6Uds+wxV9iOVyLAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DE478139B3;
+        Thu, 29 Sep 2022 01:56:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id JHciKGn7NGNteQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Thu, 29 Sep 2022 01:56:57 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com, tom@talpey.com, metze@samba.org
+Subject: [PATCH v3 0/8] cifs: introduce support for AES-GMAC signing
+Date:   Wed, 28 Sep 2022 22:56:29 -0300
+Message-Id: <20220929015637.14400-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Received: by 2002:a05:6838:27c7:0:0:0:0 with HTTP; Wed, 28 Sep 2022 17:07:30
- -0700 (PDT)
-In-Reply-To: <20220928184259.75500-2-atteh.mailbox@gmail.com>
-References: <20220928184259.75500-1-atteh.mailbox@gmail.com> <20220928184259.75500-2-atteh.mailbox@gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 29 Sep 2022 09:07:30 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_F=tWHBq8By+n9kUTA0ngsCrwN8=Hg=B3nPhPYpFi2MA@mail.gmail.com>
-Message-ID: <CAKYAXd_F=tWHBq8By+n9kUTA0ngsCrwN8=Hg=B3nPhPYpFi2MA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] ksmbd-tools: preserve share name case by
- casefolding at lookup-time
-To:     =?UTF-8?Q?Atte_Heikkil=C3=A4?= <atteh.mailbox@gmail.com>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-09-29 3:42 GMT+09:00, Atte Heikkil=C3=A4 <atteh.mailbox@gmail.com>:
-> Preserve the case of share names by doing casefolding at hash table
-> lookup-time. This is preferrable for a few reasons.
->
-> First, ksmbd can be built such that it is not capable of casefolding
-> UTF-8 share names. Such share names are then case-sensitive if they
-> have non-ASCII characters, and connections to them should succeed only
-> when matching the name in ksmbd.conf, ignoring ASCII case. As such, the
-> case-preserved share name will be sent to ksmbd in the share config
-> response so that ksmbd can casefold it and validate against the share
-> name it knows. This is necessitated by the way share config caching is
-> done.
->
-> Second, addshare should ideally preserve formatting when modifying
-> ksmbd.conf. Then, preserving the case for user readability reasons is
-> desirable. Also, since ksmbd.conf is just as often edited with a text
-> editor, it is important that share names can be searched using it,
-> which is often not possible when they are written casefolded.
->
-> Third, case-preserved share names are now used in SRVSVC GET_SHARE_INFO
-> response, with __share_entry_data_ctr0() and __share_entry_data_ctr1(),
-> and so they are seen as written in ksmbd.conf.
->
-> Also, in shm_casefold_share_name(), note that g_utf8_casefold() aborts
-> on fail, and if g_utf8_normalize() fails, g_ascii_strdown() aborts on
-> fail. `share_name' was leaked in srvsvc_share_get_info_invoke() as the
-> string returned by shm_casefold_share_name() should be freed. Before
-> that, `share_name' was the string returned by g_ascii_strdown() and
-> leaked then as well.
->
-> Signed-off-by: Atte Heikkil=C3=A4 <atteh.mailbox@gmail.com>
-Applied, Thanks for your work!
+Hi all,
+
+This is v3 of this series.  Please refer to the original cover letter here:
+https://lore.kernel.org/linux-cifs/20220829213354.2714-1-ematsumiya@suse.de/
+
+Major changes from v2:
+- added patches 1-4 as some groundwork (see more below)
+- the core function is now smb311_calc_signature(), and it's been simplified a
+  lot, and removed the "merge" with crypt_message() (thanks metze for the help!)
+- fix a very specific bug when AES-GMAC was used with KASAN enabled (patch 8/8)
+
+Summary of each patch below.  Please refer to each individual commit message
+for more details:
+
+- Patch 1/8: smb3: rename encryption/decryption TFMs
+Rename the encryption/decryption TFMs to more meaningful names.
+
+- Patch 2/8: cifs: secmech: use shash_desc directly, remove sdesc
+This patch removes the sdesc struct and uses the crypto API shash_desc directly
+instead.  It's what the API use anyway, so no need for a wrapper.
+
+- Patch 3/8: cifs: allocate ephemeral secmechs only on demand
+Remove the ephemeral, single-use TFMs from cifs_secmech, and allocate/free them
+only when they're used (on session setup), making the only long lived TFMs the
+signing and encrypting ones.
+
+- Patch 4/8: cifs: create sign/verify secmechs, don't leave keys in memory
+This patch goes further and completely remove the algorithm-specific TFMs from
+cifs_secmech, and introduce `sign' and `verify' TFMs.  This removes the need to
+allocate a new TFM on every signature verification.  Another added benefit is
+that's no longer necessary to keep the generated private keys in memory, as
+they're set right after negprot and the TFMs will use the expanded version of
+the keys internally.
+
+- Patch 5/8: cifs: introduce AES-GMAC signing support for SMB 3.1.1
+Several changes needed to be made in this patch, see the commit message/changes
+for more details.
+
+- Patch 6/8: cifs: deprecate 'enable_negotiate_signing' module param
+- Patch 7/8: cifs: show signing algorithm name in DebugData
+The above patches are pretty much the same as v2.
+
+- Patch 8/8: cifs: use MAX_CIFS_SMALL_BUFFER_SIZE-8 as padding buffer
+I hit a use-after-free on the crypto API when using AES-GMAC, with KASAN
+enabled, and on a very specific test that used the smb2_padding array.  In
+summary, KASAN was not happy with the stack-allocated array so this is the fix
+the I ended up with (of all the several forms of fix that I implemented).
+
+I welcome and expect all kinds of feedback and reviews.
+
+
+Cheers,
+
+Enzo
+
+Enzo Matsumiya (8):
+  smb3: rename encryption/decryption TFMs
+  cifs: secmech: use shash_desc directly, remove sdesc
+  cifs: allocate ephemeral secmechs only on demand
+  cifs: create sign/verify secmechs, don't leave keys in memory
+  cifs: introduce AES-GMAC signing support for SMB 3.1.1
+  cifs: deprecate 'enable_negotiate_signing' module param
+  cifs: show signing algorithm name in DebugData
+  cifs: use MAX_CIFS_SMALL_BUFFER_SIZE-8 as padding buffer
+
+ fs/cifs/cifs_debug.c    |   7 +-
+ fs/cifs/cifsencrypt.c   | 157 ++++-------
+ fs/cifs/cifsfs.c        |  14 +-
+ fs/cifs/cifsglob.h      |  68 +++--
+ fs/cifs/cifsproto.h     |   5 +-
+ fs/cifs/link.c          |  13 +-
+ fs/cifs/misc.c          |  49 ++--
+ fs/cifs/sess.c          |  12 -
+ fs/cifs/smb1ops.c       |   6 +
+ fs/cifs/smb2glob.h      |  10 +
+ fs/cifs/smb2misc.c      |  29 +-
+ fs/cifs/smb2ops.c       | 103 ++-----
+ fs/cifs/smb2pdu.c       |  78 ++++--
+ fs/cifs/smb2pdu.h       |   2 -
+ fs/cifs/smb2proto.h     |  15 +-
+ fs/cifs/smb2transport.c | 581 +++++++++++++++++++++-------------------
+ 16 files changed, 572 insertions(+), 577 deletions(-)
+
+-- 
+2.35.3
+
