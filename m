@@ -2,145 +2,178 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FBEFC32771
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 01:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B472C54EE9
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 01:57:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234202AbiI2B5B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Sep 2022 21:57:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51764 "EHLO
+        id S234105AbiI2B5E (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Sep 2022 21:57:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234105AbiI2B5A (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Sep 2022 21:57:00 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBA9B74B8A
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 18:56:59 -0700 (PDT)
+        with ESMTP id S231419AbiI2B5E (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Sep 2022 21:57:04 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53964122077
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 18:57:03 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 670D721CAB;
-        Thu, 29 Sep 2022 01:56:58 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C7BE21F890;
+        Thu, 29 Sep 2022 01:57:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1664416618; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=HB9d3qG0ezv4bBJTZnke+hvZx+U80tR64mbEkesg+mU=;
-        b=rEV3OQxnIzrlCgBDdhaqAfrPRBmuGnlL2UkZVoir3h+nHfoVfM6BJuw2nBe3XivFR/xkoj
-        BJ38an7kmwoOyP3YYAnljIZqCafHJZ2o+xNKPhijNXNM+9jRjbiUHDeoweRqCQddOyr5go
-        20DE3uj0n/CGgmunP1dHYyqMEPueqzA=
+        t=1664416621; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vhzj/xJxfT9CH4vDB8il3YZESl9ubkDvRLIplT2p/PE=;
+        b=q9CW7cl+2/aRLWjzsLgTTOq3HWQkLMjnXVwBBBanMHAMCWY/tT9Ptkn20Z2shzRKqgpgiL
+        KfBQSj5dVSA9flnBDHV2zMGzN4qzX5dZSKnKLPTEZ8Xhce9UK4XG9FIf4HiiuJ+NMbOd7Y
+        n7kyYQxSiRaWommcq1EKiiT45ETGMcg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1664416618;
+        s=susede2_ed25519; t=1664416621;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=HB9d3qG0ezv4bBJTZnke+hvZx+U80tR64mbEkesg+mU=;
-        b=RFO2tfKMLtBlUVb2BjXUw0gkMHzVbWYt4trL+EusSPlhXev7qfer47CFJFEIa7iQSz2bsa
-        6Uds+wxV9iOVyLAw==
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vhzj/xJxfT9CH4vDB8il3YZESl9ubkDvRLIplT2p/PE=;
+        b=CZR3TzQV5+tbHjeknSbK5NBn2lnKl0S+f1tPt0m4dciFQh6++0EmC6cu2JbaeFxkIzyCVV
+        /XXjIwrshbC88/Dw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DE478139B3;
-        Thu, 29 Sep 2022 01:56:57 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 48D56139B3;
+        Thu, 29 Sep 2022 01:57:01 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id JHciKGn7NGNteQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Thu, 29 Sep 2022 01:56:57 +0000
+        id hCAyA237NGN5eQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Thu, 29 Sep 2022 01:57:01 +0000
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
         nspmangalore@gmail.com, tom@talpey.com, metze@samba.org
-Subject: [PATCH v3 0/8] cifs: introduce support for AES-GMAC signing
-Date:   Wed, 28 Sep 2022 22:56:29 -0300
-Message-Id: <20220929015637.14400-1-ematsumiya@suse.de>
+Subject: [PATCH v3 1/8] smb3: rename encryption/decryption TFMs
+Date:   Wed, 28 Sep 2022 22:56:30 -0300
+Message-Id: <20220929015637.14400-2-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.35.3
+In-Reply-To: <20220929015637.14400-1-ematsumiya@suse.de>
+References: <20220929015637.14400-1-ematsumiya@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi all,
+Detach the TFM name from a specific algorithm (AES-CCM) as
+AES-GCM is also supported, making the name misleading.
 
-This is v3 of this series.  Please refer to the original cover letter here:
-https://lore.kernel.org/linux-cifs/20220829213354.2714-1-ematsumiya@suse.de/
+s/ccmaesencrypt/enc/
+s/ccmaesdecrypt/dec/
 
-Major changes from v2:
-- added patches 1-4 as some groundwork (see more below)
-- the core function is now smb311_calc_signature(), and it's been simplified a
-  lot, and removed the "merge" with crypt_message() (thanks metze for the help!)
-- fix a very specific bug when AES-GMAC was used with KASAN enabled (patch 8/8)
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ fs/cifs/cifsencrypt.c   | 12 ++++++------
+ fs/cifs/cifsglob.h      |  4 ++--
+ fs/cifs/smb2ops.c       |  3 +--
+ fs/cifs/smb2transport.c | 12 ++++++------
+ 4 files changed, 15 insertions(+), 16 deletions(-)
 
-Summary of each patch below.  Please refer to each individual commit message
-for more details:
-
-- Patch 1/8: smb3: rename encryption/decryption TFMs
-Rename the encryption/decryption TFMs to more meaningful names.
-
-- Patch 2/8: cifs: secmech: use shash_desc directly, remove sdesc
-This patch removes the sdesc struct and uses the crypto API shash_desc directly
-instead.  It's what the API use anyway, so no need for a wrapper.
-
-- Patch 3/8: cifs: allocate ephemeral secmechs only on demand
-Remove the ephemeral, single-use TFMs from cifs_secmech, and allocate/free them
-only when they're used (on session setup), making the only long lived TFMs the
-signing and encrypting ones.
-
-- Patch 4/8: cifs: create sign/verify secmechs, don't leave keys in memory
-This patch goes further and completely remove the algorithm-specific TFMs from
-cifs_secmech, and introduce `sign' and `verify' TFMs.  This removes the need to
-allocate a new TFM on every signature verification.  Another added benefit is
-that's no longer necessary to keep the generated private keys in memory, as
-they're set right after negprot and the TFMs will use the expanded version of
-the keys internally.
-
-- Patch 5/8: cifs: introduce AES-GMAC signing support for SMB 3.1.1
-Several changes needed to be made in this patch, see the commit message/changes
-for more details.
-
-- Patch 6/8: cifs: deprecate 'enable_negotiate_signing' module param
-- Patch 7/8: cifs: show signing algorithm name in DebugData
-The above patches are pretty much the same as v2.
-
-- Patch 8/8: cifs: use MAX_CIFS_SMALL_BUFFER_SIZE-8 as padding buffer
-I hit a use-after-free on the crypto API when using AES-GMAC, with KASAN
-enabled, and on a very specific test that used the smb2_padding array.  In
-summary, KASAN was not happy with the stack-allocated array so this is the fix
-the I ended up with (of all the several forms of fix that I implemented).
-
-I welcome and expect all kinds of feedback and reviews.
-
-
-Cheers,
-
-Enzo
-
-Enzo Matsumiya (8):
-  smb3: rename encryption/decryption TFMs
-  cifs: secmech: use shash_desc directly, remove sdesc
-  cifs: allocate ephemeral secmechs only on demand
-  cifs: create sign/verify secmechs, don't leave keys in memory
-  cifs: introduce AES-GMAC signing support for SMB 3.1.1
-  cifs: deprecate 'enable_negotiate_signing' module param
-  cifs: show signing algorithm name in DebugData
-  cifs: use MAX_CIFS_SMALL_BUFFER_SIZE-8 as padding buffer
-
- fs/cifs/cifs_debug.c    |   7 +-
- fs/cifs/cifsencrypt.c   | 157 ++++-------
- fs/cifs/cifsfs.c        |  14 +-
- fs/cifs/cifsglob.h      |  68 +++--
- fs/cifs/cifsproto.h     |   5 +-
- fs/cifs/link.c          |  13 +-
- fs/cifs/misc.c          |  49 ++--
- fs/cifs/sess.c          |  12 -
- fs/cifs/smb1ops.c       |   6 +
- fs/cifs/smb2glob.h      |  10 +
- fs/cifs/smb2misc.c      |  29 +-
- fs/cifs/smb2ops.c       | 103 ++-----
- fs/cifs/smb2pdu.c       |  78 ++++--
- fs/cifs/smb2pdu.h       |   2 -
- fs/cifs/smb2proto.h     |  15 +-
- fs/cifs/smb2transport.c | 581 +++++++++++++++++++++-------------------
- 16 files changed, 572 insertions(+), 577 deletions(-)
-
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 46f5718754f9..f622d2ba6bd0 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -743,14 +743,14 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
+ 		server->secmech.hmacmd5 = NULL;
+ 	}
+ 
+-	if (server->secmech.ccmaesencrypt) {
+-		crypto_free_aead(server->secmech.ccmaesencrypt);
+-		server->secmech.ccmaesencrypt = NULL;
++	if (server->secmech.enc) {
++		crypto_free_aead(server->secmech.enc);
++		server->secmech.enc = NULL;
+ 	}
+ 
+-	if (server->secmech.ccmaesdecrypt) {
+-		crypto_free_aead(server->secmech.ccmaesdecrypt);
+-		server->secmech.ccmaesdecrypt = NULL;
++	if (server->secmech.dec) {
++		crypto_free_aead(server->secmech.dec);
++		server->secmech.dec = NULL;
+ 	}
+ 
+ 	kfree(server->secmech.sdesccmacaes);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ae7f571a7dba..cbb108b15412 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -171,8 +171,8 @@ struct cifs_secmech {
+ 	struct sdesc *sdeschmacsha256;  /* ctxt to generate smb2 signature */
+ 	struct sdesc *sdesccmacaes;  /* ctxt to generate smb3 signature */
+ 	struct sdesc *sdescsha512; /* ctxt to generate smb3.11 signing key */
+-	struct crypto_aead *ccmaesencrypt; /* smb3 encryption aead */
+-	struct crypto_aead *ccmaesdecrypt; /* smb3 decryption aead */
++	struct crypto_aead *enc; /* smb3 AEAD encryption TFM (AES-CCM and AES-GCM) */
++	struct crypto_aead *dec; /* smb3 AEAD decryption TFM (AES-CCM and AES-GCM) */
+ };
+ 
+ /* per smb session structure/fields */
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 421be43af425..d1528755f330 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4344,8 +4344,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 		return rc;
+ 	}
+ 
+-	tfm = enc ? server->secmech.ccmaesencrypt :
+-						server->secmech.ccmaesdecrypt;
++	tfm = enc ? server->secmech.enc : server->secmech.dec;
+ 
+ 	if ((server->cipher_type == SMB2_ENCRYPTION_AES256_CCM) ||
+ 		(server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 4640fc4a8b13..d4e1a5d74dcd 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -904,7 +904,7 @@ smb3_crypto_aead_allocate(struct TCP_Server_Info *server)
+ {
+ 	struct crypto_aead *tfm;
+ 
+-	if (!server->secmech.ccmaesencrypt) {
++	if (!server->secmech.enc) {
+ 		if ((server->cipher_type == SMB2_ENCRYPTION_AES128_GCM) ||
+ 		    (server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
+ 			tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
+@@ -915,23 +915,23 @@ smb3_crypto_aead_allocate(struct TCP_Server_Info *server)
+ 				 __func__);
+ 			return PTR_ERR(tfm);
+ 		}
+-		server->secmech.ccmaesencrypt = tfm;
++		server->secmech.enc = tfm;
+ 	}
+ 
+-	if (!server->secmech.ccmaesdecrypt) {
++	if (!server->secmech.dec) {
+ 		if ((server->cipher_type == SMB2_ENCRYPTION_AES128_GCM) ||
+ 		    (server->cipher_type == SMB2_ENCRYPTION_AES256_GCM))
+ 			tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
+ 		else
+ 			tfm = crypto_alloc_aead("ccm(aes)", 0, 0);
+ 		if (IS_ERR(tfm)) {
+-			crypto_free_aead(server->secmech.ccmaesencrypt);
+-			server->secmech.ccmaesencrypt = NULL;
++			crypto_free_aead(server->secmech.enc);
++			server->secmech.enc = NULL;
+ 			cifs_server_dbg(VFS, "%s: Failed to alloc decrypt aead\n",
+ 				 __func__);
+ 			return PTR_ERR(tfm);
+ 		}
+-		server->secmech.ccmaesdecrypt = tfm;
++		server->secmech.dec = tfm;
+ 	}
+ 
+ 	return 0;
 -- 
 2.35.3
 
