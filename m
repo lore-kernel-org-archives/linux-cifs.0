@@ -2,107 +2,100 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A6DC04A95
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 04:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13071C07E9D
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 05:02:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233404AbiI2EyX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Sep 2022 00:54:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53164 "EHLO
+        id S234628AbiI2FCq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Sep 2022 01:02:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232380AbiI2EyW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 00:54:22 -0400
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E4021181FC
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 21:54:21 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id q26so351656vsr.7
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 21:54:21 -0700 (PDT)
+        with ESMTP id S233904AbiI2FCl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 01:02:41 -0400
+Received: from mail-ua1-x936.google.com (mail-ua1-x936.google.com [IPv6:2607:f8b0:4864:20::936])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 782681257B7
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 22:02:40 -0700 (PDT)
+Received: by mail-ua1-x936.google.com with SMTP id a14so80278uat.13
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Sep 2022 22:02:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=Mx1+Ok50Mdf3vBcixQVMQ7nj4e0WbOZI3BBrxMJMLgE=;
-        b=NlW7N2A/TEPkH++hbnf/LaW/KGHOBxhBpkQY0aJZM6ffvrGx/PmvgfN2MJBreuY//Z
-         WhSNWe8HVvdDJo/pU1y5hPkHdwaGlFT6D2CQvohUXNWjMz7ozBwifyJ5p7lAFHSm0PmV
-         JZb85tovxw/WjjnwLBHYS4SRsyxm41qEZ5It5NPhqMW0ronJFYpQ8P6S+qE+98o0TA8B
-         ie73My0FI2VCUPnfnlxC6GUQgiztMUyfT5UcN4TxAbgNaxyzmpMl+W8J2+fs6DSiw/Qx
-         TI0kGdx14e1ypQRD7bLJFCW7M2YHzvM9Cwfx4HaJzYpK7hCHQMJRO/Hetj3sBs3uXmVJ
-         R+Sg==
+        bh=ewaDed2THPemAQTLc536e2M33C8Y8T46PSx7UEqLrlw=;
+        b=RJeA2wz3gtjCfne2TfheHL2nLjB/7Gk+dAVgZHse7ZoGGcttkx+cE4fgzGCB+VmAuQ
+         tZo+1G3txb59pQj8/Q6n4fn1D2qk8QrGsgsl4Uy3ZbwfQllhIglb2PZrArVgMDTNLJ+V
+         bhtvq9aqGF2qwydws4b+c2Qy/bhsyVEPkBZm189VijGD3m1cv8jsD32btVDWzie+lFGG
+         B3vkXbQfhewbn9Nyy0oMh5DkBWo5sQX18/n1gs65k7HMd580LESgc0G30ggeAkrs5kSp
+         qILFPngMWOta7tKuVoguMhKINHdUZKgddTThEf6N9FHh/SPOHStp40LbeiPHpiFsXG2M
+         /epw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=Mx1+Ok50Mdf3vBcixQVMQ7nj4e0WbOZI3BBrxMJMLgE=;
-        b=zorK33kJ4vLd0Q9oegKT27HoAWZnu6FCRKtUF3AJrKHd6+Zh2fQyzrMOw53qrH49OB
-         uc70hchm9xDrOZNZIsV3NQKjVWn24fHdonJKCjHcR8Jg+buV+EakJi/1pNXXb6Z5GWlq
-         hlt9Km6VBKT2kDv9E4LVSGMDdMZ45UGUWflvIDom9SnCvn/82CfnqH7sfohhcqZ3t+AY
-         hUwr9dB/y+4PaT2DZGXVUT0usDO4scN/k7xejBpOvwiqoPUoJTgtuAyk1Kcm6u3mcdFb
-         ua7RlBQp+Kh94jgAd/Ht7Ms1isz0MHotVOTkW+eNOslUJr9ZiM/naV6mwT4LAkm2qQVl
-         Yy9g==
-X-Gm-Message-State: ACrzQf3smuKq+4xA+50yLnQSjDCDjHOInGmZfS83yAKyA/092Cvs7Cnk
-        7kNirZ8pFlrIRVs63NPFXnAzsO1277IR7SKijCw=
-X-Google-Smtp-Source: AMsMyM5TmyCcW7Cc8o7BBTFVHFg9N1SNtEYi1dPGwtZF9KCDJUccrxklLjaGv+CCswoKbhQuz7IPKVIhEZJL+ey+Q0w=
-X-Received: by 2002:a67:ad15:0:b0:398:6aef:316b with SMTP id
- t21-20020a67ad15000000b003986aef316bmr499696vsl.17.1664427260088; Wed, 28 Sep
- 2022 21:54:20 -0700 (PDT)
+        bh=ewaDed2THPemAQTLc536e2M33C8Y8T46PSx7UEqLrlw=;
+        b=mTF5oBnP7uBhYG93gYuo6E4B4Hch6tMZYsrMUvWv9hziYUmrzzZKZwePFJDu1thOYU
+         lNWS7WfeuZhScke4qTgcy6RzaU3NmmK+Q0D9WslVOv6SwQmlUbFaRIeJ+f11zgl99D1R
+         Ylhjpbqyqn4kyL4ty1YJcsSjKHFlMBUKdmidD+zEIEn0bmq7MdyNshpxU5EWRKzwXPu6
+         iFRzDQPSOO1FxR9EiW+E2qkLsyP4orO1y/2XNRqYvcHKTTgaj1C+dRgHq2UTLO8txfzp
+         RrZ4sg9t8QCBR1X1pxHJJSCMjvRtWCrzLeT66eLxH/r1+/bmGA1Eei8uNbo2Fw+o99lC
+         QEew==
+X-Gm-Message-State: ACrzQf09XGYv6I78sY4GM/34Y3VVTefBuRRNN9YOqBLHtirRjZtkM2dY
+        ItOoiJ7vpLvin5vcgFtperzBd3XhK2HlPTtz4CY=
+X-Google-Smtp-Source: AMsMyM6zzRJyG6TpLaEpmknQiqvbMe6zJWZizR1Rg7T0CU7g5PWEW8IphxilsgCuMKfboAF0etETfcF73gN4CK94gT4=
+X-Received: by 2002:ab0:2245:0:b0:3af:631f:6508 with SMTP id
+ z5-20020ab02245000000b003af631f6508mr695931uan.84.1664427759405; Wed, 28 Sep
+ 2022 22:02:39 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220926033631.926637-1-zhangxiaoxu5@huawei.com> <20220926033631.926637-2-zhangxiaoxu5@huawei.com>
-In-Reply-To: <20220926033631.926637-2-zhangxiaoxu5@huawei.com>
+References: <cover.1663961449.git.tom@talpey.com>
+In-Reply-To: <cover.1663961449.git.tom@talpey.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 28 Sep 2022 23:54:09 -0500
-Message-ID: <CAH2r5mtdZKOcH939kTw_q9qSTZ9iYCU+=QaHPgaWfjvxN4ffkA@mail.gmail.com>
-Subject: Re: [PATCH v8 1/3] cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO
- message
-To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, pc@cjr.nz,
-        lsahlber@redhat.com, sprasad@microsoft.com, rohiths@microsoft.com,
-        tom@talpey.com, linkinjeon@kernel.org, hyc.lee@gmail.com
+Date:   Thu, 29 Sep 2022 00:02:28 -0500
+Message-ID: <CAH2r5msZ85dBBU=rPyzgBOPJmMrJ2ACCG+DhrJJprvDJcr9QPg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] Reduce SMBDirect RDMA SGE counts and sizes
+To:     Tom Talpey <tom@talpey.com>
+Cc:     linux-cifs@vger.kernel.org, linkinjeon@kernel.org,
+        senozhatsky@chromium.org, bmt@zurich.ibm.com, longli@microsoft.com,
+        dhowells@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next  (waiting on additional
-review/testing of patch 3 in the series before merging that)
+merged patches 1, 3, 5, 6 of this series into cifs-2.6.git for-next
+(will let Namjae test/try the server patches, 2 and 4) pending
+additional testing.
 
-On Sun, Sep 25, 2022 at 9:35 PM Zhang Xiaoxu <zhangxiaoxu5@huawei.com> wrote:
+Let me know if any Reviewed-by to add
+
+On Fri, Sep 23, 2022 at 4:54 PM Tom Talpey <tom@talpey.com> wrote:
 >
-> Commit d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
-> extend the dialects from 3 to 4, but forget to decrease the extended
-> length when specific the dialect, then the message length is larger
-> than expected.
+> Allocate fewer SGEs and standard packet sizes in both kernel SMBDirect
+> implementations.
 >
-> This maybe leak some info through network because not initialize the
-> message body.
+> The current maximum values (16 SGEs and 8192 bytes) cause failures on the
+> SoftiWARP provider, and are suboptimal on others. Reduce these to 6 and
+> 1364. Additionally, recode smbd_send() to work with as few as 2 SGEs,
+> and for debug sanity, reformat client-side logging to more clearly show
+> addresses, lengths and flags in the appropriate base.
 >
-> After apply this patch, the VALIDATE_NEGOTIATE_INFO message length is
-> reduced from 28 bytes to 26 bytes.
+> Tested over SoftiWARP and SoftRoCE with shell, Connectathon basic and general.
 >
-> Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
-> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-> Cc: <stable@vger.kernel.org>
-> Reviewed-by: Tom Talpey <tom@talpey.com>
-> ---
->  fs/cifs/smb2pdu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> v2: correct an uninitialized value issue found by Coverity
 >
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 40da444c46b4..90ccac18f9f3 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1169,9 +1169,9 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
->                 pneg_inbuf->Dialects[0] =
->                         cpu_to_le16(server->vals->protocol_id);
->                 pneg_inbuf->DialectCount = cpu_to_le16(1);
-> -               /* structure is big enough for 3 dialects, sending only 1 */
-> +               /* structure is big enough for 4 dialects, sending only 1 */
->                 inbuflen = sizeof(*pneg_inbuf) -
-> -                               sizeof(pneg_inbuf->Dialects[0]) * 2;
-> +                               sizeof(pneg_inbuf->Dialects[0]) * 3;
->         }
+> Tom Talpey (6):
+>   Decrease the number of SMB3 smbdirect client SGEs
+>   Decrease the number of SMB3 smbdirect server SGEs
+>   Reduce client smbdirect max receive segment size
+>   Reduce server smbdirect max send/receive segment sizes
+>   Handle variable number of SGEs in client smbdirect send.
+>   Fix formatting of client smbdirect RDMA logging
 >
->         rc = SMB2_ioctl(xid, tcon, NO_FILE_ID, NO_FILE_ID,
+>  fs/cifs/smbdirect.c       | 227 ++++++++++++++++----------------------
+>  fs/cifs/smbdirect.h       |  14 ++-
+>  fs/ksmbd/transport_rdma.c |   6 +-
+>  3 files changed, 109 insertions(+), 138 deletions(-)
+>
 > --
-> 2.31.1
+> 2.34.1
 >
 
 
