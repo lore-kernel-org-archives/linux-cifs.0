@@ -2,144 +2,98 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8FFC433FE
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 20:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29905C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 22:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229666AbiI2UhO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Sep 2022 16:37:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43518 "EHLO
+        id S229768AbiI2WNZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Sep 2022 18:13:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229585AbiI2UhN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 16:37:13 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3120132FC9
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 13:37:12 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 4D3671F38D;
-        Thu, 29 Sep 2022 20:37:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1664483831; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9F2Pc2aXi6tZ14w54OVBFKWYmeZNdLX5//SNOb7X1HE=;
-        b=tqy8rVLLdOWE5Bb7obf9ofEVDpO+zmWUlBnu2kEdFYQUNVrHikWWqtBYlRGM8aIms7rs7Y
-        JXqUNPV9Y/VTUo2n4YALBIH8BAFVOY1VgLsv4RisaPJmZgUw0uokpHfAyPuOi+u5FRH50p
-        mNpWc0gqwaeYIoHpft203rGr2t4Ta1U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1664483831;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9F2Pc2aXi6tZ14w54OVBFKWYmeZNdLX5//SNOb7X1HE=;
-        b=dNvezTviE4r82aPYa/zp/cefVWLvC8ztRRSKSxeaAhYWYuHcaHYZcLzhttGPpFK6+6vSOh
-        OiEstTTHteoLQzCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C3F6C1348E;
-        Thu, 29 Sep 2022 20:37:10 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id FG9MIfYBNmPxTAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Thu, 29 Sep 2022 20:37:10 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com, tom@talpey.com, metze@samba.org
-Subject: [PATCH v4 7/8] cifs: show signing algorithm name in DebugData
-Date:   Thu, 29 Sep 2022 17:36:52 -0300
-Message-Id: <20220929203652.13178-5-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20220929203652.13178-1-ematsumiya@suse.de>
-References: <20220929203652.13178-1-ematsumiya@suse.de>
+        with ESMTP id S229800AbiI2WNX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 18:13:23 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964FA139BF7
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 15:13:19 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id m3so3721317eda.12
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 15:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=eRyCPvPZZxYwXFNSo/W6sA/ZYiea2DcV7a4pnsRRR94=;
+        b=Q/FOij97WrmwNlv4yD0XfcfYb0kHvenYahekG8795HxK8fDd9gC6/nruCpGEUiohmK
+         88DTgFxWGceR1b+5BSyMJRnukjrQf8j/KU6g3/7VnofPCOwqgeRKjKRjqz9bXVm+g3tP
+         OxaQ/PhubRZ1rIsMvg00268YuvXsyeIjGhmyWzX04/BY+9/kdQFCrp6bXpDc17fqNY/A
+         IfgzPXCYJvcx9o4sRB+ZnLQr4QAPcvpV3qZnscfKPzQjtBabYiqw/NoKX2PacccxS7VD
+         BobbststjpTSGnjJ6wLfYU48WPuRaUQcStLHMMgGdr8XlupRIGUtCwZKex+r/8MPT93f
+         xOZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=eRyCPvPZZxYwXFNSo/W6sA/ZYiea2DcV7a4pnsRRR94=;
+        b=FQZ+vSDC9uig1fb7GEra6cBqhzQfYLtbxaaNDO7zNPzckv3vbJRMxUExYxEe2aEyWP
+         SzksI704iIcuPjbv6JwNTQGko3NTVH2bzLcDIhHWvspK+ajBq4RxFLBRpXxrjF5g6BXj
+         txD11nXgX+xLXSzJf8HW+afskpghk7NXDT/ipUST2iVofPidnxGmggnS/hZFxfVROAaI
+         DS4J4R5yq9uyDBT3KOuNurRH/82YvHXfDonLyzQ2TNlcTcYZwWu/sjbrXFmHo/xN2sNN
+         3iekMO4FkCB699bWlRMAzCq4UQvzEnBtU2NlhOB7my9YqJ1ZklfjUdZawJwsBbjy1QnA
+         dXxg==
+X-Gm-Message-State: ACrzQf36YHArn2LYynArZug2D6LD2bWK2egsBTfDgH3wcdOQ8wWB73zZ
+        ZPDK6LVmxjWeuZJlRiX5Yzfrxig4Igm3ZqUBpEtqrsJubiA=
+X-Google-Smtp-Source: AMsMyM5TLrVTeQQRLF8noR/lG9nGIseK4WXJZ2ZqXFnr6xTsH1VFMD0c5a/aHusNUsIuEee0fxkzOMTuXVbSp2EWZfY=
+X-Received: by 2002:aa7:d504:0:b0:458:862:ffc7 with SMTP id
+ y4-20020aa7d504000000b004580862ffc7mr5420607edq.67.1664489597945; Thu, 29 Sep
+ 2022 15:13:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAH2r5muXa4pn4EYcW6quTgn1o++o6DYxAckpT9=CsRmcPKGL7w@mail.gmail.com>
+In-Reply-To: <CAH2r5muXa4pn4EYcW6quTgn1o++o6DYxAckpT9=CsRmcPKGL7w@mail.gmail.com>
+From:   Sachin Prabhu <sachin.prabhu@gmail.com>
+Date:   Thu, 29 Sep 2022 23:13:07 +0100
+Message-ID: <CAKbxtwS4K+9mmAwgCxzDOwDK=pW_mXeGO252VvfwnHpGcEynOA@mail.gmail.com>
+Subject: Re: cifs.upcall debugging
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add smb2_signing_algo_str() helper in smb2glob.h
-Show the algorithm name in DebugData, when signing is enabled.
+Hello Steve,
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/cifs/cifs_debug.c |  7 +++++--
- fs/cifs/smb2glob.h   | 10 ++++++++++
- fs/cifs/smb2pdu.c    |  4 ++--
- 3 files changed, 17 insertions(+), 4 deletions(-)
+Good to hear from you. I will consider what parts should be added to
+the wiki. It has been so long since I've debugged this part, that I
+need to refresh my memory before I can give you a good answer.
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index c05477e28cff..86a5fb93f07f 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -13,6 +13,7 @@
- #include <linux/uaccess.h>
- #include "cifspdu.h"
- #include "cifsglob.h"
-+#include "smb2glob.h"
- #include "cifsproto.h"
- #include "cifs_debug.h"
- #include "cifsfs.h"
-@@ -354,7 +355,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 		else if (server->compress_algorithm == SMB3_COMPRESS_LZ77_HUFF)
- 			seq_printf(m, " COMPRESS_LZ77_HUFF");
- 		if (server->sign)
--			seq_printf(m, " signed");
-+			seq_printf(m, " signed (%s)",
-+				   smb2_signing_algo_str(server->signing_algorithm));
- 		if (server->posix_ext_supported)
- 			seq_printf(m, " posix");
- 		if (server->nosharesock)
-@@ -405,7 +407,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			if (ses->session_flags & SMB2_SESSION_FLAG_ENCRYPT_DATA)
- 				seq_puts(m, " encrypted");
- 			if (ses->sign)
--				seq_puts(m, " signed");
-+				seq_printf(m, " signed (%s)",
-+				   smb2_signing_algo_str(server->signing_algorithm));
- 
- 			seq_printf(m, "\n\tUser: %d Cred User: %d",
- 				   from_kuid(&init_user_ns, ses->linux_uid),
-diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
-index 82e916ad167c..3a3e81b1b8cb 100644
---- a/fs/cifs/smb2glob.h
-+++ b/fs/cifs/smb2glob.h
-@@ -41,4 +41,14 @@
- #define END_OF_CHAIN 4
- #define RELATED_REQUEST 8
- 
-+static inline const char *smb2_signing_algo_str(u16 algo)
-+{
-+	switch (algo) {
-+	case SIGNING_ALG_HMAC_SHA256: return "HMAC-SHA256";
-+	case SIGNING_ALG_AES_CMAC: return "AES-CMAC";
-+	case SIGNING_ALG_AES_GMAC: return "AES-GMAC";
-+	default: return "unknown algorithm";
-+	}
-+}
-+
- #endif	/* _SMB2_GLOB_H */
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 785465873422..97dac970cd52 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -725,8 +725,8 @@ static void decode_signing_ctx(struct TCP_Server_Info *server,
- 
- 	server->signing_negotiated = true;
- 	server->signing_algorithm = le16_to_cpu(pctxt->SigningAlgorithms[0]);
--	cifs_dbg(FYI, "signing algorithm %d chosen\n",
--		     server->signing_algorithm);
-+	cifs_dbg(FYI, "negotiated signing algorithm '%s'\n",
-+		 smb2_signing_algo_str(server->signing_algorithm));
- }
- 
- 
--- 
-2.35.3
+get_tgt_time: unable to get principal
 
+The strace for the cifs.upcall helper is available at
+http://sprabhu.blogspot.com/2014/12/debugging-calls-to-cifsupcall.html
+The debug logging for the cifs.upcall is pretty good and if you can
+see the debug output, you can get a pretty good idea. If not, the
+strace will show where it fails in obtaining the tgt and usually
+contains the debug messages from the cifs.upcall.
+
+Sachin Prabhu
+
+On Thu, 29 Sept 2022 at 05:43, Steve French <smfrench@gmail.com> wrote:
+>
+> This had should useful things about cifs.upcall (and an earlier one
+> about debugging cifs.upcall problems e.g. with krb5 mounts returning
+> errors)
+>
+> http://sprabhu.blogspot.com/2019/06/howto-cifs-kerberos-mount.html
+>
+> Shouldn't some of the cifs.upcall debugging info mentioned in an
+> earlier blog post be also added to wiki.samba.org ? e.g.
+>
+> http://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+>
+> Any suggestions on how to debug cases where klist shows the principal
+> but cifs.upcall can't find it - see log entry:
+>
+> get_tgt_time: unable to get principal
+>
+> --
+> Thanks,
+>
+> Steve
