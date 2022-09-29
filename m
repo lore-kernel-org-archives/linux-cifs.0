@@ -2,186 +2,666 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2406CC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 15:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC14FC433FE
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 17:57:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235303AbiI2PqM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Sep 2022 11:46:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59304 "EHLO
+        id S234707AbiI2R5R (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Sep 2022 13:57:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235790AbiI2Pp2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 11:45:28 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2058.outbound.protection.outlook.com [40.107.237.58])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E72145959
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 08:44:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J4w9jr2/9wMkF6YXuKwnpcoJVnH5n5DMfeFR0ezCuiwpgoCJICuWR1jpzumbTgF0GFJx4ZzOu7pRl0M8ayfMbI5HENcO8LV1qa5D//EzAsI8nmSElMnRDdtpWhakPzpOr3mVviDReJpGJD5RXXh5llFRKafEbzGcJgtd3+RZiOzps19aYcjjVmfXdF+sCdp+HHgiYH3tzIUigi0pOfMJFC8JBx6cUiMhTHhZUartKkJLGhBHkz78PP2Bu4qUcZuRbGaRkQqchf2eITKt6A19CayW8Zs1NIZkKlToGbrcawA4e+dINeUpf3ibwsohU6/0ClOtHX0Q0ZHBhZTASTyvWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HPSqk0KVk1yimVjxX1yI4zEv/UAfM5OAYzKtoPpy7Ig=;
- b=lHRw7nrk0vggr7Iw/v5n6gjpbs456SeBj5880jM+/vY0CJqOgG7h/eNdSiBZmsS8QbPQT1g3uE8cUz+zIzGTSMQ17s+A4qDjPRQiO+aCT7YTRZ0Yz8RZuGUuDqc4cSVgXtGzp0SCtGLlEryWwWmz0faQK6BQ5UCgbJ0C/kgRdfrmzjsCm3WndJ+EY+cO8A1OA1q3E9uQmsVz/bNEwpd0Or4Y1tD4LKC/oA94pikP5nhInZzll4wdPBt/FYz5bKdpTbgV+BusDPsRYgrY7O+CavQiCOdkhq1oQIsGQ2iR3FwXjOzt8yQLTDjdLac4SOqVivKrsCJ2CnNvzf2lIR/yYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- DM6PR01MB3865.prod.exchangelabs.com (2603:10b6:5:91::24) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5654.22; Thu, 29 Sep 2022 15:44:24 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::5c62:b328:156a:2ded]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::5c62:b328:156a:2ded%7]) with mapi id 15.20.5676.020; Thu, 29 Sep 2022
- 15:44:24 +0000
-Message-ID: <7ae96753-f72e-fdb0-5bbe-b36864be9612@talpey.com>
-Date:   Thu, 29 Sep 2022 11:44:23 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH v2 0/6] Reduce SMBDirect RDMA SGE counts and sizes
-Content-Language: en-US
-To:     Steve French <smfrench@gmail.com>
-Cc:     linux-cifs@vger.kernel.org, linkinjeon@kernel.org,
-        senozhatsky@chromium.org, bmt@zurich.ibm.com, longli@microsoft.com,
-        dhowells@redhat.com
-References: <cover.1663961449.git.tom@talpey.com>
- <CAH2r5msZ85dBBU=rPyzgBOPJmMrJ2ACCG+DhrJJprvDJcr9QPg@mail.gmail.com>
- <c4273f7e-6024-8f1d-5514-39501fa9943c@talpey.com>
- <CAH2r5mtw3QYxufa_CNf+YHRP9BU2Ydw90gsbj4c21AyrGnDYnw@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <CAH2r5mtw3QYxufa_CNf+YHRP9BU2Ydw90gsbj4c21AyrGnDYnw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL0PR0102CA0027.prod.exchangelabs.com
- (2603:10b6:207:18::40) To SN6PR01MB4445.prod.exchangelabs.com
- (2603:10b6:805:e2::33)
+        with ESMTP id S235022AbiI2R5P (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 13:57:15 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5E73ED6D
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 10:57:10 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 06E711F8E0;
+        Thu, 29 Sep 2022 17:57:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1664474229; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=FE8faHRIDTsKTZSDrOt6GsQ+qIQAPE69Tn+Ko8mVHPI=;
+        b=qL0kgkOY6IPC2HeTVSRE/+muj5iucONw/OYiLKX8wSKx+BuauL8kOlMigg4g+7bsmnbKNa
+        aEj47RlBIV7KV0VV7xdJ7FuvzsNAqMq9bdJ+XyRTX/K/rd50B44u37NaRtg8CGMm8CISIV
+        PLQ/zDB79EN4J7tCDMlaTC8ZAfKonjA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1664474229;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=FE8faHRIDTsKTZSDrOt6GsQ+qIQAPE69Tn+Ko8mVHPI=;
+        b=d7fop/AcVQOxUWAtGmSldc5jfYsi1J058RHRUO2Gzw/V5mGFel6Dm5eRWMZ5mgBKqSiPOx
+        9sT0HnOYsMs1mECQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7C2551348E;
+        Thu, 29 Sep 2022 17:57:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id JKTND3TcNWPYFQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Thu, 29 Sep 2022 17:57:08 +0000
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com, tom@talpey.com, metze@samba.org
+Subject: [PATCH v4 3/8] cifs: allocate ephemeral secmechs only on demand
+Date:   Thu, 29 Sep 2022 14:56:52 -0300
+Message-Id: <20220929175655.6906-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|DM6PR01MB3865:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8ad53788-e525-457b-cb07-08daa2317c16
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dBfYsxlEcIRFg1EHYN+ZMDBsFuo7E7EuFERUazVaShKqSpbRgLcyyV6pC33m/JRPCfir8hpEzYdyv3vHMsri4kH1Vs3q+KCd67trSK5l+944KGsf4FRwnzCnZ8hE9+ARt74FOKxlapBlzsr2CTbo64Dv+Aui+Qlulc1lB9PTmAJfs99LuTtS3jvKTkO46CJ+bQraWA4x3+46C4cvUvV41MTbwR09F8a6h9mTdC6kzDfvYSGZ470SpcfmdNL4pqUlmT+IFvuqZwOS/WBcWP8jQFfY9np/f1KBlAb5cUX4QCrklAUJvYH1pTSmPV0g61hHfujzDRs8U8pDAbNFwUJ3LxAaOU/bYfZ5Eh2x/yRtN2Qae4N+rjKUTzwBQ3Xc+q3JlAHz80vjm9UCJ6UsrnqIMCV1hHau6HdQhkmCNmD0MlhfL17QeUhdF/e+Q4Sz011evOe/bKKfxFlp9CL/fzvaXjpOgUzTtdelNEakyD15ryyhUBIGpErwTvUM5hDfqIWo9rgW3VqttO3j3ApNOeBrIeiSym+D6fj3CUNIv9HLeKKniy7SkWiitYO79P+j8RbaXbWKVE9kkXS5gz4U2AtzBrTOfr6qHk4YlbgAZKzAxc3l7QcrRG0IH0Y/GPCYSrw1yGfKr6+vJqjS6eM8ZxYk7RvXcNDxyd1msKvubt2q/1TfloJ/sqOKLKbFRb0jv4yQjW6bucP/ng8Ty8RgcQm+7c9n5Y7eobPdoVEgUDhvJbpsUjwMWdKifb5+oUVackkzGGpPrIQJ8KgHxSnZU+WHkpbXHLgIbM4cR/vG9Jn8QWg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(136003)(396003)(376002)(346002)(39830400003)(451199015)(26005)(6506007)(186003)(53546011)(2616005)(2906002)(5660300002)(83380400001)(6512007)(6916009)(4326008)(8936002)(52116002)(66946007)(8676002)(66476007)(316002)(6486002)(66556008)(478600001)(41300700001)(38100700002)(31686004)(31696002)(38350700002)(36756003)(86362001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Mzh4TVFCQmZGVThHR1hBSkw3ZDFkV1FPRWtvTlhzaHZ4OHlLMnJRNGc0U3NX?=
- =?utf-8?B?cDhueWlFdFU1bytMYjlkVmtua1o1ckNGZGhoMFhWU1E3N3kwNmJQcTVIM2tz?=
- =?utf-8?B?QTIvZVA0R1A4WXAzck9YZ3FWME5CQVJ5ZGZwWW9qdjhOZXE1VGdaSTFidFlN?=
- =?utf-8?B?VWREWTRZZHJRVU41NDFKZUIreEp2aFdabk5ST2ZHUjdlNG1JekdTVjdxRVNU?=
- =?utf-8?B?OGtaaWxUd09wZjV1dTFQNlEyNmNCWnlYeHBvM0oxTzNGMEVOY0JJOVhYVmlR?=
- =?utf-8?B?TDFBZFU5TGRIcnN6K0RLWHpraFFhMmV6RUxtelZRWktqWFlETmZyNjBBTHA0?=
- =?utf-8?B?YThuTTFwelp2cllSZHlsN253UEtRWHFDU1puZEFEWGx4dkE4cUtsSyt0dFNx?=
- =?utf-8?B?QkxZYjVOaUtwRDNWTlFHQStJWEVreEpIKzdUbzVCak1XZVR5ZTRaVzQ3dkFX?=
- =?utf-8?B?eUFWZ2xHemp4NmJFNkNpdkNJRWlwS0JPVFJ0TjNTbWMwZU1qOGlMZ0FraFBK?=
- =?utf-8?B?VVNYb2VKYVNaeWtTUllyNFJyaWdrdE42ZHBiUVI2Y3B6dzlpbDk5dUZsdyt3?=
- =?utf-8?B?bldSTzVIZnRneWZBZnBQT3RWTzNLZnduYk5SaUJyeE9TdGlvZlVscFNZQ3k1?=
- =?utf-8?B?NXJhWnozdng4dllYbVpNM0xscmlSSklEY093enVKemZQQmRCbnR2NlNFQ1Nv?=
- =?utf-8?B?cTAwS2c5Ri80Ykhhb214cFNuclljT1NZSmR4bjVaRTZoanBiV0NJdlBHRW9K?=
- =?utf-8?B?QVZUNm40N043aDBqWEJub1lKd3ZhcHVjNzFHMms1V2JVcitxWWN6TDB3VllX?=
- =?utf-8?B?alRFWHQxSVVSVXJVOGRkUU5QU3lGRWZCOEc3RVdrMDVvb2ZDbDVLWWVVeHNV?=
- =?utf-8?B?aUZCSTZQT0ZKWVFkRHlRYW1XNm5rbTdtbHFocC9mVFdMK3k2bncvNndjc3Y4?=
- =?utf-8?B?ZlY1UnJjbTByV25ESEd1S0FQeTVjUXpEV2ovMEJsVm15WWZ6TTh5OU12QThE?=
- =?utf-8?B?WTZRYkhaWWpaQVFTUVA2djdocVF5aFZmVnRuS25BR2pyb1RIYy9QM2R1VTdX?=
- =?utf-8?B?SEtSUzBFV21ueERIQUQ4Si8wZWNiSFI1OThrTVVqWGNrNG81NTN2cFpVUU1n?=
- =?utf-8?B?OEYzcytnMTcvYmlxV2ptL245WVN0c2V3YUtPR1l5d0s2MDNzdE14QkNvbEdu?=
- =?utf-8?B?VCtvNGhMbHJsUXYraGtVZ0V0UmFQMU5IVWl4L3BaZGVaYnROa2NjcmQ4aEJM?=
- =?utf-8?B?azk3S05oY3J4U0VZOUJCN0lmZDJIV1haQ1BSTU52Q1lWY3R5TUlNS3dtK2tw?=
- =?utf-8?B?S3FwYlFoaE5tSkI5UWdoYW0zdjEyS0JyVzh0NDVheWlvYk02L3dyZTF2WmEx?=
- =?utf-8?B?SjlocmVSbnB2NEhCVi9iV2QvMFRmdXJvdWRvcGJJQ3Evby9BRHBNeExlVGJp?=
- =?utf-8?B?dnRwc0dWNjNNdDBaaUhOa3EwUTZRMEhhaUhtTEdmaWxVcHhRVUs0TGp0c3hr?=
- =?utf-8?B?dDFmSWVmZ09WWlFRamg1YlJPKzEwajhQT1BKS2lwd1cwd3VKaWdWVk9xQmcv?=
- =?utf-8?B?VEV6N1BTaEpKK0FJN2x3OFRKVVdtbW9vdDVBOWd3cTlvblNLSmdOVjBRcC9p?=
- =?utf-8?B?YzJ5ZWtRMkdPeXZUSm5ZMDZPTXorSTdGTE5NOE4zQVdoMzZ2M0JwdHNiK2hY?=
- =?utf-8?B?WGVZQmdXS2IyTGtXaWhFaSsrWUs0d01VcjEySDVQV01lclplc0d6bVQ4SWIv?=
- =?utf-8?B?eXlhMmEvLzMvUUNJdlFBUVhQejdGQW10OEdRblNvUXowMlpiZ29nN0tpQkhW?=
- =?utf-8?B?QU1VTnNvb1NCTTN6ay9LYU9uT3BDcERnMDlmazdycGVZN2FWSU4wMWU4MWdE?=
- =?utf-8?B?YS8ybVp5V1B1Z3JubExMYk01QUw2VmdnNmlhcGZtVjlrMy9HRkZQbEVyRmx0?=
- =?utf-8?B?TFFnNWdJcE1CbXZHSE9MZmc5THlyM1Q0VlppT3BVNUZHSFNNdFZvRTNuUjh4?=
- =?utf-8?B?ZU9TeDN4OXNOdTJhTnBldy9xa2oxK2owdGx1dGw1cGdHVzBqbXVTS2NZRm1T?=
- =?utf-8?B?aDlzWnczRXNHQkZjUUd5cTl3b0p1TThlRnZaSTducjNDc1Y1R1h6L1N6UjN2?=
- =?utf-8?Q?PyShl9+F6xvuH+CfQVK2QlLZU?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ad53788-e525-457b-cb07-08daa2317c16
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2022 15:44:24.7030
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IgLsGNwMg5IVLRN8yDIYoKMU3JCkctW0BrV2xFr4Lz7YAvc2SHA++IucWx1nrVY6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB3865
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 9/29/2022 11:27 AM, Steve French wrote:
-> I can add the Acked-bys if you send them to me (for the cifs.ko ones)
+Reduce memory usage a bit by removing some secmechs as they are
+only briefly used on session setup, and not needed anymore
+throughout a server's object lifetime. Allocate and free them on
+demand now.
 
-That would be a big help!
+HMAC-SHA256 is an exception because it's used both for SMB2 signatures
+as for generating SMB3+ signatures, so allocate/free a dedicated one in
+generate_key() too to keep things separated.
 
-Patch 1: Add "cifs:"
-Patch 2: Add "ksmbd:" and Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Patch 3: Add "cifs:"
-Patch 4: Add "ksmbd:" and Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Patch 5" Add "cifs:"
-Patch 6: Add "cifs:"
+smb3*_crypto_shash_allocate functions are removed since we're now
+calling cifs_alloc_hash() directly and especifically.
 
-No R-B's received, and no code changes.
+Also move smb3_crypto_aead_allocate() call to generate_key(), right
+after when crypto keys are generated.
 
-Tom.
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+v4: fix checkpatch errors (thanks to Steve)
 
-> 
-> The client for server (cifs vs ksmbd prefix) in the title is more of
-> an issue for email threads and patch review.
-> 
-> On Thu, Sep 29, 2022 at 10:15 AM Tom Talpey <tom@talpey.com> wrote:
->>
->> I need to add the "cifs" and "ksmbd" prefixes, and a couple of
->> Acked-by's. I'm still pretty ill so not getting much done just
->> now though. I'll try to get on it later today.
->>
->> On 9/29/2022 1:02 AM, Steve French wrote:
->>> merged patches 1, 3, 5, 6 of this series into cifs-2.6.git for-next
->>> (will let Namjae test/try the server patches, 2 and 4) pending
->>> additional testing.
->>>
->>> Let me know if any Reviewed-by to add
->>>
->>> On Fri, Sep 23, 2022 at 4:54 PM Tom Talpey <tom@talpey.com> wrote:
->>>>
->>>> Allocate fewer SGEs and standard packet sizes in both kernel SMBDirect
->>>> implementations.
->>>>
->>>> The current maximum values (16 SGEs and 8192 bytes) cause failures on the
->>>> SoftiWARP provider, and are suboptimal on others. Reduce these to 6 and
->>>> 1364. Additionally, recode smbd_send() to work with as few as 2 SGEs,
->>>> and for debug sanity, reformat client-side logging to more clearly show
->>>> addresses, lengths and flags in the appropriate base.
->>>>
->>>> Tested over SoftiWARP and SoftRoCE with shell, Connectathon basic and general.
->>>>
->>>> v2: correct an uninitialized value issue found by Coverity
->>>>
->>>> Tom Talpey (6):
->>>>     Decrease the number of SMB3 smbdirect client SGEs
->>>>     Decrease the number of SMB3 smbdirect server SGEs
->>>>     Reduce client smbdirect max receive segment size
->>>>     Reduce server smbdirect max send/receive segment sizes
->>>>     Handle variable number of SGEs in client smbdirect send.
->>>>     Fix formatting of client smbdirect RDMA logging
->>>>
->>>>    fs/cifs/smbdirect.c       | 227 ++++++++++++++++----------------------
->>>>    fs/cifs/smbdirect.h       |  14 ++-
->>>>    fs/ksmbd/transport_rdma.c |   6 +-
->>>>    3 files changed, 109 insertions(+), 138 deletions(-)
->>>>
->>>> --
->>>> 2.34.1
->>>>
->>>
->>>
-> 
-> 
-> 
+ fs/cifs/cifsencrypt.c   | 73 +++++++++++++++---------------------
+ fs/cifs/cifsglob.h      |  2 -
+ fs/cifs/misc.c          |  2 +-
+ fs/cifs/sess.c          | 12 ------
+ fs/cifs/smb2misc.c      | 18 ++++-----
+ fs/cifs/smb2ops.c       |  8 ++--
+ fs/cifs/smb2pdu.c       | 19 ++++++++++
+ fs/cifs/smb2proto.h     |  1 -
+ fs/cifs/smb2transport.c | 83 ++++++++++++-----------------------------
+ 9 files changed, 86 insertions(+), 132 deletions(-)
+
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 30ece0c58c71..ed25ac811f05 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -401,7 +401,8 @@ find_timestamp(struct cifs_ses *ses)
+ }
+ 
+ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+-			    const struct nls_table *nls_cp)
++			    const struct nls_table *nls_cp,
++			    struct shash_desc *hmacmd5)
+ {
+ 	int rc = 0;
+ 	int len;
+@@ -410,7 +411,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 	wchar_t *domain;
+ 	wchar_t *server;
+ 
+-	if (!ses->server->secmech.hmacmd5) {
++	if (!hmacmd5) {
+ 		cifs_dbg(VFS, "%s: can't generate ntlmv2 hash\n", __func__);
+ 		return -1;
+ 	}
+@@ -418,14 +419,13 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 	/* calculate md4 hash of password */
+ 	E_md4hash(ses->password, nt_hash, nls_cp);
+ 
+-	rc = crypto_shash_setkey(ses->server->secmech.hmacmd5->tfm, nt_hash,
+-				CIFS_NTHASH_SIZE);
++	rc = crypto_shash_setkey(hmacmd5->tfm, nt_hash, CIFS_NTHASH_SIZE);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not set NT Hash as a key\n", __func__);
+ 		return rc;
+ 	}
+ 
+-	rc = crypto_shash_init(ses->server->secmech.hmacmd5);
++	rc = crypto_shash_init(hmacmd5);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not init hmacmd5\n", __func__);
+ 		return rc;
+@@ -446,8 +446,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 		memset(user, '\0', 2);
+ 	}
+ 
+-	rc = crypto_shash_update(ses->server->secmech.hmacmd5,
+-				(char *)user, 2 * len);
++	rc = crypto_shash_update(hmacmd5, (char *)user, 2 * len);
+ 	kfree(user);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not update with user\n", __func__);
+@@ -465,9 +464,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 		}
+ 		len = cifs_strtoUTF16((__le16 *)domain, ses->domainName, len,
+ 				      nls_cp);
+-		rc =
+-		crypto_shash_update(ses->server->secmech.hmacmd5,
+-					(char *)domain, 2 * len);
++		rc = crypto_shash_update(hmacmd5, (char *)domain, 2 * len);
+ 		kfree(domain);
+ 		if (rc) {
+ 			cifs_dbg(VFS, "%s: Could not update with domain\n",
+@@ -485,9 +482,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 		}
+ 		len = cifs_strtoUTF16((__le16 *)server, ses->ip_addr, len,
+ 					nls_cp);
+-		rc =
+-		crypto_shash_update(ses->server->secmech.hmacmd5,
+-					(char *)server, 2 * len);
++		rc = crypto_shash_update(hmacmd5, (char *)server, 2 * len);
+ 		kfree(server);
+ 		if (rc) {
+ 			cifs_dbg(VFS, "%s: Could not update with server\n",
+@@ -496,8 +491,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 		}
+ 	}
+ 
+-	rc = crypto_shash_final(ses->server->secmech.hmacmd5,
+-					ntlmv2_hash);
++	rc = crypto_shash_final(hmacmd5, ntlmv2_hash);
+ 	if (rc)
+ 		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
+ 
+@@ -505,7 +499,8 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ }
+ 
+ static int
+-CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
++CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash,
++		    struct shash_desc *hmacmd5)
+ {
+ 	int rc;
+ 	struct ntlmv2_resp *ntlmv2 = (struct ntlmv2_resp *)
+@@ -516,20 +511,19 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
+ 	hash_len = ses->auth_key.len - (CIFS_SESS_KEY_SIZE +
+ 		offsetof(struct ntlmv2_resp, challenge.key[0]));
+ 
+-	if (!ses->server->secmech.hmacmd5) {
++	if (!hmacmd5) {
+ 		cifs_dbg(VFS, "%s: can't generate ntlmv2 hash\n", __func__);
+ 		return -1;
+ 	}
+ 
+-	rc = crypto_shash_setkey(ses->server->secmech.hmacmd5->tfm,
+-				 ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
++	rc = crypto_shash_setkey(hmacmd5->tfm, ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not set NTLMV2 Hash as a key\n",
+ 			 __func__);
+ 		return rc;
+ 	}
+ 
+-	rc = crypto_shash_init(ses->server->secmech.hmacmd5);
++	rc = crypto_shash_init(hmacmd5);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not init hmacmd5\n", __func__);
+ 		return rc;
+@@ -541,16 +535,14 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
+ 	else
+ 		memcpy(ntlmv2->challenge.key,
+ 		       ses->server->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
+-	rc = crypto_shash_update(ses->server->secmech.hmacmd5,
+-				 ntlmv2->challenge.key, hash_len);
++	rc = crypto_shash_update(hmacmd5, ntlmv2->challenge.key, hash_len);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
+ 		return rc;
+ 	}
+ 
+ 	/* Note that the MD5 digest over writes anon.challenge_key.key */
+-	rc = crypto_shash_final(ses->server->secmech.hmacmd5,
+-				ntlmv2->ntlmv2_hash);
++	rc = crypto_shash_final(hmacmd5, ntlmv2->ntlmv2_hash);
+ 	if (rc)
+ 		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
+ 
+@@ -567,6 +559,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	char ntlmv2_hash[16];
+ 	unsigned char *tiblob = NULL; /* target info blob */
+ 	__le64 rsp_timestamp;
++	struct shash_desc *hmacmd5 = NULL;
+ 
+ 	if (nls_cp == NULL) {
+ 		cifs_dbg(VFS, "%s called with nls_cp==NULL\n", __func__);
+@@ -625,53 +618,51 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 
+ 	cifs_server_lock(ses->server);
+ 
+-	rc = cifs_alloc_hash("hmac(md5)", &ses->server->secmech.hmacmd5);
++	rc = cifs_alloc_hash("hmac(md5)", &hmacmd5);
+ 	if (rc) {
+ 		goto unlock;
+ 	}
+ 
+ 	/* calculate ntlmv2_hash */
+-	rc = calc_ntlmv2_hash(ses, ntlmv2_hash, nls_cp);
++	rc = calc_ntlmv2_hash(ses, ntlmv2_hash, nls_cp, hmacmd5);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "Could not get v2 hash rc %d\n", rc);
+-		goto unlock;
++		goto out_free_hash;
+ 	}
+ 
+ 	/* calculate first part of the client response (CR1) */
+-	rc = CalcNTLMv2_response(ses, ntlmv2_hash);
++	rc = CalcNTLMv2_response(ses, ntlmv2_hash, hmacmd5);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "Could not calculate CR1 rc: %d\n", rc);
+-		goto unlock;
++		goto out_free_hash;
+ 	}
+ 
+ 	/* now calculate the session key for NTLMv2 */
+-	rc = crypto_shash_setkey(ses->server->secmech.hmacmd5->tfm,
+-		ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
++	rc = crypto_shash_setkey(hmacmd5->tfm, ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not set NTLMV2 Hash as a key\n",
+ 			 __func__);
+-		goto unlock;
++		goto out_free_hash;
+ 	}
+ 
+-	rc = crypto_shash_init(ses->server->secmech.hmacmd5);
++	rc = crypto_shash_init(hmacmd5);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not init hmacmd5\n", __func__);
+-		goto unlock;
++		goto out_free_hash;
+ 	}
+ 
+-	rc = crypto_shash_update(ses->server->secmech.hmacmd5,
+-		ntlmv2->ntlmv2_hash,
+-		CIFS_HMAC_MD5_HASH_SIZE);
++	rc = crypto_shash_update(hmacmd5, ntlmv2->ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not update with response\n", __func__);
+-		goto unlock;
++		goto out_free_hash;
+ 	}
+ 
+-	rc = crypto_shash_final(ses->server->secmech.hmacmd5,
+-		ses->auth_key.response);
++	rc = crypto_shash_final(hmacmd5, ses->auth_key.response);
+ 	if (rc)
+ 		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
+ 
++out_free_hash:
++	cifs_free_hash(&hmacmd5);
+ unlock:
+ 	cifs_server_unlock(ses->server);
+ setup_ntlmv2_rsp_ret:
+@@ -717,8 +708,6 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
+ 	cifs_free_hash(&server->secmech.aes_cmac);
+ 	cifs_free_hash(&server->secmech.hmacsha256);
+ 	cifs_free_hash(&server->secmech.md5);
+-	cifs_free_hash(&server->secmech.sha512);
+-	cifs_free_hash(&server->secmech.hmacmd5);
+ 
+ 	if (server->secmech.enc) {
+ 		crypto_free_aead(server->secmech.enc);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ea76f4d7ef62..5da71d946012 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -155,10 +155,8 @@ struct session_key {
+ 
+ /* crypto hashing related structure/fields, not specific to a sec mech */
+ struct cifs_secmech {
+-	struct shash_desc *hmacmd5; /* hmacmd5 hash function, for NTLMv2/CR1 hashes */
+ 	struct shash_desc *md5; /* md5 hash function, for CIFS/SMB1 signatures */
+ 	struct shash_desc *hmacsha256; /* hmac-sha256 hash function, for SMB2 signatures */
+-	struct shash_desc *sha512; /* sha512 hash function, for SMB3.1.1 preauth hash */
+ 	struct shash_desc *aes_cmac; /* block-cipher based MAC function, for SMB3 signatures */
+ 
+ 	struct crypto_aead *enc; /* smb3 encryption AEAD TFM (AES-CCM and AES-GCM) */
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 535dbe6ff994..c7eade06e2de 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1093,7 +1093,7 @@ cifs_alloc_hash(const char *name, struct shash_desc **sdesc)
+ 		return rc;
+ 	}
+ 
+-	*sdesc = kmalloc(sizeof(struct shash_desc) + crypto_shash_descsize(alg), GFP_KERNEL);
++	*sdesc = kzalloc(sizeof(struct shash_desc) + crypto_shash_descsize(alg), GFP_KERNEL);
+ 	if (*sdesc == NULL) {
+ 		cifs_dbg(VFS, "no memory left to allocate shash TFM '%s'\n", name);
+ 		crypto_free_shash(alg);
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 3af3b05b6c74..d59dec7a2a55 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -454,18 +454,6 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
+ 	spin_unlock(&ses->chan_lock);
+ 
+ 	mutex_lock(&ses->session_mutex);
+-	/*
+-	 * We need to allocate the server crypto now as we will need
+-	 * to sign packets before we generate the channel signing key
+-	 * (we sign with the session key)
+-	 */
+-	rc = smb311_crypto_shash_allocate(chan->server);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+-		mutex_unlock(&ses->session_mutex);
+-		goto out;
+-	}
+-
+ 	rc = cifs_negotiate_protocol(xid, ses, chan->server);
+ 	if (!rc)
+ 		rc = cifs_setup_session(xid, ses, chan->server, cifs_sb->local_nls);
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 7db5c09ecceb..39a9fc60eb9e 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -897,22 +897,21 @@ smb311_update_preauth_hash(struct cifs_ses *ses, struct TCP_Server_Info *server,
+ 		return 0;
+ 
+ ok:
+-	rc = smb311_crypto_shash_allocate(server);
++	rc = cifs_alloc_hash("sha512", &sha512);
+ 	if (rc)
+ 		return rc;
+ 
+-	sha512 = server->secmech.sha512;
+ 	rc = crypto_shash_init(sha512);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not init sha512 shash\n", __func__);
+-		return rc;
++		goto out_free_hash;
+ 	}
+ 
+ 	rc = crypto_shash_update(sha512, ses->preauth_sha_hash,
+ 				 SMB2_PREAUTH_HASH_SIZE);
+ 	if (rc) {
+ 		cifs_dbg(VFS, "%s: Could not update sha512 shash\n", __func__);
+-		return rc;
++		goto out_free_hash;
+ 	}
+ 
+ 	for (i = 0; i < nvec; i++) {
+@@ -920,16 +919,15 @@ smb311_update_preauth_hash(struct cifs_ses *ses, struct TCP_Server_Info *server,
+ 		if (rc) {
+ 			cifs_dbg(VFS, "%s: Could not update sha512 shash\n",
+ 				 __func__);
+-			return rc;
++			goto out_free_hash;
+ 		}
+ 	}
+ 
+ 	rc = crypto_shash_final(sha512, ses->preauth_sha_hash);
+-	if (rc) {
++	if (rc)
+ 		cifs_dbg(VFS, "%s: Could not finalize sha512 shash\n",
+ 			 __func__);
+-		return rc;
+-	}
+-
+-	return 0;
++out_free_hash:
++	cifs_free_hash(&sha512);
++	return rc;
+ }
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index d1528755f330..34dea8aa854b 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4338,10 +4338,10 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 		return rc;
+ 	}
+ 
+-	rc = smb3_crypto_aead_allocate(server);
+-	if (rc) {
+-		cifs_server_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+-		return rc;
++	/* sanity check -- TFMs were allocated after negotiate protocol */
++	if (unlikely(!server->secmech.enc || !server->secmech.dec)) {
++		cifs_server_dbg(VFS, "%s: crypto TFMs are NULL\n", __func__);
++		return -EIO;
+ 	}
+ 
+ 	tfm = enc ? server->secmech.enc : server->secmech.dec;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6352ab32c7e7..60cfaa131c31 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -927,6 +927,16 @@ SMB2_negotiate(const unsigned int xid,
+ 	else
+ 		req->SecurityMode = 0;
+ 
++	if (req->SecurityMode) {
++		/*
++		 * Allocate HMAC-SHA256 regardless of dialect requested, change to AES-CMAC later,
++		 * if SMB3+ is negotiated
++		 */
++		rc = cifs_alloc_hash("hmac(sha256)", &server->secmech.hmacsha256);
++		if (rc)
++			goto neg_exit;
++	}
++
+ 	req->Capabilities = cpu_to_le32(server->vals->req_capabilities);
+ 	if (ses->chan_max > 1)
+ 		req->Capabilities |= cpu_to_le32(SMB2_GLOBAL_CAP_MULTI_CHANNEL);
+@@ -1071,6 +1081,15 @@ SMB2_negotiate(const unsigned int xid,
+ 	rc = cifs_enable_signing(server, ses->sign);
+ 	if (rc)
+ 		goto neg_exit;
++
++	if (server->sign && server->dialect >= SMB30_PROT_ID) {
++		/* free HMAC-SHA256 allocated earlier for negprot */
++		cifs_free_hash(&server->secmech.hmacsha256);
++		rc = cifs_alloc_hash("cmac(aes)", &server->secmech.aes_cmac);
++		if (rc)
++			goto neg_exit;
++	}
++
+ 	if (blob_length) {
+ 		rc = decode_negTokenInit(security_blob, blob_length, server);
+ 		if (rc == 1)
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 3f740f24b96a..a975144c63bf 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -267,7 +267,6 @@ extern int smb2_validate_and_copy_iov(unsigned int offset,
+ extern void smb2_copy_fs_info_to_kstatfs(
+ 	 struct smb2_fs_full_size_info *pfs_inf,
+ 	 struct kstatfs *kst);
+-extern int smb311_crypto_shash_allocate(struct TCP_Server_Info *server);
+ extern int smb311_update_preauth_hash(struct cifs_ses *ses,
+ 				      struct TCP_Server_Info *server,
+ 				      struct kvec *iov, int nvec);
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index dfcbcc0b86e4..2dca2c255239 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -26,53 +26,6 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
+ 
+-static int
+-smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
+-{
+-	struct cifs_secmech *p = &server->secmech;
+-	int rc;
+-
+-	rc = cifs_alloc_hash("hmac(sha256)", &p->hmacsha256);
+-	if (rc)
+-		goto err;
+-
+-	rc = cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
+-	if (rc)
+-		goto err;
+-
+-	return 0;
+-err:
+-	cifs_free_hash(&p->hmacsha256);
+-	return rc;
+-}
+-
+-int
+-smb311_crypto_shash_allocate(struct TCP_Server_Info *server)
+-{
+-	struct cifs_secmech *p = &server->secmech;
+-	int rc = 0;
+-
+-	rc = cifs_alloc_hash("hmac(sha256)", &p->hmacsha256);
+-	if (rc)
+-		return rc;
+-
+-	rc = cifs_alloc_hash("cmac(aes)", &p->aes_cmac);
+-	if (rc)
+-		goto err;
+-
+-	rc = cifs_alloc_hash("sha512", &p->sha512);
+-	if (rc)
+-		goto err;
+-
+-	return 0;
+-
+-err:
+-	cifs_free_hash(&p->aes_cmac);
+-	cifs_free_hash(&p->hmacsha256);
+-	return rc;
+-}
+-
+-
+ static
+ int smb2_get_sign_key(__u64 ses_id, struct TCP_Server_Info *server, u8 *key)
+ {
+@@ -215,7 +168,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 	struct kvec *iov = rqst->rq_iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+ 	struct cifs_ses *ses;
+-	struct shash_desc *shash;
++	struct shash_desc *shash = NULL;
+ 	struct smb_rqst drqst;
+ 
+ 	ses = smb2_find_smb_ses(server, le64_to_cpu(shdr->SessionId));
+@@ -297,48 +250,50 @@ static int generate_key(struct cifs_ses *ses, struct kvec label,
+ 	unsigned char prfhash[SMB2_HMACSHA256_SIZE];
+ 	unsigned char *hashptr = prfhash;
+ 	struct TCP_Server_Info *server = ses->server;
++	struct shash_desc *hmac_sha256 = NULL;
+ 
+ 	memset(prfhash, 0x0, SMB2_HMACSHA256_SIZE);
+ 	memset(key, 0x0, key_size);
+ 
+-	rc = smb3_crypto_shash_allocate(server);
++	/* do not reuse the server's secmech TFM */
++	rc = cifs_alloc_hash("hmac(sha256)", &hmac_sha256);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+ 		goto smb3signkey_ret;
+ 	}
+ 
+-	rc = crypto_shash_setkey(server->secmech.hmacsha256->tfm,
+-		ses->auth_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
++	rc = crypto_shash_setkey(hmac_sha256->tfm, ses->auth_key.response,
++				 SMB2_NTLMV2_SESSKEY_SIZE);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: Could not set with session key\n", __func__);
+ 		goto smb3signkey_ret;
+ 	}
+ 
+-	rc = crypto_shash_init(server->secmech.hmacsha256);
++	rc = crypto_shash_init(hmac_sha256);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: Could not init sign hmac\n", __func__);
+ 		goto smb3signkey_ret;
+ 	}
+ 
+-	rc = crypto_shash_update(server->secmech.hmacsha256, i, 4);
++	rc = crypto_shash_update(hmac_sha256, i, 4);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: Could not update with n\n", __func__);
+ 		goto smb3signkey_ret;
+ 	}
+ 
+-	rc = crypto_shash_update(server->secmech.hmacsha256, label.iov_base, label.iov_len);
++	rc = crypto_shash_update(hmac_sha256, label.iov_base, label.iov_len);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: Could not update with label\n", __func__);
+ 		goto smb3signkey_ret;
+ 	}
+ 
+-	rc = crypto_shash_update(server->secmech.hmacsha256, &zero, 1);
++	rc = crypto_shash_update(hmac_sha256, &zero, 1);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: Could not update with zero\n", __func__);
+ 		goto smb3signkey_ret;
+ 	}
+ 
+-	rc = crypto_shash_update(server->secmech.hmacsha256, context.iov_base, context.iov_len);
++	rc = crypto_shash_update(hmac_sha256, context.iov_base, context.iov_len);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: Could not update with context\n", __func__);
+ 		goto smb3signkey_ret;
+@@ -346,16 +301,16 @@ static int generate_key(struct cifs_ses *ses, struct kvec label,
+ 
+ 	if ((server->cipher_type == SMB2_ENCRYPTION_AES256_CCM) ||
+ 		(server->cipher_type == SMB2_ENCRYPTION_AES256_GCM)) {
+-		rc = crypto_shash_update(server->secmech.hmacsha256, L256, 4);
++		rc = crypto_shash_update(hmac_sha256, L256, 4);
+ 	} else {
+-		rc = crypto_shash_update(server->secmech.hmacsha256, L128, 4);
++		rc = crypto_shash_update(hmac_sha256, L128, 4);
+ 	}
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: Could not update with L\n", __func__);
+ 		goto smb3signkey_ret;
+ 	}
+ 
+-	rc = crypto_shash_final(server->secmech.hmacsha256, hashptr);
++	rc = crypto_shash_final(hmac_sha256, hashptr);
+ 	if (rc) {
+ 		cifs_server_dbg(VFS, "%s: Could not generate sha256 hash\n", __func__);
+ 		goto smb3signkey_ret;
+@@ -364,6 +319,7 @@ static int generate_key(struct cifs_ses *ses, struct kvec label,
+ 	memcpy(key, hashptr, key_size);
+ 
+ smb3signkey_ret:
++	cifs_free_hash(&hmac_sha256);
+ 	return rc;
+ }
+ 
+@@ -428,12 +384,19 @@ generate_smb3signingkey(struct cifs_ses *ses,
+ 				  ptriplet->encryption.context,
+ 				  ses->smb3encryptionkey,
+ 				  SMB3_ENC_DEC_KEY_SIZE);
++		if (rc)
++			return rc;
++
+ 		rc = generate_key(ses, ptriplet->decryption.label,
+ 				  ptriplet->decryption.context,
+ 				  ses->smb3decryptionkey,
+ 				  SMB3_ENC_DEC_KEY_SIZE);
+ 		if (rc)
+ 			return rc;
++
++		rc = smb3_crypto_aead_allocate(server);
++		if (rc)
++			return rc;
+ 	}
+ 
+ 	if (rc)
+@@ -535,7 +498,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 	unsigned char *sigptr = smb3_signature;
+ 	struct kvec *iov = rqst->rq_iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+-	struct shash_desc *shash;
++	struct shash_desc *shash = NULL;
+ 	struct smb_rqst drqst;
+ 	u8 key[SMB3_SIGN_KEY_SIZE];
+ 
+-- 
+2.35.3
+
