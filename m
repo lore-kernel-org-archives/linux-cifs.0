@@ -2,92 +2,113 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78612C4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 13:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B53BC433FE
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 14:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235001AbiI2NI6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Sep 2022 09:08:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45034 "EHLO
+        id S235022AbiI2ORD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Sep 2022 10:17:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234666AbiI2NI5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 09:08:57 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2CEA17D40D;
-        Thu, 29 Sep 2022 06:08:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S235588AbiI2ORC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 10:17:02 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21CBD153EE5
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 07:17:01 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4459FB8247F;
-        Thu, 29 Sep 2022 13:08:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EED9C433C1;
-        Thu, 29 Sep 2022 13:08:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664456901;
-        bh=riOAsm3lzQkj+cjEbWOHZ+nQBRpg7+2HkYLykZVpJt8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lbpTyBJOwrg3CdQD1AH16Y7w0WKGK2Z3OZOiqpxC9VQQ6sXhVxiJ7qVYqoA9KrqFs
-         LRBFqfHBIs1OJR1rfaPWJaAUJ+tQ7IGH7QOkaw6YdvKC+R4ToawBGf7LBKs0oC2O+G
-         he3hOjdMbemI/iEVfIGPKZwK46vbKavKz+znEFjh8IxLqy6OlY7fMawHWDPu3nwN8e
-         uD645Ghd5Bu5onkVImKZY+VnqUD9bUepB8c8gNiA3O6AWrv6Gr1Y4HDP+UaOsOviGT
-         Jyg92XcjkxCsti7RcJf6Uw845H5extGQEyud20saGH1IKXy/ZYREqcZHJqPdan5aRR
-         DERfbERDsfakw==
-Date:   Thu, 29 Sep 2022 15:08:15 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v1] ksmbd: Fix user namespace mapping
-Message-ID: <20220929130815.3l5piy446jyynpwa@wittgenstein>
-References: <20220929100447.108468-1-mic@digikod.net>
- <20220929113735.7k6fdu75oz4jvsvz@wittgenstein>
- <75d077ca-4f1d-50c4-10d2-0fb31fcd0c86@digikod.net>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D89371F8B2;
+        Thu, 29 Sep 2022 14:16:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1664461019; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=x5G7UV4tY5ehGtPouBby1F0SMmv2Q2ZTj/FG2kYGxuY=;
+        b=BP2zInzQrvy1S4hGRAzvFe5m5JDedpg0FTNt1YaKt0l+YfkpMCruedr3UVK1SgsVjAMATE
+        g2o087RW9njTj8oebTfCtLvX/52nS2I/nFUBaeDVa4wLKfDefav1NAQnC6YaNuzVCEtl4A
+        2d7n1x3bOvx/dDYZDckt1dPTTnJlxzM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1664461019;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=x5G7UV4tY5ehGtPouBby1F0SMmv2Q2ZTj/FG2kYGxuY=;
+        b=rFYXMzwE58FO1KySRyiR6bWCiayT3aLwmou12Rq0pY600r+oNxlJlzMrts4akK/sDndylP
+        yBvxHfYfxMghTzDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5487C13A71;
+        Thu, 29 Sep 2022 14:16:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id k3JtBduoNWNbPQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Thu, 29 Sep 2022 14:16:59 +0000
+Date:   Thu, 29 Sep 2022 11:16:56 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Stefan Metzmacher <metze@samba.org>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@cjr.nz,
+        ronniesahlberg@gmail.com, nspmangalore@gmail.com, tom@talpey.com
+Subject: Re: [PATCH v3 5/8] cifs: introduce AES-GMAC signing support for SMB
+ 3.1.1
+Message-ID: <20220929141656.z77h2f5notu6qzyc@suse.de>
+References: <20220929015637.14400-1-ematsumiya@suse.de>
+ <20220929015637.14400-6-ematsumiya@suse.de>
+ <1ec4803d-e367-96f5-855d-8d48fc40260b@samba.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <75d077ca-4f1d-50c4-10d2-0fb31fcd0c86@digikod.net>
+In-Reply-To: <1ec4803d-e367-96f5-855d-8d48fc40260b@samba.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Sep 29, 2022 at 02:18:43PM +0200, Mickaël Salaün wrote:
-> 
-> On 29/09/2022 13:37, Christian Brauner wrote:
-> > On Thu, Sep 29, 2022 at 12:04:47PM +0200, Mickaël Salaün wrote:
-> > > A kernel daemon should not rely on the current thread, which is unknown
-> > > and might be malicious.  Before this security fix,
-> > > ksmbd_override_fsids() didn't correctly override FS UID/GID which means
-> > > that arbitrary user space threads could trick the kernel to impersonate
-> > > arbitrary users or groups for file system access checks, leading to
-> > > file system access bypass.
-> > > 
-> > > This was found while investigating truncate support for Landlock:
-> > > https://lore.kernel.org/r/CAKYAXd8fpMJ7guizOjHgxEyyjoUwPsx3jLOPZP=wPYcbhkVXqA@mail.gmail.com
-> > > 
-> > > Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> > > Cc: Hyunchul Lee <hyc.lee@gmail.com>
-> > > Cc: Namjae Jeon <linkinjeon@kernel.org>
-> > > Cc: Steve French <smfrench@gmail.com>
-> > > Cc: stable@vger.kernel.org
-> > > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> > > Link: https://lore.kernel.org/r/20220929100447.108468-1-mic@digikod.net
-> > > ---
-> > 
-> > I think this is ok. The alternative would probably be to somehow use a
-> > relevant userns when struct ksmbd_user is created when the session is
-> > established. But these are deeper ksmbd design questions. The fix
-> > proposed here itself seems good.
-> 
-> That would be better indeed. I guess ksmbd works whenever the netlink peer
-> is not in a user namespace with mapped UID/GID, but it should result in
-> obvious access bugs otherwise (which is already the case anyway). It seems
-> that the netlink peer must be trusted because it is the source of truth for
-> account/user mapping anyway. This change fixes the more critical side of the
-> issue and it should fit well for backports.
+Hi metze,
 
-Sorry, I also forgot,
-Acked-by: Christian Brauner (Microsoft) <brauner@kernel.org>
+On 09/29, Stefan Metzmacher wrote:
+>
+>Hi Enzo,
+>
+>>+/*
+>>+ * This function implements AES-GMAC signing for SMB2 messages as described in MS-SMB2
+>>+ * specification.  This algorithm is only supported on SMB 3.1.1.
+>>+ *
+>>+ * Note: even though Microsoft mentions RFC4543 in MS-SMB2, the mechanism used_must_  be the "raw"
+>>+ * AES-128-GCM ("gcm(aes)"); RFC4543 is designed for IPsec and trying to use "rfc4543(gcm(aes)))"
+>>+ * will fail the signature computation.
+>>+ *
+>>+ * MS-SMB2 3.1.4.1
+>>+ */
+>>+int
+>>+smb311_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server, bool verify)
+>>+{
+>
+>Can you please add aes_gmac to the function name?
+
+Sure.  Should I also change smb2_calc_signature to smb2_calc_shash or
+something similar, since it fits now for SMB[2.x,3.0.x]?
+
+>>+	union {
+>>+		struct {
+>>+			/* for MessageId (8 bytes) */
+>>+			__le64 mid;
+>>+			/* for role (client or server) and if SMB2 CANCEL (4 bytes) */
+>>+			__le32 role;
+>>+		};
+>>+		u8 buffer[12];
+>>+	} __packed nonce;
+>
+>Can you use SMB3_AES_GCM_NONCE instead of '12'?
+
+I was going to submit a follow up series replacing the defines we use
+with the crypto ones to clarify meanings, e.g. SMB3_AES_GCM_NONCE made
+me wonder at first sight if it was different from GCM_AES_IV_SIZE.
+But sure I can change it for the time being.
+
+>metze
+
+Cheers,
+
+Enzo
