@@ -2,277 +2,508 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0997C6FA90
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 07:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32AE6C04A95
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Sep 2022 07:56:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235178AbiI2HRz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Sep 2022 03:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42640 "EHLO
+        id S234630AbiI2H4T (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Sep 2022 03:56:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235095AbiI2HRx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 03:17:53 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E9441176C3
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Sep 2022 00:17:52 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28T6pC8U022009;
-        Thu, 29 Sep 2022 07:17:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=0e43JBKLXJfCcWxpqiiW1EJdShQ09SELwL94KjFMhoY=;
- b=IPuH9GvsU6WP17mS8vRolOy/6x7kYzsDtflhRV4VZ/oUmqo8TuVlg8HW3i7NAuZ5hULN
- a/akG4xJ2hI15LGNVIvp0SeGDcnlwPcsFQ4pLBWz5Zmg8QcGBkvgpq8Rvr1ml59kkdh9
- ZYQD7D5a5Jh1Qlqbwe1wL7EbJ7w5KjweXyTsFMqmfqPw/p41/rUCzNoB7tyqnOM1V7+t
- 8ToPbtnvIaFTAES45XdJvxtNd25GGzy9Z96jXu0jl2RumOvqUJWWirMqvXYDl9i1jgGD
- S4hMVMjOnLuBj/s/VOnVb9jrZ7AzeF8yHKfytNrpCSob7yX08mbFE4Ht1WCcSioO6KNw yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jw6eygqcq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Sep 2022 07:17:44 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28T6rMaU028393;
-        Thu, 29 Sep 2022 07:17:43 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jw6eygqc2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Sep 2022 07:17:43 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jz5Ud8Bq6nKveMqNKq12suEly3dvov1dO4/IGroLG58V3Zbcjt6wYbdJBod/aqgeZrbhuWeaf8Z4Pjf+3atx0HX02b+9mYqR4WFAI1yoHucg0yRbCoyowyIEmvAeADVibqdRxq44RVh4+8aZfMQU/SECpCchTqBpVtXDg9HG8OeDyTG6/KOdFKimUT1caMYswgyEKkvOrLOWuEVVSHTDG1fAM/s1dIFfeOzGUo8Ayt8ypJPYi39J4I7OkmgN3NNnABkZMX2AmyHV/wzPp8u3yhW19bxoiMswHCS74hBx7VTG7ijkRqylfsRqLbbVMTGseRHIxtI2px4XnwS+hzbWZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0e43JBKLXJfCcWxpqiiW1EJdShQ09SELwL94KjFMhoY=;
- b=PaMxdgPBF/r2PGmBbKGCmkg4ZpkQLpkQlPD6iuoTuJBSWAkJovuC0ki2YtZf0pVYGUUidv1CwZmy5CdjnjQCu3qpQmjiSj4/nJciukGIJq//aWBQjxO5DosAnK7QO/Or98GQ9JWwiZaI9NVdxT50V8/WYwwznu3ppzw4/KJDNt4av469s4/7WCV+pG8Jqht9rQRTunElPw9Ey/OK2mXtxQCuhRCQqunL5yl1yRYMZN9ZH7kLCyUF6q5BDiu9aEP+YjAnLDoVWpZcTCH4JISbiFPyTuI5jZZ1bz8qJeWYUu31Um4CTvkrqM1fq13ZVhABHH74QBSP+n9OCTjQSCeRJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=zurich.ibm.com; dmarc=pass action=none
- header.from=zurich.ibm.com; dkim=pass header.d=zurich.ibm.com; arc=none
-Received: from SA0PR15MB3919.namprd15.prod.outlook.com (2603:10b6:806:91::20)
- by SA1PR15MB4642.namprd15.prod.outlook.com (2603:10b6:806:19d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.17; Thu, 29 Sep
- 2022 07:17:41 +0000
-Received: from SA0PR15MB3919.namprd15.prod.outlook.com
- ([fe80::199f:5743:f34e:9bd3]) by SA0PR15MB3919.namprd15.prod.outlook.com
- ([fe80::199f:5743:f34e:9bd3%6]) with mapi id 15.20.5676.019; Thu, 29 Sep 2022
- 07:17:41 +0000
-From:   Bernard Metzler <BMT@zurich.ibm.com>
-To:     Tom Talpey <tom@talpey.com>, Namjae Jeon <linkinjeon@kernel.org>
-CC:     "smfrench@gmail.com" <smfrench@gmail.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "longli@microsoft.com" <longli@microsoft.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>
-Subject: RE: Re: [PATCH v2 4/6] Reduce server smbdirect max send/receive
- segment sizes
-Thread-Topic: Re: [PATCH v2 4/6] Reduce server smbdirect max send/receive
- segment sizes
-Thread-Index: AQHY09OQITFGuSOCgUuUPEh6SZCWfw==
-Date:   Thu, 29 Sep 2022 07:17:41 +0000
-Message-ID: <SA0PR15MB39198D1888B890CC75F03E5399579@SA0PR15MB3919.namprd15.prod.outlook.com>
-References: <cover.1663961449.git.tom@talpey.com>
- <f5fab678eedae83e79f25e4385bc1381ed554599.1663961449.git.tom@talpey.com>
- <CAKYAXd97ZrGVPj3astSWz3ESHKYFQ9JAxeq3z65mB6wmoiujrQ@mail.gmail.com>
- <11e7b888-460e-efd1-0a8c-3dbf594d9429@talpey.com>
- <CAKYAXd8JiF5N_Ve65=wHPyW+twRT5WOoHH=j6+u0YAAjCV-n2Q@mail.gmail.com>
- <80b2dae4-afe4-4d51-b198-09e2fdc9f10b@talpey.com>
- <SA0PR15MB39196C2A49C71FF1838B27D499559@SA0PR15MB3919.namprd15.prod.outlook.com>
- <8fa8a09e-599b-df31-d500-9c8b8bc7a7cc@talpey.com>
-In-Reply-To: <8fa8a09e-599b-df31-d500-9c8b8bc7a7cc@talpey.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA0PR15MB3919:EE_|SA1PR15MB4642:EE_
-x-ms-office365-filtering-correlation-id: 16f56b59-e667-4713-85d4-08daa1eab28f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: VvIOH3q/3aiK9j33KtkQm0+/adNByP4QK9Ij6xo5izHaRzK7OE83FNuDb4cOtx9uZ8JCWOIZcTDMOEQzbol5Mb9whW+PArK5ZDNo8RuY4cyr38tbbQPCVanBf6sCA6hhi/+sn2Sg1+a7eFEVfJhEx6TsUb0cOQ+l3gshegQJ+yY4BQLsv896WepWk5A6ZUaNYMw31DjsoD/4rUnwJR4ZUKT7c2PLWUYsWpay6Fq/ws/OeSRazWDrGnmdRfPlkEjTfbWG6fA515Uae+iW2KNLQ0tFKcM1lf4N+Mi0g68uyjMqR2pS6at/Y6PoJArjHVaw2mDo8lUODZGxIDsGxKxNwI6sidpc0YIL8trV7atPVzYx0BWccR+uO4Ywei0b7B+vugbDHRjqZunJia5caVTtwy6Pmw9sSrRy7/FqD8+3j3F6L8cAL6yePrjUI79a1C8hnf6XS/Z3W2IZVLazzp/giyLnnG5ZD81XjkQe+Ce/bMaQfQ/K7C9xjp2eEnfKyhoCWHDoi6JoWr9qQ9jc2oHRHjPI0tRFl5UIkECBAOWMBHIoeQBMv52+E/hTz8AOeN0D4MPdRYnyKcxXYOAMe1JdaGqMQ1TzS+MaHaFyslH44uyrNPpkYRHMrjeqYWAx3gMogYA4v0EawRouc0xxYWidJKVWyMv5/7Ny5OkcindRErU6bLEZdhEpqWpWeVHwyu1p//62SXswThbzpbKYY1AG6+bQsuLIQS7bsUbpZyLbgZvwwUJSDt+/i+F7UbWaQQTOUlIallAQZ96MwQA3yPEa7A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR15MB3919.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(396003)(136003)(346002)(376002)(39860400002)(451199015)(186003)(83380400001)(38100700002)(122000001)(9686003)(38070700005)(41300700001)(2906002)(8936002)(52536014)(478600001)(316002)(71200400001)(53546011)(7696005)(6506007)(5660300002)(66556008)(64756008)(66446008)(66476007)(55016003)(4326008)(45080400002)(8676002)(76116006)(66946007)(110136005)(54906003)(33656002)(86362001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?M0E0SkREcWozYjZTMXhLMDBnVkJyeUNtRUVvUkgzekR6MisxdFZZVzN6NmE1?=
- =?utf-8?B?ckRMdTFnWEY2Sjk0V0pJSlZkd2llemZDZ0huTFNTRG51SDg2ZXQzaEowSzd0?=
- =?utf-8?B?WDZVdnpTK29HSEh3anN1b0I4Y1NTeisrZVl2OTJ5a2loSjZTMGtEZGQ5ZTFa?=
- =?utf-8?B?LzNxeTRlRThIQTVUK3daS2J4cW53U0pwMGNpblBpQklFWnZBcC9LL1dLeDlW?=
- =?utf-8?B?eVpMNlBGVW1LbzlWMGRjV29rM1dQMWVVeW5CMUpuK29aTnlhbStNTzhTV1lr?=
- =?utf-8?B?blRmN3o3QUZVeVZGN0lzaWtQZFV3cTBJVXFQTzFpT253RSt5R0hPTnpoRGJ2?=
- =?utf-8?B?ZFhKbm5iUFhEZzR4cHB3Rkoxc1VsQXhkbGFWdnE0Q2VvNU5UNDZHdXJlY2Fo?=
- =?utf-8?B?SnNEYmJKK1o4NEZBb1FpQ0M0MmtBN1NhK3pHeExFZjlMUlgrSFJBRndCczlm?=
- =?utf-8?B?SVBJVG9oZmhZcmxJRkkwSGZoQ0FlM1FTYnA3Zi94S1FmRnFuU2J1MzdFN1pk?=
- =?utf-8?B?TFpXT0FocDV5UlhOUVFFcUdYRmhaWHpoM0ozUE96ZW1FYkloYzBIV2JucHFU?=
- =?utf-8?B?V2lSMTlxTWgvZFNwSHQ2aFNkdjZQUEFCUHU1R2hvbjduRFAyUGNGYzJIWTRz?=
- =?utf-8?B?NTB3aGZ3bjlFSHdMSDMvTGM4eTV2eTJ2VS9mT25oUGE2RGFIZVloU3VYaUVG?=
- =?utf-8?B?YXdMSUkxMUgxWmZCSHJId1FzUE9MY0YvcWRNUGY1K1UycnM0NnJEWTcvT0l6?=
- =?utf-8?B?SzI1WnBBY2JMeFZ1UVdnOUU4cVhSQW04VmpOZ3drREhWZnc2TkRmT09ZN3hX?=
- =?utf-8?B?VHVFRitadkxLZGwxMysyYlNtWXAxc1QyMktPOWx3UHB5bFBVOXZPY2pVU2tv?=
- =?utf-8?B?ajVFVHl3d1hvRGYxUUlmS1pucFlaVFBnZ1l2SCttK3lPSnN2SmZDcXhrYmlu?=
- =?utf-8?B?LzdJd2gzbWpQVEE3L3ZpQXpnVWl2UHRXbnZUb3F6ZDFuYW5QdXF4aHhleU0x?=
- =?utf-8?B?anA0a3FvMGJqQjYyd1hFc1dmZ1hkVURjc3l5d1UwMlpna0cyeVd5OXZlajVx?=
- =?utf-8?B?ZG1OQk9lMDhwMXRQZTE2cVN4c2VLUFBwbVZiaktPL2hSRzhWVXNwNnM2Smpr?=
- =?utf-8?B?Y096VnJWTEpHVjc0UjF2eGVCaXdjT0NZbms1T1JBeTJyUmlReWJscUhyRS92?=
- =?utf-8?B?WUFleFdRYkl2TS9TMkxpWkZYU3d5OVByaVRybUsweDBaMmI5YUg2VStoTFlY?=
- =?utf-8?B?UkVTY2lScFNOZGNpdHJpUGRLbHFUbHRnd2dZcUZhK1Z1M1N3VzlsSW5MRnZn?=
- =?utf-8?B?ZCtUUndQdElaR3NaSlFjbmJFN2tuUVE2c3RaL2RpYnZrc2ZIRkhtQXRYTCt6?=
- =?utf-8?B?MWhQSFpYb0cxbWs1ZHFlQVV3aGZhUWVZWWRrck1zNklYcFdSUFV3bnl4V0Mr?=
- =?utf-8?B?U1lUbHpjRFEzTkY4V3I3UnVhUDFsQmdDM0FHU2VuOVZKRHNUWjUvbFI1Um05?=
- =?utf-8?B?QklpbkltNUVFeFNvV2lYTnlCSWJjOUVSM0pOeHZvbXh0bmwvcnFFRTNENUNF?=
- =?utf-8?B?OXdwNkZkdFc4Y1NPVmNiYi9LNklvSlZFWENWcW1qV1dLVTNaUHI3c0d0QWIy?=
- =?utf-8?B?aEo1OC9aOFM1c05qTmdkenlYUEI4OElrb1NOcEczb3V1OHVnV0wybXpZbDZX?=
- =?utf-8?B?SEpFVHNNRlFMVW52M0lUL2pZTDlpVnRBdHZMOTVsYTFvT2QxaGlIcmh0bUtj?=
- =?utf-8?B?TC9waUpQRFduWGlVZWJsYzVRU295U3VhZy85amdqUzVSRkh5SWpMR003V0dz?=
- =?utf-8?B?MGowTnh4SkxucUtnRmJjc01hVit1QWozeXRDOVFCcHZoRlMzWnJvMnVvd1Jp?=
- =?utf-8?B?NERTekRSTHdHY1IxcXhXN3FKSFR6N2NvRG9GY2M0bFkzSWFTbjJaK2ZTL0hP?=
- =?utf-8?B?UmdBTGh1cmxYV0VhUHVmcGdMMFNvQVI0UzR6QkpNQzBrV05FdXdoTElwdHNt?=
- =?utf-8?B?NEk3UCtKMFVyL3B4ZFBKendvY2dNb2ZaNWJrdDRJY3N1Z0lDaTF4UGQ3c0Ro?=
- =?utf-8?B?aUI0NXcrU3JUaS9qcUtmYy84UlJzZytOV05aa0xzWFBXd21sZUhJNUY5bzM2?=
- =?utf-8?B?WWgzS2x3MmlrOVY2dTlmSnFXdDh1a2xjTWNhbHVJMTlmSXRxZnY5Uk03R1FN?=
- =?utf-8?Q?ICn2vDSsBvzNhEYT1AZckL/0+ZwJ/R1bYRX+nZJ7KnQ+?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S232519AbiI2H4S (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Sep 2022 03:56:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF1A12E43F;
+        Thu, 29 Sep 2022 00:56:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E3666207C;
+        Thu, 29 Sep 2022 07:56:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B5AEC433D6;
+        Thu, 29 Sep 2022 07:56:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664438176;
+        bh=kRsy+XVJX81Z/u5T/QNHixRtuaUgJf7LqZHmTwBP78Q=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VhTy8fL+65CNppCdDClsgwXx9NEic6LVL8h+4sibTNSCP0TkBev+9qlYO0kh6a/FZ
+         bIuhDXSEXE/PQORNPmpsPtZFg2KTbpBLdaUoKUa9PUQVProaV55OjxNVOr32oKLUK+
+         CWbEMqdshJyVcYCB0pHT+8B4RGTo3uscoPV2npa6ZMHEhKyXtlkM6muRQF453S2M3E
+         NiVII2AbhljAfuqOSGu/VLyUAvj2/XcOmOh1cdgSdxQp+0lwtLhMzuT+Z+pp+Bom9R
+         EcFVGEuWpFJAwOvDsn/w1t0Srxc9+oj7riK5xBb3BDvbr8MHnijwBdiXVBltXPUSGU
+         wmxKz0udK9E8Q==
+Date:   Thu, 29 Sep 2022 09:56:10 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     Seth Forshee <sforshee@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        linux-cifs@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v3 27/29] cifs: use stub posix acl handlers
+Message-ID: <20220929075610.jp2kcthlsu7zs5dr@wittgenstein>
+References: <20220928160843.382601-1-brauner@kernel.org>
+ <20220928160843.382601-28-brauner@kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Zurich.ibm.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA0PR15MB3919.namprd15.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16f56b59-e667-4713-85d4-08daa1eab28f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Sep 2022 07:17:41.6047
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: fcf67057-50c9-4ad4-98f3-ffca64add9e9
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: AjLVncajBOZeOtBvpwi5JwYFk+YEgm8DCWNp0zPOo/N3c0Ft9Vfe7LAe96CQX+2bV+haAPoSjpMgwEvqYKpxSQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR15MB4642
-X-Proofpoint-ORIG-GUID: 4PYJaw5-hJONjQbRMP_sSZEofa7YArya
-X-Proofpoint-GUID: 6iNgmkSocSMwBB-Ht7gqmVCHACESNzXl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-29_04,2022-09-29_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- phishscore=0 malwarescore=0 mlxlogscore=999 lowpriorityscore=0
- clxscore=1015 priorityscore=1501 mlxscore=0 spamscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2209290041
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220928160843.382601-28-brauner@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVG9tIFRhbHBleSA8dG9t
-QHRhbHBleS5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwgMjggU2VwdGVtYmVyIDIwMjIgMTY6NTQN
-Cj4gVG86IEJlcm5hcmQgTWV0emxlciA8Qk1UQHp1cmljaC5pYm0uY29tPjsgTmFtamFlIEplb24N
-Cj4gPGxpbmtpbmplb25Aa2VybmVsLm9yZz4NCj4gQ2M6IHNtZnJlbmNoQGdtYWlsLmNvbTsgbGlu
-dXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmc7DQo+IHNlbm96aGF0c2t5QGNocm9taXVtLm9yZzsgbG9u
-Z2xpQG1pY3Jvc29mdC5jb207IGRob3dlbGxzQHJlZGhhdC5jb20NCj4gU3ViamVjdDogW0VYVEVS
-TkFMXSBSZTogW1BBVENIIHYyIDQvNl0gUmVkdWNlIHNlcnZlciBzbWJkaXJlY3QgbWF4DQo+IHNl
-bmQvcmVjZWl2ZSBzZWdtZW50IHNpemVzDQo+IA0KPiBPbiA5LzI3LzIwMjIgMTA6NTkgQU0sIEJl
-cm5hcmQgTWV0emxlciB3cm90ZToNCj4gPg0KPiA+DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2Fn
-ZS0tLS0tDQo+ID4+IEZyb206IFRvbSBUYWxwZXkgPHRvbUB0YWxwZXkuY29tPg0KPiA+PiBTZW50
-OiBNb25kYXksIDI2IFNlcHRlbWJlciAyMDIyIDE5OjI1DQo+ID4+IFRvOiBOYW1qYWUgSmVvbiA8
-bGlua2luamVvbkBrZXJuZWwub3JnPg0KPiA+PiBDYzogc21mcmVuY2hAZ21haWwuY29tOyBsaW51
-eC1jaWZzQHZnZXIua2VybmVsLm9yZzsNCj4gPj4gc2Vub3poYXRza3lAY2hyb21pdW0ub3JnOyBC
-ZXJuYXJkIE1ldHpsZXIgPEJNVEB6dXJpY2guaWJtLmNvbT47DQo+ID4+IGxvbmdsaUBtaWNyb3Nv
-ZnQuY29tOyBkaG93ZWxsc0ByZWRoYXQuY29tDQo+ID4+IFN1YmplY3Q6IFtFWFRFUk5BTF0gUmU6
-IFtQQVRDSCB2MiA0LzZdIFJlZHVjZSBzZXJ2ZXIgc21iZGlyZWN0IG1heA0KPiA+PiBzZW5kL3Jl
-Y2VpdmUgc2VnbWVudCBzaXplcw0KPiA+Pg0KPiA+PiBPbiA5LzI1LzIwMjIgOToxMyBQTSwgTmFt
-amFlIEplb24gd3JvdGU6DQo+ID4+PiAyMDIyLTA5LTI2IDA6NDEgR01UKzA5OjAwLCBUb20gVGFs
-cGV5IDx0b21AdGFscGV5LmNvbT46DQo+ID4+Pj4gT24gOS8yNC8yMDIyIDExOjQwIFBNLCBOYW1q
-YWUgSmVvbiB3cm90ZToNCj4gPj4+Pj4gMjAyMi0wOS0yNCA2OjUzIEdNVCswOTowMCwgVG9tIFRh
-bHBleSA8dG9tQHRhbHBleS5jb20+Og0KPiA+Pj4+Pj4gUmVkdWNlIGtzbWJkIHNtYmRpcmVjdCBt
-YXggc2VnbWVudCBzZW5kIGFuZCByZWNlaXZlIHNpemUgdG8gMTM2NA0KPiA+Pj4+Pj4gdG8gbWF0
-Y2ggcHJvdG9jb2wgbm9ybXMuIExhcmdlciBidWZmZXJzIGFyZSB1bm5lY2Vzc2FyeSBhbmQgYWRk
-DQo+ID4+Pj4+PiBzaWduaWZpY2FudCBtZW1vcnkgb3ZlcmhlYWQuDQo+ID4+Pj4+Pg0KPiA+Pj4+
-Pj4gU2lnbmVkLW9mZi1ieTogVG9tIFRhbHBleSA8dG9tQHRhbHBleS5jb20+DQo+ID4+Pj4+PiAt
-LS0NCj4gPj4+Pj4+ICAgICBmcy9rc21iZC90cmFuc3BvcnRfcmRtYS5jIHwgNCArKy0tDQo+ID4+
-Pj4+PiAgICAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkN
-Cj4gPj4+Pj4+DQo+ID4+Pj4+PiBkaWZmIC0tZ2l0IGEvZnMva3NtYmQvdHJhbnNwb3J0X3JkbWEu
-YyBiL2ZzL2tzbWJkL3RyYW5zcG9ydF9yZG1hLmMNCj4gPj4+Pj4+IGluZGV4IDQ5NGI4ZTVhZjRi
-My4uMDMxNWJjYTNkNTNiIDEwMDY0NA0KPiA+Pj4+Pj4gLS0tIGEvZnMva3NtYmQvdHJhbnNwb3J0
-X3JkbWEuYw0KPiA+Pj4+Pj4gKysrIGIvZnMva3NtYmQvdHJhbnNwb3J0X3JkbWEuYw0KPiA+Pj4+
-Pj4gQEAgLTYyLDEzICs2MiwxMyBAQCBzdGF0aWMgaW50IHNtYl9kaXJlY3RfcmVjZWl2ZV9jcmVk
-aXRfbWF4ID0gMjU1Ow0KPiA+Pj4+Pj4gICAgIHN0YXRpYyBpbnQgc21iX2RpcmVjdF9zZW5kX2Ny
-ZWRpdF90YXJnZXQgPSAyNTU7DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gICAgIC8qIFRoZSBtYXhpbXVt
-IHNpbmdsZSBtZXNzYWdlIHNpemUgY2FuIGJlIHNlbnQgdG8gcmVtb3RlIHBlZXIgKi8NCj4gPj4+
-Pj4+IC1zdGF0aWMgaW50IHNtYl9kaXJlY3RfbWF4X3NlbmRfc2l6ZSA9IDgxOTI7DQo+ID4+Pj4+
-PiArc3RhdGljIGludCBzbWJfZGlyZWN0X21heF9zZW5kX3NpemUgPSAxMzY0Ow0KPiA+Pj4+Pj4N
-Cj4gPj4+Pj4+ICAgICAvKiAgVGhlIG1heGltdW0gZnJhZ21lbnRlZCB1cHBlci1sYXllciBwYXls
-b2FkIHJlY2VpdmUgc2l6ZQ0KPiA+PiBzdXBwb3J0ZWQNCj4gPj4+Pj4+ICovDQo+ID4+Pj4+PiAg
-ICAgc3RhdGljIGludCBzbWJfZGlyZWN0X21heF9mcmFnbWVudGVkX3JlY3Zfc2l6ZSA9IDEwMjQg
-KiAxMDI0Ow0KPiA+Pj4+Pj4NCj4gPj4+Pj4+ICAgICAvKiAgVGhlIG1heGltdW0gc2luZ2xlLW1l
-c3NhZ2Ugc2l6ZSB3aGljaCBjYW4gYmUgcmVjZWl2ZWQgKi8NCj4gPj4+Pj4+IC1zdGF0aWMgaW50
-IHNtYl9kaXJlY3RfbWF4X3JlY2VpdmVfc2l6ZSA9IDgxOTI7DQo+ID4+Pj4+PiArc3RhdGljIGlu
-dCBzbWJfZGlyZWN0X21heF9yZWNlaXZlX3NpemUgPSAxMzY0Ow0KPiA+Pj4+PiBDYW4gSSBrbm93
-IHdoYXQgdmFsdWUgd2luZG93cyBzZXJ2ZXIgc2V0IHRvID8NCj4gPj4+Pj4NCj4gPj4+Pj4gSSBj
-YW4gc2VlIHRoZSBmb2xsb3dpbmcgc2V0dGluZ3MgZm9yIHRoZW0gaW4gTVMtU01CRC5wZGYNCj4g
-Pj4+Pj4gQ29ubmVjdGlvbi5NYXhTZW5kU2l6ZSBpcyBzZXQgdG8gMTM2NC4NCj4gPj4+Pj4gQ29u
-bmVjdGlvbi5NYXhSZWNlaXZlU2l6ZSBpcyBzZXQgdG8gODE5Mi4NCj4gPj4+Pg0KPiA+Pj4+IEds
-YWQgeW91IGFza2VkLCBpdCdzIGFuIGludGVyZXN0aW5nIHNpdHVhdGlvbiBJTU8uDQo+ID4+Pj4N
-Cj4gPj4+PiBJbiBNUy1TTUJELCB0aGUgZm9sbG93aW5nIGFyZSBkb2N1bWVudGVkIGFzIGJlaGF2
-aW9yIG5vdGVzOg0KPiA+Pj4+DQo+ID4+Pj4gQ2xpZW50LXNpZGUgKGFjdGl2ZSBjb25uZWN0KToN
-Cj4gPj4+PiAgICAgQ29ubmVjdGlvbi5NYXhTZW5kU2l6ZSBpcyBzZXQgdG8gMTM2NC4NCj4gPj4+
-PiAgICAgQ29ubmVjdGlvbi5NYXhSZWNlaXZlU2l6ZSBpcyBzZXQgdG8gODE5Mi4NCj4gPj4+Pg0K
-PiA+Pj4+IFNlcnZlci1zaWRlIChwYXNzaXZlIGxpc3Rlbik6DQo+ID4+Pj4gICAgIENvbm5lY3Rp
-b24uTWF4U2VuZFNpemUgaXMgc2V0IHRvIDEzNjQuDQo+ID4+Pj4gICAgIENvbm5lY3Rpb24uTWF4
-UmVjZWl2ZVNpemUgaXMgc2V0IHRvIDgxOTIuDQo+ID4+Pj4NCj4gPj4+PiBIb3dldmVyLCB0aGVz
-ZSBhcmUgb25seSB0aGUgaW5pdGlhbCB2YWx1ZXMuIER1cmluZyBTTUJEDQo+ID4+Pj4gbmVnb3Rp
-YXRpb24sIHRoZSB0d28gc2lkZXMgYWRqdXN0IGRvd253YXJkIHRvIHRoZSBvdGhlcidzDQo+ID4+
-Pj4gbWF4aW11bS4gVGhlcmVmb3JlLCBXaW5kb3dzIGNvbm5lY3RpbmcgdG8gV2luZG93cyB3aWxs
-IHVzZQ0KPiA+Pj4+IDEzNjQgb24gYm90aCBzaWRlcy4NCj4gPj4+Pg0KPiA+Pj4+IEluIGNpZnMg
-YW5kIGtzbWJkLCB0aGUgY2hvaWNlcyB3ZXJlIG1lc3NpZXI6DQo+ID4+Pj4NCj4gPj4+PiBDbGll
-bnQtc2lkZSBzbWJkaXJlY3QuYzoNCj4gPj4+PiAgICAgaW50IHNtYmRfbWF4X3NlbmRfc2l6ZSA9
-IDEzNjQ7DQo+ID4+Pj4gICAgIGludCBzbWJkX21heF9yZWNlaXZlX3NpemUgPSA4MTkyOw0KPiA+
-Pj4+DQo+ID4+Pj4gU2VydmVyLXNpZGUgdHJhbnNwb3J0X3JkbWEuYzoNCj4gPj4+PiAgICAgc3Rh
-dGljIGludCBzbWJfZGlyZWN0X21heF9zZW5kX3NpemUgPSA4MTkyOw0KPiA+Pj4+ICAgICBzdGF0
-aWMgaW50IHNtYl9kaXJlY3RfbWF4X3JlY2VpdmVfc2l6ZSA9IDgxOTI7DQo+ID4+Pj4NCj4gPj4+
-PiBUaGVyZWZvcmUsIHBlZXJzIGNvbm5lY3RpbmcgdG8ga3NtYmQgd291bGQgdHlwaWNhbGx5IGVu
-ZCB1cA0KPiA+Pj4+IG5lZ290aWF0aW5nIDEzNjQgZm9yIHNlbmQgYW5kIDgxOTIgZm9yIHJlY2Vp
-dmUuDQo+ID4+Pj4NCj4gPj4+PiBUaGVyZSBpcyBhbG1vc3Qgbm8gZ29vZCByZWFzb24gdG8gdXNl
-IGxhcmdlciBidWZmZXJzLiBCZWNhdXNlDQo+ID4+Pj4gUkRNQSBpcyBoaWdobHkgZWZmaWNpZW50
-LCBhbmQgdGhlIHNtYmRpcmVjdCBwcm90b2NvbCB0cml2aWFsbHkNCj4gPj4+PiBmcmFnbWVudHMg
-bG9uZ2VyIG1lc3NhZ2VzLCB0aGVyZSBpcyBubyBzaWduaWZpY2FudCBwZXJmb3JtYW5jZQ0KPiA+
-Pj4+IHBlbmFsdHkuDQo+ID4+Pj4NCj4gPj4+PiBBbmQsIGJlY2F1c2Ugbm90IG1hbnkgU01CMyBt
-ZXNzYWdlcyByZXF1aXJlIDgxOTIgYnl0ZXMgb3Zlcg0KPiA+Pj4+IHNtYmRpcmVjdCwgaXQncyBh
-IGNvbG9zc2FsIHdhc3RlIG9mIHZpcnR1YWxseSBjb250aWd1b3VzIGtlcm5lbA0KPiA+Pj4+IG1l
-bW9yeSB0byBhbGxvY2F0ZSA4MTkyIHRvIGFsbCByZWNlaXZlcy4NCj4gPj4+Pg0KPiA+Pj4+IEJ5
-IHNldHRpbmcgYWxsIGZvdXIgdG8gdGhlIHByYWN0aWNhbCByZWFsaXR5IG9mIDEzNjQsIGl0J3Mg
-YQ0KPiA+Pj4+IGNvbnNpc3RlbnQgYW5kIGVmZmljaWVudCBkZWZhdWx0LCBhbmQgYWxpZ25zIExp
-bnV4IHNtYmRpcmVjdA0KPiA+Pj4+IHdpdGggV2luZG93cy4NCj4gPj4+IFRoYW5rcyBmb3IgeW91
-ciBkZXRhaWxlZCBleHBsYW5hdGlvbiEgIEFncmVlIHRvIHNldCBib3RoIHRvIDEzNjQgYnkNCj4g
-Pj4+IGRlZmF1bHQsIElzIHRoZXJlIGFueSB1c2FnZSB0byBpbmNyZWFzZSBpdD8gSSB3b25kZXIg
-aWYgdXNlcnMgbmVlZCBhbnkNCj4gPj4+IGNvbmZpZ3VyYXRpb24gcGFyYW1ldGVycyB0byBhZGp1
-c3QgdGhlbS4NCj4gPj4NCj4gPj4gSW4gbXkgb3BpbmlvbiwgcHJvYmFibHkgbm90LiBJIGdpdmUg
-c29tZSByZWFzb25zIHdoeSBsYXJnZSBmcmFnbWVudHMNCj4gPj4gYXJlbid0IGFsd2F5cyBoZWxw
-ZnVsIGp1c3QgYWJvdmUuIEl0J3MgdGhlIHNhbWUgbnVtYmVyIG9mIHBhY2tldHMhIEp1c3QNCj4g
-Pj4gYSBxdWVzdGlvbiBvZiB3aGV0aGVyIFNNQkRpcmVjdCBvciBFdGhlcm5ldCBkb2VzIHRoZSBm
-cmFnbWVudGF0aW9uLCBhbmQNCj4gPj4gdGhlIGJ1ZmZlciBtYW5hZ2VtZW50Lg0KPiA+Pg0KPiA+
-DQo+ID4gT25lIHNpbXBsZSByZWFzb24gZm9yIGxhcmdlciBidWZmZXJzIEkgYW0gYXdhcmUgb2Yg
-aXMgcnVubmluZw0KPiA+IGVmZmljaWVudGx5IG9uIHNvZnR3YXJlIG9ubHkgUkRNQSBwcm92aWRl
-cnMgbGlrZSBzaXcgb3IgcnhlLg0KPiA+IEZvciBzaXcgSSdkIGd1ZXNzIHdlIGN1dCB0byBsZXNz
-IHRoYW4gaGFsZiB0aGUgcGVyZm9ybWFuY2Ugd2l0aA0KPiA+IDEzNjQgYnl0ZXMgYnVmZmVycy4g
-QnV0IG1heWJlIHRoYXQgaXMgbm8gY29uY2VybiBmb3IgdGhlIHNldHVwcw0KPiA+IHlvdSBoYXZl
-IGluIG1pbmQuDQo+IA0KPiBJJ20gc2tlcHRpY2FsIG9mICJsZXNzIHRoYW4gaGFsZiIgdGhlIHBl
-cmZvcm1hbmNlLCBhbmQgd29uZGVyIHdoeQ0KPiB0aGF0IG1pZ2h0IGJlLCBidXQuLi4NCj4gDQo+
-IEFnYWluLCBpdCdzIHJhdGhlciB1bmNvbW1vbiB0aGF0IHRoZXNlIGlubGluZSBtZXNzYWdlcyBh
-cmUgZXZlcg0KPiBsYXJnZS4gQnVsayBkYXRhIChyL3cgPj00S0IpIGlzIGFsd2F5cyBjYXJyaWVk
-IGJ5IFJETUEsIGFuZCBkb2VzDQo+IG5vdCBhcHBlYXIgYXQgYWxsIGluIHRoZXNlIGRhdGFncmFt
-cywgZm9yIGV4YW1wbGUuDQo+IA0KPiBUaGUgY29kZSBjdXJyZW50bHkgaGFzIGEgc2luZ2xlIHN5
-c3RlbS13aWRlIGRlZmF1bHQsIHdoaWNoIGlzIG5vdA0KPiB0dW5hYmxlIHBlciBjb25uZWN0aW9u
-IGFuZCByZXF1aXJlcyBib3RoIHNpZGVzIG9mIHRoZSBjb25uZWN0aW9uDQo+IHRvIGRvIHNvLiBJ
-dCdzIG5vdCByZWFzb25hYmxlIHRvIGRlcGVuZCBvbiBXaW5kb3dzLCBjaWZzLmtvIGFuZA0KPiBr
-c21iZC5rbyB0byBhbGwgc29tZWhvdyBtYWdpY2FsbHkgZG8gdGhlIHNhbWUgdGhpbmcuIFNvIHRo
-ZSBiZXN0DQo+IGRlZmF1bHQgaXMgdGhlIG1vc3QgY29uc2VydmF0aXZlLCBsZWFzdCB3YXN0ZWZ1
-bCBzZXR0aW5nLg0KPiANCg0KT2gsIHNvcnJ5LCBteSBiYWQuIEkgd2FzIHVuZGVyIHRoZSBpbXBy
-ZXNzaW9uIHdlIHRhbGsgYWJvdXQgYnVsaw0KZGF0YSwgaWYgOGsgYnVmZmVycyBhcmUgdGhlIGRl
-ZmF1bHQuIFNvIEkgY29tcGxldGVseSBhZ3JlZSB3aXRoDQp5b3VyIHBvaW50Lg0KDQpCZXN0LA0K
-QmVybmFyZC4NCg0KPiBUb20uDQo+IA0KPiANCj4gPiBCZXN0LA0KPiA+IEJlcm5hcmQuDQo+ID4N
-Cj4gPj4gVGhlcmUgbWlnaHQgY29uY2VpdmFibHkgYmUgYSBjYXNlIGZvciAqc21hbGxlciosIGZv
-ciBleGFtcGxlIG9uIElCIHdoZW4NCj4gPj4gaXQncyBjcmFua2VkIGRvd24gdG8gdGhlIG1pbmlt
-dW0gKDI1NkIpIE1UVS4gQnV0IGl0IHdpbGwgd29yayB3aXRoIHRoaXMNCj4gPj4gZGVmYXVsdC4N
-Cj4gPj4NCj4gPj4gSSdkIHNheSBsZXQncyBkb24ndCBvdmVyLWVuZ2luZWVyIGl0IHVudGlsIHdl
-IGFkZHJlc3MgdGhlIG1hbnkgb3RoZXINCj4gPj4gaXNzdWVzIGluIHRoaXMgY29kZS4gTWVyZ2lu
-ZyB0aGUgdHdvIHNtYmRpcmVjdCBpbXBsZW1lbnRhdGlvbnMgaXMgbXVjaA0KPiA+PiBtb3JlIGlt
-cG9ydGFudCB0aGFuIGFkZGluZyB0d2Vha3kgbGl0dGxlIGtub2JzIHRvIGJvdGguIE1ITy4NCj4g
-Pj4NCj4gPj4gVG9tLg0KPiA+Pg0KPiA+Pj4+Pg0KPiA+Pj4+PiBXaHkgZG9lcyB0aGUgc3BlY2lm
-aWNhdGlvbiBkZXNjcmliZSBzZXR0aW5nIGl0IHRvIDgxOTI/DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4g
-ICAgIHN0YXRpYyBpbnQgc21iX2RpcmVjdF9tYXhfcmVhZF93cml0ZV9zaXplID0gU01CRF9ERUZB
-VUxUX0lPU0laRTsNCj4gPj4+Pj4+DQo+ID4+Pj4+PiAtLQ0KPiA+Pj4+Pj4gMi4zNC4xDQo+ID4+
-Pj4+Pg0KPiA+Pj4+Pj4NCj4gPj4+Pj4NCj4gPj4+Pg0KPiA+Pj4NCg==
+On Wed, Sep 28, 2022 at 06:08:41PM +0200, Christian Brauner wrote:
+> Now that cifs supports the get and set acl inode operations and the vfs
+> has been switched to the new posi api, cifs can simply rely on the stub
+> posix acl handlers. The custom xattr handlers and associated unused
+> helpers can be removed.
+> 
+> Signed-off-by: Christian Brauner (Microsoft) <brauner@kernel.org>
+> ---
+> 
+> Notes:
+>     /* v2 */
+>     unchanged
+>     
+>     /* v3 */
+>     unchanged
+> 
+>  fs/cifs/cifsproto.h |   8 --
+>  fs/cifs/cifssmb.c   | 298 --------------------------------------------
+>  fs/cifs/xattr.c     |  68 +---------
+>  3 files changed, 4 insertions(+), 370 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 279e867dee2e..9259da1b885d 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -542,18 +542,10 @@ extern int CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon,
+>  			__u16 fid, struct cifs_ntsd **acl_inf, __u32 *buflen);
+>  extern int CIFSSMBSetCIFSACL(const unsigned int, struct cifs_tcon *, __u16,
+>  			struct cifs_ntsd *, __u32, int);
+> -extern int CIFSSMBGetPosixACL(const unsigned int xid, struct cifs_tcon *tcon,
+> -		const unsigned char *searchName,
+> -		char *acl_inf, const int buflen, const int acl_type,
+> -		const struct nls_table *nls_codepage, int remap_special_chars);
+>  extern int cifs_do_get_acl(const unsigned int xid, struct cifs_tcon *tcon,
+>  			   const unsigned char *searchName,
+>  			   struct posix_acl **acl, const int acl_type,
+>  			   const struct nls_table *nls_codepage, int remap);
+> -extern int CIFSSMBSetPosixACL(const unsigned int xid, struct cifs_tcon *tcon,
+> -		const unsigned char *fileName,
+> -		const char *local_acl, const int buflen, const int acl_type,
+> -		const struct nls_table *nls_codepage, int remap_special_chars);
+>  extern int cifs_do_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
+>  			   const unsigned char *fileName,
+>  			   const struct posix_acl *acl, const int acl_type,
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 7b47d0def5d2..ddef789a6fcb 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -2914,304 +2914,6 @@ CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
+>  
+>  #ifdef CONFIG_CIFS_POSIX
+>  
+> -/*Convert an Access Control Entry from wire format to local POSIX xattr format*/
+> -static void cifs_convert_ace(struct posix_acl_xattr_entry *ace,
+> -			     struct cifs_posix_ace *cifs_ace)
+> -{
+> -	/* u8 cifs fields do not need le conversion */
+> -	ace->e_perm = cpu_to_le16(cifs_ace->cifs_e_perm);
+> -	ace->e_tag  = cpu_to_le16(cifs_ace->cifs_e_tag);
+> -	ace->e_id   = cpu_to_le32(le64_to_cpu(cifs_ace->cifs_uid));
+> -/*
+> -	cifs_dbg(FYI, "perm %d tag %d id %d\n",
+> -		 ace->e_perm, ace->e_tag, ace->e_id);
+> -*/
+> -
+> -	return;
+> -}
+> -
+> -/* Convert ACL from CIFS POSIX wire format to local Linux POSIX ACL xattr */
+> -static int cifs_copy_posix_acl(char *trgt, char *src, const int buflen,
+> -			       const int acl_type, const int size_of_data_area)
+> -{
+> -	int size =  0;
+> -	int i;
+> -	__u16 count;
+> -	struct cifs_posix_ace *pACE;
+> -	struct cifs_posix_acl *cifs_acl = (struct cifs_posix_acl *)src;
+> -	struct posix_acl_xattr_header *local_acl = (void *)trgt;
+> -
+> -	if (le16_to_cpu(cifs_acl->version) != CIFS_ACL_VERSION)
+> -		return -EOPNOTSUPP;
+> -
+> -	if (acl_type == ACL_TYPE_ACCESS) {
+> -		count = le16_to_cpu(cifs_acl->access_entry_count);
+> -		pACE = &cifs_acl->ace_array[0];
+> -		size = sizeof(struct cifs_posix_acl);
+> -		size += sizeof(struct cifs_posix_ace) * count;
+> -		/* check if we would go beyond end of SMB */
+> -		if (size_of_data_area < size) {
+> -			cifs_dbg(FYI, "bad CIFS POSIX ACL size %d vs. %d\n",
+> -				 size_of_data_area, size);
+> -			return -EINVAL;
+> -		}
+> -	} else if (acl_type == ACL_TYPE_DEFAULT) {
+> -		count = le16_to_cpu(cifs_acl->access_entry_count);
+> -		size = sizeof(struct cifs_posix_acl);
+> -		size += sizeof(struct cifs_posix_ace) * count;
+> -/* skip past access ACEs to get to default ACEs */
+> -		pACE = &cifs_acl->ace_array[count];
+> -		count = le16_to_cpu(cifs_acl->default_entry_count);
+> -		size += sizeof(struct cifs_posix_ace) * count;
+> -		/* check if we would go beyond end of SMB */
+> -		if (size_of_data_area < size)
+> -			return -EINVAL;
+> -	} else {
+> -		/* illegal type */
+> -		return -EINVAL;
+> -	}
+> -
+> -	size = posix_acl_xattr_size(count);
+> -	if ((buflen == 0) || (local_acl == NULL)) {
+> -		/* used to query ACL EA size */
+> -	} else if (size > buflen) {
+> -		return -ERANGE;
+> -	} else /* buffer big enough */ {
+> -		struct posix_acl_xattr_entry *ace = (void *)(local_acl + 1);
+> -
+> -		local_acl->a_version = cpu_to_le32(POSIX_ACL_XATTR_VERSION);
+> -		for (i = 0; i < count ; i++) {
+> -			cifs_convert_ace(&ace[i], pACE);
+> -			pACE++;
+> -		}
+> -	}
+> -	return size;
+> -}
+> -
+> -static void convert_ace_to_cifs_ace(struct cifs_posix_ace *cifs_ace,
+> -				     const struct posix_acl_xattr_entry *local_ace)
+> -{
+> -	cifs_ace->cifs_e_perm = le16_to_cpu(local_ace->e_perm);
+> -	cifs_ace->cifs_e_tag =  le16_to_cpu(local_ace->e_tag);
+> -	/* BB is there a better way to handle the large uid? */
+> -	if (local_ace->e_id == cpu_to_le32(-1)) {
+> -	/* Probably no need to le convert -1 on any arch but can not hurt */
+> -		cifs_ace->cifs_uid = cpu_to_le64(-1);
+> -	} else
+> -		cifs_ace->cifs_uid = cpu_to_le64(le32_to_cpu(local_ace->e_id));
+> -/*
+> -	cifs_dbg(FYI, "perm %d tag %d id %d\n",
+> -		 ace->e_perm, ace->e_tag, ace->e_id);
+> -*/
+> -}
+> -
+> -/* Convert ACL from local Linux POSIX xattr to CIFS POSIX ACL wire format */
+> -static __u16 ACL_to_cifs_posix(char *parm_data, const char *pACL,
+> -			       const int buflen, const int acl_type)
+> -{
+> -	__u16 rc = 0;
+> -	struct cifs_posix_acl *cifs_acl = (struct cifs_posix_acl *)parm_data;
+> -	struct posix_acl_xattr_header *local_acl = (void *)pACL;
+> -	struct posix_acl_xattr_entry *ace = (void *)(local_acl + 1);
+> -	int count;
+> -	int i;
+> -
+> -	if ((buflen == 0) || (pACL == NULL) || (cifs_acl == NULL))
+> -		return 0;
+> -
+> -	count = posix_acl_xattr_count((size_t)buflen);
+> -	cifs_dbg(FYI, "setting acl with %d entries from buf of length %d and version of %d\n",
+> -		 count, buflen, le32_to_cpu(local_acl->a_version));
+> -	if (le32_to_cpu(local_acl->a_version) != 2) {
+> -		cifs_dbg(FYI, "unknown POSIX ACL version %d\n",
+> -			 le32_to_cpu(local_acl->a_version));
+> -		return 0;
+> -	}
+> -	cifs_acl->version = cpu_to_le16(1);
+> -	if (acl_type == ACL_TYPE_ACCESS) {
+> -		cifs_acl->access_entry_count = cpu_to_le16(count);
+> -		cifs_acl->default_entry_count = cpu_to_le16(0xFFFF);
+> -	} else if (acl_type == ACL_TYPE_DEFAULT) {
+> -		cifs_acl->default_entry_count = cpu_to_le16(count);
+> -		cifs_acl->access_entry_count = cpu_to_le16(0xFFFF);
+> -	} else {
+> -		cifs_dbg(FYI, "unknown ACL type %d\n", acl_type);
+> -		return 0;
+> -	}
+> -	for (i = 0; i < count; i++)
+> -		convert_ace_to_cifs_ace(&cifs_acl->ace_array[i], &ace[i]);
+> -	if (rc == 0) {
+> -		rc = (__u16)(count * sizeof(struct cifs_posix_ace));
+> -		rc += sizeof(struct cifs_posix_acl);
+> -		/* BB add check to make sure ACL does not overflow SMB */
+> -	}
+> -	return rc;
+> -}
+> -
+> -int
+> -CIFSSMBGetPosixACL(const unsigned int xid, struct cifs_tcon *tcon,
+> -		   const unsigned char *searchName,
+> -		   char *acl_inf, const int buflen, const int acl_type,
+> -		   const struct nls_table *nls_codepage, int remap)
+> -{
+> -/* SMB_QUERY_POSIX_ACL */
+> -	TRANSACTION2_QPI_REQ *pSMB = NULL;
+> -	TRANSACTION2_QPI_RSP *pSMBr = NULL;
+> -	int rc = 0;
+> -	int bytes_returned;
+> -	int name_len;
+> -	__u16 params, byte_count;
+> -
+> -	cifs_dbg(FYI, "In GetPosixACL (Unix) for path %s\n", searchName);
+> -
+> -queryAclRetry:
+> -	rc = smb_init(SMB_COM_TRANSACTION2, 15, tcon, (void **) &pSMB,
+> -		(void **) &pSMBr);
+> -	if (rc)
+> -		return rc;
+> -
+> -	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
+> -		name_len =
+> -			cifsConvertToUTF16((__le16 *) pSMB->FileName,
+> -					   searchName, PATH_MAX, nls_codepage,
+> -					   remap);
+> -		name_len++;     /* trailing null */
+> -		name_len *= 2;
+> -		pSMB->FileName[name_len] = 0;
+> -		pSMB->FileName[name_len+1] = 0;
+> -	} else {
+> -		name_len = copy_path_name(pSMB->FileName, searchName);
+> -	}
+> -
+> -	params = 2 /* level */  + 4 /* rsrvd */  + name_len /* incl null */ ;
+> -	pSMB->TotalDataCount = 0;
+> -	pSMB->MaxParameterCount = cpu_to_le16(2);
+> -	/* BB find exact max data count below from sess structure BB */
+> -	pSMB->MaxDataCount = cpu_to_le16(4000);
+> -	pSMB->MaxSetupCount = 0;
+> -	pSMB->Reserved = 0;
+> -	pSMB->Flags = 0;
+> -	pSMB->Timeout = 0;
+> -	pSMB->Reserved2 = 0;
+> -	pSMB->ParameterOffset = cpu_to_le16(
+> -		offsetof(struct smb_com_transaction2_qpi_req,
+> -			 InformationLevel) - 4);
+> -	pSMB->DataCount = 0;
+> -	pSMB->DataOffset = 0;
+> -	pSMB->SetupCount = 1;
+> -	pSMB->Reserved3 = 0;
+> -	pSMB->SubCommand = cpu_to_le16(TRANS2_QUERY_PATH_INFORMATION);
+> -	byte_count = params + 1 /* pad */ ;
+> -	pSMB->TotalParameterCount = cpu_to_le16(params);
+> -	pSMB->ParameterCount = pSMB->TotalParameterCount;
+> -	pSMB->InformationLevel = cpu_to_le16(SMB_QUERY_POSIX_ACL);
+> -	pSMB->Reserved4 = 0;
+> -	inc_rfc1001_len(pSMB, byte_count);
+> -	pSMB->ByteCount = cpu_to_le16(byte_count);
+> -
+> -	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+> -		(struct smb_hdr *) pSMBr, &bytes_returned, 0);
+> -	cifs_stats_inc(&tcon->stats.cifs_stats.num_acl_get);
+> -	if (rc) {
+> -		cifs_dbg(FYI, "Send error in Query POSIX ACL = %d\n", rc);
+> -	} else {
+> -		/* decode response */
+> -
+> -		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+> -		/* BB also check enough total bytes returned */
+> -		if (rc || get_bcc(&pSMBr->hdr) < 2)
+> -			rc = -EIO;      /* bad smb */
+> -		else {
+> -			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+> -			__u16 count = le16_to_cpu(pSMBr->t2.DataCount);
+> -			rc = cifs_copy_posix_acl(acl_inf,
+> -				(char *)&pSMBr->hdr.Protocol+data_offset,
+> -				buflen, acl_type, count);
+> -		}
+> -	}
+> -	cifs_buf_release(pSMB);
+> -	if (rc == -EAGAIN)
+> -		goto queryAclRetry;
+> -	return rc;
+> -}
+> -
+> -int
+> -CIFSSMBSetPosixACL(const unsigned int xid, struct cifs_tcon *tcon,
+> -		   const unsigned char *fileName,
+> -		   const char *local_acl, const int buflen,
+> -		   const int acl_type,
+> -		   const struct nls_table *nls_codepage, int remap)
+> -{
+> -	struct smb_com_transaction2_spi_req *pSMB = NULL;
+> -	struct smb_com_transaction2_spi_rsp *pSMBr = NULL;
+> -	char *parm_data;
+> -	int name_len;
+> -	int rc = 0;
+> -	int bytes_returned = 0;
+> -	__u16 params, byte_count, data_count, param_offset, offset;
+> -
+> -	cifs_dbg(FYI, "In SetPosixACL (Unix) for path %s\n", fileName);
+> -setAclRetry:
+> -	rc = smb_init(SMB_COM_TRANSACTION2, 15, tcon, (void **) &pSMB,
+> -		      (void **) &pSMBr);
+> -	if (rc)
+> -		return rc;
+> -	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
+> -		name_len =
+> -			cifsConvertToUTF16((__le16 *) pSMB->FileName, fileName,
+> -					   PATH_MAX, nls_codepage, remap);
+> -		name_len++;     /* trailing null */
+> -		name_len *= 2;
+> -	} else {
+> -		name_len = copy_path_name(pSMB->FileName, fileName);
+> -	}
+> -	params = 6 + name_len;
+> -	pSMB->MaxParameterCount = cpu_to_le16(2);
+> -	/* BB find max SMB size from sess */
+> -	pSMB->MaxDataCount = cpu_to_le16(1000);
+> -	pSMB->MaxSetupCount = 0;
+> -	pSMB->Reserved = 0;
+> -	pSMB->Flags = 0;
+> -	pSMB->Timeout = 0;
+> -	pSMB->Reserved2 = 0;
+> -	param_offset = offsetof(struct smb_com_transaction2_spi_req,
+> -				InformationLevel) - 4;
+> -	offset = param_offset + params;
+> -	parm_data = ((char *) &pSMB->hdr.Protocol) + offset;
+> -	pSMB->ParameterOffset = cpu_to_le16(param_offset);
+> -
+> -	/* convert to on the wire format for POSIX ACL */
+> -	data_count = ACL_to_cifs_posix(parm_data, local_acl, buflen, acl_type);
+> -
+> -	if (data_count == 0) {
+> -		rc = -EOPNOTSUPP;
+> -		goto setACLerrorExit;
+> -	}
+> -	pSMB->DataOffset = cpu_to_le16(offset);
+> -	pSMB->SetupCount = 1;
+> -	pSMB->Reserved3 = 0;
+> -	pSMB->SubCommand = cpu_to_le16(TRANS2_SET_PATH_INFORMATION);
+> -	pSMB->InformationLevel = cpu_to_le16(SMB_SET_POSIX_ACL);
+> -	byte_count = 3 /* pad */  + params + data_count;
+> -	pSMB->DataCount = cpu_to_le16(data_count);
+> -	pSMB->TotalDataCount = pSMB->DataCount;
+> -	pSMB->ParameterCount = cpu_to_le16(params);
+> -	pSMB->TotalParameterCount = pSMB->ParameterCount;
+> -	pSMB->Reserved4 = 0;
+> -	inc_rfc1001_len(pSMB, byte_count);
+> -	pSMB->ByteCount = cpu_to_le16(byte_count);
+> -	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+> -			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+> -	if (rc)
+> -		cifs_dbg(FYI, "Set POSIX ACL returned %d\n", rc);
+> -
+> -setACLerrorExit:
+> -	cifs_buf_release(pSMB);
+> -	if (rc == -EAGAIN)
+> -		goto setAclRetry;
+> -	return rc;
+> -}
+> -
+>  #ifdef CONFIG_FS_POSIX_ACL
+>  /**
+>   * cifs_init_posix_acl - convert ACL from cifs to POSIX ACL format
+> diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
+> index 998fa51f9b68..293ffe89d6b2 100644
+> --- a/fs/cifs/xattr.c
+> +++ b/fs/cifs/xattr.c
+> @@ -200,32 +200,6 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+>  		}
+>  		break;
+>  	}
+> -
+> -#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+> -	case XATTR_ACL_ACCESS:
+> -#ifdef CONFIG_CIFS_POSIX
+> -		if (!value)
+> -			goto out;
+> -		if (sb->s_flags & SB_POSIXACL)
+> -			rc = CIFSSMBSetPosixACL(xid, pTcon, full_path,
+> -				value, (const int)size,
+> -				ACL_TYPE_ACCESS, cifs_sb->local_nls,
+> -				cifs_remap(cifs_sb));
+> -#endif  /* CONFIG_CIFS_POSIX */
+> -		break;
+> -
+> -	case XATTR_ACL_DEFAULT:
+> -#ifdef CONFIG_CIFS_POSIX
+> -		if (!value)
+> -			goto out;
+> -		if (sb->s_flags & SB_POSIXACL)
+> -			rc = CIFSSMBSetPosixACL(xid, pTcon, full_path,
+> -				value, (const int)size,
+> -				ACL_TYPE_DEFAULT, cifs_sb->local_nls,
+> -				cifs_remap(cifs_sb));
+> -#endif  /* CONFIG_CIFS_POSIX */
+> -		break;
+> -#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+>  	}
+>  
+>  out:
+> @@ -366,27 +340,6 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+>  		}
+>  		break;
+>  	}
+> -#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+> -	case XATTR_ACL_ACCESS:
+> -#ifdef CONFIG_CIFS_POSIX
+> -		if (sb->s_flags & SB_POSIXACL)
+> -			rc = CIFSSMBGetPosixACL(xid, pTcon, full_path,
+> -				value, size, ACL_TYPE_ACCESS,
+> -				cifs_sb->local_nls,
+> -				cifs_remap(cifs_sb));
+> -#endif  /* CONFIG_CIFS_POSIX */
+> -		break;
+> -
+> -	case XATTR_ACL_DEFAULT:
+> -#ifdef CONFIG_CIFS_POSIX
+> -		if (sb->s_flags & SB_POSIXACL)
+> -			rc = CIFSSMBGetPosixACL(xid, pTcon, full_path,
+> -				value, size, ACL_TYPE_DEFAULT,
+> -				cifs_sb->local_nls,
+> -				cifs_remap(cifs_sb));
+> -#endif  /* CONFIG_CIFS_POSIX */
+> -		break;
+> -#endif /* ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+>  	}
+>  
+>  	/* We could add an additional check for streams ie
+> @@ -525,21 +478,6 @@ static const struct xattr_handler smb3_ntsd_full_xattr_handler = {
+>  	.set = cifs_xattr_set,
+>  };
+>  
+> -
+> -static const struct xattr_handler cifs_posix_acl_access_xattr_handler = {
+> -	.name = XATTR_NAME_POSIX_ACL_ACCESS,
+> -	.flags = XATTR_ACL_ACCESS,
+> -	.get = cifs_xattr_get,
+> -	.set = cifs_xattr_set,
+> -};
+> -
+> -static const struct xattr_handler cifs_posix_acl_default_xattr_handler = {
+> -	.name = XATTR_NAME_POSIX_ACL_DEFAULT,
+> -	.flags = XATTR_ACL_DEFAULT,
+> -	.get = cifs_xattr_get,
+> -	.set = cifs_xattr_set,
+> -};
+> -
+>  const struct xattr_handler *cifs_xattr_handlers[] = {
+>  	&cifs_user_xattr_handler,
+>  	&cifs_os2_xattr_handler,
+> @@ -549,7 +487,9 @@ const struct xattr_handler *cifs_xattr_handlers[] = {
+>  	&smb3_ntsd_xattr_handler, /* alias for above since avoiding "cifs" */
+>  	&cifs_cifs_ntsd_full_xattr_handler,
+>  	&smb3_ntsd_full_xattr_handler, /* alias for above since avoiding "cifs" */
+> -	&cifs_posix_acl_access_xattr_handler,
+> -	&cifs_posix_acl_default_xattr_handler,
+> +#ifdef CONFIG_XFS_POSIX_ACL
+
+This was pointed out to me this morning:
+
+s/CONFIG_XFS_POSIX_ACL/CONFIG_FS_POSIX_ACL/
+
+I've fixed the places with this copy paste already in my tree.
