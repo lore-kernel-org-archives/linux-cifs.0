@@ -2,85 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8B3C433F5
-	for <linux-cifs@archiver.kernel.org>; Sat,  1 Oct 2022 23:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A105C433F5
+	for <linux-cifs@archiver.kernel.org>; Sun,  2 Oct 2022 00:21:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbiJAXvH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 1 Oct 2022 19:51:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55034 "EHLO
+        id S229472AbiJBAVY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 1 Oct 2022 20:21:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbiJAXvH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 Oct 2022 19:51:07 -0400
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B5C137199
-        for <linux-cifs@vger.kernel.org>; Sat,  1 Oct 2022 16:51:06 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id n186so2406734vsc.9
-        for <linux-cifs@vger.kernel.org>; Sat, 01 Oct 2022 16:51:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date;
-        bh=mNlj1ar7MjAtt10PpJ5/PhVXSQp48TQeJStKYXUqZqM=;
-        b=YRxnBcYn8lsbD640gx99JQcxyJ713Nt1LQbipREAPqcji3dRxHRvGSeIkckqbAuooN
-         ihCxLgE7rsdTtBqZf3KBfy2nPgUJ3vkmfCNSjQ/caoav0gT95pPPmu3jjApcpJgqspCe
-         tyPrMY2zC1RFv3XtfiybVkvP97tgBqKDJrB6VMEDOLL4LwL/gB1IH6J2Daoe/94msJo8
-         XyD2IQE8idIa4egqh6TwrVTvMJEoFlCAppf6nvYdIUQezlgYZGYid8oSykiUC9XBMLzP
-         stEXvc1JZ3CpKuj2dnkt+r3C6HrDdzlDK5xF0ZnVwWJ8qsK/uSKjYWbkQNOiZ7p6UDdo
-         LkMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=mNlj1ar7MjAtt10PpJ5/PhVXSQp48TQeJStKYXUqZqM=;
-        b=ZzZh1INf6FLgoOfdiToXHYeLkAXVn0LGsehWr9y2FqraeiubauuAw9mr7iYX2ENb2m
-         9h+7WXOoZFD+RmNBOt11NLaFOMC16BhqHVnZZQqfFmh/wBWHeLOS2M5RmGR1MklIkkJ/
-         OU1fPndXcEIlp0Sz/aZ/8wXtM2N3sH++AAwum4ElaZZEvCyfqdrM7K8REVYUWICvH4J7
-         zFkDWYnTPJeqJL2A12dOaiyXyPlQ4S5Kiixh10zxJxr1SMDeJlu7GmGZEeIsTkCzpOkW
-         F+qL38N/W36dm5+Q76ZWV2hHT86W6QDUVpWhlFE/ZvwE6oYWCXoI589UBqDCePE2iQ8b
-         SyqQ==
-X-Gm-Message-State: ACrzQf0+XZjJT2foVFGqadiQiEZiB/ydz3QpG4RUwfCn2OgxtzOSkDSg
-        FpPJYJtPlzZNhv4bYcLvTqh/6JMyfLMucC+EoIeE19xgudY=
-X-Google-Smtp-Source: AMsMyM5QU9kVSrhZ0eQqhgJS2wntE8tOsajoWmiTYQ9Nk8QiHLEfZsUSKeAnxFGg1jtFf1JrOFqEd9a8+6JuChFJn1Y=
-X-Received: by 2002:a05:6102:3118:b0:3a6:5332:25c0 with SMTP id
- e24-20020a056102311800b003a6533225c0mr859459vsh.60.1664668265021; Sat, 01 Oct
- 2022 16:51:05 -0700 (PDT)
+        with ESMTP id S229470AbiJBAVX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 Oct 2022 20:21:23 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1237553013;
+        Sat,  1 Oct 2022 17:21:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=MxJE/8q6fBKXt96GSOzonxeWGwMnsiBPptEg0mB78rU=; b=OORl8h8SNR9WvrWZHRb6tRcBka
+        Yef2Ze4rOQarkUPazPiQf5kVxHJBBJln7mkeMkMibuSFD+V2Myb/0dnz/QkFRT5408x8dPbOkb244
+        dP7stWp7DeYpW11m2iWouMNf0uVSC7Oxd4OpwYmcrRKqeYpoOn6lsyEs1ciEVjy0VbK2Ih9VlRVw7
+        vKwjAyEzH16EvRRGCPVwVyx6NEdfRKPlInHgqVFb3J2xujyipvifBysUbFdSz6/RQpZL4WxX1rR4R
+        GGEwuwINaqPh+On/WcpRuI2+fBTc16oRXMKAr0JgArRWidAirsSYrIXzWmEGyVYRvDKQsKgOnRdEF
+        38ZJTTyQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1oemjQ-005oUQ-1l;
+        Sun, 02 Oct 2022 00:21:20 +0000
+Date:   Sun, 2 Oct 2022 01:21:20 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        atteh.mailbox@gmail.com
+Subject: Re: [PATCH v7 2/3] fs: introduce lock_rename_child() helper
+Message-ID: <YzjZgB1VL69eGUfK@ZenIV>
+References: <20220920224338.22217-1-linkinjeon@kernel.org>
+ <20220920224338.22217-3-linkinjeon@kernel.org>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 1 Oct 2022 18:50:54 -0500
-Message-ID: <CAH2r5mvM6a4dU3d7Mxer9jWP0xkA2hyF9PrkwreES5T11W9O9w@mail.gmail.com>
-Subject: new SMB3.1.1 create contexts
-To:     samba-technical <samba-technical@lists.samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220920224338.22217-3-linkinjeon@kernel.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Noticed a few SMB3.1.1 create contexts missing from the Linux kernel
-code.  Any more beyond these four that are still missing?
-
-diff --git a/fs/smbfs_common/smb2pdu.h b/fs/smbfs_common/smb2pdu.h
-index 2cab413fffee..7d605db3bb3b 100644
---- a/fs/smbfs_common/smb2pdu.h
-+++ b/fs/smbfs_common/smb2pdu.h
-@@ -1101,7 +1101,11 @@ struct smb2_change_notify_rsp {
- #define SMB2_CREATE_REQUEST_LEASE              "RqLs"
- #define SMB2_CREATE_DURABLE_HANDLE_REQUEST_V2  "DH2Q"
- #define SMB2_CREATE_DURABLE_HANDLE_RECONNECT_V2        "DH2C"
--#define SMB2_CREATE_TAG_POSIX
-"\x93\xAD\x25\x50\x9C\xB4\x11\xE7\xB4\x23\x83\xDE\x96\x8B\xCD\x7C"
-+#define SMB2_CREATE_TAG_POSIX
-"\x93\xAD\x25\x50\x9C\xB4\x11\xE7\xB4\x23\x83\xDE\x96\x8B\xCD\x7C"
-+#define SMB2_CREATE_APP_INSTANCE_ID
-"\x45\xBC\xA6\x6A\xEF\xA7\xF7\x4A\x90\x08\xFA\x46\x2E\x14\x4D\x74"
-+#define SMB2_CREATE_APP_INSTANCE_VERSION
-"\xB9\x82\xD0\xB7\x3B\x56\x07\x4F\xA0\x7B\x52\x4A\x81\x16\xA0\x10"
-+#define SVHDX_OPEN_DEVICE_CONTEXT
-"\x9C\xCB\xCF\x9E\x04\xC1\xE6\x43\x98\x0E\x15\x8D\xA1\xF6\xEC\x83"
-+#define SMB2_CREATE_TAG_AAPL                   "AAPL"
+On Wed, Sep 21, 2022 at 07:43:37AM +0900, Namjae Jeon wrote:
 
 
--- 
-Thanks,
+FWIW, it probably needs a few comments:
 
-Steve
+// c1 and p2 should be on the same fs
+> +struct dentry *lock_rename_child(struct dentry *c1, struct dentry *p2)
+> +{
+> +	if (READ_ONCE(c1->d_parent) == p2) {
+		// hopefully won't need to touch ->s_vfs_rename_mutex at all.
+> +		inode_lock_nested(p2->d_inode, I_MUTEX_PARENT);
+		// now that p2 is locked, nobody can move in or out of it,
+		// so the test below is safe
+> +		if (likely(c1->d_parent == p2))
+> +			return NULL;
+> +
+		// c1 got moved out of p2 while we'd been taking locks;
+		// unlock and fall back to slow case
+> +		inode_unlock(p2->d_inode);
+> +	}
+> +
+> +	mutex_lock(&c1->d_sb->s_vfs_rename_mutex);
+	// nobody can move out of any directories on this fs
+> +	if (likely(c1->d_parent != p2))
+> +		return lock_two_directories(c1->d_parent, p2);
+> +
+	// c1 got moved into p2 while we were taking locks;
+	// we need p2 locked and ->s_vfs_rename_mutex unlocked,
+	// for consistency with lock_rename().
+> +	inode_lock_nested(p2->d_inode, I_MUTEX_PARENT);
+> +	mutex_unlock(&c1->d_sb->s_vfs_rename_mutex);
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL(lock_rename_child);
