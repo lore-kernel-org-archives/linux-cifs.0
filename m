@@ -2,139 +2,256 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C982C433FE
-	for <linux-cifs@archiver.kernel.org>; Sun,  2 Oct 2022 04:01:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9346AC433F5
+	for <linux-cifs@archiver.kernel.org>; Sun,  2 Oct 2022 15:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229500AbiJBEBu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 2 Oct 2022 00:01:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39920 "EHLO
+        id S229714AbiJBPlL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 2 Oct 2022 11:41:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbiJBEBt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Oct 2022 00:01:49 -0400
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ED79193E2
-        for <linux-cifs@vger.kernel.org>; Sat,  1 Oct 2022 21:01:48 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id k14so4088331vkk.0
-        for <linux-cifs@vger.kernel.org>; Sat, 01 Oct 2022 21:01:48 -0700 (PDT)
+        with ESMTP id S229965AbiJBPlI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Oct 2022 11:41:08 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DA673FD77
+        for <linux-cifs@vger.kernel.org>; Sun,  2 Oct 2022 08:41:01 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id j16so13482993lfg.1
+        for <linux-cifs@vger.kernel.org>; Sun, 02 Oct 2022 08:41:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date;
-        bh=frD2tspOfbluMGzPF/+MsIp8eKrwPchyS8WQzZS0cEw=;
-        b=pyytCyuUAZKS+Jp/Ig4XHght+9rdo51AmPI9xrF9dx4iZQ8CK1YuDWrpJ08IXZ/Qzn
-         GqA5yDmNdSeANPAht3LBRj3sT0B4UvycsDo1pG+xPIpRaUYD0IA1CDP2yoJQUHimRRDE
-         VVaBX7b2LUgN/XvOgJXe36JEDRHZRT5t8WDmMR/c3oFTP5ZOgZzfH2eD+6v9q8VONKfb
-         pfPVo7Yvr8x+Obc3xrgp85tXdQhvnUYppw9tgeuVAPSdvTvtZuP30IDeWo+3k8kNKK1q
-         AeMVLye+k+AFezEvvQGFqHuELFYZjrl/6/IglLYDkJY3Z1ff71t7vDBOHL619B64FAgk
-         HWoQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=+xgBNmC0MF1m5JwJ3Dfm+FLEnRhC5x/621qvSD5ZvPM=;
+        b=gtEhtbZnU7aOx9J5FXhKtOQNzpywxWVOpvRyCpZBsfRYe7fgVsOMpEqGoyRfL0ElHr
+         6A9gc42uemQdC8xjlJljKCAiq/npfF5JnmoudwCaw9W3C2vmeMvnR5maYvK+0WgV95aC
+         RbTdfzX0n4tI6Hzv4hN3eeTHw9vmibBdqQROF9Z8txAR3Qw/nvs0w88aJDN/F++hlKzk
+         whwgBQqKuwsmmP4FnCBR9X84VIOnxSL6+yLs8xvOC2bAwMr36eMvgfaemAk5QCTNMlGw
+         VVkrOiIpXRTrxKAUcoYpgq+vS6tG4UVMjf77/Nv7sG2LHv8GN0KJu1N15ub2brGQVwTs
+         pXug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=frD2tspOfbluMGzPF/+MsIp8eKrwPchyS8WQzZS0cEw=;
-        b=Y2mgmhQTdWUZJLVQ3D7bsvpktJHxMmXNZxVjOa9cIelIcsXQOcOExeLLav/lbn41rY
-         wPeHrqkqJJ8GTBBkymQJH3aVkGepHxt5WRHiRUuMC3UWLU7fw5bAzpGOw3NA5eedItfS
-         2Ig/JiFRLZ2GMw7NzLgD3dadVrUNJZFNXJDI8h9+wvAcnHbgiZDD/ZrTau9B0msszYtb
-         6/Ol6bPfXrcCGn5Wo7c7RLhK1XSauEVZ97faYmH4c4Dk6utc9gXpf/8N/I4/givSbDAQ
-         eoZgwpzqNvF/g1x8RvCUe96ffmzhcaZCwC68pZ+TvdOwtoiPjkQnoP3O+g6Ry8DRj8Kx
-         Orcg==
-X-Gm-Message-State: ACrzQf096+tRhHjkL5a6dxNFVSJ4ZMB0S34KuftG7ktmlNQ9FSyScX6L
-        UfC0pNWfCBBQ16o6aAJk1l8+a/GE2vvR61+5Ze2LF0in
-X-Google-Smtp-Source: AMsMyM4FgtckvR8L7vympMvig/WfTapEqo+WQZ9iWuaLwpSCjDYUVdiFi8hB0yuQ0BbhbrnkPgkn/6xBqaZHg1TMJ4g=
-X-Received: by 2002:a05:6122:1043:b0:3a9:9506:c34e with SMTP id
- z3-20020a056122104300b003a99506c34emr2792984vkn.38.1664683307394; Sat, 01 Oct
- 2022 21:01:47 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=+xgBNmC0MF1m5JwJ3Dfm+FLEnRhC5x/621qvSD5ZvPM=;
+        b=m7bJu/+0EVovb97IieoFtgfB83QYGkANAsCHXPufTtBMC0NdOHvEHXfC6uhGNlTsA6
+         FkXhid6qkQR/JnOj1xkE2I4+CF7NoFsRrxJzMINNaQvzgmek1bCg8UAySrnXlR5abseZ
+         fgDrDAJaM5fzdHmx4OSys01els4L7HPYzDjcQySVfYhrWhwCxmEbq8+issAjRC1a2dRk
+         dY1NWiWN3onEw8zE6zji+Mc9aFbQyHtULsd4T1WtnLOtw397iWrKve6VvbVK+7W/e7RL
+         JjkRIiTQw1p4DUe5CipnRpDbpJnXbzhVlD7n+0RWcae8OZuUEUqCoyKACy0jjf0BBP7q
+         VD6Q==
+X-Gm-Message-State: ACrzQf2CcyatEtR3nrSMHYrF6vq4NeO11ASU8zBL/3H80YdzpPeFGPxm
+        QyT8oOdclFltnXWEkLBpOEw=
+X-Google-Smtp-Source: AMsMyM7lmDkQ/41VlLFDVPYtj9VafUsdrySCkH+DWUN5AnR5I1sb9KxYuyYhyL7bo9r3sxWdWxZFSQ==
+X-Received: by 2002:ac2:5e66:0:b0:4a2:e52:2dd4 with SMTP id a6-20020ac25e66000000b004a20e522dd4mr5136489lfr.271.1664725259295;
+        Sun, 02 Oct 2022 08:40:59 -0700 (PDT)
+Received: from pohjola.lan (mobile-user-2e84be-149.dhcp.inet.fi. [46.132.190.149])
+        by smtp.gmail.com with ESMTPSA id b18-20020a056512305200b0048b0696d0b1sm1120016lfb.90.2022.10.02.08.40.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Oct 2022 08:40:58 -0700 (PDT)
+From:   =?UTF-8?q?Atte=20Heikkil=C3=A4?= <atteh.mailbox@gmail.com>
+To:     atteh.mailbox@gmail.com
+Cc:     linkinjeon@kernel.org, linux-cifs@vger.kernel.org
+Subject: [PATCH v4] ksmbd: validate share name from share config response
+Date:   Sun,  2 Oct 2022 18:40:21 +0300
+Message-Id: <20221002154021.10926-1-atteh.mailbox@gmail.com>
+X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20221002024628.106816-1-atteh.mailbox@gmail.com>
+References: <20221002024628.106816-1-atteh.mailbox@gmail.com>
 MIME-Version: 1.0
-References: <CAH2r5mvM6a4dU3d7Mxer9jWP0xkA2hyF9PrkwreES5T11W9O9w@mail.gmail.com>
-In-Reply-To: <CAH2r5mvM6a4dU3d7Mxer9jWP0xkA2hyF9PrkwreES5T11W9O9w@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 1 Oct 2022 23:01:36 -0500
-Message-ID: <CAH2r5mtoZRrCY-jDCH72DSNXPMxYiu24cuRRguLyXDx6zKUvwg@mail.gmail.com>
-Subject: Re: new SMB3.1.1 create contexts
-To:     samba-technical <samba-technical@lists.samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000033e9c305ea054963"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000033e9c305ea054963
-Content-Type: text/plain; charset="UTF-8"
+On Sun,  2 Oct 2022 05:46:28 +0300, Atte Heikkilä wrote:
+> Share config response may contain the share name without casefolding as
+> it is known to the user space daemon. When it is present, casefold and
+> compare it to the share name the share config request was made with. If
+> they differ, we have a share config which is incompatible with the way
+> share config caching is done. This is the case when CONFIG_UNICODE is
+> not set, the share name contains non-ASCII characters, and those non-
+> ASCII characters do not match those in the share name known to user
+> space. In other words, when CONFIG_UNICODE is not set, UTF-8 share
+> names now work but are only case-insensitive in the ASCII range.
+> 
+> Signed-off-by: Atte Heikkilä <atteh.mailbox@gmail.com>
+> ---
+>  v4:
+>    - check for ksmbd_casefold_sharename() error with IS_ERR()
+> 
+>  v3:
+>    - removed initial strcmp() check since it could only save a call to
+>      ksmbd_casefold_sharename() for matching ASCII-only share names
+> 
+>  v2:
+>    - no changes were made
+> 
+>  fs/ksmbd/ksmbd_netlink.h     |  3 ++-
+>  fs/ksmbd/mgmt/share_config.c | 20 +++++++++++++++++---
+>  fs/ksmbd/mgmt/share_config.h |  4 +++-
+>  fs/ksmbd/mgmt/tree_connect.c |  4 ++--
+>  fs/ksmbd/misc.c              |  4 ++--
+>  fs/ksmbd/misc.h              |  1 +
+>  6 files changed, 27 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
+> index e0cbcfa98c7e..ff07c67f4565 100644
+> --- a/fs/ksmbd/ksmbd_netlink.h
+> +++ b/fs/ksmbd/ksmbd_netlink.h
+> @@ -163,7 +163,8 @@ struct ksmbd_share_config_response {
+>  	__u16	force_directory_mode;
+>  	__u16	force_uid;
+>  	__u16	force_gid;
+> -	__u32	reserved[128];		/* Reserved room */
+> +	__s8	share_name[KSMBD_REQ_MAX_SHARE_NAME];
+> +	__u32	reserved[112];		/* Reserved room */
+>  	__u32	veto_list_sz;
+>  	__s8	____payload[];
+>  };
+> diff --git a/fs/ksmbd/mgmt/share_config.c b/fs/ksmbd/mgmt/share_config.c
+> index 5d039704c23c..dfb4bb365891 100644
+> --- a/fs/ksmbd/mgmt/share_config.c
+> +++ b/fs/ksmbd/mgmt/share_config.c
+> @@ -16,6 +16,7 @@
+>  #include "user_config.h"
+>  #include "user_session.h"
+>  #include "../transport_ipc.h"
+> +#include "../misc.h"
+>  
+>  #define SHARE_HASH_BITS		3
+>  static DEFINE_HASHTABLE(shares_table, SHARE_HASH_BITS);
+> @@ -119,7 +120,8 @@ static int parse_veto_list(struct ksmbd_share_config *share,
+>  	return 0;
+>  }
+>  
+> -static struct ksmbd_share_config *share_config_request(const char *name)
+> +static struct ksmbd_share_config *share_config_request(struct unicode_map *um,
+> +						       const char *name)
+>  {
+>  	struct ksmbd_share_config_response *resp;
+>  	struct ksmbd_share_config *share = NULL;
+> @@ -133,6 +135,17 @@ static struct ksmbd_share_config *share_config_request(const char *name)
+>  	if (resp->flags == KSMBD_SHARE_FLAG_INVALID)
+>  		goto out;
+>  
+> +	if (*resp->share_name) {
+> +		char *cf_resp_name;
+> +		bool equal;
+> +
+> +		cf_resp_name = ksmbd_casefold_sharename(um, resp->share_name);
+> +		equal = !IS_ERR(cf_resp_name) && !strcmp(cf_resp_name, name);
+> +		kfree(cf_resp_name);
 
-patch attached to add the four missing create context IDs to the kernel
+Well, kfree() is *not* a no-op for ERR_PTR() like it is for NULL so
+this patch is not good either. At least I'm running out of ways to get
+this wrong.
 
-On Sat, Oct 1, 2022 at 6:50 PM Steve French <smfrench@gmail.com> wrote:
->
-> Noticed a few SMB3.1.1 create contexts missing from the Linux kernel
-> code.  Any more beyond these four that are still missing?
->
-> diff --git a/fs/smbfs_common/smb2pdu.h b/fs/smbfs_common/smb2pdu.h
-> index 2cab413fffee..7d605db3bb3b 100644
-> --- a/fs/smbfs_common/smb2pdu.h
-> +++ b/fs/smbfs_common/smb2pdu.h
-> @@ -1101,7 +1101,11 @@ struct smb2_change_notify_rsp {
->  #define SMB2_CREATE_REQUEST_LEASE              "RqLs"
->  #define SMB2_CREATE_DURABLE_HANDLE_REQUEST_V2  "DH2Q"
->  #define SMB2_CREATE_DURABLE_HANDLE_RECONNECT_V2        "DH2C"
-> -#define SMB2_CREATE_TAG_POSIX
-> "\x93\xAD\x25\x50\x9C\xB4\x11\xE7\xB4\x23\x83\xDE\x96\x8B\xCD\x7C"
-> +#define SMB2_CREATE_TAG_POSIX
-> "\x93\xAD\x25\x50\x9C\xB4\x11\xE7\xB4\x23\x83\xDE\x96\x8B\xCD\x7C"
-> +#define SMB2_CREATE_APP_INSTANCE_ID
-> "\x45\xBC\xA6\x6A\xEF\xA7\xF7\x4A\x90\x08\xFA\x46\x2E\x14\x4D\x74"
-> +#define SMB2_CREATE_APP_INSTANCE_VERSION
-> "\xB9\x82\xD0\xB7\x3B\x56\x07\x4F\xA0\x7B\x52\x4A\x81\x16\xA0\x10"
-> +#define SVHDX_OPEN_DEVICE_CONTEXT
-> "\x9C\xCB\xCF\x9E\x04\xC1\xE6\x43\x98\x0E\x15\x8D\xA1\xF6\xEC\x83"
-> +#define SMB2_CREATE_TAG_AAPL                   "AAPL"
->
->
-> --
-> Thanks,
->
-> Steve
-
-
-
--- 
-Thanks,
-
-Steve
-
---00000000000033e9c305ea054963
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0010-smb3-define-missing-create-contexts.patch"
-Content-Disposition: attachment; 
-	filename="0010-smb3-define-missing-create-contexts.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l8qtg7ll0>
-X-Attachment-Id: f_l8qtg7ll0
-
-RnJvbSAzMTNiMWY3Mzk2MDRiOTc4YmI5OTZhNmQ2MjBjMDExNjU3Y2UxYjRlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFNhdCwgMSBPY3QgMjAyMiAyMjo1MjoyMCAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggMTAv
-MTBdIHNtYjM6IGRlZmluZSBtaXNzaW5nIGNyZWF0ZSBjb250ZXh0cwoKVXBkYXRlIHRoZSBsaXN0
-IG9mIGNyZWF0ZSBjb250ZXh0cyB0byBpbmNsdWRlIHRoZSB0aHJlZQptb3JlIHJlY2VudCBvbmVz
-IGFuZCB0aGUgb25lIHVzZWQgZm9yIG1vdW50cyB0byBNYWNzLgoKU2lnbmVkLW9mZi1ieTogU3Rl
-dmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYmZzX2NvbW1vbi9z
-bWIycGR1LmggfCA2ICsrKysrLQogMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgMSBk
-ZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYmZzX2NvbW1vbi9zbWIycGR1LmggYi9mcy9z
-bWJmc19jb21tb24vc21iMnBkdS5oCmluZGV4IDJjYWI0MTNmZmZlZS4uN2Q2MDVkYjNiYjNiIDEw
-MDY0NAotLS0gYS9mcy9zbWJmc19jb21tb24vc21iMnBkdS5oCisrKyBiL2ZzL3NtYmZzX2NvbW1v
-bi9zbWIycGR1LmgKQEAgLTExMDEsNyArMTEwMSwxMSBAQCBzdHJ1Y3Qgc21iMl9jaGFuZ2Vfbm90
-aWZ5X3JzcCB7CiAjZGVmaW5lIFNNQjJfQ1JFQVRFX1JFUVVFU1RfTEVBU0UJCSJScUxzIgogI2Rl
-ZmluZSBTTUIyX0NSRUFURV9EVVJBQkxFX0hBTkRMRV9SRVFVRVNUX1YyCSJESDJRIgogI2RlZmlu
-ZSBTTUIyX0NSRUFURV9EVVJBQkxFX0hBTkRMRV9SRUNPTk5FQ1RfVjIJIkRIMkMiCi0jZGVmaW5l
-IFNNQjJfQ1JFQVRFX1RBR19QT1NJWCAgICAgICAgICAiXHg5M1x4QURceDI1XHg1MFx4OUNceEI0
-XHgxMVx4RTdceEI0XHgyM1x4ODNceERFXHg5Nlx4OEJceENEXHg3QyIKKyNkZWZpbmUgU01CMl9D
-UkVBVEVfVEFHX1BPU0lYCQkiXHg5M1x4QURceDI1XHg1MFx4OUNceEI0XHgxMVx4RTdceEI0XHgy
-M1x4ODNceERFXHg5Nlx4OEJceENEXHg3QyIKKyNkZWZpbmUgU01CMl9DUkVBVEVfQVBQX0lOU1RB
-TkNFX0lECSJceDQ1XHhCQ1x4QTZceDZBXHhFRlx4QTdceEY3XHg0QVx4OTBceDA4XHhGQVx4NDZc
-eDJFXHgxNFx4NERceDc0IgorI2RlZmluZSBTTUIyX0NSRUFURV9BUFBfSU5TVEFOQ0VfVkVSU0lP
-TiAiXHhCOVx4ODJceEQwXHhCN1x4M0JceDU2XHgwN1x4NEZceEEwXHg3Qlx4NTJceDRBXHg4MVx4
-MTZceEEwXHgxMCIKKyNkZWZpbmUgU1ZIRFhfT1BFTl9ERVZJQ0VfQ09OVEVYVAkiXHg5Q1x4Q0Jc
-eENGXHg5RVx4MDRceEMxXHhFNlx4NDNceDk4XHgwRVx4MTVceDhEXHhBMVx4RjZceEVDXHg4MyIK
-KyNkZWZpbmUgU01CMl9DUkVBVEVfVEFHX0FBUEwJCQkiQUFQTCIKIAogLyogRmxhZyAoU01CMyBv
-cGVuIHJlc3BvbnNlKSB2YWx1ZXMgKi8KICNkZWZpbmUgU01CMl9DUkVBVEVfRkxBR19SRVBBUlNF
-UE9JTlQgMHgwMQotLSAKMi4zNC4xCgo=
---00000000000033e9c305ea054963--
+> +		if (!equal)
+> +			goto out;
+> +	}
+> +
+>  	share = kzalloc(sizeof(struct ksmbd_share_config), GFP_KERNEL);
+>  	if (!share)
+>  		goto out;
+> @@ -190,7 +203,8 @@ static struct ksmbd_share_config *share_config_request(const char *name)
+>  	return share;
+>  }
+>  
+> -struct ksmbd_share_config *ksmbd_share_config_get(const char *name)
+> +struct ksmbd_share_config *ksmbd_share_config_get(struct unicode_map *um,
+> +						  const char *name)
+>  {
+>  	struct ksmbd_share_config *share;
+>  
+> @@ -202,7 +216,7 @@ struct ksmbd_share_config *ksmbd_share_config_get(const char *name)
+>  
+>  	if (share)
+>  		return share;
+> -	return share_config_request(name);
+> +	return share_config_request(um, name);
+>  }
+>  
+>  bool ksmbd_share_veto_filename(struct ksmbd_share_config *share,
+> diff --git a/fs/ksmbd/mgmt/share_config.h b/fs/ksmbd/mgmt/share_config.h
+> index 7f7e89ecfe61..3fd338293942 100644
+> --- a/fs/ksmbd/mgmt/share_config.h
+> +++ b/fs/ksmbd/mgmt/share_config.h
+> @@ -9,6 +9,7 @@
+>  #include <linux/workqueue.h>
+>  #include <linux/hashtable.h>
+>  #include <linux/path.h>
+> +#include <linux/unicode.h>
+>  
+>  struct ksmbd_share_config {
+>  	char			*name;
+> @@ -74,7 +75,8 @@ static inline void ksmbd_share_config_put(struct ksmbd_share_config *share)
+>  	__ksmbd_share_config_put(share);
+>  }
+>  
+> -struct ksmbd_share_config *ksmbd_share_config_get(const char *name);
+> +struct ksmbd_share_config *ksmbd_share_config_get(struct unicode_map *um,
+> +						  const char *name);
+>  bool ksmbd_share_veto_filename(struct ksmbd_share_config *share,
+>  			       const char *filename);
+>  #endif /* __SHARE_CONFIG_MANAGEMENT_H__ */
+> diff --git a/fs/ksmbd/mgmt/tree_connect.c b/fs/ksmbd/mgmt/tree_connect.c
+> index 867c0286b901..8ce17b3fb8da 100644
+> --- a/fs/ksmbd/mgmt/tree_connect.c
+> +++ b/fs/ksmbd/mgmt/tree_connect.c
+> @@ -26,7 +26,7 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
+>  	struct sockaddr *peer_addr;
+>  	int ret;
+>  
+> -	sc = ksmbd_share_config_get(share_name);
+> +	sc = ksmbd_share_config_get(conn->um, share_name);
+>  	if (!sc)
+>  		return status;
+>  
+> @@ -61,7 +61,7 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
+>  		struct ksmbd_share_config *new_sc;
+>  
+>  		ksmbd_share_config_del(sc);
+> -		new_sc = ksmbd_share_config_get(share_name);
+> +		new_sc = ksmbd_share_config_get(conn->um, share_name);
+>  		if (!new_sc) {
+>  			pr_err("Failed to update stale share config\n");
+>  			status.ret = -ESTALE;
+> diff --git a/fs/ksmbd/misc.c b/fs/ksmbd/misc.c
+> index 28459b1efaa8..9e8afaa686e3 100644
+> --- a/fs/ksmbd/misc.c
+> +++ b/fs/ksmbd/misc.c
+> @@ -227,7 +227,7 @@ void ksmbd_conv_path_to_windows(char *path)
+>  	strreplace(path, '/', '\\');
+>  }
+>  
+> -static char *casefold_sharename(struct unicode_map *um, const char *name)
+> +char *ksmbd_casefold_sharename(struct unicode_map *um, const char *name)
+>  {
+>  	char *cf_name;
+>  	int cf_len;
+> @@ -273,7 +273,7 @@ char *ksmbd_extract_sharename(struct unicode_map *um, const char *treename)
+>  		name = (pos + 1);
+>  
+>  	/* caller has to free the memory */
+> -	return casefold_sharename(um, name);
+> +	return ksmbd_casefold_sharename(um, name);
+>  }
+>  
+>  /**
+> diff --git a/fs/ksmbd/misc.h b/fs/ksmbd/misc.h
+> index cc72f4e6baf2..1facfcd21200 100644
+> --- a/fs/ksmbd/misc.h
+> +++ b/fs/ksmbd/misc.h
+> @@ -20,6 +20,7 @@ int get_nlink(struct kstat *st);
+>  void ksmbd_conv_path_to_unix(char *path);
+>  void ksmbd_strip_last_slash(char *path);
+>  void ksmbd_conv_path_to_windows(char *path);
+> +char *ksmbd_casefold_sharename(struct unicode_map *um, const char *name);
+>  char *ksmbd_extract_sharename(struct unicode_map *um, const char *treename);
+>  char *convert_to_unix_name(struct ksmbd_share_config *share, const char *name);
+>  
+> -- 
+> 2.37.3
+> 
+> 
