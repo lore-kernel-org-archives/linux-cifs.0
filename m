@@ -2,256 +2,143 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9346AC433F5
-	for <linux-cifs@archiver.kernel.org>; Sun,  2 Oct 2022 15:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A17C9C433FE
+	for <linux-cifs@archiver.kernel.org>; Sun,  2 Oct 2022 18:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbiJBPlL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 2 Oct 2022 11:41:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56412 "EHLO
+        id S229754AbiJBSMJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 2 Oct 2022 14:12:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229965AbiJBPlI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Oct 2022 11:41:08 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DA673FD77
-        for <linux-cifs@vger.kernel.org>; Sun,  2 Oct 2022 08:41:01 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id j16so13482993lfg.1
-        for <linux-cifs@vger.kernel.org>; Sun, 02 Oct 2022 08:41:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=+xgBNmC0MF1m5JwJ3Dfm+FLEnRhC5x/621qvSD5ZvPM=;
-        b=gtEhtbZnU7aOx9J5FXhKtOQNzpywxWVOpvRyCpZBsfRYe7fgVsOMpEqGoyRfL0ElHr
-         6A9gc42uemQdC8xjlJljKCAiq/npfF5JnmoudwCaw9W3C2vmeMvnR5maYvK+0WgV95aC
-         RbTdfzX0n4tI6Hzv4hN3eeTHw9vmibBdqQROF9Z8txAR3Qw/nvs0w88aJDN/F++hlKzk
-         whwgBQqKuwsmmP4FnCBR9X84VIOnxSL6+yLs8xvOC2bAwMr36eMvgfaemAk5QCTNMlGw
-         VVkrOiIpXRTrxKAUcoYpgq+vS6tG4UVMjf77/Nv7sG2LHv8GN0KJu1N15ub2brGQVwTs
-         pXug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=+xgBNmC0MF1m5JwJ3Dfm+FLEnRhC5x/621qvSD5ZvPM=;
-        b=m7bJu/+0EVovb97IieoFtgfB83QYGkANAsCHXPufTtBMC0NdOHvEHXfC6uhGNlTsA6
-         FkXhid6qkQR/JnOj1xkE2I4+CF7NoFsRrxJzMINNaQvzgmek1bCg8UAySrnXlR5abseZ
-         fgDrDAJaM5fzdHmx4OSys01els4L7HPYzDjcQySVfYhrWhwCxmEbq8+issAjRC1a2dRk
-         dY1NWiWN3onEw8zE6zji+Mc9aFbQyHtULsd4T1WtnLOtw397iWrKve6VvbVK+7W/e7RL
-         JjkRIiTQw1p4DUe5CipnRpDbpJnXbzhVlD7n+0RWcae8OZuUEUqCoyKACy0jjf0BBP7q
-         VD6Q==
-X-Gm-Message-State: ACrzQf2CcyatEtR3nrSMHYrF6vq4NeO11ASU8zBL/3H80YdzpPeFGPxm
-        QyT8oOdclFltnXWEkLBpOEw=
-X-Google-Smtp-Source: AMsMyM7lmDkQ/41VlLFDVPYtj9VafUsdrySCkH+DWUN5AnR5I1sb9KxYuyYhyL7bo9r3sxWdWxZFSQ==
-X-Received: by 2002:ac2:5e66:0:b0:4a2:e52:2dd4 with SMTP id a6-20020ac25e66000000b004a20e522dd4mr5136489lfr.271.1664725259295;
-        Sun, 02 Oct 2022 08:40:59 -0700 (PDT)
-Received: from pohjola.lan (mobile-user-2e84be-149.dhcp.inet.fi. [46.132.190.149])
-        by smtp.gmail.com with ESMTPSA id b18-20020a056512305200b0048b0696d0b1sm1120016lfb.90.2022.10.02.08.40.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Oct 2022 08:40:58 -0700 (PDT)
-From:   =?UTF-8?q?Atte=20Heikkil=C3=A4?= <atteh.mailbox@gmail.com>
-To:     atteh.mailbox@gmail.com
-Cc:     linkinjeon@kernel.org, linux-cifs@vger.kernel.org
-Subject: [PATCH v4] ksmbd: validate share name from share config response
-Date:   Sun,  2 Oct 2022 18:40:21 +0300
-Message-Id: <20221002154021.10926-1-atteh.mailbox@gmail.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221002024628.106816-1-atteh.mailbox@gmail.com>
-References: <20221002024628.106816-1-atteh.mailbox@gmail.com>
+        with ESMTP id S229699AbiJBSMH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Oct 2022 14:12:07 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2089.outbound.protection.outlook.com [40.107.92.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6C621ADA2
+        for <linux-cifs@vger.kernel.org>; Sun,  2 Oct 2022 11:12:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YKtyHKF7AP6L5exATPHOP8k8eAhnZPvYTG8gT7ovoQlz65faIJSu0nlrvVjqsXXO53cJ3P3FX3LIJyEvf0OH4qAVH32Ovmw196fKkzT4nFETfUNwYm/tQnQTQe/Yik+DoDM7wobxrkL+FBKJEoSpAxXA0TdCWC7D5J1MZijK991ykVVKA2n2hRphD9lUvByZP3RIOtQdlu9HeNnnefu8R7H7SdZm6AWx9qlhEVHxqPL6QrXjT7hE2T0c+UCJ/viMEMV1fE0ZY5QYvR7RezyBoMMiVPWlVFM5/1/cSs9hQQSMyduCoY0lFakR5tpH03ReFnme+YXX5bq68YKx8FWg8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZLICrXhO/0oEFNrG4w3tFbUtYoj8snTNFVcomYv4bqU=;
+ b=AEql3TUPkq0cw5g3ZknYLwFYgyEhvFB3lnsTRKXbYmkXqP8Xvx/rVZo48Bx3O+7O0AbMGDfyzzUdsAW2UqAb2RAQLVGVPlW/HRt/mBAeZ9PVQ4/XZtKfoYHXWP0f7XL40IDJGV75B8L6FO84KmqeckUExoQV401Vard5BNLGYcyaY1Rqc/YsLbepMJTBUmd/Gb70iUmICDnRwatszMqxZBFgBYjT1RmrPJO2W/i48bZKeV3XCnJ6j30IOoKkJNsciy0TF+viJbogfNh5M1E05FZO6me3XTOpDMtyRFseokV7FXxvDDTnjuHDYBKIDAvwvj042VNSp6iTUY+BZORY3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from BYAPR01MB4438.prod.exchangelabs.com (2603:10b6:a03:98::12) by
+ BY3PR01MB6692.prod.exchangelabs.com (2603:10b6:a03:36a::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5676.17; Sun, 2 Oct 2022 18:12:02 +0000
+Received: from BYAPR01MB4438.prod.exchangelabs.com
+ ([fe80::b054:69db:e4d6:c1cc]) by BYAPR01MB4438.prod.exchangelabs.com
+ ([fe80::b054:69db:e4d6:c1cc%7]) with mapi id 15.20.5676.028; Sun, 2 Oct 2022
+ 18:12:02 +0000
+Message-ID: <7e06ff88-baa5-c2c1-9184-2cb48d6182a5@talpey.com>
+Date:   Sun, 2 Oct 2022 14:11:59 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH] ksmbd: call ib_drain_qp when disconnected
+To:     Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org,
+        atteh.mailbox@gmail.com, Hyunchul Lee <hyc.lee@gmail.com>
+References: <20221002030123.11409-1-linkinjeon@kernel.org>
+Content-Language: en-US
+From:   Tom Talpey <tom@talpey.com>
+In-Reply-To: <20221002030123.11409-1-linkinjeon@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1PR13CA0177.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::32) To BYAPR01MB4438.prod.exchangelabs.com
+ (2603:10b6:a03:98::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR01MB4438:EE_|BY3PR01MB6692:EE_
+X-MS-Office365-Filtering-Correlation-Id: d3be4666-f5c1-44b3-2c66-08daa4a19aa0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VvO1mcl57Aaj5aYZIK/NJ7mLJRWN0qiD1uIQXgiKfnH+uZDCtR9Q9WuLQipPjJ38G64NDMX3Sc26XqQlRMsxIN5smSF4XSOFiYHnstJuys35WvH0QY0SWrIuljbn6rMpiQgemBWx3gZrSCpoFK8ui2rdudgFdDBhP2bZaS2+LKF7igYk5ahIzprdx+qGXg4dQLzePmxgLUe4pYkUYs7tlSvDwY8vz+lav18R/ybLPw6eHpg4p4hie5S26hnoW2A/LUK2grsTAaevsmcxXNrMJ2nlx7pBud6QFYzRrqbM67utVDi/GfNm7dsFEnq2c50IlTBaB31ORZmQ29DjMVM8Tzl6YN79Q/dX4YwWxxvT5gFTdjQX9t+NhWAv5BNP4l+TpqOYiAwJUqUUhZ8vTi7hlUb+xoQyDKjSu3LFEZ81hv9NGhiWSgLVURlYntLNkHj3F2ymBmaguzzfx+gpd9jAS1mv4xyhIHBOpMkMNZdy6SRkPGZRg9OYdMREzYK1g2OsEe9Va2M4e8twm7gL35UZek6XjjI2hRLB7c0ZIF+Klh1jkMDOCXu9DcOtSyGWx7oVooQN9xv0u8GR9H9OZp+LmqCntPcz97J9+ch+qVAYPyn6TuIyVuWyCpRXsh6Rr6+7bw2C1YvY9xD060KzlUxgjFLeyqRPBeAFc9U7K1nhNLm1SOuVIeL9HDUZuxGGp22bY0rjYEM4flnV2BJr5ORrkbRvjGSxkWyoEBlB7BpU4KRmy2sBuJXQZ7oSmeW+EJbDwswxX0bFaXvYqJ5PtaU0BwqSC6H8cgT+U0XxCSpmGjU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR01MB4438.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(376002)(346002)(136003)(39830400003)(396003)(451199015)(31686004)(83380400001)(4326008)(186003)(6506007)(53546011)(6486002)(38350700002)(38100700002)(2616005)(52116002)(478600001)(6512007)(316002)(26005)(41300700001)(8676002)(86362001)(5660300002)(8936002)(31696002)(36756003)(2906002)(6666004)(66556008)(66476007)(66946007)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VlVKakxRRGxSdmlBOTZLS2JyRWlvaGIwRzg5eDh5ZXZyZ0F4OHpnRUg2TjRP?=
+ =?utf-8?B?Q1pnWGVDQWRiSG0rdEFkT1UwQ1ZWK1FQUXNlMzQ0MlNxWDQ1cnN1bkIvM3E4?=
+ =?utf-8?B?TzFlaGp5UmQ3UHlMQ1IxWTF5SFpGZWlFTmRTdVhkcDNVdXRWSFRZRUhPZlZJ?=
+ =?utf-8?B?WlR5NW9yL0xGRW9qRmpMZDNoRXErNDJsSm00K0xhNDYwbGI3eStjZlBnek04?=
+ =?utf-8?B?Q0NhOFN3aHVzSUFRN05ieHRxeDJZSmROTm1xUUtmM09FS00rdkU3b0twN3Bz?=
+ =?utf-8?B?blgzTDRpRFN1cFVWOFYwdVNEa3hVZG5xZ09Md2ZLWGlTMEF1RnYzT2dQT2Nv?=
+ =?utf-8?B?ZyttZTc3cHdacGdhTG5BajFNeVZXS1JocXBub24vckhzcWxIa1d4K2VkbW16?=
+ =?utf-8?B?djJiYzJwWGttUXl4Rmtrbk1nS3kyUzBoWGlvSm9SN0Rhd2pZZHhCVG1uZ3BL?=
+ =?utf-8?B?RHFDUmM4cThNK0t3YjI3Z0RaYkR5WmFsOThyVHd5TG1OUnpoZXpQb2h3WWtO?=
+ =?utf-8?B?QVk5aEZNUy9YbGtyellCSFlGOWNXbU51WXdTdndYWlJtRitoWUpSN2NFTkRo?=
+ =?utf-8?B?ZDR5S2lwbFRMVEloNENLV3hZeTgxS1Mwb056U0h3OVhnVGlwRlB1OUE5dEg3?=
+ =?utf-8?B?YVQ0d0U4YitRQzYraVJjL3ZpbldqMzB1Yi8zM1BDTUNXZjFYV3ZQSlM3MzNu?=
+ =?utf-8?B?M3l0bnVvWWdEL3g2TG9MQWw4Y21ubzVyNjZRSkN1Znpaa08vQTRkQ3pLQWNW?=
+ =?utf-8?B?NWJPQXFad3l5NmNwSXBTaVJPaFVxL3JlVUNmYkg4TUZ2YUd6UTRjbnNHN2dK?=
+ =?utf-8?B?b3F2ZE53YzhBaDZORzArS0NIVFhlUTdnQ2Y2ekhxVlBNYnBtTlJ6T0pSMVFZ?=
+ =?utf-8?B?WnlqM2xXWlhSR2RmT2RjUmxuNEZKdnJiZ0UvQ0pYcjRqcTFSZ244dzhEMi9K?=
+ =?utf-8?B?VGxXc25semxJQmNLc2g0SlhEVDFBZWNkS3NYam9HR3ZQUGJoRGJ2RUQ2dFBr?=
+ =?utf-8?B?Q2hNTDQxTE1JcHBsdlQ4TmR0STRqcC80ajN1VnJmeXc5QXpYTHBualhDN0cv?=
+ =?utf-8?B?SnZrZDU0bGNhRUo5R0pRM1Jzcy84Y1VUMGtqbWpHQ3o5czJVZ1E4RFRNcGVl?=
+ =?utf-8?B?enhvUzVJU1M0MWQyWXhibXByU0k4M0VwWmJNNGpOWFVzMkYwRXhyZVEySTUy?=
+ =?utf-8?B?a2RXRmtFNzNobktRcmpjaDFQL0dOMCt4S2tqdEcwQ0l6Wmlubk5melVQSno1?=
+ =?utf-8?B?Yjg0NndoR2NmNWcxQXVLYXBQa3ppZERGVnUxRWh0MXJTM2FMd3lsV0xlNUov?=
+ =?utf-8?B?VWRkZGVxUVZvU2xJSE5YSW1UNnE2MHcrdHlIdUZaMnI5UnFROGpQVm9LTmoy?=
+ =?utf-8?B?SWZqOSt2TXVEcnlzVVdEeXlRTUJKR0s3d3VvNjJ5TTVwMDM4T1BycGtmSzZp?=
+ =?utf-8?B?MFJXeFBFaCtRcVFWK1p1VytQcWJpUWx0cXpzc0tIT3BTM1NFdm9qdGM1UWIx?=
+ =?utf-8?B?d3FRZGtXQi92OVE4eUg1SlVITFJmQ2xIb1dSTkdsRmx4cWpnZHkzRWtZM2R3?=
+ =?utf-8?B?bkk1ajRzRmV6djdlNUhMZTRYbC91U3lLREFORjVPcUxuRUpDaWJMMmFHRW4y?=
+ =?utf-8?B?b05CTUpEYUxleGNWSGRpN21oT2VWaDNCbUJuNFF3UElsd3JLTFdMTnNCa0pr?=
+ =?utf-8?B?Z1h5SE5hc0l0ekY2TnoyS3BIVmtjNEE0bkFxWUFYQUhlWC8zbVhSNEFOQ3Nt?=
+ =?utf-8?B?ZmNvUjlUVWlJZHBqZ3E5di9SdWthWnpweEZ3dFVmUHNJMmZzMkZvczFWVGNE?=
+ =?utf-8?B?TkZnd0JiUFVSVXhYRlZaVm1mN0JzQVN0TDMra0dZeDk5U0R4OWQxNnR5Mndz?=
+ =?utf-8?B?Wk14b25QWnY1UlBHSXgzczgvbXdZY1V5WDl0TEtVNnBrejFNUnd2VHdKUlRl?=
+ =?utf-8?B?MlNNWTRwTDJESzNBRnliQkpDcjZGbUtNZUxqbG50OHVxZXB2YU1OL043WG1j?=
+ =?utf-8?B?YjZ0YmNjemttY0lHUE96dURxZjN6WUswWDg2QkpPeVJMUkttdDZwaENSMXFB?=
+ =?utf-8?B?MERXck9OTUwzTlMzN21PTGQwZ09HQ2x0cXRoak9BRlQyeFJrZldOY0hJVVln?=
+ =?utf-8?Q?4QQWf7bDJGv/of2A99rrToYnx?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3be4666-f5c1-44b3-2c66-08daa4a19aa0
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR01MB4438.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2022 18:12:01.9724
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Z4bqbpqwIxNtQAm3jHviQGFa4Q+LFH4jphb6EWODveyW/tOeoUMoeN1U2WKBg1EB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR01MB6692
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sun,  2 Oct 2022 05:46:28 +0300, Atte Heikkilä wrote:
-> Share config response may contain the share name without casefolding as
-> it is known to the user space daemon. When it is present, casefold and
-> compare it to the share name the share config request was made with. If
-> they differ, we have a share config which is incompatible with the way
-> share config caching is done. This is the case when CONFIG_UNICODE is
-> not set, the share name contains non-ASCII characters, and those non-
-> ASCII characters do not match those in the share name known to user
-> space. In other words, when CONFIG_UNICODE is not set, UTF-8 share
-> names now work but are only case-insensitive in the ASCII range.
+On 10/1/2022 11:01 PM, Namjae Jeon wrote:
+> When disconnected, call ib_drain_qp to cancel all pending work requests
+> and prevent ksmbd_conn_handler_loop from waiting for a long time
+> for those work requests to compelete.
 > 
-> Signed-off-by: Atte Heikkilä <atteh.mailbox@gmail.com>
+> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 > ---
->  v4:
->    - check for ksmbd_casefold_sharename() error with IS_ERR()
+>   fs/ksmbd/transport_rdma.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
->  v3:
->    - removed initial strcmp() check since it could only save a call to
->      ksmbd_casefold_sharename() for matching ASCII-only share names
-> 
->  v2:
->    - no changes were made
-> 
->  fs/ksmbd/ksmbd_netlink.h     |  3 ++-
->  fs/ksmbd/mgmt/share_config.c | 20 +++++++++++++++++---
->  fs/ksmbd/mgmt/share_config.h |  4 +++-
->  fs/ksmbd/mgmt/tree_connect.c |  4 ++--
->  fs/ksmbd/misc.c              |  4 ++--
->  fs/ksmbd/misc.h              |  1 +
->  6 files changed, 27 insertions(+), 9 deletions(-)
-> 
-> diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
-> index e0cbcfa98c7e..ff07c67f4565 100644
-> --- a/fs/ksmbd/ksmbd_netlink.h
-> +++ b/fs/ksmbd/ksmbd_netlink.h
-> @@ -163,7 +163,8 @@ struct ksmbd_share_config_response {
->  	__u16	force_directory_mode;
->  	__u16	force_uid;
->  	__u16	force_gid;
-> -	__u32	reserved[128];		/* Reserved room */
-> +	__s8	share_name[KSMBD_REQ_MAX_SHARE_NAME];
-> +	__u32	reserved[112];		/* Reserved room */
->  	__u32	veto_list_sz;
->  	__s8	____payload[];
->  };
-> diff --git a/fs/ksmbd/mgmt/share_config.c b/fs/ksmbd/mgmt/share_config.c
-> index 5d039704c23c..dfb4bb365891 100644
-> --- a/fs/ksmbd/mgmt/share_config.c
-> +++ b/fs/ksmbd/mgmt/share_config.c
-> @@ -16,6 +16,7 @@
->  #include "user_config.h"
->  #include "user_session.h"
->  #include "../transport_ipc.h"
-> +#include "../misc.h"
->  
->  #define SHARE_HASH_BITS		3
->  static DEFINE_HASHTABLE(shares_table, SHARE_HASH_BITS);
-> @@ -119,7 +120,8 @@ static int parse_veto_list(struct ksmbd_share_config *share,
->  	return 0;
->  }
->  
-> -static struct ksmbd_share_config *share_config_request(const char *name)
-> +static struct ksmbd_share_config *share_config_request(struct unicode_map *um,
-> +						       const char *name)
->  {
->  	struct ksmbd_share_config_response *resp;
->  	struct ksmbd_share_config *share = NULL;
-> @@ -133,6 +135,17 @@ static struct ksmbd_share_config *share_config_request(const char *name)
->  	if (resp->flags == KSMBD_SHARE_FLAG_INVALID)
->  		goto out;
->  
-> +	if (*resp->share_name) {
-> +		char *cf_resp_name;
-> +		bool equal;
+> diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
+> index 0315bca3d53b..096eda9ef873 100644
+> --- a/fs/ksmbd/transport_rdma.c
+> +++ b/fs/ksmbd/transport_rdma.c
+> @@ -1527,6 +1527,8 @@ static int smb_direct_cm_handler(struct rdma_cm_id *cm_id,
+>   	}
+>   	case RDMA_CM_EVENT_DEVICE_REMOVAL:
+>   	case RDMA_CM_EVENT_DISCONNECTED: {
+> +		ib_drain_qp(t->qp);
 > +
-> +		cf_resp_name = ksmbd_casefold_sharename(um, resp->share_name);
-> +		equal = !IS_ERR(cf_resp_name) && !strcmp(cf_resp_name, name);
-> +		kfree(cf_resp_name);
+>   		t->status = SMB_DIRECT_CS_DISCONNECTED;
+>   		wake_up_interruptible(&t->wait_status);
+>   		wake_up_interruptible(&t->wait_reassembly_queue);
 
-Well, kfree() is *not* a no-op for ERR_PTR() like it is for NULL so
-this patch is not good either. At least I'm running out of ways to get
-this wrong.
+Because we're now flushing the cancelled work requests, don't
+we need to also wake up &t->wait_send_pending, to abort any
+waiters on the send wq?
 
-> +		if (!equal)
-> +			goto out;
-> +	}
-> +
->  	share = kzalloc(sizeof(struct ksmbd_share_config), GFP_KERNEL);
->  	if (!share)
->  		goto out;
-> @@ -190,7 +203,8 @@ static struct ksmbd_share_config *share_config_request(const char *name)
->  	return share;
->  }
->  
-> -struct ksmbd_share_config *ksmbd_share_config_get(const char *name)
-> +struct ksmbd_share_config *ksmbd_share_config_get(struct unicode_map *um,
-> +						  const char *name)
->  {
->  	struct ksmbd_share_config *share;
->  
-> @@ -202,7 +216,7 @@ struct ksmbd_share_config *ksmbd_share_config_get(const char *name)
->  
->  	if (share)
->  		return share;
-> -	return share_config_request(name);
-> +	return share_config_request(um, name);
->  }
->  
->  bool ksmbd_share_veto_filename(struct ksmbd_share_config *share,
-> diff --git a/fs/ksmbd/mgmt/share_config.h b/fs/ksmbd/mgmt/share_config.h
-> index 7f7e89ecfe61..3fd338293942 100644
-> --- a/fs/ksmbd/mgmt/share_config.h
-> +++ b/fs/ksmbd/mgmt/share_config.h
-> @@ -9,6 +9,7 @@
->  #include <linux/workqueue.h>
->  #include <linux/hashtable.h>
->  #include <linux/path.h>
-> +#include <linux/unicode.h>
->  
->  struct ksmbd_share_config {
->  	char			*name;
-> @@ -74,7 +75,8 @@ static inline void ksmbd_share_config_put(struct ksmbd_share_config *share)
->  	__ksmbd_share_config_put(share);
->  }
->  
-> -struct ksmbd_share_config *ksmbd_share_config_get(const char *name);
-> +struct ksmbd_share_config *ksmbd_share_config_get(struct unicode_map *um,
-> +						  const char *name);
->  bool ksmbd_share_veto_filename(struct ksmbd_share_config *share,
->  			       const char *filename);
->  #endif /* __SHARE_CONFIG_MANAGEMENT_H__ */
-> diff --git a/fs/ksmbd/mgmt/tree_connect.c b/fs/ksmbd/mgmt/tree_connect.c
-> index 867c0286b901..8ce17b3fb8da 100644
-> --- a/fs/ksmbd/mgmt/tree_connect.c
-> +++ b/fs/ksmbd/mgmt/tree_connect.c
-> @@ -26,7 +26,7 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
->  	struct sockaddr *peer_addr;
->  	int ret;
->  
-> -	sc = ksmbd_share_config_get(share_name);
-> +	sc = ksmbd_share_config_get(conn->um, share_name);
->  	if (!sc)
->  		return status;
->  
-> @@ -61,7 +61,7 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
->  		struct ksmbd_share_config *new_sc;
->  
->  		ksmbd_share_config_del(sc);
-> -		new_sc = ksmbd_share_config_get(share_name);
-> +		new_sc = ksmbd_share_config_get(conn->um, share_name);
->  		if (!new_sc) {
->  			pr_err("Failed to update stale share config\n");
->  			status.ret = -ESTALE;
-> diff --git a/fs/ksmbd/misc.c b/fs/ksmbd/misc.c
-> index 28459b1efaa8..9e8afaa686e3 100644
-> --- a/fs/ksmbd/misc.c
-> +++ b/fs/ksmbd/misc.c
-> @@ -227,7 +227,7 @@ void ksmbd_conv_path_to_windows(char *path)
->  	strreplace(path, '/', '\\');
->  }
->  
-> -static char *casefold_sharename(struct unicode_map *um, const char *name)
-> +char *ksmbd_casefold_sharename(struct unicode_map *um, const char *name)
->  {
->  	char *cf_name;
->  	int cf_len;
-> @@ -273,7 +273,7 @@ char *ksmbd_extract_sharename(struct unicode_map *um, const char *treename)
->  		name = (pos + 1);
->  
->  	/* caller has to free the memory */
-> -	return casefold_sharename(um, name);
-> +	return ksmbd_casefold_sharename(um, name);
->  }
->  
->  /**
-> diff --git a/fs/ksmbd/misc.h b/fs/ksmbd/misc.h
-> index cc72f4e6baf2..1facfcd21200 100644
-> --- a/fs/ksmbd/misc.h
-> +++ b/fs/ksmbd/misc.h
-> @@ -20,6 +20,7 @@ int get_nlink(struct kstat *st);
->  void ksmbd_conv_path_to_unix(char *path);
->  void ksmbd_strip_last_slash(char *path);
->  void ksmbd_conv_path_to_windows(char *path);
-> +char *ksmbd_casefold_sharename(struct unicode_map *um, const char *name);
->  char *ksmbd_extract_sharename(struct unicode_map *um, const char *treename);
->  char *convert_to_unix_name(struct ksmbd_share_config *share, const char *name);
->  
-> -- 
-> 2.37.3
-> 
-> 
+Tom.
