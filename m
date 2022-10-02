@@ -2,152 +2,265 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AEF1C433F5
-	for <linux-cifs@archiver.kernel.org>; Sun,  2 Oct 2022 20:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE415C433FE
+	for <linux-cifs@archiver.kernel.org>; Sun,  2 Oct 2022 21:23:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbiJBUWU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 2 Oct 2022 16:22:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43366 "EHLO
+        id S229595AbiJBVXS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 2 Oct 2022 17:23:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbiJBUWT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Oct 2022 16:22:19 -0400
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1612E3A14D
-        for <linux-cifs@vger.kernel.org>; Sun,  2 Oct 2022 13:22:18 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id 63so9588022vse.2
-        for <linux-cifs@vger.kernel.org>; Sun, 02 Oct 2022 13:22:18 -0700 (PDT)
+        with ESMTP id S229529AbiJBVXR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Oct 2022 17:23:17 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4CD360B8
+        for <linux-cifs@vger.kernel.org>; Sun,  2 Oct 2022 14:23:16 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id q17so9922615lji.11
+        for <linux-cifs@vger.kernel.org>; Sun, 02 Oct 2022 14:23:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date;
-        bh=NnCQcYydupQyMbregF3nXizQzPehjpZkZWmZFq0hrIY=;
-        b=lSoC3srB4Q4ruN4AzFHcv9Vkvu6OJqB7WZ78pfsNe/wnOCDZLZ0iTEB7egUsSYd3Ag
-         ZmcWEf9Hama01DNwgvNYibCqVL2PqQnPw+5G4w8L1miFm39jwdseR8B/AQsZGBw8blOb
-         Cj95SV4+t9UL1OyKhbWDQw8/w5u4VsITdpRvOOafTX4arodXHYfo02bRyPUaYcOLKQ/h
-         tiB+PJ6OclEjwbHYadqG4b66mBe5EIIbBT8MgmQQOdABCi0ZtNQGNl2VqTRwh4lh2pLT
-         nEN7qbD+5DF1ByCbZd9TFnYTEt6Amn8vgfu1qgLqKcdQiNbzoHZGdj+aTYBrwnQKeGWJ
-         9w6A==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=PgfvoedX1CczGxkSAI8qvl5fuihpKYSMdcJFmY8gmW0=;
+        b=OiJSRJO1br+KDbTKsQkPxRX6jKH5ZsvzvkiYCdE5sRahXm1WQ32vFUwN8fph6hN1DO
+         FJEIShL8u8VF6+jWKUS8fyCoBlxFca0K0ww0f43MOGHQJk+32cYbzhC3Cws+HegsAsE8
+         BnIjLLr9bqLpyt2giDxgUPiWzi4vbFN6icSprMipD7q5Kq/LJ+NOiBmR1rdANky8OaG4
+         MllvvPRzbAHlLKB+FS9Etk8WWtkP3MK2TjZuV3cQF7+LZzqh4ojztzkRj0jNKT1Da49R
+         aJxQ47drPfjIiV8caVB1gSNfslUmQd7qg0xqTCh5zxaQmesfAELX77j2jcf9S9vliff/
+         BvIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=NnCQcYydupQyMbregF3nXizQzPehjpZkZWmZFq0hrIY=;
-        b=mclJpu3XqTaZQeFpoqYyuuJTSlhpahasQ1expxfUjLheqeAIcQ8LIydzs4J/61WSZK
-         FgIG3H3GtFAX0ieB2PjJnhMCxzfvBzpQV+/oh1r9dT01AIiCTcf9AE9EpOKpRB4/2e/N
-         aojttYOqiB8zn75bVnuJQxQoRs2pgZ6/DBtUDR8uzrQmUw6Mk+Xb/4GVxs0DAiPCbw7n
-         RbdWAw5rVxDDB7MmmgJNuqA1MD29v3a5WCSERi5ZURFKgAdDjjZ2QyYUnTDUabmeIdmC
-         BTxPzVsYbeD28VsMO+h31foaU8AEUgRZYfI+hjkncjqwLxbKhGzhBoPOft20ZMDnMtEj
-         8Tbg==
-X-Gm-Message-State: ACrzQf2W99rG+IfAZUJMA6PqyFkmegjCPqlcrlAp3coHAvdcCz0sT6te
-        +lMLXh1I2ZLFpPaJXho8cIpyksXXi+xSk/lWZBXY0V5J4Oc=
-X-Google-Smtp-Source: AMsMyM4VpunFFdbnPlI1Fw732VHZe1dp9XGIGLp483XgTYD/1394Scvq9ruRnhhi2cHJiw0/GLanBtX4mIHSBxmdicw=
-X-Received: by 2002:a05:6102:3118:b0:3a6:5332:25c0 with SMTP id
- e24-20020a056102311800b003a6533225c0mr1752668vsh.60.1664742136880; Sun, 02
- Oct 2022 13:22:16 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=PgfvoedX1CczGxkSAI8qvl5fuihpKYSMdcJFmY8gmW0=;
+        b=X6q+8QabJmcBJdP9e1CZWlICNDcmXUbcoOIcDZZ572E9s/E9oum+YvSE4qVoJlNaog
+         UorTKwhS0IJ67aHcmctbtLKcdxcrzvYdlcQStvgZj/tENBdIc+JWTWl8qBZ44ZxXpHG+
+         tzzLwx/7uaAuODWdnRXxH6ftnfHEjEujxJ5JN3dRA37jDxjlaGNe68fs0gQq5jGjoVox
+         LG+pDPxH9yw79KHQdFO8Y1mwBtpMc6dL4JPD2NFbtLWsFNyx0lP+PjeiPd5KdOr0Vy0U
+         9UyaZMvRxeSEnmYN++2CKZ3LCiKYVrWaf3aQ8zAScgvWeCUtJumYrHtgbJ7I9W5nKrG0
+         1uDQ==
+X-Gm-Message-State: ACrzQf3Xy0e+c7kUkOCDZLyuM7wY6Sppkbu40Q18m4HJMg1VbIjUByiW
+        +qD2CdpfsbmDL0NInsiqWIk=
+X-Google-Smtp-Source: AMsMyM5yLiSnLy65O+U/QLnxbpqZMxmBA9vsKqbBZTzhXN5rP9bkoMAYKYzdqThK400Zho5jGa7Stg==
+X-Received: by 2002:a2e:2e14:0:b0:26d:d636:4972 with SMTP id u20-20020a2e2e14000000b0026dd6364972mr897394lju.221.1664745794157;
+        Sun, 02 Oct 2022 14:23:14 -0700 (PDT)
+Received: from pohjola.lan (mobile-user-2e84be-149.dhcp.inet.fi. [46.132.190.149])
+        by smtp.gmail.com with ESMTPSA id i8-20020a056512318800b0049ebc44994fsm1189071lfe.128.2022.10.02.14.23.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Oct 2022 14:23:13 -0700 (PDT)
+From:   =?UTF-8?q?Atte=20Heikkil=C3=A4?= <atteh.mailbox@gmail.com>
+To:     tom@talpey.com
+Cc:     atteh.mailbox@gmail.com, linkinjeon@kernel.org,
+        linux-cifs@vger.kernel.org
+Subject: Re: [PATCH v4] ksmbd: validate share name from share config response
+Date:   Mon,  3 Oct 2022 00:21:37 +0300
+Message-Id: <20221002212137.156711-1-atteh.mailbox@gmail.com>
+X-Mailer: git-send-email 2.37.3
+In-Reply-To: <baba86a7-060b-c878-95ed-0310def52850@talpey.com>
+References: <baba86a7-060b-c878-95ed-0310def52850@talpey.com>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 2 Oct 2022 15:22:05 -0500
-Message-ID: <CAH2r5muqfcAOWrbnbjuW=UBerszYxAzP1fAoFj_+eyp7uqG7jQ@mail.gmail.com>
-Subject: cifs/102 test warning
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        Enzo Matsumiya <ematsumiya@suse.de>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Noticed this in the logs for cifs/102 with current for-next.   Ideas?
+On Sun, 2 Oct 2022 14:34:43 -0400, Tom Talpey wrote:
+> On 10/2/2022 11:40 AM, Atte Heikkilä wrote:
+>> On Sun,  2 Oct 2022 05:46:28 +0300, Atte Heikkilä wrote:
+>>> ...
+>>> diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
+>>> index e0cbcfa98c7e..ff07c67f4565 100644
+>>> --- a/fs/ksmbd/ksmbd_netlink.h
+>>> +++ b/fs/ksmbd/ksmbd_netlink.h
+>>> @@ -163,7 +163,8 @@ struct ksmbd_share_config_response {
+>>>   	__u16	force_directory_mode;
+>>>   	__u16	force_uid;
+>>>   	__u16	force_gid;
+>>> -	__u32	reserved[128];		/* Reserved room */
+>>> +	__s8	share_name[KSMBD_REQ_MAX_SHARE_NAME];
+>>> +	__u32	reserved[112];		/* Reserved room */
+> 
+> I notice you still have "112" here, did you reject my suggestion
+> to code the size relative to KSMBD_REQ_MAX_SHARE_NAME?
+> 
 
+If size of `reserved' should be relative, then it would be:
+128 - DIV_ROUND_UP(KSMBD_REQ_MAX_SHARE_NAME, sizeof(__u32))
 
-2014.571858] run fstests cifs/102 at 2022-10-02 15:12:19
+Since ksmbd-tools already has the 112 (128-64/4), I thought to keep the
+kernel side consistent with it for now.
 
-[ 2015.934812] ======================================================
-[ 2015.935001] WARNING: possible circular locking dependency detected
-[ 2015.935225] 6.0.0-rc7 #1 Not tainted
-[ 2015.935307] ------------------------------------------------------
-[ 2015.935307] cifsd/12418 is trying to acquire lock:
-[ 2015.935307] ffffffffc0babaf8 (&cifs_tcp_ses_lock){+.+.}-{2:2}, at:
-smb2_find_smb_tcon+0x24/0xd0 [cifs]
-[ 2015.936656]
-               but task is already holding lock:
-[ 2015.936771] ffff91f54fd02268 (&tcp_ses->mid_lock){+.+.}-{2:2}, at:
-release_mid+0x29/0x3b0 [cifs]
-[ 2015.936771]
-               which lock already depends on the new lock.
+> Either way I think I made a flawed suggestion. The "reserved" field
+> is __u32 but the KSMBD_REQ_MAX_SHARE_NAME is __s8. So, two things:
+> 
+> - why is share_name an __s8? Wouldn't __u8 be more appropriate?
 
-[ 2015.937709]
-               the existing dependency chain (in reverse order) is:
-[ 2015.938412]
-               -> #1 (&tcp_ses->mid_lock){+.+.}-{2:2}:
-[ 2015.938675]        _raw_spin_lock+0x2f/0x40
-[ 2015.938939]        cifs_debug_data_proc_show+0x60d/0x980 [cifs]
-[ 2015.938939]        seq_read_iter+0xdf/0x470
-[ 2015.939367]        proc_reg_read_iter+0x46/0x70
-[ 2015.939632]        vfs_read+0x230/0x2d0
-[ 2015.939806]        ksys_read+0x88/0xc0
-[ 2015.939806]        do_syscall_64+0x3a/0x90
-[ 2015.939806]        entry_SYSCALL_64_after_hwframe+0x63/0xcd
-[ 2015.939806]
-               -> #0 (&cifs_tcp_ses_lock){+.+.}-{2:2}:
-[ 2015.939806]        __lock_acquire+0x11d9/0x1690
-[ 2015.939806]        lock_acquire+0x254/0x300
-[ 2015.939806]        _raw_spin_lock+0x2f/0x40
-[ 2015.941189]        smb2_find_smb_tcon+0x24/0xd0 [cifs]
-[ 2015.941189]        smb2_handle_cancelled_mid+0x42/0x90 [cifs]
-[ 2015.941633]        release_mid+0x1f7/0x3b0 [cifs]
-[ 2015.942363]        cifs_demultiplex_thread+0x830/0xd40 [cifs]
-[ 2015.942892]        kthread+0xe8/0x110
-[ 2015.943423]        ret_from_fork+0x22/0x30
-[ 2015.943423]
-               other info that might help us debug this:
+As I understand it, the only reason for `__s8' over `__u8' here is that
+`char' is most often a signed type.
 
-[ 2015.943423]  Possible unsafe locking scenario:
+> - why is reserved a __u32? ISTM that __u8 would also be a better
+>    choice, and then the size would be "512 - KSMBD_REQ_MAX_SHARE_NAME".
+> 
+> 
 
-[ 2015.943423]        CPU0                    CPU1
-[ 2015.945327] CIFS: VFS: \\win16.vm.test\Share Close unmatched open for MID:211
-[ 2015.945142]        ----                    ----
-[ 2015.945142]   lock(&tcp_ses->mid_lock);
-[ 2015.945142]                                lock(&cifs_tcp_ses_lock);
-[ 2015.945142]                                lock(&tcp_ses->mid_lock);
-[ 2015.945142]   lock(&cifs_tcp_ses_lock);
-[ 2015.945142]
-                *** DEADLOCK ***
+I don't know why `reserved' is `__u32'. I agree that it would be better
+if it was `__u8'.
 
-[ 2015.945142] 1 lock held by cifsd/12418:
-[ 2015.945142]  #0: ffff91f54fd02268 (&tcp_ses->mid_lock){+.+.}-{2:2},
-at: release_mid+0x29/0x3b0 [cifs]
-[ 2015.949720]
-               stack backtrace:
-[ 2015.950654] CPU: 6 PID: 12418 Comm: cifsd Not tainted 6.0.0-rc7 #1
-[ 2015.951605] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-[ 2015.951774] Call Trace:
-[ 2015.951774]  <TASK>
-[ 2015.952771]  dump_stack_lvl+0x55/0x71
-[ 2015.952771]  check_noncircular+0xeb/0x100
-[ 2015.953646]  ? __lock_acquire+0x490/0x1690
-[ 2015.954175]  ? cpu_attach_domain+0x2e7/0x9d0
-[ 2015.954651]  ? __lock_acquire+0x11d9/0x1690
-[ 2015.955159]  __lock_acquire+0x11d9/0x1690
-[ 2015.955159]  lock_acquire+0x254/0x300
-[ 2015.955688]  ? smb2_find_smb_tcon+0x24/0xd0 [cifs]
-[ 2015.956203] CIFS: VFS: \\win16.vm.test\Share Close unmatched open for MID:212
-[ 2015.955688]  _raw_spin_lock+0x2f/0x40
-[ 2015.957008]  ? smb2_find_smb_tcon+0x24/0xd0 [cifs]
-[ 2015.957008]  smb2_find_smb_tcon+0x24/0xd0 [cifs]
-[ 2015.957008]  smb2_handle_cancelled_mid+0x42/0x90 [cifs]
-[ 2015.957008]  ? _raw_spin_lock+0x2f/0x40
-[ 2015.959650]  release_mid+0x1f7/0x3b0 [cifs]
-[ 2015.959650]  cifs_demultiplex_thread+0x830/0xd40 [cifs]
-[ 2015.959650]  ? cifs_handle_standard+0x1b0/0x1b0 [cifs]
-[ 2015.960655]  kthread+0xe8/0x110
-[ 2015.960655]  ? kthread_complete_and_exit+0x20/0x20
-[ 2015.960655]  ret_from_fork+0x22/0x30
-[ 2015.960655]  </TASK>
-[ 2015.976931] CIFS: VFS: \\win16.vm.test\Share Close unmatched open for MID:213
-
-
--- 
-Thanks,
-
-Steve
+>>>   	__u32	veto_list_sz;
+>>>   	__s8	____payload[];
+>>>   };
+>>> diff --git a/fs/ksmbd/mgmt/share_config.c b/fs/ksmbd/mgmt/share_config.c
+>>> index 5d039704c23c..dfb4bb365891 100644
+>>> --- a/fs/ksmbd/mgmt/share_config.c
+>>> +++ b/fs/ksmbd/mgmt/share_config.c
+>>> @@ -16,6 +16,7 @@
+>>>   #include "user_config.h"
+>>>   #include "user_session.h"
+>>>   #include "../transport_ipc.h"
+>>> +#include "../misc.h"
+>>>   
+>>>   #define SHARE_HASH_BITS		3
+>>>   static DEFINE_HASHTABLE(shares_table, SHARE_HASH_BITS);
+>>> @@ -119,7 +120,8 @@ static int parse_veto_list(struct ksmbd_share_config *share,
+>>>   	return 0;
+>>>   }
+>>>   
+>>> -static struct ksmbd_share_config *share_config_request(const char *name)
+>>> +static struct ksmbd_share_config *share_config_request(struct unicode_map *um,
+>>> +						       const char *name)
+>>>   {
+>>>   	struct ksmbd_share_config_response *resp;
+>>>   	struct ksmbd_share_config *share = NULL;
+>>> @@ -133,6 +135,17 @@ static struct ksmbd_share_config *share_config_request(const char *name)
+>>>   	if (resp->flags == KSMBD_SHARE_FLAG_INVALID)
+>>>   		goto out;
+>>>   
+>>> +	if (*resp->share_name) {
+>>> +		char *cf_resp_name;
+>>> +		bool equal;
+>>> +
+>>> +		cf_resp_name = ksmbd_casefold_sharename(um, resp->share_name);
+>>> +		equal = !IS_ERR(cf_resp_name) && !strcmp(cf_resp_name, name);
+>>> +		kfree(cf_resp_name);
+>> 
+>> Well, kfree() is *not* a no-op for ERR_PTR() like it is for NULL so
+>> this patch is not good either. At least I'm running out of ways to get
+>> this wrong.
+> 
+> :)
+> 
+> Tom.
+> 
+> 
+>> 
+>>> +		if (!equal)
+>>> +			goto out;
+>>> +	}
+>>> +
+>>>   	share = kzalloc(sizeof(struct ksmbd_share_config), GFP_KERNEL);
+>>>   	if (!share)
+>>>   		goto out;
+>>> @@ -190,7 +203,8 @@ static struct ksmbd_share_config *share_config_request(const char *name)
+>>>   	return share;
+>>>   }
+>>>   
+>>> -struct ksmbd_share_config *ksmbd_share_config_get(const char *name)
+>>> +struct ksmbd_share_config *ksmbd_share_config_get(struct unicode_map *um,
+>>> +						  const char *name)
+>>>   {
+>>>   	struct ksmbd_share_config *share;
+>>>   
+>>> @@ -202,7 +216,7 @@ struct ksmbd_share_config *ksmbd_share_config_get(const char *name)
+>>>   
+>>>   	if (share)
+>>>   		return share;
+>>> -	return share_config_request(name);
+>>> +	return share_config_request(um, name);
+>>>   }
+>>>   
+>>>   bool ksmbd_share_veto_filename(struct ksmbd_share_config *share,
+>>> diff --git a/fs/ksmbd/mgmt/share_config.h b/fs/ksmbd/mgmt/share_config.h
+>>> index 7f7e89ecfe61..3fd338293942 100644
+>>> --- a/fs/ksmbd/mgmt/share_config.h
+>>> +++ b/fs/ksmbd/mgmt/share_config.h
+>>> @@ -9,6 +9,7 @@
+>>>   #include <linux/workqueue.h>
+>>>   #include <linux/hashtable.h>
+>>>   #include <linux/path.h>
+>>> +#include <linux/unicode.h>
+>>>   
+>>>   struct ksmbd_share_config {
+>>>   	char			*name;
+>>> @@ -74,7 +75,8 @@ static inline void ksmbd_share_config_put(struct ksmbd_share_config *share)
+>>>   	__ksmbd_share_config_put(share);
+>>>   }
+>>>   
+>>> -struct ksmbd_share_config *ksmbd_share_config_get(const char *name);
+>>> +struct ksmbd_share_config *ksmbd_share_config_get(struct unicode_map *um,
+>>> +						  const char *name);
+>>>   bool ksmbd_share_veto_filename(struct ksmbd_share_config *share,
+>>>   			       const char *filename);
+>>>   #endif /* __SHARE_CONFIG_MANAGEMENT_H__ */
+>>> diff --git a/fs/ksmbd/mgmt/tree_connect.c b/fs/ksmbd/mgmt/tree_connect.c
+>>> index 867c0286b901..8ce17b3fb8da 100644
+>>> --- a/fs/ksmbd/mgmt/tree_connect.c
+>>> +++ b/fs/ksmbd/mgmt/tree_connect.c
+>>> @@ -26,7 +26,7 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
+>>>   	struct sockaddr *peer_addr;
+>>>   	int ret;
+>>>   
+>>> -	sc = ksmbd_share_config_get(share_name);
+>>> +	sc = ksmbd_share_config_get(conn->um, share_name);
+>>>   	if (!sc)
+>>>   		return status;
+>>>   
+>>> @@ -61,7 +61,7 @@ ksmbd_tree_conn_connect(struct ksmbd_conn *conn, struct ksmbd_session *sess,
+>>>   		struct ksmbd_share_config *new_sc;
+>>>   
+>>>   		ksmbd_share_config_del(sc);
+>>> -		new_sc = ksmbd_share_config_get(share_name);
+>>> +		new_sc = ksmbd_share_config_get(conn->um, share_name);
+>>>   		if (!new_sc) {
+>>>   			pr_err("Failed to update stale share config\n");
+>>>   			status.ret = -ESTALE;
+>>> diff --git a/fs/ksmbd/misc.c b/fs/ksmbd/misc.c
+>>> index 28459b1efaa8..9e8afaa686e3 100644
+>>> --- a/fs/ksmbd/misc.c
+>>> +++ b/fs/ksmbd/misc.c
+>>> @@ -227,7 +227,7 @@ void ksmbd_conv_path_to_windows(char *path)
+>>>   	strreplace(path, '/', '\\');
+>>>   }
+>>>   
+>>> -static char *casefold_sharename(struct unicode_map *um, const char *name)
+>>> +char *ksmbd_casefold_sharename(struct unicode_map *um, const char *name)
+>>>   {
+>>>   	char *cf_name;
+>>>   	int cf_len;
+>>> @@ -273,7 +273,7 @@ char *ksmbd_extract_sharename(struct unicode_map *um, const char *treename)
+>>>   		name = (pos + 1);
+>>>   
+>>>   	/* caller has to free the memory */
+>>> -	return casefold_sharename(um, name);
+>>> +	return ksmbd_casefold_sharename(um, name);
+>>>   }
+>>>   
+>>>   /**
+>>> diff --git a/fs/ksmbd/misc.h b/fs/ksmbd/misc.h
+>>> index cc72f4e6baf2..1facfcd21200 100644
+>>> --- a/fs/ksmbd/misc.h
+>>> +++ b/fs/ksmbd/misc.h
+>>> @@ -20,6 +20,7 @@ int get_nlink(struct kstat *st);
+>>>   void ksmbd_conv_path_to_unix(char *path);
+>>>   void ksmbd_strip_last_slash(char *path);
+>>>   void ksmbd_conv_path_to_windows(char *path);
+>>> +char *ksmbd_casefold_sharename(struct unicode_map *um, const char *name);
+>>>   char *ksmbd_extract_sharename(struct unicode_map *um, const char *treename);
+>>>   char *convert_to_unix_name(struct ksmbd_share_config *share, const char *name);
+>>>   
+>>> -- 
+>>> 2.37.3
+>>>
+>>>
+>> 
+> 
