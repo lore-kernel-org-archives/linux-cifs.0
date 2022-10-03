@@ -2,98 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7974BC433FE
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Oct 2022 03:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E25AFC433FE
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Oct 2022 04:38:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229469AbiJCDyz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 2 Oct 2022 23:54:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50798 "EHLO
+        id S229470AbiJCEiS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 3 Oct 2022 00:38:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbiJCDyx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Oct 2022 23:54:53 -0400
-Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A9C1DFD4
-        for <linux-cifs@vger.kernel.org>; Sun,  2 Oct 2022 20:54:51 -0700 (PDT)
-Received: by mail-vs1-xe34.google.com with SMTP id x124so2027785vsb.13
-        for <linux-cifs@vger.kernel.org>; Sun, 02 Oct 2022 20:54:51 -0700 (PDT)
+        with ESMTP id S229520AbiJCEiR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Oct 2022 00:38:17 -0400
+Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D0F233860
+        for <linux-cifs@vger.kernel.org>; Sun,  2 Oct 2022 21:38:16 -0700 (PDT)
+Received: by mail-vk1-xa33.google.com with SMTP id bj3so1746043vkb.5
+        for <linux-cifs@vger.kernel.org>; Sun, 02 Oct 2022 21:38:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date;
-        bh=zUXLzI+Hw4Bl3+pJAmtmgzITf6zZTSbdSsLgK2BKlCI=;
-        b=QO54OzbGrfx45lGU+N6T6CXdH4OFuEQ2SYWKZih8ClgO6Z3u0l+/81zAX9bQTtvu2p
-         5jbVHuhgxE+WD64FtCHtz/VsTBuX3ulgfz/wbrIFyQgDys8JVsd8WDbx/TYj29B4PBIV
-         OfQ3G2E7RVLgYpvpMQh+zF1NDDhQqLW0N3v/CiuEMT2VyzelKHtYmOlX8ssj3C8ht9qw
-         6+HwODfhTIksaz1O+zV83D8vFe5LuM2eC17DvMXwahx2VsA3LCCZHcWRhWgWG2/VyG5V
-         9GfgmUu0M3eckLyiRtIJqeT1CeEZrzxARyrIQwlJoGci0U0qLRHkcAKkcNOAw162Y4nU
-         BKow==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=p1IQ4xWavzrSN1ZEsVWfDaCrop+YUwxoPLR9GRlbgO0=;
+        b=ZY/3NS5ODi8PsSDeSh9/s5BqdrerdaxpUb+77pxN/PTg9gEZuvKgIbGMIEK34S6vOl
+         BSqtok+Lq+JJCMhsYY95+N1Lv1C62kz32pb4BDicpcys15XqinXjGBhxo9kF+ouOuxzD
+         VcFNLpNxMqFV5ZJhRblFuiR6nd+2MhSFydkqVUyYKJCTHeD/nYGzwpTlTC2+As1J6ZAa
+         /IGFXoC+X3xFFg4H9h9tbe/iIEftmT//7js68XK5ayzCv7YOi6kiUbPpU+zOepAK33Dq
+         qM7BszVIF5ewp3aah/Xlk/ro00Snp3LeYJMaL8v70jLKxUUXf10rBIMAuLK88Wle6ga4
+         UUmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=zUXLzI+Hw4Bl3+pJAmtmgzITf6zZTSbdSsLgK2BKlCI=;
-        b=NbO1ZSVGRlQXS8YOzm+xarE/0kbHKEXL2l7LHYcYl0X7K5jeFpsc6U1N1Iv478XMnF
-         BI9WlHPOKpjiX1fqra6oBCQxHu5RXp7L3hwUwApL7TuJza0w6IOAj8qinzzH/X3TKmXK
-         t9mYiqzJG0qoP2bHqXBZNYTenFiEhfCJQQj7Oo6c0KxE3dHBXe5CRU/BLC+DgVRN7CQK
-         IPW55kK6OeH/dIcrVDUI1N6M/7IZzn1avjLotsXTTLI5CvHbjXXTjZebSdTOZCCC0dWE
-         /02TZWnRwYBGg6m4Z4RgqxbUVEtV3TTxjkd9JI5r1Tv7J9GB1njCigqiS63Sn9XU/tYA
-         /W0w==
-X-Gm-Message-State: ACrzQf0vmpTnW+wNQg1qJ27wPZ62Xxd9wIxPCdI/SJphgl5blMX4oZOd
-        QEFIGBfQelPB2G59tmtxUpJxDBdbJJht0dBiLnE=
-X-Google-Smtp-Source: AMsMyM7NGjE4aheecK5MJpGmv5SRy0shTOlCinCAXzO1Ed+XdY4USQVT5kOBlliQyiKyZtotFbUUjwUj3Myua7iXJvU=
-X-Received: by 2002:a67:f2d5:0:b0:3a6:5f77:86b5 with SMTP id
- a21-20020a67f2d5000000b003a65f7786b5mr1343815vsn.29.1664769290169; Sun, 02
- Oct 2022 20:54:50 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=p1IQ4xWavzrSN1ZEsVWfDaCrop+YUwxoPLR9GRlbgO0=;
+        b=CaOgfUE4AJVkGJd9PQxiF0h0zZmL+doHh6uJS8FTbRh8heKi5XBTYGPcWi8kudNQwO
+         p/DHIJnsCgCmiBgYiD9OKckYz/UgBoXTAHADWDR90A4Do8utyiwF5IyGnmUxAf9M2JJG
+         DssazElk7X7SbLOE/vyP0gLtpDUozXTHHBsQzwTiiNiMidSWd81qZ7DZNZX0ixMeGFkz
+         z3UBDW3FLI0tlMuIg9+lbZqzFoemQm8qM7vk+Po50OWIGGa+Judztvizu5ttcRgJoZwu
+         psYAkN4riW27UiAxNpXsmDNC7oAqifCCIGYYUScUeGbhmmPrty5KlKKHj24jk/CZR/v6
+         78vg==
+X-Gm-Message-State: ACrzQf1m3yj1UoGTcms301G1fgKoRRsJ38Ej292EhXVnSR7c/iWo5sbh
+        jftfHBtQfzGuhOTgtDkE/Ov1/jBxP7BX+QVGDRAgYZ8+
+X-Google-Smtp-Source: AMsMyM7nOMCkcJDlpOo6TnFiqBkt42JbSMsGNA98Eo5/M7WiXRRn9inNgwpdp9oSKyeXkwKqjeSSIkk5MZ7Ok4K2VeQ=
+X-Received: by 2002:a05:6122:1043:b0:3a9:9506:c34e with SMTP id
+ z3-20020a056122104300b003a99506c34emr3875908vkn.38.1664771895120; Sun, 02 Oct
+ 2022 21:38:15 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAH2r5mvS6_AXjbK8sY_dEWUbmtRjodSYEtxeNz_NST9+EyC96A@mail.gmail.com>
+ <df473fde-e79d-ae90-37bb-3a3869d3aa9a@talpey.com>
+In-Reply-To: <df473fde-e79d-ae90-37bb-3a3869d3aa9a@talpey.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 2 Oct 2022 22:54:39 -0500
-Message-ID: <CAH2r5mtzWgXbod2tdZsRvZuhBZsv=H9Vf2GA3Q_bQe0nHhjfiQ@mail.gmail.com>
-Subject: [PATCH][smb311 client] fix oops in smb3_calc_signature
-To:     Enzo Matsumiya <ematsumiya@suse.de>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000002c86f805ea194ec3"
+Date:   Sun, 2 Oct 2022 23:38:04 -0500
+Message-ID: <CAH2r5msDX4eaGuyine__ePtOTRoSBDjiUN_dthaHpiA9UKm0yg@mail.gmail.com>
+Subject: Re: [PATCH][smb3 client] log less confusing message on multichannel
+ mounts to Samba when no interfaces returned
+To:     Tom Talpey <tom@talpey.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000002c86f805ea194ec3
-Content-Type: text/plain; charset="UTF-8"
+On Sat, Oct 1, 2022 at 6:22 PM Tom Talpey <tom@talpey.com> wrote:
+>
+> On 10/1/2022 12:54 PM, Steve French wrote:
+> > Some servers can return an empty network interface list so, unless
+> > multichannel is requested, no need to log an error for this, and
+> > when multichannel is requested on mount but no interfaces, log
+> > something less confusing.  For this case change
+> >     parse_server_interfaces: malformed interface info
+> > to
+> >     empty network interface list returned by server
+>
+> Will this spam the log if it happens on every MC refresh (10 mins)?
+> It might be helpful to identify the servername, too.
 
-shash was not being initialized in one place in smb3_calc_signature
+Yes - I just noticed that in this case (multichannel mount to Samba
+where no valid interfaces) we log it every ten minutes.
+Maybe best way to fix this is to change it to a log once error (with
+server name is fine with me) since it is probably legal to return an
+empty list (so not serious enough to be worth logging every ten
+minutes) and in theory server could fix its interfaces later.
 
-Suggested-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Steve French <stfrench@microsoft.com>
+
+
+> > Cc: <stable@vger.kernel.org>
+> > Signed-off-by: Steve French <stfrench@microsoft.com>
+> >
+> > See attached patch
+> >
+
+
 
 -- 
 Thanks,
 
 Steve
-
---0000000000002c86f805ea194ec3
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-fix-oops-in-calculating-shash_setkey.patch"
-Content-Disposition: attachment; 
-	filename="0001-fix-oops-in-calculating-shash_setkey.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l8s8mg5x0>
-X-Attachment-Id: f_l8s8mg5x0
-
-RnJvbSA2NTE0NWE0YjNiNDQzNWE3MGMwMDYyYWY1YzZjZjIyNWIyNWU5YTVmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgMiBPY3QgMjAyMiAyMjowOTo0NSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIGZp
-eCBvb3BzIGluIGNhbGN1bGF0aW5nIHNoYXNoX3NldGtleQoKc2hhc2ggd2FzIG5vdCBiZWluZyBp
-bml0aWFsaXplZCBpbiBvbmUgcGxhY2UgaW4gc21iM19jYWxjX3NpZ25hdHVyZQoKU3VnZ2VzdGVk
-LWJ5OiBFbnpvIE1hdHN1bWl5YSA8ZW1hdHN1bWl5YUBzdXNlLmRlPgpTaWduZWQtb2ZmLWJ5OiBT
-dGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIydHJh
-bnNwb3J0LmMgfCAyICstCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRp
-b24oLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYyBiL2ZzL2NpZnMvc21i
-MnRyYW5zcG9ydC5jCmluZGV4IGRmY2JjYzBiODZlNC4uNjRlMTJiMGE1YTNiIDEwMDY0NAotLS0g
-YS9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYworKysgYi9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYwpA
-QCAtNTM1LDcgKzUzNSw3IEBAIHNtYjNfY2FsY19zaWduYXR1cmUoc3RydWN0IHNtYl9ycXN0ICpy
-cXN0LCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsCiAJdW5zaWduZWQgY2hhciAqc2ln
-cHRyID0gc21iM19zaWduYXR1cmU7CiAJc3RydWN0IGt2ZWMgKmlvdiA9IHJxc3QtPnJxX2lvdjsK
-IAlzdHJ1Y3Qgc21iMl9oZHIgKnNoZHIgPSAoc3RydWN0IHNtYjJfaGRyICopaW92WzBdLmlvdl9i
-YXNlOwotCXN0cnVjdCBzaGFzaF9kZXNjICpzaGFzaDsKKwlzdHJ1Y3Qgc2hhc2hfZGVzYyAqc2hh
-c2ggPSBOVUxMOwogCXN0cnVjdCBzbWJfcnFzdCBkcnFzdDsKIAl1OCBrZXlbU01CM19TSUdOX0tF
-WV9TSVpFXTsKIAotLSAKMi4zNC4xCgo=
---0000000000002c86f805ea194ec3--
