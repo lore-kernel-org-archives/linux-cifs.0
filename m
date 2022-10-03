@@ -2,96 +2,88 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C12AEC433FE
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Oct 2022 14:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8175C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Oct 2022 14:53:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229814AbiJCObw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 3 Oct 2022 10:31:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56762 "EHLO
+        id S230009AbiJCOxg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 3 Oct 2022 10:53:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiJCObv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Oct 2022 10:31:51 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 490D8491FC
-        for <linux-cifs@vger.kernel.org>; Mon,  3 Oct 2022 07:31:50 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229685AbiJCOxb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Oct 2022 10:53:31 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13C713A17B
+        for <linux-cifs@vger.kernel.org>; Mon,  3 Oct 2022 07:53:30 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F1F50B80EFF
-        for <linux-cifs@vger.kernel.org>; Mon,  3 Oct 2022 14:31:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D03C433C1
-        for <linux-cifs@vger.kernel.org>; Mon,  3 Oct 2022 14:31:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664807507;
-        bh=8u+IzeF4e0qIlS7VYSLJbVygVRIud3A1yVxcYNb2LBU=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=fcZLnxr0+DSqx4y9uVtZ4WUlq/txtU4R4Hn+7m0nDlXTIFIehzC1Jp7vtuaxoa/PV
-         4BzjNYNpNNQn8ZvzXXqYeLhYNOvnOQQ1k8wZFJ6BzKXqn9hhavfFeo/07MzBRr5BLi
-         Z73XBGjbQmzANC/9alUgNeo2UY0V3eQbSTj+5kZ8qS3U3EMkQPj47S0mEamChWTQpr
-         q/DpU2Scx+jgaKkCMvrY6EgkxikzE6DGmjtbOi4SoUn3tJePAEw9TXPJqCo2pdNSjQ
-         s2cxR1TZhrhs+Y9b1NG+COWuvpxivDZ/RLTinSN8BXEA1RJYLkRwPDxhaLbjA+yDVo
-         IABqzGx28eIZQ==
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-131ea99262dso10874577fac.9
-        for <linux-cifs@vger.kernel.org>; Mon, 03 Oct 2022 07:31:47 -0700 (PDT)
-X-Gm-Message-State: ACrzQf0Y9ejyjwpymy0lrvzeCABLH/MbKPhJnjpWLGb0AS5Y/B/6dGKZ
-        QrshylMMsFg2aeQKtGu9T213qCKSL/yZBhrTEHM=
-X-Google-Smtp-Source: AMsMyM4oZY0CHq9Rzkem8OE7jlkOtq9XLJwVc1MzLNeZtKIhlJg+icdrOqoLeicacAWuM2xB3PQGKmzvgmV0yZuUjLc=
-X-Received: by 2002:a05:6871:207:b0:132:7706:e74f with SMTP id
- t7-20020a056871020700b001327706e74fmr2299901oad.8.1664807506893; Mon, 03 Oct
- 2022 07:31:46 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a05:6838:ea0c:0:0:0:0 with HTTP; Mon, 3 Oct 2022 07:31:46
- -0700 (PDT)
-In-Reply-To: <7e06ff88-baa5-c2c1-9184-2cb48d6182a5@talpey.com>
-References: <20221002030123.11409-1-linkinjeon@kernel.org> <7e06ff88-baa5-c2c1-9184-2cb48d6182a5@talpey.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Mon, 3 Oct 2022 23:31:46 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-OVVSkCnMYxTrS06NA5+=dK8D7PHeCLbqxQL6MmJR4qg@mail.gmail.com>
-Message-ID: <CAKYAXd-OVVSkCnMYxTrS06NA5+=dK8D7PHeCLbqxQL6MmJR4qg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: call ib_drain_qp when disconnected
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8507F1F942;
+        Mon,  3 Oct 2022 14:53:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1664808809; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UtPJbqUiYvv88Md85hEGuFZBfByl+Xwah9dvDxxRZpA=;
+        b=tcyzzSxpPbTOJkwgGdXh1IGI3uz+Jo0dFtzlVfBIp1oaDmPd/C4q7vz990tf0xmGNld8j9
+        miFgbXGjp5i/Hpmf+vFCzufX5LYc8P0msSgwGGkEzNLeVOyBAVedyEvkGFKwQg3zd+lvBI
+        v/D9Aeg5PAeEbfM7cJYjct3OX95iqew=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1664808809;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UtPJbqUiYvv88Md85hEGuFZBfByl+Xwah9dvDxxRZpA=;
+        b=lC0vbK4Q+9D/1PK3Z9cAUS7RzQfxMJtJnrwhM3xUlbd3x4fI3SCKsK+ohPg1JF/6DDStZv
+        x+L8tv178siD7aCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 08E7013522;
+        Mon,  3 Oct 2022 14:53:28 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Rgd8L2j3OmM/cQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Mon, 03 Oct 2022 14:53:28 +0000
+Date:   Mon, 3 Oct 2022 11:53:26 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     Tom Talpey <tom@talpey.com>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, atteh.mailbox@gmail.com,
-        Hyunchul Lee <hyc.lee@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH][smb311 client] fix oops in smb3_calc_signature
+Message-ID: <20221003145326.nx2hjsugeiweb2uy@suse.de>
+References: <CAH2r5mtzWgXbod2tdZsRvZuhBZsv=H9Vf2GA3Q_bQe0nHhjfiQ@mail.gmail.com>
+ <93bf9e29-32b6-7def-3595-598e59c8c46e@talpey.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <93bf9e29-32b6-7def-3595-598e59c8c46e@talpey.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-10-03 3:11 GMT+09:00, Tom Talpey <tom@talpey.com>:
-> On 10/1/2022 11:01 PM, Namjae Jeon wrote:
->> When disconnected, call ib_drain_qp to cancel all pending work requests
->> and prevent ksmbd_conn_handler_loop from waiting for a long time
->> for those work requests to compelete.
+On 10/03, Tom Talpey wrote:
+>On 10/2/2022 11:54 PM, Steve French wrote:
+>>shash was not being initialized in one place in smb3_calc_signature
 >>
->> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
->> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>   fs/ksmbd/transport_rdma.c | 2 ++
->>   1 file changed, 2 insertions(+)
+>>Suggested-by: Enzo Matsumiya <ematsumiya@suse.de>
+>>Signed-off-by: Steve French <stfrench@microsoft.com>
 >>
->> diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
->> index 0315bca3d53b..096eda9ef873 100644
->> --- a/fs/ksmbd/transport_rdma.c
->> +++ b/fs/ksmbd/transport_rdma.c
->> @@ -1527,6 +1527,8 @@ static int smb_direct_cm_handler(struct rdma_cm_id
->> *cm_id,
->>   	}
->>   	case RDMA_CM_EVENT_DEVICE_REMOVAL:
->>   	case RDMA_CM_EVENT_DISCONNECTED: {
->> +		ib_drain_qp(t->qp);
->> +
->>   		t->status = SMB_DIRECT_CS_DISCONNECTED;
->>   		wake_up_interruptible(&t->wait_status);
->>   		wake_up_interruptible(&t->wait_reassembly_queue);
 >
-> Because we're now flushing the cancelled work requests, don't
-> we need to also wake up &t->wait_send_pending, to abort any
-> waiters on the send wq?
-Could you please elaborate more how it could be a problem ?
-send_pending is decreased and wake_up &t->wait_send_pending if it is
-zero in send_done().
+>I don't see the issue. The shash pointer is initialized in both
+>arms of the "if (allocate_crypto)" block.
 
->
-> Tom.
->
+True, but cifs_alloc_hash() returns 0 if *sdesc is not NULL, so
+crypto_shash_setkey() got stack garbage as sdesc.
+
+>But if you do want to add this, them smb2_calc_signature has
+>the same code.
+
+True.  Steve will you add it to this patch please?
+
+>Tom.
+
+Cheers,
+
+Enzo
