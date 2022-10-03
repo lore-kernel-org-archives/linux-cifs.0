@@ -2,191 +2,157 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D94C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Oct 2022 15:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A87EC433FE
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Oct 2022 15:48:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229484AbiJCPdA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 3 Oct 2022 11:33:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33776 "EHLO
+        id S229496AbiJCPs4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 3 Oct 2022 11:48:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiJCPc7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Oct 2022 11:32:59 -0400
-Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED83027DF3
-        for <linux-cifs@vger.kernel.org>; Mon,  3 Oct 2022 08:32:58 -0700 (PDT)
-Received: by mail-vk1-xa34.google.com with SMTP id i5so1838964vka.9
-        for <linux-cifs@vger.kernel.org>; Mon, 03 Oct 2022 08:32:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=lcd/xVvWRJGJ6u+jgugwWW6ZbIMgbRFeQClbu4ACgW0=;
-        b=dSWJFvu+TPDya4ZbAgMeYMP9QPgAgJ1Yxqe9pu9NppgNMN15vgoxJ93x0ylLFJYRd+
-         93wf5d6nwQmuHlhb3cpsxIVwpvtfOwKwMTzE8/qbNZpSFYfheOMvM8mrVX5l4++uWf1P
-         5oTzS3WcVo3z+vjeGDPU8CykwizXNIkssGzkwriYa+IN5y7Kxt+SJalTdzeyErmMrE2d
-         f5G/EdDO91f+PCjcowCECJ3oNRgalLhtFnmvdFQmpDKPRnoXhZdv81wB1fG6uUK8dnZT
-         buPXAvdnrr5TaTiv1X2a+ufKxrzO9Dx3QEgyZWSxrT8ve8YZ/bkD1ljg1R56LGnJJ/Yd
-         YxOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=lcd/xVvWRJGJ6u+jgugwWW6ZbIMgbRFeQClbu4ACgW0=;
-        b=KAqvmksf1Or0+OSHQCHCufojm5gvqSx22SAjF4G23GB2ZucwKa8SPc/5qQzfpoLwZ1
-         dDt38w12nXudOdbXPoqQgceIW0D/6dPkNuQxUjw3cwnUvOxN2wp5O1WRV+8E9r/W8jMR
-         EqmA/baDd9Qlb0EpwfAq4luI1lL+PXMfUYlHr0ED9b5JCPFEHIwQyMhStJ7ZLWLggQql
-         OFJxBOEea1yNTIgj2MHbPe0iNeWjLZCBXo7HRRBDDAjDRD/lVYL/gWNqCIXOJWyluiDn
-         DLeyyLOElhIbR9PTgnuXO6ikkb8pZSaOx4w4r/++1lKftmIkaD2jWhz1wxf91e9WCSc/
-         3wIA==
-X-Gm-Message-State: ACrzQf3hCleGCs2O2HJVbfmfL3tdBOi4p6hS9snIA/o1EtavKokghqmr
-        iWvx0aTqupU1oux3door+lK91LNkMYwWOpDhb3M=
-X-Google-Smtp-Source: AMsMyM4+5912Kc3bOfdcScoufLPriNOqRAROmu3aTfBfb4LbPv/ZfHNSUQpIaUSmndhaHtK6P9SNGREHYs4ekiIpUww=
-X-Received: by 2002:a1f:d583:0:b0:3aa:9112:570f with SMTP id
- m125-20020a1fd583000000b003aa9112570fmr1405112vkg.3.1664811161245; Mon, 03
- Oct 2022 08:32:41 -0700 (PDT)
+        with ESMTP id S229489AbiJCPsz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Oct 2022 11:48:55 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2064.outbound.protection.outlook.com [40.107.93.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E004C2F3BF
+        for <linux-cifs@vger.kernel.org>; Mon,  3 Oct 2022 08:48:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gYSegg0Lk3bMqYYMzhkHLPJL4ACySIrnQ6BMcHLFzy1sAyPXlE/gbhjGCFaLXYdAg6+1mUK7T/TI1GDZWX9A2qmauo+ZdANaWxJw9jG6ubyfNy1wlgkhoDzq1Kxj3/z9cnHyhl3rXLaL3wM9p+JXgVT9hG7j6khcHWtv4uetb2lvT6RfMgM5AVCBvLUfCJhypw772Nu/SlY7MNZIUK7cQrenomIE2aUSDEj99K0wC6FCFCqy7SidYiM+yDEiPZcD27168RfK/B7EboBQ9S4FufQ6Y09ZeIzvxAp2mLXGlFbFlS4fK1pH33PYHb/GfDkirYovxM7hM9BPhXjY8sgJJQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F+dFN4g5Zw9MGNz9alL25TDQWSFfj02dbc+wyxMnu2Y=;
+ b=WX1s4kU9y7w3ZhicZ+zfdf+PwgF4fYx91Os5KGJ7BqZ7/urfiWuABVfcF+VBCciU1XHjSATc9pG8USWaiv/GV0QyTmVQhbhKPEgrHMNdZ8Pos6EDuhgmMGI6TtOLZsq4gTDhMSQu4yoH5DtNlNON5c0SfVJLh4pcfOHcKV9xLjb2kQeA0UN306KRtPPCymPXmVTyGStEXVIMnms5tCwzBrFtqcD6xppmguyU1OKadDQnEx9VrlBupym57jOk4UF/M7Jp7c1u8X/19EMx6cAEOB+m7HKSS9VBHWWtRlohKd8HTVavTezZgoRpVpxO483e9l4q4DDxTwazIauZUNq3Pw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ DM6PR01MB5818.prod.exchangelabs.com (2603:10b6:5:1dd::24) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5676.23; Mon, 3 Oct 2022 15:48:51 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::454c:df56:b524:13ef]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::454c:df56:b524:13ef%5]) with mapi id 15.20.5676.028; Mon, 3 Oct 2022
+ 15:48:51 +0000
+Message-ID: <3bc8a8d1-45b7-8b2b-7400-2264c4197d8c@talpey.com>
+Date:   Mon, 3 Oct 2022 11:48:48 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH] ksmbd: call ib_drain_qp when disconnected
+Content-Language: en-US
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
+        senozhatsky@chromium.org, atteh.mailbox@gmail.com,
+        Hyunchul Lee <hyc.lee@gmail.com>
+References: <20221002030123.11409-1-linkinjeon@kernel.org>
+ <7e06ff88-baa5-c2c1-9184-2cb48d6182a5@talpey.com>
+ <CAKYAXd-OVVSkCnMYxTrS06NA5+=dK8D7PHeCLbqxQL6MmJR4qg@mail.gmail.com>
+From:   Tom Talpey <tom@talpey.com>
+In-Reply-To: <CAKYAXd-OVVSkCnMYxTrS06NA5+=dK8D7PHeCLbqxQL6MmJR4qg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR12CA0014.namprd12.prod.outlook.com
+ (2603:10b6:208:a8::27) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
 MIME-Version: 1.0
-References: <CAH2r5mtzWgXbod2tdZsRvZuhBZsv=H9Vf2GA3Q_bQe0nHhjfiQ@mail.gmail.com>
- <93bf9e29-32b6-7def-3595-598e59c8c46e@talpey.com> <20221003145326.nx2hjsugeiweb2uy@suse.de>
- <50e0c130-8836-8463-ec8f-fb7cfa6cd7ab@talpey.com> <20221003152043.6skowwnlwoidi3yl@suse.de>
- <026fba64-073d-fd2c-644e-1b53c77abc92@talpey.com>
-In-Reply-To: <026fba64-073d-fd2c-644e-1b53c77abc92@talpey.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 3 Oct 2022 10:32:30 -0500
-Message-ID: <CAH2r5mtH8F6FwPTMFO8fe6=LDbqjApuEiUw6cMr9ApL73ziA+g@mail.gmail.com>
-Subject: Re: [PATCH][smb311 client] fix oops in smb3_calc_signature
-To:     Tom Talpey <tom@talpey.com>
-Cc:     Enzo Matsumiya <ematsumiya@suse.de>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000e2dce805ea230da4"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|DM6PR01MB5818:EE_
+X-MS-Office365-Filtering-Correlation-Id: 640bdd59-29e3-48c9-f9d0-08daa556c472
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: CUAZ3KoTlrt0mgo34UyrjNn5SSSMPecFazNiup9pMXM3g4w2M8jtg5WdDyAZl82h0Dk9c01V9V2bUMfFmqHN4w+Dh9CANcpopH0RstQMSJvd3H+DVv1Qx7Hi1qXc/NTXpR/mHqAyLA6+eMoU6W0E5CfrM7A9AAZoBdH0eok+NA6iZMonRzZYwgETgkeOqJJIhEgRDkXmFBEbjPoJdWRcgVgvNRBiaf4OJpOf33tnj/VgyWVvuccd1rjG+Ewki6Wd2bwbGQrNrDS9vGfRdJ/78JDPLmZ3d4jn4e5khWRbE9/XMopN7QxYkxAMtKY1ttQFuPooGBek1Cxrawqe4JnH7Xvq1Xm8yRlp90yQIqyT7U2JAPZZD+45nBOF7HEtnuB1/PaI2JjLGulbmpAlIitJDzkxVFTtJ37sQc6d30sAfRFsCp87x+YPb25BvrYzdKKfR5jJDesaSUK7ltBku7c+MGi4lbeVKMIB92W1CjamOBu6eYzqVmEchaEaDgn6XccL2DGb3RogA9ekpIP9lpQzuNuCgTw7eVGdUOV2Jq2vP385M4/zjd1Wukh1J/aFYtClo2G/IazuXnivu2K9402o6u4vfERxDF09qtbHAuVRNt7S4frgFRk324F0NtcwJqwbVckn3241hAO0//XAXiP21RJuGG+dEe5v2aPPz8ZGwYEk6CBkZgsb6edEuH+FProO7J52ijukWhcI0GQ6DJOWAqtk7k6NcRcZByRadw9zHbdXWRV5lRXUnSXJHkpoR9oM8cpaq55gkKZm+4970x8gdxt96irN5+sgWJscO7JAgi8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(136003)(376002)(39830400003)(366004)(346002)(451199015)(2616005)(86362001)(31696002)(83380400001)(38350700002)(38100700002)(5660300002)(41300700001)(66946007)(8936002)(66556008)(4326008)(66476007)(2906002)(26005)(6506007)(6512007)(478600001)(52116002)(53546011)(186003)(316002)(8676002)(6666004)(6916009)(6486002)(36756003)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?czdYYVVFaWRYR3JsYTZ3NDlBZjI2bXdERmVla0FjODE1dmJ6UjJndzJOMTJS?=
+ =?utf-8?B?U1BJL0Y4Q20zTDRZT2RQV3ZpNTJkRkdnUlYxbDErZmV3eTQzZkFKeUNaUHpj?=
+ =?utf-8?B?dFJkVE1FdGNKN1lhYTUyL3RQM0JzbUxXRUZPMitDVkFvWWdOZWRWdEVIbVlM?=
+ =?utf-8?B?alU0Y2g4WjR6YnAxUDdSL3RZcXRjdVM5cmRSNUVJaEl6MmdnL1grbVZkMGlD?=
+ =?utf-8?B?UHYyV1o4dldpbHV5SjJIVmd3WG9JSnVhQytJdCtxdGhsa1Y1eHdVRldPN3RO?=
+ =?utf-8?B?QlptdFZheDNZY2xyS3htZ05teGxvdDd4TU9uVEdYUVM2MHZEcHA1YmhIdFkw?=
+ =?utf-8?B?bUxaQ3FsRk43WjlrWEpteGFCQTdSTnFyS3lMT09ZbDRkVlV6R0M5ektMQjVu?=
+ =?utf-8?B?cjhLdFV3ZDhQdEtJVXZmTkh3TjlmblhuWjloRDgyNHNOOURBQTVEbWQ0Z01E?=
+ =?utf-8?B?bkdIRVVnMEZWUWdLVFd3eUorS3QxLzJUWEllcVpBemdLZUdsMVVOZUFLZVJ3?=
+ =?utf-8?B?dkNreCs5RlZranVSd2llSG5vcU9aZWtqZXNDdUhrYURDeWd0U3I4Yk82TWRa?=
+ =?utf-8?B?L1lnQ0tFaTJqRE1QOWFLbmJMSHBTZGlXdlZ0SitjRE9qNFdNTU9xWUhHSXd5?=
+ =?utf-8?B?cWtlRXdwOFJQRXVaVlhBYndUUWxWMENJTXA4blQ2THVtNS9KTE9nemIvVzc2?=
+ =?utf-8?B?aXBZZGhQU1lwUStka1pLN2VlRzduTlpDZEdKU0YxR28rWFdEREoxdDUwTG15?=
+ =?utf-8?B?N255NWFQUlJGR2xydHFYQ2o1Q3I1OFFKb2tIWk56anVwcnBETWI2VG1aSnlq?=
+ =?utf-8?B?RTVZSFFHTkxlRjBYQXpGUkdLU1JiN281SUYrTHlKYWt1RlEwRDBiN3k4dEto?=
+ =?utf-8?B?OFlvbHlNRUUxVU1tZHZ1SWRCLzJmYjhHcmFTZUMrd2VyTzN5T3A2OTNpd1gz?=
+ =?utf-8?B?VjVGaDFaT3ZvRmk4anJGUGppUnY2Z095bWh5Y0ptelI5RXhPV2RWcm9zRDhj?=
+ =?utf-8?B?YXBrRHFuTWNNcTRCRWxLWDJvcnJpYVk5Z1RkSktLVzlJOXkwM2dWbm14bktv?=
+ =?utf-8?B?MktNcU03L3FnZUZjd0dwYUx1VFR4RERnMU5mSVFKOGFHdzk3dXBWWm0wSHcx?=
+ =?utf-8?B?QUl2UzJiWE9JNkZCM2paZWFJMC9NN2lacHBxYmM2K1VvYUhnWVU3UGhoQ0tI?=
+ =?utf-8?B?Y2V1QVg5eEt5VHVaWmdzeTBUdThlcDFrWFZuK3E4aThrbHFNalAzQXZVZVpq?=
+ =?utf-8?B?QkpnZlFBdjkzWDFPWHlXSXp5UGtZZlJHR1BQa3RoRzdBaFVOYVljYTIwM0J2?=
+ =?utf-8?B?UkRHUC9HaCtDczdpTktVMFpYQ2YxSG9ZR05XM3pXWWNGbzFNWG5vWmJqWlVX?=
+ =?utf-8?B?UThBRHNNYWVjZUJyWXJvN2NTNWxPWjJWSzE3Mnd2U1NPK3dIaTVuMW9JQ0xD?=
+ =?utf-8?B?QXNQdlRHU3B1L1JwTHlaQmU3T3hTUkNqSTdFRW96WkdJZ0ltYWl5d3lFb0pY?=
+ =?utf-8?B?SVhMdmVrQzdjeWZOYnJYbjdLbDVjZ3FwdXpsdDVLNnNnUEcxejBnQTBhOS9v?=
+ =?utf-8?B?Ui9rT1RHRVNjejRBU2hmZW1YUytxdFlBUWlRSHlYMkdIa01BZEh3T09ucEx6?=
+ =?utf-8?B?bHZDUmxvYkxWR0VtWmNwUUhMemtrakhrdDJkemZxZlkyK3RRSDBDd2I3M1Q0?=
+ =?utf-8?B?TG40RWw1TXo5R2kvUEFBQ2pCWlZ5ZUJhUkpxZ3FTbVIyaXJyVmx6VXQ0TEpX?=
+ =?utf-8?B?MURQNjlicTJCQWs4clZJM200Kzl2M1dKa0F2cmZYNkxLL2ptNzlZMWY3Z2pT?=
+ =?utf-8?B?Q2JUb1FaMGFLQ3VNNmdJQ3ZSVXZ0OGNHRmkyNDVDa2V4MXhUQk9pL2xETGFp?=
+ =?utf-8?B?NTk4NW1TU1NPN2g1Q3JnMUdXOVJxYVEza2JZV0QyTUNIYW9RbC9JUzdWL1da?=
+ =?utf-8?B?WkdKN1FRQm9xdGQ2TWRXQUlLSlB3Z1dleUFHSDJmWGdKZWUxeExiWlhSUHZJ?=
+ =?utf-8?B?OGMxNmNQN0VzWjNNN1o4VFB0MkZxRk1YWVo4MHZRN3ZmcnorVmN5MUtFSDBz?=
+ =?utf-8?B?aDlUT1R3b0wxT3Y4ZWFuNGhRdm5yWmNoSHZwSXhwUkFMcllNS0ZMelpKRllp?=
+ =?utf-8?Q?1KQcFStqYp+uaPn7+LxbdWz4w?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 640bdd59-29e3-48c9-f9d0-08daa556c472
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2022 15:48:50.9548
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9fETDCW1t9sRHrvF//+OGA14uUxqmitjgQmpHwPit5xXTsO/vfE6jL8PWZiuPRHV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5818
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000e2dce805ea230da4
-Content-Type: text/plain; charset="UTF-8"
+On 10/3/2022 10:31 AM, Namjae Jeon wrote:
+> 2022-10-03 3:11 GMT+09:00, Tom Talpey <tom@talpey.com>:
+>> On 10/1/2022 11:01 PM, Namjae Jeon wrote:
+>>> When disconnected, call ib_drain_qp to cancel all pending work requests
+>>> and prevent ksmbd_conn_handler_loop from waiting for a long time
+>>> for those work requests to compelete.
+>>>
+>>> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+>>> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+>>> ---
+>>>    fs/ksmbd/transport_rdma.c | 2 ++
+>>>    1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
+>>> index 0315bca3d53b..096eda9ef873 100644
+>>> --- a/fs/ksmbd/transport_rdma.c
+>>> +++ b/fs/ksmbd/transport_rdma.c
+>>> @@ -1527,6 +1527,8 @@ static int smb_direct_cm_handler(struct rdma_cm_id
+>>> *cm_id,
+>>>    	}
+>>>    	case RDMA_CM_EVENT_DEVICE_REMOVAL:
+>>>    	case RDMA_CM_EVENT_DISCONNECTED: {
+>>> +		ib_drain_qp(t->qp);
+>>> +
+>>>    		t->status = SMB_DIRECT_CS_DISCONNECTED;
+>>>    		wake_up_interruptible(&t->wait_status);
+>>>    		wake_up_interruptible(&t->wait_reassembly_queue);
+>>
+>> Because we're now flushing the cancelled work requests, don't
+>> we need to also wake up &t->wait_send_pending, to abort any
+>> waiters on the send wq?
+> Could you please elaborate more how it could be a problem ?
+> send_pending is decreased and wake_up &t->wait_send_pending if it is
+> zero in send_done().
 
-updated to include a similar initialization in smb2_calc_signature
+I took another look at __ib_drain_sq() and yes it does put the
+qp into ERR, and only steals the single WR that it itself posted.
+As long as we're not using IB_POLL_DIRECT (which ksmbd isn't), we're
+good.
 
-See attached.
-
-On Mon, Oct 3, 2022 at 10:27 AM Tom Talpey <tom@talpey.com> wrote:
->
-> On 10/3/2022 11:20 AM, Enzo Matsumiya wrote:
-> > On 10/03, Tom Talpey wrote:
-> >> On 10/3/2022 10:53 AM, Enzo Matsumiya wrote:
-> >>> On 10/03, Tom Talpey wrote:
-> >>>> On 10/2/2022 11:54 PM, Steve French wrote:
-> >>>>> shash was not being initialized in one place in smb3_calc_signature
-> >>>>>
-> >>>>> Suggested-by: Enzo Matsumiya <ematsumiya@suse.de>
-> >>>>> Signed-off-by: Steve French <stfrench@microsoft.com>
-> >>>>>
-> >>>>
-> >>>> I don't see the issue. The shash pointer is initialized in both
-> >>>> arms of the "if (allocate_crypto)" block.
-> >>>
-> >>> True, but cifs_alloc_hash() returns 0 if *sdesc is not NULL, so
-> >>> crypto_shash_setkey() got stack garbage as sdesc.
-> >>
-> >> Sorry, I still don't get it.
-> >>
-> >>     if (allocate_crypto) {
-> >>         rc = cifs_alloc_hash("cmac(aes)", &hash, &sdesc);
-> >
-> > I think you're looking at an old HEAD.  We've hit this bug after my
-> > patch 10c6c7b0f060 "cifs: secmech: use shash_desc directly, remove sdesc"
->
-> Aha. But I'm looking at Steve's current cifs-2.6. Where should
-> I be looking?
->
->
-> Tom.
->
->
-> > which changes the above line to:
-> >
-> >          rc = cifs_alloc_hash("cmac(aes)", &shash);
-> >
-> > In that patch, shash is the only struct to be initialized.
-> > cifs_alloc_hash() is:
-> >
-> > cifs_alloc_hash(const char *name, struct shash_desc **sdesc)
-> > {
-> >         int rc = 0;
-> >         struct crypto_shash *alg = NULL;
-> >
-> >         if (*sdesc)
-> >                 return 0;
-> > ...
-> >
-> > Hence, sdesc having the stack garbage, cifs_alloc_hash returns 0 and
-> > crypto_shash_setkey crashes.
-> >
-> >>         if (rc)
-> >>             return rc;
-> >>
-> >>         shash = &sdesc->shash;
-> >>     } else {
-> >>         hash = server->secmech.cmacaes;
-> >>         shash = &server->secmech.sdesccmacaes->shash;
-> >>     }
-> >>
-> >> The "shash" pointer is initialized one line later.
-> >> And, "sdesc" is already initilized to NULL.
-> >>
-> >> Steve's patch initializes "shash", but now you're referring to
-> >> sdesc, and it still looks correct to me. Confused...
-> >>
-> >>>> But if you do want to add this, them smb2_calc_signature has
-> >>>> the same code.
-> >>>
-> >>> True.  Steve will you add it to this patch please?
-> >>
-> >> FYI, smb2_calc_signature() also initializes sdesc, and not shash.
-> >> Does it not oops? Same code.
-> >>
-> >> Tom.
-> >
-
-
-
--- 
-Thanks,
-
-Steve
-
---000000000000e2dce805ea230da4
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-fix-oops-in-calculating-shash_setkey.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-fix-oops-in-calculating-shash_setkey.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l8sxkngu0>
-X-Attachment-Id: f_l8sxkngu0
-
-RnJvbSAxMWIxYzk4ZDA5ODYxYzY1ZDc4MTVmMWRjNDYzMWU0ZWQ2ZWI0NGExIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgMiBPY3QgMjAyMiAyMjowOTo0NSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjM6IGZpeCBvb3BzIGluIGNhbGN1bGF0aW5nIHNoYXNoX3NldGtleQoKc2hhc2ggd2FzIG5vdCBi
-ZWluZyBpbml0aWFsaXplZCBpbiBvbmUgcGxhY2UgaW4gc21iM19jYWxjX3NpZ25hdHVyZQphbmQg
-c21iMl9jYWxjX3NpZ25hdHVyZQoKUmV2aWV3ZWQtYnk6IEVuem8gTWF0c3VtaXlhIDxlbWF0c3Vt
-aXlhQHN1c2UuZGU+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9z
-b2Z0LmNvbT4KLS0tCiBmcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYyB8IDQgKystLQogMSBmaWxlIGNo
-YW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9j
-aWZzL3NtYjJ0cmFuc3BvcnQuYyBiL2ZzL2NpZnMvc21iMnRyYW5zcG9ydC5jCmluZGV4IGRmY2Jj
-YzBiODZlNC4uOGUzZjI2ZTZmNmI5IDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQu
-YworKysgYi9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYwpAQCAtMjE1LDcgKzIxNSw3IEBAIHNtYjJf
-Y2FsY19zaWduYXR1cmUoc3RydWN0IHNtYl9ycXN0ICpycXN0LCBzdHJ1Y3QgVENQX1NlcnZlcl9J
-bmZvICpzZXJ2ZXIsCiAJc3RydWN0IGt2ZWMgKmlvdiA9IHJxc3QtPnJxX2lvdjsKIAlzdHJ1Y3Qg
-c21iMl9oZHIgKnNoZHIgPSAoc3RydWN0IHNtYjJfaGRyICopaW92WzBdLmlvdl9iYXNlOwogCXN0
-cnVjdCBjaWZzX3NlcyAqc2VzOwotCXN0cnVjdCBzaGFzaF9kZXNjICpzaGFzaDsKKwlzdHJ1Y3Qg
-c2hhc2hfZGVzYyAqc2hhc2ggPSBOVUxMOwogCXN0cnVjdCBzbWJfcnFzdCBkcnFzdDsKIAogCXNl
-cyA9IHNtYjJfZmluZF9zbWJfc2VzKHNlcnZlciwgbGU2NF90b19jcHUoc2hkci0+U2Vzc2lvbklk
-KSk7CkBAIC01MzUsNyArNTM1LDcgQEAgc21iM19jYWxjX3NpZ25hdHVyZShzdHJ1Y3Qgc21iX3Jx
-c3QgKnJxc3QsIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwKIAl1bnNpZ25lZCBjaGFy
-ICpzaWdwdHIgPSBzbWIzX3NpZ25hdHVyZTsKIAlzdHJ1Y3Qga3ZlYyAqaW92ID0gcnFzdC0+cnFf
-aW92OwogCXN0cnVjdCBzbWIyX2hkciAqc2hkciA9IChzdHJ1Y3Qgc21iMl9oZHIgKilpb3ZbMF0u
-aW92X2Jhc2U7Ci0Jc3RydWN0IHNoYXNoX2Rlc2MgKnNoYXNoOworCXN0cnVjdCBzaGFzaF9kZXNj
-ICpzaGFzaCA9IE5VTEw7CiAJc3RydWN0IHNtYl9ycXN0IGRycXN0OwogCXU4IGtleVtTTUIzX1NJ
-R05fS0VZX1NJWkVdOwogCi0tIAoyLjM0LjEKCg==
---000000000000e2dce805ea230da4--
+Reviewed-by: Tom Talpey <tom@talpey.com>
