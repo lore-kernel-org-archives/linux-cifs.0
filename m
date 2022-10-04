@@ -2,174 +2,100 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A0BC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  4 Oct 2022 14:03:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5BBC4332F
+	for <linux-cifs@archiver.kernel.org>; Tue,  4 Oct 2022 14:23:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbiJDODJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 4 Oct 2022 10:03:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38716 "EHLO
+        id S229505AbiJDOXL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 4 Oct 2022 10:23:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiJDOC7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Oct 2022 10:02:59 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF335E31E
-        for <linux-cifs@vger.kernel.org>; Tue,  4 Oct 2022 07:02:58 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id y189so8717851iof.5
-        for <linux-cifs@vger.kernel.org>; Tue, 04 Oct 2022 07:02:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=veSFG+pE7CS+m2su6zvynMVka/VajDWy7wGltkDD9Hw=;
-        b=5k8OKLOhaRINEqqXVDFHhHw3Cg3fjzsUNG4Jg6D4ZKxgDanURG2DpIofyE31j8LwyU
-         autyUdXnkuvEH0zn3kJ6CzXZ/z8csKIz1GiSl0vQyD1Y3LVIg/9Gr1SgNDrus4McOBPo
-         lHmvQtEDVEZjeEI9uaGFQFV8MxaKvksPqcdi5bZ2snNGEyWYS9FvMVx6BpAFf742qGfa
-         DP6Bs56DzGl0K+nk3gGbGm2NBCdaOJcnTuoeL2eBofPq7Le3jc0FaAoYjLu+pXSBwOBP
-         T6XATYQnyYtU7PhRnZAHyO07YwnTaKLbFDg8Bp5Y2jCfMK6oa51IDlNd0CU0lFE/QlNq
-         JVFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=veSFG+pE7CS+m2su6zvynMVka/VajDWy7wGltkDD9Hw=;
-        b=awkhp4ZCq3fqW119Gx//R+MofO9Wn5IdHKpVPfg5FYIeK/AvMBTN1UuVMPg2opjbv8
-         GfJVmS9Q8vTEqTRyt7W73nwIbOyJAPMolsdqf+y0Rfh5r0I8f6jYDlGPxCGfosB0KZTI
-         BeTGvQUhX1laEFPfcQ+FdJb9MNWt/5Sq8y/I3YCoNyRTtgl7cUsQU9Z1aUi2WrEtrt0B
-         zGZIJ6qEECAZ5uS2mM2caItdA4e5ajnymRxeKsgPRrBog3MQpxgg6P+HHoJ7eXheBwu7
-         ur4Mf+5pIMrhDc7hnpJWd3jGorzTt8S+RcYuZ9PVMQmoeAzyZG8WOWZCFidvkxDakff2
-         HyZA==
-X-Gm-Message-State: ACrzQf3lXYSjT2kZH0GvSoyw1ant1Gx4cH1iVek6H/BbVWPnzgQKbyj5
-        BvmRELS5a1ZxEE0W8a3IGgFFOg==
-X-Google-Smtp-Source: AMsMyM6uOsQrfCyDCCifEw4umZBjYyOgxegmWSmdP/kxMzjPUvZJ55XcduxvG3uythvzhqWmfBChTw==
-X-Received: by 2002:a05:6638:262:b0:363:375e:4fdd with SMTP id x2-20020a056638026200b00363375e4fddmr4182199jaq.213.1664892177438;
-        Tue, 04 Oct 2022 07:02:57 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id a5-20020a92a305000000b002f64fe8eb62sm4848785ili.45.2022.10.04.07.02.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Oct 2022 07:02:56 -0700 (PDT)
-Message-ID: <feadeb4b-4ad8-7d7e-b78e-44300dbdcc93@kernel.dk>
-Date:   Tue, 4 Oct 2022 08:02:54 -0600
+        with ESMTP id S229468AbiJDOXK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Oct 2022 10:23:10 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA7930F6B;
+        Tue,  4 Oct 2022 07:23:10 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 08A432198D;
+        Tue,  4 Oct 2022 14:23:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1664893389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5gUUNgEDhizGEpFxKtQMBGFV8uYs1I5bUDwiFyCdJPs=;
+        b=Zt/OhUS5ydTQ9UGifRGK41t6GwEwC9hWteg+uA6BanmdxcmrHSUmnRwaax6muvmAzKKREl
+        HvCVf6R1AOho0RNxtGGq8BX7drQ5X+U22DhcXFne3NLKWdoz22LRBr9nP61FvgBdh/CnD2
+        lrLR8nF+sDF1Wgk/6b85JyPAcKbmAGw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1664893389;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5gUUNgEDhizGEpFxKtQMBGFV8uYs1I5bUDwiFyCdJPs=;
+        b=nnwkZhu5TLtAve4z+S1eE5DR29Ezv4gT6tG61WizYluhc4rs1VB3OA9gmZrHP6yk89nLJM
+        fz5UHGvz5kGnMFBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 80A1D139EF;
+        Tue,  4 Oct 2022 14:23:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Ds5VEcxBPGPpdAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Tue, 04 Oct 2022 14:23:08 +0000
+Date:   Tue, 4 Oct 2022 11:23:06 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Muhammad Usama Anjum <usama.anjum@collabora.com>
+Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, kernel@collabora.com,
+        kernel-janitors@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] cifs: remove initialization value
+Message-ID: <20221004142306.ysgh45nhgdo4z3ok@suse.de>
+References: <20221004062333.416225-1-usama.anjum@collabora.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: Problematic interaction of io_uring and CIFS
-Content-Language: en-US
-To:     Fiona Ebner <f.ebner@proxmox.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Enzo Matsumiya <ematsumiya@suse.de>
-Cc:     io-uring@vger.kernel.org, CIFS <linux-cifs@vger.kernel.org>,
-        Thomas Lamprecht <t.lamprecht@proxmox.com>
-References: <af573afc-8f6a-d69e-24ab-970b33df45d9@proxmox.com>
- <20220708174815.3g4atpcu6u6icrhp@cyberdelia>
- <CANT5p=rSKRe_EXFmKS+qRyBo4i9Ko1pcgwxy-B1gugJtKjVAMA@mail.gmail.com>
- <CANT5p=qxYh+VxXpVGd2GO=WJoZ5J_p0oodN+wcFqC43t49pRqA@mail.gmail.com>
- <560586b2-8cd6-7a62-86f2-90e8968d0ad4@proxmox.com>
- <3ea2a6b3-d64d-744f-894b-66fee1242597@proxmox.com>
- <94ff5098-dd66-3c83-0810-d65c7153984d@proxmox.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <94ff5098-dd66-3c83-0810-d65c7153984d@proxmox.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20221004062333.416225-1-usama.anjum@collabora.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/4/22 2:59 AM, Fiona Ebner wrote:
-> Am 26.08.22 um 10:21 schrieb Fiona Ebner:
->> Am 11.07.22 um 15:40 schrieb Fabian Ebner:
->>> Am 09.07.22 um 05:39 schrieb Shyam Prasad N:
->>>> On Sat, Jul 9, 2022 at 9:00 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
->>>>>
->>>>> On Fri, Jul 8, 2022 at 11:22 PM Enzo Matsumiya <ematsumiya@suse.de> wrote:
->>>>>>
->>>>>> On 07/08, Fabian Ebner wrote:
->>>>>>> (Re-sending without the log from the older kernel, because the mail hit
->>>>>>> the 100000 char limit with that)
->>>>>>>
->>>>>>> Hi,
->>>>>>> it seems that in kernels >= 5.15, io_uring and CIFS don't interact
->>>>>>> nicely sometimes, leading to IO errors. Unfortunately, my reproducer is
->>>>>>> a QEMU VM with a disk on CIFS (original report by one of our users [0]),
->>>>>>> but I can try to cook up something simpler if you want.
->>>>>>>
->>>>>>> Bisecting got me to 8ef12efe26c8 ("io_uring: run regular file
->>>>>>> completions from task_work") being the first bad commit.
->>>>>>>
->>
->> I finally got around to taking another look at this issue (still present
->> in 5.19.3) and I think I've finally figured out the root cause:
->>
->> After commit 8ef12efe26c8, for my reproducer, the write completion is
->> added to task_work with notify_method being TWA_SIGNAL and thus
->> TIF_NOTIFY_SIGNAL is set for the task.
->>
->> After that, if we end up in sk_stream_wait_memory() via sock_sendmsg(),
->> signal_pending(current) will evaluate to true and thus -EINTR is
->> returned all the way up to sock_sendmsg() in smb_send_kvec().
->>
->> Related: in __smb_send_rqst() there too is a signal_pending(current)
->> check leading to the -ERESTARTSYS return value.
->>
->> To verify that this is the cause, I wasn't able to trigger the issue
->> anymore with this hack applied (i.e. excluding the TIF_NOTIFY_SIGNAL check):
->>
->>> diff --git a/net/core/stream.c b/net/core/stream.c
->>> index 06b36c730ce8..58e3825930bb 100644
->>> --- a/net/core/stream.c
->>> +++ b/net/core/stream.c
->>> @@ -134,7 +134,7 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
->>>                         goto do_error;
->>>                 if (!*timeo_p)
->>>                         goto do_eagain;
->>> -               if (signal_pending(current))
->>> +               if (task_sigpending(current))
->>>                         goto do_interrupted;
->>>                 sk_clear_bit(SOCKWQ_ASYNC_NOSPACE, sk);
->>>                 if (sk_stream_memory_free(sk) && !vm_wait)
->>
->>
->> In __cifs_writev() we have
->>
->>>     /*
->>>      * If at least one write was successfully sent, then discard any rc
->>>      * value from the later writes. If the other write succeeds, then
->>>      * we'll end up returning whatever was written. If it fails, then
->>>      * we'll get a new rc value from that.
->>>      */
->>
->> so it can happen that collect_uncached_write_data() will (correctly)
->> report a short write when calling ctx->iocb->ki_complete().
->>
->> But QEMU's io_uring backend treats a short write as an -ENOSPC error,
->> which also is a bug? Or does the kernel give any guarantees in that
->> direction?
->>
->> Still, it doesn't seem ideal that the "interrupt" happens and in fact
->> __smb_send_rqst() tries to avoid it, but fails to do so, because of the
->> unexpected TIF_NOTIFY_SIGNAL:
->>>     /*
->>>      * We should not allow signals to interrupt the network send because
->>>      * any partial send will cause session reconnects thus increasing
->>>      * latency of system calls and overload a server with unnecessary
->>>      * requests.
->>>      */
->>>
->>>     sigfillset(&mask);
->>>     sigprocmask(SIG_BLOCK, &mask, &oldmask);
->>
->> Do you have any suggestions for how to proceed?
->>
-> 
-> Ping. The issue is still present in Linux 6.0. Does it make sense to
-> also temporarily unset the task's TIF_NOTIFY_SIGNAL here or is that a
-> bad idea?
+Hi Usama,
 
-You could try setting up with ring with IORING_SETUP_COOP_TASKRUN,
-that'll avoid the TIF_NOTIFY_SIGNAL bits.
+On 10/04, Muhammad Usama Anjum wrote:
+>Don't initialize the rc as its value is being overwritten before its
+>use.
 
--- 
-Jens Axboe
+Being bitten by an unitialized variable bug as recent as 2 days ago, I'd
+say this is a step backwards from the "best practices" POV.
 
+>Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+>---
+> fs/cifs/smb2pdu.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>index 0600f0a07628..2bf43c892ae6 100644
+>--- a/fs/cifs/smb2pdu.c
+>+++ b/fs/cifs/smb2pdu.c
+>@@ -879,7 +879,7 @@ SMB2_negotiate(const unsigned int xid,
+> 	struct smb2_negotiate_rsp *rsp;
+> 	struct kvec iov[1];
+> 	struct kvec rsp_iov;
+>-	int rc = 0;
+>+	int rc;
+> 	int resp_buftype;
+> 	int blob_offset, blob_length;
+> 	char *security_blob;
+>-- 
+>2.30.2
 
+Cheers,
+
+Enzo
