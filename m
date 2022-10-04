@@ -2,100 +2,74 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5BBC4332F
-	for <linux-cifs@archiver.kernel.org>; Tue,  4 Oct 2022 14:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E499C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue,  4 Oct 2022 18:12:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229505AbiJDOXL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 4 Oct 2022 10:23:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42172 "EHLO
+        id S229593AbiJDSMy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 4 Oct 2022 14:12:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbiJDOXK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Oct 2022 10:23:10 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA7930F6B;
-        Tue,  4 Oct 2022 07:23:10 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        with ESMTP id S229861AbiJDSMx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Oct 2022 14:12:53 -0400
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A6CC3ED7F
+        for <linux-cifs@vger.kernel.org>; Tue,  4 Oct 2022 11:12:52 -0700 (PDT)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 08A432198D;
-        Tue,  4 Oct 2022 14:23:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1664893389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 8E8988079F;
+        Tue,  4 Oct 2022 18:12:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1664907171;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5gUUNgEDhizGEpFxKtQMBGFV8uYs1I5bUDwiFyCdJPs=;
-        b=Zt/OhUS5ydTQ9UGifRGK41t6GwEwC9hWteg+uA6BanmdxcmrHSUmnRwaax6muvmAzKKREl
-        HvCVf6R1AOho0RNxtGGq8BX7drQ5X+U22DhcXFne3NLKWdoz22LRBr9nP61FvgBdh/CnD2
-        lrLR8nF+sDF1Wgk/6b85JyPAcKbmAGw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1664893389;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5gUUNgEDhizGEpFxKtQMBGFV8uYs1I5bUDwiFyCdJPs=;
-        b=nnwkZhu5TLtAve4z+S1eE5DR29Ezv4gT6tG61WizYluhc4rs1VB3OA9gmZrHP6yk89nLJM
-        fz5UHGvz5kGnMFBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 80A1D139EF;
-        Tue,  4 Oct 2022 14:23:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Ds5VEcxBPGPpdAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Tue, 04 Oct 2022 14:23:08 +0000
-Date:   Tue, 4 Oct 2022 11:23:06 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, kernel@collabora.com,
-        kernel-janitors@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] cifs: remove initialization value
-Message-ID: <20221004142306.ysgh45nhgdo4z3ok@suse.de>
-References: <20221004062333.416225-1-usama.anjum@collabora.com>
+        bh=CA3gSeST++gzDQ+2eYEm2lpX5LJ4jqanAmPWFRIuzkg=;
+        b=fZ42YL7fD2yTadO1oGKAdZM0cLkkTghjVv5sElhV1vlSJpcYmn2Ddqhb6h4Jaw14KDuxgU
+        MssyplF/EyQEsV0eZp/lIZ8n6FtfkfAmOp6gqD0D+UmQhUhPfHpwx1Urwl/Fasfdie7eYV
+        KusmNeETF8dJPADYePeKH5QUkWQDbeMgDlnTvssA2dfFu2GFBqMwitOkIBVt6lC05sURJH
+        uuAo8twVaGzXZB3BCwic2Ie9y31xYhqu2l+EDP13qKpW8PzjZA89r21QNMxTBBRfh+druC
+        5WWeWod9icYNmI0yXJEOcVU4rWP6ml4KZElPffrpvHWCi8bPfBScAD+DobEdpQ==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH v2 2/2] cifs: fix uninitialised var in smb2_compound_op()
+Date:   Tue,  4 Oct 2022 15:13:25 -0300
+Message-Id: <20221004181325.15207-2-pc@cjr.nz>
+In-Reply-To: <20221004181325.15207-1-pc@cjr.nz>
+References: <20221004181325.15207-1-pc@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20221004062333.416225-1-usama.anjum@collabora.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Usama,
+Fix uninitialised variable @idata when calling smb2_compound_op() with
+SMB2_OP_POSIX_QUERY_INFO.
 
-On 10/04, Muhammad Usama Anjum wrote:
->Don't initialize the rc as its value is being overwritten before its
->use.
+Fixes: 5079f2691f73 ("cifs: improve symlink handling for smb2+")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+---
+ fs/cifs/smb2inode.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Being bitten by an unitialized variable bug as recent as 2 days ago, I'd
-say this is a step backwards from the "best practices" POV.
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index adf71b328f32..a6640e6ea58b 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -415,6 +415,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 						tcon->tid);
+ 		break;
+ 	case SMB2_OP_POSIX_QUERY_INFO:
++		idata = ptr;
+ 		if (rc == 0 && cfile && cfile->symlink_target) {
+ 			idata->symlink_target = kstrdup(cfile->symlink_target, GFP_KERNEL);
+ 			if (!idata->symlink_target)
+-- 
+2.37.3
 
->Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
->---
-> fs/cifs/smb2pdu.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
->index 0600f0a07628..2bf43c892ae6 100644
->--- a/fs/cifs/smb2pdu.c
->+++ b/fs/cifs/smb2pdu.c
->@@ -879,7 +879,7 @@ SMB2_negotiate(const unsigned int xid,
-> 	struct smb2_negotiate_rsp *rsp;
-> 	struct kvec iov[1];
-> 	struct kvec rsp_iov;
->-	int rc = 0;
->+	int rc;
-> 	int resp_buftype;
-> 	int blob_offset, blob_length;
-> 	char *security_blob;
->-- 
->2.30.2
-
-Cheers,
-
-Enzo
