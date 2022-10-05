@@ -2,149 +2,80 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C29F0C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Oct 2022 03:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A3B7C433FE
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 Oct 2022 05:17:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230164AbiJEDfC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 4 Oct 2022 23:35:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46326 "EHLO
+        id S229817AbiJEFRr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Oct 2022 01:17:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230165AbiJEDej (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Oct 2022 23:34:39 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D27376440;
-        Tue,  4 Oct 2022 20:30:32 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id k2so2850606ejr.2;
-        Tue, 04 Oct 2022 20:30:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=AhtD3Nxeo233ijtaBGAkFch/kfp5ptj7ps5Ve0jS3rE=;
-        b=PwXAORUakcWhQUOq+9BdIiqm5+8hgckUXnhGYtenuGEQKFD2WR5BXzI0aZjcNWIcW2
-         MLfOfhA+zo30sbiASXK/KLXM7FVB5qiT46CvHWSYUYXZIUCwbK8JUuWjm8j1dqxJnfaO
-         /nvIQ4pO5tXkPmtMW1vMP8jbeiHjGBgtPJVfICYQYeZUbBdxblgGPg0ofZDan4t6vOhp
-         luGdjgmmxpJ+ExWCcy6VEx4YfvNhXk5ezdF/APujX0Xj4TsXwz5o3WUacfKba0nHvGId
-         tGi/n/EKJUpVUzgz8LTcQyCO2q2fBEEAnWBYPYHfNthW7BfVU+1wKMcg3ZYDDrqXzu35
-         YUSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AhtD3Nxeo233ijtaBGAkFch/kfp5ptj7ps5Ve0jS3rE=;
-        b=yNjIJBDm8R0aEQahc4jXeztosRgJdsaK9Q3SoqIhMlzUkUeDtYQdoSSpqaxhwIVgSp
-         n5OHb046teQonXEmNDYsJuBofSHjpLLepdYEBI7+9KtTURjCLEKL3QhMfzwH/Ho2OTmt
-         CKUGaHQU6Q5MIIbBxoe2rcn9Ut9azi4zMJMJWg0iTigxZ98lD7ow1CdBpCKO/RryZ+x7
-         iJgDzTZPUBrP3lbuy2Y5J2Hlo9lqhV3DGqUqu0XcfDnKuEjzFMo3J8wnCiWONQn2Q1Dn
-         Wp0ivW3fKbUMFp2wV4KI/oVK9rJCEnVeM9Mp4TD7KSr+2+RovnEbaPW0YIfw9JYFyMdI
-         eirw==
-X-Gm-Message-State: ACrzQf3Kyez85U7cFoPUciuJHCGiCPaiN63TJ/X3xegV5EINg5Z/4qlb
-        4oRc+alCuaXu9sUgpm/e5tYoKy0v5jTS6CCLFCw=
-X-Google-Smtp-Source: AMsMyM5A5Rg0fahdHRX2NmyF9xDhTtT+izdF3OpQ519ZZD4mACJaPW88EtlUSodvSQxp8WVYYjo2cDNK1yEUWgDtkB8=
-X-Received: by 2002:a17:907:7b95:b0:731:113a:d7a2 with SMTP id
- ne21-20020a1709077b9500b00731113ad7a2mr21333233ejc.377.1664940624371; Tue, 04
- Oct 2022 20:30:24 -0700 (PDT)
+        with ESMTP id S229689AbiJEFRq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Oct 2022 01:17:46 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 068CC66A68;
+        Tue,  4 Oct 2022 22:17:44 -0700 (PDT)
+Received: from [192.168.10.9] (unknown [39.45.36.108])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: usama.anjum)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 4B77B66022AB;
+        Wed,  5 Oct 2022 06:17:41 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1664947063;
+        bh=Addv98tABUtrkD/Cgnp+ahnU5GCS4OSD2Wq6YkM6lXw=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=G6yezMwaGIsWK6qDr+RtFaaTZLyc75nn9QOHRd3Yf6pHvsol9rAZcBLfdTpUT82Pv
+         IYY4pfb9a/jAvaBXuY0kGlz49M+Ow0um46SAWm7HZtMEw7EfdJD6qaZMs4RZddO+5R
+         ABCLgqAi7v+awY4eMVzCRBHQb0EV7FYyy8HMbOYt3KGmQv+Lx0aeFswmM4VthwGfcT
+         06wSeYjgIZuKXb+QF0CM2eXhde3QJB995b1Ss/8RxdqZE+bmGA1coQMTeuXLX6npWd
+         bT7I/sHJhj307G5g7ER643GL70sFFwY3lIic5Gwr15vopov22Sz0HoYTVVHaUsg6yi
+         8qA1fNTpyKkpg==
+Message-ID: <1f5c25d6-ca8f-1e6d-b451-9f9074056cb0@collabora.com>
+Date:   Wed, 5 Oct 2022 10:17:36 +0500
 MIME-Version: 1.0
-References: <YzzjKyHDuFoQAVCu@work>
-In-Reply-To: <YzzjKyHDuFoQAVCu@work>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Wed, 5 Oct 2022 13:30:11 +1000
-Message-ID: <CAN05THRcwWjJiYyBdVuVZrvqgK4VP7LKiNQ=XVMg5oOy5u9kzg@mail.gmail.com>
-Subject: Re: [PATCH][next] cifs: Replace a couple of one-element arrays with
- flexible-array members
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH 2/2] cifs: check returned value for error
+Content-Language: en-US
+To:     Paulo Alcantara <pc@cjr.nz>, Steve French <sfrench@samba.org>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Tom Talpey <tom@talpey.com>
+Cc:     kernel@collabora.com, kernel-janitors@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org
+References: <20221004062333.416225-1-usama.anjum@collabora.com>
+ <20221004062333.416225-2-usama.anjum@collabora.com> <87lepv4dm3.fsf@cjr.nz>
+From:   Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <87lepv4dm3.fsf@cjr.nz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 5 Oct 2022 at 12:31, Gustavo A. R. Silva <gustavoars@kernel.org> wrote:
->
-> One-element arrays are deprecated, and we are replacing them with flexible
-> array members instead. So, replace one-element arrays with flexible-array
-> member in structs negotiate_req and extended_response, and refactor the
-> rest of the code, accordingly.
->
-> Also, make use of the DECLARE_FLEX_ARRAY() helper to declare flexible
-> array member EncryptionKey in union u. This new helper allows for
-> flexible-array members in unions.
->
-> Change pointer notation to proper array notation in a call to memcpy()
-> where flexible-array member DialectsArray is being used as destination
-> argument.
->
-> Important to mention is that doing a build before/after this patch results
-> in no binary output differences.
+On 10/5/22 12:01 AM, Paulo Alcantara wrote:
+> Muhammad Usama Anjum <usama.anjum@collabora.com> writes:
+> 
+>> smb311_decode_neg_context() can return error. Its return value should be
+>> checked for errors.
+>>
+>> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+>> ---
+>>   fs/cifs/smb2pdu.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>> index 2bf43c892ae6..c6e37352dbe1 100644
+> 
+> This patch doesn't apply in Steve's for-next branch[1].  If it still
+> makes sense, please rebase and resend.
+> 
+> [1] git://git.samba.org/sfrench/cifs-2.6.git
+I've just applied on the latest next next-20221004 tag. This patch 
+doesn't apply. It seems some other patch has merged and this patch isn't 
+needed.
 
-Looks good to me.
-Reviewed-by me
-
-Thanks for verifying that it does not change the binary utput.
-
->
-> This helps with the ongoing efforts to tighten the FORTIFY_SOURCE
-> routines on memcpy() and help us make progress towards globally
-> enabling -fstrict-flex-arrays=3 [1].
->
-> Link: https://github.com/KSPP/linux/issues/79
-> Link: https://github.com/KSPP/linux/issues/229
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101836 [1]
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
->  fs/cifs/cifspdu.h | 7 ++++---
->  fs/cifs/cifssmb.c | 2 +-
->  2 files changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-> index aeba371c4c70..d1abaeea974a 100644
-> --- a/fs/cifs/cifspdu.h
-> +++ b/fs/cifs/cifspdu.h
-> @@ -483,7 +483,7 @@ put_bcc(__u16 count, struct smb_hdr *hdr)
->  typedef struct negotiate_req {
->         struct smb_hdr hdr;     /* wct = 0 */
->         __le16 ByteCount;
-> -       unsigned char DialectsArray[1];
-> +       unsigned char DialectsArray[];
->  } __attribute__((packed)) NEGOTIATE_REQ;
->
->  #define MIN_TZ_ADJ (15 * 60) /* minimum grid for timezones in seconds */
-> @@ -508,13 +508,14 @@ typedef struct negotiate_rsp {
->         __u8 EncryptionKeyLength;
->         __u16 ByteCount;
->         union {
-> -               unsigned char EncryptionKey[1]; /* cap extended security off */
-> +               /* cap extended security off */
-> +               DECLARE_FLEX_ARRAY(unsigned char, EncryptionKey);
->                 /* followed by Domain name - if extended security is off */
->                 /* followed by 16 bytes of server GUID */
->                 /* then security blob if cap_extended_security negotiated */
->                 struct {
->                         unsigned char GUID[SMB1_CLIENT_GUID_SIZE];
-> -                       unsigned char SecurityBlob[1];
-> +                       unsigned char SecurityBlob[];
->                 } __attribute__((packed)) extended_response;
->         } __attribute__((packed)) u;
->  } __attribute__((packed)) NEGOTIATE_RSP;
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 7aa91e272027..7a808e41b1b8 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -465,7 +465,7 @@ CIFSSMBNegotiate(const unsigned int xid,
->         for (i = 0; i < CIFS_NUM_PROT; i++) {
->                 size_t len = strlen(protocols[i].name) + 1;
->
-> -               memcpy(pSMB->DialectsArray+count, protocols[i].name, len);
-> +               memcpy(&pSMB->DialectsArray[count], protocols[i].name, len);
->                 count += len;
->         }
->         inc_rfc1001_len(pSMB, count);
-> --
-> 2.34.1
->
+Can you apply only the first patch "[PATCH 1/2] cifs: remove 
+initialization value" from this series? Or should I send that only as v2?
