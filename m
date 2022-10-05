@@ -2,90 +2,115 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E78C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Oct 2022 23:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF39CC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 Oct 2022 23:37:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbiJEXaS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Oct 2022 19:30:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34684 "EHLO
+        id S229548AbiJEXhq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Oct 2022 19:37:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbiJEXaR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Oct 2022 19:30:17 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67DFC1E3F3;
-        Wed,  5 Oct 2022 16:30:16 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S229461AbiJEXhp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Oct 2022 19:37:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 307047287D
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Oct 2022 16:37:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4MjW5G6B6Cz4wgr;
-        Thu,  6 Oct 2022 10:30:10 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1665012611;
-        bh=Ay0T0Tx20yVNUfLNefILtCXTS32TYJJWEuMJ5kdlIuI=;
-        h=Date:From:To:Cc:Subject:From;
-        b=sYp62zPMLCSkDCeOhJLL0NLJGBxjhporQbTE4z2RXnfTj8DIScf9rjw5VGMfhVA//
-         3NnKPkbSRqvrJBC6QeJIMI6dqAUo/z38PBCZXQciAIxI+ZNWQ/px9KknV0A518fRdH
-         y/cl/WoLGGjuxv8hHutvuQBSGKX0jsqXPnpCSOH7XHsvAy0ERGv1+6RRHLGo2K964l
-         +KS4AbuF8lfrNNIDjvOQ4AmETtLqaroohV5Fu2SWjSMTt35n32JYuBggQ450UFuwlg
-         9MhgECMjswwUC8WXYmIdx/RNr7RculVEnPU6eF6tkHVoX5uYxtR/w2DzXkBvRgZfwJ
-         sxzmM3nduqzOA==
-Date:   Thu, 6 Oct 2022 10:30:09 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Paulo Alcantara <pc@cjr.nz>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the cifs tree
-Message-ID: <20221006103009.35fca676@canb.auug.org.au>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AFF34617F0
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Oct 2022 23:37:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BCBEC433D6
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Oct 2022 23:37:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665013063;
+        bh=bOSnOU3FYTrdAJaTvOIWM6GkLXsaVv4T6vqWFqr98xI=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=FdJlxUyXcT/mv1xpttgckmbjRQaCIH3zMmEJk9w/NiUzybPVvJoXmasWOcPFqHFJn
+         NafewowAt4pagzziuQqAQ0RHV4P4dPK5VJzLjj0J1N71UJcVq+kota5aJIOIHmnk6G
+         hSSVuaSAoweg2B7NYMxj2tbz6uT8I7f7PJD5ASsJ705rbaoukEtdUFkSWqiARpvPUu
+         /a0tGIClzBgK7ZrVFiw6CV1ehlxWJfo56dIJRTuUS5+8hqN3WaIFUYa3i4eE274roB
+         rVORNA9Zi9lwsFXPEQvORF9rjkPHik4UGL0raYkgYBB4fC+QdH+hJRJVR5zY11YDah
+         NSfB8M4FKgIPQ==
+Received: by mail-oo1-f46.google.com with SMTP id c13-20020a4ac30d000000b0047663e3e16bso333529ooq.6
+        for <linux-cifs@vger.kernel.org>; Wed, 05 Oct 2022 16:37:42 -0700 (PDT)
+X-Gm-Message-State: ACrzQf0B+qOy5i8Pm1KqOjVfmi7DRMo1Y1/lk3bmgPo9vn8rV0slbW+n
+        03nC0/DpLFI9Ned7dZXxWScdjZt1g/A5YX5HwO8=
+X-Google-Smtp-Source: AMsMyM5V/jF5axgVi9Iux01mjDik/5ZSXSKshHPoqt4VnzzIP4hWS0F0dyAC2+VqPARy8YtPGqTQSFpPs+R1d9RrOnc=
+X-Received: by 2002:a9d:4b0b:0:b0:660:f380:8780 with SMTP id
+ q11-20020a9d4b0b000000b00660f3808780mr465119otf.339.1665013062167; Wed, 05
+ Oct 2022 16:37:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/=C4nS_7ieDqa=xSRJrhl_HL";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Received: by 2002:a05:6838:ea0c:0:0:0:0 with HTTP; Wed, 5 Oct 2022 16:37:41
+ -0700 (PDT)
+In-Reply-To: <CAH2r5mvmYgfDQ4aYGJf+_1fC9aW4HCRVtm92dQe5CvAtc-5NOg@mail.gmail.com>
+References: <CAH2r5ms9NbH+_ruMke+ezYo-7+qZuinrP_SQbHxf3E3ikxnN0A@mail.gmail.com>
+ <CAH2r5mvmYgfDQ4aYGJf+_1fC9aW4HCRVtm92dQe5CvAtc-5NOg@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 6 Oct 2022 08:37:41 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9Pso5=OeCHQqSKD_8jw1N+7HwVh=rsGgEzJgwdXPMGPw@mail.gmail.com>
+Message-ID: <CAKYAXd9Pso5=OeCHQqSKD_8jw1N+7HwVh=rsGgEzJgwdXPMGPw@mail.gmail.com>
+Subject: Re: build failures on 6.0
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/=C4nS_7ieDqa=xSRJrhl_HL
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Steve,
 
-Hi all,
+The kernel was built by: x86_64-linux-gnu-gcc (Ubuntu 12.2.0-3ubuntu1) 12.2=
+.0
+  You are using:           gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0
 
-In commit
+Have you ever tried to do make clean and make again ?
+It seems that you upgraded ubuntu before ... ? the version looks different.
 
-  395381a6c0f7 ("cifs: fix uninitialised var in smb2_compound_op()")
+Thanks!
 
-Fixes tag
 
-  Fixes: 5079f2691f73 ("cifs: improve symlink handling for smb2+")
-
-has these problem(s):
-
-  - Target SHA1 does not exist
-
-Maybe you meant
-
-Fixes: d689449ef101 ("cifs: improve symlink handling for smb2+")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/=C4nS_7ieDqa=xSRJrhl_HL
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmM+E4EACgkQAVBC80lX
-0GzgvQf9EpIazNc/Y7366uEQcZmSsMXh9uoIzcFm99bL6HadElbpaFkwS4n8JWNm
-RHbVfmwwZyVTzapWM4FOjYafJejUR+oeCfGlzZNEpMd/09PA4db/j457ZjmMtARL
-aDI21FpLgnoicoHqkNEcxJHaa4B8RIJVyb9SyURBor0tZqFC0Qtuerh3phkVIVw0
-ENYl+sZMkzpUpvOjnytpE28fxK1TiPf5fEd/kdl0JyrqJzDFmcDPx2CHVfEvkg5J
-TbHtJnzK9BvdS3XT2tSyNbgkq5qJfwHK82BKxzIWyItGt0h8NsMUvdSgjmm0zbx1
-6WBQrY+hEj8MfhzrkClUV40rS38PEg==
-=o4OJ
------END PGP SIGNATURE-----
-
---Sig_/=C4nS_7ieDqa=xSRJrhl_HL--
+2022-10-06 8:02 GMT+09:00, Steve French <smfrench@gmail.com>:
+> This is actually ubuntu 22.04 which fails building out of tree modules
+> (as we do for testing) on 6.0-rc7 (last working one was 6.0-rc3) and
+> later
+>
+> On Wed, Oct 5, 2022 at 6:00 PM Steve French <smfrench@gmail.com> wrote:
+>>
+>> I noticed that 6.0-rc7 and later don't build out of tree modules (was
+>> trying to setup ksmbd for running buildbot tests).  Any ideas about
+>> this "unrecognized command-line option" for gcc error (this is on
+>> Ubuntu)
+>>
+>> smfrench@ubuntu20-ksmbd-target:~/smb3-kernel/fs/ksmbd$ ~/build-stock-cif=
+s
+>> make: Entering directory '/usr/src/linux-headers-6.0.0-060000-generic'
+>> warning: the compiler differs from the one used to build the kernel
+>>   The kernel was built by: x86_64-linux-gnu-gcc (Ubuntu 12.2.0-3ubuntu1)
+>> 12.2.0
+>>   You are using:           gcc (Ubuntu 11.2.0-19ubuntu1) 11.2.0
+>>   CC [M]  /home/smfrench/smb3-kernel/fs/ksmbd/unicode.o
+>> gcc: error: unrecognized command-line option
+>> =E2=80=98-ftrivial-auto-var-init=3Dzero=E2=80=99
+>> make[1]: *** [scripts/Makefile.build:249:
+>> /home/smfrench/smb3-kernel/fs/ksmbd/unicode.o] Error 1
+>> make: *** [Makefile:1858: /home/smfrench/smb3-kernel/fs/ksmbd] Error 2
+>> make: Leaving directory '/usr/src/linux-headers-6.0.0-060000-generic'
+>> smfrench@ubuntu20-ksmbd-target:~/smb3-kernel/fs/ksmbd$ uname -a
+>> Linux ubuntu20-ksmbd-target 6.0.0-060000-generic #202210022231 SMP
+>> PREEMPT_DYNAMIC Sun Oct 2 22:35:09 UTC 2022 x86_64 x86_64 x86_64
+>> GNU/Linux
+>>
+>>
+>> --
+>> Thanks,
+>>
+>> Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
+>
