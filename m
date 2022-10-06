@@ -2,86 +2,162 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1B9C433FE
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Oct 2022 18:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 962C9C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Oct 2022 23:53:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231657AbiJFSTq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 6 Oct 2022 14:19:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41184 "EHLO
+        id S232208AbiJFXxQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 6 Oct 2022 19:53:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231796AbiJFSTl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Oct 2022 14:19:41 -0400
-Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4276F616A
-        for <linux-cifs@vger.kernel.org>; Thu,  6 Oct 2022 11:19:40 -0700 (PDT)
-Received: by mail-vs1-xe31.google.com with SMTP id n186so2830905vsc.9
-        for <linux-cifs@vger.kernel.org>; Thu, 06 Oct 2022 11:19:40 -0700 (PDT)
+        with ESMTP id S232161AbiJFXxQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Oct 2022 19:53:16 -0400
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA6760489;
+        Thu,  6 Oct 2022 16:53:15 -0700 (PDT)
+Received: by mail-ua1-x934.google.com with SMTP id p89so1172590uap.12;
+        Thu, 06 Oct 2022 16:53:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date;
-        bh=lZAn0nc20ZSyu2thsRn/Tj7cNaQyvi2UZJAOsvF4BlQ=;
-        b=daGdrzrc5o5rRc5vGwqSwIeYm7Mh1AZPs0ePiUur68WtEzHBcIhLpPaJtCLqBbBuM7
-         4qtpTomSrvmIXsREz+y0Z6/XRuHKpCO4rAKUZKl9cEBx5tEvV/mDhs3g+7ERCBg0vRsf
-         nlCkJiFFxzkbMmkmHO/QqkXmSvbVxK5SBhXFgMPYJX37CuzZ8SvobF1bkPimRDckXk7C
-         MrulpME8IKzrnUBKjdaklB8j/3WSFl9mEyeYiJgYRXdh0UXkwUTS9BGGKueuOPsfPlsf
-         iXo57iwc838tM+ulwWFZNzKGOdPvIyH7girRGj954WxCTiAlAYrekLuq4lTpa9Kj3qYt
-         TFZQ==
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date;
+        bh=QaPt7Sx7U2CASqlnTSCIDEhsb4pzTZJD0EMmYjUa7Dw=;
+        b=U62SMnXBt3hvhlAz6O+Cjknk8+V4UxaNHZEeWgERgHHGR0G/Q1uleIarOySYsIiQuN
+         yGAwgGiqDZQ/YBvH8UHVKtas886qk9pdS72vwsxa85+eA+xHSu2iRKLLdFiyNQSmcbJb
+         N869mG2vE6bSsoOnVs0ubwGSJpuVHaL3aGWzaT/KVCf14Xc+LzGxSjl1eTtdBOdFX3rs
+         m7w+F6h+z8IC8l0twl5mjFvwU/Tvy6CUigrlpslDm0rmDzaD+Kv6v9FmfTkqoJth61op
+         my2eGsY4bgTz1lzvwC/6ccYWex4nNOAuyoITO232fXqVSvRGuG1Z2CWONdwbLdFwZySe
+         XXOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=lZAn0nc20ZSyu2thsRn/Tj7cNaQyvi2UZJAOsvF4BlQ=;
-        b=Yb8mWenWJ7DkJHgvDIjwVJibDSWUi0UXPKDMS1bpQrMxteWDUntKSfcTDautXw/Dfk
-         zhgcTsZJ9lorNAxeQfTH7R9sCZXOYaUhcS+OMMyt4T+h4xsCBZxhiXMDm6Xl4cYprjKc
-         1d1+cWKivG9hs+QFrT8OeYFUqfBFWRsnY6vv4hfQBgN7LMmoIQ5f1Doc5MDVkZuVG0sD
-         rjG5lgsqflVwGJ+T0W8922zY8C2E0tpcEktWStJPn4Ou90FOnM87e8hvi5ce8UiUQ8jT
-         aEkLMZ2oWngs3eiFaxwLro2CeQ7caYZeoicJsQRoxTDnsFSh9blrAMU6dT54NsU+CPSY
-         5Vxw==
-X-Gm-Message-State: ACrzQf3FKy073JUxNZthOuO/mh/c1R75IJ66T4/l1CAEgc5qsyp9zGms
-        Nkc6ZF6NMmverTLKo4kcsM8n6QXGM1uYp11z0V4=
-X-Google-Smtp-Source: AMsMyM6LYZHChCSVA4dq/kWFMPqdj1yU9NVfw9/LfL+G6tUmcWQr9ydPOFLl4HZLj33v/3O5XKIqdCOZeoPfa6b8wFw=
-X-Received: by 2002:a67:f603:0:b0:3a6:ff45:997e with SMTP id
- k3-20020a67f603000000b003a6ff45997emr877666vso.6.1665080379233; Thu, 06 Oct
- 2022 11:19:39 -0700 (PDT)
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=QaPt7Sx7U2CASqlnTSCIDEhsb4pzTZJD0EMmYjUa7Dw=;
+        b=74ZgCN8RnR+9aCZoJoLUi8Xbaz8EMtBovjJDEtnCPLjSKN6ZEC5OvEUm0lvlUmV9LR
+         cYbbzON8APdZ1VOwn1RVoI+eZs6KWSX619JM5INGz6lhU9AbdZstS79NSQKZmOfS9PR2
+         kxjEao7i0WGau94A5gGXyKlQTFRD9Wu3053UHIsW+7LojPeRaJ4in0N2fp4LSgdw8yFE
+         ZwIrHvH6hbhS42gXvoiPkT2FUjR+bnyfMLi9ai/Co9H/4JGXDX0jgeXZpM6yw9/CvSMm
+         cbiqerQWUF1lun9G9HkAFkk9CZnjwNjSr+pGGYeKm75eU3L6IKYrZk4jR9HX39HUZNAO
+         XQvw==
+X-Gm-Message-State: ACrzQf2R7N90WCxm0m2sjdrdqeAQRAMXXxl8AcG6tB3Y00QnMeFtB8OC
+        ufUvUxMUwJZs5vFA3RpQqDhkRwPd5IDk6F0tuYW8pNdLgrc=
+X-Google-Smtp-Source: AMsMyM4FmuoT7wT3Td6eRFSGGXrT4+p77sxMe8rs6Bc4gIZmGdK8ufUQd6LNtfwm1VlTHUCmF4FmjCXTatTvkhmDq/I=
+X-Received: by 2002:ab0:6494:0:b0:3da:7cac:c48d with SMTP id
+ p20-20020ab06494000000b003da7cacc48dmr1532942uam.96.1665100393941; Thu, 06
+ Oct 2022 16:53:13 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 6 Oct 2022 13:19:28 -0500
-Message-ID: <CAH2r5mtt7TCJJ12nzSF3NeZpBwV9wbu03N4amGhhY7mGL90T2g@mail.gmail.com>
-Subject: missing multichannel crediting patch in Linux client
-To:     samba-technical <samba-technical@lists.samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Thu, 6 Oct 2022 18:53:02 -0500
+Message-ID: <CAH2r5mtx9gsG01JDMWakP0o-76rzyX_YKzbgVdZZwboaVVDF3g@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Was looking through old patches and noticed one from Aurelien that
-looks important but didn't seem to get incorporated into the current
-pick_channel code on the client.
-It looks like without this patch we could have cases where we assigned
-requests to a channel which was out of credits rather than one with
-enough credits.
-round robin channel allocation is probably fine for many cases except
-when other channels have more credits and this channel is short of
-credits.  Thoughts?
-It might explain some of the perf problems we see with multichannel
-not scaling as well as expected on some workloads
+Please pull the following changes since commit
+4fe89d07dcc2804c8b562f6c7896a45643d34b2f:
 
-"Subject: [PATCH] cifs: try to pick channel with a minimum of credits
+  Linux 6.0 (2022-10-02 14:09:07 -0700)
 
-Check channel credits to prevent the client from using a starved
-channel that cannot send anything.
+are available in the Git repository at:
 
-Special care must be taken in selecting the minimum value: when
-channels are created they start off with a small amount that slowly
-ramps up as the channel gets used. Thus a new channel might never be
-picked if the min value is too big.
+  git://git.samba.org/ksmbd.git tags/6.1-rc-ksmbd-fixes
 
+for you to fetch changes up to f5ba1cdaf5eb380e148183bda06d4844b457d095:
 
--- 
+  ksmbd: validate share name from share config response (2022-10-05
+01:15:44 -0500)
+
+----------------------------------------------------------------
+24 ksmbd server fixes, including 4 for stable
+- RDMA (smbdirect fixes)
+- Fixes for SMB3.1.1 POSIX Extensions (especially for id mapping)
+- various casemapping fixes for mount and lookup
+- UID mapping fixes
+- Fix confusing error message
+- Negotiate protocol fixes, including NTLMSSP fix
+- Two encryption fixes
+- directory listing fix
+- some cleanup fixes
+
+----------------------------------------------------------------
+Al Viro (3):
+      ksmbd: don't open-code file_path()
+      ksmbd: don't open-code %pD
+      ksmbd: constify struct path
+
+Atte Heikkil=C3=A4 (3):
+      ksmbd: casefold utf-8 share names and fix ascii lowercase conversion
+      ksmbd: make utf-8 file name comparison work in __caseless_lookup()
+      ksmbd: validate share name from share config response
+
+Christian Brauner (1):
+      ksmbd: port to vfs{g,u}id_t and associated helpers
+
+Hyunchul Lee (1):
+      MAINTAINERS: remove Hyunchul Lee from ksmbd maintainers
+
+Micka=C3=ABl Sala=C3=BCn (1):
+      ksmbd: Fix user namespace mapping
+
+Namjae Jeon (12):
+      ksmbd: remove generic_fillattr use in smb2_open()
+      MAINTAINERS: Add Tom Talpey as ksmbd reviewer
+      ksmbd: fix incorrect handling of iterate_dir
+      ksmbd: update documentation
+      ksmbd: change security id to the one samba used for posix extension
+      ksmbd: set file permission mode to match Samba server posix
+extension behavior
+      ksmbd: fill sids in SMB_FIND_FILE_POSIX_INFO response
+      ksmbd: fix endless loop when encryption for response fails
+      ksmbd: fix encryption failure issue for session logoff response
+      ksmbd: set NTLMSSP_NEGOTIATE_SEAL flag to challenge blob
+      ksmbd: hide socket error message when ipv6 config is disable
+      ksmbd: call ib_drain_qp when disconnected
+
+Tom Talpey (2):
+      ksmbd: decrease the number of SMB3 smbdirect server SGEs
+      ksmbd: reduce server smbdirect max send/receive segment sizes
+
+Zhang Xiaoxu (1):
+      ksmbd: Fix wrong return value and message length check in smb2_ioctl(=
+)
+
+ Documentation/filesystems/cifs/ksmbd.rst |  42 +++++++++++++++-------
+ MAINTAINERS                              |   2 +-
+ fs/ksmbd/auth.c                          |  15 +++++---
+ fs/ksmbd/auth.h                          |   3 +-
+ fs/ksmbd/connection.c                    |   8 +++++
+ fs/ksmbd/connection.h                    |   2 ++
+ fs/ksmbd/ksmbd_netlink.h                 |   3 +-
+ fs/ksmbd/mgmt/share_config.c             |  36 +++++++++++--------
+ fs/ksmbd/mgmt/share_config.h             |   4 ++-
+ fs/ksmbd/mgmt/tree_connect.c             |   6 ++--
+ fs/ksmbd/mgmt/tree_connect.h             |   2 +-
+ fs/ksmbd/misc.c                          |  46 +++++++++++++++++++-----
+ fs/ksmbd/misc.h                          |   5 +--
+ fs/ksmbd/ndr.c                           |   8 +++--
+ fs/ksmbd/oplock.c                        |  27 +++++++++-----
+ fs/ksmbd/server.c                        |   4 +--
+ fs/ksmbd/smb2pdu.c                       | 126
++++++++++++++++++++++++++++++++++++++---------------------------
+ fs/ksmbd/smb2pdu.h                       |   7 ++--
+ fs/ksmbd/smb_common.c                    |   6 ++--
+ fs/ksmbd/smbacl.c                        |  12 ++++---
+ fs/ksmbd/smbacl.h                        |  18 +++++-----
+ fs/ksmbd/transport_rdma.c                |   8 +++--
+ fs/ksmbd/transport_tcp.c                 |   3 +-
+ fs/ksmbd/unicode.h                       |   3 +-
+ fs/ksmbd/vfs.c                           |  36 ++++++++++++-------
+ fs/ksmbd/vfs.h                           |   4 ++-
+ 26 files changed, 284 insertions(+), 152 deletions(-)
+
+--=20
 Thanks,
 
 Steve
