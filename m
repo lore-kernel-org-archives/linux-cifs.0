@@ -2,69 +2,118 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 846C3C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Oct 2022 17:00:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6639C433FE
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Oct 2022 19:25:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229694AbiJGRA0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 Oct 2022 13:00:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35354 "EHLO
+        id S229543AbiJGTZm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 Oct 2022 15:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230307AbiJGRAJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Oct 2022 13:00:09 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F3B48C82;
-        Fri,  7 Oct 2022 10:00:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S230203AbiJGTYf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Oct 2022 15:24:35 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECE912627;
+        Fri,  7 Oct 2022 12:23:03 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EDA5D61DC3;
-        Fri,  7 Oct 2022 17:00:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B1C12C433D6;
-        Fri,  7 Oct 2022 17:00:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665162007;
-        bh=SC2a3JVItge5TlMNxCwk6LePOtjoCGZXyocybFuyczs=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=RGYOFvIzPS3IkWj4mQ1yjibGoVDoU+5bjXw/RGxcKuQ7xQ+5W0JF9LUnRTL1tA3sB
-         hoLJKPhAwOLEuJWIXfrga3ZOPaYeB7G/tqnY0PpC9NrfDNIKCX2SonZxDuCdEdVmgw
-         CsZrSQY08RsFF+eYmPOSGgFSyRcsBLbKyMhyZLgYEdg9CDVveGp/S4Al+/P2gr5aDb
-         Xx+FSnGVIU9TvTwdl13z7ICyLVVftPDFGckTv9BR3zdPS5wYMk4VWkjvg6hbkDzgSw
-         XThXIUYrRr7ORjSA3FEjbRY9waykFOB6Bm2CBjiACTPWAz0mRtWGhbctbD9LA0NmOY
-         RIdSf9VsMSMzQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F841E2A05C;
-        Fri,  7 Oct 2022 17:00:07 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtx9gsG01JDMWakP0o-76rzyX_YKzbgVdZZwboaVVDF3g@mail.gmail.com>
-References: <CAH2r5mtx9gsG01JDMWakP0o-76rzyX_YKzbgVdZZwboaVVDF3g@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtx9gsG01JDMWakP0o-76rzyX_YKzbgVdZZwboaVVDF3g@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.1-rc-ksmbd-fixes
-X-PR-Tracked-Commit-Id: f5ba1cdaf5eb380e148183bda06d4844b457d095
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9f4b9beeb9cf46c4b172fca06de5bd6831108641
-Message-Id: <166516200762.22254.17760102843865160723.pr-tracker-bot@kernel.org>
-Date:   Fri, 07 Oct 2022 17:00:07 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D5F6D1F7AB;
+        Fri,  7 Oct 2022 19:23:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1665170581; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5C9GlnWH2PQfTnwA7VvBSXTuKeGaXDov8qfQoZWnQ2Q=;
+        b=NSxASkEeqmb+U2+NeQXIWzIbCesMTV+RHAhMCKOr0H3s97maz0aOjrmgkX8uo1VTkNH9LI
+        Ga79KR7ZlBXfXZ7zjgDths0DLdumDHIrsU+QhB1//pQqC7Jz11kovTMzLiW95IPnQtAJjl
+        OVXDonP3zma3FKPsZDNTWzsWb+6C54I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1665170581;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5C9GlnWH2PQfTnwA7VvBSXTuKeGaXDov8qfQoZWnQ2Q=;
+        b=iT/9+zw18bGxYwbsCqYfuJcGbFRaQ+xerYjzTkrnm+/GdF2xl1NzAlIvIativFbYg7ft0K
+        yaotfZq2yfGM/GBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5999113A3D;
+        Fri,  7 Oct 2022 19:23:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HZUFCpV8QGPCfQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Fri, 07 Oct 2022 19:23:01 +0000
+Date:   Fri, 7 Oct 2022 16:22:59 -0300
+From:   'Enzo Matsumiya' <ematsumiya@suse.de>
+To:     David Laight <David.Laight@ACULAB.COM>
+Cc:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        "kernel@collabora.com" <kernel@collabora.com>,
+        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] cifs: remove initialization value
+Message-ID: <20221007192259.lte3xpsjneg352um@suse.de>
+References: <20221004062333.416225-1-usama.anjum@collabora.com>
+ <20221004142306.ysgh45nhgdo4z3ok@suse.de>
+ <fbb39e4354434cb99b6f6731cab2e0c9@AcuMS.aculab.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <fbb39e4354434cb99b6f6731cab2e0c9@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Thu, 6 Oct 2022 18:53:02 -0500:
+On 10/05, David Laight wrote:
+>From: Enzo Matsumiya
+>> Sent: 04 October 2022 15:23
+>>
+>> Hi Usama,
+>>
+>> On 10/04, Muhammad Usama Anjum wrote:
+>> >Don't initialize the rc as its value is being overwritten before its
+>> >use.
+>>
+>> Being bitten by an unitialized variable bug as recent as 2 days ago, I'd
+>> say this is a step backwards from the "best practices" POV.
+>
+>Depends on your POV.
 
-> git://git.samba.org/ksmbd.git tags/6.1-rc-ksmbd-fixes
+My POV was, considering "unitialized variables" is a _whole_ class of
+security bugs, a patch to specifically deinitialize a variable is pretty
+much like saying "let's leave this to chance".
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9f4b9beeb9cf46c4b172fca06de5bd6831108641
+https://cwe.mitre.org/data/definitions/457.html
 
-Thank you!
+>If you don't initialise locals there is a fair chance that the
+>compiler will detect buggy code.
+>
+>If you initialise them you get well defined behaviour - but
+>the compiler won't find bugs for you.
+>
+>Mostly the kernel is in the first camp.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+My money is on the smaller unfair chances that the compiler cannot catch
+even the smallest bit of complexity of uninitialized use.
+
+Also, initializing something to 0/NULL will, most of the time, if at all,
+be "just" a bug, whereas an uninitialized variable bug might turn into a
+security bug and even go unnoticed for years.
+
+Anyway, this patch got merged and I seem to be alone with this
+concern...
+
+
+>	David
+
+Cheers,
+
+Enzo
