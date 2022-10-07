@@ -2,73 +2,69 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC0BC433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Oct 2022 05:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 846C3C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Oct 2022 17:00:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229513AbiJGFlx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 Oct 2022 01:41:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43176 "EHLO
+        id S229694AbiJGRA0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 Oct 2022 13:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiJGFlw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Oct 2022 01:41:52 -0400
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35468FE761
-        for <linux-cifs@vger.kernel.org>; Thu,  6 Oct 2022 22:41:52 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id t18so4007768vsr.12
-        for <linux-cifs@vger.kernel.org>; Thu, 06 Oct 2022 22:41:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date;
-        bh=8+p3i0IWH5Gmnhy823sWtVL1a50v/oarNJLcwqmpVb8=;
-        b=DIpy6lA3XfwFqJRjxpJrtV8c7HZhzZzwoNJxQUjIRw5uzf+hfqWlqDB0augMnviMTi
-         5xEInoBpblFkco54YckaqxsWD33GNuYAXfl0thtrcrMjsRSNZUcR51ilEMHgQiDgAObr
-         F8CoeOw3MXMOYDHYKzzrMTdXAARxiCv+qDsgZij9gkG5gLO9s3+8l+Fn0Jg3B0tda5Bg
-         0ePa9wreJgHlhmrrJjJx7Orgp8G1ZS7C8KQvC8wL6z/IRDPNSeuTOo1tj2kpZnByCyLP
-         J7TT08y3rmNvXPXlKQ18YDdSdSHVXBhlv6jN/CdRkZdyL8gI7m0RZ9vB9tgVRkPSjZBV
-         gP+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=8+p3i0IWH5Gmnhy823sWtVL1a50v/oarNJLcwqmpVb8=;
-        b=qrKNfSyW9GWlW5QS4MFQf3jG+Ft3NF+NkzysfYmJYMTM8EEPRnN3xi5385CDC2Wr6s
-         xUoq2J0I8J9K1A6i2n4RJW+ti6+3oe/rqX8eknMcIeyEDk81dt/BUzdDWPhVH0JDhEkC
-         XI+s/iwnEDGRDAIemZKgtSAhHtXdVDXmSF1nur9/WDG+Jo+uylrDPAuP6a/of5iQ15e3
-         m5Gmu0MLQChw8mC9zaPBgIWOmrkrDNLzGa1S5oXwcpHQQ2AZYvCM5NV6ZnN4V+YMFYpo
-         vOxG7sZqme/yBaGi/DlEhGh53t0Rx7ZnMRmwHYsj80K+UDtbRHGVtID47/PspTk8U722
-         9fXg==
-X-Gm-Message-State: ACrzQf0kJxMCoWNp/qYfyW2RH+TybTera94ekwVyZQ6wvmEKqQJZHol/
-        aihq58K2Ru+8tWgF/CytyBuZGjYylP0W5q5xqKQ=
-X-Google-Smtp-Source: AMsMyM5cKp8s/9UP6THFwlPxfH29aeCokBiEBPmTkBm+9fCqs2wM/g5h+2YO/OtWptsQYHC8Wtiu79j5Etb/NK7+zo8=
-X-Received: by 2002:a67:f603:0:b0:3a6:ff45:997e with SMTP id
- k3-20020a67f603000000b003a6ff45997emr1927568vso.6.1665121311179; Thu, 06 Oct
- 2022 22:41:51 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 7 Oct 2022 00:41:40 -0500
-Message-ID: <CAH2r5mtxz=T9ctLOqrfqJxAHyxWpCkdFUekybP3Ubc8KcukWPA@mail.gmail.com>
-Subject: sign failure with for-next
-To:     Enzo Matsumiya <ematsumiya@suse.de>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S230307AbiJGRAJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Oct 2022 13:00:09 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F3B48C82;
+        Fri,  7 Oct 2022 10:00:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EDA5D61DC3;
+        Fri,  7 Oct 2022 17:00:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B1C12C433D6;
+        Fri,  7 Oct 2022 17:00:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665162007;
+        bh=SC2a3JVItge5TlMNxCwk6LePOtjoCGZXyocybFuyczs=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=RGYOFvIzPS3IkWj4mQ1yjibGoVDoU+5bjXw/RGxcKuQ7xQ+5W0JF9LUnRTL1tA3sB
+         hoLJKPhAwOLEuJWIXfrga3ZOPaYeB7G/tqnY0PpC9NrfDNIKCX2SonZxDuCdEdVmgw
+         CsZrSQY08RsFF+eYmPOSGgFSyRcsBLbKyMhyZLgYEdg9CDVveGp/S4Al+/P2gr5aDb
+         Xx+FSnGVIU9TvTwdl13z7ICyLVVftPDFGckTv9BR3zdPS5wYMk4VWkjvg6hbkDzgSw
+         XThXIUYrRr7ORjSA3FEjbRY9waykFOB6Bm2CBjiACTPWAz0mRtWGhbctbD9LA0NmOY
+         RIdSf9VsMSMzQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F841E2A05C;
+        Fri,  7 Oct 2022 17:00:07 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mtx9gsG01JDMWakP0o-76rzyX_YKzbgVdZZwboaVVDF3g@mail.gmail.com>
+References: <CAH2r5mtx9gsG01JDMWakP0o-76rzyX_YKzbgVdZZwboaVVDF3g@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mtx9gsG01JDMWakP0o-76rzyX_YKzbgVdZZwboaVVDF3g@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.1-rc-ksmbd-fixes
+X-PR-Tracked-Commit-Id: f5ba1cdaf5eb380e148183bda06d4844b457d095
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 9f4b9beeb9cf46c4b172fca06de5bd6831108641
+Message-Id: <166516200762.22254.17760102843865160723.pr-tracker-bot@kernel.org>
+Date:   Fri, 07 Oct 2022 17:00:07 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I saw a sign failure running xfstest generic/070 to windows with
-current for-next (which includes some of Enzo's signing patches)
+The pull request you sent on Thu, 6 Oct 2022 18:53:02 -0500:
 
-[21805.362128] run fstests generic/070 at 2022-10-07 00:23:09
-[21838.320247] CIFS: VFS: sign fail cmd 0x8 message id 0x1965e
-[21838.320252] CIFS: VFS: \\172.31.48.1\TEST SMB signature
-verification returned error = -13
-[21839.436768] CIFS: VFS: sign fail cmd 0x8 message id 0x19a0d
-[21839.436774] CIFS: VFS: \\172.31.48.1\TEST SMB signature
-verification returned error = -13
+> git://git.samba.org/ksmbd.git tags/6.1-rc-ksmbd-fixes
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/9f4b9beeb9cf46c4b172fca06de5bd6831108641
+
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
