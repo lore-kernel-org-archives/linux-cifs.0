@@ -2,105 +2,132 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EC86C433F5
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Oct 2022 15:22:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8FECC433F5
+	for <linux-cifs@archiver.kernel.org>; Sat,  8 Oct 2022 19:15:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229538AbiJHPWD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 8 Oct 2022 11:22:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34614 "EHLO
+        id S229826AbiJHTPQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 8 Oct 2022 15:15:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiJHPWC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 8 Oct 2022 11:22:02 -0400
-Received: from mail-vk1-xa35.google.com (mail-vk1-xa35.google.com [IPv6:2607:f8b0:4864:20::a35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8941233421
-        for <linux-cifs@vger.kernel.org>; Sat,  8 Oct 2022 08:22:01 -0700 (PDT)
-Received: by mail-vk1-xa35.google.com with SMTP id k14so3494695vkk.0
-        for <linux-cifs@vger.kernel.org>; Sat, 08 Oct 2022 08:22:01 -0700 (PDT)
+        with ESMTP id S229531AbiJHTPO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 8 Oct 2022 15:15:14 -0400
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957E42A70E
+        for <linux-cifs@vger.kernel.org>; Sat,  8 Oct 2022 12:15:11 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-35ad0584879so70377477b3.7
+        for <linux-cifs@vger.kernel.org>; Sat, 08 Oct 2022 12:15:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8IZbx6ROuGfZ6tm7lt7fkD+i5Vi/7auLHsf0csZYXCE=;
-        b=OSQuBxd9b5fUWcwOEQTGvFjvEo9fNNx/xks2Vd797ph3b2bipfjCx8piE2/nQ8VOWt
-         mmiuZy1+FhnHClMznZrBpomQWH/UfZaI5l88CLa31jE8N96bRFii1QEkwqqrjP1A8xwR
-         1JsJ+/F35MLokAUP16tstGg19F+zgZreF5m3K/wh3B8Ve1gc4xqKwwfOhi9C4hHpOfXj
-         fgfn44XwFf7twZ3UyRpR8N3kWJuhNx9nMTIRTOTZXib6r+tUHiEvqngw6vyPyFbrKSk3
-         3t3LUC7rTYuvxWnOfjJfmzfGnDFzI0RQYHo9DjKqBtSFBvwGwRG2MED+Eny2njchBRFT
-         KgbQ==
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5lxO8NRlzS2dSjSoUrsC92WYk88QzgRlrDr1ZTz9HFw=;
+        b=NFEYSUPymxhJ2vSvA2dpz6EN8aZl+9A9WaoomriA0tAI3p3wmrqG5ZJcCVVO9gfDRF
+         CoXel7hxOYckXItXhrMJD4bsphj9LQUsfb97seuUhjfkoq4gS2VuGdc/o6saEKtmczd2
+         cBv975GahNHSSxjJhGj9Tzy1Qx5VMQGQZuUieg+MBQo/Rui9uizRwbHjnM+KnRg2nhkU
+         S9oCOfErM+f0G8zE6tGBpyY/FmFlRw4I5LTX6Evkfza6pmWJAjo0koEWPM4Tf6GaDb/i
+         886Q5wTXVMCseC0Jrau+u1zoIqcbUmJZu/J1SiY561UgNafWG8BY0lkfsPnbdSzArPdR
+         4AAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8IZbx6ROuGfZ6tm7lt7fkD+i5Vi/7auLHsf0csZYXCE=;
-        b=AWdWOklqIggnIr77/72cdf1CPgvifvx0v87QT9zdkQPmERy5aW46hNHd0MqbHc5nds
-         r8bMbTGdwChuSWiXPJMccSnIiUbmiYI0Q3MD/F/n6cwPZasQ7S/H0AGZQ2CSZ5qJ+YwR
-         cQsn2UNTjQSrAtzQWY2G4JJI8jpX81pNBfpKiXIeMm188fBydEFloQ0IGFR5zkRAnnjF
-         hM0snNLnE3HmEkl8cyc02Ov+glMqKFDHgmpQZE8htX2DSR3fxDHOcgNgs4xjYXtr3XpG
-         bTjbz6U29XLBIdBrbMKRUcpetuwVjXdmx38ncZvkSb98GGtrohiF4GIcjYqlDUvPvjPC
-         LSEw==
-X-Gm-Message-State: ACrzQf0ZnioqhLLn84oNzf65nRjJM8feK5xC6Xt4BVOVKw92dnpgbGyr
-        dA2ZM40DdcsjaiVW5g1c7nt0H2/5mnZ0/g5of4Y=
-X-Google-Smtp-Source: AMsMyM4iWAv+sgByHeaUIAw3CGV+9biz3KccMVoaQgMhFQJ/cVXztRZIkIgyaZ9kPgYYRCLZg491Jg+1JGrgo+J6Xf0=
-X-Received: by 2002:a1f:a788:0:b0:3a1:e690:a2a3 with SMTP id
- q130-20020a1fa788000000b003a1e690a2a3mr5359443vke.4.1665242520527; Sat, 08
- Oct 2022 08:22:00 -0700 (PDT)
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5lxO8NRlzS2dSjSoUrsC92WYk88QzgRlrDr1ZTz9HFw=;
+        b=Uj34rpdjomGc1AlyPeC0sEV/02NHav0Ks4e3j6W/oWfnQNm5P9yNAopm4MVAiKvlgn
+         IM4xw0qgM/OyDrrgxEI1MxuNRfLeu8sSF1Tth+xwXYxDbEKjFztb6Dd4BS/FpFGYUHLp
+         r9iPHPHsibbRfeGOV4zbaFSl2v0D0wWbYo6jMWLv3ZqcgFxfz6Uu5kdil6R0gIfBujRU
+         W9+KmD3C//ZwthOVNxSt+eF9QRaWyL9P4oKtaJGYrr9CdgGw2graWiWSXzxk0IZYX4Ct
+         PhJbnTIj3gIYVygI0TMay2adWE71Q6HsV72K9sO0cm5OK0o0AMZg+3v4hRpe2/b9jwIo
+         2+1A==
+X-Gm-Message-State: ACrzQf0STf4QDwifmThTHVCisX4zv4GVtIOeU1Q6Tk6i010bHEFIUlhS
+        0aMJcH+2NZm/LpDO8aLTVJQFkKmwfpbksDL5p/Sn3HnWqbI=
+X-Google-Smtp-Source: AMsMyM6FAn+AimZuvlmliA3qATJdlJedEcwXS8Yyva40052tu2YDJx33/Axj4052lVzBc0R2uN4BcD5ZUywZnx6kpMY=
+X-Received: by 2002:a81:a45:0:b0:360:a89e:a901 with SMTP id
+ 66-20020a810a45000000b00360a89ea901mr409676ywk.8.1665256510647; Sat, 08 Oct
+ 2022 12:15:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221006043609.1193398-1-lsahlber@redhat.com> <20221006043609.1193398-2-lsahlber@redhat.com>
-In-Reply-To: <20221006043609.1193398-2-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 8 Oct 2022 10:21:49 -0500
-Message-ID: <CAH2r5mu6M-AAeyXe9P7rZakjBKcAkYuUWqUhffK6hmvoL_Pf5g@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix skipping to incorrect offset in emit_cached_dirents
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+From:   Dmitry Telegin <dmitry.s.telegin@gmail.com>
+Date:   Sat, 8 Oct 2022 23:14:59 +0400
+Message-ID: <CACVrvT5CMERoJN4fz-MdNOOUV9VpOT_vv764UEgzDdaUEC9nUg@mail.gmail.com>
+Subject: A patch to implement the already documented "sep" option for the CIFS
+ file system.
+To:     linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Adding this one patch onto for-next, it went from passing all (except
-452 which is known issue with refcount and umount/mount) of buildbot
-cifs-testing group to hanging on generic/010 and generic/024 to
-Windows (interestingly 024 did not hang when run to Samba)
+DESCRIPTION OF THE PROBLEM
 
-On Wed, Oct 5, 2022 at 11:36 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> When application has done lseek() to a different offset on a directory fd
-> we skipped one entry too many before we start emitting directory entries
-> from the cache.
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/readdir.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index 8e060c00c969..da0d1e188432 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -847,9 +847,13 @@ static bool emit_cached_dirents(struct cached_dirents *cde,
->         int rc;
->
->         list_for_each_entry(dirent, &cde->entries, entry) {
-> -               if (ctx->pos >= dirent->pos)
-> +               /*
-> +                * Skip ahead until we get to the current position of the
-> +                * directory.
-> +                */
-> +               if (ctx->pos > dirent->pos)
->                         continue;
-> -               ctx->pos = dirent->pos;
-> +
->                 rc = dir_emit(ctx, dirent->name, dirent->namelen,
->                               dirent->fattr.cf_uniqueid,
->                               dirent->fattr.cf_dtype);
-> --
-> 2.35.3
->
+Some users are accustomed to using shared folders in Windows with a
+comma in the name, for example: "//server3/Block 3,4".
+When they try to migrate to Linux, they cannot mount such paths.
+
+An example of the line generated by "mount.cifs" for the kernel when
+mounting "//server3/Block 3,4":
+"ip=10.0.2.212,unc=\\server3\Block 3,4,iocharset=utf8,user=user1,domain=AD"
+Accordingly, due to the extra comma, we have an error:
+"Sep 7 21:57:18 S1 kernel: [ 795.604821] CIFS: Unknown mount option "4""
 
 
--- 
-Thanks,
+DOCUMENTATION
 
-Steve
+https://www.kernel.org/doc/html/latest/admin-guide/cifs/usage.html
+The "sep" parameter is described here to specify a new delimiter
+instead of a comma.
+I quote:
+   "sep
+   if first mount option (after the -o), overrides the comma as the
+separator between the mount parms. e.g.:
+   -o user=myname,password=mypassword,domain=mydom
+   could be passed instead with period as the separator by:
+   -o sep=.user=myname.password=mypassword.domain=mydom
+   this might be useful when comma is contained within username or
+password or domain."
+
+
+RESEARCH WORK
+
+I looked at the "mount.cifs" code. There is no provision for the use
+of a comma by the user, since the comma is used to form the parameter
+string to the kernel (man 2 mount). This line can be seen by adding
+the "--verbose" flag to the mount.
+"mount.cifs --help" lists "sep" as a possible option, but does not
+implement it in the code and does not describe it in "man 8
+mount.cifs".
+
+I looked at the "pam-mount" code - the mount options are assembled
+with a wildcard comma. The result is a text line: "mount -t cifs ...".
+
+The handling of options in the "mount" utility is based on the
+"libmount" library, which is hardcoded to use only a comma as a
+delimiter.
+
+I tried to mount "//server3/Block 3,4" with my own program (man 2
+mount) by specifying "sep=!" - successfully.
+
+
+SOLUTION
+
+It would be nice if we add in "mount.cifs", in "mount" utility and in
+"pam-mount" the ability to set a custom mount option separator. In
+other words, we need to implement the already documented "sep" option.
+
+1. For "mount.cifs" I did it in:
+https://github.com/dmitry-telegin/cifs-utils in branch
+"custom_option_separator". Commit:
+https://github.com/dmitry-telegin/cifs-utils/commit/04325b842a82edf655a14174e763bc0b2a6870e1
+
+2. For "mount" utility I did it in:
+https://github.com/dmitry-telegin/util-linux in branch
+"custom_option_separator". Commit:
+https://github.com/dmitry-telegin/util-linux/commit/5e0ecd2498edae0bf0bcab4ba6a68a9803b34ccf
+
+3. For "pam-mount" I did it in:
+https://sourceforge.net/u/dmitry-t/pam-mount/ci/master/tree/ in branch
+"custom_option_separator". Commit:
+https://sourceforge.net/u/dmitry-t/pam-mount/ci/9860f9234977f1110230482b5d87bdcb8bc6ce03/
+
+I checked the work on the Linux 5.10 kernel.
+
+--
+Dmitry Telegin
