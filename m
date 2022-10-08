@@ -2,118 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6639C433FE
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Oct 2022 19:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EC86C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat,  8 Oct 2022 15:22:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229543AbiJGTZm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 Oct 2022 15:25:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47368 "EHLO
+        id S229538AbiJHPWD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 8 Oct 2022 11:22:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230203AbiJGTYf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Oct 2022 15:24:35 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECE912627;
-        Fri,  7 Oct 2022 12:23:03 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D5F6D1F7AB;
-        Fri,  7 Oct 2022 19:23:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1665170581; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5C9GlnWH2PQfTnwA7VvBSXTuKeGaXDov8qfQoZWnQ2Q=;
-        b=NSxASkEeqmb+U2+NeQXIWzIbCesMTV+RHAhMCKOr0H3s97maz0aOjrmgkX8uo1VTkNH9LI
-        Ga79KR7ZlBXfXZ7zjgDths0DLdumDHIrsU+QhB1//pQqC7Jz11kovTMzLiW95IPnQtAJjl
-        OVXDonP3zma3FKPsZDNTWzsWb+6C54I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1665170581;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5C9GlnWH2PQfTnwA7VvBSXTuKeGaXDov8qfQoZWnQ2Q=;
-        b=iT/9+zw18bGxYwbsCqYfuJcGbFRaQ+xerYjzTkrnm+/GdF2xl1NzAlIvIativFbYg7ft0K
-        yaotfZq2yfGM/GBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5999113A3D;
-        Fri,  7 Oct 2022 19:23:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id HZUFCpV8QGPCfQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Fri, 07 Oct 2022 19:23:01 +0000
-Date:   Fri, 7 Oct 2022 16:22:59 -0300
-From:   'Enzo Matsumiya' <ematsumiya@suse.de>
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     Muhammad Usama Anjum <usama.anjum@collabora.com>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        "kernel@collabora.com" <kernel@collabora.com>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/2] cifs: remove initialization value
-Message-ID: <20221007192259.lte3xpsjneg352um@suse.de>
-References: <20221004062333.416225-1-usama.anjum@collabora.com>
- <20221004142306.ysgh45nhgdo4z3ok@suse.de>
- <fbb39e4354434cb99b6f6731cab2e0c9@AcuMS.aculab.com>
+        with ESMTP id S229459AbiJHPWC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 8 Oct 2022 11:22:02 -0400
+Received: from mail-vk1-xa35.google.com (mail-vk1-xa35.google.com [IPv6:2607:f8b0:4864:20::a35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8941233421
+        for <linux-cifs@vger.kernel.org>; Sat,  8 Oct 2022 08:22:01 -0700 (PDT)
+Received: by mail-vk1-xa35.google.com with SMTP id k14so3494695vkk.0
+        for <linux-cifs@vger.kernel.org>; Sat, 08 Oct 2022 08:22:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8IZbx6ROuGfZ6tm7lt7fkD+i5Vi/7auLHsf0csZYXCE=;
+        b=OSQuBxd9b5fUWcwOEQTGvFjvEo9fNNx/xks2Vd797ph3b2bipfjCx8piE2/nQ8VOWt
+         mmiuZy1+FhnHClMznZrBpomQWH/UfZaI5l88CLa31jE8N96bRFii1QEkwqqrjP1A8xwR
+         1JsJ+/F35MLokAUP16tstGg19F+zgZreF5m3K/wh3B8Ve1gc4xqKwwfOhi9C4hHpOfXj
+         fgfn44XwFf7twZ3UyRpR8N3kWJuhNx9nMTIRTOTZXib6r+tUHiEvqngw6vyPyFbrKSk3
+         3t3LUC7rTYuvxWnOfjJfmzfGnDFzI0RQYHo9DjKqBtSFBvwGwRG2MED+Eny2njchBRFT
+         KgbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8IZbx6ROuGfZ6tm7lt7fkD+i5Vi/7auLHsf0csZYXCE=;
+        b=AWdWOklqIggnIr77/72cdf1CPgvifvx0v87QT9zdkQPmERy5aW46hNHd0MqbHc5nds
+         r8bMbTGdwChuSWiXPJMccSnIiUbmiYI0Q3MD/F/n6cwPZasQ7S/H0AGZQ2CSZ5qJ+YwR
+         cQsn2UNTjQSrAtzQWY2G4JJI8jpX81pNBfpKiXIeMm188fBydEFloQ0IGFR5zkRAnnjF
+         hM0snNLnE3HmEkl8cyc02Ov+glMqKFDHgmpQZE8htX2DSR3fxDHOcgNgs4xjYXtr3XpG
+         bTjbz6U29XLBIdBrbMKRUcpetuwVjXdmx38ncZvkSb98GGtrohiF4GIcjYqlDUvPvjPC
+         LSEw==
+X-Gm-Message-State: ACrzQf0ZnioqhLLn84oNzf65nRjJM8feK5xC6Xt4BVOVKw92dnpgbGyr
+        dA2ZM40DdcsjaiVW5g1c7nt0H2/5mnZ0/g5of4Y=
+X-Google-Smtp-Source: AMsMyM4iWAv+sgByHeaUIAw3CGV+9biz3KccMVoaQgMhFQJ/cVXztRZIkIgyaZ9kPgYYRCLZg491Jg+1JGrgo+J6Xf0=
+X-Received: by 2002:a1f:a788:0:b0:3a1:e690:a2a3 with SMTP id
+ q130-20020a1fa788000000b003a1e690a2a3mr5359443vke.4.1665242520527; Sat, 08
+ Oct 2022 08:22:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <fbb39e4354434cb99b6f6731cab2e0c9@AcuMS.aculab.com>
+References: <20221006043609.1193398-1-lsahlber@redhat.com> <20221006043609.1193398-2-lsahlber@redhat.com>
+In-Reply-To: <20221006043609.1193398-2-lsahlber@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 8 Oct 2022 10:21:49 -0500
+Message-ID: <CAH2r5mu6M-AAeyXe9P7rZakjBKcAkYuUWqUhffK6hmvoL_Pf5g@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix skipping to incorrect offset in emit_cached_dirents
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/05, David Laight wrote:
->From: Enzo Matsumiya
->> Sent: 04 October 2022 15:23
->>
->> Hi Usama,
->>
->> On 10/04, Muhammad Usama Anjum wrote:
->> >Don't initialize the rc as its value is being overwritten before its
->> >use.
->>
->> Being bitten by an unitialized variable bug as recent as 2 days ago, I'd
->> say this is a step backwards from the "best practices" POV.
+Adding this one patch onto for-next, it went from passing all (except
+452 which is known issue with refcount and umount/mount) of buildbot
+cifs-testing group to hanging on generic/010 and generic/024 to
+Windows (interestingly 024 did not hang when run to Samba)
+
+On Wed, Oct 5, 2022 at 11:36 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
->Depends on your POV.
-
-My POV was, considering "unitialized variables" is a _whole_ class of
-security bugs, a patch to specifically deinitialize a variable is pretty
-much like saying "let's leave this to chance".
-
-https://cwe.mitre.org/data/definitions/457.html
-
->If you don't initialise locals there is a fair chance that the
->compiler will detect buggy code.
+> When application has done lseek() to a different offset on a directory fd
+> we skipped one entry too many before we start emitting directory entries
+> from the cache.
 >
->If you initialise them you get well defined behaviour - but
->the compiler won't find bugs for you.
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/readdir.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 >
->Mostly the kernel is in the first camp.
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index 8e060c00c969..da0d1e188432 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -847,9 +847,13 @@ static bool emit_cached_dirents(struct cached_dirents *cde,
+>         int rc;
+>
+>         list_for_each_entry(dirent, &cde->entries, entry) {
+> -               if (ctx->pos >= dirent->pos)
+> +               /*
+> +                * Skip ahead until we get to the current position of the
+> +                * directory.
+> +                */
+> +               if (ctx->pos > dirent->pos)
+>                         continue;
+> -               ctx->pos = dirent->pos;
+> +
+>                 rc = dir_emit(ctx, dirent->name, dirent->namelen,
+>                               dirent->fattr.cf_uniqueid,
+>                               dirent->fattr.cf_dtype);
+> --
+> 2.35.3
+>
 
-My money is on the smaller unfair chances that the compiler cannot catch
-even the smallest bit of complexity of uninitialized use.
 
-Also, initializing something to 0/NULL will, most of the time, if at all,
-be "just" a bug, whereas an uninitialized variable bug might turn into a
-security bug and even go unnoticed for years.
+-- 
+Thanks,
 
-Anyway, this patch got merged and I seem to be alone with this
-concern...
-
-
->	David
-
-Cheers,
-
-Enzo
+Steve
