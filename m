@@ -2,132 +2,163 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8FECC433F5
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Oct 2022 19:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FF7C433FE
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 Oct 2022 05:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbiJHTPQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 8 Oct 2022 15:15:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44660 "EHLO
+        id S229761AbiJIFus (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 9 Oct 2022 01:50:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbiJHTPO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 8 Oct 2022 15:15:14 -0400
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957E42A70E
-        for <linux-cifs@vger.kernel.org>; Sat,  8 Oct 2022 12:15:11 -0700 (PDT)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-35ad0584879so70377477b3.7
-        for <linux-cifs@vger.kernel.org>; Sat, 08 Oct 2022 12:15:11 -0700 (PDT)
+        with ESMTP id S229758AbiJIFur (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Oct 2022 01:50:47 -0400
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6242E9C9;
+        Sat,  8 Oct 2022 22:50:45 -0700 (PDT)
+Received: by mail-vk1-xa32.google.com with SMTP id a66so1370033vkc.3;
+        Sat, 08 Oct 2022 22:50:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=5lxO8NRlzS2dSjSoUrsC92WYk88QzgRlrDr1ZTz9HFw=;
-        b=NFEYSUPymxhJ2vSvA2dpz6EN8aZl+9A9WaoomriA0tAI3p3wmrqG5ZJcCVVO9gfDRF
-         CoXel7hxOYckXItXhrMJD4bsphj9LQUsfb97seuUhjfkoq4gS2VuGdc/o6saEKtmczd2
-         cBv975GahNHSSxjJhGj9Tzy1Qx5VMQGQZuUieg+MBQo/Rui9uizRwbHjnM+KnRg2nhkU
-         S9oCOfErM+f0G8zE6tGBpyY/FmFlRw4I5LTX6Evkfza6pmWJAjo0koEWPM4Tf6GaDb/i
-         886Q5wTXVMCseC0Jrau+u1zoIqcbUmJZu/J1SiY561UgNafWG8BY0lkfsPnbdSzArPdR
-         4AAw==
+        bh=V1eiS68Fna3XVtle3ljC6ptDGXbn5f8WPlsRS8C/bwU=;
+        b=pedmXNz53LmeXcJq514EG22VILLTADVPAl7yYDUSNFZcQ/2MqYeggAIPQDHE/QJfU1
+         +ZtYlXn/4aIJ9V8W2DthebXAs+quxLZFv+zf8yEtYv61iIS6Ylcdr5zynSGhDZxGrpMq
+         fulY84ebwnatZBR8qPvaOjfH79CbdDDC7r/IfITWaIvsltU1c9KLxVe59xM/HIXIFicb
+         H6MewrduUB91mCDj++i5Sv27NPmXVZaSjCXetwaPafhIRY1XT4CRI6hETHwoWZjkToIx
+         mpUCvH30AnVXTTm3CXVhW+A6wMxEgt6d1mp6iB3yFBQbla1neI70clsV7wOJfgk6dnRm
+         uhXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=5lxO8NRlzS2dSjSoUrsC92WYk88QzgRlrDr1ZTz9HFw=;
-        b=Uj34rpdjomGc1AlyPeC0sEV/02NHav0Ks4e3j6W/oWfnQNm5P9yNAopm4MVAiKvlgn
-         IM4xw0qgM/OyDrrgxEI1MxuNRfLeu8sSF1Tth+xwXYxDbEKjFztb6Dd4BS/FpFGYUHLp
-         r9iPHPHsibbRfeGOV4zbaFSl2v0D0wWbYo6jMWLv3ZqcgFxfz6Uu5kdil6R0gIfBujRU
-         W9+KmD3C//ZwthOVNxSt+eF9QRaWyL9P4oKtaJGYrr9CdgGw2graWiWSXzxk0IZYX4Ct
-         PhJbnTIj3gIYVygI0TMay2adWE71Q6HsV72K9sO0cm5OK0o0AMZg+3v4hRpe2/b9jwIo
-         2+1A==
-X-Gm-Message-State: ACrzQf0STf4QDwifmThTHVCisX4zv4GVtIOeU1Q6Tk6i010bHEFIUlhS
-        0aMJcH+2NZm/LpDO8aLTVJQFkKmwfpbksDL5p/Sn3HnWqbI=
-X-Google-Smtp-Source: AMsMyM6FAn+AimZuvlmliA3qATJdlJedEcwXS8Yyva40052tu2YDJx33/Axj4052lVzBc0R2uN4BcD5ZUywZnx6kpMY=
-X-Received: by 2002:a81:a45:0:b0:360:a89e:a901 with SMTP id
- 66-20020a810a45000000b00360a89ea901mr409676ywk.8.1665256510647; Sat, 08 Oct
- 2022 12:15:10 -0700 (PDT)
+        bh=V1eiS68Fna3XVtle3ljC6ptDGXbn5f8WPlsRS8C/bwU=;
+        b=Pklpx+YKWVZxaJu3TuoV9wSz1AgxvXYnRofBcIAerUbu31dHoIna7up2Z4ESxvOD5G
+         lXSo1agRSkYclsGXGauUJgyfAXidm9P18ZVFzZda+NyMYNTB8dgGXPkeCVb3U2q9dHo8
+         IySteh3K0dnDd8IDV+1pqNlYMaUp4p5zLrcLG0TpGw7MWja+gK7LlSOd1Npg57bHcfRa
+         tks7vMpDMhs1VT5zPKPcIyUB4ggxeM093lTfVRWzuCo1dCmqzAUT1i0Te5LYdnhOTjtX
+         5TBMzHPiChkW9yNSiJreVmZBHdjewrcon2eVsrmvQxBhyves7yCD+R0GNP47xIyMCvEe
+         /1Sg==
+X-Gm-Message-State: ACrzQf0F1i7b0hrRJwZ1kSPIjEBXm6ZAb5+aLzBDQOcKTtQX8nxK8+La
+        ZLbJODtjpVQ0BHIkcxFtT8EV8saVwLCPKYKl2N3UAL04ARo=
+X-Google-Smtp-Source: AMsMyM49N55i8Gu1+pXkvUTtaFi7lZuK7rZI5SAB/frAmC6Rbg2hwZJ1zXJJv7Y6JVSLMI+7FHzm8AtpdLZXIWNaTWM=
+X-Received: by 2002:ac5:c7b0:0:b0:3ab:2056:3bad with SMTP id
+ d16-20020ac5c7b0000000b003ab20563badmr6007614vkn.24.1665294644309; Sat, 08
+ Oct 2022 22:50:44 -0700 (PDT)
 MIME-Version: 1.0
-From:   Dmitry Telegin <dmitry.s.telegin@gmail.com>
-Date:   Sat, 8 Oct 2022 23:14:59 +0400
-Message-ID: <CACVrvT5CMERoJN4fz-MdNOOUV9VpOT_vv764UEgzDdaUEC9nUg@mail.gmail.com>
-Subject: A patch to implement the already documented "sep" option for the CIFS
- file system.
-To:     linux-cifs@vger.kernel.org
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 9 Oct 2022 00:50:33 -0500
+Message-ID: <CAH2r5muHt_9eBuE7GOHNvV+9zHH8X=+sVmK3Qj1R8uEWNydn_Q@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-DESCRIPTION OF THE PROBLEM
+Please pull the following changes since commit
+f76349cf41451c5c42a99f18a9163377e4b364ff:
 
-Some users are accustomed to using shared folders in Windows with a
-comma in the name, for example: "//server3/Block 3,4".
-When they try to migrate to Linux, they cannot mount such paths.
+  Linux 6.0-rc7 (2022-09-25 14:01:02 -0700)
 
-An example of the line generated by "mount.cifs" for the kernel when
-mounting "//server3/Block 3,4":
-"ip=10.0.2.212,unc=\\server3\Block 3,4,iocharset=utf8,user=user1,domain=AD"
-Accordingly, due to the extra comma, we have an error:
-"Sep 7 21:57:18 S1 kernel: [ 795.604821] CIFS: Unknown mount option "4""
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc-smb3-client-fixes-part1
+
+for you to fetch changes up to 958553d13478ad0e35fa09fecad3ce73277ccaf5:
+
+  smb3: fix oops in calculating shash_setkey (2022-10-07 23:08:41 -0500)
+
+----------------------------------------------------------------
+21 cifs/smb3 fixes, including 4 for stable
+- data corruption fix when cache disabled
+- four RDMA (smbdirect) improvements, including enabling support for SoftiWARP
+- four signing improvements
+- three directory lease improvements
+- four cleanup fixes
+- minor security fix
+- two debugging improvements
+
+Additional security improvements including enabling GMAC signing, and
+patches to extend use of directory leases (improved safe metadata and
+directory entry caching) and improvements to symlink handling are
+still being tested and are not included in this P/R.
+----------------------------------------------------------------
+Enzo Matsumiya (4):
+      cifs: return correct error in ->calc_signature()
+      cifs: replace kfree() with kfree_sensitive() for sensitive data
+      smb3: rename encryption/decryption TFMs
+      cifs: secmech: use shash_desc directly, remove sdesc
+
+Gustavo A. R. Silva (1):
+      cifs: Replace a couple of one-element arrays with flexible-array members
+
+Jiangshan Yi (1):
+      cifs: misc: fix spelling typo in comment
+
+Muhammad Usama Anjum (1):
+      cifs: remove initialization value
+
+Ronnie Sahlberg (4):
+      cifs: destage dirty pages before re-reading them for cache=none
+      cifs: Make tcon contain a wrapper structure cached_fids instead
+of cached_fid
+      cifs: improve handlecaching
+      cifs: store a pointer to a fid in the cfid structure instead of the struct
+
+Steve French (5):
+      MAINTAINERS: Add Tom Talpey as cifs.ko reviewer
+      smb3: add dynamic trace points for tree disconnect
+      smb3: define missing create contexts
+      smb3: do not log confusing message when server returns no
+network interfaces
+      smb3: fix oops in calculating shash_setkey
+
+Tom Talpey (4):
+      Decrease the number of SMB3 smbdirect client SGEs
+      Reduce client smbdirect max receive segment size
+      Handle variable number of SGEs in client smbdirect send.
+      Fix formatting of client smbdirect RDMA logging
+
+Zhang Xiaoxu (1):
+      cifs: Fix the error length of VALIDATE_NEGOTIATE_INFO message
+
+ MAINTAINERS               |   1 +
+ fs/cifs/cached_dir.c      |  92 ++++++++++++++++++++++++++++---------
+ fs/cifs/cached_dir.h      |  10 ++++-
+ fs/cifs/cifs_debug.c      |   4 +-
+ fs/cifs/cifs_debug.h      |   6 +--
+ fs/cifs/cifs_swn.c        |  12 ++---
+ fs/cifs/cifsencrypt.c     | 100 ++++++++++++++---------------------------
+ fs/cifs/cifsglob.h        |  30 +++++--------
+ fs/cifs/cifspdu.h         |   7 +--
+ fs/cifs/cifsproto.h       |   7 ++-
+ fs/cifs/cifssmb.c         |   2 +-
+ fs/cifs/connect.c         |  21 ++++-----
+ fs/cifs/dfs_cache.c       |   2 +-
+ fs/cifs/dir.c             |   8 ++--
+ fs/cifs/file.c            |   9 ++++
+ fs/cifs/fs_context.c      |  12 ++++-
+ fs/cifs/fscache.c         |   2 +-
+ fs/cifs/inode.c           |   2 +-
+ fs/cifs/link.c            |  13 +++---
+ fs/cifs/misc.c            |  63 +++++++++++++-------------
+ fs/cifs/sess.c            |  24 ++++++----
+ fs/cifs/smb2inode.c       |   2 +-
+ fs/cifs/smb2misc.c        |  13 +++---
+ fs/cifs/smb2ops.c         |  38 ++++++++++------
+ fs/cifs/smb2pdu.c         |  41 +++++++++++------
+ fs/cifs/smb2transport.c   |  98 +++++++++++++++++-----------------------
+ fs/cifs/smbdirect.c       | 227
++++++++++++++++++++++++++++++++++++++++-----------------------------------------------------
+ fs/cifs/smbdirect.h       |  14 +++---
+ fs/cifs/trace.h           |   3 ++
+ fs/smbfs_common/smb2pdu.h |   6 ++-
+ 30 files changed, 445 insertions(+), 424 deletions(-)
 
 
-DOCUMENTATION
+-- 
+Thanks,
 
-https://www.kernel.org/doc/html/latest/admin-guide/cifs/usage.html
-The "sep" parameter is described here to specify a new delimiter
-instead of a comma.
-I quote:
-   "sep
-   if first mount option (after the -o), overrides the comma as the
-separator between the mount parms. e.g.:
-   -o user=myname,password=mypassword,domain=mydom
-   could be passed instead with period as the separator by:
-   -o sep=.user=myname.password=mypassword.domain=mydom
-   this might be useful when comma is contained within username or
-password or domain."
-
-
-RESEARCH WORK
-
-I looked at the "mount.cifs" code. There is no provision for the use
-of a comma by the user, since the comma is used to form the parameter
-string to the kernel (man 2 mount). This line can be seen by adding
-the "--verbose" flag to the mount.
-"mount.cifs --help" lists "sep" as a possible option, but does not
-implement it in the code and does not describe it in "man 8
-mount.cifs".
-
-I looked at the "pam-mount" code - the mount options are assembled
-with a wildcard comma. The result is a text line: "mount -t cifs ...".
-
-The handling of options in the "mount" utility is based on the
-"libmount" library, which is hardcoded to use only a comma as a
-delimiter.
-
-I tried to mount "//server3/Block 3,4" with my own program (man 2
-mount) by specifying "sep=!" - successfully.
-
-
-SOLUTION
-
-It would be nice if we add in "mount.cifs", in "mount" utility and in
-"pam-mount" the ability to set a custom mount option separator. In
-other words, we need to implement the already documented "sep" option.
-
-1. For "mount.cifs" I did it in:
-https://github.com/dmitry-telegin/cifs-utils in branch
-"custom_option_separator". Commit:
-https://github.com/dmitry-telegin/cifs-utils/commit/04325b842a82edf655a14174e763bc0b2a6870e1
-
-2. For "mount" utility I did it in:
-https://github.com/dmitry-telegin/util-linux in branch
-"custom_option_separator". Commit:
-https://github.com/dmitry-telegin/util-linux/commit/5e0ecd2498edae0bf0bcab4ba6a68a9803b34ccf
-
-3. For "pam-mount" I did it in:
-https://sourceforge.net/u/dmitry-t/pam-mount/ci/master/tree/ in branch
-"custom_option_separator". Commit:
-https://sourceforge.net/u/dmitry-t/pam-mount/ci/9860f9234977f1110230482b5d87bdcb8bc6ce03/
-
-I checked the work on the Linux 5.10 kernel.
-
---
-Dmitry Telegin
+Steve
