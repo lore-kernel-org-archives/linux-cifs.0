@@ -2,69 +2,67 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB952C433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 21:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 885CEC4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 21:54:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229453AbiJKVic (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 Oct 2022 17:38:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41816 "EHLO
+        id S229453AbiJKVy4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Oct 2022 17:54:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiJKVia (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 17:38:30 -0400
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25BB1895F4
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 14:38:27 -0700 (PDT)
-Received: by mail-vs1-xe2c.google.com with SMTP id 3so15685554vsh.5
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 14:38:27 -0700 (PDT)
+        with ESMTP id S229483AbiJKVyz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 17:54:55 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70DC315FC1
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 14:54:53 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id b2so34283684eja.6
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 14:54:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IAGtRtICh4vIy5b0raEC5TMJ+Ueis46B/krZ/pXSSX8=;
-        b=cinXSao8CJuYC5vAE/PxTtnKtobhkss0uoDQERSYXEJyhN7Ci2HjORgwG4nu8a8CYH
-         nn5JYSYyBUN36KOL1Z+tj7y68HPaefXfpCjd1J+srUc2BfDTfVCIkbT6gq+Kqq7FVYl9
-         o6UwTcWna28/1gcggpV1bxL1uEnIYAI5NNOuAb96RNMWg3wXZoFwdBmy+tQD8zAjp6fL
-         umY8cUPF47v9WRH+j7TbYLuaU2mdWPCtuP3zG6XblzB6jtidMT86lkHd1Y9Q4cbofIk9
-         SRdrQ7upK93kYo9CX7FGEeaq3Ab83kdmETbU8Ms953OKXibnuZgq3muoo3FfDynupcqq
-         hxQw==
+        bh=VuGg7FLDCZzHmC1WA2CzQkwfWLoBkDNcul7V+Ge0IS4=;
+        b=qL+e+Z8gxhA+G4CKbQnoacm2gA/RDiccCGn/2JsnhYMBOylAhC3kA5Bye0XuFox9yy
+         DJkc/8+6zEWStCyDGY3vCb3Vjyx0BD0Aq5rLVuXGzge5kDoSSPsf5iJfMqKk51ffZyLk
+         TgIvjNO6FNzAMRhRQfiHpm2bBhrqML71+elhqghboypMMcvzQya7UwUMJFvfZWqzPGoW
+         +oy3oHLc8QS1XXUQR7QvKKkgpfQYdGyJTSKGTJQLTg0svpgNFW5BBS+O0AyPZW67vW5c
+         6AtgLU1nzDOUSr/MMbCrr6JXD4U6UrP4Xw+05dtPQLsMCsJOsugwC25Hnrc1u9uTKpW2
+         3OCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IAGtRtICh4vIy5b0raEC5TMJ+Ueis46B/krZ/pXSSX8=;
-        b=7RNHGM84YOHdrQYqA5LEfNbgpYubmkAwzz/gef7c4mIHhp+y2fG35Gb5bL1pXiXMK+
-         POMqwSQNL8JcrzPV0i8UVglg4UfZSNGnrhfP66QhUYvRxj7cNkQK2ePBwjgDI68EXp2k
-         fSmjToy1DYaxlIFC3RcZ8Sjgi+RA45U7meKNPV/joyjeBTStxei48cUwhEMhBgTWptGR
-         c+geCMxNszSTyD2EomEznc0ozKvXcAZSHBYeZYFrYmtPYHCie2GlgLV9+jni5FIxzJZh
-         F9tGQRZLgjizbKM/RgT5XT//FSQiCqRlWRBCkabs0DG+k2AEZ+1c4w5beYeZaW1D9e/1
-         UpdA==
-X-Gm-Message-State: ACrzQf1wjJ60Yt1NhdzPT14zdtlgdysCy+qPH33RuJXtFSKEAky+LXYC
-        CpgtIn3tMKFuTJafrBhsTEoLQLNYHcsRJmDfGPw=
-X-Google-Smtp-Source: AMsMyM5jdFiKEZMxfzRhhqs1cj8gkWX4N79oaQnHLK9kxSFi/qim0DK2RbmA5WKwHA0SzODNkXq2ksjBJJZzWNlff1I=
-X-Received: by 2002:a05:6102:23dc:b0:3a7:9b0c:aa8e with SMTP id
- x28-20020a05610223dc00b003a79b0caa8emr4417585vsr.60.1665524306049; Tue, 11
- Oct 2022 14:38:26 -0700 (PDT)
+        bh=VuGg7FLDCZzHmC1WA2CzQkwfWLoBkDNcul7V+Ge0IS4=;
+        b=0Ip/biz+nZ2MJQQCPoUlfY2yAk8wDoIxZw7prUUAOl9Ex6jOAD3Sb2XqF56bzutuFV
+         7zXnAiqtqiUpXwPR1Waq1zPVxCqlOpwglOg6dqZno3KeXvYZ92GA2cQNavCJQdzK7hjI
+         R3Nk+IZjPLqTPLqwkelBb/C+7ivbYVtwKlKKISRM2/WYum7NQ7sBREXsHW7ARAI/szdP
+         2wLfeIy9+ESsAMyi7if9FVFC+OU1pGQLcBabP+Frn3Ns3GVaEp1hLJ1V8SOv8W/8HLSz
+         HqhjiPTpBnbRvY/aXepgNTrtGavPO9fdNGWV7zn53XuW1h8B/mYTY03CBQiGesABCV6V
+         ICPw==
+X-Gm-Message-State: ACrzQf0qJ2/dkH8pPN/TUK4yaqAI3QPils2yEV9CqEeHttNw6oCammkT
+        PhNQGhNzCSuoDK5URfSY1RtKnKcc0cECvLg2eqho3E++
+X-Google-Smtp-Source: AMsMyM45EYWzQMBNfCtw1BXf6bGj7RGmeesWsR2Rb9uvqc4/Cddi0Jfb9gWXU7jMvDb3kdMEz0iw0rpGok2YE9JGuRI=
+X-Received: by 2002:a17:907:9717:b0:78d:9fb4:16dd with SMTP id
+ jg23-20020a170907971700b0078d9fb416ddmr13112748ejc.720.1665525291912; Tue, 11
+ Oct 2022 14:54:51 -0700 (PDT)
 MIME-Version: 1.0
 References: <20221011064611.1428646-1-lsahlber@redhat.com> <20221011064611.1428646-2-lsahlber@redhat.com>
  <f2d94342-c316-21d3-4dc8-7a969a102c2d@talpey.com>
 In-Reply-To: <f2d94342-c316-21d3-4dc8-7a969a102c2d@talpey.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 11 Oct 2022 16:38:15 -0500
-Message-ID: <CAH2r5mt=CRMf9=W0tJYkOkqrHnf-_Q1b35FCU1Z4o4en31mHjg@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 12 Oct 2022 07:54:39 +1000
+Message-ID: <CAN05THR-WMM0KX06UuH0QSan=S4=zaO9KYC9zcbY4R0NPdhhwQ@mail.gmail.com>
 Subject: Re: [PATCH] cifs: fix skipping to incorrect offset in emit_cached_dirents
 To:     Tom Talpey <tom@talpey.com>
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I ran the buildbot on this and it looks like this version of the patch
-fixed the tests which failed with the earlier version of the patch
-
-On Tue, Oct 11, 2022 at 11:38 AM Tom Talpey <tom@talpey.com> wrote:
+On Wed, 12 Oct 2022 at 02:40, Tom Talpey <tom@talpey.com> wrote:
 >
 > On 10/11/2022 2:46 AM, Ronnie Sahlberg wrote:
 > > When application has done lseek() to a different offset on a directory fd
@@ -102,6 +100,17 @@ On Tue, Oct 11, 2022 at 11:38 AM Tom Talpey <tom@talpey.com> wrote:
 > But I have a second question, does squeezing out the holes
 > affect a later possible lseek on the dirhandle? I'm having
 > trouble tracking down where that might happen.
+
+I think if an application does an lseek() to a position we did not
+previously tell
+the application about, then what happens is undefined.
+What happens in this patch is that we just "skip" to the next entry
+with a "valid" pos
+and start returning data from there.
+I.e. we just skip over the "hole" but that should be fine since the
+application should never
+have lseek()ed to somewhere inside the hole to begin with.
+
 >
 > >               ctx->pos = dirent->pos;
 > >               rc = dir_emit(ctx, dirent->name, dirent->namelen,
@@ -138,10 +147,3 @@ On Tue, Oct 11, 2022 at 11:38 AM Tom Talpey <tom@talpey.com> wrote:
 > >       }
 > >       kfree(tmp_buf);
 > >
-
-
-
--- 
-Thanks,
-
-Steve
