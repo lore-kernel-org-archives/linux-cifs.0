@@ -2,109 +2,69 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D5DC433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 06:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EC9C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 11:40:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229490AbiJKGq3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 Oct 2022 02:46:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49648 "EHLO
+        id S229748AbiJKLkE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Oct 2022 07:40:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229867AbiJKGq0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 02:46:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7FDA8993A
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Oct 2022 23:46:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665470784;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tcpDoYjkxMpw3zSqw1xUo5hBl7+y2lJmV5AmHSqPdwI=;
-        b=YHRhV47n4HA3wRcwjfWa1L5m2t5VW9Z6jgWL68T2r35ozSqmEDVmdWxL2cC+H3XRAh8Ejz
-        miQWWEhPl/EIAr/xl2Yo37ezJcFcHBYUCeiGCo6cxS6z3AnkBJq+SSkvk3y/UhVMaH5WQl
-        fhgVRjmzoBVsfWU9SlnGyN26B4cU5LQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-595-LDMf55Z7PnayFq7AKBBbrQ-1; Tue, 11 Oct 2022 02:46:22 -0400
-X-MC-Unique: LDMf55Z7PnayFq7AKBBbrQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 82206185A79C;
-        Tue, 11 Oct 2022 06:46:22 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-52-22.bne.redhat.com [10.64.52.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 94A64200D8C2;
-        Tue, 11 Oct 2022 06:46:21 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH] cifs: fix skipping to incorrect offset in emit_cached_dirents
-Date:   Tue, 11 Oct 2022 16:46:11 +1000
-Message-Id: <20221011064611.1428646-2-lsahlber@redhat.com>
-In-Reply-To: <20221011064611.1428646-1-lsahlber@redhat.com>
-References: <20221011064611.1428646-1-lsahlber@redhat.com>
+        with ESMTP id S229483AbiJKLkD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 07:40:03 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8767193FE
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 04:40:01 -0700 (PDT)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1oiDc6-0000Wf-6U; Tue, 11 Oct 2022 13:39:58 +0200
+Message-ID: <80835d45-b023-acc9-cd7e-25fa8d66be63@leemhuis.info>
+Date:   Tue, 11 Oct 2022 13:39:57 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: CIFS: attempt to fix kernel bugzilla 215375
+Content-Language: en-US, de-DE
+To:     Steve French <smfrench@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Davyd McColl <davydm@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+References: <20220906054240.4148159-1-lsahlber@redhat.com>
+ <CAH2r5mu2sKKcf3H0wNYVUJgpVYLRSEPdu+PPiWZHJfNnV=aTNA@mail.gmail.com>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <CAH2r5mu2sKKcf3H0wNYVUJgpVYLRSEPdu+PPiWZHJfNnV=aTNA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1665488401;8bd85048;
+X-HE-SMSGID: 1oiDc6-0000Wf-6U
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When application has done lseek() to a different offset on a directory fd
-we skipped one entry too many before we start emitting directory entries
-from the cache.
+On 10.09.22 17:19, Steve French wrote:
+> Any thoughts about setting up VMs for Win98 to try this?  Any luck
+> trying to test with the fix?
 
-We need to also make sure that when we are starting to emit directory
-entries from the cache, the ->pos sequence might have holes and skip
-some indices.
+Ronnie, Steve, any news on that patch and a way forward? More and more
+users are showing up in
+https://bugzilla.kernel.org/show_bug.cgi?id=215375 and complain about
+this regression. :-/ At least one of them apparently tested the patch
+now successfully: https://bugzilla.kernel.org/show_bug.cgi?id=215375#c43
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/readdir.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+Ciao, Thorsten
 
-diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index 8e060c00c969..7170614434a1 100644
---- a/fs/cifs/readdir.c
-+++ b/fs/cifs/readdir.c
-@@ -847,14 +847,19 @@ static bool emit_cached_dirents(struct cached_dirents *cde,
- 	int rc;
- 
- 	list_for_each_entry(dirent, &cde->entries, entry) {
--		if (ctx->pos >= dirent->pos)
-+		if (ctx->pos > dirent->pos)
- 			continue;
-+		/*
-+		 * There may be holes in the ->pos sequence
-+		 * so always force ctx->pos to the current position.
-+		 */
- 		ctx->pos = dirent->pos;
- 		rc = dir_emit(ctx, dirent->name, dirent->namelen,
- 			      dirent->fattr.cf_uniqueid,
- 			      dirent->fattr.cf_dtype);
- 		if (!rc)
- 			return rc;
-+		ctx->pos++;
- 	}
- 	return true;
- }
-@@ -1202,10 +1207,10 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
- 				 ctx->pos, tmp_buf);
- 			cifs_save_resume_key(current_entry, cifsFile);
- 			break;
--		} else
--			current_entry =
--				nxt_dir_entry(current_entry, end_of_smb,
--					cifsFile->srch_inf.info_level);
-+		}
-+		current_entry =
-+			nxt_dir_entry(current_entry, end_of_smb,
-+				      cifsFile->srch_inf.info_level);
- 	}
- 	kfree(tmp_buf);
- 
--- 
-2.35.3
-
+> On Tue, Sep 6, 2022 at 12:42 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>>
+>> Steve,
+>> Here is an attempt to fix kernel bz 215375.
+>> I can not test it, since I don't have access to servers this old but the change
+>> should be safe for modern users as it only affects the password field for
+>> "share mode" security, which we do not support anyway.
+>>
+>> It is only tested for regressions with user mode security on win98 and later systems, using ntlmssp
+>> authentication.
+>>
+>>
+>>
+> 
+> 
