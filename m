@@ -2,269 +2,191 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCEBFC4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 19:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EA4C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 20:41:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbiJKTuv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 Oct 2022 15:50:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44644 "EHLO
+        id S229603AbiJKUly (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Oct 2022 16:41:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229585AbiJKTup (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 15:50:45 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 635C5733EC
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 12:50:44 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A08341FAFC;
-        Tue, 11 Oct 2022 19:50:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1665517842; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        with ESMTP id S229504AbiJKUlw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 16:41:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C58466FA0B
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 13:41:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665520909;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Llp6oo6JdCN4RJptJob3L3kZbzmiR7BLwOoLtzvQyAU=;
-        b=sbrVMXbTtv/IEO9aZ1a/iRQQByJaiO5vXmfLk8+YzuUcPEasYFK/JkGtFfHoEQes0gAZ+f
-        FAzMiqqVOAeBFlexMvGP1zarffLaJEdrR6yd3Ilwe9bpb5T5gxmdaZ1X3wvX+2WGKhAvES
-        PVtVerAELKF96sBhFp+XVby7qpuLEPM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1665517842;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Llp6oo6JdCN4RJptJob3L3kZbzmiR7BLwOoLtzvQyAU=;
-        b=FupPARYLq/lecvNWcVMJSODyTWT8DadY97j7wkXFN1ww4OiWKdjF1271nInoeRDKObwJ9p
-        8ucJWntxE2wuyYBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3384C139ED;
-        Tue, 11 Oct 2022 19:50:42 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id bERnABLJRWP2TwAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Tue, 11 Oct 2022 19:50:41 +0000
-Date:   Tue, 11 Oct 2022 16:50:39 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Dmitry Telegin <dmitry.s.telegin@gmail.com>,
-        linux-cifs@vger.kernel.org
+        bh=z8D2twBBFA9vweuQUYyj0t1dMUN3BWI02gvM+zj823g=;
+        b=Bys1P0k8dBJ1GZ2brbg0ZlZQWtG74BLw113rcY/dK7ThHgUsbge+PoN4afiRPWoS+Ej45/
+        6GtY3XwMrwgwYdU01kzpWNKLu0hGeDETrySNAUNzjie5IlJN3aHHIemqdPjaiMigO3+MdK
+        v+FgoFnpOK9wbEkTNFlBXsN8MSYIApc=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-140-BwRRoW_oPBKsyZPrk7pkSg-1; Tue, 11 Oct 2022 16:41:48 -0400
+X-MC-Unique: BwRRoW_oPBKsyZPrk7pkSg-1
+Received: by mail-oi1-f199.google.com with SMTP id s8-20020a0568080b0800b00354d7ce1b4fso161015oij.8
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 13:41:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z8D2twBBFA9vweuQUYyj0t1dMUN3BWI02gvM+zj823g=;
+        b=xwAyaoehzMkULFzR5NLj2FjpwDlC5AKyHKZsplXwKR1qbTmX+j+aTqxVweeX9thoW3
+         IArZ7h+8/gg+P/reGbLmoaoUIE7Zk2d/m/sUcI/Pg2e3UPzvJ0xYg+VI4rQT3MwwIOC3
+         2NJTYj8OOsrghCSy7M+uvvxbKvpXz4BMhMua5gzVcxXx1ILCFdK72bjoKDFZpQBn5d0r
+         2l0rPZ7z3ywe5Pn84y3hXvOlWUylUPHu8ztunEi2xSRrk7rPxB7vUHv5WPhP3XuYGm88
+         /OLpRrjPO1sh6OQztoPn0iAe/xSXqQo02fHREzgDi2JgFqYQVTNhLOdPvwYOetI4XQaa
+         nHCw==
+X-Gm-Message-State: ACrzQf2DIwLLUWMBNNDKlxyeY5GPZ1jJAZZRIdTu44eomnacyyVU4qz4
+        MpPA0RfrWMgwlulAex00E7iqCHR1PETMxaoLIi+bnIYqpZi8CqThHLI+63psmzlF8WyAFjr0ExJ
+        qZuFCEn9AcdzRcUs8YVT4E7oiwhrL/DDyuE0EfQ==
+X-Received: by 2002:a05:6830:2647:b0:659:ed73:8781 with SMTP id f7-20020a056830264700b00659ed738781mr11332192otu.352.1665520907913;
+        Tue, 11 Oct 2022 13:41:47 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4rk4YKtyJmaWegBHXXpvY5cAR0rzp+SA4zyCRRDDPnNr9F6z+2HZU2RypPgJwLS8aB6vissLJU2m8ZviDJ9YA=
+X-Received: by 2002:a05:6830:2647:b0:659:ed73:8781 with SMTP id
+ f7-20020a056830264700b00659ed738781mr11332181otu.352.1665520907660; Tue, 11
+ Oct 2022 13:41:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <CACVrvT5CMERoJN4fz-MdNOOUV9VpOT_vv764UEgzDdaUEC9nUg@mail.gmail.com>
+ <CAH2r5muHfRp0yA6G4Z0iJppy7CO_n=EYoZ0__U_iTGUJFOnKpg@mail.gmail.com> <20221011185714.5elxjbut7cvfed6x@suse.de>
+In-Reply-To: <20221011185714.5elxjbut7cvfed6x@suse.de>
+From:   Leif Sahlberg <lsahlber@redhat.com>
+Date:   Wed, 12 Oct 2022 06:41:36 +1000
+Message-ID: <CAGvGhF7f-UFNDN9ZZPLdvQZV95G3NpdN_ftouKuTBTecm9MDRQ@mail.gmail.com>
 Subject: Re: A patch to implement the already documented "sep" option for the
  CIFS file system.
-Message-ID: <20221011195039.wcja5lltpym5gs6o@suse.de>
-References: <CACVrvT5CMERoJN4fz-MdNOOUV9VpOT_vv764UEgzDdaUEC9nUg@mail.gmail.com>
- <CAH2r5muHfRp0yA6G4Z0iJppy7CO_n=EYoZ0__U_iTGUJFOnKpg@mail.gmail.com>
- <20221011185714.5elxjbut7cvfed6x@suse.de>
- <CAH2r5ms=F_p5Ns_sGWsy4Ggrs9PnaNQszu3XKkSBH9+cGMp0Aw@mail.gmail.com>
- <20221011192138.dy44o34fpfhg5ck3@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20221011192138.dy44o34fpfhg5ck3@suse.de>
+To:     Enzo Matsumiya <ematsumiya@suse.de>
+Cc:     Steve French <smfrench@gmail.com>,
+        Dmitry Telegin <dmitry.s.telegin@gmail.com>,
+        linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/11, Enzo Matsumiya wrote:
->On 10/11, Steve French wrote:
->>All three approaches seem to parse it in user space, which makes
->>sense.  Easier to do it in mount.cifs than in kernel fs_context
->>parsing
+On Wed, Oct 12, 2022 at 4:58 AM Enzo Matsumiya <ematsumiya@suse.de> wrote:
 >
->Yes, I'm just saying that the original approach (having a 'sep=' option)
->would require implementation in the kernel as well (it currently doesn't
->exist).  If we just replace the comma by 0x1E in both mount.cifs and the
->kernel, we don't need all this fiddling with custom separators.
+> On 10/11, Steve French wrote:
+> >makes sense.
+> >
+> >Did anyone else review this yet?  (the mount.cifs version of the patch)
+>
+> At a glance, the patch seems ok and solves a real problem.
+>
+> However, I think a better approach would be to parse the string in user
+> space, i.e. it's much easier for mount.cifs to fetch what's the
+> UNC/password string if they're passed quoted (shell handles it), and
+> then use 0x1E (ASCII Record Separator) instead of a comma.  Then, in
+> the kernel, we'd only need to strsep() by 0x1E.  Since 0x1E is a
+> non-printable ASCII character, I have a hard assumption it's not allowed
+> as UNC/password in most systems.  Also since it would be only used
+> internally between mount.cifs and cifs.ko, users would not need to know
+> nor care about it.
+>
+> Thoughts?
 
-Hastily hacked PoC patches follow.  Worked with my simple test:
+The trouble with changing to 0x1e is that that would create a
+dependency between mount.cifs and the kernel.
+And that we would need to upgrade, or downgrade, them in lockstep
+which will cause a lot of pain.
+Old version of mount.cifs can not talk to new version of kernel and v.v.
 
-   mount.cifs -o vers=3.1.1,sign,credentials=/root/sambacreds "//192.168.0.15/my, share" /mnt/samba
+I think a better way to handle this would be to use an escape-character for ','.
+(and remove all traces of "sep=")
 
+>
+>
+> Enzo
+>
+> >On Sat, Oct 8, 2022 at 2:41 PM Dmitry Telegin
+> ><dmitry.s.telegin@gmail.com> wrote:
+> >>
+> >> DESCRIPTION OF THE PROBLEM
+> >>
+> >> Some users are accustomed to using shared folders in Windows with a
+> >> comma in the name, for example: "//server3/Block 3,4".
+> >> When they try to migrate to Linux, they cannot mount such paths.
+> >>
+> >> An example of the line generated by "mount.cifs" for the kernel when
+> >> mounting "//server3/Block 3,4":
+> >> "ip=10.0.2.212,unc=\\server3\Block 3,4,iocharset=utf8,user=user1,domain=AD"
+> >> Accordingly, due to the extra comma, we have an error:
+> >> "Sep 7 21:57:18 S1 kernel: [ 795.604821] CIFS: Unknown mount option "4""
+> >>
+> >>
+> >> DOCUMENTATION
+> >>
+> >> https://www.kernel.org/doc/html/latest/admin-guide/cifs/usage.html
+> >> The "sep" parameter is described here to specify a new delimiter
+> >> instead of a comma.
+> >> I quote:
+> >>    "sep
+> >>    if first mount option (after the -o), overrides the comma as the
+> >> separator between the mount parms. e.g.:
+> >>    -o user=myname,password=mypassword,domain=mydom
+> >>    could be passed instead with period as the separator by:
+> >>    -o sep=.user=myname.password=mypassword.domain=mydom
+> >>    this might be useful when comma is contained within username or
+> >> password or domain."
+> >>
+> >>
+> >> RESEARCH WORK
+> >>
+> >> I looked at the "mount.cifs" code. There is no provision for the use
+> >> of a comma by the user, since the comma is used to form the parameter
+> >> string to the kernel (man 2 mount). This line can be seen by adding
+> >> the "--verbose" flag to the mount.
+> >> "mount.cifs --help" lists "sep" as a possible option, but does not
+> >> implement it in the code and does not describe it in "man 8
+> >> mount.cifs".
+> >>
+> >> I looked at the "pam-mount" code - the mount options are assembled
+> >> with a wildcard comma. The result is a text line: "mount -t cifs ...".
+> >>
+> >> The handling of options in the "mount" utility is based on the
+> >> "libmount" library, which is hardcoded to use only a comma as a
+> >> delimiter.
+> >>
+> >> I tried to mount "//server3/Block 3,4" with my own program (man 2
+> >> mount) by specifying "sep=!" - successfully.
+> >>
+> >>
+> >> SOLUTION
+> >>
+> >> It would be nice if we add in "mount.cifs", in "mount" utility and in
+> >> "pam-mount" the ability to set a custom mount option separator. In
+> >> other words, we need to implement the already documented "sep" option.
+> >>
+> >> 1. For "mount.cifs" I did it in:
+> >> https://github.com/dmitry-telegin/cifs-utils in branch
+> >> "custom_option_separator". Commit:
+> >> https://github.com/dmitry-telegin/cifs-utils/commit/04325b842a82edf655a14174e763bc0b2a6870e1
+> >>
+> >> 2. For "mount" utility I did it in:
+> >> https://github.com/dmitry-telegin/util-linux in branch
+> >> "custom_option_separator". Commit:
+> >> https://github.com/dmitry-telegin/util-linux/commit/5e0ecd2498edae0bf0bcab4ba6a68a9803b34ccf
+> >>
+> >> 3. For "pam-mount" I did it in:
+> >> https://sourceforge.net/u/dmitry-t/pam-mount/ci/master/tree/ in branch
+> >> "custom_option_separator". Commit:
+> >> https://sourceforge.net/u/dmitry-t/pam-mount/ci/9860f9234977f1110230482b5d87bdcb8bc6ce03/
+> >>
+> >> I checked the work on the Linux 5.10 kernel.
+> >>
+> >> --
+> >> Dmitry Telegin
+> >
+> >
+> >
+> >--
+> >Thanks,
+> >
+> >Steve
+>
 
-Enzo
-
-Kernel patch:
-
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -414,7 +414,7 @@ int smb3_parse_opt(const char *options, const char *key, char **val)
-  	if (!opts)
-  		return -ENOMEM;
-  
--	while ((p = strsep(&opts, ","))) {
-+	while ((p = strsep(&opts, "\x1e"))) {
-  		char *nval;
-  
-  		if (!*p)
-@@ -585,7 +585,7 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
-  		return ret;
-  
-  	/* BB Need to add support for sep= here TBD */
--	while ((key = strsep(&options, ",")) != NULL) {
-+	while ((key = strsep(&options, "\x1e")) != NULL) {
-  		size_t len;
-  		char *value;
-
-
-cifs-utils patch:
-  
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 2278995c9653..1d48e257a794 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1195,7 +1195,7 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
-  
-  		/* go ahead and copy */
-  		if (out_len)
--			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			strlcat(out, "\x1e", MAX_OPTIONS_LEN);
-  
-  		strlcat(out, data, MAX_OPTIONS_LEN);
-  		out_len = strlen(out);
-@@ -1215,7 +1215,7 @@ nocopy:
-  		}
-  
-  		if (out_len) {
--			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			strlcat(out, "\x1e", MAX_OPTIONS_LEN);
-  			out_len++;
-  		}
-  		snprintf(out + out_len, word_len + 5, "uid=%s", txtbuf);
-@@ -1235,7 +1235,7 @@ nocopy:
-  		}
-  
-  		if (out_len) {
--			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			strlcat(out, "\x1e", MAX_OPTIONS_LEN);
-  			out_len++;
-  		}
-  		snprintf(out + out_len, word_len + 7, "cruid=%s", txtbuf);
-@@ -1251,7 +1251,7 @@ nocopy:
-  		}
-  
-  		if (out_len) {
--			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			strlcat(out, "\x1e", MAX_OPTIONS_LEN);
-  			out_len++;
-  		}
-  		snprintf(out + out_len, word_len + 5, "gid=%s", txtbuf);
-@@ -1267,7 +1267,7 @@ nocopy:
-  		}
-  
-  		if (out_len) {
--			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			strlcat(out, "\x1e", MAX_OPTIONS_LEN);
-  			out_len++;
-  		}
-  		snprintf(out + out_len, word_len + 11, "backupuid=%s", txtbuf);
-@@ -1283,7 +1283,7 @@ nocopy:
-  		}
-  
-  		if (out_len) {
--			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			strlcat(out, "\x1e", MAX_OPTIONS_LEN);
-  			out_len++;
-  		}
-  		snprintf(out + out_len, word_len + 11, "backupgid=%s", txtbuf);
-@@ -1299,7 +1299,7 @@ nocopy:
-  		}
-  
-  		if (out_len) {
--			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			strlcat(out, "\x1e", MAX_OPTIONS_LEN);
-  			out_len++;
-  		}
-  		snprintf(out + out_len, word_len + 10, "snapshot=%s", txtbuf);
-@@ -1558,17 +1558,17 @@ add_mtab(char *devname, char *mountpoint, unsigned long flags, const char *fstyp
-  			strlcat(mountent.mnt_opts, "rw", MTAB_OPTIONS_LEN);
-  
-  		if (flags & MS_MANDLOCK)
--			strlcat(mountent.mnt_opts, ",mand", MTAB_OPTIONS_LEN);
-+			strlcat(mountent.mnt_opts, "\x1emand", MTAB_OPTIONS_LEN);
-  		if (flags & MS_NOEXEC)
--			strlcat(mountent.mnt_opts, ",noexec", MTAB_OPTIONS_LEN);
-+			strlcat(mountent.mnt_opts, "\x1enoexec", MTAB_OPTIONS_LEN);
-  		if (flags & MS_NOSUID)
--			strlcat(mountent.mnt_opts, ",nosuid", MTAB_OPTIONS_LEN);
-+			strlcat(mountent.mnt_opts, "\x1enosuid", MTAB_OPTIONS_LEN);
-  		if (flags & MS_NODEV)
--			strlcat(mountent.mnt_opts, ",nodev", MTAB_OPTIONS_LEN);
-+			strlcat(mountent.mnt_opts, "\x1enodev", MTAB_OPTIONS_LEN);
-  		if (flags & MS_SYNCHRONOUS)
--			strlcat(mountent.mnt_opts, ",sync", MTAB_OPTIONS_LEN);
-+			strlcat(mountent.mnt_opts, "\x1esync", MTAB_OPTIONS_LEN);
-  		if (mount_user) {
--			strlcat(mountent.mnt_opts, ",user=", MTAB_OPTIONS_LEN);
-+			strlcat(mountent.mnt_opts, "\x1euser=", MTAB_OPTIONS_LEN);
-  			strlcat(mountent.mnt_opts, mount_user,
-  				MTAB_OPTIONS_LEN);
-  		}
-@@ -1942,7 +1942,7 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
-  	/* copy in user= string */
-  	if (parsed_info->got_user) {
-  		if (*parsed_info->options)
--			strlcat(parsed_info->options, ",",
-+			strlcat(parsed_info->options, "\x1e",
-  				sizeof(parsed_info->options));
-  		strlcat(parsed_info->options, "user=",
-  			sizeof(parsed_info->options));
-@@ -1952,14 +1952,14 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
-  
-  	if (*parsed_info->domain) {
-  		if (*parsed_info->options)
--			strlcat(parsed_info->options, ",",
-+			strlcat(parsed_info->options, "\x1e",
-  				sizeof(parsed_info->options));
-  		strlcat(parsed_info->options, "domain=",
-  			sizeof(parsed_info->options));
-  		strlcat(parsed_info->options, parsed_info->domain,
-  			sizeof(parsed_info->options));
-  	} else if (parsed_info->got_domain) {
--		strlcat(parsed_info->options, ",domain=",
-+		strlcat(parsed_info->options, "\x1e" "domain=",
-  			sizeof(parsed_info->options));
-  	}
-  
-@@ -2216,23 +2216,23 @@ mount_retry:
-  	strlcpy(options, "ip=", options_size);
-  	strlcat(options, currentaddress, options_size);
-  
--	strlcat(options, ",unc=\\\\", options_size);
-+	strlcat(options, "\x1eunc=\\\\", options_size);
-  	strlcat(options, parsed_info->host, options_size);
-  	strlcat(options, "\\", options_size);
-  	strlcat(options, parsed_info->share, options_size);
-  
-  	if (*parsed_info->options) {
--		strlcat(options, ",", options_size);
-+		strlcat(options, "\x1e", options_size);
-  		strlcat(options, parsed_info->options, options_size);
-  	}
-  
-  	if (*parsed_info->prefix) {
--		strlcat(options, ",prefixpath=", options_size);
-+		strlcat(options, "\x1eprefixpath=", options_size);
-  		strlcat(options, parsed_info->prefix, options_size);
-  	}
-  
-  	if (sloppy)
--		strlcat(options, ",sloppy", options_size);
-+		strlcat(options, "\x1esloppy", options_size);
-  
-  	if (parsed_info->verboseflag)
-  		fprintf(stderr, "%s kernel mount options: %s",
-@@ -2243,10 +2243,10 @@ mount_retry:
-  		 * Commas have to be doubled, or else they will
-  		 * look like the parameter separator
-  		 */
--		strlcat(options, ",pass=", options_size);
-+		strlcat(options, "\x1epass=", options_size);
-  		strlcat(options, parsed_info->password, options_size);
-  		if (parsed_info->verboseflag)
--			fprintf(stderr, ",pass=********");
-+			fprintf(stderr, "\x1epass=********");
-  	}
-  
-  	if (parsed_info->verboseflag)
