@@ -2,62 +2,68 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43721C433FE
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Oct 2022 20:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47485C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 03:43:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229453AbiJJUnH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Oct 2022 16:43:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44082 "EHLO
+        id S229977AbiJKDn1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Oct 2022 23:43:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229819AbiJJUnF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Oct 2022 16:43:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1CA41B7B9
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Oct 2022 13:43:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665434583;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=DAoavaPmaQs9SfD0/dAZK6SHmHZg5n+7ojuvIa2tyJs=;
-        b=KaRG6nGrs+Q+sCHqkxrDA+2nb0voEaRfVEWRoPdUVspa9mPZFrA07DcTAMVL9MxWWjzlLS
-        /5WQMTXrD3C1FeL1gTHLlccIg8AsJ1ZAme8wSqvBzpxGOMNpE/oSjQjKkz6iNEPtVF2lIv
-        /Yd88h2RHLkpqYHLwfKTsk/vJL8raUg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-640-EaPsNbs6PZSlCRHNlnDbPA-1; Mon, 10 Oct 2022 16:43:02 -0400
-X-MC-Unique: EaPsNbs6PZSlCRHNlnDbPA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229614AbiJKDnQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Oct 2022 23:43:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4C37F138;
+        Mon, 10 Oct 2022 20:43:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 209E23C10223;
-        Mon, 10 Oct 2022 20:43:02 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-52-22.bne.redhat.com [10.64.52.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 733222084845;
-        Mon, 10 Oct 2022 20:43:01 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: cifs: fix bug when skipping one entry too many after lseek()
-Date:   Tue, 11 Oct 2022 06:42:49 +1000
-Message-Id: <20221010204250.1411858-1-lsahlber@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 07E26610A2;
+        Tue, 11 Oct 2022 03:43:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6D69DC43140;
+        Tue, 11 Oct 2022 03:43:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665459794;
+        bh=l0uMiKxbh2cBe9j9ye2ttSVW7T5Xp18cA/LM7MxTh0k=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=saCRDHPvxhl+SIAcYE2Ao3R0dDTJ9DxwqVdPNO8ucBMzKWRJT6UwGCS5RkfEvYhqx
+         F8azxWXiqkvfA9nI7H7Dw4qAbR1nDXjSC86Q0pzEvsKcZI3sU4hl47DQ6P+vWfb3cT
+         /Z2xuBLh/5Lhkl3MHxm5VvTgxICl22vglvoUjc/6Aa/OyWn3z9oCuXdIDMAyrIFqRK
+         LlGyopFZISyrhE7T5C2gS2dXL0tvDbk7ivvqzGupZ4JWSnXtcsDRkyEAAIpaBDEQTg
+         GIn+XI9s8iJnU3mHOayVRVfcD2myEy6wD8pGPsCwAZ21diu4VSMQCp3RS6b76spvBL
+         xeiQzPgaUKA1w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5A177E29F34;
+        Tue, 11 Oct 2022 03:43:14 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5muHt_9eBuE7GOHNvV+9zHH8X=+sVmK3Qj1R8uEWNydn_Q@mail.gmail.com>
+References: <CAH2r5muHt_9eBuE7GOHNvV+9zHH8X=+sVmK3Qj1R8uEWNydn_Q@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5muHt_9eBuE7GOHNvV+9zHH8X=+sVmK3Qj1R8uEWNydn_Q@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc-smb3-client-fixes-part1
+X-PR-Tracked-Commit-Id: 958553d13478ad0e35fa09fecad3ce73277ccaf5
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ac1e8c6c95bf805c699656046aef0a05205edfbd
+Message-Id: <166545979436.4678.13983540243723521763.pr-tracker-bot@kernel.org>
+Date:   Tue, 11 Oct 2022 03:43:14 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve, List
+The pull request you sent on Sun, 9 Oct 2022 00:50:33 -0500:
 
-Please see an updated patch for the issue when skipping one entry too many
-after an lseek() on a direcotry and reading out of cache.
-This now makes this patch plus patch4 pass generic/257.
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc-smb3-client-fixes-part1
 
-It also introduces a trivial change to readir to avoid creating holes in the
-ctx->pos sequence.   We either need to handle holes in this sequence
-or we can just avoid creating holes in the first place (which this patch does)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ac1e8c6c95bf805c699656046aef0a05205edfbd
 
+Thank you!
 
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
