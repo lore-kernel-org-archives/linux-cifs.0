@@ -2,68 +2,60 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47485C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 03:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDD8C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 06:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbiJKDn1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Oct 2022 23:43:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49096 "EHLO
+        id S229871AbiJKGq2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Oct 2022 02:46:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbiJKDnQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Oct 2022 23:43:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4C37F138;
-        Mon, 10 Oct 2022 20:43:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229864AbiJKGqX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 02:46:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2682377547
+        for <linux-cifs@vger.kernel.org>; Mon, 10 Oct 2022 23:46:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665470782;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=BEHR5rl2LvogNEOZ0kK6WA/buymBTpQhkcE+lZVBjwg=;
+        b=KbKIbuJPm0EI8Xd9WaZI+Um40KpzwUDNrME5VIvIy40Ssu9lpvUYUPEGbvIYtF66ZWbJ5j
+        6T1eGuQG/9NtG/T0I1mcwj+GokC6Fu/+t4/Z28eMhsuV6YiXHM0Vv5HolpU/ohhXcuZryS
+        fh4RQ+SOHvRMBK7zzQERcLf9KXyuRis=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-316-OpnAniaWMxu_w-I9DssPdQ-1; Tue, 11 Oct 2022 02:46:20 -0400
+X-MC-Unique: OpnAniaWMxu_w-I9DssPdQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 07E26610A2;
-        Tue, 11 Oct 2022 03:43:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6D69DC43140;
-        Tue, 11 Oct 2022 03:43:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665459794;
-        bh=l0uMiKxbh2cBe9j9ye2ttSVW7T5Xp18cA/LM7MxTh0k=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=saCRDHPvxhl+SIAcYE2Ao3R0dDTJ9DxwqVdPNO8ucBMzKWRJT6UwGCS5RkfEvYhqx
-         F8azxWXiqkvfA9nI7H7Dw4qAbR1nDXjSC86Q0pzEvsKcZI3sU4hl47DQ6P+vWfb3cT
-         /Z2xuBLh/5Lhkl3MHxm5VvTgxICl22vglvoUjc/6Aa/OyWn3z9oCuXdIDMAyrIFqRK
-         LlGyopFZISyrhE7T5C2gS2dXL0tvDbk7ivvqzGupZ4JWSnXtcsDRkyEAAIpaBDEQTg
-         GIn+XI9s8iJnU3mHOayVRVfcD2myEy6wD8pGPsCwAZ21diu4VSMQCp3RS6b76spvBL
-         xeiQzPgaUKA1w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5A177E29F34;
-        Tue, 11 Oct 2022 03:43:14 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5muHt_9eBuE7GOHNvV+9zHH8X=+sVmK3Qj1R8uEWNydn_Q@mail.gmail.com>
-References: <CAH2r5muHt_9eBuE7GOHNvV+9zHH8X=+sVmK3Qj1R8uEWNydn_Q@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5muHt_9eBuE7GOHNvV+9zHH8X=+sVmK3Qj1R8uEWNydn_Q@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc-smb3-client-fixes-part1
-X-PR-Tracked-Commit-Id: 958553d13478ad0e35fa09fecad3ce73277ccaf5
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ac1e8c6c95bf805c699656046aef0a05205edfbd
-Message-Id: <166545979436.4678.13983540243723521763.pr-tracker-bot@kernel.org>
-Date:   Tue, 11 Oct 2022 03:43:14 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC50E833948;
+        Tue, 11 Oct 2022 06:46:19 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-52-22.bne.redhat.com [10.64.52.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B51E112D17C;
+        Tue, 11 Oct 2022 06:46:18 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: cifs: fix skipping to incorrect offset in emit_cached_diretns
+Date:   Tue, 11 Oct 2022 16:46:10 +1000
+Message-Id: <20221011064611.1428646-1-lsahlber@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sun, 9 Oct 2022 00:50:33 -0500:
+Steve,
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc-smb3-client-fixes-part1
+V3 of the patch.  We have to handle that there may be indicies that are
+skipped in the ->pos sequence so add support to handle this.
+As we now can handle this case we no longer need to modify cifs_filldir
+to return -EEXIST for these cases.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ac1e8c6c95bf805c699656046aef0a05205edfbd
+This fixes generic/006/100/111/257
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
