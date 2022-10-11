@@ -2,69 +2,150 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EC9C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 11:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BE3C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Oct 2022 16:22:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbiJKLkE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 Oct 2022 07:40:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55470 "EHLO
+        id S229656AbiJKQWN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Oct 2022 12:22:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbiJKLkD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 07:40:03 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8767193FE
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 04:40:01 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1oiDc6-0000Wf-6U; Tue, 11 Oct 2022 13:39:58 +0200
-Message-ID: <80835d45-b023-acc9-cd7e-25fa8d66be63@leemhuis.info>
-Date:   Tue, 11 Oct 2022 13:39:57 +0200
+        with ESMTP id S229766AbiJKQWM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Oct 2022 12:22:12 -0400
+Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8313E95E5F
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 09:22:10 -0700 (PDT)
+Received: by mail-vk1-xa2e.google.com with SMTP id e5so6889749vkg.6
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Oct 2022 09:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=URTcB6jmEv6JqFU9FotKTYiHqbMVUFkysgLRprq0jdQ=;
+        b=YcUbHqIDfEPERby7IIKRMXYc/BL7kVso+e/oD1ULfxfqKMtJ/gdfwLZpzbYwErDiQ3
+         bCwVtRMm51pEP4cr4k6eYlF8b8PRv2bgYFqYQqU6Oc0sLG2c3snNjg+97xcCxZWX+Ua3
+         ERW5P5dHHOId8rYw6DVOwsyOQ3b1YDOhsp4NgCFcyF3p+SO/MnrFCwnvW3tAB3NotqfT
+         ALKYHpMWDJtylZ5mWJ8+wTFrosnX251ysHKkEYLnfnXClMVUUY8KjeCjpvryBXBEK2sK
+         nabG3caAD5U62eJxWp+bRlFHUBMk1SRK8vzoFdp7MboZp3b8qAfFSIUcyOTg1l1vt2Tc
+         6YHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=URTcB6jmEv6JqFU9FotKTYiHqbMVUFkysgLRprq0jdQ=;
+        b=ho2vXM/jDxeyHapVdEjX62knP4wJDWmRqi1qryLAIkQaWNfqWr1j0K3jt/fEXKWjcP
+         YBnY+xwxci2F8ONq2Q89S8M9EcGmrPgLXNmKcroZQ2B3Hy4TN36GNeE4DLnnOMftkI3Y
+         Xaz+IhN9vQQblPU5W4jwwlOy2pRItJhUwRCiAuyRA0Op7sJfLTQt8/Ir5SZEXfi1yFgr
+         JdVOsnvbyb4Qzx6CeVZXBZVgqwlJUn5y2WfQ+P6TmTOaobsvUFClfs/nRqiBI1WYmep8
+         t9/GGDjVUlT1WegDZLHZeCYxIzmqV4Sso/6USlI7fqGUaGpmPysl7NXOUbBDkpQaEplC
+         gbjQ==
+X-Gm-Message-State: ACrzQf12fEc5WJQmPk72xfztOHCIlqqXNCp3y1WyKr00DAbntYA5JXnm
+        rt82LXku+DU5Nku14l+zZERSS4lX9EQWmQ5UJFb9N32L
+X-Google-Smtp-Source: AMsMyM6UoyvBCVUtgb0UtjHWZSexlKf6qoAhJejXeItF+3oemlhUeV2cBYMBUbBSiWo5GEcdaO3OCdkVHnwBBdMzjOQ=
+X-Received: by 2002:a1f:d583:0:b0:3aa:9112:570f with SMTP id
+ m125-20020a1fd583000000b003aa9112570fmr11350751vkg.3.1665505328625; Tue, 11
+ Oct 2022 09:22:08 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: CIFS: attempt to fix kernel bugzilla 215375
-Content-Language: en-US, de-DE
-To:     Steve French <smfrench@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Davyd McColl <davydm@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <20220906054240.4148159-1-lsahlber@redhat.com>
- <CAH2r5mu2sKKcf3H0wNYVUJgpVYLRSEPdu+PPiWZHJfNnV=aTNA@mail.gmail.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <CAH2r5mu2sKKcf3H0wNYVUJgpVYLRSEPdu+PPiWZHJfNnV=aTNA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1665488401;8bd85048;
-X-HE-SMSGID: 1oiDc6-0000Wf-6U
+References: <CACVrvT5CMERoJN4fz-MdNOOUV9VpOT_vv764UEgzDdaUEC9nUg@mail.gmail.com>
+In-Reply-To: <CACVrvT5CMERoJN4fz-MdNOOUV9VpOT_vv764UEgzDdaUEC9nUg@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 11 Oct 2022 11:21:58 -0500
+Message-ID: <CAH2r5muHfRp0yA6G4Z0iJppy7CO_n=EYoZ0__U_iTGUJFOnKpg@mail.gmail.com>
+Subject: Re: A patch to implement the already documented "sep" option for the
+ CIFS file system.
+To:     Dmitry Telegin <dmitry.s.telegin@gmail.com>
+Cc:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10.09.22 17:19, Steve French wrote:
-> Any thoughts about setting up VMs for Win98 to try this?  Any luck
-> trying to test with the fix?
+makes sense.
 
-Ronnie, Steve, any news on that patch and a way forward? More and more
-users are showing up in
-https://bugzilla.kernel.org/show_bug.cgi?id=215375 and complain about
-this regression. :-/ At least one of them apparently tested the patch
-now successfully: https://bugzilla.kernel.org/show_bug.cgi?id=215375#c43
+Did anyone else review this yet?  (the mount.cifs version of the patch)
 
-Ciao, Thorsten
+On Sat, Oct 8, 2022 at 2:41 PM Dmitry Telegin
+<dmitry.s.telegin@gmail.com> wrote:
+>
+> DESCRIPTION OF THE PROBLEM
+>
+> Some users are accustomed to using shared folders in Windows with a
+> comma in the name, for example: "//server3/Block 3,4".
+> When they try to migrate to Linux, they cannot mount such paths.
+>
+> An example of the line generated by "mount.cifs" for the kernel when
+> mounting "//server3/Block 3,4":
+> "ip=10.0.2.212,unc=\\server3\Block 3,4,iocharset=utf8,user=user1,domain=AD"
+> Accordingly, due to the extra comma, we have an error:
+> "Sep 7 21:57:18 S1 kernel: [ 795.604821] CIFS: Unknown mount option "4""
+>
+>
+> DOCUMENTATION
+>
+> https://www.kernel.org/doc/html/latest/admin-guide/cifs/usage.html
+> The "sep" parameter is described here to specify a new delimiter
+> instead of a comma.
+> I quote:
+>    "sep
+>    if first mount option (after the -o), overrides the comma as the
+> separator between the mount parms. e.g.:
+>    -o user=myname,password=mypassword,domain=mydom
+>    could be passed instead with period as the separator by:
+>    -o sep=.user=myname.password=mypassword.domain=mydom
+>    this might be useful when comma is contained within username or
+> password or domain."
+>
+>
+> RESEARCH WORK
+>
+> I looked at the "mount.cifs" code. There is no provision for the use
+> of a comma by the user, since the comma is used to form the parameter
+> string to the kernel (man 2 mount). This line can be seen by adding
+> the "--verbose" flag to the mount.
+> "mount.cifs --help" lists "sep" as a possible option, but does not
+> implement it in the code and does not describe it in "man 8
+> mount.cifs".
+>
+> I looked at the "pam-mount" code - the mount options are assembled
+> with a wildcard comma. The result is a text line: "mount -t cifs ...".
+>
+> The handling of options in the "mount" utility is based on the
+> "libmount" library, which is hardcoded to use only a comma as a
+> delimiter.
+>
+> I tried to mount "//server3/Block 3,4" with my own program (man 2
+> mount) by specifying "sep=!" - successfully.
+>
+>
+> SOLUTION
+>
+> It would be nice if we add in "mount.cifs", in "mount" utility and in
+> "pam-mount" the ability to set a custom mount option separator. In
+> other words, we need to implement the already documented "sep" option.
+>
+> 1. For "mount.cifs" I did it in:
+> https://github.com/dmitry-telegin/cifs-utils in branch
+> "custom_option_separator". Commit:
+> https://github.com/dmitry-telegin/cifs-utils/commit/04325b842a82edf655a14174e763bc0b2a6870e1
+>
+> 2. For "mount" utility I did it in:
+> https://github.com/dmitry-telegin/util-linux in branch
+> "custom_option_separator". Commit:
+> https://github.com/dmitry-telegin/util-linux/commit/5e0ecd2498edae0bf0bcab4ba6a68a9803b34ccf
+>
+> 3. For "pam-mount" I did it in:
+> https://sourceforge.net/u/dmitry-t/pam-mount/ci/master/tree/ in branch
+> "custom_option_separator". Commit:
+> https://sourceforge.net/u/dmitry-t/pam-mount/ci/9860f9234977f1110230482b5d87bdcb8bc6ce03/
+>
+> I checked the work on the Linux 5.10 kernel.
+>
+> --
+> Dmitry Telegin
 
-> On Tue, Sep 6, 2022 at 12:42 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->>
->> Steve,
->> Here is an attempt to fix kernel bz 215375.
->> I can not test it, since I don't have access to servers this old but the change
->> should be safe for modern users as it only affects the password field for
->> "share mode" security, which we do not support anyway.
->>
->> It is only tested for regressions with user mode security on win98 and later systems, using ntlmssp
->> authentication.
->>
->>
->>
-> 
-> 
+
+
+-- 
+Thanks,
+
+Steve
