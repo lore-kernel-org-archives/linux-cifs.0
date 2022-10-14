@@ -2,74 +2,92 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E64E9C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri, 14 Oct 2022 14:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA1D0C433FE
+	for <linux-cifs@archiver.kernel.org>; Fri, 14 Oct 2022 14:07:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230316AbiJNOFW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 14 Oct 2022 10:05:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38394 "EHLO
+        id S230289AbiJNOHQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 14 Oct 2022 10:07:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230319AbiJNOFE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 14 Oct 2022 10:05:04 -0400
+        with ESMTP id S230235AbiJNOHK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 14 Oct 2022 10:07:10 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F081D5872
-        for <linux-cifs@vger.kernel.org>; Fri, 14 Oct 2022 07:04:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5108AC491
+        for <linux-cifs@vger.kernel.org>; Fri, 14 Oct 2022 07:06:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665756180;
+        s=mimecast20190719; t=1665756395;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=k8qQltuyjmygy+O43yanVxeFaxBvrjiQoX3IXlPZtGE=;
-        b=RKHBQA/A4GlnxFkvwLNIpONxGhyNEOoKxzT/Ei36YkDnL+VAzlv3bscrVdg1uB565Zn0wN
-        e/Fvg0sj6dh7zV1RUi+wGHP76038mbA2w9LCAhFCtWWVnmQQGifGavsIwhIhy+tz3wGnAl
-        QHUBtd+tWXuW+oAphqRgaDMVjTvnq0E=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=gTDMT5dUS3Kh1fBWxDZJMEprgSmNC1zcod1UBzX5NVw=;
+        b=PO+GOYgUU/ZiEdyDGUs9fLcCq/n+2WWhk5rG4A3rVJbysBs83STEvtYHyiVYXny7LK18HX
+        fLBDrJAjzaT9boXJ/5Fb1ZNWU/f8YoLM7Ax8nwDaI0lNy5DmWSBW47kws3YKA4OO9DJfUv
+        oAhrUWrEPviVBaBQfUuMo5NWvHW20JE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-244-0ngC2H1gONipQ71LSLOWqQ-1; Fri, 14 Oct 2022 09:59:38 -0400
-X-MC-Unique: 0ngC2H1gONipQ71LSLOWqQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-625-CAqzT3VWOAucnqmqLG9C7g-1; Fri, 14 Oct 2022 10:06:32 -0400
+X-MC-Unique: CAqzT3VWOAucnqmqLG9C7g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C2DFA3C10687;
-        Fri, 14 Oct 2022 13:59:37 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0F3DA832D3E;
+        Fri, 14 Oct 2022 14:06:19 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.78])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 456D84030DF;
-        Fri, 14 Oct 2022 13:59:36 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3EF761155889;
+        Fri, 14 Oct 2022 14:06:14 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20220901220138.182896-6-vishal.moola@gmail.com>
-References: <20220901220138.182896-6-vishal.moola@gmail.com> <20220901220138.182896-1-vishal.moola@gmail.com>
-To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Cc:     dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nilfs@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH 05/23] afs: Convert afs_writepages_region() to use filemap_get_folios_tag()
+In-Reply-To: <YwWgdekd+f3MqVmu@infradead.org>
+References: <YwWgdekd+f3MqVmu@infradead.org> <166126392703.708021.14465850073772688008.stgit@warthog.procyon.org.uk> <166126393409.708021.16165278011941496946.stgit@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/7] iov_iter: Add a function to extract an iter's buffers to a bvec iter
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1569539.1665755974.1@warthog.procyon.org.uk>
-Date:   Fri, 14 Oct 2022 14:59:34 +0100
-Message-ID: <1569540.1665755974@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-ID: <1584070.1665756368.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 14 Oct 2022 15:06:08 +0100
+Message-ID: <1584071.1665756368@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Vishal Moola (Oracle) <vishal.moola@gmail.com> wrote:
+Christoph Hellwig <hch@infradead.org> wrote:
 
-> Convert to use folios throughout. This function is in preparation to
-> remove find_get_pages_range_tag().
-> 
-> Also modified this function to write the whole batch one at a time,
-> rather than calling for a new set every single write.
-> 
-> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> On Tue, Aug 23, 2022 at 03:12:14PM +0100, David Howells wrote:
+> > Copy cifs's setup_aio_ctx_iter() and to lib/iov_iter.c and generalise =
+it as
+> > extract_iter_to_iter().  This allocates and sets up an array of bio_ve=
+cs
+> > for all the page fragments in an I/O iterator and sets a second suppli=
+ed
+> > iterator to bvec-type pointing to the array.
+> =
 
-Tested-by: David Howells <dhowells@redhat.com>
+> Did you read my NACK and comments from last time?
+
+No, because they ended up in a different mailbox from everything else for =
+some
+reason.
+
+> I really do not like this as a general purpose helper.  This is an odd
+> quirk that we really generally should not needed unless you have very
+> convoluted locking.  So please keep it inside of cifs.
+
+I'm using it in under-development netfslib code also.
+
+Let me ask the question more generally in a separate email.
+
+David
 
