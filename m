@@ -2,68 +2,96 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF9D5C433FE
-	for <linux-cifs@archiver.kernel.org>; Sun, 16 Oct 2022 18:18:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5A3C433FE
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 Oct 2022 08:55:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbiJPSSy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 16 Oct 2022 14:18:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
+        id S229891AbiJQIzv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Oct 2022 04:55:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbiJPSSx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 16 Oct 2022 14:18:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4AB45F62;
-        Sun, 16 Oct 2022 11:18:51 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C053860DB9;
-        Sun, 16 Oct 2022 18:18:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F669C433C1;
-        Sun, 16 Oct 2022 18:18:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665944330;
-        bh=dPCZkyY2kZfHHrgWdQUXCc+K1FpEJBieGor3sHYxmZA=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=T1fgwMFIfqe7e5iKp1ykJvlLyPBwEL7KPeu4FJr1BxTHkXLFKBTvqE4M1oukcoOxM
-         Lkfm3eqBhNJvif0MdsGsdhn7J6r+KyUlXc38PmfPG2gCQcRM3ijnzk0vCvKDj76+qX
-         BqOd7jVgE0bAuiDuCw6lG4sf1PjSei9SY+oXvuYi2a2bhca5+YGoKsykudAiMknowH
-         1Zy5Hch3Ri4AMsHh29XFWiqdCEFVNpfgPPmyHfw2j3S5r/KtUcY/McUKwpxSBfWDKH
-         lz5YkHKrgO4KjDZElA0KHieYlzmCPOpxsTZ2cZaNqp9fJCHw+HCa6PMu3LGmrtjF9X
-         C2VNcZ/4VB9Iw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1CACBE270EE;
-        Sun, 16 Oct 2022 18:18:50 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mu+WTsmhrmJpGWqj4Wn9J2TQnEaqZv+pHLsLd91g=8wdA@mail.gmail.com>
-References: <CAH2r5mu+WTsmhrmJpGWqj4Wn9J2TQnEaqZv+pHLsLd91g=8wdA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mu+WTsmhrmJpGWqj4Wn9J2TQnEaqZv+pHLsLd91g=8wdA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc-smb3-client-fixes-part2
-X-PR-Tracked-Commit-Id: e3e9463414f610e91528f2b920b8cb655f4bae33
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b08cd74448fafaa302ce2bc11beab5e5a55d0065
-Message-Id: <166594433009.2997.11932594239257071601.pr-tracker-bot@kernel.org>
-Date:   Sun, 16 Oct 2022 18:18:50 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        with ESMTP id S230265AbiJQIzt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 04:55:49 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71C29120A5
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Oct 2022 01:55:48 -0700 (PDT)
+Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MrW6j3NzHzHv2P;
+        Mon, 17 Oct 2022 16:55:41 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 17 Oct 2022 16:55:43 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
+ (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 17 Oct
+ 2022 16:55:42 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <linux-cifs@vger.kernel.org>
+CC:     <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>,
+        <yangyingliang@huawei.com>
+Subject: [PATCH -next] cifs: use LIST_HEAD() and list_move() to simplify code
+Date:   Mon, 17 Oct 2022 16:55:08 +0800
+Message-ID: <20221017085508.3582763-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 15 Oct 2022 19:33:08 -0500:
+list_head can be initialized automatically with LIST_HEAD()
+instead of calling INIT_LIST_HEAD().
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc-smb3-client-fixes-part2
+Using list_move() instead of list_del() and list_add().
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b08cd74448fafaa302ce2bc11beab5e5a55d0065
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+---
+ fs/cifs/cached_dir.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-Thank you!
-
+diff --git a/fs/cifs/cached_dir.c b/fs/cifs/cached_dir.c
+index fe88b67c863f..8cad528a8722 100644
+--- a/fs/cifs/cached_dir.c
++++ b/fs/cifs/cached_dir.c
+@@ -378,13 +378,11 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
+ {
+ 	struct cached_fids *cfids = tcon->cfids;
+ 	struct cached_fid *cfid, *q;
+-	struct list_head entry;
++	LIST_HEAD(entry);
+ 
+-	INIT_LIST_HEAD(&entry);
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
+-		list_del(&cfid->entry);
+-		list_add(&cfid->entry, &entry);
++		list_move(&cfid->entry, &entry);
+ 		cfids->num_entries--;
+ 		cfid->is_open = false;
+ 		/* To prevent race with smb2_cached_lease_break() */
+@@ -518,15 +516,13 @@ struct cached_fids *init_cached_dirs(void)
+ void free_cached_dirs(struct cached_fids *cfids)
+ {
+ 	struct cached_fid *cfid, *q;
+-	struct list_head entry;
++	LIST_HEAD(entry);
+ 
+-	INIT_LIST_HEAD(&entry);
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
+ 		cfid->on_list = false;
+ 		cfid->is_open = false;
+-		list_del(&cfid->entry);
+-		list_add(&cfid->entry, &entry);
++		list_move(&cfid->entry, &entry);
+ 	}
+ 	spin_unlock(&cfids->cfid_list_lock);
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.25.1
+
