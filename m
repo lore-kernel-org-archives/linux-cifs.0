@@ -2,148 +2,275 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB014C4332F
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Oct 2022 21:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD98C4332F
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 Oct 2022 23:12:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229996AbiJQV2z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Oct 2022 17:28:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34562 "EHLO
+        id S231302AbiJQXMN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Oct 2022 19:12:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229739AbiJQV2y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 17:28:54 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2087.outbound.protection.outlook.com [40.107.92.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5508D7C32F
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Oct 2022 14:28:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JW8N3qRGDKKmdbfAknqjveKtiWyzypv/hDXdNizf3ySYExweVvGe8WYtfgiRLrd+PMjQ2r5eMNMcqGVp9tUG6FHUmGm0NmqLKmrckgt2VbQLk1Jh6AE2My0uCAy7gFgj67PmO+HMKO81OSPie0hg30oBG++ADPozIci1Q3LBhGxZ8kyWXRq1PoIV41M9fdENryUk0TP2KRE8XXKV3T1bicOyU0W6XI3CTxIJhGhWqLmjSKHzun6A9zSjSfZ7xS90NbWvq0pBA1n/oMlREOnm/NnrOehyoCdFMBzqDbWIaehshIFAW71w8Na7yqbXSozchbADE9p/yg3kEihXcu6qUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M9T/bjqrg3zCm4c2DjDCqDK0ht0JrHbRy5/k4l7zHyA=;
- b=XVYfXiQklJUNHWgYxq+RkDW+VCdCkDsT1UWZBqBAb2XAliS7xDJg57t1iiNTDmLUvpgNFIp2WHxr1uiJcggrZ3xs0ggaG6Zb9O18qwRceTTXcCZmk/3c0P/TZPK9hULh7OouQESFa+pMJP0Jj4KeX+Syo1AtnoDwS2Wteib9megkni/EWE9gQN8U6DVz3D26kMYfEDs5CaIFJ5TNlLyoaujadQnz0ZhpZzDyGp1uRNjIGFZf/17HErvyL82NSCvv7eCX1EtDVomWepqJwpYM+o4+Gf9dko4u7fNnpAMoP/phR3vfLII0LHHX03Yp439ggdyogX7A7Jx22DPa44XeuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- SN6PR01MB4174.prod.exchangelabs.com (2603:10b6:805:b2::26) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5723.29; Mon, 17 Oct 2022 21:28:51 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::454c:df56:b524:13ef]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::454c:df56:b524:13ef%5]) with mapi id 15.20.5723.032; Mon, 17 Oct 2022
- 21:28:51 +0000
-Message-ID: <ed5577b5-3fc2-cfac-8ea8-e8f425a47069@talpey.com>
-Date:   Mon, 17 Oct 2022 17:28:50 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.3
-Subject: Re: [PATCH][SMB3 client] Server interface count incorrectly
- calculated
-Content-Language: en-US
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>
-References: <CAH2r5mvf3zjMb3=ceL9wknZhMwp6CrOQEyzZ7HaXDNidYpLCBQ@mail.gmail.com>
- <bc73fcd9-3a30-75f1-5745-94f0e2509cf4@talpey.com>
- <CAH2r5muH+n6TYS3_O9pbwREWJ_GYuva_PvOLd88pxG+t9kVeCA@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <CAH2r5muH+n6TYS3_O9pbwREWJ_GYuva_PvOLd88pxG+t9kVeCA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BL0PR01CA0008.prod.exchangelabs.com (2603:10b6:208:71::21)
- To SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33)
+        with ESMTP id S231491AbiJQXL6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 19:11:58 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36DE5857FD
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Oct 2022 16:11:35 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id g27so18136322edf.11
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Oct 2022 16:11:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=0sHX9EvPHhaX6Wid0i1wtyr+Z6iYV15Hik14CyaMabg=;
+        b=e3+e85SaWpHspjf4nEZqRsa+003iZ/5wkBZD9D6TbHWCQht7szc90S+gS7dxsuDRAi
+         afv5cJden3r5sMdPlrNs8Cn/3IGdYvSBVHtRCR8GVzwmAVvx980mqfdA2HNjr2eEkvuk
+         tKeK39MLy4tt94oEI6RLTg/1lhGmWMhjv4fkLhhpfSQCXSrTFqfi1Z6G6BjrxykOUem9
+         fJPalrVFbIpo0+jI84/1qVR07RigjTQg90slRfMT4yTWLcx+zILFhpWA7awr2kxQGiwO
+         PCkNMTs4BkJ26OLxTlhzyJYKt2x8ee6XQAzgR8RHkae64BlNj5Cc8U6pVXlyoxGEe+ou
+         qOPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0sHX9EvPHhaX6Wid0i1wtyr+Z6iYV15Hik14CyaMabg=;
+        b=MNOvHSl90/LMw24rtK/vOi1zmrcuplIfFZY8UtTGS7yLt7eoYwJzLdjMN4rLwQIAoC
+         JZDywvluKadbNJz63nv+xMBK9kautXcOM/F7qxjhQvaIZLYm/hkh1NEfkB7B6mYmppIi
+         eeUjdbwc2opLlafL128Re6cL2ZRmj+HoHKD/lre65/opArU9m5abQugkbOty3DMCdwRd
+         1d57Q+I/n8emyncZgEmPZeklnCKBFv+cJxMLWNz6Xfm+uvdsFEmeA3xK1U4Mitp9RvHb
+         rGFFku8aUXUChcyzynkmwGUTOhuWIfRufYB4Gh2b+cB41Eqho53149B+02T4BaCBWrJS
+         Rrsw==
+X-Gm-Message-State: ACrzQf3d/hdQSk8pD00sfvL9bfrsK/PruP23I4x9nz8GMkR6r+CZmmAo
+        YYLU+obxm6u3LMzl/BaijdiPdo/CkQociUk15cY=
+X-Google-Smtp-Source: AMsMyM42X2UKrUvstK4cSQZA/YFBTYumSH6/Yab6xoG7a0p8BgLfDjaHtZ05Zh+yKxnf1qslHN2CAz5/Z+VtV6Ievas=
+X-Received: by 2002:a05:6402:11ce:b0:45c:a2a2:4207 with SMTP id
+ j14-20020a05640211ce00b0045ca2a24207mr56485edw.3.1666048248769; Mon, 17 Oct
+ 2022 16:10:48 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|SN6PR01MB4174:EE_
-X-MS-Office365-Filtering-Correlation-Id: 49aaec53-cec6-4de0-79b0-08dab08695e7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PZbXnT0q115ATAtx6mBIJ5DcYwdCSRr8mB65cn42K/y4H2RF3vdoap3WdWiS1aox2YfyGVeNp/12z7gwjN/XuyzRH3jzyVnLPXxuQImcNACE9w09PSseuOShK7qSh6vDp111sZoSn/odvT4CiQ86tOhEYAy0K44NV18SlzcUG4Cdl+UfoEXZhYXbANkmxSidYX1ThCEDm/WqE+VaS4+iUSqFA4YwZRaRYwcCvUZr9nypeEQRrIi1N0WSdoOUqC9nts+Ds241CInfBjMt3VzlERDIu3QZP5DtyGb3FMA/RNky+hYNZn7fOa4aNg+4DIwsusqa5Ez+deZurzS/x+mardcK/vWCjmd7imqya7O/ppULpZnQ0CLizeph+3e58pU5m3IkW8fnTDpQZue/RuJy+eO40KSBf14EN8mPYqtbb5mvVWVwk+ICL+izWnNFnorbkXU9ytVH7oH4pXljhizFrs7CLoSkM//ROWIytUCb2C4Fwqv716AADx8SB5svtWr/S4FRNO198Nxbn30ZNoJ4+MwYdXgV2j8IvAnMlXejc15/5mBaso4ecntWYZ7UvJdlqL5nuInBitPf9DJ/GuNKJaqzz+Sabd0MtTNk8n6rBxHmON0U3JXZzpWYjD1BttIoDwM4pGpSp1hvEPUwYmEOq7UKDXnr/jiGTmW1qofZ9sUgWlw4mR/6y23x/ljffOOkPC43fZwYkt41PGzx4KBUHfudW9mNkpMhmtAJ09SGA/n0b4EMnIPDaAcE0SLSg4x3R/Sc94tdG+WCg6aQujQu6oYN5X2rCfjKy8NIsr1IrUM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(376002)(396003)(136003)(366004)(39830400003)(451199015)(41300700001)(5660300002)(2906002)(8936002)(31686004)(36756003)(316002)(54906003)(6916009)(66476007)(52116002)(53546011)(478600001)(6506007)(6486002)(66556008)(66946007)(4326008)(8676002)(26005)(6512007)(31696002)(86362001)(83380400001)(38100700002)(38350700002)(2616005)(186003)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d2laN1FibU8wc3U1ay9KZEVFTE5FQmdwTlg3TlovK3lKdndYQmlPUko2M3RT?=
- =?utf-8?B?SFZ0QXViQW8zTFBVcURwNnJ2NXZRam5nVDIwblFrWEtrVkxvZitMeVM3cG90?=
- =?utf-8?B?bWJJSFNyRmduZVUzYTN4QkhTekpLOURBdDlnQmVGOGtoT1BOL21SVHhiMnhN?=
- =?utf-8?B?N1NWZ1MwdldFZ2ZDVkh1UmZ5RWdiS0xhcjBoOUVNVWxKWFFEYTNBVzFFejdU?=
- =?utf-8?B?N0crSE5lMSt1T0lwTEZBY2laNFQ2VExYbW1UUVJVZXYwNFpGZnNkK205VHpK?=
- =?utf-8?B?eXVEQzhFeER2RTZmdWhRdUp0TW9KNElWdHlPVXlvbVYxY1U2MEZQK1E1S3RJ?=
- =?utf-8?B?VkxUTXFKdDhxbnhHejlZTitHQVkzU2RkODlxSVFFNDNhUFdqa3FPbzYwNGtp?=
- =?utf-8?B?L216ZS8wbUEvb25LaitDanR4RGN3NkxSTFhIbWZVUG1COGdST1JOdEtXUURD?=
- =?utf-8?B?WXlvelhxa01QbnZrdWJFWXlqRGlEWlNjOC90SUcweGlrbmx6Zkk0b2pEeXpK?=
- =?utf-8?B?OE50WWExRnRreWtGUzFPaDBkeGNINU5IQzhXOGFyZzkwdVE4VXVlTnIvWEZS?=
- =?utf-8?B?Y0NzSDU5akprVGR4UG8wTU53UXRzbldtdzdBNW0zb0RsT09JYU56R3ZhZEo1?=
- =?utf-8?B?YWFXRDhWcmtiUjZFaGNPKytINnMrbC9EbUdoblZlNUhTVnp2S2FvcnVhTTFk?=
- =?utf-8?B?OXpuWjIzOU5pcG8zUUk4UXNBYnk0NEtFN1ErQ2lZVFhBZGtta3VDdHNzb1JS?=
- =?utf-8?B?Z0lvNVB6U09OSllYakxUbE04YWxYZEtjQTZVOElsM2M1RndGZ1g2SmJ6WFpo?=
- =?utf-8?B?NEdTeEhsc09YUDhJSGcwMVhLdVMyc3hGL3F1RnY2c1FOS0EybFNjaGYvYUNx?=
- =?utf-8?B?NW0ybklLZEtVT25scUZkWUhaMnpUc2VKVzQvd1FJQVhqWFhvbDZNbkROeFA1?=
- =?utf-8?B?MXdUak5BSE0vcFV3eXVja2pES2tYUkh0bDA3QlZUOUovQys1WDZRSUtHVEhk?=
- =?utf-8?B?ekZrT1FvdDZENEVYRVRUUExXZ1A4SmQ0Qyt3SmdyMFdseGVEcVR4NEQxZm5W?=
- =?utf-8?B?YlhCMUowVkxnSHN0U2haVVlPdEc2WGlBTFBkWURpeU9DbUdqQVN5S0VPT2F6?=
- =?utf-8?B?aEVUeFBsdXRsdnhHck9KUkdmMFl6d0s0Sm5BalozTHZYQ0NoWVVldUMvN3ha?=
- =?utf-8?B?UzljNHdqWHl3Q280Q0xuSDhSSElQanYrZUd6Zi8rVkR0a2I1TUlIQld0YjFQ?=
- =?utf-8?B?UGhBUk1TVVhIRWpkRjczMTc2ZnVQcHlFcHVMWngrRFhwQk04UmFvM0dtQWUv?=
- =?utf-8?B?dVpOL3hOV0tveEZXY0pQQWIySUNXSnR2aXo1ZzdkbVBWSWdiV3A1Z1hCSXFy?=
- =?utf-8?B?WkZ6YllPakw5ZlZWbmtIZWVrRDZSQi9OQzZJTzQrT0ZlWUVDSkhnTWVmRGRz?=
- =?utf-8?B?emRTdFR1d1BwaXdWU0s3eHB2cGFRL05RaG8yUmpVYzQzQWl5M3orYlpod1Mw?=
- =?utf-8?B?YUN0SHRORVQ5TUhDZzh0cDFrTmlYYmE3cE1zN1QzK3F4cTVWdCtuZzM4MVZI?=
- =?utf-8?B?eGxodzNIcTJwUG9QL0JmOXcvaHQxNmdPdDFucVdpRnhsUXlHMGNDT0cvK0lj?=
- =?utf-8?B?VzNJRWp2Zm9xdWcyN1lqVFhTaURsNmppYkF5L2w2R2haY3RMNFV4bnJMdG1Q?=
- =?utf-8?B?UmlYL1U3L3JQVSs1L2krYmNnNHpEL3VMaDFhbXFHOHE1dzNEVnVpT3RlbUpG?=
- =?utf-8?B?aWZIRFd6N0NGbVlTQW1pRndqRUx6RjkwR3ErMzdtOWpoQkl1aGJPanlJY2dq?=
- =?utf-8?B?QjhLZjFKcHY4UnNEL0pwL2lLbXltaWFENStQNzZuZ20rTVd5cndqMTU1bXAr?=
- =?utf-8?B?a3Nua0V5cGNTT1J0QnJkQ2RCSjdzeG53RzdrTDdjYlpSL1pDRnF6enlWT29R?=
- =?utf-8?B?b05sSldKYzFmVnptNTBFbkJhQ0Z5MlVXU2dFTWI2SzRSS3NKUEpVZS8rOHM2?=
- =?utf-8?B?Y0U4UU9Sbm55cEJOWnhKYVU0d2VzU2dqRXdTWFZEamswS3dtcjVrTXU0K09U?=
- =?utf-8?B?VjVNd1EyTFVVNVpHdEs1akV4TXN3MllzSThVRnF0Nzg4Vll1ZndhS2lTZFJu?=
- =?utf-8?Q?S3Uw=3D?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49aaec53-cec6-4de0-79b0-08dab08695e7
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2022 21:28:51.4990
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jCm2JwYtCLfJwlMPvusWAHvfoOFXH5cTt0UnaEZZC3XAuFnt4LYgbmQH28s5KTY6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR01MB4174
+References: <Y0l0ylvXH1kLbL0F@kili>
+In-Reply-To: <Y0l0ylvXH1kLbL0F@kili>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Tue, 18 Oct 2022 09:10:36 +1000
+Message-ID: <CAN05THRXCgWQhDBkGD4V=oW3dZBmhhEyHpW3P5cE87qCUKtr-w@mail.gmail.com>
+Subject: Re: [bug report] cifs: find and use the dentry for cached non-root
+ directories also
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     lsahlber@redhat.com, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/17/2022 5:26 PM, Steve French wrote:
-> 
-> 
-> On Mon, Oct 17, 2022, 16:03 Tom Talpey <tom@talpey.com 
-> <mailto:tom@talpey.com>> wrote:
-> 
->     On 10/15/2022 6:10 PM, Steve French wrote:
->      > smb3: interface count displayed incorrectly
->      >
->      > The "Server interfaces" count in /proc/fs/cifs/DebugData increases
->      > as the interfaces are requeried, rather than being reset to the new
->      > value.  This could cause a problem if the server disabled
->      > multichannel as the iface_count is checked in try_adding_channels
->      > to see if multichannel still supported.
->      >
->      > Cc: <stable@vger.kernel.org <mailto:stable@vger.kernel.org>>
->      >
->      > See attached
->      >
-> 
->     This zeroes the ses->iface_count under the lock, but the whole
->     routine is dropping and re-taking the same lock many times,
->     and finally sets the iface_count without holding the lock at
->     all.
-> 
-> 
-> I updated the patch earlier today to fix that existing issue as well 
-> (served into same patch). If I missed something let me know
+Thanks Dan,
 
-I was just looking at the patch attached to the message I replied to.
-I'll look again, but it will have to be tomorrow.
+rc is set to -ENOENT somewhat later and this is what is returned to
+the application for this case.
+However, I will fix this so that we do not get a smash warning for it.
 
-Tom.
+regards
+Ronnie Sahlberg
+
+On Sat, 15 Oct 2022 at 00:54, Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> Hello Ronnie Sahlberg,
+>
+> The patch ab2ef9a696a6: "cifs: find and use the dentry for cached
+> non-root directories also" from Oct 12, 2022, leads to the following
+> Smatch static checker warning:
+>
+>         fs/cifs/cached_dir.c:257 open_cached_dir()
+>         warn: missing error code here? 'IS_ERR()' failed. 'rc' = '0'
+>
+> fs/cifs/cached_dir.c
+>     105 int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+>     106                     const char *path,
+>     107                     struct cifs_sb_info *cifs_sb,
+>     108                     bool lookup_only, struct cached_fid **ret_cfid)
+>     109 {
+>     110         struct cifs_ses *ses;
+>     111         struct TCP_Server_Info *server;
+>     112         struct cifs_open_parms oparms;
+>     113         struct smb2_create_rsp *o_rsp = NULL;
+>     114         struct smb2_query_info_rsp *qi_rsp = NULL;
+>     115         int resp_buftype[2];
+>     116         struct smb_rqst rqst[2];
+>     117         struct kvec rsp_iov[2];
+>     118         struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
+>     119         struct kvec qi_iov[1];
+>     120         int rc, flags = 0;
+>     121         __le16 *utf16_path = NULL;
+>     122         u8 oplock = SMB2_OPLOCK_LEVEL_II;
+>     123         struct cifs_fid *pfid;
+>     124         struct dentry *dentry = NULL;
+>     125         struct cached_fid *cfid;
+>     126         struct cached_fids *cfids;
+>     127
+>     128         if (tcon == NULL || tcon->cfids == NULL || tcon->nohandlecache ||
+>     129             is_smb1_server(tcon->ses->server))
+>     130                 return -EOPNOTSUPP;
+>     131
+>     132         ses = tcon->ses;
+>     133         server = ses->server;
+>     134         cfids = tcon->cfids;
+>     135
+>     136         if (!server->ops->new_lease_key)
+>     137                 return -EIO;
+>     138
+>     139         if (cifs_sb->root == NULL)
+>     140                 return -ENOENT;
+>     141
+>     142         utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
+>     143         if (!utf16_path)
+>     144                 return -ENOMEM;
+>     145
+>     146         cfid = find_or_create_cached_dir(cfids, path, lookup_only);
+>     147         if (cfid == NULL) {
+>     148                 kfree(utf16_path);
+>     149                 return -ENOENT;
+>     150         }
+>     151         /*
+>     152          * At this point we either have a lease already and we can just
+>     153          * return it. If not we are guaranteed to be the only thread accessing
+>     154          * this cfid.
+>     155          */
+>     156         if (cfid->has_lease) {
+>     157                 *ret_cfid = cfid;
+>     158                 kfree(utf16_path);
+>     159                 return 0;
+>     160         }
+>     161
+>     162         /*
+>     163          * We do not hold the lock for the open because in case
+>     164          * SMB2_open needs to reconnect.
+>     165          * This is safe because no other thread will be able to get a ref
+>     166          * to the cfid until we have finished opening the file and (possibly)
+>     167          * acquired a lease.
+>     168          */
+>     169         if (smb3_encryption_required(tcon))
+>     170                 flags |= CIFS_TRANSFORM_REQ;
+>     171
+>     172         pfid = &cfid->fid;
+>     173         server->ops->new_lease_key(pfid);
+>     174
+>     175         memset(rqst, 0, sizeof(rqst));
+>     176         resp_buftype[0] = resp_buftype[1] = CIFS_NO_BUFFER;
+>     177         memset(rsp_iov, 0, sizeof(rsp_iov));
+>     178
+>     179         /* Open */
+>     180         memset(&open_iov, 0, sizeof(open_iov));
+>     181         rqst[0].rq_iov = open_iov;
+>     182         rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
+>     183
+>     184         oparms.tcon = tcon;
+>     185         oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_FILE);
+>     186         oparms.desired_access = FILE_READ_ATTRIBUTES;
+>     187         oparms.disposition = FILE_OPEN;
+>     188         oparms.fid = pfid;
+>     189         oparms.reconnect = false;
+>     190
+>     191         rc = SMB2_open_init(tcon, server,
+>     192                             &rqst[0], &oplock, &oparms, utf16_path);
+>     193         if (rc)
+>     194                 goto oshr_free;
+>     195         smb2_set_next_command(tcon, &rqst[0]);
+>     196
+>     197         memset(&qi_iov, 0, sizeof(qi_iov));
+>     198         rqst[1].rq_iov = qi_iov;
+>     199         rqst[1].rq_nvec = 1;
+>     200
+>     201         rc = SMB2_query_info_init(tcon, server,
+>     202                                   &rqst[1], COMPOUND_FID,
+>     203                                   COMPOUND_FID, FILE_ALL_INFORMATION,
+>     204                                   SMB2_O_INFO_FILE, 0,
+>     205                                   sizeof(struct smb2_file_all_info) +
+>     206                                   PATH_MAX * 2, 0, NULL);
+>     207         if (rc)
+>     208                 goto oshr_free;
+>     209
+>     210         smb2_set_related(&rqst[1]);
+>     211
+>     212         rc = compound_send_recv(xid, ses, server,
+>     213                                 flags, 2, rqst,
+>     214                                 resp_buftype, rsp_iov);
+>     215         if (rc) {
+>     216                 if (rc == -EREMCHG) {
+>     217                         tcon->need_reconnect = true;
+>     218                         pr_warn_once("server share %s deleted\n",
+>     219                                      tcon->tree_name);
+>     220                 }
+>     221                 goto oshr_free;
+>     222         }
+>     223
+>     224         atomic_inc(&tcon->num_remote_opens);
+>     225
+>     226         o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
+>     227         oparms.fid->persistent_fid = o_rsp->PersistentFileId;
+>     228         oparms.fid->volatile_fid = o_rsp->VolatileFileId;
+>     229 #ifdef CONFIG_CIFS_DEBUG2
+>     230         oparms.fid->mid = le64_to_cpu(o_rsp->hdr.MessageId);
+>     231 #endif /* CIFS_DEBUG2 */
+>     232
+>     233         if (o_rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE)
+>     234                 goto oshr_free;
+>     235
+>     236
+>     237         smb2_parse_contexts(server, o_rsp,
+>     238                             &oparms.fid->epoch,
+>     239                             oparms.fid->lease_key, &oplock,
+>     240                             NULL, NULL);
+>     241
+>     242         qi_rsp = (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
+>     243         if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_all_info))
+>     244                 goto oshr_free;
+>     245         if (!smb2_validate_and_copy_iov(
+>     246                                 le16_to_cpu(qi_rsp->OutputBufferOffset),
+>     247                                 sizeof(struct smb2_file_all_info),
+>     248                                 &rsp_iov[1], sizeof(struct smb2_file_all_info),
+>     249                                 (char *)&cfid->file_all_info))
+>     250                 cfid->file_all_info_is_valid = true;
+>     251
+>     252         if (!path[0])
+>     253                 dentry = dget(cifs_sb->root);
+>     254         else {
+>     255                 dentry = path_to_dentry(cifs_sb, path);
+>     256                 if (IS_ERR(dentry))
+> --> 257                         goto oshr_free;
+>
+> Should this be an error path?  There is a lot going on in the cleanup
+> code so maybe the error code is set later.
+>
+>     258         }
+>     259         cfid->dentry = dentry;
+>     260         cfid->tcon = tcon;
+>     261         cfid->time = jiffies;
+>     262         cfid->is_open = true;
+>     263         cfid->has_lease = true;
+>     264
+>     265 oshr_free:
+>     266         kfree(utf16_path);
+>     267         SMB2_open_free(&rqst[0]);
+>     268         SMB2_query_info_free(&rqst[1]);
+>     269         free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+>     270         free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+>     271         spin_lock(&cfids->cfid_list_lock);
+>     272         if (!cfid->has_lease) {
+>     273                 if (cfid->on_list) {
+>     274                         list_del(&cfid->entry);
+>     275                         cfid->on_list = false;
+>     276                         cfids->num_entries--;
+>     277                 }
+>     278                 rc = -ENOENT;
+>     279         }
+>     280         spin_unlock(&cfids->cfid_list_lock);
+>     281         if (rc) {
+>     282                 free_cached_dir(cfid);
+>     283                 cfid = NULL;
+>     284         }
+>     285
+>     286         if (rc == 0)
+>     287                 *ret_cfid = cfid;
+>     288
+>     289         return rc;
+>     290 }
+>
+> regards,
+> dan carpenter
