@@ -2,90 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC66FC4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Oct 2022 02:46:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B76C433FE
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Oct 2022 03:42:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbiJRCqG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Oct 2022 22:46:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44460 "EHLO
+        id S230333AbiJRDma (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Oct 2022 23:42:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230173AbiJRCqC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 22:46:02 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC67E17894
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Oct 2022 19:45:58 -0700 (PDT)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Mrym94SFdz1P72d;
-        Tue, 18 Oct 2022 10:41:13 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 18 Oct 2022 10:45:55 +0800
-From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-To:     <linux-cifs@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
-        <sfrench@samba.org>, <smfrench@gmail.com>, <pc@cjr.nz>,
-        <lsahlber@redhat.com>, <sprasad@microsoft.com>, <tom@talpey.com>
-Subject: [PATCH] cifs: Fix memory leak when build ntlmssp negotiate blob failed
-Date:   Tue, 18 Oct 2022 11:49:16 +0800
-Message-ID: <20221018034916.821280-1-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S230327AbiJRDmG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 23:42:06 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8954F10B70;
+        Mon, 17 Oct 2022 20:38:18 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Ms01z5sgyz4x1F;
+        Tue, 18 Oct 2022 14:38:15 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1666064296;
+        bh=hFKai3gFyN16yzXHC3ljQgqkU9Y4Kj4jOOZKFp5hLYo=;
+        h=Date:From:To:Cc:Subject:From;
+        b=MVOCPVK7Sat/iG95fMY5Oq79pScMaHDvSd7pRN1xYlOnKio1gdzVqP7wnqCoZWUVh
+         2wnL7+mxSMKNQG6p1NNmeL1G5ITAYc311AMz8pYy21zTEJgXyiqkxkAbwz2DbaaEcc
+         kVeCbdmDPvqq8o2HZkHXPC5yv55xP8+cyQM48bufooto8jQ2RjEuevfWoVta5K7++k
+         9oDVzdAw8l7peMybpnwVsZCr3d4BjW79i0gJNTrd6IlVLEsjq3YZO8nt77JGGazWAH
+         AtkOCpaEEWuhCMN7KyLs1s6+rHZ+SJSI510L64iKsx/BvCTc+EfhWdSHXP186otLUA
+         3FO+lbCv7mkjg==
+Date:   Tue, 18 Oct 2022 14:38:14 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <stfrench@microsoft.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Signed-off-by missing for commit in the cifs tree
+Message-ID: <20221018143814.34815e82@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500023.china.huawei.com (7.185.36.114)
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; boundary="Sig_/jMzh74PHCMpHg5WRnO/OFfY";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-There is a memory leak when mount cifs:
-  unreferenced object 0xffff888166059600 (size 448):
-    comm "mount.cifs", pid 51391, jiffies 4295596373 (age 330.596s)
-    hex dump (first 32 bytes):
-      fe 53 4d 42 40 00 00 00 00 00 00 00 01 00 82 00  .SMB@...........
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    backtrace:
-      [<0000000060609a61>] mempool_alloc+0xe1/0x260
-      [<00000000adfa6c63>] cifs_small_buf_get+0x24/0x60
-      [<00000000ebb404c7>] __smb2_plain_req_init+0x32/0x460
-      [<00000000bcf875b4>] SMB2_sess_alloc_buffer+0xa4/0x3f0
-      [<00000000753a2987>] SMB2_sess_auth_rawntlmssp_negotiate+0xf5/0x480
-      [<00000000f0c1f4f9>] SMB2_sess_setup+0x253/0x410
-      [<00000000a8b83303>] cifs_setup_session+0x18f/0x4c0
-      [<00000000854bd16d>] cifs_get_smb_ses+0xae7/0x13c0
-      [<000000006cbc43d9>] mount_get_conns+0x7a/0x730
-      [<000000005922d816>] cifs_mount+0x103/0xd10
-      [<00000000e33def3b>] cifs_smb3_do_mount+0x1dd/0xc90
-      [<0000000078034979>] smb3_get_tree+0x1d5/0x300
-      [<000000004371f980>] vfs_get_tree+0x41/0xf0
-      [<00000000b670d8a7>] path_mount+0x9b3/0xdd0
-      [<000000005e839a7d>] __x64_sys_mount+0x190/0x1d0
-      [<000000009404c3b9>] do_syscall_64+0x35/0x80
+--Sig_/jMzh74PHCMpHg5WRnO/OFfY
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-When build ntlmssp negotiate blob failed, the session setup request
-should be freed.
+Hi all,
 
-Fixes: 49bd49f983b5 ("cifs: send workstation name during ntlmssp session setup")
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
----
- fs/cifs/smb2pdu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Commit
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index a2384509ea84..c930b63bc422 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1531,7 +1531,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
- 					  &blob_length, ses, server,
- 					  sess_data->nls_cp);
- 	if (rc)
--		goto out_err;
-+		goto out;
- 
- 	if (use_spnego) {
- 		/* BB eventually need to add this */
--- 
-2.31.1
+  1b028682528c ("cifs: set rc to -ENOENT if we can not get a dentry for the=
+ cached dir")
 
+is missing a Signed-off-by from its committer.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/jMzh74PHCMpHg5WRnO/OFfY
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmNOH6YACgkQAVBC80lX
+0Gz2lgf9HU0ZKqQ2NxKCwJATiv3a3qfcBduNbjNTqMT8kz1gzowvCPIZXVa94k7p
+ZeUlDE3OetmxV4FmGLqBG8TSePiY+0QvkjfDJqTSjvO8hXwF0264aPTXsMXOVV4i
+/E3xwB4ILwnnf15xHWcO+du6zMrRef+o0pS/+L/2NJURVDRg5ijAE3A2+cRPZ70n
+4+SyUj42QOWmQkisI7DzHJXb2sRQAJE7IOU5PGfRjk8aE5Ol8h5RTDgUkszGqKF6
+r4ARM/YAdvswPboHXXb2t+8XfnCkLuK1KQxuTYbG8kRWGhMl2fcC3E4T2BhOQ6WF
+6BEZ4+6RCo9KCP2byhWLRdIieFClCw==
+=XCXv
+-----END PGP SIGNATURE-----
+
+--Sig_/jMzh74PHCMpHg5WRnO/OFfY--
