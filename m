@@ -2,177 +2,375 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A70C4332F
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Oct 2022 23:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF61C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Oct 2022 00:12:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbiJQXwf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Oct 2022 19:52:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56330 "EHLO
+        id S231511AbiJRAMB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Oct 2022 20:12:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiJQXwe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 19:52:34 -0400
-Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 688F57AC35
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Oct 2022 16:52:33 -0700 (PDT)
-Received: by mail-vs1-xe31.google.com with SMTP id 63so13142668vse.2
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Oct 2022 16:52:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zcu6y4j1/zQoEFZPUIbVqyEU3wTMIQlOVTJxJcVuVUs=;
-        b=GYhA/FRFsJYEBGCWsblrm+eeUxihRD+Ou6dv9PxxpJdD7e9xR5IVQ/TVh06G7QzwmL
-         3M+87p0znpwoo+c3l3JiTEvVWj3CGsMPX5akCyyDnGYQTwVU76hV6Im8WNYkzCmwgZIt
-         WfDLr0Ca51YU72PKN3uCy7CYNLy6igtN4DHKh+NWeDdt79q4BezeYy5tcRMjU28ryEWb
-         bY+Rn6gEQrN2Z6GAacsKED37ryasHZP9y/AqTYPpnmK5g0zuh06uil2j+MNCbzbdpXhl
-         qFVl6KsOBdjnNjWmA2gpAqJv3mROiIPUr/ZUXIRXCCyJgrZW/uyeMb+2h+j/Gw4GO0Bx
-         LP9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zcu6y4j1/zQoEFZPUIbVqyEU3wTMIQlOVTJxJcVuVUs=;
-        b=I7HkIrGa3eTHGL+0NA71rXEOTCidP7lRG/T8+ZOp8gKdR7Y0QkORAKPULSGvSaydgS
-         N0kAxAbVbsuLakypCnDpnkzGGu7uWNarLHkrcRITxDV87DwDMwmA0B5CXsrZlpeQffRr
-         0CB9/gE6l0mnuPXi7TZimpWHvcILCdnrFKFWDSkMSLJBczuigpRXMihhZdIEFEe9oeBK
-         3pXu2SHdqphf8DpPworRorRVo5t0Zqr/EXzQLj3E/HUeZlVH4u7NnjQlm4BYeHjeERcC
-         uTVymtT/MhUMi1+52/TRu/ZlHZd912i/bphFpMHBt2kc48VRgtmpD5Ab3/Q8JrIdIowK
-         xdJw==
-X-Gm-Message-State: ACrzQf2YI3lz0iRlC9YYUCKWFPLwwI7ZvjdasYxlz1iHL30AJBH6cX5P
-        3rKGQ6icf4yLKDexy8yTYmCwruPVOjoOxL2hIkI=
-X-Google-Smtp-Source: AMsMyM5Cyx/o84fRkt/oSJhSTi1VIMsNm+ajt262eo0jtQdftff7+oI/ntPlMwH2DbVPEdmhGaXsRrVSrtUnLy550sU=
-X-Received: by 2002:a05:6102:22d6:b0:3a7:c599:e02c with SMTP id
- a22-20020a05610222d600b003a7c599e02cmr73098vsh.61.1666050752357; Mon, 17 Oct
- 2022 16:52:32 -0700 (PDT)
+        with ESMTP id S230400AbiJRAKs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 20:10:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73CDD895E4;
+        Mon, 17 Oct 2022 17:08:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E60C06131C;
+        Tue, 18 Oct 2022 00:08:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 394B0C433D6;
+        Tue, 18 Oct 2022 00:08:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666051718;
+        bh=vP+Q99lZsWKTGFWxgY3JE7loaN0NWlj+K8znaZaSXFk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=b8748vbPh3cYnyfDbWB7ax5X7AydGhK4Q5YCvSWiVmLrOPBJ9679wZ+u0em+Bx3bS
+         jTQvZHYGoucF3pmBsLu3aC6Nyo+K/pmI62oc1Bij9Ayb8UJRjWtO5cTIJYeDAfcrAg
+         6Pwa5Y4pFf8NZRLo8YxLs/Htp1yGmL/4M0OMpIyE1jEW5P/cw3EL9ZZC2w56sSMiJv
+         SrD6weOFOYXl/ZTt6L7UxKwtqd0SHiJ40ni46aSamlxkFX5Wox83APyPpFzNYb9XJ9
+         w/pf36M0c91YJJ4dgSCyBTVYfo5qqO1UP4sLzkPa5TwW4CxyJ3nsD5W/FiSNdo/mtL
+         i9C5H4OrKnkrA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Enzo Matsumiya <ematsumiya@suse.de>,
+        kernel test robot <oliver.sang@intel.com>,
+        Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 6.0 32/32] cifs: replace kfree() with kfree_sensitive() for sensitive data
+Date:   Mon, 17 Oct 2022 20:07:29 -0400
+Message-Id: <20221018000729.2730519-32-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20221018000729.2730519-1-sashal@kernel.org>
+References: <20221018000729.2730519-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20221017233201.1716316-1-lsahlber@redhat.com> <20221017233201.1716316-2-lsahlber@redhat.com>
-In-Reply-To: <20221017233201.1716316-2-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 17 Oct 2022 18:52:21 -0500
-Message-ID: <CAH2r5mtzftoAm147vbe80n7hWA403cT=HbfrTqa3ButyGH-Bag@mail.gmail.com>
-Subject: Re: [PATCH] cifs: set rc to -ENOENT if we can not get a dentry for
- the cached dir
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Dan carpenter <dan.carpenter@oracle.com>,
-        coverity-bot <keescook+coverity-bot@chromium.org>,
-        Yang Yingliang <yangyingliang@huawei.com>
-Content-Type: multipart/mixed; boundary="00000000000045be8105eb43ab1a"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000045be8105eb43ab1a
-Content-Type: text/plain; charset="UTF-8"
+From: Enzo Matsumiya <ematsumiya@suse.de>
 
-Lightly updated to deal with merge conflict with "cifs: use
-LIST_HEAD() and list_move() to simplify code" and merged into
-cifs-2.6.git for-next pending review and testing
+[ Upstream commit a4e430c8c8ba96be8c6ec4f2eb108bb8bcbee069 ]
 
-See attached update patch.
+Replace kfree with kfree_sensitive, or prepend memzero_explicit() in
+other cases, when freeing sensitive material that could still be left
+in memory.
 
-On Mon, Oct 17, 2022 at 6:32 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> We already set rc to this return code further down in the function but
-> we can set it earlier in order to suppress a smash warning.
->
-> Also fix a false positive for Coverity. The reason this is a false positive is
-> that this happens during umount after all files and directories have been closed
-> but mosetting on ->on_list to suppress the warning.
->
-> Reported-by: Dan carpenter <dan.carpenter@oracle.com>
-> Reported-by: coverity-bot <keescook+coverity-bot@chromium.org>
-> Addresses-Coverity-ID: 1525256 ("Concurrent data access violations")
-> Fixes: a350d6e73f5e ("cifs: enable caching of directories for which a lease is held")
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/cached_dir.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/cached_dir.c b/fs/cifs/cached_dir.c
-> index fe88b67c863f..ffc924296e59 100644
-> --- a/fs/cifs/cached_dir.c
-> +++ b/fs/cifs/cached_dir.c
-> @@ -253,8 +253,10 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
->                 dentry = dget(cifs_sb->root);
->         else {
->                 dentry = path_to_dentry(cifs_sb, path);
-> -               if (IS_ERR(dentry))
-> +               if (IS_ERR(dentry)) {
-> +                       rc = -ENOENT;
->                         goto oshr_free;
-> +               }
->         }
->         cfid->dentry = dentry;
->         cfid->tcon = tcon;
-> @@ -387,13 +389,13 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon)
->                 list_add(&cfid->entry, &entry);
->                 cfids->num_entries--;
->                 cfid->is_open = false;
-> +               cfid->on_list = false;
->                 /* To prevent race with smb2_cached_lease_break() */
->                 kref_get(&cfid->refcount);
->         }
->         spin_unlock(&cfids->cfid_list_lock);
->
->         list_for_each_entry_safe(cfid, q, &entry, entry) {
-> -               cfid->on_list = false;
->                 list_del(&cfid->entry);
->                 cancel_work_sync(&cfid->lease_break);
->                 if (cfid->has_lease) {
-> --
-> 2.35.3
->
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Link: https://lore.kernel.org/r/202209201529.ec633796-oliver.sang@intel.com
+Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/cifsencrypt.c | 12 ++++++------
+ fs/cifs/connect.c     |  6 +++---
+ fs/cifs/fs_context.c  | 12 ++++++++++--
+ fs/cifs/misc.c        |  2 +-
+ fs/cifs/sess.c        | 24 +++++++++++++++---------
+ fs/cifs/smb2ops.c     |  6 +++---
+ fs/cifs/smb2pdu.c     | 19 ++++++++++++++-----
+ 7 files changed, 52 insertions(+), 29 deletions(-)
 
-
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 46f5718754f9..d848bc0aac27 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -679,7 +679,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ unlock:
+ 	cifs_server_unlock(ses->server);
+ setup_ntlmv2_rsp_ret:
+-	kfree(tiblob);
++	kfree_sensitive(tiblob);
+ 
+ 	return rc;
+ }
+@@ -753,14 +753,14 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
+ 		server->secmech.ccmaesdecrypt = NULL;
+ 	}
+ 
+-	kfree(server->secmech.sdesccmacaes);
++	kfree_sensitive(server->secmech.sdesccmacaes);
+ 	server->secmech.sdesccmacaes = NULL;
+-	kfree(server->secmech.sdeschmacsha256);
++	kfree_sensitive(server->secmech.sdeschmacsha256);
+ 	server->secmech.sdeschmacsha256 = NULL;
+-	kfree(server->secmech.sdeschmacmd5);
++	kfree_sensitive(server->secmech.sdeschmacmd5);
+ 	server->secmech.sdeschmacmd5 = NULL;
+-	kfree(server->secmech.sdescmd5);
++	kfree_sensitive(server->secmech.sdescmd5);
+ 	server->secmech.sdescmd5 = NULL;
+-	kfree(server->secmech.sdescsha512);
++	kfree_sensitive(server->secmech.sdescsha512);
+ 	server->secmech.sdescsha512 = NULL;
+ }
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 7ae6f2c08153..a43d5686c302 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -311,7 +311,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
+ 	}
+ 	server->sequence_number = 0;
+ 	server->session_estab = false;
+-	kfree(server->session_key.response);
++	kfree_sensitive(server->session_key.response);
+ 	server->session_key.response = NULL;
+ 	server->session_key.len = 0;
+ 	server->lstrp = jiffies;
+@@ -1580,7 +1580,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+ 
+ 	cifs_crypto_secmech_release(server);
+ 
+-	kfree(server->session_key.response);
++	kfree_sensitive(server->session_key.response);
+ 	server->session_key.response = NULL;
+ 	server->session_key.len = 0;
+ 	kfree(server->hostname);
+@@ -4134,7 +4134,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 		if (ses->auth_key.response) {
+ 			cifs_dbg(FYI, "Free previous auth_key.response = %p\n",
+ 				 ses->auth_key.response);
+-			kfree(ses->auth_key.response);
++			kfree_sensitive(ses->auth_key.response);
+ 			ses->auth_key.response = NULL;
+ 			ses->auth_key.len = 0;
+ 		}
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 0e13dec86b25..45119597c765 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -791,6 +791,13 @@ do {									\
+ 	cifs_sb->ctx->field = NULL;					\
+ } while (0)
+ 
++#define STEAL_STRING_SENSITIVE(cifs_sb, ctx, field)			\
++do {									\
++	kfree_sensitive(ctx->field);					\
++	ctx->field = cifs_sb->ctx->field;				\
++	cifs_sb->ctx->field = NULL;					\
++} while (0)
++
+ static int smb3_reconfigure(struct fs_context *fc)
+ {
+ 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
+@@ -811,7 +818,7 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 	STEAL_STRING(cifs_sb, ctx, UNC);
+ 	STEAL_STRING(cifs_sb, ctx, source);
+ 	STEAL_STRING(cifs_sb, ctx, username);
+-	STEAL_STRING(cifs_sb, ctx, password);
++	STEAL_STRING_SENSITIVE(cifs_sb, ctx, password);
+ 	STEAL_STRING(cifs_sb, ctx, domainname);
+ 	STEAL_STRING(cifs_sb, ctx, nodename);
+ 	STEAL_STRING(cifs_sb, ctx, iocharset);
+@@ -1162,7 +1169,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		}
+ 		break;
+ 	case Opt_pass:
+-		kfree(ctx->password);
++		kfree_sensitive(ctx->password);
+ 		ctx->password = NULL;
+ 		if (strlen(param->string) == 0)
+ 			break;
+@@ -1470,6 +1477,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 	return 0;
+ 
+  cifs_parse_mount_err:
++	kfree_sensitive(ctx->password);
+ 	return -EINVAL;
+ }
+ 
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 87f60f736731..85109a9a2146 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1119,7 +1119,7 @@ cifs_alloc_hash(const char *name,
+ void
+ cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
+ {
+-	kfree(*sdesc);
++	kfree_sensitive(*sdesc);
+ 	*sdesc = NULL;
+ 	if (*shash)
+ 		crypto_free_shash(*shash);
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 3af3b05b6c74..f1c3c6d9146c 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -1213,6 +1213,12 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
+ static void
+ sess_free_buffer(struct sess_data *sess_data)
+ {
++	int i;
++
++	/* zero the session data before freeing, as it might contain sensitive info (keys, etc) */
++	for (i = 0; i < 3; i++)
++		if (sess_data->iov[i].iov_base)
++			memzero_explicit(sess_data->iov[i].iov_base, sess_data->iov[i].iov_len);
+ 
+ 	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
+ 	sess_data->buf0_type = CIFS_NO_BUFFER;
+@@ -1374,7 +1380,7 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+ 	sess_free_buffer(sess_data);
+-	kfree(ses->auth_key.response);
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = NULL;
+ }
+ 
+@@ -1513,7 +1519,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+ 	sess_free_buffer(sess_data);
+-	kfree(ses->auth_key.response);
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = NULL;
+ }
+ 
+@@ -1648,7 +1654,7 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
+ 	rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
+ 
+ out_free_ntlmsspblob:
+-	kfree(ntlmsspblob);
++	kfree_sensitive(ntlmsspblob);
+ out:
+ 	sess_free_buffer(sess_data);
+ 
+@@ -1658,9 +1664,9 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
+ 	}
+ 
+ 	/* Else error. Cleanup */
+-	kfree(ses->auth_key.response);
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = NULL;
+-	kfree(ses->ntlmssp);
++	kfree_sensitive(ses->ntlmssp);
+ 	ses->ntlmssp = NULL;
+ 
+ 	sess_data->func = NULL;
+@@ -1759,7 +1765,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+ 	}
+ 
+ out_free_ntlmsspblob:
+-	kfree(ntlmsspblob);
++	kfree_sensitive(ntlmsspblob);
+ out:
+ 	sess_free_buffer(sess_data);
+ 
+@@ -1767,9 +1773,9 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+ 		rc = sess_establish_session(sess_data);
+ 
+ 	/* Cleanup */
+-	kfree(ses->auth_key.response);
++	kfree_sensitive(ses->auth_key.response);
+ 	ses->auth_key.response = NULL;
+-	kfree(ses->ntlmssp);
++	kfree_sensitive(ses->ntlmssp);
+ 	ses->ntlmssp = NULL;
+ 
+ 	sess_data->func = NULL;
+@@ -1845,7 +1851,7 @@ int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+ 	rc = sess_data->result;
+ 
+ out:
+-	kfree(sess_data);
++	kfree_sensitive(sess_data);
+ 	return rc;
+ }
+ #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 421be43af425..5094336cade6 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4410,11 +4410,11 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 	if (!rc && enc)
+ 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
+ 
+-	kfree(iv);
++	kfree_sensitive(iv);
+ free_sg:
+-	kfree(sg);
++	kfree_sensitive(sg);
+ free_req:
+-	kfree(req);
++	kfree_sensitive(req);
+ 	return rc;
+ }
+ 
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 6352ab32c7e7..722ebff05759 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1345,6 +1345,13 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
+ static void
+ SMB2_sess_free_buffer(struct SMB2_sess_data *sess_data)
+ {
++	int i;
++
++	/* zero the session data before freeing, as it might contain sensitive info (keys, etc) */
++	for (i = 0; i < 2; i++)
++		if (sess_data->iov[i].iov_base)
++			memzero_explicit(sess_data->iov[i].iov_base, sess_data->iov[i].iov_len);
++
+ 	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
+ 	sess_data->buf0_type = CIFS_NO_BUFFER;
+ }
+@@ -1477,6 +1484,8 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
+ out_put_spnego_key:
+ 	key_invalidate(spnego_key);
+ 	key_put(spnego_key);
++	if (rc)
++		kfree_sensitive(ses->auth_key.response);
+ out:
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+@@ -1573,7 +1582,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
+ 	}
+ 
+ out:
+-	kfree(ntlmssp_blob);
++	memzero_explicit(ntlmssp_blob, blob_length);
+ 	SMB2_sess_free_buffer(sess_data);
+ 	if (!rc) {
+ 		sess_data->result = 0;
+@@ -1581,7 +1590,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
+ 		return;
+ 	}
+ out_err:
+-	kfree(ses->ntlmssp);
++	kfree_sensitive(ses->ntlmssp);
+ 	ses->ntlmssp = NULL;
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+@@ -1657,9 +1666,9 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
+ 	}
+ #endif
+ out:
+-	kfree(ntlmssp_blob);
++	memzero_explicit(ntlmssp_blob, blob_length);
+ 	SMB2_sess_free_buffer(sess_data);
+-	kfree(ses->ntlmssp);
++	kfree_sensitive(ses->ntlmssp);
+ 	ses->ntlmssp = NULL;
+ 	sess_data->result = rc;
+ 	sess_data->func = NULL;
+@@ -1737,7 +1746,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 		cifs_server_dbg(VFS, "signing requested but authenticated as guest\n");
+ 	rc = sess_data->result;
+ out:
+-	kfree(sess_data);
++	kfree_sensitive(sess_data);
+ 	return rc;
+ }
+ 
 -- 
-Thanks,
+2.35.1
 
-Steve
-
---00000000000045be8105eb43ab1a
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-set-rc-to-ENOENT-if-we-can-not-get-a-dentry-for.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-set-rc-to-ENOENT-if-we-can-not-get-a-dentry-for.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l9dfkvba0>
-X-Attachment-Id: f_l9dfkvba0
-
-RnJvbSAxYjAyODY4MjUyOGNhODY1NTljYWQ1MzExZWI1MmI1NzMzM2NlY2YwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
-CkRhdGU6IE1vbiwgMTcgT2N0IDIwMjIgMTg6NDg6MjYgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBzZXQgcmMgdG8gLUVOT0VOVCBpZiB3ZSBjYW4gbm90IGdldCBhIGRlbnRyeSBmb3IgdGhl
-CiBjYWNoZWQgZGlyCgpXZSBhbHJlYWR5IHNldCByYyB0byB0aGlzIHJldHVybiBjb2RlIGZ1cnRo
-ZXIgZG93biBpbiB0aGUgZnVuY3Rpb24gYnV0CndlIGNhbiBzZXQgaXQgZWFybGllciBpbiBvcmRl
-ciB0byBzdXBwcmVzcyBhIHNtYXNoIHdhcm5pbmcuCgpBbHNvIGZpeCBhIGZhbHNlIHBvc2l0aXZl
-IGZvciBDb3Zlcml0eS4gVGhlIHJlYXNvbiB0aGlzIGlzIGEgZmFsc2UgcG9zaXRpdmUgaXMKdGhh
-dCB0aGlzIGhhcHBlbnMgZHVyaW5nIHVtb3VudCBhZnRlciBhbGwgZmlsZXMgYW5kIGRpcmVjdG9y
-aWVzIGhhdmUgYmVlbiBjbG9zZWQKYnV0IG1vc2V0dGluZyBvbiAtPm9uX2xpc3QgdG8gc3VwcHJl
-c3MgdGhlIHdhcm5pbmcuCgpSZXBvcnRlZC1ieTogRGFuIGNhcnBlbnRlciA8ZGFuLmNhcnBlbnRl
-ckBvcmFjbGUuY29tPgpSZXBvcnRlZC1ieTogY292ZXJpdHktYm90IDxrZWVzY29vaytjb3Zlcml0
-eS1ib3RAY2hyb21pdW0ub3JnPgpBZGRyZXNzZXMtQ292ZXJpdHktSUQ6IDE1MjUyNTYgKCJDb25j
-dXJyZW50IGRhdGEgYWNjZXNzIHZpb2xhdGlvbnMiKQpGaXhlczogYTM1MGQ2ZTczZjVlICgiY2lm
-czogZW5hYmxlIGNhY2hpbmcgb2YgZGlyZWN0b3JpZXMgZm9yIHdoaWNoIGEgbGVhc2UgaXMgaGVs
-ZCIpClNpZ25lZC1vZmYtYnk6IFJvbm5pZSBTYWhsYmVyZyA8bHNhaGxiZXJAcmVkaGF0LmNvbT4K
-LS0tCiBmcy9jaWZzL2NhY2hlZF9kaXIuYyB8IDYgKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwgNCBp
-bnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2FjaGVk
-X2Rpci5jIGIvZnMvY2lmcy9jYWNoZWRfZGlyLmMKaW5kZXggOGNhZDUyOGE4NzIyLi4yMGVmYzll
-MjI3NjEgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2FjaGVkX2Rpci5jCisrKyBiL2ZzL2NpZnMvY2Fj
-aGVkX2Rpci5jCkBAIC0yNTMsOCArMjUzLDEwIEBAIGludCBvcGVuX2NhY2hlZF9kaXIodW5zaWdu
-ZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJZGVudHJ5ID0gZGdldChjaWZz
-X3NiLT5yb290KTsKIAllbHNlIHsKIAkJZGVudHJ5ID0gcGF0aF90b19kZW50cnkoY2lmc19zYiwg
-cGF0aCk7Ci0JCWlmIChJU19FUlIoZGVudHJ5KSkKKwkJaWYgKElTX0VSUihkZW50cnkpKSB7CisJ
-CQlyYyA9IC1FTk9FTlQ7CiAJCQlnb3RvIG9zaHJfZnJlZTsKKwkJfQogCX0KIAljZmlkLT5kZW50
-cnkgPSBkZW50cnk7CiAJY2ZpZC0+dGNvbiA9IHRjb247CkBAIC0zODUsMTMgKzM4NywxMyBAQCB2
-b2lkIGludmFsaWRhdGVfYWxsX2NhY2hlZF9kaXJzKHN0cnVjdCBjaWZzX3Rjb24gKnRjb24pCiAJ
-CWxpc3RfbW92ZSgmY2ZpZC0+ZW50cnksICZlbnRyeSk7CiAJCWNmaWRzLT5udW1fZW50cmllcy0t
-OwogCQljZmlkLT5pc19vcGVuID0gZmFsc2U7CisJCWNmaWQtPm9uX2xpc3QgPSBmYWxzZTsKIAkJ
-LyogVG8gcHJldmVudCByYWNlIHdpdGggc21iMl9jYWNoZWRfbGVhc2VfYnJlYWsoKSAqLwogCQlr
-cmVmX2dldCgmY2ZpZC0+cmVmY291bnQpOwogCX0KIAlzcGluX3VubG9jaygmY2ZpZHMtPmNmaWRf
-bGlzdF9sb2NrKTsKIAogCWxpc3RfZm9yX2VhY2hfZW50cnlfc2FmZShjZmlkLCBxLCAmZW50cnks
-IGVudHJ5KSB7Ci0JCWNmaWQtPm9uX2xpc3QgPSBmYWxzZTsKIAkJbGlzdF9kZWwoJmNmaWQtPmVu
-dHJ5KTsKIAkJY2FuY2VsX3dvcmtfc3luYygmY2ZpZC0+bGVhc2VfYnJlYWspOwogCQlpZiAoY2Zp
-ZC0+aGFzX2xlYXNlKSB7Ci0tIAoyLjM0LjEKCg==
---00000000000045be8105eb43ab1a--
