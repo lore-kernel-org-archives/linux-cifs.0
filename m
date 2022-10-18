@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF61C4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Oct 2022 00:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 274E2C43217
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Oct 2022 00:14:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231511AbiJRAMB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Oct 2022 20:12:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37192 "EHLO
+        id S231868AbiJRAOd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Oct 2022 20:14:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230400AbiJRAKs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 20:10:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73CDD895E4;
-        Mon, 17 Oct 2022 17:08:48 -0700 (PDT)
+        with ESMTP id S230320AbiJRANI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Oct 2022 20:13:08 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C5B24C617;
+        Mon, 17 Oct 2022 17:09:41 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E60C06131C;
-        Tue, 18 Oct 2022 00:08:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 394B0C433D6;
-        Tue, 18 Oct 2022 00:08:37 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CBC7661321;
+        Tue, 18 Oct 2022 00:09:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 192FFC43140;
+        Tue, 18 Oct 2022 00:09:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666051718;
-        bh=vP+Q99lZsWKTGFWxgY3JE7loaN0NWlj+K8znaZaSXFk=;
+        s=k20201202; t=1666051780;
+        bh=roh5/X9env6+feVN+5Uc8QQfbfxb2eEacfNmV5mCZLQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=b8748vbPh3cYnyfDbWB7ax5X7AydGhK4Q5YCvSWiVmLrOPBJ9679wZ+u0em+Bx3bS
-         jTQvZHYGoucF3pmBsLu3aC6Nyo+K/pmI62oc1Bij9Ayb8UJRjWtO5cTIJYeDAfcrAg
-         6Pwa5Y4pFf8NZRLo8YxLs/Htp1yGmL/4M0OMpIyE1jEW5P/cw3EL9ZZC2w56sSMiJv
-         SrD6weOFOYXl/ZTt6L7UxKwtqd0SHiJ40ni46aSamlxkFX5Wox83APyPpFzNYb9XJ9
-         w/pf36M0c91YJJ4dgSCyBTVYfo5qqO1UP4sLzkPa5TwW4CxyJ3nsD5W/FiSNdo/mtL
-         i9C5H4OrKnkrA==
+        b=ftCCaZVnvZ+F7xuNiO7TWHESKo5/1K5xEuhxJins/5M4qXa4+mZR7VH9GHo+PBL2N
+         boEUVerj7c8GvI0zYWOtbpWB8oTSOjFwQSjzhrhbJaHrFcd4i28m0HSDEiXi9NihTf
+         DgBteDzW9Si6lCfXZ6eFZ+h4yQJniUeWPSph5ZecYdeZDp5p2heDjoQ03HzOhG1Bka
+         qGvoVJ8w6E1oz55jaIrk5H7d/BM1uOWrLI6LNapMVG9+IEXVAO34rnRhYMHLkuOGrp
+         DV6uvFp7uyJOygyN43X9a88nL09ZnlrtMvQ/Ym7kp9rOuNj5H4mJ/x7YCUe+kelzEx
+         LkxVd47lFphPg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Enzo Matsumiya <ematsumiya@suse.de>,
@@ -40,12 +40,12 @@ Cc:     Enzo Matsumiya <ematsumiya@suse.de>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.0 32/32] cifs: replace kfree() with kfree_sensitive() for sensitive data
-Date:   Mon, 17 Oct 2022 20:07:29 -0400
-Message-Id: <20221018000729.2730519-32-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.19 29/29] cifs: replace kfree() with kfree_sensitive() for sensitive data
+Date:   Mon, 17 Oct 2022 20:08:38 -0400
+Message-Id: <20221018000839.2730954-29-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221018000729.2730519-1-sashal@kernel.org>
-References: <20221018000729.2730519-1-sashal@kernel.org>
+In-Reply-To: <20221018000839.2730954-1-sashal@kernel.org>
+References: <20221018000839.2730954-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -80,10 +80,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  7 files changed, 52 insertions(+), 29 deletions(-)
 
 diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 46f5718754f9..d848bc0aac27 100644
+index 663cb9db4908..419cbdadf248 100644
 --- a/fs/cifs/cifsencrypt.c
 +++ b/fs/cifs/cifsencrypt.c
-@@ -679,7 +679,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+@@ -680,7 +680,7 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
  unlock:
  	cifs_server_unlock(ses->server);
  setup_ntlmv2_rsp_ret:
@@ -92,7 +92,7 @@ index 46f5718754f9..d848bc0aac27 100644
  
  	return rc;
  }
-@@ -753,14 +753,14 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
+@@ -754,14 +754,14 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
  		server->secmech.ccmaesdecrypt = NULL;
  	}
  
@@ -113,10 +113,10 @@ index 46f5718754f9..d848bc0aac27 100644
  	server->secmech.sdescsha512 = NULL;
  }
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 7ae6f2c08153..a43d5686c302 100644
+index bdc3efdb1221..901d9b232e2c 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -311,7 +311,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
+@@ -315,7 +315,7 @@ cifs_abort_connection(struct TCP_Server_Info *server)
  	}
  	server->sequence_number = 0;
  	server->session_estab = false;
@@ -125,7 +125,7 @@ index 7ae6f2c08153..a43d5686c302 100644
  	server->session_key.response = NULL;
  	server->session_key.len = 0;
  	server->lstrp = jiffies;
-@@ -1580,7 +1580,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+@@ -1535,7 +1535,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
  
  	cifs_crypto_secmech_release(server);
  
@@ -134,7 +134,7 @@ index 7ae6f2c08153..a43d5686c302 100644
  	server->session_key.response = NULL;
  	server->session_key.len = 0;
  	kfree(server->hostname);
-@@ -4134,7 +4134,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+@@ -4059,7 +4059,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
  		if (ses->auth_key.response) {
  			cifs_dbg(FYI, "Free previous auth_key.response = %p\n",
  				 ses->auth_key.response);
@@ -144,10 +144,10 @@ index 7ae6f2c08153..a43d5686c302 100644
  			ses->auth_key.len = 0;
  		}
 diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index 0e13dec86b25..45119597c765 100644
+index 8dc0d923ef6a..ff3ad09f2cd4 100644
 --- a/fs/cifs/fs_context.c
 +++ b/fs/cifs/fs_context.c
-@@ -791,6 +791,13 @@ do {									\
+@@ -790,6 +790,13 @@ do {									\
  	cifs_sb->ctx->field = NULL;					\
  } while (0)
  
@@ -161,7 +161,7 @@ index 0e13dec86b25..45119597c765 100644
  static int smb3_reconfigure(struct fs_context *fc)
  {
  	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-@@ -811,7 +818,7 @@ static int smb3_reconfigure(struct fs_context *fc)
+@@ -810,7 +817,7 @@ static int smb3_reconfigure(struct fs_context *fc)
  	STEAL_STRING(cifs_sb, ctx, UNC);
  	STEAL_STRING(cifs_sb, ctx, source);
  	STEAL_STRING(cifs_sb, ctx, username);
@@ -170,7 +170,7 @@ index 0e13dec86b25..45119597c765 100644
  	STEAL_STRING(cifs_sb, ctx, domainname);
  	STEAL_STRING(cifs_sb, ctx, nodename);
  	STEAL_STRING(cifs_sb, ctx, iocharset);
-@@ -1162,7 +1169,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+@@ -1154,7 +1161,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
  		}
  		break;
  	case Opt_pass:
@@ -179,7 +179,7 @@ index 0e13dec86b25..45119597c765 100644
  		ctx->password = NULL;
  		if (strlen(param->string) == 0)
  			break;
-@@ -1470,6 +1477,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+@@ -1462,6 +1469,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
  	return 0;
  
   cifs_parse_mount_err:
@@ -188,10 +188,10 @@ index 0e13dec86b25..45119597c765 100644
  }
  
 diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 87f60f736731..85109a9a2146 100644
+index 197f3c09d3f3..2baf23b3d572 100644
 --- a/fs/cifs/misc.c
 +++ b/fs/cifs/misc.c
-@@ -1119,7 +1119,7 @@ cifs_alloc_hash(const char *name,
+@@ -1129,7 +1129,7 @@ cifs_alloc_hash(const char *name,
  void
  cifs_free_hash(struct crypto_shash **shash, struct sdesc **sdesc)
  {
@@ -201,10 +201,10 @@ index 87f60f736731..85109a9a2146 100644
  	if (*shash)
  		crypto_free_shash(*shash);
 diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 3af3b05b6c74..f1c3c6d9146c 100644
+index 02c8b2906196..30143d3d0a34 100644
 --- a/fs/cifs/sess.c
 +++ b/fs/cifs/sess.c
-@@ -1213,6 +1213,12 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
+@@ -1211,6 +1211,12 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
  static void
  sess_free_buffer(struct sess_data *sess_data)
  {
@@ -217,7 +217,7 @@ index 3af3b05b6c74..f1c3c6d9146c 100644
  
  	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
  	sess_data->buf0_type = CIFS_NO_BUFFER;
-@@ -1374,7 +1380,7 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
+@@ -1372,7 +1378,7 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
  	sess_data->result = rc;
  	sess_data->func = NULL;
  	sess_free_buffer(sess_data);
@@ -226,7 +226,7 @@ index 3af3b05b6c74..f1c3c6d9146c 100644
  	ses->auth_key.response = NULL;
  }
  
-@@ -1513,7 +1519,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
+@@ -1511,7 +1517,7 @@ sess_auth_kerberos(struct sess_data *sess_data)
  	sess_data->result = rc;
  	sess_data->func = NULL;
  	sess_free_buffer(sess_data);
@@ -235,7 +235,7 @@ index 3af3b05b6c74..f1c3c6d9146c 100644
  	ses->auth_key.response = NULL;
  }
  
-@@ -1648,7 +1654,7 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
+@@ -1646,7 +1652,7 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
  	rc = decode_ntlmssp_challenge(bcc_ptr, blob_len, ses);
  
  out_free_ntlmsspblob:
@@ -244,7 +244,7 @@ index 3af3b05b6c74..f1c3c6d9146c 100644
  out:
  	sess_free_buffer(sess_data);
  
-@@ -1658,9 +1664,9 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
+@@ -1656,9 +1662,9 @@ sess_auth_rawntlmssp_negotiate(struct sess_data *sess_data)
  	}
  
  	/* Else error. Cleanup */
@@ -256,7 +256,7 @@ index 3af3b05b6c74..f1c3c6d9146c 100644
  	ses->ntlmssp = NULL;
  
  	sess_data->func = NULL;
-@@ -1759,7 +1765,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+@@ -1757,7 +1763,7 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
  	}
  
  out_free_ntlmsspblob:
@@ -265,7 +265,7 @@ index 3af3b05b6c74..f1c3c6d9146c 100644
  out:
  	sess_free_buffer(sess_data);
  
-@@ -1767,9 +1773,9 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
+@@ -1765,9 +1771,9 @@ sess_auth_rawntlmssp_authenticate(struct sess_data *sess_data)
  		rc = sess_establish_session(sess_data);
  
  	/* Cleanup */
@@ -277,7 +277,7 @@ index 3af3b05b6c74..f1c3c6d9146c 100644
  	ses->ntlmssp = NULL;
  
  	sess_data->func = NULL;
-@@ -1845,7 +1851,7 @@ int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+@@ -1843,6 +1849,6 @@ int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
  	rc = sess_data->result;
  
  out:
@@ -285,12 +285,11 @@ index 3af3b05b6c74..f1c3c6d9146c 100644
 +	kfree_sensitive(sess_data);
  	return rc;
  }
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 421be43af425..5094336cade6 100644
+index cc180d37b8ce..340ca57fa361 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -4410,11 +4410,11 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+@@ -4691,11 +4691,11 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
  	if (!rc && enc)
  		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
  
@@ -306,10 +305,10 @@ index 421be43af425..5094336cade6 100644
  }
  
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6352ab32c7e7..722ebff05759 100644
+index 31d37afae741..f3032cfafedc 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -1345,6 +1345,13 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
+@@ -1344,6 +1344,13 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
  static void
  SMB2_sess_free_buffer(struct SMB2_sess_data *sess_data)
  {
@@ -323,7 +322,7 @@ index 6352ab32c7e7..722ebff05759 100644
  	free_rsp_buf(sess_data->buf0_type, sess_data->iov[0].iov_base);
  	sess_data->buf0_type = CIFS_NO_BUFFER;
  }
-@@ -1477,6 +1484,8 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
+@@ -1476,6 +1483,8 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
  out_put_spnego_key:
  	key_invalidate(spnego_key);
  	key_put(spnego_key);
@@ -332,7 +331,7 @@ index 6352ab32c7e7..722ebff05759 100644
  out:
  	sess_data->result = rc;
  	sess_data->func = NULL;
-@@ -1573,7 +1582,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
+@@ -1572,7 +1581,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
  	}
  
  out:
@@ -341,7 +340,7 @@ index 6352ab32c7e7..722ebff05759 100644
  	SMB2_sess_free_buffer(sess_data);
  	if (!rc) {
  		sess_data->result = 0;
-@@ -1581,7 +1590,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
+@@ -1580,7 +1589,7 @@ SMB2_sess_auth_rawntlmssp_negotiate(struct SMB2_sess_data *sess_data)
  		return;
  	}
  out_err:
@@ -350,7 +349,7 @@ index 6352ab32c7e7..722ebff05759 100644
  	ses->ntlmssp = NULL;
  	sess_data->result = rc;
  	sess_data->func = NULL;
-@@ -1657,9 +1666,9 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
+@@ -1656,9 +1665,9 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
  	}
  #endif
  out:
@@ -362,7 +361,7 @@ index 6352ab32c7e7..722ebff05759 100644
  	ses->ntlmssp = NULL;
  	sess_data->result = rc;
  	sess_data->func = NULL;
-@@ -1737,7 +1746,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+@@ -1736,7 +1745,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
  		cifs_server_dbg(VFS, "signing requested but authenticated as guest\n");
  	rc = sess_data->result;
  out:
