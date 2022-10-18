@@ -2,203 +2,213 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C54C4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Oct 2022 14:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CACC433FE
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Oct 2022 14:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230470AbiJROWt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Oct 2022 10:22:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53160 "EHLO
+        id S230037AbiJROkh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Oct 2022 10:40:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231166AbiJROWb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Oct 2022 10:22:31 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2081.outbound.protection.outlook.com [40.107.237.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6067C4D92
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Oct 2022 07:22:21 -0700 (PDT)
+        with ESMTP id S229763AbiJROkf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Oct 2022 10:40:35 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0191AA2876
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Oct 2022 07:40:30 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LN20aUhcxdr2B5zRqJ5ZlwqZK36g1Io26hqE+9MlfldUV0SX/pTtPvIkV7FgHFn+04II6F6AOxN+dUxpM4/i5LimedRNGBYnYKqOHjA+QFnAgLAbTPJ6jjKTuwt1PDWpF/xmBBGQalMe7h+z/6c/8aScfrrCzMelJ1QlCEdyH1hU3wozOi3Jh47FOdQQ2AqTK4aLT9PkHvyh84H58ExPb6IPwRQooGhDSMnagqlTyydk2x8lfGMsLHHft3Bfy6bel9OdwXrnN8ePxA1SAedKXAI1vC/wdPqKcZ/QueFlQsc20M3/425i0Ah2IX6hwLalfDmWvf8qSzMig6/x2A1v8A==
+ b=cTGzEC5X1ewzQXP569NBk/Lp8Xw2R41NE/zTqOE/a9J1QubLd+Xy/AG5RJV66heFU250l4oVk1fCmAxDbF5nkiGmH04ZlZdbGVPNrbnh7TQZat9jfDcq2+522IGkNzinThzTM1mo6/yXonCq/lMtj7rrCrkpgVs5qAhy2IooA2ggKPEuwNlLd44QktEtk5PYHthvvpq/WmT/Dnie+RAeZeVbDnt3TcvfrE1Kib22DQYRrCs1bkrkxDWMDsvysUjx58YEJlAP83X3P/0KxqLJXsaRE5dLlgHy7YCHUn0vnX4T05wbq41Paar6fOJAw2t+BJ5COGYWRVeoJ4aEz9xlpg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=auOferInRIz2iiUowRRvgAoWR800pvrL14lafJuHtYU=;
- b=L3ScolkYJC2ijJ49g9mFTOxSFz8/H2FX+IvBsGgVgTEdLiHy6FjS1ZxNu/JM6HJZufVYG+g8RLYoMpaBkgZMM3Ii4wcLKbVZ2iNMQfPsQ4TV6iY7Q5m1qI7bkoVaped/ldpi21SjbYFFUPgKnrhDM9oDjWI9KrX5TGloKn5p6G+2WtL2ppc0iOZMHDEPlpgI/5uPVaGAN//WG+8WzDXR1hX5d22zgRvoKFlmYAH2G5+icOpqr3x6v3vxi1WvFv0NMGKQX8C45GC9OI9sfZ/SDWvqGVs59FeBeD/mwI7lCd4LiFEh/i49poT+uQ67DjjN7j5u092jiMwneHs4cI+Nbg==
+ bh=fIPOecZwmG9gbb3k31uvVoFcI85UidMxtirmQMIr6Qw=;
+ b=OaBzpmFO3NXqY+qUZW6tQDcWJMeMHz2JC+kY5O2daZILHHgjx+BHnkfkZ3B2CXpOpNyidtom/sio3HgrCstrPyu5yn0wN3m0wb3KH3pm5SgKGCcP8cCBZBN/X25g28Yuy02gEQXL2DMzBo7Lv5bTds7ygjOcGRkblkfSObDaHRfEMHgLALAwW4uNcEI4as4gMQv2VWKXGVz2ZrJCveyW6caIqygJ+jbKamzDSB6oFMLtYQjHUmXWbIpd7zDdJZLUVa7fHmrbVcVd4G/jAy4al43JDLtJ/YwVkrV9/nTCq7F/bU6i4POHuf3retJ1QFeLhVwQB2uMi+IxP5PZj9HqPg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
  dkim=pass header.d=talpey.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=talpey.com;
 Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- CY4PR01MB2359.prod.exchangelabs.com (2603:10b6:903:74::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5723.29; Tue, 18 Oct 2022 14:22:18 +0000
+ DM6PR01MB5643.prod.exchangelabs.com (2603:10b6:5:1c8::33) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5676.30; Tue, 18 Oct 2022 14:40:22 +0000
 Received: from SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::454c:df56:b524:13ef]) by SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::454c:df56:b524:13ef%5]) with mapi id 15.20.5723.033; Tue, 18 Oct 2022
- 14:22:18 +0000
-Message-ID: <b1454884-cc28-9de5-8dc2-b96f92f1d8e4@talpey.com>
-Date:   Tue, 18 Oct 2022 10:22:17 -0400
+ 14:40:21 +0000
+Message-ID: <24eb5cb0-75cf-9594-7171-ba0ccc3bb19e@talpey.com>
+Date:   Tue, 18 Oct 2022 10:40:20 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.3.3
-Subject: Re: [PATCH] cifs: drop the lease for cached directories on rmdir or
- rename
+Subject: Re: [PATCH][SMB3 client]
 Content-Language: en-US
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-References: <20221018073910.1732992-1-lsahlber@redhat.com>
- <20221018073910.1732992-2-lsahlber@redhat.com>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     Paulo Alcantara <pc@cjr.nz>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+References: <CAH2r5mt=zoWTmbQAsukALC4FEqatJtxDw40mR3=GepPp+KM+Uw@mail.gmail.com>
 From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <20221018073910.1732992-2-lsahlber@redhat.com>
+In-Reply-To: <CAH2r5mt=zoWTmbQAsukALC4FEqatJtxDw40mR3=GepPp+KM+Uw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR11CA0018.namprd11.prod.outlook.com
- (2603:10b6:208:23b::23) To SN6PR01MB4445.prod.exchangelabs.com
+X-ClientProxiedBy: BL0PR02CA0026.namprd02.prod.outlook.com
+ (2603:10b6:207:3c::39) To SN6PR01MB4445.prod.exchangelabs.com
  (2603:10b6:805:e2::33)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|CY4PR01MB2359:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4d9f6904-b7e9-4e74-b021-08dab114296a
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|DM6PR01MB5643:EE_
+X-MS-Office365-Filtering-Correlation-Id: 429e0f91-7a9a-4751-b9c8-08dab116af71
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UDrKFKRx2hfkMUKhe1LaOfjuvXyk/TrU2MIMWhf2Jr6ME+MEjWpT5RfNH0VRL869g7JpBbUKo0oiN/imILYWtFy3O8GzKHl9EmfkpNCgbyb7fSy8f9A8GBKvriV+/tQBOcboXTa5yNeJ6AkxtJ7Fn8JtUtzmdPukkfNJaTBqQh/Mhm2fyLysctOQV38IiHeWs3EpTg8DiMSaCL6jqCm2iSNPudLVlG+OQZdxTvhIxV3b+fp+SRVgqZjT1Al4Nyhm2wzEFvj+m6L+N2gp+KDC/PBU3xsu21kL8UR5CCSbgZUoCH2zwlTlNRhybqsjYmCZ1rvBy/R3XGN7TaVbO6C6vqjA9zyfRMpjuG4DmVMLuZKvGNf2frkwwuChxnKSeTA/zB4AtMA7upu8tysEqe5amV0dYLiJHxuhqgDHJdPINajE/DROP8+wFIPdBpWTAwBhJsIM6t63iBoVpMjjlLntukv/zWcGJvlmuV/OKiDQJnFXrc12uwQlTD7PJ08JCNWjhFp4mYFcsL5hrCsAmwlzZr1Z8JbLUoaFwG2Oaf47Uxkr6n/bJQPn+JgyIkgTdMoY1TZesdHeJsM4WQ/afWHBu1VITYgnHD7cX+mgdcyxsrFfpaig9suGUu07VcjG0FtpKq/bD70Te7ZphLoh0GlKS7W20gSCFhYSOWL0DUFPouzYPM5os7aJ30RN1L9OG3/yJBPEgVJbmqycl02UVRhs9xleMDSbO0lyuvJ8cl1rtXP9Kdqx5GNTQ2Nk1QK00bfqiOeU4kFvjv8YKuaEok7DOQTLUHbAULV2WU4z9iralEQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(396003)(136003)(366004)(39830400003)(346002)(451199015)(2616005)(186003)(26005)(53546011)(52116002)(6506007)(6512007)(83380400001)(2906002)(5660300002)(8936002)(110136005)(316002)(6486002)(478600001)(41300700001)(4326008)(8676002)(66476007)(66556008)(66946007)(36756003)(31696002)(86362001)(38100700002)(38350700002)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: m0v9r7KBvxRrtRixH3WoCWX5w5YvUtWPofJKGqZCzAr892QytJaabScm/RcuntllQ9YpgN1vH1N4rb6b99IyMMVPc1gpLAtnKIaFcSp5UF1WsV9Usyxj+iMSp8s201ZX6Pp5eNG9EGXpoBovEzGnsqO1stys1c6QzF4rdOwMLG9iHynHLn/kh6VCUBGr1tovEgme7WXTCnJ2st86LcjoCPG2U9C4tvQO2I85vYpJTW3NFFCaEz+gf8KH9oIS9kt/kDMt9BoXSvTFPKDcKF+ZP0rYU+/4xF3/NwvWF0ztwQ9dYKri8Hd6L6jk9wGDlMrKhiMSBffQmH8OfJLtRQATeY7ra/lXoXWB3e99iXmv3FPVsf960D0xWXgdNqG2UXUSNIYoFbJB5pWxi2pAstHf7SDKxADFgF/gUoN/ugFiGYAdTzwkuxd3y5E4OgKKh6P3MeHG14wdG6rj5psOj3Hh92j5dB/QWn0wsjsyyO25Sp7DREE8ZxP1n1IfXrJv1U1KriKshSvCk6dDYl7BcOS8BkLjGMqELzS12dHW5+I89i1Y/UG6XpLO1qVRcUIOMxmk4pXm2iVZtfKiOl9lDt6fWRgOtKnoqAQreOazKzCpg3iyg6KGUcqS6c3yCqPA5H+JP8diFlDRhUTQtUq1WjecGimZPQ0C72mqOd+gKr7FyVU5ZJHwcuRDFR56TOCbFrLSfXgCDCWTh0TsPdIlRtLTmyHhYHV5QVJNcErp2SyIy6CNBQGcaIvnz0Fbzwr3VPw9Q1wRwylu2nStACkJI0bAD6bHP597BC1FLp+oswPlSH0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(39830400003)(376002)(136003)(346002)(396003)(451199015)(8936002)(54906003)(110136005)(478600001)(6486002)(4326008)(36756003)(8676002)(66556008)(66476007)(66946007)(5660300002)(41300700001)(316002)(38100700002)(86362001)(38350700002)(31696002)(52116002)(26005)(6506007)(6512007)(53546011)(83380400001)(2616005)(186003)(2906002)(31686004)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?czlYOE5UeWFNSmIxVzB2MWp4Y0p0aW1VblpLQ01EeHZYL09MbkxCdU40SHVz?=
- =?utf-8?B?WUVvc0R2SStnOGF5NEczdVRQckN0SVZCaWZ1alB3Y2xyeUpyVHJWanBNVzlB?=
- =?utf-8?B?M3hVVEhmbnRnR3BESjVPZzdrdVk3dFFvc25zZmlLVnJGNDZBbUI3N01DM2VQ?=
- =?utf-8?B?eHprRWJNc2tTMWowOHl5SUs3d0g3Vks1R1draHlWa3dTUGFGbVhTWnRRZkFI?=
- =?utf-8?B?RUpEajZvMXkvVytJaU1rVDg4VDY5cGlKaHh4UjlIRk15V3lqTWdaTkhOQndE?=
- =?utf-8?B?UHBvR0hWem5TbHUvVjd1dEYvdFVOWTZ5UnBseUR0TS9ITVltcmtDMFFuYkNK?=
- =?utf-8?B?NWRBZUxKUDhpRTdWSU41N2hGRitUVncyVHVGZ0NRcnRmTGJJSjFndVZrT2Iv?=
- =?utf-8?B?ampyelhVRXZKZWhPZlljREx4blE2cFM2eS9QTmtod1l4NnJsQTZYa1NyUDVn?=
- =?utf-8?B?VjhyeW41ZDZmZ2VRUHZzKzBPR2Zxc1EwUDJNbUl0OG1YSDJ5bDRNV3RKZkwv?=
- =?utf-8?B?YUI4VXlXeUd4NVptRFRYcEZhVUNrVThDdTNoUnViT0VuakVYSnJiVUw0QnR1?=
- =?utf-8?B?R1B6Q2lwTTh3SU9qQjNYYXYrWEtRUXdVL3ovUnZZZWsrSTRZRWFBbkpmMkg4?=
- =?utf-8?B?OGZkdXhSYjllUWNoNHE2K3NST0d0WnRwQXI0L21FOVRBNTZ2Q0tvSTNDbDR6?=
- =?utf-8?B?aGpOdS9WSC9CeEc1UTNOMWgzeVgwL1BJRXowcGF1ZU5IcE5VRU5od0Fjb2NE?=
- =?utf-8?B?anlyZ0pPOUVVano0RlZwendwU2RwQWp0U3BRckNZNTR6M2JucERyNmJPWUNo?=
- =?utf-8?B?ejRwaUdmOS9GTDE2VlpzZEU2UDJRRURNU0xXZ2RibnpsZzhGamx2ZGFMVWVm?=
- =?utf-8?B?TUphZnZpWmkvUncrL3dsRkNyZklOTnlEb3Jjbk9FYTE4NU9HYzEvV1dxbEQ1?=
- =?utf-8?B?SlVWbFRDYkZ6VGZGZGMzVmxsVzk3RVI5UkFmMFA3bEZMS3FPMHh0cEZnSHYx?=
- =?utf-8?B?djJoK1FvSVZzZk11M3lDOHlxa21BUzdFZjdBU1dkbzFmSmExT0toVU55QkZV?=
- =?utf-8?B?b3hZS3hST3BuMEJ2bFpwQWNlQkFNMDlvMlV5dXdZd2hvY05ac1B5eGdPbDFT?=
- =?utf-8?B?V0d0VVpKTmhGTFQ4TSt0MldhbnlMMC9VM3gybVJDbTJZYkx2azVhVTdmWlYw?=
- =?utf-8?B?eDRQcXE5UTdCUzBQcDlla2ozOTNJMjZISkxhTkVnSk1haktwanF6RkFRTTBS?=
- =?utf-8?B?M1dqbDBoeVZ3UFRneCt0d3ExZ0dqTGVnMmNSdUtlWEpyUjErSnVIVSs2ZVVH?=
- =?utf-8?B?cTRjdVQxaTNYeDFTRk9yU1dockZseFJQbzNpNjhCaHJNRUlyODg0NnZiN0tD?=
- =?utf-8?B?QmlCdmp6UmZ6dHA0NlY3Uk5JSW50ekNHT216enRubzN4ODdqdWNPR0FPb29J?=
- =?utf-8?B?M1M3NmR1TjN1Z3AvZyttNUZhd3drZGV4bDFYZHZTNjRnUklCY3B6TE0vRGNl?=
- =?utf-8?B?U2pmSTRlSlQ4NmFzZlVOcEpVTlJTNHNDQndpdEJrN0JTWkNFa3g3b3c1c3hH?=
- =?utf-8?B?b2FvcnN0Qk9VS0lENXhkcXdOMWc2VE9UeUY0OGNKSzVSS3IvellpcytOVTJ5?=
- =?utf-8?B?MXZva0UxRWxUTUF3VFlKaEl4bFFWeUJEdTBieitBVUVkc21ua2FZWjhsMnBs?=
- =?utf-8?B?Z2NYTVF5WndJYXQwSEF6VzVwQjRpdy9UVHZEdWMxNFZhYXQwY3FBT2pSTUJL?=
- =?utf-8?B?dW5RMEd1TThzYXk5aUgvV0ZFWW9kVmtQMmVkc1lTVC9nM1lPR2IxWVR2Rzhy?=
- =?utf-8?B?a0xlNzBFckpGR2tOS2FQcjEvYkR2clFBUWNZYXBLdC9xb0tSOFAwRFF2WkZ1?=
- =?utf-8?B?NmtoZXdFY3kyK0E0OTNLeWFnLytuL3k0bUNmelpRWnM0ZUhDSnJMeGhHWFE2?=
- =?utf-8?B?aXFEL3dqdEJIMzZ5OUIwS056NU15UDFXWWxIcGVwSUx5bllDakdaSGcweERN?=
- =?utf-8?B?SWFtblp2ZUFvc0d4T2VTMndZNWNZTllZSjIrVExXUjZlWEJob0FUanpwZ3Bu?=
- =?utf-8?B?TWVRZnpkcU1LNzVHVUZhbDh2ZEREdy9ZUUl0SVlRY1IyVmxFZzlQcU1MVzJm?=
- =?utf-8?Q?mmVpHgRNd0cJ/XhIJtx8QR8CB?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SUpDcjNIN0hzYklFejdkb3piMDZWazNzZGJWeG9oKzhQUjd3SnZrWGhrbjNV?=
+ =?utf-8?B?cXE0Y0p6Z1lHbSttSEtOcVJPV3I3NVFObkc3eVIzVnB2d0swQ2E3SzBBaTdt?=
+ =?utf-8?B?SXFKNUpuT0Uwalc5SFZsUys4VDhkMndMaVM3QTE3K2hEOUZHSFhHVW40T0ZI?=
+ =?utf-8?B?TWd1VGcvVEFIMzk5cmVEN283MjR5bzBjS1I3YUc0QmNBUHAzdW9hL3dzemRX?=
+ =?utf-8?B?UEhrODVFQktnMVdpZnEwZkNmRjBZSDRHTVlrWkptZGFQL0dEMWVEY1Ixb2ky?=
+ =?utf-8?B?cGpvT0hzeDZ5QUM2eFFMdlJkVWxDTHNVZFJ2dldTcXlqc2RTQ2o5TUNoQTIz?=
+ =?utf-8?B?QzM1L3NqVWFrb0djNExoRDkycTRwUE1BSXRQNUpTV3hLUmRnMUJhOGJLeW1I?=
+ =?utf-8?B?enZ3b0RTODNmY3BBZE9SZUtZQnZLWVlVbGQ4U0NYOVZxVFhpaEwxeE1GZnVy?=
+ =?utf-8?B?UTY1Q1oyRFdHUUcrUUlQK1NSWGhNUTA4SEpVcGtUMFZ5TTkyY2d6L0FvSEJ2?=
+ =?utf-8?B?Qitja1VGZHVQRmFNdlhvMXdERFVBYzY0bHJkN1hCRUU3VGd1aUpoUm1WNGpH?=
+ =?utf-8?B?MWtRM0o2YStxUnNyRVBhcWo5Tm1RK1NDbjBaSmwwQlA4TDdmc2Z3NWVPdTIx?=
+ =?utf-8?B?NUR2ejE4QVcrNXlkZDFSdVpGc1lkc0ZvUzVvbGRSM3ovZmRWT21BZ3ZpWEZV?=
+ =?utf-8?B?K2xjWjFhUHl5QXltaWlyWmtTcDNrd1FZZE9PZXIxeDJRL0tITzczWUNqT0t0?=
+ =?utf-8?B?UU40aDgvTE5VdkpBRGhxZnVOQ0tZWG9udDQySUdkWjZuRWE0U05Sa1IxOXpX?=
+ =?utf-8?B?YjE5ejlMODlvT1N2bVdKOGhrd2MydCtUb3lWczNsbUxKN1lMZld1aVlrMGJB?=
+ =?utf-8?B?RnF0cWZrRlJBc09JaEhzMjZraU1jQVh3eXdoUUJ0emhYYkM1Y2tmODM2MDZE?=
+ =?utf-8?B?NkY5dVVmMktXc2FMWnJRTENGQ3hSSUwxOHkxbHhzSmsvL1ZzK2VIQUNGdkxY?=
+ =?utf-8?B?T2ROV29DZTJ5Lzk4RWI3RytkUUU0UmZFYWgrQzN1MWp1aXJFZmdyM0JRV1dQ?=
+ =?utf-8?B?SGVLckFVNmFTaTEvYS9LVURCZEdQUUNrY2g4cGZSZGFvVkpIejFWMmhVNXZv?=
+ =?utf-8?B?eU1KY200cFovUGhZdUlWSmp0YnVGVEk4bENOMFk3dzhuM2FJbktpRDAzVXA4?=
+ =?utf-8?B?YVA0N0RnellpQUJiYlNYLzNpWXNKRUtlTzRDR2V2Zk5mNmdOQ0VmejFJSStQ?=
+ =?utf-8?B?NnNFYnMxQ1l0bncrbGZUcGt4T05hSldkMGJtTG8va1dScHUzZlY3QnpBTlRN?=
+ =?utf-8?B?RzUxb251Q3RCbnJUSE9Xc1lQVHpXQ3JGckhzQnZRQUlNUFZJMm80SkNqRnQ3?=
+ =?utf-8?B?cTFLOFkvdVhEUm9sZTZZOGdGdE9oREt5WE0wM1QzZFVOVjYyQTBIWFBOaHB1?=
+ =?utf-8?B?a3UzRGZXb1ZGSE16TTUwSHhqaUcxbzNxZ3NLN2xqSHk5cDBwTVRLU2ExSjV1?=
+ =?utf-8?B?QWR6WnovQ1B2TXhyZ2NLbzZPQmNPa05JVUpSRFNwQnRJMUxqQk1NMDhBdy9R?=
+ =?utf-8?B?c0tiZVA1YTRlVXJKVnZFelNwSG1ZR01ua3g3aVJJWU83bTh1K0ZFKzhXREdF?=
+ =?utf-8?B?RFhyT01McEE0OC96UTk5VzQyaUtidDBoanc0YVZ3ZDZmNzhDWG1JVnU4aEJy?=
+ =?utf-8?B?OERZcW1XWll4WXhIanN4Ry8wYjNEV3dmWWN6NXFzNzFpbVFodkF2cEtVYW5I?=
+ =?utf-8?B?emh5M005M2RYWWp5V3JySDJUcXFSQU4zUWR1NjVUVThEb3IyQVY0YXNQOEZI?=
+ =?utf-8?B?U0c4Uk9GVjhlcWhlZEIvaWJEQXZsMmNyRnU0KzFNYi9Eajd5U2JLSE93MlAr?=
+ =?utf-8?B?RE1lbU1PUUhOaGtJNUxFdmtKS0w1SWtJSHJUL01XTFZIaG1rT2RmbG1iUlo2?=
+ =?utf-8?B?TG45WUQ1eXJhU2VyN0hvL2lhYUg2RVJvODNNNE9nS09WNWN6aE96U25lVkJH?=
+ =?utf-8?B?ZS93ZWJUNXM3R2ZONm1HWEswMzZzYU10QUE1NnZLbzRpT1hIRXNSalJsL05i?=
+ =?utf-8?B?UFZDVEpaUlJjMXM5UFRURmxqL01mYkpBWkJoR3FTOURZZlV0RjF5amFXQjJY?=
+ =?utf-8?Q?KlJhoTaenqkSoba/cA5WrA5ZD?=
 X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d9f6904-b7e9-4e74-b021-08dab114296a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 429e0f91-7a9a-4751-b9c8-08dab116af71
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2022 14:22:18.0385
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2022 14:40:21.8771
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S9hO4EdziL+Zi+43jmgtvugAlnaA+jlMnBx7LdBjM3TS0JfgCV/DYZKWGUuXEHyN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR01MB2359
+X-MS-Exchange-CrossTenant-UserPrincipalName: JkC12bC+6lnNMM6El85UY27Ixe8zfWXll2K2QR1zT05hcIo0E9w9oiugeMK8Otu+
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5643
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/18/2022 3:39 AM, Ronnie Sahlberg wrote:
-> When we delete or rename a directory we must also drop any cached lease we have
-> on the directory.
+On 10/15/2022 2:32 AM, Steve French wrote:
+> Change notification is a commonly supported feature by most servers,
+> and often used on other operating systems to detect when a file or
+> directory has changed and why,  but the current ioctl to request
+> notification when a directory is changed does not return the
+> information about what changed (even though it is returned by
+> the server in the SMB3 change notify response), it simply returns
+> when there is a change.
 
-Just curious, why drop the lease on rename? I guess this is related
-to setting ReplaceIfExists, but that would apply to a lease on the
-existing (replaced) directory, which would then become deleted?
+It's a useful enhancement to the API to see the details of the
+notification. What Linux applications might use it, was this
+requested by soneone?
 
-I'm probably undercaffeinated, if not.
+I do have one general comment on the implementation. I am pasting
+some snippets from the patch you attached.
+
+The new structure adds two fields:
+
++struct smb3_notify_info {
++	__u32	completion_filter;
++	bool	watch_tree;
++	__u32   data_len; /* size of notify data below */
++	__u8	notify_data[];
++} __packed;
++
+
+however the vector adds a single boolean:
+
+  	int (*notify)(const unsigned int xid, struct file *pfile,
+-			     void __user *pbuf);
++			     void __user *pbuf, bool return_changes);
+
+Why a boolean? Wouldn't it be more logical, and general, to pass
+the length instead? If zero, it's the existing behavior, and if
+set to a length, then that many bytes max are requested?
+
+It would also be logical to return the actual number of bytes returned,
+so perhaps passing the length by reference.
+
+  	int (*notify)(const unsigned int xid, struct file *pfile,
+-			     void __user *pbuf);
++			     void __user *pbuf, int *length);
+
+Finally, both the existing smb3_notify and the new smb3_notify_info
+use a strange combination of native and size-specific types, packed
+into a struct as if they were required to be wire-encoded. The __u32
+packed with a bool, in both cases, and the __u32 length in the new
+one. The bool could be anything, how does the "packed" attribute
+actually work? Any why the inflexible __u32's?
+
+struct smb3_notify {
+	__u32	completion_filter;
+	bool	watch_tree;
+} __packed;
+
+
+It seems to me that these structs should be defined in base
+types and marshaled/unmarshaled in the smb3_notify processing.
+Of course, the existing smb3_notify maybe needs to remain for
+binary compatibility, but the new structure should not copy and
+extend it.
 
 Tom.
 
-> Fixes: a350d6e73f5e ("cifs: enable caching of directories for which a lease
-> is held")
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->   fs/cifs/cached_dir.c | 21 +++++++++++++++++++++
->   fs/cifs/cached_dir.h |  4 ++++
->   fs/cifs/smb2inode.c  |  2 ++
->   3 files changed, 27 insertions(+)
+> This ioctl improves upon CIFS_IOC_NOTIFY by returning the notify
+> information structure which includes the name of the file(s) that
+> changed and why. See MS-SMB2 2.2.35 and MS-FSCC 2.7.1 for details
+> on the individual filter flags and the file_notify_information
+> structure returned.
 > 
-> diff --git a/fs/cifs/cached_dir.c b/fs/cifs/cached_dir.c
-> index ffc924296e59..6e689c4c8d1b 100644
-> --- a/fs/cifs/cached_dir.c
-> +++ b/fs/cifs/cached_dir.c
-> @@ -340,6 +340,27 @@ smb2_close_cached_fid(struct kref *ref)
->   	free_cached_dir(cfid);
->   }
->   
-> +void drop_cached_dir_by_name(const unsigned int xid, struct cifs_tcon *tcon,
-> +			     const char *name, struct cifs_sb_info *cifs_sb)
-> +{
-> +	struct cached_fid *cfid = NULL;
-> +	int rc;
-> +
-> +	rc = open_cached_dir(xid, tcon, name, cifs_sb, true, &cfid);
-> +	if (rc) {
-> +		cifs_dbg(FYI, "no cached dir found for rmdir(%s)\n", name);
-> +		return;
-> +	}
-> +	spin_lock(&cfid->cfids->cfid_list_lock);
-> +	if (cfid->has_lease) {
-> +		cfid->has_lease = false;
-> +		kref_put(&cfid->refcount, smb2_close_cached_fid);
-> +	}
-> +	spin_unlock(&cfid->cfids->cfid_list_lock);
-> +	close_cached_dir(cfid);
-> +}
-> +
-> +
->   void close_cached_dir(struct cached_fid *cfid)
->   {
->   	kref_put(&cfid->refcount, smb2_close_cached_fid);
-> diff --git a/fs/cifs/cached_dir.h b/fs/cifs/cached_dir.h
-> index e536304ca2ce..2f4e764c9ca9 100644
-> --- a/fs/cifs/cached_dir.h
-> +++ b/fs/cifs/cached_dir.h
-> @@ -69,6 +69,10 @@ extern int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
->   				     struct dentry *dentry,
->   				     struct cached_fid **cfid);
->   extern void close_cached_dir(struct cached_fid *cfid);
-> +extern void drop_cached_dir_by_name(const unsigned int xid,
-> +				    struct cifs_tcon *tcon,
-> +				    const char *name,
-> +				    struct cifs_sb_info *cifs_sb);
->   extern void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
->   extern void invalidate_all_cached_dirs(struct cifs_tcon *tcon);
->   extern int cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16]);
-> diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-> index a6640e6ea58b..68e08c85fbb8 100644
-> --- a/fs/cifs/smb2inode.c
-> +++ b/fs/cifs/smb2inode.c
-> @@ -655,6 +655,7 @@ int
->   smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
->   	   struct cifs_sb_info *cifs_sb)
->   {
-> +	drop_cached_dir_by_name(xid, tcon, name, cifs_sb);
->   	return smb2_compound_op(xid, tcon, cifs_sb, name, DELETE, FILE_OPEN,
->   				CREATE_NOT_FILE, ACL_NO_MODE,
->   				NULL, SMB2_OP_RMDIR, NULL, NULL, NULL);
-> @@ -698,6 +699,7 @@ smb2_rename_path(const unsigned int xid, struct cifs_tcon *tcon,
->   {
->   	struct cifsFileInfo *cfile;
->   
-> +	drop_cached_dir_by_name(xid, tcon, from_name, cifs_sb);
->   	cifs_get_writable_path(tcon, from_name, FIND_WR_WITH_DELETE, &cfile);
->   
->   	return smb2_set_path_attr(xid, tcon, from_name, to_name,
+> To use this simply pass in the following (with enough space
+> to fit at least one file_notify_information structure)
+> 
+> struct __attribute__((__packed__)) smb3_notify {
+>         uint32_t completion_filter;
+>         bool     watch_tree;
+>         uint32_t data_len;
+>         uint8_t  data[];
+> } __packed;
+> 
+> using CIFS_IOC_NOTIFY_INFO 0xc009cf0b
+>   or equivalently _IOWR(CIFS_IOCTL_MAGIC, 11, struct smb3_notify_info)
+> 
+> The ioctl will block until the server detects a change to that
+> directory or its subdirectories (if watch_tree is set). See attached.
+> 
+> Also attached is a simple sample program to demonstrate its use.  As an example
+> if you ran:
+>       # ./new-inotify-ioc-test /mnt-on-client1/subdir
+> it will block until a change occurs. If you then do a
+>       # touch /mnt-on-client2/subdir/newfile
+> you will see the following printed (in our sample program) showing the
+> notify information struct returned to the user
+> indicating the name of the file that was changed and what kind of change
+>     notify completed. returned data size is 28
+>     00000000:  00 00 00 00 03 00 00 00  0e 00 00 00 6e 00 65 00 ............n.e.
+>     00000010:  77 00 66 00 69 00 6c 00  65 00 00 00             w.f.i.l.e...
+> 
+> 
