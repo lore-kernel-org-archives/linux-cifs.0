@@ -2,162 +2,121 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A07C433FE
-	for <linux-cifs@archiver.kernel.org>; Fri, 21 Oct 2022 11:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D7DC433FE
+	for <linux-cifs@archiver.kernel.org>; Fri, 21 Oct 2022 14:40:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229965AbiJULwC convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 21 Oct 2022 07:52:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40386 "EHLO
+        id S230315AbiJUOkk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 21 Oct 2022 10:40:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbiJULwA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Oct 2022 07:52:00 -0400
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E0712527E8
-        for <linux-cifs@vger.kernel.org>; Fri, 21 Oct 2022 04:51:57 -0700 (PDT)
-Received: (Authenticated sender: pbl@bestov.io)
-        by mail.gandi.net (Postfix) with ESMTPSA id 200DDC0005;
-        Fri, 21 Oct 2022 11:51:55 +0000 (UTC)
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset=UTF-8
-Date:   Fri, 21 Oct 2022 13:51:55 +0200
-Message-Id: <CNRKVP9RC8O7.2162MI5CFM2ZI@enhorning>
-To:     <linux-cifs@vger.kernel.org>, <sfrench@samba.org>
-Subject: Re: CIFS kills my system when connection breaks
-From:   "Riccardo Paolo Bestetti" <pbl@bestov.io>
-X-Mailer: aerc 0.12.0
-References: <CND27FUBGI9V.29BBF662TV9DA@enhorning>
-In-Reply-To: <CND27FUBGI9V.29BBF662TV9DA@enhorning>
+        with ESMTP id S231169AbiJUOk2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Oct 2022 10:40:28 -0400
+Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 566356A52D;
+        Fri, 21 Oct 2022 07:40:19 -0700 (PDT)
+Received: by mail-vs1-xe31.google.com with SMTP id 128so1449280vsz.12;
+        Fri, 21 Oct 2022 07:40:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tzT1c25RoKfBc8ntTciHpfUO5h//KgZAglB7BspiwMw=;
+        b=P7v4RpkkWYxhLM9w+bS/amDjV8NSrzu+p2jF3zRrEYZGHg4eIqO0I0tKJ7WAJ+ST+C
+         1VAJB6PCAq8FjGxklcd2g4cqRXoj1INza+L4A0WYNyrKS0jHKKleVvqQ+lcgEKsiKr/l
+         Ijs8rtRPbSfAwHZJbU8FKdq0a4YvO8HWnCUjpcwOX+8P8biV5r/UrRGlf43kfLhIoUmC
+         Y7Wt4+3HrfKXGtsOknWua9qrJ5tFHnXhCXTx0I98ObwR/NmdWh8qSoD6mHHvdsqaLmpF
+         IqzolCvr8C66QoLOiVlQuE7sm1dk6/Ky4zB695FRCsnZiwmifpzwYhK8KKG+tzorI/AE
+         MxbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tzT1c25RoKfBc8ntTciHpfUO5h//KgZAglB7BspiwMw=;
+        b=iHGEJlmrZD+veKhzIK43XkbAuYFX5w+/zGweeutx4eYAbCL7m5TZZvPkr081h/RFIc
+         kyHjx+fTcoYuVtIr0J/SFSulrNGE9sLz6ARpc4cPNNrRsQ+WxQe37prjLlF/f0jmw6ML
+         Vfjg8+t6glkUJN/wbF9YcKST9SA3GerKVE6QfX53AGeQQM6waJ4A6US4j6sRyDVMaPjA
+         FQ+czA1ll0lUn42jCC3bCelMS2u2a/s+Cp6i+rp4LEjkexoSjv4fC8/XnE71ei3rSzrP
+         Y6q276hnzWWBbPknUDYU9h+igTt01q82sUx+FNpGbgb4H1dUWByMFGpYEQrmtqfKvD28
+         3aUg==
+X-Gm-Message-State: ACrzQf2INlAWS6UvjSGB9dCn/uOEdKsu6JtNe4nzLmlVlHTPRQWdhkDk
+        5a1h7ExkG2ngaabtfJCtoron/Bplfz3qSV8D3Xlt4HI2
+X-Google-Smtp-Source: AMsMyM4hGV1xVyZ+pKR/5uztm9opOFajadV7VupRkFxbzJ7GA4O0glyLbBWzdS/+omJuGMGB3AsGA8ONOMPhsp+MrKA=
+X-Received: by 2002:a67:fc97:0:b0:3a6:d37e:e7a3 with SMTP id
+ x23-20020a67fc97000000b003a6d37ee7a3mr12979874vsp.29.1666363218247; Fri, 21
+ Oct 2022 07:40:18 -0700 (PDT)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 21 Oct 2022 09:40:07 -0500
+Message-ID: <CAH2r5mvjQ5cnR0dc0oSRpF0Ck7cMyQRX2mng56UXZjHJ=JhMmQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Resending this, seems urgent to me since it causes a VFS deadlock.
+Please pull the following changes since commit
+9abf2313adc1ca1b6180c508c25f22f9395cc780:
 
-After additional research, might also be related to:
+  Linux 6.1-rc1 (2022-10-16 15:36:24 -0700)
 
-[1]: https://bugzilla.kernel.org/show_bug.cgi?id=202903
-[2]: https://bugzilla.kernel.org/show_bug.cgi?id=198349
-[3]: https://bugzilla.kernel.org/show_bug.cgi?id=215375
+are available in the Git repository at:
 
-Can't check the suggested workaround of mounting using SMB 2, as this is
-over the Internet and I don't want my data to be exchanged in plain
-text.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc1-smb3-fixes
 
-Best regards,
-Riccardo P. Bestetti
+for you to fetch changes up to 73b1b8d25e39a1478b3792a7075f43e053ee62c2:
+
+  cifs: update internal module number (2022-10-19 17:57:51 -0500)
+
+----------------------------------------------------------------
+12 small cifs/smb3 fixes, half for stable
+- two memory leak fixes
+- two fixes for directory leases, including an important one which
+fixes a problem noticed by git functional tests
+- five fixes relating to missing free_xid calls (helpful for
+tracing/debugging of entry/exit into cifs.ko)
+- a multichannel fix
+- a small cleanup fix (use of list_move instead of list_del/list_add)
+----------------------------------------------------------------
+Paulo Alcantara (1):
+      cifs: fix memory leaks in session setup
+
+Ronnie Sahlberg (2):
+      cifs: set rc to -ENOENT if we can not get a dentry for the cached dir
+      cifs: drop the lease for cached directories on rmdir or rename
+
+Steve French (2):
+      smb3: interface count displayed incorrectly
+      cifs: update internal module number
+
+Yang Yingliang (1):
+      cifs: use LIST_HEAD() and list_move() to simplify code
+
+Zhang Xiaoxu (6):
+      cifs: Fix xid leak in cifs_create()
+      cifs: Fix xid leak in cifs_copy_file_range()
+      cifs: Fix xid leak in cifs_flock()
+      cifs: Fix xid leak in cifs_ses_add_channel()
+      cifs: Fix xid leak in cifs_get_file_info_unix()
+      cifs: Fix memory leak when build ntlmssp negotiate blob failed
+
+ fs/cifs/cached_dir.c | 39 +++++++++++++++++++++++++++++----------
+ fs/cifs/cached_dir.h |  4 ++++
+ fs/cifs/cifsfs.c     |  7 +++++--
+ fs/cifs/cifsfs.h     |  4 ++--
+ fs/cifs/dir.c        |  6 ++++--
+ fs/cifs/file.c       | 11 +++++++----
+ fs/cifs/inode.c      |  6 ++++--
+ fs/cifs/sess.c       |  1 +
+ fs/cifs/smb2inode.c  |  2 ++
+ fs/cifs/smb2ops.c    |  3 ++-
+ fs/cifs/smb2pdu.c    | 17 ++++++++---------
+ 11 files changed, 68 insertions(+), 32 deletions(-)
 
 
-On Tue Oct 4, 2022 at 12:16 PM CEST, Riccardo Paolo Bestetti wrote:
-> TL;DR: Under conditions that I have not been able to fully identify, but
-> have something to do with network interruptions, CIFS seems to be
-> breaking my system to the point where some system calls that have
-> nothing to do with network filesystems and it doesn't un-break until the
-> CIFS fs is lazily unmounted.
->
-> I have the following setup in my /etc/fstab (apologies for long lines):
-> //some.host/backup		/volumes/storagebox	cifs	echo_interval=15,soft,nofail,credentials=/root/.smbstoragebox,uid=random,gid=random,iocharset=utf8,rw 0 0
-> /volumes/storagebox/chest	/volumes/chest		fuse./usr/bin/gocryptfs	nofail,allow_other,passfile=/root/.chest 0 0
->
-> Under normal conditions (network online, server reachable) mounts work ok:
-> # mount /volumes/storagebox
-> # mount /volumes/chest
-> # touch /volumes/storagebox/aFile  # takes <1 second
-> # touch /volumes/chest/aFile       # takes a couple seconds
->
-> However, under some conditions (my best guess is when some echo messages
-> from the server are missed, e.g. when I resume after suspension or
-> reconnect through a different network interface) the CIFS mount starts
-> hanging system calls. E.g. the mount command hangs indefinitely, stat on
-> a path under the network share never returns, and sometimes (I have not
-> identified exactly when) I can not even save files in my home directory
-> and tmpfs, which should have nothing to do with all of this.
->
-> This is mostly fixed by:
-> # umount -l /volumes/storagebox
->
-> I'm not sure what that does under the hood exactly, but evidently it
-> must be making whatever is holding the mutex release it: as soon as I
-> give that command, either all hanged syscalls/processes immediately resume,
-> or they do after a few minutes.
->
-> Please note that I've mentioned my entire setup, including the overlayed
-> fuse filesystem, on the off chance I'm missing anything, but all of this
-> happens even when /volumes/chest is not mounted.
->
-> At the end of this email you can find an extract of the kernel log from
-> the "hung task" kernel functionality. It shows CIFS waiting on a mutex
-> while attempting to reconnect. That happens a few minutes after a
->
-> CIFS: VFS: \\storage.host has not responded in 45 seconds. Reconnecting...
->
-> line is printed. (45 seconds might be my echo_interval * 3?)
->
-> While this happens, I verified with tcpdump that my computer sends about
-> 1 packet per 2 minutes to the CIFS server, without getting any replies.
->
-> To clarify what the email is about, my expectations - according to the
-> documentation and my use case - are:
-> - system calls should return (it's a soft mount) after some timeout or
->   as soon as the fs notices the need to reconnect, which judging from
->   the aforementioned line it does
-> - system calls which don't intersect CIFS filesystems should not hang
->   because of CIFS
-> - CIFS should successfully reconnect (i.e. same as me manually doing
->   umount -l /volumes/storagebox; mount /volumes/storagebox) when it
->   notices it needs to do so
->
-> First of all, are these expectations conformant to the *intended*
-> behaviour of the CIFS driver, or is the observed behaviour correct? If
-> we can identify a cause for this issue, I'm happy to prepare and test a
-> patch myself.
->
-> I went through mount.cifs(8) a couple times before posting this,
-> apologies if I missed anything.
->
-> Best regards,
-> Riccardo P. Bestetti
->
-> -- 
-> Kernel log:
-> Oct 04 10:34:58 enhorning kernel: INFO: task zsh:5217 blocked for more than 245 seconds.
-> Oct 04 10:34:58 enhorning kernel:       Tainted: G           OE     5.19.12-arch1-1 #1
-> Oct 04 10:34:58 enhorning kernel: "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> Oct 04 10:34:58 enhorning kernel: task:zsh             state:D stack:    0 pid: 5217 ppid:  5201 flags:0x00000006
-> Oct 04 10:34:58 enhorning kernel: Call Trace:
-> Oct 04 10:34:58 enhorning kernel:  <TASK>
-> Oct 04 10:34:58 enhorning kernel:  __schedule+0x356/0x11a0
-> Oct 04 10:34:58 enhorning kernel:  schedule+0x5e/0xd0
-> Oct 04 10:34:58 enhorning kernel:  schedule_preempt_disabled+0x15/0x30
-> Oct 04 10:34:58 enhorning kernel:  __mutex_lock.constprop.0+0x461/0x6e0
-> Oct 04 10:34:58 enhorning kernel:  smb2_reconnect+0x33c/0x610 [cifs cb6635f7865b17a0b314f8877a819120d4d6ead7]
-> Oct 04 10:34:58 enhorning kernel:  ? cifsConvertToUTF16+0x259/0x3e0 [cifs cb6635f7865b17a0b314f8877a819120d4d6ead7]
-> Oct 04 10:34:58 enhorning kernel:  ? __kmalloc+0x171/0x380
-> Oct 04 10:34:58 enhorning kernel:  SMB2_open_init+0x7b/0xb80 [cifs cb6635f7865b17a0b314f8877a819120d4d6ead7]
-> Oct 04 10:34:58 enhorning kernel:  smb2_compound_op+0x5d5/0x1910 [cifs cb6635f7865b17a0b314f8877a819120d4d6ead7]
-> Oct 04 10:34:58 enhorning kernel:  smb2_query_path_info+0xc2/0x210 [cifs cb6635f7865b17a0b314f8877a819120d4d6ead7]
-> Oct 04 10:34:58 enhorning kernel:  cifs_get_inode_info+0x2bf/0xac0 [cifs cb6635f7865b17a0b314f8877a819120d4d6ead7]
-> Oct 04 10:34:58 enhorning kernel:  ? path_lookupat+0x97/0x1a0
-> Oct 04 10:34:58 enhorning kernel:  cifs_revalidate_dentry_attr+0x180/0x3b0 [cifs cb6635f7865b17a0b314f8877a819120d4d6ead7]
-> Oct 04 10:34:58 enhorning kernel:  cifs_getattr+0xc1/0x250 [cifs cb6635f7865b17a0b314f8877a819120d4d6ead7]
-> Oct 04 10:34:58 enhorning kernel:  vfs_statx+0xb6/0x140
-> Oct 04 10:34:58 enhorning kernel:  vfs_fstatat+0x55/0x70
-> Oct 04 10:34:58 enhorning kernel:  __do_sys_newfstatat+0x3f/0x80
-> Oct 04 10:34:58 enhorning kernel:  do_syscall_64+0x5c/0x90
-> Oct 04 10:34:58 enhorning kernel:  ? __x64_sys_getdents64+0xe2/0x130
-> Oct 04 10:34:58 enhorning kernel:  ? __ia32_sys_getdents64+0x130/0x130
-> Oct 04 10:34:58 enhorning kernel:  ? syscall_exit_to_user_mode+0x1b/0x40
-> Oct 04 10:34:58 enhorning kernel:  ? do_syscall_64+0x6b/0x90
-> Oct 04 10:34:58 enhorning kernel:  ? syscall_exit_to_user_mode+0x1b/0x40
-> Oct 04 10:34:58 enhorning kernel:  ? do_syscall_64+0x6b/0x90
-> Oct 04 10:34:58 enhorning kernel:  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> Oct 04 10:34:58 enhorning kernel: RIP: 0033:0x7fb432e8c34e
-> Oct 04 10:34:58 enhorning kernel: RSP: 002b:00007ffc077b6fd8 EFLAGS: 00000202 ORIG_RAX: 0000000000000106
-> Oct 04 10:34:58 enhorning kernel: RAX: ffffffffffffffda RBX: 00007ffc077b7080 RCX: 00007fb432e8c34e
-> Oct 04 10:34:58 enhorning kernel: RDX: 00007ffc077b8300 RSI: 00007ffc077b7080 RDI: 00000000ffffff9c
-> Oct 04 10:34:58 enhorning kernel: RBP: 0000563dda500433 R08: 0000000000000000 R09: 00786f6265676172
-> Oct 04 10:34:58 enhorning kernel: R10: 0000000000000100 R11: 0000000000000202 R12: 00007ffc077b8300
-> Oct 04 10:34:58 enhorning kernel: R13: 00007ffc077b8300 R14: 0000000000000009 R15: 0000000000000000
-> Oct 04 10:34:58 enhorning kernel:  </TASK>
+--
+Thanks,
 
+Steve
