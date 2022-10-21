@@ -2,208 +2,78 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F9E3C4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 20 Oct 2022 14:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50452C4332F
+	for <linux-cifs@archiver.kernel.org>; Fri, 21 Oct 2022 03:25:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbiJTOEX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 20 Oct 2022 10:04:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34586 "EHLO
+        id S230096AbiJUDZI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 20 Oct 2022 23:25:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbiJTOEV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Oct 2022 10:04:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0341DB89E
-        for <linux-cifs@vger.kernel.org>; Thu, 20 Oct 2022 07:04:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666274652;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9nCYnpDiF6jG8sTPBwmH96ryJf+ugRaTkdwBFuQTVY4=;
-        b=epg4c/xL4iGpUPIyjIT2WEw2VjzPhhlswHjMCgXOnSIlUros6dzGSmbw3bOOlzNrqEa47N
-        4tRWp8CleZz1CydqiJD/AoM8fK9fd1s2a4S4QYxF6eDhZLWyZyfBvNlut3Etj4dR0xT8v9
-        c40DQZvj4x+FbrHles7bCBPy9KMR87M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-161-3ruEITnrN6ywsi0u79TsCA-1; Thu, 20 Oct 2022 10:04:04 -0400
-X-MC-Unique: 3ruEITnrN6ywsi0u79TsCA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 603E9858282;
-        Thu, 20 Oct 2022 14:03:58 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D84B40315C;
-        Thu, 20 Oct 2022 14:03:56 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y01VjOE2RrLVA2T6@infradead.org>
-References: <Y01VjOE2RrLVA2T6@infradead.org> <1762414.1665761217@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-        willy@infradead.org, dchinner@redhat.com,
-        Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>, torvalds@linux-foundation.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: How to convert I/O iterators to iterators, sglists and RDMA lists
+        with ESMTP id S230057AbiJUDYr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Oct 2022 23:24:47 -0400
+Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0669A255A3
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Oct 2022 20:24:34 -0700 (PDT)
+Received: by mail-ua1-x92c.google.com with SMTP id c23so174895uan.13
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Oct 2022 20:24:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6Jb3/y82rYG5VRksobF9av01J/tmfyezURCOgvPsHlY=;
+        b=fSb3VWhk0HXTP/lKEwp1pDwCg3cPTvD7MEc/hQLGG2+YYiYnfVSxDeMJEklTQBMsyS
+         p61+pwLs4+j6RBAWPr404G8U2VJzlmQ8MQroMDdquF0o/8dFse0gEuZZzqV2FX4FnPPv
+         MNSnDszWKlj3L7qfbtGF4+v77xsU5Tpir3yUrsDqQnGq+saGhQUkCnvysYd+VA9VxrjD
+         zb2hAv1a36qPOPGM1IIoDFZd9Mnpuf1MF2bFDvw7tbjT6ALUQZRDLNsTFS14kMA6pghj
+         5U5uGvmef0YRaEt6nZ6BV1gSy3IuXtt+GTiQG1zITa8JK4651tsD2xa08B+WTm31+iNS
+         rFyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6Jb3/y82rYG5VRksobF9av01J/tmfyezURCOgvPsHlY=;
+        b=CRi/JbRi8grhLF0F2W3EVnwql/dCJzFHJnHcqTVmfzOSJbgQ3ahScTjS1Imzkoj38s
+         8Qqq2FlVK7WPZHjcgRvgljnhF3B62faZyD4wVnbkW3RivASQ2HbGBUTzaUwCBTLaD4d8
+         UwFM4/fw9M1MceU4ABxA22M0i8OdhMSXojBCif47Bisr3Y+APk4BqdVLB5Hcir9lrQmn
+         sYDxfQ8gSHcmNyqBBwBwErZTkSGZkcgjKP26mO8jvAHhYyY6g+cN6Cv8axhYEwxfvTJp
+         ce4ejmJF8bJ/iBRr5Tt1kzDeFc+5UTuH8xgFNM7eUrGsHIV7FTcSszyNP7URMTHf6m29
+         QBgw==
+X-Gm-Message-State: ACrzQf3o3XruaNezBaB98aZJ8lcqn08JwASs8XDwkX3lwZfbtpEABArE
+        Oc90FXH9fzzjb9o6IcunHk6YieOQe8soP11DNTI=
+X-Google-Smtp-Source: AMsMyM7pI18744S9haW110tnzjv64uYfAZKpKwg2l6yQcpCsenRqBQtleq2pJ+IyJezc1fWb1beNs0zjn4SOWzmy7Z4=
+X-Received: by 2002:ab0:6f93:0:b0:3d7:b9af:39d4 with SMTP id
+ f19-20020ab06f93000000b003d7b9af39d4mr10542721uav.84.1666322673221; Thu, 20
+ Oct 2022 20:24:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1415914.1666274636.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 20 Oct 2022 15:03:56 +0100
-Message-ID: <1415915.1666274636@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 20 Oct 2022 22:24:22 -0500
+Message-ID: <CAH2r5muLCRn1O31yCJ=pemuYBY5JpW3NhOBeRpDDE5=-jcLLpQ@mail.gmail.com>
+Subject: new statx extensions
+To:     Eric Biggers <ebiggers@google.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+I saw this patch series relating to exposing DIO alignment information
+mentioned in lwn today
 
-> >  (1) Async direct I/O.
-> > =
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=825cf206ed51
 
-> >      In the async case direct I/O, we cannot hold on to the iterator w=
-hen we
-> >      return, even if the operation is still in progress (ie. we return
-> >      EIOCBQUEUED), as it is likely to be on the caller's stack.
-> > =
+Do you have any ideas of whether any network filesystem could support
+this?  There are lots of features about the server filesystem and
+preferred i/o sizes etc. that can be sent over the protocol (for
+SMB3.1.1).
 
-> >      Also, simply copying the iterator isn't sufficient as virtual use=
-rspace
-> >      addresses cannot be trusted and we may have to pin the pages that
-> >      comprise the buffer.
-> =
+Looking at 6.1-rc1 - it looks like this was mainly for xfs and ext4
+but is there any reason that it would be beneficial for cifs.ko - and
+if so is there more clarification on what information would be needed
+from the server to set this value?
 
-> This is very related to the discussion we are having related to pinning
-> for O_DIRECT with Ira and Al.
 
-Do you have a link to that discussion?  I don't see anything obvious on
-fsdevel including Ira.
 
-I do see a discussion involving iov_iter_pin_pages, but I don't see Ira
-involved in that.
+--
+Thanks,
 
-> What block file systems do is to take the pages from the iter and some f=
-lags
-> on what is pinned.  We can generalize this to store all extra state in a
-> flags word, or byte the bullet and allow cloning of the iter in one form=
- or
-> another.
-
-Yeah, I know.  A list of pages is not an ideal solution.  It can only hand=
-le
-contiguous runs of pages, possibly with a partial page at either end.  A b=
-vec
-iterator would be of more use as it can handle a series of partial pages.
-
-Note also that I would need to turn the pages *back* into an iterator in o=
-rder
-to commune with sendmsg() in the nether reaches of some network filesystem=
-s.
-
-> >  (2) Crypto.
-> > =
-
-> >      The crypto interface takes scatterlists, not iterators, so we nee=
-d to
-> >      be able to convert an iterator into a scatterlist in order to do
-> >      content encryption within netfslib.  Doing this in netfslib makes=
- it
-> >      easier to store content-encrypted files encrypted in fscache.
-> =
-
-> Note that the scatterlist is generally a pretty bad interface.  We've
-> been talking for a while to have an interface that takes a page array
-> as an input and return an array of { dma_addr, len } tuples.  Thinking
-> about it taking in an iter might actually be an even better idea.
-
-It would be nice to be able to pass an iterator to the crypto layer.  I'm =
-not
-sure what the crypto people think of that.
-
-> >  (3) RDMA.
-> > =
-
-> >      To perform RDMA, a buffer list needs to be presented as a QPE arr=
-ay.
-> >      Currently, cifs converts the iterator it is given to lists of pag=
-es,
-> >      then each list to a scatterlist and thence to a QPE array.  I hav=
-e
-> >      code to pass the iterator down to the bottom, using an intermedia=
-te
-> >      BVEC iterator instead of a page list if I can't pass down the
-> >      original directly (eg. an XARRAY iterator on the pagecache), but =
-I
-> >      still end up converting it to a scatterlist, which is then conver=
-ted
-> >      to a QPE.  I'm trying to go directly from an iterator to a QPE ar=
-ray,
-> >      thus avoiding the need to allocate an sglist.
-> =
-
-> I'm not sure what you mean with QPE.  The fundamental low-level
-> interface in RDMA is the ib_sge.
-
-Sorry, yes. ib_sge array.  I think it appears as QPs on the wire.
-
-> If you feed it to RDMA READ/WRITE requests the interface for that is the
-> RDMA R/W API in drivers/infiniband/core/rw.c, which currently takes a
-> scatterlist but to which all of the above remarks on DMA interface apply=
-.
-> For RDMA SEND that ULP has to do a dma_map_single/page to fill it, which=
- is
-> a quite horrible layering violation and should move into the driver, but
-> that is going to a massive change to the whole RDMA subsystem, so unlike=
-ly
-> to happen anytime soon.
-
-In cifs, as it is upstream, in RDMA transmission, the iterator is converte=
-d
-into a clutch of pages in the top, which is converted back into iterators
-(smbd_send()) and those into scatterlists (smbd_post_send_data()), thence =
-into
-sge lists (see smbd_post_send_sgl()).
-
-I have patches that pass an iterator (which it decants to a bvec if async)=
- all
-the way down to the bottom layer.  Snippets are then converted to scatterl=
-ists
-and those to sge lists.  I would like to skip the scatterlist intermediate=
- and
-convert directly to sge lists.
-
-On the other hand, if you think the RDMA API should be taking scatterlists
-rather than sge lists, that would be fine.  Even better if I can just pass=
- an
-iterator in directly - though neither scatterlist nor iterator has a place=
- to
-put the RDMA local_dma_key - though I wonder if that's actually necessary =
-for
-each sge element, or whether it could be handed through as part of the req=
-uest
-as a hole.
-
-> Neither case has anything to do with what should be in common iov_iter
-> code, all this needs to live in the RDMA subsystem as a consumer.
-
-That's fine in principle.  However, I have some extraction code that can
-convert an iterator to another iterator, an sglist or an rdma sge list, us=
-ing
-a common core of code to do all three.
-
-I can split it up if that is preferable.
-
-Do you have code that's ready to be used?  I can make immediate use of it.
-
-David
-
+Steve
