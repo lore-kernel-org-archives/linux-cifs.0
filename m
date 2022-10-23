@@ -2,135 +2,232 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BBBC04A95
-	for <linux-cifs@archiver.kernel.org>; Sat, 22 Oct 2022 18:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 689AAECAAA1
+	for <linux-cifs@archiver.kernel.org>; Sun, 23 Oct 2022 16:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiJVSWM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 22 Oct 2022 14:22:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60072 "EHLO
+        id S230281AbiJWQlR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 23 Oct 2022 12:41:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbiJVSWL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Oct 2022 14:22:11 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1581412E0E8
-        for <linux-cifs@vger.kernel.org>; Sat, 22 Oct 2022 11:22:10 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id mx8so4010692qvb.8
-        for <linux-cifs@vger.kernel.org>; Sat, 22 Oct 2022 11:22:10 -0700 (PDT)
+        with ESMTP id S230266AbiJWQlQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 23 Oct 2022 12:41:16 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C4BB13E81;
+        Sun, 23 Oct 2022 09:41:15 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so1454277pjc.3;
+        Sun, 23 Oct 2022 09:41:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xJq9Mhsgg0Y56t8u/KTzivxmrLRVEF+0hJd7xwI/CjQ=;
-        b=h4A/vOYPbgNuPmr+QMuFOUuMTolC/J2mApaWmizx9rAdTgBZ40AI4NdwbxFUtzyAez
-         69fNtfi/urgUdZP3EHeqDum5VdlbPe37nd35GrqGmVDIkVt8+C6TfofyUt/6z12Y8OdS
-         kEK8+ZyZvR3Gc2pHk5lBC3ymdZsq1uRFy/cGHPh7/p4l/Nbp7qWWoQywi+AXvl6oAPAY
-         T97Ft47QYnOaKh/iNtfvInWvgMqErjtvIJDH7Wilkax6IkSvpHrYLGjxmQu6BYNv3poe
-         XDRvdIFZ/Ma6gFnJRNFmYLDAR5PL9avTyUWCeZdOx8oOI6dNPpRaCSWbehNPwfQsDuR4
-         WGsQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g1Cu3DNts+pCDfLLsa4Q9GpOR28OVBmv+G8giTYg/EU=;
+        b=RO5/jO1i2hC/VigegQdljK2K8JMj1QVRgMeVA4XppWM9E0aeFrN1PzhhTAxMPf0U1F
+         GQ2E8oXQh5E7E2dpFDcJ/rdeNr0jt3tGFbkjTnX2I8QdoedkGw+U9z62ck8eWJrNmI5V
+         KH1Z+CS6kpP6XMZtfb//JXpkvtrLbxAMJVw2GHPw4h4w9k4/dSzMISIdXIz4sN3ct/uy
+         87/HQgL3vcoDkTHeoaSsgEPa90ClpIsOrj4nnVv+2bACVCahuxf7tBPr8Ngt0NrPdr7t
+         8pOgOXXq0a2k9gfiWT6+E+8avdw9wPqZX2Iwb5/47S7QNvJPn/FDMb3WpMJmyAcpvpMg
+         PO5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xJq9Mhsgg0Y56t8u/KTzivxmrLRVEF+0hJd7xwI/CjQ=;
-        b=atw4djfxL69HkQdQvORst+/nF9OezaCYCf+bW/7uRF7xXwE9hE1OUIf/sx6fe/EZn0
-         4/HBLVbCFsZGBuYjufxzD0hKb8Hj4zBJT+7G25a7/r+B4C1DCq07Aa2oRdaStICwlLa9
-         jGbIi9Bkb/tTOYxPXxB6BuxwkoO8h/YqIopf6pP4rIzVp6Uhg2b1NJ9SlurQbTbIrfFh
-         eHt6GCgfuqqiZDpf54o1q100qGC9P3mOjVOac0fwxvUBai81rNW80PdFMO76jOb6oxVE
-         2nYSdhYT6JXraZWSpP1Om5azgT7MIWw6QBOWa0SacrN6L+xfl1CQxXsxmbPS++DN1/tb
-         w+jQ==
-X-Gm-Message-State: ACrzQf1uM7d1aNr9B+h9286DMEH+Rr1owNt3NnTrz810hyTzl7y40XPE
-        DawCUGZ1+CEGLVuCYEsNDfRR76Wcx9iNDou9XPW2EO2/
-X-Google-Smtp-Source: AMsMyM6OeL9Y9rzTqbMtV9AFeD4Zk2OIrTFFmmxREbq/zD8GT3EAsL7Ggg8hDCV4FiMsebPSlfDCmhChW6n4q2rI9qI=
-X-Received: by 2002:a05:6102:23dc:b0:3a7:9b0c:aa8e with SMTP id
- x28-20020a05610223dc00b003a79b0caa8emr15000457vsr.60.1666462918118; Sat, 22
- Oct 2022 11:21:58 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g1Cu3DNts+pCDfLLsa4Q9GpOR28OVBmv+G8giTYg/EU=;
+        b=sGclB9WkFs+8CcAABOEFQG2I3tWtPBA0NswV4X56bf0XtJViHfCVKtWFSOj+KMU5Th
+         Lw7HzsxQ3cxcjNfsggnX5MLNDRcqpFYOFeHHcwxZep+h6LJByWLYDJxi8jWxg6D4T5/G
+         kWnVwQo9VNvq3MWBjF0KQKKbaC5doxxKptotB5ZVLCl+E9bt9+gIhnL6kXQ0Ka7EWYhx
+         Qh55LOZdd4QV+K8PZIIdTT+/QP79qeuBESUQ/dg7pKm2uO4leTQhbUpkJhcFbjpcun49
+         glbsggwYaNYeMd0+gdPgS6DQyU17icB0MzvMYDjBVQDvnDSpCYOVZejkXbDw1jcj14CB
+         Lh0A==
+X-Gm-Message-State: ACrzQf0MW1ugD1JIu4YGom1imIw2pwafMno6XZKxPBxOtoJQ3AXpf07x
+        8zRZyeBx20MpL1G58K0KwtaY9E3KTceGguJtPps=
+X-Google-Smtp-Source: AMsMyM5b9uLKDgvKeqOL6QRiWjFfI+W3L+9H/bOOcjuUrY5OrLVFjNSUX12EDlenDf538ZZxmDgdOQ==
+X-Received: by 2002:a17:90a:d14a:b0:203:7b4b:6010 with SMTP id t10-20020a17090ad14a00b002037b4b6010mr69783916pjw.237.1666543274908;
+        Sun, 23 Oct 2022 09:41:14 -0700 (PDT)
+Received: from localhost ([223.104.41.250])
+        by smtp.gmail.com with ESMTPSA id d4-20020a631d04000000b00460d89df1f1sm16148170pgd.57.2022.10.23.09.41.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Oct 2022 09:41:14 -0700 (PDT)
+From:   Hawkins Jiawei <yin31149@gmail.com>
+To:     yin31149@gmail.com, Steve French <sfrench@samba.org>,
+        Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>
+Cc:     18801353760@163.com, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH -next 1/5] smb3: fix possible null-ptr-deref when parsing param
+Date:   Mon, 24 Oct 2022 00:39:43 +0800
+Message-Id: <20221023163945.39920-2-yin31149@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221023163945.39920-1-yin31149@gmail.com>
+References: <20221023163945.39920-1-yin31149@gmail.com>
 MIME-Version: 1.0
-References: <20221022073521.1660841-1-zhangxiaoxu5@huawei.com> <20221022073521.1660841-3-zhangxiaoxu5@huawei.com>
-In-Reply-To: <20221022073521.1660841-3-zhangxiaoxu5@huawei.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 22 Oct 2022 13:21:47 -0500
-Message-ID: <CAH2r5msWoNw0694UjqcOAhFwoFTdVwbUmgCA7MtCTbY-FbqujQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cifs: Fix pages array leak when writedata alloc
- failed in cifs_writedata_alloc()
-To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, pc@cjr.nz,
-        lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com,
-        longli@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Good catch. Tentatively merged into cifs-2.6.git for-next pending testing.
+According to commit "vfs: parse: deal with zero length string value",
+kernel will set the param->string to null pointer in vfs_parse_fs_string()
+if fs string has zero length.
 
-On Sat, Oct 22, 2022 at 1:32 AM Zhang Xiaoxu <zhangxiaoxu5@huawei.com> wrote:
->
-> There is a memory leak when writedata alloc failed:
->
->   unreferenced object 0xffff888192364000 (size 8192):
->     comm "sync", pid 22839, jiffies 4297313967 (age 60.230s)
->     hex dump (first 32 bytes):
->       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     backtrace:
->       [<0000000027de0814>] __kmalloc+0x4d/0x150
->       [<00000000b21e81ab>] cifs_writepages+0x35f/0x14a0
->       [<0000000076f7d20e>] do_writepages+0x10a/0x360
->       [<00000000d6a36edc>] filemap_fdatawrite_wbc+0x95/0xc0
->       [<000000005751a323>] __filemap_fdatawrite_range+0xa7/0xe0
->       [<0000000088afb0ca>] file_write_and_wait_range+0x66/0xb0
->       [<0000000063dbc443>] cifs_strict_fsync+0x80/0x5f0
->       [<00000000c4624754>] __x64_sys_fsync+0x40/0x70
->       [<000000002c0dc744>] do_syscall_64+0x35/0x80
->       [<0000000052f46bee>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
->
-> cifs_writepages+0x35f/0x14a0 is:
->   kmalloc_array at include/linux/slab.h:628
->   (inlined by) kcalloc at include/linux/slab.h:659
->   (inlined by) cifs_writedata_alloc at fs/cifs/file.c:2438
->   (inlined by) wdata_alloc_and_fillpages at fs/cifs/file.c:2527
->   (inlined by) cifs_writepages at fs/cifs/file.c:2705
->
-> If writedata alloc failed in cifs_writedata_alloc(), the pages array
-> should be freed.
->
-> Fixes: 8e7360f67e75 ("CIFS: Add support for direct pages in wdata")
-> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-> ---
->  fs/cifs/file.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 87be0223a57a..cd9698209930 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2434,12 +2434,16 @@ cifs_writev_complete(struct work_struct *work)
->  struct cifs_writedata *
->  cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
->  {
-> +       struct cifs_writedata *writedata = NULL;
->         struct page **pages =
->                 kcalloc(nr_pages, sizeof(struct page *), GFP_NOFS);
-> -       if (pages)
-> -               return cifs_writedata_direct_alloc(pages, complete);
-> +       if (pages) {
-> +               writedata = cifs_writedata_direct_alloc(pages, complete);
-> +               if (!writedata)
-> +                       kvfree(pages);
-> +       }
->
-> -       return NULL;
-> +       return writedata;
->  }
->
->  struct cifs_writedata *
-> --
-> 2.31.1
->
+Yet the problem is that, smb3_fs_context_parse_param() will dereferences
+the param->string, without checking whether it is a null pointer, which
+may trigger a null-ptr-deref bug.
 
+This patch solves it by adding sanity check on param->string
+in smb3_fs_context_parse_param().
 
+Signed-off-by: Hawkins Jiawei <yin31149@gmail.com>
+---
+ fs/cifs/fs_context.c | 58 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
+
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 45119597c765..7832e5d6bbb0 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -858,7 +858,8 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 	 * fs_parse can not handle string options with an empty value so
+ 	 * we will need special handling of them.
+ 	 */
+-	if (param->type == fs_value_is_string && param->string[0] == 0) {
++	if ((param->type == fs_value_is_string && param->string[0] == 0) ||
++	    param->type == fs_value_is_empty) {
+ 		if (!strcmp("pass", param->key) || !strcmp("password", param->key)) {
+ 			skip_parsing = true;
+ 			opt = Opt_pass;
+@@ -1124,6 +1125,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 	case Opt_source:
+ 		kfree(ctx->UNC);
+ 		ctx->UNC = NULL;
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		switch (smb3_parse_devname(param->string, ctx)) {
+ 		case 0:
+ 			break;
+@@ -1181,6 +1187,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		}
+ 		break;
+ 	case Opt_ip:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		if (strlen(param->string) == 0) {
+ 			ctx->got_ip = false;
+ 			break;
+@@ -1194,6 +1205,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		ctx->got_ip = true;
+ 		break;
+ 	case Opt_domain:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		if (strnlen(param->string, CIFS_MAX_DOMAINNAME_LEN)
+ 				== CIFS_MAX_DOMAINNAME_LEN) {
+ 			pr_warn("domain name too long\n");
+@@ -1209,6 +1225,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		cifs_dbg(FYI, "Domain name set\n");
+ 		break;
+ 	case Opt_srcaddr:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		if (!cifs_convert_address(
+ 				(struct sockaddr *)&ctx->srcaddr,
+ 				param->string, strlen(param->string))) {
+@@ -1218,6 +1239,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		}
+ 		break;
+ 	case Opt_iocharset:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		if (strnlen(param->string, 1024) >= 65) {
+ 			pr_warn("iocharset name too long\n");
+ 			goto cifs_parse_mount_err;
+@@ -1237,6 +1263,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		cifs_dbg(FYI, "iocharset set to %s\n", ctx->iocharset);
+ 		break;
+ 	case Opt_netbiosname:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		memset(ctx->source_rfc1001_name, 0x20,
+ 			RFC1001_NAME_LEN);
+ 		/*
+@@ -1257,6 +1288,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			pr_warn("netbiosname longer than 15 truncated\n");
+ 		break;
+ 	case Opt_servern:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		/* last byte, type, is 0x20 for servr type */
+ 		memset(ctx->target_rfc1001_name, 0x20,
+ 			RFC1001_NAME_LEN_WITH_NULL);
+@@ -1277,6 +1313,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			pr_warn("server netbiosname longer than 15 truncated\n");
+ 		break;
+ 	case Opt_ver:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		/* version of mount userspace tools, not dialect */
+ 		/* If interface changes in mount.cifs bump to new ver */
+ 		if (strncasecmp(param->string, "1", 1) == 0) {
+@@ -1292,16 +1333,31 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		pr_warn("Invalid mount helper version specified\n");
+ 		goto cifs_parse_mount_err;
+ 	case Opt_vers:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		/* protocol version (dialect) */
+ 		if (cifs_parse_smb_version(fc, param->string, ctx, is_smb3) != 0)
+ 			goto cifs_parse_mount_err;
+ 		ctx->got_version = true;
+ 		break;
+ 	case Opt_sec:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		if (cifs_parse_security_flavors(fc, param->string, ctx) != 0)
+ 			goto cifs_parse_mount_err;
+ 		break;
+ 	case Opt_cache:
++		if (!param->string) {
++			cifs_errorf(fc, "Bad value '(null)' for mount option '%s'\n",
++				    param->key);
++			goto cifs_parse_mount_err;
++		}
+ 		if (cifs_parse_cache_flavor(fc, param->string, ctx) != 0)
+ 			goto cifs_parse_mount_err;
+ 		break;
 -- 
-Thanks,
+2.25.1
 
-Steve
