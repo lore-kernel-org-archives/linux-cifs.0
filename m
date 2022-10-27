@@ -2,70 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1FFFA3742
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 13:10:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE30FA3745
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 13:12:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236048AbiJ0NKo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Oct 2022 09:10:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38334 "EHLO
+        id S236050AbiJ0NMi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Oct 2022 09:12:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236053AbiJ0NKT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 09:10:19 -0400
+        with ESMTP id S236055AbiJ0NME (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 09:12:04 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0496B56027
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Oct 2022 06:10:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70723792E9
+        for <linux-cifs@vger.kernel.org>; Thu, 27 Oct 2022 06:11:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666876210;
+        s=mimecast20190719; t=1666876292;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=O59xZLkhVp9n6CE3WnFVuePBF6VXdtbIlYgcHesyaqQ=;
-        b=I1Ofci0uiBtRRqFy7zr4S+8jgmQEB6xLgqMUpGcxkaE11swJMBIffR2AWiuvBjom/KoH5R
-        eYtITz9rXqSBERkWA5zb4KgofYpjZXzHxKVww3oP4GrJTAWt5hbtJSW9vLfxt+i1GzzeIR
-        7uMjHNywW1Llwdt9Ivbl84tkpPKFma8=
+        bh=08qQCOq6HXtPu07yJoUG1gykaILDIdfjGgF17Vne+y0=;
+        b=bu8B6ZXMaWJisHIi1UFeVLTHXKzcJY8jKOIzh9iLso0lcI9g9da2zfnfba7KEfo1cWW0dw
+        Gh5nzeHdD/zDO0OEeZ460Q3Oyp2QbRaLggqv6wzWJ3k2eEkCudCODDt3s0Sc23oHKiERzI
+        6cOT77fLgohgAB4m3p9Ap95jMzdpKpw=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-495-oKhzdWgDNWelnqNvp0SiQg-1; Thu, 27 Oct 2022 09:10:06 -0400
-X-MC-Unique: oKhzdWgDNWelnqNvp0SiQg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-649-YAG-GrF1PNKY9HcojBWvQA-1; Thu, 27 Oct 2022 09:11:26 -0400
+X-MC-Unique: YAG-GrF1PNKY9HcojBWvQA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EE174857D0F;
-        Thu, 27 Oct 2022 13:10:05 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D41E811E75;
+        Thu, 27 Oct 2022 13:11:25 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C15A64221F;
-        Thu, 27 Oct 2022 13:10:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 66BC01121333;
+        Thu, 27 Oct 2022 13:11:24 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20221027083547.46933-6-jefflexu@linux.alibaba.com>
-References: <20221027083547.46933-6-jefflexu@linux.alibaba.com> <20221027083547.46933-1-jefflexu@linux.alibaba.com>
+In-Reply-To: <20221027083547.46933-8-jefflexu@linux.alibaba.com>
+References: <20221027083547.46933-8-jefflexu@linux.alibaba.com> <20221027083547.46933-1-jefflexu@linux.alibaba.com>
 To:     Jingbo Xu <jefflexu@linux.alibaba.com>
 Cc:     dhowells@redhat.com, jlayton@kernel.org, linux-cachefs@redhat.com,
         linux-erofs@lists.ozlabs.org, linux-cifs@vger.kernel.org,
         linux-nfs@vger.kernel.org, linux-afs@lists.infradead.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5/9] fscache,netfs: rename netfs_cache_ops as fscache_ops
+Subject: Re: [PATCH 7/9] fscache,netfs: define flags for prepare_read()
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3306532.1666876204.1@warthog.procyon.org.uk>
-Date:   Thu, 27 Oct 2022 14:10:04 +0100
-Message-ID: <3306533.1666876204@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-ID: <3306594.1666876283.1@warthog.procyon.org.uk>
+Date:   Thu, 27 Oct 2022 14:11:23 +0100
+Message-ID: <3306595.1666876283@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 Jingbo Xu <jefflexu@linux.alibaba.com> wrote:
 
-> Rename netfs_cache_ops as fscache_ops to make raw fscache APIs more
-> neutral independent on libnetfs.
+> +		if (test_bit(FSCACHE_REQ_COPY_TO_CACHE, &flags))
+> +			__set_bit(NETFS_SREQ_COPY_TO_CACHE, &subreq->flags);
 
-This is intended to be cache-architecture independent, in case someone comes
-along with a cache other than fscache they want to use.
+Please don't do that in netfslib.  Netfslib shouldn't know about fscache's
+inner workings.
 
 David
 
