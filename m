@@ -2,119 +2,146 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 961CEC67871
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 06:48:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4215C67871
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 08:35:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234484AbiJ0GsZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Oct 2022 02:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51218 "EHLO
+        id S233553AbiJ0If5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Oct 2022 04:35:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234457AbiJ0GsY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 02:48:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B98148FE4;
-        Wed, 26 Oct 2022 23:48:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D0D40621A6;
-        Thu, 27 Oct 2022 06:48:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD611C433C1;
-        Thu, 27 Oct 2022 06:48:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1666853302;
-        bh=WfnvbZ0ZCG3kuH4jEsDaJ1/vqilkTKeoMzcOu0I4SPs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Kysx0dc6L/J0j3nGVVM2jJFOtqJIRbGQx5Y3yxQpNzm7DLQpaQQZjKTg4Iv01dVxS
-         ALAPc63FhXCIsLFO3+dSkJEfWZwktJpfSSygdudzkl2vgFq6o4YbPdQAIrSqkj22Cu
-         d2S2Dr8xeqVfH7UfulHYlNpfKSyx9LYqSRuGJzko=
-Date:   Thu, 27 Oct 2022 08:49:15 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
-        David Howells <dhowells@redhat.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Russ Weight <russell.h.weight@intel.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] cred: Do not default to init_cred in
- prepare_kernel_cred()
-Message-ID: <Y1op6wgDSPu4MGB8@kroah.com>
-References: <20221026232943.never.775-kees@kernel.org>
+        with ESMTP id S234486AbiJ0Ifz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 04:35:55 -0400
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDA7689AEB;
+        Thu, 27 Oct 2022 01:35:51 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VTAl7YM_1666859747;
+Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0VTAl7YM_1666859747)
+          by smtp.aliyun-inc.com;
+          Thu, 27 Oct 2022 16:35:48 +0800
+From:   Jingbo Xu <jefflexu@linux.alibaba.com>
+To:     dhowells@redhat.com, jlayton@kernel.org, linux-cachefs@redhat.com,
+        linux-erofs@lists.ozlabs.org
+Cc:     linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/9] fscache,netfs: decouple raw fscache APIs from libnetfs
+Date:   Thu, 27 Oct 2022 16:35:38 +0800
+Message-Id: <20221027083547.46933-1-jefflexu@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221026232943.never.775-kees@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Oct 26, 2022 at 04:31:11PM -0700, Kees Cook wrote:
-> A common exploit pattern for ROP attacks is to abuse prepare_kernel_cred()
-> in order to construct escalated privileges[1]. Instead of providing a
-> short-hand argument (NULL) to the "daemon" argument to indicate using
-> init_cred as the base cred, require that "daemon" is always set to
-> an actual task. Replace all existing callers that were passing NULL
-> with &init_task.
-> 
-> Future attacks will need to have sufficiently powerful read/write
-> primitives to have found an appropriately privileged task and written it
-> to the ROP stack as an argument to succeed, which is similarly difficult
-> to the prior effort needed to escalate privileges before struct cred
-> existed: locate the current cred and overwrite the uid member.
-> 
-> This has the added benefit of meaning that prepare_kernel_cred() can no
-> longer exceed the privileges of the init task, which may have changed from
-> the original init_cred (e.g. dropping capabilities from the bounding set).
-> 
-> [1] https://google.com/search?q=commit_creds(prepare_kernel_cred(0))
-> 
-> Cc: "Eric W. Biederman" <ebiederm@xmission.com>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: Russ Weight <russell.h.weight@intel.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-> Cc: Steve French <sfrench@samba.org>
-> Cc: Paulo Alcantara <pc@cjr.nz>
-> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
-> Cc: Shyam Prasad N <sprasad@microsoft.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-> Cc: Anna Schumaker <anna@kernel.org>
-> Cc: Chuck Lever <chuck.lever@oracle.com>
-> Cc: Jeff Layton <jlayton@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: "Michal Koutný" <mkoutny@suse.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Cc: linux-nfs@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+Git tree:
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    https://github.com/lostjeffle/linux.git jingbo/clean-fscache-v1-clean-netfs
+
+Gitweb:
+
+    https://github.com/lostjeffle/linux/commits/jingbo/clean-fscache-v1-clean-netfs
+
+
+[Rationale]
+===========
+Fscache has been landed as a generic caching management framework in
+the Linux kernel for decades.  It aims to manage cache data availability
+or fetch data if needed.  Currently it's mainly used for network fses,
+but in principle the main caching subsystem can be used more widely.
+
+We do really like fscache framework and we believe it'd be better to
+reuse such framework if possible instead of duplicating other
+alternatives for better maintenance and testing.  Therefore for our
+container image use cases, we applied the existing fscache to implement
+on-demand read for erofs in the past months.  For more details, also see
+[1].
+
+In short, here each erofs filesystem is composed of multiple blobs (or
+devices).  Each blob corresponds to one fscache cookie to strictly
+follow on-disk format and implement the image downloading in a
+deterministic manner, which means it has a unique checksum and is signed
+by vendors.
+
+Data of each erofs inode can be scattered among multiple blobs (cookie)
+since erofs supports chunk-level deduplication.  In this case, each
+erofs inode can correspond to multiple cookies, and there's a logical to
+physical offset mapping between the logical offset in erofs inode and
+the physical offset in the backing file.
+
+As described above, per-cookie netfs model can not be used here
+directly.  Instead, we'd like to propose/decouple a simple set of raw
+fscache APIs, e.g. fscache_read(), to access cache for all fses to use.
+We believe it's useful since it's like the relationship between raw bio
+and iomap, both of which are useful for local fses.  However, after
+fscache/netfs rework, libnetfs is preferred to access fscache, making
+fscache closely coupled with libnetfs.
+
+Therefore, a more simple neutral raw fscache APIs is shown here which is
+independent to libnetfs for those who are not using libnetfs.
+
+
+[Patchset Organization]
+=======================
+patch 1: decouple prepare_read() from netfs_io_subrequest
+
+patch 2-9:
+All structures related to cache accessing will be transformed with
+"fscache_" prefix, and defined in fscache namespace.  The whole
+transition is divided into separate patches to facilitate code review,
+with each patch transforming one structure.
+
+It is worth noting that the structure declaration is temporarily placed
+in netfs.h, and will be moved to fscache.h when all related structures
+are transformed to "fscache_" prefixed finally.  The reason is that, in
+the intermediate state during the transition, the declarations of
+related structures are scattered among fscache.h and netfs.h.  This will
+cause a bidirectional reference of these two headers, and compilation
+error then.  As a work around, keep the declaration in netfs.h
+temporarily, until all structures are transformed and then moved to
+fscache.h (in patch 9).
+
+
+[Following cleanup for erofs]
+=============================
+We will also cleanup erofs based on fscache_read() so that it won't rely
+on netfs internals anymore. For example, erofs can implement its own
+request completion routine, so that it can get rid of reliance on
+netfs_io_request and netfs_io_subrequest.
+
+
+[1] https://lore.kernel.org/all/Yoj1AcHoBPqir++H@debian/
+
+
+Jingbo Xu (9):
+  fscache: decouple prepare_read() from netfs_io_subrequest
+  fscache,netfs: rename netfs_io_source as fscache_io_source
+  fscache,netfs: rename netfs_io_terminated_t as fscache_io_terminated_t
+  fscache,netfs: rename netfs_read_from_hole as fscache_read_from_hole
+  fscache,netfs: rename netfs_cache_ops as fscache_ops
+  fscache,netfs: rename netfs_cache_resources as fscache_resources
+  fscache,netfs: define flags for prepare_read()
+  fscache,netfs: move PageFsCache() family helpers to fscache.h
+  fscache,netfs: move "fscache_" prefixed structures to fscache.h
+
+ fs/afs/internal.h                 |   2 +-
+ fs/cachefiles/interface.c         |   2 +-
+ fs/cachefiles/internal.h          |   8 +-
+ fs/cachefiles/io.c                |  84 ++++++------
+ fs/cifs/fscache.c                 |   8 +-
+ fs/erofs/fscache.c                |  17 ++-
+ fs/fscache/io.c                   |  18 +--
+ fs/netfs/buffered_read.c          |   2 +-
+ fs/netfs/io.c                     |  67 +++++-----
+ fs/nfs/fscache.c                  |   6 +-
+ fs/nfs/fscache.h                  |   2 +-
+ include/linux/fscache-cache.h     |   8 +-
+ include/linux/fscache.h           | 211 +++++++++++++++++++++++++++---
+ include/linux/netfs.h             | 173 +-----------------------
+ include/trace/events/cachefiles.h |  27 ++--
+ include/trace/events/netfs.h      |  14 +-
+ 16 files changed, 330 insertions(+), 319 deletions(-)
+
+-- 
+2.19.1.6.gb485710b
+
