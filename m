@@ -2,302 +2,162 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99594FA373E
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 08:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 772A6ECAAA1
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 11:22:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235107AbiJ0Ig6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Oct 2022 04:36:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52540 "EHLO
+        id S233747AbiJ0LWg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Oct 2022 07:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235047AbiJ0IgZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 04:36:25 -0400
-Received: from out199-3.us.a.mail.aliyun.com (out199-3.us.a.mail.aliyun.com [47.90.199.3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54CE097D4C;
-        Thu, 27 Oct 2022 01:36:06 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VTAlX3P_1666859759;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0VTAlX3P_1666859759)
-          by smtp.aliyun-inc.com;
-          Thu, 27 Oct 2022 16:36:00 +0800
-From:   Jingbo Xu <jefflexu@linux.alibaba.com>
-To:     dhowells@redhat.com, jlayton@kernel.org, linux-cachefs@redhat.com,
-        linux-erofs@lists.ozlabs.org
-Cc:     linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 9/9] fscache,netfs: move "fscache_" prefixed structures to fscache.h
-Date:   Thu, 27 Oct 2022 16:35:47 +0800
-Message-Id: <20221027083547.46933-10-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20221027083547.46933-1-jefflexu@linux.alibaba.com>
-References: <20221027083547.46933-1-jefflexu@linux.alibaba.com>
+        with ESMTP id S233403AbiJ0LWf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 07:22:35 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21F6FFFB2;
+        Thu, 27 Oct 2022 04:22:34 -0700 (PDT)
+Received: from kwepemi500024.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MyjrJ3CrBzJnL6;
+        Thu, 27 Oct 2022 19:19:44 +0800 (CST)
+Received: from huawei.com (10.175.103.91) by kwepemi500024.china.huawei.com
+ (7.221.188.100) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 27 Oct
+ 2022 19:22:31 +0800
+From:   Zeng Heng <zengheng4@huawei.com>
+To:     <sfrench@samba.org>, <tom@talpey.com>, <sprasad@microsoft.com>,
+        <pc@cjr.nz>, <lsahlber@redhat.com>
+CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+        <linux-kernel@vger.kernel.org>, <liwei391@huawei.com>
+Subject: [PATCH v3] cifs: fix use-after-free caused by invalid pointer `hostname`
+Date:   Thu, 27 Oct 2022 19:21:27 +0800
+Message-ID: <20221027112127.2433605-1-zengheng4@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500024.china.huawei.com (7.221.188.100)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Since all related structures has been transformed with "fscache_"
-prefix, move all these structures to fscache.h as a final cleanup.
+`hostname` needs to be set as null-pointer after free in
+`cifs_put_tcp_session` function, or when `cifsd` thread attempts
+to resolve hostname and reconnect the host, the thread would deref
+the invalid pointer.
 
-Besides, make netfs.h include fscache.h rather than the other way
-around.  This is an intuitive change since libnetfs lives one layer
-above fscache, accessing backing files with facache.
+Here is one of practical backtrace examples as reference:
 
-This is a cleanup without logic change.
+Task 477
+---------------------------
+ do_mount
+  path_mount
+   do_new_mount
+    vfs_get_tree
+     smb3_get_tree
+      smb3_get_tree_common
+       cifs_smb3_do_mount
+        cifs_mount
+         mount_put_conns
+          cifs_put_tcp_session
+          --> kfree(server->hostname)
 
-Signed-off-by: Jingbo Xu <jefflexu@linux.alibaba.com>
+cifsd
+---------------------------
+ kthread
+  cifs_demultiplex_thread
+   cifs_reconnect
+    reconn_set_ipaddr_from_hostname
+    --> if (!server->hostname)
+    --> if (server->hostname[0] == '\0')  // !! UAF fault here
+
+CIFS: VFS: cifs_mount failed w/return code = -112
+mount error(112): Host is down
+BUG: KASAN: use-after-free in reconn_set_ipaddr_from_hostname+0x2ba/0x310
+Read of size 1 at addr ffff888108f35380 by task cifsd/480
+CPU: 2 PID: 480 Comm: cifsd Not tainted 6.1.0-rc2-00106-gf705792f89dd-dirty #25
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x68/0x85
+ print_report+0x16c/0x4a3
+ kasan_report+0x95/0x190
+ reconn_set_ipaddr_from_hostname+0x2ba/0x310
+ __cifs_reconnect.part.0+0x241/0x800
+ cifs_reconnect+0x65f/0xb60
+ cifs_demultiplex_thread+0x1570/0x2570
+ kthread+0x2c5/0x380
+ ret_from_fork+0x22/0x30
+ </TASK>
+Allocated by task 477:
+ kasan_save_stack+0x1e/0x40
+ kasan_set_track+0x21/0x30
+ __kasan_kmalloc+0x7e/0x90
+ __kmalloc_node_track_caller+0x52/0x1b0
+ kstrdup+0x3b/0x70
+ cifs_get_tcp_session+0xbc/0x19b0
+ mount_get_conns+0xa9/0x10c0
+ cifs_mount+0xdf/0x1970
+ cifs_smb3_do_mount+0x295/0x1660
+ smb3_get_tree+0x352/0x5e0
+ vfs_get_tree+0x8e/0x2e0
+ path_mount+0xf8c/0x1990
+ do_mount+0xee/0x110
+ __x64_sys_mount+0x14b/0x1f0
+ do_syscall_64+0x3b/0x90
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Freed by task 477:
+ kasan_save_stack+0x1e/0x40
+ kasan_set_track+0x21/0x30
+ kasan_save_free_info+0x2a/0x50
+ __kasan_slab_free+0x10a/0x190
+ __kmem_cache_free+0xca/0x3f0
+ cifs_put_tcp_session+0x30c/0x450
+ cifs_mount+0xf95/0x1970
+ cifs_smb3_do_mount+0x295/0x1660
+ smb3_get_tree+0x352/0x5e0
+ vfs_get_tree+0x8e/0x2e0
+ path_mount+0xf8c/0x1990
+ do_mount+0xee/0x110
+ __x64_sys_mount+0x14b/0x1f0
+ do_syscall_64+0x3b/0x90
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+The buggy address belongs to the object at ffff888108f35380
+ which belongs to the cache kmalloc-16 of size 16
+The buggy address is located 0 bytes inside of
+ 16-byte region [ffff888108f35380, ffff888108f35390)
+The buggy address belongs to the physical page:
+page:00000000333f8e58 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888108f350e0 pfn:0x108f35
+flags: 0x200000000000200(slab|node=0|zone=2)
+raw: 0200000000000200 0000000000000000 dead000000000122 ffff8881000423c0
+raw: ffff888108f350e0 000000008080007a 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+Memory state around the buggy address:
+ ffff888108f35280: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+ ffff888108f35300: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+>ffff888108f35380: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+                   ^
+ ffff888108f35400: fa fb fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888108f35480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+
+Fixes: 28eb24ff75c5 ("cifs: Always resolve hostname before reconnecting")
+Signed-off-by: Zeng Heng <zengheng4@huawei.com>
 ---
- fs/afs/internal.h       |  2 +-
- fs/erofs/fscache.c      |  1 +
- fs/nfs/fscache.h        |  2 +-
- include/linux/fscache.h | 80 ++++++++++++++++++++++++++++++++++++++++-
- include/linux/netfs.h   | 80 +----------------------------------------
- 5 files changed, 83 insertions(+), 82 deletions(-)
+ fs/cifs/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 723d162078a3..5d1314265e3d 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -14,7 +14,7 @@
- #include <linux/key.h>
- #include <linux/workqueue.h>
- #include <linux/sched.h>
--#include <linux/fscache.h>
-+#include <linux/netfs.h>
- #include <linux/backing-dev.h>
- #include <linux/uuid.h>
- #include <linux/mm_types.h>
-diff --git a/fs/erofs/fscache.c b/fs/erofs/fscache.c
-index e30a42a35ae7..69531be66b28 100644
---- a/fs/erofs/fscache.c
-+++ b/fs/erofs/fscache.c
-@@ -4,6 +4,7 @@
-  * Copyright (C) 2022, Bytedance Inc. All rights reserved.
-  */
- #include <linux/fscache.h>
-+#include <linux/netfs.h>
- #include "internal.h"
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index ffb291579bb9..1cc47dd3b4d6 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1584,6 +1584,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+ 	server->session_key.response = NULL;
+ 	server->session_key.len = 0;
+ 	kfree(server->hostname);
++	server->hostname = NULL;
  
- static DEFINE_MUTEX(erofs_domain_list_lock);
-diff --git a/fs/nfs/fscache.h b/fs/nfs/fscache.h
-index 2a37af880978..a0715f83a529 100644
---- a/fs/nfs/fscache.h
-+++ b/fs/nfs/fscache.h
-@@ -12,7 +12,7 @@
- #include <linux/nfs_fs.h>
- #include <linux/nfs_mount.h>
- #include <linux/nfs4_mount.h>
--#include <linux/fscache.h>
-+#include <linux/netfs.h>
- #include <linux/iversion.h>
- 
- #ifdef CONFIG_NFS_FSCACHE
-diff --git a/include/linux/fscache.h b/include/linux/fscache.h
-index 034d009c0de7..457226a396d2 100644
---- a/include/linux/fscache.h
-+++ b/include/linux/fscache.h
-@@ -15,7 +15,6 @@
- #define _LINUX_FSCACHE_H
- 
- #include <linux/fs.h>
--#include <linux/netfs.h>
- #include <linux/writeback.h>
- #include <linux/pagemap.h>
- 
-@@ -151,6 +150,85 @@ struct fscache_cookie {
- #define FSCACHE_REQ_COPY_TO_CACHE	0	/* Set if should copy the data to the cache */
- #define FSCACHE_REQ_ONDEMAND		1	/* Set if it's from on-demand read mode */
- 
-+enum fscache_io_source {
-+	FSCACHE_FILL_WITH_ZEROES,
-+	FSCACHE_DOWNLOAD_FROM_SERVER,
-+	FSCACHE_READ_FROM_CACHE,
-+	FSCACHE_INVALID_READ,
-+} __mode(byte);
-+
-+typedef void (*fscache_io_terminated_t)(void *priv, ssize_t transferred_or_error,
-+				      bool was_async);
-+
-+/*
-+ * Resources required to do operations on a cache.
-+ */
-+struct fscache_resources {
-+	const struct fscache_ops	*ops;
-+	void				*cache_priv;
-+	void				*cache_priv2;
-+	unsigned int			debug_id;	/* Cookie debug ID */
-+	unsigned int			inval_counter;	/* object->inval_counter at begin_op */
-+};
-+
-+/*
-+ * How to handle reading from a hole.
-+ */
-+enum fscache_read_from_hole {
-+	FSCACHE_READ_HOLE_IGNORE,
-+	FSCACHE_READ_HOLE_CLEAR,
-+	FSCACHE_READ_HOLE_FAIL,
-+};
-+
-+/*
-+ * Table of operations for access to a cache.  This is obtained by
-+ * rreq->ops->begin_cache_operation().
-+ */
-+struct fscache_ops {
-+	/* End an operation */
-+	void (*end_operation)(struct fscache_resources *cres);
-+
-+	/* Read data from the cache */
-+	int (*read)(struct fscache_resources *cres,
-+		    loff_t start_pos,
-+		    struct iov_iter *iter,
-+		    enum fscache_read_from_hole read_hole,
-+		    fscache_io_terminated_t term_func,
-+		    void *term_func_priv);
-+
-+	/* Write data to the cache */
-+	int (*write)(struct fscache_resources *cres,
-+		     loff_t start_pos,
-+		     struct iov_iter *iter,
-+		     fscache_io_terminated_t term_func,
-+		     void *term_func_priv);
-+
-+	/* Expand readahead request */
-+	void (*expand_readahead)(struct fscache_resources *cres,
-+				 loff_t *_start, size_t *_len, loff_t i_size);
-+
-+	/* Prepare a read operation, shortening it to a cached/uncached
-+	 * boundary as appropriate.
-+	 */
-+	enum fscache_io_source (*prepare_read)(struct fscache_resources *cres,
-+					     loff_t *_start, size_t *_len,
-+					     unsigned long *_flags, loff_t i_size);
-+
-+	/* Prepare a write operation, working out what part of the write we can
-+	 * actually do.
-+	 */
-+	int (*prepare_write)(struct fscache_resources *cres,
-+			     loff_t *_start, size_t *_len, loff_t i_size,
-+			     bool no_space_allocated_yet);
-+
-+	/* Query the occupancy of the cache in a region, returning where the
-+	 * next chunk of data starts and how long it is.
-+	 */
-+	int (*query_occupancy)(struct fscache_resources *cres,
-+			       loff_t start, size_t len, size_t granularity,
-+			       loff_t *_data_start, size_t *_data_len);
-+};
-+
- /*
-  * slow-path functions for when there is actually caching available, and the
-  * netfs does actually have a valid token
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 2ad4e1e88106..1977f953633a 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -16,19 +16,10 @@
- 
- #include <linux/workqueue.h>
- #include <linux/fs.h>
-+#include <linux/fscache.h>
- 
- enum netfs_sreq_ref_trace;
- 
--enum fscache_io_source {
--	FSCACHE_FILL_WITH_ZEROES,
--	FSCACHE_DOWNLOAD_FROM_SERVER,
--	FSCACHE_READ_FROM_CACHE,
--	FSCACHE_INVALID_READ,
--} __mode(byte);
--
--typedef void (*fscache_io_terminated_t)(void *priv, ssize_t transferred_or_error,
--				      bool was_async);
--
- /*
-  * Per-inode context.  This wraps the VFS inode.
-  */
-@@ -41,17 +32,6 @@ struct netfs_inode {
- 	loff_t			remote_i_size;	/* Size of the remote file */
- };
- 
--/*
-- * Resources required to do operations on a cache.
-- */
--struct fscache_resources {
--	const struct fscache_ops	*ops;
--	void				*cache_priv;
--	void				*cache_priv2;
--	unsigned int			debug_id;	/* Cookie debug ID */
--	unsigned int			inval_counter;	/* object->inval_counter at begin_op */
--};
--
- /*
-  * Descriptor for a single component subrequest.
-  */
-@@ -128,64 +108,6 @@ struct netfs_request_ops {
- 	void (*done)(struct netfs_io_request *rreq);
- };
- 
--/*
-- * How to handle reading from a hole.
-- */
--enum fscache_read_from_hole {
--	FSCACHE_READ_HOLE_IGNORE,
--	FSCACHE_READ_HOLE_CLEAR,
--	FSCACHE_READ_HOLE_FAIL,
--};
--
--/*
-- * Table of operations for access to a cache.  This is obtained by
-- * rreq->ops->begin_cache_operation().
-- */
--struct fscache_ops {
--	/* End an operation */
--	void (*end_operation)(struct fscache_resources *cres);
--
--	/* Read data from the cache */
--	int (*read)(struct fscache_resources *cres,
--		    loff_t start_pos,
--		    struct iov_iter *iter,
--		    enum fscache_read_from_hole read_hole,
--		    fscache_io_terminated_t term_func,
--		    void *term_func_priv);
--
--	/* Write data to the cache */
--	int (*write)(struct fscache_resources *cres,
--		     loff_t start_pos,
--		     struct iov_iter *iter,
--		     fscache_io_terminated_t term_func,
--		     void *term_func_priv);
--
--	/* Expand readahead request */
--	void (*expand_readahead)(struct fscache_resources *cres,
--				 loff_t *_start, size_t *_len, loff_t i_size);
--
--	/* Prepare a read operation, shortening it to a cached/uncached
--	 * boundary as appropriate.
--	 */
--	enum fscache_io_source (*prepare_read)(struct fscache_resources *cres,
--					     loff_t *_start, size_t *_len,
--					     unsigned long *_flags, loff_t i_size);
--
--	/* Prepare a write operation, working out what part of the write we can
--	 * actually do.
--	 */
--	int (*prepare_write)(struct fscache_resources *cres,
--			     loff_t *_start, size_t *_len, loff_t i_size,
--			     bool no_space_allocated_yet);
--
--	/* Query the occupancy of the cache in a region, returning where the
--	 * next chunk of data starts and how long it is.
--	 */
--	int (*query_occupancy)(struct fscache_resources *cres,
--			       loff_t start, size_t len, size_t granularity,
--			       loff_t *_data_start, size_t *_data_len);
--};
--
- struct readahead_control;
- void netfs_readahead(struct readahead_control *);
- int netfs_read_folio(struct file *, struct folio *);
+ 	task = xchg(&server->tsk, NULL);
+ 	if (task)
 -- 
-2.19.1.6.gb485710b
+2.25.1
 
