@@ -2,78 +2,120 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F86EFA3740
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 13:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0451ECAAA1
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 17:04:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234908AbiJ0NO1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Oct 2022 09:14:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35590 "EHLO
+        id S236925AbiJ0REh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Oct 2022 13:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236175AbiJ0NOE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 09:14:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB4E366A68
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Oct 2022 06:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666876418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dQxbSjhqzSOLM0ahZEXNwS5QfLD56iw/ahD7kkiNphg=;
-        b=DPFh/RMCsU0Mp0HPaSboDCpqKsXY892vRSZnT3OStI/lTZyXKuzAcEyKlxuTItiDZOarU3
-        JTwX9ACmjjSCSfJXsdMete4q3kZNxpTrILY1oKTZ6E0v7m8G4y8Ioo5YyeK0IjKuF5vJr2
-        FOH/g3mdCUgJNJ+OPECDMuc4cET0eqg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-214-IoArZIJpNemIDmIp9PCBzA-1; Thu, 27 Oct 2022 09:13:34 -0400
-X-MC-Unique: IoArZIJpNemIDmIp9PCBzA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3415F3C0ED55;
-        Thu, 27 Oct 2022 13:13:18 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 97E181415117;
-        Thu, 27 Oct 2022 13:13:04 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20221027083547.46933-10-jefflexu@linux.alibaba.com>
-References: <20221027083547.46933-10-jefflexu@linux.alibaba.com> <20221027083547.46933-1-jefflexu@linux.alibaba.com>
-To:     Jingbo Xu <jefflexu@linux.alibaba.com>
-Cc:     dhowells@redhat.com, jlayton@kernel.org, linux-cachefs@redhat.com,
-        linux-erofs@lists.ozlabs.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 9/9] fscache,netfs: move "fscache_" prefixed structures to fscache.h
+        with ESMTP id S236916AbiJ0REf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 13:04:35 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A339EB2;
+        Thu, 27 Oct 2022 10:04:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
+        bh=7b7C/ijuroDIL3g2LJeA1erBrGymNSgI0ci8IdF68Qg=; b=WfryvM1m33ygkKW/yTjZ79jLbI
+        LOxsz57Rpn/jQxWde0O9UrFzTRSojqZN1rDY3Ptaefb0Ncsx7VWcB/587VLefdpRpqRJnln/fGKli
+        TK6lIYLC2iy2F67nT1vAEmAD8x2GoiS2fsPGR1KLflaUEVabqPH7fguSWyzj9Bj6tztfZg9CRxRt0
+        eXz6pngq8nUdxVKQ83rxHIJ6GTu5sZuuWImwWhjU3dnOpoY9bfGbniJNNk1UlMTjoGf5/8ixavmzb
+        MFfbokKNWSpPiVSUcaL0se7/H3UZSNthZWiAiwx/gVyxFs6p1fO/X/uX6GmYjir5VfZR0W9qojx6f
+        rHKnsmaA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oo6Ht-00EI0i-Sg; Thu, 27 Oct 2022 17:03:25 +0000
+Date:   Thu, 27 Oct 2022 10:03:25 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
+        David Howells <dhowells@redhat.com>,
+        Russ Weight <russell.h.weight@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] cred: Do not default to init_cred in
+ prepare_kernel_cred()
+Message-ID: <Y1q53XlLE2n9yGH7@bombadil.infradead.org>
+References: <20221026232943.never.775-kees@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3306695.1666876383.1@warthog.procyon.org.uk>
-Date:   Thu, 27 Oct 2022 14:13:03 +0100
-Message-ID: <3306696.1666876383@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221026232943.never.775-kees@kernel.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Jingbo Xu <jefflexu@linux.alibaba.com> wrote:
+On Wed, Oct 26, 2022 at 04:31:11PM -0700, Kees Cook wrote:
+> A common exploit pattern for ROP attacks is to abuse prepare_kernel_cred()
+> in order to construct escalated privileges[1]. Instead of providing a
+> short-hand argument (NULL) to the "daemon" argument to indicate using
+> init_cred as the base cred, require that "daemon" is always set to
+> an actual task. Replace all existing callers that were passing NULL
+> with &init_task.
+> 
+> Future attacks will need to have sufficiently powerful read/write
+> primitives to have found an appropriately privileged task and written it
+> to the ROP stack as an argument to succeed, which is similarly difficult
+> to the prior effort needed to escalate privileges before struct cred
+> existed: locate the current cred and overwrite the uid member.
+> 
+> This has the added benefit of meaning that prepare_kernel_cred() can no
+> longer exceed the privileges of the init task, which may have changed from
+> the original init_cred (e.g. dropping capabilities from the bounding set).
+> 
+> [1] https://google.com/search?q=commit_creds(prepare_kernel_cred(0))
+> 
+> Cc: "Eric W. Biederman" <ebiederm@xmission.com>
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: Luis Chamberlain <mcgrof@kernel.org>
+> Cc: Russ Weight <russell.h.weight@intel.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> Cc: Steve French <sfrench@samba.org>
+> Cc: Paulo Alcantara <pc@cjr.nz>
+> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+> Cc: Shyam Prasad N <sprasad@microsoft.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+> Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+> Cc: Anna Schumaker <anna@kernel.org>
+> Cc: Chuck Lever <chuck.lever@oracle.com>
+> Cc: Jeff Layton <jlayton@kernel.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: "Michal Koutný" <mkoutny@suse.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Cc: linux-nfs@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-> index 2ad4e1e88106..1977f953633a 100644
-> --- a/include/linux/netfs.h
-> +++ b/include/linux/netfs.h
-> @@ -16,19 +16,10 @@
->  
->  #include <linux/workqueue.h>
->  #include <linux/fs.h>
-> +#include <linux/fscache.h>
+Acked-by: Luis Chamberlain <mcgrof@kernel.org>
 
-Please don't do that.  fscache is based on netfslib, not the other way around.
-
-If anything, I'm tempted to move fscache into netfslib.
-
-David
-
+  Luis
