@@ -2,136 +2,158 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB43DECAAA1
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 12:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1720EECAAA1
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Oct 2022 12:04:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235445AbiJ0MCK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Oct 2022 08:02:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46554 "EHLO
+        id S235535AbiJ0MEv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Oct 2022 08:04:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235271AbiJ0MCJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 08:02:09 -0400
+        with ESMTP id S235551AbiJ0MEs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 08:04:48 -0400
 Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FBC079684;
-        Thu, 27 Oct 2022 05:02:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD3D93FD5D;
+        Thu, 27 Oct 2022 05:04:46 -0700 (PDT)
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id AB86B7FC01;
-        Thu, 27 Oct 2022 12:02:03 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id BF77180789;
+        Thu, 27 Oct 2022 12:04:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1666872124;
+        t=1666872284;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MtpMGCF+iBRpVLWgZ5Ofi84bzkswm5lge9Z3x2eJ++g=;
-        b=cGaSQswDbxqhSBVj5pDq2GqhsfWTvLHXYYkMfnzUtzDu9qQoJIAheeOJh6kvSpEf5GvfRG
-        yRGEyPPCKVdpWf1B+kLxd0W9HSAJYK3NXUHVB/UXVrRGK19eRMFPdAp2TDyRAJrxZA4/mG
-        PbyYULxDaGdOHhPFJ1IGHC4xcjeMA0QplsS66eLO39jSdLEjsA2Zfgar8lFMkwj6RRssS7
-        WLUOcZngyyy5D2hJe4t1LhQrRm+4Ofop0TJ6lZWko/2wplsv9yIzIFYLYBhtes4EMzg4nM
-        CFzFh2tBjwghTEY1OzCuUpw850fnEkoZ26nkvczAP3RB+X5CfnZRv2jHEMHE/g==
+        bh=BJb1Kk7GF9cOzQWU+/M02gbNTsVeaeweLROo/X/n1M4=;
+        b=Yz46Hnt6E5EU6iZqONWTfxHOqzhnh+dZNZ+JIcNtcUgjTkq2JxRQ6OtVUBMrHLUog6YPf6
+        r+0CUhcvCehlQNIKqcWEAVgXbeQ993wUxpclGWbun4sZ3Yyzl03pMr7Q5W2bmA+3d3AUm9
+        oSxYmfx3ht8d37r5G12bq8Y80Fh83EoF8tEiPMoPGhxuTDqzdhkZSTT/6U/3L1ySqcp3B4
+        75UBjGnYbMYw9w/tsMIn0NJkoo4fobpgMmp2KUwCulPTl01XLt7AK61kVnQ0nUWkQVFe/T
+        Sk2Pcgyi0JS5T4mL+3j9ygflekLEoijFGmp3gcAW93oQezPSJtgLywUvaz1rqg==
 From:   Paulo Alcantara <pc@cjr.nz>
-To:     Kees Cook <keescook@chromium.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        David Howells <dhowells@redhat.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Russ Weight <russell.h.weight@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] cred: Do not default to init_cred in prepare_kernel_cred()
-In-Reply-To: <20221026232943.never.775-kees@kernel.org>
-References: <20221026232943.never.775-kees@kernel.org>
-Date:   Thu, 27 Oct 2022 09:03:08 -0300
-Message-ID: <87bkpxh3sz.fsf@cjr.nz>
+To:     Zeng Heng <zengheng4@huawei.com>, sfrench@samba.org,
+        tom@talpey.com, sprasad@microsoft.com, lsahlber@redhat.com
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, liwei391@huawei.com
+Subject: Re: [PATCH v3] cifs: fix use-after-free caused by invalid pointer
+ `hostname`
+In-Reply-To: <20221027112127.2433605-1-zengheng4@huawei.com>
+References: <20221027112127.2433605-1-zengheng4@huawei.com>
+Date:   Thu, 27 Oct 2022 09:05:50 -0300
+Message-ID: <878rl1h3oh.fsf@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Kees Cook <keescook@chromium.org> writes:
+Zeng Heng <zengheng4@huawei.com> writes:
 
-> A common exploit pattern for ROP attacks is to abuse prepare_kernel_cred()
-> in order to construct escalated privileges[1]. Instead of providing a
-> short-hand argument (NULL) to the "daemon" argument to indicate using
-> init_cred as the base cred, require that "daemon" is always set to
-> an actual task. Replace all existing callers that were passing NULL
-> with &init_task.
+> `hostname` needs to be set as null-pointer after free in
+> `cifs_put_tcp_session` function, or when `cifsd` thread attempts
+> to resolve hostname and reconnect the host, the thread would deref
+> the invalid pointer.
 >
-> Future attacks will need to have sufficiently powerful read/write
-> primitives to have found an appropriately privileged task and written it
-> to the ROP stack as an argument to succeed, which is similarly difficult
-> to the prior effort needed to escalate privileges before struct cred
-> existed: locate the current cred and overwrite the uid member.
+> Here is one of practical backtrace examples as reference:
 >
-> This has the added benefit of meaning that prepare_kernel_cred() can no
-> longer exceed the privileges of the init task, which may have changed from
-> the original init_cred (e.g. dropping capabilities from the bounding set).
+> Task 477
+> ---------------------------
+>  do_mount
+>   path_mount
+>    do_new_mount
+>     vfs_get_tree
+>      smb3_get_tree
+>       smb3_get_tree_common
+>        cifs_smb3_do_mount
+>         cifs_mount
+>          mount_put_conns
+>           cifs_put_tcp_session
+>           --> kfree(server->hostname)
 >
-> [1] https://google.com/search?q=3Dcommit_creds(prepare_kernel_cred(0))
+> cifsd
+> ---------------------------
+>  kthread
+>   cifs_demultiplex_thread
+>    cifs_reconnect
+>     reconn_set_ipaddr_from_hostname
+>     --> if (!server->hostname)
+>     --> if (server->hostname[0] == '\0')  // !! UAF fault here
 >
-> Cc: "Eric W. Biederman" <ebiederm@xmission.com>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: Russ Weight <russell.h.weight@intel.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-> Cc: Steve French <sfrench@samba.org>
-> Cc: Paulo Alcantara <pc@cjr.nz>
-> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
-> Cc: Shyam Prasad N <sprasad@microsoft.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-> Cc: Anna Schumaker <anna@kernel.org>
-> Cc: Chuck Lever <chuck.lever@oracle.com>
-> Cc: Jeff Layton <jlayton@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: "Michal Koutn=C3=BD" <mkoutny@suse.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Cc: linux-nfs@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> CIFS: VFS: cifs_mount failed w/return code = -112
+> mount error(112): Host is down
+> BUG: KASAN: use-after-free in reconn_set_ipaddr_from_hostname+0x2ba/0x310
+> Read of size 1 at addr ffff888108f35380 by task cifsd/480
+> CPU: 2 PID: 480 Comm: cifsd Not tainted 6.1.0-rc2-00106-gf705792f89dd-dirty #25
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x68/0x85
+>  print_report+0x16c/0x4a3
+>  kasan_report+0x95/0x190
+>  reconn_set_ipaddr_from_hostname+0x2ba/0x310
+>  __cifs_reconnect.part.0+0x241/0x800
+>  cifs_reconnect+0x65f/0xb60
+>  cifs_demultiplex_thread+0x1570/0x2570
+>  kthread+0x2c5/0x380
+>  ret_from_fork+0x22/0x30
+>  </TASK>
+> Allocated by task 477:
+>  kasan_save_stack+0x1e/0x40
+>  kasan_set_track+0x21/0x30
+>  __kasan_kmalloc+0x7e/0x90
+>  __kmalloc_node_track_caller+0x52/0x1b0
+>  kstrdup+0x3b/0x70
+>  cifs_get_tcp_session+0xbc/0x19b0
+>  mount_get_conns+0xa9/0x10c0
+>  cifs_mount+0xdf/0x1970
+>  cifs_smb3_do_mount+0x295/0x1660
+>  smb3_get_tree+0x352/0x5e0
+>  vfs_get_tree+0x8e/0x2e0
+>  path_mount+0xf8c/0x1990
+>  do_mount+0xee/0x110
+>  __x64_sys_mount+0x14b/0x1f0
+>  do_syscall_64+0x3b/0x90
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> Freed by task 477:
+>  kasan_save_stack+0x1e/0x40
+>  kasan_set_track+0x21/0x30
+>  kasan_save_free_info+0x2a/0x50
+>  __kasan_slab_free+0x10a/0x190
+>  __kmem_cache_free+0xca/0x3f0
+>  cifs_put_tcp_session+0x30c/0x450
+>  cifs_mount+0xf95/0x1970
+>  cifs_smb3_do_mount+0x295/0x1660
+>  smb3_get_tree+0x352/0x5e0
+>  vfs_get_tree+0x8e/0x2e0
+>  path_mount+0xf8c/0x1990
+>  do_mount+0xee/0x110
+>  __x64_sys_mount+0x14b/0x1f0
+>  do_syscall_64+0x3b/0x90
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> The buggy address belongs to the object at ffff888108f35380
+>  which belongs to the cache kmalloc-16 of size 16
+> The buggy address is located 0 bytes inside of
+>  16-byte region [ffff888108f35380, ffff888108f35390)
+> The buggy address belongs to the physical page:
+> page:00000000333f8e58 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888108f350e0 pfn:0x108f35
+> flags: 0x200000000000200(slab|node=0|zone=2)
+> raw: 0200000000000200 0000000000000000 dead000000000122 ffff8881000423c0
+> raw: ffff888108f350e0 000000008080007a 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+> Memory state around the buggy address:
+>  ffff888108f35280: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+>  ffff888108f35300: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+>>ffff888108f35380: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+>                    ^
+>  ffff888108f35400: fa fb fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>  ffff888108f35480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>
+> Fixes: 28eb24ff75c5 ("cifs: Always resolve hostname before reconnecting")
+> Signed-off-by: Zeng Heng <zengheng4@huawei.com>
 > ---
->  drivers/base/firmware_loader/main.c    |  2 +-
->  fs/cifs/cifs_spnego.c                  |  2 +-
->  fs/cifs/cifsacl.c                      |  2 +-
->  fs/ksmbd/smb_common.c                  |  2 +-
->  fs/nfs/flexfilelayout/flexfilelayout.c |  4 ++--
->  fs/nfs/nfs4idmap.c                     |  2 +-
->  fs/nfsd/nfs4callback.c                 |  2 +-
->  kernel/cred.c                          | 15 +++++++--------
->  net/dns_resolver/dns_key.c             |  2 +-
->  9 files changed, 16 insertions(+), 17 deletions(-)
+>  fs/cifs/connect.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-Acked-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
