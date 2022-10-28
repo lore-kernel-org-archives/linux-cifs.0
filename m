@@ -2,34 +2,67 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E132ECAAA1
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 19:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C639ECAAA1
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 20:34:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229528AbiJ1TbJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Oct 2022 15:31:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41554 "EHLO
+        id S229789AbiJ1UeZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Oct 2022 16:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbiJ1TbI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 15:31:08 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2669E229E44;
-        Fri, 28 Oct 2022 12:31:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=rXRqCxzSwwJwUn6NUaDL+hX0MQGv2CPlx00T8de0cos=; b=k+le+6ssU0pzX5iaW/kTWOgm4b
-        nhkSL3zT5nVqJVhVuRJK4TvRwmnHDnLaqUuWa+33dQ66uqwPEKjR4j4j9L4t1RboUwOc1Nk8nOWmt
-        mz/UZSzC7pCS3TcjH1bbsoa537jLJ9WDiRH/HpVfMZj9CdcugRvy1mxB6bk4TGkhcCT5Ttoj96BuL
-        bCfc5MewRDixyOuq+62XGtHBEts3nkQVf6Ij0WOUTS4g69Xtow1xtw/IxlhClbHYkhOkLGi5S4NAc
-        2Sd8qZ5nSnH+oEKtDPOYRfzj09tLz4dzrw4xJctoRVfgt6ij1Sy7ZerlgDLXj0BG/z3WRgj8TfwLG
-        AThxBdyQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1ooV4A-00F1pm-0v;
-        Fri, 28 Oct 2022 19:30:54 +0000
-Date:   Fri, 28 Oct 2022 20:30:54 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+        with ESMTP id S229536AbiJ1UeY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 16:34:24 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D5C22C443
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 13:34:23 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id 8so4231366qka.1
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 13:34:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5JcJ09bBdlBVf21xZKuOSzNCt5BJDxCAWw6Qi6m3gKQ=;
+        b=hU743kZXYxAVHQ1EsSBvl3ayRYEjnGCLfaHZ8Jv5OOMADfUvRRqwIase4PKYUcaJ3E
+         INbfDZi9n0Q5pnuXHtRhyGvyX40BjYI+eGMAw+5rMraVeCJayNAIOiRRhBR82dlGAo05
+         /mVa5vBjROjk9lw+ojylUbMmMrQmNGOeXMwBU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5JcJ09bBdlBVf21xZKuOSzNCt5BJDxCAWw6Qi6m3gKQ=;
+        b=DMoTElii7JUSXtX8k3bSYm5m3oCdBNHPDtnc7gxzMU1Gj4KIH46zfhZj92kuCbIKhz
+         AVTkUWlLUEgrIRBWTjW0BiqIQ+hBgNx33gv/ah12qUuG7Fh4K3pKtjvUU3IjPG+nWhFB
+         xHs7UwqTMHUZmTzACVGFAQhED5LA9BAUSrkeytbMvLudMDx1JZurDmbFW9a+UYWs+V7B
+         luCBJKZXBqzWdXkvVHHrJU38OVH2xU8oFKto6YMNASKLf8BGquq+uxAVYCCTijV20BG8
+         VonK56AksE3kX8ATI392VyAOPD0DtzRzbINWm+XoXH4PWXhfOULHRtsV+4FUh5bo6iev
+         WS0g==
+X-Gm-Message-State: ACrzQf0K3kPhlUNFqzZmna5S0QTCQwPivikd1DDvMhapuBcbQby8cCft
+        OBOKuXBZ9CG5huHYER/12hpg6ld5AEi26Q==
+X-Google-Smtp-Source: AMsMyM5XhHUOm8MLCo41cVe6SYdd0Lz3+uub6R3q7nXrRmzEkX9y/7AeaKtuXXbV8oLBoEc3DN4qoQ==
+X-Received: by 2002:a37:a48:0:b0:6fa:46e:d075 with SMTP id 69-20020a370a48000000b006fa046ed075mr877207qkk.45.1666989262665;
+        Fri, 28 Oct 2022 13:34:22 -0700 (PDT)
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com. [209.85.219.170])
+        by smtp.gmail.com with ESMTPSA id bb11-20020a05622a1b0b00b0035d08c1da35sm2863472qtb.45.2022.10.28.13.34.21
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Oct 2022 13:34:21 -0700 (PDT)
+Received: by mail-yb1-f170.google.com with SMTP id f205so7436307yba.2
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 13:34:21 -0700 (PDT)
+X-Received: by 2002:a5b:984:0:b0:6ca:9345:b2ee with SMTP id
+ c4-20020a5b0984000000b006ca9345b2eemr931629ybq.362.1666989261347; Fri, 28 Oct
+ 2022 13:34:21 -0700 (PDT)
+MIME-Version: 1.0
+References: <Y1btOP0tyPtcYajo@ZenIV> <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
+ <20221028023352.3532080-12-viro@zeniv.linux.org.uk> <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
+ <Y1wOR7YmqK8iBYa8@ZenIV> <CAHk-=wi_iDAugqFZxTiscsRCNbtARMFiugWtBKO=NqgM-vCVAQ@mail.gmail.com>
+ <Y1wt7uzL7vkBQ6Vm@ZenIV>
+In-Reply-To: <Y1wt7uzL7vkBQ6Vm@ZenIV>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 28 Oct 2022 13:34:05 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wj4ndvhOFFsnNXRmwetwL9ZxE2QzcrLFTeJ7Yfh+pJ7Mw@mail.gmail.com>
+Message-ID: <CAHk-=wj4ndvhOFFsnNXRmwetwL9ZxE2QzcrLFTeJ7Yfh+pJ7Mw@mail.gmail.com>
+Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction initializers
+To:     Al Viro <viro@zeniv.linux.org.uk>
 Cc:     Christoph Hellwig <hch@infradead.org>,
         David Howells <dhowells@redhat.com>, willy@infradead.org,
         dchinner@redhat.com, Steve French <smfrench@gmail.com>,
@@ -38,53 +71,34 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         Jeff Layton <jlayton@kernel.org>,
         Ira Weiny <ira.weiny@intel.com>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction
- initializers
-Message-ID: <Y1wt7uzL7vkBQ6Vm@ZenIV>
-References: <Y1btOP0tyPtcYajo@ZenIV>
- <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
- <20221028023352.3532080-12-viro@zeniv.linux.org.uk>
- <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
- <Y1wOR7YmqK8iBYa8@ZenIV>
- <CAHk-=wi_iDAugqFZxTiscsRCNbtARMFiugWtBKO=NqgM-vCVAQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wi_iDAugqFZxTiscsRCNbtARMFiugWtBKO=NqgM-vCVAQ@mail.gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 11:35:06AM -0700, Linus Torvalds wrote:
+On Fri, Oct 28, 2022 at 12:30 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+>
+> Went through the callers, replaced each with the right ITER_... (there's
+> not that many of them and they are fairly easy to review), then went
+> through mismatches and split their fixups into the beginning of the
+> series (READ -> ITER_SOURCE becoming READ -> WRITE -> ITER_SOURCE, that
+> is).
 
-> > Umm...  How are you going to e.g. copy from ITER_DISCARD?  I've no problem
-> > with WARN_ON_ONCE(), but when the operation really can't be done, what
-> > can we do except returning an error?
-> 
-> Fair enough. But it's the "people got the direction wrong, but the
-> code worked" case that I would want tyo make sure still works - just
-> with a warning.
-> 
-> Clearly the ITER_DISCARD didn't work before either, but all the cases
-> in patches 1-10 were things that _worked_, just with entirely the
-> wrong ->data_source (aka iov_iter_rw()) value.
-> 
-> So things like copy_to_iter() should warn if it's not a READ (or
-> ITER_DEST), but it should still copy into the destination described by
-> the iter, in order to keep broken code working.
-> 
-> That's simply because I worry that your patches 1-10 didn't actually
-> catch every single case. I'm not actually sure how you found them all
-> - did you have some automation, or was it with "boot and find warnings
-> from the first version of patch 11/12"?
+Oh, ok. So if you've actually reviewed each and every one of them,
+then I'm ok with the "abort".
 
-Went through the callers, replaced each with the right ITER_... (there's
-not that many of them and they are fairly easy to review), then went
-through mismatches and split their fixups into the beginning of the
-series (READ -> ITER_SOURCE becoming READ -> WRITE -> ITER_SOURCE, that
-is).
+I still want it to be a WARN_ON_ONCE(), because of any future addition
+that gets things wrong.
 
-FWIW, there used to be one case where we really tried to copy the wrong
-way - fixed a couple of cycles ago (f615625a44c4 "9p: handling Rerror
-without copy_from_iter_full()").  No such catches this time...
+Rationale: either the WARN_ON() can happen, or it cannot. If it
+cannot, it shouldn't exist in the first place. If it can, warning
+multiple times will just make things harder to read and possibly cause
+endless streams of scrolling errors.
+
+So either the WARN_ON() shouldn't exist, or it should be a WARN_ON_ONCE().
+
+Generally the only valid use of WARN_ON() (and BUG_ON()) is for things
+like errors in the boot/setup code, where the operation basically is
+only done once anyway.
+
+                 Linus
