@@ -2,31 +2,31 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 772C2FA373D
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 02:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 909DCFA3741
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 02:34:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236316AbiJ1CeW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Oct 2022 22:34:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46430 "EHLO
+        id S236327AbiJ1CeX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Oct 2022 22:34:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236198AbiJ1CeP (ORCPT
+        with ESMTP id S236213AbiJ1CeP (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 22:34:15 -0400
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5687BE2F5;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5349BD67D;
         Thu, 27 Oct 2022 19:34:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=fVteMAVIVg+91bTuLaocFDEKI259Dr9+CPyGCGwShcc=; b=ijcu/m4XkLYK3DKlJDahWgJHiW
-        mu7ewOaipKjhqe8VSwqNcZrMyfILUJsa2yaMpnmbZVxHA5i3JWu6p/V0JfsAfj48zCsFoHd3YLmOt
-        W01JhZsZst4iSFEpppNf0MEqyWOTaXTYlGSc3NLkewsdvMRN00foyNDwR016b8PpHvZo/LKktG6ty
-        MXuZ13R+s+K9VtWA2tvb7xaYR/SlUqxnGEQKVOT6YaVhxbYNRWPcd1wpEdp+lzWrFjBgwtVu+3LUS
-        fP6w3UjjniYWMPy29/vK7NAp1gDNZyW3VKJITWWsNvR+1mP8W70AvsKCFX+mWhOMS3BghRETljTH7
-        Dq1sletg==;
+        bh=qufNA/5kQeMMQSclQfaUC/Q9jzBAxgNcm9w2RfpdC1I=; b=guEjN2ncL7ybD6mN2yx+05P8sw
+        XwP2uFN1PVlpY4ZzDcfii84vlnSN1VSAo/tpAQJoF2GuJKshqphLeM2R/nM3vG5+AtaN85pL9Dbi9
+        /RPox8fe5y3FrfZYK3uSKQa958CWZusW11/VVwuUoU4arCks/52vWugnPgi+QzjJa5DYotpvFjMQr
+        RDzpQzxR2gGQBITEXWoLQ/gPvDGPrZUQsgzQQhKIqa52CLvkoi6P0/e2ZTO3wbISFfUliClgtW1K0
+        mJ9vrkQDxsJ3QvwGykpn4y7WjFVBdMltqn/h/CVTLJmatfGdy0Eav8p6fUXwTNg+CAvu0gZjnTrC6
+        QCg24Fpw==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1ooFBw-00Eor9-0O;
-        Fri, 28 Oct 2022 02:33:52 +0000
+        id 1ooFBx-00EorR-2n;
+        Fri, 28 Oct 2022 02:33:53 +0000
 From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     David Howells <dhowells@redhat.com>, willy@infradead.org,
@@ -37,12 +37,13 @@ Cc:     David Howells <dhowells@redhat.com>, willy@infradead.org,
         Ira Weiny <ira.weiny@intel.com>, torvalds@linux-foundation.org,
         linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 01/12] get rid of unlikely() on page_copy_sane() calls
-Date:   Fri, 28 Oct 2022 03:33:41 +0100
-Message-Id: <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
+Subject: [PATCH v2 10/12] [xen] fix "direction" argument of iov_iter_kvec()
+Date:   Fri, 28 Oct 2022 03:33:50 +0100
+Message-Id: <20221028023352.3532080-10-viro@zeniv.linux.org.uk>
 X-Mailer: git-send-email 2.37.3
-In-Reply-To: <Y1btOP0tyPtcYajo@ZenIV>
+In-Reply-To: <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
 References: <Y1btOP0tyPtcYajo@ZenIV>
+ <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Al Viro <viro@ftp.linux.org.uk>
@@ -52,44 +53,45 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- lib/iov_iter.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ drivers/xen/pvcalls-back.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index c3ca28ca68a6..e9a8fc9ee8ee 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -703,17 +703,16 @@ static inline bool page_copy_sane(struct page *page, size_t offset, size_t n)
- 	head = compound_head(page);
- 	v += (page - head) << PAGE_SHIFT;
- 
--	if (likely(n <= v && v <= (page_size(head))))
--		return true;
--	WARN_ON(1);
--	return false;
-+	if (WARN_ON(n > v || v > page_size(head)))
-+		return false;
-+	return true;
- }
- 
- size_t copy_page_to_iter(struct page *page, size_t offset, size_t bytes,
- 			 struct iov_iter *i)
- {
- 	size_t res = 0;
--	if (unlikely(!page_copy_sane(page, offset, bytes)))
-+	if (!page_copy_sane(page, offset, bytes))
- 		return 0;
- 	if (unlikely(iov_iter_is_pipe(i)))
- 		return copy_page_to_iter_pipe(page, offset, bytes, i);
-@@ -808,7 +807,7 @@ size_t copy_page_from_iter_atomic(struct page *page, unsigned offset, size_t byt
- 				  struct iov_iter *i)
- {
- 	char *kaddr = kmap_atomic(page), *p = kaddr + offset;
--	if (unlikely(!page_copy_sane(page, offset, bytes))) {
-+	if (!page_copy_sane(page, offset, bytes)) {
- 		kunmap_atomic(kaddr);
- 		return 0;
+diff --git a/drivers/xen/pvcalls-back.c b/drivers/xen/pvcalls-back.c
+index d6f945fd4147..21b9c850a382 100644
+--- a/drivers/xen/pvcalls-back.c
++++ b/drivers/xen/pvcalls-back.c
+@@ -129,13 +129,13 @@ static bool pvcalls_conn_back_read(void *opaque)
+ 	if (masked_prod < masked_cons) {
+ 		vec[0].iov_base = data->in + masked_prod;
+ 		vec[0].iov_len = wanted;
+-		iov_iter_kvec(&msg.msg_iter, WRITE, vec, 1, wanted);
++		iov_iter_kvec(&msg.msg_iter, READ, vec, 1, wanted);
+ 	} else {
+ 		vec[0].iov_base = data->in + masked_prod;
+ 		vec[0].iov_len = array_size - masked_prod;
+ 		vec[1].iov_base = data->in;
+ 		vec[1].iov_len = wanted - vec[0].iov_len;
+-		iov_iter_kvec(&msg.msg_iter, WRITE, vec, 2, wanted);
++		iov_iter_kvec(&msg.msg_iter, READ, vec, 2, wanted);
  	}
+ 
+ 	atomic_set(&map->read, 0);
+@@ -188,13 +188,13 @@ static bool pvcalls_conn_back_write(struct sock_mapping *map)
+ 	if (pvcalls_mask(prod, array_size) > pvcalls_mask(cons, array_size)) {
+ 		vec[0].iov_base = data->out + pvcalls_mask(cons, array_size);
+ 		vec[0].iov_len = size;
+-		iov_iter_kvec(&msg.msg_iter, READ, vec, 1, size);
++		iov_iter_kvec(&msg.msg_iter, WRITE, vec, 1, size);
+ 	} else {
+ 		vec[0].iov_base = data->out + pvcalls_mask(cons, array_size);
+ 		vec[0].iov_len = array_size - pvcalls_mask(cons, array_size);
+ 		vec[1].iov_base = data->out;
+ 		vec[1].iov_len = size - vec[0].iov_len;
+-		iov_iter_kvec(&msg.msg_iter, READ, vec, 2, size);
++		iov_iter_kvec(&msg.msg_iter, WRITE, vec, 2, size);
+ 	}
+ 
+ 	atomic_set(&map->write, 0);
 -- 
 2.30.2
 
