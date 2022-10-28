@@ -2,49 +2,67 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E24ECAAA1
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 17:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDECC38A02
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 17:12:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbiJ1RGQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Oct 2022 13:06:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43570 "EHLO
+        id S231394AbiJ1RMF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Oct 2022 13:12:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231236AbiJ1REp (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 13:04:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B26A07654B
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 10:02:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666976529;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/IYuohmEO1F/L2EkVBn4KSHqgkaps/PV3lH1XEHBh2w=;
-        b=NPotqG0ztOhlLyXcsWlf3vndeeFUiNzKfZ+PUbZvsKwICDUZeQUvTvZFwC7WgKF2am9B0R
-        uS+zl1zZ5D64iOcsmtnAvrZMif8CH5pM5U0skqoHb48o1sbKOir652xVTiR+HlgKUnjNEh
-        rcZ8HFcf697c5SEVQcjjl4o/BbAcymg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-319-cCmbhtwaMMW9r-ymwGBz8Q-1; Fri, 28 Oct 2022 13:02:06 -0400
-X-MC-Unique: cCmbhtwaMMW9r-ymwGBz8Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B5E602A5957D;
-        Fri, 28 Oct 2022 17:02:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3777640C6EC3;
-        Fri, 28 Oct 2022 17:02:03 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
-References: <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com> <Y1btOP0tyPtcYajo@ZenIV> <20221028023352.3532080-1-viro@zeniv.linux.org.uk> <20221028023352.3532080-12-viro@zeniv.linux.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        with ESMTP id S231314AbiJ1RLo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 13:11:44 -0400
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF9468CF8
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 10:10:11 -0700 (PDT)
+Received: by mail-qv1-xf2c.google.com with SMTP id n18so4460196qvt.11
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 10:10:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SGoG4+kkpjFKIiC1aB206pNaNNu8WHtjUzbD9QY9Ydk=;
+        b=AHLpWHbvaJj6iAHcMzE5M/XFIEJbvJiM188nPc4sZcuDlddbnWJj2scjftscU4cF4x
+         7ek2zIay9rBYB96uXxrfVQTv5OfVuThw3qxUxjLeEdzSlmmCOyQ3PY8Gh2POJX82KNSM
+         0yIW2D4UUkVkaewo1+mavlSqKbWHmteTLXE9Y=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SGoG4+kkpjFKIiC1aB206pNaNNu8WHtjUzbD9QY9Ydk=;
+        b=IeXeuVXM0x7fIzDizKFHy6WhdgsuFDmSuReIgyKyjm+w0U0jr9XczDSdnfHW1t1CAa
+         brJ97rbUrkNgFnNzNRuLspSM01L3Ndh4tLbwK7MPdc3K3IoPYwU7NnRsHcw57LaZwBpM
+         NxqWP2T/YrCrvO2hQQRhfonJvjab5Y5Wo/LeGQ8gxW/AFZMPb35retQ5f9GxbsgE05yb
+         wQ4ez5zBhko8L7C1rWpcKMOZdoQlZFYhknLWnrjNFvvfzXSndeM1z7LJMiG2Ib7RoVKS
+         7jevFuHsGBKIGzKxMcqOuVx5czZtpa4UsLpFATNXT4HWkxzWBS3/vCRVQmozHNzB53Fb
+         2vyQ==
+X-Gm-Message-State: ACrzQf3EvR6VGUyCPo1lWIneLJf9JFsdKc4LkVg1WkyDLrrKU3s+2Ijv
+        4nBaUcNpMRFs1CZHwjA9Qw385PSc2N1ppg==
+X-Google-Smtp-Source: AMsMyM5xFvZk2Sghl24aHklqZ8W2BlTLoplPeCi8kpVG5yPaKsOmreXhKry2mcIBfAltgSYpQa53kQ==
+X-Received: by 2002:ad4:5968:0:b0:4b4:7d98:7ede with SMTP id eq8-20020ad45968000000b004b47d987edemr432292qvb.130.1666977010517;
+        Fri, 28 Oct 2022 10:10:10 -0700 (PDT)
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com. [209.85.219.182])
+        by smtp.gmail.com with ESMTPSA id cm11-20020a05622a250b00b003a4f6a566e9sm938653qtb.83.2022.10.28.10.10.08
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Oct 2022 10:10:08 -0700 (PDT)
+Received: by mail-yb1-f182.google.com with SMTP id m125so6817574ybb.6
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 10:10:08 -0700 (PDT)
+X-Received: by 2002:a25:bb44:0:b0:6bb:a336:7762 with SMTP id
+ b4-20020a25bb44000000b006bba3367762mr192268ybk.501.1666977007965; Fri, 28 Oct
+ 2022 10:10:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <Y1btOP0tyPtcYajo@ZenIV> <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
+ <20221028023352.3532080-12-viro@zeniv.linux.org.uk> <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
+ <65441.1666976522@warthog.procyon.org.uk>
+In-Reply-To: <65441.1666976522@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 28 Oct 2022 10:09:51 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgMAxxw3n5gvURUV68zHr6vXbcvhXSzXdi2obKo2bK=Dw@mail.gmail.com>
+Message-ID: <CAHk-=wgMAxxw3n5gvURUV68zHr6vXbcvhXSzXdi2obKo2bK=Dw@mail.gmail.com>
+Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction initializers
+To:     David Howells <dhowells@redhat.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
         dchinner@redhat.com, Steve French <smfrench@gmail.com>,
         Shyam Prasad N <nspmangalore@gmail.com>,
@@ -52,33 +70,42 @@ Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
         Jeff Layton <jlayton@kernel.org>,
         Ira Weiny <ira.weiny@intel.com>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction initializers
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <65440.1666976522.1@warthog.procyon.org.uk>
-Date:   Fri, 28 Oct 2022 18:02:02 +0100
-Message-ID: <65441.1666976522@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On Fri, Oct 28, 2022 at 10:02 AM David Howells <dhowells@redhat.com> wrote:
+>
+> Linus Torvalds <torvalds@linux-foundation.org> wrote:
+>
+> > Honestly, I think the *real* fix would be a type-based one. Don't do
+> >
+> >         iov_iter_kvec(&iter, ITER_DEST, ...
+> >
+> > at all, but instead have two different kinds of 'struct iov_iter': one
+> > as a destination (iov_iter_dst), and one as a source (iov_iter_src),
+>
+> Or maybe something along the lines of iov_iter_into_kvec() and
+> iov_iter_from_kvec()?
 
-> Honestly, I think the *real* fix would be a type-based one. Don't do
-> 
->         iov_iter_kvec(&iter, ITER_DEST, ...
-> 
-> at all, but instead have two different kinds of 'struct iov_iter': one
-> as a destination (iov_iter_dst), and one as a source (iov_iter_src),
+For the type-based ones, you would need that to initialize the two cases.
 
-Or maybe something along the lines of iov_iter_into_kvec() and
-iov_iter_from_kvec()?
+But without the type-based approach, it ends up being yet another case
+of "you just have to use the right name, and if you don't, you won't
+know until the dynamic WARN_ON() tells you".
 
-Also, would it make sense to disallow asking the iterator for its direction
-entirely and only use it for internal sanity checking?  In many of the places
-it is looked at, the information is also available in another form (the
-IOCB_WRITE flag, for example).
+And the dynamic WARN_ON() (or, WARN_ON_ONCE(), as it should be) is
+great, but only for the drivers that get active testing by developers
+and robots.
 
-David
+Which leaves potentially a _lot_ of random code that ends up being
+wrong for years.
 
+I really like static checking that actually gets noticed by the
+compiler when you get it wrong.
+
+It may not be entirely realistic in this situation, but it would be
+really nice to try...
+
+                  Linus
