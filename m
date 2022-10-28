@@ -2,143 +2,153 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36254C38A02
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 15:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E650BC38A02
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 15:57:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230337AbiJ1PBz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Oct 2022 11:01:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43308 "EHLO
+        id S229966AbiJ1P5C (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Oct 2022 11:57:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231189AbiJ1PBs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 11:01:48 -0400
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B75E91DEC3D
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 08:01:46 -0700 (PDT)
-Received: by mail-pf1-f181.google.com with SMTP id i3so4972162pfc.11
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 08:01:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D1DCMlOA6r1LMZNncoBDDkFl+mO/8Ib8OKTb7I2A1Rk=;
-        b=zkS9xUS7+oh7hb51KaRwvAyRmDYG/7OV9302EAufcSByGLVxDiuu8a/t2jrE4pvUKR
-         sIMXC1vbT09n0oTev9EEVvUbks8fikBhUedyWNpYcJsVs1PYXuL5paOQpsui65SKMEA1
-         sISOGfTfbpPKtAvXeozEEmAHwt/4Ds+DOpAWA4JWQNEYQv8eelMmY0dRnEVh+FUPuLTk
-         fNGfS0BxIT4lLhNLLiL6/n+uY1sBs5KuUQFTyZ0gi5PqqJxEe8AWaLhWF7Xt/DCQ4qEW
-         WktTR/KNNM0tnl3UtyXIqvmYlI62ijkhraVOnNDPsqlfWw4uKsU2d11uJ0qp38MipXj0
-         NXQg==
-X-Gm-Message-State: ACrzQf38jd8S8jahy7b2rl034fL1snYzF7nsnaa/GTyZWMrAr1HTBnzv
-        M8i8y4R1jtayU9MO1/z/cqxlCPLbheU=
-X-Google-Smtp-Source: AMsMyM6Z7Ju6cEtKZJTs9AhifDMFpoOdNCEMyretoSjaoI3KSDRfaToA04roytPn/ALL45H2RheJIw==
-X-Received: by 2002:a62:584:0:b0:55a:a7a5:b597 with SMTP id 126-20020a620584000000b0055aa7a5b597mr55383413pff.71.1666969305962;
-        Fri, 28 Oct 2022 08:01:45 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id t27-20020a63225b000000b00464858cf6b0sm2820051pgm.54.2022.10.28.08.01.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Oct 2022 08:01:45 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: set SMB2_SESSION_FLAG_ENCRYPT_DATA when enforcing data encryption for this share
-Date:   Sat, 29 Oct 2022 00:01:38 +0900
-Message-Id: <20221028150138.17155-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S229941AbiJ1P4z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 11:56:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93525127BE0
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 08:55:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666972551;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=hQM2P8ykq/hiieMREgaD1+G+mSyHhsgs0GYOAB71Ku0=;
+        b=LXz70FliLnZ3l6FBrnq9aMnj1tcSrSE1p+xlfIhYEz7xEDfPGfN0eJogchsDs+RFhI4OFN
+        X80m3KGKgsPkz2uWjfNLxRv5Qed39CI6jIHrU5xSlGVdwFkrkNNiaxWegq0aGETGa6A54l
+        Wgj/lr7/3m5lAKCNHcPfhPuKu6bKsFc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-250-krPUD6jBPLSCY8bxTUkkhg-1; Fri, 28 Oct 2022 11:55:48 -0400
+X-MC-Unique: krPUD6jBPLSCY8bxTUkkhg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 79074185A794;
+        Fri, 28 Oct 2022 15:55:47 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C7F9A1415102;
+        Fri, 28 Oct 2022 15:55:45 +0000 (UTC)
+Subject: [RFC PATCH 0/9] smb3: Add iter helpers and use iov_iters down to the
+ network transport
+From:   David Howells <dhowells@redhat.com>
+To:     Steve French <smfrench@gmail.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Rohith Surabattula <rohiths.msft@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-cifs@vger.kernel.org, dhowells@redhat.com,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Fri, 28 Oct 2022 16:55:44 +0100
+Message-ID: <166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.5
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Currently, SMB2_SESSION_FLAG_ENCRYPT_DATA is always set session setup
-response. Since this forces data encryption from the client, there is a
-problem that data is always encrypted regardless of the use of the cifs
-seal mount option. SMB2_SESSION_FLAG_ENCRYPT_DATA should be set according
-to KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION flags, and in case of
-KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION_OFF, encryption mode is turned off for
-all connections.
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Hi Steve, Al, Christoph,
+
+Here's an updated version of a subset of my branch to make the cifs/smb3
+driver pass iov_iters down to the lowest layers where they can be passed to
+the network transport.
+
+Al, Christoph: Could you look at the first four patches and see if you're okay
+with them - at least on a temporary basis so that I can get this moving?
+
+Note that patch (4) uses kmap_local_folio() to map an entire folio - this is
+wrong.  I'm going to try using Willy's vmap_folio() code - but I haven't done
+that yet.
+
+The first two patches are placed in netfslib as I have patches for netfslib
+that will want to use them:
+
+ (1) Add a function to extract part of an IOVEC-/UBUF-type iterator into a
+     BVEC-type iterator.  Refs are taken on the pages to prevent them from
+     evaporating.
+
+ (2) Add a function to extract part of an iterator into a scatterlist.  If
+     extracting from an IOVEC-/UBUF-type iterator, the pages have refs taken on
+     them; any other type and they don't.
+
+     It might be worth splitting this into two separate functions, one for
+     IOVEC/UBUF that refs and one for the others that doesn't.
+
+The other patches are placed in cifs as they're only used by cifs for now.
+
+ (3) Add a function to build an RDMA SGE list from a BVEC-, KVEC- or
+     XARRAY-type iterator.  It's left to the caller to make sure they don't
+     evaporate.
+
+ (4) Add a function to hash part of the contents of a BVEC-, KVEC- or
+     XARRAY-type iterator.
+
+I will need to make use of thew proposed page pinning when it becomes
+available, but that's not yet.
+
+Changes made in a later patch in the series make the upper layers convert an
+IOVEC-/UBUF-iterator to a BVEC-type iterator in direct/unbuffered I/O so that
+the signing, crypt and RDMA code see the BVEC instead of user buffers.
+
+Note also that I haven't managed to test all the combinations of transport.
+Samba doesn't support RDMA and ksmbd doesn't support encryption.  I can test
+them separately, but not together.  That said, rdma, sign, seal and sign+seal
+seem to work.
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-for-viro
+
+David
 ---
- fs/ksmbd/ksmbd_netlink.h |  1 +
- fs/ksmbd/smb2ops.c       | 10 ++++++++--
- fs/ksmbd/smb2pdu.c       |  8 +++++---
- 3 files changed, 14 insertions(+), 5 deletions(-)
+David Howells (9):
+      netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
+      netfs: Add a function to extract an iterator into a scatterlist
+      cifs: Add a function to build an RDMA SGE list from an iterator
+      cifs: Add a function to Hash the contents of an iterator
+      cifs: Add some helper functions
+      cifs: Add a function to read into an iter from a socket
+      cifs: Change the I/O paths to use an iterator rather than a page list
+      cifs: Build the RDMA SGE list directly from an iterator
+      cifs: Remove unused code
 
-diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
-index ff07c67f4565..b6bd8311e6b4 100644
---- a/fs/ksmbd/ksmbd_netlink.h
-+++ b/fs/ksmbd/ksmbd_netlink.h
-@@ -74,6 +74,7 @@ struct ksmbd_heartbeat {
- #define KSMBD_GLOBAL_FLAG_SMB2_LEASES		BIT(0)
- #define KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION	BIT(1)
- #define KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL	BIT(2)
-+#define KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION_OFF	BIT(3)
- 
- /*
-  * IPC request for ksmbd server startup
-diff --git a/fs/ksmbd/smb2ops.c b/fs/ksmbd/smb2ops.c
-index ab23da2120b9..e401302478c3 100644
---- a/fs/ksmbd/smb2ops.c
-+++ b/fs/ksmbd/smb2ops.c
-@@ -247,8 +247,9 @@ void init_smb3_02_server(struct ksmbd_conn *conn)
- 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
- 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_LEASING;
- 
--	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION &&
--	    conn->cli_cap & SMB2_GLOBAL_CAP_ENCRYPTION)
-+	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION ||
-+	    (!(server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION_OFF) &&
-+	     conn->cli_cap & SMB2_GLOBAL_CAP_ENCRYPTION))
- 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_ENCRYPTION;
- 
- 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL)
-@@ -271,6 +272,11 @@ int init_smb3_11_server(struct ksmbd_conn *conn)
- 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
- 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_LEASING;
- 
-+	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION ||
-+	    (!(server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION_OFF) &&
-+	     conn->cli_cap & SMB2_GLOBAL_CAP_ENCRYPTION))
-+		conn->vals->capabilities |= SMB2_GLOBAL_CAP_ENCRYPTION;
-+
- 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL)
- 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_MULTI_CHANNEL;
- 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index d0a0595bb01b..90e2554d757f 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -903,7 +903,7 @@ static void decode_encrypt_ctxt(struct ksmbd_conn *conn,
- 		return;
- 	}
- 
--	if (!(server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION))
-+	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION_OFF)
- 		return;
- 
- 	for (i = 0; i < cph_cnt; i++) {
-@@ -1508,7 +1508,8 @@ static int ntlm_authenticate(struct ksmbd_work *work)
- 			return -EINVAL;
- 		}
- 		sess->enc = true;
--		rsp->SessionFlags = SMB2_SESSION_FLAG_ENCRYPT_DATA_LE;
-+		if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION)
-+			rsp->SessionFlags = SMB2_SESSION_FLAG_ENCRYPT_DATA_LE;
- 		/*
- 		 * signing is disable if encryption is enable
- 		 * on this session
-@@ -1599,7 +1600,8 @@ static int krb5_authenticate(struct ksmbd_work *work)
- 			return -EINVAL;
- 		}
- 		sess->enc = true;
--		rsp->SessionFlags = SMB2_SESSION_FLAG_ENCRYPT_DATA_LE;
-+		if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION)
-+			rsp->SessionFlags = SMB2_SESSION_FLAG_ENCRYPT_DATA_LE;
- 		sess->sign = false;
- 	}
- 
--- 
-2.25.1
+
+ fs/cifs/cifsencrypt.c |  167 +++-
+ fs/cifs/cifsfs.h      |    3 +
+ fs/cifs/cifsglob.h    |   30 +-
+ fs/cifs/cifsproto.h   |   11 +-
+ fs/cifs/cifssmb.c     |   13 +-
+ fs/cifs/connect.c     |   16 +
+ fs/cifs/file.c        | 1700 ++++++++++++++++++-----------------------
+ fs/cifs/fscache.c     |   22 +-
+ fs/cifs/fscache.h     |   10 +-
+ fs/cifs/misc.c        |  110 +--
+ fs/cifs/smb2ops.c     |  378 +++++----
+ fs/cifs/smb2pdu.c     |   44 +-
+ fs/cifs/smbdirect.c   |  503 +++++++-----
+ fs/cifs/smbdirect.h   |    4 +-
+ fs/cifs/transport.c   |   57 +-
+ fs/netfs/Makefile     |    1 +
+ fs/netfs/iterator.c   |  347 +++++++++
+ include/linux/netfs.h |    5 +
+ 18 files changed, 1835 insertions(+), 1586 deletions(-)
+ create mode 100644 fs/netfs/iterator.c
+
 
