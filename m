@@ -2,110 +2,151 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDECC38A02
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 17:12:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C75FC38A02
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 17:16:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbiJ1RMF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Oct 2022 13:12:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49188 "EHLO
+        id S229802AbiJ1RQJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Oct 2022 13:16:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231314AbiJ1RLo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 13:11:44 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF9468CF8
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 10:10:11 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id n18so4460196qvt.11
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 10:10:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SGoG4+kkpjFKIiC1aB206pNaNNu8WHtjUzbD9QY9Ydk=;
-        b=AHLpWHbvaJj6iAHcMzE5M/XFIEJbvJiM188nPc4sZcuDlddbnWJj2scjftscU4cF4x
-         7ek2zIay9rBYB96uXxrfVQTv5OfVuThw3qxUxjLeEdzSlmmCOyQ3PY8Gh2POJX82KNSM
-         0yIW2D4UUkVkaewo1+mavlSqKbWHmteTLXE9Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SGoG4+kkpjFKIiC1aB206pNaNNu8WHtjUzbD9QY9Ydk=;
-        b=IeXeuVXM0x7fIzDizKFHy6WhdgsuFDmSuReIgyKyjm+w0U0jr9XczDSdnfHW1t1CAa
-         brJ97rbUrkNgFnNzNRuLspSM01L3Ndh4tLbwK7MPdc3K3IoPYwU7NnRsHcw57LaZwBpM
-         NxqWP2T/YrCrvO2hQQRhfonJvjab5Y5Wo/LeGQ8gxW/AFZMPb35retQ5f9GxbsgE05yb
-         wQ4ez5zBhko8L7C1rWpcKMOZdoQlZFYhknLWnrjNFvvfzXSndeM1z7LJMiG2Ib7RoVKS
-         7jevFuHsGBKIGzKxMcqOuVx5czZtpa4UsLpFATNXT4HWkxzWBS3/vCRVQmozHNzB53Fb
-         2vyQ==
-X-Gm-Message-State: ACrzQf3EvR6VGUyCPo1lWIneLJf9JFsdKc4LkVg1WkyDLrrKU3s+2Ijv
-        4nBaUcNpMRFs1CZHwjA9Qw385PSc2N1ppg==
-X-Google-Smtp-Source: AMsMyM5xFvZk2Sghl24aHklqZ8W2BlTLoplPeCi8kpVG5yPaKsOmreXhKry2mcIBfAltgSYpQa53kQ==
-X-Received: by 2002:ad4:5968:0:b0:4b4:7d98:7ede with SMTP id eq8-20020ad45968000000b004b47d987edemr432292qvb.130.1666977010517;
-        Fri, 28 Oct 2022 10:10:10 -0700 (PDT)
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com. [209.85.219.182])
-        by smtp.gmail.com with ESMTPSA id cm11-20020a05622a250b00b003a4f6a566e9sm938653qtb.83.2022.10.28.10.10.08
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Oct 2022 10:10:08 -0700 (PDT)
-Received: by mail-yb1-f182.google.com with SMTP id m125so6817574ybb.6
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 10:10:08 -0700 (PDT)
-X-Received: by 2002:a25:bb44:0:b0:6bb:a336:7762 with SMTP id
- b4-20020a25bb44000000b006bba3367762mr192268ybk.501.1666977007965; Fri, 28 Oct
- 2022 10:10:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <Y1btOP0tyPtcYajo@ZenIV> <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
- <20221028023352.3532080-12-viro@zeniv.linux.org.uk> <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
- <65441.1666976522@warthog.procyon.org.uk>
-In-Reply-To: <65441.1666976522@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 28 Oct 2022 10:09:51 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgMAxxw3n5gvURUV68zHr6vXbcvhXSzXdi2obKo2bK=Dw@mail.gmail.com>
-Message-ID: <CAHk-=wgMAxxw3n5gvURUV68zHr6vXbcvhXSzXdi2obKo2bK=Dw@mail.gmail.com>
-Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction initializers
-To:     David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
+        with ESMTP id S230193AbiJ1RQI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 13:16:08 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A0D71C1155;
+        Fri, 28 Oct 2022 10:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=VF9k33pcdLTeIysuh3TIPFQyMmapNyL28cb+mCFej7M=; b=nmp1KrD+1RWDQWEGdIqlR51rBX
+        Co4HTXHi5hdL7Or9H1D7lpRvNrl/dAuuwvAE6q9kU48BXcpLgXluKjNvJ+P1tA1YmgokVrwE9OnH/
+        AcziZ+6gbDvJSaNlD0+weqyHcrHbSu7zl/Kbr3RvXdrDw165/xZy9f8iKmn6DoOJHudD6qT+vDs34
+        LKpMZK318phJiptxpreVIn2neWvwUjImyjShts7sCtdpAUKBGWGhe9/smOz/8QzCbHxWBl9aEJ6Jd
+        IK+VDpPS62qG95W0D/FpB00S75DV2grnMKSBpKWBdapKD3okncI1K/E0D1OJ65iyd/8BRJDjmYZPH
+        ezIgcMqw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1ooSxU-00F00G-04;
+        Fri, 28 Oct 2022 17:15:52 +0000
+Date:   Fri, 28 Oct 2022 18:15:51 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        David Howells <dhowells@redhat.com>, willy@infradead.org,
         dchinner@redhat.com, Steve French <smfrench@gmail.com>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         Jeff Layton <jlayton@kernel.org>,
         Ira Weiny <ira.weiny@intel.com>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction
+ initializers
+Message-ID: <Y1wOR7YmqK8iBYa8@ZenIV>
+References: <Y1btOP0tyPtcYajo@ZenIV>
+ <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
+ <20221028023352.3532080-12-viro@zeniv.linux.org.uk>
+ <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 10:02 AM David Howells <dhowells@redhat.com> wrote:
->
-> Linus Torvalds <torvalds@linux-foundation.org> wrote:
->
-> > Honestly, I think the *real* fix would be a type-based one. Don't do
-> >
-> >         iov_iter_kvec(&iter, ITER_DEST, ...
-> >
-> > at all, but instead have two different kinds of 'struct iov_iter': one
-> > as a destination (iov_iter_dst), and one as a source (iov_iter_src),
->
-> Or maybe something along the lines of iov_iter_into_kvec() and
-> iov_iter_from_kvec()?
+On Fri, Oct 28, 2022 at 09:41:35AM -0700, Linus Torvalds wrote:
 
-For the type-based ones, you would need that to initialize the two cases.
+> >         rq_for_each_segment(bvec, rq, iter) {
+> > -               iov_iter_bvec(&i, READ, &bvec, 1, bvec.bv_len);
+> >                 len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
+> >                 if (len < 0)
+> >                         return len;
+> 
+> where WRITE is used in the 'write()' function, and READ is used in the
+> read() function.
+> 
+> So that naming is not great, but it has a fairly obvious pattern in a
+> lot of code.
+> 
+> Not all code, no, as clearly shown by the other eleven patches in this
+> series, but still..
+> 
+> The new naming doesn't strike me as being obviously less confusing.
+> It's not horrible, but I'm also not seeing it as being any less likely
+> in the long run to then cause the same issues we had with READ/WRITE.
+> It's not like
+> 
+>                 iov_iter_bvec(&i, ITER_DEST, &bvec, 1, bvec.bv_len);
+> 
+> is somehow obviously really clear.
+> 
+> I can see the logic: "the destination is the iter, so the source is
+> the bvec".
 
-But without the type-based approach, it ends up being yet another case
-of "you just have to use the right name, and if you don't, you won't
-know until the dynamic WARN_ON() tells you".
+???
 
-And the dynamic WARN_ON() (or, WARN_ON_ONCE(), as it should be) is
-great, but only for the drivers that get active testing by developers
-and robots.
+Wait a sec; bvec is destination - we are going to store data into the page
+hanging off that bvec.
 
-Which leaves potentially a _lot_ of random code that ends up being
-wrong for years.
+We have a request to read from /dev/loop into given page; page is where
+the data goes into; the source of that data is the backing file of /dev/loop.
 
-I really like static checking that actually gets noticed by the
-compiler when you get it wrong.
+Or am I completely misparsing your sentence above?
 
-It may not be entirely realistic in this situation, but it would be
-really nice to try...
+> I think the real fix for this is your 11/12, which at least makes the
+> iter movement helpers warn about mis-use. That said, I hate 11/12 too,
+> but for a minor technicality: please make the WARN_ON() be a
+> WARN_ON_ONCE(), and please don't make it abort.
 
-                  Linus
+Umm...  How are you going to e.g. copy from ITER_DISCARD?  I've no problem
+with WARN_ON_ONCE(), but when the operation really can't be done, what
+can we do except returning an error?
+
+> Because otherwise somebody who has a random - but important enough -
+> driver that does this wrong will just have an unbootable machine.
+> 
+> So your 11/12 is conceptually the right thing, but practically
+> horribly wrong. While this 12/12 mainly makes me go "If we have a
+> patch this big, I think we should be able to do better than change
+> from one ambiguous name to another possibly slightly less ambiguous".
+> 
+> Honestly, I think the *real* fix would be a type-based one. Don't do
+> 
+>         iov_iter_kvec(&iter, ITER_DEST, ...
+> 
+> at all, but instead have two different kinds of 'struct iov_iter': one
+> as a destination (iov_iter_dst), and one as a source (iov_iter_src),
+> and then just force all the use-cases to use the right version. The
+> actual *underlying" struct could still be the same
+> (iov_iter_implementation), but you'd force people to always use the
+> right version - kind of the same way a 'const void *' is always a
+> source, and a 'void *' is always a destination for things like memcpy.
+> 
+> That would catch mis-uses much earlier.
+> 
+> That would also make the patch much bigger, but I do think 99.9% of
+> all users are very distinct. When you pass a iter source around, that
+> 'iov_iter_src' is basically *always* a source of the data through the
+> whole call-chain. No?
+
+No.  If nothing else, you'll get to split struct msghdr (msg->msg_iter
+different for sendmsg and recvmsg that way) *and* you get to split
+every helper in net/* that doesn't give a damn about the distinction
+(as in "doesn't even look at ->msg_iter", for example).
+
+> Maybe I'm 100% wrong and that type-based one has some fundamental
+> problem in it, but it really feels to me like your dynamic WARN_ON()
+> calls in 11/12 could have been type-based. Because they are entirely
+> static based on 'data_source'.
+
+See above; ->direct_IO() is just one example, there are much more
+painful ones.   Sure, we can make those use a union of pointers or
+pointer to union or play with casts, but that'll end up with
+much more places that can go wrong.
+
+I thought of that approach, but I hadn't been able to find any way to
+do it without a very ugly and painful mess as the result.
+
+We can do separate iov_iter_bvec_dest()/iov_iter_bvec_source(), etc.,
+but it won't buy you any kind of type safety - not without splitting
+the type and that ends up being too painful ;-/
