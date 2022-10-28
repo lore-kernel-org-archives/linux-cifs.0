@@ -2,714 +2,194 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 746A9FA3742
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 15:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DB7FA3743
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 16:42:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229707AbiJ1P7H (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Oct 2022 11:59:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48612 "EHLO
+        id S229528AbiJ1Ql6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Oct 2022 12:41:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230239AbiJ1P6F (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 11:58:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44CC321466C
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 08:57:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666972620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TIkGdsKIpnQirYx5nzYwDfV5l5VpRKSd5XYblzZTz5c=;
-        b=ayB1dpXrWkgrTKelp8w8lq3D0XLOMpBdnAhuQny1mibrqpDkBrTz/1yJ8DW9h0UVGCth4Y
-        uP7wrnMQNXI/pVwo1Q/u7p7hl7V49t+PhPe6t90Cx9oRdchu6qjIVfI8/KKX289qny1JDv
-        1GLWmqqVDWZHecJfx6G6Xpyswqv1lP0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-15-26uWDGmJOM6k8-Fax4MKAg-1; Fri, 28 Oct 2022 11:56:53 -0400
-X-MC-Unique: 26uWDGmJOM6k8-Fax4MKAg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 14C9329AB450;
-        Fri, 28 Oct 2022 15:56:53 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 65A242166B26;
-        Fri, 28 Oct 2022 15:56:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [RFC PATCH 9/9] cifs: Remove unused code
-From:   David Howells <dhowells@redhat.com>
-To:     Steve French <smfrench@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        linux-cifs@vger.kernel.org, dhowells@redhat.com,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 28 Oct 2022 16:56:50 +0100
-Message-ID: <166697261080.61150.17513116912567922274.stgit@warthog.procyon.org.uk>
-In-Reply-To: <166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk>
-References: <166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/1.5
+        with ESMTP id S229944AbiJ1Ql5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 12:41:57 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E001C841E
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 09:41:56 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id r19so3793860qtx.6
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 09:41:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=R2O57OBzpb8FA+DnVcdKrC0pUlI+m8T71gxg18g9ML0=;
+        b=KiggagMYrTu7SdTQf7qYTjBuh7Vgh0DLPpwOBg8u9qpWv7WzBIc/UO/p3ds0BQ10Y2
+         twYZGkSmA7kxGJkxMhsJuQftz9pMY+b7t5qOEkdTuyRtagTPZL/MxUkxUaekrc5Qnqz8
+         TGwfbYloJxbCkPQdW88sUCBtcQCOvMnJfcMNI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R2O57OBzpb8FA+DnVcdKrC0pUlI+m8T71gxg18g9ML0=;
+        b=La4q6Jx2NdsgVe0e3BMhBHsX5h8NmS5IqwsKM87jQBswVyugQ7Ge0UCm1K1pRFLKcm
+         VYufq15Aqx9zG/i0cOSVNKMPA4ymOqZBKtFqHmWar/ABAf+MHgW/I2yoqkU+nFapHx8s
+         y8djbdMVkOiTGjKHBRZ396U3AIf9Tu1Rr0CtwkazE9XW15iuadDoiUG9XYmZ+kD0Nh4k
+         vCG/6nB5C47BPvml7zbfz/1PUagXydhbBdF4WPUbN4IV7RsVbfVzED0CDQfOTTyY28pw
+         ZmcGb3Cn9ijvDNTdoXgbnBZ9rQlUwZqEQ+yI9w0UPAm6dSXq8bBgBtnyB5sQedYO+e54
+         pcxQ==
+X-Gm-Message-State: ACrzQf3MACsoa7hIhemEPl7XefupTVqM+EzfnDy86uSVyoyvCN3sLGSM
+        l97aRFFkemC9nl7NbNyc3u9EVcQF0xGYhg==
+X-Google-Smtp-Source: AMsMyM6NWxYX6IYR9ToNHL1TXoyppNlCS4/2a6H2vhDSQPLSmsO5naqNzg4w2whkftoYpJhFn13piw==
+X-Received: by 2002:ac8:5cc2:0:b0:39c:e770:4e77 with SMTP id s2-20020ac85cc2000000b0039ce7704e77mr325149qta.328.1666975315490;
+        Fri, 28 Oct 2022 09:41:55 -0700 (PDT)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
+        by smtp.gmail.com with ESMTPSA id w22-20020a05620a445600b006eeae49537bsm3281290qkp.98.2022.10.28.09.41.53
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Oct 2022 09:41:53 -0700 (PDT)
+Received: by mail-yb1-f178.google.com with SMTP id f205so6763419yba.2
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 09:41:53 -0700 (PDT)
+X-Received: by 2002:a05:6902:124f:b0:66e:e3da:487e with SMTP id
+ t15-20020a056902124f00b0066ee3da487emr144065ybu.310.1666975312766; Fri, 28
+ Oct 2022 09:41:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+References: <Y1btOP0tyPtcYajo@ZenIV> <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
+ <20221028023352.3532080-12-viro@zeniv.linux.org.uk>
+In-Reply-To: <20221028023352.3532080-12-viro@zeniv.linux.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 28 Oct 2022 09:41:35 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
+Message-ID: <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
+Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction initializers
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        David Howells <dhowells@redhat.com>, willy@infradead.org,
+        dchinner@redhat.com, Steve French <smfrench@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Remove a bunch of functions that are no longer used and are commented out
-after the conversion to use iterators throughout the I/O path.
+On Thu, Oct 27, 2022 at 7:34 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+>
+> READ/WRITE proved to be actively confusing
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: linux-cifs@vger.kernel.org
----
+I agree, we had the same issue with rw_verify_area()
 
- fs/cifs/file.c |  590 --------------------------------------------------------
- 1 file changed, 590 deletions(-)
+However:
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index ca14acd139af..334b3f9727f0 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2604,298 +2604,6 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- 	return rc;
- }
- 
--#if 0 // TODO: Remove for iov_iter support
--static struct cifs_writedata *
--wdata_alloc_and_fillpages(pgoff_t tofind, struct address_space *mapping,
--			  pgoff_t end, pgoff_t *index,
--			  unsigned int *found_pages)
--{
--	struct cifs_writedata *wdata;
--
--	wdata = cifs_writedata_alloc((unsigned int)tofind,
--				     cifs_writev_complete);
--	if (!wdata)
--		return NULL;
--
--	*found_pages = find_get_pages_range_tag(mapping, index, end,
--				PAGECACHE_TAG_DIRTY, tofind, wdata->pages);
--	return wdata;
--}
--
--static unsigned int
--wdata_prepare_pages(struct cifs_writedata *wdata, unsigned int found_pages,
--		    struct address_space *mapping,
--		    struct writeback_control *wbc,
--		    pgoff_t end, pgoff_t *index, pgoff_t *next, bool *done)
--{
--	unsigned int nr_pages = 0, i;
--	struct page *page;
--
--	for (i = 0; i < found_pages; i++) {
--		page = wdata->pages[i];
--		/*
--		 * At this point we hold neither the i_pages lock nor the
--		 * page lock: the page may be truncated or invalidated
--		 * (changing page->mapping to NULL), or even swizzled
--		 * back from swapper_space to tmpfs file mapping
--		 */
--
--		if (nr_pages == 0)
--			lock_page(page);
--		else if (!trylock_page(page))
--			break;
--
--		if (unlikely(page->mapping != mapping)) {
--			unlock_page(page);
--			break;
--		}
--
--		if (!wbc->range_cyclic && page->index > end) {
--			*done = true;
--			unlock_page(page);
--			break;
--		}
--
--		if (*next && (page->index != *next)) {
--			/* Not next consecutive page */
--			unlock_page(page);
--			break;
--		}
--
--		if (wbc->sync_mode != WB_SYNC_NONE)
--			wait_on_page_writeback(page);
--
--		if (PageWriteback(page) ||
--				!clear_page_dirty_for_io(page)) {
--			unlock_page(page);
--			break;
--		}
--
--		/*
--		 * This actually clears the dirty bit in the radix tree.
--		 * See cifs_writepage() for more commentary.
--		 */
--		set_page_writeback(page);
--		if (page_offset(page) >= i_size_read(mapping->host)) {
--			*done = true;
--			unlock_page(page);
--			end_page_writeback(page);
--			break;
--		}
--
--		wdata->pages[i] = page;
--		*next = page->index + 1;
--		++nr_pages;
--	}
--
--	/* reset index to refind any pages skipped */
--	if (nr_pages == 0)
--		*index = wdata->pages[0]->index + 1;
--
--	/* put any pages we aren't going to use */
--	for (i = nr_pages; i < found_pages; i++) {
--		put_page(wdata->pages[i]);
--		wdata->pages[i] = NULL;
--	}
--
--	return nr_pages;
--}
--
--static int
--wdata_send_pages(struct cifs_writedata *wdata, unsigned int nr_pages,
--		 struct address_space *mapping, struct writeback_control *wbc)
--{
--	int rc;
--
--	wdata->sync_mode = wbc->sync_mode;
--	wdata->nr_pages = nr_pages;
--	wdata->offset = page_offset(wdata->pages[0]);
--	wdata->pagesz = PAGE_SIZE;
--	wdata->tailsz = min(i_size_read(mapping->host) -
--			page_offset(wdata->pages[nr_pages - 1]),
--			(loff_t)PAGE_SIZE);
--	wdata->bytes = ((nr_pages - 1) * PAGE_SIZE) + wdata->tailsz;
--	wdata->pid = wdata->cfile->pid;
--
--	rc = adjust_credits(wdata->server, &wdata->credits, wdata->bytes);
--	if (rc)
--		return rc;
--
--	if (wdata->cfile->invalidHandle)
--		rc = -EAGAIN;
--	else
--		rc = wdata->server->ops->async_writev(wdata,
--						      cifs_writedata_release);
--
--	return rc;
--}
--
--static int cifs_writepages(struct address_space *mapping,
--			   struct writeback_control *wbc)
--{
--	struct inode *inode = mapping->host;
--	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
--	struct TCP_Server_Info *server;
--	bool done = false, scanned = false, range_whole = false;
--	pgoff_t end, index;
--	struct cifs_writedata *wdata;
--	struct cifsFileInfo *cfile = NULL;
--	int rc = 0;
--	int saved_rc = 0;
--	unsigned int xid;
--
--	/*
--	 * If wsize is smaller than the page cache size, default to writing
--	 * one page at a time via cifs_writepage
--	 */
--	if (cifs_sb->ctx->wsize < PAGE_SIZE)
--		return generic_writepages(mapping, wbc);
--
--	xid = get_xid();
--	if (wbc->range_cyclic) {
--		index = mapping->writeback_index; /* Start from prev offset */
--		end = -1;
--	} else {
--		index = wbc->range_start >> PAGE_SHIFT;
--		end = wbc->range_end >> PAGE_SHIFT;
--		if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX)
--			range_whole = true;
--		scanned = true;
--	}
--	server = cifs_pick_channel(cifs_sb_master_tcon(cifs_sb)->ses);
--
--retry:
--	while (!done && index <= end) {
--		unsigned int i, nr_pages, found_pages, wsize;
--		pgoff_t next = 0, tofind, saved_index = index;
--		struct cifs_credits credits_on_stack;
--		struct cifs_credits *credits = &credits_on_stack;
--		int get_file_rc = 0;
--
--		if (cfile)
--			cifsFileInfo_put(cfile);
--
--		rc = cifs_get_writable_file(CIFS_I(inode), FIND_WR_ANY, &cfile);
--
--		/* in case of an error store it to return later */
--		if (rc)
--			get_file_rc = rc;
--
--		rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->wsize,
--						   &wsize, credits);
--		if (rc != 0) {
--			done = true;
--			break;
--		}
--
--		tofind = min((wsize / PAGE_SIZE) - 1, end - index) + 1;
--
--		wdata = wdata_alloc_and_fillpages(tofind, mapping, end, &index,
--						  &found_pages);
--		if (!wdata) {
--			rc = -ENOMEM;
--			done = true;
--			add_credits_and_wake_if(server, credits, 0);
--			break;
--		}
--
--		if (found_pages == 0) {
--			kref_put(&wdata->refcount, cifs_writedata_release);
--			add_credits_and_wake_if(server, credits, 0);
--			break;
--		}
--
--		nr_pages = wdata_prepare_pages(wdata, found_pages, mapping, wbc,
--					       end, &index, &next, &done);
--
--		/* nothing to write? */
--		if (nr_pages == 0) {
--			kref_put(&wdata->refcount, cifs_writedata_release);
--			add_credits_and_wake_if(server, credits, 0);
--			continue;
--		}
--
--		wdata->credits = credits_on_stack;
--		wdata->cfile = cfile;
--		wdata->server = server;
--		cfile = NULL;
--
--		if (!wdata->cfile) {
--			cifs_dbg(VFS, "No writable handle in writepages rc=%d\n",
--				 get_file_rc);
--			if (is_retryable_error(get_file_rc))
--				rc = get_file_rc;
--			else
--				rc = -EBADF;
--		} else
--			rc = wdata_send_pages(wdata, nr_pages, mapping, wbc);
--
--		for (i = 0; i < nr_pages; ++i)
--			unlock_page(wdata->pages[i]);
--
--		/* send failure -- clean up the mess */
--		if (rc != 0) {
--			add_credits_and_wake_if(server, &wdata->credits, 0);
--			for (i = 0; i < nr_pages; ++i) {
--				if (is_retryable_error(rc))
--					redirty_page_for_writepage(wbc,
--							   wdata->pages[i]);
--				else
--					SetPageError(wdata->pages[i]);
--				end_page_writeback(wdata->pages[i]);
--				put_page(wdata->pages[i]);
--			}
--			if (!is_retryable_error(rc))
--				mapping_set_error(mapping, rc);
--		}
--		kref_put(&wdata->refcount, cifs_writedata_release);
--
--		if (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN) {
--			index = saved_index;
--			continue;
--		}
--
--		/* Return immediately if we received a signal during writing */
--		if (is_interrupt_error(rc)) {
--			done = true;
--			break;
--		}
--
--		if (rc != 0 && saved_rc == 0)
--			saved_rc = rc;
--
--		wbc->nr_to_write -= nr_pages;
--		if (wbc->nr_to_write <= 0)
--			done = true;
--
--		index = next;
--	}
--
--	if (!scanned && !done) {
--		/*
--		 * We hit the last page and there is more work to be done: wrap
--		 * back to the start of the file
--		 */
--		scanned = true;
--		index = 0;
--		goto retry;
--	}
--
--	if (saved_rc != 0)
--		rc = saved_rc;
--
--	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
--		mapping->writeback_index = index;
--
--	if (cfile)
--		cifsFileInfo_put(cfile);
--	free_xid(xid);
--	/* Indication to update ctime and mtime as close is deferred */
--	set_bit(CIFS_INO_MODIFIED_ATTR, &CIFS_I(inode)->flags);
--	return rc;
--}
--#endif
--
- /*
-  * Extend the region to be written back to include subsequent contiguously
-  * dirty pages if possible, but don't sleep while doing so.
-@@ -3497,49 +3205,6 @@ int cifs_flush(struct file *file, fl_owner_t id)
- 	return rc;
- }
- 
--#if 0 // TODO: Remove for iov_iter support
--static int
--cifs_write_allocate_pages(struct page **pages, unsigned long num_pages)
--{
--	int rc = 0;
--	unsigned long i;
--
--	for (i = 0; i < num_pages; i++) {
--		pages[i] = alloc_page(GFP_KERNEL|__GFP_HIGHMEM);
--		if (!pages[i]) {
--			/*
--			 * save number of pages we have already allocated and
--			 * return with ENOMEM error
--			 */
--			num_pages = i;
--			rc = -ENOMEM;
--			break;
--		}
--	}
--
--	if (rc) {
--		for (i = 0; i < num_pages; i++)
--			put_page(pages[i]);
--	}
--	return rc;
--}
--
--static inline
--size_t get_numpages(const size_t wsize, const size_t len, size_t *cur_len)
--{
--	size_t num_pages;
--	size_t clen;
--
--	clen = min_t(const size_t, len, wsize);
--	num_pages = DIV_ROUND_UP(clen, PAGE_SIZE);
--
--	if (cur_len)
--		*cur_len = clen;
--
--	return num_pages;
--}
--#endif
--
- static void
- cifs_uncached_writedata_release(struct kref *refcount)
- {
-@@ -3572,50 +3237,6 @@ cifs_uncached_writev_complete(struct work_struct *work)
- 	kref_put(&wdata->refcount, cifs_uncached_writedata_release);
- }
- 
--#if 0 // TODO: Remove for iov_iter support
--static int
--wdata_fill_from_iovec(struct cifs_writedata *wdata, struct iov_iter *from,
--		      size_t *len, unsigned long *num_pages)
--{
--	size_t save_len, copied, bytes, cur_len = *len;
--	unsigned long i, nr_pages = *num_pages;
--
--	save_len = cur_len;
--	for (i = 0; i < nr_pages; i++) {
--		bytes = min_t(const size_t, cur_len, PAGE_SIZE);
--		copied = copy_page_from_iter(wdata->pages[i], 0, bytes, from);
--		cur_len -= copied;
--		/*
--		 * If we didn't copy as much as we expected, then that
--		 * may mean we trod into an unmapped area. Stop copying
--		 * at that point. On the next pass through the big
--		 * loop, we'll likely end up getting a zero-length
--		 * write and bailing out of it.
--		 */
--		if (copied < bytes)
--			break;
--	}
--	cur_len = save_len - cur_len;
--	*len = cur_len;
--
--	/*
--	 * If we have no data to send, then that probably means that
--	 * the copy above failed altogether. That's most likely because
--	 * the address in the iovec was bogus. Return -EFAULT and let
--	 * the caller free anything we allocated and bail out.
--	 */
--	if (!cur_len)
--		return -EFAULT;
--
--	/*
--	 * i + 1 now represents the number of pages we actually used in
--	 * the copy phase above.
--	 */
--	*num_pages = i + 1;
--	return 0;
--}
--#endif
--
- static int
- cifs_resend_wdata(struct cifs_writedata *wdata, struct list_head *wdata_list,
- 	struct cifs_aio_ctx *ctx)
-@@ -4202,83 +3823,6 @@ cifs_uncached_readv_complete(struct work_struct *work)
- 	kref_put(&rdata->refcount, cifs_readdata_release);
- }
- 
--#if 0 // TODO: Remove for iov_iter support
--
--static int
--uncached_fill_pages(struct TCP_Server_Info *server,
--		    struct cifs_readdata *rdata, struct iov_iter *iter,
--		    unsigned int len)
--{
--	int result = 0;
--	unsigned int i;
--	unsigned int nr_pages = rdata->nr_pages;
--	unsigned int page_offset = rdata->page_offset;
--
--	rdata->got_bytes = 0;
--	rdata->tailsz = PAGE_SIZE;
--	for (i = 0; i < nr_pages; i++) {
--		struct page *page = rdata->pages[i];
--		size_t n;
--		unsigned int segment_size = rdata->pagesz;
--
--		if (i == 0)
--			segment_size -= page_offset;
--		else
--			page_offset = 0;
--
--
--		if (len <= 0) {
--			/* no need to hold page hostage */
--			rdata->pages[i] = NULL;
--			rdata->nr_pages--;
--			put_page(page);
--			continue;
--		}
--
--		n = len;
--		if (len >= segment_size)
--			/* enough data to fill the page */
--			n = segment_size;
--		else
--			rdata->tailsz = len;
--		len -= n;
--
--		if (iter)
--			result = copy_page_from_iter(
--					page, page_offset, n, iter);
--#ifdef CONFIG_CIFS_SMB_DIRECT
--		else if (rdata->mr)
--			result = n;
--#endif
--		else
--			result = cifs_read_page_from_socket(
--					server, page, page_offset, n);
--		if (result < 0)
--			break;
--
--		rdata->got_bytes += result;
--	}
--
--	return rdata->got_bytes > 0 && result != -ECONNABORTED ?
--						rdata->got_bytes : result;
--}
--
--static int
--cifs_uncached_read_into_pages(struct TCP_Server_Info *server,
--			      struct cifs_readdata *rdata, unsigned int len)
--{
--	return uncached_fill_pages(server, rdata, NULL, len);
--}
--
--static int
--cifs_uncached_copy_into_pages(struct TCP_Server_Info *server,
--			      struct cifs_readdata *rdata,
--			      struct iov_iter *iter)
--{
--	return uncached_fill_pages(server, rdata, iter, iter->count);
--}
--#endif
--
- static int cifs_resend_rdata(struct cifs_readdata *rdata,
- 			struct list_head *rdata_list,
- 			struct cifs_aio_ctx *ctx)
-@@ -4888,140 +4432,6 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
- 	return rc;
- }
- 
--#if 0 // TODO: Remove for iov_iter support
--
--static void
--cifs_readv_complete(struct work_struct *work)
--{
--	unsigned int i, got_bytes;
--	struct cifs_readdata *rdata = container_of(work,
--						struct cifs_readdata, work);
--
--	got_bytes = rdata->got_bytes;
--	for (i = 0; i < rdata->nr_pages; i++) {
--		struct page *page = rdata->pages[i];
--
--		if (rdata->result == 0 ||
--		    (rdata->result == -EAGAIN && got_bytes)) {
--			flush_dcache_page(page);
--			SetPageUptodate(page);
--		} else
--			SetPageError(page);
--
--		if (rdata->result == 0 ||
--		    (rdata->result == -EAGAIN && got_bytes))
--			cifs_readpage_to_fscache(rdata->mapping->host, page);
--
--		unlock_page(page);
--
--		got_bytes -= min_t(unsigned int, PAGE_SIZE, got_bytes);
--
--		put_page(page);
--		rdata->pages[i] = NULL;
--	}
--	kref_put(&rdata->refcount, cifs_readdata_release);
--}
--
--static int
--readpages_fill_pages(struct TCP_Server_Info *server,
--		     struct cifs_readdata *rdata, struct iov_iter *iter,
--		     unsigned int len)
--{
--	int result = 0;
--	unsigned int i;
--	u64 eof;
--	pgoff_t eof_index;
--	unsigned int nr_pages = rdata->nr_pages;
--	unsigned int page_offset = rdata->page_offset;
--
--	/* determine the eof that the server (probably) has */
--	eof = CIFS_I(rdata->mapping->host)->server_eof;
--	eof_index = eof ? (eof - 1) >> PAGE_SHIFT : 0;
--	cifs_dbg(FYI, "eof=%llu eof_index=%lu\n", eof, eof_index);
--
--	rdata->got_bytes = 0;
--	rdata->tailsz = PAGE_SIZE;
--	for (i = 0; i < nr_pages; i++) {
--		struct page *page = rdata->pages[i];
--		unsigned int to_read = rdata->pagesz;
--		size_t n;
--
--		if (i == 0)
--			to_read -= page_offset;
--		else
--			page_offset = 0;
--
--		n = to_read;
--
--		if (len >= to_read) {
--			len -= to_read;
--		} else if (len > 0) {
--			/* enough for partial page, fill and zero the rest */
--			zero_user(page, len + page_offset, to_read - len);
--			n = rdata->tailsz = len;
--			len = 0;
--		} else if (page->index > eof_index) {
--			/*
--			 * The VFS will not try to do readahead past the
--			 * i_size, but it's possible that we have outstanding
--			 * writes with gaps in the middle and the i_size hasn't
--			 * caught up yet. Populate those with zeroed out pages
--			 * to prevent the VFS from repeatedly attempting to
--			 * fill them until the writes are flushed.
--			 */
--			zero_user(page, 0, PAGE_SIZE);
--			flush_dcache_page(page);
--			SetPageUptodate(page);
--			unlock_page(page);
--			put_page(page);
--			rdata->pages[i] = NULL;
--			rdata->nr_pages--;
--			continue;
--		} else {
--			/* no need to hold page hostage */
--			unlock_page(page);
--			put_page(page);
--			rdata->pages[i] = NULL;
--			rdata->nr_pages--;
--			continue;
--		}
--
--		if (iter)
--			result = copy_page_from_iter(
--					page, page_offset, n, iter);
--#ifdef CONFIG_CIFS_SMB_DIRECT
--		else if (rdata->mr)
--			result = n;
--#endif
--		else
--			result = cifs_read_page_from_socket(
--					server, page, page_offset, n);
--		if (result < 0)
--			break;
--
--		rdata->got_bytes += result;
--	}
--
--	return rdata->got_bytes > 0 && result != -ECONNABORTED ?
--						rdata->got_bytes : result;
--}
--
--static int
--cifs_readpages_read_into_pages(struct TCP_Server_Info *server,
--			       struct cifs_readdata *rdata, unsigned int len)
--{
--	return readpages_fill_pages(server, rdata, NULL, len);
--}
--
--static int
--cifs_readpages_copy_into_pages(struct TCP_Server_Info *server,
--			       struct cifs_readdata *rdata,
--			       struct iov_iter *iter)
--{
--	return readpages_fill_pages(server, rdata, iter, iter->count);
--}
--#endif
--
- /*
-  * Unlock a bunch of folios in the pagecache.
-  */
+> Call them ITER_DEST and ITER_SOURCE - at least that is harder
+> to misinterpret...
 
+I'm not sure this really helps, or is less likely to cause issues.
 
+The old naming at least had some advantages (yes, yes, this is the
+_source_ of the old naming):
+
+> @@ -243,7 +243,7 @@ static int lo_write_bvec(struct file *file, struct bio_vec *bvec, loff_t *ppos)
+>         struct iov_iter i;
+>         ssize_t bw;
+>
+> -       iov_iter_bvec(&i, WRITE, bvec, 1, bvec->bv_len);
+>
+>         file_start_write(file);
+>         bw = vfs_iter_write(file, &i, ppos, 0);
+> @@ -286,7 +286,7 @@ static int lo_read_simple(struct loop_device *lo, struct request *rq,
+>         ssize_t len;
+>
+>         rq_for_each_segment(bvec, rq, iter) {
+> -               iov_iter_bvec(&i, READ, &bvec, 1, bvec.bv_len);
+>                 len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
+>                 if (len < 0)
+>                         return len;
+
+where WRITE is used in the 'write()' function, and READ is used in the
+read() function.
+
+So that naming is not great, but it has a fairly obvious pattern in a
+lot of code.
+
+Not all code, no, as clearly shown by the other eleven patches in this
+series, but still..
+
+The new naming doesn't strike me as being obviously less confusing.
+It's not horrible, but I'm also not seeing it as being any less likely
+in the long run to then cause the same issues we had with READ/WRITE.
+It's not like
+
+                iov_iter_bvec(&i, ITER_DEST, &bvec, 1, bvec.bv_len);
+
+is somehow obviously really clear.
+
+I can see the logic: "the destination is the iter, so the source is
+the bvec". I understand. But that was pretty much exactly the logic
+behind READ too: "this is a read from the device, so the source is the
+bvec". I can well imagine that the new one is clearer for some cases,
+and in the context of seeing all these other changes it's all quite
+straightforward, but I'm trying to think as a driver writer that is
+dealing with one random case at a time, and ITER_DEST doesn't strike
+me as hugely intuitive either.
+
+I think the real fix for this is your 11/12, which at least makes the
+iter movement helpers warn about mis-use. That said, I hate 11/12 too,
+but for a minor technicality: please make the WARN_ON() be a
+WARN_ON_ONCE(), and please don't make it abort.
+
+Because otherwise somebody who has a random - but important enough -
+driver that does this wrong will just have an unbootable machine.
+
+So your 11/12 is conceptually the right thing, but practically
+horribly wrong. While this 12/12 mainly makes me go "If we have a
+patch this big, I think we should be able to do better than change
+from one ambiguous name to another possibly slightly less ambiguous".
+
+Honestly, I think the *real* fix would be a type-based one. Don't do
+
+        iov_iter_kvec(&iter, ITER_DEST, ...
+
+at all, but instead have two different kinds of 'struct iov_iter': one
+as a destination (iov_iter_dst), and one as a source (iov_iter_src),
+and then just force all the use-cases to use the right version. The
+actual *underlying" struct could still be the same
+(iov_iter_implementation), but you'd force people to always use the
+right version - kind of the same way a 'const void *' is always a
+source, and a 'void *' is always a destination for things like memcpy.
+
+That would catch mis-uses much earlier.
+
+That would also make the patch much bigger, but I do think 99.9% of
+all users are very distinct. When you pass a iter source around, that
+'iov_iter_src' is basically *always* a source of the data through the
+whole call-chain. No?
+
+Maybe I'm 100% wrong and that type-based one has some fundamental
+problem in it, but it really feels to me like your dynamic WARN_ON()
+calls in 11/12 could have been type-based. Because they are entirely
+static based on 'data_source'.
+
+In fact, in a perfect world, 'data_source' as a dynamic flag goes away
+entirely, and becomes the compile-time static type. If anything really
+needs to change the data_source, it would be done as an inline
+function that does a type-cast instead.
+
+And yes, yes, I'm sure we have lots of code that currently is of the
+type "just pass it an iov_iter, and depending on data_source it does
+something different. I'm looking at __blkdev_direct_IO_simple(), which
+seems to be exactly that. So I guess the whole "->direct_IO interface
+breaks this, because - as usual - DIRECT_IO is a steaming pile of sh*t
+that couldn't do separate read/write functions, but had to be
+"special".
+
+Oh well.
+
+I still think that a type-based interface would be better, maybe
+together with the bad paths having a "iov_iter_confused" thing that
+then needs the runtime checking of ->data_source (aka iov_iter_rw()).
+But maybe DIRECT_IO isn't the only thing that thought that it's a good
+idea to use the same function for both reads and writes.
+
+                         Linus
