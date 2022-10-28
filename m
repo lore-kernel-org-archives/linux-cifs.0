@@ -2,31 +2,31 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 282B6FA3746
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 02:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751E6FA3747
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 02:34:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236281AbiJ1CeT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Oct 2022 22:34:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46422 "EHLO
+        id S236284AbiJ1CeU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Oct 2022 22:34:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235884AbiJ1CeP (ORCPT
+        with ESMTP id S236191AbiJ1CeP (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 22:34:15 -0400
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CEE2BCBAE;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3E31BD066;
         Thu, 27 Oct 2022 19:34:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=2hrSO3obB1hPkB2I0g2avezDzM2fxuFWF0A6F6V6oiI=; b=Njb6lBV8/KytFxKCtx4nRVXc9F
-        kg32OMF1Dar/iY6MkQvzhWxWZtBBEFetkJQxWiAiI/owJl+iRKMz5cOL5TqFy2mRFA1DzuzA2r/S6
-        LP5e5IEPI+ERoRpojDceUxwo8DfhigLXuHI4eio7JFbAM5SUuG23YpV/Ss0TTIM5MpAvJM7n6ARpg
-        6JtR8E6iGH4bZNs1mZpch6H3+d4gSj7PMw8UH3NDV/1vbHj6CN2uwV9yB21pC4o8JtEPVCqQLg5Vf
-        Qg0u3NufIClP+vM5uoUQsaK8LEJYGdcCnv0j04wGYT/QOpm1vEAMIbO8DE1HH+FEsJvhjaV3nNwJb
-        1244xkZQ==;
+        bh=N6G1IQbSL3QFHBqs64iGhqHUAjBWLKtVAexavconcSw=; b=CtU1YRnEKtVxQzp9T0NecJp8Lq
+        ktl2hWUsNU7iTHYudZAUs1x0vgpcyXrrVT2TpBNQ04AhuyYeK0BIBw8Q/P9thND2PJbR0f+4vuuxs
+        dJOGMMeu4z+Yw8mXi8VAM3zFBNUpOdUVn0NcQhKt8j+9Bp/z2CoE8oYwkSMQzzwGBEHn1DOY/fZdQ
+        ALcvx9ECVbSy6sMcKCUi7Mqlf6V/HuiR0o28bKz9zGjpZAI/JmnTEcZVfh0MdzbSowX2RI24G3Scd
+        TvEhlAVxbLs+HSG4GBrCD1W9BhV7+Mo0hELW4K0lSQFlJqsxAZKLf1gON1Sak0yddJcoHJTl9WZmu
+        o9H1cKXA==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1ooFBw-00EorB-1H;
-        Fri, 28 Oct 2022 02:33:52 +0000
+        id 1ooFBw-00EorH-3A;
+        Fri, 28 Oct 2022 02:33:53 +0000
 From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     David Howells <dhowells@redhat.com>, willy@infradead.org,
@@ -37,9 +37,9 @@ Cc:     David Howells <dhowells@redhat.com>, willy@infradead.org,
         Ira Weiny <ira.weiny@intel.com>, torvalds@linux-foundation.org,
         linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 02/12] csum_and_copy_to_iter(): handle ITER_DISCARD
-Date:   Fri, 28 Oct 2022 03:33:42 +0100
-Message-Id: <20221028023352.3532080-2-viro@zeniv.linux.org.uk>
+Subject: [PATCH v2 05/12] [infiniband] READ is "data destination", not source...
+Date:   Fri, 28 Oct 2022 03:33:45 +0100
+Message-Id: <20221028023352.3532080-5-viro@zeniv.linux.org.uk>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
 References: <Y1btOP0tyPtcYajo@ZenIV>
@@ -51,34 +51,24 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Not hard to implement - we are not copying anything here, so
-csum_and_memcpy() is not usable, but calculating a checksum
-of source directly is trivial...
-
 Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- lib/iov_iter.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/infiniband/ulp/rtrs/rtrs-clt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index e9a8fc9ee8ee..020e009d71c5 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1549,8 +1549,12 @@ size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *_csstate,
- 	__wsum sum, next;
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+index 8546b8816524..88282b288abd 100644
+--- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
++++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+@@ -966,7 +966,7 @@ static void rtrs_clt_init_req(struct rtrs_clt_io_req *req,
+ 	refcount_set(&req->ref, 1);
+ 	req->mp_policy = clt_path->clt->mp_policy;
  
- 	if (unlikely(iov_iter_is_discard(i))) {
--		WARN_ON(1);	/* for now */
--		return 0;
-+		// can't use csum_memcpy() for that one - data is not copied
-+		csstate->csum = csum_block_add(csstate->csum,
-+					       csum_partial(addr, bytes, 0),
-+					       csstate->off);
-+		csstate->off += bytes;
-+		return bytes;
- 	}
+-	iov_iter_kvec(&iter, READ, vec, 1, usr_len);
++	iov_iter_kvec(&iter, WRITE, vec, 1, usr_len);
+ 	len = _copy_from_iter(req->iu->buf, usr_len, &iter);
+ 	WARN_ON(len != usr_len);
  
- 	sum = csum_shift(csstate->csum, csstate->off);
 -- 
 2.30.2
 
