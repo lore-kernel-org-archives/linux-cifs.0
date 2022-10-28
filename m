@@ -2,31 +2,31 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18498ECAAA1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C19FDFA373D
 	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 02:34:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234327AbiJ1CeO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Oct 2022 22:34:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46388 "EHLO
+        id S236021AbiJ1CeP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Oct 2022 22:34:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235291AbiJ1CeO (ORCPT
+        with ESMTP id S235011AbiJ1CeO (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Oct 2022 22:34:14 -0400
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABEB8BCBAE;
-        Thu, 27 Oct 2022 19:34:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 824A4BD066;
+        Thu, 27 Oct 2022 19:34:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=linux.org.uk; s=zeniv-20220401; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=ePAnUqBsHfpEZfy8Hk6sJVchTl2kYrXoUq+WAcUoWDA=; b=ZNZOHoy8NsrV2R7T2RHyOEnnLO
-        El93uHcdcPtvooH/1/jUJkhref5Yzh5UUxmkjA8e0CzFFGms4qY80y3yHqrotbI2ObZznWKryK3W8
-        lvqZOVHceYpxEm24dCbauiXa0BpHEXDgelJRsw1tbSeowLk+UiH43/8BBPikOcVroWqUkToS6snx3
-        gMr3bs/XQ70IzefyXBqOO0ri4+MoK3C8swTqXFe0U/K2UkoGSyxoiAzEpoVNHbw/cnv11KvRnpJZ5
-        lmIOUlcr6mxlYpgDkjvFatgSAkzgOjo2/RgTXwm2oULj9LGklOJ6uDFNU1J0XP9JV+pFhGUGurXYh
-        mE4k0MdA==;
+        bh=XqHWRNjUt4tG/e2ha8c09UQVeYjgv4/bV2k/DIadbAM=; b=OqT2ghPE8GI5jOcVDF74x4+jHy
+        GSl0Qqs3Tn5Zoe+5jPI5E+E/OrVXEiRk5hf3SID0TnX0DWD8fhlYV1wh71ZX63cLYr77uL8H8vPa1
+        NsxhCYaihzbl2X9iUTgnv9+WHFXQljWbN/hxbmHvXe3583HstUARSgXMw4MOmxkFaeCOdd+j4qHcl
+        SD3yfp7wHA1iK3OVOvoOncl+mE0etpCUTQjxnn/1k/aqtXzvWnKVQP9XxzFsuyGLxWYf+nlEBLhKA
+        Y7KEfV7T3PTfEaSeCUi6fl9QH/oO8GSNlg11NbPpTdRV9Pzjfy/c86udixG5GCtkljODRYv8QMcU+
+        f5zfSDRA==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1ooFBx-00EorN-1f;
-        Fri, 28 Oct 2022 02:33:53 +0000
+        id 1ooFBw-00EorF-2W;
+        Fri, 28 Oct 2022 02:33:52 +0000
 From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     David Howells <dhowells@redhat.com>, willy@infradead.org,
@@ -37,9 +37,9 @@ Cc:     David Howells <dhowells@redhat.com>, willy@infradead.org,
         Ira Weiny <ira.weiny@intel.com>, torvalds@linux-foundation.org,
         linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 08/12] [target] fix iov_iter_bvec() "direction" argument
-Date:   Fri, 28 Oct 2022 03:33:48 +0100
-Message-Id: <20221028023352.3532080-8-viro@zeniv.linux.org.uk>
+Subject: [PATCH v2 04/12] [fsi] WRITE is "data source", not destination...
+Date:   Fri, 28 Oct 2022 03:33:44 +0100
+Message-Id: <20221028023352.3532080-4-viro@zeniv.linux.org.uk>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
 References: <Y1btOP0tyPtcYajo@ZenIV>
@@ -53,31 +53,40 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- drivers/target/target_core_file.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/fsi/fsi-sbefifo.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/target/target_core_file.c b/drivers/target/target_core_file.c
-index 28aa643be5d5..55935040541b 100644
---- a/drivers/target/target_core_file.c
-+++ b/drivers/target/target_core_file.c
-@@ -337,7 +337,7 @@ static int fd_do_rw(struct se_cmd *cmd, struct file *fd,
- 		len += sg->length;
+diff --git a/drivers/fsi/fsi-sbefifo.c b/drivers/fsi/fsi-sbefifo.c
+index 5f93a53846aa..efd4942aa043 100644
+--- a/drivers/fsi/fsi-sbefifo.c
++++ b/drivers/fsi/fsi-sbefifo.c
+@@ -659,7 +659,7 @@ static void sbefifo_collect_async_ffdc(struct sbefifo *sbefifo)
  	}
+         ffdc_iov.iov_base = ffdc;
+ 	ffdc_iov.iov_len = SBEFIFO_MAX_FFDC_SIZE;
+-        iov_iter_kvec(&ffdc_iter, WRITE, &ffdc_iov, 1, SBEFIFO_MAX_FFDC_SIZE);
++        iov_iter_kvec(&ffdc_iter, READ, &ffdc_iov, 1, SBEFIFO_MAX_FFDC_SIZE);
+ 	cmd[0] = cpu_to_be32(2);
+ 	cmd[1] = cpu_to_be32(SBEFIFO_CMD_GET_SBE_FFDC);
+ 	rc = sbefifo_do_command(sbefifo, cmd, 2, &ffdc_iter);
+@@ -756,7 +756,7 @@ int sbefifo_submit(struct device *dev, const __be32 *command, size_t cmd_len,
+ 	rbytes = (*resp_len) * sizeof(__be32);
+ 	resp_iov.iov_base = response;
+ 	resp_iov.iov_len = rbytes;
+-        iov_iter_kvec(&resp_iter, WRITE, &resp_iov, 1, rbytes);
++        iov_iter_kvec(&resp_iter, READ, &resp_iov, 1, rbytes);
  
--	iov_iter_bvec(&iter, READ, bvec, sgl_nents, len);
-+	iov_iter_bvec(&iter, is_write, bvec, sgl_nents, len);
- 	if (is_write)
- 		ret = vfs_iter_write(fd, &iter, &pos, 0);
- 	else
-@@ -473,7 +473,7 @@ fd_execute_write_same(struct se_cmd *cmd)
- 		len += se_dev->dev_attrib.block_size;
- 	}
+ 	/* Perform the command */
+ 	rc = mutex_lock_interruptible(&sbefifo->lock);
+@@ -839,7 +839,7 @@ static ssize_t sbefifo_user_read(struct file *file, char __user *buf,
+ 	/* Prepare iov iterator */
+ 	resp_iov.iov_base = buf;
+ 	resp_iov.iov_len = len;
+-	iov_iter_init(&resp_iter, WRITE, &resp_iov, 1, len);
++	iov_iter_init(&resp_iter, READ, &resp_iov, 1, len);
  
--	iov_iter_bvec(&iter, READ, bvec, nolb, len);
-+	iov_iter_bvec(&iter, WRITE, bvec, nolb, len);
- 	ret = vfs_iter_write(fd_dev->fd_file, &iter, &pos, 0);
- 
- 	kfree(bvec);
+ 	/* Perform the command */
+ 	rc = mutex_lock_interruptible(&sbefifo->lock);
 -- 
 2.30.2
 
