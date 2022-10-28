@@ -2,87 +2,210 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB7FC38A02
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 06:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DF3ECAAA1
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 06:52:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbiJ1Gv0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Oct 2022 02:51:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41576 "EHLO
+        id S229515AbiJ1GwO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Oct 2022 02:52:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229954AbiJ1GvH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 02:51:07 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97AC3311
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Oct 2022 23:48:59 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id k2so10821630ejr.2
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Oct 2022 23:48:59 -0700 (PDT)
+        with ESMTP id S230013AbiJ1GwE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 02:52:04 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2DEC101EF;
+        Thu, 27 Oct 2022 23:52:02 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id d6so6756922lfs.10;
+        Thu, 27 Oct 2022 23:52:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+8ARi2+LX6G6+XaZ70/KDk0kszqeePg7SQfaQ1kVMHA=;
-        b=H8W6rLucnvRn9f7iNFB/CMMQ72GbNDQN76kUMiBAcC5N8IkeU8Jw93F/qrvmaGxo4Z
-         BUHYJXqpuFusEPBp7IYubmFW9Y1QSthjqmrbPka2ASz/o8QhYKiIqoJPKnC4Me+hhZKK
-         lih1mTmK9xraFzSIN+lMDitVQGTqgXJ3d7gS3xfxr9PewHmUhG5tEpbWSmhs/oKNibTk
-         lAXvDm2hYTNCTZ2IcTFRMB90Ig+sf2mbvlh5j0VbveJtVlDkegr3UxEfsX7mrPS76PRt
-         1HmXT4Gp2cEVu97lRcb/JB0/ZYpMcb+kSrovUheXkPd/Mw9dgpbw4G8qoGXJx4aPf0zX
-         inGA==
+        bh=Gs4Nw3TorDT8ueT7qP3f5rmMZ2nJoqgVxN+G5n/Vf5c=;
+        b=fSUOkyKVCXMtimE8+bPYbGoX8LbXu7eHsP+MX91yLr4uFG3i5d3CxLW8sMP8EIUnsy
+         7z5VQ8DCcRXIqxDCzgZBaE2QGLPVeTGCSQT35j4DdJTSuZ7RZZjZssBkjBXzcPELOd8d
+         YZHFzkscuDx7TfCwML6L7Q+z45N6blaktzaxuPYTuCRm2evmbwxYgnCAZXku0SDrEesL
+         bJfS0r91BEqjrFQu85bY6sztV9jNRfjzMQYeLsCOlX9jYHA6RhD4SeHcjHGjf59Ff82K
+         G4UrK1QLyGuFTaxS77wKxJdBZ6eW2y8QroZy1qZXSLzV0x9lKeBLJt9k3duBbYPO/cTX
+         8ulw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+8ARi2+LX6G6+XaZ70/KDk0kszqeePg7SQfaQ1kVMHA=;
-        b=wffh9MLqQxftLmkKtNsGeRyo5QezFwb3ite3q2XKXy3Ym53+8/xqLl1S6OeRLW+Ni2
-         GZ+uV+uOUaY4uMYaxn3trFB/izPgYFOp6ZT2xx2B5BFDVc6WdIjEMfOFDcjkqmdIC7dE
-         eBmf8n6P7qVVTCFHXE+nA8bvKBlxyV0B85QXPwHctPb3Jo6g/FVLc3PquHxfWm6mkFfb
-         +veIfh5NAukZWQr1c+Xoj4nkLTMiaIwCt4dQwuYDoalmln91/XxF13F5ydqEbKQlvvuQ
-         YR1tPwQOzLtHxPbp1vzLayJLQkWDzyD/dcV2z+MYcJHZ7dS6fxnUfW6ADRQGL1DFzJ+T
-         2vEg==
-X-Gm-Message-State: ACrzQf26xtTMtduRZkTnrAK0kBi/R4JNesq26io/MU2cNpxkNRMWFq8E
-        u0MXLe7ty+7TyJH26uPWtVPDqhorLEPOjgN8nxtNP3t2
-X-Google-Smtp-Source: AMsMyM41HDTUuPRYsqDSv/+LQVLi+LQ3PI81gV31n3Ipb7J3tlYNHgO6cvU8e6Vhn7+hT+Y7lsMC3CqQAxJ0dPih9hc=
-X-Received: by 2002:a17:907:1de6:b0:7a5:ea4b:ddbb with SMTP id
- og38-20020a1709071de600b007a5ea4bddbbmr24600009ejc.757.1666939738067; Thu, 27
- Oct 2022 23:48:58 -0700 (PDT)
+        bh=Gs4Nw3TorDT8ueT7qP3f5rmMZ2nJoqgVxN+G5n/Vf5c=;
+        b=rm5+2sRPWa6hrGSnWKv85i6hm4w85y6GWkOF0SXHcU8XdSJkFFFXzhPo1hHp5k3m+a
+         P0V3qKGEpYkMaB+f7OhqsQ2YhgJSKWel4PgsgOrOW5Ps+imPVlXlcVe00x7pemmnjMZ7
+         0AwgbLmwnJiVLNDfS8J6JJLdjR6G1IwMnDHPi/23eZhKIzz3Y4OZED91dEqONYunqIti
+         nI0zblRRDvupKyPn273vRdiydp7Zs+nHxkaJaiyyGLM7BZm0z/WbnpIHfayTHzrIHrhM
+         DZGdxiHSoogpddK22SgC224tjL1Mt8YtTMqJujm5opoS6VRdGcheYSQYY6Ef1l43t/gd
+         fTFg==
+X-Gm-Message-State: ACrzQf2c82omBPy8HNDaNOslCDcdTlXqv6wlDqiSgSAE8m6XsO9th6UA
+        8lJtPGVYcE7doiNw+MtK2ogPLkOIc4K7m3A02aU=
+X-Google-Smtp-Source: AMsMyM6uaHZ7WZBI2PJSJdKl7lRWeiM+fC5b8O14doKAGYJHJStfURBic60XzGqiUt0dXrnUQABcFW0vp42fNRM0GGo=
+X-Received: by 2002:ac2:5f97:0:b0:4b0:144:a243 with SMTP id
+ r23-20020ac25f97000000b004b00144a243mr2143762lfe.394.1666939920919; Thu, 27
+ Oct 2022 23:52:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5muCMfv4HuPw6sEgKj3Ude3cz+-NRdxDXpJr3CNtUAnm7A@mail.gmail.com>
-In-Reply-To: <CAH2r5muCMfv4HuPw6sEgKj3Ude3cz+-NRdxDXpJr3CNtUAnm7A@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 28 Oct 2022 16:48:45 +1000
-Message-ID: <CAN05THQ_C_mqq-S69f53EZQUxB2Q3rNrnVU-vRH_6kt=M0-Uwg@mail.gmail.com>
-Subject: Re: [PATCH][SMB3 client] fix oplock breaks when using multichannel
+References: <20221027124528.2487025-1-zengheng4@huawei.com> <CAH2r5mu2-jfhFBTJDf8Td7yF5e4QEJbG85wVpxyePK1q8bMjAg@mail.gmail.com>
+In-Reply-To: <CAH2r5mu2-jfhFBTJDf8Td7yF5e4QEJbG85wVpxyePK1q8bMjAg@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Fri, 28 Oct 2022 12:21:49 +0530
+Message-ID: <CANT5p=qBFdFB84xh=6WQtdYhAKhrXaF09Py=bn8eGgoS3jhqtA@mail.gmail.com>
+Subject: Re: [PATCH v4] cifs: fix use-after-free caused by invalid pointer `hostname`
 To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@samba.org>
+Cc:     Zeng Heng <zengheng4@huawei.com>, sfrench@samba.org,
+        tom@talpey.com, sprasad@microsoft.com, pc@cjr.nz,
+        lsahlber@redhat.com, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        liwei391@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 28 Oct 2022 at 16:25, Steve French <smfrench@gmail.com> wrote:
+On Fri, Oct 28, 2022 at 11:29 AM Steve French <smfrench@gmail.com> wrote:
 >
-> If a mount to a server is using multichannel, an oplock break arriving
-> on a secondary channel won't find the open file (since it won't find the
-> tcon for it), and this will cause each oplock break on secondary channels
-> to time out, slowing performance drastically.
+> merged into cifs-2.6 for-next
 >
-> Fix smb2_is_valid_oplock_break so that if it is a secondary channel and
-> an oplock break was not found, check for tcons (and the files hanging
-> off the tcons) on the primary channel.
-
-Does this also happen against windows or is is only against ksmbd this triggers?
-What does MS-SMB2.pdf say about channels and oplocks?
-
+> thx
 >
-> Fixes xfstest generic/013 to ksmbd
->
-> Cc: <stable@vger.kernel.org>
+> On Thu, Oct 27, 2022 at 7:49 AM Zeng Heng <zengheng4@huawei.com> wrote:
+> >
+> > `hostname` needs to be set as null-pointer after free in
+> > `cifs_put_tcp_session` function, or when `cifsd` thread attempts
+> > to resolve hostname and reconnect the host, the thread would deref
+> > the invalid pointer.
+> >
+> > Here is one of practical backtrace examples as reference:
+> >
+> > Task 477
+> > ---------------------------
+> >  do_mount
+> >   path_mount
+> >    do_new_mount
+> >     vfs_get_tree
+> >      smb3_get_tree
+> >       smb3_get_tree_common
+> >        cifs_smb3_do_mount
+> >         cifs_mount
+> >          mount_put_conns
+> >           cifs_put_tcp_session
+> >           --> kfree(server->hostname)
+> >
+> > cifsd
+> > ---------------------------
+> >  kthread
+> >   cifs_demultiplex_thread
+> >    cifs_reconnect
+> >     reconn_set_ipaddr_from_hostname
+> >     --> if (!server->hostname)
+> >     --> if (server->hostname[0] == '\0')  // !! UAF fault here
+> >
+> > CIFS: VFS: cifs_mount failed w/return code = -112
+> > mount error(112): Host is down
+> > BUG: KASAN: use-after-free in reconn_set_ipaddr_from_hostname+0x2ba/0x310
+> > Read of size 1 at addr ffff888108f35380 by task cifsd/480
+> > CPU: 2 PID: 480 Comm: cifsd Not tainted 6.1.0-rc2-00106-gf705792f89dd-dirty #25
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+> > Call Trace:
+> >  <TASK>
+> >  dump_stack_lvl+0x68/0x85
+> >  print_report+0x16c/0x4a3
+> >  kasan_report+0x95/0x190
+> >  reconn_set_ipaddr_from_hostname+0x2ba/0x310
+> >  __cifs_reconnect.part.0+0x241/0x800
+> >  cifs_reconnect+0x65f/0xb60
+> >  cifs_demultiplex_thread+0x1570/0x2570
+> >  kthread+0x2c5/0x380
+> >  ret_from_fork+0x22/0x30
+> >  </TASK>
+> > Allocated by task 477:
+> >  kasan_save_stack+0x1e/0x40
+> >  kasan_set_track+0x21/0x30
+> >  __kasan_kmalloc+0x7e/0x90
+> >  __kmalloc_node_track_caller+0x52/0x1b0
+> >  kstrdup+0x3b/0x70
+> >  cifs_get_tcp_session+0xbc/0x19b0
+> >  mount_get_conns+0xa9/0x10c0
+> >  cifs_mount+0xdf/0x1970
+> >  cifs_smb3_do_mount+0x295/0x1660
+> >  smb3_get_tree+0x352/0x5e0
+> >  vfs_get_tree+0x8e/0x2e0
+> >  path_mount+0xf8c/0x1990
+> >  do_mount+0xee/0x110
+> >  __x64_sys_mount+0x14b/0x1f0
+> >  do_syscall_64+0x3b/0x90
+> >  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> > Freed by task 477:
+> >  kasan_save_stack+0x1e/0x40
+> >  kasan_set_track+0x21/0x30
+> >  kasan_save_free_info+0x2a/0x50
+> >  __kasan_slab_free+0x10a/0x190
+> >  __kmem_cache_free+0xca/0x3f0
+> >  cifs_put_tcp_session+0x30c/0x450
+> >  cifs_mount+0xf95/0x1970
+> >  cifs_smb3_do_mount+0x295/0x1660
+> >  smb3_get_tree+0x352/0x5e0
+> >  vfs_get_tree+0x8e/0x2e0
+> >  path_mount+0xf8c/0x1990
+> >  do_mount+0xee/0x110
+> >  __x64_sys_mount+0x14b/0x1f0
+> >  do_syscall_64+0x3b/0x90
+> >  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> > The buggy address belongs to the object at ffff888108f35380
+> >  which belongs to the cache kmalloc-16 of size 16
+> > The buggy address is located 0 bytes inside of
+> >  16-byte region [ffff888108f35380, ffff888108f35390)
+> > The buggy address belongs to the physical page:
+> > page:00000000333f8e58 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888108f350e0 pfn:0x108f35
+> > flags: 0x200000000000200(slab|node=0|zone=2)
+> > raw: 0200000000000200 0000000000000000 dead000000000122 ffff8881000423c0
+> > raw: ffff888108f350e0 000000008080007a 00000001ffffffff 0000000000000000
+> > page dumped because: kasan: bad access detected
+> > Memory state around the buggy address:
+> >  ffff888108f35280: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+> >  ffff888108f35300: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+> > >ffff888108f35380: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
+> >                    ^
+> >  ffff888108f35400: fa fb fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> >  ffff888108f35480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> >
+> > Fixes: 7be3248f3139 ("cifs: To match file servers, make sure the server hostname matches")
+> > Signed-off-by: Zeng Heng <zengheng4@huawei.com>
+> > Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+> > ---
+> > changes in v4:
+> >  - correct fix tag
+> >  - add reviewed-by
+> > ---
+> >  fs/cifs/connect.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> > index ffb291579bb9..1cc47dd3b4d6 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -1584,6 +1584,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+> >         server->session_key.response = NULL;
+> >         server->session_key.len = 0;
+> >         kfree(server->hostname);
+> > +       server->hostname = NULL;
+> >
+> >         task = xchg(&server->tsk, NULL);
+> >         if (task)
+> > --
+> > 2.25.1
+> >
 >
 >
 > --
 > Thanks,
 >
 > Steve
+
+What I mean is something like this:
+https://github.com/sprasad-microsoft/smb3-kernel-client/commit/07abfbeb01d3cb8d55d76c1937bd4cde46063e5d.patch
+
+-- 
+Regards,
+Shyam
