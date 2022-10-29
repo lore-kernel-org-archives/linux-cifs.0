@@ -2,103 +2,141 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C639ECAAA1
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Oct 2022 20:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAC4FA3741
+	for <linux-cifs@archiver.kernel.org>; Sat, 29 Oct 2022 02:29:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbiJ1UeZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Oct 2022 16:34:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42990 "EHLO
+        id S229549AbiJ2C3l (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Oct 2022 22:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbiJ1UeY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 16:34:24 -0400
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D5C22C443
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 13:34:23 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id 8so4231366qka.1
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 13:34:23 -0700 (PDT)
+        with ESMTP id S229500AbiJ2C3k (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 22:29:40 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C26B1ED
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 19:29:36 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id x21so9086045ljg.10
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 19:29:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
+        d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5JcJ09bBdlBVf21xZKuOSzNCt5BJDxCAWw6Qi6m3gKQ=;
-        b=hU743kZXYxAVHQ1EsSBvl3ayRYEjnGCLfaHZ8Jv5OOMADfUvRRqwIase4PKYUcaJ3E
-         INbfDZi9n0Q5pnuXHtRhyGvyX40BjYI+eGMAw+5rMraVeCJayNAIOiRRhBR82dlGAo05
-         /mVa5vBjROjk9lw+ojylUbMmMrQmNGOeXMwBU=
+        bh=n8tIfqWEOPRBzho+gVFWuwRL5jdGfDOJGX4WEWNGNsE=;
+        b=PncvGDTX9sMpQxR0RyF2w7sheO72+sLHpQHG3d0W9DRB9qLM5dfRPIWyf6SUl73U3W
+         coF9/eL4+hfZamD9L9QcwS0bpJFMslJEAnZK1xbD/Ka/nFQjwlltTAHQ6Ond+dj/XO9D
+         fdM3j86hiU8yCLP4M2rMtLVaUeuU3yg0bRPIWyX6sgKqr3qZJkW7cx82qK4e9ww3DCPv
+         LLVbuauVnVJpf3ItU9Dixre7wgo2iscMPTValcVGd0eRyzPoCyiBbPAnPziLUuDeSA1O
+         JRZuv1Umq+4J+okJsSO87dmPC0rJ9bU9e1K1cruINkcBQfJ1HJ4a/q8W6OVKDi2Dkf8D
+         oonQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5JcJ09bBdlBVf21xZKuOSzNCt5BJDxCAWw6Qi6m3gKQ=;
-        b=DMoTElii7JUSXtX8k3bSYm5m3oCdBNHPDtnc7gxzMU1Gj4KIH46zfhZj92kuCbIKhz
-         AVTkUWlLUEgrIRBWTjW0BiqIQ+hBgNx33gv/ah12qUuG7Fh4K3pKtjvUU3IjPG+nWhFB
-         xHs7UwqTMHUZmTzACVGFAQhED5LA9BAUSrkeytbMvLudMDx1JZurDmbFW9a+UYWs+V7B
-         luCBJKZXBqzWdXkvVHHrJU38OVH2xU8oFKto6YMNASKLf8BGquq+uxAVYCCTijV20BG8
-         VonK56AksE3kX8ATI392VyAOPD0DtzRzbINWm+XoXH4PWXhfOULHRtsV+4FUh5bo6iev
-         WS0g==
-X-Gm-Message-State: ACrzQf0K3kPhlUNFqzZmna5S0QTCQwPivikd1DDvMhapuBcbQby8cCft
-        OBOKuXBZ9CG5huHYER/12hpg6ld5AEi26Q==
-X-Google-Smtp-Source: AMsMyM5XhHUOm8MLCo41cVe6SYdd0Lz3+uub6R3q7nXrRmzEkX9y/7AeaKtuXXbV8oLBoEc3DN4qoQ==
-X-Received: by 2002:a37:a48:0:b0:6fa:46e:d075 with SMTP id 69-20020a370a48000000b006fa046ed075mr877207qkk.45.1666989262665;
-        Fri, 28 Oct 2022 13:34:22 -0700 (PDT)
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com. [209.85.219.170])
-        by smtp.gmail.com with ESMTPSA id bb11-20020a05622a1b0b00b0035d08c1da35sm2863472qtb.45.2022.10.28.13.34.21
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Oct 2022 13:34:21 -0700 (PDT)
-Received: by mail-yb1-f170.google.com with SMTP id f205so7436307yba.2
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Oct 2022 13:34:21 -0700 (PDT)
-X-Received: by 2002:a5b:984:0:b0:6ca:9345:b2ee with SMTP id
- c4-20020a5b0984000000b006ca9345b2eemr931629ybq.362.1666989261347; Fri, 28 Oct
- 2022 13:34:21 -0700 (PDT)
+        bh=n8tIfqWEOPRBzho+gVFWuwRL5jdGfDOJGX4WEWNGNsE=;
+        b=b1VVUDKn452R65cNeEpVHqNB+wWziuUNFNyflV1RNjuB7N1PC4gSKcw6LpEPKvk7Lv
+         cs4jKaQ65gGXsOYiz8ZLhdjPJSUJlH5QvcxApf8iYsxoHijepBGIvnXHJtyjYG7jChJQ
+         iaWG+O4Umk3e9i7eFWO5ffaHlOuG+DH7RUf/FXz4lC0jxLzt4euMb4O5fJ8xYJ4phNVR
+         M50P6DAbKCE2DXy1EJdwd7jp00lVCglUSFiWJljnUq6I48elx4AKbBdbRvtpTv55AQif
+         IvGD0x3x//MGzBAbolyUwquFoXeYRwPo7sltzceNZf6ZcPnnl1wOWkDaVuIdJ0dJ1G8B
+         3vcw==
+X-Gm-Message-State: ACrzQf2dxp6abbCugAcdtiMFKE7gZd/p3W51enp0sv4ho0BPVVsRnMPu
+        ANaPvRswtSXFosRmxAHnhoOaOu17ule7D4tWLR8=
+X-Google-Smtp-Source: AMsMyM7Xs09p7vEXEXTUdlfmMAJJzGwzoSkUY76sMkG5qlb0flsYJMLYevJsp061gDK0EHnLZzxXPo6OT+gcdm3MHzM=
+X-Received: by 2002:a05:651c:199e:b0:26f:e45a:5ece with SMTP id
+ bx30-20020a05651c199e00b0026fe45a5ecemr996172ljb.430.1667010574717; Fri, 28
+ Oct 2022 19:29:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <Y1btOP0tyPtcYajo@ZenIV> <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
- <20221028023352.3532080-12-viro@zeniv.linux.org.uk> <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
- <Y1wOR7YmqK8iBYa8@ZenIV> <CAHk-=wi_iDAugqFZxTiscsRCNbtARMFiugWtBKO=NqgM-vCVAQ@mail.gmail.com>
- <Y1wt7uzL7vkBQ6Vm@ZenIV>
-In-Reply-To: <Y1wt7uzL7vkBQ6Vm@ZenIV>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 28 Oct 2022 13:34:05 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj4ndvhOFFsnNXRmwetwL9ZxE2QzcrLFTeJ7Yfh+pJ7Mw@mail.gmail.com>
-Message-ID: <CAHk-=wj4ndvhOFFsnNXRmwetwL9ZxE2QzcrLFTeJ7Yfh+pJ7Mw@mail.gmail.com>
-Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction initializers
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        David Howells <dhowells@redhat.com>, willy@infradead.org,
-        dchinner@redhat.com, Steve French <smfrench@gmail.com>,
+References: <CAH2r5muCMfv4HuPw6sEgKj3Ude3cz+-NRdxDXpJr3CNtUAnm7A@mail.gmail.com>
+ <CAN05THQ_C_mqq-S69f53EZQUxB2Q3rNrnVU-vRH_6kt=M0-Uwg@mail.gmail.com>
+ <CAH2r5mu5cTX2gWhoyUBbkLeTtJeVvOH0vn_j_5DNwQ2__Rh38w@mail.gmail.com>
+ <CAN05THRpHkXnx8NqjdEb=4BcxwsK7u+jYDSTEHdHXX_c5OZmYg@mail.gmail.com>
+ <CAN05THSBzu7fgXSybe4isLGPRYxWLkZDZb_Lmox3TneAQfVP=g@mail.gmail.com> <CAKYAXd8OwkEt=fJZrtooba_OYorBt4kEg68DrLJN=0OjQhkrjQ@mail.gmail.com>
+In-Reply-To: <CAKYAXd8OwkEt=fJZrtooba_OYorBt4kEg68DrLJN=0OjQhkrjQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 28 Oct 2022 21:29:23 -0500
+Message-ID: <CAH2r5mt08V-RQa8=apT-fAqXxQtKkj_9XNSMFvUBm=da-UMyCg@mail.gmail.com>
+Subject: Re: [PATCH][SMB3 client] fix oplock breaks when using multichannel
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 12:30 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+thx for testing this  - Shyam's fix for it looks promising (needs
+review though and some testing)
+
+On Fri, Oct 28, 2022 at 5:30 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
 >
-> Went through the callers, replaced each with the right ITER_... (there's
-> not that many of them and they are fairly easy to review), then went
-> through mismatches and split their fixups into the beginning of the
-> series (READ -> ITER_SOURCE becoming READ -> WRITE -> ITER_SOURCE, that
-> is).
+> 2022-10-28 18:19 GMT+09:00, ronnie sahlberg <ronniesahlberg@gmail.com>:
+> > On Fri, 28 Oct 2022 at 16:55, ronnie sahlberg <ronniesahlberg@gmail.com>
+> > wrote:
+> >>
+> >> On Fri, 28 Oct 2022 at 16:53, Steve French <smfrench@gmail.com> wrote:
+> >> >
+> >> > I haven't tried a scenario to windows where we turn off leases and force
+> >> > server to use oplocks but with ksmbd that is the default.
+> >> > Worth also investigating how primary vs secondary works for finding
+> >> > leases for windows case
+> >>
+> >> Yes. Until we know what/how windows does things and what ms-smb2.pdf
+> >> says  we can not know if this is a cifs client bug or a ksmbd bug.
+> >
+> > So lets wait with this patch until we know where the bug is.
+> > I will review it later for locking correctness, but lets make sure it
+> > is not a ksmbd bug first.
+> We can reproduce it against samba with the following parameters.
+>
+> server multi channel support = yes
+> oplock break wait time = 35000
+> smb2 leases = no
+>
+> >
+> >
+> >>
+> >>
+> >> >
+> >> > On Fri, Oct 28, 2022, 01:48 ronnie sahlberg <ronniesahlberg@gmail.com>
+> >> > wrote:
+> >> >>
+> >> >> On Fri, 28 Oct 2022 at 16:25, Steve French <smfrench@gmail.com> wrote:
+> >> >> >
+> >> >> > If a mount to a server is using multichannel, an oplock break
+> >> >> > arriving
+> >> >> > on a secondary channel won't find the open file (since it won't find
+> >> >> > the
+> >> >> > tcon for it), and this will cause each oplock break on secondary
+> >> >> > channels
+> >> >> > to time out, slowing performance drastically.
+> >> >> >
+> >> >> > Fix smb2_is_valid_oplock_break so that if it is a secondary channel
+> >> >> > and
+> >> >> > an oplock break was not found, check for tcons (and the files
+> >> >> > hanging
+> >> >> > off the tcons) on the primary channel.
+> >> >>
+> >> >> Does this also happen against windows or is is only against ksmbd this
+> >> >> triggers?
+> >> >> What does MS-SMB2.pdf say about channels and oplocks?
+> >> >>
+> >> >> >
+> >> >> > Fixes xfstest generic/013 to ksmbd
+> >> >> >
+> >> >> > Cc: <stable@vger.kernel.org>
+> >> >> >
+> >> >> >
+> >> >> > --
+> >> >> > Thanks,
+> >> >> >
+> >> >> > Steve
+> >
 
-Oh, ok. So if you've actually reviewed each and every one of them,
-then I'm ok with the "abort".
 
-I still want it to be a WARN_ON_ONCE(), because of any future addition
-that gets things wrong.
 
-Rationale: either the WARN_ON() can happen, or it cannot. If it
-cannot, it shouldn't exist in the first place. If it can, warning
-multiple times will just make things harder to read and possibly cause
-endless streams of scrolling errors.
+-- 
+Thanks,
 
-So either the WARN_ON() shouldn't exist, or it should be a WARN_ON_ONCE().
-
-Generally the only valid use of WARN_ON() (and BUG_ON()) is for things
-like errors in the boot/setup code, where the operation basically is
-only done once anyway.
-
-                 Linus
+Steve
