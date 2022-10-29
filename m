@@ -2,188 +2,128 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C57C38A02
-	for <linux-cifs@archiver.kernel.org>; Sat, 29 Oct 2022 02:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BAF2C433FE
+	for <linux-cifs@archiver.kernel.org>; Sat, 29 Oct 2022 04:46:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbiJ2Czd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Oct 2022 22:55:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40778 "EHLO
+        id S229717AbiJ2Eq1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 29 Oct 2022 00:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229832AbiJ2Czc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Oct 2022 22:55:32 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A0A659C9;
-        Fri, 28 Oct 2022 19:54:56 -0700 (PDT)
-Received: from kwepemi500024.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MzkSs4fPRzpVZw;
-        Sat, 29 Oct 2022 10:51:25 +0800 (CST)
-Received: from [10.174.179.163] (10.174.179.163) by
- kwepemi500024.china.huawei.com (7.221.188.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 29 Oct 2022 10:54:53 +0800
-Message-ID: <46fbef33-13a3-3909-0345-628e98a5b460@huawei.com>
-Date:   Sat, 29 Oct 2022 10:54:52 +0800
+        with ESMTP id S229580AbiJ2Eq0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 29 Oct 2022 00:46:26 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90920129742;
+        Fri, 28 Oct 2022 21:46:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 45E72B82AA2;
+        Sat, 29 Oct 2022 04:46:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 968C2C433D6;
+        Sat, 29 Oct 2022 04:46:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667018781;
+        bh=80lU3QpeiitIVawK91PHV+p4z43WIDD4Rouks6i2Gj8=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=uStOgrQ+MB0RzqQUR2IfSfKEroJt+tBJ1eUXiuGJdVpHPU65B4Wndy12I7NwulNEH
+         QLUNGsb9gPkhyPjLpOHxZest61y+4N8W4qWlHOMrKXoINg0FcDDDOjXxHaefByx+f/
+         8kBWsq7LLWaUOqILmEqMSRc+s3mc9FckVC7dRltlA3gueYJyLaWQeeWS7ZpJzaVFRR
+         3jqmb9wVl/FmxMezeNEb5Mt6NqqRQIo9nqBur1wO2lEpw78o6TPaG3b+pYYYWCgZiM
+         1KYPHhw1mZSVn8629ziSH0yjYWEjxqX/XkcIejJBjvO5Ogm4Ov/+SG8x91NwiUvL6B
+         J+nrTC2V/HxDA==
+Message-ID: <cee7fa24-5699-9777-d157-f03a8dd18a00@kernel.org>
+Date:   Sat, 29 Oct 2022 12:46:19 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH v4] cifs: fix use-after-free caused by invalid pointer
- `hostname`
+ Thunderbird/102.4.0
+Subject: Re: [f2fs-dev] [PATCH v3 11/23] f2fs: Convert f2fs_fsync_node_pages()
+ to use filemap_get_folios_tag()
 Content-Language: en-US
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-CC:     <sfrench@samba.org>, <tom@talpey.com>, <sprasad@microsoft.com>,
-        <pc@cjr.nz>, <lsahlber@redhat.com>, <linux-cifs@vger.kernel.org>,
-        <samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
-        <liwei391@huawei.com>
-References: <20221027124528.2487025-1-zengheng4@huawei.com>
- <CANT5p=q50Kt+eyVaxyh891sizFSzC=eUp5P46ON-odHFRjMsEQ@mail.gmail.com>
-From:   Zeng Heng <zengheng4@huawei.com>
-In-Reply-To: <CANT5p=q50Kt+eyVaxyh891sizFSzC=eUp5P46ON-odHFRjMsEQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        linux-fsdevel@vger.kernel.org
+Cc:     linux-cifs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-btrfs@vger.kernel.org
+References: <20221017202451.4951-1-vishal.moola@gmail.com>
+ <20221017202451.4951-12-vishal.moola@gmail.com>
+From:   Chao Yu <chao@kernel.org>
+In-Reply-To: <20221017202451.4951-12-vishal.moola@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.163]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500024.china.huawei.com (7.221.188.100)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make sure `cifsd` terminated to avoid race condition, it has to call 
-function like kthread_stop.
+On 2022/10/18 4:24, Vishal Moola (Oracle) wrote:
+> Convert function to use a folio_batch instead of pagevec. This is in
+> preparation for the removal of find_get_pages_range_tag().
+> 
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
 
-Then the whole `server` struct would be released by `cifsd` and another 
-UAF appears.
+Acked-by: Chao Yu <chao@kernel.org>
 
+Thanks,
 
-On 2022/10/28 13:41, Shyam Prasad N wrote:
-> On Thu, Oct 27, 2022 at 6:19 PM Zeng Heng <zengheng4@huawei.com> wrote:
->> `hostname` needs to be set as null-pointer after free in
->> `cifs_put_tcp_session` function, or when `cifsd` thread attempts
->> to resolve hostname and reconnect the host, the thread would deref
->> the invalid pointer.
->>
->> Here is one of practical backtrace examples as reference:
->>
->> Task 477
->> ---------------------------
->>   do_mount
->>    path_mount
->>     do_new_mount
->>      vfs_get_tree
->>       smb3_get_tree
->>        smb3_get_tree_common
->>         cifs_smb3_do_mount
->>          cifs_mount
->>           mount_put_conns
->>            cifs_put_tcp_session
->>            --> kfree(server->hostname)
->>
->> cifsd
->> ---------------------------
->>   kthread
->>    cifs_demultiplex_thread
->>     cifs_reconnect
->>      reconn_set_ipaddr_from_hostname
->>      --> if (!server->hostname)
->>      --> if (server->hostname[0] == '\0')  // !! UAF fault here
->>
->> CIFS: VFS: cifs_mount failed w/return code = -112
->> mount error(112): Host is down
->> BUG: KASAN: use-after-free in reconn_set_ipaddr_from_hostname+0x2ba/0x310
->> Read of size 1 at addr ffff888108f35380 by task cifsd/480
->> CPU: 2 PID: 480 Comm: cifsd Not tainted 6.1.0-rc2-00106-gf705792f89dd-dirty #25
->> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
->> Call Trace:
->>   <TASK>
->>   dump_stack_lvl+0x68/0x85
->>   print_report+0x16c/0x4a3
->>   kasan_report+0x95/0x190
->>   reconn_set_ipaddr_from_hostname+0x2ba/0x310
->>   __cifs_reconnect.part.0+0x241/0x800
->>   cifs_reconnect+0x65f/0xb60
->>   cifs_demultiplex_thread+0x1570/0x2570
->>   kthread+0x2c5/0x380
->>   ret_from_fork+0x22/0x30
->>   </TASK>
->> Allocated by task 477:
->>   kasan_save_stack+0x1e/0x40
->>   kasan_set_track+0x21/0x30
->>   __kasan_kmalloc+0x7e/0x90
->>   __kmalloc_node_track_caller+0x52/0x1b0
->>   kstrdup+0x3b/0x70
->>   cifs_get_tcp_session+0xbc/0x19b0
->>   mount_get_conns+0xa9/0x10c0
->>   cifs_mount+0xdf/0x1970
->>   cifs_smb3_do_mount+0x295/0x1660
->>   smb3_get_tree+0x352/0x5e0
->>   vfs_get_tree+0x8e/0x2e0
->>   path_mount+0xf8c/0x1990
->>   do_mount+0xee/0x110
->>   __x64_sys_mount+0x14b/0x1f0
->>   do_syscall_64+0x3b/0x90
->>   entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> Freed by task 477:
->>   kasan_save_stack+0x1e/0x40
->>   kasan_set_track+0x21/0x30
->>   kasan_save_free_info+0x2a/0x50
->>   __kasan_slab_free+0x10a/0x190
->>   __kmem_cache_free+0xca/0x3f0
->>   cifs_put_tcp_session+0x30c/0x450
->>   cifs_mount+0xf95/0x1970
->>   cifs_smb3_do_mount+0x295/0x1660
->>   smb3_get_tree+0x352/0x5e0
->>   vfs_get_tree+0x8e/0x2e0
->>   path_mount+0xf8c/0x1990
->>   do_mount+0xee/0x110
->>   __x64_sys_mount+0x14b/0x1f0
->>   do_syscall_64+0x3b/0x90
->>   entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> The buggy address belongs to the object at ffff888108f35380
->>   which belongs to the cache kmalloc-16 of size 16
->> The buggy address is located 0 bytes inside of
->>   16-byte region [ffff888108f35380, ffff888108f35390)
->> The buggy address belongs to the physical page:
->> page:00000000333f8e58 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888108f350e0 pfn:0x108f35
->> flags: 0x200000000000200(slab|node=0|zone=2)
->> raw: 0200000000000200 0000000000000000 dead000000000122 ffff8881000423c0
->> raw: ffff888108f350e0 000000008080007a 00000001ffffffff 0000000000000000
->> page dumped because: kasan: bad access detected
->> Memory state around the buggy address:
->>   ffff888108f35280: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
->>   ffff888108f35300: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
->>> ffff888108f35380: fa fb fc fc fa fb fc fc fa fb fc fc fa fb fc fc
->>                     ^
->>   ffff888108f35400: fa fb fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->>   ffff888108f35480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->>
->> Fixes: 7be3248f3139 ("cifs: To match file servers, make sure the server hostname matches")
->> Signed-off-by: Zeng Heng <zengheng4@huawei.com>
->> Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
->> ---
->> changes in v4:
->>   - correct fix tag
->>   - add reviewed-by
->> ---
->>   fs/cifs/connect.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> index ffb291579bb9..1cc47dd3b4d6 100644
->> --- a/fs/cifs/connect.c
->> +++ b/fs/cifs/connect.c
->> @@ -1584,6 +1584,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
->>          server->session_key.response = NULL;
->>          server->session_key.len = 0;
->>          kfree(server->hostname);
->> +       server->hostname = NULL;
->>
->>          task = xchg(&server->tsk, NULL);
->>          if (task)
->> --
->> 2.25.1
->>
-> Good catch. But I think there can be a better fix.
-> How about moving the lines that follow i.e. cifsd thread kill to
-> before setting tcpStatus? That way, we don't leave scope for things to
-> race.
->
+> ---
+>   fs/f2fs/node.c | 19 ++++++++++---------
+>   1 file changed, 10 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/f2fs/node.c b/fs/f2fs/node.c
+> index 983572f23896..e8b72336c096 100644
+> --- a/fs/f2fs/node.c
+> +++ b/fs/f2fs/node.c
+> @@ -1728,12 +1728,12 @@ int f2fs_fsync_node_pages(struct f2fs_sb_info *sbi, struct inode *inode,
+>   			unsigned int *seq_id)
+>   {
+>   	pgoff_t index;
+> -	struct pagevec pvec;
+> +	struct folio_batch fbatch;
+>   	int ret = 0;
+>   	struct page *last_page = NULL;
+>   	bool marked = false;
+>   	nid_t ino = inode->i_ino;
+> -	int nr_pages;
+> +	int nr_folios;
+>   	int nwritten = 0;
+>   
+>   	if (atomic) {
+> @@ -1742,20 +1742,21 @@ int f2fs_fsync_node_pages(struct f2fs_sb_info *sbi, struct inode *inode,
+>   			return PTR_ERR_OR_ZERO(last_page);
+>   	}
+>   retry:
+> -	pagevec_init(&pvec);
+> +	folio_batch_init(&fbatch);
+>   	index = 0;
+>   
+> -	while ((nr_pages = pagevec_lookup_tag(&pvec, NODE_MAPPING(sbi), &index,
+> -				PAGECACHE_TAG_DIRTY))) {
+> +	while ((nr_folios = filemap_get_folios_tag(NODE_MAPPING(sbi), &index,
+> +					(pgoff_t)-1, PAGECACHE_TAG_DIRTY,
+> +					&fbatch))) {
+>   		int i;
+>   
+> -		for (i = 0; i < nr_pages; i++) {
+> -			struct page *page = pvec.pages[i];
+> +		for (i = 0; i < nr_folios; i++) {
+> +			struct page *page = &fbatch.folios[i]->page;
+>   			bool submitted = false;
+>   
+>   			if (unlikely(f2fs_cp_error(sbi))) {
+>   				f2fs_put_page(last_page, 0);
+> -				pagevec_release(&pvec);
+> +				folio_batch_release(&fbatch);
+>   				ret = -EIO;
+>   				goto out;
+>   			}
+> @@ -1821,7 +1822,7 @@ int f2fs_fsync_node_pages(struct f2fs_sb_info *sbi, struct inode *inode,
+>   				break;
+>   			}
+>   		}
+> -		pagevec_release(&pvec);
+> +		folio_batch_release(&fbatch);
+>   		cond_resched();
+>   
+>   		if (ret || marked)
