@@ -2,99 +2,76 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B04AFC433FE
-	for <linux-cifs@archiver.kernel.org>; Sun, 30 Oct 2022 02:40:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12885FA373D
+	for <linux-cifs@archiver.kernel.org>; Sun, 30 Oct 2022 05:01:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229647AbiJ3Ckq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 29 Oct 2022 22:40:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35284 "EHLO
+        id S229500AbiJ3FB6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 30 Oct 2022 01:01:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiJ3Ckn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 29 Oct 2022 22:40:43 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66EBB2FC35;
-        Sat, 29 Oct 2022 19:40:42 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id s24so12886793ljs.11;
-        Sat, 29 Oct 2022 19:40:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6fUYIdcwT2xWMYpbCE7d7yg88TozpwgmASlzkyxkfUA=;
-        b=SDJWiDGbjKV38imSTUJsS6USGnKv/j8IQpf6Bgg41FYvso64oCz8/F09uViIX8SvAJ
-         A8hJPOHage2nC5FDTfX+O1gy2FbsHmsGFy9FQb4ePDurrCLTk+2cva0rNnL8e3qaHokN
-         f7X7pfRm2nLI+pqeMoJ1MJp0Kp8jSRcKHxvEDO3sB1eaLNzv5HJzm9yKBTPq9CnCphLn
-         tUoCL1WRXoR2VIoaUJkl7Y1DIl+uoXYqDNjjryrgvbiahxF2U1di2nWWOuKXLZQRIP8m
-         Sfast3Mo0NRbaXwYVgPreSW7bUW3stC1+AYmdPlX+m/Xys2cMFnVC1ckbfYp+JZVtknb
-         OAdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6fUYIdcwT2xWMYpbCE7d7yg88TozpwgmASlzkyxkfUA=;
-        b=lKILSSKNK+0E46rI0h/TnhJibvyeFVGNVOWyMdae5rKiviBTIoQmW0y+kO2lLQFc4+
-         RtF25DuGkQ9FqL5BG21RhRknn/upvhoP0dH5aI//nHF5YaZR2hH6M5/EeDq3+i5v7fKY
-         FWOAjSDhIOPID7affl5ea3HIxRLXdIV7LS0qswvGL7ExpP9oiG4vgBfXoW4G3Zhe7UEE
-         m9ZHDxY/A27pkhbqj4JzGUbpotgpSJcP9OZEqXAauTCjW7kusBk4ii5yNdgZY4HBU7QE
-         8X5N38j2hh6S+/mCHKfwEH8PLmqW9WXZbP3Z//hHqnLokamZ1tom4cA9o5TIeG6XQLKZ
-         pfpA==
-X-Gm-Message-State: ACrzQf1LR2mNmSIHot8lEKwdzvMr7ZBcd6BeS1X26yX1j6edmvvDXCwP
-        PmGLhQf8vexf2CFevOV+diyMadcX9mtCINTeiQ8=
-X-Google-Smtp-Source: AMsMyM7RiR4YHrARQkliY6bEiFI1MwPRWYHXCiLvC+HVPny86wNgNk4ObeOWGzfyftJ2mopdrAbX0ai8JjqNt6V1B/A=
-X-Received: by 2002:a2e:be23:0:b0:26f:de10:4d08 with SMTP id
- z35-20020a2ebe23000000b0026fde104d08mr2804109ljq.155.1667097640636; Sat, 29
- Oct 2022 19:40:40 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 29 Oct 2022 21:40:29 -0500
-Message-ID: <CAH2r5mu1Ha1DUq8T77hf-_2njaNLUKPa=yqkZurEtzFGrEoCVg@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
+        with ESMTP id S229489AbiJ3FB5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 30 Oct 2022 01:01:57 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26EE34B98F;
+        Sat, 29 Oct 2022 22:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=snN+ahZB8RTEdCISFwrEpqTG30450n3SmkEIHv4+Nvs=; b=oCT8jdy8kiXLczS1q4R20j6sye
+        YgYw+8RrUJwph4pbyQAHRQ6lq62IoLqCBgP3FP1dYCOzVqIqq6AzHtOB2kRekwDxBhP7/pxrsplpx
+        YhNvq7jL6qEvTSmj+4kozHhBNkppCU6Tt1GyRKJjIKVbtxdWGpe6kmpoGyNW0wUWhUv8tHxBoB8pK
+        25zKtS+BCMxf3UKIngz2X5i+tAKrJul5rF5Gu0L5YhJgeRl0f96MhS28cwY54iOiQO4EcS4H5bM9L
+        aGsO3WSGCjcqxGcefu78Fc8H/pSCaooMAGV8QnuVp+RwffUf3POVhUKrdAHkLiIOEfX8OBMxEuqRa
+        BcVL5QGw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1op0S3-00FSPo-14;
+        Sun, 30 Oct 2022 05:01:39 +0000
+Date:   Sun, 30 Oct 2022 05:01:39 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        ZhangXiaoxu <zhangxiaoxu5@huawei.com>,
-        Zeng Heng <zengheng4@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        David Howells <dhowells@redhat.com>, willy@infradead.org,
+        dchinner@redhat.com, Steve French <smfrench@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 12/12] use less confusing names for iov_iter direction
+ initializers
+Message-ID: <Y14FM9svxLoaOOuS@ZenIV>
+References: <Y1btOP0tyPtcYajo@ZenIV>
+ <20221028023352.3532080-1-viro@zeniv.linux.org.uk>
+ <20221028023352.3532080-12-viro@zeniv.linux.org.uk>
+ <CAHk-=wibPKfv7mpReMj5PjKBQi4OsAQ8uwW_7=6VCVnaM-p_Dw@mail.gmail.com>
+ <Y1wOR7YmqK8iBYa8@ZenIV>
+ <CAHk-=wi_iDAugqFZxTiscsRCNbtARMFiugWtBKO=NqgM-vCVAQ@mail.gmail.com>
+ <Y1wt7uzL7vkBQ6Vm@ZenIV>
+ <CAHk-=wj4ndvhOFFsnNXRmwetwL9ZxE2QzcrLFTeJ7Yfh+pJ7Mw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wj4ndvhOFFsnNXRmwetwL9ZxE2QzcrLFTeJ7Yfh+pJ7Mw@mail.gmail.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-247f34f7b80357943234f93f247a1ae6b6c3a740:
+On Fri, Oct 28, 2022 at 01:34:05PM -0700, Linus Torvalds wrote:
+> On Fri, Oct 28, 2022 at 12:30 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+> >
+> > Went through the callers, replaced each with the right ITER_... (there's
+> > not that many of them and they are fairly easy to review), then went
+> > through mismatches and split their fixups into the beginning of the
+> > series (READ -> ITER_SOURCE becoming READ -> WRITE -> ITER_SOURCE, that
+> > is).
+> 
+> Oh, ok. So if you've actually reviewed each and every one of them,
+> then I'm ok with the "abort".
+> 
+> I still want it to be a WARN_ON_ONCE(), because of any future addition
+> that gets things wrong.
 
-  Linux 6.1-rc2 (2022-10-23 15:27:33 -0700)
-
-are available in the Git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc2-smb3-fixes
-
-for you to fetch changes up to 153695d36ead0ccc4d0256953c751cabf673e621:
-
-  cifs: fix use-after-free caused by invalid pointer `hostname`
-(2022-10-27 23:59:13 -0500)
-
-----------------------------------------------------------------
-3 cifs/smb3 fixes (also for stable)
-- use after free fix for reconnect race
-- two memory leak fixes
-
-A broader fix for reconnect races (killing the cifsd thread earlier),
-and an important for for multichannel oplock breaks are not included
-in this P/R since still being tested.
-----------------------------------------------------------------
-Zeng Heng (1):
-      cifs: fix use-after-free caused by invalid pointer `hostname`
-
-Zhang Xiaoxu (2):
-      cifs: Fix pages array leak when writedata alloc failed in
-cifs_writedata_alloc()
-      cifs: Fix pages leak when writedata alloc failed in cifs_write_from_iter()
-
- fs/cifs/connect.c |  1 +
- fs/cifs/file.c    | 13 ++++++++++---
-
-
--- 
-Thanks,
-
-Steve
+Sure, np; branch updated and pushed out - the only difference is that
+11/12 adds WARN_ON_ONCE instead of WARN_ON, so no point reposting, IMO...
