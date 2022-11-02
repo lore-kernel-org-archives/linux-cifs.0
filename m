@@ -2,53 +2,53 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5018EC433FE
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Nov 2022 16:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B93BDC433FE
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Nov 2022 16:12:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231397AbiKBQMv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Nov 2022 12:12:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51412 "EHLO
+        id S231468AbiKBQMw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Nov 2022 12:12:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231492AbiKBQLq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Nov 2022 12:11:46 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D70A02CCB8;
-        Wed,  2 Nov 2022 09:11:31 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id q1-20020a17090a750100b002139ec1e999so2318479pjk.1;
-        Wed, 02 Nov 2022 09:11:31 -0700 (PDT)
+        with ESMTP id S231571AbiKBQME (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Nov 2022 12:12:04 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA6E82CDCD;
+        Wed,  2 Nov 2022 09:11:34 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id h14so16689559pjv.4;
+        Wed, 02 Nov 2022 09:11:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EUT3qCxHFf0C7hMc68kHG0lMsaO7BNxBnXOmjml9he8=;
-        b=PTvyn3BEaAs9RE30oauDngZDkx0CdMxC8DfQHIIIl4jF6IO3gFQO/Hyq/HeBqHT04f
-         Z6twx314UNMcXHGrTZulZS0YtVydCDj24T8M8fgfqpffbv6vl6jpy6+GiLGtpaRUnwjt
-         hC9HVmZD06nQprUNjNlM4T7UE9IHxY7Kko6W6wvGb0GZeNyCB67/gGzrNo2P9nhFi2Jx
-         wgZ0J9jcHXMv4ieTAzz3i1oJACiGkx9zlPc4v370bEV7YTt8vmW2WrJHjufczTQd6zL/
-         8uZHmRqae+I/FnHCriK61BXAV9r2auhv6iVffm9aBrKd0N0Nv8qSUlpZf9PtTZLD1gi1
-         UHFg==
+        bh=M6ro/4uwbCPgnPQoXYfWSXb0BSYdAvQsNHB7i1qmjGk=;
+        b=q3y86Mqj0DeZyISqm/NEreuCkcVJdcqf1I2PppLIxLtCQkHnGzMeBPNGgV0nSBjZzo
+         fx/DTafrePXLwXBlWJcD2VH7Lg0Z1T54Sz66MqXxFSFX63QD/buYFZb6ZlrEHmgkrvOG
+         6wPPcdqdE3EZlG/p2W7Gyv6nIhwzWc745dpabg6QvsjYd3Xg4Tk5BqwdQJX7kCgd5AvR
+         dfK69VeuJCj+LO3ABeT4hrA0BZJDXiABX+2axHpLqvGhX3vsUKYQ7PHDjkGX3xzT+y95
+         L/VuMNGLM9kCQA0VEnLWnHg1PrMv390+X0DAi/s+IP/duC+XZLqgE8qsknuv46zXcBvg
+         WCSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EUT3qCxHFf0C7hMc68kHG0lMsaO7BNxBnXOmjml9he8=;
-        b=Oa/Jx11e3NWld2JZNaZ3JHLiUqXFehOV2BekTsKk1crgSYcuu7CJm7bDk3bKpqypvl
-         qzxKr0O/abRYsDv/w/+6OQLLJH0+hSDG98GmYvTN4zwZIQCQw1OstbEeERUD/sk6XgeQ
-         chMekHG5/xviAW2oO/H1mPSTcb+ReXGQepRQOyNGz7YSIj4ykowOWMCZsG2AHNnNt74f
-         Ayu8OpNbL7EfFIekebW/WcKpLdMZWs9AbVYfcbLjNFXuUNXNgDsfDArNKKWCzfo04nBB
-         OydLlUPDaPy5JBSVvAktyzmK0JbU62NkeQtHK4eN0T669HDINFXdbWv8ahmfKmoZ/XIm
-         QKrQ==
-X-Gm-Message-State: ACrzQf1GPibSsQfjYL/WWQa4YuTCdqCU+i7WBYeUyCeBOF9hyD0zgjt6
-        5Jam8FDfciSZvDK9lDTPZXnCJnyiCd8QUA==
-X-Google-Smtp-Source: AMsMyM6E3M7H/LqnJ3bGbNTMErjnaAvxsHbatUXbeFFkBd9l8Rp2shudfLk7oahwg2ax0C1UN8mN2Q==
-X-Received: by 2002:a17:90b:2705:b0:20a:b4fa:f624 with SMTP id px5-20020a17090b270500b0020ab4faf624mr26339614pjb.124.1667405491123;
-        Wed, 02 Nov 2022 09:11:31 -0700 (PDT)
+        bh=M6ro/4uwbCPgnPQoXYfWSXb0BSYdAvQsNHB7i1qmjGk=;
+        b=aRsQtJlX4l1WRXl1jOE4P83gVlgD+slY1nRG72K4x9/3bI4mv9Iid8f+13rnVasi8G
+         eiV2v0uPccODH/+qeAUftqiPMW8WikQspETzYborkUUwXFlOeuGUjypiB6uN8MDAroja
+         HFMFg3O6d+rqOUulzZ5Pi6vhiUnuwORpyxT9khXmgpahh2alaZlxjDk2j40D3GjCeCpM
+         62PnvA29wbT9HjVTi/QQacdm5RwEZxY6B1+B/7d7TIWBUBKnpFaU/XCvdguJXW0++UPI
+         ArIvLIYBvyfaBvWeUDKqsTMjIXZ+f7NWjQoiFDveS5hYkPO2uekrVPcODXiF144q9+8U
+         1OGA==
+X-Gm-Message-State: ACrzQf2vLcsjzQ2HtpJsSNPuOhDUVO+dn0pQQFLSBQ5po0IaUaBvF3YF
+        z5/OECT2yzZWkJTE/0l09ySnGIQwehvwFA==
+X-Google-Smtp-Source: AMsMyM5+yJKPsTCW+zHgZjbHbMaNzVKcqfalsqvaAr3+srXOWHJW6H/w5W+YIAenXiG0v4QRbNBUvg==
+X-Received: by 2002:a17:902:b18d:b0:186:9bb5:a92 with SMTP id s13-20020a170902b18d00b001869bb50a92mr25445634plr.11.1667405494098;
+        Wed, 02 Nov 2022 09:11:34 -0700 (PDT)
 Received: from fedora.hsd1.ca.comcast.net ([2601:644:8002:1c20::8080])
-        by smtp.googlemail.com with ESMTPSA id ms4-20020a17090b234400b00210c84b8ae5sm1632101pjb.35.2022.11.02.09.11.29
+        by smtp.googlemail.com with ESMTPSA id ms4-20020a17090b234400b00210c84b8ae5sm1632101pjb.35.2022.11.02.09.11.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 09:11:30 -0700 (PDT)
+        Wed, 02 Nov 2022 09:11:33 -0700 (PDT)
 From:   "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
 To:     linux-fsdevel@vger.kernel.org
 Cc:     linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -56,10 +56,11 @@ Cc:     linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
         linux-nilfs@vger.kernel.org, linux-mm@kvack.org,
-        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Subject: [PATCH v4 16/23] f2fs: Convert f2fs_sync_meta_pages() to use filemap_get_folios_tag()
-Date:   Wed,  2 Nov 2022 09:10:24 -0700
-Message-Id: <20221102161031.5820-17-vishal.moola@gmail.com>
+        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Subject: [PATCH v4 18/23] nilfs2: Convert nilfs_lookup_dirty_data_buffers() to use filemap_get_folios_tag()
+Date:   Wed,  2 Nov 2022 09:10:26 -0700
+Message-Id: <20221102161031.5820-19-vishal.moola@gmail.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221102161031.5820-1-vishal.moola@gmail.com>
 References: <20221102161031.5820-1-vishal.moola@gmail.com>
@@ -69,125 +70,82 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Convert function to use folios throughout. This is in preparation for the
-removal of find_get_pages_range_tag(). This change removes 5 calls to
-compound_head().
-
-Initially the function was checking if the previous page index is truly the
-previous page i.e. 1 index behind the current page. To convert to folios and
-maintain this check we need to make the check
-folio->index != prev + folio_nr_pages(previous folio) since we don't know
-how many pages are in a folio.
-
-At index i == 0 the check is guaranteed to succeed, so to workaround indexing
-bounds we can simply ignore the check for that specific index. This makes the
-initial assignment of prev trivial, so I removed that as well.
-
-Also modified a comment in commit_checkpoint for consistency.
+Convert function to use folios throughout. This is in preparation for
+the removal of find_get_pages_range_tag(). This change removes 4 calls
+to compound_head().
 
 Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
 ---
- fs/f2fs/checkpoint.c | 49 +++++++++++++++++++++++---------------------
- 1 file changed, 26 insertions(+), 23 deletions(-)
+ fs/nilfs2/segment.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/fs/f2fs/checkpoint.c b/fs/f2fs/checkpoint.c
-index 0c82dae082aa..82eb26f471c5 100644
---- a/fs/f2fs/checkpoint.c
-+++ b/fs/f2fs/checkpoint.c
-@@ -390,59 +390,62 @@ long f2fs_sync_meta_pages(struct f2fs_sb_info *sbi, enum page_type type,
+diff --git a/fs/nilfs2/segment.c b/fs/nilfs2/segment.c
+index b4cebad21b48..2183e1698f8e 100644
+--- a/fs/nilfs2/segment.c
++++ b/fs/nilfs2/segment.c
+@@ -680,7 +680,7 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+ 					      loff_t start, loff_t end)
  {
- 	struct address_space *mapping = META_MAPPING(sbi);
- 	pgoff_t index = 0, prev = ULONG_MAX;
+ 	struct address_space *mapping = inode->i_mapping;
 -	struct pagevec pvec;
 +	struct folio_batch fbatch;
- 	long nwritten = 0;
--	int nr_pages;
-+	int nr_folios;
- 	struct writeback_control wbc = {
- 		.for_reclaim = 0,
- 	};
- 	struct blk_plug plug;
- 
+ 	pgoff_t index = 0, last = ULONG_MAX;
+ 	size_t ndirties = 0;
+ 	int i;
+@@ -694,23 +694,26 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+ 		index = start >> PAGE_SHIFT;
+ 		last = end >> PAGE_SHIFT;
+ 	}
 -	pagevec_init(&pvec);
 +	folio_batch_init(&fbatch);
+  repeat:
+ 	if (unlikely(index > last) ||
+-	    !pagevec_lookup_range_tag(&pvec, mapping, &index, last,
+-				PAGECACHE_TAG_DIRTY))
++	      !filemap_get_folios_tag(mapping, &index, last,
++		      PAGECACHE_TAG_DIRTY, &fbatch))
+ 		return ndirties;
  
- 	blk_start_plug(&plug);
+-	for (i = 0; i < pagevec_count(&pvec); i++) {
++	for (i = 0; i < folio_batch_count(&fbatch); i++) {
+ 		struct buffer_head *bh, *head;
+-		struct page *page = pvec.pages[i];
++		struct folio *folio = fbatch.folios[i];
  
--	while ((nr_pages = pagevec_lookup_tag(&pvec, mapping, &index,
--				PAGECACHE_TAG_DIRTY))) {
-+	while ((nr_folios = filemap_get_folios_tag(mapping, &index,
-+					(pgoff_t)-1,
-+					PAGECACHE_TAG_DIRTY, &fbatch))) {
- 		int i;
+-		lock_page(page);
+-		if (!page_has_buffers(page))
+-			create_empty_buffers(page, i_blocksize(inode), 0);
+-		unlock_page(page);
++		folio_lock(folio);
++		head = folio_buffers(folio);
++		if (!head) {
++			create_empty_buffers(&folio->page, i_blocksize(inode), 0);
++			head = folio_buffers(folio);
++		}
++		folio_unlock(folio);
  
--		for (i = 0; i < nr_pages; i++) {
--			struct page *page = pvec.pages[i];
-+		for (i = 0; i < nr_folios; i++) {
-+			struct folio *folio = fbatch.folios[i];
- 
--			if (prev == ULONG_MAX)
--				prev = page->index - 1;
--			if (nr_to_write != LONG_MAX && page->index != prev + 1) {
--				pagevec_release(&pvec);
-+			if (nr_to_write != LONG_MAX && i != 0 &&
-+					folio->index != prev +
-+					folio_nr_pages(fbatch.folios[i-1])) {
-+				folio_batch_release(&fbatch);
- 				goto stop;
- 			}
- 
--			lock_page(page);
-+			folio_lock(folio);
- 
--			if (unlikely(page->mapping != mapping)) {
-+			if (unlikely(folio->mapping != mapping)) {
- continue_unlock:
--				unlock_page(page);
-+				folio_unlock(folio);
+-		bh = head = page_buffers(page);
++		bh = head;
+ 		do {
+ 			if (!buffer_dirty(bh) || buffer_async_write(bh))
  				continue;
+@@ -718,13 +721,13 @@ static size_t nilfs_lookup_dirty_data_buffers(struct inode *inode,
+ 			list_add_tail(&bh->b_assoc_buffers, listp);
+ 			ndirties++;
+ 			if (unlikely(ndirties >= nlimit)) {
+-				pagevec_release(&pvec);
++				folio_batch_release(&fbatch);
+ 				cond_resched();
+ 				return ndirties;
  			}
--			if (!PageDirty(page)) {
-+			if (!folio_test_dirty(folio)) {
- 				/* someone wrote it for us */
- 				goto continue_unlock;
- 			}
- 
--			f2fs_wait_on_page_writeback(page, META, true, true);
-+			f2fs_wait_on_page_writeback(&folio->page, META,
-+					true, true);
- 
--			if (!clear_page_dirty_for_io(page))
-+			if (!folio_clear_dirty_for_io(folio))
- 				goto continue_unlock;
- 
--			if (__f2fs_write_meta_page(page, &wbc, io_type)) {
--				unlock_page(page);
-+			if (__f2fs_write_meta_page(&folio->page, &wbc,
-+						io_type)) {
-+				folio_unlock(folio);
- 				break;
- 			}
--			nwritten++;
--			prev = page->index;
-+			nwritten += folio_nr_pages(folio);
-+			prev = folio->index;
- 			if (unlikely(nwritten >= nr_to_write))
- 				break;
- 		}
--		pagevec_release(&pvec);
-+		folio_batch_release(&fbatch);
- 		cond_resched();
+ 		} while (bh = bh->b_this_page, bh != head);
  	}
- stop:
-@@ -1398,7 +1401,7 @@ static void commit_checkpoint(struct f2fs_sb_info *sbi,
- 	};
- 
- 	/*
--	 * pagevec_lookup_tag and lock_page again will take
-+	 * filemap_get_folios_tag and lock_page again will take
- 	 * some extra time. Therefore, f2fs_update_meta_pages and
- 	 * f2fs_sync_meta_pages are combined in this function.
- 	 */
+-	pagevec_release(&pvec);
++	folio_batch_release(&fbatch);
+ 	cond_resched();
+ 	goto repeat;
+ }
 -- 
 2.38.1
 
