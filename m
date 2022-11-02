@@ -2,187 +2,162 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC602C433FE
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Nov 2022 05:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03108C433FE
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Nov 2022 16:11:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbiKBFMf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Nov 2022 01:12:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60412 "EHLO
+        id S231273AbiKBQLJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Nov 2022 12:11:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiKBFMe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Nov 2022 01:12:34 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CCAC252AB;
-        Tue,  1 Nov 2022 22:12:32 -0700 (PDT)
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4N2FLS5S7NzJnJ3;
-        Wed,  2 Nov 2022 13:09:36 +0800 (CST)
-Received: from kwepemm600015.china.huawei.com (7.193.23.52) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 2 Nov 2022 13:12:30 +0800
-Received: from huawei.com (10.175.101.6) by kwepemm600015.china.huawei.com
- (7.193.23.52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Wed, 2 Nov
- 2022 13:12:29 +0800
-From:   ChenXiaoSong <chenxiaosong2@huawei.com>
-To:     <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>
-CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-        <linux-kernel@vger.kernel.org>, <chenxiaosong2@huawei.com>,
-        <yi.zhang@huawei.com>, <zhangxiaoxu5@huawei.com>
-Subject: [PATCH] cifs: fix use-after-free on the link name
-Date:   Wed, 2 Nov 2022 14:16:59 +0800
-Message-ID: <20221102061659.920334-1-chenxiaosong2@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S231272AbiKBQLI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Nov 2022 12:11:08 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA1D72C667;
+        Wed,  2 Nov 2022 09:11:07 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id b185so16820222pfb.9;
+        Wed, 02 Nov 2022 09:11:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mngda3aHEeBTLGy2LfOMAwbMGwmKJm3kMZgi9Ib34ls=;
+        b=CzwkZPeCCOjWsyC7BlL9IBJTrlmYa77xNpFSOioq+e8OPdv5fbZ/zAK/WD5VaCSnaf
+         5wiT7RR/cG5GPZCjJ+Co+cRbnq0d7qvJjY3sdWpdys5S6A8w0OZe4/5smnTYFKe3NLzZ
+         5wcozYB2mpTn2ymfQyRigL4lpLb5qvdDX4Kdyh4H+2z75vNY4RC4jXXiiTVaGfLOy97h
+         uLbe3bGG1wM1TT2K00V5wMH2vpszUj/G4ZhsAUVnBiAEAK3CxOz0DxDqHYdVVOTDhWjV
+         zp2OhnRtDn0qTZBfVT4zVHKT7w33B/qlC8Fh+c591akUyRXj9kHwG407cxvWxSpLW5pP
+         0PDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mngda3aHEeBTLGy2LfOMAwbMGwmKJm3kMZgi9Ib34ls=;
+        b=w9VuzM3+4av5YPDjdTsGCrJgB88BI5SteH1uSjpOIPArMv/r7rxC5oA8fA/OXKMPLN
+         QWsA/9/GJu+HMX+vBqSiXBzsQ2g+ISm0SdxA2yIbuFheWxmA1z7sYGxBKwo2T5b4ktUi
+         yvtKZo8JRnf5ZQfk62p8fdpO41aUbXoBDaBtKPk1ZQcd8gazlJVuKbKMieJxoTRG0hf/
+         webbdYKzJ7cSdkPeFfibMWJp6KXgoQF34Y/JQcMeVxp9WAVseUg6LCaf04dn/F/CtTzS
+         d+u5R/OGURorFfJNYeJpEE3H1AFbQdWYcU3NGqfqXwOK6fNg2IVF19khxUP5khLBcjEc
+         34kw==
+X-Gm-Message-State: ACrzQf2oCZCoDfrfovZvAaTvyUBTB7roBqt+ndZ+GQ5dyFS/bIH1RzsD
+        bYQ+YVHuCV746JZy7x8Y4sInFyl8MSHV3A==
+X-Google-Smtp-Source: AMsMyM7hDOKBTXi34y4zB4HRcT4xPCgGrRzz1Zqhk7+jgpV1qJt102zpwOy+bMEbiQ6tv1xeWLGSXw==
+X-Received: by 2002:a05:6a00:88f:b0:52c:6962:274f with SMTP id q15-20020a056a00088f00b0052c6962274fmr26591050pfj.12.1667405466831;
+        Wed, 02 Nov 2022 09:11:06 -0700 (PDT)
+Received: from fedora.hsd1.ca.comcast.net ([2601:644:8002:1c20::8080])
+        by smtp.googlemail.com with ESMTPSA id ms4-20020a17090b234400b00210c84b8ae5sm1632101pjb.35.2022.11.02.09.11.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 09:11:06 -0700 (PDT)
+From:   "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nilfs@vger.kernel.org, linux-mm@kvack.org,
+        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Subject: [PATCH v4 00/23] Convert to filemap_get_folios_tag()
+Date:   Wed,  2 Nov 2022 09:10:08 -0700
+Message-Id: <20221102161031.5820-1-vishal.moola@gmail.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600015.china.huawei.com (7.193.23.52)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-xfstests generic/011 reported use-after-free bug as follows:
+This patch series replaces find_get_pages_range_tag() with
+filemap_get_folios_tag(). This also allows the removal of multiple
+calls to compound_head() throughout.
+It also makes a good chunk of the straightforward conversions to folios,
+and takes the opportunity to introduce a function that grabs a folio
+from the pagecache.
 
-  BUG: KASAN: use-after-free in __d_alloc+0x269/0x859
-  Read of size 15 at addr ffff8880078933a0 by task dirstress/952
+F2fs and Ceph have quite a lot of work to be done regarding folios, so
+for now those patches only have the changes necessary for the removal of
+find_get_pages_range_tag(), and only support folios of size 1 (which is
+all they use right now anyways).
 
-  CPU: 1 PID: 952 Comm: dirstress Not tainted 6.1.0-rc3+ #77
-  Call Trace:
-   __dump_stack+0x23/0x29
-   dump_stack_lvl+0x51/0x73
-   print_address_description+0x67/0x27f
-   print_report+0x3e/0x5c
-   kasan_report+0x7b/0xa8
-   kasan_check_range+0x1b2/0x1c1
-   memcpy+0x22/0x5d
-   __d_alloc+0x269/0x859
-   d_alloc+0x45/0x20c
-   d_alloc_parallel+0xb2/0x8b2
-   lookup_open+0x3b8/0x9f9
-   open_last_lookups+0x63d/0xc26
-   path_openat+0x11a/0x261
-   do_filp_open+0xcc/0x168
-   do_sys_openat2+0x13b/0x3f7
-   do_sys_open+0x10f/0x146
-   __se_sys_creat+0x27/0x2e
-   __x64_sys_creat+0x55/0x6a
-   do_syscall_64+0x40/0x96
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+I've run xfstests on btrfs, ext4, f2fs, and nilfs2, but more testing may be
+beneficial. The page-writeback and filemap changes implicitly work. Testing
+and review of the other changes (afs, ceph, cifs, gfs2) would be appreciated.
 
-  Allocated by task 952:
-   kasan_save_stack+0x1f/0x42
-   kasan_set_track+0x21/0x2a
-   kasan_save_alloc_info+0x17/0x1d
-   __kasan_kmalloc+0x7e/0x87
-   __kmalloc_node_track_caller+0x59/0x155
-   kstrndup+0x60/0xe6
-   parse_mf_symlink+0x215/0x30b
-   check_mf_symlink+0x260/0x36a
-   cifs_get_inode_info+0x14e1/0x1690
-   cifs_revalidate_dentry_attr+0x70d/0x964
-   cifs_revalidate_dentry+0x36/0x62
-   cifs_d_revalidate+0x162/0x446
-   lookup_open+0x36f/0x9f9
-   open_last_lookups+0x63d/0xc26
-   path_openat+0x11a/0x261
-   do_filp_open+0xcc/0x168
-   do_sys_openat2+0x13b/0x3f7
-   do_sys_open+0x10f/0x146
-   __se_sys_creat+0x27/0x2e
-   __x64_sys_creat+0x55/0x6a
-   do_syscall_64+0x40/0x96
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-  Freed by task 950:
-   kasan_save_stack+0x1f/0x42
-   kasan_set_track+0x21/0x2a
-   kasan_save_free_info+0x1c/0x34
-   ____kasan_slab_free+0x1c1/0x1d5
-   __kasan_slab_free+0xe/0x13
-   __kmem_cache_free+0x29a/0x387
-   kfree+0xd3/0x10e
-   cifs_fattr_to_inode+0xb6a/0xc8c
-   cifs_get_inode_info+0x3cb/0x1690
-   cifs_revalidate_dentry_attr+0x70d/0x964
-   cifs_revalidate_dentry+0x36/0x62
-   cifs_d_revalidate+0x162/0x446
-   lookup_open+0x36f/0x9f9
-   open_last_lookups+0x63d/0xc26
-   path_openat+0x11a/0x261
-   do_filp_open+0xcc/0x168
-   do_sys_openat2+0x13b/0x3f7
-   do_sys_open+0x10f/0x146
-   __se_sys_creat+0x27/0x2e
-   __x64_sys_creat+0x55/0x6a
-   do_syscall_64+0x40/0x96
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-When opened a symlink, link name is from 'inode->i_link', but it may be
-reset to a new value when revalidate the dentry. If some processes get the
-link name on the race scenario, then UAF will happen on link name.
-
-Fix this by implementing 'get_link' interface to duplicate the link name.
-
-Fixes: 76894f3e2f71 ("cifs: improve symlink handling for smb2+")
-Signed-off-by: ChenXiaoSong <chenxiaosong2@huawei.com>
 ---
- fs/cifs/cifsfs.c | 21 ++++++++++++++++++++-
- fs/cifs/inode.c  |  5 -----
- 2 files changed, 20 insertions(+), 6 deletions(-)
+v4:
+  Fixed a bug with reference counting in cifs changes
+  - Reported-by: kernel test robot <oliver.sang@intel.com> 
+  Improved commit messages to be more meaningful
+  Got some Acked-bys and Reviewed-bys
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index d0b9fec111aa..bb9592594fcc 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1143,8 +1143,27 @@ const struct inode_operations cifs_file_inode_ops = {
- 	.fiemap = cifs_fiemap,
- };
- 
-+const char *cifs_get_link(struct dentry *dentry, struct inode *inode,
-+			    struct delayed_call *done)
-+{
-+	char *target_path = NULL;
-+
-+	spin_lock(&inode->i_lock);
-+	if (likely(CIFS_I(inode)->symlink_target))
-+		target_path = kstrdup(CIFS_I(inode)->symlink_target,
-+				      GFP_ATOMIC);
-+	spin_unlock(&inode->i_lock);
-+
-+	if (target_path)
-+		set_delayed_call(done, kfree_link, target_path);
-+	else
-+		target_path = ERR_PTR(-EOPNOTSUPP);
-+
-+	return target_path;
-+}
-+
- const struct inode_operations cifs_symlink_inode_ops = {
--	.get_link = simple_get_link,
-+	.get_link = cifs_get_link,
- 	.permission = cifs_permission,
- 	.listxattr = cifs_listxattr,
- };
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 9bde08d44617..4e2ca3c6e5c0 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -215,11 +215,6 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
- 		kfree(cifs_i->symlink_target);
- 		cifs_i->symlink_target = fattr->cf_symlink_target;
- 		fattr->cf_symlink_target = NULL;
--
--		if (unlikely(!cifs_i->symlink_target))
--			inode->i_link = ERR_PTR(-EOPNOTSUPP);
--		else
--			inode->i_link = cifs_i->symlink_target;
- 	}
- 	spin_unlock(&inode->i_lock);
- 
+v3:
+  Rebased onto upstream 6.1
+  Simplified the ceph patch to only necessary changes
+  Changed commit messages throughout to be clearer
+  Got an Acked-by for another nilfs patch
+  Got Tested-by for afs
+
+v2:
+  Got Acked-By tags for nilfs and btrfs changes
+  Fixed an error arising in f2fs
+  - Reported-by: kernel test robot <lkp@intel.com>
+
+Vishal Moola (Oracle) (23):
+  pagemap: Add filemap_grab_folio()
+  filemap: Added filemap_get_folios_tag()
+  filemap: Convert __filemap_fdatawait_range() to use
+    filemap_get_folios_tag()
+  page-writeback: Convert write_cache_pages() to use
+    filemap_get_folios_tag()
+  afs: Convert afs_writepages_region() to use filemap_get_folios_tag()
+  btrfs: Convert btree_write_cache_pages() to use
+    filemap_get_folio_tag()
+  btrfs: Convert extent_write_cache_pages() to use
+    filemap_get_folios_tag()
+  ceph: Convert ceph_writepages_start() to use filemap_get_folios_tag()
+  cifs: Convert wdata_alloc_and_fillpages() to use
+    filemap_get_folios_tag()
+  ext4: Convert mpage_prepare_extent_to_map() to use
+    filemap_get_folios_tag()
+  f2fs: Convert f2fs_fsync_node_pages() to use filemap_get_folios_tag()
+  f2fs: Convert f2fs_flush_inline_data() to use filemap_get_folios_tag()
+  f2fs: Convert f2fs_sync_node_pages() to use filemap_get_folios_tag()
+  f2fs: Convert f2fs_write_cache_pages() to use filemap_get_folios_tag()
+  f2fs: Convert last_fsync_dnode() to use filemap_get_folios_tag()
+  f2fs: Convert f2fs_sync_meta_pages() to use filemap_get_folios_tag()
+  gfs2: Convert gfs2_write_cache_jdata() to use filemap_get_folios_tag()
+  nilfs2: Convert nilfs_lookup_dirty_data_buffers() to use
+    filemap_get_folios_tag()
+  nilfs2: Convert nilfs_lookup_dirty_node_buffers() to use
+    filemap_get_folios_tag()
+  nilfs2: Convert nilfs_btree_lookup_dirty_buffers() to use
+    filemap_get_folios_tag()
+  nilfs2: Convert nilfs_copy_dirty_pages() to use
+    filemap_get_folios_tag()
+  nilfs2: Convert nilfs_clear_dirty_pages() to use
+    filemap_get_folios_tag()
+  filemap: Remove find_get_pages_range_tag()
+
+ fs/afs/write.c          | 114 +++++++++++++++++++++-------------------
+ fs/btrfs/extent_io.c    |  57 ++++++++++----------
+ fs/ceph/addr.c          |  58 ++++++++++----------
+ fs/cifs/file.c          |  32 +++++++++--
+ fs/ext4/inode.c         |  55 ++++++++++---------
+ fs/f2fs/checkpoint.c    |  49 +++++++++--------
+ fs/f2fs/compress.c      |  13 ++---
+ fs/f2fs/data.c          |  69 +++++++++++++-----------
+ fs/f2fs/f2fs.h          |   5 +-
+ fs/f2fs/node.c          |  72 +++++++++++++------------
+ fs/gfs2/aops.c          |  64 ++++++++++++----------
+ fs/nilfs2/btree.c       |  14 ++---
+ fs/nilfs2/page.c        |  59 +++++++++++----------
+ fs/nilfs2/segment.c     |  44 ++++++++--------
+ include/linux/pagemap.h |  32 +++++++----
+ include/linux/pagevec.h |   8 ---
+ mm/filemap.c            |  84 ++++++++++++++---------------
+ mm/page-writeback.c     |  44 ++++++++--------
+ mm/swap.c               |  10 ----
+ 19 files changed, 465 insertions(+), 418 deletions(-)
+
 -- 
-2.31.1
+2.38.1
 
