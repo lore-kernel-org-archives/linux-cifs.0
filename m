@@ -2,98 +2,187 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7569BC433FE
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Nov 2022 07:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36486C4332F
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Nov 2022 16:38:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229882AbiKCHIO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Nov 2022 03:08:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43302 "EHLO
+        id S232271AbiKCQii (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Nov 2022 12:38:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229643AbiKCHIN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Nov 2022 03:08:13 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F65AE6B
-        for <linux-cifs@vger.kernel.org>; Thu,  3 Nov 2022 00:08:12 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id g24so1097594plq.3
-        for <linux-cifs@vger.kernel.org>; Thu, 03 Nov 2022 00:08:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20210112.gappssmtp.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UCGx+I//h802HOEchXeQ4l9Uif7TwqahE8c/QVCmorA=;
-        b=Qo0pCYgx3Qq1H7gtsjTo9ahtaWGAPbAqpUUP7w83R+hioFcvnb/Vum4t6njrIqmCbQ
-         9oglIFHFznb8HWDOhJ8VqGBZno5DvMa/i9rWqzvIS3F1Qe6lSOVMpDruWh58G2ZJDVRR
-         +irGuRxsC3szEMLHnbBdSVWy+8gAtIi3/dsdlKShS4dWGsFcwevGYm9bbQNs76cqEy+l
-         a7aTzEEQgFxLLhP1XqsxI1o93xRoLeyOkLszg3jyihUg4tqsI4qRKCp463KDJruVxcER
-         uahSco4O56I/ia+N+pdnGxKbS5y4Jn6JIOipSvnU+FLMXl5F+IFO/pgiKOzrTt8rdoYE
-         jcgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UCGx+I//h802HOEchXeQ4l9Uif7TwqahE8c/QVCmorA=;
-        b=Jzh0fybowIawddremEJRhD1dVNXIx+t4yk/3y/V/49aRIww3WSrB+bmDA5n00Fvn/8
-         l1I0R8YvVN2PUExy05YYYhtXpe0I0zr0VD9bGm9fbcu3fzu6Nb3NcPsGBAQc4va61YUV
-         i/5ZvIJ5BIkGRcoKw5MruZ9ecnzJa2ol7zjpW/6rfrk8jEFXVfrI9t5aShzhXg/auRr2
-         dvA6lBF9+1ymRvwtA9IjT6OosXh4vOzy5+r88r8D+z5uyBNY8Y5rPJ9sg35uCdddARZM
-         m0CFnXCo2pYaByvye4O3Mw2Xd8ht21x2oALBjMvkIkXrK6AGXVzGtcsyXkk8QWB3ByR3
-         dMow==
-X-Gm-Message-State: ACrzQf3HMKRi+htcMOi/HigdMtH30Jg2wWrViUowuUXhX6Nj+3sD1uNZ
-        Ij9ucCbKCDhzDGePa/zKofOQiw==
-X-Google-Smtp-Source: AMsMyM7EbTGuTativfwuYw+G5QrvaMpsSoYHAtMTN9boWfI/C7HSKjfDJIybcNCOqaRH/jY3hHhBSg==
-X-Received: by 2002:a17:902:ed8e:b0:187:1c78:80c2 with SMTP id e14-20020a170902ed8e00b001871c7880c2mr21606400plj.38.1667459292279;
-        Thu, 03 Nov 2022 00:08:12 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-106-210.pa.nsw.optusnet.com.au. [49.181.106.210])
-        by smtp.gmail.com with ESMTPSA id s7-20020a170902988700b00179e1f08634sm9438901plp.222.2022.11.03.00.08.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 00:08:11 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1oqUKd-009gYz-VX; Thu, 03 Nov 2022 18:08:08 +1100
-Date:   Thu, 3 Nov 2022 18:08:07 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH v4 00/23] Convert to filemap_get_folios_tag()
-Message-ID: <20221103070807.GX2703033@dread.disaster.area>
-References: <20221102161031.5820-1-vishal.moola@gmail.com>
+        with ESMTP id S232363AbiKCQiT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Nov 2022 12:38:19 -0400
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0D21DA72;
+        Thu,  3 Nov 2022 09:35:06 -0700 (PDT)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 9F6BC7FC21;
+        Thu,  3 Nov 2022 16:34:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1667493261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L7oeyOE9y+SCE0Fp1mehfx0R2Rb8YrWpiTFfBzwVnbE=;
+        b=A/1/IKG1KpNtZhg+9WqvL6/jgQa6rGajHLy3ic5Bme0VfEK1IHzSnukadQAEuBZ28Gu7+B
+        8jiA1IiBGxC9W2ymqpOFxlp7g/ckpa+u+bCDt+5XnsJBUqo15qEKdMh9WmvqcFHfOwlcl1
+        xardnrPb3Ah1qZ08IIbGaDHIctH5rlEfe05yvHZwLscMCxQJMomFFQgAuezfaQXgaejG5+
+        vTyzkQJYiCFgpfeZGEHea0YMGv/tlGvzdR3J6orRmax8in0OnE0cjzzRHlDu5UiF5hYSXa
+        PYuHrPtSGMTP1WlYRpMn4KTytQjHAugGjUGlKcmE3dCATYu1POmvpeCKgsQhUA==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     ChenXiaoSong <chenxiaosong2@huawei.com>, sfrench@samba.org,
+        lsahlber@redhat.com
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, chenxiaosong2@huawei.com,
+        yi.zhang@huawei.com, zhangxiaoxu5@huawei.com
+Subject: Re: [PATCH] cifs: fix use-after-free on the link name
+In-Reply-To: <20221102061659.920334-1-chenxiaosong2@huawei.com>
+References: <20221102061659.920334-1-chenxiaosong2@huawei.com>
+Date:   Thu, 03 Nov 2022 13:35:30 -0300
+Message-ID: <875yfw0ze5.fsf@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221102161031.5820-1-vishal.moola@gmail.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Nov 02, 2022 at 09:10:08AM -0700, Vishal Moola (Oracle) wrote:
-> This patch series replaces find_get_pages_range_tag() with
-> filemap_get_folios_tag(). This also allows the removal of multiple
-> calls to compound_head() throughout.
-> It also makes a good chunk of the straightforward conversions to folios,
-> and takes the opportunity to introduce a function that grabs a folio
-> from the pagecache.
-> 
-> F2fs and Ceph have quite a lot of work to be done regarding folios, so
-> for now those patches only have the changes necessary for the removal of
-> find_get_pages_range_tag(), and only support folios of size 1 (which is
-> all they use right now anyways).
-> 
-> I've run xfstests on btrfs, ext4, f2fs, and nilfs2, but more testing may be
-> beneficial. The page-writeback and filemap changes implicitly work. Testing
-> and review of the other changes (afs, ceph, cifs, gfs2) would be appreciated.
+ChenXiaoSong <chenxiaosong2@huawei.com> writes:
 
-Same question as last time: have you tested this with multipage
-folios enabled? If you haven't tested XFS, then I'm guessing the
-answer is no, and you haven't fixed the bug I pointed out in
-the write_cache_pages() implementation....
+> xfstests generic/011 reported use-after-free bug as follows:
+>
+>   BUG: KASAN: use-after-free in __d_alloc+0x269/0x859
+>   Read of size 15 at addr ffff8880078933a0 by task dirstress/952
+>
+>   CPU: 1 PID: 952 Comm: dirstress Not tainted 6.1.0-rc3+ #77
+>   Call Trace:
+>    __dump_stack+0x23/0x29
+>    dump_stack_lvl+0x51/0x73
+>    print_address_description+0x67/0x27f
+>    print_report+0x3e/0x5c
+>    kasan_report+0x7b/0xa8
+>    kasan_check_range+0x1b2/0x1c1
+>    memcpy+0x22/0x5d
+>    __d_alloc+0x269/0x859
+>    d_alloc+0x45/0x20c
+>    d_alloc_parallel+0xb2/0x8b2
+>    lookup_open+0x3b8/0x9f9
+>    open_last_lookups+0x63d/0xc26
+>    path_openat+0x11a/0x261
+>    do_filp_open+0xcc/0x168
+>    do_sys_openat2+0x13b/0x3f7
+>    do_sys_open+0x10f/0x146
+>    __se_sys_creat+0x27/0x2e
+>    __x64_sys_creat+0x55/0x6a
+>    do_syscall_64+0x40/0x96
+>    entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+>   Allocated by task 952:
+>    kasan_save_stack+0x1f/0x42
+>    kasan_set_track+0x21/0x2a
+>    kasan_save_alloc_info+0x17/0x1d
+>    __kasan_kmalloc+0x7e/0x87
+>    __kmalloc_node_track_caller+0x59/0x155
+>    kstrndup+0x60/0xe6
+>    parse_mf_symlink+0x215/0x30b
+>    check_mf_symlink+0x260/0x36a
+>    cifs_get_inode_info+0x14e1/0x1690
+>    cifs_revalidate_dentry_attr+0x70d/0x964
+>    cifs_revalidate_dentry+0x36/0x62
+>    cifs_d_revalidate+0x162/0x446
+>    lookup_open+0x36f/0x9f9
+>    open_last_lookups+0x63d/0xc26
+>    path_openat+0x11a/0x261
+>    do_filp_open+0xcc/0x168
+>    do_sys_openat2+0x13b/0x3f7
+>    do_sys_open+0x10f/0x146
+>    __se_sys_creat+0x27/0x2e
+>    __x64_sys_creat+0x55/0x6a
+>    do_syscall_64+0x40/0x96
+>    entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+>   Freed by task 950:
+>    kasan_save_stack+0x1f/0x42
+>    kasan_set_track+0x21/0x2a
+>    kasan_save_free_info+0x1c/0x34
+>    ____kasan_slab_free+0x1c1/0x1d5
+>    __kasan_slab_free+0xe/0x13
+>    __kmem_cache_free+0x29a/0x387
+>    kfree+0xd3/0x10e
+>    cifs_fattr_to_inode+0xb6a/0xc8c
+>    cifs_get_inode_info+0x3cb/0x1690
+>    cifs_revalidate_dentry_attr+0x70d/0x964
+>    cifs_revalidate_dentry+0x36/0x62
+>    cifs_d_revalidate+0x162/0x446
+>    lookup_open+0x36f/0x9f9
+>    open_last_lookups+0x63d/0xc26
+>    path_openat+0x11a/0x261
+>    do_filp_open+0xcc/0x168
+>    do_sys_openat2+0x13b/0x3f7
+>    do_sys_open+0x10f/0x146
+>    __se_sys_creat+0x27/0x2e
+>    __x64_sys_creat+0x55/0x6a
+>    do_syscall_64+0x40/0x96
+>    entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+> When opened a symlink, link name is from 'inode->i_link', but it may be
+> reset to a new value when revalidate the dentry. If some processes get the
+> link name on the race scenario, then UAF will happen on link name.
+>
+> Fix this by implementing 'get_link' interface to duplicate the link name.
+>
+> Fixes: 76894f3e2f71 ("cifs: improve symlink handling for smb2+")
+> Signed-off-by: ChenXiaoSong <chenxiaosong2@huawei.com>
+> ---
+>  fs/cifs/cifsfs.c | 21 ++++++++++++++++++++-
+>  fs/cifs/inode.c  |  5 -----
+>  2 files changed, 20 insertions(+), 6 deletions(-)
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Good catch.  I was also able to reproduce it with CONFIG_KASAN=y when
+running xfstests generic/011 multiple times.
+
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index d0b9fec111aa..bb9592594fcc 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -1143,8 +1143,27 @@ const struct inode_operations cifs_file_inode_ops = {
+>  	.fiemap = cifs_fiemap,
+>  };
+>  
+> +const char *cifs_get_link(struct dentry *dentry, struct inode *inode,
+> +			    struct delayed_call *done)
+> +{
+
+Aren't you supposed to return ERR_PTR(-ECHILD) when !dentry
+(e.g. rcu-walk mode)?
+
+> +	char *target_path = NULL;
+> +
+> +	spin_lock(&inode->i_lock);
+> +	if (likely(CIFS_I(inode)->symlink_target))
+> +		target_path = kstrdup(CIFS_I(inode)->symlink_target,
+> +				      GFP_ATOMIC);
+> +	spin_unlock(&inode->i_lock);
+
+Can't you get rid of above kmalloc() inside spin lock and do something
+like
+
+        target_path = kmalloc(PATH_MAX, GFP_KERNEL);
+        if (!target_path)
+                return ERR_PTR(-ENOMEM);
+
+        spin_lock(&inode->i_lock);
+        if (likely(CIFS_I(inode)->symlink_target))
+                strscpy(target_path, CIFS_I(inode)->symlink_target, PATH_MAX);
+        else {
+                kfree(target_path);
+                target_path = ERR_PTR(-EOPNOTSUPP);
+        }
+        spin_unlock(&inode->i_lock);
+
+        if (!IS_ERR(target_path))
+                set_delayed_call(done, kfree_link, target_path);
+
+        return target_path;
