@@ -2,116 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F9C2C43219
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Nov 2022 20:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4AEC433FE
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Nov 2022 22:00:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229745AbiKCUrZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Nov 2022 16:47:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48900 "EHLO
+        id S231295AbiKCV77 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Nov 2022 17:59:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230338AbiKCUrY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Nov 2022 16:47:24 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0075F20998
-        for <linux-cifs@vger.kernel.org>; Thu,  3 Nov 2022 13:47:22 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id z5-20020a17090a8b8500b00210a3a2364fso6424718pjn.0
-        for <linux-cifs@vger.kernel.org>; Thu, 03 Nov 2022 13:47:22 -0700 (PDT)
+        with ESMTP id S229445AbiKCV76 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Nov 2022 17:59:58 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387D6BE3;
+        Thu,  3 Nov 2022 14:59:58 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id u8-20020a17090a5e4800b002106dcdd4a0so6573398pji.1;
+        Thu, 03 Nov 2022 14:59:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20210112.gappssmtp.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MxS/4UcS9QV06TA42jz+n7cPJ0B1Da1lpvr3ubjc6GY=;
-        b=cuP5UtrVPLmPkgDyIU7nXUWip6wPNwEQX83eaiYzuSaa/NwaBOHxdiCCYvHyd3mrWb
-         UX4IYw78zXIF0mMu0R7qDreIqrr7PvviOTacDCidW9f3UUssGYk9RosDNLvY+hm88Tz8
-         hEooCKFouHczA6F3wBjXPLYrpYIszUEwnYnlDxkOvhuNi8oE//fz5w1SOEhhUUoWt77E
-         pAHn5L/ZZzWw3HkpcasZr6hnf6O/XMcGhjxvLwJ33vohngsJ1KBKVvIfn+XAYIa1YRVX
-         Vkpw4CNDgLSlpQfjW7+15/HKqs/xOt8+2WdHOo1jGBPReCKhIlOzYbvvyYROh/eydkAD
-         rc0Q==
+        bh=BXMtoJhRlFWaQLcxjEM+qd1+6PF53F0Hz+I5xM4y+wc=;
+        b=LSzE9TH+osvipk73Jg9gpor1ZQe37FTuPrWQ5VUxQIsLQ//7XAFuJQM1KyFIXYAxqx
+         BE4yzuk+xifeQgNpMYonk3DPgvpHS7XYbgoNdLomm2aKEkQCHaH0Bc7mrZFzL+9j5ZSy
+         b9DDF8m1+3bfZ9iV0lucJ1MqhbByVhp5MZXMvkd4dpduipcwth1ZiKn90EGRhJ8R9r+m
+         EJ4boWxUG+nQ4ooKm3DZioH6mkJd/Le4V3cgspEcIdaCLQDHg98SssmSluKeW2l4jPay
+         g1Az1Lvo9oZjC2k1yTkOvtryQxynTaEzmqQoj8oo4NJhMXBQYq056FnhoGgEMPlBjEct
+         OTAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MxS/4UcS9QV06TA42jz+n7cPJ0B1Da1lpvr3ubjc6GY=;
-        b=1lPtzIjzIjBquJ8087EU6TZZawFnhscuuJrhUzNraI4S0OmrKZWTImQPPqjKccamCA
-         VEdrmZNTSn8lWLLRsQ1gg+dHkDaf3/bmu7VQV76EkrEXk6aotbnR4hLxZPDCFtYWP0Jz
-         ihcUSzevFNu+MQEyGpSl1UFsZmmIl/dmCGL18+a2Fmp3TFSdPlM3fvkYwckllCpnCLI3
-         jk5jrhlwIlktHw5XNL4nOFWALJezHBCRTe/akgl1VQ4bq97hVCKA+yqRcOms+R61z26y
-         eCyA84fWds0s6pP9WqawoBaZu+tLMS9DiIr2IzM2anhx3zpbic2wj/niSa2UfR2XD2eD
-         7CxA==
-X-Gm-Message-State: ACrzQf0rLd3xx3l2UKJWFP9216grxlSTujx0urh7zgvBNA9dzK6lUvc0
-        PFk2Uj8bPcnBn9ONkZF7t8rwMA==
-X-Google-Smtp-Source: AMsMyM5GUtVQUrVsmSVgFmsiPB/ae+Y5AFUcecj0KBZFMpN2UeC1Le+3w3RaW8dan20LGNVVX2XxhA==
-X-Received: by 2002:a17:90a:5781:b0:20a:9962:bb4a with SMTP id g1-20020a17090a578100b0020a9962bb4amr49118773pji.185.1667508442530;
-        Thu, 03 Nov 2022 13:47:22 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-106-210.pa.nsw.optusnet.com.au. [49.181.106.210])
-        by smtp.gmail.com with ESMTPSA id y12-20020aa78f2c000000b00561b455267fsm1205656pfr.27.2022.11.03.13.47.22
+        bh=BXMtoJhRlFWaQLcxjEM+qd1+6PF53F0Hz+I5xM4y+wc=;
+        b=RKrv3DUJM7CfY2BHprOVwKEPqfFmroYGAnnHdVdqOY8dWVMmcB6og8yg8k8ROql3Re
+         Fqwdh5/RScMKafwbAcekhjZb6fW54CLqKd5in6I/+VCrk7Ndzgyk/4SrUwYBCJd08oHZ
+         fOE2BIJHTt+jLslJ8ZBF8IxdQikGfL1b2We2IziTZqbdvDlId8/NJr0JI+zZ4lKVcXhY
+         bKgh7asDtYfNDQQCmK2k7GHmqvw0nmVM2Lzvy8HfRR6dedwkH6PV2dUX7pXjfIWgTdb0
+         2VwNvImMjCwLTsOBLIwsTon/MgYFRQOByNn+ZVjLcjfEN4f5TNwAnBA+HBk6nXNr2qyg
+         V3Cw==
+X-Gm-Message-State: ACrzQf0bap+seG7CJipX4qovZDHkwJseGjTNzfZ5m93pxErfYxt2bI8O
+        kfVXF4K0FZGqWSwgNo/L4P0=
+X-Google-Smtp-Source: AMsMyM7bULDdaNCNh0UvTT4e4bGiz6aC/rB81Sbmms9IVmh3til4gq09VVgLdxxc7KpN8RZNvnj8Zw==
+X-Received: by 2002:a17:90b:1c10:b0:213:1bb8:feb with SMTP id oc16-20020a17090b1c1000b002131bb80febmr49947295pjb.214.1667512797631;
+        Thu, 03 Nov 2022 14:59:57 -0700 (PDT)
+Received: from fedora ([2601:644:8002:1c20::8080])
+        by smtp.gmail.com with ESMTPSA id 123-20020a621781000000b00562784609fbsm1184991pfx.209.2022.11.03.14.59.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 13:47:22 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1oqh7P-009uXX-4a; Fri, 04 Nov 2022 07:47:19 +1100
-Date:   Fri, 4 Nov 2022 07:47:19 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Vishal Moola <vishal.moola@gmail.com>
+        Thu, 03 Nov 2022 14:59:57 -0700 (PDT)
+Date:   Thu, 3 Nov 2022 14:59:54 -0700
+From:   Vishal Moola <vishal.moola@gmail.com>
+To:     Dave Chinner <david@fromorbit.com>
 Cc:     linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
         ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
         linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
         cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH v4 00/23] Convert to filemap_get_folios_tag()
-Message-ID: <20221103204719.GY2703033@dread.disaster.area>
-References: <20221102161031.5820-1-vishal.moola@gmail.com>
- <20221103070807.GX2703033@dread.disaster.area>
- <CAOzc2pzFMU-XiGZ9bsp40JkpYVSzQuxs2VXgfw_p9abkj4GrFw@mail.gmail.com>
+        linux-mm@kvack.org, David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 00/23] Convert to filemap_get_folios_tag()
+Message-ID: <Y2Q52uQGoqGM4o9m@fedora>
+References: <20220901220138.182896-1-vishal.moola@gmail.com>
+ <20221018214544.GI2703033@dread.disaster.area>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOzc2pzFMU-XiGZ9bsp40JkpYVSzQuxs2VXgfw_p9abkj4GrFw@mail.gmail.com>
+In-Reply-To: <20221018214544.GI2703033@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Nov 03, 2022 at 09:38:48AM -0700, Vishal Moola wrote:
-> On Thu, Nov 3, 2022 at 12:08 AM Dave Chinner <david@fromorbit.com> wrote:
-> >
-> > On Wed, Nov 02, 2022 at 09:10:08AM -0700, Vishal Moola (Oracle) wrote:
-> > > This patch series replaces find_get_pages_range_tag() with
-> > > filemap_get_folios_tag(). This also allows the removal of multiple
-> > > calls to compound_head() throughout.
-> > > It also makes a good chunk of the straightforward conversions to folios,
-> > > and takes the opportunity to introduce a function that grabs a folio
-> > > from the pagecache.
-> > >
-> > > F2fs and Ceph have quite a lot of work to be done regarding folios, so
-> > > for now those patches only have the changes necessary for the removal of
-> > > find_get_pages_range_tag(), and only support folios of size 1 (which is
-> > > all they use right now anyways).
-> > >
-> > > I've run xfstests on btrfs, ext4, f2fs, and nilfs2, but more testing may be
-> > > beneficial. The page-writeback and filemap changes implicitly work. Testing
-> > > and review of the other changes (afs, ceph, cifs, gfs2) would be appreciated.
-> >
-> > Same question as last time: have you tested this with multipage
-> > folios enabled? If you haven't tested XFS, then I'm guessing the
-> > answer is no, and you haven't fixed the bug I pointed out in
-> > the write_cache_pages() implementation....
-> >
+On Wed, Oct 19, 2022 at 08:45:44AM +1100, Dave Chinner wrote:
+> On Thu, Sep 01, 2022 at 03:01:15PM -0700, Vishal Moola (Oracle) wrote:
+> > This patch series replaces find_get_pages_range_tag() with
+> > filemap_get_folios_tag(). This also allows the removal of multiple
+> > calls to compound_head() throughout.
+> > It also makes a good chunk of the straightforward conversions to folios,
+> > and takes the opportunity to introduce a function that grabs a folio
+> > from the pagecache.
+> > 
+> > F2fs and Ceph have quite alot of work to be done regarding folios, so
+> > for now those patches only have the changes necessary for the removal of
+> > find_get_pages_range_tag(), and only support folios of size 1 (which is
+> > all they use right now anyways).
+> > 
+> > I've run xfstests on btrfs, ext4, f2fs, and nilfs2, but more testing may be
+> > beneficial.
 > 
-> I haven't tested the series with multipage folios or XFS.
+> Well, that answers my question about how filesystems that enable
+> multi-page folios were tested: they weren't. 
 > 
-> I don't seem to have gotten your earlier comments, and I
-> can't seem to find them on the mailing lists. Could you
-> please send them again so I can take a look?
+> I'd suggest that anyone working on further extending the
+> filemap/folio infrastructure really needs to be testing XFS as a
+> first priority, and then other filesystems as a secondary concern.
+> 
+> That's because XFS (via the fs/iomap infrastructure) is one of only
+> 3 filesystems in the kernel (AFS and tmpfs are the others) that
+> interact with the page cache and page cache "pages" solely via folio
+> interfaces. As such they are able to support multi-page folios in
+> the page cache. All of the tested filesystems still use the fixed
+> PAGE_SIZE page interfaces to interact with the page cache, so they
+> don't actually exercise interactions with multi-page folios at all.
+> 
 
-They are in the lore -fsdevel archive - no idea why you couldn't
-find them....
+Thanks for the explanation! That makes perfect sense. I wholeheartedly
+agree, and I'll be sure to test any future changes on XFS to try to
+ensure multi-page folio functionality. 
 
-https://lore.kernel.org/linux-fsdevel/20221018210152.GH2703033@dread.disaster.area/
-https://lore.kernel.org/linux-fsdevel/20221018214544.GI2703033@dread.disaster.area/
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+I know David ran tests on AFS, so hopefully those hit multipage folios
+well enough. But I'm not sure whether it was just for the AFS patch or
+with the whole series applied. Regardless I'll run my own set of tests
+on XFS and see if I run into any issues as well.
