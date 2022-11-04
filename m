@@ -2,88 +2,68 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA729C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Nov 2022 18:49:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 538C6C4332F
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Nov 2022 20:06:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229511AbiKDStv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 4 Nov 2022 14:49:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36392 "EHLO
+        id S229663AbiKDUG4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 4 Nov 2022 16:06:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbiKDStt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Nov 2022 14:49:49 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 108A15F70
-        for <linux-cifs@vger.kernel.org>; Fri,  4 Nov 2022 11:49:49 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id j6so3770623qvn.12
-        for <linux-cifs@vger.kernel.org>; Fri, 04 Nov 2022 11:49:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=l9rtjuYQHEdZGFnPi4RO+GW6VHNzPLGvueZ1wnAoh2k=;
-        b=OWDsUW0TRqhugSuTXEHAIWTiEORqtx5V3rm6QXXdvdb/+4LTjk8HA1gynX6RS2YvPr
-         YwGT0Vmshp0VTPKxfY0x2OPAMJFWxvc63VjG76cOTNECBxWVbm3bFDDUyd4lObbZV3C/
-         15holUc1uUmi0znm1aMGfpgmqvl14sVRYOGAg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l9rtjuYQHEdZGFnPi4RO+GW6VHNzPLGvueZ1wnAoh2k=;
-        b=gdR5F5C0rXITDu6EmxCohZZ/wjvHa/tB1AQ/8gROhUQ1Fks6//yKhAaewVuHvOkxJ6
-         46fj5rdsVl9xBhDA1eF8qAoR5vsXNsJLILedC/Nwf2S1YUdzL5i4j8e7kPCkTCI9VFXZ
-         PC4yvF5dusjjc4As1z+NRc76mTeFDWvG6886Pbz0LjZ0LhJJzBeIsBF+b36RHK/9FGrB
-         lDcpujl8iZcHwOngo1lOzSN9pNuSrm8DRx8Ta3IMT4eX1xtBetbZC2fzHV64uCXqjk01
-         IckpFq/54qW8sYvwsk0uyXvr5J1FD8RrJ0H51f/8a9lfetKil+Yriuusvhv5RWuyFsys
-         RZ/w==
-X-Gm-Message-State: ACrzQf3N4JJsGhlRcPjSMq+4cwrCFc00Dsd78hVe8a6BUd66HPUJTCCW
-        VRwN+7uLp/5fzA2TN6+zbiXqRaV1diJyUQ==
-X-Google-Smtp-Source: AMsMyM4AYc1AZVUKafnxBwYL0ahCw4NuQvto3lE5hfACa9elIG9D2/fQ23NGvF4I9xtJbTwiLphqFQ==
-X-Received: by 2002:ad4:5f4c:0:b0:4b8:ec94:68e with SMTP id p12-20020ad45f4c000000b004b8ec94068emr32956066qvg.38.1667587787934;
-        Fri, 04 Nov 2022 11:49:47 -0700 (PDT)
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com. [209.85.128.171])
-        by smtp.gmail.com with ESMTPSA id 145-20020a370b97000000b006eeb3165565sm3342636qkl.80.2022.11.04.11.49.45
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Nov 2022 11:49:45 -0700 (PDT)
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-36ad4cf9132so51583577b3.6
-        for <linux-cifs@vger.kernel.org>; Fri, 04 Nov 2022 11:49:45 -0700 (PDT)
-X-Received: by 2002:a81:8241:0:b0:370:5fad:47f0 with SMTP id
- s62-20020a818241000000b003705fad47f0mr27860255ywf.441.1667587785316; Fri, 04
- Nov 2022 11:49:45 -0700 (PDT)
+        with ESMTP id S229677AbiKDUGz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Nov 2022 16:06:55 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3A623C;
+        Fri,  4 Nov 2022 13:06:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=s2O/qvDFRXf6wsYKSZLjcNGb+D8yn522RgYWCb7F9IA=; b=GtnDjMYQ5z4Z0YK9fPQqghVAUu
+        S1NnClGtXQ3weaDOyQ9V0+0Pia32moBZqAjUYqkInOBGfZeixA7s3fZHLaEqsaXw7xHFxvuj7Bk2D
+        NGp2vaLcYpNUIXvducZ7V1dGW0tYCtdUikNkvwwd0nwwxQ2w6UAsvh2cvrULg6KAH8QmFp7WA2c2t
+        AZc9EHn3KODznyd/NQ3mZ8pYJ2EjOwTOoAkuCzZ9oZmGEy5PBpIJLR/l0lQMr9fYyRC55QvSOvYxC
+        AH/s8bS6XlEJM43lfJ6ozC36C89WNlhsRSaVoZT4F4UNLptNZsF/H6SfN7ucyrFXy4U6Q8jCS/It+
+        hkGNj1Ng==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1or2xl-007dIx-Tf; Fri, 04 Nov 2022 20:06:49 +0000
+Date:   Fri, 4 Nov 2022 20:06:49 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Vishal Moola <vishal.moola@gmail.com>,
+        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 04/23] page-writeback: Convert write_cache_pages() to use
+ filemap_get_folios_tag()
+Message-ID: <Y2Vw2UBkti7MeG5U@casper.infradead.org>
+References: <20220901220138.182896-1-vishal.moola@gmail.com>
+ <20220901220138.182896-5-vishal.moola@gmail.com>
+ <20221018210152.GH2703033@dread.disaster.area>
+ <Y2RAdUtJrOJmYU4L@fedora>
+ <20221104003235.GZ2703033@dread.disaster.area>
 MIME-Version: 1.0
-References: <1010626.1667584040@warthog.procyon.org.uk>
-In-Reply-To: <1010626.1667584040@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 4 Nov 2022 11:49:28 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjKwjX-hNV81sDy8J3vi9_x5m7iCEOFTR1ijiPGfQdz9w@mail.gmail.com>
-Message-ID: <CAHk-=wjKwjX-hNV81sDy8J3vi9_x5m7iCEOFTR1ijiPGfQdz9w@mail.gmail.com>
-Subject: Re: [PATCH] iov_iter: Declare new iterator direction symbols
-To:     David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
-        dchinner@redhat.com, Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221104003235.GZ2703033@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Nov 4, 2022 at 10:47 AM David Howells <dhowells@redhat.com> wrote:
->
-> If we're going to go with Al's changes to switch to using ITER_SOURCE and
-> ITER_DEST instead of READ/WRITE, can we put just the new symbols into mainline
-> now, even if we leave the rest for the next merge window?
+On Fri, Nov 04, 2022 at 11:32:35AM +1100, Dave Chinner wrote:
+> At minimum, it needs to be documented, though I'd much prefer that
+> we explicitly duplicate write_cache_pages() as write_cache_folios()
+> with a callback that takes a folio and change the code to be fully
+> multi-page folio safe. Then filesystems that support folios (and
+> large folios) natively can be passed folios without going through
+> this crappy "folio->page, page->folio" dance because the writepage
+> APIs are unaware of multi-page folio constructs.
 
-No, I really don't want to have mixed-used stuff in the kernel.
-
-Continue to use the old names until/if the conversion happens, at
-which point it's the conversion code that does it.
-
-No "one branch uses new names, another uses old names" mess.
-
-               Linus
+There are a lot of places which go through the folio->page->folio
+dance, and this one wasn't even close to the top of my list.  That
+said, it has a fairly small number of callers -- ext4, fuse, iomap,
+mpage, nfs, orangefs.  So Vishal, this seems like a good project for you
+to take on next -- convert write_cache_pages() to write_cache_folios()
+and writepage_t to write_folio_t.
