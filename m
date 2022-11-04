@@ -2,192 +2,88 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B282CC433FE
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Nov 2022 07:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6942C433FE
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Nov 2022 15:27:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230435AbiKDHan (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 4 Nov 2022 03:30:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57800 "EHLO
+        id S232190AbiKDP12 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 4 Nov 2022 11:27:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231360AbiKDHa1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Nov 2022 03:30:27 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC8F829C94;
-        Fri,  4 Nov 2022 00:30:02 -0700 (PDT)
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N3XHP6vGszpW5B;
-        Fri,  4 Nov 2022 15:26:25 +0800 (CST)
-Received: from kwepemm600015.china.huawei.com (7.193.23.52) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 4 Nov 2022 15:30:01 +0800
-Received: from huawei.com (10.175.101.6) by kwepemm600015.china.huawei.com
- (7.193.23.52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Fri, 4 Nov
- 2022 15:30:00 +0800
-From:   ChenXiaoSong <chenxiaosong2@huawei.com>
-To:     <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>
-CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-        <linux-kernel@vger.kernel.org>, <chenxiaosong2@huawei.com>,
-        <yi.zhang@huawei.com>, <zhangxiaoxu5@huawei.com>
-Subject: [PATCH v2] cifs: fix use-after-free on the link name
-Date:   Fri, 4 Nov 2022 15:44:41 +0800
-Message-ID: <20221104074441.634677-1-chenxiaosong2@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S232408AbiKDP1P (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Nov 2022 11:27:15 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E532716E;
+        Fri,  4 Nov 2022 08:27:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=NRigLoVbg9iNMuo2V8dujDupHLGv4656kHqtcy7GZD8=; b=cC/8pOU9guMXpHbLROmQ2jJkPP
+        fLIJJBoVaFImQSaJFL0EWP8TTGFmm1Fq/sTBJJzHOEsig/P1SI1UBIbnctYsc4kfBpEtbkTVb2mcZ
+        Ox1PTbpiMUHAhUcDFiGqO5ffa8RLcaU4htW4J7D1+QIRrp5YcZ701l+dtCKa0/v+wq867Rzs2qjn5
+        m+hDXZshw76/eeJ25GEvs/oa2Dpn7Gb7+4FfiG7RrZMv4cn4ae/Eyjl07Dbl+O73y7VDkBQtEk8h0
+        f9z379l8811dl922VVtAq9pc8KIqwTp7lj2fnWcgj+lzkCFo5nZGbwWtuSpe8hnrjhN+krL6P+YDR
+        WpFHYXzg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oqybA-007SeM-OG; Fri, 04 Nov 2022 15:27:12 +0000
+Date:   Fri, 4 Nov 2022 15:27:12 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        cluster-devel@redhat.com, linux-nilfs@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 04/23] page-writeback: Convert write_cache_pages() to use
+ filemap_get_folios_tag()
+Message-ID: <Y2UvUOn6hmnqbrA7@casper.infradead.org>
+References: <20220901220138.182896-1-vishal.moola@gmail.com>
+ <20220901220138.182896-5-vishal.moola@gmail.com>
+ <20221018210152.GH2703033@dread.disaster.area>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600015.china.huawei.com (7.193.23.52)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221018210152.GH2703033@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-xfstests generic/011 reported use-after-free bug as follows:
+On Wed, Oct 19, 2022 at 08:01:52AM +1100, Dave Chinner wrote:
+> On Thu, Sep 01, 2022 at 03:01:19PM -0700, Vishal Moola (Oracle) wrote:
+> > @@ -2313,17 +2313,18 @@ int write_cache_pages(struct address_space *mapping,
+> >  	while (!done && (index <= end)) {
+> >  		int i;
+> >  
+> > -		nr_pages = pagevec_lookup_range_tag(&pvec, mapping, &index, end,
+> > -				tag);
+> > -		if (nr_pages == 0)
+> > +		nr_folios = filemap_get_folios_tag(mapping, &index, end,
+> > +				tag, &fbatch);
+> 
+> This can find and return dirty multi-page folios if the filesystem
+> enables them in the mapping at instantiation time, right?
 
-  BUG: KASAN: use-after-free in __d_alloc+0x269/0x859
-  Read of size 15 at addr ffff8880078933a0 by task dirstress/952
+Correct.  Just like before the patch.  pagevec_lookup_range_tag() has
+only ever returned head pages, never tail pages.  This is probably
+because shmem (which was our only fs that supported compound pages)
+never supported writeback, so never looked up pages by tag.
 
-  CPU: 1 PID: 952 Comm: dirstress Not tainted 6.1.0-rc3+ #77
-  Call Trace:
-   __dump_stack+0x23/0x29
-   dump_stack_lvl+0x51/0x73
-   print_address_description+0x67/0x27f
-   print_report+0x3e/0x5c
-   kasan_report+0x7b/0xa8
-   kasan_check_range+0x1b2/0x1c1
-   memcpy+0x22/0x5d
-   __d_alloc+0x269/0x859
-   d_alloc+0x45/0x20c
-   d_alloc_parallel+0xb2/0x8b2
-   lookup_open+0x3b8/0x9f9
-   open_last_lookups+0x63d/0xc26
-   path_openat+0x11a/0x261
-   do_filp_open+0xcc/0x168
-   do_sys_openat2+0x13b/0x3f7
-   do_sys_open+0x10f/0x146
-   __se_sys_creat+0x27/0x2e
-   __x64_sys_creat+0x55/0x6a
-   do_syscall_64+0x40/0x96
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> >  			trace_wbc_writepage(wbc, inode_to_bdi(mapping->host));
+> > -			error = (*writepage)(page, wbc, data);
+> > +			error = writepage(&folio->page, wbc, data);
+> 
+> Yet, IIUC, this treats all folios as if they are single page folios.
+> i.e. it passes the head page of a multi-page folio to a callback
+> that will treat it as a single PAGE_SIZE page, because that's all
+> the writepage callbacks are currently expected to be passed...
+> 
+> So won't this break writeback of dirty multipage folios?
 
-  Allocated by task 952:
-   kasan_save_stack+0x1f/0x42
-   kasan_set_track+0x21/0x2a
-   kasan_save_alloc_info+0x17/0x1d
-   __kasan_kmalloc+0x7e/0x87
-   __kmalloc_node_track_caller+0x59/0x155
-   kstrndup+0x60/0xe6
-   parse_mf_symlink+0x215/0x30b
-   check_mf_symlink+0x260/0x36a
-   cifs_get_inode_info+0x14e1/0x1690
-   cifs_revalidate_dentry_attr+0x70d/0x964
-   cifs_revalidate_dentry+0x36/0x62
-   cifs_d_revalidate+0x162/0x446
-   lookup_open+0x36f/0x9f9
-   open_last_lookups+0x63d/0xc26
-   path_openat+0x11a/0x261
-   do_filp_open+0xcc/0x168
-   do_sys_openat2+0x13b/0x3f7
-   do_sys_open+0x10f/0x146
-   __se_sys_creat+0x27/0x2e
-   __x64_sys_creat+0x55/0x6a
-   do_syscall_64+0x40/0x96
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-  Freed by task 950:
-   kasan_save_stack+0x1f/0x42
-   kasan_set_track+0x21/0x2a
-   kasan_save_free_info+0x1c/0x34
-   ____kasan_slab_free+0x1c1/0x1d5
-   __kasan_slab_free+0xe/0x13
-   __kmem_cache_free+0x29a/0x387
-   kfree+0xd3/0x10e
-   cifs_fattr_to_inode+0xb6a/0xc8c
-   cifs_get_inode_info+0x3cb/0x1690
-   cifs_revalidate_dentry_attr+0x70d/0x964
-   cifs_revalidate_dentry+0x36/0x62
-   cifs_d_revalidate+0x162/0x446
-   lookup_open+0x36f/0x9f9
-   open_last_lookups+0x63d/0xc26
-   path_openat+0x11a/0x261
-   do_filp_open+0xcc/0x168
-   do_sys_openat2+0x13b/0x3f7
-   do_sys_open+0x10f/0x146
-   __se_sys_creat+0x27/0x2e
-   __x64_sys_creat+0x55/0x6a
-   do_syscall_64+0x40/0x96
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-When opened a symlink, link name is from 'inode->i_link', but it may be
-reset to a new value when revalidate the dentry. If some processes get the
-link name on the race scenario, then UAF will happen on link name.
-
-Fix this by implementing 'get_link' interface to duplicate the link name.
-
-Fixes: 76894f3e2f71 ("cifs: improve symlink handling for smb2+")
-Signed-off-by: ChenXiaoSong <chenxiaosong2@huawei.com>
----
- fs/cifs/cifsfs.c | 26 +++++++++++++++++++++++++-
- fs/cifs/inode.c  |  5 -----
- 2 files changed, 25 insertions(+), 6 deletions(-)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index d0b9fec111aa..fe220686bba4 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1143,8 +1143,32 @@ const struct inode_operations cifs_file_inode_ops = {
- 	.fiemap = cifs_fiemap,
- };
- 
-+const char *cifs_get_link(struct dentry *dentry, struct inode *inode,
-+			    struct delayed_call *done)
-+{
-+	char *target_path;
-+
-+	target_path = kmalloc(PATH_MAX, GFP_KERNEL);
-+	if (!target_path)
-+		return ERR_PTR(-ENOMEM);
-+
-+	spin_lock(&inode->i_lock);
-+	if (likely(CIFS_I(inode)->symlink_target)) {
-+		strscpy(target_path, CIFS_I(inode)->symlink_target, PATH_MAX);
-+	} else {
-+		kfree(target_path);
-+		target_path = ERR_PTR(-EOPNOTSUPP);
-+	}
-+	spin_unlock(&inode->i_lock);
-+
-+	if (!IS_ERR(target_path))
-+		set_delayed_call(done, kfree_link, target_path);
-+
-+	return target_path;
-+}
-+
- const struct inode_operations cifs_symlink_inode_ops = {
--	.get_link = simple_get_link,
-+	.get_link = cifs_get_link,
- 	.permission = cifs_permission,
- 	.listxattr = cifs_listxattr,
- };
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 9bde08d44617..4e2ca3c6e5c0 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -215,11 +215,6 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
- 		kfree(cifs_i->symlink_target);
- 		cifs_i->symlink_target = fattr->cf_symlink_target;
- 		fattr->cf_symlink_target = NULL;
--
--		if (unlikely(!cifs_i->symlink_target))
--			inode->i_link = ERR_PTR(-EOPNOTSUPP);
--		else
--			inode->i_link = cifs_i->symlink_target;
- 	}
- 	spin_unlock(&inode->i_lock);
- 
--- 
-2.31.1
+No.  A filesystem only sets the flag to create multipage folios once its
+writeback callback handles multipage folios correctly (amongst many other
+things that have to be fixed and tested).  I haven't written down all
+the things that a filesystem maintainer needs to check at least partly
+because I don't know how representative XFS/iomap are of all filesystems.
 
