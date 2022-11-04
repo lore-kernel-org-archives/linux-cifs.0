@@ -2,117 +2,66 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CCC4C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Nov 2022 17:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC76DC433FE
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Nov 2022 17:56:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230297AbiKDRsf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 4 Nov 2022 13:48:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
+        id S230402AbiKDRz7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 4 Nov 2022 13:55:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231797AbiKDRse (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Nov 2022 13:48:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D11B011174
-        for <linux-cifs@vger.kernel.org>; Fri,  4 Nov 2022 10:47:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667584048;
+        with ESMTP id S229882AbiKDRzz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Nov 2022 13:55:55 -0400
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C53E2ED77;
+        Fri,  4 Nov 2022 10:55:53 -0700 (PDT)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id C75D37FC21;
+        Fri,  4 Nov 2022 17:55:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1667584549;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=qnPmYmConUMgaBA5iJmBF7ozEvY3875t4nGAe/KAgjQ=;
-        b=XGQybIPrL7qvkhV+JFhFl1i/73L8BXxvQ9w/H7mK48m5O0PMxlaNMFD07E9t/uqvGlML1J
-        Wd1eday13O9/hMeUGMIK0hYM93B2E4Z7/oPCEKbbR1pYMvLBmwaot7AmC8dxOEC8ssy+pC
-        EdVU9Xg5mxe45UfyqSr0Jm5q/zBaCTQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-102-3FIYXAr3MwugYiDXwX6Aig-1; Fri, 04 Nov 2022 13:47:24 -0400
-X-MC-Unique: 3FIYXAr3MwugYiDXwX6Aig-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7905F85A583;
-        Fri,  4 Nov 2022 17:47:23 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.37.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C97C4EA5A;
-        Fri,  4 Nov 2022 17:47:21 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        David Howells <dhowells@redhat.com>, willy@infradead.org,
-        dchinner@redhat.com, Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] iov_iter: Declare new iterator direction symbols
+         in-reply-to:in-reply-to:references:references;
+        bh=q1Dy8m8CsJkIJ0vL9UqbIPKGPHuWYevvTp/f6vZV0pM=;
+        b=pW6sPzhPrB5TXSoZipU1GaNRjF7yspEEjL4QX3KVHm8sRdQhsonojI5CWnutDj9nBFkRX/
+        FJMRlg1f7y3QdZA6B/XsqRiK0lGjSdBKjTB9re1e1LVqo2UUrDDULdpkRNpOgaDpWfAJuK
+        jq0dtIxOdBMjq0/R31fetPo7pdnXwJEQWt9Ohk0sfJmcoqLW7ofhY+mIVprTqxHnGyM61R
+        KWpJbs5gxRt0b1VDtULMzCF7u/iALCq+UJG6/6AguPO6VrVMMsQ52PexFKYCRVc8akBMm4
+        KIbXtm6L1Z/GNau2DuwqwNz1ocBoKNe2NDVJ2UzwY7sKWmN6j3F6YyvixeoApA==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     ChenXiaoSong <chenxiaosong2@huawei.com>, sfrench@samba.org,
+        lsahlber@redhat.com
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, chenxiaosong2@huawei.com,
+        yi.zhang@huawei.com, zhangxiaoxu5@huawei.com
+Subject: Re: [PATCH v2] cifs: fix use-after-free on the link name
+In-Reply-To: <20221104074441.634677-1-chenxiaosong2@huawei.com>
+References: <20221104074441.634677-1-chenxiaosong2@huawei.com>
+Date:   Fri, 04 Nov 2022 14:56:57 -0300
+Message-ID: <871qqi1u3a.fsf@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1010625.1667584040.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 04 Nov 2022 17:47:20 +0000
-Message-ID: <1010626.1667584040@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Linus, Al,
+ChenXiaoSong <chenxiaosong2@huawei.com> writes:
 
-If we're going to go with Al's changes to switch to using ITER_SOURCE and
-ITER_DEST instead of READ/WRITE, can we put just the new symbols into main=
-line
-now, even if we leave the rest for the next merge window?
+> When opened a symlink, link name is from 'inode->i_link', but it may be
+> reset to a new value when revalidate the dentry. If some processes get the
+> link name on the race scenario, then UAF will happen on link name.
+>
+> Fix this by implementing 'get_link' interface to duplicate the link name.
+>
+> Fixes: 76894f3e2f71 ("cifs: improve symlink handling for smb2+")
+> Signed-off-by: ChenXiaoSong <chenxiaosong2@huawei.com>
+> ---
+>  fs/cifs/cifsfs.c | 26 +++++++++++++++++++++++++-
+>  fs/cifs/inode.c  |  5 -----
+>  2 files changed, 25 insertions(+), 6 deletions(-)
 
-Thanks,
-David
----
-From: Al Viro <viro@zeniv.linux.org.uk>
-
-iov_iter: Declare new iterator direction symbols
-
-READ/WRITE proved to be actively confusing - the meanings are
-"data destination, as used with read(2)" and "data source, as
-used with write(2)", but people keep interpreting those as
-"we read data from it" and "we write data to it", i.e. exactly
-the wrong way.
-
-Call them ITER_DEST and ITER_SOURCE - at least that is harder
-to misinterpret...
-
-[dhowells] Declare the symbols for later use and change to an enum.  If
-READ/WRITE are switched to an enum also, I think the compiler should
-generate a warning if they're mixed.
-
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Link: https://lore.kernel.org/r/20221028023352.3532080-12-viro@zeniv.linux=
-.org.uk/ # v2
----
- include/linux/uio.h |    5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 2e3134b14ffd..7c1317b34c57 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -29,6 +29,11 @@ enum iter_type {
- 	ITER_UBUF,
- };
- =
-
-+enum iov_iter_direction {
-+	ITER_DEST	=3D 0,	/* Iterator is a destination buffer (=3D=3D READ) */
-+	ITER_SOURCE	=3D 1,	/* Iterator is a source buffer (=3D=3D WRITE) */
-+};
-+
- struct iov_iter_state {
- 	size_t iov_offset;
- 	size_t count;
-
+Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
