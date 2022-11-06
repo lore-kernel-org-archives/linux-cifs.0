@@ -2,104 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C532C433FE
-	for <linux-cifs@archiver.kernel.org>; Sun,  6 Nov 2022 05:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E10B5C433FE
+	for <linux-cifs@archiver.kernel.org>; Sun,  6 Nov 2022 18:49:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229464AbiKFFHx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 6 Nov 2022 01:07:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54326 "EHLO
+        id S230194AbiKFStt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 6 Nov 2022 13:49:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiKFFHw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Nov 2022 01:07:52 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 827ADDEAE;
-        Sat,  5 Nov 2022 22:07:51 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id d3so11718208ljl.1;
-        Sat, 05 Nov 2022 22:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FD7cFXaNxreHZW/S/IEPAaDO1vDMzt9q8nyoz0dU69U=;
-        b=jPm9opIhg0S1ilPGsAvRrk0KML6qSvoVW5z+yJlnipA+AXOdidF0V24962I3lDsIlR
-         X7Cwb7O9/750qXZvuQ+mtdYP7Z7il/5HyGV/yujNbW/rmt+i7LFZl8EOquGkpXMiQCVp
-         ENCHnyThe4UEs6gsg51m+nW8PSW6VyDkUBYLMsUxuRgQb1TieZXyH3snTe8jso2nxIJc
-         7FVZ/qWxdkjxntQLjV2Rl678tS5Z5bwIz4Shuadc+7HgZJ7jI1Pf/Vcbp5Ehu2rS/L2b
-         EvYIeNVN/WCa85I4Vu8TGA2FR6DZbq5yfQSVQB/puczGE3RGVifdstOKjCw/DM3t5OmP
-         cfUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FD7cFXaNxreHZW/S/IEPAaDO1vDMzt9q8nyoz0dU69U=;
-        b=gcHiOcbxOH62tg6O4xH+lTZiodNkQzmz2iyp1uY/ZNHph4a/qaeqs6W8jlSb5EcKIi
-         nx0FXPpAr2iuncKmYpIfxHW3eOgSU/fYgDWDd+h27KxCmFO4VOAcewE6tSLpl2aNHATH
-         3GByO9SV5cl3DQYgImERE1zijYV2j1BqczHf1MI3GXB/onGjVJeWtVEdbmmtU3OPurLQ
-         6AVhXIMHChBNRh8r9Y6qIeErpBNK7IV+ByAat0zeLtoHnfyGTfitbMAU0z9ObxvhU0nC
-         m7pd7N8lgCg5QnOPi9+Si3ZzSxWdOr9i/9/nfPvkPZ0lrZ/KkJJ6U54iS8FqKJbxvNZD
-         GAGQ==
-X-Gm-Message-State: ACrzQf3ZIpdKnmOE6odb+Cf0eUPq5gS1sCQV9i9gT8PD9/t8SAevQWo9
-        RUQs9C3+ODIgRuKWHuyIVgYsXnZiE+u4rw3+mXI=
-X-Google-Smtp-Source: AMsMyM7eCUET6KyY6J1jtgBrwEFIaPGB9yMh1ig/q3XvD3C0xvwLjBB3DFtd0u7BAjDT/w1phqlXlehlU78knCm5pG4=
-X-Received: by 2002:a2e:ab0d:0:b0:26e:8a39:4cae with SMTP id
- ce13-20020a2eab0d000000b0026e8a394caemr16268501ljb.138.1667711269196; Sat, 05
- Nov 2022 22:07:49 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 6 Nov 2022 00:07:38 -0500
-Message-ID: <CAH2r5msckOPtJzUmpzRZAQCQG96nRWDFd=b3An_oiZpU=kwLBQ@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        with ESMTP id S229823AbiKFStr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Nov 2022 13:49:47 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9364AFCDB;
+        Sun,  6 Nov 2022 10:49:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id C5E0FCE0E7C;
+        Sun,  6 Nov 2022 18:49:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35F9EC433D6;
+        Sun,  6 Nov 2022 18:49:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667760583;
+        bh=1/a9XaPaAPdoM/HUiqVlNW3k6jzFVcmUm7lDa7rTz6o=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=cZVKbMY7YbMwogEaR6XJfk3Z4nuZ1OeT8dTP3zrN8WjBeTDrtBrWlD6DCH56CF5sO
+         Ylyk6TBS1JVE+IV9yt4IZc0/7jr4lWoYk3anFkVErEhhmXMII8UKd+U0VNe/l21bpb
+         aMhoj8lA7/5tZBM6hb96oKpfzF7zXI7Dj02nM9GNIAYtrRYvm5rDqqnwodoI6fh25Q
+         bQ25CEjxI7VpKXKG5JqO0F4bpgP5dsjGNaA2NX2iYHcFfduy8a64PljQdWPsYnPKtG
+         X7wFuou+qajmr/wTIpGP5isH5bso5En/BvJa5o5Joyad2FUk8Pvl+G+Cv9ufMMK5lA
+         xN5yj+6hPm9ng==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 25701C41621;
+        Sun,  6 Nov 2022 18:49:43 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5msckOPtJzUmpzRZAQCQG96nRWDFd=b3An_oiZpU=kwLBQ@mail.gmail.com>
+References: <CAH2r5msckOPtJzUmpzRZAQCQG96nRWDFd=b3An_oiZpU=kwLBQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5msckOPtJzUmpzRZAQCQG96nRWDFd=b3An_oiZpU=kwLBQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc4-smb3-fixes
+X-PR-Tracked-Commit-Id: 542228db2f28fdf775b301f2843e1fe486e7c797
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 90153f928bee544c794a2410afba6d936a09edce
+Message-Id: <166776058314.6751.4099420058110381779.pr-tracker-bot@kernel.org>
+Date:   Sun, 06 Nov 2022 18:49:43 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         ChenXiaoSong <chenxiaosong2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-30a0b95b1335e12efef89dd78518ed3e4a71a763:
+The pull request you sent on Sun, 6 Nov 2022 00:07:38 -0500:
 
-  Linux 6.1-rc3 (2022-10-30 15:19:28 -0700)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc4-smb3-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/90153f928bee544c794a2410afba6d936a09edce
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc4-smb3-fixes
-
-for you to fetch changes up to 542228db2f28fdf775b301f2843e1fe486e7c797:
-
-  cifs: fix use-after-free on the link name (2022-11-04 23:36:54 -0500)
-
-----------------------------------------------------------------
-3 cifs/smb3 fixes,
-- one for symlink handling race (fixes a bug spotted with KASAN)
-- two fix multichannel issues with iterating channels instead of using
-the primary channel. The
-more important one fixes a bug when leases are disabled (ie using
-oplocks instead) that was
-spotted with xfstest generic/013 timing out
-
-----------------------------------------------------------------
-ChenXiaoSong (1):
-      cifs: fix use-after-free on the link name
-
-Shyam Prasad N (2):
-      cifs: always iterate smb sessions using primary channel
-      cifs: avoid unnecessary iteration of tcp sessions
-
- fs/cifs/cifsfs.c        | 26 +++++++++++++++++++++++++-
- fs/cifs/inode.c         |  5 -----
- fs/cifs/misc.c          |  6 +++++-
- fs/cifs/smb2misc.c      | 81
-+++++++++++++++++++++++++++++++++++++++++++++------------------------------------
- fs/cifs/smb2ops.c       | 30 ++++++++++++++++++------------
- fs/cifs/smb2transport.c | 19 ++++++++++++-------
- 6 files changed, 105 insertions(+), 62 deletions(-)
-
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
