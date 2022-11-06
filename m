@@ -2,92 +2,101 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72583C433FE
-	for <linux-cifs@archiver.kernel.org>; Sat,  5 Nov 2022 04:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C532C433FE
+	for <linux-cifs@archiver.kernel.org>; Sun,  6 Nov 2022 05:07:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbiKEEjX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 5 Nov 2022 00:39:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44684 "EHLO
+        id S229464AbiKFFHx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 6 Nov 2022 01:07:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiKEEjX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Nov 2022 00:39:23 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5172431DC2;
-        Fri,  4 Nov 2022 21:39:22 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id bp15so9869270lfb.13;
-        Fri, 04 Nov 2022 21:39:22 -0700 (PDT)
+        with ESMTP id S229463AbiKFFHw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 6 Nov 2022 01:07:52 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 827ADDEAE;
+        Sat,  5 Nov 2022 22:07:51 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id d3so11718208ljl.1;
+        Sat, 05 Nov 2022 22:07:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pbMdUA8UzsgI7FBm0NGKkw14zTLbr3tXLACAHzr4fDs=;
-        b=CBUyq6rYjIfFSwz5VzRXGpr7DVFky/4CH0A1ipD4d8L+781f6w+0x2TsJmqGkamr6I
-         Hhnl26yg+95M13iR75yIefdX4cFjP7cM7ovutbIu4KrZRCmVksiqh7JoLI37N0plcNMS
-         s9NnMhjo2JWh1+xUY9vq9Afy0Dxf54t2hlyzG2wVyu1exu6xtm9AuZjL4+J35APgWn5Y
-         OwWXVvFlXy7J8ZlO7Bihw9NhuQo5QQ34atPRgXxJaqUOe8hGIzxu6K8muyCci9r05v02
-         Z4JLv06IBzqXbfXhVZc86fRd6QpvdlNiGQHLWu9sFaR4N4yNlRcNnQvCxQTtS8l6jBqk
-         ueTA==
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FD7cFXaNxreHZW/S/IEPAaDO1vDMzt9q8nyoz0dU69U=;
+        b=jPm9opIhg0S1ilPGsAvRrk0KML6qSvoVW5z+yJlnipA+AXOdidF0V24962I3lDsIlR
+         X7Cwb7O9/750qXZvuQ+mtdYP7Z7il/5HyGV/yujNbW/rmt+i7LFZl8EOquGkpXMiQCVp
+         ENCHnyThe4UEs6gsg51m+nW8PSW6VyDkUBYLMsUxuRgQb1TieZXyH3snTe8jso2nxIJc
+         7FVZ/qWxdkjxntQLjV2Rl678tS5Z5bwIz4Shuadc+7HgZJ7jI1Pf/Vcbp5Ehu2rS/L2b
+         EvYIeNVN/WCa85I4Vu8TGA2FR6DZbq5yfQSVQB/puczGE3RGVifdstOKjCw/DM3t5OmP
+         cfUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbMdUA8UzsgI7FBm0NGKkw14zTLbr3tXLACAHzr4fDs=;
-        b=z9QMQY899s4r/3iMaoKQ8psOEqyXRGfwRpKvu0ZFhv2EehtzXgtNrDsEwVT2rR4Vvt
-         MzhZeK+rEAyfnQf1mVTebql0gDGs8HE7z88DgmIbW3UGjNiKmpnQQQwCI/a9xHQSe7z4
-         kFFKdVrlJDewX8ClRYnVkex8oUiQP8cnogF7Ay3XvWiX+mbaZovpg8FEtWwdAZvBYwRj
-         kA44U4zz0piKyANaxrwFTIKbAlXQvIDxpBQ9gazrfBBckRWeGRJOy8u2VRCECYugG3iV
-         7VuiOTKtH2JUdeuBzPlGAx36w8oxWfyxgHUn/daxqhZY8ZKuETviYB+/2d/lYR1wK34U
-         /VzA==
-X-Gm-Message-State: ANoB5plomwEq3cphw/XAaeKHVF4YMENy/UImiytiNrpaQNXwTCe69LkQ
-        uph9Aq8cX7Xy1opR4IIb1/YUlXlqoZUE3hzs0UFaMteE
-X-Google-Smtp-Source: AA0mqf7nLvop9D7qwQ0uqbWJPpEk5/avywHRXNBnPB/1d3nHsLxajC4xHLpyUku0yqPnJvMAPZXupJDsz6XCNwkQ0DY=
-X-Received: by 2002:a19:c215:0:b0:4b2:9de:44fe with SMTP id
- l21-20020a19c215000000b004b209de44femr1584906lfc.636.1667623160012; Fri, 04
- Nov 2022 21:39:20 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FD7cFXaNxreHZW/S/IEPAaDO1vDMzt9q8nyoz0dU69U=;
+        b=gcHiOcbxOH62tg6O4xH+lTZiodNkQzmz2iyp1uY/ZNHph4a/qaeqs6W8jlSb5EcKIi
+         nx0FXPpAr2iuncKmYpIfxHW3eOgSU/fYgDWDd+h27KxCmFO4VOAcewE6tSLpl2aNHATH
+         3GByO9SV5cl3DQYgImERE1zijYV2j1BqczHf1MI3GXB/onGjVJeWtVEdbmmtU3OPurLQ
+         6AVhXIMHChBNRh8r9Y6qIeErpBNK7IV+ByAat0zeLtoHnfyGTfitbMAU0z9ObxvhU0nC
+         m7pd7N8lgCg5QnOPi9+Si3ZzSxWdOr9i/9/nfPvkPZ0lrZ/KkJJ6U54iS8FqKJbxvNZD
+         GAGQ==
+X-Gm-Message-State: ACrzQf3ZIpdKnmOE6odb+Cf0eUPq5gS1sCQV9i9gT8PD9/t8SAevQWo9
+        RUQs9C3+ODIgRuKWHuyIVgYsXnZiE+u4rw3+mXI=
+X-Google-Smtp-Source: AMsMyM7eCUET6KyY6J1jtgBrwEFIaPGB9yMh1ig/q3XvD3C0xvwLjBB3DFtd0u7BAjDT/w1phqlXlehlU78knCm5pG4=
+X-Received: by 2002:a2e:ab0d:0:b0:26e:8a39:4cae with SMTP id
+ ce13-20020a2eab0d000000b0026e8a394caemr16268501ljb.138.1667711269196; Sat, 05
+ Nov 2022 22:07:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221104074441.634677-1-chenxiaosong2@huawei.com>
- <871qqi1u3a.fsf@cjr.nz> <CAH2r5msDR41wQhtsAcE_pUvXXdvwWBBNdESvCkieBoy42vVhcA@mail.gmail.com>
-In-Reply-To: <CAH2r5msDR41wQhtsAcE_pUvXXdvwWBBNdESvCkieBoy42vVhcA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 4 Nov 2022 23:39:08 -0500
-Message-ID: <CAH2r5msCeS_3LJffON76hOO5fe7HA6Kc-5z7wDbXuoEDAijVbA@mail.gmail.com>
-Subject: Fwd: [PATCH v2] cifs: fix use-after-free on the link name
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
+Date:   Sun, 6 Nov 2022 00:07:38 -0500
+Message-ID: <CAH2r5msckOPtJzUmpzRZAQCQG96nRWDFd=b3An_oiZpU=kwLBQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        ChenXiaoSong <chenxiaosong2@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending additional testing
+Please pull the following changes since commit
+30a0b95b1335e12efef89dd78518ed3e4a71a763:
 
-On Fri, Nov 4, 2022 at 12:57 PM Paulo Alcantara via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> ChenXiaoSong <chenxiaosong2@huawei.com> writes:
->
-> > When opened a symlink, link name is from 'inode->i_link', but it may be
-> > reset to a new value when revalidate the dentry. If some processes get the
-> > link name on the race scenario, then UAF will happen on link name.
-> >
-> > Fix this by implementing 'get_link' interface to duplicate the link name.
-> >
-> > Fixes: 76894f3e2f71 ("cifs: improve symlink handling for smb2+")
-> > Signed-off-by: ChenXiaoSong <chenxiaosong2@huawei.com>
-> > ---
-> >  fs/cifs/cifsfs.c | 26 +++++++++++++++++++++++++-
-> >  fs/cifs/inode.c  |  5 -----
-> >  2 files changed, 25 insertions(+), 6 deletions(-)
->
-> Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
->
+  Linux 6.1-rc3 (2022-10-30 15:19:28 -0700)
 
+are available in the Git repository at:
 
--- 
-Thanks,
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.1-rc4-smb3-fixes
 
-Steve
+for you to fetch changes up to 542228db2f28fdf775b301f2843e1fe486e7c797:
+
+  cifs: fix use-after-free on the link name (2022-11-04 23:36:54 -0500)
+
+----------------------------------------------------------------
+3 cifs/smb3 fixes,
+- one for symlink handling race (fixes a bug spotted with KASAN)
+- two fix multichannel issues with iterating channels instead of using
+the primary channel. The
+more important one fixes a bug when leases are disabled (ie using
+oplocks instead) that was
+spotted with xfstest generic/013 timing out
+
+----------------------------------------------------------------
+ChenXiaoSong (1):
+      cifs: fix use-after-free on the link name
+
+Shyam Prasad N (2):
+      cifs: always iterate smb sessions using primary channel
+      cifs: avoid unnecessary iteration of tcp sessions
+
+ fs/cifs/cifsfs.c        | 26 +++++++++++++++++++++++++-
+ fs/cifs/inode.c         |  5 -----
+ fs/cifs/misc.c          |  6 +++++-
+ fs/cifs/smb2misc.c      | 81
++++++++++++++++++++++++++++++++++++++++++++++------------------------------------
+ fs/cifs/smb2ops.c       | 30 ++++++++++++++++++------------
+ fs/cifs/smb2transport.c | 19 ++++++++++++-------
+ 6 files changed, 105 insertions(+), 62 deletions(-)
 
 
 -- 
