@@ -2,130 +2,73 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1D7C433FE
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Nov 2022 23:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A8CC4332F
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Nov 2022 00:46:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232564AbiKGXzq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Nov 2022 18:55:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35410 "EHLO
+        id S232270AbiKHAp6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 7 Nov 2022 19:45:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232650AbiKGXzo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Nov 2022 18:55:44 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EFC527B08;
-        Mon,  7 Nov 2022 15:55:41 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id l12so7823985lfp.6;
-        Mon, 07 Nov 2022 15:55:41 -0800 (PST)
+        with ESMTP id S232607AbiKHAp6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Nov 2022 19:45:58 -0500
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D0020BC6
+        for <linux-cifs@vger.kernel.org>; Mon,  7 Nov 2022 16:45:52 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id a15so18823402ljb.7
+        for <linux-cifs@vger.kernel.org>; Mon, 07 Nov 2022 16:45:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uYpG5kIVjDW6gUzmyqnTmwzAvBCwOte6nMdhHbBsYiM=;
-        b=kweB4LEI5apssc+vdQrfozDq0gau5l6+I53kgzgOAHJrzazoB1Wm/SeyQfS+br4H4/
-         lFbgvjSLnk8g6k4aH+HQFWT4Vm+uIxMTmja9OTh0x/d5kOwop+ZDwkdwNHRJRRZAXqST
-         qml/67j7av93HVQnKzUIkI4/sDQpfIGW2HnEei2dHHwwGcPfWt7l7/hd6DpyeCc8N7yq
-         WFXnBJV3kSgM0mzeFRSVoIEdmGPKbbUneetGpSIT7ZQ3HBgxJlcdaUN6+PkrB4tASl+W
-         89Mr7gcwVuSf8Xtd4YJX1bm9DlFAYCY0PaCvRWFXQhHkUd6hEu0esTpiopH3Pk7RQvbH
-         4DbQ==
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XHHgdMe4feIszYMppdCPgQObrblKNWDiQjxYle8RSks=;
+        b=h4XLxXH8Yhp2IyB86fiD6frLrGkd8Y/i2XqTJ1mCnnOaVTHsm0K4mjV9YHK7K8e66p
+         uQv5drfMdAXscM5VFgcCO/t+SzMTy3acy4RpTllUpVRF1i28npyJyB/MqqC6s5SYBWAY
+         BDfIu4/Rs6BjZ0qn4IMMo8/L0vRwaLAxBlNDXZswIC7q49UEX47Ry3lQJHyS9+/mKcu/
+         053hdhDTuPuK/KwgRZrchqvftt90xT41kuSpgRuK/nif1gRdxARiCS7t4Bcc0ncJ/BRK
+         0uKhXDK+B2nYI1x2gWtsbFS+IpBshmVgVnUafmacBD3o3VChD/GQ3Az4kyanknLCk1Xg
+         LwxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uYpG5kIVjDW6gUzmyqnTmwzAvBCwOte6nMdhHbBsYiM=;
-        b=L4VkMhcZsLGcNKmbK+HUDUXW+YnZPIDrPPoVrEhLnVHVcPs8yAGRB/2kDoJOUOxZvN
-         2Xjlp4JBGJIj8nB8Eo8MuH/t0OoTLjXoJPzY5q579HiobkObYYtTnEeEyq86K8tdd1p8
-         YdZbGQKMszC8VcmmdJXKLzSFaOYwpF8RZ29dXw5jnLD7dvR5leGWrcJCqCzcPBz4/5cn
-         SBq0Qlh9XTPU/4c9MSCgYVvKUsMzwH6+I+bw2reAdvAKcP9r1+QyAqc/yrtPTXiG+s4S
-         t2K02Z4MbU4XRiKOE6tXRiAa6fUzW0s8L1gxWunglI4flZYTW8A0PLZLfSFAv8OcbPbO
-         d5xA==
-X-Gm-Message-State: ACrzQf1ZR1MG+EcOvt824bGCC+LDxLLLIJeOvCQ9+n7r4WsueXW3kzWC
-        Cf3UcvBwrFJsXa5CqbrtzMlbB/HOsSrzwG5Lt7m4mWMO
-X-Google-Smtp-Source: AMsMyM6uvxUMtRV2MUGugvUxU+agHp//UGoqCPruQEdbIk1tKuDNYIicX9p8nC/sDIjzMYKOvVrwqIyp3oH023i4m90=
-X-Received: by 2002:a05:6512:3c90:b0:4a2:5168:b410 with SMTP id
- h16-20020a0565123c9000b004a25168b410mr19799108lfv.163.1667865338897; Mon, 07
- Nov 2022 15:55:38 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XHHgdMe4feIszYMppdCPgQObrblKNWDiQjxYle8RSks=;
+        b=Q0NuQjY0Bc1c1MY+nhAj/BpDoAatZlT2YeqdSWf01Lbx7DsX7k17QJzVHybKTVqYFx
+         rYLqvwoVf29O0l9rgh+Ky/eIhV3OlJahZ5e5iNTOh4vK5+uAmlRh1NVgD+/C2gC68yQD
+         kiazVuK0pStFRBSHkRHYZiENxBua3wldcAW+TuQq3Df/cXUNAt+QrkbW9xZzB1JR2ewg
+         iOjMSDLBiypkMCKq6HHGrc+G/Sc73IXRM0UDyRcAvepPKlHzUC3j4mXLX19SANzUjtJr
+         pgDahz0qUrulc06bFBsusgEc2Ukgw6LK3uzEeomDGQc+FgfFjD7a7tx9PzDi9iKqm8wX
+         Bo0w==
+X-Gm-Message-State: ACrzQf3eEqdhIOWhIEdaQ52y2EzoSWSv5bCWNe+d3+59mEJcZ/fVzKSh
+        COwIpUOl2Ck4t79dWycUPqbZbuy28LEyBvyCCFvVgMpL
+X-Google-Smtp-Source: AMsMyM7tU9tdzvaaGDXNitVJ6s/eVgDrkDEuRsiIGYgVCfFiX1+FC11549zOmgJ0fi80wmPJf33QqvyV5h9XUvBvGTA=
+X-Received: by 2002:a2e:9bcc:0:b0:277:f0f:927e with SMTP id
+ w12-20020a2e9bcc000000b002770f0f927emr6356995ljj.138.1667868350504; Mon, 07
+ Nov 2022 16:45:50 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5mub3G42yb48gN-KY7tgqen8oeT-mmE7y23vyQ0e5ihctQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mub3G42yb48gN-KY7tgqen8oeT-mmE7y23vyQ0e5ihctQ@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 7 Nov 2022 17:55:27 -0600
-Message-ID: <CAH2r5muthiUdk9Lgt5noXLZo4Kkh25VmF1x9mFnWtFVqXxAoyw@mail.gmail.com>
-Subject: Fwd: patch for stable "cifs: fix regression in very old smb1 mounts"
-To:     Stable <stable@vger.kernel.org>
+Date:   Mon, 7 Nov 2022 18:45:38 -0600
+Message-ID: <CAH2r5mtc6rHC=zfWCjmGMex0qJrYKeuAcryW95-ru0KyZsaqpA@mail.gmail.com>
+Subject: reflink support and Samba running over XFS
+To:     samba-technical <samba-technical@lists.samba.org>
 Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000000f2e0e05ecea29e8"
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000000f2e0e05ecea29e8
-Content-Type: text/plain; charset="UTF-8"
+I noticed that reflink (FSCTL_DUPLICATE_EXTENTS) is not supported on
+Samba when run over XFS but is with the vfs_btrfs.
 
----------- Forwarded message ---------
-From: Steve French <smfrench@gmail.com>
-Date: Mon, Nov 7, 2022 at 5:54 PM
-Subject: patch for stable "cifs: fix regression in very old smb1 mounts"
-To: Stable <stable@vger.kernel.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Thorsten Leemhuis
-<regressions@leemhuis.info>, ronnie sahlberg
-<ronniesahlberg@gmail.com>
+I can do reflink locally on the XFS mount point, but not remotely
+unless it is BTRFS (or to Windows eg. when the share is on REFS).
 
+Any idea if there is a way to enable reflink (FSCTL_DUPLICATE_EXTENT)
+support for Samba when not running on btrfs (e.g. on xfs)?
 
-commit 2f6f19c7aaad "cifs: fix regression in very old smb1 mounts" upstream
-
-Also attached upstream commit.
-
-For 5.15 and 6.0 stable kernels
-
-
-
-
+duplicate extents is needed for various Linux client features
+(especially various fallocate operations)
 
 -- 
 Thanks,
 
 Steve
-
-
--- 
-Thanks,
-
-Steve
-
---0000000000000f2e0e05ecea29e8
-Content-Type: application/x-patch; 
-	name="0001-cifs-fix-regression-in-very-old-smb1-mounts.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-fix-regression-in-very-old-smb1-mounts.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_la7fwc7i0>
-X-Attachment-Id: f_la7fwc7i0
-
-RnJvbSAyZjZmMTljN2FhYWQ1MDA1ZGM3NTI5OGE0MTNlYjAyNDNjNWQzMTJkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
-CkRhdGU6IFdlZCwgMTIgT2N0IDIwMjIgMDk6MTI6MDcgKzEwMDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBmaXggcmVncmVzc2lvbiBpbiB2ZXJ5IG9sZCBzbWIxIG1vdW50cwoKQlo6IDIxNTM3NQoK
-Rml4ZXM6IDc2YTNjOTJlYzllMCAoImNpZnM6IHJlbW92ZSBzdXBwb3J0IGZvciBOVExNIGFuZCB3
-ZWFrZXIgYXV0aGVudGljYXRpb24gYWxnb3JpdGhtcyIpClJldmlld2VkLWJ5OiBQYXVsbyBBbGNh
-bnRhcmEgKFNVU0UpIDxwY0BjanIubno+ClNpZ25lZC1vZmYtYnk6IFJvbm5pZSBTYWhsYmVyZyA8
-bHNhaGxiZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5j
-aEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY29ubmVjdC5jIHwgMTEgKysrKystLS0tLS0K
-IDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCgpkaWZmIC0t
-Z2l0IGEvZnMvY2lmcy9jb25uZWN0LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYwppbmRleCA0MDkwMGFh
-Y2U0MTYuLmUxNTgyNTdkYTFjZCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jb25uZWN0LmMKKysrIGIv
-ZnMvY2lmcy9jb25uZWN0LmMKQEAgLTM5MjIsMTIgKzM5MjIsMTEgQEAgQ0lGU1RDb24oY29uc3Qg
-dW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpzZXMsCiAJcFNNQi0+QW5kWENvbW1h
-bmQgPSAweEZGOwogCXBTTUItPkZsYWdzID0gY3B1X3RvX2xlMTYoVENPTl9FWFRFTkRFRF9TRUNJ
-TkZPKTsKIAliY2NfcHRyID0gJnBTTUItPlBhc3N3b3JkWzBdOwotCWlmICh0Y29uLT5waXBlIHx8
-IChzZXMtPnNlcnZlci0+c2VjX21vZGUgJiBTRUNNT0RFX1VTRVIpKSB7Ci0JCXBTTUItPlBhc3N3
-b3JkTGVuZ3RoID0gY3B1X3RvX2xlMTYoMSk7CS8qIG1pbmltdW0gKi8KLQkJKmJjY19wdHIgPSAw
-OyAvKiBwYXNzd29yZCBpcyBudWxsIGJ5dGUgKi8KLQkJYmNjX3B0cisrOyAgICAgICAgICAgICAg
-Lyogc2tpcCBwYXNzd29yZCAqLwotCQkvKiBhbHJlYWR5IGFsaWduZWQgc28gbm8gbmVlZCB0byBk
-byBpdCBiZWxvdyAqLwotCX0KKworCXBTTUItPlBhc3N3b3JkTGVuZ3RoID0gY3B1X3RvX2xlMTYo
-MSk7CS8qIG1pbmltdW0gKi8KKwkqYmNjX3B0ciA9IDA7IC8qIHBhc3N3b3JkIGlzIG51bGwgYnl0
-ZSAqLworCWJjY19wdHIrKzsgICAgICAgICAgICAgIC8qIHNraXAgcGFzc3dvcmQgKi8KKwkvKiBh
-bHJlYWR5IGFsaWduZWQgc28gbm8gbmVlZCB0byBkbyBpdCBiZWxvdyAqLwogCiAJaWYgKHNlcy0+
-c2VydmVyLT5zaWduKQogCQlzbWJfYnVmZmVyLT5GbGFnczIgfD0gU01CRkxHMl9TRUNVUklUWV9T
-SUdOQVRVUkU7Ci0tIAoyLjM0LjEKCg==
---0000000000000f2e0e05ecea29e8--
