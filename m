@@ -2,66 +2,55 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A92C433FE
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Nov 2022 00:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 904E0C433FE
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Nov 2022 06:47:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232420AbiKHAyI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Nov 2022 19:54:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35250 "EHLO
+        id S229731AbiKHGrz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Nov 2022 01:47:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232900AbiKHAyF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Nov 2022 19:54:05 -0500
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FFE01D9
-        for <linux-cifs@vger.kernel.org>; Mon,  7 Nov 2022 16:53:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Message-ID:Cc:To:From:Date;
-        bh=FvedlRkE0K7poFPRe12hH4HcfrW+0d77Kd0Ugb9xiIY=; b=2cw8HEFmxNZLpe0+O5eApVXIHI
-        Ec/Yr5VXGJuhAXCOC9dYrMNFfSh2ifXKqhtW6mgGZQy+v1QsI0Q2RWx5oNAZ+Q56sibW9m2t/o+sF
-        1GwrmxC5Q1toLt2zYWJdS2qtwN4gAZPGHzM3g/toWtWraHL/bHBf8QdokTpKXsm3351VYlzAPv5km
-        5ixMxtoEXhT8FmxlHeB7Eo6ssshEBQr0jEJZSrthTsjy38PFIyJHNaX2bT3L59RCX6owgS6ZaPRe5
-        YRZ8/6iFrfFZlhYls7pkXLTY/Pjd7Ypjmns5GsEU6LXv8kG2ktc0nmgN7UY1NRl/0g2DnP6lRQ4Ap
-        aKGCZCoV764/Bj7C/fSo5e8YFzbHNb0C1YBuaJBmZsqmwRmrGGLlciA/caHj+6f7FaBR1jTkSRkvA
-        0qcVwWVTOEzGURrLje8yOk5duHFncwxEC5pN7eWFnNzhkMs8rCu9UBa4Q3Tx65GexWa10mppQGahw
-        LxQE0Zd3+7Ol6zOxFvscUvYi;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1osCs5-007cBl-Eo; Tue, 08 Nov 2022 00:53:45 +0000
-Date:   Mon, 7 Nov 2022 16:53:42 -0800
-From:   Jeremy Allison <jra@samba.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     samba-technical <samba-technical@lists.samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        with ESMTP id S229478AbiKHGry (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Nov 2022 01:47:54 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0076264B2
+        for <linux-cifs@vger.kernel.org>; Mon,  7 Nov 2022 22:47:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=6ZjC2Z9pJhd6LI9EDKmT/K7rAJbA5xGUE4Au2jRNhR4=; b=UcL8wKS+s0sQImYuafrsXbBNGl
+        YMta9vrsUUNsLN/MoLu9VTwOofkrdmlABaamGFjK+Y0lyk1LZKOmw2VtyEIbDvWi3vJz0DG/2Bpww
+        1Z3j315wmC0+8H95w2OmkOZFImFAKCJSmSdc7QoHq4SNB5G8h86fI1Ir4rd/iBlbpU5IpVeudQhWE
+        elkPyp2ZJNSVoud1WL87ranb+Z0l4kFNlpgCb7IUZeG5xL0uG1XNcslAVye6+VHJ7vgwfD0TOgxXI
+        fJXi93oRRghN7rie3bMaEAC4Lrnakr219K9/7yOPtkOws/25C1mNbKP13Rrg6IYcDeEbxhPswEBO/
+        2twFbtXQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1osIOi-003FcT-JP; Tue, 08 Nov 2022 06:47:48 +0000
+Date:   Mon, 7 Nov 2022 22:47:48 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jeremy Allison <jra@samba.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
 Subject: Re: reflink support and Samba running over XFS
-Message-ID: <Y2molp4pVGNO+kaw@jeremy-acer>
-Reply-To: Jeremy Allison <jra@samba.org>
+Message-ID: <Y2n7lENy0jrUg7XD@infradead.org>
 References: <CAH2r5mtc6rHC=zfWCjmGMex0qJrYKeuAcryW95-ru0KyZsaqpA@mail.gmail.com>
+ <Y2molp4pVGNO+kaw@jeremy-acer>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAH2r5mtc6rHC=zfWCjmGMex0qJrYKeuAcryW95-ru0KyZsaqpA@mail.gmail.com>
+In-Reply-To: <Y2molp4pVGNO+kaw@jeremy-acer>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Nov 07, 2022 at 06:45:38PM -0600, Steve French wrote:
->I noticed that reflink (FSCTL_DUPLICATE_EXTENTS) is not supported on
->Samba when run over XFS but is with the vfs_btrfs.
->
->I can do reflink locally on the XFS mount point, but not remotely
->unless it is BTRFS (or to Windows eg. when the share is on REFS).
->
->Any idea if there is a way to enable reflink (FSCTL_DUPLICATE_EXTENT)
->support for Samba when not running on btrfs (e.g. on xfs)?
->
->duplicate extents is needed for various Linux client features
->(especially various fallocate operations)
+On Mon, Nov 07, 2022 at 04:53:42PM -0800, Jeremy Allison via samba-technical wrote:
+> ret = ioctl(fsp_get_io_fd(dest_fsp), BTRFS_IOC_CLONE_RANGE, &cr_args);
+> 
+> what ioctls are used for this in XFS ?
+> 
+> We'd need a VFS module that implements them for XFS.
 
-This is implemented in vfs_btrfs.c via:
-
-ret = ioctl(fsp_get_io_fd(dest_fsp), BTRFS_IOC_CLONE_RANGE, &cr_args);
-
-what ioctls are used for this in XFS ?
-
-We'd need a VFS module that implements them for XFS.
+That ioctl is now implemented in the Linux VFS and supported by btrfs,
+ocfs2, xfs, nfs (v4.2), cifs and overlayfs.
