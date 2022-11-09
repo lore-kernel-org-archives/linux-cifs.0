@@ -2,114 +2,182 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAECFC433FE
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Nov 2022 18:14:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C91BC4332F
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Nov 2022 05:32:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234054AbiKHSOU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Nov 2022 13:14:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33128 "EHLO
+        id S229485AbiKIFce (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 9 Nov 2022 00:32:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233978AbiKHSON (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Nov 2022 13:14:13 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7FB915A01
-        for <linux-cifs@vger.kernel.org>; Tue,  8 Nov 2022 10:14:12 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 77F171F38C;
-        Tue,  8 Nov 2022 18:14:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1667931251; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=gDzW7Lj2G87D8hIPmJZwM+i8tJodGbhnssTVrZsaI8g=;
-        b=w5n0o0Ol7dDE9DnLEUKyVw2aEWIS8sbbTMd/0r829q74yacx/7vKL8k0dP8kMhgYCLHWyO
-        EeFvOjR5KCQQ3m9SUoDMIpkPHIK+NOMKT0jiJmd65nPT1JuAjsRrTmMKgN5mRkCBvcdenF
-        mWdsTbGxnvliJNp7kHdP61jo4Sqrics=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1667931251;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=gDzW7Lj2G87D8hIPmJZwM+i8tJodGbhnssTVrZsaI8g=;
-        b=rMswpfDuBG00LiZLcvHWj2C1beRJINz/p8wkrBk0BlEkEuPlA5y/+wcx/8Q178LIY7Nw+B
-        Fs3hj4d8WUH7HYCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F3728139F1;
-        Tue,  8 Nov 2022 18:14:10 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Il6hLXKcamOYNAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Tue, 08 Nov 2022 18:14:10 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com
-Subject: [PATCH] cifs: print "Unknown" instead of bogus link speed value
-Date:   Tue,  8 Nov 2022 15:14:05 -0300
-Message-Id: <20221108181405.21810-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.35.3
+        with ESMTP id S229453AbiKIFcd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Nov 2022 00:32:33 -0500
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8340D1BE93
+        for <linux-cifs@vger.kernel.org>; Tue,  8 Nov 2022 21:32:31 -0800 (PST)
+Received: by mail-lj1-x229.google.com with SMTP id d3so24172052ljl.1
+        for <linux-cifs@vger.kernel.org>; Tue, 08 Nov 2022 21:32:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=figGJPMMPFgeNmir/olEn2k1cJDmBqWy/n1ifxm92ws=;
+        b=mxJq8tTM+49ebO1SNcPPI50Fh2lrJ1xva620WSeHEwphDrpWIkpmNWS0kOJgHGWxo/
+         ZdGyJFlWwbNpcIdYGm72nNFk22xG9/6sTEmWGwzeyjWH0lkv1NvddzdYOiJffdDBIDfa
+         et+6LoTz03aKnTzvJ56SGjY80mX9SmZArwge/+mP/TuRxvYOdtcpEyO2cDyCr+iGnw10
+         EEYPoXhwCsnNQOhgAYdRyq0ut6o9fVTOX4zRw3xP7L4h7VaBfw78+dCsTPDYbXmURdSr
+         MejE6yGeEfzahX5Ns9uFg4lxFTNRVR+G1X2Qwbtxx8Ycx3m8no+Cy9Us31XY+3u3PeaA
+         uhlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=figGJPMMPFgeNmir/olEn2k1cJDmBqWy/n1ifxm92ws=;
+        b=AigH1vXJk+AMIzZ85GiLVkaOy0JWsIINedvY4Mdh+Fil49/QuO1AK6ktM7oDpsk3/b
+         18hXRRHapRaAk+3U1bHvZr9xncFVu0aMUcdXGaR870YpPa91HlZYIEPPVBSoiSfoj3uc
+         hp4Bt2wnSJ85r0RfMurexk88CrDu9eQCkUJMXmFmO7vPdM1E1A5/zEigyw0NER+UW828
+         ZR8NuHOB+Fnd9OiehtMdMRE2yeW/In4Z6+rIyB4ucyFqAHV2w5EmyhKasYdLl+oKVt/g
+         iwZX9LV95xFSWBcNy/3cr8CKJUF82Q+owiGIDiM4O87zLPde2xIRBy0PdbMAxi9zh1vA
+         Wv3Q==
+X-Gm-Message-State: ACrzQf1xH/HAdMSoipSmDJ86UbnAyz1cM9J8ky4zOYJjPiNk8/Q+xwH8
+        QwvrR+1Cm+sswqNWKcMP2/AIkFL59GnlgvEY0TI=
+X-Google-Smtp-Source: AMsMyM68wK/WnFvSt/gGPZWYQBH7QF0VIsVrzjNyPWoNOAiOtQo7gGHnJ20BHbPf60+QZ+wcLsVACdKUllGwYW80IOE=
+X-Received: by 2002:a2e:8541:0:b0:261:b44b:1a8b with SMTP id
+ u1-20020a2e8541000000b00261b44b1a8bmr21391029ljj.46.1667971949594; Tue, 08
+ Nov 2022 21:32:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAH2r5muCMfv4HuPw6sEgKj3Ude3cz+-NRdxDXpJr3CNtUAnm7A@mail.gmail.com>
+ <CAN05THQ_C_mqq-S69f53EZQUxB2Q3rNrnVU-vRH_6kt=M0-Uwg@mail.gmail.com>
+ <CAH2r5mu5cTX2gWhoyUBbkLeTtJeVvOH0vn_j_5DNwQ2__Rh38w@mail.gmail.com>
+ <CAN05THRpHkXnx8NqjdEb=4BcxwsK7u+jYDSTEHdHXX_c5OZmYg@mail.gmail.com>
+ <CAN05THSBzu7fgXSybe4isLGPRYxWLkZDZb_Lmox3TneAQfVP=g@mail.gmail.com>
+ <CAKYAXd8OwkEt=fJZrtooba_OYorBt4kEg68DrLJN=0OjQhkrjQ@mail.gmail.com>
+ <CAH2r5mt08V-RQa8=apT-fAqXxQtKkj_9XNSMFvUBm=da-UMyCg@mail.gmail.com> <abbe9909-5bf6-23d0-3c86-4c7e98e8eea9@talpey.com>
+In-Reply-To: <abbe9909-5bf6-23d0-3c86-4c7e98e8eea9@talpey.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 9 Nov 2022 11:02:18 +0530
+Message-ID: <CANT5p=qEWs8WTJQ1h0Wgrs3D5KVL3V_T0+p=yo4X=gOD1jvKfg@mail.gmail.com>
+Subject: Re: [PATCH][SMB3 client] fix oplock breaks when using multichannel
+To:     Tom Talpey <tom@talpey.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The virtio driver for Linux guests will not set a link speed to its
-paravirtualized NICs.  This will be shown as -1 in server settings, and
-when the SMB server (samba) fetches it, it's converted to an unsigned
-value (and multiplied by 1000 * 1000), so in client side we end up with:
+On Sat, Oct 29, 2022 at 6:18 PM Tom Talpey <tom@talpey.com> wrote:
+>
+> On 10/28/2022 10:29 PM, Steve French wrote:
+> > thx for testing this  - Shyam's fix for it looks promising (needs
+> > review though and some testing)
+>
+> Good, because the original fix confuses me deeply. A tcon is not tied
+> to a connection, or at least, it never should be. It's a property of
+> the session, which is shared among multichannel connections. So if we
+> have to poke at other connections to find a tcon, that's a fundamental
+> issue.
+>
+> Shyam's fix always simply looks on the primary channel, which works,
+> but it's weird relative to the protocol. The real fix would be to hang
+> the tcon off the proper object.
 
-1)      Speed: 4294967295000000 bps
+The reference to the primary channel there is to just get to the
+session (and from there, the tcon) lists, which only hang off the
+primary channel today. I'm not sure why this choice was made by
+Aurelien originally, but that is how it can be fixed with minimal
+changes today.
+Ideally, each channel should point to the session list (taking the
+necessary reference), and hence the tcons.
 
-in DebugData.
+Also, we should be able to share connections between sessions. Today,
+the secondary channels are used exclusively by one session.
+I plan to get to that next.
 
-This patch check if the speed we got is such value, and print "Unknown"
-instead.
+>
+> Ronnie asked:
+>
+>  > What does MS-SMB2.pdf say about channels and oplocks?
+>
+> Oplocks are not tied to channels, they're tied to sessions, tree
+> connects and files. An oplock can be granted on one channel and be
+> valid client-wide. And broken on any channel too btw.
+>
+> Tom.
+>
+> > On Fri, Oct 28, 2022 at 5:30 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
+> >>
+> >> 2022-10-28 18:19 GMT+09:00, ronnie sahlberg <ronniesahlberg@gmail.com>:
+> >>> On Fri, 28 Oct 2022 at 16:55, ronnie sahlberg <ronniesahlberg@gmail.com>
+> >>> wrote:
+> >>>>
+> >>>> On Fri, 28 Oct 2022 at 16:53, Steve French <smfrench@gmail.com> wrote:
+> >>>>>
+> >>>>> I haven't tried a scenario to windows where we turn off leases and force
+> >>>>> server to use oplocks but with ksmbd that is the default.
+> >>>>> Worth also investigating how primary vs secondary works for finding
+> >>>>> leases for windows case
+> >>>>
+> >>>> Yes. Until we know what/how windows does things and what ms-smb2.pdf
+> >>>> says  we can not know if this is a cifs client bug or a ksmbd bug.
+> >>>
+> >>> So lets wait with this patch until we know where the bug is.
+> >>> I will review it later for locking correctness, but lets make sure it
+> >>> is not a ksmbd bug first.
+> >> We can reproduce it against samba with the following parameters.
+> >>
+> >> server multi channel support = yes
+> >> oplock break wait time = 35000
+> >> smb2 leases = no
+> >>
+> >>>
+> >>>
+> >>>>
+> >>>>
+> >>>>>
+> >>>>> On Fri, Oct 28, 2022, 01:48 ronnie sahlberg <ronniesahlberg@gmail.com>
+> >>>>> wrote:
+> >>>>>>
+> >>>>>> On Fri, 28 Oct 2022 at 16:25, Steve French <smfrench@gmail.com> wrote:
+> >>>>>>>
+> >>>>>>> If a mount to a server is using multichannel, an oplock break
+> >>>>>>> arriving
+> >>>>>>> on a secondary channel won't find the open file (since it won't find
+> >>>>>>> the
+> >>>>>>> tcon for it), and this will cause each oplock break on secondary
+> >>>>>>> channels
+> >>>>>>> to time out, slowing performance drastically.
+> >>>>>>>
+> >>>>>>> Fix smb2_is_valid_oplock_break so that if it is a secondary channel
+> >>>>>>> and
+> >>>>>>> an oplock break was not found, check for tcons (and the files
+> >>>>>>> hanging
+> >>>>>>> off the tcons) on the primary channel.
+> >>>>>>
+> >>>>>> Does this also happen against windows or is is only against ksmbd this
+> >>>>>> triggers?
+> >>>>>> What does MS-SMB2.pdf say about channels and oplocks?
+> >>>>>>
+> >>>>>>>
+> >>>>>>> Fixes xfstest generic/013 to ksmbd
+> >>>>>>>
+> >>>>>>> Cc: <stable@vger.kernel.org>
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> --
+> >>>>>>> Thanks,
+> >>>>>>>
+> >>>>>>> Steve
+> >>>
+> >
+> >
+> >
 
-The reason to not change the value in iface->speed is because we don't
-know the real speed of the HW backing the server NIC, so let's keep
-considering these as the fastest NICs available.
 
-Also print "Capabilities: None" when the interface doesn't support any.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/cifs/cifs_debug.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 90850da390ae..6ec04869008d 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -151,12 +151,23 @@ cifs_dump_iface(struct seq_file *m, struct cifs_server_iface *iface)
- 	struct sockaddr_in *ipv4 = (struct sockaddr_in *)&iface->sockaddr;
- 	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)&iface->sockaddr;
- 
--	seq_printf(m, "\tSpeed: %zu bps\n", iface->speed);
-+	/*
-+	 * Some servers will return an invalid (-1) link speed, e.g. virtio driver on Linux guests
-+	 * When the server parses it, it's cast to an unsigned value, and the field ends with a
-+	 * bogus value.
-+	 * Let's not print such values to avoid confusion.
-+	 */
-+	if (iface->speed == ((u64)UINT_MAX * 1000 * 1000))
-+		seq_printf(m, "\tSpeed: Unknown\n");
-+	else
-+		seq_printf(m, "\tSpeed: %zu bps\n", iface->speed);
- 	seq_puts(m, "\t\tCapabilities: ");
- 	if (iface->rdma_capable)
- 		seq_puts(m, "rdma ");
- 	if (iface->rss_capable)
- 		seq_puts(m, "rss ");
-+	if (!iface->rdma_capable && !iface->rss_capable)
-+		seq_puts(m, "None");
- 	seq_putc(m, '\n');
- 	if (iface->sockaddr.ss_family == AF_INET)
- 		seq_printf(m, "\t\tIPv4: %pI4\n", &ipv4->sin_addr);
 -- 
-2.35.3
-
+Regards,
+Shyam
