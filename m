@@ -2,66 +2,62 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9885C4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Nov 2022 11:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5173C4332F
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Nov 2022 11:42:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230429AbiKJLMm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 10 Nov 2022 06:12:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58534 "EHLO
+        id S229528AbiKJLmB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 10 Nov 2022 06:42:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229797AbiKJLMl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Nov 2022 06:12:41 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D746DCD4
-        for <linux-cifs@vger.kernel.org>; Thu, 10 Nov 2022 03:12:40 -0800 (PST)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N7K1S20HKzRpCB;
-        Thu, 10 Nov 2022 19:12:28 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
- (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 10 Nov
- 2022 19:12:38 +0800
-From:   Liu Jian <liujian56@huawei.com>
-To:     <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>,
-        <sprasad@microsoft.com>, <tom@talpey.com>,
-        <zhangxiaoxu5@huawei.com>, <linux-cifs@vger.kernel.org>,
-        <samba-technical@lists.samba.org>
-CC:     <liujian56@huawei.com>
-Subject: [PATCH] cifs: use kfree in error path of cifs_writedata_alloc()
-Date:   Thu, 10 Nov 2022 19:19:39 +0800
-Message-ID: <20221110111939.135696-1-liujian56@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        with ESMTP id S230463AbiKJLmA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Nov 2022 06:42:00 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD548716E8
+        for <linux-cifs@vger.kernel.org>; Thu, 10 Nov 2022 03:41:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=HZrgbKwq/Zv90fuyRQGa8KO1ffIc2cK2MUEJ6rWQ+Sk=; b=ACCb2RAqTLt2zjn9qwHc6INnrN
+        oUe83br+N3BC7/eBR2Iv3pKUNafrieTf+9c5cDqIFF9gjVmRScGcgrVNTE+jPXM6i9FkREiPJXAmG
+        L6Wb9s0L4xxe256dSKrVaLaEmud/7MUtMX5dh92wvcZQuNU21B4rb8wQXeXWXGXZmA673Dt5dCNRM
+        mksw5m1MbkdXeYq+Ura9lWxOoUCLcfahgoyQzUCwyXV6crOejg2ZuKXbgNeucPfO/Ubw4wxm18ZtD
+        I94+zy9ESc0/M14daQChYTWY30XzzvN4YEPr3L8Eiy70qimMwFr6uG8HKOCn3CN3HE1pZIofWOGE/
+        1Xwe7Ldw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ot5w2-005RuC-Sa; Thu, 10 Nov 2022 11:41:30 +0000
+Date:   Thu, 10 Nov 2022 03:41:30 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jeremy Allison <jra@samba.org>
+Cc:     Amir Goldstein <amir73il@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        samba-technical <samba-technical@lists.samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>, vl@samba.org, metze@samba.org
+Subject: Re: reflink support and Samba running over XFS
+Message-ID: <Y2zjaoiw0m/8b0t/@infradead.org>
+References: <CAH2r5mtc6rHC=zfWCjmGMex0qJrYKeuAcryW95-ru0KyZsaqpA@mail.gmail.com>
+ <Y2molp4pVGNO+kaw@jeremy-acer>
+ <Y2n7lENy0jrUg7XD@infradead.org>
+ <Y2qXLNM5xvxZHuLQ@jeremy-acer>
+ <CAOQ4uxgyXtr6DU-eAP+kR1a7NsS-zDhXi5-0BJ7i=-erLa3-kg@mail.gmail.com>
+ <Y2vzinRPFEBZyACg@jeremy-acer>
+ <Y2v1zQbnPoqg+0aj@jeremy-acer>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y2v1zQbnPoqg+0aj@jeremy-acer>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-'pages' is allocated by kcalloc(), which should freed by kfree().
+On Wed, Nov 09, 2022 at 10:47:41AM -0800, Jeremy Allison via samba-technical wrote:
+> So it *looks* like the copy_file_range() syscall will internally
+> call the equivalent of FICLONERANGE if the underlying file
+> system supports it.
 
-Fixes: 4153d789e299 ("cifs: Fix pages array leak when writedata alloc failed in cifs_writedata_alloc()")
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
- fs/cifs/file.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index cd9698209930..9a250fee673f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2440,7 +2440,7 @@ cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
- 	if (pages) {
- 		writedata = cifs_writedata_direct_alloc(pages, complete);
- 		if (!writedata)
--			kvfree(pages);
-+			kfree(pages);
- 	}
- 
- 	return writedata;
--- 
-2.17.1
-
+Yes.  The separate clone interface exists for the cases where
+applications only want to do the fast metadata only operation and
+not fall back toan actual copy.  I'll leave it to people with more
+SMB experience if and how that matters to the protocol.  For NFS
+CLONE and COPY primitives exist on the wire with a similar distinction.
