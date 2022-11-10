@@ -2,101 +2,66 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB3C7C4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Nov 2022 01:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9885C4332F
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Nov 2022 11:12:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232520AbiKJBz7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 9 Nov 2022 20:55:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50322 "EHLO
+        id S230429AbiKJLMm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 10 Nov 2022 06:12:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232324AbiKJBzn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Nov 2022 20:55:43 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9FFA27B35
-        for <linux-cifs@vger.kernel.org>; Wed,  9 Nov 2022 17:55:24 -0800 (PST)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N74fL5RjWzmVnt;
-        Thu, 10 Nov 2022 09:55:06 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 10 Nov 2022 09:55:20 +0800
-From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-To:     <linux-cifs@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
-        <sfrench@samba.org>, <smfrench@gmail.com>, <pc@cjr.nz>,
-        <lsahlber@redhat.com>, <sprasad@microsoft.com>, <tom@talpey.com>,
-        <palcantara@suse.de>
-Subject: [PATCH] cifs: Fix connections leak when tlink setup failed
-Date:   Thu, 10 Nov 2022 11:00:09 +0800
-Message-ID: <20221110030009.2207092-1-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S229797AbiKJLMl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Nov 2022 06:12:41 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D746DCD4
+        for <linux-cifs@vger.kernel.org>; Thu, 10 Nov 2022 03:12:40 -0800 (PST)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N7K1S20HKzRpCB;
+        Thu, 10 Nov 2022 19:12:28 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
+ (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 10 Nov
+ 2022 19:12:38 +0800
+From:   Liu Jian <liujian56@huawei.com>
+To:     <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>,
+        <sprasad@microsoft.com>, <tom@talpey.com>,
+        <zhangxiaoxu5@huawei.com>, <linux-cifs@vger.kernel.org>,
+        <samba-technical@lists.samba.org>
+CC:     <liujian56@huawei.com>
+Subject: [PATCH] cifs: use kfree in error path of cifs_writedata_alloc()
+Date:   Thu, 10 Nov 2022 19:19:39 +0800
+Message-ID: <20221110111939.135696-1-liujian56@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
+Content-Type: text/plain
 X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500023.china.huawei.com (7.185.36.114)
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500010.china.huawei.com (7.192.105.118)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If the tlink setup failed, lost to put the connections, then
-the module refcnt leak since the cifsd kthread not exit.
+'pages' is allocated by kcalloc(), which should freed by kfree().
 
-Also leak the fscache info, and for next mount with fsc,it will
-print the follow errors:
-  CIFS: Cache volume key already in use (cifs,127.0.0.1:445,TEST)
-
-Let's check the result of tlink setup, and put the connection when
-error happened.
-
-Fixes: 56c762eb9bee ("cifs: Refactor out cifs_mount()")
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+Fixes: 4153d789e299 ("cifs: Fix pages array leak when writedata alloc failed in cifs_writedata_alloc()")
+Signed-off-by: Liu Jian <liujian56@huawei.com>
 ---
- fs/cifs/connect.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ fs/cifs/file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 1cc47dd3b4d6..e699e45e70c4 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3855,14 +3855,19 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
- 	uuid_copy(&cifs_sb->dfs_mount_id, &mnt_ctx.mount_id);
- 
- out:
--	free_xid(mnt_ctx.xid);
- 	cifs_try_adding_channels(cifs_sb, mnt_ctx.ses);
--	return mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
-+	rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
-+	if (rc)
-+		goto put_conns;
-+
-+	free_xid(mnt_ctx.xid);
-+	return rc;
- 
- error:
- 	dfs_cache_put_refsrv_sessions(&mnt_ctx.mount_id);
- 	kfree(mnt_ctx.origin_fullpath);
- 	kfree(mnt_ctx.leaf_fullpath);
-+put_conns:
- 	mount_put_conns(&mnt_ctx);
- 	return rc;
- }
-@@ -3884,8 +3889,12 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
- 			goto error;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index cd9698209930..9a250fee673f 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2440,7 +2440,7 @@ cifs_writedata_alloc(unsigned int nr_pages, work_func_t complete)
+ 	if (pages) {
+ 		writedata = cifs_writedata_direct_alloc(pages, complete);
+ 		if (!writedata)
+-			kvfree(pages);
++			kfree(pages);
  	}
  
-+	rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
-+	if (rc)
-+		goto error;
-+
- 	free_xid(mnt_ctx.xid);
--	return mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
-+	return rc;
- 
- error:
- 	mount_put_conns(&mnt_ctx);
+ 	return writedata;
 -- 
-2.31.1
+2.17.1
 
