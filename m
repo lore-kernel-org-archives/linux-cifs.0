@@ -2,109 +2,108 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 593C8C433FE
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Nov 2022 20:30:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C64C4332F
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Nov 2022 21:28:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230043AbiKJUa1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 10 Nov 2022 15:30:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39932 "EHLO
+        id S231649AbiKJV2V (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 10 Nov 2022 16:28:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbiKJUaZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Nov 2022 15:30:25 -0500
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D1C38B1
-        for <linux-cifs@vger.kernel.org>; Thu, 10 Nov 2022 12:30:24 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id bp15so5254161lfb.13
-        for <linux-cifs@vger.kernel.org>; Thu, 10 Nov 2022 12:30:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IQak/QQ0xC19lyj04tZJmGDoGfCaC6exeaUD1M1fKWc=;
-        b=LsamcuxSTCuqFhrR4UsHiLxWRPB/ff6rlV6xAUe9vD2I9pc5kaj22PVtQmiRPcvYyX
-         LRc8cNt+hSY4Hj7pEOyi+5bMUPL5zIPuUULHvK0jVMGo4YcksV0TtpPUbVbw+0HP+LAD
-         bYex7YQ8qFz7ARXO1digViwuiI3/rNyR3njK9UvLK9kMqEvbnoIn6jSlmyJL7fsfF7Qt
-         IEG4G3Shv48uzk8GB/VTALcfDIRwKTp6s7aud1Mfwbxy6Edo46K3rP5sZb7dPyFKg52f
-         lmr5yAnZJeHvKwLy1d2Q6CSr/sRT8m16qlsAhRZ86aDiQwRvgeVhM3ALQOS87OhgNaFs
-         pYUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IQak/QQ0xC19lyj04tZJmGDoGfCaC6exeaUD1M1fKWc=;
-        b=oGI3Pq1OtcOUZcmTqG7FrEGy1oRHUqN1X84b5bm3+0glfFYo74qdiUY1+EgOwpN+qs
-         xyb/YLNhNCa5T6vVH21zJ6ir6i5/NvXloFpBjA2mqBGVkrzmnVXcdo/mbHiKgsNfC8Io
-         6u6TrPpf06Fn7kKzVC46fOMSOoREJRU7y7c9WySE6QyOyhMLJRjsJSAm9WpzBRsxCkty
-         T8iMtiv3DDQ+ufm0GGmMaprRApXeio10nhymlFAeUlejr7+oGR1WeBBS57HqLV/ONdMP
-         +ItlCn/eQENpqIjwuZrQ5QlUjdG8sGJuEwcz25U6P2ewPEdp7ZDY/PLLhwcquLnB1pW/
-         iVwA==
-X-Gm-Message-State: ACrzQf0rMtQlyw8EVMLNQjlNN4likpHRCBwOYeb/xuiGvgpgt9IbR8qT
-        0m+WQqQBBctVWZn8UBLBEcKfM91UDeS0TGaePw8=
-X-Google-Smtp-Source: AMsMyM5eio0XLR+Hz5mnJkxVkD0MmdVs5E/MvC9gaqzhBbX8RSpyvWOryVh9fBlShqWffxWAPjlMY9usir1TbjrFM30=
-X-Received: by 2002:a05:6512:2588:b0:4af:eabe:dbf5 with SMTP id
- bf8-20020a056512258800b004afeabedbf5mr1770012lfb.668.1668112222843; Thu, 10
- Nov 2022 12:30:22 -0800 (PST)
+        with ESMTP id S229463AbiKJV2V (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Nov 2022 16:28:21 -0500
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407B8123
+        for <linux-cifs@vger.kernel.org>; Thu, 10 Nov 2022 13:28:20 -0800 (PST)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 888E27FC02;
+        Thu, 10 Nov 2022 21:28:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1668115698;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pd8sKabKJUuaaCEH3B8xVK3m0JphfkFr0uTODUnJjok=;
+        b=iYaY7a7J2AOHWflM05mv7PKXXeHnZ5T+e07mLFLvBaJWjhupt7RUgJCisHgM30VxXVhG4R
+        0IScPuuwoycoPBPUh2fUgwk1q+tIsUq6fEQ91Z5S0hXcU0zDMfsanKxw9CyBVZRwDE5bcY
+        QDBkCJd5raD8acC+vZ8x7HwlF8xRSIAdbmur1Rmk5dwzGtYKWIVy9sZKmtzjvS8ip16IVE
+        wTJhE35b8N9UoJplsSycGm9naqW0aCUd4nPqtJ+JU3UZnXwlnycAAMxHFgcLwLIbKigkx6
+        T/QW29ecgDjDrdwV5MkPLPxDrTrpFliK0drjVcKNCALOFfcSdvZZikaW+vMxjg==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>, linux-cifs@vger.kernel.org,
+        zhangxiaoxu5@huawei.com, sfrench@samba.org, smfrench@gmail.com,
+        lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com
+Subject: Re: [PATCH] cifs: Fix connections leak when tlink setup failed
+In-Reply-To: <20221110030009.2207092-1-zhangxiaoxu5@huawei.com>
+References: <20221110030009.2207092-1-zhangxiaoxu5@huawei.com>
+Date:   Thu, 10 Nov 2022 18:29:33 -0300
+Message-ID: <87eduawlaa.fsf@cjr.nz>
 MIME-Version: 1.0
-References: <20221110111939.135696-1-liujian56@huawei.com>
-In-Reply-To: <20221110111939.135696-1-liujian56@huawei.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 10 Nov 2022 14:30:13 -0600
-Message-ID: <CAH2r5ms6p4_PdihrLC+ZJ4W=YjqOmwYhDT-fF6swZ5SB0fP4Ww@mail.gmail.com>
-Subject: Fwd: [PATCH] cifs: use kfree in error path of cifs_writedata_alloc()
-To:     David Howells <dhowells@redhat.com>, liujian56@huawei.com,
-        ZhangXiaoxu <zhangxiaoxu5@huawei.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The kvfree vs. kfree wasn't obvious to me
+Zhang Xiaoxu <zhangxiaoxu5@huawei.com> writes:
 
-Is this just a "it's cleaner" patch? or a bug.  I thought kvfree will
-call kfree in this case as mentioned in the link below
+> If the tlink setup failed, lost to put the connections, then
+> the module refcnt leak since the cifsd kthread not exit.
+>
+> Also leak the fscache info, and for next mount with fsc,it will
+> print the follow errors:
+>   CIFS: Cache volume key already in use (cifs,127.0.0.1:445,TEST)
+>
+> Let's check the result of tlink setup, and put the connection when
+> error happened.
+>
+> Fixes: 56c762eb9bee ("cifs: Refactor out cifs_mount()")
+> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+> ---
+>  fs/cifs/connect.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 1cc47dd3b4d6..e699e45e70c4 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -3855,14 +3855,19 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+>  	uuid_copy(&cifs_sb->dfs_mount_id, &mnt_ctx.mount_id);
+>  
+>  out:
+> -	free_xid(mnt_ctx.xid);
+>  	cifs_try_adding_channels(cifs_sb, mnt_ctx.ses);
+> -	return mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
+> +	rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
+> +	if (rc)
+> +		goto put_conns;
 
-https://patchwork.kernel.org/project/dri-devel/patch/1447070170-8512-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp/
+Good catch.  However, this would partially fix the leaked connections as
+you must still call dfs_cache_put_refsrv_sessions() to put all other
+connections that were used for chasing DFS referrals.  For non-DFS
+mounts, it wouldn't be a problem, though.
 
----------- Forwarded message ---------
-From: Liu Jian <liujian56@huawei.com>
-Date: Thu, Nov 10, 2022 at 5:14 AM
-Subject: [PATCH] cifs: use kfree in error path of cifs_writedata_alloc()
-To: <sfrench@samba.org>, <pc@cjr.nz>, <lsahlber@redhat.com>,
-<sprasad@microsoft.com>, <tom@talpey.com>, <zhangxiaoxu5@huawei.com>,
-<linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>
-Cc: <liujian56@huawei.com>
+What about something like below
 
-
-'pages' is allocated by kcalloc(), which should freed by kfree().
-
-Fixes: 4153d789e299 ("cifs: Fix pages array leak when writedata alloc
-failed in cifs_writedata_alloc()")
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
- fs/cifs/file.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index cd9698209930..9a250fee673f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2440,7 +2440,7 @@ cifs_writedata_alloc(unsigned int nr_pages,
-work_func_t complete)
-        if (pages) {
-                writedata = cifs_writedata_direct_alloc(pages, complete);
-                if (!writedata)
--                       kvfree(pages);
-+                       kfree(pages);
-        }
-
-        return writedata;
---
-2.17.1
-
-
-
--- 
-Thanks,
-
-Steve
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 1cc47dd3b4d6..083ba70f3c1a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3855,9 +3855,13 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 	uuid_copy(&cifs_sb->dfs_mount_id, &mnt_ctx.mount_id);
+ 
+ out:
+-	free_xid(mnt_ctx.xid);
+ 	cifs_try_adding_channels(cifs_sb, mnt_ctx.ses);
+-	return mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
++	rc =  mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
++	if (rc)
++		goto error;
++
++	free_xid(mnt_ctx.xid);
++	return rc;
+ 
+ error:
+ 	dfs_cache_put_refsrv_sessions(&mnt_ctx.mount_id);
