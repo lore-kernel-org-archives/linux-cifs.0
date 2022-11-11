@@ -2,53 +2,69 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E45AC43217
-	for <linux-cifs@archiver.kernel.org>; Fri, 11 Nov 2022 16:00:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0FAC433FE
+	for <linux-cifs@archiver.kernel.org>; Fri, 11 Nov 2022 18:02:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233820AbiKKQAB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 11 Nov 2022 11:00:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40472 "EHLO
+        id S234041AbiKKSCZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 11 Nov 2022 13:02:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234387AbiKKP7t (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 11 Nov 2022 10:59:49 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A24424D5FB
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Nov 2022 07:59:47 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 754737FC02;
-        Fri, 11 Nov 2022 15:59:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1668182385;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gGl0DKOPZoVzi7R1kWtdng0rcjPljNxL+wihzIqBxkg=;
-        b=WESPJkKfW/WSLr943at1eu8jY1kNngTG6XjuZRc/xsMpC2qVoL3YU+jxGuXh0dVrRhZ9O+
-        1FMHrzR03IZSkYUul1VmV2630QGrj1k/OCeDtlwuXTJELX7BXsNmg1sdnfWzEAa3geYHhB
-        1DAVTkGFCO887KJ7AUqRICB0oRtDgBVuVaMVsV4FU53qOUXSxb8HaufVhfwJwuWI2CI2K5
-        o1JFr36/utnitbQnULekYRP6Mm60AVw+6ri4nccfeu5qkpTURBaU41W5LHEalZJFIkTzM1
-        QoBep0OOHuAK7SYEJqSMz1H81VztknDQKlwXg3gf1gCoVXUk/TGTdtu2EMfRIQ==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>, linux-cifs@vger.kernel.org,
-        zhangxiaoxu5@huawei.com, sfrench@samba.org, smfrench@gmail.com,
-        lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com
-Subject: Re: [PATCH v2] cifs: Fix connections leak when tlink setup failed
-In-Reply-To: <20221111071212.132722-1-zhangxiaoxu5@huawei.com>
-References: <20221111071212.132722-1-zhangxiaoxu5@huawei.com>
-Date:   Fri, 11 Nov 2022 13:00:58 -0300
-Message-ID: <87bkpdwked.fsf@cjr.nz>
+        with ESMTP id S233958AbiKKSCY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 11 Nov 2022 13:02:24 -0500
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E5FC63BB0
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Nov 2022 10:02:23 -0800 (PST)
+Received: by mail-lj1-x22c.google.com with SMTP id t10so5368252ljj.0
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Nov 2022 10:02:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=s8TZd9ZjbF96jq3/grWR5CYW8loDqf4MfOJ/ysatC+k=;
+        b=KpeceHP0WASJ4nP0T9ZP3U9+oQMGODAMSeu0o3/w48duveqof7V24HB30lVeQYZeU1
+         ENEFWjbJ9YQoCoG8wti/tGu5VIFagDgTFw4aaBc4eu24MbvaX5BaLFi7zows8JmtDRwX
+         kTPJNbHqKnOwajePzPnayRQHpJnodiBMfATxxKnyV8By+BnuxWdj/oOLKTfA/PFqGBRG
+         On5AYaElARc4zT7v8h3Kpv9NZZuBmy0Kf9xuHBF/5pIsgm/XLU8ZNWKkOc8kNrzvO3AV
+         AirrH0+O7RarrWoUM4nKoCJBh4M3sloETNn/bLcHevY3i8x321AT19lBkSQ64tNbek4o
+         n5Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s8TZd9ZjbF96jq3/grWR5CYW8loDqf4MfOJ/ysatC+k=;
+        b=F+lYBCKtAB1jfei2wZnvhothNyaRBRC3D90R0WYt8H3EuyxXdyDIOSm+HB2ZuY5pIX
+         gxu03mS9Qg+JKmAbxLiobHdFcMRRadsqvF09IbJ4mQV4NqJLqr2KhpsTTsVrbcUmpDsF
+         6YLmVhFFb3kTSIUYY+CX0qMdESn1RiaJWhrU+ilAZni2/qfG9XlWAgboN9BQwcbEE1AL
+         0tGjDDK8srlbDYCaRA2gPd2kjwSgFyVaaXMod38iQm32ONQTkYKiGRbbT9SlNmXA41r6
+         7Pi870vM/+skHhk72/kwkGSuxGLCYhBfI9nS3P+Li/kakCi7CXM0GVIxdePRmsJEp0nJ
+         5mHQ==
+X-Gm-Message-State: ANoB5pkaajejfJrzaf8W0EptzpnK9j7Po882fObWOC/7o0vhrHnmMGN2
+        a4Fv1CcOHOIB7iz2Ae36Rk99FFSj9zhjTnQhdO8=
+X-Google-Smtp-Source: AA0mqf6Kcl3vpDhyyrtjsjVerKB457mxEqrzxOd3NDFPeQV1V+eZAG6BHIgfXvejrGph16Ffre9lfFt4G8BgfFQnlWU=
+X-Received: by 2002:a05:651c:508:b0:277:f0f:927e with SMTP id
+ o8-20020a05651c050800b002770f0f927emr1101774ljp.138.1668189741543; Fri, 11
+ Nov 2022 10:02:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20221111071212.132722-1-zhangxiaoxu5@huawei.com>
+In-Reply-To: <20221111071212.132722-1-zhangxiaoxu5@huawei.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 11 Nov 2022 12:02:10 -0600
+Message-ID: <CAH2r5mt0D7WAjvEVWmdZ_nMO_0LZXQWWhx_RFHszT-cVBSbo3Q@mail.gmail.com>
+Subject: Re: [PATCH v2] cifs: Fix connections leak when tlink setup failed
+To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, pc@cjr.nz,
+        lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com,
+        palcantara@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Zhang Xiaoxu <zhangxiaoxu5@huawei.com> writes:
+tentatively merged into cifs-2.6.git for-next pending testing
 
+On Fri, Nov 11, 2022 at 12:07 AM Zhang Xiaoxu <zhangxiaoxu5@huawei.com> wrote:
+>
 > If the tlink setup failed, lost to put the connections, then
 > the module refcnt leak since the cifsd kthread not exit.
 >
@@ -65,5 +81,47 @@ Zhang Xiaoxu <zhangxiaoxu5@huawei.com> writes:
 >
 >  fs/cifs/connect.c | 14 +++++++++++---
 >  1 file changed, 11 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 1cc47dd3b4d6..9db9527c61cf 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -3855,9 +3855,13 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+>         uuid_copy(&cifs_sb->dfs_mount_id, &mnt_ctx.mount_id);
+>
+>  out:
+> -       free_xid(mnt_ctx.xid);
+>         cifs_try_adding_channels(cifs_sb, mnt_ctx.ses);
+> -       return mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
+> +       rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
+> +       if (rc)
+> +               goto error;
+> +
+> +       free_xid(mnt_ctx.xid);
+> +       return rc;
+>
+>  error:
+>         dfs_cache_put_refsrv_sessions(&mnt_ctx.mount_id);
+> @@ -3884,8 +3888,12 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+>                         goto error;
+>         }
+>
+> +       rc = mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
+> +       if (rc)
+> +               goto error;
+> +
+>         free_xid(mnt_ctx.xid);
+> -       return mount_setup_tlink(cifs_sb, mnt_ctx.ses, mnt_ctx.tcon);
+> +       return rc;
+>
+>  error:
+>         mount_put_conns(&mnt_ctx);
+> --
+> 2.31.1
+>
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+
+-- 
+Thanks,
+
+Steve
