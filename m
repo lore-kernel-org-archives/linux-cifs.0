@@ -2,105 +2,71 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEB0C433FE
-	for <linux-cifs@archiver.kernel.org>; Fri, 11 Nov 2022 14:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A247EC4332F
+	for <linux-cifs@archiver.kernel.org>; Fri, 11 Nov 2022 15:18:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234197AbiKKOxQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 11 Nov 2022 09:53:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56906 "EHLO
+        id S234380AbiKKPSO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 11 Nov 2022 10:18:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233967AbiKKOxO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 11 Nov 2022 09:53:14 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71B35E9E5;
-        Fri, 11 Nov 2022 06:53:12 -0800 (PST)
+        with ESMTP id S235017AbiKKPRT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 11 Nov 2022 10:17:19 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF0797E994;
+        Fri, 11 Nov 2022 07:16:58 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2F6BEB8262D;
-        Fri, 11 Nov 2022 14:53:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC919C433D6;
-        Fri, 11 Nov 2022 14:53:09 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2361C62014;
+        Fri, 11 Nov 2022 15:16:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84732C433D6;
+        Fri, 11 Nov 2022 15:16:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668178389;
-        bh=WGPrvryZfOFC3wzVBHxzozHV97DRR/WI/YY1vZ/2/qE=;
+        s=k20201202; t=1668179817;
+        bh=x9Ke/KRLYG8sRfB+wVrrL1OIQqqHlJ9aK+e+Rc9DtZA=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=EoNlpBMNR1ejsTCtegykgDZlopZro00NIke6A2KclFEqsmSdnfH+ul/G/mMGQgvaD
-         Cbd4ng3JRSeDL7S7/wrTgoTTf3nXutv2+6gUlR8CZbWnfm26pdLK5YaJ/BLwVPE//0
-         6i1xJD4nA46ZkJ72rfMGU6QkgSbUAsDQruNsTbSLZnGfVKhCrZifT6cp4cTNJvjW4s
-         9nH/QMKqatRhijj7R2P8oQt6EbuJU9vcaKVvCZKEgHEkfZS+3CQHSOvBQkUWIBuWRs
-         M5CSt894nfvGqdFLVMYrtX4cvqgjOspX3EMTmkNRbncYFpE6otDOvPIrFd1186KKKL
-         8i8ABK+aeOxtg==
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-12c8312131fso5651905fac.4;
-        Fri, 11 Nov 2022 06:53:09 -0800 (PST)
-X-Gm-Message-State: ANoB5pmSkGN1ZlbttgRIUpBoPoVx9aOfj+XihP+U7Pj0u/qYpNvac1pU
-        TEuU9X0FH4FPtQp0MM01f7k7Wb7OnRnTeTK7xBs=
-X-Google-Smtp-Source: AA0mqf6vJpHLx34mdSsrAzt/LKXi2o4W6WHbkOsKLVu8I5IX1EvXNngZJHlIpEv2ym4TxyVwGPbZMTx23gLOrARs2e0=
-X-Received: by 2002:a05:6870:5882:b0:13d:5167:43e3 with SMTP id
- be2-20020a056870588200b0013d516743e3mr1081624oab.257.1668178388804; Fri, 11
- Nov 2022 06:53:08 -0800 (PST)
+        b=eKuXnj1lSlrUKHenS8cyni9zEr1UdGjvqkDZrmIxh3wGOKK7yckVhB+mHdLgCDtzJ
+         GaGmzCGAxvQAlhneA85ponVvHb1tOj6o91qchNZDbBxdPdOPoLqB1dNdMT9Z2U9nEM
+         KUA4dTbqgP3LevS0mRIoqygCgEk1G7QZE48gwDsVwVkgFr4NY6a0W1HiMQJn/IK59h
+         d2yqdY5taVIqxqzH7JzzQB6vPA/EmadoKQ3WuQ0MxQqtBr8VdOYO1AQeIlu3jtf4Ht
+         R2k3vT6u9lH/+EXowTQoSa8XPUBx89zrYoP71I2xC3EjxgsJjfDjIstLA/XXWOodQX
+         vQqAUSFngPveQ==
+Received: by mail-oi1-f178.google.com with SMTP id n186so5163167oih.7;
+        Fri, 11 Nov 2022 07:16:57 -0800 (PST)
+X-Gm-Message-State: ANoB5plIITi++Gw5nvJCWzObH+0BMQeKVi0vZCjAAPr+IlMvwiqdWuFU
+        pPYrSKg/br4Kk4n54zkr+RnbEgDA8K5jtlo7z/o=
+X-Google-Smtp-Source: AA0mqf7ku+APaXjOsYRyL/D24pTq7efEYiUFAekNrIAOiYJTB8Gze8J8ysrBNf6kXpTadr0DIeLK9CA86xWIoOzaEWk=
+X-Received: by 2002:aca:628a:0:b0:34f:63a5:a654 with SMTP id
+ w132-20020aca628a000000b0034f63a5a654mr993220oib.257.1668179816706; Fri, 11
+ Nov 2022 07:16:56 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:6839:1a4e:0:0:0:0 with HTTP; Fri, 11 Nov 2022 06:53:08
+Received: by 2002:a05:6839:1a4e:0:0:0:0 with HTTP; Fri, 11 Nov 2022 07:16:56
  -0800 (PST)
-In-Reply-To: <20221110155522.556225-1-amir73il@gmail.com>
-References: <20221110155522.556225-1-amir73il@gmail.com>
+In-Reply-To: <20221111131153.27075-1-jlayton@kernel.org>
+References: <20221111131153.27075-1-jlayton@kernel.org>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 11 Nov 2022 23:53:08 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd--CCur4Pd9RhSTzV3ra7CV8zqsDgj-iOerun0sub1Xdw@mail.gmail.com>
-Message-ID: <CAKYAXd--CCur4Pd9RhSTzV3ra7CV8zqsDgj-iOerun0sub1Xdw@mail.gmail.com>
-Subject: Re: [PATCH] vfs: fix copy_file_range() averts filesystem freeze protection
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
-        Luis Henriques <lhenriques@suse.com>,
-        linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org
+Date:   Sat, 12 Nov 2022 00:16:56 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8roEwL_-+bdSgBgZ8QnEqES=_kJpbN2fmsTe69deXZNg@mail.gmail.com>
+Message-ID: <CAKYAXd8roEwL_-+bdSgBgZ8QnEqES=_kJpbN2fmsTe69deXZNg@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: use F_SETLK when unlocking a file
+To:     Jeff Layton <jlayton@kernel.org>
+Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-11-11 0:55 GMT+09:00, Amir Goldstein <amir73il@gmail.com>:
-> Commit 868f9f2f8e00 ("vfs: fix copy_file_range() regression in cross-fs
-> copies") removed fallback to generic_copy_file_range() for cross-fs
-> cases inside vfs_copy_file_range().
+2022-11-11 22:11 GMT+09:00, Jeff Layton <jlayton@kernel.org>:
+> ksmbd seems to be trying to use a cmd value of 0 when unlocking a file.
+> That activity requires a type of F_UNLCK with a cmd of F_SETLK. For
+> local POSIX locking, it doesn't matter much since vfs_lock_file ignores
+> @cmd, but filesystems that define their own ->lock operation expect to
+> see it set sanely.
 >
-> To preserve behavior of nfsd and ksmbd server-side-copy, the fallback to
-> generic_copy_file_range() was added in nfsd and ksmbd code, but that
-> call is missing sb_start_write(), fsnotify hooks and more.
->
-> Ideally, nfsd and ksmbd would pass a flag to vfs_copy_file_range() that
-> will take care of the fallback, but that code would be subtle and we got
-> vfs_copy_file_range() logic wrong too many times already.
->
-> Instead, add a flag to explicitly request vfs_copy_file_range() to
-> perform only generic_copy_file_range() and let nfsd and ksmbd use this
-> flag only in the fallback path.
->
-> This choise keeps the logic changes to minimum in the non-nfsd/ksmbd code
-> paths to reduce the risk of further regressions.
->
-> Fixes: 868f9f2f8e00 ("vfs: fix copy_file_range() regression in cross-fs
-> copies")
-> Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-> ---
->
-> Hi Al,
->
-> Another fix for the long tradition of copy_file_range() regressions.
-> This one only affected cross-fs server-side-copy from nfsd/ksmbd.
->
-> I ran the copy_range fstests group on ext4/xfs/overlay to verify no
-> regressions in local fs and nfsv3/nfsv4 to test server-side-copy.
->
-> I also patched copy_file_range() to test the nfsd fallback code on
-> local fs.
->
-> Namje, could you please test ksmbd.
-Works fine. You can add tested-by tag for ksmbd.
-Tested-by: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: David Howells <dhowells@redhat.com>
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
->
-> Thanks,
-> Amir.
+Thanks for your patch.
