@@ -2,274 +2,156 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E78C43219
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 09:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A13F3C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 09:42:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229842AbiKOJfD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Nov 2022 04:35:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58452 "EHLO
+        id S229879AbiKOJmA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Nov 2022 04:42:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbiKOJfC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 04:35:02 -0500
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97F0413E35
-        for <linux-cifs@vger.kernel.org>; Tue, 15 Nov 2022 01:35:00 -0800 (PST)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4NBLY30ZxHzJnkN;
-        Tue, 15 Nov 2022 17:31:51 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 15 Nov 2022 17:34:58 +0800
-From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-To:     <linux-cifs@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
-        <sfrench@samba.org>, <smfrench@gmail.com>, <pc@cjr.nz>,
-        <lsahlber@redhat.com>, <sprasad@microsoft.com>, <tom@talpey.com>
-Subject: [PATCH 2/3] cifs: Fix UAF in cifs_demultiplex_thread()
-Date:   Tue, 15 Nov 2022 18:39:35 +0800
-Message-ID: <20221115103936.3303416-3-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221115103936.3303416-1-zhangxiaoxu5@huawei.com>
-References: <20221115103936.3303416-1-zhangxiaoxu5@huawei.com>
+        with ESMTP id S229681AbiKOJly (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 04:41:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C58431581D
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Nov 2022 01:41:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668505260;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/jXxnn30oH1htkAEq4c8BajVXG6A/m7p7p9RvVlC1SI=;
+        b=BZZzad5u2crP14GolV0bGQ1WW1AbJAZ5api3d8MYMO+UzyG1DQME240bknXjd/fNOtQ/rp
+        WOapD2ShUltu692SortSEW17xQLytfZCVgUP8KzAHywmOFQddMJ9pXWSGT98i92X8zUp9V
+        5ZPUjQoQ6M0QgOy7U+S+qkb3kMlCqJc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-373-MkvcghZ8OraPCsSquUNZLw-1; Tue, 15 Nov 2022 04:40:54 -0500
+X-MC-Unique: MkvcghZ8OraPCsSquUNZLw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F0E008027EB;
+        Tue, 15 Nov 2022 09:40:53 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E9A352024CC0;
+        Tue, 15 Nov 2022 09:40:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <Y3MQ4l1AJOgniprT@casper.infradead.org>
+References: <Y3MQ4l1AJOgniprT@casper.infradead.org> <166844174069.1124521.10890506360974169994.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, dwysocha@redhat.com,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
+        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2] mm, netfs, fscache: Stop read optimisation when folio removed from pagecache
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500023.china.huawei.com (7.185.36.114)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1493971.1668505249.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Tue, 15 Nov 2022 09:40:49 +0000
+Message-ID: <1493972.1668505249@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-There is a UAF when xfstests on cifs:
+Matthew Wilcox <willy@infradead.org> wrote:
 
-  BUG: KASAN: use-after-free in smb2_is_network_name_deleted+0x27/0x160
-  Read of size 4 at addr ffff88810103fc08 by task cifsd/923
+> On Mon, Nov 14, 2022 at 04:02:20PM +0000, David Howells wrote:
+> > +++ b/mm/filemap.c
+> > @@ -3941,6 +3941,10 @@ bool filemap_release_folio(struct folio *folio,=
+ gfp_t gfp)
+> >  	struct address_space * const mapping =3D folio->mapping;
+> >  =
 
-  CPU: 1 PID: 923 Comm: cifsd Not tainted 6.1.0-rc4+ #45
-  ...
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x34/0x44
-   print_report+0x171/0x472
-   kasan_report+0xad/0x130
-   kasan_check_range+0x145/0x1a0
-   smb2_is_network_name_deleted+0x27/0x160
-   cifs_demultiplex_thread.cold+0x172/0x5a4
-   kthread+0x165/0x1a0
-   ret_from_fork+0x1f/0x30
-   </TASK>
+> >  	BUG_ON(!folio_test_locked(folio));
+> > +	if ((!mapping || !mapping_release_always(mapping))
+> > +	    && !folio_test_private(folio) &&
+> > +	    !folio_test_private_2(folio))
+> > +		return true;
+> =
 
-  Allocated by task 923:
-   kasan_save_stack+0x1e/0x40
-   kasan_set_track+0x21/0x30
-   __kasan_slab_alloc+0x54/0x60
-   kmem_cache_alloc+0x147/0x320
-   mempool_alloc+0xe1/0x260
-   cifs_small_buf_get+0x24/0x60
-   allocate_buffers+0xa1/0x1c0
-   cifs_demultiplex_thread+0x199/0x10d0
-   kthread+0x165/0x1a0
-   ret_from_fork+0x1f/0x30
+> Why do you need to test 'mapping' here?
 
-  Freed by task 921:
-   kasan_save_stack+0x1e/0x40
-   kasan_set_track+0x21/0x30
-   kasan_save_free_info+0x2a/0x40
-   ____kasan_slab_free+0x143/0x1b0
-   kmem_cache_free+0xe3/0x4d0
-   cifs_small_buf_release+0x29/0x90
-   SMB2_negotiate+0x8b7/0x1c60
-   smb2_negotiate+0x51/0x70
-   cifs_negotiate_protocol+0xf0/0x160
-   cifs_get_smb_ses+0x5fa/0x13c0
-   mount_get_conns+0x7a/0x750
-   cifs_mount+0x103/0xd00
-   cifs_smb3_do_mount+0x1dd/0xcb0
-   smb3_get_tree+0x1d5/0x300
-   vfs_get_tree+0x41/0xf0
-   path_mount+0x9b3/0xdd0
-   __x64_sys_mount+0x190/0x1d0
-   do_syscall_64+0x35/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
+Why does the function do:
 
-The UAF is because:
+	if (mapping && mapping->a_ops->release_folio)
 
- mount(pid: 921)               | cifsd(pid: 923)
--------------------------------|-------------------------------
-                               | cifs_demultiplex_thread
-SMB2_negotiate                 |
- cifs_send_recv                |
-  compound_send_recv           |
-   smb_send_rqst               |
-    wait_for_response          |
-     wait_event_state      [1] |
-                               |  standard_receive3
-                               |   cifs_handle_standard
-                               |    handle_mid
-                               |     mid->resp_buf = buf;  [2]
-                               |     dequeue_mid           [3]
-     KILL the process      [4] |
-    resp_iov[i].iov_base = buf |
- free_rsp_buf              [5] |
-                               |   is_network_name_deleted [6]
-                               |   callback
+later then?  There are callers of the function, such as shrink_folio_list(=
+),
+that seem to think that folio->mapping might be NULL.
 
-1. After send request to server, wait the response until
-    mid->mid_state != SUBMITTED;
-2. Receive response from server, and set it to mid;
-3. Set the mid state to RECEIVED;
-4. Kill the process, the mid state already RECEIVED, get 0;
-5. Handle and release the negotiate response;
-6. UAF.
+> Also this is the most inconsistent style ...
 
-It can be easily reproduce with add some delay in [3] - [6].
+Yeah, I accidentally pushed the '&&' onto the next line.
 
-Only sync call has the problem since async call's callback is
-executed in cifsd process.
+> > @@ -276,7 +275,7 @@ static long mapping_evict_folio(struct address_spa=
+ce *mapping,
+> >  	if (folio_ref_count(folio) >
+> >  			folio_nr_pages(folio) + folio_has_private(folio) + 1)
+> =
 
-Add an extra state to mark the mid state to READY before wakeup the
-waitter, then it can get the resp safely.
+> I think this line is incorrect, right?  You don't increment the folio
+> refcount just because the folio has private2 set, do you?
 
-Fixes: ec637e3ffb6b ("[CIFS] Avoid extra large buffer allocation (and memcpy) in cifs_readpages")
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
----
- fs/cifs/cifsglob.h  |  1 +
- fs/cifs/transport.c | 32 +++++++++++++++++++++-----------
- 2 files changed, 22 insertions(+), 11 deletions(-)
+Errr, yes:
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 1420acf987f0..637b33b355c6 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1810,6 +1810,7 @@ static inline bool is_retryable_error(int error)
- #define   MID_RETRY_NEEDED      8 /* session closed while this request out */
- #define   MID_RESPONSE_MALFORMED 0x10
- #define   MID_SHUTDOWN		 0x20
-+#define   MID_RESPONSE_READY 0x40 /* ready for other process handle the rsp */
- 
- /* Flags */
- #define   MID_WAIT_CANCELLED	 1 /* Cancelled while waiting for response */
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 575fa8f58342..dea5228899fb 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -87,7 +87,8 @@ static void __release_mid(struct kref *refcount)
- 	struct TCP_Server_Info *server = midEntry->server;
- 
- 	if (midEntry->resp_buf && (midEntry->mid_flags & MID_WAIT_CANCELLED) &&
--	    midEntry->mid_state == MID_RESPONSE_RECEIVED &&
-+	    (midEntry->mid_state == MID_RESPONSE_RECEIVED ||
-+	     midEntry->mid_state == MID_RESPONSE_READY) &&
- 	    server->ops->handle_cancelled_mid)
- 		server->ops->handle_cancelled_mid(midEntry, server);
- 
-@@ -754,7 +755,8 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
- 	int error;
- 
- 	error = wait_event_state(server->response_q,
--				 midQ->mid_state != MID_REQUEST_SUBMITTED,
-+				 midQ->mid_state != MID_REQUEST_SUBMITTED &&
-+				 midQ->mid_state != MID_RESPONSE_RECEIVED,
- 				 (TASK_KILLABLE|TASK_FREEZABLE_UNSAFE));
- 	if (error < 0)
- 		return -ERESTARTSYS;
-@@ -909,7 +911,7 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
- 
- 	spin_lock(&server->mid_lock);
- 	switch (mid->mid_state) {
--	case MID_RESPONSE_RECEIVED:
-+	case MID_RESPONSE_READY:
- 		spin_unlock(&server->mid_lock);
- 		return rc;
- 	case MID_RETRY_NEEDED:
-@@ -1008,6 +1010,9 @@ cifs_compound_callback(struct mid_q_entry *mid)
- 	credits.instance = server->reconnect_instance;
- 
- 	add_credits(server, &credits, mid->optype);
-+
-+	if (mid->mid_state == MID_RESPONSE_RECEIVED)
-+		mid->mid_state = MID_RESPONSE_READY;
- }
- 
- static void
-@@ -1205,7 +1210,8 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 			send_cancel(server, &rqst[i], midQ[i]);
- 			spin_lock(&server->mid_lock);
- 			midQ[i]->mid_flags |= MID_WAIT_CANCELLED;
--			if (midQ[i]->mid_state == MID_REQUEST_SUBMITTED) {
-+			if (midQ[i]->mid_state == MID_REQUEST_SUBMITTED ||
-+			    midQ[i]->mid_state == MID_RESPONSE_RECEIVED) {
- 				midQ[i]->callback = cifs_cancelled_callback;
- 				cancelled_mid[i] = true;
- 				credits[i].value = 0;
-@@ -1226,7 +1232,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 		}
- 
- 		if (!midQ[i]->resp_buf ||
--		    midQ[i]->mid_state != MID_RESPONSE_RECEIVED) {
-+		    midQ[i]->mid_state != MID_RESPONSE_READY) {
- 			rc = -EIO;
- 			cifs_dbg(FYI, "Bad MID state?\n");
- 			goto out;
-@@ -1415,7 +1421,8 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	if (rc != 0) {
- 		send_cancel(server, &rqst, midQ);
- 		spin_lock(&server->mid_lock);
--		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
-+		if (midQ->mid_state == MID_REQUEST_SUBMITTED ||
-+		    midQ->mid_state == MID_RESPONSE_RECEIVED) {
- 			/* no longer considered to be "in-flight" */
- 			midQ->callback = release_mid;
- 			spin_unlock(&server->mid_lock);
-@@ -1432,7 +1439,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	}
- 
- 	if (!midQ->resp_buf || !out_buf ||
--	    midQ->mid_state != MID_RESPONSE_RECEIVED) {
-+	    midQ->mid_state != MID_RESPONSE_READY) {
- 		rc = -EIO;
- 		cifs_server_dbg(VFS, "Bad MID state?\n");
- 		goto out;
-@@ -1558,14 +1565,16 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	/* Wait for a reply - allow signals to interrupt. */
- 	rc = wait_event_interruptible(server->response_q,
--		(!(midQ->mid_state == MID_REQUEST_SUBMITTED)) ||
-+		(!(midQ->mid_state == MID_REQUEST_SUBMITTED ||
-+		   midQ->mid_state == MID_RESPONSE_RECEIVED)) ||
- 		((server->tcpStatus != CifsGood) &&
- 		 (server->tcpStatus != CifsNew)));
- 
- 	/* Were we interrupted by a signal ? */
- 	spin_lock(&server->srv_lock);
- 	if ((rc == -ERESTARTSYS) &&
--		(midQ->mid_state == MID_REQUEST_SUBMITTED) &&
-+		(midQ->mid_state == MID_REQUEST_SUBMITTED ||
-+		 midQ->mid_state == MID_RESPONSE_RECEIVED) &&
- 		((server->tcpStatus == CifsGood) ||
- 		 (server->tcpStatus == CifsNew))) {
- 		spin_unlock(&server->srv_lock);
-@@ -1596,7 +1605,8 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		if (rc) {
- 			send_cancel(server, &rqst, midQ);
- 			spin_lock(&server->mid_lock);
--			if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
-+			if (midQ->mid_state == MID_REQUEST_SUBMITTED ||
-+			    midQ->mid_state == MID_RESPONSE_RECEIVED) {
- 				/* no longer considered to be "in-flight" */
- 				midQ->callback = release_mid;
- 				spin_unlock(&server->mid_lock);
-@@ -1616,7 +1626,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		return rc;
- 
- 	/* rcvd frame is ok */
--	if (out_buf == NULL || midQ->mid_state != MID_RESPONSE_RECEIVED) {
-+	if (out_buf == NULL || midQ->mid_state != MID_RESPONSE_READY) {
- 		rc = -EIO;
- 		cifs_tcon_dbg(VFS, "Bad MID state?\n");
- 		goto out;
--- 
-2.31.1
+	static inline void folio_start_fscache(struct folio *folio)
+	{
+		VM_BUG_ON_FOLIO(folio_test_private_2(folio), folio);
+		folio_get(folio);
+		folio_set_private_2(folio);
+	}
+
+Someone insisted - might even have been you;-)
+
+I'm working on getting rid of the use of PG_private_2 from the network
+filesystems, but it's still in progress.  Kind of blocked on the iov_iter
+stuff.
+
+> >  		return 0;
+> > -	if (folio_has_private(folio) && !filemap_release_folio(folio, 0))
+> > +	if (!filemap_release_folio(folio, 0))
+> >  		return 0;
+> >  =
+
+> >  	return remove_mapping(mapping, folio);
+> =
+
+> Can we get rid of folio_has_private()
+
+That would be nice, but there are still places that check it, and until we=
+ get
+rid of the use of PG_private_2, we can't reduce it to just a check on
+PG_private.  Truncate, for example, checks it to see if it should can
+->invalidate_folio().
+
+It's only used in mm/, so it could be moved into mm/internal.h.
+
+> / page_has_private() now?
+
+That's used in some a number of places outside of mm/.  The arch/s390/ usa=
+ge
+is just to calculate the expected refcount.  I wonder if calculation of th=
+e
+expected refcount could be potted into a function as it's performed in a
+number of places - though the expectation isn't always the same.
+
+Ext3 and fuse both use it - but those probably need to check PG_private_2 =
+and
+could use a "folio_test_private()" function when fully foliated.
+
+David
 
