@@ -2,89 +2,55 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F533C4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 04:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05851C433FE
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 09:01:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbiKOEJZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Nov 2022 23:09:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46664 "EHLO
+        id S229514AbiKOJBf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Nov 2022 04:01:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230120AbiKOEJY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Nov 2022 23:09:24 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5E31A82F;
-        Mon, 14 Nov 2022 20:09:19 -0800 (PST)
+        with ESMTP id S229485AbiKOJBe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 04:01:34 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70FC21CFFF;
+        Tue, 15 Nov 2022 01:01:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=j/xUVrD8mPcSbyQHk615wZHvvK1z2hXuDfFCa4PiwtI=; b=cqcPHDV+eY3ifO9g3vqqcV+Bnh
-        zsVmJpaFiflf5AYEOG3Gk8yCOvxY2VdVW1IHUEvxNgWPziM1+s7iQWCyjRwtqWOztJWjco+wIE8+/
-        JAszRx1WSMGrgfhPxUKltG0mJzXigO2CzTqvQCN0Q3HVnio9l5kV7sxhHrOccZCnn8Cy7fh3vQHHk
-        qM7aIAWE419vYSVxB5x5f2zCN2lWsovAQiBqh9msxwhjWhlT12x0nsBLDANysPmO7exwN52iTGj2e
-        ijqiE0P7vjJQpO6DIyXSI0xgg+e0DxJ/Z5xGIsfiwcPbNKl3PxKsNMEMxE+mpSFr4xxXC7ElQ+PUq
-        RJbOqsQw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ounFy-00G84y-Gg; Tue, 15 Nov 2022 04:09:06 +0000
-Date:   Tue, 15 Nov 2022 04:09:06 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     dwysocha@redhat.com, Rohith Surabattula <rohiths.msft@gmail.com>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
-        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
-        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2] mm, netfs, fscache: Stop read optimisation when
- folio removed from pagecache
-Message-ID: <Y3MQ4l1AJOgniprT@casper.infradead.org>
-References: <166844174069.1124521.10890506360974169994.stgit@warthog.procyon.org.uk>
+        bh=GwRoKnnlLMQISMQgHm91gHwpOySYBhQYwBeETruLTI4=; b=xl4EvsrepI1dn0YDfz56Ppl6Sk
+        JFbZsbL2FobPD4ktM5s9hKh1EkMpDY33KFb41j/i7GRK96bzqT1idYCIaVQqD/RajiYdCzr3fkupH
+        xoZNVV4MIYSBar1khx8WNcZg1nnx0Kf81e01PDJCX+S9JKjFAoSRC7wOZenKiBux1NQZK5AZYFWHV
+        UnrHE4G4+2YaDmbi5WhlV2ftJa2N7Df7FvYXIEePaYoL9axR94sgsNhkE6iShvMezvxVJA/SDjAKM
+        34D38bQHDBVDwiO/7bE1GlWtyRoczJoOF3zSmPKmQVvNWShd85PGSgRxE7+L6I9iDP6DePvoNcuWc
+        3ytJugHg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ourot-00971G-Nh; Tue, 15 Nov 2022 09:01:27 +0000
+Date:   Tue, 15 Nov 2022 01:01:27 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jeff Layton <jlayton@kernel.org>
+Cc:     linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
+        tom@talpey.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] ksmbd: use F_SETLK when unlocking a file
+Message-ID: <Y3NVZ6e7Hnddsdl6@infradead.org>
+References: <20221111131153.27075-1-jlayton@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <166844174069.1124521.10890506360974169994.stgit@warthog.procyon.org.uk>
+In-Reply-To: <20221111131153.27075-1-jlayton@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 04:02:20PM +0000, David Howells wrote:
-> +++ b/mm/filemap.c
-> @@ -3941,6 +3941,10 @@ bool filemap_release_folio(struct folio *folio, gfp_t gfp)
->  	struct address_space * const mapping = folio->mapping;
->  
->  	BUG_ON(!folio_test_locked(folio));
-> +	if ((!mapping || !mapping_release_always(mapping))
-> +	    && !folio_test_private(folio) &&
-> +	    !folio_test_private_2(folio))
-> +		return true;
+On Fri, Nov 11, 2022 at 08:11:53AM -0500, Jeff Layton wrote:
+> ksmbd seems to be trying to use a cmd value of 0 when unlocking a file.
+> That activity requires a type of F_UNLCK with a cmd of F_SETLK. For
+> local POSIX locking, it doesn't matter much since vfs_lock_file ignores
+> @cmd, but filesystems that define their own ->lock operation expect to
+> see it set sanely.
 
-Why do you need to test 'mapping' here?  Also this is the most
-inconsistent style ...
-
-	if ((!mapping || !mapping_release_always(mapping)) &&
-	    !folio_test_private(folio) && !folio_test_private_2(folio))
-
-works fine, but if you insist on splitting over three lines, then:
-
-	if ((!mapping || !mapping_release_always(mapping)) &&
-	    !folio_test_private(folio) && 
-	    !folio_test_private_2(folio))
-
-> @@ -276,7 +275,7 @@ static long mapping_evict_folio(struct address_space *mapping,
->  	if (folio_ref_count(folio) >
->  			folio_nr_pages(folio) + folio_has_private(folio) + 1)
-
-I think this line is incorrect, right?  You don't increment the folio
-refcount just because the folio has private2 set, do you?
-
->  		return 0;
-> -	if (folio_has_private(folio) && !filemap_release_folio(folio, 0))
-> +	if (!filemap_release_folio(folio, 0))
->  		return 0;
->  
->  	return remove_mapping(mapping, folio);
-
-Can we get rid of folio_has_private() / page_has_private() now?
+Btw, I really wonder if we should split vfs_lock_file into separate
+calls for locking vs unlocking.  The current interface seems very
+confusing.
