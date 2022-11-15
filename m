@@ -2,82 +2,168 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA33C433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 15:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5FBC43217
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 15:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231210AbiKOPWz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Nov 2022 10:22:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55308 "EHLO
+        id S232302AbiKOPfb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Nov 2022 10:35:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232672AbiKOPWr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 10:22:47 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DFB62DA81;
-        Tue, 15 Nov 2022 07:22:45 -0800 (PST)
+        with ESMTP id S231473AbiKOPf3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 10:35:29 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25BC5E033;
+        Tue, 15 Nov 2022 07:35:28 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8274F61862;
-        Tue, 15 Nov 2022 15:22:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14691C43144;
-        Tue, 15 Nov 2022 15:22:43 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D435AB81999;
+        Tue, 15 Nov 2022 15:35:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9DFAC433D6;
+        Tue, 15 Nov 2022 15:35:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668525764;
-        bh=rxU/qvZkzOWY6f8inhFdxsMbPSlxxghkZ09LKxGURe0=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=DIcZGyXzNwAwaz1t0O3ryQ9Ycy+iFYflsG3eR2g7/w3bFJeHNGXJbciZ0o79SxHgb
-         WgXEwWD5dpImNpG1zJqDZ39IXjugUcs5V+GlGrajbL7gaAOBtm/357+kvx/nX0YARZ
-         C9I4sIYp8Q2tU3PlP4emzlumo539dfeNHN8A7+FPNg8ZjQqGIyG/sUoj6xoMNlHb8Z
-         d7FzQTCWw0zdQI81Mf0dXgbi8fRA5wP2WmNvW6ZwogLoZR6cwweKXL/4ZEP702raGh
-         diPs5b/I+UrG2smIbrWoOOg+9Pso2attIBKqdW2mozwVOQGlHDfJbyqd0TQjSq+o86
-         CLXhkFffV7aKQ==
-Message-ID: <81a329d44cb2def622ddfcde88984caf51b4a017.camel@kernel.org>
-Subject: Re: [PATCH] ksmbd: use F_SETLK when unlocking a file
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
-        tom@talpey.com, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, David Howells <dhowells@redhat.com>
-Date:   Tue, 15 Nov 2022 10:22:42 -0500
-In-Reply-To: <Y3NVZ6e7Hnddsdl6@infradead.org>
-References: <20221111131153.27075-1-jlayton@kernel.org>
-         <Y3NVZ6e7Hnddsdl6@infradead.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+        s=k20201202; t=1668526525;
+        bh=Kk6YE6r7+pV85S3KUOQG/FfC1eR+wtQ/SfWrFF0Vwo0=;
+        h=Date:From:To:Cc:Subject:From;
+        b=TS9/0fFZ//65FVU5AEZsNoQzTvjEDGLEiFolQK6eKm5ThlnM6G28vQ32n/lC2loKY
+         cMQ/4EQMA2lGumG0hh0M0sAnLjGeFA/3SWL6vaD+nthfLXE8FvkZ+UsCN9bXnZz1xv
+         w7kH227NwrCeyzkLF19cS7UX78V6B3j3QKNZ1tdKpVQu7T8ODjGanq4InZfPt0pFVz
+         26QbEOIzq/R3Bx075GNflt8yl27iwRpItzU+bzccWPxIcuIgKMfFhqmuoJ981K07dl
+         JLBDMt95hvQKVsoQhByILWrmm39ATKLDX6oL7/9AQtdLbF7Q5kcJiVAOOdjqlz7xIL
+         w67nE3xmB2BMA==
+Date:   Tue, 15 Nov 2022 09:35:10 -0600
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>
+Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-hardening@vger.kernel.org
+Subject: [PATCH][next] ksmbd: replace one-element arrays with flexible-array
+ members
+Message-ID: <Y3OxronfaPYv9qGP@work>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 2022-11-15 at 01:01 -0800, Christoph Hellwig wrote:
-> On Fri, Nov 11, 2022 at 08:11:53AM -0500, Jeff Layton wrote:
-> > ksmbd seems to be trying to use a cmd value of 0 when unlocking a file.
-> > That activity requires a type of F_UNLCK with a cmd of F_SETLK. For
-> > local POSIX locking, it doesn't matter much since vfs_lock_file ignores
-> > @cmd, but filesystems that define their own ->lock operation expect to
-> > see it set sanely.
->=20
-> Btw, I really wonder if we should split vfs_lock_file into separate
-> calls for locking vs unlocking.  The current interface seems very
-> confusing.
+One-element arrays are deprecated, and we are replacing them with flexible
+array members instead. So, replace one-element arrays with flexible-array
+members in multiple structs in fs/ksmbd/smb_common.h and one in
+fs/ksmbd/smb2pdu.h.
 
-Maybe, though the current scheme basically of mirrors the userland API,
-as do the ->lock and ->flock file_operations.
+Important to mention is that doing a build before/after this patch results
+in no binary output differences.
 
-FWIW, the filelocking API is pretty rife with warts. Several other
-things that I wouldn't mind doing, just off the top of my head:
+This helps with the ongoing efforts to tighten the FORTIFY_SOURCE routines
+on memcpy() and help us make progress towards globally enabling
+-fstrict-flex-arrays=3 [1].
 
-- move the file locking API into a separate header. No need for it to be
-in fs.h, which is already too bloated.
+Link: https://github.com/KSPP/linux/issues/242
+Link: https://github.com/KSPP/linux/issues/79
+Link: https://gcc.gnu.org/pipermail/gcc-patches/2022-October/602902.html [1]
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ fs/ksmbd/smb2pdu.c    |  4 ++--
+ fs/ksmbd/smb2pdu.h    |  2 +-
+ fs/ksmbd/smb_common.h | 12 ++++++------
+ 3 files changed, 9 insertions(+), 9 deletions(-)
 
-- define a new struct for leases, and drop lease-specific fields from
-file_lock
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 9306e10753f9..ae7a3b000c61 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -3438,7 +3438,7 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+ 		goto free_conv_name;
+ 	}
+ 
+-	struct_sz = readdir_info_level_struct_sz(info_level) - 1 + conv_len;
++	struct_sz = readdir_info_level_struct_sz(info_level) + conv_len;
+ 	next_entry_offset = ALIGN(struct_sz, KSMBD_DIR_INFO_ALIGNMENT);
+ 	d_info->last_entry_off_align = next_entry_offset - struct_sz;
+ 
+@@ -3690,7 +3690,7 @@ static int reserve_populate_dentry(struct ksmbd_dir_info *d_info,
+ 		return -EOPNOTSUPP;
+ 
+ 	conv_len = (d_info->name_len + 1) * 2;
+-	next_entry_offset = ALIGN(struct_sz - 1 + conv_len,
++	next_entry_offset = ALIGN(struct_sz + conv_len,
+ 				  KSMBD_DIR_INFO_ALIGNMENT);
+ 
+ 	if (next_entry_offset > d_info->out_buf_len) {
+diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
+index 092fdd3f8750..aa5dbe54f5a1 100644
+--- a/fs/ksmbd/smb2pdu.h
++++ b/fs/ksmbd/smb2pdu.h
+@@ -443,7 +443,7 @@ struct smb2_posix_info {
+ 	/* SidBuffer contain two sids (UNIX user sid(16), UNIX group sid(16)) */
+ 	u8 SidBuffer[32];
+ 	__le32 name_len;
+-	u8 name[1];
++	u8 name[];
+ 	/*
+ 	 * var sized owner SID
+ 	 * var sized group SID
+diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
+index 318c16fa81da..e663ab9ea759 100644
+--- a/fs/ksmbd/smb_common.h
++++ b/fs/ksmbd/smb_common.h
+@@ -277,14 +277,14 @@ struct file_directory_info {
+ 	__le64 AllocationSize;
+ 	__le32 ExtFileAttributes;
+ 	__le32 FileNameLength;
+-	char FileName[1];
++	char FileName[];
+ } __packed;   /* level 0x101 FF resp data */
+ 
+ struct file_names_info {
+ 	__le32 NextEntryOffset;
+ 	__u32 FileIndex;
+ 	__le32 FileNameLength;
+-	char FileName[1];
++	char FileName[];
+ } __packed;   /* level 0xc FF resp data */
+ 
+ struct file_full_directory_info {
+@@ -299,7 +299,7 @@ struct file_full_directory_info {
+ 	__le32 ExtFileAttributes;
+ 	__le32 FileNameLength;
+ 	__le32 EaSize;
+-	char FileName[1];
++	char FileName[];
+ } __packed; /* level 0x102 FF resp */
+ 
+ struct file_both_directory_info {
+@@ -317,7 +317,7 @@ struct file_both_directory_info {
+ 	__u8   ShortNameLength;
+ 	__u8   Reserved;
+ 	__u8   ShortName[24];
+-	char FileName[1];
++	char FileName[];
+ } __packed; /* level 0x104 FFrsp data */
+ 
+ struct file_id_both_directory_info {
+@@ -337,7 +337,7 @@ struct file_id_both_directory_info {
+ 	__u8   ShortName[24];
+ 	__le16 Reserved2;
+ 	__le64 UniqueId;
+-	char FileName[1];
++	char FileName[];
+ } __packed;
+ 
+ struct file_id_full_dir_info {
+@@ -354,7 +354,7 @@ struct file_id_full_dir_info {
+ 	__le32 EaSize; /* EA size */
+ 	__le32 Reserved;
+ 	__le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit*/
+-	char FileName[1];
++	char FileName[];
+ } __packed; /* level 0x105 FF rsp data */
+ 
+ struct smb_version_values {
+-- 
+2.34.1
 
-- remove more separate filp and inode arguments
-
-- maybe rename locks.c to filelock.c? "locks.c" is too ambiguous
-
-Any others?
---=20
-Jeff Layton <jlayton@kernel.org>
