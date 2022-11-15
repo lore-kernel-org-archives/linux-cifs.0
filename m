@@ -2,168 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5FBC43217
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 15:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5320EC433FE
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 18:59:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232302AbiKOPfb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Nov 2022 10:35:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36632 "EHLO
+        id S231271AbiKOS7V (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Nov 2022 13:59:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231473AbiKOPf3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 10:35:29 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25BC5E033;
-        Tue, 15 Nov 2022 07:35:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D435AB81999;
-        Tue, 15 Nov 2022 15:35:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9DFAC433D6;
-        Tue, 15 Nov 2022 15:35:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668526525;
-        bh=Kk6YE6r7+pV85S3KUOQG/FfC1eR+wtQ/SfWrFF0Vwo0=;
-        h=Date:From:To:Cc:Subject:From;
-        b=TS9/0fFZ//65FVU5AEZsNoQzTvjEDGLEiFolQK6eKm5ThlnM6G28vQ32n/lC2loKY
-         cMQ/4EQMA2lGumG0hh0M0sAnLjGeFA/3SWL6vaD+nthfLXE8FvkZ+UsCN9bXnZz1xv
-         w7kH227NwrCeyzkLF19cS7UX78V6B3j3QKNZ1tdKpVQu7T8ODjGanq4InZfPt0pFVz
-         26QbEOIzq/R3Bx075GNflt8yl27iwRpItzU+bzccWPxIcuIgKMfFhqmuoJ981K07dl
-         JLBDMt95hvQKVsoQhByILWrmm39ATKLDX6oL7/9AQtdLbF7Q5kcJiVAOOdjqlz7xIL
-         w67nE3xmB2BMA==
-Date:   Tue, 15 Nov 2022 09:35:10 -0600
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>
-Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        linux-hardening@vger.kernel.org
-Subject: [PATCH][next] ksmbd: replace one-element arrays with flexible-array
- members
-Message-ID: <Y3OxronfaPYv9qGP@work>
+        with ESMTP id S230429AbiKOS7S (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 13:59:18 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F9B24962;
+        Tue, 15 Nov 2022 10:59:18 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id s8so8779811lfc.8;
+        Tue, 15 Nov 2022 10:59:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=m8W/0pY0U0/YdEIdwLzpMd90XGiJVa107n2xUOXTtzI=;
+        b=YCV05GN19uBSTv2O3yqeIqJiaYtG17bkaWOAhO2RO720T7T7oeBpFZ5WVRHZPyBcR3
+         FjlLo5voVc5ek6ikFUlEMO8pkRz7pxPlqjR1a6qimPrz/QGQbVxXdR+pHWMkJTr6AsoB
+         yo+R+Dym3E04WHHTy2FSMTRD+mYonFztVnYpKVWDnXqiyg6YCbyqN1pYV8dnkC1Hr8Vq
+         /pVFoVYN4W1cpDqCvEVZbOD1EhS+nV5ElutWA/TNax8AGsdbxdki3t++u2ssR44Na+J4
+         2mZqbL/3/xoCEH6i/3LiNhiHn6vPyKeK3VKrJrDkx7VH+kn+tjfcbABUC10EaWPZW8dY
+         1G2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=m8W/0pY0U0/YdEIdwLzpMd90XGiJVa107n2xUOXTtzI=;
+        b=Vdaq4U5KSjD9ijd8hdaD3EiRzpT/KUGunVQ83xqsAItebMyldo459p3c/UVpw7XwXs
+         L3VrwExN5JRaBZnaRf9zQdeNlH5w0rNkm6XZr2eNNPplOz/w8BLC7/qWGDPBzBwSZ9XT
+         r+9GYZ5K8UgO2k8lsqu5H2w2MV/rUstSHXTGXilf60ivSlAO2Po6LZe+UwFvp3CBjddd
+         e0YeHzQVMBji+wpgIjxJt4MdTqhWQt4TkS7cim8TFwBPTYHF2Mkcpvm9zZ5d1wlxgx0H
+         oDbr2etOxHiALOTBuIyVxa0/EB7QltQPMb6inQdonYEWoQwOr1gt6YH9MsND3EFLQgDX
+         SDXw==
+X-Gm-Message-State: ANoB5pmCaBDlk24qk/063fgeexLVZypQgs1OmlDId7q2z6pv3IZZ+Kyu
+        AvIYCh2heDDaH+Q3I+olmoszfPJdozwDIB9wq/8=
+X-Google-Smtp-Source: AA0mqf5y3LwZWjhCawuga7fH/h6NG7Icta3bCFw/67wQ9nG9UkOVSb3d8XJy76j5N0V5Cx0wDPh0qB9hQe8PCjffaZ8=
+X-Received: by 2002:a05:6512:138f:b0:4ab:534b:1b2c with SMTP id
+ p15-20020a056512138f00b004ab534b1b2cmr5800959lfa.426.1668538756218; Tue, 15
+ Nov 2022 10:59:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20221115142701.27074-1-abelova@astralinux.ru>
+In-Reply-To: <20221115142701.27074-1-abelova@astralinux.ru>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 15 Nov 2022 12:59:04 -0600
+Message-ID: <CAH2r5mtaTSih9X6Xzc0HTqRYSTx47vNzStMkXeWYzyXPMqzEFg@mail.gmail.com>
+Subject: Re: [PATCH] cifs: add check for returning value of SMB2_close_init
+To:     Anastasia Belova <abelova@astralinux.ru>
+Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, Aurelien Aptel <aaptel@suse.com>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-One-element arrays are deprecated, and we are replacing them with flexible
-array members instead. So, replace one-element arrays with flexible-array
-members in multiple structs in fs/ksmbd/smb_common.h and one in
-fs/ksmbd/smb2pdu.h.
+good catch.
 
-Important to mention is that doing a build before/after this patch results
-in no binary output differences.
+merged into cifs-2.6.git for-next
 
-This helps with the ongoing efforts to tighten the FORTIFY_SOURCE routines
-on memcpy() and help us make progress towards globally enabling
--fstrict-flex-arrays=3 [1].
+On Tue, Nov 15, 2022 at 8:41 AM Anastasia Belova <abelova@astralinux.ru> wrote:
+>
+> If the returning value of SMB2_close_init is an error-value,
+> exit the function.
+>
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>
+> Fixes: 352d96f3acc6 ("cifs: multichannel: move channel selection above transport layer")
+>
+> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+> ---
+>  fs/cifs/smb2ops.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 880cd494afea..9737296c0fbc 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -1126,6 +1126,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+>         rqst[2].rq_nvec = 1;
+>         rc = SMB2_close_init(tcon, server,
+>                              &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
+> +       if (rc)
+> +               goto sea_exit;
+>         smb2_set_related(&rqst[2]);
+>
+>         rc = compound_send_recv(xid, ses, server,
+> --
+> 2.30.2
+>
 
-Link: https://github.com/KSPP/linux/issues/242
-Link: https://github.com/KSPP/linux/issues/79
-Link: https://gcc.gnu.org/pipermail/gcc-patches/2022-October/602902.html [1]
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- fs/ksmbd/smb2pdu.c    |  4 ++--
- fs/ksmbd/smb2pdu.h    |  2 +-
- fs/ksmbd/smb_common.h | 12 ++++++------
- 3 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 9306e10753f9..ae7a3b000c61 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -3438,7 +3438,7 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
- 		goto free_conv_name;
- 	}
- 
--	struct_sz = readdir_info_level_struct_sz(info_level) - 1 + conv_len;
-+	struct_sz = readdir_info_level_struct_sz(info_level) + conv_len;
- 	next_entry_offset = ALIGN(struct_sz, KSMBD_DIR_INFO_ALIGNMENT);
- 	d_info->last_entry_off_align = next_entry_offset - struct_sz;
- 
-@@ -3690,7 +3690,7 @@ static int reserve_populate_dentry(struct ksmbd_dir_info *d_info,
- 		return -EOPNOTSUPP;
- 
- 	conv_len = (d_info->name_len + 1) * 2;
--	next_entry_offset = ALIGN(struct_sz - 1 + conv_len,
-+	next_entry_offset = ALIGN(struct_sz + conv_len,
- 				  KSMBD_DIR_INFO_ALIGNMENT);
- 
- 	if (next_entry_offset > d_info->out_buf_len) {
-diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
-index 092fdd3f8750..aa5dbe54f5a1 100644
---- a/fs/ksmbd/smb2pdu.h
-+++ b/fs/ksmbd/smb2pdu.h
-@@ -443,7 +443,7 @@ struct smb2_posix_info {
- 	/* SidBuffer contain two sids (UNIX user sid(16), UNIX group sid(16)) */
- 	u8 SidBuffer[32];
- 	__le32 name_len;
--	u8 name[1];
-+	u8 name[];
- 	/*
- 	 * var sized owner SID
- 	 * var sized group SID
-diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
-index 318c16fa81da..e663ab9ea759 100644
---- a/fs/ksmbd/smb_common.h
-+++ b/fs/ksmbd/smb_common.h
-@@ -277,14 +277,14 @@ struct file_directory_info {
- 	__le64 AllocationSize;
- 	__le32 ExtFileAttributes;
- 	__le32 FileNameLength;
--	char FileName[1];
-+	char FileName[];
- } __packed;   /* level 0x101 FF resp data */
- 
- struct file_names_info {
- 	__le32 NextEntryOffset;
- 	__u32 FileIndex;
- 	__le32 FileNameLength;
--	char FileName[1];
-+	char FileName[];
- } __packed;   /* level 0xc FF resp data */
- 
- struct file_full_directory_info {
-@@ -299,7 +299,7 @@ struct file_full_directory_info {
- 	__le32 ExtFileAttributes;
- 	__le32 FileNameLength;
- 	__le32 EaSize;
--	char FileName[1];
-+	char FileName[];
- } __packed; /* level 0x102 FF resp */
- 
- struct file_both_directory_info {
-@@ -317,7 +317,7 @@ struct file_both_directory_info {
- 	__u8   ShortNameLength;
- 	__u8   Reserved;
- 	__u8   ShortName[24];
--	char FileName[1];
-+	char FileName[];
- } __packed; /* level 0x104 FFrsp data */
- 
- struct file_id_both_directory_info {
-@@ -337,7 +337,7 @@ struct file_id_both_directory_info {
- 	__u8   ShortName[24];
- 	__le16 Reserved2;
- 	__le64 UniqueId;
--	char FileName[1];
-+	char FileName[];
- } __packed;
- 
- struct file_id_full_dir_info {
-@@ -354,7 +354,7 @@ struct file_id_full_dir_info {
- 	__le32 EaSize; /* EA size */
- 	__le32 Reserved;
- 	__le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit*/
--	char FileName[1];
-+	char FileName[];
- } __packed; /* level 0x105 FF rsp data */
- 
- struct smb_version_values {
 -- 
-2.34.1
+Thanks,
 
+Steve
