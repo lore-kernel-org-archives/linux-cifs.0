@@ -2,21 +2,21 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0742C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 665F0C4332F
 	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 09:35:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229661AbiKOJfC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S229863AbiKOJfC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Tue, 15 Nov 2022 04:35:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58434 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229722AbiKOJfA (ORCPT
+        with ESMTP id S229661AbiKOJfA (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 04:35:00 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B93CE12630
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7178110B58
         for <linux-cifs@vger.kernel.org>; Tue, 15 Nov 2022 01:34:59 -0800 (PST)
 Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NBLc42kSpzHvxf;
-        Tue, 15 Nov 2022 17:34:28 +0800 (CST)
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NBLcD5QP8zmVtM;
+        Tue, 15 Nov 2022 17:34:36 +0800 (CST)
 Received: from localhost.localdomain (10.175.101.6) by
  dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -25,12 +25,10 @@ From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
 To:     <linux-cifs@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
         <sfrench@samba.org>, <smfrench@gmail.com>, <pc@cjr.nz>,
         <lsahlber@redhat.com>, <sprasad@microsoft.com>, <tom@talpey.com>
-Subject: [PATCH 1/3] cifs: Fix wrong return value checking when GETFLAGS
-Date:   Tue, 15 Nov 2022 18:39:34 +0800
-Message-ID: <20221115103936.3303416-2-zhangxiaoxu5@huawei.com>
+Subject: [PATCH 0/3] Fix some bug in cifs
+Date:   Tue, 15 Nov 2022 18:39:33 +0800
+Message-ID: <20221115103936.3303416-1-zhangxiaoxu5@huawei.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221115103936.3303416-1-zhangxiaoxu5@huawei.com>
-References: <20221115103936.3303416-1-zhangxiaoxu5@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
@@ -42,37 +40,17 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The return value of CIFSGetExtAttr is negative, should be checked
-with -EOPNOTSUPP rather than EOPNOTSUPP.
 
-Fixes: 64a5cfa6db9 ("Allow setting per-file compression via SMB2/3")
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
----
- fs/cifs/ioctl.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Zhang Xiaoxu (3):
+  cifs: Fix wrong return value checking when GETFLAGS
+  cifs: Fix UAF in cifs_demultiplex_thread()
+  cifs: Move the in_send statistic to __smb_send_rqst()
 
-diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-index 89d5fa887364..6419ec47c2a8 100644
---- a/fs/cifs/ioctl.c
-+++ b/fs/cifs/ioctl.c
-@@ -343,7 +343,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 					rc = put_user(ExtAttrBits &
- 						FS_FL_USER_VISIBLE,
- 						(int __user *)arg);
--				if (rc != EOPNOTSUPP)
-+				if (rc != -EOPNOTSUPP)
- 					break;
- 			}
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
-@@ -373,7 +373,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 			 *		       pSMBFile->fid.netfid,
- 			 *		       extAttrBits,
- 			 *		       &ExtAttrMask);
--			 * if (rc != EOPNOTSUPP)
-+			 * if (rc != -EOPNOTSUPP)
- 			 *	break;
- 			 */
- 
+ fs/cifs/cifsglob.h  |  1 +
+ fs/cifs/ioctl.c     |  4 ++--
+ fs/cifs/transport.c | 53 +++++++++++++++++++++++++--------------------
+ 3 files changed, 33 insertions(+), 25 deletions(-)
+
 -- 
 2.31.1
 
