@@ -2,81 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E3FC433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 14:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA33C433FE
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 15:22:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229836AbiKOOfg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Nov 2022 09:35:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53440 "EHLO
+        id S231210AbiKOPWz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Nov 2022 10:22:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiKOOff (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 09:35:35 -0500
-X-Greylist: delayed 495 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Nov 2022 06:35:29 PST
-Received: from mail.astralinux.ru (mail.astralinux.ru [217.74.38.119])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AEC31401B;
-        Tue, 15 Nov 2022 06:35:29 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.astralinux.ru (Postfix) with ESMTP id 8147F1864269;
-        Tue, 15 Nov 2022 17:27:10 +0300 (MSK)
-Received: from mail.astralinux.ru ([127.0.0.1])
-        by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 4-vJmt9wN1H0; Tue, 15 Nov 2022 17:27:10 +0300 (MSK)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.astralinux.ru (Postfix) with ESMTP id 352F4186422F;
-        Tue, 15 Nov 2022 17:27:10 +0300 (MSK)
-X-Virus-Scanned: amavisd-new at astralinux.ru
-Received: from mail.astralinux.ru ([127.0.0.1])
-        by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id y9MG4Fq2LoDP; Tue, 15 Nov 2022 17:27:10 +0300 (MSK)
-Received: from rbta-msk-lt-106062.astralinux.ru (unknown [10.177.20.20])
-        by mail.astralinux.ru (Postfix) with ESMTPSA id 7D4AC1864248;
-        Tue, 15 Nov 2022 17:27:09 +0300 (MSK)
-From:   Anastasia Belova <abelova@astralinux.ru>
-To:     Steve French <sfrench@samba.org>
-Cc:     Anastasia Belova <abelova@astralinux.ru>,
-        Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, Aurelien Aptel <aaptel@suse.com>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: [PATCH] cifs: add check for returning value of SMB2_close_init
-Date:   Tue, 15 Nov 2022 17:27:01 +0300
-Message-Id: <20221115142701.27074-1-abelova@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
+        with ESMTP id S232672AbiKOPWr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 10:22:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DFB62DA81;
+        Tue, 15 Nov 2022 07:22:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8274F61862;
+        Tue, 15 Nov 2022 15:22:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14691C43144;
+        Tue, 15 Nov 2022 15:22:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668525764;
+        bh=rxU/qvZkzOWY6f8inhFdxsMbPSlxxghkZ09LKxGURe0=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=DIcZGyXzNwAwaz1t0O3ryQ9Ycy+iFYflsG3eR2g7/w3bFJeHNGXJbciZ0o79SxHgb
+         WgXEwWD5dpImNpG1zJqDZ39IXjugUcs5V+GlGrajbL7gaAOBtm/357+kvx/nX0YARZ
+         C9I4sIYp8Q2tU3PlP4emzlumo539dfeNHN8A7+FPNg8ZjQqGIyG/sUoj6xoMNlHb8Z
+         d7FzQTCWw0zdQI81Mf0dXgbi8fRA5wP2WmNvW6ZwogLoZR6cwweKXL/4ZEP702raGh
+         diPs5b/I+UrG2smIbrWoOOg+9Pso2attIBKqdW2mozwVOQGlHDfJbyqd0TQjSq+o86
+         CLXhkFffV7aKQ==
+Message-ID: <81a329d44cb2def622ddfcde88984caf51b4a017.camel@kernel.org>
+Subject: Re: [PATCH] ksmbd: use F_SETLK when unlocking a file
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
+        tom@talpey.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, David Howells <dhowells@redhat.com>
+Date:   Tue, 15 Nov 2022 10:22:42 -0500
+In-Reply-To: <Y3NVZ6e7Hnddsdl6@infradead.org>
+References: <20221111131153.27075-1-jlayton@kernel.org>
+         <Y3NVZ6e7Hnddsdl6@infradead.org>
+Content-Type: text/plain; charset="ISO-8859-15"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If the returning value of SMB2_close_init is an error-value,=20
-exit the function.
+On Tue, 2022-11-15 at 01:01 -0800, Christoph Hellwig wrote:
+> On Fri, Nov 11, 2022 at 08:11:53AM -0500, Jeff Layton wrote:
+> > ksmbd seems to be trying to use a cmd value of 0 when unlocking a file.
+> > That activity requires a type of F_UNLCK with a cmd of F_SETLK. For
+> > local POSIX locking, it doesn't matter much since vfs_lock_file ignores
+> > @cmd, but filesystems that define their own ->lock operation expect to
+> > see it set sanely.
+>=20
+> Btw, I really wonder if we should split vfs_lock_file into separate
+> calls for locking vs unlocking.  The current interface seems very
+> confusing.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Maybe, though the current scheme basically of mirrors the userland API,
+as do the ->lock and ->flock file_operations.
 
-Fixes: 352d96f3acc6 ("cifs: multichannel: move channel selection above tr=
-ansport layer")
+FWIW, the filelocking API is pretty rife with warts. Several other
+things that I wouldn't mind doing, just off the top of my head:
 
-Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
----
- fs/cifs/smb2ops.c | 2 ++
- 1 file changed, 2 insertions(+)
+- move the file locking API into a separate header. No need for it to be
+in fs.h, which is already too bloated.
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 880cd494afea..9737296c0fbc 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1126,6 +1126,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tco=
-n *tcon,
- 	rqst[2].rq_nvec =3D 1;
- 	rc =3D SMB2_close_init(tcon, server,
- 			     &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
-+	if (rc)
-+		goto sea_exit;
- 	smb2_set_related(&rqst[2]);
-=20
- 	rc =3D compound_send_recv(xid, ses, server,
+- define a new struct for leases, and drop lease-specific fields from
+file_lock
+
+- remove more separate filp and inode arguments
+
+- maybe rename locks.c to filelock.c? "locks.c" is too ambiguous
+
+Any others?
 --=20
-2.30.2
-
+Jeff Layton <jlayton@kernel.org>
