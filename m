@@ -2,89 +2,125 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E38C4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 20:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255C5C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 22:45:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231852AbiKOUlz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Nov 2022 15:41:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49090 "EHLO
+        id S231372AbiKOWpL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Nov 2022 17:45:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233025AbiKOUlw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 15:41:52 -0500
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189301C10E;
-        Tue, 15 Nov 2022 12:41:51 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S231327AbiKOWpD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 17:45:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5A8A1788D
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Nov 2022 14:44:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668552250;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Sr5cmUXaaquPODOsp7wOywLMH70ji6BY41qEcJlkct8=;
+        b=KNho62hQ6wlOIXiDdjTfToTVyQ/GRmHYkrjPsXndFfUO3V8agkyMQcubKF1mAQz2iR15jL
+        Klj+W+vGu9EAm2kk9QQpQD6OQRO30xTb22z9nIiWinl1g7uZI95UEUJD7WRGJ/mWT93VSy
+        01oZ038ruq17bRfNoSBDawxctX5DmIY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-383-qYs-SrBBO5qTlAyD7FTboQ-1; Tue, 15 Nov 2022 17:44:06 -0500
+X-MC-Unique: qYs-SrBBO5qTlAyD7FTboQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4NBdQ413mgz4xYV;
-        Wed, 16 Nov 2022 07:41:48 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1668544909;
-        bh=7bI5e+0Hg7X4jftM/RxCXhw9GKH3MRt/aNMuRTVjD80=;
-        h=Date:From:To:Cc:Subject:From;
-        b=O4c8zt1jYYu6Y6Jdx+u+fDLlfD3VLekRVBuI4bOcCFvALW2xKk+Qlp+9tknspHD5a
-         M5bPz9rp7M9bMcLC9yGqNzew/0IRU9C1aWRTZngBws3udDSHbUjFhyg2anvIrFuXws
-         qpz8fjBl5eyyOvg4Lmj4Qg6h7aLq8NR6obmesZFIFLRdaXwIJ1ydS8QTgF1r9MY8Hr
-         1Y0Wf/Yn61YEwkzsn/14UR6kc737VzYNFXmw2TRRMYr+pYrfeS+fwoBcz+EvK+WNkR
-         QIFnr403kAERceWW9vxeJC9VeDbFx6KU82MErvkyWWZq0Xep3MtGs8m+WdSi4LIwIo
-         02LKQ+3Niup7A==
-Date:   Wed, 16 Nov 2022 07:41:46 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the cifs tree
-Message-ID: <20221116074146.6e7cbce9@canb.auug.org.au>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 47DD9800B23;
+        Tue, 15 Nov 2022 22:44:06 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 40F4B40C6EC3;
+        Tue, 15 Nov 2022 22:44:05 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH] cifs: Fix problem with encrypted RDMA data read
+From:   David Howells <dhowells@redhat.com>
+To:     smfrench@gmail.com, tom@talpey.com
+Cc:     Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Stefan Metzmacher <metze@samba.org>,
+        linux-cifs@vger.kernel.org, dhowells@redhat.com,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Tue, 15 Nov 2022 22:44:02 +0000
+Message-ID: <166855224228.1998592.2212551359609792175.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.5
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/9CmOp9bGL3ZEjCl_B3bAYt2";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/9CmOp9bGL3ZEjCl_B3bAYt2
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+When the cifs client is talking to the ksmbd server by RDMA and the ksmbd
+server has "smb3 encryption = yes" in its config file, the normal PDU
+stream is encrypted, but the directly-delivered data isn't in the stream
+(and isn't encrypted), but is rather delivered by DDP/RDMA packets (at
+least with IWarp).
 
-Hi all,
+Currently, the direct delivery fails with:
 
-In commit
+   buf can not contain only a part of read data
+   WARNING: CPU: 0 PID: 4619 at fs/cifs/smb2ops.c:4731 handle_read_data+0x393/0x405
+   ...
+   RIP: 0010:handle_read_data+0x393/0x405
+   ...
+    smb3_handle_read_data+0x30/0x37
+    receive_encrypted_standard+0x141/0x224
+    cifs_demultiplex_thread+0x21a/0x63b
+    kthread+0xe7/0xef
+    ret_from_fork+0x22/0x30
 
-  9898f0456aa3 ("cifs: Fix wrong return value checking when GETFLAGS")
+The problem apparently stemming from the fact that it's trying to manage
+the decryption, but the data isn't in the smallbuf, the bigbuf or the page
+array).
 
-Fixes tag
+This can be fixed simply by inserting an extra case into handle_read_data()
+that checks to see if use_rdma_mr is true, and if it is, just setting
+rdata->got_bytes to the length of data delivered and allowing normal
+continuation.
 
-  Fixes: 64a5cfa6db9 ("Allow setting per-file compression via SMB2/3")
+This can be seen in an IWarp packet trace.  With the upstream code, it does
+a DDP/RDMA packet, which produces the warning above and then retries,
+retrieving the data inline, spread across several SMBDirect messages that
+get glued together into a single PDU.  With the patch applied, only the
+DDP/RDMA packet is seen.
 
-has these problem(s):
+Note that this doesn't happen if the server isn't told to encrypt stuff and
+it does also happen with softRoCE.
 
-  - SHA1 should be at least 12 digits long
-    This can be fixed for the future by setting core.abbrev to 12 (or
-    more) or (for git v2.11 or later) just making sure it is not set
-    (or set to "auto").
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <smfrench@gmail.com>
+cc: Tom Talpey <tom@talpey.com>
+cc: Long Li <longli@microsoft.com>
+cc: Namjae Jeon <linkinjeon@kernel.org>
+cc: Stefan Metzmacher <metze@samba.org>
+cc: linux-cifs@vger.kernel.org
+---
 
---=20
-Cheers,
-Stephen Rothwell
+ fs/cifs/smb2ops.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
---Sig_/9CmOp9bGL3ZEjCl_B3bAYt2
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 880cd494afea..8d459f60f27b 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4726,6 +4726,9 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 		iov.iov_base = buf + data_offset;
+ 		iov.iov_len = data_len;
+ 		iov_iter_kvec(&iter, WRITE, &iov, 1, data_len);
++	} else if (use_rdma_mr) {
++		/* The data was delivered directly by RDMA. */
++		rdata->got_bytes = data_len;
+ 	} else {
+ 		/* read response payload cannot be in both buf and pages */
+ 		WARN_ONCE(1, "buf can not contain only a part of read data");
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmNz+YoACgkQAVBC80lX
-0Gw5Sgf9FFkHPjtBJq+FNiWEgHnYfSZ38BmX0Vs2OBw2QkGxoJqT4z5OdKshGd17
-IaQBs84sbyvxLkk9FSgGl1km7QN7ySHzPjZxf23ZrcjHCAw/qC7xpVXRbo2ubYs7
-hQGZszpIIfu8eWM8oSKK6FQUAjm+5H4OfOIXIvGuvS69JGwPljHDSmulEG8IMtjy
-IjKXIZ5Jx+lx1a9yzNDDE9gJIwH66k2ogiPGHiYOATQylLIlOJ1Wp8CKY+TfF+Y9
-DVy/Vz2OPgOS102uQzO1V4jn5GD2lIDTm5K8tWZia4Ghh6kQsm9VMoaW65RbAcV+
-d/xcYCFyOYWkmRO3iFxR/bod9O7MUQ==
-=wpTn
------END PGP SIGNATURE-----
-
---Sig_/9CmOp9bGL3ZEjCl_B3bAYt2--
