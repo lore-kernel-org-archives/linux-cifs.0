@@ -2,101 +2,104 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5320EC433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 18:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4819C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Nov 2022 19:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231271AbiKOS7V (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Nov 2022 13:59:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52582 "EHLO
+        id S229557AbiKOTHX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Nov 2022 14:07:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230429AbiKOS7S (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 13:59:18 -0500
+        with ESMTP id S229495AbiKOTHW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 14:07:22 -0500
 Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F9B24962;
-        Tue, 15 Nov 2022 10:59:18 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id s8so8779811lfc.8;
-        Tue, 15 Nov 2022 10:59:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC08213E85
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Nov 2022 11:07:20 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id bp15so25884081lfb.13
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Nov 2022 11:07:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=m8W/0pY0U0/YdEIdwLzpMd90XGiJVa107n2xUOXTtzI=;
-        b=YCV05GN19uBSTv2O3yqeIqJiaYtG17bkaWOAhO2RO720T7T7oeBpFZ5WVRHZPyBcR3
-         FjlLo5voVc5ek6ikFUlEMO8pkRz7pxPlqjR1a6qimPrz/QGQbVxXdR+pHWMkJTr6AsoB
-         yo+R+Dym3E04WHHTy2FSMTRD+mYonFztVnYpKVWDnXqiyg6YCbyqN1pYV8dnkC1Hr8Vq
-         /pVFoVYN4W1cpDqCvEVZbOD1EhS+nV5ElutWA/TNax8AGsdbxdki3t++u2ssR44Na+J4
-         2mZqbL/3/xoCEH6i/3LiNhiHn6vPyKeK3VKrJrDkx7VH+kn+tjfcbABUC10EaWPZW8dY
-         1G2A==
+        bh=5YokOKGVYUFmXJ7sMkSANG7OKZJbZMJNrmda7teqtIc=;
+        b=QKlEx6oSCkZ7yPfq51u6Y25M+JsWbBdv7/g4g+fxyOqpHPFTJbdjtckdaBfLclc5wf
+         V54/yUqUzgIWWH7gJF8Y8rpEbfFpFLbgC+KHVZnro4S4yUkXuakVpju5lcseFDGJc5qq
+         ugPubfbrX/qiVyFlxQGrEuht0XfcOJyxnkH1XbI2a/qlR1dwMwATkDVz8ixv5+rANNFW
+         qn3wjrLRynMBXL9aKYUpuSys4/pKwCnbAI3ELdc9MXbQ7PdjVz1RWu/ee+4+dD3xv79B
+         Am3ClzmdhiswOrACi/Blt6cVxbDe4uEUTSOtrdMiP5DMjMWjoVj61ygEnyvxMBcxiE+T
+         Wg+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=m8W/0pY0U0/YdEIdwLzpMd90XGiJVa107n2xUOXTtzI=;
-        b=Vdaq4U5KSjD9ijd8hdaD3EiRzpT/KUGunVQ83xqsAItebMyldo459p3c/UVpw7XwXs
-         L3VrwExN5JRaBZnaRf9zQdeNlH5w0rNkm6XZr2eNNPplOz/w8BLC7/qWGDPBzBwSZ9XT
-         r+9GYZ5K8UgO2k8lsqu5H2w2MV/rUstSHXTGXilf60ivSlAO2Po6LZe+UwFvp3CBjddd
-         e0YeHzQVMBji+wpgIjxJt4MdTqhWQt4TkS7cim8TFwBPTYHF2Mkcpvm9zZ5d1wlxgx0H
-         oDbr2etOxHiALOTBuIyVxa0/EB7QltQPMb6inQdonYEWoQwOr1gt6YH9MsND3EFLQgDX
-         SDXw==
-X-Gm-Message-State: ANoB5pmCaBDlk24qk/063fgeexLVZypQgs1OmlDId7q2z6pv3IZZ+Kyu
-        AvIYCh2heDDaH+Q3I+olmoszfPJdozwDIB9wq/8=
-X-Google-Smtp-Source: AA0mqf5y3LwZWjhCawuga7fH/h6NG7Icta3bCFw/67wQ9nG9UkOVSb3d8XJy76j5N0V5Cx0wDPh0qB9hQe8PCjffaZ8=
+        bh=5YokOKGVYUFmXJ7sMkSANG7OKZJbZMJNrmda7teqtIc=;
+        b=HaTKwhrCE3Bf31p/4DRVw46kJdlEw9qMLJTisr6vjkqYVXtAQuKa9XbT3SMV+EgLIB
+         iRvjq+W6Qn3m41tx9/ABCPG5ENOyoal1xSdgelQZr/ef6E1zX9LV2g494FqZZpVMsz89
+         uDR0f7CviKe3hadWMV1hspQkAUeeuofYngMeBCtTcAnAKuBkmwVBTDTubNgTlRyREBAs
+         GxfQMZWdebNXErcR79Yiu5tHjbnvcR41Wl009kBbcSxjaEDhWewPxzpD6o0h5wYwSjKT
+         QAtnn0wFDPFx1fJT1oQx+c2szL1RaXCSH2zA83JvoGTYvKYmCtrJEoQkAwwL6RDhiPOC
+         cjtw==
+X-Gm-Message-State: ANoB5pls60o1z+JQ1Frf/c/wSu++WZx6vMcJhtJGeaEDaZVNAKl96ZNa
+        V4IavTvhAYY1kSq6d7ypjMiYAWq4OXO7wIfOwOk=
+X-Google-Smtp-Source: AA0mqf65dijrMzfGhX+DaJhZyW7lJvN2wmir5qb6hAPVt68z5doLyzPFJ9WGJU2P0+zBWUIwEnaWDqIe+bi+vfx24mk=
 X-Received: by 2002:a05:6512:138f:b0:4ab:534b:1b2c with SMTP id
- p15-20020a056512138f00b004ab534b1b2cmr5800959lfa.426.1668538756218; Tue, 15
- Nov 2022 10:59:16 -0800 (PST)
+ p15-20020a056512138f00b004ab534b1b2cmr5811592lfa.426.1668539238577; Tue, 15
+ Nov 2022 11:07:18 -0800 (PST)
 MIME-Version: 1.0
-References: <20221115142701.27074-1-abelova@astralinux.ru>
-In-Reply-To: <20221115142701.27074-1-abelova@astralinux.ru>
+References: <20221115103936.3303416-1-zhangxiaoxu5@huawei.com> <20221115103936.3303416-2-zhangxiaoxu5@huawei.com>
+In-Reply-To: <20221115103936.3303416-2-zhangxiaoxu5@huawei.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 15 Nov 2022 12:59:04 -0600
-Message-ID: <CAH2r5mtaTSih9X6Xzc0HTqRYSTx47vNzStMkXeWYzyXPMqzEFg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add check for returning value of SMB2_close_init
-To:     Anastasia Belova <abelova@astralinux.ru>
-Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, Aurelien Aptel <aaptel@suse.com>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Date:   Tue, 15 Nov 2022 13:07:07 -0600
+Message-ID: <CAH2r5mvxC=8Pe5SJ9HHyCbNFo48Xfzdyyji-ZqPnZMD28A1tog@mail.gmail.com>
+Subject: Re: [PATCH 1/3] cifs: Fix wrong return value checking when GETFLAGS
+To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org, pc@cjr.nz,
+        lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-good catch.
+good catch - merged into cifs-2.6.git for-next
 
-merged into cifs-2.6.git for-next
+The other two look reasonable but I wanted to do a little more testing
+on them - feedback/reviews on them welcome (especially patch 2)
 
-On Tue, Nov 15, 2022 at 8:41 AM Anastasia Belova <abelova@astralinux.ru> wrote:
+On Tue, Nov 15, 2022 at 3:35 AM Zhang Xiaoxu <zhangxiaoxu5@huawei.com> wrote:
 >
-> If the returning value of SMB2_close_init is an error-value,
-> exit the function.
+> The return value of CIFSGetExtAttr is negative, should be checked
+> with -EOPNOTSUPP rather than EOPNOTSUPP.
 >
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
-> Fixes: 352d96f3acc6 ("cifs: multichannel: move channel selection above transport layer")
->
-> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+> Fixes: 64a5cfa6db9 ("Allow setting per-file compression via SMB2/3")
+> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
 > ---
->  fs/cifs/smb2ops.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  fs/cifs/ioctl.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 880cd494afea..9737296c0fbc 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1126,6 +1126,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
->         rqst[2].rq_nvec = 1;
->         rc = SMB2_close_init(tcon, server,
->                              &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
-> +       if (rc)
-> +               goto sea_exit;
->         smb2_set_related(&rqst[2]);
+> diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+> index 89d5fa887364..6419ec47c2a8 100644
+> --- a/fs/cifs/ioctl.c
+> +++ b/fs/cifs/ioctl.c
+> @@ -343,7 +343,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+>                                         rc = put_user(ExtAttrBits &
+>                                                 FS_FL_USER_VISIBLE,
+>                                                 (int __user *)arg);
+> -                               if (rc != EOPNOTSUPP)
+> +                               if (rc != -EOPNOTSUPP)
+>                                         break;
+>                         }
+>  #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+> @@ -373,7 +373,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+>                          *                     pSMBFile->fid.netfid,
+>                          *                     extAttrBits,
+>                          *                     &ExtAttrMask);
+> -                        * if (rc != EOPNOTSUPP)
+> +                        * if (rc != -EOPNOTSUPP)
+>                          *      break;
+>                          */
 >
->         rc = compound_send_recv(xid, ses, server,
 > --
-> 2.30.2
+> 2.31.1
 >
 
 
