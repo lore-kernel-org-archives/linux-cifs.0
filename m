@@ -2,100 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5882C4332F
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 18:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D825EC433FE
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 18:29:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233761AbiKPS2m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 16 Nov 2022 13:28:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35584 "EHLO
+        id S238656AbiKPS35 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Nov 2022 13:29:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233205AbiKPS2l (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Nov 2022 13:28:41 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30022391E2;
-        Wed, 16 Nov 2022 10:28:40 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id s8so13769685lfc.8;
-        Wed, 16 Nov 2022 10:28:40 -0800 (PST)
+        with ESMTP id S239164AbiKPS3z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Nov 2022 13:29:55 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33162554CC
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Nov 2022 10:29:54 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id z24so22963197ljn.4
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Nov 2022 10:29:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SaUwZWGzJJ1Lp4N1+t6rbLaZmBRDQDLgc44MZWkfSlA=;
-        b=PvwaWTcGbS+vSRmoDoFJEVax8j5icW23HNgH4TXBKd348S7cJZtyYQCgOIlypt1bJb
-         +Amq0mHuuHfvyomxOCHoDZBF53tiairPCihc0spc8jdR8wjfGLu9+HBmjXo9UmVBCuYE
-         VyNmUvxMFEDnoFZEsdD0BwypFrTJpQ2fWfPQah/wOPWdN1eP1Lmubf8KHJXetc1/p3nN
-         uErQO+uWLr2LRlDzlzAFYP7fPCqSposoRjuglQvJ5mZqSLId2FpGVCgejoF1z6aqKsNP
-         es6n1AHY7ZXO974JB3HqHyDk3cENtI3tDsB0nbugIX9HePrGaO8C3JQUXHr8TFOZ9nmA
-         UvTg==
+        bh=77XAxebAqAyYMRUyAGlAPFj2TGmxkp7bESfvwt/Tuuw=;
+        b=Ja6dYWT5y6u1fweLisiUvKCbgo3mSLr0bX/aGUpQ7jZ0SfWUytQ2wrGSltAXq+pF95
+         +tNLir/3Szkp/vj+K+v/gAlzhjjikWjn5YOgQc+p/SX7zFvMIQMhEZLW2yRMMW3BO0bt
+         1UuNHTkRbha9S5zZ4Zieh4qC8JvSmOJKZoJyh6fYa01EXp9LagEL1HhnjFpafz8MP0bO
+         mFGjglR1hKlh44IiaOlb4luJ6iHLd2+wy1vR74UyfE7ebbemTpb0EDZXG224uNlVwiwm
+         iwsX43XtucD8RbhEeUhdZ2MOnaGlDEfdgRrv1MumVxNgq22ErI6BZEJVbhueBmIfw3Md
+         DpzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=SaUwZWGzJJ1Lp4N1+t6rbLaZmBRDQDLgc44MZWkfSlA=;
-        b=UHDjKIqD+LzzvPidzlQ9KJ7i4SEeAuHIre38ROSiis85dZaMImHoPfhmafoCiprHeK
-         kXVgU7QnEADM0UQuuAJipUHj/szwbDyLQj5hgo7mUEOAiT7utRwKaobrzQrZWEmoT6ZC
-         w0wGrac7xPBn0Josq63ZrU+NjDL62Ga3n/Sturpcdvyk6uKsUdNnhX9s9j7E9ft/mdGH
-         LCMF95NKHB5dc2/O0hG2y/A4dwlSB7YhORYD/ZD71YrwrmX6sX0lETY1HuV6+o7m9G/0
-         o0zrQTJsrzIZT4IbY301S3k7yWA5xbyLi5rOOGew9+KtWH3K1gM9nqbbxNWCY8jJE1At
-         SYig==
-X-Gm-Message-State: ANoB5pmZE/8bLsv1SrB2gw4XJ//yAqGQb+pmB1pdL25gb70L2cm9lLPk
-        YB/fvQYZc1eeYxBhBDOat91ds5TuVd14GYoNWpM=
-X-Google-Smtp-Source: AA0mqf4XAj8KhiMXEUh3kTVoZTHiB6PysvJJIUmhvFuRbnqAPxGcPIr/D7q1zdvmFUDba6t+gl/bVLhJ1Fc4aHjtEII=
-X-Received: by 2002:a05:6512:3910:b0:4b0:a51e:2b3 with SMTP id
- a16-20020a056512391000b004b0a51e02b3mr8760830lfu.636.1668623318329; Wed, 16
- Nov 2022 10:28:38 -0800 (PST)
+        bh=77XAxebAqAyYMRUyAGlAPFj2TGmxkp7bESfvwt/Tuuw=;
+        b=FoNI84+8WUBf3T/O5U02miYXScKXYfgzYAFLhHbNvqByCFAbKPV7uO2ptNCY3QyyG4
+         eIMrvnO/d+n2zQXK5aX29FiaebIrEnnZbQJ8Q81tC0dY1PHbgztoh1BhwwWUwqeXHtot
+         gEC0R10MSYtfJCWAmNvL9x6TgD3Yg7W77wXN8tuknXBLsXCqM0rrsOqrkTOx73hxu9bv
+         ECyqV3W+BVxFKaPFsMlSy3/YDALstu5oSSOKBjzGglxxyLQ2aT1ipqhwvCjfibBxDyNV
+         qOi5gPL8eq/Z4qbttqGZGvfDJTW1xfuEeAsb5OuOHV1L6z5rYs3pLk4DlZiCFEDn3OHv
+         0Scg==
+X-Gm-Message-State: ANoB5pkaKxsUoVL0upEjyn+VGjGS3r58SJj3n2XcaRPSyBil2NwEDAKp
+        CwcInJAqnlKAngCSRGmSmUJHcsnmupVU+qViL/U=
+X-Google-Smtp-Source: AA0mqf75A6ArBLdkF4AmDh9po4MnZp8rDpfDM0un7FEUw3DM8zMVDcDpWZ8h3i6d0tBgWOYykunVZ5ke/DslnGiqdtU=
+X-Received: by 2002:a2e:9853:0:b0:277:9e5:6cc4 with SMTP id
+ e19-20020a2e9853000000b0027709e56cc4mr8817737ljj.137.1668623392463; Wed, 16
+ Nov 2022 10:29:52 -0800 (PST)
 MIME-Version: 1.0
-References: <20221116141027.10947-1-abelova@astralinux.ru>
-In-Reply-To: <20221116141027.10947-1-abelova@astralinux.ru>
+References: <20221116131835.2192188-1-hch@lst.de>
+In-Reply-To: <20221116131835.2192188-1-hch@lst.de>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 16 Nov 2022 12:28:26 -0600
-Message-ID: <CAH2r5murCb6icxS4YbguNbhKLsrrw9FR-p6vW-3njCtMDw3yrw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add check for returning value of SMB2_set_info_init
-To:     Anastasia Belova <abelova@astralinux.ru>
+Date:   Wed, 16 Nov 2022 12:29:41 -0600
+Message-ID: <CAH2r5msoMJ6jNFDtHigKOqq9EwxEb9buxGVi8duW8EMz6wwgBg@mail.gmail.com>
+Subject: Re: RFC: remove cifs_writepage
+To:     Christoph Hellwig <hch@lst.de>
 Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
         Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        lvc-project@linuxtesting.org
+        samba-technical@lists.samba.org,
+        David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+I can run some tests on this later this week.
 
-On Wed, Nov 16, 2022 at 8:26 AM Anastasia Belova <abelova@astralinux.ru> wrote:
+On Wed, Nov 16, 2022 at 7:29 AM Christoph Hellwig <hch@lst.de> wrote:
 >
-> If the returning value of SMB2_set_info_init is an error-value,
-> exit the function.
+> Hi Steve,
 >
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> this series tries to remove the ->writepage method from cifs, as there
+> is no good reason for the method to exist anymore and we're trying to
+> remove it entirely.
 >
-> Fixes: 0967e5457954 ("cifs: use a compound for setting an xattr")
->
-> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
-> ---
->  fs/cifs/smb2ops.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 880cd494afea..c77e49b3fcc6 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1116,6 +1116,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
->                                 COMPOUND_FID, current->tgid,
->                                 FILE_FULL_EA_INFORMATION,
->                                 SMB2_O_INFO_FILE, 0, data, size);
-> +       if (rc)
-> +               goto sea_exit;
->         smb2_set_next_command(tcon, &rqst[1]);
->         smb2_set_related(&rqst[1]);
->
-> --
-> 2.30.2
->
+> The series is entirely untested as I don't have a CIFS setup at the
+> moment, and patch 2 is a bit crude and there might be much better
+> ways to handle the small wsize case.
+
 
 
 -- 
