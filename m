@@ -2,76 +2,103 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 007B0C433FE
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 17:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5882C4332F
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 18:28:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234069AbiKPRny (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 16 Nov 2022 12:43:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56244 "EHLO
+        id S233761AbiKPS2m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Nov 2022 13:28:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbiKPRnw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Nov 2022 12:43:52 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BE1205EF;
-        Wed, 16 Nov 2022 09:43:51 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A8C93B81E2F;
-        Wed, 16 Nov 2022 17:43:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BD2EC433C1;
-        Wed, 16 Nov 2022 17:43:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668620629;
-        bh=2Rr069LAz98mXWOCBRygJOpq9srh9YH+T/Kx1QG1dcI=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=YuC832qSDYiB2R+JDhGGQZFQDZJ4IzVPMcRVI44YJFUcH6ZkChzqKqU/qNP6DKHf4
-         wnj7NdYS6oXel8SucaJKh4mbbZ6CcYSpY6CNbn/dBBkFJPDwG/gq0wNkHFomZhhzRy
-         uxc+FhSTEz2ONm1ASwbyUu4/ul9pGgFFIErESrhOewZfHaDXdudI9EpG/WR2GM6VLe
-         jRofzCFMT/OdbceRmCNL5+H00EO+t5uv8FzxIBhwvdRALidFYhwuv3Va9lVnJgnWaS
-         SY6LnePRO1lqFs+ZGzzDbY9+V2HbZoE6zn+325necCurg1oTIHKa32WLv+/QHfyV4k
-         AbdBjWihX608Q==
-Message-ID: <e51e721d09fb875c52247d71051728a6bfd0ab97.camel@kernel.org>
-Subject: Re: [PATCH 1/7] filelock: add a new locks_inode_context accessor
- function
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        chuck.lever@oracle.com, viro@zeniv.linux.org.uk, hch@lst.de
-Date:   Wed, 16 Nov 2022 12:43:47 -0500
-In-Reply-To: <Y3ULBXgnUvt4amrc@infradead.org>
-References: <20221116151726.129217-1-jlayton@kernel.org>
-         <20221116151726.129217-2-jlayton@kernel.org>
-         <Y3ULBXgnUvt4amrc@infradead.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+        with ESMTP id S233205AbiKPS2l (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Nov 2022 13:28:41 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30022391E2;
+        Wed, 16 Nov 2022 10:28:40 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id s8so13769685lfc.8;
+        Wed, 16 Nov 2022 10:28:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SaUwZWGzJJ1Lp4N1+t6rbLaZmBRDQDLgc44MZWkfSlA=;
+        b=PvwaWTcGbS+vSRmoDoFJEVax8j5icW23HNgH4TXBKd348S7cJZtyYQCgOIlypt1bJb
+         +Amq0mHuuHfvyomxOCHoDZBF53tiairPCihc0spc8jdR8wjfGLu9+HBmjXo9UmVBCuYE
+         VyNmUvxMFEDnoFZEsdD0BwypFrTJpQ2fWfPQah/wOPWdN1eP1Lmubf8KHJXetc1/p3nN
+         uErQO+uWLr2LRlDzlzAFYP7fPCqSposoRjuglQvJ5mZqSLId2FpGVCgejoF1z6aqKsNP
+         es6n1AHY7ZXO974JB3HqHyDk3cENtI3tDsB0nbugIX9HePrGaO8C3JQUXHr8TFOZ9nmA
+         UvTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SaUwZWGzJJ1Lp4N1+t6rbLaZmBRDQDLgc44MZWkfSlA=;
+        b=UHDjKIqD+LzzvPidzlQ9KJ7i4SEeAuHIre38ROSiis85dZaMImHoPfhmafoCiprHeK
+         kXVgU7QnEADM0UQuuAJipUHj/szwbDyLQj5hgo7mUEOAiT7utRwKaobrzQrZWEmoT6ZC
+         w0wGrac7xPBn0Josq63ZrU+NjDL62Ga3n/Sturpcdvyk6uKsUdNnhX9s9j7E9ft/mdGH
+         LCMF95NKHB5dc2/O0hG2y/A4dwlSB7YhORYD/ZD71YrwrmX6sX0lETY1HuV6+o7m9G/0
+         o0zrQTJsrzIZT4IbY301S3k7yWA5xbyLi5rOOGew9+KtWH3K1gM9nqbbxNWCY8jJE1At
+         SYig==
+X-Gm-Message-State: ANoB5pmZE/8bLsv1SrB2gw4XJ//yAqGQb+pmB1pdL25gb70L2cm9lLPk
+        YB/fvQYZc1eeYxBhBDOat91ds5TuVd14GYoNWpM=
+X-Google-Smtp-Source: AA0mqf4XAj8KhiMXEUh3kTVoZTHiB6PysvJJIUmhvFuRbnqAPxGcPIr/D7q1zdvmFUDba6t+gl/bVLhJ1Fc4aHjtEII=
+X-Received: by 2002:a05:6512:3910:b0:4b0:a51e:2b3 with SMTP id
+ a16-20020a056512391000b004b0a51e02b3mr8760830lfu.636.1668623318329; Wed, 16
+ Nov 2022 10:28:38 -0800 (PST)
 MIME-Version: 1.0
+References: <20221116141027.10947-1-abelova@astralinux.ru>
+In-Reply-To: <20221116141027.10947-1-abelova@astralinux.ru>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 16 Nov 2022 12:28:26 -0600
+Message-ID: <CAH2r5murCb6icxS4YbguNbhKLsrrw9FR-p6vW-3njCtMDw3yrw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: add check for returning value of SMB2_set_info_init
+To:     Anastasia Belova <abelova@astralinux.ru>
+Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        lvc-project@linuxtesting.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 2022-11-16 at 08:08 -0800, Christoph Hellwig wrote:
-> On Wed, Nov 16, 2022 at 10:17:20AM -0500, Jeff Layton wrote:
-> > -	ctx =3D  smp_load_acquire(&inode->i_flctx);
-> > +	ctx =3D  locks_inode_context(inode);
->=20
-> Nit: this might be a good time to drop the weird double space here.
->=20
-> Otherwise looks good:
->=20
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+merged into cifs-2.6.git for-next
 
-Fixed the nit in my tree.
+On Wed, Nov 16, 2022 at 8:26 AM Anastasia Belova <abelova@astralinux.ru> wrote:
+>
+> If the returning value of SMB2_set_info_init is an error-value,
+> exit the function.
+>
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>
+> Fixes: 0967e5457954 ("cifs: use a compound for setting an xattr")
+>
+> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+> ---
+>  fs/cifs/smb2ops.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 880cd494afea..c77e49b3fcc6 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -1116,6 +1116,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+>                                 COMPOUND_FID, current->tgid,
+>                                 FILE_FULL_EA_INFORMATION,
+>                                 SMB2_O_INFO_FILE, 0, data, size);
+> +       if (rc)
+> +               goto sea_exit;
+>         smb2_set_next_command(tcon, &rqst[1]);
+>         smb2_set_related(&rqst[1]);
+>
+> --
+> 2.30.2
+>
 
-After sending this, I converted locks_remove_file to use the helper too.
-I also think we probably need to use this helper in
-locks_free_lock_context.
 
-Folded all 3 changes into this patch, and pushed to my linux-next feeder
-branch.
+-- 
+Thanks,
 
-Thanks Christoph!
---=20
-Jeff Layton <jlayton@kernel.org>
+Steve
