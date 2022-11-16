@@ -2,94 +2,78 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3C0C433FE
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 06:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB107C433FE
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 07:01:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230124AbiKPGYt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 16 Nov 2022 01:24:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43392 "EHLO
+        id S232094AbiKPHB0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Nov 2022 02:01:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232802AbiKPGXH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Nov 2022 01:23:07 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B921582D;
-        Tue, 15 Nov 2022 22:23:06 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id b3so27980027lfv.2;
-        Tue, 15 Nov 2022 22:23:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dsr7OsB8wB98rNVEI9QRhf9lR0zwcVT6qNdfdodmdlw=;
-        b=mfFlllbzPTyEVyif9qC2QIPaMpl/raWnKGEqr6DAtzKsGd1nv8m9sjTqdFOG40jo0K
-         dgwz3yBugrdHu1TDYzpVyGtURkhUSdhi14BRZj6HLjhoUzi+PO+FuAFrr2qDZ7M/9hrf
-         Ue7U+4591f3hhlewOHxulJsPuoF+PDz/W9opqmaH52zhZln1l9s5jlta+SrjzQO/lm9N
-         8820F719epsY1B3vX+cfYiucNQOhTIYlTovlgRGGnAX5Ba3uwjKcQguq47Sso+2lMeOj
-         fOJFUMG/lTzg/Owh/oMf24+0/HcuVjFoHYCE0HyAlX+m/M/n0BLmV0r//IeV57KgVyd3
-         DnBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dsr7OsB8wB98rNVEI9QRhf9lR0zwcVT6qNdfdodmdlw=;
-        b=LyXUSBmtMGXtuJPHRCECQJ2tCXyF49JwdYkpkhtCvUiD/SZycApIz7MK1F73qHDJaR
-         bTlKdyGppeJ5YfWEqLfmn0V3EnVGs41c7m+Z5ThoQeMk6RD9doH4NVJRJ/ABMTPWz3Uw
-         MAqthXSIs84lqgfETduiqZsfbS1zsLnqAlG1kc8ybD6ovh9wfiT6fipGRUSVE9YJCr1L
-         389a8DedF0rHbE/9Y4Vhi28LQPYSUeLBXs+3+ztPM6G+14P7tvVaq5Zm+Fwy0AT9MD4w
-         3yulsS5b5NUfUXSMMEeTWyxu33Vk2U3DVIF84WqKK85yXAdNmP9iW5ukjacmdSZqKVl5
-         st0A==
-X-Gm-Message-State: ANoB5pnkfD7gkd3TGUyk9WWq2P3D8wnAmkqYG+Gf5IEhA3fkgYGus5zB
-        qn3xSS7RZyp3yc87ve6T44qHleuBDcTMTDL0oE0=
-X-Google-Smtp-Source: AA0mqf5hlPGejSK5eNDPIzypAZth5+Edami5qB75CSiwQJvI62yZWoxUrqui61+XJGYexg2ogWzR3m8Bno+az1U18a0=
-X-Received: by 2002:a05:6512:1115:b0:4a2:3924:de36 with SMTP id
- l21-20020a056512111500b004a23924de36mr6620878lfg.663.1668579784635; Tue, 15
- Nov 2022 22:23:04 -0800 (PST)
+        with ESMTP id S232075AbiKPHBY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Nov 2022 02:01:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2041572F
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Nov 2022 23:00:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668582029;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6OIcgGNpadwxLbIdYcGcd+Dz1Vbz9BtruCXW1wedl5c=;
+        b=DdGl+3IPn0L36OR2s0HMThEBLZ268wS6imM6NrecNS2DmQERp1ucK4sHcz22C4FqINcEin
+        rIcCv9cn1knyAU650pF6neS/R5QVZ8kxOXg9S5NalHasK/171Q/5Gq1wAx6aK4E47SZ8TF
+        YsyVNjz15cV2/r1KNdy91l7eU/yuw6I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-300-zRSdwYDdOdWwS3fYJIStDw-1; Wed, 16 Nov 2022 02:00:24 -0500
+X-MC-Unique: zRSdwYDdOdWwS3fYJIStDw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5C798805AC8;
+        Wed, 16 Nov 2022 07:00:24 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DFEF5C1908B;
+        Wed, 16 Nov 2022 07:00:22 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <3609b064-175c-fc18-cd1a-e177d0349c58@samba.org>
+References: <3609b064-175c-fc18-cd1a-e177d0349c58@samba.org> <166855224228.1998592.2212551359609792175.stgit@warthog.procyon.org.uk>
+To:     Stefan Metzmacher <metze@samba.org>
+Cc:     dhowells@redhat.com, smfrench@gmail.com, tom@talpey.com,
+        Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] cifs: Fix problem with encrypted RDMA data read
 MIME-Version: 1.0
-References: <20221116074146.6e7cbce9@canb.auug.org.au>
-In-Reply-To: <20221116074146.6e7cbce9@canb.auug.org.au>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 16 Nov 2022 00:22:52 -0600
-Message-ID: <CAH2r5muADC_ow81cGPppTQ2zuMHvB_7aadb2WAbyZFFD7ELi0g@mail.gmail.com>
-Subject: Re: linux-next: Fixes tag needs some work in the cifs tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2147869.1668582019.1@warthog.procyon.org.uk>
+Date:   Wed, 16 Nov 2022 07:00:19 +0000
+Message-ID: <2147870.1668582019@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-updated Fixes tag for that commit in cifs-2.6.git for-next
+Stefan Metzmacher <metze@samba.org> wrote:
 
-On Tue, Nov 15, 2022 at 2:41 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> In commit
->
->   9898f0456aa3 ("cifs: Fix wrong return value checking when GETFLAGS")
->
-> Fixes tag
->
->   Fixes: 64a5cfa6db9 ("Allow setting per-file compression via SMB2/3")
->
-> has these problem(s):
->
->   - SHA1 should be at least 12 digits long
->     This can be fixed for the future by setting core.abbrev to 12 (or
->     more) or (for git v2.11 or later) just making sure it is not set
->     (or set to "auto").
->
-> --
-> Cheers,
-> Stephen Rothwell
+> I'm not sure I understand why this would fix anything when encryption is
+> enabled.
+> 
+> Is the payload still be offloaded as plaintext? Otherwise we wouldn't have
+> use_rdma_mr...  So this rather looks like a fix for the non encrypted case.
 
+The "inline"[*] PDUs are encrypted, but the direct RDMA data transmission is
+not.  I'm not sure if this is a bug in ksmbd.  As I understand it, encrypting
+and decrypting the directly transferred data would need to be done by the NIC,
+not the cifs driver.
 
+David
 
--- 
-Thanks,
+[*] I don't know the correct RDMA terminology for these things.
 
-Steve
