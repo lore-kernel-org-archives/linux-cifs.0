@@ -2,82 +2,143 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 604B2C4332F
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 00:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A38C433FE
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 00:57:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbiKPAVb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Nov 2022 19:21:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54966 "EHLO
+        id S229961AbiKPA5O (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Nov 2022 19:57:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230124AbiKPAV1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 19:21:27 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4A22A726;
-        Tue, 15 Nov 2022 16:21:27 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B08BD60E65;
-        Wed, 16 Nov 2022 00:21:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18E42C433D6;
-        Wed, 16 Nov 2022 00:21:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668558086;
-        bh=hwUOc/FCJNlwMvzC8ps/UK4ePUya28SQYKY1V9Te5Ek=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=MOyQfLkgUboBUhoax1FFM3j8JxTYQqCIqrLPZHit1GbcD9tr+UUvOcnMfbJ5BKyC9
-         tO+c04mcakviQC+8F5HZ0VV3g2ID9BjaLWOIP7v7yFUuBNcvb9BXMyb+AdgX6Wz6od
-         BSFVgLrdtSUlHPcuQo3F6Lzto1IdFt1WSbUtvzZxIBC2wo/eEpN6jeKUoaaYvD3D3G
-         PsgMVQ+XuPNJj+d4jLjoexPbVY0eNVGYzKsfaCbXjUkCjkXD7eIshMtbuehbyqDxzO
-         yETkmF/5PoApznpM6ZHM/u634RfZZnSQQTlfA6NefZjkfvFIhXNW374Z0O6Ot4wuYB
-         ML9FE+PKKqxCg==
-Received: by mail-oi1-f180.google.com with SMTP id s206so16750514oie.3;
-        Tue, 15 Nov 2022 16:21:26 -0800 (PST)
-X-Gm-Message-State: ANoB5pkXM1AZVXSeRBvy84XG2V6NZjvjNJKwEydBZoQLq/DmYBTY4sgK
-        sZcvbS0wFtjsuFe1y1S9hviZZnUbCGApeHv6mKY=
-X-Google-Smtp-Source: AA0mqf4mdSSC3UAEYBUd+P0Z6luz95XKyNOxCm8IWo4hHdxZbcKdV3WWPlBD8NHhTuekkl7Ac6go5tjCouAf1VDaF70=
-X-Received: by 2002:aca:b9c4:0:b0:34f:63a5:a654 with SMTP id
- j187-20020acab9c4000000b0034f63a5a654mr386110oif.257.1668558085274; Tue, 15
- Nov 2022 16:21:25 -0800 (PST)
+        with ESMTP id S229790AbiKPA5N (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Nov 2022 19:57:13 -0500
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74C992FFED;
+        Tue, 15 Nov 2022 16:57:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=h6LDOkE4F3jh6WWfsdhzELVK6aXoBJDVXJXXM0KDKpM=; b=UPHhsJznUb0Eh/YazapU8tbety
+        ncVk9mYqt1t4xtQkgxCb8iKYtGFc8PTq/F6dCpZ9TjiF8LqV4fdgmcTkwm2Fo9GruzH8gYgVvACuG
+        Z9a/8rPTsNM4bRw3wi3QmkuYvrXUVy0Bp7upjl/CHD4ftyoN3h8tcln1wAMHITdjtPkM2oUEQombN
+        BVpsaA+k/qXG9i1JRGMQutXq+LvKogqoV8KdMlmnA8bke+Y/Dg4vxRHHwzjhk32ezRwCgVE1qK5I9
+        anaA/e/1yKVghoIubHWWvuxhec++wFp6eUenpI5qozguZsrN15uW/XzXAFo+Vc3UG3wlCoO/M0J40
+        cAnnkzULUsrW10bBxuHBGxjC7BsemmT71hW8M6qP4mtCe2KR2C/QmdYLvMdun3Dtf1+Bnt8IS589Y
+        4NLNB5zQAIFlTTTPGHsNy7i792kaXewveMcTiCBxxJ6NK3tB2mlVpTflJmItHwC1RN/Z8doIL4p8v
+        UElYd8/7gQAHxuQxkQHJlJLP;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1ov6jl-008mxT-Hh; Wed, 16 Nov 2022 00:57:09 +0000
+Message-ID: <3609b064-175c-fc18-cd1a-e177d0349c58@samba.org>
+Date:   Wed, 16 Nov 2022 01:57:09 +0100
 MIME-Version: 1.0
-Received: by 2002:a05:6839:1a4e:0:0:0:0 with HTTP; Tue, 15 Nov 2022 16:21:24
- -0800 (PST)
-In-Reply-To: <Y3OxronfaPYv9qGP@work>
-References: <Y3OxronfaPYv9qGP@work>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 16 Nov 2022 09:21:24 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-evHBWbXbfa4tg9LEGVv6f=y9PBbDaBSySmsN0LuCCMQ@mail.gmail.com>
-Message-ID: <CAKYAXd-evHBWbXbfa4tg9LEGVv6f=y9PBbDaBSySmsN0LuCCMQ@mail.gmail.com>
-Subject: Re: [PATCH][next] ksmbd: replace one-element arrays with
- flexible-array members
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH] cifs: Fix problem with encrypted RDMA data read
+Content-Language: en-US, de-DE
+To:     David Howells <dhowells@redhat.com>, smfrench@gmail.com,
+        tom@talpey.com
+Cc:     Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <166855224228.1998592.2212551359609792175.stgit@warthog.procyon.org.uk>
+From:   Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <166855224228.1998592.2212551359609792175.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-11-16 0:35 GMT+09:00, Gustavo A. R. Silva <gustavoars@kernel.org>:
-> One-element arrays are deprecated, and we are replacing them with flexible
-> array members instead. So, replace one-element arrays with flexible-array
-> members in multiple structs in fs/ksmbd/smb_common.h and one in
-> fs/ksmbd/smb2pdu.h.
->
-> Important to mention is that doing a build before/after this patch results
-> in no binary output differences.
->
-> This helps with the ongoing efforts to tighten the FORTIFY_SOURCE routines
-> on memcpy() and help us make progress towards globally enabling
-> -fstrict-flex-arrays=3 [1].
->
-> Link: https://github.com/KSPP/linux/issues/242
-> Link: https://github.com/KSPP/linux/issues/79
-> Link: https://gcc.gnu.org/pipermail/gcc-patches/2022-October/602902.html
-> [1]
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Hi David,
 
-Thanks for your patch!
+see below...
+
+> When the cifs client is talking to the ksmbd server by RDMA and the ksmbd
+> server has "smb3 encryption = yes" in its config file, the normal PDU
+> stream is encrypted, but the directly-delivered data isn't in the stream
+> (and isn't encrypted), but is rather delivered by DDP/RDMA packets (at
+> least with IWarp).
+> 
+> Currently, the direct delivery fails with:
+> 
+>     buf can not contain only a part of read data
+>     WARNING: CPU: 0 PID: 4619 at fs/cifs/smb2ops.c:4731 handle_read_data+0x393/0x405
+>     ...
+>     RIP: 0010:handle_read_data+0x393/0x405
+>     ...
+>      smb3_handle_read_data+0x30/0x37
+>      receive_encrypted_standard+0x141/0x224
+>      cifs_demultiplex_thread+0x21a/0x63b
+>      kthread+0xe7/0xef
+>      ret_from_fork+0x22/0x30
+> 
+> The problem apparently stemming from the fact that it's trying to manage
+> the decryption, but the data isn't in the smallbuf, the bigbuf or the page
+> array).
+> 
+> This can be fixed simply by inserting an extra case into handle_read_data()
+> that checks to see if use_rdma_mr is true, and if it is, just setting
+> rdata->got_bytes to the length of data delivered and allowing normal
+> continuation.
+> 
+> This can be seen in an IWarp packet trace.  With the upstream code, it does
+> a DDP/RDMA packet, which produces the warning above and then retries,
+> retrieving the data inline, spread across several SMBDirect messages that
+> get glued together into a single PDU.  With the patch applied, only the
+> DDP/RDMA packet is seen.
+> 
+> Note that this doesn't happen if the server isn't told to encrypt stuff and
+> it does also happen with softRoCE.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <smfrench@gmail.com>
+> cc: Tom Talpey <tom@talpey.com>
+> cc: Long Li <longli@microsoft.com>
+> cc: Namjae Jeon <linkinjeon@kernel.org>
+> cc: Stefan Metzmacher <metze@samba.org>
+> cc: linux-cifs@vger.kernel.org
+> ---
+> 
+>   fs/cifs/smb2ops.c |    3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 880cd494afea..8d459f60f27b 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -4726,6 +4726,9 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+>   		iov.iov_base = buf + data_offset;
+>   		iov.iov_len = data_len;
+>   		iov_iter_kvec(&iter, WRITE, &iov, 1, data_len);
+> +	} else if (use_rdma_mr) {
+> +		/* The data was delivered directly by RDMA. */
+> +		rdata->got_bytes = data_len;
+>   	} else {
+>   		/* read response payload cannot be in both buf and pages */
+>   		WARN_ONCE(1, "buf can not contain only a part of read data");
+
+I'm not sure I understand why this would fix anything when encryption is enabled.
+
+Is the payload still be offloaded as plaintext? Otherwise we wouldn't have use_rdma_mr...
+So this rather looks like a fix for the non encrypted case.
+
+Before smbd_register_mr() is called we typically have a check like this:
+
+       if (server->rdma && !server->sign && wdata->bytes >=
+               server->smbd_conn->rdma_readwrite_threshold) {
+
+I'm wondering if server->sign is true for the encryption case, otherwise
+we would have to add a !encrypt check in addition as we should never use
+RDMA offload for encrypted connections.
+
+Latest Windows servers allow encrypted/signed offload, but that needs to be
+negotiated via MS-SMB2 2.2.3.1.6 SMB2_RDMA_TRANSFORM_CAPABILITIES, see
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/52b74a74-9838-4f51-b2b0-efeb23bd79d6
+And SMB2_READFLAG_RESPONSE_RDMA_TRANSFORM in MS-SMB2 2.2.20 SMB2 READ Response
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/3e3d2f2c-0e2f-41ea-ad07-fbca6ffdfd90
+As well as SMB2_CHANNEL_RDMA_TRANSFORM in 2.2.21 SMB2 WRITE Request
+https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/e7046961-3318-4350-be2a-a8d69bb59ce8
+But none of this is implemented in Linux yet.
+
+metze
