@@ -2,114 +2,135 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0EA1C43217
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Nov 2022 14:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A18C4332F
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Nov 2022 14:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233725AbiKQOnV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Nov 2022 09:43:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38098 "EHLO
+        id S234965AbiKQOzo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Nov 2022 09:55:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240622AbiKQOmK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Nov 2022 09:42:10 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9209573B91
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Nov 2022 06:41:18 -0800 (PST)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NCjJh1DcxzmVyS;
-        Thu, 17 Nov 2022 22:40:52 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 17 Nov 2022 22:41:15 +0800
-From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-To:     <linux-cifs@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
-        <sfrench@samba.org>, <smfrench@gmail.com>, <pc@cjr.nz>,
-        <lsahlber@redhat.com>, <sprasad@microsoft.com>, <tom@talpey.com>
-Subject: [PATCH] cifs: Fix OOB read in parse_server_interfaces()
-Date:   Thu, 17 Nov 2022 23:45:55 +0800
-Message-ID: <20221117154555.2973509-1-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S234869AbiKQOzk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Nov 2022 09:55:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D91D1C422
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Nov 2022 06:54:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668696884;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=9lCfrN2ZrVC3HhD8dAZKIdUEJSs195bbqf/UyReD6xk=;
+        b=AfWj4BoieaJEZeM1nO4e4W/ymNMp00jY7CDystgOwOQYpxx033iL3qmp8nuiJjgMYldVWV
+        /BEFlSN6PNu161Y3TvAIQefPWgNNODa92KX1wNr6KFoiYoEKAlP5EihMfKhd216jbqwuqH
+        uPJk82Wis7/pmTSAZ8suz4umlPjFTmU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-435-50OXq3sqNMC63084Kb6QkQ-1; Thu, 17 Nov 2022 09:54:41 -0500
+X-MC-Unique: 50OXq3sqNMC63084Kb6QkQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42EE7862FEC;
+        Thu, 17 Nov 2022 14:54:40 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B1DB2028E8F;
+        Thu, 17 Nov 2022 14:54:38 +0000 (UTC)
+Subject: [RFC PATCH 0/4] iov_iter: Add extraction helpers
+From:   David Howells <dhowells@redhat.com>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     linux-cachefs@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-cifs@vger.kernel.org,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>, dhowells@redhat.com,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Thu, 17 Nov 2022 14:54:35 +0000
+Message-ID: <166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.5
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500023.china.huawei.com (7.185.36.114)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-There is a OOB read in parse_server_interfaces when mount.cifs with rdma:
 
-  BUG: KASAN: slab-out-of-bounds in parse_server_interfaces+0x9ca/0xb80
-  Read of size 4 at addr ffff8881711f2f98 by task mount.cifs/1402
+Hi Al,
 
-  CPU: 6 PID: 1402 Comm: mount.cifs Not tainted 6.1.0-rc5+ #69
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x34/0x44
-   print_report+0x171/0x472
-   kasan_report+0xad/0x130
-   kasan_check_range+0x145/0x1a0
-   parse_server_interfaces+0x9ca/0xb80
-   SMB3_request_interfaces+0x174/0x1e0
-   smb3_qfs_tcon+0x150/0x2a0
-   mount_get_conns+0x218/0x750
-   cifs_mount+0x103/0xd00
-   cifs_smb3_do_mount+0x1dd/0xcb0
-   smb3_get_tree+0x1d5/0x300
-   vfs_get_tree+0x41/0xf0
-   path_mount+0x9b3/0xdd0
-   __x64_sys_mount+0x190/0x1d0
-   do_syscall_64+0x35/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
+Here are four patches to provide support for extracting pages from an
+iov_iter, where such a thing makes sense, if you could take a look?
 
-  Allocated by task 1402:
-   kasan_save_stack+0x1e/0x40
-   kasan_set_track+0x21/0x30
-   __kasan_kmalloc+0x7a/0x90
-   __kmalloc_node_track_caller+0x60/0x140
-   kmemdup+0x22/0x50
-   SMB2_ioctl+0x58d/0x5d0
-   SMB3_request_interfaces+0xcd/0x1e0
-   smb3_qfs_tcon+0x150/0x2a0
-   mount_get_conns+0x218/0x750
-   cifs_mount+0x103/0xd00
-   cifs_smb3_do_mount+0x1dd/0xcb0
-   smb3_get_tree+0x1d5/0x300
-   vfs_get_tree+0x41/0xf0
-   path_mount+0x9b3/0xdd0
-   __x64_sys_mount+0x190/0x1d0
-   do_syscall_64+0x35/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
+The first couple of patches provide iov_iter general stuff:
 
-If all the interface decoded from message, should not check whether
-has next one, otherwise there will be OOB read.
+ (1) Move the FOLL_* flags to linux/mm_types.h so that linux/uio.h can make
+     use of them.
 
-Let's just check the bytes still not decode to determine whether
-has next interface.
+ (2) Add a function to list-only, get or pin pages from an iterator as a
+     future replacement for iov_iter_get_pages*().  Pointers to the pages
+     are placed into an array (which will get allocated if not provided)
+     and, depending on the iterator type and direction, the pages will have
+     a ref or a pin get on them, or left untouched (on the assumption that
+     the caller manages their lifetime).
 
-Fixes: aa45dadd34e4 ("cifs: change iface_list from array to sorted linked list")
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+     The determination is:
+
+	UBUF/IOVEC + READ	-> pin
+	UBUF/IOVEC + WRITE	-> get
+	PIPE + READ		-> list-only
+	BVEC/XARRAY		-> list-only
+	Anything else		-> EFAULT
+
+     It also adds a function by which the caller can determine which of
+     "list only, get or pin" the extraction function will actually do to
+     aid in cleaning up (returning 0, FOLL_GET or FOLL_PIN as appropriate).
+
+Then there are a couple of patches that add stuff to netfslib that I want
+to use there as well as in cifs:
+
+ (3) Add a netfslib function to use (2) to extract pages from an ITER_IOBUF
+     or ITER_UBUF iterator into an ITER_BVEC iterator.  This will get or
+     pin the pages as appropriate.
+
+ (4) Add a netfslib function to extract pages from an iterator that's of
+     type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a scatterlist.
+
+     The function in (2) is used for a UBUF and IOVEC iterators, so those
+     need cleaning up afterwards.  BVEC and XARRAY iterators are ungot and
+     unpinned and may be rendered into elements that span multiple pages,
+     for example if large folios are present.
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
+
+David
+
+Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/
 ---
- fs/cifs/smb2ops.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+David Howells (4):
+      mm: Move FOLL_* defs to mm_types.h
+      iov_iter: Add a function to extract a page list from an iterator
+      netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
+      netfs: Add a function to extract an iterator into a scatterlist
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 880cd494afea..39c7bee87556 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -673,8 +673,7 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 		goto out;
- 	}
- 
--	/* Azure rounds the buffer size up 8, to a 16 byte boundary */
--	if ((bytes_left > 8) || p->Next)
-+	if (bytes_left > 0)
- 		cifs_dbg(VFS, "%s: incomplete interface info\n", __func__);
- 
- 
--- 
-2.31.1
+
+ fs/netfs/Makefile        |   1 +
+ fs/netfs/iterator.c      | 346 +++++++++++++++++++++++++++++++++++++++
+ include/linux/mm.h       |  74 ---------
+ include/linux/mm_types.h |  73 +++++++++
+ include/linux/netfs.h    |   5 +
+ include/linux/uio.h      |  29 ++++
+ lib/iov_iter.c           | 333 +++++++++++++++++++++++++++++++++++++
+ mm/vmalloc.c             |   1 +
+ 8 files changed, 788 insertions(+), 74 deletions(-)
+ create mode 100644 fs/netfs/iterator.c
+
 
