@@ -2,71 +2,85 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97016C433FE
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Nov 2022 23:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD8CC433FE
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Nov 2022 00:35:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232117AbiKPXpa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 16 Nov 2022 18:45:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39114 "EHLO
+        id S233958AbiKQAfI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Nov 2022 19:35:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233057AbiKPXpa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Nov 2022 18:45:30 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93592B9D;
-        Wed, 16 Nov 2022 15:45:29 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2575F6204F;
-        Wed, 16 Nov 2022 23:45:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3BDC433D6;
-        Wed, 16 Nov 2022 23:45:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668642328;
-        bh=0jxY8Opa4urpq+ge23FtRh3y/fBz0gl9rB0Qg9ryTIU=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=E6FwRvc2J5rVX6sv5rOmZasqjn7xiWtLetVRiVb0JnuwGkxswpoSFBQ1Kj9t6PJDk
-         V9H9htjCd+3nraYDfWXE/a5vtFZnHay2VVM32Mcv9UZ78AUXadrlQARFsoJ7f87Dh5
-         IcfbKHk/+x8hKHBXDL7VdH6JWx8T8UtbxJ/49pX6r2HKQGv4hagwqYoufzon0OFMgt
-         TdGDqa4qPov8yGx7zssLVcab1cWXLEk/xSj68Q7Xy7Ec0GOyqLRi05eztEFT2LeGNl
-         iWq4pEkTPlmq3z2t2MDqR0psb/8ZzBDauC7PpGWvUbhvv3Q7DwvLjDcefFcTpT0amG
-         8XxMLnfGPk1HA==
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-13ae8117023so313825fac.9;
-        Wed, 16 Nov 2022 15:45:28 -0800 (PST)
-X-Gm-Message-State: ANoB5pkDoRrDEwcUULiogHu36hXVx1JTzyMI42n9lOLzSMk+BIb8nOnd
-        0fb1Aj1VRk2sAVDkQSAV88qLRsdiapanJRL3MSU=
-X-Google-Smtp-Source: AA0mqf6VaaqxqHzy52knkr9XjLEbA/7U7ZpZSCqK75OoQ3L1+mR9W8NQVszsFW9ZsirIChQMf6IQeWc6Knbq5RrxpTY=
-X-Received: by 2002:a05:6870:430a:b0:13d:5167:43e3 with SMTP id
- w10-20020a056870430a00b0013d516743e3mr8629oah.257.1668642327655; Wed, 16 Nov
- 2022 15:45:27 -0800 (PST)
+        with ESMTP id S233394AbiKQAfG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Nov 2022 19:35:06 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000526AEC2
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Nov 2022 16:35:05 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id g10so94307plo.11
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Nov 2022 16:35:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tmvJEwiZ21xXLrZBi1WIG/q1ERap31TpLTpBBT5zmxU=;
+        b=cakRGVlFP4zUUwjnILOJJPN0XKbQNn0ZanA9TWdtV07Sm+c6Bw6IqGBgu3qize0fev
+         s3xAxHQe/+6KbKtzhhRRZngAIPva5ZZ0QfQCpQ4Ky/icC0A10gkkNIo0Yc0hMvcoom1H
+         H1hQRpPincosjsYy1r4B9an3mEa3ozSoAZYXI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tmvJEwiZ21xXLrZBi1WIG/q1ERap31TpLTpBBT5zmxU=;
+        b=68dBvnE2fwwvEuSDbsTX/uNCEEKehXfs2i6sfCgNHjNO9IXmEu4fOhkYVAwZ5DhQWh
+         bP+Qolhr0V7+uxTUZbbWRUGjFmpijTrScP9l+E6A/bFKgj18G3NEtfnUj+fsdDUlqsaS
+         O6ppV2Dy4Z4BEw+yC0Rb74CTSuAW0yHi1AxuRNZ6XjHA8Vw54mpoSDJzSKJicdtFD9hd
+         E5XWRl6EWkwS+pz4nN9tVXPc5GzSlG/VBl/e4c1cmbN5kcIUjeEcEFUxEy/HkDyemeST
+         +UPDsiz3ddOnMgS3d97BgmSAM02OHX7BIByQLbG8wV9uKr5tRJn4n1VSvMUIRZxouH3E
+         K1Ag==
+X-Gm-Message-State: ANoB5pmMehMqgnF8IC4Z5T55wTd/DdhXSglH5yy8aYX8v9funIAXFAkt
+        5wEbHuGE8ecw9KK0yKdfyMXzYg==
+X-Google-Smtp-Source: AA0mqf7hGFDPMqrXLDMFH04Laqegvn/zp/DoAbfPZEQx8qVyF2TAzljQnVqhbhiC7J0cic+rnY/IhQ==
+X-Received: by 2002:a17:902:c085:b0:186:fd58:c700 with SMTP id j5-20020a170902c08500b00186fd58c700mr274156pld.119.1668645305460;
+        Wed, 16 Nov 2022 16:35:05 -0800 (PST)
+Received: from google.com ([240f:75:7537:3187:d87c:a39a:d965:288])
+        by smtp.gmail.com with ESMTPSA id c133-20020a624e8b000000b00572275e68b2sm6980384pfb.116.2022.11.16.16.35.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 16:35:04 -0800 (PST)
+Date:   Thu, 17 Nov 2022 09:35:00 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] ksmbd: replace one-element arrays with
+ flexible-array members
+Message-ID: <Y3WBtLYcBonVrJio@google.com>
+References: <Y3OxronfaPYv9qGP@work>
 MIME-Version: 1.0
-Received: by 2002:a05:6839:1a4e:0:0:0:0 with HTTP; Wed, 16 Nov 2022 15:45:27
- -0800 (PST)
-In-Reply-To: <20221116151726.129217-5-jlayton@kernel.org>
-References: <20221116151726.129217-1-jlayton@kernel.org> <20221116151726.129217-5-jlayton@kernel.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 17 Nov 2022 08:45:27 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8wGREP_vvhDEpx5FbXqZQwUjwVP1NvcXTB08-JW1uVBg@mail.gmail.com>
-Message-ID: <CAKYAXd8wGREP_vvhDEpx5FbXqZQwUjwVP1NvcXTB08-JW1uVBg@mail.gmail.com>
-Subject: Re: [PATCH 4/7] ksmbd: use locks_inode_context helper
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        chuck.lever@oracle.com, viro@zeniv.linux.org.uk, hch@lst.de,
-        Steve French <sfrench@samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y3OxronfaPYv9qGP@work>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-11-17 0:17 GMT+09:00, Jeff Layton <jlayton@kernel.org>:
-> ksmbd currently doesn't access i_flctx safely. This requires a
-> smp_load_acquire, as the pointer is set via cmpxchg (a release
-> operation).
->
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Steve French <sfrench@samba.org>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+On (22/11/15 09:35), Gustavo A. R. Silva wrote:
+> One-element arrays are deprecated, and we are replacing them with flexible
+> array members instead. So, replace one-element arrays with flexible-array
+> members in multiple structs in fs/ksmbd/smb_common.h and one in
+> fs/ksmbd/smb2pdu.h.
+> 
+> Important to mention is that doing a build before/after this patch results
+> in no binary output differences.
+> 
+> This helps with the ongoing efforts to tighten the FORTIFY_SOURCE routines
+> on memcpy() and help us make progress towards globally enabling
+> -fstrict-flex-arrays=3 [1].
+> 
+> Link: https://github.com/KSPP/linux/issues/242
+> Link: https://github.com/KSPP/linux/issues/79
+> Link: https://gcc.gnu.org/pipermail/gcc-patches/2022-October/602902.html [1]
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-Thanks for your patch!
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
