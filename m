@@ -2,164 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE4BC43219
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Nov 2022 07:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0C9C4332F
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Nov 2022 11:08:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241278AbiKRHhl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Nov 2022 02:37:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52494 "EHLO
+        id S241765AbiKRLIe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Nov 2022 06:08:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241352AbiKRHhf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Nov 2022 02:37:35 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92652898C4
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Nov 2022 23:37:32 -0800 (PST)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ND7nJ6FQHzbmnM;
-        Fri, 18 Nov 2022 15:33:40 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 18 Nov 2022 15:37:30 +0800
-From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-To:     <linux-cifs@vger.kernel.org>, <zhangxiaoxu5@huawei.com>,
-        <sfrench@samba.org>, <smfrench@gmail.com>, <pc@cjr.nz>,
-        <lsahlber@redhat.com>, <sprasad@microsoft.com>, <tom@talpey.com>,
-        <longli@microsoft.com>
-Subject: [PATCH 2/2] cifs: Fix warning and UAF when destroy the MR list
-Date:   Fri, 18 Nov 2022 16:42:08 +0800
-Message-ID: <20221118084208.3214951-3-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221118084208.3214951-1-zhangxiaoxu5@huawei.com>
-References: <20221118084208.3214951-1-zhangxiaoxu5@huawei.com>
+        with ESMTP id S241527AbiKRLI3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Nov 2022 06:08:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF1BC99EAE
+        for <linux-cifs@vger.kernel.org>; Fri, 18 Nov 2022 03:07:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668769643;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=brWgx9l6F8XGhC0KzgNYXhkmuY06b6mqU4fM8yW3Sac=;
+        b=U1M1XdiI/HfCSP78WJZcv149yrlX5D1Z8LunM2jm1Vr2PuLW70Tuae2zIsJY9GBTA/gJVF
+        oQkPYrrlvNBliUPrv7mS/1e4IWfOdHHcwhBgNie02WHi0c5ZbcK2wgR7PzsalSWkG6s+iM
+        V0RoF5L4GA5iWPeD1+ar2SzCY8/EcJQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-672-Q1xq2j-BOCWc9Bu79GAhmw-1; Fri, 18 Nov 2022 06:07:17 -0500
+X-MC-Unique: Q1xq2j-BOCWc9Bu79GAhmw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 45F80185A79C;
+        Fri, 18 Nov 2022 11:07:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D418640C6EC3;
+        Fri, 18 Nov 2022 11:07:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <166869690376.3723671.8813331570219190705.stgit@warthog.procyon.org.uk>
+References: <166869690376.3723671.8813331570219190705.stgit@warthog.procyon.org.uk> <166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 3/4] netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500023.china.huawei.com (7.185.36.114)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <231862.1668769633.1@warthog.procyon.org.uk>
+Date:   Fri, 18 Nov 2022 11:07:13 +0000
+Message-ID: <231863.1668769633@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If the MR allocate failed, the MR recovery work not initialized
-and list not cleared. Then will be warning and UAF when release
-the MR:
+I updated the commit message to stop using pinning in a general sense:
 
-  WARNING: CPU: 4 PID: 824 at kernel/workqueue.c:3066 __flush_work.isra.0+0xf7/0x110
-  CPU: 4 PID: 824 Comm: mount.cifs Not tainted 6.1.0-rc5+ #82
-  RIP: 0010:__flush_work.isra.0+0xf7/0x110
-  Call Trace:
-   <TASK>
-   __cancel_work_timer+0x2ba/0x2e0
-   smbd_destroy+0x4e1/0x990
-   _smbd_get_connection+0x1cbd/0x2110
-   smbd_get_connection+0x21/0x40
-   cifs_get_tcp_session+0x8ef/0xda0
-   mount_get_conns+0x60/0x750
-   cifs_mount+0x103/0xd00
-   cifs_smb3_do_mount+0x1dd/0xcb0
-   smb3_get_tree+0x1d5/0x300
-   vfs_get_tree+0x41/0xf0
-   path_mount+0x9b3/0xdd0
-   __x64_sys_mount+0x190/0x1d0
-   do_syscall_64+0x35/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
+    netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
+    
+    Add a function to extract the pages from a user-space supplied iterator
+    (UBUF- or IOVEC-type) into a BVEC-type iterator, retaining the pages by
+    getting a ref on them (WRITE) or pinning them (READ) as we go.
+    
+    This is useful in three situations:
+    
+     (1) A userspace thread may have a sibling that unmaps or remaps the
+         process's VM during the operation, changing the assignment of the
+         pages and potentially causing an error.  Retaining the pages keeps
+         some pages around, even if this occurs; futher, we find out at the
+         point of extraction if EFAULT is going to be incurred.
+    
+     (2) Pages might get swapped out/discarded if not retained, so we want to
+         retain them to avoid the reload causing a deadlock due to a DIO
+         from/to an mmapped region on the same file.
+    
+     (3) The iterator may get passed to sendmsg() by the filesystem.  If a
+         fault occurs, we may get a short write to a TCP stream that's then
+         tricky to recover from.
+    
+    We don't deal with other types of iterator here, leaving it to other
+    mechanisms to retain the pages (eg. PG_locked, PG_writeback and the pipe
+    lock).
 
-  BUG: KASAN: use-after-free in smbd_destroy+0x4fc/0x990
-  Read of size 8 at addr ffff88810b156a08 by task mount.cifs/824
-  CPU: 4 PID: 824 Comm: mount.cifs Tainted: G        W          6.1.0-rc5+ #82
-  Call Trace:
-   dump_stack_lvl+0x34/0x44
-   print_report+0x171/0x472
-   kasan_report+0xad/0x130
-   smbd_destroy+0x4fc/0x990
-   _smbd_get_connection+0x1cbd/0x2110
-   smbd_get_connection+0x21/0x40
-   cifs_get_tcp_session+0x8ef/0xda0
-   mount_get_conns+0x60/0x750
-   cifs_mount+0x103/0xd00
-   cifs_smb3_do_mount+0x1dd/0xcb0
-   smb3_get_tree+0x1d5/0x300
-   vfs_get_tree+0x41/0xf0
-   path_mount+0x9b3/0xdd0
-   __x64_sys_mount+0x190/0x1d0
-   do_syscall_64+0x35/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
-
-  Allocated by task 824:
-   kasan_save_stack+0x1e/0x40
-   kasan_set_track+0x21/0x30
-   __kasan_kmalloc+0x7a/0x90
-   _smbd_get_connection+0x1b6f/0x2110
-   smbd_get_connection+0x21/0x40
-   cifs_get_tcp_session+0x8ef/0xda0
-   mount_get_conns+0x60/0x750
-   cifs_mount+0x103/0xd00
-   cifs_smb3_do_mount+0x1dd/0xcb0
-   smb3_get_tree+0x1d5/0x300
-   vfs_get_tree+0x41/0xf0
-   path_mount+0x9b3/0xdd0
-   __x64_sys_mount+0x190/0x1d0
-   do_syscall_64+0x35/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
-
-  Freed by task 824:
-   kasan_save_stack+0x1e/0x40
-   kasan_set_track+0x21/0x30
-   kasan_save_free_info+0x2a/0x40
-   ____kasan_slab_free+0x143/0x1b0
-   __kmem_cache_free+0xc8/0x330
-   _smbd_get_connection+0x1c6a/0x2110
-   smbd_get_connection+0x21/0x40
-   cifs_get_tcp_session+0x8ef/0xda0
-   mount_get_conns+0x60/0x750
-   cifs_mount+0x103/0xd00
-   cifs_smb3_do_mount+0x1dd/0xcb0
-   smb3_get_tree+0x1d5/0x300
-   vfs_get_tree+0x41/0xf0
-   path_mount+0x9b3/0xdd0
-   __x64_sys_mount+0x190/0x1d0
-   do_syscall_64+0x35/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
-
-Let's initialize the MR recovery work before MR allocate to prevent
-the warning, remove the MRs from the list to prevent the UAF.
-
-Fixes: c7398583340a ("CIFS: SMBD: Implement RDMA memory registration")
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
----
- fs/cifs/smbdirect.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index a874c2e1ae41..7013fdb4ea51 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -2217,6 +2217,7 @@ static int allocate_mr_list(struct smbd_connection *info)
- 	atomic_set(&info->mr_ready_count, 0);
- 	atomic_set(&info->mr_used_count, 0);
- 	init_waitqueue_head(&info->wait_for_mr_cleanup);
-+	INIT_WORK(&info->mr_recovery_work, smbd_mr_recovery_work);
- 	/* Allocate more MRs (2x) than hardware responder_resources */
- 	for (i = 0; i < info->responder_resources * 2; i++) {
- 		smbdirect_mr = kzalloc(sizeof(*smbdirect_mr), GFP_KERNEL);
-@@ -2244,13 +2245,13 @@ static int allocate_mr_list(struct smbd_connection *info)
- 		list_add_tail(&smbdirect_mr->list, &info->mr_list);
- 		atomic_inc(&info->mr_ready_count);
- 	}
--	INIT_WORK(&info->mr_recovery_work, smbd_mr_recovery_work);
- 	return 0;
- 
- out:
- 	kfree(smbdirect_mr);
- 
- 	list_for_each_entry_safe(smbdirect_mr, tmp, &info->mr_list, list) {
-+		list_del(&smbdirect_mr->list);
- 		ib_dereg_mr(smbdirect_mr->mr);
- 		kfree(smbdirect_mr->sgl);
- 		kfree(smbdirect_mr);
--- 
-2.31.1
+David
 
