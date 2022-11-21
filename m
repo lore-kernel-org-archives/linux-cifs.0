@@ -2,76 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95008C4332F
-	for <linux-cifs@archiver.kernel.org>; Mon, 21 Nov 2022 15:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D34FC433FE
+	for <linux-cifs@archiver.kernel.org>; Mon, 21 Nov 2022 15:34:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231969AbiKUPGU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 21 Nov 2022 10:06:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60928 "EHLO
+        id S232498AbiKUPd7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 21 Nov 2022 10:33:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231956AbiKUPFu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 21 Nov 2022 10:05:50 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D1DCD9B8E;
-        Mon, 21 Nov 2022 06:54:34 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 45B8B7FD25;
-        Mon, 21 Nov 2022 14:40:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1669041637;
+        with ESMTP id S231732AbiKUPdf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 21 Nov 2022 10:33:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B26FD29A3
+        for <linux-cifs@vger.kernel.org>; Mon, 21 Nov 2022 07:31:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669044676;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bEARu0JbQorKPvi4zAUJ1f0tT4f5K3ZqomAc0zTv4IU=;
-        b=bUeIfrhiI1iRGk6aylBQTqyrT9PYNIYcVY0djJjxf6ssRl1nqqNJltP6/NdbjN6LDiPdOo
-        bOYBdhhQLZtO27XSd7Oal3iLJIyDYc5KT68mYjzRw1JO4BKli3GTh+z8DNChXSjRI+Pn5D
-        NOU0Un9UlJcI9rSRJUHPG80FG9dMY/CN4ou1YtcjVh202tI1/ATCRaN1AGXUI/QJF0D0Tk
-        wbvyHuebllBcWXFOzFt5RadidQq+bVdMeGF3EPnmFFBYqn5f3sWGHD9MFUdIXE5Jla3Uz7
-        hfGrtR6LX5FCIBTF1tjoadg2/L2d5oCyNpVxWnM6MX8yB7kCoZFk6jT/+v4iUA==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     ChenXiaoSong <chenxiaosong2@huawei.com>, sfrench@samba.org,
-        dhowells@redhat.com
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, chenxiaosong2@huawei.com,
-        yi.zhang@huawei.com, zhangxiaoxu5@huawei.com, yanaijie@huawei.com
-Subject: Re: [PATCH] cifs: fix missing unlock in cifs_file_copychunk_range()
-In-Reply-To: <20221119045159.1400244-1-chenxiaosong2@huawei.com>
-References: <20221119045159.1400244-1-chenxiaosong2@huawei.com>
-Date:   Mon, 21 Nov 2022 11:42:01 -0300
-Message-ID: <871qpw1i9y.fsf@cjr.nz>
+        bh=43gjeh12mqeKKnzpxBrG6XHUmQQh+jBPDZXXmUO7BOQ=;
+        b=SmGhZ7Hu3TDY7ElyZMFEg8NzUX80xxzGWPZrMbTqqvKL9KTSCsqBN3oG2f84i+4mxOH9q4
+        /kvN5FWyKF2N9p7rLTU7a0R2kU4jebLtc8IKVNUttnUdvPOhLHlx1EaY2w544+COcqXEZO
+        YJVscl4xIo0dNrjvMudCGvx2x1n7+U8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-1-iFy62VxxOjCf3yA5uhfvsQ-1; Mon, 21 Nov 2022 10:31:13 -0500
+X-MC-Unique: iFy62VxxOjCf3yA5uhfvsQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8641888B76E;
+        Mon, 21 Nov 2022 15:31:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 245C04B400F;
+        Mon, 21 Nov 2022 15:31:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20221120210004.381842-1-jlayton@kernel.org>
+References: <20221120210004.381842-1-jlayton@kernel.org>
+To:     Jeff Layton <jlayton@kernel.org>
+Cc:     dhowells@redhat.com, Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        David Teigland <teigland@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        "Darrick J. Wong" <djwong@kernel.org>, hch@lst.de,
+        linux-kernel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        devel@lists.orangefs.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH] filelock: move file locking definitions to separate header file
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <416909.1669044663.1@warthog.procyon.org.uk>
+Date:   Mon, 21 Nov 2022 15:31:03 +0000
+Message-ID: <416910.1669044663@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-ChenXiaoSong <chenxiaosong2@huawei.com> writes:
+Jeff Layton <jlayton@kernel.org> wrote:
 
-> xfstests generic/013 and generic/476 reported WARNING as follows:
->
->   WARNING: lock held when returning to user space!
->   6.1.0-rc5+ #4 Not tainted
->   ------------------------------------------------
->   fsstress/504233 is leaving the kernel with locks still held!
->   2 locks held by fsstress/504233:
->    #0: ffff888054c38850 (&sb->s_type->i_mutex_key#21){+.+.}-{3:3}, at:
->                         lock_two_nondirectories+0xcf/0xf0
->    #1: ffff8880b8fec750 (&sb->s_type->i_mutex_key#21/4){+.+.}-{3:3}, at:
->                         lock_two_nondirectories+0xb7/0xf0
->
-> This will lead to deadlock and hungtask.
->
-> Fix this by releasing locks when failed to write out on a file range in
-> cifs_file_copychunk_range().
->
-> Fixes: 3e3761f1ec7d ("smb3: use filemap_write_and_wait_range instead of filemap_write_and_wait")
-> Signed-off-by: ChenXiaoSong <chenxiaosong2@huawei.com>
-> ---
->  fs/cifs/cifsfs.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> The file locking definitions have lived in fs.h since the dawn of time,
+> but they are only used by a small subset of the source files that
+> include it.
+> 
+> Move the file locking definitions to a new header file, and add the
+> appropriate #include directives to the source files that need them. By
+> doing this we trim down fs.h a bit and limit the amount of rebuilding
+> that has to be done when we make changes to the file locking APIs.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Reviewed-by: David Howells <dhowells@redhat.com>
+
