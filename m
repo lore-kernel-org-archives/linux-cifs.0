@@ -2,62 +2,113 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EEDC4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Nov 2022 09:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A61A9C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Nov 2022 11:16:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233325AbiKVJlM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Nov 2022 04:41:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41880 "EHLO
+        id S233036AbiKVLQ3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Nov 2022 06:16:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232627AbiKVJlK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Nov 2022 04:41:10 -0500
-X-Greylist: delayed 901 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Nov 2022 01:41:06 PST
-Received: from mail.axisfairfi.com (mail.axisfairfi.com [94.177.230.134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B6324F28
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Nov 2022 01:41:05 -0800 (PST)
-Received: by mail.axisfairfi.com (Postfix, from userid 1001)
-        id 521F582644; Tue, 22 Nov 2022 09:15:32 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=axisfairfi.com;
-        s=mail; t=1669108540;
-        bh=0BgaW9t8GFER5QecxVkFsHrVi3gO/4V5KAZgJaiRYBs=;
-        h=Date:From:To:Subject:From;
-        b=b4OVS0aWTh7OhiBh5d2R/8imx/gH06O7pqvuHBo5ELkdrntk++HyiTDvT78+VZWTt
-         yEN+RFDzvZBJs/E8V9fU2o7ZB5ieg6lySTq/pdSfqz5LNtlM+LE7JanhdLD4IVNkxA
-         I2al/WoJX6JVGPkqIAUutozR8ayoncqt8v3EpThIma7/h8dLwbyKt84pvO16xOciC0
-         DVjjg4yxmaITrRyh6oUH1id+f0nntiZjpx+D/QmOjvXTH93ZfLSlRCDMNl8t4QiFxD
-         IVKxdBCATyPXKKzbSGxOFWMF7xvTl3Hlfi5tv66tXR5xvFyne8zTol1qJG1DnLUeZj
-         Rjc67J0EXyE0g==
-Received: by mail.axisfairfi.com for <linux-cifs@vger.kernel.org>; Tue, 22 Nov 2022 09:15:27 GMT
-Message-ID: <20221122074500-0.1.d.odk.0.c5d26mp1fi@axisfairfi.com>
-Date:   Tue, 22 Nov 2022 09:15:27 GMT
-From:   "Zbynek Spacek" <zbynek.spacek@axisfairfi.com>
-To:     <linux-cifs@vger.kernel.org>
-Subject: Silikonmischungen
-X-Mailer: mail.axisfairfi.com
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S232864AbiKVLQF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Nov 2022 06:16:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D58B5C771;
+        Tue, 22 Nov 2022 03:14:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AA3F8B81991;
+        Tue, 22 Nov 2022 11:14:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99661C433C1;
+        Tue, 22 Nov 2022 11:13:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669115639;
+        bh=bl116Cg89IGIZVG9NrRKWmlP6ed4aJACzNI0Wp3w7MQ=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=PW904WXq7B5dnjaE/n6/stkLttLw66q95uzaVXXfC57Gr8fGyA50W/Y+6YMHj6/Z6
+         C+bp2zR/HpD7AL2kDXCaUnJHLo0QYTjCM7B7srSBYzv9QSoZunuSXqgWz/eURLlX6f
+         bkLmFZpbKLyi6RqKREvtIsB+vKfLjAYsE4lMeS50ONpsJGmxbLEBM8TI6eOVtcA0LK
+         FmF5vJc1DjzHEZ764Fk6lm5yRoCPsh46VllB8mEkIzIHUVtq1E/Ip3Df/1o0TdNO5Q
+         AIsD9dU2QJjYYPKYl3/NasVd/l9SRjkJBU0cAIKGCY06yaw8kwOzVXEKArpk5buENB
+         HvI5i9aGVVUAA==
+Message-ID: <fcc7161712a2c8ff84420477b12b9114195e6624.camel@kernel.org>
+Subject: Re: [PATCH] filelock: move file locking definitions to separate
+ header file
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        David Teigland <teigland@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        "Darrick J. Wong" <djwong@kernel.org>, hch@lst.de,
+        linux-kernel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        devel@lists.orangefs.org, linux-xfs@vger.kernel.org
+Date:   Tue, 22 Nov 2022 06:13:54 -0500
+In-Reply-To: <Y3xHQwM3UiD/SK0K@casper.infradead.org>
+References: <20221120210004.381842-1-jlayton@kernel.org>
+         <Y3xHQwM3UiD/SK0K@casper.infradead.org>
+Content-Type: text/plain; charset="ISO-8859-15"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Good morning,
+On Tue, 2022-11-22 at 03:51 +0000, Matthew Wilcox wrote:
+> On Sun, Nov 20, 2022 at 03:59:57PM -0500, Jeff Layton wrote:
+> > Move the file locking definitions to a new header file, and add the
+> > appropriate #include directives to the source files that need them. By
+> > doing this we trim down fs.h a bit and limit the amount of rebuilding
+> > that has to be done when we make changes to the file locking APIs.
+>=20
+> I'm in favour of this in general, but I think there's a few implicit
+> includes.  Can you create a test.c that only #include
+> <linnux/filelock.h> and see if there's anything missing?
+>=20
+> > +	wait_queue_head_t fl_wait;
+> > +	struct file *fl_file;
+>=20
+> These two seem undefined at this point.
+>=20
+> > +	struct fasync_struct *	fl_fasync; /* for lease break notifications */
+>=20
+> Likewise.
+>=20
 
-do you need intermediates for processing, plastics (e.g. rubber) or silic=
-one mixtures?
+Yeah, there is quite a bit missing. I think I'll have to add this at the
+head of filelock.h:
 
-We provide a wide range of silicone rubbers with various properties, sili=
-cone mixtures from renowned manufacturers such as Wacker, Elastosil LR an=
-d dyes, stabilizers, primers and anti-adhesive additives.
+#include <linux/fs.h>
 
-We also produce technical silicone compounds with increased resistance to=
- oils, resistant to high temperatures and water vapor, conductive and man=
-y more.
-
-We provide fast order fulfillment, timely deliveries and cost optimizatio=
-n.
-
-Can I introduce what we can offer you?
-
-
-Zbynek Spacek
+...as we need several definitions from fs.h for this header.
+--=20
+Jeff Layton <jlayton@kernel.org>
