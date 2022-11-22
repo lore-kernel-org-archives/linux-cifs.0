@@ -2,76 +2,62 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6EFC433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Nov 2022 06:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EEDC4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Nov 2022 09:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231899AbiKVGHH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Nov 2022 01:07:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59222 "EHLO
+        id S233325AbiKVJlM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Nov 2022 04:41:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbiKVGHH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Nov 2022 01:07:07 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D932936B;
-        Mon, 21 Nov 2022 22:07:05 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6CF9A68D05; Tue, 22 Nov 2022 07:06:59 +0100 (CET)
-Date:   Tue, 22 Nov 2022 07:06:59 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jeff Layton <jlayton@kernel.org>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        "Darrick J. Wong" <djwong@kernel.org>, hch@lst.de,
-        linux-kernel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        devel@lists.orangefs.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH] filelock: move file locking definitions to separate
- header file
-Message-ID: <20221122060659.GA14084@lst.de>
-References: <20221120210004.381842-1-jlayton@kernel.org> <Y3xHQwM3UiD/SK0K@casper.infradead.org>
+        with ESMTP id S232627AbiKVJlK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Nov 2022 04:41:10 -0500
+X-Greylist: delayed 901 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Nov 2022 01:41:06 PST
+Received: from mail.axisfairfi.com (mail.axisfairfi.com [94.177.230.134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B6324F28
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Nov 2022 01:41:05 -0800 (PST)
+Received: by mail.axisfairfi.com (Postfix, from userid 1001)
+        id 521F582644; Tue, 22 Nov 2022 09:15:32 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=axisfairfi.com;
+        s=mail; t=1669108540;
+        bh=0BgaW9t8GFER5QecxVkFsHrVi3gO/4V5KAZgJaiRYBs=;
+        h=Date:From:To:Subject:From;
+        b=b4OVS0aWTh7OhiBh5d2R/8imx/gH06O7pqvuHBo5ELkdrntk++HyiTDvT78+VZWTt
+         yEN+RFDzvZBJs/E8V9fU2o7ZB5ieg6lySTq/pdSfqz5LNtlM+LE7JanhdLD4IVNkxA
+         I2al/WoJX6JVGPkqIAUutozR8ayoncqt8v3EpThIma7/h8dLwbyKt84pvO16xOciC0
+         DVjjg4yxmaITrRyh6oUH1id+f0nntiZjpx+D/QmOjvXTH93ZfLSlRCDMNl8t4QiFxD
+         IVKxdBCATyPXKKzbSGxOFWMF7xvTl3Hlfi5tv66tXR5xvFyne8zTol1qJG1DnLUeZj
+         Rjc67J0EXyE0g==
+Received: by mail.axisfairfi.com for <linux-cifs@vger.kernel.org>; Tue, 22 Nov 2022 09:15:27 GMT
+Message-ID: <20221122074500-0.1.d.odk.0.c5d26mp1fi@axisfairfi.com>
+Date:   Tue, 22 Nov 2022 09:15:27 GMT
+From:   "Zbynek Spacek" <zbynek.spacek@axisfairfi.com>
+To:     <linux-cifs@vger.kernel.org>
+Subject: Silikonmischungen
+X-Mailer: mail.axisfairfi.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3xHQwM3UiD/SK0K@casper.infradead.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Nov 22, 2022 at 03:51:31AM +0000, Matthew Wilcox wrote:
-> These two seem undefined at this point.
-> 
-> > +	struct fasync_struct *	fl_fasync; /* for lease break notifications */
+Good morning,
 
-Given that we just use a pointer to it there is no need to have a
-definition.
+do you need intermediates for processing, plastics (e.g. rubber) or silic=
+one mixtures?
+
+We provide a wide range of silicone rubbers with various properties, sili=
+cone mixtures from renowned manufacturers such as Wacker, Elastosil LR an=
+d dyes, stabilizers, primers and anti-adhesive additives.
+
+We also produce technical silicone compounds with increased resistance to=
+ oils, resistant to high temperatures and water vapor, conductive and man=
+y more.
+
+We provide fast order fulfillment, timely deliveries and cost optimizatio=
+n.
+
+Can I introduce what we can offer you?
+
+
+Zbynek Spacek
