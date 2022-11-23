@@ -2,150 +2,129 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B13D9C4167D
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Nov 2022 13:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C79FC43219
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Nov 2022 18:35:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236518AbiKWNch (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 23 Nov 2022 08:32:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38556 "EHLO
+        id S238965AbiKWSfN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Nov 2022 13:35:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238272AbiKWNbX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Nov 2022 08:31:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D018433C
-        for <linux-cifs@vger.kernel.org>; Wed, 23 Nov 2022 05:10:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669209028;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=JdH5iMj2hJ3f18CCrntex26NGDaDwSvrSAcFPbFoP58=;
-        b=dG74Zd2uoHINo8cmD0xOf0yw+2sw26843q+SxQPbnYXU/H3AS3SvWdf7wCAtWlMZpUQsY9
-        WB7ftNuyoJCH7729+jzqEz9ok+9+OL6lqBvlDsaTcVjFXaQHmbXk2+tudy1c/fGL5sAj2a
-        xKYs35TBt2rN7dWpUdXHh3VgTBhBW48=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-137-SZdBQVGmOMmF1asWSPMeUg-1; Wed, 23 Nov 2022 08:10:25 -0500
-X-MC-Unique: SZdBQVGmOMmF1asWSPMeUg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 82D8F833AEF;
-        Wed, 23 Nov 2022 13:10:24 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.14])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D0551477F5D;
-        Wed, 23 Nov 2022 13:10:22 +0000 (UTC)
-Subject: [PATCH v2 0/4] iov_iter: Add extraction helpers
-From:   David Howells <dhowells@redhat.com>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Rohith Surabattula <rohiths.msft@gmail.com>, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cachefs@redhat.com, Matthew Wilcox <willy@infradead.org>,
-        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, dhowells@redhat.com,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 23 Nov 2022 13:10:20 +0000
-Message-ID: <166920902005.1461876.2786264600108839814.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/1.5
+        with ESMTP id S239257AbiKWSfB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Nov 2022 13:35:01 -0500
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 035FCC771
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Nov 2022 10:35:01 -0800 (PST)
+Received: by mail-qk1-x734.google.com with SMTP id g10so13053103qkl.6
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Nov 2022 10:35:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=T/jG5QaYqTRKNFcJtqKGHj4SfbKFSJH0wslCbBk+0rc=;
+        b=WtEZfFy9CjWS25vRvH8BUGmfQ5TppWVPJY29aYmVjK2t/Gqd80v173byCSBDvOcqZ5
+         GS3iagkeA7ssVh/ddKEkJKHeWkCPYto/COdNwh44sfuBXjAau3yrVZ6HAJiXAaELgCMQ
+         DakZoiuRSNhC/sDbjfyndFBio5BbqUEFc1b48=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T/jG5QaYqTRKNFcJtqKGHj4SfbKFSJH0wslCbBk+0rc=;
+        b=wQJHTVIzGCrtyAFqwD/zTQn/9EIaSTONLHptjT0oyvsIRzCy3FT67STTNrDIikpdZY
+         AAqOcVVWNXK3bf9uQDkyDXuYQEKh7pfsqT/436UxdPxCyGb6zsOcVSmo/ZnBMzIp6oSf
+         qYf8ScCvWL6DN1ox4Kr62XeRmIv8QvBnT5xZqU0nDBIfd+stodTnxUboV6CFqyOGQnQp
+         ukZBkxOkGG/MOd6Ai0JwkK6l6P9zTvcUY6TCEEV1R8rdig4XztFpketRzo72r0h3DMEm
+         08tNcM4ioFSa4OQO8ksfFbm2z3bLjooGJfFG4kGurN2Zr1RpzisHwpvCUFz4Rq2AukZ2
+         zevA==
+X-Gm-Message-State: ANoB5pkotws2Y0ZOl+9mcjrIL3QCXE7gpaLXnYoeg0qyEseCbXW+C5y8
+        0ZLsoL0mHuLUBAMKNQRnaCz3NHg7j/K5nw==
+X-Google-Smtp-Source: AA0mqf53omU7Kkl8uvv1pKcnB79vO2pd3jZrn73r1WCY+/CGOkHhVhbhqy+9FUw/iZHemWb+bAQLoA==
+X-Received: by 2002:ae9:ed4d:0:b0:6f8:4c19:8072 with SMTP id c74-20020ae9ed4d000000b006f84c198072mr26509635qkg.601.1669228499874;
+        Wed, 23 Nov 2022 10:34:59 -0800 (PST)
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com. [209.85.222.180])
+        by smtp.gmail.com with ESMTPSA id i5-20020a05620a404500b006fb11eee465sm12638386qko.64.2022.11.23.10.34.59
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Nov 2022 10:34:59 -0800 (PST)
+Received: by mail-qk1-f180.google.com with SMTP id i9so3541106qkl.5
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Nov 2022 10:34:59 -0800 (PST)
+X-Received: by 2002:ac8:41cd:0:b0:3a5:1ba7:717d with SMTP id
+ o13-20020ac841cd000000b003a51ba7717dmr9188380qtm.678.1669228012067; Wed, 23
+ Nov 2022 10:26:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+References: <1459152.1669208550@warthog.procyon.org.uk>
+In-Reply-To: <1459152.1669208550@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 23 Nov 2022 10:26:36 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wghJtq-952e_8jd=vtV68y_HsDJ8=e0=C3-AsU2WL-8YA@mail.gmail.com>
+Message-ID: <CAHk-=wghJtq-952e_8jd=vtV68y_HsDJ8=e0=C3-AsU2WL-8YA@mail.gmail.com>
+Subject: Re: [PATCH v3] mm, netfs, fscache: Stop read optimisation when folio
+ removed from pagecache
+To:     David Howells <dhowells@redhat.com>
+Cc:     willy@infradead.org, dwysocha@redhat.com,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
+        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+On Wed, Nov 23, 2022 at 5:02 AM David Howells <dhowells@redhat.com> wrote:
+>
+> Is the attached patch too heavy to be applied this late in the merge cycle?
+> Or would you prefer it to wait for the merge window?
 
-Hi Al,
+This patch is much too much for this point in the release.
 
-Here are four patches to provide support for extracting pages from an
-iov_iter, where such a thing makes sense, if you could take a look?
+But I also think it's strange in another way, with that odd placement of
 
-The first couple of patches provide iov_iter general stuff:
+        mapping_clear_release_always(inode->i_mapping);
 
- (1) Move the FOLL_* flags to linux/mm_types.h so that linux/uio.h can make
-     use of them.
+at inode eviction time. That just feels very random.
 
- (2) Add a function to list-only, get or pin pages from an iterator as a
-     future replacement for iov_iter_get_pages*().  Pointers to the pages
-     are placed into an array (which will get allocated if not provided)
-     and, depending on the iterator type and direction, the pages will have
-     a ref or a pin get on them, or left untouched (on the assumption that
-     the caller manages their lifetime).
+Similarly, that change to shrink_folio_list() looks strange, with the
+nasty folio_needs_release() helper. It seems entirely pointless, with
+the use then being
 
-     The determination is:
+                if (folio_needs_release(folio)) {
+                        if (!filemap_release_folio(folio, sc->gfp_mask))
+                                goto activate_locked;
 
-	UBUF/IOVEC + READ	-> pin
-	UBUF/IOVEC + WRITE	-> get
-	PIPE + READ		-> list-only
-	BVEC/XARRAY		-> list-only
-	Anything else		-> EFAULT
+when everybody else is just using filemap_release_folio() and checking
+its return value. I like how you changed other cases of
 
-     The function also returns an indication of which of "list only, get or
-     pin" the extraction function did to aid in cleaning up (returning 0,
-     FOLL_GET or FOLL_PIN as appropriate).
+        if (folio_has_private(folio) && !filemap_release_folio(folio, 0))
+                return 0;
 
-     [!] NOTE that this function is not marked EXPORT_SYMBOL_GPL because
-     	 it's intended as a replacement for iov_iter_get_pages*(), which is
-     	 not itself marked _GPL.
+to just use "!filemap_release_folio()" directly, and that felt like a
+cleanup, but the shrink_folio_list() changes look like a step
+backwards.
 
-Then there are a couple of patches that add stuff to netfslib that I want
-to use there as well as in cifs:
+And the change to mm/filemap.c is completely unacceptable in all
+forms, and this added test
 
- (3) Add a netfslib function to use (2) to extract pages from an ITER_IOBUF
-     or ITER_UBUF iterator into an ITER_BVEC iterator.  This will get or
-     pin the pages as appropriate.
++       if ((!mapping || !mapping_release_always(mapping)) &&
++           !folio_test_private(folio) &&
++           !folio_test_private_2(folio))
++               return true;
 
- (4) Add a netfslib function to extract pages from an iterator that's of
-     type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a scatterlist.
+will not be accepted even during the merge window. That code makes no
+sense what-so-ever, and is in no way acceptable.
 
-     The function in (2) is used for a UBUF and IOVEC iterators, so those
-     need cleaning up afterwards.  BVEC and XARRAY iterators are ungot and
-     unpinned and may be rendered into elements that span multiple pages,
-     for example if large folios are present.
+That code makes no sense what-so-ever. Why isn't it using
+"folio_has_private()"? Why is it using it's own illegible version of
+that that doesn't match any other case? Why is this done as an
+open-coded - and *badly* so - version of !folio_needs_release() that
+you for some reason made private to mm/vmscan.c?
 
-Changes:
-========
-ver #2)
- - Rolled the extraction cleanup mode query function into the extraction
-   function, returning the indication through the argument list.
- - Fixed patch 4 (extract to scatterlist) to actually use the new
-   extraction API.
+So no, this patch is too ugly to apply as-is *ever*, much less during
+the late rc series.
 
-I've pushed the patches here also:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
-
-David
-
-Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166722777223.2555743.162508599131141451.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk/ # rfc
-
----
-David Howells (4):
-      mm: Move FOLL_* defs to mm_types.h
-      iov_iter: Add a function to extract a page list from an iterator
-      netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
-      netfs: Add a function to extract an iterator into a scatterlist
-
-
- fs/netfs/Makefile        |   1 +
- fs/netfs/iterator.c      | 367 +++++++++++++++++++++++++++++++++++++++
- include/linux/mm.h       |  74 --------
- include/linux/mm_types.h |  73 ++++++++
- include/linux/netfs.h    |   7 +
- include/linux/uio.h      |   4 +
- lib/iov_iter.c           | 350 +++++++++++++++++++++++++++++++++++++
- mm/vmalloc.c             |   1 +
- 8 files changed, 803 insertions(+), 74 deletions(-)
- create mode 100644 fs/netfs/iterator.c
-
-
+                 Linus
