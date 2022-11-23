@@ -2,66 +2,49 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C79FC43219
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Nov 2022 18:35:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC05DC4332F
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Nov 2022 20:04:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238965AbiKWSfN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 23 Nov 2022 13:35:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38360 "EHLO
+        id S237461AbiKWUE5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Nov 2022 15:04:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239257AbiKWSfB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Nov 2022 13:35:01 -0500
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 035FCC771
-        for <linux-cifs@vger.kernel.org>; Wed, 23 Nov 2022 10:35:01 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id g10so13053103qkl.6
-        for <linux-cifs@vger.kernel.org>; Wed, 23 Nov 2022 10:35:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=T/jG5QaYqTRKNFcJtqKGHj4SfbKFSJH0wslCbBk+0rc=;
-        b=WtEZfFy9CjWS25vRvH8BUGmfQ5TppWVPJY29aYmVjK2t/Gqd80v173byCSBDvOcqZ5
-         GS3iagkeA7ssVh/ddKEkJKHeWkCPYto/COdNwh44sfuBXjAau3yrVZ6HAJiXAaELgCMQ
-         DakZoiuRSNhC/sDbjfyndFBio5BbqUEFc1b48=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T/jG5QaYqTRKNFcJtqKGHj4SfbKFSJH0wslCbBk+0rc=;
-        b=wQJHTVIzGCrtyAFqwD/zTQn/9EIaSTONLHptjT0oyvsIRzCy3FT67STTNrDIikpdZY
-         AAqOcVVWNXK3bf9uQDkyDXuYQEKh7pfsqT/436UxdPxCyGb6zsOcVSmo/ZnBMzIp6oSf
-         qYf8ScCvWL6DN1ox4Kr62XeRmIv8QvBnT5xZqU0nDBIfd+stodTnxUboV6CFqyOGQnQp
-         ukZBkxOkGG/MOd6Ai0JwkK6l6P9zTvcUY6TCEEV1R8rdig4XztFpketRzo72r0h3DMEm
-         08tNcM4ioFSa4OQO8ksfFbm2z3bLjooGJfFG4kGurN2Zr1RpzisHwpvCUFz4Rq2AukZ2
-         zevA==
-X-Gm-Message-State: ANoB5pkotws2Y0ZOl+9mcjrIL3QCXE7gpaLXnYoeg0qyEseCbXW+C5y8
-        0ZLsoL0mHuLUBAMKNQRnaCz3NHg7j/K5nw==
-X-Google-Smtp-Source: AA0mqf53omU7Kkl8uvv1pKcnB79vO2pd3jZrn73r1WCY+/CGOkHhVhbhqy+9FUw/iZHemWb+bAQLoA==
-X-Received: by 2002:ae9:ed4d:0:b0:6f8:4c19:8072 with SMTP id c74-20020ae9ed4d000000b006f84c198072mr26509635qkg.601.1669228499874;
-        Wed, 23 Nov 2022 10:34:59 -0800 (PST)
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com. [209.85.222.180])
-        by smtp.gmail.com with ESMTPSA id i5-20020a05620a404500b006fb11eee465sm12638386qko.64.2022.11.23.10.34.59
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Nov 2022 10:34:59 -0800 (PST)
-Received: by mail-qk1-f180.google.com with SMTP id i9so3541106qkl.5
-        for <linux-cifs@vger.kernel.org>; Wed, 23 Nov 2022 10:34:59 -0800 (PST)
-X-Received: by 2002:ac8:41cd:0:b0:3a5:1ba7:717d with SMTP id
- o13-20020ac841cd000000b003a51ba7717dmr9188380qtm.678.1669228012067; Wed, 23
- Nov 2022 10:26:52 -0800 (PST)
-MIME-Version: 1.0
-References: <1459152.1669208550@warthog.procyon.org.uk>
-In-Reply-To: <1459152.1669208550@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 23 Nov 2022 10:26:36 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wghJtq-952e_8jd=vtV68y_HsDJ8=e0=C3-AsU2WL-8YA@mail.gmail.com>
-Message-ID: <CAHk-=wghJtq-952e_8jd=vtV68y_HsDJ8=e0=C3-AsU2WL-8YA@mail.gmail.com>
-Subject: Re: [PATCH v3] mm, netfs, fscache: Stop read optimisation when folio
- removed from pagecache
-To:     David Howells <dhowells@redhat.com>
-Cc:     willy@infradead.org, dwysocha@redhat.com,
+        with ESMTP id S237795AbiKWUEv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Nov 2022 15:04:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A415FC3
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Nov 2022 12:03:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669233791;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FyF91lZbMxrHn5anVwrCryKb88DRm4Sm24TF8WqfMn8=;
+        b=NRUmSbl5oFPfQTg4kJb4EBqv1yGFpex+ntK2RiLmZEYYLehlHoBFsf9+AVhZBhlCUpsioH
+        JpyKQ2ksDwQCfZorDb5f4yqabReZEJ3LtwH4+MOFl5bHeFNH+0VJHlc92rzVEdO9IrvPxW
+        U+cGyit1QNg4k0bmIG07B2U/B2rQFDQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-599-WfiQ4PvGNeam6muHEfvymg-1; Wed, 23 Nov 2022 15:03:09 -0500
+X-MC-Unique: WfiQ4PvGNeam6muHEfvymg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CB7E087B2A1;
+        Wed, 23 Nov 2022 20:03:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B49AF40C83C5;
+        Wed, 23 Nov 2022 20:03:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wghJtq-952e_8jd=vtV68y_HsDJ8=e0=C3-AsU2WL-8YA@mail.gmail.com>
+References: <CAHk-=wghJtq-952e_8jd=vtV68y_HsDJ8=e0=C3-AsU2WL-8YA@mail.gmail.com> <1459152.1669208550@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, willy@infradead.org, dwysocha@redhat.com,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         Steve French <sfrench@samba.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
@@ -71,60 +54,130 @@ Cc:     willy@infradead.org, dwysocha@redhat.com,
         v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
         linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v3] mm, netfs, fscache: Stop read optimisation when folio removed from pagecache
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1619342.1669233783.1@warthog.procyon.org.uk>
+Date:   Wed, 23 Nov 2022 20:03:03 +0000
+Message-ID: <1619343.1669233783@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Nov 23, 2022 at 5:02 AM David Howells <dhowells@redhat.com> wrote:
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
+
+> But I also think it's strange in another way, with that odd placement of
+> 
+>         mapping_clear_release_always(inode->i_mapping);
+> 
+> at inode eviction time. That just feels very random.
+
+I was under the impression that a warning got splashed if unexpected
+address_space flags were set when ->evict_inode() returned.  I may be thinking
+of page flags.  If it doesn't, fine, this isn't required.
+
+> Similarly, that change to shrink_folio_list() looks strange, with the
+> nasty folio_needs_release() helper. It seems entirely pointless, with
+> the use then being
+> 
+>                 if (folio_needs_release(folio)) {
+>                         if (!filemap_release_folio(folio, sc->gfp_mask))
+>                                 goto activate_locked;
+
+Unfortunately, that can't be simply folded down.  It actually does something
+extra if folio_has_private() was set, filemap_release_folio() succeeds but
+there was no mapping:
+
+		 * Rarely, folios can have buffers and no ->mapping.
+		 * These are the folios which were not successfully
+		 * invalidated in truncate_cleanup_folio().  We try to
+		 * drop those buffers here and if that worked, and the
+		 * folio is no longer mapped into process address space
+		 * (refcount == 1) it can be freed.  Otherwise, leave
+		 * the folio on the LRU so it is swappable.
+
+Possibly I could split the if-statement and make it two separate cases:
+
+		/*
+		 * If the folio has buffers, try to free the buffer
+		 * mappings associated with this folio. If we succeed
+		 * we try to free the folio as well.
+		 *
+		 * We do this even if the folio is dirty.
+		 * filemap_release_folio() does not perform I/O, but it
+		 * is possible for a folio to have the dirty flag set,
+		 * but it is actually clean (all its buffers are clean).
+		 * This happens if the buffers were written out directly,
+		 * with submit_bh(). ext3 will do this, as well as
+		 * the blockdev mapping.  filemap_release_folio() will
+		 * discover that cleanness and will drop the buffers
+		 * and mark the folio clean - it can be freed.
+		 */
+		if (!filemap_release_folio(folio, sc->gfp_mask))
+			goto activate_locked;
+
+filemap_release_folio() will return true if folio_has_private() is false,
+which would allow us to reach the next part, which we would then skip.
+
+		/*
+		 * Rarely, folios can have buffers and no ->mapping.
+		 * These are the folios which were not successfully
+		 * invalidated in truncate_cleanup_folio().  We try to
+		 * drop those buffers here and if that worked, and the
+		 * folio is no longer mapped into process address space
+		 * (refcount == 1) it can be freed.  Otherwise, leave
+		 * the folio on the LRU so it is swappable.
+		 */
+		if (!mapping && folio_has_private(folio) &&
+		    folio_ref_count(folio) == 1) {
+			folio_unlock(folio);
+			if (folio_put_testzero(folio))
+				goto free_it;
+			 /*
+			  * rare race with speculative reference.
+			  * the speculative reference will free
+			  * this folio shortly, so we may
+			  * increment nr_reclaimed here (and
+			  * leave it off the LRU).
+			  */
+			nr_reclaimed += nr_pages;
+			continue;
+		}
+
+But that will malfunction if try_to_free_buffers(), as called from
+folio_has_private(), manages to clear the private bits.  I wonder if it might
+be possible to fold this bit into filemap_release_folio() somehow.
+
+I really need a three-state return from filemap_release_folio() - maybe:
+
+	0	couldn't release
+	1	released
+	2	there was no private
+
+The ordinary "if (filemap_release_folio()) { ... }" would work as expected.
+shrink_folio_list() could do something different between case 1 and case 2.
+
+> And the change to mm/filemap.c is completely unacceptable in all
+> forms, and this added test
+> 
+> +       if ((!mapping || !mapping_release_always(mapping)) &&
+> +           !folio_test_private(folio) &&
+> +           !folio_test_private_2(folio))
+> +               return true;
+> 
+> will not be accepted even during the merge window. That code makes no
+> sense what-so-ever, and is in no way acceptable.
 >
-> Is the attached patch too heavy to be applied this late in the merge cycle?
-> Or would you prefer it to wait for the merge window?
+> That code makes no sense what-so-ever. Why isn't it using
+> "folio_has_private()"?
 
-This patch is much too much for this point in the release.
+It should be, yes.
 
-But I also think it's strange in another way, with that odd placement of
+> Why is this done as an open-coded - and *badly* so - version of
+> !folio_needs_release() that you for some reason made private to mm/vmscan.c?
 
-        mapping_clear_release_always(inode->i_mapping);
+Yeah, in retrospect, I should have put that in mm/internal.h.
 
-at inode eviction time. That just feels very random.
+David
 
-Similarly, that change to shrink_folio_list() looks strange, with the
-nasty folio_needs_release() helper. It seems entirely pointless, with
-the use then being
-
-                if (folio_needs_release(folio)) {
-                        if (!filemap_release_folio(folio, sc->gfp_mask))
-                                goto activate_locked;
-
-when everybody else is just using filemap_release_folio() and checking
-its return value. I like how you changed other cases of
-
-        if (folio_has_private(folio) && !filemap_release_folio(folio, 0))
-                return 0;
-
-to just use "!filemap_release_folio()" directly, and that felt like a
-cleanup, but the shrink_folio_list() changes look like a step
-backwards.
-
-And the change to mm/filemap.c is completely unacceptable in all
-forms, and this added test
-
-+       if ((!mapping || !mapping_release_always(mapping)) &&
-+           !folio_test_private(folio) &&
-+           !folio_test_private_2(folio))
-+               return true;
-
-will not be accepted even during the merge window. That code makes no
-sense what-so-ever, and is in no way acceptable.
-
-That code makes no sense what-so-ever. Why isn't it using
-"folio_has_private()"? Why is it using it's own illegible version of
-that that doesn't match any other case? Why is this done as an
-open-coded - and *badly* so - version of !folio_needs_release() that
-you for some reason made private to mm/vmscan.c?
-
-So no, this patch is too ugly to apply as-is *ever*, much less during
-the late rc series.
-
-                 Linus
