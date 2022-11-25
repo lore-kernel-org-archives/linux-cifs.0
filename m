@@ -2,253 +2,106 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF0C7C4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Nov 2022 09:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88E9C433FE
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Nov 2022 03:35:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229585AbiKXJyo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 24 Nov 2022 04:54:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39670 "EHLO
+        id S229455AbiKYDf0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 24 Nov 2022 22:35:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230006AbiKXJye (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 24 Nov 2022 04:54:34 -0500
-Received: from mail-vk1-xa35.google.com (mail-vk1-xa35.google.com [IPv6:2607:f8b0:4864:20::a35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 660821255C5;
-        Thu, 24 Nov 2022 01:54:33 -0800 (PST)
-Received: by mail-vk1-xa35.google.com with SMTP id j24so611699vkk.0;
-        Thu, 24 Nov 2022 01:54:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=znZLdhUtS0rOajRMXtdBuYUM81G8XYp3wNm06MpyRAQ=;
-        b=Tu67bb6ygx0vUkZ+2K8StD1SuiJCiBl9tNobBdlL0q7mfLM4TbIC0TaC1hBOJGtWzD
-         3xWKSO7JUsHoV9daGNIgoy5fr5ddDO2N+kRlO67T/X7CJRJIT6/8H/8g3qVj4Vjni/PO
-         +atqFRy8Nksjqqeh66VShN+A+Wk7DiTKrT4XUcuLzzzLYFvsxsClPP5c3SDmXTZF7OcN
-         E2g6wAktS1Nz+0zkloTKTjNaoE4lZ5YTKbikeCItzKpKHHVMA+g8QPxFyNPEeGcTwUy0
-         wNVPeKITW+FtTd7XRN3v/tamUsNhZvhp53rgyyMB+ZKVA8JaUqoqqc5K2e+YfUX99Fb/
-         yDOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=znZLdhUtS0rOajRMXtdBuYUM81G8XYp3wNm06MpyRAQ=;
-        b=cHiFb9QNGiq62HlT4A17Qe+oaiZKwYe4rv4IxP0BuQFTtt5vRAJ2IyYSiAZ298CdLi
-         1ublzRgpuv5d8JXSFG4P8nI+L5oh4qlkxe3wVr3xde+sCz0xCjwFF9poERy0mvTAdsa0
-         SE15/Jlg1oZU0uRpIGXIRCc2PZMqp34K+4VMvx685G6OUlwuXYUk7Yl88p4I1KgEnxou
-         oXFIAERTtQkZnpRSc6o2Tu9lhjLf67YxTLgjv8xfZG97I3HuJS4FlX27YCDuRrCQWJQy
-         sAKKb/Tm/lC/MEy7MWMc4CqsyHd9gOJ33Sv4BY/0/sODqYx2nvlu0vlKXv3Rb2X3PpF2
-         ozSA==
-X-Gm-Message-State: ANoB5pnoA8dtP3e3FUa2hiRL42dYIBUclM1DslBnX2kcAAIwSgObgXGL
-        87ryQ2pVPRmNn9TjgRf6Ea82M92M5uqkXIdmuvq3VVl6
-X-Google-Smtp-Source: AA0mqf4Mbu+taHe6j0moXui6AgZL8RVU2aQ/HargOrIRs439zbH5DSvCFHypYiTrNX0xB/4l7yrk2ySUhDqal4C/AtM=
-X-Received: by 2002:a1f:120b:0:b0:3bc:8497:27fd with SMTP id
- 11-20020a1f120b000000b003bc849727fdmr7856792vks.15.1669283672400; Thu, 24 Nov
- 2022 01:54:32 -0800 (PST)
-MIME-Version: 1.0
-References: <20221117205249.1886336-1-amir73il@gmail.com>
-In-Reply-To: <20221117205249.1886336-1-amir73il@gmail.com>
-From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Thu, 24 Nov 2022 11:54:20 +0200
-Message-ID: <CAOQ4uxhzuZ+5+ZARwRLrZhz7tVt19AST982CEpZnUaKGuBokcw@mail.gmail.com>
-Subject: Re: [PATCH v2] vfs: fix copy_file_range() averts filesystem freeze protection
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        with ESMTP id S229453AbiKYDf0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 24 Nov 2022 22:35:26 -0500
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B753C2982C;
+        Thu, 24 Nov 2022 19:35:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=f8/x32fER3aRdejEpsCx+wOLDBv/ItD+V8F3NbSrtbc=; b=r01ynWszvCOW0gRReJc0mPmaeT
+        4udkpjpGBia+sXIkLIOXBsuaTlBVVkhuppKmpDdjkBhDkp9t+rxXxKEZfC7Fah0vLuWEsX16J14kQ
+        iTDi+/xmZDYDDpRiJO3Ln80mvbANCN9dZ1YHac6GOcrRJjA/aE2lJaIL/tDDVCfEUylL4CZlZXZZX
+        nbCeFUeaVpnHpD9IQVhtUafE52qEQizDsH/bqXEg2ls1U9f8Vd+QBwZpM706f8WpTgGDI09nTdvx6
+        baGfSswMUU47TynqNM8QZmdIAaIBUdKFdNBuvYwagQEw9nbEwfjDKkq/hBZ4WObbqHj0I0Imkq+By
+        1qK4U+Ig==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1oyPTi-006a41-0t;
+        Fri, 25 Nov 2022 03:34:14 +0000
+Date:   Fri, 25 Nov 2022 03:34:14 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Jeff Layton <jlayton@kernel.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        David Teigland <teigland@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
         Namjae Jeon <linkinjeon@kernel.org>,
-        Luis Henriques <lhenriques@suse.com>,
-        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
-        Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        Luis Henriques <lhenriques@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        "Darrick J. Wong" <djwong@kernel.org>, hch@lst.de,
+        linux-kernel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        devel@lists.orangefs.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH] filelock: move file locking definitions to separate
+ header file
+Message-ID: <Y4A3tmISFIR7ERfE@ZenIV>
+References: <20221120210004.381842-1-jlayton@kernel.org>
+ <Y3xHQwM3UiD/SK0K@casper.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y3xHQwM3UiD/SK0K@casper.infradead.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Nov 17, 2022 at 10:53 PM Amir Goldstein <amir73il@gmail.com> wrote:
->
-> Commit 868f9f2f8e00 ("vfs: fix copy_file_range() regression in cross-fs
-> copies") removed fallback to generic_copy_file_range() for cross-fs
-> cases inside vfs_copy_file_range().
->
-> To preserve behavior of nfsd and ksmbd server-side-copy, the fallback to
-> generic_copy_file_range() was added in nfsd and ksmbd code, but that
-> call is missing sb_start_write(), fsnotify hooks and more.
->
-> Ideally, nfsd and ksmbd would pass a flag to vfs_copy_file_range() that
-> will take care of the fallback, but that code would be subtle and we got
-> vfs_copy_file_range() logic wrong too many times already.
->
-> Instead, add a flag to explicitly request vfs_copy_file_range() to
-> perform only generic_copy_file_range() and let nfsd and ksmbd use this
-> flag only in the fallback path.
->
-> This choise keeps the logic changes to minimum in the non-nfsd/ksmbd code
-> paths to reduce the risk of further regressions.
->
-> Fixes: 868f9f2f8e00 ("vfs: fix copy_file_range() regression in cross-fs copies")
-> Tested-by: Namjae Jeon <linkinjeon@kernel.org>
-> Tested-by: Luis Henriques <lhenriques@suse.de>
-> Signed-off-by: Amir Goldstein <amir73il@gmail.com>
-> ---
->
-> Hi Linus,
->
-> I've tried Al, but he seems to be AFK, so since you ended up applying
-> the regressing commit, I might as well send you the fix as well.
->
-> I intentionally chose a fix "for dummies", because I'd like to end this
-> copy_file_range() regression streak.
->
-> I ran the copy_range fstests group on ext4/xfs/overlay to verify no
-> regressions in local fs and nfsv3/nfsv4 to test server-side-copy.
->
-> I also patched copy_file_range() locally to test the "dumb" fallback
-> code on local fs.
->
-> Namje tested ksmbd.
->
-> Please apply.
->
+On Tue, Nov 22, 2022 at 03:51:31AM +0000, Matthew Wilcox wrote:
+> On Sun, Nov 20, 2022 at 03:59:57PM -0500, Jeff Layton wrote:
+> > Move the file locking definitions to a new header file, and add the
+> > appropriate #include directives to the source files that need them. By
+> > doing this we trim down fs.h a bit and limit the amount of rebuilding
+> > that has to be done when we make changes to the file locking APIs.
+> 
+> I'm in favour of this in general, but I think there's a few implicit
+> includes.  Can you create a test.c that only #include
+> <linnux/filelock.h> and see if there's anything missing?
+> 
+> > +	wait_queue_head_t fl_wait;
+> > +	struct file *fl_file;
+> 
+> These two seem undefined at this point.
+> 
+> > +	struct fasync_struct *	fl_fasync; /* for lease break notifications */
+> 
+> Likewise.
 
-Ping.
+#include <linux/wait.h>
 
-Happy Thanksgiving!
-Amir.
+struct file;
+struct fasync_struct;
 
->
-> Changes since v1:
-> - Added Tested-by's
->
->  fs/ksmbd/vfs.c     |  6 +++---
->  fs/nfsd/vfs.c      |  4 ++--
->  fs/read_write.c    | 19 +++++++++++++++----
->  include/linux/fs.h |  8 ++++++++
->  4 files changed, 28 insertions(+), 9 deletions(-)
->
-> diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
-> index 8de970d6146f..94b8ed4ef870 100644
-> --- a/fs/ksmbd/vfs.c
-> +++ b/fs/ksmbd/vfs.c
-> @@ -1794,9 +1794,9 @@ int ksmbd_vfs_copy_file_ranges(struct ksmbd_work *work,
->                 ret = vfs_copy_file_range(src_fp->filp, src_off,
->                                           dst_fp->filp, dst_off, len, 0);
->                 if (ret == -EOPNOTSUPP || ret == -EXDEV)
-> -                       ret = generic_copy_file_range(src_fp->filp, src_off,
-> -                                                     dst_fp->filp, dst_off,
-> -                                                     len, 0);
-> +                       ret = vfs_copy_file_range(src_fp->filp, src_off,
-> +                                                 dst_fp->filp, dst_off, len,
-> +                                                 COPY_FILE_SPLICE);
->                 if (ret < 0)
->                         return ret;
->
-> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
-> index f650afedd67f..5cf11cde51f8 100644
-> --- a/fs/nfsd/vfs.c
-> +++ b/fs/nfsd/vfs.c
-> @@ -596,8 +596,8 @@ ssize_t nfsd_copy_file_range(struct file *src, u64 src_pos, struct file *dst,
->         ret = vfs_copy_file_range(src, src_pos, dst, dst_pos, count, 0);
->
->         if (ret == -EOPNOTSUPP || ret == -EXDEV)
-> -               ret = generic_copy_file_range(src, src_pos, dst, dst_pos,
-> -                                             count, 0);
-> +               ret = vfs_copy_file_range(src, src_pos, dst, dst_pos, count,
-> +                                         COPY_FILE_SPLICE);
->         return ret;
->  }
->
-> diff --git a/fs/read_write.c b/fs/read_write.c
-> index 328ce8cf9a85..24b9668d6377 100644
-> --- a/fs/read_write.c
-> +++ b/fs/read_write.c
-> @@ -1388,6 +1388,8 @@ ssize_t generic_copy_file_range(struct file *file_in, loff_t pos_in,
->                                 struct file *file_out, loff_t pos_out,
->                                 size_t len, unsigned int flags)
->  {
-> +       lockdep_assert(sb_write_started(file_inode(file_out)->i_sb));
-> +
->         return do_splice_direct(file_in, &pos_in, file_out, &pos_out,
->                                 len > MAX_RW_COUNT ? MAX_RW_COUNT : len, 0);
->  }
-> @@ -1424,7 +1426,9 @@ static int generic_copy_file_checks(struct file *file_in, loff_t pos_in,
->          * and several different sets of file_operations, but they all end up
->          * using the same ->copy_file_range() function pointer.
->          */
-> -       if (file_out->f_op->copy_file_range) {
-> +       if (flags & COPY_FILE_SPLICE) {
-> +               /* cross sb splice is allowed */
-> +       } else if (file_out->f_op->copy_file_range) {
->                 if (file_in->f_op->copy_file_range !=
->                     file_out->f_op->copy_file_range)
->                         return -EXDEV;
-> @@ -1474,8 +1478,9 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
->                             size_t len, unsigned int flags)
->  {
->         ssize_t ret;
-> +       bool splice = flags & COPY_FILE_SPLICE;
->
-> -       if (flags != 0)
-> +       if (flags & ~COPY_FILE_SPLICE)
->                 return -EINVAL;
->
->         ret = generic_copy_file_checks(file_in, pos_in, file_out, pos_out, &len,
-> @@ -1501,14 +1506,14 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
->          * same sb using clone, but for filesystems where both clone and copy
->          * are supported (e.g. nfs,cifs), we only call the copy method.
->          */
-> -       if (file_out->f_op->copy_file_range) {
-> +       if (!splice && file_out->f_op->copy_file_range) {
->                 ret = file_out->f_op->copy_file_range(file_in, pos_in,
->                                                       file_out, pos_out,
->                                                       len, flags);
->                 goto done;
->         }
->
-> -       if (file_in->f_op->remap_file_range &&
-> +       if (!splice && file_in->f_op->remap_file_range &&
->             file_inode(file_in)->i_sb == file_inode(file_out)->i_sb) {
->                 ret = file_in->f_op->remap_file_range(file_in, pos_in,
->                                 file_out, pos_out,
-> @@ -1528,6 +1533,8 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
->          * consistent story about which filesystems support copy_file_range()
->          * and which filesystems do not, that will allow userspace tools to
->          * make consistent desicions w.r.t using copy_file_range().
-> +        *
-> +        * We also get here if caller (e.g. nfsd) requested COPY_FILE_SPLICE.
->          */
->         ret = generic_copy_file_range(file_in, pos_in, file_out, pos_out, len,
->                                       flags);
-> @@ -1582,6 +1589,10 @@ SYSCALL_DEFINE6(copy_file_range, int, fd_in, loff_t __user *, off_in,
->                 pos_out = f_out.file->f_pos;
->         }
->
-> +       ret = -EINVAL;
-> +       if (flags != 0)
-> +               goto out;
-> +
->         ret = vfs_copy_file_range(f_in.file, pos_in, f_out.file, pos_out, len,
->                                   flags);
->         if (ret > 0) {
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index e654435f1651..59ae95ddb679 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -2089,6 +2089,14 @@ struct dir_context {
->   */
->  #define REMAP_FILE_ADVISORY            (REMAP_FILE_CAN_SHORTEN)
->
-> +/*
-> + * These flags control the behavior of vfs_copy_file_range().
-> + * They are not available to the user via syscall.
-> + *
-> + * COPY_FILE_SPLICE: call splice direct instead of fs clone/copy ops
-> + */
-> +#define COPY_FILE_SPLICE               (1 << 0)
-> +
->  struct iov_iter;
->  struct io_uring_cmd;
->
-> --
-> 2.25.1
->
+
