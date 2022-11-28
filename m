@@ -2,76 +2,148 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83875C46467
-	for <linux-cifs@archiver.kernel.org>; Sun, 27 Nov 2022 20:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94327C433FE
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Nov 2022 10:54:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbiK0Uty (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 27 Nov 2022 15:49:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48168 "EHLO
+        id S229653AbiK1KyC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 28 Nov 2022 05:54:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbiK0Utu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 27 Nov 2022 15:49:50 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62E33DF1F
-        for <linux-cifs@vger.kernel.org>; Sun, 27 Nov 2022 12:49:49 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id c2so6009000qko.1
-        for <linux-cifs@vger.kernel.org>; Sun, 27 Nov 2022 12:49:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0EcRsn3mpfYpm/vhZ/v7NRpfbut+cY/FRel9FddrnfI=;
-        b=KBcUhnkE30+t44sLhT0QIA/TKDoVVcw2IDATdES6KfLCITZM1dINmG7lHKlIAtF5Bv
-         XYen05Yj2oFW9mtHJEXYSDUF20MEYEfNCJOIA7Ao4ErgCMxXzNeUrFhRHU4n0UR5efBV
-         NPgtVWwXuMjsplabdQq4ltrd1s/IVTuK0fB6M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0EcRsn3mpfYpm/vhZ/v7NRpfbut+cY/FRel9FddrnfI=;
-        b=GbYkHrXUNTUTE5mNWH1e7oQSL1Hl1o2GftzYo5G3t24Xsuxuek0KPptov7pjqqTVSx
-         l4Au0IuWam150kjENmOcBWj1L3dtSzXAmSi7kI8UjA5SK/EbD21MKoEsJcMbCYbTIi7D
-         vJNH9t8ZMMOzjR5RMrq0PMyegkwpby8Qn30UwApOvLy4LuEdKeVu5+mXegCMoHNQbLqn
-         1jaSc26i30Nem8pIbhl02Ns3JGC4Woyn/jngPPAyWI5Jgpavn7+9zLDsiw9FKUoX+y9n
-         S+D2xo2UlHSVpjnMzKYbHyccCg6X2Y8UqP2wpu+RSs/gss/hNiFH1ioxnGcDThO0QCn+
-         N+UQ==
-X-Gm-Message-State: ANoB5pnVMkqBAPRKmb24cq2F6plV3CsYBPU1V4YBkCOj4+rH10BKWxAR
-        8c6pfPVSQYmRCXtmkR/Iyg6K+Acmypidew==
-X-Google-Smtp-Source: AA0mqf4aHXE19aFWJQdQ1y1KyNCSnDdS1Bdqdkk/GGguJltJXQZG6fs/7L7qp2LeIjs/xIbkYwSSoQ==
-X-Received: by 2002:a37:92c6:0:b0:6f9:f247:8864 with SMTP id u189-20020a3792c6000000b006f9f2478864mr26143645qkd.100.1669582188283;
-        Sun, 27 Nov 2022 12:49:48 -0800 (PST)
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com. [209.85.222.173])
-        by smtp.gmail.com with ESMTPSA id bl3-20020a05622a244300b00399fe4aac3esm5823944qtb.50.2022.11.27.12.49.46
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 27 Nov 2022 12:49:46 -0800 (PST)
-Received: by mail-qk1-f173.google.com with SMTP id j26so5985268qki.10
-        for <linux-cifs@vger.kernel.org>; Sun, 27 Nov 2022 12:49:46 -0800 (PST)
-X-Received: by 2002:ae9:e00c:0:b0:6f8:1e47:8422 with SMTP id
- m12-20020ae9e00c000000b006f81e478422mr43523021qkk.72.1669582186451; Sun, 27
- Nov 2022 12:49:46 -0800 (PST)
-MIME-Version: 1.0
-References: <20221117205249.1886336-1-amir73il@gmail.com>
-In-Reply-To: <20221117205249.1886336-1-amir73il@gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun, 27 Nov 2022 12:49:30 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wgnnhUqO8mv4=0ri=Q8xYd9dpHm+_r61CTMCkQKj9fN=w@mail.gmail.com>
-Message-ID: <CAHk-=wgnnhUqO8mv4=0ri=Q8xYd9dpHm+_r61CTMCkQKj9fN=w@mail.gmail.com>
-Subject: Re: [PATCH v2] vfs: fix copy_file_range() averts filesystem freeze protection
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        with ESMTP id S229603AbiK1KyB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Nov 2022 05:54:01 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D70701E4;
+        Mon, 28 Nov 2022 02:54:00 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 73DA360F9F;
+        Mon, 28 Nov 2022 10:54:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02102C433D6;
+        Mon, 28 Nov 2022 10:53:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669632839;
+        bh=TCH4X0vYXDYZIjposZLwuZH5bK38a+ap9JQQcvpsmrQ=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=NiNiD/NIPJwPZZvubu2no8wdsdDDjItBldgVSQaImG5cxRrl7n6IQYZBc0nV5JpBQ
+         xVnrX+B1v8v8ehMk7vofau11mkaKHiqPTVjq0mOg6uPLSQDNcWU6ra7XZX/5SPPGhe
+         3NTDUsRcNblciTaLJIOHNpisMvl41lRYHx3bKhRvui4ToVySHHAMBffDg6ovppKkDe
+         qsAeUfpeq06hna20AvMvcPdONgQBIVeU0n576fCL1sfDRo1XzYu64pPEHg4b2C61ur
+         Lr2NVgPJPqeEYUjJtggTrBXIJXDvpIqIvFPOspCvYeix5kRtYTD6U+z1lN7Xo1zCxs
+         ZI6W95+J1AmkQ==
+Message-ID: <6a093484bb977355db40c70ffa51386f3d4ed57b.camel@kernel.org>
+Subject: Re: [PATCH] filelock: move file locking definitions to separate
+ header file
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        David Teigland <teigland@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
         Namjae Jeon <linkinjeon@kernel.org>,
-        Luis Henriques <lhenriques@suse.com>,
-        Olga Kornievskaia <olga.kornievskaia@gmail.com>,
-        Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        Luis Henriques <lhenriques@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        "Darrick J. Wong" <djwong@kernel.org>, hch@lst.de,
+        linux-kernel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
+        devel@lists.orangefs.org, linux-xfs@vger.kernel.org
+Date:   Mon, 28 Nov 2022 05:53:54 -0500
+In-Reply-To: <Y4Dw65Nzt4bX9esd@ZenIV>
+References: <20221120210004.381842-1-jlayton@kernel.org>
+         <Y4A6/ozhUncxbimi@ZenIV>
+         <1d474f53670771f324745f597ec94b63a006d687.camel@kernel.org>
+         <Y4Dw65Nzt4bX9esd@ZenIV>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ok, this is finally in my tree now. Thanks,
+On Fri, 2022-11-25 at 16:44 +0000, Al Viro wrote:
+> On Fri, Nov 25, 2022 at 08:23:45AM -0500, Jeff Layton wrote:
+>=20
+> > I left it in fs.h for now. Some of the file_operations prototypes need
+> > that typedef, and I figure that anyone who is including filelock.h will
+> > almost certainly need to include fs.h anyway. We could move it into a
+> > separate header too, but it's probably not worth it.
+> >=20
+> > HCH mentioned years ago though that we should just get rid of fl_owner_=
+t
+> > altogether and just use 'void *'. I didn't do it at the time because I
+> > was focused on other changes, but this might be a good time to change
+> > it.
+>=20
+> Might be...
+>=20
+> > > > +extern void show_fd_locks(struct seq_file *f,
+> > > > +			 struct file *filp, struct files_struct *files);
+> > >=20
+> > > If anything, that would be better off as fl_owner_t...  Again, a sepa=
+rate
+> > > patch.
+> >=20
+> > I'm not sure what you mean here. This prototype hasn't changed, and is
+> > only called from procfs.
+>=20
+> Take a look at that function and its caller.  The use of 'files' argument=
+ there
+> is (and can be) only as an opaque pointer to be compared to ->fl_owner; a=
+t that
+> point it might be pointing to freed memory, for all we know (and give fal=
+se
+> positives if already reused).
 
-             Linus
+Ok. What we want this function to do is show any traditional POSIX or
+OFD locks that were set on a particular file. The logic in
+__show_fd_locks looks right, but you're correct that we don't want
+anyone dereferencing those pointers in that codepath.
+
+Note too that this info is not wholly reliable. POSIX locks can merge
+with other locks that were set within the same process (same
+files_struct) but on different fds.
+
+I think we want to get rid of fl_owner_t anyway. Maybe we should replace
+it with an unsigned long instead of void * to discourage anyone from
+trying to dereference those pointers?
+
+> TBH, I'd never been able to finish the audit of files_struct pointers pas=
+sed
+> into locks subsystem; there definitely are moments when code from fs/lock=
+s.c
+> is dealing with pointers to already freed instances - show_fd_locks() at =
+the
+> very least.  They are not dereferenced, but beyond that...
+
+Yeah. In general, we try to ensure that locks are torn down before the
+file with which it is associated, but with some of the delayed freeing,
+they can outlive the file at times. For example:
+
+    https://tracker.ceph.com/issues/57986
+
+--=20
+Jeff Layton <jlayton@kernel.org>
