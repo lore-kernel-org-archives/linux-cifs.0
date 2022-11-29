@@ -2,109 +2,79 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BF1C4321E
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Nov 2022 11:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D816CC4321E
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Nov 2022 14:03:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233074AbiK2LTw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 29 Nov 2022 06:19:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
+        id S232670AbiK2ODI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Nov 2022 09:03:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232955AbiK2LTo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Nov 2022 06:19:44 -0500
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C60D5DBA0
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Nov 2022 03:19:41 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id m7-20020a05600c090700b003cf8a105d9eso10528080wmp.5
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Nov 2022 03:19:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gl0GD9JnH6cpxJhbsuvz2kuf9WhGyPLw4aqUGuCfQWA=;
-        b=uT/KmvVxsVHSojKFXypr0XGGPFixtwQ6mS3J6zI48Tip94Ze7B62Zdw6YesDzTSMNu
-         rx7aK9WT6XqGRV6MbOa9ZJSy1tWKyp97vDdXDKGBicwY+3J5HzVc+xCcZ+mVKiRMDtt/
-         stVMRIfRSfdjBstMcbvooh7UTeGNdYidYaef7E8CaXHzqJPKfxRKJbPS579gC0qoIk39
-         Bz6JKpTuS5/AgXyp+tpT357+P0w5rlFZ7atpS+2flKgWlbIl0NCEx+nffslutKCNirho
-         OBBPKQ1EgvecymBTHaqVmVD8p5fNF49NhpV2OARpD/igfTa/k1h+YOALG6kgzSkSNPNa
-         6tIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gl0GD9JnH6cpxJhbsuvz2kuf9WhGyPLw4aqUGuCfQWA=;
-        b=Ynu2non7a5UFWc0WgyyiibxvKA5kcDhF9QNdWCPTbeX5WZbODkQ1dVtXbiP2WqFLxM
-         0fhu+89wmhYRdUSj/IAkOHJ1wWcBXgH7/AC568crfdxuFt2LivvHrTIG2ZO7guhil+X2
-         Ixked/KuFANXahZVlHJx2onuwgIdu1GjC+Rl78Yv+2GYRDz8sqh9nbGc+I4jBYIESHjJ
-         Or61LqSWr+xeWl+TqLGIpC1Ww6xLowau2PZUqKU9rF79GQvu1eUf3FlLcW6iCqMyLhsv
-         3r5S2GrIaux852kuLUA6sWKrPQStlB0ACDUSmG/NK1GVSdg4nkNLhh0cJn0v/nbrc7wQ
-         VGOA==
-X-Gm-Message-State: ANoB5pnMYyuAS2q5e8QZyHTXssJ1rpT77c3Fmf3b8I3WkVsGBbK0soep
-        9RZ55++O3zy+k1FMDpnTyWgiN4lJq/R9ZZTV
-X-Google-Smtp-Source: AA0mqf6s+tPE+SgTjpPt3Sun2U4COJ9Ba0Ene9WaCmjPrBqZ09tXI4hxGh8HNxCCE1XPU5diEZIV7Q==
-X-Received: by 2002:a05:600c:4e09:b0:3cf:55bd:4944 with SMTP id b9-20020a05600c4e0900b003cf55bd4944mr43665573wmq.64.1669720779498;
-        Tue, 29 Nov 2022 03:19:39 -0800 (PST)
-Received: from marios-t5500.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
-        by smtp.gmail.com with ESMTPSA id dn11-20020a05600c654b00b003c701c12a17sm1693425wmb.12.2022.11.29.03.19.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Nov 2022 03:19:39 -0800 (PST)
-From:   Marios Makassikis <mmakassikis@freebox.fr>
-To:     linux-cifs@vger.kernel.org
-Cc:     Marios Makassikis <mmakassikis@freebox.fr>
-Subject: [PATCH] ksmbd: Fix resource leak in smb2_lock()
-Date:   Tue, 29 Nov 2022 12:19:33 +0100
-Message-Id: <20221129111933.2251777-1-mmakassikis@freebox.fr>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S233706AbiK2OCt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Nov 2022 09:02:49 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0251813D20;
+        Tue, 29 Nov 2022 06:02:49 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7710168BEB; Tue, 29 Nov 2022 15:02:42 +0100 (CET)
+Date:   Tue, 29 Nov 2022 15:02:42 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Benjamin Coddington <bcodding@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Steve French <sfrench@samba.org>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        David Teigland <teigland@redhat.com>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, cluster-devel@redhat.com,
+        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
+        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
+Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
+Message-ID: <20221129140242.GA15747@lst.de>
+References: <cover.1669036433.git.bcodding@redhat.com> <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-"flock" is leaked if an error happens before smb2_lock_init(), as the
-lock is not added to the lock_list to be cleaned up.
-
-Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
----
- fs/ksmbd/smb2pdu.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index b2fc85d440d0..58da085413a6 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -6855,6 +6855,7 @@ int smb2_lock(struct ksmbd_work *work)
- 		if (lock_start > U64_MAX - lock_length) {
- 			pr_err("Invalid lock range requested\n");
- 			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
-+			locks_free_lock(flock);
- 			goto out;
- 		}
- 
-@@ -6874,6 +6875,7 @@ int smb2_lock(struct ksmbd_work *work)
- 				    "the end offset(%llx) is smaller than the start offset(%llx)\n",
- 				    flock->fl_end, flock->fl_start);
- 			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
-+			locks_free_lock(flock);
- 			goto out;
- 		}
- 
-@@ -6885,6 +6887,7 @@ int smb2_lock(struct ksmbd_work *work)
- 				    flock->fl_type != F_UNLCK) {
- 					pr_err("conflict two locks in one request\n");
- 					err = -EINVAL;
-+					locks_free_lock(flock);
- 					goto out;
- 				}
- 			}
-@@ -6893,6 +6896,7 @@ int smb2_lock(struct ksmbd_work *work)
- 		smb_lock = smb2_lock_init(flock, cmd, flags, &lock_list);
- 		if (!smb_lock) {
- 			err = -EINVAL;
-+			locks_free_lock(flock);
- 			goto out;
- 		}
- 	}
--- 
-2.25.1
-
+Hmm.  Having to set a flag to not accidentally corrupt per-task
+state seems a bit fragile.  Wouldn't it make sense to find a way to opt
+into the feature only for sockets created from the syscall layer?
