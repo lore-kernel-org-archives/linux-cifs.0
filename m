@@ -2,81 +2,109 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38775C4332F
-	for <linux-cifs@archiver.kernel.org>; Mon, 28 Nov 2022 17:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BF1C4321E
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Nov 2022 11:19:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232922AbiK1RW2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 28 Nov 2022 12:22:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39248 "EHLO
+        id S233074AbiK2LTw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Nov 2022 06:19:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232144AbiK1RW1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Nov 2022 12:22:27 -0500
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EFC319B
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Nov 2022 09:22:26 -0800 (PST)
-Received: by mail-lj1-x22b.google.com with SMTP id h5so9708945ljk.11
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Nov 2022 09:22:26 -0800 (PST)
+        with ESMTP id S232955AbiK2LTo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Nov 2022 06:19:44 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C60D5DBA0
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Nov 2022 03:19:41 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id m7-20020a05600c090700b003cf8a105d9eso10528080wmp.5
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Nov 2022 03:19:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wSE3Ldymljc0w6HwknemxKCjum4rM1V9tzMeV8n5h4E=;
-        b=o0RhSxYUsqXyrYS5DhF+tqAWqCErYUF1wHjacCcKCgoBxKiMwhxTPnmu8r3P4xSBb8
-         iPameT3iozJNV8LxPyjczsWOyr9pop7IoYSAUglW0xPvhUocFGwHKTWjvQxG0NupXtTs
-         img3iLhHhh5GRcoLb1huw6wDXSmxxQyGwZnrKmkDgMCNNTx5Ciy3EKrXaXDQvVv+EEI8
-         MFax8wCxYByeIaQOdgo36Ry3XHyB0WjrYhEthWxgWjA7dO9YrpyBFFqwTFuq5J8NJT6L
-         c6Z/lc1WFHomn56tM1pIRvHdPmiR6LGZqC/k92J1u6Mb9cAwpLwkImIgd8DTzElgxRke
-         xAoA==
+        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gl0GD9JnH6cpxJhbsuvz2kuf9WhGyPLw4aqUGuCfQWA=;
+        b=uT/KmvVxsVHSojKFXypr0XGGPFixtwQ6mS3J6zI48Tip94Ze7B62Zdw6YesDzTSMNu
+         rx7aK9WT6XqGRV6MbOa9ZJSy1tWKyp97vDdXDKGBicwY+3J5HzVc+xCcZ+mVKiRMDtt/
+         stVMRIfRSfdjBstMcbvooh7UTeGNdYidYaef7E8CaXHzqJPKfxRKJbPS579gC0qoIk39
+         Bz6JKpTuS5/AgXyp+tpT357+P0w5rlFZ7atpS+2flKgWlbIl0NCEx+nffslutKCNirho
+         OBBPKQ1EgvecymBTHaqVmVD8p5fNF49NhpV2OARpD/igfTa/k1h+YOALG6kgzSkSNPNa
+         6tIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wSE3Ldymljc0w6HwknemxKCjum4rM1V9tzMeV8n5h4E=;
-        b=MmrDSK+9R1dgPgdWvbi3gGlyVROqF05l4oTZgYVis6Kl2ZEqZwD7sNAbPrvniWSYTm
-         MwWEYXZxrdxF5fiBdGF6R4X2axbuLyiDCEDT+Lu6V6kkBe12HLp9bmQmUDFokTieyQ+d
-         Npl5JLqDsik7Uij9gngimUVioJ8ZPFvDqTrRNmImOgxOk6cKcf8vkTYy2pLQzLOV0X2q
-         a46J3rN68d2Y9J3ZaDsYZstZ9rR83eAXtCGXVIuSe0Ch9Y8VaLx+wXsRNO89lzjJYFj0
-         ekWg5ffvMiNxe6dTL5A81cbO4hLV6DIr7Xu/0TsM/6KYflJk5hxYMFFwdWf9c8J6a/5n
-         17lw==
-X-Gm-Message-State: ANoB5pkdbWnBqz2i/GOiGrOo0iaKRWewBJ/2EPNGas3rM325QsSz96DC
-        JocA3TRCRZ+W20T0+GF90fO/yadYN45dSa9lI+0I5Hzw2rE=
-X-Google-Smtp-Source: AA0mqf6TDmGbCN49eOgSwWynhZWGRaaTsoGhtUiiFhy5O2UVMkTxbLs9uUkO3vvo8tgvdRMm0KsqdvHGPXWq/L9XmWg=
-X-Received: by 2002:a05:651c:2ca:b0:277:1e9b:2b07 with SMTP id
- f10-20020a05651c02ca00b002771e9b2b07mr18360111ljo.242.1669656144372; Mon, 28
- Nov 2022 09:22:24 -0800 (PST)
+        bh=gl0GD9JnH6cpxJhbsuvz2kuf9WhGyPLw4aqUGuCfQWA=;
+        b=Ynu2non7a5UFWc0WgyyiibxvKA5kcDhF9QNdWCPTbeX5WZbODkQ1dVtXbiP2WqFLxM
+         0fhu+89wmhYRdUSj/IAkOHJ1wWcBXgH7/AC568crfdxuFt2LivvHrTIG2ZO7guhil+X2
+         Ixked/KuFANXahZVlHJx2onuwgIdu1GjC+Rl78Yv+2GYRDz8sqh9nbGc+I4jBYIESHjJ
+         Or61LqSWr+xeWl+TqLGIpC1Ww6xLowau2PZUqKU9rF79GQvu1eUf3FlLcW6iCqMyLhsv
+         3r5S2GrIaux852kuLUA6sWKrPQStlB0ACDUSmG/NK1GVSdg4nkNLhh0cJn0v/nbrc7wQ
+         VGOA==
+X-Gm-Message-State: ANoB5pnMYyuAS2q5e8QZyHTXssJ1rpT77c3Fmf3b8I3WkVsGBbK0soep
+        9RZ55++O3zy+k1FMDpnTyWgiN4lJq/R9ZZTV
+X-Google-Smtp-Source: AA0mqf6s+tPE+SgTjpPt3Sun2U4COJ9Ba0Ene9WaCmjPrBqZ09tXI4hxGh8HNxCCE1XPU5diEZIV7Q==
+X-Received: by 2002:a05:600c:4e09:b0:3cf:55bd:4944 with SMTP id b9-20020a05600c4e0900b003cf55bd4944mr43665573wmq.64.1669720779498;
+        Tue, 29 Nov 2022 03:19:39 -0800 (PST)
+Received: from marios-t5500.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
+        by smtp.gmail.com with ESMTPSA id dn11-20020a05600c654b00b003c701c12a17sm1693425wmb.12.2022.11.29.03.19.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Nov 2022 03:19:39 -0800 (PST)
+From:   Marios Makassikis <mmakassikis@freebox.fr>
+To:     linux-cifs@vger.kernel.org
+Cc:     Marios Makassikis <mmakassikis@freebox.fr>
+Subject: [PATCH] ksmbd: Fix resource leak in smb2_lock()
+Date:   Tue, 29 Nov 2022 12:19:33 +0100
+Message-Id: <20221129111933.2251777-1-mmakassikis@freebox.fr>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <Y4DJ2o6w+SxIH7Yl@sernet.de> <CAH2r5mscUWuAbsSjw1DOFT=yG3dDZhcmCtAVLNhoH-5hrby-tg@mail.gmail.com>
- <Y4TNnusYnxfwYN0s@sernet.de>
-In-Reply-To: <Y4TNnusYnxfwYN0s@sernet.de>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 28 Nov 2022 11:22:13 -0600
-Message-ID: <CAH2r5mtZpmX5EQPD8AqZNLuskimE0=NG8du6gRHXivxNv1uuCg@mail.gmail.com>
-Subject: Re: Parse owner and group sids from smb311 posix extension qfileinfo call
-To:     Volker.Lendecke@sernet.de
-Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-updated patch in for-next and added Paulo's RB
+"flock" is leaked if an error happens before smb2_lock_init(), as the
+lock is not added to the lock_list to be cleaned up.
 
-On Mon, Nov 28, 2022 at 9:03 AM Volker Lendecke
-<Volker.Lendecke@sernet.de> wrote:
->
-> Am Sat, Nov 26, 2022 at 06:31:51PM -0600 schrieb Steve French:
-> > Looks like this does help the group information returned by stat, but
-> > will need to make it easier to translate the owner sid to UID (GID was
-> > an easier mapping since gid was returned as "S-1-22-"... but SID for
-> > uid owner has to be looked up)
->
-> Next version. I have to learn that -EINVAL and not EINVAL is the right
-> error return in the kernel.
+Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+---
+ fs/ksmbd/smb2pdu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-
-
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index b2fc85d440d0..58da085413a6 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -6855,6 +6855,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 		if (lock_start > U64_MAX - lock_length) {
+ 			pr_err("Invalid lock range requested\n");
+ 			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
++			locks_free_lock(flock);
+ 			goto out;
+ 		}
+ 
+@@ -6874,6 +6875,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 				    "the end offset(%llx) is smaller than the start offset(%llx)\n",
+ 				    flock->fl_end, flock->fl_start);
+ 			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
++			locks_free_lock(flock);
+ 			goto out;
+ 		}
+ 
+@@ -6885,6 +6887,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 				    flock->fl_type != F_UNLCK) {
+ 					pr_err("conflict two locks in one request\n");
+ 					err = -EINVAL;
++					locks_free_lock(flock);
+ 					goto out;
+ 				}
+ 			}
+@@ -6893,6 +6896,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 		smb_lock = smb2_lock_init(flock, cmd, flags, &lock_list);
+ 		if (!smb_lock) {
+ 			err = -EINVAL;
++			locks_free_lock(flock);
+ 			goto out;
+ 		}
+ 	}
 -- 
-Thanks,
+2.25.1
 
-Steve
