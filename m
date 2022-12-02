@@ -2,118 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 019F8C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Dec 2022 09:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26EB5C4332F
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Dec 2022 09:45:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232409AbiLBJof (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 2 Dec 2022 04:44:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
+        id S233001AbiLBJpT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 2 Dec 2022 04:45:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232584AbiLBJoR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Dec 2022 04:44:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9FA21409E
-        for <linux-cifs@vger.kernel.org>; Fri,  2 Dec 2022 01:43:26 -0800 (PST)
+        with ESMTP id S233007AbiLBJox (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Dec 2022 04:44:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75543C8D2F
+        for <linux-cifs@vger.kernel.org>; Fri,  2 Dec 2022 01:43:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669974205;
+        s=mimecast20190719; t=1669974233;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=JPL3HeqWrrSKDJIfWXlo82sdG8gZ+m15F8/peAepuFE=;
-        b=C+JlyDCtR57nKSm1HBGiAQr5bAoyerXOzrq/T7NrrMVhpeN0DrZCcH8ilwoz/XKZMaR9GS
-        Buhnss1ZVuY+v9HiR4QF+0vxE3CvhdZjOiFkd87jbUNUzf+YhtJCNn8ZlYzXAi0JSwZiiH
-        cTvtfb56njpKtRicE3ggUIXCRxzMZaY=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=coJ6ZwB6vq1bKOKZ1ImRVDxiA5RDC8EMY0DOiTntObo=;
+        b=VPnrjc14arXau0AbK4EDGKg3EhJTKvyNpT8+IxoMWp+2I0VOIRz4DtSCXzkOmSHOWMnpPW
+        u/iNSZI236GYTzlV7+pwRpyNsqgPCBwX+IDw0WZwKIMvd53yQDVYtD8b6kzJyTGGawcDBS
+        ATyKLuGQz3COx6YnCyjSydS9vgroa04=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-348-6efNmvdpPW2mpW2TiorUrg-1; Fri, 02 Dec 2022 04:43:22 -0500
-X-MC-Unique: 6efNmvdpPW2mpW2TiorUrg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-153-M1MJ7vYqMjSJfcdU7hUj3A-1; Fri, 02 Dec 2022 04:43:50 -0500
+X-MC-Unique: M1MJ7vYqMjSJfcdU7hUj3A-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0DD0338173CB;
-        Fri,  2 Dec 2022 09:43:22 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F337738173D2;
+        Fri,  2 Dec 2022 09:43:49 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.116])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A55E2028E96;
-        Fri,  2 Dec 2022 09:43:19 +0000 (UTC)
-Subject: [PATCH v3 0/4] iov_iter: Add extraction helpers
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 618F5492B06;
+        Fri,  2 Dec 2022 09:43:48 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH v3 3/4] netfs: Add a function to extract a UBUF or IOVEC into
+ a BVEC iterator
 From:   David Howells <dhowells@redhat.com>
 To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-fsdevel@vger.kernel.org,
+Cc:     Jeff Layton <jlayton@kernel.org>, Steve French <sfrench@samba.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, linux-cachefs@redhat.com,
-        linux-cifs@vger.kernel.org, linux-mm@kvack.org,
-        Steve French <sfrench@samba.org>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, dhowells@redhat.com,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jeff Layton <jlayton@kernel.org>,
         Logan Gunthorpe <logang@deltatee.com>,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 02 Dec 2022 09:43:16 +0000
-Message-ID: <166997419665.9475.15014699817597102032.stgit@warthog.procyon.org.uk>
+Date:   Fri, 02 Dec 2022 09:43:45 +0000
+Message-ID: <166997422579.9475.12101700945635692496.stgit@warthog.procyon.org.uk>
+In-Reply-To: <166997419665.9475.15014699817597102032.stgit@warthog.procyon.org.uk>
+References: <166997419665.9475.15014699817597102032.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/1.5
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Add a function to extract the pages from a user-space supplied iterator
+(UBUF- or IOVEC-type) into a BVEC-type iterator, retaining the pages by
+getting a ref on them (WRITE) or pinning them (READ) as we go.
 
-Hi Al,
+This is useful in three situations:
 
-Here are four patches to provide support for extracting pages from an
-iov_iter, where such a thing makes sense, if you could take a look?
+ (1) A userspace thread may have a sibling that unmaps or remaps the
+     process's VM during the operation, changing the assignment of the
+     pages and potentially causing an error.  Retaining the pages keeps
+     some pages around, even if this occurs; futher, we find out at the
+     point of extraction if EFAULT is going to be incurred.
 
-[!] NOTE that I've switched the functions to be exported GPL-only at
-    Christoph's request[1].  They are, however, intended as a replacement
-    for iov_iter_get_pages*(), which is not marked _GPL - so that
-    functionality will probably become unavailable to non-GPL 3rd party
-    modules in future.
+ (2) Pages might get swapped out/discarded if not retained, so we want to
+     retain them to avoid the reload causing a deadlock due to a DIO
+     from/to an mmapped region on the same file.
 
-The first couple of patches provide iov_iter general stuff:
+ (3) The iterator may get passed to sendmsg() by the filesystem.  If a
+     fault occurs, we may get a short write to a TCP stream that's then
+     tricky to recover from.
 
- (1) Move the FOLL_* flags to linux/mm_types.h so that linux/uio.h can make
-     use of them.
-
- (2) Add a function to list-only, get or pin pages from an iterator as a
-     future replacement for iov_iter_get_pages*().  Pointers to the pages
-     are placed into an array (which will get allocated if not provided)
-     and, depending on the iterator type and direction, the pages will have
-     a ref or a pin get on them, or left untouched (on the assumption that
-     the caller manages their lifetime).
-
-     The determination is:
-
-	UBUF/IOVEC + READ	-> pin
-	UBUF/IOVEC + WRITE	-> get
-	PIPE + READ		-> list-only
-	BVEC/XARRAY		-> list-only
-	Anything else		-> EFAULT
-
-     The function also returns an indication of which of "list only, get or
-     pin" the extraction function did to aid in cleaning up (returning 0,
-     FOLL_GET or FOLL_PIN as appropriate).
-
-Then there are a couple of patches that add stuff to netfslib that I want
-to use there as well as in cifs:
-
- (3) Add a netfslib function to use (2) to extract pages from an ITER_IOBUF
-     or ITER_UBUF iterator into an ITER_BVEC iterator.  This will get or
-     pin the pages as appropriate.
-
- (4) Add a netfslib function to extract pages from an iterator that's of
-     type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a scatterlist.
-
-     The function in (2) is used for a UBUF and IOVEC iterators, so those
-     need cleaning up afterwards.  BVEC and XARRAY iterators are ungot and
-     unpinned and may be rendered into elements that span multiple pages,
-     for example if large folios are present.
+We don't deal with other types of iterator here, leaving it to other
+mechanisms to retain the pages (eg. PG_locked, PG_writeback and the pipe
+lock).
 
 Changes:
 ========
@@ -121,41 +98,156 @@ ver #3)
  - Switch to using EXPORT_SYMBOL_GPL to prevent indirect 3rd-party access
    to get/pin_user_pages_fast()[1].
 
-ver #2)
- - Rolled the extraction cleanup mode query function into the extraction
-   function, returning the indication through the argument list.
- - Fixed patch 4 (extract to scatterlist) to actually use the new
-   extraction API.
-
-I've pushed the patches here also:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
-
-David
-
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: linux-cachefs@redhat.com
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 Link: https://lore.kernel.org/r/Y3zFzdWnWlEJ8X8/@infradead.org/ [1]
-Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166722777223.2555743.162508599131141451.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732024173.3186319.18204305072070871546.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166869687556.3723671.10061142538708346995.stgit@warthog.procyon.org.uk/ # rfc
-
+Link: https://lore.kernel.org/r/166697255265.61150.6289490555867717077.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166732026503.3186319.12020462741051772825.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166869690376.3723671.8813331570219190705.stgit@warthog.procyon.org.uk/ # rfc
 ---
-David Howells (4):
-      mm: Move FOLL_* defs to mm_types.h
-      iov_iter: Add a function to extract a page list from an iterator
-      netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
-      netfs: Add a function to extract an iterator into a scatterlist
 
-
- fs/netfs/Makefile        |   1 +
- fs/netfs/iterator.c      | 367 +++++++++++++++++++++++++++++++++++++++
- include/linux/mm.h       |  74 --------
- include/linux/mm_types.h |  73 ++++++++
- include/linux/netfs.h    |   7 +
- include/linux/uio.h      |   4 +
- lib/iov_iter.c           | 350 +++++++++++++++++++++++++++++++++++++
- mm/vmalloc.c             |   1 +
- 8 files changed, 803 insertions(+), 74 deletions(-)
+ fs/netfs/Makefile     |    1 
+ fs/netfs/iterator.c   |   99 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/netfs.h |    3 +
+ 3 files changed, 103 insertions(+)
  create mode 100644 fs/netfs/iterator.c
+
+diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+index f684c0cd1ec5..386d6fb92793 100644
+--- a/fs/netfs/Makefile
++++ b/fs/netfs/Makefile
+@@ -3,6 +3,7 @@
+ netfs-y := \
+ 	buffered_read.o \
+ 	io.o \
++	iterator.o \
+ 	main.o \
+ 	objects.o
+ 
+diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
+new file mode 100644
+index 000000000000..82a691b233ef
+--- /dev/null
++++ b/fs/netfs/iterator.c
+@@ -0,0 +1,99 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Iterator helpers.
++ *
++ * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#include <linux/export.h>
++#include <linux/slab.h>
++#include <linux/uio.h>
++#include <linux/netfs.h>
++#include "internal.h"
++
++/**
++ * netfs_extract_user_iter - Extract the pages from a user iterator into a bvec
++ * @orig: The original iterator
++ * @orig_len: The amount of iterator to copy
++ * @new: The iterator to be set up
++ * @cleanup_mode: Where to indicate the cleanup mode
++ *
++ * Extract the page fragments from the given amount of the source iterator and
++ * build up a second iterator that refers to all of those bits.  This allows
++ * the original iterator to disposed of.
++ *
++ * On success, the number of elements in the bvec is returned, the original
++ * iterator will have been advanced by the amount extracted and @*cleanup_mode
++ * will have been set to FOLL_GET, FOLL_PIN or 0.
++ */
++ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
++				struct iov_iter *new, unsigned int *cleanup_mode)
++{
++	struct bio_vec *bv = NULL;
++	struct page **pages;
++	unsigned int cur_npages;
++	unsigned int max_pages;
++	unsigned int npages = 0;
++	unsigned int i;
++	ssize_t ret;
++	size_t count = orig_len, offset, len;
++	size_t bv_size, pg_size;
++
++	if (WARN_ON_ONCE(!iter_is_ubuf(orig) && !iter_is_iovec(orig)))
++		return -EIO;
++
++	max_pages = iov_iter_npages(orig, INT_MAX);
++	bv_size = array_size(max_pages, sizeof(*bv));
++	bv = kvmalloc(bv_size, GFP_KERNEL);
++	if (!bv)
++		return -ENOMEM;
++
++	*cleanup_mode = 0;
++
++	/* Put the page list at the end of the bvec list storage.  bvec
++	 * elements are larger than page pointers, so as long as we work
++	 * 0->last, we should be fine.
++	 */
++	pg_size = array_size(max_pages, sizeof(*pages));
++	pages = (void *)bv + bv_size - pg_size;
++
++	while (count && npages < max_pages) {
++		ret = iov_iter_extract_pages(orig, &pages, count,
++					     max_pages - npages, &offset,
++					     cleanup_mode);
++		if (ret < 0) {
++			pr_err("Couldn't get user pages (rc=%zd)\n", ret);
++			break;
++		}
++
++		if (ret > count) {
++			pr_err("get_pages rc=%zd more than %zu\n", ret, count);
++			break;
++		}
++
++		count -= ret;
++		ret += offset;
++		cur_npages = DIV_ROUND_UP(ret, PAGE_SIZE);
++
++		if (npages + cur_npages > max_pages) {
++			pr_err("Out of bvec array capacity (%u vs %u)\n",
++			       npages + cur_npages, max_pages);
++			break;
++		}
++
++		for (i = 0; i < cur_npages; i++) {
++			len = ret > PAGE_SIZE ? PAGE_SIZE : ret;
++			bv[npages + i].bv_page	 = *pages++;
++			bv[npages + i].bv_offset = offset;
++			bv[npages + i].bv_len	 = len - offset;
++			ret -= len;
++			offset = 0;
++		}
++
++		npages += cur_npages;
++	}
++
++	iov_iter_bvec(new, iov_iter_rw(orig), bv, npages, orig_len - count);
++	return npages;
++}
++EXPORT_SYMBOL_GPL(netfs_extract_user_iter);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index f2402ddeafbf..eed84474e4cf 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -288,6 +288,9 @@ void netfs_get_subrequest(struct netfs_io_subrequest *subreq,
+ void netfs_put_subrequest(struct netfs_io_subrequest *subreq,
+ 			  bool was_async, enum netfs_sreq_ref_trace what);
+ void netfs_stats_show(struct seq_file *);
++ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
++				struct iov_iter *new,
++				unsigned int *cleanup_mode);
+ 
+ /**
+  * netfs_inode - Get the netfs inode context from the inode
 
 
