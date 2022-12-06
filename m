@@ -2,59 +2,145 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7003C47090
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Dec 2022 06:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ECCFC352A1
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Dec 2022 13:12:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233936AbiLFGhD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Dec 2022 01:37:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33202 "EHLO
+        id S231869AbiLFNMi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Dec 2022 08:12:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230036AbiLFGhD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Dec 2022 01:37:03 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 440B3220D1
-        for <linux-cifs@vger.kernel.org>; Mon,  5 Dec 2022 22:37:02 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 003C66732D; Tue,  6 Dec 2022 07:36:57 +0100 (CET)
-Date:   Tue, 6 Dec 2022 07:36:57 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org,
-        David Howells <dhowells@redhat.com>
-Subject: Re: RFC: remove cifs_writepage
-Message-ID: <20221206063657.GA6939@lst.de>
-References: <20221116131835.2192188-1-hch@lst.de> <CAH2r5msoMJ6jNFDtHigKOqq9EwxEb9buxGVi8duW8EMz6wwgBg@mail.gmail.com> <20221204081913.GB26937@lst.de> <CAH2r5mvZh+5S74fec0o8EGf+OdjP4LaRKsK-FKh-ctf4uzHX0Q@mail.gmail.com>
+        with ESMTP id S235438AbiLFNMU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Dec 2022 08:12:20 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6942C0;
+        Tue,  6 Dec 2022 05:11:55 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EE348B81974;
+        Tue,  6 Dec 2022 13:11:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B76B1C433C1;
+        Tue,  6 Dec 2022 13:11:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670332312;
+        bh=VVHMOEJUAAOA/RtsQv7QMpPJdj1/u6S3jZMKl5TJ8GI=;
+        h=Subject:From:To:Cc:Date:From;
+        b=F5UWSOaEDoHnHXcU43B6TM2774yeZtYXZDnrTEFERzcizLauw+q4z7w0sFjdCwgEM
+         huAj5OJJFPWgQSasfmi4uSSS0OEX+Y/vxsmi7RfTQRerMNS7IXQxgC9+IHe2N0OqIZ
+         bykRXwyVOVqRyoc2ZEZQLSZORUpf+x/W73Tp2mH5y4C+h+qTI4v1cI/UEl5NH7CyA3
+         KziTvZKgDn8+FDKW1SwLaWiaZj2iBzMLqBurHa2fwOVe++oPEQ7ja2MDh/VmYHn9OY
+         l/sKhKiPELag18Tz4hheNehfCMFkjfrdaMTT5UjiZ1sVXJx2riaWScvR+0WdK7fEH+
+         a3gv6qN6lIAkQ==
+Message-ID: <d3ba2c7f26958242c0a31b8f966e7c3d251a9e0f.camel@kernel.org>
+Subject: [GIT PULL] file locking changes for v6.2-rc1
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-nfs <linux-nfs@vger.kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Date:   Tue, 06 Dec 2022 08:11:43 -0500
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-U/x8SEMmkxi22ZtjFzj9"
+User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH2r5mvZh+5S74fec0o8EGf+OdjP4LaRKsK-FKh-ctf4uzHX0Q@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Dec 05, 2022 at 06:22:12PM -0600, Steve French wrote:
-> Ran some tests today with the three patch (remove writepage for
-> cifs.ko) series.  Let me know if any updates for those.  Also let me
-> know which gti branch you would like to see these merged from (mine or
-> yours e.g.)
 
-If they work and look fine to you please queue them up in the cifs
-tree as-is.
+--=-U/x8SEMmkxi22ZtjFzj9
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
 
-> I did see an intermittent  failure (when run with these three patches)
-> that doesn't appear to be obviously related to yours but am still
-> investigating it.   Test 043 failed once, and on one of retries of the
-> group  -  test 045 failed once. See example below.  This looks related
-> to an issue with deferred close (handle leases) and reference counts
-> holding up unmount, and not related to these patches (at least at
-> first glance).   Continuing to debug
+The following changes since commit 094226ad94f471a9f19e8f8e7140a09c2625abaa=
+:
 
-Yes.  I have no good idea but to may suggest what NFS does about
-silly renamed inodes to ensure they don't try to get in the way
-of mount.
+  Linux 6.1-rc5 (2022-11-13 13:12:55 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git tags/lock=
+s-v6.2
+
+for you to fetch changes up to f2f2494c8aa3cc317572c4674ef256005ebc092b:
+
+  Add process name and pid to locks warning (2022-11-30 05:08:10 -0500)
+
+----------------------------------------------------------------
+The main change here is to add the new locks_inode_context helper, and
+convert all of the places that dereference inode->i_flctx directly to
+use that instead.
+
+There a new helper to indicate whether any locks are held on an inode.
+This is mostly for Ceph but may be usable elsewhere too.
+
+Andi Kleen requested that we print the PID when the LOCK_MAND warning
+fires, to help track down applications trying to use it.
+
+Finally, we added some new warnings to some of the file locking
+functions that fire when the ->fl_file and filp arguments differ. This
+helped us find some long-standing bugs in lockd. Patches for those are
+in Chuck Lever's tree and should be in his v6.2 PR. After that patch,
+people using NFSv2/v3 locking may see some warnings fire until those go
+in.
+
+Happy Holidays!
+----------------------------------------------------------------
+Andi Kleen (1):
+      Add process name and pid to locks warning
+
+Jeff Layton (9):
+      filelock: WARN_ON_ONCE when ->fl_file and filp don't match
+      filelock: new helper: vfs_inode_has_locks
+      filelock: add a new locks_inode_context accessor function
+      ceph: use locks_inode_context helper
+      cifs: use locks_inode_context helper
+      ksmbd: use locks_inode_context helper
+      lockd: use locks_inode_context helper
+      nfs: use locks_inode_context helper
+      nfsd: use locks_inode_context helper
+
+ fs/ceph/locks.c     |  4 ++--
+ fs/cifs/file.c      |  2 +-
+ fs/ksmbd/vfs.c      |  2 +-
+ fs/lockd/svcsubs.c  |  4 ++--
+ fs/locks.c          | 50 ++++++++++++++++++++++++++++++++++++++-----------=
+-
+ fs/nfs/delegation.c |  2 +-
+ fs/nfs/nfs4state.c  |  2 +-
+ fs/nfs/pagelist.c   |  2 +-
+ fs/nfs/write.c      |  4 ++--
+ fs/nfsd/nfs4state.c |  6 +++---
+ include/linux/fs.h  | 20 ++++++++++++++++++++
+ 11 files changed, 72 insertions(+), 26 deletions(-)
+
+--=20
+Jeff Layton <jlayton@kernel.org>
+
+--=-U/x8SEMmkxi22ZtjFzj9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAABCAAxFiEES8DXskRxsqGE6vXTAA5oQRlWghUFAmOPP48THGpsYXl0b25A
+a2VybmVsLm9yZwAKCRAADmhBGVaCFfJND/4p6X6SWmAXSzBgZ7EOT/dnC66PllS1
+KO50o2DfeiIapxkvqzOo49YyGovbFMcdQqWNXcBJ3TdSZ2v18FRcrnp47UU/MnPU
+pz3bgdqDteDwsEEQPPSSpgFZr4CpokiwoFiHARKz0DdbJFRefN7CcL99whaNDioR
+VS6w0bysdNxesED9asHOl8MzzmKvbiOQV7/SHLOjIrxm+FwrSFkkC4ReO3UMZp72
+HxK80v4IF1Aarw2rd/+8jUsEiwWHRpWkYS1mxT6pIUqJrwFkBue6kkoUlmd5GaUl
+fqsQE8EQcuQHACHPd07MiH/VLgnNyOpY9KbHZoLf1JFDEWuXapVrIlg9iNuR/oT4
+wLJbC5U5HaOJlG5mcnOsg6KFc3+6Gf9BGuD8SPKhlGroHTPlb78+Xh8jPAdeOwn+
+nsEO9njtMdt7uR1AAJIyv8SvrC/ZuPc0kR3rQ3CVkG4yIBrnjsgul5MkBVjsImwF
+jYT7oQwDokTFGryROOt9nzW6O2bmcwin1NfUCA80iVaIm0JXW8IXii5/RT5vxmei
+4bNqNkQLrHU48OBtW3yz5YG/g9lZme71f+M8QUzRfSkGk1lTcDDMtjIZAK6OphpJ
+baITwvncNSkq7zmf03SpaN+l1GYK9A20BVdA1gu59qmanF/Fy532qbrotFEpLbJY
+yNqzj5LP4OrxJQ==
+=1wv0
+-----END PGP SIGNATURE-----
+
+--=-U/x8SEMmkxi22ZtjFzj9--
