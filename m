@@ -2,73 +2,201 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2F6C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Dec 2022 01:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C5F6C4332F
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Dec 2022 12:38:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbiLIBH4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 8 Dec 2022 20:07:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50232 "EHLO
+        id S229962AbiLIMiZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Dec 2022 07:38:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbiLIBHz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Dec 2022 20:07:55 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5074C2FFF4
-        for <linux-cifs@vger.kernel.org>; Thu,  8 Dec 2022 17:07:54 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id n65-20020a17090a2cc700b0021bc5ef7a14so3372544pjd.0
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Dec 2022 17:07:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GMgcio3GEyGGRJF/K7KlPrcvkmRO7TqWfwuOwdnacGc=;
-        b=gZht8F7nsvDzPIuSJ+S+zxSpiD/+2VhGF7mptjcAN5f4gCwk/vgE0OosnqNrDDiv0u
-         f9Km217LaVDNYXbBzCjnptGNlh2MS6XWbXiQqi4vXsWx9ZZyBbYRhSuDyzYG4AS7O8by
-         7rV0HlR2zO5ZaudpuPfsHARWP7fMiGpRmn7G8=
+        with ESMTP id S229936AbiLIMiR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Dec 2022 07:38:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E919A66CBF
+        for <linux-cifs@vger.kernel.org>; Fri,  9 Dec 2022 04:37:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670589435;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kKcc7XQPg0UZn1AHNfQ4N2d5zF9JzBW3g3hPGFAB4Kc=;
+        b=ZG3qqAatQhAgpOboJAhhAnXOsAls6GT3djKhXpAx8qhAmpWP+j5Ewoo4/diUxYxZxAhmAx
+        IsB4N7gRUZDNj5yOs+yBwaGHPcGpIAQwcjkCOeZuP6frx+KIOVT+ppWBotynfu9bGbnIWY
+        PFnFWXmmPhUxIB2B9Yq/ZGaPsueGibY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-437-O7JaO8ZlP_OiR-SAniCYWw-1; Fri, 09 Dec 2022 07:37:14 -0500
+X-MC-Unique: O7JaO8ZlP_OiR-SAniCYWw-1
+Received: by mail-wm1-f69.google.com with SMTP id m17-20020a05600c3b1100b003cf9cc47da5so2333115wms.9
+        for <linux-cifs@vger.kernel.org>; Fri, 09 Dec 2022 04:37:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GMgcio3GEyGGRJF/K7KlPrcvkmRO7TqWfwuOwdnacGc=;
-        b=bnZcq1/xjKQuKu2ao3FSwZugCoY9aAojxP8nz+ZpEinQ772ENjfAWnJ5svtQJ5Dl/n
-         UZL87ov3MrvMAgFMvJWhdBEPLuIo4dGa1Jkk2J2aCZLEn0jcLE4DMB+lqrZyRhCQFbZq
-         fiNLVYo1T3FDoyzWeQqh6RqjiV6E5mobxHqR5J4UseVVkbuq8JNaW43jdvLxbj/XyE8m
-         lGmhTb91AcdlfNvSmCMUOz7rDrfy7mjUtBdn5CXuo+yCqv7GAqQYpH7OO7R2xsmVpiyf
-         uamrZqaatT37Ug9CUp+2PvvGhipjhom8qsoBMwuyleKX4QABmaIktInPUfkD3B40SQcQ
-         s9XQ==
-X-Gm-Message-State: ANoB5pkJI3Xc2rAnhysLZh+ZZfmFAoTJj8fFHraz7CK5P1xVId+LeMvp
-        D1orQg09Rrrj0UpvJg+r7tlOBA==
-X-Google-Smtp-Source: AA0mqf4m57nSOe++sM9RXZzuK1MXJ48TXmwuWx1bdZuYmdC/h8DAgeBR7INxXll6fJPNMVhAA/LxRA==
-X-Received: by 2002:a17:902:c94d:b0:189:b36a:5448 with SMTP id i13-20020a170902c94d00b00189b36a5448mr5700057pla.44.1670548073678;
-        Thu, 08 Dec 2022 17:07:53 -0800 (PST)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id h4-20020a170902b94400b001895f7c8a71sm61153pls.97.2022.12.08.17.07.50
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kKcc7XQPg0UZn1AHNfQ4N2d5zF9JzBW3g3hPGFAB4Kc=;
+        b=ZioRalnaqvc5oBzcDOD0h1ITnr/yoSBSayFQyxL7dPkER0vsQN3j9vqVpA20pOZQiJ
+         UE0YCyvcqr5s2u9n3Pk7ketSHnDiizhtziIVnFA/xT93CY+8Fu/qzjJv7Ep3RcaY5rwx
+         et6EXOxGEqQqvo9F5bqmu14Ew/agBaBTwvWvg2Hrtn1RXyrMo8jlpMgp5ZntpxisjP/t
+         8x1Kl7VJDyH9E/7hLoranz8yFiyrIY6s/XiOr0YzA33H8OkIpAS0DGbRUJTFWjhElQ5y
+         r3Fck/RNSFtFIDyww+AzkLmWtI1QW6umdSu6jk2Wnh5po0sAchxykvYqWsqvT+aivvu/
+         ewcA==
+X-Gm-Message-State: ANoB5pmTZB2nQPUBnB7yawSQbfMw8UKoBls7WcIiPfDOXy4IFvEvL3Pf
+        XK9PQVKiEfHMni5uedShpztuWGuMNXlM+l/p+/AlutGJIccj+6TcYUqqIEC6L7yoXRomnyGmCf3
+        aH6UowBmmz1hsv2ufzuiyxw==
+X-Received: by 2002:a05:600c:4fd0:b0:3d1:c0a1:4804 with SMTP id o16-20020a05600c4fd000b003d1c0a14804mr4752783wmq.17.1670589432861;
+        Fri, 09 Dec 2022 04:37:12 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5DyMiYpWNcqaQueb0cVh7tJ5lH4JY75MZjLcmrbwYgfM+x/au0sr5C4m2hvq8cZrZMVyWo5g==
+X-Received: by 2002:a05:600c:4fd0:b0:3d1:c0a1:4804 with SMTP id o16-20020a05600c4fd000b003d1c0a14804mr4752714wmq.17.1670589432518;
+        Fri, 09 Dec 2022 04:37:12 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-106-22.dyn.eolo.it. [146.241.106.22])
+        by smtp.gmail.com with ESMTPSA id j10-20020a05600c1c0a00b003b49bd61b19sm9284355wms.15.2022.12.09.04.37.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 17:07:52 -0800 (PST)
-Date:   Fri, 9 Dec 2022 10:07:48 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     ye.xingchen@zte.com.cn
-Cc:     linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
-        tom@talpey.com, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ksmbd: Convert to use sysfs_emit()/sysfs_emit_at() APIs
-Message-ID: <Y5KKZKn8D0uvvyr+@google.com>
-References: <202212070929276734686@zte.com.cn>
+        Fri, 09 Dec 2022 04:37:11 -0800 (PST)
+Message-ID: <d220402a232e204676d9100d6fe4c2ae08f753ee.camel@redhat.com>
+Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     Benjamin Coddington <bcodding@redhat.com>, netdev@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Christoph =?ISO-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Steve French <sfrench@samba.org>,
+        Christine Caulfield <ccaulfie@redhat.com>,
+        David Teigland <teigland@redhat.com>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Xiubo Li <xiubli@redhat.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
+        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, cluster-devel@redhat.com,
+        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
+        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
+Date:   Fri, 09 Dec 2022 13:37:08 +0100
+In-Reply-To: <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
+References: <cover.1669036433.git.bcodding@redhat.com>
+         <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202212070929276734686@zte.com.cn>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On (22/12/07 09:29), ye.xingchen@zte.com.cn wrote:
-> From: ye xingchen <ye.xingchen@zte.com.cn>
+On Mon, 2022-11-21 at 08:35 -0500, Benjamin Coddington wrote:
+> Since moving to memalloc_nofs_save/restore, SUNRPC has stopped setting the
+> GFP_NOIO flag on sk_allocation which the networking system uses to decide
+> when it is safe to use current->task_frag.  The results of this are
+> unexpected corruption in task_frag when SUNRPC is involved in memory
+> reclaim.
 > 
-> Follow the advice of the Documentation/filesystems/sysfs.rst and show()
-> should only use sysfs_emit() or sysfs_emit_at() when formatting the
-> value to be returned to user space.
+> The corruption can be seen in crashes, but the root cause is often
+> difficult to ascertain as a crashing machine's stack trace will have no
+> evidence of being near NFS or SUNRPC code.  I believe this problem to
+> be much more pervasive than reports to the community may indicate.
 > 
-> Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+> Fix this by having kernel users of sockets that may corrupt task_frag due
+> to reclaim set sk_use_task_frag = false.  Preemptively correcting this
+> situation for users that still set sk_allocation allows them to convert to
+> memalloc_nofs_save/restore without the same unexpected corruptions that are
+> sure to follow, unlikely to show up in testing, and difficult to bisect.
+> 
+> CC: Philipp Reisner <philipp.reisner@linbit.com>
+> CC: Lars Ellenberg <lars.ellenberg@linbit.com>
+> CC: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
+> CC: Jens Axboe <axboe@kernel.dk>
+> CC: Josef Bacik <josef@toxicpanda.com>
+> CC: Keith Busch <kbusch@kernel.org>
+> CC: Christoph Hellwig <hch@lst.de>
+> CC: Sagi Grimberg <sagi@grimberg.me>
+> CC: Lee Duncan <lduncan@suse.com>
+> CC: Chris Leech <cleech@redhat.com>
+> CC: Mike Christie <michael.christie@oracle.com>
+> CC: "James E.J. Bottomley" <jejb@linux.ibm.com>
+> CC: "Martin K. Petersen" <martin.petersen@oracle.com>
+> CC: Valentina Manea <valentina.manea.m@gmail.com>
+> CC: Shuah Khan <shuah@kernel.org>
+> CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> CC: David Howells <dhowells@redhat.com>
+> CC: Marc Dionne <marc.dionne@auristor.com>
+> CC: Steve French <sfrench@samba.org>
+> CC: Christine Caulfield <ccaulfie@redhat.com>
+> CC: David Teigland <teigland@redhat.com>
+> CC: Mark Fasheh <mark@fasheh.com>
+> CC: Joel Becker <jlbec@evilplan.org>
+> CC: Joseph Qi <joseph.qi@linux.alibaba.com>
+> CC: Eric Van Hensbergen <ericvh@gmail.com>
+> CC: Latchesar Ionkov <lucho@ionkov.net>
+> CC: Dominique Martinet <asmadeus@codewreck.org>
+> CC: "David S. Miller" <davem@davemloft.net>
+> CC: Eric Dumazet <edumazet@google.com>
+> CC: Jakub Kicinski <kuba@kernel.org>
+> CC: Paolo Abeni <pabeni@redhat.com>
+> CC: Ilya Dryomov <idryomov@gmail.com>
+> CC: Xiubo Li <xiubli@redhat.com>
+> CC: Chuck Lever <chuck.lever@oracle.com>
+> CC: Jeff Layton <jlayton@kernel.org>
+> CC: Trond Myklebust <trond.myklebust@hammerspace.com>
+> CC: Anna Schumaker <anna@kernel.org>
+> CC: drbd-dev@lists.linbit.com
+> CC: linux-block@vger.kernel.org
+> CC: linux-kernel@vger.kernel.org
+> CC: nbd@other.debian.org
+> CC: linux-nvme@lists.infradead.org
+> CC: open-iscsi@googlegroups.com
+> CC: linux-scsi@vger.kernel.org
+> CC: linux-usb@vger.kernel.org
+> CC: linux-afs@lists.infradead.org
+> CC: linux-cifs@vger.kernel.org
+> CC: samba-technical@lists.samba.org
+> CC: cluster-devel@redhat.com
+> CC: ocfs2-devel@oss.oracle.com
+> CC: v9fs-developer@lists.sourceforge.net
+> CC: netdev@vger.kernel.org
+> CC: ceph-devel@vger.kernel.org
+> CC: linux-nfs@vger.kernel.org
+> 
+> Suggested-by: Guillaume Nault <gnault@redhat.com>
+> Signed-off-by: Benjamin Coddington <bcodding@redhat.com>
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+I think this is the most feasible way out of the existing issue, and I
+think this patchset should go via the networking tree, targeting the
+Linux 6.2.
+
+If someone has disagreement with the above, please speak! 
+
+Thanks,
+
+Paolo
+
