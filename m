@@ -2,134 +2,193 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0172BC10F1E
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Dec 2022 16:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46825C4332F
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Dec 2022 23:08:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229488AbiLIQwK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Dec 2022 11:52:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44310 "EHLO
+        id S229482AbiLIXIx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Dec 2022 18:08:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiLIQwI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Dec 2022 11:52:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4F6934F7
-        for <linux-cifs@vger.kernel.org>; Fri,  9 Dec 2022 08:51:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670604671;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hEHtknj7G67yuPB9tWefZgr9ALjA/T5Vl29gdCA8cwI=;
-        b=SF4wB6nt06RO5Xq96UcWeUT8IuEj0EoUkuR8W1ZKvc7m+Cmv/sLKo61FfBJftwGHgAuecj
-        l7VKRADhWOjuDTPBoY/1aVKE1wmU+XiyyJOLZnkeXXDPEbdu5ZBS98saWn99+JXBwEJaAf
-        sA7n+e9NoPmRG+wCHcjv/P/LtafnBWE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-376-oZIveDTgMI2YLIKclhz5Vw-1; Fri, 09 Dec 2022 11:51:10 -0500
-X-MC-Unique: oZIveDTgMI2YLIKclhz5Vw-1
-Received: by mail-wm1-f72.google.com with SMTP id 9-20020a1c0209000000b003d1c0a147f6so121320wmc.4
-        for <linux-cifs@vger.kernel.org>; Fri, 09 Dec 2022 08:51:09 -0800 (PST)
+        with ESMTP id S229521AbiLIXIw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Dec 2022 18:08:52 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A2B511D2
+        for <linux-cifs@vger.kernel.org>; Fri,  9 Dec 2022 15:08:50 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id x11so6460603ljh.7
+        for <linux-cifs@vger.kernel.org>; Fri, 09 Dec 2022 15:08:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2KMvRzodgfZJFb8i/VCUwrcSu1KrkyIVmEiUJAESOGI=;
+        b=P4GiQ+kxiDzcv3pwh60KBH5tEt54FFjbojZKjSHneJmhEj1Aq3atFC70A8F1tcbPOV
+         akFY6WTiyL0IBSxJ2jqYYCbB3TolKuUDzEgJ2/4q/OoP+XLzeZxOC3FpzkfHNE9F25uB
+         HD+aQuhADjWQ4QxilUN7WAuzxaoz3onhYdX0TZbloMEU8/SrJAJEvSfyBcL3QlhzGrbN
+         kPf6HdIJa6nb7jRCEXXDcMeOnESx1d3GCu7iVrV5zuWQxayLluE1fOTcliZ3Q91QwOXc
+         qP4GNh7bVPc7cXCJZpvu0Z5eN/rLoFic24GgbekUDPiAouFcIHJ4erIwRxUoUyK+vllw
+         o3KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hEHtknj7G67yuPB9tWefZgr9ALjA/T5Vl29gdCA8cwI=;
-        b=Waroi746aU5qoORS/+bu9FFI2ASSuLJ4rlQylCqpTCUI9mhlTjUQXLFwKbXxSxH3NA
-         0ytd5t/9WC430EoCRVgipDUw9ocRm5X+vQgXts2FcidERlfPtE+bdbOyXm1GkuxegfCi
-         b3WPjR+fQlIW3Mz4HaHdV9je5oV1aTnvw9yT6cWU8yKBNRewCbRGs930HRtLSEcjQc+O
-         D7uH49OfL4RE97C6MGna/4wJ3VXh3ixsq0OUETVDcfGg1aW7q5kz0El2Pm53XCcwtc+C
-         FUKYQexeJrQw/vk0qn7W6ax+8D0LOYU0nZqVaLAP/KxTkzDGQL/Fkqi186UvARfXbcq5
-         2gYw==
-X-Gm-Message-State: ANoB5pkN4UHcNdNimT4w6JyEvORJ0fx5gXBz78OQYwupV7rqvluZc2LF
-        rPvMT3Uy01CY5Q8YPnkRDFI4kjJ2aqrFYzJR57pjlw++QDmA2jU93lbscWA0ccwDGprGY6Welad
-        Z0PPDGhhWEnkofDd5CiV3Hw==
-X-Received: by 2002:a05:600c:4f48:b0:3cf:e850:4435 with SMTP id m8-20020a05600c4f4800b003cfe8504435mr5700775wmq.13.1670604669137;
-        Fri, 09 Dec 2022 08:51:09 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4vPLwblTckd8B2URRNRbKIW7VqMLQd/PWlQAHufJr6jh2xD5egmlwfWsaGwQofLy1f6L/9tQ==
-X-Received: by 2002:a05:600c:4f48:b0:3cf:e850:4435 with SMTP id m8-20020a05600c4f4800b003cfe8504435mr5700758wmq.13.1670604668951;
-        Fri, 09 Dec 2022 08:51:08 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-105-105.dyn.eolo.it. [146.241.105.105])
-        by smtp.gmail.com with ESMTPSA id ay13-20020a05600c1e0d00b003c6bd91caa5sm302339wmb.17.2022.12.09.08.50.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 08:51:08 -0800 (PST)
-Message-ID: <73186bd6e1ad62da16726b95b1a266c0aeb39719.camel@redhat.com>
-Subject: Re: [PATCH v1 2/3] Treewide: Stop corrupting socket's task_frag
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Benjamin Coddington <bcodding@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Christoph =?ISO-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Steve French <sfrench@samba.org>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, cluster-devel@redhat.com,
-        ocfs2-devel@oss.oracle.com, v9fs-developer@lists.sourceforge.net,
-        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org
-Date:   Fri, 09 Dec 2022 17:50:53 +0100
-In-Reply-To: <20221209081101.7500478c@kernel.org>
-References: <cover.1669036433.git.bcodding@redhat.com>
-         <c2ec184226acd21a191ccc1aa46a1d7e43ca7104.1669036433.git.bcodding@redhat.com>
-         <d220402a232e204676d9100d6fe4c2ae08f753ee.camel@redhat.com>
-         <20221209081101.7500478c@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2KMvRzodgfZJFb8i/VCUwrcSu1KrkyIVmEiUJAESOGI=;
+        b=EgHEA1TbISMtEa8SGRGnlaBkLflz8EUKr2j4U4Ub+FQcej1O9sMMqcm3I9AvwmAaSc
+         QdpGijNqqltJz/0c7ir74Qm3nBRU+KEA8raRAI7SMG3jiy60RB2QRI2ib9AwSWoDymd0
+         E48feZRptBlPulFDLHk98WHaYEftIJcdu4FRNIg2RWIg6pISl1ByIMIkrbyA43Q2Nq4B
+         4OxcEpTV8yOnieyW2gpCqVWwRdaokY0E/v609/rCi2MbbDeFEGcO46vC/fcb3cC1xwwT
+         xAoOM04spOX9fLsO1AsyevAH7MhdJ/Ev5yCk8FJq8ldHWSLtXKpJFBna1wefFZRpJ1Uc
+         VlvA==
+X-Gm-Message-State: ANoB5plnnkGOXTzVIntlHZ6MI2nVxPrTdZhFGTj7l8Fpyr6/2kuihw2e
+        Y61GIgW30V2HzH5f37NPx7XN52gkKtxk5VNtA1RtC5ekwg4=
+X-Google-Smtp-Source: AA0mqf67e7rVTANp//5Ixhn2F+dw+80r5IbTDm7r6Q8L7H9M+4Tv3Yo+TZFF7aBobhXDd2xawzJHZRh/xPz/YPGOs+E=
+X-Received: by 2002:a05:651c:12c1:b0:277:2fd5:482 with SMTP id
+ 1-20020a05651c12c100b002772fd50482mr26552688lje.194.1670627327998; Fri, 09
+ Dec 2022 15:08:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <CAH2r5ms=n5_0OUeE9ro8MD3w9dG=bMm=_koqCW6x_KjTvuJoUw@mail.gmail.com>
+In-Reply-To: <CAH2r5ms=n5_0OUeE9ro8MD3w9dG=bMm=_koqCW6x_KjTvuJoUw@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 9 Dec 2022 17:08:36 -0600
+Message-ID: <CAH2r5mufwnyu+D_H-xdr9vm6=322Gu=A6yzzAyj6cQyZVcqBDw@mail.gmail.com>
+Subject: Re: [[PATCH][CIFS] minor cleanup of some headers pointed out by checkpatch
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000701c3c05ef6d3ccf"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 2022-12-09 at 08:11 -0800, Jakub Kicinski wrote:
-> On Fri, 09 Dec 2022 13:37:08 +0100 Paolo Abeni wrote:
-> > I think this is the most feasible way out of the existing issue, and I
-> > think this patchset should go via the networking tree, targeting the
-> > Linux 6.2.
-> 
-> FWIW some fields had been moved so this will not longer apply cleanly,
-> see b534dc46c8ae016. But I think we can apply it to net since the merge
-> window is upon us? Just a heads up.
+--000000000000701c3c05ef6d3ccf
+Content-Type: text/plain; charset="UTF-8"
 
-We will need an additional revision, see my reply to patch 3/3. I think
-the -net tree should be the appropriate target.
+one more trivial one (more whitespace cleanup pointed out by checkpatch)
 
+On Thu, Dec 8, 2022 at 4:14 PM Steve French <smfrench@gmail.com> wrote:
+>
+> See attached for minor cleanup of some cifs.ko headers
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
+
+
+
+-- 
 Thanks,
 
-Paolo
+Steve
 
+--000000000000701c3c05ef6d3ccf
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-fix-various-whitespace-errors-in-headers.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-fix-various-whitespace-errors-in-headers.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lbh4czsv0>
+X-Attachment-Id: f_lbh4czsv0
+
+RnJvbSA4NmYyZjIyMDUwODVjNTFmOWY3ZWUwNThiNWNmYzVlNWFmNzZlMmE3IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IEZyaSwgOSBEZWMgMjAyMiAxNjo1NTo1MSAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIGNp
+ZnM6IGZpeCB2YXJpb3VzIHdoaXRlc3BhY2UgZXJyb3JzIGluIGhlYWRlcnMKCkZpeCBzb21lIGV4
+dHJhIHNwYWNlcyBhbmQgYSBmZXcgY29tbWVudHMgdGhhdCB3ZXJlIHVubmVjZXNzYXJpbHkgc3Bs
+aXQgb3Zlcgp0d28gbGluZXMuIFRoZXNlIHdlcmUgc29tZSB0cml2aWFsIGlzc3VlcyBwb2ludGVk
+IG91dCBieSBjaGVja3BhdGNoKQoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5j
+aEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc3BkdS5oICAgfCA1MCArKysrKysrKysr
+KysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KIGZzL2NpZnMvY2lmc3Byb3RvLmgg
+fCAgMiArLQogMiBmaWxlcyBjaGFuZ2VkLCAyMiBpbnNlcnRpb25zKCspLCAzMCBkZWxldGlvbnMo
+LSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNwZHUuaCBiL2ZzL2NpZnMvY2lmc3BkdS5oCmlu
+ZGV4IGQxYWJhZWVhOTc0YS4uNjIzY2FlY2UyYjEwIDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNw
+ZHUuaAorKysgYi9mcy9jaWZzL2NpZnNwZHUuaApAQCAtMTQyOSw3ICsxNDI5LDcgQEAgdHlwZWRl
+ZiBzdHJ1Y3Qgc21iX2NvbV90cmFuc2FjdGlvbl9jaGFuZ2Vfbm90aWZ5X3JlcSB7CiAJX191OCBX
+YXRjaFRyZWU7ICAvKiAxID0gTW9uaXRvciBzdWJkaXJlY3RvcmllcyAqLwogCV9fdTggUmVzZXJ2
+ZWQyOwogCV9fbGUxNiBCeXRlQ291bnQ7Ci0vKiAJX191OCBQYWRbM107Ki8KKy8qCV9fdTggUGFk
+WzNdOyovCiAvKglfX3U4IERhdGFbMV07Ki8KIH0gX19hdHRyaWJ1dGVfXygocGFja2VkKSkgVFJB
+TlNBQ1RfQ0hBTkdFX05PVElGWV9SRVE7CiAKQEAgLTE3NTIsOCArMTc1Miw3IEBAIHN0cnVjdCBz
+bWJfY29tX3RyYW5zYWN0aW9uMl9zZmlfcnNwIHsKIAlzdHJ1Y3Qgc21iX2hkciBoZHI7CS8qIHdj
+dCA9IDEwICsgU2V0dXBDb3VudCAqLwogCXN0cnVjdCB0cmFuczJfcmVzcCB0MjsKIAlfX3UxNiBC
+eXRlQ291bnQ7Ci0JX191MTYgUmVzZXJ2ZWQyOwkvKiBwYXJhbWV0ZXIgd29yZCByZXNlcnZlZCAt
+Ci0JCQkJCXByZXNlbnQgZm9yIGluZm9sZXZlbHMgPiAxMDAgKi8KKwlfX3UxNiBSZXNlcnZlZDI7
+IC8qIHBhcmFtZXRlciB3b3JkIHJlc2VydmVkIC0gcHJlc2VudCBmb3IgaW5mb2xldmVscyA+IDEw
+MCAqLwogfSBfX2F0dHJpYnV0ZV9fKChwYWNrZWQpKTsKIAogc3RydWN0IHNtYl90Ml9xZmlfcmVx
+IHsKQEAgLTE3NjgsOCArMTc2Nyw3IEBAIHN0cnVjdCBzbWJfdDJfcWZpX3JzcCB7CiAJc3RydWN0
+IHNtYl9oZHIgaGRyOyAgICAgLyogd2N0ID0gMTAgKyBTZXR1cENvdW50ICovCiAJc3RydWN0IHRy
+YW5zMl9yZXNwIHQyOwogCV9fdTE2IEJ5dGVDb3VudDsKLQlfX3UxNiBSZXNlcnZlZDI7ICAgICAg
+ICAvKiBwYXJhbWV0ZXIgd29yZCByZXNlcnZlZCAtCi0JCQkJICAgcHJlc2VudCBmb3IgaW5mb2xl
+dmVscyA+IDEwMCAqLworCV9fdTE2IFJlc2VydmVkMjsgLyogcGFyYW1ldGVyIHdvcmQgcmVzZXJ2
+ZWQgLSBwcmVzZW50IGZvciBpbmZvbGV2ZWxzID4gMTAwICovCiB9IF9fYXR0cmlidXRlX18oKHBh
+Y2tlZCkpOwogCiAvKgpAQCAtMjE0NiwxMyArMjE0NCwxMSBAQCB0eXBlZGVmIHN0cnVjdCB7CiAj
+ZGVmaW5lIENJRlNfVU5JWF9QT1NJWF9QQVRIX09QU19DQVAgICAgMHgwMDAwMDAyMCAvKiBBbGxv
+dyBuZXcgUE9TSVggcGF0aCBiYXNlZAogCQkJCQkJICAgICAgY2FsbHMgaW5jbHVkaW5nIHBvc2l4
+IG9wZW4KIAkJCQkJCSAgICAgIGFuZCBwb3NpeCB1bmxpbmsgKi8KLSNkZWZpbmUgQ0lGU19VTklY
+X0xBUkdFX1JFQURfQ0FQICAgICAgICAweDAwMDAwMDQwIC8qIHN1cHBvcnQgcmVhZHMgPjEyOEsg
+KHVwCi0JCQkJCQkgICAgICB0byAweEZGRkYwMCAqLworI2RlZmluZSBDSUZTX1VOSVhfTEFSR0Vf
+UkVBRF9DQVAgICAgICAgIDB4MDAwMDAwNDAgLyogc3VwcG9ydCByZWFkcyA+MTI4SyAodXAgdG8g
+MHhGRkZGMDAgKi8KICNkZWZpbmUgQ0lGU19VTklYX0xBUkdFX1dSSVRFX0NBUCAgICAgICAweDAw
+MDAwMDgwCiAjZGVmaW5lIENJRlNfVU5JWF9UUkFOU1BPUlRfRU5DUllQVElPTl9DQVAgMHgwMDAw
+MDEwMCAvKiBjYW4gZG8gU1BORUdPIGNyeXB0ICovCiAjZGVmaW5lIENJRlNfVU5JWF9UUkFOU1BP
+UlRfRU5DUllQVElPTl9NQU5EQVRPUllfQ0FQICAweDAwMDAwMjAwIC8qIG11c3QgZG8gICovCi0j
+ZGVmaW5lIENJRlNfVU5JWF9QUk9YWV9DQVAgICAgICAgICAgICAgMHgwMDAwMDQwMCAvKiBQcm94
+eSBjYXA6IDB4QUNFIGlvY3RsIGFuZAotCQkJCQkJICAgICAgUUZTIFBST1hZIGNhbGwgKi8KKyNk
+ZWZpbmUgQ0lGU19VTklYX1BST1hZX0NBUCAgICAgICAgICAgICAweDAwMDAwNDAwIC8qIFByb3h5
+IGNhcDogMHhBQ0UgaW9jdGwgYW5kIFFGUyBQUk9YWSBjYWxsICovCiAjaWZkZWYgQ09ORklHX0NJ
+RlNfUE9TSVgKIC8qIHByZXN1bWFibHkgZG9uJ3QgbmVlZCB0aGUgMHgyMCBQT1NJWF9QQVRIX09Q
+U19DQVAgc2luY2Ugd2UgbmV2ZXIgc2VuZAogICAgTG9ja2luZ1ggaW5zdGVhZCBvZiBwb3NpeCBs
+b2NraW5nIGNhbGwgb24gdW5peCBzZXNzIChhbmQgd2UgZG8gbm90IGV4cGVjdApAQCAtMjM2OCw4
+ICsyMzY0LDcgQEAgdHlwZWRlZiBzdHJ1Y3QgewogCiBzdHJ1Y3QgZmlsZV9hbGxvY2F0aW9uX2lu
+Zm8gewogCV9fbGU2NCBBbGxvY2F0aW9uU2l6ZTsgLyogTm90ZSBvbGQgU2FtYmEgc3J2ciByb3Vu
+ZHMgdGhpcyB1cCB0b28gbXVjaCAqLwotfSBfX2F0dHJpYnV0ZV9fKChwYWNrZWQpKTsJLyogc2l6
+ZSB1c2VkIG9uIGRpc2ssIGZvciBsZXZlbCAweDEwMyBmb3Igc2V0LAotCQkJCSAgIDB4MTA1IGZv
+ciBxdWVyeSAqLworfSBfX3BhY2tlZDsgLyogc2l6ZSB1c2VkIG9uIGRpc2ssIGZvciBsZXZlbCAw
+eDEwMyBmb3Igc2V0LCAweDEwNSBmb3IgcXVlcnkgKi8KIAogc3RydWN0IGZpbGVfZW5kX29mX2Zp
+bGVfaW5mbyB7CiAJX19sZTY0IEZpbGVTaXplOwkJLyogb2Zmc2V0IHRvIGVuZCBvZiBmaWxlICov
+CkBAIC0yNDA5LDggKzI0MDQsNyBAQCBzdHJ1Y3QgY2lmc19wb3NpeF9hY2wgeyAvKiBhY2Nlc3Mg
+Y29ucm9sIGxpc3QgIChBQ0wpICovCiAJX19sZTE2CWFjY2Vzc19lbnRyeV9jb3VudDsgIC8qIGFj
+Y2VzcyBBQ0wgLSBjb3VudCBvZiBlbnRyaWVzICovCiAJX19sZTE2CWRlZmF1bHRfZW50cnlfY291
+bnQ7IC8qIGRlZmF1bHQgQUNMIC0gY291bnQgb2YgZW50cmllcyAqLwogCXN0cnVjdCBjaWZzX3Bv
+c2l4X2FjZSBhY2VfYXJyYXlbXTsKLQkvKiBmb2xsb3dlZCBieQotCXN0cnVjdCBjaWZzX3Bvc2l4
+X2FjZSBkZWZhdWx0X2FjZV9hcnJhYXlbXSAqLworCS8qIGZvbGxvd2VkIGJ5IHN0cnVjdCBjaWZz
+X3Bvc2l4X2FjZSBkZWZhdWx0X2FjZV9hcnJheVtdICovCiB9IF9fYXR0cmlidXRlX18oKHBhY2tl
+ZCkpOyAgLyogbGV2ZWwgMHgyMDQgKi8KIAogLyogdHlwZXMgb2YgYWNjZXNzIGNvbnRyb2wgZW50
+cmllcyBhbHJlYWR5IGRlZmluZWQgaW4gcG9zaXhfYWNsLmggKi8KQEAgLTI0MjksMTcgKzI0MjMs
+MTcgQEAgc3RydWN0IGNpZnNfcG9zaXhfYWNsIHsgLyogYWNjZXNzIGNvbnJvbCBsaXN0ICAoQUNM
+KSAqLwogLyogZW5kIG9mIFBPU0lYIEFDTCBkZWZpbml0aW9ucyAqLwogCiAvKiBQT1NJWCBPcGVu
+IEZsYWdzICovCi0jZGVmaW5lIFNNQl9PX1JET05MWSAJIDB4MQotI2RlZmluZSBTTUJfT19XUk9O
+TFkgCTB4MgotI2RlZmluZSBTTUJfT19SRFdSIAkweDQKLSNkZWZpbmUgU01CX09fQ1JFQVQgCTB4
+MTAKLSNkZWZpbmUgU01CX09fRVhDTCAJMHgyMAotI2RlZmluZSBTTUJfT19UUlVOQyAJMHg0MAot
+I2RlZmluZSBTTUJfT19BUFBFTkQgCTB4ODAKLSNkZWZpbmUgU01CX09fU1lOQyAJMHgxMDAKLSNk
+ZWZpbmUgU01CX09fRElSRUNUT1JZIDB4MjAwCi0jZGVmaW5lIFNNQl9PX05PRk9MTE9XIAkweDQw
+MAotI2RlZmluZSBTTUJfT19ESVJFQ1QgCTB4ODAwCisjZGVmaW5lIFNNQl9PX1JET05MWQkweDEK
+KyNkZWZpbmUgU01CX09fV1JPTkxZCTB4MgorI2RlZmluZSBTTUJfT19SRFdSCTB4NAorI2RlZmlu
+ZSBTTUJfT19DUkVBVAkweDEwCisjZGVmaW5lIFNNQl9PX0VYQ0wJMHgyMAorI2RlZmluZSBTTUJf
+T19UUlVOQwkweDQwCisjZGVmaW5lIFNNQl9PX0FQUEVORAkweDgwCisjZGVmaW5lIFNNQl9PX1NZ
+TkMJMHgxMDAKKyNkZWZpbmUgU01CX09fRElSRUNUT1JZCTB4MjAwCisjZGVmaW5lIFNNQl9PX05P
+Rk9MTE9XCTB4NDAwCisjZGVmaW5lIFNNQl9PX0RJUkVDVAkweDgwMAogCiB0eXBlZGVmIHN0cnVj
+dCB7CiAJX19sZTMyIE9wZW5GbGFnczsgLyogc2FtZSBhcyBOVCBDcmVhdGVYICovCkBAIC0yNzE2
+LDE1ICsyNzEwLDEzIEBAIHR5cGVkZWYgc3RydWN0IGZpbGVfeGF0dHJfaW5mbyB7CiAJX191MzIg
+eGF0dHJfdmFsdWVfbGVuOwogCWNoYXIgIHhhdHRyX25hbWVbXTsKIAkvKiBmb2xsb3dlZCBieSB4
+YXR0cl92YWx1ZVt4YXR0cl92YWx1ZV9sZW5dLCBubyBwYWQgKi8KLX0gX19hdHRyaWJ1dGVfXygo
+cGFja2VkKSkgRklMRV9YQVRUUl9JTkZPOyAvKiBleHRlbmRlZCBhdHRyaWJ1dGUgaW5mbwotCQkJ
+CQkgICAgICBsZXZlbCAweDIwNSAqLworfSBfX3BhY2tlZCBGSUxFX1hBVFRSX0lORk87IC8qIGV4
+dGVuZGVkIGF0dHJpYnV0ZSBpbmZvIGxldmVsIDB4MjA1ICovCiAKIC8qIGZsYWdzIGZvciBsc2F0
+dHIgYW5kIGNoZmxhZ3MgY29tbWFuZHMgcmVtb3ZlZCBhcmVpbiB1YXBpL2xpbnV4L2ZzLmggKi8K
+IAogdHlwZWRlZiBzdHJ1Y3QgZmlsZV9jaGF0dHJfaW5mbyB7CiAJX19sZTY0CW1hc2s7IC8qIGxp
+c3Qgb2YgYWxsIHBvc3NpYmxlIGF0dHJpYnV0ZSBiaXRzICovCiAJX19sZTY0CW1vZGU7IC8qIGxp
+c3Qgb2YgYWN0dWFsIGF0dHJpYnV0ZSBiaXRzIG9uIHRoaXMgaW5vZGUgKi8KLX0gX19hdHRyaWJ1
+dGVfXygocGFja2VkKSkgRklMRV9DSEFUVFJfSU5GTzsgIC8qIGV4dCBhdHRyaWJ1dGVzCi0JCQkJ
+CQkoY2hhdHRyLCBjaGZsYWdzKSBsZXZlbCAweDIwNiAqLwotI2VuZGlmIAkJCQkvKiBQT1NJWCAq
+LworfSBfX3BhY2tlZCBGSUxFX0NIQVRUUl9JTkZPOyAgLyogZXh0IGF0dHJpYnV0ZXMgKGNoYXR0
+ciwgY2hmbGFncykgbGV2ZWwgMHgyMDYgKi8KKyNlbmRpZgkJCQkvKiBQT1NJWCAqLwogI2VuZGlm
+CQkJCS8qIF9DSUZTUERVX0ggKi8KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3Byb3RvLmggYi9m
+cy9jaWZzL2NpZnNwcm90by5oCmluZGV4IDgzZTgzZDhiZWFiYi4uZjIxNmZhMjY5Yzg1IDEwMDY0
+NAotLS0gYS9mcy9jaWZzL2NpZnNwcm90by5oCisrKyBiL2ZzL2NpZnMvY2lmc3Byb3RvLmgKQEAg
+LTEyNCw3ICsxMjQsNyBAQCBleHRlcm4gaW50IFNlbmRSZWNlaXZlMihjb25zdCB1bnNpZ25lZCBp
+bnQgLyogeGlkICovICwgc3RydWN0IGNpZnNfc2VzICosCiAJCQlzdHJ1Y3Qga3ZlYyAqIC8qIHJl
+c3AgdmVjICovKTsKIGV4dGVybiBpbnQgU2VuZFJlY2VpdmVCbG9ja2luZ0xvY2soY29uc3QgdW5z
+aWduZWQgaW50IHhpZCwKIAkJCXN0cnVjdCBjaWZzX3Rjb24gKnB0Y29uLAotCQkJc3RydWN0IHNt
+Yl9oZHIgKmluX2J1ZiAsCisJCQlzdHJ1Y3Qgc21iX2hkciAqaW5fYnVmLAogCQkJc3RydWN0IHNt
+Yl9oZHIgKm91dF9idWYsCiAJCQlpbnQgKmJ5dGVzX3JldHVybmVkKTsKIHZvaWQKLS0gCjIuMzQu
+MQoK
+--000000000000701c3c05ef6d3ccf--
