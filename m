@@ -2,73 +2,60 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF51C00145
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Dec 2022 17:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED222C4332F
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Dec 2022 02:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232592AbiLLRd7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Dec 2022 12:33:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42190 "EHLO
+        id S237020AbiLNCjT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 13 Dec 2022 21:39:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233006AbiLLRdh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Dec 2022 12:33:37 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A4B814088;
-        Mon, 12 Dec 2022 09:33:21 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7514661198;
-        Mon, 12 Dec 2022 17:33:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D7F87C433D2;
-        Mon, 12 Dec 2022 17:33:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670866399;
-        bh=dgbOreq2+9ogIExFZGD4+OIZzBTjfO+LyrrdHLkAyYE=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=ta87ayO91/p5HoB/Yt5vNqwqsjvLxFznHs5u3Xm7gmO0MggQuQ6B9vEOzB6kfo/5X
-         RahnZjnVXZwmuZAdyrZyV4MkBm5mKMdrkwVM0BxauLUmnW7XW5MfXZnZoDJQOArPGX
-         oSyMrQuqB/AgWPANyw8EPLfTndrqLl9xgWSIF0DkjSVLQYzhZCl2GgW3aIsE8cd5Ga
-         NA4BR2i10PjXxCnH8EekjfRoYhhOEynuEALKosQ794a48e0H0PgDP039m9s+jLVuhH
-         iaAk5p7AFnnLjB35G/yRTmr8hUSR2q98BJMchAoXgTR7+HaLyUrxGdtqyQlrrcPS9U
-         8CG7fs7ANQuuQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C0684C00445;
-        Mon, 12 Dec 2022 17:33:19 +0000 (UTC)
-Subject: Re: [GIT PULL] file locking changes for v6.2-rc1
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <d3ba2c7f26958242c0a31b8f966e7c3d251a9e0f.camel@kernel.org>
-References: <d3ba2c7f26958242c0a31b8f966e7c3d251a9e0f.camel@kernel.org>
-X-PR-Tracked-List-Id: <ceph-devel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <d3ba2c7f26958242c0a31b8f966e7c3d251a9e0f.camel@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git tags/locks-v6.2
-X-PR-Tracked-Commit-Id: f2f2494c8aa3cc317572c4674ef256005ebc092b
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 73fa58dca80293320f5cfeb06f5b2daeb8d97bd5
-Message-Id: <167086639978.22610.6556749360002379813.pr-tracker-bot@kernel.org>
-Date:   Mon, 12 Dec 2022 17:33:19 +0000
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        linux-nfs <linux-nfs@vger.kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+        with ESMTP id S229522AbiLNCjS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Dec 2022 21:39:18 -0500
+Received: from out30-1.freemail.mail.aliyun.com (out30-1.freemail.mail.aliyun.com [115.124.30.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE26A13F60;
+        Tue, 13 Dec 2022 18:39:16 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VXGKkRd_1670985553;
+Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VXGKkRd_1670985553)
+          by smtp.aliyun-inc.com;
+          Wed, 14 Dec 2022 10:39:14 +0800
+From:   Yang Li <yang.lee@linux.alibaba.com>
+To:     lsahlber@redhat.com
+Cc:     sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        Yang Li <yang.lee@linux.alibaba.com>,
+        Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH -next] cifs: Remove duplicated include in cifsglob.h
+Date:   Wed, 14 Dec 2022 10:39:11 +0800
+Message-Id: <20221214023911.85141-1-yang.lee@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Tue, 06 Dec 2022 08:11:43 -0500:
+./fs/cifs/cifsglob.h: linux/scatterlist.h is included more than once.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git tags/locks-v6.2
+Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=3459
+Fixes: f7f291e14dde ("cifs: fix oops during encryption")
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+---
+ fs/cifs/cifsglob.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/73fa58dca80293320f5cfeb06f5b2daeb8d97bd5
-
-Thank you!
-
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 703685e2db5e..82f2d3070c26 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -23,7 +23,6 @@
+ #include "cifs_fs_sb.h"
+ #include "cifsacl.h"
+ #include <crypto/internal/hash.h>
+-#include <linux/scatterlist.h>
+ #include <uapi/linux/cifs/cifs_mount.h>
+ #include "../smbfs_common/smb2pdu.h"
+ #include "smb2pdu.h"
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.20.1.7.g153144c
+
