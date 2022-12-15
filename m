@@ -2,69 +2,132 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C92EEC4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Dec 2022 18:30:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A230BC4332F
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Dec 2022 22:41:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230293AbiLOSaL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Dec 2022 13:30:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55638 "EHLO
+        id S229524AbiLOWlA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Dec 2022 17:41:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230520AbiLOS31 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Dec 2022 13:29:27 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 654524876F;
-        Thu, 15 Dec 2022 10:28:46 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 14A8EB81B0B;
-        Thu, 15 Dec 2022 18:28:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A6AA8C433D2;
-        Thu, 15 Dec 2022 18:28:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671128923;
-        bh=HO6pevyUao/aOCVkxHh+lrrFVCIdD2FxNhXwF4ECUmI=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=dJvlzrPkN45yJyGGEzXanv277j5S64bdeAYcm+QaPeHocRYOkqNJ4e2jtskIqC7+k
-         FpuOIU3ZShIotkO4qGOvFsGrqDeG5o2mpizM0LIJyN/t3gBtPCWZCShkNPDDZ/6x24
-         X7ZGWXzNJcJ/oS5iPvSJB5KYBDv9jhkhVds5n0XHHKtX/A6E9n05kReu4cF50x4PuY
-         /FxKkTa7UziQnZv5U33HiuG33vgq6lI0uTtXsDA8n++3Ekywrff1B/UGcjUOebINzY
-         N3Y1RYRidk7DVUrzsJWUdoGn3U9VTri0IdohjYP86cOWeH4myCNBFXvrWER8m0ynZK
-         NgI6FFTLPhngA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9714BC197B4;
-        Thu, 15 Dec 2022 18:28:43 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvfH2Kn_h2z+NsCoOdN8eBNw9_6=fFmgPvFOejwnCJMuA@mail.gmail.com>
-References: <CAH2r5mvfH2Kn_h2z+NsCoOdN8eBNw9_6=fFmgPvFOejwnCJMuA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvfH2Kn_h2z+NsCoOdN8eBNw9_6=fFmgPvFOejwnCJMuA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.2-rc-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: 72ee45fd46d0d3578c4e6046f66fae3218543ce3
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 504a73d46bad8964be2cdaa63a2bedaef198ea3b
-Message-Id: <167112892361.20649.11546129183422634830.pr-tracker-bot@kernel.org>
-Date:   Thu, 15 Dec 2022 18:28:43 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        with ESMTP id S229480AbiLOWk6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Dec 2022 17:40:58 -0500
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C3C5437C;
+        Thu, 15 Dec 2022 14:40:57 -0800 (PST)
+Received: by mail-lf1-x12a.google.com with SMTP id b13so740892lfo.3;
+        Thu, 15 Dec 2022 14:40:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OgTp2YMfj45HVIaWgO/3U9fXjxNFtfARcTcwYW7TX6w=;
+        b=iKKRxha24pjspYjsH5AGgHhkCxORLjjOlpcNWzOFTb0Z5ixM1rucXQk6rlDYRrapWz
+         GXiIrLFRviozB6BvKENOOHCqjKrD6IbhA9xyqpsiNWEAt48V2HBBvOMTsDeWBQySsb6u
+         BXieXzFzu+RI1WQDzNgD10L2Efqk7Jui2Ut1rI9uqD1UHx1UTBI1EzlC00z87ZVXLcQy
+         xWsB0NSVYHsPZWowdoH+NJPswOmIU9SUii1F4Msr9GORUkn/Ita6dfsF0AnBIyfDgGYp
+         LHZwrIEfbGP4bl7rPd4RhIPHxr4630oX1uJYZkKf0qA2qusVtQ2PT7aGN3gzKJANz7T9
+         tEFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OgTp2YMfj45HVIaWgO/3U9fXjxNFtfARcTcwYW7TX6w=;
+        b=FOwk9t1uiFqQjpC7rgGLKO1eK+WpwaRs8JJ3VFclG9IKcaEdB6Qj9bUoxa2aRmyQrm
+         UB0mNcmD8dq3++h0i1fkGioJTUzQXIBYlLfUmHcHqyWN/dQdIgaCOJ9JNQSX3unMjppv
+         4/RZnPyTsAAllzZ/BeWMkEh8R+s54uE7Qb5uaRHrasIDESovVs7k6R3FaHdGc9f32esq
+         GIsZRJxlU/qM/PfDdB5lSoBiEZA6EAs3O9T/ZDmWiWfHSdLR9VBNyT6gDDX1eJtRrzgA
+         GU+bIUNHqN5D1jbX2uuLLW+LQ6x3epADGuuG/zxZWQpLCobvwzWmJcz1/PQ9JuTkM3Ru
+         9Jtw==
+X-Gm-Message-State: ANoB5pkZOQn70h6aULZHxBvQye/o3kqUJ1mxfQROmPycAL982woz+O41
+        8rMXfiCKx0gV8G4pUX/Z3UUjUXTA663bIuDY1F/zhEGnFBQ=
+X-Google-Smtp-Source: AA0mqf7M3637RBpE5UF/Kb2RQo5/grILhO6tmbSi/Zd5U8sV3EBYni/PjBfY8wOJAEwVZEwuBazdFN7OXDsnIC0PIzw=
+X-Received: by 2002:a19:5219:0:b0:4b5:9125:1432 with SMTP id
+ m25-20020a195219000000b004b591251432mr3727068lfb.204.1671144055594; Thu, 15
+ Dec 2022 14:40:55 -0800 (PST)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 15 Dec 2022 16:40:44 -0600
+Message-ID: <CAH2r5mve4N+szjwBM2qebKwVdC_fybKEaG8JeeMLk-S_D0dckw@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Wed, 14 Dec 2022 21:18:14 -0600:
+Please pull the following changes since commit
+76dcd734eca23168cb008912c0f69ff408905235:
 
-> git://git.samba.org/ksmbd.git tags/6.2-rc-ksmbd-server-fixes
+  Linux 6.1-rc8 (2022-12-04 14:48:12 -0800)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/504a73d46bad8964be2cdaa63a2bedaef198ea3b
+are available in the Git repository at:
 
-Thank you!
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc-smb3-client-fixes-part1
+
+for you to fetch changes up to d74f4a3f6d88a2416564bc6bf937e423a4ae8f8e:
+
+  cifs: Remove duplicated include in cifsglob.h (2022-12-13 22:54:40 -0600)
+
+There is a slightly larger set of fixes being tested, which is not
+included in this
+P/R since need to be tested a bit more: e.g. 12 patches from Paulo
+(mostly DFS related fixes) and also two performance fixes and a
+security (password expired) fix, but I wanted to at least get these
+easier ones in that have been in for-next for longer.
+----------------------------------------------------------------
+13 cifs/smb3 client fixes
+- 2 SMB3.1.1 POSIX Extensions fixes
+- 3 patches to remove cifs_writepages
+- 2 memory management fixes
+- 2 mount parm parsing fixes
+- 4 minor cleanup fixes
+----------------------------------------------------------------
+Christoph Hellwig (3):
+      cifs: wire up >migrate_folio
+      cifs: stop using generic_writepages
+      cifs: remove ->writepage
+
+Paulo Alcantara (2):
+      cifs: skip alloc when request has no pages
+      cifs: fix oops during encryption
+
+Steve French (4):
+      cifs: minor cleanup of some headers
+      cifs: fix various whitespace errors in headers
+      cifs: fix missing display of three mount options
+      cifs: print warning when conflicting soft vs. hard mount options specified
+
+Volker Lendecke (3):
+      Fix path in cifs/usage.rst
+      cifs: Add "extbuf" and "extbuflen" args to smb2_compound_op()
+      cifs: Parse owner/group for stat in smb311 posix extensions
+
+Yang Li (1):
+      cifs: Remove duplicated include in cifsglob.h
+
+ Documentation/admin-guide/cifs/usage.rst |   2 +-
+ fs/cifs/cifs_ioctl.h                     |   2 +-
+ fs/cifs/cifsfs.c                         |   8 ++++-
+ fs/cifs/cifsfs.h                         |   4 +--
+ fs/cifs/cifsglob.h                       |  76
+++++++++++++++++++++++++++++++++++++++++++--
+ fs/cifs/cifspdu.h                        |  50 ++++++++++++-----------------
+ fs/cifs/cifsproto.h                      |   6 ++--
+ fs/cifs/file.c                           |  36 +++++++++++++--------
+ fs/cifs/fs_context.c                     |  11 +++++--
+ fs/cifs/inode.c                          |  13 +++++---
+ fs/cifs/misc.c                           |   4 +--
+ fs/cifs/smb2inode.c                      |  68
+++++++++++++++++++++++++++++++++-------
+ fs/cifs/smb2ops.c                        | 179
++++++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------------------
+ fs/cifs/smb2proto.h                      |   5 ++-
+ 14 files changed, 298 insertions(+), 166 deletions(-)
+
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
