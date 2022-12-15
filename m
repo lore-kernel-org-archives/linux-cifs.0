@@ -2,93 +2,122 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C53C4332F
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Dec 2022 04:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00549C4332F
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Dec 2022 03:18:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237292AbiLNE7M (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 13 Dec 2022 23:59:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38796 "EHLO
+        id S229524AbiLODSa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 14 Dec 2022 22:18:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiLNE7K (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Dec 2022 23:59:10 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8105D22BD2
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Dec 2022 20:59:09 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id v11so5517886ljk.12
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Dec 2022 20:59:09 -0800 (PST)
+        with ESMTP id S229462AbiLODS2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 14 Dec 2022 22:18:28 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDCCD2C674;
+        Wed, 14 Dec 2022 19:18:27 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id c1so13642116lfi.7;
+        Wed, 14 Dec 2022 19:18:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AkHTjbFTE4B9gk6maXDD1B13DWlXW3IkznpvbVqmGb0=;
-        b=d4PsM3Zp+/9cMM7zYMp0df1GAm0FtVi79ZK5exzsEnWqZ/647L4TD27kfB/u/Iu/Wz
-         gaiIsGBWlip+7E0Zu9nTQJQWckEv5ajSxUVGh0LHh4MnajVDt2Q+Phbj13L9tJeNsD7r
-         jJTjEndhy6JlesP9ppKG59kNHBjhoXJJ7sXhuteK9mSl8SsixGJZPmj4LvytrGoZBqBA
-         iV+P5JoyhczPsla92XptgItuIjSVAYXi8O2qIdgdW0BIE9g1e7zOfQtYgGEZdcQ5F9xz
-         zy+j6Z5fLqluuPmcDEQeJox9zH2x+D+ts4SoG10fF3HpoiNnUr8ruCkoU5AnAVwir8NH
-         RNrA==
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dioFLbEOGxQ1WnnPJFiBEKHGM2mIWuscar3MU6PY/Qc=;
+        b=YK/UjZC/8oLSXcDlx9PRbvxoLHvIo7kfSpSp05f9bl6ZgAYf+S+bTzzVMDmJkuQLgq
+         I/L9aj+abPTM5wdNO5YpO6Y2p3Jagtt2N4iOlbxTFuyoz9m7MpH+LxSmHkpKbvRznERG
+         qr1f22XsZhu4t2hfPEWARsboeAccKGDk7RquereIirSJurxLYeBiLrSV9Gn/IgD/hy/V
+         lH4QZWKbuQ/UWRJrf7JuQUlXtz7y/AWFT0/AYrzQ15m5bdyO0c5ya7kj+4uiKkNUlzl/
+         JFotnApLUuOvmTwCbybnPLslpG/NQGuaL8LWiB2lKBxLyfLbTBMgDI4Oaik8cZ9REWB0
+         RW6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AkHTjbFTE4B9gk6maXDD1B13DWlXW3IkznpvbVqmGb0=;
-        b=0w5qT/FKzL4ddQy3QaqwsE0aorSmjcScG1RVpRYpiE30/UNtTnZhH32cbGOe+CLTgn
-         Vv/E1GfupGYnYkLcI4tzoUDi4zvW0CTWSZm/qXNrLl1HOEG4EjAlCI0lVNyS25AdjRbh
-         LTAym9amV7pwj7QYEEDvG8kiUC4yLgTTVZR7daKLUwsJG7UXRdJCw/VkOs5pD+sbvwEJ
-         cvDzVeHvkjSXQezWdtk6Ozv5wUtNNUoO77AW/0U0QNMQUU/Yi2U2ILX6nfIx9fibeMXo
-         y4WEgVPAbtb35/Vucrfy1dNSyeSS0OJ2WlQBJh3BcdmDC615cot9alwlZGBNHVrpO4tl
-         a2hQ==
-X-Gm-Message-State: ANoB5pnNdZOWc5jJgg+TtA7T0Qz1NQ4K3r3+aL6l9hO+JI4c+ygSQ+lJ
-        EMLw1QoCgF4744GIBrBzQ4oxo511stfwWJh/Bjd2tX/bKp8=
-X-Google-Smtp-Source: AA0mqf5y+6PCw0wQM3WMgbVhxPk3QZa845YLXCCJtkzpJrmUqzp6TfIDbCTvg5kQ6Q5UZqsL+7WMWY/SIrde1GmHVN0=
-X-Received: by 2002:a2e:a90a:0:b0:26d:ccb6:1d47 with SMTP id
- j10-20020a2ea90a000000b0026dccb61d47mr27345823ljq.199.1670993947746; Tue, 13
- Dec 2022 20:59:07 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dioFLbEOGxQ1WnnPJFiBEKHGM2mIWuscar3MU6PY/Qc=;
+        b=dcF4XmdRf4315/+dTAPS3XYgz4+u0JovfXzDZ1gn3fGVLkzcJw+JgRYXsawYi3EqUm
+         61edjhDheKeOagQDV9rfHBFLU6SnJlJo4Hi5ZFrsKbddVquPE1o52hdIDSvDXz2oRtFS
+         B+3REPp3OicBp8HLwVnwABZ4OrZMe2uEt8gdr23gGgi3tBc5/tO9ZNIiE4i2HomR47fq
+         ZHX9p72Cmh3UjOAjcuOusAGdv9PQyoGX23/O6MLlNzN6f13+bUu2ztbhf+DJMoRlnk0q
+         fF/mKLr1V1UDIyZiG4ZhMrL40TeExoh16go+9/kOFWhEqbrk7Qpw8G+oWJ4eelob9Hd7
+         uEXw==
+X-Gm-Message-State: ANoB5pmd13z/CBD0SIeyoayqRQtBt7NFiyNzQEOW8IRFRYjOzbTyCx/q
+        y+iPORWZgPc3hFNcTQCjnyPkDTSG17njk4g6tnliSVin06g=
+X-Google-Smtp-Source: AA0mqf5lpAMDlviE6CswnkABPszt6HgcWcLpVGlUcDEmIavh1Qly7bEhY4J3efY5ExEB5SxIv/yeFTw3r8Gi8XwqKBQ=
+X-Received: by 2002:a19:5f03:0:b0:4a2:67ea:a06 with SMTP id
+ t3-20020a195f03000000b004a267ea0a06mr31870920lfb.580.1671074305968; Wed, 14
+ Dec 2022 19:18:25 -0800 (PST)
 MIME-Version: 1.0
-References: <20221214023911.85141-1-yang.lee@linux.alibaba.com>
-In-Reply-To: <20221214023911.85141-1-yang.lee@linux.alibaba.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 13 Dec 2022 22:58:55 -0600
-Message-ID: <CAH2r5mtyckeEjGWaU6e2DkXvkU2hbPS4eCDaf_NU3XUvGZNJ7g@mail.gmail.com>
-Subject: Re: [PATCH -next] cifs: Remove duplicated include in cifsglob.h
-To:     Yang Li <yang.lee@linux.alibaba.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+Date:   Wed, 14 Dec 2022 21:18:14 -0600
+Message-ID: <CAH2r5mvfH2Kn_h2z+NsCoOdN8eBNw9_6=fFmgPvFOejwnCJMuA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Merged into cifs-2.6.git for-next
+Please pull the following changes since commit
+76dcd734eca23168cb008912c0f69ff408905235:
 
+  Linux 6.1-rc8 (2022-12-04 14:48:12 -0800)
 
-On Tue, Dec 13, 2022 at 8:44 PM Yang Li <yang.lee@linux.alibaba.com> wrote:
->
-> ./fs/cifs/cifsglob.h: linux/scatterlist.h is included more than once.
->
-> Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=3459
-> Fixes: f7f291e14dde ("cifs: fix oops during encryption")
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
-> ---
->  fs/cifs/cifsglob.h | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 703685e2db5e..82f2d3070c26 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -23,7 +23,6 @@
->  #include "cifs_fs_sb.h"
->  #include "cifsacl.h"
->  #include <crypto/internal/hash.h>
-> -#include <linux/scatterlist.h>
->  #include <uapi/linux/cifs/cifs_mount.h>
->  #include "../smbfs_common/smb2pdu.h"
->  #include "smb2pdu.h"
-> --
-> 2.20.1.7.g153144c
->
+are available in the Git repository at:
 
+  git://git.samba.org/ksmbd.git tags/6.2-rc-ksmbd-server-fixes
+
+for you to fetch changes up to 72ee45fd46d0d3578c4e6046f66fae3218543ce3:
+
+  ksmbd: Convert to use sysfs_emit()/sysfs_emit_at() APIs (2022-12-11
+08:33:32 -0600)
+
+Note that this P/R includes one commit ("ksmbd: replace
+one-element arrays with flexible-array members") which you just merged
+from a different unrelated P/R a few days ago.  Let me know if you
+want me to rebase the ksmbd tree and resend the server P/R.
+
+I can also send the client (cifs.ko) P/R tomorrow if it is easier but
+have been working on testing some important fixes which are not in
+linux-next yet, so not sure if it is easier to send the client fixes
+as two P/Rs, or wait and send the client fixes all together as one
+P/R later in the merge window.
+
+----------------------------------------------------------------
+six ksmbd server fixes:
+- two resource leak fixes
+- two cleanup
+- a file unlock fix
+- a fix for configuring packet encryption properly
+
+----------------------------------------------------------------
+Gustavo A. R. Silva (1):
+      ksmbd: replace one-element arrays with flexible-array members
+
+Jeff Layton (1):
+      ksmbd: use F_SETLK when unlocking a file
+
+Marios Makassikis (1):
+      ksmbd: Fix resource leak in smb2_lock()
+
+Namjae Jeon (1):
+      ksmbd: set SMB2_SESSION_FLAG_ENCRYPT_DATA when enforcing data
+encryption for this share
+
+Xiu Jianfeng (1):
+      ksmbd: Fix resource leak in ksmbd_session_rpc_open()
+
+ye xingchen (1):
+      ksmbd: Convert to use sysfs_emit()/sysfs_emit_at() APIs
+
+ fs/ksmbd/ksmbd_netlink.h     |  1 +
+ fs/ksmbd/mgmt/user_session.c |  8 +++++---
+ fs/ksmbd/server.c            | 20 ++++++--------------
+ fs/ksmbd/smb2ops.c           | 10 ++++++++--
+ fs/ksmbd/smb2pdu.c           | 20 +++++++++++++-------
+ fs/ksmbd/smb2pdu.h           |  2 +-
+ fs/ksmbd/smb_common.h        | 12 ++++++------
+ 7 files changed, 40 insertions(+), 33 deletions(-)
 
 -- 
 Thanks,
