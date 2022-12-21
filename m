@@ -2,158 +2,147 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E900C4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Dec 2022 21:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BD3C4332F
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Dec 2022 15:36:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233726AbiLTVt4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Dec 2022 16:49:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56384 "EHLO
+        id S234755AbiLUPgh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 21 Dec 2022 10:36:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiLTVtz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Dec 2022 16:49:55 -0500
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BDE183BA;
-        Tue, 20 Dec 2022 13:49:53 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id n6so8147844ljj.11;
-        Tue, 20 Dec 2022 13:49:53 -0800 (PST)
+        with ESMTP id S234884AbiLUPgA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 21 Dec 2022 10:36:00 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B645312AA5
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Dec 2022 07:33:14 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id b13so24052978lfo.3
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Dec 2022 07:33:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tkPYCUNmqr17+v9yQOtJ3j6rSJ6OzQvmePXcoXtefxU=;
-        b=YhRmV+cQr0S5aEgLYIJ5wmhkmbgtxYA/7VQ9rfLKgbsAyUGJ4yND5VIi7BaITRtt3M
-         7cvgFUpYTAtna9D4FpZ4XenmvL4tS0dNo+zM+/xpPqyxg9m2WnPDx/FkCAHhXy4pYjDq
-         QRb25dA7lVhrBD3xSlPpe0J+j4GJmw/dXAomyNM8j/GcXM4CD3LSuMKtZXHOsQ6/KtgG
-         oXsHPdXPlQt7BYpU17t9hNxCS/HYdN6uYAUw38yfYKwsBpgu5YyZEqERAhUzt6GzJT8N
-         zWOB32ijHONVdF+GxyimnKbLTJmB8WztOlcGg/8wU0GXoP3o0i3oIl/USJt5t2Eb8+c6
-         G/0A==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zGFzu9g9646JJSFOPhemH5hnnp/CtmrP9HslKbW8OGU=;
+        b=SlJKoJ1zp451hNYw0DqOpd7WAbstYybelswJUgKw4C231Se9gPbfev8TNUTtlRegNQ
+         F9EiP7xIIfgxWHpsyPqiL364LELgusG9S3CZ28ohlqv0RyvmQIFktje2EO9BBWYAPIP1
+         lAaNLVGiQBCzLBRCeFa2uZh0xt9zyhVYaWsYsgZ3rANlkxD5hfzkKelq0rj3V+YPyOTn
+         KfdLmSTmUmK21AGIQoyAFa1q3vOMBBIzcxEIQdeNNQgYSMv2pCwn6JCoCZwy8zvCFdfE
+         wnHXdgjtSMavD0VMwU9fWgZM10YY+I2z0YKxR1XDcH6W4XPtBDLUfqAiejMsWvqLoItO
+         y3Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tkPYCUNmqr17+v9yQOtJ3j6rSJ6OzQvmePXcoXtefxU=;
-        b=oQm8JyvYBFxI/WzKSZnLpZJ4e6aDRnV08EGkzjVegcAFdI76I7XZRb7TSN50Xw/LVn
-         orT6NNSgZJuUsYhaMAveVm+o5KPes5l2zPqR67erKTQhYT6BLvkCUps4fF/A8VRBwJRN
-         CK5EnkI4JaFgdWxebWPmAwRCPT1mVB198XLzx4jOszIepCDTsMgueOBj/p8QIeldaA3F
-         dbnE/5kYYLIXP2AXA5fSAmgqqRAqk9atyG/vtahBl6/lekVgYQj+ez93tiUmbEajT5ck
-         cMw9MuB53Ftem529qGNCUhRGK6Km7rWYcmkZkzZvlEDLyHxf+eVTiOzEs+L5a3jBLHjU
-         JZTA==
-X-Gm-Message-State: ANoB5pkeGjNBAfSKhCvsRNQMYuFyaJC1eFvjWqav5T4H3/jvk5auLq+k
-        S53K98oZtlcTtXgh3GErD5IudWvn+YsJbMAXwhR/9bf29/8=
-X-Google-Smtp-Source: AA0mqf4qaMwHUwzKUCLFUSUMVawRvw+CVhG089UVjSLGrCQru5urUdpljLjdC0v30UJkFXLVKr72WM9esD3sV+QIyhQ=
-X-Received: by 2002:a2e:86d2:0:b0:279:df97:e895 with SMTP id
- n18-20020a2e86d2000000b00279df97e895mr9636825ljj.226.1671572991812; Tue, 20
- Dec 2022 13:49:51 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zGFzu9g9646JJSFOPhemH5hnnp/CtmrP9HslKbW8OGU=;
+        b=nxKyTPSn8Spddg7Dnf7UIrVKFe30CxZiF1+A2+NLmbt/SaE/Qe4Ybgifjkmkxqix8p
+         POXCYHLIDSAP+mtTHzCGUNPDIBTok2gWUtGPgAN1PYMGZu/vpZUkpSuNq+ImdoEidmY3
+         bTMTdwY/YKe4GkLB45WIfxhJboxuNa55Gl0Cfy+5qio5p9YhdFxb4yWlS3AcIZs15JBa
+         CFOnPsRyMRz7vndACf+QQqKfjArgJDfnLJo6I1Vk02l0/PWRWIUlHqhjUV3mvB/ZMNaX
+         OvLKoATTAL9qDxzmex2eZuN8bLuqh7oaeQ2mXUbpcKYQrkpMLpbD0ONZytRajCVnnb+a
+         GQBQ==
+X-Gm-Message-State: AFqh2kruvdGY6ANwxudt+fuxGQ7aFcO8hakkwz5QbS9m5iFB356QVU6S
+        OBfifI/cnNkUh2F/XxX7mPzGpRv4741nPGS5/Ks=
+X-Google-Smtp-Source: AMrXdXucikRGttoBDgD69dCRW6CUBLJQt7eQJ9Q2XyamykM4hCLydvvC3Qd1IlWywa7pLNNgyuy/d38nQ8qr8GK3u3s=
+X-Received: by 2002:ac2:5cca:0:b0:4b2:5c79:ae9c with SMTP id
+ f10-20020ac25cca000000b004b25c79ae9cmr237931lfq.619.1671636792851; Wed, 21
+ Dec 2022 07:33:12 -0800 (PST)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 20 Dec 2022 15:49:40 -0600
-Message-ID: <CAH2r5mupDphsriFvcC_Hh0dWaDWdyAKNk1xKwEts7mfm3K5ESw@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <CANT5p=oKQEB6HnopL=jAd0pxd-+OukcfrVgc76X-suShqUiA9w@mail.gmail.com>
+ <CAH2r5muGBpwvpt6tTXDj2s=UHhJyG1=p94mcTaZ7QbrpuZ2R+w@mail.gmail.com> <6b39f048-b292-a0fd-af8a-abad97d22ed7@talpey.com>
+In-Reply-To: <6b39f048-b292-a0fd-af8a-abad97d22ed7@talpey.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 21 Dec 2022 21:03:01 +0530
+Message-ID: <CANT5p=rje_XAHySDoxL50C6=EUkvdawN4neU+0xyvFDLAbYW6A@mail.gmail.com>
+Subject: Re: [PATCH] cifs: use the least loaded channel for sending requests
+To:     Tom Talpey <tom@talpey.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Bharath S M <bharathsm@microsoft.com>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aurelien.aptel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-851f657a86421dded42b6175c6ea0f4f5e86af97:
+On Tue, Dec 20, 2022 at 11:48 PM Tom Talpey <tom@talpey.com> wrote:
+>
+> I'd suggest a runtime configuration, personally. A config option
+> is undesirable, because it's very difficult to deploy. A module
+> parameter is only slightly better. The channel selection is a
+> natural for a runtime per-operation decision. And for the record,
+> I think a round-robin selection is a bad approach. Personally
+> I'd just yank it.
 
-  Merge tag '6.2-rc-smb3-client-fixes-part1' of
-git://git.samba.org/sfrench/cifs-2.6 (2022-12-15 14:53:14 -0800)
+Hi Tom,
 
-are available in the Git repository at:
+Thanks for taking a look at this.
+I was considering doing so. But was unsure if we'll still need a way
+to do round robin.
+Steve/Aurelien: Any objections to just remove the round-robin approach?
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc-smb3-client-fixes-part2
+>
+> I'm uneasy about ignoring the channel bandwidth and channel type.
+> Low bandwidth channels, or mixing RDMA and non-RDMA, are going to
+> be very problematic for bulk data. In fact, the Windows client
+> never mixes such alternatives, it always selects identical link
+> speeds and transport types. The traffic will always find a way to
+> block on the slowest/worst connection.
+>
+> Do you feel there is some advantage to mixing traffic? If so, can
+> you elaborate on that?
 
-for you to fetch changes up to aacfc939cc42293fbcfe113040b4e8abaef68429:
+We will not be mixing traffic here. Channel bandwidth and type are
+considered while establishing a new channel.
+This change is only for distributing the requests among the channels
+for the session.
 
-  cifs: update internal module number (2022-12-19 08:04:50 -0600)
+That said, those decisions are sub-optimal today, IMO.
+I plan to send out some changes there too.
 
-As mentioned in the earlier smb3 client P/R, last week we were still
-testing various additional important fixes: a series of DFS and reconnect
-fixes from Paulo, which are now included in this P/R
-----------------------------------------------------------------
-20 cifs/smb3 client fixes, mostly related to reconnect and/or DFS
+>
+> The patch you link to doesn't seem complete. If min_in_flight is
+> initialized to -1, how does the server->in_flight < min_in_flight
+> test ever return true?
 
-- two important reconnect fixes: cases where status of recently connected IPCs
-and shares were not being updated leaving them in an incorrect state
-- fix for older Windows servers that would return STATUS_OBJECT_NAME_INVALID
-to query info requests on DFS links in a namespace that contained non-ASCII
-characters, reducing number of wasted roundtrips.
-- fix for leaked -ENOMEM to userspace when cifs.ko couldn't perform I/O due
-to a disconnected server, expired or deleted session.
-- removal of all unneeded DFS related mount option string parsing (now using
-fs_context for automounts)
--improve clarity/readability, moving various DFS related functions out
-of fs/cifs/connect.c
-(which was getting too big to be readable) to new file.
-- Fix problem when large number of DFS connections.  Allow sharing of DFS
-connections and fix how the referral paths are matched
-- Referral caching fix: Instead of looking up ipc connections to
-refresh cached referrals,
-store direct dfs root server's IPC pointer in new sessions so can
-simply access it to
-either refresh or create a new referral that such connections belong to.
-- Fix to allow dfs root server's connections to also failover
-- Optimized reconnect of nested DFS links
-- Set correct status of IPC connections marked for reconnect
-----------------------------------------------------------------
-Paulo Alcantara (19):
-      cifs: set correct tcon status after initial tree connect
-      cifs: set correct ipc status after initial tree connect
-      cifs: reduce roundtrips on create/qinfo requests
-      cifs: use fs_context for automounts
-      cifs: get rid of mount options string parsing
-      cifs: remove unused smb3_fs_context::mount_options
-      cifs: set resolved ip in sockaddr
-      cifs: split out ses and tcon retrieval from mount_get_conns()
-      cifs: share dfs connections and supers
-      cifs: don't refresh cached referrals from unactive mounts
-      cifs: fix refresh of cached referrals
-      cifs: refresh root referrals
-      cifs: don't block in dfs_cache_noreq_update_tgthint()
-      cifs: fix confusing debug message
-      cifs: fix source pathname comparison of dfs supers
-      cifs: optimize reconnect of nested links
-      cifs: set correct status of tcon ipc when reconnecting
-      cifs: use origin fullpath for automounts
-      cifs: don't leak -ENOMEM in smb2_open_file()
+min_in_flight is declared as unsigned and then assigned to -1.
+I'm relying on the compiler to use the max value for the unsigned int
+based on this.
+Perhaps I should have been more explicit by assigning this to
+UINT_MAX. Will do so now.
 
-Steve French (1):
-      cifs: update internal module number
+>
+> Tom.
+>
+> On 12/20/2022 9:47 AM, Steve French wrote:
+> > maybe a module load parm would be easier to use than kernel config
+> > option (and give more realistic test comparison data for many)
+> >
+> > On Tue, Dec 20, 2022 at 7:29 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> >>
+> >> Hi Steve,
+> >>
+> >> Below is a patch for a new channel allocation strategy that we've been
+> >> discussing for some time now. It uses the least loaded channel to send
+> >> requests as compared to the simple round robin. This will help
+> >> especially in cases where the server is not consuming requests at the
+> >> same rate across the channels.
+> >>
+> >> I've put the changes behind a config option that has a default value of true.
+> >> This way, we have an option to switch to the current default of round
+> >> robin when needed.
+> >>
+> >> Please review.
+> >>
+> >> https://github.com/sprasad-microsoft/smb3-kernel-client/commit/28b96fd89f7d746fc2b6c68682527214a55463f9.patch
+> >>
+> >> --
+> >> Regards,
+> >> Shyam
+> >
+> >
+> >
 
- fs/cifs/Makefile       |   2 +-
- fs/cifs/cifs_debug.c   |   8 +
- fs/cifs/cifs_dfs_ref.c | 255 +++++++-------------------------
- fs/cifs/cifsfs.c       |   6 -
- fs/cifs/cifsfs.h       |   4 +-
- fs/cifs/cifsglob.h     |  18 ++-
- fs/cifs/cifsproto.h    |  14 +-
- fs/cifs/connect.c      | 899
-++++++++++++++++++---------------------------------------------------------------------------------------------
- fs/cifs/dfs.c          | 544
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/dfs.h          |  46 ++++++
- fs/cifs/dfs_cache.c    | 276 +++++++---------------------------
- fs/cifs/dfs_cache.h    |   2 +-
- fs/cifs/dir.c          |  21 ++-
- fs/cifs/dns_resolve.c  |  49 +++---
- fs/cifs/dns_resolve.h  |   4 +-
- fs/cifs/fs_context.c   |  13 +-
- fs/cifs/fs_context.h   |   3 +-
- fs/cifs/inode.c        |   6 -
- fs/cifs/misc.c         |  81 ++--------
- fs/cifs/smb2file.c     |   4 +-
- fs/cifs/smb2inode.c    |  46 ++++--
- fs/cifs/smb2ops.c      |  28 +++-
- 22 files changed, 991 insertions(+), 1338 deletions(-)
- create mode 100644 fs/cifs/dfs.c
- create mode 100644 fs/cifs/dfs.h
 
 
 -- 
-Thanks,
-
-Steve
+Regards,
+Shyam
