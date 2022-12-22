@@ -2,128 +2,141 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1530C4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Dec 2022 10:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43388C41535
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Dec 2022 15:02:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235293AbiLVKsS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Dec 2022 05:48:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49552 "EHLO
+        id S235300AbiLVPCv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Dec 2022 10:02:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235281AbiLVKsR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Dec 2022 05:48:17 -0500
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0208E25EB7
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Dec 2022 02:48:16 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id y16so1233351wrm.2
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Dec 2022 02:48:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9bVt/QDTeT3eLxZxhkn7PsFUBEZi6VhoNSxlR8G3p5Q=;
-        b=2pN6X+NIjT/yBbE7uYF0O6CE5sDW+1BnZAAmNtwvnkPgbAoheiTntcS1urqYadzaNR
-         5n6dlXsNzQ5zo2yAlPg83tJ6iNAfCTiPvdEhPDbHd3vRqVDLwnBR+dEwJ0f88yCwbgzE
-         NYt5xSmD3I0Bm0r6PYtcFw6c6JJxQR6v+OW0v0lk137H56wNeLo24bmKVsFbB/Zq4oAT
-         w8OdCZdY09xMnBKkgP4Xz7dzu/NpZiLZzCMc2GLHyL3AECu7uqmi/TPB+/+xT7A0Zu+5
-         dixXFHeMwsqINUwQin3tOJo9fWXfR0jvXSmD4roIbWO6FpBZrL6E2t4iGB/kh9mImj6d
-         cCcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9bVt/QDTeT3eLxZxhkn7PsFUBEZi6VhoNSxlR8G3p5Q=;
-        b=seum/Fqb1/D5wNyfh4tgQLPxmz54XV8w45PT91t5XpjPKIrYvQu/HeE/CcR/N8BJG0
-         FRSowG7xuWm9zK2XQLorlqsPAMRBUBHTafLKr5rdVGKrmK2pT1IfnYbG/I13T7fag2Tu
-         rCvEXR0+iFaKJNKuZvO3QkYwYL+dWZFbpfkf7AqwK21O5KR9RMwmmrqcxIaDdwW6aXzr
-         pyJ8N7givebeSX90uV7blPo+n3ajgia44ZcFQNz9w/DJxuaq8Xi0RGTT4ZOL+vA+twUb
-         W3x2lPQ7LT4HyEB+umQ1GNhghBhlDDDp3n0tyv1snbVRx+VXgdRwnHdMFWZ7Zo99dbe8
-         RArg==
-X-Gm-Message-State: AFqh2krCVExT2k4zlQiRqIIbI9kPfh+zR/UqJ+tdU64ezVKLP7aSXOLG
-        yWk3dqgPGx3V1+aBfYCMnnqApyqE104t98PY
-X-Google-Smtp-Source: AMrXdXuPvFiymDj6gWejzviVT++fVxOh8y46cMtAHo//D4RrDk6PSi/vrY0ME0rzyvW921oVQACGwg==
-X-Received: by 2002:adf:ef89:0:b0:26f:63ec:eb78 with SMTP id d9-20020adfef89000000b0026f63eceb78mr1423792wro.23.1671706094381;
-        Thu, 22 Dec 2022 02:48:14 -0800 (PST)
-Received: from marios-t5500.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
-        by smtp.gmail.com with ESMTPSA id o6-20020adfa106000000b002423620d356sm207846wro.35.2022.12.22.02.48.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Dec 2022 02:48:14 -0800 (PST)
-From:   Marios Makassikis <mmakassikis@freebox.fr>
-To:     linux-cifs@vger.kernel.org
-Cc:     Marios Makassikis <mmakassikis@freebox.fr>
-Subject: [PATCH] ksmbd: send proper error response in smb2_tree_connect()
-Date:   Thu, 22 Dec 2022 11:47:02 +0100
-Message-Id: <20221222104701.717586-1-mmakassikis@freebox.fr>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S235534AbiLVPCt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Dec 2022 10:02:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4062821276
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Dec 2022 07:02:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671721322;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LJ9TKjkNcbwIl+mphZW6iF9b6MFhoECdv27WBprwBlw=;
+        b=M3IqyvZS3yKdWhlO6ebxH0gqP68j7MYUxxykryNVppYvhqVR7uy/m2Pw0Gwk5G2k3SUgtq
+        hPpN558NrjHRhcqvMmHuligeXbrZlJLR2YYcz1hChNX5V07J68e5Lbng6DTlMkxdhf09Nc
+        CDujoVszFRsDGbP1PYxtDhL895K2qYY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-546-vEDcC2HANCu8HRye7N1l7Q-1; Thu, 22 Dec 2022 10:01:59 -0500
+X-MC-Unique: vEDcC2HANCu8HRye7N1l7Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8C0CF1C06901;
+        Thu, 22 Dec 2022 15:01:57 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 844512166B29;
+        Thu, 22 Dec 2022 15:01:54 +0000 (UTC)
+Subject: [PATCH v5 0/3] mm, netfs,
+ fscache: Stop read optimisation when folio removed from pagecache
+From:   David Howells <dhowells@redhat.com>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Dave Wysochanski <dwysocha@redhat.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        linux-cachefs@redhat.com,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-nfs@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        Ilya Dryomov <idryomov@gmail.com>, linux-cifs@vger.kernel.org,
+        dhowells@redhat.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, linux-erofs@lists.ozlabs.org,
+        linux-ext4@lists.ozlabs.org, linux-cachefs@redhat.com,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Thu, 22 Dec 2022 15:01:53 +0000
+Message-ID: <167172131368.2334525.8569808925687731937.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.5
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Currently, smb2_tree_connect doesn't send an error response packet on
-error.
 
-This causes libsmb2 to skip the specific error code and fail with the
-following:
- smb2_service failed with : Failed to parse fixed part of command
- payload. Unexpected size of Error reply. Expected 9, got 8
+Hi Linus,
 
-Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+I've split the folio_has_private()/filemap_release_folio() call pair
+merging into its own patch, separate from the actual bugfix and pulled out
+the folio_needs_release() function into mm/internal.h and made
+filemap_release_folio() use it.  I've also got rid of the bit clearances
+from the network filesystem evict_inode functions as they doesn't seem to
+be necessary.
+
+Note that the last vestiges of try_to_release_page() got swept away in the
+current merge window, so I rebased and dealt with that.  One comment
+remained, which is removed by the first patch.
+
+David
+
+Changes:
+========
+ver #5)
+ - Rebased on linus/master.  try_to_release_page() has now been entirely
+   replaced by filemap_release_folio(), barring one comment.
+ - Cleaned up some pairs in ext4.
+
+ver #4)
+ - Split has_private/release call pairs into own patch.
+ - Moved folio_needs_release() to mm/internal.h and removed open-coded
+   version from filemap_release_folio().
+ - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
+ - Added experimental patch to reduce shrink_folio_list().
+
+ver #3)
+ - Fixed mapping_clear_release_always() to use clear_bit() not set_bit().
+ - Moved a '&&' to the correct line.
+
+ver #2)
+ - Rewrote entirely according to Willy's suggestion[1].
+
+Link: https://lore.kernel.org/r/Yk9V/03wgdYi65Lb@casper.infradead.org/ [1]
+Link: https://lore.kernel.org/r/164928630577.457102.8519251179327601178.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/166844174069.1124521.10890506360974169994.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/166869495238.3720468.4878151409085146764.stgit@warthog.procyon.org.uk/ # v3
+Link: https://lore.kernel.org/r/1459152.1669208550@warthog.procyon.org.uk/ # v3 also
 ---
- fs/ksmbd/smb2pdu.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+David Howells (3):
+      mm: Merge folio_has_private()/filemap_release_folio() call pairs
+      mm, netfs, fscache: Stop read optimisation when folio removed from pagecache
+      mm: Make filemap_release_folio() better inform shrink_folio_list()
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 14d7f3599c63..bd2ff9ffa965 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -1882,12 +1882,14 @@ int smb2_tree_connect(struct ksmbd_work *work)
- 	if (IS_ERR(treename)) {
- 		pr_err("treename is NULL\n");
- 		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
-+		smb2_set_err_rsp(work);
- 		goto out_err1;
- 	}
- 
- 	name = ksmbd_extract_sharename(conn->um, treename);
- 	if (IS_ERR(name)) {
- 		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
-+		smb2_set_err_rsp(work);
- 		goto out_err1;
- 	}
- 
-@@ -1895,10 +1897,12 @@ int smb2_tree_connect(struct ksmbd_work *work)
- 		    name, treename);
- 
- 	status = ksmbd_tree_conn_connect(conn, sess, name);
--	if (status.ret == KSMBD_TREE_CONN_STATUS_OK)
-+	if (status.ret == KSMBD_TREE_CONN_STATUS_OK) {
- 		rsp->hdr.Id.SyncId.TreeId = cpu_to_le32(status.tree_conn->id);
--	else
-+	} else {
-+		smb2_set_err_rsp(work);
- 		goto out_err1;
-+	}
- 
- 	share = status.tree_conn->share_conf;
- 	if (test_share_config_flag(share, KSMBD_SHARE_FLAG_PIPE)) {
-@@ -1928,13 +1932,13 @@ int smb2_tree_connect(struct ksmbd_work *work)
- 	if (conn->posix_ext_supported)
- 		status.tree_conn->posix_extensions = true;
- 
--out_err1:
- 	rsp->StructureSize = cpu_to_le16(16);
-+	inc_rfc1001_len(work->response_buf, 16);
-+out_err1:
- 	rsp->Capabilities = 0;
- 	rsp->Reserved = 0;
- 	/* default manual caching */
- 	rsp->ShareFlags = SMB2_SHAREFLAG_MANUAL_CACHING;
--	inc_rfc1001_len(work->response_buf, 16);
- 
- 	if (!IS_ERR(treename))
- 		kfree(treename);
--- 
-2.25.1
+
+ fs/9p/cache.c           |  2 ++
+ fs/afs/internal.h       |  2 ++
+ fs/cachefiles/namei.c   |  2 ++
+ fs/ceph/cache.c         |  2 ++
+ fs/cifs/fscache.c       |  2 ++
+ fs/ext4/move_extent.c   | 12 ++++--------
+ fs/splice.c             |  3 +--
+ include/linux/pagemap.h | 23 ++++++++++++++++++++++-
+ mm/filemap.c            | 20 +++++++++++++++-----
+ mm/huge_memory.c        |  3 +--
+ mm/internal.h           | 11 +++++++++++
+ mm/khugepaged.c         |  3 +--
+ mm/memory-failure.c     |  8 +++-----
+ mm/migrate.c            |  3 +--
+ mm/truncate.c           |  6 ++----
+ mm/vmscan.c             | 35 ++++++++++++++++++-----------------
+ 16 files changed, 89 insertions(+), 48 deletions(-)
+
 
