@@ -2,233 +2,139 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A524DC4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Dec 2022 15:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA669C4332F
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Dec 2022 04:21:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235925AbiLVPEp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Dec 2022 10:04:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50532 "EHLO
+        id S229997AbiLWEVK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Dec 2022 23:21:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235561AbiLVPES (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Dec 2022 10:04:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E22028E20
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Dec 2022 07:02:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671721359;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=75w1pfVKB1Ro0XqkbXmr8eWxoXfk22o+qXL/5b9cucw=;
-        b=XLRwGmDZVV85fRvVvsUASDYl7VFxM593UFrwdOCx6aZ/dDknwEiIuagJK9gGqzIefbEJdK
-        ggWKfvvBeo4hlBDyrp4qdzreAzufQab2QaG5zoIczq13PotfA5MiOpkPrlB5QXZhvMTCp4
-        9PX8e9U26OF55MDxspHf6SLGT1znpmI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-290-HaKXfIxlMWuof_yakpjAKg-1; Thu, 22 Dec 2022 10:02:34 -0500
-X-MC-Unique: HaKXfIxlMWuof_yakpjAKg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229549AbiLWEVI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Dec 2022 23:21:08 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F02201B4
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Dec 2022 20:21:04 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1C872803D7E;
-        Thu, 22 Dec 2022 15:02:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4BBDC2166B29;
-        Thu, 22 Dec 2022 15:02:30 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v5 3/3] mm: Make filemap_release_folio() better inform
- shrink_folio_list()
-From:   David Howells <dhowells@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Dave Wysochanski <dwysocha@redhat.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
-        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
-        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, dhowells@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, linux-erofs@lists.ozlabs.org,
-        linux-ext4@lists.ozlabs.org, linux-cachefs@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 22 Dec 2022 15:02:29 +0000
-Message-ID: <167172134962.2334525.570622889806603086.stgit@warthog.procyon.org.uk>
-In-Reply-To: <167172131368.2334525.8569808925687731937.stgit@warthog.procyon.org.uk>
-References: <167172131368.2334525.8569808925687731937.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/1.5
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B33C361A09
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Dec 2022 04:21:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B3B0C433EF
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Dec 2022 04:21:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671769263;
+        bh=NAoofNn3fhgrKQKJmnIeYxESZaY+K8zxqHdSFqnm9KA=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=gTzvOJe6gjtUlDvBi38GGOhgpPIPc3qUuEUegOSCJteQ7i7o05b1BnK1OYheVAIeM
+         VVrH/MIwOKJZul3n+mZ2sflqj8cM2LP+VuCEV0gPTATJZiapNae4Tp29mLFISl2mLg
+         D5QwbZyT0ckKbunwhXIdpHldNQR+b1/NihN209xzfFxHP1w5gZKu+e/YskI/ZPbSRR
+         dGEDrwP2+PSX3+dxVo6XYRnBQlifZT2bgDjFsFLiwgwExCUCznkzHBsrLPcVPCvNHJ
+         ZUxoEyZ/hewPJFNGVq1yQSMfpzIyUaX2M2NZfuurbsFDRAabaPjehBSYpaD9BVLrol
+         vSzIYPnzhDpNQ==
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-12c8312131fso4837892fac.4
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Dec 2022 20:21:03 -0800 (PST)
+X-Gm-Message-State: AFqh2kpNqy0xqpempqTseOlcuJSI8fkRY0Vr8T8p09ZxvuBH/pt6UjR4
+        J1G9+/RtttLRV7rPkC1/SUEi9eMxLiD8swxipOA=
+X-Google-Smtp-Source: AMrXdXvwi+Xsdthu6Fy0jT+vsrUdYf8DlfHSKFXXzrTCT/omVQY8GLKCixeXpsVrZI7guAhF9lvdP+36IYhUH35ZVmU=
+X-Received: by 2002:a05:6870:a10e:b0:141:828c:12b5 with SMTP id
+ m14-20020a056870a10e00b00141828c12b5mr614490oae.8.1671769262175; Thu, 22 Dec
+ 2022 20:21:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Received: by 2002:a05:6838:2d06:0:0:0:0 with HTTP; Thu, 22 Dec 2022 20:21:01
+ -0800 (PST)
+In-Reply-To: <20221222104701.717586-1-mmakassikis@freebox.fr>
+References: <20221222104701.717586-1-mmakassikis@freebox.fr>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Fri, 23 Dec 2022 13:21:01 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_SLXF664ajnNEVxkx-BOSk7M-JXAn_w-_SuoTjfZtH1A@mail.gmail.com>
+Message-ID: <CAKYAXd_SLXF664ajnNEVxkx-BOSk7M-JXAn_w-_SuoTjfZtH1A@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: send proper error response in smb2_tree_connect()
+To:     Marios Makassikis <mmakassikis@freebox.fr>
+Cc:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make filemap_release_folio() return one of three values:
+2022-12-22 19:47 GMT+09:00, Marios Makassikis <mmakassikis@freebox.fr>:
+Hi Marios,
+> Currently, smb2_tree_connect doesn't send an error response packet on
+> error.
+>
+> This causes libsmb2 to skip the specific error code and fail with the
+> following:
+>  smb2_service failed with : Failed to parse fixed part of command
+>  payload. Unexpected size of Error reply. Expected 9, got 8
+>
+> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+> ---
+>  fs/ksmbd/smb2pdu.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index 14d7f3599c63..bd2ff9ffa965 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -1882,12 +1882,14 @@ int smb2_tree_connect(struct ksmbd_work *work)
+>  	if (IS_ERR(treename)) {
+>  		pr_err("treename is NULL\n");
+>  		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
+> +		smb2_set_err_rsp(work);
+>  		goto out_err1;
+>  	}
+>
+>  	name = ksmbd_extract_sharename(conn->um, treename);
+>  	if (IS_ERR(name)) {
+>  		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
+> +		smb2_set_err_rsp(work);
+>  		goto out_err1;
+>  	}
+>
+> @@ -1895,10 +1897,12 @@ int smb2_tree_connect(struct ksmbd_work *work)
+>  		    name, treename);
+>
+>  	status = ksmbd_tree_conn_connect(conn, sess, name);
+> -	if (status.ret == KSMBD_TREE_CONN_STATUS_OK)
+> +	if (status.ret == KSMBD_TREE_CONN_STATUS_OK) {
+>  		rsp->hdr.Id.SyncId.TreeId = cpu_to_le32(status.tree_conn->id);
+> -	else
+> +	} else {
+> +		smb2_set_err_rsp(work);
+>  		goto out_err1;
+> +	}
+>
+>  	share = status.tree_conn->share_conf;
+>  	if (test_share_config_flag(share, KSMBD_SHARE_FLAG_PIPE)) {
+> @@ -1928,13 +1932,13 @@ int smb2_tree_connect(struct ksmbd_work *work)
+>  	if (conn->posix_ext_supported)
+>  		status.tree_conn->posix_extensions = true;
+>
+> -out_err1:
+>  	rsp->StructureSize = cpu_to_le16(16);
+> +	inc_rfc1001_len(work->response_buf, 16);
+> +out_err1:
+>  	rsp->Capabilities = 0;
+>  	rsp->Reserved = 0;
+>  	/* default manual caching */
+>  	rsp->ShareFlags = SMB2_SHAREFLAG_MANUAL_CACHING;
+> -	inc_rfc1001_len(work->response_buf, 16);
+>
+>  	if (!IS_ERR(treename))
+>  		kfree(treename);
 
- (0) FILEMAP_CANT_RELEASE_FOLIO
+How about moving smb2_set_err_rsp() to the end of this function to simplify?
 
-     Couldn't release the folio's private data, so the folio can't itself
-     be released.
+@@ -1987,6 +1987,9 @@ out_err1:
+                rsp->hdr.Status = STATUS_ACCESS_DENIED;
+        }
 
- (1) FILEMAP_RELEASED_FOLIO
-
-     The private data on the folio was released and the folio can be
-     released.
-
- (2) FILEMAP_FOLIO_HAD_NO_PRIVATE
-
-     There was no private data on the folio and the folio can be released.
-
-The first must be zero so that existing tests of !filemap_release_folio()
-continue to work as expected; similarly the other two must both be non-zero
-so that existing tests of filemap_release_folio() continue to work as
-expected.
-
-Using this, make shrink_folio_list() choose which of three cases to follow
-based on the return from filemap_release_folio() rather than testing the
-folio's private bit itself.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Dave Wysochanski <dwysocha@redhat.com>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Ilya Dryomov <idryomov@gmail.com>
-cc: linux-cachefs@redhat.com
-cc: linux-cifs@vger.kernel.org
-cc: linux-afs@lists.infradead.org
-cc: v9fs-developer@lists.sourceforge.net
-cc: ceph-devel@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
-
-Link: https://lore.kernel.org/r/1459152.1669208550@warthog.procyon.org.uk/ # v3
-Link: https://lore.kernel.org/r/166924373637.1772793.2622483388224911574.stgit@warthog.procyon.org.uk/ # v4
----
-
- include/linux/pagemap.h |    7 ++++++-
- mm/filemap.c            |   20 ++++++++++++++------
- mm/vmscan.c             |   29 +++++++++++++++--------------
- 3 files changed, 35 insertions(+), 21 deletions(-)
-
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index a0d433e0addd..cd00fb3b524b 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -1121,7 +1121,12 @@ void __filemap_remove_folio(struct folio *folio, void *shadow);
- void replace_page_cache_folio(struct folio *old, struct folio *new);
- void delete_from_page_cache_batch(struct address_space *mapping,
- 				  struct folio_batch *fbatch);
--bool filemap_release_folio(struct folio *folio, gfp_t gfp);
-+enum filemap_released_folio {
-+	FILEMAP_CANT_RELEASE_FOLIO	= 0, /* (This must be 0) Release failed */
-+	FILEMAP_RELEASED_FOLIO		= 1, /* Folio's private data released */
-+	FILEMAP_FOLIO_HAD_NO_PRIVATE	= 2, /* Folio had no private data */
-+};
-+enum filemap_released_folio filemap_release_folio(struct folio *folio, gfp_t gfp);
- loff_t mapping_seek_hole_data(struct address_space *, loff_t start, loff_t end,
- 		int whence);
- 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 344146c170b0..217ca847773a 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -3953,20 +3953,28 @@ EXPORT_SYMBOL(generic_file_write_iter);
-  * this page (__GFP_IO), and whether the call may block
-  * (__GFP_RECLAIM & __GFP_FS).
-  *
-- * Return: %true if the release was successful, otherwise %false.
-+ * Return: %FILEMAP_RELEASED_FOLIO if the release was successful,
-+ * %FILEMAP_CANT_RELEASE_FOLIO if the private data couldn't be released and
-+ * %FILEMAP_FOLIO_HAD_NO_PRIVATE if there was no private data.
-  */
--bool filemap_release_folio(struct folio *folio, gfp_t gfp)
-+enum filemap_released_folio filemap_release_folio(struct folio *folio,
-+						  gfp_t gfp)
- {
- 	struct address_space * const mapping = folio->mapping;
-+	bool released;
- 
- 	BUG_ON(!folio_test_locked(folio));
- 	if (!folio_needs_release(folio))
--		return true;
-+		return FILEMAP_FOLIO_HAD_NO_PRIVATE;
- 	if (folio_test_writeback(folio))
--		return false;
-+		return FILEMAP_CANT_RELEASE_FOLIO;
- 
- 	if (mapping && mapping->a_ops->release_folio)
--		return mapping->a_ops->release_folio(folio, gfp);
--	return try_to_free_buffers(folio);
-+		released = mapping->a_ops->release_folio(folio, gfp);
-+	else
-+		released = try_to_free_buffers(folio);
++       if (status.ret != KSMBD_TREE_CONN_STATUS_OK)
++               smb2_set_err_rsp(work);
 +
-+	return released ?
-+		FILEMAP_RELEASED_FOLIO : FILEMAP_CANT_RELEASE_FOLIO;
+        return rc;
  }
- EXPORT_SYMBOL(filemap_release_folio);
-diff --git a/mm/vmscan.c b/mm/vmscan.c
-index bded71961143..b1e5ca348223 100644
---- a/mm/vmscan.c
-+++ b/mm/vmscan.c
-@@ -1996,25 +1996,26 @@ static unsigned int shrink_folio_list(struct list_head *folio_list,
- 		 * (refcount == 1) it can be freed.  Otherwise, leave
- 		 * the folio on the LRU so it is swappable.
- 		 */
--		if (folio_needs_release(folio)) {
--			if (!filemap_release_folio(folio, sc->gfp_mask))
--				goto activate_locked;
-+		switch (filemap_release_folio(folio, sc->gfp_mask)) {
-+		case FILEMAP_CANT_RELEASE_FOLIO:
-+			goto activate_locked;
-+		case FILEMAP_RELEASED_FOLIO:
- 			if (!mapping && folio_ref_count(folio) == 1) {
- 				folio_unlock(folio);
- 				if (folio_put_testzero(folio))
- 					goto free_it;
--				else {
--					/*
--					 * rare race with speculative reference.
--					 * the speculative reference will free
--					 * this folio shortly, so we may
--					 * increment nr_reclaimed here (and
--					 * leave it off the LRU).
--					 */
--					nr_reclaimed += nr_pages;
--					continue;
--				}
-+				/*
-+				 * rare race with speculative reference.  the
-+				 * speculative reference will free this folio
-+				 * shortly, so we may increment nr_reclaimed
-+				 * here (and leave it off the LRU).
-+				 */
-+				nr_reclaimed += nr_pages;
-+				continue;
- 			}
-+			break;
-+		case FILEMAP_FOLIO_HAD_NO_PRIVATE:
-+			break;
- 		}
- 
- 		if (folio_test_anon(folio) && !folio_test_swapbacked(folio)) {
 
-
+> --
+> 2.25.1
+>
+>
