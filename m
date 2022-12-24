@@ -2,100 +2,107 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B904C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Dec 2022 15:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C08C4167B
+	for <linux-cifs@archiver.kernel.org>; Sat, 24 Dec 2022 01:32:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230124AbiLWPbg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 23 Dec 2022 10:31:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50334 "EHLO
+        id S236566AbiLXBcg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Dec 2022 20:32:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236398AbiLWPbf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Dec 2022 10:31:35 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E485B2;
-        Fri, 23 Dec 2022 07:31:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YI+GETaE07zfIF6gTr93yZkoaqmkXGRyTSkPLa22IzA=; b=RkLgtlP2zs+0grtCP2XKKuFJes
-        6FHjSru80hSAyAYCWjR4giWwoV3DaU3XpMF7/3HZDUa+E/kozrd+x6VmAXg4TRMKJHW9b8wzSyfeD
-        VokI0tlui9x8PQhh88Z82EqORo/ZAaFcoi8Gbx6S9ZrNjmqThuHWTTIRq3+YEjgq3IX5yINDVvjt+
-        e0+/qxQDLcU/llLFjIUrhW0P/9m/nHcrhbkOptvrE3r4S9ZgmuFyMLR/rPv50gmRKgcXjautu9IC5
-        U8MyiLTneJokeOtEKvUEFCZUMIUmLTbzJVU1SPbmDcoK0FIf2BAPGpTW1uoenfctyu+YHc+9jx57b
-        guycEkxA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p8k0x-009SnO-0o; Fri, 23 Dec 2022 15:31:15 +0000
-Date:   Fri, 23 Dec 2022 07:31:14 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Dave Wysochanski <dwysocha@redhat.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
-        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
-        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Jeff Layton <jlayton@kernel.org>,
-        linux-erofs@lists.ozlabs.org, linux-ext4@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 3/3] mm: Make filemap_release_folio() better inform
- shrink_folio_list()
-Message-ID: <Y6XJwvjKyTgRIiI3@infradead.org>
-References: <167172131368.2334525.8569808925687731937.stgit@warthog.procyon.org.uk>
- <167172134962.2334525.570622889806603086.stgit@warthog.procyon.org.uk>
+        with ESMTP id S236605AbiLXBb6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Dec 2022 20:31:58 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C57149588;
+        Fri, 23 Dec 2022 17:30:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9156DB821BA;
+        Sat, 24 Dec 2022 01:30:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F37EC433EF;
+        Sat, 24 Dec 2022 01:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671845430;
+        bh=DfOg0MeNK9vqD6Q+lI5LXysBvJ+WQsbYuUS6GqR3FNk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=scIxe646cOLm0B1B6VPzYuVmc5f2chN47Z6GaTzsy+QAdjdP0OfMk2VaW5PiHdre0
+         andb7GV9MOsw8kRJqUik2QuL5ViQQ+C3beaXBRSHpZ6wyab51o6537ywREesX5Wp8l
+         Jir7oTiyrNvUhgzKD3/WPAcdeApSnU8VDyBK+u66t7g1xEydxwoF3n0BoKYrJiXpXz
+         td0O+pFZe3FTOCUldsah7phrVdn5Ke4wlWANQSxRp+zoHAFi4AJV1qtVGGTSHJ501O
+         KYblBl/PKNE/CmT2nWQvAwE0FnT6JH4NxLRcadWX6T8agKbqpQwBubNdwln8mWMGRQ
+         fN/cRo3SboJqA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Marios Makassikis <mmakassikis@freebox.fr>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 23/26] ksmbd: Fix resource leak in smb2_lock()
+Date:   Fri, 23 Dec 2022 20:29:27 -0500
+Message-Id: <20221224012930.392358-23-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20221224012930.392358-1-sashal@kernel.org>
+References: <20221224012930.392358-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <167172134962.2334525.570622889806603086.stgit@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Dec 22, 2022 at 03:02:29PM +0000, David Howells wrote:
-> Make filemap_release_folio() return one of three values:
-> 
->  (0) FILEMAP_CANT_RELEASE_FOLIO
-> 
->      Couldn't release the folio's private data, so the folio can't itself
->      be released.
-> 
->  (1) FILEMAP_RELEASED_FOLIO
-> 
->      The private data on the folio was released and the folio can be
->      released.
-> 
->  (2) FILEMAP_FOLIO_HAD_NO_PRIVATE
+From: Marios Makassikis <mmakassikis@freebox.fr>
 
-These names read really odd, due to the different placementments
-of FOLIO, the present vs past tense and the fact that 2 also released
-the folio, and the reliance of callers that one value of an enum
-must be 0, while no unprecedented, is a bit ugly.
+[ Upstream commit 01f6c61bae3d658058ee6322af77acea26a5ee3a ]
 
-But do we even need them?  What abut just open coding
-filemap_release_folio (which is a mostly trivial function) in
-shrink_folio_list, which is the only place that cares?
+"flock" is leaked if an error happens before smb2_lock_init(), as the
+lock is not added to the lock_list to be cleaned up.
 
-	if (folio_has_private(folio) && folio_needs_release(folio)) {
-		if (folio_test_writeback(folio))
-			goto activate_locked;
+Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/ksmbd/smb2pdu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-		if (mapping && mapping->a_ops->release_folio) {
-			if (!mapping->a_ops->release_folio(folio, gfp))
-				goto activate_locked;
-		} else {
-			if (!try_to_free_buffers(folio))
-				goto activate_locked;
-		}
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index b2fc85d440d0..58da085413a6 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -6855,6 +6855,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 		if (lock_start > U64_MAX - lock_length) {
+ 			pr_err("Invalid lock range requested\n");
+ 			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
++			locks_free_lock(flock);
+ 			goto out;
+ 		}
+ 
+@@ -6874,6 +6875,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 				    "the end offset(%llx) is smaller than the start offset(%llx)\n",
+ 				    flock->fl_end, flock->fl_start);
+ 			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
++			locks_free_lock(flock);
+ 			goto out;
+ 		}
+ 
+@@ -6885,6 +6887,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 				    flock->fl_type != F_UNLCK) {
+ 					pr_err("conflict two locks in one request\n");
+ 					err = -EINVAL;
++					locks_free_lock(flock);
+ 					goto out;
+ 				}
+ 			}
+@@ -6893,6 +6896,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 		smb_lock = smb2_lock_init(flock, cmd, flags, &lock_list);
+ 		if (!smb_lock) {
+ 			err = -EINVAL;
++			locks_free_lock(flock);
+ 			goto out;
+ 		}
+ 	}
+-- 
+2.35.1
 
-		if (!mapping && folio_ref_count(folio) == 1) {
-			...
-
-alternatively just keep using filemap_release_folio and just add the
-folio_needs_release in the first branch.  That duplicates the test,
-but makes the change a one-liner.
