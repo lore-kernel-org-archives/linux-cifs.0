@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C08C4167B
-	for <linux-cifs@archiver.kernel.org>; Sat, 24 Dec 2022 01:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 539A9C4332F
+	for <linux-cifs@archiver.kernel.org>; Sat, 24 Dec 2022 01:34:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236566AbiLXBcg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 23 Dec 2022 20:32:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57548 "EHLO
+        id S236779AbiLXBe3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Dec 2022 20:34:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236605AbiLXBb6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Dec 2022 20:31:58 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C57149588;
-        Fri, 23 Dec 2022 17:30:46 -0800 (PST)
+        with ESMTP id S236689AbiLXBd2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Dec 2022 20:33:28 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEFB379EF;
+        Fri, 23 Dec 2022 17:31:24 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9156DB821BA;
-        Sat, 24 Dec 2022 01:30:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F37EC433EF;
-        Sat, 24 Dec 2022 01:30:29 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E0E7A61FA3;
+        Sat, 24 Dec 2022 01:31:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C58CC433D2;
+        Sat, 24 Dec 2022 01:31:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671845430;
-        bh=DfOg0MeNK9vqD6Q+lI5LXysBvJ+WQsbYuUS6GqR3FNk=;
+        s=k20201202; t=1671845483;
+        bh=LGNqtuSIQ2sa068rG6exeuPBkG6eWEpHMY9HQSZqgHI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=scIxe646cOLm0B1B6VPzYuVmc5f2chN47Z6GaTzsy+QAdjdP0OfMk2VaW5PiHdre0
-         andb7GV9MOsw8kRJqUik2QuL5ViQQ+C3beaXBRSHpZ6wyab51o6537ywREesX5Wp8l
-         Jir7oTiyrNvUhgzKD3/WPAcdeApSnU8VDyBK+u66t7g1xEydxwoF3n0BoKYrJiXpXz
-         td0O+pFZe3FTOCUldsah7phrVdn5Ke4wlWANQSxRp+zoHAFi4AJV1qtVGGTSHJ501O
-         KYblBl/PKNE/CmT2nWQvAwE0FnT6JH4NxLRcadWX6T8agKbqpQwBubNdwln8mWMGRQ
-         fN/cRo3SboJqA==
+        b=V9WsBAJEGEatSWl+F9w41aUcKHQTtIzzlYt06hzqgvVyK4rX+2gmUVHGWYE8kA5ox
+         4bY/fqszbWxryRasnhJe0igGVhshhaFS5VC8l//pRXYReKpUdWrwGpPK1RA5oysVM+
+         8dtC7WSgd8gU7fjcmt7dRz0ruvpHfooA1Jxv0LYeRfIMQGy/iKhf68As9uwXmtWct4
+         xL/NQLKnB0WOSM65JCpEf2oiCB0P3qgvtFWpkU/Uj8po6RQZlYwjvQfQHbMyNAZ7NE
+         9ON1E6vSLIn3dwAAX30pX9rlVnbJXiotEM6ui2od9MC9k53Ox9WmBftxrxqSlEgObN
+         CFDyjSMKORC5g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Marios Makassikis <mmakassikis@freebox.fr>,
@@ -38,12 +38,12 @@ Cc:     Marios Makassikis <mmakassikis@freebox.fr>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 23/26] ksmbd: Fix resource leak in smb2_lock()
-Date:   Fri, 23 Dec 2022 20:29:27 -0500
-Message-Id: <20221224012930.392358-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.0 15/18] ksmbd: Fix resource leak in smb2_lock()
+Date:   Fri, 23 Dec 2022 20:30:31 -0500
+Message-Id: <20221224013034.392810-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221224012930.392358-1-sashal@kernel.org>
-References: <20221224012930.392358-1-sashal@kernel.org>
+In-Reply-To: <20221224013034.392810-1-sashal@kernel.org>
+References: <20221224013034.392810-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -68,10 +68,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+)
 
 diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index b2fc85d440d0..58da085413a6 100644
+index 7a9497a7b0a3..4e6e55714f4b 100644
 --- a/fs/ksmbd/smb2pdu.c
 +++ b/fs/ksmbd/smb2pdu.c
-@@ -6855,6 +6855,7 @@ int smb2_lock(struct ksmbd_work *work)
+@@ -6835,6 +6835,7 @@ int smb2_lock(struct ksmbd_work *work)
  		if (lock_start > U64_MAX - lock_length) {
  			pr_err("Invalid lock range requested\n");
  			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
@@ -79,7 +79,7 @@ index b2fc85d440d0..58da085413a6 100644
  			goto out;
  		}
  
-@@ -6874,6 +6875,7 @@ int smb2_lock(struct ksmbd_work *work)
+@@ -6854,6 +6855,7 @@ int smb2_lock(struct ksmbd_work *work)
  				    "the end offset(%llx) is smaller than the start offset(%llx)\n",
  				    flock->fl_end, flock->fl_start);
  			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
@@ -87,7 +87,7 @@ index b2fc85d440d0..58da085413a6 100644
  			goto out;
  		}
  
-@@ -6885,6 +6887,7 @@ int smb2_lock(struct ksmbd_work *work)
+@@ -6865,6 +6867,7 @@ int smb2_lock(struct ksmbd_work *work)
  				    flock->fl_type != F_UNLCK) {
  					pr_err("conflict two locks in one request\n");
  					err = -EINVAL;
@@ -95,7 +95,7 @@ index b2fc85d440d0..58da085413a6 100644
  					goto out;
  				}
  			}
-@@ -6893,6 +6896,7 @@ int smb2_lock(struct ksmbd_work *work)
+@@ -6873,6 +6876,7 @@ int smb2_lock(struct ksmbd_work *work)
  		smb_lock = smb2_lock_init(flock, cmd, flags, &lock_list);
  		if (!smb_lock) {
  			err = -EINVAL;
