@@ -2,37 +2,37 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BEAC53210
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BABBC4708E
 	for <linux-cifs@archiver.kernel.org>; Mon, 26 Dec 2022 14:22:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231894AbiLZOWI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S231865AbiLZOWI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Mon, 26 Dec 2022 09:22:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39118 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231614AbiLZOWG (ORCPT
+        with ESMTP id S231609AbiLZOWG (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Dec 2022 09:22:06 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6B91140;
-        Mon, 26 Dec 2022 06:22:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4982182;
+        Mon, 26 Dec 2022 06:22:05 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E0F4560EB4;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3ABD160EA0;
         Mon, 26 Dec 2022 14:22:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F842C433D2;
-        Mon, 26 Dec 2022 14:22:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E67C4339B;
+        Mon, 26 Dec 2022 14:22:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672064525;
-        bh=22S317lWg8AbLm/4T86Rzeza0QVf8ZdO+6YLdtwviT0=;
+        s=k20201202; t=1672064524;
+        bh=BEzrRcBKQ+GZ/U+aeCEg9n4Pdy0ikdO5wXFWpAtXmSg=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=E4k5OXvypcw8JKWNx6C4dSUgCG2CsGTlxUbLraGkrXVSvF8AMAD7gX7KnyZDbc3uX
-         ZsNzjvKiPxDxG+oR5TopbMGilH1sUH3bokqsnBHlqzkz4AQKh7/B9WXFNeej/reQya
-         dU1Mnq6X+mGX9sykpmVkUki7ScBWs84ONjlv1qoJm0t7e79xu6cZNjMWpFMdd3vkwz
-         UjJRhFH5fv+TqT8wdZI5Tw/E6K/zVf0vNVX4NLda6wj+29s3ruxs9Tya/z86tEjBE+
-         rwVylYF+UiX3jen7J7X3chKLADzrU7lT2hxuBJSNwCHwCwa6bpWJSQgoDQpm+LrrLt
-         Mb4naxRegkZ+g==
+        b=N7GrMIigC6HxWNrAVct3befoFSSCxU8We3pVOw0O7RzGrspOaLS7OpPHudv168XAA
+         25iLUs0PGQXhlSEnFpoMuteXkAvUDuXi2F3q5Ilj3JLvHTC0foaYVDx8XDUHW+FfEn
+         lqCyqB5hNS+kNb4YFZ9eV4RnkF0iFaa4JEVF30ZkqOMn2UQsHeJ+XlEW0A0kdXjKtc
+         Xnn089Q0lcPPNDHVVs8gb8ZCLt1Gr/wpy2bnawgEal9zvN7aQIAwzliJYz0B7WrevK
+         JgvI5+UbqzqVfOzTHbOeRJ2Ud40GRBYxGQlvQ1bcYt2Piyv+6jvwF/w1hr47ANYy2v
+         ugCvYxfnZppOg==
 Received: by pali.im (Postfix)
-        id DED229D7; Mon, 26 Dec 2022 15:22:04 +0100 (CET)
+        id 46DDAA32; Mon, 26 Dec 2022 15:22:02 +0100 (CET)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -52,9 +52,9 @@ To:     linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         Kari Argillander <kari.argillander@gmail.com>,
         Viacheslav Dubeyko <slava@dubeyko.com>
-Subject: [RFC PATCH v2 04/18] ntfs: Fix error processing when load_nls() fails
-Date:   Mon, 26 Dec 2022 15:21:36 +0100
-Message-Id: <20221226142150.13324-5-pali@kernel.org>
+Subject: [RFC PATCH v2 02/18] hfsplus: Add iocharset= mount option as alias for nls=
+Date:   Mon, 26 Dec 2022 15:21:34 +0100
+Message-Id: <20221226142150.13324-3-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221226142150.13324-1-pali@kernel.org>
 References: <20221226142150.13324-1-pali@kernel.org>
@@ -65,52 +65,68 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ensure that specified charset in iocharset= mount option is used. On error
-correctly propagate error code back to the caller.
+Other fs drivers are using iocharset= mount option for specifying charset.
+So add it also for hfsplus and mark old nls= mount option as deprecated.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/ntfs/super.c | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+ Documentation/filesystems/hfsplus.rst | 3 +++
+ fs/hfsplus/options.c                  | 7 ++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/fs/ntfs/super.c b/fs/ntfs/super.c
-index 55762abdc22a..b4f26035e750 100644
---- a/fs/ntfs/super.c
-+++ b/fs/ntfs/super.c
-@@ -94,7 +94,7 @@ static bool parse_options(ntfs_volume *vol, char *opt)
- 	umode_t fmask = (umode_t)-1, dmask = (umode_t)-1;
- 	int mft_zone_multiplier = -1, on_errors = -1;
- 	int show_sys_files = -1, case_sensitive = -1, disable_sparse = -1;
--	struct nls_table *nls_map = NULL, *old_nls;
-+	struct nls_table *nls_map = NULL;
+diff --git a/Documentation/filesystems/hfsplus.rst b/Documentation/filesystems/hfsplus.rst
+index f02f4f5fc020..171805304cc2 100644
+--- a/Documentation/filesystems/hfsplus.rst
++++ b/Documentation/filesystems/hfsplus.rst
+@@ -50,6 +50,9 @@ When mounting an HFSPlus filesystem, the following options are accepted:
+ 	or locked.  Use at your own risk.
  
- 	/* I am lazy... (-8 */
- #define NTFS_GETOPT_WITH_DEFAULT(option, variable, default_value)	\
-@@ -195,20 +195,12 @@ static bool parse_options(ntfs_volume *vol, char *opt)
- 			if (!v || !*v)
- 				goto needs_arg;
- use_utf8:
--			old_nls = nls_map;
-+			unload_nls(nls_map);
- 			nls_map = load_nls(v);
- 			if (!nls_map) {
--				if (!old_nls) {
--					ntfs_error(vol->sb, "NLS character set "
--							"%s not found.", v);
--					return false;
--				}
--				ntfs_error(vol->sb, "NLS character set %s not "
--						"found. Using previous one %s.",
--						v, old_nls->charset);
--				nls_map = old_nls;
--			} else /* nls_map */ {
--				unload_nls(old_nls);
-+				ntfs_error(vol->sb, "NLS character set "
-+					   "%s not found.", v);
-+				return false;
+   nls=cccc
++	Deprecated alias for ``iocharset=`` mount option.
++
++  iocharset=cccc
+ 	Encoding to use when presenting file names.
+ 
+ 
+diff --git a/fs/hfsplus/options.c b/fs/hfsplus/options.c
+index c94a58762ad6..d3dc0d4ba77f 100644
+--- a/fs/hfsplus/options.c
++++ b/fs/hfsplus/options.c
+@@ -23,6 +23,7 @@ enum {
+ 	opt_creator, opt_type,
+ 	opt_umask, opt_uid, opt_gid,
+ 	opt_part, opt_session, opt_nls,
++	opt_iocharset,
+ 	opt_nodecompose, opt_decompose,
+ 	opt_barrier, opt_nobarrier,
+ 	opt_force, opt_err
+@@ -37,6 +38,7 @@ static const match_table_t tokens = {
+ 	{ opt_part, "part=%u" },
+ 	{ opt_session, "session=%u" },
+ 	{ opt_nls, "nls=%s" },
++	{ opt_iocharset, "iocharset=%s" },
+ 	{ opt_decompose, "decompose" },
+ 	{ opt_nodecompose, "nodecompose" },
+ 	{ opt_barrier, "barrier" },
+@@ -170,6 +172,9 @@ int hfsplus_parse_options(char *input, struct hfsplus_sb_info *sbi)
  			}
- 		} else if (!strcmp(p, "utf8")) {
- 			bool val = false;
+ 			break;
+ 		case opt_nls:
++			pr_warn("option nls= is deprecated, use iocharset=\n");
++			fallthrough;
++		case opt_iocharset:
+ 			if (sbi->nls) {
+ 				pr_err("unable to change nls mapping\n");
+ 				return 0;
+@@ -234,7 +239,7 @@ int hfsplus_show_options(struct seq_file *seq, struct dentry *root)
+ 	if (sbi->session >= 0)
+ 		seq_printf(seq, ",session=%u", sbi->session);
+ 	if (sbi->nls)
+-		seq_printf(seq, ",nls=%s", sbi->nls->charset);
++		seq_printf(seq, ",iocharset=%s", sbi->nls->charset);
+ 	if (test_bit(HFSPLUS_SB_NODECOMPOSE, &sbi->flags))
+ 		seq_puts(seq, ",nodecompose");
+ 	if (test_bit(HFSPLUS_SB_NOBARRIER, &sbi->flags))
 -- 
 2.20.1
 
