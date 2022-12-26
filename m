@@ -2,37 +2,37 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BABBC4708E
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Dec 2022 14:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5E3C3DA79
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Dec 2022 14:22:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231865AbiLZOWI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Dec 2022 09:22:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39100 "EHLO
+        id S231910AbiLZOWo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Dec 2022 09:22:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231609AbiLZOWG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Dec 2022 09:22:06 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4982182;
-        Mon, 26 Dec 2022 06:22:05 -0800 (PST)
+        with ESMTP id S231896AbiLZOWJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Dec 2022 09:22:09 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECE8A2613;
+        Mon, 26 Dec 2022 06:22:08 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3ABD160EA0;
-        Mon, 26 Dec 2022 14:22:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E67C4339B;
-        Mon, 26 Dec 2022 14:22:04 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 728FB60EB1;
+        Mon, 26 Dec 2022 14:22:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B26BEC433F0;
+        Mon, 26 Dec 2022 14:22:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672064524;
-        bh=BEzrRcBKQ+GZ/U+aeCEg9n4Pdy0ikdO5wXFWpAtXmSg=;
+        s=k20201202; t=1672064527;
+        bh=7z2lZ+Be7RkuOUgzW/6Khhu+Fp4b8cIx0oWTtjIwGLE=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=N7GrMIigC6HxWNrAVct3befoFSSCxU8We3pVOw0O7RzGrspOaLS7OpPHudv168XAA
-         25iLUs0PGQXhlSEnFpoMuteXkAvUDuXi2F3q5Ilj3JLvHTC0foaYVDx8XDUHW+FfEn
-         lqCyqB5hNS+kNb4YFZ9eV4RnkF0iFaa4JEVF30ZkqOMn2UQsHeJ+XlEW0A0kdXjKtc
-         Xnn089Q0lcPPNDHVVs8gb8ZCLt1Gr/wpy2bnawgEal9zvN7aQIAwzliJYz0B7WrevK
-         JgvI5+UbqzqVfOzTHbOeRJ2Ud40GRBYxGQlvQ1bcYt2Piyv+6jvwF/w1hr47ANYy2v
-         ugCvYxfnZppOg==
+        b=pW2+TFrbcj9Y/de7k5L+kL7JaFTjxs8ZabMRJesm96TzLOlfKyD2ZU68GdwWD8OXT
+         /MkTbPYx6x8/RdXTBHi3KPZQxXa8UGIALdcDx5R4UUCAIeGxc5H3qa0eefxO9C/Jd9
+         p6VIQ9PDX11m451GS7nAbpjNoq02pEoNbs7obTnCtto51IJC/LsXKGSoIa/p3oigPD
+         SLjqwoOadzlBmO6fGa6k6SBurFCHiz+fFOrARIv28c5D32lF8h6Tan2asFNhWWAZmq
+         GN/kH9H2zR240mg+LXhnncrZFZ0qrN76B7p4mgr/FFafhpqv3pN5093qKOle7exmNL
+         rLQ12nQGwmE7g==
 Received: by pali.im (Postfix)
-        id 46DDAA32; Mon, 26 Dec 2022 15:22:02 +0100 (CET)
+        id 6D4ED9D7; Mon, 26 Dec 2022 15:22:07 +0100 (CET)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -52,9 +52,9 @@ To:     linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         Kari Argillander <kari.argillander@gmail.com>,
         Viacheslav Dubeyko <slava@dubeyko.com>
-Subject: [RFC PATCH v2 02/18] hfsplus: Add iocharset= mount option as alias for nls=
-Date:   Mon, 26 Dec 2022 15:21:34 +0100
-Message-Id: <20221226142150.13324-3-pali@kernel.org>
+Subject: [RFC PATCH v2 06/18] befs: Rename enum value Opt_charset to Opt_iocharset to match mount option
+Date:   Mon, 26 Dec 2022 15:21:38 +0100
+Message-Id: <20221226142150.13324-7-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221226142150.13324-1-pali@kernel.org>
 References: <20221226142150.13324-1-pali@kernel.org>
@@ -65,68 +65,42 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Other fs drivers are using iocharset= mount option for specifying charset.
-So add it also for hfsplus and mark old nls= mount option as deprecated.
+Mount option is named iocharset= and not charset=
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- Documentation/filesystems/hfsplus.rst | 3 +++
- fs/hfsplus/options.c                  | 7 ++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ fs/befs/linuxvfs.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/filesystems/hfsplus.rst b/Documentation/filesystems/hfsplus.rst
-index f02f4f5fc020..171805304cc2 100644
---- a/Documentation/filesystems/hfsplus.rst
-+++ b/Documentation/filesystems/hfsplus.rst
-@@ -50,6 +50,9 @@ When mounting an HFSPlus filesystem, the following options are accepted:
- 	or locked.  Use at your own risk.
+diff --git a/fs/befs/linuxvfs.c b/fs/befs/linuxvfs.c
+index f983852ba863..5c66550f7933 100644
+--- a/fs/befs/linuxvfs.c
++++ b/fs/befs/linuxvfs.c
+@@ -677,13 +677,13 @@ static struct dentry *befs_get_parent(struct dentry *child)
+ }
  
-   nls=cccc
-+	Deprecated alias for ``iocharset=`` mount option.
-+
-+  iocharset=cccc
- 	Encoding to use when presenting file names.
+ enum {
+-	Opt_uid, Opt_gid, Opt_charset, Opt_debug, Opt_err,
++	Opt_uid, Opt_gid, Opt_iocharset, Opt_debug, Opt_err,
+ };
  
- 
-diff --git a/fs/hfsplus/options.c b/fs/hfsplus/options.c
-index c94a58762ad6..d3dc0d4ba77f 100644
---- a/fs/hfsplus/options.c
-+++ b/fs/hfsplus/options.c
-@@ -23,6 +23,7 @@ enum {
- 	opt_creator, opt_type,
- 	opt_umask, opt_uid, opt_gid,
- 	opt_part, opt_session, opt_nls,
-+	opt_iocharset,
- 	opt_nodecompose, opt_decompose,
- 	opt_barrier, opt_nobarrier,
- 	opt_force, opt_err
-@@ -37,6 +38,7 @@ static const match_table_t tokens = {
- 	{ opt_part, "part=%u" },
- 	{ opt_session, "session=%u" },
- 	{ opt_nls, "nls=%s" },
-+	{ opt_iocharset, "iocharset=%s" },
- 	{ opt_decompose, "decompose" },
- 	{ opt_nodecompose, "nodecompose" },
- 	{ opt_barrier, "barrier" },
-@@ -170,6 +172,9 @@ int hfsplus_parse_options(char *input, struct hfsplus_sb_info *sbi)
- 			}
+ static const match_table_t befs_tokens = {
+ 	{Opt_uid, "uid=%d"},
+ 	{Opt_gid, "gid=%d"},
+-	{Opt_charset, "iocharset=%s"},
++	{Opt_iocharset, "iocharset=%s"},
+ 	{Opt_debug, "debug"},
+ 	{Opt_err, NULL}
+ };
+@@ -744,7 +744,7 @@ parse_options(char *options, struct befs_mount_options *opts)
+ 			opts->gid = gid;
+ 			opts->use_gid = 1;
  			break;
- 		case opt_nls:
-+			pr_warn("option nls= is deprecated, use iocharset=\n");
-+			fallthrough;
-+		case opt_iocharset:
- 			if (sbi->nls) {
- 				pr_err("unable to change nls mapping\n");
- 				return 0;
-@@ -234,7 +239,7 @@ int hfsplus_show_options(struct seq_file *seq, struct dentry *root)
- 	if (sbi->session >= 0)
- 		seq_printf(seq, ",session=%u", sbi->session);
- 	if (sbi->nls)
--		seq_printf(seq, ",nls=%s", sbi->nls->charset);
-+		seq_printf(seq, ",iocharset=%s", sbi->nls->charset);
- 	if (test_bit(HFSPLUS_SB_NODECOMPOSE, &sbi->flags))
- 		seq_puts(seq, ",nodecompose");
- 	if (test_bit(HFSPLUS_SB_NOBARRIER, &sbi->flags))
+-		case Opt_charset:
++		case Opt_iocharset:
+ 			kfree(opts->iocharset);
+ 			opts->iocharset = match_strdup(&args[0]);
+ 			if (!opts->iocharset) {
 -- 
 2.20.1
 
