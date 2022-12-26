@@ -2,37 +2,37 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D3AC54EBF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C59C54EBD
 	for <linux-cifs@archiver.kernel.org>; Mon, 26 Dec 2022 14:23:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232130AbiLZOWt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Dec 2022 09:22:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39188 "EHLO
+        id S232140AbiLZOWu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Dec 2022 09:22:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231937AbiLZOWK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Dec 2022 09:22:10 -0500
+        with ESMTP id S232030AbiLZOWj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Dec 2022 09:22:39 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A295FCB;
-        Mon, 26 Dec 2022 06:22:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29CBD2608;
+        Mon, 26 Dec 2022 06:22:13 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7D3D560EB7;
-        Mon, 26 Dec 2022 14:22:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFEEEC433D2;
-        Mon, 26 Dec 2022 14:22:08 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BB22A60EB5;
+        Mon, 26 Dec 2022 14:22:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3473C433D2;
+        Mon, 26 Dec 2022 14:22:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672064528;
-        bh=n/8YydJ79H6S/fefunn6cS5wD6zvjrcaM37T3x4SMFw=;
+        s=k20201202; t=1672064532;
+        bh=Xsp3m3OsW4jVnQPkMQLxfCHZ/XiAut6pdb2ruAApCB4=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ITEyGudTisy0cXAFBX6UA/0uO8IzKYmzwqZmTQfwsyU8qEjXxS8veri/7DHQtx2gE
-         f/tC2MgveyNb4XnH2FXKEdpsxvf0aRkDnVAxTWvupN+x1TjHuDV6d0thwMxGap08hI
-         mhkLBcN4s1dGvBHaM8AXziWJmTsKjlGE9eh2yuKx5056rBktL8OPI2ahK0J/RATzMy
-         kGSGHNn/LeVBL6ZSVkSWPT2pK7fVoiDv9f6SIEyMjV31bk5PW1uuSNMvGFGOp5s8mK
-         orIdD72HFP9XOkFHttlHqr+6DnRcNYGpQ207uuDc7fQtdj4tK2WM60BdcScb3TW3Bv
-         Ne+0cPnSDicFQ==
+        b=Up4OAqH55iaCAJw883S9943eBNly3aIMlynhdSIFfKbVseamKeJfQH0MxLPkAHuPa
+         0RO+8XOWxMOAchvnruly8oZKaVEQHv93la8lc8DwyAqnDlp/+ol3zsBzwGycA5kTs3
+         PiipsjZFO53qGXeQAlkyrZ2Iet0frsmuqAA9GT26/1kj2XkqsT9ysgskuXT64p/YCW
+         NdTkq630GuiyNhUfa+c2ohwTj+LBm3CEJKAf/qfyCBgrckS9wp2z+abpEpNKo+7RC4
+         qzXqOV8xr4EQF3Y0KwHx44xvTMy2W5MYRu++4b1Ux+ux6ypyB58J8MsaHiompDhxdR
+         lLWkEteZYAALA==
 Received: by pali.im (Postfix)
-        id 7BAC69D7; Mon, 26 Dec 2022 15:22:08 +0100 (CET)
+        id 8C8A49D7; Mon, 26 Dec 2022 15:22:11 +0100 (CET)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -52,9 +52,9 @@ To:     linux-fsdevel@vger.kernel.org,
         Christoph Hellwig <hch@infradead.org>,
         Kari Argillander <kari.argillander@gmail.com>,
         Viacheslav Dubeyko <slava@dubeyko.com>
-Subject: [RFC PATCH v2 07/18] befs: Fix error processing when load_nls() fails
-Date:   Mon, 26 Dec 2022 15:21:39 +0100
-Message-Id: <20221226142150.13324-8-pali@kernel.org>
+Subject: [RFC PATCH v2 10/18] hfs: Do not use broken utf8 NLS table for iocharset=utf8 mount option
+Date:   Mon, 26 Dec 2022 15:21:42 +0100
+Message-Id: <20221226142150.13324-11-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221226142150.13324-1-pali@kernel.org>
 References: <20221226142150.13324-1-pali@kernel.org>
@@ -65,31 +65,160 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ensure that specified charset in iocharset= mount option is used. On error
-correctly propagate error code back to the caller.
+NLS table for utf8 is broken and cannot be fixed.
+
+So instead of broken utf8 nls functions char2uni() and uni2char() use
+functions utf8_to_utf32() and utf32_to_utf8() which implements correct
+encoding and decoding between Unicode code points and UTF-8 sequence.
+
+When iochatset=utf8 is used then set hsb->nls_io to NULL and use it for
+distinguish between the fact if NLS table or native UTF-8 functions should
+be used.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/befs/linuxvfs.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ fs/hfs/super.c | 33 ++++++++++++++++++++++-----------
+ fs/hfs/trans.c | 24 ++++++++++++++++++++----
+ 2 files changed, 42 insertions(+), 15 deletions(-)
 
-diff --git a/fs/befs/linuxvfs.c b/fs/befs/linuxvfs.c
-index 5c66550f7933..8d2954e3afd6 100644
---- a/fs/befs/linuxvfs.c
-+++ b/fs/befs/linuxvfs.c
-@@ -913,10 +913,9 @@ befs_fill_super(struct super_block *sb, void *data, int silent)
- 			   befs_sb->mount_opts.iocharset);
- 		befs_sb->nls = load_nls(befs_sb->mount_opts.iocharset);
- 		if (!befs_sb->nls) {
--			befs_warning(sb, "Cannot load nls %s"
--					" loading default nls",
-+			befs_error(sb, "Cannot load nls %s",
- 					befs_sb->mount_opts.iocharset);
--			befs_sb->nls = load_nls_default();
-+			goto unacquire_priv_sbp;
+diff --git a/fs/hfs/super.c b/fs/hfs/super.c
+index cea19ed06bce..5a63df41da05 100644
+--- a/fs/hfs/super.c
++++ b/fs/hfs/super.c
+@@ -149,10 +149,13 @@ static int hfs_show_options(struct seq_file *seq, struct dentry *root)
+ 		seq_printf(seq, ",part=%u", sbi->part);
+ 	if (sbi->session >= 0)
+ 		seq_printf(seq, ",session=%u", sbi->session);
+-	if (sbi->nls_disk)
++	if (sbi->nls_disk) {
+ 		seq_printf(seq, ",codepage=%s", sbi->nls_disk->charset);
+-	if (sbi->nls_io)
+-		seq_printf(seq, ",iocharset=%s", sbi->nls_io->charset);
++		if (sbi->nls_io)
++			seq_printf(seq, ",iocharset=%s", sbi->nls_io->charset);
++		else
++			seq_puts(seq, ",iocharset=utf8");
++	}
+ 	if (sbi->s_quiet)
+ 		seq_printf(seq, ",quiet");
+ 	return 0;
+@@ -225,6 +228,7 @@ static int parse_options(char *options, struct hfs_sb_info *hsb)
+ 	char *p;
+ 	substring_t args[MAX_OPT_ARGS];
+ 	int tmp, token;
++	bool have_iocharset;
+ 
+ 	/* initialize the sb with defaults */
+ 	hsb->s_uid = current_uid();
+@@ -239,6 +243,8 @@ static int parse_options(char *options, struct hfs_sb_info *hsb)
+ 	if (!options)
+ 		return 1;
+ 
++	have_iocharset = false;
++
+ 	while ((p = strsep(&options, ",")) != NULL) {
+ 		if (!*p)
+ 			continue;
+@@ -332,18 +338,22 @@ static int parse_options(char *options, struct hfs_sb_info *hsb)
+ 			kfree(p);
+ 			break;
+ 		case opt_iocharset:
+-			if (hsb->nls_io) {
++			if (have_iocharset) {
+ 				pr_err("unable to change iocharset\n");
+ 				return 0;
+ 			}
+ 			p = match_strdup(&args[0]);
+-			if (p)
+-				hsb->nls_io = load_nls(p);
+-			if (!hsb->nls_io) {
+-				pr_err("unable to load iocharset \"%s\"\n", p);
+-				kfree(p);
++			if (!p)
+ 				return 0;
++			if (strcmp(p, "utf8") != 0) {
++				hsb->nls_io = load_nls(p);
++				if (!hsb->nls_io) {
++					pr_err("unable to load iocharset \"%s\"\n", p);
++					kfree(p);
++					return 0;
++				}
+ 			}
++			have_iocharset = true;
+ 			kfree(p);
+ 			break;
+ 		default:
+@@ -351,7 +361,7 @@ static int parse_options(char *options, struct hfs_sb_info *hsb)
  		}
- 	/* load default nls if none is specified  in mount options */
- 	} else {
+ 	}
+ 
+-	if (hsb->nls_io && !hsb->nls_disk) {
++	if (have_iocharset && !hsb->nls_disk) {
+ 		/*
+ 		 * Previous version of hfs driver did something unexpected:
+ 		 * When codepage was not defined but iocharset was then
+@@ -382,7 +392,8 @@ static int parse_options(char *options, struct hfs_sb_info *hsb)
+ 			return 0;
+ 		}
+ 	}
+-	if (hsb->nls_disk && !hsb->nls_io) {
++	if (hsb->nls_disk &&
++	    !have_iocharset && strcmp(CONFIG_NLS_DEFAULT, "utf8") != 0) {
+ 		hsb->nls_io = load_nls_default();
+ 		if (!hsb->nls_io) {
+ 			pr_err("unable to load default iocharset\n");
+diff --git a/fs/hfs/trans.c b/fs/hfs/trans.c
+index dbf535d52d37..01f37b395f10 100644
+--- a/fs/hfs/trans.c
++++ b/fs/hfs/trans.c
+@@ -44,7 +44,7 @@ int hfs_mac2asc(struct super_block *sb, char *out, const struct hfs_name *in)
+ 		srclen = HFS_NAMELEN;
+ 	dst = out;
+ 	dstlen = HFS_MAX_NAMELEN;
+-	if (nls_io) {
++	if (nls_disk) {
+ 		wchar_t ch;
+ 
+ 		while (srclen > 0) {
+@@ -57,7 +57,12 @@ int hfs_mac2asc(struct super_block *sb, char *out, const struct hfs_name *in)
+ 			srclen -= size;
+ 			if (ch == '/')
+ 				ch = ':';
+-			size = nls_io->uni2char(ch, dst, dstlen);
++			if (nls_io)
++				size = nls_io->uni2char(ch, dst, dstlen);
++			else if (dstlen > 0)
++				size = utf32_to_utf8(ch, dst, dstlen);
++			else
++				size = -ENAMETOOLONG;
+ 			if (size < 0) {
+ 				if (size == -ENAMETOOLONG)
+ 					goto out;
+@@ -101,11 +106,22 @@ void hfs_asc2mac(struct super_block *sb, struct hfs_name *out, const struct qstr
+ 	srclen = in->len;
+ 	dst = out->name;
+ 	dstlen = HFS_NAMELEN;
+-	if (nls_io) {
++	if (nls_disk) {
+ 		wchar_t ch;
++		unicode_t u;
+ 
+ 		while (srclen > 0 && dstlen > 0) {
+-			size = nls_io->char2uni(src, srclen, &ch);
++			if (nls_io)
++				size = nls_io->char2uni(src, srclen, &ch);
++			else {
++				size = utf8_to_utf32(src, srclen, &u);
++				if (size >= 0) {
++					if (u <= MAX_WCHAR_T)
++						ch = u;
++					else
++						size = -EINVAL;
++				}
++			}
+ 			if (size < 0) {
+ 				ch = '?';
+ 				size = 1;
 -- 
 2.20.1
 
