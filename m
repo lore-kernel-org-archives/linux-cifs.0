@@ -2,190 +2,158 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37101C5479D
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Dec 2022 14:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D7FC4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Dec 2022 15:02:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbiLZOXU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Dec 2022 09:23:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40116 "EHLO
+        id S231535AbiL0PCD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 27 Dec 2022 10:02:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232040AbiLZOWo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Dec 2022 09:22:44 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E136302;
-        Mon, 26 Dec 2022 06:22:21 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5EF6360EB3;
-        Mon, 26 Dec 2022 14:22:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72CF0C433F1;
-        Mon, 26 Dec 2022 14:22:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672064540;
-        bh=5u2bH7VJtM/e+LvuxtpQp+PsRT4F9kDqvViUS/4AlLc=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=tYsbgvlgOJaF8H1SdFzVwT/R2HizKskvG/7ePvtZ1Zah8Nowv0dae2/QH1uUXQEqN
-         tX4oe095AgKLScJipg2QqH6fNYTdZPSsTR0sYqL/rSidlPk6T0S7zfLoTVNYWh65nG
-         zuZYflHj8oifrjrkkGFs9qvR7uvaXg0ZiRsEK+oaBK/3425Ow6YEgPrqkj3OvCty7+
-         J0F/0Nw1OTfl5g4GFaxoQXERgnMDONqMT3jkeLy4zuNVil9TnTAV0R6SM7irCbfJ81
-         kvQ/bXiol65QJi1ZruhYHP+0nhxUyS8O1Zdk72l1CUaWTszATm4fxQLZIxpCKc/1Vw
-         rJiMOl47B5OIw==
-Received: by pali.im (Postfix)
-        id 2D6729D7; Mon, 26 Dec 2022 15:22:20 +0100 (CET)
-From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To:     linux-fsdevel@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>, "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, Dave Kleikamp <shaggy@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kari Argillander <kari.argillander@gmail.com>,
-        Viacheslav Dubeyko <slava@dubeyko.com>
-Subject: [RFC PATCH v2 18/18] nls: Drop broken nls_utf8 module
-Date:   Mon, 26 Dec 2022 15:21:50 +0100
-Message-Id: <20221226142150.13324-19-pali@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221226142150.13324-1-pali@kernel.org>
-References: <20221226142150.13324-1-pali@kernel.org>
+        with ESMTP id S231448AbiL0PCB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Dec 2022 10:02:01 -0500
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA862F6D
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Dec 2022 07:02:00 -0800 (PST)
+Received: by mail-pj1-f54.google.com with SMTP id u4-20020a17090a518400b00223f7eba2c4so13429819pjh.5
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Dec 2022 07:02:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T4gJ20N3Rbmsqog9geloTo37a9qnQot2o212KrS0oKE=;
+        b=lBrh5nKTiqPAVDrz/2nEPVkiiXCbG0hvFWBoNQiUDjibbc5nYlj1YkgAOVrbw4oaSC
+         GU17eU4fVhLJu/px5qF9UL8uuuHAejwLdrevLoXOYiRJpDTFC9Lqe7dEpny4dHhX8s2/
+         MpGDFFmxoxxoYw1LKwrBppTKL0UWaIwFRM6YPlY5bjWEH8dUyYNYYpkqyjWSOt9oKXMY
+         LeShmShz1gBJbl7G6+ewimC6vJEh1X2qNxii96vGU2G3G5cMDuIw0j/9Jp5aaINwy7QG
+         9bkh7s28d6ZhiMtq7mBvWG6NMUUdIknvGEiSduR2UMCU/fjpMEC9K+5b2Tndt9VNvA9a
+         cDdw==
+X-Gm-Message-State: AFqh2kqRicX9V9O9Mf01motq0oPPUFCoiKaM+9mcyHYoxNONX9CYVEF9
+        o7hfjeNGaNhhgQm7MC61Ok+P28QlyqA=
+X-Google-Smtp-Source: AMrXdXs8KqtK4dAXkBvJ0upPt8j6tLzXSUIs/E08SoYJBwvag6udlbmBR8xzB36H7/D+XvWSF3t7WQ==
+X-Received: by 2002:a05:6a20:e61a:b0:a9:f48e:aea0 with SMTP id my26-20020a056a20e61a00b000a9f48eaea0mr47751621pzb.9.1672153319872;
+        Tue, 27 Dec 2022 07:01:59 -0800 (PST)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id 32-20020a631060000000b0046feca0883fsm7858815pgq.64.2022.12.27.07.01.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Dec 2022 07:01:59 -0800 (PST)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: add max connections parameter
+Date:   Tue, 27 Dec 2022 23:59:54 +0900
+Message-Id: <20221227145954.9663-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-NLS table for utf8 is broken and cannot be fixed.
+Add max connections parameter to limit number of maximum simultaneous
+connections.
 
-Now that all filesystems are using utf8s_to_utf16s()/utf16s_to_utf8s()
-functions for converting between UTF-8 and UTF-16, and functions
-utf8_to_utf32()/utf32_to_utf8() for converting between UTF-8 and Unicode
-code points, there is no need to have this broken utf8 NLS module in kernel
-tree anymore.
-
-There is no user of this utf8 NLS module, so completely drop it,
-
-Signed-off-by: Pali Rohár <pali@kernel.org>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/nls/Kconfig    |  9 -------
- fs/nls/Makefile   |  1 -
- fs/nls/nls_utf8.c | 67 -----------------------------------------------
- 3 files changed, 77 deletions(-)
- delete mode 100644 fs/nls/nls_utf8.c
+ fs/ksmbd/ksmbd_netlink.h |  3 ++-
+ fs/ksmbd/server.h        |  1 +
+ fs/ksmbd/transport_ipc.c |  3 +++
+ fs/ksmbd/transport_tcp.c | 19 ++++++++++++++++++-
+ 4 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/fs/nls/Kconfig b/fs/nls/Kconfig
-index c7857e36adbb..8f82cf30a493 100644
---- a/fs/nls/Kconfig
-+++ b/fs/nls/Kconfig
-@@ -608,13 +608,4 @@ config NLS_MAC_TURKISH
+diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
+index b6bd8311e6b4..fb8b2d566efb 100644
+--- a/fs/ksmbd/ksmbd_netlink.h
++++ b/fs/ksmbd/ksmbd_netlink.h
+@@ -106,7 +106,8 @@ struct ksmbd_startup_request {
+ 	__u32	sub_auth[3];		/* Subauth value for Security ID */
+ 	__u32	smb2_max_credits;	/* MAX credits */
+ 	__u32	smbd_max_io_size;	/* smbd read write size */
+-	__u32	reserved[127];		/* Reserved room */
++	__u32	max_connections;	/* Number of maximum simultaneous connections */
++	__u32	reserved[126];		/* Reserved room */
+ 	__u32	ifc_list_sz;		/* interfaces list size */
+ 	__s8	____payload[];
+ };
+diff --git a/fs/ksmbd/server.h b/fs/ksmbd/server.h
+index ac9d932f8c8a..db7278181760 100644
+--- a/fs/ksmbd/server.h
++++ b/fs/ksmbd/server.h
+@@ -41,6 +41,7 @@ struct ksmbd_server_config {
+ 	unsigned int		share_fake_fscaps;
+ 	struct smb_sid		domain_sid;
+ 	unsigned int		auth_mechs;
++	unsigned int		max_connections;
  
- 	  If unsure, say Y.
+ 	char			*conf[SERVER_CONF_WORK_GROUP + 1];
+ };
+diff --git a/fs/ksmbd/transport_ipc.c b/fs/ksmbd/transport_ipc.c
+index c9aca21637d5..40c721f9227e 100644
+--- a/fs/ksmbd/transport_ipc.c
++++ b/fs/ksmbd/transport_ipc.c
+@@ -308,6 +308,9 @@ static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
+ 	if (req->smbd_max_io_size)
+ 		init_smbd_max_io_size(req->smbd_max_io_size);
  
--config NLS_UTF8
--	tristate "NLS UTF-8"
--	help
--	  If you want to display filenames with native language characters
--	  from the Microsoft FAT file system family or from JOLIET CD-ROMs
--	  correctly on the screen, you need to include the appropriate
--	  input/output character sets. Say Y here for the UTF-8 encoding of
--	  the Unicode/ISO9646 universal character set.
--
- endif # NLS
-diff --git a/fs/nls/Makefile b/fs/nls/Makefile
-index ac54db297128..e573db7fc173 100644
---- a/fs/nls/Makefile
-+++ b/fs/nls/Makefile
-@@ -42,7 +42,6 @@ obj-$(CONFIG_NLS_ISO8859_14)	+= nls_iso8859-14.o
- obj-$(CONFIG_NLS_ISO8859_15)	+= nls_iso8859-15.o
- obj-$(CONFIG_NLS_KOI8_R)	+= nls_koi8-r.o
- obj-$(CONFIG_NLS_KOI8_U)	+= nls_koi8-u.o nls_koi8-ru.o
--obj-$(CONFIG_NLS_UTF8)		+= nls_utf8.o
- obj-$(CONFIG_NLS_MAC_CELTIC)    += mac-celtic.o
- obj-$(CONFIG_NLS_MAC_CENTEURO)  += mac-centeuro.o
- obj-$(CONFIG_NLS_MAC_CROATIAN)  += mac-croatian.o
-diff --git a/fs/nls/nls_utf8.c b/fs/nls/nls_utf8.c
-deleted file mode 100644
-index afcfbc4a14db..000000000000
---- a/fs/nls/nls_utf8.c
-+++ /dev/null
-@@ -1,67 +0,0 @@
--/*
-- * Module for handling utf8 just like any other charset.
-- * By Urban Widmark 2000
-- */
--
--#include <linux/module.h>
--#include <linux/kernel.h>
--#include <linux/string.h>
--#include <linux/nls.h>
--#include <linux/errno.h>
--
--static unsigned char identity[256];
--
--static int uni2char(wchar_t uni, unsigned char *out, int boundlen)
--{
--	int n;
--
--	if (boundlen <= 0)
--		return -ENAMETOOLONG;
--
--	n = utf32_to_utf8(uni, out, boundlen);
--	if (n < 0) {
--		*out = '?';
--		return -EINVAL;
--	}
--	return n;
--}
--
--static int char2uni(const unsigned char *rawstring, int boundlen, wchar_t *uni)
--{
--	int n;
--	unicode_t u;
--
--	n = utf8_to_utf32(rawstring, boundlen, &u);
--	if (n < 0 || u > MAX_WCHAR_T) {
--		*uni = 0x003f;	/* ? */
--		return -EINVAL;
--	}
--	*uni = (wchar_t) u;
--	return n;
--}
--
--static struct nls_table table = {
--	.charset	= "utf8",
--	.uni2char	= uni2char,
--	.char2uni	= char2uni,
--	.charset2lower	= identity,	/* no conversion */
--	.charset2upper	= identity,
--};
--
--static int __init init_nls_utf8(void)
--{
--	int i;
--	for (i=0; i<256; i++)
--		identity[i] = i;
--
--        return register_nls(&table);
--}
--
--static void __exit exit_nls_utf8(void)
--{
--        unregister_nls(&table);
--}
--
--module_init(init_nls_utf8)
--module_exit(exit_nls_utf8)
--MODULE_LICENSE("Dual BSD/GPL");
++	if (req->max_connections)
++		server_conf.max_connections = req->max_connections;
++
+ 	ret = ksmbd_set_netbios_name(req->netbios_name);
+ 	ret |= ksmbd_set_server_string(req->server_string);
+ 	ret |= ksmbd_set_work_group(req->work_group);
+diff --git a/fs/ksmbd/transport_tcp.c b/fs/ksmbd/transport_tcp.c
+index 63d55f543bd2..c60f7b8b22fe 100644
+--- a/fs/ksmbd/transport_tcp.c
++++ b/fs/ksmbd/transport_tcp.c
+@@ -15,6 +15,8 @@
+ #define IFACE_STATE_DOWN		BIT(0)
+ #define IFACE_STATE_CONFIGURED		BIT(1)
+ 
++static atomic_t active_num_conn;
++
+ struct interface {
+ 	struct task_struct	*ksmbd_kthread;
+ 	struct socket		*ksmbd_socket;
+@@ -185,8 +187,10 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
+ 	struct tcp_transport *t;
+ 
+ 	t = alloc_transport(client_sk);
+-	if (!t)
++	if (!t) {
++		sock_release(client_sk);
+ 		return -ENOMEM;
++	}
+ 
+ 	csin = KSMBD_TCP_PEER_SOCKADDR(KSMBD_TRANS(t)->conn);
+ 	if (kernel_getpeername(client_sk, csin) < 0) {
+@@ -239,6 +243,17 @@ static int ksmbd_kthread_fn(void *p)
+ 			continue;
+ 		}
+ 
++		if (server_conf.max_connections) {
++			if (atomic_read(&active_num_conn) >= server_conf.max_connections) {
++				pr_info("Limit the maximum number of connections(%u)\n",
++						atomic_read(&active_num_conn));
++				sock_release(client_sk);
++				continue;
++			}
++
++			atomic_inc(&active_num_conn);
++		}
++
+ 		ksmbd_debug(CONN, "connect success: accepted new connection\n");
+ 		client_sk->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
+ 		client_sk->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
+@@ -365,6 +380,8 @@ static int ksmbd_tcp_writev(struct ksmbd_transport *t, struct kvec *iov,
+ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
+ {
+ 	free_transport(TCP_TRANS(t));
++	if (server_conf.max_connections)
++		atomic_dec(&active_num_conn);
+ }
+ 
+ static void tcp_destroy_socket(struct socket *ksmbd_socket)
 -- 
-2.20.1
+2.25.1
 
