@@ -2,160 +2,95 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C4EC4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 09:41:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0B4C3DA7D
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 09:42:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233168AbiL2JlI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Dec 2022 04:41:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36182 "EHLO
+        id S231182AbiL2Jmv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Dec 2022 04:42:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233171AbiL2JjD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Dec 2022 04:39:03 -0500
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D26013CC6
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 01:38:58 -0800 (PST)
-Received: by mail-pj1-f51.google.com with SMTP id o2so13160952pjh.4
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 01:38:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jPML/DA9q7748AhCrZhoOSPcu029DLJ6kFfIc0XDj3k=;
-        b=yJZ7VenAehgG+z23PrN3VtC+rPLO5cMceZiTfJ8BeHRHJ6lOmyWveaRZh+aWv9TyYh
-         9L9A1Wo+5pS97qumwyRULxGKzbGMRgILZms9YkImRB1fgsC+UoaF6Ek10gTPbuXcO1dB
-         Pkyj4pP3t7oSyuCHKhRNAO/k5kX8NzjQiW3poRhLl6yGNc/pJwXXgUoGLrCebdQI8DsZ
-         977hdhs1/c2EHx1G1EiZdxwAXdKOdpcgb1oCdN20dQPeQQNSZvcI/RYAynuO8OLyV6Fq
-         Hq8ZKryZnSHr51ouV2DwCHiPwRnpohAsVj6v+9ezjNM4IXCQm5nuXz5OkQf5yrazBepX
-         EYkw==
-X-Gm-Message-State: AFqh2krGecCB+xA3q01ZOLj32pxnyM6+CHtwm4HYa2mj22xOdabIcHar
-        sYp63XF/9FAHq9cS9zJ+MRePuOPOHOo=
-X-Google-Smtp-Source: AMrXdXt+Y5xeJdy9TdBq35p2B97WzLd0szAVW9uxE5Y3vMMlFq069FPFgTe8pEi/fWO4aDKlwSy72A==
-X-Received: by 2002:a17:902:e845:b0:188:fc0c:b736 with SMTP id t5-20020a170902e84500b00188fc0cb736mr67065580plg.67.1672306737457;
-        Thu, 29 Dec 2022 01:38:57 -0800 (PST)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id i6-20020a170902c94600b00189847cd4acsm12411849pla.237.2022.12.29.01.38.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Dec 2022 01:38:57 -0800 (PST)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2] ksmbd: add max connections parameter
-Date:   Thu, 29 Dec 2022 18:38:36 +0900
-Message-Id: <20221229093836.7804-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S233257AbiL2Jkm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Dec 2022 04:40:42 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DCDB13EAA
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 01:40:41 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B5220B81990
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 09:40:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57094C433F1
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 09:40:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672306838;
+        bh=Dnj+2U+uCOIFE5f1f7/i29T39RqgbsSo7Fx/qkGOqZ8=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=jzESyr5I9A/PW/onwuK0IglsU180ZJnfDGiG5hRiYp0lj/wnTfBZYZmcdDAF38w2m
+         D7pQeHdn6MlXGc1HnrM7Ade7AhmqJpkQX6I3IIeN/e0UB02gPYRdCKZohVBB6XRDQ/
+         DOg5a0O11zOgaGFasLBKaUs22LDkYkxXoeCZApH74FzF1pMlEqm3uDwlJ/PGtOu/CP
+         dkBSor+wY0L44kEKm6E0WGS64UrTwVws8ns5ey7Lg+OzlNf/fN6AyplI84KIhD0JZc
+         4AuhsvqIvL+7czL6qJnQpayBie4X/B+1TN0Pkxtd4APnNWBzDMVls3Z1rAdi3k0pxr
+         pHjUvek1LJb4A==
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-1441d7d40c6so21170649fac.8
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 01:40:38 -0800 (PST)
+X-Gm-Message-State: AFqh2kp91SCbtMIO1gsI5p6aNp1v46Hd64jMYMLHuRGQ/AuvDRNJfv6J
+        dNvD2hs/ab5QkZJFiuK+7gK3qJE62dqmEel0Z5I=
+X-Google-Smtp-Source: AMrXdXvci9w+vc58oCHxzA9Leru5HtHOSYNxUGKr3Y+rrt85Ll9T68kv1RPM151Vcn5HVbSL9SHcx1yXtRkHFRUIDEs=
+X-Received: by 2002:a05:6870:d0d4:b0:13d:5167:43e3 with SMTP id
+ k20-20020a056870d0d400b0013d516743e3mr2462075oaa.257.1672306837434; Thu, 29
+ Dec 2022 01:40:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a05:6838:2d06:0:0:0:0 with HTTP; Thu, 29 Dec 2022 01:40:36
+ -0800 (PST)
+In-Reply-To: <Y6z7cjj+OkkVYFYR@google.com>
+References: <20221227145954.9663-1-linkinjeon@kernel.org> <Y6z7cjj+OkkVYFYR@google.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 29 Dec 2022 18:40:36 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8FJRO017i1BmguOEPcunyEv_LCu5AvyxW=4iWQh_1vrg@mail.gmail.com>
+Message-ID: <CAKYAXd8FJRO017i1BmguOEPcunyEv_LCu5AvyxW=4iWQh_1vrg@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: add max connections parameter
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, tom@talpey.com,
+        atteh.mailbox@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add max connections parameter to limit number of maximum simultaneous
-connections.
-
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- v2:
-   - use atomic_inc_return() to avoid racy issue.
-   - change pr_info to pr_info_ratelimited() to avoid message flood. 
-
- fs/ksmbd/ksmbd_netlink.h |  3 ++-
- fs/ksmbd/server.h        |  1 +
- fs/ksmbd/transport_ipc.c |  3 +++
- fs/ksmbd/transport_tcp.c | 17 ++++++++++++++++-
- 4 files changed, 22 insertions(+), 2 deletions(-)
-
-diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
-index b6bd8311e6b4..fb8b2d566efb 100644
---- a/fs/ksmbd/ksmbd_netlink.h
-+++ b/fs/ksmbd/ksmbd_netlink.h
-@@ -106,7 +106,8 @@ struct ksmbd_startup_request {
- 	__u32	sub_auth[3];		/* Subauth value for Security ID */
- 	__u32	smb2_max_credits;	/* MAX credits */
- 	__u32	smbd_max_io_size;	/* smbd read write size */
--	__u32	reserved[127];		/* Reserved room */
-+	__u32	max_connections;	/* Number of maximum simultaneous connections */
-+	__u32	reserved[126];		/* Reserved room */
- 	__u32	ifc_list_sz;		/* interfaces list size */
- 	__s8	____payload[];
- };
-diff --git a/fs/ksmbd/server.h b/fs/ksmbd/server.h
-index ac9d932f8c8a..db7278181760 100644
---- a/fs/ksmbd/server.h
-+++ b/fs/ksmbd/server.h
-@@ -41,6 +41,7 @@ struct ksmbd_server_config {
- 	unsigned int		share_fake_fscaps;
- 	struct smb_sid		domain_sid;
- 	unsigned int		auth_mechs;
-+	unsigned int		max_connections;
- 
- 	char			*conf[SERVER_CONF_WORK_GROUP + 1];
- };
-diff --git a/fs/ksmbd/transport_ipc.c b/fs/ksmbd/transport_ipc.c
-index c9aca21637d5..40c721f9227e 100644
---- a/fs/ksmbd/transport_ipc.c
-+++ b/fs/ksmbd/transport_ipc.c
-@@ -308,6 +308,9 @@ static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
- 	if (req->smbd_max_io_size)
- 		init_smbd_max_io_size(req->smbd_max_io_size);
- 
-+	if (req->max_connections)
-+		server_conf.max_connections = req->max_connections;
-+
- 	ret = ksmbd_set_netbios_name(req->netbios_name);
- 	ret |= ksmbd_set_server_string(req->server_string);
- 	ret |= ksmbd_set_work_group(req->work_group);
-diff --git a/fs/ksmbd/transport_tcp.c b/fs/ksmbd/transport_tcp.c
-index 63d55f543bd2..cec73dc765f4 100644
---- a/fs/ksmbd/transport_tcp.c
-+++ b/fs/ksmbd/transport_tcp.c
-@@ -15,6 +15,8 @@
- #define IFACE_STATE_DOWN		BIT(0)
- #define IFACE_STATE_CONFIGURED		BIT(1)
- 
-+static atomic_t active_num_conn;
-+
- struct interface {
- 	struct task_struct	*ksmbd_kthread;
- 	struct socket		*ksmbd_socket;
-@@ -185,8 +187,10 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
- 	struct tcp_transport *t;
- 
- 	t = alloc_transport(client_sk);
--	if (!t)
-+	if (!t) {
-+		sock_release(client_sk);
- 		return -ENOMEM;
-+	}
- 
- 	csin = KSMBD_TCP_PEER_SOCKADDR(KSMBD_TRANS(t)->conn);
- 	if (kernel_getpeername(client_sk, csin) < 0) {
-@@ -239,6 +243,15 @@ static int ksmbd_kthread_fn(void *p)
- 			continue;
- 		}
- 
-+		if (server_conf.max_connections &&
-+		    atomic_inc_return(&active_num_conn) >= server_conf.max_connections) {
-+			pr_info_ratelimited("Limit the maximum number of connections(%u)\n",
-+					    atomic_read(&active_num_conn));
-+			atomic_dec(&active_num_conn);
-+			sock_release(client_sk);
-+			continue;
-+		}
-+
- 		ksmbd_debug(CONN, "connect success: accepted new connection\n");
- 		client_sk->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
- 		client_sk->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
-@@ -365,6 +378,8 @@ static int ksmbd_tcp_writev(struct ksmbd_transport *t, struct kvec *iov,
- static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
- {
- 	free_transport(TCP_TRANS(t));
-+	if (server_conf.max_connections)
-+		atomic_dec(&active_num_conn);
- }
- 
- static void tcp_destroy_socket(struct socket *ksmbd_socket)
--- 
-2.25.1
-
+2022-12-29 11:29 GMT+09:00, Sergey Senozhatsky <senozhatsky@chromium.org>:
+> On (22/12/27 23:59), Namjae Jeon wrote:
+> [..]
+>>  	csin = KSMBD_TCP_PEER_SOCKADDR(KSMBD_TRANS(t)->conn);
+>>  	if (kernel_getpeername(client_sk, csin) < 0) {
+>> @@ -239,6 +243,17 @@ static int ksmbd_kthread_fn(void *p)
+>>  			continue;
+>>  		}
+>>
+>> +		if (server_conf.max_connections) {
+>> +			if (atomic_read(&active_num_conn) >= server_conf.max_connections) {
+>> +				pr_info("Limit the maximum number of connections(%u)\n",
+>> +						atomic_read(&active_num_conn));
+>> +				sock_release(client_sk);
+>> +				continue;
+>> +			}
+>> +
+>> +			atomic_inc(&active_num_conn);
+>> +		}
+>
+> This has to be one atomic op:
+>
+> 	if (atomic_inc_return() >= max_connections) {
+> 		atomic_dec
+> 		sock_release
+> 		continue
+> 	}
+>
+> Otherwise it's racy and it's possible to have more active
+> connections than the limit.
+Ok.
+>
+> I'd also note that pr_info() is risky there, it would be safer
+> to use rate-limited printk().
+Ok. FIXED. I have sent v2 patch.
+Thanks for your review!
+>
