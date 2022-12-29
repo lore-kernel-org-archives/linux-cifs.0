@@ -2,94 +2,138 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2023CC3DA7C
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 02:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF6DC4332F
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 03:26:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbiL2C3Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Dec 2022 21:29:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49744 "EHLO
+        id S230078AbiL2D0R (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Dec 2022 22:26:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232969AbiL2C3M (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Dec 2022 21:29:12 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F041812084
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Dec 2022 18:29:11 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id d9so926260pll.9
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Dec 2022 18:29:11 -0800 (PST)
+        with ESMTP id S230006AbiL2D0Q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Dec 2022 22:26:16 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448BEFAEA
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Dec 2022 19:26:14 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id j17so16456522lfr.3
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Dec 2022 19:26:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W2hf5CbYXCFQBcGt2m+dp8tLwBISDFTVA7vD9NfSqAA=;
-        b=M7giVCbF43STi477aZF25AQQZ1fTpFXXtJFlPN2G5OMeubAcibZRMF0YH4yEGvGHVF
-         C4AQkTxS+vDgj5F5enKojtYDYqHUNbO2+qPUKJiREGpaG29zBbH6+T1qndmwHYyy0avb
-         QFIggTno4PWiieAP9csHAkUIQx5uhA7/lWhL0=
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tvG/Du20VyVVqDR9fWM/fuxG7WUXf9V0dRwSaZuSWrU=;
+        b=CuYvyp0BdzxJHnopoo40n91Y0RnqwAjK/yvxNakCurHcYIxMEvMvW3G37R8IwlDDDP
+         v/zNn/PHxvwFiZ0OM1s2RBQjQoFCgg/2xRFJb3aX8I0uK8COE9nrIFx+UVJPsEfCwpDt
+         xh8AXSTCkIo4rCSohgApQMHDrBlDidLugVkc72VqIFP66dvbJFOXatx7Eq4eK761VB2H
+         QhoQkhDf+nBRrMxeEa3kAR8lE22CSQ6O5jt82WuoR3HUOMpHoqmdZ64KOqdC04EnfCQs
+         k6MQtZwPCsDLEWnQW1Gen7ffTXelzF/rT0fgVElV7AXYwLSnMFflKoh2QzBMbQkWtCKb
+         1RQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W2hf5CbYXCFQBcGt2m+dp8tLwBISDFTVA7vD9NfSqAA=;
-        b=YzCXGy5QoCGtpjjdrZ/DJisjeThK7mNs24l+Gf71Vq/6NSxwcGkxfdylqOa9r53efW
-         IdPovjoAWXbboRGZbC/NWK4a4lfAszUVrcU7ar5IJ3JD07uEppjSuCJWfpg1US7Oi7VD
-         ZvIv2tqSYjmDC77sE+N2EgZVUKVKrKkYvZG2ZUq5OQFcB6M5RkoFXyB07f4Ws+9nAYU7
-         yy0czKsE5mCX6xM3T/K0DqG/vByWAVDZzmBTmisSmOjcsQ4zF8Tv41eJoBo9JUxLsLSe
-         BVYKaNsaXlRRVCPpTwyWd4nBJmGXIU/u1XXhyOkL3rXtX+dSrQaQuMij4DwK+4UUzBjI
-         seqw==
-X-Gm-Message-State: AFqh2kol36Avsw6c6+JIBSd1T4NkDYwypMlinWkz2Ad7B0DPg+ehIeeG
-        PK9Ao1euwyXKGY+Lv77dbilQwg5vEq8BYm50
-X-Google-Smtp-Source: AMrXdXvpfU55xQLInH9yk6pxvFPDMkSgVAfsvIpFXoAIgajHG3GNkXWuzyXM4kqvZZyBmWvCyhBl7g==
-X-Received: by 2002:a17:90a:64c9:b0:226:2f1c:f167 with SMTP id i9-20020a17090a64c900b002262f1cf167mr1226033pjm.15.1672280951501;
-        Wed, 28 Dec 2022 18:29:11 -0800 (PST)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id ml4-20020a17090b360400b00225ab429953sm11709989pjb.6.2022.12.28.18.29.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Dec 2022 18:29:11 -0800 (PST)
-Date:   Thu, 29 Dec 2022 11:29:06 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, tom@talpey.com,
-        atteh.mailbox@gmail.com
-Subject: Re: [PATCH] ksmbd: add max connections parameter
-Message-ID: <Y6z7cjj+OkkVYFYR@google.com>
-References: <20221227145954.9663-1-linkinjeon@kernel.org>
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tvG/Du20VyVVqDR9fWM/fuxG7WUXf9V0dRwSaZuSWrU=;
+        b=2VXzzgP2lWDanP8NMq7iF0pLLG3dVttj59lI2Mvjj/r1YpP+QhBIHaQxn7uJfHOb2r
+         5Hq+yg7XrKVHoRUGATcZi2pB2Fh6ooIvGHrT+/U/yd58+WAWsw66ebal6h4AmgQ8/lKy
+         lLCOoDYOSPedjJ3nnuLThumkPuOfYvjhYY6nRZU9zNbI/NeTObVV/yg1dZSwdpcTnoom
+         wUHb7ktxSGtms8S8skgPwPDFyXjt3pKqYtQr63l6JAIGaj4rKElKSnIQsLW5YSV6DsSF
+         IoNK+pHI1VJo4N6EBqSw+bmTfEAZ8U028uPqaN1WTR0D/xsrxgt5DrWBC3CKbXpCRcYv
+         KfoQ==
+X-Gm-Message-State: AFqh2kqHo/T7OwHXfrzHzyordthzaff2/GRjXB1aF3k9JUSCg541mRgQ
+        4yxJbpn+8R2kPR1CMrvhBz6dV0Y9lahZQyghzAA=
+X-Google-Smtp-Source: AMrXdXvShqqA5M8QFWetoXjF51ldUZyGYu2HxieJ6QMflc11a786XNksavHDNjJE6YLgkUVrBdhhuFiMekc2mbohH8Y=
+X-Received: by 2002:a05:6512:c03:b0:4b5:5ceb:3ca7 with SMTP id
+ z3-20020a0565120c0300b004b55ceb3ca7mr1214249lfu.338.1672284372347; Wed, 28
+ Dec 2022 19:26:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221227145954.9663-1-linkinjeon@kernel.org>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Thu, 29 Dec 2022 08:56:00 +0530
+Message-ID: <CANT5p=qEwppcgZvbdLaABb6M-pRxyDQ05oHOb523n34tYyDqcw@mail.gmail.com>
+Subject: Deadlock in Ubuntu 5.4 kernel
+To:     Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>,
+        Enzo Matsumiya <ematsumiya@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On (22/12/27 23:59), Namjae Jeon wrote:
-[..]
->  	csin = KSMBD_TCP_PEER_SOCKADDR(KSMBD_TRANS(t)->conn);
->  	if (kernel_getpeername(client_sk, csin) < 0) {
-> @@ -239,6 +243,17 @@ static int ksmbd_kthread_fn(void *p)
->  			continue;
->  		}
->  
-> +		if (server_conf.max_connections) {
-> +			if (atomic_read(&active_num_conn) >= server_conf.max_connections) {
-> +				pr_info("Limit the maximum number of connections(%u)\n",
-> +						atomic_read(&active_num_conn));
-> +				sock_release(client_sk);
-> +				continue;
-> +			}
-> +
-> +			atomic_inc(&active_num_conn);
-> +		}
+Hi Paulo/Enzo,
 
-This has to be one atomic op:
+A customer reported this deadlock in a Kubernetes setup running on Ubuntu-18.04.
+This must be a 5.4 kernel, running this code:
+https://git.launchpad.net/~canonical-kernel/ubuntu/+source/linux-azure/+git/bionic
 
-	if (atomic_inc_return() >= max_connections) {
-		atomic_dec
-		sock_release
-		continue
-	}
+Based on the stack, it appears to be a hang in DFS reconnect codepath,
+trying to access the DFS cache lock in dfs_cache_update_vol.
 
-Otherwise it's racy and it's possible to have more active
-connections than the limit.
+Can you tell if this is a known issue that has been fixed since?
+And if Ubuntu should backport any fix to 5.4?
+I could not find the function in the mainline codebase.
 
-I'd also note that pr_info() is risky there, it would be safer
-to use rate-limited printk().
+dmesg:
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.066765] INFO: task cifsd:981715 blocked for more than 604
+seconds.
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.073365]       Not tainted 5.4.0-1091-azure #96~18.04.1-Ubuntu
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.080279] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E
+node-problem-detector-startup.sh[562959]: I1210 09:07:48.142691
+562992 log_monitor.go:160] New status generated:
+&{Source:kernel-monitor Events:[{Severity:warn Timestamp:2022-12-10
+09:07:47.636272174 +0000 UTC m=+63284.134685121 Reason:TaskHung
+Message:INFO: task cifsd:981715 blocked for more than 604 seconds.}]
+Conditions:[{Type:KernelDeadlock Status:False Transition:2022-12-09
+15:33:03.569676476 +0000 UTC m=+0.068089323 Reason:KernelHasNoDeadlock
+Message:kernel has no deadlock} {Type:ReadonlyFilesystem Status:False
+Transition:2022-12-09 15:33:03.569676576 +0000 UTC m=+0.068089423
+Reason:FilesystemIsNotReadOnly Message:Filesystem is not read-only}]}
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086811] cifsd           D    0 981715      2 0x80004002
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086814] Call Trace:
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086826]  __schedule+0x277/0x710
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086829]  ? __next_timer_interrupt+0xe0/0xe0
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086836]  schedule+0x33/0xa0
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086838]  schedule_preempt_disabled+0xe/0x10
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086840]  __mutex_lock.isra.10+0x24c/0x4a0
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086870]  ? do_dfs_cache_find+0x1be/0xea0 [cifs]
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086873]  __mutex_lock_slowpath+0x13/0x20
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086874]  ? __mutex_lock_slowpath+0x13/0x20
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086875]  mutex_lock+0x2f/0x40
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086891]  dfs_cache_update_vol+0x4a/0x290 [cifs]
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086904]  cifs_reconnect+0x597/0xd50 [cifs]
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086916]  cifs_handle_standard+0x198/0x1c0 [cifs]
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086928]  cifs_demultiplex_thread+0x9ed/0xc70 [cifs]
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086931]  kthread+0x121/0x140
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086942]  ? cifs_handle_standard+0x1c0/0x1c0 [cifs]
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086944]  ? kthread_park+0x90/0x90
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.086946]  ret_from_fork+0x35/0x40
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.087014] INFO: task kworker/0:2:2562230 blocked for more than
+604 seconds.
+Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
+[5653610.092927]       Not tainted 5.4.0-1091-azure #96~18.04.1-Ubuntu
+
+
+-- 
+Regards,
+Shyam
