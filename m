@@ -2,138 +2,160 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF6DC4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 03:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C4EC4332F
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 09:41:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbiL2D0R (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Dec 2022 22:26:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34706 "EHLO
+        id S233168AbiL2JlI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Dec 2022 04:41:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230006AbiL2D0Q (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Dec 2022 22:26:16 -0500
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448BEFAEA
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Dec 2022 19:26:14 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id j17so16456522lfr.3
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Dec 2022 19:26:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tvG/Du20VyVVqDR9fWM/fuxG7WUXf9V0dRwSaZuSWrU=;
-        b=CuYvyp0BdzxJHnopoo40n91Y0RnqwAjK/yvxNakCurHcYIxMEvMvW3G37R8IwlDDDP
-         v/zNn/PHxvwFiZ0OM1s2RBQjQoFCgg/2xRFJb3aX8I0uK8COE9nrIFx+UVJPsEfCwpDt
-         xh8AXSTCkIo4rCSohgApQMHDrBlDidLugVkc72VqIFP66dvbJFOXatx7Eq4eK761VB2H
-         QhoQkhDf+nBRrMxeEa3kAR8lE22CSQ6O5jt82WuoR3HUOMpHoqmdZ64KOqdC04EnfCQs
-         k6MQtZwPCsDLEWnQW1Gen7ffTXelzF/rT0fgVElV7AXYwLSnMFflKoh2QzBMbQkWtCKb
-         1RQw==
+        with ESMTP id S233171AbiL2JjD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Dec 2022 04:39:03 -0500
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D26013CC6
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 01:38:58 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id o2so13160952pjh.4
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 01:38:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tvG/Du20VyVVqDR9fWM/fuxG7WUXf9V0dRwSaZuSWrU=;
-        b=2VXzzgP2lWDanP8NMq7iF0pLLG3dVttj59lI2Mvjj/r1YpP+QhBIHaQxn7uJfHOb2r
-         5Hq+yg7XrKVHoRUGATcZi2pB2Fh6ooIvGHrT+/U/yd58+WAWsw66ebal6h4AmgQ8/lKy
-         lLCOoDYOSPedjJ3nnuLThumkPuOfYvjhYY6nRZU9zNbI/NeTObVV/yg1dZSwdpcTnoom
-         wUHb7ktxSGtms8S8skgPwPDFyXjt3pKqYtQr63l6JAIGaj4rKElKSnIQsLW5YSV6DsSF
-         IoNK+pHI1VJo4N6EBqSw+bmTfEAZ8U028uPqaN1WTR0D/xsrxgt5DrWBC3CKbXpCRcYv
-         KfoQ==
-X-Gm-Message-State: AFqh2kqHo/T7OwHXfrzHzyordthzaff2/GRjXB1aF3k9JUSCg541mRgQ
-        4yxJbpn+8R2kPR1CMrvhBz6dV0Y9lahZQyghzAA=
-X-Google-Smtp-Source: AMrXdXvShqqA5M8QFWetoXjF51ldUZyGYu2HxieJ6QMflc11a786XNksavHDNjJE6YLgkUVrBdhhuFiMekc2mbohH8Y=
-X-Received: by 2002:a05:6512:c03:b0:4b5:5ceb:3ca7 with SMTP id
- z3-20020a0565120c0300b004b55ceb3ca7mr1214249lfu.338.1672284372347; Wed, 28
- Dec 2022 19:26:12 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jPML/DA9q7748AhCrZhoOSPcu029DLJ6kFfIc0XDj3k=;
+        b=yJZ7VenAehgG+z23PrN3VtC+rPLO5cMceZiTfJ8BeHRHJ6lOmyWveaRZh+aWv9TyYh
+         9L9A1Wo+5pS97qumwyRULxGKzbGMRgILZms9YkImRB1fgsC+UoaF6Ek10gTPbuXcO1dB
+         Pkyj4pP3t7oSyuCHKhRNAO/k5kX8NzjQiW3poRhLl6yGNc/pJwXXgUoGLrCebdQI8DsZ
+         977hdhs1/c2EHx1G1EiZdxwAXdKOdpcgb1oCdN20dQPeQQNSZvcI/RYAynuO8OLyV6Fq
+         Hq8ZKryZnSHr51ouV2DwCHiPwRnpohAsVj6v+9ezjNM4IXCQm5nuXz5OkQf5yrazBepX
+         EYkw==
+X-Gm-Message-State: AFqh2krGecCB+xA3q01ZOLj32pxnyM6+CHtwm4HYa2mj22xOdabIcHar
+        sYp63XF/9FAHq9cS9zJ+MRePuOPOHOo=
+X-Google-Smtp-Source: AMrXdXt+Y5xeJdy9TdBq35p2B97WzLd0szAVW9uxE5Y3vMMlFq069FPFgTe8pEi/fWO4aDKlwSy72A==
+X-Received: by 2002:a17:902:e845:b0:188:fc0c:b736 with SMTP id t5-20020a170902e84500b00188fc0cb736mr67065580plg.67.1672306737457;
+        Thu, 29 Dec 2022 01:38:57 -0800 (PST)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id i6-20020a170902c94600b00189847cd4acsm12411849pla.237.2022.12.29.01.38.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Dec 2022 01:38:57 -0800 (PST)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH v2] ksmbd: add max connections parameter
+Date:   Thu, 29 Dec 2022 18:38:36 +0900
+Message-Id: <20221229093836.7804-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Thu, 29 Dec 2022 08:56:00 +0530
-Message-ID: <CANT5p=qEwppcgZvbdLaABb6M-pRxyDQ05oHOb523n34tYyDqcw@mail.gmail.com>
-Subject: Deadlock in Ubuntu 5.4 kernel
-To:     Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>,
-        Enzo Matsumiya <ematsumiya@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Paulo/Enzo,
+Add max connections parameter to limit number of maximum simultaneous
+connections.
 
-A customer reported this deadlock in a Kubernetes setup running on Ubuntu-18.04.
-This must be a 5.4 kernel, running this code:
-https://git.launchpad.net/~canonical-kernel/ubuntu/+source/linux-azure/+git/bionic
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ v2:
+   - use atomic_inc_return() to avoid racy issue.
+   - change pr_info to pr_info_ratelimited() to avoid message flood. 
 
-Based on the stack, it appears to be a hang in DFS reconnect codepath,
-trying to access the DFS cache lock in dfs_cache_update_vol.
+ fs/ksmbd/ksmbd_netlink.h |  3 ++-
+ fs/ksmbd/server.h        |  1 +
+ fs/ksmbd/transport_ipc.c |  3 +++
+ fs/ksmbd/transport_tcp.c | 17 ++++++++++++++++-
+ 4 files changed, 22 insertions(+), 2 deletions(-)
 
-Can you tell if this is a known issue that has been fixed since?
-And if Ubuntu should backport any fix to 5.4?
-I could not find the function in the mainline codebase.
-
-dmesg:
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.066765] INFO: task cifsd:981715 blocked for more than 604
-seconds.
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.073365]       Not tainted 5.4.0-1091-azure #96~18.04.1-Ubuntu
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.080279] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-disables this message.
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E
-node-problem-detector-startup.sh[562959]: I1210 09:07:48.142691
-562992 log_monitor.go:160] New status generated:
-&{Source:kernel-monitor Events:[{Severity:warn Timestamp:2022-12-10
-09:07:47.636272174 +0000 UTC m=+63284.134685121 Reason:TaskHung
-Message:INFO: task cifsd:981715 blocked for more than 604 seconds.}]
-Conditions:[{Type:KernelDeadlock Status:False Transition:2022-12-09
-15:33:03.569676476 +0000 UTC m=+0.068089323 Reason:KernelHasNoDeadlock
-Message:kernel has no deadlock} {Type:ReadonlyFilesystem Status:False
-Transition:2022-12-09 15:33:03.569676576 +0000 UTC m=+0.068089423
-Reason:FilesystemIsNotReadOnly Message:Filesystem is not read-only}]}
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086811] cifsd           D    0 981715      2 0x80004002
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086814] Call Trace:
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086826]  __schedule+0x277/0x710
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086829]  ? __next_timer_interrupt+0xe0/0xe0
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086836]  schedule+0x33/0xa0
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086838]  schedule_preempt_disabled+0xe/0x10
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086840]  __mutex_lock.isra.10+0x24c/0x4a0
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086870]  ? do_dfs_cache_find+0x1be/0xea0 [cifs]
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086873]  __mutex_lock_slowpath+0x13/0x20
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086874]  ? __mutex_lock_slowpath+0x13/0x20
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086875]  mutex_lock+0x2f/0x40
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086891]  dfs_cache_update_vol+0x4a/0x290 [cifs]
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086904]  cifs_reconnect+0x597/0xd50 [cifs]
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086916]  cifs_handle_standard+0x198/0x1c0 [cifs]
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086928]  cifs_demultiplex_thread+0x9ed/0xc70 [cifs]
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086931]  kthread+0x121/0x140
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086942]  ? cifs_handle_standard+0x1c0/0x1c0 [cifs]
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086944]  ? kthread_park+0x90/0x90
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.086946]  ret_from_fork+0x35/0x40
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.087014] INFO: task kworker/0:2:2562230 blocked for more than
-604 seconds.
-Dec 10 09:07:48 aks-corew26-13626357-vmss00000E kernel:
-[5653610.092927]       Not tainted 5.4.0-1091-azure #96~18.04.1-Ubuntu
-
-
+diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
+index b6bd8311e6b4..fb8b2d566efb 100644
+--- a/fs/ksmbd/ksmbd_netlink.h
++++ b/fs/ksmbd/ksmbd_netlink.h
+@@ -106,7 +106,8 @@ struct ksmbd_startup_request {
+ 	__u32	sub_auth[3];		/* Subauth value for Security ID */
+ 	__u32	smb2_max_credits;	/* MAX credits */
+ 	__u32	smbd_max_io_size;	/* smbd read write size */
+-	__u32	reserved[127];		/* Reserved room */
++	__u32	max_connections;	/* Number of maximum simultaneous connections */
++	__u32	reserved[126];		/* Reserved room */
+ 	__u32	ifc_list_sz;		/* interfaces list size */
+ 	__s8	____payload[];
+ };
+diff --git a/fs/ksmbd/server.h b/fs/ksmbd/server.h
+index ac9d932f8c8a..db7278181760 100644
+--- a/fs/ksmbd/server.h
++++ b/fs/ksmbd/server.h
+@@ -41,6 +41,7 @@ struct ksmbd_server_config {
+ 	unsigned int		share_fake_fscaps;
+ 	struct smb_sid		domain_sid;
+ 	unsigned int		auth_mechs;
++	unsigned int		max_connections;
+ 
+ 	char			*conf[SERVER_CONF_WORK_GROUP + 1];
+ };
+diff --git a/fs/ksmbd/transport_ipc.c b/fs/ksmbd/transport_ipc.c
+index c9aca21637d5..40c721f9227e 100644
+--- a/fs/ksmbd/transport_ipc.c
++++ b/fs/ksmbd/transport_ipc.c
+@@ -308,6 +308,9 @@ static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
+ 	if (req->smbd_max_io_size)
+ 		init_smbd_max_io_size(req->smbd_max_io_size);
+ 
++	if (req->max_connections)
++		server_conf.max_connections = req->max_connections;
++
+ 	ret = ksmbd_set_netbios_name(req->netbios_name);
+ 	ret |= ksmbd_set_server_string(req->server_string);
+ 	ret |= ksmbd_set_work_group(req->work_group);
+diff --git a/fs/ksmbd/transport_tcp.c b/fs/ksmbd/transport_tcp.c
+index 63d55f543bd2..cec73dc765f4 100644
+--- a/fs/ksmbd/transport_tcp.c
++++ b/fs/ksmbd/transport_tcp.c
+@@ -15,6 +15,8 @@
+ #define IFACE_STATE_DOWN		BIT(0)
+ #define IFACE_STATE_CONFIGURED		BIT(1)
+ 
++static atomic_t active_num_conn;
++
+ struct interface {
+ 	struct task_struct	*ksmbd_kthread;
+ 	struct socket		*ksmbd_socket;
+@@ -185,8 +187,10 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
+ 	struct tcp_transport *t;
+ 
+ 	t = alloc_transport(client_sk);
+-	if (!t)
++	if (!t) {
++		sock_release(client_sk);
+ 		return -ENOMEM;
++	}
+ 
+ 	csin = KSMBD_TCP_PEER_SOCKADDR(KSMBD_TRANS(t)->conn);
+ 	if (kernel_getpeername(client_sk, csin) < 0) {
+@@ -239,6 +243,15 @@ static int ksmbd_kthread_fn(void *p)
+ 			continue;
+ 		}
+ 
++		if (server_conf.max_connections &&
++		    atomic_inc_return(&active_num_conn) >= server_conf.max_connections) {
++			pr_info_ratelimited("Limit the maximum number of connections(%u)\n",
++					    atomic_read(&active_num_conn));
++			atomic_dec(&active_num_conn);
++			sock_release(client_sk);
++			continue;
++		}
++
+ 		ksmbd_debug(CONN, "connect success: accepted new connection\n");
+ 		client_sk->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
+ 		client_sk->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
+@@ -365,6 +378,8 @@ static int ksmbd_tcp_writev(struct ksmbd_transport *t, struct kvec *iov,
+ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
+ {
+ 	free_transport(TCP_TRANS(t));
++	if (server_conf.max_connections)
++		atomic_dec(&active_num_conn);
+ }
+ 
+ static void tcp_destroy_socket(struct socket *ksmbd_socket)
 -- 
-Regards,
-Shyam
+2.25.1
+
