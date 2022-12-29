@@ -2,70 +2,94 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D2DC4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Dec 2022 15:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2023CC3DA7C
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 02:29:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbiL0PFr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 27 Dec 2022 10:05:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33082 "EHLO
+        id S229716AbiL2C3Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Dec 2022 21:29:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiL0PFq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Dec 2022 10:05:46 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45C72DB9
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Dec 2022 07:05:44 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 001BDB8109B
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Dec 2022 15:05:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99F13C433F2
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Dec 2022 15:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672153541;
-        bh=2fcxw8ZP1mtRGDU+uSz1R24zCeMo3laJ820Eilx25Bg=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=BH6BPfUtjN54UkAYjo+IDrlN5wfZqatfM3BmnkiEpoKAKrdlymwQAZAMZmfMmMXCN
-         FhpMtYGFLjXvXUpkjSh9Do3W8ukHALy2Vj19rZWGTJ5MUd8RaunIe4rnmDG/UcOahp
-         C7YtTDJ28DdElq6Xxs8N3CrDNhNeioAZt5aGWYNyE2SiHzDrp7IvqLMxdBD0/qjlmq
-         KCyGP8A7J8V3vlUMXlrU92An3YFhGdmUQT5VRGeWFXOlBaNsDizNHNa4c5my8imNfD
-         6wqOSRz9RBFBJ1oR/1+14D7iAM+O5N3iVHh8k2HauBh7ppWFxuOBdO4Rqf2Dj2R0Lt
-         +715nNbrRT14w==
-Received: by mail-ot1-f41.google.com with SMTP id p17-20020a9d6951000000b00678306ceb94so8328064oto.5
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Dec 2022 07:05:41 -0800 (PST)
-X-Gm-Message-State: AFqh2kqR6DgyPLWwTih4S4CViu38VUuIY5TI3WC38YR/uYnMWfwIGqgP
-        uA68fbtMgOwDqIa/kXjihfrAA30mxR2C41OCfus=
-X-Google-Smtp-Source: AMrXdXt2+PCVFIuzWzLLsIw5TES6ppcpxedqdJeINMhhJ9Ois5BbQSwigLoNq6TU/rwvHUeOT3m3PiMuNTBfogioq8w=
-X-Received: by 2002:a05:6830:4119:b0:670:6e9b:2c89 with SMTP id
- w25-20020a056830411900b006706e9b2c89mr1329674ott.339.1672153540729; Tue, 27
- Dec 2022 07:05:40 -0800 (PST)
+        with ESMTP id S232969AbiL2C3M (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Dec 2022 21:29:12 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F041812084
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Dec 2022 18:29:11 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id d9so926260pll.9
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Dec 2022 18:29:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W2hf5CbYXCFQBcGt2m+dp8tLwBISDFTVA7vD9NfSqAA=;
+        b=M7giVCbF43STi477aZF25AQQZ1fTpFXXtJFlPN2G5OMeubAcibZRMF0YH4yEGvGHVF
+         C4AQkTxS+vDgj5F5enKojtYDYqHUNbO2+qPUKJiREGpaG29zBbH6+T1qndmwHYyy0avb
+         QFIggTno4PWiieAP9csHAkUIQx5uhA7/lWhL0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W2hf5CbYXCFQBcGt2m+dp8tLwBISDFTVA7vD9NfSqAA=;
+        b=YzCXGy5QoCGtpjjdrZ/DJisjeThK7mNs24l+Gf71Vq/6NSxwcGkxfdylqOa9r53efW
+         IdPovjoAWXbboRGZbC/NWK4a4lfAszUVrcU7ar5IJ3JD07uEppjSuCJWfpg1US7Oi7VD
+         ZvIv2tqSYjmDC77sE+N2EgZVUKVKrKkYvZG2ZUq5OQFcB6M5RkoFXyB07f4Ws+9nAYU7
+         yy0czKsE5mCX6xM3T/K0DqG/vByWAVDZzmBTmisSmOjcsQ4zF8Tv41eJoBo9JUxLsLSe
+         BVYKaNsaXlRRVCPpTwyWd4nBJmGXIU/u1XXhyOkL3rXtX+dSrQaQuMij4DwK+4UUzBjI
+         seqw==
+X-Gm-Message-State: AFqh2kol36Avsw6c6+JIBSd1T4NkDYwypMlinWkz2Ad7B0DPg+ehIeeG
+        PK9Ao1euwyXKGY+Lv77dbilQwg5vEq8BYm50
+X-Google-Smtp-Source: AMrXdXvpfU55xQLInH9yk6pxvFPDMkSgVAfsvIpFXoAIgajHG3GNkXWuzyXM4kqvZZyBmWvCyhBl7g==
+X-Received: by 2002:a17:90a:64c9:b0:226:2f1c:f167 with SMTP id i9-20020a17090a64c900b002262f1cf167mr1226033pjm.15.1672280951501;
+        Wed, 28 Dec 2022 18:29:11 -0800 (PST)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id ml4-20020a17090b360400b00225ab429953sm11709989pjb.6.2022.12.28.18.29.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Dec 2022 18:29:11 -0800 (PST)
+Date:   Thu, 29 Dec 2022 11:29:06 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, tom@talpey.com,
+        atteh.mailbox@gmail.com
+Subject: Re: [PATCH] ksmbd: add max connections parameter
+Message-ID: <Y6z7cjj+OkkVYFYR@google.com>
+References: <20221227145954.9663-1-linkinjeon@kernel.org>
 MIME-Version: 1.0
-Received: by 2002:a05:6838:2d06:0:0:0:0 with HTTP; Tue, 27 Dec 2022 07:05:40
- -0800 (PST)
-In-Reply-To: <20221223105930.1405307-1-mmakassikis@freebox.fr>
-References: <20221222104701.717586-1-mmakassikis@freebox.fr> <20221223105930.1405307-1-mmakassikis@freebox.fr>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 28 Dec 2022 00:05:40 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_CybBWJBMqpir0FFCU8yw0tkfXXUJDkCrqg=N9FmJBtg@mail.gmail.com>
-Message-ID: <CAKYAXd_CybBWJBMqpir0FFCU8yw0tkfXXUJDkCrqg=N9FmJBtg@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: send proper error response in smb2_tree_connect()
-To:     Marios Makassikis <mmakassikis@freebox.fr>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221227145954.9663-1-linkinjeon@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-12-23 19:59 GMT+09:00, Marios Makassikis <mmakassikis@freebox.fr>:
-> Currently, smb2_tree_connect doesn't send an error response packet on
-> error.
->
-> This causes libsmb2 to skip the specific error code and fail with the
-> following:
->  smb2_service failed with : Failed to parse fixed part of command
->  payload. Unexpected size of Error reply. Expected 9, got 8
->
-> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+On (22/12/27 23:59), Namjae Jeon wrote:
+[..]
+>  	csin = KSMBD_TCP_PEER_SOCKADDR(KSMBD_TRANS(t)->conn);
+>  	if (kernel_getpeername(client_sk, csin) < 0) {
+> @@ -239,6 +243,17 @@ static int ksmbd_kthread_fn(void *p)
+>  			continue;
+>  		}
+>  
+> +		if (server_conf.max_connections) {
+> +			if (atomic_read(&active_num_conn) >= server_conf.max_connections) {
+> +				pr_info("Limit the maximum number of connections(%u)\n",
+> +						atomic_read(&active_num_conn));
+> +				sock_release(client_sk);
+> +				continue;
+> +			}
+> +
+> +			atomic_inc(&active_num_conn);
+> +		}
 
-Thanks!
+This has to be one atomic op:
+
+	if (atomic_inc_return() >= max_connections) {
+		atomic_dec
+		sock_release
+		continue
+	}
+
+Otherwise it's racy and it's possible to have more active
+connections than the limit.
+
+I'd also note that pr_info() is risky there, it would be safer
+to use rate-limited printk().
