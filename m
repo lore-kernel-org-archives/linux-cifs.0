@@ -2,141 +2,113 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E1AC3DA79
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 21:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFF1C3DA79
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Dec 2022 22:05:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234057AbiL2VoB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Dec 2022 16:44:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46586 "EHLO
+        id S230195AbiL2WE7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Dec 2022 17:04:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230155AbiL2VoB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Dec 2022 16:44:01 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5877D10055
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 13:43:59 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 75DFF7FC20;
-        Thu, 29 Dec 2022 21:43:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1672350237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=/EVamuxWW8kNwshuB1gJZJVjqaKjvcNSpFnLuL0XsFw=;
-        b=fTYnHsbYO4d9SZWBYqFDwKCyGaoVIqNT7XPm9UtjVf5StGc7Ql58WWqx5uXtPEXyyIQBqs
-        WikPm1IvvQdX1a6cy7VB2/Gv7R9RvqN7TS/23Gvo+GY1RctSMN0TXve6BLYdCc7v8fQS5j
-        Acuw9AoOM3FApy1IhApOkU2+myYhsrb7jLiJJGax6FGFtNdKpuMPNHaieAmlATo3Dy+7Fw
-        xD2ubZ/kncjMgeOp673CkSFJJd/GrpBtF0ngw+LPd56SxFab71+pcVaVXLvGOQxn9gOvpp
-        d6/iQu1dCQ6YnheFnwu/KqPsowQQYFJnizUbhfuUiP7upBAJ1lCYGbbOAyMAIw==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH] cifs: protect access of TCP_Server_Info::{dstaddr,hostname}
-Date:   Thu, 29 Dec 2022 18:43:46 -0300
-Message-Id: <20221229214346.9979-1-pc@cjr.nz>
+        with ESMTP id S229688AbiL2WE6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Dec 2022 17:04:58 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64789BC3F
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 14:04:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1672351498; x=1703887498;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=rdXt2PZHBXw2YWMOphhjUm6XadC8g7OTuNG/wCex40c=;
+  b=DnXNy1OWQwx9ZPFk33vfQl92Zw2qzpMxZqRBmLWoYrTWFEVWqGnFSIVq
+   ALAT7iBeDi4okAFClp0LsNQ32C4WLqEURy721+jOlIkl5OFOxXFjFlF7M
+   4nCEmsMteCcyp6e9XTRAI6sd9k9t2Qx32YBmEDSk7kMIQJD4yauC8znqU
+   CmaonrkYwam1NphE1ZI4A4AgzLL/ifDyFKEZmpbtuB3fhlp2mh3H3NmZl
+   EshoZSy8VZyq6WR5FdB5imgIuFXiAhq//4kpL/CZbfZfVKAwwcHCuq8jj
+   I7Gv3nXrfDyrmeJS0odmTHGuovEvbDQFG1X2dLG8j4EyuoAZj2AHOxtTr
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10575"; a="385545716"
+X-IronPort-AV: E=Sophos;i="5.96,285,1665471600"; 
+   d="scan'208";a="385545716"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2022 14:04:57 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10575"; a="899093226"
+X-IronPort-AV: E=Sophos;i="5.96,285,1665471600"; 
+   d="scan'208";a="899093226"
+Received: from iweiny-desk3.amr.corp.intel.com (HELO localhost) ([10.212.27.114])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2022 14:04:57 -0800
+From:   Ira Weiny <ira.weiny@intel.com>
+Date:   Thu, 29 Dec 2022 14:04:46 -0800
+Subject: [PATCH] cifs: Fix kmap_local_page() unmapping
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20221229-cifs-kmap-v1-1-c70d0e9a53eb@intel.com>
+X-B4-Tracking: v=1; b=H4sIAP4OrmMC/x2NQQqDQAxFryJZNzBm0VKvIl1kZjI1iKMkpQji3
+ Tt2+fjv8w5wMRWHoTvA5Kuua23Q3zpIE9e3oObGQIGoJ3pi0uI4L7zh/RFC5sgl5QLNj+yC0bim
+ 6Xos7B+xa9hMiu7/yPg6zx/QunWldAAAAA==
+To:     Ira Weiny <ira.weiny@intel.com>
+Cc:     Paulo Alcantara <pc@cjr.nz>, Steve French <sfrench@samba.org>,
+        "Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+X-Mailer: b4 0.11.0-dev-e429b
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1672351497; l=1502;
+ i=ira.weiny@intel.com; s=20221222; h=from:subject:message-id;
+ bh=rdXt2PZHBXw2YWMOphhjUm6XadC8g7OTuNG/wCex40c=;
+ b=GNTMMJHJ6K//3TLb4zIn1TVx5mdU/2vVLxwXQfqoW/UQSsHm4K4PxlbftKJrn6gTGEmXi7K8M5x6
+ 8rNaPZHCC0asw5R3KcnaFHxEJe+TR+HLjMZx6yNnbEFM+TV4FCxe
+X-Developer-Key: i=ira.weiny@intel.com; a=ed25519;
+ pk=brwqReAJklzu/xZ9FpSsMPSQ/qkSalbg6scP3w809Ec=
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use the appropriate locks to protect access of hostname and dstaddr
-fields in cifs_tree_connect() as they might get changed by other
-tasks.
+kmap_local_page() requires kunmap_local() to unmap the mapping.  In
+addition memcpy_page() is provided to perform this common memcpy
+pattern.
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Replace the kmap_local_page() and broken kunmap() with memcpy_page()
+
+Fixes: d406d26745ab ("cifs: skip alloc when request has no pages")
+Cc: Paulo Alcantara <pc@cjr.nz>
+Cc: Steve French <sfrench@samba.org>
+Cc: "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: samba-technical@lists.samba.org
+Signed-off-by: Ira Weiny <ira.weiny@intel.com>
 ---
- fs/cifs/dfs.c  | 22 +++++++++++-----------
- fs/cifs/misc.c |  2 ++
- 2 files changed, 13 insertions(+), 11 deletions(-)
+ fs/cifs/smb2ops.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/dfs.c b/fs/cifs/dfs.c
-index 30086f2060a1..b64d20374b9c 100644
---- a/fs/cifs/dfs.c
-+++ b/fs/cifs/dfs.c
-@@ -327,8 +327,8 @@ static int update_server_fullpath(struct TCP_Server_Info *server, struct cifs_sb
- 	return rc;
- }
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index dc160de7a6de..0d7e9bcd9f34 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4488,17 +4488,12 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
  
--static int target_share_matches_server(struct TCP_Server_Info *server, const char *tcp_host,
--				       size_t tcp_host_len, char *share, bool *target_match)
-+static int target_share_matches_server(struct TCP_Server_Info *server, char *share,
-+				       bool *target_match)
- {
- 	int rc = 0;
- 	const char *dfs_host;
-@@ -338,13 +338,16 @@ static int target_share_matches_server(struct TCP_Server_Info *server, const cha
- 	extract_unc_hostname(share, &dfs_host, &dfs_host_len);
+ 		/* copy pages form the old */
+ 		for (j = 0; j < npages; j++) {
+-			char *dst, *src;
+ 			unsigned int offset, len;
  
- 	/* Check if hostnames or addresses match */
--	if (dfs_host_len != tcp_host_len || strncasecmp(dfs_host, tcp_host, dfs_host_len) != 0) {
--		cifs_dbg(FYI, "%s: %.*s doesn't match %.*s\n", __func__, (int)dfs_host_len,
--			 dfs_host, (int)tcp_host_len, tcp_host);
-+	cifs_server_lock(server);
-+	if (dfs_host_len != strlen(server->hostname) ||
-+	    strncasecmp(dfs_host, server->hostname, dfs_host_len)) {
-+		cifs_dbg(FYI, "%s: %.*s doesn't match %s\n", __func__,
-+			 (int)dfs_host_len, dfs_host, server->hostname);
- 		rc = match_target_ip(server, dfs_host, dfs_host_len, target_match);
- 		if (rc)
- 			cifs_dbg(VFS, "%s: failed to match target ip: %d\n", __func__, rc);
- 	}
-+	cifs_server_unlock(server);
- 	return rc;
- }
+ 			rqst_page_get_length(new, j, &len, &offset);
  
-@@ -358,13 +361,9 @@ static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *t
- 	struct cifs_ses *root_ses = CIFS_DFS_ROOT_SES(tcon->ses);
- 	struct cifs_tcon *ipc = root_ses->tcon_ipc;
- 	char *share = NULL, *prefix = NULL;
--	const char *tcp_host;
--	size_t tcp_host_len;
- 	struct dfs_cache_tgt_iterator *tit;
- 	bool target_match;
- 
--	extract_unc_hostname(server->hostname, &tcp_host, &tcp_host_len);
+-			dst = kmap_local_page(new->rq_pages[j]) + offset;
+-			src = kmap_local_page(old->rq_pages[j]) + offset;
 -
- 	tit = dfs_cache_get_tgt_iterator(tl);
- 	if (!tit) {
- 		rc = -ENOENT;
-@@ -387,8 +386,7 @@ static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *t
- 			break;
+-			memcpy(dst, src, len);
+-			kunmap(new->rq_pages[j]);
+-			kunmap(old->rq_pages[j]);
++			memcpy_page(new->rq_pages[j], offset,
++				    old->rq_pages[j], offset, len);
  		}
- 
--		rc = target_share_matches_server(server, tcp_host, tcp_host_len, share,
--						 &target_match);
-+		rc = target_share_matches_server(server, share, &target_match);
- 		if (rc)
- 			break;
- 		if (!target_match) {
-@@ -497,7 +495,9 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
  	}
  
- 	if (tcon->ipc) {
-+		cifs_server_lock(server);
- 		scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$", server->hostname);
-+		cifs_server_unlock(server);
- 		rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
- 		goto out;
- 	}
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 4d3c586785a5..2a19c7987c5b 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -1277,7 +1277,9 @@ int match_target_ip(struct TCP_Server_Info *server,
- 	if (rc < 0)
- 		return rc;
- 
-+	spin_lock(&server->srv_lock);
- 	*result = cifs_match_ipaddr((struct sockaddr *)&server->dstaddr, (struct sockaddr *)&ss);
-+	spin_unlock(&server->srv_lock);
- 	cifs_dbg(FYI, "%s: ip addresses match: %u\n", __func__, *result);
- 	return 0;
- }
--- 
-2.39.0
 
+---
+base-commit: 1b929c02afd37871d5afb9d498426f83432e71c2
+change-id: 20221229-cifs-kmap-6700dabafcdf
+
+Best regards,
+-- 
+Ira Weiny <ira.weiny@intel.com>
