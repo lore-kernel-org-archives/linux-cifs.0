@@ -2,97 +2,98 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3D5C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Dec 2022 02:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 923FDC4332F
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Dec 2022 03:34:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbiL3Cy5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Dec 2022 21:54:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53680 "EHLO
+        id S229680AbiL3DeC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Dec 2022 22:34:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbiL3Cy4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Dec 2022 21:54:56 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6F0263B
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 18:54:56 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso24706993pjt.0
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 18:54:56 -0800 (PST)
+        with ESMTP id S229537AbiL3DeB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Dec 2022 22:34:01 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFEF1868D
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 19:33:58 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id bf43so30175684lfb.6
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Dec 2022 19:33:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i8M1DvGFn/IOUPV7luzJzYiKF8Vw6N8DIX/BnYrNrMM=;
-        b=av3BV2sbAMn4gj1FybfsCdoGa+Y7Ax0xj9J5rWpgPZasWgOX/gZqbPhBS4WwF6Yv4f
-         HK9+BVY0B8O5x/oqG+UNt5dYXjyCwJHVfHde0jXj6f3p0sVgCWDDLZRmSNIL9aHIkR7V
-         EttBT5XipVFv/cW0Ckq8viE9Dt3XeLeNBon5k=
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9qefYZ5qnloMz3eYPSn49OcdoGxY6Ybcu7tQzavkZ0w=;
+        b=Ns3S9DE61itn9rxWjPoxs8uLzHF83/HEowLdvLqg75eVi4I76Q84m0w99nvbjMzI4I
+         X+012Gi/shW/ZPgff+Z8Z5gk9yDq6IaWPUvAnVSCFknzRByPKpAtrZY0Z5kTHBei3czd
+         2vclQmX0o+dee23VZzdY8rjJUP0Vmuq2HGw58NXAAHo8MDg22uKm6iTTdZltSDQcOmBz
+         dad2SM9j2uwY4n6KGf9aHK1Z8WieUfnrRq8RzCuAzYaUGpfHc7Vk4AR46vDa1jOrg2YK
+         cXgkiHucODSouoMQ+PPJnvJiKizqETZzAqtFlIzWApG2alhWiFeMOi4mgKEhPQlNAYzI
+         Gu/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i8M1DvGFn/IOUPV7luzJzYiKF8Vw6N8DIX/BnYrNrMM=;
-        b=Ts/qiFsUePLVEKMpRKESuVTLbuOA+f2/MQHXfcZAt6FiXbbVM9LWP2Ez0Q8daBiC+j
-         tKsyMLHrpEddqD46E75J2te/Cx2+B8XrvAUNkfgnOMo6i6L0Tp67rpzn4pCYiGTZisCC
-         smLXXnDcxKIjUwYYUnOdyNSHT0JjszkqjxLJy+bvPv1ieFJMsuBroJKtReWNNaZkAR6i
-         4Ju9cdSzZvAw/DoZdd8YUk+L4YA0YVuG3BuTUzSbHnXdYvFVdKODsBFt9+9TdFWNlJy2
-         6yEGQ39/hbGiDJ1iVwDLCFhjBJUhgxfjKilOAG8U8q0zGQFLA/hLv7bMduHh3B8T0HII
-         l2hA==
-X-Gm-Message-State: AFqh2koCvVi0ItP1LvhrQzgDUemj4OfpPbDGFXcZvJLd6wtcJ39teaQD
-        dhV30fVsAezDGAcWWty/bEAfPA==
-X-Google-Smtp-Source: AMrXdXtH08h50VKEYH2PQAkcIc6KZX3VixQfXcywo880yjTtzoCfGbczGHqvPpczCRsR+SEupLQCBg==
-X-Received: by 2002:a17:90a:cc2:b0:219:9973:2746 with SMTP id 2-20020a17090a0cc200b0021999732746mr47289089pjt.0.1672368895688;
-        Thu, 29 Dec 2022 18:54:55 -0800 (PST)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id g3-20020a17090a300300b0022618929f89sm3768917pjb.45.2022.12.29.18.54.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Dec 2022 18:54:55 -0800 (PST)
-Date:   Fri, 30 Dec 2022 11:54:50 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, tom@talpey.com, atteh.mailbox@gmail.com
-Subject: Re: [PATCH] ksmbd-tools: add max connections parameter to global
- section
-Message-ID: <Y65S+r6PtXWjvmmx@google.com>
-References: <20221227150213.9842-1-linkinjeon@kernel.org>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9qefYZ5qnloMz3eYPSn49OcdoGxY6Ybcu7tQzavkZ0w=;
+        b=f/ZFHWE4FEVQQ+CMYvxSopj75wYpyjxGaEg/criuhGBjjun8LHUrrDruVZmqUSSyYM
+         hlygEJJqz2qTKA4ZDJ8K6xLM3cJzMEkESIc6jSSMUUwGu5nKUVN5KxNjOrtqIJr4lPLs
+         ZkjPO0mvhffHTxhJnoo9xgDueHNrrQC25sOIhgwMJsYLQVgpq86u8i2ZEQsHRxcgK9U6
+         WVzrx6iGkMEhhZuebdcl9xTY9p0ZHvs2OZpR88OgI0iFVYV2gyXNfWN/T+bNZzZ4zcLl
+         BNrs7rxDEgunG2+JUaz22bFh+aSdoe7m6/nc1+1KBhjaTGzkyLuwdDAZiMOezs8owH72
+         ljhA==
+X-Gm-Message-State: AFqh2kpvm3ghsP3/yaJdSgtahEqmwluaMthxf30edJ/UAivRatUwlsXs
+        f7qfTNxhhD0GasCtmVh9G1vSXYjfDxC2+7cJkjM=
+X-Google-Smtp-Source: AMrXdXswQypeo26RU2sQ7kTfwc+aY92KpS+w2N1u+1sMsRpoS2my2fOXXw9TbB6OjgDvf8BRerHV2uAWujrSe4tWlg4=
+X-Received: by 2002:a05:6512:552:b0:4b5:9233:6e9b with SMTP id
+ h18-20020a056512055200b004b592336e9bmr2863348lfl.394.1672371236172; Thu, 29
+ Dec 2022 19:33:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221227150213.9842-1-linkinjeon@kernel.org>
+References: <CANT5p=qEwppcgZvbdLaABb6M-pRxyDQ05oHOb523n34tYyDqcw@mail.gmail.com>
+ <87a6364d6x.fsf@cjr.nz>
+In-Reply-To: <87a6364d6x.fsf@cjr.nz>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Fri, 30 Dec 2022 09:03:44 +0530
+Message-ID: <CANT5p=o9y+w885o2kW0fiyXKUjrzc++8T6-7eqPH=EeYL1Q_Ew@mail.gmail.com>
+Subject: Re: Deadlock in Ubuntu 5.4 kernel
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Enzo Matsumiya <ematsumiya@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On (22/12/28 00:02), Namjae Jeon wrote:
-[..]
-> @@ -175,6 +175,7 @@ static int ipc_ksmbd_starting_up(void)
->  	ev->smb2_max_write = global_conf.smb2_max_write;
->  	ev->smb2_max_trans = global_conf.smb2_max_trans;
->  	ev->smbd_max_io_size = global_conf.smbd_max_io_size;
-> +	ev->max_connections = global_conf.max_connections;
->  	ev->share_fake_fscaps = global_conf.share_fake_fscaps;
->  	memcpy(ev->sub_auth, global_conf.gen_subauth, sizeof(ev->sub_auth));
->  	ev->smb2_max_credits = global_conf.smb2_max_credits;
-> diff --git a/tools/config_parser.c b/tools/config_parser.c
-> index 2dc6b34..5f36606 100644
-> --- a/tools/config_parser.c
-> +++ b/tools/config_parser.c
-> @@ -548,6 +548,11 @@ static gboolean global_group_kv(gpointer _k, gpointer _v, gpointer user_data)
->  		return TRUE;
->  	}
->  
-> +	if (!cp_key_cmp(_k, "max connections")) {
-> +		global_conf.max_connections = memparse(_v);
-> +		return TRUE;
-> +	}
-> +
+On Thu, Dec 29, 2022 at 5:47 PM Paulo Alcantara <pc@cjr.nz> wrote:
+>
+> Shyam Prasad N <nspmangalore@gmail.com> writes:
+>
+> > A customer reported this deadlock in a Kubernetes setup running on Ubuntu-18.04.
+> > This must be a 5.4 kernel, running this code:
+> > https://git.launchpad.net/~canonical-kernel/ubuntu/+source/linux-azure/+git/bionic
+> >
+> > Based on the stack, it appears to be a hang in DFS reconnect codepath,
+> > trying to access the DFS cache lock in dfs_cache_update_vol.
+> >
+> > Can you tell if this is a known issue that has been fixed since?
+>
+> Looks like this has been fixed by
+>
+>         06d57378bcc9 ("cifs: Fix potential deadlock when updating vol in cifs_reconnect()")
+>
 
-I'd say that it'll make sense to me if ksmbd will impose a default
-limit on the number of connections, which people can overwrite. Yes,
-I know that samba doesn't limit by default, but ksmbd is a kernel
-module and the price of unlimited resource consumption is higher.
-We can't probably easily apply the "samba does it" rule here. What
-do you think?
+Thanks for this.
 
-How about:
-- default `max connections`, say, of 512. max possible value, say, 64k?
-- `max connections` cannot be zero
+> > And if Ubuntu should backport any fix to 5.4?
+>
+> I would say so.  It would probably also require others dfs related
+> patches to be backported in addition to the above.
+
+If you could point me to a list of other patches that could be
+backported to a 5.4 kernel, that would be great.
+
+>
+> > I could not find the function in the mainline codebase.
+>
+> Yes, it has changed alot.
+
+-- 
+Regards,
+Shyam
