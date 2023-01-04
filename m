@@ -2,57 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38301C46467
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Jan 2023 06:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C4EC4332F
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 Jan 2023 06:14:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231179AbjADGOO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 4 Jan 2023 01:14:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40322 "EHLO
+        id S230423AbjADGOd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 4 Jan 2023 01:14:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230423AbjADGON (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 Jan 2023 01:14:13 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEFE41582F
-        for <linux-cifs@vger.kernel.org>; Tue,  3 Jan 2023 22:14:11 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id v25so1602566lfe.12
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Jan 2023 22:14:11 -0800 (PST)
+        with ESMTP id S229469AbjADGOa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 Jan 2023 01:14:30 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7483183B2
+        for <linux-cifs@vger.kernel.org>; Tue,  3 Jan 2023 22:14:28 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id bf43so49028714lfb.6
+        for <linux-cifs@vger.kernel.org>; Tue, 03 Jan 2023 22:14:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=sDZt+OUEMk33IyjiPH1bLca16LOkhf7ByuRNP9e7gVM=;
-        b=kazS2uhrAAaK0MFzloiuFkles46MYKycn87b0jGuTx/lHc1AyHj3BWTEvTbm5pw9G+
-         JGRgJSV/kI5dQRF1r7uVaPMI7Ex4C395N6IGBtAhu7Dj1gcyWD1U+hQw2Kh2WoUeWKPe
-         wJIZmeYd3bc1ywjnBadu1YNEjyyKRPVbY9TKVWUyzxdIpCwT9kz3Mrue862fKkUCXnpz
-         4GxD6AVTGotoLyWf5tYw4p0h2FIyKAni8AzTyVLNW3UmDTAI6y65ieHYr2ucCceDcph5
-         3yHYk4FYftbw/YYHeAM3kLXAOrdELKPZtM7Rbwr2dKBVDyAZSs65k5KV4vWp5mu3kVGT
-         DhAQ==
+        bh=7qLAJ8QLgWzTuMG2kz7xtNQEOKmFgfrm43QFAh0/+Dc=;
+        b=IZmQ0bubw7HS9vJIVX8E2GG3IefPTIvNbkVIIzeWQ0+JSdOP5M93ZF4/sAXtRsKs4x
+         l3PV4sI0SYlefBbfdwUCJ8WA1OUjm9zRN8S3EYjzBZXH42PlXHVIX6nBNXPWPe1+D9np
+         RQsliAfxbkYuDJxL5uN+oscQFmj8MA0Xa5IQaTfNPE7nK8aYK26O2WELEfXBPRVfQ+hj
+         pUvdd/CANiWKiJ4/t3xN2xsLG6ynVteeuZYeeuDZ0MTVuxdtX8KhPdCa+KA42Ylx16Ns
+         M/iA5eQD+uz79zRSN8rMTw8to1trupu3rxYCrEtfhSwGbBHCYEkKs/TXuEI5M13ZTR9M
+         49CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=sDZt+OUEMk33IyjiPH1bLca16LOkhf7ByuRNP9e7gVM=;
-        b=1g5u6AoQgA290q2Tlq1Zy6xmYIw3asWVGU4CxibVFU+g0haoNkUASrk+xet+GdkdXx
-         69GjdPlDlhcu8g9RXF4X6ncEtWTUqy5pxPPTAzKfw/p8YIhWlSQRiSw6Qh/CuoJtAiWU
-         nsymhKqdma1NbZ6dQXJzh1zwH2APcCQ5Agd2Y+WRN1qQEcVKle+2OBcC/Pulyq0C/2k8
-         vFx4NruOvMMNvUasE+3ghDMMMDZ56q50T4PhgyExv94dJm1c/SGLPcHOFydQfQ4t9xDG
-         /Hz+BZIRXBxHZ1ILoGUTN2vUR8qVrz6CWjRmgoqJsHCycrcKb5dEN3b6D8KJUWX1CE5H
-         LkeA==
-X-Gm-Message-State: AFqh2ko0tO6TBA6H+4azm1+Do2wyJ5pEx35EEJ9SYERfsXGPE9CZaAOV
-        Sp9wp/zOaf9enWHvmIQNpTQSj7UT7i0jkn2a+FoMbUe1
-X-Google-Smtp-Source: AMrXdXsDxtP7rKvJMuEHABanI/t8dWTpPdY1mCgn/0V4sno1XpXwmUvm+D5BDXrmPTUnqZjFnQojzquR/k4/+cFr1B8=
-X-Received: by 2002:a05:6512:14d:b0:4cb:3a2f:26d1 with SMTP id
- m13-20020a056512014d00b004cb3a2f26d1mr376599lfo.303.1672812849975; Tue, 03
- Jan 2023 22:14:09 -0800 (PST)
+        bh=7qLAJ8QLgWzTuMG2kz7xtNQEOKmFgfrm43QFAh0/+Dc=;
+        b=71pVwQmGDD9LBR8XVfVAA0RMb/q+s9NAnE4DjqGeAnpwZQ1s1YSlGQ6TSVz4RggWyc
+         9axyM5VcaBZSpGrfvAsOOEaY/AAwvqdVDpEXBt1XcswpWitfHm7m4ElrW+TPHbwdRcMm
+         FG8ZbgD8Hw2+xxAmVtqsIe+XeZA1TiAcZLiwtQRsGG6rXxybSqDd/vjnTQAr+5c2ddGK
+         Jq5HMXSb5EpeHqFRxJMI/OIAU1Ii15gBKsNDVbBCcYi0rBiAueDcv8NhgltcuG3Bw7r6
+         FB5nqStRm//Fn4/koNh32Wqq3UvwlepafIQZ31rYM50SerN+Ybex+LLxKBRrorzDswCO
+         YDuQ==
+X-Gm-Message-State: AFqh2kpYvWKNS4KNoqlFre5MOmU/+7w11Xq+rS56EJ6WljLQA0qAakpD
+        Ei8f9wRfOeO8vP+cDMs2VliMEX5/4IB15G4FosIVMA/D
+X-Google-Smtp-Source: AMrXdXtSq+DNUDxnN95wLN8YpfW6ZV9AYatq9qfNoNrQxtOzcQB4HJTYR7OiTta/cO5pWriOw2xE2PJW+ZrWTeF3w+U=
+X-Received: by 2002:a05:6512:3d28:b0:4a2:2c4b:8138 with SMTP id
+ d40-20020a0565123d2800b004a22c4b8138mr2315569lfv.14.1672812866872; Tue, 03
+ Jan 2023 22:14:26 -0800 (PST)
 MIME-Version: 1.0
-References: <20221229153356.8221-1-pc@cjr.nz> <20221229201029.lajhejwbbtca6poc@suse.de>
- <CAH2r5mv-2MPzd-zJSxDXh5avC4Bhp-BJG9nmr2f=1FR5m6B3Zg@mail.gmail.com>
-In-Reply-To: <CAH2r5mv-2MPzd-zJSxDXh5avC4Bhp-BJG9nmr2f=1FR5m6B3Zg@mail.gmail.com>
+References: <20221229153356.8221-1-pc@cjr.nz> <20221229153356.8221-2-pc@cjr.nz>
+ <20221229201448.bzxqnsea52zcb4xw@suse.de> <CAH2r5mso6PLpKpVxtcUHW4RQ1jc-Tmj5ALOEba2z+40uSDf0JA@mail.gmail.com>
+In-Reply-To: <CAH2r5mso6PLpKpVxtcUHW4RQ1jc-Tmj5ALOEba2z+40uSDf0JA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 4 Jan 2023 00:13:58 -0600
-Message-ID: <CAH2r5msnXZXKYQD3sVKig0MWzrRo7rth1BVuFsvboWcO0J7eeg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] cifs: ignore ipc reconnect failures during dfs failover
+Date:   Wed, 4 Jan 2023 00:14:15 -0600
+Message-ID: <CAH2r5mu+C0kxvdg8XEyYJYaZQc0Q2EzddtwwLPmzR4=djsQmOw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] cifs: fix race in assemble_neg_contexts()
 To:     Enzo Matsumiya <ematsumiya@suse.de>
 Cc:     Paulo Alcantara <pc@cjr.nz>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -60,70 +60,66 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Jan 4, 2023 at 12:13 AM Steve French <smfrench@gmail.com> wrote:
+On Wed, Jan 4, 2023 at 12:12 AM Steve French <smfrench@gmail.com> wrote:
 >
 > merged into cifs-2.6.git for-next
 >
-> On Thu, Dec 29, 2022 at 2:10 PM Enzo Matsumiya <ematsumiya@suse.de> wrote:
+> On Thu, Dec 29, 2022 at 2:14 PM Enzo Matsumiya <ematsumiya@suse.de> wrote:
 >>
 >> On 12/29, Paulo Alcantara wrote:
->> >If it failed to reconnect ipc used for getting referrals, we can just
->> >ignore it as it is not required for reconnecting the share.  The worst
->> >case would be not being able to detect or chase nested links as long
->> >as dfs root server is unreachable.
->> >
->> >Before patch:
->> >
->> >  $ mount.cifs //root/dfs/link /mnt -o echo_interval=10,...
->> >    -> target share: /fs0/share
->> >
->> >  disconnect root & fs0
->> >
->> >  $ ls /mnt
->> >  ls: cannot access '/mnt': Host is down
->> >
->> >  connect fs0
->> >
->> >  $ ls /mnt
->> >  ls: cannot access '/mnt': Resource temporarily unavailable
->> >
->> >After patch:
->> >
->> >  $ mount.cifs //root/dfs/link /mnt -o echo_interval=10,...
->> >    -> target share: /fs0/share
->> >
->> >  disconnect root & fs0
->> >
->> >  $ ls /mnt
->> >  ls: cannot access '/mnt': Host is down
->> >
->> >  connect fs0
->> >
->> >  $ ls /mnt
->> >  bar.rtf  dir1  foo
+>> >Serialise access of TCP_Server_Info::hostname in
+>> >assemble_neg_contexts() by holding the server's mutex otherwise it
+>> >might end up accessing an already-freed hostname pointer from
+>> >cifs_reconnect() or cifs_resolve_server().
 >> >
 >> >Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+>>
+>> Couldn't reproduce this one as easy as the other one, but it makes sense
+>> anyway.
 >>
 >> Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
 >>
 >> >---
->> > fs/cifs/dfs.c | 3 +--
->> > 1 file changed, 1 insertion(+), 2 deletions(-)
+>> > fs/cifs/smb2pdu.c | 11 +++++++----
+>> > 1 file changed, 7 insertions(+), 4 deletions(-)
 >> >
->> >diff --git a/fs/cifs/dfs.c b/fs/cifs/dfs.c
->> >index b541e68378f6..30086f2060a1 100644
->> >--- a/fs/cifs/dfs.c
->> >+++ b/fs/cifs/dfs.c
->> >@@ -401,8 +401,7 @@ static int __tree_connect_dfs_target(const unsigned int xid, struct cifs_tcon *t
->> >               if (ipc->need_reconnect) {
->> >                       scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$", server->hostname);
->> >                       rc = ops->tree_connect(xid, ipc->ses, tree, ipc, cifs_sb->local_nls);
->> >-                      if (rc)
->> >-                              break;
->> >+                      cifs_dbg(FYI, "%s: reconnect ipc: %d\n", __func__, rc);
->> >               }
+>> >diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+>> >index a5695748a89b..2c484d47c592 100644
+>> >--- a/fs/cifs/smb2pdu.c
+>> >+++ b/fs/cifs/smb2pdu.c
+>> >@@ -541,9 +541,10 @@ static void
+>> > assemble_neg_contexts(struct smb2_negotiate_req *req,
+>> >                     struct TCP_Server_Info *server, unsigned int *total_len)
+>> > {
+>> >-      char *pneg_ctxt;
+>> >-      char *hostname = NULL;
+>> >       unsigned int ctxt_len, neg_context_count;
+>> >+      struct TCP_Server_Info *pserver;
+>> >+      char *pneg_ctxt;
+>> >+      char *hostname;
 >> >
->> >               scnprintf(tree, MAX_TREE_SIZE, "\\%s", share);
+>> >       if (*total_len > 200) {
+>> >               /* In case length corrupted don't want to overrun smb buffer */
+>> >@@ -574,8 +575,9 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
+>> >        * secondary channels don't have the hostname field populated
+>> >        * use the hostname field in the primary channel instead
+>> >        */
+>> >-      hostname = CIFS_SERVER_IS_CHAN(server) ?
+>> >-              server->primary_server->hostname : server->hostname;
+>> >+      pserver = CIFS_SERVER_IS_CHAN(server) ? server->primary_server : server;
+>> >+      cifs_server_lock(pserver);
+>> >+      hostname = pserver->hostname;
+>> >       if (hostname && (hostname[0] != 0)) {
+>> >               ctxt_len = build_netname_ctxt((struct smb2_netname_neg_context *)pneg_ctxt,
+>> >                                             hostname);
+>> >@@ -584,6 +586,7 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
+>> >               neg_context_count = 3;
+>> >       } else
+>> >               neg_context_count = 2;
+>> >+      cifs_server_unlock(pserver);
+>> >
+>> >       build_posix_ctxt((struct smb2_posix_neg_context *)pneg_ctxt);
+>> >       *total_len += sizeof(struct smb2_posix_neg_context);
 >> >--
 >> >2.39.0
 >> >
