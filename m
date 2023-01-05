@@ -2,139 +2,94 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E8FC53210
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Jan 2023 21:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A74C3DA7D
+	for <linux-cifs@archiver.kernel.org>; Thu,  5 Jan 2023 13:41:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240415AbjADVPp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 4 Jan 2023 16:15:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57526 "EHLO
+        id S229938AbjAENld (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 5 Jan 2023 08:41:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240338AbjADVPO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 Jan 2023 16:15:14 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715DE1DDE5;
-        Wed,  4 Jan 2023 13:15:12 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id c2so9657103plc.5;
-        Wed, 04 Jan 2023 13:15:12 -0800 (PST)
+        with ESMTP id S233622AbjAENlQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Jan 2023 08:41:16 -0500
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8309E12D02;
+        Thu,  5 Jan 2023 05:41:14 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id k22-20020a05600c1c9600b003d1ee3a6289so1332341wms.2;
+        Thu, 05 Jan 2023 05:41:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yH5uknizJ+VZ3ByJbVZj3rNFJAjGpaD6mNiQZQbwTDM=;
-        b=HbtlZrradnwPMjbOnk5CSSrEWLtsrycMj6Tm30jqV76XWo9P/G6G9QfGZXA3hEuuO0
-         yNLMx+3+R2fxnnyrSrsdtAH0YAmNGiTL388KwyzROfoONWg1jTa9Ux254/uWey0xofFS
-         ZcN1YVGa74THrAOxSXWb1EhxG2YA/LskeaMec+FBsOyEUefqmBI414yyRv7F6qtfnFnG
-         AKTzOXJ+X4W+hyL+EGENc2vkpZu+8+kQREVxb3SQSXSnUiBROYLOIlwHYGmrLdygYais
-         EBeKayC0rdoQzyAgQz2uWHzmW86g0Hrl3uDZm7ONl8JUgVLCxAkjfMiNh3ua3ACkBAqv
-         sniA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GyyRdgebspZF1HHBg/x+bnzRDFwvCGUNNQpRJ9GE9NE=;
+        b=gVovIXNCyutrMkt3B7RkQAXY9mkDckwwv0IwDDTcMNXgyGB/xpYBpp07ss+3hnRL4r
+         VNSazoyUN8XC1C5yLkMI1DcBWCH/YA+y2FXM45UghIv6aUPAUBAoFZBnNe4FEUAMegID
+         3c7ZnWO5b0AYdk7acTUBed5ytK1VLXUtsK7B5zybvgrnnHOXdGMKZV75T4f0G+Hh4kbH
+         opPfBEB4SE6UA4OESxQIGCoqAgfjqna0saJ9vGzS2ClRJnzWUEhhOEILucszK8ZIqZHA
+         /CV/27Jtt8du9zkuwBXSoPf57ZxeJN9c0VC+b6XRkLohdWdipAVn9lU4jBJjNe6mgCo7
+         8mKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yH5uknizJ+VZ3ByJbVZj3rNFJAjGpaD6mNiQZQbwTDM=;
-        b=PiHm+qGU5PiD/fenLezVaGpPhIN2EBl5I9+obaGck3ALYh0D74fnzvF3ZHfOafpwQq
-         Uq2QqYrKi1OKpC1oDFOiMqpCpD/nOVtdXOPVQm91F1pCX4i5V/iuZrKHcTZC24+DXisB
-         NSTqO4jBP7rEnmKIzCcE3+5jI6czfqbpEMI5tDFrkuqO4l7NTwk03qnpmOK5hjVIvhdn
-         wAR2anNQBZX+LkeKsiK3iyaltQh+bIYDoHs5JLPSCZLd//hiwO12GM3epPkw0Yz/Ismi
-         n8aqSgaqrRIEgMY+8c+N/Xh9Wvndk0KP0YiqZ/2LCRRDfDisgZQPB3xWhLg5MI3gSRfx
-         OdKQ==
-X-Gm-Message-State: AFqh2kpr6Q09KV5ZthjjxdBraCK/crWsGBsFTIC5KMksv1v6Fb329ElJ
-        pomkAustyBYo77rBK/xmIDDmgOO19AaNaA==
-X-Google-Smtp-Source: AMrXdXtVQz3vUnk6SvLBb/uxtWWFs3KjCzby6fY2kylk/nf26hkuu2Sk6nOiS0bo0LRTvW+QMbKhXA==
-X-Received: by 2002:a17:90b:520e:b0:226:ba10:14e9 with SMTP id sg14-20020a17090b520e00b00226ba1014e9mr2765079pjb.12.1672866911945;
-        Wed, 04 Jan 2023 13:15:11 -0800 (PST)
-Received: from fedora.hsd1.ca.comcast.net ([2601:644:8002:1c20::a55d])
-        by smtp.googlemail.com with ESMTPSA id i8-20020a17090a138800b00226369149cesm6408pja.21.2023.01.04.13.15.10
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GyyRdgebspZF1HHBg/x+bnzRDFwvCGUNNQpRJ9GE9NE=;
+        b=a9idR9MiBNKwb5HIjJxgiuLep+q5KE7ZFvVc5GXZt1WiwLVgQce83R3NBJ8dYINGLd
+         f3VShGEZsBpivS1O9EH7nz2ylRpQ/dZliAqI9Pkx08bboTtJBJ9fsV+ZTE6rNggBQmCI
+         Bbnm2+qfwog5D7l4f3Q7OwX/73XSXv9xCSH1HMQXPdKum6bKacErNgTZXdgRc97iObaM
+         ezWw/ufYxSR0R8QWDRfNCcuSo/4mkOzeUwYx24lohqtyxhHzW9nRsOyAlKRRUMXai2RJ
+         32OU24nfvDDpPXBo9kUz27X9qKEUtOMubA7YLSCPkrEnAd+yhvbLmb6RTnQTilMJ+6Np
+         7GSg==
+X-Gm-Message-State: AFqh2kpnVRfzfw8yWlJMcAQj4Edtu9G06KpRaUCD0Ne503VRQAHHqKIz
+        FldixAtNEgcRF5KqAv7wTiKb8fu8IPjp5Msw
+X-Google-Smtp-Source: AMrXdXv+HroiUbAmYEH/mD+Ekli8hj6yu3IC02jJ00oTFNUO93iv3a1BHfq46uZB6xtnwejHQ1zFMQ==
+X-Received: by 2002:a05:600c:b4d:b0:3d3:5d69:7aa5 with SMTP id k13-20020a05600c0b4d00b003d35d697aa5mr34879221wmr.25.1672926073037;
+        Thu, 05 Jan 2023 05:41:13 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id l9-20020a05600c4f0900b003d9780466b0sm2689085wmq.31.2023.01.05.05.41.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jan 2023 13:15:11 -0800 (PST)
-From:   "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-To:     linux-fsdevel@vger.kernel.org
-Cc:     linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nilfs@vger.kernel.org, linux-mm@kvack.org,
-        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
-        Chao Yu <chao@kernel.org>
-Subject: [PATCH v5 11/23] f2fs: Convert f2fs_fsync_node_pages() to use filemap_get_folios_tag()
-Date:   Wed,  4 Jan 2023 13:14:36 -0800
-Message-Id: <20230104211448.4804-12-vishal.moola@gmail.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230104211448.4804-1-vishal.moola@gmail.com>
-References: <20230104211448.4804-1-vishal.moola@gmail.com>
+        Thu, 05 Jan 2023 05:41:12 -0800 (PST)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH][next] cifs: remove redundant assignment to the variable match
+Date:   Thu,  5 Jan 2023 13:41:11 +0000
+Message-Id: <20230105134111.45001-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Convert function to use a folio_batch instead of pagevec. This is in
-preparation for the removal of find_get_pages_range_tag().
+The variable match is being assigned a value that is never read, it
+is being re-assigned a new value later on. The assignment is redundant
+and can be removed.
 
-Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
-Acked-by: Chao Yu <chao@kernel.org>
+Cleans up clang scan-build warning:
+fs/cifs/dfs_cache.c:1302:2: warning: Value stored to 'match' is never read
+
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
- fs/f2fs/node.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ fs/cifs/dfs_cache.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/fs/f2fs/node.c b/fs/f2fs/node.c
-index dde4c0458704..3e0362794e27 100644
---- a/fs/f2fs/node.c
-+++ b/fs/f2fs/node.c
-@@ -1731,12 +1731,12 @@ int f2fs_fsync_node_pages(struct f2fs_sb_info *sbi, struct inode *inode,
- 			unsigned int *seq_id)
- {
- 	pgoff_t index;
--	struct pagevec pvec;
-+	struct folio_batch fbatch;
- 	int ret = 0;
- 	struct page *last_page = NULL;
- 	bool marked = false;
- 	nid_t ino = inode->i_ino;
--	int nr_pages;
-+	int nr_folios;
- 	int nwritten = 0;
+diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+index 43ad1176dcb9..e20f8880363f 100644
+--- a/fs/cifs/dfs_cache.c
++++ b/fs/cifs/dfs_cache.c
+@@ -1299,7 +1299,6 @@ static bool target_share_equal(struct TCP_Server_Info *server, const char *s1, c
+ 	 * Resolve share's hostname and check if server address matches.  Otherwise just ignore it
+ 	 * as we could not have upcall to resolve hostname or failed to convert ip address.
+ 	 */
+-	match = true;
+ 	extract_unc_hostname(s1, &host, &hostlen);
+ 	scnprintf(unc, sizeof(unc), "\\\\%.*s", (int)hostlen, host);
  
- 	if (atomic) {
-@@ -1745,20 +1745,21 @@ int f2fs_fsync_node_pages(struct f2fs_sb_info *sbi, struct inode *inode,
- 			return PTR_ERR_OR_ZERO(last_page);
- 	}
- retry:
--	pagevec_init(&pvec);
-+	folio_batch_init(&fbatch);
- 	index = 0;
- 
--	while ((nr_pages = pagevec_lookup_tag(&pvec, NODE_MAPPING(sbi), &index,
--				PAGECACHE_TAG_DIRTY))) {
-+	while ((nr_folios = filemap_get_folios_tag(NODE_MAPPING(sbi), &index,
-+					(pgoff_t)-1, PAGECACHE_TAG_DIRTY,
-+					&fbatch))) {
- 		int i;
- 
--		for (i = 0; i < nr_pages; i++) {
--			struct page *page = pvec.pages[i];
-+		for (i = 0; i < nr_folios; i++) {
-+			struct page *page = &fbatch.folios[i]->page;
- 			bool submitted = false;
- 
- 			if (unlikely(f2fs_cp_error(sbi))) {
- 				f2fs_put_page(last_page, 0);
--				pagevec_release(&pvec);
-+				folio_batch_release(&fbatch);
- 				ret = -EIO;
- 				goto out;
- 			}
-@@ -1824,7 +1825,7 @@ int f2fs_fsync_node_pages(struct f2fs_sb_info *sbi, struct inode *inode,
- 				break;
- 			}
- 		}
--		pagevec_release(&pvec);
-+		folio_batch_release(&fbatch);
- 		cond_resched();
- 
- 		if (ret || marked)
 -- 
-2.38.1
+2.30.2
 
