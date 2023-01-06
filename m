@@ -2,130 +2,246 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF536C4708E
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 Jan 2023 01:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD25C54E76
+	for <linux-cifs@archiver.kernel.org>; Fri,  6 Jan 2023 07:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230430AbjAFB2A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 Jan 2023 20:28:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52476 "EHLO
+        id S231171AbjAFH7E (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 6 Jan 2023 02:59:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230017AbjAFB1i (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Jan 2023 20:27:38 -0500
-Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 930B63225D
-        for <linux-cifs@vger.kernel.org>; Thu,  5 Jan 2023 17:21:16 -0800 (PST)
-Received: by mail-vs1-xe2e.google.com with SMTP id l184so222223vsc.0
-        for <linux-cifs@vger.kernel.org>; Thu, 05 Jan 2023 17:21:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bZVfcYNGrcIA0zuT9dCvLyeprPvGGEgboYWjoRhrvss=;
-        b=hdN59MhNjAoDnl7eeVyrQfC34BbbR7xGowHDyJTvzLUxXRIOj6+tcgQaYLRRbOCzQK
-         8lHhj6X3Fb9q680+Nig76J61YCPcXXZyZHlG+U5/bRr+XQyNAOdaha+lY3y48WzEra53
-         Z+yXlOG3BzPDx84ijoyWKpYUdkiv3aO3fLZLs9NtrrKF0GVcAfqFP1ZA6yRajCTyOm7+
-         dn2GRCloGBseVeGqnQcgG47dYfhc50O+oPF0/1LOmSMJ1wuoJ8kWVIfrgnSpzsQNNARC
-         bqvOM1TWH0m7zMzPxfMIHZTqrNBqM02taoI1jVZWtMYvGLgEpkWvRjCPme7az9VTBxZP
-         FrVg==
+        with ESMTP id S231202AbjAFH7C (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 6 Jan 2023 02:59:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3277878E80
+        for <linux-cifs@vger.kernel.org>; Thu,  5 Jan 2023 23:57:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672991854;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xmb3IcLHCLsi/xOiQHUkWYlXfS8doiaC8cJwdmVUFK4=;
+        b=SLVzg7+qVCkSPwpEXCMyFeNPY9fsRC3J6m6t9JyyNaGFIjjHxovBVrdPL/kwwpyv/tLyr+
+        uAEuds0xSUup0UDOyInIosfoE5Z2o/gfG+Wqj40CVNLzVuwrG63GucOn2dCZ3OWAJ+VClz
+        dumlyhgYGDzQ/s+rMBR1O1MSWa7geiY=
+Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
+ [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-404-O3ISqbPyPE-MPNX15Yvcug-1; Fri, 06 Jan 2023 02:57:32 -0500
+X-MC-Unique: O3ISqbPyPE-MPNX15Yvcug-1
+Received: by mail-yb1-f200.google.com with SMTP id z17-20020a256651000000b007907852ca4dso1142567ybm.16
+        for <linux-cifs@vger.kernel.org>; Thu, 05 Jan 2023 23:57:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bZVfcYNGrcIA0zuT9dCvLyeprPvGGEgboYWjoRhrvss=;
-        b=ePP5ruhNcrWujgqC4ulcqHPdUaV2oOKxjVLe7OzfFzbwXJ1T7S3ZuH8ZdDDgGGLVOX
-         T6/huoMbxa4vX/VSq/+IGcYMA/DrMYDGRmvJzwWATpzu/fr4AWup9/gLlXC///OjPVmi
-         dkvJ0u0WUAUTWZ/L15bTLjB40aUTLYLfMNF8cOBI9HzrzK/bgMHxV7se9GBCLrhZur2C
-         8EMKONRBCIzXQTDIVzMgoq+vpbAvgpgrGYyq88qMHdtS7ZbKveo9X0NvygWQgc8uQk33
-         I+Bgg/ROfd1/FzJFzCqUUq2IfO7yDDNInRMkq4ExNy/u3g0DdHtLKiKcfVxs9N5k8zle
-         c3sg==
-X-Gm-Message-State: AFqh2krgu6mRxCQ5Gq0DHde99xN9uk3/PiKZxbWWUoSEOeTw4sCE2FGn
-        vu9N0yJq/zBoXAS/o7stw0tjBAMAVKgWaQai5pkOWbD5g8o=
-X-Google-Smtp-Source: AMrXdXuoXEw7VEVMqMAET+i/LVl6pSw1XNucBexVFy1oe3HRZAT3OwGfZHh6WUHxrO0to2KG5xgLkxlhocqOjPApTDM=
-X-Received: by 2002:a05:6102:32d6:b0:3b5:3bd5:2a78 with SMTP id
- o22-20020a05610232d600b003b53bd52a78mr6482426vss.3.1672968073568; Thu, 05 Jan
- 2023 17:21:13 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xmb3IcLHCLsi/xOiQHUkWYlXfS8doiaC8cJwdmVUFK4=;
+        b=IM2IMK/nuA+w5kKhJ//uTM7oAxOZo2gFMn54IRHnWX03LMVnKhv/QBrF1OKVpZaVg8
+         lm70GqIgyHWeD/pr1aUDa9tgZGXfSZgaeX9NRdMZThXUhg1OnOieCmOdhy/fNnRQs5k2
+         rLDEs6wRo9CYJHCo/w2bTcNI24xBJPRfTSFBxKb2l0jubFqCd/s8Xc7WT+VOjLfYckJZ
+         DPByqbmbdAGsCsP9vMkmlJDBoNcefAJm+bSCy6Xi5gwM6Bb23jvNxY5DZGeDdNQnfvm8
+         hoLrr6o4Ik75mdX6HCxuW8xmiITpAVKIkbvffkCVs960aSYc1nYUQBq2VOYVpPBtb0Tn
+         Xs4w==
+X-Gm-Message-State: AFqh2krSXT6KvXuPaRIIkIz6U/kj90ZLRwuNWn2EKyOJkubIMibstBOi
+        hgw/ujEKv960zk0jc1of95URbe+1mj7nnzSsDg/TPP9dNgSOVV0WV87kNYkUAJN8nDVj4noUHKb
+        6k8JEmjXmgyu5YNugOj4lheVh70dMjVLRDA2Uyg==
+X-Received: by 2002:a05:690c:87:b0:46f:36b1:a27 with SMTP id be7-20020a05690c008700b0046f36b10a27mr4200654ywb.147.1672991851846;
+        Thu, 05 Jan 2023 23:57:31 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuC/bbIcMr4bQ8ok16zXLqM2NrU98mA2WJd0uc+HAfHs8BnKxPTLzGpg1jIsSESD/q9eqv3v1Jyw7xgl7+RWvk=
+X-Received: by 2002:a05:690c:87:b0:46f:36b1:a27 with SMTP id
+ be7-20020a05690c008700b0046f36b10a27mr4200651ywb.147.1672991851590; Thu, 05
+ Jan 2023 23:57:31 -0800 (PST)
 MIME-Version: 1.0
-From:   Xiaoli Feng <fengxiaoli0714@gmail.com>
-Date:   Fri, 6 Jan 2023 09:21:26 +0800
-Message-ID: <CAOoqPcSqOZWN7LKmZQzPhu8MWxNsxYoDs2woHotE_te__+MF=w@mail.gmail.com>
-Subject: CIFS: kernel BUG at mm/slub.c:435
-To:     Steve French <sfrench@samba.org>, lsahlber@redhat.com,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <20230104211448.4804-1-vishal.moola@gmail.com> <20230104211448.4804-18-vishal.moola@gmail.com>
+In-Reply-To: <20230104211448.4804-18-vishal.moola@gmail.com>
+From:   Andreas Gruenbacher <agruenba@redhat.com>
+Date:   Fri, 6 Jan 2023 08:57:20 +0100
+Message-ID: <CAHc6FU55EfV0qvtpPUWAvHm72kPd7Rzb8=-GX0oFgfJonXt7Pg@mail.gmail.com>
+Subject: Re: [Cluster-devel] [PATCH v5 17/23] gfs2: Convert
+ gfs2_write_cache_jdata() to use filemap_get_folios_tag()
+To:     "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-btrfs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Test the latest kernel in the branch for-next of
-git://git.samba.org/sfrench/cifs-2.6.git. Kernel always panic when
-mount cifs with option "-o sec=krb5,multiuser".
+On Wed, Jan 4, 2023 at 10:15 PM Vishal Moola (Oracle)
+<vishal.moola@gmail.com> wrote:
+> Converted function to use folios throughout. This is in preparation for
+> the removal of find_get_pgaes_range_tag(). This change removes 8 calls
+> to compound_head().
+>
+> Also had to modify and rename gfs2_write_jdata_pagevec() to take in
+> and utilize folio_batch rather than pagevec and use folios rather
+> than pages. gfs2_write_jdata_batch() now supports large folios.
+>
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> ---
+>  fs/gfs2/aops.c | 64 +++++++++++++++++++++++++++-----------------------
+>  1 file changed, 35 insertions(+), 29 deletions(-)
+>
+> diff --git a/fs/gfs2/aops.c b/fs/gfs2/aops.c
+> index e782b4f1d104..0a47068f9acc 100644
+> --- a/fs/gfs2/aops.c
+> +++ b/fs/gfs2/aops.c
+> @@ -195,67 +195,71 @@ static int gfs2_writepages(struct address_space *mapping,
+>  }
+>
+>  /**
+> - * gfs2_write_jdata_pagevec - Write back a pagevec's worth of pages
+> + * gfs2_write_jdata_batch - Write back a folio batch's worth of folios
+>   * @mapping: The mapping
+>   * @wbc: The writeback control
+> - * @pvec: The vector of pages
+> - * @nr_pages: The number of pages to write
+> + * @fbatch: The batch of folios
+>   * @done_index: Page index
+>   *
+>   * Returns: non-zero if loop should terminate, zero otherwise
+>   */
+>
+> -static int gfs2_write_jdata_pagevec(struct address_space *mapping,
+> +static int gfs2_write_jdata_batch(struct address_space *mapping,
+>                                     struct writeback_control *wbc,
+> -                                   struct pagevec *pvec,
+> -                                   int nr_pages,
+> +                                   struct folio_batch *fbatch,
+>                                     pgoff_t *done_index)
+>  {
+>         struct inode *inode = mapping->host;
+>         struct gfs2_sbd *sdp = GFS2_SB(inode);
+> -       unsigned nrblocks = nr_pages * (PAGE_SIZE >> inode->i_blkbits);
+> +       unsigned nrblocks;
+>         int i;
+>         int ret;
+> +       int nr_pages = 0;
+> +       int nr_folios = folio_batch_count(fbatch);
+> +
+> +       for (i = 0; i < nr_folios; i++)
+> +               nr_pages += folio_nr_pages(fbatch->folios[i]);
+> +       nrblocks = nr_pages * (PAGE_SIZE >> inode->i_blkbits);
+>
+>         ret = gfs2_trans_begin(sdp, nrblocks, nrblocks);
+>         if (ret < 0)
+>                 return ret;
+>
+> -       for(i = 0; i < nr_pages; i++) {
+> -               struct page *page = pvec->pages[i];
+> +       for (i = 0; i < nr_folios; i++) {
+> +               struct folio *folio = fbatch->folios[i];
+>
+> -               *done_index = page->index;
+> +               *done_index = folio->index;
+>
+> -               lock_page(page);
+> +               folio_lock(folio);
+>
+> -               if (unlikely(page->mapping != mapping)) {
+> +               if (unlikely(folio->mapping != mapping)) {
+>  continue_unlock:
+> -                       unlock_page(page);
+> +                       folio_unlock(folio);
+>                         continue;
+>                 }
+>
+> -               if (!PageDirty(page)) {
+> +               if (!folio_test_dirty(folio)) {
+>                         /* someone wrote it for us */
+>                         goto continue_unlock;
+>                 }
+>
+> -               if (PageWriteback(page)) {
+> +               if (folio_test_writeback(folio)) {
+>                         if (wbc->sync_mode != WB_SYNC_NONE)
+> -                               wait_on_page_writeback(page);
+> +                               folio_wait_writeback(folio);
+>                         else
+>                                 goto continue_unlock;
+>                 }
+>
+> -               BUG_ON(PageWriteback(page));
+> -               if (!clear_page_dirty_for_io(page))
+> +               BUG_ON(folio_test_writeback(folio));
+> +               if (!folio_clear_dirty_for_io(folio))
+>                         goto continue_unlock;
+>
+>                 trace_wbc_writepage(wbc, inode_to_bdi(inode));
+>
+> -               ret = __gfs2_jdata_writepage(page, wbc);
+> +               ret = __gfs2_jdata_writepage(&folio->page, wbc);
+>                 if (unlikely(ret)) {
+>                         if (ret == AOP_WRITEPAGE_ACTIVATE) {
+> -                               unlock_page(page);
+> +                               folio_unlock(folio);
+>                                 ret = 0;
+>                         } else {
+>
+> @@ -268,7 +272,8 @@ static int gfs2_write_jdata_pagevec(struct address_space *mapping,
+>                                  * not be suitable for data integrity
+>                                  * writeout).
+>                                  */
+> -                               *done_index = page->index + 1;
+> +                               *done_index = folio->index +
+> +                                       folio_nr_pages(folio);
+>                                 ret = 1;
+>                                 break;
+>                         }
+> @@ -305,8 +310,8 @@ static int gfs2_write_cache_jdata(struct address_space *mapping,
+>  {
+>         int ret = 0;
+>         int done = 0;
+> -       struct pagevec pvec;
+> -       int nr_pages;
+> +       struct folio_batch fbatch;
+> +       int nr_folios;
+>         pgoff_t writeback_index;
+>         pgoff_t index;
+>         pgoff_t end;
+> @@ -315,7 +320,7 @@ static int gfs2_write_cache_jdata(struct address_space *mapping,
+>         int range_whole = 0;
+>         xa_mark_t tag;
+>
+> -       pagevec_init(&pvec);
+> +       folio_batch_init(&fbatch);
+>         if (wbc->range_cyclic) {
+>                 writeback_index = mapping->writeback_index; /* prev offset */
+>                 index = writeback_index;
+> @@ -341,17 +346,18 @@ static int gfs2_write_cache_jdata(struct address_space *mapping,
+>                 tag_pages_for_writeback(mapping, index, end);
+>         done_index = index;
+>         while (!done && (index <= end)) {
+> -               nr_pages = pagevec_lookup_range_tag(&pvec, mapping, &index, end,
+> -                               tag);
+> -               if (nr_pages == 0)
+> +               nr_folios = filemap_get_folios_tag(mapping, &index, end,
+> +                               tag, &fbatch);
+> +               if (nr_folios == 0)
+>                         break;
+>
+> -               ret = gfs2_write_jdata_pagevec(mapping, wbc, &pvec, nr_pages, &done_index);
+> +               ret = gfs2_write_jdata_batch(mapping, wbc, &fbatch,
+> +                               &done_index);
+>                 if (ret)
+>                         done = 1;
+>                 if (ret > 0)
+>                         ret = 0;
+> -               pagevec_release(&pvec);
+> +               folio_batch_release(&fbatch);
+>                 cond_resched();
+>         }
+>
+> --
+> 2.38.1
+>
 
-Bug 216878 - CIFS: kernel BUG at mm/slub.c:435
-https://bugzilla.kernel.org/show_bug.cgi?id=216878
+Reviewed-by: Andreas Gruenbacher <agruenba@redhat.com>
 
-[332881.480892] kernel BUG at mm/slub.c:435!
-[332881.481816] invalid opcode: 0000 [#1] PREEMPT SMP PTI
-[332881.482958] CPU: 0 PID: 144956 Comm: mount.cifs Kdump: loaded Not
-tainted 6.2.0-rc1 #1
-[332881.484714] Hardware name: Red Hat KVM, BIOS 1.15.0-1.el9 04/01/2014
-[332881.486121] RIP: 0010:__kmem_cache_free+0x2bb/0x2e0
-[332881.487231] Code: 5e e9 19 e8 ff ff 49 8b 46 08 f0 48 83 28 01 0f
-85 96 fe ff ff 49 8b 46 08 4c 89 f7 48 8b 40 08 e8 4a 62 8c 00 e9 81
-fe ff ff <0f> 0b 4c 8b 32 4d 85 f6 0f 85 1d fe ff ff e9 b2 fe ff ff 48
-8b 15
-[332881.491300] RSP: 0018:ffffa20cc33b7bb0 EFLAGS: 00010246
-[332881.492472] RAX: ffff93dcb0bd0060 RBX: ffff93dcb0bd0060 RCX:
-ffff93dcb0bd0070
-[332881.494049] RDX: 00000000da820000 RSI: ffffebe380000000 RDI:
-ffff93dc40042400
-[332881.495584] RBP: ffff93dc40042400 R08: 0000000000000000 R09:
-ffff93dcb0bd0060
-[332881.497155] R10: ffffa20cc33b7a90 R11: ffffffffad3e4b48 R12:
-ffffebe385c2f400
-[332881.498709] R13: ffffffffc0f3c0a5 R14: ffff93dca323b800 R15:
-ffff93dca323ba10
-[332881.500267] FS:  00007f1798617780(0000) GS:ffff93dd1a600000(0000)
-knlGS:0000000000000000
-[332881.502038] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[332881.503324] CR2: 00007f2c31de1000 CR3: 000000010334e006 CR4:
-0000000000370ef0
-[332881.504889] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-0000000000000000
-[332881.506463] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-0000000000000400
-[332881.508024] Call Trace:
-[332881.508608]  <TASK>
-[332881.509118]  sesInfoFree+0x85/0x1a0 [cifs]
-[332881.510347]  cifs_get_smb_ses+0x3ce/0x980 [cifs]
-[332881.511468]  cifs_mount_get_session+0x65/0x1e0 [cifs]
-[332881.512701]  dfs_mount_share+0x33/0x140 [cifs]
-[332881.513840]  cifs_mount+0x60/0x2d0 [cifs]
-[332881.514874]  cifs_smb3_do_mount+0xf8/0x310 [cifs]
-[332881.516059]  smb3_get_tree+0x3d/0x70 [cifs]
-[332881.517127]  vfs_get_tree+0x25/0xc0
-[332881.518369]  do_new_mount+0x17a/0x310
-[332881.519612]  __x64_sys_mount+0x107/0x140
-[332881.520920]  do_syscall_64+0x5c/0x90
-[332881.522184]  ? __do_sys_capset+0x14d/0x220
-[332881.523498]  ? syscall_exit_work+0x103/0x130
-[332881.524832]  ? syscall_exit_to_user_mode+0x12/0x30
-[332881.526288]  ? do_syscall_64+0x69/0x90
-[332881.527509]  ? exc_page_fault+0x62/0x150
-[332881.528752]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-[332881.530237] RIP: 0033:0x7f179843f7be
-[332881.531420] Code: 48 8b 0d 65 a6 1b 00 f7 d8 64 89 01 48 83 c8 ff
-c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 a5 00 00
-00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 32 a6 1b 00 f7 d8 64 89
-01 48
-[332881.536167] RSP: 002b:00007ffe73666a18 EFLAGS: 00000206 ORIG_RAX:
-00000000000000a5
-[332881.538195] RAX: ffffffffffffffda RBX: 0000555761170eb0 RCX:
-00007f179843f7be
-[332881.540121] RDX: 000055575f65d473 RSI: 000055575f65d4da RDI:
-00007ffe7366803b
-[332881.542054] RBP: 0000000000000000 R08: 0000555761170eb0 R09:
-0000000000000000
-[332881.543983] R10: 0000000000000000 R11: 0000000000000206 R12:
-00007ffe73668030
-[332881.545903] R13: 00007f179862b000 R14: 00007f179862d90f R15:
-0000555761171ee0
+Thanks,
+Andreas
+
