@@ -2,68 +2,89 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCEAEC678D5
-	for <linux-cifs@archiver.kernel.org>; Sat,  7 Jan 2023 18:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B66C46467
+	for <linux-cifs@archiver.kernel.org>; Sat,  7 Jan 2023 20:01:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233807AbjAGSnV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 7 Jan 2023 13:43:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32968 "EHLO
+        id S230120AbjAGUBx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 7 Jan 2023 15:01:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233071AbjAGSnT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 7 Jan 2023 13:43:19 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378BA1BC92;
-        Sat,  7 Jan 2023 10:43:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229621AbjAGUBw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 7 Jan 2023 15:01:52 -0500
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0D2C11812
+        for <linux-cifs@vger.kernel.org>; Sat,  7 Jan 2023 12:01:49 -0800 (PST)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E4796B8069C;
-        Sat,  7 Jan 2023 18:43:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C669C433F0;
-        Sat,  7 Jan 2023 18:43:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673116995;
-        bh=t8oFbteuHleMYMX/TCZigNH4jj4T+HHQHGSfXFfIyV0=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=n/Rbb7/4BWVBMphOEROKgu5l/tgeLOGn1RhBYCyfoV5aH/GYWNF9c2ByNVjkgXqFz
-         k7C+E8hpFnyotXtuN1yZ/NNBcoBlz6N0uL5sByS6Vm9Dx1XiSnZDDZ2EaWzFPdOUWn
-         ZqpVtIR/ZvKZVRMgCK+jRcDDvGevN6bwTi4ldXzQwuxxb2j0RiOgCB/fximuddfyfm
-         atKLjFJEgVt8Uxu2fW5R2xJj5PWvvqadpRXS1H7VpnF9qSeSuNer3FVYThCTv29fsy
-         5Jty39Hr2QM0jJc4QBpztT1hB9z2Md/vXnVCWPvPT87svTPUw9EcOGDXPLXRn97yJF
-         +qjLH9xQZ09Fg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8A1F6E57249;
-        Sat,  7 Jan 2023 18:43:15 +0000 (UTC)
-Subject: Re: [GIT PULL] cifs/smb3 fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5muwatnq0rkQzeeWw9pYdd4fZJTMLAiW2j_44cfyMYs1ag@mail.gmail.com>
-References: <CAH2r5muwatnq0rkQzeeWw9pYdd4fZJTMLAiW2j_44cfyMYs1ag@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5muwatnq0rkQzeeWw9pYdd4fZJTMLAiW2j_44cfyMYs1ag@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc2-smb3-client-fixes
-X-PR-Tracked-Commit-Id: cc7d79d4fad6a4eab3f88c4bb237de72be4478f1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f18fca98ac1622220dfdf795fefa91dc52d3707d
-Message-Id: <167311699556.9095.7863282434122676334.pr-tracker-bot@kernel.org>
-Date:   Sat, 07 Jan 2023 18:43:15 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 759FF7FC01;
+        Sat,  7 Jan 2023 20:01:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1673121707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0Lbohn13YaeIO2SMROjzeMvCs2dk9ZZ5TN/7K28kadw=;
+        b=yW3RHYsQIhBpEoEc3zDuod1tzyshtV+ZnwCI7/+fp20lUwyGDOvYCxIDEkWCncr+nTBzQ9
+        QLmr5asBQGa8w56QnnzcP2pxVal2PwfxEKFF4OwVUlXatlPtaCk888zxnYYE2k2JSynq3U
+        gwgIU+gNpFHmaCe78EgS64WQ1nlY8DTr5JE6Ez1rdBIKxMU6l14XzFLJsttK7ueLWC5kmi
+        c8mmOpDFP+Xg73hgKc8XEiDU0aE/mbDpqfYm4XiHR6S8AaGu4uafhSkHL4Vc9sz2h4YkSG
+        qeF7U38wOrclMnG3vKv4yMI4he25rJDe4mFaL5UvMIHv/Vi25p9RA+3MrdVrfA==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>
+Subject: [PATCH 1/2] cifs: fix file info setting in cifs_query_path_info()
+Date:   Sat,  7 Jan 2023 17:01:33 -0300
+Message-Id: <20230107200134.4822-1-pc@cjr.nz>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 7 Jan 2023 11:27:27 -0600:
+We missed to set file info when CIFSSMBQPathInfo() returned 0, thus
+leaving cifs_open_info_data::fi unset.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc2-smb3-client-fixes
+Fix this by setting cifs_open_info_data::fi when either
+CIFSSMBQPathInfo() or SMBQueryInformation() succeed.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f18fca98ac1622220dfdf795fefa91dc52d3707d
+Bug: https://bugzilla.kernel.org/show_bug.cgi?id=216881
+Fixes: 76894f3e2f71 ("cifs: improve symlink handling for smb2+")
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+---
+ fs/cifs/smb1ops.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Thank you!
-
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 50480751e521..5fe2c2f8ef41 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -562,17 +562,20 @@ static int cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if ((rc == -EOPNOTSUPP) || (rc == -EINVAL)) {
+ 		rc = SMBQueryInformation(xid, tcon, full_path, &fi, cifs_sb->local_nls,
+ 					 cifs_remap(cifs_sb));
+-		if (!rc)
+-			move_cifs_info_to_smb2(&data->fi, &fi);
+ 		*adjustTZ = true;
+ 	}
+ 
+-	if (!rc && (le32_to_cpu(fi.Attributes) & ATTR_REPARSE)) {
++	if (!rc) {
+ 		int tmprc;
+ 		int oplock = 0;
+ 		struct cifs_fid fid;
+ 		struct cifs_open_parms oparms;
+ 
++		move_cifs_info_to_smb2(&data->fi, &fi);
++
++		if (!(le32_to_cpu(fi.Attributes) & ATTR_REPARSE))
++			return 0;
++
+ 		oparms.tcon = tcon;
+ 		oparms.cifs_sb = cifs_sb;
+ 		oparms.desired_access = FILE_READ_ATTRIBUTES;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.39.0
+
