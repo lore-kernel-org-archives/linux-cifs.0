@@ -2,86 +2,165 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 211B7C54EBC
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Jan 2023 16:45:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E775BC54EBC
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Jan 2023 17:20:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233737AbjAJQpz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 10 Jan 2023 11:45:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58040 "EHLO
+        id S234888AbjAJRUs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 10 Jan 2023 12:20:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238748AbjAJQpk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Jan 2023 11:45:40 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B5228CBC4
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Jan 2023 08:45:39 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        with ESMTP id S234877AbjAJRUA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Jan 2023 12:20:00 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7DF65E0B2
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Jan 2023 09:18:57 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 71A9B7FC04;
-        Tue, 10 Jan 2023 16:45:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1673369137;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 2991238648;
+        Tue, 10 Jan 2023 17:18:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1673371136; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Sx2kcXm0zSYVaJiak5hkt4phPF47PQk2BqxggpE3j0I=;
-        b=VL5nf5aDV0yMyZxqhhgc1xYwRwGjzU9bj61ydQugEGxwMhkAswp6C4gCCmxVmjZyMjmagY
-        GtSqIPH7xT1xhnTMYbBq2YERi0RK9yVx1H2geknopRy8GzLR7tfDAh0C02RYz0uOqeOaGs
-        0kYMH/OYNV8bteYlsctF9jmb5P/+w2eDxMJMVuOf129aLmJ8yodsEI8/BFRElZDmFVd7bj
-        t3Iidw3hbGISSE9HSbsSHKzYGzWkxmFuLQz33YhbJre0kUEYptXXpq1tXaFCynYGzo5Edg
-        71H7LdMbDcUhB1MasdLxn63oTyfeEe4BKgReIImyc4kb4JFx9VGYzBaFu5/PSg==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Tom Talpey <tom@talpey.com>, smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] cifs: do not query ifaces on smb1 mounts
-In-Reply-To: <f1e10da3-d2b5-98ed-637b-7773d0fb9b0f@talpey.com>
-References: <20230109164146.1910-1-pc@cjr.nz>
- <f1e10da3-d2b5-98ed-637b-7773d0fb9b0f@talpey.com>
-Date:   Tue, 10 Jan 2023 13:45:32 -0300
-Message-ID: <87k01uwd77.fsf@cjr.nz>
+        bh=p1CV/63olESn0tD73PTlbErS/qrVB0kEePgJ1lgLL4w=;
+        b=iURI2jtbD91wC0FkAtGVO1xnZYdBruXIZNNETgNJBr1aAMbsqCihrVRhBATfDffDyvNx6r
+        oUF6ZEDfcH+y/rPilmTzPjbKv5NaaE2ck3hxJYWPmQMWqqmfd6hdQzePEkmqjiGe8n4VFZ
+        D1lNuksPIX57jajltaWYvT7BxRgdmHo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1673371136;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=p1CV/63olESn0tD73PTlbErS/qrVB0kEePgJ1lgLL4w=;
+        b=/8n7+6b/F81xxXyyv71EqayJFg5TCbHaEL0Cp9zZ95puB2x7tjKndkuloKZfXLNrMYyC2L
+        d3CUpn/tH3GKFqDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A20071358A;
+        Tue, 10 Jan 2023 17:18:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id B550Gf+dvWP4PAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Tue, 10 Jan 2023 17:18:55 +0000
+Date:   Tue, 10 Jan 2023 14:18:53 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Bharath S M <bharathsm@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>,
+        =?utf-8?B?QXVyw6lsaWVu?= Aptel <aurelien.aptel@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+Subject: Re: Connection sharing in SMB multichannel
+Message-ID: <20230110171853.ysh7svc5gxgnzlxp@suse.de>
+References: <CANT5p=p5vHbitjNMCJ56xT48m0amNaWKhfnASCwcHha3ZvTErQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CANT5p=p5vHbitjNMCJ56xT48m0amNaWKhfnASCwcHha3ZvTErQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Tom Talpey <tom@talpey.com> writes:
+Hi Shyam,
 
-> On 1/9/2023 11:41 AM, Paulo Alcantara wrote:
->> Users have reported the following error on every 600 seconds
->> (SMB_INTERFACE_POLL_INTERVAL) when mounting SMB1 shares:
->> 
->> 	CIFS: VFS: \\srv\share error -5 on ioctl to get interface list
->> 
->> It's supported only by SMB2+, so do not query network interfaces on
->> SMB1 mounts.
->> 
->> Fixes: 6e1c1c08cdf3 ("cifs: periodically query network interfaces from server")
->> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
->> ---
->>   fs/cifs/cifsglob.h |  1 +
->>   fs/cifs/connect.c  | 18 ++++++++++++------
->>   2 files changed, 13 insertions(+), 6 deletions(-)
->> 
->> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> index cfdd5bf701a1..931e9d5b21f4 100644
->> --- a/fs/cifs/cifsglob.h
->> +++ b/fs/cifs/cifsglob.h
->> @@ -1240,6 +1240,7 @@ struct cifs_tcon {
->>   #ifdef CONFIG_CIFS_DFS_UPCALL
->>   	struct list_head ulist; /* cache update list */
->>   #endif
->> +	bool			iface_query_poll:1;
+I 100% agree with your proposed changes. I came up with an idea and got
+to draw a diagram a while ago that would handle multichannel connections
+in a similar way you propose here.
+
+https://exis.tech/cifs-multicore-multichannel.png
+
+The main idea is to have the 'channels' (sockets) pool for a particular
+server, but also create submission/receiving queues (SQ/RQ) (similar to NVMe
+and io_uring) for each online CPU.  Then each CPU/queue is free to send
+to any of the available channels, based on whatever algorithm is chosen
+(RR, free channel, fastest NIC, etc).
+
+I still haven't got time to design the receiving flow, but it shouldn't
+change much from the reverse of the sending side.
+
+Of course, there's a lot to improve/fix in that design, but something I
+thought would enhance cifs multichannel performance a lot.
+
+I've discussed this idea with Paulo a while back, and he already
+provided me with great improvements/fixes for this.  Since I still
+haven't got the time to work on it, I hope this to serve as inspiration.
+
+
+Cheers,
+
+Enzo
+
+On 01/10, Shyam Prasad N wrote:
+>Hi all,
 >
-> Why add such a special-case flag, instead of simply checking the
-> dialect, or (betyter) the server's multichannel capability attribute?
+>I wanted to revisit the way we do a few things while doing
+>multichannel mounts in cifs.ko:
 >
-> It seems fragile and untestable to set a flag like this, especially
-> in the tcon, which has nothing to do with supporting the multichannel
-> fsctl.
-
-Makes sense.  I'll fix it in v2.
-
-Thanks.
+>1.
+>The way connections are organized today, the connections of primary
+>channels of sessions can be shared among different sessions and their
+>channels. However, connections to secondary channels are not shared.
+>i.e. created with nosharesock.
+>Is there a reason why we have it that way?
+>We could have a pool of connections for a particular server. When new
+>channels are to be created for a session, we could simply pick
+>connections from this pool.
+>Another approach could be not to share sockets for any of the channels
+>of multichannel mounts. This way, multichannel would implicitly mean
+>nosharesock. Assuming that multichannel is being used for performance
+>reasons, this would actually make a lot of sense. Each channel would
+>create new connection to the server, and take advantage of number of
+>interfaces and RSS capabilities of server interfaces.
+>I'm planning to take the latter approach for now, since it's easier.
+>Please let me know about your opinions on this.
+>
+>2.
+>Today, the interface list for a server hangs off the session struct. Why?
+>Doesn't it make more sense to hang it off the server struct? With my
+>recent changes to query the interface list from the server
+>periodically, each tcon is querying this and keeping the results in
+>the session struct.
+>I plan to move this to the server struct too. And avoid having to
+>query this too many times unnecessarily. Please let me know if you see
+>a reason not to do this.
+>
+>3.
+>I saw that there was a bug in iface_cmp, where we did not do full
+>comparison of addresses to match them.
+>Fixed it here:
+>https://github.com/sprasad-microsoft/smb3-kernel-client/commit/cef2448dc43d1313571e21ce8283bccacf01978e.patch
+>
+>@Tom Talpey Was this your concern with iface_cmp?
+>
+>4.
+>I also feel that the way an interface is selected today for
+>multichannel will not scale.
+>We keep selecting the fastest server interface, if it supports RSS.
+>IMO, we should be distributing the requests among the server
+>interfaces, based on the interface speed adveritsed.
+>Something on these lines:
+>https://github.com/sprasad-microsoft/smb3-kernel-client/commit/ebe1ac3426111a872d19fea41de365b1b3aca0fe.patch
+>
+>The above patch assigns weights to each interface (which is a function
+>of it's advertised speed). The weight is 1 for the interface that is
+>advertising minimum speed, and for any interface that does not support
+>RSS.
+>Please let me know if you have any opinions on this change.
+>
+>====
+>Also, I did not find a good way to test out these changes yet i.e.
+>customize and change the QueryInterface response from the server on
+>successive requests.
+>So I've requested Steve not to take this into his branch yet.
+>
+>I'm thinking I'll hard code the client code to generate different set
+>of dummy interfaces on every QueryInterface call.
+>Any ideas on how I can test this more easily will be appreciated.
+>
+>-- 
+>Regards,
+>Shyam
