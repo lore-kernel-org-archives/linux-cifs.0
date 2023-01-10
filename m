@@ -2,129 +2,176 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 664E7C54EBE
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Jan 2023 09:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8F7C46467
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Jan 2023 09:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjAJJRH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 10 Jan 2023 04:17:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33204 "EHLO
+        id S231487AbjAJJ2E (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 10 Jan 2023 04:28:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232006AbjAJJQ7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Jan 2023 04:16:59 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A371544E6
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Jan 2023 01:16:55 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id d30so12458703lfv.8
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Jan 2023 01:16:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NsUxpSj0BfbZ519vFUTaAtUgxkGVbEXUObd/WrSFfnI=;
-        b=Fl+lHwHrGnXOI59nKGSCloHslbAC0oLrDpSejz23Y7P/hlIHUVLrEHZ7UQf7FhWHPI
-         DB9jT5akX06Vx4iP/kDiro0OfCpkAKMOOljhNdYOhi3534C9aa/mUXyuPDp7Q6wawBao
-         8bH0vR39IGULcydGB1D9iib6MJZwNhCyApo5HrSKxWZiIIG8bSNKHRTYRIp74BOY4pE2
-         HgCkWRE7HYm9E0MtzoXN4vY6FIsgkggEFErm8UBro0fuHHYAjiQ4bC35Nh02/TSE3x83
-         rnfH/0WLCEM3lk+YROd7IbE7+KsrIWx8aAnfiKSYmwvcAEJMrxhjJaChXoLf96/JwydA
-         ehkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NsUxpSj0BfbZ519vFUTaAtUgxkGVbEXUObd/WrSFfnI=;
-        b=6gjJuf0I79tX/GxnGErIT7nPb2fla45gaq6gwkvcBPrTF5IQo2gAEr+jgZl/x0Hg1u
-         bTdFK8KPmy/YHFSy3V75322zyrSOp/BaYdOhx0O5T+JYbWBnjOPyRIqfkcgvaTpDDjsG
-         gfo6isb3o2rKGEU0KCesVed/joaeJwzaINLeXbpjv4P7B3+hSbQ8z6V+VfxvK5dBDzor
-         KQq4/n5jPJq9MpN188A9PZ/xoOsKqL3Phf8LiKgnZWUm4SaiBM1YwPbujs81z0yl5vNu
-         d+13gS/IeP/A7t+9gMk5mzkCr8XQxvwDcgpYGpJarztLgtt7dqIoToTA8bL5bY6bj3OD
-         koLw==
-X-Gm-Message-State: AFqh2koCAt5aH/bxRcQg7qZCntuYUOiJ34150lhZOasIhO0z55zdyNpK
-        V/ZMowTV6kSRdNkT7yHd/BOhC/9YeoRlP+UjVMc=
-X-Google-Smtp-Source: AMrXdXtEXvYfWI+hanKAIVWPyutKyhI3IEbigL/HKo2q6xayYrTlO4Jb5hXr6+N6IjpfFvCPJVe4l4RD0ed2TfabaRg=
-X-Received: by 2002:a05:6512:3b8d:b0:4aa:f992:28aa with SMTP id
- g13-20020a0565123b8d00b004aaf99228aamr5295349lfv.459.1673342213730; Tue, 10
- Jan 2023 01:16:53 -0800 (PST)
+        with ESMTP id S238164AbjAJJ1X (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Jan 2023 04:27:23 -0500
+X-Greylist: delayed 590 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Jan 2023 01:27:01 PST
+Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E67B813D17;
+        Tue, 10 Jan 2023 01:27:01 -0800 (PST)
+Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
+        by mail.parknet.co.jp (Postfix) with ESMTPSA id DBC882055F9C;
+        Tue, 10 Jan 2023 18:17:09 +0900 (JST)
+Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
+        by ibmpc.myhome.or.jp (8.17.1.9/8.17.1.9/Debian-1) with ESMTPS id 30A9H8X3104114
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Tue, 10 Jan 2023 18:17:09 +0900
+Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
+        by devron.myhome.or.jp (8.17.1.9/8.17.1.9/Debian-1) with ESMTPS id 30A9H8gj370581
+        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+        Tue, 10 Jan 2023 18:17:08 +0900
+Received: (from hirofumi@localhost)
+        by devron.myhome.or.jp (8.17.1.9/8.17.1.9/Submit) id 30A9H6Hl370575;
+        Tue, 10 Jan 2023 18:17:06 +0900
+From:   OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>, "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Luis de Bethencourt <luisbg@kernel.org>,
+        Salah Triki <salah.triki@gmail.com>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, Dave Kleikamp <shaggy@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Pavel Machek <pavel@ucw.cz>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kari Argillander <kari.argillander@gmail.com>,
+        Viacheslav Dubeyko <slava@dubeyko.com>
+Subject: Re: [RFC PATCH v2 01/18] fat: Fix iocharset=utf8 mount option
+In-Reply-To: <20221226142150.13324-2-pali@kernel.org> ("Pali
+ =?iso-8859-1?Q?Roh=E1r=22's?= message
+        of "Mon, 26 Dec 2022 15:21:33 +0100")
+References: <20221226142150.13324-1-pali@kernel.org>
+        <20221226142150.13324-2-pali@kernel.org>
+Date:   Tue, 10 Jan 2023 18:17:05 +0900
+Message-ID: <874jsyvje6.fsf@mail.parknet.co.jp>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Tue, 10 Jan 2023 14:46:42 +0530
-Message-ID: <CANT5p=p5vHbitjNMCJ56xT48m0amNaWKhfnASCwcHha3ZvTErQ@mail.gmail.com>
-Subject: Connection sharing in SMB multichannel
-To:     Steve French <smfrench@gmail.com>,
-        Bharath S M <bharathsm@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aurelien.aptel@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi all,
+Pali Rohár <pali@kernel.org> writes:
 
-I wanted to revisit the way we do a few things while doing
-multichannel mounts in cifs.ko:
+> Currently iocharset=utf8 mount option is broken and error is printed to
+> dmesg when it is used. To use UTF-8 as iocharset, it is required to use
+> utf8=1 mount option.
+>
+> Fix iocharset=utf8 mount option to use be equivalent to the utf8=1 mount
+> option and remove printing error from dmesg.
 
-1.
-The way connections are organized today, the connections of primary
-channels of sessions can be shared among different sessions and their
-channels. However, connections to secondary channels are not shared.
-i.e. created with nosharesock.
-Is there a reason why we have it that way?
-We could have a pool of connections for a particular server. When new
-channels are to be created for a session, we could simply pick
-connections from this pool.
-Another approach could be not to share sockets for any of the channels
-of multichannel mounts. This way, multichannel would implicitly mean
-nosharesock. Assuming that multichannel is being used for performance
-reasons, this would actually make a lot of sense. Each channel would
-create new connection to the server, and take advantage of number of
-interfaces and RSS capabilities of server interfaces.
-I'm planning to take the latter approach for now, since it's easier.
-Please let me know about your opinions on this.
+[...]
 
-2.
-Today, the interface list for a server hangs off the session struct. Why?
-Doesn't it make more sense to hang it off the server struct? With my
-recent changes to query the interface list from the server
-periodically, each tcon is querying this and keeping the results in
-the session struct.
-I plan to move this to the server struct too. And avoid having to
-query this too many times unnecessarily. Please let me know if you see
-a reason not to do this.
+> -
+> -	There is also an option of doing UTF-8 translations
+> -	with the utf8 option.
+> -
+> -.. note:: ``iocharset=utf8`` is not recommended. If unsure, you should consider
+> -	  the utf8 option instead.
+> +	**utf8** is supported too and recommended to use.
+>  
+>  **utf8=<bool>**
+> -	UTF-8 is the filesystem safe version of Unicode that
+> -	is used by the console. It can be enabled or disabled
+> -	for the filesystem with this option.
+> -	If 'uni_xlate' gets set, UTF-8 gets disabled.
+> -	By default, FAT_DEFAULT_UTF8 setting is used.
+> +	Alias for ``iocharset=utf8`` mount option.
+>  
+>  **uni_xlate=<bool>**
+>  	Translate unhandled Unicode characters to special
+> diff --git a/fs/fat/Kconfig b/fs/fat/Kconfig
+> index 238cc55f84c4..e98aaa3bb55b 100644
+> --- a/fs/fat/Kconfig
+> +++ b/fs/fat/Kconfig
+> @@ -93,29 +93,12 @@ config FAT_DEFAULT_IOCHARSET
+>  	  like FAT to use. It should probably match the character set
+>  	  that most of your FAT filesystems use, and can be overridden
+>  	  with the "iocharset" mount option for FAT filesystems.
+> -	  Note that "utf8" is not recommended for FAT filesystems.
+> -	  If unsure, you shouldn't set "utf8" here - select the next option
+> -	  instead if you would like to use UTF-8 encoded file names by default.
+> +	  "utf8" is supported too and recommended to use.
 
-3.
-I saw that there was a bug in iface_cmp, where we did not do full
-comparison of addresses to match them.
-Fixed it here:
-https://github.com/sprasad-microsoft/smb3-kernel-client/commit/cef2448dc43d1313571e21ce8283bccacf01978e.patch
+This patch fixes the issue of utf-8 partially only. I think we can't
+still recommend only partially working one.
 
-@Tom Talpey Was this your concern with iface_cmp?
+[...]
 
-4.
-I also feel that the way an interface is selected today for
-multichannel will not scale.
-We keep selecting the fastest server interface, if it supports RSS.
-IMO, we should be distributing the requests among the server
-interfaces, based on the interface speed adveritsed.
-Something on these lines:
-https://github.com/sprasad-microsoft/smb3-kernel-client/commit/ebe1ac3426111a872d19fea41de365b1b3aca0fe.patch
+> -	opts->utf8 = IS_ENABLED(CONFIG_FAT_DEFAULT_UTF8) && is_vfat;
+> -
+>  	if (!options)
+>  		goto out;
+>  
+> @@ -1318,10 +1316,14 @@ static int parse_options(struct super_block *sb, char *options, int is_vfat,
+>  					| VFAT_SFN_CREATE_WIN95;
+>  			break;
+>  		case Opt_utf8_no:		/* 0 or no or false */
+> -			opts->utf8 = 0;
+> +			fat_reset_iocharset(opts);
 
-The above patch assigns weights to each interface (which is a function
-of it's advertised speed). The weight is 1 for the interface that is
-advertising minimum speed, and for any interface that does not support
-RSS.
-Please let me know if you have any opinions on this change.
+This changes the behavior of "iocharset=iso8859-1,utf8=no" for
+example. Do we need this user visible change here?
 
-====
-Also, I did not find a good way to test out these changes yet i.e.
-customize and change the QueryInterface response from the server on
-successive requests.
-So I've requested Steve not to take this into his branch yet.
+>  			break;
+>  		case Opt_utf8_yes:		/* empty or 1 or yes or true */
+> -			opts->utf8 = 1;
+> +			fat_reset_iocharset(opts);
+> +			iocharset = kstrdup("utf8", GFP_KERNEL);
+> +			if (!iocharset)
+> +				return -ENOMEM;
+> +			opts->iocharset = iocharset;
+>  			break;
+>  		case Opt_uni_xl_no:		/* 0 or no or false */
+>  			opts->unicode_xlate = 0;
+> @@ -1359,18 +1361,11 @@ static int parse_options(struct super_block *sb, char *options, int is_vfat,
+>  	}
+>  
+>  out:
+> -	/* UTF-8 doesn't provide FAT semantics */
+> -	if (!strcmp(opts->iocharset, "utf8")) {
+> -		fat_msg(sb, KERN_WARNING, "utf8 is not a recommended IO charset"
+> -		       " for FAT filesystems, filesystem will be "
+> -		       "case sensitive!");
+> -	}
+> +	opts->utf8 = !strcmp(opts->iocharset, "utf8") && is_vfat;
 
-I'm thinking I'll hard code the client code to generate different set
-of dummy interfaces on every QueryInterface call.
-Any ideas on how I can test this more easily will be appreciated.
+Still broken, so I think we still need the warning here (would be
+tweaked warning).
 
+>  	/* If user doesn't specify allow_utime, it's initialized from dmask. */
+>  	if (opts->allow_utime == (unsigned short)-1)
+>  		opts->allow_utime = ~opts->fs_dmask & (S_IWGRP | S_IWOTH);
+> -	if (opts->unicode_xlate)
+> -		opts->utf8 = 0;
+
+unicode_xlate option is exclusive with utf8, need to adjust
+somewhere. (with this patch, unicode_xlate and utf8 will shows by
+show_options())
+
+> +	else if (utf8)
+> +		return fat_utf8_strnicmp(name->name, str, alen);
+> +	else
+> +		return nls_strnicmp(t, name->name, str, alen);
+>  }
+
+Not strong opinion though, maybe we better to consolidate this to a
+(inline) function? (FWIW, it may be better to refactor to provide some
+filename functions to hide the detail of handling nls/utf8)
+
+Thanks.
 -- 
-Regards,
-Shyam
+OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
