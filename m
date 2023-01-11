@@ -2,120 +2,106 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B6FC46467
-	for <linux-cifs@archiver.kernel.org>; Wed, 11 Jan 2023 11:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCE0C46467
+	for <linux-cifs@archiver.kernel.org>; Wed, 11 Jan 2023 12:08:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232011AbjAKLai (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 11 Jan 2023 06:30:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57934 "EHLO
+        id S229509AbjAKMIE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 11 Jan 2023 07:08:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229913AbjAKLad (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 11 Jan 2023 06:30:33 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE8F29585;
-        Wed, 11 Jan 2023 03:30:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        with ESMTP id S232227AbjAKMHZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 11 Jan 2023 07:07:25 -0500
+X-Greylist: delayed 1422 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 11 Jan 2023 04:06:43 PST
+Received: from mail.sernet.de (mail.sernet.de [IPv6:2a0a:a3c0:0:25::217:2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648371171
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Jan 2023 04:06:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sernet.de;
+        s=20210621-rsa; h=Content-Type:MIME-Version:Reply-To:Message-ID:Subject:To:
+        From:Date:Sender:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=+JK7A8PclGSDaImlFVKUH2wXcLUn/BgeCpjYxyTxTMU=; b=XdMSsYhFqtFFhkI9drhY+SQggd
+        2AHfyf3jZU7FMOHYFPRD/2aPtaRNZ5vwACIg35Bn15/oOfe3InkA750bbWmt2x9SGSnz44xzVY4XI
+        kJbIKYYjEhbtcaK9GR7m5vMyqomn75t31zd1/QnqHzTjIJO8ciHLHXf2T+u+B3A3b45Ky23IwoqZY
+        EB7j+SFvoHEx6K0+IT9vLrRthCij410TpJTzr2lpOroCGa/vYGzbhCZp1MDH9Ay97pbjTo7wAp6hG
+        IzCjrYkwr64rQzXa5IoPSz/zUklQYP721bew++XE43lU9oMJqMM1Em/9189t8rp2z/8vbjfzKcgzY
+        yvLFcfkQ==;
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=sernet.de; s=20210621-ed25519; h=Content-Type:MIME-Version:Reply-To:
+        Message-ID:Subject:To:From:Date:Sender:Cc:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=/B/lUwSLDdy4TKNacqRrqVdQIO2bhHf2Dz5b7u6s8PE=; b=bcql4AlYVAJfMUZcdgk78k/Yny
-        q4YxTySo08vOzZJbXrcUsvwxHEdzxgb+Ii1pvB23J18DFaDaSxWwBDTwyZecKpMjpzQSj9cSdzwmB
-        E7FeOscjYnn+NHlMhzBHTcQyUCHILWDwxB3r/wjmCpMi1dOhxzWkdzfdVZaVaLtHEn2WfhcBSiMoJ
-        xaR4xsr0iH8jHbII4QbOQBd/z6Ffk95rwXeSJqAugvrLrUzd2S6So2J6l2wpGNMPAo+GmrZbGZYy2
-        3br39DqBSOcN8JgFwxhPiVl/2Ubg9nDcfM/BSKfMobkmQa8ifVIF5567jY8IZeuTcc+4AkuGErYD7
-        D1ThFcXw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36052)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1pFZIf-00054b-0L; Wed, 11 Jan 2023 11:29:44 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1pFZIV-0001D1-VB; Wed, 11 Jan 2023 11:29:35 +0000
-Date:   Wed, 11 Jan 2023 11:29:35 +0000
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Steve French <stfrench@microsoft.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        devel@lists.orangefs.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v2] filelock: move file locking definitions to separate
- header file
-Message-ID: <Y76dnx07NGAS2jqG@shell.armlinux.org.uk>
-References: <20230105211937.1572384-1-jlayton@kernel.org>
+        bh=+JK7A8PclGSDaImlFVKUH2wXcLUn/BgeCpjYxyTxTMU=; b=VRnVUjL0uP039WOFrHBIOaM9vM
+        Iw/tLXRxg5BPOgLOk54GzRo9fk9CO3NlGkp9i7h+jxjnuP6ftn5NEV4OGEBQ==;
+Received: from intern.sernet.de by mail.sernet.de
+        with esmtps (Exim Mail Transfer Agent)
+        for linux-cifs@vger.kernel.org
+        id 1pFZVR-005N9F-V8; Wed, 11 Jan 2023 12:42:57 +0100
+Received: by intern.sernet.de
+        id 1pFZVR-00DDSp-M7; Wed, 11 Jan 2023 12:42:57 +0100
+Date:   Wed, 11 Jan 2023 12:42:52 +0100
+From:   Volker Lendecke <Volker.Lendecke@sernet.de>
+To:     linux-cifs@vger.kernel.org
+Subject: Fix posix 311 symlink creation mode
+Message-ID: <Y76gvH9ADxSgAxSw@sernet.de>
+Reply-To: Volker.Lendecke@sernet.de
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="NTlW/YCD6xrb4czP"
 Content-Disposition: inline
-In-Reply-To: <20230105211937.1572384-1-jlayton@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 04:19:29PM -0500, Jeff Layton wrote:
-> The file locking definitions have lived in fs.h since the dawn of time,
-> but they are only used by a small subset of the source files that
-> include it.
-> 
-> Move the file locking definitions to a new header file, and add the
-> appropriate #include directives to the source files that need them. By
-> doing this we trim down fs.h a bit and limit the amount of rebuilding
-> that has to be done when we make changes to the file locking APIs.
-> 
-> Reviewed-by: Xiubo Li <xiubli@redhat.com>
-> Reviewed-by: Christian Brauner (Microsoft) <brauner@kernel.org>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: David Howells <dhowells@redhat.com>
-> Acked-by: Chuck Lever <chuck.lever@oracle.com>
-> Acked-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-> Acked-by: Steve French <stfrench@microsoft.com>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  arch/arm/kernel/sys_oabi-compat.c |   1 +
 
-For arm:
+--NTlW/YCD6xrb4czP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Hi!
 
-Thanks.
+Attached find a patch that fixes an uninitialized memory read when
+creating symlinks using the smb311 posix extensions.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+Volker
+
+--NTlW/YCD6xrb4czP
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="posix-symlink.diff"
+Content-Transfer-Encoding: quoted-printable
+
+=46rom 482fa85ef97505626b6b146155834e6bc36012fa Mon Sep 17 00:00:00 2001
+=46rom: Volker Lendecke <vl@samba.org>
+Date: Wed, 11 Jan 2023 12:37:58 +0100
+Subject: [PATCH] cifs: Fix uninitialized memory read for smb311 posix symli=
+nk
+ create
+
+If smb311 posix is enabled, we send the intended mode for file
+creation in the posix create context. Instead of using what's there on
+the stack, create the mfsymlink file with 0644.
+
+Signed-off-by: Volker Lendecke <vl@samba.org>
+---
+ fs/cifs/link.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index bd374feeccaa..a5a097a69983 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -428,6 +428,7 @@ smb3_create_mf_symlink(unsigned int xid, struct cifs_tc=
+on *tcon,
+ 	oparms.disposition =3D FILE_CREATE;
+ 	oparms.fid =3D &fid;
+ 	oparms.reconnect =3D false;
++	oparms.mode =3D 0644;
+=20
+ 	rc =3D SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL,
+ 		       NULL, NULL);
+--=20
+2.30.2
+
+
+--NTlW/YCD6xrb4czP--
