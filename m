@@ -2,146 +2,193 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F3CDC5479D
-	for <linux-cifs@archiver.kernel.org>; Wed, 11 Jan 2023 04:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D89C5479D
+	for <linux-cifs@archiver.kernel.org>; Wed, 11 Jan 2023 07:35:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232658AbjAKEyu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 10 Jan 2023 23:54:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44976 "EHLO
+        id S229994AbjAKHfs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 11 Jan 2023 02:35:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231705AbjAKEys (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Jan 2023 23:54:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E372AC5
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Jan 2023 20:54:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673412849;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AwDGIIG2kEW7th9yR8DoIeZiikP/oVS4/IYm7KTM+N0=;
-        b=brBsQQCOn3YNpLDRSqJ0fzxkPgWTd4vbAn6G6HjRvF4ftTEjYNlIg2wBSn3tcP5h2zfNIk
-        jWqFpNqwVQdt3rHPjEQTY6pwwFqd6aMMsecCM9qO+H49BcBd/QzXarky/Q/461Wvi4a92Y
-        V+yqgBm2DJ/BldL60Ie7/m7IEX5QWqQ=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-413-kUNaqX1DPbKXGLvXFQr30Q-1; Tue, 10 Jan 2023 23:54:07 -0500
-X-MC-Unique: kUNaqX1DPbKXGLvXFQr30Q-1
-Received: by mail-pg1-f199.google.com with SMTP id h185-20020a636cc2000000b004820a10a57bso6199441pgc.22
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Jan 2023 20:54:07 -0800 (PST)
+        with ESMTP id S229931AbjAKHfr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 11 Jan 2023 02:35:47 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B86FB25
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Jan 2023 23:35:46 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id y18so11598592ljk.11
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Jan 2023 23:35:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nm6lUEzJW4La15K9SyyF6SP1OjFrmgyG4atDkNdInCo=;
+        b=ntWjXZOw7+4miBgxP/5VaIwVMSMYWI0h+dXUAS8p2wZ3zlBgyoaMFdxySfloMI4BhL
+         ayvv8D/CEC2SfOquGWCjDBrasIz2EZfswUGwE93Ho5tnkwdYN8qJLa/2x1m1pu8DCE87
+         qx99MFffWeDKU7o1zu8sV/oYbrQOChYqwYc8EEibiPhSHfz4fIrdf9e0RBf3Si8fMLEK
+         biA8MvXXcagAcmEUHf6Lch3oOyOiIUQ+lfxmUX1lhVSVBg6IxyvyT9WnI0BIMF/Lv/d7
+         He4q3fzPbRROcbnGKimRhkNE+QTN60/PQls3DdS9QzZ5pXuijwml8sLZRkBSwzrzPvSN
+         DnoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AwDGIIG2kEW7th9yR8DoIeZiikP/oVS4/IYm7KTM+N0=;
-        b=6mIISU0r/Qbo/MlgTpSp6p68vonIqa4XU2WWViyg3vo+IbxOq+TajUrrpvEZLjwALo
-         ZZKFb2UBgC5QBZtrL6q42az3Pv2ystJ/TCm1OQiNpcqdUcndFAqC1ytDiTSflu4WoZ8I
-         pOSSgwdwoxmA1rb8vfV2cmeefjBnm4cAuKNFW2l3ery43ER8MAuly24/MJTggZSXpZZr
-         pHlSAbjHxPJnDAoUinC3h1XVSMb+R+Ax3WeszdsIeJ9bxus1Fgc1OgfaOwJj7YH32T5x
-         KaI+pkut4nfobfQ3zL/FoOBdvzfJ0toxKxI48zsORvzlQ4463c7OPALE1IrbWq+4Jq4K
-         9xyg==
-X-Gm-Message-State: AFqh2krIpyzAtPZ/K2oxqnT7+tlUvJDFl5vfQikIhk+5X17XVQpVhWny
-        Z+C0wHxtbMZ1jS4q9XNUeF+K5H6PpfPzDZaXFh4iLafjgit8K3cVkUohG0HwxUR9noVUGD/QoKw
-        5HLrtxI+xnEFl0DhU3ngWTg==
-X-Received: by 2002:a17:903:50e:b0:189:bda4:4a39 with SMTP id jn14-20020a170903050e00b00189bda44a39mr68317497plb.49.1673412846853;
-        Tue, 10 Jan 2023 20:54:06 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXs+9rrIRD+6pRvHkwnX14gh2BCpLNg+4mxFg/ySKLAFpFMrHGq/R+Lf/NnqdSw7vAx/2ZYhMg==
-X-Received: by 2002:a17:903:50e:b0:189:bda4:4a39 with SMTP id jn14-20020a170903050e00b00189bda44a39mr68317481plb.49.1673412846568;
-        Tue, 10 Jan 2023 20:54:06 -0800 (PST)
-Received: from [10.72.14.8] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d11-20020a170902654b00b001895d87225csm8944870pln.182.2023.01.10.20.53.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jan 2023 20:54:05 -0800 (PST)
-Message-ID: <330d1f1b-02b2-ceb1-5df5-ef6ce0061eb2@redhat.com>
-Date:   Wed, 11 Jan 2023 12:53:49 +0800
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nm6lUEzJW4La15K9SyyF6SP1OjFrmgyG4atDkNdInCo=;
+        b=Yxf6E7LzoSOJtBT3UFUrTr33Ph6F3ieVuZRtSoOTfvdF3S6H+NL9xYs+caiB7nkugM
+         fmHpHWCTLtMgjwZqLZrCqxHWKetZA8wZnm3nCAmDmUo1heQCe5a1BDwsxz5dBObeXtjr
+         FdvHA5g4P+GROin94ff6pQtYfHj0FuRkXeVbEQsy4wCLFGubww8EBgyQA3uzzbZBzZvI
+         DgfVyZDa5XOUMZ91PfyTPCM4MiBPGbjsZ5k8GZczCYrhfiK8/+kvAzUHXA1hAsYdhy/O
+         ZWqfTJd1eMHAnI2Pp1V6uQDHCTxaRoI/G5/inE8QU8D4A/oWqWXEoAXZBB+meuahgHlJ
+         siQw==
+X-Gm-Message-State: AFqh2kp2Ga+Avz7ntltjBUuahSedQTqd6Q/OT2nmzXkxn3zxvpQq0q+k
+        CjKaEnKovXTZMm2jEHFVHVCyNWNlaJAI8GLHNu0=
+X-Google-Smtp-Source: AMrXdXuW0PQkPmwrzrDVqIV9oQ0Zf0oKmLHXPGpym/J5eLvwuUKFzwQVCi1fPCWPJ9mD/Y3y3zRslRLX+nSrZqO2e68=
+X-Received: by 2002:a05:651c:c5:b0:284:2fea:5266 with SMTP id
+ 5-20020a05651c00c500b002842fea5266mr804340ljr.476.1673422544044; Tue, 10 Jan
+ 2023 23:35:44 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v2] filelock: move file locking definitions to separate
- header file
-Content-Language: en-US
-To:     Jeff Layton <jlayton@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Christine Caulfield <ccaulfie@redhat.com>,
-        David Teigland <teigland@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Steve French <stfrench@microsoft.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        devel@lists.orangefs.org, linux-xfs@vger.kernel.org
-References: <20230105211937.1572384-1-jlayton@kernel.org>
-From:   Xiubo Li <xiubli@redhat.com>
-In-Reply-To: <20230105211937.1572384-1-jlayton@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CANT5p=p5vHbitjNMCJ56xT48m0amNaWKhfnASCwcHha3ZvTErQ@mail.gmail.com>
+ <CA+5B0FOrTzfqoij0NBTn8wnGodqpAtMCatkAfvpYGPmHp8aPzA@mail.gmail.com>
+In-Reply-To: <CA+5B0FOrTzfqoij0NBTn8wnGodqpAtMCatkAfvpYGPmHp8aPzA@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 11 Jan 2023 13:05:32 +0530
+Message-ID: <CANT5p=rEDkTsSin7y_VKZ=9T9V2tqNVXp2qM4MHnFQEJo8Sinw@mail.gmail.com>
+Subject: Re: Connection sharing in SMB multichannel
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aurelien.aptel@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Bharath S M <bharathsm@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, CIFS <linux-cifs@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Hi Aur=C3=A9lien,
 
-On 06/01/2023 05:19, Jeff Layton wrote:
-> The file locking definitions have lived in fs.h since the dawn of time,
-> but they are only used by a small subset of the source files that
-> include it.
+Thanks for the inputs.
+
+On Tue, Jan 10, 2023 at 6:30 PM Aur=C3=A9lien Aptel <aurelien.aptel@gmail.c=
+om> wrote:
 >
-> Move the file locking definitions to a new header file, and add the
-> appropriate #include directives to the source files that need them. By
-> doing this we trim down fs.h a bit and limit the amount of rebuilding
-> that has to be done when we make changes to the file locking APIs.
+> Hey Shyam,
 >
-> Reviewed-by: Xiubo Li <xiubli@redhat.com>
-> Reviewed-by: Christian Brauner (Microsoft) <brauner@kernel.org>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: David Howells <dhowells@redhat.com>
-> Acked-by: Chuck Lever <chuck.lever@oracle.com>
-> Acked-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-> Acked-by: Steve French <stfrench@microsoft.com>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->   arch/arm/kernel/sys_oabi-compat.c |   1 +
->   fs/9p/vfs_file.c                  |   1 +
->   fs/afs/internal.h                 |   1 +
->   fs/attr.c                         |   1 +
->   fs/ceph/locks.c                   |   1 +
+> I remember thinking that channels should be part of the server too
+> when I started working on this but switched it up to session as I kept
+> working on it and finding it was the right choice.
+> I don't remember all the details so my comments will be a bit vague.
 
-ceph part looks good to me.
+I'm not proposing to move the channels to per-server here, but to move
+the connections to per-server. Each channel is associated with a
+connection.
+I think our use of server and connection interchangeably is causing
+this confusion. :)
 
-Thanks
+>
+> On Tue, Jan 10, 2023 at 10:16 AM Shyam Prasad N <nspmangalore@gmail.com> =
+wrote:
+> > 1.
+> > The way connections are organized today, the connections of primary
+> > channels of sessions can be shared among different sessions and their
+> > channels. However, connections to secondary channels are not shared.
+> > i.e. created with nosharesock.
+> > Is there a reason why we have it that way?
+> > We could have a pool of connections for a particular server. When new
+> > channels are to be created for a session, we could simply pick
+> > connections from this pool.
+> > Another approach could be not to share sockets for any of the channels
+> > of multichannel mounts. This way, multichannel would implicitly mean
+> > nosharesock. Assuming that multichannel is being used for performance
+> > reasons, this would actually make a lot of sense. Each channel would
+> > create new connection to the server, and take advantage of number of
+> > interfaces and RSS capabilities of server interfaces.
+> > I'm planning to take the latter approach for now, since it's easier.
+> > Please let me know about your opinions on this.
+>
+> First, in the abstract models, Channels are kept in the Session object.
+> https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/817=
+4c219-2224-4009-b96a-06d84eccb3ae
+>
+> Channels and sessions are intertwined. Channels signing keys depend on
+> the session it is connected to (See "3.2.5.3.1 Handling a New
+> Authentication" and "3.2.5.3.3 Handling Session Binding").
+> Think carefully on what should be done on disconnect/reconnect.
+> Especially if the channel is shared with multiple sessions.
 
-- Xiubo
+That's a good point.
+But that affects even other cases like multiuser mounts and cases
+where a session shares a socket. Doesn't it?
+I think we call cifs_reconnect very generously today. We should give
+this another look, IMO.
+
+>
+> Problem with the pool approach is mount options might require
+> different connections so sharing is not so easy. And reconnecting
+> might involve different fallbacks (dfs) for different sessions.
+>
+> You should see the server struct as the "final destination". Once it's
+> picked we know it's going there.
+>
+> > 2.
+> > Today, the interface list for a server hangs off the session struct. Wh=
+y?
+> > Doesn't it make more sense to hang it off the server struct? With my
+> > recent changes to query the interface list from the server
+> > periodically, each tcon is querying this and keeping the results in
+> > the session struct.
+> > I plan to move this to the server struct too. And avoid having to
+> > query this too many times unnecessarily. Please let me know if you see
+> > a reason not to do this.
+>
+> It's more convenient to have the interface list at the same place as
+> the channel list but it could be moved I suppose.
+> In the abstract model it's in the server apparently.
+
+Yeah. It makes more sense to keep it on per-server basis.
+
+>
+> > 4.
+> > I also feel that the way an interface is selected today for
+> > multichannel will not scale.
+> > We keep selecting the fastest server interface, if it supports RSS.
+> > IMO, we should be distributing the requests among the server
+> > interfaces, based on the interface speed adveritsed.
+>
+> RSS means the interface can process packets in parallel queues. The
+> problem is we don't know how many queues it has.
+> I'm not sure you can find an optimal algorithm for all NIC
+> vendor/driver combinations. Probably you need to do some tests with a
+> bunch of different HW or find someone knowledgeable.
+> From my small experience now at mellanox/nvidia I have yet to see less
+> than 8 rx/combined queues. You can get/set the number with ethtool
+> -l/-L.
+> I've set the max channel connection to 16 at the time but I still
+> don't know what large scale high-speed deployment of SMB look like.
+> For what it's worth, in the NVMe-TCP tests I'm doing at the moment and
+> the systems we use to test (fio reads with a 100gbs eth nic with 63 hw
+> queues, 96 cores cpu on the host&target, reading from a null block
+> target), we get diminishing returns around 24 parallel connections. I
+> don't know how transferable this data point is.
+>
+> On that topic, for best performance, some possible future project
+> could be to assign steering rules on the client to force each channel
+> packet processing on different cpus and making sure the cpus are the
+> same as the demultiplex thread (avoids context switches and
+> contentions). See
+> https://www.kernel.org/doc/Documentation/networking/scaling.txt
+> (warning, not an easy read lol)
+
+Interesting. I'm guessing that this is the "send side scaling" that's
+mentioned here:
+https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-=
+server-2012-r2-and-2012/hh997036(v=3Dws.11)
+
+>
+> Cheers,
 
 
+
+--=20
+Regards,
+Shyam
