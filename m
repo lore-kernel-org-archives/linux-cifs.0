@@ -2,95 +2,225 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C59C5C54EBC
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Jan 2023 16:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1087C61DB3
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Jan 2023 17:57:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231512AbjALQJQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 12 Jan 2023 11:09:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49332 "EHLO
+        id S238181AbjALR5C (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 12 Jan 2023 12:57:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231732AbjALQIy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Jan 2023 11:08:54 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6217863D2B
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Jan 2023 07:59:23 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id m6so29065544lfj.11
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Jan 2023 07:59:23 -0800 (PST)
+        with ESMTP id S238233AbjALR4U (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Jan 2023 12:56:20 -0500
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3220259334;
+        Thu, 12 Jan 2023 09:16:13 -0800 (PST)
+Received: by mail-yb1-xb35.google.com with SMTP id t15so19496646ybq.4;
+        Thu, 12 Jan 2023 09:16:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HJqR1mA5ND25kZxBlJSI44lSntDVKIlWDRbFYeFcWiI=;
-        b=YwlLrRDZCk4S34d2g3SRocHw5z0Yc+APqJnB4urvjKKxhQZDKeC0OrFSh/TqCvl/ud
-         H4eYJnJV9HC/PU8MJ0LNwMh1UQAnWyBdgGOzo5Qko9sO+kmuhk8AZ8Fy18vSr5Co0Wi3
-         zF3o09mzTXqb0zaBZo9b8IHXhWRjjBAssv30Tf/mvNw96UFbOq1sZQp+9WpRhYQjQD2e
-         dtKmn0ZC/R0E2cH5S0zj3pKT2uyDZzRW9gVTaSMly/FK0CwIysjKbDCv+GXPAm0s0S/Z
-         1xbAnrC+RuXiQKbLqUXAo1OecT/ACwIMfmJA7PrC966Z7fljiZNoaMVIadi6eTTvEugt
-         3yJA==
+        bh=ueu49HbYyw3uKaxLdkdNJFDLhnVwdUbocDy8yp3uK6U=;
+        b=NC4oLmKyiU3uGHOrCu0neAT7WGQm+evGATS22zDmNdb+/2NhuIG0f1cXd+Oo71x2x/
+         d9fjT4jYSUOUBJWL+/XfoQRQcJircib0hCIQNig7qcjc8w6s9NDKCE8BxNIxJ/QIPawr
+         cGDcDEgYwNMISqTlSdoe2gi9E7vXeiwnnDNv9jj5eXpGknHXsQrJmwtldQVLWCvhl3ZG
+         lIyceotTUmoEX6Dvf7U4pSHAwxk6VUESS1YrPAshFBx/sv/5P+3kMTg7lyJXQYkVLv/j
+         nhYbgnk5O/zNb7Ew31BfnKA81FkIZ4oEZPonWMG3EVzYgOtn38OFepH0Ci/+hw4YNxsB
+         DwLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HJqR1mA5ND25kZxBlJSI44lSntDVKIlWDRbFYeFcWiI=;
-        b=tPOklSGemXkIm+1F+XU53VbzEiQJfbpZntFwxblC1eeCy/wZYt5YOC6cpCFNQYydqi
-         6kw19EEnFYyyks+DEUUPrm4MUMoqKEHq2/cMIH099IZWeuWXxEy4zaWQqo1oqprTzH+h
-         yHJX6d83cQIv6aCwA1WTM6LjpKYtVxNZcqxqijeIBRGV3nLaqrOKc1vuxPsAV3vdmtvl
-         CxH4c/+Kuq4im+fKkyrzbpGwXgCP2xNeUo81Jh4wwZvYm8eFKN2gybxrnm6eMjPFkDhD
-         hr0BTcUlbnNSp+ll3cv8y30oSniwG3M+UWeUPhxs5Do628weCm6l7HI123IopZTqUXwE
-         NRYQ==
-X-Gm-Message-State: AFqh2kqLoN2dP4P0SyX21omk4fJBpA90HoWHM9bdlkZa/rq6/mwhHI17
-        VUoV3b3lj0aFqqOE8dz4q0NYHVE5kGIKw6RDVRh0W0Ts
-X-Google-Smtp-Source: AMrXdXvqRBSYQ6AActhdurHbSlFlxszKIYXPjV8cGITRB05LiCu9N6LZmpZlDH23Ee2EKyQTiCjImzJrXIsqX7T5GxE=
-X-Received: by 2002:a05:6512:14d:b0:4cb:3a2f:26d1 with SMTP id
- m13-20020a056512014d00b004cb3a2f26d1mr1796932lfo.303.1673539161466; Thu, 12
- Jan 2023 07:59:21 -0800 (PST)
+        bh=ueu49HbYyw3uKaxLdkdNJFDLhnVwdUbocDy8yp3uK6U=;
+        b=g2I9aUEIrBrUc3z2BzZDtmh6uy7nLPCOudd/f8+E6Q6wCsUvPi8VwR2w7TyR6Gkr2y
+         qRYZ1+wXXyE4NQWz4bRDjJiGPv5S4nqCTSKqgQnT7bmx7Bw7adep11UHcr7kYiRv7vme
+         IbA4Pr/ueHqSC48LBHNPvW9I6matmoEKcPoJUYFOVYzs8ri0J//FrnO//cPz4t5AFKcy
+         QW1R4bYiRYqy5ENFpWbi775+he+8IzYrRyjnNwLCuoBxPZCPLWFazy2H7f+gGfoIjscU
+         J0WSS5pwOw6Obgt4rxQqBQOIIoFeT8xFUX3pCCNWdbwc6IdRetglaSiF16wvOb0jlgth
+         3hBQ==
+X-Gm-Message-State: AFqh2kqZwgwV119Jfc+5GJVr8K5qc7j2orMzr+Nu4I0PnidJaYGRhZJX
+        XXq84hiFcyHpvUIfojJBcGZL4t+0VdQv3fzg0+Fwux0J
+X-Google-Smtp-Source: AMrXdXt4S29867pWpNEcWUZVtr/uqb3UM4fpVgRhzCkqlx5R6lghcyEfD/1N+9wnCtzwrdSh12ePIMINBFYAmF+ldAs=
+X-Received: by 2002:a25:abea:0:b0:762:b86:e82e with SMTP id
+ v97-20020a25abea000000b007620b86e82emr8539372ybi.407.1673543771906; Thu, 12
+ Jan 2023 09:16:11 -0800 (PST)
 MIME-Version: 1.0
-References: <Y76gvH9ADxSgAxSw@sernet.de> <20230112142517.7ea551e7@echidna.fritz.box>
-In-Reply-To: <20230112142517.7ea551e7@echidna.fritz.box>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 12 Jan 2023 09:59:09 -0600
-Message-ID: <CAH2r5mvXz+AULf7yd2in0gjRWV=phGfR1JOO0feGgMXKqOqQYg@mail.gmail.com>
-Subject: Re: Fix posix 311 symlink creation mode
-To:     David Disseldorp <ddiss@suse.de>
-Cc:     Volker Lendecke <Volker.Lendecke@sernet.de>,
-        linux-cifs@vger.kernel.org
+References: <20230104211448.4804-1-vishal.moola@gmail.com> <20230104211448.4804-11-vishal.moola@gmail.com>
+In-Reply-To: <20230104211448.4804-11-vishal.moola@gmail.com>
+From:   Vishal Moola <vishal.moola@gmail.com>
+Date:   Thu, 12 Jan 2023 09:16:00 -0800
+Message-ID: <CAOzc2pwoY74wdgCn2b=u391BNDmzOQ32e7yDt-ULwoNkhZ_4ig@mail.gmail.com>
+Subject: Re: [PATCH v5 10/23] ext4: Convert mpage_prepare_extent_to_map() to
+ use filemap_get_folios_tag()
+To:     linux-fsdevel@vger.kernel.org, tytso@mit.edu
+Cc:     linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nilfs@vger.kernel.org, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-updated
+On Wed, Jan 4, 2023 at 1:15 PM Vishal Moola (Oracle)
+<vishal.moola@gmail.com> wrote:
+>
+> Converted the function to use folios throughout. This is in preparation
+> for the removal of find_get_pages_range_tag(). Now supports large
+> folios. This change removes 11 calls to compound_head().
+>
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> ---
+>  fs/ext4/inode.c | 65 ++++++++++++++++++++++++-------------------------
+>  1 file changed, 32 insertions(+), 33 deletions(-)
+>
+> diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+> index 9d9f414f99fe..fb6cd994e59a 100644
+> --- a/fs/ext4/inode.c
+> +++ b/fs/ext4/inode.c
+> @@ -2595,8 +2595,8 @@ static bool ext4_page_nomap_can_writeout(struct page *page)
+>  static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+>  {
+>         struct address_space *mapping = mpd->inode->i_mapping;
+> -       struct pagevec pvec;
+> -       unsigned int nr_pages;
+> +       struct folio_batch fbatch;
+> +       unsigned int nr_folios;
+>         long left = mpd->wbc->nr_to_write;
+>         pgoff_t index = mpd->first_page;
+>         pgoff_t end = mpd->last_page;
+> @@ -2610,18 +2610,17 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+>                 tag = PAGECACHE_TAG_TOWRITE;
+>         else
+>                 tag = PAGECACHE_TAG_DIRTY;
+> -
+> -       pagevec_init(&pvec);
+> +       folio_batch_init(&fbatch);
+>         mpd->map.m_len = 0;
+>         mpd->next_page = index;
+>         while (index <= end) {
+> -               nr_pages = pagevec_lookup_range_tag(&pvec, mapping, &index, end,
+> -                               tag);
+> -               if (nr_pages == 0)
+> +               nr_folios = filemap_get_folios_tag(mapping, &index, end,
+> +                               tag, &fbatch);
+> +               if (nr_folios == 0)
+>                         break;
+>
+> -               for (i = 0; i < nr_pages; i++) {
+> -                       struct page *page = pvec.pages[i];
+> +               for (i = 0; i < nr_folios; i++) {
+> +                       struct folio *folio = fbatch.folios[i];
+>
+>                         /*
+>                          * Accumulated enough dirty pages? This doesn't apply
+> @@ -2635,10 +2634,10 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+>                                 goto out;
+>
+>                         /* If we can't merge this page, we are done. */
+> -                       if (mpd->map.m_len > 0 && mpd->next_page != page->index)
+> +                       if (mpd->map.m_len > 0 && mpd->next_page != folio->index)
+>                                 goto out;
+>
+> -                       lock_page(page);
+> +                       folio_lock(folio);
+>                         /*
+>                          * If the page is no longer dirty, or its mapping no
+>                          * longer corresponds to inode we are writing (which
+> @@ -2646,16 +2645,16 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+>                          * page is already under writeback and we are not doing
+>                          * a data integrity writeback, skip the page
+>                          */
+> -                       if (!PageDirty(page) ||
+> -                           (PageWriteback(page) &&
+> +                       if (!folio_test_dirty(folio) ||
+> +                           (folio_test_writeback(folio) &&
+>                              (mpd->wbc->sync_mode == WB_SYNC_NONE)) ||
+> -                           unlikely(page->mapping != mapping)) {
+> -                               unlock_page(page);
+> +                           unlikely(folio->mapping != mapping)) {
+> +                               folio_unlock(folio);
+>                                 continue;
+>                         }
+>
+> -                       wait_on_page_writeback(page);
+> -                       BUG_ON(PageWriteback(page));
+> +                       folio_wait_writeback(folio);
+> +                       BUG_ON(folio_test_writeback(folio));
+>
+>                         /*
+>                          * Should never happen but for buggy code in
+> @@ -2666,49 +2665,49 @@ static int mpage_prepare_extent_to_map(struct mpage_da_data *mpd)
+>                          *
+>                          * [1] https://lore.kernel.org/linux-mm/20180103100430.GE4911@quack2.suse.cz
+>                          */
+> -                       if (!page_has_buffers(page)) {
+> -                               ext4_warning_inode(mpd->inode, "page %lu does not have buffers attached", page->index);
+> -                               ClearPageDirty(page);
+> -                               unlock_page(page);
+> +                       if (!folio_buffers(folio)) {
+> +                               ext4_warning_inode(mpd->inode, "page %lu does not have buffers attached", folio->index);
+> +                               folio_clear_dirty(folio);
+> +                               folio_unlock(folio);
+>                                 continue;
+>                         }
+>
+>                         if (mpd->map.m_len == 0)
+> -                               mpd->first_page = page->index;
+> -                       mpd->next_page = page->index + 1;
+> +                               mpd->first_page = folio->index;
+> +                       mpd->next_page = folio->index + folio_nr_pages(folio);
+>                         /*
+>                          * Writeout for transaction commit where we cannot
+>                          * modify metadata is simple. Just submit the page.
+>                          */
+>                         if (!mpd->can_map) {
+> -                               if (ext4_page_nomap_can_writeout(page)) {
+> -                                       err = mpage_submit_page(mpd, page);
+> +                               if (ext4_page_nomap_can_writeout(&folio->page)) {
+> +                                       err = mpage_submit_page(mpd, &folio->page);
+>                                         if (err < 0)
+>                                                 goto out;
+>                                 } else {
+> -                                       unlock_page(page);
+> -                                       mpd->first_page++;
+> +                                       folio_unlock(folio);
+> +                                       mpd->first_page += folio_nr_pages(folio);
+>                                 }
+>                         } else {
+>                                 /* Add all dirty buffers to mpd */
+> -                               lblk = ((ext4_lblk_t)page->index) <<
+> +                               lblk = ((ext4_lblk_t)folio->index) <<
+>                                         (PAGE_SHIFT - blkbits);
+> -                               head = page_buffers(page);
+> +                               head = folio_buffers(folio);
+>                                 err = mpage_process_page_bufs(mpd, head, head,
+> -                                                             lblk);
+> +                                               lblk);
+>                                 if (err <= 0)
+>                                         goto out;
+>                                 err = 0;
+>                         }
+> -                       left--;
+> +                       left -= folio_nr_pages(folio);
+>                 }
+> -               pagevec_release(&pvec);
+> +               folio_batch_release(&fbatch);
+>                 cond_resched();
+>         }
+>         mpd->scanned_until_end = 1;
+>         return 0;
+>  out:
+> -       pagevec_release(&pvec);
+> +       folio_batch_release(&fbatch);
+>         return err;
+>  }
+>
+> --
+> 2.38.1
+>
 
-On Thu, Jan 12, 2023 at 7:24 AM David Disseldorp <ddiss@suse.de> wrote:
->
-> Hi Volker,
->
-> On Wed, 11 Jan 2023 12:42:52 +0100, Volker Lendecke wrote:
->
-> > If smb311 posix is enabled, we send the intended mode for file
-> > creation in the posix create context. Instead of using what's there on
-> > the stack, create the mfsymlink file with 0644.
-> >
-> > Signed-off-by: Volker Lendecke <vl@samba.org>
->
-> Good catch. I think this deserves a Fixes tag as per
-> https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes
-> E.g.
-> Fixes: ce558b0e17f8a ("smb3: Add posix create context for smb3.11 posix mounts")
-> Preferably also with "Cc: stable@vger.kernel.org" for applicable
-> backports.
->
-> oparms.mode appears to be uninitialized in cifs_create_mf_symlink()
-> (#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY) and various other codepaths
-> but isn't currently used further down the call chain... This looks like
-> an accident waiting to happen.
->
-> Cheers, David
-
-
-
--- 
-Thanks,
-
-Steve
+Could someone review this ext4 patch, please? This is one of the
+2 remaining patches that need to be looked at in the series.
