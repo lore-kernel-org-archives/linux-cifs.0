@@ -2,100 +2,68 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFC6C3DA78
-	for <linux-cifs@archiver.kernel.org>; Sat, 14 Jan 2023 08:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C173C46467
+	for <linux-cifs@archiver.kernel.org>; Sat, 14 Jan 2023 14:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbjANI6i (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 14 Jan 2023 03:58:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45316 "EHLO
+        id S230126AbjANORa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 14 Jan 2023 09:17:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229767AbjANI60 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 14 Jan 2023 03:58:26 -0500
-Received: from smtp.smtpout.orange.fr (smtp-19.smtpout.orange.fr [80.12.242.19])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3CB259E6
-        for <linux-cifs@vger.kernel.org>; Sat, 14 Jan 2023 00:58:25 -0800 (PST)
-Received: from pop-os.home ([86.243.2.178])
-        by smtp.orange.fr with ESMTPA
-        id GcMoplIKCnvraGcMopwaX6; Sat, 14 Jan 2023 09:58:24 +0100
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 14 Jan 2023 09:58:24 +0100
-X-ME-IP: 86.243.2.178
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH v2] cifs: Use kstrtobool() instead of strtobool()
-Date:   Sat, 14 Jan 2023 09:58:15 +0100
-Message-Id: <b4cb5ccc96332ca81d6732b3063942186614eaa6.1673686651.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S230178AbjANOR1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 14 Jan 2023 09:17:27 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F62A7EFC;
+        Sat, 14 Jan 2023 06:17:26 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C48460B4B;
+        Sat, 14 Jan 2023 14:17:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9176EC433D2;
+        Sat, 14 Jan 2023 14:17:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673705845;
+        bh=wKCGa5m67Vuqc8IYj87M1TAXthmZQYqZPMLynHu6HJU=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=BVRmBExRWWaLqIrNYYULcDl3MeO3avPhbBABdl4Gtzv3psOUWf19lWEf6jAHPX7qc
+         juyebr2sX5yDzw5+DUPo97FJ/xK2ga1RGFYa7u2dGcX6J+HoAR5rmib4BFvIcAZAPh
+         o8QHxERGTeDKPjiVNtuk3ZuhrYeqwEnW+SMnLOqS1la2gIWC+2yA8Mp0wWJ1BhY+lt
+         EuuzEhPN13BvRk4F9EfNDaz95/AGR7GRdlMMyjelbjiVfOHDnlf76XF9d2T/b1n7Cd
+         tRDbRZNC6+RGd1V12ykxu23UvPDHZoPjQnc70w4HAd2LPEfZLZIEitaDA4yuoHyGEz
+         pd2w1cbytGGRw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7E3A1C395C8;
+        Sat, 14 Jan 2023 14:17:25 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mvwNTHEfbr2DNW8HCx=pdJxNCG5vSO+qk8qxv6Hbcy9rQ@mail.gmail.com>
+References: <CAH2r5mvwNTHEfbr2DNW8HCx=pdJxNCG5vSO+qk8qxv6Hbcy9rQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mvwNTHEfbr2DNW8HCx=pdJxNCG5vSO+qk8qxv6Hbcy9rQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc3-smb3-client-fixes
+X-PR-Tracked-Commit-Id: a152d05ae4a71d802d50cf9177dba34e8bb09f68
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b35ad63eeccadbcc83f295a64a029f7e7188444f
+Message-Id: <167370584550.24149.10871171774912685074.pr-tracker-bot@kernel.org>
+Date:   Sat, 14 Jan 2023 14:17:25 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-strtobool() is the same as kstrtobool().
-However, the latter is more used within the kernel.
+The pull request you sent on Fri, 13 Jan 2023 19:19:09 -0600:
 
-In order to remove strtobool() and slightly simplify kstrtox.h, switch to
-the other function name.
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc3-smb3-client-fixes
 
-While at it, include the corresponding header file (<linux/kstrtox.h>)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b35ad63eeccadbcc83f295a64a029f7e7188444f
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-This patch was already sent as a part of a serie ([1]) that axed all usages
-of strtobool().
-Most of the patches have been merged in -next.
+Thank you!
 
-I synch'ed with latest -next and re-send the remaining ones as individual
-patches.
-
-Changes in v2:
-  - synch with latest -next.
-
-[1]: https://lore.kernel.org/all/cover.1667336095.git.christophe.jaillet@wanadoo.fr/
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- fs/cifs/cifs_debug.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 56b23def4c95..612f0bb284c9 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -8,6 +8,7 @@
- #include <linux/fs.h>
- #include <linux/string.h>
- #include <linux/ctype.h>
-+#include <linux/kstrtox.h>
- #include <linux/module.h>
- #include <linux/proc_fs.h>
- #include <linux/uaccess.h>
-@@ -787,7 +788,7 @@ static ssize_t cifsFYI_proc_write(struct file *file, const char __user *buffer,
- 	rc = get_user(c[0], buffer);
- 	if (rc)
- 		return rc;
--	if (strtobool(c, &bv) == 0)
-+	if (kstrtobool(c, &bv) == 0)
- 		cifsFYI = bv;
- 	else if ((c[0] > '1') && (c[0] <= '9'))
- 		cifsFYI = (int) (c[0] - '0'); /* see cifs_debug.h for meanings */
-@@ -947,7 +948,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
- 
- 	if (count < 3) {
- 		/* single char or single char followed by null */
--		if (strtobool(flags_string, &bv) == 0) {
-+		if (kstrtobool(flags_string, &bv) == 0) {
- 			global_secflags = bv ? CIFSSEC_MAX : CIFSSEC_DEF;
- 			return count;
- 		} else if (!isdigit(flags_string[0])) {
 -- 
-2.34.1
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
