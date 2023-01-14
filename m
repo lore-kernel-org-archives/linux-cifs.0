@@ -2,107 +2,100 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 411FDC3DA78
-	for <linux-cifs@archiver.kernel.org>; Sat, 14 Jan 2023 01:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFC6C3DA78
+	for <linux-cifs@archiver.kernel.org>; Sat, 14 Jan 2023 08:58:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230251AbjANBTY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Jan 2023 20:19:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54982 "EHLO
+        id S229662AbjANI6i (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 14 Jan 2023 03:58:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229996AbjANBTX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Jan 2023 20:19:23 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A73AD8BAAE;
-        Fri, 13 Jan 2023 17:19:22 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id x40so1354585lfu.12;
-        Fri, 13 Jan 2023 17:19:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=W6Nb5m59yqglWarTpIWBsMtluzB3GAv0iVhqzRthZkw=;
-        b=odcuyC3Oj+RheC1ROv3uSXzK2A+S4NC1M1qQA5dyP7STuyhiptCmC0KaTBlbg1MDCu
-         9ImWVpN9UIqKfHWZLKLgJXjMgRB8iHEtgMzAePR8OHQIqysVtnSrhWAdTr5P9uq12CT5
-         d0nBOjhn2rI+BGQFeEBKWNYeGPu7N7eqxtMJ07GboBHsRa1hBLCXi9JpiV4eY1fZNo0w
-         Phd5gUwEzORmezPRrcmXf9DLdkPJCRt2XnhA4O8VXxd/ILeko5me6tNX0ILOeUmRnt5x
-         RAOPKdgCi0ZUnI1NXLzmrzUzggaAArgj+XcGI5xLoh8SBQEWpEwbNH2LiX7cNfeY3Yly
-         9Mbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W6Nb5m59yqglWarTpIWBsMtluzB3GAv0iVhqzRthZkw=;
-        b=Q8RMpa5WEf1R4SsvXwdcULqkKArPoKSYdHhrV9edAlQHSxHfL6iLVTMkEHUNW833ck
-         uY1CZz8NQkfnRuJ8GWs0O7WDYX+6MLZE6fTNglkU4s5f3idsgxVrzskw0yO1LCijfXB0
-         Ai4Vhlx0WLM9Kv8JKNbMUj3X9Owqmj4hxXMt25gDm7ZQ6Zb4kazVOCHzjuAmLhBHGNZw
-         yd8T+BPXsA2Hehg3wEhrFkZeixvp8dNFOoaSrFcsTxOyCMdWo4Fivpb8fc3xJTXWMjCq
-         Fih31Q2qfmj+jABLHoT3ALPJdzOeFHb0dIdDnqAezZ9AkdvBiMjkg6CB84iIirEeedSX
-         i53w==
-X-Gm-Message-State: AFqh2krD8+15cKUtNA8+yyYDP6R9P+JAaw0Qsep7f7hXE+L67uvOzoi0
-        M3tLl2Y9OMu0/X+sDi0+icf4U1rhFdNeikiUlYqMozms+18=
-X-Google-Smtp-Source: AMrXdXsUVEyEPjacI1DRBTfcvbbgZSf4IsGFqObU5kQRiuJObNxt+r/tzDslzhDo2cprtEGzetNmTRnzK+Gk6eTfIlw=
-X-Received: by 2002:a05:6512:14d:b0:4cb:3a2f:26d1 with SMTP id
- m13-20020a056512014d00b004cb3a2f26d1mr2053745lfo.303.1673659160883; Fri, 13
- Jan 2023 17:19:20 -0800 (PST)
+        with ESMTP id S229767AbjANI60 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 14 Jan 2023 03:58:26 -0500
+Received: from smtp.smtpout.orange.fr (smtp-19.smtpout.orange.fr [80.12.242.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3CB259E6
+        for <linux-cifs@vger.kernel.org>; Sat, 14 Jan 2023 00:58:25 -0800 (PST)
+Received: from pop-os.home ([86.243.2.178])
+        by smtp.orange.fr with ESMTPA
+        id GcMoplIKCnvraGcMopwaX6; Sat, 14 Jan 2023 09:58:24 +0100
+X-ME-Helo: pop-os.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 14 Jan 2023 09:58:24 +0100
+X-ME-IP: 86.243.2.178
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Subject: [PATCH v2] cifs: Use kstrtobool() instead of strtobool()
+Date:   Sat, 14 Jan 2023 09:58:15 +0100
+Message-Id: <b4cb5ccc96332ca81d6732b3063942186614eaa6.1673686651.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 13 Jan 2023 19:19:09 -0600
-Message-ID: <CAH2r5mvwNTHEfbr2DNW8HCx=pdJxNCG5vSO+qk8qxv6Hbcy9rQ@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-b7bfaa761d760e72a969d116517eaa12e404c262:
+strtobool() is the same as kstrtobool().
+However, the latter is more used within the kernel.
 
-  Linux 6.2-rc3 (2023-01-08 11:49:43 -0600)
+In order to remove strtobool() and slightly simplify kstrtox.h, switch to
+the other function name.
 
-are available in the Git repository at:
+While at it, include the corresponding header file (<linux/kstrtox.h>)
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc3-smb3-client-fixes
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+This patch was already sent as a part of a serie ([1]) that axed all usages
+of strtobool().
+Most of the patches have been merged in -next.
 
-for you to fetch changes up to a152d05ae4a71d802d50cf9177dba34e8bb09f68:
+I synch'ed with latest -next and re-send the remaining ones as individual
+patches.
 
-  cifs: Fix uninitialized memory read for smb311 posix symlink create
-(2023-01-12 09:51:48 -0600)
+Changes in v2:
+  - synch with latest -next.
 
-----------------------------------------------------------------
-7 smb3 client fixes, most also for stable
-- memory leak and double free fix
-- two symlink fixes
-- minor cleanup fix
-- two smb1 fixes
+[1]: https://lore.kernel.org/all/cover.1667336095.git.christophe.jaillet@wanadoo.fr/
 
-----------------------------------------------------------------
-Colin Ian King (1):
-      cifs: remove redundant assignment to the variable match
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ fs/cifs/cifs_debug.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Paulo Alcantara (5):
-      cifs: fix file info setting in cifs_query_path_info()
-      cifs: fix file info setting in cifs_open_file()
-      cifs: fix double free on failed kerberos auth
-      cifs: do not query ifaces on smb1 mounts
-      cifs: fix potential memory leaks in session setup
-
-Volker Lendecke (1):
-      cifs: Fix uninitialized memory read for smb311 posix symlink create
-
- fs/cifs/cifsencrypt.c |  1 +
- fs/cifs/connect.c     |  9 +++++---
- fs/cifs/dfs_cache.c   |  1 -
- fs/cifs/link.c        |  1 +
- fs/cifs/sess.c        |  2 ++
- fs/cifs/smb1ops.c     | 63 +++++++++++++++++++++++++++------------------------
- fs/cifs/smb2pdu.c     |  6 ++++-
- 7 files changed, 49 insertions(+), 34 deletions(-)
-
-
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 56b23def4c95..612f0bb284c9 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -8,6 +8,7 @@
+ #include <linux/fs.h>
+ #include <linux/string.h>
+ #include <linux/ctype.h>
++#include <linux/kstrtox.h>
+ #include <linux/module.h>
+ #include <linux/proc_fs.h>
+ #include <linux/uaccess.h>
+@@ -787,7 +788,7 @@ static ssize_t cifsFYI_proc_write(struct file *file, const char __user *buffer,
+ 	rc = get_user(c[0], buffer);
+ 	if (rc)
+ 		return rc;
+-	if (strtobool(c, &bv) == 0)
++	if (kstrtobool(c, &bv) == 0)
+ 		cifsFYI = bv;
+ 	else if ((c[0] > '1') && (c[0] <= '9'))
+ 		cifsFYI = (int) (c[0] - '0'); /* see cifs_debug.h for meanings */
+@@ -947,7 +948,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+ 
+ 	if (count < 3) {
+ 		/* single char or single char followed by null */
+-		if (strtobool(flags_string, &bv) == 0) {
++		if (kstrtobool(flags_string, &bv) == 0) {
+ 			global_secflags = bv ? CIFSSEC_MAX : CIFSSEC_DEF;
+ 			return count;
+ 		} else if (!isdigit(flags_string[0])) {
 -- 
-Thanks,
+2.34.1
 
-Steve
