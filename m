@@ -2,128 +2,81 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6612C67871
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Jan 2023 23:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C03DC46467
+	for <linux-cifs@archiver.kernel.org>; Tue, 17 Jan 2023 00:11:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235518AbjAPX13 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 16 Jan 2023 18:27:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38160 "EHLO
+        id S231272AbjAQALB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 16 Jan 2023 19:11:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235520AbjAPX0y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Jan 2023 18:26:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C624439B90
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Jan 2023 15:15:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673910912;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ntGo6rTYFCYIHyffDu5aqHQltoEFdTWJMIOs9Lz75sM=;
-        b=Z1cb+i7lDwn0fn+YWaDlvrBaI0hqve4xhgXiHNd0UX5ZHtznVjZ05Tq7t+BNiTxvCQHYQj
-        YEqgKANtq+IXVWk2cc16i2PtQb+of8j4FTe8rWeEdv+xlSHEdyxwo4AZI+fW3E9pUf+Oux
-        GlAtJJ6RggtX+sZxtWTeuxskrQ3+fKA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-259-ab7qPHtTPKW5GI6TkEaaVA-1; Mon, 16 Jan 2023 18:11:57 -0500
-X-MC-Unique: ab7qPHtTPKW5GI6TkEaaVA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S232913AbjAQALA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Jan 2023 19:11:00 -0500
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6522716
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Jan 2023 16:10:57 -0800 (PST)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D6A10811E6E;
-        Mon, 16 Jan 2023 23:11:56 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2EF9E1415108;
-        Mon, 16 Jan 2023 23:11:55 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v6 32/34] cifs: DIO to/from KVEC-type iterators should now
- work
-From:   David Howells <dhowells@redhat.com>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>, Jeff Layton <jlayton@kernel.org>,
-        linux-cifs@vger.kernel.org, dhowells@redhat.com,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Mon, 16 Jan 2023 23:11:54 +0000
-Message-ID: <167391071464.2311931.14722270915404689054.stgit@warthog.procyon.org.uk>
-In-Reply-To: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
-References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/1.5
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 0ED0A80267;
+        Tue, 17 Jan 2023 00:10:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1673914255;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=SKWwpnsCjO9W99zj2nvqCsU/USVpIDBZx7N0nRbw40w=;
+        b=PLaQXoDB5qUeT0ntrEm6FxaEYR3A+PQG1JvFZoj4AuLUGo4OVaE6ypzzsIgedKljPL8qOn
+        +LJYdGvy6r9h0q/P59ipCM2WQYi3VhmNfwAtvVygCRX880i2DVjdtF51tfEsB0FGJaT/R+
+        GC7znNL+AWmxPUTQVs+2V/7NDsauaB3WnlAzmwfzEnp2XUKvbVcFJ4fs8BXULF8hobVth2
+        rbWwmWnoKEl+vqSGifTb4DkS5538ksSPg0K+gaQPMCFUE9u7HeaHC0SzkhaxyLtzLJ0NZ+
+        t0GkPR55wGXs5ha7NPFg2ODd9Z3UFUYTA/mJxIMbG0vZqP17dqV12Puq9Q+RsA==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>
+Subject: [PATCH 0/5] dfs fixes
+Date:   Mon, 16 Jan 2023 21:09:47 -0300
+Message-Id: <20230117000952.9965-1-pc@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-DIO to/from KVEC-type iterators should now work as the iterator is passed
-down to the socket in non-RDMA/non-crypto mode and in RDMA or crypto mode
-care is taken to handle vmap/vmalloc correctly and not take page refs when
-building a scatterlist.
+Hi Steve,
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Tom Talpey <tom@talpey.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
----
+The most important fix is 1/5 that should fix those random hangs that
+we've observed while running dfs tests on buildbot.
 
- fs/cifs/file.c |   20 --------------------
- 1 file changed, 20 deletions(-)
+I have run twice 50 dfs tests against Windows 2022 and samba 4.16 with
+these mount options
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 6baf591f63a3..7f1e01cee83d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3545,16 +3545,6 @@ static ssize_t __cifs_writev(
- 	struct cifs_aio_ctx *ctx;
- 	int rc;
- 
--	/*
--	 * iov_iter_get_pages_alloc doesn't work with ITER_KVEC.
--	 * In this case, fall back to non-direct write function.
--	 * this could be improved by getting pages directly in ITER_KVEC
--	 */
--	if (direct && iov_iter_is_kvec(from)) {
--		cifs_dbg(FYI, "use non-direct cifs_writev for kvec I/O\n");
--		direct = false;
--	}
--
- 	rc = generic_write_checks(iocb, from);
- 	if (rc <= 0)
- 		return rc;
-@@ -4090,16 +4080,6 @@ static ssize_t __cifs_readv(
- 	loff_t offset = iocb->ki_pos;
- 	struct cifs_aio_ctx *ctx;
- 
--	/*
--	 * iov_iter_get_pages_alloc() doesn't work with ITER_KVEC,
--	 * fall back to data copy read path
--	 * this could be improved by getting pages directly in ITER_KVEC
--	 */
--	if (direct && iov_iter_is_kvec(to)) {
--		cifs_dbg(FYI, "use non-direct cifs_user_readv for kvec I/O\n");
--		direct = false;
--	}
--
- 	len = iov_iter_count(to);
- 	if (!len)
- 		return 0;
+	vers=3.1.1,echo_interval=10,{,hard}
+	vers=3.0,echo_interval=10,{,hard}
+	vers=3.0,echo_interval=10,{,sign}
+	vers=3.0,echo_interval=10,{,seal}
+	vers=2.1,echo_interval=10,{,hard}
+	vers=1.0,echo_interval=10,{,hard}
 
+The only tests which failed (2%) were with SMB1 UNIX extensions
+against samba.  readdir(2) was getting STATUS_INVALID_LEVEL from
+QUERY_PATH_INFO after failover for some reason -- I'll look into that
+when time allows.  Those failures aren't related to this series,
+though.
+
+I also did some quick tests with kerberos.
+
+Paulo Alcantara (5):
+  cifs: fix potential deadlock in cache_refresh_path()
+  cifs: avoid re-lookups in dfs_cache_find()
+  cifs: don't take exclusive lock for updating target hints
+  cifs: remove duplicate code in __refresh_tcon()
+  cifs: handle cache lookup errors different than -ENOENT
+
+ fs/cifs/dfs_cache.c | 185 ++++++++++++++++++++++----------------------
+ 1 file changed, 94 insertions(+), 91 deletions(-)
+
+-- 
+2.39.0
 
