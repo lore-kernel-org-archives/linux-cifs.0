@@ -2,48 +2,47 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEA4C3DA78
-	for <linux-cifs@archiver.kernel.org>; Tue, 17 Jan 2023 17:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE52DC3DA78
+	for <linux-cifs@archiver.kernel.org>; Tue, 17 Jan 2023 18:41:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbjAQRsC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 Jan 2023 12:48:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34442 "EHLO
+        id S232329AbjAQSlu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 17 Jan 2023 13:41:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231759AbjAQRqP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Jan 2023 12:46:15 -0500
+        with ESMTP id S232570AbjAQSbu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Jan 2023 13:31:50 -0500
 Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8029658641
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Jan 2023 09:36:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF3C43921
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Jan 2023 10:03:38 -0800 (PST)
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id D92027FC02;
-        Tue, 17 Jan 2023 17:36:05 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 2CA147FC02;
+        Tue, 17 Jan 2023 18:03:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1673976966;
+        t=1673978602;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uPyl/wgKU60YkaUUsrvxfPk3JrPxCTW9mOhgbTb9QdM=;
-        b=HIWQVdoBL98eBMpCUt4PCA6taEE97lMZx68TdI0sdZBnxhtZazV/nKo8q1YQkXpZZgVGQg
-        eK3OiWw5JXTkMUDG6uIG1Oa+W/j5ywX+mj8Ak5ypR/Vju53Mxmh3R/ZtZqpdfE4Aw5JRvp
-        09ItpCOrdmy7mj2MDNikhXGHNMRll1Um8/28sxCdL8MtpX4BnWmpmP/4t3xwPgtvsbDT3T
-        VfYHOy9i2BsvDeJAInE4100yPpx4DGZKHL1C5Q/hSC5RULiNU2G4As6Q6E/MkN/IXiPTUk
-        fqKE2ZAzpQcvJe7ODf8h7XSSrWKr4pe5VqQMtcrNKASoBNFitkK9BNnqaO0Jlg==
+        bh=a0EQXHjlHZRuk7/E+eBLMAYriAzidRzFju2Ms/2y53Q=;
+        b=1CsMKMwjlW2uFy9oTGTAcYsPuAxG2yiIn87iJgpQfYFBFbiho1FcRers8BpkIgc473YYLB
+        abi1D9xGg2RZOhLSCvFJqHH6vxBzMtnoQGlHcd1VAw8q77X6s7bfUDqcYKlhNQix0d5wkY
+        mYpruEiKgXeYs1oh69uP4oV+s71tHAzOpxPLLojKYv9Y7psw+Xr1segXuY5ATEBqeqLeD1
+        4CXK8nab7MPYZT2ppnUP7WHJbWHmry3o18T+aFXagx5zIbhEp12C2/geA+iKF8xTIHsJ1u
+        SnXUmEZxbSII79B/llIWb9ZKs+lZYUPoZvGYu+LQMSPc3N7j8/x2ewrVwjfREg==
 From:   Paulo Alcantara <pc@cjr.nz>
-To:     =?utf-8?Q?J=2E_Pablo_Gonz=C3=A1lez?= <disablez@disablez.com>,
-        linux-cifs@vger.kernel.org
-Subject: Re: [Bug report] Since 5.17 kernel, non existing files may be
- treated as remote DFS entries
-In-Reply-To: <CAF2j4JG_w4XD=LzhPHWAMjA2yRqJ6A4K+x8XZ36d2zJOuZp4KQ@mail.gmail.com>
-References: <CAF2j4JFp2=J41j3d7MU-QNmHWPbfidG9V86gGagzEm-e4sDRQQ@mail.gmail.com>
- <878ri2d446.fsf@cjr.nz>
- <CAF2j4JG_w4XD=LzhPHWAMjA2yRqJ6A4K+x8XZ36d2zJOuZp4KQ@mail.gmail.com>
-Date:   Tue, 17 Jan 2023 14:36:01 -0300
-Message-ID: <87y1q1ukqm.fsf@cjr.nz>
+To:     =?utf-8?Q?Aur=C3=A9lien?= Aptel <aurelien.aptel@gmail.com>
+Cc:     smfrench@gmail.com, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 1/5] cifs: fix potential deadlock in cache_refresh_path()
+In-Reply-To: <CA+5B0FPp5ELawadvymYumQPSaCrCL15=2_KiCX2=91u6KBoVyw@mail.gmail.com>
+References: <20230117000952.9965-1-pc@cjr.nz>
+ <20230117000952.9965-2-pc@cjr.nz>
+ <CA+5B0FPp5ELawadvymYumQPSaCrCL15=2_KiCX2=91u6KBoVyw@mail.gmail.com>
+Date:   Tue, 17 Jan 2023 15:03:18 -0300
+Message-ID: <87v8l5ujh5.fsf@cjr.nz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -51,42 +50,29 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-J. Pablo Gonz=C3=A1lez <disablez@disablez.com> writes:
+Aur=C3=A9lien Aptel <aurelien.aptel@gmail.com> writes:
 
-> On Mon, Jan 16, 2023 at 2:02 PM Paulo Alcantara <pc@cjr.nz> wrote:
+> On Tue, Jan 17, 2023 at 1:35 AM Paulo Alcantara <pc@cjr.nz> wrote:
+>> -       down_write(&htable_rw_lock);
+>> +       down_read(&htable_rw_lock);
 >>
->> J. Pablo Gonz=C3=A1lez <disablez@disablez.com> writes:
+>>         ce =3D lookup_cache_entry(path);
+>> -       if (!IS_ERR(ce)) {
+>> -               if (!cache_entry_expired(ce)) {
+>> -                       dump_ce(ce);
+>> -                       up_write(&htable_rw_lock);
+>> -                       return 0;
+>> -               }
+>> -       } else {
+>> -               newent =3D true;
+>> +       if (!IS_ERR(ce) && !cache_entry_expired(ce)) {
+>> +               up_read(&htable_rw_lock);
+>> +               return 0;
+>>         }
 >>
->> > We=E2=80=99re experiencing some issues when accessing some mounts in a=
- DFS
->> > share, which seem to happen since kernel 5.17.
->> >
->> > After some investigation, we=E2=80=99ve pinpointed the origin to commit
->> > a2809d0e16963fdf3984409e47f145
->> > cccb0c6821
->> > - Original BZ for that is https://bugzilla.kernel.org/show_bug.cgi?id=
-=3D215440
->> > - Patch discussion is at
->> > https://patchwork.kernel.org/project/cifs-client/patch/YeHUxJ9zTVNrKve=
-F@himera.home/
->> > - Similar issues referenced in https://bugzilla.suse.com/show_bug.cgi?=
-id=3D1198753
->>
->> 6.2-rc4 has
->>
->>         c877ce47e137 ("cifs: reduce roundtrips on create/qinfo requests")
->>
->> which should fix your issue.
->>
->> Could you try it?  Thanks.
+>> +       up_read(&htable_rw_lock);
 >
-> I'll still need to test it more thoroughly, but for now, this patch
-> seems to have fixed all issues, including the "-o nodfs ones." Thank
-> you!
+> Please add a comment before the up_read() to say why you do it here
+> and where is the dead lock.
 
-OK - thanks for quickily testing it!
-
-> Any chance this could be formally backported to 6.1.x ? I see it's
-> only tagged for 6.2-rc for now.
-
-Absolutely.  Will take care of that.
+Ok, thanks.  Will send v2 with your suggestions.
