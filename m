@@ -2,82 +2,97 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6CDC63797
-	for <linux-cifs@archiver.kernel.org>; Tue, 17 Jan 2023 07:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB88C63797
+	for <linux-cifs@archiver.kernel.org>; Tue, 17 Jan 2023 15:07:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235747AbjAQHqz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 Jan 2023 02:46:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44182 "EHLO
+        id S231610AbjAQPHa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 17 Jan 2023 10:07:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235920AbjAQHqv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Jan 2023 02:46:51 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFDF6244A2;
-        Mon, 16 Jan 2023 23:46:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IHNi2aQpDkDbxKRjgKUG7Y3Yld9OP1h4x11WFrd3RAw=; b=k/V5SGX3Iv307bhFijCNd9+XzJ
-        4OZZVg4pTrQ47wdACEoqa6fcwWyyzSJ1lhtSHglIupg7ogd211aVQJ6OI9/yW2sIpe+P6NgR5rA+D
-        zNqRtkse1UOtjqHzoW29Rh63WwvJgZVhfLw5XEWctufFrI/TO1HUHHd2RPU21xWLbBKk+NZo/eIce
-        IWHvU5eGdauz3vMjLWQeCKmowA6ii/hRCf0kjODMFgCNYp1z8V5c2cBjVZoKGAkmMvu4T0bJM+/Vk
-        P7yrjX4O+Fv6IO2OiPYjXeV1I4PNnQIWmi55XsISaHhLJ6PXVU5fsS9KGu4JeP2alt+NdMnC0fCim
-        Mp66819w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pHgfw-00DEsx-QJ; Tue, 17 Jan 2023 07:46:32 +0000
-Date:   Mon, 16 Jan 2023 23:46:32 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>, Paulo Alcantara <pc@cjr.nz>,
-        linux-scsi@vger.kernel.org, Steve French <sfrench@samba.org>,
-        Stefan Metzmacher <metze@samba.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Anna Schumaker <anna@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Tom Talpey <tom@talpey.com>, linux-rdma@vger.kernel.org,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
-        linux-nfs@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        linux-fsdevel@vger.kernel.org,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Long Li <longli@microsoft.com>, Jan Kara <jack@suse.cz>,
-        linux-cachefs@redhat.com, linux-block@vger.kernel.org,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 00/34] iov_iter: Improve page extraction (ref, pin or
- just list)
-Message-ID: <Y8ZSWM2bxlRmMMTz@infradead.org>
-References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+        with ESMTP id S231436AbjAQPHa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Jan 2023 10:07:30 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562313D0B1;
+        Tue, 17 Jan 2023 07:07:29 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1965BB811D5;
+        Tue, 17 Jan 2023 15:07:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0C8AC433F1;
+        Tue, 17 Jan 2023 15:07:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673968046;
+        bh=X+HCcwyHt3MGqJpCaG1w/tkEuW0Iyo5TQOJGa6JrvVk=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=TJQpMrvJ9qB8909TeONz1R6biPQQygs8ny3R6d/l9ajusEPnL6GgNJVQAX0G9XJmP
+         2CKC4t3Dqv4r6fhZPhIHw1V/1CALEnRqz9RbioWZSQFCpmlEudF7fT3aUnekrwVfOo
+         4JkDdwM+w8MZeIjdCo5zFZQK3A17TGxInbF2kDaxg5iSxAi6QMaZ43tk+JvjfIpoJ8
+         mjmSowZTxOvJLWmo2qEWzrZmy3+dbYYTN4lg/h8swEdS+J3uTIJ1Yiw3cVZHBVGQgB
+         oeO9z1ZNi/KZPDAlUTGyDIe4o4Tv5r+9K0eon6bwwyXDlqPW7SbYUefCy5I6whx9Ix
+         qzE8tXJqEwlbA==
+Received: by mail-ot1-f53.google.com with SMTP id v15-20020a9d69cf000000b006709b5a534aso17975183oto.11;
+        Tue, 17 Jan 2023 07:07:26 -0800 (PST)
+X-Gm-Message-State: AFqh2krRtkHAqguAW+FOJ7t8t2Q/SdLhZkknPHbcV27XXohxOgBFUuvH
+        MHfg0giya0AHmJutgV8POvDmeuXrxeSxgQjyYp0=
+X-Google-Smtp-Source: AMrXdXvNc2KsleS8qULIJRtcQbD1k0ix52exYOBhVwkrr0Fc4FenlKU+EAe4BgoPnMj/LMgGFAneAyK9pxVmIKkiUSA=
+X-Received: by 2002:a05:6830:3883:b0:684:ed12:d614 with SMTP id
+ bq3-20020a056830388300b00684ed12d614mr191726otb.190.1673968045873; Tue, 17
+ Jan 2023 07:07:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Received: by 2002:a05:6802:195:b0:49c:ff2e:6ecb with HTTP; Tue, 17 Jan 2023
+ 07:07:25 -0800 (PST)
+In-Reply-To: <TYCP286MB23239EE29037F6051CFE5691CAC09@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+References: <TYCP286MB23239EE29037F6051CFE5691CAC09@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 18 Jan 2023 00:07:25 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8AjjzXWEmMDydgRm1p6F7Fo-s836iWryRGeQPYbjcQTQ@mail.gmail.com>
+Message-ID: <CAKYAXd8AjjzXWEmMDydgRm1p6F7Fo-s836iWryRGeQPYbjcQTQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] ksmbd: Minor performance improvement & code cleanup
+To:     Dawei Li <set_pte_at@outlook.com>
+Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
+        hyc.lee@gmail.com, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-First off the liver comment:  can we cut down things for a first
-round?  Maybe just convert everything using the bio based helpers
-and then chunk it up?  Reviewing 34 patches across a dozen subsystems
-isn't going to be easy and it will be hard to come up with a final
-positive conclusion.
+2023-01-15 19:32 GMT+09:00, Dawei Li <set_pte_at@outlook.com>:
+> It's a small series mostly aimed at performance improvement and code
+> cleanup.
+>
+> Among which, First three ones are performance related commits, and
+> other ones are minor code cleanup.
+except 0005 patch, Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+
+Thanks for your patch!
+>
+> 1 & 2: list => xarray, acclerating index based lookup.
+> 3: rwlock => rcu primitive, enabling write & read concurrency.
+> 4: Simple duplicated code removal.
+> 5: Minor code rework and exception handling.
+> 6: Simple typo fix.
+>
+> Dawei Li (6):
+>   ksmbd: Implements sess->ksmbd_chann_list as xarray
+>   ksmbd: Implements sess->rpc_handle_list as xarray
+>   ksmbd: replace rwlock with rcu for concurrenct access on conn list
+>   ksmbd: Remove duplicated codes
+>   ksmbd: improve exception handling and avoid redundant sanity check in
+>     loop
+>   ksmbd: fix typo, syncronous->synchronous
+>
+>  fs/ksmbd/asn1.c              | 19 ++++---
+>  fs/ksmbd/connection.c        | 54 +++++++++++---------
+>  fs/ksmbd/connection.h        |  1 -
+>  fs/ksmbd/ksmbd_work.h        |  2 +-
+>  fs/ksmbd/mgmt/user_session.c | 98 ++++++++++++++----------------------
+>  fs/ksmbd/mgmt/user_session.h |  6 +--
+>  fs/ksmbd/smb2pdu.c           | 52 ++++++-------------
+>  7 files changed, 93 insertions(+), 139 deletions(-)
+>
+> --
+> 2.25.1
+>
+>
