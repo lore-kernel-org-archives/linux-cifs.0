@@ -2,201 +2,109 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15039C00A5A
-	for <linux-cifs@archiver.kernel.org>; Tue, 17 Jan 2023 22:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4C1C00A5A
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Jan 2023 01:33:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbjAQWXw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 Jan 2023 17:23:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60914 "EHLO
+        id S229616AbjARBd5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 17 Jan 2023 20:33:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230126AbjAQWVL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Jan 2023 17:21:11 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9962261882
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Jan 2023 14:00:56 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 2D3B080CF7;
-        Tue, 17 Jan 2023 22:00:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1673992855;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bM1gJFc+tNJJwlTFw9QEOZDd0XBC1HlF9j/fpfhnEYw=;
-        b=mLkutIPY6KBdEis5b58fcvQ89y9e/cB/YhO6iFaj+Se1z+JiyGXm5/lxWgdueeGkkv6Usz
-        iWTK41AVEEIhyEe0F7t8zI29Unp40FAvjcJqLB5YuzZ5scc5b1fu2QgQXGWqEbPcc9x4Mq
-        lm16D/pdif0ZafJbM1fYWXnNXvPPNFECvKBS1bBGsn7bIG19LAWprpGw4xR7yb92j0S7bj
-        I+vRqDcou0hrakSjo2mxTvW6ZHwE96QAPzTgSpcIZqHga+ruDkDXfaFUAU3ZI8T34qSquQ
-        p55qmoJ9l4swIHPimPvBNN+WowGdDBYGgSgONNPRyClhiLg+toANOIaNGS2r7A==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, aurelien.aptel@gmail.com,
-        Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH v2 2/5] cifs: avoid re-lookups in dfs_cache_find()
-Date:   Tue, 17 Jan 2023 19:00:38 -0300
-Message-Id: <20230117220041.15905-3-pc@cjr.nz>
-In-Reply-To: <20230117220041.15905-1-pc@cjr.nz>
-References: <20230117000952.9965-1-pc@cjr.nz>
- <20230117220041.15905-1-pc@cjr.nz>
+        with ESMTP id S229596AbjARBd4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Jan 2023 20:33:56 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 520BA4ED18
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Jan 2023 17:33:55 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id b3so49649410lfv.2
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Jan 2023 17:33:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=1K9QCv2UtVsrI07DuqisWinbGf0dbiRb90wADACm0S8=;
+        b=BtG1IMIOM/L8U7vhQ8lfy/JC8g9UFziqUmSFqnDjvZ/SUqkUcZV7igJ1lhX4qrDnPc
+         +bdWxNdMBAaKpuBgL9+mVWUuma3uTxrv/SxVBF4hyBWs4U/gukgl4xYpEzgVP2VNor6J
+         axDFbIFE30ClXRKnUL3uv0V9/xdBtMBFY+5U6JjgEZ4yKFbY7+lp74MlV184XL8lyQ/D
+         xhr3tmCPmDcwKCpKRxVnHtuJt2PlJw+WQVBqWLdSwvr7mRbrhd0KM7ZG4//OoMAtfbRP
+         K5/+40AnUKlxcUfK5GFRM3LnF/U+epbW021oLNR0UX9OeLCIC8ijESe+TUdoHSVkSqW/
+         BXrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1K9QCv2UtVsrI07DuqisWinbGf0dbiRb90wADACm0S8=;
+        b=8FG35vgfY3wAKOfLqn+/GQ2wVFlQ3wTmql+hKPh8klxj+WQRDBEihWn9WYMw5VzwD9
+         P30X1PHbsu1PwCEca8Ca198cupQgofUy5qL/jG8GFZp+JXQRy4hWuW0FKVhz+GhBT1bb
+         jKCZjvkIyK5G1bGaiRSjJ61GtblyUmVZngCn1iFib0fL/hgUdO2SkzuYYZogV47qQKjp
+         nnjxqh9gZtM8e2S7hMzST5xW5XRfef2MmPeml016NIK1FKvH3RxJDGUCYsWOl+UKsCjX
+         6cHjXKpbBEyv+lxIb41SLDMmAmHvl+GOd4h1fqRM0Y9+L/ARb3HE7dXfCrck0ACbBAGP
+         GwsA==
+X-Gm-Message-State: AFqh2kp0q4AXHvEg/6v/aFGaF0yY+0oaL1H/bhC5PLY+7K/+g8Jd6IB4
+        YfBJ94kf8xrSVyXc6iB4usDHl201w5i1keVXE3M=
+X-Google-Smtp-Source: AMrXdXt/OdH4TOhEiOcpiYfe8iF3MtqJ3KuP8RQtztmJvaiYfq9jgHADDezFVZk/qtkzXUQeBuf18immvBffiACbHc8=
+X-Received: by 2002:a05:6512:39cb:b0:4b5:9125:1432 with SMTP id
+ k11-20020a05651239cb00b004b591251432mr272413lfu.204.1674005633603; Tue, 17
+ Jan 2023 17:33:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230117000952.9965-1-pc@cjr.nz> <20230117220041.15905-1-pc@cjr.nz>
+In-Reply-To: <20230117220041.15905-1-pc@cjr.nz>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 17 Jan 2023 19:33:42 -0600
+Message-ID: <CAH2r5muK1FUHq=06McOD+=fC8ttu_UH=9fjFg4bGkK6d2w42MQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] dfs fixes
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     linux-cifs@vger.kernel.org, aurelien.aptel@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Simply downgrade the write lock on cache updates from
-cache_refresh_path() and avoid unnecessary re-lookup in
-dfs_cache_find().
+tentatively merged into cifs-2.6.git for-next pending more review/testing
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
----
- fs/cifs/dfs_cache.c | 58 ++++++++++++++++++++++++++-------------------
- 1 file changed, 34 insertions(+), 24 deletions(-)
+On Tue, Jan 17, 2023 at 4:00 PM Paulo Alcantara <pc@cjr.nz> wrote:
+>
+> Hi Steve,
+>
+> The most important fix is 1/5 that should fix those random hangs that
+> we've observed while running dfs tests on buildbot.
+>
+> I have run twice 50 dfs tests against Windows 2022 and samba 4.16 with
+> these mount options
+>
+>         vers=3.1.1,echo_interval=10,{,hard}
+>         vers=3.0,echo_interval=10,{,hard}
+>         vers=3.0,echo_interval=10,{,sign}
+>         vers=3.0,echo_interval=10,{,seal}
+>         vers=2.1,echo_interval=10,{,hard}
+>         vers=1.0,echo_interval=10,{,hard}
+>
+> The only tests which failed (2%) were with SMB1 UNIX extensions
+> against samba.  readdir(2) was getting STATUS_INVALID_LEVEL from
+> QUERY_PATH_INFO after failover for some reason -- I'll look into that
+> when time allows.  Those failures aren't related to this series,
+> though.
+>
+> I also did some quick tests with kerberos.
+>
+> ---
+> v1 -> v2: add comments in patch 1/5 as suggested by Aurelien
+>
+> Paulo Alcantara (5):
+>   cifs: fix potential deadlock in cache_refresh_path()
+>   cifs: avoid re-lookups in dfs_cache_find()
+>   cifs: don't take exclusive lock for updating target hints
+>   cifs: remove duplicate code in __refresh_tcon()
+>   cifs: handle cache lookup errors different than -ENOENT
+>
+>  fs/cifs/dfs_cache.c | 191 +++++++++++++++++++++++---------------------
+>  1 file changed, 100 insertions(+), 91 deletions(-)
+>
+> --
+> 2.39.0
+>
 
-diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-index a6d7ae5f49a4..755a00c4cba1 100644
---- a/fs/cifs/dfs_cache.c
-+++ b/fs/cifs/dfs_cache.c
-@@ -558,7 +558,8 @@ static void remove_oldest_entry_locked(void)
- }
- 
- /* Add a new DFS cache entry */
--static int add_cache_entry_locked(struct dfs_info3_param *refs, int numrefs)
-+static struct cache_entry *add_cache_entry_locked(struct dfs_info3_param *refs,
-+						  int numrefs)
- {
- 	int rc;
- 	struct cache_entry *ce;
-@@ -573,11 +574,11 @@ static int add_cache_entry_locked(struct dfs_info3_param *refs, int numrefs)
- 
- 	rc = cache_entry_hash(refs[0].path_name, strlen(refs[0].path_name), &hash);
- 	if (rc)
--		return rc;
-+		return ERR_PTR(rc);
- 
- 	ce = alloc_cache_entry(refs, numrefs);
- 	if (IS_ERR(ce))
--		return PTR_ERR(ce);
-+		return ce;
- 
- 	spin_lock(&cache_ttl_lock);
- 	if (!cache_ttl) {
-@@ -594,7 +595,7 @@ static int add_cache_entry_locked(struct dfs_info3_param *refs, int numrefs)
- 
- 	atomic_inc(&cache_count);
- 
--	return 0;
-+	return ce;
- }
- 
- /* Check if two DFS paths are equal.  @s1 and @s2 are expected to be in @cache_cp's charset */
-@@ -767,8 +768,12 @@ static int get_dfs_referral(const unsigned int xid, struct cifs_ses *ses, const
-  *
-  * For interlinks, cifs_mount() and expand_dfs_referral() are supposed to
-  * handle them properly.
-+ *
-+ * On success, return entry with acquired lock for reading, otherwise error ptr.
-  */
--static int cache_refresh_path(const unsigned int xid, struct cifs_ses *ses, const char *path)
-+static struct cache_entry *cache_refresh_path(const unsigned int xid,
-+					      struct cifs_ses *ses,
-+					      const char *path)
- {
- 	struct dfs_info3_param *refs = NULL;
- 	struct cache_entry *ce;
-@@ -780,10 +785,9 @@ static int cache_refresh_path(const unsigned int xid, struct cifs_ses *ses, cons
- 	down_read(&htable_rw_lock);
- 
- 	ce = lookup_cache_entry(path);
--	if (!IS_ERR(ce) && !cache_entry_expired(ce)) {
--		up_read(&htable_rw_lock);
--		return 0;
--	}
-+	if (!IS_ERR(ce) && !cache_entry_expired(ce))
-+		return ce;
-+
- 	/*
- 	 * Unlock shared access as we don't want to hold any locks while getting
- 	 * a new referral.  The @ses used for performing the I/O could be
-@@ -797,8 +801,10 @@ static int cache_refresh_path(const unsigned int xid, struct cifs_ses *ses, cons
- 	 * Request a new DFS referral in order to create or update a cache entry.
- 	 */
- 	rc = get_dfs_referral(xid, ses, path, &refs, &numrefs);
--	if (rc)
-+	if (rc) {
-+		ce = ERR_PTR(rc);
- 		goto out;
-+	}
- 
- 	dump_refs(refs, numrefs);
- 
-@@ -806,16 +812,24 @@ static int cache_refresh_path(const unsigned int xid, struct cifs_ses *ses, cons
- 	/* Re-check as another task might have it added or refreshed already */
- 	ce = lookup_cache_entry(path);
- 	if (!IS_ERR(ce)) {
--		if (cache_entry_expired(ce))
-+		if (cache_entry_expired(ce)) {
- 			rc = update_cache_entry_locked(ce, refs, numrefs);
-+			if (rc)
-+				ce = ERR_PTR(rc);
-+		}
- 	} else {
--		rc = add_cache_entry_locked(refs, numrefs);
-+		ce = add_cache_entry_locked(refs, numrefs);
- 	}
- 
--	up_write(&htable_rw_lock);
-+	if (IS_ERR(ce)) {
-+		up_write(&htable_rw_lock);
-+		goto out;
-+	}
-+
-+	downgrade_write(&htable_rw_lock);
- out:
- 	free_dfs_info_array(refs, numrefs);
--	return rc;
-+	return ce;
- }
- 
- /*
-@@ -935,15 +949,8 @@ int dfs_cache_find(const unsigned int xid, struct cifs_ses *ses, const struct nl
- 	if (IS_ERR(npath))
- 		return PTR_ERR(npath);
- 
--	rc = cache_refresh_path(xid, ses, npath);
--	if (rc)
--		goto out_free_path;
--
--	down_read(&htable_rw_lock);
--
--	ce = lookup_cache_entry(npath);
-+	ce = cache_refresh_path(xid, ses, npath);
- 	if (IS_ERR(ce)) {
--		up_read(&htable_rw_lock);
- 		rc = PTR_ERR(ce);
- 		goto out_free_path;
- 	}
-@@ -1039,10 +1046,13 @@ int dfs_cache_update_tgthint(const unsigned int xid, struct cifs_ses *ses,
- 
- 	cifs_dbg(FYI, "%s: update target hint - path: %s\n", __func__, npath);
- 
--	rc = cache_refresh_path(xid, ses, npath);
--	if (rc)
-+	ce = cache_refresh_path(xid, ses, npath);
-+	if (IS_ERR(ce)) {
-+		rc = PTR_ERR(ce);
- 		goto out_free_path;
-+	}
- 
-+	up_read(&htable_rw_lock);
- 	down_write(&htable_rw_lock);
- 
- 	ce = lookup_cache_entry(npath);
+
 -- 
-2.39.0
+Thanks,
 
+Steve
