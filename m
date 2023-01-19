@@ -2,109 +2,70 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7807AC004D4
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Jan 2023 13:46:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B82C004D4
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Jan 2023 18:25:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230282AbjASNqy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Jan 2023 08:46:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50590 "EHLO
+        id S230012AbjASSZf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 Jan 2023 13:25:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230219AbjASNqu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Jan 2023 08:46:50 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08981613C8;
-        Thu, 19 Jan 2023 05:46:49 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id a11so3397476lfg.0;
-        Thu, 19 Jan 2023 05:46:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6jMrzHfUDMPhgoNY3yBd3hH0UTZZSH5iDS5mJLl0a84=;
-        b=nsIQEI4Jqq5DVCmCuuojkzlwUJrC1cc+FJ0GCunSHeHdGo/1280j0Is7H0xBkfZc3q
-         zhjdQOjXAkh165V9gOyN0J+8kj2Noe415LnR8C5n+qIE2+Errcxl7GbosvrSPmI4gOFw
-         Fz3XUs22zAGJl1AyHQTt6afEytrsDV8WLjDDSBnO3zvJ9MfgH28rmnz3uOl9zy1D1KJb
-         hrkWt+oMxCXLyNodUMWftk9E3oG2r23/YZ9f2bvF+Lx968RIarluhHjMgYEc3LfcxGaA
-         SPcB88xFwqlrTc+FTrAGnl52xHj6sgtlDpn+F31Au6yoCewX+3pjyYt7SwdIU34sBGG6
-         q+2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6jMrzHfUDMPhgoNY3yBd3hH0UTZZSH5iDS5mJLl0a84=;
-        b=0XAGhlkpUG0MiQUxJLWzBMbFrhb1JJMkaoHFdjElxhxjm24bVsEsNvGmG5GJkll+9F
-         TRRBbDEIjlwSbbD9OyeoPKjuKTyl5OeFMUI9EHfft5Xtjbd+dchQdMdrBOostQ5JgbC6
-         9RiMy30+ilOxkheuCI55Q8zShNO22phND1/pSbg/v8mVeTE0gVFwje7RymfwMAG2sfoH
-         R6Ky5OX9HFWlOlcwTaNg83jV10yiAqfrHVY4MkO5C+8sK15UspGJ+7Ux/QqBfRtyr6RY
-         gtIUvUc3GsogGO6+mnJDTsLs54Yq3h3iSAZh1XbC9vNn1vjQth4oywzhTykFwhZ4EXfO
-         8UCw==
-X-Gm-Message-State: AFqh2krPNZ2zgp5DOgFJTgtuiun8QYLhRnxkStkOwg6pFdGxb3r5Hp2H
-        4t5WyZm/dwztM151XZIk1/eEpt2FNETggOyPLxAJpcFm
-X-Google-Smtp-Source: AMrXdXs1eVnrtkkjaYXo4G/F36N2WVOQE8ZZ1Ky3bMn/HPt8/om3BFjfXu66wvpsvZpNLBr8BrCvPJvVJuw6RW/iNc4=
-X-Received: by 2002:ac2:4c8a:0:b0:4cb:e53:d54a with SMTP id
- d10-20020ac24c8a000000b004cb0e53d54amr1091310lfl.156.1674136007018; Thu, 19
- Jan 2023 05:46:47 -0800 (PST)
+        with ESMTP id S230146AbjASSZa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Jan 2023 13:25:30 -0500
+X-Greylist: delayed 1799 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 19 Jan 2023 10:25:16 PST
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E015394323;
+        Thu, 19 Jan 2023 10:25:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=Gc4QRic3oOW9jZaNZmu54QNDymxEhCF0UTpzB08co6Q=; b=H9EbDT6g8xJehZrjzjvPj+Rpdl
+        3shbnqV44QWZV+w7vBunk5zdZ7YXF3sI6hxb6JV3OVBooar0NU3XBfM2tKiNuwf9UoQL+jD2V4WwV
+        zDNk3V2sCPp5HpPUMFtw+KbAehs8opS6wHqVgmhAbjgYFNoG/7iG2Q8UperkhaXb/QX+vLgwCNgco
+        oojp2E6wKCr397zSM1qC4/a8iRCJoE4AUGxAEVq8tNRp7oT/HbcbCPcS/5KpvFqSVjir5Ur+j1/xT
+        NSSnlHjie1IIVn7M13BQKihQ1qIE75CbEZyPG7DJm64CelF0gWPM/i/VktaCgp2Y9en+8mOb0rYet
+        kCRny1lG6BjlEOSL58IrUKexITfdQzYVpb2j+/8YtU/5Rfa9bd9lsM2qbDp4D+gIJP9DiiOLVvwT6
+        qh8gVjGxc1cdfqhzr45zp4adk6oICkANGJDXh9QOhr8tuDzf+vRkbWM7366YhDGO1KB3YaS7DAm0n
+        JSm6H6/Kuvj4uXNUi6OeVuUh;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1pIXjP-009NuW-1f; Thu, 19 Jan 2023 16:25:39 +0000
+Message-ID: <8a6b6192-0413-a0cf-218e-4b86c5de3f8a@samba.org>
+Date:   Thu, 19 Jan 2023 17:25:38 +0100
 MIME-Version: 1.0
-References: <20230119111853.596560-1-arnd@kernel.org>
-In-Reply-To: <20230119111853.596560-1-arnd@kernel.org>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Thu, 19 Jan 2023 19:16:35 +0530
-Message-ID: <CANT5p=r+FB87Mx+Je6Xeo1-q=Cu01Mx++jR-=UegFYRtEtpBmA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix debug format string in cifs_debug_data_proc_show
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Steve French <sfrench@samba.org>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Tom Talpey <tom@talpey.com>,
-        Enzo Matsumiya <ematsumiya@suse.de>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v6 31/34] cifs: Fix problem with encrypted RDMA data read
+Content-Language: en-US, de-DE
+To:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
+        Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        linux-cifs@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
+ <167391070712.2311931.8909671251130425914.stgit@warthog.procyon.org.uk>
+From:   Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <167391070712.2311931.8909671251130425914.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 4:55 PM Arnd Bergmann <arnd@kernel.org> wrote:
->
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> Printing a size_t as %lu causes a warning on some architectures:
->
-> fs/cifs/cifs_debug.c: In function 'cifs_debug_data_proc_show':
-> fs/cifs/cifs_debug.c:478:75: error: format '%lu' expects argument of type 'long unsigned int', but argument 3 has type 'size_t' {aka 'unsigned int'} [-Werror=format=]
->   478 |                                 seq_printf(m, "\t\tWeight (cur,total): (%lu,%lu)"
->
-> Use the correct %zu format string instead.
->
-> Fixes: 962a0fd04791 ("cifs: distribute channels across interfaces based on speed")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  fs/cifs/cifs_debug.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index f5f07019fc7e..2e644d926e62 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -475,7 +475,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
->                                 cifs_dump_iface(m, iface);
->
->                                 iface_weight = iface->speed / iface_min_speed;
-> -                               seq_printf(m, "\t\tWeight (cur,total): (%lu,%lu)"
-> +                               seq_printf(m, "\t\tWeight (cur,total): (%zu,%zu)"
->                                            "\n\t\tAllocated channels: %u\n",
->                                            iface->weight_fulfilled,
->                                            iface_weight,
-> --
-> 2.39.0
->
+Am 17.01.23 um 00:11 schrieb David Howells:
+> When the cifs client is talking to the ksmbd server by RDMA and the ksmbd
+> server has "smb3 encryption = yes" in its config file, the normal PDU
+> stream is encrypted, but the directly-delivered data isn't in the stream
+> (and isn't encrypted), but is rather delivered by DDP/RDMA packets (at
+> least with IWarp).
 
-Hi Arnd,
+In that case the client must not use DDP/RDMA offload!
+This needs to be fixed in the request code for both read and write!
 
-Thanks for pointing this out.
-
--- 
-Regards,
-Shyam
+metze
