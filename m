@@ -2,70 +2,112 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B82C004D4
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Jan 2023 18:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF020C05027
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Jan 2023 12:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230012AbjASSZf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Jan 2023 13:25:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49394 "EHLO
+        id S229807AbjATMI2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 20 Jan 2023 07:08:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230146AbjASSZa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Jan 2023 13:25:30 -0500
-X-Greylist: delayed 1799 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 19 Jan 2023 10:25:16 PST
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E015394323;
-        Thu, 19 Jan 2023 10:25:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=Gc4QRic3oOW9jZaNZmu54QNDymxEhCF0UTpzB08co6Q=; b=H9EbDT6g8xJehZrjzjvPj+Rpdl
-        3shbnqV44QWZV+w7vBunk5zdZ7YXF3sI6hxb6JV3OVBooar0NU3XBfM2tKiNuwf9UoQL+jD2V4WwV
-        zDNk3V2sCPp5HpPUMFtw+KbAehs8opS6wHqVgmhAbjgYFNoG/7iG2Q8UperkhaXb/QX+vLgwCNgco
-        oojp2E6wKCr397zSM1qC4/a8iRCJoE4AUGxAEVq8tNRp7oT/HbcbCPcS/5KpvFqSVjir5Ur+j1/xT
-        NSSnlHjie1IIVn7M13BQKihQ1qIE75CbEZyPG7DJm64CelF0gWPM/i/VktaCgp2Y9en+8mOb0rYet
-        kCRny1lG6BjlEOSL58IrUKexITfdQzYVpb2j+/8YtU/5Rfa9bd9lsM2qbDp4D+gIJP9DiiOLVvwT6
-        qh8gVjGxc1cdfqhzr45zp4adk6oICkANGJDXh9QOhr8tuDzf+vRkbWM7366YhDGO1KB3YaS7DAm0n
-        JSm6H6/Kuvj4uXNUi6OeVuUh;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1pIXjP-009NuW-1f; Thu, 19 Jan 2023 16:25:39 +0000
-Message-ID: <8a6b6192-0413-a0cf-218e-4b86c5de3f8a@samba.org>
-Date:   Thu, 19 Jan 2023 17:25:38 +0100
+        with ESMTP id S229518AbjATMI2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Jan 2023 07:08:28 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92BFF4A1DC;
+        Fri, 20 Jan 2023 04:08:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674216507; x=1705752507;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AZ/jvlZjDAGzwVeZ5n8u21laCDo/f+erT+mJrrLfC7E=;
+  b=Z60xQK/Ak8OOa45s6jDFuGp/Um+pmnOICvCuhkceSPRQrcHoQB6XicW9
+   CrXZnkj5pR63xF14LnCOli6dDEE4zoLI7A443s8z/un8V8HDJzf1RPMwf
+   CvrVQlPhkFE1bsqddvF0AyX/5aYiugsFBZHEPz5loixqOHNADSYsMsAHL
+   4gI6Kljohn8e9d3Ej4YJqyzUft94A5kHPnIpKbOWoy1794M9KCjuupg+s
+   Qj0SCYN92d5QcJNWJHEtt77MUQVgARuQiotNT7pxc7RhoBIxCe5Pk3MoT
+   6ekBEWhe4pOuPg+iybM4sCbOuBxohOQbyh0TpQb3Ey0+FCIoVklgyodNX
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="323255751"
+X-IronPort-AV: E=Sophos;i="5.97,232,1669104000"; 
+   d="scan'208";a="323255751"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2023 04:08:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="834392629"
+X-IronPort-AV: E=Sophos;i="5.97,232,1669104000"; 
+   d="scan'208";a="834392629"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga005.jf.intel.com with ESMTP; 20 Jan 2023 04:08:24 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 50A4A36D; Fri, 20 Jan 2023 14:08:59 +0200 (EET)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Steve French <stfrench@microsoft.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 1/1] cifs: Get rid of unneeded conditional in the smb2_get_aead_req()
+Date:   Fri, 20 Jan 2023 14:08:57 +0200
+Message-Id: <20230120120857.60444-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v6 31/34] cifs: Fix problem with encrypted RDMA data read
-Content-Language: en-US, de-DE
-To:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
-        Long Li <longli@microsoft.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        linux-cifs@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <167391047703.2311931.8115712773222260073.stgit@warthog.procyon.org.uk>
- <167391070712.2311931.8909671251130425914.stgit@warthog.procyon.org.uk>
-From:   Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <167391070712.2311931.8909671251130425914.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Am 17.01.23 um 00:11 schrieb David Howells:
-> When the cifs client is talking to the ksmbd server by RDMA and the ksmbd
-> server has "smb3 encryption = yes" in its config file, the normal PDU
-> stream is encrypted, but the directly-delivered data isn't in the stream
-> (and isn't encrypted), but is rather delivered by DDP/RDMA packets (at
-> least with IWarp).
+In the smb2_get_aead_req() the skip variable is used only for
+the very first iteration of the two nested loops, which means
+it's basically in invariant to those loops. Hence, instead of
+using conditional on each iteration, unconditionally assing
+the 'skip' variable before the loops and at the end of the
+inner loop.
 
-In that case the client must not use DDP/RDMA offload!
-This needs to be fixed in the request code for both read and write!
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ fs/cifs/smb2ops.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-metze
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 519e6124d73d..7fcb79ce6a94 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4280,6 +4280,12 @@ static void *smb2_get_aead_req(struct crypto_aead *tfm, const struct smb_rqst *r
+ 	sg_init_table(*sgl, num_sgs);
+ 	sg = *sgl;
+ 
++	/*
++	 * The first rqst has a transform header where the
++	 * first 20 bytes are not part of the encrypted blob.
++	 */
++	skip = 20;
++
+ 	/* Assumes the first rqst has a transform header as the first iov.
+ 	 * I.e.
+ 	 * rqst[0].rq_iov[0]  is transform header
+@@ -4287,17 +4293,15 @@ static void *smb2_get_aead_req(struct crypto_aead *tfm, const struct smb_rqst *r
+ 	 * rqst[1+].rq_iov[0+] data to be encrypted/decrypted
+ 	 */
+ 	for (i = 0; i < num_rqst; i++) {
+-		/*
+-		 * The first rqst has a transform header where the
+-		 * first 20 bytes are not part of the encrypted blob.
+-		 */
+ 		for (j = 0; j < rqst[i].rq_nvec; j++) {
+ 			struct kvec *iov = &rqst[i].rq_iov[j];
+ 
+-			skip = (i == 0) && (j == 0) ? 20 : 0;
+ 			addr = (unsigned long)iov->iov_base + skip;
+ 			len = iov->iov_len - skip;
+ 			sg = cifs_sg_set_buf(sg, (void *)addr, len);
++
++			/* See the above comment on the 'skip' assignment */
++			skip = 0;
+ 		}
+ 		for (j = 0; j < rqst[i].rq_npages; j++) {
+ 			rqst_page_get_length(&rqst[i], j, &len, &off);
+-- 
+2.39.0
+
