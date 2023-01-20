@@ -2,90 +2,99 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13391C25B50
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Jan 2023 19:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40114C05027
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Jan 2023 21:23:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229445AbjATTSL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 20 Jan 2023 14:18:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52088 "EHLO
+        id S229673AbjATVXt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 20 Jan 2023 16:23:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229997AbjATTSK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Jan 2023 14:18:10 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0A229155;
-        Fri, 20 Jan 2023 11:18:00 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id b3so9541395lfv.2;
-        Fri, 20 Jan 2023 11:18:00 -0800 (PST)
+        with ESMTP id S229591AbjATVXs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Jan 2023 16:23:48 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9203D6A300;
+        Fri, 20 Jan 2023 13:23:46 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id cf42so9959566lfb.1;
+        Fri, 20 Jan 2023 13:23:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYPQJWlniGBmq4AzLRQJWodVCfnM6YRZwibUhCT+d5A=;
-        b=heb15bTtdZT17xmmqjNbgXZT0dR2QN6/fu8nuXR960n6sInBBperAgntX22WCjwI2n
-         I+g6HqywVBYfiBrGn/zojiY5V3EHTnonOlNP3RdOw44+HwSm34z5JjBJz65SuGhOCXC9
-         j+iv6bzjhCisC3KHwxyceKjn5A2X5q1fy0Pc3sF2M34Fp8VqntW18liDTWnUl8MWrLUA
-         OIIgmEnMkN9lfCwBscWFHFAXWURMk6uvWbUx2WSxUdtg9mmwAxunaqv6Gty9RdskDzjw
-         W2NrC8hH594iosmYoGQ3BGNbWdf93K6yNPM3md3/ij/lk289A5YBrVcQRwMsbRqdHTPw
-         v1Vg==
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YQSow/XXJue1Hfuq2P+XDRAvjPVOFPOHzpi4+mYE10Q=;
+        b=LZyQ6jiCUeSUvXBqySwUnKy9InloWWFUsgD2XzfMP1Siz7Ah5XPmlmCXGEMcXnclL7
+         0ZBalY5dIBRvrDQvVfMFQ398JUMY3WsfaFrLwf5ZUdSAgST4XVTbrMl3CvHrI3fwSc5C
+         G3EcFT/TPL8czzD1GR2YMCo2Urn6qjFwplU6F2+pHhPWXOjVhfjaXpr7oIVOIUQRJRvs
+         tZfoyGDZf+xriMss6XAsg5BEz+FdEtM4JJWztfopzOQcAy3Gr+xsRWlhKLaUsasDUdcF
+         5T17a1Mll6h8tehqfZI/dP5Wp0qa9CQYPwaBVc9zmah52RkkjTedWrUtnrrAP7LMdhC4
+         SIcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fYPQJWlniGBmq4AzLRQJWodVCfnM6YRZwibUhCT+d5A=;
-        b=bJvD5rXIFoE+YnkIAXrtvMYp6S7jo2hjy5nYyiRnaKbOcxl2r3sLj5xJNc4CK1h/h0
-         R1QCD/U9ohy7rOIwJYq0+s/TJGeyb9TADc1gMulWDKCsSLni+So7eip55w7bO18wKcC7
-         2fjQIiXRLaaJEiHrI7HZvMyxZBaF7G6Z9MkTB7Qn8xzJBGSYPUPT/WnAN4eEt+9nXcli
-         PKHy/bUJ7B04oHlyPAL4TGWFyil7uRiYgaMWqTwyyJo8jx5YbaMEGuMIOjK0xUIAb+8z
-         ZZZmJYjRwx/2j09C6x7luoaZPUXCZbvwBmNaUDZ6w+F8ADvRka1wtEnAJm6/cgJ+zFta
-         EfNg==
-X-Gm-Message-State: AFqh2krtowqfd9h93PZWis+tLIzEebpDUUUGdKq51ZrH4nWJKAcFlSt3
-        /mEgVgR2LlWbwJeSNDGTvm2O9DmzxRgdsNpSklw=
-X-Google-Smtp-Source: AMrXdXtDjM/fxl3sPQunHrLRY+Jj0Ha2oXd/y57zrVpFObrM9t3REGLn9LV3cDjpgSmVtgRrV4wMJxAi7FbJPsX/uXE=
-X-Received: by 2002:a05:6512:2397:b0:494:842e:3f6 with SMTP id
- c23-20020a056512239700b00494842e03f6mr858882lfv.225.1674242278695; Fri, 20
- Jan 2023 11:17:58 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YQSow/XXJue1Hfuq2P+XDRAvjPVOFPOHzpi4+mYE10Q=;
+        b=jDDgNPSYpbWNwOXRXQFbBzbhEakO2NwhkldKTCItyRQl2cvulGkar/VZylO4HiEsGa
+         XQQ3Ue7BLGlVZwVt9BVttqgELk7Pc1A5D+lXRYzSwTNm1PdwD1x0DnBY69ASmgevy5Wd
+         q7fiKOD5H6mxMr5jY45V3JpSw6TvAqjMOiEvCCl3zB4CXNPyA+kCm+XA5M9tQEfNUKlk
+         CHqlxZZ7yvnkV6CHQxeChL0nc7w2/uoQYJ+3M1Gnu/ANmvYMhAIxJood/sC6Qv10vBlo
+         F6YoJF+or3vJWcQC7hqOd0LHw0uZO9wmLlUB8pJP2TrNpHS/XSvSdh2RCPeOB6OqKkse
+         f/6w==
+X-Gm-Message-State: AFqh2kqLnW11QGf8TglLic8FMqhnihT0UD7oZVohuxf95YFX8HriXNKr
+        ikV5S3p6QNfXGf08+qio0ENK/ouwUY7uuW0qtQogE6QvYuo=
+X-Google-Smtp-Source: AMrXdXuajlowEGNe7JcbD8+0+9w+GeZwp66vF9oB3Y070H1+7Nkf25YT4X2PBFuC26bSs9l8iVWgh7WUQfTGITbADik=
+X-Received: by 2002:a05:6512:3996:b0:4a2:67ea:a06 with SMTP id
+ j22-20020a056512399600b004a267ea0a06mr901370lfu.580.1674249824458; Fri, 20
+ Jan 2023 13:23:44 -0800 (PST)
 MIME-Version: 1.0
-References: <20230120120857.60444-1-andriy.shevchenko@linux.intel.com> <87r0vpe182.fsf@cjr.nz>
-In-Reply-To: <87r0vpe182.fsf@cjr.nz>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 20 Jan 2023 13:17:47 -0600
-Message-ID: <CAH2r5mvgSnVhLSx=sjAu=dK1C5q9tqby-EmSz6_3rp+Azw-hKg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/1] cifs: Get rid of unneeded conditional in the smb2_get_aead_req()
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Steve French <stfrench@microsoft.com>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-        Tom Talpey <tom@talpey.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
+Date:   Fri, 20 Jan 2023 15:23:33 -0600
+Message-ID: <CAH2r5mtJDpG9COgrDSrytNvcsCruxe1svD5CtjeYnakQDjrVCQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+Please pull the following changes since commit
+5dc4c995db9eb45f6373a956eb1f69460e69e6d4:
 
-On Fri, Jan 20, 2023 at 8:22 AM Paulo Alcantara via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> Andy Shevchenko <andriy.shevchenko@linux.intel.com> writes:
->
-> > In the smb2_get_aead_req() the skip variable is used only for
-> > the very first iteration of the two nested loops, which means
-> > it's basically in invariant to those loops. Hence, instead of
-> > using conditional on each iteration, unconditionally assing
-> > the 'skip' variable before the loops and at the end of the
-> > inner loop.
-> >
-> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > ---
-> >  fs/cifs/smb2ops.c | 14 +++++++++-----
-> >  1 file changed, 9 insertions(+), 5 deletions(-)
->
-> Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
->
+  Linux 6.2-rc4 (2023-01-15 09:22:43 -0600)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc4-smb3-client-fixes
+
+for you to fetch changes up to a1b7c8457ecc062f612a1aca174c2e1c21f9ac10:
+
+  cifs: remove unused function (2023-01-18 14:49:51 -0600)
+
+----------------------------------------------------------------
+8 smb3 client fixes
+- important fix for packet signature calculation error
+- three fixes to correct DFS deadlock, and DFS refresh problem
+- remove an unused DFS function, and duplicate tcon refresh code
+- DFS cache lookup fix
+- uninitialized rc fix
+----------------------------------------------------------------
+Enzo Matsumiya (1):
+      cifs: do not include page data when checking signature
+
+Paulo Alcantara (7):
+      cifs: fix potential deadlock in cache_refresh_path()
+      cifs: avoid re-lookups in dfs_cache_find()
+      cifs: don't take exclusive lock for updating target hints
+      cifs: remove duplicate code in __refresh_tcon()
+      cifs: handle cache lookup errors different than -ENOENT
+      cifs: fix return of uninitialized rc in dfs_cache_update_tgthint()
+      cifs: remove unused function
+
+ fs/cifs/dfs_cache.c | 243
++++++++++++++++++++++++++++++++-----------------------------------------------
+ fs/cifs/dfs_cache.h |   3 -
+ fs/cifs/smb2pdu.c   |  15 +++--
+ 3 files changed, 105 insertions(+), 156 deletions(-)
 
 
 -- 
