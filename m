@@ -2,68 +2,99 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A04C38159
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Jan 2023 22:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F6EC25B4E
+	for <linux-cifs@archiver.kernel.org>; Sun, 22 Jan 2023 13:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbjATWib (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 20 Jan 2023 17:38:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46268 "EHLO
+        id S229749AbjAVNpr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 22 Jan 2023 08:45:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbjATWia (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Jan 2023 17:38:30 -0500
+        with ESMTP id S229566AbjAVNpq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 Jan 2023 08:45:46 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8A6722A25;
-        Fri, 20 Jan 2023 14:38:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E55D93F0;
+        Sun, 22 Jan 2023 05:45:45 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A09ECB82A68;
-        Fri, 20 Jan 2023 22:38:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 57AA0C4339B;
-        Fri, 20 Jan 2023 22:38:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674254307;
-        bh=QLbPU9eAYmoROBLx3KkIcxhf9AIMhTr5gxbMIOoCkVk=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=uWSY6Fva9TlKBhqyRQwP0L95svJ1kLUo/yQ6PchHLJup/YQhd9d6hqlGuggMujzRJ
-         tAq3LRBUK9+11QeV3JDGKsyHYvsX790pNQN1hh/ci3EqnXwlySKCJQVeSa42ZO4vVs
-         mJpUEGfTmKSQgXusDUSs2R0PW2SppFr2LcVnz4oQ3rga3qEM820xE7oT9HV2ceD0WP
-         CQ1SPb7ldjo1y7hRZt3aVlQZ/PW2c5BHQKJKBZQplpJulQJUs5UKYy5rnIoXhKHnQZ
-         pP7DCJ4LA16dbQ4gttSVGUY+EHdWS3OA3G/8yDYvf4sxTalhdv2Pl19umAfZn9LD9J
-         1SoJhB6FZmZqA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 47B09E54D2B;
-        Fri, 20 Jan 2023 22:38:27 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtJDpG9COgrDSrytNvcsCruxe1svD5CtjeYnakQDjrVCQ@mail.gmail.com>
-References: <CAH2r5mtJDpG9COgrDSrytNvcsCruxe1svD5CtjeYnakQDjrVCQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtJDpG9COgrDSrytNvcsCruxe1svD5CtjeYnakQDjrVCQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc4-smb3-client-fixes
-X-PR-Tracked-Commit-Id: a1b7c8457ecc062f612a1aca174c2e1c21f9ac10
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 4e31badaa188d0e2923f5082c041083c05bda3ff
-Message-Id: <167425430728.2096.9732513153474237440.pr-tracker-bot@kernel.org>
-Date:   Fri, 20 Jan 2023 22:38:27 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        by ams.source.kernel.org (Postfix) with ESMTPS id E7914B80AD2;
+        Sun, 22 Jan 2023 13:45:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506F8C433D2;
+        Sun, 22 Jan 2023 13:45:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1674395142;
+        bh=6qUeEO1YYbP5ZALYKGC/qa5S706OPhIYpJ2pP62OYnc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=h8giy6lNYlwItTTqiXQmpHdRbaJa8yVzDnZvsdSQGCwFP9nU2T1pa1LA6utuEIBIR
+         EQzAR8WdJAspkCnesvmlJlp8JjWIUdwBdCT0bzVufG9g770WCQ3esCdXjvbth452oV
+         XONlk2qrjeccdZbywrK7v5eVzHH9bCcvPyd50o+k=
+Date:   Sun, 22 Jan 2023 14:45:40 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     =?iso-8859-1?Q?J=2E_Pablo_Gonz=E1lez?= <disablez@disablez.com>,
+        linux-cifs@vger.kernel.org, stable@vger.kernel.org,
+        Steve French <smfrench@gmail.com>
+Subject: Re: [Bug report] Since 5.17 kernel, non existing files may be
+ treated as remote DFS entries
+Message-ID: <Y80+BM6J1nfEu1XO@kroah.com>
+References: <CAF2j4JFp2=J41j3d7MU-QNmHWPbfidG9V86gGagzEm-e4sDRQQ@mail.gmail.com>
+ <878ri2d446.fsf@cjr.nz>
+ <CAF2j4JG_w4XD=LzhPHWAMjA2yRqJ6A4K+x8XZ36d2zJOuZp4KQ@mail.gmail.com>
+ <87pmbbwjr1.fsf@cjr.nz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87pmbbwjr1.fsf@cjr.nz>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 20 Jan 2023 15:23:33 -0600:
+On Wed, Jan 18, 2023 at 07:38:58PM -0300, Paulo Alcantara wrote:
+> Stable team,
+> 
+> J. Pablo González <disablez@disablez.com> writes:
+> 
+> > On Mon, Jan 16, 2023 at 2:02 PM Paulo Alcantara <pc@cjr.nz> wrote:
+> >>
+> >> J. Pablo González <disablez@disablez.com> writes:
+> >>
+> >> > We’re experiencing some issues when accessing some mounts in a DFS
+> >> > share, which seem to happen since kernel 5.17.
+> >> >
+> >> > After some investigation, we’ve pinpointed the origin to commit
+> >> > a2809d0e16963fdf3984409e47f145
+> >> > cccb0c6821
+> >> > - Original BZ for that is https://bugzilla.kernel.org/show_bug.cgi?id=215440
+> >> > - Patch discussion is at
+> >> > https://patchwork.kernel.org/project/cifs-client/patch/YeHUxJ9zTVNrKveF@himera.home/
+> >> > - Similar issues referenced in https://bugzilla.suse.com/show_bug.cgi?id=1198753
+> >>
+> >> 6.2-rc4 has
+> >>
+> >>         c877ce47e137 ("cifs: reduce roundtrips on create/qinfo requests")
+> >>
+> >> which should fix your issue.
+> >>
+> >> Could you try it?  Thanks.
+> >
+> > I'll still need to test it more thoroughly, but for now, this patch
+> > seems to have fixed all issues, including the "-o nodfs ones." Thank
+> > you!
+> > Any chance this could be formally backported to 6.1.x ? I see it's
+> > only tagged for 6.2-rc for now.
+> 
+> Could you please queue
+> 
+>         c877ce47e137 ("cifs: reduce roundtrips on create/qinfo requests")
+> 
+> for 6.1.y as a fix for
+> 
+>         a2809d0e1696 ("cifs: quirk for STATUS_OBJECT_NAME_INVALID returned for non-ASCII dfs refs")
+> 
+> Find attached a backportable version of such commit.  Thanks.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc4-smb3-client-fixes
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/4e31badaa188d0e2923f5082c041083c05bda3ff
+Now queued up, thanks.
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+greg k-h
