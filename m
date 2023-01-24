@@ -2,47 +2,47 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E9F9C25B4E
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Jan 2023 13:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C37C25B4E
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Jan 2023 13:45:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234410AbjAXNpG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 Jan 2023 08:45:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34418 "EHLO
+        id S234288AbjAXNpU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 24 Jan 2023 08:45:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233738AbjAXNor (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Jan 2023 08:44:47 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09EFA4743F;
-        Tue, 24 Jan 2023 05:43:31 -0800 (PST)
+        with ESMTP id S234273AbjAXNos (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Jan 2023 08:44:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62818474C7;
+        Tue, 24 Jan 2023 05:43:32 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A420DB811D8;
-        Tue, 24 Jan 2023 13:42:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50EE7C433D2;
-        Tue, 24 Jan 2023 13:42:35 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BF395B811EA;
+        Tue, 24 Jan 2023 13:43:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79CECC433EF;
+        Tue, 24 Jan 2023 13:43:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674567756;
-        bh=g6GgNpDKXBeZ7/1AVJByKzXpU0x5FSVBr5SVaFkksSI=;
+        s=k20201202; t=1674567806;
+        bh=aU13aZswrVBF+jlf0x4wFwaNBxGQzJ+noTS0NkOOf2U=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=G3S6l6sVTTJf/AnvjlopcC8ZAgMY65lMKKghtzasruggzLyuGah5xXEJgL6yfOjJM
-         67W1rGT/mAGfHEW+cnntV9Is4aYb12N0Vsn+t4dK6VxVZAhuTtqKFhIZgkjw1+bgnP
-         8uDk/YfXMxfYDARJKNz1FJN1vkUrG5bylrXJvGJ1k7lzdPEU2hH7TlmP7/hQiWDPPu
-         ehuWJynZlqot3CRfa9ENDYruUN6KdX7JdXwYlUvr3uHhfZVsfSaRrzzUGDRFM9DNu3
-         GXwlQmlWSfIId1LptJdV4O+YQmVj/Pvkw45QLLm9Rv5+gA9qn/nOlx1EcMiTXsPCHA
-         pmIDDVo0oBOOA==
+        b=ZzVKW9BOs0LVuZnfezcVOir7QLHRKktuH15I31s7X9yLDeYCiWQztvbyHAjEQLA5k
+         MKFfGpUr9eXZg+YpHAO+iKHsQHt3zK+1CVM3xT4r8Ma+moK+UgMuwFpx1husqNgakM
+         axLhjxMGGiId5/8nq+t3h0AQ0TqAhZ/4qWQDz/VDhMbBX43q8V+S3QIpv+CclJeBcX
+         dmGfzEyGMB/YuzjFzDi5GbBWxqlXRHLEXmQ3Iy8ZxfW/1mIO3d+ysV/qA9YC6zjWg3
+         L0lakbQi0UrAJ094shZEjf+9M6JvnsdKCql5WFQfTwSQSL8tc0pay1HVoEUe/VNJrj
+         6KdueM4CdDMCg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Paulo Alcantara <pc@cjr.nz>, kernel test robot <lkp@intel.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.1 25/35] cifs: fix return of uninitialized rc in dfs_cache_update_tgthint()
-Date:   Tue, 24 Jan 2023 08:41:21 -0500
-Message-Id: <20230124134131.637036-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 13/14] cifs: fix return of uninitialized rc in dfs_cache_update_tgthint()
+Date:   Tue, 24 Jan 2023 08:42:56 -0500
+Message-Id: <20230124134257.637523-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230124134131.637036-1-sashal@kernel.org>
-References: <20230124134131.637036-1-sashal@kernel.org>
+In-Reply-To: <20230124134257.637523-1-sashal@kernel.org>
+References: <20230124134257.637523-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -68,7 +68,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-index e70915ad7541..805fabbc3cb2 100644
+index 1f3efa7821a0..935c5781d878 100644
 --- a/fs/cifs/dfs_cache.c
 +++ b/fs/cifs/dfs_cache.c
 @@ -1046,10 +1046,10 @@ int dfs_cache_update_tgthint(const unsigned int xid, struct cifs_ses *ses,
