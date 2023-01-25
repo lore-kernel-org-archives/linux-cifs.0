@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF87C61D97
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Jan 2023 21:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C040C61DA0
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Jan 2023 21:49:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236381AbjAYVtb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Jan 2023 16:49:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41284 "EHLO
+        id S231465AbjAYVtc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 25 Jan 2023 16:49:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236154AbjAYVsU (ORCPT
+        with ESMTP id S236405AbjAYVsU (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Jan 2023 16:48:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9891B5D920
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Jan 2023 13:46:24 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB755D935
+        for <linux-cifs@vger.kernel.org>; Wed, 25 Jan 2023 13:46:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674683183;
+        s=mimecast20190719; t=1674683185;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TREYAwJageIukWTSjR1QmDBqozeTGEzkTCcOqfCkCRk=;
-        b=N2Pq2NwvvNB0uWK163ICV8QbcQO7U5pL3QAlQakv8yUEnuyW18SLNgpifQdsL8MQClJJF9
-        gAmN67feZvFmm+j8pdG5EPhoD5Zlq5V6lFQoTeUpvDmVYjbfYBhG9tEeQk4KsEMKMTPMao
-        mte8KmHs1ASTG3cXlz/+AEVxT8uzjIE=
+        bh=8jKmMRM2nq81YfigboqsCbN4hFV42zsGjxYudxczqOU=;
+        b=R9dvURDqvOASd2zhnZGI6ghiynpQTI2koNHy0EVMimzINdIUsExFj1vyCIyTCHIu2oCbkT
+        7WT8GY00jDofG6wSKkadZfbkEuETJH46EWpY1tG70Y+nZdwynHaO8aD3reTM2M98um74v2
+        roemO8CTpOtaJVX4HMhYukkXDyJtMyk=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-567-bwc2LBG4PqONbHKjuCviSw-1; Wed, 25 Jan 2023 16:46:20 -0500
-X-MC-Unique: bwc2LBG4PqONbHKjuCviSw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-48-DUjn4GoKOBiSQPJU4gg7Xw-1; Wed, 25 Jan 2023 16:46:22 -0500
+X-MC-Unique: DUjn4GoKOBiSQPJU4gg7Xw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5237A38041D7;
-        Wed, 25 Jan 2023 21:46:19 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF3FE1C08975;
+        Wed, 25 Jan 2023 21:46:21 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7343B1121330;
-        Wed, 25 Jan 2023 21:46:17 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 046AC51FF;
+        Wed, 25 Jan 2023 21:46:19 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -49,82 +49,71 @@ Cc:     David Howells <dhowells@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Long Li <longli@microsoft.com>,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: [RFC 12/13] cifs: Fix problem with encrypted RDMA data read
-Date:   Wed, 25 Jan 2023 21:45:42 +0000
-Message-Id: <20230125214543.2337639-13-dhowells@redhat.com>
+        Steve French <sfrench@samba.org>
+Subject: [RFC 13/13] cifs: DIO to/from KVEC-type iterators should now work
+Date:   Wed, 25 Jan 2023 21:45:43 +0000
+Message-Id: <20230125214543.2337639-14-dhowells@redhat.com>
 In-Reply-To: <20230125214543.2337639-1-dhowells@redhat.com>
 References: <20230125214543.2337639-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When the cifs client is talking to the ksmbd server by RDMA and the ksmbd
-server has "smb3 encryption = yes" in its config file, the normal PDU
-stream is encrypted, but the directly-delivered data isn't in the stream
-(and isn't encrypted), but is rather delivered by DDP/RDMA packets (at
-least with IWarp).
-
-Currently, the direct delivery fails with:
-
-   buf can not contain only a part of read data
-   WARNING: CPU: 0 PID: 4619 at fs/cifs/smb2ops.c:4731 handle_read_data+0x393/0x405
-   ...
-   RIP: 0010:handle_read_data+0x393/0x405
-   ...
-    smb3_handle_read_data+0x30/0x37
-    receive_encrypted_standard+0x141/0x224
-    cifs_demultiplex_thread+0x21a/0x63b
-    kthread+0xe7/0xef
-    ret_from_fork+0x22/0x30
-
-The problem apparently stemming from the fact that it's trying to manage
-the decryption, but the data isn't in the smallbuf, the bigbuf or the page
-array).
-
-This can be fixed simply by inserting an extra case into handle_read_data()
-that checks to see if use_rdma_mr is true, and if it is, just setting
-rdata->got_bytes to the length of data delivered and allowing normal
-continuation.
-
-This can be seen in an IWarp packet trace.  With the upstream code, it does
-a DDP/RDMA packet, which produces the warning above and then retries,
-retrieving the data inline, spread across several SMBDirect messages that
-get glued together into a single PDU.  With the patch applied, only the
-DDP/RDMA packet is seen.
-
-Note that this doesn't happen if the server isn't told to encrypt stuff and
-it does also happen with softRoCE.
+DIO to/from KVEC-type iterators should now work as the iterator is passed
+down to the socket in non-RDMA/non-crypto mode and in RDMA or crypto mode
+care is taken to handle vmap/vmalloc correctly and not take page refs when
+building a scatterlist.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <smfrench@gmail.com>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
 cc: Tom Talpey <tom@talpey.com>
-cc: Long Li <longli@microsoft.com>
-cc: Namjae Jeon <linkinjeon@kernel.org>
-cc: Stefan Metzmacher <metze@samba.org>
+cc: Jeff Layton <jlayton@kernel.org>
 cc: linux-cifs@vger.kernel.org
-
-Link: https://lore.kernel.org/r/166855224228.1998592.2212551359609792175.stgit@warthog.procyon.org.uk/ # v1
 ---
- fs/cifs/smb2ops.c | 3 +++
- 1 file changed, 3 insertions(+)
+ fs/cifs/file.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 335080893ebc..aba6643e0869 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -4721,6 +4721,9 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
- 		if (length < 0)
- 			return length;
- 		rdata->got_bytes = data_len;
-+	} else if (use_rdma_mr) {
-+		/* The data was delivered directly by RDMA. */
-+		rdata->got_bytes = data_len;
- 	} else {
- 		/* read response payload cannot be in both buf and pages */
- 		WARN_ONCE(1, "buf can not contain only a part of read data");
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 89d59723bda8..98d3ad86995d 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -3545,16 +3545,6 @@ static ssize_t __cifs_writev(
+ 	struct cifs_aio_ctx *ctx;
+ 	int rc;
+ 
+-	/*
+-	 * iov_iter_get_pages_alloc doesn't work with ITER_KVEC.
+-	 * In this case, fall back to non-direct write function.
+-	 * this could be improved by getting pages directly in ITER_KVEC
+-	 */
+-	if (direct && iov_iter_is_kvec(from)) {
+-		cifs_dbg(FYI, "use non-direct cifs_writev for kvec I/O\n");
+-		direct = false;
+-	}
+-
+ 	rc = generic_write_checks(iocb, from);
+ 	if (rc <= 0)
+ 		return rc;
+@@ -4088,16 +4078,6 @@ static ssize_t __cifs_readv(
+ 	loff_t offset = iocb->ki_pos;
+ 	struct cifs_aio_ctx *ctx;
+ 
+-	/*
+-	 * iov_iter_get_pages_alloc() doesn't work with ITER_KVEC,
+-	 * fall back to data copy read path
+-	 * this could be improved by getting pages directly in ITER_KVEC
+-	 */
+-	if (direct && iov_iter_is_kvec(to)) {
+-		cifs_dbg(FYI, "use non-direct cifs_user_readv for kvec I/O\n");
+-		direct = false;
+-	}
+-
+ 	len = iov_iter_count(to);
+ 	if (!len)
+ 		return 0;
 
