@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D9FC54EED
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Jan 2023 21:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E90D7C61DA2
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Jan 2023 21:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235962AbjAYVqr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Jan 2023 16:46:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40244 "EHLO
+        id S236073AbjAYVqt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 25 Jan 2023 16:46:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235973AbjAYVqp (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Jan 2023 16:46:45 -0500
+        with ESMTP id S236212AbjAYVqq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Jan 2023 16:46:46 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FC844B485
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Jan 2023 13:45:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06A83B3C1
+        for <linux-cifs@vger.kernel.org>; Wed, 25 Jan 2023 13:46:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674683156;
+        s=mimecast20190719; t=1674683160;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t3UIPHmqMFH1ajjKP7sH9bM7EYfR1yJADQVx392bk1s=;
-        b=PJVBhbn6zTcfi3wVpKP0VzhEc0KOpBAI6FycW0DWdvCziJcZoipYu+BeCUTQkkef8PITRk
-        GzoczXn0kzpUWr8J3ln8jBuABD70Fm0XoVpJyMKaYorFSV656DaqAQZPi66Ylzx5BW7iYr
-        4wXznIa3gIj3dpoTEkBbMmSSuvbXB3Q=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=1A6ZB3Yy8mK1H2diytJlOZUelVQn8YZ/aJwc/khkLhs=;
+        b=MxQbZWMR2wMrFZOvSgnOLEqowPBy+fXu6RPjYNucjHCt43Q/J7rwQoTzxrMwYzondo0r46
+        IlZhERdfGAct/8omtmwfbf6hShYmRlBT/bKh1yMq/0IjdmEbC5CDiGkE5v5werk2Krfg55
+        uZEcA1qhSllwOGSkTqv8neg7pPWX3Jg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-67-dC5a56WxOtSuj4wIXfRqCw-1; Wed, 25 Jan 2023 16:45:51 -0500
-X-MC-Unique: dC5a56WxOtSuj4wIXfRqCw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-605-ZAS_uQopMf2myGoakY2Apg-1; Wed, 25 Jan 2023 16:45:58 -0500
+X-MC-Unique: ZAS_uQopMf2myGoakY2Apg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F43F2823811;
-        Wed, 25 Jan 2023 21:45:50 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0A343185A794;
+        Wed, 25 Jan 2023 21:45:58 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 59469492B01;
-        Wed, 25 Jan 2023 21:45:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45DE02166B26;
+        Wed, 25 Jan 2023 21:45:56 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -49,189 +49,236 @@ Cc:     David Howells <dhowells@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>, linux-cachefs@redhat.com
-Subject: [RFC 01/13] netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
-Date:   Wed, 25 Jan 2023 21:45:31 +0000
-Message-Id: <20230125214543.2337639-2-dhowells@redhat.com>
+        Steve French <sfrench@samba.org>
+Subject: [RFC 04/13] cifs: Implement splice_read to pass down ITER_BVEC not ITER_PIPE
+Date:   Wed, 25 Jan 2023 21:45:34 +0000
+Message-Id: <20230125214543.2337639-5-dhowells@redhat.com>
 In-Reply-To: <20230125214543.2337639-1-dhowells@redhat.com>
 References: <20230125214543.2337639-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a function to extract the pages from a user-space supplied iterator
-(UBUF- or IOVEC-type) into a BVEC-type iterator, retaining the pages by
-getting a pin on them (as FOLL_PIN) as we go.
+Provide cifs_splice_read() to use a bvec rather than an pipe iterator as
+the latter cannot so easily be split and advanced, which is necessary to
+pass an iterator down to the bottom levels.  Upstream cifs gets around this
+problem by using iov_iter_get_pages() to prefill the pipe and then passing
+the list of pages down.
 
-This is useful in three situations:
+This is done by:
 
- (1) A userspace thread may have a sibling that unmaps or remaps the
-     process's VM during the operation, changing the assignment of the
-     pages and potentially causing an error.  Retaining the pages keeps
-     some pages around, even if this occurs; futher, we find out at the
-     point of extraction if EFAULT is going to be incurred.
+ (1) Bulk-allocate a bunch of pages to carry as much of the requested
+     amount of data as possible, but without overrunning the available
+     slots in the pipe and add them to an ITER_BVEC.
 
- (2) Pages might get swapped out/discarded if not retained, so we want to
-     retain them to avoid the reload causing a deadlock due to a DIO
-     from/to an mmapped region on the same file.
+ (2) Synchronously call ->read_iter() to read into the buffer.
 
- (3) The iterator may get passed to sendmsg() by the filesystem.  If a
-     fault occurs, we may get a short write to a TCP stream that's then
-     tricky to recover from.
+ (3) Discard any unused pages.
 
-We don't deal with other types of iterator here, leaving it to other
-mechanisms to retain the pages (eg. PG_locked, PG_writeback and the pipe
-lock).
+ (4) Load the remaining pages into the pipe in order and advance the head
+     pointer.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
 cc: Steve French <sfrench@samba.org>
 cc: Shyam Prasad N <nspmangalore@gmail.com>
 cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: linux-cachefs@redhat.com
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/Makefile     |   1 +
- fs/netfs/iterator.c   | 102 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/netfs.h |   2 +
- 3 files changed, 105 insertions(+)
- create mode 100644 fs/netfs/iterator.c
 
-diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
-index f684c0cd1ec5..386d6fb92793 100644
---- a/fs/netfs/Makefile
-+++ b/fs/netfs/Makefile
-@@ -3,6 +3,7 @@
- netfs-y := \
- 	buffered_read.o \
- 	io.o \
-+	iterator.o \
- 	main.o \
- 	objects.o
- 
-diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
-new file mode 100644
-index 000000000000..7b7cdc2863fc
---- /dev/null
-+++ b/fs/netfs/iterator.c
-@@ -0,0 +1,102 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Iterator helpers.
-+ *
-+ * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
+Link: https://lore.kernel.org/r/166732028113.3186319.1793644937097301358.stgit@warthog.procyon.org.uk/ # rfc
+---
+ fs/cifs/cifsfs.c | 12 +++----
+ fs/cifs/cifsfs.h |  3 ++
+ fs/cifs/file.c   | 92 ++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/splice.c      |  1 +
+ 4 files changed, 102 insertions(+), 6 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 10e00c624922..3c57e8b11692 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1358,7 +1358,7 @@ const struct file_operations cifs_file_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = cifs_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1378,7 +1378,7 @@ const struct file_operations cifs_file_strict_ops = {
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = cifs_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1398,7 +1398,7 @@ const struct file_operations cifs_file_direct_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_mmap,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = cifs_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.unlocked_ioctl  = cifs_ioctl,
+ 	.copy_file_range = cifs_copy_file_range,
+@@ -1416,7 +1416,7 @@ const struct file_operations cifs_file_nobrl_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = cifs_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1434,7 +1434,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = cifs_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1452,7 +1452,7 @@ const struct file_operations cifs_file_direct_nobrl_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_mmap,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = cifs_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.unlocked_ioctl  = cifs_ioctl,
+ 	.copy_file_range = cifs_copy_file_range,
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 63a0ac2b9355..25decebbc478 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -100,6 +100,9 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
++extern ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
++				struct pipe_inode_info *pipe, size_t len,
++				unsigned int flags);
+ extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
+ extern int cifs_lock(struct file *, int, struct file_lock *);
+ extern int cifs_fsync(struct file *, loff_t, loff_t, int);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 22dfc1f8b4f1..30d01b236f77 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -5273,3 +5273,95 @@ const struct address_space_operations cifs_addr_ops_smallbuf = {
+ 	.launder_folio = cifs_launder_folio,
+ 	.migrate_folio = filemap_migrate_folio,
+ };
 +
-+#include <linux/export.h>
-+#include <linux/slab.h>
-+#include <linux/uio.h>
-+#include <linux/netfs.h>
-+#include "internal.h"
-+
-+/**
-+ * netfs_extract_user_iter - Extract the pages from a user iterator into a bvec
-+ * @orig: The original iterator
-+ * @orig_len: The amount of iterator to copy
-+ * @new: The iterator to be set up
-+ * @extract_flags: Flags to qualify the request
-+ *
-+ * Extract the page fragments from the given amount of the source iterator and
-+ * build up a second iterator that refers to all of those bits.  This allows
-+ * the original iterator to disposed of.
-+ *
-+ * @extract_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA be
-+ * allowed on the pages extracted.
-+ *
-+ * On success, the number of elements in the bvec is returned, the original
-+ * iterator will have been advanced by the amount extracted.
-+ *
-+ * The iov_iter_extract_mode() function should be used to query how cleanup
-+ * should be performed.
++/*
++ * Splice data from a file into a pipe.
 + */
-+ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
-+				struct iov_iter *new, unsigned int extract_flags)
++ssize_t cifs_splice_read(struct file *file, loff_t *ppos,
++			 struct pipe_inode_info *pipe, size_t len,
++			 unsigned int flags)
 +{
-+	struct bio_vec *bv = NULL;
-+	struct page **pages;
-+	unsigned int cur_npages;
-+	unsigned int max_pages;
-+	unsigned int npages = 0;
-+	unsigned int i;
++	LIST_HEAD(pages);
++	struct iov_iter to;
++	struct bio_vec *bv;
++	struct kiocb kiocb;
++	struct page *page;
++	unsigned int head;
 +	ssize_t ret;
-+	size_t count = orig_len, offset, len;
-+	size_t bv_size, pg_size;
++	size_t used, npages, chunk, remain, reclaim;
++	int i;
 +
-+	if (WARN_ON_ONCE(!iter_is_ubuf(orig) && !iter_is_iovec(orig)))
-+		return -EIO;
++	/* Work out how much data we can actually add into the pipe */
++	used = pipe_occupancy(pipe->head, pipe->tail);
++	npages = max_t(ssize_t, pipe->max_usage - used, 0);
++	len = min_t(size_t, len, npages * PAGE_SIZE);
++	npages = DIV_ROUND_UP(len, PAGE_SIZE);
 +
-+	max_pages = iov_iter_npages(orig, INT_MAX);
-+	bv_size = array_size(max_pages, sizeof(*bv));
-+	bv = kvmalloc(bv_size, GFP_KERNEL);
++	bv = kmalloc(array_size(npages, sizeof(bv[0])), GFP_KERNEL);
 +	if (!bv)
 +		return -ENOMEM;
 +
-+	/* Put the page list at the end of the bvec list storage.  bvec
-+	 * elements are larger than page pointers, so as long as we work
-+	 * 0->last, we should be fine.
-+	 */
-+	pg_size = array_size(max_pages, sizeof(*pages));
-+	pages = (void *)bv + bv_size - pg_size;
-+
-+	while (count && npages < max_pages) {
-+		ret = iov_iter_extract_pages(orig, &pages, count,
-+					     max_pages - npages, extract_flags,
-+					     &offset);
-+		if (ret < 0) {
-+			pr_err("Couldn't get user pages (rc=%zd)\n", ret);
-+			break;
-+		}
-+
-+		if (ret > count) {
-+			pr_err("get_pages rc=%zd more than %zu\n", ret, count);
-+			break;
-+		}
-+
-+		count -= ret;
-+		ret += offset;
-+		cur_npages = DIV_ROUND_UP(ret, PAGE_SIZE);
-+
-+		if (npages + cur_npages > max_pages) {
-+			pr_err("Out of bvec array capacity (%u vs %u)\n",
-+			       npages + cur_npages, max_pages);
-+			break;
-+		}
-+
-+		for (i = 0; i < cur_npages; i++) {
-+			len = ret > PAGE_SIZE ? PAGE_SIZE : ret;
-+			bv[npages + i].bv_page	 = *pages++;
-+			bv[npages + i].bv_offset = offset;
-+			bv[npages + i].bv_len	 = len - offset;
-+			ret -= len;
-+			offset = 0;
-+		}
-+
-+		npages += cur_npages;
++	npages = alloc_pages_bulk_list(GFP_USER, npages, &pages);
++	if (!npages) {
++		kfree(bv);
++		return -ENOMEM;
 +	}
 +
-+	iov_iter_bvec(new, orig->data_source, bv, npages, orig_len - count);
-+	return npages;
++	remain = len = min_t(size_t, len, npages * PAGE_SIZE);
++
++	for (i = 0; i < npages; i++) {
++		chunk = min_t(size_t, PAGE_SIZE, remain);
++		page = list_first_entry(&pages, struct page, lru);
++		list_del_init(&page->lru);
++		bv[i].bv_page = page;
++		bv[i].bv_offset = 0;
++		bv[i].bv_len = chunk;
++		remain -= chunk;
++	}
++
++	/* Do the I/O */
++	iov_iter_bvec(&to, READ, bv, npages, len);
++	init_sync_kiocb(&kiocb, file);
++	kiocb.ki_pos = *ppos;
++	ret = call_read_iter(file, &kiocb, &to);
++
++	reclaim = npages * PAGE_SIZE;
++	remain = 0;
++	if (ret > 0) {
++		reclaim -= ret;
++		remain = ret;
++		*ppos = kiocb.ki_pos;
++		file_accessed(file);
++	} else if (ret < 0) {
++		/*
++		 * callers of ->splice_read() expect -EAGAIN on
++		 * "can't put anything in there", rather than -EFAULT.
++		 */
++		if (ret == -EFAULT)
++			ret = -EAGAIN;
++	}
++
++	/* Free any pages that didn't get touched at all. */
++	for (; reclaim >= PAGE_SIZE; reclaim -= PAGE_SIZE)
++		__free_page(bv[--npages].bv_page);
++
++	/* Push the remaining pages into the pipe. */
++	head = pipe->head;
++	for (i = 0; i < npages; i++) {
++		struct pipe_buffer *buf = &pipe->bufs[head & (pipe->ring_size - 1)];
++
++		chunk = min_t(size_t, remain, PAGE_SIZE);
++		*buf = (struct pipe_buffer) {
++			.ops	= &default_pipe_buf_ops,
++			.page	= bv[i].bv_page,
++			.offset	= 0,
++			.len	= chunk,
++		};
++		head++;
++		remain -= chunk;
++	}
++	pipe->head = head;
++
++	kfree(bv);
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(netfs_extract_user_iter);
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 4c76ddfb6a67..e8c560131170 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -296,6 +296,8 @@ void netfs_get_subrequest(struct netfs_io_subrequest *subreq,
- void netfs_put_subrequest(struct netfs_io_subrequest *subreq,
- 			  bool was_async, enum netfs_sreq_ref_trace what);
- void netfs_stats_show(struct seq_file *);
-+ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
-+				struct iov_iter *new, unsigned int extract_flags);
+diff --git a/fs/splice.c b/fs/splice.c
+index 5969b7a1d353..95435b5cca2a 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -330,6 +330,7 @@ const struct pipe_buf_operations default_pipe_buf_ops = {
+ 	.try_steal	= generic_pipe_buf_try_steal,
+ 	.get		= generic_pipe_buf_get,
+ };
++EXPORT_SYMBOL(default_pipe_buf_ops);
  
- /**
-  * netfs_inode - Get the netfs inode context from the inode
+ /* Pipe buffer operations for a socket and similar. */
+ const struct pipe_buf_operations nosteal_pipe_buf_ops = {
 
