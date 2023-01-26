@@ -2,110 +2,111 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCA3C54E94
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Jan 2023 23:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E9D6C54E94
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Jan 2023 09:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231178AbjAYXoB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Jan 2023 18:44:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47024 "EHLO
+        id S236836AbjAZJ1H convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 26 Jan 2023 04:27:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235793AbjAYXn7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Jan 2023 18:43:59 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E305E51F
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Jan 2023 15:43:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F0FB3616C5
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Jan 2023 23:43:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ABA0C4339E
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Jan 2023 23:43:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674690180;
-        bh=qHk3TpXTZuccOhOJ9OM3fuKdZLCnha39JKERSTcxlhE=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=DoHpMNtbh6GspZM8Tc+fvgU4DROQK2enSMDKVAl1tjoZ9YgeE1e2e1/OG5E3b1xtR
-         Q16/nEWniU+QyXP3YPzXr/Nr70g1gWyzEae0p/iMUiSapRB5/kMH2CjXn8djwdAuOB
-         5HAIxC6PhLgkh2xi67PMqCHgoJ8yYaCP0lQTlnFTQ7q2/qnPR0nQzg2B3NT2jQ1Nxh
-         iMEDXPjqcTawjWccWJE4R1nRnfXp7bkq9VySwsd3Qy0TiM+/J3psN5JBaIjGtsKC4r
-         Pgt/CO9dK3n66THra2uaIx1wg0j6AVJIz39NknSjfN3PFh15WoJWW3ht++1oT0xYIG
-         eqke25P9zlRwQ==
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-1633e6f83d4so618020fac.0
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Jan 2023 15:43:00 -0800 (PST)
-X-Gm-Message-State: AFqh2koSlHwP+2St+wMwxYF+KW7Kwtreeg9jVWxk2cXYoT79chzjVowy
-        x0kFDKL0AXLlna80ZnU++0hS6jkaXDVZnLxxPjQ=
-X-Google-Smtp-Source: AMrXdXvuz63Tl5kePbVOwYXITxHGtvL1gQ3DZNwHgeekGxP9A0cX7T1FD0x2WMY9hqLtil+Q98rA7XpjJPAXThWUbqQ=
-X-Received: by 2002:a05:6870:8c11:b0:15f:de79:36c7 with SMTP id
- ec17-20020a0568708c1100b0015fde7936c7mr1320176oab.215.1674690179368; Wed, 25
- Jan 2023 15:42:59 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:ac9:6f93:0:b0:49e:db28:779a with HTTP; Wed, 25 Jan 2023
- 15:42:58 -0800 (PST)
-In-Reply-To: <2341329.1674686619@warthog.procyon.org.uk>
-References: <fa35788a-c858-11c5-5d9a-1d5c837020b6@talpey.com>
- <1130899.1674582538@warthog.procyon.org.uk> <2132364.1674655333@warthog.procyon.org.uk>
- <2302242.1674679279@warthog.procyon.org.uk> <3006f2ac-c70f-57d0-8286-ffd5892571f7@talpey.com>
- <2341329.1674686619@warthog.procyon.org.uk>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 26 Jan 2023 08:42:58 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_Zy+7WC=gSsp+3KbQNTCrGgyGoQdZo0aky80NcJfjCBA@mail.gmail.com>
-Message-ID: <CAKYAXd_Zy+7WC=gSsp+3KbQNTCrGgyGoQdZo0aky80NcJfjCBA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Fix oops due to uncleared server->smbd_conn in reconnect
-To:     David Howells <dhowells@redhat.com>
-Cc:     Tom Talpey <tom@talpey.com>, Steve French <sfrench@samba.org>,
+        with ESMTP id S233508AbjAZJ1G (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Jan 2023 04:27:06 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B561EB
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Jan 2023 01:27:05 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-318-koHdLQDNPsa4DU4YcOx9dg-1; Thu, 26 Jan 2023 09:27:03 +0000
+X-MC-Unique: koHdLQDNPsa4DU4YcOx9dg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.45; Thu, 26 Jan
+ 2023 09:27:02 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.045; Thu, 26 Jan 2023 09:27:02 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Howells' <dhowells@redhat.com>,
+        Steve French <smfrench@gmail.com>
+CC:     Al Viro <viro@zeniv.linux.org.uk>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
-        Long Li <longli@microsoft.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "Tom Talpey" <tom@talpey.com>, Stefan Metzmacher <metze@samba.org>,
+        "Christoph Hellwig" <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Jeff Layton" <jlayton@kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Steve French <sfrench@samba.org>
+Subject: RE: [RFC 08/13] cifs: Add a function to read into an iter from a
+ socket
+Thread-Topic: [RFC 08/13] cifs: Add a function to read into an iter from a
+ socket
+Thread-Index: AQHZMQai4Pp239USek2HtsrL1M/WuK6wa3Ew
+Date:   Thu, 26 Jan 2023 09:27:02 +0000
+Message-ID: <0d53a3cc9f9448298bba04d06f51b23d@AcuMS.aculab.com>
+References: <20230125214543.2337639-1-dhowells@redhat.com>
+ <20230125214543.2337639-9-dhowells@redhat.com>
+In-Reply-To: <20230125214543.2337639-9-dhowells@redhat.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-01-26 7:43 GMT+09:00, David Howells <dhowells@redhat.com>:
-> Tom Talpey <tom@talpey.com> wrote:
->
->> What are you trying to test?
->
-> I'm trying to make sure my iteratorisation patches work, including with
-> RDMA.
-> I have some functions to decant some data an iterator either into a
-> scatterlist and into an RDMA SGE array without the need to get refs on
-> pages.
->
->> Since encrypted SMBDirect traffic is known to have an issue, I guess I'd
->> suggest turning off encryption-by-default on the share.
->
-> How do I do that?  In the ksmbd config?
->
-> 	[global]
-> 		smb3 encryption =3D yes
-I recently changed the input of the smb3 encryption parameters. It is
-"auto" by default. Requests/responses will not be encrypted unless you
-give the seal option in the mount options. So please update the latest
-ksmbd-tools for your test.
+From: David Howells
+> Sent: 25 January 2023 21:46
 
-man ksmbd.conf
+> Add a helper function to read data from a socket into the given iterator.
+...
+> +int
+> +cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct iov_iter *iter,
+> +			   unsigned int to_read)
+> +{
+> +	struct msghdr smb_msg;
+> +	int ret;
+> +
+> +	smb_msg.msg_iter = *iter;
+> +	if (smb_msg.msg_iter.count > to_read)
+> +		smb_msg.msg_iter.count = to_read;
+> +	ret = cifs_readv_from_socket(server, &smb_msg);
+> +	if (ret > 0)
+> +		iov_iter_advance(iter, ret);
+> +	return ret;
+> +}
 
-smb3 encryption (G)
-              Client is disallowed, allowed, or required to use SMB3
-encryption.  With  smb3  en=E2=80=90
-              cryption  =3D  disabled, SMB3 encryption is disallowed
-even if it is requested by the
-              client.  With smb3 encryption =3D auto, SMB3 encryption is
-allowed if it is requested
-              by the client.  With smb3 encryption =3D mandatory, SMB3
-encryption is required. i.e.
-              clients that do not support encryption will be denied
-access to the share.
+On the face of it that passes a largely uninitialised 'struct msghdr'
+to cifs_readv_from_socket() in order to pass an iov_iter.
+That seems to be asking for trouble.
 
-              Default: smb3 encryption =3D auto
+I'm also not 100% sure that taking a copy of an iov_iter is a good idea.
 
-Thanks.
->
-> David
->
->
+If cifs_readv_from_socket() only needs the iov_iter then wouldn't
+it be better to do the wrapper the other way around?
+(Probably as an inline function)
+Something like:
+
+int
+cifs_readv_from_socket(struct TCP_Server_Info *server, struct msghdr *smb_msg)
+{
+	return cifs_read_iter_from_socket(server, &smb_msg->msg_iter, smb_msg->msg_iter.count);
+}
+
+and then changing cifs_readv_from_socket() to just use the iov_iter.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
