@@ -2,167 +2,215 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52AA3C05027
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Jan 2023 20:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AF3C05027
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Jan 2023 20:49:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229871AbjAZU3a (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 26 Jan 2023 15:29:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41202 "EHLO
+        id S230338AbjAZUtM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 26 Jan 2023 15:49:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbjAZU33 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Jan 2023 15:29:29 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7DD4B8AE
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Jan 2023 12:29:28 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oRzOkFi45rWpxKwT1xJO+ggUjZY5UNuqhVa0MR+twjXJpVr+r0iAwKGEqb+NBxLFNIo/7PXzJ+YjMiR7KPoT7GnSwxXOiDFmaXMnfmZPVM/15XSHz5nkC8xJheraIl88K42jSM/fuZxRoVpT8Puu0KV7dNHNjcV5YbH5DXY5GAjHiKL7samHN7nXXYs3J3Jfkx9Ho1ag0Vumt24+kAB3f2qscfO9Px6jddVUXeg77MjhGHw23X13g30Qo+DvLiLJl6RTO5tm8KbnCH2osKKgSoBjH0XIpOd1RItn7Fiz1yq0Au5uZkIGyUPhyRxSA2rHl1qVIwk5OGaMW3aEQwI19A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6JkuUYUvgwEGcNAUuVymZSNA/QuMXk+/mN5G5JneSvo=;
- b=il7/C9yndOcuZBjFDcAL7O9YepyLkgxefZAd4efJfAkuQ02ICcU99xSG9hBUyuI/CMDzalsT6vVTnIZUexNp3hTfR2cJ+ieQds0vVCt4V7itLbdYmIcqtxWDYG4h4ZNpaA8CAN8EI/sRTNWGwI9W7XZwBMEoZt1hIRt8Nms6T1hBOR7MBtaoa8BScWf949XPMc/AtqwQzthy0/hoBWSp6OqgMsgIhevJhoovLgRcvK04euRCQsMFFuLJgfU+ftCzC9tw6yGmsRTQorbAVVUDgrRxtYaSgYozm+RUXtNmvu106fzNYfkp2MPsSyonjV/TFwycL9P/sVUNaxpIQBIQhg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- SN6PR01MB4496.prod.exchangelabs.com (2603:10b6:805:e4::32) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.21; Thu, 26 Jan 2023 20:29:27 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::d8d6:449f:967:ccb5]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::d8d6:449f:967:ccb5%7]) with mapi id 15.20.6043.022; Thu, 26 Jan 2023
- 20:29:27 +0000
-Message-ID: <104c2782-4d9a-22ce-d680-08d01733fb4e@talpey.com>
-Date:   Thu, 26 Jan 2023 15:29:25 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: pcap of misbehaving fallocate over cifs rdma
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        Steve French <smfrench@gmail.com>
-Cc:     Steve French <sfrench@samba.org>,
+        with ESMTP id S229448AbjAZUtL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Jan 2023 15:49:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B362F1BD8
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Jan 2023 12:48:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674766088;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QOa1f6eDeA/kW0lQNCHenMzIgi8GWue4frugwTASAHI=;
+        b=DK+zjFPCpAestBUySHkpILiA+yyWwHMF2jMpHLnUjuQxlu6EneHHyckeDrBgQwcQC4gGIq
+        jXtn/GFryvidTjRieCtfyfSDMcYhem2YGJ5f2JDM+rETXT2iVREoadu+1Ac04m28pl5tCZ
+        6OXGUYG7WDQbzrBkYgCgkBHdGdD5QqQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-588-Yb31RANPP-ChQKOJ3tSVxQ-1; Thu, 26 Jan 2023 15:47:57 -0500
+X-MC-Unique: Yb31RANPP-ChQKOJ3tSVxQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E64A380450C;
+        Thu, 26 Jan 2023 20:47:57 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C28384014EBE;
+        Thu, 26 Jan 2023 20:47:55 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <104c2782-4d9a-22ce-d680-08d01733fb4e@talpey.com>
+References: <104c2782-4d9a-22ce-d680-08d01733fb4e@talpey.com> <CAH2r5mupuFEw4hY7uOYjeHi08pS9vv3n30KppR_CTrKZ4xAdnw@mail.gmail.com> <3006f2ac-c70f-57d0-8286-ffd5892571f7@talpey.com> <fa35788a-c858-11c5-5d9a-1d5c837020b6@talpey.com> <1130899.1674582538@warthog.procyon.org.uk> <2132364.1674655333@warthog.procyon.org.uk> <2302242.1674679279@warthog.procyon.org.uk> <2341329.1674686619@warthog.procyon.org.uk> <06b1c12f-7662-d822-4c8d-4f76f7e8ab01@talpey.com> <2811906.1674744126@warthog.procyon.org.uk> <2896646.1674762874@warthog.procyon.org.uk>
+To:     Tom Talpey <tom@talpey.com>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        Steve French <sfrench@samba.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         Long Li <longli@microsoft.com>,
         Namjae Jeon <linkinjeon@kernel.org>,
         Stefan Metzmacher <metze@samba.org>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org
-References: <CAH2r5mupuFEw4hY7uOYjeHi08pS9vv3n30KppR_CTrKZ4xAdnw@mail.gmail.com>
- <3006f2ac-c70f-57d0-8286-ffd5892571f7@talpey.com>
- <fa35788a-c858-11c5-5d9a-1d5c837020b6@talpey.com>
- <1130899.1674582538@warthog.procyon.org.uk>
- <2132364.1674655333@warthog.procyon.org.uk>
- <2302242.1674679279@warthog.procyon.org.uk>
- <2341329.1674686619@warthog.procyon.org.uk>
- <06b1c12f-7662-d822-4c8d-4f76f7e8ab01@talpey.com>
- <2811906.1674744126@warthog.procyon.org.uk>
- <2896646.1674762874@warthog.procyon.org.uk>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <2896646.1674762874@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL0PR01CA0007.prod.exchangelabs.com (2603:10b6:208:71::20)
- To SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33)
+Subject: Re: pcap of misbehaving fallocate over cifs rdma
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|SN6PR01MB4496:EE_
-X-MS-Office365-Filtering-Correlation-Id: a72b5421-9fc4-43f8-bc78-08daffdc0516
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4cuYNafYrYE+fmX740JlyqgrciH4OFu3QP8BwFGMmY1CNl7eHo3FKMVzB3gR8Iy0m7NagvcBUriZjJfvF47ZS57bZJw3gJm/1kd0WNA2pcXqMM93Ja3h1BbbZw2ajFTJrOYJUGOXyeDBDfdQL40hkyWFO+OmZjTK6m6Da/CES1Jhfk8lRWN9Mb0YRcu5+a6q9BoYbkmK1TtYoAnF0cTVZ2dLxi+S8waz3occFqMXuM9kVxbV0I0LNAgQoMxqu+lvHNViXSORyOA+T3SRzWShBg8BexVfYOHmx3YqNWhPrtSWwqIwfeHNCzSGcuHWHkATmcb9cJ4CuVipFuIqZwhbGZI5psYK3563ornOG2MlwdggeGBHR7pEslOXpgMciKKd3CcNHG/DsPYJ8Dxf+KxrWbQNbbgvPwVmh5pqyYCsb2oiTFihtHIerw6NsBHpIwiHsCgVYO1eTbEirUL0Xrby+yfkGaDJb8fRBOI88l8Z2aKwtZXmTVL3KFCT3Y3+KoICvkYXcYvlN7SG1OOG7AfC2AlHOZuj7RXYuh7LPf+slb2fDy+w9Qw+BMIaFaVm7byeHDZVoCwDdIji34xPJKQGgaJsJe3z8+etgD8FqrbQG3Vdw/zVSJN0kiKuAdI9rhlKeK8A9j31yhtQOaVkqhC1TXHtjt5LP8qX+g72tWchDQQS2XSdWclX++jAoTCHHMEZaLJ7fOHXAy1aieNuu7Yhe84djqmCnfyYqgdrwiz7OWo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230025)(136003)(39830400003)(396003)(366004)(376002)(346002)(451199018)(186003)(31686004)(36756003)(8676002)(31696002)(38100700002)(26005)(38350700002)(83380400001)(7416002)(66574015)(2616005)(86362001)(54906003)(6512007)(5660300002)(110136005)(478600001)(53546011)(41300700001)(6486002)(52116002)(6506007)(66476007)(66556008)(8936002)(2906002)(4326008)(316002)(66946007)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NExZUjhRODFhSVdBSENHa2h1eTNjWkRVTzRrdHhJRWFVTWtCZ21aeXhzSmpR?=
- =?utf-8?B?b0locTNkeEh6S3lFdHVGZ3lFNGJYbGswcWtIVG5PTjZRaVJEeE5FeHBmVFV5?=
- =?utf-8?B?V2d4R2EzdFVCTjRmdmJIZE9LU0NCSzBJRU00bzFWak9QODY5bU5mcTJqZ3kr?=
- =?utf-8?B?V2J4ZFdXNkVOZmVGdUpHc0hFbGJLVjdYSU1EaDVLK1c4R0VBSFNhdWQ3S1Rl?=
- =?utf-8?B?VVpMWVFpaC9wTUpWb3BXcWZTd0hnS25nTzBNNlJJWFhtOTNBZXZ3OENwYXVi?=
- =?utf-8?B?eUlNTTZITjZxUEJPNEZMSks0TjQxekRIU2p5RFlnNFhwS3J0ODZQd1pzU1VO?=
- =?utf-8?B?ZWNTNUdxTkdDTllKVEkvYWFsY3VIMzRtMUYrSHNtbUhTSGo4Y3RrRkljcElp?=
- =?utf-8?B?cXRCNU1penZid1ZHYUVKRVdtSTJWWmNnMEY5c1k0OGpWTW9CT0dEZlpVSTNm?=
- =?utf-8?B?TXlsbmEyWmZBNE4ySm5teDZOMlJWK0hRejNEYUw2TFNnc0s1NzBBSHM1T1Ju?=
- =?utf-8?B?K2lUZHRQZG9MQlhDOVYwQ01BMzdtT2tTMEErZnRHTGt2a1h5blFFb1hGM0c2?=
- =?utf-8?B?YUpsRDdJU2E1dmtqWXRpRnV6b3dScE81bU9SL1JDd2tPSHR0b3pmQnNGOUVX?=
- =?utf-8?B?SktMT1paRjF6N0w0aVdhbHlmR0dibUZmV0ZUTEt4TXo1MGlvaElFS3k2WjZV?=
- =?utf-8?B?UTd1NlVZVFlkUkRVRTB5S2VSeG5NMjFrODJtU01HM3YrRnA3cFppcDVtdzdM?=
- =?utf-8?B?S1UyU1FRdDJhOGtlRmY3SUVSWGJVbGQrYkVqRkRaME9YRTNTWHpOT3VBZDZB?=
- =?utf-8?B?eFZOTXg3V0JJNjFobUdGZ2pLWTlyOWpiMGJDRHRHTW1Cbm1uT2JXaStjY0NL?=
- =?utf-8?B?a1UxUjJPa2U1Q2ZrY3lhUDVQbjJWMjhQSmozcWRRMlRiVGlWblc2bHNoRDJ1?=
- =?utf-8?B?MXZVUVNQekRUeUlVN0dNU0RFMkNWTTJITVVFdnhTRE9McktyWWI5dHJEdDJz?=
- =?utf-8?B?cG5zMkdFNGJ6d1lVblFIZDc2cUNCdWFCYlpxMkxSbVdOSExaVGs1S3R1ZGJJ?=
- =?utf-8?B?RUFjVlB2VWQyY05pdWRoT2V1UnFFbUUwZW50aXFvWmsyLzZPbVZnU0lkc3RJ?=
- =?utf-8?B?b08yUWZoUGVZdStsS285c2R0bm0vTHVBYTNuNXoxUTdUdHduODdoTnJFNjd0?=
- =?utf-8?B?b0kxY3EwcG4rdit2ak1CUkN5OTJROXNSeFNPbWcyRUVXcUFHNXdPRnJmMjlX?=
- =?utf-8?B?US92czNSTU5tcGxVNm9GWDhFcnBGT2RiYzg4cXFjUms3VkkrTi9zOGJvdkE4?=
- =?utf-8?B?UXU0ZmJ6TDNqSHpqRHV1WWdNb2JHY1RSS3Z3RngvcWFOQkJrTzNBeDFKeXpv?=
- =?utf-8?B?Ty9nRzBPSkExNG91Ump5TTVkQXJjdEM2aHdBY0VWenlHVndvYlRNMzV1MGNo?=
- =?utf-8?B?cDNjdEhhN1JySjBkdVE0Q25pUm85anRZNjFZLzhuNWNaYnB6SUhnQm9ZZ3JF?=
- =?utf-8?B?MkRkQ0s2VlExNzNiR1AxaXg1U3N3blJiNERTMTUxemJFSEpPY0lmRkJ5OTU1?=
- =?utf-8?B?MVAwK0JBU1hDM05mRkRTUGkyamtxMkhBN2VyU1VTSW9RVTNmNkplTkROUnJE?=
- =?utf-8?B?VU1aUTcwVWl5VmQvS3lHdzA4NkxlRWFtR0YxQUNEWUdqU2VBbTRzM1lSb3BQ?=
- =?utf-8?B?UjR2UVBTMmk3V2VWV2JZWUVvRURRWUQrUDdBc2t0ZXdhRy8vdGxaMm9tMkV4?=
- =?utf-8?B?clgxdlVuNm1pcGpyeGtDbU1VVENrT0crMzk1NE1MU0dabzNKbmJrRGFlVWFi?=
- =?utf-8?B?UGpWbFVPaExXUTBCTDRoaG42Z0ZJZ1lkN0U2OXJ6WGxyUGUvMFdkSGJDdklW?=
- =?utf-8?B?MDVIL201dzg2YmpSMnFKMUVXaWU4TjFkM1AyOFNidDNJN0VpaFk3VDZyVzdR?=
- =?utf-8?B?N3JOdVEvelV6RlVBYWZ3b2Y4MmF5emQwdm13QjdLTjVsT0YyUnVzUStmMmdL?=
- =?utf-8?B?QmRDR0ZaQ21heFF6R2VtUjNxc29hVW0wK1NxYjR0U0N5d0xpODA2bmdDdWtH?=
- =?utf-8?B?WDJqQjI1dW1hMHE5cDc3VGJPMXZTeGRSNXJNaUlFZlVhcTIwZlFRM2JPZUhD?=
- =?utf-8?Q?FrzEGggS68cLmu5GpeElkC+TV?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a72b5421-9fc4-43f8-bc78-08daffdc0516
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2023 20:29:27.1016
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4eeShW3jb8cmP0dfz2jvSwWec5DdCqwdclwLof5r0oM2Smi6BAH5RkCjc6StTwLc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR01MB4496
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 26 Jan 2023 20:47:55 +0000
+Message-ID: <2899394.1674766075@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 1/26/2023 2:54 PM, David Howells wrote:
-> Steve French <smfrench@gmail.com> wrote:
-> 
->> I am puzzled ... you show the fallocate failing but why do you mention
->> it sending data, sending writes
-> 
-> smb3_simple_fallocate_write_range() sends data.
-> 
->> - when I try the fallocate you pasted above I see what is in the attached
->> screenshot go over the network (no writes) - and your example looks like it
->> simply doesn't send anything then resets the session at frame 93
-> 
-> Look at frame 92.  That's the concluding packet of the write performed by
-> smb3_simple_fallocate_write_range().
-> 
->    74 4.568861795  192.168.6.2 -> 192.168.6.1  SMB2 250 Ioctl Request FSCTL_QUERY_ALLOCATED_RANGES File: hello
->     75 4.569429926  192.168.6.1 -> 192.168.6.2  SMB2 242 Ioctl Response FSCTL_QUERY_ALLOCATED_RANGES
->     77 4.680495774  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     78 4.680496219  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     79 4.680496364  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     80 4.680496552  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     81 4.680496698  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     82 4.680496844  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     83 4.680496989  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     84 4.680497177  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     88 4.680638842  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     89 4.680639016  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     90 4.680704523  192.168.6.1 -> 192.168.6.2  DDP/RDMA 114 5445 > 50018 Terminate [last DDP segment]
->     91 4.680735089  192.168.6.2 -> 192.168.6.1  DDP/RDMA 1514 50018 > 5445 Send [more DDP segments]
->     92 4.680735359  192.168.6.2 -> 192.168.6.1  SMB2 946 Write Request Len:16384 Off:204800 File: hello
-> 
+Tom Talpey <tom@talpey.com> wrote:
 
-That's a really large SMBDirect Send operation, it looks like it's
-trying to send the entire write in one message and it overflows
-the receive buffer.
+> That's a really large SMBDirect Send operation, it looks like it's
+> trying to send the entire write in one message and it overflows
+> the receive buffer.
+>=20
+> I'm still fighting with wireshark and can't decode the layers
+> above TCP. Can you look at the SMBDirect negotiation at the
+> start of the trace, and tell me what the max send/receive
+> values were set by each side?
 
-I'm still fighting with wireshark and can't decode the layers
-above TCP. Can you look at the SMBDirect negotiation at the
-start of the trace, and tell me what the max send/receive
-values were set by each side?
+Frame 8: 110 bytes on wire (880 bits), 110 bytes captured (880 bits) on int=
+erface enp2s0, id 0
+Ethernet II, Src: IntelCor_bb:e6:30 (00:1b:21:bb:e6:30), Dst: IntelCor_bb:e=
+6:ac (00:1b:21:bb:e6:ac)
+Internet Protocol Version 4, Src: 192.168.6.2, Dst: 192.168.6.1
+Transmission Control Protocol, Src Port: 50018, Dst Port: 5445, Seq: 33, Ac=
+k: 33, Len: 44
+iWARP Marker Protocol data unit Aligned framing
+iWARP Direct Data Placement and Remote Direct Memory Access Protocol
+SMB-Direct (SMB RDMA Transport)
+    NegotiateRequest
+        MinVersion: 0x0100
+        MaxVersion: 0x0100
+        CreditsRequested: 255
+        PreferredSendSize: 1364
+        MaxReceiveSize: 1364
+        MaxFragmentedSize: 1048576
+
+Frame 9: 122 bytes on wire (976 bits), 122 bytes captured (976 bits) on int=
+erface enp2s0, id 0
+Ethernet II, Src: IntelCor_bb:e6:ac (00:1b:21:bb:e6:ac), Dst: IntelCor_bb:e=
+6:30 (00:1b:21:bb:e6:30)
+Internet Protocol Version 4, Src: 192.168.6.1, Dst: 192.168.6.2
+Transmission Control Protocol, Src Port: 5445, Dst Port: 50018, Seq: 33, Ac=
+k: 77, Len: 56
+iWARP Marker Protocol data unit Aligned framing
+iWARP Direct Data Placement and Remote Direct Memory Access Protocol
+SMB-Direct (SMB RDMA Transport)
+    NegotiateResponse
+        MinVersion: 0x0100
+        MaxVersion: 0x0100
+        NegotiatedVersion: 0x0100
+        CreditsRequested: 255
+        CreditsGranted: 254
+        Status: STATUS_SUCCESS (0x00000000)
+        MaxReadWriteSize: 524224
+        PreferredSendSize: 1364
+        MaxReceiveSize: 1364
+        MaxFragmentedSize: 173910
+
+Frame 10: 110 bytes on wire (880 bits), 110 bytes captured (880 bits) on in=
+terface enp2s0, id 0
+Ethernet II, Src: IntelCor_bb:e6:30 (00:1b:21:bb:e6:30), Dst: IntelCor_bb:e=
+6:ac (00:1b:21:bb:e6:ac)
+Internet Protocol Version 4, Src: 192.168.6.2, Dst: 192.168.6.1
+Transmission Control Protocol, Src Port: 50018, Dst Port: 5445, Seq: 77, Ac=
+k: 89, Len: 44
+iWARP Marker Protocol data unit Aligned framing
+iWARP Direct Data Placement and Remote Direct Memory Access Protocol
+SMB-Direct (SMB RDMA Transport)
+    DataMessage
+        CreditsRequested: 255
+        CreditsGranted: 255
+        Flags: 0x0000
+            .... .... .... ...0 =3D ResponseRequested: False
+        RemainingLength: 0
+        DataOffset: 0
+        DataLength: 0
+
+Frame 11: 346 bytes on wire (2768 bits), 346 bytes captured (2768 bits) on =
+interface enp2s0, id 0
+Ethernet II, Src: IntelCor_bb:e6:30 (00:1b:21:bb:e6:30), Dst: IntelCor_bb:e=
+6:ac (00:1b:21:bb:e6:ac)
+Internet Protocol Version 4, Src: 192.168.6.2, Dst: 192.168.6.1
+Transmission Control Protocol, Src Port: 50018, Dst Port: 5445, Seq: 121, A=
+ck: 89, Len: 280
+iWARP Marker Protocol data unit Aligned framing
+iWARP Direct Data Placement and Remote Direct Memory Access Protocol
+SMB-Direct (SMB RDMA Transport)
+    DataMessage
+        CreditsRequested: 255
+        CreditsGranted: 0
+        Flags: 0x0000
+            .... .... .... ...0 =3D ResponseRequested: False
+        RemainingLength: 0
+        DataOffset: 24
+        DataLength: 232
+SMB2 (Server Message Block Protocol version 2)
+    SMB2 Header
+        ProtocolId: 0xfe534d42
+        Header Length: 64
+        Credit Charge: 0
+        Channel Sequence: 0
+        Reserved: 0000
+        Command: Negotiate Protocol (0)
+        Credits requested: 10
+        Flags: 0x00000000
+        Chain Offset: 0x00000000
+        Message ID: 0
+        Process Id: 0x000013c5
+        Tree Id: 0x00000000
+        Session Id: 0x0000000000000000
+        Signature: 00000000000000000000000000000000
+        [Response in: 13]
+    Negotiate Protocol Request (0x00)
+        [Preauth Hash: 81cd52dea94ed363a171b7effe222c0003574f5c54f6c7a1cbb0=
+41676ea9ddf15245b2a4=E2=80=A6]
+        StructureSize: 0x0024
+        Dialect count: 4
+        Security mode: 0x01, Signing enabled
+        Reserved: 0000
+        Capabilities: 0x00000077, DFS, LEASING, LARGE MTU, PERSISTENT HANDL=
+ES, DIRECTORY LEASING, ENCRYPTION
+        Client Guid: c494649a-e636-d94c-a55e-be00d5a02a30
+        NegotiateContextOffset: 0x00000070
+        NegotiateContextCount: 4
+        Reserved: 0000
+        Dialect: SMB 2.1 (0x0210)
+        Dialect: SMB 3.0 (0x0300)
+        Dialect: SMB 3.0.2 (0x0302)
+        Dialect: SMB 3.1.1 (0x0311)
+        Negotiate Context: SMB2_PREAUTH_INTEGRITY_CAPABILITIES=20
+            Type: SMB2_PREAUTH_INTEGRITY_CAPABILITIES (0x0001)
+            DataLength: 38
+            Reserved: 00000000
+            HashAlgorithmCount: 1
+            SaltLength: 32
+            HashAlgorithm: SHA-512 (0x0001)
+            Salt: 1d6e14b44264b6cc1db622478c3826c4cd09df1dc70abf73f13b92617=
+24d4181
+        Negotiate Context: SMB2_ENCRYPTION_CAPABILITIES=20
+            Type: SMB2_ENCRYPTION_CAPABILITIES (0x0002)
+            DataLength: 8
+            Reserved: 00000000
+            CipherCount: 3
+            CipherId: AES-128-GCM (0x0002)
+            CipherId: AES-256-GCM (0x0004)
+            CipherId: AES-128-CCM (0x0001)
+        Negotiate Context: SMB2_NETNAME_NEGOTIATE_CONTEXT_ID=20
+            Type: SMB2_NETNAME_NEGOTIATE_CONTEXT_ID (0x0005)
+            DataLength: 22
+            Reserved: 00000000
+            Netname: 192.168.6.1
+        Negotiate Context: SMB2_POSIX_EXTENSIONS_CAPABILITIES=20
+            Type: SMB2_POSIX_EXTENSIONS_CAPABILITIES (0x0100)
+            DataLength: 16
+            Reserved: 00000000
+            POSIX Reserved: 93ad25509cb411e7b42383de968bcd7c
+
