@@ -2,32 +2,49 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C831C05027
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Jan 2023 16:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECE7C54E94
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Jan 2023 16:42:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232591AbjAZQJP convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 26 Jan 2023 11:09:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47258 "EHLO
+        id S232523AbjAZQmi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 26 Jan 2023 11:42:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbjAZQJN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Jan 2023 11:09:13 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 666DD611C9
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Jan 2023 08:09:09 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-130-3ubTVGOQOF6GfUUMF1oHig-1; Thu, 26 Jan 2023 16:09:06 +0000
-X-MC-Unique: 3ubTVGOQOF6GfUUMF1oHig-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.45; Thu, 26 Jan
- 2023 16:09:05 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.045; Thu, 26 Jan 2023 16:09:05 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'David Howells' <dhowells@redhat.com>
-CC:     Steve French <smfrench@gmail.com>,
+        with ESMTP id S232336AbjAZQmc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Jan 2023 11:42:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C43654DE06
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Jan 2023 08:41:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674751295;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/KtFX/q2/0OOZvzDHVqjHXs3eBRAU+KUlsybGLpin4A=;
+        b=fDXmgJ4M4pIWHVjdTMjtVzS0OaOyfZ68KD6VNs6w28HfN/+kZd/EkgfNzUGLrdXgebI6DT
+        m2BwRUE0/LMGVMjFp/SRaZDfMrDeu7HB1Lc6Sn1cnoA0L+SSbIcBPkbmz8haXaHh4uNha3
+        Ob6EbrsWDXKTvYNVtZmRIaIqxyPzQ7w=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-199-3lTw8DidPgaiMarBdmojow-1; Thu, 26 Jan 2023 11:41:32 -0500
+X-MC-Unique: 3lTw8DidPgaiMarBdmojow-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BE65B3C38FEF;
+        Thu, 26 Jan 2023 16:41:31 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 02F4AC15BA0;
+        Thu, 26 Jan 2023 16:41:29 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <5d0bc437eebb4d5aa4774962a4970095@AcuMS.aculab.com>
+References: <5d0bc437eebb4d5aa4774962a4970095@AcuMS.aculab.com> <0d53a3cc9f9448298bba04d06f51b23d@AcuMS.aculab.com> <20230125214543.2337639-1-dhowells@redhat.com> <20230125214543.2337639-9-dhowells@redhat.com> <2862713.1674747841@warthog.procyon.org.uk>
+To:     David Laight <David.Laight@ACULAB.COM>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
         Al Viro <viro@zeniv.linux.org.uk>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
@@ -40,60 +57,55 @@ CC:     Steve French <smfrench@gmail.com>,
         "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Steve French <sfrench@samba.org>
-Subject: RE: [RFC 08/13] cifs: Add a function to read into an iter from a
- socket
-Thread-Topic: [RFC 08/13] cifs: Add a function to read into an iter from a
- socket
-Thread-Index: AQHZMQai4Pp239USek2HtsrL1M/WuK6wa3EwgABsh4CAAAWBEA==
-Date:   Thu, 26 Jan 2023 16:09:05 +0000
-Message-ID: <5d0bc437eebb4d5aa4774962a4970095@AcuMS.aculab.com>
-References: <0d53a3cc9f9448298bba04d06f51b23d@AcuMS.aculab.com>
- <20230125214543.2337639-1-dhowells@redhat.com>
- <20230125214543.2337639-9-dhowells@redhat.com>
- <2862713.1674747841@warthog.procyon.org.uk>
-In-Reply-To: <2862713.1674747841@warthog.procyon.org.uk>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+Subject: Re: [RFC 08/13] cifs: Add a function to read into an iter from a socket
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2878214.1674751289.1@warthog.procyon.org.uk>
+Date:   Thu, 26 Jan 2023 16:41:29 +0000
+Message-ID: <2878215.1674751289@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: David Howells
-> Sent: 26 January 2023 15:44
-...
-> > I'm also not 100% sure that taking a copy of an iov_iter is a good idea.
+David Laight <David.Laight@ACULAB.COM> wrote:
+
+> > It shouldn't matter as the only problematic iterator is ITER_PIPE
+> > (advancing that has side effects) - and splice_read is handled specially
+> > by patch 4.  The problem with splice_read with the way cifs works is that
+> > it likes to subdivide its read/write requests across multiple reqs and
+> > then subsubdivide them if certain types of failure occur.  But you can't
+> > do that with ITER_PIPE.
 > 
-> It shouldn't matter as the only problematic iterator is ITER_PIPE (advancing
-> that has side effects) - and splice_read is handled specially by patch 4.  The
-> problem with splice_read with the way cifs works is that it likes to subdivide
-> its read/write requests across multiple reqs and then subsubdivide them if
-> certain types of failure occur.  But you can't do that with ITER_PIPE.
+> I was thinking that even if ok at the moment it might be troublesome later.
+> Somewhere I started writing a patch to put the iov_cache[] for user
+> requests into the same structure as the iterator.
+> Copying those might cause oddities.
 
-I was thinking that even if ok at the moment it might be troublesome later.
-Somewhere I started writing a patch to put the iov_cache[] for user
-requests into the same structure as the iterator.
-Copying those might cause oddities.
+Well, there is dup_iter(), but that copies the vector table, which isn't what
+we want in a number of cases.  You probably need to come up with a wrapper for
+that.
 
-> I build an ITER_BVEC from ITER_PIPE, ITER_UBUF and ITER_IOVEC in the top
-> levels with pins inserted as appropriate and hand the ITER_BVEC down.  For
-> user-backed iterators it has to be done this way because the I/O may get
-> shuffled off to a different thread.
+But we copy iters by assignment in a lot of places.  With regards to msg_hdr,
+it might be worth giving it an iterator pointer rather than its own iterator.
 
-For sub-page sided transfers it is probably worth doing a bounce buffer
-copy of user requests - just to save all the complex page pinning code.
+I've just had a go at attempting to modify the code.
+cifs_read_iter_from_socket() wants to copy the iterator and truncate the copy,
+which makes things slightly trickier.  For both of the call sites,
+receive_encrypted_read() and cifs_readv_receive(), it can do the truncation
+before calling cifs_read_iter_from_socket(), I think - but it may have to undo
+the truncation afterwards.
 
-	David
+> > I build an ITER_BVEC from ITER_PIPE, ITER_UBUF and ITER_IOVEC in the top
+> > levels with pins inserted as appropriate and hand the ITER_BVEC down.  For
+> > user-backed iterators it has to be done this way because the I/O may get
+> > shuffled off to a different thread.
+> 
+> For sub-page sided transfers it is probably worth doing a bounce buffer
+> copy of user requests - just to save all the complex page pinning code.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+You can't avoid it for async DIO reads.  But that sort of thing I'm intending
+to do in netfslib.
+
+David
 
