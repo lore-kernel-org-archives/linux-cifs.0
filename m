@@ -2,58 +2,244 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19FE9C38142
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Jan 2023 10:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE7FC54EAA
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Jan 2023 11:14:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231972AbjA0Ki7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 Jan 2023 05:38:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47212 "EHLO
+        id S232933AbjA0LOf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 Jan 2023 06:14:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232008AbjA0Ki5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 Jan 2023 05:38:57 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 188121735;
-        Fri, 27 Jan 2023 02:38:52 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pLM7x-004gYD-Ql; Fri, 27 Jan 2023 18:38:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Jan 2023 18:38:37 +0800
-Date:   Fri, 27 Jan 2023 18:38:37 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     smfrench@gmail.com, viro@zeniv.linux.org.uk,
-        nspmangalore@gmail.com, rohiths.msft@gmail.com, tom@talpey.com,
-        metze@samba.org, hch@infradead.org, willy@infradead.org,
-        jlayton@kernel.org, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sfrench@samba.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 06/13] cifs: Add a function to Hash the contents of an
- iterator
-Message-ID: <Y9OprbIBseKadiej@gondor.apana.org.au>
-References: <Y9Om95NlPTFiHMSj@gondor.apana.org.au>
- <2957463.1674815638@warthog.procyon.org.uk>
+        with ESMTP id S232996AbjA0LOa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 Jan 2023 06:14:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C5E1040D
+        for <linux-cifs@vger.kernel.org>; Fri, 27 Jan 2023 03:13:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674818019;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1T3l0J0UinmjdVIL92SoZoP9qVR5G6gLjIHVlY/tDsY=;
+        b=PhVfH0vxJOC0IcPWxjBllsaxOcMBINM0GDy09NU6BBtgCeroiLvcYlWQv4SAyvtSz78ELE
+        NxfsKNuvsfhDqMIQjS2HpV02wgCvA9yBP+m9DX1uUGL8lpxoPrAsPhxUdep+TXNYJCDPU0
+        zBAqgf1FtxoY43BSTF88uS2bBwqq5DE=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-209-MN2z4d4iNOOeOVil6Q1cDQ-1; Fri, 27 Jan 2023 06:13:37 -0500
+X-MC-Unique: MN2z4d4iNOOeOVil6Q1cDQ-1
+Received: by mail-qk1-f200.google.com with SMTP id u11-20020a05620a430b00b007052a66d201so2804831qko.23
+        for <linux-cifs@vger.kernel.org>; Fri, 27 Jan 2023 03:13:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1T3l0J0UinmjdVIL92SoZoP9qVR5G6gLjIHVlY/tDsY=;
+        b=q/IbDED5g5PtVx4r+BQv1EOexvK4qsFHvHVuUP2Vtmg7xzJrmXm3NLfqHocmJCSXPl
+         /nXUfAAeK5GpzUchzWS1d7fFgt6Nv/ntc6VghJRzmQeyEn10+ZNKMF6jP3k7fU5w/1Ie
+         I1kH0BtNSJUqvcI2LAzG9tUqPk4fztABQ6tmccmdpawhGHLeDY46Mtxyny7IJf/YripH
+         +fwB2d+sqfFG1Lr7XRLCtCvrxUBhtrB5Q0uOW1WZnqAJsgWgSjiAgawHkEh+ZmhH3meP
+         XkvnIUlESsP1rmJuNGa1Y0UfqUycnRyXA2HtUHpixElZguFC/BNUMensX86hmLDSaZZP
+         exqQ==
+X-Gm-Message-State: AFqh2krWfJbP46La2PDxvxwqbMwGi3MGDxTDNvuTc3+G6zH9IxxeYzIn
+        Xqnc9L5Cuu7fUvoeKLlMZaQ4Q8OTNnMTgPfg1cEJhecks/1kIDeSm+rdca1fL6Hj+7G4ojke2cr
+        xi7819I2HUqkSjq8elHrlWw==
+X-Received: by 2002:a05:6214:3c88:b0:535:54ab:16a3 with SMTP id ok8-20020a0562143c8800b0053554ab16a3mr51822485qvb.45.1674818016537;
+        Fri, 27 Jan 2023 03:13:36 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuXFIWEponDCw/N8IxhQ8sfn+0efm/HOuhAWzS7r2hIRFsXIlF4IzozvtJcCyEtL8KlXxK4Pw==
+X-Received: by 2002:a05:6214:3c88:b0:535:54ab:16a3 with SMTP id ok8-20020a0562143c8800b0053554ab16a3mr51822457qvb.45.1674818016219;
+        Fri, 27 Jan 2023 03:13:36 -0800 (PST)
+Received: from [192.168.1.3] (68-20-15-154.lightspeed.rlghnc.sbcglobal.net. [68.20.15.154])
+        by smtp.gmail.com with ESMTPSA id pj4-20020a05620a1d8400b0070648cf78bdsm2659198qkn.54.2023.01.27.03.13.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jan 2023 03:13:35 -0800 (PST)
+Message-ID: <148c5edccd0f26851d9fe7883e9025383f4399eb.camel@redhat.com>
+Subject: Re: [PATCH] vfs: parse sloppy mount option in correct order
+From:   Jeff Layton <jlayton@redhat.com>
+To:     Ian Kent <raven@themaw.net>, Al Viro <viro@ZenIV.linux.org.uk>
+Cc:     Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        linux-nfs-list <linux-nfs@vger.kernel.org>,
+        David Wysochanski <dwysocha@redhat.com>,
+        David Howells <dhowells@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Roberto Bergantinos Corpas <rbergant@redhat.com>
+Date:   Fri, 27 Jan 2023 06:13:34 -0500
+In-Reply-To: <166432738753.7008.13932358518650344215.stgit@donald.themaw.net>
+References: <166432738753.7008.13932358518650344215.stgit@donald.themaw.net>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2957463.1674815638@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 10:33:58AM +0000, David Howells wrote:
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> 
-> > Please convert this to ahash.  The whole point of shash is to
-> > process *small* amounts of data that is not on an SG list.
-> 
-> Is ahash offloaded to another thread or hardware?
+On Wed, 2022-09-28 at 09:09 +0800, Ian Kent wrote:
+> From: Roberto Bergantinos Corpas <rbergant@redhat.com>
+>=20
+> With addition of fs_context support, options string is parsed
+> sequentially, if 'sloppy' option is not leftmost one, we may
+> return ENOPARAM to userland if a non-valid option preceeds sloopy
+> and mount will fail :
+>=20
+> host# mount -o quota,sloppy 172.23.1.225:/share /mnt
+> mount.nfs: an incorrect mount option was specified
+> host# mount -o sloppy,quota 172.23.1.225:/share /mnt
+> host#
+>=20
+> This patch correct that behaviour so that sloppy takes precedence
+> if specified anywhere on the string
+>=20
+> changes since v1:
+> - add a boolean to fs context and postpone error reporting until
+>   parsing is done.
+>=20
+> Signed-off-by: Roberto Bergantinos Corpas <rbergant@redhat.com>
+> ---
+>  fs/cifs/fs_context.c       |    4 ++--
+>  fs/cifs/fs_context.h       |    1 -
+>  fs/fs_context.c            |   14 ++++++++++++--
+>  fs/nfs/fs_context.c        |    5 +++--
+>  fs/nfs/internal.h          |    1 -
+>  include/linux/fs_context.h |    2 ++
+>  6 files changed, 19 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+> index 0e13dec86b25..32c3fdd7d27a 100644
+> --- a/fs/cifs/fs_context.c
+> +++ b/fs/cifs/fs_context.c
+> @@ -864,7 +864,7 @@ static int smb3_fs_context_parse_param(struct fs_cont=
+ext *fc,
+>  	if (!skip_parsing) {
+>  		opt =3D fs_parse(fc, smb3_fs_parameters, param, &result);
+>  		if (opt < 0)
+> -			return ctx->sloppy ? 1 : opt;
+> +			return fc->sloppy ? 1 : opt;
+>  	}
+> =20
+>  	switch (opt) {
+> @@ -1420,7 +1420,7 @@ static int smb3_fs_context_parse_param(struct fs_co=
+ntext *fc,
+>  		ctx->multiuser =3D true;
+>  		break;
+>  	case Opt_sloppy:
+> -		ctx->sloppy =3D true;
+> +		fc->sloppy =3D true;
+>  		break;
+>  	case Opt_nosharesock:
+>  		ctx->nosharesock =3D true;
+> diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
+> index bbaee4c2281f..75e4c41466fa 100644
+> --- a/fs/cifs/fs_context.h
+> +++ b/fs/cifs/fs_context.h
+> @@ -157,7 +157,6 @@ struct smb3_fs_context {
+>  	bool uid_specified;
+>  	bool cruid_specified;
+>  	bool gid_specified;
+> -	bool sloppy;
+>  	bool got_ip;
+>  	bool got_version;
+>  	bool got_rsize;
+> diff --git a/fs/fs_context.c b/fs/fs_context.c
+> index df04e5fc6d66..911a36bf2226 100644
+> --- a/fs/fs_context.c
+> +++ b/fs/fs_context.c
+> @@ -157,8 +157,15 @@ int vfs_parse_fs_param(struct fs_context *fc, struct=
+ fs_parameter *param)
+>  	if (ret !=3D -ENOPARAM)
+>  		return ret;
+> =20
+> -	return invalf(fc, "%s: Unknown parameter '%s'",
+> -		      fc->fs_type->name, param->key);
+> +	/* We got an invalid parameter, but sloppy may have been specified
+> +	 * later on param string.
+> +	 * Let's wait to process whole params to return EINVAL.
+> +	 */
+> +
+> +	fc->param_inval =3D true;
+> +	errorf(fc, "%s: Unknown parameter '%s'", fc->fs_type->name, param->key)=
+;
 
-That's something you can control when you allocate the ahash
-object? You could even restrict it to sync algorithms by setting
-type to 0 and mask to CRYPTO_ALG_SYNC.
+Is it correct to store an error message when we don't know whether
+"sloppy" has been specified yet?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> +
+> +	return 0;
+>  }
+>  EXPORT_SYMBOL(vfs_parse_fs_param);
+> =20
+> @@ -234,6 +241,9 @@ int generic_parse_monolithic(struct fs_context *fc, v=
+oid *data)
+>  		}
+>  	}
+> =20
+> +	if (!fc->sloppy && fc->param_inval)
+> +		ret =3D -EINVAL;
+> +
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL(generic_parse_monolithic);
+> diff --git a/fs/nfs/fs_context.c b/fs/nfs/fs_context.c
+> index 4da701fd1424..09da63cc84f7 100644
+> --- a/fs/nfs/fs_context.c
+> +++ b/fs/nfs/fs_context.c
+> @@ -485,7 +485,7 @@ static int nfs_fs_context_parse_param(struct fs_conte=
+xt *fc,
+> =20
+>  	opt =3D fs_parse(fc, nfs_fs_parameters, param, &result);
+>  	if (opt < 0)
+> -		return (opt =3D=3D -ENOPARAM && ctx->sloppy) ? 1 : opt;
+> +		return (opt =3D=3D -ENOPARAM && fc->sloppy) ? 1 : opt;
+> =20
+>  	if (fc->security)
+>  		ctx->has_sec_mnt_opts =3D 1;
+> @@ -853,7 +853,8 @@ static int nfs_fs_context_parse_param(struct fs_conte=
+xt *fc,
+>  		 * Special options
+>  		 */
+>  	case Opt_sloppy:
+> -		ctx->sloppy =3D true;
+> +		fc->sloppy =3D true;
+> +		dfprintk(MOUNT, "NFS:   relaxing parsing rules\n");
+>  		break;
+>  	}
+> =20
+> diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
+> index 898dd95bc7a7..83552def96f1 100644
+> --- a/fs/nfs/internal.h
+> +++ b/fs/nfs/internal.h
+> @@ -90,7 +90,6 @@ struct nfs_fs_context {
+>  	bool			internal;
+>  	bool			skip_reconfig_option_check;
+>  	bool			need_mount;
+> -	bool			sloppy;
+>  	unsigned int		flags;		/* NFS{,4}_MOUNT_* flags */
+>  	unsigned int		rsize, wsize;
+>  	unsigned int		timeo, retrans;
+> diff --git a/include/linux/fs_context.h b/include/linux/fs_context.h
+> index ff1375a16c8c..d91d42bc06ce 100644
+> --- a/include/linux/fs_context.h
+> +++ b/include/linux/fs_context.h
+> @@ -111,6 +111,8 @@ struct fs_context {
+>  	bool			need_free:1;	/* Need to call ops->free() */
+>  	bool			global:1;	/* Goes into &init_user_ns */
+>  	bool			oldapi:1;	/* Coming from mount(2) */
+> +	bool                    sloppy:1;       /* If fs support it and was spe=
+cified */
+> +	bool                    param_inval:1;  /* If set, check sloppy value *=
+/
+>  };
+> =20
+>  struct fs_context_operations {
+>=20
+>=20
+
+Overall, the patch looks reasonable though.
+--=20
+Jeff Layton <jlayton@redhat.com>
+
