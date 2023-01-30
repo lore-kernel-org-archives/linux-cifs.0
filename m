@@ -2,89 +2,125 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF55C54EED
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 09:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3ADC61DA4
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 09:26:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236333AbjA3J0B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 04:26:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56086 "EHLO
+        id S236375AbjA3J0H (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 04:26:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236070AbjA3JZQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 04:25:16 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD12A2FCE3;
-        Mon, 30 Jan 2023 01:24:17 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id q10so10386411wrm.4;
-        Mon, 30 Jan 2023 01:24:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vfICYlOuLoOFLmSVCsv7Ez+Wg1iIfXBt/b5H/P4TiEQ=;
-        b=fAr+gRUQ7tl3KvPS7+xNmBeEAU0Yuce94GDMBv2SkZ7oKen6ZHC2e4T3ix7t3Xzj3d
-         kW5kAA34cUt2REzQ4bDyJwRm6VxuW2uazTE7Yf5mx+BehyY0MEpWwM4759kcl9x3bbg+
-         wKCE07oAsTri8cQ8GN9H7Cbk5mPciyjI12xKAN5dxSr56uGsYhXUDFTVV8bTVR5caF/C
-         gng9jNGVpnXtqgjCzDDcMJvY9duVyY5E/f0YPM2sxABhW+ULHFWTdbbjvWjyRL6QKLNC
-         49OmfCY2ZyOMQVhUhL1eWlPgXdciB9KYaqO4JYv6wCwwWnmrfwtnaMKTdWZmi3efdi8U
-         Zwhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vfICYlOuLoOFLmSVCsv7Ez+Wg1iIfXBt/b5H/P4TiEQ=;
-        b=XKo9i7E0+P2s0O2qgNzvWkjLXPydFg0WHelsYd6PrDvlhV0TPMAKUKSfgmgrwOU4x9
-         F5r6ATQoeJ+ValC078zNKoEg1OxppBd1nBwbJTeJMluN0xsoO+owQ2kmAyziWAYVFMm6
-         MwulukIT8NlfqqV0+APEqZMhIxpCoLFrhV1sdWZ5I+FP9vFc5UT0SSLXGMhr6ZZeGkWI
-         gyszf8ghUZ/6DUFVAvzKfGTwxZ8dWnVvYluDgXvpv7VKrQWX+G6uAqFWeLLGCicPusAZ
-         /NYnP4bbbbnP9OwnB5a6DnOIgIoCgKm2ECCTbQdXhBY76uptgOZgvRl8IuYEr2Bt/7pj
-         jMxQ==
-X-Gm-Message-State: AO0yUKXC6fjgkllt0Mkfc8plgYGpF9Yq37zTdvIQ+r8+pKIACe7KI3yG
-        DYMnynfHfFESWlp9oRuCH28=
-X-Google-Smtp-Source: AK7set+2myVLd06Pu5edYxOwUfsZKmitHbZAGtWszR3c1HZ2HD+vVEMkpKY6OnedR68lQkQl+PpjpA==
-X-Received: by 2002:a05:6000:1448:b0:2bf:decb:ecac with SMTP id v8-20020a056000144800b002bfdecbecacmr8700884wrx.11.1675070638360;
-        Mon, 30 Jan 2023 01:23:58 -0800 (PST)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id x7-20020a5d6b47000000b002bbed1388a5sm11348862wrw.15.2023.01.30.01.23.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 01:23:57 -0800 (PST)
-From:   Colin Ian King <colin.i.king@gmail.com>
-To:     Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <sfrench@samba.org>,
+        with ESMTP id S235649AbjA3JZr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 04:25:47 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 513A32FCDD;
+        Mon, 30 Jan 2023 01:24:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=qP38AeUO0Rmk+VJkMh1f6goA+lT+IUSKmsc4pvMdtPc=; b=0U7C/4XVekTjj+yEkY+iPbVHS9
+        SCowiG4W/On0oC0DNts1jXCq9PANMU5TUjGyEzvCijD/oLG1m+VrJYiNlUNGYBjErEfnFoIaWXips
+        Gq6HKuysFUNiA+dHDOA8lPW1NJrEyhAS3EvRq0MYqc1fbaCN4zTed7e8bCwvFLNiLRhH89ZXkRYWZ
+        FwX12RJjOzkFSnF6rDP7RrVrDM1m8vuCfiYubETB3lLkrwswOgdkZmV8ceIYxk1be2k15UTBH1+s7
+        TP/jadRuAY8HqN/XCCqPHefZ1IPYFmZgmKkFBJP1ZRIdSdEy6x6V7+/hRtYyooMunB7/mc5ClXWZB
+        UVK1amGg==;
+Received: from [2001:4bb8:19a:272a:732e:e417:47d7:2f4a] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pMQNH-002oGb-QE; Mon, 30 Jan 2023 09:22:52 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH][next] ksmbd: Fix spelling mistake "excceed" -> "exceeded"
-Date:   Mon, 30 Jan 2023 09:23:57 +0000
-Message-Id: <20230130092357.36730-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: [PATCH 15/23] nfs: use bvec_set_page to initialize bvecs
+Date:   Mon, 30 Jan 2023 10:21:49 +0100
+Message-Id: <20230130092157.1759539-16-hch@lst.de>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230130092157.1759539-1-hch@lst.de>
+References: <20230130092157.1759539-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-There is a spelling mistake in an error message. Fix it.
+Use the bvec_set_page helper to initialize bvecs.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/ksmbd/connection.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/nfs/fscache.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
-index 56be077e5d8a..0f7eab5aa04c 100644
---- a/fs/ksmbd/connection.c
-+++ b/fs/ksmbd/connection.c
-@@ -312,7 +312,7 @@ int ksmbd_conn_handler_loop(void *p)
- 			max_allowed_pdu_size = SMB3_MAX_MSGSIZE;
+diff --git a/fs/nfs/fscache.c b/fs/nfs/fscache.c
+index e731c00a9fcbc3..ea5f2976dfaba4 100644
+--- a/fs/nfs/fscache.c
++++ b/fs/nfs/fscache.c
+@@ -245,14 +245,12 @@ static int fscache_fallback_read_page(struct inode *inode, struct page *page)
+ 	struct netfs_cache_resources cres;
+ 	struct fscache_cookie *cookie = nfs_i_fscache(inode);
+ 	struct iov_iter iter;
+-	struct bio_vec bvec[1];
++	struct bio_vec bvec;
+ 	int ret;
  
- 		if (pdu_size > max_allowed_pdu_size) {
--			pr_err_ratelimited("PDU length(%u) excceed maximum allowed pdu size(%u) on connection(%d)\n",
-+			pr_err_ratelimited("PDU length(%u) exceeded maximum allowed pdu size(%u) on connection(%d)\n",
- 					pdu_size, max_allowed_pdu_size,
- 					conn->status);
- 			break;
+ 	memset(&cres, 0, sizeof(cres));
+-	bvec[0].bv_page		= page;
+-	bvec[0].bv_offset	= 0;
+-	bvec[0].bv_len		= PAGE_SIZE;
+-	iov_iter_bvec(&iter, ITER_DEST, bvec, ARRAY_SIZE(bvec), PAGE_SIZE);
++	bvec_set_page(&bvec, page, PAGE_SIZE, 0);
++	iov_iter_bvec(&iter, ITER_DEST, &bvec, 1, PAGE_SIZE);
+ 
+ 	ret = fscache_begin_read_operation(&cres, cookie);
+ 	if (ret < 0)
+@@ -273,16 +271,14 @@ static int fscache_fallback_write_page(struct inode *inode, struct page *page,
+ 	struct netfs_cache_resources cres;
+ 	struct fscache_cookie *cookie = nfs_i_fscache(inode);
+ 	struct iov_iter iter;
+-	struct bio_vec bvec[1];
++	struct bio_vec bvec;
+ 	loff_t start = page_offset(page);
+ 	size_t len = PAGE_SIZE;
+ 	int ret;
+ 
+ 	memset(&cres, 0, sizeof(cres));
+-	bvec[0].bv_page		= page;
+-	bvec[0].bv_offset	= 0;
+-	bvec[0].bv_len		= PAGE_SIZE;
+-	iov_iter_bvec(&iter, ITER_SOURCE, bvec, ARRAY_SIZE(bvec), PAGE_SIZE);
++	bvec_set_page(&bvec, page, PAGE_SIZE, 0);
++	iov_iter_bvec(&iter, ITER_SOURCE, &bvec, 1, PAGE_SIZE);
+ 
+ 	ret = fscache_begin_write_operation(&cres, cookie);
+ 	if (ret < 0)
 -- 
-2.30.2
+2.39.0
 
