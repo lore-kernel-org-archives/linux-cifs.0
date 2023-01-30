@@ -2,74 +2,108 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7823FC05027
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 00:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5023C54EED
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 01:57:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbjA3APL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 29 Jan 2023 19:15:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38744 "EHLO
+        id S229977AbjA3B50 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 Jan 2023 20:57:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjA3APK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Jan 2023 19:15:10 -0500
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A071D199D7
-        for <linux-cifs@vger.kernel.org>; Sun, 29 Jan 2023 16:15:09 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id t12so11116812lji.13
-        for <linux-cifs@vger.kernel.org>; Sun, 29 Jan 2023 16:15:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Mckd2DI46eMFQEEYqNnffLmF7XoaDgxAo4sggosflkY=;
-        b=D7rTsM3a4qfW0TLsK1RTsKT5eUTuauXlCC0azZYagcgjQtTNFSsZJJlcZC+a9/5Fjb
-         vQ4ToqTazs1RAUxwdw6BWWT6XOUjYiy0VxN6IlrV9Myj1z1Vtay9A9WwfnD1kVp4YCUb
-         7+JndnZwk1N4reNPC5rwNSan+2UKmP6BOD2AwlY2tMdiZnb90+wF/SIA3AIRMYLs1FvX
-         mYCZQpWdFqVeKtOFhtou/Mk3ECMoHmMH/nWyEasbmcwKL0PjoP+vAFlolHUWwZVyBSnL
-         3LYfck6O+b8oHK8sv5Bx6MEQfXCWXp32POX4bcL8Sg/I0cwwfpxIDqKFo0jjkfz+pUju
-         3zaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mckd2DI46eMFQEEYqNnffLmF7XoaDgxAo4sggosflkY=;
-        b=NdCoDmpa2BXCf7xKUnvKVcpmjT5ZT6JXgpjHHHx191HcQzoPGFrSSK4H5/55EfvGrn
-         /hbt904tFtftaPQoQ2viTaQYHDq53kasNExvrEOkQurOP+VJiE328YBDNdmmOpnuCKDd
-         gJ7qzgd3z17BEt/Vjyc1UEXsLqLcr6CumnsTQqFc1/ZEwrPZ7IuGpbbwqma6ScOESYaM
-         w3WslsWHKqpZqZld4V/9yVXvCoHws3GW9tZFHa0SlNYiMEcmL9pJhG4yHtI8x6j+4Z2y
-         wn6rQsg4HX5cAEuB0ZwDgobalz0vLiYRpl/s1gYLM9oQbziyIa46oik1V5qBqBdNRlWa
-         Iabg==
-X-Gm-Message-State: AFqh2kp4JG4lWQPK3cAlfegk8yj+6TtybTrKi6pLe0+I37lmwNyRniXL
-        1ANEO4OMAO1wE1yEF1GFWQGncMCNV2PXHnxabzjFN2jF8Ac=
-X-Google-Smtp-Source: AMrXdXts1QHO3UGPxNzlPb1jD8VQpPqiS73kf18kbE5TMbJPOu/KzzCMcHdhySB0AlcxtTAf3adYoFyKyw6Qr/PM5oM=
-X-Received: by 2002:a05:651c:481:b0:28b:a09b:b02e with SMTP id
- s1-20020a05651c048100b0028ba09bb02emr2901596ljc.106.1675037707411; Sun, 29
- Jan 2023 16:15:07 -0800 (PST)
+        with ESMTP id S230206AbjA3B5Y (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Jan 2023 20:57:24 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C0D1C30C;
+        Sun, 29 Jan 2023 17:57:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 402A8B80D7C;
+        Mon, 30 Jan 2023 01:57:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF9A8C433EF;
+        Mon, 30 Jan 2023 01:57:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675043837;
+        bh=YHmT4MUA98weBZS7vacMYPV3iqY0ECu7epOQAGBvov0=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=YjCDvxjVnl6Fk/GnFbOhbxqd5y+Q3YD74Yv2hbV3E5tcGQHunWlVuOi3wygDvOaaQ
+         MiYGEIP0kKM+8K08SlQvHkOQP5BGoPSe9du0Ld+fZ4oO5jkFBgKHbCtbxRJ8tAYVcd
+         X60A2RrnOp7it4fO/O9qi6BIkHkz6Q7+AKLVZR0YkoFMxRMiZR993xrcpvDdp0mPi1
+         he3E5ezAG+wyXtPdft+NhXE9tokcY4ydsHOD6L59RBmbhN8uSRqd2yJ7PfkHCZHhpg
+         SH5CdPVbJ6nGagqz13ZiS4wwSmzm8e/WyYkGby3B4J/H8kAaPdU9PZD16asU9eHqNp
+         qpYKmcVT07Blw==
+Received: by mail-ot1-f43.google.com with SMTP id l3-20020a05683016c300b0068bba72c8bfso1701454otr.13;
+        Sun, 29 Jan 2023 17:57:17 -0800 (PST)
+X-Gm-Message-State: AFqh2kp10xTffvgQiYsgOL/Bz0U6Fdhz/DxvFMoO7HaDSln64TtSSuQy
+        noCpROBRPYDEcQYzglUO47kIJE+os8N53rMOK+0=
+X-Google-Smtp-Source: AMrXdXshhcc5ZYk6xro06djR669RC5tzE6Nqx/48tpv+MXvMaBeEnZS/yLSqghfFhjuXSi2CHZNCfoyB2GQAFlK9Zm0=
+X-Received: by 2002:a9d:6c4a:0:b0:684:e846:74db with SMTP id
+ g10-20020a9d6c4a000000b00684e84674dbmr2923693otq.51.1675043836961; Sun, 29
+ Jan 2023 17:57:16 -0800 (PST)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 29 Jan 2023 18:14:56 -0600
-Message-ID: <CAH2r5muJ2DZySJMTNww6uhjGmf3N31s=N896tJ-7HKGhwUn4+w@mail.gmail.com>
-Subject: ksmbd-for-next udpated
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+Received: by 2002:a8a:355:0:b0:4a5:1048:434b with HTTP; Sun, 29 Jan 2023
+ 17:57:16 -0800 (PST)
+In-Reply-To: <CAH2r5muSiYCHbHg8zgF1jNiEyafXBhH_pcytudU-4_LQ6DyUmg@mail.gmail.com>
+References: <CAH2r5muSiYCHbHg8zgF1jNiEyafXBhH_pcytudU-4_LQ6DyUmg@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Mon, 30 Jan 2023 10:57:16 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-gKrZ4gZZjookTDSL9ATLtnapQrciJpFH=LzX_8-ZO9g@mail.gmail.com>
+Message-ID: <CAKYAXd-gKrZ4gZZjookTDSL9ATLtnapQrciJpFH=LzX_8-ZO9g@mail.gmail.com>
+Subject: Re: [PATCH][KSMBD] fix indentation in ksmbd config and note Kerberos support
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Six patches for 6.3-rc for ksmbd server included so far:
+2023-01-30 9:01 GMT+09:00, Steve French <smfrench@gmail.com>:
+Hi Steve,
 
-$ git log --oneline -7
-c63a0e4fe477 (HEAD -> ksmbd-for-next, origin/ksmbd-for-next) ksmbd:
-update Kconfig to note Kerberos support and fix indentation
-35caa2e2d148 ksmbd: Remove duplicated codes
-c2809fc63119 ksmbd: fix typo, syncronous->synchronous
-1c42cd62499e ksmbd: replace rwlock with rcu for concurrenct access on conn list
-b685757c7b08 ksmbd: Implements sess->rpc_handle_list as xarray
-1d9c4172110e ksmbd: Implements sess->ksmbd_chann_list as xarray
-6d796c50f84c (linus/master) Linux 6.2-rc6
+> Fix indentation of server config options, and also since
+> support for very old, less secure, NTLM authentication was removed
+> (and quite a while ago), remove the mention of that in Kconfig, but
+> do note Kerberos (not just NTLMv2) which are supported and much
+> more secure.
+>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> ---
+>  fs/ksmbd/Kconfig | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/ksmbd/Kconfig b/fs/ksmbd/Kconfig
+> index e1fe17747ed6..4153e5491435 100644
+> --- a/fs/ksmbd/Kconfig
+> +++ b/fs/ksmbd/Kconfig
+> @@ -33,17 +33,18 @@ config SMB_SERVER
+>     in ksmbd-tools, available from
+>     https://github.com/cifsd-team/ksmbd-tools.
+>     More detail about how to run the ksmbd kernel server is
+> -   available via README file
+> +   available via the README file
+>     (https://github.com/cifsd-team/ksmbd-tools/blob/master/README).
+>
+>     ksmbd kernel server includes support for auto-negotiation,
+>     Secure negotiate, Pre-authentication integrity, oplock/lease,
+>     compound requests, multi-credit, packet signing, RDMA(smbdirect),
+>     smb3 encryption, copy-offload, secure per-user session
+> -   establishment via NTLM or NTLMv2.
+> +   establishment via Kerberos or NTLMv2.
+>
+>  config SMB_SERVER_SMBDIRECT
+>   bool "Support for SMB Direct protocol"
+> + depends on SMB_SERVER
+I am wondering this change is needed in this patch ? There is no patch
+description for this change...
 
-
--- 
-Thanks,
-
-Steve
+Thanks!
+>   depends on SMB_SERVER=m && INFINIBAND && INFINIBAND_ADDR_TRANS ||
+> SMB_SERVER=y && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
+>   select SG_POOL
+>   default n
+>
+> --
+> Thanks,
+>
+> Steve
+>
