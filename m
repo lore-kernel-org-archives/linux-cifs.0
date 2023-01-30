@@ -2,55 +2,59 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDD3C636CD
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 21:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1DCEC54EAA
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 21:24:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbjA3VQM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 16:16:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40682 "EHLO
+        id S229823AbjA3VYA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 16:24:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230135AbjA3VQK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 16:16:10 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 249EF7EED;
-        Mon, 30 Jan 2023 13:16:09 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B2F796126D;
-        Mon, 30 Jan 2023 21:16:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D17DC433A0;
-        Mon, 30 Jan 2023 21:16:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675113368;
-        bh=2S03H7fD4naG7KTpUwIw+Yz2fSOiRObvNN6hiNwBCUo=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=eQEbwFYLjjkeFFEzczkfxYAB4mEibjmLyLyPer5+LBm+C9t1HlzqQhIh8K2NL2VM1
-         mfTW2sxlxwkYHo/v7Nhejy+Ra6KeReeyXMIozKyuw3ed8El9tCL/SxvRx2t5gySnhX
-         MEQleXNcqVQBt1F4SJTVkk6dSAiizJeWlDjysdNe+6W9m9HnwRMRXxLYC0bITxyEeJ
-         EUgMz9Z3S7a5ya7MuMZ0+n65T/BaPJZZcOLuquI2T9Oa+lEZY4T9jfHNUrjfVOYcfb
-         YQU+pUHwLf7ZtdiaTeX1qH8OwwZUPFGqb4pt+lYTz+xMDitkgd9boPw9h4HB0vMCqt
-         y2KorzwgsxZ0g==
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-142b72a728fso16834536fac.9;
-        Mon, 30 Jan 2023 13:16:08 -0800 (PST)
-X-Gm-Message-State: AFqh2kqdwWFbIkhj6y//yjGLYwystEtO+IkaV2BakfewjsFb1+q7mQSI
-        rMyOEveKGU0MadIt1CHRkEmC/wSv9yVm/truulM=
-X-Google-Smtp-Source: AMrXdXtB53/qFM1iiGo26TtT4yGfxrKK/gWnHN/GArEN8iZgkj9mWvEbKXmACHZBBoGkDKU99Iyuy25sg/Gc7QGT+mE=
-X-Received: by 2002:a05:6870:8c11:b0:15f:de79:36c7 with SMTP id
- ec17-20020a0568708c1100b0015fde7936c7mr2738367oab.215.1675113367173; Mon, 30
- Jan 2023 13:16:07 -0800 (PST)
+        with ESMTP id S229742AbjA3VX7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 16:23:59 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34A5B30E9D;
+        Mon, 30 Jan 2023 13:23:58 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id u12so10595436lfq.0;
+        Mon, 30 Jan 2023 13:23:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tFZC+05wFKTwfBGiPm2JG45yZl9PbUY9aQpOd0L6E7g=;
+        b=fvW/6D2DrtdIJ/6d1hceaPOF1h6ipkEhchDRSrdREgCUCtR1zBw/xxWtzoW7u+RWZA
+         QlKyRmo5JZ6/HthrfJYHTuni2Xj7HzrkiZE+4PlbaWOqTpVyq2vDY/sQjWE9KgplrCSW
+         oa41bbYwyXV4w5cPBfQG0je+JEYjN+zeINDdofYB2w4XDo50ulHPOOEagSlzsnGpv0II
+         +9HA7a7kVzVifHDIJegD5/6IaD3a0k4CDdcwc3Tip3tWICRc/ot7YS10O0czTg4HrlKu
+         ud5E2PRByaqtBVwaDyZvdM/EyvZquoU6o2ssHh8CcGp11ERPI27Azy4ooowpvw0Fco2P
+         AzpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tFZC+05wFKTwfBGiPm2JG45yZl9PbUY9aQpOd0L6E7g=;
+        b=NRUIr9Y6Hu3APUf5hD1RmBpLDzwUbz3XnT0oTXc3nv+ilRjLNhwAbXN29br+Vaeq/8
+         PSUF75yhTEv6A3nF7Lke4aKKPn8hMP6ptXX5yVeGGZdO/6KuYqfVWR/ddBNWkrHpZUBr
+         VhpQwDAjn8DXE+FoZHw3wzDs0IXHpMF/9S88xeZsjw+OHbKJDu8CgNWAln4zRTZ6mur7
+         GHUXFDBm4ujGSiwOLEEN0zRqEz2U/I+eDeIsiE2UR8lZ8Hm6LoTPS5V08L73gUQt3vsl
+         05jsG4E+xNUETmv9Vqz562sxWzSupHfUWGtgRU1vBmx6vnsf6hk/28rGrUqjlt4u7CpZ
+         4LHw==
+X-Gm-Message-State: AFqh2kqsQi6386om28J7Sa5igWgt4lQ8LWO5Ajl9SqK/NNmDr8AMkDhy
+        f0Q5iDTutR8zk8v85fLuJt9CkxLZ0o/O6CzePgM=
+X-Google-Smtp-Source: AMrXdXvScZZA1kRbAk5eq+Cm5AtTeHfnPzL3YpC02jU2WGXCjtQ75wxhNZ0xCWwOKZnFsmPA4u7gld7fYRAcikFfpz4=
+X-Received: by 2002:a05:6512:3f03:b0:4cb:20b3:e7f4 with SMTP id
+ y3-20020a0565123f0300b004cb20b3e7f4mr6707926lfa.194.1675113836316; Mon, 30
+ Jan 2023 13:23:56 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a8a:355:0:b0:4a5:1048:434b with HTTP; Mon, 30 Jan 2023
- 13:16:06 -0800 (PST)
-In-Reply-To: <20230130092357.36730-1-colin.i.king@gmail.com>
 References: <20230130092357.36730-1-colin.i.king@gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 31 Jan 2023 06:16:06 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_tPpu-w7vuALcfDnBe4Fsu4hFUdbJ==xUqfFmNuaUVHw@mail.gmail.com>
-Message-ID: <CAKYAXd_tPpu-w7vuALcfDnBe4Fsu4hFUdbJ==xUqfFmNuaUVHw@mail.gmail.com>
+In-Reply-To: <20230130092357.36730-1-colin.i.king@gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 30 Jan 2023 15:23:45 -0600
+Message-ID: <CAH2r5muFzyAW6YYFRmoZ89AFPYETPZU59-DR+2H8zAxsZbnwkw@mail.gmail.com>
 Subject: Re: [PATCH][next] ksmbd: Fix spelling mistake "excceed" -> "exceeded"
 To:     Colin Ian King <colin.i.king@gmail.com>
-Cc:     Steve French <sfrench@samba.org>,
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
         Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
         kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -59,10 +63,38 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-01-30 18:23 GMT+09:00, Colin Ian King <colin.i.king@gmail.com>:
+added to smb3-kernel ksmbd-for-next
+
+thx
+
+On Mon, Jan 30, 2023 at 3:26 AM Colin Ian King <colin.i.king@gmail.com> wrote:
+>
 > There is a spelling mistake in an error message. Fix it.
 >
 > Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  fs/ksmbd/connection.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
+> index 56be077e5d8a..0f7eab5aa04c 100644
+> --- a/fs/ksmbd/connection.c
+> +++ b/fs/ksmbd/connection.c
+> @@ -312,7 +312,7 @@ int ksmbd_conn_handler_loop(void *p)
+>                         max_allowed_pdu_size = SMB3_MAX_MSGSIZE;
+>
+>                 if (pdu_size > max_allowed_pdu_size) {
+> -                       pr_err_ratelimited("PDU length(%u) excceed maximum allowed pdu size(%u) on connection(%d)\n",
+> +                       pr_err_ratelimited("PDU length(%u) exceeded maximum allowed pdu size(%u) on connection(%d)\n",
+>                                         pdu_size, max_allowed_pdu_size,
+>                                         conn->status);
+>                         break;
+> --
+> 2.30.2
+>
 
-Thanks!
+
+-- 
+Thanks,
+
+Steve
