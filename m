@@ -2,31 +2,31 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9B7C63797
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A068C64EC4
 	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 09:23:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235876AbjA3JXs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 04:23:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54982 "EHLO
+        id S236251AbjA3JXt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 04:23:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234878AbjA3JXi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 04:23:38 -0500
+        with ESMTP id S236204AbjA3JXn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 04:23:43 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D3B125B7;
-        Mon, 30 Jan 2023 01:23:28 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAD652C648;
+        Mon, 30 Jan 2023 01:23:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=qHieNPI7z3sFtodokWVnoougmLvZVnqE3Y/VparMyFY=; b=ODubD1C2BRMqrFChW7fD2/w9bG
-        Bek9dBQcKN5N+ru2staBvvFXiwAiWim7hYwhHUZGSLXX24jbnEbAqdmS5Ajj9+NlnFCavBXfsfhs3
-        XI6lzCu2GeqKtRgevITrArS3zGcwLMRZMxlr4utu1juNhvass81bDd906uTcf5xiZsb6cCOqyl8nK
-        m98KeGJ9SE/V3c3ZRyUJeGtRoQ5nsh6i4jGrfSPRpVbUu4hyqMBJxi9JGDZJNhoGK0a94aCuKbtu8
-        rmmcphUXaeiu9gmh/7++19/XF9wkSuRyP7q7ZgI/exYaX7pXYil/gd10qOnCgTC3hp+S0hEq97BKO
-        qjR+Sy/Q==;
+        bh=gx0nLEas5vXY4XJdO/lbtlr7xJlWecx82+q2uHX+Lho=; b=yeg4s7gq9DJKu/VauV7HjrbNXk
+        WA82K3EG4T53jYpZBmBSIvVN1NWiwq36BmDTj9L8CxgtME+sTBIYOYxJ2rq7AWgsMfdFNfzp4fJdu
+        uqAV4alMEhfFh4rrKBrBO7ECezdW/TjRPcQwW7m2GLvWOZNtFkyeG3jxOFK7MavPPVz4Nc0ByMC6O
+        vBe6jOuX9q4TSyAOSFjiUCm7zuCZaS3K7DuZGoqA4GoPhRYKN1BKSZoT829lmBVHeRbZDtCV8N97p
+        xCZ6HjiZmg9/nRwihqTRuuBqCtDwAr6o8caAQgpRuFyjHz2TTPhcynkZCDuzAMlYs395GEfvQZmgt
+        UbDtcSsA==;
 Received: from [2001:4bb8:19a:272a:732e:e417:47d7:2f4a] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pMQMh-002o1D-D3; Mon, 30 Jan 2023 09:22:15 +0000
+        id 1pMQMt-002o6C-IU; Mon, 30 Jan 2023 09:22:28 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ilya Dryomov <idryomov@gmail.com>,
@@ -59,9 +59,9 @@ Cc:     Ilya Dryomov <idryomov@gmail.com>,
         linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
         devel@lists.orangefs.org, io-uring@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 03/23] block: add a bvec_set_virt helper
-Date:   Mon, 30 Jan 2023 10:21:37 +0100
-Message-Id: <20230130092157.1759539-4-hch@lst.de>
+Subject: [PATCH 07/23] nvme: use bvec_set_virt to initialize special_vec
+Date:   Mon, 30 Jan 2023 10:21:41 +0100
+Message-Id: <20230130092157.1759539-8-hch@lst.de>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230130092157.1759539-1-hch@lst.de>
 References: <20230130092157.1759539-1-hch@lst.de>
@@ -72,37 +72,28 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-A small wrapper around bvec_set_page for callers that have a virtual
-address.
+Use the bvec_set_virt helper to initialize the special_vec.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/bvec.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/nvme/host/core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index f094512ce3bda9..7031d83af02267 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -63,6 +63,18 @@ static inline void bvec_set_folio(struct bio_vec *bv, struct folio *folio,
- 	bvec_set_page(bv, &folio->page, len, offset);
- }
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 505e16f20e57fa..7ba1accc3c22a4 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -806,9 +806,7 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
+ 	cmnd->dsm.nr = cpu_to_le32(segments - 1);
+ 	cmnd->dsm.attributes = cpu_to_le32(NVME_DSMGMT_AD);
  
-+/**
-+ * bvec_set_virt - initialize a bvec based on a virtual address
-+ * @bv:		bvec to initialize
-+ * @vaddr:	virtual address to set the bvec to
-+ * @len:	length of the bvec
-+ */
-+static inline void bvec_set_virt(struct bio_vec *bv, void *vaddr,
-+		unsigned int len)
-+{
-+	bvec_set_page(bv, virt_to_page(vaddr), len, offset_in_page(vaddr));
-+}
-+
- struct bvec_iter {
- 	sector_t		bi_sector;	/* device address in 512 byte
- 						   sectors */
+-	req->special_vec.bv_page = virt_to_page(range);
+-	req->special_vec.bv_offset = offset_in_page(range);
+-	req->special_vec.bv_len = alloc_size;
++	bvec_set_virt(&req->special_vec, range, alloc_size);
+ 	req->rq_flags |= RQF_SPECIAL_PAYLOAD;
+ 
+ 	return BLK_STS_OK;
 -- 
 2.39.0
 
