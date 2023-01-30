@@ -2,104 +2,67 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1ECC636D6
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 19:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDD3C636CD
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 21:16:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235545AbjA3TYs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 14:24:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52886 "EHLO
+        id S229839AbjA3VQM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 16:16:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231538AbjA3TYr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 14:24:47 -0500
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC0B212E;
-        Mon, 30 Jan 2023 11:24:45 -0800 (PST)
-Received: by mail-pj1-f54.google.com with SMTP id cq16-20020a17090af99000b0022c9791ac39so4191032pjb.4;
-        Mon, 30 Jan 2023 11:24:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q0USauUwqY1SaOU2GvOVYD8aiTVQVkxSRI7nFSgwMtU=;
-        b=H3uUYUYdL0zlowCOr8tyfXc4JDL3ZjZgc6OL1sEgm+4YEEqsZ3/MFUwp5DHIe4NXIt
-         nGMOYHt2NPw5sfawWQG0G0sBA92lkpFnF2bsSgnbXdBnc1ekBPidTh41vkkWtvZyRxBg
-         nW9BJefQmaAg3i0fpUXtK0TKG6oZnP44tHeK+aaUI6ZlNDDa//5cH0JSN1Ib/qWa53FO
-         YdWhDHMnCcU6Hh8qC9F8VfiwE9AER9S4uXYAmpPetcx13RdNKhYJ0IPjYKNZL2ARstzc
-         kNdAebX6e5PAB+Gxi3K4rzoII+iWmQugiMUcv4pNEdGwJHRDCdDkJfgnZ24ob2Irtxya
-         0Eig==
-X-Gm-Message-State: AO0yUKWDxMivhK+gCHffektmOv2mXfLY2MeuIryf8YW9zQ9VhjnmfKB6
-        Q+vUJVtP1mW0MUbfSD5oQgQ=
-X-Google-Smtp-Source: AK7set/rGKHetFHi+kM9ZonjZUNA4n9BoD4xsf4KlNV/nZP1isOdo/PYXU7cRl9F9xNCOZ6lx4KGGg==
-X-Received: by 2002:a05:6a20:54a3:b0:be:a177:af43 with SMTP id i35-20020a056a2054a300b000bea177af43mr2872944pzk.24.1675106684718;
-        Mon, 30 Jan 2023 11:24:44 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:5016:3bcd:59fe:334b? ([2620:15c:211:201:5016:3bcd:59fe:334b])
-        by smtp.gmail.com with ESMTPSA id 69-20020a630248000000b0045ff216a0casm7117730pgc.3.2023.01.30.11.24.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jan 2023 11:24:43 -0800 (PST)
-Message-ID: <0a7739db-13e2-efac-2c1a-872d7f2fa7aa@acm.org>
-Date:   Mon, 30 Jan 2023 11:24:40 -0800
+        with ESMTP id S230135AbjA3VQK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 16:16:10 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 249EF7EED;
+        Mon, 30 Jan 2023 13:16:09 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B2F796126D;
+        Mon, 30 Jan 2023 21:16:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D17DC433A0;
+        Mon, 30 Jan 2023 21:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675113368;
+        bh=2S03H7fD4naG7KTpUwIw+Yz2fSOiRObvNN6hiNwBCUo=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=eQEbwFYLjjkeFFEzczkfxYAB4mEibjmLyLyPer5+LBm+C9t1HlzqQhIh8K2NL2VM1
+         mfTW2sxlxwkYHo/v7Nhejy+Ra6KeReeyXMIozKyuw3ed8El9tCL/SxvRx2t5gySnhX
+         MEQleXNcqVQBt1F4SJTVkk6dSAiizJeWlDjysdNe+6W9m9HnwRMRXxLYC0bITxyEeJ
+         EUgMz9Z3S7a5ya7MuMZ0+n65T/BaPJZZcOLuquI2T9Oa+lEZY4T9jfHNUrjfVOYcfb
+         YQU+pUHwLf7ZtdiaTeX1qH8OwwZUPFGqb4pt+lYTz+xMDitkgd9boPw9h4HB0vMCqt
+         y2KorzwgsxZ0g==
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-142b72a728fso16834536fac.9;
+        Mon, 30 Jan 2023 13:16:08 -0800 (PST)
+X-Gm-Message-State: AFqh2kqdwWFbIkhj6y//yjGLYwystEtO+IkaV2BakfewjsFb1+q7mQSI
+        rMyOEveKGU0MadIt1CHRkEmC/wSv9yVm/truulM=
+X-Google-Smtp-Source: AMrXdXtB53/qFM1iiGo26TtT4yGfxrKK/gWnHN/GArEN8iZgkj9mWvEbKXmACHZBBoGkDKU99Iyuy25sg/Gc7QGT+mE=
+X-Received: by 2002:a05:6870:8c11:b0:15f:de79:36c7 with SMTP id
+ ec17-20020a0568708c1100b0015fde7936c7mr2738367oab.215.1675113367173; Mon, 30
+ Jan 2023 13:16:07 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH 01/23] block: factor out a bvec_set_page helper
-Content-Language: en-US
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Ilya Dryomov <idryomov@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Minchan Kim <minchan@kernel.org>,
+Received: by 2002:a8a:355:0:b0:4a5:1048:434b with HTTP; Mon, 30 Jan 2023
+ 13:16:06 -0800 (PST)
+In-Reply-To: <20230130092357.36730-1-colin.i.king@gmail.com>
+References: <20230130092357.36730-1-colin.i.king@gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 31 Jan 2023 06:16:06 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_tPpu-w7vuALcfDnBe4Fsu4hFUdbJ==xUqfFmNuaUVHw@mail.gmail.com>
+Message-ID: <CAKYAXd_tPpu-w7vuALcfDnBe4Fsu4hFUdbJ==xUqfFmNuaUVHw@mail.gmail.com>
+Subject: Re: [PATCH][next] ksmbd: Fix spelling mistake "excceed" -> "exceeded"
+To:     Colin Ian King <colin.i.king@gmail.com>
+Cc:     Steve French <sfrench@samba.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-References: <20230130092157.1759539-1-hch@lst.de>
- <20230130092157.1759539-2-hch@lst.de>
- <2bab7050-dec7-3af8-b643-31b414b8c4b4@acm.org>
-In-Reply-To: <2bab7050-dec7-3af8-b643-31b414b8c4b4@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 1/30/23 09:09, Bart Van Assche wrote:
-> On 1/30/23 01:21, Christoph Hellwig wrote:
->> Add a helper to initialize a bvec based of a page pointer.  This will 
->> help
->> removing various open code bvec initializations.
-> 
-> Why do you want to remove the open-coded bvec initializations? What is 
-> wrong with open-coding bvec initialization? This patch series modifies a 
-> lot of code but does not improve code readability. Anyone who encounters 
-> code that uses the new function bvec_set_page() has to look up the 
-> definition of that function to figure out what it does.
+2023-01-30 18:23 GMT+09:00, Colin Ian King <colin.i.king@gmail.com>:
+> There is a spelling mistake in an error message. Fix it.
+>
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-Please ignore the above question - I just noticed that this question has 
-been answered in the cover letter.
-
-Bart.
-
+Thanks!
