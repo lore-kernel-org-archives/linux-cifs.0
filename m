@@ -2,99 +2,203 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1DCEC54EAA
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 21:24:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A5EC54EAA
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 23:33:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbjA3VYA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 16:24:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46016 "EHLO
+        id S230370AbjA3Xdm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 18:33:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbjA3VX7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 16:23:59 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34A5B30E9D;
-        Mon, 30 Jan 2023 13:23:58 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id u12so10595436lfq.0;
-        Mon, 30 Jan 2023 13:23:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tFZC+05wFKTwfBGiPm2JG45yZl9PbUY9aQpOd0L6E7g=;
-        b=fvW/6D2DrtdIJ/6d1hceaPOF1h6ipkEhchDRSrdREgCUCtR1zBw/xxWtzoW7u+RWZA
-         QlKyRmo5JZ6/HthrfJYHTuni2Xj7HzrkiZE+4PlbaWOqTpVyq2vDY/sQjWE9KgplrCSW
-         oa41bbYwyXV4w5cPBfQG0je+JEYjN+zeINDdofYB2w4XDo50ulHPOOEagSlzsnGpv0II
-         +9HA7a7kVzVifHDIJegD5/6IaD3a0k4CDdcwc3Tip3tWICRc/ot7YS10O0czTg4HrlKu
-         ud5E2PRByaqtBVwaDyZvdM/EyvZquoU6o2ssHh8CcGp11ERPI27Azy4ooowpvw0Fco2P
-         AzpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tFZC+05wFKTwfBGiPm2JG45yZl9PbUY9aQpOd0L6E7g=;
-        b=NRUIr9Y6Hu3APUf5hD1RmBpLDzwUbz3XnT0oTXc3nv+ilRjLNhwAbXN29br+Vaeq/8
-         PSUF75yhTEv6A3nF7Lke4aKKPn8hMP6ptXX5yVeGGZdO/6KuYqfVWR/ddBNWkrHpZUBr
-         VhpQwDAjn8DXE+FoZHw3wzDs0IXHpMF/9S88xeZsjw+OHbKJDu8CgNWAln4zRTZ6mur7
-         GHUXFDBm4ujGSiwOLEEN0zRqEz2U/I+eDeIsiE2UR8lZ8Hm6LoTPS5V08L73gUQt3vsl
-         05jsG4E+xNUETmv9Vqz562sxWzSupHfUWGtgRU1vBmx6vnsf6hk/28rGrUqjlt4u7CpZ
-         4LHw==
-X-Gm-Message-State: AFqh2kqsQi6386om28J7Sa5igWgt4lQ8LWO5Ajl9SqK/NNmDr8AMkDhy
-        f0Q5iDTutR8zk8v85fLuJt9CkxLZ0o/O6CzePgM=
-X-Google-Smtp-Source: AMrXdXvScZZA1kRbAk5eq+Cm5AtTeHfnPzL3YpC02jU2WGXCjtQ75wxhNZ0xCWwOKZnFsmPA4u7gld7fYRAcikFfpz4=
-X-Received: by 2002:a05:6512:3f03:b0:4cb:20b3:e7f4 with SMTP id
- y3-20020a0565123f0300b004cb20b3e7f4mr6707926lfa.194.1675113836316; Mon, 30
- Jan 2023 13:23:56 -0800 (PST)
+        with ESMTP id S230377AbjA3Xdk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 18:33:40 -0500
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7162BEE3
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 15:33:38 -0800 (PST)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id EC5CA7FEB4;
+        Mon, 30 Jan 2023 23:33:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1675121616;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=iiW56G6nq6kEemrfRoUVg0HqDM2CJoIzw7mWn7G5GRk=;
+        b=J0KkkDCyWSDMLiMfoGHPerz6yAvsVAVWHEo2bwJzkrvH8xB09jBIzfrMd6ttuvnr1XspzS
+        FbbyadFeL6w1KjxPO3n64jDIJCX09YB7e1yzbDCnrlhVvEoGJGAT8orSEPmSWYmrxll/4P
+        acGcCeUrK6lp/qfLbKyrEyfQSPMzYBhuB/oDoWtBOKrQnsB//S5z8mAAN3hcxgMoH/yv4M
+        2kHEtYu+BbS/jdUOYFEVOCd8fjTy9JMrpH6yw/Nm3AeXfg6Hkiz+dk+hnebtYhGqlje85l
+        YGkks1gD39mmo6oLW+2rU2mTjQ91Sg2aWncLsYMflWirGeQv8lK/zmrpOrS1KQ==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>
+Subject: [PATCH] cifs: prevent data race in smb2_reconnect()
+Date:   Mon, 30 Jan 2023 20:33:29 -0300
+Message-Id: <20230130233329.7074-1-pc@cjr.nz>
 MIME-Version: 1.0
-References: <20230130092357.36730-1-colin.i.king@gmail.com>
-In-Reply-To: <20230130092357.36730-1-colin.i.king@gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 30 Jan 2023 15:23:45 -0600
-Message-ID: <CAH2r5muFzyAW6YYFRmoZ89AFPYETPZU59-DR+2H8zAxsZbnwkw@mail.gmail.com>
-Subject: Re: [PATCH][next] ksmbd: Fix spelling mistake "excceed" -> "exceeded"
-To:     Colin Ian King <colin.i.king@gmail.com>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-added to smb3-kernel ksmbd-for-next
+Make sure to get an up-to-date TCP_Server_Info::nr_targets value prior
+to waiting the server to be reconnected in smb2_reconnect().  It is
+set in cifs_tcp_ses_needs_reconnect() and protected by
+TCP_Server_Info::srv_lock.
 
-thx
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+---
+ fs/cifs/smb2pdu.c | 119 +++++++++++++++++++++++++---------------------
+ 1 file changed, 64 insertions(+), 55 deletions(-)
 
-On Mon, Jan 30, 2023 at 3:26 AM Colin Ian King <colin.i.king@gmail.com> wrote:
->
-> There is a spelling mistake in an error message. Fix it.
->
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  fs/ksmbd/connection.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
-> index 56be077e5d8a..0f7eab5aa04c 100644
-> --- a/fs/ksmbd/connection.c
-> +++ b/fs/ksmbd/connection.c
-> @@ -312,7 +312,7 @@ int ksmbd_conn_handler_loop(void *p)
->                         max_allowed_pdu_size = SMB3_MAX_MSGSIZE;
->
->                 if (pdu_size > max_allowed_pdu_size) {
-> -                       pr_err_ratelimited("PDU length(%u) excceed maximum allowed pdu size(%u) on connection(%d)\n",
-> +                       pr_err_ratelimited("PDU length(%u) exceeded maximum allowed pdu size(%u) on connection(%d)\n",
->                                         pdu_size, max_allowed_pdu_size,
->                                         conn->status);
->                         break;
-> --
-> 2.30.2
->
-
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 2c9ffa921e6f..2d5c3df2277d 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -139,6 +139,66 @@ smb2_hdr_assemble(struct smb2_hdr *shdr, __le16 smb2_cmd,
+ 	return;
+ }
+ 
++static int wait_for_server_reconnect(struct TCP_Server_Info *server,
++				     __le16 smb2_command, bool retry)
++{
++	int timeout = 10;
++	int rc;
++
++	spin_lock(&server->srv_lock);
++	if (server->tcpStatus != CifsNeedReconnect) {
++		spin_unlock(&server->srv_lock);
++		return 0;
++	}
++	timeout *= server->nr_targets;
++	spin_unlock(&server->srv_lock);
++
++	/*
++	 * Return to caller for TREE_DISCONNECT and LOGOFF and CLOSE
++	 * here since they are implicitly done when session drops.
++	 */
++	switch (smb2_command) {
++	/*
++	 * BB Should we keep oplock break and add flush to exceptions?
++	 */
++	case SMB2_TREE_DISCONNECT:
++	case SMB2_CANCEL:
++	case SMB2_CLOSE:
++	case SMB2_OPLOCK_BREAK:
++		return -EAGAIN;
++	}
++
++	/*
++	 * Give demultiplex thread up to 10 seconds to each target available for
++	 * reconnect -- should be greater than cifs socket timeout which is 7
++	 * seconds.
++	 *
++	 * On "soft" mounts we wait once. Hard mounts keep retrying until
++	 * process is killed or server comes back on-line.
++	 */
++	do {
++		rc = wait_event_interruptible_timeout(server->response_q,
++						      (server->tcpStatus != CifsNeedReconnect),
++						      timeout * HZ);
++		if (rc < 0) {
++			cifs_dbg(FYI, "%s: aborting reconnect due to received signal\n",
++				 __func__);
++			return -ERESTARTSYS;
++		}
++
++		/* are we still trying to reconnect? */
++		spin_lock(&server->srv_lock);
++		if (server->tcpStatus != CifsNeedReconnect) {
++			spin_unlock(&server->srv_lock);
++			return 0;
++		}
++		spin_unlock(&server->srv_lock);
++	} while (retry);
++
++	cifs_dbg(FYI, "%s: gave up waiting on reconnect\n", __func__);
++	return -EHOSTDOWN;
++}
++
+ static int
+ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	       struct TCP_Server_Info *server)
+@@ -146,7 +206,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	int rc = 0;
+ 	struct nls_table *nls_codepage;
+ 	struct cifs_ses *ses;
+-	int retries;
+ 
+ 	/*
+ 	 * SMB2s NegProt, SessSetup, Logoff do not have tcon yet so
+@@ -184,61 +243,11 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	    (!tcon->ses->server) || !server)
+ 		return -EIO;
+ 
++	rc = wait_for_server_reconnect(server, smb2_command, tcon->retry);
++	if (rc)
++		return rc;
++
+ 	ses = tcon->ses;
+-	retries = server->nr_targets;
+-
+-	/*
+-	 * Give demultiplex thread up to 10 seconds to each target available for
+-	 * reconnect -- should be greater than cifs socket timeout which is 7
+-	 * seconds.
+-	 */
+-	while (server->tcpStatus == CifsNeedReconnect) {
+-		/*
+-		 * Return to caller for TREE_DISCONNECT and LOGOFF and CLOSE
+-		 * here since they are implicitly done when session drops.
+-		 */
+-		switch (smb2_command) {
+-		/*
+-		 * BB Should we keep oplock break and add flush to exceptions?
+-		 */
+-		case SMB2_TREE_DISCONNECT:
+-		case SMB2_CANCEL:
+-		case SMB2_CLOSE:
+-		case SMB2_OPLOCK_BREAK:
+-			return -EAGAIN;
+-		}
+-
+-		rc = wait_event_interruptible_timeout(server->response_q,
+-						      (server->tcpStatus != CifsNeedReconnect),
+-						      10 * HZ);
+-		if (rc < 0) {
+-			cifs_dbg(FYI, "%s: aborting reconnect due to a received signal by the process\n",
+-				 __func__);
+-			return -ERESTARTSYS;
+-		}
+-
+-		/* are we still trying to reconnect? */
+-		spin_lock(&server->srv_lock);
+-		if (server->tcpStatus != CifsNeedReconnect) {
+-			spin_unlock(&server->srv_lock);
+-			break;
+-		}
+-		spin_unlock(&server->srv_lock);
+-
+-		if (retries && --retries)
+-			continue;
+-
+-		/*
+-		 * on "soft" mounts we wait once. Hard mounts keep
+-		 * retrying until process is killed or server comes
+-		 * back on-line
+-		 */
+-		if (!tcon->retry) {
+-			cifs_dbg(FYI, "gave up waiting on reconnect in smb_init\n");
+-			return -EHOSTDOWN;
+-		}
+-		retries = server->nr_targets;
+-	}
+ 
+ 	spin_lock(&ses->chan_lock);
+ 	if (!cifs_chan_needs_reconnect(ses, server) && !tcon->need_reconnect) {
 -- 
-Thanks,
+2.39.1
 
-Steve
