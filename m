@@ -2,81 +2,108 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3359C54EAA
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 04:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14EB7C54EED
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 09:23:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235449AbjA3EPm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 29 Jan 2023 23:15:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60648 "EHLO
+        id S235361AbjA3JXd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 04:23:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235075AbjA3EPl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Jan 2023 23:15:41 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518A32718
-        for <linux-cifs@vger.kernel.org>; Sun, 29 Jan 2023 20:15:40 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id g68so6752852pgc.11
-        for <linux-cifs@vger.kernel.org>; Sun, 29 Jan 2023 20:15:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=58GLUmzTwYb3qKKyCXh7E1D5tYRikGavhnZW7KqYzpE=;
-        b=gSPhxMatcRxlJNQTaNoO6CpIY0C7E++sw3LR0QtT3JAJaIXywGAEKdedJ5mzQrPKpX
-         hazv2Hq785/5a8RQj1APm1FzRM2DYSuOVaMIRKisKUIl7RSzrQfpMVqW+ZJrMmJ4Gkh4
-         XwxHhvWHx88Wpwr7InkhRg6JQfR1nh+eEO+2E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=58GLUmzTwYb3qKKyCXh7E1D5tYRikGavhnZW7KqYzpE=;
-        b=r4Rv+rcnoYPIaX5lc+Pxkpd9J4jcytTqYEpuS1xgFzf5uGhZ4bc+w+KLoU4PgZOCZr
-         LsAbyFbtnLuByho9p85bk+VQd7UXrjDSie9oiPkhPn27/vRNyknHcgFYoZMkHOBT77ac
-         dVHQvZ1SfviV9aQ5ve16NBopvNuua1OBjZl765orKxMeUMRe4vq+Nmo9j+Bpil9m3jVw
-         el27VXqHWgadxJE+YiCy9X93hF6PYI0dHLwPAj6IRLs79F4rDFymwIgzCbar/USBwlBH
-         VBlSbuPrqwyScbuRSLSXzNY6NYn/uVeUhmJi+MGkM2+23haMvHbDBpEFrdP7czxdCwIO
-         xSLg==
-X-Gm-Message-State: AFqh2ko23AkH8cNNOZR+u9DLPrgZePaJYb/khVxoYakYZ9s5eeGNnNHE
-        f8TBh2z9clN2oJdzvoPOAFWTWuzFcFtjZtvX
-X-Google-Smtp-Source: AMrXdXtSroPaEaFc2L+7weTBDxXFdF7qQ0tQjiHbzWP9rqBjgIaTTgNfvbGeseX41UKAeS8rD65aQA==
-X-Received: by 2002:a05:6a00:24d4:b0:57e:866d:c095 with SMTP id d20-20020a056a0024d400b0057e866dc095mr58185827pfv.25.1675052139722;
-        Sun, 29 Jan 2023 20:15:39 -0800 (PST)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id z2-20020aa79f82000000b00593c679d405sm809537pfr.78.2023.01.29.20.15.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Jan 2023 20:15:39 -0800 (PST)
-Date:   Mon, 30 Jan 2023 13:15:35 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Dawei Li <set_pte_at@outlook.com>
-Cc:     linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
-        tom@talpey.com, hyc.lee@gmail.com, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/6] ksmbd: replace rwlock with rcu for concurrenct
- access on conn list
-Message-ID: <Y9dEZ5IgfwpZNlVm@google.com>
-References: <20230115103209.146002-1-set_pte_at@outlook.com>
- <TYCP286MB23235FDD8102162698EF3154CAC09@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+        with ESMTP id S234878AbjA3JXc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 04:23:32 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D701024A;
+        Mon, 30 Jan 2023 01:23:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=lCuBrdiApHtnAzdlL9jd8/orKVtuLY/i0Sero01PH48=; b=gUt9fXuq6v7ElJkjGIu4Bt2k6I
+        aie9JrU1FF7iS8hNoPZplHZMIg/mjCy9+CuXAh/U/DNgLjS6V1ufgxJp2NQMex5tHZQGfnrKiKRKo
+        caqpxM1HRuxRxX61XnnyxOSlZ2/Jq47eap8gN/lH6+L4ZPbDi3w4YLBF5OHjyJWW13xcFRDWCqAUZ
+        NKpMf5yhHzm/uS9x384Srna47NYmLZm+gDq7sZpO/NDG+BHvojVyEMNCK01EInd7TUHZ7+Fo+Bd26
+        ywRu7rwlcWBFPjfGdWJeRjwhamdKyIPJEjKoaPO4rYQ0QXObm0HMjgFoMXTg096Bm2LCYjvYSlGAx
+        FW6FwsxA==;
+Received: from [2001:4bb8:19a:272a:732e:e417:47d7:2f4a] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pMQMS-002nyI-W6; Mon, 30 Jan 2023 09:22:01 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: add bvec initialization helpers
+Date:   Mon, 30 Jan 2023 10:21:34 +0100
+Message-Id: <20230130092157.1759539-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TYCP286MB23235FDD8102162698EF3154CAC09@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On (23/01/15 18:32), Dawei Li wrote:
-> 
->  void ksmbd_conn_free(struct ksmbd_conn *conn)
->  {
-> -	write_lock(&conn_list_lock);
-> -	list_del(&conn->conns_list);
-> -	write_unlock(&conn_list_lock);
-> +	spin_lock(&conn_list_lock);
-> +	list_del_rcu(&conn->conns_list);
-> +	spin_unlock(&conn_list_lock);
->  
->  	xa_destroy(&conn->sessions);
->  	kvfree(conn->request_buf);
+Hi all,
 
-From a quick look this does not seem like a correct RCU usage. E.g.
-where do you wait for grace periods and synchronize readers/writers?
+this series adds the helpers to initalize a bvec.  These remove open coding of
+bvec internals and help with experimenting with other representations like
+a phys_addr_t instead of page + offset.
+
+Diffstat:
+ block/bio-integrity.c             |    7 ------
+ block/bio.c                       |   12 +----------
+ drivers/block/rbd.c               |    7 ++----
+ drivers/block/virtio_blk.c        |    4 ---
+ drivers/block/zram/zram_drv.c     |   15 +++-----------
+ drivers/nvme/host/core.c          |    4 ---
+ drivers/nvme/target/io-cmd-file.c |   10 +--------
+ drivers/nvme/target/tcp.c         |    5 +---
+ drivers/scsi/sd.c                 |   36 ++++++++++++++++------------------
+ drivers/target/target_core_file.c |   18 +++++------------
+ drivers/vhost/vringh.c            |    5 +---
+ fs/afs/write.c                    |    8 ++-----
+ fs/ceph/file.c                    |   10 ++++-----
+ fs/cifs/connect.c                 |    5 ++--
+ fs/cifs/fscache.c                 |   16 +++++----------
+ fs/cifs/misc.c                    |    5 +---
+ fs/cifs/smb2ops.c                 |    6 ++---
+ fs/coredump.c                     |    7 +-----
+ fs/nfs/fscache.c                  |   16 +++++----------
+ fs/orangefs/inode.c               |   22 ++++++--------------
+ fs/splice.c                       |    5 +---
+ include/linux/bvec.h              |   40 ++++++++++++++++++++++++++++++++++++++
+ io_uring/rsrc.c                   |    4 ---
+ mm/page_io.c                      |    8 +------
+ net/ceph/messenger_v1.c           |    7 +-----
+ net/ceph/messenger_v2.c           |   28 ++++++++++----------------
+ net/rxrpc/rxperf.c                |    8 ++-----
+ net/sunrpc/svcsock.c              |    7 +-----
+ net/sunrpc/xdr.c                  |    5 +---
+ 29 files changed, 143 insertions(+), 187 deletions(-)
