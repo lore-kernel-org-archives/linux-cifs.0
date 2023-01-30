@@ -2,144 +2,74 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8027BC05027
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 00:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7823FC05027
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 00:15:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231654AbjA3ACM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 29 Jan 2023 19:02:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36962 "EHLO
+        id S229614AbjA3APL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 Jan 2023 19:15:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjA3ACL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Jan 2023 19:02:11 -0500
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF761ADE5;
-        Sun, 29 Jan 2023 16:02:10 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id cf42so16724655lfb.1;
-        Sun, 29 Jan 2023 16:02:10 -0800 (PST)
+        with ESMTP id S229476AbjA3APK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Jan 2023 19:15:10 -0500
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A071D199D7
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Jan 2023 16:15:09 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id t12so11116812lji.13
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Jan 2023 16:15:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=M7mFhCHIKrDAQRw7JizbyIbXXiHSGBAj4H5t/HZyGaI=;
-        b=nlShhLXf/jHipfUCYV6b6qycV63aU00ybPUuuRiVKeka6CZM8zCQzR50L9lqvx30h8
-         jWihkptmVb8M74jH2WVYV7YPidP7FuS3SpwK8/cYANy15j5X29e8l/eU6voJDZGpLsEQ
-         6PwLYZ/rNQcCS+J6UgxmOfCFj8EKn7Xup0meLNHMzJifYrPNuX59C68o88hx2kziQ57x
-         ioPp6IxUxNuE2f0zT8U+LiTNaFn0hXF4Twd5fg8UZT0IqzrRufhAs7mRVpfN59mmr6qh
-         pAY+nhc3zPk1zSzAOMXVP+CB3TDIXF2agHsa7yhgnuZLtrO6qL5Gt++fekVTfmALK66k
-         /o1g==
+        bh=Mckd2DI46eMFQEEYqNnffLmF7XoaDgxAo4sggosflkY=;
+        b=D7rTsM3a4qfW0TLsK1RTsKT5eUTuauXlCC0azZYagcgjQtTNFSsZJJlcZC+a9/5Fjb
+         vQ4ToqTazs1RAUxwdw6BWWT6XOUjYiy0VxN6IlrV9Myj1z1Vtay9A9WwfnD1kVp4YCUb
+         7+JndnZwk1N4reNPC5rwNSan+2UKmP6BOD2AwlY2tMdiZnb90+wF/SIA3AIRMYLs1FvX
+         mYCZQpWdFqVeKtOFhtou/Mk3ECMoHmMH/nWyEasbmcwKL0PjoP+vAFlolHUWwZVyBSnL
+         3LYfck6O+b8oHK8sv5Bx6MEQfXCWXp32POX4bcL8Sg/I0cwwfpxIDqKFo0jjkfz+pUju
+         3zaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=M7mFhCHIKrDAQRw7JizbyIbXXiHSGBAj4H5t/HZyGaI=;
-        b=ryJDvs8eNaIFE1IqkCB/sVoR/1GGYudQsEDpYUKbqPk+JeD3qtkwqbgSQEzdMcjaQ8
-         P0x5OIwRYcIRMMh09jIFpibcaRWj/Q+2MjRdnBOKIBZ2fpHjYztTsqygP7Kb7iq606FH
-         r7N5V3JGWLmUhD9QpuPbWXrUFw+2+1dk/keVdGONI/0dgE4/qxLEAt0IZR1xymjkh3BE
-         O5UsVC55CYceJ8OJSnY371lNrXdkn6mrgSQ3BcFGWEKV4r+pTPplNf0D1RKH6aL1Mn8h
-         C3lPRcrApIq7DXp9ZiWzxC4HvlyDMMHTq16+hIwgwO5zXRZPaPELB/2KoqH3vsgymkGh
-         x+Zg==
-X-Gm-Message-State: AO0yUKUv/MCNqtTSgtn/KJSOCG4ivg2XtvaaUdl8ckcMcZheBSItCRBr
-        q1sG8jZ//JPsLm4xhiKwt6Fgr0E4oWnf1FszHULq3QGO7ME=
-X-Google-Smtp-Source: AK7set9pJqL+fdWIUFYrgAiC3sKFyZ0wyie5NSzoMn6opifeFbzS9g5YmcJ0TagQvEoYLHbPDWyuXNBA5l6j4msJ5BE=
-X-Received: by 2002:a19:c219:0:b0:4d7:2dc1:b7bc with SMTP id
- l25-20020a19c219000000b004d72dc1b7bcmr1968783lfc.100.1675036928246; Sun, 29
- Jan 2023 16:02:08 -0800 (PST)
+        bh=Mckd2DI46eMFQEEYqNnffLmF7XoaDgxAo4sggosflkY=;
+        b=NdCoDmpa2BXCf7xKUnvKVcpmjT5ZT6JXgpjHHHx191HcQzoPGFrSSK4H5/55EfvGrn
+         /hbt904tFtftaPQoQ2viTaQYHDq53kasNExvrEOkQurOP+VJiE328YBDNdmmOpnuCKDd
+         gJ7qzgd3z17BEt/Vjyc1UEXsLqLcr6CumnsTQqFc1/ZEwrPZ7IuGpbbwqma6ScOESYaM
+         w3WslsWHKqpZqZld4V/9yVXvCoHws3GW9tZFHa0SlNYiMEcmL9pJhG4yHtI8x6j+4Z2y
+         wn6rQsg4HX5cAEuB0ZwDgobalz0vLiYRpl/s1gYLM9oQbziyIa46oik1V5qBqBdNRlWa
+         Iabg==
+X-Gm-Message-State: AFqh2kp4JG4lWQPK3cAlfegk8yj+6TtybTrKi6pLe0+I37lmwNyRniXL
+        1ANEO4OMAO1wE1yEF1GFWQGncMCNV2PXHnxabzjFN2jF8Ac=
+X-Google-Smtp-Source: AMrXdXts1QHO3UGPxNzlPb1jD8VQpPqiS73kf18kbE5TMbJPOu/KzzCMcHdhySB0AlcxtTAf3adYoFyKyw6Qr/PM5oM=
+X-Received: by 2002:a05:651c:481:b0:28b:a09b:b02e with SMTP id
+ s1-20020a05651c048100b0028ba09bb02emr2901596ljc.106.1675037707411; Sun, 29
+ Jan 2023 16:15:07 -0800 (PST)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 29 Jan 2023 18:01:56 -0600
-Message-ID: <CAH2r5muSiYCHbHg8zgF1jNiEyafXBhH_pcytudU-4_LQ6DyUmg@mail.gmail.com>
-Subject: [PATCH][KSMBD] fix indentation in ksmbd config and note Kerberos support
-To:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000018359305f36fedec"
+Date:   Sun, 29 Jan 2023 18:14:56 -0600
+Message-ID: <CAH2r5muJ2DZySJMTNww6uhjGmf3N31s=N896tJ-7HKGhwUn4+w@mail.gmail.com>
+Subject: ksmbd-for-next udpated
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000018359305f36fedec
-Content-Type: text/plain; charset="UTF-8"
+Six patches for 6.3-rc for ksmbd server included so far:
 
-Fix indentation of server config options, and also since
-support for very old, less secure, NTLM authentication was removed
-(and quite a while ago), remove the mention of that in Kconfig, but
-do note Kerberos (not just NTLMv2) which are supported and much
-more secure.
+$ git log --oneline -7
+c63a0e4fe477 (HEAD -> ksmbd-for-next, origin/ksmbd-for-next) ksmbd:
+update Kconfig to note Kerberos support and fix indentation
+35caa2e2d148 ksmbd: Remove duplicated codes
+c2809fc63119 ksmbd: fix typo, syncronous->synchronous
+1c42cd62499e ksmbd: replace rwlock with rcu for concurrenct access on conn list
+b685757c7b08 ksmbd: Implements sess->rpc_handle_list as xarray
+1d9c4172110e ksmbd: Implements sess->ksmbd_chann_list as xarray
+6d796c50f84c (linus/master) Linux 6.2-rc6
 
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/ksmbd/Kconfig | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/fs/ksmbd/Kconfig b/fs/ksmbd/Kconfig
-index e1fe17747ed6..4153e5491435 100644
---- a/fs/ksmbd/Kconfig
-+++ b/fs/ksmbd/Kconfig
-@@ -33,17 +33,18 @@ config SMB_SERVER
-    in ksmbd-tools, available from
-    https://github.com/cifsd-team/ksmbd-tools.
-    More detail about how to run the ksmbd kernel server is
--   available via README file
-+   available via the README file
-    (https://github.com/cifsd-team/ksmbd-tools/blob/master/README).
-
-    ksmbd kernel server includes support for auto-negotiation,
-    Secure negotiate, Pre-authentication integrity, oplock/lease,
-    compound requests, multi-credit, packet signing, RDMA(smbdirect),
-    smb3 encryption, copy-offload, secure per-user session
--   establishment via NTLM or NTLMv2.
-+   establishment via Kerberos or NTLMv2.
-
- config SMB_SERVER_SMBDIRECT
-  bool "Support for SMB Direct protocol"
-+ depends on SMB_SERVER
-  depends on SMB_SERVER=m && INFINIBAND && INFINIBAND_ADDR_TRANS ||
-SMB_SERVER=y && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
-  select SG_POOL
-  default n
 
 -- 
 Thanks,
 
 Steve
-
---00000000000018359305f36fedec
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-ksmbd-update-Kconfig-to-note-Kerberos-support-and-fi.patch"
-Content-Disposition: attachment; 
-	filename="0001-ksmbd-update-Kconfig-to-note-Kerberos-support-and-fi.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ldi1oc650>
-X-Attachment-Id: f_ldi1oc650
-
-RnJvbSBmZWIxMWQwMzRjYjM2ZTg2Mjk5ZjZmNWYwZmQ3NTJhZmNlNWM3ZmQ1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgMjkgSmFuIDIwMjMgMTc6NDk6NTkgLTA2MDAKU3ViamVjdDogW1BBVENIXSBr
-c21iZDogdXBkYXRlIEtjb25maWcgdG8gbm90ZSBLZXJiZXJvcyBzdXBwb3J0IGFuZCBmaXgKIGlu
-ZGVudGF0aW9uCgpGaXggaW5kZW50YXRpb24gb2Ygc2VydmVyIGNvbmZpZyBvcHRpb25zLCBhbmQg
-YWxzbyBzaW5jZQpzdXBwb3J0IGZvciB2ZXJ5IG9sZCwgbGVzcyBzZWN1cmUsIE5UTE0gYXV0aGVu
-dGljYXRpb24gd2FzIHJlbW92ZWQKKGFuZCBxdWl0ZSBhIHdoaWxlIGFnbyksIHJlbW92ZSB0aGUg
-bWVudGlvbiBvZiB0aGF0IGluIEtjb25maWcsIGJ1dApkbyBub3RlIEtlcmJlcm9zIChub3QganVz
-dCBOVExNdjIpIHdoaWNoIGFyZSBzdXBwb3J0ZWQgYW5kIG11Y2gKbW9yZSBzZWN1cmUuCgpTaWdu
-ZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Cgpmb28KLS0t
-CiBmcy9rc21iZC9LY29uZmlnIHwgNSArKystLQogMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9u
-cygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9rc21iZC9LY29uZmlnIGIvZnMv
-a3NtYmQvS2NvbmZpZwppbmRleCBlMWZlMTc3NDdlZDYuLjQxNTNlNTQ5MTQzNSAxMDA2NDQKLS0t
-IGEvZnMva3NtYmQvS2NvbmZpZworKysgYi9mcy9rc21iZC9LY29uZmlnCkBAIC0zMywxNyArMzMs
-MTggQEAgY29uZmlnIFNNQl9TRVJWRVIKIAkgIGluIGtzbWJkLXRvb2xzLCBhdmFpbGFibGUgZnJv
-bQogCSAgaHR0cHM6Ly9naXRodWIuY29tL2NpZnNkLXRlYW0va3NtYmQtdG9vbHMuCiAJICBNb3Jl
-IGRldGFpbCBhYm91dCBob3cgdG8gcnVuIHRoZSBrc21iZCBrZXJuZWwgc2VydmVyIGlzCi0JICBh
-dmFpbGFibGUgdmlhIFJFQURNRSBmaWxlCisJICBhdmFpbGFibGUgdmlhIHRoZSBSRUFETUUgZmls
-ZQogCSAgKGh0dHBzOi8vZ2l0aHViLmNvbS9jaWZzZC10ZWFtL2tzbWJkLXRvb2xzL2Jsb2IvbWFz
-dGVyL1JFQURNRSkuCiAKIAkgIGtzbWJkIGtlcm5lbCBzZXJ2ZXIgaW5jbHVkZXMgc3VwcG9ydCBm
-b3IgYXV0by1uZWdvdGlhdGlvbiwKIAkgIFNlY3VyZSBuZWdvdGlhdGUsIFByZS1hdXRoZW50aWNh
-dGlvbiBpbnRlZ3JpdHksIG9wbG9jay9sZWFzZSwKIAkgIGNvbXBvdW5kIHJlcXVlc3RzLCBtdWx0
-aS1jcmVkaXQsIHBhY2tldCBzaWduaW5nLCBSRE1BKHNtYmRpcmVjdCksCiAJICBzbWIzIGVuY3J5
-cHRpb24sIGNvcHktb2ZmbG9hZCwgc2VjdXJlIHBlci11c2VyIHNlc3Npb24KLQkgIGVzdGFibGlz
-aG1lbnQgdmlhIE5UTE0gb3IgTlRMTXYyLgorCSAgZXN0YWJsaXNobWVudCB2aWEgS2VyYmVyb3Mg
-b3IgTlRMTXYyLgogCiBjb25maWcgU01CX1NFUlZFUl9TTUJESVJFQ1QKIAlib29sICJTdXBwb3J0
-IGZvciBTTUIgRGlyZWN0IHByb3RvY29sIgorCWRlcGVuZHMgb24gU01CX1NFUlZFUgogCWRlcGVu
-ZHMgb24gU01CX1NFUlZFUj1tICYmIElORklOSUJBTkQgJiYgSU5GSU5JQkFORF9BRERSX1RSQU5T
-IHx8IFNNQl9TRVJWRVI9eSAmJiBJTkZJTklCQU5EPXkgJiYgSU5GSU5JQkFORF9BRERSX1RSQU5T
-PXkKIAlzZWxlY3QgU0dfUE9PTAogCWRlZmF1bHQgbgotLSAKMi4zNC4xCgo=
---00000000000018359305f36fedec--
