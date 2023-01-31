@@ -2,72 +2,133 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC281C61DA4
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 02:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E46C636D4
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 03:24:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbjAaClB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 21:41:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57670 "EHLO
+        id S230124AbjAaDYB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 22:24:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230060AbjAaClA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 21:41:00 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A8A21973
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 18:40:59 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id 5so13683194plo.3
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 18:40:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=alDr8rnuCdi5UnNlDrRyh+KO4l3lmqdwsUiDHxjRReQ=;
-        b=oEXi8wHoUktKmI2sc94o06ppFw5nran23Th+8v7ax2OM+x+0k2Zp2IdQICC9xdWg/B
-         nIZBwEYj8h1E6/9ezOas2DcYAg8xv8K/Rn2/yJGB7L+WdAvIL0RbepDl4SFd2m1yrUqq
-         os0+09i9UcvmWNRpLvQJk8LdNGIWOW3whXxU0=
+        with ESMTP id S229810AbjAaDYA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 22:24:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDA7D358A
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 19:23:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675135390;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ltkBGnwECMJmhbD7vrl7YLMiwdLoKe7LIr5e2nHG3PQ=;
+        b=bNackPNdox5dPIIdmUa0xSaQ56Hs5k2u4WpXgd14n+nzidcPmkoO/fkh9FgKSIiAfrzn+K
+        YGGFa9MmhiweNPFhKYoVYnOMrxfBUtp6On1E4vGf11XX42LiPELSgyXbwyjFqCrCO8oJOK
+        D/m6LyUn9k9LtZYzzcagFineDayAhT8=
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
+ [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-307-Yb4H_I6sNXiuW4XZOoRQlA-1; Mon, 30 Jan 2023 22:23:08 -0500
+X-MC-Unique: Yb4H_I6sNXiuW4XZOoRQlA-1
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-163a3511e93so2023888fac.11
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 19:23:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=alDr8rnuCdi5UnNlDrRyh+KO4l3lmqdwsUiDHxjRReQ=;
-        b=soGQFhqoOycKQHMKKPz7JXHnmcIOXleoeMEdvwaE5sjYGYy8bg2/WIYk+rJfkAqBAw
-         cfZxuJZpxdJ+MtA0nLDuAhI2YhY7lRJCfsr0iciemCngDWvqQgOlGwEJEFASLd6Js9Hb
-         5VOI7pM8oe0Ae50wUZKykmKzUSZhiVD7HTcAwMrQ9ZP1NugK/XtLqOEzGvFhSS6pJmf8
-         cXuCDiVUTKPHfp8GyszKKXZhj9AtZCTzdnSzxSluqvUic92UfMYfCi3BwRnGMbqAJUMq
-         lSp1YsOk0b+q7fpb1Ja4zwRw/1Qo3e+jepI2bi7J6ps7Gmit8PGzlNxkaN+fIbRrY1pJ
-         2bNQ==
-X-Gm-Message-State: AO0yUKVPyowbbWcnkl1P2CbpeqBbWEvm9JtZqWe18mCwC8JP96HbJ6T1
-        wOS2gjju5DGvY6FeEdSqRTjVbg==
-X-Google-Smtp-Source: AK7set8KEiRNB4VK5ujMQHqAkva5XQPwI7xJP2sI9JcJ39lI8c2XRJiSLWH/d+PHXTKmQp7rsnmsKA==
-X-Received: by 2002:a17:902:e2c5:b0:196:86ce:ab6b with SMTP id l5-20020a170902e2c500b0019686ceab6bmr4266853plc.3.1675132858898;
-        Mon, 30 Jan 2023 18:40:58 -0800 (PST)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id ik7-20020a170902ab0700b00194ab9a4fecsm8435934plb.138.2023.01.30.18.40.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 18:40:58 -0800 (PST)
-Date:   Tue, 31 Jan 2023 11:40:54 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Dawei Li <set_pte_at@outlook.com>
-Cc:     linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
-        tom@talpey.com, hyc.lee@gmail.com, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/6] ksmbd: fix typo, syncronous->synchronous
-Message-ID: <Y9h/tt7Au7EUUqZU@google.com>
-References: <20230115103209.146002-1-set_pte_at@outlook.com>
- <TYCP286MB2323A6AB80B9EFE1CAB86003CAC09@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ltkBGnwECMJmhbD7vrl7YLMiwdLoKe7LIr5e2nHG3PQ=;
+        b=Z3G8HmEfdSVxvL9GRSktygFsKoOF2duvqAQCzrTgCJtue6RZ1fXvidP+q2K0uFRFtW
+         +3bDmVPAJSg/WehIRcX5ISplS1jiqsR/idls3whSUpq5kdXRtAo49kWGRQkxpTbDg57q
+         7ZwoPdueQ5PPJwYU+zheNcgsWI7v8cyk2yTnV6degWAlxK11wD4aS3gncs+fmBhybYCs
+         tz6qg3siZpUJTcSyhp2lC5GyUIDx3kj6uafYZ8iIqa7JT/uJzE7U7mTLlLXzRPcb5Bqb
+         5HM5UauG3Qf3HNp17fUQeZ597JD6FuKM3HYS6guDq/OlJY6MiZ3TniwOE4W76cSFJECB
+         Tn9w==
+X-Gm-Message-State: AO0yUKWXVqJ+KRyor9D+/Wpo7ZDu01ay8ZrwTgtHADdoU4D0kjMeSvnR
+        Ng4jqIWwWoZv0Ci9kXU4goOYGtJH+ILxZJ8jFJGiBwEJ0Lm95YRs8NVUYWhk6Ue/GrzP3P/W4yE
+        tLAxYQDU8x6IeH22/kvdKo+nVXbpA8RZWS87PwQ==
+X-Received: by 2002:a05:6870:959e:b0:163:9cea:eea7 with SMTP id k30-20020a056870959e00b001639ceaeea7mr567804oao.35.1675135387491;
+        Mon, 30 Jan 2023 19:23:07 -0800 (PST)
+X-Google-Smtp-Source: AK7set9Hu2HFEDPiDGXCaNnCjpBr1M/3mkKYHDHH6RsQ5EtesD62XsOTK7GEj1aXmBl8gjJeRQSyQJytKuQEUWxkdJU=
+X-Received: by 2002:a05:6870:959e:b0:163:9cea:eea7 with SMTP id
+ k30-20020a056870959e00b001639ceaeea7mr567795oao.35.1675135387309; Mon, 30 Jan
+ 2023 19:23:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TYCP286MB2323A6AB80B9EFE1CAB86003CAC09@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-10-hch@lst.de>
+ <20230130101747-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230130101747-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 31 Jan 2023 11:22:56 +0800
+Message-ID: <CACGkMEuoqJP4S+jz8Tt5K72i-w5qBhuheTiCWaRLxUBfYS_jQg@mail.gmail.com>
+Subject: Re: [PATCH 09/23] virtio_blk: use bvec_set_virt to initialize special_vec
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On (23/01/15 18:32), Dawei Li wrote:
-> 
-> syncronous->synchronous
-> 
-> Signed-off-by: Dawei Li <set_pte_at@outlook.com>
+On Mon, Jan 30, 2023 at 11:18 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Jan 30, 2023 at 10:21:43AM +0100, Christoph Hellwig wrote:
+> > Use the bvec_set_virt helper to initialize the special_vec.
+> >
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
+>
+>
+> > ---
+> >  drivers/block/virtio_blk.c | 4 +---
+> >  1 file changed, 1 insertion(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index 6a77fa91742880..dc6e9b989910b0 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -170,9 +170,7 @@ static int virtblk_setup_discard_write_zeroes_erase(struct request *req, bool un
+> >
+> >       WARN_ON_ONCE(n != segments);
+> >
+> > -     req->special_vec.bv_page = virt_to_page(range);
+> > -     req->special_vec.bv_offset = offset_in_page(range);
+> > -     req->special_vec.bv_len = sizeof(*range) * segments;
+> > +     bvec_set_virt(&req->special_vec, range, sizeof(*range) * segments);
+> >       req->rq_flags |= RQF_SPECIAL_PAYLOAD;
+> >
+> >       return 0;
+> > --
+> > 2.39.0
+>
 
