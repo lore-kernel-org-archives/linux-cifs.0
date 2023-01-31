@@ -2,164 +2,132 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DEDC61DA4
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 02:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A90DC64EC3
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 02:32:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231190AbjAaCB2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 21:01:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37992 "EHLO
+        id S229810AbjAaCcU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 21:32:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231266AbjAaCBY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 21:01:24 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA553252F;
-        Mon, 30 Jan 2023 18:01:20 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id d30so22045039lfv.8;
-        Mon, 30 Jan 2023 18:01:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3FX1nguOn530FjieJGxPrgbsgP+PsVHfD0ppimHUX5w=;
-        b=b1rqbpSgSAfsYCL4yXbiN+ZYAPXdNQhFr5MPI7LplPGb8GQhW/MAGZkZTZgz61TfmJ
-         B3ZNjOxC54EP9WBMrr/xWkqVkUoKBnTK8oy4uzkyvbFO4rLQD5jin7ZmcyQzb2pBiOs3
-         5Egajg7mo3Cx/5eAdCuTOvxU8gvx+6K0qISGkmhV93c5Y9eRUHlQrpYwtqCkC9M6L9Sh
-         btmZ76dDbXNvw3LldnbDDTQRXrIzC+bOITOv5zIpDBIoQtWijJYyyjIYnndN2auDK9oB
-         Sag3/0wXR+0MUD8Ws9qIMZEFsdU4iZefZCEYm8RuhL/0MIeVTgCko4QUSO8aHmQMtln1
-         I8lw==
+        with ESMTP id S229501AbjAaCcT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 21:32:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ADCD19F28
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 18:31:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675132291;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=utT+RE/MkgWVBG/iNzPiYM+H0kp8FILH2HeviGKceUM=;
+        b=V0M3wGpdBBsw/qnBVJYGvqUuY6TgQf50fzKDFiI6thRAWkSc0D91LO7BU4MOA8viUUO0B8
+        BvdbvTyp47iIjrnKhfl27aaJNqLC2BQmEv7Q0EGEVF4u2Rix3+GlQJ0o4iusJM3sWlfqX4
+        FzyQ3m03bWC7v3ZqVshmtQvPuYD/st4=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-301-e-h4LELqOQOgNdiWcZgzKQ-1; Mon, 30 Jan 2023 21:31:29 -0500
+X-MC-Unique: e-h4LELqOQOgNdiWcZgzKQ-1
+Received: by mail-ot1-f70.google.com with SMTP id t20-20020a05683022f400b0068655e05e7eso6587971otc.22
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 18:31:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3FX1nguOn530FjieJGxPrgbsgP+PsVHfD0ppimHUX5w=;
-        b=ou49a074g9m2TguONU8RyySZppB3RrilOWmx3by9lalnjVFTtFdjpfu3CtQNy7MbTy
-         Hu6AF6XoFJ1q0AlniydpyFrUvT0t0P/tT/IwIlxlaPCQ/tUzfvM+CN1PsxtSs8hg1wHS
-         WK2B9GpQw9+SkJZglBV2wnEFdlyUb+L9bqx8L/otcZHZNI9wlO6z1b3CbbWPjArMpoPy
-         iAxlGhSvD0KDgzY067NFWnrCaYZdzOWe4LhmlqDUnXxJnH+lVkS59eiqo9Wx7fE9wwP7
-         zfm8HCniqLgLhccWoreLYdehf+emNn7OfQmvXKJDOTVDc2Cr1bPVwDqYysrUKgUhk6jy
-         BDdw==
-X-Gm-Message-State: AFqh2ko+nfA+p25xohAf1/i0Y4xkJms4ODOPamC9R9atkWhrGRJc4+o8
-        NAO+Tiq63SJrDPsD0Z1SN/eh7BRaT9XNa/Ol09w=
-X-Google-Smtp-Source: AMrXdXtIEw5TWX9SP7FtHsdK+XkupNgNcR6tiT5Wg0rItxD2DWJf1nMCGQDp9EtG0hmh+ONX0K0aS1FU4f1Yjid8LTw=
-X-Received: by 2002:a05:6512:1284:b0:4d5:9957:541 with SMTP id
- u4-20020a056512128400b004d599570541mr5048862lfs.52.1675130478214; Mon, 30 Jan
- 2023 18:01:18 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=utT+RE/MkgWVBG/iNzPiYM+H0kp8FILH2HeviGKceUM=;
+        b=dDd8k4AGv7NS1LRIF93LQ2GNlySVY4AoXVv4gmNKvZlWcHFkv3Nf9Lsf5JmGwCBr8t
+         DWkEazWOf2HoPj2vBmMAlKJfLI/7H1pgn3h15Uze3Fj8GDtN3t3fgUknBmAXFZNOvtlS
+         AX9/WNMYF6js1HW4ee1CafGvEJ/CF6hrtdDOUvTzo5axowOk00GB2nHQM/ot1FMpU6iZ
+         l8SXmh+UeWlTwNoFA+k0aylLcF6wT+5MFWZzqH0X4ftI9/amkx21Av2c7QXsIzmdemc5
+         6D8CiqQ6e7eT63YI+s5p1TO4DRPiidJuv9iUbOwn8csb0TrpZ8CQpi0HVfTk4LC28gZv
+         QeNw==
+X-Gm-Message-State: AFqh2kpbS0okti0VjcSfQjOxcBMi4i2WK3qIY6D01/NTQ6M1nHndQTbI
+        rIyTfyrmZKE0I/OnqeOzZgl7QKo+M2x8BrQykYd/hjWe9+atVs7Arc8/Dsrby9qO5p2b5LTJSF8
+        SFwGZKoT0MHde6SQOuispUdfFghrKcAkfIRbKIA==
+X-Received: by 2002:aca:3f84:0:b0:36e:f5f8:cce1 with SMTP id m126-20020aca3f84000000b0036ef5f8cce1mr1057773oia.35.1675132289132;
+        Mon, 30 Jan 2023 18:31:29 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXssco6mBUOhDTHWFT4/t2hB47krC6OsHE12Ww1f+hysvA2CpNEADdT3xvxh0DzmLnnFuHE/ftXAK22WOSTVfWk=
+X-Received: by 2002:aca:3f84:0:b0:36e:f5f8:cce1 with SMTP id
+ m126-20020aca3f84000000b0036ef5f8cce1mr1057763oia.35.1675132288910; Mon, 30
+ Jan 2023 18:31:28 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5muSiYCHbHg8zgF1jNiEyafXBhH_pcytudU-4_LQ6DyUmg@mail.gmail.com>
-In-Reply-To: <CAH2r5muSiYCHbHg8zgF1jNiEyafXBhH_pcytudU-4_LQ6DyUmg@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 30 Jan 2023 20:01:06 -0600
-Message-ID: <CAH2r5mstTSBJLRht6QRoJy3yy0pmNxg_CFS0Pid=bikLWzp8_Q@mail.gmail.com>
-Subject: Re: [PATCH][KSMBD] fix indentation in ksmbd config and note Kerberos support
-To:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
-Content-Type: multipart/mixed; boundary="0000000000001b584805f385b531"
+References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-23-hch@lst.de>
+In-Reply-To: <20230130092157.1759539-23-hch@lst.de>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 31 Jan 2023 10:31:18 +0800
+Message-ID: <CACGkMEsPvy5jVWA7AHJkyRKa8-xr9oi4DUAzBcU0pQ_n4rqCFA@mail.gmail.com>
+Subject: Re: [PATCH 22/23] vring: use bvec_set_page to initialize a bvec
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000001b584805f385b531
-Content-Type: text/plain; charset="UTF-8"
-
-updated version following David Howell's suggestion for using if/endif
-to fix the indentation
-
-
-On Sun, Jan 29, 2023 at 6:01 PM Steve French <smfrench@gmail.com> wrote:
+On Mon, Jan 30, 2023 at 5:23 PM Christoph Hellwig <hch@lst.de> wrote:
 >
-> Fix indentation of server config options, and also since
-> support for very old, less secure, NTLM authentication was removed
-> (and quite a while ago), remove the mention of that in Kconfig, but
-> do note Kerberos (not just NTLMv2) which are supported and much
-> more secure.
+> Use the bvec_set_page helper to initialize a bvec.
 >
-> Signed-off-by: Steve French <stfrench@microsoft.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+A typo in the subject, should be "vringh".
+
+Other than this
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
 > ---
->  fs/ksmbd/Kconfig | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  drivers/vhost/vringh.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 >
-> diff --git a/fs/ksmbd/Kconfig b/fs/ksmbd/Kconfig
-> index e1fe17747ed6..4153e5491435 100644
-> --- a/fs/ksmbd/Kconfig
-> +++ b/fs/ksmbd/Kconfig
-> @@ -33,17 +33,18 @@ config SMB_SERVER
->     in ksmbd-tools, available from
->     https://github.com/cifsd-team/ksmbd-tools.
->     More detail about how to run the ksmbd kernel server is
-> -   available via README file
-> +   available via the README file
->     (https://github.com/cifsd-team/ksmbd-tools/blob/master/README).
->
->     ksmbd kernel server includes support for auto-negotiation,
->     Secure negotiate, Pre-authentication integrity, oplock/lease,
->     compound requests, multi-credit, packet signing, RDMA(smbdirect),
->     smb3 encryption, copy-offload, secure per-user session
-> -   establishment via NTLM or NTLMv2.
-> +   establishment via Kerberos or NTLMv2.
->
->  config SMB_SERVER_SMBDIRECT
->   bool "Support for SMB Direct protocol"
-> + depends on SMB_SERVER
->   depends on SMB_SERVER=m && INFINIBAND && INFINIBAND_ADDR_TRANS ||
-> SMB_SERVER=y && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
->   select SG_POOL
->   default n
->
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index 33eb941fcf1546..a1e27da544814a 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -1126,9 +1126,8 @@ static int iotlb_translate(const struct vringh *vrh,
+>                 size = map->size - addr + map->start;
+>                 pa = map->addr + addr - map->start;
+>                 pfn = pa >> PAGE_SHIFT;
+> -               iov[ret].bv_page = pfn_to_page(pfn);
+> -               iov[ret].bv_len = min(len - s, size);
+> -               iov[ret].bv_offset = pa & (PAGE_SIZE - 1);
+> +               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, size),
+> +                             pa & (PAGE_SIZE - 1));
+>                 s += size;
+>                 addr += size;
+>                 ++ret;
 > --
-> Thanks,
+> 2.39.0
 >
-> Steve
 
-
-
--- 
-Thanks,
-
-Steve
-
---0000000000001b584805f385b531
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-ksmbd-update-Kconfig-to-note-Kerberos-support-and-fi.patch"
-Content-Disposition: attachment; 
-	filename="0001-ksmbd-update-Kconfig-to-note-Kerberos-support-and-fi.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ldjlfbgc0>
-X-Attachment-Id: f_ldjlfbgc0
-
-RnJvbSBhMzM3MWIzNmQzNDZmOTc1NjAxNmU1MzIxYWNlYmMyZGFhYjk2ODZiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgMjkgSmFuIDIwMjMgMTc6NDk6NTkgLTA2MDAKU3ViamVjdDogW1BBVENIIDEv
-Ml0ga3NtYmQ6IHVwZGF0ZSBLY29uZmlnIHRvIG5vdGUgS2VyYmVyb3Mgc3VwcG9ydCBhbmQgZml4
-CiBpbmRlbnRhdGlvbgoKRml4IGluZGVudGF0aW9uIG9mIHNlcnZlciBjb25maWcgb3B0aW9ucywg
-YW5kIGFsc28gc2luY2UKc3VwcG9ydCBmb3IgdmVyeSBvbGQsIGxlc3Mgc2VjdXJlLCBOVExNIGF1
-dGhlbnRpY2F0aW9uIHdhcyByZW1vdmVkCihhbmQgcXVpdGUgYSB3aGlsZSBhZ28pLCByZW1vdmUg
-dGhlIG1lbnRpb24gb2YgdGhhdCBpbiBLY29uZmlnLCBidXQKZG8gbm90ZSBLZXJiZXJvcyAobm90
-IGp1c3QgTlRMTXYyKSB3aGljaCBhcmUgc3VwcG9ydGVkIGFuZCBtdWNoCm1vcmUgc2VjdXJlLgoK
-QWNrZWQtYnk6IE5hbWphZSBKZW9uIDxsaW5raW5qZW9uQGtlcm5lbC5vcmc+CkFja2VkLWJ5OiBE
-YXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBG
-cmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMva3NtYmQvS2NvbmZpZyB8IDgg
-KysrKysrLS0KIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0p
-CgpkaWZmIC0tZ2l0IGEvZnMva3NtYmQvS2NvbmZpZyBiL2ZzL2tzbWJkL0tjb25maWcKaW5kZXgg
-ZTFmZTE3NzQ3ZWQ2Li43MDU1Y2I1ZDI4ODAgMTAwNjQ0Ci0tLSBhL2ZzL2tzbWJkL0tjb25maWcK
-KysrIGIvZnMva3NtYmQvS2NvbmZpZwpAQCAtMzMsMTQgKzMzLDE2IEBAIGNvbmZpZyBTTUJfU0VS
-VkVSCiAJICBpbiBrc21iZC10b29scywgYXZhaWxhYmxlIGZyb20KIAkgIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9jaWZzZC10ZWFtL2tzbWJkLXRvb2xzLgogCSAgTW9yZSBkZXRhaWwgYWJvdXQgaG93IHRv
-IHJ1biB0aGUga3NtYmQga2VybmVsIHNlcnZlciBpcwotCSAgYXZhaWxhYmxlIHZpYSBSRUFETUUg
-ZmlsZQorCSAgYXZhaWxhYmxlIHZpYSB0aGUgUkVBRE1FIGZpbGUKIAkgIChodHRwczovL2dpdGh1
-Yi5jb20vY2lmc2QtdGVhbS9rc21iZC10b29scy9ibG9iL21hc3Rlci9SRUFETUUpLgogCiAJICBr
-c21iZCBrZXJuZWwgc2VydmVyIGluY2x1ZGVzIHN1cHBvcnQgZm9yIGF1dG8tbmVnb3RpYXRpb24s
-CiAJICBTZWN1cmUgbmVnb3RpYXRlLCBQcmUtYXV0aGVudGljYXRpb24gaW50ZWdyaXR5LCBvcGxv
-Y2svbGVhc2UsCiAJICBjb21wb3VuZCByZXF1ZXN0cywgbXVsdGktY3JlZGl0LCBwYWNrZXQgc2ln
-bmluZywgUkRNQShzbWJkaXJlY3QpLAogCSAgc21iMyBlbmNyeXB0aW9uLCBjb3B5LW9mZmxvYWQs
-IHNlY3VyZSBwZXItdXNlciBzZXNzaW9uCi0JICBlc3RhYmxpc2htZW50IHZpYSBOVExNIG9yIE5U
-TE12Mi4KKwkgIGVzdGFibGlzaG1lbnQgdmlhIEtlcmJlcm9zIG9yIE5UTE12Mi4KKworaWYgU01C
-X1NFUlZFUgogCiBjb25maWcgU01CX1NFUlZFUl9TTUJESVJFQ1QKIAlib29sICJTdXBwb3J0IGZv
-ciBTTUIgRGlyZWN0IHByb3RvY29sIgpAQCAtNTQsNiArNTYsOCBAQCBjb25maWcgU01CX1NFUlZF
-Ul9TTUJESVJFQ1QKIAkgIFNNQiBEaXJlY3QgYWxsb3dzIHRyYW5zZmVycmluZyBTTUIgcGFja2V0
-cyBvdmVyIFJETUEuIElmIHVuc3VyZSwKIAkgIHNheSBOLgogCitlbmRpZgorCiBjb25maWcgU01C
-X1NFUlZFUl9DSEVDS19DQVBfTkVUX0FETUlOCiAJYm9vbCAiRW5hYmxlIGNoZWNrIG5ldHdvcmsg
-YWRtaW5pc3RyYXRpb24gY2FwYWJpbGl0eSIKIAlkZXBlbmRzIG9uIFNNQl9TRVJWRVIKLS0gCjIu
-MzQuMQoK
---0000000000001b584805f385b531--
