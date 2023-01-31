@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83569C636CD
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 18:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC61FC636CC
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 18:30:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbjAaSaG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Jan 2023 13:30:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53824 "EHLO
+        id S231482AbjAaSac (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Jan 2023 13:30:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231358AbjAaSaB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Jan 2023 13:30:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E8645894F
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Jan 2023 10:29:11 -0800 (PST)
+        with ESMTP id S231481AbjAaSa0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Jan 2023 13:30:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1AC4AA61
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Jan 2023 10:29:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675189750;
+        s=mimecast20190719; t=1675189775;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t3UIPHmqMFH1ajjKP7sH9bM7EYfR1yJADQVx392bk1s=;
-        b=C9NeSARzxNJ8HrEfprUiW3iaFirpecBBV5ZGRPP2xgvoGM7t4Xcj9Vkyj3HMYNfnD8Rkor
-        dygK0PAUM9+AjEKTNsyfylPsGKewCgbaT4NnBCRdTgepjwMxtk6XFDQ2yUXcSduDJRj5jh
-        iw5tNEDErh3kdNXUFiBT/vgwv397UVA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=kWb7O41f1WriEcZrcMKHfGt97wrF3RMDR3uAu+lgAnU=;
+        b=Q5Id3IEt+75tRCg9lU0pJXbAznQmbcueDQUi+ImCM+RlVA65u5ZNxhCkTBFujbveyJyNWH
+        ZNgeptWG9kr74EiOR4kJafV4+LcI/b3wk3PMCqBJ6SK6+1qdud/obizS7V9mc43FOpDBiC
+        r5TunEfhoydGBDQS9A77waCdie79qkk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-508-lFqgZSIxMbOwC8PglsK-rQ-1; Tue, 31 Jan 2023 13:29:04 -0500
-X-MC-Unique: lFqgZSIxMbOwC8PglsK-rQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-119-26M0M9c5MEaghaDZXABYkQ-1; Tue, 31 Jan 2023 13:29:30 -0500
+X-MC-Unique: 26M0M9c5MEaghaDZXABYkQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8FF5329AB445;
-        Tue, 31 Jan 2023 18:29:02 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A743088B7D4;
+        Tue, 31 Jan 2023 18:29:09 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C3C1A2026D4B;
-        Tue, 31 Jan 2023 18:29:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EC6DC14171B6;
+        Tue, 31 Jan 2023 18:29:07 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -49,189 +49,275 @@ Cc:     David Howells <dhowells@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>, linux-cachefs@redhat.com
-Subject: [PATCH 01/12] netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
-Date:   Tue, 31 Jan 2023 18:28:44 +0000
-Message-Id: <20230131182855.4027499-2-dhowells@redhat.com>
+        Steve French <sfrench@samba.org>, linux-rdma@vger.kernel.org
+Subject: [PATCH 04/12] cifs: Add a function to build an RDMA SGE list from an iterator
+Date:   Tue, 31 Jan 2023 18:28:47 +0000
+Message-Id: <20230131182855.4027499-5-dhowells@redhat.com>
 In-Reply-To: <20230131182855.4027499-1-dhowells@redhat.com>
 References: <20230131182855.4027499-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a function to extract the pages from a user-space supplied iterator
-(UBUF- or IOVEC-type) into a BVEC-type iterator, retaining the pages by
-getting a pin on them (as FOLL_PIN) as we go.
+Add a function to add elements onto an RDMA SGE list representing page
+fragments extracted from a BVEC-, KVEC- or XARRAY-type iterator and DMA
+mapped until the maximum number of elements is reached.
 
-This is useful in three situations:
-
- (1) A userspace thread may have a sibling that unmaps or remaps the
-     process's VM during the operation, changing the assignment of the
-     pages and potentially causing an error.  Retaining the pages keeps
-     some pages around, even if this occurs; futher, we find out at the
-     point of extraction if EFAULT is going to be incurred.
-
- (2) Pages might get swapped out/discarded if not retained, so we want to
-     retain them to avoid the reload causing a deadlock due to a DIO
-     from/to an mmapped region on the same file.
-
- (3) The iterator may get passed to sendmsg() by the filesystem.  If a
-     fault occurs, we may get a short write to a TCP stream that's then
-     tricky to recover from.
-
-We don't deal with other types of iterator here, leaving it to other
-mechanisms to retain the pages (eg. PG_locked, PG_writeback and the pipe
-lock).
+Nothing is done to make sure the pages remain present - that must be done
+by the caller.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
 cc: Steve French <sfrench@samba.org>
 cc: Shyam Prasad N <nspmangalore@gmail.com>
 cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: linux-cachefs@redhat.com
+cc: Tom Talpey <tom@talpey.com>
+cc: Jeff Layton <jlayton@kernel.org>
 cc: linux-cifs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/Makefile     |   1 +
- fs/netfs/iterator.c   | 102 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/netfs.h |   2 +
- 3 files changed, 105 insertions(+)
- create mode 100644 fs/netfs/iterator.c
+cc: linux-rdma@vger.kernel.org
 
-diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
-index f684c0cd1ec5..386d6fb92793 100644
---- a/fs/netfs/Makefile
-+++ b/fs/netfs/Makefile
-@@ -3,6 +3,7 @@
- netfs-y := \
- 	buffered_read.o \
- 	io.o \
-+	iterator.o \
- 	main.o \
- 	objects.o
+Link: https://lore.kernel.org/r/166697256704.61150.17388516338310645808.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166732028840.3186319.8512284239779728860.stgit@warthog.procyon.org.uk/ # rfc
+---
+ fs/cifs/smbdirect.c | 220 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 220 insertions(+)
+
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 8c816b25ce7c..44eff1cf4ed0 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -44,6 +44,17 @@ static int smbd_post_send_page(struct smbd_connection *info,
+ static void destroy_mr_list(struct smbd_connection *info);
+ static int allocate_mr_list(struct smbd_connection *info);
  
-diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
-new file mode 100644
-index 000000000000..7b7cdc2863fc
---- /dev/null
-+++ b/fs/netfs/iterator.c
-@@ -0,0 +1,102 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Iterator helpers.
-+ *
-+ * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
++struct smb_extract_to_rdma {
++	struct ib_sge		*sge;
++	unsigned int		nr_sge;
++	unsigned int		max_sge;
++	struct ib_device	*device;
++	u32			local_dma_lkey;
++	enum dma_data_direction	direction;
++};
++static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
++					struct smb_extract_to_rdma *rdma);
 +
-+#include <linux/export.h>
-+#include <linux/slab.h>
-+#include <linux/uio.h>
-+#include <linux/netfs.h>
-+#include "internal.h"
+ /* SMBD version number */
+ #define SMBD_V1	0x0100
+ 
+@@ -2490,3 +2501,212 @@ int smbd_deregister_mr(struct smbd_mr *smbdirect_mr)
+ 
+ 	return rc;
+ }
 +
-+/**
-+ * netfs_extract_user_iter - Extract the pages from a user iterator into a bvec
-+ * @orig: The original iterator
-+ * @orig_len: The amount of iterator to copy
-+ * @new: The iterator to be set up
-+ * @extract_flags: Flags to qualify the request
-+ *
-+ * Extract the page fragments from the given amount of the source iterator and
-+ * build up a second iterator that refers to all of those bits.  This allows
-+ * the original iterator to disposed of.
-+ *
-+ * @extract_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA be
-+ * allowed on the pages extracted.
-+ *
-+ * On success, the number of elements in the bvec is returned, the original
-+ * iterator will have been advanced by the amount extracted.
-+ *
-+ * The iov_iter_extract_mode() function should be used to query how cleanup
-+ * should be performed.
-+ */
-+ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
-+				struct iov_iter *new, unsigned int extract_flags)
++static bool smb_set_sge(struct smb_extract_to_rdma *rdma,
++			struct page *lowest_page, size_t off, size_t len)
 +{
-+	struct bio_vec *bv = NULL;
-+	struct page **pages;
-+	unsigned int cur_npages;
-+	unsigned int max_pages;
-+	unsigned int npages = 0;
++	struct ib_sge *sge = &rdma->sge[rdma->nr_sge];
++	u64 addr;
++
++	addr = ib_dma_map_page(rdma->device, lowest_page,
++			       off, len, rdma->direction);
++	if (ib_dma_mapping_error(rdma->device, addr))
++		return false;
++
++	sge->addr   = addr;
++	sge->length = len;
++	sge->lkey   = rdma->local_dma_lkey;
++	rdma->nr_sge++;
++	return true;
++}
++
++/*
++ * Extract page fragments from a BVEC-class iterator and add them to an RDMA
++ * element list.  The pages are not pinned.
++ */
++static ssize_t smb_extract_bvec_to_rdma(struct iov_iter *iter,
++					struct smb_extract_to_rdma *rdma,
++					ssize_t maxsize)
++{
++	const struct bio_vec *bv = iter->bvec;
++	unsigned long start = iter->iov_offset;
 +	unsigned int i;
-+	ssize_t ret;
-+	size_t count = orig_len, offset, len;
-+	size_t bv_size, pg_size;
++	ssize_t ret = 0;
 +
-+	if (WARN_ON_ONCE(!iter_is_ubuf(orig) && !iter_is_iovec(orig)))
-+		return -EIO;
++	for (i = 0; i < iter->nr_segs; i++) {
++		size_t off, len;
 +
-+	max_pages = iov_iter_npages(orig, INT_MAX);
-+	bv_size = array_size(max_pages, sizeof(*bv));
-+	bv = kvmalloc(bv_size, GFP_KERNEL);
-+	if (!bv)
-+		return -ENOMEM;
++		len = bv[i].bv_len;
++		if (start >= len) {
++			start -= len;
++			continue;
++		}
 +
-+	/* Put the page list at the end of the bvec list storage.  bvec
-+	 * elements are larger than page pointers, so as long as we work
-+	 * 0->last, we should be fine.
-+	 */
-+	pg_size = array_size(max_pages, sizeof(*pages));
-+	pages = (void *)bv + bv_size - pg_size;
++		len = min_t(size_t, maxsize, len - start);
++		off = bv[i].bv_offset + start;
 +
-+	while (count && npages < max_pages) {
-+		ret = iov_iter_extract_pages(orig, &pages, count,
-+					     max_pages - npages, extract_flags,
-+					     &offset);
-+		if (ret < 0) {
-+			pr_err("Couldn't get user pages (rc=%zd)\n", ret);
++		if (!smb_set_sge(rdma, bv[i].bv_page, off, len))
++			return -EIO;
++
++		ret += len;
++		maxsize -= len;
++		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
 +			break;
-+		}
-+
-+		if (ret > count) {
-+			pr_err("get_pages rc=%zd more than %zu\n", ret, count);
-+			break;
-+		}
-+
-+		count -= ret;
-+		ret += offset;
-+		cur_npages = DIV_ROUND_UP(ret, PAGE_SIZE);
-+
-+		if (npages + cur_npages > max_pages) {
-+			pr_err("Out of bvec array capacity (%u vs %u)\n",
-+			       npages + cur_npages, max_pages);
-+			break;
-+		}
-+
-+		for (i = 0; i < cur_npages; i++) {
-+			len = ret > PAGE_SIZE ? PAGE_SIZE : ret;
-+			bv[npages + i].bv_page	 = *pages++;
-+			bv[npages + i].bv_offset = offset;
-+			bv[npages + i].bv_len	 = len - offset;
-+			ret -= len;
-+			offset = 0;
-+		}
-+
-+		npages += cur_npages;
++		start = 0;
 +	}
 +
-+	iov_iter_bvec(new, orig->data_source, bv, npages, orig_len - count);
-+	return npages;
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(netfs_extract_user_iter);
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 4c76ddfb6a67..e8c560131170 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -296,6 +296,8 @@ void netfs_get_subrequest(struct netfs_io_subrequest *subreq,
- void netfs_put_subrequest(struct netfs_io_subrequest *subreq,
- 			  bool was_async, enum netfs_sreq_ref_trace what);
- void netfs_stats_show(struct seq_file *);
-+ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
-+				struct iov_iter *new, unsigned int extract_flags);
- 
- /**
-  * netfs_inode - Get the netfs inode context from the inode
++
++/*
++ * Extract fragments from a KVEC-class iterator and add them to an RDMA list.
++ * This can deal with vmalloc'd buffers as well as kmalloc'd or static buffers.
++ * The pages are not pinned.
++ */
++static ssize_t smb_extract_kvec_to_rdma(struct iov_iter *iter,
++					struct smb_extract_to_rdma *rdma,
++					ssize_t maxsize)
++{
++	const struct kvec *kv = iter->kvec;
++	unsigned long start = iter->iov_offset;
++	unsigned int i;
++	ssize_t ret = 0;
++
++	for (i = 0; i < iter->nr_segs; i++) {
++		struct page *page;
++		unsigned long kaddr;
++		size_t off, len, seg;
++
++		len = kv[i].iov_len;
++		if (start >= len) {
++			start -= len;
++			continue;
++		}
++
++		kaddr = (unsigned long)kv[i].iov_base + start;
++		off = kaddr & ~PAGE_MASK;
++		len = min_t(size_t, maxsize, len - start);
++		kaddr &= PAGE_MASK;
++
++		maxsize -= len;
++		do {
++			seg = min_t(size_t, len, PAGE_SIZE - off);
++
++			if (is_vmalloc_or_module_addr((void *)kaddr))
++				page = vmalloc_to_page((void *)kaddr);
++			else
++				page = virt_to_page(kaddr);
++
++			if (!smb_set_sge(rdma, page, off, seg))
++				return -EIO;
++
++			ret += seg;
++			len -= seg;
++			kaddr += PAGE_SIZE;
++			off = 0;
++		} while (len > 0 && rdma->nr_sge < rdma->max_sge);
++
++		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
++			break;
++		start = 0;
++	}
++
++	return ret;
++}
++
++/*
++ * Extract folio fragments from an XARRAY-class iterator and add them to an
++ * RDMA list.  The folios are not pinned.
++ */
++static ssize_t smb_extract_xarray_to_rdma(struct iov_iter *iter,
++					  struct smb_extract_to_rdma *rdma,
++					  ssize_t maxsize)
++{
++	struct xarray *xa = iter->xarray;
++	struct folio *folio;
++	loff_t start = iter->xarray_start + iter->iov_offset;
++	pgoff_t index = start / PAGE_SIZE;
++	ssize_t ret = 0;
++	size_t off, len;
++	XA_STATE(xas, xa, index);
++
++	rcu_read_lock();
++
++	xas_for_each(&xas, folio, ULONG_MAX) {
++		if (xas_retry(&xas, folio))
++			continue;
++		if (WARN_ON(xa_is_value(folio)))
++			break;
++		if (WARN_ON(folio_test_hugetlb(folio)))
++			break;
++
++		off = offset_in_folio(folio, start);
++		len = min_t(size_t, maxsize, folio_size(folio) - off);
++
++		if (!smb_set_sge(rdma, folio_page(folio, 0), off, len)) {
++			rcu_read_lock();
++			return -EIO;
++		}
++
++		maxsize -= len;
++		ret += len;
++		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
++			break;
++	}
++
++	rcu_read_unlock();
++	return ret;
++}
++
++/*
++ * Extract page fragments from up to the given amount of the source iterator
++ * and build up an RDMA list that refers to all of those bits.  The RDMA list
++ * is appended to, up to the maximum number of elements set in the parameter
++ * block.
++ *
++ * The extracted page fragments are not pinned or ref'd in any way; if an
++ * IOVEC/UBUF-type iterator is to be used, it should be converted to a
++ * BVEC-type iterator and the pages pinned, ref'd or otherwise held in some
++ * way.
++ */
++static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
++					struct smb_extract_to_rdma *rdma)
++{
++	ssize_t ret;
++	int before = rdma->nr_sge;
++
++	if (iov_iter_is_discard(iter) ||
++	    iov_iter_is_pipe(iter) ||
++	    user_backed_iter(iter)) {
++		WARN_ON_ONCE(1);
++		return -EIO;
++	}
++
++	switch (iov_iter_type(iter)) {
++	case ITER_BVEC:
++		ret = smb_extract_bvec_to_rdma(iter, rdma, len);
++		break;
++	case ITER_KVEC:
++		ret = smb_extract_kvec_to_rdma(iter, rdma, len);
++		break;
++	case ITER_XARRAY:
++		ret = smb_extract_xarray_to_rdma(iter, rdma, len);
++		break;
++	default:
++		BUG();
++	}
++
++	if (ret > 0) {
++		iov_iter_advance(iter, ret);
++	} else if (ret < 0) {
++		while (rdma->nr_sge > before) {
++			struct ib_sge *sge = &rdma->sge[rdma->nr_sge--];
++
++			ib_dma_unmap_single(rdma->device, sge->addr, sge->length,
++					    rdma->direction);
++			sge->addr = 0;
++		}
++	}
++
++	return ret;
++}
 
