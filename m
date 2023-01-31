@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B879C38142
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 18:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F403C38142
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 18:30:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231660AbjAaSaq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Jan 2023 13:30:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54016 "EHLO
+        id S231557AbjAaSat (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Jan 2023 13:30:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231485AbjAaSad (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Jan 2023 13:30:33 -0500
+        with ESMTP id S231564AbjAaSaf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Jan 2023 13:30:35 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B30058969
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Jan 2023 10:29:42 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92E2589A4
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Jan 2023 10:29:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675189781;
+        s=mimecast20190719; t=1675189784;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fK9UANJIw+SgKwPMH1h7QmOCsXxDJO7CfeS4m/u44DQ=;
-        b=IOdhSDvp9VtREcYdvjzPafQxoAN6GwqkhX7oBVTYe0TF0ZMexuGrMXp7NygvDJX4InGZlr
-        7Yf8To3sH+BE6OY+KNVz79P1LBAUi7Q8O1BmRsT8Gtxf1htoRLHc5CHyqLScHKEfwLOwpM
-        qJUpUvxorTTEdSvT6mI5VA+/6XpB7OI=
+        bh=jlR4JcCg1XC8eTF3I+rHcc7NxJf4yOAtTyxChrY5i+Y=;
+        b=A8e3Yry1yRTaTRpJ3DeaOC78KuqJr+PkzS6fiOU4mYDcx5lMOPB5h8CpWa9fZq+SlmMxLY
+        MEAimU6ZXi+Pj0/Jn84JQOLjc4aJOGsR9TUfYOi2KbAxa7BhiRtJn4KZ5NqUMluBZ1qhAj
+        6oibC3mlmDMOVYtjtzynMEwKRX/OlCc=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-455-qIHfuhcfP6KtFfwlJJioYw-1; Tue, 31 Jan 2023 13:29:33 -0500
-X-MC-Unique: qIHfuhcfP6KtFfwlJJioYw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-523-Pkmmkwa7NbypcP1AWv9hYg-1; Tue, 31 Jan 2023 13:29:41 -0500
+X-MC-Unique: Pkmmkwa7NbypcP1AWv9hYg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 541D418A650B;
-        Tue, 31 Jan 2023 18:29:07 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F346E106D186;
+        Tue, 31 Jan 2023 18:29:11 +0000 (UTC)
 Received: from warthog.procyon.org.uk.com (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AF61C40C2064;
-        Tue, 31 Jan 2023 18:29:05 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45A0CC15BAD;
+        Tue, 31 Jan 2023 18:29:10 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -49,236 +49,195 @@ Cc:     David Howells <dhowells@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>
-Subject: [PATCH 03/12] cifs: Implement splice_read to pass down ITER_BVEC not ITER_PIPE
-Date:   Tue, 31 Jan 2023 18:28:46 +0000
-Message-Id: <20230131182855.4027499-4-dhowells@redhat.com>
+        Steve French <sfrench@samba.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH 05/12] cifs: Add a function to Hash the contents of an iterator
+Date:   Tue, 31 Jan 2023 18:28:48 +0000
+Message-Id: <20230131182855.4027499-6-dhowells@redhat.com>
 In-Reply-To: <20230131182855.4027499-1-dhowells@redhat.com>
 References: <20230131182855.4027499-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Provide cifs_splice_read() to use a bvec rather than an pipe iterator as
-the latter cannot so easily be split and advanced, which is necessary to
-pass an iterator down to the bottom levels.  Upstream cifs gets around this
-problem by using iov_iter_get_pages() to prefill the pipe and then passing
-the list of pages down.
+Add a function to push the contents of a BVEC-, KVEC- or XARRAY-type
+iterator into a symmetric hash algorithm.
 
-This is done by:
-
- (1) Bulk-allocate a bunch of pages to carry as much of the requested
-     amount of data as possible, but without overrunning the available
-     slots in the pipe and add them to an ITER_BVEC.
-
- (2) Synchronously call ->read_iter() to read into the buffer.
-
- (3) Discard any unused pages.
-
- (4) Load the remaining pages into the pipe in order and advance the head
-     pointer.
+UBUF- and IOBUF-type iterators are not supported on the assumption that
+either we're doing buffered I/O, in which case we won't see them, or we're
+doing direct I/O, in which case the iterator will have been extracted into
+a BVEC-type iterator higher up.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
 cc: Shyam Prasad N <nspmangalore@gmail.com>
 cc: Rohith Surabattula <rohiths.msft@gmail.com>
 cc: Jeff Layton <jlayton@kernel.org>
-cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-crypto@vger.kernel.org
 
-Link: https://lore.kernel.org/r/166732028113.3186319.1793644937097301358.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166697257423.61150.12070648579830206483.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166732029577.3186319.17162612653237909961.stgit@warthog.procyon.org.uk/ # rfc
 ---
- fs/cifs/cifsfs.c | 12 +++----
- fs/cifs/cifsfs.h |  3 ++
- fs/cifs/file.c   | 92 ++++++++++++++++++++++++++++++++++++++++++++++++
- fs/splice.c      |  1 +
- 4 files changed, 102 insertions(+), 6 deletions(-)
+ fs/cifs/cifsencrypt.c | 144 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 144 insertions(+)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 10e00c624922..3c57e8b11692 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1358,7 +1358,7 @@ const struct file_operations cifs_file_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap  = cifs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = cifs_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -1378,7 +1378,7 @@ const struct file_operations cifs_file_strict_ops = {
- 	.fsync = cifs_strict_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_strict_mmap,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = cifs_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -1398,7 +1398,7 @@ const struct file_operations cifs_file_direct_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = cifs_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.unlocked_ioctl  = cifs_ioctl,
- 	.copy_file_range = cifs_copy_file_range,
-@@ -1416,7 +1416,7 @@ const struct file_operations cifs_file_nobrl_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap  = cifs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = cifs_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -1434,7 +1434,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
- 	.fsync = cifs_strict_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_strict_mmap,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = cifs_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -1452,7 +1452,7 @@ const struct file_operations cifs_file_direct_nobrl_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = cifs_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.unlocked_ioctl  = cifs_ioctl,
- 	.copy_file_range = cifs_copy_file_range,
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index 1705c76529d8..2e979d2f4e36 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -100,6 +100,9 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
- extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
- extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
- extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
-+extern ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
-+				struct pipe_inode_info *pipe, size_t len,
-+				unsigned int flags);
- extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
- extern int cifs_lock(struct file *, int, struct file_lock *);
- extern int cifs_fsync(struct file *, loff_t, loff_t, int);
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 22dfc1f8b4f1..30d01b236f77 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -5273,3 +5273,95 @@ const struct address_space_operations cifs_addr_ops_smallbuf = {
- 	.launder_folio = cifs_launder_folio,
- 	.migrate_folio = filemap_migrate_folio,
- };
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index cbc18b4a9cb2..7be589aeb520 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -24,6 +24,150 @@
+ #include "../smbfs_common/arc4.h"
+ #include <crypto/aead.h>
+ 
++/*
++ * Hash data from a BVEC-type iterator.
++ */
++static int cifs_shash_bvec(const struct iov_iter *iter, ssize_t maxsize,
++			   struct shash_desc *shash)
++{
++	const struct bio_vec *bv = iter->bvec;
++	unsigned long start = iter->iov_offset;
++	unsigned int i;
++	void *p;
++	int ret;
++
++	for (i = 0; i < iter->nr_segs; i++) {
++		size_t off, len;
++
++		len = bv[i].bv_len;
++		if (start >= len) {
++			start -= len;
++			continue;
++		}
++
++		len = min_t(size_t, maxsize, len - start);
++		off = bv[i].bv_offset + start;
++
++		p = kmap_local_page(bv[i].bv_page);
++		ret = crypto_shash_update(shash, p + off, len);
++		kunmap_local(p);
++		if (ret < 0)
++			return ret;
++
++		maxsize -= len;
++		if (maxsize <= 0)
++			break;
++		start = 0;
++	}
++
++	return 0;
++}
 +
 +/*
-+ * Splice data from a file into a pipe.
++ * Hash data from a KVEC-type iterator.
 + */
-+ssize_t cifs_splice_read(struct file *file, loff_t *ppos,
-+			 struct pipe_inode_info *pipe, size_t len,
-+			 unsigned int flags)
++static int cifs_shash_kvec(const struct iov_iter *iter, ssize_t maxsize,
++			   struct shash_desc *shash)
 +{
-+	LIST_HEAD(pages);
-+	struct iov_iter to;
-+	struct bio_vec *bv;
-+	struct kiocb kiocb;
-+	struct page *page;
-+	unsigned int head;
-+	ssize_t ret;
-+	size_t used, npages, chunk, remain, reclaim;
-+	int i;
++	const struct kvec *kv = iter->kvec;
++	unsigned long start = iter->iov_offset;
++	unsigned int i;
++	int ret;
 +
-+	/* Work out how much data we can actually add into the pipe */
-+	used = pipe_occupancy(pipe->head, pipe->tail);
-+	npages = max_t(ssize_t, pipe->max_usage - used, 0);
-+	len = min_t(size_t, len, npages * PAGE_SIZE);
-+	npages = DIV_ROUND_UP(len, PAGE_SIZE);
++	for (i = 0; i < iter->nr_segs; i++) {
++		size_t len;
 +
-+	bv = kmalloc(array_size(npages, sizeof(bv[0])), GFP_KERNEL);
-+	if (!bv)
-+		return -ENOMEM;
++		len = kv[i].iov_len;
++		if (start >= len) {
++			start -= len;
++			continue;
++		}
 +
-+	npages = alloc_pages_bulk_list(GFP_USER, npages, &pages);
-+	if (!npages) {
-+		kfree(bv);
-+		return -ENOMEM;
++		len = min_t(size_t, maxsize, len - start);
++		ret = crypto_shash_update(shash, kv[i].iov_base + start, len);
++		if (ret < 0)
++			return ret;
++		maxsize -= len;
++
++		if (maxsize <= 0)
++			break;
++		start = 0;
 +	}
 +
-+	remain = len = min_t(size_t, len, npages * PAGE_SIZE);
-+
-+	for (i = 0; i < npages; i++) {
-+		chunk = min_t(size_t, PAGE_SIZE, remain);
-+		page = list_first_entry(&pages, struct page, lru);
-+		list_del_init(&page->lru);
-+		bv[i].bv_page = page;
-+		bv[i].bv_offset = 0;
-+		bv[i].bv_len = chunk;
-+		remain -= chunk;
-+	}
-+
-+	/* Do the I/O */
-+	iov_iter_bvec(&to, READ, bv, npages, len);
-+	init_sync_kiocb(&kiocb, file);
-+	kiocb.ki_pos = *ppos;
-+	ret = call_read_iter(file, &kiocb, &to);
-+
-+	reclaim = npages * PAGE_SIZE;
-+	remain = 0;
-+	if (ret > 0) {
-+		reclaim -= ret;
-+		remain = ret;
-+		*ppos = kiocb.ki_pos;
-+		file_accessed(file);
-+	} else if (ret < 0) {
-+		/*
-+		 * callers of ->splice_read() expect -EAGAIN on
-+		 * "can't put anything in there", rather than -EFAULT.
-+		 */
-+		if (ret == -EFAULT)
-+			ret = -EAGAIN;
-+	}
-+
-+	/* Free any pages that didn't get touched at all. */
-+	for (; reclaim >= PAGE_SIZE; reclaim -= PAGE_SIZE)
-+		__free_page(bv[--npages].bv_page);
-+
-+	/* Push the remaining pages into the pipe. */
-+	head = pipe->head;
-+	for (i = 0; i < npages; i++) {
-+		struct pipe_buffer *buf = &pipe->bufs[head & (pipe->ring_size - 1)];
-+
-+		chunk = min_t(size_t, remain, PAGE_SIZE);
-+		*buf = (struct pipe_buffer) {
-+			.ops	= &default_pipe_buf_ops,
-+			.page	= bv[i].bv_page,
-+			.offset	= 0,
-+			.len	= chunk,
-+		};
-+		head++;
-+		remain -= chunk;
-+	}
-+	pipe->head = head;
-+
-+	kfree(bv);
-+	return ret;
++	return 0;
 +}
-diff --git a/fs/splice.c b/fs/splice.c
-index 5969b7a1d353..95435b5cca2a 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -330,6 +330,7 @@ const struct pipe_buf_operations default_pipe_buf_ops = {
- 	.try_steal	= generic_pipe_buf_try_steal,
- 	.get		= generic_pipe_buf_get,
- };
-+EXPORT_SYMBOL(default_pipe_buf_ops);
- 
- /* Pipe buffer operations for a socket and similar. */
- const struct pipe_buf_operations nosteal_pipe_buf_ops = {
++
++/*
++ * Hash data from an XARRAY-type iterator.
++ */
++static ssize_t cifs_shash_xarray(const struct iov_iter *iter, ssize_t maxsize,
++				 struct shash_desc *shash)
++{
++	struct folio *folios[16], *folio;
++	unsigned int nr, i, j, npages;
++	loff_t start = iter->xarray_start + iter->iov_offset;
++	pgoff_t last, index = start / PAGE_SIZE;
++	ssize_t ret = 0;
++	size_t len, offset, foffset;
++	void *p;
++
++	if (maxsize == 0)
++		return 0;
++
++	last = (start + maxsize - 1) / PAGE_SIZE;
++	do {
++		nr = xa_extract(iter->xarray, (void **)folios, index, last,
++				ARRAY_SIZE(folios), XA_PRESENT);
++		if (nr == 0)
++			return -EIO;
++
++		for (i = 0; i < nr; i++) {
++			folio = folios[i];
++			npages = folio_nr_pages(folio);
++			foffset = start - folio_pos(folio);
++			offset = foffset % PAGE_SIZE;
++			for (j = foffset / PAGE_SIZE; j < npages; j++) {
++				len = min_t(size_t, maxsize, PAGE_SIZE - offset);
++				p = kmap_local_page(folio_page(folio, j));
++				ret = crypto_shash_update(shash, p, len);
++				kunmap_local(p);
++				if (ret < 0)
++					return ret;
++				maxsize -= len;
++				if (maxsize <= 0)
++					return 0;
++				start += len;
++				offset = 0;
++				index++;
++			}
++		}
++	} while (nr == ARRAY_SIZE(folios));
++	return 0;
++}
++
++/*
++ * Pass the data from an iterator into a hash.
++ */
++static int cifs_shash_iter(const struct iov_iter *iter, size_t maxsize,
++			   struct shash_desc *shash)
++{
++	if (maxsize == 0)
++		return 0;
++
++	switch (iov_iter_type(iter)) {
++	case ITER_BVEC:
++		return cifs_shash_bvec(iter, maxsize, shash);
++	case ITER_KVEC:
++		return cifs_shash_kvec(iter, maxsize, shash);
++	case ITER_XARRAY:
++		return cifs_shash_xarray(iter, maxsize, shash);
++	default:
++		pr_err("cifs_shash_iter(%u) unsupported\n", iov_iter_type(iter));
++		WARN_ON_ONCE(1);
++		return -EIO;
++	}
++}
++
+ int __cifs_calc_signature(struct smb_rqst *rqst,
+ 			struct TCP_Server_Info *server, char *signature,
+ 			struct shash_desc *shash)
 
