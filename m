@@ -2,65 +2,55 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A90DC64EC3
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 02:32:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC549C636D4
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 02:35:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229810AbjAaCcU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 21:32:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49258 "EHLO
+        id S231487AbjAaCfZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 21:35:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjAaCcT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 21:32:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ADCD19F28
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 18:31:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675132291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=utT+RE/MkgWVBG/iNzPiYM+H0kp8FILH2HeviGKceUM=;
-        b=V0M3wGpdBBsw/qnBVJYGvqUuY6TgQf50fzKDFiI6thRAWkSc0D91LO7BU4MOA8viUUO0B8
-        BvdbvTyp47iIjrnKhfl27aaJNqLC2BQmEv7Q0EGEVF4u2Rix3+GlQJ0o4iusJM3sWlfqX4
-        FzyQ3m03bWC7v3ZqVshmtQvPuYD/st4=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-301-e-h4LELqOQOgNdiWcZgzKQ-1; Mon, 30 Jan 2023 21:31:29 -0500
-X-MC-Unique: e-h4LELqOQOgNdiWcZgzKQ-1
-Received: by mail-ot1-f70.google.com with SMTP id t20-20020a05683022f400b0068655e05e7eso6587971otc.22
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 18:31:29 -0800 (PST)
+        with ESMTP id S231515AbjAaCeu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 21:34:50 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E71A36FCC
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 18:34:24 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id mi9so3756776pjb.4
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 18:34:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A9VhNAncouGPghsLCtxdhrn+26s29dRN0H0czKp2bTE=;
+        b=ADZjED2w0momUtfafOuSNuN7ZxxrP0KeUDW1RTHuQc80r3inyDTwQ1MXq8KQQCJPA1
+         2IjPoFNw6EOC1H2jGbZ0sNPpCmiE0a1bmED2KiD/tXvqcCixj5NIzO02aStn2z3ovwP6
+         3Z5APDKQvCBsotmTrQZGzddlPRda1HIIj6Rto=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=utT+RE/MkgWVBG/iNzPiYM+H0kp8FILH2HeviGKceUM=;
-        b=dDd8k4AGv7NS1LRIF93LQ2GNlySVY4AoXVv4gmNKvZlWcHFkv3Nf9Lsf5JmGwCBr8t
-         DWkEazWOf2HoPj2vBmMAlKJfLI/7H1pgn3h15Uze3Fj8GDtN3t3fgUknBmAXFZNOvtlS
-         AX9/WNMYF6js1HW4ee1CafGvEJ/CF6hrtdDOUvTzo5axowOk00GB2nHQM/ot1FMpU6iZ
-         l8SXmh+UeWlTwNoFA+k0aylLcF6wT+5MFWZzqH0X4ftI9/amkx21Av2c7QXsIzmdemc5
-         6D8CiqQ6e7eT63YI+s5p1TO4DRPiidJuv9iUbOwn8csb0TrpZ8CQpi0HVfTk4LC28gZv
-         QeNw==
-X-Gm-Message-State: AFqh2kpbS0okti0VjcSfQjOxcBMi4i2WK3qIY6D01/NTQ6M1nHndQTbI
-        rIyTfyrmZKE0I/OnqeOzZgl7QKo+M2x8BrQykYd/hjWe9+atVs7Arc8/Dsrby9qO5p2b5LTJSF8
-        SFwGZKoT0MHde6SQOuispUdfFghrKcAkfIRbKIA==
-X-Received: by 2002:aca:3f84:0:b0:36e:f5f8:cce1 with SMTP id m126-20020aca3f84000000b0036ef5f8cce1mr1057773oia.35.1675132289132;
-        Mon, 30 Jan 2023 18:31:29 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXssco6mBUOhDTHWFT4/t2hB47krC6OsHE12Ww1f+hysvA2CpNEADdT3xvxh0DzmLnnFuHE/ftXAK22WOSTVfWk=
-X-Received: by 2002:aca:3f84:0:b0:36e:f5f8:cce1 with SMTP id
- m126-20020aca3f84000000b0036ef5f8cce1mr1057763oia.35.1675132288910; Mon, 30
- Jan 2023 18:31:28 -0800 (PST)
-MIME-Version: 1.0
-References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-23-hch@lst.de>
-In-Reply-To: <20230130092157.1759539-23-hch@lst.de>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 31 Jan 2023 10:31:18 +0800
-Message-ID: <CACGkMEsPvy5jVWA7AHJkyRKa8-xr9oi4DUAzBcU0pQ_n4rqCFA@mail.gmail.com>
-Subject: Re: [PATCH 22/23] vring: use bvec_set_page to initialize a bvec
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A9VhNAncouGPghsLCtxdhrn+26s29dRN0H0czKp2bTE=;
+        b=RMzgDnNUw0jGwp0PgCDRhLYLdR5RHZgQp3Hrz/vJyGe2OrpgJVCaFnWSGyUgPVQeed
+         RT7nilwcw1i1hfUDbT9wIbi6M+cbkNqq7ThUGCpt5HhVTusDWXADVnRfO8L+bHOKZYDB
+         h98H3R6b7Mb3D/muQOAqLzK8nwC6xuIPyTGl1pzzfjTB7IqXMA/aBUKp9pGI0UyR/NxP
+         fzeSZW4S0L069FwY1BMqleeEIWwNefozsRGp4VFNot5Q2UftBKvTIqPUS/tK8y4DHxsr
+         5D8BVhbHBmnm2yprOuS5SS6QeupXtA+EBKOJwmt49WpTdK2kdN0Sl7ZM9xkB6tIxXVDE
+         3P8w==
+X-Gm-Message-State: AFqh2kpMzfuvnV+J6K6K/Z8NoUhv6VKg68gx1l7fnEj8lChT0wlJ8H5S
+        6RTyWdIftvZFZJy6Y0LNHGxBqw==
+X-Google-Smtp-Source: AMrXdXsnmC1gw3eG1rPepfp90wWItWSXAPyy0WFX0PxqmtkL6j5e8V5dnOtluVb8V5qnNkoyExcM+g==
+X-Received: by 2002:a17:902:ba85:b0:194:828d:62b0 with SMTP id k5-20020a170902ba8500b00194828d62b0mr38778219pls.48.1675132459197;
+        Mon, 30 Jan 2023 18:34:19 -0800 (PST)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id y20-20020a1709027c9400b00186c5e8a8d7sm3404428pll.171.2023.01.30.18.34.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 18:34:18 -0800 (PST)
+Date:   Tue, 31 Jan 2023 11:34:08 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Ilya Dryomov <idryomov@gmail.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
         Minchan Kim <minchan@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
         Keith Busch <kbusch@kernel.org>,
@@ -88,46 +78,21 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Ilya Dryomov <idryomov@gmail.com>,
         linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
         devel@lists.orangefs.org, io-uring@vger.kernel.org,
         linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 10/23] zram: use bvec_set_page to initialize bvecs
+Message-ID: <Y9h+ILaGkNOhYJC5@google.com>
+References: <20230130092157.1759539-1-hch@lst.de>
+ <20230130092157.1759539-11-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230130092157.1759539-11-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 5:23 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> Use the bvec_set_page helper to initialize a bvec.
->
+On (23/01/30 10:21), Christoph Hellwig wrote:
+> Use the bvec_set_page helper to initialize bvecs.
+> 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-A typo in the subject, should be "vringh".
-
-Other than this
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-Thanks
-
-> ---
->  drivers/vhost/vringh.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 33eb941fcf1546..a1e27da544814a 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -1126,9 +1126,8 @@ static int iotlb_translate(const struct vringh *vrh,
->                 size = map->size - addr + map->start;
->                 pa = map->addr + addr - map->start;
->                 pfn = pa >> PAGE_SHIFT;
-> -               iov[ret].bv_page = pfn_to_page(pfn);
-> -               iov[ret].bv_len = min(len - s, size);
-> -               iov[ret].bv_offset = pa & (PAGE_SIZE - 1);
-> +               bvec_set_page(&iov[ret], pfn_to_page(pfn), min(len - s, size),
-> +                             pa & (PAGE_SIZE - 1));
->                 s += size;
->                 addr += size;
->                 ++ret;
-> --
-> 2.39.0
->
-
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
