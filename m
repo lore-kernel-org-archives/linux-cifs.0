@@ -2,228 +2,166 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69CB1C38142
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 06:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E24C38142
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 06:55:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230077AbjAaGDa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Jan 2023 01:03:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52866 "EHLO
+        id S230268AbjAaGzS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Jan 2023 01:55:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbjAaGD3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Jan 2023 01:03:29 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4662115CB3
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 22:03:28 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id f34so22590709lfv.10
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 22:03:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ekU64BkYaLZqWJDR41WQN/a5Bve6XwGcK1Ufsksb2mQ=;
-        b=U5ugTjw6WPzSXCfQR6O6Pcpb/B3UZlgC8ew61zFNndq0uA7xP0UPN/q0k2v2G4FP13
-         DQarzobhCfPLd8imCtnXiS2iehZxkGaGWWkOmXal4CwiLR4RUrRpM++62VtJfscSXwEW
-         KS5U9cup9taXIsFzjgmluRCGnZ35I6CcV60Lqf1eY71ZZPan9P4aLTQdK+htGEttluJc
-         MU0xoUHMMCTvKBDnuo8LZi/r9Vukp7tBjqtbWzAVqSWtviMhMtmeOAi1Xfs5Owtipzvj
-         zO6OXdQvpVEePIbTiDjs4vkLQG5eU3HB3zWrA8CWJP5LQEdA0DjH8754fK3h4JDBlIDr
-         nyDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ekU64BkYaLZqWJDR41WQN/a5Bve6XwGcK1Ufsksb2mQ=;
-        b=7zl1BHYv74PN0k/cL95C+YLQqo1R6FsfqGjm8Ydc48oRh4ytdfPHFc4WgMuBpYCrGd
-         kxoG5agxoYOnzgxqhJqyazzMlo2x9eKv6X8EGhH9eROgmXIEeNX2NiDzVy20ouyxvwVw
-         u/r6Bp7JrUv6RwUbyCaWfSqCeS4XEzHR0t6ruzadYgvmLZ8C3MxrCFN98K9hqgEO85/u
-         Ykd4PYGbGVq3rwenIr9s7JoN1KGvqButYyLXYCaBNtv3c30y+zXg63+X2HrbRAaHWZEA
-         /LQsMX6vYL++TiC6yiz89yAXcjc9MYPVebP1M1WTfp5/UntxVy5AQzTajdS4e4vm41KY
-         2ARg==
-X-Gm-Message-State: AFqh2kqzLdSdQZO7/bZQxWD6xt9YfkiMO7ci+ZsEenkN3U8VWD2W6PhX
-        UB54q9HzlmvmGJYQGT0YhvHNYJwN+9gaH7ZjWJ4=
-X-Google-Smtp-Source: AMrXdXvMXg9cQeV/unQPh7lRNvKU/Eih3oNNmvpfd/jLv+tXsAr2OY/WXMBXmjRVQWsUqXNqhWd4RG3a5P9Hz4Ao8sA=
-X-Received: by 2002:a05:6512:1284:b0:4d5:9957:541 with SMTP id
- u4-20020a056512128400b004d599570541mr5167980lfs.52.1675145006231; Mon, 30 Jan
- 2023 22:03:26 -0800 (PST)
+        with ESMTP id S229986AbjAaGzQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Jan 2023 01:55:16 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2066.outbound.protection.outlook.com [40.107.243.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE0B29E37;
+        Mon, 30 Jan 2023 22:55:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=elyT5+kwAMCuQQOTxAElDDLiPKaI0xS7cuJezWphyzUXUA/b4KF5nBPZjnB5/cpd3QB5yFNeYlZOBcens4suEpnEroDh5OWSDVyXPYrN9e8rfWAbunsQq1XCUmckj3RhDTZzxgP/JxmteVKRgdR7kCEl2TwwKHQqHZxR81C57+GBnNHk4OQ8gzTVbGdZDteLiWCR39jqBgaAF1RHKAzWOuiXC6IjjUIoco7V3MeWAwEfhnTEdkLhWwajfkCobV7Y/nTwFjiClyMfv0hJwzVUVgjZUhTxMRHj8R3p2R0/8H4YhEl7V9PIWwjU8POHNRco1IqPofHQYqg1AAD/aubvqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=miB3y97PJsydrR4G7Y73XYehBABnBQrCrP70vFTRVqc=;
+ b=Ow++nJ9LUHBHn4OV9uKPiT6vJSKTNE4YeZZgVr6IxpJsIh6b+VWkdPqPa2JqkFYOxmwMfVCho8h+WPv6YKZfpmt3GepBjBVQUHV4SP+5ve1QIW5P3KvbTLv/vi6tGb605yyhUkDzKaMBQrDAsflzDEWcAEJQCubK0nI6lag/shxOIKoUVK6FWyGCQzYLYoV/oOLWfngbS06d3hco+OWYFn115KNIOlSv7LaSyEaLPAxpuF+aRpviPoS5YfWU6S4k4pTraQpwTpjFSFD40duXPh2wGNKlNXJBRzUDQ2TxKe8sF7QTR6NNt2PfksXAaBE3Wg1KhErDdefIF/DXRiFhTA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=miB3y97PJsydrR4G7Y73XYehBABnBQrCrP70vFTRVqc=;
+ b=uRqsTuBoyXIRnrMXo3kMdYxr2MNZQZnyobYVlHa2IDFh+KfFx0QlHvjTdJVYVvtbn1YDKiF/zW+ThQmIih98ux8nAvIFc6wgybD2gXSByStE98ydgJX1JMkaeKz28MLbCJ1DoF8XJYEwRV8jHSVt7yhPWomgwF8vo/kwj6AJ+5NJOHrCqVpO9jB9e/5MfFyw53nJfTiWxbvMQk/P2mocqhMwn2N2+VP+ZIeslBA10zAfUfN++5MT+09krxr97Q2HaHI54CS+aGdUVOTaor1NLdiXKjLD+6TACRstqaxRB29S23mk9EnyeY52CIoBgKT8r4JN+3GAzh2JWfhY1STaTw==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by IA0PR12MB7674.namprd12.prod.outlook.com (2603:10b6:208:434::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.36; Tue, 31 Jan
+ 2023 06:55:09 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::b84c:b6e:dc0:8d7]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::b84c:b6e:dc0:8d7%2]) with mapi id 15.20.6043.036; Tue, 31 Jan 2023
+ 06:55:09 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        "devel@lists.orangefs.org" <devel@lists.orangefs.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>
+Subject: Re: [PATCH 01/23] block: factor out a bvec_set_page helper
+Thread-Topic: [PATCH 01/23] block: factor out a bvec_set_page helper
+Thread-Index: AQHZNIxdpbYkT/F1XUe/QrKqMdEyyq64GNAA
+Date:   Tue, 31 Jan 2023 06:55:08 +0000
+Message-ID: <3ca88dba-8675-08cd-6547-ce7a0e382b7a@nvidia.com>
+References: <20230130092157.1759539-1-hch@lst.de>
+ <20230130092157.1759539-2-hch@lst.de>
+In-Reply-To: <20230130092157.1759539-2-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|IA0PR12MB7674:EE_
+x-ms-office365-filtering-correlation-id: 300a9d4a-6285-45e9-0d56-08db03581792
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: sIT6qjAYqcvouXXDMYk1l8rTCINAGKIRqxz5OI62CZdxdvupACErkbqSfi/miK/z/t3J85lquIK8N+5wr4as49ZmgvbLZorue0d4TA/C1x/1bMA5S/+dfn2MyNs3NSTgW7JpCHTEpm/lonutLWsn5YQnajh/L7ufo3iAbD2SD/cEn5ZWZV3iLzn1SNtCJ/LYxRnwkbewdL1xy7VHQlkufxDPpkMSxA6rOKXuqEqFnCiVuaDHgf03vXXCHar3wk44N18nEAg7i197EPoJaSZrc8HKIQ1OzuMSW+ej6sM9P5wFE+aQnhdxIPCB2AEDy4FwDp6A4C226Eted6HnUgW1GUkIAvBlIMuW7Tzm48V65ZsrIjMq2X4tmEDo0lt0guxrgWLNN0RxXOddYCy9XgQiilkuk9pYudg0aK5MNOmyhN/C6c7YMXMmmLx45z8j+KUf4U/APaCv+/+Nxd3R3O7loFp+2zl1VasRcyT3i5T8MzZU0kT23rWNLadDRxxvSebYP4Ru0YG68bKtep9r+s5ZGJW83/GOSw2f833fl1Sf6ONuX7zjwEkPZpLMOjmNcjVVV4TcEjU87Nl412DKxsIqQe1rRwlfMqxdfPv9yLeX3MqmucDQUkANpO1eCWsFs8gCqC+teI/CSiVsnjkvslTeQe1CuO88e+Ha/Kn1WJCeHME4tG48QV6gfol8H07uGYu3rwLv3GwNvxZ10COA2aBoPb/DREj8Ie6PVQ8CIBiGiMEhC8HfAv35IM+57LXWI9RVPYiYJNkUpCfBcknNuqDX0g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(39860400002)(136003)(396003)(376002)(366004)(451199018)(31686004)(7416002)(7406005)(5660300002)(8936002)(2906002)(41300700001)(2616005)(8676002)(38070700005)(122000001)(54906003)(66476007)(66556008)(66446008)(478600001)(36756003)(316002)(4326008)(38100700002)(6486002)(64756008)(71200400001)(110136005)(86362001)(6512007)(186003)(31696002)(53546011)(6506007)(558084003)(91956017)(66946007)(76116006)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YjVpRHlOZjZwekczdC9GNE1tVkg2SUhUL1lTL0p5dnVmUlE3UUdWQzR5bXdm?=
+ =?utf-8?B?SFc3Z0hJTU12UU5SSVJHWHhKdTJJRkRmSkhsTWx0OHh0YWkwdVcxQVlyVnBq?=
+ =?utf-8?B?SENlNytFdk5CMDFzZjVRQlBEZWNGWDE1aGJpSEgvODBSa2NldWpEWGptRjBL?=
+ =?utf-8?B?cVl1QW85U3JjNzlJbmRuZFE4TndSWTh3VDV5WXJFMXVaMjNGUytNYU1XK3FX?=
+ =?utf-8?B?RG5ocnphTEc3Uk9VNzQwdllSK2lVUlc5UDd4eGNCdG9QVHNEWVFZbGI2aUhY?=
+ =?utf-8?B?MFBKaDEva2MxZXQrbTVyaDZDTnRpc2hXRWFPOFJEOWkyWGxhS3FtRlRxY0RK?=
+ =?utf-8?B?YXVaRDZOdjVtTk1XOFhyT29jMmRETTc0R0xvd2tQRVh5SzVSODhONE9raXlm?=
+ =?utf-8?B?b0RSU0pGZXVNTVIxZTdQMjBYcklPQmdaZzJscGoxenZtcFJMVDFIQXd4cFQ3?=
+ =?utf-8?B?YVZjR0ZGaDUrZ3ZDd0MycnpXNFNjS1d3aDJpSExSN0ZURHZWR2xNR25wZmQ3?=
+ =?utf-8?B?cStUUUFnVVVaeEJtVk43MVQzb2NtRnRpaGZNMlgvOTIxbWJGUDArWUlGZzh1?=
+ =?utf-8?B?WXdOMEc1Z1JEbXpEVlR6NU1pMWN2UlhCOWNSV0NRaS8xd3lyZE5XaHNhZEc0?=
+ =?utf-8?B?dXdkK2ZocXJZWmI2KzM2L3g3dkdKOGJQbjNOK1IvQmZWaG5aL1F4VWsxT3pP?=
+ =?utf-8?B?NVl5WFhPb3hiUE1pM3YwY21kQlB1c0pldXg1M3paZkxVdE1Fc0grWG1ma05i?=
+ =?utf-8?B?K2JENk1JWTdoRTgvd2o1bmlKY2dsUTNHUlp5QjBKbUIzbllzQ0lsVTJRUzBm?=
+ =?utf-8?B?UEduZFgyd1Vxb0ZVZnVMUXl3azRtbnpkVnNQb3FEaXc0M3pVNExFdXRyYTl5?=
+ =?utf-8?B?MEdTUVZYVEZndkxEa2RnODFqRkxFbllhSXZwczMyK21wbHNsc0d4OTlmS2U2?=
+ =?utf-8?B?ZS8vWm53elVWTXo5VTM0YzVMWWhtVUFYMlczV2EwR1U2YmhrQ3hxSDJxbWdD?=
+ =?utf-8?B?QkYyRXNHRjJ5ZzVmeWJKay9oc3h0YXRKNzJNY29TRko4QTk3MHZMZ1A0NWxO?=
+ =?utf-8?B?RUtCbDJUUXhBVTlZZkdrZzEvSmRMM2ZJYWNEbEJYVGU0WHB5U25LMkJjV0s1?=
+ =?utf-8?B?V3ZaaW9mVTlDRVpwc3dndkJoVEdvVG5NRUZneGJuK1QrcDVMVWZSallXV1g5?=
+ =?utf-8?B?T2MrUkltOTYvYjllUXVpd1NXZWdzaUd2aDBpU0IyVFdxTTRZQ29Bd1hsTTJF?=
+ =?utf-8?B?SURVejBMM3FydGVORy9Sdy8vd3EwTUg3TitQUEtaOVM1eVIwRUhmV21UcTRn?=
+ =?utf-8?B?MlEwL21JbHpTRE1uT3VFTGNOVllyTTZJNW9nOXdldDU2aFdnQjc2SUJvSTRa?=
+ =?utf-8?B?ZnhTU3ptVnBrQ0xMVGVVeFgyMGNBcWhjdnlJUmFOVVFKUzVEMUJFMDF5TjZL?=
+ =?utf-8?B?MldlZjNDbjQzdXRVcWdEVjRQQ0llRXVWSmxWMitSVXJ3UnRVRU5Ecm4vK3hp?=
+ =?utf-8?B?YnU5WXVod0l6dTJSWTUveFQ2dUxFNk0vbkZRSGVEc2JlK0Q5cVhtai9TVjBs?=
+ =?utf-8?B?L1libjZuYTlneGJKSFk3alc0WVBpekxxTTZEVjViR2tuNUtBN1VZajFmNWFr?=
+ =?utf-8?B?WDU4YlNxcHRxUmE1b0ZFTXBESi81S0hnNlhMRS9YRGplWisvRGdtQnFuL3Ax?=
+ =?utf-8?B?SjVHWkV1TlBFeGp5b2FzMy9EL3poNmFPY0VPV0pBZ0l6UHNDb2NpYTlSVkVW?=
+ =?utf-8?B?bDYvUjJxL2RyalJtSkllaVZPWDkyS3VDRUdtaFN2SEFDM0VwYitZUnN0bmFq?=
+ =?utf-8?B?R0NSYnpFUlE2Q2xNNTZXS3RLRXF1SFducGxIY2NsYnVLa1E2ZVhXV21TM0xh?=
+ =?utf-8?B?Z3pTaWN6MXRMalBqZUwzVGNnZ0NlRnpwazA0K3dJOHExMzlJK1JISXQwYktE?=
+ =?utf-8?B?WXJaOTVVeEl0WFVZNjRxeXlKZnVwcW9tQktuRm54Y29xWEZSRDBtMEJtQ3NS?=
+ =?utf-8?B?K1NOWGxZSndMMklGdVhwVVVvZlNXUk9mMzRqek11NEowcWlXV1laL0FibnRM?=
+ =?utf-8?B?ZXFFL2ROb0dqaUZpWmZ2N0tKZ1N1YXF1SWFZbHJZS0lUcmpuUncvUFVCOWZ4?=
+ =?utf-8?B?OGh3OEl5cXBRSmRjazFaN3k4amdDZmhRVFl0WXRzak1NUWZFd1k1QXdJTVhS?=
+ =?utf-8?B?VWc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <33EEDD8BA6BCEF4A8E8B4E864348AC1F@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20230130233329.7074-1-pc@cjr.nz>
-In-Reply-To: <20230130233329.7074-1-pc@cjr.nz>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 31 Jan 2023 00:03:15 -0600
-Message-ID: <CAH2r5mu9xT8oij5kvLqJi0t=j1LH2NoVM1N5VmQgkrkt5H5fhQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: prevent data race in smb2_reconnect()
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 300a9d4a-6285-45e9-0d56-08db03581792
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jan 2023 06:55:09.0041
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: oXf3NWwfFjr2PaiHz4J7q7SLTLY7Oa1Lj4A3rM5WkBBMgDMBPM5PrP1QoG+yUtGgWlD1Yw9XcBSdmxVImbXnVA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7674
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending review/testing
-
-On Mon, Jan 30, 2023 at 5:33 PM Paulo Alcantara <pc@cjr.nz> wrote:
->
-> Make sure to get an up-to-date TCP_Server_Info::nr_targets value prior
-> to waiting the server to be reconnected in smb2_reconnect().  It is
-> set in cifs_tcp_ses_needs_reconnect() and protected by
-> TCP_Server_Info::srv_lock.
->
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> ---
->  fs/cifs/smb2pdu.c | 119 +++++++++++++++++++++++++---------------------
->  1 file changed, 64 insertions(+), 55 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 2c9ffa921e6f..2d5c3df2277d 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -139,6 +139,66 @@ smb2_hdr_assemble(struct smb2_hdr *shdr, __le16 smb2_cmd,
->         return;
->  }
->
-> +static int wait_for_server_reconnect(struct TCP_Server_Info *server,
-> +                                    __le16 smb2_command, bool retry)
-> +{
-> +       int timeout = 10;
-> +       int rc;
-> +
-> +       spin_lock(&server->srv_lock);
-> +       if (server->tcpStatus != CifsNeedReconnect) {
-> +               spin_unlock(&server->srv_lock);
-> +               return 0;
-> +       }
-> +       timeout *= server->nr_targets;
-> +       spin_unlock(&server->srv_lock);
-> +
-> +       /*
-> +        * Return to caller for TREE_DISCONNECT and LOGOFF and CLOSE
-> +        * here since they are implicitly done when session drops.
-> +        */
-> +       switch (smb2_command) {
-> +       /*
-> +        * BB Should we keep oplock break and add flush to exceptions?
-> +        */
-> +       case SMB2_TREE_DISCONNECT:
-> +       case SMB2_CANCEL:
-> +       case SMB2_CLOSE:
-> +       case SMB2_OPLOCK_BREAK:
-> +               return -EAGAIN;
-> +       }
-> +
-> +       /*
-> +        * Give demultiplex thread up to 10 seconds to each target available for
-> +        * reconnect -- should be greater than cifs socket timeout which is 7
-> +        * seconds.
-> +        *
-> +        * On "soft" mounts we wait once. Hard mounts keep retrying until
-> +        * process is killed or server comes back on-line.
-> +        */
-> +       do {
-> +               rc = wait_event_interruptible_timeout(server->response_q,
-> +                                                     (server->tcpStatus != CifsNeedReconnect),
-> +                                                     timeout * HZ);
-> +               if (rc < 0) {
-> +                       cifs_dbg(FYI, "%s: aborting reconnect due to received signal\n",
-> +                                __func__);
-> +                       return -ERESTARTSYS;
-> +               }
-> +
-> +               /* are we still trying to reconnect? */
-> +               spin_lock(&server->srv_lock);
-> +               if (server->tcpStatus != CifsNeedReconnect) {
-> +                       spin_unlock(&server->srv_lock);
-> +                       return 0;
-> +               }
-> +               spin_unlock(&server->srv_lock);
-> +       } while (retry);
-> +
-> +       cifs_dbg(FYI, "%s: gave up waiting on reconnect\n", __func__);
-> +       return -EHOSTDOWN;
-> +}
-> +
->  static int
->  smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
->                struct TCP_Server_Info *server)
-> @@ -146,7 +206,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
->         int rc = 0;
->         struct nls_table *nls_codepage;
->         struct cifs_ses *ses;
-> -       int retries;
->
->         /*
->          * SMB2s NegProt, SessSetup, Logoff do not have tcon yet so
-> @@ -184,61 +243,11 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
->             (!tcon->ses->server) || !server)
->                 return -EIO;
->
-> +       rc = wait_for_server_reconnect(server, smb2_command, tcon->retry);
-> +       if (rc)
-> +               return rc;
-> +
->         ses = tcon->ses;
-> -       retries = server->nr_targets;
-> -
-> -       /*
-> -        * Give demultiplex thread up to 10 seconds to each target available for
-> -        * reconnect -- should be greater than cifs socket timeout which is 7
-> -        * seconds.
-> -        */
-> -       while (server->tcpStatus == CifsNeedReconnect) {
-> -               /*
-> -                * Return to caller for TREE_DISCONNECT and LOGOFF and CLOSE
-> -                * here since they are implicitly done when session drops.
-> -                */
-> -               switch (smb2_command) {
-> -               /*
-> -                * BB Should we keep oplock break and add flush to exceptions?
-> -                */
-> -               case SMB2_TREE_DISCONNECT:
-> -               case SMB2_CANCEL:
-> -               case SMB2_CLOSE:
-> -               case SMB2_OPLOCK_BREAK:
-> -                       return -EAGAIN;
-> -               }
-> -
-> -               rc = wait_event_interruptible_timeout(server->response_q,
-> -                                                     (server->tcpStatus != CifsNeedReconnect),
-> -                                                     10 * HZ);
-> -               if (rc < 0) {
-> -                       cifs_dbg(FYI, "%s: aborting reconnect due to a received signal by the process\n",
-> -                                __func__);
-> -                       return -ERESTARTSYS;
-> -               }
-> -
-> -               /* are we still trying to reconnect? */
-> -               spin_lock(&server->srv_lock);
-> -               if (server->tcpStatus != CifsNeedReconnect) {
-> -                       spin_unlock(&server->srv_lock);
-> -                       break;
-> -               }
-> -               spin_unlock(&server->srv_lock);
-> -
-> -               if (retries && --retries)
-> -                       continue;
-> -
-> -               /*
-> -                * on "soft" mounts we wait once. Hard mounts keep
-> -                * retrying until process is killed or server comes
-> -                * back on-line
-> -                */
-> -               if (!tcon->retry) {
-> -                       cifs_dbg(FYI, "gave up waiting on reconnect in smb_init\n");
-> -                       return -EHOSTDOWN;
-> -               }
-> -               retries = server->nr_targets;
-> -       }
->
->         spin_lock(&ses->chan_lock);
->         if (!cifs_chan_needs_reconnect(ses, server) && !tcon->need_reconnect) {
-> --
-> 2.39.1
->
-
-
--- 
-Thanks,
-
-Steve
+T24gMS8zMC8yMyAwMToyMSwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+IEFkZCBhIGhlbHBl
+ciB0byBpbml0aWFsaXplIGEgYnZlYyBiYXNlZCBvZiBhIHBhZ2UgcG9pbnRlci4gIFRoaXMgd2ls
+bCBoZWxwDQo+IHJlbW92aW5nIHZhcmlvdXMgb3BlbiBjb2RlIGJ2ZWMgaW5pdGlhbGl6YXRpb25z
+Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQo+
+IC0tLQ0KDQpMb29rcyBnb29kLg0KDQpSZXZpZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxr
+Y2hAbnZpZGlhLmNvbT4NCg0KLWNrDQoNCg==
