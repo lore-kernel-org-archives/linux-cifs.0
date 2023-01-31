@@ -2,72 +2,96 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 708FEC38142
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 13:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A750C636CC
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 16:22:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbjAaNpe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Jan 2023 08:45:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56310 "EHLO
+        id S229615AbjAaQWU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Jan 2023 11:22:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjAaNpd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Jan 2023 08:45:33 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7084269F;
-        Tue, 31 Jan 2023 05:45:31 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A7B4968B05; Tue, 31 Jan 2023 14:45:22 +0100 (CET)
-Date:   Tue, 31 Jan 2023 14:45:21 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 01/23] block: factor out a bvec_set_page helper
-Message-ID: <20230131134521.GA24165@lst.de>
-References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-2-hch@lst.de> <2bab7050-dec7-3af8-b643-31b414b8c4b4@acm.org>
+        with ESMTP id S229468AbjAaQWT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Jan 2023 11:22:19 -0500
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBA6430F3
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Jan 2023 08:22:18 -0800 (PST)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 355B87FEB4;
+        Tue, 31 Jan 2023 16:22:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1675182134;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=c4mZFlqvSUhLIwwyWCoc7WKkJ8wgJRNy/P34hnovpXc=;
+        b=AaIV4CEMONQM2ghZEJYU15IqiPcnOYQ9s1q4qW0q1Q1WIGksK9yLyEtWrS70v2THYXfMN7
+        twlzM3x6VDqB7rZ/BSIDB22oQ5BSy2lneVbZ0zgCPm6oOKVyWMRQDpDFF5YM1tiI/eV6Fg
+        KHtKMWuEjAMn0jrC3/gz7ae2ePInEAibniBBzgFVnR2A5+BDaR1HvPpR7SxvmadxHdYzbD
+        xvvE4ZCPHJ96RPJ3FjdVCVa/9MtSlElxauVP/JDlVxyyQVixffVh3gNgUy1IPN/6DugIL8
+        V0/tzBTVyK30Jr5n+KAitmyliVdeCvSZGx1LTq/Z3Mpw4r+/Iejmdq7KfmPK2g==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>
+Subject: [PATCH] cifs: get rid of unneeded conditional in cifs_get_num_sgs()
+Date:   Tue, 31 Jan 2023 13:22:07 -0300
+Message-Id: <20230131162207.3511-1-pc@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2bab7050-dec7-3af8-b643-31b414b8c4b4@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 09:09:23AM -0800, Bart Van Assche wrote:
-> Has it been considered to use structure assignment instead of introducing 
-> bvec_set_page(), e.g. as follows?
->
-> bip->bip_vec[bip->bip_vcnt] = (struct bio_vec) {
->       .bv_page = page, .bv_len = len, .bv_offset = offset };
+Just have @skip set to 0 after first iterations of the two nested
+loops.
 
-Unless it's hidden behind a macro it doesn't solve the problem of
-abstraction away the layout.  I'm also find it less readable.
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+---
+ fs/cifs/cifsglob.h | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 3da302ea9d76..1d893bea4723 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -2164,6 +2164,12 @@ static inline unsigned int cifs_get_num_sgs(const struct smb_rqst *rqst,
+ 	unsigned long addr;
+ 	int i, j;
+ 
++	/*
++	 * The first rqst has a transform header where the first 20 bytes are
++	 * not part of the encrypted blob.
++	 */
++	skip = 20;
++
+ 	/* Assumes the first rqst has a transform header as the first iov.
+ 	 * I.e.
+ 	 * rqst[0].rq_iov[0]  is transform header
+@@ -2171,14 +2177,9 @@ static inline unsigned int cifs_get_num_sgs(const struct smb_rqst *rqst,
+ 	 * rqst[1+].rq_iov[0+] data to be encrypted/decrypted
+ 	 */
+ 	for (i = 0; i < num_rqst; i++) {
+-		/*
+-		 * The first rqst has a transform header where the
+-		 * first 20 bytes are not part of the encrypted blob.
+-		 */
+ 		for (j = 0; j < rqst[i].rq_nvec; j++) {
+ 			struct kvec *iov = &rqst[i].rq_iov[j];
+ 
+-			skip = (i == 0) && (j == 0) ? 20 : 0;
+ 			addr = (unsigned long)iov->iov_base + skip;
+ 			if (unlikely(is_vmalloc_addr((void *)addr))) {
+ 				len = iov->iov_len - skip;
+@@ -2187,6 +2188,7 @@ static inline unsigned int cifs_get_num_sgs(const struct smb_rqst *rqst,
+ 			} else {
+ 				nents++;
+ 			}
++			skip = 0;
+ 		}
+ 		nents += rqst[i].rq_npages;
+ 	}
+-- 
+2.39.1
+
