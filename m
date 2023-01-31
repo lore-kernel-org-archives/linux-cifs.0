@@ -2,203 +2,180 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A5EC54EAA
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Jan 2023 23:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E68ABC636D3
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Jan 2023 01:12:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230370AbjA3Xdm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Jan 2023 18:33:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55676 "EHLO
+        id S230185AbjAaBMo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Jan 2023 20:12:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230377AbjA3Xdk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 18:33:40 -0500
-Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7162BEE3
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Jan 2023 15:33:38 -0800 (PST)
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id EC5CA7FEB4;
-        Mon, 30 Jan 2023 23:33:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1675121616;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=iiW56G6nq6kEemrfRoUVg0HqDM2CJoIzw7mWn7G5GRk=;
-        b=J0KkkDCyWSDMLiMfoGHPerz6yAvsVAVWHEo2bwJzkrvH8xB09jBIzfrMd6ttuvnr1XspzS
-        FbbyadFeL6w1KjxPO3n64jDIJCX09YB7e1yzbDCnrlhVvEoGJGAT8orSEPmSWYmrxll/4P
-        acGcCeUrK6lp/qfLbKyrEyfQSPMzYBhuB/oDoWtBOKrQnsB//S5z8mAAN3hcxgMoH/yv4M
-        2kHEtYu+BbS/jdUOYFEVOCd8fjTy9JMrpH6yw/Nm3AeXfg6Hkiz+dk+hnebtYhGqlje85l
-        YGkks1gD39mmo6oLW+2rU2mTjQ91Sg2aWncLsYMflWirGeQv8lK/zmrpOrS1KQ==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH] cifs: prevent data race in smb2_reconnect()
-Date:   Mon, 30 Jan 2023 20:33:29 -0300
-Message-Id: <20230130233329.7074-1-pc@cjr.nz>
+        with ESMTP id S229817AbjAaBMn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Jan 2023 20:12:43 -0500
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 067702B2B6;
+        Mon, 30 Jan 2023 17:12:42 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id t12so14457569lji.13;
+        Mon, 30 Jan 2023 17:12:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EjdiAa8c6Qvj1NCdEIb0i9bJmr0kmiDAx481+Zg80vM=;
+        b=RZqHpTGC8QPmetJxZyudlvCU/1nbY6OE3NlbuJmenrF+dCmD8KMTVsCQpuQ6ZX7J3k
+         XBRAOMKmqhsuW9nEIJ1RiiGNdHKSLwnba5v6S65w2G+tP958A/EeE4W+SvyBvkFsx7qy
+         3gv5OnMTw5dyW2XYu39Blje59Ky08uc1UqHAsYKQEbPnmgp9rBjWekSZcKc42MxCowgH
+         MHLr/WBsvoJ5oeS6SAIbxx+9TfrH0vYw4XS/RDpAMBBBkYPg9QviZ1EIvREi8H44qV1i
+         LxRRcDqYMHMjTEgelnb9o7Y58C+kuG3xR9uhqOfWnUqsPt8ZOUlsMVOMne9J52ZYajIu
+         CWng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EjdiAa8c6Qvj1NCdEIb0i9bJmr0kmiDAx481+Zg80vM=;
+        b=I4SYsKUVF3FVOGbQ/T7jQyFv2WoY7JaDJgGeyqfZYVMril+xs+ORdMySYm4LZNZgIJ
+         /NdHyl1a1jBp5ke/8ZFFFfHqLn1gwJhhKLG86qx2Q1zUCw+2QYdVXbiWeA4ULzVd1+n+
+         Ub6veNcuu9QL5HQpBN/oY2zDZij1HJN8+v68SLeDEhu+Fz3Yn6X9dSqqv7G0Xzr4hGM/
+         bpvDppLsB6Ofop8A/6o5CjNxCsPYNeWRxfQrVP77mpe2H0FXoH+URtCPEQgLiChO4dV0
+         xwWNr8UiGfYRn6Tpim6vEjpCxdDvVuYLbq6Wk39JuT1AFfNgssRavpqpZUnC1VsOS29/
+         4Tvg==
+X-Gm-Message-State: AO0yUKWtCXUR5MhDiP+VGwYGsqlPGHsd6NOEdVnTgJcK4JJ5k2tDDNZs
+        ycxrsviyTMe4SLKQ068o6J1C2F4YlxGRA7YCEPlB/YLxSdw=
+X-Google-Smtp-Source: AK7set/jz08NpydF/GhOSK0WN/1oIaQVTciMoeupM8drYaH84Bjn8LcBdo7m4yq9ontAbGMqAkOZK59RHzycFqWzm8c=
+X-Received: by 2002:a2e:9a9a:0:b0:290:60a9:b5e6 with SMTP id
+ p26-20020a2e9a9a000000b0029060a9b5e6mr870547lji.62.1675127559691; Mon, 30 Jan
+ 2023 17:12:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 30 Jan 2023 19:12:28 -0600
+Message-ID: <CAH2r5msGoRGzKbjFUJQ9HBivb0ia8-bakeVzeDknEmCQd5yd-A@mail.gmail.com>
+Subject: [PATCH] cifs: update Kconfig description
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Paulo Alcantara <pc@cjr.nz>
+Content-Type: multipart/mixed; boundary="000000000000263c5705f3850793"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make sure to get an up-to-date TCP_Server_Info::nr_targets value prior
-to waiting the server to be reconnected in smb2_reconnect().  It is
-set in cifs_tcp_ses_needs_reconnect() and protected by
-TCP_Server_Info::srv_lock.
+--000000000000263c5705f3850793
+Content-Type: text/plain; charset="UTF-8"
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
----
- fs/cifs/smb2pdu.c | 119 +++++++++++++++++++++++++---------------------
- 1 file changed, 64 insertions(+), 55 deletions(-)
+There were various outdated or missing things in fs/cifs/Kconfig
+e.g. mention of support for insecure NTLM which has been removed,
+and lack of mention of some important features. This also shortens
+it slightly, and fixes some confusing text (e.g. the SMB1 POSIX
+extensions option).  See attached.
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 2c9ffa921e6f..2d5c3df2277d 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -139,6 +139,66 @@ smb2_hdr_assemble(struct smb2_hdr *shdr, __le16 smb2_cmd,
- 	return;
- }
- 
-+static int wait_for_server_reconnect(struct TCP_Server_Info *server,
-+				     __le16 smb2_command, bool retry)
-+{
-+	int timeout = 10;
-+	int rc;
-+
-+	spin_lock(&server->srv_lock);
-+	if (server->tcpStatus != CifsNeedReconnect) {
-+		spin_unlock(&server->srv_lock);
-+		return 0;
-+	}
-+	timeout *= server->nr_targets;
-+	spin_unlock(&server->srv_lock);
-+
-+	/*
-+	 * Return to caller for TREE_DISCONNECT and LOGOFF and CLOSE
-+	 * here since they are implicitly done when session drops.
-+	 */
-+	switch (smb2_command) {
-+	/*
-+	 * BB Should we keep oplock break and add flush to exceptions?
-+	 */
-+	case SMB2_TREE_DISCONNECT:
-+	case SMB2_CANCEL:
-+	case SMB2_CLOSE:
-+	case SMB2_OPLOCK_BREAK:
-+		return -EAGAIN;
-+	}
-+
-+	/*
-+	 * Give demultiplex thread up to 10 seconds to each target available for
-+	 * reconnect -- should be greater than cifs socket timeout which is 7
-+	 * seconds.
-+	 *
-+	 * On "soft" mounts we wait once. Hard mounts keep retrying until
-+	 * process is killed or server comes back on-line.
-+	 */
-+	do {
-+		rc = wait_event_interruptible_timeout(server->response_q,
-+						      (server->tcpStatus != CifsNeedReconnect),
-+						      timeout * HZ);
-+		if (rc < 0) {
-+			cifs_dbg(FYI, "%s: aborting reconnect due to received signal\n",
-+				 __func__);
-+			return -ERESTARTSYS;
-+		}
-+
-+		/* are we still trying to reconnect? */
-+		spin_lock(&server->srv_lock);
-+		if (server->tcpStatus != CifsNeedReconnect) {
-+			spin_unlock(&server->srv_lock);
-+			return 0;
-+		}
-+		spin_unlock(&server->srv_lock);
-+	} while (retry);
-+
-+	cifs_dbg(FYI, "%s: gave up waiting on reconnect\n", __func__);
-+	return -EHOSTDOWN;
-+}
-+
- static int
- smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	       struct TCP_Server_Info *server)
-@@ -146,7 +206,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	int rc = 0;
- 	struct nls_table *nls_codepage;
- 	struct cifs_ses *ses;
--	int retries;
- 
- 	/*
- 	 * SMB2s NegProt, SessSetup, Logoff do not have tcon yet so
-@@ -184,61 +243,11 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	    (!tcon->ses->server) || !server)
- 		return -EIO;
- 
-+	rc = wait_for_server_reconnect(server, smb2_command, tcon->retry);
-+	if (rc)
-+		return rc;
-+
- 	ses = tcon->ses;
--	retries = server->nr_targets;
--
--	/*
--	 * Give demultiplex thread up to 10 seconds to each target available for
--	 * reconnect -- should be greater than cifs socket timeout which is 7
--	 * seconds.
--	 */
--	while (server->tcpStatus == CifsNeedReconnect) {
--		/*
--		 * Return to caller for TREE_DISCONNECT and LOGOFF and CLOSE
--		 * here since they are implicitly done when session drops.
--		 */
--		switch (smb2_command) {
--		/*
--		 * BB Should we keep oplock break and add flush to exceptions?
--		 */
--		case SMB2_TREE_DISCONNECT:
--		case SMB2_CANCEL:
--		case SMB2_CLOSE:
--		case SMB2_OPLOCK_BREAK:
--			return -EAGAIN;
--		}
--
--		rc = wait_event_interruptible_timeout(server->response_q,
--						      (server->tcpStatus != CifsNeedReconnect),
--						      10 * HZ);
--		if (rc < 0) {
--			cifs_dbg(FYI, "%s: aborting reconnect due to a received signal by the process\n",
--				 __func__);
--			return -ERESTARTSYS;
--		}
--
--		/* are we still trying to reconnect? */
--		spin_lock(&server->srv_lock);
--		if (server->tcpStatus != CifsNeedReconnect) {
--			spin_unlock(&server->srv_lock);
--			break;
--		}
--		spin_unlock(&server->srv_lock);
--
--		if (retries && --retries)
--			continue;
--
--		/*
--		 * on "soft" mounts we wait once. Hard mounts keep
--		 * retrying until process is killed or server comes
--		 * back on-line
--		 */
--		if (!tcon->retry) {
--			cifs_dbg(FYI, "gave up waiting on reconnect in smb_init\n");
--			return -EHOSTDOWN;
--		}
--		retries = server->nr_targets;
--	}
- 
- 	spin_lock(&ses->chan_lock);
- 	if (!cifs_chan_needs_reconnect(ses, server) && !tcon->need_reconnect) {
 -- 
-2.39.1
+Thanks,
 
+Steve
+
+--000000000000263c5705f3850793
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-update-Kconfig-description.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-update-Kconfig-description.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_ldjjl3sl0>
+X-Attachment-Id: f_ldjjl3sl0
+
+RnJvbSA2YTEwYjdlZTJhOGQ0ZDlmMDFiNzAxZjliZTU2MGIxYWI0YmNlMWYyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgMzAgSmFuIDIwMjMgMTg6NTc6MDYgLTA2MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiB1cGRhdGUgS2NvbmZpZyBkZXNjcmlwdGlvbgoKVGhlcmUgd2VyZSB2YXJpb3VzIG91dGRh
+dGVkIG9yIG1pc3NpbmcgdGhpbmdzIGluIGZzL2NpZnMvS2NvbmZpZwplLmcuIG1lbnRpb24gb2Yg
+c3VwcG9ydCBmb3IgaW5zZWN1cmUgTlRMTSB3aGljaCBoYXMgYmVlbiByZW1vdmVkLAphbmQgbGFj
+ayBvZiBtZW50aW9uIG9mIHNvbWUgaW1wb3J0YW50IGZlYXR1cmVzLiBUaGlzIGFsc28gc2hvcnRl
+bnMKaXQgc2xpZ2h0bHksIGFuZCBmaXhlcyBzb21lIGNvbmZ1c2luZyB0ZXh0IChlLmcuIHRoZSBT
+TUIxIFBPU0lYCmV4dGVuc2lvbnMgb3B0aW9uKS4KCkFja2VkLWJ5OiBQYXVsbyBBbGNhbnRhcmEg
+KFNVU0UpIDxwY0BjanIubno+CkFja2VkLWJ5OiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJl
+ZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0
+LmNvbT4KLS0tCiBmcy9jaWZzL0tjb25maWcgfCA2MSArKysrKysrKysrKysrKysrKysrKysrKy0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMjkgaW5zZXJ0aW9ucygr
+KSwgMzIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9LY29uZmlnIGIvZnMvY2lm
+cy9LY29uZmlnCmluZGV4IDNiN2UzYjllNGZkMi4uMWUwMjFjMGIwNjUzIDEwMDY0NAotLS0gYS9m
+cy9jaWZzL0tjb25maWcKKysrIGIvZnMvY2lmcy9LY29uZmlnCkBAIC0xOSwzOSArMTksMzYgQEAg
+Y29uZmlnIENJRlMKIAlzZWxlY3QgQVNOMQogCXNlbGVjdCBPSURfUkVHSVNUUlkKIAloZWxwCi0J
+ICBUaGlzIGlzIHRoZSBjbGllbnQgVkZTIG1vZHVsZSBmb3IgdGhlIFNNQjMgZmFtaWx5IG9mIE5B
+UyBwcm90b2NvbHMsCi0JICAoaW5jbHVkaW5nIHN1cHBvcnQgZm9yIHRoZSBtb3N0IHJlY2VudCwg
+bW9zdCBzZWN1cmUgZGlhbGVjdCBTTUIzLjEuMSkKLQkgIGFzIHdlbGwgYXMgZm9yIGVhcmxpZXIg
+ZGlhbGVjdHMgc3VjaCBhcyBTTUIyLjEsIFNNQjIgYW5kIHRoZSBvbGRlcgotCSAgQ29tbW9uIElu
+dGVybmV0IEZpbGUgU3lzdGVtIChDSUZTKSBwcm90b2NvbC4gIENJRlMgd2FzIHRoZSBzdWNjZXNz
+b3IKLQkgIHRvIHRoZSBvcmlnaW5hbCBkaWFsZWN0LCB0aGUgU2VydmVyIE1lc3NhZ2UgQmxvY2sg
+KFNNQikgcHJvdG9jb2wsIHRoZQotCSAgbmF0aXZlIGZpbGUgc2hhcmluZyBtZWNoYW5pc20gZm9y
+IG1vc3QgZWFybHkgUEMgb3BlcmF0aW5nIHN5c3RlbXMuCi0KLQkgIFRoZSBTTUIzIHByb3RvY29s
+IGlzIHN1cHBvcnRlZCBieSBtb3N0IG1vZGVybiBvcGVyYXRpbmcgc3lzdGVtcwotCSAgYW5kIE5B
+UyBhcHBsaWFuY2VzIChlLmcuIFNhbWJhLCBXaW5kb3dzIDEwLCBXaW5kb3dzIFNlcnZlciAyMDE2
+LAotCSAgTWFjT1MpIGFuZCBldmVuIGluIHRoZSBjbG91ZCAoZS5nLiBNaWNyb3NvZnQgQXp1cmUp
+LgotCSAgVGhlIG9sZGVyIENJRlMgcHJvdG9jb2wgd2FzIGluY2x1ZGVkIGluIFdpbmRvd3MgTlQ0
+LCAyMDAwIGFuZCBYUCAoYW5kCi0JICBsYXRlcikgYXMgd2VsbCBieSBTYW1iYSAod2hpY2ggcHJv
+dmlkZXMgZXhjZWxsZW50IENJRlMgYW5kIFNNQjMKLQkgIHNlcnZlciBzdXBwb3J0IGZvciBMaW51
+eCBhbmQgbWFueSBvdGhlciBvcGVyYXRpbmcgc3lzdGVtcykuIFVzZSBvZgotCSAgZGlhbGVjdHMg
+b2xkZXIgdGhhbiBTTUIyLjEgaXMgb2Z0ZW4gZGlzY291cmFnZWQgb24gcHVibGljIG5ldHdvcmtz
+LgorCSAgVGhpcyBpcyB0aGUgY2xpZW50IFZGUyBtb2R1bGUgZm9yIHRoZSBTTUIzIGZhbWlseSBv
+ZiBuZXR3b3JrIGZpbGUKKwkgIHByb3RvY29scyAoaW5jbHVkaW5nIHRoZSBtb3N0IHJlY2VudCwg
+bW9zdCBzZWN1cmUgZGlhbGVjdCBTTUIzLjEuMSkuCisJICBUaGlzIG1vZHVsZSBhbHNvIGluY2x1
+ZGVzIHN1cHBvcnQgZm9yIGVhcmxpZXIgZGlhbGVjdHMgc3VjaCBhcworCSAgU01CMi4xLCBTTUIy
+IGFuZCBldmVuIHRoZSBvbGQgQ29tbW9uIEludGVybmV0IEZpbGUgU3lzdGVtIChDSUZTKQorCSAg
+cHJvdG9jb2wuICBDSUZTIHdhcyB0aGUgc3VjY2Vzc29yIHRvIHRoZSBvcmlnaW5hbCBuZXR3b3Jr
+IGZpbGVzeXN0ZW0KKwkgIHByb3RvY29sLCBTZXJ2ZXIgTWVzc2FnZSBCbG9jayAoU01CIGllIFNN
+QjEpLCB0aGUgbmF0aXZlIGZpbGUgc2hhcmluZworCSAgbWVjaGFuaXNtIGZvciBtb3N0IGVhcmx5
+IFBDIG9wZXJhdGluZyBzeXN0ZW1zLgorCisJICBUaGUgU01CMy4xLjEgcHJvdG9jb2wgaXMgc3Vw
+cG9ydGVkIGJ5IG1vc3QgbW9kZXJuIG9wZXJhdGluZyBzeXN0ZW1zCisJICBhbmQgTkFTIGFwcGxp
+YW5jZXMgKGUuZy4gU2FtYmEsIFdpbmRvd3MgMTEsIFdpbmRvd3MgU2VydmVyIDIwMjIsCisJICBN
+YWNPUykgYW5kIGV2ZW4gaW4gdGhlIGNsb3VkIChlLmcuIE1pY3Jvc29mdCBBenVyZSkgYW5kIGFs
+c28gYnkgdGhlCisJICBMaW51eCBrZXJuZWwgc2VydmVyLCBrc21iZC4gIFN1cHBvcnQgZm9yIHRo
+ZSBvbGRlciBDSUZTIHByb3RvY29sIHdhcworCSAgaW5jbHVkZWQgaW4gV2luZG93cyBOVDQsIDIw
+MDAgYW5kIFhQIChhbmQgbGF0ZXIpLiBVc2Ugb2YgZGlhbGVjdHMKKwkgIG9sZGVyIHRoYW4gU01C
+Mi4xIGlzIG9mdGVuIGRpc2NvdXJhZ2VkIG9uIHB1YmxpYyBuZXR3b3Jrcy4KIAkgIFRoaXMgbW9k
+dWxlIGFsc28gcHJvdmlkZXMgbGltaXRlZCBzdXBwb3J0IGZvciBPUy8yIGFuZCBXaW5kb3dzIE1F
+CiAJICBhbmQgc2ltaWxhciB2ZXJ5IG9sZCBzZXJ2ZXJzLgogCi0JICBUaGlzIG1vZHVsZSBwcm92
+aWRlcyBhbiBhZHZhbmNlZCBuZXR3b3JrIGZpbGUgc3lzdGVtIGNsaWVudAotCSAgZm9yIG1vdW50
+aW5nIHRvIFNNQjMgKGFuZCBDSUZTKSBjb21wbGlhbnQgc2VydmVycy4gIEl0IGluY2x1ZGVzCi0J
+ICBzdXBwb3J0IGZvciBERlMgKGhpZXJhcmNoaWNhbCBuYW1lIHNwYWNlKSwgc2VjdXJlIHBlci11
+c2VyCi0JICBzZXNzaW9uIGVzdGFibGlzaG1lbnQgdmlhIEtlcmJlcm9zIG9yIE5UTE0gb3IgTlRM
+TXYyLCBSRE1BCi0JICAoc21iZGlyZWN0KSwgYWR2YW5jZWQgc2VjdXJpdHkgZmVhdHVyZXMsIHBl
+ci1zaGFyZSBlbmNyeXB0aW9uLAotCSAgZGlyZWN0b3J5IGxlYXNlcywgc2FmZSBkaXN0cmlidXRl
+ZCBjYWNoaW5nIChvcGxvY2spLCBvcHRpb25hbCBwYWNrZXQKLQkgIHNpZ25pbmcsIFVuaWNvZGUg
+YW5kIG90aGVyIGludGVybmF0aW9uYWxpemF0aW9uIGltcHJvdmVtZW50cy4KKwkgIFRoaXMgbW9k
+dWxlIHByb3ZpZGVzIGFuIGFkdmFuY2VkIG5ldHdvcmsgZmlsZSBzeXN0ZW0gY2xpZW50IGZvcgor
+CSAgbW91bnRpbmcgdG8gU01CMyAoYW5kIENJRlMpIGNvbXBsaWFudCBzZXJ2ZXJzLiAgSXQgaW5j
+bHVkZXMgc3VwcG9ydAorCSAgZm9yIERGUyAoaGllcmFyY2hpY2FsIG5hbWUgc3BhY2UpLCBzZWN1
+cmUgcGVyLXVzZXIgc2Vzc2lvbgorCSAgZXN0YWJsaXNobWVudCB2aWEgS2VyYmVyb3Mgb3IgTlRM
+TXYyLCBSRE1BIChzbWJkaXJlY3QpLCBhZHZhbmNlZAorCSAgc2VjdXJpdHkgZmVhdHVyZXMsIHBl
+ci1zaGFyZSBlbmNyeXB0aW9uLCBwYWNrZXQtc2lnbmluZywgc25hcHNob3RzLAorCSAgZGlyZWN0
+b3J5IGxlYXNlcywgc2FmZSBkaXN0cmlidXRlZCBjYWNoaW5nIChsZWFzZXMpLCBtdWx0aWNoYW5u
+ZWwsCisJICBVbmljb2RlIGFuZCBvdGhlciBpbnRlcm5hdGlvbmFsaXphdGlvbiBpbXByb3ZlbWVu
+dHMuCiAKIAkgIEluIGdlbmVyYWwsIHRoZSBkZWZhdWx0IGRpYWxlY3RzLCBTTUIzIGFuZCBsYXRl
+ciwgZW5hYmxlIGJldHRlcgogCSAgcGVyZm9ybWFuY2UsIHNlY3VyaXR5IGFuZCBmZWF0dXJlcywg
+dGhhbiB3b3VsZCBiZSBwb3NzaWJsZSB3aXRoIENJRlMuCi0JICBOb3RlIHRoYXQgd2hlbiBtb3Vu
+dGluZyB0byBTYW1iYSwgZHVlIHRvIHRoZSBDSUZTIFBPU0lYIGV4dGVuc2lvbnMsCi0JICBDSUZT
+IG1vdW50cyBjYW4gcHJvdmlkZSBzbGlnaHRseSBiZXR0ZXIgUE9TSVggY29tcGF0aWJpbGl0eQot
+CSAgdGhhbiBTTUIzIG1vdW50cy4gU01CMi9TTUIzIG1vdW50IG9wdGlvbnMgYXJlIGFsc28KLQkg
+IHNsaWdodGx5IHNpbXBsZXIgKGNvbXBhcmVkIHRvIENJRlMpIGR1ZSB0byBwcm90b2NvbCBpbXBy
+b3ZlbWVudHMuCiAKLQkgIElmIHlvdSBuZWVkIHRvIG1vdW50IHRvIFNhbWJhLCBBenVyZSwgTWFj
+cyBvciBXaW5kb3dzIGZyb20gdGhpcyBtYWNoaW5lLCBzYXkgWS4KKwkgIElmIHlvdSBuZWVkIHRv
+IG1vdW50IHRvIFNhbWJhLCBBenVyZSwga3NtYmQsIE1hY3Mgb3IgV2luZG93cyBmcm9tIHRoaXMK
+KwkgIG1hY2hpbmUsIHNheSBZLgogCiBjb25maWcgQ0lGU19TVEFUUzIKIAlib29sICJFeHRlbmRl
+ZCBzdGF0aXN0aWNzIgpAQCAtMTExLDEyICsxMDgsMTIgQEAgY29uZmlnIENJRlNfUE9TSVgKIAlk
+ZXBlbmRzIG9uIENJRlMgJiYgQ0lGU19BTExPV19JTlNFQ1VSRV9MRUdBQ1kgJiYgQ0lGU19YQVRU
+UgogCWhlbHAKIAkgIEVuYWJsaW5nIHRoaXMgb3B0aW9uIHdpbGwgY2F1c2UgdGhlIGNpZnMgY2xp
+ZW50IHRvIGF0dGVtcHQgdG8KLQkgIG5lZ290aWF0ZSBhIG5ld2VyIGRpYWxlY3Qgd2l0aCBzZXJ2
+ZXJzLCBzdWNoIGFzIFNhbWJhIDMuMC41Ci0JICBvciBsYXRlciwgdGhhdCBvcHRpb25hbGx5IGNh
+biBoYW5kbGUgbW9yZSBQT1NJWCBsaWtlIChyYXRoZXIKLQkgIHRoYW4gV2luZG93cyBsaWtlKSBm
+aWxlIGJlaGF2aW9yLiAgSXQgYWxzbyBlbmFibGVzCi0JICBzdXBwb3J0IGZvciBQT1NJWCBBQ0xz
+IChnZXRmYWNsIGFuZCBzZXRmYWNsKSB0byBzZXJ2ZXJzCi0JICAoc3VjaCBhcyBTYW1iYSAzLjEw
+IGFuZCBsYXRlcikgd2hpY2ggY2FuIG5lZ290aWF0ZQotCSAgQ0lGUyBQT1NJWCBBQ0wgc3VwcG9y
+dC4gIElmIHVuc3VyZSwgc2F5IE4uCisJICBuZWdvdGlhdGUgYSBmZWF0dXJlIG9mIHRoZSBvbGRl
+ciBjaWZzIGRpYWxlY3Qgd2l0aCBzZXJ2ZXJzLCBzdWNoIGFzCisJICBTYW1iYSAzLjAuNSBvciBs
+YXRlciwgdGhhdCBvcHRpb25hbGx5IGNhbiBoYW5kbGUgbW9yZSBQT1NJWCBsaWtlCisJICAocmF0
+aGVyIHRoYW4gV2luZG93cyBsaWtlKSBmaWxlIGJlaGF2aW9yLiAgSXQgYWxzbyBlbmFibGVzIHN1
+cHBvcnQKKwkgIGZvciBQT1NJWCBBQ0xzIChnZXRmYWNsIGFuZCBzZXRmYWNsKSB0byBzZXJ2ZXJz
+IChzdWNoIGFzIFNhbWJhIDMuMTAKKwkgIGFuZCBsYXRlcikgd2hpY2ggY2FuIG5lZ290aWF0ZSBD
+SUZTIFBPU0lYIEFDTCBzdXBwb3J0LiAgVGhpcyBjb25maWcKKwkgIG9wdGlvbiBpcyBub3QgbmVl
+ZGVkIHdoZW4gbW91bnRpbmcgd2l0aCBTTUIzLjEuMS4gSWYgdW5zdXJlLCBzYXkgTi4KIAogY29u
+ZmlnIENJRlNfREVCVUcKIAlib29sICJFbmFibGUgQ0lGUyBkZWJ1Z2dpbmcgcm91dGluZXMiCi0t
+IAoyLjM0LjEKCg==
+--000000000000263c5705f3850793--
