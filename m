@@ -2,64 +2,58 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF33C05027
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Feb 2023 13:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E67D7C05027
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Feb 2023 13:39:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231719AbjBANhH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Feb 2023 08:37:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60930 "EHLO
+        id S232234AbjBANjp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Feb 2023 08:39:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjBANhF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Feb 2023 08:37:05 -0500
+        with ESMTP id S231733AbjBANjo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Feb 2023 08:39:44 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39DB010F7;
-        Wed,  1 Feb 2023 05:37:05 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9457DC15B;
+        Wed,  1 Feb 2023 05:39:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=+KZHp1jKXys/dV6xJC6crmtQWDDsv7KCPO1b9rtXp0k=; b=xnTZOLWWg7ILYx1AWRqGQgtNX/
-        137HSpNtcyLKMGKmR7HZhGkc1yi29pXEa0wMrS7awyQJCaa8dVtHIFYiCSPmSMxUlhZLodvWJVgCO
-        QmFWF4p01m7P+qLn5DwF+2HxioDXDWhoL95T+zfvCEoh2qnCvaeUuOXOGR/eHrDVP56tmiJEERUnk
-        GeujjsKUrH9tiwujNzbsGoZ+0iztpS+XIsZHncegBE5LRQJn9qDq1LgApWbwXYcCU4+TJzUi16aGe
-        se6ieZY/Xk67Z9q7N8nbQcmYSP4KUe2SdKwu4YBi1rsy8XCWpfXPTP5iV4yyL0WO9jIv18wngbx1h
-        9ITLUnZw==;
+        bh=H072VOHrXp4GY4j1x/3/j1jBrZ9UMoe6XDuOCjrdYAo=; b=dwn4ue0TeGHPJC+IZxn4F3llxK
+        ZKDsJwjCJ9gTjoQTOqnuxkC8lgmKkWfHSYXusn80D8r/RUHSGLIH3XkOFEAPYHjbEDrcLcWn/Gmxs
+        Gsp1hKaW55Zw+9/mUfnKA9gQNlymXwflpntMISN5s4hsLV32e1AOfXo7R0km13bwVnPYWxsv+VQq7
+        IGYbnxfPDBgatGEPyUuEY++0g+DINxU1GWPbyZr3rFOzlA6L1XLA18SuXbJIU8eR9tPsQJkwzZJck
+        kzy0uBsD1tJ8wTcEazZngAbuRw+La+WCm0YOSUQJAJNQS8KqRIBKAnLQxn/yGGO1C0PwveVBUhk8g
+        FHebF49g==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNDII-00C6X8-0C; Wed, 01 Feb 2023 13:36:58 +0000
-Date:   Wed, 1 Feb 2023 05:36:57 -0800
+        id 1pNDKx-00C7Dg-3k; Wed, 01 Feb 2023 13:39:43 +0000
+Date:   Wed, 1 Feb 2023 05:39:43 -0800
 From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Long Li <longli@microsoft.com>,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: Re: [PATCH 11/12] cifs: Fix problem with encrypted RDMA data read
-Message-ID: <Y9pq+YUf/iFE8JUC@infradead.org>
-References: <20230131182855.4027499-1-dhowells@redhat.com>
- <20230131182855.4027499-12-dhowells@redhat.com>
+To:     Stefan Metzmacher <metze@samba.org>
+Cc:     linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
+        Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        David Howells <dhowells@redhat.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 0/3] avoid plaintext rdma offset if encryption is required
+Message-ID: <Y9prn4niNung9Zer@infradead.org>
+References: <cover.1675252643.git.metze@samba.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230131182855.4027499-12-dhowells@redhat.com>
+In-Reply-To: <cover.1675252643.git.metze@samba.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 06:28:54PM +0000, David Howells wrote:
-> When the cifs client is talking to the ksmbd server by RDMA and the ksmbd
-> server has "smb3 encryption = yes" in its config file, the normal PDU
-> stream is encrypted, but the directly-delivered data isn't in the stream
-> (and isn't encrypted), but is rather delivered by DDP/RDMA packets (at
-> least with IWarp).
+On Wed, Feb 01, 2023 at 01:04:40PM +0100, Stefan Metzmacher wrote:
+> I think it is a security problem to send confidential data in plaintext
+> over the wire, so we should avoid doing that even if rdma is in use.
 
-This really needs to be split into a separate backportable fix series.
-And it seems like Stefan has just send such a series.
+Yep.
+
+> Modern Windows servers support signed and encrypted rdma offload,
+> but we don't support this yet...
+
+There is a series out on the list for encryption offload to mlx5
+hardware, whch is one way to handle this.  If not you need to bounce
+buffer.
