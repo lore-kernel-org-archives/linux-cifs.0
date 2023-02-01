@@ -2,85 +2,143 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DA0C636CD
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Feb 2023 14:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86155C636CD
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Feb 2023 14:53:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231963AbjBAOh7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Feb 2023 09:37:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43996 "EHLO
+        id S232127AbjBAOxI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Feb 2023 09:53:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231908AbjBAOhz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Feb 2023 09:37:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE50069526
-        for <linux-cifs@vger.kernel.org>; Wed,  1 Feb 2023 06:36:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675262210;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8/dpDM/3REEz3eyiAc+dJjDInqTxFwwyfLND3C6oXCQ=;
-        b=AoecflevKedTs40TpZDQwdPHoW02u0/QN3OJDO+H0Zm+J0KRtt8zvPrDBuYn94ly+jhOKh
-        y5H7TsIjNxAQA7QJIDWZN8y4F/+KivfV0lHc8S8c2nszn8mvo/ncYHGEYhwi/AjDjkyrYw
-        cNPHJbw7M0WzJfbhU3hQaLtYooU7SAs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-292-20SeWIIfNo2jUTyP7mdrOw-1; Wed, 01 Feb 2023 09:36:46 -0500
-X-MC-Unique: 20SeWIIfNo2jUTyP7mdrOw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3223C1C08793;
-        Wed,  1 Feb 2023 14:36:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 44A41492B05;
-        Wed,  1 Feb 2023 14:36:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Y9ooW52m0Afnhj7Z@gondor.apana.org.au>
-References: <Y9ooW52m0Afnhj7Z@gondor.apana.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, smfrench@gmail.com, viro@zeniv.linux.org.uk,
-        nspmangalore@gmail.com, rohiths.msft@gmail.com, tom@talpey.com,
-        metze@samba.org, hch@infradead.org, willy@infradead.org,
-        jlayton@kernel.org, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sfrench@samba.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 05/12] cifs: Add a function to Hash the contents of an iterator
+        with ESMTP id S232078AbjBAOxF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Feb 2023 09:53:05 -0500
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F229A25B;
+        Wed,  1 Feb 2023 06:53:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Cc:To:From:Date:Message-ID;
+        bh=+XxjRK8o0/jr4I/dPjE/RFZ7ftW0gWsdt6xluJbmr84=; b=isqPG01Tu7HpXho3VZlnTQp+Qd
+        eklUa2ie+bb83GUw8oG+OazlhF+/s7McoVoA1x3jZDzrkRz9dI9X2JXVkROuqora6Vz8kyQhuFf7l
+        +2knwnlRdAXUWWDROZOaOiaNhzMfgpIYXP7eBt9jQwHeRNlMddbTOyUZwrRHFNaZu3NO1E3xtMlpo
+        tQ3fbmZzKZs7P/tcjYG16juglfQjsDt5WVaI8Q4gCxQMj+4IBab69cKLGtfRQ+zAYWmYiVM4dJuOm
+        zi3pp3H2aTkOWRKVKii89M9RCX76+lyJ6CxYVDqfhlPm6E/cs0LSnOWGFnLuNYC3qwJu9Fq+aQ8/9
+        d8UFd/qHpdcfzJmaMa6sFaxxRzcLktQmB9TvgWDWeuSe9Aj9gePPCmZRKUGXTy1ZNPZoS6++AodaF
+        +rUc5+1rONoDr/sXIZ0B7KD1Uv4+g3uSWf5YFtu/xldHO5x2gXkM7+ZQPzn6n6wbNIJpDvCw1KnSR
+        oHesveImMJSZT3ZFEt8vyhxF;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1pNETr-00BFNU-Nh; Wed, 01 Feb 2023 14:52:59 +0000
+Message-ID: <4a43598d-51f0-b7bb-575a-d93f7879741f@samba.org>
+Date:   Wed, 1 Feb 2023 15:52:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <312907.1675262203.1@warthog.procyon.org.uk>
-Date:   Wed, 01 Feb 2023 14:36:43 +0000
-Message-ID: <312908.1675262203@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH 11/12] cifs: Fix problem with encrypted RDMA data read
+Content-Language: en-US
+From:   Stefan Metzmacher <metze@samba.org>
+To:     David Howells <dhowells@redhat.com>,
+        Steve French <smfrench@gmail.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>
+References: <20230131182855.4027499-1-dhowells@redhat.com>
+ <20230131182855.4027499-12-dhowells@redhat.com>
+ <be4dfc12-5593-e93a-3f78-638ee8ea9ad8@samba.org>
+In-Reply-To: <be4dfc12-5593-e93a-3f78-638ee8ea9ad8@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-
-> > Add a function to push the contents of a BVEC-, KVEC- or XARRAY-type
-> > iterator into a symmetric hash algorithm.
+Am 01.02.23 um 15:05 schrieb Stefan Metzmacher:
+> Am 31.01.23 um 19:28 schrieb David Howells:
+>> When the cifs client is talking to the ksmbd server by RDMA and the ksmbd
+>> server has "smb3 encryption = yes" in its config file, the normal PDU
+>> stream is encrypted, but the directly-delivered data isn't in the stream
+>> (and isn't encrypted), but is rather delivered by DDP/RDMA packets (at
+>> least with IWarp).
+>>
+>> Currently, the direct delivery fails with:
+>>
+>>     buf can not contain only a part of read data
+>>     WARNING: CPU: 0 PID: 4619 at fs/cifs/smb2ops.c:4731 handle_read_data+0x393/0x405
+>>     ...
+>>     RIP: 0010:handle_read_data+0x393/0x405
+>>     ...
+>>      smb3_handle_read_data+0x30/0x37
+>>      receive_encrypted_standard+0x141/0x224
+>>      cifs_demultiplex_thread+0x21a/0x63b
+>>      kthread+0xe7/0xef
+>>      ret_from_fork+0x22/0x30
+>>
+>> The problem apparently stemming from the fact that it's trying to manage
+>> the decryption, but the data isn't in the smallbuf, the bigbuf or the page
+>> array).
+>>
+>> This can be fixed simply by inserting an extra case into handle_read_data()
+>> that checks to see if use_rdma_mr is true, and if it is, just setting
+>> rdata->got_bytes to the length of data delivered and allowing normal
+>> continuation.
+>>
+>> This can be seen in an IWarp packet trace.  With the upstream code, it does
+>> a DDP/RDMA packet, which produces the warning above and then retries,
+>> retrieving the data inline, spread across several SMBDirect messages that
+>> get glued together into a single PDU.  With the patch applied, only the
+>> DDP/RDMA packet is seen.
+>>
+>> Note that this doesn't happen if the server isn't told to encrypt stuff and
+>> it does also happen with softRoCE.
+>>
+>> Signed-off-by: David Howells <dhowells@redhat.com>
+>> cc: Steve French <smfrench@gmail.com>
+>> cc: Tom Talpey <tom@talpey.com>
+>> cc: Long Li <longli@microsoft.com>
+>> cc: Namjae Jeon <linkinjeon@kernel.org>
+>> cc: Stefan Metzmacher <metze@samba.org>
+>> cc: linux-cifs@vger.kernel.org
+>>
+>> Link: https://lore.kernel.org/r/166855224228.1998592.2212551359609792175.stgit@warthog.procyon.org.uk/ # v1
+>> ---
+>>   fs/cifs/smb2ops.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+>> index cea578a45ed8..73b66ac86abf 100644
+>> --- a/fs/cifs/smb2ops.c
+>> +++ b/fs/cifs/smb2ops.c
+>> @@ -4733,6 +4733,9 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+>>           if (length < 0)
+>>               return length;
+>>           rdata->got_bytes = data_len;
+>> +    } else if (use_rdma_mr) {
+>> +        /* The data was delivered directly by RDMA. */
+>> +        rdata->got_bytes = data_len;
 > 
-> There is no such thing as a symmetric hash.  You're using shash
-> which stands for synchronous hash.
+> I actually don't understand why this would only be a problem with encryption.
+> 
+> I guess there's much more needed and data_offset should most likely be
+> ignored completely in the rdma offload case. So I'd guess its just luck
+> that we don't trigger the below warning/error more often.
 
-Sorry, you're right.
+I guess it might be related to smb3_handle_read_data passing
+server->pdu_size to handle_read_data(), while server->pdu_size is
+the outer size of the transform and not the size of the decrypted pdu.
 
-> In any case, as I said in the previous review this is abusing the
-> shash API.  Please use ahash instead.
+Maybe receive_encrypted_standard() needs to reset server->pdu_size
+during this:
 
-It's already abusing the shash API, this doesn't change that, except where it
-gets the data from.
+         if (mid_entry && mid_entry->handle)
+                 ret = mid_entry->handle(server, mid_entry);
+         else
+                 ret = cifs_handle_standard(server, mid_entry);
 
-I can have a go at conversion to ahash, but that will have to be a separate
-patch set as it isn't trivial.  The problem is that the current code just
-assumes it can push bits into the hash as it gets them - this is not possible
-with ahash.
-
-David
+But this code is so overly complex, that's way to hard to understand...
 
