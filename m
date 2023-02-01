@@ -2,38 +2,42 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4BAC05027
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DE3C636CD
 	for <linux-cifs@archiver.kernel.org>; Wed,  1 Feb 2023 12:05:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231476AbjBAMFl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Feb 2023 07:05:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34230 "EHLO
+        id S229597AbjBAMFm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Feb 2023 07:05:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbjBAMFk (ORCPT
+        with ESMTP id S230261AbjBAMFk (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Feb 2023 07:05:40 -0500
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499DF2CC60
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 498FE29E29
         for <linux-cifs@vger.kernel.org>; Wed,  1 Feb 2023 04:05:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
         s=42; h=Message-Id:Date:Cc:To:From;
-        bh=IMxYJ0tVCTl6eqGyHVw2KnyRPFh2LXUpr+XpcPOHyVg=; b=owU/RjKkGiDny/ROzMtyu1cYlR
-        I1RzcXLOCLBNZt9/inWdeGHMc6z65vm/sGEPDTmyg6WW+xNA8g5gIJCYaadMMRT0qSXBK2wZOPpS+
-        paVV1RZsQXmEryAjARAJrbAMlkaUoQnAJvxRGXV766vZj1ItZYWf7F5uZvFAGCyUHbZi6eADHTFy5
-        QPuW6PE2Kn7jtRjX9O84RGPoJe/ruDtF+uJFuiwch3Y9HKRfDMO0JH+hk5rdXcGrbNZ3lY6cGndB8
-        o53J2B5jS/+39NyCCqkRVE2PGeafl7xzyoXlBY0HyCXI4vkcsX1qew424EyntDIhAtAMMYQcmInSD
-        OitRqAfsBjJBEHYO3uMmBIl9QTtCn7pOOHWGCdW5UW8WrubVlZev/5L8ba2NCcWm/0YMYofR26gbG
-        chVUkmlnlfD5kXBEH4SsXGud48/tXj6iQKXv+OCOJIXOx2UlMhGGJ6B1iFU3sVOL6UgEwFkmCmrQ+
-        M5yT26etAdVZ0VTRUzP7J7wz;
+        bh=Bknl8YBzziRlkluRYCNcInPknbR6aYwMsTkimd3N8g0=; b=dMDqhxFJlAOQQ65TVF6J5+9SPj
+        /JllHCL4JuO+xM0xRopPMkHvtQCgbabHb+a4pVwXo8nmWtjuAz0semi6SfOoO66EYwlB0ZrCBlfn+
+        RTY4SBFu/PsTggsQZpmjVCPc9hvlJ6aZaG8Bo9LaIe/76FGNWsRoAU9Nb+3MqJBMakkpKUWdS10y0
+        XebJ9j/m59LuyDkkFnUswJxtheSQW0ueJ19oJDdGbFvzvRAZ7bidDMutRKCKFJ3jCdONTy26Mm+3P
+        6UbB0BFOAuuo/itydjM7aCXfkHXxsLQV0UZIhGzY2rIFvYkm39V4NB6MwEk5iCclhVCvajCzBndIk
+        eZRvsZ3Axtbk4/Yko271C/KSDCECRatpOwoNvCb+QH+PUQQcihspFWbZf4QVcTyfYNc8x/+mKYRKs
+        oCBA9/ilvgGsp85KZmdW6e4X/CMY1Ymhk01tIZUycaVDz3m8ofz/1ueqYEZLsdqKQXhFpGPP35Mox
+        XjqFOpGUcGzEiq7jXSjTkLXZ;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
         (Exim)
-        id 1pNBrq-00BE69-Fe; Wed, 01 Feb 2023 12:05:34 +0000
+        id 1pNBri-00BE5t-GI; Wed, 01 Feb 2023 12:05:26 +0000
 From:   Stefan Metzmacher <metze@samba.org>
 To:     linux-cifs@vger.kernel.org
-Cc:     Stefan Metzmacher <metze@samba.org>
-Subject: [PATCH 2/3] cifs: split out smb3_use_rdma_offload() helper
-Date:   Wed,  1 Feb 2023 13:04:42 +0100
-Message-Id: <d393687816f6913a026c2c0d66553cc23d3e42b1.1675252643.git.metze@samba.org>
+Cc:     Stefan Metzmacher <metze@samba.org>,
+        Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
+        Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        David Howells <dhowells@redhat.com>, stable@vger.kernel.org
+Subject: [PATCH 1/3] cifs: introduce cifs_io_parms in smb2_async_writev()
+Date:   Wed,  1 Feb 2023 13:04:41 +0100
+Message-Id: <ff2e9e6cff4c2082e516405f4ebe0d1338f5b67d.1675252643.git.metze@samba.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1675252643.git.metze@samba.org>
 References: <cover.1675252643.git.metze@samba.org>
@@ -43,73 +47,135 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We should have the logic to decide if we want rdma offload
-in a single spot in order to advance it in future.
+This will simplify the following changes and makes it easy to get
+in passed in from the caller in future.
 
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org
 ---
- fs/cifs/smb2pdu.c | 34 ++++++++++++++++++++++++++++------
- 1 file changed, 28 insertions(+), 6 deletions(-)
+ fs/cifs/smb2pdu.c | 53 ++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 39 insertions(+), 14 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 64e2c8b438f4..6a4d621241dd 100644
+index 2d5c3df2277d..64e2c8b438f4 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -4063,6 +4063,32 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 	return rc;
- }
+@@ -4504,10 +4504,27 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	struct kvec iov[1];
+ 	struct smb_rqst rqst = { };
+ 	unsigned int total_len;
++	struct cifs_io_parms _io_parms;
++	struct cifs_io_parms *io_parms = NULL;
  
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+static inline bool smb3_use_rdma_offload(struct cifs_io_parms *io_parms)
-+{
-+	struct TCP_Server_Info *server = io_parms->server;
-+	struct cifs_tcon *tcon = io_parms->tcon;
-+
-+	/* we can only offload if we're connected */
-+	if (!server || !tcon)
-+		return false;
-+
-+	/* we can only offload on an rdma connection */
-+	if (!server->rdma || !server->smbd_conn)
-+		return false;
-+
-+	/* we don't support signed offload yet */
-+	if (server->sign)
-+		return false;
-+
-+	/* offload also has its overhead, so only do it if desired */
-+	if (io_parms->length < server->smbd_conn->rdma_readwrite_threshold)
-+		return false;
-+
-+	return true;
-+}
-+#endif /* CONFIG_CIFS_SMB_DIRECT */
-+
- /*
-  * To form a chain of read requests, any read requests after the first should
-  * have the end_of_chain boolean set to true.
-@@ -4106,9 +4132,7 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
- 	 * If we want to do a RDMA write, fill in and append
- 	 * smbd_buffer_descriptor_v1 to the end of read request
- 	 */
--	if (server->rdma && rdata && !server->sign &&
--		rdata->bytes >= server->smbd_conn->rdma_readwrite_threshold) {
--
-+	if (smb3_use_rdma_offload(io_parms)) {
- 		struct smbd_buffer_descriptor_v1 *v1;
- 		bool need_invalidate = server->dialect == SMB30_PROT_ID;
+ 	if (!wdata->server)
+ 		server = wdata->server = cifs_pick_channel(tcon->ses);
  
-@@ -4558,9 +4582,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
++	/*
++	 * in future we may get cifs_io_parms passed in from the caller,
++	 * but for now we construct it here...
++	 */
++	_io_parms = (struct cifs_io_parms) {
++		.tcon = tcon,
++		.server = server,
++		.offset = wdata->offset,
++		.length = wdata->bytes,
++		.persistent_fid = wdata->cfile->fid.persistent_fid,
++		.volatile_fid = wdata->cfile->fid.volatile_fid,
++		.pid = wdata->pid,
++	};
++	io_parms = &_io_parms;
++
+ 	rc = smb2_plain_req_init(SMB2_WRITE, tcon, server,
+ 				 (void **) &req, &total_len);
+ 	if (rc)
+@@ -4517,26 +4534,31 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 		flags |= CIFS_TRANSFORM_REQ;
+ 
+ 	shdr = (struct smb2_hdr *)req;
+-	shdr->Id.SyncId.ProcessId = cpu_to_le32(wdata->cfile->pid);
++	shdr->Id.SyncId.ProcessId = cpu_to_le32(io_parms->pid);
+ 
+-	req->PersistentFileId = wdata->cfile->fid.persistent_fid;
+-	req->VolatileFileId = wdata->cfile->fid.volatile_fid;
++	req->PersistentFileId = io_parms->persistent_fid;
++	req->VolatileFileId = io_parms->volatile_fid;
+ 	req->WriteChannelInfoOffset = 0;
+ 	req->WriteChannelInfoLength = 0;
+ 	req->Channel = 0;
+-	req->Offset = cpu_to_le64(wdata->offset);
++	req->Offset = cpu_to_le64(io_parms->offset);
+ 	req->DataOffset = cpu_to_le16(
+ 				offsetof(struct smb2_write_req, Buffer));
+ 	req->RemainingBytes = 0;
+ 
+-	trace_smb3_write_enter(0 /* xid */, wdata->cfile->fid.persistent_fid,
+-		tcon->tid, tcon->ses->Suid, wdata->offset, wdata->bytes);
++	trace_smb3_write_enter(0 /* xid */,
++			       io_parms->persistent_fid,
++			       io_parms->tcon->tid,
++			       io_parms->tcon->ses->Suid,
++			       io_parms->offset,
++			       io_parms->length);
++
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	/*
  	 * If we want to do a server RDMA read, fill in and append
  	 * smbd_buffer_descriptor_v1 to the end of write request
  	 */
--	if (server->rdma && !server->sign && io_parms->length >=
--		server->smbd_conn->rdma_readwrite_threshold) {
--
-+	if (smb3_use_rdma_offload(io_parms)) {
- 		struct smbd_buffer_descriptor_v1 *v1;
- 		bool need_invalidate = server->dialect == SMB30_PROT_ID;
+-	if (server->rdma && !server->sign && wdata->bytes >=
++	if (server->rdma && !server->sign && io_parms->length >=
+ 		server->smbd_conn->rdma_readwrite_threshold) {
  
+ 		struct smbd_buffer_descriptor_v1 *v1;
+@@ -4590,14 +4612,14 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	}
+ #endif
+ 	cifs_dbg(FYI, "async write at %llu %u bytes\n",
+-		 wdata->offset, wdata->bytes);
++		 io_parms->offset, io_parms->length);
+ 
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	/* For RDMA read, I/O size is in RemainingBytes not in Length */
+ 	if (!wdata->mr)
+-		req->Length = cpu_to_le32(wdata->bytes);
++		req->Length = cpu_to_le32(io_parms->length);
+ #else
+-	req->Length = cpu_to_le32(wdata->bytes);
++	req->Length = cpu_to_le32(io_parms->length);
+ #endif
+ 
+ 	if (wdata->credits.value > 0) {
+@@ -4605,7 +4627,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 						    SMB2_MAX_BUFFER_SIZE));
+ 		shdr->CreditRequest = cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 8);
+ 
+-		rc = adjust_credits(server, &wdata->credits, wdata->bytes);
++		rc = adjust_credits(server, &wdata->credits, io_parms->length);
+ 		if (rc)
+ 			goto async_writev_out;
+ 
+@@ -4618,9 +4640,12 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 
+ 	if (rc) {
+ 		trace_smb3_write_err(0 /* no xid */,
+-				     req->PersistentFileId,
+-				     tcon->tid, tcon->ses->Suid, wdata->offset,
+-				     wdata->bytes, rc);
++				     io_parms->persistent_fid,
++				     io_parms->tcon->tid,
++				     io_parms->tcon->ses->Suid,
++				     io_parms->offset,
++				     io_parms->length,
++				     rc);
+ 		kref_put(&wdata->refcount, release);
+ 		cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
+ 	}
 -- 
 2.34.1
 
