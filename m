@@ -2,90 +2,91 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 544E1C636CD
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Feb 2023 15:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7C2C05027
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Feb 2023 00:05:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231827AbjBAPXB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Feb 2023 10:23:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35574 "EHLO
+        id S229548AbjBBAFv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Feb 2023 19:05:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231868AbjBAPWp (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Feb 2023 10:22:45 -0500
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8A373756;
-        Wed,  1 Feb 2023 07:22:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Message-Id:Date:Cc:To:From;
-        bh=/gS+o52Nxg0TkWEyh5LB7+Cdq/QCMDiQwBueylw1go4=; b=UsCJF2/D33Dz7Ve/J76UgOx5lI
-        a5NRV+Xu38x6OaYNh1pTzLLHTab1CM1S20mXz8ai1Fp2gS08skLJErOkAbHGZDd7LUMpuKr39t+KQ
-        tEYBpQqws63oqEgUWqSfY5ILgO+zAJSpRFl7KqMsJO2431RSWPC/Uwsee/0WQETfulbqa83m7PYEg
-        Huh89eornzWzB78chAlZ4RSytooVJJq+4GHSGLokPo1xiJ53XkODfUhAsgBUP50FFXfzBuKT2LCdi
-        isO7YtgopheKc73iPve48Akoq/QmoS90XHv1mWDzxYHe/siCebOlcLcAY1cv3RsgjcXo9Y0lpXo6p
-        tFJmnwRAFIgEvu8Yk4MwOI9ytcOASTiHrEKzGjrk1PFX8+B1T1DulOhjjsMeGjcoLhleZe/VesBhJ
-        ZJkosSmDQr05kt31UyzKmjpHqmJSj5iksE7yYOJuZt5X7ZJ7Acwon1iFPLdQHApLSw7xJgkqELCni
-        w957rjgP3fmbkZmWIqgsHNJN;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1pNEwC-00BFaB-O5; Wed, 01 Feb 2023 15:22:16 +0000
-From:   Stefan Metzmacher <metze@samba.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     Stefan Metzmacher <metze@samba.org>,
-        Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
-        Long Li <longli@microsoft.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        David Howells <dhowells@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH v2 3/3] cifs: don't try to use rdma offload on encrypted connections
-Date:   Wed,  1 Feb 2023 16:21:41 +0100
-Message-Id: <cd26594054b0c291e01b1da20f974245d3f494c3.1675264648.git.metze@samba.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1675264648.git.metze@samba.org>
-References: <cover.1675264648.git.metze@samba.org>
+        with ESMTP id S229451AbjBBAFv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Feb 2023 19:05:51 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201AE646A1
+        for <linux-cifs@vger.kernel.org>; Wed,  1 Feb 2023 16:05:50 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id f34so512059lfv.10
+        for <linux-cifs@vger.kernel.org>; Wed, 01 Feb 2023 16:05:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+4ayPMBmFEoBPiefQTVC8OlYFhtxrMD/0ygEuAv8+0E=;
+        b=M7msfNgSO38QfdgaGa+Ny/0/LcXytKX0S5dccxuXt0KbLpVhxJBu7pjSSxkkgw+wv6
+         Ef9tUDWyQrtVWCWt0j32ByQr+HW9U8E0DW2ip3rzjmDG4aX4t4KeL6hFfvSNiTxkMCei
+         30PEnhV9eTHjX69dVd6pziCou3+OJPQpNEAAEkP1MVRunER6qYrrppE7qgcZpqkC3Ceh
+         ABeGHHPB8AnTvLiz+livLi5+nW7ZfBI0skQ6qXnYFzqZjfhw6MyONueLDI6Cj+/O18lD
+         aQorz1qTsHqcLqu3+yyHnDaPqLf+UJD31yGQeVh+inuykgsM2euj+LePUHNVfL/yginK
+         R7+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+4ayPMBmFEoBPiefQTVC8OlYFhtxrMD/0ygEuAv8+0E=;
+        b=Cltxce+yN0cCWq7zvQtaj7+xo010wfNuhob0cRBU6zQDsofKstpfDdFkp+bC6JSsPN
+         RXcidAvDp9g32LWEgJAiNqfGMDLVe7xqf6RvdxG1XI7bHlZwF0SgHyZtZud7OJBHUwls
+         GfPDmPWid3kJRwhty4GoRXUnzPGNEj/QwqE3NGZtxh+1tvYcXWZ33vaC6ByYaj0fQFss
+         Yb5aUG38KL3buiPmUzeIhHNTJsvT8mZNj0m89c4iGw6OVzlmxSWTsjtLEFO8PlvhDfJn
+         sHoJZvTRodZJqloQvPVVjPGm/z+fVz7HJzybFWaLJxVVwQDJUUXCJnsKp2iRcACjYVEH
+         SjYg==
+X-Gm-Message-State: AO0yUKXX9w3oAQYKPzqIT2TZZGYvnUaYWDSrYXGFpcqFyu+zj6rDilHX
+        jYxt1luTkjX108GByLqrT8NiiRGzQkLoptrh+E33AYsGZjE=
+X-Google-Smtp-Source: AK7set9GQbeQZOnBSnEcRnFM0WPXn/Go0fM1g8aeZhbayr7DhSYyl913TeS4uzltQCIic6jLj/LMdQRhRtroT5EwcwU=
+X-Received: by 2002:a05:6512:1145:b0:4cb:20b3:e7f4 with SMTP id
+ m5-20020a056512114500b004cb20b3e7f4mr770866lfg.194.1675296347273; Wed, 01 Feb
+ 2023 16:05:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1675264648.git.metze@samba.org>
+In-Reply-To: <cover.1675264648.git.metze@samba.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 1 Feb 2023 18:05:36 -0600
+Message-ID: <CAH2r5mvNh+_ctF2xhOtK3y=eFJkN3T2cnUiA9Sbg+o9536Gx=g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] avoid plaintext rdma offload if encryption is required
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The aim of using encryption on a connection is to keep
-the data confidential, so we must not use plaintext rdma offload
-for that data!
+Tentatively merged into cifs-2.6.git for-next pending review and testing
 
-It seems that current windows servers and ksmbd would allow
-this, but that's no reason to expose the users data in plaintext!
-And servers hopefully reject this in future.
+On Wed, Feb 1, 2023 at 9:21 AM Stefan Metzmacher <metze@samba.org> wrote:
+>
+> I think it is a security problem to send confidential data in plaintext
+> over the wire, so we should avoid doing that even if rdma is in use.
+>
+> We already have a similar check to prevent data integrity problems
+> for rdma offload.
+>
+> Modern Windows servers support signed and encrypted rdma offload,
+> but we don't support this yet...
+>
+> Changes v2:
+> - Added missing Cc: list on commit 2/3
+>
+> Stefan Metzmacher (3):
+>   cifs: introduce cifs_io_parms in smb2_async_writev()
+>   cifs: split out smb3_use_rdma_offload() helper
+>   cifs: don't try to use rdma offload on encrypted connections
+>
+>  fs/cifs/smb2pdu.c | 89 +++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 70 insertions(+), 19 deletions(-)
+>
+> --
+> 2.34.1
+>
 
-Note modern windows servers support signed or encrypted offload,
-see MS-SMB2 2.2.3.1.6 SMB2_RDMA_TRANSFORM_CAPABILITIES, but we don't
-support that yet.
 
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: stable@vger.kernel.org
----
- fs/cifs/smb2pdu.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 6a4d621241dd..c5cb2639b3f1 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -4081,6 +4081,10 @@ static inline bool smb3_use_rdma_offload(struct cifs_io_parms *io_parms)
- 	if (server->sign)
- 		return false;
- 
-+	/* we don't support encrypted offload yet */
-+	if (smb3_encryption_required(tcon))
-+		return false;
-+
- 	/* offload also has its overhead, so only do it if desired */
- 	if (io_parms->length < server->smbd_conn->rdma_readwrite_threshold)
- 		return false;
 -- 
-2.34.1
+Thanks,
 
+Steve
