@@ -2,55 +2,111 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D253CC05027
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Feb 2023 00:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B62D2C61DA4
+	for <linux-cifs@archiver.kernel.org>; Fri,  3 Feb 2023 15:07:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229686AbjBBAze (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Feb 2023 19:55:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49454 "EHLO
+        id S233735AbjBCPHb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Feb 2023 10:07:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjBBAze (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Feb 2023 19:55:34 -0500
-Received: from formenos.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B5244FAE7;
-        Wed,  1 Feb 2023 16:55:31 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pNNsa-006ZcC-6G; Thu, 02 Feb 2023 08:55:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Feb 2023 08:55:08 +0800
-Date:   Thu, 2 Feb 2023 08:55:08 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     smfrench@gmail.com, viro@zeniv.linux.org.uk,
-        nspmangalore@gmail.com, rohiths.msft@gmail.com, tom@talpey.com,
-        metze@samba.org, hch@infradead.org, willy@infradead.org,
-        jlayton@kernel.org, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sfrench@samba.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 05/12] cifs: Add a function to Hash the contents of an
- iterator
-Message-ID: <Y9sJ7Nuubw1U4M6u@gondor.apana.org.au>
-References: <Y9ooW52m0Afnhj7Z@gondor.apana.org.au>
- <312908.1675262203@warthog.procyon.org.uk>
+        with ESMTP id S232498AbjBCPHa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Feb 2023 10:07:30 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF714A2A5E;
+        Fri,  3 Feb 2023 07:07:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=CiyB48vb6mrmTaEOVbqLR4u5Ie+kSkIibxGdt/yEGrQ=; b=D+S3e79rKed63zGKQODZ2ajajk
+        tY9PTZKFAa2fY7TmJOLLnb65WB73dEl4Jgj/gOugeSqMbkmLbXohy1C6IwWfuiZo77jdisGjM3yt4
+        9xvdaWC7YH4+evg/huO/wnallnWJ+vAfbAy+KZ1lxMwOxypC9YvrMMgminhOcGcxNYLxnvCObX1OD
+        yOODt3y4LRWDt6sPzQe9gbo91x07bQX4zJYyv+FuFp5RkEeW42m5CZNG2NJ+PmXd8QRNdkVwaLx8u
+        Ed4Ftp13pBU7ExNTD2TCUOM24LHzJnSBzaVBjKWd5mYX39pRy/ZbN9BsCfck6fVftE+tsT0WOITG1
+        xZXpO+3Q==;
+Received: from [2001:4bb8:19a:272a:910:bb67:7287:f956] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pNxeE-002adJ-Pc; Fri, 03 Feb 2023 15:06:43 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org, Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 02/23] block: add a bvec_set_folio helper
+Date:   Fri,  3 Feb 2023 16:06:13 +0100
+Message-Id: <20230203150634.3199647-3-hch@lst.de>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230203150634.3199647-1-hch@lst.de>
+References: <20230203150634.3199647-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <312908.1675262203@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Feb 01, 2023 at 02:36:43PM +0000, David Howells wrote:
-> 
-> It's already abusing the shash API, this doesn't change that, except where it
-> gets the data from.
+A smaller wrapper around bvec_set_page that takes a folio instead.
+There are only two potential users for this in the tree, but the number
+will grow in the future.
 
-Oh OK.  All I saw was this one patch which added shash code.
-Were you also deleting shash code in another patch that wasn't
-cc'ed to me?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ include/linux/bvec.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Cheers,
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 9e3dac51eb26b6..2bae1134499e7f 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -50,6 +50,19 @@ static inline void bvec_set_page(struct bio_vec *bv, struct page *page,
+ 	bv->bv_offset = offset;
+ }
+ 
++/**
++ * bvec_set_folio - initialize a bvec based off a struct folio
++ * @bv:		bvec to initialize
++ * @folio:	folio the bvec should point to
++ * @len:	length of the bvec
++ * @offset:	offset into the folio
++ */
++static inline void bvec_set_folio(struct bio_vec *bv, struct folio *folio,
++		unsigned int len, unsigned int offset)
++{
++	bvec_set_page(bv, &folio->page, len, offset);
++}
++
+ struct bvec_iter {
+ 	sector_t		bi_sector;	/* device address in 512 byte
+ 						   sectors */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.0
+
