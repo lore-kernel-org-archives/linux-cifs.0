@@ -2,31 +2,31 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B1EC61DA4
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Feb 2023 15:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76779C64ED6
+	for <linux-cifs@archiver.kernel.org>; Fri,  3 Feb 2023 15:10:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234315AbjBCPKb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Feb 2023 10:10:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50600 "EHLO
+        id S234356AbjBCPKh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Feb 2023 10:10:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234168AbjBCPJA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Feb 2023 10:09:00 -0500
+        with ESMTP id S234113AbjBCPJq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Feb 2023 10:09:46 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96903A145A;
-        Fri,  3 Feb 2023 07:08:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5867A7ED8;
+        Fri,  3 Feb 2023 07:08:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=WVeCTAFZrkMT1bjw8l1TFDAlVxNms+8mA7ykabtaeDg=; b=t9FEQ5rjC3OIn2nzgYy1gJw8Mr
-        n53fGXsQMf+ehav4QQE5ZTAG8tGsjUiGEBVQYh2SDvUkP9IT5HI/OvK6+Vuq11BsHPccCsYlaVya8
-        pSFtm+XG2ShLMfy3vd1SSr6c38wjVS0dXGNtGikvtcXOlAn4vjpa1DRXkf999sCWxsy5/DVR36uk5
-        iqpwoO7N70bhXaz2L3OKdTWPG2CIMdaT/I9joJapJfQKQxfPZTsr5I5s2fspc63TJDqQDH58BYjKO
-        tC7gYnap2gM8uy5sbPN/U8EX8p/ffgsOL0XlluLwFPxZAKLKhDgrpaYcRf0sLoH554FDB8S4FjEB0
-        l9W1hitg==;
+        bh=hrqLS9VRJdwWgQKPMrZrcg15ZPJuMvt1hsLhaUGAnIc=; b=BFKATpqtVunXubdNNkJ5PWdGdR
+        w5eGqcr1X3knNS9rr6k9oWENyIENlbi6OonNovYL8ZHpJJjUDwpcHhHTonjJY90oiMj+zCg0GCLCT
+        ZgNdYtwQXm0LQxe0W+f7iZTRogn9U/K+/3e+BH4ejOUB6/fIsWrQ9/00S1gnU4+Kd1mny+mtvIcKf
+        JBQbwIHCn96cgHxD69nkGyasiOfbHuKn0hnE8rzKpZB3qBEEW9iNbSwkEF+umPMiYEN99kqyv25Ra
+        OyRlO6fWHiMfP1LpyRoEaKpRG1PL6hAcJNC4/vgMJdlJJBo2kCaI7cWoF5XwWHzsLSZZ3Jn/itg0Q
+        3+X6SEYg==;
 Received: from [2001:4bb8:19a:272a:910:bb67:7287:f956] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNxfM-002bR0-0P; Fri, 03 Feb 2023 15:07:52 +0000
+        id 1pNxfT-002bcT-3j; Fri, 03 Feb 2023 15:07:59 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ilya Dryomov <idryomov@gmail.com>,
@@ -59,9 +59,9 @@ Cc:     Ilya Dryomov <idryomov@gmail.com>,
         linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
         devel@lists.orangefs.org, io-uring@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 21/23] sunrpc: use bvec_set_page to initialize bvecs
-Date:   Fri,  3 Feb 2023 16:06:32 +0100
-Message-Id: <20230203150634.3199647-22-hch@lst.de>
+Subject: [PATCH 23/23] libceph: use bvec_set_page to initialize bvecs
+Date:   Fri,  3 Feb 2023 16:06:34 +0100
+Message-Id: <20230203150634.3199647-24-hch@lst.de>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230203150634.3199647-1-hch@lst.de>
 References: <20230203150634.3199647-1-hch@lst.de>
@@ -75,47 +75,101 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 Use the bvec_set_page helper to initialize bvecs.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Chuck Lever <chuck.lever@oracle.com>
-Acked-by: Trond Myklebust <trond.myklebust@hammerspace.com>
+Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
 ---
- net/sunrpc/svcsock.c | 7 ++-----
- net/sunrpc/xdr.c     | 5 ++---
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ net/ceph/messenger_v1.c |  7 ++-----
+ net/ceph/messenger_v2.c | 28 +++++++++++-----------------
+ 2 files changed, 13 insertions(+), 22 deletions(-)
 
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 815baf308236a9..91252adcae4696 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -252,11 +252,8 @@ static ssize_t svc_tcp_read_msg(struct svc_rqst *rqstp, size_t buflen,
+diff --git a/net/ceph/messenger_v1.c b/net/ceph/messenger_v1.c
+index d1787d7d33ef9a..d664cb1593a777 100644
+--- a/net/ceph/messenger_v1.c
++++ b/net/ceph/messenger_v1.c
+@@ -40,15 +40,12 @@ static int ceph_tcp_recvmsg(struct socket *sock, void *buf, size_t len)
+ static int ceph_tcp_recvpage(struct socket *sock, struct page *page,
+ 		     int page_offset, size_t length)
+ {
+-	struct bio_vec bvec = {
+-		.bv_page = page,
+-		.bv_offset = page_offset,
+-		.bv_len = length
+-	};
++	struct bio_vec bvec;
+ 	struct msghdr msg = { .msg_flags = MSG_DONTWAIT | MSG_NOSIGNAL };
+ 	int r;
  
- 	clear_bit(XPT_DATA, &svsk->sk_xprt.xpt_flags);
+ 	BUG_ON(page_offset + length > PAGE_SIZE);
++	bvec_set_page(&bvec, page, length, page_offset);
+ 	iov_iter_bvec(&msg.msg_iter, ITER_DEST, &bvec, 1, length);
+ 	r = sock_recvmsg(sock, &msg, msg.msg_flags);
+ 	if (r == -EAGAIN)
+diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
+index 3009028c4fa28f..301a991dc6a68e 100644
+--- a/net/ceph/messenger_v2.c
++++ b/net/ceph/messenger_v2.c
+@@ -149,10 +149,10 @@ static int do_try_sendpage(struct socket *sock, struct iov_iter *it)
  
--	for (i = 0, t = 0; t < buflen; i++, t += PAGE_SIZE) {
--		bvec[i].bv_page = rqstp->rq_pages[i];
--		bvec[i].bv_len = PAGE_SIZE;
--		bvec[i].bv_offset = 0;
--	}
-+	for (i = 0, t = 0; t < buflen; i++, t += PAGE_SIZE)
-+		bvec_set_page(&bvec[i], rqstp->rq_pages[i], PAGE_SIZE, 0);
- 	rqstp->rq_respages = &rqstp->rq_pages[i];
- 	rqstp->rq_next_page = rqstp->rq_respages + 1;
+ 	while (iov_iter_count(it)) {
+ 		/* iov_iter_iovec() for ITER_BVEC */
+-		bv.bv_page = it->bvec->bv_page;
+-		bv.bv_offset = it->bvec->bv_offset + it->iov_offset;
+-		bv.bv_len = min(iov_iter_count(it),
+-				it->bvec->bv_len - it->iov_offset);
++		bvec_set_page(&bv, it->bvec->bv_page,
++			      min(iov_iter_count(it),
++				  it->bvec->bv_len - it->iov_offset),
++			      it->bvec->bv_offset + it->iov_offset);
  
-diff --git a/net/sunrpc/xdr.c b/net/sunrpc/xdr.c
-index f7767bf224069f..afe7ec02d23229 100644
---- a/net/sunrpc/xdr.c
-+++ b/net/sunrpc/xdr.c
-@@ -150,9 +150,8 @@ xdr_alloc_bvec(struct xdr_buf *buf, gfp_t gfp)
- 		if (!buf->bvec)
- 			return -ENOMEM;
- 		for (i = 0; i < n; i++) {
--			buf->bvec[i].bv_page = buf->pages[i];
--			buf->bvec[i].bv_len = PAGE_SIZE;
--			buf->bvec[i].bv_offset = 0;
-+			bvec_set_page(&buf->bvec[i], buf->pages[i], PAGE_SIZE,
-+				      0);
- 		}
- 	}
- 	return 0;
+ 		/*
+ 		 * sendpage cannot properly handle pages with
+@@ -286,9 +286,8 @@ static void set_out_bvec_zero(struct ceph_connection *con)
+ 	WARN_ON(iov_iter_count(&con->v2.out_iter));
+ 	WARN_ON(!con->v2.out_zero);
+ 
+-	con->v2.out_bvec.bv_page = ceph_zero_page;
+-	con->v2.out_bvec.bv_offset = 0;
+-	con->v2.out_bvec.bv_len = min(con->v2.out_zero, (int)PAGE_SIZE);
++	bvec_set_page(&con->v2.out_bvec, ceph_zero_page,
++		      min(con->v2.out_zero, (int)PAGE_SIZE), 0);
+ 	con->v2.out_iter_sendpage = true;
+ 	iov_iter_bvec(&con->v2.out_iter, ITER_SOURCE, &con->v2.out_bvec, 1,
+ 		      con->v2.out_bvec.bv_len);
+@@ -863,10 +862,7 @@ static void get_bvec_at(struct ceph_msg_data_cursor *cursor,
+ 
+ 	/* get a piece of data, cursor isn't advanced */
+ 	page = ceph_msg_data_next(cursor, &off, &len);
+-
+-	bv->bv_page = page;
+-	bv->bv_offset = off;
+-	bv->bv_len = len;
++	bvec_set_page(bv, page, len, off);
+ }
+ 
+ static int calc_sg_cnt(void *buf, int buf_len)
+@@ -1855,9 +1851,8 @@ static void prepare_read_enc_page(struct ceph_connection *con)
+ 	     con->v2.in_enc_resid);
+ 	WARN_ON(!con->v2.in_enc_resid);
+ 
+-	bv.bv_page = con->v2.in_enc_pages[con->v2.in_enc_i];
+-	bv.bv_offset = 0;
+-	bv.bv_len = min(con->v2.in_enc_resid, (int)PAGE_SIZE);
++	bvec_set_page(&bv, con->v2.in_enc_pages[con->v2.in_enc_i],
++		      min(con->v2.in_enc_resid, (int)PAGE_SIZE), 0);
+ 
+ 	set_in_bvec(con, &bv);
+ 	con->v2.in_enc_i++;
+@@ -2998,9 +2993,8 @@ static void queue_enc_page(struct ceph_connection *con)
+ 	     con->v2.out_enc_resid);
+ 	WARN_ON(!con->v2.out_enc_resid);
+ 
+-	bv.bv_page = con->v2.out_enc_pages[con->v2.out_enc_i];
+-	bv.bv_offset = 0;
+-	bv.bv_len = min(con->v2.out_enc_resid, (int)PAGE_SIZE);
++	bvec_set_page(&bv, con->v2.out_enc_pages[con->v2.out_enc_i],
++		      min(con->v2.out_enc_resid, (int)PAGE_SIZE), 0);
+ 
+ 	set_out_bvec(con, &bv, false);
+ 	con->v2.out_enc_i++;
 -- 
 2.39.0
 
