@@ -2,201 +2,122 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D62DC61DA4
-	for <linux-cifs@archiver.kernel.org>; Sat,  4 Feb 2023 10:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8771C636CC
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Feb 2023 19:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbjBDK5K (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 4 Feb 2023 05:57:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58598 "EHLO
+        id S232414AbjBDTK1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 4 Feb 2023 14:10:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229843AbjBDK5J (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 4 Feb 2023 05:57:09 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1557CA0B;
-        Sat,  4 Feb 2023 02:57:07 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 80EF16068F;
-        Sat,  4 Feb 2023 10:57:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83787C433D2;
-        Sat,  4 Feb 2023 10:57:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675508226;
-        bh=kMAzJD4jato0wOMCl0gOK8URH/g9P1F1yx8fLEcqu0M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TIJDT+KTE+1f1XIgi0D0hor8jwY2nRuIV6FphVBYHrI/A+Pdbv6lVS7SH0Gn5I/wa
-         v9gza/eegV5E3ESm3GEymToXDZ56i43ihjAqoJf4Ncx9ZqqPn3R09ZUMbgPseVFdNB
-         /kdreIycg5WXiL0rd71I5R8njA6iiwlmz/3J6t+MraPdnpHbtskpoFLJMHnSFNezm/
-         QR5pWaAKEBAkMrGQjwegsNDhwKVrRUOyHCnfg52Ps3yDCjEviweJC8BlkxUmLv7b/L
-         KUPS4QpKJsvQcQHEY7x9Rh1pcvx00I0ElnHNA5Sad3eq70I3JkR0EvmMybCnugBBFi
-         kZ1XOyrRht9wQ==
-Received: by pali.im (Postfix)
-        id 5045F976; Sat,  4 Feb 2023 11:57:03 +0100 (CET)
-Date:   Sat, 4 Feb 2023 11:57:03 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-Cc:     linux-fsdevel@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>, "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, Dave Kleikamp <shaggy@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        Christoph Hellwig <hch@infradead.org>,
-        Kari Argillander <kari.argillander@gmail.com>,
-        Viacheslav Dubeyko <slava@dubeyko.com>
-Subject: Re: [RFC PATCH v2 01/18] fat: Fix iocharset=utf8 mount option
-Message-ID: <20230204105703.pnc6vcy4hvmvvm3b@pali>
-References: <20221226142150.13324-1-pali@kernel.org>
- <20221226142150.13324-2-pali@kernel.org>
- <874jsyvje6.fsf@mail.parknet.co.jp>
+        with ESMTP id S229796AbjBDTK1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 4 Feb 2023 14:10:27 -0500
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E00BD2798E
+        for <linux-cifs@vger.kernel.org>; Sat,  4 Feb 2023 11:10:25 -0800 (PST)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-163bd802238so10636512fac.1
+        for <linux-cifs@vger.kernel.org>; Sat, 04 Feb 2023 11:10:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zQejtNGKsURp8/VjP/TrlOduU9OqexWo7k0nc7zpciU=;
+        b=Q6H43TjLJ9lFOipFfKfrmgZh2B0jKfA0KaSxOV6tO+1KGbRFm/WfsXja3luhmyPO+s
+         ZuYU/8uYtNJCpf6zZRkT3VV5Jw0f3NOd4FxRdWeY7hnZQgc/U8nKw42sSaPJT9kZXAl0
+         Ud+q377bvcotHQN4On8sPKg2X4Xis2WvBWr932yv2t9TXHO47MlK4TVHNEhqJu0jsGoN
+         AAYwX7WX8VTWm1ICyprNW33kp5tRxIkK+6BP8xDvBVy2A2DQKRyQ8nVuTrrqYC8657mW
+         Kvd9cgOhet/RrBiYAB6nneep+pABnxB20lzyHHW9A36X8+qQowKemoRbtaMRugfZSaRu
+         GJOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zQejtNGKsURp8/VjP/TrlOduU9OqexWo7k0nc7zpciU=;
+        b=PzQAWlszwmRASwZ0KVbTDQFbznHFbwsDeuYbdcn2iegsdvZ2En17WpNzPPoEPw7DRj
+         yS1CMVOfugqHz9dx5K6wP30fPc6mAL9lJ5TX4uXS55IgibdK62YPExiXdX5xt1xBfquy
+         aLM3W8geIGesRcf8Ie/TdNWw4Ay2AAz9I236iWQe/d5aXyklKOF/CROx7eNyFq0XdGEU
+         RmKqSrNtfO9X964ElZp0y+KBUbw0sBqltKUyISmLqNvMs/j/rKK9gRaOPhv6g/dZY3+e
+         PAqXkRG4asPTBm7HtCYdteHnUzW/9anSHhxgjToI9i3pFvPBS6mCSBH69MXGkDo4BVB8
+         ESXg==
+X-Gm-Message-State: AO0yUKWGsOq7Tn2EFVeYMfRRInYHqeKKQTM5lTyrwgnw9VBPGAEEjrkc
+        hXxl9Brql8dNUNUAHfCavD+IVT5pN88BzRuL3Q1qEXqS8zo=
+X-Google-Smtp-Source: AK7set+fGvsaDmlLGGNVcISF/BSV2H9ZlRAACegDVRbU1R7NxZAp+MQVz0mHjr6juDpY2DXLoIbjLlbLIW809VG4FP4=
+X-Received: by 2002:a05:6870:c892:b0:163:a89a:c5e6 with SMTP id
+ er18-20020a056870c89200b00163a89ac5e6mr955030oab.276.1675537824762; Sat, 04
+ Feb 2023 11:10:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <874jsyvje6.fsf@mail.parknet.co.jp>
-User-Agent: NeoMutt/20180716
+From:   Stan Hu <stanhu@gmail.com>
+Date:   Sat, 4 Feb 2023 11:10:13 -0800
+Message-ID: <CAMBWrQnRKQVPh8Vi8bY4eL_VSZhnPu_5OALv1nKZuXvoEMsLzQ@mail.gmail.com>
+Subject: curious about a CIFS bug fixed in Linux 5.13
+To:     linux-cifs@vger.kernel.org,
+        Rohith Surabattula <rohiths.msft@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tuesday 10 January 2023 18:17:05 OGAWA Hirofumi wrote:
-> Pali Rohár <pali@kernel.org> writes:
-> 
-> > Currently iocharset=utf8 mount option is broken and error is printed to
-> > dmesg when it is used. To use UTF-8 as iocharset, it is required to use
-> > utf8=1 mount option.
-> >
-> > Fix iocharset=utf8 mount option to use be equivalent to the utf8=1 mount
-> > option and remove printing error from dmesg.
-> 
-> [...]
-> 
-> > -
-> > -	There is also an option of doing UTF-8 translations
-> > -	with the utf8 option.
-> > -
-> > -.. note:: ``iocharset=utf8`` is not recommended. If unsure, you should consider
-> > -	  the utf8 option instead.
-> > +	**utf8** is supported too and recommended to use.
-> >  
-> >  **utf8=<bool>**
-> > -	UTF-8 is the filesystem safe version of Unicode that
-> > -	is used by the console. It can be enabled or disabled
-> > -	for the filesystem with this option.
-> > -	If 'uni_xlate' gets set, UTF-8 gets disabled.
-> > -	By default, FAT_DEFAULT_UTF8 setting is used.
-> > +	Alias for ``iocharset=utf8`` mount option.
-> >  
-> >  **uni_xlate=<bool>**
-> >  	Translate unhandled Unicode characters to special
-> > diff --git a/fs/fat/Kconfig b/fs/fat/Kconfig
-> > index 238cc55f84c4..e98aaa3bb55b 100644
-> > --- a/fs/fat/Kconfig
-> > +++ b/fs/fat/Kconfig
-> > @@ -93,29 +93,12 @@ config FAT_DEFAULT_IOCHARSET
-> >  	  like FAT to use. It should probably match the character set
-> >  	  that most of your FAT filesystems use, and can be overridden
-> >  	  with the "iocharset" mount option for FAT filesystems.
-> > -	  Note that "utf8" is not recommended for FAT filesystems.
-> > -	  If unsure, you shouldn't set "utf8" here - select the next option
-> > -	  instead if you would like to use UTF-8 encoded file names by default.
-> > +	  "utf8" is supported too and recommended to use.
-> 
-> This patch fixes the issue of utf-8 partially only. I think we can't
-> still recommend only partially working one.
+I've been investigating a strange bug that appears to return an
+`-EINVAL` when our application attempts to open a newly-renamed file
+on a CIFS mount. The good news is that the bug is gone in Linux 5.13
+but present in versions preceding that. After doing some git
+bisecting, I've validated that commit c3f207ab29f79 (cifs: Deferred
+close for files) appears to have solved the problem.
 
-With this patch FAT_DEFAULT_IOCHARSET=utf8 is same what was
-FAT_DEFAULT_UTF8=y without this patch. And option FAT_DEFAULT_UTF8 was
-recommended in description before "select the next option instead if you
-would like to use UTF-8 encoded file names by default."
+Now I'm wondering: is this bug really fixed, or is this commit masking
+another issue?
 
-> [...]
-> 
-> > -	opts->utf8 = IS_ENABLED(CONFIG_FAT_DEFAULT_UTF8) && is_vfat;
-> > -
-> >  	if (!options)
-> >  		goto out;
-> >  
-> > @@ -1318,10 +1316,14 @@ static int parse_options(struct super_block *sb, char *options, int is_vfat,
-> >  					| VFAT_SFN_CREATE_WIN95;
-> >  			break;
-> >  		case Opt_utf8_no:		/* 0 or no or false */
-> > -			opts->utf8 = 0;
-> > +			fat_reset_iocharset(opts);
-> 
-> This changes the behavior of "iocharset=iso8859-1,utf8=no" for
-> example. Do we need this user visible change here?
+The `mount` output for this CIFS mount is as follows:
 
-Ok, I agree, we do not want to change iocharset when
-"iocharset=iso8859-1,utf8=no" was specified. It should stay on
-iso8859-1.
+//10.128.0.36/share on /mnt/windows type cifs
+(rw,relatime,vers=3.1.1,cache=strict,username=stan,uid=997,noforceuid,gid=997,noforcegid,addr=10.128.0.36,file_mode=0700,dir_mode=0700,soft,nounix,serverino,mapposix,rsize=4194304,wsize=4194304,bsize=1048576,echo_interval=60,actimeo=1)
 
-> >  			break;
-> >  		case Opt_utf8_yes:		/* empty or 1 or yes or true */
-> > -			opts->utf8 = 1;
-> > +			fat_reset_iocharset(opts);
-> > +			iocharset = kstrdup("utf8", GFP_KERNEL);
-> > +			if (!iocharset)
-> > +				return -ENOMEM;
-> > +			opts->iocharset = iocharset;
-> >  			break;
-> >  		case Opt_uni_xl_no:		/* 0 or no or false */
-> >  			opts->unicode_xlate = 0;
-> > @@ -1359,18 +1361,11 @@ static int parse_options(struct super_block *sb, char *options, int is_vfat,
-> >  	}
-> >  
-> >  out:
-> > -	/* UTF-8 doesn't provide FAT semantics */
-> > -	if (!strcmp(opts->iocharset, "utf8")) {
-> > -		fat_msg(sb, KERN_WARNING, "utf8 is not a recommended IO charset"
-> > -		       " for FAT filesystems, filesystem will be "
-> > -		       "case sensitive!");
-> > -	}
-> > +	opts->utf8 = !strcmp(opts->iocharset, "utf8") && is_vfat;
-> 
-> Still broken, so I think we still need the warning here (would be
-> tweaked warning).
+As far as I understand, our application works something like this:
 
-There was no warning before for utf8=1. And with this patch
-iocharset=utf8 should have same behavior as what was utf8=1 before this
-patch.
+1. Process A writes a small file to a temporary location:
+`/mnt/windows/artifacts/tmp/uploads/gitlab-workhorse-upload749963764`
+2. Process B calls:
+`rename("/mnt/windows/artifacts/tmp/uploads/gitlab-workhorse-upload749963764",
+"/mnt/windows/artifacts/tmp/work/1675526501-1286-0001-0710/.env.gz")`
+3. Process B calls:
+`rename("/mnt/windows/artifacts/tmp/work/1675526501-1286-0001-0710/.env.gz",
+"/mnt/windows/artifacts/tmp/cache/1675526501-1286-0001-0710/.env.gz")`.
+4. Process B calls: `openat(AT_FDCWD,
+"/mnt/windows/artifacts/tmp/cache/1675526501-1286-0001-0710/.env.gz",
+O_RDONLY|O_CLOEXEC)`.
 
-So if we should show some warning for utf8=1 then it is somehow not
-related to this patch and it should be done separately, possible also to
-the current codebase and before this patch.
+An `strace` on our application shows the error:
 
-> >  	/* If user doesn't specify allow_utime, it's initialized from dmask. */
-> >  	if (opts->allow_utime == (unsigned short)-1)
-> >  		opts->allow_utime = ~opts->fs_dmask & (S_IWGRP | S_IWOTH);
-> > -	if (opts->unicode_xlate)
-> > -		opts->utf8 = 0;
-> 
-> unicode_xlate option is exclusive with utf8, need to adjust
-> somewhere. (with this patch, unicode_xlate and utf8 will shows by
-> show_options())
+1108 openat(AT_FDCWD,
+"/mnt/windows/artifacts/tmp/cache/1675526501-1286-0001-0710/.env.gz",
+O_RDONLY|O_CLOEXEC) = -1 EINVAL (Invalid argument)
 
-Ok, seems that there is more work to handle unicode_xlate option
-correctly.
+However, I can open and read this file fine from the shell.
 
-> > +	else if (utf8)
-> > +		return fat_utf8_strnicmp(name->name, str, alen);
-> > +	else
-> > +		return nls_strnicmp(t, name->name, str, alen);
-> >  }
-> 
-> Not strong opinion though, maybe we better to consolidate this to a
-> (inline) function? (FWIW, it may be better to refactor to provide some
-> filename functions to hide the detail of handling nls/utf8)
+When I turn on CIFS debugging, I see "STATUS_INVALID_PARAMETER" in
+response to cifs_open():
 
-This looks like an another cleanup / improvement which can be done. I'm
-not sure if it is a good idea to put into this patch series (it is
-already big).
+[ 5241.432481] fs/cifs/inode.c: CIFS VFS: leaving cifs_rmdir (xid = 703) rc = 0
+[ 5241.436049] fs/cifs/file.c: CIFS VFS: in cifs_open as Xid: 704 with uid: 997
+[ 5241.436052] fs/cifs/file.c: inode = 0x00000000028100cc file flags
+are 0x8000 for \tmp\cache\1675526501-1286-0001-0710\.env.gz
+[ 5241.436588] Status code returned 0xc000000d STATUS_INVALID_PARAMETER
+[ 5241.443409] fs/cifs/file.c: CIFS VFS: leaving cifs_open (xid = 704) rc = -22
+[ 5241.452108] fs/cifs/file.c: Flush inode 00000000028100cc file
+0000000005911244 rc 0
+[ 5241.452112] fs/cifs/file.c: closing last open instance for inode
+00000000028100cc
+[ 5241.452114] fs/cifs/file.c: CIFS VFS: in _cifsFileInfo_put as Xid:
+705 with uid: 997
+
+I took a Wireshark pcap of the STATUS_INVALID_PARAMETER response for
+another failed run here:
+https://gitlab.com/gitlab-org/gitlab/uploads/b047728a695adc098a6d3ce77df2ae7d/test.pcap
+
+Working case: https://gitlab.com/gitlab-org/gitlab/uploads/4df1625bf3ab3775bc97d8b56546eacc/test-working.pcap
+
+In the working case, I see "No oplock" on the "Create request" for the
+temporary file in question, and the ExtraInfo flags are a little
+different (https://gitlab.com/gitlab-org/gitlab/-/issues/389995#note_1265800095).
+
+I attempted to set "cache=none,actimeo=0" in the mount options, but
+that did not seem to help.
