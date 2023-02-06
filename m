@@ -2,67 +2,125 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BADCC05027
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Feb 2023 15:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C7AC61DA4
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Feb 2023 23:45:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230344AbjBFPsw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 6 Feb 2023 10:48:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57444 "EHLO
+        id S229930AbjBFXpC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 6 Feb 2023 18:45:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230419AbjBFPst (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Feb 2023 10:48:49 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52A9EB40;
-        Mon,  6 Feb 2023 07:48:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZM4SLufXDDu44KxKnGy/pqFAr7hmVOIRITrZRFpLfF8=; b=eg4ZHygFr0KgRTE9pJp5IgzGhU
-        EGn02BEAI3bGZRsOV3hkZHeIuAwo3heZvgKULzbxONSbOFi+/Nq/FFJzB/ecdbCLYt1EcJRi92+Ho
-        JzM6tjZ+LOuHEq+W2zcv3sZb4nqP2hIMGm2AZxzt/lzss18yfY8PADZbjJH/7DEFoD/JZ0YHOtJpx
-        CnrzQjj8zaoeMXqzCf8I/GXMkqL5kfpDpP0mmxlo9C3wDtWlQwG7rxU4BnJKe+vNx3ZK4NE6FNX14
-        0AcJEGMGxJ66jb+VkPishYzAe1BgE5Ql7F6BufMCe/aDvUqKvxc3RTs3u53j1mzLIbeYVzVcXXrh/
-        N+BzEc1g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pP3iy-0092qr-A4; Mon, 06 Feb 2023 15:48:08 +0000
-Date:   Mon, 6 Feb 2023 07:48:08 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>
-Subject: Re: [PATCH 03/11] cifs: Implement splice_read to pass down ITER_BVEC
- not ITER_PIPE
-Message-ID: <Y+EhOHVZWLjTq26h@infradead.org>
-References: <20230203205929.2126634-1-dhowells@redhat.com>
- <20230203205929.2126634-4-dhowells@redhat.com>
+        with ESMTP id S229936AbjBFXpB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Feb 2023 18:45:01 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 291D1303E5;
+        Mon,  6 Feb 2023 15:44:36 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B4A7EB8167D;
+        Mon,  6 Feb 2023 23:44:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E32AC433A0;
+        Mon,  6 Feb 2023 23:44:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675727073;
+        bh=+VS0T7saKGxXpafCOxelveBrW5g7V/bi82d9i0jTJOw=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=Mefy5tCBU30U2vgPjHQ7NT0ziRYCnzZIx9vft/xTFg2vhJlUt6LHSYKLSoGkXCWYd
+         R08UlnTuVBLXJgpsldZISrLKoWp1+BTS7RzEahS7i0yztNYFj1N9c+xeioDxRrQJp7
+         u2fxlEXTGZfG0qx88czFSgAoPEEEW7vv10J/K0etpfvWOzMvpURkF17K3wvEKfW6EN
+         Nb+iqGn6Tp1etLPp/X3m9/1KiOQc4CxSau7PA7n90aLIzATln0Bqv9o31ZvaqkagUo
+         gYO0sQrVuSzk30yAmsgZBhxyU5XNY3gx83c9e5XVE+k/7Kb9st3MrC/HmSCTshFEqO
+         C49rnhzyT028A==
+Received: by mail-oi1-f173.google.com with SMTP id 20so10436454oix.5;
+        Mon, 06 Feb 2023 15:44:33 -0800 (PST)
+X-Gm-Message-State: AO0yUKUe1Qpn1DkPv+VbgK0Qbj4RG09MXHQlgiQZU8aT0ExjSSOknS0N
+        1a1/cgS6VhMNOgLQRmI/j3bSxHnD3QWS4W5Eip0=
+X-Google-Smtp-Source: AK7set+239NZEdy9JC4+houRK9nVQSewhMxnSxX0ik41Ipo6URjzwhlruxeiBMQvMt0MG9ioy/nceY43s38Zk6g68O0=
+X-Received: by 2002:a05:6808:10:b0:378:57fb:de1f with SMTP id
+ u16-20020a056808001000b0037857fbde1fmr1019860oic.215.1675727072447; Mon, 06
+ Feb 2023 15:44:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230203205929.2126634-4-dhowells@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Received: by 2002:a8a:355:0:b0:4a5:1048:434b with HTTP; Mon, 6 Feb 2023
+ 15:44:31 -0800 (PST)
+In-Reply-To: <20230206023630.9457-1-hbh25y@gmail.com>
+References: <20230206023630.9457-1-hbh25y@gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 7 Feb 2023 08:44:31 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9c1Cm=3vbqTO6V=mwfu=YUEwEiGYZFc0mBfeSuH4phyQ@mail.gmail.com>
+Message-ID: <CAKYAXd9c1Cm=3vbqTO6V=mwfu=YUEwEiGYZFc0mBfeSuH4phyQ@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: fix possible memory leak in smb2_lock()
+To:     Hangyu Hua <hbh25y@gmail.com>
+Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
+        lsahlber@redhat.com, hyc.lee@gmail.com, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Feb 03, 2023 at 08:59:21PM +0000, David Howells wrote:
-> Provide cifs_splice_read() to use a bvec rather than an pipe iterator as
-> the latter cannot so easily be split and advanced, which is necessary to
-> pass an iterator down to the bottom levels.  Upstream cifs gets around this
-> problem by using iov_iter_get_pages() to prefill the pipe and then passing
-> the list of pages down.
+2023-02-06 11:36 GMT+09:00, Hangyu Hua <hbh25y@gmail.com>:
+> argv needs to be free when setup_async_work fails or when the current
+> process is woken up.
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
+> ---
+>
+> v2: avoid NULL pointer dereference in set_close_state_blocked_works()
+>
+>  fs/ksmbd/smb2pdu.c   | 5 +++++
+>  fs/ksmbd/vfs_cache.c | 2 ++
+>  2 files changed, 7 insertions(+)
+>
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index d681f91947d9..177a24704021 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -7050,6 +7050,7 @@ int smb2_lock(struct ksmbd_work *work)
+>  						      smb2_remove_blocked_lock,
+>  						      argv);
+>  				if (rc) {
+> +					kfree(argv);
+>  					err = -ENOMEM;
+>  					goto out;
+>  				}
+> @@ -7072,6 +7073,8 @@ int smb2_lock(struct ksmbd_work *work)
+>  						spin_lock(&fp->f_lock);
+>  						list_del(&work->fp_entry);
+>  						spin_unlock(&fp->f_lock);
+> +						kfree(argv);
+> +						work->cancel_fn = NULL;
+>  						rsp->hdr.Status =
+>  							STATUS_CANCELLED;
+>  						kfree(smb_lock);
+> @@ -7096,6 +7099,8 @@ int smb2_lock(struct ksmbd_work *work)
+>  				spin_lock(&fp->f_lock);
+>  				list_del(&work->fp_entry);
+>  				spin_unlock(&fp->f_lock);
+> +				kfree(argv);
+> +				work->cancel_fn = NULL;
+This doesn't seem so simple... You have to consider the racy issue
+between this change and smb2_cancel(). Also, how are you testing this
+patch?
 
-Just as last time:  if cifs has a problem with splitting these iters
-so does everyone else.  What about solving the root cause here?
-
-If the splice isn't actually a splice you might as well not implement
-it.
+>  				goto retry;
+>  			} else if (!rc) {
+>  				spin_lock(&work->conn->llist_lock);
+> diff --git a/fs/ksmbd/vfs_cache.c b/fs/ksmbd/vfs_cache.c
+> index da9163b00350..eb95c16393b7 100644
+> --- a/fs/ksmbd/vfs_cache.c
+> +++ b/fs/ksmbd/vfs_cache.c
+> @@ -372,6 +372,8 @@ static void set_close_state_blocked_works(struct
+> ksmbd_file *fp)
+>  		list_del(&cancel_work->fp_entry);
+>  		cancel_work->state = KSMBD_WORK_CLOSED;
+>  		cancel_work->cancel_fn(cancel_work->cancel_argv);
+> +		kfree(cancel_work->cancel_argv);
+> +		cancel_work->cancel_fn = NULL;
+>  	}
+>  	spin_unlock(&fp->f_lock);
+>  }
+> --
+> 2.34.1
+>
+>
