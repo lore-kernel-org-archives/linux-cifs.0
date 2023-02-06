@@ -2,68 +2,67 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D5DC05027
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Feb 2023 14:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BADCC05027
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Feb 2023 15:48:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230344AbjBFOlV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 6 Feb 2023 09:41:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58298 "EHLO
+        id S230344AbjBFPsw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 6 Feb 2023 10:48:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbjBFOlU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Feb 2023 09:41:20 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D25BE19F2B;
-        Mon,  6 Feb 2023 06:41:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8D8B1B810BC;
-        Mon,  6 Feb 2023 14:41:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42C42C433A0;
-        Mon,  6 Feb 2023 14:41:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675694477;
-        bh=Invyop0Vrpy/4vxCSmZxsYv+TgKBo2QnqpiBYoPic34=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=UDenQ/1xR20pNM4tdtspyaPqh1ygIs0ikoHxP6OKxpi9N32JyFmqSZIvpmvdwPq7v
-         9s0vKlWqzFT0Vtca2asxrLRhTpfgkUtA5og21uYnTa0oBshHPhGKJJXKqBi3SkcTre
-         tXF/cV4Tpy0y6n/iHydyrgqZvl9eQRPdn8J9gkFyQxQYbyCEHN63cWGpeHI/+wSIgF
-         UERu09fRwhB7PBCq0SVlqql+E9UFkMnyM1GiwQwO3RfkqvTMkcX206a/mBR07AQX7X
-         QkoeBDKKXByVjn5LYjNIWuZ5WuGTNxobib+SWp+cDdQEuTuSH+wss0XrNjUWbX54/2
-         Dth1likDitVGQ==
-Received: by mail-oi1-f171.google.com with SMTP id j21so9902176oie.4;
-        Mon, 06 Feb 2023 06:41:17 -0800 (PST)
-X-Gm-Message-State: AO0yUKVtoD45jl4lBppUidV8b3xYK9ToiA/RT4FpwSwcVb3C4Zy4Rm3y
-        TDBA8ThThfDzvu9NxixGKP5gAGcjT741TqIvZHs=
-X-Google-Smtp-Source: AK7set/Qoh4TNeUFC9Qi0w4HHSS1qD+DeLvrQ8kDsLnVYywPxUZ+Ieog0V2J50KHxzmuJWM/knIUTqTQUE3eEg7tNTY=
-X-Received: by 2002:aca:6547:0:b0:363:a539:4f with SMTP id j7-20020aca6547000000b00363a539004fmr1272324oiw.189.1675694476392;
- Mon, 06 Feb 2023 06:41:16 -0800 (PST)
+        with ESMTP id S230419AbjBFPst (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Feb 2023 10:48:49 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52A9EB40;
+        Mon,  6 Feb 2023 07:48:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ZM4SLufXDDu44KxKnGy/pqFAr7hmVOIRITrZRFpLfF8=; b=eg4ZHygFr0KgRTE9pJp5IgzGhU
+        EGn02BEAI3bGZRsOV3hkZHeIuAwo3heZvgKULzbxONSbOFi+/Nq/FFJzB/ecdbCLYt1EcJRi92+Ho
+        JzM6tjZ+LOuHEq+W2zcv3sZb4nqP2hIMGm2AZxzt/lzss18yfY8PADZbjJH/7DEFoD/JZ0YHOtJpx
+        CnrzQjj8zaoeMXqzCf8I/GXMkqL5kfpDpP0mmxlo9C3wDtWlQwG7rxU4BnJKe+vNx3ZK4NE6FNX14
+        0AcJEGMGxJ66jb+VkPishYzAe1BgE5Ql7F6BufMCe/aDvUqKvxc3RTs3u53j1mzLIbeYVzVcXXrh/
+        N+BzEc1g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pP3iy-0092qr-A4; Mon, 06 Feb 2023 15:48:08 +0000
+Date:   Mon, 6 Feb 2023 07:48:08 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Steve French <sfrench@samba.org>
+Subject: Re: [PATCH 03/11] cifs: Implement splice_read to pass down ITER_BVEC
+ not ITER_PIPE
+Message-ID: <Y+EhOHVZWLjTq26h@infradead.org>
+References: <20230203205929.2126634-1-dhowells@redhat.com>
+ <20230203205929.2126634-4-dhowells@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a8a:355:0:b0:4a5:1048:434b with HTTP; Mon, 6 Feb 2023
- 06:41:15 -0800 (PST)
-In-Reply-To: <20230206072029.32574-1-jiapeng.chong@linux.alibaba.com>
-References: <20230206072029.32574-1-jiapeng.chong@linux.alibaba.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Mon, 6 Feb 2023 23:41:15 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9AwBLzGrkXpea-CVszJtbKwLD+Sd=UDvaiJgCQ-AG08w@mail.gmail.com>
-Message-ID: <CAKYAXd9AwBLzGrkXpea-CVszJtbKwLD+Sd=UDvaiJgCQ-AG08w@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: Fix parameter name and comment mismatch
-To:     Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Abaci Robot <abaci@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230203205929.2126634-4-dhowells@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-02-06 16:20 GMT+09:00, Jiapeng Chong <jiapeng.chong@linux.alibaba.com>:
-> fs/ksmbd/vfs.c:965: warning: Function parameter or member 'attr_value' not
-> described in 'ksmbd_vfs_setxattr'.
->
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=3946
-> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+On Fri, Feb 03, 2023 at 08:59:21PM +0000, David Howells wrote:
+> Provide cifs_splice_read() to use a bvec rather than an pipe iterator as
+> the latter cannot so easily be split and advanced, which is necessary to
+> pass an iterator down to the bottom levels.  Upstream cifs gets around this
+> problem by using iov_iter_get_pages() to prefill the pipe and then passing
+> the list of pages down.
 
-Thanks.
+Just as last time:  if cifs has a problem with splitting these iters
+so does everyone else.  What about solving the root cause here?
+
+If the splice isn't actually a splice you might as well not implement
+it.
