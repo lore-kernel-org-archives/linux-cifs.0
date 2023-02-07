@@ -2,125 +2,72 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C7AC61DA4
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Feb 2023 23:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A8BC61DA4
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Feb 2023 01:52:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229930AbjBFXpC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 6 Feb 2023 18:45:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40362 "EHLO
+        id S229882AbjBGBwq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 6 Feb 2023 20:52:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229936AbjBFXpB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Feb 2023 18:45:01 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 291D1303E5;
-        Mon,  6 Feb 2023 15:44:36 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B4A7EB8167D;
-        Mon,  6 Feb 2023 23:44:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E32AC433A0;
-        Mon,  6 Feb 2023 23:44:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675727073;
-        bh=+VS0T7saKGxXpafCOxelveBrW5g7V/bi82d9i0jTJOw=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Mefy5tCBU30U2vgPjHQ7NT0ziRYCnzZIx9vft/xTFg2vhJlUt6LHSYKLSoGkXCWYd
-         R08UlnTuVBLXJgpsldZISrLKoWp1+BTS7RzEahS7i0yztNYFj1N9c+xeioDxRrQJp7
-         u2fxlEXTGZfG0qx88czFSgAoPEEEW7vv10J/K0etpfvWOzMvpURkF17K3wvEKfW6EN
-         Nb+iqGn6Tp1etLPp/X3m9/1KiOQc4CxSau7PA7n90aLIzATln0Bqv9o31ZvaqkagUo
-         gYO0sQrVuSzk30yAmsgZBhxyU5XNY3gx83c9e5XVE+k/7Kb9st3MrC/HmSCTshFEqO
-         C49rnhzyT028A==
-Received: by mail-oi1-f173.google.com with SMTP id 20so10436454oix.5;
-        Mon, 06 Feb 2023 15:44:33 -0800 (PST)
-X-Gm-Message-State: AO0yUKUe1Qpn1DkPv+VbgK0Qbj4RG09MXHQlgiQZU8aT0ExjSSOknS0N
-        1a1/cgS6VhMNOgLQRmI/j3bSxHnD3QWS4W5Eip0=
-X-Google-Smtp-Source: AK7set+239NZEdy9JC4+houRK9nVQSewhMxnSxX0ik41Ipo6URjzwhlruxeiBMQvMt0MG9ioy/nceY43s38Zk6g68O0=
-X-Received: by 2002:a05:6808:10:b0:378:57fb:de1f with SMTP id
- u16-20020a056808001000b0037857fbde1fmr1019860oic.215.1675727072447; Mon, 06
- Feb 2023 15:44:32 -0800 (PST)
+        with ESMTP id S229582AbjBGBwp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Feb 2023 20:52:45 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5DCC2006C
+        for <linux-cifs@vger.kernel.org>; Mon,  6 Feb 2023 17:52:37 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id g9so9736136pfo.5
+        for <linux-cifs@vger.kernel.org>; Mon, 06 Feb 2023 17:52:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1gulD7/kEHZP9aV24EBXw4BTF6qeGzgE3oWiXaNuNyM=;
+        b=NnftswKdW/GuNHmKgvrK/YjFAXvgrmAgKu4HhzDGFosWw1T1E5KnEEGUmNksLJZ6mC
+         Mp6PFpGNBHNIK8n3k/nUG4spq2I9kRUVNz0EWn2ZAG+jzrS585ET/bhpJ7SZhQaIpcM0
+         KtyPBKvZk1GAh5Ik3rFK1zNJHpoBpExhRtSAo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1gulD7/kEHZP9aV24EBXw4BTF6qeGzgE3oWiXaNuNyM=;
+        b=nkQmh2TSxMz1d+5o+rUru3Avd+YwdFsFR8BS6Y8FEI5d9VqDjgvC2d/sr5wMJc1q82
+         oG3jfYdlKm1ztD/HSkrd2IousN5Ye+2FfdbWOhjcO83oB8TbBDZX/zeP7hmcQIL7iYDE
+         BMMEp+b4EXuFjLj2xcAAnas3gusZrklJudl4YwTUj1RvlGNQRhMYXMobWVcA/yu8cG7F
+         xAXUG+M3WbKfx/7iLqFxGLSWHeikr1YM5BIahcqA38rePCKzgtNE0Z9qx8p4uTFhl0Ne
+         oeQ4cHOklZ4Q44kGtDvUMOvhUFD+LHgvh6PGOC/uPOeuzYNUfH1t7DEsSg4m5AjhuDXL
+         RFKg==
+X-Gm-Message-State: AO0yUKWZrf3hu33n6oZ/D87m8FR+M1HfGxYIe/OlfBBCl38odzVofIIG
+        OydnJivW0sIgkPyowsTx6vntEw==
+X-Google-Smtp-Source: AK7set8H+dbd0lJWJrpQxSUZ22uAN3nmgTC75O9U7b3Or9fM6qgLl71NV1ZLUSb6i+Pgt8FcSG+KUQ==
+X-Received: by 2002:a62:384f:0:b0:593:c41e:474 with SMTP id f76-20020a62384f000000b00593c41e0474mr1299789pfa.9.1675734757406;
+        Mon, 06 Feb 2023 17:52:37 -0800 (PST)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id h11-20020a056a00230b00b0058837da69edsm7817189pfh.128.2023.02.06.17.52.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 17:52:36 -0800 (PST)
+Date:   Tue, 7 Feb 2023 10:52:32 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Cc:     linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
+        tom@talpey.com, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
+Subject: Re: [PATCH] ksmbd: Fix parameter name and comment mismatch
+Message-ID: <Y+Gu4Fg00D//CGpo@google.com>
+References: <20230206072029.32574-1-jiapeng.chong@linux.alibaba.com>
 MIME-Version: 1.0
-Received: by 2002:a8a:355:0:b0:4a5:1048:434b with HTTP; Mon, 6 Feb 2023
- 15:44:31 -0800 (PST)
-In-Reply-To: <20230206023630.9457-1-hbh25y@gmail.com>
-References: <20230206023630.9457-1-hbh25y@gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 7 Feb 2023 08:44:31 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9c1Cm=3vbqTO6V=mwfu=YUEwEiGYZFc0mBfeSuH4phyQ@mail.gmail.com>
-Message-ID: <CAKYAXd9c1Cm=3vbqTO6V=mwfu=YUEwEiGYZFc0mBfeSuH4phyQ@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: fix possible memory leak in smb2_lock()
-To:     Hangyu Hua <hbh25y@gmail.com>
-Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        lsahlber@redhat.com, hyc.lee@gmail.com, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230206072029.32574-1-jiapeng.chong@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-02-06 11:36 GMT+09:00, Hangyu Hua <hbh25y@gmail.com>:
-> argv needs to be free when setup_async_work fails or when the current
-> process is woken up.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
-> ---
->
-> v2: avoid NULL pointer dereference in set_close_state_blocked_works()
->
->  fs/ksmbd/smb2pdu.c   | 5 +++++
->  fs/ksmbd/vfs_cache.c | 2 ++
->  2 files changed, 7 insertions(+)
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index d681f91947d9..177a24704021 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -7050,6 +7050,7 @@ int smb2_lock(struct ksmbd_work *work)
->  						      smb2_remove_blocked_lock,
->  						      argv);
->  				if (rc) {
-> +					kfree(argv);
->  					err = -ENOMEM;
->  					goto out;
->  				}
-> @@ -7072,6 +7073,8 @@ int smb2_lock(struct ksmbd_work *work)
->  						spin_lock(&fp->f_lock);
->  						list_del(&work->fp_entry);
->  						spin_unlock(&fp->f_lock);
-> +						kfree(argv);
-> +						work->cancel_fn = NULL;
->  						rsp->hdr.Status =
->  							STATUS_CANCELLED;
->  						kfree(smb_lock);
-> @@ -7096,6 +7099,8 @@ int smb2_lock(struct ksmbd_work *work)
->  				spin_lock(&fp->f_lock);
->  				list_del(&work->fp_entry);
->  				spin_unlock(&fp->f_lock);
-> +				kfree(argv);
-> +				work->cancel_fn = NULL;
-This doesn't seem so simple... You have to consider the racy issue
-between this change and smb2_cancel(). Also, how are you testing this
-patch?
+On (23/02/06 15:20), Jiapeng Chong wrote:
+> 
+> fs/ksmbd/vfs.c:965: warning: Function parameter or member 'attr_value' not described in 'ksmbd_vfs_setxattr'.
+> 
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=3946
+> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
 
->  				goto retry;
->  			} else if (!rc) {
->  				spin_lock(&work->conn->llist_lock);
-> diff --git a/fs/ksmbd/vfs_cache.c b/fs/ksmbd/vfs_cache.c
-> index da9163b00350..eb95c16393b7 100644
-> --- a/fs/ksmbd/vfs_cache.c
-> +++ b/fs/ksmbd/vfs_cache.c
-> @@ -372,6 +372,8 @@ static void set_close_state_blocked_works(struct
-> ksmbd_file *fp)
->  		list_del(&cancel_work->fp_entry);
->  		cancel_work->state = KSMBD_WORK_CLOSED;
->  		cancel_work->cancel_fn(cancel_work->cancel_argv);
-> +		kfree(cancel_work->cancel_argv);
-> +		cancel_work->cancel_fn = NULL;
->  	}
->  	spin_unlock(&fp->f_lock);
->  }
-> --
-> 2.34.1
->
->
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
