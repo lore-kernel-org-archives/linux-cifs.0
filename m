@@ -2,93 +2,120 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E63E9C636D3
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Feb 2023 19:43:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B247C05027
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Feb 2023 23:48:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbjBITnz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 9 Feb 2023 14:43:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34900 "EHLO
+        id S229633AbjBIXsQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 9 Feb 2023 18:48:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbjBITny (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Feb 2023 14:43:54 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B56465EF2
-        for <linux-cifs@vger.kernel.org>; Thu,  9 Feb 2023 11:43:47 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id m10so3369584ljp.3
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Feb 2023 11:43:47 -0800 (PST)
+        with ESMTP id S229483AbjBIXsQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Feb 2023 18:48:16 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E263803C
+        for <linux-cifs@vger.kernel.org>; Thu,  9 Feb 2023 15:48:14 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id br9so5638950lfb.4
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Feb 2023 15:48:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xaRXzQ9Qn2NgokMojNMzNnouRiKMQmOV8PPZD0vvcjU=;
-        b=GUOa31p+XSshRvbCVSNFUEOvYo9HoNU9QG8ooa8I4IoASktRoLvPAy8BM+S+RE9GIM
-         5hTAYve0KXge8/51LrDUbpUL7nFsFi0duhfDKcG7jqUk8YN+JccSW6zYrCXlp65ct8SZ
-         tGXOHvsXzTV8ymb2XAupQtHL+KH+P1YJc41xah7RcBDVMKoY/umBPvY5DXcNyDT2QsRU
-         PkDlJ+XB0vjs29DbCOql9nHA6u3Flu7oVmer9u9O7JVc75svIHiwwiAfs0iCNfDGJrbQ
-         tyVEpbrjsYqFkFGwkd6Zgdo+LYG8Xf70kusgXc4VMN3NanFzI+CY5+B5efa6P/4PWA0B
-         jL7Q==
+        bh=iK+fy5OrQ8oSN04ZMh8oXW6YQ5N6Js4T4HPGX2BFQ4s=;
+        b=EAX2VTINZGKufLCVwnfy2C++gErlo586skDfnAahXOmgzQm0qL+YcsiK3t3klTpbGj
+         3XA32qbBjzZaIN/Vv45n1ceZKZPX1rR0lNjcyR7Nwhu1onbkOLXWGPKZBa1FNjwIu9SJ
+         DPdrlIYLDM03kdnmsMATi6jmKq8daok7na1zxguofIYOKsyQsbxomvbUZFWqzfHg2aZq
+         6aevlbh2CkWcJ7cm86O/gR1IawMN4MdCOGWOKdiwdTVf8T27LdTd1MGbl1TE+UM0JdFH
+         1sy+qtl9UBA7Na9u2J7cOF4IapXZ7TxP39Jig0Cd6C9HL9Ir9t5XIXyRwt8rcuLGgpZM
+         1Khg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xaRXzQ9Qn2NgokMojNMzNnouRiKMQmOV8PPZD0vvcjU=;
-        b=hKUWTmPaRPr5yreIBH70AFO7CI/urgEzUg/wg6ox2UKUO/BX+16XC200Hd2JYqEJ+m
-         qvymXBieZEsROCcMZb4hD3yg59byoKtOEBLNfVYFWa0i7NP5c6+8VgwI0gAWUWaUnQcn
-         xpLDZ1s0sgV52a+3BKwwfzuJBT4vqOiVm1byTX2VPr/pR4MZJm+cftlqZg6eXlASoKOQ
-         DEobVxlGfCzKpwrpPSXgc5IUwNOkwxoV6US9yCpLcQRQ1aUQOrj6mYgPv+Ez5tp1Qhp0
-         4GUorIxrGMz/+/9ZIP3XU0LGSU9ZDApfckQh/jh6i2+DXQ9obJQh80MQhmbNVoZlRUNJ
-         TGhA==
-X-Gm-Message-State: AO0yUKXIJOHyFz/9JDcJ2s7ZcRsc4mccQUG/1k8597eqScT41nppcG8H
-        XfUnm7rFrhaZ4098O6QR1cXbqCroknoOjaIqwe3Pxdw6
-X-Google-Smtp-Source: AK7set+rReMRkPbMxDOKLH7ULMMJDJI+4OgyBJhGpc8UImVxWQj0mJt17jADShIIHoRKKzc+hPiWpmx94cYTqYzH4Vs=
-X-Received: by 2002:a2e:b0f2:0:b0:293:2cca:109b with SMTP id
- h18-20020a2eb0f2000000b002932cca109bmr918865ljl.60.1675971825752; Thu, 09 Feb
- 2023 11:43:45 -0800 (PST)
+        bh=iK+fy5OrQ8oSN04ZMh8oXW6YQ5N6Js4T4HPGX2BFQ4s=;
+        b=ecxtQ8MGuxFnKeKSZsjL856Af5YAuuVRyMYdOtnQFQEYPZfYr76facz3fEi42hJmdt
+         1w8SjWVoVC5cFQt1lzLavsYfk2irfUsRHB9hTCRENL1U3lwvJrB67QCE+CR6kE/8VL9o
+         Q1FBw9LS4ukwWmj9ScoPuDIXF4iTK3N0azRytfiPwiKLSPK6kAYpf/uXitwf91h2mZr0
+         pCDXzc20xgLPi0xbATuLElrrniaO+y1qkUEnlHFPCnzyBJT6Bu9D/wC6rUHpDfWrwSvN
+         PgaE9UbVAhmuX5w1aaCshEULqq5oBI8ewxkVldcvWjracJNKN58d6DjCCIR5msC/9Jnc
+         QK3A==
+X-Gm-Message-State: AO0yUKUUH56h6JMVLcPOLTowIFpactwlCzrz9J5YB8KbZ12C+Ze03Map
+        rKGsMK4rTP7bwS5Eo20DNGGDfKsLpMJxb9qxe78=
+X-Google-Smtp-Source: AK7set/jFtKWGLaaAHpzbCi0Fl23Y7lKKYyJvxmf4M1p1jwuikY03hmlWB+Keq0MKEpKX8Dku7iOvpiFPi5RWXwl42Q=
+X-Received: by 2002:ac2:4a66:0:b0:4db:dd7:dee2 with SMTP id
+ q6-20020ac24a66000000b004db0dd7dee2mr1755927lfp.16.1675986492915; Thu, 09 Feb
+ 2023 15:48:12 -0800 (PST)
 MIME-Version: 1.0
-References: <Y+UrrjvGrOT6Bcmy@sernet.de> <87lel6enq6.fsf@cjr.nz>
-In-Reply-To: <87lel6enq6.fsf@cjr.nz>
+References: <20230208094104.10766-1-linkinjeon@kernel.org>
+In-Reply-To: <20230208094104.10766-1-linkinjeon@kernel.org>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 9 Feb 2023 13:43:34 -0600
-Message-ID: <CAH2r5mvGWJVjPJo1Guyd7W0eiHyRD9Wd7F0ndKLaGCj6VyHUwA@mail.gmail.com>
-Subject: Re: Fix an uninitialized read in smb3_qfs_tcon()
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     Volker.Lendecke@sernet.de, linux-cifs@vger.kernel.org
+Date:   Thu, 9 Feb 2023 17:48:01 -0600
+Message-ID: <CAH2r5muCPMELUij-9RLcBqsYqbkcnOYi=F-JN8Oc3c3azUW0uw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ksmbd: do not allow the actual frame length to be
+ smaller than the rfc10024 length
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, senozhatsky@chromium.org,
+        tom@talpey.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+typically rounding up to 8 byte boundary would be logical to allow
 
-On Thu, Feb 9, 2023 at 11:55 AM Paulo Alcantara <pc@cjr.nz> wrote:
+On Wed, Feb 8, 2023 at 3:41 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
 >
-> Hi Volker,
+> ksmbd allowed the actual frame length to be smaller than the rfc1002
+> length. If allowed, it is possible to allocates a large amount of memory
+> that can be limited by credit management and can eventually cause memory
+> exhaustion problem. This patch do not allow it except SMB2 Negotiate
+> request which will be validated when message handling proceeds.
+> Also, cifs client pad smb2 tree connect to 2bytes.
 >
-> Volker Lendecke <Volker.Lendecke@sernet.de> writes:
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  fs/ksmbd/smb2misc.c | 23 +++++++++++------------
+>  1 file changed, 11 insertions(+), 12 deletions(-)
 >
-> > Attached find a patch that fixes another case where oparms.mode is
-> > uninitialized. This patch fixes it with a struct assignment, relying
-> > on the implicit initialization of unmentioned fields. Please note that
-> > the assignment does not explicitly mention "reconnect" anymore,
-> > relying on the implicit "false" value.
+> diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+> index a717aa9b4af8..fc44f08b5939 100644
+> --- a/fs/ksmbd/smb2misc.c
+> +++ b/fs/ksmbd/smb2misc.c
+> @@ -408,20 +408,19 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
+>                         goto validate_credit;
 >
-> OK - thanks.
+>                 /*
+> -                * windows client also pad up to 8 bytes when compounding.
+> -                * If pad is longer than eight bytes, log the server behavior
+> -                * (once), since may indicate a problem but allow it and
+> -                * continue since the frame is parseable.
+> +                * SMB2 NEGOTIATE request will be validated when message
+> +                * handling proceeds.
+>                  */
+> -               if (clc_len < len) {
+> -                       ksmbd_debug(SMB,
+> -                                   "cli req padded more than expected. Length %d not %d for cmd:%d mid:%llu\n",
+> -                                   len, clc_len, command,
+> -                                   le64_to_cpu(hdr->MessageId));
+> -                       goto validate_credit;
+> -               }
+> +               if (command == SMB2_NEGOTIATE_HE)
+> +                       goto validate_credit;
+> +
+> +               /*
+> +                * cifs client pads smb2 tree connect to 2 bytes.
+> +                */
+> +               if (clc_len + 2 == len)
+> +                       goto validate_credit;
 >
-> > Is this kernel-style? Shall we just go through all of the oparms
-> > initializations, there are quite a few other cases that might have the
-> > mode uninitialized.
+> -               ksmbd_debug(SMB,
+> +               pr_err_ratelimited(
+>                             "cli req too short, len %d not %d. cmd:%d mid:%llu\n",
+>                             len, clc_len, command,
+>                             le64_to_cpu(hdr->MessageId));
+> --
+> 2.25.1
 >
-> Please go through all of them.
->
-> Perhaps initialise those structures as below
->
->         struct cifs_open_parms oparms = {};
->
-> and then avoid any uninitialised data to be sent.
->
-> Patch looks good.
-
 
 
 -- 
