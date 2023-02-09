@@ -2,74 +2,82 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F35CEC05027
-	for <linux-cifs@archiver.kernel.org>; Wed,  8 Feb 2023 14:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 846A2C61DA4
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Feb 2023 04:46:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231373AbjBHO4c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 8 Feb 2023 09:56:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34160 "EHLO
+        id S230097AbjBIEq3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 8 Feb 2023 23:46:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230178AbjBHO43 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 Feb 2023 09:56:29 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CA3F212B3;
-        Wed,  8 Feb 2023 06:56:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=baZ/nm5e+R3XpfQTMaFkd+YUn4nTSX5Qn+q+GEDnUZo=; b=Gx5CVRVtkXGKd05GkNug9twl21
-        3Yfy4xwVgLapq4T07IKuCqXyQ/xIoSY6UQ4BQLUR8utAE97rmLAQ2CHuXDZVdEllbJHNJg7UDEPcb
-        LA3is5r4btsWGjLgp3Vza9VfjjfZ5WPW62mgxbQsW9k1VuAVCdwFsNFoCEKvmqdDwuWcHaA2mNmDp
-        6pwQQpwU5kcZfl5LqI3QUATioxNPHwuWXXxAF9CjI0buFVcvDpWxUCkYCuw4sAn58nellOtfxi/JG
-        JYO6qJ/cfcDsRA8sHH+6gLaYdZ83R6JVkid+OcotN45MCdl2HqzO4gs3NM4B1mLKTJpkbds4kpMlK
-        pp2+c+HQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pPlrp-001I3K-Hd; Wed, 08 Feb 2023 14:56:13 +0000
-From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Subject: [PATCH 2/2] filemap: Remove lock_page_killable()
-Date:   Wed,  8 Feb 2023 14:56:11 +0000
-Message-Id: <20230208145611.307706-3-willy@infradead.org>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20230208145611.307706-1-willy@infradead.org>
-References: <20230208145611.307706-1-willy@infradead.org>
+        with ESMTP id S230116AbjBIEqK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 Feb 2023 23:46:10 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391476279E;
+        Wed,  8 Feb 2023 20:44:02 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id o5so768395ljp.6;
+        Wed, 08 Feb 2023 20:44:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=brNEnjw3/P/bcIbPP5bGSOdJWZu8MtNOmWrx7LzMZlk=;
+        b=broYV6kas3IZzkIPpgTmGOgHLlQqZUjUnZSMcmWRs/MYblIwN7ZFvPDVHyO5nBi29H
+         ovhscFZ8BDv2TzFYINHhl3DlBNG5+51COWJQnBhXPbWaKhQ+QFYANpJaHCze2tv3+0BZ
+         3FNpZX6GBdZK/cS2oBlV/qIQNoLgvabmep3CDIixj6lBx9SJ3vQBp1Tf+EgE0sDV6hVg
+         t7NFDQBndGKFCjpxk4x2R42daEnzZOB6b8cQFqRDT5RgLnJin14Ir64E77AncS3kiQvp
+         QUGVr58uMlb/Af0OxSOGzUwKDNBE6mt7C3hlcnHGgcrHRS9bCEecR+r8SPTMQgoda22g
+         Lfqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=brNEnjw3/P/bcIbPP5bGSOdJWZu8MtNOmWrx7LzMZlk=;
+        b=LWK1bofC75DTZ3L1Ht9ZUHG4Aa9N/JepIj644hRMMps/+lpUesUPw2kVEBtInBmQVb
+         FAVNZbEYcfEJJhp+oKQxc9HFn9oX6W5yH7fjyZgOklN/zLLlWC6aHYXA3WjqStG8jCr7
+         Tv4vo0fAGLdwbX+Tubn2Zin6hm7XrmFXpVmFkAmEMmOj55/OlrFbU8XQDGGls1OH69Wc
+         Z+XMT3UbDcq8NUfrG9to8V4yHxh2uvPkjYcS0AOPeLjnW0j7GRZ2CmNcSSkLJmGgaiqw
+         F+F8dyyvRmHHbSM2g2cTNTtUnkt3W3dEZuEMPxb0w6L4G+ZmKbiSJ4L4so7Ek7l+OAq+
+         6D/A==
+X-Gm-Message-State: AO0yUKVV55eWO7+2fTiPml8pZq1X/GyvT4xJNeyPnz+NZJAdtFQy6hca
+        NgL3kF/o6Y4TYSLF7Ty5WVluKF/K3whv4RxcbNDvyOLJc60=
+X-Google-Smtp-Source: AK7set+GphGpM7GDvLZYNt3eyh/hn500jEVP7DjrctTaQIF7BfwcGPQYdA1hM+JX7FrddG0vam1jrUF0mfxTeLvyGp8=
+X-Received: by 2002:a2e:9c4b:0:b0:293:ed1:ee6f with SMTP id
+ t11-20020a2e9c4b000000b002930ed1ee6fmr1861115ljj.119.1675917840128; Wed, 08
+ Feb 2023 20:44:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 8 Feb 2023 22:43:48 -0600
+Message-ID: <CAH2r5mut-6o5Jy7Kb8ZmjyRDikAi7iueqNStX1JLdixrFmJPZQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fix
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-There are no more callers; remove this function before any more appear.
+Please pull the following changes since commit
+aa5465aeca3c66fecdf7efcf554aed79b4c4b211:
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- include/linux/pagemap.h | 10 ----------
- 1 file changed, 10 deletions(-)
+  cifs: Fix use-after-free in rdata->read_into_pages() (2023-02-06
+22:50:25 -0600)
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index cf0677419981..51b75b89730e 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -993,16 +993,6 @@ static inline int folio_lock_killable(struct folio *folio)
- 	return 0;
- }
- 
--/*
-- * lock_page_killable is like lock_page but can be interrupted by fatal
-- * signals.  It returns 0 if it locked the page and -EINTR if it was
-- * killed while waiting.
-- */
--static inline int lock_page_killable(struct page *page)
--{
--	return folio_lock_killable(page_folio(page));
--}
--
- /*
-  * folio_lock_or_retry - Lock the folio, unless this would block and the
-  * caller indicated that it can handle a retry.
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc8-smb3-client-fix
+
+for you to fetch changes up to aa5465aeca3c66fecdf7efcf554aed79b4c4b211:
+
+  cifs: Fix use-after-free in rdata->read_into_pages() (2023-02-06
+22:50:25 -0600)
+
+----------------------------------------------------------------
+small fix for use after free in readpages
+
+----------------------------------------------------------------
+
 -- 
-2.35.1
+Thanks,
 
+Steve
