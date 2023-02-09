@@ -2,90 +2,68 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 655B9C636D6
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Feb 2023 18:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB6EC636D6
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Feb 2023 18:10:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230267AbjBISDn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 9 Feb 2023 13:03:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52588 "EHLO
+        id S230309AbjBISKe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 9 Feb 2023 13:10:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230258AbjBISDn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Feb 2023 13:03:43 -0500
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4C65643D4
-        for <linux-cifs@vger.kernel.org>; Thu,  9 Feb 2023 10:03:38 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id b13so2999486ljf.8
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Feb 2023 10:03:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KlFs/0zoSWgjyvU76UyC7VIXtahmwS6cmAKflPNcPd8=;
-        b=gjMe7T6EVffZUDBzTjL+ISQMNVQRGqcla/nG6gwNOj0olWqFhyRNRnL36GYWCRBdHV
-         SWUmzsi1awQAyPjjQXSC/sathKbj44DEMiFDW9g/e3alafzUOTfJOl6nXyUlR7z9CEnj
-         Vd+xVTdf/+ufGpC45841HERy3DFtZ2ss02ZHOwZ4FN/pFVjyKN+zcLLBCM1GVZFdX7LY
-         W0soOuLNv3qMAYpbqlATN3wIUBm3VkoKW9sAbVK149vIBVm3BJg02r6ulUgbHYmCmVQi
-         lcIC+WCx2YWh2F5YTtsXpldhfpemo5hLPQQs2k21fUTyFJwzItLr9LuEDm02FqwStwFH
-         sgnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KlFs/0zoSWgjyvU76UyC7VIXtahmwS6cmAKflPNcPd8=;
-        b=WiPMd4MbYML5zKARR0gQizeJgWeatqiyNP9LdO9s+KSjko9uShUsp7imX4CrQDc0+U
-         0IZpWFlbWiYCqUFPOK8vJM7gaveqX+T2DFfKStC+bjkQUpQDqrO+f+SQolj6KInC3e9j
-         XyWTLAFaLDuJBWc8kZTSpS8CgJKRB9jew1QHdZ5HiQJe/AjbG4mIdIlBHogzMIE96DNk
-         ALPFv04zds44KU11GmpYZPUKZ6IhnbmaoIe4KzepNBkYH1TZoN41+8edt2rCmXQn75av
-         beNf/Wff9GyWnycxUDKdtWFO7wpEn9Qm0Ha805yXrrQDn4xiIXvOpI1M/O7SpIJaioAQ
-         eT3Q==
-X-Gm-Message-State: AO0yUKVGniFVDX3Q43HfRBErHmukTuzZ1SU8cG8ipIwhlFc+HuL+h4kC
-        a+tN7W9WBoEfXI+ICKi53H0jTiTGK6Kxyx74MhUA7u+J
-X-Google-Smtp-Source: AK7set98/c0ZiQ2sUr4HYvEZjUPcZlD23Mo1C9DVqx3v8sWuTgXsgnYH7mDrBWvv4MMK6uWOt61yNkV6Iqn053ULgAs=
-X-Received: by 2002:a2e:141c:0:b0:293:2986:4981 with SMTP id
- u28-20020a2e141c000000b0029329864981mr1202141ljd.99.1675965816833; Thu, 09
- Feb 2023 10:03:36 -0800 (PST)
-MIME-Version: 1.0
-References: <Y+UrrjvGrOT6Bcmy@sernet.de>
-In-Reply-To: <Y+UrrjvGrOT6Bcmy@sernet.de>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 9 Feb 2023 12:03:25 -0600
-Message-ID: <CAH2r5mvwOO3-o+mf3ajLQDoOyJnF3-g_=m48iaB0QNUz8m9TnA@mail.gmail.com>
-Subject: Re: Fix an uninitialized read in smb3_qfs_tcon()
-To:     Volker.Lendecke@sernet.de
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S229572AbjBISKZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Feb 2023 13:10:25 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E074B68112;
+        Thu,  9 Feb 2023 10:10:23 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 792A2B82286;
+        Thu,  9 Feb 2023 18:10:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 26F1DC433A0;
+        Thu,  9 Feb 2023 18:10:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675966221;
+        bh=Qs+MhMw4k+/Gs23oSxJ7sBhpojKfGJ4OKzEtilZRKVA=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=cKu6alxgRxvy4v2Q12afaL1Luexldp4B8T96hXkHuYTDdtYH6gmwVtkhYHS046zP1
+         +L0cS+OYXqE0IrafCLJ56FLUliIYYifOHBgvIctCvHFIQ4kO/r3AO35/pnzKtN02qJ
+         9TCT7H5yZm1U23Ew5xjN52XKJ0GENWTrwG0UIHhwOZB7qXFxIKS3lqQE43y5x/ppSr
+         50LGhiQaCBT/lHzJZhZT3/0yYrYkwAotPzYXIi31IN55ICqw2RvHzfY9di6UEVf2QR
+         BMWqfHmYZHyyXWXF+ddXsMw2S8mCYtpnS7i5WsSNbTMwwSnCw8RPRl8qyfjaX+jsiq
+         TowyBeTeVL7Sw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 12AB9E21ECB;
+        Thu,  9 Feb 2023 18:10:21 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fix
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mut-6o5Jy7Kb8ZmjyRDikAi7iueqNStX1JLdixrFmJPZQ@mail.gmail.com>
+References: <CAH2r5mut-6o5Jy7Kb8ZmjyRDikAi7iueqNStX1JLdixrFmJPZQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mut-6o5Jy7Kb8ZmjyRDikAi7iueqNStX1JLdixrFmJPZQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc8-smb3-client-fix
+X-PR-Tracked-Commit-Id: aa5465aeca3c66fecdf7efcf554aed79b4c4b211
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 94a1f56db688f134c763a4b2a5926b437f1ab4b9
+Message-Id: <167596622106.10454.16721813136064000676.pr-tracker-bot@kernel.org>
+Date:   Thu, 09 Feb 2023 18:10:21 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-we also should probably go through all the places that we call
-SMB2_open_init - various compounded cases and make sure that we
-request leases when it makes sense (we are missing a few for directory
-leases e.g.)
+The pull request you sent on Wed, 8 Feb 2023 22:43:48 -0600:
 
-On Thu, Feb 9, 2023 at 11:50 AM Volker Lendecke
-<Volker.Lendecke@sernet.de> wrote:
->
-> Hi!
->
-> Attached find a patch that fixes another case where oparms.mode is
-> uninitialized. This patch fixes it with a struct assignment, relying
-> on the implicit initialization of unmentioned fields. Please note that
-> the assignment does not explicitly mention "reconnect" anymore,
-> relying on the implicit "false" value.
->
-> Is this kernel-style? Shall we just go through all of the oparms
-> initializations, there are quite a few other cases that might have the
-> mode uninitialized.
->
-> Regards,
->
-> Volker
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc8-smb3-client-fix
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/94a1f56db688f134c763a4b2a5926b437f1ab4b9
 
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
