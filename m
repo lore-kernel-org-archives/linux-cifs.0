@@ -2,120 +2,85 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0C5C61DA4
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Feb 2023 17:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D09C636D6
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Feb 2023 17:25:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbjBIRWF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 9 Feb 2023 12:22:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49138 "EHLO
+        id S229642AbjBIRZf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 9 Feb 2023 12:25:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbjBIRWD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Feb 2023 12:22:03 -0500
-Received: from mail.sernet.de (mail.sernet.de [IPv6:2a0a:a3c0:0:25::217:2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E243D1117A
-        for <linux-cifs@vger.kernel.org>; Thu,  9 Feb 2023 09:22:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sernet.de;
-        s=20210621-rsa; h=Content-Type:MIME-Version:Reply-To:Message-ID:Subject:To:
-        From:Date:Sender:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=bwWOupcFO78skUGN0OfYiP2NVYXa/FxzYCLX9gf+z80=; b=fxUzbyL5k+thIJEdbH8owvoG8Q
-        cKJEMEcX08EmqW1KM/PjJBVeZuuO2tFgFso06D8XABPdxxECXafHyrnoqP+AzPq8Ocd+W5jTCIePk
-        8bNKLoZfJau7BHOyJxX9H6gqCgQCab+W2XOdvj66Rw/qjcsShmkO0PR5wYuJGdFvcr+41YSyAvJbB
-        LZ/LRkmiNO6cf/1UdcqlJPNwXqhYC6vzlAGPuf+42PhfZZMmgBtUH38KikNY+aIN8fcslWlSSbdIM
-        Qj8fH3UBJeeGiufOv2lDiHNI425kQBdiY1BdxQX4Epy5yqi/cDlVMcB/dEkZ6qJ/325vsHYrwfGKU
-        qKYIPqxw==;
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sernet.de; s=20210621-ed25519; h=Content-Type:MIME-Version:Reply-To:
-        Message-ID:Subject:To:From:Date:Sender:Cc:Content-Transfer-Encoding:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=bwWOupcFO78skUGN0OfYiP2NVYXa/FxzYCLX9gf+z80=; b=5tFuy8ifxPLHdV/dT76g1hDJuJ
-        TxS+xq58mGv1Vs0iPdn430nusF629hlZDzmVpIRs7SeO+mKKXN3kHOpGduBQ==;
-Received: from intern.sernet.de by mail.sernet.de
-        with esmtps (Exim Mail Transfer Agent)
-        for linux-cifs@vger.kernel.org
-        id 1pQAcR-00Ga9Q-Hf; Thu, 09 Feb 2023 18:21:59 +0100
-Received: by intern.sernet.de
-        id 1pQAcR-009dxa-6i; Thu, 09 Feb 2023 18:21:59 +0100
-Date:   Thu, 9 Feb 2023 18:21:50 +0100
-From:   Volker Lendecke <Volker.Lendecke@sernet.de>
-To:     linux-cifs@vger.kernel.org
-Subject: Fix an uninitialized read in smb3_qfs_tcon()
-Message-ID: <Y+UrrjvGrOT6Bcmy@sernet.de>
-Reply-To: Volker.Lendecke@sernet.de
+        with ESMTP id S229535AbjBIRZe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Feb 2023 12:25:34 -0500
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5876C31E33;
+        Thu,  9 Feb 2023 09:25:30 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id m10so2887915ljp.3;
+        Thu, 09 Feb 2023 09:25:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=cbJO3Maf1JEAHMG56uNfordoM7VG9n3IPMLycBD2LwQ=;
+        b=EEFR4nEyrlDLk84iKjsPmg9xzEPX85+RmHFwud0wKmPArj52xfRy/HxzBwwuaTt1Ht
+         2HK/nuyMcyx0pOscg7pCqCuwzED6M9RUT3vBf6jan3YmyPdHIUBGMpSs7mcCWOTDm6vo
+         4RcMjVF3DLD+vGvBj7cSgdRD1BBPniwoU5OWIUAvoZPVf1TCZDzryPjTrfpAHSMrgQ+H
+         OXp0Ogm3bLtLmoQHn2FFvG8v8jvsd8GYRu+2q/NZb8Q7aZGggWCf3iqmR2go2cncqJFa
+         Pa9++29SwbmKmEUDyrFo82KVIrHwRP130M4mblgkfjEp7GnjK6giKraVNBW5a16qbCFl
+         ZDxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cbJO3Maf1JEAHMG56uNfordoM7VG9n3IPMLycBD2LwQ=;
+        b=iw/EuhaTxRsbtx7B3FrfmzDaaqKLnKK/YGRZi5WFhl1Z1PeFT1vcNTf6/nKnl/Hs/N
+         C3pvR3UXMYBO5MB8q2YlbAPTbRTJpXILJJbLU2YZT/urXlQHofr0dguVM+2PX7K4GFew
+         paYZ0y36EFoFZXWzvPWQHogkLVWr9D/Zc9BZtuu8AtCOqS9uvqZUgDV6SniIdZME7TgS
+         4fhUTdUv/97sWXtq0Hc/N8Y8oJPZ64/D+/Seh+v8FhiD5TXYKwkul+Apjlip/0yX7cdP
+         UTjek7z1tlNBbZy9A1y7O9YHomra3ZmszvQyYySc+HaINcpBBOPYWkjxw9gg2Axo0Tci
+         69wg==
+X-Gm-Message-State: AO0yUKURAHHSebaEPbTTxVlr/HoHZgdSq+FC+0ic2yClnoBkScnrlsjd
+        XzqUVseywNiyICo0PJC5TNozFg5vgYFv6GOE9ZNk3070
+X-Google-Smtp-Source: AK7set9JRW+ahSw8FbU2acXz65vf+JYqV+gTsgESlqSEvOyOPu2yD/9rafRAdcJlp61H+BxHGxYwE7cCBcCLJ+NR5Qc=
+X-Received: by 2002:a2e:88d1:0:b0:293:2d3b:9790 with SMTP id
+ a17-20020a2e88d1000000b002932d3b9790mr746129ljk.140.1675963528441; Thu, 09
+ Feb 2023 09:25:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="YyXJtAxXLcRazTbB"
-Content-Disposition: inline
+References: <CAH2r5mut-6o5Jy7Kb8ZmjyRDikAi7iueqNStX1JLdixrFmJPZQ@mail.gmail.com>
+ <CAHk-=wiyY4ahLjKfvVho0CiCj-Nv0P3Edxqfu4bH4TcsZmsBJw@mail.gmail.com>
+In-Reply-To: <CAHk-=wiyY4ahLjKfvVho0CiCj-Nv0P3Edxqfu4bH4TcsZmsBJw@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 9 Feb 2023 11:25:16 -0600
+Message-ID: <CAH2r5muTXCME1s8=HPrNHnZbNAQkFn9gjwCnF7a==nETU80kdw@mail.gmail.com>
+Subject: Re: [GIT PULL] smb3 client fix
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+sorry - cut and paste error
 
---YyXJtAxXLcRazTbB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi!
-
-Attached find a patch that fixes another case where oparms.mode is
-uninitialized. This patch fixes it with a struct assignment, relying
-on the implicit initialization of unmentioned fields. Please note that
-the assignment does not explicitly mention "reconnect" anymore,
-relying on the implicit "false" value.
-
-Is this kernel-style? Shall we just go through all of the oparms
-initializations, there are quite a few other cases that might have the
-mode uninitialized.
-
-Regards,
-
-Volker
-
---YyXJtAxXLcRazTbB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="patch.txt"
-Content-Transfer-Encoding: quoted-printable
-
-=46rom 848e2d42a731ed0612a5c5de188659b98734edce Mon Sep 17 00:00:00 2001
-=46rom: Volker Lendecke <vl@samba.org>
-Date: Wed, 11 Jan 2023 12:37:58 +0100
-Subject: [PATCH] cifs: Fix uninitialized memory read in smb3_qfs_tcon()
-
-Signed-off-by: Volker Lendecke <vl@samba.org>
----
- fs/cifs/smb2ops.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index e6bcd2baf446..34c2ff0247db 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -729,12 +729,13 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tco=
-n *tcon,
- 	struct cifs_fid fid;
- 	struct cached_fid *cfid =3D NULL;
-=20
--	oparms.tcon =3D tcon;
--	oparms.desired_access =3D FILE_READ_ATTRIBUTES;
--	oparms.disposition =3D FILE_OPEN;
--	oparms.create_options =3D cifs_create_options(cifs_sb, 0);
--	oparms.fid =3D &fid;
--	oparms.reconnect =3D false;
-+	oparms =3D (struct cifs_open_parms) {
-+		.tcon =3D tcon,
-+		.desired_access =3D FILE_READ_ATTRIBUTES,
-+		.disposition =3D FILE_OPEN,
-+		.create_options =3D cifs_create_options(cifs_sb, 0),
-+		.fid =3D &fid,
-+	};
-=20
- 	rc =3D open_cached_dir(xid, tcon, "", cifs_sb, false, &cfid);
- 	if (rc =3D=3D 0)
---=20
-2.30.2
+On Thu, Feb 9, 2023 at 11:02 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Wed, Feb 8, 2023 at 8:44 PM Steve French <smfrench@gmail.com> wrote:
+> >
+> >   git://git.samba.org/sfrench/cifs-2.6.git tags/6.2-rc8-smb3-client-fix
+>
+> Hmm. Malformed git pull request with no shortlog or diffstat?
+>
+> I've pulled it, because I can see the SHA1 matching, and it is indeed
+> a "small fix for use after free in readpages", but I really do want to
+> see proper pull requests...
+>
+>             Linus
 
 
---YyXJtAxXLcRazTbB--
+
+-- 
+Thanks,
+
+Steve
