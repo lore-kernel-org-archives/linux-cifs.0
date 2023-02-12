@@ -2,152 +2,72 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD652C05027
-	for <linux-cifs@archiver.kernel.org>; Sun, 12 Feb 2023 20:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B3AC05027
+	for <linux-cifs@archiver.kernel.org>; Sun, 12 Feb 2023 23:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229479AbjBLUoC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 12 Feb 2023 15:44:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44418 "EHLO
+        id S229642AbjBLXk0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 12 Feb 2023 18:40:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjBLUoB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 12 Feb 2023 15:44:01 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DAB3F757
-        for <linux-cifs@vger.kernel.org>; Sun, 12 Feb 2023 12:44:00 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id w11so16209227lfu.11
-        for <linux-cifs@vger.kernel.org>; Sun, 12 Feb 2023 12:43:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FwYkWsEo44WGpLJHfXDsH9W6jLzggKTKdUui1Ypn3EQ=;
-        b=jPUiiWhvwm04tzVeiTPPOUZm62lGvWCjQsp7HeH4S45DpPOrCS3YzPJbGMSpcFA3bx
-         hubwjs61x5a2D36+iEZ0eMyWOPPSvHno8I9U/7IHBVai16MQQYutpoOkYr9PN7e2DQmK
-         zaOHMD/O19kidaw5VWp7CBVcYTigBeqiknRopKoEkh/Nw+3TTj0YSpUrhpKreTovqw7d
-         puv3ZLVGsBvS7CpdvdBDrGnFRhbGagd+Tl0FoIf8YbK1pWb907pkS6ON3yM0OPZ/Sq9p
-         PM0M9rLrzJ1vVoZ61EWI6j8Ir4uE+HLRJMzjHLndBe7Wut1+9sKl+fvW1QWC+HvfkFZ1
-         7TgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FwYkWsEo44WGpLJHfXDsH9W6jLzggKTKdUui1Ypn3EQ=;
-        b=6E0cFsDdoxWQEvTj9GDE2zjvxFjYxZFugxvUdPjsCiBp9DcKW6pDxH5mwd9asH7uuM
-         /cyTQqTeJclQxkFnTo2aZidTzpbf/iEm1znvTiJDbs5Hf0pTCRdCm11JK2Ag7CNO78RB
-         sW1Q6ms8MkDYQXzIndyKO0GqwEb4DsD0ssK7Y3EnJ3ldGKzUDosw8HW6V4HNzMfw+Xsw
-         ehmtQB55PqXOmMavQZ/zkYTcIupMakOHVhW/HqmA4AD4wpWToyDunYjk7QRkj2RETE+L
-         4Qg8pfvAPpNrvEo49giTHjESkdl1A97l2f3ou4MIFV5nTn2TCltMpgnTRn7CLX6SObzO
-         iwUQ==
-X-Gm-Message-State: AO0yUKVje8f2dlgYnu2XtMO5f8+K0RZb42I/eoLHWta6qEtQh4LzMifz
-        XWpW3iIKoVofRwsE3I8eD8XXpsoiRZRriQsy3i8=
-X-Google-Smtp-Source: AK7set/yV+3rXqQOqfT480T8aemi+JZmp3RuZcw1M1MjG7xcBJbeFO+rfsEaep+BRfMS17w6910bUWyrZ9LghWlti50=
-X-Received: by 2002:ac2:4f8d:0:b0:4d8:696d:6ab0 with SMTP id
- z13-20020ac24f8d000000b004d8696d6ab0mr4166385lfs.152.1676234638284; Sun, 12
- Feb 2023 12:43:58 -0800 (PST)
+        with ESMTP id S229641AbjBLXkZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 12 Feb 2023 18:40:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E52C7F76E
+        for <linux-cifs@vger.kernel.org>; Sun, 12 Feb 2023 15:39:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676245178;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SK0wZXWovBD7DJL+Hoj+/Uuq1+hXGQ1+AFTjGroCWZU=;
+        b=XYGVfh/xH3Y1mqYB2X3OEuKYIT4HIQjWADgMbRSLzIf2phWOtz7Upa6dGy/zmgIRgG5gXn
+        0Co9BXSfugAkuL8R5xfZL/neMF/tZ9vbXj8QoFqsyVxLgMdCt+S3BPp3uxySYkMY1lyv9o
+        R+8k09dYh5TJ/bKjTwR3CmgqRfGdCNI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-646-NCtFzw2lOdGu_e8vXRWDsg-1; Sun, 12 Feb 2023 18:39:33 -0500
+X-MC-Unique: NCtFzw2lOdGu_e8vXRWDsg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 863F180006E;
+        Sun, 12 Feb 2023 23:39:32 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C6F494014D03;
+        Sun, 12 Feb 2023 23:39:30 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230210233205.1517459-12-dhowells@redhat.com>
+References: <20230210233205.1517459-12-dhowells@redhat.com> <20230210233205.1517459-1-dhowells@redhat.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>
+Subject: Re: [PATCH 11/11] cifs: Fix problem with encrypted RDMA data read
 MIME-Version: 1.0
-References: <20230208094104.10766-1-linkinjeon@kernel.org> <CAH2r5mvGspRdByLkuC79oHfNkirKj2hEFSODDHKvXtQkV9KdEQ@mail.gmail.com>
- <CAKYAXd_h7QyFFRn689+_jFzSOJBYLc9xJRTh-UbZ3MrR0oNpYg@mail.gmail.com>
-In-Reply-To: <CAKYAXd_h7QyFFRn689+_jFzSOJBYLc9xJRTh-UbZ3MrR0oNpYg@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 12 Feb 2023 14:43:46 -0600
-Message-ID: <CAH2r5mvZe-SgMeTmT53Qeu3Zw6yPU+gJ6Whq+7-G4nHvH7yrDA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] ksmbd: do not allow the actual frame length to be
- smaller than the rfc10024 length
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, senozhatsky@chromium.org,
-        tom@talpey.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1614386.1676245170.1@warthog.procyon.org.uk>
+Date:   Sun, 12 Feb 2023 23:39:30 +0000
+Message-ID: <1614387.1676245170@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-seems reasonable to merge the client fix - I will doublecheck it later
-today or tomorrow and add it to for-next
+Sorry, this one shouldn't have been included.  It's the one Stefan Metzmacher
+objected to and provided his own changes for.
 
-On Sat, Feb 11, 2023 at 8:01 PM Namjae Jeon <linkinjeon@kernel.org> wrote:
->
-> 2023-02-12 5:53 GMT+09:00, Steve French <smfrench@gmail.com>:
-> > Did you see any examples other than (SMB3) tree connect where the
-> > Linux client padded a request beyond end of SMB/SMB3 frame?
-> Yes. libsmb,  but rfc1002 length is 8byte-aligned frame length. (i.e.
-> ALIGN(clc_len, 8) == len) but cifs don't do that about smb2 tree
-> connect, just frame length + 2.
-> And I can not understand why cifs pad smb2 tree connect to 2bytes.
->
-> note that smbclient, windows, MacOs, and Nautilus clients do not pad
-> smb2 tree connect request.
->
-> >
-> > On Wed, Feb 8, 2023 at 3:41 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
-> >>
-> >> ksmbd allowed the actual frame length to be smaller than the rfc1002
-> >> length. If allowed, it is possible to allocates a large amount of memory
-> >> that can be limited by credit management and can eventually cause memory
-> >> exhaustion problem. This patch do not allow it except SMB2 Negotiate
-> >> request which will be validated when message handling proceeds.
-> >> Also, cifs client pad smb2 tree connect to 2bytes.
-> >>
-> >> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-> >> ---
-> >>  fs/ksmbd/smb2misc.c | 23 +++++++++++------------
-> >>  1 file changed, 11 insertions(+), 12 deletions(-)
-> >>
-> >> diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
-> >> index a717aa9b4af8..fc44f08b5939 100644
-> >> --- a/fs/ksmbd/smb2misc.c
-> >> +++ b/fs/ksmbd/smb2misc.c
-> >> @@ -408,20 +408,19 @@ int ksmbd_smb2_check_message(struct ksmbd_work
-> >> *work)
-> >>                         goto validate_credit;
-> >>
-> >>                 /*
-> >> -                * windows client also pad up to 8 bytes when
-> >> compounding.
-> >> -                * If pad is longer than eight bytes, log the server
-> >> behavior
-> >> -                * (once), since may indicate a problem but allow it and
-> >> -                * continue since the frame is parseable.
-> >> +                * SMB2 NEGOTIATE request will be validated when message
-> >> +                * handling proceeds.
-> >>                  */
-> >> -               if (clc_len < len) {
-> >> -                       ksmbd_debug(SMB,
-> >> -                                   "cli req padded more than expected.
-> >> Length %d not %d for cmd:%d mid:%llu\n",
-> >> -                                   len, clc_len, command,
-> >> -                                   le64_to_cpu(hdr->MessageId));
-> >> -                       goto validate_credit;
-> >> -               }
-> >> +               if (command == SMB2_NEGOTIATE_HE)
-> >> +                       goto validate_credit;
-> >> +
-> >> +               /*
-> >> +                * cifs client pads smb2 tree connect to 2 bytes.
-> >> +                */
-> >> +               if (clc_len + 2 == len)
-> >> +                       goto validate_credit;
-> >>
-> >> -               ksmbd_debug(SMB,
-> >> +               pr_err_ratelimited(
-> >>                             "cli req too short, len %d not %d. cmd:%d
-> >> mid:%llu\n",
-> >>                             len, clc_len, command,
-> >>                             le64_to_cpu(hdr->MessageId));
-> >> --
-> >> 2.25.1
-> >>
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
-> >
+David
 
-
-
--- 
-Thanks,
-
-Steve
