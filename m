@@ -2,80 +2,428 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5DCC05027
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Feb 2023 23:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91773C05027
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Feb 2023 23:29:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbjBNXVq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Feb 2023 18:21:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49842 "EHLO
+        id S229647AbjBNX3k (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Feb 2023 18:29:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232164AbjBNXVp (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Feb 2023 18:21:45 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994CA22003
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Feb 2023 15:21:44 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id e12so1078958plh.6
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Feb 2023 15:21:44 -0800 (PST)
+        with ESMTP id S229640AbjBNX3j (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Feb 2023 18:29:39 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79931301B8
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Feb 2023 15:29:37 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id m2so18617542plg.4
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Feb 2023 15:29:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wVlSW+MzcaFhWzFtR663veMvlkA/2gETJbdbvLMrqwg=;
-        b=YtQfkyFjqHsFwgLK1k2ylJT9ni2w93w6RvbOhhSCH/15ARnLhvtKyJPzZ3MhtXGpg7
-         cdWXC1UTFP3cd9zeCHpjnWyQaOsxOk1eH4efxLrUbr5ULex03BITFebPGEAIvx7y7au5
-         W32xN1pFjjKkOZ/v4N8ddGbx9TomNuN74dKeQ=
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ARVgRA/g7iezqPvohsm/ZelCiADVLMmx/ayaewZCWL0=;
+        b=f23xOIc8/UMAvzWAuiUZQb8nmc4hwC/FHlwoN3JRFNN3ZcmNvvUqYqlOoeAP1+X6rB
+         w8Ko5gXod41/fbI3f2PvMMAF2bXBfoLgSzM0usSZtASjxfFS0O7X6jPZrlM5bI+K2stD
+         jcnX4zNJFbNcwsi2Io16KnQbkdGQBSfg/VF+w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wVlSW+MzcaFhWzFtR663veMvlkA/2gETJbdbvLMrqwg=;
-        b=M89FvhetEQY+2XjZ0GsbKHDpf35yuKm9Quxcfr6mSLdtlJUeatv5om0r3c1OopzvnV
-         YuGM/TBF65+49Y4qQaTbHAOLviCCfzezspXQBt2uxjQSfBXFzgZN18l1VnFsdY1Jx3f+
-         4czuCS/S64UqkxFzVpeLfHGKTdW1DJuljK3TqursCOf9AykBgyxpxm2TQ2XNwUjk2f7B
-         mIcgHdJyeNyJjoyZmUg6fJG5YRE2iAdvr73ov/Nn/m5ccgv+ZZ7SAt+dwkHq1w19TqVs
-         tw5jPN/k2ZEyRxY6LXjKfc//YlKk/WQF+npk1yhT2o2YGC1ibYQpkCOFaY/gVBDzsePq
-         ZiVg==
-X-Gm-Message-State: AO0yUKVqTCyk5907jGVOBsLhkrihuLr7I/9ZqcvTaRcc3GYP4DTyhhFe
-        xI6nLnlCiwtTIOggjGV0mEX5IQ==
-X-Google-Smtp-Source: AK7set9q8bTv2pNuwHm4PPCPSiBfM2nKd30kkfNZw8jfMk5RqJT9oVnFuc8N8F2HAJ3AyI3Zi9kfSw==
-X-Received: by 2002:a17:902:d501:b0:198:b945:4108 with SMTP id b1-20020a170902d50100b00198b9454108mr642068plg.0.1676416904081;
-        Tue, 14 Feb 2023 15:21:44 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ARVgRA/g7iezqPvohsm/ZelCiADVLMmx/ayaewZCWL0=;
+        b=OI/lLRUP5zzq6f1Z+DAaezDrY7paUzw9VJMDQ7aVtLu/gFaX6DLFTI5F5rlLz3pDag
+         KlAr5bRt2NqLGFem5CiL5gV9uEcdREXTJyWeEsbUCY+HLc/ElKm4KBku4QxoKboBk5gI
+         9SFydlq8Zi9KVi5eeV4d4pTCXvV7VQhxhLL7DXOceoqD5qc7+GpsB4tkksaNwWsBc5Yz
+         PqhQ7oWtS1gn3nTF1483xhyI1mF7opCwctD8Rkk0i3+L3oQV/1fl0q4MZN+z191Kpx4B
+         tPqGPjhsa8GEToNjYVUxx2fuXpQqPKWD8SpuR3SZhSLF+LczBIMu5fH2Jmy/k/+fKUBs
+         pK5w==
+X-Gm-Message-State: AO0yUKVv005Fz4zSotX0l+1zdhJaDBkGXy1DmpRD1ZC6DW0xqQ98j1hI
+        2lIsliX2AIOFRTOXjR9SHjOabg==
+X-Google-Smtp-Source: AK7set83e0bmI07LWr00KfCX5ZZB23e3LkjmX99Ovgn+R4nn53aTD4LasoOQqjZRDb+THCUL5saYiA==
+X-Received: by 2002:a17:90b:4c04:b0:233:d12f:f43a with SMTP id na4-20020a17090b4c0400b00233d12ff43amr708780pjb.1.1676417376883;
+        Tue, 14 Feb 2023 15:29:36 -0800 (PST)
 Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id w9-20020a1709029a8900b0019605d48707sm10721849plp.114.2023.02.14.15.21.43
+        by smtp.gmail.com with ESMTPSA id x19-20020a17090aa39300b002311c4596f6sm69201pjp.54.2023.02.14.15.29.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Feb 2023 15:21:43 -0800 (PST)
-Message-ID: <63ec1787.170a0220.8e840.4d7a@mx.google.com>
-X-Google-Original-Message-ID: <202302141521.@keescook>
-Date:   Tue, 14 Feb 2023 15:21:43 -0800
+        Tue, 14 Feb 2023 15:29:36 -0800 (PST)
 From:   Kees Cook <keescook@chromium.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+To:     Steve French <sfrench@samba.org>
+Cc:     Kees Cook <keescook@chromium.org>, Paulo Alcantara <pc@cjr.nz>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
         Tom Talpey <tom@talpey.com>,
         Namjae Jeon <linkinjeon@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
-        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] smb3: Replace smb2pdu 1-element arrays with flex-arrays
-References: <20230214215446.never.567-kees@kernel.org>
- <CAH2r5msOxm0PLoc1fAFjDnaonGVv+E1vyHxBGEh_rtAvJ_qNaQ@mail.gmail.com>
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-hardening@vger.kernel.org
+Subject: [PATCH v2] smb3: Replace smb2pdu 1-element arrays with flex-arrays
+Date:   Tue, 14 Feb 2023 15:29:32 -0800
+Message-Id: <20230214232928.gonna.714-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH2r5msOxm0PLoc1fAFjDnaonGVv+E1vyHxBGEh_rtAvJ_qNaQ@mail.gmail.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12506; h=from:subject:message-id; bh=R2XcL27e5iOA+stAd9FKfjdVDNU4Y77s93+G9i4ZubM=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBj7Blbrld559hSM5bx7Gp0Gk5n3XAxjTgbBHmNTulc UnNPKNuJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCY+wZWwAKCRCJcvTf3G3AJntlEA CRAxaKs1NgqSlVwb6IhtKdHArl72XEHQr3pFsuAx1T4VhWnEYQRUBl+QDKz2WLyaVBPCsdJt7ds1wA ejUP4iuZhQIPL1Om9Ykpm/WPCMgkVNbbFspDK3drFXEtg1N2YVRT1/FsEduyLS6NnmtRYFv8U8DzPL pRq9od5GNhcLsbFsowIebmow0wqYaEsvYLIUh6gkxOLNBgC6MXbaDndxd2JhgGVkBvrwlMohmXSpgX EvXHn0463NzDbBIWwhFpzGJ2dm8S8ObovtqZ8Te+S8rWn274leGOGsc3sYVvCH7YoFYAgpVO4rYdWu 69HNXXoHiSVTzSMLi+ULCL6yfFeUIkBBt1mco3jHVN3TH2jJpEy6DHwxsAvrowG+nLjrS/JRsQ8dWE FOI1Xv4u2EjZl8sme0ooDg69aUsssHFnn3J4RarnOu2ptNndDKLAioT/c3Zha37PBWquXy7SvlLU2J NGXtCnFzMKOCFAhf6AyYIBsXVjQpXnsJeDi9Jr6bXUaEk4knl/NFv5np+zw+u30lxKsx8pnbYz0CLx rV6VCYolOwJPkulO+nTSOYKjYcG3V0Tf2RIwUZLUHXMDADBWeNhEYxQSr2GnX/vJAYJE9ywqB2Ed3n /O1U7og61ZrevcTFcbChKBm5twYrXKVywC8WFHjjYSJ+wFEBJjroM7Y0R1MA==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Feb 14, 2023 at 04:53:10PM -0600, Steve French wrote:
-> This seems to have a lot of conflicts with for-next (doesn't apply).
-> Any chance you could rebase it on linux-next
+The kernel is globally removing the ambiguous 0-length and 1-element
+arrays in favor of flexible arrays, so that we can gain both compile-time
+and run-time array bounds checking[1].
 
-Ah, dang. I was working off of 20230203. I will rebase! Sorry for the
-noise. :)
+Replace the trailing 1-element array with a flexible array in the
+following structures:
 
+	struct smb2_err_rsp
+	struct smb2_tree_connect_req
+	struct smb2_negotiate_rsp
+	struct smb2_sess_setup_req
+	struct smb2_sess_setup_rsp
+	struct smb2_read_req
+	struct smb2_read_rsp
+	struct smb2_write_req
+	struct smb2_write_rsp
+	struct smb2_query_directory_req
+	struct smb2_query_directory_rsp
+	struct smb2_set_info_req
+	struct smb2_change_notify_rsp
+	struct smb2_create_rsp
+	struct smb2_query_info_req
+	struct smb2_query_info_rsp
+
+Replace the trailing 1-element array with a flexible array, but leave
+the existing structure padding:
+
+	struct smb2_file_all_info
+	struct smb2_lock_req
+
+Adjust all related size calculations to match the changes to sizeof().
+
+No machine code output differences are produced after these changes.
+
+[1] For lots of details, see both:
+    https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+    https://people.kernel.org/kees/bounded-flexible-arrays-in-c
+
+Cc: Steve French <sfrench@samba.org>
+Cc: Paulo Alcantara <pc@cjr.nz>
+Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+v2: rebased to next-20230214
+v1: https://lore.kernel.org/lkml/20230214215446.never.567-kees@kernel.org
+---
+ fs/cifs/smb2file.c        |  2 +-
+ fs/cifs/smb2misc.c        |  2 +-
+ fs/cifs/smb2pdu.c         | 16 +++++++--------
+ fs/cifs/smb2pdu.h         |  2 +-
+ fs/ksmbd/smb2pdu.c        |  6 ++----
+ fs/smbfs_common/smb2pdu.h | 42 ++++++++++++++++++++++-----------------
+ 6 files changed, 36 insertions(+), 34 deletions(-)
+
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index 9f1dd04b555a..e0ee96d69d49 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -35,7 +35,7 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
+ 		len = (u32)err->ErrorContextCount * (offsetof(struct smb2_error_context_rsp,
+ 							      ErrorContextData) +
+ 						     sizeof(struct smb2_symlink_err_rsp));
+-		if (le32_to_cpu(err->ByteCount) < len || iov->iov_len < len + sizeof(*err))
++		if (le32_to_cpu(err->ByteCount) < len || iov->iov_len < len + sizeof(*err) + 1)
+ 			return ERR_PTR(-EINVAL);
+ 
+ 		p = (struct smb2_error_context_rsp *)err->ErrorData;
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 572293c18e16..3935a60db5c3 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -113,7 +113,7 @@ static __u32 get_neg_ctxt_len(struct smb2_hdr *hdr, __u32 len,
+ 	} else if (nc_offset + 1 == non_ctxlen) {
+ 		cifs_dbg(FYI, "no SPNEGO security blob in negprot rsp\n");
+ 		size_of_pad_before_neg_ctxts = 0;
+-	} else if (non_ctxlen == SMB311_NEGPROT_BASE_SIZE)
++	} else if (non_ctxlen == SMB311_NEGPROT_BASE_SIZE + 1)
+ 		/* has padding, but no SPNEGO blob */
+ 		size_of_pad_before_neg_ctxts = nc_offset - non_ctxlen + 1;
+ 	else
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index b16b41d35560..c304678514a5 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1373,7 +1373,7 @@ SMB2_sess_sendreceive(struct SMB2_sess_data *sess_data)
+ 
+ 	/* Testing shows that buffer offset must be at location of Buffer[0] */
+ 	req->SecurityBufferOffset =
+-		cpu_to_le16(sizeof(struct smb2_sess_setup_req) - 1 /* pad */);
++		cpu_to_le16(sizeof(struct smb2_sess_setup_req));
+ 	req->SecurityBufferLength = cpu_to_le16(sess_data->iov[1].iov_len);
+ 
+ 	memset(&rqst, 0, sizeof(struct smb_rqst));
+@@ -1892,8 +1892,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	iov[0].iov_len = total_len - 1;
+ 
+ 	/* Testing shows that buffer offset must be at location of Buffer[0] */
+-	req->PathOffset = cpu_to_le16(sizeof(struct smb2_tree_connect_req)
+-			- 1 /* pad */);
++	req->PathOffset = cpu_to_le16(sizeof(struct smb2_tree_connect_req));
+ 	req->PathLength = cpu_to_le16(unc_path_len);
+ 	iov[1].iov_base = unc_path;
+ 	iov[1].iov_len = unc_path_len;
+@@ -3773,7 +3772,7 @@ SMB2_change_notify(const unsigned int xid, struct cifs_tcon *tcon,
+ 			ses->Suid, (u8)watch_tree, completion_filter);
+ 		/* validate that notify information is plausible */
+ 		if ((rsp_iov.iov_base == NULL) ||
+-		    (rsp_iov.iov_len < sizeof(struct smb2_change_notify_rsp)))
++		    (rsp_iov.iov_len < sizeof(struct smb2_change_notify_rsp) + 1))
+ 			goto cnotify_exit;
+ 
+ 		smb_rsp = (struct smb2_change_notify_rsp *)rsp_iov.iov_base;
+@@ -4966,7 +4965,7 @@ int SMB2_query_directory_init(const unsigned int xid,
+ 	memcpy(bufptr, &asteriks, len);
+ 
+ 	req->FileNameOffset =
+-		cpu_to_le16(sizeof(struct smb2_query_directory_req) - 1);
++		cpu_to_le16(sizeof(struct smb2_query_directory_req));
+ 	req->FileNameLength = cpu_to_le16(len);
+ 	/*
+ 	 * BB could be 30 bytes or so longer if we used SMB2 specific
+@@ -5162,8 +5161,7 @@ SMB2_set_info_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 	req->VolatileFileId = volatile_fid;
+ 	req->AdditionalInformation = cpu_to_le32(additional_info);
+ 
+-	req->BufferOffset =
+-			cpu_to_le16(sizeof(struct smb2_set_info_req) - 1);
++	req->BufferOffset = cpu_to_le16(sizeof(struct smb2_set_info_req));
+ 	req->BufferLength = cpu_to_le32(*size);
+ 
+ 	memcpy(req->Buffer, *data, *size);
+@@ -5397,9 +5395,9 @@ build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon,
+ 	req->VolatileFileId = volatile_fid;
+ 	/* 1 for pad */
+ 	req->InputBufferOffset =
+-			cpu_to_le16(sizeof(struct smb2_query_info_req) - 1);
++			cpu_to_le16(sizeof(struct smb2_query_info_req));
+ 	req->OutputBufferLength = cpu_to_le32(
+-		outbuf_len + sizeof(struct smb2_query_info_rsp) - 1);
++		outbuf_len + sizeof(struct smb2_query_info_rsp));
+ 
+ 	iov->iov_base = (char *)req;
+ 	iov->iov_len = total_len;
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 1237bb86e93a..a5773a06aba8 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -57,7 +57,7 @@ struct smb2_rdma_crypto_transform {
+ #define COMPOUND_FID 0xFFFFFFFFFFFFFFFFULL
+ 
+ #define SMB2_SYMLINK_STRUCT_SIZE \
+-	(sizeof(struct smb2_err_rsp) - 1 + sizeof(struct smb2_symlink_err_rsp))
++	(sizeof(struct smb2_err_rsp) + sizeof(struct smb2_symlink_err_rsp))
+ 
+ #define SYMLINK_ERROR_TAG 0x4c4d5953
+ 
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 619857af0cc2..aef72077fc75 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -274,8 +274,7 @@ int init_smb2_neg_rsp(struct ksmbd_work *work)
+ 		le16_to_cpu(rsp->SecurityBufferOffset));
+ 	inc_rfc1001_len(work->response_buf,
+ 			sizeof(struct smb2_negotiate_rsp) -
+-			sizeof(struct smb2_hdr) - sizeof(rsp->Buffer) +
+-			AUTH_GSS_LENGTH);
++			sizeof(struct smb2_hdr) + AUTH_GSS_LENGTH);
+ 	rsp->SecurityMode = SMB2_NEGOTIATE_SIGNING_ENABLED_LE;
+ 	if (server_conf.signing == KSMBD_CONFIG_OPT_MANDATORY)
+ 		rsp->SecurityMode |= SMB2_NEGOTIATE_SIGNING_REQUIRED_LE;
+@@ -1205,8 +1204,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 	ksmbd_copy_gss_neg_header((char *)(&rsp->hdr) +
+ 				  le16_to_cpu(rsp->SecurityBufferOffset));
+ 	inc_rfc1001_len(work->response_buf, sizeof(struct smb2_negotiate_rsp) -
+-			sizeof(struct smb2_hdr) - sizeof(rsp->Buffer) +
+-			 AUTH_GSS_LENGTH);
++			sizeof(struct smb2_hdr) + AUTH_GSS_LENGTH);
+ 	rsp->SecurityMode = SMB2_NEGOTIATE_SIGNING_ENABLED_LE;
+ 	conn->use_spnego = true;
+ 
+diff --git a/fs/smbfs_common/smb2pdu.h b/fs/smbfs_common/smb2pdu.h
+index 7d605db3bb3b..ace133cf6072 100644
+--- a/fs/smbfs_common/smb2pdu.h
++++ b/fs/smbfs_common/smb2pdu.h
+@@ -167,7 +167,7 @@ struct smb2_err_rsp {
+ 	__u8   ErrorContextCount;
+ 	__u8   Reserved;
+ 	__le32 ByteCount;  /* even if zero, at least one byte follows */
+-	__u8   ErrorData[1];  /* variable length */
++	__u8   ErrorData[];  /* variable length */
+ } __packed;
+ 
+ #define SMB3_AES_CCM_NONCE 11
+@@ -308,7 +308,7 @@ struct smb2_tree_connect_req {
+ 	__le16 Flags;		/* Flags in SMB3.1.1 */
+ 	__le16 PathOffset;
+ 	__le16 PathLength;
+-	__u8   Buffer[1];	/* variable length */
++	__u8   Buffer[];	/* variable length */
+ } __packed;
+ 
+ /* Possible ShareType values */
+@@ -595,7 +595,7 @@ struct smb2_negotiate_rsp {
+ 	__le16 SecurityBufferOffset;
+ 	__le16 SecurityBufferLength;
+ 	__le32 NegotiateContextOffset;	/* Pre:SMB3.1.1 was reserved/ignored */
+-	__u8   Buffer[1];	/* variable length GSS security buffer */
++	__u8   Buffer[];	/* variable length GSS security buffer */
+ } __packed;
+ 
+ 
+@@ -616,7 +616,7 @@ struct smb2_sess_setup_req {
+ 	__le16 SecurityBufferOffset;
+ 	__le16 SecurityBufferLength;
+ 	__le64 PreviousSessionId;
+-	__u8   Buffer[1];	/* variable length GSS security buffer */
++	__u8   Buffer[];	/* variable length GSS security buffer */
+ } __packed;
+ 
+ /* Currently defined SessionFlags */
+@@ -633,7 +633,7 @@ struct smb2_sess_setup_rsp {
+ 	__le16 SessionFlags;
+ 	__le16 SecurityBufferOffset;
+ 	__le16 SecurityBufferLength;
+-	__u8   Buffer[1];	/* variable length GSS security buffer */
++	__u8   Buffer[];	/* variable length GSS security buffer */
+ } __packed;
+ 
+ 
+@@ -715,7 +715,7 @@ struct smb2_read_req {
+ 	__le32 RemainingBytes;
+ 	__le16 ReadChannelInfoOffset;
+ 	__le16 ReadChannelInfoLength;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ /* Read flags */
+@@ -730,7 +730,7 @@ struct smb2_read_rsp {
+ 	__le32 DataLength;
+ 	__le32 DataRemaining;
+ 	__le32 Flags;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ 
+@@ -754,7 +754,7 @@ struct smb2_write_req {
+ 	__le16 WriteChannelInfoOffset;
+ 	__le16 WriteChannelInfoLength;
+ 	__le32 Flags;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ struct smb2_write_rsp {
+@@ -765,7 +765,7 @@ struct smb2_write_rsp {
+ 	__le32 DataLength;
+ 	__le32 DataRemaining;
+ 	__u32  Reserved2;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ 
+@@ -812,7 +812,10 @@ struct smb2_lock_req {
+ 	__u64  PersistentFileId;
+ 	__u64  VolatileFileId;
+ 	/* Followed by at least one */
+-	struct smb2_lock_element locks[1];
++	union {
++		struct smb2_lock_element lock;
++		DECLARE_FLEX_ARRAY(struct smb2_lock_element, locks);
++	};
+ } __packed;
+ 
+ struct smb2_lock_rsp {
+@@ -866,7 +869,7 @@ struct smb2_query_directory_req {
+ 	__le16 FileNameOffset;
+ 	__le16 FileNameLength;
+ 	__le32 OutputBufferLength;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ struct smb2_query_directory_rsp {
+@@ -874,7 +877,7 @@ struct smb2_query_directory_rsp {
+ 	__le16 StructureSize; /* Must be 9 */
+ 	__le16 OutputBufferOffset;
+ 	__le32 OutputBufferLength;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ /*
+@@ -897,7 +900,7 @@ struct smb2_set_info_req {
+ 	__le32 AdditionalInformation;
+ 	__u64  PersistentFileId;
+ 	__u64  VolatileFileId;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ struct smb2_set_info_rsp {
+@@ -952,7 +955,7 @@ struct smb2_change_notify_rsp {
+ 	__le16	StructureSize;  /* Must be 9 */
+ 	__le16	OutputBufferOffset;
+ 	__le32	OutputBufferLength;
+-	__u8	Buffer[1]; /* array of file notify structs */
++	__u8	Buffer[]; /* array of file notify structs */
+ } __packed;
+ 
+ 
+@@ -1158,7 +1161,7 @@ struct smb2_create_rsp {
+ 	__u64  VolatileFileId;
+ 	__le32 CreateContextsOffset;
+ 	__le32 CreateContextsLength;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ struct create_posix {
+@@ -1501,7 +1504,7 @@ struct smb2_query_info_req {
+ 	__le32 Flags;
+ 	__u64  PersistentFileId;
+ 	__u64  VolatileFileId;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ struct smb2_query_info_rsp {
+@@ -1509,7 +1512,7 @@ struct smb2_query_info_rsp {
+ 	__le16 StructureSize; /* Must be 9 */
+ 	__le16 OutputBufferOffset;
+ 	__le32 OutputBufferLength;
+-	__u8   Buffer[1];
++	__u8   Buffer[];
+ } __packed;
+ 
+ /*
+@@ -1570,7 +1573,10 @@ struct smb2_file_all_info { /* data block encoding of response to level 18 */
+ 	__le32 Mode;
+ 	__le32 AlignmentRequirement;
+ 	__le32 FileNameLength;
+-	char   FileName[1];
++	union {
++		char __pad;	/* Legacy structure padding */
++		DECLARE_FLEX_ARRAY(char, FileName);
++	};
+ } __packed; /* level 18 Query */
+ 
+ struct smb2_file_eof_info { /* encoding of request for level 10 */
 -- 
-Kees Cook
+2.34.1
+
