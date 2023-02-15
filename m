@@ -2,181 +2,221 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F677C636CC
-	for <linux-cifs@archiver.kernel.org>; Wed, 15 Feb 2023 08:35:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38ADFC636CC
+	for <linux-cifs@archiver.kernel.org>; Wed, 15 Feb 2023 11:15:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233942AbjBOIfF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Feb 2023 03:35:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35212 "EHLO
+        id S232148AbjBOLPd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 15 Feb 2023 06:15:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234012AbjBOIey (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Feb 2023 03:34:54 -0500
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E05C936FCF;
-        Wed, 15 Feb 2023 00:34:46 -0800 (PST)
-Received: by mail-pg1-x543.google.com with SMTP id y186so22pgb.10;
-        Wed, 15 Feb 2023 00:34:46 -0800 (PST)
+        with ESMTP id S232350AbjBOLPc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Feb 2023 06:15:32 -0500
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAE70367D5
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Feb 2023 03:15:29 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id d8so21734069ljq.9
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Feb 2023 03:15:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dPi7xiAI6eAt2R20RcGc0yiA68oMwbx0n93NNjF27nI=;
-        b=ihRs+bM0QSwnRrFxRJSDOaUo0eetuDiAqiT23n/MaB8EjaDbIGV8yWOdOYXzHltNlk
-         GEXazSsSy/Hf6BzxZz1Iq/KYt3KCKX9eN99sHpGmzHqupVUR8DT2+9jPH4cZbkLZXKeQ
-         0xAXMYv9a87MT6AmcPkTk69pWoaLbprqSoGIlLWRji0B+z+b6TlI/vdHcHrvBaUYWpCG
-         28xlofVCXDC24IQ6Dp5nlUfMioS2XIHvabHG6lthHAbnE2Dv/m9Jc6zNTuYXh73MO63D
-         iwDvh7gmyWVm6Svwfv2U1n/YhaXiU+Ov/8QkE0FmiLTL/G/zw+6cjlRZEZltjJxBiHwf
-         XXPw==
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iwl5N1UEcZnB71HWHaStV/h8Qez5W0HKuwpopz3uNUE=;
+        b=ab7nJj8WaLfzOQKUu1MGzUR3QkV2ZKOU9Oo62Q9FDqDvu2pPETd9fbuvgDLSGQaRg3
+         OuZVmk5fA/I/5mN8Y4ldfZ3I+hz6HkIZNyQRG7NWJz3TK14JzE5VssyfjmwIy/n9YShj
+         xZTCvKWdjB/1T76Z9bTy/LWX5sTLQ5TQyDNQzhqmNhLigijaHBL2hx2QNzn/lDmzO+qD
+         QRbW4LUjS4GYpTruVqmrKjBcX3u8/zZnhSOEdnXDHH3I9Obs0F427TflA1A+GOLRLxvO
+         6Fto2joEvepjYAfwZaJ9j4UFPIyXKfwIJn0VYskKpueocOg8d98+Lj18StQDCBvwR3yK
+         7RZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dPi7xiAI6eAt2R20RcGc0yiA68oMwbx0n93NNjF27nI=;
-        b=o6OF5UbYqzQb31XXkE9JqNUQ429mSm/6Heh2H5MIyF0wfO4fFwIVwNUQx1J9/7M3iL
-         7meaHH+mS7k+g9PRLKeH3Vn0gt3HIuksrDXq5lRGDv9PdxXuk+ZM0F4wn+beQpsLvu9o
-         CauANOkTOzcDMlQL0C7PcIiQANs8ZGOhU8kub8akVb9rV3N2132zVqLWwOtlR/jyNmGq
-         iRRx8YCF4PdRHDZXqDepohVKyE8y6+Hu8May+b6jLkQuLoarunLmgfm9tcg/OFeKdjMf
-         zh64AeiakLiujunpLzetrquSzjp4Ch8eHTIr64UJfz33FPZGDo0QlRjUcuoaIkz8FL1D
-         lrbg==
-X-Gm-Message-State: AO0yUKUHv5bQBnhlPP/tFkdEEimju6PVA2OOUQ/kbNnPgCT27ODitWVy
-        EvzMJ05NH2qoE225638cui0=
-X-Google-Smtp-Source: AK7set8OxptjF1uPj7AePYt17pID2doTHVF7spDoWP0HfMXl2igAO8QAme1hbjIRKDt4VoLMDWXd5A==
-X-Received: by 2002:a62:8202:0:b0:5a8:c116:edc with SMTP id w2-20020a628202000000b005a8c1160edcmr1029234pfd.1.1676450070770;
-        Wed, 15 Feb 2023 00:34:30 -0800 (PST)
-Received: from hbh25y.. ([129.227.150.140])
-        by smtp.gmail.com with ESMTPSA id j26-20020aa7929a000000b0058b927b9653sm11459571pfa.92.2023.02.15.00.34.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Feb 2023 00:34:30 -0800 (PST)
-From:   Hangyu Hua <hbh25y@gmail.com>
-To:     linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
-        tom@talpey.com, lsahlber@redhat.com, hyc.lee@gmail.com
-Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hangyu Hua <hbh25y@gmail.com>
-Subject: [PATCH v5] ksmbd: fix possible memory leak in smb2_lock()
-Date:   Wed, 15 Feb 2023 16:33:50 +0800
-Message-Id: <20230215083350.5815-1-hbh25y@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iwl5N1UEcZnB71HWHaStV/h8Qez5W0HKuwpopz3uNUE=;
+        b=optkESh37vz3w9dAcQrL3KDe8kZEQllSKPrS4CC2IGZ0L9N7JGzFGAv0EGx0EWao0Q
+         /MWOuWhYflS02LkUBBfy6GhsBmG9++GCTtFezNRnYP2/rMqZbBd7lZ4el0qIyjkaXheK
+         QGpKp/qMzCwbHeTAwa5O5+yrl434UNYKjBJeMuyo7/IBGk47Xad5hnHeHYFCLS5y7vBH
+         SxicDEy0vmtZnR+rlLpxTYPI410/U0gFaGGhm4ZbnBFxIp09C2FWJDEN2MaSnSRV5tC+
+         1EsrEVlUKwkHCDekZB2b/Ln4iCE5Ka7dAUfuXsKd66y/LsYm4fp4YxbK9deJLaIyt0My
+         KfWA==
+X-Gm-Message-State: AO0yUKVzfcoqJ1lghFi3YhYSzvYfMFBa5ot9pdcuhw0ejGqyUGI6L/wv
+        H2Zc85vIjbKrmeLXcbc12PT18HWmWFXTfTk2Sq8q+Y7Z+kFcGJ9l
+X-Google-Smtp-Source: AK7set/sQaapF48aONE2akXhiW71mA6kkdJtteYEZUlFkIFUWHtEGjMCwexfAFGoLVAwpZYzPBYUcsp5MHJWTTZOF4k=
+X-Received: by 2002:a2e:a4b7:0:b0:293:4be3:9e6c with SMTP id
+ g23-20020a2ea4b7000000b002934be39e6cmr459573ljm.1.1676459727715; Wed, 15 Feb
+ 2023 03:15:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 15 Feb 2023 16:45:16 +0530
+Message-ID: <CANT5p=oRRbupWDr30fW8TAyZb-_k8XoCO9fY6DWfxJ+kY3vm8g@mail.gmail.com>
+Subject: Are we leaking cifs_inode?
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-argv needs to be free when setup_async_work fails or when the current
-process is woken up.
+Occasionally, I see this warning during my testing with kasan kernel.
+This happens when I do an rmmod.
+Essentially it's complaining that there are still cifs_inode objects allocated.
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
----
+[Wed Feb 15 11:08:16 2023]
+=============================================================================
+[Wed Feb 15 11:08:16 2023] BUG cifs_inode_cache (Tainted: G        W
+OE     ): Objects remaining in cifs_inode_cache on
+__kmem_cache_shutdown()
+[Wed Feb 15 11:08:16 2023]
+-----------------------------------------------------------------------------
 
-v2: avoid NULL pointer dereference in set_close_state_blocked_works().
-v3: avoid race condition between smb2_lock() and smb2_cancel().
-v4: use another way to avoid race condition.
-v5: Keep things under the control of request_lock and f_lock.
+[Wed Feb 15 11:08:16 2023] Slab 0x000000006876b569 objects=17 used=1
+fp=0x00000000762533d9
+flags=0x17ffffc0010200(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
+[Wed Feb 15 11:08:16 2023] CPU: 0 PID: 9331 Comm: rmmod Tainted: G
+   W  OE      6.2.0-rc5withkasan #19
+[Wed Feb 15 11:08:16 2023] Hardware name: Microsoft Corporation
+Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.0
+12/17/2019
+[Wed Feb 15 11:08:16 2023] Call Trace:
+[Wed Feb 15 11:08:16 2023]  <TASK>
+[Wed Feb 15 11:08:16 2023]  dump_stack_lvl+0x5a/0x78
+[Wed Feb 15 11:08:16 2023]  dump_stack+0x10/0x16
+[Wed Feb 15 11:08:16 2023]  slab_err+0x95/0xd0
+[Wed Feb 15 11:08:16 2023]  __kmem_cache_shutdown+0x14b/0x2d0
+[Wed Feb 15 11:08:16 2023]  kmem_cache_destroy+0x62/0x170
+[Wed Feb 15 11:08:16 2023]  exit_cifs+0x7e/0xc15 [cifs]
+[Wed Feb 15 11:08:16 2023]  __do_sys_delete_module.constprop.0+0x258/0x410
+[Wed Feb 15 11:08:16 2023]  ? __pfx___do_sys_delete_module.constprop.0+0x10/0x10
+[Wed Feb 15 11:08:16 2023]  ? __pfx___rseq_handle_notify_resume+0x10/0x10
+[Wed Feb 15 11:08:16 2023]  ? __pfx_mem_cgroup_handle_over_high+0x10/0x10
+[Wed Feb 15 11:08:16 2023]  ? lockdep_hardirqs_on_prepare+0x13/0x230
+[Wed Feb 15 11:08:16 2023]  ? trace_hardirqs_on+0x3d/0x130
+[Wed Feb 15 11:08:16 2023]  __x64_sys_delete_module+0x1f/0x30
+[Wed Feb 15 11:08:16 2023]  do_syscall_64+0x59/0x90
+[Wed Feb 15 11:08:16 2023]  ? lockdep_hardirqs_on_prepare+0x13/0x230
+[Wed Feb 15 11:08:16 2023]  ? syscall_exit_to_user_mode+0x37/0x50
+[Wed Feb 15 11:08:16 2023]  ? do_syscall_64+0x69/0x90
+[Wed Feb 15 11:08:16 2023]  ? syscall_exit_to_user_mode+0x37/0x50
+[Wed Feb 15 11:08:16 2023]  ? do_syscall_64+0x69/0x90
+[Wed Feb 15 11:08:16 2023]  ? syscall_exit_to_user_mode+0x37/0x50
+[Wed Feb 15 11:08:16 2023]  ? do_syscall_64+0x69/0x90
+[Wed Feb 15 11:08:16 2023]  ? do_syscall_64+0x69/0x90
+[Wed Feb 15 11:08:16 2023]  ? exc_page_fault+0x8e/0x110
+[Wed Feb 15 11:08:16 2023]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[Wed Feb 15 11:08:16 2023] RIP: 0033:0x7f6912726c9b
+[Wed Feb 15 11:08:16 2023] Code: 73 01 c3 48 8b 0d 95 21 0f 00 f7 d8
+64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa
+b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 65 21 0f 00
+f7 d8 64 89 01 48
+[Wed Feb 15 11:08:16 2023] RSP: 002b:00007ffdc4bb6ec8 EFLAGS: 00000206
+ORIG_RAX: 00000000000000b0
+[Wed Feb 15 11:08:16 2023] RAX: ffffffffffffffda RBX: 0000563f8c228760
+RCX: 00007f6912726c9b
+[Wed Feb 15 11:08:16 2023] RDX: 000000000000000a RSI: 0000000000000800
+RDI: 0000563f8c2287c8
+[Wed Feb 15 11:08:16 2023] RBP: 0000000000000000 R08: 0000000000000000
+R09: 0000000000000000
+[Wed Feb 15 11:08:16 2023] R10: 00007f69127beac0 R11: 0000000000000206
+R12: 00007ffdc4bb7120
+[Wed Feb 15 11:08:16 2023] R13: 0000563f8c2282a0 R14: 00007ffdc4bb88f6
+R15: 0000563f8c228760
+[Wed Feb 15 11:08:16 2023]  </TASK>
+[Wed Feb 15 11:08:16 2023] Object 0x0000000094f20a7f @offset=21120
+[Wed Feb 15 11:08:16 2023] ------------[ cut here ]------------
+[Wed Feb 15 11:08:16 2023] kmem_cache_destroy cifs_inode_cache: Slab
+cache still has objects when called from exit_cifs+0x7e/0xc15 [cifs]
+[Wed Feb 15 11:08:16 2023] WARNING: CPU: 0 PID: 9331 at
+mm/slab_common.c:497 kmem_cache_destroy+0x15d/0x170
+[Wed Feb 15 11:08:16 2023] Modules linked in: cifs(OE-) mptcp_diag
+tcp_diag udp_diag raw_diag inet_diag unix_diag tls cmac nls_utf8
+cifs_arc4 rdma_cm iw_cm ib_cm ib_core cifs_md4 sunrpc binfmt_misc
+nls_iso8859_1 intel_rapl_msr intel_rapl_common rapl serio_raw
+hv_balloon hyperv_fb joydev mac_hid sch_fq_codel dm_multipath
+scsi_dh_rdac scsi_dh_emc scsi_dh_alua msr ramoops reed_solomon
+efi_pstore ip_tables x_tables autofs4 btrfs blake2b_generic raid10
+raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor
+raid6_pq libcrc32c raid1 raid0 multipath linear hyperv_drm
+drm_shmem_helper drm_kms_helper syscopyarea sysfillrect sysimgblt
+hid_generic hv_storvsc hid_hyperv scsi_transport_fc drm hv_netvsc hid
+hv_utils hyperv_keyboard crct10dif_pclmul crc32_pclmul
+ghash_clmulni_intel sha512_ssse3 aesni_intel crypto_simd cryptd
+hv_vmbus [last unloaded: cifs(OE)]
+[Wed Feb 15 11:08:16 2023] CPU: 0 PID: 9331 Comm: rmmod Tainted: G
+B   W  OE      6.2.0-rc5withkasan #19
+[Wed Feb 15 11:08:16 2023] Hardware name: Microsoft Corporation
+Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.0
+12/17/2019
+[Wed Feb 15 11:08:16 2023] RIP: 0010:kmem_cache_destroy+0x15d/0x170
+[Wed Feb 15 11:08:16 2023] Code: 49 fa c3 ff e9 6f ff ff ff c3 cc cc
+cc cc 49 8b 54 24 60 48 8b 4d 08 48 c7 c6 40 75 36 91 48 c7 c7 00 a3
+c2 91 e8 46 12 28 01 <0f> 0b e9 47 ff ff ff 66 66 2e 0f 1f 84 00 00 00
+00 00 90 90 90 90
+[Wed Feb 15 11:08:16 2023] RSP: 0018:ffff88819b6efd18 EFLAGS: 00010282
+[Wed Feb 15 11:08:16 2023] RAX: 0000000000000000 RBX: 000000004c020000
+RCX: 0000000000000000
+[Wed Feb 15 11:08:16 2023] RDX: 0000000000000001 RSI: 0000000000000004
+RDI: ffffed10336ddf95
+[Wed Feb 15 11:08:16 2023] RBP: ffff88819b6efd28 R08: ffffffff8f796e88
+R09: ffff8886841f080b
+[Wed Feb 15 11:08:16 2023] R10: ffffed10d083e101 R11: 0000000000000001
+R12: ffff888109415c80
+[Wed Feb 15 11:08:16 2023] R13: ffff88819b6efe28 R14: ffffffffc134a100
+R15: 0000000000000000
+[Wed Feb 15 11:08:16 2023] FS:  00007f6912e8dc40(0000)
+GS:ffff888684000000(0000) knlGS:0000000000000000
+[Wed Feb 15 11:08:16 2023] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[Wed Feb 15 11:08:16 2023] CR2: 00007f8cf7051f40 CR3: 0000000172bdc002
+CR4: 00000000003706f0
+[Wed Feb 15 11:08:16 2023] Call Trace:
+[Wed Feb 15 11:08:16 2023]  <TASK>
+[Wed Feb 15 11:08:16 2023]  exit_cifs+0x7e/0xc15 [cifs]
+[Wed Feb 15 11:08:16 2023]  __do_sys_delete_module.constprop.0+0x258/0x410
+[Wed Feb 15 11:08:16 2023]  ? __pfx___do_sys_delete_module.constprop.0+0x10/0x10
+[Wed Feb 15 11:08:16 2023]  ? __pfx___rseq_handle_notify_resume+0x10/0x10
+[Wed Feb 15 11:08:16 2023]  ? __pfx_mem_cgroup_handle_over_high+0x10/0x10
+[Wed Feb 15 11:08:16 2023]  ? lockdep_hardirqs_on_prepare+0x13/0x230
+[Wed Feb 15 11:08:16 2023]  ? trace_hardirqs_on+0x3d/0x130
+[Wed Feb 15 11:08:16 2023]  __x64_sys_delete_module+0x1f/0x30
+[Wed Feb 15 11:08:16 2023]  do_syscall_64+0x59/0x90
+[Wed Feb 15 11:08:16 2023]  ? lockdep_hardirqs_on_prepare+0x13/0x230
+[Wed Feb 15 11:08:16 2023]  ? syscall_exit_to_user_mode+0x37/0x50
+[Wed Feb 15 11:08:16 2023]  ? do_syscall_64+0x69/0x90
+[Wed Feb 15 11:08:16 2023]  ? syscall_exit_to_user_mode+0x37/0x50
+[Wed Feb 15 11:08:16 2023]  ? do_syscall_64+0x69/0x90
+[Wed Feb 15 11:08:16 2023]  ? syscall_exit_to_user_mode+0x37/0x50
+[Wed Feb 15 11:08:16 2023]  ? do_syscall_64+0x69/0x90
+[Wed Feb 15 11:08:16 2023]  ? do_syscall_64+0x69/0x90
+[Wed Feb 15 11:08:16 2023]  ? exc_page_fault+0x8e/0x110
+[Wed Feb 15 11:08:16 2023]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[Wed Feb 15 11:08:16 2023] RIP: 0033:0x7f6912726c9b
+[Wed Feb 15 11:08:16 2023] Code: 73 01 c3 48 8b 0d 95 21 0f 00 f7 d8
+64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa
+b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 65 21 0f 00
+f7 d8 64 89 01 48
+[Wed Feb 15 11:08:16 2023] RSP: 002b:00007ffdc4bb6ec8 EFLAGS: 00000206
+ORIG_RAX: 00000000000000b0
+[Wed Feb 15 11:08:16 2023] RAX: ffffffffffffffda RBX: 0000563f8c228760
+RCX: 00007f6912726c9b
+[Wed Feb 15 11:08:16 2023] RDX: 000000000000000a RSI: 0000000000000800
+RDI: 0000563f8c2287c8
+[Wed Feb 15 11:08:16 2023] RBP: 0000000000000000 R08: 0000000000000000
+R09: 0000000000000000
+[Wed Feb 15 11:08:16 2023] R10: 00007f69127beac0 R11: 0000000000000206
+R12: 00007ffdc4bb7120
+[Wed Feb 15 11:08:16 2023] R13: 0000563f8c2282a0 R14: 00007ffdc4bb88f6
+R15: 0000563f8c228760
+[Wed Feb 15 11:08:16 2023]  </TASK>
+[Wed Feb 15 11:08:16 2023] irq event stamp: 0
+[Wed Feb 15 11:08:16 2023] hardirqs last  enabled at (0):
+[<0000000000000000>] 0x0
+[Wed Feb 15 11:08:16 2023] hardirqs last disabled at (0):
+[<ffffffff8f72869a>] copy_process+0xeda/0x3960
+[Wed Feb 15 11:08:16 2023] softirqs last  enabled at (0):
+[<ffffffff8f72869a>] copy_process+0xeda/0x3960
+[Wed Feb 15 11:08:16 2023] softirqs last disabled at (0):
+[<0000000000000000>] 0x0
+[Wed Feb 15 11:08:16 2023] ---[ end trace 0000000000000000 ]---
 
- fs/ksmbd/smb2pdu.c   | 28 +++++++++++++---------------
- fs/ksmbd/vfs_cache.c |  5 ++---
- 2 files changed, 15 insertions(+), 18 deletions(-)
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index d681f91947d9..875eecc6b95e 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -6644,7 +6644,7 @@ int smb2_cancel(struct ksmbd_work *work)
- 	struct ksmbd_conn *conn = work->conn;
- 	struct smb2_hdr *hdr = smb2_get_msg(work->request_buf);
- 	struct smb2_hdr *chdr;
--	struct ksmbd_work *cancel_work = NULL, *iter;
-+	struct ksmbd_work *iter;
- 	struct list_head *command_list;
- 
- 	ksmbd_debug(SMB, "smb2 cancel called on mid %llu, async flags 0x%x\n",
-@@ -6666,7 +6666,9 @@ int smb2_cancel(struct ksmbd_work *work)
- 				    "smb2 with AsyncId %llu cancelled command = 0x%x\n",
- 				    le64_to_cpu(hdr->Id.AsyncId),
- 				    le16_to_cpu(chdr->Command));
--			cancel_work = iter;
-+			iter->state = KSMBD_WORK_CANCELLED;
-+			if (iter->cancel_fn)
-+				iter->cancel_fn(iter->cancel_argv);
- 			break;
- 		}
- 		spin_unlock(&conn->request_lock);
-@@ -6685,18 +6687,12 @@ int smb2_cancel(struct ksmbd_work *work)
- 				    "smb2 with mid %llu cancelled command = 0x%x\n",
- 				    le64_to_cpu(hdr->MessageId),
- 				    le16_to_cpu(chdr->Command));
--			cancel_work = iter;
-+			iter->state = KSMBD_WORK_CANCELLED;
- 			break;
- 		}
- 		spin_unlock(&conn->request_lock);
- 	}
- 
--	if (cancel_work) {
--		cancel_work->state = KSMBD_WORK_CANCELLED;
--		if (cancel_work->cancel_fn)
--			cancel_work->cancel_fn(cancel_work->cancel_argv);
--	}
--
- 	/* For SMB2_CANCEL command itself send no response*/
- 	work->send_no_response = 1;
- 	return 0;
-@@ -7061,6 +7057,14 @@ int smb2_lock(struct ksmbd_work *work)
- 
- 				ksmbd_vfs_posix_lock_wait(flock);
- 
-+				spin_lock(&work->conn->request_lock);
-+				spin_lock(&fp->f_lock);
-+				list_del(&work->fp_entry);
-+				work->cancel_fn = NULL;
-+				kfree(argv);
-+				spin_unlock(&fp->f_lock);
-+				spin_unlock(&work->conn->request_lock);
-+
- 				if (work->state != KSMBD_WORK_ACTIVE) {
- 					list_del(&smb_lock->llist);
- 					spin_lock(&work->conn->llist_lock);
-@@ -7069,9 +7073,6 @@ int smb2_lock(struct ksmbd_work *work)
- 					locks_free_lock(flock);
- 
- 					if (work->state == KSMBD_WORK_CANCELLED) {
--						spin_lock(&fp->f_lock);
--						list_del(&work->fp_entry);
--						spin_unlock(&fp->f_lock);
- 						rsp->hdr.Status =
- 							STATUS_CANCELLED;
- 						kfree(smb_lock);
-@@ -7093,9 +7094,6 @@ int smb2_lock(struct ksmbd_work *work)
- 				list_del(&smb_lock->clist);
- 				spin_unlock(&work->conn->llist_lock);
- 
--				spin_lock(&fp->f_lock);
--				list_del(&work->fp_entry);
--				spin_unlock(&fp->f_lock);
- 				goto retry;
- 			} else if (!rc) {
- 				spin_lock(&work->conn->llist_lock);
-diff --git a/fs/ksmbd/vfs_cache.c b/fs/ksmbd/vfs_cache.c
-index da9163b00350..0ae5dd0829e9 100644
---- a/fs/ksmbd/vfs_cache.c
-+++ b/fs/ksmbd/vfs_cache.c
-@@ -364,12 +364,11 @@ static void __put_fd_final(struct ksmbd_work *work, struct ksmbd_file *fp)
- 
- static void set_close_state_blocked_works(struct ksmbd_file *fp)
- {
--	struct ksmbd_work *cancel_work, *ctmp;
-+	struct ksmbd_work *cancel_work;
- 
- 	spin_lock(&fp->f_lock);
--	list_for_each_entry_safe(cancel_work, ctmp, &fp->blocked_works,
-+	list_for_each_entry(cancel_work, &fp->blocked_works,
- 				 fp_entry) {
--		list_del(&cancel_work->fp_entry);
- 		cancel_work->state = KSMBD_WORK_CLOSED;
- 		cancel_work->cancel_fn(cancel_work->cancel_argv);
- 	}
 -- 
-2.34.1
-
+Regards,
+Shyam
