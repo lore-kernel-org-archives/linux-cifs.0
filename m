@@ -2,284 +2,101 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 492F3C636CC
-	for <linux-cifs@archiver.kernel.org>; Wed, 15 Feb 2023 12:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA58C636D4
+	for <linux-cifs@archiver.kernel.org>; Wed, 15 Feb 2023 13:03:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbjBOMBM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Feb 2023 07:01:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57968 "EHLO
+        id S233915AbjBONDG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 15 Feb 2023 08:03:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233907AbjBOMBE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Feb 2023 07:01:04 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B571738658
-        for <linux-cifs@vger.kernel.org>; Wed, 15 Feb 2023 04:00:46 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id u21so21730619edv.3
-        for <linux-cifs@vger.kernel.org>; Wed, 15 Feb 2023 04:00:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CTdIxWofoZbrNI+0T5uLIfywbnnYI1faqI99lTcvgD4=;
-        b=DPicoMrchplmMVruPuhN53nBF3IEotLq2L0p8YcPJQ/0AhVREKehl4KLdc0YoUq0I6
-         NvKJ2gKHd8Gw7UWHAIIsgLMBdwJyAez/8/bqIo/2lCe9Nb/2JXiQhOZ3iIgJgDFwIWij
-         piXl5UgaHibBzS/wSK2geYlTyiHZbKnOGSBGuZgLG5pzX9QxpD38KQgkRBF8j7cNBoWx
-         JSOQLarV6h92oB3j4J0q7X3dH4XcGSAP8PgHMgG6p9NB+wuKkCbLzta/Avvx+MLgyfZv
-         Uh6RmRfo3OiAwRm4U3D3XIK76pCRL/0GMLimRRuOeDYN+P4XN8YpkW/XTRWkzHyJltCo
-         O46Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CTdIxWofoZbrNI+0T5uLIfywbnnYI1faqI99lTcvgD4=;
-        b=fzFmSeOcKpOhO+eQ6PKYP7KrsMkA6IUKhsLOz7ma/ZGFC3yVbNQwPaGsetyGOGNpVs
-         8e+Uyruv8SC8Smgs236yMdyLU0YL0p2v1yyJMexmC519xSK62uJwZMf/i1Do6g53nnxI
-         3Vo+fRrBcuZYxLdx/JUmnpl4IjIEidSHZ50mHKB/jD8aft8COjWhtYXuur0vulZ8e6Tb
-         OUu1HwzQmBGykfaJE71vTNttCJLi0qR93LIGAD/5rgBhp4wEISz7pKlFs8iu0varwBs6
-         PHZwOS3PxDWfaT3jcVVmOoNT739RX5Y3AS7n0jfn5Zkn+39k+1hfFIQziC04LIw7Kkg4
-         Fzgw==
-X-Gm-Message-State: AO0yUKXhmYFQ0QYhwnN9PyWoWIJp5RW973hPezUzxPiGIbiXVc3AAScJ
-        AGNl6rbujgVH644ymgbwKm3rLQ==
-X-Google-Smtp-Source: AK7set+hCDLUEnIdvXW6KZUjw70YbZYedf6amBYRgn/9tgsiKw/kn/BqszQM6Js3Oo3miu4VimUPLg==
-X-Received: by 2002:a50:ec85:0:b0:4ad:66b:84a6 with SMTP id e5-20020a50ec85000000b004ad066b84a6mr1654860edr.13.1676462445119;
-        Wed, 15 Feb 2023 04:00:45 -0800 (PST)
-Received: from [192.168.1.101] (abxh117.neoplus.adsl.tpnet.pl. [83.9.1.117])
-        by smtp.gmail.com with ESMTPSA id h2-20020a056402094200b004acb42134c4sm7001477edz.70.2023.02.15.04.00.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Feb 2023 04:00:44 -0800 (PST)
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-Date:   Wed, 15 Feb 2023 13:00:39 +0100
-Subject: [PATCH 2/2] Revert "splice: Do splice read from a buffered file
- without using ITER_PIPE"
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230215-topic-next-20230214-revert-v1-2-c58cd87b9086@linaro.org>
-References: <20230215-topic-next-20230214-revert-v1-0-c58cd87b9086@linaro.org>
-In-Reply-To: <20230215-topic-next-20230214-revert-v1-0-c58cd87b9086@linaro.org>
-To:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        with ESMTP id S233836AbjBONDF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Feb 2023 08:03:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27E535252
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Feb 2023 05:02:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676466128;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1kO8N6JLykhQ4YdfKs2d43b+gPORvqK7xPAz9ypT+Zk=;
+        b=evrgbIJa3NmCarau6CRjtl8FINp/OfKkv5n+GqX07uBwkZprbvu7eTMEJVw/NAzfv6Nvgj
+        H0pCtrxIck+a89ydGwuCbu6apizx9neVnJ8nbBDrXC3d+dZLlgl+tS8kBxm56M900gjQh6
+        q7/NvzaXrEVyeyVOMZEKzAY13vNVGCE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-653-BxtiEXZhM5WJBsv1CLOnxg-1; Wed, 15 Feb 2023 08:02:02 -0500
+X-MC-Unique: BxtiEXZhM5WJBsv1CLOnxg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 842BD3C10691;
+        Wed, 15 Feb 2023 13:02:01 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 57EA9140EBF4;
+        Wed, 15 Feb 2023 13:01:59 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230215-topic-next-20230214-revert-v1-2-c58cd87b9086@linaro.org>
+References: <20230215-topic-next-20230214-revert-v1-2-c58cd87b9086@linaro.org> <20230215-topic-next-20230214-revert-v1-0-c58cd87b9086@linaro.org>
+To:     Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc:     dhowells@redhat.com, Alexander Viro <viro@zeniv.linux.org.uk>,
         Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
         Tom Talpey <tom@talpey.com>,
         "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-mm@kvack.org, Konrad Dybcio <konrad.dybcio@linaro.org>
-X-Mailer: b4 0.12.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1676462440; l=5678;
- i=konrad.dybcio@linaro.org; s=20230215; h=from:subject:message-id;
- bh=GhZqoVotGOrdGVVTlpDSlth0cBTnSieaqw2vZSOgwMg=;
- b=kNOAlZxm146sX4RVEP1agu2t6Duxj4iwCjq2UwEUESRutNpNxNhcL8oQbqfeiw57PyJEeXzT37Oe
- coVqbCJODCzECjLMISdgy6cJo3Khk2+tqwAcR/SUcXvaAedyrvLB
-X-Developer-Key: i=konrad.dybcio@linaro.org; a=ed25519;
- pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
+        linux-mm@kvack.org
+Subject: Re: [PATCH 2/2] Revert "splice: Do splice read from a buffered file without using ITER_PIPE"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3055588.1676466118.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 15 Feb 2023 13:01:58 +0000
+Message-ID: <3055589.1676466118@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-next-20230213 introduced commit d9722a475711 ("splice: Do splice read from
-a buffered file without using ITER_PIPE") which broke booting on any
-Qualcomm ARM64 device I grabbed, dereferencing a null pointer in
-generic_filesplice_read+0xf8/x598. Revert it to make the devices
-bootable again.
+Konrad Dybcio <konrad.dybcio@linaro.org> wrote:
 
-This reverts commit d9722a47571104f7fa1eeb5ec59044d3607c6070.
-Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
----
- fs/splice.c | 159 +++++++++---------------------------------------------------
- 1 file changed, 24 insertions(+), 135 deletions(-)
+> next-20230213 introduced commit d9722a475711 ("splice: Do splice read fr=
+om
+> a buffered file without using ITER_PIPE") which broke booting on any
+> Qualcomm ARM64 device I grabbed, dereferencing a null pointer in
+> generic_filesplice_read+0xf8/x598. Revert it to make the devices
+> bootable again.
+> =
 
-diff --git a/fs/splice.c b/fs/splice.c
-index fa82dfee1ed0..10b258250868 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -22,7 +22,6 @@
- #include <linux/fs.h>
- #include <linux/file.h>
- #include <linux/pagemap.h>
--#include <linux/pagevec.h>
- #include <linux/splice.h>
- #include <linux/memcontrol.h>
- #include <linux/mm_inline.h>
-@@ -378,135 +377,6 @@ static ssize_t generic_file_direct_splice_read(struct file *in, loff_t *ppos,
- 	return ret;
- }
- 
--/*
-- * Splice subpages from a folio into a pipe.
-- */
--static size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
--				     struct folio *folio,
--				     loff_t fpos, size_t size)
--{
--	struct page *page;
--	size_t spliced = 0, offset = offset_in_folio(folio, fpos);
--
--	page = folio_page(folio, offset / PAGE_SIZE);
--	size = min(size, folio_size(folio) - offset);
--	offset %= PAGE_SIZE;
--
--	while (spliced < size &&
--	       !pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
--		struct pipe_buffer *buf = &pipe->bufs[pipe->head & (pipe->ring_size - 1)];
--		size_t part = min_t(size_t, PAGE_SIZE - offset, size - spliced);
--
--		*buf = (struct pipe_buffer) {
--			.ops	= &page_cache_pipe_buf_ops,
--			.page	= page,
--			.offset	= offset,
--			.len	= part,
--		};
--		folio_get(folio);
--		pipe->head++;
--		page++;
--		spliced += part;
--		offset = 0;
--	}
--
--	return spliced;
--}
--
--/*
-- * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
-- * a pipe.
-- */
--static ssize_t generic_file_buffered_splice_read(struct file *in, loff_t *ppos,
--						 struct pipe_inode_info *pipe,
--						 size_t len,
--						 unsigned int flags)
--{
--	struct folio_batch fbatch;
--	size_t total_spliced = 0, used, npages;
--	loff_t isize, end_offset;
--	bool writably_mapped;
--	int i, error = 0;
--
--	struct kiocb iocb = {
--		.ki_filp	= in,
--		.ki_pos		= *ppos,
--	};
--
--	/* Work out how much data we can actually add into the pipe */
--	used = pipe_occupancy(pipe->head, pipe->tail);
--	npages = max_t(ssize_t, pipe->max_usage - used, 0);
--	len = min_t(size_t, len, npages * PAGE_SIZE);
--
--	folio_batch_init(&fbatch);
--
--	do {
--		cond_resched();
--
--		if (*ppos >= i_size_read(file_inode(in)))
--			break;
--
--		iocb.ki_pos = *ppos;
--		error = filemap_get_pages(&iocb, len, &fbatch, true);
--		if (error < 0)
--			break;
--
--		/*
--		 * i_size must be checked after we know the pages are Uptodate.
--		 *
--		 * Checking i_size after the check allows us to calculate
--		 * the correct value for "nr", which means the zero-filled
--		 * part of the page is not copied back to userspace (unless
--		 * another truncate extends the file - this is desired though).
--		 */
--		isize = i_size_read(file_inode(in));
--		if (unlikely(*ppos >= isize))
--			break;
--		end_offset = min_t(loff_t, isize, *ppos + len);
--
--		/*
--		 * Once we start copying data, we don't want to be touching any
--		 * cachelines that might be contended:
--		 */
--		writably_mapped = mapping_writably_mapped(in->f_mapping);
--
--		for (i = 0; i < folio_batch_count(&fbatch); i++) {
--			struct folio *folio = fbatch.folios[i];
--			size_t n;
--
--			if (folio_pos(folio) >= end_offset)
--				goto out;
--			folio_mark_accessed(folio);
--
--			/*
--			 * If users can be writing to this folio using arbitrary
--			 * virtual addresses, take care of potential aliasing
--			 * before reading the folio on the kernel side.
--			 */
--			if (writably_mapped)
--				flush_dcache_folio(folio);
--
--			n = splice_folio_into_pipe(pipe, folio, *ppos, len);
--			if (!n)
--				goto out;
--			len -= n;
--			total_spliced += n;
--			*ppos += n;
--			in->f_ra.prev_pos = *ppos;
--			if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
--				goto out;
--		}
--
--		folio_batch_release(&fbatch);
--	} while (len);
--
--out:
--	folio_batch_release(&fbatch);
--	file_accessed(in);
--
--	return total_spliced ? total_spliced : error;
--}
--
- /**
-  * generic_file_splice_read - splice data from file to a pipe
-  * @in:		file to splice from
-@@ -524,13 +394,32 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
- 				 struct pipe_inode_info *pipe, size_t len,
- 				 unsigned int flags)
- {
--	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
--		return 0;
--	if (unlikely(!len))
--		return 0;
-+	struct iov_iter to;
-+	struct kiocb kiocb;
-+	int ret;
-+
- 	if (in->f_flags & O_DIRECT)
- 		return generic_file_direct_splice_read(in, ppos, pipe, len, flags);
--	return generic_file_buffered_splice_read(in, ppos, pipe, len, flags);
-+
-+	iov_iter_pipe(&to, ITER_DEST, pipe, len);
-+	init_sync_kiocb(&kiocb, in);
-+	kiocb.ki_pos = *ppos;
-+	ret = call_read_iter(in, &kiocb, &to);
-+	if (ret > 0) {
-+		*ppos = kiocb.ki_pos;
-+		file_accessed(in);
-+	} else if (ret < 0) {
-+		/* free what was emitted */
-+		pipe_discard_from(pipe, to.start_head);
-+		/*
-+		 * callers of ->splice_read() expect -EAGAIN on
-+		 * "can't put anything in there", rather than -EFAULT.
-+		 */
-+		if (ret == -EFAULT)
-+			ret = -EAGAIN;
-+	}
-+
-+	return ret;
- }
- EXPORT_SYMBOL(generic_file_splice_read);
- 
+> This reverts commit d9722a47571104f7fa1eeb5ec59044d3607c6070.
+> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
--- 
-2.39.1
+Commit d9722a47571104f7fa1eeb5ec59044d3607c6070 was part of v13 of my
+patches.  This got replaced yesterday by a newer version which may or may =
+not
+have made it into linux-next.
+
+This is probably a known bug fixed in the v14 by making shmem have its own
+splice-read function.
+
+Can you try this?
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log=
+/?h=3Diov-extract
+
+(Also, can you include me in the cc list as I'm the author of the patch yo=
+u
+reverted?)
+
+Thanks,
+David
 
