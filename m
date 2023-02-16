@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC747C636CC
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 21:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C52A7C61DA4
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 21:49:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbjBPVtJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:49:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36164 "EHLO
+        id S230191AbjBPVt0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:49:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjBPVtI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 16:49:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A204BE89
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:48:15 -0800 (PST)
+        with ESMTP id S230083AbjBPVtU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 16:49:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB433B846
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:48:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676584094;
+        s=mimecast20190719; t=1676584100;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iluk0YvlYbmqrBsJ+zi3CUpWIoo6vLBgAkY0zGemXLc=;
-        b=ga3ZmbIeP0zk0wKPuTi0wAdsPjRiPo1jA3n/BpxwynDVDaKiDokDHH+3bv55MxmTzS3Z65
-        wyxWyGV5SObQ9a2ejGxEavlr1P3K+r+Y7WJMxDtoceBraUsCA7nUQE/NBf6rn3CuSwqzHp
-        2titvWHWF2Blb/A7bKhIBvIL30m2OFQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=LFENKL+WQlWvhbDc2HxenGINBq9+lQWBR5ko6ef/r4M=;
+        b=ViuFyVdS6vSNIQM223c65lCRmxkaqQ2rmX/di7ts2xGlA5QW6RxFlqEQhv/MAfQ0Vh11qf
+        9D4cVaEywJQEd8mNjmLKQWFwBcgvPRCa2GWJ7c4INSvXctFgJ7Nv6x43Cpxf1PvutTWX13
+        iHtPn+MivIju6RlK1oC//akaN8+h+UY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-668-Jom6SA2lN1mnPzx0-IYKGQ-1; Thu, 16 Feb 2023 16:48:11 -0500
-X-MC-Unique: Jom6SA2lN1mnPzx0-IYKGQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-267-_tSm9z9QMGu8nYP2_juG9w-1; Thu, 16 Feb 2023 16:48:17 -0500
+X-MC-Unique: _tSm9z9QMGu8nYP2_juG9w-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 774593C0F686;
-        Thu, 16 Feb 2023 21:48:10 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 25232802D32;
+        Thu, 16 Feb 2023 21:48:16 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 81E7D401014C;
-        Thu, 16 Feb 2023 21:47:50 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E2AC5492B15;
+        Thu, 16 Feb 2023 21:48:13 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
@@ -50,130 +50,236 @@ Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        syzbot+a440341a59e3b7142895@syzkaller.appspotmail.com,
         Christoph Hellwig <hch@lst.de>,
         David Hildenbrand <david@redhat.com>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH 01/17] mm: Pass info, not iter, into filemap_get_pages()
-Date:   Thu, 16 Feb 2023 21:47:29 +0000
-Message-Id: <20230216214745.3985496-2-dhowells@redhat.com>
+Subject: [PATCH 03/17] splice: Add a func to do a splice from an O_DIRECT file without ITER_PIPE
+Date:   Thu, 16 Feb 2023 21:47:31 +0000
+Message-Id: <20230216214745.3985496-4-dhowells@redhat.com>
 In-Reply-To: <20230216214745.3985496-1-dhowells@redhat.com>
 References: <20230216214745.3985496-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-filemap_get_pages() and a number of functions that it calls take an
-iterator to provide two things: the number of bytes to be got from the file
-specified and whether partially uptodate pages are allowed.  Change these
-functions so that this information is passed in directly.  This allows it
-to be called without having an iterator to hand.
+Implement a function, direct_file_splice(), that deals with this by using
+an ITER_BVEC iterator instead of an ITER_PIPE iterator as the former won't
+free its buffers when reverted.  The function bulk allocates all the
+buffers it thinks it is going to use in advance, does the read
+synchronously and only then trims the buffer down.  The pages we did use
+get pushed into the pipe.
 
+This fixes a problem with the upcoming iov_iter_extract_pages() function,
+whereby pages extracted from a non-user-backed iterator such as ITER_PIPE
+aren't pinned.  __iomap_dio_rw(), however, calls iov_iter_revert() to
+shorten the iterator to just the bufferage it is going to use - which has
+the side-effect of freeing the excess pipe buffers, even though they're
+attached to a bio and may get written to by DMA (thanks to Hillf Danton for
+spotting this[1]).
+
+This then causes memory corruption that is particularly noticable when the
+syzbot test[2] is run.  The test boils down to:
+
+	out = creat(argv[1], 0666);
+	ftruncate(out, 0x800);
+	lseek(out, 0x200, SEEK_SET);
+	in = open(argv[1], O_RDONLY | O_DIRECT | O_NOFOLLOW);
+	sendfile(out, in, NULL, 0x1dd00);
+
+run repeatedly in parallel.  What I think is happening is that ftruncate()
+occasionally shortens the DIO read that's about to be made by sendfile's
+splice core by reducing i_size.
+
+This should be more efficient for DIO read by virtue of doing a bulk page
+allocation, but slightly less efficient by ignoring any partial page in the
+pipe.
+
+Reported-by: syzbot+a440341a59e3b7142895@syzkaller.appspotmail.com
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jens Axboe <axboe@kernel.dk>
 cc: Christoph Hellwig <hch@lst.de>
-cc: Matthew Wilcox <willy@infradead.org>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: David Hildenbrand <david@redhat.com>
 cc: John Hubbard <jhubbard@nvidia.com>
 cc: linux-mm@kvack.org
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
+Link: https://lore.kernel.org/r/20230207094731.1390-1-hdanton@sina.com/ [1]
+Link: https://lore.kernel.org/r/000000000000b0b3c005f3a09383@google.com/ [2]
 ---
- mm/filemap.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ fs/splice.c               | 92 +++++++++++++++++++++++++++++++++++++++
+ include/linux/fs.h        |  3 ++
+ include/linux/pipe_fs_i.h | 20 +++++++++
+ lib/iov_iter.c            |  6 ---
+ 4 files changed, 115 insertions(+), 6 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index c4d4ace9cc70..876e77278d2a 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2440,21 +2440,19 @@ static int filemap_read_folio(struct file *file, filler_t filler,
+diff --git a/fs/splice.c b/fs/splice.c
+index 5969b7a1d353..4c6332854b63 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -282,6 +282,98 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
+ 	kfree(spd->partial);
  }
  
- static bool filemap_range_uptodate(struct address_space *mapping,
--		loff_t pos, struct iov_iter *iter, struct folio *folio)
-+		loff_t pos, size_t count, struct folio *folio,
-+		bool need_uptodate)
- {
--	int count;
++/*
++ * Splice data from an O_DIRECT file into pages and then add them to the output
++ * pipe.
++ */
++ssize_t direct_splice_read(struct file *in, loff_t *ppos,
++			   struct pipe_inode_info *pipe,
++			   size_t len, unsigned int flags)
++{
++	struct iov_iter to;
++	struct bio_vec *bv;
++	struct kiocb kiocb;
++	struct page **pages;
++	ssize_t ret;
++	size_t used, npages, chunk, remain, reclaim;
++	int i;
++
++	/* Work out how much data we can actually add into the pipe */
++	used = pipe_occupancy(pipe->head, pipe->tail);
++	npages = max_t(ssize_t, pipe->max_usage - used, 0);
++	len = min_t(size_t, len, npages * PAGE_SIZE);
++	npages = DIV_ROUND_UP(len, PAGE_SIZE);
++
++	bv = kzalloc(array_size(npages, sizeof(bv[0])) +
++		     array_size(npages, sizeof(struct page *)), GFP_KERNEL);
++	if (!bv)
++		return -ENOMEM;
++
++	pages = (void *)(bv + npages);
++	npages = alloc_pages_bulk_array(GFP_USER, npages, pages);
++	if (!npages) {
++		kfree(bv);
++		return -ENOMEM;
++	}
++
++	remain = len = min_t(size_t, len, npages * PAGE_SIZE);
++
++	for (i = 0; i < npages; i++) {
++		chunk = min_t(size_t, PAGE_SIZE, remain);
++		bv[i].bv_page = pages[i];
++		bv[i].bv_offset = 0;
++		bv[i].bv_len = chunk;
++		remain -= chunk;
++	}
++
++	/* Do the I/O */
++	iov_iter_bvec(&to, ITER_DEST, bv, npages, len);
++	init_sync_kiocb(&kiocb, in);
++	kiocb.ki_pos = *ppos;
++	ret = call_read_iter(in, &kiocb, &to);
++
++	reclaim = npages * PAGE_SIZE;
++	remain = 0;
++	if (ret > 0) {
++		reclaim -= ret;
++		remain = ret;
++		*ppos = kiocb.ki_pos;
++		file_accessed(in);
++	} else if (ret < 0) {
++		/*
++		 * callers of ->splice_read() expect -EAGAIN on
++		 * "can't put anything in there", rather than -EFAULT.
++		 */
++		if (ret == -EFAULT)
++			ret = -EAGAIN;
++	}
++
++	/* Free any pages that didn't get touched at all. */
++	reclaim /= PAGE_SIZE;
++	if (reclaim) {
++		npages -= reclaim;
++		release_pages(pages + npages, reclaim);
++	}
++
++	/* Push the remaining pages into the pipe. */
++	for (i = 0; i < npages; i++) {
++		struct pipe_buffer *buf = pipe_head_buf(pipe);
++
++		chunk = min_t(size_t, remain, PAGE_SIZE);
++		*buf = (struct pipe_buffer) {
++			.ops	= &default_pipe_buf_ops,
++			.page	= bv[i].bv_page,
++			.offset	= 0,
++			.len	= chunk,
++		};
++		pipe->head++;
++		remain -= chunk;
++	}
++
++	kfree(bv);
++	return ret;
++}
++
+ /**
+  * generic_file_splice_read - splice data from file to a pipe
+  * @in:		file to splice from
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 28743e38df91..551c9403f9b3 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3166,6 +3166,9 @@ ssize_t vfs_iocb_iter_write(struct file *file, struct kiocb *iocb,
+ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+ 			    struct pipe_inode_info *pipe,
+ 			    size_t len, unsigned int flags);
++ssize_t direct_splice_read(struct file *in, loff_t *ppos,
++			   struct pipe_inode_info *pipe,
++			   size_t len, unsigned int flags);
+ extern ssize_t generic_file_splice_read(struct file *, loff_t *,
+ 		struct pipe_inode_info *, size_t, unsigned int);
+ extern ssize_t iter_file_splice_write(struct pipe_inode_info *,
+diff --git a/include/linux/pipe_fs_i.h b/include/linux/pipe_fs_i.h
+index 6cb65df3e3ba..d2c3f16cf6b1 100644
+--- a/include/linux/pipe_fs_i.h
++++ b/include/linux/pipe_fs_i.h
+@@ -156,6 +156,26 @@ static inline bool pipe_full(unsigned int head, unsigned int tail,
+ 	return pipe_occupancy(head, tail) >= limit;
+ }
+ 
++/**
++ * pipe_buf - Return the pipe buffer for the specified slot in the pipe ring
++ * @pipe: The pipe to access
++ * @slot: The slot of interest
++ */
++static inline struct pipe_buffer *pipe_buf(const struct pipe_inode_info *pipe,
++					   unsigned int slot)
++{
++	return &pipe->bufs[slot & (pipe->ring_size - 1)];
++}
++
++/**
++ * pipe_head_buf - Return the pipe buffer at the head of the pipe ring
++ * @pipe: The pipe to access
++ */
++static inline struct pipe_buffer *pipe_head_buf(const struct pipe_inode_info *pipe)
++{
++	return pipe_buf(pipe, pipe->head);
++}
++
+ /**
+  * pipe_buf_get - get a reference to a pipe_buffer
+  * @pipe:	the pipe that the buffer belongs to
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index f9a3ff37ecd1..47c484551c59 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -186,12 +186,6 @@ static int copyin(void *to, const void __user *from, size_t n)
+ 	return res;
+ }
+ 
+-static inline struct pipe_buffer *pipe_buf(const struct pipe_inode_info *pipe,
+-					   unsigned int slot)
+-{
+-	return &pipe->bufs[slot & (pipe->ring_size - 1)];
+-}
 -
- 	if (folio_test_uptodate(folio))
- 		return true;
- 	/* pipes can't handle partially uptodate pages */
--	if (iov_iter_is_pipe(iter))
-+	if (need_uptodate)
- 		return false;
- 	if (!mapping->a_ops->is_partially_uptodate)
- 		return false;
- 	if (mapping->host->i_blkbits >= folio_shift(folio))
- 		return false;
- 
--	count = iter->count;
- 	if (folio_pos(folio) > pos) {
- 		count -= folio_pos(folio) - pos;
- 		pos = 0;
-@@ -2466,8 +2464,8 @@ static bool filemap_range_uptodate(struct address_space *mapping,
- }
- 
- static int filemap_update_page(struct kiocb *iocb,
--		struct address_space *mapping, struct iov_iter *iter,
--		struct folio *folio)
-+		struct address_space *mapping, size_t count,
-+		struct folio *folio, bool need_uptodate)
+ #ifdef PIPE_PARANOIA
+ static bool sanity(const struct iov_iter *i)
  {
- 	int error;
- 
-@@ -2501,7 +2499,8 @@ static int filemap_update_page(struct kiocb *iocb,
- 		goto unlock;
- 
- 	error = 0;
--	if (filemap_range_uptodate(mapping, iocb->ki_pos, iter, folio))
-+	if (filemap_range_uptodate(mapping, iocb->ki_pos, count, folio,
-+				   need_uptodate))
- 		goto unlock;
- 
- 	error = -EAGAIN;
-@@ -2577,8 +2576,8 @@ static int filemap_readahead(struct kiocb *iocb, struct file *file,
- 	return 0;
- }
- 
--static int filemap_get_pages(struct kiocb *iocb, struct iov_iter *iter,
--		struct folio_batch *fbatch)
-+static int filemap_get_pages(struct kiocb *iocb, size_t count,
-+		struct folio_batch *fbatch, bool need_uptodate)
- {
- 	struct file *filp = iocb->ki_filp;
- 	struct address_space *mapping = filp->f_mapping;
-@@ -2588,7 +2587,7 @@ static int filemap_get_pages(struct kiocb *iocb, struct iov_iter *iter,
- 	struct folio *folio;
- 	int err = 0;
- 
--	last_index = DIV_ROUND_UP(iocb->ki_pos + iter->count, PAGE_SIZE);
-+	last_index = DIV_ROUND_UP(iocb->ki_pos + count, PAGE_SIZE);
- retry:
- 	if (fatal_signal_pending(current))
- 		return -EINTR;
-@@ -2621,7 +2620,8 @@ static int filemap_get_pages(struct kiocb *iocb, struct iov_iter *iter,
- 		if ((iocb->ki_flags & IOCB_WAITQ) &&
- 		    folio_batch_count(fbatch) > 1)
- 			iocb->ki_flags |= IOCB_NOWAIT;
--		err = filemap_update_page(iocb, mapping, iter, folio);
-+		err = filemap_update_page(iocb, mapping, count, folio,
-+					  need_uptodate);
- 		if (err)
- 			goto err;
- 	}
-@@ -2691,7 +2691,8 @@ ssize_t filemap_read(struct kiocb *iocb, struct iov_iter *iter,
- 		if (unlikely(iocb->ki_pos >= i_size_read(inode)))
- 			break;
- 
--		error = filemap_get_pages(iocb, iter, &fbatch);
-+		error = filemap_get_pages(iocb, iter->count, &fbatch,
-+					  iov_iter_is_pipe(iter));
- 		if (error < 0)
- 			break;
- 
 
