@@ -2,102 +2,140 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DC6C636CC
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 14:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D135FC61DA4
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 15:08:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229800AbjBPOZe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 09:25:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36894 "EHLO
+        id S230040AbjBPPH7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Feb 2023 10:07:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbjBPOZd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 09:25:33 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9002497F4;
-        Thu, 16 Feb 2023 06:25:17 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229475AbjBPPH6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 10:07:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5FAE29161
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 07:07:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676560031;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4Zm5Dn7i1p/5BiDzjYElohEtJkvunM7mT3Q22YOMQp4=;
+        b=g8cnHZvofZ7i/w9wp+ISRIzMVPyhB7KpY+X4KED2BKu1g65nAAZs+z2pmgUwMdPP+EiRb0
+        RGgCanFsMHq8Em2Nw0GBJfqAEENFcrJBqujhFXypVDL3N90sHh3I1WU41j1HpRPe5pB1/t
+        TM4lrA6MK5DXps66GDWv35ivlgRGEwg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-6-iIVyHqFbOUyMy5heOHW_ZQ-1; Thu, 16 Feb 2023 10:07:09 -0500
+X-MC-Unique: iIVyHqFbOUyMy5heOHW_ZQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 97080B8284E;
-        Thu, 16 Feb 2023 14:25:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45DFDC433A1;
-        Thu, 16 Feb 2023 14:25:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676557503;
-        bh=DlaFGPI8/PtG0jbRs8yDMyRigvxWoADQdFPsFBEUvVM=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=jtPb9BXfoJ4ZIuteko19xvEHrh0zX9vL+hj21bb6i9YloP5XD4j0AzdYnrNw/r1cV
-         irTY1qdNbSU6KHCtRGYajBsFTXo5RihWxDt6qmzyEG/tlAiIKA4VZCyuxIb8zXfcK+
-         7b2C8p1C/NXEgYNStB11TWeq4NWj4fYRYDI2TSJyarB99J32scKwyTeeNvGxYb5tbJ
-         pwB/9qiPeh4iOe9T+t+ydQDl2em2wxZhNTyvrNXc3PoOlvZDWYsdN0QPZ6bXDtrNe4
-         TsGw1SfbYUDD4aVR7dyDpsy2RIfLhXPdkbuVMKOZMUtNPy6n0WsQ0DpNVHD+Zyj8XL
-         EEuI/zj4uTO9w==
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-16df32f2ffdso2726411fac.1;
-        Thu, 16 Feb 2023 06:25:03 -0800 (PST)
-X-Gm-Message-State: AO0yUKUzMsLcMiAqD1Tq1QlfVrxfye0o16DPxKnyGWwASPJj7n7mLIN6
-        8UaCreNYbyE2k8+q8hmfqZgefKgV+CJzdoEC99Q=
-X-Google-Smtp-Source: AK7set/YDnoRsXFW4kmp4obtqoSrpLbMekh5OLqyPQitghf4s397JCGpwBcy4mlMZ5KbG30FMsXw3/Lnue0SZ0ll3J0=
-X-Received: by 2002:a05:6870:b52c:b0:16a:b198:74e9 with SMTP id
- v44-20020a056870b52c00b0016ab19874e9mr194278oap.215.1676557502403; Thu, 16
- Feb 2023 06:25:02 -0800 (PST)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2CAE93C14862;
+        Thu, 16 Feb 2023 15:07:07 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E53A4010E85;
+        Thu, 16 Feb 2023 15:07:05 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, linux-erofs@lists.ozlabs.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v6 0/2] mm, netfs, fscache: Stop read optimisation when folio removed from pagecache
+Date:   Thu, 16 Feb 2023 15:06:59 +0000
+Message-Id: <20230216150701.3654894-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a8a:355:0:b0:4a5:1048:434b with HTTP; Thu, 16 Feb 2023
- 06:25:01 -0800 (PST)
-In-Reply-To: <20230214232928.gonna.714-kees@kernel.org>
-References: <20230214232928.gonna.714-kees@kernel.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 16 Feb 2023 23:25:01 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-fcukmXfdwiAxOxe+5c+Y6vvaoQ3ff-5sK+Zis0HgC5A@mail.gmail.com>
-Message-ID: <CAKYAXd-fcukmXfdwiAxOxe+5c+Y6vvaoQ3ff-5sK+Zis0HgC5A@mail.gmail.com>
-Subject: Re: [PATCH v2] smb3: Replace smb2pdu 1-element arrays with flex-arrays
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Kees,
+Hi Willy,
 
->  /* Read flags */
-> @@ -730,7 +730,7 @@ struct smb2_read_rsp {
->  	__le32 DataLength;
->  	__le32 DataRemaining;
->  	__le32 Flags;
-> -	__u8   Buffer[1];
-> +	__u8   Buffer[];
->  } __packed;
->
+Is this okay by you?  You said you wanted to look at the remaining uses of
+page_has_private(), of which there are then three after these patches, not
+counting folio_has_private():
 
-You seem to have missed -1 removal in the code below.
+	arch/s390/kernel/uv.c:          if (page_has_private(page))
+	mm/khugepaged.c:                    1 + page_mapcount(page) + page_has_private(page)) {
+	mm/migrate_device.c:            extra += 1 + page_has_private(page);
 
-./fs/cifs/smb2ops.c:5632:       .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/cifs/smb2ops.c:5654:       .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/cifs/smb2ops.c:5675:       .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/cifs/smb2ops.c:5696:       .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/cifs/smb2ops.c:5717:       .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/cifs/smb2ops.c:5738:       .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/cifs/smb2ops.c:5759:       .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
+--
+I've split the folio_has_private()/filemap_release_folio() call pair
+merging into its own patch, separate from the actual bugfix and pulled out
+the folio_needs_release() function into mm/internal.h and made
+filemap_release_folio() use it.  I've also got rid of the bit clearances
+from the network filesystem evict_inode functions as they doesn't seem to
+be necessary.
 
-./fs/ksmbd/smb2ops.c:29:        .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/ksmbd/smb2ops.c:55:        .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/ksmbd/smb2ops.c:82:        .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
-./fs/ksmbd/smb2ops.c:109:       .read_rsp_size = sizeof(struct
-smb2_read_rsp) - 1,
+Note that the last vestiges of try_to_release_page() got swept away, so I
+rebased and dealt with that.  One comment remained, which is removed by the
+first patch.
 
-thanks.
+David
+
+Changes:
+========
+ver #6)
+ - Drop the third patch which removes a duplicate check in vmscan().
+
+ver #5)
+ - Rebased on linus/master.  try_to_release_page() has now been entirely
+   replaced by filemap_release_folio(), barring one comment.
+ - Cleaned up some pairs in ext4.
+
+ver #4)
+ - Split has_private/release call pairs into own patch.
+ - Moved folio_needs_release() to mm/internal.h and removed open-coded
+   version from filemap_release_folio().
+ - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
+ - Added experimental patch to reduce shrink_folio_list().
+
+ver #3)
+ - Fixed mapping_clear_release_always() to use clear_bit() not set_bit().
+ - Moved a '&&' to the correct line.
+
+ver #2)
+ - Rewrote entirely according to Willy's suggestion[1].
+
+Link: https://lore.kernel.org/r/Yk9V/03wgdYi65Lb@casper.infradead.org/ [1]
+Link: https://lore.kernel.org/r/164928630577.457102.8519251179327601178.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/166844174069.1124521.10890506360974169994.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/166869495238.3720468.4878151409085146764.stgit@warthog.procyon.org.uk/ # v3
+Link: https://lore.kernel.org/r/1459152.1669208550@warthog.procyon.org.uk/ # v3 also
+Link: https://lore.kernel.org/r/166924370539.1772793.13730698360771821317.stgit@warthog.procyon.org.uk/ # v4
+Link: https://lore.kernel.org/r/167172131368.2334525.8569808925687731937.stgit@warthog.procyon.org.uk/ # v5
+---
+%(shortlog)s
+%(diffstat)s
+
+David Howells (2):
+  mm: Merge folio_has_private()/filemap_release_folio() call pairs
+  mm, netfs, fscache: Stop read optimisation when folio removed from
+    pagecache
+
+ fs/9p/cache.c           |  2 ++
+ fs/afs/internal.h       |  2 ++
+ fs/cachefiles/namei.c   |  2 ++
+ fs/ceph/cache.c         |  2 ++
+ fs/cifs/fscache.c       |  2 ++
+ fs/ext4/move_extent.c   | 12 ++++--------
+ fs/splice.c             |  3 +--
+ include/linux/pagemap.h | 16 ++++++++++++++++
+ mm/filemap.c            |  2 ++
+ mm/huge_memory.c        |  3 +--
+ mm/internal.h           | 11 +++++++++++
+ mm/khugepaged.c         |  3 +--
+ mm/memory-failure.c     |  8 +++-----
+ mm/migrate.c            |  3 +--
+ mm/truncate.c           |  6 ++----
+ mm/vmscan.c             |  8 ++++----
+ 16 files changed, 56 insertions(+), 29 deletions(-)
+
