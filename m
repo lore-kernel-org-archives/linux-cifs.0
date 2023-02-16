@@ -2,268 +2,211 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E3A7C636CC
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 15:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 147F1C64EC4
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 18:43:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229907AbjBPPJG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 10:09:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43132 "EHLO
+        id S229781AbjBPSnA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Feb 2023 13:43:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230288AbjBPPIq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 10:08:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD3C93B870
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 07:07:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676560039;
+        with ESMTP id S229746AbjBPSm7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 13:42:59 -0500
+X-Greylist: delayed 555 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 16 Feb 2023 10:42:57 PST
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD712005C
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 10:42:57 -0800 (PST)
+From:   Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1676572418;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dEvVR7mNrJtJrzwBvJMyNMWCqmrGhsk9d3FtHweO8aQ=;
-        b=HlsbL4OyxLqB124e9FCZ+1BdP2U3FpGrOto2rm6uyx59zgWLq9qxecbDJdfFTuwyRBCZnS
-        Me9Yk7ypGFMYoY9xvOjkFPGMC62mcuzwbxdUD49+SJVSHBQpV73m9kqoagJwVlujx8TdgA
-        VjgB9pm6//3+J3lD3Cc7le/sQzp/iT0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-518-h1RdFIDIPg6lnrRYr2xXyw-1; Thu, 16 Feb 2023 10:07:16 -0500
-X-MC-Unique: h1RdFIDIPg6lnrRYr2xXyw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CFC4B3C1486A;
-        Thu, 16 Feb 2023 15:07:13 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A3572026D4B;
-        Thu, 16 Feb 2023 15:07:11 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, linux-erofs@lists.ozlabs.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Dave Wysochanski <dwysocha@redhat.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Ilya Dryomov <idryomov@gmail.com>, linux-mm@kvack.org
-Subject: [PATCH v6 2/2] mm, netfs, fscache: Stop read optimisation when folio removed from pagecache
-Date:   Thu, 16 Feb 2023 15:07:01 +0000
-Message-Id: <20230216150701.3654894-3-dhowells@redhat.com>
-In-Reply-To: <20230216150701.3654894-1-dhowells@redhat.com>
-References: <20230216150701.3654894-1-dhowells@redhat.com>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=KUihj16f+Rl0+EPBbj+6wYxYUlXR+HnEh4sSX2ydQaY=;
+        b=WmSnFmve3jX6+ifiOQ/fV0AyxLradgno1F9LSQ3BSTMWd+0WS4XzIoz951WdyR1+jSMzeu
+        Z+G/vfb90OAAVWNN0J/DsFjk3OWcFkUapFergbdtAsvQRTCABcRvVt1bu1mMMHiSpliDG6
+        Qov4dMVtnj62SOtJRm79oqDbtfC75/QOuTlu1rcZzmBuySEbtR/uYPvSDEKagU/CEaWLyc
+        iDdQnIwPJ8EjGWJg3HP5Bv5+huYDnccyfX51IeYNlc63np8HdRDHvtdHKjyPnNGd0HDnoy
+        1a6Q7ae8VwTXDqdXW3tlWrOb75tPIqHnCnQP9IUu3gR88vNBYZkJeNWwxJMK8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1676572418;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=KUihj16f+Rl0+EPBbj+6wYxYUlXR+HnEh4sSX2ydQaY=;
+        b=HKOK8l+7wRBDxSwqHfDsAhUjs7odnymY9V0lVZZK/W/cpKmNPQuSrmBLaTWmyiMQ+xvnAB
+        r7170JaNXgSr5tSW6ILiCakf2/GdJfhGUVbigbz0a9f3efclvL5gbk3e3olXivfZU08E7C
+        rRrg+6QNX1dhmmzoPj19pz+P7h3GPk2b2Wca0jEFZDiJ6pBlrQg69oY6vGF57o5VQIgJ1F
+        Syv8jR5FqRxMc1azQTTQH+M/k/vyyYM841LEHghjbjByaTRK8aeuskxKccX5mq1PZnjfPU
+        PCvfGgNzJyTlxpB3HjcQWhxTxHNlbwgIW4+CZbuzi31qFx4Uh3h9F1Fpa86ujw==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1676572418; a=rsa-sha256;
+        cv=none;
+        b=rVjJFmFJHzKbCbnKI44u70qvrAjw9KTENWIVWYdo2heUOSs4zLl4Fk+HS276qGW0+cjvOg
+        dAauudSoTNsbkswh/GzSAiAx7MroB3knTD78jJv6DgqvDeK+2b7LX5QnMQ9gbdTvhBjUeW
+        RQQvZl/+W4rOQQ5VwGeeO6LbKb4cuMYh6NYDhvQVcLyzcqkBXJUCNUpy0B4ULUmeEfJios
+        MfRd6fTn+z3SkahJo8kr/rNT6XQWNdZJ55AY6jLTKRwmOnv1kQjV1RUG8Tei3TFFAVKR1q
+        vMe4671wU59+MuwfyfY5NI08qRTukcgW5Nb/Eca0KmD5zsYYRBbRC231TSX+bQ==
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH] cifs: fix mount on old smb servers
+Date:   Thu, 16 Feb 2023 15:33:22 -0300
+Message-Id: <20230216183322@manguebit.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Rspamd-Queue-Id: 4C2F2573E50
+X-Rspamd-Server: srv0
+X-Spamd-Result: default: False [-2.60 / 15.00];
+        BAYES_HAM(-3.00)[100.00%];
+        R_MISSING_CHARSET(0.50)[];
+        MIME_GOOD(-0.10)[text/plain];
+        FREEMAIL_TO(0.00)[gmail.com];
+        RCVD_COUNT_ZERO(0.00)[0];
+        MIME_TRACE(0.00)[0:+];
+        FROM_EQ_ENVFROM(0.00)[];
+        ASN(0.00)[asn:28573, ipnet:187.181.252.0/22, country:BR];
+        FREEMAIL_ENVRCPT(0.00)[gmail.com];
+        DKIM_SIGNED(0.00)[manguebit.com:s=dkim];
+        ARC_SIGNED(0.00)[manguebit.com:s=dkim:i=1];
+        FROM_HAS_DN(0.00)[];
+        MID_RHS_MATCH_FROM(0.00)[];
+        RCPT_COUNT_THREE(0.00)[3];
+        TO_MATCH_ENVRCPT_ALL(0.00)[];
+        TO_DN_SOME(0.00)[];
+        ARC_NA(0.00)[]
+X-Rspamd-Action: no action
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fscache has an optimisation by which reads from the cache are skipped until
-we know that (a) there's data there to be read and (b) that data isn't
-entirely covered by pages resident in the netfs pagecache.  This is done
-with two flags manipulated by fscache_note_page_release():
+The client was sending rfc1002 session request packet with a wrong
+length field set, therefore failing to mount shares against old SMB
+servers over port 139.
 
-	if (...
-	    test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&
-	    test_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags))
-		clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
+Fix this by calculating the correct length as specified in rfc1002.
 
-where the NO_DATA_TO_READ flag causes cachefiles_prepare_read() to indicate
-that netfslib should download from the server or clear the page instead.
-
-The fscache_note_page_release() function is intended to be called from
-->releasepage() - but that only gets called if PG_private or PG_private_2
-is set - and currently the former is at the discretion of the network
-filesystem and the latter is only set whilst a page is being written to the
-cache, so sometimes we miss clearing the optimisation.
-
-Fix this by following Willy's suggestion[1] and adding an address_space
-flag, AS_RELEASE_ALWAYS, that causes filemap_release_folio() to always call
-->release_folio() if it's set, even if PG_private or PG_private_2 aren't
-set.
-
-Note that this would require folio_test_private() and page_has_private() to
-become more complicated.  To avoid that, in the places[*] where these are
-used to conditionalise calls to filemap_release_folio() and
-try_to_release_page(), the tests are removed the those functions just
-jumped to unconditionally and the test is performed there.
-
-[*] There are some exceptions in vmscan.c where the check guards more than
-just a call to the releaser.  I've added a function, folio_needs_release()
-to wrap all the checks for that.
-
-AS_RELEASE_ALWAYS should be set if a non-NULL cookie is obtained from
-fscache and cleared in ->evict_inode() before truncate_inode_pages_final()
-is called.
-
-Additionally, the FSCACHE_COOKIE_NO_DATA_TO_READ flag needs to be cleared
-and the optimisation cancelled if a cachefiles object already contains data
-when we open it.
-
-Reported-by: Rohith Surabattula <rohiths.msft@gmail.com>
-Suggested-by: Matthew Wilcox <willy@infradead.org>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Dave Wysochanski <dwysocha@redhat.com>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Ilya Dryomov <idryomov@gmail.com>
-cc: linux-cachefs@redhat.com
-cc: linux-cifs@vger.kernel.org
-cc: linux-afs@lists.infradead.org
-cc: v9fs-developer@lists.sourceforge.net
-cc: ceph-devel@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
+Fixes: d7173623bf0b ("cifs: use ALIGN() and round_up() macros")
+Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
+ fs/cifs/connect.c | 100 ++++++++++++++++++----------------------------
+ 1 file changed, 38 insertions(+), 62 deletions(-)
 
-Notes:
-    ver #4)
-     - Split out merging of folio_has_private()/filemap_release_folio() call
-       pairs into a preceding patch.
-     - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
-    
-    ver #3)
-     - Fixed mapping_clear_release_always() to use clear_bit() not set_bit().
-     - Moved a '&&' to the correct line.
-    
-    ver #2)
-     - Rewrote entirely according to Willy's suggestion[1].
-
- fs/9p/cache.c           |  2 ++
- fs/afs/internal.h       |  2 ++
- fs/cachefiles/namei.c   |  2 ++
- fs/ceph/cache.c         |  2 ++
- fs/cifs/fscache.c       |  2 ++
- include/linux/pagemap.h | 16 ++++++++++++++++
- mm/internal.h           |  5 ++++-
- 7 files changed, 30 insertions(+), 1 deletion(-)
-
-diff --git a/fs/9p/cache.c b/fs/9p/cache.c
-index cebba4eaa0b5..12c0ae29f185 100644
---- a/fs/9p/cache.c
-+++ b/fs/9p/cache.c
-@@ -68,6 +68,8 @@ void v9fs_cache_inode_get_cookie(struct inode *inode)
- 				       &path, sizeof(path),
- 				       &version, sizeof(version),
- 				       i_size_read(&v9inode->netfs.inode));
-+	if (v9inode->netfs.cache)
-+		mapping_set_release_always(inode->i_mapping);
- 
- 	p9_debug(P9_DEBUG_FSC, "inode %p get cookie %p\n",
- 		 inode, v9fs_inode_cookie(v9inode));
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index fd8567b98e2b..2d7e06fcb77f 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -680,6 +680,8 @@ static inline void afs_vnode_set_cache(struct afs_vnode *vnode,
- {
- #ifdef CONFIG_AFS_FSCACHE
- 	vnode->netfs.cache = cookie;
-+	if (cookie)
-+		mapping_set_release_always(vnode->netfs.inode.i_mapping);
- #endif
- }
- 
-diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-index 03ca8f2f657a..50b2ee163af6 100644
---- a/fs/cachefiles/namei.c
-+++ b/fs/cachefiles/namei.c
-@@ -584,6 +584,8 @@ static bool cachefiles_open_file(struct cachefiles_object *object,
- 	if (ret < 0)
- 		goto check_failed;
- 
-+	clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &object->cookie->flags);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index b2a04b4e89a5..af49ae53aaf4 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2843,72 +2843,48 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
+ 	 * negprot - BB check reconnection in case where second
+ 	 * sessinit is sent but no second negprot
+ 	 */
+-	struct rfc1002_session_packet *ses_init_buf;
+-	unsigned int req_noscope_len;
+-	struct smb_hdr *smb_buf;
++	struct rfc1002_session_packet req = {};
++	struct smb_hdr *smb_buf = (struct smb_hdr *)&req;
++	unsigned int len;
 +
- 	object->file = file;
- 
- 	/* Always update the atime on an object we've just looked up (this is
-diff --git a/fs/ceph/cache.c b/fs/ceph/cache.c
-index 177d8e8d73fe..de1dee46d3df 100644
---- a/fs/ceph/cache.c
-+++ b/fs/ceph/cache.c
-@@ -36,6 +36,8 @@ void ceph_fscache_register_inode_cookie(struct inode *inode)
- 				       &ci->i_vino, sizeof(ci->i_vino),
- 				       &ci->i_version, sizeof(ci->i_version),
- 				       i_size_read(inode));
-+	if (ci->netfs.cache)
-+		mapping_set_release_always(inode->i_mapping);
- }
- 
- void ceph_fscache_unregister_inode_cookie(struct ceph_inode_info *ci)
-diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-index f6f3a6b75601..79e9665dfc90 100644
---- a/fs/cifs/fscache.c
-+++ b/fs/cifs/fscache.c
-@@ -108,6 +108,8 @@ void cifs_fscache_get_inode_cookie(struct inode *inode)
- 				       &cifsi->uniqueid, sizeof(cifsi->uniqueid),
- 				       &cd, sizeof(cd),
- 				       i_size_read(&cifsi->netfs.inode));
-+	if (cifsi->netfs.cache)
-+		mapping_set_release_always(inode->i_mapping);
- }
- 
- void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update)
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 29e1f9e76eb6..a0d433e0addd 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -199,6 +199,7 @@ enum mapping_flags {
- 	/* writeback related tags are not used */
- 	AS_NO_WRITEBACK_TAGS = 5,
- 	AS_LARGE_FOLIO_SUPPORT = 6,
-+	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
- };
- 
- /**
-@@ -269,6 +270,21 @@ static inline int mapping_use_writeback_tags(struct address_space *mapping)
- 	return !test_bit(AS_NO_WRITEBACK_TAGS, &mapping->flags);
- }
- 
-+static inline bool mapping_release_always(const struct address_space *mapping)
-+{
-+	return test_bit(AS_RELEASE_ALWAYS, &mapping->flags);
-+}
++	req.trailer.session_req.called_len = sizeof(req.trailer.session_req.called_name);
 +
-+static inline void mapping_set_release_always(struct address_space *mapping)
-+{
-+	set_bit(AS_RELEASE_ALWAYS, &mapping->flags);
-+}
++	if (server->server_RFC1001_name[0] != 0)
++		rfc1002mangle(req.trailer.session_req.called_name,
++			      server->server_RFC1001_name,
++			      RFC1001_NAME_LEN_WITH_NULL);
++	else
++		rfc1002mangle(req.trailer.session_req.called_name,
++			      DEFAULT_CIFS_CALLED_NAME,
++			      RFC1001_NAME_LEN_WITH_NULL);
 +
-+static inline void mapping_clear_release_always(struct address_space *mapping)
-+{
-+	clear_bit(AS_RELEASE_ALWAYS, &mapping->flags);
-+}
++	req.trailer.session_req.calling_len = sizeof(req.trailer.session_req.calling_name);
 +
- static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
- {
- 	return mapping->gfp_mask;
-diff --git a/mm/internal.h b/mm/internal.h
-index c4c8e58e1d12..5421ce8661fa 100644
---- a/mm/internal.h
-+++ b/mm/internal.h
-@@ -168,7 +168,10 @@ static inline void set_page_refcounted(struct page *page)
-  */
- static inline bool folio_needs_release(struct folio *folio)
- {
--	return folio_has_private(folio);
-+	struct address_space *mapping = folio->mapping;
-+
-+	return folio_has_private(folio) ||
-+		(mapping && mapping_release_always(mapping));
- }
++	/* calling name ends in null (byte 16) from old smb convention */
++	if (server->workstation_RFC1001_name[0] != 0)
++		rfc1002mangle(req.trailer.session_req.calling_name,
++			      server->workstation_RFC1001_name,
++			      RFC1001_NAME_LEN_WITH_NULL);
++	else
++		rfc1002mangle(req.trailer.session_req.calling_name,
++			      "LINUX_CIFS_CLNT",
++			      RFC1001_NAME_LEN_WITH_NULL);
  
- extern unsigned long highest_memmap_pfn;
+-	ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
+-			       GFP_KERNEL);
+-
+-	if (ses_init_buf) {
+-		ses_init_buf->trailer.session_req.called_len = 32;
+-
+-		if (server->server_RFC1001_name[0] != 0)
+-			rfc1002mangle(ses_init_buf->trailer.
+-				      session_req.called_name,
+-				      server->server_RFC1001_name,
+-				      RFC1001_NAME_LEN_WITH_NULL);
+-		else
+-			rfc1002mangle(ses_init_buf->trailer.
+-				      session_req.called_name,
+-				      DEFAULT_CIFS_CALLED_NAME,
+-				      RFC1001_NAME_LEN_WITH_NULL);
+-
+-		ses_init_buf->trailer.session_req.calling_len = 32;
+-
+-		/*
+-		 * calling name ends in null (byte 16) from old smb
+-		 * convention.
+-		 */
+-		if (server->workstation_RFC1001_name[0] != 0)
+-			rfc1002mangle(ses_init_buf->trailer.
+-				      session_req.calling_name,
+-				      server->workstation_RFC1001_name,
+-				      RFC1001_NAME_LEN_WITH_NULL);
+-		else
+-			rfc1002mangle(ses_init_buf->trailer.
+-				      session_req.calling_name,
+-				      "LINUX_CIFS_CLNT",
+-				      RFC1001_NAME_LEN_WITH_NULL);
+-
+-		ses_init_buf->trailer.session_req.scope1 = 0;
+-		ses_init_buf->trailer.session_req.scope2 = 0;
+-		smb_buf = (struct smb_hdr *)ses_init_buf;
+-
+-		/* sizeof RFC1002_SESSION_REQUEST with no scopes */
+-		req_noscope_len = sizeof(struct rfc1002_session_packet) - 2;
++	/*
++	 * As per rfc1002, @len must be the number of bytes that follows the
++	 * length field of a rfc1002 session request payload.
++	 */
++	len = sizeof(req) - offsetof(struct rfc1002_session_packet, trailer.session_req);
+ 
+-		/* == cpu_to_be32(0x81000044) */
+-		smb_buf->smb_buf_length =
+-			cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | req_noscope_len);
+-		rc = smb_send(server, smb_buf, 0x44);
+-		kfree(ses_init_buf);
+-		/*
+-		 * RFC1001 layer in at least one server
+-		 * requires very short break before negprot
+-		 * presumably because not expecting negprot
+-		 * to follow so fast.  This is a simple
+-		 * solution that works without
+-		 * complicating the code and causes no
+-		 * significant slowing down on mount
+-		 * for everyone else
+-		 */
+-		usleep_range(1000, 2000);
+-	}
++	smb_buf->smb_buf_length = cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | len);
++	rc = smb_send(server, smb_buf, len);
+ 	/*
+-	 * else the negprot may still work without this
+-	 * even though malloc failed
++	 * RFC1001 layer in at least one server requires very short break before
++	 * negprot presumably because not expecting negprot to follow so fast.
++	 * This is a simple solution that works without complicating the code
++	 * and causes no significant slowing down on mount for everyone else
+ 	 */
++	usleep_range(1000, 2000);
+ 
+ 	return rc;
+ }
+-- 
+2.39.1
 
