@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A96C61DA4
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 21:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9FDC636CC
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 21:49:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230252AbjBPVtd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:49:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36352 "EHLO
+        id S230141AbjBPVts (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:49:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230152AbjBPVtX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 16:49:23 -0500
+        with ESMTP id S230235AbjBPVt2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 16:49:28 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE47C46144
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:48:25 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0357F34C1D
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:48:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676584105;
+        s=mimecast20190719; t=1676584110;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XQdifRk6LoRlY8bBJqWjSiNz8KoUNxlUmZ1XJ6Y/O6c=;
-        b=fLJiXt7BJTbwHvwH7sfyKzWmDGLOi0gbj66BY7I+XlQBn36EHA8IakyNP2b1jKsiIb2fDh
-        zComy44VMMOsIk7iYSG5Akyejk9YhKo9R46YwmSitgyOtqklSzAcfOQSs2ZD5Ql+tLpgKI
-        HtFtKikHCRJnACfXGC3ST579gsRGQmk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=aTLk2eEjUUGfJZpasC0aeUIJz1OFiWbQqwHM/iVEKgQ=;
+        b=Z/9fqueIA82bb/Hvq1DBniyB7tuqC+jiIWQ7T6HcInZv0A4G/lGtC3W9D8WzX4gorYsMqH
+        Ivw76a92RlX+46bzKWa5Jqa4bGBGdbyu5raaARCft8QMNhWChUbhGFNSkrKPlfSz3G8mgo
+        hCHY16RH/PRhdAbaLo6BKwylk12ORUE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-558-TZxIysogMpWNukeCTYhZIA-1; Thu, 16 Feb 2023 16:48:19 -0500
-X-MC-Unique: TZxIysogMpWNukeCTYhZIA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-460-PfIjLxiFPsiEdCok_9z79A-1; Thu, 16 Feb 2023 16:48:14 -0500
+X-MC-Unique: PfIjLxiFPsiEdCok_9z79A-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0DF2F3C10146;
-        Thu, 16 Feb 2023 21:48:19 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 51530811E9C;
+        Thu, 16 Feb 2023 21:48:13 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D6ECD1121314;
-        Thu, 16 Feb 2023 21:48:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3518A492B10;
+        Thu, 16 Feb 2023 21:48:11 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
@@ -51,206 +51,221 @@ Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH 04/17] iov_iter: Define flags to qualify page extraction.
-Date:   Thu, 16 Feb 2023 21:47:32 +0000
-Message-Id: <20230216214745.3985496-5-dhowells@redhat.com>
+        David Hildenbrand <david@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH 02/17] splice: Add a func to do a splice from a buffered file without ITER_PIPE
+Date:   Thu, 16 Feb 2023 21:47:30 +0000
+Message-Id: <20230216214745.3985496-3-dhowells@redhat.com>
 In-Reply-To: <20230216214745.3985496-1-dhowells@redhat.com>
 References: <20230216214745.3985496-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Define flags to qualify page extraction to pass into iov_iter_*_pages*()
-rather than passing in FOLL_* flags.
+Provide a function to do splice read from a buffered file, pulling the
+folios out of the pagecache directly by calling filemap_get_pages() to do
+any required reading and then pasting the returned folios into the pipe.
 
-For now only a flag to allow peer-to-peer DMA is supported.
+A helper function is provided to do the actual folio pasting and will
+handle multipage folios by splicing as many of the relevant subpages as
+will fit into the pipe.
+
+The code is loosely based on filemap_read() and might belong in
+mm/filemap.c with that as it needs to use filemap_get_pages().
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 Reviewed-by: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Logan Gunthorpe <logang@deltatee.com>
-cc: linux-fsdevel@vger.kernel.org
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: linux-mm@kvack.org
 cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 ---
- block/bio.c         |  6 +++---
- block/blk-map.c     |  8 ++++----
- include/linux/uio.h | 10 ++++++++--
- lib/iov_iter.c      | 14 ++++++++------
- 4 files changed, 23 insertions(+), 15 deletions(-)
+ include/linux/fs.h |   3 ++
+ mm/filemap.c       | 128 +++++++++++++++++++++++++++++++++++++++++++++
+ mm/internal.h      |   6 +++
+ 3 files changed, 137 insertions(+)
 
-diff --git a/block/bio.c b/block/bio.c
-index ab59a491a883..b97f3991c904 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1245,11 +1245,11 @@ static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index c1769a2c5d70..28743e38df91 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -3163,6 +3163,9 @@ ssize_t vfs_iocb_iter_write(struct file *file, struct kiocb *iocb,
+ 			    struct iov_iter *iter);
+ 
+ /* fs/splice.c */
++ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
++			    struct pipe_inode_info *pipe,
++			    size_t len, unsigned int flags);
+ extern ssize_t generic_file_splice_read(struct file *, loff_t *,
+ 		struct pipe_inode_info *, size_t, unsigned int);
+ extern ssize_t iter_file_splice_write(struct pipe_inode_info *,
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 876e77278d2a..8c7b135c8e23 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -42,6 +42,8 @@
+ #include <linux/ramfs.h>
+ #include <linux/page_idle.h>
+ #include <linux/migrate.h>
++#include <linux/pipe_fs_i.h>
++#include <linux/splice.h>
+ #include <asm/pgalloc.h>
+ #include <asm/tlbflush.h>
+ #include "internal.h"
+@@ -2842,6 +2844,132 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ }
+ EXPORT_SYMBOL(generic_file_read_iter);
+ 
++/*
++ * Splice subpages from a folio into a pipe.
++ */
++size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
++			      struct folio *folio, loff_t fpos, size_t size)
++{
++	struct page *page;
++	size_t spliced = 0, offset = offset_in_folio(folio, fpos);
++
++	page = folio_page(folio, offset / PAGE_SIZE);
++	size = min(size, folio_size(folio) - offset);
++	offset %= PAGE_SIZE;
++
++	while (spliced < size &&
++	       !pipe_full(pipe->head, pipe->tail, pipe->max_usage)) {
++		struct pipe_buffer *buf = pipe_head_buf(pipe);
++		size_t part = min_t(size_t, PAGE_SIZE - offset, size - spliced);
++
++		*buf = (struct pipe_buffer) {
++			.ops	= &page_cache_pipe_buf_ops,
++			.page	= page,
++			.offset	= offset,
++			.len	= part,
++		};
++		folio_get(folio);
++		pipe->head++;
++		page++;
++		spliced += part;
++		offset = 0;
++	}
++
++	return spliced;
++}
++
++/*
++ * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
++ * a pipe.
++ */
++ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
++			    struct pipe_inode_info *pipe,
++			    size_t len, unsigned int flags)
++{
++	struct folio_batch fbatch;
++	struct kiocb iocb;
++	size_t total_spliced = 0, used, npages;
++	loff_t isize, end_offset;
++	bool writably_mapped;
++	int i, error = 0;
++
++	init_sync_kiocb(&iocb, in);
++	iocb.ki_pos = *ppos;
++
++	/* Work out how much data we can actually add into the pipe */
++	used = pipe_occupancy(pipe->head, pipe->tail);
++	npages = max_t(ssize_t, pipe->max_usage - used, 0);
++	len = min_t(size_t, len, npages * PAGE_SIZE);
++
++	folio_batch_init(&fbatch);
++
++	do {
++		cond_resched();
++
++		if (*ppos >= i_size_read(file_inode(in)))
++			break;
++
++		iocb.ki_pos = *ppos;
++		error = filemap_get_pages(&iocb, len, &fbatch, true);
++		if (error < 0)
++			break;
++
++		/*
++		 * i_size must be checked after we know the pages are Uptodate.
++		 *
++		 * Checking i_size after the check allows us to calculate
++		 * the correct value for "nr", which means the zero-filled
++		 * part of the page is not copied back to userspace (unless
++		 * another truncate extends the file - this is desired though).
++		 */
++		isize = i_size_read(file_inode(in));
++		if (unlikely(*ppos >= isize))
++			break;
++		end_offset = min_t(loff_t, isize, *ppos + len);
++
++		/*
++		 * Once we start copying data, we don't want to be touching any
++		 * cachelines that might be contended:
++		 */
++		writably_mapped = mapping_writably_mapped(in->f_mapping);
++
++		for (i = 0; i < folio_batch_count(&fbatch); i++) {
++			struct folio *folio = fbatch.folios[i];
++			size_t n;
++
++			if (folio_pos(folio) >= end_offset)
++				goto out;
++			folio_mark_accessed(folio);
++
++			/*
++			 * If users can be writing to this folio using arbitrary
++			 * virtual addresses, take care of potential aliasing
++			 * before reading the folio on the kernel side.
++			 */
++			if (writably_mapped)
++				flush_dcache_folio(folio);
++
++			n = splice_folio_into_pipe(pipe, folio, *ppos, len);
++			if (!n)
++				goto out;
++			len -= n;
++			total_spliced += n;
++			*ppos += n;
++			in->f_ra.prev_pos = *ppos;
++			if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
++				goto out;
++		}
++
++		folio_batch_release(&fbatch);
++	} while (len);
++
++out:
++	folio_batch_release(&fbatch);
++	file_accessed(in);
++
++	return total_spliced ? total_spliced : error;
++}
++
+ static inline loff_t folio_seek_hole_data(struct xa_state *xas,
+ 		struct address_space *mapping, struct folio *folio,
+ 		loff_t start, loff_t end, bool seek_data)
+diff --git a/mm/internal.h b/mm/internal.h
+index bcf75a8b032d..6d4ca98f3844 100644
+--- a/mm/internal.h
++++ b/mm/internal.h
+@@ -794,6 +794,12 @@ struct migration_target_control {
+ 	gfp_t gfp_mask;
+ };
+ 
++/*
++ * mm/filemap.c
++ */
++size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
++			      struct folio *folio, loff_t fpos, size_t size);
++
+ /*
+  * mm/vmalloc.c
   */
- static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
-+	iov_iter_extraction_t extraction_flags = 0;
- 	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
- 	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
- 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages = (struct page **)bv;
--	unsigned int gup_flags = 0;
- 	ssize_t size, left;
- 	unsigned len, i = 0;
- 	size_t offset, trim;
-@@ -1264,7 +1264,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
- 
- 	if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
--		gup_flags |= FOLL_PCI_P2PDMA;
-+		extraction_flags |= ITER_ALLOW_P2PDMA;
- 
- 	/*
- 	 * Each segment in the iov is required to be a block size multiple.
-@@ -1275,7 +1275,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	 */
- 	size = iov_iter_get_pages(iter, pages,
- 				  UINT_MAX - bio->bi_iter.bi_size,
--				  nr_pages, &offset, gup_flags);
-+				  nr_pages, &offset, extraction_flags);
- 	if (unlikely(size <= 0))
- 		return size ? size : -EFAULT;
- 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 19940c978c73..080dd60485be 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -265,9 +265,9 @@ static struct bio *blk_rq_map_bio_alloc(struct request *rq,
- static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 		gfp_t gfp_mask)
- {
-+	iov_iter_extraction_t extraction_flags = 0;
- 	unsigned int max_sectors = queue_max_hw_sectors(rq->q);
- 	unsigned int nr_vecs = iov_iter_npages(iter, BIO_MAX_VECS);
--	unsigned int gup_flags = 0;
- 	struct bio *bio;
- 	int ret;
- 	int j;
-@@ -280,7 +280,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 		return -ENOMEM;
- 
- 	if (blk_queue_pci_p2pdma(rq->q))
--		gup_flags |= FOLL_PCI_P2PDMA;
-+		extraction_flags |= ITER_ALLOW_P2PDMA;
- 
- 	while (iov_iter_count(iter)) {
- 		struct page **pages, *stack_pages[UIO_FASTIOV];
-@@ -291,10 +291,10 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
- 			pages = stack_pages;
- 			bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
--						   nr_vecs, &offs, gup_flags);
-+						   nr_vecs, &offs, extraction_flags);
- 		} else {
- 			bytes = iov_iter_get_pages_alloc(iter, &pages,
--						LONG_MAX, &offs, gup_flags);
-+						LONG_MAX, &offs, extraction_flags);
- 		}
- 		if (unlikely(bytes <= 0)) {
- 			ret = bytes ? bytes : -EFAULT;
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 9f158238edba..eec6ed8a627a 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -13,6 +13,8 @@
- struct page;
- struct pipe_inode_info;
- 
-+typedef unsigned int __bitwise iov_iter_extraction_t;
-+
- struct kvec {
- 	void *iov_base; /* and that should *never* hold a userland pointer */
- 	size_t iov_len;
-@@ -252,12 +254,12 @@ void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *
- 		     loff_t start, size_t count);
- ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
- 		size_t maxsize, unsigned maxpages, size_t *start,
--		unsigned gup_flags);
-+		iov_iter_extraction_t extraction_flags);
- ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
- 			size_t maxsize, unsigned maxpages, size_t *start);
- ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
- 		struct page ***pages, size_t maxsize, size_t *start,
--		unsigned gup_flags);
-+		iov_iter_extraction_t extraction_flags);
- ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i, struct page ***pages,
- 			size_t maxsize, size_t *start);
- int iov_iter_npages(const struct iov_iter *i, int maxpages);
-@@ -360,4 +362,8 @@ static inline void iov_iter_ubuf(struct iov_iter *i, unsigned int direction,
- 	};
- }
- 
-+/* Flags for iov_iter_get/extract_pages*() */
-+/* Allow P2PDMA on the extracted pages */
-+#define ITER_ALLOW_P2PDMA	((__force iov_iter_extraction_t)0x01)
-+
- #endif
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 47c484551c59..9d4949ea9b27 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1426,9 +1426,9 @@ static struct page *first_bvec_segment(const struct iov_iter *i,
- static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
- 		   struct page ***pages, size_t maxsize,
- 		   unsigned int maxpages, size_t *start,
--		   unsigned int gup_flags)
-+		   iov_iter_extraction_t extraction_flags)
- {
--	unsigned int n;
-+	unsigned int n, gup_flags = 0;
- 
- 	if (maxsize > i->count)
- 		maxsize = i->count;
-@@ -1436,6 +1436,8 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
- 		return 0;
- 	if (maxsize > MAX_RW_COUNT)
- 		maxsize = MAX_RW_COUNT;
-+	if (extraction_flags & ITER_ALLOW_P2PDMA)
-+		gup_flags |= FOLL_PCI_P2PDMA;
- 
- 	if (likely(user_backed_iter(i))) {
- 		unsigned long addr;
-@@ -1489,14 +1491,14 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
- 
- ssize_t iov_iter_get_pages(struct iov_iter *i,
- 		   struct page **pages, size_t maxsize, unsigned maxpages,
--		   size_t *start, unsigned gup_flags)
-+		   size_t *start, iov_iter_extraction_t extraction_flags)
- {
- 	if (!maxpages)
- 		return 0;
- 	BUG_ON(!pages);
- 
- 	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages,
--					  start, gup_flags);
-+					  start, extraction_flags);
- }
- EXPORT_SYMBOL_GPL(iov_iter_get_pages);
- 
-@@ -1509,14 +1511,14 @@ EXPORT_SYMBOL(iov_iter_get_pages2);
- 
- ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
- 		   struct page ***pages, size_t maxsize,
--		   size_t *start, unsigned gup_flags)
-+		   size_t *start, iov_iter_extraction_t extraction_flags)
- {
- 	ssize_t len;
- 
- 	*pages = NULL;
- 
- 	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start,
--					 gup_flags);
-+					 extraction_flags);
- 	if (len <= 0) {
- 		kvfree(*pages);
- 		*pages = NULL;
 
