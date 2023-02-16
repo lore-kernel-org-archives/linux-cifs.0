@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C1EC64ED8
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 21:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E83C61DA4
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 21:50:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230294AbjBPVuX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:50:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36274 "EHLO
+        id S230305AbjBPVu0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:50:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230300AbjBPVuD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 16:50:03 -0500
+        with ESMTP id S230307AbjBPVuE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 16:50:04 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 129DB4FAAC
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:48:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEDB4505C1
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:48:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676584123;
+        s=mimecast20190719; t=1676584122;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jQcJ17qVNUKIVAthm+EjBPaJCPdilCzc5b5eGZTuD8w=;
-        b=D7Qh4dCx1bNJzHWxTL1Re7rWtOrW+cBbRoM8+XrLCe+wGUGJf4Ivg3cxgMcf7YbsScRLyB
-        O+sLuU8QYpnoM0MHqfcO4UQfpAQchYoQp7AGlHgIkkVoKiAhSK+h8t25Mb2Wp27wJvPLX3
-        aVMGGI1mzKXY61e4kM8z/QCymUkluoU=
+        bh=e8eQEU7H5KI+mR6DaJwt19VwGfbirTBzTPLMp2PHuNY=;
+        b=g3Aep2ooaqIB08u7Bes8t/1R6Cz4MMzv2/0mPiwwSLIF4P2nAMhKrxkUmDPw8FRTUbp4sk
+        O4c7hLPXVbEqaQicvNsRfJ3xNc6tdv52tEBnF9A1+0rKuIz3sH25E8xxvoO3hY7P0I/PLD
+        BPekBkwiE8rYjtt+fBhm7kCkQaSR/nM=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-167-P9DRTr1UPGurnYjvUQcAQg-1; Thu, 16 Feb 2023 16:48:41 -0500
-X-MC-Unique: P9DRTr1UPGurnYjvUQcAQg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-671-9yLGMC7UPNqociWeikV9Bw-1; Thu, 16 Feb 2023 16:48:36 -0500
+X-MC-Unique: 9yLGMC7UPNqociWeikV9Bw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF965185A7A4;
-        Thu, 16 Feb 2023 21:48:40 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E522800B24;
+        Thu, 16 Feb 2023 21:48:35 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EBF2A40C945A;
-        Thu, 16 Feb 2023 21:48:38 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 99D1EC15BA0;
+        Thu, 16 Feb 2023 21:48:33 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
@@ -50,157 +50,269 @@ Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Steve French <sfrench@samba.org>
-Subject: [PATCH 12/17] cifs: Add some helper functions
-Date:   Thu, 16 Feb 2023 21:47:40 +0000
-Message-Id: <20230216214745.3985496-13-dhowells@redhat.com>
+        Steve French <sfrench@samba.org>, linux-rdma@vger.kernel.org
+Subject: [PATCH 10/17] cifs: Add a function to build an RDMA SGE list from an iterator
+Date:   Thu, 16 Feb 2023 21:47:38 +0000
+Message-Id: <20230216214745.3985496-11-dhowells@redhat.com>
 In-Reply-To: <20230216214745.3985496-1-dhowells@redhat.com>
 References: <20230216214745.3985496-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add some helper functions to manipulate the folio marks by iterating
-through a list of folios held in an xarray rather than using a page list.
+Add a function to add elements onto an RDMA SGE list representing page
+fragments extracted from a BVEC-, KVEC- or XARRAY-type iterator and DMA
+mapped until the maximum number of elements is reached.
+
+Nothing is done to make sure the pages remain present - that must be done
+by the caller.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
 cc: Shyam Prasad N <nspmangalore@gmail.com>
 cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Tom Talpey <tom@talpey.com>
 cc: Jeff Layton <jlayton@kernel.org>
 cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-rdma@vger.kernel.org
 
-Link: https://lore.kernel.org/r/164928616583.457102.15157033997163988344.stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/165211418840.3154751.3090684430628501879.stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/165348878940.2106726.204291614267188735.stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/165364825674.3334034.3356201708659748648.stgit@warthog.procyon.org.uk/ # v3
-Link: https://lore.kernel.org/r/166126394799.708021.10637797063862600488.stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/166697258147.61150.9940790486999562110.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/166732030314.3186319.9209944805565413627.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166697256704.61150.17388516338310645808.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/166732028840.3186319.8512284239779728860.stgit@warthog.procyon.org.uk/ # rfc
 ---
- fs/cifs/cifsfs.h |  3 ++
- fs/cifs/file.c   | 93 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 96 insertions(+)
+ fs/cifs/smbdirect.c | 214 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 214 insertions(+)
 
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index 25decebbc478..ea628da503c6 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -113,6 +113,9 @@ extern int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma);
- extern const struct file_operations cifs_dir_ops;
- extern int cifs_dir_open(struct inode *inode, struct file *file);
- extern int cifs_readdir(struct file *file, struct dir_context *ctx);
-+extern void cifs_pages_written_back(struct inode *inode, loff_t start, unsigned int len);
-+extern void cifs_pages_write_failed(struct inode *inode, loff_t start, unsigned int len);
-+extern void cifs_pages_write_redirty(struct inode *inode, loff_t start, unsigned int len);
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 8c816b25ce7c..3e0aacddc291 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -44,6 +44,17 @@ static int smbd_post_send_page(struct smbd_connection *info,
+ static void destroy_mr_list(struct smbd_connection *info);
+ static int allocate_mr_list(struct smbd_connection *info);
  
- /* Functions related to dir entries */
- extern const struct dentry_operations cifs_dentry_ops;
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index ddf6f572af81..09240b8b018a 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -36,6 +36,99 @@
- #include "cifs_ioctl.h"
- #include "cached_dir.h"
++struct smb_extract_to_rdma {
++	struct ib_sge		*sge;
++	unsigned int		nr_sge;
++	unsigned int		max_sge;
++	struct ib_device	*device;
++	u32			local_dma_lkey;
++	enum dma_data_direction	direction;
++};
++static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
++					struct smb_extract_to_rdma *rdma);
++
+ /* SMBD version number */
+ #define SMBD_V1	0x0100
  
-+/*
-+ * Completion of write to server.
-+ */
-+void cifs_pages_written_back(struct inode *inode, loff_t start, unsigned int len)
+@@ -2490,3 +2501,206 @@ int smbd_deregister_mr(struct smbd_mr *smbdirect_mr)
+ 
+ 	return rc;
+ }
++
++static bool smb_set_sge(struct smb_extract_to_rdma *rdma,
++			struct page *lowest_page, size_t off, size_t len)
 +{
-+	struct address_space *mapping = inode->i_mapping;
-+	struct folio *folio;
-+	pgoff_t end;
++	struct ib_sge *sge = &rdma->sge[rdma->nr_sge];
++	u64 addr;
 +
-+	XA_STATE(xas, &mapping->i_pages, start / PAGE_SIZE);
++	addr = ib_dma_map_page(rdma->device, lowest_page,
++			       off, len, rdma->direction);
++	if (ib_dma_mapping_error(rdma->device, addr))
++		return false;
 +
-+	if (!len)
-+		return;
-+
-+	rcu_read_lock();
-+
-+	end = (start + len - 1) / PAGE_SIZE;
-+	xas_for_each(&xas, folio, end) {
-+		if (!folio_test_writeback(folio)) {
-+			WARN_ONCE(1, "bad %x @%llx page %lx %lx\n",
-+				  len, start, folio_index(folio), end);
-+			continue;
-+		}
-+
-+		folio_detach_private(folio);
-+		folio_end_writeback(folio);
-+	}
-+
-+	rcu_read_unlock();
++	sge->addr   = addr;
++	sge->length = len;
++	sge->lkey   = rdma->local_dma_lkey;
++	rdma->nr_sge++;
++	return true;
 +}
 +
 +/*
-+ * Failure of write to server.
++ * Extract page fragments from a BVEC-class iterator and add them to an RDMA
++ * element list.  The pages are not pinned.
 + */
-+void cifs_pages_write_failed(struct inode *inode, loff_t start, unsigned int len)
++static ssize_t smb_extract_bvec_to_rdma(struct iov_iter *iter,
++					struct smb_extract_to_rdma *rdma,
++					ssize_t maxsize)
 +{
-+	struct address_space *mapping = inode->i_mapping;
-+	struct folio *folio;
-+	pgoff_t end;
++	const struct bio_vec *bv = iter->bvec;
++	unsigned long start = iter->iov_offset;
++	unsigned int i;
++	ssize_t ret = 0;
 +
-+	XA_STATE(xas, &mapping->i_pages, start / PAGE_SIZE);
++	for (i = 0; i < iter->nr_segs; i++) {
++		size_t off, len;
 +
-+	if (!len)
-+		return;
-+
-+	rcu_read_lock();
-+
-+	end = (start + len - 1) / PAGE_SIZE;
-+	xas_for_each(&xas, folio, end) {
-+		if (!folio_test_writeback(folio)) {
-+			WARN_ONCE(1, "bad %x @%llx page %lx %lx\n",
-+				  len, start, folio_index(folio), end);
++		len = bv[i].bv_len;
++		if (start >= len) {
++			start -= len;
 +			continue;
 +		}
 +
-+		folio_set_error(folio);
-+		folio_end_writeback(folio);
++		len = min_t(size_t, maxsize, len - start);
++		off = bv[i].bv_offset + start;
++
++		if (!smb_set_sge(rdma, bv[i].bv_page, off, len))
++			return -EIO;
++
++		ret += len;
++		maxsize -= len;
++		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
++			break;
++		start = 0;
 +	}
 +
-+	rcu_read_unlock();
++	return ret;
 +}
 +
 +/*
-+ * Redirty pages after a temporary failure.
++ * Extract fragments from a KVEC-class iterator and add them to an RDMA list.
++ * This can deal with vmalloc'd buffers as well as kmalloc'd or static buffers.
++ * The pages are not pinned.
 + */
-+void cifs_pages_write_redirty(struct inode *inode, loff_t start, unsigned int len)
++static ssize_t smb_extract_kvec_to_rdma(struct iov_iter *iter,
++					struct smb_extract_to_rdma *rdma,
++					ssize_t maxsize)
 +{
-+	struct address_space *mapping = inode->i_mapping;
-+	struct folio *folio;
-+	pgoff_t end;
++	const struct kvec *kv = iter->kvec;
++	unsigned long start = iter->iov_offset;
++	unsigned int i;
++	ssize_t ret = 0;
 +
-+	XA_STATE(xas, &mapping->i_pages, start / PAGE_SIZE);
++	for (i = 0; i < iter->nr_segs; i++) {
++		struct page *page;
++		unsigned long kaddr;
++		size_t off, len, seg;
 +
-+	if (!len)
-+		return;
-+
-+	rcu_read_lock();
-+
-+	end = (start + len - 1) / PAGE_SIZE;
-+	xas_for_each(&xas, folio, end) {
-+		if (!folio_test_writeback(folio)) {
-+			WARN_ONCE(1, "bad %x @%llx page %lx %lx\n",
-+				  len, start, folio_index(folio), end);
++		len = kv[i].iov_len;
++		if (start >= len) {
++			start -= len;
 +			continue;
 +		}
 +
-+		filemap_dirty_folio(folio->mapping, folio);
-+		folio_end_writeback(folio);
++		kaddr = (unsigned long)kv[i].iov_base + start;
++		off = kaddr & ~PAGE_MASK;
++		len = min_t(size_t, maxsize, len - start);
++		kaddr &= PAGE_MASK;
++
++		maxsize -= len;
++		do {
++			seg = min_t(size_t, len, PAGE_SIZE - off);
++
++			if (is_vmalloc_or_module_addr((void *)kaddr))
++				page = vmalloc_to_page((void *)kaddr);
++			else
++				page = virt_to_page(kaddr);
++
++			if (!smb_set_sge(rdma, page, off, seg))
++				return -EIO;
++
++			ret += seg;
++			len -= seg;
++			kaddr += PAGE_SIZE;
++			off = 0;
++		} while (len > 0 && rdma->nr_sge < rdma->max_sge);
++
++		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
++			break;
++		start = 0;
++	}
++
++	return ret;
++}
++
++/*
++ * Extract folio fragments from an XARRAY-class iterator and add them to an
++ * RDMA list.  The folios are not pinned.
++ */
++static ssize_t smb_extract_xarray_to_rdma(struct iov_iter *iter,
++					  struct smb_extract_to_rdma *rdma,
++					  ssize_t maxsize)
++{
++	struct xarray *xa = iter->xarray;
++	struct folio *folio;
++	loff_t start = iter->xarray_start + iter->iov_offset;
++	pgoff_t index = start / PAGE_SIZE;
++	ssize_t ret = 0;
++	size_t off, len;
++	XA_STATE(xas, xa, index);
++
++	rcu_read_lock();
++
++	xas_for_each(&xas, folio, ULONG_MAX) {
++		if (xas_retry(&xas, folio))
++			continue;
++		if (WARN_ON(xa_is_value(folio)))
++			break;
++		if (WARN_ON(folio_test_hugetlb(folio)))
++			break;
++
++		off = offset_in_folio(folio, start);
++		len = min_t(size_t, maxsize, folio_size(folio) - off);
++
++		if (!smb_set_sge(rdma, folio_page(folio, 0), off, len)) {
++			rcu_read_lock();
++			return -EIO;
++		}
++
++		maxsize -= len;
++		ret += len;
++		if (rdma->nr_sge >= rdma->max_sge || maxsize <= 0)
++			break;
 +	}
 +
 +	rcu_read_unlock();
++	return ret;
 +}
 +
- /*
-  * Mark as invalid, all open files on tree connections since they
-  * were closed when session to server was lost.
++/*
++ * Extract page fragments from up to the given amount of the source iterator
++ * and build up an RDMA list that refers to all of those bits.  The RDMA list
++ * is appended to, up to the maximum number of elements set in the parameter
++ * block.
++ *
++ * The extracted page fragments are not pinned or ref'd in any way; if an
++ * IOVEC/UBUF-type iterator is to be used, it should be converted to a
++ * BVEC-type iterator and the pages pinned, ref'd or otherwise held in some
++ * way.
++ */
++static ssize_t smb_extract_iter_to_rdma(struct iov_iter *iter, size_t len,
++					struct smb_extract_to_rdma *rdma)
++{
++	ssize_t ret;
++	int before = rdma->nr_sge;
++
++	switch (iov_iter_type(iter)) {
++	case ITER_BVEC:
++		ret = smb_extract_bvec_to_rdma(iter, rdma, len);
++		break;
++	case ITER_KVEC:
++		ret = smb_extract_kvec_to_rdma(iter, rdma, len);
++		break;
++	case ITER_XARRAY:
++		ret = smb_extract_xarray_to_rdma(iter, rdma, len);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		return -EIO;
++	}
++
++	if (ret > 0) {
++		iov_iter_advance(iter, ret);
++	} else if (ret < 0) {
++		while (rdma->nr_sge > before) {
++			struct ib_sge *sge = &rdma->sge[rdma->nr_sge--];
++
++			ib_dma_unmap_single(rdma->device, sge->addr, sge->length,
++					    rdma->direction);
++			sge->addr = 0;
++		}
++	}
++
++	return ret;
++}
 
