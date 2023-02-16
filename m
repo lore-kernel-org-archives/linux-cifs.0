@@ -2,68 +2,102 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9C3C61DA4
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 14:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DC6C636CC
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 14:25:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbjBPOSi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 09:18:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56106 "EHLO
+        id S229800AbjBPOZe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Feb 2023 09:25:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbjBPOSi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 09:18:38 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D48E74BEA5;
-        Thu, 16 Feb 2023 06:18:30 -0800 (PST)
+        with ESMTP id S229642AbjBPOZd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 09:25:33 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9002497F4;
+        Thu, 16 Feb 2023 06:25:17 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6B09A60EC0;
-        Thu, 16 Feb 2023 14:18:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2E34C433EF;
-        Thu, 16 Feb 2023 14:18:29 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 97080B8284E;
+        Thu, 16 Feb 2023 14:25:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45DFDC433A1;
+        Thu, 16 Feb 2023 14:25:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676557109;
-        bh=qljvpZ/qaq0j/2hLjwXx+T0T6rRMPZee1Sgmk5JkV5s=;
+        s=k20201202; t=1676557503;
+        bh=DlaFGPI8/PtG0jbRs8yDMyRigvxWoADQdFPsFBEUvVM=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=KHM3W282p+2pGgneRpfxPG7goMRfcWSjxq+xnpldW2w6JKhwLtH9SUtQ9uCMqHv3p
-         a46V69bXxy/hnrnMq35qIj8cqE8XfTOjDLhIhYITviDP5nRF+/bLiKoutFgj/5nyDE
-         MrVaVCBr048D9Y5XBEwxDkNBzGNDkFalukjJvXR/ddsp4c3mN9RNRqV1NiBqY9ByTV
-         ob1AOegXvqCiUhT9eYo8BzBL1pMwCWast2u53LjsF1EV10j4DUcUqINnbp2uCbZ02X
-         I7qFmto24muf2R66k6TuP2qlXgrT4Azacnm5kD3FwMr/O+p3rmaK95uwGS8bPV/esM
-         caYELCP7NDwpA==
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-16cc1e43244so2617535fac.12;
-        Thu, 16 Feb 2023 06:18:29 -0800 (PST)
-X-Gm-Message-State: AO0yUKXp5bw4BuXRVGB1Or9RafWUhm8Fd82Gba7xTHQGW6uAHeNDGMyT
-        ovLsWiZzTDd6+YGKDv8fmnj5K4rxD0e7bp0N2GA=
-X-Google-Smtp-Source: AK7set+JOHjtHJPlCIP6J9C0GtafRUfyZrmiSNoFjxYGcBGoBYUuE6dkoj9qz2KAqUi+7K1RFNkMv4FpIxTJOpnEUVo=
+        b=jtPb9BXfoJ4ZIuteko19xvEHrh0zX9vL+hj21bb6i9YloP5XD4j0AzdYnrNw/r1cV
+         irTY1qdNbSU6KHCtRGYajBsFTXo5RihWxDt6qmzyEG/tlAiIKA4VZCyuxIb8zXfcK+
+         7b2C8p1C/NXEgYNStB11TWeq4NWj4fYRYDI2TSJyarB99J32scKwyTeeNvGxYb5tbJ
+         pwB/9qiPeh4iOe9T+t+ydQDl2em2wxZhNTyvrNXc3PoOlvZDWYsdN0QPZ6bXDtrNe4
+         TsGw1SfbYUDD4aVR7dyDpsy2RIfLhXPdkbuVMKOZMUtNPy6n0WsQ0DpNVHD+Zyj8XL
+         EEuI/zj4uTO9w==
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-16df32f2ffdso2726411fac.1;
+        Thu, 16 Feb 2023 06:25:03 -0800 (PST)
+X-Gm-Message-State: AO0yUKUzMsLcMiAqD1Tq1QlfVrxfye0o16DPxKnyGWwASPJj7n7mLIN6
+        8UaCreNYbyE2k8+q8hmfqZgefKgV+CJzdoEC99Q=
+X-Google-Smtp-Source: AK7set/YDnoRsXFW4kmp4obtqoSrpLbMekh5OLqyPQitghf4s397JCGpwBcy4mlMZ5KbG30FMsXw3/Lnue0SZ0ll3J0=
 X-Received: by 2002:a05:6870:b52c:b0:16a:b198:74e9 with SMTP id
- v44-20020a056870b52c00b0016ab19874e9mr192502oap.215.1676557109059; Thu, 16
- Feb 2023 06:18:29 -0800 (PST)
+ v44-20020a056870b52c00b0016ab19874e9mr194278oap.215.1676557502403; Thu, 16
+ Feb 2023 06:25:02 -0800 (PST)
 MIME-Version: 1.0
 Received: by 2002:a8a:355:0:b0:4a5:1048:434b with HTTP; Thu, 16 Feb 2023
- 06:18:28 -0800 (PST)
-In-Reply-To: <20230214063650.12832-1-hbh25y@gmail.com>
-References: <20230214063650.12832-1-hbh25y@gmail.com>
+ 06:25:01 -0800 (PST)
+In-Reply-To: <20230214232928.gonna.714-kees@kernel.org>
+References: <20230214232928.gonna.714-kees@kernel.org>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 16 Feb 2023 23:18:28 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9bfOOTfFVFvx_gakLiPqZSZrNvT12OnRMq2cUBHcPzAA@mail.gmail.com>
-Message-ID: <CAKYAXd9bfOOTfFVFvx_gakLiPqZSZrNvT12OnRMq2cUBHcPzAA@mail.gmail.com>
-Subject: Re: [PATCH v4] ksmbd: fix possible memory leak in smb2_lock()
-To:     Hangyu Hua <hbh25y@gmail.com>
-Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        hyc.lee@gmail.com, lsahlber@redhat.com, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Date:   Thu, 16 Feb 2023 23:25:01 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-fcukmXfdwiAxOxe+5c+Y6vvaoQ3ff-5sK+Zis0HgC5A@mail.gmail.com>
+Message-ID: <CAKYAXd-fcukmXfdwiAxOxe+5c+Y6vvaoQ3ff-5sK+Zis0HgC5A@mail.gmail.com>
+Subject: Re: [PATCH v2] smb3: Replace smb2pdu 1-element arrays with flex-arrays
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-hardening@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-02-14 15:36 GMT+09:00, Hangyu Hua <hbh25y@gmail.com>:
-> argv needs to be free when setup_async_work fails or when the current
-> process is woken up.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Hi Kees,
 
-Thanks.
+>  /* Read flags */
+> @@ -730,7 +730,7 @@ struct smb2_read_rsp {
+>  	__le32 DataLength;
+>  	__le32 DataRemaining;
+>  	__le32 Flags;
+> -	__u8   Buffer[1];
+> +	__u8   Buffer[];
+>  } __packed;
+>
+
+You seem to have missed -1 removal in the code below.
+
+./fs/cifs/smb2ops.c:5632:       .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/cifs/smb2ops.c:5654:       .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/cifs/smb2ops.c:5675:       .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/cifs/smb2ops.c:5696:       .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/cifs/smb2ops.c:5717:       .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/cifs/smb2ops.c:5738:       .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/cifs/smb2ops.c:5759:       .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+
+./fs/ksmbd/smb2ops.c:29:        .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/ksmbd/smb2ops.c:55:        .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/ksmbd/smb2ops.c:82:        .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+./fs/ksmbd/smb2ops.c:109:       .read_rsp_size = sizeof(struct
+smb2_read_rsp) - 1,
+
+thanks.
