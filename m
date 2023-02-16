@@ -2,196 +2,220 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E35F4C61DA4
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 21:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FEE6C64ED8
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 21:48:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230136AbjBPVJG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:09:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42792 "EHLO
+        id S230063AbjBPVst (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Feb 2023 16:48:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbjBPVJF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 16:09:05 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69CED521FD
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:08:59 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id c1so7866385edt.4
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:08:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YFI1uhVWicUVRIKhqqQ8UGC9QCbg2sJ4ChVsk7Qr634=;
-        b=ChddP9JDQENBSuetvs2VGupwdzBTU9Sk0yWMijZzQD5YzNbLn3KwqckpXVphaMUO6x
-         v60uxZ+RYJECHyR+pMw52k7dBNtz/U+INTqOEVkXIWyYR4oou/8B/XYiIuD6um67YrnR
-         JupjgW0J7lwZUan8NnC/t/pdPIZGKj0jXJGlZ8lmQ9w0BmXJbUjxiN9mBtM75A33vsex
-         hYwHuEtDl+o1EGioPDNZGydYXGEK5beAaD0nYvsJOc3o9a4/M7yVotgzDLMuWh4STlV9
-         LXEIcqahX4kQtrLQidH3qY2gdnETZcSA0HYy5Xl2Ag9oQFhOCJtWqKM1/NtLYY4ybu4H
-         QXiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YFI1uhVWicUVRIKhqqQ8UGC9QCbg2sJ4ChVsk7Qr634=;
-        b=tKd9iEEgPo4IaXBCqjtmlmPfAa3AAPjaphLyUvEJwZwICUg/8hTWznscw7gTSoBc18
-         bS3h6faXNyS3FfbemuSCk6RUw/OQ+qg3RD1rJ7RtsbDh2pXL+Hxjo5YP7MHVYt9OfMeR
-         eoS45wA+omZ9O4SN5ED4dQDw4/la/dewPFXEUU4eVn4Cv6jhlcxrlmYbUjkAZ1kOGaKG
-         fqhoDd60ee22PJK/OXCuIdlMCabBwalfF+O0dl+ZGcbWcl7pHIqUbH0v3NtjYlOuj0hg
-         P8W9dHrtubjOl9Vc0V7kk6uOcSmk/4sAsOkOlxNuenSXtFnbPV1hA2edzV21SzLHVEXV
-         VaOA==
-X-Gm-Message-State: AO0yUKXwIG9XRx3E5sVclp607gif/eAnFTSupNuE4rszqRPcREJOWPY0
-        u2dkj7RKuzeerX/KZOqfYHxBlB84EZb7Nn2gZL24+nMk
-X-Google-Smtp-Source: AK7set8nUpwtB3sWO0O0s60e4y98YDakqK+cbuzCQQjPznW3B03WSSp7OQ6tuU+HWRgJxFmjVxYABf8cTra0XasR6HA=
-X-Received: by 2002:a50:d0d3:0:b0:4aa:b918:44cf with SMTP id
- g19-20020a50d0d3000000b004aab91844cfmr3814350edf.8.1676581737812; Thu, 16 Feb
- 2023 13:08:57 -0800 (PST)
+        with ESMTP id S230040AbjBPVsr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 16:48:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2AF1B56F
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 13:47:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676584075;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4OB3pN7HUKRF2HBGdaKO4enU3FqFrSp+zht7+u7JxNg=;
+        b=BF8+mD7pfEtb9L2ppVaH+NTi9qovkoYtKjJFGykYIOrhV8fEoCb5OGK4CVKaIHDp0CgxR5
+        HnJ+ODMZpAZ4Y+exsvnwpgvoJEziTguyVx0y3D42hMaNYuUF4HzJblfObbatf5V3qhiJBr
+        wp+hwJBIZMixli6S/7y5W93hx26u8nc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-125-pPzLFv9JOBy47XbqpzsHQw-1; Thu, 16 Feb 2023 16:47:51 -0500
+X-MC-Unique: pPzLFv9JOBy47XbqpzsHQw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E60BC85A588;
+        Thu, 16 Feb 2023 21:47:49 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E0DD21121314;
+        Thu, 16 Feb 2023 21:47:47 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 00/17] smb3: Use iov_iters down to the network transport and fix DIO page pinning
+Date:   Thu, 16 Feb 2023 21:47:28 +0000
+Message-Id: <20230216214745.3985496-1-dhowells@redhat.com>
 MIME-Version: 1.0
-References: <20230216183322@manguebit.com>
-In-Reply-To: <20230216183322@manguebit.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 17 Feb 2023 07:08:45 +1000
-Message-ID: <CAN05THRjG_-q65LF8kmQvBAq4Eak2z-7aRcMM+_SLcqqFSrBCQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix mount on old smb servers
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     smfrench@gmail.com, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Very nice cleanup.
+Hi Steve,
 
-Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Here's an updated version of my patchset to make the cifs/smb3 driver pass
+iov_iters down to the lowest layers where they can be passed directly to
+the network transport rather than passing lists of pages around.
 
-On Fri, 17 Feb 2023 at 04:44, Paulo Alcantara <pc@manguebit.com> wrote:
->
-> The client was sending rfc1002 session request packet with a wrong
-> length field set, therefore failing to mount shares against old SMB
-> servers over port 139.
->
-> Fix this by calculating the correct length as specified in rfc1002.
->
-> Fixes: d7173623bf0b ("cifs: use ALIGN() and round_up() macros")
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
-> ---
->  fs/cifs/connect.c | 100 ++++++++++++++++++----------------------------
->  1 file changed, 38 insertions(+), 62 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index b2a04b4e89a5..af49ae53aaf4 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2843,72 +2843,48 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
->          * negprot - BB check reconnection in case where second
->          * sessinit is sent but no second negprot
->          */
-> -       struct rfc1002_session_packet *ses_init_buf;
-> -       unsigned int req_noscope_len;
-> -       struct smb_hdr *smb_buf;
-> +       struct rfc1002_session_packet req = {};
-> +       struct smb_hdr *smb_buf = (struct smb_hdr *)&req;
-> +       unsigned int len;
-> +
-> +       req.trailer.session_req.called_len = sizeof(req.trailer.session_req.called_name);
-> +
-> +       if (server->server_RFC1001_name[0] != 0)
-> +               rfc1002mangle(req.trailer.session_req.called_name,
-> +                             server->server_RFC1001_name,
-> +                             RFC1001_NAME_LEN_WITH_NULL);
-> +       else
-> +               rfc1002mangle(req.trailer.session_req.called_name,
-> +                             DEFAULT_CIFS_CALLED_NAME,
-> +                             RFC1001_NAME_LEN_WITH_NULL);
-> +
-> +       req.trailer.session_req.calling_len = sizeof(req.trailer.session_req.calling_name);
-> +
-> +       /* calling name ends in null (byte 16) from old smb convention */
-> +       if (server->workstation_RFC1001_name[0] != 0)
-> +               rfc1002mangle(req.trailer.session_req.calling_name,
-> +                             server->workstation_RFC1001_name,
-> +                             RFC1001_NAME_LEN_WITH_NULL);
-> +       else
-> +               rfc1002mangle(req.trailer.session_req.calling_name,
-> +                             "LINUX_CIFS_CLNT",
-> +                             RFC1001_NAME_LEN_WITH_NULL);
->
-> -       ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
-> -                              GFP_KERNEL);
-> -
-> -       if (ses_init_buf) {
-> -               ses_init_buf->trailer.session_req.called_len = 32;
-> -
-> -               if (server->server_RFC1001_name[0] != 0)
-> -                       rfc1002mangle(ses_init_buf->trailer.
-> -                                     session_req.called_name,
-> -                                     server->server_RFC1001_name,
-> -                                     RFC1001_NAME_LEN_WITH_NULL);
-> -               else
-> -                       rfc1002mangle(ses_init_buf->trailer.
-> -                                     session_req.called_name,
-> -                                     DEFAULT_CIFS_CALLED_NAME,
-> -                                     RFC1001_NAME_LEN_WITH_NULL);
-> -
-> -               ses_init_buf->trailer.session_req.calling_len = 32;
-> -
-> -               /*
-> -                * calling name ends in null (byte 16) from old smb
-> -                * convention.
-> -                */
-> -               if (server->workstation_RFC1001_name[0] != 0)
-> -                       rfc1002mangle(ses_init_buf->trailer.
-> -                                     session_req.calling_name,
-> -                                     server->workstation_RFC1001_name,
-> -                                     RFC1001_NAME_LEN_WITH_NULL);
-> -               else
-> -                       rfc1002mangle(ses_init_buf->trailer.
-> -                                     session_req.calling_name,
-> -                                     "LINUX_CIFS_CLNT",
-> -                                     RFC1001_NAME_LEN_WITH_NULL);
-> -
-> -               ses_init_buf->trailer.session_req.scope1 = 0;
-> -               ses_init_buf->trailer.session_req.scope2 = 0;
-> -               smb_buf = (struct smb_hdr *)ses_init_buf;
-> -
-> -               /* sizeof RFC1002_SESSION_REQUEST with no scopes */
-> -               req_noscope_len = sizeof(struct rfc1002_session_packet) - 2;
-> +       /*
-> +        * As per rfc1002, @len must be the number of bytes that follows the
-> +        * length field of a rfc1002 session request payload.
-> +        */
-> +       len = sizeof(req) - offsetof(struct rfc1002_session_packet, trailer.session_req);
->
-> -               /* == cpu_to_be32(0x81000044) */
-> -               smb_buf->smb_buf_length =
-> -                       cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | req_noscope_len);
-> -               rc = smb_send(server, smb_buf, 0x44);
-> -               kfree(ses_init_buf);
-> -               /*
-> -                * RFC1001 layer in at least one server
-> -                * requires very short break before negprot
-> -                * presumably because not expecting negprot
-> -                * to follow so fast.  This is a simple
-> -                * solution that works without
-> -                * complicating the code and causes no
-> -                * significant slowing down on mount
-> -                * for everyone else
-> -                */
-> -               usleep_range(1000, 2000);
-> -       }
-> +       smb_buf->smb_buf_length = cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | len);
-> +       rc = smb_send(server, smb_buf, len);
->         /*
-> -        * else the negprot may still work without this
-> -        * even though malloc failed
-> +        * RFC1001 layer in at least one server requires very short break before
-> +        * negprot presumably because not expecting negprot to follow so fast.
-> +        * This is a simple solution that works without complicating the code
-> +        * and causes no significant slowing down on mount for everyone else
->          */
-> +       usleep_range(1000, 2000);
->
->         return rc;
->  }
-> --
-> 2.39.1
->
+The series deals with the following issues:
+
+ (-) By pinning pages, it fixes the race between concurrent DIO read and
+     fork, whereby the pages containing the DIO read buffer may end up
+     belonging to the child process and not the parent - with the result
+     that the parent might not see the retrieved data.
+
+ (-) cifs shouldn't take refs on pages extracted from non-user-backed
+     iterators (eg. KVEC).  With these changes, cifs will apply the
+     appropriate cleanup.  Note that there is the possibility the network
+     transport might, but that's beyond the scope of this patchset.
+
+ (-) Making it easier to transition to using folios in cifs rather than
+     pages by dealing with them through BVEC and XARRAY iterators.
+
+The first five patches add two facilities to the VM/VFS core, excerpts from
+my iov-extract branch[1] that are required in order to do the cifs
+iteratorisation:
+
+ (*) Future replacements for file-splicing in the form of functions
+     filemap_splice_read() and direct_splice_read().  These allow file
+     splicing to be done without the use of an ITER_PIPE iterator, without
+     the need to take refs on the pages extracted from KVEC/BVEC/XARRAY
+     iterators.  This is necessary to use iov_iter_extract_pages().
+
+     [!] Note that whilst these are added in core code, they are only used
+     by cifs at this point.
+
+ (*) Add iov_iter_extract_pages(), a replacement for iov_iter_get_pages*()
+     that uses FOLL_PIN on user pages (IOVEC, UBUF) and doesn't pin kernel
+     pages (BVEC, KVEC, XARRAY).  This allows cifs to do the page pinning
+     correctly.
+
+     [!] Note that whilst this is added in core code, it is only used by
+     cifs at this point - though a corresponding change is made to the
+     flags argument of iov_iter_get_pages*() so that it doesn't take FOLL_*
+     flags, but rather takes iov_iter_extraction_t flags that are
+     translated internally to FOLL_* flags.
+
+Then there's a couple of patches to make cifs use the new splice functions.
+
+The series continues with a couple of patches that add stuff to netfslib
+that I want to use there as well as in cifs:
+
+ (*) Add a netfslib function to extract and pin pages from an ITER_IOBUF or
+     ITER_UBUF iterator into an ITER_BVEC iterator.
+
+ (*) Add a netfslib function to extract pages from an iterator that's of
+     type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a scatterlist.
+     The cleanup will need to be done as for iov_iter_extract_pages().
+
+     BVEC, KVEC and XARRAY iterators can be rendered into elements that
+     span multiple pages.
+
+Added to that are some cifs helpers that work with iterators:
+
+ (*) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
+     add elements to an RDMA SGE list.  Only the DMA addresses are stored,
+     and an element may span multiple pages (say if an xarray contains a
+     multipage folio).
+
+ (*) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
+     pass the contents into a shash function.
+
+ (*) Add functions to walk through an ITER_XARRAY iterator and perform
+     various sorts of cleanup on the folios held therein, to be used on I/O
+     completion.
+
+ (*) Add a function to read from the transport TCP socket directly into an
+     iterator.
+
+Finally come the patches that actually do the work of iteratorising cifs:
+
+ (*) The main patch.  Replace page lists with iterators.  It extracts the
+     pages from ITER_UBUF and ITER_IOVEC iterators to an ITER_BVEC
+     iterator, pinning or getting refs on them, before passing them down as
+     the I/O may be done from a worker thread.
+
+     The iterator is extracted into a scatterlist in order to talk to the
+     crypto interface or to do RDMA.
+
+ (*) In the cifs RDMA code, extract the iterator into an RDMA SGE[] list,
+     removing the scatterlist intermediate - at least for smbd_send().
+     There appear to be other ways for cifs to talk to the RDMA layer that
+     don't go through that that I haven't managed to work out.
+
+ (*) Remove a chunk of now-unused code.
+
+ (*) Allow DIO to/from KVEC-type iterators.
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-cifs
+
+David
+
+Link: https://lore.kernel.org/r/20230214171330.2722188-1-dhowells@redhat.com/ [1]
+Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/20230131182855.4027499-1-dhowells@redhat.com/ # v1
+
+David Howells (17):
+  mm: Pass info, not iter, into filemap_get_pages()
+  splice: Add a func to do a splice from a buffered file without
+    ITER_PIPE
+  splice: Add a func to do a splice from an O_DIRECT file without
+    ITER_PIPE
+  iov_iter: Define flags to qualify page extraction.
+  iov_iter: Add a function to extract a page list from an iterator
+  splice: Export filemap/direct_splice_read()
+  cifs: Implement splice_read to pass down ITER_BVEC not ITER_PIPE
+  netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
+  netfs: Add a function to extract an iterator into a scatterlist
+  cifs: Add a function to build an RDMA SGE list from an iterator
+  cifs: Add a function to Hash the contents of an iterator
+  cifs: Add some helper functions
+  cifs: Add a function to read into an iter from a socket
+  cifs: Change the I/O paths to use an iterator rather than a page list
+  cifs: Build the RDMA SGE list directly from an iterator
+  cifs: Remove unused code
+  cifs: DIO to/from KVEC-type iterators should now work
+
+ block/bio.c               |    6 +-
+ block/blk-map.c           |    8 +-
+ fs/cifs/Kconfig           |    1 +
+ fs/cifs/cifsencrypt.c     |  172 +++-
+ fs/cifs/cifsfs.c          |   12 +-
+ fs/cifs/cifsfs.h          |    6 +
+ fs/cifs/cifsglob.h        |   66 +-
+ fs/cifs/cifsproto.h       |   11 +-
+ fs/cifs/cifssmb.c         |   15 +-
+ fs/cifs/connect.c         |   14 +
+ fs/cifs/file.c            | 1772 ++++++++++++++++---------------------
+ fs/cifs/fscache.c         |   22 +-
+ fs/cifs/fscache.h         |   10 +-
+ fs/cifs/misc.c            |  128 +--
+ fs/cifs/smb2ops.c         |  362 ++++----
+ fs/cifs/smb2pdu.c         |   53 +-
+ fs/cifs/smbdirect.c       |  535 ++++++-----
+ fs/cifs/smbdirect.h       |    7 +-
+ fs/cifs/transport.c       |   54 +-
+ fs/netfs/Makefile         |    1 +
+ fs/netfs/iterator.c       |  371 ++++++++
+ fs/splice.c               |   93 ++
+ include/linux/fs.h        |    6 +
+ include/linux/netfs.h     |    8 +
+ include/linux/pipe_fs_i.h |   20 +
+ include/linux/uio.h       |   35 +-
+ lib/iov_iter.c            |  284 +++++-
+ mm/filemap.c              |  156 +++-
+ mm/internal.h             |    6 +
+ mm/vmalloc.c              |    1 +
+ 30 files changed, 2515 insertions(+), 1720 deletions(-)
+ create mode 100644 fs/netfs/iterator.c
+
