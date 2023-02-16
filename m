@@ -2,132 +2,304 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0DCC636CC
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 10:58:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D216C61DA4
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Feb 2023 14:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230338AbjBPK6D (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 05:58:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48804 "EHLO
+        id S229681AbjBPOAV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Feb 2023 09:00:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229991AbjBPK57 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 05:57:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4585356ED8
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 02:56:23 -0800 (PST)
+        with ESMTP id S229489AbjBPOAU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 09:00:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED7D26AF
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 05:59:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676544979;
+        s=mimecast20190719; t=1676555976;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uTgMQWhXxbdOB1s+iJ3y+3uVjK3VfEIrdExBYMmTzrk=;
-        b=cgTA8yeBuLVrFQVUmlI+zpc+i1N1YJx/XupkVor1p/PDzbtkrCJaRFBHH5jm5w/+5d51X8
-        Bn2kkqyd8oZGSVLCtonsceAAevnNU5H26m5PiLePfMmuSxCWYBhVrrk1glN+9V+nsIJyVa
-        6qv75jzAEiTEOdI0A+bzz0LgINFEB2s=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xEH9h33TQSqPPiPDsBdeDp7ByTBzbtZLpeGkYEW8pJk=;
+        b=YGXrMEp2158BuX6LMzSoiN3athVlua4SnxDDevmxfl2rr0YwmFPy57UACYs1Vx/aOZYBZw
+        KVDan8iPcIguWns1yLfeXocCdrxlcOqOOVzrA6Wa9WeZsYHiCKFgry8BwUFUIfhjhVfPOs
+        T2qSFJTnHestN5Ky7v+rT8EdPktbo94=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-353-5OD6McStPDG25ynv3xBmww-1; Thu, 16 Feb 2023 05:56:18 -0500
-X-MC-Unique: 5OD6McStPDG25ynv3xBmww-1
-Received: by mail-wr1-f72.google.com with SMTP id g8-20020a5d46c8000000b002c54a27803cso190273wrs.22
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 02:56:17 -0800 (PST)
+ us-mta-206-zeCQUsY5NAWbXY69ekwZWQ-1; Thu, 16 Feb 2023 08:59:36 -0500
+X-MC-Unique: zeCQUsY5NAWbXY69ekwZWQ-1
+Received: by mail-pj1-f72.google.com with SMTP id gn18-20020a17090ac79200b0022bef1f49c9so3380807pjb.0
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 05:59:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uTgMQWhXxbdOB1s+iJ3y+3uVjK3VfEIrdExBYMmTzrk=;
-        b=dqsRJm7lg+h+fPfU9EDJThUKBY16E2jdL04rdcUlf9KozaBKRLb73c3WL3fPTTQ+4w
-         4/gM1hbwZLqAqySBy7UA+25bQAPCLTFHSPBfWMiDPhMX9hSyvSI83QvgkT3J6VAeh4al
-         iiaIQ0kI1FrMtRes2yPm+WNCw73zxvPCmkrzE157KQlWsu3DPJBh1SVz7Lc1+0hQrRso
-         uKkyJ7hGiZGP7kR2Ap2XYn9+qi7QLSLNkUAXoD4w0o89U6F75oUCo6bxZ+opWuU7mwy8
-         scaZK0QqSsBrPkL0+gBv8r/HUnEwVpuR8rxaNZ6WL7EZQb03091nq6s9LyNYczVk4qqC
-         FClQ==
-X-Gm-Message-State: AO0yUKXj1PyP/iMOy6pUNaJESCaDxQ0DIp7soKua1BRXQRhMWZnsIDC0
-        vHuJsvebtHjpKOqYXtjXOhoqF2i/uYcn6Uhd2nW7u8N1T/xQoZqRWumZ0ZB0Y4ZI04baZ7Dc6W9
-        Z7Fnia5gzP4VewivwBUU4Tw==
-X-Received: by 2002:adf:e701:0:b0:2c5:5331:5516 with SMTP id c1-20020adfe701000000b002c553315516mr4351124wrm.51.1676544976935;
-        Thu, 16 Feb 2023 02:56:16 -0800 (PST)
-X-Google-Smtp-Source: AK7set9ObTYOMWdJTcJUhFYm6zKW9Smmq8ZljjToRyJseQklHttx5j+GTfa92sWHSmEG8i4fOJ6xDQ==
-X-Received: by 2002:adf:e701:0:b0:2c5:5331:5516 with SMTP id c1-20020adfe701000000b002c553315516mr4351100wrm.51.1676544976599;
-        Thu, 16 Feb 2023 02:56:16 -0800 (PST)
-Received: from ?IPV6:2003:cb:c708:bc00:2acb:9e46:1412:686a? (p200300cbc708bc002acb9e461412686a.dip0.t-ipconnect.de. [2003:cb:c708:bc00:2acb:9e46:1412:686a])
-        by smtp.gmail.com with ESMTPSA id h16-20020adffa90000000b002c5621263e3sm1221457wrr.19.2023.02.16.02.56.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Feb 2023 02:56:16 -0800 (PST)
-Message-ID: <909d3cd5-eb64-6901-4e12-00ac5c69f4aa@redhat.com>
-Date:   Thu, 16 Feb 2023 11:56:15 +0100
+        bh=xEH9h33TQSqPPiPDsBdeDp7ByTBzbtZLpeGkYEW8pJk=;
+        b=22CJxZWgD7rk6fW3K+mu7+eBORrX74SkbNTbwatVlYR50VCvwpxEhYK9IuLmKTpQ4C
+         C/0/CEM6Ou9DxvrJ7yMmvIXo6cOOR28Sx+0mO8MPdt4ZE+wg7ed0nHlmZ8bJzP5+j97s
+         BcV96sPsCVl1brrgYRfQUqkeJMD7PMEdtV290iyOiIedeiSTdBbs/1uI5FaPZeRJTZR7
+         48DRJad6eNIhWau6X8sM1wl++k5yw5ricTSHerpN6/mPawi0MeE/x2+OCsKC3FIIlnjw
+         9jBblZOH9+Ka3QMxVzuunu8AacpdA5VKyHdoCooKRaMUvXR3CjPyFSYSB3e4hGzexkwD
+         J9lQ==
+X-Gm-Message-State: AO0yUKW7dA4UApwkjJngLRue8uhh/Rf/CA/DIadteQ+QxR7O+5ZvEEb1
+        ahdR4v8n+By7OMis92zzgDlHVT6dHVN3cOgxgFiEklQ469aOhdtvG4LeTF39DEtj+ijoOkbIFHA
+        ZfI7yLcZdARS7sbPANIc0B57pMzGoOXbrQe4WYQ==
+X-Received: by 2002:a63:375a:0:b0:4cd:fd18:8ccb with SMTP id g26-20020a63375a000000b004cdfd188ccbmr792423pgn.43.1676555974843;
+        Thu, 16 Feb 2023 05:59:34 -0800 (PST)
+X-Google-Smtp-Source: AK7set+fnE4zZrwJsp2nenn4dAhNJXa5kjnLl2S0zfctKiolwaM2jNY3wF/FKP7SRJni882H8wLcwDW2NvsCxga0P3o=
+X-Received: by 2002:a63:375a:0:b0:4cd:fd18:8ccb with SMTP id
+ g26-20020a63375a000000b004cdfd188ccbmr792412pgn.43.1676555974531; Thu, 16 Feb
+ 2023 05:59:34 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH 2/2] Revert "splice: Do splice read from a buffered file
- without using ITER_PIPE"
-Content-Language: en-US
-To:     Konrad Dybcio <konrad.dybcio@linaro.org>,
-        David Howells <dhowells@redhat.com>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-mm@kvack.org
-References: <20230215-topic-next-20230214-revert-v1-2-c58cd87b9086@linaro.org>
- <20230215-topic-next-20230214-revert-v1-0-c58cd87b9086@linaro.org>
- <3055589.1676466118@warthog.procyon.org.uk>
- <71078188-1443-d84e-658c-967991f3b590@linaro.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <71078188-1443-d84e-658c-967991f3b590@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <167172131368.2334525.8569808925687731937.stgit@warthog.procyon.org.uk>
+ <167172133121.2334525.2608800018126833569.stgit@warthog.procyon.org.uk>
+In-Reply-To: <167172133121.2334525.2608800018126833569.stgit@warthog.procyon.org.uk>
+From:   David Wysochanski <dwysocha@redhat.com>
+Date:   Thu, 16 Feb 2023 08:58:58 -0500
+Message-ID: <CALF+zO=P1QbKmyE7c+4CQZyWKM5PeU1GqgPxUnerWc9B03OxCA@mail.gmail.com>
+Subject: Re: [PATCH v5 2/3] mm, netfs, fscache: Stop read optimisation when
+ folio removed from pagecache
+To:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     Rohith Surabattula <rohiths.msft@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
+        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Jeff Layton <jlayton@kernel.org>,
+        linux-erofs@lists.ozlabs.org, linux-ext4@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 16.02.23 10:10, Konrad Dybcio wrote:
-> 
-> 
-> On 15.02.2023 14:01, David Howells wrote:
->> Konrad Dybcio <konrad.dybcio@linaro.org> wrote:
->>
->>> next-20230213 introduced commit d9722a475711 ("splice: Do splice read from
->>> a buffered file without using ITER_PIPE") which broke booting on any
->>> Qualcomm ARM64 device I grabbed, dereferencing a null pointer in
->>> generic_filesplice_read+0xf8/x598. Revert it to make the devices
->>> bootable again.
->>>
->>> This reverts commit d9722a47571104f7fa1eeb5ec59044d3607c6070.
->>> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
->>
->> Commit d9722a47571104f7fa1eeb5ec59044d3607c6070 was part of v13 of my
->> patches.  This got replaced yesterday by a newer version which may or may not
->> have made it into linux-next.
->>
->> This is probably a known bug fixed in the v14 by making shmem have its own
->> splice-read function.
->>
->> Can you try this?
->>
->> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-extract
-> next-20230216 boots fine again, thanks!
-> 
->>
->> (Also, can you include me in the cc list as I'm the author of the patch you
->> reverted?)
-> Ugh.. I thought b4 would have done that for me.. weird..
+On Thu, Dec 22, 2022 at 10:02 AM David Howells <dhowells@redhat.com> wrote:
+>
+> Fscache has an optimisation by which reads from the cache are skipped until
+> we know that (a) there's data there to be read and (b) that data isn't
+> entirely covered by pages resident in the netfs pagecache.  This is done
+> with two flags manipulated by fscache_note_page_release():
+>
+>         if (...
+>             test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&
+>             test_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags))
+>                 clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
+>
+> where the NO_DATA_TO_READ flag causes cachefiles_prepare_read() to indicate
+> that netfslib should download from the server or clear the page instead.
+>
+> The fscache_note_page_release() function is intended to be called from
+> ->releasepage() - but that only gets called if PG_private or PG_private_2
+> is set - and currently the former is at the discretion of the network
+> filesystem and the latter is only set whilst a page is being written to the
+> cache, so sometimes we miss clearing the optimisation.
+>
+> Fix this by following Willy's suggestion[1] and adding an address_space
+> flag, AS_RELEASE_ALWAYS, that causes filemap_release_folio() to always call
+> ->release_folio() if it's set, even if PG_private or PG_private_2 aren't
+> set.
+>
+> Note that this would require folio_test_private() and page_has_private() to
+> become more complicated.  To avoid that, in the places[*] where these are
+> used to conditionalise calls to filemap_release_folio() and
+> try_to_release_page(), the tests are removed the those functions just
+> jumped to unconditionally and the test is performed there.
+>
+> [*] There are some exceptions in vmscan.c where the check guards more than
+> just a call to the releaser.  I've added a function, folio_needs_release()
+> to wrap all the checks for that.
+>
+> AS_RELEASE_ALWAYS should be set if a non-NULL cookie is obtained from
+> fscache and cleared in ->evict_inode() before truncate_inode_pages_final()
+> is called.
+>
+> Additionally, the FSCACHE_COOKIE_NO_DATA_TO_READ flag needs to be cleared
+> and the optimisation cancelled if a cachefiles object already contains data
+> when we open it.
+>
+> Changes:
+> ========
+> ver #4)
+>  - Split out merging of folio_has_private()/filemap_release_folio() call
+>    pairs into a preceding patch.
+>  - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
+>
+> ver #3)
+>  - Fixed mapping_clear_release_always() to use clear_bit() not set_bit().
+>  - Moved a '&&' to the correct line.
+>
+> ver #2)
+>  - Rewrote entirely according to Willy's suggestion[1].
+>
+> Reported-by: Rohith Surabattula <rohiths.msft@gmail.com>
+> Suggested-by: Matthew Wilcox <willy@infradead.org>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Linus Torvalds <torvalds@linux-foundation.org>
+> cc: Steve French <sfrench@samba.org>
+> cc: Shyam Prasad N <nspmangalore@gmail.com>
+> cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> cc: Dave Wysochanski <dwysocha@redhat.com>
+> cc: Dominique Martinet <asmadeus@codewreck.org>
+> cc: Ilya Dryomov <idryomov@gmail.com>
+> cc: linux-cachefs@redhat.com
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-afs@lists.infradead.org
+> cc: v9fs-developer@lists.sourceforge.net
+> cc: ceph-devel@vger.kernel.org
+> cc: linux-nfs@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+>
+> Link: https://lore.kernel.org/r/Yk9V/03wgdYi65Lb@casper.infradead.org/ [1]
+> Link: https://lore.kernel.org/r/164928630577.457102.8519251179327601178.stgit@warthog.procyon.org.uk/ # v1
+> Link: https://lore.kernel.org/r/166844174069.1124521.10890506360974169994.stgit@warthog.procyon.org.uk/ # v2
+> Link: https://lore.kernel.org/r/166869495238.3720468.4878151409085146764.stgit@warthog.procyon.org.uk/ # v3
+> Link: https://lore.kernel.org/r/1459152.1669208550@warthog.procyon.org.uk/ # v3 also
+> Link: https://lore.kernel.org/r/166924372614.1772793.3804564782036202222.stgit@warthog.procyon.org.uk/ # v4
+> ---
+>
+>  fs/9p/cache.c           |    2 ++
+>  fs/afs/internal.h       |    2 ++
+>  fs/cachefiles/namei.c   |    2 ++
+>  fs/ceph/cache.c         |    2 ++
+>  fs/cifs/fscache.c       |    2 ++
+>  include/linux/pagemap.h |   16 ++++++++++++++++
+>  mm/internal.h           |    5 ++++-
+>  7 files changed, 30 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/9p/cache.c b/fs/9p/cache.c
+> index cebba4eaa0b5..12c0ae29f185 100644
+> --- a/fs/9p/cache.c
+> +++ b/fs/9p/cache.c
+> @@ -68,6 +68,8 @@ void v9fs_cache_inode_get_cookie(struct inode *inode)
+>                                        &path, sizeof(path),
+>                                        &version, sizeof(version),
+>                                        i_size_read(&v9inode->netfs.inode));
+> +       if (v9inode->netfs.cache)
+> +               mapping_set_release_always(inode->i_mapping);
+>
+>         p9_debug(P9_DEBUG_FSC, "inode %p get cookie %p\n",
+>                  inode, v9fs_inode_cookie(v9inode));
+> diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+> index 9ba7b68375c9..8e4afaeb6bff 100644
+> --- a/fs/afs/internal.h
+> +++ b/fs/afs/internal.h
+> @@ -680,6 +680,8 @@ static inline void afs_vnode_set_cache(struct afs_vnode *vnode,
+>  {
+>  #ifdef CONFIG_AFS_FSCACHE
+>         vnode->netfs.cache = cookie;
+> +       if (cookie)
+> +               mapping_set_release_always(vnode->netfs.inode.i_mapping);
+>  #endif
+>  }
+>
+> diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
+> index 03ca8f2f657a..50b2ee163af6 100644
+> --- a/fs/cachefiles/namei.c
+> +++ b/fs/cachefiles/namei.c
+> @@ -584,6 +584,8 @@ static bool cachefiles_open_file(struct cachefiles_object *object,
+>         if (ret < 0)
+>                 goto check_failed;
+>
+> +       clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &object->cookie->flags);
+> +
+>         object->file = file;
+>
+>         /* Always update the atime on an object we've just looked up (this is
+> diff --git a/fs/ceph/cache.c b/fs/ceph/cache.c
+> index 177d8e8d73fe..de1dee46d3df 100644
+> --- a/fs/ceph/cache.c
+> +++ b/fs/ceph/cache.c
+> @@ -36,6 +36,8 @@ void ceph_fscache_register_inode_cookie(struct inode *inode)
+>                                        &ci->i_vino, sizeof(ci->i_vino),
+>                                        &ci->i_version, sizeof(ci->i_version),
+>                                        i_size_read(inode));
+> +       if (ci->netfs.cache)
+> +               mapping_set_release_always(inode->i_mapping);
+>  }
+>
+>  void ceph_fscache_unregister_inode_cookie(struct ceph_inode_info *ci)
+> diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
+> index f6f3a6b75601..79e9665dfc90 100644
+> --- a/fs/cifs/fscache.c
+> +++ b/fs/cifs/fscache.c
+> @@ -108,6 +108,8 @@ void cifs_fscache_get_inode_cookie(struct inode *inode)
+>                                        &cifsi->uniqueid, sizeof(cifsi->uniqueid),
+>                                        &cd, sizeof(cd),
+>                                        i_size_read(&cifsi->netfs.inode));
+> +       if (cifsi->netfs.cache)
+> +               mapping_set_release_always(inode->i_mapping);
+>  }
+>
+>  void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update)
+> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+> index 29e1f9e76eb6..a0d433e0addd 100644
+> --- a/include/linux/pagemap.h
+> +++ b/include/linux/pagemap.h
+> @@ -199,6 +199,7 @@ enum mapping_flags {
+>         /* writeback related tags are not used */
+>         AS_NO_WRITEBACK_TAGS = 5,
+>         AS_LARGE_FOLIO_SUPPORT = 6,
+> +       AS_RELEASE_ALWAYS,      /* Call ->release_folio(), even if no private data */
+>  };
+>
+>  /**
+> @@ -269,6 +270,21 @@ static inline int mapping_use_writeback_tags(struct address_space *mapping)
+>         return !test_bit(AS_NO_WRITEBACK_TAGS, &mapping->flags);
+>  }
+>
+> +static inline bool mapping_release_always(const struct address_space *mapping)
+> +{
+> +       return test_bit(AS_RELEASE_ALWAYS, &mapping->flags);
+> +}
+> +
+> +static inline void mapping_set_release_always(struct address_space *mapping)
+> +{
+> +       set_bit(AS_RELEASE_ALWAYS, &mapping->flags);
+> +}
+> +
+> +static inline void mapping_clear_release_always(struct address_space *mapping)
+> +{
+> +       clear_bit(AS_RELEASE_ALWAYS, &mapping->flags);
+> +}
+> +
+>  static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
+>  {
+>         return mapping->gfp_mask;
+> diff --git a/mm/internal.h b/mm/internal.h
+> index c4c8e58e1d12..5421ce8661fa 100644
+> --- a/mm/internal.h
+> +++ b/mm/internal.h
+> @@ -168,7 +168,10 @@ static inline void set_page_refcounted(struct page *page)
+>   */
+>  static inline bool folio_needs_release(struct folio *folio)
+>  {
+> -       return folio_has_private(folio);
+> +       struct address_space *mapping = folio->mapping;
+> +
+> +       return folio_has_private(folio) ||
+> +               (mapping && mapping_release_always(mapping));
+>  }
+>
+>  extern unsigned long highest_memmap_pfn;
+>
+>
 
-Right, and usually it's nicer to comment on the problematic patches, 
-asking for a fix or a revert, instead of sending reverts.
+What is the status of this patch?  I think it may be stalled but I'm not sure
+if maybe it's in progress behind the scenes, or in someone's testing tree?
 
-My 2 cents.
+FWIW, this is still needed for the NFS netfs conversion patches [1]
+(I will post a v11 soon), to avoid a perf regression seen by my unit
+tests as well as by Daire Byrne and Ben Maynard re-export environments.
 
--- 
-Thanks,
+Thanks.
 
-David / dhildenb
+[1] https://marc.info/?l=linux-nfs&m=166749188616723&w=4
 
