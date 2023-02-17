@@ -2,177 +2,241 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD245C05027
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 05:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F612C64EC4
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 05:52:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229445AbjBQFrR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Feb 2023 00:47:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47606 "EHLO
+        id S229445AbjBQFws (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Feb 2023 00:52:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjBQFrR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 00:47:17 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C782498B6
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 21:47:15 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id eg30so8198edb.7
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 21:47:15 -0800 (PST)
+        with ESMTP id S229632AbjBQFwr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 00:52:47 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A7F4A1F7;
+        Thu, 16 Feb 2023 21:52:45 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id u22so475009lfu.5;
+        Thu, 16 Feb 2023 21:52:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XB7h+cmZtvYgAba2kFYYNfPzL/JUxgaBKXdnhmUiumQ=;
-        b=bAb38fAhP4mhGMKOH0qlW9w7L2Q0wDPOTt+Cl07Q4/RFwfhtljLSnueKnQDTwX6+SE
-         ESbfV5kClJP3Y+wc0xR7KVIUejRF4IwJOBLgxkc2Yap/GnI12IBQGBWc4RIi9rp/bxmZ
-         91eIwC7gcSiihjSWmTXMDfLoMp9kE2ki3AKzRzhzdV/MrCB7PP6hOdY1Ck/9z+XJ5oJK
-         cl/NKtFFYaPXb0vBGzZADh/4IgR04/APmM9IzHADsORKj2rXysFz3osF8+AvaZfBKZio
-         U0PtYdMLIDtxPuBq3am51XUFBe5hz8h/g4bftAcso950/SO/JeNx3yFkZMvZbqmc/BzJ
-         BKzA==
+        bh=jhKEcQNHLahXXVVAZN/VNTQNbuPo76AKJbBDzHJgOUc=;
+        b=i4sVg3Rt5qkkB82twz6yJ7yklKP63AMrO5uciaCNTatfIbYzWS8W0yu9GSv9ssFqJB
+         hosNtRGyWss72q3YGpVwmbaVKxVGu6atglPUQ/iglRVjU/wKcYx9h1WYpbV1FM/lCHRi
+         Zad6gTaXNW7kYPhkIASR/UVWUfK6C67bp+sJj9VwVe9Y28DxA4wp5mn51ejjbXNXzuze
+         wWkJvUlmizecxndGdkkm81ywSm4nrISQpOdnP/rk1rzeqhfpQ+spGUrXp81aRucPBEuE
+         sb8XK4ZASIte04pVDASai2uT0gRiFnn4/T4mWeLedzZIM+BCArUR8RqopmLVtaJA7wDY
+         brpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XB7h+cmZtvYgAba2kFYYNfPzL/JUxgaBKXdnhmUiumQ=;
-        b=8IprZrK+4FT50l7Fs9xbqVc11+NMkknr9fjEfe8fBtrk3eIEq9brkFTyhEXEo9SDvM
-         bvIzju/mVAkUhUqryeyCyh8v/LS+aJaW4Q+KOf0+LLb23Um9FzBBGAGJ+3Qe3nl4tQZm
-         zU2IJIAbkQvFZtsMYCV3uJVMf99TFl88ohaltFFa74yBx9d5J9jpljwNskqu4k9Tng6r
-         z3poA8KynCdYblKbwRYrww6j2cv3jN1fnhKsvO7rlA5c3Gl0bM6Rj02UkoeWjH3gPjPY
-         3c7WZnFBred+TALi30kPyeVovy+D+uk57OEJnjCExQCc7rHctHGM04BgDbiHqfHKvSmU
-         cUqg==
-X-Gm-Message-State: AO0yUKWOz4LkO0NV/v1tY/GYUgWrvNijFarp4RRkCJYVJI9dXM6XcECd
-        7Uoiv0VqdsexNFmedxptIc7wGtZDYs+2h3rIFaY=
-X-Google-Smtp-Source: AK7set/f4WvLtADHl3rZq4RHSEHDLDuPOgxQqcwz01p4spdLfNJWj0nU5R74BLqzbGEDSmqKc0SyjkJ/DfDdHGJ+ZNY=
-X-Received: by 2002:a50:f697:0:b0:4ac:c838:5b4 with SMTP id
- d23-20020a50f697000000b004acc83805b4mr262151edn.8.1676612833628; Thu, 16 Feb
- 2023 21:47:13 -0800 (PST)
+        bh=jhKEcQNHLahXXVVAZN/VNTQNbuPo76AKJbBDzHJgOUc=;
+        b=4obSH3oPWr12TeO/dfb4ipvZOrFIeesTdS686Uv/y0jJUeVAmMZuz1iJmmTL7EK0JK
+         7JspqJCs/+UNkH/cxoiDBRKXW7+kFMiYI0nZr4YnoJCzXZH1Bi5uZXktLagYic+UdXyM
+         pEP5I6BeKh1C/9+D65PiVQtAapinOc0/IeAXsyiYlqQ0gRicZ5lWQi/xTtUt1T5iOpwH
+         Bfl+ijyXDUD2DimaGksERmNSvad0UYmFQldMvEgQ9l8kFYlpn4kvgr7tVOhBlkuhkxEl
+         LQpctjUOIyCxw56wfdBM/UozcqFlrej+3FGeO6P9zUfMHuYdO7ePrQe6JcpR69hTXSAw
+         N50A==
+X-Gm-Message-State: AO0yUKVhn/y6/lsvpQhKA9iv7uMZrfPDQns0T76+GkNvdpobg3kmj9Q0
+        jgHzs0HlATmYvtIRasPn6WwYveEnNECcSmuw8q0=
+X-Google-Smtp-Source: AK7set/cB6L3GkTNc49elZ1VVrbsKguVoD4zFbvB6iRnustoBN4+jp+084rglthKUbV/WhcVCix1pklnzzgNYJB23eA=
+X-Received: by 2002:a05:6512:501:b0:4d5:ca32:7bc3 with SMTP id
+ o1-20020a056512050100b004d5ca327bc3mr78862lfb.10.1676613163893; Thu, 16 Feb
+ 2023 21:52:43 -0800 (PST)
 MIME-Version: 1.0
-References: <20230217033501.2591185-1-lsahlber@redhat.com> <20230217033501.2591185-2-lsahlber@redhat.com>
- <CAH2r5mv54i_ASAGPpfw2bC0wqUZ=P47vRmK2NWt=t5b69KJA+A@mail.gmail.com>
-In-Reply-To: <CAH2r5mv54i_ASAGPpfw2bC0wqUZ=P47vRmK2NWt=t5b69KJA+A@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 17 Feb 2023 15:47:01 +1000
-Message-ID: <CAN05THTXsk3v6Uk65y3ryJPjurpRnfuhk0e5=90Hypd6canu2Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cifs: return a single-use cfid if we did not get a lease
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Bharath S M <bharathsm@microsoft.com>
+References: <20230216214745.3985496-1-dhowells@redhat.com>
+In-Reply-To: <20230216214745.3985496-1-dhowells@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 16 Feb 2023 23:52:32 -0600
+Message-ID: <CAH2r5mtXfAF19zrRzoLCnHYK593L8HyFTScw-FeaB=Mt7Wj0AQ@mail.gmail.com>
+Subject: Re: [PATCH 00/17] smb3: Use iov_iters down to the network transport
+ and fix DIO page pinning
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-At a later time we can make additional changes so that we ALWAYS
-return a single-use cfid to all callers IFF we could SMB2_open() the
-file for the cfid.
-Right now any concurrent opens on a cfid for a path that does not have
-cfid->has_lease will return NULL and have the application retry a
-normal SMB2_open.
+tentatively merged the first 13 of this series into cifs-2.6.git
+for-next (pending additional testing and any more review comments)
 
-We can change this further to also return single-use cfids for
-concurrent use and this would have the benefit that we can avoid
-having to do the
-"try getting a cfid if it fails try a normal smb2_open conditional" in
-the callers.
-It would simplify the code in the callers.  It is not an urgent
-cleanup but something we should do in the future.
+On Thu, Feb 16, 2023 at 3:47 PM David Howells <dhowells@redhat.com> wrote:
+>
+> Hi Steve,
+>
+> Here's an updated version of my patchset to make the cifs/smb3 driver pass
+> iov_iters down to the lowest layers where they can be passed directly to
+> the network transport rather than passing lists of pages around.
+>
+> The series deals with the following issues:
+>
+>  (-) By pinning pages, it fixes the race between concurrent DIO read and
+>      fork, whereby the pages containing the DIO read buffer may end up
+>      belonging to the child process and not the parent - with the result
+>      that the parent might not see the retrieved data.
+>
+>  (-) cifs shouldn't take refs on pages extracted from non-user-backed
+>      iterators (eg. KVEC).  With these changes, cifs will apply the
+>      appropriate cleanup.  Note that there is the possibility the network
+>      transport might, but that's beyond the scope of this patchset.
+>
+>  (-) Making it easier to transition to using folios in cifs rather than
+>      pages by dealing with them through BVEC and XARRAY iterators.
+>
+> The first five patches add two facilities to the VM/VFS core, excerpts from
+> my iov-extract branch[1] that are required in order to do the cifs
+> iteratorisation:
+>
+>  (*) Future replacements for file-splicing in the form of functions
+>      filemap_splice_read() and direct_splice_read().  These allow file
+>      splicing to be done without the use of an ITER_PIPE iterator, without
+>      the need to take refs on the pages extracted from KVEC/BVEC/XARRAY
+>      iterators.  This is necessary to use iov_iter_extract_pages().
+>
+>      [!] Note that whilst these are added in core code, they are only used
+>      by cifs at this point.
+>
+>  (*) Add iov_iter_extract_pages(), a replacement for iov_iter_get_pages*()
+>      that uses FOLL_PIN on user pages (IOVEC, UBUF) and doesn't pin kernel
+>      pages (BVEC, KVEC, XARRAY).  This allows cifs to do the page pinning
+>      correctly.
+>
+>      [!] Note that whilst this is added in core code, it is only used by
+>      cifs at this point - though a corresponding change is made to the
+>      flags argument of iov_iter_get_pages*() so that it doesn't take FOLL_*
+>      flags, but rather takes iov_iter_extraction_t flags that are
+>      translated internally to FOLL_* flags.
+>
+> Then there's a couple of patches to make cifs use the new splice functions.
+>
+> The series continues with a couple of patches that add stuff to netfslib
+> that I want to use there as well as in cifs:
+>
+>  (*) Add a netfslib function to extract and pin pages from an ITER_IOBUF or
+>      ITER_UBUF iterator into an ITER_BVEC iterator.
+>
+>  (*) Add a netfslib function to extract pages from an iterator that's of
+>      type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a scatterlist.
+>      The cleanup will need to be done as for iov_iter_extract_pages().
+>
+>      BVEC, KVEC and XARRAY iterators can be rendered into elements that
+>      span multiple pages.
+>
+> Added to that are some cifs helpers that work with iterators:
+>
+>  (*) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
+>      add elements to an RDMA SGE list.  Only the DMA addresses are stored,
+>      and an element may span multiple pages (say if an xarray contains a
+>      multipage folio).
+>
+>  (*) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
+>      pass the contents into a shash function.
+>
+>  (*) Add functions to walk through an ITER_XARRAY iterator and perform
+>      various sorts of cleanup on the folios held therein, to be used on I/O
+>      completion.
+>
+>  (*) Add a function to read from the transport TCP socket directly into an
+>      iterator.
+>
+> Finally come the patches that actually do the work of iteratorising cifs:
+>
+>  (*) The main patch.  Replace page lists with iterators.  It extracts the
+>      pages from ITER_UBUF and ITER_IOVEC iterators to an ITER_BVEC
+>      iterator, pinning or getting refs on them, before passing them down as
+>      the I/O may be done from a worker thread.
+>
+>      The iterator is extracted into a scatterlist in order to talk to the
+>      crypto interface or to do RDMA.
+>
+>  (*) In the cifs RDMA code, extract the iterator into an RDMA SGE[] list,
+>      removing the scatterlist intermediate - at least for smbd_send().
+>      There appear to be other ways for cifs to talk to the RDMA layer that
+>      don't go through that that I haven't managed to work out.
+>
+>  (*) Remove a chunk of now-unused code.
+>
+>  (*) Allow DIO to/from KVEC-type iterators.
+>
+> I've pushed the patches here also:
+>
+>         https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-cifs
+>
+> David
+>
+> Link: https://lore.kernel.org/r/20230214171330.2722188-1-dhowells@redhat.com/ [1]
+> Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/
+> Link: https://lore.kernel.org/r/20230131182855.4027499-1-dhowells@redhat.com/ # v1
+>
+> David Howells (17):
+>   mm: Pass info, not iter, into filemap_get_pages()
+>   splice: Add a func to do a splice from a buffered file without
+>     ITER_PIPE
+>   splice: Add a func to do a splice from an O_DIRECT file without
+>     ITER_PIPE
+>   iov_iter: Define flags to qualify page extraction.
+>   iov_iter: Add a function to extract a page list from an iterator
+>   splice: Export filemap/direct_splice_read()
+>   cifs: Implement splice_read to pass down ITER_BVEC not ITER_PIPE
+>   netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
+>   netfs: Add a function to extract an iterator into a scatterlist
+>   cifs: Add a function to build an RDMA SGE list from an iterator
+>   cifs: Add a function to Hash the contents of an iterator
+>   cifs: Add some helper functions
+>   cifs: Add a function to read into an iter from a socket
+>   cifs: Change the I/O paths to use an iterator rather than a page list
+>   cifs: Build the RDMA SGE list directly from an iterator
+>   cifs: Remove unused code
+>   cifs: DIO to/from KVEC-type iterators should now work
+>
+>  block/bio.c               |    6 +-
+>  block/blk-map.c           |    8 +-
+>  fs/cifs/Kconfig           |    1 +
+>  fs/cifs/cifsencrypt.c     |  172 +++-
+>  fs/cifs/cifsfs.c          |   12 +-
+>  fs/cifs/cifsfs.h          |    6 +
+>  fs/cifs/cifsglob.h        |   66 +-
+>  fs/cifs/cifsproto.h       |   11 +-
+>  fs/cifs/cifssmb.c         |   15 +-
+>  fs/cifs/connect.c         |   14 +
+>  fs/cifs/file.c            | 1772 ++++++++++++++++---------------------
+>  fs/cifs/fscache.c         |   22 +-
+>  fs/cifs/fscache.h         |   10 +-
+>  fs/cifs/misc.c            |  128 +--
+>  fs/cifs/smb2ops.c         |  362 ++++----
+>  fs/cifs/smb2pdu.c         |   53 +-
+>  fs/cifs/smbdirect.c       |  535 ++++++-----
+>  fs/cifs/smbdirect.h       |    7 +-
+>  fs/cifs/transport.c       |   54 +-
+>  fs/netfs/Makefile         |    1 +
+>  fs/netfs/iterator.c       |  371 ++++++++
+>  fs/splice.c               |   93 ++
+>  include/linux/fs.h        |    6 +
+>  include/linux/netfs.h     |    8 +
+>  include/linux/pipe_fs_i.h |   20 +
+>  include/linux/uio.h       |   35 +-
+>  lib/iov_iter.c            |  284 +++++-
+>  mm/filemap.c              |  156 +++-
+>  mm/internal.h             |    6 +
+>  mm/vmalloc.c              |    1 +
+>  30 files changed, 2515 insertions(+), 1720 deletions(-)
+>  create mode 100644 fs/netfs/iterator.c
+>
 
 
-On Fri, 17 Feb 2023 at 15:41, Steve French <smfrench@gmail.com> wrote:
->
-> Added Reviewed-by Bharath and merged into cifs-2.6.git for-next
->
-> On Thu, Feb 16, 2023 at 9:35 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
-> >
-> > If we did not get a lease we can still return a single use cfid to the caller.
-> > The cfid will not have has_lease set and will thus not be shared with any
-> > other concurrent users and will be freed immediately when the caller
-> > drops the handle.
-> >
-> > This avoids extra roundtrips for servers that do not support directory leases
-> > where they would first fail to get a cfid with a lease and then fallback
-> > to try a normal SMB2_open()
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/cached_dir.c | 16 +++++++++++++---
-> >  1 file changed, 13 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/fs/cifs/cached_dir.c b/fs/cifs/cached_dir.c
-> > index 6672f1a0acd7..27ae908e4903 100644
-> > --- a/fs/cifs/cached_dir.c
-> > +++ b/fs/cifs/cached_dir.c
-> > @@ -14,6 +14,7 @@
-> >
-> >  static struct cached_fid *init_cached_dir(const char *path);
-> >  static void free_cached_dir(struct cached_fid *cfid);
-> > +static void smb2_close_cached_fid(struct kref *ref);
-> >
-> >  static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
-> >                                                     const char *path,
-> > @@ -220,6 +221,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> >                 }
-> >                 goto oshr_free;
-> >         }
-> > +       cfid->tcon = tcon;
-> >         cfid->is_open = true;
-> >
-> >         o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
-> > @@ -232,7 +234,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> >         if (o_rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE)
-> >                 goto oshr_free;
-> >
-> > -
-> >         smb2_parse_contexts(server, o_rsp,
-> >                             &oparms.fid->epoch,
-> >                             oparms.fid->lease_key, &oplock,
-> > @@ -259,7 +260,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> >                 }
-> >         }
-> >         cfid->dentry = dentry;
-> > -       cfid->tcon = tcon;
-> >         cfid->time = jiffies;
-> >         cfid->has_lease = true;
-> >
-> > @@ -270,7 +270,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> >         free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
-> >         free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
-> >         spin_lock(&cfids->cfid_list_lock);
-> > -       if (!cfid->has_lease) {
-> > +       if (rc && !cfid->has_lease) {
-> >                 if (cfid->on_list) {
-> >                         list_del(&cfid->entry);
-> >                         cfid->on_list = false;
-> > @@ -279,6 +279,15 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
-> >                 rc = -ENOENT;
-> >         }
-> >         spin_unlock(&cfids->cfid_list_lock);
-> > +       if (!rc && !cfid->has_lease) {
-> > +               /*
-> > +                * We are guaranteed to have two references at this point.
-> > +                * One for the caller and one for a potential lease.
-> > +                * Release the Lease-ref so that the directory will be closed
-> > +                * when the caller closes the cached handle.
-> > +                */
-> > +               kref_put(&cfid->refcount, smb2_close_cached_fid);
-> > +       }
-> >         if (rc) {
-> >                 if (cfid->is_open)
-> >                         SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid,
-> > @@ -339,6 +348,7 @@ smb2_close_cached_fid(struct kref *ref)
-> >         if (cfid->is_open) {
-> >                 SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid,
-> >                            cfid->fid.volatile_fid);
-> > +               atomic_dec(&cfid->tcon->num_remote_opens);
-> >         }
-> >
-> >         free_cached_dir(cfid);
-> > --
-> > 2.35.3
-> >
->
->
-> --
-> Thanks,
->
-> Steve
+-- 
+Thanks,
+
+Steve
