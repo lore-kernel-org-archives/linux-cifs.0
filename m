@@ -2,81 +2,110 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB06C05027
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 13:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66623C636D6
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 17:48:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229706AbjBQNiS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Feb 2023 08:38:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33442 "EHLO
+        id S229554AbjBQRso (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Feb 2023 12:48:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbjBQNiR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 08:38:17 -0500
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E60A31E31
-        for <linux-cifs@vger.kernel.org>; Fri, 17 Feb 2023 05:38:16 -0800 (PST)
-Message-Id: <1ba6aed922e5a6b09a665c8df07b55ce@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1676641094;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cfMlq4qsHiUGaRFnO8A89OrnEGFsbguBVPxFT8JGe10=;
-        b=cfaOMGAlxCfBW8w97Yv6rtkqtZE5UFtQSzTQgmeVB6GcPx1KB69uzUgnKLIjmAz086tkNE
-        Lznh7plt+eBhrZK5DnsdvtwCR9wQhIHMZ2ZqJHeZjSlJdp26M4lH85RoNVd50qZRR732pL
-        SxWS0/1/S7zTsO3XwTlbo8gKDjGS36H9Pz1zdAKSHoCjGGmKmCOtfivoFsMB9bhZ1qI50g
-        JNAY4FwNn0yR/O/ysI/1+I8qxWCdsr4we2FqGdk/doE4EUZc469Xz3UF9P84ibm59Cly0/
-        V9kEvX2cPBldBzp90UEox9i84+CriU/ufPVEeN+ZwTUHNHW7LJk1DSsgkM1nTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1676641094;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cfMlq4qsHiUGaRFnO8A89OrnEGFsbguBVPxFT8JGe10=;
-        b=QtCR3DFMM8ccA6t6BQktqniGIXa4HbdX2UyZWcvI01lwffQ2fyJTFGiyqrJYKFsbZuBSML
-        p+RJ5dpSmoWitWR/aTTgmFbro88bzc/6ojW6PPzn+XfKIaRXU8pn1dGo06FnWp163Gavo6
-        Ur/6SFyeg1F8/vk10HTc7tu4bIQW+DAln3RxqEySLEreMAHhLAMritU/ISDduo7p6ulrGB
-        9LD+lwoFRGerXo7GsbflJ50NqEpcOrUVcngvbnV150m3vh1QX8HEj6nsktez5pNs+qKmRC
-        KYIGpOZQXD6T5nfUlvDzwS+rmFfmS/v84hL/pLHC78acEE0fTXKiBaO2PPwcAw==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1676641094; a=rsa-sha256;
-        cv=none;
-        b=lu7VfpyT6jYK48W50v75vMSfYkSwwVGWWwXclWP8lZKjF5e+++S7Pn1CztEGin7w1alnX4
-        /UN6LQfXOaheGqSWlaUbKiEAlQ9u62VW0Gg3KTRxCPWPAujpIce0GNFXHaW8iEUTaYT1GC
-        YT5MtmzKMoszcisDEUF+LOEQM1dAqmaLY3kpThG7MAfAhKXjaujAu6QWKu0xfKWhbmRUHs
-        gZ0DfsPuaqAsQNxYoHqZn+hgojqDuiaqqwarY58BRxi9JCFb3m3Oq3B+rUu64qNTrWY2Ci
-        TP2KncqL0dN6pgdcKmaS3eglMry3WLLAi2ryXEOcx5iY9xtRlEqgOXHxu3e1NA==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH 2/2] cifs: return a single-use cfid if we did not get a
- lease
-In-Reply-To: <20230217033501.2591185-2-lsahlber@redhat.com>
-References: <20230217033501.2591185-1-lsahlber@redhat.com>
- <20230217033501.2591185-2-lsahlber@redhat.com>
-Date:   Fri, 17 Feb 2023 10:38:10 -0300
+        with ESMTP id S229502AbjBQRsn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 12:48:43 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 412854FCBD;
+        Fri, 17 Feb 2023 09:48:42 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id bi36so2414239lfb.6;
+        Fri, 17 Feb 2023 09:48:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=W82mtufaxCxYaCrOwsWwXEqkQ8P4m8alQaSwlsBKCQE=;
+        b=RimT2oCov4P2FJhzEMVzK6vAiZ1gzLQ+s2iyY+NBElRkyquEhBySqKaTrFiClN3Q5L
+         tc4BrLdaY/OzDcL8amvmaZWPWdQ29gctSOMhZYz00WwaVG+tKgqs9a0ZOrPBcQdOZauU
+         4eHv8uCS2ezA6q1tCzEtShJ0lcitKPXVnXs6b4z+J2wS0/IRMtfn/yjH0SSTaPK9A/J5
+         2ELTVzNKbzdyrKU0wEKbfPTf629znz/I3HfzV0bSoeErirN2hQn6zDbQJwkEZSod+M5s
+         2XzWNrgf/6UxcM1LExMCpG3ohyVuDIhCxkEmyopQDxfD7YU5yQXzh/3R+DznDDXV4yjr
+         Yz5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W82mtufaxCxYaCrOwsWwXEqkQ8P4m8alQaSwlsBKCQE=;
+        b=Q0fGN7ApykI008wSYWbeAIuOAEtDywXpMjpU7ET1aPyznALkWYnb4/g+L5Wmm5A7s3
+         nh+khoGnoAfIDYtyPn8N0vF2/Vf1hH2XUrDvLzHgmeKtvVaYji+EUrLi06qq+NQrs5GL
+         18No2Dqt6gRzuMSHZV+P3d9+i6bbg+XVI7wlfPr98x+IxU86qlo0GrsDqke7oDILXAIY
+         LLSZnTZIh5spCRgObRha9Bu1VwEX+57rix1ibUBMmkbxwAhO6ghPA+n4YWhkVFVz1MlH
+         gsa8OYoxfVuUOvr4eVDSoeYaOn9UsceCigLHTRFMx99ykk2cE5HhBGapIQ1FSuN+D7yr
+         w8dQ==
+X-Gm-Message-State: AO0yUKWROb3peoP3KSMITkZVNo05SyoZAMQPAFH8adBq83wB71IuodXr
+        IyUAxDUxDy4RLldrKKO2+cG8haXifGuNrS3lX40=
+X-Google-Smtp-Source: AK7set86i6m3Q4viJu7w21vbC25QAPfZIb1xUe2TG6mkfmZTyneWDww3gkbjTM2kzGZ0bcI9FudMJJy97KppSFxu5AQ=
+X-Received: by 2002:a05:6512:501:b0:4d5:ca32:7bc3 with SMTP id
+ o1-20020a056512050100b004d5ca327bc3mr646949lfb.10.1676656120238; Fri, 17 Feb
+ 2023 09:48:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20230216214745.3985496-1-dhowells@redhat.com> <20230216214745.3985496-15-dhowells@redhat.com>
+ <CAH2r5msNJTdt7295xt=NVY7wUaWFycKMb_=7d9LySsGGwBTnjQ@mail.gmail.com> <4008035.1676621321@warthog.procyon.org.uk>
+In-Reply-To: <4008035.1676621321@warthog.procyon.org.uk>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 17 Feb 2023 11:48:28 -0600
+Message-ID: <CAH2r5ms1u7OPYhzYHLD2vddK6FHxOR3q+O_n80JmbJeo_mbUMQ@mail.gmail.com>
+Subject: Re: [PATCH 14/17] cifs: Change the I/O paths to use an iterator
+ rather than a page list
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ronnie Sahlberg <lsahlber@redhat.com> writes:
+I don't think that those are particular important to clean up - but a
+couple of the other checkpatch warnings were
 
-> If we did not get a lease we can still return a single use cfid to the caller.
-> The cfid will not have has_lease set and will thus not be shared with any
-> other concurrent users and will be freed immediately when the caller
-> drops the handle.
+On Fri, Feb 17, 2023 at 2:08 AM David Howells <dhowells@redhat.com> wrote:
 >
-> This avoids extra roundtrips for servers that do not support directory leases
-> where they would first fail to get a cfid with a lease and then fallback
-> to try a normal SMB2_open()
+> Steve French <smfrench@gmail.com> wrote:
 >
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/cached_dir.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #627: FILE: fs/cifs/file.c:2609:
+> > +#if 0 // TODO: Remove for iov_iter support
+> > ...
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #1040: FILE: fs/cifs/file.c:3512:
+> > +#if 0 // TODO: Remove for iov_iter support
+> >
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #1067: FILE: fs/cifs/file.c:3587:
+> > +#if 0 // TODO: Remove for iov_iter support
+> >
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #1530: FILE: fs/cifs/file.c:4217:
+> > +#if 0 // TODO: Remove for iov_iter support
+> >
+> > WARNING: Consider removing the code enclosed by this #if 0 and its #endif
+> > #1837: FILE: fs/cifs/file.c:4903:
+> > +#if 0 // TODO: Remove for iov_iter support
+>
+> These chunks of code are removed in patch 16.  I did it this way to reduce the
+> size of patch 14.  I can merge 16 into 14 if you like.
+>
+> David
+>
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+
+-- 
+Thanks,
+
+Steve
