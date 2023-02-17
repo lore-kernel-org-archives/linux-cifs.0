@@ -2,238 +2,91 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F612C64EC4
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 05:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80267C05027
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 06:13:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229445AbjBQFws (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Feb 2023 00:52:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51902 "EHLO
+        id S229694AbjBQGNp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Feb 2023 01:13:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbjBQFwr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 00:52:47 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A7F4A1F7;
-        Thu, 16 Feb 2023 21:52:45 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id u22so475009lfu.5;
-        Thu, 16 Feb 2023 21:52:45 -0800 (PST)
+        with ESMTP id S229517AbjBQGNo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 01:13:44 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4044AFE6
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 22:13:43 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id be32so271388lfb.10
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 22:13:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jhKEcQNHLahXXVVAZN/VNTQNbuPo76AKJbBDzHJgOUc=;
-        b=i4sVg3Rt5qkkB82twz6yJ7yklKP63AMrO5uciaCNTatfIbYzWS8W0yu9GSv9ssFqJB
-         hosNtRGyWss72q3YGpVwmbaVKxVGu6atglPUQ/iglRVjU/wKcYx9h1WYpbV1FM/lCHRi
-         Zad6gTaXNW7kYPhkIASR/UVWUfK6C67bp+sJj9VwVe9Y28DxA4wp5mn51ejjbXNXzuze
-         wWkJvUlmizecxndGdkkm81ywSm4nrISQpOdnP/rk1rzeqhfpQ+spGUrXp81aRucPBEuE
-         sb8XK4ZASIte04pVDASai2uT0gRiFnn4/T4mWeLedzZIM+BCArUR8RqopmLVtaJA7wDY
-         brpw==
+        bh=4LO/TzNRdGS+NAkb5c71zI75VS0pG4xxytpLbiPd0I4=;
+        b=a0yFFbFs/eJ2WILLyY882FII66RWrbk398R/rZ0L/ZeHqDFp913+T2sVegcfKUWID4
+         AohpGOyIdvs2TGy2qWgWHwKme0y38MV3X/DpiI+2Hd7gEbGsCcrTeTM/Ru/38n32dbxS
+         5e1BlC8GxCGQP3VOi1HsqKIJIt67Dd9dSqjJIrPtqHZXBlAVpgWGWt/umU/JE7RAXrP2
+         QlG3glusrc/XCVIUDiJ8oK1RP0aLD9usUXY2MXnfFEPGdKIxUo49tp/5D3a9rqlvn0lT
+         z7s1wTYEWhdc1wyR1Y8GOwgDQ0E04nsZp15GuDbb0dpGRGU7IofG84zX3hDwKHZU5STH
+         DPvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jhKEcQNHLahXXVVAZN/VNTQNbuPo76AKJbBDzHJgOUc=;
-        b=4obSH3oPWr12TeO/dfb4ipvZOrFIeesTdS686Uv/y0jJUeVAmMZuz1iJmmTL7EK0JK
-         7JspqJCs/+UNkH/cxoiDBRKXW7+kFMiYI0nZr4YnoJCzXZH1Bi5uZXktLagYic+UdXyM
-         pEP5I6BeKh1C/9+D65PiVQtAapinOc0/IeAXsyiYlqQ0gRicZ5lWQi/xTtUt1T5iOpwH
-         Bfl+ijyXDUD2DimaGksERmNSvad0UYmFQldMvEgQ9l8kFYlpn4kvgr7tVOhBlkuhkxEl
-         LQpctjUOIyCxw56wfdBM/UozcqFlrej+3FGeO6P9zUfMHuYdO7ePrQe6JcpR69hTXSAw
-         N50A==
-X-Gm-Message-State: AO0yUKVhn/y6/lsvpQhKA9iv7uMZrfPDQns0T76+GkNvdpobg3kmj9Q0
-        jgHzs0HlATmYvtIRasPn6WwYveEnNECcSmuw8q0=
-X-Google-Smtp-Source: AK7set/cB6L3GkTNc49elZ1VVrbsKguVoD4zFbvB6iRnustoBN4+jp+084rglthKUbV/WhcVCix1pklnzzgNYJB23eA=
-X-Received: by 2002:a05:6512:501:b0:4d5:ca32:7bc3 with SMTP id
- o1-20020a056512050100b004d5ca327bc3mr78862lfb.10.1676613163893; Thu, 16 Feb
- 2023 21:52:43 -0800 (PST)
+        bh=4LO/TzNRdGS+NAkb5c71zI75VS0pG4xxytpLbiPd0I4=;
+        b=f5ra+T2Q61IDeE+jzzKZjtWB5cd8kZLnDCgckkLo1SkFUdr9fE/Lo3/uEVxZLBaCh0
+         l2YTKwmv60Qq2Qo/DwGx4c88teY1gYnSf8dAJrLDWseWfGoacbdRAaviDMrv/vJQ557c
+         SqSlInAEGsnIPgQXuPGVyAy5ADwEF+6XQtsRmbVOEfj3RJHAPAvE//iHNQe84DY6eOMH
+         VVVWOjlFp4vQxVvz0i5S9dfeL9dm1O+0mrL1Ih6ETn2L1zHeKJ3Y8uxl+H3sbqZ7BcRD
+         +u3uTRAtRSN41LDDuLdpmMZVAb8hYsV7CHPB+OHazlNyl+VsU8h/10+QhkbvjV6qtSoY
+         eoxg==
+X-Gm-Message-State: AO0yUKVy+Qd9EhqvoANcaLZAyvn2ZLJVzriUYqt4KwlbUZnHHqaD3186
+        O8HAZDhL52wTe3ciDt1eH2HeAtR8+HyMSyJGBXCGYcjy
+X-Google-Smtp-Source: AK7set9S9Seir/i6DgEs+RqoWhQF/hPQa59O4G6cqdQtLs7xZuqUSRELsdsB+V7FfMzZpncdr4t9+qilRfIY/IrIka0=
+X-Received: by 2002:a19:700f:0:b0:4d5:ca32:6aea with SMTP id
+ h15-20020a19700f000000b004d5ca326aeamr117217lfc.10.1676614422064; Thu, 16 Feb
+ 2023 22:13:42 -0800 (PST)
 MIME-Version: 1.0
-References: <20230216214745.3985496-1-dhowells@redhat.com>
-In-Reply-To: <20230216214745.3985496-1-dhowells@redhat.com>
+References: <Y+UrrjvGrOT6Bcmy@sernet.de> <87lel6enq6.fsf@cjr.nz>
+ <CAH2r5mvGWJVjPJo1Guyd7W0eiHyRD9Wd7F0ndKLaGCj6VyHUwA@mail.gmail.com>
+ <Y+Y4vMiTFdev4V1L@sernet.de> <CAH2r5mvzVQKAT-a+MJ-qN=Ogn8PqNdMz=3zYntaq26UdgcY0Cg@mail.gmail.com>
+ <Y+nrvNByzLDMnDvU@sernet.de> <CAH2r5mtoSHTXNeOF-MzOA_EmgZS0C7WsBkQJcNtRXpDmj=mowg@mail.gmail.com>
+In-Reply-To: <CAH2r5mtoSHTXNeOF-MzOA_EmgZS0C7WsBkQJcNtRXpDmj=mowg@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 16 Feb 2023 23:52:32 -0600
-Message-ID: <CAH2r5mtXfAF19zrRzoLCnHYK593L8HyFTScw-FeaB=Mt7Wj0AQ@mail.gmail.com>
-Subject: Re: [PATCH 00/17] smb3: Use iov_iters down to the network transport
- and fix DIO page pinning
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Date:   Fri, 17 Feb 2023 00:13:30 -0600
+Message-ID: <CAH2r5mtx4d+V3OETUU8+_Q_Ec5OUqT0gtdjYvbezUDGKuBDejQ@mail.gmail.com>
+Subject: Re: Fix an uninitialized read in smb3_qfs_tcon()
+To:     Volker.Lendecke@sernet.de
+Cc:     Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged the first 13 of this series into cifs-2.6.git
-for-next (pending additional testing and any more review comments)
+also I added cc:stable (to this and to the followon related patch) ...
+let me know if any objections
 
-On Thu, Feb 16, 2023 at 3:47 PM David Howells <dhowells@redhat.com> wrote:
+On Tue, Feb 14, 2023 at 4:54 PM Steve French <smfrench@gmail.com> wrote:
 >
-> Hi Steve,
+> merged into cifs-2.6.git for-next (pending testing and any additional review)
 >
-> Here's an updated version of my patchset to make the cifs/smb3 driver pass
-> iov_iters down to the lowest layers where they can be passed directly to
-> the network transport rather than passing lists of pages around.
+> On Mon, Feb 13, 2023 at 1:50 AM Volker Lendecke
+> <Volker.Lendecke@sernet.de> wrote:
+> >
+> > Am Fri, Feb 10, 2023 at 10:01:37PM -0600 schrieb Steve French:
+> > > Yes. On top of for next. They don't have to be squashed into one if it
+> > > makes it harder to review.
+> >
+> > Attached.
+> >
+> > Volker
 >
-> The series deals with the following issues:
 >
->  (-) By pinning pages, it fixes the race between concurrent DIO read and
->      fork, whereby the pages containing the DIO read buffer may end up
->      belonging to the child process and not the parent - with the result
->      that the parent might not see the retrieved data.
 >
->  (-) cifs shouldn't take refs on pages extracted from non-user-backed
->      iterators (eg. KVEC).  With these changes, cifs will apply the
->      appropriate cleanup.  Note that there is the possibility the network
->      transport might, but that's beyond the scope of this patchset.
+> --
+> Thanks,
 >
->  (-) Making it easier to transition to using folios in cifs rather than
->      pages by dealing with them through BVEC and XARRAY iterators.
->
-> The first five patches add two facilities to the VM/VFS core, excerpts from
-> my iov-extract branch[1] that are required in order to do the cifs
-> iteratorisation:
->
->  (*) Future replacements for file-splicing in the form of functions
->      filemap_splice_read() and direct_splice_read().  These allow file
->      splicing to be done without the use of an ITER_PIPE iterator, without
->      the need to take refs on the pages extracted from KVEC/BVEC/XARRAY
->      iterators.  This is necessary to use iov_iter_extract_pages().
->
->      [!] Note that whilst these are added in core code, they are only used
->      by cifs at this point.
->
->  (*) Add iov_iter_extract_pages(), a replacement for iov_iter_get_pages*()
->      that uses FOLL_PIN on user pages (IOVEC, UBUF) and doesn't pin kernel
->      pages (BVEC, KVEC, XARRAY).  This allows cifs to do the page pinning
->      correctly.
->
->      [!] Note that whilst this is added in core code, it is only used by
->      cifs at this point - though a corresponding change is made to the
->      flags argument of iov_iter_get_pages*() so that it doesn't take FOLL_*
->      flags, but rather takes iov_iter_extraction_t flags that are
->      translated internally to FOLL_* flags.
->
-> Then there's a couple of patches to make cifs use the new splice functions.
->
-> The series continues with a couple of patches that add stuff to netfslib
-> that I want to use there as well as in cifs:
->
->  (*) Add a netfslib function to extract and pin pages from an ITER_IOBUF or
->      ITER_UBUF iterator into an ITER_BVEC iterator.
->
->  (*) Add a netfslib function to extract pages from an iterator that's of
->      type ITER_UBUF/IOVEC/BVEC/KVEC/XARRAY and add them to a scatterlist.
->      The cleanup will need to be done as for iov_iter_extract_pages().
->
->      BVEC, KVEC and XARRAY iterators can be rendered into elements that
->      span multiple pages.
->
-> Added to that are some cifs helpers that work with iterators:
->
->  (*) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
->      add elements to an RDMA SGE list.  Only the DMA addresses are stored,
->      and an element may span multiple pages (say if an xarray contains a
->      multipage folio).
->
->  (*) Add a function to walk through an ITER_BVEC/KVEC/XARRAY iterator and
->      pass the contents into a shash function.
->
->  (*) Add functions to walk through an ITER_XARRAY iterator and perform
->      various sorts of cleanup on the folios held therein, to be used on I/O
->      completion.
->
->  (*) Add a function to read from the transport TCP socket directly into an
->      iterator.
->
-> Finally come the patches that actually do the work of iteratorising cifs:
->
->  (*) The main patch.  Replace page lists with iterators.  It extracts the
->      pages from ITER_UBUF and ITER_IOVEC iterators to an ITER_BVEC
->      iterator, pinning or getting refs on them, before passing them down as
->      the I/O may be done from a worker thread.
->
->      The iterator is extracted into a scatterlist in order to talk to the
->      crypto interface or to do RDMA.
->
->  (*) In the cifs RDMA code, extract the iterator into an RDMA SGE[] list,
->      removing the scatterlist intermediate - at least for smbd_send().
->      There appear to be other ways for cifs to talk to the RDMA layer that
->      don't go through that that I haven't managed to work out.
->
->  (*) Remove a chunk of now-unused code.
->
->  (*) Allow DIO to/from KVEC-type iterators.
->
-> I've pushed the patches here also:
->
->         https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-cifs
->
-> David
->
-> Link: https://lore.kernel.org/r/20230214171330.2722188-1-dhowells@redhat.com/ [1]
-> Link: https://lore.kernel.org/r/166697254399.61150.1256557652599252121.stgit@warthog.procyon.org.uk/
-> Link: https://lore.kernel.org/r/20230131182855.4027499-1-dhowells@redhat.com/ # v1
->
-> David Howells (17):
->   mm: Pass info, not iter, into filemap_get_pages()
->   splice: Add a func to do a splice from a buffered file without
->     ITER_PIPE
->   splice: Add a func to do a splice from an O_DIRECT file without
->     ITER_PIPE
->   iov_iter: Define flags to qualify page extraction.
->   iov_iter: Add a function to extract a page list from an iterator
->   splice: Export filemap/direct_splice_read()
->   cifs: Implement splice_read to pass down ITER_BVEC not ITER_PIPE
->   netfs: Add a function to extract a UBUF or IOVEC into a BVEC iterator
->   netfs: Add a function to extract an iterator into a scatterlist
->   cifs: Add a function to build an RDMA SGE list from an iterator
->   cifs: Add a function to Hash the contents of an iterator
->   cifs: Add some helper functions
->   cifs: Add a function to read into an iter from a socket
->   cifs: Change the I/O paths to use an iterator rather than a page list
->   cifs: Build the RDMA SGE list directly from an iterator
->   cifs: Remove unused code
->   cifs: DIO to/from KVEC-type iterators should now work
->
->  block/bio.c               |    6 +-
->  block/blk-map.c           |    8 +-
->  fs/cifs/Kconfig           |    1 +
->  fs/cifs/cifsencrypt.c     |  172 +++-
->  fs/cifs/cifsfs.c          |   12 +-
->  fs/cifs/cifsfs.h          |    6 +
->  fs/cifs/cifsglob.h        |   66 +-
->  fs/cifs/cifsproto.h       |   11 +-
->  fs/cifs/cifssmb.c         |   15 +-
->  fs/cifs/connect.c         |   14 +
->  fs/cifs/file.c            | 1772 ++++++++++++++++---------------------
->  fs/cifs/fscache.c         |   22 +-
->  fs/cifs/fscache.h         |   10 +-
->  fs/cifs/misc.c            |  128 +--
->  fs/cifs/smb2ops.c         |  362 ++++----
->  fs/cifs/smb2pdu.c         |   53 +-
->  fs/cifs/smbdirect.c       |  535 ++++++-----
->  fs/cifs/smbdirect.h       |    7 +-
->  fs/cifs/transport.c       |   54 +-
->  fs/netfs/Makefile         |    1 +
->  fs/netfs/iterator.c       |  371 ++++++++
->  fs/splice.c               |   93 ++
->  include/linux/fs.h        |    6 +
->  include/linux/netfs.h     |    8 +
->  include/linux/pipe_fs_i.h |   20 +
->  include/linux/uio.h       |   35 +-
->  lib/iov_iter.c            |  284 +++++-
->  mm/filemap.c              |  156 +++-
->  mm/internal.h             |    6 +
->  mm/vmalloc.c              |    1 +
->  30 files changed, 2515 insertions(+), 1720 deletions(-)
->  create mode 100644 fs/netfs/iterator.c
->
+> Steve
+
 
 
 -- 
