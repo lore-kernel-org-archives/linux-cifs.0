@@ -2,58 +2,63 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31630C05027
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 05:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 706D3C05027
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 05:36:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229475AbjBQFdX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Feb 2023 00:33:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42154 "EHLO
+        id S229553AbjBQFf7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Feb 2023 00:35:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjBQFdX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 00:33:23 -0500
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA82497FA
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 21:33:19 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id u27so4202724ljo.12
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 21:33:19 -0800 (PST)
+        with ESMTP id S229436AbjBQFf6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 00:35:58 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 249D44DBC4;
+        Thu, 16 Feb 2023 21:35:56 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id d8so4218060ljq.9;
+        Thu, 16 Feb 2023 21:35:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5fYzJsdOctTF7U06F6KS70ZNsNiIrJNIsM7sQi8Dtcs=;
-        b=i8ICbMeRmY5jnrGJVzSo4MHlbDI3cGWZ031ZTOle6ngV7UZCBbRvuAUUCZMZf01w+F
-         E8Kr22/X1iFhwZWm4NRElwoM2jQWPUrsWzPbLJlL+Sv4VRO8u43TPN0YASFcf8j3qs5O
-         e6pN22iqqcBZEUb/wBb1SD25NeJPrXeWv1djNhnJoreBy8JGmh6wXprKNFM53RoYlZCp
-         g3N98B73K2rejtqOXhFrHzFpJT4S7o9f29Oa5eB+rErH4x6Z1qhgCceW+uMEco3bHEsm
-         viNR4lSpR0owK/Eq32fpcMdyJ0KfUuWlk7YYy1QpDOTsqE2furX9ln4Z7w/Zv145jDiV
-         Y4Zw==
+        bh=rWva4xxS8q1iw/3ddXyeH06mIO4Txvijo6JEiv2lAxo=;
+        b=aAesOw3ly4z1IlD112SNOICk1ygbNQoy+nDyB778JoLCHEb1igWrsTLKKVrJ3N4jGN
+         g8OUU0e/j/W13m9yPH06nLKtTeddvA563MsXr93Fpa9hYYRvkWfvycactptJ+dlWp+Ao
+         vi5bhii0oYV+nr+/8gfVVYHFw/rDU3SekpTpfLAjR59H2XPpjiNel2vbhMdwRjjhPFGd
+         YawMnN8uWCKySzOo4N6kdVOvjYDsWMDiL12VH+YrgbOIzv2+nzqkZg48hAk895ZDiVIA
+         jCh8yt1fvaVV/yEayOjX9U4aX6xiJZdAI91rnMGuV/haslldbz7LpsJnlpFTYGf+PGTP
+         s53w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5fYzJsdOctTF7U06F6KS70ZNsNiIrJNIsM7sQi8Dtcs=;
-        b=v5xc2qg6xmbjb6k0UJYnDCiHkiQCZCfBTkkYEUZ6CEROaw3JpE4wGMEok/0VzjUfz1
-         N6JiJGGQkLJZnX/NvtXV6BUy5hM7rS+Rar4RFlI1WzXMUlCD6ifotHB1P6hAYUZRf8FE
-         eEd7fYhih067hEUFaDYt96KOD4IGfXbvdJ4fTKAv9x9o6brSiQR4KyMdHUUVOumJ2jCQ
-         gp+6UPMQPZUxdHLq70yqExdDosM76L5ae6JPMwz/vqrAtgCw5rkRRIdT4Q9ULwGdFNAK
-         e0QDjkc7fWtKgZdeLYys5BxwwqI8mpb7oabuYvZx+wOY0xfmywjX3Z7L1o37NrEzty/l
-         /Evg==
-X-Gm-Message-State: AO0yUKWM9BktrFFGsHAkWggbzViOH/0Sd0DESM7wcbs8IAIS5eEYtqDO
-        XdGlgPjoivxy2pX3PKnJHKNygH4Jm72QOZCUdxwBdkZq
-X-Google-Smtp-Source: AK7set/0BSWeOwVs51pbwuPdFFOkE6Bsnd3er/qoSGQhVXKPUP4sD+Cn4eunX4s9i6O9AOCm7c/fxgZ8mDqi2YYIf+M=
-X-Received: by 2002:a2e:b554:0:b0:293:34b9:b86a with SMTP id
- a20-20020a2eb554000000b0029334b9b86amr9919ljn.7.1676611997809; Thu, 16 Feb
- 2023 21:33:17 -0800 (PST)
+        bh=rWva4xxS8q1iw/3ddXyeH06mIO4Txvijo6JEiv2lAxo=;
+        b=VmwqvPFESj5l4Ef4kzuFQZnBfFD7BQ79ogwyt2DOm40YKS2LhzrzrvLrKV7BUyFSua
+         8ZVr5h4UN/I2Tk7m/trWOVxj0PB6fNUL5xmab0z9QY2/vpDJmqwK4k/kNQWUPa4ZGk0m
+         DVsZoaK5lt3xtt97IzS868g9AYFwP1BEZnHW1xvvMFWc+NTTkfJjxd9sTgu1PYN5NnaD
+         52tc0qfM9nl63s1PmLeVs72Xz7w4NONQ9AGEDxQfB4ETC+aD3ObHf5M5Ac/2LPe4eWFM
+         T8+3vZLNwt7BijFQTQBjfyPAzF5Nny1ytlaRpX6xt5lmpczcKEI/Um2vUzezLdjWr0Mt
+         vAjg==
+X-Gm-Message-State: AO0yUKUNuIA5RvBy0/BhsFsJfsp72FRRYQN8c9yvKTx96boSQ9wRW6DL
+        NcIrDQko8sp7+kOy3633GdShl5FJmeH2hA7C1Xo=
+X-Google-Smtp-Source: AK7set9MEOglzLTI8rbidr0loBB8RX4UB4/hIsI4AUFlivFTBEybEd71GoMzu57L/GHd+tGuuPl0wk5hmT6+YQDg0g4=
+X-Received: by 2002:a2e:8e3a:0:b0:293:5169:6cc6 with SMTP id
+ r26-20020a2e8e3a000000b0029351696cc6mr74807ljk.7.1676612154091; Thu, 16 Feb
+ 2023 21:35:54 -0800 (PST)
 MIME-Version: 1.0
-References: <20230216183322@manguebit.com> <CAN05THRjG_-q65LF8kmQvBAq4Eak2z-7aRcMM+_SLcqqFSrBCQ@mail.gmail.com>
-In-Reply-To: <CAN05THRjG_-q65LF8kmQvBAq4Eak2z-7aRcMM+_SLcqqFSrBCQ@mail.gmail.com>
+References: <20230215000832.never.591-kees@kernel.org>
+In-Reply-To: <20230215000832.never.591-kees@kernel.org>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 16 Feb 2023 23:33:06 -0600
-Message-ID: <CAH2r5muDWpO1Jo73kHCBXs_g8kW+OdcH6NnHNHozLRKxMTOffQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix mount on old smb servers
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
+Date:   Thu, 16 Feb 2023 23:35:42 -0600
+Message-ID: <CAH2r5mv5uKRJtq5buaDzmW5D61gv_E5P=xn5kxjbTwdBa33nsQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Convert struct fealist away from 1-element array
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
@@ -61,146 +66,117 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 merged into cifs-2.6.git for-next
 
-On Thu, Feb 16, 2023 at 3:08 PM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
+On Tue, Feb 14, 2023 at 6:16 PM Kees Cook <keescook@chromium.org> wrote:
 >
-> Very nice cleanup.
+> The kernel is globally removing the ambiguous 0-length and 1-element
+> arrays in favor of flexible arrays, so that we can gain both compile-time
+> and run-time array bounds checking[1].
 >
-> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> While struct fealist is defined as a "fake" flexible array (via a
+> 1-element array), it is only used for examination of the first array
+> element. Walking the list is performed separately, so there is no reason
+> to treat the "list" member of struct fealist as anything other than a
+> single entry. Adjust the struct and code to match.
 >
-> On Fri, 17 Feb 2023 at 04:44, Paulo Alcantara <pc@manguebit.com> wrote:
-> >
-> > The client was sending rfc1002 session request packet with a wrong
-> > length field set, therefore failing to mount shares against old SMB
-> > servers over port 139.
-> >
-> > Fix this by calculating the correct length as specified in rfc1002.
-> >
-> > Fixes: d7173623bf0b ("cifs: use ALIGN() and round_up() macros")
-> > Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
-> > ---
-> >  fs/cifs/connect.c | 100 ++++++++++++++++++----------------------------
-> >  1 file changed, 38 insertions(+), 62 deletions(-)
-> >
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index b2a04b4e89a5..af49ae53aaf4 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -2843,72 +2843,48 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
-> >          * negprot - BB check reconnection in case where second
-> >          * sessinit is sent but no second negprot
-> >          */
-> > -       struct rfc1002_session_packet *ses_init_buf;
-> > -       unsigned int req_noscope_len;
-> > -       struct smb_hdr *smb_buf;
-> > +       struct rfc1002_session_packet req = {};
-> > +       struct smb_hdr *smb_buf = (struct smb_hdr *)&req;
-> > +       unsigned int len;
-> > +
-> > +       req.trailer.session_req.called_len = sizeof(req.trailer.session_req.called_name);
-> > +
-> > +       if (server->server_RFC1001_name[0] != 0)
-> > +               rfc1002mangle(req.trailer.session_req.called_name,
-> > +                             server->server_RFC1001_name,
-> > +                             RFC1001_NAME_LEN_WITH_NULL);
-> > +       else
-> > +               rfc1002mangle(req.trailer.session_req.called_name,
-> > +                             DEFAULT_CIFS_CALLED_NAME,
-> > +                             RFC1001_NAME_LEN_WITH_NULL);
-> > +
-> > +       req.trailer.session_req.calling_len = sizeof(req.trailer.session_req.calling_name);
-> > +
-> > +       /* calling name ends in null (byte 16) from old smb convention */
-> > +       if (server->workstation_RFC1001_name[0] != 0)
-> > +               rfc1002mangle(req.trailer.session_req.calling_name,
-> > +                             server->workstation_RFC1001_name,
-> > +                             RFC1001_NAME_LEN_WITH_NULL);
-> > +       else
-> > +               rfc1002mangle(req.trailer.session_req.calling_name,
-> > +                             "LINUX_CIFS_CLNT",
-> > +                             RFC1001_NAME_LEN_WITH_NULL);
-> >
-> > -       ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
-> > -                              GFP_KERNEL);
-> > -
-> > -       if (ses_init_buf) {
-> > -               ses_init_buf->trailer.session_req.called_len = 32;
-> > -
-> > -               if (server->server_RFC1001_name[0] != 0)
-> > -                       rfc1002mangle(ses_init_buf->trailer.
-> > -                                     session_req.called_name,
-> > -                                     server->server_RFC1001_name,
-> > -                                     RFC1001_NAME_LEN_WITH_NULL);
-> > -               else
-> > -                       rfc1002mangle(ses_init_buf->trailer.
-> > -                                     session_req.called_name,
-> > -                                     DEFAULT_CIFS_CALLED_NAME,
-> > -                                     RFC1001_NAME_LEN_WITH_NULL);
-> > -
-> > -               ses_init_buf->trailer.session_req.calling_len = 32;
-> > -
-> > -               /*
-> > -                * calling name ends in null (byte 16) from old smb
-> > -                * convention.
-> > -                */
-> > -               if (server->workstation_RFC1001_name[0] != 0)
-> > -                       rfc1002mangle(ses_init_buf->trailer.
-> > -                                     session_req.calling_name,
-> > -                                     server->workstation_RFC1001_name,
-> > -                                     RFC1001_NAME_LEN_WITH_NULL);
-> > -               else
-> > -                       rfc1002mangle(ses_init_buf->trailer.
-> > -                                     session_req.calling_name,
-> > -                                     "LINUX_CIFS_CLNT",
-> > -                                     RFC1001_NAME_LEN_WITH_NULL);
-> > -
-> > -               ses_init_buf->trailer.session_req.scope1 = 0;
-> > -               ses_init_buf->trailer.session_req.scope2 = 0;
-> > -               smb_buf = (struct smb_hdr *)ses_init_buf;
-> > -
-> > -               /* sizeof RFC1002_SESSION_REQUEST with no scopes */
-> > -               req_noscope_len = sizeof(struct rfc1002_session_packet) - 2;
-> > +       /*
-> > +        * As per rfc1002, @len must be the number of bytes that follows the
-> > +        * length field of a rfc1002 session request payload.
-> > +        */
-> > +       len = sizeof(req) - offsetof(struct rfc1002_session_packet, trailer.session_req);
-> >
-> > -               /* == cpu_to_be32(0x81000044) */
-> > -               smb_buf->smb_buf_length =
-> > -                       cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | req_noscope_len);
-> > -               rc = smb_send(server, smb_buf, 0x44);
-> > -               kfree(ses_init_buf);
-> > -               /*
-> > -                * RFC1001 layer in at least one server
-> > -                * requires very short break before negprot
-> > -                * presumably because not expecting negprot
-> > -                * to follow so fast.  This is a simple
-> > -                * solution that works without
-> > -                * complicating the code and causes no
-> > -                * significant slowing down on mount
-> > -                * for everyone else
-> > -                */
-> > -               usleep_range(1000, 2000);
-> > -       }
-> > +       smb_buf->smb_buf_length = cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | len);
-> > +       rc = smb_send(server, smb_buf, len);
-> >         /*
-> > -        * else the negprot may still work without this
-> > -        * even though malloc failed
-> > +        * RFC1001 layer in at least one server requires very short break before
-> > +        * negprot presumably because not expecting negprot to follow so fast.
-> > +        * This is a simple solution that works without complicating the code
-> > +        * and causes no significant slowing down on mount for everyone else
-> >          */
-> > +       usleep_range(1000, 2000);
-> >
-> >         return rc;
-> >  }
-> > --
-> > 2.39.1
-> >
-
+> Additionally, struct fea uses the "name" member either as a dynamic
+> string, or is manually calculated from the start of the struct. Redefine
+> the member as a flexible array.
+>
+> No machine code output differences are produced after these changes.
+>
+> [1] For lots of details, see both:
+>     https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+>     https://people.kernel.org/kees/bounded-flexible-arrays-in-c
+>
+> Cc: Steve French <sfrench@samba.org>
+> Cc: Paulo Alcantara <pc@cjr.nz>
+> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+> Cc: Shyam Prasad N <sprasad@microsoft.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  fs/cifs/cifspdu.h |  4 ++--
+>  fs/cifs/cifssmb.c | 16 ++++++++--------
+>  2 files changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index 623caece2b10..add73be4902c 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -2583,7 +2583,7 @@ struct fea {
+>         unsigned char EA_flags;
+>         __u8 name_len;
+>         __le16 value_len;
+> -       char name[1];
+> +       char name[];
+>         /* optionally followed by value */
+>  } __attribute__((packed));
+>  /* flags for _FEA.fEA */
+> @@ -2591,7 +2591,7 @@ struct fea {
+>
+>  struct fealist {
+>         __le32 list_len;
+> -       struct fea list[1];
+> +       struct fea list;
+>  } __attribute__((packed));
+>
+>  /* used to hold an arbitrary blob of data */
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 60dd4e37030a..7c587157d030 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -5787,7 +5787,7 @@ CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
+>
+>         /* account for ea list len */
+>         list_len -= 4;
+> -       temp_fea = ea_response_data->list;
+> +       temp_fea = &ea_response_data->list;
+>         temp_ptr = (char *)temp_fea;
+>         while (list_len > 0) {
+>                 unsigned int name_len;
+> @@ -5902,7 +5902,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+>         else
+>                 name_len = strnlen(ea_name, 255);
+>
+> -       count = sizeof(*parm_data) + ea_value_len + name_len;
+> +       count = sizeof(*parm_data) + 1 + ea_value_len + name_len;
+>         pSMB->MaxParameterCount = cpu_to_le16(2);
+>         /* BB find max SMB PDU from sess */
+>         pSMB->MaxDataCount = cpu_to_le16(1000);
+> @@ -5926,14 +5926,14 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+>         byte_count = 3 /* pad */  + params + count;
+>         pSMB->DataCount = cpu_to_le16(count);
+>         parm_data->list_len = cpu_to_le32(count);
+> -       parm_data->list[0].EA_flags = 0;
+> +       parm_data->list.EA_flags = 0;
+>         /* we checked above that name len is less than 255 */
+> -       parm_data->list[0].name_len = (__u8)name_len;
+> +       parm_data->list.name_len = (__u8)name_len;
+>         /* EA names are always ASCII */
+>         if (ea_name)
+> -               strncpy(parm_data->list[0].name, ea_name, name_len);
+> -       parm_data->list[0].name[name_len] = 0;
+> -       parm_data->list[0].value_len = cpu_to_le16(ea_value_len);
+> +               strncpy(parm_data->list.name, ea_name, name_len);
+> +       parm_data->list.name[name_len] = '\0';
+> +       parm_data->list.value_len = cpu_to_le16(ea_value_len);
+>         /* caller ensures that ea_value_len is less than 64K but
+>         we need to ensure that it fits within the smb */
+>
+> @@ -5941,7 +5941,7 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+>              negotiated SMB buffer size BB */
+>         /* if (ea_value_len > buffer_size - 512 (enough for header)) */
+>         if (ea_value_len)
+> -               memcpy(parm_data->list[0].name+name_len+1,
+> +               memcpy(parm_data->list.name + name_len + 1,
+>                        ea_value, ea_value_len);
+>
+>         pSMB->TotalDataCount = pSMB->DataCount;
+> --
+> 2.34.1
+>
 
 
 -- 
