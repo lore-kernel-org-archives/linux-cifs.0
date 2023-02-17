@@ -2,115 +2,208 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BBDC636D4
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 03:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31630C05027
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 05:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbjBQDgK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Feb 2023 22:36:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47638 "EHLO
+        id S229475AbjBQFdX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Feb 2023 00:33:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbjBQDgJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Feb 2023 22:36:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E64498BD
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 19:35:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676604920;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=rjZXrMa0WadpCuLhWIhGQOhQi11+oBz0hI2g6SreywY=;
-        b=Ev3MCMIZQNuVfLJ5tJKcghGEgBJpLKcNbDnGMcQZFvXi5F+j6dWYAfEt+eG9hEb7Pl0zBh
-        lN3ly3bXnja+YENFR2NTZMjSfHCtlNoPEtnGA8hbExrH4qDvDoN3MhhY9AAVZ6oNiRVOuu
-        yvRA74UE04Jn8ajj/5+8DbBuPqqN2KU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-423-W3M9fmChOoiYeesRWCoFVg-1; Thu, 16 Feb 2023 22:35:13 -0500
-X-MC-Unique: W3M9fmChOoiYeesRWCoFVg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AC3C9821B8C;
-        Fri, 17 Feb 2023 03:35:12 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-52-18.bne.redhat.com [10.64.52.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A65D12166B30;
-        Fri, 17 Feb 2023 03:35:11 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH 1/2] cifs: Check the lease context if we actually got a lease
-Date:   Fri, 17 Feb 2023 13:35:00 +1000
-Message-Id: <20230217033501.2591185-1-lsahlber@redhat.com>
+        with ESMTP id S229436AbjBQFdX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 00:33:23 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA82497FA
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 21:33:19 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id u27so4202724ljo.12
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 21:33:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5fYzJsdOctTF7U06F6KS70ZNsNiIrJNIsM7sQi8Dtcs=;
+        b=i8ICbMeRmY5jnrGJVzSo4MHlbDI3cGWZ031ZTOle6ngV7UZCBbRvuAUUCZMZf01w+F
+         E8Kr22/X1iFhwZWm4NRElwoM2jQWPUrsWzPbLJlL+Sv4VRO8u43TPN0YASFcf8j3qs5O
+         e6pN22iqqcBZEUb/wBb1SD25NeJPrXeWv1djNhnJoreBy8JGmh6wXprKNFM53RoYlZCp
+         g3N98B73K2rejtqOXhFrHzFpJT4S7o9f29Oa5eB+rErH4x6Z1qhgCceW+uMEco3bHEsm
+         viNR4lSpR0owK/Eq32fpcMdyJ0KfUuWlk7YYy1QpDOTsqE2furX9ln4Z7w/Zv145jDiV
+         Y4Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5fYzJsdOctTF7U06F6KS70ZNsNiIrJNIsM7sQi8Dtcs=;
+        b=v5xc2qg6xmbjb6k0UJYnDCiHkiQCZCfBTkkYEUZ6CEROaw3JpE4wGMEok/0VzjUfz1
+         N6JiJGGQkLJZnX/NvtXV6BUy5hM7rS+Rar4RFlI1WzXMUlCD6ifotHB1P6hAYUZRf8FE
+         eEd7fYhih067hEUFaDYt96KOD4IGfXbvdJ4fTKAv9x9o6brSiQR4KyMdHUUVOumJ2jCQ
+         gp+6UPMQPZUxdHLq70yqExdDosM76L5ae6JPMwz/vqrAtgCw5rkRRIdT4Q9ULwGdFNAK
+         e0QDjkc7fWtKgZdeLYys5BxwwqI8mpb7oabuYvZx+wOY0xfmywjX3Z7L1o37NrEzty/l
+         /Evg==
+X-Gm-Message-State: AO0yUKWM9BktrFFGsHAkWggbzViOH/0Sd0DESM7wcbs8IAIS5eEYtqDO
+        XdGlgPjoivxy2pX3PKnJHKNygH4Jm72QOZCUdxwBdkZq
+X-Google-Smtp-Source: AK7set/0BSWeOwVs51pbwuPdFFOkE6Bsnd3er/qoSGQhVXKPUP4sD+Cn4eunX4s9i6O9AOCm7c/fxgZ8mDqi2YYIf+M=
+X-Received: by 2002:a2e:b554:0:b0:293:34b9:b86a with SMTP id
+ a20-20020a2eb554000000b0029334b9b86amr9919ljn.7.1676611997809; Thu, 16 Feb
+ 2023 21:33:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+References: <20230216183322@manguebit.com> <CAN05THRjG_-q65LF8kmQvBAq4Eak2z-7aRcMM+_SLcqqFSrBCQ@mail.gmail.com>
+In-Reply-To: <CAN05THRjG_-q65LF8kmQvBAq4Eak2z-7aRcMM+_SLcqqFSrBCQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 16 Feb 2023 23:33:06 -0600
+Message-ID: <CAH2r5muDWpO1Jo73kHCBXs_g8kW+OdcH6NnHNHozLRKxMTOffQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix mount on old smb servers
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Some servers may return that we got a lease in rsp->OplockLevel
-but then in the lease context contradict this and say we got no lease
-at all.  Thus we need to check the context if we have a lease.
-Additionally, IF we do not get a lease we need to make sure we close
-the handle before we return an error to the caller.
+merged into cifs-2.6.git for-next
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/cached_dir.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+On Thu, Feb 16, 2023 at 3:08 PM ronnie sahlberg
+<ronniesahlberg@gmail.com> wrote:
+>
+> Very nice cleanup.
+>
+> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+>
+> On Fri, 17 Feb 2023 at 04:44, Paulo Alcantara <pc@manguebit.com> wrote:
+> >
+> > The client was sending rfc1002 session request packet with a wrong
+> > length field set, therefore failing to mount shares against old SMB
+> > servers over port 139.
+> >
+> > Fix this by calculating the correct length as specified in rfc1002.
+> >
+> > Fixes: d7173623bf0b ("cifs: use ALIGN() and round_up() macros")
+> > Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+> > ---
+> >  fs/cifs/connect.c | 100 ++++++++++++++++++----------------------------
+> >  1 file changed, 38 insertions(+), 62 deletions(-)
+> >
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> > index b2a04b4e89a5..af49ae53aaf4 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -2843,72 +2843,48 @@ ip_rfc1001_connect(struct TCP_Server_Info *server)
+> >          * negprot - BB check reconnection in case where second
+> >          * sessinit is sent but no second negprot
+> >          */
+> > -       struct rfc1002_session_packet *ses_init_buf;
+> > -       unsigned int req_noscope_len;
+> > -       struct smb_hdr *smb_buf;
+> > +       struct rfc1002_session_packet req = {};
+> > +       struct smb_hdr *smb_buf = (struct smb_hdr *)&req;
+> > +       unsigned int len;
+> > +
+> > +       req.trailer.session_req.called_len = sizeof(req.trailer.session_req.called_name);
+> > +
+> > +       if (server->server_RFC1001_name[0] != 0)
+> > +               rfc1002mangle(req.trailer.session_req.called_name,
+> > +                             server->server_RFC1001_name,
+> > +                             RFC1001_NAME_LEN_WITH_NULL);
+> > +       else
+> > +               rfc1002mangle(req.trailer.session_req.called_name,
+> > +                             DEFAULT_CIFS_CALLED_NAME,
+> > +                             RFC1001_NAME_LEN_WITH_NULL);
+> > +
+> > +       req.trailer.session_req.calling_len = sizeof(req.trailer.session_req.calling_name);
+> > +
+> > +       /* calling name ends in null (byte 16) from old smb convention */
+> > +       if (server->workstation_RFC1001_name[0] != 0)
+> > +               rfc1002mangle(req.trailer.session_req.calling_name,
+> > +                             server->workstation_RFC1001_name,
+> > +                             RFC1001_NAME_LEN_WITH_NULL);
+> > +       else
+> > +               rfc1002mangle(req.trailer.session_req.calling_name,
+> > +                             "LINUX_CIFS_CLNT",
+> > +                             RFC1001_NAME_LEN_WITH_NULL);
+> >
+> > -       ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
+> > -                              GFP_KERNEL);
+> > -
+> > -       if (ses_init_buf) {
+> > -               ses_init_buf->trailer.session_req.called_len = 32;
+> > -
+> > -               if (server->server_RFC1001_name[0] != 0)
+> > -                       rfc1002mangle(ses_init_buf->trailer.
+> > -                                     session_req.called_name,
+> > -                                     server->server_RFC1001_name,
+> > -                                     RFC1001_NAME_LEN_WITH_NULL);
+> > -               else
+> > -                       rfc1002mangle(ses_init_buf->trailer.
+> > -                                     session_req.called_name,
+> > -                                     DEFAULT_CIFS_CALLED_NAME,
+> > -                                     RFC1001_NAME_LEN_WITH_NULL);
+> > -
+> > -               ses_init_buf->trailer.session_req.calling_len = 32;
+> > -
+> > -               /*
+> > -                * calling name ends in null (byte 16) from old smb
+> > -                * convention.
+> > -                */
+> > -               if (server->workstation_RFC1001_name[0] != 0)
+> > -                       rfc1002mangle(ses_init_buf->trailer.
+> > -                                     session_req.calling_name,
+> > -                                     server->workstation_RFC1001_name,
+> > -                                     RFC1001_NAME_LEN_WITH_NULL);
+> > -               else
+> > -                       rfc1002mangle(ses_init_buf->trailer.
+> > -                                     session_req.calling_name,
+> > -                                     "LINUX_CIFS_CLNT",
+> > -                                     RFC1001_NAME_LEN_WITH_NULL);
+> > -
+> > -               ses_init_buf->trailer.session_req.scope1 = 0;
+> > -               ses_init_buf->trailer.session_req.scope2 = 0;
+> > -               smb_buf = (struct smb_hdr *)ses_init_buf;
+> > -
+> > -               /* sizeof RFC1002_SESSION_REQUEST with no scopes */
+> > -               req_noscope_len = sizeof(struct rfc1002_session_packet) - 2;
+> > +       /*
+> > +        * As per rfc1002, @len must be the number of bytes that follows the
+> > +        * length field of a rfc1002 session request payload.
+> > +        */
+> > +       len = sizeof(req) - offsetof(struct rfc1002_session_packet, trailer.session_req);
+> >
+> > -               /* == cpu_to_be32(0x81000044) */
+> > -               smb_buf->smb_buf_length =
+> > -                       cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | req_noscope_len);
+> > -               rc = smb_send(server, smb_buf, 0x44);
+> > -               kfree(ses_init_buf);
+> > -               /*
+> > -                * RFC1001 layer in at least one server
+> > -                * requires very short break before negprot
+> > -                * presumably because not expecting negprot
+> > -                * to follow so fast.  This is a simple
+> > -                * solution that works without
+> > -                * complicating the code and causes no
+> > -                * significant slowing down on mount
+> > -                * for everyone else
+> > -                */
+> > -               usleep_range(1000, 2000);
+> > -       }
+> > +       smb_buf->smb_buf_length = cpu_to_be32((RFC1002_SESSION_REQUEST << 24) | len);
+> > +       rc = smb_send(server, smb_buf, len);
+> >         /*
+> > -        * else the negprot may still work without this
+> > -        * even though malloc failed
+> > +        * RFC1001 layer in at least one server requires very short break before
+> > +        * negprot presumably because not expecting negprot to follow so fast.
+> > +        * This is a simple solution that works without complicating the code
+> > +        * and causes no significant slowing down on mount for everyone else
+> >          */
+> > +       usleep_range(1000, 2000);
+> >
+> >         return rc;
+> >  }
+> > --
+> > 2.39.1
+> >
 
-diff --git a/fs/cifs/cached_dir.c b/fs/cifs/cached_dir.c
-index 60399081046a..6672f1a0acd7 100644
---- a/fs/cifs/cached_dir.c
-+++ b/fs/cifs/cached_dir.c
-@@ -220,8 +220,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		}
- 		goto oshr_free;
- 	}
--
--	atomic_inc(&tcon->num_remote_opens);
-+	cfid->is_open = true;
- 
- 	o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
- 	oparms.fid->persistent_fid = o_rsp->PersistentFileId;
-@@ -238,7 +237,8 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 			    &oparms.fid->epoch,
- 			    oparms.fid->lease_key, &oplock,
- 			    NULL, NULL);
--
-+	if (!(oplock & SMB2_LEASE_READ_CACHING_HE))
-+		goto oshr_free;
- 	qi_rsp = (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
- 	if (le32_to_cpu(qi_rsp->OutputBufferLength) < sizeof(struct smb2_file_all_info))
- 		goto oshr_free;
-@@ -261,7 +261,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	cfid->dentry = dentry;
- 	cfid->tcon = tcon;
- 	cfid->time = jiffies;
--	cfid->is_open = true;
- 	cfid->has_lease = true;
- 
- oshr_free:
-@@ -281,12 +280,17 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	}
- 	spin_unlock(&cfids->cfid_list_lock);
- 	if (rc) {
-+		if (cfid->is_open)
-+			SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid,
-+				   cfid->fid.volatile_fid);
- 		free_cached_dir(cfid);
- 		cfid = NULL;
- 	}
- 
--	if (rc == 0)
-+	if (rc == 0) {
- 		*ret_cfid = cfid;
-+		atomic_inc(&tcon->num_remote_opens);
-+	}
- 
- 	return rc;
- }
+
+
 -- 
-2.35.3
+Thanks,
 
+Steve
