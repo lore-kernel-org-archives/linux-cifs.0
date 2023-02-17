@@ -2,596 +2,153 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E18C636D4
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 05:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F266C05027
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Feb 2023 05:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbjBQFiM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Feb 2023 00:38:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45418 "EHLO
+        id S229475AbjBQFlL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Feb 2023 00:41:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjBQFiL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 00:38:11 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85BB95B77D;
-        Thu, 16 Feb 2023 21:37:47 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id z18so533849lfd.0;
-        Thu, 16 Feb 2023 21:37:47 -0800 (PST)
+        with ESMTP id S229445AbjBQFlL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 00:41:11 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345C710D
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 21:41:08 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id z18so540410lfd.0
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Feb 2023 21:41:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=foa1SE7cPPbww4HsZWUHr94s3O7/sc/umYf5bSjuWwU=;
-        b=Piglj1lspiLP+i1OkqVPH1xgESnvSjcO5Sjav3nK7Q2aV2e9ySrJ0N4Wwc6JH9rNRO
-         p0CAJrr8xOGUPfyNzV2iFXuQxQg2SZKJyDGQMPkZktBfIDmLAlOpsbh7vL3v4Tp6HA2W
-         e0z9wtvscT+qCVHlGK30oejQrM9OkgQQwN3qvXufCPaEDHuzW0Z5JkjLtCoStD4Pi2LJ
-         JhJeRoz30Bn91Rxtox9NLrYDftGD4O473jXF9aBsK8NRkmMsJtTqk0TSuhH6grJf/gZP
-         x+WCrXwONT7jsKePipXEnAhwtAqW1iua7Epdf8laVKu1Hd78qPv4hTG4PaftEWoIwkks
-         7aAA==
+        bh=J1b7h4RkJp87XrNdijHedMGL1criQvQoXeV3V8B5Oqs=;
+        b=HTKDQozAZdhc5nGP4dx9aMRdUmB4Fw+Kiktg0hZx2QFJGacCiDE/2jrc9kT2ZfcOQ/
+         O7vKtv5Aa0QGC/08tCM/v5aI2BOc/JViEZlt7xWyZaNBOL/mjH9++6ERVs/aqwF4g3FF
+         uN0H8axdoe2Eey17qyWqMH0BNHZ+hlQNq3j4gK4Vlv+/FzaGNj8OR+eyX2+UPBIYBXy0
+         YD7vOOCUacbRJ4yEjWgDut+posTc3Duxrv7G6eWNk33PkYC+hsaxejsCib9rc+hmMGlO
+         2s02KChJORNV9JjDirKeeFYOsGEkUoSB7stiDA+jvqVK5qTTmUiy/M25EBKIqpcs8o+n
+         3X0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=foa1SE7cPPbww4HsZWUHr94s3O7/sc/umYf5bSjuWwU=;
-        b=ERHPZnJE0TJiJ/JZZOBjoJ6t7WI5kgIB9Q3ay6SZ9xju4quDZlppOJ8AWeseEqyMkP
-         8IGG431W6k6FAXsGioMz1T5ATwgTknCd255Dw54QCJqmbRpWfegVNqT2YANj+t/3Gxau
-         LJHlqwihruNr0l0Z/OsomSLP8QSsDDMWnj2122GluA/5k/x2qPFNp7zpYQgw6ZdmKr+k
-         npAAoJAHSQ1uZ+Wlsj08QMTi/wo+/YjSu9IZXHsgPaquk+E1rZbiiHfQQwgQ+SxCrn+p
-         Kju9DKQpR4zBvan1mYpMTxCGSaaE1r6BWdE5rrgZViZgSJem+b+TjZ01cXX35uA900bM
-         Q3dA==
-X-Gm-Message-State: AO0yUKUgzmGjhQRATfz9Uzl/55j4FGnur3AQ3Nu9kHSGiz+otPRmQNNQ
-        fPSixc+1Lo4nyFDJGrBa3AnMLBXpouCgbqNYnQ8=
-X-Google-Smtp-Source: AK7set/+SIMXqPyJmADv4N9Ge8nft2HaCmaS6YNSoGKwHjuw7bC2g1Btvr6sYk8gnZk5y/VOlsVzYOWb4BSw+MKUZH0=
-X-Received: by 2002:a05:6512:507:b0:4dc:807a:d149 with SMTP id
- o7-20020a056512050700b004dc807ad149mr641706lfb.10.1676612265472; Thu, 16 Feb
- 2023 21:37:45 -0800 (PST)
+        bh=J1b7h4RkJp87XrNdijHedMGL1criQvQoXeV3V8B5Oqs=;
+        b=oURx+aHmDMvPE85kiBPE3HV+QfWVi72WGQP0IsshUuKQeuKrmVl39gJZr++4qJPjQO
+         goChqCCG7t1Q6VwAKZWsGXO0kC9GEFdBXO5dqx/q3Ez5sTo191f4/YG4jBGqFhlfHggh
+         vxdnJAmbujvhInYnojCvZWIc0uzp6z2h2K4eVYxA6cFEeVfn9dbvzN5C5p8u5DW1YvmP
+         fZBoBUhCn7SVETNheA8o0rdJjvtCyw4pWQtHz6veSU3hrmNm5oQGSF09jASbXuaKA3T0
+         hexjD/s/WJC622ne6uBa6u7N2MwPL/rOG9kzvIyfIA1Z2C6NpRjXvQNJ3Odz4qs24eCb
+         krKA==
+X-Gm-Message-State: AO0yUKVMqLJwLzRU6b+YO+jtq1PrBaMrWWo3N7aIXjDltY8Lm4LMAjgc
+        Pv/XoHIoGHMSvEolCSxTsuoojqrk94X7dLXxCNk=
+X-Google-Smtp-Source: AK7set+FDyoRbf1tOJPYXKyvrdYwkSTGkhAU4r2vOOof5B91AuNG2mQHshzOXR3CLB/RZ48S8Gr1+4yIvktVHU61zKc=
+X-Received: by 2002:a05:6512:239a:b0:4db:1809:29a1 with SMTP id
+ c26-20020a056512239a00b004db180929a1mr2378339lfv.2.1676612466342; Thu, 16 Feb
+ 2023 21:41:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20230215000945.never.734-kees@kernel.org>
-In-Reply-To: <20230215000945.never.734-kees@kernel.org>
+References: <20230217033501.2591185-1-lsahlber@redhat.com> <20230217033501.2591185-2-lsahlber@redhat.com>
+In-Reply-To: <20230217033501.2591185-2-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 16 Feb 2023 23:37:34 -0600
-Message-ID: <CAH2r5msf4yDYNd4Vwh7jNB3LNNje44JC8p5QnB5W2EpunepU5A@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Replace remaining 1-element arrays
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        Tom Talpey <tom@talpey.com>, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org
+Date:   Thu, 16 Feb 2023 23:40:55 -0600
+Message-ID: <CAH2r5mv54i_ASAGPpfw2bC0wqUZ=P47vRmK2NWt=t5b69KJA+A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] cifs: return a single-use cfid if we did not get a lease
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Bharath S M <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git pending testing
+Added Reviewed-by Bharath and merged into cifs-2.6.git for-next
 
-On Tue, Feb 14, 2023 at 6:17 PM Kees Cook <keescook@chromium.org> wrote:
+On Thu, Feb 16, 2023 at 9:35 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
-> The kernel is globally removing the ambiguous 0-length and 1-element
-> arrays in favor of flexible arrays, so that we can gain both compile-time
-> and run-time array bounds checking[1].
+> If we did not get a lease we can still return a single use cfid to the caller.
+> The cfid will not have has_lease set and will thus not be shared with any
+> other concurrent users and will be freed immediately when the caller
+> drops the handle.
 >
-> Replace the trailing 1-element array with a flexible array in the
-> following structures:
+> This avoids extra roundtrips for servers that do not support directory leases
+> where they would first fail to get a cfid with a lease and then fallback
+> to try a normal SMB2_open()
 >
->         struct cifs_spnego_msg
->         struct cifs_quota_data
->         struct get_dfs_referral_rsp
->         struct file_alt_name_info
->         NEGOTIATE_RSP
->         SESSION_SETUP_ANDX
->         TCONX_REQ
->         TCONX_RSP
->         TCONX_RSP_EXT
->         ECHO_REQ
->         ECHO_RSP
->         OPEN_REQ
->         OPENX_REQ
->         LOCK_REQ
->         RENAME_REQ
->         COPY_REQ
->         COPY_RSP
->         NT_RENAME_REQ
->         DELETE_FILE_REQ
->         DELETE_DIRECTORY_REQ
->         CREATE_DIRECTORY_REQ
->         QUERY_INFORMATION_REQ
->         SETATTR_REQ
->         TRANSACT_IOCTL_REQ
->         TRANSACT_CHANGE_NOTIFY_REQ
->         TRANSACTION2_QPI_REQ
->         TRANSACTION2_SPI_REQ
->         TRANSACTION2_FFIRST_REQ
->         TRANSACTION2_GET_DFS_REFER_REQ
->         FILE_UNIX_LINK_INFO
->         FILE_DIRECTORY_INFO
->         FILE_FULL_DIRECTORY_INFO
->         SEARCH_ID_FULL_DIR_INFO
->         FILE_BOTH_DIRECTORY_INFO
->         FIND_FILE_STANDARD_INFO
->
-> Replace the trailing 1-element array with a flexible array, but leave
-> the existing structure padding:
->
->         FILE_ALL_INFO
->         FILE_UNIX_INFO
->
-> Remove unused structures:
->
->         struct gea
->         struct gealist
->
-> Adjust all related size calculations to match the changes to sizeof().
->
-> No machine code output differences are produced after these changes.
->
-> [1] For lots of details, see both:
->     https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
->     https://people.kernel.org/kees/bounded-flexible-arrays-in-c
->
-> Cc: Steve French <sfrench@samba.org>
-> Cc: Paulo Alcantara <pc@cjr.nz>
-> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
-> Cc: Shyam Prasad N <sprasad@microsoft.com>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 > ---
->  fs/cifs/cifs_spnego.h |  2 +-
->  fs/cifs/cifspdu.h     | 94 +++++++++++++++++++++----------------------
->  fs/cifs/readdir.c     |  6 +--
->  fs/cifs/smb2pdu.c     |  4 +-
->  fs/cifs/smb2pdu.h     |  2 +-
->  5 files changed, 52 insertions(+), 56 deletions(-)
+>  fs/cifs/cached_dir.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
 >
-> diff --git a/fs/cifs/cifs_spnego.h b/fs/cifs/cifs_spnego.h
-> index 7f102ffeb675..e4d751b0c812 100644
-> --- a/fs/cifs/cifs_spnego.h
-> +++ b/fs/cifs/cifs_spnego.h
-> @@ -24,7 +24,7 @@ struct cifs_spnego_msg {
->         uint32_t        flags;
->         uint32_t        sesskey_len;
->         uint32_t        secblob_len;
-> -       uint8_t         data[1];
-> +       uint8_t         data[];
->  };
+> diff --git a/fs/cifs/cached_dir.c b/fs/cifs/cached_dir.c
+> index 6672f1a0acd7..27ae908e4903 100644
+> --- a/fs/cifs/cached_dir.c
+> +++ b/fs/cifs/cached_dir.c
+> @@ -14,6 +14,7 @@
 >
->  #ifdef __KERNEL__
-> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-> index add73be4902c..445e3eaebcc1 100644
-> --- a/fs/cifs/cifspdu.h
-> +++ b/fs/cifs/cifspdu.h
-> @@ -562,7 +562,7 @@ typedef union smb_com_session_setup_andx {
->                 __u32 Reserved;
->                 __le32 Capabilities;    /* see below */
->                 __le16 ByteCount;
-> -               unsigned char SecurityBlob[1];  /* followed by */
-> +               unsigned char SecurityBlob[];   /* followed by */
->                 /* STRING NativeOS */
->                 /* STRING NativeLanMan */
->         } __attribute__((packed)) req;  /* NTLM request format (with
-> @@ -582,7 +582,7 @@ typedef union smb_com_session_setup_andx {
->                 __u32 Reserved; /* see below */
->                 __le32 Capabilities;
->                 __le16 ByteCount;
-> -               unsigned char CaseInsensitivePassword[1];     /* followed by: */
-> +               unsigned char CaseInsensitivePassword[];     /* followed by: */
->                 /* unsigned char * CaseSensitivePassword; */
->                 /* STRING AccountName */
->                 /* STRING PrimaryDomain */
-> @@ -599,7 +599,7 @@ typedef union smb_com_session_setup_andx {
->                 __le16 Action;  /* see below */
->                 __le16 SecurityBlobLength;
->                 __u16 ByteCount;
-> -               unsigned char SecurityBlob[1];  /* followed by */
-> +               unsigned char SecurityBlob[];   /* followed by */
->  /*      unsigned char  * NativeOS;      */
->  /*     unsigned char  * NativeLanMan;  */
->  /*      unsigned char  * PrimaryDomain; */
-> @@ -618,7 +618,7 @@ typedef union smb_com_session_setup_andx {
->                 __le16 PasswordLength;
->                 __u32 Reserved; /* encrypt key len and offset */
->                 __le16 ByteCount;
-> -               unsigned char AccountPassword[1];       /* followed by */
-> +               unsigned char AccountPassword[];        /* followed by */
->                 /* STRING AccountName */
->                 /* STRING PrimaryDomain */
->                 /* STRING NativeOS */
-> @@ -632,7 +632,7 @@ typedef union smb_com_session_setup_andx {
->                 __le16 AndXOffset;
->                 __le16 Action;  /* see below */
->                 __u16 ByteCount;
-> -               unsigned char NativeOS[1];      /* followed by */
-> +               unsigned char NativeOS[];       /* followed by */
->  /*     unsigned char * NativeLanMan; */
->  /*      unsigned char * PrimaryDomain; */
->         } __attribute__((packed)) old_resp; /* pre-NTLM (LANMAN2.1) response */
-> @@ -693,7 +693,7 @@ typedef struct smb_com_tconx_req {
->         __le16 Flags;           /* see below */
->         __le16 PasswordLength;
->         __le16 ByteCount;
-> -       unsigned char Password[1];      /* followed by */
-> +       unsigned char Password[];       /* followed by */
->  /* STRING Path    *//* \\server\share name */
->         /* STRING Service */
->  } __attribute__((packed)) TCONX_REQ;
-> @@ -705,7 +705,7 @@ typedef struct smb_com_tconx_rsp {
->         __le16 AndXOffset;
->         __le16 OptionalSupport; /* see below */
->         __u16 ByteCount;
-> -       unsigned char Service[1];       /* always ASCII, not Unicode */
-> +       unsigned char Service[];        /* always ASCII, not Unicode */
->         /* STRING NativeFileSystem */
->  } __attribute__((packed)) TCONX_RSP;
+>  static struct cached_fid *init_cached_dir(const char *path);
+>  static void free_cached_dir(struct cached_fid *cfid);
+> +static void smb2_close_cached_fid(struct kref *ref);
 >
-> @@ -718,7 +718,7 @@ typedef struct smb_com_tconx_rsp_ext {
->         __le32 MaximalShareAccessRights;
->         __le32 GuestMaximalShareAccessRights;
->         __u16 ByteCount;
-> -       unsigned char Service[1];       /* always ASCII, not Unicode */
-> +       unsigned char Service[];        /* always ASCII, not Unicode */
->         /* STRING NativeFileSystem */
->  } __attribute__((packed)) TCONX_RSP_EXT;
+>  static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
+>                                                     const char *path,
+> @@ -220,6 +221,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+>                 }
+>                 goto oshr_free;
+>         }
+> +       cfid->tcon = tcon;
+>         cfid->is_open = true;
 >
-> @@ -755,14 +755,14 @@ typedef struct smb_com_echo_req {
->         struct  smb_hdr hdr;
->         __le16  EchoCount;
->         __le16  ByteCount;
-> -       char    Data[1];
-> +       char    Data[];
->  } __attribute__((packed)) ECHO_REQ;
+>         o_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
+> @@ -232,7 +234,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+>         if (o_rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE)
+>                 goto oshr_free;
 >
->  typedef struct smb_com_echo_rsp {
->         struct  smb_hdr hdr;
->         __le16  SequenceNumber;
->         __le16  ByteCount;
-> -       char    Data[1];
-> +       char    Data[];
->  } __attribute__((packed)) ECHO_RSP;
->
->  typedef struct smb_com_logoff_andx_req {
-> @@ -862,7 +862,7 @@ typedef struct smb_com_open_req {   /* also handles create */
->         __le32 ImpersonationLevel;
->         __u8 SecurityFlags;
->         __le16 ByteCount;
-> -       char fileName[1];
-> +       char fileName[];
->  } __attribute__((packed)) OPEN_REQ;
->
->  /* open response: oplock levels */
-> @@ -937,7 +937,7 @@ typedef struct smb_com_openx_req {
->         __le32 Timeout;
->         __le32 Reserved;
->         __le16  ByteCount;  /* file name follows */
-> -       char   fileName[1];
-> +       char   fileName[];
->  } __attribute__((packed)) OPENX_REQ;
->
->  typedef struct smb_com_openx_rsp {
-> @@ -1085,7 +1085,7 @@ typedef struct smb_com_lock_req {
->         __le16 NumberOfUnlocks;
->         __le16 NumberOfLocks;
->         __le16 ByteCount;
-> -       LOCKING_ANDX_RANGE Locks[1];
-> +       LOCKING_ANDX_RANGE Locks[];
->  } __attribute__((packed)) LOCK_REQ;
->
->  /* lock type */
-> @@ -1114,7 +1114,7 @@ typedef struct smb_com_rename_req {
->         __le16 SearchAttributes;        /* target file attributes */
->         __le16 ByteCount;
->         __u8 BufferFormat;      /* 4 = ASCII or Unicode */
-> -       unsigned char OldFileName[1];
-> +       unsigned char OldFileName[];
->         /* followed by __u8 BufferFormat2 */
->         /* followed by NewFileName */
->  } __attribute__((packed)) RENAME_REQ;
-> @@ -1134,7 +1134,7 @@ typedef struct smb_com_copy_req {
->         __le16 Flags;
->         __le16 ByteCount;
->         __u8 BufferFormat;      /* 4 = ASCII or Unicode */
-> -       unsigned char OldFileName[1];
-> +       unsigned char OldFileName[];
->         /* followed by __u8 BufferFormat2 */
->         /* followed by NewFileName string */
->  } __attribute__((packed)) COPY_REQ;
-> @@ -1144,7 +1144,7 @@ typedef struct smb_com_copy_rsp {
->         __le16 CopyCount;    /* number of files copied */
->         __u16 ByteCount;    /* may be zero */
->         __u8 BufferFormat;  /* 0x04 - only present if errored file follows */
-> -       unsigned char ErrorFileName[1]; /* only present if error in copy */
-> +       unsigned char ErrorFileName[]; /* only present if error in copy */
->  } __attribute__((packed)) COPY_RSP;
->
->  #define CREATE_HARD_LINK               0x103
-> @@ -1158,7 +1158,7 @@ typedef struct smb_com_nt_rename_req {    /* A5 - also used for create hardlink */
->         __le32 ClusterCount;
->         __le16 ByteCount;
->         __u8 BufferFormat;      /* 4 = ASCII or Unicode */
-> -       unsigned char OldFileName[1];
-> +       unsigned char OldFileName[];
->         /* followed by __u8 BufferFormat2 */
->         /* followed by NewFileName */
->  } __attribute__((packed)) NT_RENAME_REQ;
-> @@ -1173,7 +1173,7 @@ typedef struct smb_com_delete_file_req {
->         __le16 SearchAttributes;
->         __le16 ByteCount;
->         __u8 BufferFormat;      /* 4 = ASCII */
-> -       unsigned char fileName[1];
-> +       unsigned char fileName[];
->  } __attribute__((packed)) DELETE_FILE_REQ;
->
->  typedef struct smb_com_delete_file_rsp {
-> @@ -1185,7 +1185,7 @@ typedef struct smb_com_delete_directory_req {
->         struct smb_hdr hdr;     /* wct = 0 */
->         __le16 ByteCount;
->         __u8 BufferFormat;      /* 4 = ASCII */
-> -       unsigned char DirName[1];
-> +       unsigned char DirName[];
->  } __attribute__((packed)) DELETE_DIRECTORY_REQ;
->
->  typedef struct smb_com_delete_directory_rsp {
-> @@ -1197,7 +1197,7 @@ typedef struct smb_com_create_directory_req {
->         struct smb_hdr hdr;     /* wct = 0 */
->         __le16 ByteCount;
->         __u8 BufferFormat;      /* 4 = ASCII */
-> -       unsigned char DirName[1];
-> +       unsigned char DirName[];
->  } __attribute__((packed)) CREATE_DIRECTORY_REQ;
->
->  typedef struct smb_com_create_directory_rsp {
-> @@ -1209,7 +1209,7 @@ typedef struct smb_com_query_information_req {
->         struct smb_hdr hdr;     /* wct = 0 */
->         __le16 ByteCount;       /* 1 + namelen + 1 */
->         __u8 BufferFormat;      /* 4 = ASCII */
-> -       unsigned char FileName[1];
-> +       unsigned char FileName[];
->  } __attribute__((packed)) QUERY_INFORMATION_REQ;
->
->  typedef struct smb_com_query_information_rsp {
-> @@ -1229,7 +1229,7 @@ typedef struct smb_com_setattr_req {
->         __le16 reserved[5]; /* must be zero */
->         __u16  ByteCount;
->         __u8   BufferFormat; /* 4 = ASCII */
-> -       unsigned char fileName[1];
-> +       unsigned char fileName[];
->  } __attribute__((packed)) SETATTR_REQ;
->
->  typedef struct smb_com_setattr_rsp {
-> @@ -1311,7 +1311,7 @@ typedef struct smb_com_transaction_ioctl_req {
->         __u8 IsRootFlag; /* 1 = apply command to root of share (must be DFS) */
->         __le16 ByteCount;
->         __u8 Pad[3];
-> -       __u8 Data[1];
-> +       __u8 Data[];
->  } __attribute__((packed)) TRANSACT_IOCTL_REQ;
->
->  typedef struct smb_com_transaction_compr_ioctl_req {
-> @@ -1430,7 +1430,7 @@ typedef struct smb_com_transaction_change_notify_req {
->         __u8 Reserved2;
->         __le16 ByteCount;
->  /*     __u8 Pad[3];*/
-> -/*     __u8 Data[1];*/
-> +/*     __u8 Data[];*/
->  } __attribute__((packed)) TRANSACT_CHANGE_NOTIFY_REQ;
->
->  /* BB eventually change to use generic ntransact rsp struct
-> @@ -1519,7 +1519,7 @@ struct cifs_quota_data {
->         __u64   space_used;
->         __u64   soft_limit;
->         __u64   hard_limit;
-> -       char    sid[1];  /* variable size? */
-> +       char    sid[];  /* variable size? */
->  } __attribute__((packed));
->
->  /* quota sub commands */
-> @@ -1671,7 +1671,7 @@ typedef struct smb_com_transaction2_qpi_req {
->         __u8 Pad;
->         __le16 InformationLevel;
->         __u32 Reserved4;
-> -       char FileName[1];
-> +       char FileName[];
->  } __attribute__((packed)) TRANSACTION2_QPI_REQ;
->
->  typedef struct smb_com_transaction2_qpi_rsp {
-> @@ -1704,7 +1704,7 @@ typedef struct smb_com_transaction2_spi_req {
->         __u16 Pad1;
->         __le16 InformationLevel;
->         __u32 Reserved4;
-> -       char FileName[1];
-> +       char FileName[];
->  } __attribute__((packed)) TRANSACTION2_SPI_REQ;
->
->  typedef struct smb_com_transaction2_spi_rsp {
-> @@ -1809,7 +1809,7 @@ typedef struct smb_com_transaction2_ffirst_req {
->         __le16 SearchFlags;
->         __le16 InformationLevel;
->         __le32 SearchStorageType;
-> -       char FileName[1];
-> +       char FileName[];
->  } __attribute__((packed)) TRANSACTION2_FFIRST_REQ;
->
->  typedef struct smb_com_transaction2_ffirst_rsp {
-> @@ -2020,7 +2020,7 @@ typedef struct smb_com_transaction2_get_dfs_refer_req {
->                                    perhaps?) followed by one byte pad - doesn't
->                                    seem to matter though */
->         __le16 MaxReferralLevel;
-> -       char RequestFileName[1];
-> +       char RequestFileName[];
->  } __attribute__((packed)) TRANSACTION2_GET_DFS_REFER_REQ;
->
->  #define DFS_VERSION cpu_to_le16(0x0003)
-> @@ -2049,7 +2049,7 @@ struct get_dfs_referral_rsp {
->         __le16 PathConsumed;
->         __le16 NumberOfReferrals;
->         __le32 DFSFlags;
-> -       REFERRAL3 referrals[1]; /* array of level 3 dfs_referral structures */
-> +       REFERRAL3 referrals[];  /* array of level 3 dfs_referral structures */
->         /* followed by the strings pointed to by the referral structures */
->  } __packed;
->
-> @@ -2284,7 +2284,10 @@ typedef struct { /* data block encoding of response to level 263 QPathInfo */
->         __le32 Mode;
->         __le32 AlignmentRequirement;
->         __le32 FileNameLength;
-> -       char FileName[1];
-> +       union {
-> +               char __pad;
-> +               DECLARE_FLEX_ARRAY(char, FileName);
-> +       };
->  } __attribute__((packed)) FILE_ALL_INFO;       /* level 0x107 QPathInfo */
->
->  typedef struct {
-> @@ -2322,7 +2325,7 @@ typedef struct {
->  } __attribute__((packed)) FILE_UNIX_BASIC_INFO;        /* level 0x200 QPathInfo */
->
->  typedef struct {
-> -       char LinkDest[1];
-> +       DECLARE_FLEX_ARRAY(char, LinkDest);
->  } __attribute__((packed)) FILE_UNIX_LINK_INFO; /* level 0x201 QPathInfo */
->
->  /* The following three structures are needed only for
-> @@ -2371,7 +2374,7 @@ struct file_end_of_file_info {
->  } __attribute__((packed)); /* size info, level 0x104 for set, 0x106 for query */
->
->  struct file_alt_name_info {
-> -       __u8   alt_name[1];
-> +       DECLARE_FLEX_ARRAY(__u8, alt_name);
->  } __attribute__((packed));      /* level 0x0108 */
->
->  struct file_stream_info {
-> @@ -2480,7 +2483,10 @@ typedef struct {
->         __le32 NextEntryOffset;
->         __u32 ResumeKey; /* as with FileIndex - no need to convert */
->         FILE_UNIX_BASIC_INFO basic;
-> -       char FileName[1];
-> +       union {
-> +               char __pad;
-> +               DECLARE_FLEX_ARRAY(char, FileName);
-> +       };
->  } __attribute__((packed)) FILE_UNIX_INFO; /* level 0x202 */
->
->  typedef struct {
-> @@ -2494,7 +2500,7 @@ typedef struct {
->         __le64 AllocationSize;
->         __le32 ExtFileAttributes;
->         __le32 FileNameLength;
-> -       char FileName[1];
-> +       char FileName[];
->  } __attribute__((packed)) FILE_DIRECTORY_INFO;   /* level 0x101 FF resp data */
->
->  typedef struct {
-> @@ -2509,7 +2515,7 @@ typedef struct {
->         __le32 ExtFileAttributes;
->         __le32 FileNameLength;
->         __le32 EaSize; /* length of the xattrs */
-> -       char FileName[1];
-> +       char FileName[];
->  } __attribute__((packed)) FILE_FULL_DIRECTORY_INFO; /* level 0x102 rsp data */
->
->  typedef struct {
-> @@ -2526,7 +2532,7 @@ typedef struct {
->         __le32 EaSize; /* EA size */
->         __le32 Reserved;
->         __le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit*/
-> -       char FileName[1];
-> +       char FileName[];
->  } __attribute__((packed)) SEARCH_ID_FULL_DIR_INFO; /* level 0x105 FF rsp data */
->
->  typedef struct {
-> @@ -2544,7 +2550,7 @@ typedef struct {
->         __u8   ShortNameLength;
->         __u8   Reserved;
->         __u8   ShortName[24];
-> -       char FileName[1];
-> +       char FileName[];
->  } __attribute__((packed)) FILE_BOTH_DIRECTORY_INFO; /* level 0x104 FFrsp data */
->
->  typedef struct {
-> @@ -2559,7 +2565,7 @@ typedef struct {
->         __le32 AllocationSize;
->         __le16 Attributes; /* verify not u32 */
->         __u8   FileNameLength;
-> -       char FileName[1];
-> +       char FileName[];
->  } __attribute__((packed)) FIND_FILE_STANDARD_INFO; /* level 0x1 FF resp data */
->
->
-> @@ -2569,16 +2575,6 @@ struct win_dev {
->         __le64 minor;
->  } __attribute__((packed));
->
-> -struct gea {
-> -       unsigned char name_len;
-> -       char name[1];
-> -} __attribute__((packed));
 > -
-> -struct gealist {
-> -       unsigned long list_len;
-> -       struct gea list[1];
-> -} __attribute__((packed));
-> -
->  struct fea {
->         unsigned char EA_flags;
->         __u8 name_len;
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index 2d75ba5aaa8a..ef638086d734 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -495,7 +495,7 @@ static char *nxt_dir_entry(char *old_entry, char *end_of_smb, int level)
->                 FIND_FILE_STANDARD_INFO *pfData;
->                 pfData = (FIND_FILE_STANDARD_INFO *)pDirInfo;
+>         smb2_parse_contexts(server, o_rsp,
+>                             &oparms.fid->epoch,
+>                             oparms.fid->lease_key, &oplock,
+> @@ -259,7 +260,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+>                 }
+>         }
+>         cfid->dentry = dentry;
+> -       cfid->tcon = tcon;
+>         cfid->time = jiffies;
+>         cfid->has_lease = true;
 >
-> -               new_entry = old_entry + sizeof(FIND_FILE_STANDARD_INFO) +
-> +               new_entry = old_entry + sizeof(FIND_FILE_STANDARD_INFO) + 1 +
->                                 pfData->FileNameLength;
->         } else {
->                 u32 next_offset = le32_to_cpu(pDirInfo->NextEntryOffset);
-> @@ -513,9 +513,9 @@ static char *nxt_dir_entry(char *old_entry, char *end_of_smb, int level)
->                          new_entry, end_of_smb, old_entry);
->                 return NULL;
->         } else if (((level == SMB_FIND_FILE_INFO_STANDARD) &&
-> -                   (new_entry + sizeof(FIND_FILE_STANDARD_INFO) > end_of_smb))
-> +                   (new_entry + sizeof(FIND_FILE_STANDARD_INFO) + 1 > end_of_smb))
->                   || ((level != SMB_FIND_FILE_INFO_STANDARD) &&
-> -                  (new_entry + sizeof(FILE_DIRECTORY_INFO) > end_of_smb)))  {
-> +                  (new_entry + sizeof(FILE_DIRECTORY_INFO) + 1 > end_of_smb)))  {
->                 cifs_dbg(VFS, "search entry %p extends after end of SMB %p\n",
->                          new_entry, end_of_smb);
->                 return NULL;
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index c304678514a5..4982f5e65e13 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -5010,10 +5010,10 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
+> @@ -270,7 +270,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+>         free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+>         free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+>         spin_lock(&cfids->cfid_list_lock);
+> -       if (!cfid->has_lease) {
+> +       if (rc && !cfid->has_lease) {
+>                 if (cfid->on_list) {
+>                         list_del(&cfid->entry);
+>                         cfid->on_list = false;
+> @@ -279,6 +279,15 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+>                 rc = -ENOENT;
+>         }
+>         spin_unlock(&cfids->cfid_list_lock);
+> +       if (!rc && !cfid->has_lease) {
+> +               /*
+> +                * We are guaranteed to have two references at this point.
+> +                * One for the caller and one for a potential lease.
+> +                * Release the Lease-ref so that the directory will be closed
+> +                * when the caller closes the cached handle.
+> +                */
+> +               kref_put(&cfid->refcount, smb2_close_cached_fid);
+> +       }
+>         if (rc) {
+>                 if (cfid->is_open)
+>                         SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid,
+> @@ -339,6 +348,7 @@ smb2_close_cached_fid(struct kref *ref)
+>         if (cfid->is_open) {
+>                 SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid,
+>                            cfid->fid.volatile_fid);
+> +               atomic_dec(&cfid->tcon->num_remote_opens);
+>         }
 >
->         switch (srch_inf->info_level) {
->         case SMB_FIND_FILE_DIRECTORY_INFO:
-> -               info_buf_size = sizeof(FILE_DIRECTORY_INFO) - 1;
-> +               info_buf_size = sizeof(FILE_DIRECTORY_INFO);
->                 break;
->         case SMB_FIND_FILE_ID_FULL_DIR_INFO:
-> -               info_buf_size = sizeof(SEARCH_ID_FULL_DIR_INFO) - 1;
-> +               info_buf_size = sizeof(SEARCH_ID_FULL_DIR_INFO);
->                 break;
->         case SMB_FIND_FILE_POSIX_INFO:
->                 /* note that posix payload are variable size */
-> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-> index a5773a06aba8..2114e8a0c63a 100644
-> --- a/fs/cifs/smb2pdu.h
-> +++ b/fs/cifs/smb2pdu.h
-> @@ -371,7 +371,7 @@ struct smb2_file_id_extd_directory_info {
->         __le32 EaSize; /* EA size */
->         __le32 ReparsePointTag; /* valid if FILE_ATTR_REPARSE_POINT set in FileAttributes */
->         __le64 UniqueId; /* inode num - le since Samba puts ino in low 32 bit */
-> -       char FileName[1];
-> +       char FileName[];
->  } __packed; /* level 60 */
->
->  extern char smb2_padding[7];
+>         free_cached_dir(cfid);
 > --
-> 2.34.1
+> 2.35.3
 >
 
 
