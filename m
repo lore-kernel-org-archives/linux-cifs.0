@@ -2,55 +2,59 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2185DC05027
-	for <linux-cifs@archiver.kernel.org>; Sat, 18 Feb 2023 03:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EC1AC6379F
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Feb 2023 15:19:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229533AbjBRDWk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Feb 2023 22:22:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59886 "EHLO
+        id S229678AbjBRPTl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 18 Feb 2023 10:19:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjBRDWj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Feb 2023 22:22:39 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6459A23C7B;
-        Fri, 17 Feb 2023 19:22:38 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 18B74B82F37;
-        Sat, 18 Feb 2023 03:22:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B40EDC4339E;
-        Sat, 18 Feb 2023 03:22:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676690555;
-        bh=NvM8rMX7vszmzZ13cFwLKAQaASG65dDWzi5/WCQTomE=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=CE0rrKuOS3SuJ9R0TWg2MNjvLadgNh+Bt1n2s2WGloPLG3gCtCJiTGQ/EkrGjiFuw
-         xFaGyZz2yyYe+Oh3P5OwRmAOgOIhD4ounADO0VxgTm25NAzzOlllt3Bo9YEYUH/fXJ
-         TPnCiNNygf0Rb+6p1VAffEXzontneXzsvHUWUbzULI595U8KaUvlNLeA6synTIitNA
-         BjfOkC+Lv7tvfg9gsTLrEMN1sL0pqwxPxaZmu7t6NbinQYJtksa/EDZEpJGyHitbK3
-         Bju0+w1Weke/G9vRxVpTR2COAdzB/xHUMxXbUT1X5IzT0LrUr1rtANingaqJ5z63Yp
-         YOlIIJrniQ8eA==
-Received: by mail-oi1-f182.google.com with SMTP id bg20so2658308oib.9;
-        Fri, 17 Feb 2023 19:22:35 -0800 (PST)
-X-Gm-Message-State: AO0yUKUvSnPiL9OPs1XQGKH18wnRNBGlM5g9tjO7n0MFoQMxZxz7NepU
-        uiv4dIA9WaXDJuAVkrUeNGqD9I2Gm7+aAIXvjxI=
-X-Google-Smtp-Source: AK7set/XiooE4fdic8DHDR2MO1lKg50DpTkthOAR8RCDo+fI51RFAecJ7GKfs86cRk4RchcreGuAjfy61GhJ8UyaBkY=
-X-Received: by 2002:a05:6808:20aa:b0:37f:8c73:4218 with SMTP id
- s42-20020a05680820aa00b0037f8c734218mr916992oiw.253.1676690554761; Fri, 17
- Feb 2023 19:22:34 -0800 (PST)
+        with ESMTP id S229445AbjBRPTk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Feb 2023 10:19:40 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C3715546;
+        Sat, 18 Feb 2023 07:19:39 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id b22so1367224lfv.5;
+        Sat, 18 Feb 2023 07:19:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7q2Wg8S1rsfm30D7lgChP+RGLUmdPuKtGfy28d6nd2c=;
+        b=Q+twZu/73PHUCZPn32nq0NgKH/rksz15uwZZFZqEIxVuq7cBUyB91DH9OFAkMhBZOZ
+         25h4g1NLayShc27rvbNVkiohaUxWtzE8Ggc//EMsxd0HqhYXAftPtFojX5+lMfYHVmZP
+         PXwIF10DE36X0lJNd/UsoMy2vlQlsUWT723LH09UTQtZIZ5aY8aqRnWSOc8UiAPiTTHL
+         6fIoa9Gu54FZZWDRIEkiZg9RjNn0g++x8pTqJQIWfc0noFCtrvbfU715AePLjKoxCX/E
+         If9AQx/7mZzIXoR9JgsZxE6WL3X9vbb3g5vMu2bVZDVCz12eYAHutrUL1o0GgMiFB4sZ
+         LJgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7q2Wg8S1rsfm30D7lgChP+RGLUmdPuKtGfy28d6nd2c=;
+        b=MR5cPGrk3ycy9gZudMWBmZEpeiMS6ckbbna4uvnRwQrPqf36dMa4hC/ZvUEvpQPKwo
+         o65TuVGzs4vrk57pi8mHY77wsKkSLPW4gy6MA4TYXKQG9NP816JB3bL3c86gni0B5UNd
+         4BsF/jcpH/hwAH4uxNVtLUpVrhCayvGRayqon0/4r7H7FcHzeCKKY1+7TvCR7egxe37T
+         X+OWjOtp8zfQGS4OzJFiAST2/gGTfGS8JdGwxNMjL/hP/HggBGEg70Mq10oQVDw4XCRd
+         WjXb0kwoyjvxHtsA+u6XKOTHxLf4yWfzRkgqJzFWnas5wcNLK6mgyAhqF6L2MMhFKBY4
+         UxsA==
+X-Gm-Message-State: AO0yUKU6aT8dTP7DIfV/S44m6WoHAI09YJMXDFfzZLJmzvMlbI/VLdH/
+        1fG4NCscwiOKCaMGty8m+ohNDiXVbXzrLFm/LZhZRaON
+X-Google-Smtp-Source: AK7set9O89dNDCkMb+Ei/ZIH686OBETFP2ZLwTaSTkzyJBNq3dib4fxm87Hu9j1qs5CFBv5i1vz4rqvnBjNPBHRTCvQ=
+X-Received: by 2002:a05:6512:501:b0:4d5:ca32:7bc3 with SMTP id
+ o1-20020a056512050100b004d5ca327bc3mr1349945lfb.10.1676733577507; Sat, 18 Feb
+ 2023 07:19:37 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:ac9:78d8:0:b0:49f:f8ae:2ce5 with HTTP; Fri, 17 Feb 2023
- 19:22:34 -0800 (PST)
-In-Reply-To: <20230218002436.give.204-kees@kernel.org>
-References: <20230218002436.give.204-kees@kernel.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sat, 18 Feb 2023 12:22:34 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9Y+wCbAy3a_W55fgb2Sy7M9UQUhR+XujaTKZ255YCjGg@mail.gmail.com>
-Message-ID: <CAKYAXd9Y+wCbAy3a_W55fgb2Sy7M9UQUhR+XujaTKZ255YCjGg@mail.gmail.com>
+References: <20230218002436.give.204-kees@kernel.org> <CAKYAXd9Y+wCbAy3a_W55fgb2Sy7M9UQUhR+XujaTKZ255YCjGg@mail.gmail.com>
+In-Reply-To: <CAKYAXd9Y+wCbAy3a_W55fgb2Sy7M9UQUhR+XujaTKZ255YCjGg@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 18 Feb 2023 09:19:26 -0600
+Message-ID: <CAH2r5msJ1ZogypaiiLQ=STiroEXULwJr71_ta_+ZamXSqzxgpA@mail.gmail.com>
 Subject: Re: [PATCH v3] smb3: Replace smb2pdu 1-element arrays with flex-arrays
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
         Tom Talpey <tom@talpey.com>,
@@ -62,57 +66,68 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-02-18 9:24 GMT+09:00, Kees Cook <keescook@chromium.org>:
-> The kernel is globally removing the ambiguous 0-length and 1-element
-> arrays in favor of flexible arrays, so that we can gain both compile-time
-> and run-time array bounds checking[1].
->
-> Replace the trailing 1-element array with a flexible array in the
-> following structures:
->
-> 	struct smb2_err_rsp
-> 	struct smb2_tree_connect_req
-> 	struct smb2_negotiate_rsp
-> 	struct smb2_sess_setup_req
-> 	struct smb2_sess_setup_rsp
-> 	struct smb2_read_req
-> 	struct smb2_read_rsp
-> 	struct smb2_write_req
-> 	struct smb2_write_rsp
-> 	struct smb2_query_directory_req
-> 	struct smb2_query_directory_rsp
-> 	struct smb2_set_info_req
-> 	struct smb2_change_notify_rsp
-> 	struct smb2_create_rsp
-> 	struct smb2_query_info_req
-> 	struct smb2_query_info_rsp
->
-> Replace the trailing 1-element array with a flexible array, but leave
-> the existing structure padding:
->
-> 	struct smb2_file_all_info
-> 	struct smb2_lock_req
->
-> Adjust all related size calculations to match the changes to sizeof().
->
-> No machine code output or .data section differences are produced after
-> these changes.
->
-> [1] For lots of details, see both:
->
-> https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
->     https://people.kernel.org/kees/bounded-flexible-arrays-in-c
->
-> Cc: Steve French <sfrench@samba.org>
-> Cc: Paulo Alcantara <pc@cjr.nz>
-> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
-> Cc: Shyam Prasad N <sprasad@microsoft.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Cc: linux-cifs@vger.kernel.org
-> Cc: samba-technical@lists.samba.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+merged into cifs-2.6.git for-next pending testing
 
-Thanks!
+On Fri, Feb 17, 2023 at 9:24 PM Namjae Jeon <linkinjeon@kernel.org> wrote:
+>
+> 2023-02-18 9:24 GMT+09:00, Kees Cook <keescook@chromium.org>:
+> > The kernel is globally removing the ambiguous 0-length and 1-element
+> > arrays in favor of flexible arrays, so that we can gain both compile-time
+> > and run-time array bounds checking[1].
+> >
+> > Replace the trailing 1-element array with a flexible array in the
+> > following structures:
+> >
+> >       struct smb2_err_rsp
+> >       struct smb2_tree_connect_req
+> >       struct smb2_negotiate_rsp
+> >       struct smb2_sess_setup_req
+> >       struct smb2_sess_setup_rsp
+> >       struct smb2_read_req
+> >       struct smb2_read_rsp
+> >       struct smb2_write_req
+> >       struct smb2_write_rsp
+> >       struct smb2_query_directory_req
+> >       struct smb2_query_directory_rsp
+> >       struct smb2_set_info_req
+> >       struct smb2_change_notify_rsp
+> >       struct smb2_create_rsp
+> >       struct smb2_query_info_req
+> >       struct smb2_query_info_rsp
+> >
+> > Replace the trailing 1-element array with a flexible array, but leave
+> > the existing structure padding:
+> >
+> >       struct smb2_file_all_info
+> >       struct smb2_lock_req
+> >
+> > Adjust all related size calculations to match the changes to sizeof().
+> >
+> > No machine code output or .data section differences are produced after
+> > these changes.
+> >
+> > [1] For lots of details, see both:
+> >
+> > https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+> >     https://people.kernel.org/kees/bounded-flexible-arrays-in-c
+> >
+> > Cc: Steve French <sfrench@samba.org>
+> > Cc: Paulo Alcantara <pc@cjr.nz>
+> > Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+> > Cc: Shyam Prasad N <sprasad@microsoft.com>
+> > Cc: Tom Talpey <tom@talpey.com>
+> > Cc: Namjae Jeon <linkinjeon@kernel.org>
+> > Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+> > Cc: linux-cifs@vger.kernel.org
+> > Cc: samba-technical@lists.samba.org
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+>
+> Thanks!
+
+
+
+-- 
+Thanks,
+
+Steve
