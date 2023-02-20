@@ -2,122 +2,83 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF44C636D6
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Feb 2023 21:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0538C61DA3
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Feb 2023 23:34:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231331AbjBTVBF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Feb 2023 16:01:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43214 "EHLO
+        id S232587AbjBTXeg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Feb 2023 18:34:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjBTVBF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Feb 2023 16:01:05 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA87BDF2;
-        Mon, 20 Feb 2023 13:01:03 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id s20so2864449lfb.11;
-        Mon, 20 Feb 2023 13:01:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=t+AYXp7cx1zGbgbpmTlMP4RRwMZJH7DgOJzu/qs2IxM=;
-        b=oV7p0yfAVYKuE1aulM8oaB0dLgOuyB7hSdrdZaM13aVptasEW7i9Lgw9aGLbAFR2y4
-         m3ljbNRXM/4VLBYxzWgDVyocLaBZ9y8bUPhw8FXtOpCIv6ARyCE0mMjrHPdhuwnEljMj
-         P4F4Icf9KzapXczEIfgxsoF9PGgGgCbaQ7r118YlsE5VJvgL5tuC4MGStLVwbdoQlDD/
-         3ff382DfjevEY0l2dl9bxGD+8ypWqkEKkgsgZqLDtalNrAFMZoOODTkp0Hx7pmlI+RUG
-         gtUjQGBKhULBLMLrDGqfa5zSwBIu0Md3dCRtulVS4LWszg3ruO2FuW1owgLeB4lr9XX/
-         ikzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t+AYXp7cx1zGbgbpmTlMP4RRwMZJH7DgOJzu/qs2IxM=;
-        b=aSXvPjmfeM49I8aQgemOOYOx1diJ4tmjJTb34rhCvhVLkI1P15i0OeMpePS/v93Z0k
-         iFpDclYUcnvP6bjBIJUiUACBSnpXfhKudzLp2E3slZVS+JMd2v/i1kjVsbL4L0pOMIi4
-         IFUuHdNigYVXWvAdexvmwvPeH/Ub6ybNxaTPvrMb+j5USLKw4kV7Nluf+1eYr0mARIAk
-         IIHSN7+xw1Dam4cWSI08q/3oNIFAMi31giaoB6UyuPZL/d4OT1vyVlaqw9P6u9GShLDM
-         cgdI+RzzjV/q3EOyJAnO6dKqaseprZOISZ/sLGoX67K+yhhlpOr8nwjmqqCa97ZOpJtO
-         uBww==
-X-Gm-Message-State: AO0yUKVg4NlICKQSQsUqM6MUSyjwm+mGEatIORFxZLE2o4xt2DD3+UIr
-        vcdr0Mpu6DvZrbZ7CX6KkUArruN/9fILx7JCHTQ=
-X-Google-Smtp-Source: AK7set/6lpjDqJlDtMmjaOZFg4AkK0TLe0+lJKxxu/gKWkIUH8cEpHVSp9vFkgXkoZcAdmfAQX1u461L9IzDTj0Fatg=
-X-Received: by 2002:a19:c501:0:b0:4d5:ca32:7bc3 with SMTP id
- w1-20020a19c501000000b004d5ca327bc3mr1057826lfe.10.1676926861829; Mon, 20 Feb
- 2023 13:01:01 -0800 (PST)
+        with ESMTP id S232039AbjBTXef (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Feb 2023 18:34:35 -0500
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA974A5E9;
+        Mon, 20 Feb 2023 15:34:33 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PLJfX2c7Zz4x1h;
+        Tue, 21 Feb 2023 10:34:28 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1676936068;
+        bh=PZ+QHxDFdbxKxNJEpTxiivJARGFLCGlmcuBS0i+RWZE=;
+        h=Date:From:To:Cc:Subject:From;
+        b=ZzYhV+Oi+IIP7tknCcuMomwXr2PxqXR0SngnZrBj7PgqbwvJjzH7Muc4I7Nft7o2y
+         mClDcEiSIxlhcyrg+vhchJpp9zgj94Uvqy9jeX5gy1yOBP5q+NlZ0VVuJpBkZye/pG
+         XYODg4kGFyN3i/0Mg5BRdRFI85RXRWE+33T04kfArTUVDzVG+or1V6B3UWD97j/g4h
+         tb6rpIgQPLqK26Oqh6hG3dLu1rP/jpiUYDAgZY7Ai3hQmjjHFa16WczRyRMOZCA+TM
+         +kvogT25ds19vcEH930vdTGzv2lkslyNybYT2GqigOtxjcyrVFzvTIKE2hB+17O171
+         W/kxUKokPPl/w==
+Date:   Tue, 21 Feb 2023 10:34:27 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Signed-off-by missing for commits in the cifs tree
+Message-ID: <20230221103427.2aba1c37@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20230220152933.1ab8fa4a@canb.auug.org.au> <Y/N8hVWeR3AjssUC@casper.infradead.org>
- <20230220190157.3b43b9a7@canb.auug.org.au>
-In-Reply-To: <20230220190157.3b43b9a7@canb.auug.org.au>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 20 Feb 2023 15:00:50 -0600
-Message-ID: <CAH2r5ms6J_hWmLaLA=pCQz1oez3bO07ahvr6mdCbYzQHrNVNkA@mail.gmail.com>
-Subject: Re: linux-next: manual merge of the mm-stable tree with the cifs tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Steve French <stfrench@microsoft.com>,
-        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/.Tm=1v/2bKj0CpDGqP1y6uQ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 2:55 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi Matthew,
->
-> On Mon, 20 Feb 2023 13:58:29 +0000 Matthew Wilcox <willy@infradead.org> wrote:
-> >
-> > On Mon, Feb 20, 2023 at 03:29:33PM +1100, Stephen Rothwell wrote:
-> > >
-> > > Today's linux-next merge of the mm-stable tree got a conflict in:
-> > >
-> > >   fs/cifs/file.c
-> > >
-> > > between commit:
-> > >
-> > >   c8859bc0c129 ("cifs: Remove unused code")
-> > >
-> > > from the cifs tree and commits:
-> > >
-> > >   4cda80f3a7a5 ("cifs: convert wdata_alloc_and_fillpages() to use filemap_get_folios_tag()")
-> > >   d585bdbeb79a ("fs: convert writepage_t callback to pass a folio")
-> > >
-> > > from the mm-stable tree.
-> > >
-> > > This is a real mess :-(
-> >
-> > Doesn't look too bad to me.  Dave's commit is just removing the
-> > functions, so it doesn't matter how they're being changed.
->
-> The problem I see is that an earlier commit in the cifs tree moves the
-> use of find_get_pages_range_tag() to another function and 4cda80f3a7a5
-> then removes find_get_pages_range_tag().
->
-> > The real question in my mind is why for-next is being updated two days
-> > before the merge window with new patches.  What's the point in -next
-> > if patches are being added at this late point?
->
-> Indeed :-(
+--Sig_/.Tm=1v/2bKj0CpDGqP1y6uQ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I don't think it was so much that they were added late (most were
-reviewed over multiple week period) - just moved trees to make it
-easier a week ago.  The changes David etc. have been making recently
-to the series seemed fairly small.  And I am hoping that his series
-allows removal of more dead code as well. Also FYI Paulo caught a
-minor bug in one of Dave's patches while testing today, and I noticed
-a merge conflict with a small unrelated patch that went into
-mm/filemap.c for rc8 so I am rebasing my cifs-2.6.git for-next on 6.2
-now (to avoid that merge conflict) and will update later this
-afternoon with the trivial fix for the problem Paulo pointed out.
+Hi all,
 
+Commits
 
--- 
-Thanks,
+  87788bad1133 ("cifs: DIO to/from KVEC-type iterators should now work")
+  043e4d17b6b4 ("cifs: Remove unused code")
+  3eb2bd2275e1 ("cifs: Build the RDMA SGE list directly from an iterator")
+  6b188cd64831 ("cifs: Change the I/O paths to use an iterator rather than =
+a page list")
 
-Steve
+are missing a Signed-off-by from their committer.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/.Tm=1v/2bKj0CpDGqP1y6uQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmP0A4MACgkQAVBC80lX
+0GyqDAf/cojNQ3Fhk994BtCW/PtJ0EIpWYoes8E1y8RdTQlgWtfEbYvXAMQI2oD3
+FYp+I79cvrPlRtXLmdIeXZS0AZIslKqWMCZwfrCKJWKj+WLBWIe2nMS7sorTJyIM
+wRVDoQwZnOgTOrSaR7biVunLLvdOAuNrjoFRXSJO8upRmciYW60jvI7MGmq/krbQ
+yWdMPGD0USOtBwInPSl9fXpr0C1VDPPQlDRbnlOt1FtI4bjevlQBzO0hay4/muG7
+HJb4A/igkoFLBrZmUEXc4LN+s20bWhXpdme6CNIAU8ZDbmXNnGZHD1mf7fhu6wwe
+4UDyoTNdKFFXZTprLFdUcycOW+fUMg==
+=ToTd
+-----END PGP SIGNATURE-----
+
+--Sig_/.Tm=1v/2bKj0CpDGqP1y6uQ--
