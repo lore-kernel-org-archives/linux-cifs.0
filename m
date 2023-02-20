@@ -2,76 +2,79 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A20C05027
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Feb 2023 13:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94891C636CC
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Feb 2023 14:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232724AbjBTN7H (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Feb 2023 08:59:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50058 "EHLO
+        id S231661AbjBTOah (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Feb 2023 09:30:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232706AbjBTN7D (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Feb 2023 08:59:03 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F6721EBE5;
-        Mon, 20 Feb 2023 05:58:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BDP+GXZzksa3aQWqV2A3A4f9tq1StQVPiy8S81efm1s=; b=p9q3AMbI+icsav00MNd4G4w2PG
-        yXAliSSxVqUaclV3ZXF/+ItfsOVUdpeiRi/dGsIgp0j+OU45ZEGtHKsMQZSteeg5Etzfp8lnBFe0K
-        moJsbV796AYxVTnPuW5+1MwuhkwjuYIMF4k6oF2IRPaQRlq9wHb+zKnmSVUXel96xC/IpX+SUlSUc
-        /tqaHM8G/uLAKehz9NKuQvBJczqYsal9teH0SvQNFhkBW4/Q0SIf+GKls3MnBLXARKJl3dKih9Aqx
-        297jQngNqmT8ShoaRw87hCQhfEc52SE+VH9ef5c854JMu6h1gprJXtjJEhTkC7vXh+WUcJt+cdBo5
-        qfJfLjAA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pU6gX-00BlzV-KL; Mon, 20 Feb 2023 13:58:29 +0000
-Date:   Mon, 20 Feb 2023 13:58:29 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        with ESMTP id S231992AbjBTOah (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Feb 2023 09:30:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A102610AB2
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Feb 2023 06:29:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1676903389;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=x5p6lK28Ra573v7+UHzSn0UqRqk59msus4yoHKjo37Y=;
+        b=hQ4OpHlP+Kfn3jfzOxRioy6GZIV/BRESxUvwGkplc5QX9JX+7xhwnfH2Ia+xnCHN8UQYct
+        rmmR3BMgeYqgyNxhhK8Jl/xH2Zs5Ll10AkxgyHpSmxr9UscHSmiDxKON3cje1bzPZZVTQV
+        EMQ9fV5qK8cNbfyHVWbLwhVP7sqTdPE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-74-BUWw3wZaOMeCm6RwB8xb4Q-1; Mon, 20 Feb 2023 09:29:44 -0500
+X-MC-Unique: BUWw3wZaOMeCm6RwB8xb4Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DF90329AB44F;
+        Mon, 20 Feb 2023 14:29:43 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 702734097544;
+        Mon, 20 Feb 2023 14:29:42 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <Y/N8hVWeR3AjssUC@casper.infradead.org>
+References: <Y/N8hVWeR3AjssUC@casper.infradead.org> <20230220152933.1ab8fa4a@canb.auug.org.au>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, Stephen Rothwell <sfr@canb.auug.org.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
         Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>,
         Steve French <stfrench@microsoft.com>,
         "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
 Subject: Re: linux-next: manual merge of the mm-stable tree with the cifs tree
-Message-ID: <Y/N8hVWeR3AjssUC@casper.infradead.org>
-References: <20230220152933.1ab8fa4a@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230220152933.1ab8fa4a@canb.auug.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1676389.1676903381.1@warthog.procyon.org.uk>
+Date:   Mon, 20 Feb 2023 14:29:41 +0000
+Message-ID: <1676391.1676903381@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 03:29:33PM +1100, Stephen Rothwell wrote:
-> Hi all,
-> 
-> Today's linux-next merge of the mm-stable tree got a conflict in:
-> 
->   fs/cifs/file.c
-> 
-> between commit:
-> 
->   c8859bc0c129 ("cifs: Remove unused code")
-> 
-> from the cifs tree and commits:
-> 
->   4cda80f3a7a5 ("cifs: convert wdata_alloc_and_fillpages() to use filemap_get_folios_tag()")
->   d585bdbeb79a ("fs: convert writepage_t callback to pass a folio")
-> 
-> from the mm-stable tree.
-> 
-> This is a real mess :-(
+Matthew Wilcox <willy@infradead.org> wrote:
 
-Doesn't look too bad to me.  Dave's commit is just removing the
-functions, so it doesn't matter how they're being changed.
+> Doesn't look too bad to me.  Dave's commit is just removing the
+> functions, so it doesn't matter how they're being changed.
+> 
+> The real question in my mind is why for-next is being updated two days
+> before the merge window with new patches.  What's the point in -next
+> if patches are being added at this late point?
 
-The real question in my mind is why for-next is being updated two days
-before the merge window with new patches.  What's the point in -next
-if patches are being added at this late point?
+It's more of a transfer of a subset of my iov/splice patches from the
+linux-block tree to the cifs tree.  I thought Jens would've dropped my branch
+from his tree for the moment.
+
+David
 
