@@ -2,104 +2,116 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4E2C636D6
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Feb 2023 00:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F439C636D6
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Feb 2023 00:47:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232049AbjBUAjs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Feb 2023 19:39:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57406 "EHLO
+        id S232804AbjBUArr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Feb 2023 19:47:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232435AbjBUAjq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Feb 2023 19:39:46 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28FEE1ADDE;
-        Mon, 20 Feb 2023 16:39:45 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PLL5q4jGgz4x5Y;
-        Tue, 21 Feb 2023 11:39:43 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1676939984;
-        bh=a7w2e6KHGnEX0MRAjsRNMueYhsFOVGl0qcjlqUf7nPo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=l7+YQW6C6+9wWL1f8YNvMhVzvR/MiPL8Rd6GcgjmFIYpdoaUNpWiHjr28fgVfcrYk
-         OsT2d1QcQm+HPOpiqxW+vehhNr3ohBI7KtBYpUwXCVL19j6Bzq8DAq47rFUZyFNYI2
-         sBcq+kzhHmtwf0IVfimNGs/2sHfZYqaUih8pwiCVYrn+vKyZVqWvIyOzAF2jmaXVRs
-         P1H74Zug1u51zppuxpr0YWB/q+TvFDgmxtGR0WDtg7xaM/NmnkJJEEdSB1iPjUifb6
-         au+g+bCgJ+PMQMIkoU0YUesHvVvd81kMc6S4TLeA/IekaYbjFewGA9Ym7wfFZTWnxn
-         TNfUmIx/TPPXQ==
-Date:   Tue, 21 Feb 2023 11:39:42 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>
+        with ESMTP id S229709AbjBUArr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Feb 2023 19:47:47 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 025F71C7F1;
+        Mon, 20 Feb 2023 16:47:46 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id m7so3601026lfj.8;
+        Mon, 20 Feb 2023 16:47:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=YUYO8E9O6ODuJMvaLPRZa6MMp8VX9JxblM5j/UG0tI8=;
+        b=f8ZIo8vNCNCQuOQ88sg7/nVSh6iZjpYt8b4J7ArdWqIzKGUeQT4JUHXTBMah7cvcq7
+         iEpdop6Up/38Bi/GEtxaJ4HPsqGOIgl0L5Br0su3btk9uMxVYIN1Be2sXQ0Rf4ThqFS9
+         K/9/czmjAsxFykTJLn6GQEnz57obC4l9Y2YJhFImzNOhvqkv8gA00n55WDafCvOvxi3s
+         xIY+SRFCCsQbv1g0UKLqVBiX3qB5xHTu+DWXhBhC1V1+PoZ38GZX3rkJEn2RRTmH83ZC
+         ADuXY75mcJT/R+nBr4BTOEZ5WaqIwlXh3iq5g9OrZzhAOCLcyYLf/0zcsYIn9tixizj+
+         EIwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YUYO8E9O6ODuJMvaLPRZa6MMp8VX9JxblM5j/UG0tI8=;
+        b=QIBgMzEghACYu3V2fZpZga0wn8Ch7xRbKVp6Xe8eDk1RWg79VERXqGi0v9N2xeClyl
+         /mxV4v2kqdg4F0Gmj2zmr/9wWlFHKr2Cvt15v5j+30LQvC29HjGvx6cv6g6N42h+Dw0A
+         RlNa9stMot3KiNGU+mW74XFbgSbBDknFLIiZ0GpQL/+Bv04vSBFGVJrWrAgK9Lll7qE8
+         QFM9cfDOBEybbK79v7IW7OCE8bW25ImQq5jp0SB+FCMgzrVoXylREaQ7WSloYidx7L72
+         sFox6gWZ66KiciqQUBd4gMKopSGIin57e79/Fi5cHg2qDFehS8uq1t4ErQXmjkW4BIh+
+         zBlw==
+X-Gm-Message-State: AO0yUKWGGLbAe8rzDCACPSBHLFvL1hfFkO4mVHDPssTUURVVMYxaJQiE
+        8yramwZl7nN2p4qqUZDDiuv37YQDneTX2ujjx+3UuInMa8k=
+X-Google-Smtp-Source: AK7set9hY4nprlqYsh+SRppL45xiTx/FRnmHRpvTiSSb44KajRfLchJpvPtkFWpqFBz30rYlLu25EaV26LNHs8QYYjc=
+X-Received: by 2002:ac2:50da:0:b0:4db:2554:93a6 with SMTP id
+ h26-20020ac250da000000b004db255493a6mr1104224lfm.10.1676940464179; Mon, 20
+ Feb 2023 16:47:44 -0800 (PST)
+MIME-Version: 1.0
+References: <20230220115056.22751cf6@canb.auug.org.au> <20230221113942.0d0ca13c@canb.auug.org.au>
+In-Reply-To: <20230221113942.0d0ca13c@canb.auug.org.au>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 20 Feb 2023 18:47:33 -0600
+Message-ID: <CAH2r5msX0HOjqHLmkpXOx0PQdjFAZgqeb22kHQ_F2RpUKBWG7A@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the block tree with the cifs tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
 Cc:     Jens Axboe <axboe@kernel.dk>, CIFS <linux-cifs@vger.kernel.org>,
         Christoph Hellwig <hch@lst.de>,
         David Howells <dhowells@redhat.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Steve French <stfrench@microsoft.com>
-Subject: Re: linux-next: manual merge of the block tree with the cifs tree
-Message-ID: <20230221113942.0d0ca13c@canb.auug.org.au>
-In-Reply-To: <20230220115056.22751cf6@canb.auug.org.au>
-References: <20230220115056.22751cf6@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/7GsqgIcHxyht7J.Uk0ahOQ/";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        Steve French <stfrench@microsoft.com>,
+        Paulo Alcantara <pc@cjr.nz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/7GsqgIcHxyht7J.Uk0ahOQ/
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Should I rebase my cifs for-next branch on Christoph's patch (now in
+mainline) to make it easier to merge my branch later in the week?
 
-Hi all,
+       cifs: use bvec_set_page to initialize bvecs
+         Use the bvec_set_page helper to initialize bvecs.
+       Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-On Mon, 20 Feb 2023 11:50:56 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->=20
-> Today's linux-next merge of the block tree got a conflict in:
->=20
->   fs/cifs/smb2ops.c
->=20
-> between commit:
->=20
->   8378eea2e41f ("cifs: Change the I/O paths to use an iterator rather tha=
-n a page list")
->=20
-> from the cifs tree and commit:
->=20
->   220ae4a5c2ba ("cifs: use bvec_set_page to initialize bvecs")
->=20
-> from the block tree.
->=20
-> I fixed it up (the former removed the code updated by the latter) and
-> can carry the fix as necessary. This is now fixed as far as linux-next
-> is concerned, but any non trivial conflicts should be mentioned to your
-> upstream maintainer when your tree is submitted for merging.  You may
-> also want to consider cooperating with the maintainer of the conflicting
-> tree to minimise any particularly complex conflicts.
+This would avoid merge conflicts in various of David Howell's patches
+in my tree.
 
-This is now a conflict between the cifs tree and Linus' tree.
---=20
-Cheers,
-Stephen Rothwell
+Thoughts?
 
---Sig_/7GsqgIcHxyht7J.Uk0ahOQ/
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+On Mon, Feb 20, 2023 at 6:39 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Hi all,
+>
+> On Mon, 20 Feb 2023 11:50:56 +1100 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> >
+> > Today's linux-next merge of the block tree got a conflict in:
+> >
+> >   fs/cifs/smb2ops.c
+> >
+> > between commit:
+> >
+> >   8378eea2e41f ("cifs: Change the I/O paths to use an iterator rather than a page list")
+> >
+> > from the cifs tree and commit:
+> >
+> >   220ae4a5c2ba ("cifs: use bvec_set_page to initialize bvecs")
+> >
+> > from the block tree.
+> >
+> > I fixed it up (the former removed the code updated by the latter) and
+> > can carry the fix as necessary. This is now fixed as far as linux-next
+> > is concerned, but any non trivial conflicts should be mentioned to your
+> > upstream maintainer when your tree is submitted for merging.  You may
+> > also want to consider cooperating with the maintainer of the conflicting
+> > tree to minimise any particularly complex conflicts.
+>
+> This is now a conflict between the cifs tree and Linus' tree.
+> --
+> Cheers,
+> Stephen Rothwell
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmP0Es4ACgkQAVBC80lX
-0GzhPwf/Yr3e8y170nPtPoDvXjhBDBnvKFM2VpCdOuYx1kYXAYH5o6FayM2oyheh
-gShDCt/+Davsc5wd0Vd9t82lrxZCIvDWnAmEtznnot8h59icP53bgWXA+u/YWxcO
-ZOrTkF28/EvxYvskh6OWJHEqFmYLhCg+EagB7tYbkBq4VrFP/gOhSTh+/q//8oAj
-vKGJuLvAQxQthjQHBW6pXMpvHMWjg6YYN+RZPCzCrPeCcHP4olbgjkoUtvJffvju
-TQjb0arsdRP+UxkR0sydeJxU+Mcm0zBRMB+9TzBmtjMMHvcMpMhJ1PkUUDnh9+Sk
-Gmit9AinQTYOprDON7DvQW00bX62Fw==
-=mF5X
------END PGP SIGNATURE-----
 
---Sig_/7GsqgIcHxyht7J.Uk0ahOQ/--
+-- 
+Thanks,
+
+Steve
