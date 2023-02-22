@@ -2,121 +2,76 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B28BAC61DA4
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Feb 2023 04:16:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 728B8C64EC4
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Feb 2023 08:28:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230284AbjBVEQO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Feb 2023 23:16:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56784 "EHLO
+        id S229560AbjBVI2y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 22 Feb 2023 03:28:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbjBVEQN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Feb 2023 23:16:13 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1578934C3C;
-        Tue, 21 Feb 2023 20:16:12 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id m6so8489105lfq.5;
-        Tue, 21 Feb 2023 20:16:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YwNzJLcpDDqs5yIWRlC/s8Am5Np1WdXF71ovyHKPyq4=;
-        b=b1uBgXiEuyt1q6UTsjdqezO3613zO5/vEI+bbdAdf4EP8LonKKyVqxd2uVmbtJTvae
-         yIdRLFOQSNx12Nbqvr+rdg3W/4n+Q9u+GWZ7e+qpWW67fGjvLfkG5eJ5juNB6m7G2rLD
-         0ono6ys2hYv1AZ3GBo3MwvEiEWCWURZXnkAPceokGLHOo6RHZK4iwamC55RdnkF35M6v
-         zfgQvDkTZpRCIeKYkelzMT2O/H0BW+5T5Q5oA0s6HHKu3geteWZ2uBEl/LJEG7OlpoE5
-         bhy9yreJLJstZbh7HaWHVIlmRUEKlzGkN1hSMHWUtgOQLxPG6p9nAt348cW57KQvOV/5
-         2MnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YwNzJLcpDDqs5yIWRlC/s8Am5Np1WdXF71ovyHKPyq4=;
-        b=obAh7+zvzKBWnaPf+j+a6xPrNw14pV2GNskPGWZQ9TW4L9mfNO/hGqCYslkcHSSfDY
-         MplsV/Kfg5puOe9RZQpEPxxfsfggmLMCxDLKFv3X6r96HDKFW+cyjXKaajvXcBV+lgIC
-         4SllWvyvZtI40FIk0ApQ3e8be85Kunku+UCfLUYiTlOWOAK2mKb1C6zZYufrkfURChR0
-         YzXRYQt71fb58iRIk3/Lp0RIh1NkB1pbmuGuvlxatWKQeHkt8goPWxu0VVjFpe/BE2dI
-         RP1A0WSNr0sMsGMbi6uQ1Jh5ztk3j7tRqt8KLE85cG5tjmJD4Rbqv+K+OUISRT3/BtU+
-         ItMA==
-X-Gm-Message-State: AO0yUKXdkwtIwyjHey+6RoWc5PVst4szzYrzDLMqSdzkbRohKiHZ3nul
-        Db4NE3dXnelm8j7EK5viFnE5rtEnx4sqOus/jWeMmSzWtWM=
-X-Google-Smtp-Source: AK7set+dElkkM4ktil/I62xZdtW915ZC+8chQdEGaXOcGi41GTLI2s8uO3N9j1w5hK9+ZHeCjJEEH9I5o+V+VZv7D+I=
-X-Received: by 2002:ac2:4306:0:b0:4dd:98c6:ee3 with SMTP id
- l6-20020ac24306000000b004dd98c60ee3mr588010lfh.4.1677039370165; Tue, 21 Feb
- 2023 20:16:10 -0800 (PST)
+        with ESMTP id S231375AbjBVI2o (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Feb 2023 03:28:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E4191B339
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Feb 2023 00:27:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677054476;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mdoO5s95Na4aAS2r09uUBGkI6PI2mKVEuOEm/TcR5jM=;
+        b=glExR2rmF/SPbGupc0XtaQRcVOaQC7utOWI2YLbvKKvY+c7+nBlNNfIJUO+zREJM1YV1cG
+        JvUJE22G4qI0H8nNMXTnddKglUZjY1qo6ptO6+MnRuXZjNYJIejIH2nIFHDSBdEN49wOCJ
+        GeSWfQypTgy7MY9SFQaxlx3+aFdqfdo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-591-AwZy-EmxN16bppq_h_UWGg-1; Wed, 22 Feb 2023 03:27:53 -0500
+X-MC-Unique: AwZy-EmxN16bppq_h_UWGg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9B181280AA26;
+        Wed, 22 Feb 2023 08:27:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D0B8D440DF;
+        Wed, 22 Feb 2023 08:27:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230222134927.459b036b@canb.auug.org.au>
+References: <20230222134927.459b036b@canb.auug.org.au> <20230221184225.0e734f0e@canb.auug.org.au> <20230221174401.7198357d@canb.auug.org.au> <20230220152933.1ab8fa4a@canb.auug.org.au> <Y/N8hVWeR3AjssUC@casper.infradead.org> <20230220190157.3b43b9a7@canb.auug.org.au> <Y/Pe2xHklSr1hDtz@casper.infradead.org> <2351091.1676963957@warthog.procyon.org.uk> <2885897.1676990364@warthog.procyon.org.uk>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Steve French <smfrench@gmail.com>,
+        Steve French <stfrench@microsoft.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>, Paulo Alcantara <pc@cjr.nz>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org
+Subject: Re: linux-next: manual merge of the mm-stable tree with the cifs tree
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 21 Feb 2023 22:15:59 -0600
-Message-ID: <CAH2r5mv+jJK0AhCEo-gx_5cBcyk0RSHvrQv9irWisoVPnbV3jQ@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3325857.1677054470.1@warthog.procyon.org.uk>
+Date:   Wed, 22 Feb 2023 08:27:50 +0000
+Message-ID: <3325858.1677054470@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-6d796c50f84ca79f1722bb131799e5a5710c4700:
+Stephen Rothwell <sfr@canb.auug.org.au> wrote:
 
-  Linux 6.2-rc6 (2023-01-29 13:59:43 -0800)
+> OK, so in the merge of mm-stable, I used the cifs version of
+> fs/cifs/file.c with this patch applied.  The merge resolution for that
+> file looks like this:
 
-are available in the Git repository at:
+I checked it out and diffed it against mine.  Looks right, thanks!
 
-  git://git.samba.org/ksmbd.git tags/6.3-rc-ksmbd-fixes
+David
 
-for you to fetch changes up to d3ca9f7aeba793d74361d88a8800b2f205c9236b:
-
-  ksmbd: fix possible memory leak in smb2_lock() (2023-02-19 17:57:25 -0600)
-
-----------------------------------------------------------------
-Ten ksmbd smb3 server fixes, including three for stable
-- Fix for memory leak
-- Two important fixes for frame length checks (which are also now stricter)
-- four minor cleanup fixes
-- Fix to clarify ksmbd/Kconfig to indent properl
-- Conversion of the channel list and rpc handle list to xarrays
-----------------------------------------------------------------
-Colin Ian King (1):
-      ksmbd: Fix spelling mistake "excceed" -> "exceeded"
-
-Dawei Li (4):
-      ksmbd: Implements sess->ksmbd_chann_list as xarray
-      ksmbd: Implements sess->rpc_handle_list as xarray
-      ksmbd: fix typo, syncronous->synchronous
-      ksmbd: Remove duplicated codes
-
-Hangyu Hua (1):
-      ksmbd: fix possible memory leak in smb2_lock()
-
-Jiapeng Chong (1):
-      ksmbd: Fix parameter name and comment mismatch
-
-Namjae Jeon (2):
-      ksmbd: fix wrong data area length for smb2 lock request
-      ksmbd: do not allow the actual frame length to be smaller than
-the rfc1002 length
-
-Steve French (1):
-      ksmbd: update Kconfig to note Kerberos support and fix indentation
-
- fs/ksmbd/Kconfig             |  8 ++++++--
- fs/ksmbd/asn1.c              | 23 +++++++++++------------
- fs/ksmbd/connection.c        |  6 +++---
- fs/ksmbd/ksmbd_work.h        |  2 +-
- fs/ksmbd/mgmt/user_session.c | 98
-++++++++++++++++++++++++++++++++++++++-----------------------------------------------------------
- fs/ksmbd/mgmt/user_session.h |  6 ++----
- fs/ksmbd/smb2misc.c          | 31 +++++++++++++------------------
- fs/ksmbd/smb2pdu.c           | 66
-++++++++++++++++++++---------------------------------------------
- fs/ksmbd/vfs.c               |  6 +++---
- fs/ksmbd/vfs_cache.c         |  5 ++---
- 10 files changed, 99 insertions(+), 152 deletions(-)
-
--- 
-Thanks,
-
-Steve
