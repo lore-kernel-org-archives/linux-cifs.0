@@ -2,58 +2,105 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE84C61DA4
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Feb 2023 08:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 828CCC6379F
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Feb 2023 12:13:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231312AbjBVIjo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 22 Feb 2023 03:39:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57840 "EHLO
+        id S231485AbjBVMNt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 22 Feb 2023 07:13:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229964AbjBVIjn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Feb 2023 03:39:43 -0500
-Received: from mail.crawnon.pl (mail.crawnon.pl [51.68.198.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A051E1CAC0
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Feb 2023 00:39:42 -0800 (PST)
-Received: by mail.crawnon.pl (Postfix, from userid 1002)
-        id 44367A4361; Wed, 22 Feb 2023 08:39:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=crawnon.pl; s=mail;
-        t=1677055181; bh=C5hX24svv/9/TME4wPCHfYjl17BCtmuxEd1i9B4zdYs=;
-        h=Date:From:To:Subject:From;
-        b=GoCV6H4wOX7wrKn3AwfUIjlJkErZS+aS9gFvDrHbZ7lHkDihJpcySz5RC9V+9PxHN
-         N9EmM1JCti2UEZYZa+mCj9MPaHWDJ46xOlU90zeCr+tH7R1ACBrH9/X9CtqLdt2BKB
-         zBCaT41XIK2fpz1pWruKVjf2CxW7Mj0BgA/AGmeLxpTFMCuRb6xoTkng/cVyUfjEMn
-         OwXFoQeH3N323fulYLHWs7u/mJIWSOIJ+oEHyhVqG0marQ91oorrTHe/4NsPjAHJhq
-         b3oTMYNqQBKmjew5b8Lz29Q9FjsyXgmbq0vDDu4lyE2iCaPGB7oMDcuLyq9ENgsf+g
-         a1sQ38s+5U5Hw==
-Received: by mail.crawnon.pl for <linux-cifs@vger.kernel.org>; Wed, 22 Feb 2023 08:39:39 GMT
-Message-ID: <20230222073001-0.1.9b.lvqt.0.m4zpcm4jmx@crawnon.pl>
-Date:   Wed, 22 Feb 2023 08:39:39 GMT
-From:   =?UTF-8?Q? "Miko=C5=82aj_Fiodorczyk" ?= 
-        <mikolaj.fiodorczyk@crawnon.pl>
-To:     <linux-cifs@vger.kernel.org>
-Subject: Fotowoltaika - nowe warunki
-X-Mailer: mail.crawnon.pl
+        with ESMTP id S229884AbjBVMNs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Feb 2023 07:13:48 -0500
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D705B7A87;
+        Wed, 22 Feb 2023 04:13:45 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PMFS41Nh5z4x7W;
+        Wed, 22 Feb 2023 23:13:40 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1677068021;
+        bh=CCCioTOAL95lINYsTc0QjL/cyM1/Zvh2V1qPLfQyFGk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SRhKyWt94W4krAAzBoj1L28ZgJYnMDgOjaTAYe6Tda/8TOSbtiTmlilRuzHDv6MYL
+         1CZvEjFFv8fANoaBud0knqTmCxqt/iyMO8OILAOh3WymsO51T8Wp9sO0EL6TigIdb9
+         6AwVbP958lhs/YVzMmjBkKZceS5tBFDIbY/3ZIT5u1vA6+2wAos48KJvr+7u1lZYqn
+         eqB7/RZ7xFsFDAr05lyXspmDZJLEYjFLQSucIQNHHZ3Rei0yqylS8sWPkXbXdgF0pQ
+         UB84pfphYOzHlFrb8AcuARmCN32XPGsl9eUZilYUZKswJIb+wtWZt4Ej8LNCqd+bcq
+         KB3EY5p+iN4TA==
+Date:   Wed, 22 Feb 2023 23:13:37 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        "Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Steve French <smfrench@gmail.com>,
+        Steve French <stfrench@microsoft.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>, Paulo Alcantara <pc@cjr.nz>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org
+Subject: Re: linux-next: manual merge of the mm-stable tree with the cifs
+ tree
+Message-ID: <20230222231337.3316440a@canb.auug.org.au>
+In-Reply-To: <3325858.1677054470@warthog.procyon.org.uk>
+References: <20230222134927.459b036b@canb.auug.org.au>
+        <20230221184225.0e734f0e@canb.auug.org.au>
+        <20230221174401.7198357d@canb.auug.org.au>
+        <20230220152933.1ab8fa4a@canb.auug.org.au>
+        <Y/N8hVWeR3AjssUC@casper.infradead.org>
+        <20230220190157.3b43b9a7@canb.auug.org.au>
+        <Y/Pe2xHklSr1hDtz@casper.infradead.org>
+        <2351091.1676963957@warthog.procyon.org.uk>
+        <2885897.1676990364@warthog.procyon.org.uk>
+        <3325858.1677054470@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/ygwXD6lRg3GxyS/ln.n=Vs_";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
+--Sig_/ygwXD6lRg3GxyS/ln.n=Vs_
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-chcia=C5=82bym poinformowa=C4=87, i=C5=BC mog=C4=85 Pa=C5=84stwo uzyska=C4=
-=87 dofinansowanie na systemy fotowoltaiczne w ramach nowej edycji progra=
-mu M=C3=B3j Pr=C4=85d.
+Hi David,
 
-Program zapewnia 6000 z=C5=82 dofinansowania na instalacj=C4=99 paneli i =
-16 000 z=C5=82 na magazyn energii, ni=C5=BCsze cen pr=C4=85du i mo=C5=BCl=
-iwo=C5=9B=C4=87 odliczenia koszt=C3=B3w zwi=C4=85zanych z instalacj=C4=85=
- fotowoltaiki w ramach rozliczenia PIT (tzw. ulga termomodernizacyjna).
+On Wed, 22 Feb 2023 08:27:50 +0000 David Howells <dhowells@redhat.com> wrot=
+e:
+>
+> Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>=20
+> > OK, so in the merge of mm-stable, I used the cifs version of
+> > fs/cifs/file.c with this patch applied.  The merge resolution for that
+> > file looks like this: =20
+>=20
+> I checked it out and diffed it against mine.  Looks right, thanks!
 
-Czy s=C4=85 Pa=C5=84stwo otwarci na wst=C4=99pn=C4=85 rozmow=C4=99 w tym =
-temacie?
+Thanks for checking.
 
+--=20
+Cheers,
+Stephen Rothwell
 
-Pozdrawiam,
-Miko=C5=82aj Fiodorczyk
+--Sig_/ygwXD6lRg3GxyS/ln.n=Vs_
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmP2BvEACgkQAVBC80lX
+0GxcWwf9HniWWVZROA72eHBznLGITsOKf6EmTYN1iQenlMOublvbyQroPeBnEPSa
+Vm3Mv7a218GPpHnej7JrrndfFJa1s/7f7yHVx7z7wI153rtPc1gFYBgSxKeorgbg
+sO94YGKRp6D3Ro0XOJgmSky+ScVUY2d5YbbogN/YGrZcQz59SkFh4bm8/VG/bvEB
+ZJymKCVTugr4tRLxPCD/Tw7XDZgspbxfRSFrXZTMpe21xNHL7WNuuNZZAAKNH/33
+slGBsGZ07LV6LULGyYYN/9lpB5esiGOfGTy4X0VpmppItjEm/SC8a3QabKgv0eCF
+KfK3pShbs+G67Xy07ywDgAgmST7JKQ==
+=gpVM
+-----END PGP SIGNATURE-----
+
+--Sig_/ygwXD6lRg3GxyS/ln.n=Vs_--
