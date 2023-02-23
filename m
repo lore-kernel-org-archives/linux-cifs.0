@@ -2,75 +2,90 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF3AC6379F
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Feb 2023 08:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3177CC61DA4
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Feb 2023 21:10:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231849AbjBWIRG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 23 Feb 2023 03:17:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42640 "EHLO
+        id S229452AbjBWVK6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 23 Feb 2023 16:10:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233512AbjBWIRB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Feb 2023 03:17:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFD74DE13
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Feb 2023 00:15:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677140149;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=N+RF2+RPgUggwhI+a1oS5LZoLf2bDJ0WzpxSX5IdQfc=;
-        b=C+kFnYdYTTEUhv+cfuks1441Bbnr/uUL6NOd43Dkl6sF7zeXRDaIA0NNFnN3a6+Oax4vx/
-        /AT/alrSq1MAKr0cknMrQw8JU4wX7Nv4IZsGM1ESPf9cQr49txq9JQg0ueD30nLMI89DDY
-        aREdqXNLRrNj7iV+XKe0aoNoAIpsP9A=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-507-D9tfDm8sPjCnsBnBURMyYQ-1; Thu, 23 Feb 2023 03:15:43 -0500
-X-MC-Unique: D9tfDm8sPjCnsBnBURMyYQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229436AbjBWVK5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Feb 2023 16:10:57 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B47A61EE6;
+        Thu, 23 Feb 2023 13:10:16 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 33A85299E740;
-        Thu, 23 Feb 2023 08:15:43 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DAA2140168B5;
-        Thu, 23 Feb 2023 08:15:41 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PN5Hw5ZD0z4x4r;
+        Fri, 24 Feb 2023 08:09:32 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1677186573;
+        bh=IjET4LaTsMosOZdyCGu9jMUfom0oOQ8pCqeH0r0uRLc=;
+        h=Date:From:To:Cc:Subject:From;
+        b=jSFBIoA6Bs5zddJ07S4GFD43qZYp39wV5zYHksxhhMdrsu7y+K+wjcHTFMJtNzZ8V
+         6BirU/r9Df4wPmrP1NXBjkhYgZiQD+zgLCdQ8LNmOnQLl6QBteAN2p7NHhj+fx3NAe
+         YD+h6FFma4/MwUZzpQOX9Fyx2F6CyXTfj6yl94hu2Qdrr8p9Sf03guWUaT7dWhfvmH
+         32lEnzhNj7GYfSsml4TM3NUPpwrHPmyfeI2METBydkeCRGz4y4TfoAtT/szhHJnj1a
+         zCbzq9Xv9WeFEavHYi/I+oka9jWQsstUQ1zd2bYAU/LLb7Q0APHkQUD+6qmK8T67KW
+         xMj8e+uotPD+A==
+Date:   Fri, 24 Feb 2023 08:09:31 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
 To:     Steve French <smfrench@gmail.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] smb3: Miscellaneous fixes
-Date:   Thu, 23 Feb 2023 08:15:37 +0000
-Message-Id: <20230223081539.970487-1-dhowells@redhat.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the cifs tree
+Message-ID: <20230224080931.6433105a@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: multipart/signed; boundary="Sig_/00Yl2C+ngHrtSKek.=3.r3=";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Steve,
+--Sig_/00Yl2C+ngHrtSKek.=3.r3=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Here are a couple of fix patches for you.
+Hi all,
 
-I've pushed the patches here also:
+In commit
 
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-cifs
+  d7830041d59a ("cifs: Add some missing xas_retry() calls")
 
-David
+Fixes tag
 
-David Howells (2):
-  cifs: Add some missing xas_retry() calls
-  cifs: Fix an uninitialised variable
+  Fixes: 5f0955c98375 ("cifs: Add some helper functions")
 
- fs/cifs/file.c      | 6 ++++++
- fs/cifs/smbdirect.c | 2 +-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+has these problem(s):
 
+  - Target SHA1 does not exist
+
+Maybe you meant
+
+Fixes: b8713c4dbfa3 ("cifs: Add some helper functions")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/00Yl2C+ngHrtSKek.=3.r3=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmP31gsACgkQAVBC80lX
+0GzlbggAk5m2l/jgc0RZVN2QrEW171HecCxLgCYbXqs00caVvWVmy+ylQtCMbx/Y
+htea2PICrsdlt1WctDvgWbQGlWD+LhX/N/xJ6LammXbkoq2IuhMxNXT6OHyvcXSN
+APQJMIJfMkKsVSTeByYRCUkPDRwEUa3yvGaIYHkDwIvbwAGnTfEWuAsSfOP1VQuh
+cIzSCfFQtdTSoqZSr6O1tQiwHY7NbeIxcnJUoGpXGTwt8aIJENbRdoBNpsZcAhd7
+x5O4D+UcnEnU0RWnoPgXN42jTHr83QrQhgwvXl+e5Ko09BRDwFo7uEEe0YWj2sP8
+3wayqxchWCFbUBLFjFO4j1Xpq+aSqQ==
+=7HPT
+-----END PGP SIGNATURE-----
+
+--Sig_/00Yl2C+ngHrtSKek.=3.r3=--
