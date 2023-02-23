@@ -2,81 +2,83 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F46C677F1
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Feb 2023 21:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B42C0C64ED8
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Feb 2023 21:29:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbjBWVLL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 23 Feb 2023 16:11:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52716 "EHLO
+        id S229485AbjBWV2j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 23 Feb 2023 16:28:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbjBWVLJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Feb 2023 16:11:09 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8990619F;
-        Thu, 23 Feb 2023 13:10:44 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S229628AbjBWV21 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Feb 2023 16:28:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4201951F90
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Feb 2023 13:27:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677187664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JXkd4bBjOVLioQAy1OHIxQD9rlQn7Lspd9Q3TTjBqx8=;
+        b=Vx/9ESpPQ0/DhvZjEh2ngz49UqPSz1F68lHVMdl/ARBqfVY6Aksvx98kIX4QRbS4FiBzQt
+        93Vqcg8MMPBy24wfJrbxz2WWqoJKYQ272IFyqRuX4CIJRSV3dkJteZRuvHm38cL6SmAlrN
+        l0sLk4FKt4s6Q5h5QOP0qvVNEPNRMS0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-199-r_RG81CSNVyaNXRF7sOHiQ-1; Thu, 23 Feb 2023 16:27:40 -0500
+X-MC-Unique: r_RG81CSNVyaNXRF7sOHiQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PN5KH32b0z4x1T;
-        Fri, 24 Feb 2023 08:10:43 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1677186643;
-        bh=0eChOWpGUNS2J+XhqSPEYxziEpsuWjFu1T24LMRwRoQ=;
-        h=Date:From:To:Cc:Subject:From;
-        b=NncRq+8bvAgbh0Kgf9RqCO03KJrL8+yEfcQwUvRxwPK4mK32zrVJtfD3yUcpsMtqN
-         63eJtfL67duNQ5/i9315VoJTuqhg3GbKTX1EiuLLdjue6yFTWRsLL3ehbk5l2IMoPF
-         OsG7gcL9AGJ32A+LLg1WlN7HM/IsQHzj0PxhT3ufXWH5IviCVXXIYZYCY7dQYYJbFr
-         ulkbXTqSGymsIi/3/TjNUgIarhOVeQKrXTP+v/hk8J06iosayfAQM85rSjKvzb5/gh
-         P+yEmkIDeOujpqsv34NQIlh47EmMiewEo6YnLbeeqlXwfr7/+fZGwWG98ezDlxoBIv
-         xeJsZfFtFDleg==
-Date:   Fri, 24 Feb 2023 08:10:42 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7D28E282380D;
+        Thu, 23 Feb 2023 21:27:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BBBAB440D9;
+        Thu, 23 Feb 2023 21:27:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230224080931.6433105a@canb.auug.org.au>
+References: <20230224080931.6433105a@canb.auug.org.au>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the cifs tree
-Message-ID: <20230224081042.36fa0f2f@canb.auug.org.au>
+Subject: Re: linux-next: Fixes tag needs some work in the cifs tree
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/8/0ivESdw8cIBMEI3jpHPwT";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1659484.1677187658.1@warthog.procyon.org.uk>
+Date:   Thu, 23 Feb 2023 21:27:38 +0000
+Message-ID: <1659485.1677187658@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/8/0ivESdw8cIBMEI3jpHPwT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Stephen Rothwell <sfr@canb.auug.org.au> wrote:
 
-Hi all,
+> In commit
+> 
+>   d7830041d59a ("cifs: Add some missing xas_retry() calls")
+> 
+> Fixes tag
+> 
+>   Fixes: 5f0955c98375 ("cifs: Add some helper functions")
+> 
+> has these problem(s):
+> 
+>   - Target SHA1 does not exist
+> 
+> Maybe you meant
+> 
+> Fixes: b8713c4dbfa3 ("cifs: Add some helper functions")
 
-Commits
+Sorry, yes, I was on my branch and not the one with Steve's applied version of
+the patches.
 
-  23b7e4141de5 ("cifs: reuse cifs_match_ipaddr for comparison of dstaddr to=
-o")
-  c9334cd0edaf ("cifs: match even the scope id for ipv6 addresses")
+David
 
-are missing a Signed-off-by from their committer.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/8/0ivESdw8cIBMEI3jpHPwT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmP31lIACgkQAVBC80lX
-0GwYUQf9FB+IedYCbi7TcZmzULtnhg9k0vtxXiNtcjBzEc64S9QF284HkJLsLEO7
-MPSm5gy9ctkMaq2srIVrkw7XwpUzMhhpV0C4AyJDM9B494LjET39UaqSIFT9rmL/
-aknzOISrl6bW1XN7k7UvQiwP8N1D6+Kcdif+DHHqYEIBs72aXRZIGY4/we5DxVuC
-mbTottf5MXXV9hfm8CEc5liy+M0BadoxNOrLFd5qtq1EzSwfI40wntYbnnxmk5Js
-5bqtYSFdWk25F9ie6CsKz+GBArTxd9100IY8nh9FhEtDNIx3RW+XafP8gMz9bRXT
-4Z7/BmnfZxkKQVxhAmTJJAt0SpgqcA==
-=ezdL
------END PGP SIGNATURE-----
-
---Sig_/8/0ivESdw8cIBMEI3jpHPwT--
