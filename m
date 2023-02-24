@@ -2,96 +2,119 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 354F2C64ED8
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Feb 2023 22:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C79C61DA4
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Feb 2023 15:15:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbjBWWoG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 23 Feb 2023 17:44:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43596 "EHLO
+        id S230331AbjBXPP5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 24 Feb 2023 10:15:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbjBWWn4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Feb 2023 17:43:56 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8666E4C2C;
-        Thu, 23 Feb 2023 14:43:55 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id bp25so15819395lfb.0;
-        Thu, 23 Feb 2023 14:43:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CNaOqOCPpq1ndzqLedSspxae9I63sTlFiJ8Ui7FMY9o=;
-        b=hBRyUxAREwRiRYyR4JMMLb9J4JUUhgSovXBAhTXSgwtzFknD1e5gaQdsg2UMZVoBm5
-         HDR88wFnB4NNeU45xvF3lDNprQi7W0D+MDH//9VhJoNKkUKbzSBAFccmUKJw2gE3NxW4
-         8L9mTGFokhimMo5gnDF79U/gg9knez9no1O6m+0Wk1d+1DW2h4n0IIrVdy5DorMCWCBE
-         lc3jZbcPQjgtMWGcowNZK6h3eD9Gz5bviiLQxvP4O2Gwr0BVMu7tRElsTsAjQyy2XpV0
-         YCgQ/D0YMCN+Bp0lctyzdUj4Uhqt381x7MwmDKvNbk9MoRAyGd7GsJ4TLGDcT6SMqfhC
-         8GOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CNaOqOCPpq1ndzqLedSspxae9I63sTlFiJ8Ui7FMY9o=;
-        b=cXB3AcDH4bk1jpm4OGOizSGwVIv/UMYwqt3mQAVs8hHTn+gNPuud1YG4n0rzv7CJRp
-         +140gJRxN1gSojSdP0T2/xuVd6gbWhDIwdqqPuAZXt/E9sIjCxDXz/6SVjH/HJFvBNxY
-         VTutim3NBY9ZriKnMCvn88mjJTaCLX0fCwNeHfC/hu5snCsxLKVRFvAm+lXHr0wctmFE
-         JOEcxkrgnrSxLis1VjJfVH0i1msGrac9aJGLXcIyGaOz3SKb5tP3u6VyNaF7FuwY5r9n
-         pi1jpH3KIkRs9KVy+CKMi15uDWuLKzqcLZVdyAYM3cCYdqLCkXqqVyVLOwpRfrJj85LK
-         YHMA==
-X-Gm-Message-State: AO0yUKXhp+QXX0oHHqAw2Q4dTS0uQJGCN/SqUBPva/WBZM3wTgCQupOL
-        zCVBv66D2UIVLn6b0dLUus2btkzJ18WeG5rUDd0KSgXI
-X-Google-Smtp-Source: AK7set+NIzWM7lae+k2kz33lbmR7Os5+CsjVpNXozaWKxGOKknyJHNDak4eXxI5hLf6cv++xbW0bFSudZ5DxEsdhNMM=
-X-Received: by 2002:a05:6512:340f:b0:4d5:ca32:6ed6 with SMTP id
- i15-20020a056512340f00b004d5ca326ed6mr6420581lfr.4.1677192233838; Thu, 23 Feb
- 2023 14:43:53 -0800 (PST)
+        with ESMTP id S230319AbjBXPPo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 24 Feb 2023 10:15:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B3ED9EF4
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Feb 2023 07:14:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677251592;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GQh9PzREi1aKG+cvDq/BudsqXqu0IrqPEQVrEk5VEng=;
+        b=YwjMdEocuACtOXvfhU9cBHZBKDhOOCR5AeI/t/VvwyXg6Pj8ukYQH3N3dGmhbKFeyc83rT
+        dKIJlaHvpD7C5Kx2wdOXDUkbZIaiUADbhRQ/4m3xFSdf0mX1fcqY9ABMhJ+vGsxaZ68SxD
+        tUT2b7dGRcJHRIorJouFwS4m8/bxMig=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-656-ZGuU11x2PtyBMDfxKc7VNQ-1; Fri, 24 Feb 2023 10:13:09 -0500
+X-MC-Unique: ZGuU11x2PtyBMDfxKc7VNQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9C9F6800B23;
+        Fri, 24 Feb 2023 15:13:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CBAC7492B12;
+        Fri, 24 Feb 2023 15:13:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <2213409.1677249075@warthog.procyon.org.uk>
+References: <2213409.1677249075@warthog.procyon.org.uk> <2134430.1677240738@warthog.procyon.org.uk> <2009825.1677229488@warthog.procyon.org.uk> <CAHk-=whAAOVBrzwb2uMjCmdRrtudGesYj0tuqdUgi8X_gbw1jw@mail.gmail.com> <20230220135225.91b0f28344c01d5306c31230@linux-foundation.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Steve French <stfrench@microsoft.com>
+Cc:     dhowells@redhat.com, Vishal Moola <vishal.moola@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jan Kara <jack@suse.cz>, Paulo Alcantara <pc@cjr.nz>,
+        Matthew Wilcox <willy@infradead.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Baolin Wang <baolin.wang@linux.alibaba.com>,
+        Xin Hao <xhao@linux.alibaba.com>, linux-mm@kvack.org,
+        mm-commits@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [RFC][PATCH] cifs: Improve use of filemap_get_folios_tag()
 MIME-Version: 1.0
-References: <20230224080931.6433105a@canb.auug.org.au> <1659485.1677187658@warthog.procyon.org.uk>
-In-Reply-To: <1659485.1677187658@warthog.procyon.org.uk>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 23 Feb 2023 16:43:42 -0600
-Message-ID: <CAH2r5mts6edG_a1bj7oxF5LdNU-qpor-xEoKFsf4L5-9fnNdTA@mail.gmail.com>
-Subject: Re: linux-next: Fixes tag needs some work in the cifs tree
-To:     David Howells <dhowells@redhat.com>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2244150.1677251586.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 24 Feb 2023 15:13:06 +0000
+Message-ID: <2244151.1677251586@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fixed. And updated now in cifs-2.6.git for-next
+[This additional to the "cifs: Fix cifs_writepages_region()" patch that I
+posted]
 
-On Thu, Feb 23, 2023 at 3:27 PM David Howells <dhowells@redhat.com> wrote:
->
-> Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> > In commit
-> >
-> >   d7830041d59a ("cifs: Add some missing xas_retry() calls")
-> >
-> > Fixes tag
-> >
-> >   Fixes: 5f0955c98375 ("cifs: Add some helper functions")
-> >
-> > has these problem(s):
-> >
-> >   - Target SHA1 does not exist
-> >
-> > Maybe you meant
-> >
-> > Fixes: b8713c4dbfa3 ("cifs: Add some helper functions")
->
-> Sorry, yes, I was on my branch and not the one with Steve's applied version of
-> the patches.
->
-> David
->
+The inefficiency derived from filemap_get_folios_tag() get a batch of
+contiguous folios in Vishal's change to afs that got copied into cifs can
+be reduced by skipping over those folios that have been passed by the star=
+t
+position rather than going through the process of locking, checking and
+trying to write them.
 
+A similar change would need to be made in afs, in addition to fixing the b=
+ugs
+there.
 
--- 
-Thanks,
+There's also a fix in cifs_write_back_from_locked_folio() where it doesn't
+return the amount of data dispatched to the server as ->async_writev() jus=
+t
+returns 0 on success.
 
-Steve
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index ebfcaae8c437..bae1a9709e32 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2839,6 +2839,7 @@ static ssize_t cifs_write_back_from_locked_folio(str=
+uct address_space *mapping,
+ 	free_xid(xid);
+ 	if (rc =3D=3D 0) {
+ 		wbc->nr_to_write =3D count;
++		rc =3D len;
+ 	} else if (is_retryable_error(rc)) {
+ 		cifs_pages_write_redirty(inode, start, len);
+ 	} else {
+@@ -2873,6 +2874,13 @@ static int cifs_writepages_region(struct address_sp=
+ace *mapping,
+ 		for (int i =3D 0; i < nr; i++) {
+ 			ssize_t ret;
+ 			struct folio *folio =3D fbatch.folios[i];
++			unsigned long long fstart;
++
++			fstart =3D folio_pos(folio); /* May go backwards with THPs */
++			if (fstart < start &&
++			    folio_size(folio) <=3D start - fstart)
++				continue;
++			start =3D fstart;
+ =
+
+ redo_folio:
+ 			start =3D folio_pos(folio); /* May regress with THPs */
+
