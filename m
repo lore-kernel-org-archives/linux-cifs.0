@@ -2,235 +2,295 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B97E0C64EC7
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Feb 2023 06:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71599C64EC7
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Feb 2023 22:02:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbjB1GUh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Feb 2023 01:20:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46278 "EHLO
+        id S229737AbjB1WCR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Feb 2023 17:02:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229485AbjB1GUg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Feb 2023 01:20:36 -0500
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2FD18165
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Feb 2023 22:20:34 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id a4so5731040ljr.9
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Feb 2023 22:20:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gERUKMfBlfFbLzjKANGb0Hwt5qYqiXKZx1kd+jstXAM=;
-        b=ctwy4OjqP7NZEeA8mMZxcy2EG7VPojFE1UOdVd20Kxi8lNjhDZwdOWFqQbGWoRpgYL
-         mRk/oxbUQfuxBnwFM2UOuZ7OLyH0QkTnuBrQoeJwUyDGYa/0o3xUMBytATpM6EqUId0h
-         Di1vgekUvWQjghUudzG/VA9G7Hf4ah2b5aGNCxcPbr+jX8szvRnzQL+tycfi/xqm9vHp
-         S/KYrfJpwH7USvMffWBCCe/Qo4REOsfX2S+q7JrloBMtoWA31/OrZPjGuHryYfM4ECzK
-         bgeejxZhm5elrOvrEtyvmKjiHw2H0IndZpwhHGlDEEHZUsm4K8GpsPBg94FWZIVc6Iv/
-         cG8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gERUKMfBlfFbLzjKANGb0Hwt5qYqiXKZx1kd+jstXAM=;
-        b=dJkN9JjFawxYxGYaGooZT71eovLH4zXY+ALjHzSkK/ls0gJL0oH9BP/aumc7kKn49m
-         40nam5RI1zvc1SbVUvw3qumgTc/eGJ486RZf8Uk/xhbFPeJlO2B8UxMDPLRpNCNY+06q
-         zToz8PWwgbdSOT6KeVxiCCgxMsqc71JJz6qayiLsDsgbxWKlT1GRfNc3zLKls0fOD4Ab
-         fBADtimPWgaRyS4viHvYzlZUAB5pVpODcQxwPaQLCmOrt4xrLrtHBdJKHndM5sLTFwCy
-         QmRQb3eZ52CxJxisjfasnGDf6ssQU9B0Tx85AxVjdrikzj6zXtV5s1Vh3K8ytWnqsu+p
-         1Wxg==
-X-Gm-Message-State: AO0yUKX7Zde8l2p5KDw4MbONTqdz62MPG9EvyC6tcELJxFPy9cFmbNt8
-        tK4SReZJ+2eILbyZoRQGYQqcA8TmBmMSvirUEQWc5ZMOkfg=
-X-Google-Smtp-Source: AK7set95g45UmZt9N75YenK/bmRoYmFNZYpSXfy1esExZ1RwhxFO38ymANUlFDNASejjQ40Wu/BzNzXbuGe+r41JovE=
-X-Received: by 2002:a05:651c:2223:b0:294:efb6:1cea with SMTP id
- y35-20020a05651c222300b00294efb61ceamr4886371ljq.5.1677565232680; Mon, 27 Feb
- 2023 22:20:32 -0800 (PST)
+        with ESMTP id S229783AbjB1WCQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Feb 2023 17:02:16 -0500
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF422E0C9
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Feb 2023 14:02:13 -0800 (PST)
+From:   Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1677621728;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K9OY8SuhRO8JShenxlpopWdmt8MuKiUmh0wxAzu3YPE=;
+        b=e4I19eCDtFEOFHUWAlaJ1rer1Hl6TYW9PgulGVnGK/BSnjVyry83LoPXah7ZDd/W1hvHIM
+        efwepHeq1ISeJFcENbn+Az0vfYLhPeFY6iYC+NcMaxwM33XSmCbkDBYEW0JwoQvEZW2XdJ
+        GkPzNqlOoDc51JSZdyviZU7HGVIHRcskeE9fEMn5IrNFWeBn8ecSKgO3CLlv1KHLhV/R9Y
+        jZ8jO41RhJHoc5wVs1uT+Fa9ucJqQCyWF5RT91wCW+rBvbkVweQaYY7q1+WggmmseyqlSM
+        nYjaLhSHAAB44soCHSnCMWdo4ihZUU2h6PLF6ABgGtlCFriXpHEqrrTqboefyg==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1677621728; a=rsa-sha256;
+        cv=none;
+        b=KbnPXvf7CpBV/JUKYS2EucKpngpIGDy8QbGlZdP5ZleH75+xnpYlGCEI9clYPCQoGOzVNu
+        PyjedaJQgpQyTdR6VHfRxM/Hx9ez6kk4G42xfsvbDjnD0jVphU2tR/mgtnlXM9qEdWlM+x
+        3lDy9MeCMVA4+CtnSDE1/fqDHEuL6RBfFoUynnvQbUJNowoT8FRnS6esWtZbBry4uAdFXS
+        rpFcBo734+xH6jIUmt/WAMoiVSzYZM5yEaIuikmKsa5Rm1NmFJ6Vd/dorgY/uYtJD+atu5
+        XIA59RzlgGFCUhVl1gEbl5qev81PQfFl7PfKdOHP8V/euaPMlFHfxpsw+fZokw==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1677621728;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K9OY8SuhRO8JShenxlpopWdmt8MuKiUmh0wxAzu3YPE=;
+        b=jXVoRx4F3PMnpR5NuXcaiSfPppedf02XFYda9tKg9AqkLzM3sjoBBA6eWC/6cYIZdN9hLx
+        aeEWYHwXmy0Jnu1FRxN/lFnZzMlqMAGz19j1TyD80/CdJi/Z/QVOOYkC9+fCdK+fTv29Bz
+        J4iWxr1bIzVahSIgFyqzQdMs6wQkdIjKT73VQlkbPZczKBgVR2NUJfPcdpXjT5CU755wUx
+        EJ+mLOoWtoIfRGsGKZW2xJVGEgDWMcuVma4iH9o1sJ3zC8Cx8doDFPqNg1HTGadqg4waeY
+        WOjOjtuQfJIQcWaKwT/7SMSVfHsrbvS8emjC0134zgB1JMDuY4H8tDjwRFOaJA==
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH v2 1/2] cifs: improve checking of DFS links over STATUS_OBJECT_NAME_INVALID
+Date:   Tue, 28 Feb 2023 19:01:54 -0300
+Message-Id: <20230228220155.23394-1-pc@manguebit.com>
+In-Reply-To: <20230227135323.26712-1-pc@manguebit.com>
+References: <20230227135323.26712-1-pc@manguebit.com>
 MIME-Version: 1.0
-References: <CADJHv_s5s=Di_buo_1ENgJQjO_qR_tcKf+UySfdCR0k0+g2Dxw@mail.gmail.com>
- <CAH2r5mvyVuhk8-VAaNxg8RfF-CK=yd5_6i75enOut7x5qTHE4w@mail.gmail.com>
-In-Reply-To: <CAH2r5mvyVuhk8-VAaNxg8RfF-CK=yd5_6i75enOut7x5qTHE4w@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 28 Feb 2023 00:20:21 -0600
-Message-ID: <CAH2r5mvaTsJ---n=265a4zqRA7pP+o4MJ36WCQUS6oPrOij8cw@mail.gmail.com>
-Subject: Re: cifs xfstests aio-dio-invalidate-failure test fail after 6.3 merge
-To:     Murphy Zhou <jencce.kernel@gmail.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I am getting this error when I ran it on 6.3-rc but as you noted, I do
-see it work on 6.2 (I tested on 6.2-rc6 a few minutes ago).  Perhaps
-related to one of of the iov_iter/netfs changes in 6.3?
+Do not map STATUS_OBJECT_NAME_INVALID to -EREMOTE under non-DFS
+shares, or 'nodfs' mounts or CONFIG_CIFS_DFS_UPCALL=n builds.
+Otherwise, in the slow path, get a referral to figure out whether it
+is an actual DFS link.
 
-generic/208 201s ... [failed, exit status 1]- output mismatch (see
-/home/smfrench/xfstests-dev/results//generic/208.out.bad)
-    --- tests/generic/208.out   2020-01-24 17:11:18.720859829 -0600
-    +++ /home/smfrench/xfstests-dev/results//generic/208.out.bad
- 2023-02-24 22:22:56.015999894 -0600
-    @@ -1,2 +1,2 @@
-     QA output created by 208
-    -ran for 200 seconds without error, passing
-    +event res 25165824
-    ...
-    (Run 'diff -u /home/smfrench/xfstests-dev/tests/generic/208.out
-/home/smfrench/xfstests-dev/results//generic/208.out.bad'  to see the
-entire diff)
+This could be simply reproduced under a non-DFS share by running the
+following
 
-running it with 6.2-rc6 I did notice 3 share reconnects (and a session
-reconnect) which was strange but the test passed ...
+  $ mount.cifs //srv/share /mnt -o ...
+  $ cat /mnt/$(printf '\U110000')
+  cat: '/mnt/'$'\364\220\200\200': Object is remote
 
-1 session 3 share reconnects
+Fixes: c877ce47e137 ("cifs: reduce roundtrips on create/qinfo requests")
+Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+---
+v1 -> v2: fixed mem leak on PTR_ERR(ref_path) != -EINVAL
 
-On Tue, Feb 28, 2023 at 12:03=E2=80=AFAM Steve French <smfrench@gmail.com> =
-wrote:
->
-> Do you see this with the fixes from David Howells in cifs for next?
->
-> On Tue, Feb 28, 2023, 00:00 Murphy Zhou <jencce.kernel@gmail.com> wrote:
->>
->> Hi,
->>
->> It is xfstests generic/208. It passed with the v6.2 release.
->>
->> The similar WARNING can be triggered with the v6.2 release without the
->> "cache=3Dnone" mount option.
->>
->>
->> Thanks,
->> Murphy
->>
->> Test log with kernel built on the top of commit f3a2439f20d9:
->>
->> # FS QA Test No. 208
->> #
->> # Run aio-dio-invalidate-failure - test race in read cache invalidation
->> #
->>
->> FSTYP         -- cifs
->> PLATFORM      -- Linux/x86_64 xzhouw2 6.2.0+ #3 SMP PREEMPT_DYNAMIC
->> Mon Feb 27 12:18:03 CST 2023
->> MKFS_OPTIONS  -- //localhost/scratch
->> MOUNT_OPTIONS -- -o vers=3D3.11,username=3Droot,
->> password=3Dredhat,mfsymlinks,cache=3Dnone -o
->> context=3Dsystem_u:object_r:nfs_t:s0 //localhost/scratch /cifssch
->>
->> generic/208 200s ...  [13:01:11][failed, exit status 1] [13:01:53]-
->> output mismatch (see
->> /root/upstream/xfstests/results//generic/208.out.bad)
->>     --- tests/generic/208.out    2022-09-13 10:27:36.077029036 +0800
->>     +++ /root/upstream/xfstests/results//generic/208.out.bad
->> 2023-02-27 13:01:53.189534533 +0800
->>     @@ -1,2 +1,2 @@
->>      QA output created by 208
->>     -ran for 200 seconds without error, passing
->>     +buffered write returned -1_check_dmesg: something found in dmesg
->> (see /root/upstream/xfstests/results//generic/208.dmesg)
->> Ran: generic/208
->> Failures: generic/208
->> Failed 1 of 1 tests
->>
->> [   30.762541] run fstests generic/208 at 2023-02-27 13:01:11
->> [   72.029275] ------------[ cut here ]------------
->> [   72.029279] WARNING: CPU: 0 PID: 3064 at mm/gup.c:218
->> try_grab_page+0x65/0x100
->> [   72.029288] Modules linked in: cifs rdma_cm iw_cm ib_cm ib_core
->> dns_resolver fscache netfs loop xt_CHECKSUM xt_MASQUERADE xt_conntrack
->> ipt_REJECT nf_reject_ipv4 nft_compat nft_chain_nat nf_nat nf_conntrack
->> nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink bridge stp llc
->> rfkill sunrpc snd_hda_codec_generic ledtrig_audio snd_hda_intel
->> snd_intel_dspcfg snd_intel_sdw_acpi snd_hda_codec snd_hda_core
->> intel_rapl_msr snd_hwdep intel_rapl_common snd_seq
->> intel_uncore_frequency_common isst_if_common snd_seq_device snd_pcm
->> nfit snd_timer crct10dif_pclmul crc32_pclmul ghash_clmulni_intel snd
->> rapl iTCO_wdt i2c_i801 iTCO_vendor_support soundcore pcspkr i2c_smbus
->> lpc_ich joydev virtio_balloon xfs libcrc32c qxl drm_ttm_helper ttm
->> drm_kms_helper sr_mod cdrom sg syscopyarea sysfillrect sysimgblt drm
->> ahci libahci libata virtio_net crc32c_intel net_failover serio_raw
->> virtio_blk virtio_scsi virtio_console failover dm_mirror
->> dm_region_hash dm_log dm_mod fuse
->> [   72.029345] CPU: 0 PID: 3064 Comm: aio-dio-invalid Not tainted 6.2.0+=
- #3
->> [   72.029347] Hardware name: Red Hat RHEL/RHEL-AV, BIOS
->> 1.15.0-2.module+el8.6.0+14757+c25ee005 04/01/2014
->> [   72.029349] RIP: 0010:try_grab_page+0x65/0x100
->> [   72.029351] Code: 48 89 fa f7 c7 ff 0f 00 00 75 d1 48 8b 07 a9 00
->> 00 01 00 74 c7 48 8b 47 48 48 8d 50 ff a8 01 48 0f 44 d7 8b 42 34 85
->> c0 7f b9 <0f> 0b b8 f4 ff ff ff c3 cc cc cc cc 31 c0 81 e6 00 00 08 00
->> 74 32
->> [   72.029353] RSP: 0018:ffffb14582f8fa80 EFLAGS: 00010282
->> [   72.029354] RAX: 0000000080000001 RBX: ffffd79904a08568 RCX: 80000000=
-00000225
->> [   72.029356] RDX: ffffd7990042fd80 RSI: 0000000000290000 RDI: ffffd799=
-0042fd80
->> [   72.029357] RBP: ffffa00be8215020 R08: 0000000000000000 R09: 00000000=
-00000043
->> [   72.029358] R10: ffffa00be9c50a00 R11: 0000000000000000 R12: 00000000=
-00290000
->> [   72.029358] R13: 8000000010bf6225 R14: ffffd7990042fd80 R15: 00000000=
-00080000
->> [   72.029362] FS:  00007fb185af2740(0000) GS:ffffa01aff600000(0000)
->> knlGS:0000000000000000
->> [   72.029363] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> [   72.029364] CR2: 000055725030d000 CR3: 000000010ff24002 CR4: 00000000=
-007706f0
->> [   72.029365] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000=
-00000000
->> [   72.029366] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000=
-00000400
->> [   72.029367] PKRU: 55555554
->> [   72.029368] Call Trace:
->> [   72.029369]  <TASK>
->> [   72.029370]  follow_page_pte+0x1a7/0x570
->> [   72.029374]  __get_user_pages+0x1a2/0x650
->> [   72.029376]  __gup_longterm_locked+0xdc/0xb50
->> [   72.029379]  internal_get_user_pages_fast+0x17f/0x310
->> [   72.029382]  pin_user_pages_fast+0x46/0x60
->> [   72.029384]  iov_iter_extract_pages+0xc9/0x510
->> [   72.029388]  ? __kmalloc_large_node+0xb1/0x120
->> [   72.029392]  ? __kmalloc_node+0xbe/0x130
->> [   72.029394]  netfs_extract_user_iter+0xbf/0x200 [netfs]
->> [   72.029404]  __cifs_writev+0x150/0x330 [cifs]
->> [   72.029561]  vfs_write+0x2a8/0x3c0
->> [   72.029570]  ksys_pwrite64+0x65/0xa0
->> [   72.029573]  ? syscall_trace_enter.isra.17+0x126/0x1a0
->> [   72.029578]  do_syscall_64+0x58/0x80
->> [   72.029583]  ? exit_to_user_mode_prepare+0x176/0x190
->> [   72.029585]  ? syscall_exit_to_user_mode+0x12/0x30
->> [   72.029589]  ? do_syscall_64+0x67/0x80
->> [   72.029590]  ? syscall_exit_to_user_mode+0x12/0x30
->> [   72.029591]  ? do_syscall_64+0x67/0x80
->> [   72.029592]  ? do_syscall_64+0x67/0x80
->> [   72.029593]  ? do_syscall_64+0x67/0x80
->> [   72.029595]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
->> [   72.029598] RIP: 0033:0x7fb185012448
->> [   72.029601] Code: 89 02 48 c7 c0 ff ff ff ff eb b6 0f 1f 80 00 00
->> 00 00 f3 0f 1e fa 8b 05 06 d0 20 00 49 89 ca 85 c0 75 17 b8 12 00 00
->> 00 0f 05 <48> 3d 00 f0 ff ff 77 60 c3 0f 1f 80 00 00 00 00 41 55 49 89
->> cd 41
->> [   72.029602] RSP: 002b:00007ffd8f67ae48 EFLAGS: 00000246 ORIG_RAX:
->> 0000000000000012
->> [   72.029604] RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007fb1=
-85012448
->> [   72.029605] RDX: 0000000002000000 RSI: 0000000000604000 RDI: 00000000=
-00000004
->> [   72.029606] RBP: 0000000000000003 R08: 0000000000000000 R09: 00007fb1=
-8521b2f0
->> [   72.029606] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000=
-00000004
->> [   72.029607] R13: 00007ffd8f67aff0 R14: 0000000000000000 R15: 00000000=
-00000000
->> [   72.029609]  </TASK>
->> [   72.029610] ---[ end trace 0000000000000000 ]---
->> [   72.029612] netfs: Couldn't get user pages (rc=3D-12)
+ fs/cifs/cifsproto.h | 20 ++++++++++----
+ fs/cifs/misc.c      | 67 +++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2inode.c | 21 +++++++-------
+ fs/cifs/smb2ops.c   | 23 +++++++++-------
+ 4 files changed, 106 insertions(+), 25 deletions(-)
 
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index b7a36ebd0f2f..20a2f0f3f682 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -667,11 +667,21 @@ static inline int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
+ int match_target_ip(struct TCP_Server_Info *server,
+ 		    const char *share, size_t share_len,
+ 		    bool *result);
+-
+-int cifs_dfs_query_info_nonascii_quirk(const unsigned int xid,
+-				       struct cifs_tcon *tcon,
+-				       struct cifs_sb_info *cifs_sb,
+-				       const char *dfs_link_path);
++int cifs_inval_name_dfs_link_error(const unsigned int xid,
++				   struct cifs_tcon *tcon,
++				   struct cifs_sb_info *cifs_sb,
++				   const char *full_path,
++				   bool *islink);
++#else
++static inline int cifs_inval_name_dfs_link_error(const unsigned int xid,
++				   struct cifs_tcon *tcon,
++				   struct cifs_sb_info *cifs_sb,
++				   const char *full_path,
++				   bool *islink)
++{
++	*islink = false;
++	return 0;
++}
+ #endif
+ 
+ static inline int cifs_create_options(struct cifs_sb_info *cifs_sb, int options)
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 2905734eb289..0c6c1fc8dae9 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -21,6 +21,7 @@
+ #include "cifsfs.h"
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ #include "dns_resolve.h"
++#include "dfs_cache.h"
+ #endif
+ #include "fs_context.h"
+ #include "cached_dir.h"
+@@ -1198,4 +1199,70 @@ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix)
+ 	cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_USE_PREFIX_PATH;
+ 	return 0;
+ }
++
++/*
++ * Handle weird Windows SMB server behaviour. It responds with
++ * STATUS_OBJECT_NAME_INVALID code to SMB2 QUERY_INFO request for
++ * "\<server>\<dfsname>\<linkpath>" DFS reference, where <dfsname> contains
++ * non-ASCII unicode symbols.
++ */
++int cifs_inval_name_dfs_link_error(const unsigned int xid,
++				   struct cifs_tcon *tcon,
++				   struct cifs_sb_info *cifs_sb,
++				   const char *full_path,
++				   bool *islink)
++{
++	struct cifs_ses *ses = tcon->ses;
++	size_t len;
++	char *path;
++	char *ref_path;
++
++	*islink = false;
++
++	/*
++	 * Fast path - skip check when @full_path doesn't have a prefix path to
++	 * look up or tcon is not DFS.
++	 */
++	if (strlen(full_path) < 2 || !cifs_sb ||
++	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS) ||
++	    !is_tcon_dfs(tcon) || !ses->server->origin_fullpath)
++		return 0;
++
++	/*
++	 * Slow path - tcon is DFS and @full_path has prefix path, so attempt
++	 * to get a referral to figure out whether it is an DFS link.
++	 */
++	len = strnlen(tcon->tree_name, MAX_TREE_SIZE + 1) + strlen(full_path) + 1;
++	path = kmalloc(len, GFP_KERNEL);
++	if (!path)
++		return -ENOMEM;
++
++	scnprintf(path, len, "%s%s", tcon->tree_name, full_path);
++	ref_path = dfs_cache_canonical_path(path + 1, cifs_sb->local_nls,
++					    cifs_remap(cifs_sb));
++	kfree(path);
++
++	if (IS_ERR(ref_path)) {
++		if (PTR_ERR(ref_path) != -EINVAL)
++			return PTR_ERR(ref_path);
++	} else {
++		struct dfs_info3_param *refs = NULL;
++		int num_refs = 0;
++
++		/*
++		 * XXX: we are not using dfs_cache_find() here because we might
++		 * end filling all the DFS cache and thus potentially
++		 * removing cached DFS targets that the client would eventually
++		 * need during failover.
++		 */
++		if (ses->server->ops->get_dfs_refer &&
++		    !ses->server->ops->get_dfs_refer(xid, ses, ref_path, &refs,
++						     &num_refs, cifs_sb->local_nls,
++						     cifs_remap(cifs_sb)))
++			*islink = refs[0].server_type == DFS_TYPE_LINK;
++		free_dfs_info_array(refs, num_refs);
++		kfree(ref_path);
++	}
++	return 0;
++}
+ #endif
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 37b4cd59245d..9b956294e864 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -527,12 +527,13 @@ int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 			 struct cifs_sb_info *cifs_sb, const char *full_path,
+ 			 struct cifs_open_info_data *data, bool *adjust_tz, bool *reparse)
+ {
+-	int rc;
+ 	__u32 create_options = 0;
+ 	struct cifsFileInfo *cfile;
+ 	struct cached_fid *cfid = NULL;
+ 	struct kvec err_iov[3] = {};
+ 	int err_buftype[3] = {};
++	bool islink;
++	int rc, rc2;
+ 
+ 	*adjust_tz = false;
+ 	*reparse = false;
+@@ -580,15 +581,15 @@ int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 					      SMB2_OP_QUERY_INFO, cfile, NULL, NULL,
+ 					      NULL, NULL);
+ 			goto out;
+-		} else if (rc != -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) &&
+-			   hdr->Status == STATUS_OBJECT_NAME_INVALID) {
+-			/*
+-			 * Handle weird Windows SMB server behaviour. It responds with
+-			 * STATUS_OBJECT_NAME_INVALID code to SMB2 QUERY_INFO request
+-			 * for "\<server>\<dfsname>\<linkpath>" DFS reference,
+-			 * where <dfsname> contains non-ASCII unicode symbols.
+-			 */
+-			rc = -EREMOTE;
++		} else if (rc != -EREMOTE && hdr->Status == STATUS_OBJECT_NAME_INVALID) {
++			rc2 = cifs_inval_name_dfs_link_error(xid, tcon, cifs_sb,
++							     full_path, &islink);
++			if (rc2) {
++				rc = rc2;
++				goto out;
++			}
++			if (islink)
++				rc = -EREMOTE;
+ 		}
+ 		if (rc == -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) && cifs_sb &&
+ 		    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS))
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index f79b075f2992..6dfb865ee9d7 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -796,7 +796,6 @@ static int
+ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+ 			struct cifs_sb_info *cifs_sb, const char *full_path)
+ {
+-	int rc;
+ 	__le16 *utf16_path;
+ 	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	int err_buftype = CIFS_NO_BUFFER;
+@@ -804,6 +803,8 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct kvec err_iov = {};
+ 	struct cifs_fid fid;
+ 	struct cached_fid *cfid;
++	bool islink;
++	int rc, rc2;
+ 
+ 	rc = open_cached_dir(xid, tcon, full_path, cifs_sb, true, &cfid);
+ 	if (!rc) {
+@@ -833,15 +834,17 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 		if (unlikely(!hdr || err_buftype == CIFS_NO_BUFFER))
+ 			goto out;
+-		/*
+-		 * Handle weird Windows SMB server behaviour. It responds with
+-		 * STATUS_OBJECT_NAME_INVALID code to SMB2 QUERY_INFO request
+-		 * for "\<server>\<dfsname>\<linkpath>" DFS reference,
+-		 * where <dfsname> contains non-ASCII unicode symbols.
+-		 */
+-		if (rc != -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) &&
+-		    hdr->Status == STATUS_OBJECT_NAME_INVALID)
+-			rc = -EREMOTE;
++
++		if (rc != -EREMOTE && hdr->Status == STATUS_OBJECT_NAME_INVALID) {
++			rc2 = cifs_inval_name_dfs_link_error(xid, tcon, cifs_sb,
++							     full_path, &islink);
++			if (rc2) {
++				rc = rc2;
++				goto out;
++			}
++			if (islink)
++				rc = -EREMOTE;
++		}
+ 		if (rc == -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) && cifs_sb &&
+ 		    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS))
+ 			rc = -EOPNOTSUPP;
+-- 
+2.39.2
 
-
---=20
-Thanks,
-
-Steve
