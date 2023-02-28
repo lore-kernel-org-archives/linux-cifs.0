@@ -2,93 +2,124 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC71C7EE2E
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Feb 2023 00:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A48A1C64ED6
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Feb 2023 01:02:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229850AbjB1AKJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 27 Feb 2023 19:10:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42044 "EHLO
+        id S229734AbjB1BCS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 27 Feb 2023 20:02:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229627AbjB1AKG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 27 Feb 2023 19:10:06 -0500
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C51140CF
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Feb 2023 16:09:55 -0800 (PST)
-Message-ID: <8a0a723accb2b3bbaa48dd98d5572ebb.pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1677542967;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=swTbyEyB1VfTqVHb16+knnMr6zQTRgU5iFHZQzbmkrk=;
-        b=fPQwzGYOK/fVsyqxQXYTTIsBI8fkgHzQ41IHAXs8cZHRAmjMQdzhElwLUxoROVppLgSMpm
-        P0j8KcfDShIuNuct7w0I/o+9W5/UL1D5Ed1iT1LhaVdfSpa4SJGelUVkvEWGOb/kjoWgOm
-        mZP0Quo2YcHvVdYjeccAo9T3LJLKHwo2r/iLGwAwoU1B44x1BVbgOsvVZXsrP9DCdyrTSG
-        wwRUrtfSt1/O1uf2vxvwTawxQRvzz1ZlLR1gyaG2Vo3/ouAzmqQZKmgjduNAIwxg6ISe1F
-        4aGQ+CHjbpXNYzY1UlF17/r0Rd+/Tq96RTfJrXVNGlk468RDV/2V/vJ6ePVEzQ==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1677542967; a=rsa-sha256;
-        cv=none;
-        b=oWrh7E3asHiic6E0U9/tallayI+I+gSVuvRtYBqU5cip7X3eNQhY5+QeHPAFZ3syvthdFY
-        3c1FoWkkfuYalsHdLSJcaZzORcmHPAwY3HCb26lbFQ9uDeexuxr4lRM0Bk8KpjItFE/+Z3
-        FC3PkOo2Tih6vnm/0vaknUDTO4u9Jrdwov2LWbCG3ssLQAk/rTWgtRLcsDJQTcNJQWIxsz
-        u/iC7eKZgbUhGeys0fAIEujk/XyS9Pez8bW350avqk/61h+/U+jNWRe7V5UyxHiePtySag
-        /A8BfSQVEl8aiutaBKHqQfA7OmA3Zh3npwHPkRxnZ+++E/EXswyhL7E5SRNoFg==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1677542967;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=swTbyEyB1VfTqVHb16+knnMr6zQTRgU5iFHZQzbmkrk=;
-        b=q5COPUqcQ9psTQFiYHRcmmD+fHYWoVX91KD0BuMOGaBJeZw4XCF2AlC/D3JhaONGOUBX9L
-        W9r0BMI9OiDvl9p6U1Dch+M1XUyvp2UtUNuO9RXYRdrqc2UoT3xKzZBbooxvZcaSi+cj0D
-        5S3oOzFNurqbdKbmpSQJKJRLHC4f9Ca4HAapBREPCj0RazJ3AlMoKuOHfaFN/Dc7lnYCEk
-        riuzVcfdQlBOJqI7m/GOXHTcc3OwLwgQYt6pl7PVO+K2dV4Z6Ss95NBx9KbQ+P/pc3pYpa
-        4LEg6+dPFO5ClErHjH67YkcrxtV3uvUiAl7XQIPc0fiAHBbfziM2UHavf+mRGg==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     Steve French <smfrench@gmail.com>
-Cc:     linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 2/2] cifs: prevent data race in cifs_reconnect_tcon()
-In-Reply-To: <CAH2r5mufi6BRa3tDdzpDNsLDsE2g8ApTTYgK4zF_wU9ExEc1EQ@mail.gmail.com>
-References: <20230227135323.26712-1-pc@manguebit.com>
- <20230227135323.26712-2-pc@manguebit.com>
- <CAH2r5mufi6BRa3tDdzpDNsLDsE2g8ApTTYgK4zF_wU9ExEc1EQ@mail.gmail.com>
-Date:   Mon, 27 Feb 2023 21:09:21 -0300
+        with ESMTP id S229719AbjB1BCK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 27 Feb 2023 20:02:10 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5ED29E2A;
+        Mon, 27 Feb 2023 17:01:57 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7587CB80DD4;
+        Tue, 28 Feb 2023 01:01:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2A490C4339B;
+        Tue, 28 Feb 2023 01:01:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677546115;
+        bh=0MyrhP8zxv6k33rgc7qfdjiKkOYxKugd6Y5yIm+G+iw=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=TrpxKXLHDJRZmtxPellg2R2e0LwhTmG2M11tD4m4F8F5sKa+ry/nGM6/NDBChHoSD
+         j+YaN0hFzU38PKpe17cqCZbGiwewOAiZERVYOj+LVc+zb+jt+6wDtD4bw9ZY6ZPna5
+         065r5y/ntPdrttGXnI3ygAbmSEG2s9nsuyYdZPPvc3oEf0eJPU9GIxZ27JxeQH239M
+         eIP+6uHS95fWDDm7rwjzBKHQryPRBHRS4JkIq4xsHici3XYcI9wSHemkzlMeag11Ao
+         CyNrHEzQkd0ZOa/GCfBP9ibpQQKBD4VlH0bx1VPvcM/70InEGg8VvhrbOZQC5RFlmL
+         wAFn4/77eBcag==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ED819C41676;
+        Tue, 28 Feb 2023 01:01:54 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Subject: Re: [f2fs-dev] [PATCH v5 00/23] Convert to filemap_get_folios_tag()
+From:   patchwork-bot+f2fs@kernel.org
+Message-Id: <167754611496.27916.17463541946406622753.git-patchwork-notify@kernel.org>
+Date:   Tue, 28 Feb 2023 01:01:54 +0000
+References: <20230104211448.4804-1-vishal.moola@gmail.com>
+In-Reply-To: <20230104211448.4804-1-vishal.moola@gmail.com>
+To:     Vishal Moola (Oracle) <vishal.moola@gmail.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-btrfs@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve French <smfrench@gmail.com> writes:
+Hello:
 
->   CHECK   /home/smfrench/cifs-2.6/fs/cifs/smb2pdu.c
-> /home/smfrench/cifs-2.6/fs/cifs/smb2pdu.c:204:20: warning: context
-> imbalance in 'smb2_reconnect' - unexpected unlock
+This series was applied to jaegeuk/f2fs.git (dev)
+by Andrew Morton <akpm@linux-foundation.org>:
 
-Thanks.
+On Wed,  4 Jan 2023 13:14:25 -0800 you wrote:
+> This patch series replaces find_get_pages_range_tag() with
+> filemap_get_folios_tag(). This also allows the removal of multiple
+> calls to compound_head() throughout.
+> It also makes a good chunk of the straightforward conversions to folios,
+> and takes the opportunity to introduce a function that grabs a folio
+> from the pagecache.
+> 
+> [...]
 
-Please fold this change in
+Here is the summary with links:
+  - [f2fs-dev,v5,01/23] pagemap: Add filemap_grab_folio()
+    https://git.kernel.org/jaegeuk/f2fs/c/ee7a5906ff08
+  - [f2fs-dev,v5,02/23] filemap: Added filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/247f9e1feef4
+  - [f2fs-dev,v5,03/23] filemap: Convert __filemap_fdatawait_range() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/6817ef514e1a
+  - [f2fs-dev,v5,04/23] page-writeback: Convert write_cache_pages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/0fff435f060c
+  - [f2fs-dev,v5,05/23] afs: Convert afs_writepages_region() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/acc8d8588cb7
+  - [f2fs-dev,v5,06/23] btrfs: Convert btree_write_cache_pages() to use filemap_get_folio_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/51c5cd3bafe5
+  - [f2fs-dev,v5,07/23] btrfs: Convert extent_write_cache_pages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/9f50fd2e92e3
+  - [f2fs-dev,v5,08/23] ceph: Convert ceph_writepages_start() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/590a2b5f0a9b
+  - [f2fs-dev,v5,09/23] cifs: Convert wdata_alloc_and_fillpages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/4cda80f3a7a5
+  - [f2fs-dev,v5,10/23] ext4: Convert mpage_prepare_extent_to_map() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/50ead2537441
+  - [f2fs-dev,v5,11/23] f2fs: Convert f2fs_fsync_node_pages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/e6e46e1eb7ce
+  - [f2fs-dev,v5,12/23] f2fs: Convert f2fs_flush_inline_data() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/a40a4ad1186a
+  - [f2fs-dev,v5,13/23] f2fs: Convert f2fs_sync_node_pages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/7525486affa5
+  - [f2fs-dev,v5,14/23] f2fs: Convert f2fs_write_cache_pages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/1cd98ee747cf
+  - [f2fs-dev,v5,15/23] f2fs: Convert last_fsync_dnode() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/4f4a4f0febe6
+  - [f2fs-dev,v5,16/23] f2fs: Convert f2fs_sync_meta_pages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/580e7a492608
+  - [f2fs-dev,v5,17/23] gfs2: Convert gfs2_write_cache_jdata() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/87ed37e66dfd
+  - [f2fs-dev,v5,18/23] nilfs2: Convert nilfs_lookup_dirty_data_buffers() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/5ee4b25cb730
+  - [f2fs-dev,v5,19/23] nilfs2: Convert nilfs_lookup_dirty_node_buffers() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/a24586583169
+  - [f2fs-dev,v5,20/23] nilfs2: Convert nilfs_btree_lookup_dirty_buffers() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/41f3f3b5373e
+  - [f2fs-dev,v5,21/23] nilfs2: Convert nilfs_copy_dirty_pages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/d4a16d31334e
+  - [f2fs-dev,v5,22/23] nilfs2: Convert nilfs_clear_dirty_pages() to use filemap_get_folios_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/243c5ea4f783
+  - [f2fs-dev,v5,23/23] filemap: Remove find_get_pages_range_tag()
+    https://git.kernel.org/jaegeuk/f2fs/c/c5792d938411
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 62c125e73b73..0e53265e1462 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -185,7 +185,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 
- 	spin_lock(&server->srv_lock);
- 	if (server->tcpStatus == CifsNeedReconnect) {
--		spin_unlock(&server->srv_lock);
- 		/*
- 		 * Return to caller for TREE_DISCONNECT and LOGOFF and CLOSE
- 		 * here since they are implicitly done when session drops.
-@@ -198,6 +197,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 		case SMB2_CANCEL:
- 		case SMB2_CLOSE:
- 		case SMB2_OPLOCK_BREAK:
-+			spin_unlock(&server->srv_lock);
- 			return -EAGAIN;
- 		}
- 	}
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
