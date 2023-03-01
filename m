@@ -2,112 +2,161 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90516C7EE23
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Mar 2023 03:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC756C64ED6
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Mar 2023 14:54:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbjCAD6I (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Feb 2023 22:58:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32964 "EHLO
+        id S229789AbjCAOyo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Mar 2023 09:54:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbjCAD6H (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Feb 2023 22:58:07 -0500
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D095B61A6
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Feb 2023 19:58:05 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id f16so12564285ljq.10
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Feb 2023 19:58:05 -0800 (PST)
+        with ESMTP id S230241AbjCAOye (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Mar 2023 09:54:34 -0500
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F2637730;
+        Wed,  1 Mar 2023 06:54:25 -0800 (PST)
+Received: by mail-lf1-x134.google.com with SMTP id t11so18021956lfr.1;
+        Wed, 01 Mar 2023 06:54:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jVk/nmx5CCuysWO/eExH8X84Lj2rj9TYV94nuP7mkWE=;
-        b=fjFWMeVeRfxqXBR+1upnqGxQr+6ND2LkrAK62FDjvnsNvfBycIiC0VqMRdc3D3hSgF
-         YlbAlcxaqCwUtpM3dBYgMq0GcqzN6p3ezMG4NoChGIqO8yiO26xgPspQofipTXW4xWEh
-         v08LOqIcstwXOilxCAE9zqQBPHNmGdYDUQSeEZbjbK+Cf6FtRu7/Zsb7PAD1iXxGw6vB
-         HDRWvixCfslgaiztr7TvzbWDRZzlAcCbzoeIiwHk2vyQZ2+VzVCVWfYIQhyFS9bjjMxy
-         E+yk0gQY7TzTF63A8lGygewxDrg7qQuD4lbAPLsAY+SvIhhevbDp0ijqF9OVc8aTjFAD
-         v38Q==
+        bh=XelpH73Wlo+PcchMEWN6DkX2OQ+7tNP39REIEtZR3gA=;
+        b=ldV7uSo+F9m2pHn6+dKPMriarQVSVqfCCg/7BTEuyk5SInOZr1EtbLHP4KKOz3EZXc
+         wP0QoxCEyqtcVklir/r/KHb3lhAL5zienhZQLV/v55nG022ySe+S89DZ8/zM0hDgB7MW
+         IZuDX/b8EIdCXws9+c5AdG52Wudck1ZrlMT3uI7w77qZrh5V51ZzlBj+pUkTbHKl2Bzn
+         S7YTMVpERipYnTss9DC7/Xb9WoTs1vbn/xCvtdfSYPhk2EnIU04aX8xp3cfCLUYgWSP+
+         axZIL4ja5c4hbqNm5ar19NEgxFd4kXiDsw/vCIefLkoBeob1hFM6R2tdPkkKIhw/BnJ1
+         QCxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jVk/nmx5CCuysWO/eExH8X84Lj2rj9TYV94nuP7mkWE=;
-        b=MSetq01dgBjjCoDWo/PoFMUcLTJHoF5jN5FH7pacuMEvci8Se549OMaOm5KzOa7rrW
-         Q/ZUbhdtt+XR1GmSKsZxKZb00S9DM6b8ZXEi3kMugKxmqYQwTjyTGsSDuJfcVuhPK0D1
-         c5HGwP/VwUp7eHZE1Yc11rjGoaknKWwcntZd8SUu8WOfV2JRoQR2kVNJ3//zMHn/4ai4
-         eBbZ5iRYT+HgngGTFswzITKS/3leCLCgQLtQXHUWPLXJME757X0Dh/wY7KnvqXyjNonS
-         CllEX8N9LdBNKf+lBwSnboio+q1dMy/oRnDd2Nb6h9TE9A9yMrsJvIA8n7E3Z5pURVBW
-         IM9A==
-X-Gm-Message-State: AO0yUKUYKAqE9hjPbGNAnl/BgcOxH2/odUXroNFRpPx1RKePIM3fyPRs
-        +n9AJinhxxIbdoLIDmdH9X2kq6TD6EajPi+Uav4=
-X-Google-Smtp-Source: AK7set/EtX+SgpkoznRcITN9MVg+hHW+EnFeFyTVxbfKXz3lhcaL8K4a2zoLBIfz184EmcvECWezt8ZWXY4Ca+2IH0A=
-X-Received: by 2002:a2e:a26e:0:b0:295:a32a:3664 with SMTP id
- k14-20020a2ea26e000000b00295a32a3664mr1561494ljm.5.1677643083850; Tue, 28 Feb
- 2023 19:58:03 -0800 (PST)
+        bh=XelpH73Wlo+PcchMEWN6DkX2OQ+7tNP39REIEtZR3gA=;
+        b=MH+ItLEhA5NPhaPn0zHy0EAkmw6qxXTIPK8A9HY+5ELM7udIKEyBKqp1dvqe9HRYzN
+         NImvFPEwDbxzxgXYGAmPQf/bJPbxky/R26CWBeu4GM/8xfY9zbE0Fnkr2stDeBYOyCG3
+         WQvMEmVz+y3Iousdedj/SzVQWpkWkqiv5AP4bPOyUo9P/7M9B7gGZoWlYrRv821wig9j
+         uuDku60NKpB2N+3dmkB5kzQoI+GnupR06x3YE0kFUU8Hl8qTCoTLTNl0u6wHq/EsHFAO
+         e+3xZpXZtlQFDDG+H+/9bAm8MHD9sjn6ShlzNWhnjQ1TUVgeA338VbsTBoIi17iRsewn
+         HJ0A==
+X-Gm-Message-State: AO0yUKWP0U3hmA44ynPm0TPL5HF0MGsiJVMC3flYvET+meXYpF5HZARa
+        UThdGOSb/JTw65SyE8S6YT9x0rvYtlgPGnqvhqCvVNj2
+X-Google-Smtp-Source: AK7set/AeqLMRRI9SdDjmlD28g8b1QRcF+vhfO4YjK2H5N0wuaMVTxwFAfNVAKZBORvcX2vMUujZpJ4nngZw98AH7gc=
+X-Received: by 2002:a05:6512:340f:b0:4d5:ca32:6ed6 with SMTP id
+ i15-20020a056512340f00b004d5ca326ed6mr3480637lfr.4.1677682463387; Wed, 01 Mar
+ 2023 06:54:23 -0800 (PST)
 MIME-Version: 1.0
-References: <20230228235624.5451-1-linkinjeon@kernel.org>
-In-Reply-To: <20230228235624.5451-1-linkinjeon@kernel.org>
+References: <20230228223838.3794807-1-dhowells@redhat.com> <20230228223838.3794807-2-dhowells@redhat.com>
+In-Reply-To: <20230228223838.3794807-2-dhowells@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 28 Feb 2023 21:57:52 -0600
-Message-ID: <CAH2r5mvEK37L6iniO5bt7PB8XjA7Oc9zi8ujo1UzBogiXDf0KQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix wrong signingkey creation when encryption is AES256
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, senozhatsky@chromium.org,
-        tom@talpey.com, Miao Lihua <441884205@qq.com>
+Date:   Wed, 1 Mar 2023 08:54:12 -0600
+Message-ID: <CAH2r5muh5g=QOuqFRvNMLdiiHiJF-9AX0rAE_9M8zxvfW8i3bA@mail.gmail.com>
+Subject: Re: [PATCH 1/1] cifs: Fix memory leak in direct I/O
+To:     David Howells <dhowells@redhat.com>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Murphy Zhou <jencce.kernel@gmail.com>,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-FYI - Linux client also supports AES GCM 256 encryption.  It is
-enabled by default and can be set to required with:
+merged into cifs-2.6.git for-next pending more testing
 
-MODULE_PARM_DESC(require_gcm_256, "Require strongest (256 bit) GCM
-encryption. Default: n/N/0");
-
-On Tue, Feb 28, 2023 at 5:57=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org>=
+On Tue, Feb 28, 2023 at 4:38=E2=80=AFPM David Howells <dhowells@redhat.com>=
  wrote:
 >
-> MacOS and Win11 support AES256 encrytion and it is included in the cipher
-> array of encryption context. Especially on macOS, The most preferred
-> cipher is AES256. Connecting to ksmbd fails on newer MacOS clients that
-> support AES256 encryption. MacOS send disconnect request after receiving
-> final session setup response from ksmbd. Because final session setup is
-> signed with signing key was generated incorrectly.
-> For signging key, 'L' value should be initialized to 128 if key size is
-> 16bytes.
+> When __cifs_readv() and __cifs_writev() extract pages from a user-backed
+> iterator into a BVEC-type iterator, they set ->bv_need_unpin to note
+> whether they need to unpin the pages later.  However, in both cases they
+> examine the BVEC-type iterator and not the source iterator - and so
+> bv_need_unpin doesn't get set and the pages are leaked.
 >
-> Reported-by: Miao Lihua <441884205@qq.com>
-> Tested-by: Miao Lihua <441884205@qq.com>
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> I think this may be responsible for the generic/208 xfstest failing
+> occasionally with:
+>
+>         WARNING: CPU: 0 PID: 3064 at mm/gup.c:218 try_grab_page+0x65/0x10=
+0
+>         RIP: 0010:try_grab_page+0x65/0x100
+>         follow_page_pte+0x1a7/0x570
+>         __get_user_pages+0x1a2/0x650
+>         __gup_longterm_locked+0xdc/0xb50
+>         internal_get_user_pages_fast+0x17f/0x310
+>         pin_user_pages_fast+0x46/0x60
+>         iov_iter_extract_pages+0xc9/0x510
+>         ? __kmalloc_large_node+0xb1/0x120
+>         ? __kmalloc_node+0xbe/0x130
+>         netfs_extract_user_iter+0xbf/0x200 [netfs]
+>         __cifs_writev+0x150/0x330 [cifs]
+>         vfs_write+0x2a8/0x3c0
+>         ksys_pwrite64+0x65/0xa0
+>
+> with the page refcount going negative.  This is less unlikely than it see=
+ms
+> because the page is being pinned, not simply got, and so the refcount
+> increased by 1024 each time, and so only needs to be called around ~20971=
+52
+> for the refcount to go negative.
+>
+> Further, the test program (aio-dio-invalidate-failure) uses a 32MiB stati=
+c
+> buffer and all the PTEs covering it refer to the same page because it's
+> never written to.
+>
+> The warning in try_grab_page():
+>
+>         if (WARN_ON_ONCE(folio_ref_count(folio) <=3D 0))
+>                 return -ENOMEM;
+>
+> then trips and prevents us ever using the page again for DIO at least.
+>
+> Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rathe=
+r than a page list")
+> Reported-by: Murphy Zhou <jencce.kernel@gmail.com>
+> Link: https://lore.kernel.org/r/CAH2r5mvaTsJ---n=3D265a4zqRA7pP+o4MJ36WCQ=
+US6oPrOij8cw@mail.gmail.com
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <sfrench@samba.org>
+> cc: Shyam Prasad N <nspmangalore@gmail.com>
+> cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> cc: Paulo Alcantara <pc@cjr.nz>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cifs@vger.kernel.org
 > ---
->  fs/ksmbd/auth.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  fs/cifs/file.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/fs/ksmbd/auth.c b/fs/ksmbd/auth.c
-> index 6e61b5bc7d86..cead696b656a 100644
-> --- a/fs/ksmbd/auth.c
-> +++ b/fs/ksmbd/auth.c
-> @@ -727,8 +727,9 @@ static int generate_key(struct ksmbd_conn *conn, stru=
-ct ksmbd_session *sess,
->                 goto smb3signkey_ret;
->         }
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index ec0694a65c7b..4d4a2d82636d 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -3612,7 +3612,7 @@ static ssize_t __cifs_writev(
 >
-> -       if (conn->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_CCM ||
-> -           conn->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_GCM)
-> +       if (key_size =3D=3D SMB3_ENC_DEC_KEY_SIZE &&
-> +           (conn->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_CCM ||
-> +            conn->cipher_type =3D=3D SMB2_ENCRYPTION_AES256_GCM))
->                 rc =3D crypto_shash_update(CRYPTO_HMACSHA256(ctx), L256, =
-4);
->         else
->                 rc =3D crypto_shash_update(CRYPTO_HMACSHA256(ctx), L128, =
-4);
-> --
-> 2.25.1
+>                 ctx->nr_pinned_pages =3D rc;
+>                 ctx->bv =3D (void *)ctx->iter.bvec;
+> -               ctx->bv_need_unpin =3D iov_iter_extract_will_pin(&ctx->it=
+er);
+> +               ctx->bv_need_unpin =3D iov_iter_extract_will_pin(from);
+>         } else if ((iov_iter_is_bvec(from) || iov_iter_is_kvec(from)) &&
+>                    !is_sync_kiocb(iocb)) {
+>                 /*
+> @@ -4148,7 +4148,7 @@ static ssize_t __cifs_readv(
+>
+>                 ctx->nr_pinned_pages =3D rc;
+>                 ctx->bv =3D (void *)ctx->iter.bvec;
+> -               ctx->bv_need_unpin =3D iov_iter_extract_will_pin(&ctx->it=
+er);
+> +               ctx->bv_need_unpin =3D iov_iter_extract_will_pin(to);
+>                 ctx->should_dirty =3D true;
+>         } else if ((iov_iter_is_bvec(to) || iov_iter_is_kvec(to)) &&
+>                    !is_sync_kiocb(iocb)) {
 >
 
 
