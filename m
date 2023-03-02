@@ -2,86 +2,108 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD45C7EE23
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Mar 2023 01:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10181C7EE23
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Mar 2023 01:49:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbjCBBdx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Mar 2023 20:33:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37190 "EHLO
+        id S229535AbjCBBt2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Mar 2023 20:49:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjCBBdw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Mar 2023 20:33:52 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02AF71ACEF
-        for <linux-cifs@vger.kernel.org>; Wed,  1 Mar 2023 17:33:52 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id 132so8872635pgh.13
-        for <linux-cifs@vger.kernel.org>; Wed, 01 Mar 2023 17:33:51 -0800 (PST)
+        with ESMTP id S229498AbjCBBt1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Mar 2023 20:49:27 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F9C3866D
+        for <linux-cifs@vger.kernel.org>; Wed,  1 Mar 2023 17:49:26 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id g17so20201882lfv.4
+        for <linux-cifs@vger.kernel.org>; Wed, 01 Mar 2023 17:49:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ixsystems.com; s=google; t=1677720831;
+        d=gmail.com; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lLeNdKrtAHPtUqY7PjIQ73OelcWsCQC+T2XDCBdour0=;
-        b=XYhA8hgXMWYP2R6xH9NYzHdn/yR80g8tAK0roqdtFDoeihKhAodKrteUFD5zBKfrTU
-         mVTg8aLIzhmKav1WMKkvlal+QRi/PAMfuhAK4iTt/kY6NFLLzCyJC1ZfFQVIWJiqx2O2
-         bsRgeyZHCLUTBu4eC+rdAuxjstZEBaKxp+gFqw8pNHaiu4ANq+/zyn9CydmYkmzV/EwD
-         bh0mRdzpFhv0sC0A6rvA1IwwYsxMr0ifzBkVIBAswvxcBDwGWF0NPubI/x7yMTmN4Y0l
-         yf8ZIfvSoyeoS2f5WtOTzE7I5vQd6Sc877lneRzLUAUr6bBykFtc8+PS2tTXXmzw7zx5
-         UGDA==
+        bh=2EvutdPIZw6OKgsWKoXGVzYu5Tg8WZTYz3bsspnRlIw=;
+        b=FvgYwkirchvjnHNedbRrQWHZHEYv2PzS4yUdcgCdZOikqhqKW3EwZFw3U7PVW65Mxo
+         kYvJqk+ON0ZHhAkGm3Du5umyRD2qUJcubwZaWozCjnpvS7tXtQIxUc9Keb+u3oWO9+fw
+         2wyQm9UXRudgzQWOZwUpOAdoTHNesk4PerSj4moLaOU1ocp17nQ0qS5Tv+93Jjbk2JkV
+         DCU57rwrZ49CTD4JxAku/ktzuNAuLwtssrjrz7SnwUD/lq+mJ6ZpmBQ6lzQKgbhN+Ec4
+         mZXNG14AAwAqVkQ1iM71XWN/A6NNj7FwXDgCgUoCqOV3+uDGwQOIqb/lMAJVunFYomz7
+         iJKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677720831;
+        d=1e100.net; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lLeNdKrtAHPtUqY7PjIQ73OelcWsCQC+T2XDCBdour0=;
-        b=WUrdBA885/vckGuizzKxNcho6gYizBvHCbW3joKk4b1fO0Pmp9zJ72fJf9EsL19L6X
-         ExHsjod6LPDIdk2LIzj6LDehZqYGSo87cf6wpyqVMOLIYjUFOft82LO2HNALwDn4pc+9
-         ZBnlEoU3GM3DxT5UXX5Lt1SqKP3wDXr4gz0MIWOTrVLLBQAkPS7LSzrVTkM3nEVSkoha
-         W1NtzDd/UFPFWXKX0Oj5gK23E8OOJBC5onV+FPpY9/0fJ5b5ZwsAiZJoH+5BrUf2dH84
-         UDqGKE1hYx2TjgUc/HS/JyGqrRVbhOToMTg0DgN8Irb2GcBI/2yUMWT502ptZkXAPYf4
-         qh/w==
-X-Gm-Message-State: AO0yUKUgKxNFElkaC68YAiq4b/cNwU7UcNDVwHMiBWbpQxyN04Z4zG1M
-        QbqnwOUcy0+rDHDvJ34+kWRWjn48sYLMmwipYOi14JbyN+pwFz081zY=
-X-Google-Smtp-Source: AK7set/7FlFAahjwjnxK0fSc38QHD1LRmH0caf73zaA2E1JSlEQMOj3arJ9+XdiLdShHMb7p46hCy2fHZ3W8pFZ9reM=
-X-Received: by 2002:a63:b21b:0:b0:503:a8:2792 with SMTP id x27-20020a63b21b000000b0050300a82792mr2831182pge.5.1677720831442;
- Wed, 01 Mar 2023 17:33:51 -0800 (PST)
+        bh=2EvutdPIZw6OKgsWKoXGVzYu5Tg8WZTYz3bsspnRlIw=;
+        b=v/0fxZdhYrAWwnew7goH76ytF8c+9VaGcuUjVRIJz303pGJOdMV/+dII5zow9DjcVj
+         p6lhED/jKRti7a7P7UMSu/vHgWKAnDvcYh0KjQiwTVb2XeHVKcH2C2ZfRhmwIOA+hu4C
+         MYahB2C/12LLtjR+xWLkMkztLLbYK8n+M+lN02Bc0H5j90Bb/QWmarABv7tCq5Hm71pR
+         6F3ilvTFSrQCnGTZBhqZUVesA1yxHC0BUTmaz2gBx/8Ov/Uh8cn0Z40tD0ztjvoygwyf
+         jsDgQOnf41+Y0n5F075GxnhIXg4xJLzMvKLynoPxcsrOg6cZgswy6iaItbM19pi8SWK6
+         rZKw==
+X-Gm-Message-State: AO0yUKWnqAXAw0Pu8H7k/8k9/XpTi1xUxDqCtO/5EyjhDWGidAdKqTek
+        07DvBW1fVs7yiXlVGUzgiQO5YXZn/JvIEACqHqt5bkYr
+X-Google-Smtp-Source: AK7set8N8H9x+KErVm4rC29ZA/0wnB4f4lcM92JoOfDf9V99p0NH3wjPyoa1o3cEi57p483c7OyyEehIGt1ZMasT0bs=
+X-Received: by 2002:ac2:5451:0:b0:4d5:ca32:6ae4 with SMTP id
+ d17-20020ac25451000000b004d5ca326ae4mr2466646lfn.4.1677721764782; Wed, 01 Mar
+ 2023 17:49:24 -0800 (PST)
 MIME-Version: 1.0
 References: <CAB5c7xoUXH6Xy+79Wz8M4yC70E=rwUL0ZRD_ApAFWv=C7S_uxg@mail.gmail.com>
- <514a3d90d263bd8422e9d13bd4c6e269.pc@manguebit.com>
-In-Reply-To: <514a3d90d263bd8422e9d13bd4c6e269.pc@manguebit.com>
-From:   Andrew Walker <awalker@ixsystems.com>
-Date:   Wed, 1 Mar 2023 20:33:40 -0500
-Message-ID: <CAB5c7xrdKSO4YE_vUQ6tg+p=WwxEdquj+VrRpwKxi8Jd0vPyAQ@mail.gmail.com>
+ <514a3d90d263bd8422e9d13bd4c6e269.pc@manguebit.com> <CAB5c7xrdKSO4YE_vUQ6tg+p=WwxEdquj+VrRpwKxi8Jd0vPyAQ@mail.gmail.com>
+In-Reply-To: <CAB5c7xrdKSO4YE_vUQ6tg+p=WwxEdquj+VrRpwKxi8Jd0vPyAQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 1 Mar 2023 19:49:13 -0600
+Message-ID: <CAH2r5mv52koGnKbvtRKE95c_JwwtitTXFaRc6mcM8nwLmWNo9A@mail.gmail.com>
 Subject: Re: Nested NTFS volumes within Windows SMB share may result in inode
  collisions in linux client
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     linux-cifs@vger.kernel.org
+To:     Andrew Walker <awalker@ixsystems.com>
+Cc:     Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Mar 1, 2023 at 5:37=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> w=
-rote:
+I would expect when the inode collision is noted that
+"cifs_autodisable_serverino()" will get called in the Linux client and
+you should see: "Autodisabling the user of server inode numbers on
+..."
+"Consider mounting with noserverino to silence this message"
+
+If this is easy to setup we could try some tricks when we encounter
+such a reparse point - do you have patch ideas for the client to fake
+up inode numbers in this case?
+
+On Wed, Mar 1, 2023 at 7:39=E2=80=AFPM Andrew Walker <awalker@ixsystems.com=
+> wrote:
 >
-> Andrew Walker <awalker@ixsystems.com> writes:
+> On Wed, Mar 1, 2023 at 5:37=E2=80=AFPM Paulo Alcantara <pc@manguebit.com>=
+ wrote:
+> >
+> > Andrew Walker <awalker@ixsystems.com> writes:
+> >
+> > > On my Windows server I mounted multiple NTFS volumes within the same
+> > > share and played around until I was able to create directories with
+> > > the same fileid number.
+> >
+> > Did you try it with 'noserverino' mount option?  For more information,
+> > see mount.cifs(8).
 >
-> > On my Windows server I mounted multiple NTFS volumes within the same
-> > share and played around until I was able to create directories with
-> > the same fileid number.
+> Yes. In this case I get a unique inode number
 >
-> Did you try it with 'noserverino' mount option?  For more information,
-> see mount.cifs(8).
+> > Did it work with older kernels?
+> I only tested with 5.15 kernel. Was there a different algorithm in
+> older kernels that's worth testing?
+>
+> > Perhaps we could conditionally stop trusting file ids sent by the serve=
+r
+> > as we currently do for hardlinks when we see these reparse points as
+> > well.
+>
+> Maybe fail chdir with EXDEV unless mount is with noserverino?
 
-Yes. In this case I get a unique inode number
 
-> Did it work with older kernels?
-I only tested with 5.15 kernel. Was there a different algorithm in
-older kernels that's worth testing?
 
-> Perhaps we could conditionally stop trusting file ids sent by the server
-> as we currently do for hardlinks when we see these reparse points as
-> well.
+--=20
+Thanks,
 
-Maybe fail chdir with EXDEV unless mount is with noserverino?
+Steve
