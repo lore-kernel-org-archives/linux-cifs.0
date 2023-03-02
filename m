@@ -2,118 +2,175 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C74F5C678D4
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Mar 2023 19:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C25BC6FA8E
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Mar 2023 23:18:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbjCBTm2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 2 Mar 2023 14:42:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39396 "EHLO
+        id S229615AbjCBXSU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 Mar 2023 18:18:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjCBTm1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Mar 2023 14:42:27 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CCCD12BD2
-        for <linux-cifs@vger.kernel.org>; Thu,  2 Mar 2023 11:42:26 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id u9so1571937edd.2
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Mar 2023 11:42:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kOqx6+dyQPye0A81ODuEToLEveIRPrUr3lZNhmSxjjk=;
-        b=iIxJ+yaqP3QmfBW0rsDQmbUeN2HV9lQSgW9lPvJNFQ5OA6vsIf9R/rS4J5ed51Ityk
-         tP38dC8HUmfeM+h02dXn1giAYHHOabCkfPyhXroows+8+1OmI6+kb8R22AVk7+f4rHe4
-         qmSC8oQRs4SCX/e2IuDKGhQHz2lSlaCcm6uH8DCYFrL86CNLgzQszQ+ktSVmdkuQgcQt
-         moHBS8W0drY2SqTsH1TeX4z58lIP7M9Eo+UjitfptDEHb1cNEISrnvPls7P/Fcd00Zu2
-         LsFn+U1sNZnmIoN8ZDlofjJY+RgYiQsgmapahlZ2L8WGnhoHh0NN7v4aC4QC/YWH0ZS2
-         RUvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kOqx6+dyQPye0A81ODuEToLEveIRPrUr3lZNhmSxjjk=;
-        b=PVm2GT3iAsXkbbaclEy/k5yFWzjUnUtzH92mzAbh/cmrX341HS0bJNNoIfxeQF5xVS
-         YAgefVZ2MtSDCJ7Pg7sodLXMYFM7kOTIVocwpEy4ALEtAmbB0JT8LRkMzQl7qGXFjdx6
-         JKT9tvVM+BbXSdu14TqOoZiiiaadOUcZ03d2XP8PBxawobo683vReKyO4xkadSw7Zb7e
-         qRfDHSHOVEo1IVif/MeR5ZoPZ5TDcf+LW4O134jTZ3GNfRp8xtMbbk2v7J6kEhvqwvAI
-         1OA8OwqCi802h3DnzLgf7utk8NvalNm9G5Z/zvMMFkeJz+dq5JjgE4thHqi+iVoq9yUs
-         8riQ==
-X-Gm-Message-State: AO0yUKV01l6oibd9cB5qkcP0a6P4H5GSgILc0ZIXt37eOX7p1x//NXX5
-        kK12dRbhNhvvr9r5ELzdm3PrqK/kApdAnf9HLUI=
-X-Google-Smtp-Source: AK7set/0xFcpWqwQDQPSfbB+cPf/CHo5PsvE69nxXhYD2gRy03tmyT1+jbcO1l0BS0d32BWVtp3UB57hoHiVk9gedjw=
-X-Received: by 2002:a17:906:53ca:b0:878:790b:b7fd with SMTP id
- p10-20020a17090653ca00b00878790bb7fdmr5526415ejo.14.1677786144708; Thu, 02
- Mar 2023 11:42:24 -0800 (PST)
+        with ESMTP id S229736AbjCBXSJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Mar 2023 18:18:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6531058B4F
+        for <linux-cifs@vger.kernel.org>; Thu,  2 Mar 2023 15:16:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677799008;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LAJJhudeXwtcWIsgOSeQzqHZOSp/kZ+Tsq3aTHJfVgw=;
+        b=O2pgfdftPeK50yEzVS7qdqaP+YCLQFgIJia//lOEGC1Fy9rBWX4xkaZf0Lobjsq9YVpvax
+        WPL2ny/IDY3S0c1gfktrhFYVIS3h2aSEBA7SyantKYM9wtkNlxhDZXVrEALzqRLr82HIFF
+        qm27ghCKGjfjAFBrqEQF9wahKpstGlc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-656-L88jf00AM7usTIYZwG25HA-1; Thu, 02 Mar 2023 18:16:44 -0500
+X-MC-Unique: L88jf00AM7usTIYZwG25HA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B9C151C05ABE;
+        Thu,  2 Mar 2023 23:16:43 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C38BC2026D76;
+        Thu,  2 Mar 2023 23:16:41 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Steve French <smfrench@gmail.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Vishal Moola <vishal.moola@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Tom Talpey <tom@talpey.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Paulo Alcantara <pc@cjr.nz>, Jeff Layton <jlayton@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] smb3, afs: Revert changes to {cifs,afs}_writepages_region()
+Date:   Thu,  2 Mar 2023 23:16:35 +0000
+Message-Id: <20230302231638.521280-1-dhowells@redhat.com>
 MIME-Version: 1.0
-References: <CAB5c7xoUXH6Xy+79Wz8M4yC70E=rwUL0ZRD_ApAFWv=C7S_uxg@mail.gmail.com>
- <514a3d90d263bd8422e9d13bd4c6e269.pc@manguebit.com> <CAB5c7xrdKSO4YE_vUQ6tg+p=WwxEdquj+VrRpwKxi8Jd0vPyAQ@mail.gmail.com>
- <CAH2r5mv52koGnKbvtRKE95c_JwwtitTXFaRc6mcM8nwLmWNo9A@mail.gmail.com>
- <300597ce-06a5-a987-5110-aa6ec24ea199@talpey.com> <CAH2r5msjKi-FMQRaHptk5fPycZRSS5ZQNC-u=1wE8oxBUhN5Ug@mail.gmail.com>
-In-Reply-To: <CAH2r5msjKi-FMQRaHptk5fPycZRSS5ZQNC-u=1wE8oxBUhN5Ug@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 3 Mar 2023 05:42:11 +1000
-Message-ID: <CAN05THRC3nbDFhsiBxaQo9NPazk2RFr65EpEjka_gnDY_aOapg@mail.gmail.com>
-Subject: Re: Nested NTFS volumes within Windows SMB share may result in inode
- collisions in linux client
-To:     Steve French <smfrench@gmail.com>
-Cc:     Tom Talpey <tom@talpey.com>, Andrew Walker <awalker@ixsystems.com>,
-        Paulo Alcantara <pc@manguebit.com>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 3 Mar 2023 at 05:38, Steve French <smfrench@gmail.com> wrote:
->
-> > Why isn't this behavior simply the default?
->
-> Without persisted inode numbers (UniqueId) it would cause problems
-> with hardlinks (ie mounting with noserverino).  We could try a trick
-> of hashing them with the volume id if we could detect the transition
-> to a different volume (as original thread was discussing) -
-> fortunately in Linux you have to walk a path component by component so
-> might be possible to spot these more easily.
+Hi Linus, Steve,
 
-Just hashing it with something does not make the problem go away, it
-would just make it
-more unpredictable to trigger or reproduce  but the very serious issue
-with data loss that Tom ponted out still remains.
+Could you consider applying these please?
 
-Maybe a solution is to NOT traverse across these volume transitions at
-all in the client and maybe users should be forced to
-explicitely mount these different volumes clientside, exactly like how
-NFSv3 does and requires clients to deal with this situation.
+I've split the patch that I proposed[1] to revert Vishal's patch to afs and
+Linus's changes to cifs back to the point where find_get_pages_range_tag()
+was being used to get a single folio and then replace that with a function,
+filemap_get_folio_tag() that just gets a single folio and done some
+benchmarking against this and some conversions to use write_cache_pages()
+in various ways.
 
-But yes, it is an extremely serious bug that will cause data loss when
-it triggers for files we write to.
+This is using the following to do testing of the write paths:
 
+	fio --ioengine=libaio --direct=0 --gtod_reduce=1 --name=readtest \
+	    --filename=/xfstest.test/foo --iodepth=128 --time_based \
+	    --runtime=120 --readwrite=randread --iodepth_low=96 \
+	    --iodepth_batch=16 --numjobs=4 --size=16M --bs=4k
 
->
-> On Thu, Mar 2, 2023 at 1:19=E2=80=AFPM Tom Talpey <tom@talpey.com> wrote:
-> >
-> > On 3/1/2023 8:49 PM, Steve French wrote:
-> > > I would expect when the inode collision is noted that
-> > > "cifs_autodisable_serverino()" will get called in the Linux client an=
-d
-> > > you should see: "Autodisabling the user of server inode numbers on
-> > > ..."
-> > > "Consider mounting with noserverino to silence this message"
-> >
-> > Why isn't this behavior simply the default? It's going to be
-> > data corruption (sev 1 issue) if the inode number is the same
-> > for two different fileid's, so this seems entirely backwards.
-> >
-> > Also, the words "to silence this message" really don't convey
-> > the severity of the situation.
-> >
-> > Tom.
->
->
->
-> --
-> Thanks,
->
-> Steve
+The base for comparison, the upstream kernel at commit:
+
+	d2980d8d826554fa6981d621e569a453787472f8
+	"Merge tag 'mm-nonmm-stable-2023-02-20-15-29' of git://git./linux/kernel/git/akpm/mm"
+
+plus the accumulated fixes on Steve's cifs for-next branch.
+
+AFS firstly.  The code that's upstream keeps track of the dirtied region of
+a folio in page->private, so I tried removing that to see what difference
+it makes, in addition to trying conversions to use write_cache_pages().  I
+also tried giving afs it's own copy of write_cache_pages() in order to
+eliminate the function pointer - in case that had a signifcant effect due
+to spectre mitigations.
+
+  Base:
+	WRITE: bw=302MiB/s (316MB/s), 71.9MiB/s-78.9MiB/s (75.3MB/s-82.8MB/s)
+	WRITE: bw=303MiB/s (318MB/s), 65.9MiB/s-84.0MiB/s (69.1MB/s-88.1MB/s)
+	WRITE: bw=310MiB/s (325MB/s), 73.6MiB/s-87.3MiB/s (77.1MB/s-91.5MB/s)
+
+  Base + Partial revert (these patches):
+	WRITE: bw=348MiB/s (365MB/s), 86.4MiB/s-87.5MiB/s (90.6MB/s-91.8MB/s)
+	WRITE: bw=350MiB/s (367MB/s), 86.6MiB/s-88.4MiB/s (90.8MB/s-92.7MB/s)
+	WRITE: bw=387MiB/s (406MB/s), 96.8MiB/s-97.0MiB/s (101MB/s-102MB/s)
+
+  Base + write_cache_pages():
+	WRITE: bw=280MiB/s (294MB/s), 69.7MiB/s-70.5MiB/s (73.0MB/s-73.9MB/s)
+	WRITE: bw=285MiB/s (299MB/s), 70.9MiB/s-71.5MiB/s (74.4MB/s-74.9MB/s)
+	WRITE: bw=290MiB/s (304MB/s), 71.6MiB/s-73.2MiB/s (75.1MB/s-76.8MB/s)
+
+  Base + Page-dirty-region removed:
+	WRITE: bw=301MiB/s (315MB/s), 70.4MiB/s-80.2MiB/s (73.8MB/s-84.1MB/s)
+	WRITE: bw=325MiB/s (341MB/s), 78.5MiB/s-87.1MiB/s (82.3MB/s-91.3MB/s)
+	WRITE: bw=320MiB/s (335MB/s), 71.6MiB/s-88.6MiB/s (75.0MB/s-92.9MB/s)
+
+  Base + Page-dirty-region tracking removed +  write_cache_pages():
+	WRITE: bw=288MiB/s (302MB/s), 71.9MiB/s-72.3MiB/s (75.4MB/s-75.8MB/s)
+	WRITE: bw=284MiB/s (297MB/s), 70.7MiB/s-71.3MiB/s (74.1MB/s-74.8MB/s)
+	WRITE: bw=287MiB/s (301MB/s), 71.2MiB/s-72.6MiB/s (74.7MB/s-76.1MB/s)
+
+  Base + Page-dirty-region tracking removed + Own write_cache_pages()
+	WRITE: bw=302MiB/s (316MB/s), 75.1MiB/s-76.1MiB/s (78.7MB/s-79.8MB/s)
+	WRITE: bw=302MiB/s (316MB/s), 74.5MiB/s-76.1MiB/s (78.1MB/s-79.8MB/s)
+	WRITE: bw=301MiB/s (316MB/s), 75.2MiB/s-75.5MiB/s (78.9MB/s-79.1MB/s)
+
+So the partially reverted code appears significantly faster than code based
+on write_cache_pages().  Removing the page-dirty-region tracking also slows
+things down - I have a suspicion that this may be due to multipage folios
+enlarging the apparently dirty regions of a file.
+
+And then CIFS.  There's no dirtied region tracking here, so just the
+partial reversion, a conversion to write_cache_pages() and its own version
+of write_cache_pages() to eliminate the function pointer.
+
+  Base:
+	WRITE: bw=464MiB/s (487MB/s), 116MiB/s-116MiB/s (122MB/s-122MB/s)
+	WRITE: bw=463MiB/s (486MB/s), 116MiB/s-116MiB/s (121MB/s-122MB/s)
+	WRITE: bw=465MiB/s (488MB/s), 116MiB/s-116MiB/s (122MB/s-122MB/s)
+
+  Base + Partial revert (these patches):
+	WRITE: bw=470MiB/s (493MB/s), 117MiB/s-118MiB/s (123MB/s-123MB/s)
+	WRITE: bw=467MiB/s (489MB/s), 117MiB/s-117MiB/s (122MB/s-122MB/s)
+	WRITE: bw=464MiB/s (486MB/s), 116MiB/s-116MiB/s (121MB/s-122MB/s)
+
+  Base + write_cache_pages():
+	WRITE: bw=457MiB/s (479MB/s), 114MiB/s-114MiB/s (120MB/s-120MB/s)
+	WRITE: bw=449MiB/s (471MB/s), 112MiB/s-113MiB/s (118MB/s-118MB/s)
+	WRITE: bw=459MiB/s (482MB/s), 115MiB/s-115MiB/s (120MB/s-121MB/s)
+
+  Base + Own write_cache_pages():
+	WRITE: bw=451MiB/s (473MB/s), 113MiB/s-113MiB/s (118MB/s-118MB/s)
+	WRITE: bw=455MiB/s (478MB/s), 114MiB/s-114MiB/s (119MB/s-120MB/s)
+	WRITE: bw=453MiB/s (475MB/s), 113MiB/s-113MiB/s (119MB/s-119MB/s)
+	WRITE: bw=459MiB/s (481MB/s), 115MiB/s-115MiB/s (120MB/s-120MB/s)
+
+Here the partially reverted code appears slightly better - but the results
+are very close so I'm not sure if it's statistically significant.
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-cifs
+
+David
+
+Link: https://lore.kernel.org/r/2214157.1677250083@warthog.procyon.org.uk/ [1]
+
+David Howells (3):
+  mm: Add a function to get a single tagged folio from a file
+  afs: Partially revert and use filemap_get_folio_tag()
+  cifs: Partially revert and use filemap_get_folio_tag()
+
+ fs/afs/write.c          | 118 +++++++++++++++++++---------------------
+ fs/cifs/file.c          | 115 +++++++++++++++++----------------------
+ include/linux/pagemap.h |   2 +
+ mm/filemap.c            |  58 ++++++++++++++++++++
+ 4 files changed, 166 insertions(+), 127 deletions(-)
+
