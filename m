@@ -2,255 +2,66 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BEEAC6FA8E
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Mar 2023 23:42:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4CD9C678D4
+	for <linux-cifs@archiver.kernel.org>; Fri,  3 Mar 2023 02:02:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbjCBXm3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 2 Mar 2023 18:42:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57546 "EHLO
+        id S229555AbjCCCC6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 Mar 2023 21:02:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjCBXm2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Mar 2023 18:42:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA3164615E
-        for <linux-cifs@vger.kernel.org>; Thu,  2 Mar 2023 15:41:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1677800507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PlH4fJFKppxY+A07JXfq9y7Xnf4IHpCsyJL9AJzCkgg=;
-        b=cGO9mvf9jf12+W6+xMDMiiFsSUBrk145E3IxC7P9x5gviCxSbRdFg4oQtyGSI5f5oeNiEn
-        aTzlIQjyvfC7MUB8cZSmxgPPe6UeJR05pFb9Q/zVSj/J0y+zO11SloZ2jk1e3f93NaCNQh
-        3TLqjhOYDf5QViiMPRSdTXmd9yfTqHQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-175-AwPjlJZLO6-m9tqSQdYfyw-1; Thu, 02 Mar 2023 18:41:42 -0500
-X-MC-Unique: AwPjlJZLO6-m9tqSQdYfyw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B90D31C05AEE;
-        Thu,  2 Mar 2023 23:41:41 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F275F440D9;
-        Thu,  2 Mar 2023 23:41:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <522331.1677800209@warthog.procyon.org.uk>
-References: <522331.1677800209@warthog.procyon.org.uk> <20230302231638.521280-1-dhowells@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Steve French <smfrench@gmail.com>
-Cc:     dhowells@redhat.com, Vishal Moola <vishal.moola@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Tom Talpey <tom@talpey.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Paulo Alcantara <pc@cjr.nz>, Jeff Layton <jlayton@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: cifs test patch to make cifs use its own version of write_cache_pages()
+        with ESMTP id S229451AbjCCCC5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Mar 2023 21:02:57 -0500
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840667698
+        for <linux-cifs@vger.kernel.org>; Thu,  2 Mar 2023 18:02:56 -0800 (PST)
+Received: from kwepemm600015.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4PSWT85BR8zKmSs;
+        Fri,  3 Mar 2023 10:02:52 +0800 (CST)
+Received: from [10.174.176.52] (10.174.176.52) by
+ kwepemm600015.china.huawei.com (7.193.23.52) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Fri, 3 Mar 2023 10:02:53 +0800
+Message-ID: <c6a6e4a0-a66b-e86c-8c67-fdd24fbfcce2@huawei.com>
+Date:   Fri, 3 Mar 2023 10:02:52 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <522531.1677800499.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 02 Mar 2023 23:41:39 +0000
-Message-ID: <522532.1677800499@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH v2 0/2] Fix some bug in cifs
+To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
+        <linux-cifs@vger.kernel.org>, <sfrench@samba.org>,
+        <smfrench@gmail.com>, <pc@cjr.nz>
+References: <20221116031136.3967579-1-zhangxiaoxu5@huawei.com>
+CC:     <lsahlber@redhat.com>, <sprasad@microsoft.com>, <tom@talpey.com>
+From:   ChenXiaoSong <chenxiaosong2@huawei.com>
+In-Reply-To: <20221116031136.3967579-1-zhangxiaoxu5@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.52]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600015.china.huawei.com (7.193.23.52)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+Hi Steve and Paulo:
 
-> And then CIFS. ...
-> =
+Do you have any suggestions for this patchset ?
 
->   Base + Own write_cache_pages():
-> 	WRITE: bw=3D451MiB/s (473MB/s), 113MiB/s-113MiB/s (118MB/s-118MB/s)
-> 	WRITE: bw=3D455MiB/s (478MB/s), 114MiB/s-114MiB/s (119MB/s-120MB/s)
-> 	WRITE: bw=3D453MiB/s (475MB/s), 113MiB/s-113MiB/s (119MB/s-119MB/s)
-> 	WRITE: bw=3D459MiB/s (481MB/s), 115MiB/s-115MiB/s (120MB/s-120MB/s)
+xfstests generic/011 always report this bug, our mount option is: -o 
+mfsymlinks,vers=3.0
 
-Here's my patch to give cifs its own copy of write_cache_pages() so that t=
-he
-function pointer can be eliminated in case some sort of spectre thing is
-causing a slowdown.
-
-This goes on top of "cifs test patch to convert to using write_cache_pages=
-()".
-
-David
----
- fs/cifs/file.c |  137 +++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 136 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 04e2466609d9..c33c7db729c7 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2802,6 +2802,141 @@ static int cifs_writepages_add_folio(struct folio =
-*folio,
- 	return 0;
- }
- =
-
-+static int cifs_write_cache_pages(struct address_space *mapping,
-+				  struct writeback_control *wbc,
-+				  struct cifs_writepages_context *ctx)
-+{
-+	int ret =3D 0;
-+	int done =3D 0;
-+	int error;
-+	struct folio_batch fbatch;
-+	int nr_folios;
-+	pgoff_t index;
-+	pgoff_t end;		/* Inclusive */
-+	pgoff_t done_index;
-+	int range_whole =3D 0;
-+	xa_mark_t tag;
-+
-+	folio_batch_init(&fbatch);
-+	if (wbc->range_cyclic) {
-+		index =3D mapping->writeback_index; /* prev offset */
-+		end =3D -1;
-+	} else {
-+		index =3D wbc->range_start >> PAGE_SHIFT;
-+		end =3D wbc->range_end >> PAGE_SHIFT;
-+		if (wbc->range_start =3D=3D 0 && wbc->range_end =3D=3D LLONG_MAX)
-+			range_whole =3D 1;
-+	}
-+	if (wbc->sync_mode =3D=3D WB_SYNC_ALL || wbc->tagged_writepages) {
-+		tag_pages_for_writeback(mapping, index, end);
-+		tag =3D PAGECACHE_TAG_TOWRITE;
-+	} else {
-+		tag =3D PAGECACHE_TAG_DIRTY;
-+	}
-+	done_index =3D index;
-+	while (!done && (index <=3D end)) {
-+		int i;
-+
-+		nr_folios =3D filemap_get_folios_tag(mapping, &index, end,
-+				tag, &fbatch);
-+
-+		if (nr_folios =3D=3D 0)
-+			break;
-+
-+		for (i =3D 0; i < nr_folios; i++) {
-+			struct folio *folio =3D fbatch.folios[i];
-+
-+			done_index =3D folio->index;
-+
-+			folio_lock(folio);
-+
-+			/*
-+			 * Page truncated or invalidated. We can freely skip it
-+			 * then, even for data integrity operations: the page
-+			 * has disappeared concurrently, so there could be no
-+			 * real expectation of this data integrity operation
-+			 * even if there is now a new, dirty page at the same
-+			 * pagecache address.
-+			 */
-+			if (unlikely(folio->mapping !=3D mapping)) {
-+continue_unlock:
-+				folio_unlock(folio);
-+				continue;
-+			}
-+
-+			if (!folio_test_dirty(folio)) {
-+				/* someone wrote it for us */
-+				goto continue_unlock;
-+			}
-+
-+			if (folio_test_writeback(folio)) {
-+				if (wbc->sync_mode !=3D WB_SYNC_NONE)
-+					folio_wait_writeback(folio);
-+				else
-+					goto continue_unlock;
-+			}
-+
-+			BUG_ON(folio_test_writeback(folio));
-+			if (!folio_clear_dirty_for_io(folio))
-+				goto continue_unlock;
-+
-+			error =3D cifs_writepages_add_folio(folio, wbc, ctx);
-+			if (unlikely(error)) {
-+				/*
-+				 * Handle errors according to the type of
-+				 * writeback. There's no need to continue for
-+				 * background writeback. Just push done_index
-+				 * past this page so media errors won't choke
-+				 * writeout for the entire file. For integrity
-+				 * writeback, we must process the entire dirty
-+				 * set regardless of errors because the fs may
-+				 * still have state to clear for each page. In
-+				 * that case we continue processing and return
-+				 * the first error.
-+				 */
-+				if (error =3D=3D AOP_WRITEPAGE_ACTIVATE) {
-+					folio_unlock(folio);
-+					error =3D 0;
-+				} else if (wbc->sync_mode !=3D WB_SYNC_ALL) {
-+					ret =3D error;
-+					done_index =3D folio->index +
-+						folio_nr_pages(folio);
-+					done =3D 1;
-+					break;
-+				}
-+				if (!ret)
-+					ret =3D error;
-+			}
-+
-+			/*
-+			 * We stop writing back only if we are not doing
-+			 * integrity sync. In case of integrity sync we have to
-+			 * keep going until we have written all the pages
-+			 * we tagged for writeback prior to entering this loop.
-+			 */
-+			if (--wbc->nr_to_write <=3D 0 &&
-+			    wbc->sync_mode =3D=3D WB_SYNC_NONE) {
-+				done =3D 1;
-+				break;
-+			}
-+		}
-+		folio_batch_release(&fbatch);
-+		cond_resched();
-+	}
-+
-+	/*
-+	 * If we hit the last page and there is more work to be done: wrap
-+	 * back the index back to the start of the file for the next
-+	 * time we are called.
-+	 */
-+	if (wbc->range_cyclic && !done)
-+		done_index =3D 0;
-+	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
-+		mapping->writeback_index =3D done_index;
-+
-+	return ret;
-+}
-+
- /*
-  * Write some of the pending data back to the server
-  */
-@@ -2816,7 +2951,7 @@ static int cifs_writepages(struct address_space *map=
-ping,
- 	 * to prevent it.
- 	 */
- =
-
--	ret =3D write_cache_pages(mapping, wbc, cifs_writepages_add_folio, &ctx)=
-;
-+	ret =3D cifs_write_cache_pages(mapping, wbc, &ctx);
- 	if (ret >=3D 0 && ctx.begun) {
- 		ret =3D cifs_writepages_submit(mapping, wbc, &ctx);
- 		if (ret < 0)
-
+在 2022/11/16 11:11, Zhang Xiaoxu 写道:
+> v2:
+>    - remove the 1st patch since steve already merged it into repo.
+>    - fix cifs 1.0 hung since not set READY flag when wakeup task
+>      on 2nd patch.
+> 
+> Zhang Xiaoxu (2):
+>    cifs: Fix UAF in cifs_demultiplex_thread()
+>    cifs: Move the in_send statistic to __smb_send_rqst()
+> 
+>   fs/cifs/cifsglob.h  |  1 +
+>   fs/cifs/transport.c | 55 ++++++++++++++++++++++++++-------------------
+>   2 files changed, 33 insertions(+), 23 deletions(-)
+> 
