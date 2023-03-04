@@ -2,69 +2,106 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F820C61DA4
-	for <linux-cifs@archiver.kernel.org>; Sat,  4 Mar 2023 00:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2467AC678D5
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Mar 2023 08:36:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229509AbjCDAjU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Mar 2023 19:39:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40882 "EHLO
+        id S229557AbjCDIgL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 4 Mar 2023 03:36:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229685AbjCDAjT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Mar 2023 19:39:19 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C0D38018;
-        Fri,  3 Mar 2023 16:39:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0E40CB81A09;
-        Sat,  4 Mar 2023 00:39:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AF35DC433EF;
-        Sat,  4 Mar 2023 00:39:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677890355;
-        bh=7+CXXksS/QheM84IxxA2rRrCsPB3wRg1ChOMaMcmX6M=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=lRvqMVdNLoRNENCuhECfn9i2u4ik/soTESCI1DqPuehxIeCWxov5VG249+fvAvdgL
-         rPyfKf3CoGXhr2NC/sanfA/fYa9u0yB/GsbDDCi5pp+3erYpudJJuNJASPE6BwN2+6
-         fSI0zq9qR+Thhc7jmA759BMTtdNQbIXVC7S03quPTcdNA6MnsJhj/zGXeMtUvBSYjM
-         yObjXkQrvIxuybFdL3aEyRUE710dpaXPYGM5R7ihOX6IUwiKEkKzt6UsroNbSGfBrY
-         AHWMydBl7DG62IuYyH+8TcBWVSfn3HHmYPWJN10AafG482DVr1HfPTOqIqhFu+Veml
-         Pj4a9lQ1hwCZg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9D7AFC41679;
-        Sat,  4 Mar 2023 00:39:15 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvneK=w-1DFk9A7y=3xgLp=HQtNFQ5Tvee+g2B4qKumeA@mail.gmail.com>
-References: <CAH2r5mvneK=w-1DFk9A7y=3xgLp=HQtNFQ5Tvee+g2B4qKumeA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvneK=w-1DFk9A7y=3xgLp=HQtNFQ5Tvee+g2B4qKumeA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.3-rc-smb3-client-fixes-part2
-X-PR-Tracked-Commit-Id: 71562809e401b2f5ad371d99ce0323e988406fd6
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3162745aad939af6b8bc00951d1344ee872526a9
-Message-Id: <167789035564.14111.6365275079862617222.pr-tracker-bot@kernel.org>
-Date:   Sat, 04 Mar 2023 00:39:15 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>
+        with ESMTP id S229437AbjCDIgK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 4 Mar 2023 03:36:10 -0500
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DDD21BAC7;
+        Sat,  4 Mar 2023 00:36:08 -0800 (PST)
+Received: by mail-pj1-x1043.google.com with SMTP id m20-20020a17090ab79400b00239d8e182efso8409718pjr.5;
+        Sat, 04 Mar 2023 00:36:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677918968;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CLEGwvh2qYbgB4rTOKx78eSVSdlKxGUFU7IahmTi8kg=;
+        b=cZBLUpvgd39BJ8BGY4K2n3nc2VIGwsmFeaaVmw3xM/zCu1Hgj6mxNav9wjBE6qHN2x
+         hHRBmc3SrcEPPTgV514Vy6oZjVvKT/9L5Dc/z3wlrFNxCRpAHtZT0WnBsZb71ATuFcml
+         vf/sbRwVg6PhncP9Zno6bYObazplHotdGedjFtfvvliMhWdpGic6foFrefeTZi3hNPcu
+         EkEidmuBcMHK4DM2FT3Kp6NJYL1rqqxbmi57yovKHzMLylc6LKDy+C5CRdYWyWHFYpUJ
+         ohbBb1YHNIY6STz5/Pbe1Fy0F1EWricmFqUSyDtsiB/F0H4BBjQxnMhIB+f9/BQN1bzd
+         3ITw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677918968;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CLEGwvh2qYbgB4rTOKx78eSVSdlKxGUFU7IahmTi8kg=;
+        b=V/WQsXRK0Vy2D+ocUlTnfcvny18gIKXMKhbYviAdVKpkxTD1E7vKKuIHiizZaex2TO
+         Gr+GXtlhO7M/DiIZ/iZEuQcsjA5VtZLs6imEG/7gixwHIs3mKowWDDyZ9RoS4BVvqLqp
+         d7+DS5EJKCWGRV7BGMoawuf2igKGX1QJTZeOCELgoZ/WwC5kBhJyfEiDp4wcCDO9FpOV
+         M+vsRjq66E7/DpV4yNep9+kHLX8uAZGWyxE+TMQVKWYk7KfkuxFSK/ngvW9BotKlx4qe
+         bTpob1/QLfw2nTaU2MgJGaZWVWrTYC3bFkdwa6kDQm0G4PCG4CKWYf9FyMbPIKu7Gzjs
+         QBBg==
+X-Gm-Message-State: AO0yUKVp/thVR0IVNe1m04zHaZsGS4gXv10QKhDR/iowQa9vSeSLy20a
+        y4FMEH9fsN2ZMlo9sDN57qc=
+X-Google-Smtp-Source: AK7set/xUMSOQt3Jg4JgzeijVRwsTzvD9rCjv1wKIwRnRSgfekzhcYusGk/nKtvHei5uGo+2dG/9zA==
+X-Received: by 2002:a17:902:d4cd:b0:19a:70f9:affb with SMTP id o13-20020a170902d4cd00b0019a70f9affbmr5885752plg.2.1677918967926;
+        Sat, 04 Mar 2023 00:36:07 -0800 (PST)
+Received: from c1ion.lan ([139.227.13.23])
+        by smtp.gmail.com with ESMTPSA id e4-20020a17090301c400b0019e866acda5sm2869103plh.9.2023.03.04.00.36.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Mar 2023 00:36:07 -0800 (PST)
+From:   MIngyi Cong <congmingyi@gmail.com>
+To:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
+        hyc.lee@gmail.com
+Cc:     congmingyi@gmail.com, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH] fs: add the tuncate check of exfat and hfsplus
+Date:   Sat,  4 Mar 2023 16:35:59 +0800
+Message-Id: <20230304083559.172398-1-congmingyi@gmail.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 3 Mar 2023 17:29:17 -0600:
+From: Mingyi Cong <congmingyi@gmail.com>
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.3-rc-smb3-client-fixes-part2
+EXFAT and HFSPLUS will fill zero data in truncated range.
+Fix this by adding *_SUPER_MAGIC check.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3162745aad939af6b8bc00951d1344ee872526a9
+Signed-off-by: Mingyi Cong <congmingyi@gmail.com>
+---
+ fs/ksmbd/smb2pdu.c         | 4 +++-
+ include/uapi/linux/magic.h | 2 ++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-Thank you!
-
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index ac029dfd2..10ab929ad 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -5738,7 +5738,9 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 	 * truncate of some filesystem like FAT32 fill zero data in
+ 	 * truncated range.
+ 	 */
+-	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC) {
++	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC ||
++		inode->i_sb->s_magic != EXFAT_SUPER_MAGIC ||
++		inode->i_sb->s_magic != HFSPLUS_SUPER_MAGIC) {
+ 		ksmbd_debug(SMB, "filename : %s truncated to newsize %lld\n",
+ 			    fp->filename, newsize);
+ 		rc = ksmbd_vfs_truncate(work, fp, newsize);
+diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
+index 35687dcb1..687b7f584 100644
+--- a/include/uapi/linux/magic.h
++++ b/include/uapi/linux/magic.h
+@@ -43,6 +43,8 @@
+ #define MINIX3_SUPER_MAGIC	0x4d5a		/* minix v3 fs, 60 char names */
+ 
+ #define MSDOS_SUPER_MAGIC	0x4d44		/* MD */
++#define EXFAT_SUPER_MAGIC	0x2011BAB0UL		/* EXFAT */
++#define HFSPLUS_SUPER_MAGIC	0x482b		/* HFSPLUS */
+ #define NCP_SUPER_MAGIC		0x564c		/* Guess, what 0x564c is :-) */
+ #define NFS_SUPER_MAGIC		0x6969
+ #define OCFS2_SUPER_MAGIC	0x7461636f
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.34.1
+
