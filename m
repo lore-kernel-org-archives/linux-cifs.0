@@ -2,106 +2,82 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2467AC678D5
-	for <linux-cifs@archiver.kernel.org>; Sat,  4 Mar 2023 08:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA9D3C61DA4
+	for <linux-cifs@archiver.kernel.org>; Sun,  5 Mar 2023 12:35:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjCDIgL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 4 Mar 2023 03:36:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50376 "EHLO
+        id S229676AbjCEMfA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 5 Mar 2023 07:35:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCDIgK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 4 Mar 2023 03:36:10 -0500
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DDD21BAC7;
-        Sat,  4 Mar 2023 00:36:08 -0800 (PST)
-Received: by mail-pj1-x1043.google.com with SMTP id m20-20020a17090ab79400b00239d8e182efso8409718pjr.5;
-        Sat, 04 Mar 2023 00:36:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677918968;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CLEGwvh2qYbgB4rTOKx78eSVSdlKxGUFU7IahmTi8kg=;
-        b=cZBLUpvgd39BJ8BGY4K2n3nc2VIGwsmFeaaVmw3xM/zCu1Hgj6mxNav9wjBE6qHN2x
-         hHRBmc3SrcEPPTgV514Vy6oZjVvKT/9L5Dc/z3wlrFNxCRpAHtZT0WnBsZb71ATuFcml
-         vf/sbRwVg6PhncP9Zno6bYObazplHotdGedjFtfvvliMhWdpGic6foFrefeTZi3hNPcu
-         EkEidmuBcMHK4DM2FT3Kp6NJYL1rqqxbmi57yovKHzMLylc6LKDy+C5CRdYWyWHFYpUJ
-         ohbBb1YHNIY6STz5/Pbe1Fy0F1EWricmFqUSyDtsiB/F0H4BBjQxnMhIB+f9/BQN1bzd
-         3ITw==
+        with ESMTP id S229643AbjCEMe7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 5 Mar 2023 07:34:59 -0500
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 483A11BD1
+        for <linux-cifs@vger.kernel.org>; Sun,  5 Mar 2023 04:34:57 -0800 (PST)
+Received: by mail-pf1-f172.google.com with SMTP id y10so4080057pfi.8
+        for <linux-cifs@vger.kernel.org>; Sun, 05 Mar 2023 04:34:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677918968;
+        d=1e100.net; s=20210112; t=1678019696;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CLEGwvh2qYbgB4rTOKx78eSVSdlKxGUFU7IahmTi8kg=;
-        b=V/WQsXRK0Vy2D+ocUlTnfcvny18gIKXMKhbYviAdVKpkxTD1E7vKKuIHiizZaex2TO
-         Gr+GXtlhO7M/DiIZ/iZEuQcsjA5VtZLs6imEG/7gixwHIs3mKowWDDyZ9RoS4BVvqLqp
-         d7+DS5EJKCWGRV7BGMoawuf2igKGX1QJTZeOCELgoZ/WwC5kBhJyfEiDp4wcCDO9FpOV
-         M+vsRjq66E7/DpV4yNep9+kHLX8uAZGWyxE+TMQVKWYk7KfkuxFSK/ngvW9BotKlx4qe
-         bTpob1/QLfw2nTaU2MgJGaZWVWrTYC3bFkdwa6kDQm0G4PCG4CKWYf9FyMbPIKu7Gzjs
-         QBBg==
-X-Gm-Message-State: AO0yUKVp/thVR0IVNe1m04zHaZsGS4gXv10QKhDR/iowQa9vSeSLy20a
-        y4FMEH9fsN2ZMlo9sDN57qc=
-X-Google-Smtp-Source: AK7set/xUMSOQt3Jg4JgzeijVRwsTzvD9rCjv1wKIwRnRSgfekzhcYusGk/nKtvHei5uGo+2dG/9zA==
-X-Received: by 2002:a17:902:d4cd:b0:19a:70f9:affb with SMTP id o13-20020a170902d4cd00b0019a70f9affbmr5885752plg.2.1677918967926;
-        Sat, 04 Mar 2023 00:36:07 -0800 (PST)
-Received: from c1ion.lan ([139.227.13.23])
-        by smtp.gmail.com with ESMTPSA id e4-20020a17090301c400b0019e866acda5sm2869103plh.9.2023.03.04.00.36.05
+        bh=s/Sav/z4jStbwj4LP4lq+DnMmWl3QrYqg63iHjU8heY=;
+        b=685MGumMyyRgrTav84cme8mvEv9KgHlN6x8ALW4WOHKo2ggdPtQk+ujYZzdGITOAtS
+         SiSGu/Cqy4KlR8nhpR/bk6J311P+23zzXTcCUezvs8Kyk3DWsuQoUbE7QjXTjMEhqcx1
+         WRTUd9Em9DKVlnwOmOOfqQmvnKT3ZZKT72Rm5bXhgIS/ROX93r48BQI79VAPe66vuu+0
+         iZ+Y6uxthOCmO8/hFEi6cCnVYsONEAg4HmqqgLOXlSqi19uWZGOzWzIBGVXUZKjyi/+5
+         K8PE4KGikbrCVzKQcQwiXJMD0O7y/MPbC80BaYSMeEyhZFuTX1l2++Hsh/iCRLT5mqQ0
+         2lNg==
+X-Gm-Message-State: AO0yUKWWkdfnh3Zos7c8cu/K4pSZeeEGfyFjpD22Le/f4JKdzWqmWkn3
+        gMq0nDhojW2oWezUDJt7Gc0Z6j94ccY=
+X-Google-Smtp-Source: AK7set9aB8CRHpCIKLp12gxaqtWLneQpmYEwz9bXjr2YIkOgG7J+V/zNrXM4MHvDZ/cZQ5QuMBy9/Q==
+X-Received: by 2002:aa7:9f81:0:b0:60b:81ae:c6d2 with SMTP id z1-20020aa79f81000000b0060b81aec6d2mr7603209pfr.27.1678019696512;
+        Sun, 05 Mar 2023 04:34:56 -0800 (PST)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id e21-20020aa78255000000b005a8dcd32851sm4683257pfn.11.2023.03.05.04.34.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Mar 2023 00:36:07 -0800 (PST)
-From:   MIngyi Cong <congmingyi@gmail.com>
-To:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
-        hyc.lee@gmail.com
-Cc:     congmingyi@gmail.com, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org
-Subject: [PATCH] fs: add the tuncate check of exfat and hfsplus
-Date:   Sat,  4 Mar 2023 16:35:59 +0800
-Message-Id: <20230304083559.172398-1-congmingyi@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Sun, 05 Mar 2023 04:34:55 -0800 (PST)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
+        Dan Carpenter <error27@gmail.com>
+Subject: [PATCH 1/2] ksmbd: add low bound validation to FSCTL_SET_ZERO_DATA
+Date:   Sun,  5 Mar 2023 21:34:42 +0900
+Message-Id: <20230305123443.21509-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Mingyi Cong <congmingyi@gmail.com>
+Smatch static checker warning:
+ fs/ksmbd/smb2pdu.c:7759 smb2_ioctl()
+ warn: no lower bound on 'off'
 
-EXFAT and HFSPLUS will fill zero data in truncated range.
-Fix this by adding *_SUPER_MAGIC check.
+Fix unexpected result that could caused from negative off and bfz.
 
-Signed-off-by: Mingyi Cong <congmingyi@gmail.com>
+Fixes: b5e5f9dfc915 ("ksmbd: check invalid FileOffset and BeyondFinalZero in FSCTL_ZERO_DATA")
+Reported-by: Dan Carpenter <error27@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/ksmbd/smb2pdu.c         | 4 +++-
- include/uapi/linux/magic.h | 2 ++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ fs/ksmbd/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index ac029dfd2..10ab929ad 100644
+index 81e987114206..b7a420e0fcc4 100644
 --- a/fs/ksmbd/smb2pdu.c
 +++ b/fs/ksmbd/smb2pdu.c
-@@ -5738,7 +5738,9 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- 	 * truncate of some filesystem like FAT32 fill zero data in
- 	 * truncated range.
- 	 */
--	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC) {
-+	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC ||
-+		inode->i_sb->s_magic != EXFAT_SUPER_MAGIC ||
-+		inode->i_sb->s_magic != HFSPLUS_SUPER_MAGIC) {
- 		ksmbd_debug(SMB, "filename : %s truncated to newsize %lld\n",
- 			    fp->filename, newsize);
- 		rc = ksmbd_vfs_truncate(work, fp, newsize);
-diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
-index 35687dcb1..687b7f584 100644
---- a/include/uapi/linux/magic.h
-+++ b/include/uapi/linux/magic.h
-@@ -43,6 +43,8 @@
- #define MINIX3_SUPER_MAGIC	0x4d5a		/* minix v3 fs, 60 char names */
+@@ -7757,7 +7757,7 @@ int smb2_ioctl(struct ksmbd_work *work)
  
- #define MSDOS_SUPER_MAGIC	0x4d44		/* MD */
-+#define EXFAT_SUPER_MAGIC	0x2011BAB0UL		/* EXFAT */
-+#define HFSPLUS_SUPER_MAGIC	0x482b		/* HFSPLUS */
- #define NCP_SUPER_MAGIC		0x564c		/* Guess, what 0x564c is :-) */
- #define NFS_SUPER_MAGIC		0x6969
- #define OCFS2_SUPER_MAGIC	0x7461636f
+ 		off = le64_to_cpu(zero_data->FileOffset);
+ 		bfz = le64_to_cpu(zero_data->BeyondFinalZero);
+-		if (off > bfz) {
++		if (off < 0 || bfz < 0 || off > bfz) {
+ 			ret = -EINVAL;
+ 			goto out;
+ 		}
 -- 
-2.34.1
+2.25.1
 
