@@ -2,109 +2,187 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07C1EC6FD1A
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Mar 2023 13:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C5CC678DB
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Mar 2023 17:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbjCGN5u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 Mar 2023 08:57:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37126 "EHLO
+        id S232311AbjCGRvw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 Mar 2023 12:51:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229743AbjCGN5t (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Mar 2023 08:57:49 -0500
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C5813D934;
-        Tue,  7 Mar 2023 05:57:48 -0800 (PST)
-Received: by mail-pl1-x641.google.com with SMTP id v11so14115128plz.8;
-        Tue, 07 Mar 2023 05:57:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678197468;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e26yGfrppj54n5vu7MfF/4DYSTLCxazeKAAKghatviY=;
-        b=k/LZaCEOhH/zfw12s8b5z0xjRas5BMADQ6kguj4C3m0zq1lB+MXNW1Fd8Fjuahrynt
-         eDorKtTgJrkOE0rzQiVFYgMzVFk8oGeKxaHzQskwupYpLsqvLPmuchycVQWV2Vgz4fiK
-         u7jSI+8UUKIN0rrao7v1iXyDGLrvHr9tHa66HMvrDCEWM+wqe2mZSbW5mTFlLTyD5lF1
-         I7mU3a48MjsXv5HCqXfHZwYYl07VuFI4GMFa7WZkyy3Mr++BfuzXgfZkAolFoF5LZEPT
-         2tR1Zs4S9WF9DcNUV8eMK0vi6NMXPtWfmolKSMpvI0OtvzQycSHdk9GL1CPnDhgfwqgC
-         nkUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678197468;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e26yGfrppj54n5vu7MfF/4DYSTLCxazeKAAKghatviY=;
-        b=aCzY/YNEipiwFhHbsDZhS+5ggguMRgToUhueEPlLv0fmmnczfI7HidhjUZBUqfO4Z1
-         /7WsF5NSEnOT7ZUeJlW5Gv5bEX+hpZ/Zkcp17JyZ22bd+cs9W+5npBY2BkMfXk/zKoTY
-         HtLylGrXmHRt3oRnIZPfHjYugp7zfufVGmSQ4Svl4L8wmtYu7LuKAlcrgQIdlTSq+NRl
-         92dCz4ppK2pS5E5Q9WOVaEOSvyEAxsVWJ8+jiHrqUxW43W7lVOnqZFGET38eX+E4cLIh
-         5sjgaCAYMaSzCNh3DzYSVNrAM1MbKfdGRWb3+m8R/NSJOjTiMQpE5lhiS6O4MoXUvw7T
-         KTDA==
-X-Gm-Message-State: AO0yUKWP0WMasAnHUNUqxlEwuSx3dNY517rcO1978YdNQUwPEGy4gSkR
-        baueciDCo+bZVUh3bptDTJM=
-X-Google-Smtp-Source: AK7set9r+bjjz1RVMZbPFkGSq6WmI+Zg//SSBPKYDlE0h7u9jAfa342u/wsZvjs2SDljBlts4ZFswA==
-X-Received: by 2002:a17:903:41c6:b0:19d:181f:511 with SMTP id u6-20020a17090341c600b0019d181f0511mr17521973ple.30.1678197468004;
-        Tue, 07 Mar 2023 05:57:48 -0800 (PST)
-Received: from c1ion.lan ([139.227.13.23])
-        by smtp.gmail.com with ESMTPSA id x7-20020a1709029a4700b0019339f3368asm8535554plv.3.2023.03.07.05.57.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 05:57:47 -0800 (PST)
-From:   MIngyi Cong <congmingyi@gmail.com>
-To:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
-        tom@talpey.com
-Cc:     congmingyi@gmail.com, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org
-Subject: [PATCH v2] fs: add the tuncate check of hfs, exfat and hfsplus
-Date:   Tue,  7 Mar 2023 21:57:40 +0800
-Message-Id: <20230307135740.13209-1-congmingyi@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230304083559.172398-1-congmingyi@gmail.com>
-References: <20230304083559.172398-1-congmingyi@gmail.com>
+        with ESMTP id S232257AbjCGRv3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Mar 2023 12:51:29 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 758CF584A3;
+        Tue,  7 Mar 2023 09:46:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 70A23B819B4;
+        Tue,  7 Mar 2023 17:46:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAF78C433D2;
+        Tue,  7 Mar 2023 17:46:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1678211163;
+        bh=RWAImVFas2It3Rt5Glwm6asNoUdBBRXVmcsw/fEkPH4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=sgTOLRIVgQ856Leb8kAD/fAvza6+B7946ycAShjfMw6VHSJwNTOmwzEi2CUn/nlO5
+         SsxlGNuI19rS+9t5OrhLELIcGlRDh2FBF9UzmBCALVTjYRDljIDY1OZszOPqNDqQhA
+         m43cqr4sjoLbb0A2jXDhIgArVdA3WL3RsrktNYAw=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev, Stefan Metzmacher <metze@samba.org>,
+        Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>,
+        Long Li <longli@microsoft.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        linux-cifs@vger.kernel.org, Steve French <stfrench@microsoft.com>
+Subject: [PATCH 6.2 0774/1001] cifs: introduce cifs_io_parms in smb2_async_writev()
+Date:   Tue,  7 Mar 2023 17:59:06 +0100
+Message-Id: <20230307170055.341925106@linuxfoundation.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230307170022.094103862@linuxfoundation.org>
+References: <20230307170022.094103862@linuxfoundation.org>
+User-Agent: quilt/0.67
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-HFS, EXFAT and HFSPLUS will fill zero data in truncated range.
-Fix this by adding *_SUPER_MAGIC check.
+From: Stefan Metzmacher <metze@samba.org>
 
-Signed-off-by: MIngyi Cong <congmingyi@gmail.com>
+commit d643a8a446fc46c06837d08a056f69da2ff16025 upstream.
+
+This will simplify the following changes and makes it easy to get
+in passed in from the caller in future.
+
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Long Li <longli@microsoft.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
-V1 -> V2: add the truncate check of hfs and remove EXFAT_SUPER_MAGIC in magic.h
- fs/ksmbd/smb2pdu.c         | 5 ++++-
- include/uapi/linux/magic.h | 2 ++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ fs/cifs/smb2pdu.c |   53 +++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 39 insertions(+), 14 deletions(-)
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 0685c1c77b9f..881a2b37fab0 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -5746,7 +5746,10 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- 	 * truncate of some filesystem like FAT32 fill zero data in
- 	 * truncated range.
- 	 */
--	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC) {
-+	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC ||
-+		inode->i_sb->s_magic != EXFAT_SUPER_MAGIC ||
-+		inode->i_sb->s_magic != HFSPLUS_SUPER_MAGIC ||
-+		inode->i_sb->s_magic != HFS_SUPER_MAGIC) {
- 		ksmbd_debug(SMB, "truncated to newsize %lld\n", newsize);
- 		rc = ksmbd_vfs_truncate(work, fp, newsize);
- 		if (rc) {
-diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
-index 6325d1d0e90f..db2c81755025 100644
---- a/include/uapi/linux/magic.h
-+++ b/include/uapi/linux/magic.h
-@@ -46,6 +46,8 @@
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -4504,10 +4504,27 @@ smb2_async_writev(struct cifs_writedata
+ 	struct kvec iov[1];
+ 	struct smb_rqst rqst = { };
+ 	unsigned int total_len;
++	struct cifs_io_parms _io_parms;
++	struct cifs_io_parms *io_parms = NULL;
  
- #define MSDOS_SUPER_MAGIC	0x4d44		/* MD */
- #define EXFAT_SUPER_MAGIC	0x2011BAB0
-+#define HFSPLUS_SUPER_MAGIC	0x482b		/* HFSPLUS */
-+#define HFS_SUPER_MAGIC	0x4244		/* "BD": HFS MDB (super block) */
- #define NCP_SUPER_MAGIC		0x564c		/* Guess, what 0x564c is :-) */
- #define NFS_SUPER_MAGIC		0x6969
- #define OCFS2_SUPER_MAGIC	0x7461636f
--- 
-2.34.1
+ 	if (!wdata->server)
+ 		server = wdata->server = cifs_pick_channel(tcon->ses);
+ 
++	/*
++	 * in future we may get cifs_io_parms passed in from the caller,
++	 * but for now we construct it here...
++	 */
++	_io_parms = (struct cifs_io_parms) {
++		.tcon = tcon,
++		.server = server,
++		.offset = wdata->offset,
++		.length = wdata->bytes,
++		.persistent_fid = wdata->cfile->fid.persistent_fid,
++		.volatile_fid = wdata->cfile->fid.volatile_fid,
++		.pid = wdata->pid,
++	};
++	io_parms = &_io_parms;
++
+ 	rc = smb2_plain_req_init(SMB2_WRITE, tcon, server,
+ 				 (void **) &req, &total_len);
+ 	if (rc)
+@@ -4517,26 +4534,31 @@ smb2_async_writev(struct cifs_writedata
+ 		flags |= CIFS_TRANSFORM_REQ;
+ 
+ 	shdr = (struct smb2_hdr *)req;
+-	shdr->Id.SyncId.ProcessId = cpu_to_le32(wdata->cfile->pid);
++	shdr->Id.SyncId.ProcessId = cpu_to_le32(io_parms->pid);
+ 
+-	req->PersistentFileId = wdata->cfile->fid.persistent_fid;
+-	req->VolatileFileId = wdata->cfile->fid.volatile_fid;
++	req->PersistentFileId = io_parms->persistent_fid;
++	req->VolatileFileId = io_parms->volatile_fid;
+ 	req->WriteChannelInfoOffset = 0;
+ 	req->WriteChannelInfoLength = 0;
+ 	req->Channel = 0;
+-	req->Offset = cpu_to_le64(wdata->offset);
++	req->Offset = cpu_to_le64(io_parms->offset);
+ 	req->DataOffset = cpu_to_le16(
+ 				offsetof(struct smb2_write_req, Buffer));
+ 	req->RemainingBytes = 0;
+ 
+-	trace_smb3_write_enter(0 /* xid */, wdata->cfile->fid.persistent_fid,
+-		tcon->tid, tcon->ses->Suid, wdata->offset, wdata->bytes);
++	trace_smb3_write_enter(0 /* xid */,
++			       io_parms->persistent_fid,
++			       io_parms->tcon->tid,
++			       io_parms->tcon->ses->Suid,
++			       io_parms->offset,
++			       io_parms->length);
++
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	/*
+ 	 * If we want to do a server RDMA read, fill in and append
+ 	 * smbd_buffer_descriptor_v1 to the end of write request
+ 	 */
+-	if (server->rdma && !server->sign && wdata->bytes >=
++	if (server->rdma && !server->sign && io_parms->length >=
+ 		server->smbd_conn->rdma_readwrite_threshold) {
+ 
+ 		struct smbd_buffer_descriptor_v1 *v1;
+@@ -4590,14 +4612,14 @@ smb2_async_writev(struct cifs_writedata
+ 	}
+ #endif
+ 	cifs_dbg(FYI, "async write at %llu %u bytes\n",
+-		 wdata->offset, wdata->bytes);
++		 io_parms->offset, io_parms->length);
+ 
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	/* For RDMA read, I/O size is in RemainingBytes not in Length */
+ 	if (!wdata->mr)
+-		req->Length = cpu_to_le32(wdata->bytes);
++		req->Length = cpu_to_le32(io_parms->length);
+ #else
+-	req->Length = cpu_to_le32(wdata->bytes);
++	req->Length = cpu_to_le32(io_parms->length);
+ #endif
+ 
+ 	if (wdata->credits.value > 0) {
+@@ -4605,7 +4627,7 @@ smb2_async_writev(struct cifs_writedata
+ 						    SMB2_MAX_BUFFER_SIZE));
+ 		shdr->CreditRequest = cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 8);
+ 
+-		rc = adjust_credits(server, &wdata->credits, wdata->bytes);
++		rc = adjust_credits(server, &wdata->credits, io_parms->length);
+ 		if (rc)
+ 			goto async_writev_out;
+ 
+@@ -4618,9 +4640,12 @@ smb2_async_writev(struct cifs_writedata
+ 
+ 	if (rc) {
+ 		trace_smb3_write_err(0 /* no xid */,
+-				     req->PersistentFileId,
+-				     tcon->tid, tcon->ses->Suid, wdata->offset,
+-				     wdata->bytes, rc);
++				     io_parms->persistent_fid,
++				     io_parms->tcon->tid,
++				     io_parms->tcon->ses->Suid,
++				     io_parms->offset,
++				     io_parms->length,
++				     rc);
+ 		kref_put(&wdata->refcount, release);
+ 		cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
+ 	}
+
 
