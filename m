@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FBAC742A7
-	for <linux-cifs@archiver.kernel.org>; Wed,  8 Mar 2023 14:39:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC17FC6FD1E
+	for <linux-cifs@archiver.kernel.org>; Wed,  8 Mar 2023 16:55:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232268AbjCHOji (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 8 Mar 2023 09:39:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48504 "EHLO
+        id S230050AbjCHQy7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 8 Mar 2023 11:54:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231549AbjCHOjR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 Mar 2023 09:39:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2848C305F6
-        for <linux-cifs@vger.kernel.org>; Wed,  8 Mar 2023 06:38:22 -0800 (PST)
+        with ESMTP id S229529AbjCHQym (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 Mar 2023 11:54:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C7766D07
+        for <linux-cifs@vger.kernel.org>; Wed,  8 Mar 2023 08:53:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678286301;
+        s=mimecast20190719; t=1678294403;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t6OAyEYn0daMnp8L9pWL3EjurZ3FwJIkgFcgCsYP8ro=;
-        b=D5BzN3SvnWLIMiWlIziLC31sMPI0vptz4Q3jvEiQ+kg2tdXNkpMcj9XKDRE5KCK6YSuY6K
-        Xavb7koOY8ruLfyn95cxnPN336VDaWhEX0AnoL34ur0c7Njq6FGvjBMh2lNeF9WCe5k9Yw
-        EBf2oX++5ARJBjNX0ouiTVBJMURuylk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=cO3np2De/ugwikklpZQNS+rZPSCRCQBh402/ZSlB0NU=;
+        b=EDqA9xZJ2mtVbP68Kf8IaFXwyJM4bw0wYVri0OtKRxuiRITb6iPmvKiMCWbYcqItmQp4pV
+        JC6TVpAktykQDP38AQO9vHCDKPeEtr3GrhTdRgOn/HKdzR///RsLXuZnQ6dt8Rneln2N2y
+        5cXo4i4msW4tKeFQp7IyuJ9CW9fH1Fs=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-373-z2E0ldL8PlCMxbtTf0W6YQ-1; Wed, 08 Mar 2023 09:38:18 -0500
-X-MC-Unique: z2E0ldL8PlCMxbtTf0W6YQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-582-VQJz-tdFMcWDa0obmcHkjg-1; Wed, 08 Mar 2023 11:53:20 -0500
+X-MC-Unique: VQJz-tdFMcWDa0obmcHkjg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 135FD802DD4;
-        Wed,  8 Mar 2023 14:38:17 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 137A33C10C6C;
+        Wed,  8 Mar 2023 16:53:19 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CF5211121314;
-        Wed,  8 Mar 2023 14:38:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CE7BC2026D4B;
+        Wed,  8 Mar 2023 16:53:16 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,14 +53,14 @@ Cc:     David Howells <dhowells@redhat.com>,
         Steve French <smfrench@gmail.com>,
         Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
-Subject: [PATCH v16 06/13] splice: Do splice read from a file without using ITER_PIPE
-Date:   Wed,  8 Mar 2023 14:37:47 +0000
-Message-Id: <20230308143754.1976726-7-dhowells@redhat.com>
-In-Reply-To: <20230308143754.1976726-1-dhowells@redhat.com>
-References: <20230308143754.1976726-1-dhowells@redhat.com>
+Subject: [PATCH v17 07/14] splice: Do splice read from a file without using ITER_PIPE
+Date:   Wed,  8 Mar 2023 16:52:44 +0000
+Message-Id: <20230308165251.2078898-8-dhowells@redhat.com>
+In-Reply-To: <20230308165251.2078898-1-dhowells@redhat.com>
+References: <20230308165251.2078898-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -172,7 +172,7 @@ index 4d4a2d82636d..321f9b7c84c9 100644
 -	return filemap_splice_read(in, ppos, pipe, len, flags);
 -}
 diff --git a/fs/splice.c b/fs/splice.c
-index abd21a455a2b..9c6adcd0a2e9 100644
+index 90ccd3666dca..f46dd1fb367b 100644
 --- a/fs/splice.c
 +++ b/fs/splice.c
 @@ -387,29 +387,13 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
