@@ -2,211 +2,226 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A692C64EC4
-	for <linux-cifs@archiver.kernel.org>; Wed,  8 Mar 2023 06:30:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FBAC742A7
+	for <linux-cifs@archiver.kernel.org>; Wed,  8 Mar 2023 14:39:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbjCHGah (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 8 Mar 2023 01:30:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49648 "EHLO
+        id S232268AbjCHOji (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 8 Mar 2023 09:39:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229705AbjCHGag (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 Mar 2023 01:30:36 -0500
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32AF5550E
-        for <linux-cifs@vger.kernel.org>; Tue,  7 Mar 2023 22:30:34 -0800 (PST)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-536c2a1cc07so287767897b3.5
-        for <linux-cifs@vger.kernel.org>; Tue, 07 Mar 2023 22:30:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678257034;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qaln0Re/T9LgFOmQRMX1USshCsX1jqXjzhSXOwG35c0=;
-        b=JAcPFEIJbPIXXzWUIcOb0OorflRUq7o1L9VelEkCgAnvOfXq5nH99z1yJINDDQaxWb
-         BgLP3w9pIYCkpAlvtUXiVbFR29fhEvAib0/Lw03trlE5t+cfvzAAb8LXKYn5JQCptE6C
-         CSSCCqBxu1Ml4BeegDHqqmWXDhPBNpvO+H9c0geeDkr5QWdl5qDM29cfNBa4PUSDTKNw
-         akHMOH3A97IEh94YD/+/iUFbJdVaYRL4vpLT8pvOMM8y1N2oiOo9bPlfYair/piyC65v
-         LNyYZp/M4CWNnD8njlbHIPu6rhsh/xz7Vfomu8qqEXRMYXBuSJb7bPtMhRuHNwrv9MLE
-         pSQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678257034;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qaln0Re/T9LgFOmQRMX1USshCsX1jqXjzhSXOwG35c0=;
-        b=5TZ3BWRJHTxhD8wioMvRVx+8Y197RzbqfZw+VgtKfjSyv1HVVvdR6SOhEi11XokOMa
-         PkSfexYk2MTgHFayxhUz/qTcMC/3A7rtdPUYAwU3t+dLkFKzROX0dqavN7Dc9Qbmyioj
-         0DKOhF1AJ5SixEVDPTTrdcyVTq0Om5U5IgQXNx6fIUUajDjjEGD5O1JpkIwp6TGsMsnD
-         uIvlBMddcxegO/CvgEdS6fo9hGFl62vOU3ZGhxjD+/pdUBwFXxz2ev26+XjTruwk0tgw
-         8BDiyRKxh7zP9ymRu6dyqLQYCnUjsdQISXZ6RpYsgrWpC4xfZXQxYaO46R0HYr4tYxmS
-         O9SA==
-X-Gm-Message-State: AO0yUKXIUzlViFyT4n5ta/GIkWSM02p3QZr5e29b0NliyIvPGUe2slSQ
-        uH0w5pvPLOeJmiZaPP6U8QL59tY1oA5sqlXMTP0V7Rdbwis=
-X-Google-Smtp-Source: AK7set+pDdvf8n5iKbTDOT5ET0KySkbVVxKZoUtuJBCUBhGck/SiZAR4lq+0gy4wshk4UR+/6hs/yG0l1OMv2mEvRuw=
-X-Received: by 2002:a81:a906:0:b0:536:38b4:f50 with SMTP id
- g6-20020a81a906000000b0053638b40f50mr11028976ywh.1.1678257034038; Tue, 07 Mar
- 2023 22:30:34 -0800 (PST)
+        with ESMTP id S231549AbjCHOjR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 Mar 2023 09:39:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2848C305F6
+        for <linux-cifs@vger.kernel.org>; Wed,  8 Mar 2023 06:38:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678286301;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=t6OAyEYn0daMnp8L9pWL3EjurZ3FwJIkgFcgCsYP8ro=;
+        b=D5BzN3SvnWLIMiWlIziLC31sMPI0vptz4Q3jvEiQ+kg2tdXNkpMcj9XKDRE5KCK6YSuY6K
+        Xavb7koOY8ruLfyn95cxnPN336VDaWhEX0AnoL34ur0c7Njq6FGvjBMh2lNeF9WCe5k9Yw
+        EBf2oX++5ARJBjNX0ouiTVBJMURuylk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-373-z2E0ldL8PlCMxbtTf0W6YQ-1; Wed, 08 Mar 2023 09:38:18 -0500
+X-MC-Unique: z2E0ldL8PlCMxbtTf0W6YQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 135FD802DD4;
+        Wed,  8 Mar 2023 14:38:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CF5211121314;
+        Wed,  8 Mar 2023 14:38:14 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Steve French <smfrench@gmail.com>,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
+Subject: [PATCH v16 06/13] splice: Do splice read from a file without using ITER_PIPE
+Date:   Wed,  8 Mar 2023 14:37:47 +0000
+Message-Id: <20230308143754.1976726-7-dhowells@redhat.com>
+In-Reply-To: <20230308143754.1976726-1-dhowells@redhat.com>
+References: <20230308143754.1976726-1-dhowells@redhat.com>
 MIME-Version: 1.0
-References: <CADJHv_s5s=Di_buo_1ENgJQjO_qR_tcKf+UySfdCR0k0+g2Dxw@mail.gmail.com>
- <CAH2r5mvyVuhk8-VAaNxg8RfF-CK=yd5_6i75enOut7x5qTHE4w@mail.gmail.com>
-In-Reply-To: <CAH2r5mvyVuhk8-VAaNxg8RfF-CK=yd5_6i75enOut7x5qTHE4w@mail.gmail.com>
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-Date:   Wed, 8 Mar 2023 14:30:22 +0800
-Message-ID: <CADJHv_srMcKf8-5qu_d=EwoLFyHow4HDxXo9-tr5E8+41rm9rA@mail.gmail.com>
-Subject: Re: cifs xfstests aio-dio-invalidate-failure test fail after 6.3 merge
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi
+Make generic_file_splice_read() use filemap_splice_read() and
+direct_splice_read() rather than using an ITER_PIPE and call_read_iter().
 
-Sorry for the late.
+Make cifs use generic_file_splice_read() rather than doing it for itself.
 
-On Tue, Feb 28, 2023 at 2:04=E2=80=AFPM Steve French <smfrench@gmail.com> w=
-rote:
->
-> Do you see this with the fixes from David Howells in cifs for next?
-I can't reproduce it on cifs for-next or Linus tree any more.
+Unexport filemap_splice_read().
 
-Thanks,
->
-> On Tue, Feb 28, 2023, 00:00 Murphy Zhou <jencce.kernel@gmail.com> wrote:
->>
->> Hi,
->>
->> It is xfstests generic/208. It passed with the v6.2 release.
->>
->> The similar WARNING can be triggered with the v6.2 release without the
->> "cache=3Dnone" mount option.
->>
->>
->> Thanks,
->> Murphy
->>
->> Test log with kernel built on the top of commit f3a2439f20d9:
->>
->> # FS QA Test No. 208
->> #
->> # Run aio-dio-invalidate-failure - test race in read cache invalidation
->> #
->>
->> FSTYP         -- cifs
->> PLATFORM      -- Linux/x86_64 xzhouw2 6.2.0+ #3 SMP PREEMPT_DYNAMIC
->> Mon Feb 27 12:18:03 CST 2023
->> MKFS_OPTIONS  -- //localhost/scratch
->> MOUNT_OPTIONS -- -o vers=3D3.11,username=3Droot,
->> password=3Dredhat,mfsymlinks,cache=3Dnone -o
->> context=3Dsystem_u:object_r:nfs_t:s0 //localhost/scratch /cifssch
->>
->> generic/208 200s ...  [13:01:11][failed, exit status 1] [13:01:53]-
->> output mismatch (see
->> /root/upstream/xfstests/results//generic/208.out.bad)
->>     --- tests/generic/208.out    2022-09-13 10:27:36.077029036 +0800
->>     +++ /root/upstream/xfstests/results//generic/208.out.bad
->> 2023-02-27 13:01:53.189534533 +0800
->>     @@ -1,2 +1,2 @@
->>      QA output created by 208
->>     -ran for 200 seconds without error, passing
->>     +buffered write returned -1_check_dmesg: something found in dmesg
->> (see /root/upstream/xfstests/results//generic/208.dmesg)
->> Ran: generic/208
->> Failures: generic/208
->> Failed 1 of 1 tests
->>
->> [   30.762541] run fstests generic/208 at 2023-02-27 13:01:11
->> [   72.029275] ------------[ cut here ]------------
->> [   72.029279] WARNING: CPU: 0 PID: 3064 at mm/gup.c:218
->> try_grab_page+0x65/0x100
->> [   72.029288] Modules linked in: cifs rdma_cm iw_cm ib_cm ib_core
->> dns_resolver fscache netfs loop xt_CHECKSUM xt_MASQUERADE xt_conntrack
->> ipt_REJECT nf_reject_ipv4 nft_compat nft_chain_nat nf_nat nf_conntrack
->> nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink bridge stp llc
->> rfkill sunrpc snd_hda_codec_generic ledtrig_audio snd_hda_intel
->> snd_intel_dspcfg snd_intel_sdw_acpi snd_hda_codec snd_hda_core
->> intel_rapl_msr snd_hwdep intel_rapl_common snd_seq
->> intel_uncore_frequency_common isst_if_common snd_seq_device snd_pcm
->> nfit snd_timer crct10dif_pclmul crc32_pclmul ghash_clmulni_intel snd
->> rapl iTCO_wdt i2c_i801 iTCO_vendor_support soundcore pcspkr i2c_smbus
->> lpc_ich joydev virtio_balloon xfs libcrc32c qxl drm_ttm_helper ttm
->> drm_kms_helper sr_mod cdrom sg syscopyarea sysfillrect sysimgblt drm
->> ahci libahci libata virtio_net crc32c_intel net_failover serio_raw
->> virtio_blk virtio_scsi virtio_console failover dm_mirror
->> dm_region_hash dm_log dm_mod fuse
->> [   72.029345] CPU: 0 PID: 3064 Comm: aio-dio-invalid Not tainted 6.2.0+=
- #3
->> [   72.029347] Hardware name: Red Hat RHEL/RHEL-AV, BIOS
->> 1.15.0-2.module+el8.6.0+14757+c25ee005 04/01/2014
->> [   72.029349] RIP: 0010:try_grab_page+0x65/0x100
->> [   72.029351] Code: 48 89 fa f7 c7 ff 0f 00 00 75 d1 48 8b 07 a9 00
->> 00 01 00 74 c7 48 8b 47 48 48 8d 50 ff a8 01 48 0f 44 d7 8b 42 34 85
->> c0 7f b9 <0f> 0b b8 f4 ff ff ff c3 cc cc cc cc 31 c0 81 e6 00 00 08 00
->> 74 32
->> [   72.029353] RSP: 0018:ffffb14582f8fa80 EFLAGS: 00010282
->> [   72.029354] RAX: 0000000080000001 RBX: ffffd79904a08568 RCX: 80000000=
-00000225
->> [   72.029356] RDX: ffffd7990042fd80 RSI: 0000000000290000 RDI: ffffd799=
-0042fd80
->> [   72.029357] RBP: ffffa00be8215020 R08: 0000000000000000 R09: 00000000=
-00000043
->> [   72.029358] R10: ffffa00be9c50a00 R11: 0000000000000000 R12: 00000000=
-00290000
->> [   72.029358] R13: 8000000010bf6225 R14: ffffd7990042fd80 R15: 00000000=
-00080000
->> [   72.029362] FS:  00007fb185af2740(0000) GS:ffffa01aff600000(0000)
->> knlGS:0000000000000000
->> [   72.029363] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> [   72.029364] CR2: 000055725030d000 CR3: 000000010ff24002 CR4: 00000000=
-007706f0
->> [   72.029365] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000=
-00000000
->> [   72.029366] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000=
-00000400
->> [   72.029367] PKRU: 55555554
->> [   72.029368] Call Trace:
->> [   72.029369]  <TASK>
->> [   72.029370]  follow_page_pte+0x1a7/0x570
->> [   72.029374]  __get_user_pages+0x1a2/0x650
->> [   72.029376]  __gup_longterm_locked+0xdc/0xb50
->> [   72.029379]  internal_get_user_pages_fast+0x17f/0x310
->> [   72.029382]  pin_user_pages_fast+0x46/0x60
->> [   72.029384]  iov_iter_extract_pages+0xc9/0x510
->> [   72.029388]  ? __kmalloc_large_node+0xb1/0x120
->> [   72.029392]  ? __kmalloc_node+0xbe/0x130
->> [   72.029394]  netfs_extract_user_iter+0xbf/0x200 [netfs]
->> [   72.029404]  __cifs_writev+0x150/0x330 [cifs]
->> [   72.029561]  vfs_write+0x2a8/0x3c0
->> [   72.029570]  ksys_pwrite64+0x65/0xa0
->> [   72.029573]  ? syscall_trace_enter.isra.17+0x126/0x1a0
->> [   72.029578]  do_syscall_64+0x58/0x80
->> [   72.029583]  ? exit_to_user_mode_prepare+0x176/0x190
->> [   72.029585]  ? syscall_exit_to_user_mode+0x12/0x30
->> [   72.029589]  ? do_syscall_64+0x67/0x80
->> [   72.029590]  ? syscall_exit_to_user_mode+0x12/0x30
->> [   72.029591]  ? do_syscall_64+0x67/0x80
->> [   72.029592]  ? do_syscall_64+0x67/0x80
->> [   72.029593]  ? do_syscall_64+0x67/0x80
->> [   72.029595]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
->> [   72.029598] RIP: 0033:0x7fb185012448
->> [   72.029601] Code: 89 02 48 c7 c0 ff ff ff ff eb b6 0f 1f 80 00 00
->> 00 00 f3 0f 1e fa 8b 05 06 d0 20 00 49 89 ca 85 c0 75 17 b8 12 00 00
->> 00 0f 05 <48> 3d 00 f0 ff ff 77 60 c3 0f 1f 80 00 00 00 00 41 55 49 89
->> cd 41
->> [   72.029602] RSP: 002b:00007ffd8f67ae48 EFLAGS: 00000246 ORIG_RAX:
->> 0000000000000012
->> [   72.029604] RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007fb1=
-85012448
->> [   72.029605] RDX: 0000000002000000 RSI: 0000000000604000 RDI: 00000000=
-00000004
->> [   72.029606] RBP: 0000000000000003 R08: 0000000000000000 R09: 00007fb1=
-8521b2f0
->> [   72.029606] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000=
-00000004
->> [   72.029607] R13: 00007ffd8f67aff0 R14: 0000000000000000 R15: 00000000=
-00000000
->> [   72.029609]  </TASK>
->> [   72.029610] ---[ end trace 0000000000000000 ]---
->> [   72.029612] netfs: Couldn't get user pages (rc=3D-12)
+With this, ITER_PIPE is no longer used.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Steve French <smfrench@gmail.com>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: linux-mm@kvack.org
+cc: linux-block@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/cifs/cifsfs.c |  8 ++++----
+ fs/cifs/cifsfs.h |  3 ---
+ fs/cifs/file.c   | 16 ----------------
+ fs/splice.c      | 30 +++++++-----------------------
+ mm/filemap.c     |  1 -
+ 5 files changed, 11 insertions(+), 47 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index cbcf210d56e4..ba963a26cb19 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1359,7 +1359,7 @@ const struct file_operations cifs_file_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+-	.splice_read = cifs_splice_read,
++	.splice_read = generic_file_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1379,7 +1379,7 @@ const struct file_operations cifs_file_strict_ops = {
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+-	.splice_read = cifs_splice_read,
++	.splice_read = generic_file_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1417,7 +1417,7 @@ const struct file_operations cifs_file_nobrl_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+-	.splice_read = cifs_splice_read,
++	.splice_read = generic_file_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1435,7 +1435,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+-	.splice_read = cifs_splice_read,
++	.splice_read = generic_file_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 71fe0a0a7992..8b239854e590 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -100,9 +100,6 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
+-extern ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
+-				struct pipe_inode_info *pipe, size_t len,
+-				unsigned int flags);
+ extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
+ extern int cifs_lock(struct file *, int, struct file_lock *);
+ extern int cifs_fsync(struct file *, loff_t, loff_t, int);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 4d4a2d82636d..321f9b7c84c9 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -5066,19 +5066,3 @@ const struct address_space_operations cifs_addr_ops_smallbuf = {
+ 	.launder_folio = cifs_launder_folio,
+ 	.migrate_folio = filemap_migrate_folio,
+ };
+-
+-/*
+- * Splice data from a file into a pipe.
+- */
+-ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
+-			 struct pipe_inode_info *pipe, size_t len,
+-			 unsigned int flags)
+-{
+-	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
+-		return 0;
+-	if (unlikely(!len))
+-		return 0;
+-	if (in->f_flags & O_DIRECT)
+-		return direct_splice_read(in, ppos, pipe, len, flags);
+-	return filemap_splice_read(in, ppos, pipe, len, flags);
+-}
+diff --git a/fs/splice.c b/fs/splice.c
+index abd21a455a2b..9c6adcd0a2e9 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -387,29 +387,13 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
+ 				 struct pipe_inode_info *pipe, size_t len,
+ 				 unsigned int flags)
+ {
+-	struct iov_iter to;
+-	struct kiocb kiocb;
+-	int ret;
+-
+-	iov_iter_pipe(&to, ITER_DEST, pipe, len);
+-	init_sync_kiocb(&kiocb, in);
+-	kiocb.ki_pos = *ppos;
+-	ret = call_read_iter(in, &kiocb, &to);
+-	if (ret > 0) {
+-		*ppos = kiocb.ki_pos;
+-		file_accessed(in);
+-	} else if (ret < 0) {
+-		/* free what was emitted */
+-		pipe_discard_from(pipe, to.start_head);
+-		/*
+-		 * callers of ->splice_read() expect -EAGAIN on
+-		 * "can't put anything in there", rather than -EFAULT.
+-		 */
+-		if (ret == -EFAULT)
+-			ret = -EAGAIN;
+-	}
+-
+-	return ret;
++	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
++		return 0;
++	if (unlikely(!len))
++		return 0;
++	if (in->f_flags & O_DIRECT)
++		return direct_splice_read(in, ppos, pipe, len, flags);
++	return filemap_splice_read(in, ppos, pipe, len, flags);
+ }
+ EXPORT_SYMBOL(generic_file_splice_read);
+ 
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 2723104cc06a..3a93515ae2ed 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2967,7 +2967,6 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+ 
+ 	return total_spliced ? total_spliced : error;
+ }
+-EXPORT_SYMBOL(filemap_splice_read);
+ 
+ static inline loff_t folio_seek_hole_data(struct xa_state *xas,
+ 		struct address_space *mapping, struct folio *folio,
+
