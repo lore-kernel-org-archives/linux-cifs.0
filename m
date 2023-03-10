@@ -2,226 +2,195 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC17FC6FD1E
-	for <linux-cifs@archiver.kernel.org>; Wed,  8 Mar 2023 16:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A33BC6FD1F
+	for <linux-cifs@archiver.kernel.org>; Fri, 10 Mar 2023 15:45:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230050AbjCHQy7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 8 Mar 2023 11:54:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50868 "EHLO
+        id S232110AbjCJPpB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 10 Mar 2023 10:45:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbjCHQym (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 Mar 2023 11:54:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C7766D07
-        for <linux-cifs@vger.kernel.org>; Wed,  8 Mar 2023 08:53:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678294403;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cO3np2De/ugwikklpZQNS+rZPSCRCQBh402/ZSlB0NU=;
-        b=EDqA9xZJ2mtVbP68Kf8IaFXwyJM4bw0wYVri0OtKRxuiRITb6iPmvKiMCWbYcqItmQp4pV
-        JC6TVpAktykQDP38AQO9vHCDKPeEtr3GrhTdRgOn/HKdzR///RsLXuZnQ6dt8Rneln2N2y
-        5cXo4i4msW4tKeFQp7IyuJ9CW9fH1Fs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-582-VQJz-tdFMcWDa0obmcHkjg-1; Wed, 08 Mar 2023 11:53:20 -0500
-X-MC-Unique: VQJz-tdFMcWDa0obmcHkjg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 137A33C10C6C;
-        Wed,  8 Mar 2023 16:53:19 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CE7BC2026D4B;
-        Wed,  8 Mar 2023 16:53:16 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Steve French <smfrench@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
-Subject: [PATCH v17 07/14] splice: Do splice read from a file without using ITER_PIPE
-Date:   Wed,  8 Mar 2023 16:52:44 +0000
-Message-Id: <20230308165251.2078898-8-dhowells@redhat.com>
-In-Reply-To: <20230308165251.2078898-1-dhowells@redhat.com>
-References: <20230308165251.2078898-1-dhowells@redhat.com>
+        with ESMTP id S234457AbjCJPop (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 10 Mar 2023 10:44:45 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9115125DAD
+        for <linux-cifs@vger.kernel.org>; Fri, 10 Mar 2023 07:32:50 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id qa18-20020a17090b4fd200b0023750b675f5so10211376pjb.3
+        for <linux-cifs@vger.kernel.org>; Fri, 10 Mar 2023 07:32:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678462370;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gLhrp//XsD+C95FDg8T1gfm9S5ECm9FE3n839Gavxdk=;
+        b=jpMzea76/WCNXSipgX5Z4PmSbmKuQg72V1pmeKM09ndEj0EmKnafyMdb2pXA1EbqYb
+         DE+xzYnjcNl24krA7KlO7QDChObxbYIq8JPA0cxNmcM0cCFIKQD/gYegTrPoWzdZQiGx
+         L0Dy6OtPNn66/Xz+mcAHsM/DZssbHVH/UhkRHLM6Jk/uxXNX9OFtsBdpVUwQGOR7vZkX
+         RQfjL744Lw8gD8ny6BiFkP7xDPGRnQC3q0DV0qMu5FFTRNCrWdDz/qAIhJYZ8gqxOuZg
+         g1j7xNPAY5sphRR4GzOOGnXak/ey0DeKxifTBvOpwvQFV2c+as0nyeG3IGBsKOSABEZq
+         gEPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678462370;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gLhrp//XsD+C95FDg8T1gfm9S5ECm9FE3n839Gavxdk=;
+        b=Pz7OANd55Y2a77+8zxCPz5kgA+A0yG7boDdmFTMXjduk48uu+uHnNCm3LHZEUfZsbp
+         IGHGK4xbHAqMN4peuUeEWCvRZD7caJa+14ZemnEoy0tjcJiP5fBrWXCOpkJn0Uf2qhgZ
+         dCBDgY4xJ8y/+RD1ZNJ3ln1pGc0eN3uekg4xqSiuQ+bN7AaDXaSGOXLF8ddkRgp/VW0r
+         WroobjJWofzXpn4P9KSHrjgW8u8wQ9lcs2GxjMi47JM9sFAQvmn+/7wqAeloZGMqByE2
+         Zk0sfMpBUXCxgFV8SNPunT3zWUBwN5TszJkaYbrO0QeBFQZCyJWsSehbX6laSh0FCB6I
+         OsLg==
+X-Gm-Message-State: AO0yUKXTcoVGNci+ZSQVxqKtqyeFu5QO+Uqucv8qR7FTJINDcqddO03e
+        7hXpkTgHdF2dwFmuIUnKjXRSVF0apTQ7qvD5
+X-Google-Smtp-Source: AK7set9H/eCEG0mvoUuQpcjgPJ7byVAtuQ5YkoWc5rILCMrXrjuHWghdpB4B0Oc9ZkIrmTATAPVPKA==
+X-Received: by 2002:a17:90a:e7c7:b0:237:7891:1ea4 with SMTP id kb7-20020a17090ae7c700b0023778911ea4mr26730454pjb.18.1678462369831;
+        Fri, 10 Mar 2023 07:32:49 -0800 (PST)
+Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:3:7e0c:5dff:fea8:2c14])
+        by smtp.gmail.com with ESMTPSA id h7-20020a17090a604700b00230b8402760sm71637pjm.38.2023.03.10.07.32.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Mar 2023 07:32:49 -0800 (PST)
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+X-Google-Original-From: Shyam Prasad N <sprasad@microsoft.com>
+To:     smfrench@gmail.com, bharathsm.hsk@gmail.com, pc@cjr.nz,
+        tom@talpey.com, linux-cifs@vger.kernel.org
+Cc:     Shyam Prasad N <sprasad@microsoft.com>
+Subject: [PATCH 01/11] cifs: fix tcon status change after tree connect
+Date:   Fri, 10 Mar 2023 15:32:00 +0000
+Message-Id: <20230310153211.10982-1-sprasad@microsoft.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make generic_file_splice_read() use filemap_splice_read() and
-direct_splice_read() rather than using an ITER_PIPE and call_read_iter().
+After cifs_tree_connect, tcon status should not be
+set to TID_GOOD. There could still be files that need
+reopen. The status should instead be changed to
+TID_NEED_FILES_INVALIDATE. That way, after reopen of
+files, the status can be changed to TID_GOOD.
 
-Make cifs use generic_file_splice_read() rather than doing it for itself.
-
-Unexport filemap_splice_read().
-
-With this, ITER_PIPE is no longer used.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Steve French <smfrench@gmail.com>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: linux-mm@kvack.org
-cc: linux-block@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/cifs/cifsfs.c |  8 ++++----
- fs/cifs/cifsfs.h |  3 ---
- fs/cifs/file.c   | 16 ----------------
- fs/splice.c      | 30 +++++++-----------------------
- mm/filemap.c     |  1 -
- 5 files changed, 11 insertions(+), 47 deletions(-)
+ fs/cifs/cifsglob.h |  2 +-
+ fs/cifs/connect.c  | 14 ++++++++++----
+ fs/cifs/dfs.c      | 16 +++++++++++-----
+ fs/cifs/file.c     | 10 +++++-----
+ 4 files changed, 27 insertions(+), 15 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index cbcf210d56e4..ba963a26cb19 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1359,7 +1359,7 @@ const struct file_operations cifs_file_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap  = cifs_file_mmap,
--	.splice_read = cifs_splice_read,
-+	.splice_read = generic_file_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -1379,7 +1379,7 @@ const struct file_operations cifs_file_strict_ops = {
- 	.fsync = cifs_strict_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_strict_mmap,
--	.splice_read = cifs_splice_read,
-+	.splice_read = generic_file_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -1417,7 +1417,7 @@ const struct file_operations cifs_file_nobrl_ops = {
- 	.fsync = cifs_fsync,
- 	.flush = cifs_flush,
- 	.mmap  = cifs_file_mmap,
--	.splice_read = cifs_splice_read,
-+	.splice_read = generic_file_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-@@ -1435,7 +1435,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
- 	.fsync = cifs_strict_fsync,
- 	.flush = cifs_flush,
- 	.mmap = cifs_file_strict_mmap,
--	.splice_read = cifs_splice_read,
-+	.splice_read = generic_file_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.llseek = cifs_llseek,
- 	.unlocked_ioctl	= cifs_ioctl,
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index 71fe0a0a7992..8b239854e590 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -100,9 +100,6 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
- extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
- extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
- extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
--extern ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
--				struct pipe_inode_info *pipe, size_t len,
--				unsigned int flags);
- extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
- extern int cifs_lock(struct file *, int, struct file_lock *);
- extern int cifs_fsync(struct file *, loff_t, loff_t, int);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index a99883f16d94..8a37b1553dc6 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -137,7 +137,7 @@ enum tid_status_enum {
+ 	TID_NEED_RECON,
+ 	TID_NEED_TCON,
+ 	TID_IN_TCON,
+-	TID_NEED_FILES_INVALIDATE, /* currently unused */
++	TID_NEED_FILES_INVALIDATE,
+ 	TID_IN_FILES_INVALIDATE
+ };
+ 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 5233f14f0636..3d07729c91a1 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -4038,9 +4038,15 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
+ 
+ 	/* only send once per connect */
+ 	spin_lock(&tcon->tc_lock);
+-	if (tcon->ses->ses_status != SES_GOOD ||
+-	    (tcon->status != TID_NEW &&
+-	    tcon->status != TID_NEED_TCON)) {
++	if (tcon->status != TID_GOOD &&
++	    tcon->status != TID_NEW &&
++	    tcon->status != TID_NEED_RECON) {
++		spin_unlock(&tcon->tc_lock);
++		return -EHOSTDOWN;
++	}
++
++	if (tcon->status == TID_NEED_FILES_INVALIDATE ||
++	    tcon->status == TID_GOOD) {
+ 		spin_unlock(&tcon->tc_lock);
+ 		return 0;
+ 	}
+@@ -4051,7 +4057,7 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
+ 	if (rc) {
+ 		spin_lock(&tcon->tc_lock);
+ 		if (tcon->status == TID_IN_TCON)
+-			tcon->status = TID_NEED_TCON;
++			tcon->status = TID_NEED_RECON;
+ 		spin_unlock(&tcon->tc_lock);
+ 	} else {
+ 		spin_lock(&tcon->tc_lock);
+diff --git a/fs/cifs/dfs.c b/fs/cifs/dfs.c
+index b64d20374b9c..d37af02902c5 100644
+--- a/fs/cifs/dfs.c
++++ b/fs/cifs/dfs.c
+@@ -479,9 +479,15 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
+ 
+ 	/* only send once per connect */
+ 	spin_lock(&tcon->tc_lock);
+-	if (tcon->ses->ses_status != SES_GOOD ||
+-	    (tcon->status != TID_NEW &&
+-	    tcon->status != TID_NEED_TCON)) {
++	if (tcon->status != TID_GOOD &&
++	    tcon->status != TID_NEW &&
++	    tcon->status != TID_NEED_RECON) {
++		spin_unlock(&tcon->tc_lock);
++		return -EHOSTDOWN;
++	}
++
++	if (tcon->status == TID_NEED_FILES_INVALIDATE ||
++	    tcon->status == TID_GOOD) {
+ 		spin_unlock(&tcon->tc_lock);
+ 		return 0;
+ 	}
+@@ -529,12 +535,12 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
+ 	if (rc) {
+ 		spin_lock(&tcon->tc_lock);
+ 		if (tcon->status == TID_IN_TCON)
+-			tcon->status = TID_NEED_TCON;
++			tcon->status = TID_NEED_RECON;
+ 		spin_unlock(&tcon->tc_lock);
+ 	} else {
+ 		spin_lock(&tcon->tc_lock);
+ 		if (tcon->status == TID_IN_TCON)
+-			tcon->status = TID_GOOD;
++			tcon->status = TID_NEED_FILES_INVALIDATE;
+ 		spin_unlock(&tcon->tc_lock);
+ 		tcon->need_reconnect = false;
+ 	}
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4d4a2d82636d..321f9b7c84c9 100644
+index 4d4a2d82636d..96d865e108f4 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -5066,19 +5066,3 @@ const struct address_space_operations cifs_addr_ops_smallbuf = {
- 	.launder_folio = cifs_launder_folio,
- 	.migrate_folio = filemap_migrate_folio,
- };
--
--/*
-- * Splice data from a file into a pipe.
-- */
--ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
--			 struct pipe_inode_info *pipe, size_t len,
--			 unsigned int flags)
--{
--	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
--		return 0;
--	if (unlikely(!len))
--		return 0;
--	if (in->f_flags & O_DIRECT)
--		return direct_splice_read(in, ppos, pipe, len, flags);
--	return filemap_splice_read(in, ppos, pipe, len, flags);
--}
-diff --git a/fs/splice.c b/fs/splice.c
-index 90ccd3666dca..f46dd1fb367b 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -387,29 +387,13 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
- 				 struct pipe_inode_info *pipe, size_t len,
- 				 unsigned int flags)
- {
--	struct iov_iter to;
--	struct kiocb kiocb;
--	int ret;
--
--	iov_iter_pipe(&to, ITER_DEST, pipe, len);
--	init_sync_kiocb(&kiocb, in);
--	kiocb.ki_pos = *ppos;
--	ret = call_read_iter(in, &kiocb, &to);
--	if (ret > 0) {
--		*ppos = kiocb.ki_pos;
--		file_accessed(in);
--	} else if (ret < 0) {
--		/* free what was emitted */
--		pipe_discard_from(pipe, to.start_head);
--		/*
--		 * callers of ->splice_read() expect -EAGAIN on
--		 * "can't put anything in there", rather than -EFAULT.
--		 */
--		if (ret == -EFAULT)
--			ret = -EAGAIN;
--	}
--
--	return ret;
-+	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
-+		return 0;
-+	if (unlikely(!len))
-+		return 0;
-+	if (in->f_flags & O_DIRECT)
-+		return direct_splice_read(in, ppos, pipe, len, flags);
-+	return filemap_splice_read(in, ppos, pipe, len, flags);
- }
- EXPORT_SYMBOL(generic_file_splice_read);
+@@ -174,13 +174,13 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+ 	struct list_head *tmp1;
  
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 2723104cc06a..3a93515ae2ed 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2967,7 +2967,6 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+ 	/* only send once per connect */
+-	spin_lock(&tcon->ses->ses_lock);
+-	if ((tcon->ses->ses_status != SES_GOOD) || (tcon->status != TID_NEED_RECON)) {
+-		spin_unlock(&tcon->ses->ses_lock);
++	spin_lock(&tcon->tc_lock);
++	if (tcon->status != TID_NEED_FILES_INVALIDATE) {
++		spin_unlock(&tcon->tc_lock);
+ 		return;
+ 	}
+ 	tcon->status = TID_IN_FILES_INVALIDATE;
+-	spin_unlock(&tcon->ses->ses_lock);
++	spin_unlock(&tcon->tc_lock);
  
- 	return total_spliced ? total_spliced : error;
- }
--EXPORT_SYMBOL(filemap_splice_read);
+ 	/* list all files open on tree connection and mark them invalid */
+ 	spin_lock(&tcon->open_file_lock);
+@@ -194,7 +194,7 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+ 	invalidate_all_cached_dirs(tcon);
+ 	spin_lock(&tcon->tc_lock);
+ 	if (tcon->status == TID_IN_FILES_INVALIDATE)
+-		tcon->status = TID_NEED_TCON;
++		tcon->status = TID_GOOD;
+ 	spin_unlock(&tcon->tc_lock);
  
- static inline loff_t folio_seek_hole_data(struct xa_state *xas,
- 		struct address_space *mapping, struct folio *folio,
+ 	/*
+-- 
+2.34.1
 
