@@ -2,159 +2,181 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4901C6FD1E
-	for <linux-cifs@archiver.kernel.org>; Fri, 10 Mar 2023 22:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DAAAC61DA4
+	for <linux-cifs@archiver.kernel.org>; Sat, 11 Mar 2023 04:51:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231707AbjCJWke (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 10 Mar 2023 17:40:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39198 "EHLO
+        id S229541AbjCKEvq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 10 Mar 2023 23:51:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231625AbjCJWk2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 10 Mar 2023 17:40:28 -0500
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7430312DDEB
-        for <linux-cifs@vger.kernel.org>; Fri, 10 Mar 2023 14:40:22 -0800 (PST)
-Received: by mail-lj1-x22c.google.com with SMTP id h3so6885414lja.12
-        for <linux-cifs@vger.kernel.org>; Fri, 10 Mar 2023 14:40:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678488020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cQ30MQ4yY5YUYoWouORbDVE/2nWJy7oFFlrgCBgwRSo=;
-        b=R05xGF+gcHQ049jV05vhZFfxIXqE37kn2wpJTckIivLodCobqgiihz0IjTLOi5Skab
-         EgN07h1710R4tndS8UZOOx0Xq0AN+lPbzbFU4YRQ6BwKzOmZ9Jm27gJkJhPklrjqay9O
-         jZXcajUwG6/dQ41lv40fHzX827CmE2Ma9xdFJM9RhhHLVa+++Ra6SV3ewFS+EZXSF+96
-         hzzC5HpGp/YGlz11mkW6PUkn5L58rkMwyA+yCxUKDrdHt28wC7cg8OYgXqYSQxqfxxnI
-         XExSDc5uL+hDFmAlliEbXdFKh7IAT64DKGro+JudJBCuFB9YsNA9XacRC6u4WVm7ZvM/
-         XGHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678488020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cQ30MQ4yY5YUYoWouORbDVE/2nWJy7oFFlrgCBgwRSo=;
-        b=pj/PCXBwasArCv/0r6sTdVfXg2+xwCDaWOo3f70tQroy97GuAyTfmqQK0/HTlZkrUx
-         GfwucPhBq34GXjqE+2+KSM2Flh2qPiHYy1hy9YR4VOrUFcpv+6/lXxpVVh5I1frhL93Y
-         rpAeebToXWVdISy7PFXwyzS2If9zShLmS7kuaIRaKzqWimqxWoZoLTtnwetZgVbSgI9F
-         j61JI2CwscqHrauyrJTwwBBDM4uunfGTygNb9csGoXujpAKA9Qe9c54jJFdEtMUJxDnh
-         fL9nU9yKL3RRT6ENiaMWNgANLvzmb24lsDKl7UHVYwoPUMRVtXYoi0WQPMQ5g0oLFyVm
-         kFSw==
-X-Gm-Message-State: AO0yUKVb+hyiDhpD3lgxALD5s5GrOVVmhtjG9PgMoc4sHT0ZFBoyJAU1
-        vP2anfJUkoPJvOqcfkMm1mqEIPQwMbQ7JDVxai3sBrwk66M=
-X-Google-Smtp-Source: AK7set/CWkXAYIe4On6wbF/JeRLVHsquugsEdZmqWaCJ2xQUJX3Gp+isxWPPFRU7mZEAcO6VLfV1/6iHHTsG3CG0qcg=
-X-Received: by 2002:a05:651c:124e:b0:295:c458:da98 with SMTP id
- h14-20020a05651c124e00b00295c458da98mr8464590ljh.5.1678488019876; Fri, 10 Mar
- 2023 14:40:19 -0800 (PST)
+        with ESMTP id S229455AbjCKEvo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 10 Mar 2023 23:51:44 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC5712CBA9
+        for <linux-cifs@vger.kernel.org>; Fri, 10 Mar 2023 20:51:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678510303; x=1710046303;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1HEGvN9dy9dJdIxtmk3mLrI0hIFRcV7HoFa2Ta4fcFk=;
+  b=Xh+oH17fbFYMtmYLlKpqLINGUnVqRVofQfA5OL4ASD16rKj2CgRLKgT8
+   nV/QaJqsO37UURnX/8sykvrkAQWyUK9P1MZr+RI3Gg0rjx4R1A9xewkfm
+   Hpl/4AbCTeY6fGVSncp6pb8308sxnAVmZc/P5dyQ9GpF+swzc3C/FvgY+
+   kDatHk3Ysem4UgSPYIGN7WotQ2tBTUwWjTlgsb0VcCc1cUh24KyJd9pnk
+   2BfYS9q6DWgyw/jbSBu3lw/6LDwH3b5X70uYR2ol3FaqQw3MOVzZJNlQN
+   D/nwxyiuwVocmhQdBLBAYqudX8fJo7ATEEK8dt/5O/bMdf30Qn6zAphFJ
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="336899866"
+X-IronPort-AV: E=Sophos;i="5.98,251,1673942400"; 
+   d="scan'208";a="336899866"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2023 20:51:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10645"; a="746980280"
+X-IronPort-AV: E=Sophos;i="5.98,251,1673942400"; 
+   d="scan'208";a="746980280"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 10 Mar 2023 20:51:40 -0800
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1parCm-0004LJ-0R;
+        Sat, 11 Mar 2023 04:51:40 +0000
+Date:   Sat, 11 Mar 2023 12:51:05 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>, smfrench@gmail.com,
+        bharathsm.hsk@gmail.com, pc@cjr.nz, tom@talpey.com,
+        linux-cifs@vger.kernel.org
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 06/11] cifs: fix sockaddr comparison in iface_cmp
+Message-ID: <202303111213.VsaCo9Ff-lkp@intel.com>
+References: <20230310153211.10982-6-sprasad@microsoft.com>
 MIME-Version: 1.0
-References: <20230310153211.10982-1-sprasad@microsoft.com> <20230310153211.10982-4-sprasad@microsoft.com>
-In-Reply-To: <20230310153211.10982-4-sprasad@microsoft.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 10 Mar 2023 16:40:08 -0600
-Message-ID: <CAH2r5mtR9neaTB4OiDfb6XVUpz9unmzxpfqkere4PEh4AF0VpQ@mail.gmail.com>
-Subject: Re: [PATCH 04/11] cifs: serialize channel reconnects
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     bharathsm.hsk@gmail.com, pc@cjr.nz, tom@talpey.com,
-        linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230310153211.10982-6-sprasad@microsoft.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Paulo had a few comments on patch 3 of the series, so have applied the
-first two, and will wait on patch 3 and 4, but tentatively merged the
-first two:
+Hi Shyam,
 
-a7c73e3d5842 (HEAD -> for-next, origin/for-next) cifs: generate
-signkey for the channel that's reconnecting
-d169aadd50c7 cifs: fix tcon status change after tree connect
+I love your patch! Yet something to improve:
 
-On Fri, Mar 10, 2023 at 9:33=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.=
-com> wrote:
->
-> Parallel session reconnects are prone to race conditions
-> that are difficult to avoid cleanly. The changes so far do
-> ensure that parallel reconnects eventually go through.
-> But that can take multiple session setups on the same channel.
->
-> Avoiding that by serializing the session setups on parallel
-> channels. In doing so, we should avoid such issues.
->
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/cifs/connect.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 7b103f69432e..4ea1e51c3fa5 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -222,6 +222,11 @@ cifs_mark_tcp_ses_conns_for_reconnect(struct TCP_Ser=
-ver_Info *server,
->                 else
->                         cifs_chan_set_need_reconnect(ses, server);
->
-> +               cifs_dbg(FYI, "%s: channel connect bitmaps: 0x%lx 0x%lx\n=
-",
-> +                        __func__,
-> +                        ses->chans_need_reconnect,
-> +                        ses->chans_in_reconnect);
-> +
->                 /* If all channels need reconnect, then tcon needs reconn=
-ect */
->                 if (!mark_smb_session && !CIFS_ALL_CHANS_NEED_RECONNECT(s=
-es)) {
->                         spin_unlock(&ses->chan_lock);
-> @@ -3744,6 +3749,11 @@ cifs_setup_session(const unsigned int xid, struct =
-cifs_ses *ses,
->         retries =3D 5;
->
->         spin_lock(&ses->ses_lock);
-> +       cifs_dbg(FYI, "%s: channel connect bitmaps: 0x%lx 0x%lx\n",
-> +                __func__,
-> +                ses->chans_need_reconnect,
-> +                ses->chans_in_reconnect);
-> +
->         if (ses->ses_status !=3D SES_GOOD &&
->             ses->ses_status !=3D SES_NEW &&
->             ses->ses_status !=3D SES_NEED_RECON) {
-> @@ -3762,11 +3772,11 @@ cifs_setup_session(const unsigned int xid, struct=
- cifs_ses *ses,
->         }
->
->         /* another process is in the processs of sess setup */
-> -       while (cifs_chan_in_reconnect(ses, server)) {
-> +       while (ses->chans_in_reconnect) {
->                 spin_unlock(&ses->chan_lock);
->                 spin_unlock(&ses->ses_lock);
->                 rc =3D wait_event_interruptible_timeout(ses->reconnect_q,
-> -                                                     (!cifs_chan_in_reco=
-nnect(ses, server)),
-> +                                                     (!ses->chans_in_rec=
-onnect),
->                                                       HZ);
->                 if (rc < 0) {
->                         cifs_dbg(FYI, "%s: aborting sess setup due to a r=
-eceived signal by the process\n",
-> @@ -3776,8 +3786,8 @@ cifs_setup_session(const unsigned int xid, struct c=
-ifs_ses *ses,
->                 spin_lock(&ses->ses_lock);
->                 spin_lock(&ses->chan_lock);
->
-> -               /* are we still trying to reconnect? */
-> -               if (!cifs_chan_in_reconnect(ses, server)) {
-> +               /* did the bitmask change? */
-> +               if (!ses->chans_in_reconnect) {
->                         spin_unlock(&ses->chan_lock);
->                         spin_unlock(&ses->ses_lock);
->                         goto check_again;
-> --
-> 2.34.1
->
+[auto build test ERROR on cifs/for-next]
+[also build test ERROR on linus/master v6.3-rc1 next-20230310]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Shyam-Prasad-N/cifs-generate-signkey-for-the-channel-that-s-reconnecting/20230310-234711
+base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+patch link:    https://lore.kernel.org/r/20230310153211.10982-6-sprasad%40microsoft.com
+patch subject: [PATCH 06/11] cifs: fix sockaddr comparison in iface_cmp
+config: x86_64-randconfig-a001 (https://download.01.org/0day-ci/archive/20230311/202303111213.VsaCo9Ff-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/799e15f02b7da48acdde0b568eef1deb23aa32ed
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Shyam-Prasad-N/cifs-generate-signkey-for-the-channel-that-s-reconnecting/20230310-234711
+        git checkout 799e15f02b7da48acdde0b568eef1deb23aa32ed
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash fs/cifs/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303111213.VsaCo9Ff-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+>> fs/cifs/connect.c:1311:4: error: expected expression
+                           struct sockaddr_in *saddr4 = (struct sockaddr_in *)srcaddr;
+                           ^
+>> fs/cifs/connect.c:1313:19: error: use of undeclared identifier 'saddr4'; did you mean 'vaddr4'?
+                           return memcmp(&saddr4->sin_addr.s_addr,
+                                          ^~~~~~
+                                          vaddr4
+   fs/cifs/connect.c:1312:24: note: 'vaddr4' declared here
+                           struct sockaddr_in *vaddr4 = (struct sockaddr_in *)rhs;
+                                               ^
+>> fs/cifs/connect.c:1312:24: warning: mixing declarations and code is incompatible with standards before C99 [-Wdeclaration-after-statement]
+                           struct sockaddr_in *vaddr4 = (struct sockaddr_in *)rhs;
+                                               ^
+   fs/cifs/connect.c:1328:4: error: expected expression
+                           struct sockaddr_in6 *saddr6 = (struct sockaddr_in6 *)srcaddr;
+                           ^
+>> fs/cifs/connect.c:1330:19: error: use of undeclared identifier 'saddr6'; did you mean 'vaddr6'?
+                           return memcmp(&saddr6->sin6_addr,
+                                          ^~~~~~
+                                          vaddr6
+   fs/cifs/connect.c:1329:25: note: 'vaddr6' declared here
+                           struct sockaddr_in6 *vaddr6 = (struct sockaddr_in6 *)rhs;
+                                                ^
+   fs/cifs/connect.c:1329:25: warning: mixing declarations and code is incompatible with standards before C99 [-Wdeclaration-after-statement]
+                           struct sockaddr_in6 *vaddr6 = (struct sockaddr_in6 *)rhs;
+                                                ^
+   2 warnings and 4 errors generated.
 
 
---=20
-Thanks,
+vim +1311 fs/cifs/connect.c
 
-Steve
+  1291	
+  1292	int
+  1293	cifs_ipaddr_cmp(struct sockaddr *srcaddr, struct sockaddr *rhs)
+  1294	{
+  1295		switch (srcaddr->sa_family) {
+  1296		case AF_UNSPEC:
+  1297			switch (rhs->sa_family) {
+  1298			case AF_UNSPEC:
+  1299				return 0;
+  1300			case AF_INET:
+  1301			case AF_INET6:
+  1302				return 1;
+  1303			default:
+  1304				return -1;
+  1305			}
+  1306		case AF_INET: {
+  1307			switch (rhs->sa_family) {
+  1308			case AF_UNSPEC:
+  1309				return -1;
+  1310			case AF_INET:
+> 1311				struct sockaddr_in *saddr4 = (struct sockaddr_in *)srcaddr;
+> 1312				struct sockaddr_in *vaddr4 = (struct sockaddr_in *)rhs;
+> 1313				return memcmp(&saddr4->sin_addr.s_addr,
+  1314				       &vaddr4->sin_addr.s_addr,
+  1315				       sizeof(struct sockaddr_in));
+  1316			case AF_INET6:
+  1317				return 1;
+  1318			default:
+  1319				return -1;
+  1320			}
+  1321		}
+  1322		case AF_INET6: {
+  1323			switch (rhs->sa_family) {
+  1324			case AF_UNSPEC:
+  1325			case AF_INET:
+  1326				return -1;
+  1327			case AF_INET6:
+  1328				struct sockaddr_in6 *saddr6 = (struct sockaddr_in6 *)srcaddr;
+  1329				struct sockaddr_in6 *vaddr6 = (struct sockaddr_in6 *)rhs;
+> 1330				return memcmp(&saddr6->sin6_addr,
+  1331					      &vaddr6->sin6_addr,
+  1332					      sizeof(struct sockaddr_in6));
+  1333			default:
+  1334				return -1;
+  1335			}
+  1336		}
+  1337		default:
+  1338			return -1; /* don't expect to be here */
+  1339		}
+  1340	}
+  1341	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
