@@ -2,81 +2,135 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 568BEC6FD1F
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Mar 2023 21:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C91C7619A
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Mar 2023 22:10:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230502AbjCNVxH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Mar 2023 17:53:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44310 "EHLO
+        id S231264AbjCNWJ5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Mar 2023 18:09:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230499AbjCNVxE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Mar 2023 17:53:04 -0400
+        with ESMTP id S231290AbjCNWJc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Mar 2023 18:09:32 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E24F52904
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Mar 2023 14:52:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20DA019B4
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Mar 2023 15:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678830734;
+        s=mimecast20190719; t=1678831715;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KL7RUrUlJgDEAxq9GYJFCawiEJWge2p1Oaahbua9byM=;
-        b=NymZW1cNArKA4tyoK7T6WafryMP69XvmUV9mtRz9RaZSH526BKQlYEPqB25d0WmAIvnPke
-        PUEoYlsHRblLrbZzaBz/tss4dpxUfVEIl4/vNyQMSXEMHmjnhtjSufrGRsQs87cnrXohAh
-        MF4GxOh4tj1Xm1+0zuWxB/ErbNFedPg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=tPHDzTeiqkehQq1hzvPvPGknkMXTxgyXWdFbtANbawg=;
+        b=IplD54JX0fSwRR9ceHO+iIudepFxxMBxazKVNEijM5BXflvFLtoQdvjs4lVZGRqmWCYfVt
+        /99bKn7kr68e2JUC7B2ORXmUAJnAsm30evx+cuhpXLZ4OaAbAfMtDztHh0N6cYMdeSjtdf
+        lzpajRS891MKs1GMsCeCJBUWfm93ZrE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-595-uS-EDXNSN3qnzq1H8duDKw-1; Tue, 14 Mar 2023 17:52:11 -0400
-X-MC-Unique: uS-EDXNSN3qnzq1H8duDKw-1
+ us-mta-607-yinWqeU4PtWbq9L6irR4zQ-1; Tue, 14 Mar 2023 18:08:29 -0400
+X-MC-Unique: yinWqeU4PtWbq9L6irR4zQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 76942385F36D;
-        Tue, 14 Mar 2023 21:52:10 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6700D85A5A3;
+        Tue, 14 Mar 2023 22:08:28 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 21BD9C164E7;
-        Tue, 14 Mar 2023 21:52:08 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B9EAC164E7;
+        Tue, 14 Mar 2023 22:08:26 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZBCvqQyOgEa626ON@infradead.org>
-References: <ZBCvqQyOgEa626ON@infradead.org> <20230308165251.2078898-1-dhowells@redhat.com> <20230308165251.2078898-8-dhowells@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
+To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Steve French <smfrench@gmail.com>,
         Christoph Hellwig <hch@lst.de>,
+        Steve French <smfrench@gmail.com>,
         John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v17 07/14] splice: Do splice read from a file without using ITER_PIPE
+Subject: [PATCH v18 07/15] splice: Do splice read from a file without using ITER_PIPE
+Date:   Tue, 14 Mar 2023 22:07:49 +0000
+Message-Id: <20230314220757.3827941-8-dhowells@redhat.com>
+In-Reply-To: <20230314220757.3827941-1-dhowells@redhat.com>
+References: <20230314220757.3827941-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3826684.1678830727.1@warthog.procyon.org.uk>
-Date:   Tue, 14 Mar 2023 21:52:07 +0000
-Message-ID: <3826685.1678830727@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+Make generic_file_splice_read() use filemap_splice_read() and
+direct_splice_read() rather than using an ITER_PIPE and call_read_iter().
 
-> > Make cifs use generic_file_splice_read() rather than doing it for itself.
-> 
-> Please split the cifs patch out into a separate one.
+With this, ITER_PIPE is no longer used.
 
-Okay - I've done that.  It needs to go after this one and the unexport of
-filemap_splice_read() needs to go with it (or in a separate follow-up patch).
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Steve French <smfrench@gmail.com>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: linux-mm@kvack.org
+cc: linux-block@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
 
-David
+Notes:
+    ver #18)
+     - Split out the change to cifs to make it use generic_file_splice_read().
+     - Split out the unexport of filemap_splice_read() (still needed by cifs).
+
+ fs/splice.c | 30 +++++++-----------------------
+ 1 file changed, 7 insertions(+), 23 deletions(-)
+
+diff --git a/fs/splice.c b/fs/splice.c
+index 90ccd3666dca..f46dd1fb367b 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -387,29 +387,13 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
+ 				 struct pipe_inode_info *pipe, size_t len,
+ 				 unsigned int flags)
+ {
+-	struct iov_iter to;
+-	struct kiocb kiocb;
+-	int ret;
+-
+-	iov_iter_pipe(&to, ITER_DEST, pipe, len);
+-	init_sync_kiocb(&kiocb, in);
+-	kiocb.ki_pos = *ppos;
+-	ret = call_read_iter(in, &kiocb, &to);
+-	if (ret > 0) {
+-		*ppos = kiocb.ki_pos;
+-		file_accessed(in);
+-	} else if (ret < 0) {
+-		/* free what was emitted */
+-		pipe_discard_from(pipe, to.start_head);
+-		/*
+-		 * callers of ->splice_read() expect -EAGAIN on
+-		 * "can't put anything in there", rather than -EFAULT.
+-		 */
+-		if (ret == -EFAULT)
+-			ret = -EAGAIN;
+-	}
+-
+-	return ret;
++	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
++		return 0;
++	if (unlikely(!len))
++		return 0;
++	if (in->f_flags & O_DIRECT)
++		return direct_splice_read(in, ppos, pipe, len, flags);
++	return filemap_splice_read(in, ppos, pipe, len, flags);
+ }
+ EXPORT_SYMBOL(generic_file_splice_read);
+ 
 
