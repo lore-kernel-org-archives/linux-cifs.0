@@ -2,440 +2,141 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C109C6FD1D
-	for <linux-cifs@archiver.kernel.org>; Wed, 15 Mar 2023 14:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8774C61DA4
+	for <linux-cifs@archiver.kernel.org>; Wed, 15 Mar 2023 14:49:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232343AbjCOO1Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Mar 2023 10:27:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51862 "EHLO
+        id S232724AbjCOOte (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 15 Mar 2023 10:49:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232296AbjCOO1P (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Mar 2023 10:27:15 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DCDA838A5;
-        Wed, 15 Mar 2023 07:27:10 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id s22so24544733lfi.9;
-        Wed, 15 Mar 2023 07:27:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678890429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hBgrBuGZL9KCbbmPqMJHrSDvVkfUycBrmH8dtn8yKhY=;
-        b=GdotJ7MiDP99F1Cz1UKMUdO3N8TFpm2wtCRSea2y/i+m9pFXr31B5RZSD/itKXAhey
-         mzHywza+WpSPORvQoL64NkjlSU9EXRDr1nIlXeh/CACltup115FKOW7kgfcN4JYW6UXw
-         SLcN6mF5JoniemlQh4kIXam1v24Hgn8Z701V/k0RZCUxnMrPmg+WHF1eJXaQEmH9SviY
-         /CaT10BRVXkxL1rnlzLrWdhQtUxakFfJIlGMSEYbarWfMXQ3r6sr2Thq6VOUODWvAZwG
-         b64OZ4OKoGnkOFzjuJx+xXrMuLI8pJQCcZqy92O+wU9TXrlgHqOKH9+QMyk7c8nBB5JV
-         2Q9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678890429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hBgrBuGZL9KCbbmPqMJHrSDvVkfUycBrmH8dtn8yKhY=;
-        b=iOSw+GS8NM9B8LSWtGd58RKvZCMdyPE61eLqb4zaXL/vJQPbEYSrDM18QH+sE1YZYO
-         Ifu0tt3tWjrDHD47baKgCEmf4JhYOKsO8jTqkTenP2wGQjBTOKIk0+LyE+Le56UVi3TP
-         UZom/kmCPwbnM8mnCLEwBjFF5tpLdDQih8m5w9Ibw/GKvVoM2ktJ2ZId8ywOm2QtVxcU
-         25XK0ijUnzUhs/WcUHhWAxrZughsQLS+mOHbiPicCsugp2MoYKa2N4kkGRRSDFlvjZjb
-         PIvHj2+4Ek/5WntZFEtR+8JtaPVRFOlUWPNmJ02qD/e1fN/Dv5cOw3ldcFnxBqYMTfPO
-         b20A==
-X-Gm-Message-State: AO0yUKWoU1oS5O/wa4TE1fDZWgOH8a0YtLBMXGEqnUQnO8oK1uBApVmX
-        +SiWhgqS0Q9LSECbQe91b0v2qaJX9TIrhfSX7fw=
-X-Google-Smtp-Source: AK7set/6zVMm/cqEuez+4ncyX8m3G9+7/9uhgvfGp0tGa5hnRcMZwArkQ1eYC47JiM6DR25LXmu9oThTT69scA1KWWE=
-X-Received: by 2002:ac2:4a9b:0:b0:4dc:807a:d140 with SMTP id
- l27-20020ac24a9b000000b004dc807ad140mr2027739lfp.10.1678890428567; Wed, 15
- Mar 2023 07:27:08 -0700 (PDT)
+        with ESMTP id S233169AbjCOOtW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Mar 2023 10:49:22 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2079.outbound.protection.outlook.com [40.107.244.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1922366F
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Mar 2023 07:49:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X3LIeJ0e3OouP1eXc+nRdU00wJf8Pz+kb8N3FzFFuTqgtgOSPEEGGenCmcdgTEfUbjynaa1wVCBOsY0FRzM/u/cTqelFF6UKFudPRj/hIQ2XWXIvixzbr2YCWtw1daIwpsTOotWNnt3amlgybVJBhG7pWf1l8/a5AG4ABo8bO2zkM3b11vlg/woNo8HTsBe6FGF8Saby7Rkw/MP9QFLUG9b7QExxVE9xuWjmb692TC7YR+u4pCq8xraKlAXpPOfcBy935uwdHkPebA5LzRGujNY53w/BHamfMlcHsrbmNkxIUWFTLazQMJjYOwBv2WZ0au8LfqHDXHhSxrljfJNvqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LlPnKFM06VIZGIl0Y5b2/HZzlLHymibc6fJbI0u7I3g=;
+ b=eUveH5J9AJ+gOSGx26w/fNvZRJ1dCe5FkSGS7bMSgTlngLM4P8HmSoWzkpft3iC+ho7FmAoX0gMkf+kw+vlh79R7CZ3/ZYWS3rTJVFWAmEVB/SjHKudu8IVg/y2HPg86JhQ0XHkyN1ihBnp0HSDAH7xY6HIHAlk8hv3sl2QY1lzheWiWIuRniDJfQrxUBuo9enHXSWVysj3WBLLrJguSvziya/cMbfXd1gtNhukSCWPhKBXjofFI+du0zlIBp5gVlFJ/wjRUtkKeqtSgZeQWoe1zc5DlIKiGxypl990FA0N+0/RgUwGunrIek8THorhYc1rs0A6B93cehUOjs7lQmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
+ BL0PR01MB4786.prod.exchangelabs.com (2603:10b6:208:30::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.24; Wed, 15 Mar 2023 14:49:17 +0000
+Received: from SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::1d6d:194:ddc0:999d]) by SN6PR01MB4445.prod.exchangelabs.com
+ ([fe80::1d6d:194:ddc0:999d%7]) with mapi id 15.20.6178.024; Wed, 15 Mar 2023
+ 14:49:17 +0000
+Message-ID: <5254934a-36c2-18ab-1cf8-5c8f0991e2ac@talpey.com>
+Date:   Wed, 15 Mar 2023 10:49:16 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH 00/10] Some cleanups for fs/cifs
+To:     Volker Lendecke <vl@samba.org>, linux-cifs@vger.kernel.org
+References: <cover.1678885349.git.vl@samba.org>
+Content-Language: en-US
+From:   Tom Talpey <tom@talpey.com>
+In-Reply-To: <cover.1678885349.git.vl@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR13CA0033.namprd13.prod.outlook.com
+ (2603:10b6:208:160::46) To SN6PR01MB4445.prod.exchangelabs.com
+ (2603:10b6:805:e2::33)
 MIME-Version: 1.0
-References: <20220826022031.GA76590@inn2.lkp.intel.com> <c8310cba-36ef-2940-b2c2-07573e015185@intel.com>
- <95e604ff-516a-4f7c-7f2c-8ff3d2cc66fa@intel.com>
-In-Reply-To: <95e604ff-516a-4f7c-7f2c-8ff3d2cc66fa@intel.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 15 Mar 2023 09:26:59 -0500
-Message-ID: <CAH2r5msk7R4qZ-GQT2mKnCWzZ_MzYPUyJwWXuLRUMtt2XtApoA@mail.gmail.com>
-Subject: Re: [smb3] 5efdd9122e: filebench.sum_operations/s -50.0% regression
-To:     "Yin, Fengwei" <fengwei.yin@intel.com>
-Cc:     kernel test robot <yujie.liu@intel.com>,
-        Steve French <stfrench@microsoft.com>, lkp@lists.01.org,
-        lkp@intel.com, Bharath SM <bharathsm@microsoft.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        "Paulo Alcantara (SUSE)" <pc@cjr.nz>, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        ying.huang@intel.com, feng.tang@intel.com,
-        zhengjun.xing@linux.intel.com, regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|BL0PR01MB4786:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ac390a9-6d90-4b3c-67e7-08db2564738e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yotLaz9QRf4UE+dxhN/BvKW6KjYaj4ykL4hciZac5BChGs4w9EFIsaC2KQzF71yG50NAEL8M17nkqyOspdoBxzJ/9O/VqfRb0DUgvObrVnRMFW4ghSL+0rz1tM2s3CNc+jq0L6YQBCJ544EAfr4+DSl+bMVyhhOKK3s3WqrZwA+f+zeQwwGKOEhxRTZUWp58i9Cx8Erupg06Kw/l3OeDoOdXRTn/UhMd6ItQP6zdcw+oZXvuI85WiEG2bt8QZK6Mf8ODdj0rB8zRah3XEY+AK12bwDpqO/dUr46NiCzhulh7YOHGB32dOQAdsq8ijPeaZaw/ZSUAd1LQM8MK6hEV76i9/ugO6XLQAqsmaamEV90jE3WcPtLJUrPBYDVejVV18dMAdEThM5Ky2OhZ98wVT+AIHQtgI/Cv4Db5q697elMvUfHH2BKT59OH7+H5p6rXuH1W5tVW0bxApcr3KNazN+O7uHC0BjCQk2nO+XrU3jZ8G1/L0iNKKoEoldYHYegFOKMqUmwsBEVqmzoApYOnu2ZaUYPF8OXvW/Hdi7MMiTEy3beUtCvQpe78DVLI86XVX7LE1jj/kvCBUmbUs1wyz8CIx/+ieKdO31o0Mj4C/Lvd6sgsnf2yb7jQiyXSggpgV8vrTkCf2AtIfgYL4AmY29VKKywJjC6S6cpd1e6lRTqHwao5B9QPPjno2SMLPiebAnGbi0nHkx+yqw+FgUf9JlJeaZJ+xuqSF4tU2Qi25dY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(39830400003)(346002)(366004)(136003)(376002)(451199018)(31696002)(36756003)(86362001)(38350700002)(38100700002)(8676002)(66946007)(478600001)(41300700001)(8936002)(66556008)(26005)(316002)(5660300002)(2906002)(83380400001)(2616005)(186003)(66476007)(6506007)(53546011)(6512007)(52116002)(6486002)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ckYyeEtwTUhKQmRuZzYrZkdqMWtxVlhUZTErdVR2QUROVlhTdmdzblM2YlVV?=
+ =?utf-8?B?N1AwRDF4OS9KU1NnWWFaT0ZTem53UkJia3VqQjZhcy84T0VmWjNUbm9vWldV?=
+ =?utf-8?B?bjYweVNFeWNibkdGT1c0dFVHUmNLcmc1Y2pXSXRlRm1TOWRRZHd1ZnF3K2d1?=
+ =?utf-8?B?K0czR0ZMamVFcStoc1FnTTN4VGNZS1luKzhCNTlwYm5abmhkWDhHNkI4Szc4?=
+ =?utf-8?B?TEc1eTRqVUU5b3IwanhwMWRGM2o0aEQvSTJ3NFl6b3Y5RFRJbSs4OU9EQUN3?=
+ =?utf-8?B?SWhXTmNKTEoyV2NzWW9LV2t0MVJCdXVXUkRQendIRG9XS3pFQ3ZkcVc3MGV5?=
+ =?utf-8?B?ZGZRYzR6MnZvcVc4MkhiY1JFMmlpazdaY055NmN2Q25WZ3d1eXJLUDNVaFQw?=
+ =?utf-8?B?OGY4T2V0c0NBNldtM1pJbTFyTExVczBDeU9tS1RmQStubXNpV3U1UXpBK2VQ?=
+ =?utf-8?B?WWlBdmZjaUJ2UyttMlhGbFpCUnR1UHJXNEdKOXJySGNPdSsvQXVxL2NGOUVm?=
+ =?utf-8?B?U2pMb1ZpZGlsdjFWdUF1clhNQkttaFo5MUpMZWMxTG5wQmVmZ2FFM0kxVkc4?=
+ =?utf-8?B?SVVCNGZJVnRtYlVrL0tFN0hQUk5hZEFMNlBqalM1ckxoY0NMN2d4enpIdUkw?=
+ =?utf-8?B?MzVab01CckdRLzh2V1VxZHZOWWltSkZnSVRBU3YzRno1bm1kamV5YVRleHZz?=
+ =?utf-8?B?dGU0b0pjVTJwMmRtcDJmeGh0NXlEOWJTQUR2dzdOdnlqZm95bFZ0d3ZUL0dP?=
+ =?utf-8?B?K0xiekVHZUNkUzNNczc0aUl2OHdvQkFUREQrdUdxeHlyT2orYVg3Sm9sK3dJ?=
+ =?utf-8?B?ZkJpTmgva2hacWJMQmRBaHVBdVFhbXV0Z1NDeFFNNitjQVN3ZFJBV1BhbVdM?=
+ =?utf-8?B?ZzlMVis0YVI3VVh2UXUyWXRtTHRRM2tqS1U1d0Qrb0x0cEhuR2xTT0gwQVRR?=
+ =?utf-8?B?eTVmVEZzeC9tRE5BaXh4T1RHQ1RIcmlKRkFSNkFrZjg3Wk8xL1FBTzJjMmZG?=
+ =?utf-8?B?OWF4VTRjaU54STI3bG9oV1QrTW1Fa2Frc2w2cTMzd1hDcm9LOEsyU0tZeWVn?=
+ =?utf-8?B?Vk91U0dCakhMMTBDaXBpRUp4emIzVnkwYVUxaStMK1NybVBxV1N2RjV6ZGt4?=
+ =?utf-8?B?VFMvcjk2dWxVb2RaWUJyMHp0aGtIRHczR0NYenF5ODhkcXl4RFc1QVhOR2JG?=
+ =?utf-8?B?QzNRQkt3V3BKMElCcVZmRWw3UFRiWUhUUnNOdDN0cUZjVWpNWEswc1FtTWtF?=
+ =?utf-8?B?SThvVXFLdExLM1BMUkl3YnVNN1p6SEZJNlBERGV6RlZPYWVINHNibkpKd3M1?=
+ =?utf-8?B?Q0NKY2I0bUpjMXB5Y25sSHFJYVdJeU1HejlSYXJUWXJ0ZWdwdFZpRHFGQU1t?=
+ =?utf-8?B?Nzl5MUhURi9wNFJBWXR4SG5NcnVRR0x2SzJnTno5TElOL3ZPSGlOWUY2WlQ3?=
+ =?utf-8?B?T1BUQW5TL05ZWXdsL2h3VjhTVVRsY2Y3TXVEZnZzR0pJTVJZc3VlMEMvYVZq?=
+ =?utf-8?B?anFZODRnQmI2S1o5aklFd1lYdjFxL3pKK21NaTREdy9YVXVLeEJTRkZWVjMz?=
+ =?utf-8?B?M3BPUVVEZmEzYkFWSXlzNGJpS1FsckYrUVIvVHNRc1EwMis2azNxTUp2anBG?=
+ =?utf-8?B?N0svVVJReThta0ZEd2JuWjNDcnBsQUF3VVVPTjNSZlBaanBDUXA0RnJyRldN?=
+ =?utf-8?B?RnpSc2I4SUF5bDlDUzdGYVViRVpZK2pva2s1bVNYaTlOeW0zRWtIdlNGSytn?=
+ =?utf-8?B?SUtrYWVmMm1BZUVZM3VXNXhac2Vyd2RSY0F4K2V1b2VXVURnVHVxNFlQTGtz?=
+ =?utf-8?B?WU9CaWVuNTM5aXhRTEs0WmJLY0pwTVpmeW9RbzVKREIyVDZJSW4wQnVEZlBC?=
+ =?utf-8?B?WVZzd3I2Yk40K3ovTzhKY0oxTmhjb0kwTURlZnBSektINFVsaTF3OWZYN0Va?=
+ =?utf-8?B?VjVJb0lSbTkrVEx3ZDM2QzFRM0crTHltOGZLSlNGOUdtSGdac2ltalhKVklo?=
+ =?utf-8?B?cU9qWXk4Y3R5RnNIeno5bFNORnl6R1UyWjBsMmVxRzRUUmRMZ0FwYXJ3Q2JN?=
+ =?utf-8?B?QU9xZ0xSeE12Um1IOXMvL3RCdWNZMFB3SDZkMkZtNHIwNUdrYm05ZTdwOVdk?=
+ =?utf-8?Q?SKp06ZkRdCmYy/Cutk5B6EZ7h?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ac390a9-6d90-4b3c-67e7-08db2564738e
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2023 14:49:17.1070
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pCr5WFWMOCpfXxL41b5F+KhZudDjqlhzCBY/dzz/NPx7De+0BEx1pKHOy0BMfXZz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR01MB4786
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Can you verify what this perf looks like with "closetime=3D0" and "closetim=
-e=3D1"
+I like all these changes but I think #5 should be split out
+into a standalone patch. It changes the rmdir wire semantics
+so it's not just a cleanup.
 
-Are there differences in /proc/fs/cifs/Stats when you run the same
-steps with "closetimeo=3D1" vs. the more recent default (5 seconds)?
+Acked-by: Tom Talpey <tom@talpey.com>
 
-On Wed, Mar 15, 2023 at 2:46=E2=80=AFAM Yin, Fengwei <fengwei.yin@intel.com=
-> wrote:
->
->
->
-> On 8/26/2022 10:41 AM, kernel test robot wrote:
-> > Greeting,
-> >
-> > FYI, we noticed a -50.0% regression of filebench.sum_operations/s due t=
-o commit:
-> >
-> >
-> > commit: 5efdd9122eff772eae2feae9f0fc0ec02d4846a3 ("smb3: allow deferred=
- close timeout to be configurable")
-> > https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> >
-> > in testcase: filebench
-> > on test machine: 88 threads 2 sockets Intel(R) Xeon(R) Gold 6238M CPU @=
- 2.10GHz (Cascade Lake) with 128G memory
-> > with following parameters:
-> >
-> >     disk: 1HDD
-> >     fs: ext4
-> >     fs2: cifs
-> >     test: filemicro_delete.f
-> >     cpufreq_governor: performance
-> >     ucode: 0x5003302
-> Please note, we still could see this regresion on v6.3-rc2. And the regre=
-ssion is related with
-> the commit: 5efdd9122eff772eae2feae9f0fc0ec02d4846a3. This commit changed=
- the default timeout
-> value from 1s to 5s. If change the timeout back to 1s as following:
->
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index 6d13f8207e96..6b930fb0c4bd 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -1537,7 +1537,7 @@ int smb3_init_fs_context(struct fs_context *fc)
->
->         ctx->acregmax =3D CIFS_DEF_ACTIMEO;
->         ctx->acdirmax =3D CIFS_DEF_ACTIMEO;
-> -       ctx->closetimeo =3D SMB3_DEF_DCLOSETIMEO;
-> +       ctx->closetimeo =3D CIFS_DEF_ACTIMEO;
->
->         /* Most clients set timeout to 0, allows server to use its defaul=
-t */
->         ctx->handle_timeout =3D 0; /* See MS-SMB2 spec section 2.2.14.2.1=
-2 */
->
-> The regression is gone:
-> dcb45fd7f501f864                    v6.3-rc2 32715af441411a5a266606be08f
-> ---------------- --------------------------- ---------------------------
->        fail:runs  %reproduction    fail:runs  %reproduction    fail:runs
->            |             |             |             |             |
->            :25           0%            :3           33%           1:3    =
- last_state.booting
->            :25           0%            :3           33%           1:3    =
- last_state.is_incomplete_run
->          %stddev     %change         %stddev     %change         %stddev
->              \          |                \          |                \
->     515.95           -50.0%     257.98            -0.0%     515.92       =
- filebench.sum_operations/s
->       5.04 =C2=B1  7%    +833.7%      47.09 =C2=B1  2%      -2.9%       4=
-.90 =C2=B1  2%  filebench.sum_time_ms/op
->      10438          -100.0%       0.33 =C2=B1141%    -100.0%       0.50 =
-=C2=B1100%  filebench.time.major_page_faults
->     167575            -4.1%     160660            -4.4%     160140       =
- filebench.time.maximum_resident_set_size
->       7138 =C2=B1 11%    +141.4%      17235 =C2=B1  3%    +147.6%      17=
-677        filebench.time.minor_page_faults
->      28.68 =C2=B1  9%    +199.9%      86.00 =C2=B1  7%      -2.4%      28=
-.00        filebench.time.percent_of_cpu_this_job_got
->    2453485 =C2=B1 54%     -63.0%     907380           -66.2%     830273 =
-=C2=B1  6%  cpuidle..usage
->       0.61 =C2=B1 38%      +0.8        1.41 =C2=B1  3%      +0.2        0=
-.80 =C2=B1  4%  mpstat.cpu.all.sys%
->     142984 =C2=B1 13%     -45.6%      77725           -47.5%      75106  =
-      vmstat.system.in
->      34.23 =C2=B1  7%     +27.9%      43.79           +27.8%      43.74  =
-      boot-time.boot
->      17.09 =C2=B1 11%     +66.0%      28.38           +65.5%      28.28  =
-      boot-time.dhcp
->       2661 =C2=B1  7%     +37.5%       3659           +37.2%       3651  =
-      boot-time.idle
->     104737 =C2=B1185%     -87.8%      12762 =C2=B1 10%     -89.8%      10=
-631 =C2=B1  4%  turbostat.C1
->
->
-> 32715af441411a5a266606be08f is v6.3-rc2 with the change to restore the ti=
-meout to 1s. Thanks.
->
-> Regards
-> Yin, Fengwei
->
->
-> >
-> >
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > compiler/cpufreq_governor/disk/fs2/fs/kconfig/rootfs/tbox_group/test/te=
-stcase/ucode:
-> >   gcc-11/performance/1HDD/cifs/ext4/x86_64-rhel-8.3/debian-11.1-x86_64-=
-20220510.cgz/lkp-csl-2sp9/filemicro_delete.f/filebench/0x5003302
-> >
-> > commit:
-> >   dcb45fd7f5 ("cifs: Do not use tcon->cfid directly, use the cfid we ge=
-t from open_cached_dir")
-> >   5efdd9122e ("smb3: allow deferred close timeout to be configurable")
-> >
-> > dcb45fd7f501f864 5efdd9122eff772eae2feae9f0f
-> > ---------------- ---------------------------
-> >          %stddev     %change         %stddev
-> >              \          |                \
-> >     515.95           -50.0%     257.98        filebench.sum_operations/=
-s
-> >       4.81 =C2=B1  2%   +1038.4%      54.78 =C2=B1  6%  filebench.sum_t=
-ime_ms/op
-> >      29.00 =C2=B1  8%    +212.1%      90.50 =C2=B1  3%  filebench.time.=
-percent_of_cpu_this_job_got
-> >      24629            +2.7%      25297        filebench.time.voluntary_=
-context_switches
-> >  7.685e+08           +19.3%  9.169e+08 =C2=B1  4%  cpuidle..time
-> >       2.53 =C2=B1  6%     -20.6%       2.00 =C2=B1  3%  iostat.cpu.iowa=
-it
-> >    1506141 =C2=B1  8%     +22.4%    1843256 =C2=B1  3%  turbostat.IRQ
-> >       2.00           -50.0%       1.00        vmstat.procs.b
-> >      21969 =C2=B1  2%      -9.5%      19885 =C2=B1  2%  vmstat.system.c=
-s
-> >       3.06 =C2=B1  7%      -0.7        2.35 =C2=B1  4%  mpstat.cpu.all.=
-iowait%
-> >       0.79 =C2=B1  5%      +0.5        1.27 =C2=B1  2%  mpstat.cpu.all.=
-sys%
-> >       0.89 =C2=B1  3%      -0.1        0.79 =C2=B1  3%  mpstat.cpu.all.=
-usr%
-> >      34.55 =C2=B1 14%     -34.8%      22.51 =C2=B1 27%  sched_debug.cfs=
-_rq:/.removed.runnable_avg.avg
-> >     119.64 =C2=B1  3%     -20.0%      95.69 =C2=B1 17%  sched_debug.cfs=
-_rq:/.removed.runnable_avg.stddev
-> >      34.55 =C2=B1 14%     -34.8%      22.51 =C2=B1 27%  sched_debug.cfs=
-_rq:/.removed.util_avg.avg
-> >     119.64 =C2=B1  3%     -20.0%      95.69 =C2=B1 17%  sched_debug.cfs=
-_rq:/.removed.util_avg.stddev
-> >       5249           +15.8%       6076        meminfo.Active
-> >       3866 =C2=B1  2%     +17.7%       4552        meminfo.Active(anon)
-> >       1382 =C2=B1  4%     +10.3%       1524 =C2=B1  4%  meminfo.Active(=
-file)
-> >      69791 =C2=B1 14%     +39.8%      97553 =C2=B1  6%  meminfo.AnonHug=
-ePages
-> >      72709 =C2=B1  2%     +12.5%      81779 =C2=B1  3%  meminfo.Inactiv=
-e(file)
-> >      23219           +13.5%      26352 =C2=B1  3%  meminfo.KernelStack
-> >     966.50 =C2=B1  2%     +17.7%       1137        proc-vmstat.nr_activ=
-e_anon
-> >      74302            +6.3%      78977 =C2=B1  2%  proc-vmstat.nr_anon_=
-pages
-> >      81133            +6.0%      85973        proc-vmstat.nr_inactive_a=
-non
-> >      18172 =C2=B1  2%     +12.5%      20442 =C2=B1  3%  proc-vmstat.nr_=
-inactive_file
-> >      23213           +13.5%      26348 =C2=B1  3%  proc-vmstat.nr_kerne=
-l_stack
-> >      17983            +2.3%      18400        proc-vmstat.nr_mapped
-> >       7446 =C2=B1  2%      +5.5%       7853 =C2=B1  3%  proc-vmstat.nr_=
-shmem
-> >      26888            +1.6%      27306        proc-vmstat.nr_slab_recla=
-imable
-> >      47220            +3.4%      48803        proc-vmstat.nr_slab_unrec=
-laimable
-> >     966.50 =C2=B1  2%     +17.7%       1137        proc-vmstat.nr_zone_=
-active_anon
-> >      81133            +6.0%      85973        proc-vmstat.nr_zone_inact=
-ive_anon
-> >      18172 =C2=B1  2%     +12.5%      20442 =C2=B1  3%  proc-vmstat.nr_=
-zone_inactive_file
-> >     361460            +2.5%     370454        proc-vmstat.numa_hit
-> >     946.67           +18.6%       1122        proc-vmstat.pgactivate
-> >     361562            +2.5%     370553        proc-vmstat.pgalloc_norma=
-l
-> >     187906            +4.7%     196761        proc-vmstat.pgfault
-> >       8189            +2.5%       8395        proc-vmstat.pgreuse
-> >  1.097e+09           +15.5%  1.267e+09 =C2=B1  7%  perf-stat.i.branch-i=
-nstructions
-> >   39079265 =C2=B1  6%     -20.9%   30915354 =C2=B1  4%  perf-stat.i.bra=
-nch-misses
-> >    5093263 =C2=B1  4%     -23.7%    3884752 =C2=B1  9%  perf-stat.i.cac=
-he-misses
-> >      29213           -18.7%      23764 =C2=B1  5%  perf-stat.i.context-=
-switches
-> >  7.666e+09 =C2=B1  4%      +5.7%  8.106e+09 =C2=B1  2%  perf-stat.i.cpu=
--cycles
-> >       1877 =C2=B1 15%     +75.1%       3287 =C2=B1 12%  perf-stat.i.cyc=
-les-between-cache-misses
-> >    1735450 =C2=B1  3%     -12.9%    1512060 =C2=B1  3%  perf-stat.i.iTL=
-B-load-misses
-> >       2898 =C2=B1  3%     +34.4%       3895 =C2=B1  7%  perf-stat.i.ins=
-tructions-per-iTLB-miss
-> >       1493           -20.3%       1190 =C2=B1  7%  perf-stat.i.major-fa=
-ults
-> >       0.09 =C2=B1  3%      +5.8%       0.09 =C2=B1  2%  perf-stat.i.met=
-ric.GHz
-> >      48.47 =C2=B1 11%      +8.4       56.83 =C2=B1  7%  perf-stat.i.nod=
-e-store-miss-rate%
-> >     283426 =C2=B1  4%     -21.6%     222190 =C2=B1 10%  perf-stat.i.nod=
-e-stores
-> >       3.57 =C2=B1  7%      -1.1        2.44 =C2=B1  6%  perf-stat.overa=
-ll.branch-miss-rate%
-> >       1508 =C2=B1  3%     +39.8%       2108 =C2=B1  9%  perf-stat.overa=
-ll.cycles-between-cache-misses
-> >       3022 =C2=B1  3%     +23.6%       3736 =C2=B1  5%  perf-stat.overa=
-ll.instructions-per-iTLB-miss
-> >  9.585e+08           +18.8%  1.138e+09 =C2=B1  6%  perf-stat.ps.branch-=
-instructions
-> >   34151514 =C2=B1  6%     -18.8%   27725316 =C2=B1  4%  perf-stat.ps.br=
-anch-misses
-> >    4450329 =C2=B1  5%     -21.7%    3486409 =C2=B1  9%  perf-stat.ps.ca=
-che-misses
-> >      25524           -16.4%      21333 =C2=B1  4%  perf-stat.ps.context=
--switches
-> >      77139            +2.5%      79105        perf-stat.ps.cpu-clock
-> >  6.704e+09 =C2=B1  4%      +8.7%  7.287e+09        perf-stat.ps.cpu-cyc=
-les
-> >   1.06e+09           +11.3%   1.18e+09 =C2=B1  5%  perf-stat.ps.dTLB-lo=
-ads
-> >    1517349 =C2=B1  3%     -10.5%    1357716 =C2=B1  2%  perf-stat.ps.iT=
-LB-load-misses
-> >  4.582e+09           +10.8%  5.075e+09 =C2=B1  6%  perf-stat.ps.instruc=
-tions
-> >       1296           -18.1%       1061 =C2=B1  6%  perf-stat.ps.major-f=
-aults
-> >     247613 =C2=B1  4%     -19.5%     199283 =C2=B1  9%  perf-stat.ps.no=
-de-stores
-> >      77139            +2.5%      79105        perf-stat.ps.task-clock
-> >  3.697e+10           +35.3%  5.003e+10        perf-stat.total.instructi=
-ons
-> >       8.51 =C2=B1 91%      -6.9        1.59 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.getdents64
-> >       8.34 =C2=B1 83%      -6.7        1.67 =C2=B1141%  perf-profile.ca=
-lltrace.cycles-pp.exit_to_user_mode_loop.exit_to_user_mode_prepare.syscall_=
-exit_to_user_mode.do_syscall_64.entry_SYSCALL_64_after_hwframe
-> >       6.25 =C2=B1107%      -6.2        0.00        perf-profile.calltra=
-ce.cycles-pp.entry_SYSCALL_64_after_hwframe.open64
-> >       6.25 =C2=B1107%      -6.2        0.00        perf-profile.calltra=
-ce.cycles-pp.do_syscall_64.entry_SYSCALL_64_after_hwframe.open64
-> >       6.25 =C2=B1107%      -6.2        0.00        perf-profile.calltra=
-ce.cycles-pp.open64
-> >       7.63 =C2=B1 84%      -6.0        1.59 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.entry_SYSCALL_64_after_hwframe.getdents64
-> >       7.63 =C2=B1 84%      -6.0        1.59 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.do_syscall_64.entry_SYSCALL_64_after_hwframe.getdents64
-> >       7.63 =C2=B1 84%      -6.0        1.59 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.__x64_sys_getdents64.do_syscall_64.entry_SYSCALL_64_after=
-_hwframe.getdents64
-> >       7.63 =C2=B1 84%      -6.0        1.59 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.iterate_dir.__x64_sys_getdents64.do_syscall_64.entry_SYSC=
-ALL_64_after_hwframe.getdents64
-> >       6.26 =C2=B1115%      -5.4        0.88 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.syscall_exit_to_user_mode.do_syscall_64.entry_SYSCALL_64_=
-after_hwframe
-> >       6.26 =C2=B1115%      -5.4        0.88 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.exit_to_user_mode_prepare.syscall_exit_to_user_mode.do_sy=
-scall_64.entry_SYSCALL_64_after_hwframe
-> >       6.26 =C2=B1115%      -4.6        1.67 =C2=B1141%  perf-profile.ca=
-lltrace.cycles-pp.do_group_exit.get_signal.arch_do_signal_or_restart.exit_t=
-o_user_mode_loop.exit_to_user_mode_prepare
-> >       6.26 =C2=B1115%      -4.6        1.67 =C2=B1141%  perf-profile.ca=
-lltrace.cycles-pp.do_exit.do_group_exit.get_signal.arch_do_signal_or_restar=
-t.exit_to_user_mode_loop
-> >       6.26 =C2=B1115%      -4.6        1.67 =C2=B1141%  perf-profile.ca=
-lltrace.cycles-pp.arch_do_signal_or_restart.exit_to_user_mode_loop.exit_to_=
-user_mode_prepare.syscall_exit_to_user_mode.do_syscall_64
-> >       6.26 =C2=B1115%      -4.6        1.67 =C2=B1141%  perf-profile.ca=
-lltrace.cycles-pp.get_signal.arch_do_signal_or_restart.exit_to_user_mode_lo=
-op.exit_to_user_mode_prepare.syscall_exit_to_user_mode
-> >       4.57 =C2=B1 73%      -3.8        0.76 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.asm_exc_page_fault.perf_mmap__read_head.perf_mmap__push.r=
-ecord__mmap_read_evlist.__cmd_record
-> >       4.57 =C2=B1 73%      -3.8        0.76 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.exc_page_fault.asm_exc_page_fault.perf_mmap__read_head.pe=
-rf_mmap__push.record__mmap_read_evlist
-> >       4.57 =C2=B1 73%      -3.8        0.76 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.do_user_addr_fault.exc_page_fault.asm_exc_page_fault.perf=
-_mmap__read_head.perf_mmap__push
-> >       4.57 =C2=B1 73%      -3.8        0.76 =C2=B1223%  perf-profile.ca=
-lltrace.cycles-pp.perf_mmap__read_head.perf_mmap__push.record__mmap_read_ev=
-list.__cmd_record.cmd_record
-> >       3.38 =C2=B1103%      -3.4        0.00        perf-profile.calltra=
-ce.cycles-pp.unmap_vmas.exit_mmap.mmput.exit_mm.do_exit
-> >       3.38 =C2=B1103%      -3.4        0.00        perf-profile.calltra=
-ce.cycles-pp.unmap_page_range.unmap_vmas.exit_mmap.mmput.exit_mm
-> >       3.38 =C2=B1103%      -3.4        0.00        perf-profile.calltra=
-ce.cycles-pp.zap_pmd_range.unmap_page_range.unmap_vmas.exit_mmap.mmput
-> >       3.38 =C2=B1103%      -3.4        0.00        perf-profile.calltra=
-ce.cycles-pp.zap_pte_range.zap_pmd_range.unmap_page_range.unmap_vmas.exit_m=
-map
-> >       8.51 =C2=B1 91%      -6.9        1.59 =C2=B1223%  perf-profile.ch=
-ildren.cycles-pp.getdents64
-> >       8.34 =C2=B1 83%      -6.7        1.67 =C2=B1141%  perf-profile.ch=
-ildren.cycles-pp.exit_to_user_mode_prepare
-> >       8.34 =C2=B1 83%      -6.7        1.67 =C2=B1141%  perf-profile.ch=
-ildren.cycles-pp.exit_to_user_mode_loop
-> >       8.34 =C2=B1 83%      -6.7        1.67 =C2=B1141%  perf-profile.ch=
-ildren.cycles-pp.syscall_exit_to_user_mode
-> >       6.25 =C2=B1107%      -6.2        0.00        perf-profile.childre=
-n.cycles-pp.open64
-> >       7.63 =C2=B1 84%      -6.0        1.59 =C2=B1223%  perf-profile.ch=
-ildren.cycles-pp.__x64_sys_getdents64
-> >       7.63 =C2=B1 84%      -6.0        1.59 =C2=B1223%  perf-profile.ch=
-ildren.cycles-pp.iterate_dir
-> >       6.26 =C2=B1115%      -4.6        1.67 =C2=B1141%  perf-profile.ch=
-ildren.cycles-pp.arch_do_signal_or_restart
-> >       6.26 =C2=B1115%      -4.6        1.67 =C2=B1141%  perf-profile.ch=
-ildren.cycles-pp.get_signal
-> >       4.57 =C2=B1 73%      -3.8        0.76 =C2=B1223%  perf-profile.ch=
-ildren.cycles-pp.perf_mmap__read_head
-> >       3.38 =C2=B1103%      -3.4        0.00        perf-profile.childre=
-n.cycles-pp.unmap_vmas
-> >       3.38 =C2=B1103%      -3.4        0.00        perf-profile.childre=
-n.cycles-pp.unmap_page_range
-> >       3.38 =C2=B1103%      -3.4        0.00        perf-profile.childre=
-n.cycles-pp.zap_pmd_range
-> >       3.38 =C2=B1103%      -3.4        0.00        perf-profile.childre=
-n.cycles-pp.zap_pte_range
-> >       8.54 =C2=B1 43%      +8.6       17.19 =C2=B1 38%  perf-profile.ch=
-ildren.cycles-pp.asm_exc_page_fault
-> >
-> >
-> > If you fix the issue, kindly add following tag
-> > Reported-by: kernel test robot <yujie.liu@intel.com>
-> >
-> >
-> > To reproduce:
-> >
-> >         git clone https://github.com/intel/lkp-tests.git
-> >         cd lkp-tests
-> >         sudo bin/lkp install job.yaml           # job file is attached =
-in this email
-> >         bin/lkp split-job --compatible job.yaml # generate the yaml fil=
-e for lkp run
-> >         sudo bin/lkp run generated-yaml-file
-> >
-> >         # if come across any failure that blocks the test,
-> >         # please remove ~/.lkp and /lkp dir to run from a clean state.
-> >
-> >
-> > Disclaimer:
-> > Results have been estimated based on internal Intel analysis and are pr=
-ovided
-> > for informational purposes only. Any difference in system hardware or s=
-oftware
-> > design or configuration may affect actual performance.
-> >
-> >
-> > #regzbot introduced: 5efdd9122e
-> >
-> >
-
-
-
---=20
-Thanks,
-
-Steve
+On 3/15/2023 9:05 AM, Volker Lendecke wrote:
+> These are some cleanups and simplifications to fs/cifs which helped me
+> understand the code a bit better.
+> 
+> Volker Lendecke (10):
+>    cifs: Simplify some callers of compound_send_recv()
+>    cifs: Make "resp_buf_type" initialization consistent
+>    cifs: Slightly simplify cifs_readdir()
+>    cifs: Slightly simplify cifs_readdir()
+>    cifs: Simplify SMB2_OP_RMDIR with CREATE_DELETE_ON_CLOSE
+>    cifs: Slightly refactor smb2_compound_op()
+>    cifs: Reduce copy&paste in smb2_compound_op()
+>    cifs: Avoid two "else" branches
+>    cifs: Store smb3_create_tag_posix just once
+>    cifs: Use switch/case to dissect negprot reply ctxts
+> 
+>   fs/cifs/cached_dir.c |   1 -
+>   fs/cifs/cifssmb.c    |   6 +-
+>   fs/cifs/readdir.c    |   6 +-
+>   fs/cifs/smb2inode.c  | 163 +++++++++++++------------------------------
+>   fs/cifs/smb2ops.c    |   7 --
+>   fs/cifs/smb2pdu.c    |  92 ++++++++++--------------
+>   6 files changed, 91 insertions(+), 184 deletions(-)
+> 
