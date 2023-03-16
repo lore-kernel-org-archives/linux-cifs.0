@@ -2,173 +2,90 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1810EC6FD1F
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Mar 2023 10:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E687DC74A5B
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Mar 2023 13:40:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbjCPK6T (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Mar 2023 06:58:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52882 "EHLO
+        id S230370AbjCPNky (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Mar 2023 09:40:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbjCPK6S (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Mar 2023 06:58:18 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEEBE1C309
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Mar 2023 03:58:09 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id y20so1789680lfj.2
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Mar 2023 03:58:09 -0700 (PDT)
+        with ESMTP id S230413AbjCPNkw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Mar 2023 09:40:52 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 301FDBAD08
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Mar 2023 06:40:50 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id ay8so1293606wmb.1
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Mar 2023 06:40:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678964287;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XJ10toemGBC5+3ANaCOIcU5tNyv4z65v0HLVMIcmza8=;
-        b=QTLVPdWG9DFazfdZ7ALkKh2MsyQgS4fgRqHZAZJ1xKYxyFi62FziPrGBft1ICAWoMl
-         rNAXNBZ38uvNJN4ZR1qIPc6qxFB0v8EZD3PxYhPrmiFEAmFWmfiBZGdB8ehiSZzYWdRN
-         GI8PSLR/vcXuXK3sG0296YQNUkcDP6XHFwy3a2rTuhWwWJ86MCM3PAtgI3DiLz3lbyzU
-         rSBi8JGp1Ca6hXWYGGwaLpElDS4jAL+zgpkKBeqvSl2QpHnvSrK5LEEEU8h4MK5hbX6+
-         vAiUhoevex0gZxvtvbJcNPXdxT5TLegU31H+hlrvIJ7AA4KBv6JdYpBrAVcfoVsr9hxp
-         4cMQ==
+        d=freebox-fr.20210112.gappssmtp.com; s=20210112; t=1678974049;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GcGENDEJd5wvM3QphTd68cXz45S413z3jii2ne/89rA=;
+        b=8XbuFY0lDPyFRX6ObSVeHcX0YBNxf3nmDa6mRkTsZ0usdkNmAmkfI3Ucc8JAisBV0j
+         bPidO1GNJREngcaETXmwVq/jyKpR6VY+QlFKsoMaUC5wgnnkhZ8Ox7GmeK7KKWvHbEnW
+         aXZUskcKly/7T16OKagaKtgF+Big0H07Uc8t9hWTXqcjoI5R1EwT4o+4+DpPMDdZRvpU
+         U/NZWTvud2GpjVtrLqPKPiBOzG7qClXMeq8wvB6VNj66IK+OeFs4pN+3OerixZBMr7BG
+         ejknnUbUeadlhgdWX46WMIP8Kq0jjS8dmwEuIgMd4WJbb1EEuQOGs96lvo+3vIhRj8Ap
+         fauA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678964287;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20210112; t=1678974049;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XJ10toemGBC5+3ANaCOIcU5tNyv4z65v0HLVMIcmza8=;
-        b=ZFPixTpZwlIukLovV0Aw8LbHvMaA38Qaa4sPqD4dxypHcfX1Zpo2+Uq9t4ip932h19
-         rpQMCHVqGpuyNeQAshQWIhcVkrtkmE8gTgwdbECreF4BsjJjkS+pHKmFWmYwtdVP8N5R
-         Qtwawjr7xlioLb0KM303KlF+RSmETGiM3ZtzPVRrqXW9pu7/ak6HdZ9viPav2/6FZg/h
-         i/peT8Fa/cfrQ0VnVKaiU5zT/2BEMwsQnaULjfGN7kaS+ju9TRdJj3QFBzYXTbOLCHHj
-         rtR8YiYWiWLNyXj2ACxgjD2KaT/DxBnmeaX1bV63weXAArHHoWN6oEwUvSBC/6gny0gC
-         tSxQ==
-X-Gm-Message-State: AO0yUKVOxelt9JOvCq92jEC5YIOGalYRcbGWolelwq/VTdmX8tkcKEv2
-        ytnfgKuW+yiAnPV7ZetXBaWu0yPWY/lfpW4svQE=
-X-Google-Smtp-Source: AK7set+YENp0pS8u16okZwCTAArEIo3KP8FqSqJPoHwyxjZ04eFQIWPlmBu4krvSQVhBU53gc3KZLAObaSFpnJHlG5c=
-X-Received: by 2002:ac2:44a1:0:b0:4d9:861e:26cc with SMTP id
- c1-20020ac244a1000000b004d9861e26ccmr3038286lfm.4.1678964287146; Thu, 16 Mar
- 2023 03:58:07 -0700 (PDT)
+        bh=GcGENDEJd5wvM3QphTd68cXz45S413z3jii2ne/89rA=;
+        b=vXWzVxJ07W+ikzWhC+NyLNFL3J9GoIAew0dWBYr9h1g790t8L7l+E3PlSVFtyOf2Va
+         vIXlh5XkvmcHDLoZ6GdHaKJ2f5cV8O5dxJXmWPJQXpbJZHCS3OgJ1N3SbNfjc7VQieOw
+         SO+Tt6GYYZwgjZxEbMQ9LI12qb+KNy1m5JLcsEoDWpqPO0MDLazV2styWNDmDWkaOFNu
+         wVURFHJhmqiVEFgjjty4pzHShnGLs2DkGEzmppf3rZJp/ZaMUDjLa3/X/XvpYefb0s37
+         UAw3OmRFvA+2cGbNCmWamaj8EQi4fZOM0Ag0hTXN/LKOCnoZxOM7Ht7srERUaSEKsrtl
+         RhGQ==
+X-Gm-Message-State: AO0yUKVD+KBjHXsJNr5VBsxz2ceXyMKJ/pVeuiSfLTJGNX5v9PvPaP/N
+        MYL5fVoEWmP0o1SH70eKA9O3xdr891lWtnR+DGlAHA==
+X-Google-Smtp-Source: AK7set8jjWDEEZq4ZRO9si3TI/uUqcW8c+va0KhyoIzU58ayLyplCFQojYuf6k9dpDvMjQDJ4WH56A==
+X-Received: by 2002:a05:600c:444a:b0:3ed:1fa2:e25b with SMTP id v10-20020a05600c444a00b003ed1fa2e25bmr14851109wmn.20.1678974049493;
+        Thu, 16 Mar 2023 06:40:49 -0700 (PDT)
+Received: from marios-t5500.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
+        by smtp.gmail.com with ESMTPSA id x2-20020a05600c21c200b003e1f2e43a1csm4937600wmj.48.2023.03.16.06.40.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Mar 2023 06:40:49 -0700 (PDT)
+From:   Marios Makassikis <mmakassikis@freebox.fr>
+To:     linux-cifs@vger.kernel.org
+Cc:     Marios Makassikis <mmakassikis@freebox.fr>
+Subject: [PATCH] ksmbd: do not call kvmalloc() with __GFP_NORETRY | __GFP_NO_WARN
+Date:   Thu, 16 Mar 2023 14:40:43 +0100
+Message-Id: <20230316134043.1824345-1-mmakassikis@freebox.fr>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20230310153211.10982-1-sprasad@microsoft.com> <95f468756e26ebfb41f00b01f13d09da.pc.crab@mail.manguebit.com>
-In-Reply-To: <95f468756e26ebfb41f00b01f13d09da.pc.crab@mail.manguebit.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Thu, 16 Mar 2023 16:27:55 +0530
-Message-ID: <CANT5p=pfZNefhzGSytg9tuGXhNgvesVecTGoZFhWnUmnLxb-9g@mail.gmail.com>
-Subject: Re: [PATCH 01/11] cifs: fix tcon status change after tree connect
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     smfrench@gmail.com, bharathsm.hsk@gmail.com, tom@talpey.com,
-        linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
-Content-Type: multipart/mixed; boundary="000000000000ed360a05f70255ea"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000ed360a05f70255ea
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Commit 83dcedd5540 ("ksmbd: fix infinite loop in ksmbd_conn_handler_loop()"),
+changes GFP modifiers passed to kvmalloc(). However, the latter calls
+kvmalloc_node() which does not support __GFP_NORETRY.
 
-On Wed, Mar 15, 2023 at 3:49=E2=80=AFAM Paulo Alcantara <pc@manguebit.com> =
-wrote:
->
-> Hi Shyam,
->
-> Shyam Prasad N <nspmangalore@gmail.com> writes:
->
-> > After cifs_tree_connect, tcon status should not be
-> > set to TID_GOOD. There could still be files that need
-> > reopen. The status should instead be changed to
-> > TID_NEED_FILES_INVALIDATE. That way, after reopen of
-> > files, the status can be changed to TID_GOOD.
-> >
-> > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> > ---
-> >  fs/cifs/cifsglob.h |  2 +-
-> >  fs/cifs/connect.c  | 14 ++++++++++----
-> >  fs/cifs/dfs.c      | 16 +++++++++++-----
-> >  fs/cifs/file.c     | 10 +++++-----
-> >  4 files changed, 27 insertions(+), 15 deletions(-)
->
-> With this patch, the status of TID_GOOD is no longer set after
-> reconnecting tcons.  I've noticed that when the DFS cache refresher
-> attempted to get a new referral for updating a cached entry but the IPC
-> tcon status was still set to TID_NEED_FILES_INVALIDATE, therefore
-> skipping the I/O as it thought the IPC tcon was disconnected.
->
-> IOW, the TID_NEED_FILES_INVALIDATE status remains set for both types of
-> tcons after reconnect.
->
-> Besides, could you please split this patch into two?  The first one
-> would fix the checking of tcon statuses by using the appropriate spin
-> lock, and the second would make use of TID_NEED_FILES_INVALIDATE on
-> non-IPC tcons and set the TID_GOOD status afterwards.
->
-> Thanks.
+Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+---
+ fs/ksmbd/connection.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Hi Paulo,
+diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
+index 5b10b03800c1..54e077597f4e 100644
+--- a/fs/ksmbd/connection.c
++++ b/fs/ksmbd/connection.c
+@@ -329,10 +329,7 @@ int ksmbd_conn_handler_loop(void *p)
+ 
+ 		/* 4 for rfc1002 length field */
+ 		size = pdu_size + 4;
+-		conn->request_buf = kvmalloc(size,
+-					     GFP_KERNEL |
+-					     __GFP_NOWARN |
+-					     __GFP_NORETRY);
++		conn->request_buf = kvmalloc(size, GFP_KERNEL);
+ 		if (!conn->request_buf)
+ 			break;
+ 
+-- 
+2.34.1
 
-Good point. The tcon status were indeed messed up after this patch.
-Should have checked it earlier. My bad.
-
-Let me revert this one and include only the checking of tcon status
-with the right lock.
-
-Attached the patch for that.
-
---=20
-Regards,
-Shyam
-
---000000000000ed360a05f70255ea
-Content-Type: application/octet-stream; 
-	name="0001-cifs-check-only-tcon-status-on-tcon-related-function.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-check-only-tcon-status-on-tcon-related-function.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lfazxnns0>
-X-Attachment-Id: f_lfazxnns0
-
-RnJvbSBkNDFlODQxNzVkNzk1Njk0ODMyMGJhYjY0OGJjZWE2MjVjMzVmZDNkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-PgpEYXRlOiBUaHUsIDE2IE1hciAyMDIzIDEwOjQ1OjEyICswMDAwClN1YmplY3Q6IFtQQVRDSCAw
-MS8xM10gY2lmczogY2hlY2sgb25seSB0Y29uIHN0YXR1cyBvbiB0Y29uIHJlbGF0ZWQgZnVuY3Rp
-b25zCgpXZSBoYWQgYSBjb3VwbGUgb2YgY2hlY2tzIGZvciBzZXNzaW9uIGluIGNpZnNfdHJlZV9j
-b25uZWN0CmFuZCBjaWZzX21hcmtfb3Blbl9maWxlc19pbnZhbGlkLCB3aGljaCB3ZXJlIHVubmVj
-ZXNzYXJ5LgpBbmQgdGhhdCB3YXMgZG9uZSB3aXRoIHNlc19sb2NrLiBDaGFuZ2VkIHRoYXQgdG8g
-dGNfbG9jayB0b28uCgpTaWduZWQtb2ZmLWJ5OiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNy
-b3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY29ubmVjdC5jIHwgMTAgKysrKysrKy0tLQogZnMvY2lm
-cy9kZnMuYyAgICAgfCAxMCArKysrKysrLS0tCiBmcy9jaWZzL2ZpbGUuYyAgICB8ICA4ICsrKyst
-LS0tCiAzIGZpbGVzIGNoYW5nZWQsIDE4IGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQoK
-ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25uZWN0LmMKaW5kZXgg
-NTIzM2YxNGYwNjM2Li5lMjQ5ZjZmZWNkMjYgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY29ubmVjdC5j
-CisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC00MDM4LDkgKzQwMzgsMTMgQEAgaW50IGNpZnNf
-dHJlZV9jb25uZWN0KGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRj
-b24sIGNvbnN0IHN0cnUKIAogCS8qIG9ubHkgc2VuZCBvbmNlIHBlciBjb25uZWN0ICovCiAJc3Bp
-bl9sb2NrKCZ0Y29uLT50Y19sb2NrKTsKLQlpZiAodGNvbi0+c2VzLT5zZXNfc3RhdHVzICE9IFNF
-U19HT09EIHx8Ci0JICAgICh0Y29uLT5zdGF0dXMgIT0gVElEX05FVyAmJgotCSAgICB0Y29uLT5z
-dGF0dXMgIT0gVElEX05FRURfVENPTikpIHsKKwlpZiAodGNvbi0+c3RhdHVzICE9IFRJRF9ORVcg
-JiYKKwkgICAgdGNvbi0+c3RhdHVzICE9IFRJRF9ORUVEX1RDT04pIHsKKwkJc3Bpbl91bmxvY2so
-JnRjb24tPnRjX2xvY2spOworCQlyZXR1cm4gLUVIT1NURE9XTjsKKwl9CisKKwlpZiAodGNvbi0+
-c3RhdHVzID09IFRJRF9HT09EKSB7CiAJCXNwaW5fdW5sb2NrKCZ0Y29uLT50Y19sb2NrKTsKIAkJ
-cmV0dXJuIDA7CiAJfQpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9kZnMuYyBiL2ZzL2NpZnMvZGZzLmMK
-aW5kZXggYjY0ZDIwMzc0YjljLi44M2JjN2UxNmYzYTMgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvZGZz
-LmMKKysrIGIvZnMvY2lmcy9kZnMuYwpAQCAtNDc5LDkgKzQ3OSwxMyBAQCBpbnQgY2lmc190cmVl
-X2Nvbm5lY3QoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwg
-Y29uc3Qgc3RydQogCiAJLyogb25seSBzZW5kIG9uY2UgcGVyIGNvbm5lY3QgKi8KIAlzcGluX2xv
-Y2soJnRjb24tPnRjX2xvY2spOwotCWlmICh0Y29uLT5zZXMtPnNlc19zdGF0dXMgIT0gU0VTX0dP
-T0QgfHwKLQkgICAgKHRjb24tPnN0YXR1cyAhPSBUSURfTkVXICYmCi0JICAgIHRjb24tPnN0YXR1
-cyAhPSBUSURfTkVFRF9UQ09OKSkgeworCWlmICh0Y29uLT5zdGF0dXMgIT0gVElEX05FVyAmJgor
-CSAgICB0Y29uLT5zdGF0dXMgIT0gVElEX05FRURfVENPTikgeworCQlzcGluX3VubG9jaygmdGNv
-bi0+dGNfbG9jayk7CisJCXJldHVybiAtRUhPU1RET1dOOworCX0KKworCWlmICh0Y29uLT5zdGF0
-dXMgPT0gVElEX0dPT0QpIHsKIAkJc3Bpbl91bmxvY2soJnRjb24tPnRjX2xvY2spOwogCQlyZXR1
-cm4gMDsKIAl9CmRpZmYgLS1naXQgYS9mcy9jaWZzL2ZpbGUuYyBiL2ZzL2NpZnMvZmlsZS5jCmlu
-ZGV4IDRkNGEyZDgyNjM2ZC4uNjgzMWE5OTQ5YzQzIDEwMDY0NAotLS0gYS9mcy9jaWZzL2ZpbGUu
-YworKysgYi9mcy9jaWZzL2ZpbGUuYwpAQCAtMTc0LDEzICsxNzQsMTMgQEAgY2lmc19tYXJrX29w
-ZW5fZmlsZXNfaW52YWxpZChzdHJ1Y3QgY2lmc190Y29uICp0Y29uKQogCXN0cnVjdCBsaXN0X2hl
-YWQgKnRtcDE7CiAKIAkvKiBvbmx5IHNlbmQgb25jZSBwZXIgY29ubmVjdCAqLwotCXNwaW5fbG9j
-aygmdGNvbi0+c2VzLT5zZXNfbG9jayk7Ci0JaWYgKCh0Y29uLT5zZXMtPnNlc19zdGF0dXMgIT0g
-U0VTX0dPT0QpIHx8ICh0Y29uLT5zdGF0dXMgIT0gVElEX05FRURfUkVDT04pKSB7Ci0JCXNwaW5f
-dW5sb2NrKCZ0Y29uLT5zZXMtPnNlc19sb2NrKTsKKwlzcGluX2xvY2soJnRjb24tPnRjX2xvY2sp
-OworCWlmICh0Y29uLT5zdGF0dXMgIT0gVElEX05FRURfUkVDT04pIHsKKwkJc3Bpbl91bmxvY2so
-JnRjb24tPnRjX2xvY2spOwogCQlyZXR1cm47CiAJfQogCXRjb24tPnN0YXR1cyA9IFRJRF9JTl9G
-SUxFU19JTlZBTElEQVRFOwotCXNwaW5fdW5sb2NrKCZ0Y29uLT5zZXMtPnNlc19sb2NrKTsKKwlz
-cGluX3VubG9jaygmdGNvbi0+dGNfbG9jayk7CiAKIAkvKiBsaXN0IGFsbCBmaWxlcyBvcGVuIG9u
-IHRyZWUgY29ubmVjdGlvbiBhbmQgbWFyayB0aGVtIGludmFsaWQgKi8KIAlzcGluX2xvY2soJnRj
-b24tPm9wZW5fZmlsZV9sb2NrKTsKLS0gCjIuMzQuMQoK
---000000000000ed360a05f70255ea--
