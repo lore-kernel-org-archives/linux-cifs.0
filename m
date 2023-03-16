@@ -2,94 +2,53 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDCFC6FD19
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Mar 2023 14:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1177FC6FD19
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Mar 2023 14:47:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbjCPOp3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Mar 2023 10:45:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53964 "EHLO
+        id S229928AbjCPOrn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Mar 2023 10:47:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229659AbjCPOp2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Mar 2023 10:45:28 -0400
-Received: from mail-pg1-x544.google.com (mail-pg1-x544.google.com [IPv6:2607:f8b0:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0376B113E5;
-        Thu, 16 Mar 2023 07:45:25 -0700 (PDT)
-Received: by mail-pg1-x544.google.com with SMTP id k15so293379pgt.10;
-        Thu, 16 Mar 2023 07:45:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678977925;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q5S9yam8E0yc9SuJ7yNknLaYjD0yQwuVUoXiwUMDyx8=;
-        b=Z2F06eYXq5d+2HeYSQGUg7z43Xm/I5qZcvLTI6VFCb5aCcMjT0E9uEs1z3lzGnfkzp
-         o8S3GiXJRQkO0+p9fC75Pl26ZIhvCwKhsxrnW+mO07ZUNDrbByvfd8gpND23GFkJ31Pc
-         edqo8fjxwB6GxswXpj3L52vg4+mk3Rh48+vaJPKWqYXM5IHwb2qgjsW5s4a2Vhtwiky4
-         JPPfWbGzAxrtilpcaQzPe6fNc0W5zAm9ZS7uPcBZyzygQrBq50iWycR34yoKBvZYC1nE
-         vhEwKFJd4cp/xSf0IlKEXuH/6vqtbfkGjUzJ5UNx9+0Yof/T5s4tc2Np67IZC0k+oGXR
-         19NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678977925;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q5S9yam8E0yc9SuJ7yNknLaYjD0yQwuVUoXiwUMDyx8=;
-        b=0MOPfy+HhavfJ3tJGO1MaVEKAH9x6ADVP8YzIPZMGVEfYwpS6//bRM/8o4ldgLji4D
-         OLRQP3s8CBTISuDVM3Ag2pGAzANMUQnR3yeVQs4pqWQUEWBIn6cWd13zIFsvqN2UeTCN
-         VaI4g5jf6bvPcawMIDuw2z89/yeYX4JZ1yn/HHlTEh9aS4uzDlBXyXoRG8sMkupNIzyX
-         oSpR5Qf2WHkadhl/JLbUVOEIFyllxR5AbOSq9J23RqNfr5+XINVpi07PvNmX11K31bcv
-         a6uCtDf3P/6wwMwxTmdk42CQG9TaaqAfWSofZKzLeT2CVDqT0QoaD9K6k1PxIvfPRCUM
-         UbzQ==
-X-Gm-Message-State: AO0yUKWjQhBrGsPfEgR+7DaVdd47vcsMEadAU7T90NMrr47ISRd8+QDL
-        mj8S8H1mdlBVDrbSklYbgvU=
-X-Google-Smtp-Source: AK7set8IxOrl3onJPkC6BfWLMgm2uKRqmxa2/FvQhwZWA6kSSVX/qfbRHCQAN9ukZCE51Vmew3u1gg==
-X-Received: by 2002:aa7:8f08:0:b0:5d7:637a:abcf with SMTP id x8-20020aa78f08000000b005d7637aabcfmr3074363pfr.32.1678977925322;
-        Thu, 16 Mar 2023 07:45:25 -0700 (PDT)
-Received: from c1ion.lan ([139.227.13.23])
-        by smtp.gmail.com with ESMTPSA id l22-20020a62be16000000b0058bacd6c4e8sm5503701pff.207.2023.03.16.07.45.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 07:45:24 -0700 (PDT)
-From:   MIngyi Cong <congmingyi@gmail.com>
-To:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
-        tom@talpey.com
-Cc:     congmingyi@gmail.com, linux-kernel@vger.kernel.org,
+        with ESMTP id S229790AbjCPOrm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Mar 2023 10:47:42 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E15CA618D;
+        Thu, 16 Mar 2023 07:47:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=/QbrHDToz4OYTamtsGa0neSPu+ZWm/jLj9D1wlpmcUM=; b=MqSPb1uZU91VReNokGTYmdasei
+        9h6CSvSUd5PC4DBPIOvcNBBE8guMEg+maloDdidLt05jw7/lP2ACGA2sB0YaY7BWcI8YKs9BLpZTb
+        1hz8x0B8H79Qqk3IlJfASV0pe3EogpOM+zdtOO4VXgAMQ8iY52wp56YUdRvPAJasZeHZgyv5nstgi
+        0yQJgx8ahY40RuYaCjEbY68MXtyCI9TD4OsvnXkD845CUJJ0ojV9YPxqxOJ3R7hfsbgyXNkKYRDv/
+        LcAZAw79dOJODtu1FsXHAcRadCayz2Ym4d9hzRyFkULaoQ8AM9H5xxk4zn8LuKFB4ZOCV8Mq+3v+n
+        BEc49sbw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pcosv-00GjQ0-1t;
+        Thu, 16 Mar 2023 14:47:17 +0000
+Date:   Thu, 16 Mar 2023 07:47:17 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     MIngyi Cong <congmingyi@gmail.com>
+Cc:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
+        tom@talpey.com, linux-kernel@vger.kernel.org,
         linux-cifs@vger.kernel.org
-Subject: [PATCH v3] fs: add the tuncate check of exfat
-Date:   Thu, 16 Mar 2023 22:45:17 +0800
-Message-Id: <20230316144517.7355-1-congmingyi@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230307135740.13209-1-congmingyi@gmail.com>
+Subject: Re: [PATCH v3] fs: add the tuncate check of exfat
+Message-ID: <ZBMr9YOmLtC6GNQ8@infradead.org>
 References: <20230307135740.13209-1-congmingyi@gmail.com>
+ <20230316142753.6628-1-congmingyi@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230316142753.6628-1-congmingyi@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-EXFAT will fill zero data in truncated range.
-Fix this by adding EXFAT_SUPER_MAGIC check.
+On Thu, Mar 16, 2023 at 10:27:53PM +0800, MIngyi Cong wrote:
+> EXFAT will fill zero data in truncated range.
+> Fix this by adding EXFAT_SUPER_MAGIC check.
 
-Signed-off-by: MIngyi Cong <congmingyi@gmail.com>
----
- V1 -> V2: add the truncate check of hfs and remove EXFAT_SUPER_MAGIC in magic.h
- V2 -> V3: remove the truncate check of hfs and hfsplus
- fs/ksmbd/smb2pdu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 0685c1c77b9f..3f2e34936b8d 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -5746,7 +5746,8 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- 	 * truncate of some filesystem like FAT32 fill zero data in
- 	 * truncated range.
- 	 */
--	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC) {
-+	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC ||
-+		inode->i_sb->s_magic != EXFAT_SUPER_MAGIC) {
- 		ksmbd_debug(SMB, "truncated to newsize %lld\n", newsize);
- 		rc = ksmbd_vfs_truncate(work, fp, newsize);
- 		if (rc) {
--- 
-2.34.1
-
+None of these is correct.  We need to find a way to communicate
+this information without looking at magic numbers.
