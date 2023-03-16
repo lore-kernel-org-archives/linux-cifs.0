@@ -2,61 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E11C6FD1F
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Mar 2023 14:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2F0C6FD19
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Mar 2023 14:36:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230215AbjCPO2U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Mar 2023 10:28:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60190 "EHLO
+        id S230177AbjCPOgQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Mar 2023 10:36:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230176AbjCPO2S (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Mar 2023 10:28:18 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E85245FE4;
-        Thu, 16 Mar 2023 07:28:09 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id z10so1024031pgr.8;
-        Thu, 16 Mar 2023 07:28:09 -0700 (PDT)
+        with ESMTP id S229838AbjCPOgQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Mar 2023 10:36:16 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C8EE3BF;
+        Thu, 16 Mar 2023 07:36:15 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id o6-20020a17090a9f8600b0023f32869993so1667506pjp.1;
+        Thu, 16 Mar 2023 07:36:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678976888;
+        d=gmail.com; s=20210112; t=1678977375;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=M7Aqp/vCsVP1mtxvgQ+j+GMgl/fAIAsqktfz1ENdg3U=;
-        b=ThLnSy636s2ceW+2BuQpxDg3BeyXPAKuTJgyCCKtBdXeM9/rA60FHrK3q8qzAZ+sGK
-         0Y7T+qNAD/zcDTTVqLM4rGINJjluhEcPbROqkn2O8UkcY7mk+xt40lsfT596q2oP+1+H
-         fwBBuWpmx0hwy7fiMMbwdE6i8Hj22FzaNgECKliQeFll8xRx9zCxSmq82hkHxNOD2jcE
-         JKGxcMOKLdLtSFe+gfuVMjg7DFYTONxCV43Tpo7+ljzrYzPhws490Ue2cpTdNElFFNAi
-         BL2GkX5Ty/t9xNOCEXPot/PJgV4D0vauMLH5/+BB0OvNI+/F2X+Cy1IzNUYX8pxdt9A2
-         ssJQ==
+        bh=Q5S9yam8E0yc9SuJ7yNknLaYjD0yQwuVUoXiwUMDyx8=;
+        b=TObbh32HkmIQ6Z1Ln0lm1/+Iw0cOFUwf1YqA5eqmOcSOPSDPK4hQjHGI5uZah3xAZl
+         IVvctf11Ktt6s0poWKuf8PDUXYM+S1R2nBabIqHVvoBZKKDYJiBo6bGah0/PMfBW4WBe
+         IsvpcafZpYxjpiA1VZd4CZSn4gLYX2B4CPDR/sPeSDo15HDvHTgRyUjK7C/TzUgHrS30
+         yD0o/Jq/HNPXK8hS2HOwDOrIqUfWyjNvMQpdUkSOJqLTx2GFFSApeKAFgCWqm+2Q3G3i
+         9O9CSulW80/LvxHBCy89Lb7hxlnYoMQd/7hvApO36Wvxh66rkeR6JVYHCpxwUPlBMbFi
+         fQ2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678976888;
+        d=1e100.net; s=20210112; t=1678977375;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M7Aqp/vCsVP1mtxvgQ+j+GMgl/fAIAsqktfz1ENdg3U=;
-        b=aomMkPI7wuw8JEcdXTXDndsUPNoCYMcyb9dgg/EpPP76j3TwpKTnYA7RSGIqinZPAP
-         l1l89XHf8SJ75ypaZfIK4iOPupnFy73iOTqiamHVnLMnJclvD+9HkEcxpCJi1EJqqx9O
-         wZ+UjgIqteWj3QBicuM1gbdP2JfTs2ZDPE3cozmQL2n6r8THh/036zplk2VRWN3AysN3
-         uGw3FwzwaWEkliWmGqyellzm8qVURyDZYw4IJ+aEsu7vrTKDq3cQlzDboz0wiXh+sCrQ
-         Nkmt9TbTCYYz26mKN27Gi3J00hY3h9KKiLFclWpNo484wDrP4c2vbyoLlPZP3aTtMpQS
-         ztrA==
-X-Gm-Message-State: AO0yUKU8qpYH2xxwH0SGEaR2Ss+3abx5Kj8erII8Qh7umzmosZsEIFyh
-        /HaWxNePNe8wr/p9RoGl5szo9Q5YYvFP2Q==
-X-Google-Smtp-Source: AK7set+nQjrth2IsI2my79ig6nDTaUEKWSmsDA4k9pvQa+I6uQSjYSrK/+B4jTu383dd6b+/KU4Sng==
-X-Received: by 2002:aa7:9681:0:b0:624:2f88:927d with SMTP id f1-20020aa79681000000b006242f88927dmr3049632pfk.27.1678976888137;
-        Thu, 16 Mar 2023 07:28:08 -0700 (PDT)
+        bh=Q5S9yam8E0yc9SuJ7yNknLaYjD0yQwuVUoXiwUMDyx8=;
+        b=pnv+4AX2wrHn9W/6Hz0JIuyv/s3i5IYyE6ERyaJchcSNrOURbiw8N6H3kVH2jD2Prj
+         uqjwTg9MQK9fYz/pRiXbrfE1WFLhS/4nrcUD0zzGkAKdbXkM0PGWme+6rowZAZP1PY6c
+         a117XHthVxhTodOJYdac63jrW2qVw4Iz54NSX5VrnPGQD7sJc3V4JfYqcP7631YQaIE9
+         TrIKvH5jNYgx0kI5O2iiucUPBds5deZzbjsXVRVCg6xYmO8Z8ag5lihfUBMqESxgI83n
+         VpAm0rgETAFyC98ewygxQS+eCex+6B3yHUz8N15o+tCDJOIga5WvTGcZo8TVeo7jl5Uj
+         arZA==
+X-Gm-Message-State: AO0yUKXrLPwto0WyWNBNEkRh3XLzmwFYk5Q8X4n+1MiaivzLz6zKzTVC
+        MNE7FbmNiGCT+Wo3uv0fS/Y=
+X-Google-Smtp-Source: AK7set9/BHGkdAw8o1Cv7koO/h1NyzpaxYr9qQcM1OLRNTB2NF7cD3mEFwx87vASTm67DuJXggtuBg==
+X-Received: by 2002:a17:90b:388f:b0:23e:f867:e0b with SMTP id mu15-20020a17090b388f00b0023ef8670e0bmr3979057pjb.49.1678977374858;
+        Thu, 16 Mar 2023 07:36:14 -0700 (PDT)
 Received: from c1ion.lan ([139.227.13.23])
-        by smtp.gmail.com with ESMTPSA id x21-20020aa784d5000000b0062485a1675bsm5510058pfn.137.2023.03.16.07.28.05
+        by smtp.gmail.com with ESMTPSA id bt7-20020a17090af00700b0023440af7aafsm3262689pjb.9.2023.03.16.07.36.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 07:28:07 -0700 (PDT)
+        Thu, 16 Mar 2023 07:36:14 -0700 (PDT)
 From:   MIngyi Cong <congmingyi@gmail.com>
 To:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
         tom@talpey.com
 Cc:     congmingyi@gmail.com, linux-kernel@vger.kernel.org,
         linux-cifs@vger.kernel.org
 Subject: [PATCH v3] fs: add the tuncate check of exfat
-Date:   Thu, 16 Mar 2023 22:27:53 +0800
-Message-Id: <20230316142753.6628-1-congmingyi@gmail.com>
+Date:   Thu, 16 Mar 2023 22:35:02 +0800
+Message-Id: <20230316143502.7059-1-congmingyi@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230307135740.13209-1-congmingyi@gmail.com>
 References: <20230307135740.13209-1-congmingyi@gmail.com>
@@ -72,10 +72,9 @@ Fix this by adding EXFAT_SUPER_MAGIC check.
 Signed-off-by: MIngyi Cong <congmingyi@gmail.com>
 ---
  V1 -> V2: add the truncate check of hfs and remove EXFAT_SUPER_MAGIC in magic.h
- V2 -> V3: remove the truncate  check of hfs and hfsplus 
- fs/ksmbd/smb2pdu.c         | 3 ++-
- include/uapi/linux/magic.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ V2 -> V3: remove the truncate  check of hfs and hfsplus
+ fs/ksmbd/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
 index 0685c1c77b9f..3f2e34936b8d 100644
@@ -91,18 +90,6 @@ index 0685c1c77b9f..3f2e34936b8d 100644
  		ksmbd_debug(SMB, "truncated to newsize %lld\n", newsize);
  		rc = ksmbd_vfs_truncate(work, fp, newsize);
  		if (rc) {
-diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
-index 6325d1d0e90f..309cb3b5c5c4 100644
---- a/include/uapi/linux/magic.h
-+++ b/include/uapi/linux/magic.h
-@@ -46,6 +46,7 @@
- 
- #define MSDOS_SUPER_MAGIC	0x4d44		/* MD */
- #define EXFAT_SUPER_MAGIC	0x2011BAB0
-+#define HFS_SUPER_MAGIC	0x4244		/* "BD": HFS MDB (super block) */
- #define NCP_SUPER_MAGIC		0x564c		/* Guess, what 0x564c is :-) */
- #define NFS_SUPER_MAGIC		0x6969
- #define OCFS2_SUPER_MAGIC	0x7461636f
 -- 
 2.34.1
 
