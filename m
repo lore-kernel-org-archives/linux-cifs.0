@@ -2,68 +2,60 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E289EC74A5B
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Mar 2023 22:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 165F0C74A5B
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Mar 2023 08:56:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229848AbjCPWMh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Mar 2023 18:12:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50940 "EHLO
+        id S231288AbjCQI4u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Mar 2023 04:56:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjCPWMg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Mar 2023 18:12:36 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629F277E1A;
-        Thu, 16 Mar 2023 15:12:31 -0700 (PDT)
+        with ESMTP id S231361AbjCQI4r (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Mar 2023 04:56:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4C765C46;
+        Fri, 17 Mar 2023 01:56:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EBF2962135;
-        Thu, 16 Mar 2023 22:12:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FCAAC433D2;
-        Thu, 16 Mar 2023 22:12:30 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0C12DB824F4;
+        Fri, 17 Mar 2023 08:56:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D103AC433EF;
+        Fri, 17 Mar 2023 08:55:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679004750;
-        bh=blkqnagaUqPW+2mgMNz2gB1RDzsSKL2IX+6bnYtgGYE=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=ch7w9FSNo5E6yyLIapOBgbiheg/7Yuk/Og0SMPGewGZmXjZOjGfRw9g7mQziRvc5g
-         1antCtLL0BsU4P3tyQtS+vNYqSodUKJ8TN6Ss+Yw0F+UhzYSYj+Q3+aEMBsy10ynBT
-         xNOk6BtBmepF7LamuRzR+faAy71Up5V3w96tszYi+vET6/hXcfJOAZ8r7aSz8bfiQy
-         6qUsmUS0aEfqtadTOt09/sPNe0Ih7CcTUGcVM1FClUBlGnsxe1xgOK0RTMB6EH9gkw
-         mseiyQpJ1T0ZPqym65t7s5KBGgNRH13zMc0dUA83GUIqn2au3PuiVCX4nXe9Z6XCUr
-         b5RrsUwoSjHvQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4D831C43161;
-        Thu, 16 Mar 2023 22:12:30 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvy1og79Zxumu_Bn4NZGpian1Tk2LXpDTQYjCG4nF4Mbw@mail.gmail.com>
-References: <CAH2r5mvy1og79Zxumu_Bn4NZGpian1Tk2LXpDTQYjCG4nF4Mbw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvy1og79Zxumu_Bn4NZGpian1Tk2LXpDTQYjCG4nF4Mbw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.3-rc2-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 6284e46bdd47743a064fe6ac834a7ac05b1fd206
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 38e04b3e4240a6d8fb43129ebad41608db64bc6f
-Message-Id: <167900475031.29338.15186387726164392384.pr-tracker-bot@kernel.org>
-Date:   Thu, 16 Mar 2023 22:12:30 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        s=k20201202; t=1679043361;
+        bh=Gio1GUXXQujGj5kXLT+lgayppKbjCJJ2ylmSUsEZdb8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sbwT+Sgw6SB4naNHeDAUcthAaEz5V+jqBQsQ2UfcFEUZ8kTffhqQeerIuSg10asya
+         8OKN4CMWuq8vRO6HC7J74u+DLC2SIs6yrvgSF+wQTLQmqt/cI3dVpSy3m1UqjJt00j
+         iUW4ajPPnaGeEouPeTAWrqwgq65bwP0x2pvrbFfOCH5kS9Yjp0qPh6HXRUmlz5sJSX
+         RZfeZd/Oh44KT1mQcYEut97rHfV6YXVz+y+eevqfPBpE9lrbhxhD9RWKKKo1WOF5fN
+         Kbc/Tinp4gptC9YxWtkWxRImS5dn6vFmMFsKYRx2tBJ5kZCzoaQDqT80czd/dYb1pv
+         QjSVVrsb178fg==
+Date:   Fri, 17 Mar 2023 09:55:56 +0100
+From:   Christian Brauner <brauner@kernel.org>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, smfrench@gmail.com,
+        senozhatsky@chromium.org, tom@talpey.com
+Subject: Re: [PATCH v8 1/3] ksmbd: remove internal.h include
+Message-ID: <20230317085556.sprbco6yrd2d2jf2@wittgenstein>
+References: <20230315223435.5139-1-linkinjeon@kernel.org>
+ <20230315223435.5139-2-linkinjeon@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230315223435.5139-2-linkinjeon@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Thu, 16 Mar 2023 15:39:53 -0500:
+On Thu, Mar 16, 2023 at 07:34:33AM +0900, Namjae Jeon wrote:
+> Since vfs_path_lookup is exported, It should not be internal.
+> Move vfs_path_lookup prototype in internal.h to linux/namei.h.
+> 
+> Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.3-rc2-smb3-client-fixes
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/38e04b3e4240a6d8fb43129ebad41608db64bc6f
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Looks good to me,
+Reviewed-by: Christian Brauner <brauner@kernel.org>
