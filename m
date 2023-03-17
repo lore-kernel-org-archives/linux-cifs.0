@@ -2,73 +2,69 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59DE7C74A5B
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Mar 2023 12:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 763D9C6FD1D
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Mar 2023 16:43:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbjCQMg2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Mar 2023 08:36:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34366 "EHLO
+        id S229816AbjCQQnQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Mar 2023 12:43:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230133AbjCQMg1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Mar 2023 08:36:27 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFF194A47
-        for <linux-cifs@vger.kernel.org>; Fri, 17 Mar 2023 05:36:02 -0700 (PDT)
-Message-ID: <4913391e6b2ed4672fd427b479460eae.pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1679056505;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vHoMkyfGjxnHLflN/ohKYeEJ8K7Scd0ZrRo3bqjfyVk=;
-        b=CTN7Pxm8TuLH56mfNnbbMb8lnKhbFNg+azBVMPy92SCx+IPbR3i9T7p0DvFyn0GscXJLwe
-        D6ZyD9BHVOC9/se+DJTemapTz2I2lcvOI+ANJdwYWk7puiqDXlgpNod1nFKX6SQwe1h3aA
-        OkoUuWwYUfomgOm5h7YuscFIuGcgQDLBR4g9M5juMrHbOgfPr5d2bohvKEdfC/k9TFA18N
-        vf0uFsYKe23xpW5Gc42YA2AoLwEWr8nBY6K2JhNrTfLZr+DHhXcIHqQBWtNkC/idodtqLY
-        59HSZVxaDexf0bCpIYExb4HY2IdUA6o083pf1nXMvfH+w9DUwf5CEPkixPKHOQ==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1679056505; a=rsa-sha256;
-        cv=none;
-        b=IpFlVihUReGKzjTkc4qmWpp3zJJLgjK4X+yLnkPOYt8xcE9ydpU01OhyzGC6CLMxc/cok7
-        VU9z4cDy7Gu0h481N/OctZmKSD6spK5KjaarkY09hKWXtZXL04bgB5AxNyGgOLRPLtdvgU
-        FVC98SEH4lXKYrEfb22Wjvne2/4K9P4weYuHk7u/bRc/Fyu/uD+jOFfNOgsnvZYXzq3oiD
-        P1oTe5DH9CnjN6K2m5nmSc1NJZ6EYz29zhfPFn9cpsG5uYRwFxabhB6Uj3dHQbk7X4Z3Cl
-        kINKocXVL0XvmmavhGRdxEWwyfowQRlzSo965ZO2hHRgc6Ek7R0/xLicoR6o7Q==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1679056505;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vHoMkyfGjxnHLflN/ohKYeEJ8K7Scd0ZrRo3bqjfyVk=;
-        b=eMZTVsa8azcLz1Vp3T53Qt4GBJY+HvFrmzlxkezwsjXIVCyVE1QoyYXQhfI6ZW20YZEDLj
-        +fCB4+TeyleFydBmX1VIzKowpwnHQe2OjGlB4QvzZguUccQJpVwX0xEO2Trl0exmKFIxgm
-        FJJRTShx5eoLK6QzoC8d7iC6VKaSmkAwFdrbwXIeF2trrOq6z6sozMzTw69hgaFVdrSmok
-        U4W4oI+Oi12h1wrL9kb75vPcIf9Bwgt7niBgV9HKFA8cGCeRbRcb7+lv24v2rhdXN+v/Hc
-        AS6yivZEovdJ5g6Y5nfPtNiAdnbrLGrfpqYvOmxMdqPOTro8DbMmNPLKikz7Wg==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     smfrench@gmail.com, bharathsm.hsk@gmail.com, tom@talpey.com,
-        linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 01/11] cifs: fix tcon status change after tree connect
-In-Reply-To: <CANT5p=qyFkJn0cCfiyJma3RFcmeBcjq4C4qDhw7CL8A+fiAUEQ@mail.gmail.com>
-References: <20230310153211.10982-1-sprasad@microsoft.com>
- <95f468756e26ebfb41f00b01f13d09da.pc.crab@mail.manguebit.com>
- <CANT5p=pfZNefhzGSytg9tuGXhNgvesVecTGoZFhWnUmnLxb-9g@mail.gmail.com>
- <ee7ad068976dcf1a7356fb6cd230fb69.pc@manguebit.com>
- <CANT5p=qyFkJn0cCfiyJma3RFcmeBcjq4C4qDhw7CL8A+fiAUEQ@mail.gmail.com>
-Date:   Fri, 17 Mar 2023 09:35:01 -0300
+        with ESMTP id S230383AbjCQQnN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Mar 2023 12:43:13 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 009128735C
+        for <linux-cifs@vger.kernel.org>; Fri, 17 Mar 2023 09:42:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-Id:Date:Cc:To:From;
+        bh=KGdkQ2QHsXAcNFVHTJz2bvfdT+IWSrZAfEnaRhDehlI=; b=1B3LS0F/oQJzc7ztVCJkwvCKQe
+        m1yj9NSO0PBw+gbLPJRYqjHXrdlsla2HIQRi8lYrILJdxkCbcaustO/Lxdv7M3mxPlvXMWRBf0oV9
+        g54RunSq+9COCt/pmuqhErviivCVOOzi90a8d+D+K7Da/mWHoIHSrPB2wXjXACTmatr3OvdPpgu7X
+        zz3mmmIjx/7vpkbTt1X66Er/3KMyTEHBAfN2yGFrrqjMmgfGenX9DxXK4QwPmzOWxPBa0/vbFVvAM
+        I0s4qJlHsI1MHnBHBWbWY4LtpcM/RBEfMR12xfFWLRFkoWPkHz9t+8mJoyGwkfRvsfwoIrMs2DFx4
+        jvk8Qgkt2uYbUp3RPwuoHIqbxrLq2pDvSpSXLJZmJ0wft53+WmCLe1EPrt9+EWa0RvWcB+0rxrFbz
+        0XIO+u5rGyu/QSMGBfGrf44bCTg6wkI/l+VXg4CuRklkxQBnj4OQXibodNLmMHCk3E/cm/7IGtHaq
+        plVXp/h0kykMlIKzIOgh1kz+;
+Received: from [2a01:4f8:252:410e::177:224] (port=50854 helo=atb-devel-224..) 
+        by hr2.samba.org with esmtp (Exim)
+        id 1pdDAA-003s0d-MF; Fri, 17 Mar 2023 16:42:42 +0000
+From:   Volker Lendecke <vl@samba.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     Volker Lendecke <vl@samba.org>
+Subject: [PATCH] cifs: Clarify an if-condition in SMB2_open_init()
+Date:   Fri, 17 Mar 2023 16:42:36 +0000
+Message-Id: <19c9ea1d0b1927d9550facbc5d1b43885bb3a327.1679071266.git.vl@samba.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+(server->capabilities & SMB2_GLOBAL_CAP_LEASING) is the wrong
+condition to stitch together the create contexts, what we really care
+about is whether there already was a create context before the durable
+one we just are about to add. This also aligns with the other cases
+further down in SMB2_open_init().
 
-> Here's the updated patch.
+Signed-off-by: Volker Lendecke <vl@samba.org>
+---
+ fs/cifs/smb2pdu.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Thanks!
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 0e53265e1462..5d06ecc9341b 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2840,8 +2840,7 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 	}
+ 
+ 	if (*oplock == SMB2_OPLOCK_LEVEL_BATCH) {
+-		/* need to set Next field of lease context if we request it */
+-		if (server->capabilities & SMB2_GLOBAL_CAP_LEASING) {
++		if (n_iov > 2) {
+ 			struct create_context *ccontext =
+ 			    (struct create_context *)iov[n_iov-1].iov_base;
+ 			ccontext->Next =
+-- 
+2.30.2
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
