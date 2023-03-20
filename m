@@ -2,58 +2,81 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B82DBC7618A
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Mar 2023 13:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A40C6FD1D
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Mar 2023 18:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229759AbjCTNpZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Mar 2023 09:45:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55786 "EHLO
+        id S230379AbjCTSvw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Mar 2023 14:51:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231604AbjCTNo5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Mar 2023 09:44:57 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5954BDC9;
-        Mon, 20 Mar 2023 06:44:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=fJeItlnrEgSrVscMNkkOVI4DUx68JFTI3xaa/+k0qtY=; b=Wa/PnoDcEEK1PijKAuoHRFq9a0
-        7un3cph4HE0VEo+BApeWcPsgDMHmZl2CxFwy3RiK9b7tJ0npia4drz1TkwGkTrQxOwOmUzJnomy9m
-        Fs1X8qivZJgLzCnXH/sO08Eoy3ckr8fG8/5v6WpkEpS6580Fj4km0pPqYKeq7GOTUChmQBXqHmvKS
-        AXEBDniRjCCeLnpngx+iIhBmdDSTvC8IylpdN9LI7P8r2PUPgMxca//JGxA4Jt1HpX1MwMAVlDZkk
-        ltsmwpD9hf3G4d/VVLQCRLTiW2HDbZ1PBeU0zNb0j+qokWUBg93ud9dwVK9IvMGo9hhlXIn37q7G3
-        crqlV/pw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1peFo7-009Dvn-38;
-        Mon, 20 Mar 2023 13:44:15 +0000
-Date:   Mon, 20 Mar 2023 06:44:15 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mingyi Cong <congmingyi@gmail.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, linkinjeon@kernel.org,
-        senozhatsky@chromium.org, sfrench@samba.org, tom@talpey.com,
-        linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v3] fs: add the tuncate check of exfat
-Message-ID: <ZBhjL0zie5CZUq+z@infradead.org>
-References: <20230307135740.13209-1-congmingyi@gmail.com>
- <20230316142753.6628-1-congmingyi@gmail.com>
- <ZBMr9YOmLtC6GNQ8@infradead.org>
- <CAABeQzW++EWfW1rKqqKJCDN5eTceVJ4r380SA6Dg99CRZtUKFw@mail.gmail.com>
+        with ESMTP id S230411AbjCTSuz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Mar 2023 14:50:55 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E053A846
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Mar 2023 11:44:11 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id s20so5962736ljp.1
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Mar 2023 11:44:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679337848;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wsGRixAT3tuvq0GJFObtutOeQn67VzHDaGF9txZ6f0I=;
+        b=E7zTYH6z7kHcWP/s6whtW5qPrwTPhbmXewaQ+FVXlFtMUXWZzETFVUx3h29jrty1Jh
+         HHrYykJL63qaapzy0OOhN0DngY/JbHr63IKxTujPpzh0EDxSzjblTZhV8eN0t140/8Fh
+         tTigFpVtMqsmLrp/+65cB47AhqA9vDrycfr4MD094GLQWrbiiF+QIZ1UvZxgytNxr4z8
+         OBqMwkUkLZFs8yXfmUPa+aS8VEmN9XNsdMEMAD9O9zW5VA1Dyt8+ZNi9rxMjxExNvKg4
+         kMA876KJDhShEB9wY3Sw3Nty11JA74d7SIkvAXJy1mXwy4gPtcTbKg9ZFBmsMGuYL0l3
+         vA4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679337848;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wsGRixAT3tuvq0GJFObtutOeQn67VzHDaGF9txZ6f0I=;
+        b=Ders4wbA6axA5de1nDaPPsIxKq7AYJnNPtAeVPcV0e1lIlgi13p9NuBjwNI+JyRNmK
+         26VBLdHxhG4Jlif1rBUQtIYzoGBt+JyGLOFHoICgdnp7a2lDYskM4Jx+QB2WXt6EQV+9
+         XFXDKOTuxfjSdH7znvEHFh7DZwWAi3MghITAxRxZXOPMUNdCDmcjznrrKXFD8Gf+1mXq
+         NsyxJOT9byW7o9nnXW7OM4/SPVTckjhO4ACoJpIecSGXrhxJok8Bo/w0cIWRZ/FclOhl
+         yFuf63D2LBU4gLcc/p7pd+uGD3K3c0UCWYg+si77SK2Q8Ne+ht/S5vz1nG8B3Te21xTt
+         MLGw==
+X-Gm-Message-State: AO0yUKXRuT5pHJdvxAIRKg6mmcjRLQ12fmP8sJ+73n+Zs32KwWWZBMwO
+        GIX8sjQozwmYW9gWdZGf0IyijOi4ZguMpWHPZc5i5A7W
+X-Google-Smtp-Source: AK7set8z36lwk35Lhv0/JvhJeoUhaaAHPa+A4hHTK94PwwZvixRrf1waK3lH3LyOvLBWLzUZYU2AFB8syMaALVm3ERE=
+X-Received: by 2002:a2e:7405:0:b0:298:b3c7:293d with SMTP id
+ p5-20020a2e7405000000b00298b3c7293dmr64897ljc.7.1679337848136; Mon, 20 Mar
+ 2023 11:44:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAABeQzW++EWfW1rKqqKJCDN5eTceVJ4r380SA6Dg99CRZtUKFw@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 20 Mar 2023 13:43:57 -0500
+Message-ID: <CAH2r5mvj=ObccFPLXiX0bGsxs_Y6Vex-z138NnyGeke92XNrZg@mail.gmail.com>
+Subject: ksmbd not returning errors on unsupported dialects
+To:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 11:15:10PM +0800, Mingyi Cong wrote:
-> After my analysis, the reason is that the truncate system call of some file
-> systems will be filled with 0 data. We should add some conditional
-> judgments to avoid the use of some file systems for truncate. Do you have a
-> better suggestion for revision?
+David Howells had noticed that ksmbd returned "Input/output error"
+when mounting with vers=2.0 to ksmbd.    Looking at this more
+carefully, mounting to ksmbd works with 3.1.1 (and 3.0 and 2.1) as
+expected, but he is correct it fails with the wrong error for
+unsupported dialects like 2.0. ksmbd would be expected to fail with
+mounts with vers-2.1 but this error would be confusing to users.
 
-As ѕaid we need a flag, be that per-file system or per-inode to flag
-the behavior instead of guessing it from the major number.
+The problem is that ksmbd is returning STATUS_SUCESS on the negprot in
+the first part of the SMB1 header, but returning no information in the
+NegProt part of the response (e.g. StructureSize, SecurityMode,
+Dialect etc.)
+
+Looks like the bug is that you meant to return a status not supported
+or similar but left that out (or similar to what you do with vers=1.0,
+kill the socket which causes HOST DOWN to be returned by the Linux
+client).
+
+MS-SMB2 3.3.5.4 may have the exact error that is best to return in this case
+
+-- 
+Thanks,
+
+Steve
