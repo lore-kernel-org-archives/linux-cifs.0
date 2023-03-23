@@ -2,212 +2,161 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD72C6FD1C
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Mar 2023 16:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01489C74A5B
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Mar 2023 19:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232410AbjCWQn1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 23 Mar 2023 12:43:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41266 "EHLO
+        id S231526AbjCWTFO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 23 Mar 2023 15:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232030AbjCWQnD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Mar 2023 12:43:03 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C9F7EE2
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Mar 2023 09:40:41 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id t14so23195807ljd.5
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Mar 2023 09:40:41 -0700 (PDT)
+        with ESMTP id S231464AbjCWTFN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Mar 2023 15:05:13 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECDEE14216
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Mar 2023 12:05:12 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id bn14so5719162pgb.11
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Mar 2023 12:05:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679589637;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yXT7Q99MJclBWr90utjHDOXI0lYhfPprxpFtnCAbI3E=;
-        b=K7bGXXSOqaiENwya0fNZ/RjBuNbB5DlugwUBxRk21H4yNPZ8ZmIynx6cqRhFL0VeQS
-         hzOmOSD7VcxRQHkt9XRoh0eFMY/sPF6ErTb1nm0H5BNW/DoL/tdKKSrXQunhb4/wooIF
-         F9QGNIFoNfpeTfyCulTjH5o1xBEzNzLLaci818BqdvXiUYgotIxIl70yj1a6RGsBAg9c
-         18/fTtIUVj4EhhYikNFBe2+hU68OPF8Td0HKTjbTXpZDADl3I5WM/MR/dTySggL2Tvuj
-         wSItBFtd4pBoRTnYJxyN7oqKWDEmzPiYwSKPw1dO+w8vXcIqDWAdh5TPSemYAfmip014
-         CZkQ==
+        d=gmail.com; s=20210112; t=1679598312;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ACg+Z6I7+TvGUeT5hWZ3WZFwqVhJo9b/DSwM6tRWhmM=;
+        b=pvHkuOE5tqR3RL8IiA4HtYNyD4XB4LgSI7yz62+vibbmBFX9m8tQSnw4UPQ0UsK89e
+         yQknvimNimWFRrGN84dRQ6jL9CxkwhPGJOCS05+t+2fOjnVrl3y3t4Obiar0S7Pauhal
+         W7ISx2PIXIp8NZLejb8zjqxYjhOPq2rxlAHFUNJvmX10B9VjXE+TtAfjA3Rle7TntPl9
+         MIu5olEHQ5tPWXWG1tPRs9gNRIHiUrWv/PmFxyWERkLHeq0b5oA9pls2Uquadmr1EoWz
+         t6YAt1S99r3w7qUzew3VgZFP8XooN2EI0dJKrELiIXIwB9KMtPwI+iwWDQ84Gx76SS6J
+         059Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679589637;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yXT7Q99MJclBWr90utjHDOXI0lYhfPprxpFtnCAbI3E=;
-        b=7KyqhWKsUfVAI/b5yAEle43tdD2kEKYGr9dBsgu89P4hfOUu8woKsbv9lkg5A3Fthf
-         40+wj/Vw3XjfYIijvKRFKifzFYJBrIBkh3KdTcO6WnaQsP+jCntsLAD4Guur1waAwsj/
-         1sZtKG8T5wI5Jl9SKSq6yrBkT8qDW4ATpKgYw43hN/MPFgvNQohTgPfEtUB1JxgAzT0Q
-         VeKWeJ2CaBbv2ZxZ3Z343u//SG7OKx8EdzkaoWqo4HxbWpcDRZynljGnADfcG9ETXPUH
-         G8zOXsW+ETIqVqTJduVRXYs1uQHEyUcZwOBWXui5Ytxau9XfECLqoUXXvQjxqf3FiyWg
-         cDeg==
-X-Gm-Message-State: AO0yUKXQO9I9mZjqn+gJSzxJdLbvIee5LWH8cl2WLSpqrG7kUdo99/5s
-        beDZVvZXUlWrKTmvhn0ejmbThvDlDjl3iyi81nQ=
-X-Google-Smtp-Source: AK7set+J6H0D6JdtlocH4Wq/tcJoY8/CIj+hLVrjQzrduh123EtXGlKAmlm7DWTvEq11Vym5n1sSG5n5brlO2Fju3ME=
-X-Received: by 2002:a2e:8ed1:0:b0:299:9de5:2f1b with SMTP id
- e17-20020a2e8ed1000000b002999de52f1bmr3446275ljl.7.1679589637352; Thu, 23 Mar
- 2023 09:40:37 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679598312;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ACg+Z6I7+TvGUeT5hWZ3WZFwqVhJo9b/DSwM6tRWhmM=;
+        b=i3JnMFZsLxfpiswxqy5TliZUdIKkOXKvx+W8NTGXTBXp725EMOY6V4X9sUQGUhXLkl
+         tY8E/+a3cZbNHt11RJ0DgXY+BBSmkswoBiFRtGpthO7qWmyNhXg2+tOA+L9C1QV+2lKT
+         /w0PdmXPFIzy97yQnqcfzGPb3lif49AMzbGx2glloLYf+J70updnoUxHh3M6fRi66Cxx
+         fc9X9FKbWG3SdxGi7aX0j6f4gSnUwSRfb+3mSokMShTldWM6FpbkAi304TxbmWMlLukW
+         DofIkNJoMKxMhmrB8Cd1ZIRoRhqCJbkFxZgNENMOz6udg5gfpjbud3qYpyWbDAwlDuE7
+         2+iw==
+X-Gm-Message-State: AAQBX9fHb8ZgmGq9J9duEr8wpkvGfr597heH2ZbFCpwOZsljXfKBM1/e
+        4cuAMddVwbdzQYzq6ghUCKjXAS3t6HWLVg==
+X-Google-Smtp-Source: AKy350ZgxRqtbS/ek0jbfgGbFpbGtcPENrAgz6m9m6IvJG2zHkuXw+3nwfFNmQvUUJdqnmWKXV6opw==
+X-Received: by 2002:a62:7905:0:b0:61d:f243:e817 with SMTP id u5-20020a627905000000b0061df243e817mr347935pfc.16.1679598312220;
+        Thu, 23 Mar 2023 12:05:12 -0700 (PDT)
+Received: from localhost.localdomain ([167.220.238.138])
+        by smtp.googlemail.com with ESMTPSA id a14-20020a62e20e000000b00625d84a0194sm12377948pfi.107.2023.03.23.12.05.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Mar 2023 12:05:11 -0700 (PDT)
+From:   bharathsm.hsk@gmail.com
+To:     sfrench@samba.org, pc@cjr.nz, lsahlber@redhat.com,
+        sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH] SMB3: Close deferred file handles if we get handle lease break
+Date:   Thu, 23 Mar 2023 19:05:00 +0000
+Message-Id: <20230323190500.1684832-1-bharathsm.hsk@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <13de0bf0-aa74-46a3-8389-3c70fe77be1f@kili.mountain> <bbb33b9e-570f-8d02-1162-fa93fbe006dd@talpey.com>
-In-Reply-To: <bbb33b9e-570f-8d02-1162-fa93fbe006dd@talpey.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 23 Mar 2023 11:40:26 -0500
-Message-ID: <CAH2r5mscB6L4vZEhAj99sfgRXkPvLpgGJi_5QeJvNtzydArnTg@mail.gmail.com>
-Subject: Re: [cifs:for-next 3/8] fs/cifs/connect.c:1303 cifs_ipaddr_cmp()
- error: memcmp() '&saddr4->sin_addr.s_addr' too small (4 vs 16)
-To:     Tom Talpey <tom@talpey.com>
-Cc:     Dan Carpenter <error27@gmail.com>, oe-kbuild@lists.linux.dev,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        "Paulo Alcantara (SUSE)" <pc@manguebit.com>,
-        linux-cifs@vger.kernel.org, lkp@intel.com,
-        samba-technical@lists.samba.org, oe-kbuild-all@lists.linux.dev,
-        Steve French <stfrench@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I have removed that patch from for-next (so still has the other 8
-multichannel fixes and debug improvements).  Should be adding an
-important deferred close fix later this afternoon and the "umount -f"
-fix as well
+From: Bharath SM <bharathsm@microsoft.com>
 
-On Thu, Mar 23, 2023 at 8:07=E2=80=AFAM Tom Talpey via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> On 3/23/2023 5:40 AM, Dan Carpenter wrote:
-> > tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-> > head:   96114df697dfaef2ce29c14089a83e4a5777e915
-> > commit: 010c4e0a894e6a3dee3176aa2f654fce632d0346 [3/8] cifs: fix sockad=
-dr comparison in iface_cmp
-> > config: i386-randconfig-m021 (https://download.01.org/0day-ci/archive/2=
-0230323/202303230210.ufS9gVzi-lkp@intel.com/config)
-> > compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
-> >
-> > If you fix the issue, kindly add following tag where applicable
-> > | Reported-by: kernel test robot <lkp@intel.com>
-> > | Reported-by: Dan Carpenter <error27@gmail.com>
-> > | Link: https://lore.kernel.org/r/202303230210.ufS9gVzi-lkp@intel.com/
-> >
-> > New smatch warnings:
-> > fs/cifs/connect.c:1303 cifs_ipaddr_cmp() error: memcmp() '&saddr4->sin_=
-addr.s_addr' too small (4 vs 16)
-> > fs/cifs/connect.c:1318 cifs_ipaddr_cmp() error: memcmp() '&saddr6->sin6=
-_addr' too small (16 vs 28)
-> >
-> > Old smatch warnings:
-> > fs/cifs/connect.c:1303 cifs_ipaddr_cmp() error: memcmp() '&vaddr4->sin_=
-addr.s_addr' too small (4 vs 16)
-> > fs/cifs/connect.c:1318 cifs_ipaddr_cmp() error: memcmp() '&vaddr6->sin6=
-_addr' too small (16 vs 28)
-> > fs/cifs/connect.c:2937 generic_ip_connect() error: we previously assume=
-d 'socket' could be null (see line 2925)
-> >
-> > vim +1303 fs/cifs/connect.c
-> >
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1279  int
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1280  cifs_ipaddr_cmp(struct=
- sockaddr *srcaddr, struct sockaddr *rhs)
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1281  {
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1282       struct sockaddr_i=
-n *saddr4 =3D (struct sockaddr_in *)srcaddr;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1283       struct sockaddr_i=
-n *vaddr4 =3D (struct sockaddr_in *)rhs;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1284       struct sockaddr_i=
-n6 *saddr6 =3D (struct sockaddr_in6 *)srcaddr;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1285       struct sockaddr_i=
-n6 *vaddr6 =3D (struct sockaddr_in6 *)rhs;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1286
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1287       switch (srcaddr->=
-sa_family) {
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1288       case AF_UNSPEC:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1289               switch (r=
-hs->sa_family) {
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1290               case AF_U=
-NSPEC:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1291                       r=
-eturn 0;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1292               case AF_I=
-NET:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1293               case AF_I=
-NET6:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1294                       r=
-eturn 1;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1295               default:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1296                       r=
-eturn -1;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1297               }
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1298       case AF_INET: {
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1299               switch (r=
-hs->sa_family) {
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1300               case AF_U=
-NSPEC:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1301                       r=
-eturn -1;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1302               case AF_I=
-NET:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27 @1303                       r=
-eturn memcmp(&saddr4->sin_addr.s_addr,
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1304                        =
-      &vaddr4->sin_addr.s_addr,
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1305                        =
-      sizeof(struct sockaddr_in));
-> >
-> > saddr4 and vaddr4 are type sockaddr_in.  But sin_addr.s_addr is an
-> > offset into the struct.  This looks like a read overflow.  I would thin=
-k
-> > it should be sizeof(struct in_addr).
->
-> Oh, definitely. It's more than a read overflow, it's an incorrect
-> comparison which will lead to creating new and unnecessary channels.
-> Two bugs here.
->
-> Tom.
->
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1306               case AF_I=
-NET6:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1307                       r=
-eturn 1;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1308               default:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1309                       r=
-eturn -1;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1310               }
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1311       }
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1312       case AF_INET6: {
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1313               switch (r=
-hs->sa_family) {
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1314               case AF_U=
-NSPEC:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1315               case AF_I=
-NET:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1316                       r=
-eturn -1;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1317               case AF_I=
-NET6:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27 @1318                       r=
-eturn memcmp(&saddr6->sin6_addr,
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1319                        =
-             &vaddr6->sin6_addr,
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1320                        =
-             sizeof(struct sockaddr_in6));
-> >
-> > Same.
-> >
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1321               default:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1322                       r=
-eturn -1;
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1323               }
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1324       }
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1325       default:
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1326               return -1=
-; /* don't expect to be here */
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1327       }
-> > 010c4e0a894e6a3 Shyam Prasad N 2022-12-27  1328  }
-> >
->
+We should not cache deferred file handles if we dont have
+handle lease on a file. And we should immediately close all
+deferred handles in case of handle lease break.
 
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+Fixes: 9e31678fb403 ("SMB3: fix lease break timeout when multiple deferred close handles for the same file.")
+---
+ fs/cifs/cifsproto.h |  3 ++-
+ fs/cifs/file.c      | 21 +++++++++++++++++++++
+ fs/cifs/misc.c      |  4 ++--
+ 3 files changed, 25 insertions(+), 3 deletions(-)
 
---=20
-Thanks,
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index e2eff66eefab..d2819d449f05 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -278,7 +278,8 @@ extern void cifs_add_deferred_close(struct cifsFileInfo *cfile,
+ 
+ extern void cifs_del_deferred_close(struct cifsFileInfo *cfile);
+ 
+-extern void cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode);
++extern void cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode,
++				     bool wait_oplock_handler);
+ 
+ extern void cifs_close_all_deferred_files(struct cifs_tcon *cifs_tcon);
+ 
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 4d4a2d82636d..ce75d8c1e3fe 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -4884,6 +4884,9 @@ void cifs_oplock_break(struct work_struct *work)
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+ 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
++	bool is_deferred = false;
++	struct cifs_deferred_close *dclose;
++
+ 	int rc = 0;
+ 	bool purge_cache = false;
+ 
+@@ -4921,6 +4924,23 @@ void cifs_oplock_break(struct work_struct *work)
+ 		cifs_dbg(VFS, "Push locks rc = %d\n", rc);
+ 
+ oplock_break_ack:
++	/*
++	 * When oplock break is received and there are no active file handles
++	 * but cached file handles, then schedule deferred close immediately.
++	 * So, new open will not use cached handle.
++	 */
++	spin_lock(&CIFS_I(inode)->deferred_lock);
++	is_deferred = cifs_is_deferred_close(cfile, &dclose);
++	spin_unlock(&CIFS_I(inode)->deferred_lock);
++	if (!CIFS_CACHE_HANDLE(cinode) && is_deferred &&
++			cfile->deferred_close_scheduled && delayed_work_pending(&cfile->deferred)) {
++		if (cancel_delayed_work(&cfile->deferred)) {
++			_cifsFileInfo_put(cfile, false, false);
++			cifs_close_deferred_file(cinode, false);
++			goto oplock_break_done;
++		}
++	}
++
+ 	/*
+ 	 * releasing stale oplock after recent reconnect of smb session using
+ 	 * a now incorrect file handle is not a data integrity issue but do
+@@ -4933,6 +4953,7 @@ void cifs_oplock_break(struct work_struct *work)
+ 		cifs_dbg(FYI, "Oplock release rc = %d\n", rc);
+ 	}
+ 
++oplock_break_done:
+ 	_cifsFileInfo_put(cfile, false /* do not wait for ourself */, false);
+ 	cifs_done_oplock_break(cinode);
+ }
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index a0d286ee723d..fd9d6b1ee1e2 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -728,7 +728,7 @@ cifs_del_deferred_close(struct cifsFileInfo *cfile)
+ }
+ 
+ void
+-cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode)
++cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode, bool wait_oplock_handler)
+ {
+ 	struct cifsFileInfo *cfile = NULL;
+ 	struct file_list *tmp_list, *tmp_next_list;
+@@ -755,7 +755,7 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode)
+ 	spin_unlock(&cifs_inode->open_file_lock);
+ 
+ 	list_for_each_entry_safe(tmp_list, tmp_next_list, &file_head, list) {
+-		_cifsFileInfo_put(tmp_list->cfile, true, false);
++		_cifsFileInfo_put(tmp_list->cfile, wait_oplock_handler, false);
+ 		list_del(&tmp_list->list);
+ 		kfree(tmp_list);
+ 	}
+-- 
+2.25.1
 
-Steve
