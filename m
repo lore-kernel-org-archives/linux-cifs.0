@@ -2,98 +2,84 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E382BC6FD1C
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Mar 2023 04:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4703C6FD1C
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Mar 2023 05:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbjCXE26 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 24 Mar 2023 00:28:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47510 "EHLO
+        id S229484AbjCXFbr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 24 Mar 2023 01:31:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjCXE25 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 24 Mar 2023 00:28:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5C1CCDFE
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Mar 2023 21:28:56 -0700 (PDT)
+        with ESMTP id S229589AbjCXFbq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 24 Mar 2023 01:31:46 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3172DF
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Mar 2023 22:31:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E6F9F6292C
-        for <linux-cifs@vger.kernel.org>; Fri, 24 Mar 2023 04:28:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AEEBC4339E
-        for <linux-cifs@vger.kernel.org>; Fri, 24 Mar 2023 04:28:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 69B78628CD
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Mar 2023 05:31:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7421C433EF
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Mar 2023 05:31:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679632135;
-        bh=1FfQfKlPnWoA0NPNOai7HMlDRSEZTiFKXW/6zX8BThw=;
+        s=k20201202; t=1679635904;
+        bh=KHHcBACPX85+RiJwXdRio2bfuBhdJMJZ/1Gt9iXEs1A=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Qkw9TbyLLGCVGXwmcg0Wak9JccIrih6e+b2YIN5W4q4/CjQ/SR0xSlPSjG/FbVtE1
-         URjPwL82nCnoCnm9QuXfRhOCGkmOYSOAi0oPMCytOAyoGt/ffm1LM3ogiTZfIzs45u
-         acZDItooLO8TUjOmHyhZBXfkW1c4LItkx1KeqwmcjxCd5dPqYkakM15vbu5TAZ3ToL
-         KSOftKqXT0jjZ/3nTb5aAskmJ9Dg+z2HfTFS4JEqZ+KFoG5y+pnIQH1ulcYfolqhNc
-         saZWiJza5vmoGY7wiQyRCs655Cj2i/Da1Zmh7xu5A9v3CeBeEpDA9ALsDgQ0/DHj5O
-         UFugLt1CTqD2g==
-Received: by mail-ot1-f41.google.com with SMTP id p11-20020a9d454b000000b0069d8eb419f9so335063oti.4
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Mar 2023 21:28:55 -0700 (PDT)
-X-Gm-Message-State: AO0yUKURQUQBSesGfigoE4/32M2n6hUZD4CtxVOi6UCVzXZWORnpLiLN
-        ooqrs2B0C8DlM8PcxTCuduPZAfS9dmHLkLXym/I=
-X-Google-Smtp-Source: AK7set/rgaeq4jv7ueO+4hsMdiJLMJBkYMUBArCY33msQ4p3RRftC/aKieaWe3HGIvum4mzRxW4moD7axaPhYT0v38k=
-X-Received: by 2002:a9d:744f:0:b0:69a:b32c:9882 with SMTP id
- p15-20020a9d744f000000b0069ab32c9882mr477125otk.3.1679632134460; Thu, 23 Mar
- 2023 21:28:54 -0700 (PDT)
+        b=au4Wqk6BnIa8i7IQIQDGtjDeAGa5CJ3JKlvjlSIO+/Yi3p2FWdRWpopZshOrAYiQA
+         cFT1V0v6N60gyvhLx9GbRv2dgnWDh5f1rfUy6byqNiHHddbHPwXiEbuyM97AL24jUm
+         M+RFtoKe/EkCZuqyINbzAMkUS1jOjircYqjLgu9CJUyMPOkFwEcG1slvtBiyXuXP4X
+         9B9HQpgngdUzhsxFbJoha0UiAJXgD8EvMYxV6qv05OcNHUX7MFGJpTmJeDzZZ/rJwi
+         x06G5Q+XTsXMMJwVQoZcdVLpjwqiCuTkgkoqUL7r0KpmBd2Lp307/ROVm+ZIUlIxYQ
+         jsQCs58VyzgqQ==
+Received: by mail-oi1-f172.google.com with SMTP id b19so533241oib.7
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Mar 2023 22:31:44 -0700 (PDT)
+X-Gm-Message-State: AO0yUKUEA315CKByZv1rLvbDGmkqag37OLxjXICNmA9BcC2bZNKtcIXX
+        XU+eDzzjpQ26A3AZNrkcHu+Wx3GF4vV07Mwkp3k=
+X-Google-Smtp-Source: AK7set/dgdEkNG5FP2AWV3lXSfVAHyZhuzJmhWLWPBjL18+5JMRblNxWDmCwK24Aw5eQpP5oR20kqWWEx9pPjyfe7CQ=
+X-Received: by 2002:aca:1b09:0:b0:383:fcba:70e6 with SMTP id
+ b9-20020aca1b09000000b00383fcba70e6mr303896oib.1.1679635903915; Thu, 23 Mar
+ 2023 22:31:43 -0700 (PDT)
 MIME-Version: 1.0
 Received: by 2002:ac9:774e:0:b0:4c8:b94d:7a80 with HTTP; Thu, 23 Mar 2023
- 21:28:53 -0700 (PDT)
-In-Reply-To: <20230324035000.GD3271889@google.com>
-References: <20230321133312.103789-1-linkinjeon@kernel.org> <20230324035000.GD3271889@google.com>
+ 22:31:43 -0700 (PDT)
+In-Reply-To: <CAH2r5mvd7tSEX-sh6tLhxS=5FbX6ZOVuwR2FoEbjXnnGksSiXw@mail.gmail.com>
+References: <CAH2r5mvd7tSEX-sh6tLhxS=5FbX6ZOVuwR2FoEbjXnnGksSiXw@mail.gmail.com>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 24 Mar 2023 13:28:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_y+xh_2Rp9RLi1xWfrsgYSBvQENMkE0uS=W1Wnp6Espg@mail.gmail.com>
-Message-ID: <CAKYAXd_y+xh_2Rp9RLi1xWfrsgYSBvQENMkE0uS=W1Wnp6Espg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: don't terminate inactive sessions after a few seconds
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, tom@talpey.com,
-        atteh.mailbox@gmail.com, Steve French <stfrench@microsoft.com>
+Date:   Fri, 24 Mar 2023 14:31:43 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_zHm5QKzLNOOHs8Cwewq33nC0YJ02Jk2AZga9UK1ba0Q@mail.gmail.com>
+Message-ID: <CAKYAXd_zHm5QKzLNOOHs8Cwewq33nC0YJ02Jk2AZga9UK1ba0Q@mail.gmail.com>
+Subject: Re: Additional Functional Tests (xfstests) to run from Linux vs. ksmbd
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-03-24 12:50 GMT+09:00, Sergey Senozhatsky <senozhatsky@chromium.org>:
-> On (23/03/21 22:33), Namjae Jeon wrote:
-> [..]
->> @@ -335,14 +336,23 @@ static int ksmbd_tcp_readv(struct tcp_transport *t,
->> struct kvec *iov_orig,
->>  		} else if (conn->status == KSMBD_SESS_NEED_RECONNECT) {
->>  			total_read = -EAGAIN;
->>  			break;
->> -		} else if ((length == -ERESTARTSYS || length == -EAGAIN) &&
->> -			   max_retry) {
->> +		} else if (length == -ERESTARTSYS || length == -EAGAIN) {
->> +			/*
->> +			 * If max_retries is negative, Allow unlimited
->> +			 * retries to keep connection with inactive sessions.
->> +			 */
->> +			if (max_retries == 0) {
->> +				total_read = length;
->> +				break;
->> +			} else if (max_retries > 0) {
->> +				max_retries--;
->> +			}
->> +
->>  			usleep_range(1000, 2000);
->>  			length = 0;
->> -			max_retry--;
->>  			continue;
->>  		} else if (length <= 0) {
->> -			total_read = -EAGAIN;
->> +			total_read = length;
->>  			break;
->>  		}
->>  	}
+2023-03-24 12:44 GMT+09:00, Steve French <smfrench@gmail.com>:
+> Was looking at some functional tests runs with current for-next vs.
+> current ksmbd and noticed a set of more recent tests that I had not
+> been including in the xfstest runs to ksmbd that I should be (since
+> they pass)
 >
-> By the way, ksmbd_tcp_readv() calls kvec_array_init() on each iteration.
-> Shouldn't we call it only if length > 0? That is only if the most recent
-> call to kernel_recvmsg() has read some data.
-If length == to_read is equal then it is not called. And in case
-length < to_read, we have to call it which reinitialize io vec again
-for reading the rest of the data.
+> xfstests generic/604 609 610 615 618 632 634 637 638 639 676 678 and 701
+Thanks for sharing these tests. these tests are not in my test script.
+I will add them.
+>
+> By the way the only suspicious failure I got in this run was an umount
+> busy error in generic/509 (but it was not reproducible, it passed when
+> I retried)
+generic/509 tests is not included in my test list also. I will try to
+reproduce it.
+>
+> Namjae,
+> Are those tests included in your test runs?
+They are not included. I will try to test after adding them.
+
+Thanks!
+>
+> --
+> Thanks,
+>
+> Steve
 >
