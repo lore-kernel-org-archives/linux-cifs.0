@@ -2,79 +2,94 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F13E3C77B62
-	for <linux-cifs@archiver.kernel.org>; Mon, 27 Mar 2023 16:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCA2C77B61
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Mar 2023 13:14:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232372AbjC0QFS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 27 Mar 2023 12:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39812 "EHLO
+        id S233108AbjC1NOQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Mar 2023 09:14:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230289AbjC0QFP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 27 Mar 2023 12:05:15 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64A74271D;
-        Mon, 27 Mar 2023 09:05:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=RGwHI36+26alMOPcJARCf4i+u/nuff7mObHUT3LcJRU=; b=LPLf/jCvgk6BbAdu2sWsjs0oNX
-        30l+yYDMt7lIPUZlX1xLPKvd+VVVQITd3MBjp55UXnh0lC27yas9PjZ1X8/Ke/FN2w5Z7mgrMqRNS
-        NMe2iIKVClT29RE+YYzmxZbB3MjqVTlPCvQNedD6+P2DTM3qoHKrTsXd9k/l+Z6LWIlrLqO0i0LPP
-        WcUrCoUENmgBRd1TwHHhU6kKgkRvL9EW+Kwg4gKazSQbHimCznogGlrnIrlhrYbEsmEYHmZgBhRO2
-        txegvcMIwswcdkNGLcJijBEGxeQVIVJr1oRDPP6IWPp68b1YWWkcPAIa7dwiPZZpdkAy2Plhs+eAH
-        tVStJIQg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pgpLM-00Beeh-0e;
-        Mon, 27 Mar 2023 16:05:12 +0000
-Date:   Mon, 27 Mar 2023 09:05:12 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Minchan Kim <minchan@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Russ Weight <russell.h.weight@intel.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <sfrench@samba.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        linux-cifs@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH] driver core: class: mark the struct class for sysfs
- callbacks as constant
-Message-ID: <ZCG+uH4Dh16Gwonj@bombadil.infradead.org>
-References: <20230325084537.3622280-1-gregkh@linuxfoundation.org>
+        with ESMTP id S233118AbjC1NOB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Mar 2023 09:14:01 -0400
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D161B458;
+        Tue, 28 Mar 2023 06:13:42 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id u10so11585846plz.7;
+        Tue, 28 Mar 2023 06:13:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680009222;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C9vHjCxIjnbJV+D1kIkkgMWfWHa4MSx5Br+Gi/URJXY=;
+        b=eASSDHDI/SwtNuH2zZQNURqNiP7TcxCqqOkwEvoTB6VPh9yCsDi9eQEKB9qSwZfiDu
+         t0Y5pp5a2WtAajKUVBiP/OlefYDH67ApHEbkGXEQfYUGBYQp4GzVUahT6aDH+fEcIXaL
+         WMrLt9Fn9XdseCjBzzwD9hJzCS4CDIrfRC+VSr+XNyV47h+nr6atYaSYXAdIp+b3bMYc
+         LED3SlaUpvBhOqTFdPLPCIoyFvGaC32Uucl0Vw6WnSBgPQMlRTrDBI/U79Fy5niKwx0A
+         rMQIqv38gwFYIgkJHhHYej3w+0S2wFG73gsZacVfm1qoilllZ9Wc/hvkfuPMPIBgzwWM
+         91zA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680009222;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C9vHjCxIjnbJV+D1kIkkgMWfWHa4MSx5Br+Gi/URJXY=;
+        b=67DOu8IhfxkeUBX4hxC7/dtGRszeRLVhM0gUw9s7i5KGGuwj3k0v4Yt2dqtKkq3bX+
+         jXxFzySs/q97efkWqQaDLlkyNqOr622iCyNPytCoLmQzJITa7e9JKFch0ZBMX8K2KZJo
+         yJGhjZig6M48ju2t44jei6q0HWclug0NskKkGvS2OZHpQAz3EtEQAFU9JNBlh4Ln1yJO
+         CaEGtsc750FAajIDY/6YTz2sL82YB4rvc5VtNkQwDBQFoeizC/TirzG6SmrUNRYZV3IF
+         WpPhDiRGwsGf4l02uaupliioHLSyUf7+AzxQ8rAUge/LvtJbk7vmpaPwn389ptIqb4Hz
+         1WcQ==
+X-Gm-Message-State: AAQBX9eatHT7/WccnjLARSBImYVO6DUUEY3Yxt5IBqKXKngMk60r44fw
+        t0W4GAPcatMjz/7bg0DFHy4x2x2xZeK9eQ==
+X-Google-Smtp-Source: AKy350aJ+T+hdHviafYXKpyM3dcU1QV3g25fUqBprPiMOv0XbIa3xlXVbCVQ9jrzJvjk6a8A6Fj1iA==
+X-Received: by 2002:a17:903:886:b0:1a1:bcaa:aaea with SMTP id kt6-20020a170903088600b001a1bcaaaaeamr14617060plb.3.1680009221761;
+        Tue, 28 Mar 2023 06:13:41 -0700 (PDT)
+Received: from c1ion.lan ([139.227.13.23])
+        by smtp.gmail.com with ESMTPSA id io20-20020a17090312d400b001a1faeac240sm10642646plb.186.2023.03.28.06.13.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 06:13:41 -0700 (PDT)
+From:   Mingyi Cong <congmingyi@gmail.com>
+To:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
+        tom@talpey.com
+Cc:     congmingyi@gmail.com, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH v3] fs: add the tuncate check of exfat
+Date:   Tue, 28 Mar 2023 21:13:34 +0800
+Message-Id: <20230328131334.5572-1-congmingyi@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CAKYAXd8GzB_onCcs=2aZs0MGTy_7oGhECEdr+rcdVS+Jf2C5xQ@mail.gmail.com>
+References: <CAKYAXd8GzB_onCcs=2aZs0MGTy_7oGhECEdr+rcdVS+Jf2C5xQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230325084537.3622280-1-gregkh@linuxfoundation.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, Mar 25, 2023 at 09:45:37AM +0100, Greg Kroah-Hartman wrote:
-> struct class should never be modified in a sysfs callback as there is
-> nothing in the structure to modify, and frankly, the structure is almost
-> never used in a sysfs callback, so mark it as constant to allow struct
-> class to be moved to read-only memory.
-> 
-> While we are touching all class sysfs callbacks also mark the attribute
-> as constant as it can not be modified.  The bonding code still uses this
-> structure so it can not be removed from the function callbacks.
-> 
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: MIngyi Cong <congmingyi@gmail.com>
 
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+EXFAT will fill zero data in truncated range.
+Fix this by adding EXFAT_SUPER_MAGIC check.
 
-  Luis
+Signed-off-by: MIngyi Cong <congmingyi@gmail.com>
+---
+ fs/ksmbd/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 0685c1c77b9f..3f2e34936b8d 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -5746,7 +5746,8 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 	 * truncate of some filesystem like FAT32 fill zero data in
+ 	 * truncated range.
+ 	 */
+-	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC) {
++	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC ||
++		inode->i_sb->s_magic != EXFAT_SUPER_MAGIC) {
+ 		ksmbd_debug(SMB, "truncated to newsize %lld\n", newsize);
+ 		rc = ksmbd_vfs_truncate(work, fp, newsize);
+ 		if (rc) {
+-- 
+2.34.1
+
