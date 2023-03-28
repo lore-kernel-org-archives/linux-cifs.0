@@ -2,94 +2,113 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCA2C77B61
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Mar 2023 13:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80638C76196
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Mar 2023 14:49:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233108AbjC1NOQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Mar 2023 09:14:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53822 "EHLO
+        id S233408AbjC1OtJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Mar 2023 10:49:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233118AbjC1NOB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Mar 2023 09:14:01 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D161B458;
-        Tue, 28 Mar 2023 06:13:42 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id u10so11585846plz.7;
-        Tue, 28 Mar 2023 06:13:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680009222;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C9vHjCxIjnbJV+D1kIkkgMWfWHa4MSx5Br+Gi/URJXY=;
-        b=eASSDHDI/SwtNuH2zZQNURqNiP7TcxCqqOkwEvoTB6VPh9yCsDi9eQEKB9qSwZfiDu
-         t0Y5pp5a2WtAajKUVBiP/OlefYDH67ApHEbkGXEQfYUGBYQp4GzVUahT6aDH+fEcIXaL
-         WMrLt9Fn9XdseCjBzzwD9hJzCS4CDIrfRC+VSr+XNyV47h+nr6atYaSYXAdIp+b3bMYc
-         LED3SlaUpvBhOqTFdPLPCIoyFvGaC32Uucl0Vw6WnSBgPQMlRTrDBI/U79Fy5niKwx0A
-         rMQIqv38gwFYIgkJHhHYej3w+0S2wFG73gsZacVfm1qoilllZ9Wc/hvkfuPMPIBgzwWM
-         91zA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680009222;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C9vHjCxIjnbJV+D1kIkkgMWfWHa4MSx5Br+Gi/URJXY=;
-        b=67DOu8IhfxkeUBX4hxC7/dtGRszeRLVhM0gUw9s7i5KGGuwj3k0v4Yt2dqtKkq3bX+
-         jXxFzySs/q97efkWqQaDLlkyNqOr622iCyNPytCoLmQzJITa7e9JKFch0ZBMX8K2KZJo
-         yJGhjZig6M48ju2t44jei6q0HWclug0NskKkGvS2OZHpQAz3EtEQAFU9JNBlh4Ln1yJO
-         CaEGtsc750FAajIDY/6YTz2sL82YB4rvc5VtNkQwDBQFoeizC/TirzG6SmrUNRYZV3IF
-         WpPhDiRGwsGf4l02uaupliioHLSyUf7+AzxQ8rAUge/LvtJbk7vmpaPwn389ptIqb4Hz
-         1WcQ==
-X-Gm-Message-State: AAQBX9eatHT7/WccnjLARSBImYVO6DUUEY3Yxt5IBqKXKngMk60r44fw
-        t0W4GAPcatMjz/7bg0DFHy4x2x2xZeK9eQ==
-X-Google-Smtp-Source: AKy350aJ+T+hdHviafYXKpyM3dcU1QV3g25fUqBprPiMOv0XbIa3xlXVbCVQ9jrzJvjk6a8A6Fj1iA==
-X-Received: by 2002:a17:903:886:b0:1a1:bcaa:aaea with SMTP id kt6-20020a170903088600b001a1bcaaaaeamr14617060plb.3.1680009221761;
-        Tue, 28 Mar 2023 06:13:41 -0700 (PDT)
-Received: from c1ion.lan ([139.227.13.23])
-        by smtp.gmail.com with ESMTPSA id io20-20020a17090312d400b001a1faeac240sm10642646plb.186.2023.03.28.06.13.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 06:13:41 -0700 (PDT)
-From:   Mingyi Cong <congmingyi@gmail.com>
-To:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
-        tom@talpey.com
-Cc:     congmingyi@gmail.com, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org
-Subject: [PATCH v3] fs: add the tuncate check of exfat
-Date:   Tue, 28 Mar 2023 21:13:34 +0800
-Message-Id: <20230328131334.5572-1-congmingyi@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAKYAXd8GzB_onCcs=2aZs0MGTy_7oGhECEdr+rcdVS+Jf2C5xQ@mail.gmail.com>
-References: <CAKYAXd8GzB_onCcs=2aZs0MGTy_7oGhECEdr+rcdVS+Jf2C5xQ@mail.gmail.com>
+        with ESMTP id S233363AbjC1Osq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Mar 2023 10:48:46 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DD75C155;
+        Tue, 28 Mar 2023 07:48:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C473F61826;
+        Tue, 28 Mar 2023 14:48:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6054C433EF;
+        Tue, 28 Mar 2023 14:48:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1680014903;
+        bh=4Y8/xJhwU7aJXJUzYvMwx8jzSFFEXA9tPwndwM5aX+Q=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=fqIVVzpUm8m4ymi6Elj0QtIKmvFzparOAcowwKp9uAsfxPw8hFuwVrNgPucmCEJHK
+         veXDll+HlwuntJktcxeR/MLXTzNqcjf7G+gftu4bQdMftEmxcLh78IrDY7XmX+RvF3
+         g+3O4nO1kkbtbyFm9EurTHWsWw++W7EAj6seKUzI=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev, Bharath SM <bharathsm@microsoft.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Steve French <smfrench@gmail.com>, keyrings@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.2 067/240] keys: Do not cache key in task struct if key is requested from kernel thread
+Date:   Tue, 28 Mar 2023 16:40:30 +0200
+Message-Id: <20230328142622.530564908@linuxfoundation.org>
+X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230328142619.643313678@linuxfoundation.org>
+References: <20230328142619.643313678@linuxfoundation.org>
+User-Agent: quilt/0.67
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: MIngyi Cong <congmingyi@gmail.com>
+From: David Howells <dhowells@redhat.com>
 
-EXFAT will fill zero data in truncated range.
-Fix this by adding EXFAT_SUPER_MAGIC check.
+[ Upstream commit 47f9e4c924025c5be87959d3335e66fcbb7f6b5c ]
 
-Signed-off-by: MIngyi Cong <congmingyi@gmail.com>
+The key which gets cached in task structure from a kernel thread does not
+get invalidated even after expiry.  Due to which, a new key request from
+kernel thread will be served with the cached key if it's present in task
+struct irrespective of the key validity.  The change is to not cache key in
+task_struct when key requested from kernel thread so that kernel thread
+gets a valid key on every key request.
+
+The problem has been seen with the cifs module doing DNS lookups from a
+kernel thread and the results getting pinned by being attached to that
+kernel thread's cache - and thus not something that can be easily got rid
+of.  The cache would ordinarily be cleared by notify-resume, but kernel
+threads don't do that.
+
+This isn't seen with AFS because AFS is doing request_key() within the
+kernel half of a user thread - which will do notify-resume.
+
+Fixes: 7743c48e54ee ("keys: Cache result of request_key*() temporarily in task_struct")
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Steve French <smfrench@gmail.com>
+cc: keyrings@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+Link: https://lore.kernel.org/r/CAGypqWw951d=zYRbdgNR4snUDvJhWL=q3=WOyh7HhSJupjz2vA@mail.gmail.com/
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/ksmbd/smb2pdu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ security/keys/request_key.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 0685c1c77b9f..3f2e34936b8d 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -5746,7 +5746,8 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- 	 * truncate of some filesystem like FAT32 fill zero data in
- 	 * truncated range.
- 	 */
--	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC) {
-+	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC ||
-+		inode->i_sb->s_magic != EXFAT_SUPER_MAGIC) {
- 		ksmbd_debug(SMB, "truncated to newsize %lld\n", newsize);
- 		rc = ksmbd_vfs_truncate(work, fp, newsize);
- 		if (rc) {
+diff --git a/security/keys/request_key.c b/security/keys/request_key.c
+index 2da4404276f0f..07a0ef2baacd8 100644
+--- a/security/keys/request_key.c
++++ b/security/keys/request_key.c
+@@ -38,9 +38,12 @@ static void cache_requested_key(struct key *key)
+ #ifdef CONFIG_KEYS_REQUEST_CACHE
+ 	struct task_struct *t = current;
+ 
+-	key_put(t->cached_requested_key);
+-	t->cached_requested_key = key_get(key);
+-	set_tsk_thread_flag(t, TIF_NOTIFY_RESUME);
++	/* Do not cache key if it is a kernel thread */
++	if (!(t->flags & PF_KTHREAD)) {
++		key_put(t->cached_requested_key);
++		t->cached_requested_key = key_get(key);
++		set_tsk_thread_flag(t, TIF_NOTIFY_RESUME);
++	}
+ #endif
+ }
+ 
 -- 
-2.34.1
+2.39.2
+
+
 
