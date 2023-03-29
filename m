@@ -2,103 +2,100 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C23C74A5B
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Mar 2023 14:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D047AC6FD18
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Mar 2023 20:14:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229720AbjC2OpI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Mar 2023 10:45:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49016 "EHLO
+        id S229553AbjC2UOm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Mar 2023 16:14:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbjC2Oox (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Mar 2023 10:44:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54BF37D97
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 07:41:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680100890;
+        with ESMTP id S229563AbjC2UOl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Mar 2023 16:14:41 -0400
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D8C4ED5
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 13:14:39 -0700 (PDT)
+From:   Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1680120877;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fsOLHSRSLMInNcD449MTPXsGwp1kWYvONeYqTpf/Ez4=;
-        b=Ld/52s06xrrInv5iDs5iSDylgYbWZamGxMGTj1kE4X5ASXLS5se32mX3JrisigZb4PDghm
-        Rxas5EPqu6wkyn104ZIVQ7jyZ+Klnudzqpy3c2dNWXkmvrn7Y24tWUynebRoZJs1IqJVN7
-        BSDjjOAQNCtf74hdeyeSdceky5AKPzQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-516-Xdb9sur-PoeNk1trWuucgw-1; Wed, 29 Mar 2023 10:14:03 -0400
-X-MC-Unique: Xdb9sur-PoeNk1trWuucgw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 080F01C06EE7;
-        Wed, 29 Mar 2023 14:14:02 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 94AC618EC6;
-        Wed, 29 Mar 2023 14:13:59 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Chuck Lever III <chuck.lever@oracle.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org
-Subject: [RFC PATCH v2 01/48] netfs: Fix netfs_extract_iter_to_sg() for ITER_UBUF/IOVEC
-Date:   Wed, 29 Mar 2023 15:13:07 +0100
-Message-Id: <20230329141354.516864-2-dhowells@redhat.com>
-In-Reply-To: <20230329141354.516864-1-dhowells@redhat.com>
-References: <20230329141354.516864-1-dhowells@redhat.com>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=R1xP26q+B0iKEnLoXzJoz3Z/hIUQJdqBUNJ4ookh6c4=;
+        b=AZBtvbcmP0wMRGwN7W+bU+0dwJ5OHeFHmm9PokI1/MBQ4YQZwctEd1J0pYshedVp6Sq+gw
+        EuzpJWIaVXr6QOc/AGfXiuQZ0Wr58TXHWudzpLTYsILkFgSsO16B7jKD6CUNZfXLeHqzLF
+        Z58tvzNaUigLcEmmP9aKP9ogd2E6YYyoKLbBUySHa68cznbSrmSnIJdXmSdBmci2pmBGmX
+        ktSoTTMsdEyDLNm5+Nobugqwy4Qmdo1aj9unUhM2/XbnNqM7byyWrBn5qdZxA+i07iW6cT
+        XseHptCsMs05CrYPbqsRFLHzmRQghPDwL3Gt9DSAVsPB3KPZKjRITgFdODh/+g==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1680120877; a=rsa-sha256;
+        cv=none;
+        b=dCuFe9Rz45sWRPtpDiVFuzvMaoJGKuqT8lVyAdr3RfeavwpAOe17MrNRGhHqe1YzBiZigT
+        7sctq7Tg6ueYn8n1X3tuQAZnDtMpLfWlcg4s+HJsYqikRC2yXYm8SehPPQWK7JO4WDHpKH
+        uiZO9ET9dmoQUBfiL8BRj9CmDmp/IDv4hCchT/1qO/K+HzmgoqHNWb8KBw03QrkceLL95R
+        jPfido4RNGg8VQPnoHAE8CZRhVd9XUBu15JXnKFMsQJ76TTG+0I3kLYrZILOewx+3odWDx
+        PhpEWjaTkXKlQiMr5Rk0ZJDcOg29Vn7k4OSXiTGIb6IfXErP9eD32o5UF0HW/g==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1680120877;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=R1xP26q+B0iKEnLoXzJoz3Z/hIUQJdqBUNJ4ookh6c4=;
+        b=obKOFToe/mRa/JfwF8sgkztsVuT2P97c3f4Kltmpfd+boya+Yx+yKMugcR+WaUIuHg/0JA
+        PqkWxZZhCmNeDlJBcXMQ+j44jX/iwfg1zUrFoXHDbqjRQF8GpeBhpCD0/v6CoE1LiIcaJr
+        2AfR9JmaVSaumtPfj1GWpW0SLwhRxPxSg5LzJpvhFb/dV7Fgvochs5AwwPKjAwcJZS8Bds
+        W8OShmDJcL/e+DcFGK60ihoHMdia7ttV5QzYkmNrbJ53tQ2BLdPWJOfEA3a6V7SjTlo/3p
+        jDmHqE8auG0uGk7fh9n4ho4VXuG1rliNrgQXJjkjBxXuWXEeHyQxN8UiBNPHeA==
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH 1/5] cifs: get rid of cifs_mount_ctx::{origin,leaf}_fullpath
+Date:   Wed, 29 Mar 2023 17:14:19 -0300
+Message-Id: <20230329201423.32134-1-pc@manguebit.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix netfs_extract_iter_to_sg() for ITER_UBUF and ITER_IOVEC to set the size
-of the page to the part of the page extracted, not the remaining amount of
-data in the extracted page array at that point.
+leaf_fullpath is now part of smb3_fs_context structure, while
+origin_fullpath is just a variable in __dfs_mount_share() that is used
+when final tcon is available.
 
-This doesn't yet affect anything as cifs, the only current user, only
-passes in non-user-backed iterators.
+Get rid of those fields in cifs_mount_ctx structure and no-op
+kfree()'s.
 
-Fixes: 018584697533 ("netfs: Add a function to extract an iterator into a scatterlist")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: linux-cachefs@redhat.com
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
+Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
- fs/netfs/iterator.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/cifsglob.h | 1 -
+ fs/cifs/connect.c  | 2 --
+ 2 files changed, 3 deletions(-)
 
-diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
-index e9a45dea748a..8a4c86687429 100644
---- a/fs/netfs/iterator.c
-+++ b/fs/netfs/iterator.c
-@@ -139,7 +139,7 @@ static ssize_t netfs_extract_user_to_sg(struct iov_iter *iter,
- 			size_t seg = min_t(size_t, PAGE_SIZE - off, len);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 08a73dcb7786..c5e3a0fc7983 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1750,7 +1750,6 @@ struct cifs_mount_ctx {
+ 	struct TCP_Server_Info *server;
+ 	struct cifs_ses *ses;
+ 	struct cifs_tcon *tcon;
+-	char *origin_fullpath, *leaf_fullpath;
+ 	struct list_head dfs_ses_list;
+ };
  
- 			*pages++ = NULL;
--			sg_set_page(sg, page, len, off);
-+			sg_set_page(sg, page, seg, off);
- 			sgtable->nents++;
- 			sg++;
- 			len -= seg;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 1cbb90587995..ef50f603e640 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3454,8 +3454,6 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+ 
+ error:
+ 	dfs_put_root_smb_sessions(&mnt_ctx.dfs_ses_list);
+-	kfree(mnt_ctx.origin_fullpath);
+-	kfree(mnt_ctx.leaf_fullpath);
+ 	cifs_mount_put_conns(&mnt_ctx);
+ 	return rc;
+ }
+-- 
+2.40.0
 
