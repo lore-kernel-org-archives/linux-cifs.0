@@ -2,67 +2,68 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA6EC6FD18
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Mar 2023 20:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72555C6FD18
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Mar 2023 23:21:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbjC2U3X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Mar 2023 16:29:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41636 "EHLO
+        id S230434AbjC2XVp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Mar 2023 19:21:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjC2U3W (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Mar 2023 16:29:22 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EEB24EF2;
-        Wed, 29 Mar 2023 13:29:21 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id y4so68316852edo.2;
-        Wed, 29 Mar 2023 13:29:21 -0700 (PDT)
+        with ESMTP id S230419AbjC2XVo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Mar 2023 19:21:44 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70744171E
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 16:21:43 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id e11so17818799lji.8
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 16:21:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680121760;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PzO45Itb2rhyqvuxYhW+Lzip9Sn5S9p47n8/nUNslV4=;
-        b=PAlLl8AeMeBq78D1ANa2vKZm2xx9C32v5VhgKyPwI6kR5eo1VkvG0dIj6RlfQSo50a
-         WAhrsB8vXQdMfGek011eRWA44tIjAk0avPq/0Ek/29YmaBotOPSOMyC7j21UPnI9UIG7
-         BNxjqgGHKXUBAkD7J5UYgdX4VEe9KHXQef9HmxclVnxurRrlT+JnAZIXh3XHSj9w/grP
-         ovc+XMr7pguuuqJkPz48YnEwsNmwYA5xJ7DVp1jfqbIJAY2bknliBSs8HLLarXrtfL08
-         0KtwCdiCSxe1Grk5SSONFGq8VaqVhuaPB5EVUB+kMj5pp+iYkSzX4RhknTV5B54CCjY3
-         Ec2A==
+        d=gmail.com; s=20210112; t=1680132101;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GtSiJsA/lZ88L2un1QDafrmeA+ZXYg/KJLwWTWWtzFM=;
+        b=HOEhK2SDRJPdLO0swG/YOIiFZhs5rO1m7Ca1hznnkWrVWSj66inRhFlDA36t/kj92i
+         weJKbDLSSWNAa6NSLMlfQFS2P6QS7PJZi5bzhRNESaFxml84mOJzeQTQ14SzLCw8ja/j
+         EynlFrWRexf8rEqqzoamkdhVIhxUJb1355RmCUldpyzft25CUAtCOFs75H9Qv1G5FnKk
+         0VUFBMc68ZfQ3XrmhWMdpl+9KIQCuFhOKjQllAOlptuKqog21HIwgoufJ1sxGWtlJyml
+         LjrI7K6gBR9E+GXBcueNtJz19hGsLP0bfNcApeGw+PvtNMxnwSRyS0jAkcJqiRys1IAU
+         yfhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680121760;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PzO45Itb2rhyqvuxYhW+Lzip9Sn5S9p47n8/nUNslV4=;
-        b=fY+/lwwBLUYVRGXFW3AbSyq2pIYjhOJDZBjOs3n6nyHNndTvhhlPyGnY9KG/mtelJw
-         nCqGYIEKGvNfMHB5sCwim6hYl6EPHo1ttoPn0XJESwkhOjDRvW+MisWZ928iefM31qr+
-         QvHLGzltV9vfqWmVWmuPR5R1RQb2+V3mEepkEtHrBkR37HAyhHVEuYAr4Ila+Bhjbk61
-         APYm6v1uW/FyKgyDyO9gbGNm8cF9EJ4I8tolzvcmOA91JtDkeSuqvsmpCqujKUd3R3EW
-         fvLkgjXEY8gJDbQptrYKZHasM5gUbIuur0yHMoLOp0xeR0Kt3RCNfFg3dWbCcK9zHUYP
-         Y+RQ==
-X-Gm-Message-State: AAQBX9dHn6ROMSTMtBUDSfWhAfy6aeeIVeXDBpr3giA9fL+qHyywD9XF
-        9r4eCLLqYVPF9ajJnARueZFzo/mM4f+IJcRc6W8NnZFt
-X-Google-Smtp-Source: AKy350ZIQhFkWw+W1s3nEjbVfelaXBIeDZXZ7kuap/QQL1GT9LO34SBwNB4Z41s92akJsCUeXEx40kWeU741u3fqbpI=
-X-Received: by 2002:a50:d705:0:b0:4fb:7ccf:337a with SMTP id
- t5-20020a50d705000000b004fb7ccf337amr2063532edi.3.1680121759989; Wed, 29 Mar
- 2023 13:29:19 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680132101;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GtSiJsA/lZ88L2un1QDafrmeA+ZXYg/KJLwWTWWtzFM=;
+        b=18KwT3faVtoy5deCvHrkQnh3MaA2u5opk4kqWRJdBJcykC1OD9v5PDUB9JhaMQJyig
+         /prrXkF1s4sIMt79D/te3fIE5uHs/uUXmaP7p8ZjUWUblV4xoCAuF4jWSoyt9LVVN6XD
+         kxrHSK74uMDxTnyG+bweuIOOu4QeLzVPoIrM4G2h3sp5D2ray/G4KNQ+bhj4cXjeFlPb
+         Rh3s2R8uqP9JRVebBI7rs0BRIe3/7d/bMcBLBDS47/EMf5ewaj6OJ4jz5QfJVTACVlGD
+         w5lpsfixVWKQjx3BV6vlmqQQiPYMnpDdzgFUaXnO294V0N1juv/N5oG06AE3zrcKyrJW
+         0QTw==
+X-Gm-Message-State: AAQBX9cX4l7XlIevORtlK4IHxr/V6xdnmFM2d5sxe7SpMgTGmaDQRnvL
+        5r6etKJox7/4D6ssQ5kRJmIV7v/BM5a5uOYERgCMAVgN
+X-Google-Smtp-Source: AKy350b3GRWHkk3ykD9KbnDz/nbjGJwwuDyQ9gsRdW8CM9l+1arsrnf3RuFUWkCfFGp0GCqpe8+taR4LuXwuiqOGR9E=
+X-Received: by 2002:a2e:3203:0:b0:298:b337:c11f with SMTP id
+ y3-20020a2e3203000000b00298b337c11fmr6461285ljy.7.1680132100890; Wed, 29 Mar
+ 2023 16:21:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230329202406.15762-1-ddiss@suse.de>
-In-Reply-To: <20230329202406.15762-1-ddiss@suse.de>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 30 Mar 2023 06:29:07 +1000
-Message-ID: <CAN05THRvaQ_8T3aMa-MZSniANizrqtO9UMJnhzZbfc4MPV3oyA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix DFS traversal oops without CONFIG_CIFS_DFS_UPCALL
-To:     David Disseldorp <ddiss@suse.de>
-Cc:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        smfrench@gmail.com
+References: <20230329202406.15762-1-ddiss@suse.de> <CAH2r5mtEXtRWbtf9OAzwWa2Wm6fUR+fZrU=OmtiP3E0VQpn+2w@mail.gmail.com>
+In-Reply-To: <CAH2r5mtEXtRWbtf9OAzwWa2Wm6fUR+fZrU=OmtiP3E0VQpn+2w@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 29 Mar 2023 18:21:29 -0500
+Message-ID: <CAH2r5msRi6=9cvx_SKtP=1r9YUY1p8Gy8mc_hXmBWHE1gVurow@mail.gmail.com>
+Subject: Fwd: [PATCH] cifs: fix DFS traversal oops without CONFIG_CIFS_DFS_UPCALL
+To:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-reviewed-by me
+merged into cifs-2.6.git for-next and added Paulo's Reviewed-by
 
-On Thu, 30 Mar 2023 at 06:23, David Disseldorp <ddiss@suse.de> wrote:
+On Wed, Mar 29, 2023 at 3:23=E2=80=AFPM David Disseldorp <ddiss@suse.de> wr=
+ote:
 >
 > When compiled with CONFIG_CIFS_DFS_UPCALL disabled, cifs_dfs_d_automount
 > NULL. cifs.ko logic for mapping CIFS_FATTR_DFS_REFERRAL attributes to
@@ -102,7 +103,8 @@ On Thu, 30 Mar 2023 at 06:23, David Disseldorp <ddiss@suse.de> wrote:
 > index 71fe0a0a7992..415176b2cf32 100644
 > --- a/fs/cifs/cifsfs.h
 > +++ b/fs/cifs/cifsfs.h
-> @@ -124,7 +124,10 @@ extern const struct dentry_operations cifs_ci_dentry_ops;
+> @@ -124,7 +124,10 @@ extern const struct dentry_operations cifs_ci_dentry=
+_ops;
 >  #ifdef CONFIG_CIFS_DFS_UPCALL
 >  extern struct vfsmount *cifs_dfs_d_automount(struct path *path);
 >  #else
@@ -117,3 +119,15 @@ On Thu, 30 Mar 2023 at 06:23, David Disseldorp <ddiss@suse.de> wrote:
 > --
 > 2.35.3
 >
+
+
+--=20
+Thanks,
+
+Steve
+
+
+--=20
+Thanks,
+
+Steve
