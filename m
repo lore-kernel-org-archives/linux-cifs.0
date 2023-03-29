@@ -2,58 +2,59 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD398C74A5B
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Mar 2023 20:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA6EC6FD18
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Mar 2023 20:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229479AbjC2U2S (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Mar 2023 16:28:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41478 "EHLO
+        id S229567AbjC2U3X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Mar 2023 16:29:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjC2U2R (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Mar 2023 16:28:17 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C78527D
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 13:28:16 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id y4so68306573edo.2
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 13:28:16 -0700 (PDT)
+        with ESMTP id S229504AbjC2U3W (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Mar 2023 16:29:22 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EEB24EF2;
+        Wed, 29 Mar 2023 13:29:21 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id y4so68316852edo.2;
+        Wed, 29 Mar 2023 13:29:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680121695;
+        d=gmail.com; s=20210112; t=1680121760;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VhTRqJl2kiD60/EpjlAVP9ErcZo20BpSAh3SlTDaImo=;
-        b=crxmgLrXtNNDjmCFgU4hzKGuNcNRxQQU/MVJi5VA0mUpmOgfL3ANe4RxMvhqOP4JXR
-         iNPA9L1+UcScpD8oHgX7gh/SCkENGkUMlIih8x9qsT+UXOoZGyLdtYCAJzKM/1hz35GC
-         ZPcllWzUAVOx8N74O9KfHqQXJvseQH4T0SjPAzC6zjxSJoN96hGWS1V+Mws/+ADAXH/L
-         /B6mqKgIOqGYmqg10jeKH4Mj+MOUTgvurGIxWQ22qZljuJSlPJutDXiWw6/nOgVfTSxF
-         FnoaAyr1ygByTIME9QbY9MlAT9dpNR9ATLiHsUJl5EQ1HbokqWYQwpG42QbM4NTo8IGg
-         b8mA==
+        bh=PzO45Itb2rhyqvuxYhW+Lzip9Sn5S9p47n8/nUNslV4=;
+        b=PAlLl8AeMeBq78D1ANa2vKZm2xx9C32v5VhgKyPwI6kR5eo1VkvG0dIj6RlfQSo50a
+         WAhrsB8vXQdMfGek011eRWA44tIjAk0avPq/0Ek/29YmaBotOPSOMyC7j21UPnI9UIG7
+         BNxjqgGHKXUBAkD7J5UYgdX4VEe9KHXQef9HmxclVnxurRrlT+JnAZIXh3XHSj9w/grP
+         ovc+XMr7pguuuqJkPz48YnEwsNmwYA5xJ7DVp1jfqbIJAY2bknliBSs8HLLarXrtfL08
+         0KtwCdiCSxe1Grk5SSONFGq8VaqVhuaPB5EVUB+kMj5pp+iYkSzX4RhknTV5B54CCjY3
+         Ec2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680121695;
+        d=1e100.net; s=20210112; t=1680121760;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VhTRqJl2kiD60/EpjlAVP9ErcZo20BpSAh3SlTDaImo=;
-        b=fn9M1MraO7kz7H6YsURw49TknHX2yJ9okRP4/8DbXI4aXovQyhEqUkOLtq1pAj9Qe7
-         dcEhjzlD9JYNqwcaJJQ2BdbQiNgAf7e4TeOZ1q+LBWEPYxOV/+8ihjL3qWzqnaCVnLP+
-         azgeN0QgmwRpZWexbUqdaMct/Qh0BVr5VX8IlTO/pzNZ+aP0itAsZ+0tqBSe9JdK9fku
-         NahAaeheihbLQW3P04hFIU3CbROgOM6uv1bPg+HIXd2plPGei//RmM0IOVP+awZL1mWl
-         DNqnritkAgdxnTs6qEY3QG1Z0UcwEut3k3k/Y5VYWyermATH/9gFmdCnGrWJtLYt2SW+
-         RBzA==
-X-Gm-Message-State: AAQBX9f6rZL+xlp4tyKmSUX5QmU2T4F3D/Wfuemn7GmIvuuWKUMD2rVP
-        c7gQdx1m7iKI/A/UfsO4kNR0gS2rcEN3Npz53aU=
-X-Google-Smtp-Source: AKy350aTK0yx6bKIZtHuHw5T/0znQ0mE1TCtTW1k2UQZzgEKRFiNjFhSfDk3Rj5KZ8K9Bnd/axOBfHgLe7RtJgQidSM=
-X-Received: by 2002:a17:907:160e:b0:946:a095:b314 with SMTP id
- hb14-20020a170907160e00b00946a095b314mr4250507ejc.2.1680121694957; Wed, 29
- Mar 2023 13:28:14 -0700 (PDT)
+        bh=PzO45Itb2rhyqvuxYhW+Lzip9Sn5S9p47n8/nUNslV4=;
+        b=fY+/lwwBLUYVRGXFW3AbSyq2pIYjhOJDZBjOs3n6nyHNndTvhhlPyGnY9KG/mtelJw
+         nCqGYIEKGvNfMHB5sCwim6hYl6EPHo1ttoPn0XJESwkhOjDRvW+MisWZ928iefM31qr+
+         QvHLGzltV9vfqWmVWmuPR5R1RQb2+V3mEepkEtHrBkR37HAyhHVEuYAr4Ila+Bhjbk61
+         APYm6v1uW/FyKgyDyO9gbGNm8cF9EJ4I8tolzvcmOA91JtDkeSuqvsmpCqujKUd3R3EW
+         fvLkgjXEY8gJDbQptrYKZHasM5gUbIuur0yHMoLOp0xeR0Kt3RCNfFg3dWbCcK9zHUYP
+         Y+RQ==
+X-Gm-Message-State: AAQBX9dHn6ROMSTMtBUDSfWhAfy6aeeIVeXDBpr3giA9fL+qHyywD9XF
+        9r4eCLLqYVPF9ajJnARueZFzo/mM4f+IJcRc6W8NnZFt
+X-Google-Smtp-Source: AKy350ZIQhFkWw+W1s3nEjbVfelaXBIeDZXZ7kuap/QQL1GT9LO34SBwNB4Z41s92akJsCUeXEx40kWeU741u3fqbpI=
+X-Received: by 2002:a50:d705:0:b0:4fb:7ccf:337a with SMTP id
+ t5-20020a50d705000000b004fb7ccf337amr2063532edi.3.1680121759989; Wed, 29 Mar
+ 2023 13:29:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230329201423.32134-1-pc@manguebit.com> <20230329201423.32134-5-pc@manguebit.com>
-In-Reply-To: <20230329201423.32134-5-pc@manguebit.com>
+References: <20230329202406.15762-1-ddiss@suse.de>
+In-Reply-To: <20230329202406.15762-1-ddiss@suse.de>
 From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 30 Mar 2023 06:28:02 +1000
-Message-ID: <CAN05THSshgpUHy-Dvf-fwnr=KD0DyqAdnX0x2keXhgcr1pKedA@mail.gmail.com>
-Subject: Re: [PATCH 5/5] cifs: get rid of dead check in smb2_reconnect()
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     smfrench@gmail.com, linux-cifs@vger.kernel.org
+Date:   Thu, 30 Mar 2023 06:29:07 +1000
+Message-ID: <CAN05THRvaQ_8T3aMa-MZSniANizrqtO9UMJnhzZbfc4MPV3oyA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix DFS traversal oops without CONFIG_CIFS_DFS_UPCALL
+To:     David Disseldorp <ddiss@suse.de>
+Cc:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        smfrench@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
@@ -61,28 +62,58 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 reviewed-by me
 
-On Thu, 30 Mar 2023 at 06:20, Paulo Alcantara <pc@manguebit.com> wrote:
+On Thu, 30 Mar 2023 at 06:23, David Disseldorp <ddiss@suse.de> wrote:
 >
-> The SMB2_IOCTL check in the switch statement will never be true as we
-> return earlier from smb2_reconnect() if @smb2_command == SMB2_IOCTL.
+> When compiled with CONFIG_CIFS_DFS_UPCALL disabled, cifs_dfs_d_automount
+> NULL. cifs.ko logic for mapping CIFS_FATTR_DFS_REFERRAL attributes to
+> S_AUTOMOUNT and corresponding dentry flags is retained regardless of
+> CONFIG_CIFS_DFS_UPCALL, leading to a NULL pointer dereference in
+> VFS follow_automount() when traversing a DFS referral link:
+>   BUG: kernel NULL pointer dereference, address: 0000000000000000
+>   ...
+>   Call Trace:
+>    <TASK>
+>    __traverse_mounts+0xb5/0x220
+>    ? cifs_revalidate_mapping+0x65/0xc0 [cifs]
+>    step_into+0x195/0x610
+>    ? lookup_fast+0xe2/0xf0
+>    path_lookupat+0x64/0x140
+>    filename_lookup+0xc2/0x140
+>    ? __create_object+0x299/0x380
+>    ? kmem_cache_alloc+0x119/0x220
+>    ? user_path_at_empty+0x31/0x50
+>    user_path_at_empty+0x31/0x50
+>    __x64_sys_chdir+0x2a/0xd0
+>    ? exit_to_user_mode_prepare+0xca/0x100
+>    do_syscall_64+0x42/0x90
+>    entry_SYSCALL_64_after_hwframe+0x72/0xdc
 >
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+> This fix adds an inline cifs_dfs_d_automount() {return -EREMOTE} handler
+> when CONFIG_CIFS_DFS_UPCALL is disabled. An alternative would be to
+> avoid flagging S_AUTOMOUNT, etc. without CONFIG_CIFS_DFS_UPCALL. This
+> approach was chosen as it provides more control over the error path.
+>
+> Signed-off-by: David Disseldorp <ddiss@suse.de>
 > ---
->  fs/cifs/smb2pdu.c | 1 -
->  1 file changed, 1 deletion(-)
+>  fs/cifs/cifsfs.h | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 6bd2aa6af18f..2b92132097dc 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -310,7 +310,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
->         case SMB2_READ:
->         case SMB2_WRITE:
->         case SMB2_LOCK:
-> -       case SMB2_IOCTL:
->         case SMB2_QUERY_DIRECTORY:
->         case SMB2_CHANGE_NOTIFY:
->         case SMB2_QUERY_INFO:
+> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+> index 71fe0a0a7992..415176b2cf32 100644
+> --- a/fs/cifs/cifsfs.h
+> +++ b/fs/cifs/cifsfs.h
+> @@ -124,7 +124,10 @@ extern const struct dentry_operations cifs_ci_dentry_ops;
+>  #ifdef CONFIG_CIFS_DFS_UPCALL
+>  extern struct vfsmount *cifs_dfs_d_automount(struct path *path);
+>  #else
+> -#define cifs_dfs_d_automount NULL
+> +static inline struct vfsmount *cifs_dfs_d_automount(struct path *path)
+> +{
+> +       return ERR_PTR(-EREMOTE);
+> +}
+>  #endif
+>
+>  /* Functions related to symlinks */
 > --
-> 2.40.0
+> 2.35.3
 >
