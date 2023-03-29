@@ -2,56 +2,56 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D66CC6FD18
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Mar 2023 20:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9720C74A5B
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Mar 2023 20:25:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbjC2UZT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Mar 2023 16:25:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39988 "EHLO
+        id S229597AbjC2UZp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Mar 2023 16:25:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbjC2UZS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Mar 2023 16:25:18 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1880F46B0
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 13:25:14 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id cn12so68239342edb.4
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 13:25:14 -0700 (PDT)
+        with ESMTP id S229481AbjC2UZo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Mar 2023 16:25:44 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAD5840F4
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 13:25:43 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id x3so68139979edb.10
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Mar 2023 13:25:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680121512;
+        d=gmail.com; s=20210112; t=1680121542;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DWjVI/cyPicHkcA47j//YCHWMvlzteacsHyL9QASJZg=;
-        b=k5KfpgOrRUWWdDO2yD955REup+rFfBZHL5vZyt7lZWu02bNg0EdmI0dsOZdPE1yjhA
-         Ele+oEL9WCW+DEhHhT5OpawcmYQFdZ7WXgNgxYKZfjmhYat/9oxtw+CH+70a1S3bZ67b
-         s4ZNebYAJiOZVfNH/8dpZSMuIyuYiM87jTud14692MChEx9wlkqHEvRB1AilDrQz2iLG
-         2kc19ogxEm0qoFtdytRS/bVhkFgGcnRNgh2/gg3hZgEGxTrM6pOA1yrnqQsBQ3v1toer
-         J5f4kUj7zoCH5AbXqEAW6G+YRU3BQaEje3kBNimT2wSnBgfJDquHV6BcmYpsfiV0qrM/
-         hqsw==
+        bh=UPhJCTYEPdMY6UyrMqZcin+6MgCbiBqOJzAzi1i3AVI=;
+        b=ht0rpNhzIFTZ50OQlfYwc2Dyajc99gcg/Uyi3A5GugMI3Km8sbqSZDGrOTYzjCdPYG
+         E9YmKg0vs6dSR6i0u/UePxuOGVyI6vhS14ku234PLEeHB83l6GW+p4tOD3jF+2MvFq67
+         3UrjBPGMh4GkcjR7L9UaY8H9iM0EvUsfphNhtsJ0ZeabOgHlYWmRJZSiJt+uQcFRroS5
+         zecBwcuO+8m/uUa0DPKTscv+/3hQJ/YU2EfhL3Y2ein0kaoJc1FvS5LlvlUxdn7wSqaj
+         KsGduViyNEYedKbinAu3sm/XU6ItWUBVj3pRX+OMpvFdLXL8WVLgK1UDJ4vevueilfN4
+         MX0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680121512;
+        d=1e100.net; s=20210112; t=1680121542;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DWjVI/cyPicHkcA47j//YCHWMvlzteacsHyL9QASJZg=;
-        b=HpruVkZH94a6IdttWyn9VU4cewIW7XeqxQLaj544nU/atN38BtCN8FfIaonhia31Jn
-         1waMj/+gLt0p+GAYhe4rhfLZAoumaQomeXq8Jtqhv0+0fXkvqkEpoMb9lFIHl5biPWpW
-         6HJSZORC/uf45L0n9o8/Sgqw6YkB5zANFA7AOPTVwo0ktSDKBUaG8BZqX5jMp7WDWkYs
-         44J467X5eb9ijuHNKbUkk0uyAoZZArT2HdGqrg64yYshaHb3r+GqdRsoUkyfC1OztfdL
-         69KJpZNsTsK78lVzh6XVHnQBrCoY8PUqq3wqrWBXAXLmMlyJSW5mbuDMHfG6XR4E/XSs
-         znhw==
-X-Gm-Message-State: AAQBX9eTc/yLj3ONfveUSBIMlQ3ojTpQxacGXBtSTUvGieRVXwHYuo81
-        6A0IqrC4bMsBkojHMNTvtspbweVSaz+mqtSExWw=
-X-Google-Smtp-Source: AKy350YZBtz7W80fTGYAyrqdSKT2x0eV0mn54tPqGLS1UF+/aj03YIeOhFSCMsZDHt7XeZi5b5ATXE3ZSIdFQQI7nps=
-X-Received: by 2002:a17:907:a0cd:b0:947:4b15:51e5 with SMTP id
- hw13-20020a170907a0cd00b009474b1551e5mr53101ejc.2.1680121512417; Wed, 29 Mar
- 2023 13:25:12 -0700 (PDT)
+        bh=UPhJCTYEPdMY6UyrMqZcin+6MgCbiBqOJzAzi1i3AVI=;
+        b=45BzpnUzN1eafm4JRjGkISUVcCUbdW1gp+9geL7S8ltDtHoiGiV+aCwuFfJGSVXuwL
+         Kfd0+nj6ZdWHilRGv+YiK5RW+hvZsDfQyAM8g//58f9OpUOKI0O7uYbHM6PgxWzOClCO
+         rgQSW9werJoAjILw11Wt/IdBO8QyYcuzgD2h1KtiDqeyBQp4gMB0gwOxAtfMmHszjcoT
+         /Zz6z0bCk00+LgY2FL1/274Eu9s/VFRjU10j8z0WoGoTxJAK0ChB0pJAJq3Io3IU4ZLP
+         2lMnYTa6Fq6tuCxxaHBmYRsnj3SCfBaYvf7AVXcksUtG5V8l5vJZS6CJlhFOHc1i1O8r
+         Leyw==
+X-Gm-Message-State: AAQBX9f8VUzf+RiMjPYCUJXQmTfOpyKp6cJnta7UW0ENt8+MhyM0fqNA
+        GEqQ0Kwgr1rSPictBhme6vooVav66rf9/rg/zEo=
+X-Google-Smtp-Source: AKy350ZYFmTwKNbNp426jG4Ai2JHzLBt2wgWcd9mMFPEYFbysoy13mMIXy9XMno/+P20fuIGVLRx5eJqU2rRqnmsuF8=
+X-Received: by 2002:a17:907:160e:b0:946:a095:b314 with SMTP id
+ hb14-20020a170907160e00b00946a095b314mr4246879ejc.2.1680121542239; Wed, 29
+ Mar 2023 13:25:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230329201423.32134-1-pc@manguebit.com>
-In-Reply-To: <20230329201423.32134-1-pc@manguebit.com>
+References: <20230329201423.32134-1-pc@manguebit.com> <20230329201423.32134-2-pc@manguebit.com>
+In-Reply-To: <20230329201423.32134-2-pc@manguebit.com>
 From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 30 Mar 2023 06:24:59 +1000
-Message-ID: <CAN05THRzKyB0bgMRi4pqA2GecAMapbMzaCdcvS0igh0r_629WA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] cifs: get rid of cifs_mount_ctx::{origin,leaf}_fullpath
+Date:   Thu, 30 Mar 2023 06:25:29 +1000
+Message-ID: <CAN05THSk5wESDBcc6g4Dtpr4HWkTSsrM-5BzWaTPD403a_3dQg@mail.gmail.com>
+Subject: Re: [PATCH 2/5] cifs: get rid of unnecessary ifdef
 To:     Paulo Alcantara <pc@manguebit.com>
 Cc:     smfrench@gmail.com, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -59,48 +59,33 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reviewed-by me
+reviewed-by me
 
 On Thu, 30 Mar 2023 at 06:20, Paulo Alcantara <pc@manguebit.com> wrote:
 >
-> leaf_fullpath is now part of smb3_fs_context structure, while
-> origin_fullpath is just a variable in __dfs_mount_share() that is used
-> when final tcon is available.
->
-> Get rid of those fields in cifs_mount_ctx structure and no-op
-> kfree()'s.
+> No need to ifdef around TCP_Server_Info::{origin,leaf}_fullpath as
+> they're declared regardless CONFIG_CIFS_DFS_UPCALL.
 >
 > Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 > ---
->  fs/cifs/cifsglob.h | 1 -
->  fs/cifs/connect.c  | 2 --
->  2 files changed, 3 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 08a73dcb7786..c5e3a0fc7983 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1750,7 +1750,6 @@ struct cifs_mount_ctx {
->         struct TCP_Server_Info *server;
->         struct cifs_ses *ses;
->         struct cifs_tcon *tcon;
-> -       char *origin_fullpath, *leaf_fullpath;
->         struct list_head dfs_ses_list;
->  };
+>  fs/cifs/connect.c | 2 --
+>  1 file changed, 2 deletions(-)
 >
 > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 1cbb90587995..ef50f603e640 100644
+> index ef50f603e640..7c3e090a0f13 100644
 > --- a/fs/cifs/connect.c
 > +++ b/fs/cifs/connect.c
-> @@ -3454,8 +3454,6 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+> @@ -993,10 +993,8 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+>                  */
+>         }
 >
->  error:
->         dfs_put_root_smb_sessions(&mnt_ctx.dfs_ses_list);
-> -       kfree(mnt_ctx.origin_fullpath);
-> -       kfree(mnt_ctx.leaf_fullpath);
->         cifs_mount_put_conns(&mnt_ctx);
->         return rc;
->  }
+> -#ifdef CONFIG_CIFS_DFS_UPCALL
+>         kfree(server->origin_fullpath);
+>         kfree(server->leaf_fullpath);
+> -#endif
+>         kfree(server);
+>
+>         length = atomic_dec_return(&tcpSesAllocCount);
 > --
 > 2.40.0
 >
