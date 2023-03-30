@@ -2,37 +2,37 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BC4C6FD1D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F127FC761AF
 	for <linux-cifs@archiver.kernel.org>; Thu, 30 Mar 2023 12:05:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230397AbjC3MFC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 30 Mar 2023 08:05:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37762 "EHLO
+        id S229436AbjC3MFD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Mar 2023 08:05:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjC3MFB (ORCPT
+        with ESMTP id S229869AbjC3MFB (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Mar 2023 08:05:01 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7976422C
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE73F420B
         for <linux-cifs@vger.kernel.org>; Thu, 30 Mar 2023 05:05:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
         s=42; h=Message-Id:Date:Cc:To:From;
-        bh=deS2kLHw61a6ZEmvlUtUEoCBmDqXLszlmUTSWey+tns=; b=0g1VYFIKjDCDB2wMvRJNz/8Tbe
-        x052l0vU+DAEN06sq4ktnFQR8m1wuAykEn6TwEceKvR+RPRk69EIaAiJ2ujLCMqY9jnFB2Dd3f1EX
-        UnGx8zw3eMKRBTBPVWH8WbzRc9pyymb5NiwZY20KJd7+LC8BxggpQpNu4QzCB99eLz6J1bmptk3ap
-        5El55oFpbMu1IOVI+xRe9U1DsUcQg8BWMAQ5UPxRAgj+unLvTboOz05+iDbyfo/A63ltfhnXFQ5ep
-        +lV5Icf9RdFuTuGfp3myjuT1rHK6DRhFyR1GSJBRDU/Nle9x+0f2LWzohG++R32aPArMWuUojlely
-        lK6mVaWTuQlSFAvZ1wzzgyGRXD9bro3vaowF440B4W+GP43Q/xpjhD3uVsGex1vGsyCfS7dw9A1Ec
-        Z4ixaHendn3/rWxLW6klcoAlmy0JblbepvEmkPKmnURC/kBciBEBv0MEd86QUj5grlDE6uOh6vFUX
-        C9YIax7SZPdrzXOrnWlgkxo4;
+        bh=pIDAdTinNCg9b6xzvp/5PJcnEwG9KmyRNxX9esNeAQ0=; b=i09ts02uWSfeY9IjjmtoIuX9/d
+        DctMR8T2CqsCXY/wWP1FN3ZZ+07YrdkhV0nLd8uI25S4COmhtg3fg7BCY9QMSqa7x54JEvgKyJ53H
+        4YlLQ6F9Z1qlWY0q85PwguJexCU82wP1hMb9twL06x5vG92NrMMQkrz4/21Cygh/mYMOB2C1lsRST
+        QElmfPOfDmJyrgN2/UdvfXadAf7IsWVbkmlYASVwQUrSJACo3tzL8Fv6zWEXsEPa0jaKdNx5nklmT
+        VqQxMulOaZZ8moPwtrgYO9qZNainhNlTNjQG8AdOi85LnVg+M/5qM2U9FrswdHECo8o3+gSII/ExJ
+        qbGBi1YzlUJPAMWv0M4Q2wRYDW9SFBf+qXKGzaa/MTZsGUuebnDD7sNN/Sydf6uUOT/VgWGH/eaGS
+        iYAEg+napjEcf9rHwGZOcgJuXQqav/zp8N09qR5KmZlE++X13qhrF7tt6dCLWyq6svundKT5yoQhl
+        k+1xaupVqPeAjbW1W7P1tGLo;
 Received: from [2a01:4f8:252:410e::177:224] (port=52126 helo=atb-devel-224..) 
         by hr2.samba.org with esmtp (Exim)
-        id 1phr1W-006GnE-Sm; Thu, 30 Mar 2023 12:04:58 +0000
+        id 1phr1W-006GnE-MI; Thu, 30 Mar 2023 12:04:58 +0000
 From:   Volker Lendecke <vl@samba.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     Volker Lendecke <vl@samba.org>
-Subject: [PATCH 2/3] cifs: Simplify SMB2_open_init()
-Date:   Thu, 30 Mar 2023 12:04:46 +0000
-Message-Id: <12ae1d4e5bdecf8aec7240dda92c044aabbf9144.1680177540.git.vl@samba.org>
+Subject: [PATCH 1/3] cifs: Simplify SMB2_open_init()
+Date:   Thu, 30 Mar 2023 12:04:45 +0000
+Message-Id: <f5a9bc4ec1f6f1f952a1f8d32b9ca0c9c313e78c.1680177540.git.vl@samba.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1680177540.git.vl@samba.org>
 References: <cover.1680177540.git.vl@samba.org>
@@ -42,102 +42,133 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reduce code duplication by stitching together create contexts in one
-place.
+We can point to the create contexts in just one place, we don't have
+to do this in every add_*_context routine.
 
 Signed-off-by: Volker Lendecke <vl@samba.org>
 ---
- fs/cifs/smb2pdu.c | 42 +++++++++---------------------------------
- 1 file changed, 9 insertions(+), 33 deletions(-)
+ fs/cifs/smb2pdu.c | 45 +++++++++++++--------------------------------
+ 1 file changed, 13 insertions(+), 32 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5c5a7c3f3064..9160f3a54805 100644
+index 6bd2aa6af18f..5c5a7c3f3064 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2815,14 +2815,6 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+@@ -810,10 +810,6 @@ add_posix_context(struct kvec *iov, unsigned int *num_iovec, umode_t mode)
+ 	if (iov[num].iov_base == NULL)
+ 		return -ENOMEM;
+ 	iov[num].iov_len = sizeof(struct create_posix);
+-	if (!req->CreateContextsOffset)
+-		req->CreateContextsOffset = cpu_to_le32(
+-				sizeof(struct smb2_create_req) +
+-				iov[num - 1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_posix));
+ 	*num_iovec = num + 1;
+ 	return 0;
+@@ -2163,10 +2159,6 @@ add_lease_context(struct TCP_Server_Info *server, struct kvec *iov,
+ 		return -ENOMEM;
+ 	iov[num].iov_len = server->vals->create_lease_size;
+ 	req->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_LEASE;
+-	if (!req->CreateContextsOffset)
+-		req->CreateContextsOffset = cpu_to_le32(
+-				sizeof(struct smb2_create_req) +
+-				iov[num - 1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength,
+ 		     server->vals->create_lease_size);
+ 	*num_iovec = num + 1;
+@@ -2254,10 +2246,6 @@ add_durable_v2_context(struct kvec *iov, unsigned int *num_iovec,
+ 	if (iov[num].iov_base == NULL)
+ 		return -ENOMEM;
+ 	iov[num].iov_len = sizeof(struct create_durable_v2);
+-	if (!req->CreateContextsOffset)
+-		req->CreateContextsOffset =
+-			cpu_to_le32(sizeof(struct smb2_create_req) +
+-								iov[1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_durable_v2));
+ 	*num_iovec = num + 1;
+ 	return 0;
+@@ -2277,10 +2265,6 @@ add_durable_reconnect_v2_context(struct kvec *iov, unsigned int *num_iovec,
+ 	if (iov[num].iov_base == NULL)
+ 		return -ENOMEM;
+ 	iov[num].iov_len = sizeof(struct create_durable_handle_reconnect_v2);
+-	if (!req->CreateContextsOffset)
+-		req->CreateContextsOffset =
+-			cpu_to_le32(sizeof(struct smb2_create_req) +
+-								iov[1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength,
+ 			sizeof(struct create_durable_handle_reconnect_v2));
+ 	*num_iovec = num + 1;
+@@ -2311,10 +2295,6 @@ add_durable_context(struct kvec *iov, unsigned int *num_iovec,
+ 	if (iov[num].iov_base == NULL)
+ 		return -ENOMEM;
+ 	iov[num].iov_len = sizeof(struct create_durable);
+-	if (!req->CreateContextsOffset)
+-		req->CreateContextsOffset =
+-			cpu_to_le32(sizeof(struct smb2_create_req) +
+-								iov[1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength, sizeof(struct create_durable));
+ 	*num_iovec = num + 1;
+ 	return 0;
+@@ -2356,10 +2336,6 @@ add_twarp_context(struct kvec *iov, unsigned int *num_iovec, __u64 timewarp)
+ 	if (iov[num].iov_base == NULL)
+ 		return -ENOMEM;
+ 	iov[num].iov_len = sizeof(struct crt_twarp_ctxt);
+-	if (!req->CreateContextsOffset)
+-		req->CreateContextsOffset = cpu_to_le32(
+-				sizeof(struct smb2_create_req) +
+-				iov[num - 1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength, sizeof(struct crt_twarp_ctxt));
+ 	*num_iovec = num + 1;
+ 	return 0;
+@@ -2491,10 +2467,6 @@ add_sd_context(struct kvec *iov, unsigned int *num_iovec, umode_t mode, bool set
+ 	if (iov[num].iov_base == NULL)
+ 		return -ENOMEM;
+ 	iov[num].iov_len = len;
+-	if (!req->CreateContextsOffset)
+-		req->CreateContextsOffset = cpu_to_le32(
+-				sizeof(struct smb2_create_req) +
+-				iov[num - 1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength, len);
+ 	*num_iovec = num + 1;
+ 	return 0;
+@@ -2533,10 +2505,6 @@ add_query_id_context(struct kvec *iov, unsigned int *num_iovec)
+ 	if (iov[num].iov_base == NULL)
+ 		return -ENOMEM;
+ 	iov[num].iov_len = sizeof(struct crt_query_id_ctxt);
+-	if (!req->CreateContextsOffset)
+-		req->CreateContextsOffset = cpu_to_le32(
+-				sizeof(struct smb2_create_req) +
+-				iov[num - 1].iov_len);
+ 	le32_add_cpu(&req->CreateContextsLength, sizeof(struct crt_query_id_ctxt));
+ 	*num_iovec = num + 1;
+ 	return 0;
+@@ -2700,6 +2668,9 @@ int smb311_posix_mkdir(const unsigned int xid, struct inode *inode,
+ 		rc = add_posix_context(iov, &n_iov, mode);
+ 		if (rc)
+ 			goto err_free_req;
++		req->CreateContextsOffset = cpu_to_le32(
++			sizeof(struct smb2_create_req) +
++			iov[1].iov_len);
+ 		pc_buf = iov[n_iov-1].iov_base;
  	}
  
- 	if (*oplock == SMB2_OPLOCK_LEVEL_BATCH) {
--		/* need to set Next field of lease context if we request it */
--		if (server->capabilities & SMB2_GLOBAL_CAP_LEASING) {
--			struct create_context *ccontext =
--			    (struct create_context *)iov[n_iov-1].iov_base;
--			ccontext->Next =
--				cpu_to_le32(server->vals->create_lease_size);
--		}
--
- 		rc = add_durable_context(iov, &n_iov, oparms,
- 					tcon->use_persistent);
- 		if (rc)
-@@ -2830,13 +2822,6 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+@@ -2923,6 +2894,16 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
  	}
- 
- 	if (tcon->posix_extensions) {
--		if (n_iov > 2) {
--			struct create_context *ccontext =
--			    (struct create_context *)iov[n_iov-1].iov_base;
--			ccontext->Next =
--				cpu_to_le32(iov[n_iov-1].iov_len);
--		}
--
- 		rc = add_posix_context(iov, &n_iov, oparms->mode);
- 		if (rc)
- 			return rc;
-@@ -2844,13 +2829,6 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 
- 	if (tcon->snapshot_time) {
- 		cifs_dbg(FYI, "adding snapshot context\n");
--		if (n_iov > 2) {
--			struct create_context *ccontext =
--			    (struct create_context *)iov[n_iov-1].iov_base;
--			ccontext->Next =
--				cpu_to_le32(iov[n_iov-1].iov_len);
--		}
--
- 		rc = add_twarp_context(iov, &n_iov, tcon->snapshot_time);
- 		if (rc)
- 			return rc;
-@@ -2874,12 +2852,6 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 			set_owner = false;
- 
- 		if (set_owner | set_mode) {
--			if (n_iov > 2) {
--				struct create_context *ccontext =
--				    (struct create_context *)iov[n_iov-1].iov_base;
--				ccontext->Next = cpu_to_le32(iov[n_iov-1].iov_len);
--			}
--
- 			cifs_dbg(FYI, "add sd with mode 0x%x\n", oparms->mode);
- 			rc = add_sd_context(iov, &n_iov, oparms->mode, set_owner);
- 			if (rc)
-@@ -2887,11 +2859,6 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 		}
- 	}
- 
--	if (n_iov > 2) {
--		struct create_context *ccontext =
--			(struct create_context *)iov[n_iov-1].iov_base;
--		ccontext->Next = cpu_to_le32(iov[n_iov-1].iov_len);
--	}
  	add_query_id_context(iov, &n_iov);
  
- 	if (n_iov > 2) {
-@@ -2902,6 +2869,15 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 		req->CreateContextsOffset = cpu_to_le32(
- 			sizeof(struct smb2_create_req) +
- 			iov[1].iov_len);
++	if (n_iov > 2) {
++		/*
++		 * We have create contexts behind iov[1] (the file
++		 * name), point at them from the main create request
++		 */
++		req->CreateContextsOffset = cpu_to_le32(
++			sizeof(struct smb2_create_req) +
++			iov[1].iov_len);
++	}
 +
-+		for (unsigned int i = 2; i < (n_iov-1); i++) {
-+			struct kvec *v = &iov[i];
-+			size_t len = v->iov_len;
-+			struct create_context *cctx =
-+				(struct create_context *)v->iov_base;
-+
-+			cctx->Next = cpu_to_le32(len);
-+		}
- 	}
- 
  	rqst->rq_nvec = n_iov;
+ 	return 0;
+ }
 -- 
 2.30.2
 
