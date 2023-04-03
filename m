@@ -2,68 +2,121 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B97C76196
-	for <linux-cifs@archiver.kernel.org>; Sun,  2 Apr 2023 18:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0527C761A6
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Apr 2023 09:28:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230501AbjDBSCJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 2 Apr 2023 14:02:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60464 "EHLO
+        id S231421AbjDCJ2g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 3 Apr 2023 05:28:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231322AbjDBSCI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Apr 2023 14:02:08 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9CF1CDC4;
-        Sun,  2 Apr 2023 11:02:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S232043AbjDCJ2c (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Apr 2023 05:28:32 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7420E3C26
+        for <linux-cifs@vger.kernel.org>; Mon,  3 Apr 2023 02:28:29 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5E6A0B80F10;
-        Sun,  2 Apr 2023 18:02:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 14295C433D2;
-        Sun,  2 Apr 2023 18:02:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680458525;
-        bh=s+3aut4dzx49Tpfk1jQ7bdm/uqHONBcDKv/95RZNTo4=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=s0HNlhi/vg/bQo4JrwiUpofI5GRNm6Rr1WcmH8ZYkgQN/CU2g4iXiJrt7euDVeFVj
-         fMdPY2popcsBSOfSuykKbzq2f3cAvuBpKOGL6KWN5aBa3LSlFLjGaJHfMad5M4P09r
-         9wSg2tqjiAnJHKYVef6diLLxPSxw4MrA2Pvy5hPETF/Ox7TBUwJax8rSVk9ebhJcne
-         vB1ouHYD45v9++TxeoY4VYTviEeEEhCas6vRTtAvyDfDdMBX/3ds8HAyYe6X3+noKI
-         xl3aJfJgajmK2rpQBTPK9Y8M9UwPd/yGFoIBhZyKgnwwWldD9vNCMP0K5tVrqWLOK2
-         5qHgINkphrd/g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0273FC73FE0;
-        Sun,  2 Apr 2023 18:02:05 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtvRF98xs3FCjc+WcfdR2wNVLNTqn=h+rYvtkj22T2f4w@mail.gmail.com>
-References: <CAH2r5mtvRF98xs3FCjc+WcfdR2wNVLNTqn=h+rYvtkj22T2f4w@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtvRF98xs3FCjc+WcfdR2wNVLNTqn=h+rYvtkj22T2f4w@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.3-rc4-smb3-client-fixes
-X-PR-Tracked-Commit-Id: e03677100707f849f01d8faf07ee58b4e56cdbf1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f7772da66255ab2b478a33df404a335fab55cc25
-Message-Id: <168045852500.9845.4905937925386678170.pr-tracker-bot@kernel.org>
-Date:   Sun, 02 Apr 2023 18:02:05 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 1AD1D21A42;
+        Mon,  3 Apr 2023 09:28:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1680514108; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NoyCghpYSK6WOE9xOow/VmWY1QfrCTyCyRWV8q3I27w=;
+        b=n2cwLEryApfo6QPFWBSw2pTEry6hdYNRtHnXH9b4FatNuW00Cn/3TQbKvAtzelo7FoiyoT
+        y82cel95nHF547BtRGTm62KP1Zh+LWQK+tNVE9N5gJ6DLROq3oyR2CgrP+16zaTWmKreA2
+        DESfUsTHq1ufBh+/w5uL77LuGqk3CnE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1680514108;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=NoyCghpYSK6WOE9xOow/VmWY1QfrCTyCyRWV8q3I27w=;
+        b=dMKImn47h5DyQKPfdLcqpaXa/jdAv7hzaFL00hcESbEPO6XYd3ja0YGZZXOvJ1Bqdqe8c0
+        kcG5JVz8azb/gYDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EC4E913416;
+        Mon,  3 Apr 2023 09:28:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id NsFIODucKmSOYgAAMHmgww
+        (envelope-from <ddiss@suse.de>); Mon, 03 Apr 2023 09:28:27 +0000
+From:   David Disseldorp <ddiss@suse.de>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, David Disseldorp <ddiss@suse.de>
+Subject: [PATCH] ksmbd: set NegotiateContextCount once instead of every inc
+Date:   Mon,  3 Apr 2023 11:29:55 +0200
+Message-Id: <20230403092955.23752-1-ddiss@suse.de>
+X-Mailer: git-send-email 2.35.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 1 Apr 2023 16:32:58 -0500:
+There are no early returns, so marshalling the incremented
+NegotiateContextCount with every context is unnecessary.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.3-rc4-smb3-client-fixes
+Signed-off-by: David Disseldorp <ddiss@suse.de>
+---
+ fs/ksmbd/smb2pdu.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f7772da66255ab2b478a33df404a335fab55cc25
-
-Thank you!
-
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 97c9d1b5bcc0..e4d142b265d0 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -808,7 +808,6 @@ static void assemble_neg_contexts(struct ksmbd_conn *conn,
+ 		    "assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context\n");
+ 	build_preauth_ctxt((struct smb2_preauth_neg_context *)pneg_ctxt,
+ 			   conn->preauth_info->Preauth_HashId);
+-	rsp->NegotiateContextCount = cpu_to_le16(neg_ctxt_cnt);
+ 	inc_rfc1001_len(smb2_buf_len, AUTH_GSS_PADDING);
+ 	ctxt_size = sizeof(struct smb2_preauth_neg_context);
+ 	/* Round to 8 byte boundary */
+@@ -820,7 +819,7 @@ static void assemble_neg_contexts(struct ksmbd_conn *conn,
+ 			    "assemble SMB2_ENCRYPTION_CAPABILITIES context\n");
+ 		build_encrypt_ctxt((struct smb2_encryption_neg_context *)pneg_ctxt,
+ 				   conn->cipher_type);
+-		rsp->NegotiateContextCount = cpu_to_le16(++neg_ctxt_cnt);
++		neg_ctxt_cnt++;
+ 		ctxt_size += sizeof(struct smb2_encryption_neg_context) + 2;
+ 		/* Round to 8 byte boundary */
+ 		pneg_ctxt +=
+@@ -835,7 +834,7 @@ static void assemble_neg_contexts(struct ksmbd_conn *conn,
+ 		/* Temporarily set to SMB3_COMPRESS_NONE */
+ 		build_compression_ctxt((struct smb2_compression_capabilities_context *)pneg_ctxt,
+ 				       conn->compress_algorithm);
+-		rsp->NegotiateContextCount = cpu_to_le16(++neg_ctxt_cnt);
++		neg_ctxt_cnt++;
+ 		ctxt_size += sizeof(struct smb2_compression_capabilities_context) + 2;
+ 		/* Round to 8 byte boundary */
+ 		pneg_ctxt += round_up(sizeof(struct smb2_compression_capabilities_context) + 2,
+@@ -847,7 +846,7 @@ static void assemble_neg_contexts(struct ksmbd_conn *conn,
+ 		ksmbd_debug(SMB,
+ 			    "assemble SMB2_POSIX_EXTENSIONS_AVAILABLE context\n");
+ 		build_posix_ctxt((struct smb2_posix_neg_context *)pneg_ctxt);
+-		rsp->NegotiateContextCount = cpu_to_le16(++neg_ctxt_cnt);
++		neg_ctxt_cnt++;
+ 		ctxt_size += sizeof(struct smb2_posix_neg_context);
+ 		/* Round to 8 byte boundary */
+ 		pneg_ctxt += round_up(sizeof(struct smb2_posix_neg_context), 8);
+@@ -859,10 +858,11 @@ static void assemble_neg_contexts(struct ksmbd_conn *conn,
+ 			    "assemble SMB2_SIGNING_CAPABILITIES context\n");
+ 		build_sign_cap_ctxt((struct smb2_signing_capabilities *)pneg_ctxt,
+ 				    conn->signing_algorithm);
+-		rsp->NegotiateContextCount = cpu_to_le16(++neg_ctxt_cnt);
++		neg_ctxt_cnt++;
+ 		ctxt_size += sizeof(struct smb2_signing_capabilities) + 2;
+ 	}
+ 
++	rsp->NegotiateContextCount = cpu_to_le16(neg_ctxt_cnt);
+ 	inc_rfc1001_len(smb2_buf_len, ctxt_size);
+ }
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.35.3
+
