@@ -2,79 +2,128 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F37C6FD1D
-	for <linux-cifs@archiver.kernel.org>; Tue,  4 Apr 2023 14:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53316C761A6
+	for <linux-cifs@archiver.kernel.org>; Tue,  4 Apr 2023 14:12:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235190AbjDDOKx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 4 Apr 2023 10:10:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60576 "EHLO
+        id S235703AbjDDOMO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 4 Apr 2023 10:12:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235477AbjDDOKv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Apr 2023 10:10:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8841FED
-        for <linux-cifs@vger.kernel.org>; Tue,  4 Apr 2023 07:10:50 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S235737AbjDDOMN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Apr 2023 10:12:13 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7BB2AF
+        for <linux-cifs@vger.kernel.org>; Tue,  4 Apr 2023 07:12:10 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 08513634B2
-        for <linux-cifs@vger.kernel.org>; Tue,  4 Apr 2023 14:10:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BFBBC433A4
-        for <linux-cifs@vger.kernel.org>; Tue,  4 Apr 2023 14:10:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680617449;
-        bh=yYt0PcX2CNYAzSHaj+qWV3gUrZ6UHJPGAiomppQNRrc=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=E6gEXTA/sRNG1ZoW56u8LXtB4+VRRAz4WJ6GMpODyBL9XcT17WM0SwziOh1jdYt2i
-         svZnypDumJxbJuZom+ud9nlbyJMJs8HXqQKodBx8Vu8t7dBh0mCC8OU3z8PndYl6Ik
-         k9rskSs6Tf2jucsog2LhVmgaJAyzTW5H3S2fAsKaTC2NShWByDyMyJmvuxI/UH5ywA
-         izVFsZfDwwi65l0YjQG5Fv9+ug0lgWwELVho30nP5w5eMkbBe6AAcJLNS2OxDLc4T+
-         Wv/NB0FiXD+mMDPDa5eGJ5rKEar3sjQq46pcZmKUOSTKgU+osKMWSoYrrGHVKpWvpS
-         iDh+uC8Fia2iA==
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-17683b570b8so34631247fac.13
-        for <linux-cifs@vger.kernel.org>; Tue, 04 Apr 2023 07:10:49 -0700 (PDT)
-X-Gm-Message-State: AAQBX9cg7f+Nd8D8LuQiL0rDSyeYMWg45UN6Gu03vVoPuaXR1DDaK4Yn
-        mpPuI759muLUvMUKEWJK6YT0gxM4lwqp0YUnn4Y=
-X-Google-Smtp-Source: AKy350aHH7m1rR8Fcm1UUlZ+e3hehpn2HjvpK/x3v3MxGTJgnyfBd8Q7asOvcd/bMgZ6YTFJj8uExH8zgxh5bgYGTP8=
-X-Received: by 2002:a05:6870:508:b0:17b:7376:8c82 with SMTP id
- j8-20020a056870050800b0017b73768c82mr1368138oao.1.1680617448491; Tue, 04 Apr
- 2023 07:10:48 -0700 (PDT)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 1BE9222B67;
+        Tue,  4 Apr 2023 14:12:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1680617529; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=HkWnQIwLMNzM/oP3tGht9ZdRGvA9DoNZ4Am1Vc01PVQ=;
+        b=H7vrqO40QHnwXGul2CiumSWtQm4RxVM9qdm6c47JQ3S4WY6t8n6zxYsPcz+QvWVOkBVs3j
+        dmhDHE9mRilWA0SeR4RqQH50LxfggYC8waXEBS6RZ4ix83+gLN7HA+0e4tzjkrKiW710hz
+        wh6SIGRRzHf1CBe4N/yozPG3xRs6jSA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1680617529;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=HkWnQIwLMNzM/oP3tGht9ZdRGvA9DoNZ4Am1Vc01PVQ=;
+        b=+xxnEXq57TIDtmB6tQzV0m92JOEftkVmnvllDy7k0sBV/KpEjrTOWJivKTKD6D66NykRZg
+        EJ7oSwKLLdzVX6Aw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E46AE1391A;
+        Tue,  4 Apr 2023 14:12:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id sfomNjgwLGSMXAAAMHmgww
+        (envelope-from <ddiss@suse.de>); Tue, 04 Apr 2023 14:12:08 +0000
+From:   David Disseldorp <ddiss@suse.de>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org,
+        David Disseldorp <ddiss@suse.de>
+Subject: [PATCH] ksmbd: remove unused compression negotiate ctx packing
+Date:   Tue,  4 Apr 2023 16:13:42 +0200
+Message-Id: <20230404141342.26269-1-ddiss@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Received: by 2002:ac9:744d:0:b0:4c8:b94d:7a80 with HTTP; Tue, 4 Apr 2023
- 07:10:48 -0700 (PDT)
-In-Reply-To: <20230403224748.27323-1-ddiss@suse.de>
-References: <20230403224748.27323-1-ddiss@suse.de>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 4 Apr 2023 23:10:48 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_pCtvayZj4FoEM1S_BH8g2U3Nf=4_8RfvZ7fLN3eY9qg@mail.gmail.com>
-Message-ID: <CAKYAXd_pCtvayZj4FoEM1S_BH8g2U3Nf=4_8RfvZ7fLN3eY9qg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: avoid duplicate negotiate ctx offset increments
-To:     David Disseldorp <ddiss@suse.de>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-04-04 7:47 GMT+09:00, David Disseldorp <ddiss@suse.de>:
-> Both pneg_ctxt and ctxt_size change in unison, with each adding the
-> length of the previously added context, rounded up to an eight byte
-> boundary.
-> Drop pneg_ctxt increments and instead use the ctxt_size offset when
-> passing output pointers to per-context helper functions. This slightly
-> simplifies offset tracking and shaves off a few text bytes.
-> Before (x86-64 gcc 7.5):
->    text    data     bss     dec     hex filename
->  213234    8677     672  222583   36577 ksmbd.ko
->
-> After:
->    text    data     bss     dec     hex filename
->  213218    8677     672  222567   36567 ksmbd.ko
->
-> Signed-off-by: David Disseldorp <ddiss@suse.de>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+build_compression_ctxt() is currently unreachable due to
+conn.compress_algorithm remaining zero (SMB3_COMPRESS_NONE).
 
-> ---
-> Note: this applies atop my previous assemble_neg_contexts cleanup
->   ksmbd: set NegotiateContextCount once instead of every inc
-Okay:) Thanks for your patch!
+It appears to have been broken in a couple of subtle ways over the
+years:
+- prior to d6c9ad23b421 ("ksmbd: use the common definitions for
+  NEGOTIATE_PROTOCOL") smb2_compression_ctx.DataLength was set to 8,
+  which didn't account for the single CompressionAlgorithms flexible
+  array member.
+- post d6c9ad23b421 smb2_compression_capabilities_context
+  CompressionAlgorithms is a three member array, while
+  CompressionAlgorithmCount is set to indicates only one member.
+
+Signed-off-by: David Disseldorp <ddiss@suse.de>
+---
+Note: this applies atop my previous assemble_neg_contexts cleanups
+  ksmbd: set NegotiateContextCount once instead of every inc
+  ksmbd: avoid duplicate negotiate ctx offset increments
+
+ fs/ksmbd/smb2pdu.c | 26 ++------------------------
+ 1 file changed, 2 insertions(+), 24 deletions(-)
+
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 9416c766483e..6dbc2300bd2a 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -747,19 +747,6 @@ static void build_encrypt_ctxt(struct smb2_encryption_neg_context *pneg_ctxt,
+ 	pneg_ctxt->Ciphers[0] = cipher_type;
+ }
+ 
+-static void build_compression_ctxt(struct smb2_compression_capabilities_context *pneg_ctxt,
+-				   __le16 comp_algo)
+-{
+-	pneg_ctxt->ContextType = SMB2_COMPRESSION_CAPABILITIES;
+-	pneg_ctxt->DataLength =
+-		cpu_to_le16(sizeof(struct smb2_compression_capabilities_context)
+-			- sizeof(struct smb2_neg_context));
+-	pneg_ctxt->Reserved = cpu_to_le32(0);
+-	pneg_ctxt->CompressionAlgorithmCount = cpu_to_le16(1);
+-	pneg_ctxt->Flags = cpu_to_le32(0);
+-	pneg_ctxt->CompressionAlgorithms[0] = comp_algo;
+-}
+-
+ static void build_sign_cap_ctxt(struct smb2_signing_capabilities *pneg_ctxt,
+ 				__le16 sign_algo)
+ {
+@@ -823,17 +810,8 @@ static void assemble_neg_contexts(struct ksmbd_conn *conn,
+ 		ctxt_size += sizeof(struct smb2_encryption_neg_context) + 2;
+ 	}
+ 
+-	if (conn->compress_algorithm) {
+-		ctxt_size = round_up(ctxt_size, 8);
+-		ksmbd_debug(SMB,
+-			    "assemble SMB2_COMPRESSION_CAPABILITIES context\n");
+-		/* Temporarily set to SMB3_COMPRESS_NONE */
+-		build_compression_ctxt((struct smb2_compression_capabilities_context *)
+-				       (pneg_ctxt + ctxt_size),
+-				       conn->compress_algorithm);
+-		neg_ctxt_cnt++;
+-		ctxt_size += sizeof(struct smb2_compression_capabilities_context) + 2;
+-	}
++	/* compression context not yet supported */
++	WARN_ON(conn->compress_algorithm != SMB3_COMPRESS_NONE);
+ 
+ 	if (conn->posix_ext_supported) {
+ 		ctxt_size = round_up(ctxt_size, 8);
+-- 
+2.35.3
+
