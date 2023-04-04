@@ -2,123 +2,119 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 886A7C77B60
-	for <linux-cifs@archiver.kernel.org>; Tue,  4 Apr 2023 17:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 801EFC6FD1D
+	for <linux-cifs@archiver.kernel.org>; Tue,  4 Apr 2023 19:00:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235888AbjDDRPB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 4 Apr 2023 13:15:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37844 "EHLO
+        id S235711AbjDDTAL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 4 Apr 2023 15:00:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235876AbjDDROs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Apr 2023 13:14:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7541BF1;
-        Tue,  4 Apr 2023 10:14:46 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S235984AbjDDTAK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Apr 2023 15:00:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A641597
+        for <linux-cifs@vger.kernel.org>; Tue,  4 Apr 2023 11:59:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680634764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6W0xzD/aChfysShRb/0ZKMoLOy4vn7cZgUPoeAGGEYw=;
+        b=N4XY7/oVa3r7eJLBPp+PbJtgc22q7G5aOGk6jRPeu9/BQTDUKn5oGKzAEU9Zak7314bB70
+        +DIQEGpF8y11MLXFDMaaFbZb0Q0EeKRSmjeFAINITtLIMZvbwbVXmJQcmryRvLzyN1Ebl8
+        wKaw2cKIqMr1/3oRHQSPdLeDrjzbEys=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-498-EnDqV-tqMjCxCackCx-rbw-1; Tue, 04 Apr 2023 14:59:21 -0400
+X-MC-Unique: EnDqV-tqMjCxCackCx-rbw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 450ED6378E;
-        Tue,  4 Apr 2023 17:14:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E8ABC433A1;
-        Tue,  4 Apr 2023 17:14:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680628485;
-        bh=qEU5p/rrPBMCcC0b9NygBo0CKzlLnTtdCdY5YHNjXz8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=a7ZekHh0kNeqmVuQWe3cMaiVtL9ICvdGaufuyHnjBLAPy3EG4Jf6gOeacxzbQ4xn9
-         QTLN3vKygazocZQuD6bz67l1p9bYvsCQZAYHJlFOw35kzra2NO6G33uE8wOfolwziO
-         xj2ficCC1e0A9/fy64r5Y7LewDk8qhNPbg49nwMZJMp/fJTKljG3nDKPjkpWSZdtho
-         abvZl57ghjk+PPSUaejv8IyCjJtYWhsS9ciQ8B3XXbSWjI+n64WX+Hxqboqjc22ttP
-         ennHYz2Fk0PjdGRvcCJxw+lWV5D5mNtZv205GCv6lzOzACCpuUuMXBIGpDSPMvIi9E
-         239Szkhk1pZQw==
-From:   Zorro Lang <zlang@kernel.org>
-To:     fstests@vger.kernel.org
-Cc:     linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com, linux-unionfs@vger.kernel.org,
-        jack@suse.com, linux-xfs@vger.kernel.org, fdmanana@suse.com,
-        ebiggers@google.com, brauner@kernel.org, amir73il@gmail.com,
-        djwong@kernel.org, anand.jain@oracle.com
-Subject: [PATCH 4/5] fstests/MAINTAINERS: add some specific reviewers
-Date:   Wed,  5 Apr 2023 01:14:10 +0800
-Message-Id: <20230404171411.699655-5-zlang@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230404171411.699655-1-zlang@kernel.org>
-References: <20230404171411.699655-1-zlang@kernel.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9DC728996E2;
+        Tue,  4 Apr 2023 18:59:19 +0000 (UTC)
+Received: from nyarly.com (ovpn-116-59.gru2.redhat.com [10.97.116.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 637791121314;
+        Tue,  4 Apr 2023 18:59:15 +0000 (UTC)
+From:   Thiago Becker <tbecker@redhat.com>
+To:     sfrench@samba.org, linux-cifs@vger.kernel.org
+Cc:     pc@cjr.nz, lsahlber@redhat.com, sprasad@microsoft.com,
+        tom@talpey.com, trbecker@gmail.com,
+        samba-technical@lists.samba.org, Thiago Becker <tbecker@redhat.com>
+Subject: [PATCH] cifs: sanitize paths in cifs_update_super_prepath.
+Date:   Tue,  4 Apr 2023 15:59:08 -0300
+Message-Id: <20230404185908.993738-1-tbecker@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Some people contribute to someone specific fs testing mostly, record
-some of them as Reviewer.
+After a server reboot, clients are failing to move files with ENOENT.
+This is caused by DFS referrals containing multiple separators, which
+the server move call doesn't recognize.
 
-Signed-off-by: Zorro Lang <zlang@kernel.org>
+BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=2182472
+Fixes: a31080899d5f ("cifs: sanitize multiple delimiters in prepath")
+Actually-Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+Signed-off-by: Thiago Rafael Becker <tbecker@redhat.com>
 ---
+ fs/cifs/fs_context.c | 6 +++---
+ fs/cifs/misc.c       | 4 +++-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-If someone doesn't want to be in cc list of related fstests patch, please
-reply this email, I'll remove that reviewer line.
-
-Or if someone else (who contribute to fstests very much) would like to a
-specific reviewer, nominate yourself to get a review.
-
-Thanks,
-Zorro
-
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 620368cb..0ad12a38 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -108,6 +108,7 @@ Maintainers List
- 	  or reviewer or co-maintainer can be in cc list.
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 6d13f8207e96a..c4d9139b89d29 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -445,7 +445,7 @@ int smb3_parse_opt(const char *options, const char *key, char **val)
+  * cleaning up the original.
+  */
+ #define IS_DELIM(c) ((c) == '/' || (c) == '\\')
+-static char *sanitize_path(char *path)
++char *sanitize_path(char *path, gfp_t gfp)
+ {
+ 	char *cursor1 = path, *cursor2 = path;
  
- BTRFS
-+R:	Filipe Manana <fdmanana@suse.com>
- L:	linux-btrfs@vger.kernel.org
- S:	Supported
- F:	tests/btrfs/
-@@ -137,16 +138,19 @@ F:	tests/f2fs/
- F:	common/f2fs
+@@ -469,7 +469,7 @@ static char *sanitize_path(char *path)
+ 		cursor2--;
  
- FSVERITY
-+R:	Eric Biggers <ebiggers@google.com>
- L:	fsverity@lists.linux.dev
- S:	Supported
- F:	common/verity
+ 	*(cursor2) = '\0';
+-	return kstrdup(path, GFP_KERNEL);
++	return kstrdup(path, gfp);
+ }
  
- FSCRYPT
-+R:	Eric Biggers <ebiggers@google.com>
- L:      linux-fscrypt@vger.kernel.org
- S:	Supported
- F:	common/encrypt
+ /*
+@@ -531,7 +531,7 @@ smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)
+ 	if (!*pos)
+ 		return 0;
  
- FS-IDMAPPED
-+R:	Christian Brauner <brauner@kernel.org>
- L:	linux-fsdevel@vger.kernel.org
- S:	Supported
- F:	src/vfs/
-@@ -163,6 +167,7 @@ S:	Supported
- F:	tests/ocfs2/
+-	ctx->prepath = sanitize_path(pos);
++	ctx->prepath = sanitize_path(pos, GFP_KERNEL);
+ 	if (!ctx->prepath)
+ 		return -ENOMEM;
  
- OVERLAYFS
-+R:	Amir Goldstein <amir73il@gmail.com>
- L:	linux-unionfs@vger.kernel.org
- S:	Supported
- F:	tests/overlay
-@@ -174,6 +179,7 @@ S:	Supported
- F:	tests/udf/
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index b44fb51968bfb..e6f208110de83 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1190,12 +1190,14 @@ int match_target_ip(struct TCP_Server_Info *server,
+ 	return 0;
+ }
  
- XFS
-+R:	Darrick J. Wong <djwong@kernel.org>
- L:	linux-xfs@vger.kernel.org
- S:	Supported
- F:	common/dump
++extern char *sanitize_path(char *path, gfp_t gfp);
++
+ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix)
+ {
+ 	kfree(cifs_sb->prepath);
+ 
+ 	if (prefix && *prefix) {
+-		cifs_sb->prepath = kstrdup(prefix, GFP_ATOMIC);
++		cifs_sb->prepath = sanitize_path(prefix, GFP_ATOMIC);
+ 		if (!cifs_sb->prepath)
+ 			return -ENOMEM;
+ 
 -- 
 2.39.2
 
