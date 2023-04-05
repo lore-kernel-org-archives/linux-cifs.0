@@ -2,193 +2,78 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E150C761AF
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Apr 2023 09:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A43A3C7619A
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 Apr 2023 13:16:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237450AbjDEJwh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Apr 2023 05:52:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59248 "EHLO
+        id S237221AbjDENQS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Apr 2023 09:16:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbjDEJwe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Apr 2023 05:52:34 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89E6E91;
-        Wed,  5 Apr 2023 02:52:21 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        with ESMTP id S232719AbjDENQR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Apr 2023 09:16:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C57F5E7A
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Apr 2023 06:16:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 1A3AB20685;
-        Wed,  5 Apr 2023 09:52:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1680688340; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5kxEOZs1Ac76OBwtijAiq1LEHzxrTF/ESnoZeBX1s5U=;
-        b=IRxH5dLldXbzWoseDDJFLON27UWQisexrdux6pTmZwMEJUh7+KDDgOL2FFGwMdw4qXX+88
-        SZXtRstArd4pzrgcJ8oig7KPreFloNY/MGYHpRLp72bp2qfZlFYU7wFiZqAGyQ0vGW2203
-        wLigaRb7GuLAIa/y7Wt2ZqyTi00uXvE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1680688340;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5kxEOZs1Ac76OBwtijAiq1LEHzxrTF/ESnoZeBX1s5U=;
-        b=9GU3V54N4nWUFuOORZ946DHhtbHXxKXuPtMcQGot4qVFgX8PM9hEOJcrOnifZQlqrRHef3
-        ++8hpDdRa+nWC8Dg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E15F713A31;
-        Wed,  5 Apr 2023 09:52:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id rfgAN9NELWQFbwAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 05 Apr 2023 09:52:19 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 1E028A0729; Wed,  5 Apr 2023 11:52:19 +0200 (CEST)
-Date:   Wed, 5 Apr 2023 11:52:19 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Zorro Lang <zlang@kernel.org>
-Cc:     fstests@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com, linux-unionfs@vger.kernel.org,
-        jack@suse.com, linux-xfs@vger.kernel.org, fdmanana@suse.com,
-        ebiggers@google.com, brauner@kernel.org, amir73il@gmail.com,
-        djwong@kernel.org, anand.jain@oracle.com
-Subject: Re: [PATCH 3/5] fstests/MAINTAINERS: add supported mailing list
-Message-ID: <20230405095219.fx2lw4dt25gn34ib@quack3>
-References: <20230404171411.699655-1-zlang@kernel.org>
- <20230404171411.699655-4-zlang@kernel.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5AEC4628F2
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Apr 2023 13:16:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8705C4339C
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Apr 2023 13:16:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680700575;
+        bh=d/py0SeCW+mA9rz7Gns3Ac7OJwXGKahbBCvBivrCYQk=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=kUabwK9lOEzr0alm1PYGettFNP6z5KL9wzAQSlbKPi7SxhRYv1ZnXwnnM4J0Y7vvI
+         1E6jU+UteHvErRr7pYyjWwfqRQ2GlSqdZE41Z9946iAFr8O9DuXsja9wI+9m7IDkFO
+         J03Q1TyqBpjCLPHr+lpmaTJ77+sd+lemwH5/dGCWgGRse4E4bpyqlwWb5WLA1Kg7M3
+         w6KbPqnlLsCX6n1IEZBIILNzDSvQAVCTjhrz4oyXfiS3uz2ddok4vFrZBLatEwGDvk
+         T5jLEtFvy75zA6UbjsLfTc02RAnQl86m8kveyxAqn5vePFdNqedYfaItXmnif/rWuu
+         PkYXR1sOu2Snw==
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-17997ccf711so38409306fac.0
+        for <linux-cifs@vger.kernel.org>; Wed, 05 Apr 2023 06:16:15 -0700 (PDT)
+X-Gm-Message-State: AAQBX9cnZLcT4UvWrsZZpOlXqXWwTD/pdhVTbktA4GcGjVqV2WF/UAKS
+        vZs4nBWLI/FU4hpm36as0Ry+wFJBUzyow0W1GxM=
+X-Google-Smtp-Source: AKy350Zt3V3MixrWzDKgNo3Q5x7d0abvmqd3KwJIZdNNpivdp+4nNqqE9EjqeOG2VFnvBNS/UwvXWcRwagjYZ8EgdFM=
+X-Received: by 2002:a05:6870:cd04:b0:16e:8993:9d7c with SMTP id
+ qk4-20020a056870cd0400b0016e89939d7cmr1172915oab.1.1680700574855; Wed, 05 Apr
+ 2023 06:16:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230404171411.699655-4-zlang@kernel.org>
+Received: by 2002:ac9:744d:0:b0:4c8:b94d:7a80 with HTTP; Wed, 5 Apr 2023
+ 06:16:14 -0700 (PDT)
+In-Reply-To: <20230404142954.26674-1-ddiss@suse.de>
+References: <20230404142954.26674-1-ddiss@suse.de>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 5 Apr 2023 22:16:14 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_MqyrFjL0cO2ZhS-Sjvhb14SMe-H9ffnq57OtKnnXQ0g@mail.gmail.com>
+Message-ID: <CAKYAXd_MqyrFjL0cO2ZhS-Sjvhb14SMe-H9ffnq57OtKnnXQ0g@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: remove unused compression negotiate ctx packing
+To:     David Disseldorp <ddiss@suse.de>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed 05-04-23 01:14:09, Zorro Lang wrote:
-> The fstests supports different kind of fs testing, better to cc
-> specific fs mailing list for specific fs testing, to get better
-> reviewing points. So record these mailing lists and files related
-> with them in MAINTAINERS file.
-> 
-> Signed-off-by: Zorro Lang <zlang@kernel.org>
-> ---
+2023-04-04 23:29 GMT+09:00, David Disseldorp <ddiss@suse.de>:
+> build_compression_ctxt() is currently unreachable due to
+> conn.compress_algorithm remaining zero (SMB3_COMPRESS_NONE).
+>
+> It appears to have been broken in a couple of subtle ways over the
+> years:
+> - prior to d6c9ad23b421 ("ksmbd: use the common definitions for
+>   NEGOTIATE_PROTOCOL") smb2_compression_ctx.DataLength was set to 8,
+>   which didn't account for the single CompressionAlgorithms flexible
+>   array member.
+> - post d6c9ad23b421 smb2_compression_capabilities_context
+>   CompressionAlgorithms is a three member array, while
+>   CompressionAlgorithmCount is set to indicate only one member.
+>   assemble_neg_contexts() ctxt_size is also incorrectly incremented by
+>   sizeof(struct smb2_compression_capabilities_context) + 2, which
+>   assumes one flexible array member.
+>
+> Signed-off-by: David Disseldorp <ddiss@suse.de>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-Looks good to me. Feel free to add:
-
-Acked-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> 
-> If someone mailing list doesn't want to be in cc list of related fstests
-> patch, please reply this email, I'll remove that line.
-> 
-> Or if I missed someone mailing list, please feel free to tell me.
-> 
-> Thanks,
-> Zorro
-> 
->  MAINTAINERS | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 77 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 09b1a5a3..620368cb 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -107,6 +107,83 @@ Maintainers List
->  	  should send patch to fstests@ at least. Other relevant mailing list
->  	  or reviewer or co-maintainer can be in cc list.
->  
-> +BTRFS
-> +L:	linux-btrfs@vger.kernel.org
-> +S:	Supported
-> +F:	tests/btrfs/
-> +F:	common/btrfs
-> +
-> +CEPH
-> +L:	ceph-devel@vger.kernel.org
-> +S:	Supported
-> +F:	tests/ceph/
-> +F:	common/ceph
-> +
-> +CIFS
-> +L:	linux-cifs@vger.kernel.org
-> +S:	Supported
-> +F:	tests/cifs
-> +
-> +EXT4
-> +L:	linux-ext4@vger.kernel.org
-> +S:	Supported
-> +F:	tests/ext4/
-> +F:	common/ext4
-> +
-> +F2FS
-> +L:	linux-f2fs-devel@lists.sourceforge.net
-> +S:	Supported
-> +F:	tests/f2fs/
-> +F:	common/f2fs
-> +
-> +FSVERITY
-> +L:	fsverity@lists.linux.dev
-> +S:	Supported
-> +F:	common/verity
-> +
-> +FSCRYPT
-> +L:      linux-fscrypt@vger.kernel.org
-> +S:	Supported
-> +F:	common/encrypt
-> +
-> +FS-IDMAPPED
-> +L:	linux-fsdevel@vger.kernel.org
-> +S:	Supported
-> +F:	src/vfs/
-> +
-> +NFS
-> +L:	linux-nfs@vger.kernel.org
-> +S:	Supported
-> +F:	tests/nfs/
-> +F:	common/nfs
-> +
-> +OCFS2
-> +L:	ocfs2-devel@oss.oracle.com
-> +S:	Supported
-> +F:	tests/ocfs2/
-> +
-> +OVERLAYFS
-> +L:	linux-unionfs@vger.kernel.org
-> +S:	Supported
-> +F:	tests/overlay
-> +F:	common/overlay
-> +
-> +UDF
-> +R:	Jan Kara <jack@suse.com>
-> +S:	Supported
-> +F:	tests/udf/
-> +
-> +XFS
-> +L:	linux-xfs@vger.kernel.org
-> +S:	Supported
-> +F:	common/dump
-> +F:	common/fuzzy
-> +F:	common/inject
-> +F:	common/populate
-> +F:	common/repair
-> +F:	common/xfs
-> +F:	tests/xfs/
-> +
->  ALL
->  M:	Zorro Lang <zlang@kernel.org>
->  L:	fstests@vger.kernel.org
-> -- 
-> 2.39.2
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks for your patch!
