@@ -2,78 +2,143 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A43A3C7619A
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Apr 2023 13:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 623F0C7619A
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 Apr 2023 13:19:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237221AbjDENQS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Apr 2023 09:16:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59636 "EHLO
+        id S238259AbjDENTo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Apr 2023 09:19:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232719AbjDENQR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Apr 2023 09:16:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C57F5E7A
-        for <linux-cifs@vger.kernel.org>; Wed,  5 Apr 2023 06:16:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S238231AbjDENTj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Apr 2023 09:19:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D7C2106
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Apr 2023 06:18:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680700730;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=S1IMAu3kJtNv64ElJe0Fo5uhPnChLUpWs29JbgHtniM=;
+        b=WwhYR+Ric8UxUwd57qGty39JWtMegrt7ZWGKBEWihakgVTzdsb9XCL8ghQ8BQ2UYaX0S40
+        zvDkvlj6g+QDg9tS6Fu6NEoYOPiBArGx/ALlQGZHqSBEi/Gzw9S63noINHcXvH9obGnatU
+        hM5rGJ4yzWrGa66o0bEO0tztd3rSu6Q=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-385-l5gOn0chODCL3P1Aybk6Zg-1; Wed, 05 Apr 2023 09:18:47 -0400
+X-MC-Unique: l5gOn0chODCL3P1Aybk6Zg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5AEC4628F2
-        for <linux-cifs@vger.kernel.org>; Wed,  5 Apr 2023 13:16:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8705C4339C
-        for <linux-cifs@vger.kernel.org>; Wed,  5 Apr 2023 13:16:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680700575;
-        bh=d/py0SeCW+mA9rz7Gns3Ac7OJwXGKahbBCvBivrCYQk=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=kUabwK9lOEzr0alm1PYGettFNP6z5KL9wzAQSlbKPi7SxhRYv1ZnXwnnM4J0Y7vvI
-         1E6jU+UteHvErRr7pYyjWwfqRQ2GlSqdZE41Z9946iAFr8O9DuXsja9wI+9m7IDkFO
-         J03Q1TyqBpjCLPHr+lpmaTJ77+sd+lemwH5/dGCWgGRse4E4bpyqlwWb5WLA1Kg7M3
-         w6KbPqnlLsCX6n1IEZBIILNzDSvQAVCTjhrz4oyXfiS3uz2ddok4vFrZBLatEwGDvk
-         T5jLEtFvy75zA6UbjsLfTc02RAnQl86m8kveyxAqn5vePFdNqedYfaItXmnif/rWuu
-         PkYXR1sOu2Snw==
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-17997ccf711so38409306fac.0
-        for <linux-cifs@vger.kernel.org>; Wed, 05 Apr 2023 06:16:15 -0700 (PDT)
-X-Gm-Message-State: AAQBX9cnZLcT4UvWrsZZpOlXqXWwTD/pdhVTbktA4GcGjVqV2WF/UAKS
-        vZs4nBWLI/FU4hpm36as0Ry+wFJBUzyow0W1GxM=
-X-Google-Smtp-Source: AKy350Zt3V3MixrWzDKgNo3Q5x7d0abvmqd3KwJIZdNNpivdp+4nNqqE9EjqeOG2VFnvBNS/UwvXWcRwagjYZ8EgdFM=
-X-Received: by 2002:a05:6870:cd04:b0:16e:8993:9d7c with SMTP id
- qk4-20020a056870cd0400b0016e89939d7cmr1172915oab.1.1680700574855; Wed, 05 Apr
- 2023 06:16:14 -0700 (PDT)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A8F981C05140;
+        Wed,  5 Apr 2023 13:18:46 +0000 (UTC)
+Received: from nyarly.com (ovpn-116-127.gru2.redhat.com [10.97.116.127])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4848740C20FA;
+        Wed,  5 Apr 2023 13:18:40 +0000 (UTC)
+From:   Thiago Becker <tbecker@redhat.com>
+To:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Thiago Rafael Becker <trbecker@gmail.com>
+Cc:     Thiago Becker <tbecker@redhat.com>,
+        Steve French <stfrench@microsoft.com>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] cifs: sanitize paths in cifs_update_super_prepath.
+Date:   Wed,  5 Apr 2023 10:16:48 -0300
+Message-Id: <20230405131647.6389-1-tbecker@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:ac9:744d:0:b0:4c8:b94d:7a80 with HTTP; Wed, 5 Apr 2023
- 06:16:14 -0700 (PDT)
-In-Reply-To: <20230404142954.26674-1-ddiss@suse.de>
-References: <20230404142954.26674-1-ddiss@suse.de>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 5 Apr 2023 22:16:14 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_MqyrFjL0cO2ZhS-Sjvhb14SMe-H9ffnq57OtKnnXQ0g@mail.gmail.com>
-Message-ID: <CAKYAXd_MqyrFjL0cO2ZhS-Sjvhb14SMe-H9ffnq57OtKnnXQ0g@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: remove unused compression negotiate ctx packing
-To:     David Disseldorp <ddiss@suse.de>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-04-04 23:29 GMT+09:00, David Disseldorp <ddiss@suse.de>:
-> build_compression_ctxt() is currently unreachable due to
-> conn.compress_algorithm remaining zero (SMB3_COMPRESS_NONE).
->
-> It appears to have been broken in a couple of subtle ways over the
-> years:
-> - prior to d6c9ad23b421 ("ksmbd: use the common definitions for
->   NEGOTIATE_PROTOCOL") smb2_compression_ctx.DataLength was set to 8,
->   which didn't account for the single CompressionAlgorithms flexible
->   array member.
-> - post d6c9ad23b421 smb2_compression_capabilities_context
->   CompressionAlgorithms is a three member array, while
->   CompressionAlgorithmCount is set to indicate only one member.
->   assemble_neg_contexts() ctxt_size is also incorrectly incremented by
->   sizeof(struct smb2_compression_capabilities_context) + 2, which
->   assumes one flexible array member.
->
-> Signed-off-by: David Disseldorp <ddiss@suse.de>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+After a server reboot, clients are failing to move files with ENOENT.
+This is caused by DFS referrals containing multiple separators, which
+the server move call doesn't recognize.
 
-Thanks for your patch!
+v1: Initial patch.
+v2: Move prototype to header.
+
+BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=2182472
+Fixes: a31080899d5f ("cifs: sanitize multiple delimiters in prepath")
+Actually-Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+Signed-off-by: Thiago Rafael Becker <tbecker@redhat.com>
+---
+ fs/cifs/fs_context.c | 13 +++++++------
+ fs/cifs/fs_context.h |  3 +++
+ fs/cifs/misc.c       |  2 +-
+ 3 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 6d13f8207e96a..ace11a1a7c8ab 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -441,13 +441,14 @@ int smb3_parse_opt(const char *options, const char *key, char **val)
+  * but there are some bugs that prevent rename from working if there are
+  * multiple delimiters.
+  *
+- * Returns a sanitized duplicate of @path. The caller is responsible for
+- * cleaning up the original.
++ * Returns a sanitized duplicate of @path. @gfp indicates the GFP_* flags
++ * for kstrdup.
++ * The caller is responsible for freeing the original.
+  */
+ #define IS_DELIM(c) ((c) == '/' || (c) == '\\')
+-static char *sanitize_path(char *path)
++char *cifs_sanitize_prepath(char *prepath, gfp_t gfp)
+ {
+-	char *cursor1 = path, *cursor2 = path;
++	char *cursor1 = prepath, *cursor2 = prepath;
+ 
+ 	/* skip all prepended delimiters */
+ 	while (IS_DELIM(*cursor1))
+@@ -469,7 +470,7 @@ static char *sanitize_path(char *path)
+ 		cursor2--;
+ 
+ 	*(cursor2) = '\0';
+-	return kstrdup(path, GFP_KERNEL);
++	return kstrdup(prepath, gfp);
+ }
+ 
+ /*
+@@ -531,7 +532,7 @@ smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)
+ 	if (!*pos)
+ 		return 0;
+ 
+-	ctx->prepath = sanitize_path(pos);
++	ctx->prepath = cifs_sanitize_prepath(pos, GFP_KERNEL);
+ 	if (!ctx->prepath)
+ 		return -ENOMEM;
+ 
+diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
+index 3de00e7127ec4..f4eaf85589022 100644
+--- a/fs/cifs/fs_context.h
++++ b/fs/cifs/fs_context.h
+@@ -287,4 +287,7 @@ extern void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
+  */
+ #define SMB3_MAX_DCLOSETIMEO (1 << 30)
+ #define SMB3_DEF_DCLOSETIMEO (1 * HZ) /* even 1 sec enough to help eg open/write/close/open/read */
++
++extern char *cifs_sanitize_prepath(char *prepath, gfp_t gfp);
++
+ #endif
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index b44fb51968bfb..7f085ed2d866b 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1195,7 +1195,7 @@ int cifs_update_super_prepath(struct cifs_sb_info *cifs_sb, char *prefix)
+ 	kfree(cifs_sb->prepath);
+ 
+ 	if (prefix && *prefix) {
+-		cifs_sb->prepath = kstrdup(prefix, GFP_ATOMIC);
++		cifs_sb->prepath = cifs_sanitize_prepath(prefix, GFP_ATOMIC);
+ 		if (!cifs_sb->prepath)
+ 			return -ENOMEM;
+ 
+-- 
+2.39.2
+
