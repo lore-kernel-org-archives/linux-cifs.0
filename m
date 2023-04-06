@@ -2,177 +2,132 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF57BC7619A
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Apr 2023 17:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46386C7619A
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Apr 2023 00:26:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231503AbjDERg7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Apr 2023 13:36:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52972 "EHLO
+        id S234514AbjDFA00 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Apr 2023 20:26:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231346AbjDERg6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Apr 2023 13:36:58 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 992295B81;
-        Wed,  5 Apr 2023 10:36:57 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id h11so40699199lfu.8;
-        Wed, 05 Apr 2023 10:36:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680716216;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=io+3jqowGGlAADxVVVRHguq+rruQrbxOod7tsbpQt3o=;
-        b=geRNmWWoe1Vh4jNpLy+p+ZQ87NyvywzksSKDMvC0J19WfU9cRrGQJuofOhdVR7WXAY
-         4BZk8H6k1OILfymJ0RgUheRJ31XYd/TJaNhg7ZIHMDulFSuV59YZ71xmqRacdOTyy81e
-         OWylE9/Q//M3aR4JTPXck1iPpKrRPlpQxBWHsXXWfljNUJB5YjhbtkKTn10F6Zrxxtrs
-         KQLejFMjyDwgF1RGHNds/vK0o8aQiUfSRIW39Cq8hh8uw4t18Ne1Ddh7xUstJAQgX5YG
-         tqX+KKEqLsoBUAaXkhA8PXGWr3cdoBcxX4YIolYmmdNnlbhLB3VNUTiYnZSUbLp2n4ez
-         amJw==
+        with ESMTP id S234430AbjDFA0Y (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Apr 2023 20:26:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F9E7A81
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Apr 2023 17:25:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680740736;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YnG+nCyPWB8ZL9Ap6fLZh9ezCdT+TIIsCMEMmA9isDc=;
+        b=EXmP3vYYRWRmJJRhXqggrPi1F1uu+Px2PPChOJibgm3Iy2xeiePk+WOfQZu1yO6rZwQzHn
+        TyRjQExsPrN0h7D8yQeWJU3VFabn5gyBuaXgqilAfs35cEtZOss7WZKqBMtgxes7zO/an/
+        AzW/iwAdPfxBRjZHMURGqnb3Qf8tBNE=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-322-XaWowYAvMPODRnY9b4keZw-1; Wed, 05 Apr 2023 20:25:35 -0400
+X-MC-Unique: XaWowYAvMPODRnY9b4keZw-1
+Received: by mail-pf1-f198.google.com with SMTP id w135-20020a62828d000000b0062c4eb40ddeso15272178pfd.3
+        for <linux-cifs@vger.kernel.org>; Wed, 05 Apr 2023 17:25:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680716216;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=io+3jqowGGlAADxVVVRHguq+rruQrbxOod7tsbpQt3o=;
-        b=1/BZuqGFx1SzHVMEz0YW2IIL8K8fF1doFapSR5uYXbeMjU7YydbjMdUkIaDwvYp/AD
-         lDKX0or/QGqNRhzk6IP4j+DjxU2OTeImZsP95Ja2FV3GDQiu6azjBY9niQ84ydvMLCaf
-         RXIMkVmm4N70dkWcMSIKhNn4VbrzVN18weQxG9EjSnLNj1gBqMdDvorkF97VQPaBwy5O
-         L8z9ZahxyjcTrY2PVA2P6eaBwexZy5FwCKLMJWOOEdRPuShyKEzNVJCBJcmSKmjepBxS
-         Plcmw96YLsJ6WZAX6ItrnsyIliRlFZASxjS/RGyDA2s3+o1aMKzRNKkqOUXXzQ5foBQR
-         N12g==
-X-Gm-Message-State: AAQBX9fJ/5tR4QWp1WyqqA6ieinvRZ0f6H1CF3BhI1lJGH76CmhS6iV1
-        kaGoebb+zrgatQBJUgMHpgmJ3XnqvO5JMMvFknsE0zBfAvU=
-X-Google-Smtp-Source: AKy350a2O9eO93p10bVJLARVQzbIgEn2r3CdtkEFAGSgP85LLIHkG28POYjsOY8rGPh+VA4Ccdw80naQnsJ2VBeo/ME=
-X-Received: by 2002:a05:6512:12d4:b0:4e8:3ee1:db14 with SMTP id
- p20-20020a05651212d400b004e83ee1db14mr1783567lfg.6.1680716215745; Wed, 05 Apr
- 2023 10:36:55 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680740734;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YnG+nCyPWB8ZL9Ap6fLZh9ezCdT+TIIsCMEMmA9isDc=;
+        b=MhN4PG2PVkUIU9JXXYBoqa0BcLF9qelbsBwhKbEbl99KOMNbQOEEpcMxCQs6h0f6kz
+         0/5Kn3oJHYDRxYGsDJJOVUvmCefCA/jRpYMG7RakekvmwaA+W4IpukREgggq56z3D3tL
+         Gg1EUdDUW1lB27cDgfqBEoZjyyD9P7AzZMMvoulUx9pglpfVIXvKqh5R1QC6LlPFWb78
+         nLmL99R3CDGiLB+VfNJWyfSoWvoOFxMp7Db0N3rQee4y3CRQoaWkFXd+XAuhX1ityIW8
+         wRIy7Wg+uIaJHjs/p1qQpsdH+44Eu53gstr4jtAqGpGOTdK0BVsHvB1wPqk4D6mAXJdF
+         txoQ==
+X-Gm-Message-State: AAQBX9c0kCBNPU25F0fAowCCwf3ybAMjHQ8EaE5wmgmpEvX0xY1YKHHV
+        WL/TIEr2Aq/GE2wtb8kDnV9WBYt9QLKShdAe7iPgTD3LZeShyXgYS/QoNml6ytW0LpVMj3O8Rma
+        QhkrTRQ4RuMs75JXwar+dKA==
+X-Received: by 2002:a17:90b:17c7:b0:23f:7d05:8765 with SMTP id me7-20020a17090b17c700b0023f7d058765mr8769212pjb.10.1680740734098;
+        Wed, 05 Apr 2023 17:25:34 -0700 (PDT)
+X-Google-Smtp-Source: AKy350YchunmOlWsqR1uqhyleFq+e6uT40JJEkEYVgwX9vsqmDYfOCSrK9/Althx8xc8uY/FzfvVaQ==
+X-Received: by 2002:a17:90b:17c7:b0:23f:7d05:8765 with SMTP id me7-20020a17090b17c700b0023f7d058765mr8769184pjb.10.1680740733840;
+        Wed, 05 Apr 2023 17:25:33 -0700 (PDT)
+Received: from [10.72.13.97] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id ce21-20020a17090aff1500b0023d386e4806sm1864484pjb.57.2023.04.05.17.25.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Apr 2023 17:25:33 -0700 (PDT)
+Message-ID: <7c2bfeb5-3c93-1fc9-cc1e-e7350b406ea1@redhat.com>
+Date:   Thu, 6 Apr 2023 08:25:24 +0800
 MIME-Version: 1.0
-References: <20230405131647.6389-1-tbecker@redhat.com>
-In-Reply-To: <20230405131647.6389-1-tbecker@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 5 Apr 2023 12:36:44 -0500
-Message-ID: <CAH2r5mv93nJKNrAz=7DfYKEZrN=gUA7pXciD_Kyr8yVdFGR_Lg@mail.gmail.com>
-Subject: Re: [PATCH v2] cifs: sanitize paths in cifs_update_super_prepath.
-To:     Thiago Becker <tbecker@redhat.com>
-Cc:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Thiago Rafael Becker <trbecker@gmail.com>,
-        Steve French <stfrench@microsoft.com>,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH 3/5] fstests/MAINTAINERS: add supported mailing list
+Content-Language: en-US
+To:     Zorro Lang <zlang@kernel.org>, fstests@vger.kernel.org
+Cc:     linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com, linux-unionfs@vger.kernel.org,
+        jack@suse.com, linux-xfs@vger.kernel.org, fdmanana@suse.com,
+        ebiggers@google.com, brauner@kernel.org, amir73il@gmail.com,
+        djwong@kernel.org, anand.jain@oracle.com
+References: <20230404171411.699655-1-zlang@kernel.org>
+ <20230404171411.699655-4-zlang@kernel.org>
+From:   Xiubo Li <xiubli@redhat.com>
+In-Reply-To: <20230404171411.699655-4-zlang@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Added to cifs-2.6.git for-next and updated the tag which says:
 
-"Buglink:" to "Link:"  (see this email thread for context
-https://lore.kernel.org/all/3b036087d80b8c0e07a46a1dbaaf4ad0d018f8d5.167421=
-7480.git.linux@leemhuis.info/)
-
-On Wed, Apr 5, 2023 at 8:28=E2=80=AFAM Thiago Becker <tbecker@redhat.com> w=
-rote:
+On 4/5/23 01:14, Zorro Lang wrote:
+> The fstests supports different kind of fs testing, better to cc
+> specific fs mailing list for specific fs testing, to get better
+> reviewing points. So record these mailing lists and files related
+> with them in MAINTAINERS file.
 >
-> After a server reboot, clients are failing to move files with ENOENT.
-> This is caused by DFS referrals containing multiple separators, which
-> the server move call doesn't recognize.
->
-> v1: Initial patch.
-> v2: Move prototype to header.
->
-> BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=3D2182472
-> Fixes: a31080899d5f ("cifs: sanitize multiple delimiters in prepath")
-> Actually-Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
-> Signed-off-by: Thiago Rafael Becker <tbecker@redhat.com>
+> Signed-off-by: Zorro Lang <zlang@kernel.org>
 > ---
->  fs/cifs/fs_context.c | 13 +++++++------
->  fs/cifs/fs_context.h |  3 +++
->  fs/cifs/misc.c       |  2 +-
->  3 files changed, 11 insertions(+), 7 deletions(-)
 >
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index 6d13f8207e96a..ace11a1a7c8ab 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -441,13 +441,14 @@ int smb3_parse_opt(const char *options, const char =
-*key, char **val)
->   * but there are some bugs that prevent rename from working if there are
->   * multiple delimiters.
->   *
-> - * Returns a sanitized duplicate of @path. The caller is responsible for
-> - * cleaning up the original.
-> + * Returns a sanitized duplicate of @path. @gfp indicates the GFP_* flag=
-s
-> + * for kstrdup.
-> + * The caller is responsible for freeing the original.
->   */
->  #define IS_DELIM(c) ((c) =3D=3D '/' || (c) =3D=3D '\\')
-> -static char *sanitize_path(char *path)
-> +char *cifs_sanitize_prepath(char *prepath, gfp_t gfp)
->  {
-> -       char *cursor1 =3D path, *cursor2 =3D path;
-> +       char *cursor1 =3D prepath, *cursor2 =3D prepath;
+> If someone mailing list doesn't want to be in cc list of related fstests
+> patch, please reply this email, I'll remove that line.
 >
->         /* skip all prepended delimiters */
->         while (IS_DELIM(*cursor1))
-> @@ -469,7 +470,7 @@ static char *sanitize_path(char *path)
->                 cursor2--;
+> Or if I missed someone mailing list, please feel free to tell me.
 >
->         *(cursor2) =3D '\0';
-> -       return kstrdup(path, GFP_KERNEL);
-> +       return kstrdup(prepath, gfp);
->  }
+> Thanks,
+> Zorro
 >
->  /*
-> @@ -531,7 +532,7 @@ smb3_parse_devname(const char *devname, struct smb3_f=
-s_context *ctx)
->         if (!*pos)
->                 return 0;
+>   MAINTAINERS | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 77 insertions(+)
 >
-> -       ctx->prepath =3D sanitize_path(pos);
-> +       ctx->prepath =3D cifs_sanitize_prepath(pos, GFP_KERNEL);
->         if (!ctx->prepath)
->                 return -ENOMEM;
->
-> diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
-> index 3de00e7127ec4..f4eaf85589022 100644
-> --- a/fs/cifs/fs_context.h
-> +++ b/fs/cifs/fs_context.h
-> @@ -287,4 +287,7 @@ extern void smb3_update_mnt_flags(struct cifs_sb_info=
- *cifs_sb);
->   */
->  #define SMB3_MAX_DCLOSETIMEO (1 << 30)
->  #define SMB3_DEF_DCLOSETIMEO (1 * HZ) /* even 1 sec enough to help eg op=
-en/write/close/open/read */
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 09b1a5a3..620368cb 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -107,6 +107,83 @@ Maintainers List
+>   	  should send patch to fstests@ at least. Other relevant mailing list
+>   	  or reviewer or co-maintainer can be in cc list.
+>   
+> +BTRFS
+> +L:	linux-btrfs@vger.kernel.org
+> +S:	Supported
+> +F:	tests/btrfs/
+> +F:	common/btrfs
 > +
-> +extern char *cifs_sanitize_prepath(char *prepath, gfp_t gfp);
+> +CEPH
+> +L:	ceph-devel@vger.kernel.org
+> +S:	Supported
+> +F:	tests/ceph/
+> +F:	common/ceph
 > +
->  #endif
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index b44fb51968bfb..7f085ed2d866b 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -1195,7 +1195,7 @@ int cifs_update_super_prepath(struct cifs_sb_info *=
-cifs_sb, char *prefix)
->         kfree(cifs_sb->prepath);
->
->         if (prefix && *prefix) {
-> -               cifs_sb->prepath =3D kstrdup(prefix, GFP_ATOMIC);
-> +               cifs_sb->prepath =3D cifs_sanitize_prepath(prefix, GFP_AT=
-OMIC);
->                 if (!cifs_sb->prepath)
->                         return -ENOMEM;
->
-> --
-> 2.39.2
->
 
+LGTM and feel free to add:
 
---=20
+Acked-by: Xiubo Li <xiubli@redhat.com>
+
 Thanks,
 
-Steve
+- Xiubo
+
