@@ -2,69 +2,88 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C7BC7618D
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Apr 2023 01:55:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A1CC7618D
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Apr 2023 08:56:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233061AbjDFBzL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Apr 2023 21:55:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55754 "EHLO
+        id S233624AbjDFI4A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 6 Apr 2023 04:56:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230527AbjDFBzK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Apr 2023 21:55:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C59A283CA;
-        Wed,  5 Apr 2023 18:54:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 07C10618D7;
-        Thu,  6 Apr 2023 01:53:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65538C433EF;
-        Thu,  6 Apr 2023 01:53:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680746022;
-        bh=RU0Q3vUCSoOriMTSmQ2CiAo6okbHQsDApEtyfqhB/os=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=FbWqGQ0wbGurzrP9KVHM0SNw0YC9GyWApFTXwdNVcK2A0TiZtlGaba89nxCOMrOnv
-         LWjeD76eOESSoHb3bjdBWreXKq9o6hYFzR7svS/T2cmmEB82GOCY4PQ4xwOErbFzpU
-         hmcAghCKLKqbx4A0blihXUGzlq7+9VmymPLp1sU/9GKwTNgaMazWLz2aF2o38rqb3J
-         b3LRiP0wTjMiqcG9t360E1ofmIBaOFnuhJb3uzgevc579iZR/wnVuIvdPxErd0uHqj
-         plvf4gfX7jEtsbHb5zbnA4A6/Ie41UsiXOM4Khj5aTYqCMkOCJ9lIg3iiItz27lqAh
-         KTIvUAvOE5HOQ==
-Message-ID: <b0214d14-aa0e-f1df-4ff3-02304b710a6e@kernel.org>
-Date:   Thu, 6 Apr 2023 09:53:36 +0800
+        with ESMTP id S233973AbjDFIz7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Apr 2023 04:55:59 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5062F526C;
+        Thu,  6 Apr 2023 01:55:58 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id v6-20020a05600c470600b003f034269c96so13115877wmo.4;
+        Thu, 06 Apr 2023 01:55:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680771357; x=1683363357;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B9/Axgxw789vjHSKYobykbKjrh7zpjCP2oBQY/iyJas=;
+        b=g2Qr6/zrh6oFLeQwJDsSseiOxtP6XC12UfICsXT7C5TxfsJmqVjA5vXPfdX55N3GPn
+         DAlxL19v8t0N+VL0qgHnv0J68yF5bXDL6fYpU8hVu7pFG0nF8LHfFuySXkC4pj0shrWo
+         AqbL64xpw3haU35F24Rn4eng4wRzXDXoiE3gw+6JMbh+R7YyU18HxF3E3vYbsYKV3JX4
+         JHKomehQAXR8Aqvz8Hl1g38JDGsnqHAm5oHTczMSzTDyjgweTN1eSeKF7108aZoOCKwX
+         iBXYJVoTmUva0PG7fqGJa72oBPIsceTDgqR08my16yMl909EYZQlD+8JVDlxhw0fyVPV
+         GBmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680771357; x=1683363357;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B9/Axgxw789vjHSKYobykbKjrh7zpjCP2oBQY/iyJas=;
+        b=PCRvYz5/4Co58WjdluwkVvzHQiASg9dcqiGDjQAxAIEk3Ho9WR7cKphM1uKG9ptRG8
+         JybCVaZtB3jVXzbpDOcwDAN2XWPaBlsGPYg0hkMVMRb9QB1M3zWZS5J15MeuAaXAuc9e
+         Y1ybxVJqwWWfSjiV5MMPv8YE7/YrFmXrq99edeG9kz3lfnSZR5XDR+t83tZL432blgIU
+         52hL98cE/WS0WMVKa3kh8wqpeB4+naYb0dsEfTAkjPeiF3UH6KrGTi+FiK91LQo8jIZg
+         OD/ki0JOUslXRfXTATeO25jqe/oFlZqkbrniFGQuiZn+a7OvtXTJVW7q3y+tm6mUe3bv
+         yfeA==
+X-Gm-Message-State: AAQBX9cHXoKzyg//tOSRBUtu7Rofex5IRTf3/8IpX8lNrcfzZyoPcmGf
+        bnKOWmmWa436qSRka1a2Uck=
+X-Google-Smtp-Source: AKy350ZzuCVLy75YllzgUZ6DCi3WQ+PI9bLc0iV07zUhK+fXpzHZ0SEvAy6OfQcqLb2K7iCTgd4HqA==
+X-Received: by 2002:a7b:c7c6:0:b0:3ef:6e1c:3ffa with SMTP id z6-20020a7bc7c6000000b003ef6e1c3ffamr6710681wmk.28.1680771356751;
+        Thu, 06 Apr 2023 01:55:56 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id 13-20020a05600c230d00b003ed2384566fsm975582wmo.21.2023.04.06.01.55.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Apr 2023 01:55:56 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 11:55:47 +0300
+From:   Dan Carpenter <error27@gmail.com>
+To:     Paulo Alcantara <pc@manguebit.com>
+Cc:     Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] cifs: double lock in cifs_reconnect_tcon()
+Message-ID: <ZC6JEx4dvWUvgcwW@kili>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [f2fs-dev] [PATCH 3/5] fstests/MAINTAINERS: add supported mailing
- list
-Content-Language: en-US
-To:     Zorro Lang <zlang@kernel.org>, fstests@vger.kernel.org
-Cc:     brauner@kernel.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, ebiggers@google.com, djwong@kernel.org,
-        amir73il@gmail.com, linux-unionfs@vger.kernel.org,
-        anand.jain@oracle.com, linux-f2fs-devel@lists.sourceforge.net,
-        linux-xfs@vger.kernel.org, fdmanana@suse.com,
-        ocfs2-devel@oss.oracle.com, jack@suse.com,
-        linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-btrfs@vger.kernel.org
-References: <20230404171411.699655-1-zlang@kernel.org>
- <20230404171411.699655-4-zlang@kernel.org>
-From:   Chao Yu <chao@kernel.org>
-In-Reply-To: <20230404171411.699655-4-zlang@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 2023/4/5 1:14, Zorro Lang wrote:
-> +F2FS
-> +L:	linux-f2fs-devel@lists.sourceforge.net
-> +S:	Supported
-> +F:	tests/f2fs/
-> +F:	common/f2fs
+This lock was supposed to be an unlock.
 
-Acked-by: Chao Yu <chao@kernel.org>
+Fixes: 6cc041e90c17 ("cifs: avoid races in parallel reconnects in smb1")
+Signed-off-by: Dan Carpenter <error27@gmail.com>
+---
+ fs/cifs/cifssmb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 0d30b17494e4..9d963caec35c 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -120,7 +120,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+ 	spin_lock(&server->srv_lock);
+ 	if (server->tcpStatus == CifsNeedReconnect) {
+ 		spin_unlock(&server->srv_lock);
+-		mutex_lock(&ses->session_mutex);
++		mutex_unlock(&ses->session_mutex);
+ 
+ 		if (tcon->retry)
+ 			goto again;
+-- 
+2.39.1
+
