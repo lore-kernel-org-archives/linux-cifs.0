@@ -2,75 +2,147 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16303C761A6
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Apr 2023 12:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AEDCC7618D
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Apr 2023 13:12:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236004AbjDFMJf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 6 Apr 2023 08:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47426 "EHLO
+        id S229671AbjDFNMq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 6 Apr 2023 09:12:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236845AbjDFMJe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Apr 2023 08:09:34 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB3162681;
-        Thu,  6 Apr 2023 05:09:31 -0700 (PDT)
-Message-ID: <8219c3dd87179df545fb6de4b89b2bbc.pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1680782966;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=548kDFj4gIoUugd5f3FYvuQrAA/yoYohbrORtH8xrVk=;
-        b=WG6MoNIYST3leO8UG3+SBA1KImJjXJHiBms2FEDzjWadFiVyAuuFk3OicXaKSfwuZtHn3u
-        bqS6sDnzoJmjn5JhW0rXbD/1VmPPXqtSJGwLBYEuPqNq4axcIpzZw36sh/WFDlzhJcSxNl
-        5DBcWlFdMZZTAo9zFK/HtZ8/1mLx0HKsARVyrnvd4OauNAhQTC6lS910tZYlBdXdaHuMa1
-        gFr0nW6ZCsgCQcKQkpEduGC8m9Ocac+WZqCCizZbp/PqUMhOLAMjVR1z1CTQEB1kGraWm3
-        J7YrAVLnluy6pWwh2YBBWtNIlBYWKEObedkV2SCx0XYGV92HanF4LrX4Z8Jp+w==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1680782966; a=rsa-sha256;
-        cv=none;
-        b=X+L8UmhLUdRCBAw9MWHAqu6ulQyTRO1vwEhwH4nMhXOY50ydAUQbV79F8R0krcT89qEq/e
-        sAhoVpan6GKLt1OWmZpfPfXst20ouAzbbEOvzY2W+vropoxvtYaVqycd+DLBlNw64kp/zV
-        QZdn9uwYphChBpz836Hh3cKz6lV5FGtyjBgJ6738RSClmOtg2VOwMeeXQ9SBfqbc40uSP7
-        ADzqy+rEisk421OWhVmi2sQ83zxi1P3c/ggm2uj6fdwMXS6+SzBrYuF3rf/6LkJHpOhMty
-        MpISUdKw6RD8VXXq4T+DdADeAZPpPu/R8ipyq4JmOPRVATu5C8Io1ysW0RnR1Q==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1680782966;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=548kDFj4gIoUugd5f3FYvuQrAA/yoYohbrORtH8xrVk=;
-        b=c4FeABY1c2gOAKYwLkzF0oDm8UHzqz72Q5G9vlCPwdcvI0VsuuRFVuWcFjX5YZ1nVkV5cj
-        nGo3qoG5a0j+b1/FNnHg5M5QqXbuXAGRWVIR6KBZyEtzWOzOnSUM7Mz06nnM5HMTr7he2Z
-        e0va26ZyVMdfqLHtFrZuHzVeqAcNjnomKMg91YXDogjEJUZSVaSd2W2sIqQo3mg5Q+NZ83
-        98MY4jfVONrbUutKxEXnpFG6H/JoSDirVmxuOk7WChTV559mSqTn8AlqGZ3gBr0KgWZtj9
-        FYCL5x6IQGqCUY2xH662o9SkyFd+xJjnGmfOzR1FI0g77YkAxRxNGgmr2k22wg==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     Dan Carpenter <error27@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] cifs: double lock in cifs_reconnect_tcon()
-In-Reply-To: <ZC6JEx4dvWUvgcwW@kili>
-References: <ZC6JEx4dvWUvgcwW@kili>
-Date:   Thu, 06 Apr 2023 09:09:16 -0300
+        with ESMTP id S237113AbjDFNMm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Apr 2023 09:12:42 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B9308A51
+        for <linux-cifs@vger.kernel.org>; Thu,  6 Apr 2023 06:12:35 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id l15-20020a05600c4f0f00b003ef6d684102so20205723wmq.3
+        for <linux-cifs@vger.kernel.org>; Thu, 06 Apr 2023 06:12:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680786754; x=1683378754;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=97jhiXzpmv5lcGNd0zqtVJxxGpnjhau/0QYQc6x4Wec=;
+        b=jQjkwvJ0aySHsI6rnSO5YDn7OzLHnkAoE9OJBUCF8mUxBcpw+io3AU6eNvL8LKeLUF
+         RrsYypIzb2NvXsLk9DDjiQmgBP4x3aLvTb4qnisBD0olB2dELGECT5at48ycjhKLSRPh
+         PSaId3HqylCVrKk6md+QcTsDXtCeXE5nQHIdcS8WiOLTmOwyLvQLpAbaUPZL/B6GjgRX
+         gPMMnlmZ2akhDARvUzLaiFiAPM0B/j62/K14dKRMT+zix1Amz/+MHyNHsAn+1TdByp5U
+         wp4NahftDkhn9DTQazeA4GybkivcrQg2JOZxSI4Ta+etMZpOXDmx712LUniVwCEeD2jo
+         uUGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680786754; x=1683378754;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=97jhiXzpmv5lcGNd0zqtVJxxGpnjhau/0QYQc6x4Wec=;
+        b=gD3GdR9h4ZujSAL5i/UzJW2Wrk57uhiiK5OgEEbI7LZrWqQOQhPB7Ak8wLSDpCPTpr
+         wrH+DBXQNi9qZBo3zCfQhzJoPVubxJX3X38kAtOdAxOBn3d8rK50QXH3Bn7+v6IkhsR9
+         JyGbvQBFX0VycWVmNt56t3RCtCoVlBvVQd0k69C3xiHfIs7BrLirH8+vB9DVyKKYpwje
+         qy5puITwe8d6/0xbdwiTBdq4E2fPDPAElyrnHqguSKBuVc4/nggjHT944B5/x4rCd4nc
+         Hvqo7YcCg58m+OfTVgFO8HZR/zDBq0xdzg4Mzp0gkg6YVlzDaTBd3XwejAELklH+vjEo
+         ahew==
+X-Gm-Message-State: AAQBX9d2djffVvLtL30mRzfnJbw+8fr47FaehDw67s06nhbG3+SnUWtY
+        pJENp13lMtWRWcO0x+dO1+M=
+X-Google-Smtp-Source: AKy350ZpiSTUC7IW/BotMJKA/CANpkeWgKNAsypUTDTwrmmaQck8S0YcnMIaIsQMyuuXjDa8cKG7/w==
+X-Received: by 2002:a05:600c:22d6:b0:3eb:2da5:e19 with SMTP id 22-20020a05600c22d600b003eb2da50e19mr7297059wmg.27.1680786753629;
+        Thu, 06 Apr 2023 06:12:33 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id d10-20020a1c730a000000b003f0373d077csm1534857wmb.47.2023.04.06.06.12.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Apr 2023 06:12:33 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 16:12:28 +0300
+From:   Dan Carpenter <error27@gmail.com>
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     linux-cifs@vger.kernel.org
+Subject: [bug report] cifs: reduce roundtrips on create/qinfo requests
+Message-ID: <98e488d0-4a32-4635-a777-4a216e35c647@kili.mountain>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dan Carpenter <error27@gmail.com> writes:
+Hello Paulo Alcantara,
 
-> This lock was supposed to be an unlock.
->
-> Fixes: 6cc041e90c17 ("cifs: avoid races in parallel reconnects in smb1")
-> Signed-off-by: Dan Carpenter <error27@gmail.com>
-> ---
->  fs/cifs/cifssmb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+The patch c877ce47e137: "cifs: reduce roundtrips on create/qinfo
+requests" from Dec 12, 2022, leads to the following Smatch static
+checker warning:
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+	fs/cifs/smb2ops.c:865 smb2_is_path_accessible()
+	warn: variable dereferenced before check 'cifs_sb' (see line 834)
+
+fs/cifs/smb2ops.c
+    811 static int
+    812 smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+    813                         struct cifs_sb_info *cifs_sb, const char *full_path)
+    814 {
+    815         __le16 *utf16_path;
+    816         __u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+    817         int err_buftype = CIFS_NO_BUFFER;
+    818         struct cifs_open_parms oparms;
+    819         struct kvec err_iov = {};
+    820         struct cifs_fid fid;
+    821         struct cached_fid *cfid;
+    822         bool islink;
+    823         int rc, rc2;
+    824 
+    825         rc = open_cached_dir(xid, tcon, full_path, cifs_sb, true, &cfid);
+    826         if (!rc) {
+    827                 if (cfid->has_lease) {
+    828                         close_cached_dir(cfid);
+    829                         return 0;
+    830                 }
+    831                 close_cached_dir(cfid);
+    832         }
+    833 
+    834         utf16_path = cifs_convert_path_to_utf16(full_path, cifs_sb);
+                                                                   ^^^^^^^
+Unchecked dereference inside the function.
+
+    835         if (!utf16_path)
+    836                 return -ENOMEM;
+    837 
+    838         oparms = (struct cifs_open_parms) {
+    839                 .tcon = tcon,
+    840                 .path = full_path,
+    841                 .desired_access = FILE_READ_ATTRIBUTES,
+    842                 .disposition = FILE_OPEN,
+    843                 .create_options = cifs_create_options(cifs_sb, 0),
+    844                 .fid = &fid,
+    845         };
+    846 
+    847         rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL,
+    848                        &err_iov, &err_buftype);
+    849         if (rc) {
+    850                 struct smb2_hdr *hdr = err_iov.iov_base;
+    851 
+    852                 if (unlikely(!hdr || err_buftype == CIFS_NO_BUFFER))
+    853                         goto out;
+    854 
+    855                 if (rc != -EREMOTE && hdr->Status == STATUS_OBJECT_NAME_INVALID) {
+    856                         rc2 = cifs_inval_name_dfs_link_error(xid, tcon, cifs_sb,
+    857                                                              full_path, &islink);
+    858                         if (rc2) {
+    859                                 rc = rc2;
+    860                                 goto out;
+    861                         }
+    862                         if (islink)
+    863                                 rc = -EREMOTE;
+    864                 }
+--> 865                 if (rc == -EREMOTE && IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) && cifs_sb &&
+                                                                                    ^^^^^^^
+No point in checking after a dereference.
+
+    866                     (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS))
+    867                         rc = -EOPNOTSUPP;
+    868                 goto out;
+    869         }
+    870 
+    871         rc = SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
+    872 
+    873 out:
+    874         free_rsp_buf(err_buftype, err_iov.iov_base);
+    875         kfree(utf16_path);
+    876         return rc;
+    877 }
+
+regards,
+dan carpenter
