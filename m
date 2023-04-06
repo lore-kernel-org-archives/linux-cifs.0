@@ -2,88 +2,107 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A1CC7618D
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Apr 2023 08:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DE3C76196
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Apr 2023 12:05:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233624AbjDFI4A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 6 Apr 2023 04:56:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41764 "EHLO
+        id S237606AbjDFMFp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 6 Apr 2023 08:05:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233973AbjDFIz7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Apr 2023 04:55:59 -0400
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5062F526C;
-        Thu,  6 Apr 2023 01:55:58 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id v6-20020a05600c470600b003f034269c96so13115877wmo.4;
-        Thu, 06 Apr 2023 01:55:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680771357; x=1683363357;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B9/Axgxw789vjHSKYobykbKjrh7zpjCP2oBQY/iyJas=;
-        b=g2Qr6/zrh6oFLeQwJDsSseiOxtP6XC12UfICsXT7C5TxfsJmqVjA5vXPfdX55N3GPn
-         DAlxL19v8t0N+VL0qgHnv0J68yF5bXDL6fYpU8hVu7pFG0nF8LHfFuySXkC4pj0shrWo
-         AqbL64xpw3haU35F24Rn4eng4wRzXDXoiE3gw+6JMbh+R7YyU18HxF3E3vYbsYKV3JX4
-         JHKomehQAXR8Aqvz8Hl1g38JDGsnqHAm5oHTczMSzTDyjgweTN1eSeKF7108aZoOCKwX
-         iBXYJVoTmUva0PG7fqGJa72oBPIsceTDgqR08my16yMl909EYZQlD+8JVDlxhw0fyVPV
-         GBmQ==
+        with ESMTP id S237619AbjDFMF2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Apr 2023 08:05:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F65493C7
+        for <linux-cifs@vger.kernel.org>; Thu,  6 Apr 2023 05:02:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680782563;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=n00mKCdV4rdOBgXkXCVylGLpwrX31Gf94p4L9PL3ul0=;
+        b=JCrqu5/PUY3+2c03Yfusi8hPy/azBF5AsKLJXFaXwDrX8MSEPEHHjEDc9rFRAkGg0/Ar2h
+        lWrdIzwyUflr5lsYvi6FH7joZsbvwNSa+QYObvAjpg8OpyVHTyGsYx80c1n2Gcpy1riG54
+        h4iXkZMQT2F1tEHQ6qi4CS3Tiwgq/6s=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-657-xXAAzHc1OpuODDR4y1dfXg-1; Thu, 06 Apr 2023 08:02:32 -0400
+X-MC-Unique: xXAAzHc1OpuODDR4y1dfXg-1
+Received: by mail-pl1-f200.google.com with SMTP id o9-20020a170902d4c900b001a2bef29d53so6988960plg.7
+        for <linux-cifs@vger.kernel.org>; Thu, 06 Apr 2023 05:02:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680771357; x=1683363357;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B9/Axgxw789vjHSKYobykbKjrh7zpjCP2oBQY/iyJas=;
-        b=PCRvYz5/4Co58WjdluwkVvzHQiASg9dcqiGDjQAxAIEk3Ho9WR7cKphM1uKG9ptRG8
-         JybCVaZtB3jVXzbpDOcwDAN2XWPaBlsGPYg0hkMVMRb9QB1M3zWZS5J15MeuAaXAuc9e
-         Y1ybxVJqwWWfSjiV5MMPv8YE7/YrFmXrq99edeG9kz3lfnSZR5XDR+t83tZL432blgIU
-         52hL98cE/WS0WMVKa3kh8wqpeB4+naYb0dsEfTAkjPeiF3UH6KrGTi+FiK91LQo8jIZg
-         OD/ki0JOUslXRfXTATeO25jqe/oFlZqkbrniFGQuiZn+a7OvtXTJVW7q3y+tm6mUe3bv
-         yfeA==
-X-Gm-Message-State: AAQBX9cHXoKzyg//tOSRBUtu7Rofex5IRTf3/8IpX8lNrcfzZyoPcmGf
-        bnKOWmmWa436qSRka1a2Uck=
-X-Google-Smtp-Source: AKy350ZzuCVLy75YllzgUZ6DCi3WQ+PI9bLc0iV07zUhK+fXpzHZ0SEvAy6OfQcqLb2K7iCTgd4HqA==
-X-Received: by 2002:a7b:c7c6:0:b0:3ef:6e1c:3ffa with SMTP id z6-20020a7bc7c6000000b003ef6e1c3ffamr6710681wmk.28.1680771356751;
-        Thu, 06 Apr 2023 01:55:56 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id 13-20020a05600c230d00b003ed2384566fsm975582wmo.21.2023.04.06.01.55.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 01:55:56 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 11:55:47 +0300
-From:   Dan Carpenter <error27@gmail.com>
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     Paulo Alcantara <pc@cjr.nz>, Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] cifs: double lock in cifs_reconnect_tcon()
-Message-ID: <ZC6JEx4dvWUvgcwW@kili>
+        d=1e100.net; s=20210112; t=1680782551;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=n00mKCdV4rdOBgXkXCVylGLpwrX31Gf94p4L9PL3ul0=;
+        b=6HilRPLiSXWCGjtQce3tP4pAzqbzvs1FKcCLuEufeyr6NiY3co/TdhbKKI4llheThd
+         z1zMVBQUXfH6DukbvJjTt/EjOzp/+je0efnpZwA+6+cgzeGEabd+KXYBWCB4BEVFvoUX
+         szAjMBw2v+4MQB3xfJ08cRf/pO8zvA0ewKdQ1YvhzxPbW9JNHRKmrAiTFtFTHbceUWOZ
+         7k516+hUlUOd03ev0rdiwveiiMtLYkn+mrYN/GT4UinWVJivuXY3Yu0mUAZl5MmwwBVd
+         8XdtGm5WlPSzYVln51ls/mmBdPjk8Dd81h66Lq3pGYmRIVjSWmEhsQyVJbvB2259H7fS
+         sIbw==
+X-Gm-Message-State: AAQBX9e/VSfb+7BxUiJzyVMOz2Pcw3v0fy1xJeFMlpPudEwPqftgeO2a
+        AMfwtFspaCJY+b7ALt2+MRGaYGtD9DLFi5ZO9pzw/BbDKVH75g2o91VVHHD7zUR54VV0yQ+mTDV
+        GlHLf13pqxV+wtow4Fuj8cg==
+X-Received: by 2002:a62:5401:0:b0:62d:b4ae:b84a with SMTP id i1-20020a625401000000b0062db4aeb84amr5491943pfb.7.1680782550874;
+        Thu, 06 Apr 2023 05:02:30 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bmWvToWKWs8tsXjHVlfJMBGC0NFhWq4zrQUmAgKl++tvX/YVQ9pNx6sN2nDyEgIQ2Ffxu4dA==
+X-Received: by 2002:a62:5401:0:b0:62d:b4ae:b84a with SMTP id i1-20020a625401000000b0062db4aeb84amr5491909pfb.7.1680782550483;
+        Thu, 06 Apr 2023 05:02:30 -0700 (PDT)
+Received: from [192.168.100.225] (221x248x148x155.ap221.ftth.ucom.ne.jp. [221.248.148.155])
+        by smtp.gmail.com with ESMTPSA id p21-20020a62ab15000000b00625616f59a1sm1236977pff.73.2023.04.06.05.02.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Apr 2023 05:02:29 -0700 (PDT)
+Message-ID: <6cf163fe-a974-68ab-0edc-11ebc54314ef@redhat.com>
+Date:   Thu, 6 Apr 2023 21:02:25 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+From:   Takayuki Nagata <tnagata@redhat.com>
+Subject: [PATCH] cifs: reinstate original behavior again for forceuid/forcegid
+To:     sfrench@samba.org
+Cc:     pc@cjr.nz, lsahlber@redhat.com, sprasad@microsoft.com,
+        tom@talpey.com, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, tnagata@redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This lock was supposed to be an unlock.
+forceuid/forcegid should be enabled by default when uid=/gid= options are
+specified, but commit 24e0a1eff9e2 ("cifs: switch to new mount api")
+changed the behavior. This patch reinstates original behavior to overriding
+uid/gid with specified uid/gid.
 
-Fixes: 6cc041e90c17 ("cifs: avoid races in parallel reconnects in smb1")
-Signed-off-by: Dan Carpenter <error27@gmail.com>
+Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+Signed-off-by: Takayuki Nagata <tnagata@redhat.com>
 ---
- fs/cifs/cifssmb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/fs_context.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 0d30b17494e4..9d963caec35c 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -120,7 +120,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- 	spin_lock(&server->srv_lock);
- 	if (server->tcpStatus == CifsNeedReconnect) {
- 		spin_unlock(&server->srv_lock);
--		mutex_lock(&ses->session_mutex);
-+		mutex_unlock(&ses->session_mutex);
- 
- 		if (tcon->retry)
- 			goto again;
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index ace11a1a7c8a..6f7c5ca3764f 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -972,6 +972,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			goto cifs_parse_mount_err;
+ 		ctx->linux_uid = uid;
+ 		ctx->uid_specified = true;
++		ctx->override_uid = 1;
+ 		break;
+ 	case Opt_cruid:
+ 		uid = make_kuid(current_user_ns(), result.uint_32);
+@@ -1000,6 +1001,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 			goto cifs_parse_mount_err;
+ 		ctx->linux_gid = gid;
+ 		ctx->gid_specified = true;
++		ctx->override_gid = 1;
+ 		break;
+ 	case Opt_port:
+ 		ctx->port = result.uint_32;
 -- 
-2.39.1
+2.40.0
 
