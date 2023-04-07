@@ -2,111 +2,69 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A44AEC77B6E
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Apr 2023 10:14:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD68C6FD1D
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Apr 2023 20:57:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbjDGKOU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 Apr 2023 06:14:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46146 "EHLO
+        id S230117AbjDGU5L (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 Apr 2023 16:57:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232399AbjDGKOT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Apr 2023 06:14:19 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271DC9004
-        for <linux-cifs@vger.kernel.org>; Fri,  7 Apr 2023 03:14:18 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id sg7so7385979ejc.9
-        for <linux-cifs@vger.kernel.org>; Fri, 07 Apr 2023 03:14:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680862456; x=1683454456;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Dh6ojJ1aLo61oAOPLHDys23msr377LbLwQmvUkIACk=;
-        b=OOnBrmgkvKwMuPxuUzXeqTI54QW/7T3fDO1aYHt+nWr3jp6FFfynu1F8Jh6kNwQsmK
-         gF7cKLFDajyULHAmxiFB94h50n4oRXZJYKrhPS4SKgOsUw63SN3Wuz86CbccpA13O4qC
-         +YZEH/Bdw8vEpdi4MTcYSa5DrnUrBhfBB4rg+g5dQJZ6Iu2paM1f7uGI/oxqb8ZY2X3a
-         RNs0xqmvLHyubMv4+1XYl5DVz5fbwJqCfH4Q0bXU79PlDcPhNIXG5reRxpBZcbhb8fM7
-         bZ0NTrwR7lUQdBy5OGVLxWYOB3SvcOyzH7ieOSR9iGweOVecG00o2Zwiw1i8oOLBuj+u
-         EXHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680862456; x=1683454456;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0Dh6ojJ1aLo61oAOPLHDys23msr377LbLwQmvUkIACk=;
-        b=nICXr7tCsuCqdMry6VdrTwfZIqUfmEG9XkAdSInB2IfisLbRkrcrm+ke6HdNoSIK4E
-         gJs8s2WG8tJq3xUeiaQj9D+gBNffQV6DDidzBQwoeCdpr8nCQW0yp7t7OZYAuHsp7UIa
-         +PMV13uU7ehTb93y2H4Rlxwb2JN729JJV0bR+P0k5eUwA5ZJou7d5Hu/9EvTJwNbO4SM
-         w18nEgT80O3tmo5k9T4D48rZo07M0Pgy6PZwoZQEID67+Xxzc+MMCNwS/BX/MBwLscEg
-         +ne0vjBCVrS3UENFo7PsFZhr5L0dVPez8fFmZnYM7nS3DGSwRPmp2+AkDXn7njY9HyM7
-         shwA==
-X-Gm-Message-State: AAQBX9cQifK4hTVY/VT8r5TR8lwzGDUIt0MA6iOjQPce1q3vE+zDWN23
-        KZHlfJ2opIzWkYzuT0s/SExmPIETd7goKrmVGuI=
-X-Google-Smtp-Source: AKy350bbs3q+gqoTfvRGsZnf3KurJm+o/nwFKA8YK2UQxqR9LJdFgwOnS+HXqWQYQOA/e80ID2sew9Pq3HRs2NLXSBg=
-X-Received: by 2002:a17:906:802:b0:8b1:3298:c587 with SMTP id
- e2-20020a170906080200b008b13298c587mr911297ejd.2.1680862456649; Fri, 07 Apr
- 2023 03:14:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <1efcd842-b6a3-353a-0bf9-3ebf890eb712@redhat.com>
-In-Reply-To: <1efcd842-b6a3-353a-0bf9-3ebf890eb712@redhat.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 7 Apr 2023 20:14:04 +1000
-Message-ID: <CAN05THRJb_4edm9Hne1yY3D6VvtQ=CbYn+KhVy7Xw=i4GE-c+w@mail.gmail.com>
-Subject: Re: [PATCH v2] cifs: reinstate original behavior again for forceuid/forcegid
-To:     Takayuki Nagata <tnagata@redhat.com>
-Cc:     sfrench@samba.org, pc@cjr.nz, lsahlber@redhat.com,
-        sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S230121AbjDGU5H (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Apr 2023 16:57:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1C0FCC1C;
+        Fri,  7 Apr 2023 13:56:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 434BB65482;
+        Fri,  7 Apr 2023 20:56:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FA41C433EF;
+        Fri,  7 Apr 2023 20:56:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680901012;
+        bh=p3jRf1L9xGohI32YHj7FCCNyMaoewqD3ww+BUmp2Wds=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=VrjHV/NNqQz0DguIrG9GkzCcUC0HQrPXKDaseEGMQoo4axGTpwxz+x0HfESlpqhw+
+         Uh44Lk9WrXD93GgG8jU0LISwHR7zMbXiWICD4enjQPX7t5TpWU6bdtM3ez8cy32BKU
+         7357ksvdKbyL518jNh3gEyoiIjpvwTQjCYdA/z09MUsnqEGpRdxHLe7QQNopaKhTA8
+         00Ukv07Cw5FiHrT8w5xfkV/M5uZtTXqlZ0HMdgsQ4eJhE9hZomIswoc0K4kceFXUV5
+         1acpPHwik04kwct8IpVUDWqAWMVLI5DcncUTDWyR+UWc0PdAWsazoWEKpS8oWQ78wE
+         mOf2+w9eblQ3Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8DA23C4167B;
+        Fri,  7 Apr 2023 20:56:52 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5muJ_pjqS7pqDOLWiqcwjR1eHB91dX5XeoM8TVL-Lng-eg@mail.gmail.com>
+References: <CAH2r5muJ_pjqS7pqDOLWiqcwjR1eHB91dX5XeoM8TVL-Lng-eg@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5muJ_pjqS7pqDOLWiqcwjR1eHB91dX5XeoM8TVL-Lng-eg@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.3-rc5-ksmbd-server-fixes
+X-PR-Tracked-Commit-Id: dc8289f912387c3bcfbc5d2db29c8947fa207c11
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: a1e6fff395d3209511f6a2264c5b6256614afaa3
+Message-Id: <168090101257.23908.8315231906053313171.pr-tracker-bot@kernel.org>
+Date:   Fri, 07 Apr 2023 20:56:52 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good.
-The question arises, are there any situations where forceuid is
-meaningful without uid= argument and what would it mean?
+The pull request you sent on Thu, 6 Apr 2023 23:16:37 -0500:
 
-On Fri, 7 Apr 2023 at 15:09, Takayuki Nagata <tnagata@redhat.com> wrote:
->
-> forceuid/forcegid should be enabled by default when uid=/gid= options are
-> specified, but commit 24e0a1eff9e2 ("cifs: switch to new mount api")
-> changed the behavior. Due to the change, a mounted share does not show
-> intentional uid/gid for files and directories even though uid=/gid=
-> options are specified since forceuid/forcegid are not enabled.
->
-> This patch reinstates original behavior that overrides uid/gid with
-> specified uid/gid by the options.
->
-> Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
-> Signed-off-by: Takayuki Nagata <tnagata@redhat.com>
-> Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> Acked-by: Tom Talpey <tom@talpey.com>
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
-> V1 -> V2: Revised commit message to clarify "what breaks".
->
->  fs/cifs/fs_context.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index ace11a1a7c8a..6f7c5ca3764f 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -972,6 +972,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
->                         goto cifs_parse_mount_err;
->                 ctx->linux_uid = uid;
->                 ctx->uid_specified = true;
-> +               ctx->override_uid = 1;
->                 break;
->         case Opt_cruid:
->                 uid = make_kuid(current_user_ns(), result.uint_32);
-> @@ -1000,6 +1001,7 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
->                         goto cifs_parse_mount_err;
->                 ctx->linux_gid = gid;
->                 ctx->gid_specified = true;
-> +               ctx->override_gid = 1;
->                 break;
->         case Opt_port:
->                 ctx->port = result.uint_32;
-> --
-> 2.40.0
->
+> git://git.samba.org/ksmbd.git tags/6.3-rc5-ksmbd-server-fixes
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/a1e6fff395d3209511f6a2264c5b6256614afaa3
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
