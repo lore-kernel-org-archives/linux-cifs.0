@@ -2,115 +2,105 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B383C76196
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Apr 2023 04:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C9FC6FD1D
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Apr 2023 04:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232170AbjDGENg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 Apr 2023 00:13:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33574 "EHLO
+        id S230401AbjDGEQx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 Apr 2023 00:16:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjDGENf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Apr 2023 00:13:35 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 335235B9B
-        for <linux-cifs@vger.kernel.org>; Thu,  6 Apr 2023 21:13:33 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id k37so53240329lfv.0
-        for <linux-cifs@vger.kernel.org>; Thu, 06 Apr 2023 21:13:33 -0700 (PDT)
+        with ESMTP id S229460AbjDGEQw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Apr 2023 00:16:52 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A25855B83;
+        Thu,  6 Apr 2023 21:16:50 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id g19so40070559lfr.9;
+        Thu, 06 Apr 2023 21:16:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680840811; x=1683432811;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2ayCY8gnSzRVaLPlX69HunLAAxrpGlLKZnIoUUkKakI=;
-        b=G3am6QtCc/ohzizao0JPiLpe5jex0BIOfdy7+tfEDRYRKwumPeM7UTmFkhxOSkS7xt
-         fiHh/tLU/T+bFubDudvwLvwX5ebInUPh+PFfFdQnzlGNCfp3FelWGUSOo1nMBGY3U23s
-         QHzivT99VepCzvxF8I3g1AG7d5moC/30iU4j7NjXzgz0KihLjwFJ77g5YqJc2JrK71Ld
-         TGEorHKWfJrQbpbjE6r2BrsprUVghOQdT536ryiw48QGoCtjedEdwJPFnoJ5MojUhplb
-         FnGFPJcGOTTxkjPXpWqgwhT2hX799lx96C/bh6Q9V4mxKt9Q4KOLJOSFSAk0HzX/cEOq
-         iE/Q==
+        d=gmail.com; s=20210112; t=1680841009; x=1683433009;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VuHizS7zH+ZMih1S8QStNJ1DoB7dvTOcMrQct9meOak=;
+        b=Ash4y/U6xqht05MVKr8Xx6Uo4YB3NFOyXfWs9Krih/t9nh59xRkg4wvDt+e7so2RjM
+         eXV/9tljzYFtJrU1J+HjFx6JGCw7BRyzsaiSTHHZCzIvQtw9BtusBAxhE48jkTYcwY08
+         cWDpfzKZN6l9PO2mdeCRfmKJp1utWgNZSB56k3lLQdw5dyH0/9dlYQPF8tPqWz2wvPxi
+         UfQKGeHNhloU8wOoIAoGCh2Umd1apf/9HufOfsoCFyKqjrAsdstxUkAhUfByjtFxCoPO
+         /9O8nIqAVvqb/lhtg0bQRyQTjMJNP1bW8fMldAPuKL6skFMtilEXStpInPxfVTNGrCGe
+         03Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680840811; x=1683432811;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2ayCY8gnSzRVaLPlX69HunLAAxrpGlLKZnIoUUkKakI=;
-        b=txRuaCnftexRwsa6sqb4CRauEfPpNKOCd7wHw1JdHW4x6gdq9naQNpvbiMtJZ0zotv
-         xACxAzcTPVqABJKIZKK0Fd8rk9i0dNbQr7i8Wo632j0xUm2Gzr+hULzcXncfwy0+TDsW
-         gHVylEK5OGluM0dlb1tMdmt2/WdLiNwG8UpCey+onTnjJ8ZRTJ8pfEzG9y2PbcvjKmji
-         7N509rdsTDoC7fpgxYeD3OaQv9XL9VIj5G069Y7ymaRcQSC+FLiKr8VZSaq8atOlJz6o
-         u4S0LbeZ6ZjQi2L/SPabHcWWUuSPofelY0tYHK3plzLR0LxYwUGv8cjnEW/a6spBkGqS
-         fJjg==
-X-Gm-Message-State: AAQBX9eZFV+wqmKp+9rxvfgu5JjQRlTe5GTjXWThkskbx3hOYb9FH3dk
-        az9gxQ5BsqWGsR1sRr1sPeDNcVZ8BVMT3rq+nVY=
-X-Google-Smtp-Source: AKy350bRswQc+Go4VLcS//oc6Km8D/aDmonvZzbB2PVC4ejAc8eEuZn7aAMOJPzFaH2SlE6OdF9KR4FpYY4fV7PFS8M=
-X-Received: by 2002:ac2:4569:0:b0:4e9:22ff:948d with SMTP id
- k9-20020ac24569000000b004e922ff948dmr327215lfm.7.1680840811172; Thu, 06 Apr
- 2023 21:13:31 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680841009; x=1683433009;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VuHizS7zH+ZMih1S8QStNJ1DoB7dvTOcMrQct9meOak=;
+        b=zVwXBF7LX8EJbdsck9QHnorW6ya7gGKq5cj5EuElu+RU+Ou82b0b3XMgVKjPPI0HEN
+         ZeFiA90gsDXH0sUvT32DRn454T428fv7hREu0XbwKpmdI7M+Iz6s4GL0Wzuo/8s1F1l7
+         QFGfM18yjdzY3q1CpDRL7mffZ5b5UpBuaiay1jICewEpEJ6CZNiQXhzstRXE8YHThnSB
+         /arcRFBHazQYqxRdJoL01a+3VDniyhGOVbEgMXE4k5pgM7AV09cujM9n+9P+fnCgI+aT
+         5TCJNlDs7vmqTB3x7uNedddEtTvN1vIlrd1lAeWHYVcq7qM1KcAl8FySRZlkW8xgTGo7
+         sw0w==
+X-Gm-Message-State: AAQBX9dPOsSUuno8cYf5SOSTL5jxJzRcByPJ1lumysxBYkyV6YpSAOJr
+        wymndtIm1ypmkVLi4GGAK481AZ8NBKGwb65zAeO9JCiMc0Y=
+X-Google-Smtp-Source: AKy350ZBD/D+rQLDe9CzAYMO7+EWxdxbe2OKl/Kp/uCsntdt0m1dFYQ5764Moq91zt1WIoRqf7Qdlz1fXhaWLw9QTW0=
+X-Received: by 2002:ac2:54ad:0:b0:4eb:1606:48d5 with SMTP id
+ w13-20020ac254ad000000b004eb160648d5mr384818lfk.7.1680841008736; Thu, 06 Apr
+ 2023 21:16:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <6cf163fe-a974-68ab-0edc-11ebc54314ef@redhat.com>
-In-Reply-To: <6cf163fe-a974-68ab-0edc-11ebc54314ef@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 6 Apr 2023 23:13:20 -0500
-Message-ID: <CAH2r5msJtiGDuQcQdUkpamChTYNobUEVCax5GmHwpV0NbZOR0Q@mail.gmail.com>
-Subject: Re: [PATCH] cifs: reinstate original behavior again for forceuid/forcegid
-To:     Takayuki Nagata <tnagata@redhat.com>
-Cc:     sfrench@samba.org, pc@cjr.nz, lsahlber@redhat.com,
-        sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
+Date:   Thu, 6 Apr 2023 23:16:37 -0500
+Message-ID: <CAH2r5muJ_pjqS7pqDOLWiqcwjR1eHB91dX5XeoM8TVL-Lng-eg@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Tentatively merged into cifs-2.6.git for-next
+Please pull the following changes since commit
+90c8ce31dbe93f277fc1157e34740e841094c254:
 
-Any thoughts on priority sending it upstream soon?
+  Merge tag '6.3-rc3-ksmbd-smb3-server-fixes' of
+git://git.samba.org/ksmbd (2023-03-24 17:59:00 -0700)
 
-On Thu, Apr 6, 2023 at 7:06=E2=80=AFAM Takayuki Nagata <tnagata@redhat.com>=
- wrote:
->
-> forceuid/forcegid should be enabled by default when uid=3D/gid=3D options=
- are
-> specified, but commit 24e0a1eff9e2 ("cifs: switch to new mount api")
-> changed the behavior. This patch reinstates original behavior to overridi=
-ng
-> uid/gid with specified uid/gid.
->
-> Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
-> Signed-off-by: Takayuki Nagata <tnagata@redhat.com>
-> ---
->  fs/cifs/fs_context.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index ace11a1a7c8a..6f7c5ca3764f 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -972,6 +972,7 @@ static int smb3_fs_context_parse_param(struct fs_cont=
-ext *fc,
->                         goto cifs_parse_mount_err;
->                 ctx->linux_uid =3D uid;
->                 ctx->uid_specified =3D true;
-> +               ctx->override_uid =3D 1;
->                 break;
->         case Opt_cruid:
->                 uid =3D make_kuid(current_user_ns(), result.uint_32);
-> @@ -1000,6 +1001,7 @@ static int smb3_fs_context_parse_param(struct fs_co=
-ntext *fc,
->                         goto cifs_parse_mount_err;
->                 ctx->linux_gid =3D gid;
->                 ctx->gid_specified =3D true;
-> +               ctx->override_gid =3D 1;
->                 break;
->         case Opt_port:
->                 ctx->port =3D result.uint_32;
-> --
-> 2.40.0
->
+are available in the Git repository at:
 
+  git://git.samba.org/ksmbd.git tags/6.3-rc5-ksmbd-server-fixes
 
---=20
+for you to fetch changes up to dc8289f912387c3bcfbc5d2db29c8947fa207c11:
+
+  ksmbd: fix slab-out-of-bounds in init_smb2_rsp_hdr (2023-04-02 23:08:56 -0500)
+
+----------------------------------------------------------------
+four ksmbd server fixes, including three for stable
+- slab out of bounds fix
+- lock cancellation fix
+- minor cleanup to address clang warning
+- fix for xfstest 551 (wrong parms passed to kvmalloc)
+----------------------------------------------------------------
+Marios Makassikis (1):
+      ksmbd: do not call kvmalloc() with __GFP_NORETRY | __GFP_NO_WARN
+
+Namjae Jeon (2):
+      ksmbd: delete asynchronous work from list
+      ksmbd: fix slab-out-of-bounds in init_smb2_rsp_hdr
+
+Tom Rix (1):
+      ksmbd: remove unused is_char_allowed function
+
+ fs/ksmbd/connection.c |  17 ++++-------
+ fs/ksmbd/ksmbd_work.h |   2 +-
+ fs/ksmbd/server.c     |   5 +---
+ fs/ksmbd/smb2pdu.c    |  36 ++++++++++++++----------
+ fs/ksmbd/smb2pdu.h    |   1 +
+ fs/ksmbd/smb_common.c | 138
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------
+ fs/ksmbd/smb_common.h |   2 +-
+ fs/ksmbd/unicode.c    |  18 ------------
+ 8 files changed, 140 insertions(+), 79 deletions(-)
+
+-- 
 Thanks,
 
 Steve
