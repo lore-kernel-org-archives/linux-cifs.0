@@ -2,109 +2,82 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 162D0C77B6E
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 Apr 2023 12:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B825C77B6E
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 Apr 2023 16:27:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231207AbjDLMT6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 Apr 2023 08:19:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57858 "EHLO
+        id S229484AbjDLQ1z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 Apr 2023 12:27:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230328AbjDLMTw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Apr 2023 08:19:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B53030EE
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Apr 2023 05:19:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681301943;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=oDvpuO+outR1fzDI82r+racSPaiTDWT0/eKdzaYnWqM=;
-        b=iyFJ1xz0NAPGUSQEnitdCPlzXkaczjKazrmow+HyOuX8T4xeg1j7QnVVqPTHK5qHqxv7O5
-        kOVJ8pJnqeRZA5e8tCtPBrTLzyvP/w2yvhF+G6LDnH+4cam5w7PhBVyx6z85QyAzphLgBX
-        P3xXuXpt40e/kkZ6p1UVzYwyjo5lU0M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-263-mTzkuoVFP_29896gGCW_Bg-1; Wed, 12 Apr 2023 08:19:00 -0400
-X-MC-Unique: mTzkuoVFP_29896gGCW_Bg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7959780C8C1;
-        Wed, 12 Apr 2023 12:18:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 378F0492B00;
-        Wed, 12 Apr 2023 12:18:58 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-cc:     dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-        Steve French <sfrench@samba.org>,
+        with ESMTP id S229469AbjDLQ1z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Apr 2023 12:27:55 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A62410CC
+        for <linux-cifs@vger.kernel.org>; Wed, 12 Apr 2023 09:27:53 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id sg7so41711147ejc.9
+        for <linux-cifs@vger.kernel.org>; Wed, 12 Apr 2023 09:27:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1681316871; x=1683908871;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LlbBUU3Heh2HbQgGaI5PMM5WO9GB4tDWoyyHCpBYNx4=;
+        b=efCuKwNHI+e5ttjxepW1uvimCACd89PmCHF1VAnRqej2/xLnn9b8tpJu36F2CiP0yr
+         Mep67bOSUqLiuHmV6LGR3innHFLBaL5lRzkYPl4+RyyWC7AGHf6ZvvLwLkZlMxLZ967B
+         rsBZ88WVUh/FexU/p8WdLfDSH8dpH1Gbxfd/E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681316871; x=1683908871;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LlbBUU3Heh2HbQgGaI5PMM5WO9GB4tDWoyyHCpBYNx4=;
+        b=QuNFU3fQMqXYu4D3ihHEp6gQSk5TMPcbx41Wqg2bF+mrMkucsa1iSqI2DdgCNYRZ9U
+         /JeDEaYOZrxHR4bAFOiozgAGKQHtuD2gq4UcHRh5SoKKAqMN4B3m7snwL18UajH4OBf6
+         +PHxpZ79XF5rK4PQPvnubQ9e6SMQD2o0iduPRleZsjSknT+qnBiObieqjJa9yzre2mm2
+         hmFTF/q0bJR2iaD+j83Il8mZsODQK7mCKzMTyWMPRLpR5tFnrTV9ewtKUItwtKKlVaL3
+         TAUNv2XZiRb2dRXjC9MNIfAQ9P1OzZC8WRg+GBgE+QHEpIbA8cKeZ23VWy8NGJGSrM+6
+         r4Dw==
+X-Gm-Message-State: AAQBX9dLFhG52vtwnypHwBPht10t/BI1XrAIb7DflpBJ0pwfBmwQvvw2
+        QQUMtL7pPXuu7yhMF23SpKASCCbpKaq4EOo0uKNcXw==
+X-Google-Smtp-Source: AKy350bJqqdjefv8q1cxn4AIh2NsDELLHFv50m9W/TGgK5NLJCKnW6hseZirEa+8/nI6jjvhXocvpw==
+X-Received: by 2002:a17:906:2a48:b0:93b:1c78:5796 with SMTP id k8-20020a1709062a4800b0093b1c785796mr13441278eje.43.1681316871401;
+        Wed, 12 Apr 2023 09:27:51 -0700 (PDT)
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com. [209.85.208.44])
+        by smtp.gmail.com with ESMTPSA id m15-20020a50930f000000b0050477decdfasm6153080eda.3.2023.04.12.09.27.50
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Apr 2023 09:27:50 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-504718a2282so3681661a12.0
+        for <linux-cifs@vger.kernel.org>; Wed, 12 Apr 2023 09:27:50 -0700 (PDT)
+X-Received: by 2002:a50:9fa2:0:b0:504:81d3:48f with SMTP id
+ c31-20020a509fa2000000b0050481d3048fmr3195779edf.2.1681316870239; Wed, 12 Apr
+ 2023 09:27:50 -0700 (PDT)
+MIME-Version: 1.0
+References: <110100.1681301937@warthog.procyon.org.uk>
+In-Reply-To: <110100.1681301937@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 12 Apr 2023 09:27:33 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjJt-6_PJ=hm2_TzwVHcWSatMCiByrFiUizpteogGNibA@mail.gmail.com>
+Message-ID: <CAHk-=wjJt-6_PJ=hm2_TzwVHcWSatMCiByrFiUizpteogGNibA@mail.gmail.com>
+Subject: Re: [PATCH] netfs: Fix netfs_extract_iter_to_sg() for ITER_UBUF/IOVEC
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jeff Layton <jlayton@kernel.org>, Steve French <sfrench@samba.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] netfs: Fix netfs_extract_iter_to_sg() for ITER_UBUF/IOVEC
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <110099.1681301937.1@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 12 Apr 2023 13:18:57 +0100
-Message-ID: <110100.1681301937@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Linus,
+On Wed, Apr 12, 2023 at 5:19=E2=80=AFAM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> Could you apply this, please?  It doesn't affect anything yet, but I have
+> patches in the works that will use it.
 
-Could you apply this, please?  It doesn't affect anything yet, but I have
-patches in the works that will use it.
+Applied,
 
-Thanks,
-David
----
-netfs: Fix netfs_extract_iter_to_sg() for ITER_UBUF/IOVEC
-
-Fix netfs_extract_iter_to_sg() for ITER_UBUF and ITER_IOVEC to set the siz=
-e
-of the page to the part of the page extracted, not the remaining amount of
-data in the extracted page array at that point.
-
-This doesn't yet affect anything as cifs, the only current user, only
-passes in non-user-backed iterators.
-
-Fixes: 018584697533 ("netfs: Add a function to extract an iterator into a =
-scatterlist")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: linux-cachefs@redhat.com
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/iterator.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
-index e9a45dea748a..8a4c86687429 100644
---- a/fs/netfs/iterator.c
-+++ b/fs/netfs/iterator.c
-@@ -139,7 +139,7 @@ static ssize_t netfs_extract_user_to_sg(struct iov_ite=
-r *iter,
- 			size_t seg =3D min_t(size_t, PAGE_SIZE - off, len);
- =
-
- 			*pages++ =3D NULL;
--			sg_set_page(sg, page, len, off);
-+			sg_set_page(sg, page, seg, off);
- 			sgtable->nents++;
- 			sg++;
- 			len -=3D seg;
-
+             Linus
