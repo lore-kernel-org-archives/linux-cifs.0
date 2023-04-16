@@ -2,68 +2,109 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5C7C77B70
-	for <linux-cifs@archiver.kernel.org>; Sun, 16 Apr 2023 03:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE552C77B61
+	for <linux-cifs@archiver.kernel.org>; Sun, 16 Apr 2023 03:52:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229904AbjDPDCd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 15 Apr 2023 23:02:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46442 "EHLO
+        id S229876AbjDPDwf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 15 Apr 2023 23:52:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229743AbjDPDCb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 15 Apr 2023 23:02:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59053268A;
-        Sat, 15 Apr 2023 20:02:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C652D61509;
-        Sun, 16 Apr 2023 03:02:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3A1E1C433EF;
-        Sun, 16 Apr 2023 03:02:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681614149;
-        bh=x98Id3EKUNL+LcQp3r5iKifcLzhqvv+ViqyYdhCH4HE=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=MM0AtbD7jh6BR4M7rDb89VhM5C5RTDlDCpav0+CNy9EEYPyucKTej+VjcNB/n2FFI
-         G1mLjCP2Am6mLtB37R+s2jo81QJVrHp5L7HLkrwEuFMKiOfDwtlgTRJk05zxFpbJTu
-         FnWCVqk7t33JY2mXZ4tTpqZSUS+p4R3hQQUokWjrlawbcTvjUKKBYPLKXARHtihjJm
-         ZbjQFqiAebgPVjgTPvL6RIic1WUatjEDLK8aDyjbGtLBXbK4W7CGXrAX6ys1ZvuOTb
-         /JMDmTTpRAP3onuovCGc9EeYJw51a8csrPr2Zq1xIbEj4y51UHARtO5NxdxZelosiC
-         ZyjBee5HT9Q5g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 22B30E5244F;
-        Sun, 16 Apr 2023 03:02:29 +0000 (UTC)
-Subject: Re: [GIT PULL] smb311 client fix
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mv+eZW6RAPOqZ0FCWixdj-kKWHj2DfEDLHZvYCZh8iAzw@mail.gmail.com>
-References: <CAH2r5mv+eZW6RAPOqZ0FCWixdj-kKWHj2DfEDLHZvYCZh8iAzw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mv+eZW6RAPOqZ0FCWixdj-kKWHj2DfEDLHZvYCZh8iAzw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.3-rc6-smb311-client-negcontext-fix
-X-PR-Tracked-Commit-Id: 5105a7ffce19160e7062aee67fb6b3b8a1b56d78
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3e7bb4f2461710b70887704af7f175383251088e
-Message-Id: <168161414913.1043.7700400503552988608.pr-tracker-bot@kernel.org>
-Date:   Sun, 16 Apr 2023 03:02:29 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        with ESMTP id S229636AbjDPDwe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 15 Apr 2023 23:52:34 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DEE9271C;
+        Sat, 15 Apr 2023 20:52:33 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id x34so9579095ljq.1;
+        Sat, 15 Apr 2023 20:52:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681617152; x=1684209152;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QhssxvX2XIQX5gXBmeauZ98Mdf5jdlgnzZaIKoOePvc=;
+        b=Bje5M0UV6fkAVYcil5mvFqAeWkPMJgiFF66bOr/yLUlG/yuuDTiInMh1a3EduDmzXw
+         U9kfuY2JVc/P0pRDqTPgw+GHUPVw3xojpVPYJ3veWomONCtpVqphxfICXaHKnNcwc+BH
+         x0+OEObmj6k4WWH03N2mjJ95AcSCvo/CIuGQvn3sKkSGEWOM3hI5erCoLGObFhRzn6qf
+         XtRU5wFnOuOCb8PdzEoEh6eO/uhVDtSEJ+aA1YBEHx+YyRtqaLLJO45nwfKyYJZirIha
+         zrN7RqkIM58pVoiAysY7/IqU2R44RlYfb5nYZnqbyH+TZ/zYy6OKgQDTOpdqHbb9fceu
+         uipA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681617152; x=1684209152;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QhssxvX2XIQX5gXBmeauZ98Mdf5jdlgnzZaIKoOePvc=;
+        b=JRReH4JH3DSgmzqp5lJORuTpw3i4lzGiZqpqyz6os8wsnoJZRQiAhh1t03Z1Jq+TbA
+         gxV9XeJr2m72isYub9ASJtNcAc9tfHAdpkIfLRC1Qh74W993S4RgU8TSAuDBCXUO3omy
+         3LSbADoynFlqIxmLC+vimUko98T2fF8DaOrUws5r7sdUffY+qaFD9cVHs6DljtqX3tKm
+         Q1GGNjfG2gjGvlMxL/z3cOWnEy0qSoimn4A0Nqqb8/cHx9hAgorP1XJZ1hnu+VkQzfCa
+         ENyqZNWopafq/JeUzNSt+i8lfoO6ho7Y5PWUDY/d1Zh/qpTQmhyJ1WoYn28TEoe7H0kK
+         ogVQ==
+X-Gm-Message-State: AAQBX9emVpNgf6Jnp8PQvRIMU1wN16doi4gVCsI0UN2POcLeU+hw9rsh
+        1CB8dEkGg9t2BBGEemDjD2N4VFrdOJFbDkxMIOkr3k5dzQY=
+X-Google-Smtp-Source: AKy350bh1X7xFKWCTrihOOrhWm8fQ027nIW30/WTNM88fg4Z69ZPIbcPimJEXqGPvRY2ztrkf0qLboE6/fTp+jPHPoI=
+X-Received: by 2002:a2e:a0d2:0:b0:2a8:bbd9:1a07 with SMTP id
+ f18-20020a2ea0d2000000b002a8bbd91a07mr632315ljm.2.1681617151564; Sat, 15 Apr
+ 2023 20:52:31 -0700 (PDT)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 15 Apr 2023 22:52:20 -0500
+Message-ID: <CAH2r5mumQ=wg8H4d+vYGZZGPz1cbK5+LOeCoBxo+VbYta05QBA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fix
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 15 Apr 2023 18:58:39 -0500:
+Please pull the following changes since commit
+09a9639e56c01c7a00d6c0ca63f4c7c41abe075d:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.3-rc6-smb311-client-negcontext-fix
+  Linux 6.3-rc6 (2023-04-09 11:15:57 -0700)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3e7bb4f2461710b70887704af7f175383251088e
+are available in the Git repository at:
 
-Thank you!
+  git://git.samba.org/ksmbd.git tags/6.3-rc6-ksmbd-server-fix
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+for you to fetch changes up to e7067a446264a7514fa1cfaa4052cdb6803bc6a2:
+
+  ksmbd: avoid out of bounds access in decode_preauth_ctxt()
+(2023-04-13 14:17:32 -0500)
+
+----------------------------------------------------------------
+smb311 server preauth integrity negotiate context parsing fix
+(check for out of bounds access)
+
+----------------------------------------------------------------
+David Disseldorp (1):
+      ksmbd: avoid out of bounds access in decode_preauth_ctxt()
+
+--Please pull the following changes since commit
+09a9639e56c01c7a00d6c0ca63f4c7c41abe075d:
+
+  Linux 6.3-rc6 (2023-04-09 11:15:57 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/6.3-rc6-ksmbd-server-fix
+
+for you to fetch changes up to e7067a446264a7514fa1cfaa4052cdb6803bc6a2:
+
+  ksmbd: avoid out of bounds access in decode_preauth_ctxt()
+(2023-04-13 14:17:32 -0500)
+
+----------------------------------------------------------------
+smb311 server preauth integrity negotiate context parsing fix
+(check for out of bounds access)
+
+----------------------------------------------------------------
+David Disseldorp (1):
+      ksmbd: avoid out of bounds access in decode_preauth_ctxt()
+
+ fs/ksmbd/smb2pdu.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+Thanks,
+
+Steve
