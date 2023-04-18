@@ -2,84 +2,132 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA895C77B76
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Apr 2023 19:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B93CDC6FD18
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Apr 2023 22:41:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbjDQT4q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Apr 2023 15:56:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36472 "EHLO
+        id S230153AbjDRWlR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Apr 2023 18:41:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230239AbjDQT4o (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Apr 2023 15:56:44 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE1C59E8
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Apr 2023 12:56:07 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2a776fb84a3so16028761fa.1
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Apr 2023 12:56:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681761365; x=1684353365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UIXNyEqz8w4LSqLZEAM1j0vMQNbtYnPf8a4T7Be+F6A=;
-        b=LbhgV47v5DeDLStzUNHTowfrzbnuWObE+snZvIffz59PHRoAP0Ke2qHoDgqBrJ2mtX
-         tnNWIFrykv58Km/6uAzZdnZwdXWYksIdr3ZTyesCKlG3Mlq4edQ3p4R6mDHvOdaRMAWh
-         eaa1yY/O9rFLZXLFjl5qFUc03/C984TIY43B5KiDvuZdVcjsE3Cic+bfQ6YQNF1rLEtY
-         ciWmOYhq0mcHuou4JK0EG59Mbcj2SZLNFxmiVdE+CN8d85rlp7J5Y4kdp3TCVrrAuCPo
-         x4wGRCocfCZ1YB0jaKHLjlOiugujogBkd3y/4V3z9NYDpWPQyWfkp4hpirl0xAsY2yIP
-         Z1sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681761365; x=1684353365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UIXNyEqz8w4LSqLZEAM1j0vMQNbtYnPf8a4T7Be+F6A=;
-        b=LTzmQfPKA9Cu01Q3sH6zbIpcOwrGfRJKhBWly9Gii8Lg0wdxF/nR3DKaihwQEqICuc
-         1lTyHpLwFZO2x8PJbLtCgcAZFFUP9/z0wVt9M2aP5mtJXku3VYWK+uHoO1qzzPoimeUZ
-         x+yQes3nHYY7Rm+VebQ6w6OVnGz5HT3OJGHJr1IGR2otflHDdRj0mP36CPR5t2z235if
-         72jPKeyTEmN9xKN0eSChmMiFTTk5ZTWIduwr09qiP1+mIOjk8PclwbhpB2zjIv1Yhalb
-         QgtRaS65Tg7E56QQAQJE3q7YLHxh/s0unuIXluMWuhTjquc9hKc3vcgKk7yOTdHp9um5
-         0zYg==
-X-Gm-Message-State: AAQBX9eQSNsSt+wy5vx0TFligZ1A0E9XXZ15COPOItuAqIczX4WSRlPY
-        xER5Cjrqr4BobQP5sjZ29Y7pGl8nm79BMvycyrNuaWDaCGU=
-X-Google-Smtp-Source: AKy350bDxfO8SHE9mYSd2SQGSBQtt4MTqiSDio1XU3Z0dX8psbrfbKRrhygbjNy1Q34OROxaFZcwErCdh9Qi2chpq0Y=
-X-Received: by 2002:ac2:528b:0:b0:4ec:9350:e57f with SMTP id
- q11-20020ac2528b000000b004ec9350e57fmr2607072lfm.7.1681761365209; Mon, 17 Apr
- 2023 12:56:05 -0700 (PDT)
+        with ESMTP id S232772AbjDRWlJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Apr 2023 18:41:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B3D9745
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Apr 2023 15:40:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681857613;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=88WLzUQfui8MOyB5NEFokobl+41u8GpMubwgrVgH7UQ=;
+        b=KFcsdEbaMDJvabIpradp/yHzVpp+HxP+Fx1Nb7wLkMo5W/WEeFxJ2Wf1WRm41QFjCzFgE7
+        lthJsVkKC1dSGaZCwJbHz5FW56TgmGCgXcW7gWLF2tYhsp3zzqSZc92WsZfOX2dCOydtub
+        mE8sSFcMHUPACu8VOqR5sJhHnUbzoyM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-463-ld5D_CZpP5eRYdorAN4ycA-1; Tue, 18 Apr 2023 18:40:09 -0400
+X-MC-Unique: ld5D_CZpP5eRYdorAN4ycA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 290F3101A531;
+        Tue, 18 Apr 2023 22:40:09 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EE26540BC798;
+        Tue, 18 Apr 2023 22:40:07 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Steve French <smfrench@gmail.com>
+cc:     dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Long Li <longli@microsoft.com>,
+        Enzo Matsumiya <ematsumiya@suse.de>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix unbuffered read
 MIME-Version: 1.0
-References: <82da2a3dc9704b2cecb51f00e93092c22a309a6d.camel@gmail.com>
-In-Reply-To: <82da2a3dc9704b2cecb51f00e93092c22a309a6d.camel@gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 17 Apr 2023 14:55:52 -0500
-Message-ID: <CAH2r5ms4pdFMGEuuMRuGu-iL2Xqqb5sNoFgxd85M8p+cm2fg9g@mail.gmail.com>
-Subject: Re: informazione
-To:     cristiano forestan <cristiano.forestan@gmail.com>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Date:   Tue, 18 Apr 2023 23:40:07 +0100
+Message-ID: <1692048.1681857607@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-There are multiple tutorials out there, here is an example from Ubuntu
-of setting up the server:
 
-https://phoenixnap.com/kb/ubuntu-samba
+If read() is done in an unbuffered manner, such that, say,
+cifs_strict_readv() goes through cifs_user_readv() and thence
+__cifs_readv(), it doesn't recognise the EOF and keeps indicating to
+userspace that it returning full buffers of data.
 
-here is one example of accessing it from Linux:
-https://www.chrisrmiller.com/mount-samba-share-in-ubuntu/
-and more examples:
-https://www.privex.io/articles/how-to-mount-an-smb-share-setup-an-smb-serve=
-r-on-linux/
+This is due to ctx->iter being advanced in cifs_send_async_read() as the
+buffer is split up amongst a number of rdata objects.  The iterator count
+is then used in collect_uncached_read_data() in the non-DIO case to set the
+total length read - and thus the return value of sys_read().  But since the
+iterator normally gets used up completely during splitting, ctx->total_len
+gets overridden to the full amount.
 
-On Mon, Apr 17, 2023 at 2:15=E2=80=AFPM cristiano forestan
-<cristiano.forestan@gmail.com> wrote:
->
-> come posso iniziare usare samba per metterci file?
->
+However, prior to that in collect_uncached_read_data(), we've gone through
+the list of rdatas and added up the amount of data we actually received
+(which we then throw away).
 
+Fix this by removing the bit that overrides the amount read in the non-DIO
+case and just going with the total added up in the aforementioned loop.
 
---=20
-Thanks,
+This was observed by mounting a cifs share with multiple channels, e.g.:
 
-Steve
+	mount //192.168.6.1/test /test/ -o user=3Dshares,pass=3D...,max_channels=
+=3D6
+
+and then reading a 1MiB file on the share:
+
+	strace cat /xfstest.test/1M  >/dev/null
+
+Through strace, the same data can be seen being read again and again.
+=20=20=20=20
+Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rather =
+than a page list")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <smfrench@gmail.com>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+cc: Long Li <longli@microsoft.com>
+cc: Enzo Matsumiya <ematsumiya@suse.de>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
+---
+ fs/cifs/file.c |    4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 321f9b7c84c9..f8877dc91cc5 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -4010,7 +4010,6 @@ static void
+ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+ {
+ 	struct cifs_readdata *rdata, *tmp;
+-	struct iov_iter *to =3D &ctx->iter;
+ 	struct cifs_sb_info *cifs_sb;
+ 	int rc;
+=20
+@@ -4076,9 +4075,6 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+ 		kref_put(&rdata->refcount, cifs_readdata_release);
+ 	}
+=20
+-	if (!ctx->direct_io)
+-		ctx->total_len =3D ctx->len - iov_iter_count(to);
+-
+ 	/* mask nodata case */
+ 	if (rc =3D=3D -ENODATA)
+ 		rc =3D 0;
+
