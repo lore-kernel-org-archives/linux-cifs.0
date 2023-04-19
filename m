@@ -2,47 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B93CDC6FD18
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Apr 2023 22:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BED9C77B7C
+	for <linux-cifs@archiver.kernel.org>; Wed, 19 Apr 2023 02:16:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbjDRWlR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Apr 2023 18:41:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60720 "EHLO
+        id S229598AbjDSCQ6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Apr 2023 22:16:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232772AbjDRWlJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Apr 2023 18:41:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B3D9745
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Apr 2023 15:40:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681857613;
+        with ESMTP id S231159AbjDSCQ5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Apr 2023 22:16:57 -0400
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3609D2681;
+        Tue, 18 Apr 2023 19:16:53 -0700 (PDT)
+Message-ID: <03d46708ca8adaf2fe98689e04c98541.pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1681870610;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=88WLzUQfui8MOyB5NEFokobl+41u8GpMubwgrVgH7UQ=;
-        b=KFcsdEbaMDJvabIpradp/yHzVpp+HxP+Fx1Nb7wLkMo5W/WEeFxJ2Wf1WRm41QFjCzFgE7
-        lthJsVkKC1dSGaZCwJbHz5FW56TgmGCgXcW7gWLF2tYhsp3zzqSZc92WsZfOX2dCOydtub
-        mE8sSFcMHUPACu8VOqR5sJhHnUbzoyM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-463-ld5D_CZpP5eRYdorAN4ycA-1; Tue, 18 Apr 2023 18:40:09 -0400
-X-MC-Unique: ld5D_CZpP5eRYdorAN4ycA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 290F3101A531;
-        Tue, 18 Apr 2023 22:40:09 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EE26540BC798;
-        Tue, 18 Apr 2023 22:40:07 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Steve French <smfrench@gmail.com>
-cc:     dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xwuO365E3uWJjHSCA6WvcUrrebXU0puVdAVof+NAIBk=;
+        b=prf48IjvaTQG15ExjQ/iMTOUBexRi1XKhmRMZWqjIfwDnPeBw5B81xfseexaew9Q1TfKtv
+        eZ7CljqWYTnugydnfn9aUtYvvl4dW7wIIMUqgg8FUbfW/POzf1ryjQVdJv/hyQTNM63Ag6
+        ygygP9aIImvP6OGEv2/oykEvw1zfpSozjFkrMzbjkPxkqkLXg8N6E6P2Kr3QvwyiksAk04
+        UBDW0NpTKc2dSAk8v6Tb1Gy5gadJbU92BgsZB35Ha+IiknBdwXWO4hq6aclO4eMZP97hvS
+        IYmnhZvSmxbclMK9UxJDPCsoS0j2j/1iVwaby70TV941cWK4HmWrs68ouhQuUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1681870610;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xwuO365E3uWJjHSCA6WvcUrrebXU0puVdAVof+NAIBk=;
+        b=CuhbOYftU+3lzams5OIgKou8sm6usykvy8iEAiiO0vhMDTt40Tb+feXmEV3jyMFTNwm2Zi
+        rN0tcEhXYzdcBGbXc8P8Ug+KR2iqjVIY+noKPYBvEO2A+71B/uowYCBCfTBTsVpKuM5a9D
+        cCCpF1OwGULVDgT3Y3ti78l9gFJ3643mL27/8Ym/sAMeEBFuUaOJ/bylZKD/j5Vb16rz7U
+        zWp2BefO4C/kFClXizk/HLhmTPPIPjQ6xubcRRhjMOD/fzCyq8nKeyDnKx8FZlYvw1T41e
+        eb4RAQXYRqtsI3Zv7zvSpnKWQAjtnPpSoyTpcZAqVcPJKEmcphOR0ThdaHYHww==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1681870610; a=rsa-sha256;
+        cv=none;
+        b=izNevIs0sGaspWAvKtlZKGm8XHoRXRhjpwxfC36SVd//nNpIKJlJoUrHAeapwgyQRFjwe0
+        Itnk5ePF+56GcN6KX9YTvzM93EDVCnIzUiKlvn5QZTSO25tcr3XTNvOiA6CLRMdeayYoDJ
+        3JYPFWXWqhjYAuQtRMSEizFY/t+CY0MAvLmevReQvXBIDUUMPY7jz7f92FSu+4FhYMWwbs
+        8RYspDbxN5vmhXiAJ/yxQwD3hafu49ledalfHUg+4EiK+sOVVzKC3OVZyU2fKUpQVLHiwj
+        UXiwn7LTGgNwMMrLRngmF26yVWrATDyzKu6NoHGEILMYssC5yzG51ArwZ7PH3A==
+From:   Paulo Alcantara <pc@manguebit.com>
+To:     David Howells <dhowells@redhat.com>,
+        Steve French <smfrench@gmail.com>
+Cc:     dhowells@redhat.com,
         =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
         Long Li <longli@microsoft.com>,
         Enzo Matsumiya <ematsumiya@suse.de>,
@@ -50,84 +60,65 @@ cc:     dhowells@redhat.com, Paulo Alcantara <pc@manguebit.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix unbuffered read
+Subject: Re: [PATCH] cifs: Fix unbuffered read
+In-Reply-To: <1692048.1681857607@warthog.procyon.org.uk>
+References: <1692048.1681857607@warthog.procyon.org.uk>
+Date:   Tue, 18 Apr 2023 23:16:45 -0300
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 18 Apr 2023 23:40:07 +0100
-Message-ID: <1692048.1681857607@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+David Howells <dhowells@redhat.com> writes:
 
-If read() is done in an unbuffered manner, such that, say,
-cifs_strict_readv() goes through cifs_user_readv() and thence
-__cifs_readv(), it doesn't recognise the EOF and keeps indicating to
-userspace that it returning full buffers of data.
-
-This is due to ctx->iter being advanced in cifs_send_async_read() as the
-buffer is split up amongst a number of rdata objects.  The iterator count
-is then used in collect_uncached_read_data() in the non-DIO case to set the
-total length read - and thus the return value of sys_read().  But since the
-iterator normally gets used up completely during splitting, ctx->total_len
-gets overridden to the full amount.
-
-However, prior to that in collect_uncached_read_data(), we've gone through
-the list of rdatas and added up the amount of data we actually received
-(which we then throw away).
-
-Fix this by removing the bit that overrides the amount read in the non-DIO
-case and just going with the total added up in the aforementioned loop.
-
-This was observed by mounting a cifs share with multiple channels, e.g.:
-
-	mount //192.168.6.1/test /test/ -o user=3Dshares,pass=3D...,max_channels=
+> If read() is done in an unbuffered manner, such that, say,
+> cifs_strict_readv() goes through cifs_user_readv() and thence
+> __cifs_readv(), it doesn't recognise the EOF and keeps indicating to
+> userspace that it returning full buffers of data.
+>
+> This is due to ctx->iter being advanced in cifs_send_async_read() as the
+> buffer is split up amongst a number of rdata objects.  The iterator count
+> is then used in collect_uncached_read_data() in the non-DIO case to set t=
+he
+> total length read - and thus the return value of sys_read().  But since t=
+he
+> iterator normally gets used up completely during splitting, ctx->total_len
+> gets overridden to the full amount.
+>
+> However, prior to that in collect_uncached_read_data(), we've gone through
+> the list of rdatas and added up the amount of data we actually received
+> (which we then throw away).
+>
+> Fix this by removing the bit that overrides the amount read in the non-DIO
+> case and just going with the total added up in the aforementioned loop.
+>
+> This was observed by mounting a cifs share with multiple channels, e.g.:
+>
+> 	mount //192.168.6.1/test /test/ -o user=3Dshares,pass=3D...,max_channels=
 =3D6
+>
+> and then reading a 1MiB file on the share:
+>
+> 	strace cat /xfstest.test/1M  >/dev/null
+>
+> Through strace, the same data can be seen being read again and again.
+>=20=20=20=20=20
+> Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rathe=
+r than a page list")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <smfrench@gmail.com>
+> cc: Paulo Alcantara <pc@manguebit.com>
+> cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> cc: Long Li <longli@microsoft.com>
+> cc: Enzo Matsumiya <ematsumiya@suse.de>
+> cc: Shyam Prasad N <nspmangalore@gmail.com>
+> cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cifs@vger.kernel.org
+> ---
+>  fs/cifs/file.c |    4 ----
+>  1 file changed, 4 deletions(-)
 
-and then reading a 1MiB file on the share:
-
-	strace cat /xfstest.test/1M  >/dev/null
-
-Through strace, the same data can be seen being read again and again.
-=20=20=20=20
-Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rather =
-than a page list")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <smfrench@gmail.com>
-cc: Paulo Alcantara <pc@manguebit.com>
-cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
-cc: Long Li <longli@microsoft.com>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
----
- fs/cifs/file.c |    4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 321f9b7c84c9..f8877dc91cc5 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -4010,7 +4010,6 @@ static void
- collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- {
- 	struct cifs_readdata *rdata, *tmp;
--	struct iov_iter *to =3D &ctx->iter;
- 	struct cifs_sb_info *cifs_sb;
- 	int rc;
-=20
-@@ -4076,9 +4075,6 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
- 		kref_put(&rdata->refcount, cifs_readdata_release);
- 	}
-=20
--	if (!ctx->direct_io)
--		ctx->total_len =3D ctx->len - iov_iter_count(to);
--
- 	/* mask nodata case */
- 	if (rc =3D=3D -ENODATA)
- 		rc =3D 0;
-
+Acked-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
