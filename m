@@ -2,70 +2,136 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CD5C7618E
-	for <linux-cifs@archiver.kernel.org>; Fri, 21 Apr 2023 07:26:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE534C7618E
+	for <linux-cifs@archiver.kernel.org>; Fri, 21 Apr 2023 18:39:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229533AbjDUH00 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 21 Apr 2023 03:26:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35918 "EHLO
+        id S231535AbjDUSjJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 21 Apr 2023 14:39:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230317AbjDUH0Y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Apr 2023 03:26:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9672726B5;
-        Fri, 21 Apr 2023 00:26:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 33ECD6116A;
-        Fri, 21 Apr 2023 07:26:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94535C433D2;
-        Fri, 21 Apr 2023 07:26:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682061978;
-        bh=XIZwQxSmdbbbE9ngb3dPfpaMLJHg9URk2JAPiW2tKJ8=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=W6vmAzOCaaQfObpUCun/ED6tnpiS9Dt7t3oBPoBVWgLSkcxztcUdi0xfqef3yUuge
-         qnL3rWrA23bdNXj9FI21jJ/NVr9c/rN5FtRsHOleiqdmX8OLddTw90nBp/ys6+bKg/
-         n4aN4J40O7CkULWTdCl2dLiy1u/rB0dNQAua5wOik4Pvsm0zEh6BU7sseMI89zWMvr
-         YJScra+eMCsFW5kNpqRMnEuo6eCes23XnsSFyyBAH+puhW3zCxyXiG/caQot8ZfRi9
-         zKPrQRX8vT0CLSWNpZytN5CA1CITYqPAB5cHGBiXrP7DXsF0bfSIcdnlZs/GOOm0CH
-         YHupQKPkXdCKg==
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-187b70ab997so9555522fac.0;
-        Fri, 21 Apr 2023 00:26:18 -0700 (PDT)
-X-Gm-Message-State: AAQBX9eOihiSOvelv21E6r/QEa86EsL1SCNdtl17nmlf1hbB8iadLGtG
-        z1O6TJZcVPTAjEEkBchc2d1X/RWYZEd5Imaq0bM=
-X-Google-Smtp-Source: AKy350Zn75WAE3Mv5D521UTq38M5bum7e02nfnK8oR1L8O1x7D5DHFpSHOeaqNazXBktHEiqzu8w6NdSOzj+LeFKIfI=
-X-Received: by 2002:a05:6820:1acf:b0:542:2321:658b with SMTP id
- bu15-20020a0568201acf00b005422321658bmr1030454oob.2.1682061977767; Fri, 21
- Apr 2023 00:26:17 -0700 (PDT)
+        with ESMTP id S232545AbjDUSjH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Apr 2023 14:39:07 -0400
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9921FF3;
+        Fri, 21 Apr 2023 11:39:06 -0700 (PDT)
+Message-ID: <b6dfbc63d89715a1298117bc0afeb436.pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1682102343;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xu/A0sGZABzTtCZ5T1EI8r0dy3MZmrDAsQUyPMNdKJ8=;
+        b=od/6EJKJcn1yXwsU4vEpxhv++WsIFIwBxgLe2VSqk1MeH0oeGEKs2vgK7+7yh2ZmBNxZue
+        tV9O3qB7eKPXoQfLxH50blDVQej7/vWfU1kKHPdQpPHcmk7TpESqT4fE3ZUCHNcEB5jriz
+        Cbk7SPDRI5PjX7n1IcWNOoUmK5PqcZxllosU+sY1xuUxvVhsYWFvRZOIyQv8B+kAuCWh6m
+        g98Pk8NC6kGphI5St5683Rj6hX8X0rRBdcuONOx+N+xxVNHG7e0Dg/60fUC4XmHDXK16eh
+        cbHxZ+2dDlnBGStncBw8d00RFYq549Fts6wYfo//+UewYhNpOsoCOZor7tyPbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1682102343;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xu/A0sGZABzTtCZ5T1EI8r0dy3MZmrDAsQUyPMNdKJ8=;
+        b=fXzXe3Gu1UkMJVoUdfLFJoMA8wATq2vY3FLKJh0yRyRNYi0ofDuN8Qqp6piSG8f9dxllsM
+        rnQggNgCylYnLvsTS3lHYY+k59Kdvcv8vAONUt8aTQGsXAEikJX+CwJoqpHMcpEJlOWii3
+        ZTffFHRn0VD3zXIMwEzdLgRIxCYEEG33HFA6gTc5Dd8ab85xKn9/bV+fUJ2ExLBwJPNiPb
+        mUO4VdOtvJ0yXsWjN5jLfnGv6W8af6ahk4qESjXFJmaAul5Sv4ui5uBe1GLNMvUxTXCCrO
+        dADfD+QWdM6jqgKz/T+mfWAi3r4Zg6Xc6iEoUvqVkYJET+cssJ7JUHBC33Bk2w==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1682102343; a=rsa-sha256;
+        cv=none;
+        b=CcghgD5TFQ9bquEGIUo3Cd1UvctPVoaIo8l501jebbUbUY7XjxeXPssmjZ4SHKgK4XcXLB
+        s2qOzvI7KBOT2PQ/lMVuy9XZJ8SI4/BnCHiSOgGsx63m2VPQXS3ntZqqqoQ+8lmscrOwbT
+        EcvDRl2khXG8z4Tum/Yz8AwKcJBXnvfkeq53LsT8DalBiZE7PiUuZfM3Tfi4uc6BFmCiRm
+        4ARwfkjpYJe4mUxvtg0RtDsQy+2ChxZwr0A1RXrC8zmiohxd/0JvGI7ibX4PPsA1n7hySX
+        jdwOKzsgJuZOHmEc1Ms5wH12+eykvcKU8A802psCx/7AIAcb8+YqRSqH078E0Q==
+From:   Paulo Alcantara <pc@manguebit.com>
+To:     Tejun Heo <tj@kernel.org>, jiangshanlai@gmail.com
+Cc:     linux-kernel@vger.kernel.org, kernel-team@meta.com,
+        Tejun Heo <tj@kernel.org>, Steve French <sfrench@samba.org>,
+        Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: Re: [PATCH 17/22] cifs: Use alloc_ordered_workqueue() to create
+ ordered workqueues
+In-Reply-To: <20230421025046.4008499-18-tj@kernel.org>
+References: <20230421025046.4008499-1-tj@kernel.org>
+ <20230421025046.4008499-18-tj@kernel.org>
+Date:   Fri, 21 Apr 2023 15:38:57 -0300
 MIME-Version: 1.0
-Received: by 2002:ac9:53dd:0:b0:4d3:d9bf:b562 with HTTP; Fri, 21 Apr 2023
- 00:26:17 -0700 (PDT)
-In-Reply-To: <20230421023500.GY3390869@ZenIV>
-References: <20230315223435.5139-1-linkinjeon@kernel.org> <20230421023500.GY3390869@ZenIV>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 21 Apr 2023 16:26:17 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_Swxd4so5MHt8L5sm8tH=DYC2A6O5609=V3b9Ri6L5Zg@mail.gmail.com>
-Message-ID: <CAKYAXd_Swxd4so5MHt8L5sm8tH=DYC2A6O5609=V3b9Ri6L5Zg@mail.gmail.com>
-Subject: Re: [PATCH v8 0/3] ksmbd patches included vfs changes
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        brauner@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-04-21 11:35 GMT+09:00, Al Viro <viro@zeniv.linux.org.uk>:
-> On Thu, Mar 16, 2023 at 07:34:32AM +0900, Namjae Jeon wrote:
->
-> OK...  Let's do it that way: I put the first two commits into
-> never-rebased branch (work.lock_rename_child), then you pull
-> it into your tree (and slap the third commit on top of that)
-> while I merge it into #for-next.
-Okay. Can I add your acked-by in third patch ?
+Tejun Heo <tj@kernel.org> writes:
 
-Thank you!
+> BACKGROUND
+> ==========
 >
+> When multiple work items are queued to a workqueue, their execution order
+> doesn't match the queueing order. They may get executed in any order and
+> simultaneously. When fully serialized execution - one by one in the queueing
+> order - is needed, an ordered workqueue should be used which can be created
+> with alloc_ordered_workqueue().
+>
+> However, alloc_ordered_workqueue() was a later addition. Before it, an
+> ordered workqueue could be obtained by creating an UNBOUND workqueue with
+> @max_active==1. This originally was an implementation side-effect which was
+> broken by 4c16bd327c74 ("workqueue: restore WQ_UNBOUND/max_active==1 to be
+> ordered"). Because there were users that depended on the ordered execution,
+> 5c0338c68706 ("workqueue: restore WQ_UNBOUND/max_active==1 to be ordered")
+> made workqueue allocation path to implicitly promote UNBOUND workqueues w/
+> @max_active==1 to ordered workqueues.
+>
+> While this has worked okay, overloading the UNBOUND allocation interface
+> this way creates other issues. It's difficult to tell whether a given
+> workqueue actually needs to be ordered and users that legitimately want a
+> min concurrency level wq unexpectedly gets an ordered one instead. With
+> planned UNBOUND workqueue updates to improve execution locality and more
+> prevalence of chiplet designs which can benefit from such improvements, this
+> isn't a state we wanna be in forever.
+>
+> This patch series audits all callsites that create an UNBOUND workqueue w/
+> @max_active==1 and converts them to alloc_ordered_workqueue() as necessary.
+>
+> WHAT TO LOOK FOR
+> ================
+>
+> The conversions are from
+>
+>   alloc_workqueue(WQ_UNBOUND | flags, 1, args..)
+>
+> to
+>
+>   alloc_ordered_workqueue(flags, args...)
+>
+> which don't cause any functional changes. If you know that fully ordered
+> execution is not ncessary, please let me know. I'll drop the conversion and
+> instead add a comment noting the fact to reduce confusion while conversion
+> is in progress.
+>
+> If you aren't fully sure, it's completely fine to let the conversion
+> through. The behavior will stay exactly the same and we can always
+> reconsider later.
+>
+> As there are follow-up workqueue core changes, I'd really appreciate if the
+> patch can be routed through the workqueue tree w/ your acks. Thanks.
+>
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Cc: Steve French <sfrench@samba.org>
+> Cc: Paulo Alcantara <pc@cjr.nz>
+> Cc: Ronnie Sahlberg <lsahlber@redhat.com>
+> Cc: Shyam Prasad N <sprasad@microsoft.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: linux-cifs@vger.kernel.org
+> Cc: samba-technical@lists.samba.org
+> ---
+>  fs/cifs/dfs_cache.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Acked-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
