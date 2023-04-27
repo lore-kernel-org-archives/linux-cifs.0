@@ -2,104 +2,121 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 095FBC77B60
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Apr 2023 03:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EF2C77B73
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Apr 2023 08:27:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242905AbjD0DJ1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 26 Apr 2023 23:09:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47092 "EHLO
+        id S243120AbjD0I1x (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Apr 2023 04:27:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242895AbjD0DJZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 Apr 2023 23:09:25 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 924F440DA
-        for <linux-cifs@vger.kernel.org>; Wed, 26 Apr 2023 20:09:23 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2a8dd1489b0so76919251fa.3
-        for <linux-cifs@vger.kernel.org>; Wed, 26 Apr 2023 20:09:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682564961; x=1685156961;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xf+gurgH4g455L2T8b5XNhCtdmfV7A+6I1FsTUYGsi0=;
-        b=JO+gP0AXlZLdtQi5MTNxY90WCF+JhjEwohXf8rLqa6rEheAdq4+UR8ECIun5mwrRKM
-         RQ+r2747TmE8z6WUPMivBwg1I9SJ+VJZX+ntwlh+OjOGumfKJfK1fbTQMLj9RiJT8jNd
-         ilFoOctmuXZ3ZJFNFyiMNmd+oweiLYJjuBjsQd3ZTrMhOGPiP+BUm07E/Ulc80qxuD/h
-         ZTdtSpDgciHtLWAFh9ABGAc5xnV1mSp2d4Tp1jRgGrZVlZgFMEKr5udq0d7fTGce3BLj
-         vHxJ/QyMicSn/FJuEQbdFIBo2hCAg9QMxsnt0QGzSfQevsf9IuwnWIa4Xcc74HZDi3li
-         fsag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682564961; x=1685156961;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xf+gurgH4g455L2T8b5XNhCtdmfV7A+6I1FsTUYGsi0=;
-        b=l0dE3otH2abjLZUoXAnEp4B6sHKqYARAvD3/4/qHiwLaIdBRyWQP0z2yigEh7Mzn2t
-         6rR/PfBr5qbnZkbEelf3X6iImXW0jSljQL9BThG37KV7IQwTGf2i3lXCLt+VzeBLdgm8
-         KDmHiIFHplAhLoBU0obUCcC7QEQsDetmbEpgOB02/dYMJo3WraMX8+AGGUYF3PqC+vW7
-         +ZbAq64nf8OPdRaKush2/Go/o+LnRqY1eYy3bzpZ7UkBFnTnfxpNWIXtH9OM30CSpFKy
-         CxpqNaIfgCNI8FUGahKTJPJ3ZOZ8eIySdGIxqGp+ozPlGwXyQXtwtLNLSIZwmndii7+a
-         wOBA==
-X-Gm-Message-State: AC+VfDxpTEOLdsUrcGiCoAc5xG58KNdMXZaRW/wnkNFuWCfLxtyQI1mG
-        XQPbxpCimF8SES85cd2kOXxXoWwQL6famnnBU+8YqNlmV5k=
-X-Google-Smtp-Source: ACHHUZ6I9t4sJOqos8UudO4WLVIPUXtG0QDDReJZBgnl1B1GeP0JUCkE57j718zcGxxIYtrXsi1Sl2QxVTQ7gm6psRM=
-X-Received: by 2002:ac2:5930:0:b0:4eb:1527:e2a7 with SMTP id
- v16-20020ac25930000000b004eb1527e2a7mr68250lfi.45.1682564961231; Wed, 26 Apr
- 2023 20:09:21 -0700 (PDT)
+        with ESMTP id S243100AbjD0I1s (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Apr 2023 04:27:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6369449D8
+        for <linux-cifs@vger.kernel.org>; Thu, 27 Apr 2023 01:27:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682584019;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=l6syDLggRiYjAStI+X0+pQOosy+q7w0nb4goYRoZwCE=;
+        b=XxewBXzUqqNRNlv2HJ5fNAyP7vEj1FfQjXVm58gYlXn+ww+LXifAjlnMIIM/X5rcXfz4tL
+        a6jJIjHKrHu424icHaLz8o3WAuJ/W73O/anteVV7cJpwG9tyRtUhabBNpSU11H2LkpkhRL
+        jdRF9tYOaRP6wegF1nobyeGjJI3HPx4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-372-dI1KEEV-NJOdULEjrzKuFQ-1; Thu, 27 Apr 2023 04:26:56 -0400
+X-MC-Unique: dI1KEEV-NJOdULEjrzKuFQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA5773C10C74;
+        Thu, 27 Apr 2023 08:26:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E1951121314;
+        Thu, 27 Apr 2023 08:26:54 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Steve French <sfrench@samba.org>
+cc:     dhowells@redhat.com, fstests@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Weird behaviour with cifs in xfstests shutdown tests
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 26 Apr 2023 22:09:10 -0500
-Message-ID: <CAH2r5msM9ayyLmijEWjTQJN_kn-gy_Jp5BQRRYuhc-KYqRqYoA@mail.gmail.com>
-Subject: [PATCH][CIFS] missing lock when updating session status
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000d3793505fa48ae50"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <971804.1682584013.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 27 Apr 2023 09:26:53 +0100
+Message-ID: <971805.1682584013@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000d3793505fa48ae50
-Content-Type: text/plain; charset="UTF-8"
+I'm seeing some failures running xfstests on cifs when it comes to tests t=
+hat
+do a shutdown of the filesystem, generic/392 for example:
 
-Coverity noted a place where we were not grabbing
-the ses_lock when setting (and checking) ses_status.
+generic/392       [failed, exit status 1]- output mismatch (see /root/xfst=
+ests-dev/results//smb3/generic/392.out.bad)
+    --- tests/generic/392.out   2021-05-25 13:27:50.000000000 +0100
+    +++ /root/xfstests-dev/results//smb3/generic/392.out.bad    2023-04-27=
+ 09:07:42.402657080 +0100
+    @@ -1,11 +1,67 @@
+     QA output created by 392
+     =3D=3D=3D=3D i_size 1024 test with fsync =3D=3D=3D=3D
+    +stat: cannot statx '/xfstest.scratch/testfile': Input/output error
+    +Before:  "b: 8194 s: 4195328 a: 2023-04-27 09:07:39.410675400 +0100 m=
+: 2023-04-27 09:07:39.410675400 +0100 c: 2023-04-27 09:07:39.410675400 +01=
+00"
+    +After : =
 
-Addresses-Coverity: 1536833 ("Data race condition (MISSING_LOCK)")
+    +rm: cannot remove '/xfstest.scratch/testfile': Input/output error
+     =3D=3D=3D=3D i_size 4096 test with fsync =3D=3D=3D=3D
+    ...
+    (Run 'diff -u /root/xfstests-dev/tests/generic/392.out /root/xfstests-=
+dev/results//smb3/generic/392.out.bad'  to see the entire diff)
 
+The problem appears to be that the CIFS_MOUNT_SHUTDOWN persists if there's
+another cifs mount from the same server present.  So in generic/392 it doe=
+s:
 
--- 
-Thanks,
+	before=3D`stat "$stat_opt" $testfile`
 
-Steve
+	$XFS_IO_PROG -c "$sync_mode" $testfile | _filter_xfs_io
+	_scratch_shutdown | tee -a $seqres.full
+	_scratch_cycle_mount
 
---000000000000d3793505fa48ae50
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-missing-lock-when-updating-session-status.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-missing-lock-when-updating-session-status.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lgyjq48c0>
-X-Attachment-Id: f_lgyjq48c0
+	after=3D`stat "$stat_opt" $testfile`
 
-RnJvbSAzOTBjOTBjMjkyOGEzM2YyNjMyZTlkNjY4Y2QzYjViNzY5YzliMWU5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFdlZCwgMjYgQXByIDIwMjMgMjI6MDE6MzEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBtaXNzaW5nIGxvY2sgd2hlbiB1cGRhdGluZyBzZXNzaW9uIHN0YXR1cwoKQ292ZXJpdHkg
-bm90ZWQgYSBwbGFjZSB3aGVyZSB3ZSB3ZXJlIG5vdCBncmFiYmluZwp0aGUgc2VzX2xvY2sgd2hl
-biBzZXR0aW5nIChhbmQgY2hlY2tpbmcpIHNlc19zdGF0dXMuCgpBZGRyZXNzZXMtQ292ZXJpdHk6
-IDE1MzY4MzMgKCJEYXRhIHJhY2UgY29uZGl0aW9uIChNSVNTSU5HX0xPQ0spIikKU2lnbmVkLW9m
-Zi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMv
-Y29ubmVjdC5jIHwgNSArKysrLQogMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgMSBk
-ZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25u
-ZWN0LmMKaW5kZXggMWNiYjkwNTg3OTk1Li5jYzUzOGVkNjFiYzAgMTAwNjQ0Ci0tLSBhL2ZzL2Np
-ZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC0xOTE2LDE5ICsxOTE2LDIy
-IEBAIHZvaWQgY2lmc19wdXRfc21iX3NlcyhzdHJ1Y3QgY2lmc19zZXMgKnNlcykKIAkvKiBzZXNf
-Y291bnQgY2FuIG5ldmVyIGdvIG5lZ2F0aXZlICovCiAJV0FSTl9PTihzZXMtPnNlc19jb3VudCA8
-IDApOwogCisJc3Bpbl9sb2NrKCZzZXMtPnNlc19sb2NrKTsKIAlpZiAoc2VzLT5zZXNfc3RhdHVz
-ID09IFNFU19HT09EKQogCQlzZXMtPnNlc19zdGF0dXMgPSBTRVNfRVhJVElORzsKIAogCWNpZnNf
-ZnJlZV9pcGMoc2VzKTsKIAogCWlmIChzZXMtPnNlc19zdGF0dXMgPT0gU0VTX0VYSVRJTkcgJiYg
-c2VydmVyLT5vcHMtPmxvZ29mZikgeworCQlzcGluX3VubG9jaygmc2VzLT5zZXNfbG9jayk7CiAJ
-CXhpZCA9IGdldF94aWQoKTsKIAkJcmMgPSBzZXJ2ZXItPm9wcy0+bG9nb2ZmKHhpZCwgc2VzKTsK
-IAkJaWYgKHJjKQogCQkJY2lmc19zZXJ2ZXJfZGJnKFZGUywgIiVzOiBTZXNzaW9uIExvZ29mZiBm
-YWlsdXJlIHJjPSVkXG4iLAogCQkJCV9fZnVuY19fLCByYyk7CiAJCV9mcmVlX3hpZCh4aWQpOwot
-CX0KKwl9IGVsc2UKKwkJc3Bpbl91bmxvY2soJnNlcy0+c2VzX2xvY2spOwogCiAJc3Bpbl9sb2Nr
-KCZjaWZzX3RjcF9zZXNfbG9jayk7CiAJbGlzdF9kZWxfaW5pdCgmc2VzLT5zbWJfc2VzX2xpc3Qp
-OwotLSAKMi4zNC4xCgo=
---000000000000d3793505fa48ae50--
+which cycles the *scratch* mount, but leaves the test mount still mounted =
+and
+then the 'after' stat fails with EIO.
+
+Testing this by hand:
+
+  mount //192.168.6.1/scratch /xfstest.scratch/ -o user=3Dshares,pass=3D..=
+.;\
+  touch /xfstest.scratch/testfile; \
+  stat /xfstest.scratch/testfile; \
+  ./src/godown /xfstest.scratch/; \
+  umount /xfstest.scratch/; \
+  mount //192.168.6.1/scratch /xfstest.scratch/ -o user=3Dshares,pass=3D..=
+.; \
+  stat /xfstest.scratch/testfile
+
+works, but will fail if I do:
+
+  mount //192.168.6.1/test /xfstest.test/ -o user=3Dshares,pass=3D...;
+
+first.
+
+Interestingly, the two mounts have different device numbers according to s=
+tat,
+so they would appear to have different superblocks.
+
+David
+
