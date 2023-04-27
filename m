@@ -2,140 +2,145 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C7A5C77B73
-	for <linux-cifs@archiver.kernel.org>; Thu, 27 Apr 2023 16:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B326C77B61
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 Apr 2023 16:06:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243284AbjD0QE0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 27 Apr 2023 12:04:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47198 "EHLO
+        id S243466AbjD0QGA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 Apr 2023 12:06:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243215AbjD0QE0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Apr 2023 12:04:26 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FBA30D3
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Apr 2023 09:04:25 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f0037de1d1so2857230e87.0
-        for <linux-cifs@vger.kernel.org>; Thu, 27 Apr 2023 09:04:24 -0700 (PDT)
+        with ESMTP id S243215AbjD0QF7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 Apr 2023 12:05:59 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E05A310EF
+        for <linux-cifs@vger.kernel.org>; Thu, 27 Apr 2023 09:05:57 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4f004cc54f4so2763131e87.3
+        for <linux-cifs@vger.kernel.org>; Thu, 27 Apr 2023 09:05:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682611463; x=1685203463;
+        d=gmail.com; s=20221208; t=1682611556; x=1685203556;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/VRUepJSl/YbHkY8psV+tEXRKigruPZKmUiC49TKFsE=;
-        b=RItHYfSlGmX9qfL6Eol46+hVdmoJdrLc6FczWyYECqBGPLxpgCxKrjcefxtX/p7eQ2
-         FT1XQXvI1jNAlWTxB9AZcRXJx/BgHCCQw42nSVLnhDqtfsj9LRgpaNfROUF6QQfj3niY
-         ZddF7jQIaBzRhBGCmlwyRr0fwYPTJQQrfPfR4yBxt9aHkxcvGyC3fpTUZWijtXi9dm8t
-         sapZdyKf16eIEItjR8KBCPXRc3yR08ZzvG19hx22dgmvvH0crrtPXwXAmn34OU4icy/m
-         X3neLooLwW/FdXSNcOpaEjb3uMn21a1OZshwYut9okhjpC+JNewwR8QoeoqyDNaErKeJ
-         30jw==
+        bh=lFuTTNboen+osXdL6MizTpPRmfSNeXAvH+okyPlYBek=;
+        b=gS8Q4Z8h0iJurUnXEciKk4t5T3xG5oExmICUmfabeyjj3/DZesbpsGF+ebBx/7hQ4E
+         VXqEEVQzVBRhBgdpxn1045kjO5jRLlilkUdRZsOLQka8OiwAFg4Zniz9YRE35Tk3ePGa
+         UZz6y7vlKBztSOKJmg8H6/mTWyPiY25+Hn0PVcywZBTjxvGpjdN37zPWIuvGqrP4mey6
+         i7RGT/oQCrZGxu5GWLn1BT9WFUC1FSxMHIy7wFUQ1yjjwTMJwadYrzqZ6kCpz97e3Hja
+         lBm5dr7vKI8JTEaOrl7gndvqOwPRIljWauufJosVsTRd11POsNU6mYedOUwqNsBx4VxO
+         ylsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682611463; x=1685203463;
+        d=1e100.net; s=20221208; t=1682611556; x=1685203556;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/VRUepJSl/YbHkY8psV+tEXRKigruPZKmUiC49TKFsE=;
-        b=EdH3nwl9tltxMlltYWFWaPZHQbI0LvBuMZZQooRWSjnu6O4ZozRlQyh0kPcqd2W8xI
-         Fd4O8lz6Ql71loUS4hR+pWxUhQirKHtJvAUj9aLU36f1w46Fnsu5n1hNqD5u1ENVOOND
-         /lKjGxyBecfXYRLp65KEUsE2bkN5To1qco4eqSgkEx+Jg33iwTwRAVpemduwMBzVoUnt
-         jYN1jT8l60Y9wcgdaP9MbjrYelxdaY51yilAPO9W2+QaRIz/KIdWchSjAvUhBG5ftxnK
-         CnxS0iZAnWVf0j4fAEm/xXm/OyuT9rbohKJjgSflWKU1NaOhK++y4zIOxgFeZJUqU048
-         7TnQ==
-X-Gm-Message-State: AC+VfDzKK2qEBWf3NQz445hwMcMOvqYH4Srax4GM7LiodgPn7AueBxzH
-        7b6qxdvH9vqoRc61XRF2V2b7qWUVQsD31dphO0Z4Ga0p
-X-Google-Smtp-Source: ACHHUZ5nLuUSh3nux1mPvcCZtqdFFLXXkSkX07a1juf3Ir+pyGq+ncdDaiD5LsAQ6Z+eFiByNoi4JOCocK94B+B25TE=
-X-Received: by 2002:ac2:4478:0:b0:4dd:af74:acef with SMTP id
- y24-20020ac24478000000b004ddaf74acefmr759877lfl.35.1682611463151; Thu, 27 Apr
- 2023 09:04:23 -0700 (PDT)
+        bh=lFuTTNboen+osXdL6MizTpPRmfSNeXAvH+okyPlYBek=;
+        b=blyceV236PyhwUX59bs/b8+6V+WBKT7t5JhhXRAku6vSRLsQE/3Iv9CRW5MVZ8WLvX
+         ukMd6p9iskvpqYrbG0Z9yHhcH24igYUuf0/9/p7nWgrXPblP5x1/BCqh9ogLDhpUck0l
+         C17vOTC+TOYMpV1E4L7MGb1jp8BQ/PlxJv2nRdZFpC3gZ7ApLASLCoEs0m+RQy0Qe8KT
+         GAGRqY6bkUN9PuuMV7Qm+yP57lLqTqgkYklIxZEFQO/ZSmrFRfc9/UY2gG7D1WswXGpN
+         TFUuBoFG1FHE1wNzDsfkusLhchob26/oEd5sMcLeve0YlV1sWdLjAvu+IE9tqa34RINX
+         aDDg==
+X-Gm-Message-State: AC+VfDz6ZcwKfojQuPHY8SP3OYIaHa3gE2NMWe3L8W5eByg/dbRr2YBm
+        MYoXW61ijIAZMM5mrmdVzSLJDvhvl5IKvnaeNvHfg0mG
+X-Google-Smtp-Source: ACHHUZ6d7f4+3goF5sCWawvJrliJVfLthE7RKMEMaHJvkstY26OqjOCdYITabzX1vZIMIXekmhcAu4onxIj8uOyI1KE=
+X-Received: by 2002:ac2:50cd:0:b0:4ef:ef67:65c9 with SMTP id
+ h13-20020ac250cd000000b004efef6765c9mr679343lfm.23.1682611555833; Thu, 27 Apr
+ 2023 09:05:55 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230426140516.12532-1-bharathsm.hsk@gmail.com>
-In-Reply-To: <20230426140516.12532-1-bharathsm.hsk@gmail.com>
+References: <20230420160646.291053-1-bharathsm.hsk@gmail.com> <a63523569c379a1ec13a1f352687cdcf.pc@manguebit.com>
+In-Reply-To: <a63523569c379a1ec13a1f352687cdcf.pc@manguebit.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 27 Apr 2023 11:04:11 -0500
-Message-ID: <CAH2r5mvzbg2U8dk_KbOQOuZoDmDJOx9X__jrBGg_RSNUJPe9_w@mail.gmail.com>
-Subject: Re: [PATCH] SMB3: Close deferred file handles in case of handle lease break
-To:     Bharath SM <bharathsm.hsk@gmail.com>
-Cc:     pc@cjr.nz, sfrench@samba.org, lsahlber@redhat.com,
-        sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
-        Bharath SM <bharathsm@microsoft.com>
+Date:   Thu, 27 Apr 2023 11:05:44 -0500
+Message-ID: <CAH2r5mvuteP+gczbW-pLtY1Prmt8iN0dL_Z__ydEWA0Lwep+GQ@mail.gmail.com>
+Subject: Re: [PATCH] SMB3: Add missing locks to protect deferred close file list
+To:     Paulo Alcantara <pc@manguebit.com>
+Cc:     Bharath SM <bharathsm.hsk@gmail.com>, pc@cjr.nz, sfrench@samba.org,
+        lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com,
+        linux-cifs@vger.kernel.org, Bharath SM <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively added to for-next pending testing
+added to cifs-2.6.git for-next now (with the 2 acked-bys)  that Fixes
+tag is there
 
-On Wed, Apr 26, 2023 at 9:15=E2=80=AFAM Bharath SM <bharathsm.hsk@gmail.com=
-> wrote:
+On Thu, Apr 20, 2023 at 1:08=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
+wrote:
 >
-> We should not cache deferred file handles if we dont have
-> handle lease on a file. And we should immediately close all
-> deferred handles in case of handle lease break.
+> Bharath SM <bharathsm.hsk@gmail.com> writes:
 >
-> Fixes: 9e31678fb403 ("SMB3: fix lease break timeout when multiple deferre=
-d close handles for the same file.")
-> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> ---
->  fs/cifs/file.c | 16 ++++++++++++++++
->  fs/cifs/misc.c |  2 +-
->  2 files changed, 17 insertions(+), 1 deletion(-)
+> > From: Bharath SM <bharathsm@microsoft.com>
+> >
+> > cifs_del_deferred_close function has a critical section which modifies
+> > the deferred close file list. We must acquire deferred_lock before
+> > calling cifs_del_deferred_close function.
+> >
+> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> > ---
+> >  fs/cifs/misc.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> > index a0d286ee723d..89bbc12e2ca7 100644
+> > --- a/fs/cifs/misc.c
+> > +++ b/fs/cifs/misc.c
+> > @@ -742,7 +742,10 @@ cifs_close_deferred_file(struct cifsInodeInfo *cif=
+s_inode)
+> >       list_for_each_entry(cfile, &cifs_inode->openFileList, flist) {
+> >               if (delayed_work_pending(&cfile->deferred)) {
+> >                       if (cancel_delayed_work(&cfile->deferred)) {
+> > +
 >
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 4d4a2d82636d..791a12575109 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -4886,6 +4886,8 @@ void cifs_oplock_break(struct work_struct *work)
->         struct TCP_Server_Info *server =3D tcon->ses->server;
->         int rc =3D 0;
->         bool purge_cache =3D false;
-> +       struct cifs_deferred_close *dclose;
-> +       bool is_deferred =3D false;
+> No need for this extra blank line.  Please remove the below ones as
+> well.
 >
->         wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
->                         TASK_UNINTERRUPTIBLE);
-> @@ -4921,6 +4923,20 @@ void cifs_oplock_break(struct work_struct *work)
->                 cifs_dbg(VFS, "Push locks rc =3D %d\n", rc);
+> With the "Fixes:" tag added as per Ronnie's suggestion,
 >
->  oplock_break_ack:
-> +       /*
-> +        * When oplock break is received and there are no active
-> +        * file handles but cached, then schedule deferred close immediat=
-ely.
-> +        * So, new open will not use cached handle.
-> +        */
-> +       spin_lock(&CIFS_I(inode)->deferred_lock);
-> +       is_deferred =3D cifs_is_deferred_close(cfile, &dclose);
-> +       spin_unlock(&CIFS_I(inode)->deferred_lock);
-> +
-> +       if (!CIFS_CACHE_HANDLE(cinode) && is_deferred &&
-> +                       cfile->deferred_close_scheduled && delayed_work_p=
-ending(&cfile->deferred)) {
-> +               cifs_close_deferred_file(cinode);
-> +       }
-> +
->         /*
->          * releasing stale oplock after recent reconnect of smb session u=
-sing
->          * a now incorrect file handle is not a data integrity issue but =
-do
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index 5f874e9c1554..0cfb46d7773c 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -757,7 +757,7 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs_i=
-node)
->         spin_unlock(&cifs_inode->open_file_lock);
+> Acked-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 >
->         list_for_each_entry_safe(tmp_list, tmp_next_list, &file_head, lis=
-t) {
-> -               _cifsFileInfo_put(tmp_list->cfile, true, false);
-> +               _cifsFileInfo_put(tmp_list->cfile, false, false);
->                 list_del(&tmp_list->list);
->                 kfree(tmp_list);
->         }
-> --
-> 2.34.1
->
+> > +                             spin_lock(&cifs_inode->deferred_lock);
+> >                               cifs_del_deferred_close(cfile);
+> > +                             spin_unlock(&cifs_inode->deferred_lock);
+> >
+> >                               tmp_list =3D kmalloc(sizeof(struct file_l=
+ist), GFP_ATOMIC);
+> >                               if (tmp_list =3D=3D NULL)
+> > @@ -773,7 +776,10 @@ cifs_close_all_deferred_files(struct cifs_tcon *tc=
+on)
+> >       list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+> >               if (delayed_work_pending(&cfile->deferred)) {
+> >                       if (cancel_delayed_work(&cfile->deferred)) {
+> > +
+> > +                             spin_lock(&CIFS_I(d_inode(cfile->dentry))=
+->deferred_lock);
+> >                               cifs_del_deferred_close(cfile);
+> > +                             spin_unlock(&CIFS_I(d_inode(cfile->dentry=
+))->deferred_lock);
+> >
+> >                               tmp_list =3D kmalloc(sizeof(struct file_l=
+ist), GFP_ATOMIC);
+> >                               if (tmp_list =3D=3D NULL)
+> > @@ -808,7 +814,10 @@ cifs_close_deferred_file_under_dentry(struct cifs_=
+tcon *tcon, const char *path)
+> >               if (strstr(full_path, path)) {
+> >                       if (delayed_work_pending(&cfile->deferred)) {
+> >                               if (cancel_delayed_work(&cfile->deferred)=
+) {
+> > +
+> > +                                     spin_lock(&CIFS_I(d_inode(cfile->=
+dentry))->deferred_lock);
+> >                                       cifs_del_deferred_close(cfile);
+> > +                                     spin_unlock(&CIFS_I(d_inode(cfile=
+->dentry))->deferred_lock);
+> >
+> >                                       tmp_list =3D kmalloc(sizeof(struc=
+t file_list), GFP_ATOMIC);
+> >                                       if (tmp_list =3D=3D NULL)
+> > --
+> > 2.34.1
+
 
 
 --=20
