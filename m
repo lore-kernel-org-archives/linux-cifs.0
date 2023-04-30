@@ -2,71 +2,117 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFCDC77B7C
-	for <linux-cifs@archiver.kernel.org>; Sat, 29 Apr 2023 18:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96039C77B73
+	for <linux-cifs@archiver.kernel.org>; Sun, 30 Apr 2023 15:35:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229894AbjD2ST3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 29 Apr 2023 14:19:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47178 "EHLO
+        id S229521AbjD3PfU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 30 Apr 2023 11:35:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229774AbjD2ST1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 29 Apr 2023 14:19:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B3B9F;
-        Sat, 29 Apr 2023 11:19:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5F23060B6B;
-        Sat, 29 Apr 2023 18:19:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AD4A4C433D2;
-        Sat, 29 Apr 2023 18:19:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682792365;
-        bh=8HDfUiZjrvUti/9Ci5CYxqlcQpcPcVdKxSLybQOJ1/c=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Pp/ubhqcsJx437DN1q0keIixF8iPP9qa6h5P2vDMGUcE93XFogT6mTR5QsCyFpsDQ
-         D/Jh21nth6YUH5Ll+SOGXdJ3IR5w52ep5+cLXCO5/FpcEGvZlElC9e0HdPf7/NTD4/
-         +Wg847xT0Luus5pH/evc3js8FfP7RAXNM8KODG7tmdtAJwA8tR6rNF0bruAmH1G03H
-         W0MpU9aHmQil365hD4zONYC1z0TGt07QlxqriP23iKue9rNPKC3QsV1sNZN4Exj8h3
-         k/a9TNlypFSzxjB4tNh0u+PJAjOyEFm4/efgDLbuR9XTjH96MlFt69bWA+0Ugzy+Ji
-         jAZ8etbyhB+zw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88D7EC43158;
-        Sat, 29 Apr 2023 18:19:25 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtsYPer65Fjm7BFhsjKt-g4XMCtk8siYAZxXg4qpyRKXw@mail.gmail.com>
-References: <CAH2r5mtsYPer65Fjm7BFhsjKt-g4XMCtk8siYAZxXg4qpyRKXw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtsYPer65Fjm7BFhsjKt-g4XMCtk8siYAZxXg4qpyRKXw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.4-rc-ksmbd-server-fixes
-X-PR-Tracked-Commit-Id: 74d7970febf7e9005375aeda0df821d2edffc9f7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1ae78a14516b9372e4c90a89ac21b259339a3a3a
-Message-Id: <168279236542.22076.7235162901818800004.pr-tracker-bot@kernel.org>
-Date:   Sat, 29 Apr 2023 18:19:25 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        with ESMTP id S229452AbjD3PfT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 30 Apr 2023 11:35:19 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAB719A6;
+        Sun, 30 Apr 2023 08:35:18 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2a8b1b51dbdso15465351fa.0;
+        Sun, 30 Apr 2023 08:35:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682868916; x=1685460916;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0ZsFoZX2gI1MlEhPRWk4v2TPDpNZTyJdaXiY+J/jwtQ=;
+        b=XiCfF+J+ln5UU8cEjv9JPcK4vuF11pXkZNspKxuI1dZCBABQcSjC8A4sKqf+IWWZhU
+         2zL5NQg1OG8+t1w5C03GKFHX9NdJ05qHSpxN1x+kXtLtnYGwcx4rlQU0lkhKjmGiLMXM
+         7a5HN7dirpAtHnwWK9m0F9zt1aC7dDH8iTzgKLAnKJbK5xs+JRwFGuKEmdBkvNnPQKJb
+         M5zu8lNQScKZBIkeOpVJjbFptiT3C0CyNGg0VWhza9Hu2M0Fqt2K2RYmwjevm/Qbam3X
+         GUZV3KCQVjth44n7q8S+AlZTURQZiV+Q7xwndg/5UgCHbG70VVpne+PR03KnFNkKo6YO
+         ES2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682868916; x=1685460916;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0ZsFoZX2gI1MlEhPRWk4v2TPDpNZTyJdaXiY+J/jwtQ=;
+        b=UyCw9pkMJqKcm2R78BfV9+ULA0yR4gqSGBGpWCw5iCCFDCR+c5nhmJe2XuogtfOv7G
+         cetWWSZwzHgWaZFFpQVm3/1jKSZUyePLwikhxgFZbGLMsRxRKwaIIElWaff+FaajshCA
+         4K9eOsal68pO4PW0g9VtSBJ80jziQ+Pet00BPspCOpg2OBnmIe3WgAgMAEFAdxC+35GS
+         P/f8JMCXx1SuXVON5uoI5jHLFDeKgxdWIGJl6QvvRqmbnXBtGmsLiCFepm1NBsTBNTke
+         1o8Aokb+2IrzpwstvIz6+XIO5Nf9C9vO/L+wh5ukzQvggRIhhKyWQW1wqM+mjebjU65w
+         D40Q==
+X-Gm-Message-State: AC+VfDzslnFIlAjwUUycrtzu6PBbZsNepJsaBPzbbWprLjl3uW8iqrjd
+        ycq55fg6E/e9tY2HoNnhSpNEA50LvgteGqu4cRPuyscW8TY=
+X-Google-Smtp-Source: ACHHUZ4yh7IfKnRp+4eHLpFQSKiuHxs2nEBBpGJHL093qA04q3PrpDLUoBlCgSRXKa4qGoWpKvnA8g7YuytTuohZzY8=
+X-Received: by 2002:a2e:3609:0:b0:2a8:ab4c:3599 with SMTP id
+ d9-20020a2e3609000000b002a8ab4c3599mr3458558lja.35.1682868916039; Sun, 30 Apr
+ 2023 08:35:16 -0700 (PDT)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 30 Apr 2023 10:35:04 -0500
+Message-ID: <CAH2r5mtWYqepZSYBvSbC5AHiJv70ETtNobBbSH1Oc2K=2qO6UA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Wed, 26 Apr 2023 21:11:44 -0500:
+Please pull the following changes since commit
+457391b0380335d5e9a5babdec90ac53928b23b4:
 
-> git://git.samba.org/ksmbd.git tags/6.4-rc-ksmbd-server-fixes
+  Linux 6.3 (2023-04-23 12:02:52 -0700)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1ae78a14516b9372e4c90a89ac21b259339a3a3a
+are available in the Git repository at:
 
-Thank you!
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc-smb3-client-fixes-part1
+
+for you to fetch changes up to 9be11a69315e26363a4de8930bc50d0901a96775:
+
+  cifs: update internal module version number for cifs.ko (2023-04-28
+22:50:42 -0500)
+
+----------------------------------------------------------------
+11 smb3 client fixes, mostly cleanup
+- deferred close fixe for an important case when cached file should be
+closed immediately)
+- two fixes for missing locks
+- eight minor cleanup
+
+Am still working on testing some additional patches, and also
+expecting a set of fixes from Paulo and Bharath later in the week.
+----------------------------------------------------------------
+Bharath SM (2):
+      SMB3: Add missing locks to protect deferred close file list
+      SMB3: Close deferred file handles in case of handle lease break
+
+Steve French (5):
+      cifs: missing lock when updating session status
+      SMB3.1.1: add new tree connect ShareFlags
+      smb3: make query_on_disk_id open context consistent and move to
+common code
+      smb3: move some common open context structs to smbfs_common
+      cifs: update internal module version number for cifs.ko
+
+Volker Lendecke (4):
+      cifs: Simplify SMB2_open_init()
+      cifs: Simplify SMB2_open_init()
+      cifs: Simplify SMB2_open_init()
+      cifs: Avoid a cast in add_lease_context()
+
+ fs/cifs/cifsfs.h          |   4 ++--
+ fs/cifs/connect.c         |   8 ++++++--
+ fs/cifs/file.c            |  16 ++++++++++++++++
+ fs/cifs/misc.c            |   8 +++++++-
+ fs/cifs/smb2pdu.c         | 115
+++++++++++++++++++++++++++++++-------------------------------------------------------------------------------------
+ fs/cifs/smb2pdu.h         |  20 --------------------
+ fs/ksmbd/smb2pdu.h        |  33 ---------------------------------
+ fs/smbfs_common/smb2pdu.h |  56
+++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 8 files changed, 109 insertions(+), 151 deletions(-)
+
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
