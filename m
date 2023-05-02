@@ -2,68 +2,115 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A013DC77B73
-	for <linux-cifs@archiver.kernel.org>; Mon,  1 May 2023 19:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3984BC77B73
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 May 2023 05:54:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233362AbjEAT10 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 1 May 2023 15:27:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53792 "EHLO
+        id S229954AbjEBFyz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 May 2023 01:54:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233325AbjEAT1Q (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 1 May 2023 15:27:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837B8213E;
-        Mon,  1 May 2023 12:26:54 -0700 (PDT)
+        with ESMTP id S229449AbjEBFyy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 May 2023 01:54:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8AA40DD
+        for <linux-cifs@vger.kernel.org>; Mon,  1 May 2023 22:54:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1EBF161EDB;
-        Mon,  1 May 2023 19:26:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FB01C4339B;
-        Mon,  1 May 2023 19:26:02 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 27C9D6188A
+        for <linux-cifs@vger.kernel.org>; Tue,  2 May 2023 05:54:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83731C4339B
+        for <linux-cifs@vger.kernel.org>; Tue,  2 May 2023 05:54:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682969162;
-        bh=WANaJ6hpamRufnLdA+BwZiyH5ZDt0NbEy/LY9fBR0eg=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=I2y6IndckdEVkDRh7eM4QmNZkEFe57upmyNpH6lx2s7tyX7KVKbDkE6VOED8aRpkM
-         IYRRsLcib8XruxfapBJAGSTy8MIj4/dvVNNCzIvfufiz6QGLnwYsSSjKg8fQoaQK/L
-         WqtfFCcdCHUEUJH8FPTJ0NYhhFmhr1ZoYdupIWmzCdlypBLFEabPJhPDE4i9HDCc0k
-         g7JTWXA0cJV7oX0LKJs7IGGXS/gnr3PkKlqMX3SCZXeDHRYjyup1uddZ7iW/ufMxov
-         VFSToyJXyyIzmdtJBoZICP8U4O7PXVJiMHCy99d4jQBAbO5aYCh5xCXIciKyLU6lQa
-         fu9WneHARMStg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6DFD0C395FD;
-        Mon,  1 May 2023 19:26:02 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtWYqepZSYBvSbC5AHiJv70ETtNobBbSH1Oc2K=2qO6UA@mail.gmail.com>
-References: <CAH2r5mtWYqepZSYBvSbC5AHiJv70ETtNobBbSH1Oc2K=2qO6UA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtWYqepZSYBvSbC5AHiJv70ETtNobBbSH1Oc2K=2qO6UA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc-smb3-client-fixes-part1
-X-PR-Tracked-Commit-Id: 9be11a69315e26363a4de8930bc50d0901a96775
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 26c009dffca89b0f8fe7facc41d1ccf88a66825a
-Message-Id: <168296916244.17937.15989336939630290745.pr-tracker-bot@kernel.org>
-Date:   Mon, 01 May 2023 19:26:02 +0000
+        s=k20201202; t=1683006892;
+        bh=gJW+oP21UfBXXjm4SaSKFM4Z4OhGmyZssJrSC1aN+2Y=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=B7MlEqDlem1ZMVGBwiL5KOs4wtS1iWKV6coE9BMUOF6HjeB/ceqraylPukFrjz00e
+         7+QtkVRDtSrICT4xjFnF52Tcvvn19qreRW4+JIAZsyV7Ja6TARChEcB9A0z4vaUo4o
+         2VYaxIOl1qLPdrXD1VcIOB0lZgqYNL/g/TF66X8ttaqywcv6mnEDZ1op89BTiwQsvN
+         Pq49og/EwNGaZCzDYuDvCt0eQ1DS1J62eaLgEjqnvfopY57F0M5VOA7Gj8JHgDFNeX
+         CJYnUrKrSm0v/OmuqRnOQqYw2dzUUXidEvHEUMHY2VSq4MCkTN7wT6Sy2tRAwjMxi3
+         SrhJ+yPnQEIYg==
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-54cae469c07so208690eaf.3
+        for <linux-cifs@vger.kernel.org>; Mon, 01 May 2023 22:54:52 -0700 (PDT)
+X-Gm-Message-State: AC+VfDxousOWlSyVsYt24nn7x4LqeIP9JyQ9iNdGNCkrghIfQUyCylDR
+        6Uc9Jv+5flL/kVUHG2o2L4iFb2fo+pZO0n6eQo8=
+X-Google-Smtp-Source: ACHHUZ70Lr0e1XVxSPV4Ja3OaAki+RgaxiBHkYQ4ne81GFgc3AjRBlBLHw1JIgC0eb+5qdveKxtzwASqpC+eZ4ASGfs=
+X-Received: by 2002:aca:1e19:0:b0:38d:f4dd:ac69 with SMTP id
+ m25-20020aca1e19000000b0038df4ddac69mr7077960oic.42.1683006891665; Mon, 01
+ May 2023 22:54:51 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a8a:1086:0:b0:4d3:d9bf:b562 with HTTP; Mon, 1 May 2023
+ 22:54:51 -0700 (PDT)
+In-Reply-To: <CAH2r5mspEcMGsgeWqNpNSLxCnog1XJt7U_m6aM=fuBDhzsNHNQ@mail.gmail.com>
+References: <CAH2r5ms+mTNU746nkbAjb9FOdiaAcK9rQK76NMv6Njd0MsDq7A@mail.gmail.com>
+ <CAH2r5muyLyhc_y8k6XwTyfpF4hhSTAezRmvfCCd+wjzpLqkwMg@mail.gmail.com>
+ <CAH2r5muDPGgFQoXhME0MDUH+9enrpcFW5z=XBLBB_gRTz7hu=g@mail.gmail.com> <CAH2r5mspEcMGsgeWqNpNSLxCnog1XJt7U_m6aM=fuBDhzsNHNQ@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 2 May 2023 14:54:51 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8J=5kOM0LCgzZG8QNYgU2urHAvY=oQKGaVHBo7_dVa4g@mail.gmail.com>
+Message-ID: <CAKYAXd8J=5kOM0LCgzZG8QNYgU2urHAvY=oQKGaVHBo7_dVa4g@mail.gmail.com>
+Subject: Re: [PATCH][CIFS] fix incorrect size for query_on_disk_id
 To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sun, 30 Apr 2023 10:35:04 -0500:
+2023-04-29 11:31 GMT+09:00, Steve French <smfrench@gmail.com>:
+> attached wrong patch - resending with right attachment
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc-smb3-client-fixes-part1
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/26c009dffca89b0f8fe7facc41d1ccf88a66825a
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks!
+>
+>
+> On Fri, Apr 28, 2023 at 9:30=E2=80=AFPM Steve French <smfrench@gmail.com>=
+ wrote:
+>>
+>> As Paulo pointed out - size was not incorrect, just confusing when the
+>> two structs (cifs and ksmbd)
+>> differed.  I fixed the patch description.
+>>
+>> On Fri, Apr 28, 2023 at 12:48=E2=80=AFAM Steve French <smfrench@gmail.co=
+m> wrote:
+>> >
+>> > forgot to remove the old incorrect struct (now unused).  Patch fixed
+>> > and reattached
+>> >
+>> > On Fri, Apr 28, 2023 at 12:24=E2=80=AFAM Steve French <smfrench@gmail.=
+com>
+>> > wrote:
+>> > >
+>> > > We were assuming the wrong size for the struct, use the ksmbd
+>> > >     version of this struct and move it to common code.
+>> > >
+>> > >
+>> > >
+>> > > --
+>> > > Thanks,
+>> > >
+>> > > Steve
+>> >
+>> >
+>> >
+>> > --
+>> > Thanks,
+>> >
+>> > Steve
+>>
+>>
+>>
+>> --
+>> Thanks,
+>>
+>> Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
+>
