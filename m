@@ -2,121 +2,95 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A0DC77B7E
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 May 2023 14:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 084C9C77B75
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 May 2023 22:21:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234389AbjEBOv6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 May 2023 10:51:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51256 "EHLO
+        id S229706AbjECWVs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 3 May 2023 18:21:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233929AbjEBOvv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 May 2023 10:51:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8215D19AC;
-        Tue,  2 May 2023 07:51:50 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 206A96228E;
-        Tue,  2 May 2023 14:51:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C544C433EF;
-        Tue,  2 May 2023 14:51:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683039109;
-        bh=J+ew9hMgs9WohOp8pQurJdXVNAtdA3K9ozUlYGq/D7c=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=YnQDMJI5X2Gj3HTToS5ANeHlgJRsis6aEiWWyBIIK38BbA471B56BqehBgLZwsZBn
-         efhOeeWIs0QrTJUy01/MimnNI365lvCQ0VU/nCR2S2395yuA8HTHLxn+uz1InWse33
-         FTSZL1ntMLgcWd35DnIUSydp+8SKjHgU/+ZA44nD+oKL/J1A4nu0p61OzvjFW/ljj+
-         HGF2flMHLjDMSYfGinHyQuNg2YPKgqVOB/9iIaC6oxYsXm93m6NLylqJNSMH8Pj9A/
-         gMQ/xOj821d8KXPgPeU+CtsOyiztUXHQxuCFYMP2M340iL8tEifSG8o4FhG/ST8RgQ
-         A7EEC3Q31Xx8g==
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6a5f7341850so2856432a34.2;
-        Tue, 02 May 2023 07:51:49 -0700 (PDT)
-X-Gm-Message-State: AC+VfDz1SpQ49UtFWOkc439GCtvStZ+Kyzb279xYrNBa8m3oL75lcx5n
-        ssvPRKNzwqnnJR45/sgnaEi2botYWHxo7VqWN70=
-X-Google-Smtp-Source: ACHHUZ6bDPEpyhNC0XRtf3AqJ7LstTvdhAez7GSZQv6bvRBZSVBR2f9qlH3DfvpYno8y8SXYo27WuqCni+7LxL+Etao=
-X-Received: by 2002:a4a:4f81:0:b0:54c:b507:2616 with SMTP id
- c123-20020a4a4f81000000b0054cb5072616mr1017978oob.3.1683039108652; Tue, 02
- May 2023 07:51:48 -0700 (PDT)
+        with ESMTP id S229729AbjECWVr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 May 2023 18:21:47 -0400
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 894EA8A41
+        for <linux-cifs@vger.kernel.org>; Wed,  3 May 2023 15:21:42 -0700 (PDT)
+From:   Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1683152498;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qS6Z0gpNfpvyhubK+TNPGYfmfNyo5Q+wVyCrg0Wv+y8=;
+        b=sdTXJmKPWW+R5Jqn80LvwIVp/kVxFefE5r9QaVII4fclS5VNAoyT0mh/nhk/0EE3O12Zvw
+        0JqKmVdYUD6ynvQeHtSq9nhS+f5HxnKhS/zwAE0V2i0m8fY34bOvKubLpEaBpdYGtWTCGs
+        a6AcNCf6dPJZglrNwuGvw4zthRD9XHLGpRbfDwMKrg/MNm953XuT4356hWVgJzFokVcAlK
+        oYVjGhGUVjZpAGgjztsw9Kz/RKlun6l1avb2DkNl8Vntn7b8js4bgNuUfmINi2HdnMpzr6
+        Y4qNJAae14Ho0s4WiiR9yGUJk0ovgFOiocD1lqX4rgg/dvawO5Rw3JD4dciKJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1683152498;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qS6Z0gpNfpvyhubK+TNPGYfmfNyo5Q+wVyCrg0Wv+y8=;
+        b=HEUPaotMRuKXZ1yduILrLB7FvieV3nkdltat1LEUlAY1ufFRD1fd2AOg+ISY+nZtyVaMoy
+        r9P20FvLhVrqkfvXp2ZOkCBL2gO5OzoV3uRTVLIC58EGvKZCurQd3jTg7TNXKrWasM6rRe
+        njuQ2v+6qQU/UrF++6wNcjiGnV4gflgbN0CiNIy/QQ/ikJWGvH5Frbyo3PquFDsN0qQvc7
+        piUA/XIrRR34OvTpmQW/zHGbwn67rMj/5O9/6FCW7tLI/EStFS+euUfuFBIeSeiqkep/uv
+        nvPzdM4q+MsBvHs0hHMsnn91Kn9xk+OCPbECnMyGhyFLS4fMlnJU2wakFSMh7w==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1683152498; a=rsa-sha256;
+        cv=none;
+        b=q8vZypO6J1Y64hxHdULRiMoIJCSnY9L+mCbQ3crVSFcBFVYjkEpHpZsvSGzv87RmyG3I2a
+        b6C2uh/qe3PlJclSlDAKJmVvfTMZkDHZClSwtjHCyAKb7x6d1UAbdXovjYtgxCnsggNZ55
+        VMxatjHx9oIfJ+7jkHNDyWiCfRwXKE8Dds7E0dE0ptKKz+anorF/survPCItEaRCPVO4MF
+        AD7yYptCRu8GehD5Kw8f0kao5+iwYJ192f18cWByu6Km0QJdos+D4HAy+wXbTbizlYwFjt
+        BETbwZqbQjDaQK3PBWyOsVxFGYMBnwk8t6AfjXXJ2i4y4pKWzBh2ZpOESI4TLw==
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH 0/7] cifs.ko fixes
+Date:   Wed,  3 May 2023 19:21:10 -0300
+Message-Id: <20230503222117.7609-1-pc@manguebit.com>
 MIME-Version: 1.0
-Received: by 2002:a8a:1086:0:b0:4d3:d9bf:b562 with HTTP; Tue, 2 May 2023
- 07:51:48 -0700 (PDT)
-In-Reply-To: <CAAn9K_u5OFb5Fv-2_3v9=VZ-WCcRaBmPMyYRkJ5UTCazkDa=8w@mail.gmail.com>
-References: <20230502080254.51928-1-cc85nod@gmail.com> <CAAn9K_u5OFb5Fv-2_3v9=VZ-WCcRaBmPMyYRkJ5UTCazkDa=8w@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 2 May 2023 23:51:48 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_nhyS1JF++OEM38TyM7-5KYG1OwV+WRAkf2G+2R+at+A@mail.gmail.com>
-Message-ID: <CAKYAXd_nhyS1JF++OEM38TyM7-5KYG1OwV+WRAkf2G+2R+at+A@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix null-ptr-deref in smb2_get_info_filesystem
-To:     =?UTF-8?B?5by15pm66Ku6?= <cc85nod@gmail.com>
-Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-05-02 17:30 GMT+09:00, =E5=BC=B5=E6=99=BA=E8=AB=BA <cc85nod@gmail.com>=
-:
-> Sorry, I missed to add the curly brackets, I will resend new commit.
-This issue was reported and it's already been fixed.
+Hi Steve,
 
-Thanks.
->
-> Pumpkin <cc85nod@gmail.com> =E6=96=BC 2023=E5=B9=B45=E6=9C=882=E6=97=A5 =
-=E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=884:03=E5=AF=AB=E9=81=93=EF=BC=9A
->
->> We do not assign path for those shares which have KSMBD_SHARE_FLAG_PIPE
->> flag, so we need to check if path is NULL before use it.
->>
->> [    8.067958]
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> [    8.068413] BUG: KASAN: null-ptr-deref in strlen+0xa/0x40
->> [    8.068747] Read of size 1 at addr 0000000000000000 by task
->> kworker/0:2/45
->> ...
->> [    8.070638] Call Trace:
->> [    8.070797]  <TASK>
->> [    8.070931]  dump_stack_lvl+0x33/0x50
->> [    8.071351]  kasan_report+0xae/0xe0
->> [    8.071766]  strlen+0xa/0x40
->> [    8.071948]  getname_kernel+0x10/0x1a0
->> [    8.072182]  kern_path+0x10/0x40
->> [    8.072385]  smb2_get_info_filesystem+0xf9/0xc70
->> [    8.076519]  smb2_query_info+0x36b/0x1fd0
->> [    8.079913]  handle_ksmbd_work+0x274/0x810
->> [    8.080165]  process_one_work+0x419/0x760
->> [    8.080421]  worker_thread+0x2a2/0x6f0
->> [    8.080916]  kthread+0x160/0x190
->> [    8.081423]  ret_from_fork+0x1f/0x30
->> [    8.081648]  </TASK>
->>
->> Signed-off-by: Pumpkin <cc85nod@gmail.com>
->> ---
->>  fs/ksmbd/smb2pdu.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->> index aa823b13d..798b193cf 100644
->> --- a/fs/ksmbd/smb2pdu.c
->> +++ b/fs/ksmbd/smb2pdu.c
->> @@ -4906,6 +4906,9 @@ static int smb2_get_info_filesystem(struct
->> ksmbd_work *work,
->>         int rc =3D 0, len;
->>         int fs_infoclass_size =3D 0;
->>
->> +       if (share->path =3D=3D NULL)
->> +               return -EIO;
->> +
->>         rc =3D kern_path(share->path, LOOKUP_NO_SYMLINKS, &path);
->>         if (rc) {
->>                 pr_err("cannot create vfs path\n");
->> --
->> 2.39.2 (Apple Git-143)
->>
->>
->
+Follow a series of bugfixes that were mostly found by doing some
+stress testing over the reconnect paths. I was able to find most of
+the issues by hard-coding the DFS cache ttl to 10 seconds which made
+it running several times on every reconnect test.
+
+Please review and test.
+
+Paulo Alcantara (7):
+  cifs: fix potential race when tree connecting ipc
+  cifs: fix potential use-after-free bugs in TCP_Server_Info::hostname
+  cifs: protect session status check in smb2_reconnect()
+  cifs: protect access of TCP_Server_Info::{origin,leaf}_fullpath
+  cifs: print smb3_fs_context::source when mounting
+  cifs: avoid potential races when handling multiple dfs tcons
+  cifs: fix sharing of DFS connections
+
+ fs/cifs/cifs_debug.c |   7 ++-
+ fs/cifs/cifs_debug.h |  12 ++--
+ fs/cifs/cifsfs.c     |  14 ++---
+ fs/cifs/cifsglob.h   |  23 ++++---
+ fs/cifs/cifsproto.h  |  44 ++++++++++++-
+ fs/cifs/connect.c    | 145 ++++++++++++++++++++++++-------------------
+ fs/cifs/dfs.c        | 137 ++++++++++++++++++++++++++++++----------
+ fs/cifs/dfs.h        |  13 +++-
+ fs/cifs/dfs_cache.c  | 137 ++++++++++++++++++----------------------
+ fs/cifs/dfs_cache.h  |   9 +++
+ fs/cifs/ioctl.c      |   2 +-
+ fs/cifs/sess.c       |   7 ++-
+ fs/cifs/smb2pdu.c    |  19 ++++--
+ 13 files changed, 360 insertions(+), 209 deletions(-)
+
+-- 
+2.40.1
+
