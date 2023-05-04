@@ -2,166 +2,154 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDEEC77B78
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 May 2023 05:14:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C072BC77B7C
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 May 2023 11:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229462AbjEDFOz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 May 2023 01:14:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47454 "EHLO
+        id S229864AbjEDLS7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 May 2023 07:18:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjEDFOy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 May 2023 01:14:54 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7428D10D1;
-        Wed,  3 May 2023 22:14:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683177292; x=1714713292;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=U0Mvm2Qigu/1mTyodDCfTROC/3TRZNheY7qiLXnriVk=;
-  b=IhGEh8+Z9O5sJL6bRVNSjOJSQb5dy9aGqCnauSQK+JR76zoEj4ljPz3d
-   LpXIfvQUaCK8p+aRsxMQo4Nb6nBzrO2IpiLYK6iNEkB/iR+wCK0MdV3Y/
-   zj4egz+zh33EcvNYLcIythFMTtBankrBKi9DedJZKgqoUyMTcbDXlU9gc
-   RmQoFQCi+pogGFCf+F+umzzjJjoSNeITB+iGDlIO8qsXdv7IpcAB+C5bf
-   26ST8/x13PTddJMyYCd2PyQc+qNwYnM2VjvNs9DGKjL+BfPxP33w5pYe+
-   qQxHPzTOJudILTKOO6MizB91ouufsUGzwu4V5aIO/Vzjno3i9AQI1o9ce
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10699"; a="350922770"
-X-IronPort-AV: E=Sophos;i="5.99,249,1677571200"; 
-   d="scan'208";a="350922770"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2023 22:14:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10699"; a="871219323"
-X-IronPort-AV: E=Sophos;i="5.99,249,1677571200"; 
-   d="scan'208";a="871219323"
-Received: from lkp-server01.sh.intel.com (HELO e3434d64424d) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 03 May 2023 22:14:50 -0700
-Received: from kbuild by e3434d64424d with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1puRIn-0002ay-1L;
-        Thu, 04 May 2023 05:14:49 +0000
-Date:   Thu, 4 May 2023 13:14:25 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Paulo Alcantara <pc@manguebit.com>, smfrench@gmail.com
-Cc:     oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
-        Paulo Alcantara <pc@manguebit.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 7/7] cifs: fix sharing of DFS connections
-Message-ID: <202305041040.j7W2xQSy-lkp@intel.com>
-References: <20230503222117.7609-8-pc@manguebit.com>
+        with ESMTP id S229904AbjEDLS6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 May 2023 07:18:58 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1636346B3
+        for <linux-cifs@vger.kernel.org>; Thu,  4 May 2023 04:18:57 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3062678861fso218233f8f.0
+        for <linux-cifs@vger.kernel.org>; Thu, 04 May 2023 04:18:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1683199135; x=1685791135;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y7J3gW0AViIJcJ+86DhCcZPCmZUnTwWrI3wUu6UJv4M=;
+        b=dUXRauxa+ek8duEUabVTCAwNck245VAMwdvaKZP7xs+BxTTQithalby5kyNexxa8pG
+         WJkoY4IYlTo3Ku3nog3bvP9RH+i6n2Pq048XHfNrtDCWD+YQcbUVas5iQJ1jCWA11RP6
+         FU0gFHFV7SkbgIakfzcWcvsz0qNdXQkq3dlCfYkvili5BF0NKwoKt12nhpeOtOP9+rwp
+         cAc2iutXS+G+uHd9zdOW8sT1dyla7osyyUSPDUxI4D7Bir3LWlZwrKYscrqcMHzX7tLC
+         0fHxbHTg3BFRITBK9NcbxhldIT1LRSxvdVIv4VKyrQat0xr19ZlyHAztbcYwlVosTLjt
+         s09A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683199135; x=1685791135;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y7J3gW0AViIJcJ+86DhCcZPCmZUnTwWrI3wUu6UJv4M=;
+        b=dQNtm04t89637hm6UVSod/p/82HYA4O8BXfQXLYENUXFji79ZMxeNrk1HrbJwgUIh+
+         dlO0NcVnp8Yt91dg0YfO/DTRF46gUmvgmJlrL5SqSnfXGsLSyjPSjjpvLo9JuwbzMAIv
+         MD5c+Ul7zsatyIIY0eivfimJJ2iQQMhO+R7IYoUSofHUhrGlSWdwFEIP2D5C5+AQULAj
+         juYcWVgEJU++3hym+VtacE3C5teZ42NulCPiUmfbdS1F7Z/tPfdTPA7hmsArwxXmycpC
+         lqLMPPMmOi0KLMDj7viFgUNBpavJHux/WA8wYC6mrOTSqtuayP2DHW5pz/iZnIzAIhoV
+         8u9Q==
+X-Gm-Message-State: AC+VfDwxjiWpCz6avfW3rPRXPia5IG1J6nZhAf8dVYTX78/em1WaOFPF
+        0ctUNoL+l+Y3JNBFNFpbB3vJTg==
+X-Google-Smtp-Source: ACHHUZ7TpXAz2EYVY8YPbIYWuBoKK2SU4Lwnd0MtB+F9wWPOxBReKe0bM/URjpBu/bmZHLCPPEkqAQ==
+X-Received: by 2002:a5d:6b45:0:b0:306:46ba:b2f1 with SMTP id x5-20020a5d6b45000000b0030646bab2f1mr2358406wrw.50.1683199135505;
+        Thu, 04 May 2023 04:18:55 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id k9-20020a5d6d49000000b003068f5cca8csm1902523wri.94.2023.05.04.04.18.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 May 2023 04:18:53 -0700 (PDT)
+Date:   Thu, 4 May 2023 14:18:48 +0300
+From:   Dan Carpenter <dan.carpenter@linaro.org>
+To:     linkinjeon@kernel.org
+Cc:     linux-cifs@vger.kernel.org
+Subject: [bug report] ksmbd: fix racy issue from using ->d_parent and ->d_name
+Message-ID: <e90beca7-fa27-4338-bb7b-1e9f4ac1b290@kili.mountain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230503222117.7609-8-pc@manguebit.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Paulo,
+Hello Namjae Jeon,
 
-kernel test robot noticed the following build warnings:
+The patch 74d7970febf7: "ksmbd: fix racy issue from using ->d_parent
+and ->d_name" from Apr 21, 2023, leads to the following Smatch static
+checker warning:
 
-[auto build test WARNING on v6.3]
-[also build test WARNING on linus/master next-20230428]
-[cannot apply to cifs/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+	fs/ksmbd/vfs.c:1159 ksmbd_vfs_kern_path_locked()
+	info: return a literal instead of 'err'
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Paulo-Alcantara/cifs-fix-potential-race-when-tree-connecting-ipc/20230504-062335
-base:   457391b0380335d5e9a5babdec90ac53928b23b4
-patch link:    https://lore.kernel.org/r/20230503222117.7609-8-pc%40manguebit.com
-patch subject: [PATCH 7/7] cifs: fix sharing of DFS connections
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20230504/202305041040.j7W2xQSy-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/5a2a7b1846bb61ee5669afdfe2238eaa80c339c2
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Paulo-Alcantara/cifs-fix-potential-race-when-tree-connecting-ipc/20230504-062335
-        git checkout 5a2a7b1846bb61ee5669afdfe2238eaa80c339c2
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash fs/
+fs/ksmbd/vfs.c
+    1149 int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
+    1150                                unsigned int flags, struct path *path,
+    1151                                bool caseless)
+    1152 {
+    1153         struct ksmbd_share_config *share_conf = work->tcon->share_conf;
+    1154         int err;
+    1155         struct path parent_path;
+    1156 
+    1157         err = ksmbd_vfs_path_lookup_locked(share_conf, name, flags, path);
+    1158         if (!err)
+--> 1159                 return err;
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202305041040.j7W2xQSy-lkp@intel.com/
+Originally this was return 0, but the patch changed it to return ret.
+The reason for this check is that sometimes people accidentally reverse
+their if statements so they write if (!err) instead of if (err).  Here
+it looks intentional but it's hard to be sure.
 
-All warnings (new ones prefixed by >>):
+    1160 
+    1161         if (caseless) {
+    1162                 char *filepath;
+    1163                 size_t path_len, remain_len;
+    1164 
+    1165                 filepath = kstrdup(name, GFP_KERNEL);
+    1166                 if (!filepath)
+    1167                         return -ENOMEM;
+    1168 
+    1169                 path_len = strlen(filepath);
+    1170                 remain_len = path_len;
+    1171 
+    1172                 parent_path = share_conf->vfs_path;
+    1173                 path_get(&parent_path);
+    1174 
+    1175                 while (d_can_lookup(parent_path.dentry)) {
+    1176                         char *filename = filepath + path_len - remain_len;
+    1177                         char *next = strchrnul(filename, '/');
+    1178                         size_t filename_len = next - filename;
+    1179                         bool is_last = !next[0];
+    1180 
+    1181                         if (filename_len == 0)
+    1182                                 break;
+    1183 
+    1184                         err = ksmbd_vfs_lookup_in_dir(&parent_path, filename,
+    1185                                                       filename_len,
+    1186                                                       work->conn->um);
+    1187                         if (err)
+    1188                                 goto out2;
+    1189 
+    1190                         next[0] = '\0';
+    1191 
+    1192                         err = vfs_path_lookup(share_conf->vfs_path.dentry,
+    1193                                               share_conf->vfs_path.mnt,
+    1194                                               filepath,
+    1195                                               flags,
+    1196                                               path);
+    1197                         if (err)
+    1198                                 goto out2;
+    1199                         else if (is_last)
+    1200                                 goto out1;
+    1201                         path_put(&parent_path);
+    1202                         parent_path = *path;
+    1203 
+    1204                         next[0] = '/';
+    1205                         remain_len -= filename_len + 1;
+    1206                 }
+    1207 
+    1208                 err = -EINVAL;
+    1209 out2:
+    1210                 path_put(&parent_path);
+    1211 out1:
+    1212                 kfree(filepath);
+    1213         }
+    1214 
+    1215         if (!err) {
+    1216                 err = ksmbd_vfs_lock_parent(parent_path.dentry, path->dentry);
+    1217                 if (err)
+    1218                         dput(path->dentry);
+    1219                 path_put(&parent_path);
+    1220         }
+    1221         return err;
+    1222 }
 
-   fs/cifs/connect.c: In function 'cifs_put_tcon':
->> fs/cifs/connect.c:2310:33: warning: variable 'server' set but not used [-Wunused-but-set-variable]
-    2310 |         struct TCP_Server_Info *server;
-         |                                 ^~~~~~
-
-
-vim +/server +2310 fs/cifs/connect.c
-
-  2306	
-  2307	void
-  2308	cifs_put_tcon(struct cifs_tcon *tcon)
-  2309	{
-> 2310		struct TCP_Server_Info *server;
-  2311		struct cifs_ses *ses;
-  2312		unsigned int xid;
-  2313	
-  2314		/*
-  2315		 * IPC tcon share the lifetime of their session and are
-  2316		 * destroyed in the session put function
-  2317		 */
-  2318		if (tcon == NULL || tcon->ipc)
-  2319			return;
-  2320	
-  2321		ses = tcon->ses;
-  2322		server = ses->server;
-  2323		cifs_dbg(FYI, "%s: tc_count=%d\n", __func__, tcon->tc_count);
-  2324		spin_lock(&cifs_tcp_ses_lock);
-  2325		spin_lock(&tcon->tc_lock);
-  2326		if (--tcon->tc_count > 0) {
-  2327			spin_unlock(&tcon->tc_lock);
-  2328			spin_unlock(&cifs_tcp_ses_lock);
-  2329			return;
-  2330		}
-  2331	
-  2332		/* tc_count can never go negative */
-  2333		WARN_ON(tcon->tc_count < 0);
-  2334	
-  2335		list_del_init(&tcon->tcon_list);
-  2336		tcon->status = TID_EXITING;
-  2337		spin_unlock(&tcon->tc_lock);
-  2338		spin_unlock(&cifs_tcp_ses_lock);
-  2339	
-  2340		/* cancel polling of interfaces */
-  2341		cancel_delayed_work_sync(&tcon->query_interfaces);
-  2342	#ifdef CONFIG_CIFS_DFS_UPCALL
-  2343		cancel_delayed_work_sync(&tcon->dfs_cache_work);
-  2344	#endif
-  2345	
-  2346		if (tcon->use_witness) {
-  2347			int rc;
-  2348	
-  2349			rc = cifs_swn_unregister(tcon);
-  2350			if (rc < 0) {
-  2351				cifs_dbg(VFS, "%s: Failed to unregister for witness notifications: %d\n",
-  2352						__func__, rc);
-  2353			}
-  2354		}
-  2355	
-  2356		xid = get_xid();
-  2357		if (ses->server->ops->tree_disconnect)
-  2358			ses->server->ops->tree_disconnect(xid, tcon);
-  2359		_free_xid(xid);
-  2360	
-  2361		cifs_fscache_release_super_cookie(tcon);
-  2362		tconInfoFree(tcon);
-  2363		cifs_put_smb_ses(ses);
-  2364	}
-  2365	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+regards,
+dan carpenter
