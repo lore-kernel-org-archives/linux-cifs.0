@@ -2,81 +2,93 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E696C7EE22
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 May 2023 15:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F4A6C7EE24
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 May 2023 15:15:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232229AbjEEPLp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 May 2023 11:11:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47486 "EHLO
+        id S232457AbjEEPPF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 May 2023 11:15:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232122AbjEEPLo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 May 2023 11:11:44 -0400
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB186EB5
-        for <linux-cifs@vger.kernel.org>; Fri,  5 May 2023 08:11:43 -0700 (PDT)
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5191796a483so1325453a12.0
-        for <linux-cifs@vger.kernel.org>; Fri, 05 May 2023 08:11:43 -0700 (PDT)
+        with ESMTP id S231987AbjEEPPE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 May 2023 11:15:04 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F6A41BCA
+        for <linux-cifs@vger.kernel.org>; Fri,  5 May 2023 08:15:03 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4ec8133c59eso2202132e87.0
+        for <linux-cifs@vger.kernel.org>; Fri, 05 May 2023 08:15:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683299701; x=1685891701;
+        h=content-transfer-encoding:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G2Fhl/8xaRw80SS/8jJuxAz6zcjXeBnc7VV9nqdCNUc=;
+        b=eUcTPPAlx6iuI8pJdJcDe269uyIc4qbpV19qLhEgQ4gbaUVrYyNpLNeI9TEw/SsC+H
+         EKfOhi0dLifb0e+YwtDZj32rtqv8lu7pDJiSqQ0QrJW50HDDsKYKqf53r0JmtsOCPBCk
+         BaKGiM51WwEheUP/xefAfMoaEHrBL/NOY6cefS4mVr5iph6NjWj6u924eCXnvQGa14AR
+         HZluuNCT+DMzUbvnRRKFKQJKfLdMW7YMV6sT0Ea1u3jMVCpU3bPZ0PgG2bOpRrE9VpFa
+         lR614iwbs2K83SsaZLGb78OyHgDJz7HLiBO+QxZ3hD1zWoQhG8LussjQvyYqpPYSNqPU
+         XfCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683299503; x=1685891503;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qOXPjqvMMoAafjBIsNZ3V+vTfWMMSzGigeANy4HIEwE=;
-        b=Vg/LR4dsHwo4wwG5DD8k0MWpRJNXPbvKHpy984vWyF8BNhlNob1eYOlrb03/2Quxn6
-         ay2N7zy8O5Qp4D17+B0CElg9zUdOslaE+9SYnCZoG6FEbtDQcm7dgm9zXIXPn8v4zAik
-         3glKwk4crKOSkhAFQG3/WNpFGD6uxQE9n02oaUSzjl42wRmX6FUmBhuWECj6qxrYkt0G
-         O8jCQpK0gXhevaE83Kqyfr5ERSuDp1jC1QWawLidM5AnT1jxngoj3epbcoVUOlUUs1qg
-         rKw8KDfwWe4Q05AlsrOpIhBKNggD5qOFPq95kNx+H4YHf5fEty43akNjptLclIxmCvJy
-         zlag==
-X-Gm-Message-State: AC+VfDyvmJBdeIQFaEfWDpCpuA96M9qJG0TerwvcgNfVwxKgVkHgQo7D
-        ox66EeDGMV0P3SCRjIFj5NdXiGZamxM=
-X-Google-Smtp-Source: ACHHUZ7ih3k9/U4McizhdoPmKthf5ZUraZt6rrqiuAh64OD9XGeXg3D3/rwfuIOmK4ydO3qvfXNrFQ==
-X-Received: by 2002:a17:902:e850:b0:1aa:e5e9:6769 with SMTP id t16-20020a170902e85000b001aae5e96769mr2214028plg.23.1683299503003;
-        Fri, 05 May 2023 08:11:43 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id o4-20020a170902d4c400b001a2135e7eabsm1950898plg.16.2023.05.05.08.11.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 May 2023 08:11:42 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
-        Dan Carpenter <error27@gmail.com>
-Subject: [PATCH 6/6] ksmbd: use kzalloc() instead of __GFP_ZERO
-Date:   Sat,  6 May 2023 00:11:08 +0900
-Message-Id: <20230505151108.5911-6-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230505151108.5911-1-linkinjeon@kernel.org>
-References: <20230505151108.5911-1-linkinjeon@kernel.org>
+        d=1e100.net; s=20221208; t=1683299701; x=1685891701;
+        h=content-transfer-encoding:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=G2Fhl/8xaRw80SS/8jJuxAz6zcjXeBnc7VV9nqdCNUc=;
+        b=Ef4el96wQO2NyGaqmawE2JAJi12pENRaBoxX7YF00BvFFDR6WTnqOnETsLafd3zJ6q
+         Jroxbrho6pV/HuSZE8AEbhvmxNFf81fCO8zjyjV/rFOGlzVzuRfavs4Ec1CHf+ZMoexv
+         7Br3xisIhlL6yM7C/1HPCA7ancw7CyyyLOb02ZBSARy313nT95S+9IuHKzYjlP1r/LW6
+         qzDCI3Ktb6ebd/zaDysQo8udhoxCA4CqXGMRHvnzTBZgKu/Jb+soSvnmSKOG4pvKu5j8
+         52kV6m3S8BOJf1eHDnCbvfSV2C3aw2k3v5up+WkudOqOaB2qEf2wOZhODwhOlMSv0sRo
+         vB4A==
+X-Gm-Message-State: AC+VfDzNkS2/PKnxWRLZhjBpnRaAunIzHLXLBo+hL6vWCFNj1yZbgBl5
+        LCi4+9o3yZZr04YtmoZ3iEADeJMAVXU=
+X-Google-Smtp-Source: ACHHUZ5j/KExXhVhR9ptaYium42mg8Gy3beDGQQB9cMpEctT1Y/qV7eSHi1OiKeWxTHo4eDvju7LyQ==
+X-Received: by 2002:ac2:520a:0:b0:4f1:2142:5540 with SMTP id a10-20020ac2520a000000b004f121425540mr639437lfl.6.1683299701061;
+        Fri, 05 May 2023 08:15:01 -0700 (PDT)
+Received: from [10.10.10.110] ([94.231.1.83])
+        by smtp.gmail.com with ESMTPSA id w11-20020ac2598b000000b004f14591a942sm318176lfn.271.2023.05.05.08.15.00
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 May 2023 08:15:00 -0700 (PDT)
+Message-ID: <4b402539-1b98-bfe6-fa60-d73d13794077@gmail.com>
+Date:   Fri, 5 May 2023 17:14:59 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Content-Language: en-US
+From:   Pawel Witek <pawel.ireneusz.witek@gmail.com>
+Subject: [PATCH] cifs: fix pcchunk length type in smb2_copychunk_range
+To:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use kzalloc() instead of __GFP_ZERO.
+Change type of pcchunk->Length from u32 to u64 to match
+smb2_copychunk_range arguments type. Fixes the problem where performing
+server-side copy with CIFS_IOC_COPYCHUNK_FILE ioctl resulted in incomplete
+copy of large files while returning -EINVAL.
 
-Reported-by: Dan Carpenter <error27@gmail.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Pawel Witek <pawel.ireneusz.witek@gmail.com>
 ---
- fs/ksmbd/smb_common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/smb2ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
-index af0c2a9b8529..c6e4d38319df 100644
---- a/fs/ksmbd/smb_common.c
-+++ b/fs/ksmbd/smb_common.c
-@@ -347,8 +347,8 @@ static int smb1_check_user_session(struct ksmbd_work *work)
-  */
- static int smb1_allocate_rsp_buf(struct ksmbd_work *work)
- {
--	work->response_buf = kmalloc(MAX_CIFS_SMALL_BUFFER_SIZE,
--			GFP_KERNEL | __GFP_ZERO);
-+	work->response_buf = kzalloc(MAX_CIFS_SMALL_BUFFER_SIZE,
-+			GFP_KERNEL);
- 	work->response_sz = MAX_CIFS_SMALL_BUFFER_SIZE;
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index a81758225fcd..35c7c35882c9 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1682,7 +1682,7 @@ smb2_copychunk_range(const unsigned int xid,
+ 		pcchunk->SourceOffset = cpu_to_le64(src_off);
+ 		pcchunk->TargetOffset = cpu_to_le64(dest_off);
+ 		pcchunk->Length =
+-			cpu_to_le32(min_t(u32, len, tcon->max_bytes_chunk));
++			cpu_to_le64(min_t(u64, len, tcon->max_bytes_chunk));
  
- 	if (!work->response_buf) {
+ 		/* Request server copy to target from src identified by key */
+ 		kfree(retbuf);
 -- 
-2.25.1
+2.40.1
+
 
