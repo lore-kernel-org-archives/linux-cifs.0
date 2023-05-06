@@ -2,155 +2,121 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2735FC77B75
-	for <linux-cifs@archiver.kernel.org>; Sat,  6 May 2023 08:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F635C77B73
+	for <linux-cifs@archiver.kernel.org>; Sat,  6 May 2023 20:45:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbjEFIGH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 6 May 2023 04:06:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55100 "EHLO
+        id S229462AbjEFUpn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 6 May 2023 16:45:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230450AbjEFIGG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 6 May 2023 04:06:06 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6CF893E6
-        for <linux-cifs@vger.kernel.org>; Sat,  6 May 2023 01:06:03 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4f00d41df22so20133018e87.1
-        for <linux-cifs@vger.kernel.org>; Sat, 06 May 2023 01:06:03 -0700 (PDT)
+        with ESMTP id S229446AbjEFUpm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 6 May 2023 16:45:42 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E04372D401;
+        Sat,  6 May 2023 13:45:37 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4efe8b3f3f7so3556992e87.2;
+        Sat, 06 May 2023 13:45:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683360362; x=1685952362;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9OZWUagey7z0c7RtHnHlQx+rkc8Wn9ftjEHjFVnackg=;
-        b=IpLjWdwk/lzLl4kXjZulPn0n2C8r6FVQLHpq81eKmwGiqeetGCrwNhZIomstT+3fsl
-         uem64KaEJ7IR1U/Ppv/9JMM7p5r2Mn0EEoeYK5CqDUGvCKwivbhzQEYpwdmXvjWoGT9r
-         8n7Zl4YargVgXIKDSJXi85TUeexGFTT1PHgZtIpc3bBle/HUgyZcAF4PtR9/OPA0xQg6
-         +VNhix9jbtzcamAmF+YYT3ELV4HRxnwuJKITo39Kcbvob8TMHQmYXpOzXiDw0gpPd2Nu
-         Xi8hLHr4hvC07Gb9jUm+222d1MxTji55tynUDHNl1yNy3yhAewX3vv0TKMMtaQrnHriZ
-         A02Q==
+        d=gmail.com; s=20221208; t=1683405936; x=1685997936;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MEugINQdUm3f7YxPQfaXjELKCaf43ILlW7WiVWB4tUQ=;
+        b=dTxPpfGLIposVgzaeUUbZC77KVnT6R3R+BDNv7VqRgAqvAa8ZeXi1zpe4LXk1YOLaq
+         4rMfltpXSlSbXQesNAbAPRizILmhWqYm5rPoAvWnas3/rhVdtvehexlMl1cdsBZPoOl+
+         SuY+3f7RfSaSOWcFfh1y92/5vhjzFUHvSA1UH5aIHOS2GSs7MeQ5cjswETcMubBpA9zd
+         NmAnAuXzQX0RipVVRw8lodEk38SCYyABKdcprZ/e+2nvMCsnAav7AAoGtlwmhqkvuD+l
+         QAJsFDtLU+LpL+FsyuDQl+1xcxYqckw+7aUzMzaQOt8qXG6o61YmuNB39uriGZSFfRp+
+         Stmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683360362; x=1685952362;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9OZWUagey7z0c7RtHnHlQx+rkc8Wn9ftjEHjFVnackg=;
-        b=PCyaOGRlhhLVI2C6ArFe9B2di4zYjI4SknQ4sGaMk++fNvMIFgAfwIMGAuptQZbVXL
-         1R0RDvDI6m1Bz1oH6E1PYXGDPqDcGb5ykv8gLkxhV/lflJRcGO4CX2ZHh8+OWhKnctmA
-         FRwxet9XoHW8gGfcHe1DCoHz5gi4br+navquSGS7wjC/Szv07uiPv7wTkTRRdArgoyYB
-         tI9f2Eui+GZbgFDCVd/IL2WUVVa6nCrHS2+WjKFWBUiDEXmIOdp50NDdJW9+5Mc1AjVb
-         1Xb4/RHlvFojwRj6NTEXM1LnzaGl6Jg87GRhTa29g9Tah5vazLaD8h8VZgr+hZ27dk8N
-         DvOA==
-X-Gm-Message-State: AC+VfDz92XfmMNI9h2EdF2LEJ35TKHL9/0dxQddOd3fJ7d0NOB1pps9r
-        Xw+VqAaciomNPS+eXJd+fZw=
-X-Google-Smtp-Source: ACHHUZ6O2ajN3FUspUMZ3G1P4AHlnuHsnkVXZW4J0ELbhLuy+yMwzHAl3ecrY1ipRq0PV82ofLR3Ww==
-X-Received: by 2002:ac2:5387:0:b0:4b6:fddc:1fcd with SMTP id g7-20020ac25387000000b004b6fddc1fcdmr1224762lfh.23.1683360361854;
-        Sat, 06 May 2023 01:06:01 -0700 (PDT)
-Received: from [10.10.10.110] ([94.231.1.83])
-        by smtp.gmail.com with ESMTPSA id z8-20020ac24f88000000b004eff6dd9072sm574532lfs.111.2023.05.06.01.06.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 May 2023 01:06:01 -0700 (PDT)
-Message-ID: <478cf3a9-b1bc-d170-3176-5cd67e5e63d3@gmail.com>
-Date:   Sat, 6 May 2023 10:06:00 +0200
+        d=1e100.net; s=20221208; t=1683405936; x=1685997936;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MEugINQdUm3f7YxPQfaXjELKCaf43ILlW7WiVWB4tUQ=;
+        b=AGLGtkJObmDSKbdWUgMI7NldjhEkeEQaf0e3JfSSXsp5ef7N0xy11kxGS+1NzlAw7w
+         fxX+FG2LToW8u4tqLqjT6JWDsaedHRlPuMiQLZn02IBi2Df2wUiN37R3yandund0oofs
+         c8DKTDcfStDITC1QxMnjVRdJNAxLnhvad9I3kbVCGXlX0IOj2Fdo5fnzWZhspfptt9HE
+         /NoGnPGtU8wmLKjy1tttLdI5PChqS80E4rZyfxToX8PXJ1N8mHxGBkTLnxRWyl14m7cp
+         suMEszn4gfZrhmMeOuYQq0JQbP3yph6xLNKPHMRyCQd4SO/RbZOSQ209mNf/YzhvIKdz
+         WdWg==
+X-Gm-Message-State: AC+VfDwWlvNGz6AmNPHGTuh4NYL90HRqW9K7iLdnWgpjA2G09sVrogaW
+        ryLFe/SKTm+WQfBpbX39G9hCLdgWqKbYnHen1MtscX7SN8k=
+X-Google-Smtp-Source: ACHHUZ7lt3jYpv+7YL4nxgqYJ8sQ+4jw7kh2kJHRP6S03fyfRPKfy0FE5y9K5tEGnF6XmCabrol6KXbGHR6X9mGWbJA=
+X-Received: by 2002:ac2:4196:0:b0:4ef:d479:a391 with SMTP id
+ z22-20020ac24196000000b004efd479a391mr1404382lfh.45.1683405935774; Sat, 06
+ May 2023 13:45:35 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH] cifs: fix pcchunk length type in smb2_copychunk_range
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-References: <4b402539-1b98-bfe6-fa60-d73d13794077@gmail.com>
- <CAH2r5mszw6sayQfJqiYwTjPCqKDB7Dk-Hmtr0-Z3fXf=e3t0aQ@mail.gmail.com>
- <824c8a05-4c68-119e-45a9-504ea0aa8583@gmail.com>
- <CAH2r5mvCCY=VT9ZUkjz4c+QGZ0MjR4ggdG56QUa-apZ7eoeo0A@mail.gmail.com>
- <CAH2r5muOMc1ks+RJeC0uV30pwgH7iaUeag0C5=4biy8dHURkdA@mail.gmail.com>
- <CAH2r5muUUTxNesxPRO=2TRDSZ7GFqTLJxEpmaYWj2aTzEps1Ng@mail.gmail.com>
-Content-Language: en-US
-From:   Pawel Witek <pawel.ireneusz.witek@gmail.com>
-In-Reply-To: <CAH2r5muUUTxNesxPRO=2TRDSZ7GFqTLJxEpmaYWj2aTzEps1Ng@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 6 May 2023 15:45:24 -0500
+Message-ID: <CAH2r5muHUgLTaYUcWWEucCmdBR=JHgEAC+oPePBgLVKpJxHYVA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-You're right, that does look better and safer :)
+Please pull the following changes since commit
+26c009dffca89b0f8fe7facc41d1ccf88a66825a:
 
-On 5/6/23 06:51, Steve French wrote:
-> I was also able to reproduce it by using xfs_io to execute copy_range
-> on a file of exactly 4GB and verified that the patches (both versions)
-> fix it.
-> 
-> On Fri, May 5, 2023 at 11:49 PM Steve French <smfrench@gmail.com> wrote:
->>
->> Wouldn't it be safer (since pcchunk->Length is a u32 to do the
->> following minor change to your patch
->>
->>                 pcchunk->Length =
->> -                       cpu_to_le32(min_t(u32, len, tcon->max_bytes_chunk));
->> +                       cpu_to_le32(min_t(u64, len, tcon->max_bytes_chunk));
->>
->> Also added Cc: stable and Fixes: tags.  See attached.
->>
->> On Fri, May 5, 2023 at 2:48 PM Steve French <smfrench@gmail.com> wrote:
->>>
->>> Good catch
->>>
->>> On Fri, May 5, 2023, 14:31 Pawel Witek <pawel.ireneusz.witek@gmail.com> wrote:
->>>>
->>>> I've tried to copy a 5 GB file which resulted in -EINVAL (same for larger
->>>> files). After wiresharking the protocol I've observed that one packet
->>>> requests ioctl with 'Transfer Length: 0', to which the server responded
->>>> with an error. Some investigation showed, that this happens when
->>>> len=4294967296.
->>>>
->>>> On 5/5/23 18:47, Steve French wrote:
->>>>> since pcchunk->Length is a 32 bit field doing cpu_to_le64 seems wrong.
->>>>>
->>>>> Perhaps one option is to split this into two lines do the minimum(u64, len, tcon->max_bytes_chunk) on one line and the cpu_to_le32 of the result on the next
->>>>>
->>>>> What is "len" in the example you see failing?
->>>>>
->>>>> On Fri, May 5, 2023 at 10:15 AM Pawel Witek <pawel.ireneusz.witek@gmail.com <mailto:pawel.ireneusz.witek@gmail.com>> wrote:
->>>>>
->>>>>     Change type of pcchunk->Length from u32 to u64 to match
->>>>>     smb2_copychunk_range arguments type. Fixes the problem where performing
->>>>>     server-side copy with CIFS_IOC_COPYCHUNK_FILE ioctl resulted in incomplete
->>>>>     copy of large files while returning -EINVAL.
->>>>>
->>>>>     Signed-off-by: Pawel Witek <pawel.ireneusz.witek@gmail.com <mailto:pawel.ireneusz.witek@gmail.com>>
->>>>>     ---
->>>>>      fs/cifs/smb2ops.c | 2 +-
->>>>>      1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>
->>>>>     diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
->>>>>     index a81758225fcd..35c7c35882c9 100644
->>>>>     --- a/fs/cifs/smb2ops.c
->>>>>     +++ b/fs/cifs/smb2ops.c
->>>>>     @@ -1682,7 +1682,7 @@ smb2_copychunk_range(const unsigned int xid,
->>>>>                     pcchunk->SourceOffset = cpu_to_le64(src_off);
->>>>>                     pcchunk->TargetOffset = cpu_to_le64(dest_off);
->>>>>                     pcchunk->Length =
->>>>>     -                       cpu_to_le32(min_t(u32, len, tcon->max_bytes_chunk));
->>>>>     +                       cpu_to_le64(min_t(u64, len, tcon->max_bytes_chunk));
->>>>>
->>>>>                     /* Request server copy to target from src identified by key */
->>>>>                     kfree(retbuf);
->>>>>     --
->>>>>     2.40.1
->>>>>
->>>>>
->>>>>
->>>>>
->>>>> --
->>>>> Thanks,
->>>>>
->>>>> Steve
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
-> 
-> 
-> 
+  Merge tag '6.4-rc-smb3-client-fixes-part1' of
+git://git.samba.org/sfrench/cifs-2.6 (2023-05-01 10:43:44 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc-smb3-client-fixes-part2
+
+for you to fetch changes up to 9ee04875ae73412f5071f6ec1af01788ec271e7c:
+
+  cifs: Remove unneeded semicolon (2023-05-05 04:29:58 -0500)
+
+----------------------------------------------------------------
+9 smb3 client fixes, mostly DFS or reconnect related (six also for stable)
+- Two DFS connection sharing fixes
+- DFS refresh fix
+- Reconnect fix
+- Two potential use after free fixes
+- Also print prefix patch in mount debug msg
+- Two small cleanup fixes
+----------------------------------------------------------------
+Paulo Alcantara (7):
+      cifs: protect session status check in smb2_reconnect()
+      cifs: print smb3_fs_context::source when mounting
+      cifs: fix potential use-after-free bugs in TCP_Server_Info::hostname
+      cifs: fix potential race when tree connecting ipc
+      cifs: protect access of TCP_Server_Info::{origin,leaf}_fullpath
+      cifs: avoid potential races when handling multiple dfs tcons
+      cifs: fix sharing of DFS connections
+
+Steve French (1):
+      SMB3.1.1: correct definition for app_instance_id create contexts
+
+Yang Li (1):
+      cifs: Remove unneeded semicolon
+
+ fs/cifs/cifs_debug.c      |   7 +++-
+ fs/cifs/cifs_debug.h      |  12 +++---
+ fs/cifs/cifsfs.c          |  14 +++----
+ fs/cifs/cifsglob.h        |  23 ++++++-----
+ fs/cifs/cifsproto.h       |  44 ++++++++++++++++++++-
+ fs/cifs/connect.c         | 141
++++++++++++++++++++++++++++++++++++++------------------------------
+ fs/cifs/dfs.c             | 137
+++++++++++++++++++++++++++++++++++++++++++++++++++---------------
+ fs/cifs/dfs.h             |  13 ++++++-
+ fs/cifs/dfs_cache.c       | 133
++++++++++++++++++++++++++++++----------------------------------
+ fs/cifs/dfs_cache.h       |   9 +++++
+ fs/cifs/ioctl.c           |   2 +-
+ fs/cifs/sess.c            |   7 ++--
+ fs/cifs/smb2pdu.c         |  21 ++++++----
+ fs/ksmbd/smb2pdu.h        |  16 --------
+ fs/smbfs_common/smb2pdu.h |  20 ++++++++++
+ 15 files changed, 376 insertions(+), 223 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
