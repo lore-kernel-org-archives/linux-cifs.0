@@ -2,116 +2,69 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FAEC77B7D
-	for <linux-cifs@archiver.kernel.org>; Sat,  6 May 2023 00:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE24BC7EE24
+	for <linux-cifs@archiver.kernel.org>; Sat,  6 May 2023 02:20:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbjEFATR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 May 2023 20:19:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60206 "EHLO
+        id S233237AbjEFCUK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 May 2023 22:20:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbjEFATP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 May 2023 20:19:15 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A83AF7;
-        Fri,  5 May 2023 17:19:14 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4f11d267d8bso2696068e87.2;
-        Fri, 05 May 2023 17:19:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683332352; x=1685924352;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5zJbT9seqOr610GSQPlm/KBZDSeZR99v0XHRcyfZsL4=;
-        b=Wy214gXS09ETUO442Xq6Q9xy8yO5zx3NwJ80gbhp9l8mJvTnqZxBYLtiZHkUg365E6
-         iYJAHc/wr7eQ9n0HjOBlfCkA1xbNa/wFj0YLUFI5JgToiDLX/RNwAxvj3UZdE2Bm+d6C
-         T6XehCFIFV/4yIjzAGwlzfU65fwf8Hmudt6KSOq81SDIDnzol1+NvK6vFjZIXgvBCy67
-         uBHgt8HbyKp4whqMUjL2adkG42wVc0H1Dl9lzPL/Mvkz68YGaQvflSnGXBjdGSPZEmqe
-         qK35OobtnpVC194sJGe6lImafdwLyMuakxRyngXqlkVeoMUy3wKgdoug+zxlK4GO4nZJ
-         4kTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683332352; x=1685924352;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5zJbT9seqOr610GSQPlm/KBZDSeZR99v0XHRcyfZsL4=;
-        b=CVo+/nvLQ1B3rXGMr8DMl2IvLzK+3190lpYm85puROhqtvI9k7J5oYSxG9nmLmN+Sc
-         HSxVJUMt1fr2X2T1izNd1q+8aGrva3Xtyjw2Co9LysqtD3cmBAj4TkKOdfZiDd48dLRU
-         /Z6k58JmRD/LRl4T1k96PIEy9tE4mCHok0eF6mJ278lB1Eu+BSBe2HwFhkWjSDIQYqFA
-         TKd+/MM2MsJj3x0sFh8nrkUnFSP+IJFxNzgTQcwCI8KXtylew/pqPF3uDgnPLoQoQ583
-         fZ6Cd8kl13hS3xwhfl7/qdf27twTv7NbPQktVVZ53D2llbHwQgmn2L9awzy4Xt/VBJxV
-         dE4Q==
-X-Gm-Message-State: AC+VfDyF20n7UFPvkAMLlLas4qksiJoKScsysv/5R6Z0pDnsuiiSS03r
-        b3luWvVkiI/an9+eR1xopvCVOWCf6QdRNvSrhnPPQJImv8A=
-X-Google-Smtp-Source: ACHHUZ4A99RCn0qy34YbIPZUTbTx4Fx64p6VPUhpMYdbTtJtj8dj4wJi/OLnFnebB3J35wBSRqKHObv+423QrsG+xLc=
-X-Received: by 2002:a05:6512:3c2:b0:4b6:eca8:f6ca with SMTP id
- w2-20020a05651203c200b004b6eca8f6camr973158lfp.67.1683332352005; Fri, 05 May
- 2023 17:19:12 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 5 May 2023 19:19:00 -0500
-Message-ID: <CAH2r5msXNvALwEwtEyQuX_VjN=aNgfPZkvMbR74GeBHZyTDO_A@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        with ESMTP id S233179AbjEFCUJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 May 2023 22:20:09 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C7AF101;
+        Fri,  5 May 2023 19:20:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ED800641DD;
+        Sat,  6 May 2023 02:20:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5604AC433EF;
+        Sat,  6 May 2023 02:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1683339607;
+        bh=xhwjIeJR5ESGnA4DDITcj+rCAi+jdF01WbZ9r3O2A/I=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=ny+/TixONd5Eo+hkMg710YKlIQnCFle9sIpBQAzLXTmeZMUoibX7Xic6bDsYjGIsV
+         pomdyDe7e50NyOssHm5q5AUqatO7rNSCqOq6Ci8835zuszvbu9ENmE39vkOBiid2Y2
+         Oglc9juXqfNcVNnrKioHlkfChwVAUuaYkBou81bDaUDOzIbd+KcVtkfc0PjJnNeC+p
+         swNGlObP6zw3u/bkwbdagvLnuDHn2T2BCCtUd211kSWG5sIslhXkctSrtOJ5IESKEO
+         MmG/5DbsZdHk1sYT6NeZhPSv31TKnH2RBI6uP/at2qbzjjJC9M/eAoVVS2mOPaSLuq
+         YsoRPJhhrMndg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 478E6E5FFFA;
+        Sat,  6 May 2023 02:20:07 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5msXNvALwEwtEyQuX_VjN=aNgfPZkvMbR74GeBHZyTDO_A@mail.gmail.com>
+References: <CAH2r5msXNvALwEwtEyQuX_VjN=aNgfPZkvMbR74GeBHZyTDO_A@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5msXNvALwEwtEyQuX_VjN=aNgfPZkvMbR74GeBHZyTDO_A@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.4-rc-ksmbd-server-fixes-part2
+X-PR-Tracked-Commit-Id: eb307d09fe15844fdaebeb8cc8c9b9e925430aa5
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 2e1e1337881b0e9844d687982aa54b31b1269b11
+Message-Id: <168333960728.28237.14225405585433312318.pr-tracker-bot@kernel.org>
+Date:   Sat, 06 May 2023 02:20:07 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-1ae78a14516b9372e4c90a89ac21b259339a3a3a:
+The pull request you sent on Fri, 5 May 2023 19:19:00 -0500:
 
-  Merge tag '6.4-rc-ksmbd-server-fixes' of git://git.samba.org/ksmbd
-(2023-04-29 11:10:39 -0700)
+> git://git.samba.org/ksmbd.git tags/6.4-rc-ksmbd-server-fixes-part2
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/2e1e1337881b0e9844d687982aa54b31b1269b11
 
-  git://git.samba.org/ksmbd.git tags/6.4-rc-ksmbd-server-fixes-part2
-
-for you to fetch changes up to eb307d09fe15844fdaebeb8cc8c9b9e925430aa5:
-
-  ksmbd: call rcu_barrier() in ksmbd_server_exit() (2023-05-03 23:03:02 -0500)
-
-----------------------------------------------------------------
-Ten ksmbd server fixes, including some important security fixes
-- Two use after free fixes
-- Fix RCU callback race
-- Deadlock fix
-- Three patches to prevent session setup attacks
-- Prevent guest users from establishing multichannel sessions
-- Fix null pointer dereference in query FS info
-- Memleak fix
-----------------------------------------------------------------
-Namjae Jeon (10):
-      ksmbd: fix memleak in session setup
-      ksmbd: fix NULL pointer dereference in smb2_get_info_filesystem()
-      ksmbd: fix racy issue from session setup and logoff
-      ksmbd: destroy expired sessions
-      ksmbd: block asynchronous requests when making a delay on session setup
-      ksmbd: fix deadlock in ksmbd_find_crypto_ctx()
-      ksmbd: not allow guest user on multichannel
-      ksmbd: fix racy issue from smb2 close and logoff with multichannel
-      ksmbd: fix racy issue under cocurrent smb2 tree disconnect
-      ksmbd: call rcu_barrier() in ksmbd_server_exit()
-
- fs/ksmbd/auth.c              |  19 +++++++++++--------
- fs/ksmbd/connection.c        |  68
-++++++++++++++++++++++++++++++++++++++++++++++++--------------------
- fs/ksmbd/connection.h        |  58
-+++++++++++++++++++++++++++++++++++++++-------------------
- fs/ksmbd/mgmt/tree_connect.c |  13 ++++++++++++-
- fs/ksmbd/mgmt/tree_connect.h |   3 +++
- fs/ksmbd/mgmt/user_session.c |  81
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------------
- fs/ksmbd/mgmt/user_session.h |   1 +
- fs/ksmbd/server.c            |   4 +++-
- fs/ksmbd/smb2pdu.c           | 109
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------------
- fs/ksmbd/smb2pdu.h           |   2 ++
- fs/ksmbd/transport_tcp.c     |   2 +-
- 11 files changed, 250 insertions(+), 110 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
