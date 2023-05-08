@@ -2,70 +2,105 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9EEC77B7C
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 May 2023 01:07:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 405F1C77B75
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 May 2023 05:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230433AbjEHBH3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 7 May 2023 21:07:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34542 "EHLO
+        id S229852AbjEHFhK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 May 2023 01:37:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232026AbjEHBH2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 7 May 2023 21:07:28 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF3735AE
-        for <linux-cifs@vger.kernel.org>; Sun,  7 May 2023 18:07:27 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1ab01bf474aso29204225ad.1
-        for <linux-cifs@vger.kernel.org>; Sun, 07 May 2023 18:07:27 -0700 (PDT)
+        with ESMTP id S230348AbjEHFhI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 May 2023 01:37:08 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593D6A271
+        for <linux-cifs@vger.kernel.org>; Sun,  7 May 2023 22:37:06 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2ac79d4858dso45298731fa.2
+        for <linux-cifs@vger.kernel.org>; Sun, 07 May 2023 22:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1683508047; x=1686100047;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M5UtACvJBcuZF7Pht4qG1VtEcBaFBtDu1h1lJmGKQB0=;
-        b=SD0WYBqwI29OrLtQjTHyQZGc5qQIEcpxL46/rEgLwJlKcIE5t8bP66XNkxQUm4sgOR
-         ACJG2zfZlaSi/r89X3h9hOtt50Flg3mpjn7aYDxnJ7zI6wr9T8jbfuhCKn2XpgxxqZcE
-         R3AMG74xtbOkdBGMa9XDmy2XRRPfOP2gg3lg8=
+        d=gmail.com; s=20221208; t=1683524224; x=1686116224;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZS7iBiT3MqEhcXXQkzzeQcnpCKE5TAS9/DMn1oh0VNM=;
+        b=ePfzG1OBB13l5ChKS6bHvHTNvxWThXVKgykVTmIWtkn9NTXfkumAZ/TWeQwjFZHM1X
+         HOL4G3Nk1hjY6K39Fq0rGZx9cWjc/6mOBZeLk+7wklVX5Fl3x7+54YO+os9RK4tFH5Rr
+         FzW4st/Vtl8QHCSV/6N1oXt7ZeEu/NbuOGU6gGkNxidStottOV1YAfanZOUVwwdVXVE3
+         bznYfkMTq6dC/E313Zn/g9vcuIbq03ZqRThBmi0v0LHQiUW3y7S+ZZenf3WNSbp87E/1
+         XaCzjY/8Cui+bOhK43lUsBruCKCnsnabY44TYN87pe3BguPZ++py4A9KTH4noqz2UVFL
+         zktw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683508047; x=1686100047;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M5UtACvJBcuZF7Pht4qG1VtEcBaFBtDu1h1lJmGKQB0=;
-        b=QOnLKdXOKK4OFt+IGYi+L0jygXcUTfdELKLtpJ9ILD4Pr/l6IhnZoUgbh1Uh3TtSc4
-         iJikzGRvZLQCbIhnX7o7xi8jSL7tyLrwCTNFzx+5Z7Dr2VmfOs4f1DU2BHheaUsXfy0z
-         TFVxDkfZAeEj+bbugiMbEqISVnuidU51RNW3TAPWKV6bbPWJcTIpuASqh8fUO7d9782j
-         k3QDp8yWrJQ2Pv+J3TDaQsBiQkZSE5blU0ZeSSEc/IpABDOVcTMhQzKPcYOri/Fzr/VO
-         fPS0Bjf5AkwZzj+Y98qeOu7AbaDIK7cBLd4Ee/juHTy3qQ8u4UzI2oeL9daA0P79Go1W
-         RgDA==
-X-Gm-Message-State: AC+VfDwqGXcUoURCOTLGXve9deS1IjUcf710PC+6wUC3lzDGtylBQJ1p
-        CnHKa06/6uYf3ZMkOmb2j7M6YQ==
-X-Google-Smtp-Source: ACHHUZ5YxCtAA/hg35byANT47L8C/vZRd2tWrT1JVyl/JdqjqveUJyxpMWQoB9NeZ67zKYSRO3LQcA==
-X-Received: by 2002:a17:903:1205:b0:1ac:6d4c:c26a with SMTP id l5-20020a170903120500b001ac6d4cc26amr3465391plh.14.1683508046849;
-        Sun, 07 May 2023 18:07:26 -0700 (PDT)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id d6-20020a170902c18600b0019a5aa7eab0sm5746656pld.54.2023.05.07.18.07.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 May 2023 18:07:26 -0700 (PDT)
-Date:   Mon, 8 May 2023 10:07:22 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, tom@talpey.com, atteh.mailbox@gmail.com
-Subject: Re: [PATCH 5/6] ksmbd: remove unused ksmbd_tree_conn_share function
-Message-ID: <20230508010722.GC11511@google.com>
-References: <20230505151108.5911-1-linkinjeon@kernel.org>
- <20230505151108.5911-5-linkinjeon@kernel.org>
+        d=1e100.net; s=20221208; t=1683524224; x=1686116224;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZS7iBiT3MqEhcXXQkzzeQcnpCKE5TAS9/DMn1oh0VNM=;
+        b=b/kEaT95PcaOpR6Qkcfn9/GJ7wHFVMg1t0UJTX7nKJSjgdUdEClaHeGevY6HNZ4gmO
+         NqVpvjzjPO3Yuu+mBigIjy+yNYOgIdyuODR0NttK5wguyZVJa899Kzlz+kFRC/ZmEDgg
+         Kbpg5uY1xuUagRVc15/72XjCC+1u56Spew50BvDhGPrfA1oujU5z0m8QcC5l72j20iwD
+         fquEfvtdBmrazed1qU2CISPFuoUmm92Cvd/DnMeU0i3VNpNC3FirMq82yuLM4Et+l/Sc
+         x9cUPFeAbCQ6P50GXjtWkGRdKAejrYNqWVYV6Oap7V6NXvk0CrXTaMJMIeXCyr1qEiy3
+         bxEQ==
+X-Gm-Message-State: AC+VfDy9XidRrE0eLOQG0k0jpxurLnTIB3g2iPDZr+rs7vZRuw2tzrM8
+        l37cMeoV8oC+CnPoJ56xGw74e2MUr82uNzHINSe6qx2wy3d6uw==
+X-Google-Smtp-Source: ACHHUZ4AbUTrDAhrw3HVUtrP9NNumAyAzWYCmsqkWoVEBS5WiP3TgTeOfH2JS4QC3ac6SKq2Z3DyAz6GCcnYj4IxVfQ=
+X-Received: by 2002:a2e:93c3:0:b0:2a8:a5b8:185a with SMTP id
+ p3-20020a2e93c3000000b002a8a5b8185amr2426649ljh.10.1683524223921; Sun, 07 May
+ 2023 22:37:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230505151108.5911-5-linkinjeon@kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 8 May 2023 00:36:47 -0500
+Message-ID: <CAH2r5mtN7BW6AoeNEAPM=+7YM2EUtxJJ9bt-ezsiFcDCYH+e4g@mail.gmail.com>
+Subject: [PATCH][CIFS] do not reuse connection if share marked as isolated
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: multipart/mixed; boundary="0000000000005683d405fb2807b0"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On (23/05/06 00:11), Namjae Jeon wrote:
-> 
-> Remove unused ksmbd_tree_conn_share function.
-> 
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+--0000000000005683d405fb2807b0
+Content-Type: text/plain; charset="UTF-8"
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+"SHAREFLAG_ISOLATED_TRANSPORT" indicates that we should not reuse the socket
+for this share (for future mounts).  Mark the socket as server->nosharesock if
+share flags returned include SHAREFLAG_ISOLATED_TRANSPORT.
+
+See MS-SMB2 MS-SMB2 2.2.10 and 3.2.5.5
+
+See attached patch
+
+
+-- 
+Thanks,
+
+Steve
+
+--0000000000005683d405fb2807b0
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-SMB3.1.1-do-not-reuse-connection-if-share-marked-as-.patch"
+Content-Disposition: attachment; 
+	filename="0001-SMB3.1.1-do-not-reuse-connection-if-share-marked-as-.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lheeuekh0>
+X-Attachment-Id: f_lheeuekh0
+
+RnJvbSA0MzY1YTM5MWIxYjVjMGYyYTA2NWFiYWZhZmU0YWJkYTllOTYwMzhhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFN1biwgNyBNYXkgMjAyMyAxNzo1NzoxNyAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIFtT
+TUIzLjEuMV0gZG8gbm90IHJldXNlIGNvbm5lY3Rpb24gaWYgc2hhcmUgbWFya2VkIGFzCiBpc29s
+YXRlZAoKIlNIQVJFRkxBR19JU09MQVRFRF9UUkFOU1BPUlQiIGluZGljYXRlcyB0aGF0IHdlIHNo
+b3VsZCBub3QgcmV1c2UgdGhlCnNvY2tldCBmb3IgdGhpcyBzaGFyZSAoZm9yIGZ1dHVyZSBtb3Vu
+dHMpLiAgTWFyayB0aGUgc29ja2V0IGFzCnNlcnZlci0+bm9zaGFyZXNvY2sgaWYgc2hhcmUgZmxh
+Z3MgcmV0dXJuZWQgaW5jbHVkZQpTSEFSRUZMQUdfSVNPTEFURURfVFJBTlNQT1JULgoKU2VlIE1T
+LVNNQjIgTVMtU01CMiAyLjIuMTAgYW5kIDMuMi41LjUKClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZy
+ZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL3NtYjJwZHUuYyB8IDMg
+KysrCiAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvY2lm
+cy9zbWIycGR1LmMgYi9mcy9jaWZzL3NtYjJwZHUuYwppbmRleCBlMzNjYTBkMzM5MDYuLjllZDYx
+YjZmOWIyMSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIycGR1LmMKKysrIGIvZnMvY2lmcy9zbWIy
+cGR1LmMKQEAgLTE5NDcsNiArMTk0Nyw5IEBAIFNNQjJfdGNvbihjb25zdCB1bnNpZ25lZCBpbnQg
+eGlkLCBzdHJ1Y3QgY2lmc19zZXMgKnNlcywgY29uc3QgY2hhciAqdHJlZSwKIAlpbml0X2NvcHlf
+Y2h1bmtfZGVmYXVsdHModGNvbik7CiAJaWYgKHNlcnZlci0+b3BzLT52YWxpZGF0ZV9uZWdvdGlh
+dGUpCiAJCXJjID0gc2VydmVyLT5vcHMtPnZhbGlkYXRlX25lZ290aWF0ZSh4aWQsIHRjb24pOwor
+CWlmIChyYyA9PSAwKSAvKiBTZWUgTVMtU01CMiAyLjIuMTAgYW5kIDMuMi41LjUgKi8KKwkJaWYg
+KHRjb24tPnNoYXJlX2ZsYWdzICYgU01CMl9TSEFSRUZMQUdfSVNPTEFURURfVFJBTlNQT1JUKQor
+CQkJc2VydmVyLT5ub3NoYXJlc29jayA9IHRydWU7CiB0Y29uX2V4aXQ6CiAKIAlmcmVlX3JzcF9i
+dWYocmVzcF9idWZ0eXBlLCByc3ApOwotLSAKMi4zNC4xCgo=
+--0000000000005683d405fb2807b0--
