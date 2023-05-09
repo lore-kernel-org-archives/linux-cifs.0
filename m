@@ -2,100 +2,97 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D4C5C77B75
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 May 2023 07:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A4DC7EE22
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 May 2023 20:56:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbjEIHXn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 May 2023 03:23:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47470 "EHLO
+        id S235375AbjEIU4x (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 May 2023 16:56:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbjEIHXm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 May 2023 03:23:42 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31F3173C
-        for <linux-cifs@vger.kernel.org>; Tue,  9 May 2023 00:23:39 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-ba5e37f60f0so584928276.0
-        for <linux-cifs@vger.kernel.org>; Tue, 09 May 2023 00:23:39 -0700 (PDT)
+        with ESMTP id S235178AbjEIU4r (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 May 2023 16:56:47 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E80465B81
+        for <linux-cifs@vger.kernel.org>; Tue,  9 May 2023 13:56:04 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2ad1ba5dff7so42574171fa.3
+        for <linux-cifs@vger.kernel.org>; Tue, 09 May 2023 13:56:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683617019; x=1686209019;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0z7kuOsiTr7ntrsc0k5TrSWyDWzgG8oq3eJD9a4NwIE=;
-        b=QAz8EJDuU6Jf2yjFX93BccI/AN9ZyEHQZOAapIpLTRM5+b7LZi6w2zXStExmMN/7r+
-         tpaVL7wVDbTYgo8pa3TKG8mdRcxaQWo1tYibyj5IcjXt8Tr7rchThiGV+RJqCtkC7aC4
-         Fqq7RNI5yKTin62L5JSyfRbzHGG+u+WBfnplmGcMpb8giIP32M2oOIsJbnB5wfPkHPwa
-         +o1+xys/e5oxiB7+qf7m+GJKXZRi6atPyFgAg1fhA6BprUy6IxAVoZeZxWu+Tx3HOise
-         13zvuGHcVrnqntTwJBdHNgIy88CqvQZpR1h0+2iZCok0dPlhrTY2WmPjlgmjDa+YDzyO
-         KX/w==
+        d=gmail.com; s=20221208; t=1683665698; x=1686257698;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fR9UYariANfKNbUu5CYkvB/lFJh2KDM4XjyejLUkM44=;
+        b=MJJGFqUVVXBGcQZWSf1KQ9ISa3lvpDx25Ekl8B6h8n4GMJI7+jCylLFacex34EbM/F
+         bCSNP9PTQoKg5ZrDsRxJjSTLwJaD3I94riI8KFwbNoCftPjZbKQWkOtMPYSJ6cL8fsw0
+         U+Y9cE2L8NwKSGRWYa0+0JESSEx98GNrpw3Zdnzu7UKpeSWTH+wZwzMlML9Y14Ch0fKd
+         kt85zPCW9fk4G9Te0suPl+/IWa9F11AtDeL++OrmQGQEDJjbUOtIU0Sokc5nucy3ViwU
+         gMStVLQ37MgsTy6lE1GT3o65kgthSAWJ35upc9ECedmxDSGfn4C3HE2jxkDueiCn8UMJ
+         twYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683617019; x=1686209019;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0z7kuOsiTr7ntrsc0k5TrSWyDWzgG8oq3eJD9a4NwIE=;
-        b=ZmLi/KVySHRH1qXgfAVjD++Tlu66jECX4BkPUQmsj6d9+pDZxFjKGBG6HJ43XsHnpv
-         qrAXBEGMlHLz4itPPPk5tU/X+zuJVbzBL5yobFG783D1kCJOETtMEWDVt/FzUaVsEqo7
-         nq7roa/Y/lAeKp7HLpB9kRJBVJJUS2/E1Oewm38MgXrOGD1GisDo5EBoolkh7Z0268x1
-         yvrhkVs4RFaSQyRCJPi0K1SdONrZRNBq6cUF5g0metm/YNvEOBZPPwubjFDJ4lbjlU7y
-         4PAb9HNqDoJr0SyqpjEPDU9WIz0VXI/l1uzIjiPYBB+trRwQzYCYln0ApYC9kIXEfSjr
-         FHhQ==
-X-Gm-Message-State: AC+VfDzwCsUyJhLnDQKMRoLrHk4FD8TpaJ5ytaHvGos6+i/dymhltOTD
-        qnSB4GHRxkwnMATxGazR7yF18gthpaYpud33lzAMN1yd7U0=
-X-Google-Smtp-Source: ACHHUZ5lILYB/1+SR/wGBKqLGS/Mn9sFwbtL50/GrCEebzCgCuFQi0Y0T38f2weqfZeM4KPJK+ILy7gOvFd8aLsxRtc=
-X-Received: by 2002:a25:c5d3:0:b0:b9d:a3e5:76ff with SMTP id
- v202-20020a25c5d3000000b00b9da3e576ffmr15329440ybe.32.1683617018994; Tue, 09
- May 2023 00:23:38 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1683665698; x=1686257698;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fR9UYariANfKNbUu5CYkvB/lFJh2KDM4XjyejLUkM44=;
+        b=FV1lNHDa9qDr9xN7uD3fy7uLPWOpzadf+OziiPCOZk4U4rlfGFryKqXd5mHl80BNDz
+         MiJDgD1l4PUwL1m3BY3kDUeDGqzC/4IHZ0lQ0wVAbu6I1gQu03Mm833bn1Tuq5Ymyrlf
+         G2kyjwCdBpAiinx0pWK2sYWGiVwse7VXN0pjatSGM1RuIsCrt5+uSyMTKKlYb3c8+aDs
+         SqQ9+oKnoDz8dxOWrRdgM9tCSmBiVQYygc2m9Ibd8DbqY3XkJmVg0MKr5q8Me3ieB8cd
+         TnZmpFqdwBxBg8sPS+z7667UnQhyJTT0GESHvMicCyA1g3np5bt/Ru1jNEEpE8RyiXv0
+         tIhg==
+X-Gm-Message-State: AC+VfDyo0Zt7YwD2Ozn1UTHliOdtBjGVjOPn2lWNrVrKKNoWZ7Webxy5
+        evBTYlBtyC+jDXoHS2KgsHyEqvie3oFa3T3C86Fuxln86BkiWR6K
+X-Google-Smtp-Source: ACHHUZ7VVGUOPOsTKwT86ksA/6DJ9YvqHlgtol3hlgbt37vCr3s+6M0J6dNtDmX++RhgKFx0MtG4LFwIR5uJJrW4OZk=
+X-Received: by 2002:a2e:7c0f:0:b0:2ac:7ae8:2c10 with SMTP id
+ x15-20020a2e7c0f000000b002ac7ae82c10mr1395421ljc.33.1683665698290; Tue, 09
+ May 2023 13:54:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvqK0CkcR_DOwUfDVzsWco-SXb4rTt14b-YF5CpqCNrZQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mvqK0CkcR_DOwUfDVzsWco-SXb4rTt14b-YF5CpqCNrZQ@mail.gmail.com>
-From:   Bharath SM <bharathsm.hsk@gmail.com>
-Date:   Tue, 9 May 2023 12:53:28 +0530
-Message-ID: <CAGypqWyuCdiEmuFzefEY05zDiBhP+g7y2e0p-9nts4rM5keRpg@mail.gmail.com>
-Subject: Re: [PATCH] SMB3: force unmount was failing to close deferred close files
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Bharath S M <bharathsm@microsoft.com>,
-        rohiths msft <rohiths.msft@gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 9 May 2023 15:54:47 -0500
+Message-ID: <CAH2r5muZavtKBU__Qy2s+XRG11u1HXyjC3oXF2yxY5h1b2jh1g@mail.gmail.com>
+Subject: Samba returning mtime for multiple time stamp fields
+To:     samba-technical <samba-technical@lists.samba.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ack by me.
+I noticed a problem with Samba when running xfstest 236.
 
-On Tue, May 9, 2023 at 12:05=E2=80=AFPM Steve French <smfrench@gmail.com> w=
-rote:
->
-> In investigating a failure with xfstest generic/392 it
-> was noticed that mounts were reusing a superblock that should
-> already have been freed. This turned out to be related to
-> deferred close files keeping a reference count until the
-> closetimeo expired.
->
-> Currently the only way an fs knows that mount is beginning is
-> when force unmount is called, but when this, ie umount_begin(),
-> is called all deferred close files on the share (tree
-> connection) should be closed immediately (unless shared by
-> another mount) to avoid using excess resources on the server
-> and to avoid reusing a superblock which should already be freed.
->
-> In umount_begin, close all deferred close handles for that
-> share if this is the last mount using that share on this
-> client (ie send the SMB3 close request over the wire for those
-> that have been already closed by the app but that we have
-> kept a handle lease open for and have not sent closes to the
-> server for yet).
->
-> Reported-by: David Howells <dhowells@redhat.com>
-> Cc: <stable@vger.kernel.org>
-> Fixes: 78c09634f7dc ("Cifs: Fix kernel oops caused by deferred close
-> for files.")
->
-> See attached
-> --
-> Thanks,
->
-> Steve
+xfstest/236 does
+touch file1
+stat file1
+ln file1 file2
+stat file2
+
+And checks to make sure ctime is updated.  Locally I can see the ctime
+is updated, but Samba reports the value of mtime in both mtime and
+ctime (and doesn't show the change to ctime which causes the test to
+fail)
+
+root@smfrench-ThinkPad-P52:/mnt2# stat /test/out1
+  File: /test/out1
+  Size: 0          Blocks: 8          IO Block: 4096   regular empty file
+Device: 10302h/66306d Inode: 552933716   Links: 2
+Access: (0777/-rwxrwxrwx)  Uid: ( 1000/smfrench)   Gid: ( 1000/smfrench)
+Access: 2023-05-09 15:49:37.000109800 -0500
+Modify: 2023-05-09 15:49:37.000109800 -0500
+Change: 2023-05-09 15:50:08.405799460 -0500
+ Birth: 2023-05-09 15:49:36.980131061 -0500
+root@smfrench-ThinkPad-P52:/mnt2# stat out1
+  File: out1
+  Size: 0          Blocks: 8          IO Block: 1048576 regular empty file
+Device: 35h/53d Inode: 226         Links: 2
+Access: (0777/-rwxrwxrwx)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2023-05-09 15:49:37.000109800 -0500
+Modify: 2023-05-09 15:49:37.000109800 -0500
+Change: 2023-05-09 15:49:37.000109800 -0500
+ Birth: 2023-05-09 15:49:36.980131000 -0500
+
+#  /usr/local/samba/sbin/smbd -V
+Version 4.19.0pre1-GIT-3633027e49a
+
+
+-- 
+Thanks,
+
+Steve
