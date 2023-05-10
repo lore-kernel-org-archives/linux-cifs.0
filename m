@@ -2,139 +2,111 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC9DC7EE22
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 May 2023 00:58:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55781C7EE22
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 May 2023 22:51:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235307AbjEJA6Y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 May 2023 20:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
+        id S235540AbjEJWv6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 May 2023 18:51:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229702AbjEJA6W (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 May 2023 20:58:22 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A375E44AB;
-        Tue,  9 May 2023 17:58:20 -0700 (PDT)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QGGjw6xnszTkTS;
-        Wed, 10 May 2023 08:53:40 +0800 (CST)
-Received: from [10.67.110.112] (10.67.110.112) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Wed, 10 May 2023 08:58:18 +0800
-Message-ID: <c6e84076-9134-8c27-75bb-9191da6c23c3@huawei.com>
-Date:   Wed, 10 May 2023 08:58:17 +0800
+        with ESMTP id S230467AbjEJWv5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 May 2023 18:51:57 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56BEA4488;
+        Wed, 10 May 2023 15:51:55 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4f139de8cefso42789897e87.0;
+        Wed, 10 May 2023 15:51:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683759113; x=1686351113;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ohs3T3NdbbBRfBPZoviqythlTyCVKHR7HNnzdiYYugg=;
+        b=UZcIdCcS9GRr82mG/CdB3huJwhDoxQIzvsmnyFbvvmquGJg4EQuA2UEmpC49ODEitw
+         9vAgM6uM3DM7uSpET+bjLVEqgrLIaFrHLgV6tEYyjN8qLYwRgPkoC7JddtTcss2iSn+N
+         O4Ic6SZzG/SJ6mFkVy7Y0kHE49H8ECiJBGW8quvIQTrBVC0YAyJb9SkrzNfENLbL3TeY
+         O9c3LRdhg18EZ7YMdJfHUi/1wnXsl9wNMDVDKXVPoUwS8Ry7klVlPUU3FVKsBHlo4nfK
+         nNQuv2lX7qaQeap8/ZF0KD+c3nXN6fBBoY585/0v9PCIq7xZk6Lp7ExMDTnvLSAK2+RC
+         Fevg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683759113; x=1686351113;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ohs3T3NdbbBRfBPZoviqythlTyCVKHR7HNnzdiYYugg=;
+        b=fnFoHsww106QeMPSZB/ZXBujYJxQskHgzYX3LgWlS9olFXgVrc3VcKjMBzhSoW2f/E
+         dUWvzDhQgBmzxBFj2hWFL+lxzW2/ZASHVxVin3AZngrh0eh2g2gOY0lZVqBYdGWmJ9KG
+         Rsjii6tpjOAA+BMaATXIjxGDj3pAlldmWvPj6ntzC1VDalUuKyI8l3O9tVoD8a8B5AA1
+         NSmtY4jMzGtuiMwxO1lZCi+hzEiEP1IA0e8VoQt25vuT0PzAA+mMU5YcVG9glWXHryRX
+         qZaiyn6rr8CU4XU8gpybX1SUJh6Oi/jq19HzIlFk+begBt8g6fwJtIUPwA9iGEuqGcoW
+         0j+w==
+X-Gm-Message-State: AC+VfDz7kdFLCHBfCy7OhneP51dzkr8bHDmdq8UbfrRCo106gA5STdIi
+        kPrtq0uIGTFODeKM2zAqxFAvZkMKuNQiT3Xb6SCahfDBNkcb/eJR
+X-Google-Smtp-Source: ACHHUZ6pFQA0UQwdD2HgKoqbtWxg3G+c05xilomwWIM3CxOrp3RcYZSBfnwod4YVRpJnf3J/cH3r1pgeRS3YN/Dz05k=
+X-Received: by 2002:a05:6512:2806:b0:4eb:4258:bf62 with SMTP id
+ cf6-20020a056512280600b004eb4258bf62mr1882701lfb.8.1683759113049; Wed, 10 May
+ 2023 15:51:53 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH -next 0/2] lsm: Change inode_setattr() to take struct
-Content-Language: en-US
-From:   xiujianfeng <xiujianfeng@huawei.com>
-To:     <gregkh@linuxfoundation.org>, <rafael@kernel.org>,
-        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-        <dhowells@redhat.com>, <code@tyhicks.com>,
-        <hirofumi@mail.parknet.co.jp>, <linkinjeon@kernel.org>,
-        <sfrench@samba.org>, <senozhatsky@chromium.org>, <tom@talpey.com>,
-        <chuck.lever@oracle.com>, <jlayton@kernel.org>,
-        <miklos@szeredi.hu>, <paul@paul-moore.com>, <jmorris@namei.org>,
-        <serge@hallyn.com>, <stephen.smalley.work@gmail.com>,
-        <eparis@parisplace.org>, <casey@schaufler-ca.com>,
-        <dchinner@redhat.com>, <john.johansen@canonical.com>,
-        <mcgrof@kernel.org>, <mortonm@chromium.org>, <fred@cloudflare.com>,
-        <mic@digikod.net>, <mpe@ellerman.id.au>, <nathanl@linux.ibm.com>,
-        <gnoack3000@gmail.com>, <roberto.sassu@huawei.com>
-CC:     <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-cachefs@redhat.com>, <ecryptfs@vger.kernel.org>,
-        <linux-cifs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-        <linux-unionfs@vger.kernel.org>,
-        <linux-security-module@vger.kernel.org>, <selinux@vger.kernel.org>,
-        <wangweiyang2@huawei.com>
-References: <20230505081200.254449-1-xiujianfeng@huawei.com>
-In-Reply-To: <20230505081200.254449-1-xiujianfeng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.110.112]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500023.china.huawei.com (7.185.36.114)
-X-CFilter-Loop: Reflected
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 10 May 2023 17:51:41 -0500
+Message-ID: <CAH2r5mtcjLkmWqRTZnZaXzvXZWHka_73nN1nSq0a=KQZ4hA4eA@mail.gmail.com>
+Subject: [PATCH] cifs: release leases for deferred close handles when freezing
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000d22d8205fb5eb705"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-sorry, I forgot to add the link to preview discussion:
+--000000000000d22d8205fb5eb705
+Content-Type: text/plain; charset="UTF-8"
 
-https://lore.kernel.org/all/20220827111215.131442-1-xiujianfeng@huawei.com/
+We should not be caching closed files when freeze is invoked on an fs
+so we can release resources more gracefully).
 
-On 2023/5/5 16:11, Xiu Jianfeng wrote:
-> Hi,
-> 
-> I am working on adding xattr/attr support for landlock [1], so we can
-> control fs accesses such as chmod, chown, uptimes, setxattr, etc.. inside
-> landlock sandbox. the LSM hooks as following are invoved:
-> 1.inode_setattr
-> 2.inode_setxattr
-> 3.inode_removexattr
-> 4.inode_set_acl
-> 5.inode_remove_acl
-> which are controlled by LANDLOCK_ACCESS_FS_WRITE_METADATA.
-> 
-> and
-> 1.inode_getattr
-> 2.inode_get_acl
-> 3.inode_getxattr
-> 4.inode_listxattr
-> which are controlled by LANDLOCK_ACCESS_FS_READ_METADATA
-> 
-> Some of these hooks only take struct dentry as a argument, However, for
-> path-based LSMs such Landlock, Apparmor and Tomoyo, struct path instead
-> of struct dentry required to make sense of attr/xattr accesses. So we
-> need to refactor these hooks to take a struct path argument.
-> 
-> This patchset only refators inode_setattr hook as part of whole work.
-> 
-> Also, I have a problem about file_dentry() in __file_remove_privs() of the
-> first patch, before changes in commit c1892c37769cf ("vfs: fix deadlock in
-> file_remove_privs() on overlayfs"), it gets dentry and inode as belows:
-> 
-> struct dentry *dentry = file->f_path.dentry;
-> struct inode *inode = d_inode(dentry);
-> 
-> That would be clear to change it to pass &file->f_path to
-> __remove_privs()->notify_change()->inode_setattr().
-> After that commit, it has been changed to:
-> 
-> struct dentry *dentry = file_dentry(file);
-> struct inode *inode = file_inode(file);
-> 
-> If I understand correctly, the dentry from file_dentry() maybe the upper
-> or the lower, it can be different from file->f_path.dentry. It can't just
-> go back to use &file->f_path otherwise the bug will come back for
-> overlayfs. So for such scenario, how to get a path from file if the file
-> maybe or not from overlayfs, and which kind of overlayfs path is ok for
-> Landlock?
-> 
-> Xiu Jianfeng (2):
->   fs: Change notify_change() to take struct path argument
->   lsm: Change inode_setattr hook to take struct path argument
-> 
->  drivers/base/devtmpfs.c       |  5 +++--
->  fs/attr.c                     |  7 ++++---
->  fs/cachefiles/interface.c     |  4 ++--
->  fs/coredump.c                 |  2 +-
->  fs/ecryptfs/inode.c           | 18 +++++++++---------
->  fs/fat/file.c                 |  2 +-
->  fs/inode.c                    |  8 +++++---
->  fs/ksmbd/smb2pdu.c            |  6 +++---
->  fs/ksmbd/smbacl.c             |  2 +-
->  fs/namei.c                    |  2 +-
->  fs/nfsd/vfs.c                 | 12 ++++++++----
->  fs/open.c                     | 19 ++++++++++---------
->  fs/overlayfs/overlayfs.h      |  4 +++-
->  fs/utimes.c                   |  2 +-
->  include/linux/fs.h            |  4 ++--
->  include/linux/lsm_hook_defs.h |  2 +-
->  include/linux/security.h      |  4 ++--
->  security/security.c           | 10 +++++-----
->  security/selinux/hooks.c      |  3 ++-
->  security/smack/smack_lsm.c    |  5 +++--
->  20 files changed, 67 insertions(+), 54 deletions(-)
-> 
+Fixes xfstests generic/068 generic/390 generic/491
+
+See attached.
+
+
+
+
+-- 
+Thanks,
+
+Steve
+
+--000000000000d22d8205fb5eb705
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-release-leases-for-deferred-close-handles-when-.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-release-leases-for-deferred-close-handles-when-.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lhiaozqt0>
+X-Attachment-Id: f_lhiaozqt0
+
+RnJvbSBkMzlmYzU5MmVmOGFlOWE4OWM1ZTg1YzhkOWY3NjA5MzdhNTdkNWJhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFdlZCwgMTAgTWF5IDIwMjMgMTc6NDI6MjEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiByZWxlYXNlIGxlYXNlcyBmb3IgZGVmZXJyZWQgY2xvc2UgaGFuZGxlcyB3aGVuIGZyZWV6
+aW5nCgpXZSBzaG91bGQgbm90IGJlIGNhY2hpbmcgY2xvc2VkIGZpbGVzIHdoZW4gZnJlZXplIGlz
+IGludm9rZWQgb24gYW4gZnMKKHNvIHdlIGNhbiByZWxlYXNlIHJlc291cmNlcyBtb3JlIGdyYWNl
+ZnVsbHkpLgoKRml4ZXMgeGZzdGVzdHMgZ2VuZXJpYy8wNjggZ2VuZXJpYy8zOTAgZ2VuZXJpYy80
+OTEKClJldmlld2VkLWJ5OiBEYXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpDYzog
+PHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmc+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3Rm
+cmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNmcy5jIHwgMTUgKysrKysrKysr
+KysrKysrCiAxIGZpbGUgY2hhbmdlZCwgMTUgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2Zz
+L2NpZnMvY2lmc2ZzLmMgYi9mcy9jaWZzL2NpZnNmcy5jCmluZGV4IDhiNmIzYjY5ODVmMy4uNDNh
+NGQ4NjAzZGIzIDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNmcy5jCisrKyBiL2ZzL2NpZnMvY2lm
+c2ZzLmMKQEAgLTc2MCw2ICs3NjAsMjAgQEAgc3RhdGljIHZvaWQgY2lmc191bW91bnRfYmVnaW4o
+c3RydWN0IHN1cGVyX2Jsb2NrICpzYikKIAlyZXR1cm47CiB9CiAKK3N0YXRpYyBpbnQgY2lmc19m
+cmVlemUoc3RydWN0IHN1cGVyX2Jsb2NrICpzYikKK3sKKwlzdHJ1Y3QgY2lmc19zYl9pbmZvICpj
+aWZzX3NiID0gQ0lGU19TQihzYik7CisJc3RydWN0IGNpZnNfdGNvbiAqdGNvbjsKKworCWlmIChj
+aWZzX3NiID09IE5VTEwpCisJCXJldHVybiAwOworCisJdGNvbiA9IGNpZnNfc2JfbWFzdGVyX3Rj
+b24oY2lmc19zYik7CisKKwljaWZzX2Nsb3NlX2FsbF9kZWZlcnJlZF9maWxlcyh0Y29uKTsKKwly
+ZXR1cm4gMDsKK30KKwogI2lmZGVmIENPTkZJR19DSUZTX1NUQVRTMgogc3RhdGljIGludCBjaWZz
+X3Nob3dfc3RhdHMoc3RydWN0IHNlcV9maWxlICpzLCBzdHJ1Y3QgZGVudHJ5ICpyb290KQogewpA
+QCAtNzk4LDYgKzgxMiw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3Qgc3VwZXJfb3BlcmF0aW9ucyBj
+aWZzX3N1cGVyX29wcyA9IHsKIAlhcyBvcGVucyAqLwogCS5zaG93X29wdGlvbnMgPSBjaWZzX3No
+b3dfb3B0aW9ucywKIAkudW1vdW50X2JlZ2luICAgPSBjaWZzX3Vtb3VudF9iZWdpbiwKKwkuZnJl
+ZXplX2ZzICAgICAgPSBjaWZzX2ZyZWV6ZSwKICNpZmRlZiBDT05GSUdfQ0lGU19TVEFUUzIKIAku
+c2hvd19zdGF0cyA9IGNpZnNfc2hvd19zdGF0cywKICNlbmRpZgotLSAKMi4zNC4xCgo=
+--000000000000d22d8205fb5eb705--
