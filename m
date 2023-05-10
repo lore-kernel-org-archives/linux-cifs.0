@@ -2,101 +2,139 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D48EC77B75
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 May 2023 21:22:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC9DC7EE22
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 May 2023 00:58:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236095AbjEIVWN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 May 2023 17:22:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38656 "EHLO
+        id S235307AbjEJA6Y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 May 2023 20:58:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235967AbjEIVVe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 May 2023 17:21:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D317E7EE4;
-        Tue,  9 May 2023 14:20:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1640B63759;
-        Tue,  9 May 2023 21:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34832C43322;
-        Tue,  9 May 2023 21:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683667220;
-        bh=D0inDjh17ucDAvUCWYWlRHkWEI4z5LPZgGMhf9w+PlI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OM+PnJ5qxTNhpe1X4+K7E2ATUna/Z5J5zpfqKoN/dAqNimZhjjUJkkwN2g5E+McFN
-         QbArfb/UxOF+O9GY+mtQg39Rljeb3XS8JmwC6fsOO6r1vtD7eFtOL+QZJzd0aVS0oV
-         q8clvspzUVj7sPEGY2zixI9oh9vpWEx59H28IbQQVilX/2bGkVFHAEntRWixfZU/1b
-         Id55WxtEehe2Zev7eNHLa+KndeHvf/87u2ZMYqXqkuilIToRQ5syoCKOhW9q/G8w26
-         0wikHTG1eUq8WzhZQgOOG3q42uR9qorHLFLMtP6HY7+ot1mp01lKhqVEUvs0BC6rnU
-         J6AvxvjXGl9UQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Steve French <stfrench@microsoft.com>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Bharath SM <bharathsm@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.2 18/18] cifs: missing lock when updating session status
-Date:   Tue,  9 May 2023 17:19:56 -0400
-Message-Id: <20230509211958.21596-18-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230509211958.21596-1-sashal@kernel.org>
-References: <20230509211958.21596-1-sashal@kernel.org>
+        with ESMTP id S229702AbjEJA6W (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 May 2023 20:58:22 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A375E44AB;
+        Tue,  9 May 2023 17:58:20 -0700 (PDT)
+Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QGGjw6xnszTkTS;
+        Wed, 10 May 2023 08:53:40 +0800 (CST)
+Received: from [10.67.110.112] (10.67.110.112) by
+ dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 10 May 2023 08:58:18 +0800
+Message-ID: <c6e84076-9134-8c27-75bb-9191da6c23c3@huawei.com>
+Date:   Wed, 10 May 2023 08:58:17 +0800
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH -next 0/2] lsm: Change inode_setattr() to take struct
+Content-Language: en-US
+From:   xiujianfeng <xiujianfeng@huawei.com>
+To:     <gregkh@linuxfoundation.org>, <rafael@kernel.org>,
+        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <dhowells@redhat.com>, <code@tyhicks.com>,
+        <hirofumi@mail.parknet.co.jp>, <linkinjeon@kernel.org>,
+        <sfrench@samba.org>, <senozhatsky@chromium.org>, <tom@talpey.com>,
+        <chuck.lever@oracle.com>, <jlayton@kernel.org>,
+        <miklos@szeredi.hu>, <paul@paul-moore.com>, <jmorris@namei.org>,
+        <serge@hallyn.com>, <stephen.smalley.work@gmail.com>,
+        <eparis@parisplace.org>, <casey@schaufler-ca.com>,
+        <dchinner@redhat.com>, <john.johansen@canonical.com>,
+        <mcgrof@kernel.org>, <mortonm@chromium.org>, <fred@cloudflare.com>,
+        <mic@digikod.net>, <mpe@ellerman.id.au>, <nathanl@linux.ibm.com>,
+        <gnoack3000@gmail.com>, <roberto.sassu@huawei.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-cachefs@redhat.com>, <ecryptfs@vger.kernel.org>,
+        <linux-cifs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+        <linux-unionfs@vger.kernel.org>,
+        <linux-security-module@vger.kernel.org>, <selinux@vger.kernel.org>,
+        <wangweiyang2@huawei.com>
+References: <20230505081200.254449-1-xiujianfeng@huawei.com>
+In-Reply-To: <20230505081200.254449-1-xiujianfeng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.110.112]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500023.china.huawei.com (7.185.36.114)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Steve French <stfrench@microsoft.com>
+sorry, I forgot to add the link to preview discussion:
 
-[ Upstream commit 943fb67b090212f1d3789eb7796b1c9045c62fd6 ]
+https://lore.kernel.org/all/20220827111215.131442-1-xiujianfeng@huawei.com/
 
-Coverity noted a place where we were not grabbing
-the ses_lock when setting (and checking) ses_status.
-
-Addresses-Coverity: 1536833 ("Data race condition (MISSING_LOCK)")
-Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
-Reviewed-by: Bharath SM <bharathsm@microsoft.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/connect.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 985e962cf0858..860e533ad1bf0 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1965,18 +1965,22 @@ void cifs_put_smb_ses(struct cifs_ses *ses)
- 	/* ses_count can never go negative */
- 	WARN_ON(ses->ses_count < 0);
- 
-+	spin_lock(&ses->ses_lock);
- 	if (ses->ses_status == SES_GOOD)
- 		ses->ses_status = SES_EXITING;
- 
--	cifs_free_ipc(ses);
--
- 	if (ses->ses_status == SES_EXITING && server->ops->logoff) {
-+		spin_unlock(&ses->ses_lock);
-+		cifs_free_ipc(ses);
- 		xid = get_xid();
- 		rc = server->ops->logoff(xid, ses);
- 		if (rc)
- 			cifs_server_dbg(VFS, "%s: Session Logoff failure rc=%d\n",
- 				__func__, rc);
- 		_free_xid(xid);
-+	} else {
-+		spin_unlock(&ses->ses_lock);
-+		cifs_free_ipc(ses);
- 	}
- 
- 	spin_lock(&cifs_tcp_ses_lock);
--- 
-2.39.2
-
+On 2023/5/5 16:11, Xiu Jianfeng wrote:
+> Hi,
+> 
+> I am working on adding xattr/attr support for landlock [1], so we can
+> control fs accesses such as chmod, chown, uptimes, setxattr, etc.. inside
+> landlock sandbox. the LSM hooks as following are invoved:
+> 1.inode_setattr
+> 2.inode_setxattr
+> 3.inode_removexattr
+> 4.inode_set_acl
+> 5.inode_remove_acl
+> which are controlled by LANDLOCK_ACCESS_FS_WRITE_METADATA.
+> 
+> and
+> 1.inode_getattr
+> 2.inode_get_acl
+> 3.inode_getxattr
+> 4.inode_listxattr
+> which are controlled by LANDLOCK_ACCESS_FS_READ_METADATA
+> 
+> Some of these hooks only take struct dentry as a argument, However, for
+> path-based LSMs such Landlock, Apparmor and Tomoyo, struct path instead
+> of struct dentry required to make sense of attr/xattr accesses. So we
+> need to refactor these hooks to take a struct path argument.
+> 
+> This patchset only refators inode_setattr hook as part of whole work.
+> 
+> Also, I have a problem about file_dentry() in __file_remove_privs() of the
+> first patch, before changes in commit c1892c37769cf ("vfs: fix deadlock in
+> file_remove_privs() on overlayfs"), it gets dentry and inode as belows:
+> 
+> struct dentry *dentry = file->f_path.dentry;
+> struct inode *inode = d_inode(dentry);
+> 
+> That would be clear to change it to pass &file->f_path to
+> __remove_privs()->notify_change()->inode_setattr().
+> After that commit, it has been changed to:
+> 
+> struct dentry *dentry = file_dentry(file);
+> struct inode *inode = file_inode(file);
+> 
+> If I understand correctly, the dentry from file_dentry() maybe the upper
+> or the lower, it can be different from file->f_path.dentry. It can't just
+> go back to use &file->f_path otherwise the bug will come back for
+> overlayfs. So for such scenario, how to get a path from file if the file
+> maybe or not from overlayfs, and which kind of overlayfs path is ok for
+> Landlock?
+> 
+> Xiu Jianfeng (2):
+>   fs: Change notify_change() to take struct path argument
+>   lsm: Change inode_setattr hook to take struct path argument
+> 
+>  drivers/base/devtmpfs.c       |  5 +++--
+>  fs/attr.c                     |  7 ++++---
+>  fs/cachefiles/interface.c     |  4 ++--
+>  fs/coredump.c                 |  2 +-
+>  fs/ecryptfs/inode.c           | 18 +++++++++---------
+>  fs/fat/file.c                 |  2 +-
+>  fs/inode.c                    |  8 +++++---
+>  fs/ksmbd/smb2pdu.c            |  6 +++---
+>  fs/ksmbd/smbacl.c             |  2 +-
+>  fs/namei.c                    |  2 +-
+>  fs/nfsd/vfs.c                 | 12 ++++++++----
+>  fs/open.c                     | 19 ++++++++++---------
+>  fs/overlayfs/overlayfs.h      |  4 +++-
+>  fs/utimes.c                   |  2 +-
+>  include/linux/fs.h            |  4 ++--
+>  include/linux/lsm_hook_defs.h |  2 +-
+>  include/linux/security.h      |  4 ++--
+>  security/security.c           | 10 +++++-----
+>  security/selinux/hooks.c      |  3 ++-
+>  security/smack/smack_lsm.c    |  5 +++--
+>  20 files changed, 67 insertions(+), 54 deletions(-)
+> 
