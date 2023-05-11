@@ -2,60 +2,60 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E72C77B7C
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 12:00:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94110C7EE22
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 12:00:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237969AbjEKMAR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 11 May 2023 08:00:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38770 "EHLO
+        id S237991AbjEKMA0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 May 2023 08:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237820AbjEKL74 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 May 2023 07:59:56 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C83B93F9
-        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:51 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4f26f437b30so501129e87.1
-        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:51 -0700 (PDT)
+        with ESMTP id S237935AbjEKMAB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 May 2023 08:00:01 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4749055B3
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:52 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2ac88d9edf3so80973461fa.0
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683806389; x=1686398389;
+        d=linaro.org; s=google; t=1683806390; x=1686398390;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2CPc/Vm/Ur0JOy8kF/L6fs0qWXc+VKBrwCqiZQE3hiQ=;
-        b=us1qr2gpwQ3bBAky0xvbHlSTRCtb1nydasm8z39XkazIJzESLaqNzEYvSDrqWvBqBX
-         4xcES64hit/N9fYugYwoV5W3g4eBVSitwsbnnifZ0lNM9KhPgKlQsFulFvXvE2t+KR4U
-         ORQ5OFqloYcfrHKwTO12OVVscWtd5hVcDmECRKCgjTthI9wyAS5zhkAj5RdT8DId2mTE
-         5+ejX9H2q5kq1KWIA7iOUhoaa7GyZwuQHvQ3gEGe/NTiXYuogO2QROPtUakEjm0CnwbK
-         kvsZHLKeUbzU9xoleFgHTrQZPpPyif74SXwCAcrOuKmxwemz6uMXGapYyPfo5nL/aCgI
-         pNdA==
+        bh=AULvzv+57dD5HpSWPkpxyceRhii29y9Rzv9p/7gtLz8=;
+        b=soo7gel61xLJPPvWmBpSRpISycpQ4XMSOLDpuxsIg8UcYukLYcg7kMmXk/2zJzG1nW
+         dsU8I+b6+EeJC/RPFjsri77SgRQ6hq2riwqwbxPxb9BPmFrHaOXA8XlBqwiqx0GubS/i
+         Mhuqa/PtIduAVK1dEpaA3MpUlLbL32Xbmw+sH+jktUlv+lmF4kpGzKSikAVGP0VgKPOp
+         YCj4v5oEg1jhayDSX8iKc90tIlislQLi37GCRWiSDvFSwFEkSlw0s6Y42ltaRe+/B46x
+         HB3CKfzsllSPT5KE0DczkqM0Ns6TrGXqPqX3xl8eTKyXRx+KvTrVcbjwXkVi5//X0Zuv
+         BYQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683806389; x=1686398389;
+        d=1e100.net; s=20221208; t=1683806390; x=1686398390;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2CPc/Vm/Ur0JOy8kF/L6fs0qWXc+VKBrwCqiZQE3hiQ=;
-        b=Sr7Ew1MRW4lqZkFJJ7lNhuW2Q3fLzpusTZ3OMFX/YlFm+5rgsuTrmdMh0JKAVEH6oV
-         Y81OvZgAGYohIRb+xZcgPDBEFLCQ47+hFuFdy1CUIsQDkv2ZdIF9xP6pDfzGq5NLPdb1
-         Ju+TmpvMOCBdCNABXk+2vJ0KTBlmD/CgqS8ewCQ+u1OkA0TyM/7zYixiqM6unFnro/XU
-         B48KVr5LCR9eXw0fzoiwhbyx6t2WF1mwseDNKTQnYc1/SwN/BMSH2mvhu1BGJD0+KSoT
-         TkV46E0p5KrQzLe29pjCPVhs+khoMR8WBEH2ZTONJe9oXSClwrYvSVECScDCSgLOClh+
-         29UA==
-X-Gm-Message-State: AC+VfDzBA99eGu7Azqn3334iV0j/uIaIP86w7rcn5KAMykcymWOE/vXd
-        Jiunme3JozeiiKZETDfp+JhvHQ==
-X-Google-Smtp-Source: ACHHUZ4QkE8eS3TpZoQ27rQu2+0fhZ0L6/1Hi4I8nOp2Q9+9XqczCBc3KV8aWbi1HyhYGQflHWz/3A==
-X-Received: by 2002:ac2:5fae:0:b0:4ea:fa07:1182 with SMTP id s14-20020ac25fae000000b004eafa071182mr2670102lfe.14.1683806389365;
-        Thu, 11 May 2023 04:59:49 -0700 (PDT)
+        bh=AULvzv+57dD5HpSWPkpxyceRhii29y9Rzv9p/7gtLz8=;
+        b=aQ+xUUC8NunlOWebS4Kde4e0xHzk4abrNyZFRHwebWME+5wK7vz73rJk1z+P3V0j8U
+         0OuQcD+601uMBGFHqe7pccGZM9TPjHtpGWkZaUFVizqmU94P5W+oA4QiXAneCwyWZezB
+         hrePv2MiAvcggartvkx1xdt9EdUBoKmdnrVyOAgwy8nMjJ+Ka7Ie7cFVo4s+75eaxfp4
+         Ckx96UXpn5r8Lt1v+UQdU8P2jwDc+hHAly701dcTXmgHauPCv6N2ziYm/fYt3TQFsUMh
+         4l1sbZ1j15zqM/55qv226pEUzYRYo5gPplIOzQFv2hXEfecQMgvJo0UaTcWWVu3VLTaB
+         kb7g==
+X-Gm-Message-State: AC+VfDxZhQGJhlaHRZ6gBTVqaTMjd2qen8GTQrM32gOXKnoQb88x2L4n
+        fgAzaSFkF6ViI0x3GrLdMQ/z9Q==
+X-Google-Smtp-Source: ACHHUZ4YcTu6FF7odIThWKYfIjWHhaQ1ovlMhVuhR/qJ6RT8psLdgX3PwvbGJutv6zmhIytcpYTEfA==
+X-Received: by 2002:a05:6512:3744:b0:4e7:dd1e:e521 with SMTP id a4-20020a056512374400b004e7dd1ee521mr2323684lfs.9.1683806390306;
+        Thu, 11 May 2023 04:59:50 -0700 (PDT)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id f16-20020ac25090000000b004cb23904bd9sm1100841lfm.144.2023.05.11.04.59.48
+        by smtp.gmail.com with ESMTPSA id f16-20020ac25090000000b004cb23904bd9sm1100841lfm.144.2023.05.11.04.59.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 May 2023 04:59:49 -0700 (PDT)
+        Thu, 11 May 2023 04:59:50 -0700 (PDT)
 From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Thu, 11 May 2023 13:59:20 +0200
-Subject: [PATCH 03/12] ARC: init: Pass a pointer to virt_to_pfn() in init
+Date:   Thu, 11 May 2023 13:59:21 +0200
+Subject: [PATCH 04/12] riscv: mm: init: Pass a pointer to virt_to_page()
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v1-3-6c4698dcf9c8@linaro.org>
+Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v1-4-6c4698dcf9c8@linaro.org>
 References: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
 In-Reply-To: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
 To:     Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -82,26 +82,36 @@ many architectures implement virt_to_pfn() as a macro,
 this function becomes polymorphic and accepts both a
 (unsigned long) and a (void *).
 
-Fix up the offending call in arch/arc with an explicit cast.
+Fix this in the RISCV mm init code, so we can implement
+a strongly typed virt_to_pfn().
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- arch/arc/mm/init.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/riscv/mm/init.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arc/mm/init.c b/arch/arc/mm/init.c
-index 2b89b6c53801..9f64d729c9f8 100644
---- a/arch/arc/mm/init.c
-+++ b/arch/arc/mm/init.c
-@@ -87,7 +87,7 @@ void __init setup_arch_memory(void)
- 	setup_initial_init_mm(_text, _etext, _edata, _end);
+diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+index 747e5b1ef02d..2f7a7c345a6a 100644
+--- a/arch/riscv/mm/init.c
++++ b/arch/riscv/mm/init.c
+@@ -356,7 +356,7 @@ static phys_addr_t __init alloc_pte_late(uintptr_t va)
+ 	unsigned long vaddr;
  
- 	/* first page of system - kernel .vector starts here */
--	min_low_pfn = virt_to_pfn(CONFIG_LINUX_RAM_BASE);
-+	min_low_pfn = virt_to_pfn((void *)CONFIG_LINUX_RAM_BASE);
+ 	vaddr = __get_free_page(GFP_KERNEL);
+-	BUG_ON(!vaddr || !pgtable_pte_page_ctor(virt_to_page(vaddr)));
++	BUG_ON(!vaddr || !pgtable_pte_page_ctor(virt_to_page((void *)vaddr)));
  
- 	/* Last usable page of low mem */
- 	max_low_pfn = max_pfn = PFN_DOWN(low_mem_start + low_mem_sz);
+ 	return __pa(vaddr);
+ }
+@@ -439,7 +439,7 @@ static phys_addr_t __init alloc_pmd_late(uintptr_t va)
+ 	unsigned long vaddr;
+ 
+ 	vaddr = __get_free_page(GFP_KERNEL);
+-	BUG_ON(!vaddr || !pgtable_pmd_page_ctor(virt_to_page(vaddr)));
++	BUG_ON(!vaddr || !pgtable_pmd_page_ctor(virt_to_page((void *)vaddr)));
+ 
+ 	return __pa(vaddr);
+ }
 
 -- 
 2.34.1
