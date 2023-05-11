@@ -2,61 +2,102 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52332C7EE22
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 09:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4111BC7EE2D
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 11:59:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237513AbjEKJrN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 11 May 2023 05:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33926 "EHLO
+        id S237801AbjEKL7x (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 May 2023 07:59:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237130AbjEKJrL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 May 2023 05:47:11 -0400
-Received: from mail.feshiecree.pl (mail.feshiecree.pl [89.40.114.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE862101
-        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 02:47:10 -0700 (PDT)
-Received: by mail.feshiecree.pl (Postfix, from userid 1001)
-        id 4C935869FF; Thu, 11 May 2023 10:44:53 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=feshiecree.pl;
-        s=mail; t=1683798324;
-        bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
-        h=Date:From:To:Subject:From;
-        b=QJ+mrj8N+JSP6rQKwMd/MTOz3qs+AQs4AGRt6g03ZM2QMjWBP1UMav7CnIy4FciFP
-         z41Mld7L6HgPcnISZCgrrDZ5nv1uWUqEWZRokw7TZX0C/N9ch9aEp3w7SHOjWlEh86
-         YOVXWaIEfqpCCMt/9O94melouc1MjBufStlfAe3ZSW+VvPbeWTF7Q3buuZvX+uuMxI
-         Vphgvxtxr1mUpF51y4RGJasNLyaL3oz0pZ7fdhz5cTXEe2DG6Y8CwLDovNRc24e1IU
-         0a0wjGb5Qt9Lwk2eyTJtBUs7tZLgbCh8QO0/V7MOco4ceboRtlR31D0RPVydU42U81
-         iY+ONgdB57BoQ==
-Received: by mail.feshiecree.pl for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 09:44:07 GMT
-Message-ID: <20230511103853-0.1.2i.hstx.0.lk05cbt8b0@feshiecree.pl>
-Date:   Thu, 11 May 2023 09:44:07 GMT
-From:   "Krystian Wieczorek" <krystian.wieczorek@feshiecree.pl>
-To:     <linux-cifs@vger.kernel.org>
-Subject: W sprawie samochodu
-X-Mailer: mail.feshiecree.pl
+        with ESMTP id S237852AbjEKL7w (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 May 2023 07:59:52 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D4AA49C1
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:49 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4effb818c37so9654805e87.3
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1683806387; x=1686398387;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hYHNj4xOB3A9+sRrGGyA+CHl8mr8r8wePJEdzxz75NA=;
+        b=R4Y4sQ/pkhaXoYZ0Rmd1wl/WLm/7drgJkx1KJxPtPNk0U7/Mys/EiSrRg/aC1csD6H
+         9Ih1YKeabZAcuvs/HS424EWEMpleCMYQeT/9LVkHgdtK69kZNs2zwBtMRLphBYzVZ/hs
+         aDZyGK/fBqbFH5SMwvxg9nukw0XnauWw2q9+PpZDsge/KbQ2l9ENpY6j04woB9CnctYG
+         SPFNfSpIoDlrAPu//AN94SEgou0j1PTsONUBEXvBRqckAwnYGE3ExGqk3OteELdlGjFO
+         m/1lITxVQiGV5penGZwLpZYGrjuIrRpYLPFetkUBHAziQ1sTCIuJGSXa/TrJ+B8c4VmB
+         RtOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683806387; x=1686398387;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hYHNj4xOB3A9+sRrGGyA+CHl8mr8r8wePJEdzxz75NA=;
+        b=eZ7tXxrkPBXYAyUpQ7nSCsN4lZdqb43dDgENQ5KuzIeirN+gMqc0brbTL+AZxpA+4b
+         PsgY/Mfu6o7KA5OrQ/rFTqcWJXueLMvumXFlqE0Be6IF+LKNAoQEaQGWTg5/jj0BjYNt
+         TnDkyvN0eAjGLnMZEjQiFHeQsnPywZoLqtixC0IDdxwZQtLuYVnQzP3JzSBhusGE02F3
+         Ozt6m93XzBC+kMdvWH/kdPPDpchgOjt5vsDxgIpIFYiQWyBd6HubQrKuOWINeUUzllE8
+         +nuQWEPcTgKuHEEn8/5kWmPy50CYLHkUmZi4pW4QAUxoOHDeI1wBvcbG+iLKYjFkpNqJ
+         lu6Q==
+X-Gm-Message-State: AC+VfDxrsHFP509pi2s4lUlsm30kS/zAh+/otOFkgLaJ2VFrFioTbGTT
+        /M8pZWdB/aujs2iDeLTB6d+2LQ==
+X-Google-Smtp-Source: ACHHUZ77sxt7O279jjcWgP97akxP8WNE4SSfCZuV++STuG/v7BFEHGC1ImpffMxABw9Zm5xLGsx0aA==
+X-Received: by 2002:a05:6512:48f:b0:4f1:3ca4:a57f with SMTP id v15-20020a056512048f00b004f13ca4a57fmr2625276lfq.54.1683806387473;
+        Thu, 11 May 2023 04:59:47 -0700 (PDT)
+Received: from [127.0.1.1] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id f16-20020ac25090000000b004cb23904bd9sm1100841lfm.144.2023.05.11.04.59.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 May 2023 04:59:47 -0700 (PDT)
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Thu, 11 May 2023 13:59:18 +0200
+Subject: [PATCH 01/12] fs/proc/kcore.c: Pass a pointer to virt_addr_valid()
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v1-1-6c4698dcf9c8@linaro.org>
+References: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
+In-Reply-To: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Greg Ungerer <gerg@linux-m68k.org>
+Cc:     linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+        linux-snps-arc@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.12.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
+The virt_addr_valid() should be passed a pointer, the current
+code passing a long unsigned int is just exploiting the
+unintentional polymorphism of these calls being implemented
+as preprocessor macros.
 
-chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
-, je=C5=9Bli chodzi o system monitoringu GPS.
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ fs/proc/kcore.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
-e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
-a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+diff --git a/fs/proc/kcore.c b/fs/proc/kcore.c
+index 25b44b303b35..75708c66527f 100644
+--- a/fs/proc/kcore.c
++++ b/fs/proc/kcore.c
+@@ -199,7 +199,7 @@ kclist_add_private(unsigned long pfn, unsigned long nr_pages, void *arg)
+ 	ent->addr = (unsigned long)page_to_virt(p);
+ 	ent->size = nr_pages << PAGE_SHIFT;
+ 
+-	if (!virt_addr_valid(ent->addr))
++	if (!virt_addr_valid((void *)ent->addr))
+ 		goto free_out;
+ 
+ 	/* cut not-mapped area. ....from ppc-32 code. */
 
-Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
-dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
-szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
-mne znaczenie.
+-- 
+2.34.1
 
-Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
-b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
-
-
-Pozdrawiam
-Krystian Wieczorek
