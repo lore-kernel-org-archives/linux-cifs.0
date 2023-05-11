@@ -2,111 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55781C7EE22
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 May 2023 22:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52332C7EE22
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 09:47:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235540AbjEJWv6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 May 2023 18:51:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50514 "EHLO
+        id S237513AbjEKJrN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 May 2023 05:47:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230467AbjEJWv5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 May 2023 18:51:57 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56BEA4488;
-        Wed, 10 May 2023 15:51:55 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4f139de8cefso42789897e87.0;
-        Wed, 10 May 2023 15:51:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683759113; x=1686351113;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ohs3T3NdbbBRfBPZoviqythlTyCVKHR7HNnzdiYYugg=;
-        b=UZcIdCcS9GRr82mG/CdB3huJwhDoxQIzvsmnyFbvvmquGJg4EQuA2UEmpC49ODEitw
-         9vAgM6uM3DM7uSpET+bjLVEqgrLIaFrHLgV6tEYyjN8qLYwRgPkoC7JddtTcss2iSn+N
-         O4Ic6SZzG/SJ6mFkVy7Y0kHE49H8ECiJBGW8quvIQTrBVC0YAyJb9SkrzNfENLbL3TeY
-         O9c3LRdhg18EZ7YMdJfHUi/1wnXsl9wNMDVDKXVPoUwS8Ry7klVlPUU3FVKsBHlo4nfK
-         nNQuv2lX7qaQeap8/ZF0KD+c3nXN6fBBoY585/0v9PCIq7xZk6Lp7ExMDTnvLSAK2+RC
-         Fevg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683759113; x=1686351113;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ohs3T3NdbbBRfBPZoviqythlTyCVKHR7HNnzdiYYugg=;
-        b=fnFoHsww106QeMPSZB/ZXBujYJxQskHgzYX3LgWlS9olFXgVrc3VcKjMBzhSoW2f/E
-         dUWvzDhQgBmzxBFj2hWFL+lxzW2/ZASHVxVin3AZngrh0eh2g2gOY0lZVqBYdGWmJ9KG
-         Rsjii6tpjOAA+BMaATXIjxGDj3pAlldmWvPj6ntzC1VDalUuKyI8l3O9tVoD8a8B5AA1
-         NSmtY4jMzGtuiMwxO1lZCi+hzEiEP1IA0e8VoQt25vuT0PzAA+mMU5YcVG9glWXHryRX
-         qZaiyn6rr8CU4XU8gpybX1SUJh6Oi/jq19HzIlFk+begBt8g6fwJtIUPwA9iGEuqGcoW
-         0j+w==
-X-Gm-Message-State: AC+VfDz7kdFLCHBfCy7OhneP51dzkr8bHDmdq8UbfrRCo106gA5STdIi
-        kPrtq0uIGTFODeKM2zAqxFAvZkMKuNQiT3Xb6SCahfDBNkcb/eJR
-X-Google-Smtp-Source: ACHHUZ6pFQA0UQwdD2HgKoqbtWxg3G+c05xilomwWIM3CxOrp3RcYZSBfnwod4YVRpJnf3J/cH3r1pgeRS3YN/Dz05k=
-X-Received: by 2002:a05:6512:2806:b0:4eb:4258:bf62 with SMTP id
- cf6-20020a056512280600b004eb4258bf62mr1882701lfb.8.1683759113049; Wed, 10 May
- 2023 15:51:53 -0700 (PDT)
+        with ESMTP id S237130AbjEKJrL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 May 2023 05:47:11 -0400
+Received: from mail.feshiecree.pl (mail.feshiecree.pl [89.40.114.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE862101
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 02:47:10 -0700 (PDT)
+Received: by mail.feshiecree.pl (Postfix, from userid 1001)
+        id 4C935869FF; Thu, 11 May 2023 10:44:53 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=feshiecree.pl;
+        s=mail; t=1683798324;
+        bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=QJ+mrj8N+JSP6rQKwMd/MTOz3qs+AQs4AGRt6g03ZM2QMjWBP1UMav7CnIy4FciFP
+         z41Mld7L6HgPcnISZCgrrDZ5nv1uWUqEWZRokw7TZX0C/N9ch9aEp3w7SHOjWlEh86
+         YOVXWaIEfqpCCMt/9O94melouc1MjBufStlfAe3ZSW+VvPbeWTF7Q3buuZvX+uuMxI
+         Vphgvxtxr1mUpF51y4RGJasNLyaL3oz0pZ7fdhz5cTXEe2DG6Y8CwLDovNRc24e1IU
+         0a0wjGb5Qt9Lwk2eyTJtBUs7tZLgbCh8QO0/V7MOco4ceboRtlR31D0RPVydU42U81
+         iY+ONgdB57BoQ==
+Received: by mail.feshiecree.pl for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 09:44:07 GMT
+Message-ID: <20230511103853-0.1.2i.hstx.0.lk05cbt8b0@feshiecree.pl>
+Date:   Thu, 11 May 2023 09:44:07 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@feshiecree.pl>
+To:     <linux-cifs@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.feshiecree.pl
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 10 May 2023 17:51:41 -0500
-Message-ID: <CAH2r5mtcjLkmWqRTZnZaXzvXZWHka_73nN1nSq0a=KQZ4hA4eA@mail.gmail.com>
-Subject: [PATCH] cifs: release leases for deferred close handles when freezing
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000d22d8205fb5eb705"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000d22d8205fb5eb705
-Content-Type: text/plain; charset="UTF-8"
+Dzie=C5=84 dobry,
 
-We should not be caching closed files when freeze is invoked on an fs
-so we can release resources more gracefully).
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-Fixes xfstests generic/068 generic/390 generic/491
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
 
-See attached.
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
+
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
 
 
-
-
--- 
-Thanks,
-
-Steve
-
---000000000000d22d8205fb5eb705
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-release-leases-for-deferred-close-handles-when-.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-release-leases-for-deferred-close-handles-when-.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lhiaozqt0>
-X-Attachment-Id: f_lhiaozqt0
-
-RnJvbSBkMzlmYzU5MmVmOGFlOWE4OWM1ZTg1YzhkOWY3NjA5MzdhNTdkNWJhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFdlZCwgMTAgTWF5IDIwMjMgMTc6NDI6MjEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiByZWxlYXNlIGxlYXNlcyBmb3IgZGVmZXJyZWQgY2xvc2UgaGFuZGxlcyB3aGVuIGZyZWV6
-aW5nCgpXZSBzaG91bGQgbm90IGJlIGNhY2hpbmcgY2xvc2VkIGZpbGVzIHdoZW4gZnJlZXplIGlz
-IGludm9rZWQgb24gYW4gZnMKKHNvIHdlIGNhbiByZWxlYXNlIHJlc291cmNlcyBtb3JlIGdyYWNl
-ZnVsbHkpLgoKRml4ZXMgeGZzdGVzdHMgZ2VuZXJpYy8wNjggZ2VuZXJpYy8zOTAgZ2VuZXJpYy80
-OTEKClJldmlld2VkLWJ5OiBEYXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpDYzog
-PHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmc+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3Rm
-cmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNmcy5jIHwgMTUgKysrKysrKysr
-KysrKysrCiAxIGZpbGUgY2hhbmdlZCwgMTUgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2Zz
-L2NpZnMvY2lmc2ZzLmMgYi9mcy9jaWZzL2NpZnNmcy5jCmluZGV4IDhiNmIzYjY5ODVmMy4uNDNh
-NGQ4NjAzZGIzIDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNmcy5jCisrKyBiL2ZzL2NpZnMvY2lm
-c2ZzLmMKQEAgLTc2MCw2ICs3NjAsMjAgQEAgc3RhdGljIHZvaWQgY2lmc191bW91bnRfYmVnaW4o
-c3RydWN0IHN1cGVyX2Jsb2NrICpzYikKIAlyZXR1cm47CiB9CiAKK3N0YXRpYyBpbnQgY2lmc19m
-cmVlemUoc3RydWN0IHN1cGVyX2Jsb2NrICpzYikKK3sKKwlzdHJ1Y3QgY2lmc19zYl9pbmZvICpj
-aWZzX3NiID0gQ0lGU19TQihzYik7CisJc3RydWN0IGNpZnNfdGNvbiAqdGNvbjsKKworCWlmIChj
-aWZzX3NiID09IE5VTEwpCisJCXJldHVybiAwOworCisJdGNvbiA9IGNpZnNfc2JfbWFzdGVyX3Rj
-b24oY2lmc19zYik7CisKKwljaWZzX2Nsb3NlX2FsbF9kZWZlcnJlZF9maWxlcyh0Y29uKTsKKwly
-ZXR1cm4gMDsKK30KKwogI2lmZGVmIENPTkZJR19DSUZTX1NUQVRTMgogc3RhdGljIGludCBjaWZz
-X3Nob3dfc3RhdHMoc3RydWN0IHNlcV9maWxlICpzLCBzdHJ1Y3QgZGVudHJ5ICpyb290KQogewpA
-QCAtNzk4LDYgKzgxMiw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3Qgc3VwZXJfb3BlcmF0aW9ucyBj
-aWZzX3N1cGVyX29wcyA9IHsKIAlhcyBvcGVucyAqLwogCS5zaG93X29wdGlvbnMgPSBjaWZzX3No
-b3dfb3B0aW9ucywKIAkudW1vdW50X2JlZ2luICAgPSBjaWZzX3Vtb3VudF9iZWdpbiwKKwkuZnJl
-ZXplX2ZzICAgICAgPSBjaWZzX2ZyZWV6ZSwKICNpZmRlZiBDT05GSUdfQ0lGU19TVEFUUzIKIAku
-c2hvd19zdGF0cyA9IGNpZnNfc2hvd19zdGF0cywKICNlbmRpZgotLSAKMi4zNC4xCgo=
---000000000000d22d8205fb5eb705--
+Pozdrawiam
+Krystian Wieczorek
