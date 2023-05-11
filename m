@@ -2,60 +2,60 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D3CC7EE26
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 12:01:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAFD7C77B7C
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 12:01:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238082AbjEKMBO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 11 May 2023 08:01:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38586 "EHLO
+        id S238087AbjEKMBR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 May 2023 08:01:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237988AbjEKMA0 (ORCPT
+        with ESMTP id S237935AbjEKMA0 (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 May 2023 08:00:26 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F03DDD047
-        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:57 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4efe8b3f3f7so9685935e87.2
-        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:57 -0700 (PDT)
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FCCBAD07
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:59 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f13c577e36so9471917e87.1
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683806397; x=1686398397;
+        d=linaro.org; s=google; t=1683806399; x=1686398399;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uJU163QagIQsrvP5Rw+8jaAtPEKkrWxHz6dgH9Ny+pM=;
-        b=OVzygYKFGH1TTuxbFUj+CoSj3NrTaizXuR71JpjrxDkWl2PVUYhH5JT70fm6co/+NH
-         tgSpK7iB7XOIFx/oZ27wrlRvxiiOU0TkhphL4Cjxz38b+G77ryH+u4qiryaQVZOcLNF0
-         H0/G73Db2ZLdNZ+R+FwIBPtPTT8FO9chca9MkRhxDx0g0MNcweB6mimyP670IWhPwMJJ
-         Zi33byy7BPYmwDP7tGDqy3rZxw7unhbkfjS7DQcxkZzUfpvfhpgVrM2yoH5+zUDj/FTE
-         k6lQKniemblf8dnVu3vStZsdx03og3rxM39S2DuvQLZfuDbOnEOTZqUyvlVqW9qAn7Vc
-         1b6w==
+        bh=vHjA668SX6CTsxzYO8Z8nc4Ecy//EJfwtQFWj2t6kqU=;
+        b=Kbc555pcdKJLogrS9D2fpTuZbCLYtRRslUUmtE3xLf7EzdNZYf1OzcE9wV1Z90iGk3
+         NIk4MKV6b+X0k2N3VL5lQ56i9UXtaetINfk3JT4UgzFD7yBuaWIOfZWXEKT5PzupCvP/
+         bamqIQqMgGCRriAPRj2xemXl7nSVYfhgFkSm0NP8XdgPgFP+JDpOUwXIwzQsFylS4IVi
+         tfsy8c7iyORHTNygYljmk4DBR7XlBqGcbH84OblELC60Ek8nQDNUr7Skn4YvyNLuLFxu
+         E+aTQ0Z1NbLg7cPj3DH6p8fVNfeCCf6YY3IJLOUYGk/XToeDr9UU3eGzOCWV1mI1abGA
+         My9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683806397; x=1686398397;
+        d=1e100.net; s=20221208; t=1683806399; x=1686398399;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uJU163QagIQsrvP5Rw+8jaAtPEKkrWxHz6dgH9Ny+pM=;
-        b=bK2swhjLPKG0aVZJ42PGdHFj8TJiTqOXen3BN5VDfFLLjyCrCRfZBRpxfFAu0zgxd8
-         OFTUPSiImbhgjJwRQ9jke9Wi0OfT7+zW/t/SQGM9u6qF7UVq3v+l5VKdDpMicG6BCrV/
-         Lv9P8avva2uYAC1jsamPidEKeGvGstjDtjMT653Uyaoldlei/ezMDfieel1hXq4bvq6L
-         McJkuD7aatfscXTwN7pC8XEKzQIQghNwVs4ti7S2u4jkbtOLfIPs7FqcS5lABiqGUTME
-         rJQHg1RKkdmV139WkmWybRboZclPsIrBi29ANNoJmcdBWq2BmmLmgPci6uj8RHMW0yAX
-         pecg==
-X-Gm-Message-State: AC+VfDzAMBvL9sBxIoJKG9KPgxgjebbMxyCv067WU76Z8dSyvr4n9jPp
-        o3ygmIqA4y4C8eGLm8PisvPbzA==
-X-Google-Smtp-Source: ACHHUZ7ZE/nf3YvAX+fWh9Dbm/hshMVwzXisVNx+UvqRN2YZL2q+Z1orbXsbt6AiZ+R2G9hM4ez+dQ==
-X-Received: by 2002:a19:ad43:0:b0:4ef:d5fb:c37c with SMTP id s3-20020a19ad43000000b004efd5fbc37cmr2214552lfd.69.1683806397378;
-        Thu, 11 May 2023 04:59:57 -0700 (PDT)
+        bh=vHjA668SX6CTsxzYO8Z8nc4Ecy//EJfwtQFWj2t6kqU=;
+        b=B+4L7AaODYoYmqSjoo5DWX1h0u0+fHLxBDHZklUGEnvXE60r3/jBsApkgFqfS1jGWo
+         cguQk7wVPdZHEu4o5Jpunfy/JtGLc2AJg5pNr5u09IJiN/1kZzOT8oDT5nllVwn7RLCa
+         ieryKDp/954w+9VLj8MZuENPJnwc7VtVfzH4lse9pV/8Aw2XWkOqsoBrWTSc44UbJZnQ
+         E0mIILHDtExZLhp1Aiwdvb7R8Ey9IBN1qoNQeDAaDi+nyGEMayyqFQ5CIJa1TNBDBvcC
+         qzRDvssW30L+bYtOx3oAyweZ+xE9d9428oVT3GvOVCv+aEVyEHjxY1qD86o9cEpC3Iuy
+         imGg==
+X-Gm-Message-State: AC+VfDzIklrorkoCUXg9MdMQb2JtMVJMhOFsaISGbQ6IvQZxtr6yIngo
+        xCrE6GIRm0kyCgt8MitTDj5ZRQ==
+X-Google-Smtp-Source: ACHHUZ5Tk4UWnqnRlmgGPDZhdIZdZccQAMG3sQLb+3VXhq0OP50ACPtrgCCvBe8ZpLc4O18r3rteNw==
+X-Received: by 2002:ac2:4e51:0:b0:4ee:e10f:8e5d with SMTP id f17-20020ac24e51000000b004eee10f8e5dmr2439363lfr.4.1683806398938;
+        Thu, 11 May 2023 04:59:58 -0700 (PDT)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id f16-20020ac25090000000b004cb23904bd9sm1100841lfm.144.2023.05.11.04.59.56
+        by smtp.gmail.com with ESMTPSA id f16-20020ac25090000000b004cb23904bd9sm1100841lfm.144.2023.05.11.04.59.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 May 2023 04:59:57 -0700 (PDT)
+        Thu, 11 May 2023 04:59:58 -0700 (PDT)
 From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Thu, 11 May 2023 13:59:28 +0200
-Subject: [PATCH 11/12] arm64: memory: Make virt_to_pfn() a static inline
+Date:   Thu, 11 May 2023 13:59:29 +0200
+Subject: [PATCH 12/12] m68k/mm: Make pfn accessors static inlines
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v1-11-6c4698dcf9c8@linaro.org>
+Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v1-12-6c4698dcf9c8@linaro.org>
 References: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
 In-Reply-To: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
 To:     Geert Uytterhoeven <geert@linux-m68k.org>,
@@ -81,42 +81,58 @@ macro virt_to_pfn() acting polymorphic and accepting many types
 such as (void *), (unitptr_t) or (unsigned long) as arguments
 without warnings.
 
-Since arm64 is using <asm-generic/memory_model.h> to provide
-__phys_to_pfn() we need to move the inclusion of that header
-up, so we can resolve the static inline at compile time.
+For symmetry, do the same with pfn_to_virt().
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- arch/arm64/include/asm/memory.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ arch/m68k/include/asm/page_mm.h | 11 +++++++++--
+ arch/m68k/include/asm/page_no.h | 11 +++++++++--
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index c735afdf639b..4d85212b622e 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -331,6 +331,14 @@ static inline void *phys_to_virt(phys_addr_t x)
- 	return (void *)(__phys_to_virt(x));
- }
- 
-+/* Needed already here for resolving __phys_to_pfn() in virt_to_pfn() */
-+#include <asm-generic/memory_model.h>
-+
+diff --git a/arch/m68k/include/asm/page_mm.h b/arch/m68k/include/asm/page_mm.h
+index 3903db2e8da7..40bcc6aa33da 100644
+--- a/arch/m68k/include/asm/page_mm.h
++++ b/arch/m68k/include/asm/page_mm.h
+@@ -121,8 +121,15 @@ static inline void *__va(unsigned long x)
+  * TODO: implement (fast) pfn<->pgdat_idx conversion functions, this makes lots
+  * of the shifts unnecessary.
+  */
+-#define virt_to_pfn(kaddr)	(__pa(kaddr) >> PAGE_SHIFT)
+-#define pfn_to_virt(pfn)	__va((pfn) << PAGE_SHIFT)
 +static inline unsigned long virt_to_pfn(const void *kaddr)
 +{
-+	return __phys_to_pfn(virt_to_phys(kaddr));
++	return __pa(kaddr) >> PAGE_SHIFT;
 +}
 +
- /*
-  * Drivers should NOT use these either.
-  */
-@@ -339,7 +347,6 @@ static inline void *phys_to_virt(phys_addr_t x)
- #define __pa_nodebug(x)		__virt_to_phys_nodebug((unsigned long)(x))
- #define __va(x)			((void *)__phys_to_virt((phys_addr_t)(x)))
- #define pfn_to_kaddr(pfn)	__va((pfn) << PAGE_SHIFT)
--#define virt_to_pfn(x)		__phys_to_pfn(__virt_to_phys((unsigned long)(x)))
- #define sym_to_pfn(x)		__phys_to_pfn(__pa_symbol(x))
++static inline void * pfn_to_virt(unsigned long pfn)
++{
++	return __va(pfn << PAGE_SHIFT);
++}
  
- /*
+ extern int m68k_virt_to_node_shift;
+ 
+diff --git a/arch/m68k/include/asm/page_no.h b/arch/m68k/include/asm/page_no.h
+index 060e4c0e7605..f1daf466a57b 100644
+--- a/arch/m68k/include/asm/page_no.h
++++ b/arch/m68k/include/asm/page_no.h
+@@ -19,8 +19,15 @@ extern unsigned long memory_end;
+ #define __pa(vaddr)		((unsigned long)(vaddr))
+ #define __va(paddr)		((void *)((unsigned long)(paddr)))
+ 
+-#define virt_to_pfn(kaddr)	(__pa(kaddr) >> PAGE_SHIFT)
+-#define pfn_to_virt(pfn)	__va((pfn) << PAGE_SHIFT)
++static inline unsigned long virt_to_pfn(const void *kaddr)
++{
++	return __pa(kaddr) >> PAGE_SHIFT;
++}
++
++static inline void * pfn_to_virt(unsigned long pfn)
++{
++	return __va(pfn << PAGE_SHIFT);
++}
+ 
+ #define virt_to_page(addr)	(mem_map + (((unsigned long)(addr)-PAGE_OFFSET) >> PAGE_SHIFT))
+ #define page_to_virt(page)	__va(((((page) - mem_map) << PAGE_SHIFT) + PAGE_OFFSET))
 
 -- 
 2.34.1
