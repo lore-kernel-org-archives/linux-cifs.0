@@ -2,62 +2,62 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F086CC77B7C
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 11:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 879FCC77B7C
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 May 2023 12:00:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237867AbjEKL7w (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 11 May 2023 07:59:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38546 "EHLO
+        id S237951AbjEKMAC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 May 2023 08:00:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237820AbjEKL7v (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 May 2023 07:59:51 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4527D55B3
-        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:48 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4f004cc54f4so9639983e87.3
-        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:48 -0700 (PDT)
+        with ESMTP id S237821AbjEKL7y (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 May 2023 07:59:54 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E22793CA
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:50 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4efe8b3f3f7so9685722e87.2
+        for <linux-cifs@vger.kernel.org>; Thu, 11 May 2023 04:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683806386; x=1686398386;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fRNm+KFUDDN1oQKMlpBJgWHFsPEB2sb8N1qDdTLzrRA=;
-        b=q/t+iF7gcJlLwSFwyWdRVnaOH6DnZ15Hh00D8KDQCVj3czLiXT5DcNm1lg1D63XkNa
-         Pj7xZBHkxALHXET/ZaOVwqFb6EwCwf3dRnmhxU6pcwd8SWBYpQMrJhlGMfdKuUwNFgWP
-         adfl9m0RH4IrxjXpe4B1I+Wh+kNFUTEkijwmETCXnS28KGFkhTO4BdrOSzMloCUJEtSa
-         f2Bgg9QCu7u/mZ8HVRLDEVI1QgOPsZwCF8T3osYHfET+aMPl2+RtI/u7llqrOun4YjTd
-         uoN9KVeCneLQVGqjqCZOUwLprHCLtQbeB4KKpHA7KQtZK0gWwU/3dYookH8iYrMjdaU/
-         0hRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683806386; x=1686398386;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1683806388; x=1686398388;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fRNm+KFUDDN1oQKMlpBJgWHFsPEB2sb8N1qDdTLzrRA=;
-        b=MJF2C/tP8EdaUzZpNZ8f+cRzQ7O33Y954Lm7omlHMfbVznjthjB30x6ch0EJy0O/6K
-         DhdrrCwF8mwyN1dNcpFBJMHd7+2VgigfYUHDEYGLh+Psb0pTP0kmnoKYAjWIXtvJbwaL
-         y3RwRZpAzaED/uZFPn7TBMSQE6PJCc3sBVYQnZGP233kApmoq6em1kUMsw015hM2+whd
-         agpy3EYJx2bjSSWIfVKvqypK2K7De0MZDS4MtvWhieQ9pQbR6jZUHbHcZu/qMyR6+hG0
-         AJ7hy7AeVTu3UPuicGdcvoNAvnpuVb4tLypAaAXXKTwdC0nqh3m9ojNbgi2kJJSKtsnO
-         OvXA==
-X-Gm-Message-State: AC+VfDzYmbqcrCwPWwZojtHIMFuWg1LgoIheMlHY/AcWkt6ovFZPfmcK
-        cCTZ/K8IfKPFupAFBKoSTDdKPg==
-X-Google-Smtp-Source: ACHHUZ5buhASnVjeRPaHmKvQyrqmIv8tehj5S8Nqt/PTjDb7bZMSILKyBVZvDPpNIQ1tGpyJ5D9CUw==
-X-Received: by 2002:a05:6512:932:b0:4ef:ef67:65c9 with SMTP id f18-20020a056512093200b004efef6765c9mr2958124lft.23.1683806386456;
-        Thu, 11 May 2023 04:59:46 -0700 (PDT)
+        bh=p9HwjvVojH9hO+PcXlqtL0N9aNW9rB2MppMH77zfxVc=;
+        b=h0huwFcuyufkrW22b7sSvhGB+Ccc6Lvo9LGZiN8vwcbnU3/n9iarupyO8uSUn0mH7F
+         UImAdUl3W888BP2VJ8/y8hWeLPQaZrBrjm/Nu0uLf1rKtgfpgHOHOP3tTQ9zFsRYQoKI
+         fGAtPet9xa7ZtgZBS/HBd67ncf+0PhGxnnIJLi+0TR3kFXVIwxrxsSsx9kN2u2S00z2X
+         5KFPOq38DBsV6TYrMad4lE6aD4UesfNWsMyc8GuXrhIa7ASsSuoxihIooTid0hE5RsnF
+         bNeaAbNDtKQlSprjkgw+hz3rwPgZB+BNN+D6bTWYVkWkC3zgqquZjKjZxaDyStXaw9xj
+         elHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683806388; x=1686398388;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p9HwjvVojH9hO+PcXlqtL0N9aNW9rB2MppMH77zfxVc=;
+        b=dXTw4rfcVVJPhciJ/dVvfW5lb4LLELfVUAD6ESc9V2LSIphfhBxZzell3bOCMW/7bb
+         rv9Bd1+mg7AVhRkOFTv27wCG1bT6Umt9nG7d6P9bKnikcjpFGG6ahQtJdLRMbiJwtVNW
+         LnhCfAWGUEOfmd0Yac9kqw2/bP9oOtqOqlNtOwvER4yg4pXaVFKITZJ+936e3MFKUbSk
+         5qtzBa+XcIntX0/l7d6e1Tn4aUWPsfjvVIqZqcE+RvbU5luf5uDxnpDRLl6w4WAJn/GP
+         oU+UkdBMCtM9nidG2hmB3HbSqLBLjNyc7/5k/qvSziqKAgnvrZ+2MNrLgyqUYESeVXWP
+         x/KA==
+X-Gm-Message-State: AC+VfDyoiJV/rU/YWcRXgPNVagITINe/fqQhLuunUiBKZuCfVqdhx+SC
+        LRPh/DSH3Ii9SJp1sQUaFtHuMw==
+X-Google-Smtp-Source: ACHHUZ4qGS9xBErA7Vxmp86kEFbZREMrSwBsY/Yl8Ba5RFvn3cUSOtGcwzeX5nOwmTp3pnnJ0geHYA==
+X-Received: by 2002:a19:f813:0:b0:4ec:a48a:28c0 with SMTP id a19-20020a19f813000000b004eca48a28c0mr2749652lff.25.1683806388439;
+        Thu, 11 May 2023 04:59:48 -0700 (PDT)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id f16-20020ac25090000000b004cb23904bd9sm1100841lfm.144.2023.05.11.04.59.45
+        by smtp.gmail.com with ESMTPSA id f16-20020ac25090000000b004cb23904bd9sm1100841lfm.144.2023.05.11.04.59.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 May 2023 04:59:46 -0700 (PDT)
+        Thu, 11 May 2023 04:59:48 -0700 (PDT)
 From:   Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 00/12] arch: Make virt_to_pfn into a static inline
-Date:   Thu, 11 May 2023 13:59:17 +0200
-Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
+Date:   Thu, 11 May 2023 13:59:19 +0200
+Subject: [PATCH 02/12] m68k: Pass a pointer to virt_to_pfn() virt_to_page()
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJXYXGQC/1XOQQqDMBCF4avIrB2JRm3tVUoXMZnobKJMbBDEu
- ze2qy5/eB+8AyIJU4RHcYBQ4shLyFGXBdjZhImQXW5oVKNVpzQmlg23BVcfMPXYotgaW9/d9EB
- 31ysHmY4mEo5igp0v/G+qnxFy7/0ar0Ke9++H5+s8P+BE9BOTAAAA
+Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v1-2-6c4698dcf9c8@linaro.org>
+References: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
+In-Reply-To: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
 To:     Geert Uytterhoeven <geert@linux-m68k.org>,
         Vineet Gupta <vgupta@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
@@ -74,135 +74,90 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an attempt to harden the typing on virt_to_pfn()
-and pfn_to_virt().
+Functions that work on a pointer to virtual memory such as
+virt_to_pfn() and users of that function such as
+virt_to_page() are supposed to pass a pointer to virtual
+memory, ideally a (void *) or other pointer. However since
+many architectures implement virt_to_pfn() as a macro,
+this function becomes polymorphic and accepts both a
+(unsigned long) and a (void *).
 
-Making virt_to_pfn() a static inline taking a strongly typed
-(const void *) makes the contract of a passing a pointer of that
-type to the function explicit and exposes any misuse of the
-macro virt_to_pfn() acting polymorphic and accepting many types
-such as (void *), (unitptr_t) or (unsigned long) as arguments
-without warnings.
-
-For symmetry, we do the same with pfn_to_virt().
-
-The problem with this inconsistent typing was pointed out by
-Russell King:
-https://lore.kernel.org/linux-arm-kernel/YoJDKJXc0MJ2QZTb@shell.armlinux.org.uk/
-
-And confirmed by Andrew Morton:
-https://lore.kernel.org/linux-mm/20220701160004.2ffff4e5ab59a55499f4c736@linux-foundation.org/
-
-So the recognition of the problem is widespread.
-
-These platforms have been chosen as initial conversion targets:
-
-- ARC
-- ARM
-- ARM64/Aarch64
-- asm-generic (including for example x86)
-- m68k
-
-The idea is that if this goes in, it will block further misuse
-of the function signatures due to the large compile coverage,
-and then I can go in and fix the remaining platforms on a
-one-by-one basis.
-
-Some of the patches have been circulated before but were not
-picked up by subsystem maintainers, so now the arch tree is
-target for this series.
-
-It has passed zeroday builds after a lot of iterations in my
-personal tree, but there could be some randconfig outliers.
-
-The To/Cc list would be too long if I include all the minor
-patches maintainers, so I have trimmed it down to the mailing
-lists since these people certainly have received the patches
-before.
+Fix up the offending calls in arch/m68k with explicit casts.
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-Linus Walleij (12):
-      fs/proc/kcore.c: Pass a pointer to virt_addr_valid()
-      m68k: Pass a pointer to virt_to_pfn() virt_to_page()
-      ARC: init: Pass a pointer to virt_to_pfn() in init
-      riscv: mm: init: Pass a pointer to virt_to_page()
-      cifs: Pass a pointer to virt_to_page()
-      cifs: Pass a pointer to virt_to_page() in cifsglob
-      netfs: Pass a pointer to virt_to_page()
-      arm64: vdso: Pass (void *) to virt_to_page()
-      asm-generic/page.h: Make pfn accessors static inlines
-      ARM: mm: Make virt_to_pfn() a static inline
-      arm64: memory: Make virt_to_pfn() a static inline
-      m68k/mm: Make pfn accessors static inlines
-
- arch/arc/mm/init.c                   |  2 +-
- arch/arm/common/sharpsl_param.c      |  2 +-
- arch/arm/include/asm/delay.h         |  2 +-
- arch/arm/include/asm/io.h            |  2 +-
- arch/arm/include/asm/memory.h        | 17 ++++++++++++-----
- arch/arm/include/asm/page.h          |  4 ++--
- arch/arm/include/asm/pgtable.h       |  2 +-
- arch/arm/include/asm/proc-fns.h      |  2 --
- arch/arm/include/asm/sparsemem.h     |  2 +-
- arch/arm/include/asm/uaccess-asm.h   |  2 +-
- arch/arm/include/asm/uaccess.h       |  2 +-
- arch/arm/kernel/asm-offsets.c        |  2 +-
- arch/arm/kernel/entry-armv.S         |  2 +-
- arch/arm/kernel/entry-common.S       |  2 +-
- arch/arm/kernel/entry-v7m.S          |  2 +-
- arch/arm/kernel/head-nommu.S         |  3 +--
- arch/arm/kernel/head.S               |  2 +-
- arch/arm/kernel/hibernate.c          |  2 +-
- arch/arm/kernel/suspend.c            |  2 +-
- arch/arm/kernel/tcm.c                |  2 +-
- arch/arm/kernel/vmlinux-xip.lds.S    |  3 +--
- arch/arm/kernel/vmlinux.lds.S        |  3 +--
- arch/arm/mach-berlin/platsmp.c       |  2 +-
- arch/arm/mach-keystone/keystone.c    |  2 +-
- arch/arm/mach-omap2/sleep33xx.S      |  2 +-
- arch/arm/mach-omap2/sleep43xx.S      |  2 +-
- arch/arm/mach-omap2/sleep44xx.S      |  2 +-
- arch/arm/mach-pxa/gumstix.c          |  2 +-
- arch/arm/mach-rockchip/sleep.S       |  2 +-
- arch/arm/mach-sa1100/pm.c            |  2 +-
- arch/arm/mach-shmobile/headsmp-scu.S |  2 +-
- arch/arm/mach-shmobile/headsmp.S     |  2 +-
- arch/arm/mach-socfpga/headsmp.S      |  2 +-
- arch/arm/mach-spear/spear.h          |  2 +-
- arch/arm/mm/cache-fa.S               |  1 -
- arch/arm/mm/cache-v4wb.S             |  1 -
- arch/arm/mm/dma-mapping.c            |  2 +-
- arch/arm/mm/dump.c                   |  2 +-
- arch/arm/mm/init.c                   |  2 +-
- arch/arm/mm/kasan_init.c             |  1 -
- arch/arm/mm/mmu.c                    |  2 +-
- arch/arm/mm/physaddr.c               |  2 +-
- arch/arm/mm/pmsa-v8.c                |  2 +-
- arch/arm/mm/proc-v7.S                |  2 +-
- arch/arm/mm/proc-v7m.S               |  2 +-
- arch/arm/mm/pv-fixup-asm.S           |  2 +-
- arch/arm64/include/asm/memory.h      |  9 ++++++++-
- arch/arm64/kernel/vdso.c             |  2 +-
- arch/m68k/include/asm/page_mm.h      | 11 +++++++++--
- arch/m68k/include/asm/page_no.h      | 11 +++++++++--
- arch/m68k/mm/motorola.c              |  4 ++--
- arch/m68k/mm/sun3mmu.c               |  2 +-
- arch/m68k/sun3/dvma.c                |  2 +-
- arch/m68k/sun3x/dvma.c               |  2 +-
- arch/riscv/mm/init.c                 |  4 ++--
- drivers/memory/ti-emif-sram-pm.S     |  2 +-
- fs/cifs/cifsglob.h                   |  2 +-
- fs/cifs/smbdirect.c                  |  2 +-
- fs/netfs/iterator.c                  |  2 +-
- fs/proc/kcore.c                      |  2 +-
- include/asm-generic/page.h           | 12 ++++++++++--
- 61 files changed, 103 insertions(+), 75 deletions(-)
+ChangeLog v1->v2:
+- Add an extra parens around the page argument to the
+  PD_PTABLE() macro, as is normally required.
 ---
-base-commit: ac9a78681b921877518763ba0e89202254349d1b
-change-id: 20230503-virt-to-pfn-v6-4-rc1-4f5739e8d60d
+ arch/m68k/mm/motorola.c | 4 ++--
+ arch/m68k/mm/sun3mmu.c  | 2 +-
+ arch/m68k/sun3/dvma.c   | 2 +-
+ arch/m68k/sun3x/dvma.c  | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-Best regards,
+diff --git a/arch/m68k/mm/motorola.c b/arch/m68k/mm/motorola.c
+index 911301224078..c75984e2d86b 100644
+--- a/arch/m68k/mm/motorola.c
++++ b/arch/m68k/mm/motorola.c
+@@ -102,7 +102,7 @@ static struct list_head ptable_list[2] = {
+ 	LIST_HEAD_INIT(ptable_list[1]),
+ };
+ 
+-#define PD_PTABLE(page) ((ptable_desc *)&(virt_to_page(page)->lru))
++#define PD_PTABLE(page) ((ptable_desc *)&(virt_to_page((void *)(page))->lru))
+ #define PD_PAGE(ptable) (list_entry(ptable, struct page, lru))
+ #define PD_MARKBITS(dp) (*(unsigned int *)&PD_PAGE(dp)->index)
+ 
+@@ -201,7 +201,7 @@ int free_pointer_table(void *table, int type)
+ 		list_del(dp);
+ 		mmu_page_dtor((void *)page);
+ 		if (type == TABLE_PTE)
+-			pgtable_pte_page_dtor(virt_to_page(page));
++			pgtable_pte_page_dtor(virt_to_page((void *)page));
+ 		free_page (page);
+ 		return 1;
+ 	} else if (ptable_list[type].next != dp) {
+diff --git a/arch/m68k/mm/sun3mmu.c b/arch/m68k/mm/sun3mmu.c
+index b619d0d4319c..c5e6a23e0262 100644
+--- a/arch/m68k/mm/sun3mmu.c
++++ b/arch/m68k/mm/sun3mmu.c
+@@ -75,7 +75,7 @@ void __init paging_init(void)
+ 		/* now change pg_table to kernel virtual addresses */
+ 		pg_table = (pte_t *) __va ((unsigned long) pg_table);
+ 		for (i=0; i<PTRS_PER_PTE; ++i, ++pg_table) {
+-			pte_t pte = pfn_pte(virt_to_pfn(address), PAGE_INIT);
++			pte_t pte = pfn_pte(virt_to_pfn((void *)address), PAGE_INIT);
+ 			if (address >= (unsigned long)high_memory)
+ 				pte_val (pte) = 0;
+ 			set_pte (pg_table, pte);
+diff --git a/arch/m68k/sun3/dvma.c b/arch/m68k/sun3/dvma.c
+index f15ff16b9997..83fcae6a0e79 100644
+--- a/arch/m68k/sun3/dvma.c
++++ b/arch/m68k/sun3/dvma.c
+@@ -29,7 +29,7 @@ static unsigned long dvma_page(unsigned long kaddr, unsigned long vaddr)
+ 	j = *(volatile unsigned long *)kaddr;
+ 	*(volatile unsigned long *)kaddr = j;
+ 
+-	ptep = pfn_pte(virt_to_pfn(kaddr), PAGE_KERNEL);
++	ptep = pfn_pte(virt_to_pfn((void *)kaddr), PAGE_KERNEL);
+ 	pte = pte_val(ptep);
+ //	pr_info("dvma_remap: addr %lx -> %lx pte %08lx\n", kaddr, vaddr, pte);
+ 	if(ptelist[(vaddr & 0xff000) >> PAGE_SHIFT] != pte) {
+diff --git a/arch/m68k/sun3x/dvma.c b/arch/m68k/sun3x/dvma.c
+index 08bb92113026..a6034ba05845 100644
+--- a/arch/m68k/sun3x/dvma.c
++++ b/arch/m68k/sun3x/dvma.c
+@@ -125,7 +125,7 @@ inline int dvma_map_cpu(unsigned long kaddr,
+ 			do {
+ 				pr_debug("mapping %08lx phys to %08lx\n",
+ 					 __pa(kaddr), vaddr);
+-				set_pte(pte, pfn_pte(virt_to_pfn(kaddr),
++				set_pte(pte, pfn_pte(virt_to_pfn((void *)kaddr),
+ 						     PAGE_KERNEL));
+ 				pte++;
+ 				kaddr += PAGE_SIZE;
+
 -- 
-Linus Walleij <linus.walleij@linaro.org>
+2.34.1
 
