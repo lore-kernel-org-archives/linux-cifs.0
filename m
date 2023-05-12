@@ -2,100 +2,68 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9155C77B7F
-	for <linux-cifs@archiver.kernel.org>; Fri, 12 May 2023 19:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79DE1C77B7C
+	for <linux-cifs@archiver.kernel.org>; Fri, 12 May 2023 22:14:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239176AbjELTVX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 12 May 2023 15:21:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42152 "EHLO
+        id S239763AbjELWON (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 12 May 2023 18:14:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238509AbjELTVW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 12 May 2023 15:21:22 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FFFF729B;
-        Fri, 12 May 2023 12:21:21 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4eed764a10cso11581181e87.0;
-        Fri, 12 May 2023 12:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683919279; x=1686511279;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MAf9SaDWTdarAzCYCfsyt3lnD/b/cooKNRhsZnbbUbg=;
-        b=VoD1G4nCwO+L9mlhAcZflbvzJ7LWLEWPiWkhPowZEetA74tQvxy1p5njXAeVfuPk+f
-         a0HlF5JKfxenfJxZ7xgTcRL/FfJptBHvBG9bceXXvKhoMLKIUFkseCOMHrYwbhiS8BCI
-         szR2FhS7oyfoQRNifeXIKiFte3clykXmPwMZUrtfX5UJncw/Lf5+leFicIxu+Euh0JVx
-         rYaBHTpCICBmfI+spSoomVLlGhSXZ3tFT7+aGQ+eG7+z0a/yu00qKFnI+RP3kC3yH5H1
-         FK+y3b645KG6hUSOQy58XTtn2aATE5Vi7frC+EIupa8fKUdb/sNv4Z4mZoXu0/zriKcp
-         W8eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683919279; x=1686511279;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MAf9SaDWTdarAzCYCfsyt3lnD/b/cooKNRhsZnbbUbg=;
-        b=ku+snrvRP0QYvezJafuFej61GAz23hBf38GQPHNOFtfexOEtiGmDVN7WRab2BYs0wv
-         RtvS+/Pb9XSYum7TdRySPaeKbt/n34w/vgPupPKINkl2BqvdzmtqDEu+aF0iLDqkr3Ln
-         XwSJhO14K/djk3kQABlYemHg74JMXZHAKwcA1hDUKveddtt4NBKKd6zSCMQ2MsyKsEui
-         +8dkCyRvsFzWLpoFWHPJud/llLHjcZo8oGGK1wnALBWuOAO17DPNs/HOLitHJgFvcB6V
-         fsYgrI0b7jv8QgKIVRM9vJ9XOXIpjPUaqJCRvaSPHi1n8d5mf35VyRBCaFoaBWCWdECq
-         jtDA==
-X-Gm-Message-State: AC+VfDzgMlgpg4ZIT9512ED3mmmbJKXFcj45Xs3KTXU8sQEdc43eNura
-        mMyKlljZ/QQvaU8wwb2c+6s96mpHDbXENu9guI5caWwvtJ448Q==
-X-Google-Smtp-Source: ACHHUZ4A7muQ9/gC30kZZtHTrCgLOJ5NNDx7XIX3isDaPLR9fSwjxeYZE7pkmSMl3Rekp9FrKT83gcdqgnIzYamF2DE=
-X-Received: by 2002:ac2:4a76:0:b0:4f1:26da:54ab with SMTP id
- q22-20020ac24a76000000b004f126da54abmr4174350lfp.51.1683919278800; Fri, 12
- May 2023 12:21:18 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 12 May 2023 14:21:05 -0500
-Message-ID: <CAH2r5mv21PgfmG7N=mV33QMsAmF4eeV=A77sXrPLNSbMR=79FQ@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        with ESMTP id S240017AbjELWOM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 12 May 2023 18:14:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B2C030D1;
+        Fri, 12 May 2023 15:14:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9EF0D634FA;
+        Fri, 12 May 2023 22:14:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13C3AC433D2;
+        Fri, 12 May 2023 22:14:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1683929650;
+        bh=OzaPbwHbEHyVHDM48cNTRPjjxoLJH+DKUek4pcg2/gY=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=BgOJammtyBqOBQDK/EkJG4nYr7KTzg/SOulPxWYKDkDTMmS2sfsB6EPcm6ltX6Gib
+         IF7dZAb2N/fhABghJsyBGZdNCZzkB5zFRlXrBdjtbdAgvylSo+6ZPUnUxMtgR5EtYK
+         Khh/FwPtdGnPSB2W1XeYasmnLLm1LyXqESbu3r3sGoMSPox31j4ByXpsG9ci8DRVD8
+         vPuv55aX4T+PvuDrzIpyzxARf20X21UUGjkZkY4pP+QpbrlO487P2opSS5DgNJ3JO3
+         0Spc9Vv7UNkd51oy6lHDZpf3F9X4oaRBLzqIyx8Syg1yKUQB1jrlpu/cxi6xx1cTo5
+         vkgpPOltE/+aQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC2A0E26D20;
+        Fri, 12 May 2023 22:14:09 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mv21PgfmG7N=mV33QMsAmF4eeV=A77sXrPLNSbMR=79FQ@mail.gmail.com>
+References: <CAH2r5mv21PgfmG7N=mV33QMsAmF4eeV=A77sXrPLNSbMR=79FQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mv21PgfmG7N=mV33QMsAmF4eeV=A77sXrPLNSbMR=79FQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc1-smb3-client-fixes
+X-PR-Tracked-Commit-Id: d39fc592ef8ae9a89c5e85c8d9f760937a57d5ba
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: fd88f147cb121c9c748ca0d4c5155a96e9d81e58
+Message-Id: <168392964996.28473.12333015860903558034.pr-tracker-bot@kernel.org>
+Date:   Fri, 12 May 2023 22:14:09 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-ac9a78681b921877518763ba0e89202254349d1b:
+The pull request you sent on Fri, 12 May 2023 14:21:05 -0500:
 
-  Linux 6.4-rc1 (2023-05-07 13:34:35 -0700)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc1-smb3-client-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/fd88f147cb121c9c748ca0d4c5155a96e9d81e58
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc1-smb3-client-fixes
+Thank you!
 
-for you to fetch changes up to d39fc592ef8ae9a89c5e85c8d9f760937a57d5ba:
-
-  cifs: release leases for deferred close handles when freezing
-(2023-05-10 17:48:30 -0500)
-
-----------------------------------------------------------------
-6 smb3 client fixes, most also for stable
-- fix for copy_file_range bug for very large files that are multiples of rsize
-- do not ignore "isolated transport" flag if set on share
-- set rasize default better
-- three fixes related to shutdown and freezing (fixes 4 xfstests, and
-closes deferred handles faster in some places that were missed)
-----------------------------------------------------------------
-Pawel Witek (1):
-      cifs: fix pcchunk length type in smb2_copychunk_range
-
-Steve French (5):
-      do not reuse connection if share marked as isolated
-      smb3: improve parallel reads of large files
-      SMB3: force unmount was failing to close deferred close files
-      smb3: fix problem remounting a share after shutdown
-      cifs: release leases for deferred close handles when freezing
-
- fs/cifs/cifsfs.c  | 18 +++++++++++++++++-
- fs/cifs/connect.c |  7 +++++++
- fs/cifs/smb2ops.c |  2 +-
- fs/cifs/smb2pdu.c |  3 +++
- 4 files changed, 28 insertions(+), 2 deletions(-)
-
---
-Thanks,
-
-Steve
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
