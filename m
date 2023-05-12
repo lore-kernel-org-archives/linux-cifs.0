@@ -2,68 +2,96 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA76BC77B7F
-	for <linux-cifs@archiver.kernel.org>; Fri, 12 May 2023 08:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA17C7EE24
+	for <linux-cifs@archiver.kernel.org>; Fri, 12 May 2023 08:56:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230522AbjELIpT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 12 May 2023 04:45:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55872 "EHLO
+        id S240175AbjELI44 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 12 May 2023 04:56:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232659AbjELIpS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 12 May 2023 04:45:18 -0400
-X-Greylist: delayed 504 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 12 May 2023 01:45:17 PDT
-Received: from mail.mojafirma24biz.pl (mail.mojafirma24biz.pl [94.177.230.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FAEA7A83
-        for <linux-cifs@vger.kernel.org>; Fri, 12 May 2023 01:45:17 -0700 (PDT)
-Received: by mail.mojafirma24biz.pl (Postfix, from userid 1002)
-        id E1CE782B60; Fri, 12 May 2023 10:35:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mojafirma24biz.pl;
-        s=mail; t=1683880609;
-        bh=QbP1U00PseMsQKCCzubvpt4P1svntDdd/QYVIBIcXDg=;
-        h=Date:From:To:Subject:From;
-        b=E8M6EIe9qCOGmL4nunfw6JIXDvtxvKVvCjtBOY/2N1nyloql/UOHR2PWc9rMxC3sI
-         Hs3uLIMLS5qrg9gL5nAuDc6Th1T7LdCcCUMKziycEXwj9vS7NUrmDvjeUZIfozPbPk
-         bvLdVsgZWRyH9SaoDyvYVFpgBvKJz3NMDWRgMbznCjdJLhQllxwREcaDniOq5JaJcU
-         C7TL9fcFY++vTMFeLCi3MqxgNHp/VI7AWVeGH22nPJnmXQl7dg8RU5l9yhmk0Ge/sA
-         ICwSOfDz5lHKXuokeuB4Q6TpElqeMSE3FLPx3AmpHQHSPhg90kGfk+QpD+AbEPm8vS
-         YgoExcFkPLLHA==
-Received: by mail.mojafirma24biz.pl for <linux-cifs@vger.kernel.org>; Fri, 12 May 2023 08:34:54 GMT
-Message-ID: <20230512103246-0.1.8.go5.0.z7bbffd7v8@mojafirma24biz.pl>
-Date:   Fri, 12 May 2023 08:34:54 GMT
-From:   "Adam Wyrwisz" <adam.wyrwisz@mojafirma24biz.pl>
-To:     <linux-cifs@vger.kernel.org>
-Subject: Fotowoltaika dla biznesu
-X-Mailer: mail.mojafirma24biz.pl
+        with ESMTP id S240113AbjELI4z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 12 May 2023 04:56:55 -0400
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79972128;
+        Fri, 12 May 2023 01:56:49 -0700 (PDT)
+Received: (Authenticated sender: alex@ghiti.fr)
+        by mail.gandi.net (Postfix) with ESMTPSA id 5F562FF811;
+        Fri, 12 May 2023 08:56:24 +0000 (UTC)
+Message-ID: <1e30aaca-b4a8-4269-c368-d1f6e0ffff54@ghiti.fr>
+Date:   Fri, 12 May 2023 10:56:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 04/12] riscv: mm: init: Pass a pointer to virt_to_page()
+To:     Linus Walleij <linus.walleij@linaro.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Greg Ungerer <gerg@linux-m68k.org>
+Cc:     linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+        linux-snps-arc@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+References: <20230503-virt-to-pfn-v6-4-rc1-v1-0-6c4698dcf9c8@linaro.org>
+ <20230503-virt-to-pfn-v6-4-rc1-v1-4-6c4698dcf9c8@linaro.org>
+Content-Language: en-US
+From:   Alexandre Ghiti <alex@ghiti.fr>
+In-Reply-To: <20230503-virt-to-pfn-v6-4-rc1-v1-4-6c4698dcf9c8@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
++cc linux-riscv
 
-w zwi=C4=85zku z nieustannie rosn=C4=85cymi cenami produkt=C3=B3w i us=C5=
-=82ug - wiele firmy stawia na rozwi=C4=85zania, kt=C3=B3re pomog=C4=85 zm=
-niejszy=C4=87 wydatki zwi=C4=85zane z prowadzeniem dzia=C5=82alno=C5=9Bci=
-, a jednym z nich jest wyb=C3=B3r instalacji fotowoltaicznych.=20
+On 5/11/23 13:59, Linus Walleij wrote:
+> Functions that work on a pointer to virtual memory such as
+> virt_to_pfn() and users of that function such as
+> virt_to_page() are supposed to pass a pointer to virtual
+> memory, ideally a (void *) or other pointer. However since
+> many architectures implement virt_to_pfn() as a macro,
+> this function becomes polymorphic and accepts both a
+> (unsigned long) and a (void *).
+>
+> Fix this in the RISCV mm init code, so we can implement
+> a strongly typed virt_to_pfn().
+>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>   arch/riscv/mm/init.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+> index 747e5b1ef02d..2f7a7c345a6a 100644
+> --- a/arch/riscv/mm/init.c
+> +++ b/arch/riscv/mm/init.c
+> @@ -356,7 +356,7 @@ static phys_addr_t __init alloc_pte_late(uintptr_t va)
+>   	unsigned long vaddr;
+>   
+>   	vaddr = __get_free_page(GFP_KERNEL);
+> -	BUG_ON(!vaddr || !pgtable_pte_page_ctor(virt_to_page(vaddr)));
+> +	BUG_ON(!vaddr || !pgtable_pte_page_ctor(virt_to_page((void *)vaddr)));
+>   
+>   	return __pa(vaddr);
+>   }
+> @@ -439,7 +439,7 @@ static phys_addr_t __init alloc_pmd_late(uintptr_t va)
+>   	unsigned long vaddr;
+>   
+>   	vaddr = __get_free_page(GFP_KERNEL);
+> -	BUG_ON(!vaddr || !pgtable_pmd_page_ctor(virt_to_page(vaddr)));
+> +	BUG_ON(!vaddr || !pgtable_pmd_page_ctor(virt_to_page((void *)vaddr)));
+>   
+>   	return __pa(vaddr);
+>   }
+>
 
-Wszystkim odbiorcom szukaj=C4=85cym mo=C5=BCliwo=C5=9Bci obni=C5=BCenia k=
-oszt=C3=B3w energii elektrycznej, wychodzimy naprzeciw =C5=9Bwiadcz=C4=85=
-c kompleksow=C4=85 obs=C5=82ug=C4=99 inwestycji w fotowoltaik=C4=99.=20
+Reviewed-by: Alexandre Ghiti <alexghiti@rivosinc.com>
 
-Jako jedyna na rynku firma zapewniamy 12 lat gwarancji, audyt po monta=C5=
-=BCowy, a tak=C5=BCe kalkulacj=C4=99 oszcz=C4=99dno=C5=9Bci po monta=C5=BC=
-u fotowoltaiki.
+Thanks,
 
-Umo=C5=BCliwiamy leasing z odroczon=C4=85 sp=C5=82at=C4=85 i bez wk=C5=82=
-adu w=C5=82asnego, gwarantujemy wsparcie w pozyskaniu odpowiedniego =C5=BA=
-r=C3=B3d=C5=82a finansowania i pomoc w przypadku wnioskowania o dotacj=C4=
-=99.
+Alex
 
-Czy chcieliby Pa=C5=84stwo zapozna=C4=87 si=C4=99 z mo=C5=BCliwo=C5=9Bcia=
-mi inwestycji w PV dopasowanymi do Pa=C5=84stwa obiektu?
-
-
-Pozdrawiam
-Adam Wyrwisz
