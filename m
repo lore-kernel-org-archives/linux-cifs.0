@@ -2,179 +2,191 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7C5C7EE24
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 May 2023 20:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05462C77B7D
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 May 2023 21:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244998AbjEOUtg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 May 2023 16:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55342 "EHLO
+        id S245561AbjEOV1G (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 May 2023 17:27:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjEOUtf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 15 May 2023 16:49:35 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CFB67EDA
-        for <linux-cifs@vger.kernel.org>; Mon, 15 May 2023 13:49:34 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id 3f1490d57ef6-ba724ec3b06so6476845276.2
-        for <linux-cifs@vger.kernel.org>; Mon, 15 May 2023 13:49:34 -0700 (PDT)
+        with ESMTP id S245501AbjEOV1A (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 15 May 2023 17:27:00 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B0E13C18
+        for <linux-cifs@vger.kernel.org>; Mon, 15 May 2023 14:26:34 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-75773a7bd66so1021800385a.1
+        for <linux-cifs@vger.kernel.org>; Mon, 15 May 2023 14:26:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684183773; x=1686775773;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1e7tWy7LrpqiWScMwgxEKZa+vUpe/ORZ55MwWzEBwA=;
-        b=W7yU/CBHV8xQ8xw7RsCp5lgyjlyM6oXnx9X+K4Mg5lT00igJZQjGlA1BshvSFJNw6s
-         cE95SGqRu35iG7U8i+BGSKulcOGGzIpfHn3rFZhskSnLLSKVPQrTkc2JDDEDHgzwQ3Tx
-         XOucanM5Rn4AfFr2wGcF5PTH3mbRVKTCkJVyt8APKCpPQJp8/ZffMoWe8EfNEymuLFsT
-         14GuktA3Rli7d8eAzA8/LcBS3eb7TulWfcak+zjWmoHAFZtMPoR0fPgApT90jT9vV0oy
-         Act4ZNqxJ4xTCd9D3mvT4BQFvNrdDbvCycOSk7bY//AE746ZMCD4LXF0NVw6eMTBScRu
-         Y+Kw==
+        d=gmail.com; s=20221208; t=1684185993; x=1686777993;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XJIy+gKpleVhui/GdnvuJ4ylTzic+zNhaKi23bM/TGg=;
+        b=prFTaDHxSFzH0Sup2CAgTsdfFteNwFxCLVY2SYoDGWYDYdUg4m2Wv7uanG4OBpqmet
+         /x9GH4ZGxMyUUPo2EAnTJm8yH+A9/k5byxjruyDd9yBL2OxHo/4YyxkpRffV1QYyb8fo
+         rqvPkOj1NRT/IOADzl8NVgAiZCxKID7yKM4ZaVDPFTQyDXHzisPPZ9IP/PdLZzxCxKcN
+         6Eu4HIAR+CeRcmvnatsL5wfvI+2kjWg2ZcwRHUblF2aK32GdO4T3Mu9Cu2QYW7wM7bzU
+         xrIP+FfHxSbwrvPQRMV4iIre9zeSqONf0w9tY6rorEVavJFrFheLi3Dml+ix5Gid+iNy
+         pI+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684183773; x=1686775773;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1684185993; x=1686777993;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=S1e7tWy7LrpqiWScMwgxEKZa+vUpe/ORZ55MwWzEBwA=;
-        b=I8OJlQwbTpw0NcdEno6zcg787YamDIPN+u0cvv4PMZf8sPFsNwnz0Fg/GTPa6ScUfM
-         nbDX+958Tb0b95/6SVAWU1IYqmy5efqQDp3NPER3/pC5ky3VJJCWxyLWHcTQaNsJIpYQ
-         pnHq3cgnXzYBOy8a4rRMYITlfLp4N4zSVlCQeqiqt9eOwUE8yyQIkGZEB7QB8c1htrK9
-         K5t6O61+RNRnSLf3/KsDs4JLOh8D+eEPlxuZg3SsfD0LmHVQCxw5Sp1psV9wkr7xRa0H
-         /74sWVza05yKJGvb995XU+nYPUaGW2fKC65fhPX4GX7K7ld9ebaJyFG1lyFxz3cOTekb
-         AIHg==
-X-Gm-Message-State: AC+VfDwgi2Poa+ZuNJQ0eTDu+urUvWL4Kedm5DtqF9eheUY2+3nvJaj7
-        qehOyhje7Kj1xSW4IiqlP/XoYiLLL4iwY93HafY=
-X-Google-Smtp-Source: ACHHUZ5kA3vL88oYo6gx2f0Z/SOQpWL68fxA+yeSS/68DDtp8khuQiGDeRVHLfx1VWQCVEDCF3QTHHfuimhUXYtF6Vk=
-X-Received: by 2002:a0d:cc4b:0:b0:55a:3420:5adc with SMTP id
- o72-20020a0dcc4b000000b0055a34205adcmr33227729ywd.51.1684183772963; Mon, 15
- May 2023 13:49:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230508190103.601678-1-bharathsm.hsk@gmail.com>
-In-Reply-To: <20230508190103.601678-1-bharathsm.hsk@gmail.com>
+        bh=XJIy+gKpleVhui/GdnvuJ4ylTzic+zNhaKi23bM/TGg=;
+        b=Leh7Nd2u4evdr4BYEILBHL94kTo9hQSwXaPMQ5xyO802jC6naORt4lsqKzw7MNBzZG
+         cKo9n5PdK6rYVrqgq05yn8xh9RBDdWyMvVzUZw9dATQLjbLppRYYMSv/WjJov7N8JkJO
+         mgvOEdR0+ru7AmPCawkvEr81yPQCGhHhiwheBCt02QQMxNug/JNG4dEhBrxgitaMfpz/
+         Ho61vJ3/WI3hn17VC1k++XWsqlQnz1BFIuKxulf+42nYqdaXwvRbmGIWSiCWU25I6Xyw
+         QPr2JygstDsansfMit2G8c+l9R3sOc+Py/YZH04+qNp+MTHHU98POBbdsz7BoAK3EETC
+         0Qrg==
+X-Gm-Message-State: AC+VfDzEcLPqMFZ1BdPUpFTVPLlz1M9W7Ky47wSMh0yE79tS/ig581Xx
+        XeJn/zuXr5pzw+MYBpY0hPt0aTuZi4Ai6g==
+X-Google-Smtp-Source: ACHHUZ4Fm4V/hv2XzSZR9oCU/gGKZB7n61WUSO5RTAbVVRm4MUETTmO96PNPTPVdRS0zY+ta84umCw==
+X-Received: by 2002:a05:622a:24b:b0:3f4:f210:959b with SMTP id c11-20020a05622a024b00b003f4f210959bmr24115928qtx.12.1684185992972;
+        Mon, 15 May 2023 14:26:32 -0700 (PDT)
+Received: from ubuntu2004.1qqixozwsnuevircicbvxjrsib.bx.internal.cloudapp.net ([20.84.44.103])
+        by smtp.googlemail.com with ESMTPSA id ff14-20020a05622a4d8e00b003ef3e8f8823sm5378599qtb.89.2023.05.15.14.26.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 May 2023 14:26:32 -0700 (PDT)
 From:   Bharath SM <bharathsm.hsk@gmail.com>
-Date:   Tue, 16 May 2023 02:19:21 +0530
-Message-ID: <CAGypqWzMe3SiqQSDPUSvNauXzmzATNyVWzOKyOY1pwU49M=exw@mail.gmail.com>
-Subject: Re: [PATCH] SMB3: Close all deferred handles of inode in case of
- handle lease break
+X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
 To:     pc@cjr.nz, sfrench@samba.org, lsahlber@redhat.com,
         nspmangalore@gmail.com, tom@talpey.com, linux-cifs@vger.kernel.org,
         smfrench@gmail.com
 Cc:     Bharath SM <bharathsm@microsoft.com>
-Content-Type: multipart/mixed; boundary="00000000000086ac5205fbc197d0"
+Subject: [PATCH] SMB3: drop reference to cfile before sending oplock break
+Date:   Mon, 15 May 2023 21:25:12 +0000
+Message-Id: <20230515212512.1402756-1-bharathsm@microsoft.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000086ac5205fbc197d0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In cifs_oplock_break function we drop reference to a cfile at
+the end of function, due to which close command goes on wire
+after lease break acknowledgment even if file is already closed
+by application but we had deferred the handle close.
+If other client with limited file shareaccess waiting on lease
+break ack proceeds operation on that file as soon as first client
+sends ack, then we may encounter status sharing violation error
+because of open handle.
+Solution is to put reference to cfile(send close on wire if last ref)
+and then send oplock acknowledgment to server.
 
-Attached updated patch with expanded commit message.
+Fixes: 9e31678fb403 ("SMB3: fix lease break timeout when multiple deferred close handles for the same file.")
+Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+---
+ fs/cifs/cifsglob.h |  4 ++--
+ fs/cifs/file.c     | 17 ++++++++++++-----
+ fs/cifs/smb1ops.c  |  9 ++++-----
+ fs/cifs/smb2ops.c  |  7 +++----
+ 4 files changed, 21 insertions(+), 16 deletions(-)
 
-On Tue, May 9, 2023 at 12:32=E2=80=AFAM Bharath SM <bharathsm.hsk@gmail.com=
-> wrote:
->
-> Oplock break may occur for different file handle than the deferred handle=
-.
-> Check for inode deferred closes list, if it's not empty then close all th=
-e
-> deferred handles of inode.
->
-> Fixes: 9e31678fb403 ("SMB3: fix lease break timeout when multiple deferre=
-d close handles for the same file.")
-> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
-> ---
->  fs/cifs/file.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 791a12575109..260d5ec878e8 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -4886,8 +4886,6 @@ void cifs_oplock_break(struct work_struct *work)
->         struct TCP_Server_Info *server =3D tcon->ses->server;
->         int rc =3D 0;
->         bool purge_cache =3D false;
-> -       struct cifs_deferred_close *dclose;
-> -       bool is_deferred =3D false;
->
->         wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
->                         TASK_UNINTERRUPTIBLE);
-> @@ -4928,14 +4926,9 @@ void cifs_oplock_break(struct work_struct *work)
->          * file handles but cached, then schedule deferred close immediat=
-ely.
->          * So, new open will not use cached handle.
->          */
-> -       spin_lock(&CIFS_I(inode)->deferred_lock);
-> -       is_deferred =3D cifs_is_deferred_close(cfile, &dclose);
-> -       spin_unlock(&CIFS_I(inode)->deferred_lock);
->
-> -       if (!CIFS_CACHE_HANDLE(cinode) && is_deferred &&
-> -                       cfile->deferred_close_scheduled && delayed_work_p=
-ending(&cfile->deferred)) {
-> +       if (!CIFS_CACHE_HANDLE(cinode) && !list_empty(&cinode->deferred_c=
-loses))
->                 cifs_close_deferred_file(cinode);
-> -       }
->
->         /*
->          * releasing stale oplock after recent reconnect of smb session u=
-sing
-> --
-> 2.34.1
->
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index a99883f16d94..2b8f9d335ad7 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -424,8 +424,8 @@ struct smb_version_operations {
+ 	/* check for STATUS_NETWORK_SESSION_EXPIRED */
+ 	bool (*is_session_expired)(char *);
+ 	/* send oplock break response */
+-	int (*oplock_response)(struct cifs_tcon *, struct cifs_fid *,
+-			       struct cifsInodeInfo *);
++	int (*oplock_response)(struct cifs_tcon *, __u64, __u64, __u16,
++			struct cifsInodeInfo *);
+ 	/* query remote filesystem */
+ 	int (*queryfs)(const unsigned int, struct cifs_tcon *,
+ 		       struct cifs_sb_info *, struct kstatfs *);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 260d5ec878e8..8b6414824e8e 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -4885,7 +4885,9 @@ void cifs_oplock_break(struct work_struct *work)
+ 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	int rc = 0;
+-	bool purge_cache = false;
++	bool purge_cache = false, oplock_break_cancelled;
++	__u64 persistent_fid, volatile_fid;
++	__u16 net_fid;
+ 
+ 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
+ 			TASK_UNINTERRUPTIBLE);
+@@ -4930,19 +4932,24 @@ void cifs_oplock_break(struct work_struct *work)
+ 	if (!CIFS_CACHE_HANDLE(cinode) && !list_empty(&cinode->deferred_closes))
+ 		cifs_close_deferred_file(cinode);
+ 
++	persistent_fid = cfile->fid.persistent_fid;
++	volatile_fid = cfile->fid.volatile_fid;
++	net_fid = cfile->fid.netfid;
++	oplock_break_cancelled = cfile->oplock_break_cancelled;
++
++	_cifsFileInfo_put(cfile, false /* do not wait for ourself */, false);
+ 	/*
+ 	 * releasing stale oplock after recent reconnect of smb session using
+ 	 * a now incorrect file handle is not a data integrity issue but do
+ 	 * not bother sending an oplock release if session to server still is
+ 	 * disconnected since oplock already released by the server
+ 	 */
+-	if (!cfile->oplock_break_cancelled) {
+-		rc = tcon->ses->server->ops->oplock_response(tcon, &cfile->fid,
+-							     cinode);
++	if (!oplock_break_cancelled) {
++		rc = tcon->ses->server->ops->oplock_response(tcon, persistent_fid,
++				volatile_fid, net_fid, cinode);
+ 		cifs_dbg(FYI, "Oplock release rc = %d\n", rc);
+ 	}
+ 
+-	_cifsFileInfo_put(cfile, false /* do not wait for ourself */, false);
+ 	cifs_done_oplock_break(cinode);
+ }
+ 
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index abda6148be10..7d1b3fc014d9 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -897,12 +897,11 @@ cifs_close_dir(const unsigned int xid, struct cifs_tcon *tcon,
+ }
+ 
+ static int
+-cifs_oplock_response(struct cifs_tcon *tcon, struct cifs_fid *fid,
+-		     struct cifsInodeInfo *cinode)
++cifs_oplock_response(struct cifs_tcon *tcon, __u64 persistent_fid,
++		__u64 volatile_fid, __u16 net_fid, struct cifsInodeInfo *cinode)
+ {
+-	return CIFSSMBLock(0, tcon, fid->netfid, current->tgid, 0, 0, 0, 0,
+-			   LOCKING_ANDX_OPLOCK_RELEASE, false,
+-			   CIFS_CACHE_READ(cinode) ? 1 : 0);
++	return CIFSSMBLock(0, tcon, net_fid, current->tgid, 0, 0, 0, 0,
++			   LOCKING_ANDX_OPLOCK_RELEASE, false, CIFS_CACHE_READ(cinode) ? 1 : 0);
+ }
+ 
+ static int
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 6dfb865ee9d7..bbae7a77fbec 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2363,15 +2363,14 @@ smb2_is_network_name_deleted(char *buf, struct TCP_Server_Info *server)
+ }
+ 
+ static int
+-smb2_oplock_response(struct cifs_tcon *tcon, struct cifs_fid *fid,
+-		     struct cifsInodeInfo *cinode)
++smb2_oplock_response(struct cifs_tcon *tcon, __u64 persistent_fid,
++		__u64 volatile_fid, __u16 net_fid, struct cifsInodeInfo *cinode)
+ {
+ 	if (tcon->ses->server->capabilities & SMB2_GLOBAL_CAP_LEASING)
+ 		return SMB2_lease_break(0, tcon, cinode->lease_key,
+ 					smb2_get_lease_state(cinode));
+ 
+-	return SMB2_oplock_break(0, tcon, fid->persistent_fid,
+-				 fid->volatile_fid,
++	return SMB2_oplock_break(0, tcon, persistent_fid, volatile_fid,
+ 				 CIFS_CACHE_READ(cinode) ? 1 : 0);
+ }
+ 
+-- 
+2.34.1
 
---00000000000086ac5205fbc197d0
-Content-Type: application/octet-stream; 
-	name="0001-SMB3-Close-all-deferred-handles-of-inode-in-case-of-.patch"
-Content-Disposition: attachment; 
-	filename="0001-SMB3-Close-all-deferred-handles-of-inode-in-case-of-.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lhpbgsvb0>
-X-Attachment-Id: f_lhpbgsvb0
-
-RnJvbSAzOTg2ZGJlZmNhNmJkNWJmN2Y1MjE3MjdlYzlmNjk1OWRjY2FhN2QwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBCaGFyYXRoIFNNIDxiaGFyYXRoc21AbWljcm9zb2Z0LmNvbT4K
-RGF0ZTogV2VkLCAzIE1heSAyMDIzIDE0OjM4OjM1ICswMDAwClN1YmplY3Q6IFtQQVRDSF0gU01C
-MzogQ2xvc2UgYWxsIGRlZmVycmVkIGhhbmRsZXMgb2YgaW5vZGUgaW4gY2FzZSBvZiBoYW5kbGUK
-IGxlYXNlIGJyZWFrCgpPcGxvY2sgYnJlYWsgbWF5IG9jY3VyIGZvciBkaWZmZXJlbnQgZmlsZSBo
-YW5kbGUgdGhhbiB0aGUgZGVmZXJyZWQKaGFuZGxlLiBDaGVjayBmb3IgaW5vZGUgZGVmZXJyZWQg
-Y2xvc2VzIGxpc3QsIGlmIGl0J3Mgbm90IGVtcHR5IHRoZW4KY2xvc2UgYWxsIHRoZSBkZWZlcnJl
-ZCBoYW5kbGVzIG9mIGlub2RlIGJlY2F1c2Ugd2Ugc2hvdWxkIG5vdCBjYWNoZQpoYW5kbGVzIGlm
-IHdlIGRvbnQgaGF2ZSBoYW5kbGUgbGVhc2UuCgpFZzogSWYgb3BlbmZpbGVsaXN0IGhhcyBvbmUg
-ZGVmZXJyZWQgZmlsZSBoYW5kbGUgYW5kIGFub3RoZXIgb3BlbiBmaWxlCmhhbmRsZSBmcm9tIGFw
-cCBmb3IgYSBzYW1lIGZpbGUsIHRoZW4gb24gYSBsZWFzZSBicmVhayB3ZSBjaG9vc2UgdGhlCmZp
-cnN0IGhhbmRsZSBpbiBvcGVuZmlsZSBsaXN0LiBUaGUgZmlyc3QgaGFuZGxlIGluIGxpc3QgY2Fu
-IGJlIGRlZmVycmVkCmhhbmRsZSBvciBhY3R1YWwgb3BlbiBmaWxlIGhhbmRsZSBmcm9tIGFwcC4g
-SW4gY2FzZSBpZiBpdCBpcyBhY3R1YWwgb3BlbgpoYW5kbGUgdGhlbiB0b2RheSwgd2UgZG9uJ3Qg
-Y2xvc2UgZGVmZXJyZWQgaGFuZGxlcyBpZiB3ZSBsb3NlIGhhbmRsZSBsZWFzZQpvbiBhIGZpbGUu
-IFByb2JsZW0gd2l0aCB0aGlzIGlzLCBsYXRlciBpZiBhcHAgZGVjaWRlcyB0byBjbG9zZSB0aGUg
-ZXhpc3RpbmcKb3BlbiBoYW5kbGUgdGhlbiB3ZSBzdGlsbCBiZSBjYWNoaW5nIGRlZmVycmVkIGhh
-bmRsZXMgdW50aWwgZGVmZXJyZWQgY2xvc2UKdGltZW91dC4gTGVhdmluZyBvcGVuIGhhbmRsZSBt
-YXkgcmVzdWx0IGluIHNoYXJpbmcgdmlvbGF0aW9uIHdoZW4gd2luZG93cwpjbGllbnQgdHJpZXMg
-dG8gb3BlbiBhIGZpbGUgd2l0aCBsaW1pdGVkIGZpbGUgc2hhcmUgYWNjZXNzLgoKU28gd2Ugc2hv
-dWxkIGNoZWNrIGZvciBkZWZlcnJlZCBsaXN0IG9mIGlub2RlIGFuZCB3YWxrIHRocm91Z2ggdGhl
-IGxpc3Qgb2YKZGVmZXJyZWQgZmlsZXMgaW4gaW5vZGUgYW5kIGNsb3NlIGFsbCBkZWZlcnJlZCBm
-aWxlcy4KCkZpeGVzOiA5ZTMxNjc4ZmI0MDMgKCJTTUIzOiBmaXggbGVhc2UgYnJlYWsgdGltZW91
-dCB3aGVuIG11bHRpcGxlIGRlZmVycmVkIGNsb3NlIGhhbmRsZXMgZm9yIHRoZSBzYW1lIGZpbGUu
-IikKU2lnbmVkLW9mZi1ieTogQmhhcmF0aCBTTSA8YmhhcmF0aHNtQG1pY3Jvc29mdC5jb20+Ci0t
-LQogZnMvY2lmcy9maWxlLmMgfCA5ICstLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0
-aW9uKCspLCA4IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvZmlsZS5jIGIvZnMv
-Y2lmcy9maWxlLmMKaW5kZXggNzkxYTEyNTc1MTA5Li4yNjBkNWVjODc4ZTggMTAwNjQ0Ci0tLSBh
-L2ZzL2NpZnMvZmlsZS5jCisrKyBiL2ZzL2NpZnMvZmlsZS5jCkBAIC00ODg2LDggKzQ4ODYsNiBA
-QCB2b2lkIGNpZnNfb3Bsb2NrX2JyZWFrKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykKIAlzdHJ1
-Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIgPSB0Y29uLT5zZXMtPnNlcnZlcjsKIAlpbnQgcmMg
-PSAwOwogCWJvb2wgcHVyZ2VfY2FjaGUgPSBmYWxzZTsKLQlzdHJ1Y3QgY2lmc19kZWZlcnJlZF9j
-bG9zZSAqZGNsb3NlOwotCWJvb2wgaXNfZGVmZXJyZWQgPSBmYWxzZTsKIAogCXdhaXRfb25fYml0
-KCZjaW5vZGUtPmZsYWdzLCBDSUZTX0lOT0RFX1BFTkRJTkdfV1JJVEVSUywKIAkJCVRBU0tfVU5J
-TlRFUlJVUFRJQkxFKTsKQEAgLTQ5MjgsMTQgKzQ5MjYsOSBAQCB2b2lkIGNpZnNfb3Bsb2NrX2Jy
-ZWFrKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykKIAkgKiBmaWxlIGhhbmRsZXMgYnV0IGNhY2hl
-ZCwgdGhlbiBzY2hlZHVsZSBkZWZlcnJlZCBjbG9zZSBpbW1lZGlhdGVseS4KIAkgKiBTbywgbmV3
-IG9wZW4gd2lsbCBub3QgdXNlIGNhY2hlZCBoYW5kbGUuCiAJICovCi0Jc3Bpbl9sb2NrKCZDSUZT
-X0koaW5vZGUpLT5kZWZlcnJlZF9sb2NrKTsKLQlpc19kZWZlcnJlZCA9IGNpZnNfaXNfZGVmZXJy
-ZWRfY2xvc2UoY2ZpbGUsICZkY2xvc2UpOwotCXNwaW5fdW5sb2NrKCZDSUZTX0koaW5vZGUpLT5k
-ZWZlcnJlZF9sb2NrKTsKIAotCWlmICghQ0lGU19DQUNIRV9IQU5ETEUoY2lub2RlKSAmJiBpc19k
-ZWZlcnJlZCAmJgotCQkJY2ZpbGUtPmRlZmVycmVkX2Nsb3NlX3NjaGVkdWxlZCAmJiBkZWxheWVk
-X3dvcmtfcGVuZGluZygmY2ZpbGUtPmRlZmVycmVkKSkgeworCWlmICghQ0lGU19DQUNIRV9IQU5E
-TEUoY2lub2RlKSAmJiAhbGlzdF9lbXB0eSgmY2lub2RlLT5kZWZlcnJlZF9jbG9zZXMpKQogCQlj
-aWZzX2Nsb3NlX2RlZmVycmVkX2ZpbGUoY2lub2RlKTsKLQl9CiAKIAkvKgogCSAqIHJlbGVhc2lu
-ZyBzdGFsZSBvcGxvY2sgYWZ0ZXIgcmVjZW50IHJlY29ubmVjdCBvZiBzbWIgc2Vzc2lvbiB1c2lu
-ZwotLSAKMi4zNC4xCgo=
---00000000000086ac5205fbc197d0--
