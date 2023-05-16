@@ -2,348 +2,81 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA66DC77B75
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 May 2023 19:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB58C77B75
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 May 2023 19:55:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbjEPTka (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 May 2023 15:40:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33190 "EHLO
+        id S229665AbjEPTzR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 May 2023 15:55:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbjEPTk2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 May 2023 15:40:28 -0400
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BECD04C
-        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:40:03 -0700 (PDT)
-Received: by mail-vk1-xa33.google.com with SMTP id 71dfb90a1353d-44fd6524c36so21772e0c.0
-        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:40:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1684265957; x=1686857957;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bl0KxKY/sUcM54GB5tUsJdCgfaOj1mAl6bkpff/gM1k=;
-        b=dsbLYDRucXeFfy0Q/wCYCvEpNLRRzLYvTikvSdUg55vOz24AO+E/QwEMZYFCLgsIUL
-         TP2kqL/XSO9xo4qYSlxpIMcnDRh93iGsYH1x1Of0ShspCO1GxrShBtdFerCbFQ7XNOOS
-         h1ROfA6eOs4GIHyR6q/h/4u+C8FOWvtUBAr35zxQeSISTQ+fm7utqJjvjB9bP+jW+ys1
-         oT2uZk/G+oUv+KhJPlOiv/tHPy5vl/Y6MWIsLReICSp28OninHw7eMvOT97IJ4XYogrk
-         fq5n2E8l+4lUW3JwfVBNlMCpWk91W3x46+13OI/IntSRkIJHnKz2tn+HbVkm/e/9QXEi
-         ZVSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684265957; x=1686857957;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bl0KxKY/sUcM54GB5tUsJdCgfaOj1mAl6bkpff/gM1k=;
-        b=EcmkR+rBS5cbKTm6JnRK0pOPUnvPIi6PQR6UvzouvEAHizK60S72j0IKNbJY6QIj9L
-         kxlqKqWKb5JxqXObtIPuQkGyFXlyJIsInI/IcqETPb/A6+LUrNFXX/rNVQkEWynqkb6y
-         4y6oEaH4DGu0BMEUvDJheDoSBgnledYObtcELk8TxS7LxFHMEBpUwn+0tW44zwvTnSvX
-         1DplC+36sn6sshT4W25XrsdVKU7eVSazwCyabp6mh/VenqJVxSZI5Cza3DoO/rRiIkus
-         BL2+R08BAoNWf3H2i1zF7FNvbhwHDddoqGI2kvARncHw1mS8BOPGqBTarMFEzZfm3BCe
-         TWmQ==
-X-Gm-Message-State: AC+VfDzaFKc2O/ZCvnmF11XR1kf2edA54303BdoLqjQOKznF+V27izaQ
-        4p8BZYuAwCV2y7cCmlIZFJJVaPL0AuSMDOaV/Yr/sQ==
-X-Google-Smtp-Source: ACHHUZ5vIZUSmno0LG6tQNjwPdpLccVbcF3x/foJyasbY5MnT2o8uMNXCaMfo51qg7XyO1B4jwPULmnkSizsP8h04ik=
-X-Received: by 2002:a1f:bf47:0:b0:453:9057:1693 with SMTP id
- p68-20020a1fbf47000000b0045390571693mr7211731vkf.5.1684265956844; Tue, 16 May
- 2023 12:39:16 -0700 (PDT)
+        with ESMTP id S229631AbjEPTzQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 May 2023 15:55:16 -0400
+X-Greylist: delayed 1702 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 16 May 2023 12:55:14 PDT
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE974C2E
+        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:55:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Cc:To:From:Date;
+        bh=1bvVwfiEzxcnCPrb8quhPeRFyiotgkIIcOf58sHlh+k=; b=tkVwtMu5fNf2YN9QCjPBh1hRHC
+        pLrIPPUfE/gJ+bpsrUaTqGH9TN1JsDlm9sRfM/Mpvz0+MTEEhaF+gcNKnoWmRgCPP8WGgc4m6ruFK
+        TevNZX52PiZJ4FjxFqm0tiiSJK4xeWCHYqCuyOLIIrf2PGUkn/AZyKArDJ/iB0IcvZx2KLhyhXrEW
+        +EL3wCjXQX/63ejmO+3zEbBO9FMjJN4NUg+8jjCoUnve4rdHS6yhFrNGjHR8KB8qYb0t4fkUzBog0
+        Up8GSTlTabpojhgoHNEAG9gH5ZdoUCPVCBzKunHKYbyczGaVFtfLjzYGxOSnPGPWs4sG8pav5nLyX
+        1AU46zm8ykSvy5tHeM20lpkR8eUxM4SElzWi60ZiFexJuusPJIMNFIBcICpgxf6Occ8Y19PnROwe7
+        W/oqIm7sAl2gJDg380mLwsCdQARGhVCWGP8soul+9RZdt2rAmvi4VCAPhriij34zORTIYGgqZLWUs
+        zZfu1twU9cVgmlSIhGbp0rLE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1pz0Js-009Ho7-Bv; Tue, 16 May 2023 19:26:48 +0000
+Date:   Tue, 16 May 2023 12:26:42 -0700
+From:   Jeremy Allison <jra@samba.org>
+To:     Tom Talpey <tom@talpey.com>
+Cc:     Ross Lagerwall <ross.lagerwall@citrix.com>,
+        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>,
+        Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Rohith Surabattula <rohiths@microsoft.com>
+Subject: Re: [PATCH] cifs: Close deferred files that may be open via hard
+ links
+Message-ID: <ZGPY8kuw/v2TD71X@jeremy-rocky-laptop>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <20230516150153.1864023-1-ross.lagerwall@citrix.com>
+ <55740ab3-e020-df8c-07bc-02386486539f@talpey.com>
 MIME-Version: 1.0
-References: <20230515161707.203549282@linuxfoundation.org>
-In-Reply-To: <20230515161707.203549282@linuxfoundation.org>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Wed, 17 May 2023 01:09:05 +0530
-Message-ID: <CA+G9fYtjmJS893BLx7ggwMXvqzqpiRU7BrvgRjE8d+epJYLrGQ@mail.gmail.com>
-Subject: Re: [PATCH 4.19 000/191] 4.19.283-rc1 review
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     stable@vger.kernel.org, patches@lists.linux.dev,
-        linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-        akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org,
-        patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de,
-        jonathanh@nvidia.com, f.fainelli@gmail.com,
-        sudipm.mukherjee@gmail.com, srw@sladewatkins.net, rwarsow@gmx.de,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <55740ab3-e020-df8c-07bc-02386486539f@talpey.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 15 May 2023 at 22:09, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
+On Tue, May 16, 2023 at 02:41:06PM -0400, Tom Talpey wrote:
+>On 5/16/2023 11:01 AM, Ross Lagerwall wrote:
+>>Windows Server (tested with 2016) disallows opening the same inode via
+>>two different hardlinks at the same time. With deferred closes, this can
+>>result in unexpected behaviour as the following Python snippet shows:
+>>
+>>The final open returns EINVAL due to the server returning
+>>STATUS_INVALID_PARAMETER.
 >
-> This is the start of the stable review cycle for the 4.19.283 release.
-> There are 191 patches in this series, all will be posted as a response
-> to this one.  If anyone has any issues with these being applied, please
-> let me know.
+>Good sleuthing. The hardlink behavior is slightly surprising, but
+>it is certainly the case that certain incompatible combinations of
+>open/create flags can conflict with other handles, including
+>cached opens.
+
+That certainly sounds like implementation-dependent behavior,
+probably due to running into the same dev/ino numbers via
+a new path :-).
+
+>>This is kind of an RFC. Is the server doing the wrong thing? Is it
+>>correct to work around this in the client?
 >
-> Responses should be made by Wed, 17 May 2023 16:16:37 +0000.
-> Anything received after that time might be too late.
->
-> The whole patch series can be found in one patch at:
->         https://www.kernel.org/pub/linux/kernel/v4.x/stable-review/patch-=
-4.19.283-rc1.gz
-> or in the git tree and branch at:
->         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable=
--rc.git linux-4.19.y
-> and the diffstat can be found below.
->
-> thanks,
->
-> greg k-h
+>By definition the server is doing what it does, and it's a moot
+>question whether it's appropriate to work around it. However, I don't
+>see this behavior explicitly stated in MS-FSA. And INVALID_PARAMETER
+>is a strange error code to return for this. Do you have a packet
+>trace? We should ask Microsoft.
 
-Results from Linaro=E2=80=99s test farm.
-Regressions on arm64, arm, x86_64 and i386.
-
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-1) ltp-syscalls fallocate06 - FAILS on arm and arm64 on 4.19 and 4.14.
-
-2) We have recently upgraded our selftest sources to stable-rc 6.3 and
-running on stable rc 6.1, 5.15, 5.10, 5.4, 4.19 and 4.14 kernels.
-
-List of test regressions:
-=3D=3D=3D=3D=3D=3D=3D=3D
-
-ltp-syscalls
-  - fallocate06
-
-kselftest-membarrier
-  - membarrier_membarrier_test_multi_thread
-  - membarrier_membarrier_test_single_thread
-
-kselftest-memfd
-  - memfd_memfd_test
-
-kselftest-rseq
-  - rseq_basic_test
-
- kselftest-kvm
-  - kvm_xapic_state_test
-
-=3D=3D=3D=3D=3D=3D
-
-ltp-syscalls
-  - fallocate06 - FAILS on arm and arm64 on 4.19 and 4.14
-
-fallocate06.c:155: TFAIL: fallocate(FALLOC_FL_PUNCH_HOLE |
-FALLOC_FL_KEEP_SIZE) failed unexpectedly: ENOSPC (28)
-
-Test log links,
-=3D=3D=3D=3D=3D=3D=3D=3D
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.19.y/build/v4=
-.19.282-192-g373cdd8d6123/testrun/17027069/suite/ltp-syscalls/test/fallocat=
-e06/history/
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.19.y/build/v4=
-.19.282-192-g373cdd8d6123/testrun/17027069/suite/ltp-syscalls/test/fallocat=
-e06/log
-
-NOTE:
-The logs are the same as reported on other email reports.
-link,
- - https://lore.kernel.org/stable/CA+G9fYu6ZOu_We2GMP0sFnSovOsqd6waW7oKS-Y1=
-VPrjdibu5Q@mail.gmail.com/
-
-## Build
-* kernel: 4.19.283-rc1
-* git: https://gitlab.com/Linaro/lkft/mirrors/stable/linux-stable-rc
-* git branch: linux-4.19.y
-* git commit: 373cdd8d6123d6ed489c5a5b91a0ab5b206ba0e4
-* git describe: v4.19.282-192-g373cdd8d6123
-* test details:
-https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.19.y/build/v4.19=
-.282-192-g373cdd8d6123
-
-## Test Regressions (compared to v4.19.279-173-g8ca3c8d28616)
-
-* dragonboard-410c, kselftest-membarrier
-  - membarrier_membarrier_test_multi_thread
-  - membarrier_membarrier_test_single_thread
-
-* dragonboard-410c, kselftest-rseq
-  - rseq_basic_test
-
-* dragonboard-410c, ltp-syscalls
-  - fallocate06
-
-* i386, kselftest-membarrier
-  - membarrier_membarrier_test_multi_thread
-  - membarrier_membarrier_test_single_thread
-
-* i386, kselftest-rseq
-  - rseq_basic_test
-  - rseq_run_param_test_sh
-
-* juno-r2, kselftest-membarrier
-  - membarrier_membarrier_test_multi_thread
-  - membarrier_membarrier_test_single_thread
-
-* juno-r2, kselftest-rseq
-  - rseq_basic_test
-
-* juno-r2, ltp-syscalls
-  - fallocate06
-
-* juno-r2-compat, ltp-syscalls
-  - fallocate06
-
-* juno-r2-kasan, ltp-syscalls
-  - fallocate06
-
-* qemu_i386, kselftest-membarrier
-  - membarrier_membarrier_test_multi_thread
-  - membarrier_membarrier_test_single_thread
-
-* qemu_i386, kselftest-rseq
-  - rseq_basic_test
-  - rseq_run_param_test_sh
-
-* qemu_x86_64, kselftest-membarrier
-  - membarrier_membarrier_test_multi_thread
-  - membarrier_membarrier_test_single_thread
-
-* qemu_x86_64, kselftest-rseq
-  - rseq_basic_test
-
-* x15, kselftest-membarrier
-  - membarrier_membarrier_test_multi_thread
-  - membarrier_membarrier_test_single_thread
-
-* x15, kselftest-rseq
-  - rseq_basic_test
-
-* x86, kselftest-kvm
-  - kvm_xapic_state_test
-
-* x86, kselftest-membarrier
-  - membarrier_membarrier_test_multi_thread
-  - membarrier_membarrier_test_single_thread
-
-* x86, kselftest-rseq
-  - rseq_basic_test
-
-## Metric Regressions (compared to v4.19.279-173-g8ca3c8d28616)
-
-## Test Fixes (compared to v4.19.279-173-g8ca3c8d28616)
-
-## Metric Fixes (compared to v4.19.279-173-g8ca3c8d28616)
-
-## Test result summary
-total: 80130, pass: 68396, fail: 2694, skip: 8901, xfail: 139
-
-## Build Summary
-* arc: 10 total, 10 passed, 0 failed
-* arm: 111 total, 106 passed, 5 failed
-* arm64: 37 total, 32 passed, 5 failed
-* i386: 21 total, 18 passed, 3 failed
-* mips: 22 total, 22 passed, 0 failed
-* parisc: 6 total, 6 passed, 0 failed
-* powerpc: 24 total, 24 passed, 0 failed
-* s390: 6 total, 6 passed, 0 failed
-* sh: 12 total, 12 passed, 0 failed
-* sparc: 6 total, 6 passed, 0 failed
-* x86_64: 31 total, 26 passed, 5 failed
-
-## Test suites summary
-* boot
-* fwts
-* igt-gpu-tools
-* kselftest-android
-* kselftest-arm64
-* kselftest-breakpoints
-* kselftest-capabilities
-* kselftest-cgroup
-* kselftest-clone3
-* kselftest-core
-* kselftest-cpu-hotplug
-* kselftest-cpufreq
-* kselftest-drivers-dma-buf
-* kselftest-efivarfs
-* kselftest-filesystems
-* kselftest-filesystems-binderfs
-* kselftest-firmware
-* kselftest-fpu
-* kselftest-ftrace
-* kselftest-futex
-* kselftest-gpio
-* kselftest-intel_pstate
-* kselftest-ipc
-* kselftest-ir
-* kselftest-kcmp
-* kselftest-kexec
-* kselftest-kvm
-* kselftest-lib
-* kselftest-livepatch
-* kselftest-membarrier
-* kselftest-memfd
-* kselftest-memory-hotplug
-* kselftest-mincore
-* kselftest-mount
-* kselftest-mqueue
-* kselftest-net
-* kselftest-net-forwarding
-* kselftest-netfilter
-* kselftest-nsfs
-* kselftest-openat2
-* kselftest-pid_namespace
-* kselftest-pidfd
-* kselftest-proc
-* kselftest-pstore
-* kselftest-ptrace
-* kselftest-rseq
-* kselftest-rtc
-* kselftest-seccomp
-* kselftest-sigaltstack
-* kselftest-size
-* kselftest-splice
-* kselftest-static_keys
-* kselftest-sync
-* kselftest-sysctl
-* kselftest-tc-testing
-* kselftest-timens
-* kselftest-timers
-* kselftest-tmpfs
-* kselftest-tpm2
-* kselftest-user
-* kselftest-x86
-* kselftest-zram
-* kunit
-* kvm-unit-tests
-* libhugetlbfs
-* log-parser-boot
-* log-parser-test
-* ltp-cap_bounds
-* ltp-commands
-* ltp-containers
-* ltp-controllers
-* ltp-cpuhotplug
-* ltp-crypto
-* ltp-cve
-* ltp-dio
-* ltp-fcntl-locktests
-* ltp-filecaps
-* ltp-fs
-* ltp-fs_bind
-* ltp-fs_perms_simple
-* ltp-fsx
-* ltp-hugetlb
-* ltp-io
-* ltp-ipc
-* ltp-math
-* ltp-mm
-* ltp-nptl
-* ltp-pty
-* ltp-sched
-* ltp-securebits
-* ltp-smoke
-* ltp-syscalls
-* ltp-tracing
-* network-basic-tests
-* rcutorture
-* v4l2-compliance
-* vdso
-
---
-Linaro LKFT
-https://lkft.linaro.org
+A packet trace of this would be really interesting :-).
