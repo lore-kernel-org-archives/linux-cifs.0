@@ -2,135 +2,190 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8AADC77B7A
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 May 2023 19:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F50C7EE23
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 May 2023 19:30:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229457AbjEPTIG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 May 2023 15:08:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41444 "EHLO
+        id S229706AbjEPTam (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 May 2023 15:30:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjEPTIF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 May 2023 15:08:05 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492A5E7A
-        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:08:04 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f00d41df22so6295362e87.1
-        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:08:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684264082; x=1686856082;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z1Ddzgar7RPOdlkzXuXLkT8rvtt8pUPgnmzCxBA0oDw=;
-        b=JQMSBQ3ZxFvdNHhYDJ+sQMmGmu1m4UV2eNzZQdLUmcKDWICKKDwvBfYwVO28Iqq9Mq
-         ox7AJkR/02hGT5QhcpmcqEc0zt3Np+O8gVTFXZQ1WHXbCuWwNzI5lH0RcMF7KXHMxlTb
-         3B1zdb+7qCtNgcxVlaPB0Oi4HHTtiRn/YS4kQIM1hU50VTgI62vMlGgz+/lb+OkxkMQC
-         As0U92ClPtPPdIhmBd2yHL4CI3ETIqXxujTX8mniy5i6YLxkrAhU8kYdHDGSU/gh4xW4
-         l2xSNWSHld0qjjuL2+O+LZFWG8C5bL4rdjYn144rUymzK1a6ajd8DoKRzMl4NzU/KEFz
-         Dv3Q==
+        with ESMTP id S229621AbjEPTaj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 May 2023 15:30:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 198C47AAD
+        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:29:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684265388;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=t9UrkqIYKxvK9jQQrJXRaqEAIFWUC38gkJPtkDfF+s0=;
+        b=jQZjHrKEyMPpO6wAVJSc1C7EYXzJoJ6UlA376aMGkAoDVuWL2E2FbMFQ9i3YwseWSGzKRt
+        E44RxffD8JEoM9cJM7fj5Y9h4Z+Ub0hDhygKoW2HZqf/vDf7onXP8BA6f4ZfqDuDw1GqOf
+        460pOshDbwQrrHzg1l7HMsQtkPV+gik=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-299-mbaPFnwSMeWP0zrYfNapfg-1; Tue, 16 May 2023 15:29:47 -0400
+X-MC-Unique: mbaPFnwSMeWP0zrYfNapfg-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-24e147c206eso18744a91.0
+        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:29:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684264082; x=1686856082;
+        d=1e100.net; s=20221208; t=1684265386; x=1686857386;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Z1Ddzgar7RPOdlkzXuXLkT8rvtt8pUPgnmzCxBA0oDw=;
-        b=ha7XQYJTYsQIVBmqBX7UgTsLUvp0XcyjWadwr4XCQ5Wo7mj8kJlEYHIn122C6jeqDX
-         oVUnQNxTV9a0B9m6Lql4kgRszhs650Y9rDQgmrz+b5v+0mFjSMvbLoAhT2h0MBzL/kmu
-         mzg8plL54ayUJQca3LsT/u8lp5U8Hlzhpqw+C2JGIkevKOWFzmvLszUD6xZkfrkhYJdA
-         iZXdbEjS3LRpaxIn9qrlGlYQKpxLDxhzkcv68tYLB/1RTf/6Doy0PZjnwBa4UMuPDdpQ
-         yHMM1aK+3A1WOrRxjO4JL8gDGM4qrLajCkRJ+yyg7dsdsfCzW3V2naD6jVdw4HolEyei
-         6MsA==
-X-Gm-Message-State: AC+VfDydZeBPD92bX9znHJ1cvL6clxz0k4UDw0EJTFnmUxcP8yom6c6M
-        v3PbEfrQ7TkkjFaHqDM0LVSli2Fn2DObv98HUyk=
-X-Google-Smtp-Source: ACHHUZ7kpTiS2+L8tDImS6CeswPwd8IDbkLTRcCYE/5ofogMZEUzxaGcNJdeAmebpz2q34nLHQHW4KGLpXMg7P+6Dsg=
-X-Received: by 2002:a05:6512:33d4:b0:4f0:3e1:9ada with SMTP id
- d20-20020a05651233d400b004f003e19adamr8700365lfg.31.1684264082257; Tue, 16
- May 2023 12:08:02 -0700 (PDT)
+        bh=t9UrkqIYKxvK9jQQrJXRaqEAIFWUC38gkJPtkDfF+s0=;
+        b=JcDg7iHD6beSHQf8u3SnduTfy6bK33aNgUml9nM6JqK7HEkGJMYYnIOBkzT38Ees/C
+         19tCSKnTNshOX9sTViM2th0vcWV6hjdsNik/utiM3VoiyigvRu0pf4XeCJvApnimT7ni
+         5Fg0aHG94K38opJG2g1x2cb8tgBF+COcIX6uGGE+9HRGJCziaaDCodBXOiBVLik5cQi5
+         NKUTg2ndu/GETNBS1owz0QPzxZxUPgmCLIZoP79Di1HnBlWURbmchwBGrlIHZuc8bOkZ
+         gsFCkYprWhoGTT3Idb7MuMa9jUyRZco3eJV9DuV/6ekfuOn90vqJJT/dBuLnLghUJ0pR
+         Jqvg==
+X-Gm-Message-State: AC+VfDzBpIz5HuXMallliL90xYCTDxxv98nj21XIqQcfBSWpex0GwDeT
+        ExPz44X11MjS+ZMPOsRKZUfcrNG29wOestwqlzSWeiS1mIzYkPASbt+jyt/7G6CwnMjxWNiZfto
+        oM1N1auOjoTCnG3atI8YlQ1dKKu+Pw2wmZZCLpA==
+X-Received: by 2002:a17:90a:8049:b0:24d:e929:56cf with SMTP id e9-20020a17090a804900b0024de92956cfmr37452326pjw.39.1684265385701;
+        Tue, 16 May 2023 12:29:45 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5gBFGff4dAZMhxmbGkiocJy63rZyONMUQ6rm3VRtZFYy02jZIS98cu+nLLPRraC5I03lzcx85+v3rvPJQsVd4=
+X-Received: by 2002:a17:90a:8049:b0:24d:e929:56cf with SMTP id
+ e9-20020a17090a804900b0024de92956cfmr37452303pjw.39.1684265385415; Tue, 16
+ May 2023 12:29:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvqK0CkcR_DOwUfDVzsWco-SXb4rTt14b-YF5CpqCNrZQ@mail.gmail.com>
- <CAGypqWyuCdiEmuFzefEY05zDiBhP+g7y2e0p-9nts4rM5keRpg@mail.gmail.com> <CANT5p=pWYfn-CGTn3QdgVo4JWh85vqjJQoeZCbmPOOCaYogPXw@mail.gmail.com>
-In-Reply-To: <CANT5p=pWYfn-CGTn3QdgVo4JWh85vqjJQoeZCbmPOOCaYogPXw@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 16 May 2023 14:07:50 -0500
-Message-ID: <CAH2r5ms83NK1FbtTUQdQdT4ES+k8nuVdci3RowRsEddMaebqeA@mail.gmail.com>
-Subject: Re: [PATCH] SMB3: force unmount was failing to close deferred close files
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Bharath SM <bharathsm.hsk@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Bharath S M <bharathsm@microsoft.com>,
-        rohiths msft <rohiths.msft@gmail.com>
+References: <20230216150701.3654894-1-dhowells@redhat.com>
+In-Reply-To: <20230216150701.3654894-1-dhowells@redhat.com>
+From:   David Wysochanski <dwysocha@redhat.com>
+Date:   Tue, 16 May 2023 15:29:09 -0400
+Message-ID: <CALF+zO=w2Gyz6JtzEoFgTVjH67-_CuTaK7e+2yoHEwXZ8bPx_A@mail.gmail.com>
+Subject: Re: [Linux-cachefs] [PATCH v6 0/2] mm, netfs, fscache: Stop read
+ optimisation when folio removed from pagecache
+To:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, May 16, 2023 at 1:51=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.=
-com> wrote:
+On Thu, Feb 16, 2023 at 10:07=E2=80=AFAM David Howells <dhowells@redhat.com=
+> wrote:
 >
-> On Tue, May 9, 2023 at 1:03=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.co=
-m> wrote:
-> >
-> > Ack by me.
-> >
-> > On Tue, May 9, 2023 at 12:05=E2=80=AFPM Steve French <smfrench@gmail.co=
-m> wrote:
-> > >
-> > > In investigating a failure with xfstest generic/392 it
-> > > was noticed that mounts were reusing a superblock that should
-> > > already have been freed. This turned out to be related to
-> > > deferred close files keeping a reference count until the
-> > > closetimeo expired.
-> > >
-> > > Currently the only way an fs knows that mount is beginning is
-> > > when force unmount is called, but when this, ie umount_begin(),
-> > > is called all deferred close files on the share (tree
-> > > connection) should be closed immediately (unless shared by
-> > > another mount) to avoid using excess resources on the server
-> > > and to avoid reusing a superblock which should already be freed.
-> > >
-> > > In umount_begin, close all deferred close handles for that
-> > > share if this is the last mount using that share on this
-> > > client (ie send the SMB3 close request over the wire for those
-> > > that have been already closed by the app but that we have
-> > > kept a handle lease open for and have not sent closes to the
-> > > server for yet).
-> > >
-> > > Reported-by: David Howells <dhowells@redhat.com>
-> > > Cc: <stable@vger.kernel.org>
-> > > Fixes: 78c09634f7dc ("Cifs: Fix kernel oops caused by deferred close
-> > > for files.")
-
-> cifs_put_tcon sounds like a more logical place to do this. When the
-> ref count has dropped to 0.
+> Hi Willy,
+>
+> Is this okay by you?  You said you wanted to look at the remaining uses o=
+f
+> page_has_private(), of which there are then three after these patches, no=
+t
+> counting folio_has_private():
+>
+>         arch/s390/kernel/uv.c:          if (page_has_private(page))
+>         mm/khugepaged.c:                    1 + page_mapcount(page) + pag=
+e_has_private(page)) {
+>         mm/migrate_device.c:            extra +=3D 1 + page_has_private(p=
+age);
 >
 > --
-> Regards,
-> Shyam
+> I've split the folio_has_private()/filemap_release_folio() call pair
+> merging into its own patch, separate from the actual bugfix and pulled ou=
+t
+> the folio_needs_release() function into mm/internal.h and made
+> filemap_release_folio() use it.  I've also got rid of the bit clearances
+> from the network filesystem evict_inode functions as they doesn't seem to
+> be necessary.
+>
+> Note that the last vestiges of try_to_release_page() got swept away, so I
+> rebased and dealt with that.  One comment remained, which is removed by t=
+he
+> first patch.
+>
+> David
+>
+> Changes:
+> =3D=3D=3D=3D=3D=3D=3D=3D
+> ver #6)
+>  - Drop the third patch which removes a duplicate check in vmscan().
+>
+> ver #5)
+>  - Rebased on linus/master.  try_to_release_page() has now been entirely
+>    replaced by filemap_release_folio(), barring one comment.
+>  - Cleaned up some pairs in ext4.
+>
+> ver #4)
+>  - Split has_private/release call pairs into own patch.
+>  - Moved folio_needs_release() to mm/internal.h and removed open-coded
+>    version from filemap_release_folio().
+>  - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
+>  - Added experimental patch to reduce shrink_folio_list().
+>
+> ver #3)
+>  - Fixed mapping_clear_release_always() to use clear_bit() not set_bit().
+>  - Moved a '&&' to the correct line.
+>
+> ver #2)
+>  - Rewrote entirely according to Willy's suggestion[1].
+>
+> Link: https://lore.kernel.org/r/Yk9V/03wgdYi65Lb@casper.infradead.org/ [1=
+]
+> Link: https://lore.kernel.org/r/164928630577.457102.8519251179327601178.s=
+tgit@warthog.procyon.org.uk/ # v1
+> Link: https://lore.kernel.org/r/166844174069.1124521.10890506360974169994=
+.stgit@warthog.procyon.org.uk/ # v2
+> Link: https://lore.kernel.org/r/166869495238.3720468.4878151409085146764.=
+stgit@warthog.procyon.org.uk/ # v3
+> Link: https://lore.kernel.org/r/1459152.1669208550@warthog.procyon.org.uk=
+/ # v3 also
+> Link: https://lore.kernel.org/r/166924370539.1772793.13730698360771821317=
+.stgit@warthog.procyon.org.uk/ # v4
+> Link: https://lore.kernel.org/r/167172131368.2334525.8569808925687731937.=
+stgit@warthog.procyon.org.uk/ # v5
+> ---
+> %(shortlog)s
+> %(diffstat)s
+>
+> David Howells (2):
+>   mm: Merge folio_has_private()/filemap_release_folio() call pairs
+>   mm, netfs, fscache: Stop read optimisation when folio removed from
+>     pagecache
+>
+>  fs/9p/cache.c           |  2 ++
+>  fs/afs/internal.h       |  2 ++
+>  fs/cachefiles/namei.c   |  2 ++
+>  fs/ceph/cache.c         |  2 ++
+>  fs/cifs/fscache.c       |  2 ++
+>  fs/ext4/move_extent.c   | 12 ++++--------
+>  fs/splice.c             |  3 +--
+>  include/linux/pagemap.h | 16 ++++++++++++++++
+>  mm/filemap.c            |  2 ++
+>  mm/huge_memory.c        |  3 +--
+>  mm/internal.h           | 11 +++++++++++
+>  mm/khugepaged.c         |  3 +--
+>  mm/memory-failure.c     |  8 +++-----
+>  mm/migrate.c            |  3 +--
+>  mm/truncate.c           |  6 ++----
+>  mm/vmscan.c             |  8 ++++----
+>  16 files changed, 56 insertions(+), 29 deletions(-)
+>
+> --
+> Linux-cachefs mailing list
+> Linux-cachefs@redhat.com
+> https://listman.redhat.com/mailman/listinfo/linux-cachefs
+>
 
-The problem with waiting till cifs_put_tcon (although it wouldn't hurt
-to also call close_all_deferred_files() there or in cifs_kill_sb) is
-that that is too late.
+Willy, and David,
 
-We don't get notified when umount begins except on force umount
-("umount_begin") so a simple scenario like:
+Can this series move forward?
+This just got mentioned again [1] after Chris tested the NFS netfs
+patches that were merged in 6.4-rc1
 
-          echo "data in new file" >> /mnt2/newfile ; umount /mnt2
+[1] https://lore.kernel.org/linux-nfs/CAAmbk-f_U8CPcTQM866L572uUHdK4p5iWKnU=
+Qs4r8fkW=3D6RW9g@mail.gmail.com/
 
-will wait until the deferred close timeout ("closetimeo") before
-closing these files and then sending the tree disconnect, so in that
-example tree discconnect was unnecessarily delayed (although "umount"
-completes immediately, we can't send the tree disconnect until all the
-closetimeouts expire since we will not receive the "kill_sb()" call
-until the deferred close references are released).
-
-Closing deferred files in various scenarios ("umount -f" and calls to
-"shutdown") can help us send the tree disconnect faster and not tie up
-resources on the server longer for files we won't be using
-
-
---=20
-Thanks,
-
-Steve
