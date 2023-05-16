@@ -2,190 +2,348 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F50C7EE23
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 May 2023 19:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA66DC77B75
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 May 2023 19:40:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229706AbjEPTam (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 May 2023 15:30:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52664 "EHLO
+        id S230125AbjEPTka (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 May 2023 15:40:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbjEPTaj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 May 2023 15:30:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 198C47AAD
-        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:29:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684265388;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=t9UrkqIYKxvK9jQQrJXRaqEAIFWUC38gkJPtkDfF+s0=;
-        b=jQZjHrKEyMPpO6wAVJSc1C7EYXzJoJ6UlA376aMGkAoDVuWL2E2FbMFQ9i3YwseWSGzKRt
-        E44RxffD8JEoM9cJM7fj5Y9h4Z+Ub0hDhygKoW2HZqf/vDf7onXP8BA6f4ZfqDuDw1GqOf
-        460pOshDbwQrrHzg1l7HMsQtkPV+gik=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-mbaPFnwSMeWP0zrYfNapfg-1; Tue, 16 May 2023 15:29:47 -0400
-X-MC-Unique: mbaPFnwSMeWP0zrYfNapfg-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-24e147c206eso18744a91.0
-        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:29:46 -0700 (PDT)
+        with ESMTP id S229920AbjEPTk2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 May 2023 15:40:28 -0400
+Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BECD04C
+        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:40:03 -0700 (PDT)
+Received: by mail-vk1-xa33.google.com with SMTP id 71dfb90a1353d-44fd6524c36so21772e0c.0
+        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 12:40:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1684265957; x=1686857957;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bl0KxKY/sUcM54GB5tUsJdCgfaOj1mAl6bkpff/gM1k=;
+        b=dsbLYDRucXeFfy0Q/wCYCvEpNLRRzLYvTikvSdUg55vOz24AO+E/QwEMZYFCLgsIUL
+         TP2kqL/XSO9xo4qYSlxpIMcnDRh93iGsYH1x1Of0ShspCO1GxrShBtdFerCbFQ7XNOOS
+         h1ROfA6eOs4GIHyR6q/h/4u+C8FOWvtUBAr35zxQeSISTQ+fm7utqJjvjB9bP+jW+ys1
+         oT2uZk/G+oUv+KhJPlOiv/tHPy5vl/Y6MWIsLReICSp28OninHw7eMvOT97IJ4XYogrk
+         fq5n2E8l+4lUW3JwfVBNlMCpWk91W3x46+13OI/IntSRkIJHnKz2tn+HbVkm/e/9QXEi
+         ZVSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684265386; x=1686857386;
+        d=1e100.net; s=20221208; t=1684265957; x=1686857957;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=t9UrkqIYKxvK9jQQrJXRaqEAIFWUC38gkJPtkDfF+s0=;
-        b=JcDg7iHD6beSHQf8u3SnduTfy6bK33aNgUml9nM6JqK7HEkGJMYYnIOBkzT38Ees/C
-         19tCSKnTNshOX9sTViM2th0vcWV6hjdsNik/utiM3VoiyigvRu0pf4XeCJvApnimT7ni
-         5Fg0aHG94K38opJG2g1x2cb8tgBF+COcIX6uGGE+9HRGJCziaaDCodBXOiBVLik5cQi5
-         NKUTg2ndu/GETNBS1owz0QPzxZxUPgmCLIZoP79Di1HnBlWURbmchwBGrlIHZuc8bOkZ
-         gsFCkYprWhoGTT3Idb7MuMa9jUyRZco3eJV9DuV/6ekfuOn90vqJJT/dBuLnLghUJ0pR
-         Jqvg==
-X-Gm-Message-State: AC+VfDzBpIz5HuXMallliL90xYCTDxxv98nj21XIqQcfBSWpex0GwDeT
-        ExPz44X11MjS+ZMPOsRKZUfcrNG29wOestwqlzSWeiS1mIzYkPASbt+jyt/7G6CwnMjxWNiZfto
-        oM1N1auOjoTCnG3atI8YlQ1dKKu+Pw2wmZZCLpA==
-X-Received: by 2002:a17:90a:8049:b0:24d:e929:56cf with SMTP id e9-20020a17090a804900b0024de92956cfmr37452326pjw.39.1684265385701;
-        Tue, 16 May 2023 12:29:45 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5gBFGff4dAZMhxmbGkiocJy63rZyONMUQ6rm3VRtZFYy02jZIS98cu+nLLPRraC5I03lzcx85+v3rvPJQsVd4=
-X-Received: by 2002:a17:90a:8049:b0:24d:e929:56cf with SMTP id
- e9-20020a17090a804900b0024de92956cfmr37452303pjw.39.1684265385415; Tue, 16
- May 2023 12:29:45 -0700 (PDT)
+        bh=bl0KxKY/sUcM54GB5tUsJdCgfaOj1mAl6bkpff/gM1k=;
+        b=EcmkR+rBS5cbKTm6JnRK0pOPUnvPIi6PQR6UvzouvEAHizK60S72j0IKNbJY6QIj9L
+         kxlqKqWKb5JxqXObtIPuQkGyFXlyJIsInI/IcqETPb/A6+LUrNFXX/rNVQkEWynqkb6y
+         4y6oEaH4DGu0BMEUvDJheDoSBgnledYObtcELk8TxS7LxFHMEBpUwn+0tW44zwvTnSvX
+         1DplC+36sn6sshT4W25XrsdVKU7eVSazwCyabp6mh/VenqJVxSZI5Cza3DoO/rRiIkus
+         BL2+R08BAoNWf3H2i1zF7FNvbhwHDddoqGI2kvARncHw1mS8BOPGqBTarMFEzZfm3BCe
+         TWmQ==
+X-Gm-Message-State: AC+VfDzaFKc2O/ZCvnmF11XR1kf2edA54303BdoLqjQOKznF+V27izaQ
+        4p8BZYuAwCV2y7cCmlIZFJJVaPL0AuSMDOaV/Yr/sQ==
+X-Google-Smtp-Source: ACHHUZ5vIZUSmno0LG6tQNjwPdpLccVbcF3x/foJyasbY5MnT2o8uMNXCaMfo51qg7XyO1B4jwPULmnkSizsP8h04ik=
+X-Received: by 2002:a1f:bf47:0:b0:453:9057:1693 with SMTP id
+ p68-20020a1fbf47000000b0045390571693mr7211731vkf.5.1684265956844; Tue, 16 May
+ 2023 12:39:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230216150701.3654894-1-dhowells@redhat.com>
-In-Reply-To: <20230216150701.3654894-1-dhowells@redhat.com>
-From:   David Wysochanski <dwysocha@redhat.com>
-Date:   Tue, 16 May 2023 15:29:09 -0400
-Message-ID: <CALF+zO=w2Gyz6JtzEoFgTVjH67-_CuTaK7e+2yoHEwXZ8bPx_A@mail.gmail.com>
-Subject: Re: [Linux-cachefs] [PATCH v6 0/2] mm, netfs, fscache: Stop read
- optimisation when folio removed from pagecache
-To:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-        linux-ext4@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org
+References: <20230515161707.203549282@linuxfoundation.org>
+In-Reply-To: <20230515161707.203549282@linuxfoundation.org>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Wed, 17 May 2023 01:09:05 +0530
+Message-ID: <CA+G9fYtjmJS893BLx7ggwMXvqzqpiRU7BrvgRjE8d+epJYLrGQ@mail.gmail.com>
+Subject: Re: [PATCH 4.19 000/191] 4.19.283-rc1 review
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     stable@vger.kernel.org, patches@lists.linux.dev,
+        linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
+        akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org,
+        patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de,
+        jonathanh@nvidia.com, f.fainelli@gmail.com,
+        sudipm.mukherjee@gmail.com, srw@sladewatkins.net, rwarsow@gmx.de,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Feb 16, 2023 at 10:07=E2=80=AFAM David Howells <dhowells@redhat.com=
-> wrote:
+On Mon, 15 May 2023 at 22:09, Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
 >
-> Hi Willy,
+> This is the start of the stable review cycle for the 4.19.283 release.
+> There are 191 patches in this series, all will be posted as a response
+> to this one.  If anyone has any issues with these being applied, please
+> let me know.
 >
-> Is this okay by you?  You said you wanted to look at the remaining uses o=
-f
-> page_has_private(), of which there are then three after these patches, no=
-t
-> counting folio_has_private():
+> Responses should be made by Wed, 17 May 2023 16:16:37 +0000.
+> Anything received after that time might be too late.
 >
->         arch/s390/kernel/uv.c:          if (page_has_private(page))
->         mm/khugepaged.c:                    1 + page_mapcount(page) + pag=
-e_has_private(page)) {
->         mm/migrate_device.c:            extra +=3D 1 + page_has_private(p=
-age);
+> The whole patch series can be found in one patch at:
+>         https://www.kernel.org/pub/linux/kernel/v4.x/stable-review/patch-=
+4.19.283-rc1.gz
+> or in the git tree and branch at:
+>         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable=
+-rc.git linux-4.19.y
+> and the diffstat can be found below.
 >
-> --
-> I've split the folio_has_private()/filemap_release_folio() call pair
-> merging into its own patch, separate from the actual bugfix and pulled ou=
-t
-> the folio_needs_release() function into mm/internal.h and made
-> filemap_release_folio() use it.  I've also got rid of the bit clearances
-> from the network filesystem evict_inode functions as they doesn't seem to
-> be necessary.
+> thanks,
 >
-> Note that the last vestiges of try_to_release_page() got swept away, so I
-> rebased and dealt with that.  One comment remained, which is removed by t=
-he
-> first patch.
->
-> David
->
-> Changes:
-> =3D=3D=3D=3D=3D=3D=3D=3D
-> ver #6)
->  - Drop the third patch which removes a duplicate check in vmscan().
->
-> ver #5)
->  - Rebased on linus/master.  try_to_release_page() has now been entirely
->    replaced by filemap_release_folio(), barring one comment.
->  - Cleaned up some pairs in ext4.
->
-> ver #4)
->  - Split has_private/release call pairs into own patch.
->  - Moved folio_needs_release() to mm/internal.h and removed open-coded
->    version from filemap_release_folio().
->  - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
->  - Added experimental patch to reduce shrink_folio_list().
->
-> ver #3)
->  - Fixed mapping_clear_release_always() to use clear_bit() not set_bit().
->  - Moved a '&&' to the correct line.
->
-> ver #2)
->  - Rewrote entirely according to Willy's suggestion[1].
->
-> Link: https://lore.kernel.org/r/Yk9V/03wgdYi65Lb@casper.infradead.org/ [1=
-]
-> Link: https://lore.kernel.org/r/164928630577.457102.8519251179327601178.s=
-tgit@warthog.procyon.org.uk/ # v1
-> Link: https://lore.kernel.org/r/166844174069.1124521.10890506360974169994=
-.stgit@warthog.procyon.org.uk/ # v2
-> Link: https://lore.kernel.org/r/166869495238.3720468.4878151409085146764.=
-stgit@warthog.procyon.org.uk/ # v3
-> Link: https://lore.kernel.org/r/1459152.1669208550@warthog.procyon.org.uk=
-/ # v3 also
-> Link: https://lore.kernel.org/r/166924370539.1772793.13730698360771821317=
-.stgit@warthog.procyon.org.uk/ # v4
-> Link: https://lore.kernel.org/r/167172131368.2334525.8569808925687731937.=
-stgit@warthog.procyon.org.uk/ # v5
-> ---
-> %(shortlog)s
-> %(diffstat)s
->
-> David Howells (2):
->   mm: Merge folio_has_private()/filemap_release_folio() call pairs
->   mm, netfs, fscache: Stop read optimisation when folio removed from
->     pagecache
->
->  fs/9p/cache.c           |  2 ++
->  fs/afs/internal.h       |  2 ++
->  fs/cachefiles/namei.c   |  2 ++
->  fs/ceph/cache.c         |  2 ++
->  fs/cifs/fscache.c       |  2 ++
->  fs/ext4/move_extent.c   | 12 ++++--------
->  fs/splice.c             |  3 +--
->  include/linux/pagemap.h | 16 ++++++++++++++++
->  mm/filemap.c            |  2 ++
->  mm/huge_memory.c        |  3 +--
->  mm/internal.h           | 11 +++++++++++
->  mm/khugepaged.c         |  3 +--
->  mm/memory-failure.c     |  8 +++-----
->  mm/migrate.c            |  3 +--
->  mm/truncate.c           |  6 ++----
->  mm/vmscan.c             |  8 ++++----
->  16 files changed, 56 insertions(+), 29 deletions(-)
->
-> --
-> Linux-cachefs mailing list
-> Linux-cachefs@redhat.com
-> https://listman.redhat.com/mailman/listinfo/linux-cachefs
->
+> greg k-h
 
-Willy, and David,
+Results from Linaro=E2=80=99s test farm.
+Regressions on arm64, arm, x86_64 and i386.
 
-Can this series move forward?
-This just got mentioned again [1] after Chris tested the NFS netfs
-patches that were merged in 6.4-rc1
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-[1] https://lore.kernel.org/linux-nfs/CAAmbk-f_U8CPcTQM866L572uUHdK4p5iWKnU=
-Qs4r8fkW=3D6RW9g@mail.gmail.com/
+1) ltp-syscalls fallocate06 - FAILS on arm and arm64 on 4.19 and 4.14.
 
+2) We have recently upgraded our selftest sources to stable-rc 6.3 and
+running on stable rc 6.1, 5.15, 5.10, 5.4, 4.19 and 4.14 kernels.
+
+List of test regressions:
+=3D=3D=3D=3D=3D=3D=3D=3D
+
+ltp-syscalls
+  - fallocate06
+
+kselftest-membarrier
+  - membarrier_membarrier_test_multi_thread
+  - membarrier_membarrier_test_single_thread
+
+kselftest-memfd
+  - memfd_memfd_test
+
+kselftest-rseq
+  - rseq_basic_test
+
+ kselftest-kvm
+  - kvm_xapic_state_test
+
+=3D=3D=3D=3D=3D=3D
+
+ltp-syscalls
+  - fallocate06 - FAILS on arm and arm64 on 4.19 and 4.14
+
+fallocate06.c:155: TFAIL: fallocate(FALLOC_FL_PUNCH_HOLE |
+FALLOC_FL_KEEP_SIZE) failed unexpectedly: ENOSPC (28)
+
+Test log links,
+=3D=3D=3D=3D=3D=3D=3D=3D
+ - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.19.y/build/v4=
+.19.282-192-g373cdd8d6123/testrun/17027069/suite/ltp-syscalls/test/fallocat=
+e06/history/
+ - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.19.y/build/v4=
+.19.282-192-g373cdd8d6123/testrun/17027069/suite/ltp-syscalls/test/fallocat=
+e06/log
+
+NOTE:
+The logs are the same as reported on other email reports.
+link,
+ - https://lore.kernel.org/stable/CA+G9fYu6ZOu_We2GMP0sFnSovOsqd6waW7oKS-Y1=
+VPrjdibu5Q@mail.gmail.com/
+
+## Build
+* kernel: 4.19.283-rc1
+* git: https://gitlab.com/Linaro/lkft/mirrors/stable/linux-stable-rc
+* git branch: linux-4.19.y
+* git commit: 373cdd8d6123d6ed489c5a5b91a0ab5b206ba0e4
+* git describe: v4.19.282-192-g373cdd8d6123
+* test details:
+https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.19.y/build/v4.19=
+.282-192-g373cdd8d6123
+
+## Test Regressions (compared to v4.19.279-173-g8ca3c8d28616)
+
+* dragonboard-410c, kselftest-membarrier
+  - membarrier_membarrier_test_multi_thread
+  - membarrier_membarrier_test_single_thread
+
+* dragonboard-410c, kselftest-rseq
+  - rseq_basic_test
+
+* dragonboard-410c, ltp-syscalls
+  - fallocate06
+
+* i386, kselftest-membarrier
+  - membarrier_membarrier_test_multi_thread
+  - membarrier_membarrier_test_single_thread
+
+* i386, kselftest-rseq
+  - rseq_basic_test
+  - rseq_run_param_test_sh
+
+* juno-r2, kselftest-membarrier
+  - membarrier_membarrier_test_multi_thread
+  - membarrier_membarrier_test_single_thread
+
+* juno-r2, kselftest-rseq
+  - rseq_basic_test
+
+* juno-r2, ltp-syscalls
+  - fallocate06
+
+* juno-r2-compat, ltp-syscalls
+  - fallocate06
+
+* juno-r2-kasan, ltp-syscalls
+  - fallocate06
+
+* qemu_i386, kselftest-membarrier
+  - membarrier_membarrier_test_multi_thread
+  - membarrier_membarrier_test_single_thread
+
+* qemu_i386, kselftest-rseq
+  - rseq_basic_test
+  - rseq_run_param_test_sh
+
+* qemu_x86_64, kselftest-membarrier
+  - membarrier_membarrier_test_multi_thread
+  - membarrier_membarrier_test_single_thread
+
+* qemu_x86_64, kselftest-rseq
+  - rseq_basic_test
+
+* x15, kselftest-membarrier
+  - membarrier_membarrier_test_multi_thread
+  - membarrier_membarrier_test_single_thread
+
+* x15, kselftest-rseq
+  - rseq_basic_test
+
+* x86, kselftest-kvm
+  - kvm_xapic_state_test
+
+* x86, kselftest-membarrier
+  - membarrier_membarrier_test_multi_thread
+  - membarrier_membarrier_test_single_thread
+
+* x86, kselftest-rseq
+  - rseq_basic_test
+
+## Metric Regressions (compared to v4.19.279-173-g8ca3c8d28616)
+
+## Test Fixes (compared to v4.19.279-173-g8ca3c8d28616)
+
+## Metric Fixes (compared to v4.19.279-173-g8ca3c8d28616)
+
+## Test result summary
+total: 80130, pass: 68396, fail: 2694, skip: 8901, xfail: 139
+
+## Build Summary
+* arc: 10 total, 10 passed, 0 failed
+* arm: 111 total, 106 passed, 5 failed
+* arm64: 37 total, 32 passed, 5 failed
+* i386: 21 total, 18 passed, 3 failed
+* mips: 22 total, 22 passed, 0 failed
+* parisc: 6 total, 6 passed, 0 failed
+* powerpc: 24 total, 24 passed, 0 failed
+* s390: 6 total, 6 passed, 0 failed
+* sh: 12 total, 12 passed, 0 failed
+* sparc: 6 total, 6 passed, 0 failed
+* x86_64: 31 total, 26 passed, 5 failed
+
+## Test suites summary
+* boot
+* fwts
+* igt-gpu-tools
+* kselftest-android
+* kselftest-arm64
+* kselftest-breakpoints
+* kselftest-capabilities
+* kselftest-cgroup
+* kselftest-clone3
+* kselftest-core
+* kselftest-cpu-hotplug
+* kselftest-cpufreq
+* kselftest-drivers-dma-buf
+* kselftest-efivarfs
+* kselftest-filesystems
+* kselftest-filesystems-binderfs
+* kselftest-firmware
+* kselftest-fpu
+* kselftest-ftrace
+* kselftest-futex
+* kselftest-gpio
+* kselftest-intel_pstate
+* kselftest-ipc
+* kselftest-ir
+* kselftest-kcmp
+* kselftest-kexec
+* kselftest-kvm
+* kselftest-lib
+* kselftest-livepatch
+* kselftest-membarrier
+* kselftest-memfd
+* kselftest-memory-hotplug
+* kselftest-mincore
+* kselftest-mount
+* kselftest-mqueue
+* kselftest-net
+* kselftest-net-forwarding
+* kselftest-netfilter
+* kselftest-nsfs
+* kselftest-openat2
+* kselftest-pid_namespace
+* kselftest-pidfd
+* kselftest-proc
+* kselftest-pstore
+* kselftest-ptrace
+* kselftest-rseq
+* kselftest-rtc
+* kselftest-seccomp
+* kselftest-sigaltstack
+* kselftest-size
+* kselftest-splice
+* kselftest-static_keys
+* kselftest-sync
+* kselftest-sysctl
+* kselftest-tc-testing
+* kselftest-timens
+* kselftest-timers
+* kselftest-tmpfs
+* kselftest-tpm2
+* kselftest-user
+* kselftest-x86
+* kselftest-zram
+* kunit
+* kvm-unit-tests
+* libhugetlbfs
+* log-parser-boot
+* log-parser-test
+* ltp-cap_bounds
+* ltp-commands
+* ltp-containers
+* ltp-controllers
+* ltp-cpuhotplug
+* ltp-crypto
+* ltp-cve
+* ltp-dio
+* ltp-fcntl-locktests
+* ltp-filecaps
+* ltp-fs
+* ltp-fs_bind
+* ltp-fs_perms_simple
+* ltp-fsx
+* ltp-hugetlb
+* ltp-io
+* ltp-ipc
+* ltp-math
+* ltp-mm
+* ltp-nptl
+* ltp-pty
+* ltp-sched
+* ltp-securebits
+* ltp-smoke
+* ltp-syscalls
+* ltp-tracing
+* network-basic-tests
+* rcutorture
+* v4l2-compliance
+* vdso
+
+--
+Linaro LKFT
+https://lkft.linaro.org
