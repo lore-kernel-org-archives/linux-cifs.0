@@ -2,295 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C48BC77B7F
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 May 2023 20:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA55AC7EE23
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 May 2023 07:51:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbjEPUJE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 May 2023 16:09:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58514 "EHLO
+        id S229711AbjEQHvv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 May 2023 03:51:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbjEPUJE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 May 2023 16:09:04 -0400
-Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA337682
-        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 13:08:58 -0700 (PDT)
-Received: by mail-vs1-xe35.google.com with SMTP id ada2fe7eead31-4361225a745so3150135137.2
-        for <linux-cifs@vger.kernel.org>; Tue, 16 May 2023 13:08:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1684267738; x=1686859738;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7DBoVho2ELfwf8xFod3p2Xy8hTGWnwzQmWp1BhB8w9o=;
-        b=o9t4f7WwcdoQ/ufMDCYBJxxJoWiDW5b99hO3LW4Ce1Cwer2T6WUpp+kfMFQQ0uT+qE
-         Y3EH15M0VA1ESBSdgY3oduuSTbfbn7tM0exdZfeY7zNIrDMomucT2eiwndZvn/06svnC
-         mFeRrdTZdr4M/BHzNxusseXjUMwOB+iivcQ8qSfSpXnaXh1xNWwjMRLcxLnBBXHYUBcD
-         ez+kdMdBA16XYBvX1o4n7B0AR5aWdQk577fGEgW9BZk1POai7M6gH7y/7ANQ5XVtoXyf
-         5Wspxm7dmTyPDjGWYQStWk13FRwfFxh2j/bkovfedC7PrJU9EBUA7k9MdVsMqykQGl/m
-         laEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684267738; x=1686859738;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7DBoVho2ELfwf8xFod3p2Xy8hTGWnwzQmWp1BhB8w9o=;
-        b=cuqhUxFLkvgVyz1orDPJ/NW9CxeM1Vz5FntrsFPNh7hfyyPClszJTL2vEjUakuwjbQ
-         mkO7y35/jxR7naTQDGa/n1NISg1PI6mOCgvx8ZYy81C9L1WXeO4L0BnMd2uXe5Y/iSr9
-         M2iqEMubAcNr6mZ1bSJnfJ4LCYuBLQOMzuOu04HRUDwUjtYNyZOTdbC/8BQnTm0BIBgd
-         /afkSzAt+aruX2uUd0KMO5/+4HsEZsDQyxD8PLmQ3Kp7cRg5IJrLnKDSL3Y+zCfXeTgK
-         4aQzbtGKeHVWlR+r+DumAkqpdCbIwF/FPRlwdH2jL+7kNnemSlo0ySJrNQIqZItmQFRN
-         jInQ==
-X-Gm-Message-State: AC+VfDx80+zDJ1HAOoLL8WYck7JJgXxu5e+4AHGDA4F4wiQQLBw0vM31
-        C7ZegvS/Ua04Y35vbm3yhb1XGBvE4KoadqH3LeFDfA==
-X-Google-Smtp-Source: ACHHUZ4qyeqQ2VF116h5i3lUPhXtdRr98E0TNIbj6xeeFCRymVRG6Qo8zUoadLuHlDfIbPZk39vCIUi319M/Na5Pz9E=
-X-Received: by 2002:a67:e9c6:0:b0:436:18b:6a32 with SMTP id
- q6-20020a67e9c6000000b00436018b6a32mr13567983vso.30.1684267737751; Tue, 16
- May 2023 13:08:57 -0700 (PDT)
+        with ESMTP id S229634AbjEQHvv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 May 2023 03:51:51 -0400
+Received: from mail.feshiecree.pl (mail.feshiecree.pl [89.40.114.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4823A9A
+        for <linux-cifs@vger.kernel.org>; Wed, 17 May 2023 00:51:49 -0700 (PDT)
+Received: by mail.feshiecree.pl (Postfix, from userid 1001)
+        id 3AB5F84173; Wed, 17 May 2023 08:51:28 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=feshiecree.pl;
+        s=mail; t=1684309908;
+        bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=0BWridvaNm2PTrnCAFLkCFLTuv/pDAftpJ3jZ4k+Jila1dB/bdJ6fYSgoK+GuwZ5C
+         vdnNDrvQBbPphvY0OSZJhmz4AnGIqtpEVFnr56lpBSAlRvKbtKQVoxjdeKTYL6PXeT
+         XebyW8U6DIjDxREBZYE+GNmh1Dm/97Ty5chBCItJZM/gTNjC2qrw2IIznvY9gH34GB
+         PiqvjUblaUGq/Z3Sbbi7wZM5JhMSF8aSaq+QQlsCJnzutKEUD/Qxd5dbptraZ1Ni/y
+         sgawInCJNEyWO3QNnXAoygQM2+k3832BArRQg358b45xkIZSANTIeG9oQV9nhdtroE
+         A6cztcChiLI7w==
+Received: by mail.feshiecree.pl for <linux-cifs@vger.kernel.org>; Wed, 17 May 2023 07:51:09 GMT
+Message-ID: <20230517074502-0.1.2m.hstx.0.2px15g37kr@feshiecree.pl>
+Date:   Wed, 17 May 2023 07:51:09 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@feshiecree.pl>
+To:     <linux-cifs@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.feshiecree.pl
 MIME-Version: 1.0
-References: <20230515161658.228491273@linuxfoundation.org>
-In-Reply-To: <20230515161658.228491273@linuxfoundation.org>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Wed, 17 May 2023 01:38:46 +0530
-Message-ID: <CA+G9fYthEih_mti7PdjCjif9crHqWV_erk-05iWUgD7wMJTtkQ@mail.gmail.com>
-Subject: Re: [PATCH 4.14 000/116] 4.14.315-rc1 review
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     stable@vger.kernel.org, patches@lists.linux.dev,
-        linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-        akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org,
-        patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de,
-        jonathanh@nvidia.com, f.fainelli@gmail.com,
-        sudipm.mukherjee@gmail.com, srw@sladewatkins.net, rwarsow@gmx.de,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-cifs@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 15 May 2023 at 22:03, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> This is the start of the stable review cycle for the 4.14.315 release.
-> There are 116 patches in this series, all will be posted as a response
-> to this one.  If anyone has any issues with these being applied, please
-> let me know.
->
-> Responses should be made by Wed, 17 May 2023 16:16:37 +0000.
-> Anything received after that time might be too late.
->
-> The whole patch series can be found in one patch at:
->         https://www.kernel.org/pub/linux/kernel/v4.x/stable-review/patch-=
-4.14.315-rc1.gz
-> or in the git tree and branch at:
->         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable=
--rc.git linux-4.14.y
-> and the diffstat can be found below.
->
-> thanks,
->
-> greg k-h
+Dzie=C5=84 dobry,
+
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
+
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
+
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
 
 
-Results from Linaro=E2=80=99s test farm.
-Regressions on arm64, arm, x86_64 and i386.
-
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-We have recently upgraded our selftest sources to stable-rc 6.3 and
-running on stable rc 6.1, 5.15, 5.10, 5.4, 4.19 and 4.14 kernels.
-
-List of test regressions:
-=3D=3D=3D=3D=3D=3D=3D=3D
-
-ltp-syscalls
-  - fallocate06 - FAILS on arm and arm64.
-
-kselftest-kvm
-  - kvm_xapic_state_test - FAILS on x86.
-
-=3D=3D=3D=3D=3D=3D
-
-ltp-syscalls
-  - fallocate06 - FAILS on arm and arm64.
-
-fallocate06.c:155: TFAIL: fallocate(FALLOC_FL_PUNCH_HOLE |
-FALLOC_FL_KEEP_SIZE) failed unexpectedly: ENOSPC (28)
-
-Test log links,
-=3D=3D=3D=3D=3D=3D=3D=3D
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.14.y/build/v4=
-.14.314-117-g854d9237fbd3/testrun/17026942/suite/ltp-syscalls/test/fallocat=
-e06/history/
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.14.y/build/v4=
-.14.314-117-g854d9237fbd3/testrun/17026942/suite/ltp-syscalls/test/fallocat=
-e06/log
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-kselftest-kvm
-  - kvm_xapic_state_test - - FAILS on x86.
-
-# selftests: kvm: xapic_state_test
-# =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-#   x86_64/xapic_state_test.c:147: apic_id =3D=3D expected
-#   pid=3D4581 tid=3D4581 errno=3D4 - Interrupted system call
-#      1 0x0000000000402bac: ?? ??:0
-#      2 0x00000000004025ba: ?? ??:0
-#      3 0x00007f8bc10e557a: ?? ??:0
-#      4 0x00007f8bc10e562f: ?? ??:0
-#      5 0x0000000000402624: ?? ??:0
-#   APIC_ID not set back to xAPIC format; wanted =3D 1000000, got =3D 1
-not ok 46 selftests: kvm: xapic_state_test # exit=3D254
-
-Test log links,
-=3D=3D=3D=3D=3D=3D=3D=3D
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.14.y/build/v4=
-.14.314-117-g854d9237fbd3/testrun/17025913/suite/kselftest-kvm/test/kvm_xap=
-ic_state_test/history/
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.14.y/build/v4=
-.14.314-117-g854d9237fbd3/testrun/17025913/suite/kselftest-kvm/test/kvm_xap=
-ic_state_test/log
-
-## Build
-* kernel: 4.14.315-rc1
-* git: https://gitlab.com/Linaro/lkft/mirrors/stable/linux-stable-rc
-* git branch: linux-4.14.y
-* git commit: 854d9237fbd3cc4b72183256a0fa5edf2f967d88
-* git describe: v4.14.314-117-g854d9237fbd3
-* test details:
-https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-4.14.y/build/v4.14=
-.314-117-g854d9237fbd3
-
-## Test Regressions (compared to v4.14.311-134-g05f80276ba11)
-
-* dragonboard-410c, ltp-syscalls
-  - fallocate06
-
-* juno-r2, ltp-syscalls
-  - fallocate06
-
-* juno-r2-kasan, ltp-syscalls
-  - fallocate06
-
-* x86, kselftest-kvm
-  - kvm_xapic_state_test
-
-## Metric Regressions (compared to v4.14.311-134-g05f80276ba11)
-
-## Test Fixes (compared to v4.14.311-134-g05f80276ba11)
-
-## Metric Fixes (compared to v4.14.311-134-g05f80276ba11)
-
-## Test result summary
-total: 79873, pass: 67657, fail: 2892, skip: 9170, xfail: 154
-
-## Build Summary
-* arc: 10 total, 10 passed, 0 failed
-* arm: 108 total, 104 passed, 4 failed
-* arm64: 35 total, 31 passed, 4 failed
-* i386: 21 total, 18 passed, 3 failed
-* mips: 21 total, 21 passed, 0 failed
-* parisc: 6 total, 6 passed, 0 failed
-* powerpc: 8 total, 7 passed, 1 failed
-* s390: 6 total, 5 passed, 1 failed
-* sh: 12 total, 12 passed, 0 failed
-* sparc: 6 total, 6 passed, 0 failed
-* x86_64: 27 total, 23 passed, 4 failed
-
-## Test suites summary
-* boot
-* fwts
-* igt-gpu-tools
-* kselftest-android
-* kselftest-arm64
-* kselftest-breakpoints
-* kselftest-capabilities
-* kselftest-cgroup
-* kselftest-clone3
-* kselftest-core
-* kselftest-cpu-hotplug
-* kselftest-cpufreq
-* kselftest-drivers-dma-buf
-* kselftest-efivarfs
-* kselftest-filesystems
-* kselftest-filesystems-binderfs
-* kselftest-firmware
-* kselftest-fpu
-* kselftest-ftrace
-* kselftest-futex
-* kselftest-gpio
-* kselftest-intel_pstate
-* kselftest-ipc
-* kselftest-ir
-* kselftest-kcmp
-* kselftest-kexec
-* kselftest-kvm
-* kselftest-lib
-* kselftest-livepatch
-* kselftest-membarrier
-* kselftest-net
-* kselftest-net-forwarding
-* kselftest-netfilter
-* kselftest-nsfs
-* kselftest-openat2
-* kselftest-pid_namespace
-* kselftest-pidfd
-* kselftest-proc
-* kselftest-pstore
-* kselftest-ptrace
-* kselftest-rseq
-* kselftest-rtc
-* kselftest-seccomp
-* kselftest-sigaltstack
-* kselftest-size
-* kselftest-splice
-* kselftest-static_keys
-* kselftest-sync
-* kselftest-sysctl
-* kselftest-tc-testing
-* kselftest-timens
-* kselftest-timers
-* kselftest-tmpfs
-* kselftest-tpm2
-* kselftest-user
-* kselftest-x86
-* kselftest-zram
-* kunit
-* kvm-unit-tests
-* libhugetlbfs
-* log-parser-boot
-* log-parser-test
-* ltp-cap_bounds
-* ltp-commands
-* ltp-containers
-* ltp-controllers
-* ltp-cpuhotplug
-* ltp-crypto
-* ltp-cve
-* ltp-dio
-* ltp-fcntl-locktests
-* ltp-filecaps
-* ltp-fs
-* ltp-fs_bind
-* ltp-fs_perms_simple
-* ltp-fsx
-* ltp-hugetlb
-* ltp-io
-* ltp-ipc
-* ltp-math
-* ltp-mm
-* ltp-nptl
-* ltp-pty
-* ltp-sched
-* ltp-securebits
-* ltp-smoke
-* ltp-syscalls
-* ltp-tracing
-* network-basic-tests
-* rcutorture
-* v4l2-compliance
-* vdso
-
---
-Linaro LKFT
-https://lkft.linaro.org
+Pozdrawiam
+Krystian Wieczorek
