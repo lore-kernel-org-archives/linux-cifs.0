@@ -2,61 +2,392 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA55AC7EE23
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 May 2023 07:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFDFC77B75
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 May 2023 08:27:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229711AbjEQHvv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 May 2023 03:51:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48178 "EHLO
+        id S230440AbjEQI1u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 May 2023 04:27:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbjEQHvv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 May 2023 03:51:51 -0400
-Received: from mail.feshiecree.pl (mail.feshiecree.pl [89.40.114.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4823A9A
-        for <linux-cifs@vger.kernel.org>; Wed, 17 May 2023 00:51:49 -0700 (PDT)
-Received: by mail.feshiecree.pl (Postfix, from userid 1001)
-        id 3AB5F84173; Wed, 17 May 2023 08:51:28 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=feshiecree.pl;
-        s=mail; t=1684309908;
-        bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
-        h=Date:From:To:Subject:From;
-        b=0BWridvaNm2PTrnCAFLkCFLTuv/pDAftpJ3jZ4k+Jila1dB/bdJ6fYSgoK+GuwZ5C
-         vdnNDrvQBbPphvY0OSZJhmz4AnGIqtpEVFnr56lpBSAlRvKbtKQVoxjdeKTYL6PXeT
-         XebyW8U6DIjDxREBZYE+GNmh1Dm/97Ty5chBCItJZM/gTNjC2qrw2IIznvY9gH34GB
-         PiqvjUblaUGq/Z3Sbbi7wZM5JhMSF8aSaq+QQlsCJnzutKEUD/Qxd5dbptraZ1Ni/y
-         sgawInCJNEyWO3QNnXAoygQM2+k3832BArRQg358b45xkIZSANTIeG9oQV9nhdtroE
-         A6cztcChiLI7w==
-Received: by mail.feshiecree.pl for <linux-cifs@vger.kernel.org>; Wed, 17 May 2023 07:51:09 GMT
-Message-ID: <20230517074502-0.1.2m.hstx.0.2px15g37kr@feshiecree.pl>
-Date:   Wed, 17 May 2023 07:51:09 GMT
-From:   "Krystian Wieczorek" <krystian.wieczorek@feshiecree.pl>
-To:     <linux-cifs@vger.kernel.org>
-Subject: W sprawie samochodu
-X-Mailer: mail.feshiecree.pl
+        with ESMTP id S230451AbjEQI1a (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 May 2023 04:27:30 -0400
+Received: from esa6.hc3370-68.iphmx.com (esa6.hc3370-68.iphmx.com [216.71.155.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DB08272C
+        for <linux-cifs@vger.kernel.org>; Wed, 17 May 2023 01:27:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1684312047;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:mime-version;
+  bh=XmfW2C8EBwdCtA/PHBGfsHh4OaywhrnQoVfyxTRKnbI=;
+  b=a2Ktr7sykuWehrxOG2We2YxN4phvLL4m4Bt8q756dXhevosLPk3amXv/
+   zrqklP+u5dPMp0WYaSHMwzv4ku3V97JjLrErOtGYCGLmwu737WTXo2fk6
+   z4C1nmP/wo/mdcRN4z0mmWNrr/OPgZcZS4DAFl7zJ0D4B6/ltFxM/jozJ
+   0=;
+X-IronPort-RemoteIP: 104.47.58.103
+X-IronPort-MID: 108664314
+X-IronPort-Reputation: None
+X-IronPort-Listener: OutboundMail
+X-IronPort-SenderGroup: RELAY_O365
+X-IronPort-MailFlowPolicy: $RELAYED
+IronPort-Data: A9a23:a4bVVaJwFls3IiBoFE+RspUlxSXFcZb7ZxGr2PjLsTEN4o4Qp3Zan
+ CZdCDrTJL/ZMyLFz+oGOYS+/EwE7cTRzNUwTQZvrCwyQ35G85fJCIvAdx76MnOZf5GdRx1u4
+ ZpHO4GQIZ9oEC6C90/zb+W6piglhPGDSNIQZAKq1gVZHGeIHw9/2Uw98wJAvrNVvDSZP++sk
+ d/+/5HUMQSui2ErazhKsPjdoRg2ta+r6WsW5lVkOqER7QPSz3UbMskSdPq7R5fariu4PcbhH
+ rqek+vplo/9101wYj9wuu+jKiXmepaLYU7VzCIQA/P46vR7jnRa+r4hM/YBYltghTyMntRgo
+ P1ArpX1QgoyVkH2sL11vyJwTmcvbMWqxJedeSLk6ZHKkBWfG5fR664G4H8ebNVwFtlfWQmix
+ dRAQBgRYxaKgf6Bwb7TYoGAUex6caEHlKtG0p1R5Wmx4cQOGPgvcI2TjTNs5x8ih9gmIBrrT
+ 5FxhQyDzvj3S0Yn1l8/UPrSlQoz75X1W2UwRFm9/cLb74VPpeDYPXeE3Nf9I7S3qctpckmw+
+ mvGpTXeK04jLobPlGOl0kqPifDVgnauMG4SPOXQGv9CpnS2nzRWJDhIEFyxrL++l1K0XM9ZJ
+ woM4C0yoKMu9UutCN7gQxm/p33CtRkZMzZSO7RitEfRleyJs0DAXjNsoj1pMbTKsOcsQicxk
+ FuAkN7zGjVrtJWeSG6H96fSpjS3UcQQBTZaNXFaEVBcv7EPpqkanz+TFvlsMZeaj/nfQTvbn
+ GzUjTAX0uB7Yckjkv/TEUr8qy6ro7DVRwot6xSRVWWghit9ZYi4d8mj6FbAxehPIZzfTVSbu
+ nUA3c+E44gmFp+XmSqGQM0WFbSj7rCCKjK0qUZkN5Ij7XKr6RaLeZtZ4DV0KV1BKMsIeTb1J
+ kTUvGt5/4dJNWCjYYdyYomrDN8tw7SmHtPgPtjOadpPfphqXAqG9ztpfkmewybml01ErE0kE
+ ZKScMLpAXNED61ilWKyX71EieRtwT0iz2TOQ5y91w6gzbeVeH+ST/ECLUeKaec6qqiDpW057
+ upiCidD8D0HOMWWX8Ud2dd7wYwiRZTjOa3Llg==
+IronPort-HdrOrdr: A9a23:taeRaqHUbtIr8UWmpLqELMeALOsnbusQ8zAXPiBKJCC9E/bo8v
+ xG+c5w6faaslkssR0b9+xoW5PwI080l6QU3WB5B97LMDUO0FHCEGgI1/qA/9SPIUzDHu4279
+ YbT0B9YueAcGSTW6zBkXWF+9VL+qj5zEix792uq0uE1WtRGtldBwESMHf9LmRGADNoKLAeD5
+ Sm6s9Ot1ObCA8qhpTSPAhiYwDbzee77a7bXQ==
+X-Talos-CUID: =?us-ascii?q?9a23=3A9u9WV2oJfX1srwc8ngoj1Y/mUZwscieM616PGlX?=
+ =?us-ascii?q?iWTswaJ2talCP4rwxxg=3D=3D?=
+X-Talos-MUID: =?us-ascii?q?9a23=3AjY84ewyoTaNoTCEucbdnN+kQ9nuaqI2/JRxVvpo?=
+ =?us-ascii?q?nguaFEQYoMRzC0GqWWqZyfw=3D=3D?=
+X-IronPort-AV: E=Sophos;i="5.99,281,1677560400"; 
+   d="pcap'?scan'208";a="108664314"
+Received: from mail-dm6nam10lp2103.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.103])
+  by ob1.hc3370-68.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 May 2023 04:27:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Oaj7l0r0rLP4bormuqiYWQ6HsuqWa5wi87KWuWtip4iezPuyid9aWbUxtIR0FFWBe/tweIzNDFtUsWv/zkMLLb+EaEMil68pq6jLJErak4/Aqj1YFHvcrT9T7cBErfFmMdODiqRTYDgqfDiMVK2J6Nn61wgp1g7sIzDLcdBlIrEQJYwqJE+CUPP67zBu2JGDp44QV2u37CK3ulLmpRdzyelkXcIXKP+l/j4i63E6Q8QGccc/nmrhk+9Ns34QDpvL/rN7Y4bN/Xvfq94sF5m0Z+sL4F+SoS9y2mTlxbVy7Oc/gi9TPhmt2aouHnt8xnCqulP6VOfDFJkvtZLdAdVecg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DoT2fBOE0TsfAHVjXXknelkOTB12lbRiR8+JU8KZdGA=;
+ b=HVQg10xfIysKf16xcPhH52/dvqGioCYrAnt2vPKWHIjPGKQnY22FUKE4HF7ZhMasiPQ6Fbt4VdeY3srwFjtZiJ/Thwv/tFdFf0dJxiRSkY2dv18JqZExTYrZCBPMx95C8QfSoGM6E166ysvqO6Ag2SDDTykCYWzMlBhh+Y9Qj+qtnj6jsSoSJgi7ap8gY5NT++GuTNr+cTTBBQS0D2ApfTlwHyw2DdmWgHc8cFK9OGjqPqVPC+ZkvxFaNBrFNe50xYuHipBRDHkwxeagSZqVEEXFHh7d0ksgzBY8x2GC6h6PLn9Bzfx6W2RniNBeirbKticT58ucg1jewVpCpZiYGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DoT2fBOE0TsfAHVjXXknelkOTB12lbRiR8+JU8KZdGA=;
+ b=hXVi173kOcX0bwDladnd7hAGtlkRoytFjJNMojQCCB3gP/RgXqxueLS1CW8JjkjVB+ZMVQa2EXKLV0nwyN2AjufHz0dOI62RKxnbFMlsXdSboiX915C0Z3Us1INBTOtM8ebteNm+C+4PCeahWJqlgX8/NWkHWphZBeVHXr/PNJA=
+Received: from DM6PR03MB5372.namprd03.prod.outlook.com (2603:10b6:5:24f::15)
+ by SJ0PR03MB6597.namprd03.prod.outlook.com (2603:10b6:a03:393::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.30; Wed, 17 May
+ 2023 08:27:20 +0000
+Received: from DM6PR03MB5372.namprd03.prod.outlook.com
+ ([fe80::53f7:d006:1645:81e2]) by DM6PR03MB5372.namprd03.prod.outlook.com
+ ([fe80::53f7:d006:1645:81e2%5]) with mapi id 15.20.6387.033; Wed, 17 May 2023
+ 08:27:20 +0000
+From:   Ross Lagerwall <ross.lagerwall@citrix.com>
+To:     Tom Talpey <tom@talpey.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+CC:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Rohith Surabattula <rohiths@microsoft.com>
+Subject: Re: [PATCH] cifs: Close deferred files that may be open via hard
+ links
+Thread-Topic: [PATCH] cifs: Close deferred files that may be open via hard
+ links
+Thread-Index: AQHZiAdjwVeGRDUqzk+4gN1288JV8a9dO+MAgADjel4=
+Date:   Wed, 17 May 2023 08:27:19 +0000
+Message-ID: <DM6PR03MB5372810EDDBE8C9A5192B1F3F07E9@DM6PR03MB5372.namprd03.prod.outlook.com>
+References: <20230516150153.1864023-1-ross.lagerwall@citrix.com>
+ <55740ab3-e020-df8c-07bc-02386486539f@talpey.com>
+In-Reply-To: <55740ab3-e020-df8c-07bc-02386486539f@talpey.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator: 
+msip_labels: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=citrix.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR03MB5372:EE_|SJ0PR03MB6597:EE_
+x-ms-office365-filtering-correlation-id: b120c27f-857a-4acc-891d-08db56b08813
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: a6oGC6FdZ2+HAaH+VuVeqZRVgoI6WLovqihV8nLMgzfJL6Vg4jnBY0xj6XbePEgqkW5hM1COImz5qF0KJnsF98FCUH1GNWjciNYukiWhOwoJbpQubITukKbXVPBp36EG34S+qSHuHJRRIYCxSD1qbuMi7dsyoYHbawk/hLRrSI2ZuaxY3uui/r8rMlpsnzazYI2IN53rJtPZePSyRtwk9j+ams2Gx7l2DBeLfmQS/dqHq+C/IN2jXFIIpAM7UTLgAH6x9hehBKEqMi38WtTERa8f+ZldIk5+vfsMqd7juNtnmntQZaMXz38/yVQ/PujDdA1HqxhuwXJBvLLY6yijfmvU93TA1XxmgDb0NcHm+Y7u05TRnEOaoQkxYex4ue/zZyTwTmaTBHR0wa+GENVxE75nnUVUkkJQoPKQQMDHYTXfZcoU6qWvlvYe2PiqnmL9YYOy+YLtt+wzIFuRfOJHj4fgg1FH+0Nm7gighzLIS7QgZL6dz0xwSBFBQQct0oVeCBnMDgoqQEQn2jBod6YAHF8qDjtMsxW7lfxJfUz+hQTeWfXrzXF/Lmh2xY27Tu1Ld/e7Qpaa5zx8brT5l9AEFYPBBCC6GiHpJ+D9qQ9rGOQouXchFNZif0j3JfCyVLJw
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR03MB5372.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(366004)(376002)(346002)(451199021)(9686003)(6506007)(53546011)(186003)(478600001)(26005)(86362001)(55016003)(71200400001)(45080400002)(66446008)(66946007)(4326008)(82960400001)(76116006)(66556008)(99936003)(91956017)(66476007)(64756008)(7696005)(54906003)(83380400001)(110136005)(8936002)(5660300002)(44832011)(52536014)(2906002)(41300700001)(316002)(122000001)(38070700005)(33656002)(8676002)(38100700002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?2PMsIDigloGLkSNhyEYisBZDTBL5nZf9bLDfYZEmA6mp2ISiHO2BMPI13/?=
+ =?iso-8859-1?Q?E82CTmeeWDjLpCqWMkm/6MyNI7U6rs6yybNcO26KYh7HSjXXeCAgvXBert?=
+ =?iso-8859-1?Q?vji4a0BXUOjRCgLv06W1Rw+NtYc/99yYXC4mwySjP7ksqrcFBhYt0CYyFq?=
+ =?iso-8859-1?Q?twNaOFoFKdGQPqIsC7Tt22+pm3CCG1O+0S1QxzowhuvBr1laGCgyvYCPIK?=
+ =?iso-8859-1?Q?m8gjTyRsQ5pt+ocHQploD5FYNGglqzvy/ImWIsOcIdD8ichrzDpXd8bUB3?=
+ =?iso-8859-1?Q?rjgusz0cObLuP03UW+hx/h+xQTVGa0B5vUNMKdDmy5Jdau+SjLEIEoC7qY?=
+ =?iso-8859-1?Q?B/Rl5lV7s9e0VjPOVu77W7qLFB8kN/Vi+XsUlted3GYaGB/tKIsay2Cjsd?=
+ =?iso-8859-1?Q?NrcWX0tTcpUzVAb5ErosQlPb0o7ssZcYW/8T0b9cy0I+dDIM6mE2RNC0hO?=
+ =?iso-8859-1?Q?q4K61qPTzEllf0/Uz7tAcf9aWjIBeygLQSyxGFz2ldNF3MM2W25KU+Gg5g?=
+ =?iso-8859-1?Q?9GxkELRgDuIud9jBQfTU/zPb9m+hpUhDKI0jZwvbIY9Gz77yewmblryY75?=
+ =?iso-8859-1?Q?FEBLNhWblMXPP/0cdpUP6ljPrfmzI+gKI+vlew6xmR2KJyS8JyFXiGSkAQ?=
+ =?iso-8859-1?Q?3LjJDwYBrFOuhMZ2c61t1Sc7RNaEI3/7ZH7grQwq/b1tS61o2bgH+UaynE?=
+ =?iso-8859-1?Q?R/FX5A8B3GOV1pZRoAm7At0Ifg7gWP5zFyHoei3qkhNs4UPiLYb8UUbakX?=
+ =?iso-8859-1?Q?N7dZiBLYwAx++PdnWgpKj9J7vS6gU46mFMEDUVSYGLNE/v1jS40iPOlOFf?=
+ =?iso-8859-1?Q?8M6Lht/06YOCtLYyCErQSUeTNRwsFP5Bo41PNlK2oQBezxnhRUyIkj1qry?=
+ =?iso-8859-1?Q?rG6FUNS4ox7HhX+dwB3u6HCm8Bz7hfoAKLAjjAyjLOaFtWMYxQ5hHMEMoU?=
+ =?iso-8859-1?Q?AgStfREv7aZOLGWydPGjKm2z43z0aDORdcX+TBXmMdfaPvkobEoENnwMMi?=
+ =?iso-8859-1?Q?B33fKt6qbjlOhquv1IVfxR2uulA7Sc4rgRG4Zrc3NRdBcTg+KeTu0oPTs3?=
+ =?iso-8859-1?Q?eolJ5+ptRpCQLL+smtGq69O34vGs81sBl0PxzS37GklDWpMP+d0qhWUYeC?=
+ =?iso-8859-1?Q?FW+FGYAb7tS8GHNMbtZjVqtV6/JJTX+6LfLIkK4UGuA1dVCNstce/tbKPi?=
+ =?iso-8859-1?Q?fKzZenqshSm6JLc0yO1J89dM5/B5liU+uV3DNWPNh23sExqvFwQhf1B1BP?=
+ =?iso-8859-1?Q?1cj7+r3p9YrGlFj8szdnLNePNNoWv6dGMSCm6vBooG9Pru4VlXrd5D2yV2?=
+ =?iso-8859-1?Q?Cz7bEO5QexSvVO4JnWrJqRcowEbFIG7twxurPInaTWmfur3vA1B2TA6Msq?=
+ =?iso-8859-1?Q?9ikANJIr6X6SMjKodevpSKv0GqVLfBPBSSjq7/sJYrUVEOntf3v0HzTIq3?=
+ =?iso-8859-1?Q?tprU5AJEq9eNV+Ycb+czz1BfJ+LTThhXNcPArTvKhjiKuknIE/U176vLtJ?=
+ =?iso-8859-1?Q?MsrEThZ1HFyydZKM2hcdOT5tXcJ97wonUP+w48l+HWsGNQaS9E77lmep8b?=
+ =?iso-8859-1?Q?5E7FtaYzFpRU8KZrfN8YB86bdB2hJPfLdhQgjIasei/qgUXsfwGyDW5G+R?=
+ =?iso-8859-1?Q?KxAaVbEJy5v+9odPegDDA4ye0hgB/83YCr?=
+Content-Type: multipart/mixed;
+        boundary="_002_DM6PR03MB5372810EDDBE8C9A5192B1F3F07E9DM6PR03MB5372namp_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: X8hyAHQ/dzPZCvXo608XmP4oTjQWSyaZwD/A4zsmnv70fMolprWYm8jeNLJqJKCE9CzyEriz/xJ4LObH4SbBUHrrFks4o4GrOssXbSq5VI2vKx8Vq5ZIScVVBoyfPbmPyAa9Zuue7xsnFFFV7B/bBQ4AurmO2HAzIuZeLVu3h1bMqoCzmMSTn8JXIyQy4jm/AnmfXjjOs8gn7W00kpaxwgDQP799Uh2oEKHprG8j6n/htoMk6L+80mHqUwtD1xxnto5dKSEa0UaE0wq+atnKcw1sUS2/VZPxTNdC2wcyXbMqBcrC9vQDbK5iytyRr/eMGeiLhzVbiRI/mwjpSTT2ZH+OXirDjkkGUlCfZf7gg0fh996WpSCaEaRdDJ4Aw9IsfQQ2XiEXYPfsO04ha9tnzHh1jpgJFgIyEiwtrPpdeS5Hmos8nszSVhqkdlaej1/nynIQ5Rejlaqb3ZRVHBBTpr3HQMfuVAKACndKkqYUeGxaw/DXIyPRYp2g/zfKz7LEjX/IwBo+T9qK5JUTi3T/iZmgRpMMrAnTFggHQv304OyxdfV7Cwjpmj2b67eKGvJ85r71Z6QlqEXyj/sn9nSGCLUdsBw7xn6exbFdyCdckIsCAnVBasCGYTJTokpdx67aXFqAkkcPI34pVe2StRA+pt+lKOI56B5dnRQOCHju9iENiargsQsLylQ8w+SP+PNobaxF/C3AARfTSrTFLkzpGqLLgeH8APPc31fBfNQ49b0A6D9GqyGGiOfL+ycfppUY5OhuxaNq+JSDECnQ2NnbB94oXl3rw9og54+2PQdSnROahzs6+sWG74O6xtqZwA52SEjMZnUTSDOvMZuCXD1lc2eu6lA921BUclxsZzOivxH6kvJIqfM16RT6WWxsnVH2qGfjwSO8rnkCFiBC9wz9SA==
+X-OriginatorOrg: citrix.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR03MB5372.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b120c27f-857a-4acc-891d-08db56b08813
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2023 08:27:19.9990
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UnoU4HXquHupc/iz+zM/s+sXbFZMMzNrela5H0WQ1sZGcYR6iQ8zLoflFd0hOsyCOvb3bCSy0hlEKvHmKvuPHpoRNQQsiDeFHASpbvIQbZs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR03MB6597
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
+--_002_DM6PR03MB5372810EDDBE8C9A5192B1F3F07E9DM6PR03MB5372namp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
-, je=C5=9Bli chodzi o system monitoringu GPS.
+> From: Tom Talpey <tom@talpey.com>=0A=
+> Sent: Tuesday, May 16, 2023 7:41 PM=0A=
+> To: Ross Lagerwall <ross.lagerwall@citrix.com>; linux-cifs@vger.kernel.or=
+g <linux-cifs@vger.kernel.org>=0A=
+> Cc: Steve French <sfrench@samba.org>; Paulo Alcantara <pc@cjr.nz>; Ronnie=
+ Sahlberg <lsahlber@redhat.com>; Shyam Prasad N <sprasad@microsoft.com>; Ro=
+hith Surabattula <rohiths@microsoft.com>=0A=
+> Subject: Re: [PATCH] cifs: Close deferred files that may be open via hard=
+ links =0A=
+> =A0=0A=
+> On 5/16/2023 11:01 AM, Ross Lagerwall wrote:=0A=
+> > Windows Server (tested with 2016) disallows opening the same inode via=
+=0A=
+> > two different hardlinks at the same time. With deferred closes, this ca=
+n=0A=
+> > result in unexpected behaviour as the following Python snippet shows:=
+=0A=
+> > =0A=
+> >=A0=A0=A0=A0=A0 # Create file=0A=
+> >=A0=A0=A0=A0=A0 fd =3D os.open('test', os.O_WRONLY|os.O_CREAT)=0A=
+> >=A0=A0=A0=A0=A0 os.write(fd, b'foo')=0A=
+> >=A0=A0=A0=A0=A0 os.close(fd)=0A=
+> > =0A=
+> >=A0=A0=A0=A0=A0 # Open and close the file to leave a pending deferred cl=
+ose=0A=
+> >=A0=A0=A0=A0=A0 fd =3D os.open('test', os.O_RDONLY|os.O_DIRECT)=0A=
+> >=A0=A0=A0=A0=A0 os.close(fd)=0A=
+> > =0A=
+> >=A0=A0=A0=A0=A0 # Try to open the file via a hard link=0A=
+> >=A0=A0=A0=A0=A0 os.link('test', 'new')=0A=
+> >=A0=A0=A0=A0=A0 newfd =3D os.open('new', os.O_RDONLY|os.O_DIRECT)=0A=
+> > =0A=
+> > The final open returns EINVAL due to the server returning=0A=
+> > STATUS_INVALID_PARAMETER.=0A=
+> =0A=
+> Good sleuthing. The hardlink behavior is slightly surprising, but=0A=
+> it is certainly the case that certain incompatible combinations of=0A=
+> open/create flags can conflict with other handles, including=0A=
+> cached opens.=0A=
+> =0A=
+> > Fix this by closing any deferred closes that may be open via other hard=
+=0A=
+> > links if we haven't successfully reused a cached handle.=0A=
+> > =0A=
+> > Fixes: c3f207ab29f7 ("cifs: Deferred close for files")=0A=
+> > Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>=0A=
+> > ---=0A=
+> > =0A=
+> > This is kind of an RFC. Is the server doing the wrong thing? Is it=0A=
+> > correct to work around this in the client?=0A=
+> =0A=
+> By definition the server is doing what it does, and it's a moot=0A=
+> question whether it's appropriate to work around it. However, I don't=0A=
+> see this behavior explicitly stated in MS-FSA. And INVALID_PARAMETER=0A=
+> is a strange error code to return for this. Do you have a packet=0A=
+> trace? We should ask Microsoft.=0A=
+> =0A=
+> >=A0=A0 fs/cifs/file.c | 1 +=0A=
+> >=A0=A0 1 file changed, 1 insertion(+)=0A=
+> > =0A=
+> > diff --git a/fs/cifs/file.c b/fs/cifs/file.c=0A=
+> > index c5fcefdfd797..723cbc060f57 100644=0A=
+> > --- a/fs/cifs/file.c=0A=
+> > +++ b/fs/cifs/file.c=0A=
+> > @@ -749,6 +749,7 @@ int cifs_open(struct inode *inode, struct file *fil=
+e)=0A=
+> >=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 _c=
+ifsFileInfo_put(cfile, true, false);=0A=
+> >=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }=0A=
+> >=A0=A0=A0=A0=A0=A0=A0 }=0A=
+> > +=A0=A0=A0=A0 cifs_close_deferred_file(CIFS_I(inode));=0A=
+> =0A=
+> But, is this correct? I don't believe this function blocks. And I'm=0A=
+> not sure this triggers the close only in the case you've identified.=0A=
+> =0A=
+=0A=
+It calls _cifsFileInfo_put() on each cached handle which calls=0A=
+server->ops->close() which is synchronous as far as I can tell.=0A=
+=0A=
+I could restrict it to check if the inode has > 1 link but as you=0A=
+mentioned above, there are various combinations of open/create flags=0A=
+that can conflict with cached handles, so maybe it is correct to always=0A=
+called it in the cache miss path?=0A=
+=0A=
+In any case, I have attached a packet trace from running the above=0A=
+Python reproducer.=0A=
+=0A=
+Client IP =3D=3D 10.71.56.138=0A=
+Server IP =3D=3D 10.71.57.49=0A=
+Server OS =3D=3D Windows Server 2016 1607 (build 14393.5717)=0A=
+=0A=
+Thanks,=0A=
+Ross=
 
-Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
-e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
-a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+--_002_DM6PR03MB5372810EDDBE8C9A5192B1F3F07E9DM6PR03MB5372namp_
+Content-Type: application/octet-stream; name="smbtrace.pcap"
+Content-Description: smbtrace.pcap
+Content-Disposition: attachment; filename="smbtrace.pcap"; size=6866;
+	creation-date="Wed, 17 May 2023 08:27:01 GMT";
+	modification-date="Wed, 17 May 2023 08:27:01 GMT"
+Content-Transfer-Encoding: base64
 
-Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
-dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
-szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
-mne znaczenie.
+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
+8XndBXLsgBAB9YZvAAABAQgKMP77DwUL6O8=
 
-Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
-b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
-
-
-Pozdrawiam
-Krystian Wieczorek
+--_002_DM6PR03MB5372810EDDBE8C9A5192B1F3F07E9DM6PR03MB5372namp_--
