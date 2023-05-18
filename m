@@ -2,207 +2,129 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73138C7EE23
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 May 2023 14:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 195F2C77B7A
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 May 2023 15:31:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231603AbjEROmi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 May 2023 10:42:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59608 "EHLO
+        id S231223AbjERPbz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 May 2023 11:31:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231550AbjEROmg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 May 2023 10:42:36 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA3B1E1
-        for <linux-cifs@vger.kernel.org>; Thu, 18 May 2023 07:42:34 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-51b0f9d7d70so1872330a12.1
-        for <linux-cifs@vger.kernel.org>; Thu, 18 May 2023 07:42:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684420954; x=1687012954;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Xt3wdwBaezZi829BAZyd3dShfMmd/beulpfdNkkWlc=;
-        b=iGjflk3WNVoKLy6lsOcBH/zdxXbrgr+Q1kmVxik5PKMBqyh+Hrs1JVozuONg+/y0kz
-         iiawXqWMrTQNmLlfYjG3SRl5yFuIljZYQkjGRuuNNmUpOwQGRQl2G58/HL/FKfh319M9
-         wNIQYqbXtme/X1mYrDkpuEbWjxV4c7/U26Nk62tvv9IfghsauprqdEhBxrnprdf4fNh5
-         VRBf8suInwYlt291KIC/yKCo9FwIhMyY6SW3no5Zhef5uz9DKvAdZ9zCAgPlxGW3pma2
-         Hb6DC6iEzudvmZyofCGPMFv5hpg/kfyaZGa+sTMQHR3ccCEumIdpZRAG+hQHkrwi2/wr
-         Ih5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684420954; x=1687012954;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5Xt3wdwBaezZi829BAZyd3dShfMmd/beulpfdNkkWlc=;
-        b=ls0W3is54LNzAt0uCL3uH/xUtqxn+byud7ZSnAzWFlbxOszEETKez7IayJcJxj14mN
-         2UYEVYXR9xMgOhiWggMAgZP6pgY1s3wXcn24NkBFUd9MHaV9Yb9V4zAfe9o6zKaIhlbP
-         B5Bj9RlygJlRpltP1+WTg6oQU001JMqMl8a/i/0Wds/ueWKrkOxAKlIXpDPE9gfkBkty
-         YHRGDmWxVdKFHpCZ0SwWHIoxGiUQ50kWxiJwe1Skr6DE1cg6vQbhFmingTCa85upwq1a
-         k+x11re49ZzPEhtgldx8o02Oy7yM7Yhj9QscQVREAKbKcfdLk4UvvmidaYxr4n+7//P/
-         pLtg==
-X-Gm-Message-State: AC+VfDw8NwC+b4XCs4/iA0CkIScXI7wHPa9wPkisymJ+jFXhiY9EMXwc
-        Pv75vGnTLamwd4aQmX0PDXk=
-X-Google-Smtp-Source: ACHHUZ7o2tsqecRswvt3Y41FMl1tVi2bC5oRsyOOKzmSmq2IhkJGEDiRwFm3+7J53FIZrVpKflL2gA==
-X-Received: by 2002:a17:902:c1c4:b0:1a8:1320:133 with SMTP id c4-20020a170902c1c400b001a813200133mr2723834plc.51.1684420953986;
-        Thu, 18 May 2023 07:42:33 -0700 (PDT)
-Received: from localhost.localdomain (netlab-9.cs.nctu.edu.tw. [140.113.203.211])
-        by smtp.gmail.com with ESMTPSA id jd5-20020a170903260500b001a96562642dsm1495706plb.277.2023.05.18.07.42.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 07:42:33 -0700 (PDT)
-From:   HexRabbit <h3xrabbit@gmail.com>
-To:     linkinjeon@kernel.org
-Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        linux-cifs@vger.kernel.org, Kuan-Ting Chen <h3xrabbit@gmail.com>
-Subject: [PATCH] ksmbd: fix multiple out-of-bounds read during context decoding
-Date:   Thu, 18 May 2023 14:42:08 +0000
-Message-Id: <20230518144208.2099772-1-h3xrabbit@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S230234AbjERPby (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 May 2023 11:31:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32177F9;
+        Thu, 18 May 2023 08:31:50 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BB72161127;
+        Thu, 18 May 2023 15:31:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD10BC433EF;
+        Thu, 18 May 2023 15:31:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684423909;
+        bh=QR4Dg1YX8B3ucH22ew4CZd/iXu3GjZRKYDWVOpx+evE=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=hkdFwcBJVE9dIN6CfKsxNXSd9p1Dtcr1QSDfC8aMAvKedIePfHDxUlpwmozTZzfAP
+         TLCpcZOxGKz5VlEpgPrgpr5t3YzKML/wC+aJreAjz3GtZlHuoNi30y34bKkaomgG+X
+         Yy9zcWXpi6PGfMYcOZ3z6O8VqBMQf8pvec+lwb6DaGTqCS3CRxKjPqps536opGcEvy
+         TAJgkl6XBfgrbZe5ZkFzqgubsFE59jd2MfqCUK6kqij4NFXrre+7zIPhMXng2Ms9Z4
+         JvY0rdmps06AX+Bqn9hYd6YD6k8r0RJk2reKh6o2ga0ZDkvPqjI+YpWD2wcKBcIlkx
+         adWAjdBLXM3Sw==
+Message-ID: <b046f7e3c86d1c9dd45e932d3f25785fce921f4a.camel@kernel.org>
+Subject: Re: [PATCH v4 4/9] nfsd: ensure we use ctime_peek to grab the
+ inode->i_ctime
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Chuck Lever III <chuck.lever@oracle.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
+        Amir Goldstein <amir73il@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Neil Brown <neilb@suse.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Theodore T'so <tytso@mit.edu>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-XFS <linux-xfs@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Date:   Thu, 18 May 2023 11:31:45 -0400
+In-Reply-To: <2B6A4DDD-0356-4765-9CED-B22A29767254@oracle.com>
+References: <20230518114742.128950-1-jlayton@kernel.org>
+         <20230518114742.128950-5-jlayton@kernel.org>
+         <2B6A4DDD-0356-4765-9CED-B22A29767254@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.1 (3.48.1-1.fc38) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Kuan-Ting Chen <h3xrabbit@gmail.com>
+On Thu, 2023-05-18 at 13:43 +0000, Chuck Lever III wrote:
+>=20
+> > On May 18, 2023, at 7:47 AM, Jeff Layton <jlayton@kernel.org> wrote:
+> >=20
+> > If getattr fails, then nfsd can end up scraping the time values directl=
+y
+> > out of the inode for pre and post-op attrs. This may or may not be the
+> > right thing to do, but for now make it at least use ctime_peek in this
+> > situation to ensure that the QUERIED flag is masked.
+>=20
+> That code comes from:
+>=20
+> commit 39ca1bf624b6b82cc895b0217889eaaf572a7913
+> Author:     Amir Goldstein <amir73il@gmail.com>
+> AuthorDate: Wed Jan 3 17:14:35 2018 +0200
+> Commit:     J. Bruce Fields <bfields@redhat.com>
+> CommitDate: Thu Feb 8 13:40:17 2018 -0500
+>=20
+>     nfsd: store stat times in fill_pre_wcc() instead of inode times
+>=20
+>     The time values in stat and inode may differ for overlayfs and stat t=
+ime
+>     values are the correct ones to use. This is also consistent with the =
+fact
+>     that fill_post_wcc() also stores stat time values.
+>=20
+>     This means introducing a stat call that could fail, where previously =
+we
+>     were just copying values out of the inode.  To be conservative about
+>     changing behavior, we fall back to copying values out of the inode in
+>     the error case.  It might be better just to clear fh_pre_saved (thoug=
+h
+>     note the BUG_ON in set_change_info).
+>=20
+>     Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+>     Signed-off-by: J. Bruce Fields <bfields@redhat.com>
+>=20
+> I was thinking it might have been added to handle odd corner
+> cases around re-exporting NFS mounts, but that does not seem
+> to be the case.
+>=20
+> The fh_getattr() can fail for legitimate reasons -- like the
+> file is in the middle of being deleted or renamed over -- I
+> would think. This code should really deal with that by not
+> adding pre-op attrs, since they are optional.
+>=20
 
-Check the remaining data length before accessing the context structure
-to ensure that the entire structure is contained within the packet.
-Additionally, since the context data length `ctxt_len` has already been
-checked against the total packet length `len_of_ctxts`, update the
-comparison to use `ctxt_len`.
+That sounds fine to me. I'll plan to drop this patch from the series and
+I'll send a separate patch to just remove those branches altogether
+(which should DTRT).
 
-Signed-off-by: Kuan-Ting Chen <h3xrabbit@gmail.com>
----
- fs/ksmbd/smb2pdu.c | 52 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 33 insertions(+), 19 deletions(-)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 972176bff..0285c3f9e 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -849,13 +849,13 @@ static void assemble_neg_contexts(struct ksmbd_conn *conn,
- 
- static __le32 decode_preauth_ctxt(struct ksmbd_conn *conn,
- 				  struct smb2_preauth_neg_context *pneg_ctxt,
--				  int len_of_ctxts)
-+				  int ctxt_len)
- {
- 	/*
- 	 * sizeof(smb2_preauth_neg_context) assumes SMB311_SALT_SIZE Salt,
- 	 * which may not be present. Only check for used HashAlgorithms[1].
- 	 */
--	if (len_of_ctxts < MIN_PREAUTH_CTXT_DATA_LEN)
-+	if (ctxt_len < MIN_PREAUTH_CTXT_DATA_LEN)
- 		return STATUS_INVALID_PARAMETER;
- 
- 	if (pneg_ctxt->HashAlgorithms != SMB2_PREAUTH_INTEGRITY_SHA512)
-@@ -867,15 +867,23 @@ static __le32 decode_preauth_ctxt(struct ksmbd_conn *conn,
- 
- static void decode_encrypt_ctxt(struct ksmbd_conn *conn,
- 				struct smb2_encryption_neg_context *pneg_ctxt,
--				int len_of_ctxts)
-+				int ctxt_len)
- {
--	int cph_cnt = le16_to_cpu(pneg_ctxt->CipherCount);
--	int i, cphs_size = cph_cnt * sizeof(__le16);
-+	int cph_cnt;
-+	int i, cphs_size;
-+
-+	if (sizeof(struct smb2_encryption_neg_context) > ctxt_len) {
-+		pr_err("Invalid SMB2_ENCRYPTION_CAPABILITIES context size\n");
-+		return;
-+	}
- 
- 	conn->cipher_type = 0;
- 
-+	cph_cnt = le16_to_cpu(pneg_ctxt->CipherCount);
-+	cphs_size = cph_cnt * sizeof(__le16);
-+
- 	if (sizeof(struct smb2_encryption_neg_context) + cphs_size >
--	    len_of_ctxts) {
-+	    ctxt_len) {
- 		pr_err("Invalid cipher count(%d)\n", cph_cnt);
- 		return;
- 	}
-@@ -923,15 +931,22 @@ static void decode_compress_ctxt(struct ksmbd_conn *conn,
- 
- static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
- 				 struct smb2_signing_capabilities *pneg_ctxt,
--				 int len_of_ctxts)
-+				 int ctxt_len)
- {
--	int sign_algo_cnt = le16_to_cpu(pneg_ctxt->SigningAlgorithmCount);
--	int i, sign_alos_size = sign_algo_cnt * sizeof(__le16);
-+	int sign_algo_cnt;
-+	int i, sign_alos_size;
-+
-+	if (sizeof(struct smb2_signing_capabilities) > ctxt_len) {
-+		pr_err("Invalid SMB2_SIGNING_CAPABILITIES context length\n");
-+		return;
-+	}
- 
- 	conn->signing_negotiated = false;
-+	sign_algo_cnt = le16_to_cpu(pneg_ctxt->SigningAlgorithmCount);
-+	sign_alos_size = sign_algo_cnt * sizeof(__le16);
- 
- 	if (sizeof(struct smb2_signing_capabilities) + sign_alos_size >
--	    len_of_ctxts) {
-+	    ctxt_len) {
- 		pr_err("Invalid signing algorithm count(%d)\n", sign_algo_cnt);
- 		return;
- 	}
-@@ -969,18 +984,16 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
- 	len_of_ctxts = len_of_smb - offset;
- 
- 	while (i++ < neg_ctxt_cnt) {
--		int clen;
--
--		/* check that offset is not beyond end of SMB */
--		if (len_of_ctxts == 0)
--			break;
-+		int clen, ctxt_len;
- 
- 		if (len_of_ctxts < sizeof(struct smb2_neg_context))
- 			break;
- 
- 		pctx = (struct smb2_neg_context *)((char *)pctx + offset);
- 		clen = le16_to_cpu(pctx->DataLength);
--		if (clen + sizeof(struct smb2_neg_context) > len_of_ctxts)
-+		ctxt_len = clen + sizeof(struct smb2_neg_context);
-+
-+		if (ctxt_len > len_of_ctxts)
- 			break;
- 
- 		if (pctx->ContextType == SMB2_PREAUTH_INTEGRITY_CAPABILITIES) {
-@@ -991,7 +1004,7 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
- 
- 			status = decode_preauth_ctxt(conn,
- 						     (struct smb2_preauth_neg_context *)pctx,
--						     len_of_ctxts);
-+						     ctxt_len);
- 			if (status != STATUS_SUCCESS)
- 				break;
- 		} else if (pctx->ContextType == SMB2_ENCRYPTION_CAPABILITIES) {
-@@ -1002,7 +1015,7 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
- 
- 			decode_encrypt_ctxt(conn,
- 					    (struct smb2_encryption_neg_context *)pctx,
--					    len_of_ctxts);
-+					    ctxt_len);
- 		} else if (pctx->ContextType == SMB2_COMPRESSION_CAPABILITIES) {
- 			ksmbd_debug(SMB,
- 				    "deassemble SMB2_COMPRESSION_CAPABILITIES context\n");
-@@ -1021,9 +1034,10 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
- 		} else if (pctx->ContextType == SMB2_SIGNING_CAPABILITIES) {
- 			ksmbd_debug(SMB,
- 				    "deassemble SMB2_SIGNING_CAPABILITIES context\n");
-+
- 			decode_sign_cap_ctxt(conn,
- 					     (struct smb2_signing_capabilities *)pctx,
--					     len_of_ctxts);
-+					     ctxt_len);
- 		}
- 
- 		/* offsets must be 8 byte aligned */
--- 
-2.25.1
-
+--=20
+Jeff Layton <jlayton@kernel.org>
