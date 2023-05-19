@@ -2,239 +2,118 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 168E2C77B7A
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 May 2023 14:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5284C77B7A
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 May 2023 14:15:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231410AbjESOPe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 May 2023 10:15:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44272 "EHLO
+        id S231635AbjESOPk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 May 2023 10:15:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231792AbjESOPY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 May 2023 10:15:24 -0400
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1936C12C
-        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 07:15:20 -0700 (PDT)
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1ae4d1d35e6so24892565ad.0
-        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 07:15:20 -0700 (PDT)
+        with ESMTP id S232088AbjESOPe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 May 2023 10:15:34 -0400
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6905E10D1
+        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 07:15:27 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1ae54b623c2so29877355ad.3
+        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 07:15:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684505719; x=1687097719;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K6hH5LoAPzLRuNwQSivPUT9RGZEJq6cymw3Y+qmHiKk=;
-        b=cZC4bjc9Bo+oKXiH0sbWIXquXz/r5RBHXV0HdtjW1wNs/Gr0bU3akcksmUoufGFQDZ
-         42muYvla3yTXlT0L9W2VflpebKsdCJzUHhgL/6jsVDa/+vlj6ey8lYzLs50R6+pT61tA
-         1b9l/xrkNszO3BBaskRcB/9IpZA+hmWIVn/SACUc/z6ruGk5+k0R6WThvhXRrCM9Ihtl
-         KBVXyf1TmgOlbTRt8P8FA72AgW/WTpt9639TZ6cMevbO0RUbIIgGhIk/fG2fkqU1PGcA
-         JJ0magMBchEs54LHQcu/Y/a6Vp+hoXIaK70SNm8B93hxAkUjo5PWMW0vrbmyZ79bDVPa
-         42KA==
-X-Gm-Message-State: AC+VfDxWGVSf3pt0balbjRXgegvvJS3/j4KqmVdZrwgz7blTyhY6YPUp
-        jbYonmgfzD2Agg6bKSEurOYmig8M09c=
-X-Google-Smtp-Source: ACHHUZ5ZeuuSr3VpppSYxFJiiMvXfn29hUc5j3mU9By+BJXEYASn2G7ZDsMtzGCTODLPYZvZ00OrWA==
-X-Received: by 2002:a17:903:4ca:b0:1a6:b23c:3bf2 with SMTP id jm10-20020a17090304ca00b001a6b23c3bf2mr2810087plb.10.1684505719225;
-        Fri, 19 May 2023 07:15:19 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684505726; x=1687097726;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m5RSa2sHNFGhHFkCUqFEtwHrXCYjeq7GkI6Wy3n2s3s=;
+        b=OLcqtJBv216E1JqQUe5hGrH4ZSm+Xxe90TU+9bmju6gPiAiisJzgzMYKQrOlS2ep/j
+         srPZHKeWw6igm6lTXfDfZ4VeZOh+oSxU8TIamR3EEoYMfXPizfqRG4/sOhgbjDg/EIpp
+         opp1ZISQeuzw+6t2ot3q8e94OOmfX9sbwktwn6bFaQJ22T7Ce+gmeksgHYnI+j7MiQkc
+         boHAs8CErreykrJn9cHaG8O+0oiPudxqGkSOY6kOBfvPw4/rlqxyln181mosxl98Y9r2
+         0xd3LoJNHc5aptvdEF4UI3+FczG9tmAe2Opbh/Qn+f+EbDzf3oRHQI/+BLjafWk+9QcC
+         icCQ==
+X-Gm-Message-State: AC+VfDxLEsSbYD0XXCndYkzOY8xRaHDTWwumtcr3WVM1b1XgI45OZbZD
+        cmZMCK2vq4hSMv/jQ+3hz3cu/DrBEGI=
+X-Google-Smtp-Source: ACHHUZ5ibxXRLW/fxDAgvzWUn3I+aX3+l2mpHYbPCg7z6JR+Lw4rXDL99M+mSi2Mt6tQPJyMITGdjA==
+X-Received: by 2002:a17:902:b616:b0:1a9:4fa1:2747 with SMTP id b22-20020a170902b61600b001a94fa12747mr2353692pls.47.1684505726487;
+        Fri, 19 May 2023 07:15:26 -0700 (PDT)
 Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id ba9-20020a170902720900b001ac7af58b66sm3489409plb.224.2023.05.19.07.15.17
+        by smtp.gmail.com with ESMTPSA id ba9-20020a170902720900b001ac7af58b66sm3489409plb.224.2023.05.19.07.15.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 May 2023 07:15:18 -0700 (PDT)
+        Fri, 19 May 2023 07:15:26 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
-        Per Forlin <per.forlin@axis.com>
-Subject: [PATCH] ksmbd: fix UAF issue from opinfo->conn
-Date:   Fri, 19 May 2023 23:15:07 +0900
-Message-Id: <20230519141508.12694-1-linkinjeon@kernel.org>
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: fix incorrect AllocationSize set in smb2_get_info
+Date:   Fri, 19 May 2023 23:15:08 +0900
+Message-Id: <20230519141508.12694-2-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230519141508.12694-1-linkinjeon@kernel.org>
+References: <20230519141508.12694-1-linkinjeon@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If opinfo->conn is another connection and while ksmbd send oplock break
-request to cient on current connection, The connection for opinfo->conn
-can be disconnect and conn could be freed. When sending oplock break
-request, this ksmbd_conn can be used and cause user-after-free issue.
-When getting opinfo from the list, ksmbd check connection is being
-released. If it is not released, Increase ->r_count to wait that connection
-is freed.
+If filesystem support sparse file, ksmbd should return allocated size
+using ->i_blocks instead of stat->size. This fix generic/694 xfstests.
 
-Reported-by: Per Forlin <per.forlin@axis.com>
-Tested-by: Per Forlin <per.forlin@axis.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/ksmbd/oplock.c | 72 +++++++++++++++++++++++++++++++----------------
- 1 file changed, 47 insertions(+), 25 deletions(-)
+ fs/ksmbd/smb2pdu.c | 21 +++------------------
+ 1 file changed, 3 insertions(+), 18 deletions(-)
 
-diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
-index 6d1ccb999893..db181bdad73a 100644
---- a/fs/ksmbd/oplock.c
-+++ b/fs/ksmbd/oplock.c
-@@ -157,13 +157,42 @@ static struct oplock_info *opinfo_get_list(struct ksmbd_inode *ci)
- 	rcu_read_lock();
- 	opinfo = list_first_or_null_rcu(&ci->m_op_list, struct oplock_info,
- 					op_entry);
--	if (opinfo && !atomic_inc_not_zero(&opinfo->refcount))
--		opinfo = NULL;
-+	if (opinfo) {
-+		if (!atomic_inc_not_zero(&opinfo->refcount))
-+			opinfo = NULL;
-+		else {
-+			atomic_inc(&opinfo->conn->r_count);
-+			if (ksmbd_conn_releasing(opinfo->conn)) {
-+				atomic_dec(&opinfo->conn->r_count);
-+				atomic_dec(&opinfo->refcount);
-+				opinfo = NULL;
-+			}
-+		}
-+	}
-+
- 	rcu_read_unlock();
- 
- 	return opinfo;
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index a1939ff7c742..7a81541de602 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -4369,21 +4369,6 @@ static int get_file_basic_info(struct smb2_query_info_rsp *rsp,
+ 	return 0;
  }
  
-+static void opinfo_conn_put(struct oplock_info *opinfo)
-+{
-+	struct ksmbd_conn *conn;
-+
-+	if (!opinfo)
-+		return;
-+
-+	conn = opinfo->conn;
-+	/*
-+	 * Checking waitqueue to dropping pending requests on
-+	 * disconnection. waitqueue_active is safe because it
-+	 * uses atomic operation for condition.
-+	 */
-+	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
-+		wake_up(&conn->r_count_q);
-+	opinfo_put(opinfo);
-+}
-+
- void opinfo_put(struct oplock_info *opinfo)
+-static unsigned long long get_allocation_size(struct inode *inode,
+-					      struct kstat *stat)
+-{
+-	unsigned long long alloc_size = 0;
+-
+-	if (!S_ISDIR(stat->mode)) {
+-		if ((inode->i_blocks << 9) <= stat->size)
+-			alloc_size = stat->size;
+-		else
+-			alloc_size = inode->i_blocks << 9;
+-	}
+-
+-	return alloc_size;
+-}
+-
+ static void get_file_standard_info(struct smb2_query_info_rsp *rsp,
+ 				   struct ksmbd_file *fp, void *rsp_org)
  {
- 	if (!atomic_dec_and_test(&opinfo->refcount))
-@@ -666,13 +695,6 @@ static void __smb2_oplock_break_noti(struct work_struct *wk)
+@@ -4398,7 +4383,7 @@ static void get_file_standard_info(struct smb2_query_info_rsp *rsp,
+ 	sinfo = (struct smb2_file_standard_info *)rsp->Buffer;
+ 	delete_pending = ksmbd_inode_pending_delete(fp);
  
- out:
- 	ksmbd_free_work_struct(work);
--	/*
--	 * Checking waitqueue to dropping pending requests on
--	 * disconnection. waitqueue_active is safe because it
--	 * uses atomic operation for condition.
--	 */
--	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
--		wake_up(&conn->r_count_q);
- }
- 
- /**
-@@ -706,7 +728,6 @@ static int smb2_oplock_break_noti(struct oplock_info *opinfo)
- 	work->conn = conn;
- 	work->sess = opinfo->sess;
- 
--	atomic_inc(&conn->r_count);
- 	if (opinfo->op_state == OPLOCK_ACK_WAIT) {
- 		INIT_WORK(&work->work, __smb2_oplock_break_noti);
- 		ksmbd_queue_work(work);
-@@ -776,13 +797,6 @@ static void __smb2_lease_break_noti(struct work_struct *wk)
- 
- out:
- 	ksmbd_free_work_struct(work);
--	/*
--	 * Checking waitqueue to dropping pending requests on
--	 * disconnection. waitqueue_active is safe because it
--	 * uses atomic operation for condition.
--	 */
--	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
--		wake_up(&conn->r_count_q);
- }
- 
- /**
-@@ -822,7 +836,6 @@ static int smb2_lease_break_noti(struct oplock_info *opinfo)
- 	work->conn = conn;
- 	work->sess = opinfo->sess;
- 
--	atomic_inc(&conn->r_count);
- 	if (opinfo->op_state == OPLOCK_ACK_WAIT) {
- 		list_for_each_safe(tmp, t, &opinfo->interim_list) {
- 			struct ksmbd_work *in_work;
-@@ -1144,8 +1157,10 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
- 	}
- 	prev_opinfo = opinfo_get_list(ci);
- 	if (!prev_opinfo ||
--	    (prev_opinfo->level == SMB2_OPLOCK_LEVEL_NONE && lctx))
-+	    (prev_opinfo->level == SMB2_OPLOCK_LEVEL_NONE && lctx)) {
-+		opinfo_conn_put(prev_opinfo);
- 		goto set_lev;
-+	}
- 	prev_op_has_lease = prev_opinfo->is_lease;
- 	if (prev_op_has_lease)
- 		prev_op_state = prev_opinfo->o_lease->state;
-@@ -1153,19 +1168,19 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
- 	if (share_ret < 0 &&
- 	    prev_opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
- 		err = share_ret;
--		opinfo_put(prev_opinfo);
-+		opinfo_conn_put(prev_opinfo);
- 		goto err_out;
- 	}
- 
- 	if (prev_opinfo->level != SMB2_OPLOCK_LEVEL_BATCH &&
- 	    prev_opinfo->level != SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
--		opinfo_put(prev_opinfo);
-+		opinfo_conn_put(prev_opinfo);
- 		goto op_break_not_needed;
- 	}
- 
- 	list_add(&work->interim_entry, &prev_opinfo->interim_list);
- 	err = oplock_break(prev_opinfo, SMB2_OPLOCK_LEVEL_II);
--	opinfo_put(prev_opinfo);
-+	opinfo_conn_put(prev_opinfo);
- 	if (err == -ENOENT)
- 		goto set_lev;
- 	/* Check all oplock was freed by close */
-@@ -1228,14 +1243,14 @@ static void smb_break_all_write_oplock(struct ksmbd_work *work,
- 		return;
- 	if (brk_opinfo->level != SMB2_OPLOCK_LEVEL_BATCH &&
- 	    brk_opinfo->level != SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
--		opinfo_put(brk_opinfo);
-+		opinfo_conn_put(brk_opinfo);
- 		return;
- 	}
- 
- 	brk_opinfo->open_trunc = is_trunc;
- 	list_add(&work->interim_entry, &brk_opinfo->interim_list);
- 	oplock_break(brk_opinfo, SMB2_OPLOCK_LEVEL_II);
--	opinfo_put(brk_opinfo);
-+	opinfo_conn_put(brk_opinfo);
- }
- 
- /**
-@@ -1263,6 +1278,13 @@ void smb_break_all_levII_oplock(struct ksmbd_work *work, struct ksmbd_file *fp,
- 	list_for_each_entry_rcu(brk_op, &ci->m_op_list, op_entry) {
- 		if (!atomic_inc_not_zero(&brk_op->refcount))
- 			continue;
-+
-+		atomic_inc(&brk_op->conn->r_count);
-+		if (ksmbd_conn_releasing(brk_op->conn)) {
-+			atomic_dec(&brk_op->conn->r_count);
-+			continue;
-+		}
-+
- 		rcu_read_unlock();
- 		if (brk_op->is_lease && (brk_op->o_lease->state &
- 		    (~(SMB2_LEASE_READ_CACHING_LE |
-@@ -1292,7 +1314,7 @@ void smb_break_all_levII_oplock(struct ksmbd_work *work, struct ksmbd_file *fp,
- 		brk_op->open_trunc = is_trunc;
- 		oplock_break(brk_op, SMB2_OPLOCK_LEVEL_NONE);
- next:
--		opinfo_put(brk_op);
-+		opinfo_conn_put(brk_op);
- 		rcu_read_lock();
- 	}
- 	rcu_read_unlock();
+-	sinfo->AllocationSize = cpu_to_le64(get_allocation_size(inode, &stat));
++	sinfo->AllocationSize = cpu_to_le64(inode->i_blocks << 9);
+ 	sinfo->EndOfFile = S_ISDIR(stat.mode) ? 0 : cpu_to_le64(stat.size);
+ 	sinfo->NumberOfLinks = cpu_to_le32(get_nlink(&stat) - delete_pending);
+ 	sinfo->DeletePending = delete_pending;
+@@ -4463,7 +4448,7 @@ static int get_file_all_info(struct ksmbd_work *work,
+ 	file_info->Attributes = fp->f_ci->m_fattr;
+ 	file_info->Pad1 = 0;
+ 	file_info->AllocationSize =
+-		cpu_to_le64(get_allocation_size(inode, &stat));
++		cpu_to_le64(inode->i_blocks << 9);
+ 	file_info->EndOfFile = S_ISDIR(stat.mode) ? 0 : cpu_to_le64(stat.size);
+ 	file_info->NumberOfLinks =
+ 			cpu_to_le32(get_nlink(&stat) - delete_pending);
+@@ -4652,7 +4637,7 @@ static int get_file_network_open_info(struct smb2_query_info_rsp *rsp,
+ 	file_info->ChangeTime = cpu_to_le64(time);
+ 	file_info->Attributes = fp->f_ci->m_fattr;
+ 	file_info->AllocationSize =
+-		cpu_to_le64(get_allocation_size(inode, &stat));
++		cpu_to_le64(inode->i_blocks << 9);
+ 	file_info->EndOfFile = S_ISDIR(stat.mode) ? 0 : cpu_to_le64(stat.size);
+ 	file_info->Reserved = cpu_to_le32(0);
+ 	rsp->OutputBufferLength =
 -- 
 2.25.1
 
