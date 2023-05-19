@@ -2,75 +2,144 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DCCC77B7F
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 May 2023 05:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC5C5C77B7A
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 May 2023 07:45:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230073AbjESFRD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 May 2023 01:17:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57600 "EHLO
+        id S231409AbjESHpZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 May 2023 03:45:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjESFRC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 May 2023 01:17:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC08E42
-        for <linux-cifs@vger.kernel.org>; Thu, 18 May 2023 22:17:01 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S231462AbjESHoz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 May 2023 03:44:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AAFF19A
+        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 00:42:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684482146;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KIPsbdoO43iq3tUvemirM6xG5g+su+9PgNJxpKHBcQ0=;
+        b=OeTLBJKu3ar0s3l5yedTUrqph075KAF3fdeIFuONOB0aGZMrele8yzDKc54ij+g03m07J2
+        UEXxWynpWQxs199z40PL4VoA1pOoRkEyNe/QT7zMQPOH2WZHjzoQ5GPX0ET1tQ57UwSeDh
+        8EgnhycgkQ+einsDvz6su9igEClyq44=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-581-aSvtV5ZQOk2ZrLbIVY_T4A-1; Fri, 19 May 2023 03:42:23 -0400
+X-MC-Unique: aSvtV5ZQOk2ZrLbIVY_T4A-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 68E3B6540B
-        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 05:17:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD58BC4339C
-        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 05:17:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684473420;
-        bh=n06pXcC4gPgjY8r7z7dQb3VHliVuWEiPBYSInyI3ymI=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=tSCTZ4KJOXrGROyX4DGIszyFfgu3JKNOyIlwXwnCpxz8aHMtIIoCxZIpXnvhDgUDT
-         wixLZRZoTS013AS7V7X9w6Gvy0tCCyfEkUMKZiZcRNLzxaSRTGR/QHPDsvn+vhTYlk
-         RH0iG2/fZhSaNQzR/17eyP2XWOvy76BiEa1hAy4HUAK0ex61g1+9ZEbHfnN4GxROoe
-         XVsFQHqwuA6fNCA35yrb/0bTHxLqu6Yz3Sq8o6W+vDdu5VQZOaUsdvUNSSuzSNp0zv
-         qWlnNsNNqYF4qnhp7brf1adi0+DqHGE8yL6dmnfrUh4Kp2vigztxxz+XoPx4uU2vu/
-         Ixq0Rl8S1Ixew==
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-54fdc9b8351so1737950eaf.0
-        for <linux-cifs@vger.kernel.org>; Thu, 18 May 2023 22:17:00 -0700 (PDT)
-X-Gm-Message-State: AC+VfDwnRitqje2nbLb5/uvYpjEn31bx2DqnGLooKEh4rPzpPxbxmZMA
-        FDBI9yKuqpH/YwF7fIMJhdyIfS5QZ5Yi8gTRLeA=
-X-Google-Smtp-Source: ACHHUZ6bYlRvGLX07fjDytbpjkJ8excDm6GQEgaWDG5xG0LXlphtYZ+dZCO/10JotiLg91zmN/XCzWFiBunK6KXdY5g=
-X-Received: by 2002:a4a:654a:0:b0:54f:5d2e:ad8f with SMTP id
- z10-20020a4a654a000000b0054f5d2ead8fmr234311oog.7.1684473419831; Thu, 18 May
- 2023 22:16:59 -0700 (PDT)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80C8380013A;
+        Fri, 19 May 2023 07:42:22 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CE32492B0A;
+        Fri, 19 May 2023 07:42:20 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        Steve French <smfrench@gmail.com>,
+        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
+Subject: [PATCH v20 24/32] splice: Do splice read from a file without using ITER_PIPE
+Date:   Fri, 19 May 2023 08:40:39 +0100
+Message-Id: <20230519074047.1739879-25-dhowells@redhat.com>
+In-Reply-To: <20230519074047.1739879-1-dhowells@redhat.com>
+References: <20230519074047.1739879-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:ac9:6415:0:b0:4da:311c:525d with HTTP; Thu, 18 May 2023
- 22:16:59 -0700 (PDT)
-In-Reply-To: <CAF3ZFec8fGUmKun1hPG9yBj0A5iRA5HJKMfjS6oqgQi1+CrDTw@mail.gmail.com>
-References: <20230518144208.2099772-1-h3xrabbit@gmail.com> <CAKYAXd9gBFPORqQ17mELGyygyOPxY4awsGxvOLYj7O3ckUHjrw@mail.gmail.com>
- <CAF3ZFec8fGUmKun1hPG9yBj0A5iRA5HJKMfjS6oqgQi1+CrDTw@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 19 May 2023 14:16:59 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_o2+SFz+a7c7MwYmsyH0LrVqWP4AePM2imMSBsqXOq6Q@mail.gmail.com>
-Message-ID: <CAKYAXd_o2+SFz+a7c7MwYmsyH0LrVqWP4AePM2imMSBsqXOq6Q@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix multiple out-of-bounds read during context decoding
-To:     Hex Rabbit <h3xrabbit@gmail.com>
-Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-05-19 13:34 GMT+09:00, Hex Rabbit <h3xrabbit@gmail.com>:
->>          if (ctxt_len <
->>              sizeof(struct smb2_neg_context) + MIN_PREAUTH_CTXT_DATA_LEN)
->>  You need to plus sizeof(struct smb2_neg_context) here.
->>  MIN_PREAUTH_CTXT_DATA_LEN  accounts for HashAlgorithmCount,
->>  SaltLength, and 1 HashAlgorithm.
->>
->>  >               return STATUS_INVALID_PARAMETER;
->
-> Sorry, should I resend the patch?
-No, I will directly update it.
+Make generic_file_splice_read() use filemap_splice_read() and
+direct_splice_read() rather than using an ITER_PIPE and call_read_iter().
 
-Thanks for your patch.
->
-> Thanks
->
+With this, ITER_PIPE is no longer used.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Steve French <smfrench@gmail.com>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: linux-mm@kvack.org
+cc: linux-block@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
+
+Notes:
+    ver #20)
+     - Use s_maxbytes from the backing store (in->f_mapping), not the front
+       inode (especially for a blockdev).
+    
+    ver #18)
+     - Split out the change to cifs to make it use generic_file_splice_read().
+     - Split out the unexport of filemap_splice_read() (still needed by cifs).
+
+ fs/splice.c | 31 +++++++------------------------
+ 1 file changed, 7 insertions(+), 24 deletions(-)
+
+diff --git a/fs/splice.c b/fs/splice.c
+index 7b818b5b18d4..56d9802729d0 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -417,34 +417,17 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
+ 				 struct pipe_inode_info *pipe, size_t len,
+ 				 unsigned int flags)
+ {
+-	struct iov_iter to;
+-	struct kiocb kiocb;
+-	int ret;
+-
++	if (unlikely(*ppos >= in->f_mapping->host->i_sb->s_maxbytes))
++		return 0;
++	if (unlikely(!len))
++		return 0;
+ #ifdef CONFIG_FS_DAX
+ 	if (IS_DAX(in->f_mapping->host))
+ 		return direct_splice_read(in, ppos, pipe, len, flags);
+ #endif
+-
+-	iov_iter_pipe(&to, ITER_DEST, pipe, len);
+-	init_sync_kiocb(&kiocb, in);
+-	kiocb.ki_pos = *ppos;
+-	ret = call_read_iter(in, &kiocb, &to);
+-	if (ret > 0) {
+-		*ppos = kiocb.ki_pos;
+-		file_accessed(in);
+-	} else if (ret < 0) {
+-		/* free what was emitted */
+-		pipe_discard_from(pipe, to.start_head);
+-		/*
+-		 * callers of ->splice_read() expect -EAGAIN on
+-		 * "can't put anything in there", rather than -EFAULT.
+-		 */
+-		if (ret == -EFAULT)
+-			ret = -EAGAIN;
+-	}
+-
+-	return ret;
++	if ((in->f_flags & O_DIRECT))
++		return direct_splice_read(in, ppos, pipe, len, flags);
++	return filemap_splice_read(in, ppos, pipe, len, flags);
+ }
+ EXPORT_SYMBOL(generic_file_splice_read);
+ 
+
