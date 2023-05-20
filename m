@@ -2,32 +2,32 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 825D0C77B7D
-	for <linux-cifs@archiver.kernel.org>; Sat, 20 May 2023 04:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AA12C77B7D
+	for <linux-cifs@archiver.kernel.org>; Sat, 20 May 2023 04:15:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230100AbjETEJn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 20 May 2023 00:09:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48938 "EHLO
+        id S231455AbjETEPN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 20 May 2023 00:15:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230175AbjETEJf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 May 2023 00:09:35 -0400
+        with ESMTP id S231164AbjETEPF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 May 2023 00:15:05 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63502E5D;
-        Fri, 19 May 2023 21:09:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4569FE45;
+        Fri, 19 May 2023 21:15:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=L7zd0FceZPEP0KMqUzOC4TwHCi
-        mtUWDIHm2GxvMT7QgIpF2DfCk8uzOqeLIyMsK4VqAlbk3cJ6tsPk3RnMwqTvoOip+mpmczSdgrdtu
-        Ka3IKJYFLq7MW7Ylj6pGt1vLF0jCtySxWmE00sxrt/C1Ayh49+qxRQ0ME3G4wSP1CazCJ6OrvO2lF
-        F1hRC3/NsOz10tYD357YYHV+wGEIDsqXBIT/Ztn3kw1hwry8BAAEiTnarNY0OcdKFoCRZM0mcygNI
-        neMQoIt+t2JGXSVRIC8XxX1kp0YIWkOMwZwv8+Ak1HMVinGCEwjw17/De8BSGLZpQT6ISGRXKxUta
-        mwtZATcQ==;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=e7vq8LS8itf139couz5qiNZhjb
+        PlFL53X5kDj6rLT1juxBt6D/91KO1XTgWIG1UHizMdvxs4xF/BJuiS7PLLQ9sgK8cDrbM1qxBBGtS
+        e0GiFlwSEynDcDnnmdCNAkKHYV1DB3XZK28610akSgQ5AzSpt/0XppOlcOEINpTxbcJcDyfaummge
+        2+YAmweetqOecxvJBhckYl36TZC7a4N2fgPdO1i/xqmlW7RPW5D/rx/y6mvaJVAMoDbpwIDc9Eqfm
+        vswPnBnsZhv2lfxr3vDFenIlEiUpeJg9PrKKYV598wj7UfQt+R84p76bOaGnHM3u+Uh55T0A3Zb1i
+        B/rNr6Xg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q0DuE-000czV-2B;
-        Sat, 20 May 2023 04:09:22 +0000
-Date:   Fri, 19 May 2023 21:09:22 -0700
+        id 1q0DzY-000dul-1q;
+        Sat, 20 May 2023 04:14:52 +0000
+Date:   Fri, 19 May 2023 21:14:52 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
@@ -43,16 +43,16 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v21 03/30] splice: Rename direct_splice_read() to
- copy_splice_read()
-Message-ID: <ZGhH8kyQyH7zy6Wg@infradead.org>
+        Steve French <smfrench@gmail.com>,
+        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH v21 29/30] splice: Remove generic_file_splice_read()
+Message-ID: <ZGhJPJE9TG3ojckn@infradead.org>
 References: <20230520000049.2226926-1-dhowells@redhat.com>
- <20230520000049.2226926-4-dhowells@redhat.com>
+ <20230520000049.2226926-30-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230520000049.2226926-4-dhowells@redhat.com>
+In-Reply-To: <20230520000049.2226926-30-dhowells@redhat.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
