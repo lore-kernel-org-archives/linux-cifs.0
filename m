@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD18C77B7F
-	for <linux-cifs@archiver.kernel.org>; Sat, 20 May 2023 00:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 647CDC77B7F
+	for <linux-cifs@archiver.kernel.org>; Sat, 20 May 2023 00:05:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232171AbjETAFC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 May 2023 20:05:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51394 "EHLO
+        id S232199AbjETAFJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 May 2023 20:05:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231913AbjETAEC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 May 2023 20:04:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DAB9E5F
-        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 17:02:28 -0700 (PDT)
+        with ESMTP id S231928AbjETAEE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 May 2023 20:04:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E9E1BDA
+        for <linux-cifs@vger.kernel.org>; Fri, 19 May 2023 17:02:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684540947;
+        s=mimecast20190719; t=1684540942;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rmUg21oqbgLRKa8Xmc9rYZI7yR2ltYVW2UHU8B7zCB0=;
-        b=cUImny7lzYiVC2HTPe25U2MbIqLkacpwMDuYakT/FPuLGjsq6Bl9zcJWClhLokqv94Gwib
-        jpovP+4ORLfZk5XC5xSJFUHcFk6aL60vsfoZo2JJMITPQhqTdTWDGgRZcP6jo1YX++CY5s
-        tjUUwKDjCew2Y0t1yf3r2iUCuVlOurE=
+        bh=KS9sZ9kcl+UmAh/rrU1AUBhdO0vlEMJjBaa07cCJK5s=;
+        b=NmMuwKy8AwgROcHUJNu8zef06gpNXha1Fuzxy1Map8gl5tKsAykg+dE+tjOPqlu0/3/027
+        pZ/oHMEgcfKEV0j1NUt1WvwgNcQ7Q2n+sEEiGeOaGjYmutuGpgvtzvGsf5ZfA+N/s/ZE2m
+        PDEuh2f4Cu9sqVcuMIZjul5QTzzVQpk=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-416-JpVDmfLpP9q6slSFpg2Hww-1; Fri, 19 May 2023 20:02:24 -0400
-X-MC-Unique: JpVDmfLpP9q6slSFpg2Hww-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-231-r_htSqC2OBidCEEBrjvtAw-1; Fri, 19 May 2023 20:02:18 -0400
+X-MC-Unique: r_htSqC2OBidCEEBrjvtAw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6209238035AA;
-        Sat, 20 May 2023 00:02:23 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4832938035AA;
+        Sat, 20 May 2023 00:02:17 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB668492B0A;
-        Sat, 20 May 2023 00:02:20 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C46A240CFD45;
+        Sat, 20 May 2023 00:02:14 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,27 +52,27 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
+        Paulo Alcantara <pc@manguebit.com>,
         Steve French <smfrench@gmail.com>,
         John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
-Subject: [PATCH v21 29/30] splice: Remove generic_file_splice_read()
-Date:   Sat, 20 May 2023 01:00:48 +0100
-Message-Id: <20230520000049.2226926-30-dhowells@redhat.com>
+Subject: [PATCH v21 27/30] cifs: Use filemap_splice_read()
+Date:   Sat, 20 May 2023 01:00:46 +0100
+Message-Id: <20230520000049.2226926-28-dhowells@redhat.com>
 In-Reply-To: <20230520000049.2226926-1-dhowells@redhat.com>
 References: <20230520000049.2226926-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Remove generic_file_splice_read() as it has been replaced with calls to
-filemap_splice_read() and copy_splice_read().
-
-With this, ITER_PIPE is no longer used.
+Make cifs use filemap_splice_read() rather than doing its own version of
+generic_file_splice_read().
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Steve French <smfrench@gmail.com>
 cc: Al Viro <viro@zeniv.linux.org.uk>
@@ -86,87 +86,95 @@ cc: linux-fsdevel@vger.kernel.org
 
 Notes:
     ver #21)
-     - Move zero-len check to vfs_splice_read().
-     - Move s_maxbytes check to filemap_splice_read().
-     - DIO (and DAX) are handled by vfs_splice_read().
+     - Switch to filemap_splice_read() rather than generic_file_splice_read().
     
     ver #20)
-     - Use s_maxbytes from the backing store (in->f_mapping), not the front
-       inode (especially for a blockdev).
+     - Don't remove the export of filemap_splice_read().
     
     ver #18)
-     - Split out the change to cifs to make it use generic_file_splice_read().
-     - Split out the unexport of filemap_splice_read() (still needed by cifs).
+     - Split out from change to generic_file_splice_read().
 
- fs/splice.c        | 43 -------------------------------------------
- include/linux/fs.h |  2 --
- 2 files changed, 45 deletions(-)
+ fs/cifs/cifsfs.c |  8 ++++----
+ fs/cifs/cifsfs.h |  3 ---
+ fs/cifs/file.c   | 16 ----------------
+ 3 files changed, 4 insertions(+), 23 deletions(-)
 
-diff --git a/fs/splice.c b/fs/splice.c
-index 8268248df3a9..9be4cb3b9879 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -386,49 +386,6 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
- }
- EXPORT_SYMBOL(copy_splice_read);
- 
--/**
-- * generic_file_splice_read - splice data from file to a pipe
-- * @in:		file to splice from
-- * @ppos:	position in @in
-- * @pipe:	pipe to splice to
-- * @len:	number of bytes to splice
-- * @flags:	splice modifier flags
-- *
-- * Description:
-- *    Will read pages from given file and fill them into a pipe. Can be
-- *    used as long as it has more or less sane ->read_iter().
-- *
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index fa2477bbcc86..4f4492eb975f 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1376,7 +1376,7 @@ const struct file_operations cifs_file_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+-	.splice_read = cifs_splice_read,
++	.splice_read = filemap_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1396,7 +1396,7 @@ const struct file_operations cifs_file_strict_ops = {
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+-	.splice_read = cifs_splice_read,
++	.splice_read = filemap_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1434,7 +1434,7 @@ const struct file_operations cifs_file_nobrl_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+-	.splice_read = cifs_splice_read,
++	.splice_read = filemap_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+@@ -1452,7 +1452,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+-	.splice_read = cifs_splice_read,
++	.splice_read = filemap_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.llseek = cifs_llseek,
+ 	.unlocked_ioctl	= cifs_ioctl,
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 74cd6fafb33e..d7274eefc666 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -100,9 +100,6 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
+-extern ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
+-				struct pipe_inode_info *pipe, size_t len,
+-				unsigned int flags);
+ extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
+ extern int cifs_lock(struct file *, int, struct file_lock *);
+ extern int cifs_fsync(struct file *, loff_t, loff_t, int);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 023496207c18..375a8037a3f3 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -5078,19 +5078,3 @@ const struct address_space_operations cifs_addr_ops_smallbuf = {
+ 	.launder_folio = cifs_launder_folio,
+ 	.migrate_folio = filemap_migrate_folio,
+ };
+-
+-/*
+- * Splice data from a file into a pipe.
 - */
--ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
--				 struct pipe_inode_info *pipe, size_t len,
--				 unsigned int flags)
+-ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
+-			 struct pipe_inode_info *pipe, size_t len,
+-			 unsigned int flags)
 -{
--	struct iov_iter to;
--	struct kiocb kiocb;
--	int ret;
--
--	iov_iter_pipe(&to, ITER_DEST, pipe, len);
--	init_sync_kiocb(&kiocb, in);
--	kiocb.ki_pos = *ppos;
--	ret = call_read_iter(in, &kiocb, &to);
--	if (ret > 0) {
--		*ppos = kiocb.ki_pos;
--		file_accessed(in);
--	} else if (ret < 0) {
--		/* free what was emitted */
--		pipe_discard_from(pipe, to.start_head);
--		/*
--		 * callers of ->splice_read() expect -EAGAIN on
--		 * "can't put anything in there", rather than -EFAULT.
--		 */
--		if (ret == -EFAULT)
--			ret = -EAGAIN;
--	}
--
--	return ret;
+-	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
+-		return 0;
+-	if (unlikely(!len))
+-		return 0;
+-	if (in->f_flags & O_DIRECT)
+-		return copy_splice_read(in, ppos, pipe, len, flags);
+-	return filemap_splice_read(in, ppos, pipe, len, flags);
 -}
--EXPORT_SYMBOL(generic_file_splice_read);
--
- const struct pipe_buf_operations default_pipe_buf_ops = {
- 	.release	= generic_pipe_buf_release,
- 	.try_steal	= generic_pipe_buf_try_steal,
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index e3c22efa413e..08ba2ae1d3ce 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2755,8 +2755,6 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
- ssize_t copy_splice_read(struct file *in, loff_t *ppos,
- 			 struct pipe_inode_info *pipe,
- 			 size_t len, unsigned int flags);
--extern ssize_t generic_file_splice_read(struct file *, loff_t *,
--		struct pipe_inode_info *, size_t, unsigned int);
- extern ssize_t iter_file_splice_write(struct pipe_inode_info *,
- 		struct file *, loff_t *, size_t, unsigned int);
- extern ssize_t generic_splice_sendpage(struct pipe_inode_info *pipe,
 
