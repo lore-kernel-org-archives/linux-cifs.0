@@ -2,55 +2,56 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10AD1C7EE23
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 May 2023 04:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D0DC77B7C
+	for <linux-cifs@archiver.kernel.org>; Sun, 21 May 2023 05:14:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229769AbjEUEwx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 21 May 2023 00:52:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32900 "EHLO
+        id S229647AbjEUFOv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 21 May 2023 01:14:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjEUEwv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 May 2023 00:52:51 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84CAB10D;
-        Sat, 20 May 2023 21:52:50 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2af1ae3a21fso37695201fa.0;
-        Sat, 20 May 2023 21:52:50 -0700 (PDT)
+        with ESMTP id S229481AbjEUFOu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 May 2023 01:14:50 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49999119;
+        Sat, 20 May 2023 22:14:48 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4f00c33c3d6so5604370e87.2;
+        Sat, 20 May 2023 22:14:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684644768; x=1687236768;
+        d=gmail.com; s=20221208; t=1684646086; x=1687238086;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=9ssxyagVOAxt3HHQzIYOHijwAfZDoWnOE3z1Qpaea4c=;
-        b=ariHR1YGrH5mOH+TZqaDROY/z1vODsvPVOY1mCkD/COYTEGrZCkC8BLDrRodoPCuAj
-         C1hojbSeVXwYe/ib3pQL1wKlBcbNOFc31gapPl8Adnonh6tNwYZrm0Os6nNA3JTumull
-         +SSBmiWqb2xiKkwPRc0nfcjIUSHNCpqtlqVb1GdQhj+z2bXCQHfMZL1Pa0F6/7OsmkBJ
-         IGDFAltH+PgaVA0QgDu1nRmAPVeYU24nRTn04Mfyn91I9nzxbFyfbiEjJlERlwOnu+Tx
-         1Xs+bv6LXQPHuTZJHjkYYwaWKsA0NoryCwVTwvdc1ohVc6+HZFBaJu+hUrN/ajVa8bef
-         yzTA==
+        bh=OSn+AKVBiBTX7km27zSr9ngaOs21L/I4AitRB9KUSH0=;
+        b=N/5x0r/PG2QCg7J1igVQ8z7KErgWMLqVm4/KwAVm2IFInTmU8A0YsQ7D9n8LFruhWi
+         q9lcrIM/CRB0GJTvFpLwckDGsdBQlY5b1cSRPP6M+gp8Y2PVEWmFXDwrJcycDke/4Xlo
+         iobafj5fC+BYar0ZwvuP19a/0EgQR9Xr0Sl+96D91ZMpPHvTkCKAgfvrPRQp4aJVuKwl
+         e+YCM1Qiq5KxqcoMx0+4uWsZSj6TJ+LZUTdfIqbT+NOdPFM3gK/6/GYuDpZAHHV9Z+NS
+         f+viBwPRWBivGc6zc6tH9VklDCFkfUrW36z2a0Yquhz1yNxInMYbeFx/Vph3mK38iLC2
+         QLdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684644768; x=1687236768;
+        d=1e100.net; s=20221208; t=1684646086; x=1687238086;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=9ssxyagVOAxt3HHQzIYOHijwAfZDoWnOE3z1Qpaea4c=;
-        b=KG14pC0auYxp4fi5pZNV4PO45mSwlD19cRAUtt3fRwImQn94MF9WLMoEooJiy9SILT
-         3TFh9lQtliyQIqP0t9VesIIFydvmD3e0Dh70rfFIMylmzeu1uOgM8hh+RDIIG5qpYb74
-         Xvz49Gfo1QWgl0xeg1boBYaKPLT90q7z6qofdMz6rAv5MK6F1IPCp7FLIvchUGdnWANt
-         XRd5iWbhXO55nbgSm7CEe51ip970v5o+lIKseY5fT89tiyAE0URpxFL8zfXv8lctT02c
-         sLgxOmNeUzbEA+4VuhEUO04CkeotmGZgFzCOBRvl0ZUUa5ZV7jXUMU/QsNNdwBmjMKfb
-         /tEw==
-X-Gm-Message-State: AC+VfDxIjGp4+Zw+ypMJo9fYSMUhqyv7JaBvMjYIRQ1wcAt25ZWTfwrY
-        mV2AhdrrHruJLfjnbzxhbBnFnq8P1Uud7+tS0agucUCae8U0FILu
-X-Google-Smtp-Source: ACHHUZ6n1svPwI6NcRhyCYGSqjhVAf9LGu/L62JJ6qJpa/Jo+cRDuYCXVBKiTGoQt4npa09OSoWMSCS7BCiMFJ+/HhE=
-X-Received: by 2002:a2e:3213:0:b0:2af:1eee:84af with SMTP id
- y19-20020a2e3213000000b002af1eee84afmr2733099ljy.26.1684644768154; Sat, 20
- May 2023 21:52:48 -0700 (PDT)
+        bh=OSn+AKVBiBTX7km27zSr9ngaOs21L/I4AitRB9KUSH0=;
+        b=ZMPKCGqjN7GI1Z+d0e/2HNB0J0SHG0cjMZ7YeK7yaVYfLvSl7Anc1zygT9wZ+iZ1Tl
+         7zosBdmfFkceL4uEbTCapl5aZzL8zy2ZhPCzDLxh5jIap0UeatKQusrp6XsgQw3ofJYk
+         psMGcWXoo/OzQbFPiSvPpziD15yMrkX9h/n6nsUZBbuk96JKmg6prWXULxN+EkJ5x3WM
+         P6rIobtSGQr159+SxvjN5QsvYtKaO8iqx8eTww5uLSEb/YsyaYRE/bbUgM+4g58i8tjg
+         x23o6kxrf15n9gJypprOR0fPIbXEiqLdGHFGn2lvVpsDovmhwBuyqL1zgZfz+SCwwS+Z
+         vm+Q==
+X-Gm-Message-State: AC+VfDzTM/PfQJ2qABBMq1hOCB3acpRKXxE/rVXa09riDHvroZMrMNW9
+        XXCL+SuZT/H0y5V2FXbMdaDPstDpystx816G0GhXzBmj0hPqqwPd
+X-Google-Smtp-Source: ACHHUZ4sJ79vDrleTqO4EWZcRom17FT2a5dk9TyR5e7yqK4ioMYJDSeLaRFnyW0AIMGo3VRII7z2R6JqLmBb54Xwhek=
+X-Received: by 2002:ac2:41cc:0:b0:4f0:2233:9b9 with SMTP id
+ d12-20020ac241cc000000b004f0223309b9mr2281482lfi.62.1684646086257; Sat, 20
+ May 2023 22:14:46 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 20 May 2023 23:52:37 -0500
-Message-ID: <CAH2r5msKAPYH17pZOiZ8Mv2FV96HpAQ5P0+KVXv+uG=uvb0tZw@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
+Date:   Sun, 21 May 2023 00:14:35 -0500
+Message-ID: <CAH2r5msxkE5cPJ-nQCAibJ+x+hO7uSLpasGm81i6DknQ8M5zWg@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
 To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -64,32 +65,35 @@ f1fcbaa18b28dec10281551dfe6ed3a3ed80e3d6:
 
 are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc2-smb3-client-fixes
+  git://git.samba.org/ksmbd.git tags/6.4-rc2-ksmbd-server-fixes
 
-for you to fetch changes up to 59a556aebc43dded08535fe97d94ca3f657915e4:
+for you to fetch changes up to e7b8b8ed9960bf699bf4029f482d9e869c094ed6:
 
-  SMB3: drop reference to cfile before sending oplock break
-(2023-05-17 12:04:41 -0500)
-
-----------------------------------------------------------------
-2 smb3 client fixes, both related to deferred close (also for stable)
-
-- send close for deferred handles before not after lease break
-response to avoid possible sharing violations
-- check all opens on an inode (looking for deferred handles) when
-lease break is returned not just the handle the lease break came in
-on.
+  ksmbd: smb2: Allow messages padded to 8byte boundary (2023-05-16
+10:26:14 -0500)
 
 ----------------------------------------------------------------
-Bharath SM (2):
-      SMB3: Close all deferred handles of inode in case of handle lease break
-      SMB3: drop reference to cfile before sending oplock break
+Four ksmbd server fixes:
+- two fixes for incorrect SMB3 message validation (one for client
+which uses 8 byte padding, and one for empty bcc)
+- two fixes for out of bounds bugs: one for username offset checks (in
+session setup) and the other for create context name length checks (in
+open requests)
+----------------------------------------------------------------
+Chih-Yen Chang (3):
+      ksmbd: fix global-out-of-bounds in smb2_find_context_vals
+      ksmbd: fix wrong UserName check in session_user
+      ksmbd: allocate one more byte for implied bcc[0]
 
- fs/cifs/cifsglob.h |  4 ++--
- fs/cifs/file.c     | 26 +++++++++++++-------------
- fs/cifs/smb1ops.c  |  9 ++++-----
- fs/cifs/smb2ops.c  |  7 +++----
- 4 files changed, 22 insertions(+), 24 deletions(-)
+Gustav Johansson (1):
+      ksmbd: smb2: Allow messages padded to 8byte boundary
+
+ fs/ksmbd/connection.c |  3 ++-
+ fs/ksmbd/oplock.c     |  5 +++--
+ fs/ksmbd/oplock.h     |  2 +-
+ fs/ksmbd/smb2misc.c   |  5 ++++-
+ fs/ksmbd/smb2pdu.c    | 19 +++++++++----------
+ 5 files changed, 19 insertions(+), 15 deletions(-)
 
 -- 
 Thanks,
