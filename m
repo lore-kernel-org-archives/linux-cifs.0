@@ -2,108 +2,68 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67353C7EE23
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 May 2023 18:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 953BDC77B7C
+	for <linux-cifs@archiver.kernel.org>; Sun, 21 May 2023 18:28:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231189AbjEUSJD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 21 May 2023 14:09:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47576 "EHLO
+        id S231797AbjEUS2y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 21 May 2023 14:28:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231786AbjEUSGj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 May 2023 14:06:39 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8585102
-        for <linux-cifs@vger.kernel.org>; Sun, 21 May 2023 11:06:37 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-96fab30d1e1so230632466b.0
-        for <linux-cifs@vger.kernel.org>; Sun, 21 May 2023 11:06:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1684692396; x=1687284396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GMadGmvjqp8xzF2NAhfvAfuBYa9KMMmlXCO3kEDZwAM=;
-        b=gn/sLYZphidGrvrDMOxCRbNY8HB6uvZE1TDJyvj5zI1D4eu0GDCGAL1Ax7ihd1UxZV
-         BfFKctjP5JYxO2a80fJoAhXhijFT+xt92v1Nna7mMBwlRGO0CwZh+tFyiUQOL6RfIxPS
-         uRXgQ94R/JckRuiW0G27YJj1L48k+tXNmv4AI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684692396; x=1687284396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GMadGmvjqp8xzF2NAhfvAfuBYa9KMMmlXCO3kEDZwAM=;
-        b=HTzDncEtuLcWVxPqnJO4vBUI/Erjdrqcj7PYfGYTbGwGnW3SW/479FfxBYhCULJCiu
-         m8yU+Wkk6H7SRl8Uf1i7gYBwM4eIRfbeCQ+5HIFlqjFog8tH3Mu7Du7fvOo6IxFTZc2S
-         pajNJCC3M3Lnp3NUT7z7GQSaX+QprCP0rcSOFu95W92WeVwDmD+DHTOcQnPCjlGt+XBa
-         F4TohbE1tpJXCPKlSw6K/g+VI7oAQ22TOXzqbatLawFI8NU/f7EMvOZtYzdUZQA75N3v
-         KhFaZAGoxD3WGlCowJRowfelVFbRshklBmSv79eDmEcII0KNI0mJcqyRHM5eF+Z36Jrl
-         1dLw==
-X-Gm-Message-State: AC+VfDwElZm9CieqwoOWmXNCnfjWZ3CtEkerEeet8IZz6AYRVUVDw4Ej
-        L6oZTwBT1u33uC2FIw/EvXAaaDb6bsrbxJbg70UC9Q==
-X-Google-Smtp-Source: ACHHUZ6mIgR9jEjJCIHXVySuyDCwQMkoXM1Bkz/yx09C+PyhAUoDiOgdDb8g2GGaMQyUjtmyrMJxJg==
-X-Received: by 2002:a17:907:6d8f:b0:96f:7d0a:5981 with SMTP id sb15-20020a1709076d8f00b0096f7d0a5981mr5723758ejc.36.1684692396078;
-        Sun, 21 May 2023 11:06:36 -0700 (PDT)
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
-        by smtp.gmail.com with ESMTPSA id f25-20020a170906825900b0096f6647b5e8sm2177668ejx.64.2023.05.21.11.06.35
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 May 2023 11:06:35 -0700 (PDT)
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-510bcd2d6b8so5527935a12.0
-        for <linux-cifs@vger.kernel.org>; Sun, 21 May 2023 11:06:35 -0700 (PDT)
-X-Received: by 2002:a05:6402:3593:b0:513:62de:768a with SMTP id
- y19-20020a056402359300b0051362de768amr2856862edc.19.1684692394687; Sun, 21
- May 2023 11:06:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAH2r5msxkE5cPJ-nQCAibJ+x+hO7uSLpasGm81i6DknQ8M5zWg@mail.gmail.com>
-In-Reply-To: <CAH2r5msxkE5cPJ-nQCAibJ+x+hO7uSLpasGm81i6DknQ8M5zWg@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun, 21 May 2023 11:06:18 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiStOAKntvgzZ79aA=Xc0Zz7byoBxBW_As5cmn5cgkuoQ@mail.gmail.com>
-Message-ID: <CAHk-=wiStOAKntvgzZ79aA=Xc0Zz7byoBxBW_As5cmn5cgkuoQ@mail.gmail.com>
-Subject: Re: [GIT PULL] ksmbd server fixes
+        with ESMTP id S231774AbjEUSQ0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 May 2023 14:16:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4037312B;
+        Sun, 21 May 2023 11:09:39 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C9FDB60EE2;
+        Sun, 21 May 2023 18:09:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3615BC433EF;
+        Sun, 21 May 2023 18:09:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684692578;
+        bh=j0rvlUHfUVrFxS8a6kSVC8ETDNMwBXvUQlXQOjGM0Kg=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=IhQ4IS7ifxfmGYRQNoyjLUT1B72iQ7i/K4bLTPEm2ZwUilB19Ath8MFmzmXe8IRyk
+         AJ7rGE6d8Iaq0/YLB1esqqr3t+ARacyFX6vELOCGzA4bvVpLUUV37+7IZFSfT3/9ce
+         +8AX7BJr6Zt1IFDW6xhoBoG+d6Z8bbiVKV00T0g2FA57nVGdVHVv8NkLLloYsqP8sw
+         5d+GtPydsP6yEdRZs0ZgC2V6otryL5LxRQRoM0lvoA3ECzB/IXjfFziVP6c5BqN3rf
+         VabZxW0Ri8XEp0brDH7uNireTF3MqC8P10qpXHfIoMu+45XmcjMkbDfAwPhtKDUdwM
+         Ra1kNSqDBsXYg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21475C3959E;
+        Sun, 21 May 2023 18:09:38 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5msKAPYH17pZOiZ8Mv2FV96HpAQ5P0+KVXv+uG=uvb0tZw@mail.gmail.com>
+References: <CAH2r5msKAPYH17pZOiZ8Mv2FV96HpAQ5P0+KVXv+uG=uvb0tZw@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5msKAPYH17pZOiZ8Mv2FV96HpAQ5P0+KVXv+uG=uvb0tZw@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc2-smb3-client-fixes
+X-PR-Tracked-Commit-Id: 59a556aebc43dded08535fe97d94ca3f657915e4
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0c9dcf128ef99c257dcde5dbb8683605009906bf
+Message-Id: <168469257812.2919.7517356976985544350.pr-tracker-bot@kernel.org>
+Date:   Sun, 21 May 2023 18:09:38 +0000
 To:     Steve French <smfrench@gmail.com>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         LKML <linux-kernel@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, May 20, 2023 at 10:14=E2=80=AFPM Steve French <smfrench@gmail.com> =
-wrote:
->
-> Four ksmbd server fixes:
+The pull request you sent on Sat, 20 May 2023 23:52:37 -0500:
 
-This reply is not really directly related to this pull (which I just
-did), but more of a reaction to getting the cifs and ksmbd pulls next
-to each other again.
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc2-smb3-client-fixes
 
-We talked about directory layout issues some time ago, and there's
-kind of beginnings of it, but it never happened, and the parts that
-*did* happen I'm not super-happy about. That "fs/smbfs_common/"
-subdirectory is just fairly ugly.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0c9dcf128ef99c257dcde5dbb8683605009906bf
 
-Would you mind horribly to just bite the bullet, and rename things,
-and put it all under "smbfs". Something like
+Thank you!
 
-    mkdir fs/smbfs
-    git mv fs/cifs fs/smbfs/client
-    git mv fs/ksmbd fs/smbfs/server
-    git mv fs/smbfs_common fs/smbfs/common
-
-plus the required Makefile editing to just make it all build right?
-
-And if you prefer just "fs/smb" over "fs/smbfs", that sounds fine to
-me too, but I guess this all really does just the filesystem part
-(rather than all the printing and whatever other stuff that smb also
-contains).
-
-I dunno. I just feel like the current organization and naming is this
-odd half-way state, and we could just fairly easily do the above.
-
-I could do it myself, of course, and git will sort out any rename
-issues. But me doing it seems silly when you maintain all three
-pieces.
-
-                 Linus
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
