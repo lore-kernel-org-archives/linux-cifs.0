@@ -2,149 +2,94 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1040DC77B75
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 May 2023 13:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0E9C7EE23
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 May 2023 14:41:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234425AbjEVN4z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 May 2023 09:56:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59044 "EHLO
+        id S233883AbjEVOl0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 May 2023 10:41:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234208AbjEVN42 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 May 2023 09:56:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E371BE9
-        for <linux-cifs@vger.kernel.org>; Mon, 22 May 2023 06:52:57 -0700 (PDT)
+        with ESMTP id S232891AbjEVOlZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 May 2023 10:41:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D0A39E
+        for <linux-cifs@vger.kernel.org>; Mon, 22 May 2023 07:40:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763549;
+        s=mimecast20190719; t=1684766438;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1dW3gfal+wiqS1BsUQ7v1POUMzsncK8bE2BxQUdT+Fw=;
-        b=MSIc70WlbW4QTA7Y/PU+fF7cHraUiYIAEhUKMDssJ8HHiyGZrSVbRA9rjZGRGlM+8gDjmt
-        /+dhtyCMtQjisicd5Q1D54i6gpYZSG3M2rnk8ccQB2DRLv/Nk1n3MoyW97FipeG0rjjz+v
-        EppuDeC+PdYi3ogVGwZELaJYIdg5r/I=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AFW+IZL67Cz0xRBwmMsauHMgB+wZd79K6KlpZee9jmw=;
+        b=ZCPgzD33rW6/tdJmb2DzlTNCnt23sQWtPZcw4Jj/cVPcWcJ6SLoQYGCNsOO8ocIpWVwhu/
+        02BxsSAXpA2RK8S1AdgKP6p/5owUVhbUsaI8/zvRlWI5dvLxbjnkBgnA+EDSF8u35q9Xmg
+        TiCQdRTJKZv+o2yXL4hiO5sdVXSWH0g=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-401-O78IS1gQNUW2bLyo8CEsOA-1; Mon, 22 May 2023 09:52:26 -0400
-X-MC-Unique: O78IS1gQNUW2bLyo8CEsOA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-564-Ig3pnr3WNRKXjMESuYRgaA-1; Mon, 22 May 2023 10:40:33 -0400
+X-MC-Unique: Ig3pnr3WNRKXjMESuYRgaA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 213773C025AD;
-        Mon, 22 May 2023 13:52:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B189D38025F5;
+        Mon, 22 May 2023 14:40:32 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6AEE4140E95D;
-        Mon, 22 May 2023 13:52:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4895C40CFD45;
+        Mon, 22 May 2023 14:40:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org
-Subject: [PATCH v22 31/31] splice: kdoc for filemap_splice_read() and copy_splice_read()
-Date:   Mon, 22 May 2023 14:50:18 +0100
-Message-Id: <20230522135018.2742245-32-dhowells@redhat.com>
-In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
-References: <20230522135018.2742245-1-dhowells@redhat.com>
+To:     Shyam Prasad N <sprasad@microsoft.com>
+cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Tom Talpey <tom@talpey.com>, Jeff Layton <jlayton@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix cifs_limit_bvec_subset() to correctly check the maxmimum size
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2811950.1684766430.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 22 May 2023 15:40:30 +0100
+Message-ID: <2811951.1684766430@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Provide kerneldoc comments for filemap_splice_read() and
-copy_splice_read().
+Fix cifs_limit_bvec_subset() so that it limits the span to the maximum
+specified and won't return with a size greater than max_size.
 
+Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rather=
+ than a page list")
+Reported-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Jens Axboe <axboe@kernel.dk>
 cc: Steve French <smfrench@gmail.com>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: linux-mm@kvack.org
-cc: linux-block@vger.kernel.org
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: Tom Talpey <tom@talpey.com>
+cc: Jeff Layton <jlayton@kernel.org>
 cc: linux-cifs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/splice.c  | 21 +++++++++++++++++++--
- mm/filemap.c | 21 ++++++++++++++++++---
- 2 files changed, 37 insertions(+), 5 deletions(-)
+ fs/cifs/file.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/splice.c b/fs/splice.c
-index 9be4cb3b9879..2420ead610a7 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -299,8 +299,25 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
- 	kfree(spd->partial);
- }
- 
--/*
-- * Copy data from a file into pages and then splice those into the output pipe.
-+/**
-+ * copy_splice_read -  Copy data from a file and splice the copy into a pipe
-+ * @in: The file to read from
-+ * @ppos: Pointer to the file position to read from
-+ * @pipe: The pipe to splice into
-+ * @len: The amount to splice
-+ * @flags: The SPLICE_F_* flags
-+ *
-+ * This function allocates a bunch of pages sufficient to hold the requested
-+ * amount of data (but limited by the remaining pipe capacity), passes it to
-+ * the file's ->read_iter() to read into and then splices the used pages into
-+ * the pipe.
-+ *
-+ * Return: On success, the number of bytes read will be returned and *@ppos
-+ * will be updated if appropriate; 0 will be returned if there is no more data
-+ * to be read; -EAGAIN will be returned if the pipe had no space, and some
-+ * other negative error code will be returned on error.  A short read may occur
-+ * if the pipe has insufficient space, we reach the end of the data or we hit a
-+ * hole.
-  */
- ssize_t copy_splice_read(struct file *in, loff_t *ppos,
- 			 struct pipe_inode_info *pipe,
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 603b562d69b1..f87e2ad8cff1 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2871,9 +2871,24 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
- 	return spliced;
- }
- 
--/*
-- * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
-- * a pipe.
-+/**
-+ * filemap_splice_read -  Splice data from a file's pagecache into a pipe
-+ * @in: The file to read from
-+ * @ppos: Pointer to the file position to read from
-+ * @pipe: The pipe to splice into
-+ * @len: The amount to splice
-+ * @flags: The SPLICE_F_* flags
-+ *
-+ * This function gets folios from a file's pagecache and splices them into the
-+ * pipe.  Readahead will be called as necessary to fill more folios.  This may
-+ * be used for blockdevs also.
-+ *
-+ * Return: On success, the number of bytes read will be returned and *@ppos
-+ * will be updated if appropriate; 0 will be returned if there is no more data
-+ * to be read; -EAGAIN will be returned if the pipe had no space, and some
-+ * other negative error code will be returned on error.  A short read may occur
-+ * if the pipe has insufficient space, we reach the end of the data or we hit a
-+ * hole.
-  */
- ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
- 			    struct pipe_inode_info *pipe,
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index ba7f2e09d6c8..4778614cfccf 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -3353,6 +3353,7 @@ static size_t cifs_limit_bvec_subset(const struct io=
+v_iter *iter, size_t max_siz
+ 	while (n && ix < nbv) {
+ 		len =3D min3(n, bvecs[ix].bv_len - skip, max_size);
+ 		span +=3D len;
++		max_size -=3D len;
+ 		nsegs++;
+ 		ix++;
+ 		if (span >=3D max_size || nsegs >=3D max_segs)
 
