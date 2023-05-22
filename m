@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56EF6C7EE29
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 May 2023 13:56:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1040DC77B75
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 May 2023 13:56:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233559AbjEVN4X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 May 2023 09:56:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
+        id S234425AbjEVN4z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 May 2023 09:56:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233981AbjEVNzo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 May 2023 09:55:44 -0400
+        with ESMTP id S234208AbjEVN42 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 May 2023 09:56:28 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6851719B4
-        for <linux-cifs@vger.kernel.org>; Mon, 22 May 2023 06:52:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E371BE9
+        for <linux-cifs@vger.kernel.org>; Mon, 22 May 2023 06:52:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763543;
+        s=mimecast20190719; t=1684763549;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sPgb6iT0KyhUHD55wBvrfISNeJ76P+kmnyDDc2IZvro=;
-        b=bntSshGVyOuVSK0qK+8d8OvYzL4CbBMOMMxpjg4pyU7g1mmUQB6HgcOkgZzUorgHN1AtJw
-        x2SF2AdvIyXoIs3ZeNLwOYUDBU9qAwV7newbIu1dYNgnLUrtQnqnf4WbT9blwjSc6l+/vu
-        UY09y25LKUpQBsDmz2XSs1IvXyVsBhE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=1dW3gfal+wiqS1BsUQ7v1POUMzsncK8bE2BxQUdT+Fw=;
+        b=MSIc70WlbW4QTA7Y/PU+fF7cHraUiYIAEhUKMDssJ8HHiyGZrSVbRA9rjZGRGlM+8gDjmt
+        /+dhtyCMtQjisicd5Q1D54i6gpYZSG3M2rnk8ccQB2DRLv/Nk1n3MoyW97FipeG0rjjz+v
+        EppuDeC+PdYi3ogVGwZELaJYIdg5r/I=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-195-wzCHOXg9PImMcHZvn4QAHg-1; Mon, 22 May 2023 09:52:19 -0400
-X-MC-Unique: wzCHOXg9PImMcHZvn4QAHg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-401-O78IS1gQNUW2bLyo8CEsOA-1; Mon, 22 May 2023 09:52:26 -0400
+X-MC-Unique: O78IS1gQNUW2bLyo8CEsOA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CB97D8032F5;
-        Mon, 22 May 2023 13:52:17 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 213773C025AD;
+        Mon, 22 May 2023 13:52:25 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0A30C40CFD45;
-        Mon, 22 May 2023 13:52:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6AEE4140E95D;
+        Mon, 22 May 2023 13:52:22 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,122 +52,99 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Steve French <smfrench@gmail.com>,
-        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
-Subject: [PATCH v22 29/31] splice: Remove generic_file_splice_read()
-Date:   Mon, 22 May 2023 14:50:16 +0100
-Message-Id: <20230522135018.2742245-30-dhowells@redhat.com>
+        Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org
+Subject: [PATCH v22 31/31] splice: kdoc for filemap_splice_read() and copy_splice_read()
+Date:   Mon, 22 May 2023 14:50:18 +0100
+Message-Id: <20230522135018.2742245-32-dhowells@redhat.com>
 In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
 References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Remove generic_file_splice_read() as it has been replaced with calls to
-filemap_splice_read() and copy_splice_read().
-
-With this, ITER_PIPE is no longer used.
+Provide kerneldoc comments for filemap_splice_read() and
+copy_splice_read().
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+cc: Christian Brauner <brauner@kernel.org>
+cc: Christoph Hellwig <hch@lst.de>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Steve French <smfrench@gmail.com>
 cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
 cc: linux-mm@kvack.org
 cc: linux-block@vger.kernel.org
 cc: linux-cifs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 ---
-
-Notes:
-    ver #21)
-     - Move zero-len check to vfs_splice_read().
-     - Move s_maxbytes check to filemap_splice_read().
-     - DIO (and DAX) are handled by vfs_splice_read().
-    
-    ver #20)
-     - Use s_maxbytes from the backing store (in->f_mapping), not the front
-       inode (especially for a blockdev).
-    
-    ver #18)
-     - Split out the change to cifs to make it use generic_file_splice_read().
-     - Split out the unexport of filemap_splice_read() (still needed by cifs).
-
- fs/splice.c        | 43 -------------------------------------------
- include/linux/fs.h |  2 --
- 2 files changed, 45 deletions(-)
+ fs/splice.c  | 21 +++++++++++++++++++--
+ mm/filemap.c | 21 ++++++++++++++++++---
+ 2 files changed, 37 insertions(+), 5 deletions(-)
 
 diff --git a/fs/splice.c b/fs/splice.c
-index 8268248df3a9..9be4cb3b9879 100644
+index 9be4cb3b9879..2420ead610a7 100644
 --- a/fs/splice.c
 +++ b/fs/splice.c
-@@ -386,49 +386,6 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
+@@ -299,8 +299,25 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
+ 	kfree(spd->partial);
  }
- EXPORT_SYMBOL(copy_splice_read);
  
--/**
-- * generic_file_splice_read - splice data from file to a pipe
-- * @in:		file to splice from
-- * @ppos:	position in @in
-- * @pipe:	pipe to splice to
-- * @len:	number of bytes to splice
-- * @flags:	splice modifier flags
-- *
-- * Description:
-- *    Will read pages from given file and fill them into a pipe. Can be
-- *    used as long as it has more or less sane ->read_iter().
-- *
-- */
--ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
--				 struct pipe_inode_info *pipe, size_t len,
--				 unsigned int flags)
--{
--	struct iov_iter to;
--	struct kiocb kiocb;
--	int ret;
--
--	iov_iter_pipe(&to, ITER_DEST, pipe, len);
--	init_sync_kiocb(&kiocb, in);
--	kiocb.ki_pos = *ppos;
--	ret = call_read_iter(in, &kiocb, &to);
--	if (ret > 0) {
--		*ppos = kiocb.ki_pos;
--		file_accessed(in);
--	} else if (ret < 0) {
--		/* free what was emitted */
--		pipe_discard_from(pipe, to.start_head);
--		/*
--		 * callers of ->splice_read() expect -EAGAIN on
--		 * "can't put anything in there", rather than -EFAULT.
--		 */
--		if (ret == -EFAULT)
--			ret = -EAGAIN;
--	}
--
--	return ret;
--}
--EXPORT_SYMBOL(generic_file_splice_read);
--
- const struct pipe_buf_operations default_pipe_buf_ops = {
- 	.release	= generic_pipe_buf_release,
- 	.try_steal	= generic_pipe_buf_try_steal,
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index e3c22efa413e..08ba2ae1d3ce 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2755,8 +2755,6 @@ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+-/*
+- * Copy data from a file into pages and then splice those into the output pipe.
++/**
++ * copy_splice_read -  Copy data from a file and splice the copy into a pipe
++ * @in: The file to read from
++ * @ppos: Pointer to the file position to read from
++ * @pipe: The pipe to splice into
++ * @len: The amount to splice
++ * @flags: The SPLICE_F_* flags
++ *
++ * This function allocates a bunch of pages sufficient to hold the requested
++ * amount of data (but limited by the remaining pipe capacity), passes it to
++ * the file's ->read_iter() to read into and then splices the used pages into
++ * the pipe.
++ *
++ * Return: On success, the number of bytes read will be returned and *@ppos
++ * will be updated if appropriate; 0 will be returned if there is no more data
++ * to be read; -EAGAIN will be returned if the pipe had no space, and some
++ * other negative error code will be returned on error.  A short read may occur
++ * if the pipe has insufficient space, we reach the end of the data or we hit a
++ * hole.
+  */
  ssize_t copy_splice_read(struct file *in, loff_t *ppos,
  			 struct pipe_inode_info *pipe,
- 			 size_t len, unsigned int flags);
--extern ssize_t generic_file_splice_read(struct file *, loff_t *,
--		struct pipe_inode_info *, size_t, unsigned int);
- extern ssize_t iter_file_splice_write(struct pipe_inode_info *,
- 		struct file *, loff_t *, size_t, unsigned int);
- extern ssize_t generic_splice_sendpage(struct pipe_inode_info *pipe,
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 603b562d69b1..f87e2ad8cff1 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2871,9 +2871,24 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
+ 	return spliced;
+ }
+ 
+-/*
+- * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
+- * a pipe.
++/**
++ * filemap_splice_read -  Splice data from a file's pagecache into a pipe
++ * @in: The file to read from
++ * @ppos: Pointer to the file position to read from
++ * @pipe: The pipe to splice into
++ * @len: The amount to splice
++ * @flags: The SPLICE_F_* flags
++ *
++ * This function gets folios from a file's pagecache and splices them into the
++ * pipe.  Readahead will be called as necessary to fill more folios.  This may
++ * be used for blockdevs also.
++ *
++ * Return: On success, the number of bytes read will be returned and *@ppos
++ * will be updated if appropriate; 0 will be returned if there is no more data
++ * to be read; -EAGAIN will be returned if the pipe had no space, and some
++ * other negative error code will be returned on error.  A short read may occur
++ * if the pipe has insufficient space, we reach the end of the data or we hit a
++ * hole.
+  */
+ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+ 			    struct pipe_inode_info *pipe,
 
