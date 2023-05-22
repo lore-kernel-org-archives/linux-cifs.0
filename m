@@ -2,91 +2,168 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFCEC77B73
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 May 2023 11:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F39E2C77B73
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 May 2023 12:53:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233069AbjEVLJi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 May 2023 07:09:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54934 "EHLO
+        id S233832AbjEVMxt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 May 2023 08:53:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231138AbjEVLJS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 May 2023 07:09:18 -0400
+        with ESMTP id S233835AbjEVMxs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 May 2023 08:53:48 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12FE62119;
-        Mon, 22 May 2023 04:04:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5070AC;
+        Mon, 22 May 2023 05:53:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9CC766187D;
-        Mon, 22 May 2023 10:53:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40EACC43442;
-        Mon, 22 May 2023 10:53:14 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 521B76182C;
+        Mon, 22 May 2023 12:53:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452FFC433EF;
+        Mon, 22 May 2023 12:53:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684752801;
-        bh=lxoFdlwyXreWklHMGhjnnVDqvf5QqMirVF69DEG4jMg=;
+        s=k20201202; t=1684760023;
+        bh=ImInocG/5tz/0H3zPAKjnZJKUJJ7f7gU8sP1cCYTc4M=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Ct274itzCgUdbCBjIi3u/ZuZmET312SHUcSUBK2Lkv3upiqkMWaP9Qq0zgj+4HbPE
-         fvQijfSZwweDPv0LNSALl1fiE6LtH9LiviXLFaVxf77cyoWoeww2S21gQEAXUCj1pZ
-         VtyTeHrbIDNp69dBMo1dR+0Ni43MBESSIkh/MqIyj1hmT6MGiQOS0nwtQs58ujg/5A
-         s0i1BLJvJx9Epkd0Bi76KBwOmg+bJ19wLhSSeInBoVPgAHkrzWsB7AW5OfWhKeciyi
-         I4UKgE8UBOtfjfmH6OCgbl9+JCvxaCZi+6x6BRI8QYqHd30puM0p91YwBa55dH0yHg
-         S8ZcqLivMgRwA==
-Date:   Mon, 22 May 2023 12:53:05 +0200
+        b=WoCejcijL504amG1JWhHwZTY9ANeFzKIntYQLP07J5uj6is7A9fQS3E45NEVz8wk6
+         ijfRl5PO3lTu/TTTIv32g7R7yLRypfiWOTi3Uj/0KvpuFrOTVcMel9+d2wSGIkyYdu
+         vUWYxwspLqeF3kuLLovyI+OOPx0h36hOwidawlUZUg9fAT5m8b6iSCy+1CpVnsDVp7
+         WsqlRyT5zrYfRVFyupWZadvSK20ofoJ9ED4LN+qqMECRszCrYQYsWxjuqjJ6xikft9
+         Dj+RJ+BTQGXrekuYCaTiR3iKGCv67tOqqWySpi7M8dOONCCzlP1x8letugsbywO8H1
+         ygjRrnqit//Zw==
+Date:   Mon, 22 May 2023 14:53:31 +0200
 From:   Christian Brauner <brauner@kernel.org>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     dsterba@suse.cz, Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Chinner <david@fromorbit.com>,
-        Chuck Lever <chuck.lever@oracle.com>, Jan Kara <jack@suse.cz>,
-        Amir Goldstein <amir73il@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Neil Brown <neilb@suse.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Theodore T'so <tytso@mit.edu>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-mm@kvack.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v4 9/9] btrfs: convert to multigrain timestamps
-Message-ID: <20230522-bannen-urkunden-9759d84aece5@brauner>
-References: <20230518114742.128950-1-jlayton@kernel.org>
- <20230518114742.128950-10-jlayton@kernel.org>
- <20230522095601.GH32559@twin.jikos.cz>
- <cde7bc1874e2d69860ecdb87d4e21c762f355aea.camel@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH v21 03/30] splice: Rename direct_splice_read() to
+ copy_splice_read()
+Message-ID: <20230522-pfund-ferngeblieben-53fad9c0e527@brauner>
+References: <20230520-sekunde-vorteil-f2d588e40b68@brauner>
+ <20230520000049.2226926-1-dhowells@redhat.com>
+ <20230520000049.2226926-4-dhowells@redhat.com>
+ <2468127.1684742114@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cde7bc1874e2d69860ecdb87d4e21c762f355aea.camel@kernel.org>
+In-Reply-To: <2468127.1684742114@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, May 22, 2023 at 06:08:56AM -0400, Jeff Layton wrote:
-> On Mon, 2023-05-22 at 11:56 +0200, David Sterba wrote:
-> > On Thu, May 18, 2023 at 07:47:42AM -0400, Jeff Layton wrote:
-> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > 
-> > Acked-by: David Sterba <dsterba@suse.com>
-> > 
-> > Please add a brief description to the changelog too, there's a similar
-> > text in the patches adding the infrastructure. Something like "Allow to
-> > optimize lot of metadata updates by encoding the status in the cmtime.
-> > The fine grained time is needed for NFS."
+On Mon, May 22, 2023 at 08:55:14AM +0100, David Howells wrote:
+> > For the future it'd be nice if exported functions would always get
+> > proper kernel doc,
 > 
-> Sure thing.
+> Something like the attached?
 > 
-> Christian, do you want to just alter the changelog with David's
-> suggestion, or would you rather I resend the series?
+> David
+> ---
+> commit 0362042ba0751fc5457b0548fb9006f9d7dfbeca
+> Author: David Howells <dhowells@redhat.com>
+> Date:   Mon May 22 08:34:24 2023 +0100
+> 
+>     splice: kdoc for filemap_splice_read() and copy_splice_read()
+>     
+>     Provide kerneldoc comments for filemap_splice_read() and
+>     copy_splice_read().
+>     
+>     Signed-off-by: David Howells <dhowells@redhat.com>
+>     cc: Christian Brauner <brauner@kernel.org>
+>     cc: Christoph Hellwig <hch@lst.de>
+>     cc: Jens Axboe <axboe@kernel.dk>
+>     cc: Steve French <smfrench@gmail.com>
+>     cc: Al Viro <viro@zeniv.linux.org.uk>
+>     cc: linux-mm@kvack.org
+>     cc: linux-block@vger.kernel.org
+>     cc: linux-cifs@vger.kernel.org
+>     cc: linux-fsdevel@vger.kernel.org
+> 
+> diff --git a/fs/splice.c b/fs/splice.c
+> index 9be4cb3b9879..5292a8fa929d 100644
+> --- a/fs/splice.c
+> +++ b/fs/splice.c
+> @@ -299,8 +299,25 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
+>  	kfree(spd->partial);
+>  }
+>  
+> -/*
+> - * Copy data from a file into pages and then splice those into the output pipe.
+> +/**
+> + * copy_splice_read -  Copy data from a file and splice the copy into a pipe
+> + * @in: The file to read from
+> + * @ppos: Pointer to the file position to read from
+> + * @pipe: The pipe to splice into
+> + * @len: The amount to splice
+> + * @flags: The SPLICE_F_* flags
+> + *
+> + * This function allocates a bunch of pages sufficient to hold the requested
+> + * amount of data (but limited by the remaining pipe capacity), passes it to
+> + * the file's ->read_iter() to read into and then splices the used pages into
+> + * the pipe.
+> + *
+> + * On success, the number of bytes read will be returned and *@ppos will be
+> + * updated if appropriate; 0 will be returned if there is no more data to be
+> + * read; -EAGAIN will be returned if the pipe had no space, and some other
+> + * negative error code will be returned on error.  A short read may occur if
+> + * the pipe has insufficient space, we reach the end of the data or we hit a
+> + * hole.
+>   */
 
-Nah, don't bother resending I'll just add it to the fs specific patches.
-I'll end up updating the patch trailers anyway when individual
-maintainers add new Acks.
+I think kdoc expects:
+
+* Return: On success, the number of bytes read will be returned and *@ppos will be
+* updated if appropriate; 0 will be returned if there is no more data to be
+* read; -EAGAIN will be returned if the pipe had no space, and some other
+* negative error code will be returned on error.  A short read may occur if
+* the pipe has insufficient space, we reach the end of the data or we hit a
+* hole.
+
+and similar for filemap_splice_read() other than that this looks good!
+
+>  ssize_t copy_splice_read(struct file *in, loff_t *ppos,
+>  			 struct pipe_inode_info *pipe,
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index 603b562d69b1..1f235a6430fd 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -2871,9 +2871,24 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
+>  	return spliced;
+>  }
+>  
+> -/*
+> - * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
+> - * a pipe.
+> +/**
+> + * filemap_splice_read -  Splice data from a file's pagecache into a pipe
+> + * @in: The file to read from
+> + * @ppos: Pointer to the file position to read from
+> + * @pipe: The pipe to splice into
+> + * @len: The amount to splice
+> + * @flags: The SPLICE_F_* flags
+> + *
+> + * This function gets folios from a file's pagecache and splices them into the
+> + * pipe.  Readahead will be called as necessary to fill more folios.  This may
+> + * be used for blockdevs also.
+> + *
+> + * On success, the number of bytes read will be returned and *@ppos will be
+> + * updated if appropriate; 0 will be returned if there is no more data to be
+> + * read; -EAGAIN will be returned if the pipe had no space, and some other
+> + * negative error code will be returned on error.  A short read may occur if
+> + * the pipe has insufficient space, we reach the end of the data or we hit a
+> + * hole.
+>   */
+>  ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+>  			    struct pipe_inode_info *pipe,
+> 
