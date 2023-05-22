@@ -2,168 +2,174 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F39E2C77B73
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 May 2023 12:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E661C7EE2F
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 May 2023 13:52:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233832AbjEVMxt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 May 2023 08:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53652 "EHLO
+        id S230362AbjEVNwP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 May 2023 09:52:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233835AbjEVMxs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 May 2023 08:53:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5070AC;
-        Mon, 22 May 2023 05:53:44 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S233879AbjEVNwE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 May 2023 09:52:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BEEA19B
+        for <linux-cifs@vger.kernel.org>; Mon, 22 May 2023 06:50:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684763446;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IqkXhDjcGTp5qgC2QwXKM8JLGfM3IWsybre/9cqiJ5w=;
+        b=RmY4bl/piiTolGCkW5+aW8msXjufuay44u+muJfNFv/5ire5rRdEUhYZUipdHD9IoeG81n
+        j0y18CuiW1508gdcau7QD5laVBi4hcaW+SKn9c/4hcuxn9sCEANxhItjHtl+OP41gv5axg
+        MJ8GOFO5HRfyFJUYauBjn4R1qhKLaRQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-383-QM4O9WzdNfyEMQKKRbb3Hw-1; Mon, 22 May 2023 09:50:40 -0400
+X-MC-Unique: QM4O9WzdNfyEMQKKRbb3Hw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 521B76182C;
-        Mon, 22 May 2023 12:53:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452FFC433EF;
-        Mon, 22 May 2023 12:53:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684760023;
-        bh=ImInocG/5tz/0H3zPAKjnZJKUJJ7f7gU8sP1cCYTc4M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WoCejcijL504amG1JWhHwZTY9ANeFzKIntYQLP07J5uj6is7A9fQS3E45NEVz8wk6
-         ijfRl5PO3lTu/TTTIv32g7R7yLRypfiWOTi3Uj/0KvpuFrOTVcMel9+d2wSGIkyYdu
-         vUWYxwspLqeF3kuLLovyI+OOPx0h36hOwidawlUZUg9fAT5m8b6iSCy+1CpVnsDVp7
-         WsqlRyT5zrYfRVFyupWZadvSK20ofoJ9ED4LN+qqMECRszCrYQYsWxjuqjJ6xikft9
-         Dj+RJ+BTQGXrekuYCaTiR3iKGCv67tOqqWySpi7M8dOONCCzlP1x8letugsbywO8H1
-         ygjRrnqit//Zw==
-Date:   Mon, 22 May 2023 14:53:31 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 695863C025AD;
+        Mon, 22 May 2023 13:50:37 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 88BEA2166B25;
+        Mon, 22 May 2023 13:50:34 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
         Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v21 03/30] splice: Rename direct_splice_read() to
- copy_splice_read()
-Message-ID: <20230522-pfund-ferngeblieben-53fad9c0e527@brauner>
-References: <20230520-sekunde-vorteil-f2d588e40b68@brauner>
- <20230520000049.2226926-1-dhowells@redhat.com>
- <20230520000049.2226926-4-dhowells@redhat.com>
- <2468127.1684742114@warthog.procyon.org.uk>
+Subject: [PATCH v22 03/31] splice: Rename direct_splice_read() to copy_splice_read()
+Date:   Mon, 22 May 2023 14:49:50 +0100
+Message-Id: <20230522135018.2742245-4-dhowells@redhat.com>
+In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
+References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2468127.1684742114@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, May 22, 2023 at 08:55:14AM +0100, David Howells wrote:
-> > For the future it'd be nice if exported functions would always get
-> > proper kernel doc,
-> 
-> Something like the attached?
-> 
-> David
-> ---
-> commit 0362042ba0751fc5457b0548fb9006f9d7dfbeca
-> Author: David Howells <dhowells@redhat.com>
-> Date:   Mon May 22 08:34:24 2023 +0100
-> 
->     splice: kdoc for filemap_splice_read() and copy_splice_read()
->     
->     Provide kerneldoc comments for filemap_splice_read() and
->     copy_splice_read().
->     
->     Signed-off-by: David Howells <dhowells@redhat.com>
->     cc: Christian Brauner <brauner@kernel.org>
->     cc: Christoph Hellwig <hch@lst.de>
->     cc: Jens Axboe <axboe@kernel.dk>
->     cc: Steve French <smfrench@gmail.com>
->     cc: Al Viro <viro@zeniv.linux.org.uk>
->     cc: linux-mm@kvack.org
->     cc: linux-block@vger.kernel.org
->     cc: linux-cifs@vger.kernel.org
->     cc: linux-fsdevel@vger.kernel.org
-> 
-> diff --git a/fs/splice.c b/fs/splice.c
-> index 9be4cb3b9879..5292a8fa929d 100644
-> --- a/fs/splice.c
-> +++ b/fs/splice.c
-> @@ -299,8 +299,25 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
->  	kfree(spd->partial);
->  }
->  
-> -/*
-> - * Copy data from a file into pages and then splice those into the output pipe.
-> +/**
-> + * copy_splice_read -  Copy data from a file and splice the copy into a pipe
-> + * @in: The file to read from
-> + * @ppos: Pointer to the file position to read from
-> + * @pipe: The pipe to splice into
-> + * @len: The amount to splice
-> + * @flags: The SPLICE_F_* flags
-> + *
-> + * This function allocates a bunch of pages sufficient to hold the requested
-> + * amount of data (but limited by the remaining pipe capacity), passes it to
-> + * the file's ->read_iter() to read into and then splices the used pages into
-> + * the pipe.
-> + *
-> + * On success, the number of bytes read will be returned and *@ppos will be
-> + * updated if appropriate; 0 will be returned if there is no more data to be
-> + * read; -EAGAIN will be returned if the pipe had no space, and some other
-> + * negative error code will be returned on error.  A short read may occur if
-> + * the pipe has insufficient space, we reach the end of the data or we hit a
-> + * hole.
->   */
+Rename direct_splice_read() to copy_splice_read() to better reflect as to
+what it does.
 
-I think kdoc expects:
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christian Brauner <brauner@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: linux-cifs@vger.kernel.org
+cc: linux-mm@kvack.org
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+---
 
-* Return: On success, the number of bytes read will be returned and *@ppos will be
-* updated if appropriate; 0 will be returned if there is no more data to be
-* read; -EAGAIN will be returned if the pipe had no space, and some other
-* negative error code will be returned on error.  A short read may occur if
-* the pipe has insufficient space, we reach the end of the data or we hit a
-* hole.
+Notes:
+    ver #21)
+     - Rename direct_splice_read() to copy_splice_read().
 
-and similar for filemap_splice_read() other than that this looks good!
+ fs/cifs/cifsfs.c   |  4 ++--
+ fs/cifs/file.c     |  2 +-
+ fs/splice.c        | 11 +++++------
+ include/linux/fs.h |  6 +++---
+ 4 files changed, 11 insertions(+), 12 deletions(-)
 
->  ssize_t copy_splice_read(struct file *in, loff_t *ppos,
->  			 struct pipe_inode_info *pipe,
-> diff --git a/mm/filemap.c b/mm/filemap.c
-> index 603b562d69b1..1f235a6430fd 100644
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
-> @@ -2871,9 +2871,24 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
->  	return spliced;
->  }
->  
-> -/*
-> - * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
-> - * a pipe.
-> +/**
-> + * filemap_splice_read -  Splice data from a file's pagecache into a pipe
-> + * @in: The file to read from
-> + * @ppos: Pointer to the file position to read from
-> + * @pipe: The pipe to splice into
-> + * @len: The amount to splice
-> + * @flags: The SPLICE_F_* flags
-> + *
-> + * This function gets folios from a file's pagecache and splices them into the
-> + * pipe.  Readahead will be called as necessary to fill more folios.  This may
-> + * be used for blockdevs also.
-> + *
-> + * On success, the number of bytes read will be returned and *@ppos will be
-> + * updated if appropriate; 0 will be returned if there is no more data to be
-> + * read; -EAGAIN will be returned if the pipe had no space, and some other
-> + * negative error code will be returned on error.  A short read may occur if
-> + * the pipe has insufficient space, we reach the end of the data or we hit a
-> + * hole.
->   */
->  ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
->  			    struct pipe_inode_info *pipe,
-> 
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 43a4d8603db3..fa2477bbcc86 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1416,7 +1416,7 @@ const struct file_operations cifs_file_direct_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_mmap,
+-	.splice_read = direct_splice_read,
++	.splice_read = copy_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.unlocked_ioctl  = cifs_ioctl,
+ 	.copy_file_range = cifs_copy_file_range,
+@@ -1470,7 +1470,7 @@ const struct file_operations cifs_file_direct_nobrl_ops = {
+ 	.fsync = cifs_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_mmap,
+-	.splice_read = direct_splice_read,
++	.splice_read = copy_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ 	.unlocked_ioctl  = cifs_ioctl,
+ 	.copy_file_range = cifs_copy_file_range,
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index c5fcefdfd797..023496207c18 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -5091,6 +5091,6 @@ ssize_t cifs_splice_read(struct file *in, loff_t *ppos,
+ 	if (unlikely(!len))
+ 		return 0;
+ 	if (in->f_flags & O_DIRECT)
+-		return direct_splice_read(in, ppos, pipe, len, flags);
++		return copy_splice_read(in, ppos, pipe, len, flags);
+ 	return filemap_splice_read(in, ppos, pipe, len, flags);
+ }
+diff --git a/fs/splice.c b/fs/splice.c
+index 3e06611d19ae..2478e065bc53 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -300,12 +300,11 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
+ }
+ 
+ /*
+- * Splice data from an O_DIRECT file into pages and then add them to the output
+- * pipe.
++ * Copy data from a file into pages and then splice those into the output pipe.
+  */
+-ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+-			   struct pipe_inode_info *pipe,
+-			   size_t len, unsigned int flags)
++ssize_t copy_splice_read(struct file *in, loff_t *ppos,
++			 struct pipe_inode_info *pipe,
++			 size_t len, unsigned int flags)
+ {
+ 	struct iov_iter to;
+ 	struct bio_vec *bv;
+@@ -390,7 +389,7 @@ ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	kfree(bv);
+ 	return ret;
+ }
+-EXPORT_SYMBOL(direct_splice_read);
++EXPORT_SYMBOL(copy_splice_read);
+ 
+ /**
+  * generic_file_splice_read - splice data from file to a pipe
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 21a981680856..e3c22efa413e 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2752,9 +2752,9 @@ ssize_t vfs_iocb_iter_write(struct file *file, struct kiocb *iocb,
+ ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+ 			    struct pipe_inode_info *pipe,
+ 			    size_t len, unsigned int flags);
+-ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+-			   struct pipe_inode_info *pipe,
+-			   size_t len, unsigned int flags);
++ssize_t copy_splice_read(struct file *in, loff_t *ppos,
++			 struct pipe_inode_info *pipe,
++			 size_t len, unsigned int flags);
+ extern ssize_t generic_file_splice_read(struct file *, loff_t *,
+ 		struct pipe_inode_info *, size_t, unsigned int);
+ extern ssize_t iter_file_splice_write(struct pipe_inode_info *,
+
