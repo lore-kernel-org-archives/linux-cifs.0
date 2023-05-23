@@ -2,61 +2,60 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 742C3C7EE26
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 May 2023 14:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C678C7EE29
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 May 2023 14:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237143AbjEWOHN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 May 2023 10:07:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46882 "EHLO
+        id S237120AbjEWOHX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 May 2023 10:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231325AbjEWOHL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 May 2023 10:07:11 -0400
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9921186
-        for <linux-cifs@vger.kernel.org>; Tue, 23 May 2023 07:06:48 -0700 (PDT)
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-4f3bb395e69so3564057e87.2
-        for <linux-cifs@vger.kernel.org>; Tue, 23 May 2023 07:06:48 -0700 (PDT)
+        with ESMTP id S237126AbjEWOHM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 May 2023 10:07:12 -0400
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2726912B
+        for <linux-cifs@vger.kernel.org>; Tue, 23 May 2023 07:06:50 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-4f3a99b9177so6333276e87.1
+        for <linux-cifs@vger.kernel.org>; Tue, 23 May 2023 07:06:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1684850747; x=1687442747;
+        d=linaro.org; s=google; t=1684850749; x=1687442749;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EZAVHnI0RnVaS/2VmTowQqEKdQQ5rGu0g+MysdOCzRE=;
-        b=CndnVf4Wz0L7DCgFoh3Gq+YOBOn/KSBOCbH8YksJupr6UUPOhddHJUufNJpsGX6RPn
-         rTDP0CIM0yfz0E9z2hoqsv+IrS9bNsKCIWeoIiAKo1FLM6IUrHeaw016T1O9DEAo7W0s
-         lGILyoagX94XkZQ+8x2RQCqAZfYySvk+7OvtomiQ5PLGb7k8yRkB5FQhQ10QmX0bg6eL
-         s7Ko5smzRaiFKzMutWbf/9ftcS5cdW7GP0A5ukP7k6S25BdkMtlB9BCM9AQmGDpbZGdM
-         uxU1fALRef1aE+fzPPwRaMJZVm/kLgAfXQLWcvxYyYtb7qAOO8RA1O1GAaM+1Cd9JyCz
-         y/YQ==
+        bh=SZOtWVS1lCOxds2QCY7M+hAIKv6XvV3Hqis31ERV0mU=;
+        b=jQFz6Zi2QlqzFhgg609+OdU2cVzXhTGama6kh7r3qdlPmt1t9W7hOhsu94u+OwaOb4
+         qZCyO9HFjWxC1UNvj7aH4gjawmqX/FfvnrnEMqAdWBJ1gKgK3OsCh2be1l8goABkGeca
+         4qq5vjGppvB0Ff3wZVKpQwbjqPgJrSjep7pLQRAqJ0vCR1bSNUwj/9E5GGjNWZG6UBIQ
+         laVwoCR2Q+OLiyyzutCe6jstO9ARgNPtspYX4FMnjz5PkCuGHkQ+phxAPeufD6G8i1or
+         2yIWRKaSDcAN6pWjBjwXMvm/DRKg3Ys05cggpxTJlPQbn2mQmxpWJNhzydJrgvcQ4AmW
+         jBKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684850747; x=1687442747;
+        d=1e100.net; s=20221208; t=1684850749; x=1687442749;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EZAVHnI0RnVaS/2VmTowQqEKdQQ5rGu0g+MysdOCzRE=;
-        b=jvi98lXSpkO6d9DCKEG7upYee2LPozZ9UzLiPe/4gnCbIdC6NpOneeMYf0CpieQkPt
-         0XgWGpC5JItKuUK6HTb70LNDSZy5G6iJGB9V24hshNwPtV8X6j/bB6ls1S8XdwDIkOhR
-         sNHAMEjEzzQhlHKWzhzRuL8mKPl5t7LXrLpLGIPDObGOjUcHVN8hfim9E9IoWZnyXDez
-         CMOLA2lxij4rP+fqn3z8x15gEOpfmJ+0lRFSL5dKIr4gVdFpNl52/VFcYTBcrGZOVl6H
-         L5w58EsfuQuj2plmgI/CJXy9a50JR4YqnEDCs6aye7bXK79GxZbI3O1EY8NYhUWQsQYe
-         eiEQ==
-X-Gm-Message-State: AC+VfDxJfDxbIIlosFrIBTQhv+4DwT1sVUVQQegoM8Ab1ia80TfK9CmB
-        6SCdmoQnQbFO1IFOPSazdqRdgPLfUe9+TVRKNEc=
-X-Google-Smtp-Source: ACHHUZ65J8Z3/JvqtcArdgyxfAPz6sl81M4hzs4N3aTQHnJRtGcRDM0SdUGRMB6f5OBhCMlJco5Hlw==
-X-Received: by 2002:ac2:4c39:0:b0:4f1:2986:3920 with SMTP id u25-20020ac24c39000000b004f129863920mr4308136lfq.41.1684850746806;
-        Tue, 23 May 2023 07:05:46 -0700 (PDT)
+        bh=SZOtWVS1lCOxds2QCY7M+hAIKv6XvV3Hqis31ERV0mU=;
+        b=IMxAleINSpLn3ahpH1sGHDVnUM7aV+0axBS02Vbh4T0mxduhLgp8ep75pYXB5PPf3s
+         NP4UKv6KWqGgt0lDVEhSMetvkqHjcVvWi+VrB7nBWYo4FdV3A7P1p7jqMMhwCaSlYxmv
+         r+NopJkqqkL/rNRY/T4NVKa6hXVpBvsBjd9R2W19FsgTScBwiLbvDB1+yACo5h4zLEEk
+         6Ge3GiT0Jb75qbz9m4tJiO+c76+3uKymRCiZStdmAJvifAS6d7GurkqKHsg0TFYjWLBz
+         9FknRw1lbiVSW/zJsyqZekdajQIHAekR+2lHTpZ9imgZZQ/C22PYW6xi88Xol8Yw39K/
+         o9gw==
+X-Gm-Message-State: AC+VfDwfan5bXARiFEj6OcGS0hMBlMQJRjCFX5wY5V6RP0q0bkedTLS6
+        Ppu2Ji9awGsRR6oEzC2vc7fL5lwVhFraXu3lfWE=
+X-Google-Smtp-Source: ACHHUZ7//7IWxqZNm6Gka+LjfJMyuUS9SSINKAocHmPnom7yVCqmEeps0sj76NQaN9sPKxOw8HiGaQ==
+X-Received: by 2002:ac2:593c:0:b0:4f3:b588:48d0 with SMTP id v28-20020ac2593c000000b004f3b58848d0mr3291847lfi.14.1684850749081;
+        Tue, 23 May 2023 07:05:49 -0700 (PDT)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id h28-20020ac2597c000000b004e9bf853c27sm1346562lfp.70.2023.05.23.07.05.45
+        by smtp.gmail.com with ESMTPSA id h28-20020ac2597c000000b004e9bf853c27sm1346562lfp.70.2023.05.23.07.05.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 07:05:46 -0700 (PDT)
+        Tue, 23 May 2023 07:05:48 -0700 (PDT)
 From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Tue, 23 May 2023 16:05:26 +0200
-Subject: [PATCH v3 02/12] m68k: Pass a pointer to virt_to_pfn()
- virt_to_page()
+Date:   Tue, 23 May 2023 16:05:28 +0200
+Subject: [PATCH v3 04/12] riscv: mm: init: Pass a pointer to virt_to_page()
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v3-2-a16c19c03583@linaro.org>
+Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v3-4-a16c19c03583@linaro.org>
 References: <20230503-virt-to-pfn-v6-4-rc1-v3-0-a16c19c03583@linaro.org>
 In-Reply-To: <20230503-virt-to-pfn-v6-4-rc1-v3-0-a16c19c03583@linaro.org>
 To:     Andrew Morton <akpm@linux-foundation.org>,
@@ -71,7 +70,8 @@ Cc:     linux-mm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-cifs@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-arch@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>
+        Linus Walleij <linus.walleij@linaro.org>,
+        Alexandre Ghiti <alexghiti@rivosinc.com>
 X-Mailer: b4 0.12.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
@@ -85,154 +85,37 @@ many architectures implement virt_to_pfn() as a macro,
 this function becomes polymorphic and accepts both a
 (unsigned long) and a (void *).
 
-Fix up the offending calls in arch/m68k with explicit casts.
+Fix this in the RISCV mm init code, so we can implement
+a strongly typed virt_to_pfn().
 
-The page table include <asm/pgtable.h> will include different
-variants of the defines depending on whether you build for
-classic m68k, ColdFire or Sun3, so fix all variants.
-
-Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Alexandre Ghiti <alexghiti@rivosinc.com>
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-ChangeLog v2->v3:
-- Fix up versioning. This is v3.
-- Let Coldfire __pte_page() return a (void *) instead of __va
-- Delete Coldfire pte_pagenr() which was using unsigned long
-  semantics from __pte_page()
-- Drop ill-advised change to Coldfire pmd_page_vaddr()
-ChangeLog v1->v2:
-- Fix the sun3 pgtable macro to not cast to unsigned long.
-- Make a similar change to the ColdFire include.
-- Add an extra parens around the page argument to the
-  PD_PTABLE() macro, as is normally required.
----
- arch/m68k/include/asm/mcf_pgtable.h  | 3 +--
- arch/m68k/include/asm/sun3_pgtable.h | 4 ++--
- arch/m68k/mm/mcfmmu.c                | 3 ++-
- arch/m68k/mm/motorola.c              | 4 ++--
- arch/m68k/mm/sun3mmu.c               | 2 +-
- arch/m68k/sun3/dvma.c                | 2 +-
- arch/m68k/sun3x/dvma.c               | 2 +-
- 7 files changed, 10 insertions(+), 10 deletions(-)
+ arch/riscv/mm/init.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/m68k/include/asm/mcf_pgtable.h b/arch/m68k/include/asm/mcf_pgtable.h
-index d97fbb812f63..43e8da8465f9 100644
---- a/arch/m68k/include/asm/mcf_pgtable.h
-+++ b/arch/m68k/include/asm/mcf_pgtable.h
-@@ -115,7 +115,7 @@ static inline void pgd_set(pgd_t *pgdp, pmd_t *pmdp)
- 	pgd_val(*pgdp) = virt_to_phys(pmdp);
+diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+index 747e5b1ef02d..2f7a7c345a6a 100644
+--- a/arch/riscv/mm/init.c
++++ b/arch/riscv/mm/init.c
+@@ -356,7 +356,7 @@ static phys_addr_t __init alloc_pte_late(uintptr_t va)
+ 	unsigned long vaddr;
+ 
+ 	vaddr = __get_free_page(GFP_KERNEL);
+-	BUG_ON(!vaddr || !pgtable_pte_page_ctor(virt_to_page(vaddr)));
++	BUG_ON(!vaddr || !pgtable_pte_page_ctor(virt_to_page((void *)vaddr)));
+ 
+ 	return __pa(vaddr);
  }
+@@ -439,7 +439,7 @@ static phys_addr_t __init alloc_pmd_late(uintptr_t va)
+ 	unsigned long vaddr;
  
--#define __pte_page(pte)	((unsigned long) (pte_val(pte) & PAGE_MASK))
-+#define __pte_page(pte)	((void *) (pte_val(pte) & PAGE_MASK))
- #define pmd_page_vaddr(pmd)	((unsigned long) (pmd_val(pmd)))
+ 	vaddr = __get_free_page(GFP_KERNEL);
+-	BUG_ON(!vaddr || !pgtable_pmd_page_ctor(virt_to_page(vaddr)));
++	BUG_ON(!vaddr || !pgtable_pmd_page_ctor(virt_to_page((void *)vaddr)));
  
- static inline int pte_none(pte_t pte)
-@@ -134,7 +134,6 @@ static inline void pte_clear(struct mm_struct *mm, unsigned long addr,
- 	pte_val(*ptep) = 0;
+ 	return __pa(vaddr);
  }
- 
--#define pte_pagenr(pte)	((__pte_page(pte) - PAGE_OFFSET) >> PAGE_SHIFT)
- #define pte_page(pte)	virt_to_page(__pte_page(pte))
- 
- static inline int pmd_none2(pmd_t *pmd) { return !pmd_val(*pmd); }
-diff --git a/arch/m68k/include/asm/sun3_pgtable.h b/arch/m68k/include/asm/sun3_pgtable.h
-index e582b0484a55..f428f73125d5 100644
---- a/arch/m68k/include/asm/sun3_pgtable.h
-+++ b/arch/m68k/include/asm/sun3_pgtable.h
-@@ -91,7 +91,7 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
- #define pmd_set(pmdp,ptep) do {} while (0)
- 
- #define __pte_page(pte) \
--((unsigned long) __va ((pte_val (pte) & SUN3_PAGE_PGNUM_MASK) << PAGE_SHIFT))
-+(__va ((pte_val (pte) & SUN3_PAGE_PGNUM_MASK) << PAGE_SHIFT))
- 
- static inline unsigned long pmd_page_vaddr(pmd_t pmd)
- {
-@@ -111,7 +111,7 @@ static inline void pte_clear (struct mm_struct *mm, unsigned long addr, pte_t *p
- 
- #define pte_page(pte)		virt_to_page(__pte_page(pte))
- #define pmd_pfn(pmd)		(pmd_val(pmd) >> PAGE_SHIFT)
--#define pmd_page(pmd)		virt_to_page(pmd_page_vaddr(pmd))
-+#define pmd_page(pmd)		virt_to_page((void  *)pmd_page_vaddr(pmd))
- 
- 
- static inline int pmd_none2 (pmd_t *pmd) { return !pmd_val (*pmd); }
-diff --git a/arch/m68k/mm/mcfmmu.c b/arch/m68k/mm/mcfmmu.c
-index 70aa0979e027..278e85fcecd4 100644
---- a/arch/m68k/mm/mcfmmu.c
-+++ b/arch/m68k/mm/mcfmmu.c
-@@ -69,7 +69,8 @@ void __init paging_init(void)
- 
- 		/* now change pg_table to kernel virtual addresses */
- 		for (i = 0; i < PTRS_PER_PTE; ++i, ++pg_table) {
--			pte_t pte = pfn_pte(virt_to_pfn(address), PAGE_INIT);
-+			pte_t pte = pfn_pte(virt_to_pfn((void *)address),
-+					    PAGE_INIT);
- 			if (address >= (unsigned long) high_memory)
- 				pte_val(pte) = 0;
- 
-diff --git a/arch/m68k/mm/motorola.c b/arch/m68k/mm/motorola.c
-index 911301224078..c75984e2d86b 100644
---- a/arch/m68k/mm/motorola.c
-+++ b/arch/m68k/mm/motorola.c
-@@ -102,7 +102,7 @@ static struct list_head ptable_list[2] = {
- 	LIST_HEAD_INIT(ptable_list[1]),
- };
- 
--#define PD_PTABLE(page) ((ptable_desc *)&(virt_to_page(page)->lru))
-+#define PD_PTABLE(page) ((ptable_desc *)&(virt_to_page((void *)(page))->lru))
- #define PD_PAGE(ptable) (list_entry(ptable, struct page, lru))
- #define PD_MARKBITS(dp) (*(unsigned int *)&PD_PAGE(dp)->index)
- 
-@@ -201,7 +201,7 @@ int free_pointer_table(void *table, int type)
- 		list_del(dp);
- 		mmu_page_dtor((void *)page);
- 		if (type == TABLE_PTE)
--			pgtable_pte_page_dtor(virt_to_page(page));
-+			pgtable_pte_page_dtor(virt_to_page((void *)page));
- 		free_page (page);
- 		return 1;
- 	} else if (ptable_list[type].next != dp) {
-diff --git a/arch/m68k/mm/sun3mmu.c b/arch/m68k/mm/sun3mmu.c
-index b619d0d4319c..c5e6a23e0262 100644
---- a/arch/m68k/mm/sun3mmu.c
-+++ b/arch/m68k/mm/sun3mmu.c
-@@ -75,7 +75,7 @@ void __init paging_init(void)
- 		/* now change pg_table to kernel virtual addresses */
- 		pg_table = (pte_t *) __va ((unsigned long) pg_table);
- 		for (i=0; i<PTRS_PER_PTE; ++i, ++pg_table) {
--			pte_t pte = pfn_pte(virt_to_pfn(address), PAGE_INIT);
-+			pte_t pte = pfn_pte(virt_to_pfn((void *)address), PAGE_INIT);
- 			if (address >= (unsigned long)high_memory)
- 				pte_val (pte) = 0;
- 			set_pte (pg_table, pte);
-diff --git a/arch/m68k/sun3/dvma.c b/arch/m68k/sun3/dvma.c
-index f15ff16b9997..83fcae6a0e79 100644
---- a/arch/m68k/sun3/dvma.c
-+++ b/arch/m68k/sun3/dvma.c
-@@ -29,7 +29,7 @@ static unsigned long dvma_page(unsigned long kaddr, unsigned long vaddr)
- 	j = *(volatile unsigned long *)kaddr;
- 	*(volatile unsigned long *)kaddr = j;
- 
--	ptep = pfn_pte(virt_to_pfn(kaddr), PAGE_KERNEL);
-+	ptep = pfn_pte(virt_to_pfn((void *)kaddr), PAGE_KERNEL);
- 	pte = pte_val(ptep);
- //	pr_info("dvma_remap: addr %lx -> %lx pte %08lx\n", kaddr, vaddr, pte);
- 	if(ptelist[(vaddr & 0xff000) >> PAGE_SHIFT] != pte) {
-diff --git a/arch/m68k/sun3x/dvma.c b/arch/m68k/sun3x/dvma.c
-index 08bb92113026..a6034ba05845 100644
---- a/arch/m68k/sun3x/dvma.c
-+++ b/arch/m68k/sun3x/dvma.c
-@@ -125,7 +125,7 @@ inline int dvma_map_cpu(unsigned long kaddr,
- 			do {
- 				pr_debug("mapping %08lx phys to %08lx\n",
- 					 __pa(kaddr), vaddr);
--				set_pte(pte, pfn_pte(virt_to_pfn(kaddr),
-+				set_pte(pte, pfn_pte(virt_to_pfn((void *)kaddr),
- 						     PAGE_KERNEL));
- 				pte++;
- 				kaddr += PAGE_SIZE;
 
 -- 
 2.34.1
