@@ -2,41 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 835E8C77B75
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 May 2023 11:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B23D9C77B75
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 May 2023 12:46:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235751AbjEWLPH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 May 2023 07:15:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47728 "EHLO
+        id S235892AbjEWMqQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 May 2023 08:46:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbjEWLPG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 May 2023 07:15:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 164D3119;
-        Tue, 23 May 2023 04:15:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S230024AbjEWMqP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 May 2023 08:46:15 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A20C1DB;
+        Tue, 23 May 2023 05:46:10 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8DA5063144;
-        Tue, 23 May 2023 11:15:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86034C433EF;
-        Tue, 23 May 2023 11:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684840503;
-        bh=t7q3eN4BhkELHpTr8DtxIodckxoWL2ElEdGhZ8MHRXA=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=kkOoNXpsxbLfCboBMvGQ0TZ495A4EkCqbOAhscv082uZWwcELAtlQYSschubrdr7e
-         s41Z0KfV1nRirJQ+AXcuUlwXITW7dG+QbnBqsROCo7fnGawbuOSiV1H/jac4LP62Px
-         DgTNYFrlEMVh15PHU0jwip1npMemwKtmdPYAnnIQUUIw09adZ4/j4VXr9V1mp039FO
-         8zxW1TPfGEf3AnApU6fmuw7BVmsLam15SH3gzqm4qmy+oakOHWJck/MpVclOMnuvBR
-         A+fjefks4366G9TneC0ktxH2ISCrf7eEdYApxB2Uw2EdkseBJW/MvR3OvEYUKuZ2ix
-         9aYZU2cyS5TdA==
-Message-ID: <c350ae1b689ef325561ba3443ff841c4d22e5791.camel@kernel.org>
-Subject: Re: [PATCH v4 2/9] fs: add infrastructure for multigrain inode
- i_m/ctime
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Christian Brauner <brauner@kernel.org>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3F71C22A61;
+        Tue, 23 May 2023 12:46:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1684845969; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=D2nL3xyYPlMdtq9qs01YJNIyc/qfR7bb6+Vphl3LLao=;
+        b=eOBxwWMb3EwllwDof3+xAu6djq6MmFwQorTzrxkBCEBmVr+ed4A3SGo6BLOuvPawqLNp8j
+        +bLaynXcHXPaZ9hduIypIgdVXKOOjv8BKzR99NWAl5wWqkzGRzyyxyXBxy11ZGUNQ/XV9i
+        1RTWYrBE9v44zs3IXsZc7kq0jspZ7uI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1684845969;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=D2nL3xyYPlMdtq9qs01YJNIyc/qfR7bb6+Vphl3LLao=;
+        b=s3H7NU7JGOmO3C7j1CKkYSeoBVTvMWjfTQOo/Ja+pc5RBlLw2VM4u3aqEqD6VQCd6TXpp1
+        Fz805agjqIxvCfCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DF2EC13A10;
+        Tue, 23 May 2023 12:46:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id IkZuNpC1bGSyMgAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 23 May 2023 12:46:08 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 92B3CA075D; Tue, 23 May 2023 14:46:06 +0200 (CEST)
+Date:   Tue, 23 May 2023 14:46:06 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Jeff Layton <jlayton@kernel.org>
 Cc:     Jan Kara <jack@suse.cz>, Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
         "Darrick J. Wong" <djwong@kernel.org>,
         Hugh Dickins <hughd@google.com>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -58,168 +74,143 @@ Cc:     Jan Kara <jack@suse.cz>, Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-mm@kvack.org, linux-nfs@vger.kernel.org,
         linux-cifs@vger.kernel.org
-Date:   Tue, 23 May 2023 07:15:00 -0400
-In-Reply-To: <20230523-undicht-antihelden-b1a98aa769be@brauner>
+Subject: Re: [PATCH v4 2/9] fs: add infrastructure for multigrain inode
+ i_m/ctime
+Message-ID: <20230523124606.bkkhwi6b67ieeygl@quack3>
 References: <20230518114742.128950-1-jlayton@kernel.org>
-         <20230518114742.128950-3-jlayton@kernel.org>
-         <20230523100240.mgeu4y46friv7hau@quack3>
-         <20230523101723.xmy7mylbczhki6aa@quack3>
-         <ef75ac7c96f309b8f080a717f260247f69988d4a.camel@kernel.org>
-         <20230523-undicht-antihelden-b1a98aa769be@brauner>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.1 (3.48.1-1.fc38) 
+ <20230518114742.128950-3-jlayton@kernel.org>
+ <20230523100240.mgeu4y46friv7hau@quack3>
+ <bf0065f2c9895edb66faeacc6cf77bd257088348.camel@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bf0065f2c9895edb66faeacc6cf77bd257088348.camel@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 2023-05-23 at 13:01 +0200, Christian Brauner wrote:
-> On Tue, May 23, 2023 at 06:56:11AM -0400, Jeff Layton wrote:
-> > On Tue, 2023-05-23 at 12:17 +0200, Jan Kara wrote:
-> > > On Tue 23-05-23 12:02:40, Jan Kara wrote:
-> > > > On Thu 18-05-23 07:47:35, Jeff Layton wrote:
-> > > > > The VFS always uses coarse-grained timestamp updates for filling =
-out the
-> > > > > ctime and mtime after a change. This has the benefit of allowing
-> > > > > filesystems to optimize away a lot metadata updates, down to arou=
-nd 1
-> > > > > per jiffy, even when a file is under heavy writes.
-> > > > >=20
-> > > > > Unfortunately, this has always been an issue when we're exporting=
- via
-> > > > > NFSv3, which relies on timestamps to validate caches. Even with N=
-FSv4, a
-> > > > > lot of exported filesystems don't properly support a change attri=
-bute
-> > > > > and are subject to the same problems with timestamp granularity. =
-Other
-> > > > > applications have similar issues (e.g backup applications).
-> > > > >=20
-> > > > > Switching to always using fine-grained timestamps would improve t=
-he
-> > > > > situation, but that becomes rather expensive, as the underlying
-> > > > > filesystem will have to log a lot more metadata updates.
-> > > > >=20
-> > > > > What we need is a way to only use fine-grained timestamps when th=
-ey are
-> > > > > being actively queried.
-> > > > >=20
-> > > > > The kernel always stores normalized ctime values, so only the fir=
-st 30
-> > > > > bits of the tv_nsec field are ever used. Whenever the mtime chang=
-es, the
-> > > > > ctime must also change.
-> > > > >=20
-> > > > > Use the 31st bit of the ctime tv_nsec field to indicate that some=
-thing
-> > > > > has queried the inode for the i_mtime or i_ctime. When this flag =
-is set,
-> > > > > on the next timestamp update, the kernel can fetch a fine-grained
-> > > > > timestamp instead of the usual coarse-grained one.
-> > > > >=20
-> > > > > This patch adds the infrastructure this scheme. Filesytems can op=
-t
-> > > > > into it by setting the FS_MULTIGRAIN_TS flag in the fstype.
-> > > > >=20
-> > > > > Later patches will convert individual filesystems over to use it.
-> > > > >=20
-> > > > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > >=20
-> > > > So there are two things I dislike about this series because I think=
- they
-> > > > are fragile:
-> > > >=20
-> > > > 1) If we have a filesystem supporting multigrain ts and someone
-> > > > accidentally directly uses the value of inode->i_ctime, he can get =
-bogus
-> > > > value (with QUERIED flag). This mistake is very easy to do. So I th=
-ink we
-> > > > should rename i_ctime to something like __i_ctime and always use ac=
-cessor
-> > > > function for it.
-> > > >=20
-> > > > 2) As I already commented in a previous version of the series, the =
-scheme
-> > > > with just one flag for both ctime and mtime and flag getting cleare=
-d in
-> > > > current_time() relies on the fact that filesystems always do an equ=
-ivalent
-> > > > of:
-> > > >=20
-> > > > 	inode->i_mtime =3D inode->i_ctime =3D current_time();
-> > > >=20
-> > > > Otherwise we can do coarse grained update where we should have done=
- a fine
-> > > > grained one. Filesystems often update timestamps like this but not
-> > > > universally. Grepping shows some instances where only inode->i_mtim=
-e is set
-> > > > from current_time() e.g. in autofs or bfs. Again a mistake that is =
-rather
-> > > > easy to make and results in subtle issues. I think this would be al=
-so
-> > > > nicely solved by renaming i_ctime to __i_ctime and using a function=
- to set
-> > > > ctime. Mtime could then be updated with inode->i_mtime =3D ctime_pe=
-ek().
-> > > >=20
-> > > > I understand this is quite some churn but a very mechanical one tha=
-t could
-> > > > be just done with Coccinelle and a few manual fixups. So IMHO it is=
- worth
-> > > > the more robust result.
-> > >=20
-> > > Also as I'm thinking about it your current scheme is slightly racy. S=
-uppose
-> > > the filesystem does:
-> > >=20
-> > > CPU1					CPU2
-> > >=20
-> > > 					statx()
-> > > inode->i_ctime =3D current_time()
-> > >   current_mg_time()
-> > >     nsec =3D atomic_long_fetch_andnot(QUERIED, &inode->i_ctime.tv_nse=
-c)
-> > > 					  nsec =3D atomic_long_fetch_or(QUERIED, &inode->i_ctime.tv_nsec=
-)
-> > >     if (nsec & QUERIED) - not set
-> > >       ktime_get_coarse_real_ts64(&now)
-> > >     return timestamp_truncate(now, inode);
-> > > - QUERIED flag in the inode->i_ctime gets overwritten by the assignme=
-nt
-> > >   =3D> we need not update ctime due to granularity although it was qu=
-eried
-> > >=20
-> > > One more reason to use explicit function to update inode->i_ctime ;)
-> >=20
-> > When we store the new time in the i_ctime field, the flag gets cleared
-> > because at that point we're storing a new (unseen) time.
-> >=20
-> > However, you're correct: if the i_ctime in your above example starts at
-> > the same value that is currently being returned by
-> > ktime_get_coarse_real_ts64, then we'll lose the flag set in statx.
-> >=20
-> > I think the right fix there would be to not update the ctime at all if
-> > it's a coarse grained time, and the value wouldn't have an apparent
-> > change to an observer. That would leave the flag intact.
-> >=20
-> > That does mean we'd need to move to a function that does clock fetch an=
-d
-> > assigns it to i_ctime in one go (like you suggest). Something like:
-> >=20
-> >     inode_update_ctime(inode);
-> >=20
-> > How we do that with atomic operations over two values (the tv_sec and
-> > tv_nsec) is a bit tricky. I'll have to think about it.
-> >=20
-> > Christian, given Jan's concerns do you want to drop this series for now
-> > and let me respin it?
->=20
-> I deliberately put it into a vfs.unstable.* branch. I would leave it
-> there until you send a new one then drop it. If we get lucky the bots
-> that run on -next will have time to report potential perf issues while
-> it's not currently causing conflicts.
+On Tue 23-05-23 06:40:08, Jeff Layton wrote:
+> On Tue, 2023-05-23 at 12:02 +0200, Jan Kara wrote:
+> > On Thu 18-05-23 07:47:35, Jeff Layton wrote:
+> > > The VFS always uses coarse-grained timestamp updates for filling out the
+> > > ctime and mtime after a change. This has the benefit of allowing
+> > > filesystems to optimize away a lot metadata updates, down to around 1
+> > > per jiffy, even when a file is under heavy writes.
+> > > 
+> > > Unfortunately, this has always been an issue when we're exporting via
+> > > NFSv3, which relies on timestamps to validate caches. Even with NFSv4, a
+> > > lot of exported filesystems don't properly support a change attribute
+> > > and are subject to the same problems with timestamp granularity. Other
+> > > applications have similar issues (e.g backup applications).
+> > > 
+> > > Switching to always using fine-grained timestamps would improve the
+> > > situation, but that becomes rather expensive, as the underlying
+> > > filesystem will have to log a lot more metadata updates.
+> > > 
+> > > What we need is a way to only use fine-grained timestamps when they are
+> > > being actively queried.
+> > > 
+> > > The kernel always stores normalized ctime values, so only the first 30
+> > > bits of the tv_nsec field are ever used. Whenever the mtime changes, the
+> > > ctime must also change.
+> > > 
+> > > Use the 31st bit of the ctime tv_nsec field to indicate that something
+> > > has queried the inode for the i_mtime or i_ctime. When this flag is set,
+> > > on the next timestamp update, the kernel can fetch a fine-grained
+> > > timestamp instead of the usual coarse-grained one.
+> > > 
+> > > This patch adds the infrastructure this scheme. Filesytems can opt
+> > > into it by setting the FS_MULTIGRAIN_TS flag in the fstype.
+> > > 
+> > > Later patches will convert individual filesystems over to use it.
+> > > 
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > 
+> > So there are two things I dislike about this series because I think they
+> > are fragile:
+> > 
+> > 1) If we have a filesystem supporting multigrain ts and someone
+> > accidentally directly uses the value of inode->i_ctime, he can get bogus
+> > value (with QUERIED flag). This mistake is very easy to do. So I think we
+> > should rename i_ctime to something like __i_ctime and always use accessor
+> > function for it.
+> > 
+> 
+> We could do this, but it'll be quite invasive. We'd have to change any
+> place that touches i_ctime (and there are a lot of them), even on
+> filesystems that are not being converted.
 
-Sounds good to me. Thanks!
---=20
-Jeff Layton <jlayton@kernel.org>
+Yes, that's why I suggested Coccinelle to deal with this.
+
+> > 2) As I already commented in a previous version of the series, the scheme
+> > with just one flag for both ctime and mtime and flag getting cleared in
+> > current_time() relies on the fact that filesystems always do an equivalent
+> > of:
+> > 
+> > 	inode->i_mtime = inode->i_ctime = current_time();
+> > 
+> > Otherwise we can do coarse grained update where we should have done a fine
+> > grained one. Filesystems often update timestamps like this but not
+> > universally. Grepping shows some instances where only inode->i_mtime is set
+> > from current_time() e.g. in autofs or bfs. Again a mistake that is rather
+> > easy to make and results in subtle issues. I think this would be also
+> > nicely solved by renaming i_ctime to __i_ctime and using a function to set
+> > ctime. Mtime could then be updated with inode->i_mtime = ctime_peek().
+> >
+> > I understand this is quite some churn but a very mechanical one that could
+> > be just done with Coccinelle and a few manual fixups. So IMHO it is worth
+> > the more robust result.
+> 
+> AFAICT, under POSIX, you must _always_ set the ctime when you set the
+> mtime, but the reverse is not true. That's why keeping the flag in the
+> ctime makes sense. If we're updating the mtime, then we necessarily must
+> update the ctime.
+
+Yes, but technically speaking:
+
+	inode->i_mtime = current_time();
+	inode->i_ctime = current_time();
+
+follows these requirements but is broken with your changes in unobvious
+way. And if mtime update is hidden in some function or condition, it is not
+even that suboptimal coding pattern.
+
+> > > +}
+> > > +
+> > > +/**
+> > > + * ctime_peek - peek at (but don't query) the ctime
+> > > + * @inode: inode to fetch the ctime from
+> > > + *
+> > > + * Grab the current ctime from the inode, sans I_CTIME_QUERIED flag. For
+> > > + * use by internal consumers that don't require a fine-grained update on
+> > > + * the next change.
+> > > + *
+> > > + * This is safe to call regardless of whether the underlying filesystem
+> > > + * is using multigrain timestamps.
+> > > + */
+> > > +static inline struct timespec64 ctime_peek(const struct inode *inode)
+> > > +{
+> > > +	struct timespec64 ctime;
+> > > +
+> > > +	ctime.tv_sec = inode->i_ctime.tv_sec;
+> > > +	ctime.tv_nsec = ctime_nsec_peek(inode);
+> > > +
+> > > +	return ctime;
+> > > +}
+> > 
+> > Given this is in a header that gets included in a lot of places, maybe we
+> > should call it like inode_ctime_peek() or inode_ctime_get() to reduce
+> > chances of a name clash?
+> 
+> I'd be fine with that, but "ctime" sort of implies inode->i_ctime to me.
+> We don't really use that nomenclature elsewhere.
+
+Yes, I don't insist here but we do have 'ctime' e.g. in IPC code
+(sem_ctime, shm_ctime, msg_ctime), we have ctime in md layer, ctime(3) is
+also a glibc function. So it is not *completely* impossible the clash
+happens but we can deal with it when it happens.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
