@@ -2,140 +2,58 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3024CC7EE23
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 May 2023 14:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE8D4C7EE26
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 May 2023 16:25:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237198AbjEWOI4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 May 2023 10:08:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47154 "EHLO
+        id S233067AbjEWQZi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 May 2023 12:25:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237200AbjEWOHZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 May 2023 10:07:25 -0400
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70EBEE64
-        for <linux-cifs@vger.kernel.org>; Tue, 23 May 2023 07:06:59 -0700 (PDT)
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-4effb818c37so8286719e87.3
-        for <linux-cifs@vger.kernel.org>; Tue, 23 May 2023 07:06:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1684850757; x=1687442757;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XXvb5TDUzvESWFR9QC/PoBRtJqf1+F8aU7D/u9pREy0=;
-        b=jUf/xLDRQeFWkvJxlE7DG8k/g9Kaq7kmU356lCnEcTPt7HRH9mF3yYSSKYy3AjdmMb
-         PNJoXmxSr7xwdkekuAGpi31DkWD2cnBbwWlnwniyL4NTEq8RWhSGAm7lNJ56nBi7lYUz
-         E0oj4UfEebq9LsjfphS/f/Zp9PIP/3JLeguL6Pe8UJJWKt8dQFmYwMpDNb6cjxHzVKmh
-         7fNHGbzoBbZ9dqlk8I/Mn0uG+EBCCvXw2LyD39z4Mh8nQI8yIzYFz+e/GOxUL2Yxfk6e
-         uOTevK/Gu1QvFq1s1cju6TkuunqswAEzPfBN+ZKrRoq9EFkn/phqnUa5oOger2h3AlhE
-         3yJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684850757; x=1687442757;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XXvb5TDUzvESWFR9QC/PoBRtJqf1+F8aU7D/u9pREy0=;
-        b=if6TrZffLlbYQJ63s1yh/LdqqMsmDlY4ZX5JwLZ5EvwSRqnAkige3PV7+PLd4fpHTh
-         u0578HwGlzkcfbt/c4jxhaC/Cl/jyywWgJYNzwnH5VcsOsaSAHfoslj0CUbc4T8xD9Ex
-         LbDshzKSOxhehKBj1b9xKXfzx5kiDncMkJDDoqCRm81iHq5sSCqT/MuX3e6lJUXjbP/d
-         Qq+tfaWfR7SpCMa6fOJ5sT6DtD4UenVc03Gx5gyuX2tG88gMHSWyWU2/owIEqcOWUFVu
-         NbNB196K7GR3cs9fDyhT4D6oDLfKJyVU8knAejiZcLHXTwJ+evOIkFvppvGoPxRHyCIe
-         kGpQ==
-X-Gm-Message-State: AC+VfDxeoOsAa5CIsapZjdfqe/utA5VGTYeb5NYQEwD+7MWlpdTvb8Tx
-        2xWF1TrqGoKvYQ4RWMbSEMfuih/lAiG0/wN7rsI=
-X-Google-Smtp-Source: ACHHUZ4aZ/AZ/8gxQE/YnF0VxlckPQW0Tv4gMGhkdHXNXCrF6Daph5XoYtZlIIicwXM9NPHyzPIGpA==
-X-Received: by 2002:ac2:43ba:0:b0:4f4:aea9:2a2d with SMTP id t26-20020ac243ba000000b004f4aea92a2dmr2010283lfl.43.1684850757405;
-        Tue, 23 May 2023 07:05:57 -0700 (PDT)
-Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id h28-20020ac2597c000000b004e9bf853c27sm1346562lfp.70.2023.05.23.07.05.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 07:05:57 -0700 (PDT)
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Tue, 23 May 2023 16:05:36 +0200
-Subject: [PATCH v3 12/12] m68k/mm: Make pfn accessors static inlines
+        with ESMTP id S231878AbjEWQZh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 May 2023 12:25:37 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C308E5
+        for <linux-cifs@vger.kernel.org>; Tue, 23 May 2023 09:25:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Cc:To:From:Date;
+        bh=5mcoNpXcRSaOXDsBNCjRyS67OEGsy3NcToOXqG/IOaA=; b=BoAuYWerklnzYYawx6EtikPD1f
+        khfBKewgyuLEu4UJCB+C3wl51DHwTw4q5Qgb6m2+pelzQLXV7vxINBKgsYtNzNTfRzvyQFv4hFJ1A
+        5cgNHP2kVGGiCKJRJf9t65KdZOpsabydwpLBtto2PNoMo8eokOmudRBz1ARGdwCQMoteO4r/67W0a
+        SozO6B3nPT27ypbbPo0KEOuoI6f9fYC5yE4BNjeGN+v5GD2bulrDDWWg6fUlcD0lC9gs+Dsj6r1kC
+        Bv5+dRr0kCcfWQO1H9U22pbTHYzZn2JUznQY3QXECLfZ1rebcYqz+Eg3xtsTO3Ptmka57FOR82FME
+        TCasuAazKbgWCLDXaZw9q1T17zjGsa+KXFznTFI2muvu6Az9pMCA7hzDE10hfeBGF2LYErBJ++VYd
+        d+9HK6ksp0TrHHWLmP0E8EHfHWZkq4E4ReFxrzO1/zcKJ24TjrG5ZUex1A1Nf2WzJiSXDdONm58Ty
+        ddzVoYgqBYXaR2SYX+o2XqGE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1q1UpJ-00BVB4-5a; Tue, 23 May 2023 16:25:33 +0000
+Date:   Tue, 23 May 2023 09:25:28 -0700
+From:   Jeremy Allison <jra@samba.org>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        samba-technical <samba-technical@lists.samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: Displaying streams as xattrs
+Message-ID: <ZGzo+KVlSTNk/B0r@jeremy-rocky-laptop>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <CAH2r5mv8nAncg-f=Z5u8LkH4o7kfJLJdtoksYQgiguF7efKZkQ@mail.gmail.com>
+ <CAN05THRKq9XPD11rBWXyTL_OGSh4pP6mQyufeW+xc+J3wvkMmw@mail.gmail.com>
+ <CAH2r5mtJfSiQXBRUwv6zcR5rhG2Q-pCvjH+n+_SZmVQo1pMeVg@mail.gmail.com>
+ <ZGuWhzP98U9Niog+@jeremy-rocky-laptop>
+ <CAN05THRnHcZtTMLxUSCYQXULVHiOXVYDU9TRy9K+_wBQQ1CFAw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230503-virt-to-pfn-v6-4-rc1-v3-12-a16c19c03583@linaro.org>
-References: <20230503-virt-to-pfn-v6-4-rc1-v3-0-a16c19c03583@linaro.org>
-In-Reply-To: <20230503-virt-to-pfn-v6-4-rc1-v3-0-a16c19c03583@linaro.org>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Vineet Gupta <vgupta@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Russell King <linux@armlinux.org.uk>,
-        Greg Ungerer <gerg@linux-m68k.org>
-Cc:     linux-mm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-m68k@lists.linux-m68k.org,
-        linux-snps-arc@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-arch@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.12.1
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAN05THRnHcZtTMLxUSCYQXULVHiOXVYDU9TRy9K+_wBQQ1CFAw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Making virt_to_pfn() a static inline taking a strongly typed
-(const void *) makes the contract of a passing a pointer of that
-type to the function explicit and exposes any misuse of the
-macro virt_to_pfn() acting polymorphic and accepting many types
-such as (void *), (unitptr_t) or (unsigned long) as arguments
-without warnings.
+On Tue, May 23, 2023 at 10:59:27AM +1000, ronnie sahlberg wrote:
 
-For symmetry, do the same with pfn_to_virt().
+>There are really nice use-cases for ADS where one can store additional
+>metadata within the "file" itself.
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- arch/m68k/include/asm/page_mm.h | 11 +++++++++--
- arch/m68k/include/asm/page_no.h | 11 +++++++++--
- 2 files changed, 18 insertions(+), 4 deletions(-)
-
-diff --git a/arch/m68k/include/asm/page_mm.h b/arch/m68k/include/asm/page_mm.h
-index 3903db2e8da7..363aa0f9ba8a 100644
---- a/arch/m68k/include/asm/page_mm.h
-+++ b/arch/m68k/include/asm/page_mm.h
-@@ -121,8 +121,15 @@ static inline void *__va(unsigned long x)
-  * TODO: implement (fast) pfn<->pgdat_idx conversion functions, this makes lots
-  * of the shifts unnecessary.
-  */
--#define virt_to_pfn(kaddr)	(__pa(kaddr) >> PAGE_SHIFT)
--#define pfn_to_virt(pfn)	__va((pfn) << PAGE_SHIFT)
-+static inline unsigned long virt_to_pfn(const void *kaddr)
-+{
-+	return __pa(kaddr) >> PAGE_SHIFT;
-+}
-+
-+static inline void *pfn_to_virt(unsigned long pfn)
-+{
-+	return __va(pfn << PAGE_SHIFT);
-+}
- 
- extern int m68k_virt_to_node_shift;
- 
-diff --git a/arch/m68k/include/asm/page_no.h b/arch/m68k/include/asm/page_no.h
-index 060e4c0e7605..af3a10973233 100644
---- a/arch/m68k/include/asm/page_no.h
-+++ b/arch/m68k/include/asm/page_no.h
-@@ -19,8 +19,15 @@ extern unsigned long memory_end;
- #define __pa(vaddr)		((unsigned long)(vaddr))
- #define __va(paddr)		((void *)((unsigned long)(paddr)))
- 
--#define virt_to_pfn(kaddr)	(__pa(kaddr) >> PAGE_SHIFT)
--#define pfn_to_virt(pfn)	__va((pfn) << PAGE_SHIFT)
-+static inline unsigned long virt_to_pfn(const void *kaddr)
-+{
-+	return __pa(kaddr) >> PAGE_SHIFT;
-+}
-+
-+static inline void *pfn_to_virt(unsigned long pfn)
-+{
-+	return __va(pfn << PAGE_SHIFT);
-+}
- 
- #define virt_to_page(addr)	(mem_map + (((unsigned long)(addr)-PAGE_OFFSET) >> PAGE_SHIFT))
- #define page_to_virt(page)	__va(((((page) - mem_map) << PAGE_SHIFT) + PAGE_OFFSET))
-
--- 
-2.34.1
-
+"Nice" for virus writers, yeah. A complete swamp for everyone
+else :-).
