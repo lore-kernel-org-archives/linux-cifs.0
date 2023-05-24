@@ -2,165 +2,127 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A92AFC7EE23
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 May 2023 08:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E130C77B7A
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 May 2023 10:10:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240318AbjEXImV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 May 2023 04:42:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49138 "EHLO
+        id S230493AbjEXKKx convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 May 2023 06:10:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240477AbjEXImC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 May 2023 04:42:02 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77691BC6
-        for <linux-cifs@vger.kernel.org>; Wed, 24 May 2023 01:40:49 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2af189d323fso70536771fa.1
-        for <linux-cifs@vger.kernel.org>; Wed, 24 May 2023 01:40:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684917648; x=1687509648;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mwzlUEgLOBGCBAK9+swrDLQw93OeIBiWQuYfcnnum/0=;
-        b=oLp2T/EXJrbO+puQYaddVW69Que01zlGIaI0KyuoRmBpkRUQM0d5KX02PABEw4BYKj
-         gRwie0sAYp7dv3QBaMSRRgw+HiWTxs41Akqa+GqzGaoZSFGj7VXBhYQicw0UmDKWlrlu
-         HD1ClxKX88rtknJxi92EuOyI/3ZKUPnGlSocxn/e49zHDeRui+VzK57FgnDeuMPjuD/Z
-         e5pS+KwL7wWnPfHiMLfBV1vXN0KzFAdatx6w2rZhMKjsVuza1jeblm5eSkvjqjsQMB70
-         oP6nLrBWnb4Pu4pkqWaAbR/i5nPmJ+MwvUMGM3gawGFhG6Oyi2TUVb+LkHeZC9n10Rb9
-         qozQ==
+        with ESMTP id S230214AbjEXKKv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 May 2023 06:10:51 -0400
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D4BFFC;
+        Wed, 24 May 2023 03:10:50 -0700 (PDT)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-563b1e5f701so7005407b3.3;
+        Wed, 24 May 2023 03:10:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684917648; x=1687509648;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mwzlUEgLOBGCBAK9+swrDLQw93OeIBiWQuYfcnnum/0=;
-        b=WbTWp5AcNq/J7N359OuS6z6zvrRcdlVSrqxyL9794y7UEIFPbWqVhtmDqLdlOB/RUV
-         WDt65VtKYKTRbu5NgPaBNX+4A9kChPzOZjljawCwJySBc47AUjIdx1YnOznDJcXwgV9m
-         SPYvbMvqLGPILDSuGRrYJotdeUydK2yIW4VFg5yuTBPut/cPAVJqaOzIUKMNLkCB4SXM
-         O/PBdz0COzKPLSD0TE+QJUVUh2e5II/HYkIng6dqMcYcowD4I9moeBJ8rYluOKGyjr09
-         BjfYWKYk4fTvFT5AEoYha7cQHJR+nP8ATRR1QjPDM3UqCYLGPtMnM1QNEWgeKOip4MBa
-         9qmw==
-X-Gm-Message-State: AC+VfDxYnBK96ZdY7SsO5TuGCwqeMbbGxSg1vLwnL251U4RsYQav9fbb
-        +ytSe+OxqgXqFDQZXweJMGLkdvEgEXPcnGavn2PeIKbLjj2v9Bj3
-X-Google-Smtp-Source: ACHHUZ7EinVoISPWEICAo8P3ol/RtI54woZwKrKUbfTSRD4sfYJu/02Xxq1GRWRd2SQOeW+gq8Tle6HiuacoXAMKhjE=
-X-Received: by 2002:a05:651c:10a9:b0:2af:1ff0:9eb3 with SMTP id
- k9-20020a05651c10a900b002af1ff09eb3mr5776224ljn.15.1684917647382; Wed, 24 May
- 2023 01:40:47 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684923049; x=1687515049;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qjsS8fRbVoZU8c34Ms8NTam545AKBDbkDG6TRRcdYb4=;
+        b=LjtrAJ8Z85MESZw25ozmK2IDUbJ9EQMNlRFB6a03PSPp4vRG2qSs1Xg2B0+QfdYUFh
+         eVkflIxZznOABD692XTjfe1/1FPAUSBS3CRDVW9S01s3nQm5CuDOCfgujL6x5l9LqqGR
+         lOUYTKkPrDTcXfxbg2lQC/G31quMWfuJYyS50PXfZecOBQ9XKvtwjnmejuX6M6ph9ifS
+         YNdgRDaUkf+P2AGyiQyjctdX/K6TbSgtmfrYGBR1wySp7yPQDkJGrEOrPNtStAPzhB0a
+         NeOznzVlGZBWO+yqYk9bBJkPvs/O5nETJXfFNWpdWYIaF+PfrpGORLnB7RjtSpbCyTTo
+         ZjPQ==
+X-Gm-Message-State: AC+VfDym/LE86ixzpJ1ERmgA30CdRPCAfKBsXebaWw40QH16Y8jR5SMI
+        TVvob1fPlxCo0OsJu5CQ3Jt23SJ7iF53pg==
+X-Google-Smtp-Source: ACHHUZ5iDHVW2SFTOZawBoCCVCzpPNS9w2ap/ITNnKDoHEGYnsZlsEJ+/es5jF9jSwYIutFcnmWOBw==
+X-Received: by 2002:a81:a107:0:b0:55a:1f2:ef6 with SMTP id y7-20020a81a107000000b0055a01f20ef6mr16756863ywg.9.1684923049215;
+        Wed, 24 May 2023 03:10:49 -0700 (PDT)
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
+        by smtp.gmail.com with ESMTPSA id x11-20020a817c0b000000b0055aaccfa2c7sm3592626ywc.91.2023.05.24.03.10.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 May 2023 03:10:48 -0700 (PDT)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-564dc3dc075so7136977b3.1;
+        Wed, 24 May 2023 03:10:48 -0700 (PDT)
+X-Received: by 2002:a0d:c007:0:b0:560:ee0d:1d95 with SMTP id
+ b7-20020a0dc007000000b00560ee0d1d95mr18669163ywd.3.1684923047913; Wed, 24 May
+ 2023 03:10:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <ZG1rih4YPhwaQdQs@storage>
-In-Reply-To: <ZG1rih4YPhwaQdQs@storage>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 24 May 2023 03:40:35 -0500
-Message-ID: <CAH2r5mv5cj-BfhLgYJ1asPR+rQ9g5gm7tcwc1qBfQffKTiXGNQ@mail.gmail.com>
-Subject: Re: Bug with mount.cifs and mapchars
-To:     Tyler Spivey <tspivey8@gmail.com>
-Cc:     linux-cifs@vger.kernel.org,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        David Howells <dhowells@redhat.com>
-Content-Type: multipart/mixed; boundary="000000000000d972a705fc6c75ea"
+References: <20230503-virt-to-pfn-v6-4-rc1-v3-0-a16c19c03583@linaro.org> <20230503-virt-to-pfn-v6-4-rc1-v3-2-a16c19c03583@linaro.org>
+In-Reply-To: <20230503-virt-to-pfn-v6-4-rc1-v3-2-a16c19c03583@linaro.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Wed, 24 May 2023 12:10:36 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXafb3SYUgu=ZWFRSiqGdt5ahvPEa75v6jGPBPGARaBhw@mail.gmail.com>
+Message-ID: <CAMuHMdXafb3SYUgu=ZWFRSiqGdt5ahvPEa75v6jGPBPGARaBhw@mail.gmail.com>
+Subject: Re: [PATCH v3 02/12] m68k: Pass a pointer to virt_to_pfn() virt_to_page()
+To:     Linus Walleij <linus.walleij@linaro.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Greg Ungerer <gerg@linux-m68k.org>, linux-mm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+        linux-snps-arc@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-arch@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000d972a705fc6c75ea
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Linus,
 
-Good catch.   The conversion of cifs.ko to the new mount API in the
-5.11 kernel and later broke this mount option.   Patch is attached to
-fix it.
-
-Patch is attached but here is the description:
-
-    There are two ways that (reserved for other OS like Windows)
-special characters
-    have been mapped in the past ("SFU" and "SFM" mappings). The default
-    for Linux has been to use "mapposix" (ie the SFM mapping) but
-    the conversion to the new mount API in the 5.11 kernel broke
-    the ability to override the default mapping of the reserved
-    characters (like '?' and '*' and '\') via "mapchars" mount option.
-
-    This patch fixes that - so can now mount with "mapchars"
-    mount option to override the default ("mapposix" ie SFM) mapping.
-
-    Reported-by: Tyler Spivey <tspivey8@gmail.com>
-    Fixes: 24e0a1eff9e2b ("cifs: switch to new mount api")
-    Signed-off-by: Steve French <stfrench@microsoft.com>
-
-On Tue, May 23, 2023 at 8:48=E2=80=AFPM Tyler Spivey <tspivey8@gmail.com> w=
-rote:
+On Tue, May 23, 2023 at 4:05 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+> Functions that work on a pointer to virtual memory such as
+> virt_to_pfn() and users of that function such as
+> virt_to_page() are supposed to pass a pointer to virtual
+> memory, ideally a (void *) or other pointer. However since
+> many architectures implement virt_to_pfn() as a macro,
+> this function becomes polymorphic and accepts both a
+> (unsigned long) and a (void *).
 >
-> Hi.
+> Fix up the offending calls in arch/m68k with explicit casts.
 >
-> Note: I'm not subscribed, please CC.
+> The page table include <asm/pgtable.h> will include different
+> variants of the defines depending on whether you build for
+> classic m68k, ColdFire or Sun3, so fix all variants.
 >
-> I'm trying to mount a Windows 10 share from Linux with mapchars,
-> but it still uses the SFM mapping.
->
-> Linux storage 5.15.0-72-generic #79-Ubuntu SMP Wed Apr 19 08:22:18 UTC 20=
-23 x86_64 x86_64 x86_64 GNU/Linux
-> mount.cifs version: 6.14
-> Command line: mount //192.168.145.1/e e -o username=3Dtyler,uid=3Dtyler,m=
-apchars
->
-> This also failed under Arch:
->
-> Linux arch1 6.3.3-arch1-1 #1 SMP PREEMPT_DYNAMIC Sun, 21 May 2023 16:15:2=
-2 +0000 x86_64 GNU/Linux
-> mount.cifs version: 7.0
->
-> If I create a file called test? in a directory, the ?
-> shows up on the Windows machine as u+f025 (SFM mapping).
-> With mapchars, I would expect u+f03f (SFU mapping).
->
-> Looking at the kernel source for version 6.3.3,
-> it looks like sfu_remap needs to be set for this to work.
-> However, I can't find anything which sets it (mapchars doesn't seem to
-> be hooked up to it).
->
-> Thanks,
-> Tyler
+> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 
+Thanks for your patch!
 
+> ---
+> ChangeLog v2->v3:
+> - Fix up versioning. This is v3.
+> - Let Coldfire __pte_page() return a (void *) instead of __va
+> - Delete Coldfire pte_pagenr() which was using unsigned long
+>   semantics from __pte_page()
 
---=20
-Thanks,
+You may want to mention this removal in the patch descriptin.
 
-Steve
+> - Drop ill-advised change to Coldfire pmd_page_vaddr()
 
---000000000000d972a705fc6c75ea
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-mapchars-mount-option-ignored.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-mapchars-mount-option-ignored.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_li1gecmf0>
-X-Attachment-Id: f_li1gecmf0
+> --- a/arch/m68k/include/asm/sun3_pgtable.h
+> +++ b/arch/m68k/include/asm/sun3_pgtable.h
 
-RnJvbSAzMGY0MjgzZjQ1Mjc1NjkwNTkyNjA1MjcwMGVmZTQyMjUyNTZjNzFkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFdlZCwgMjQgTWF5IDIwMjMgMDM6MjY6MTkgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBtYXBjaGFycyBtb3VudCBvcHRpb24gaWdub3JlZAoKVGhlcmUgYXJlIHR3byB3YXlzIHRo
-YXQgKFdpbmRvd3MsIHJlc2VydmVkKSBzcGVjaWFsIGNoYXJhY3RlcnMgaGF2ZQpiZWVuIG1hcHBl
-ZCBpbiB0aGUgcGFzdCAoIlNGVSIgYW5kICJTRk0iIG1hcHBpbmdzKS4gVGhlIGRlZmF1bHQKZm9y
-IExpbnV4IGhhcyBiZWVuIHRvIHVzZSAibWFwcG9zaXgiIChpZSB0aGUgU0ZNIG1hcHBpbmcpIGJ1
-dAp0aGUgY29udmVyc2lvbiB0byB0aGUgbmV3IG1vdW50IEFQSSBpbiB0aGUgNS4xMSBrZXJuZWwg
-YnJva2UKdGhlIGFiaWxpdHkgdG8gb3ZlcnJpZGUgdGhlIGRlZmF1bHQgbWFwcGluZyBvZiB0aGUg
-cmVzZXJ2ZWQKY2hhcmFjdGVycyAobGlrZSAnPycgYW5kICcqJyBhbmQgJ1wnKSB2aWEgIm1hcGNo
-YXJzIiBtb3VudCBvcHRpb24uCgpUaGlzIHBhdGNoIGZpeGVzIHRoYXQgLSBzbyBjYW4gbm93IG1v
-dW50IHdpdGggIm1hcGNoYXJzIgptb3VudCBvcHRpb24gdG8gb3ZlcnJpZGUgdGhlIGRlZmF1bHQg
-KCJtYXBwb3NpeCIgaWUgU0ZNKSBtYXBwaW5nLgoKUmVwb3J0ZWQtYnk6IFR5bGVyIFNwaXZleSA8
-dHNwaXZleThAZ21haWwuY29tPgpGaXhlczogMjRlMGExZWZmOWUyYiAoImNpZnM6IHN3aXRjaCB0
-byBuZXcgbW91bnQgYXBpIikKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBt
-aWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvZnNfY29udGV4dC5jIHwgOCArKysrKysrKwogMSBm
-aWxlIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvZnNfY29u
-dGV4dC5jIGIvZnMvY2lmcy9mc19jb250ZXh0LmMKaW5kZXggYWNlMTFhMWE3YzhhLi4xYmRhNzU2
-MDliNjQgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvZnNfY29udGV4dC5jCisrKyBiL2ZzL2NpZnMvZnNf
-Y29udGV4dC5jCkBAIC05MDQsNiArOTA0LDE0IEBAIHN0YXRpYyBpbnQgc21iM19mc19jb250ZXh0
-X3BhcnNlX3BhcmFtKHN0cnVjdCBmc19jb250ZXh0ICpmYywKIAkJCWN0eC0+c2Z1X3JlbWFwID0g
-ZmFsc2U7IC8qIGRpc2FibGUgU0ZVIG1hcHBpbmcgKi8KIAkJfQogCQlicmVhazsKKwljYXNlIE9w
-dF9tYXBjaGFyczoKKwkJaWYgKHJlc3VsdC5uZWdhdGVkKQorCQkJY3R4LT5zZnVfcmVtYXAgPSBm
-YWxzZTsKKwkJZWxzZSB7CisJCQljdHgtPnNmdV9yZW1hcCA9IHRydWU7CisJCQljdHgtPnJlbWFw
-ID0gZmFsc2U7IC8qIGRpc2FibGUgU0ZNIChtYXBwb3NpeCkgbWFwcGluZyAqLworCQl9CisJCWJy
-ZWFrOwogCWNhc2UgT3B0X3VzZXJfeGF0dHI6CiAJCWlmIChyZXN1bHQubmVnYXRlZCkKIAkJCWN0
-eC0+bm9feGF0dHIgPSAxOwotLSAKMi4zNC4xCgo=
---000000000000d972a705fc6c75ea--
+> @@ -111,7 +111,7 @@ static inline void pte_clear (struct mm_struct *mm, unsigned long addr, pte_t *p
+>
+>  #define pte_page(pte)          virt_to_page(__pte_page(pte))
+>  #define pmd_pfn(pmd)           (pmd_val(pmd) >> PAGE_SHIFT)
+> -#define pmd_page(pmd)          virt_to_page(pmd_page_vaddr(pmd))
+> +#define pmd_page(pmd)          virt_to_page((void  *)pmd_page_vaddr(pmd))
+
+There's an extra space between "void" and "*".
+
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
