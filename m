@@ -2,102 +2,229 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5265BC77B73
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 May 2023 15:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AA9C77B7A
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 May 2023 16:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232915AbjEXPQm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 May 2023 11:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54800 "EHLO
+        id S229461AbjEXQk0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 May 2023 12:40:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjEXPQl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 May 2023 11:16:41 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7125DA9
-        for <linux-cifs@vger.kernel.org>; Wed, 24 May 2023 08:16:40 -0700 (PDT)
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ae51b07338so3068925ad.0
-        for <linux-cifs@vger.kernel.org>; Wed, 24 May 2023 08:16:40 -0700 (PDT)
+        with ESMTP id S229605AbjEXQkV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 May 2023 12:40:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B2312E
+        for <linux-cifs@vger.kernel.org>; Wed, 24 May 2023 09:39:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684946340;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hIRDFYHmrI2ea9PgJ9cG2BzagPncv2WifE6ykqY/z1c=;
+        b=JYylOJb+NzvsPb3go+eofLvRUsLwcMr6QMlGTwp3VirHN/L/4sKl9a9qYhnmC/cR4+GW3d
+        WgZ+rzV2h5FhAmPtIqtdJOvefiLDq8bJMcp/9FetIiZ55k+xnl16pB8pwk1zJnzq32Gafw
+        R3IUsKP3/2ZQEZff8cdkFFfF9WrdBBE=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-280-w9BBNNZTPiiUn4tmEEueRA-1; Wed, 24 May 2023 12:38:58 -0400
+X-MC-Unique: w9BBNNZTPiiUn4tmEEueRA-1
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-5341081a962so465411a12.2
+        for <linux-cifs@vger.kernel.org>; Wed, 24 May 2023 09:38:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684941400; x=1687533400;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qCCiokG9KKNnbY1lO++nu+kKmFcA4dj2qr7nCXk9o78=;
-        b=OpzQptpLvKLcmhkh1SvhZCbhY7KnTCw9e043URmvlSCinASlSqrs7vQV+OoV7p+XSb
-         0+EJ+j/315UFjZ4YiCFbJwuesVVk793WDuXPxsdaszqLdZsYsw0+LNdO5Kix4RpS/2By
-         0VlF6wvWFdRhmHkE8PFQrrgAnnvbRqVCEinpCIpNOCtwWHcmJSuOGuqs8rpwpxBLW95T
-         iwz0nUbALlprUwdtDA1bV60u9qT1w9UZEuvYySGnHTMVIp/9lqmedP8YpZ2pP4v9JRxS
-         jBWhg/aQO/bZ+Y6sGrt3qrEyGR+kLRP1Z6VHvJTKpADejHAS1WbZRCEhBrgiOlbCqYG/
-         7EMg==
-X-Gm-Message-State: AC+VfDzvDWc5MH+lbo4+TaPxeh4wljBepaz/GxHuCfadMNUfJgFCw5jt
-        O7gHJwggjzLEbDN6j1tPd321W+hG2hM=
-X-Google-Smtp-Source: ACHHUZ6WqAp+vCg+dPLgK4BrkSP3iN60xvyiQKk1/FbtBP8Q/LICTLlDL/7Xf3etD36Hm0ZUv0qmpg==
-X-Received: by 2002:a17:902:edc2:b0:1aa:fd48:f5e2 with SMTP id q2-20020a170902edc200b001aafd48f5e2mr14332950plk.32.1684941399595;
-        Wed, 24 May 2023 08:16:39 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id q7-20020a170902dac700b001a6d4ffc760sm8891011plx.244.2023.05.24.08.16.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 May 2023 08:16:39 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: call putname after using the last component
-Date:   Thu, 25 May 2023 00:16:32 +0900
-Message-Id: <20230524151632.8135-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20221208; t=1684946338; x=1687538338;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hIRDFYHmrI2ea9PgJ9cG2BzagPncv2WifE6ykqY/z1c=;
+        b=a9TFptD2GtMLZxyRYsHFF0E2+hahCuLkoeHmqtYKHc9SovwJ+RhE5pVZ5PUPLWMRw6
+         9Tr162cbkHPKtl6L0W/BhyOsS2pdU39L5CDQ4yfmx+qoFhvsD1bt4aKaGxRx8XwSACjN
+         G0q6gOH8gaJFM1JNUnKo615GUdsLlwCfDnfnuEAkMP9bzKdlCPhXhm33XzoZDaU60cUB
+         YHoCkcKknomq2c/STgE/wNDhMbHz9lsPFyxqxBEJbr7Qtg9U/n9esQP1nYFfd+rLcE+B
+         q9qaBwno61JcjK9iCl5CqppIHG1/TG0OvZ9v6DhjUPENa2KS6OiXViOsg/sNChmFDoVa
+         pw3A==
+X-Gm-Message-State: AC+VfDwP5fPff0/qMJkuhiWgi1vv83oKapmq1QZXG/rA0nRNIJZKvhw/
+        dYzmM7w3zSFxeLVPgjolK06a8Q0l4lfBrH89uU2T1Ax36tYEnE3NaOjCMQydwEAdAYSq39/kBr9
+        UdZ4MZrLkWvFb8lm1ts+9WS+p12MQBRXeede0aQ==
+X-Received: by 2002:a17:903:428a:b0:1ac:4a41:d38d with SMTP id ju10-20020a170903428a00b001ac4a41d38dmr15831015plb.51.1684946337865;
+        Wed, 24 May 2023 09:38:57 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7QhwNbEG7dVnvKUcvcrF5VXTCpluYFQoMIGO7odXS8eF4N7acYVvSWWvlkVR9tfx1GsK6DpUi0zEDdnwhFY7c=
+X-Received: by 2002:a17:903:428a:b0:1ac:4a41:d38d with SMTP id
+ ju10-20020a170903428a00b001ac4a41d38dmr15830993plb.51.1684946337555; Wed, 24
+ May 2023 09:38:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230216150701.3654894-1-dhowells@redhat.com> <CALF+zO=w2Gyz6JtzEoFgTVjH67-_CuTaK7e+2yoHEwXZ8bPx_A@mail.gmail.com>
+In-Reply-To: <CALF+zO=w2Gyz6JtzEoFgTVjH67-_CuTaK7e+2yoHEwXZ8bPx_A@mail.gmail.com>
+From:   David Wysochanski <dwysocha@redhat.com>
+Date:   Wed, 24 May 2023 12:38:21 -0400
+Message-ID: <CALF+zO=Y8dMsJ79RYp1e7n9B5_0=segpqW9_tetBqPhFiQcZxA@mail.gmail.com>
+Subject: Re: [Linux-cachefs] [PATCH v6 0/2] mm, netfs, fscache: Stop read
+ optimisation when folio removed from pagecache
+To:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-last component point filename struct. Currently putname is called after
-vfs_path_parent_lookup(). And then last component is used for
-lookup_one_qstr_excl(). name in last component is freed by previous
-calling putname(). And It cause file lookup failure when testing
-generic/464 test of xfstest.
+On Tue, May 16, 2023 at 3:29=E2=80=AFPM David Wysochanski <dwysocha@redhat.=
+com> wrote:
+>
+> On Thu, Feb 16, 2023 at 10:07=E2=80=AFAM David Howells <dhowells@redhat.c=
+om> wrote:
+> >
+> > Hi Willy,
+> >
+> > Is this okay by you?  You said you wanted to look at the remaining uses=
+ of
+> > page_has_private(), of which there are then three after these patches, =
+not
+> > counting folio_has_private():
+> >
+> >         arch/s390/kernel/uv.c:          if (page_has_private(page))
+> >         mm/khugepaged.c:                    1 + page_mapcount(page) + p=
+age_has_private(page)) {
+> >         mm/migrate_device.c:            extra +=3D 1 + page_has_private=
+(page);
+> >
+> > --
+> > I've split the folio_has_private()/filemap_release_folio() call pair
+> > merging into its own patch, separate from the actual bugfix and pulled =
+out
+> > the folio_needs_release() function into mm/internal.h and made
+> > filemap_release_folio() use it.  I've also got rid of the bit clearance=
+s
+> > from the network filesystem evict_inode functions as they doesn't seem =
+to
+> > be necessary.
+> >
+> > Note that the last vestiges of try_to_release_page() got swept away, so=
+ I
+> > rebased and dealt with that.  One comment remained, which is removed by=
+ the
+> > first patch.
+> >
+> > David
+> >
+> > Changes:
+> > =3D=3D=3D=3D=3D=3D=3D=3D
+> > ver #6)
+> >  - Drop the third patch which removes a duplicate check in vmscan().
+> >
+> > ver #5)
+> >  - Rebased on linus/master.  try_to_release_page() has now been entirel=
+y
+> >    replaced by filemap_release_folio(), barring one comment.
+> >  - Cleaned up some pairs in ext4.
+> >
+> > ver #4)
+> >  - Split has_private/release call pairs into own patch.
+> >  - Moved folio_needs_release() to mm/internal.h and removed open-coded
+> >    version from filemap_release_folio().
+> >  - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
+> >  - Added experimental patch to reduce shrink_folio_list().
+> >
+> > ver #3)
+> >  - Fixed mapping_clear_release_always() to use clear_bit() not set_bit(=
+).
+> >  - Moved a '&&' to the correct line.
+> >
+> > ver #2)
+> >  - Rewrote entirely according to Willy's suggestion[1].
+> >
+> > Link: https://lore.kernel.org/r/Yk9V/03wgdYi65Lb@casper.infradead.org/ =
+[1]
+> > Link: https://lore.kernel.org/r/164928630577.457102.8519251179327601178=
+.stgit@warthog.procyon.org.uk/ # v1
+> > Link: https://lore.kernel.org/r/166844174069.1124521.108905063609741699=
+94.stgit@warthog.procyon.org.uk/ # v2
+> > Link: https://lore.kernel.org/r/166869495238.3720468.487815140908514676=
+4.stgit@warthog.procyon.org.uk/ # v3
+> > Link: https://lore.kernel.org/r/1459152.1669208550@warthog.procyon.org.=
+uk/ # v3 also
+> > Link: https://lore.kernel.org/r/166924370539.1772793.137306983607718213=
+17.stgit@warthog.procyon.org.uk/ # v4
+> > Link: https://lore.kernel.org/r/167172131368.2334525.856980892568773193=
+7.stgit@warthog.procyon.org.uk/ # v5
+> > ---
+> > %(shortlog)s
+> > %(diffstat)s
+> >
+> > David Howells (2):
+> >   mm: Merge folio_has_private()/filemap_release_folio() call pairs
+> >   mm, netfs, fscache: Stop read optimisation when folio removed from
+> >     pagecache
+> >
+> >  fs/9p/cache.c           |  2 ++
+> >  fs/afs/internal.h       |  2 ++
+> >  fs/cachefiles/namei.c   |  2 ++
+> >  fs/ceph/cache.c         |  2 ++
+> >  fs/cifs/fscache.c       |  2 ++
+> >  fs/ext4/move_extent.c   | 12 ++++--------
+> >  fs/splice.c             |  3 +--
+> >  include/linux/pagemap.h | 16 ++++++++++++++++
+> >  mm/filemap.c            |  2 ++
+> >  mm/huge_memory.c        |  3 +--
+> >  mm/internal.h           | 11 +++++++++++
+> >  mm/khugepaged.c         |  3 +--
+> >  mm/memory-failure.c     |  8 +++-----
+> >  mm/migrate.c            |  3 +--
+> >  mm/truncate.c           |  6 ++----
+> >  mm/vmscan.c             |  8 ++++----
+> >  16 files changed, 56 insertions(+), 29 deletions(-)
+> >
+> > --
+> > Linux-cachefs mailing list
+> > Linux-cachefs@redhat.com
+> > https://listman.redhat.com/mailman/listinfo/linux-cachefs
+> >
+>
+> Willy, and David,
+>
+> Can this series move forward?
+> This just got mentioned again [1] after Chris tested the NFS netfs
+> patches that were merged in 6.4-rc1
+>
+> [1] https://lore.kernel.org/linux-nfs/CAAmbk-f_U8CPcTQM866L572uUHdK4p5iWK=
+nUQs4r8fkW=3D6RW9g@mail.gmail.com/
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/ksmbd/vfs.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Sorry about the timing on the original email as I forgot it lined up
+with LSF/MM.
 
-diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
-index 9bdb01c5b201..6f302919e9f7 100644
---- a/fs/ksmbd/vfs.c
-+++ b/fs/ksmbd/vfs.c
-@@ -86,12 +86,14 @@ static int ksmbd_vfs_path_lookup_locked(struct ksmbd_share_config *share_conf,
- 	err = vfs_path_parent_lookup(filename, flags,
- 				     &parent_path, &last, &type,
- 				     root_share_path);
--	putname(filename);
--	if (err)
-+	if (err) {
-+		putname(filename);
- 		return err;
-+	}
- 
- 	if (unlikely(type != LAST_NORM)) {
- 		path_put(&parent_path);
-+		putname(filename);
- 		return -ENOENT;
- 	}
- 
-@@ -108,12 +110,14 @@ static int ksmbd_vfs_path_lookup_locked(struct ksmbd_share_config *share_conf,
- 	path->dentry = d;
- 	path->mnt = share_conf->vfs_path.mnt;
- 	path_put(&parent_path);
-+	putname(filename);
- 
- 	return 0;
- 
- err_out:
- 	inode_unlock(parent_path.dentry->d_inode);
- 	path_put(&parent_path);
-+	putname(filename);
- 	return -ENOENT;
+FYI, I tested with 6.4-rc1 plus these two patches, then I added the NFS
+hunk needed (see below).  All my tests pass now[1], and it makes sense
+from all the ftraces I've seen on test runs that fail (cachefiles_prep_read
+trace event would show "DOWN no-data" even after data was written
+previously).
+
+This small NFS hunk needs added to patch #2 in this series:
+
+diff --git a/fs/nfs/fscache.c b/fs/nfs/fscache.c
+index 8c35d88a84b1..d4a20748b14f 100644
+--- a/fs/nfs/fscache.c
++++ b/fs/nfs/fscache.c
+@@ -180,6 +180,10 @@ void nfs_fscache_init_inode(struct inode *inode)
+                                               &auxdata,      /* aux_data *=
+/
+                                               sizeof(auxdata),
+                                               i_size_read(inode));
++
++       if (netfs_inode(inode)->cache)
++               mapping_set_release_always(inode->i_mapping);
++
  }
- 
--- 
-2.25.1
+
+ /*
+
+[1] https://lore.kernel.org/linux-nfs/CALF+zOn_qX4tcT2ucq4jD3G-1ERqZkL6Cw7h=
+x75OnQF0ivqSeA@mail.gmail.com/
 
