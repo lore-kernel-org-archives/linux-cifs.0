@@ -2,229 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AA9C77B7A
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 May 2023 16:40:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7719DC77B7E
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 May 2023 07:34:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229461AbjEXQk0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 May 2023 12:40:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50964 "EHLO
+        id S239180AbjEYHeG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 May 2023 03:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbjEXQkV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 May 2023 12:40:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B2312E
-        for <linux-cifs@vger.kernel.org>; Wed, 24 May 2023 09:39:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684946340;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hIRDFYHmrI2ea9PgJ9cG2BzagPncv2WifE6ykqY/z1c=;
-        b=JYylOJb+NzvsPb3go+eofLvRUsLwcMr6QMlGTwp3VirHN/L/4sKl9a9qYhnmC/cR4+GW3d
-        WgZ+rzV2h5FhAmPtIqtdJOvefiLDq8bJMcp/9FetIiZ55k+xnl16pB8pwk1zJnzq32Gafw
-        R3IUsKP3/2ZQEZff8cdkFFfF9WrdBBE=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-280-w9BBNNZTPiiUn4tmEEueRA-1; Wed, 24 May 2023 12:38:58 -0400
-X-MC-Unique: w9BBNNZTPiiUn4tmEEueRA-1
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-5341081a962so465411a12.2
-        for <linux-cifs@vger.kernel.org>; Wed, 24 May 2023 09:38:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684946338; x=1687538338;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hIRDFYHmrI2ea9PgJ9cG2BzagPncv2WifE6ykqY/z1c=;
-        b=a9TFptD2GtMLZxyRYsHFF0E2+hahCuLkoeHmqtYKHc9SovwJ+RhE5pVZ5PUPLWMRw6
-         9Tr162cbkHPKtl6L0W/BhyOsS2pdU39L5CDQ4yfmx+qoFhvsD1bt4aKaGxRx8XwSACjN
-         G0q6gOH8gaJFM1JNUnKo615GUdsLlwCfDnfnuEAkMP9bzKdlCPhXhm33XzoZDaU60cUB
-         YHoCkcKknomq2c/STgE/wNDhMbHz9lsPFyxqxBEJbr7Qtg9U/n9esQP1nYFfd+rLcE+B
-         q9qaBwno61JcjK9iCl5CqppIHG1/TG0OvZ9v6DhjUPENa2KS6OiXViOsg/sNChmFDoVa
-         pw3A==
-X-Gm-Message-State: AC+VfDwP5fPff0/qMJkuhiWgi1vv83oKapmq1QZXG/rA0nRNIJZKvhw/
-        dYzmM7w3zSFxeLVPgjolK06a8Q0l4lfBrH89uU2T1Ax36tYEnE3NaOjCMQydwEAdAYSq39/kBr9
-        UdZ4MZrLkWvFb8lm1ts+9WS+p12MQBRXeede0aQ==
-X-Received: by 2002:a17:903:428a:b0:1ac:4a41:d38d with SMTP id ju10-20020a170903428a00b001ac4a41d38dmr15831015plb.51.1684946337865;
-        Wed, 24 May 2023 09:38:57 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7QhwNbEG7dVnvKUcvcrF5VXTCpluYFQoMIGO7odXS8eF4N7acYVvSWWvlkVR9tfx1GsK6DpUi0zEDdnwhFY7c=
-X-Received: by 2002:a17:903:428a:b0:1ac:4a41:d38d with SMTP id
- ju10-20020a170903428a00b001ac4a41d38dmr15830993plb.51.1684946337555; Wed, 24
- May 2023 09:38:57 -0700 (PDT)
+        with ESMTP id S229836AbjEYHeF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 May 2023 03:34:05 -0400
+Received: from mail.feshiecree.pl (mail.feshiecree.pl [89.40.114.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280991AC
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 00:34:03 -0700 (PDT)
+Received: by mail.feshiecree.pl (Postfix, from userid 1001)
+        id 796EB86AE8; Thu, 25 May 2023 08:31:39 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=feshiecree.pl;
+        s=mail; t=1684999975;
+        bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=mxhl8X8UyujJ9rwJgsJHxUkYYcmWkPd/6fZJRaL1cNscv+dFMRxwEAG3YVdZ5++2M
+         iw++nHnrGPxFGP8//McwV2hzQOoJwhOA6/PD79C7cTLpWFS1AxbBjDXTxhD6KS4d9V
+         ISUssCx2bDuBmh++XkXo9VtGvIwu35XBng2HS1/G+xSYRwBzUtEec3xHyckgQdNgu1
+         OJDSB10JWmLsPnMn+aGSgvmOXR/YkutrMkrSxTiHky5q+zQN66yNxwSTZ/LKZ6zZas
+         ZGjcNZw4WSkv00YrnnOrzyt2/ue4uzAAMZ7eUtFmQ9kWg/UQCjlVIntW0rkyHpqT/K
+         JZ/TYhxuxAhnw==
+Received: by mail.feshiecree.pl for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 07:30:39 GMT
+Message-ID: <20230525074503-0.1.2r.hstx.0.qp85fl9l7a@feshiecree.pl>
+Date:   Thu, 25 May 2023 07:30:39 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@feshiecree.pl>
+To:     <linux-cifs@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.feshiecree.pl
 MIME-Version: 1.0
-References: <20230216150701.3654894-1-dhowells@redhat.com> <CALF+zO=w2Gyz6JtzEoFgTVjH67-_CuTaK7e+2yoHEwXZ8bPx_A@mail.gmail.com>
-In-Reply-To: <CALF+zO=w2Gyz6JtzEoFgTVjH67-_CuTaK7e+2yoHEwXZ8bPx_A@mail.gmail.com>
-From:   David Wysochanski <dwysocha@redhat.com>
-Date:   Wed, 24 May 2023 12:38:21 -0400
-Message-ID: <CALF+zO=Y8dMsJ79RYp1e7n9B5_0=segpqW9_tetBqPhFiQcZxA@mail.gmail.com>
-Subject: Re: [Linux-cachefs] [PATCH v6 0/2] mm, netfs, fscache: Stop read
- optimisation when folio removed from pagecache
-To:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-        linux-ext4@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, May 16, 2023 at 3:29=E2=80=AFPM David Wysochanski <dwysocha@redhat.=
-com> wrote:
->
-> On Thu, Feb 16, 2023 at 10:07=E2=80=AFAM David Howells <dhowells@redhat.c=
-om> wrote:
-> >
-> > Hi Willy,
-> >
-> > Is this okay by you?  You said you wanted to look at the remaining uses=
- of
-> > page_has_private(), of which there are then three after these patches, =
-not
-> > counting folio_has_private():
-> >
-> >         arch/s390/kernel/uv.c:          if (page_has_private(page))
-> >         mm/khugepaged.c:                    1 + page_mapcount(page) + p=
-age_has_private(page)) {
-> >         mm/migrate_device.c:            extra +=3D 1 + page_has_private=
-(page);
-> >
-> > --
-> > I've split the folio_has_private()/filemap_release_folio() call pair
-> > merging into its own patch, separate from the actual bugfix and pulled =
-out
-> > the folio_needs_release() function into mm/internal.h and made
-> > filemap_release_folio() use it.  I've also got rid of the bit clearance=
-s
-> > from the network filesystem evict_inode functions as they doesn't seem =
-to
-> > be necessary.
-> >
-> > Note that the last vestiges of try_to_release_page() got swept away, so=
- I
-> > rebased and dealt with that.  One comment remained, which is removed by=
- the
-> > first patch.
-> >
-> > David
-> >
-> > Changes:
-> > =3D=3D=3D=3D=3D=3D=3D=3D
-> > ver #6)
-> >  - Drop the third patch which removes a duplicate check in vmscan().
-> >
-> > ver #5)
-> >  - Rebased on linus/master.  try_to_release_page() has now been entirel=
-y
-> >    replaced by filemap_release_folio(), barring one comment.
-> >  - Cleaned up some pairs in ext4.
-> >
-> > ver #4)
-> >  - Split has_private/release call pairs into own patch.
-> >  - Moved folio_needs_release() to mm/internal.h and removed open-coded
-> >    version from filemap_release_folio().
-> >  - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
-> >  - Added experimental patch to reduce shrink_folio_list().
-> >
-> > ver #3)
-> >  - Fixed mapping_clear_release_always() to use clear_bit() not set_bit(=
-).
-> >  - Moved a '&&' to the correct line.
-> >
-> > ver #2)
-> >  - Rewrote entirely according to Willy's suggestion[1].
-> >
-> > Link: https://lore.kernel.org/r/Yk9V/03wgdYi65Lb@casper.infradead.org/ =
-[1]
-> > Link: https://lore.kernel.org/r/164928630577.457102.8519251179327601178=
-.stgit@warthog.procyon.org.uk/ # v1
-> > Link: https://lore.kernel.org/r/166844174069.1124521.108905063609741699=
-94.stgit@warthog.procyon.org.uk/ # v2
-> > Link: https://lore.kernel.org/r/166869495238.3720468.487815140908514676=
-4.stgit@warthog.procyon.org.uk/ # v3
-> > Link: https://lore.kernel.org/r/1459152.1669208550@warthog.procyon.org.=
-uk/ # v3 also
-> > Link: https://lore.kernel.org/r/166924370539.1772793.137306983607718213=
-17.stgit@warthog.procyon.org.uk/ # v4
-> > Link: https://lore.kernel.org/r/167172131368.2334525.856980892568773193=
-7.stgit@warthog.procyon.org.uk/ # v5
-> > ---
-> > %(shortlog)s
-> > %(diffstat)s
-> >
-> > David Howells (2):
-> >   mm: Merge folio_has_private()/filemap_release_folio() call pairs
-> >   mm, netfs, fscache: Stop read optimisation when folio removed from
-> >     pagecache
-> >
-> >  fs/9p/cache.c           |  2 ++
-> >  fs/afs/internal.h       |  2 ++
-> >  fs/cachefiles/namei.c   |  2 ++
-> >  fs/ceph/cache.c         |  2 ++
-> >  fs/cifs/fscache.c       |  2 ++
-> >  fs/ext4/move_extent.c   | 12 ++++--------
-> >  fs/splice.c             |  3 +--
-> >  include/linux/pagemap.h | 16 ++++++++++++++++
-> >  mm/filemap.c            |  2 ++
-> >  mm/huge_memory.c        |  3 +--
-> >  mm/internal.h           | 11 +++++++++++
-> >  mm/khugepaged.c         |  3 +--
-> >  mm/memory-failure.c     |  8 +++-----
-> >  mm/migrate.c            |  3 +--
-> >  mm/truncate.c           |  6 ++----
-> >  mm/vmscan.c             |  8 ++++----
-> >  16 files changed, 56 insertions(+), 29 deletions(-)
-> >
-> > --
-> > Linux-cachefs mailing list
-> > Linux-cachefs@redhat.com
-> > https://listman.redhat.com/mailman/listinfo/linux-cachefs
-> >
->
-> Willy, and David,
->
-> Can this series move forward?
-> This just got mentioned again [1] after Chris tested the NFS netfs
-> patches that were merged in 6.4-rc1
->
-> [1] https://lore.kernel.org/linux-nfs/CAAmbk-f_U8CPcTQM866L572uUHdK4p5iWK=
-nUQs4r8fkW=3D6RW9g@mail.gmail.com/
+Dzie=C5=84 dobry,
 
-Sorry about the timing on the original email as I forgot it lined up
-with LSF/MM.
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-FYI, I tested with 6.4-rc1 plus these two patches, then I added the NFS
-hunk needed (see below).  All my tests pass now[1], and it makes sense
-from all the ftraces I've seen on test runs that fail (cachefiles_prep_read
-trace event would show "DOWN no-data" even after data was written
-previously).
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
 
-This small NFS hunk needs added to patch #2 in this series:
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
 
-diff --git a/fs/nfs/fscache.c b/fs/nfs/fscache.c
-index 8c35d88a84b1..d4a20748b14f 100644
---- a/fs/nfs/fscache.c
-+++ b/fs/nfs/fscache.c
-@@ -180,6 +180,10 @@ void nfs_fscache_init_inode(struct inode *inode)
-                                               &auxdata,      /* aux_data *=
-/
-                                               sizeof(auxdata),
-                                               i_size_read(inode));
-+
-+       if (netfs_inode(inode)->cache)
-+               mapping_set_release_always(inode->i_mapping);
-+
- }
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
 
- /*
 
-[1] https://lore.kernel.org/linux-nfs/CALF+zOn_qX4tcT2ucq4jD3G-1ERqZkL6Cw7h=
-x75OnQF0ivqSeA@mail.gmail.com/
-
+Pozdrawiam
+Krystian Wieczorek
