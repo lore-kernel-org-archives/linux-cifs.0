@@ -2,411 +2,113 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5968AC77B7E
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 May 2023 23:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D6FBC77B7E
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 May 2023 23:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233743AbjEYXi2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 May 2023 19:38:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
+        id S230103AbjEYXub (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 May 2023 19:50:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230389AbjEYXi2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 May 2023 19:38:28 -0400
+        with ESMTP id S229734AbjEYXua (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 May 2023 19:50:30 -0400
 Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C250A3;
-        Thu, 25 May 2023 16:38:25 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f004cc54f4so58979e87.3;
-        Thu, 25 May 2023 16:38:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB41612F
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 16:50:28 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f3b314b1d7so69752e87.1
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 16:50:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685057903; x=1687649903;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CRzA4TSuNbRkvjf9wpxiaSWiXpR8KS7NFNcbPrnX1fM=;
-        b=JB7LEsBbwGJoTtw+4gPJ0wdvGW3V0/naNYN3touihHC6spNUNJiPJ2qHzWOBLXum3O
-         TqrQhjObO2mWpvsmh/rT27jUOhnKc4bPXEKVyRpypRcZ2K8G5iqOTIGRsDYum7xde4Mf
-         e2D/aBbK/kzqEU5VmVFECi/3m4+ADpf+Dew10oSTkUJOOJrYKdOaC7c46BSqixIadjA6
-         6cc7q5kABqBhSSqz+jvfZJdtqq21s7LfpPrx4hKObCwt4qwaSynVjlSPuuLE6Wulj/nr
-         fg49Y4JTq4X1muuvn0oS41NdRwUgOQfQHxbs0MyTeYtCFeGsAcKRS8Dp9pAbrRm8/ZkC
-         jncA==
+        d=gmail.com; s=20221208; t=1685058627; x=1687650627;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ggWLpR5SIsdGQr/iFMBh/HeMCJnyFwZgVHSjyUREoBU=;
+        b=Ar5pb64m8luvleoEMT5l/KwPtlu2fSEhq3qP0yDS9gQJI+EkOMIbMewT2mR1b2QpX+
+         MEv1wZ2FKg3Si8BVhfqBEZve1txGIDQSM+ew70/dfX47ecXkwXLr9X0bGwItZFZXTfYx
+         xEralR8UXsG/0G3jNiQyKzcvwDBbW+6REhF8kiVWP3Wj7hEskrsj/KXk702JND1UZmTX
+         ocrvOE+E6aSt/byH/tMjGUGyp0rp0t489V5PIzWZwURW7R2It6l2BKNjoZ7g10O4rLRn
+         7bYqUnWgEo9p3UT3icdMLpbBFRIVa333J6NbTouBGMMhS9idioZZsD8HOy6kaiK0AW6j
+         zgdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685057903; x=1687649903;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CRzA4TSuNbRkvjf9wpxiaSWiXpR8KS7NFNcbPrnX1fM=;
-        b=AAjfnRZhGfXTHj9tPJZ/eb7Rs5BIU3YtjetHEETjoZc+7MyAO+oSkEQXGO97jhBitH
-         irQcqvHdS9vMHl/bWnfZHhKwTnsdTZnel1ZXkoomcuKTG0ZWBxKL9TNz9wFdRp94CIWT
-         IRKRQi8Dtn4k8pCmxDxvLO4phNfmSHhAncLTPGtKYXR1l+vFjD1YXl+QGKBM+yKyvc1B
-         F4GTShpKPx1Zh0hFmuotEpkwfw21I9qSsO3EmWRj7T3g7CIEMy4KWDaBCfV9iQ3+yHjR
-         39bL/YHjBjhC712vBwe0vexaPPSPGonjDqD6bEEuC4or1d/403SYBf8EQ9HlMK6TO0LP
-         APVQ==
-X-Gm-Message-State: AC+VfDypFUZVa80LkuFEq1MX5hKBQwQJc0q9mvVLNQYHDH6512woChe8
-        AbEFQGNB1HCYovOsRwS86Sb/eSLiovIcsl9ZfLBQ2OvtW5wB1snA
-X-Google-Smtp-Source: ACHHUZ5NMCdPUVjM5R5bbPJt5lHPlFhkOwBTYUBVbDDnIoj1Ja5KuF2jxBA6+ywTZmp7DqG4ZHKTgc3uLdA8fqrIpWA=
-X-Received: by 2002:ac2:44ae:0:b0:4ed:c61d:c8e8 with SMTP id
- c14-20020ac244ae000000b004edc61dc8e8mr8272273lfm.29.1685057903022; Thu, 25
- May 2023 16:38:23 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685058627; x=1687650627;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ggWLpR5SIsdGQr/iFMBh/HeMCJnyFwZgVHSjyUREoBU=;
+        b=YPh/uig08ucMWFcxkEo/XwSqkNYnMaIRSkuOgU7Fenf7/qGmWZqRyNFGXTv7LdaMQk
+         smwjceQ+uitXYJa1IfOTGWvM+EL8Bcen/qV4r6t8pHPitplAE+TJhiXt3NEI8iFEUiat
+         oRT4RGzFQFl9XVxnPNV+RJN57dgqH66KmCSMwhKc0T75FlgRhNX90ErDbICwbdbMXj+F
+         6iSueUxrLEk4UCvkAF+5KLXex9STVGFXsisSY7ShsRphrjsW4nBsRrda47c/HXEzoy5k
+         AMCUFGgGb3BpruO6Fsh6+J+Gl2skfTbumApK2I7S45tJMGTZO5eKWyO38VjunrJoW5hQ
+         9wAg==
+X-Gm-Message-State: AC+VfDwxA7PSskuuGz+LFVxARpslpdUQ5DakV355eW5qYHIWmzYJAuFU
+        HueMoxbbr0Myb7kLiGFvXceD5r7l3hQDCDFtSSI=
+X-Google-Smtp-Source: ACHHUZ60GaMNEO7fvqQdli4vTnAMaqI/aq6v+5xZUGoaDmitC4MDvDndxXc8/fkMnH2djVNGYSHK6kN4ZJs4zUJA0jo=
+X-Received: by 2002:a19:7003:0:b0:4e8:5576:98f4 with SMTP id
+ h3-20020a197003000000b004e8557698f4mr6536043lfc.45.1685058626856; Thu, 25 May
+ 2023 16:50:26 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAH2r5mv8nAncg-f=Z5u8LkH4o7kfJLJdtoksYQgiguF7efKZkQ@mail.gmail.com>
+ <CAN05THRKq9XPD11rBWXyTL_OGSh4pP6mQyufeW+xc+J3wvkMmw@mail.gmail.com>
+ <CAH2r5mtJfSiQXBRUwv6zcR5rhG2Q-pCvjH+n+_SZmVQo1pMeVg@mail.gmail.com>
+ <ZGuWhzP98U9Niog+@jeremy-rocky-laptop> <20230525093900.GA261009@sernet.de>
+ <CAN05THTi0BC_iwjXMiWn61fg3hRemi5Momwp3O0WGygyWLGomQ@mail.gmail.com>
+ <ZG+LOKTr8B+zjQsC@jeremy-rocky-laptop> <CAH2r5mv7aZ8nm30oKyYpa-bd8-MqA13EcEmQWV4mOyrV-rj8Ug@mail.gmail.com>
+ <ZG/DajG6spMO6A7v@jeremy-rocky-laptop> <20230525221449.GA9932@sernet.de>
+In-Reply-To: <20230525221449.GA9932@sernet.de>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 25 May 2023 18:38:11 -0500
-Message-ID: <CAH2r5muUoXaeFdq=HUnEvjrppaD2e0_HUZOkgcHDSk_MmZOUag@mail.gmail.com>
-Subject: [GIT PULL] SMB3 client fixes and move of cifs and ksmbd to under
- "smb" directory
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 25 May 2023 18:50:15 -0500
+Message-ID: <CAH2r5mvGb_e-kjLoKpwF3Eg7f7oOGGKcM7rL95SkU4q=pSE1AQ@mail.gmail.com>
+Subject: Re: Displaying streams as xattrs
+To:     Jeremy Allison <jra@samba.org>, Steve French <smfrench@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Christoph Hellwig <hch@lst.de>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-44c026a73be8038f03dbdeef028b642880cf1511:
+On Thu, May 25, 2023 at 5:14=E2=80=AFPM Bj=C3=B6rn JACKE <bj@sernet.de> wro=
+te:
+>
+> On 2023-05-25 at 13:22 -0700 Jeremy Allison sent off:
+> > I think cifsfs providing access to ADS remotely on Windows
+> > and Samba shares is fine.
+> >
+> > What I'm scared of is adding ADS as a generic "feature" to
+> > the Linux VFS and other filesystems :-).
+>
+> full ack on Jeremy's view here.
+>
+> If there is something the the Linux VFS layer should *really* add to help
+> interoperability with basically all other major OS implementations is NFS=
+v4
+> ACLs.  Seriously, for so many people living with Linux is a real pain due=
+ to
+> the lack of NFS4 ACLs here.
 
-  Linux 6.4-rc3 (2023-05-21 14:05:48 -0700)
+Today the "RichACLs" can be displayed multiple ways (e.g. "getcifsacl"
+and various other
+tools and also via system xattrs).
+Being able to display "RichACLs" makes sense - and I am fine with
+mapping these (and
+probably would make sense to at least have a readonly mapping of the
+existing richacls on
+a file to "posixacl") and RichACLs are very important.
 
-are available in the Git repository at:
+Wouldn't it be easier to let them also be queried for cifs.ko via
+"system.getrichacl" (or whatever
+the "getrichacl" tool used in various xfstests uses)?
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc3-smb3-client-fixes
-
-for you to fetch changes up to ab6cacf833ba337b41700ee193d2c8936f1d049e:
-
-  smb3: move Documentation/filesystems/cifs to
-Documentation/filesystems/smb (2023-05-24 16:29:21 -0500)
-
-----------------------------------------------------------------
-Four smb3 client server fixes (3 also for stable) and three patches to
-move of fs/cifs and fs/ksmbd to a new common "fs/smb" parent directory
-- Move the client and server source directories to a common parent
-directory: e.g. fs/cifs --> fs/smb/client and fs/ksmbd -->
-fs/smb/server and fs/smbfs_common --> fs/smb/common
-- important readahead fix
-- important fix for SMB1 regression
-- fix for missing mount option ("mapchars") in mount API conversion
-- minor debugging improvement
-
-----------------------------------------------------------------
-David Howells (1):
-      cifs: Fix cifs_limit_bvec_subset() to correctly check the maxmimum size
-
-Paulo Alcantara (1):
-      cifs: fix smb1 mount regression
-
-Steve French (5):
-      smb3: display debug information better for encryption
-      cifs: mapchars mount option ignored
-      smb: move client and server files to common directory fs/smb
-      cifs: correct references in Documentation to old fs/cifs path
-      smb3: move Documentation/filesystems/cifs to Documentation/filesystems/smb
-
- Documentation/admin-guide/cifs/changes.rst              |  4 ++--
- Documentation/admin-guide/cifs/usage.rst                |  8 ++++----
- Documentation/filesystems/index.rst                     |  2 +-
- Documentation/filesystems/{cifs => smb}/cifsroot.rst    |  2 +-
- Documentation/filesystems/{cifs => smb}/index.rst       |  0
- Documentation/filesystems/{cifs => smb}/ksmbd.rst       |  0
- Documentation/userspace-api/ioctl/ioctl-number.rst      |  2 +-
- MAINTAINERS                                             | 10 +++++-----
- fs/Kconfig                                              |  9 +--------
- fs/Makefile                                             |  4 +---
- fs/smb/Kconfig                                          | 11 +++++++++++
- fs/smb/Makefile                                         |  5 +++++
- fs/{cifs => smb/client}/Kconfig                         |  0
- fs/{cifs => smb/client}/Makefile                        |  0
- fs/{cifs => smb/client}/asn1.c                          |  0
- fs/{cifs => smb/client}/cached_dir.c                    |  0
- fs/{cifs => smb/client}/cached_dir.h                    |  0
- fs/{cifs => smb/client}/cifs_debug.c                    |  8 ++++++--
- fs/{cifs => smb/client}/cifs_debug.h                    |  0
- fs/{cifs => smb/client}/cifs_dfs_ref.c                  |  0
- fs/{cifs => smb/client}/cifs_fs_sb.h                    |  0
- fs/{cifs => smb/client}/cifs_ioctl.h                    |  0
- fs/{cifs => smb/client}/cifs_spnego.c                   |  0
- fs/{cifs => smb/client}/cifs_spnego.h                   |  0
- fs/{cifs => smb/client}/cifs_spnego_negtokeninit.asn1   |  0
- fs/{cifs => smb/client}/cifs_swn.c                      |  0
- fs/{cifs => smb/client}/cifs_swn.h                      |  0
- fs/{cifs => smb/client}/cifs_unicode.c                  |  0
- fs/{cifs => smb/client}/cifs_unicode.h                  |  0
- fs/{cifs => smb/client}/cifs_uniupr.h                   |  0
- fs/{cifs => smb/client}/cifsacl.c                       |  0
- fs/{cifs => smb/client}/cifsacl.h                       |  0
- fs/{cifs => smb/client}/cifsencrypt.c                   |  2 +-
- fs/{cifs => smb/client}/cifsfs.c                        |  0
- fs/{cifs => smb/client}/cifsfs.h                        |  0
- fs/{cifs => smb/client}/cifsglob.h                      |  2 +-
- fs/{cifs => smb/client}/cifspdu.h                       |  2 +-
- fs/{cifs => smb/client}/cifsproto.h                     |  0
- fs/{cifs => smb/client}/cifsroot.c                      |  0
- fs/{cifs => smb/client}/cifssmb.c                       |  0
- fs/{cifs => smb/client}/connect.c                       |  0
- fs/{cifs => smb/client}/dfs.c                           |  2 +-
- fs/{cifs => smb/client}/dfs.h                           |  0
- fs/{cifs => smb/client}/dfs_cache.c                     |  0
- fs/{cifs => smb/client}/dfs_cache.h                     |  0
- fs/{cifs => smb/client}/dir.c                           |  0
- fs/{cifs => smb/client}/dns_resolve.c                   |  0
- fs/{cifs => smb/client}/dns_resolve.h                   |  0
- fs/{cifs => smb/client}/export.c                        |  0
- fs/{cifs => smb/client}/file.c                          |  3 ++-
- fs/{cifs => smb/client}/fs_context.c                    |  8 ++++++++
- fs/{cifs => smb/client}/fs_context.h                    |  0
- fs/{cifs => smb/client}/fscache.c                       |  0
- fs/{cifs => smb/client}/fscache.h                       |  0
- fs/{cifs => smb/client}/inode.c                         |  0
- fs/{cifs => smb/client}/ioctl.c                         |  0
- fs/{cifs => smb/client}/link.c                          |  0
- fs/{cifs => smb/client}/misc.c                          |  0
- fs/{cifs => smb/client}/netlink.c                       |  0
- fs/{cifs => smb/client}/netlink.h                       |  0
- fs/{cifs => smb/client}/netmisc.c                       |  0
- fs/{cifs => smb/client}/nterr.c                         |  0
- fs/{cifs => smb/client}/nterr.h                         |  0
- fs/{cifs => smb/client}/ntlmssp.h                       |  0
- fs/{cifs => smb/client}/readdir.c                       |  0
- fs/{cifs => smb/client}/rfc1002pdu.h                    |  0
- fs/{cifs => smb/client}/sess.c                          |  0
- fs/{cifs => smb/client}/smb1ops.c                       |  0
- fs/{cifs => smb/client}/smb2file.c                      |  0
- fs/{cifs => smb/client}/smb2glob.h                      |  0
- fs/{cifs => smb/client}/smb2inode.c                     |  0
- fs/{cifs => smb/client}/smb2maperror.c                  |  0
- fs/{cifs => smb/client}/smb2misc.c                      |  0
- fs/{cifs => smb/client}/smb2ops.c                       |  0
- fs/{cifs => smb/client}/smb2pdu.c                       |  0
- fs/{cifs => smb/client}/smb2pdu.h                       |  0
- fs/{cifs => smb/client}/smb2proto.h                     |  0
- fs/{cifs => smb/client}/smb2status.h                    |  0
- fs/{cifs => smb/client}/smb2transport.c                 |  0
- fs/{cifs => smb/client}/smbdirect.c                     |  0
- fs/{cifs => smb/client}/smbdirect.h                     |  0
- fs/{cifs => smb/client}/smbencrypt.c                    |  2 +-
- fs/{cifs => smb/client}/smberr.h                        |  0
- fs/{cifs => smb/client}/trace.c                         |  0
- fs/{cifs => smb/client}/trace.h                         |  0
- fs/{cifs => smb/client}/transport.c                     |  0
- fs/{cifs => smb/client}/unc.c                           |  0
- fs/{cifs => smb/client}/winucase.c                      |  0
- fs/{cifs => smb/client}/xattr.c                         |  0
- fs/{smbfs_common => smb/common}/Makefile                |  4 ++--
- fs/{smbfs_common => smb/common}/arc4.h                  |  0
- fs/{smbfs_common => smb/common}/cifs_arc4.c             |  0
- fs/{smbfs_common => smb/common}/cifs_md4.c              |  0
- fs/{smbfs_common => smb/common}/md4.h                   |  0
- fs/{smbfs_common => smb/common}/smb2pdu.h               |  0
- fs/{smbfs_common => smb/common}/smbfsctl.h              |  0
- fs/{ksmbd => smb/server}/Kconfig                        |  0
- fs/{ksmbd => smb/server}/Makefile                       |  0
- fs/{ksmbd => smb/server}/asn1.c                         |  0
- fs/{ksmbd => smb/server}/asn1.h                         |  0
- fs/{ksmbd => smb/server}/auth.c                         |  2 +-
- fs/{ksmbd => smb/server}/auth.h                         |  0
- fs/{ksmbd => smb/server}/connection.c                   |  0
- fs/{ksmbd => smb/server}/connection.h                   |  0
- fs/{ksmbd => smb/server}/crypto_ctx.c                   |  0
- fs/{ksmbd => smb/server}/crypto_ctx.h                   |  0
- fs/{ksmbd => smb/server}/glob.h                         |  0
- fs/{ksmbd => smb/server}/ksmbd_netlink.h                |  0
- fs/{ksmbd => smb/server}/ksmbd_spnego_negtokeninit.asn1 |  0
- fs/{ksmbd => smb/server}/ksmbd_spnego_negtokentarg.asn1 |  0
- fs/{ksmbd => smb/server}/ksmbd_work.c                   |  0
- fs/{ksmbd => smb/server}/ksmbd_work.h                   |  0
- fs/{ksmbd => smb/server}/mgmt/ksmbd_ida.c               |  0
- fs/{ksmbd => smb/server}/mgmt/ksmbd_ida.h               |  0
- fs/{ksmbd => smb/server}/mgmt/share_config.c            |  0
- fs/{ksmbd => smb/server}/mgmt/share_config.h            |  0
- fs/{ksmbd => smb/server}/mgmt/tree_connect.c            |  0
- fs/{ksmbd => smb/server}/mgmt/tree_connect.h            |  0
- fs/{ksmbd => smb/server}/mgmt/user_config.c             |  0
- fs/{ksmbd => smb/server}/mgmt/user_config.h             |  0
- fs/{ksmbd => smb/server}/mgmt/user_session.c            |  0
- fs/{ksmbd => smb/server}/mgmt/user_session.h            |  0
- fs/{ksmbd => smb/server}/misc.c                         |  0
- fs/{ksmbd => smb/server}/misc.h                         |  0
- fs/{ksmbd => smb/server}/ndr.c                          |  0
- fs/{ksmbd => smb/server}/ndr.h                          |  0
- fs/{ksmbd => smb/server}/nterr.h                        |  0
- fs/{ksmbd => smb/server}/ntlmssp.h                      |  0
- fs/{ksmbd => smb/server}/oplock.c                       |  0
- fs/{ksmbd => smb/server}/oplock.h                       |  0
- fs/{ksmbd => smb/server}/server.c                       |  0
- fs/{ksmbd => smb/server}/server.h                       |  0
- fs/{ksmbd => smb/server}/smb2misc.c                     |  0
- fs/{ksmbd => smb/server}/smb2ops.c                      |  0
- fs/{ksmbd => smb/server}/smb2pdu.c                      |  0
- fs/{ksmbd => smb/server}/smb2pdu.h                      |  0
- fs/{ksmbd => smb/server}/smb_common.c                   |  0
- fs/{ksmbd => smb/server}/smb_common.h                   |  2 +-
- fs/{ksmbd => smb/server}/smbacl.c                       |  0
- fs/{ksmbd => smb/server}/smbacl.h                       |  0
- fs/{ksmbd => smb/server}/smbfsctl.h                     |  2 +-
- fs/{ksmbd => smb/server}/smbstatus.h                    |  2 +-
- fs/{ksmbd => smb/server}/transport_ipc.c                |  0
- fs/{ksmbd => smb/server}/transport_ipc.h                |  0
- fs/{ksmbd => smb/server}/transport_rdma.c               |  0
- fs/{ksmbd => smb/server}/transport_rdma.h               |  0
- fs/{ksmbd => smb/server}/transport_tcp.c                |  0
- fs/{ksmbd => smb/server}/transport_tcp.h                |  0
- fs/{ksmbd => smb/server}/unicode.c                      |  0
- fs/{ksmbd => smb/server}/unicode.h                      |  0
- fs/{ksmbd => smb/server}/uniupr.h                       |  0
- fs/{ksmbd => smb/server}/vfs.c                          |  0
- fs/{ksmbd => smb/server}/vfs.h                          |  0
- fs/{ksmbd => smb/server}/vfs_cache.c                    |  0
- fs/{ksmbd => smb/server}/vfs_cache.h                    |  0
- fs/{ksmbd => smb/server}/xattr.h                        |  0
- 156 files changed, 59 insertions(+), 39 deletions(-)
- rename Documentation/filesystems/{cifs => smb}/cifsroot.rst (97%)
- rename Documentation/filesystems/{cifs => smb}/index.rst (100%)
- rename Documentation/filesystems/{cifs => smb}/ksmbd.rst (100%)
- create mode 100644 fs/smb/Kconfig
- create mode 100644 fs/smb/Makefile
- rename fs/{cifs => smb/client}/Kconfig (100%)
- rename fs/{cifs => smb/client}/Makefile (100%)
- rename fs/{cifs => smb/client}/asn1.c (100%)
- rename fs/{cifs => smb/client}/cached_dir.c (100%)
- rename fs/{cifs => smb/client}/cached_dir.h (100%)
- rename fs/{cifs => smb/client}/cifs_debug.c (99%)
- rename fs/{cifs => smb/client}/cifs_debug.h (100%)
- rename fs/{cifs => smb/client}/cifs_dfs_ref.c (100%)
- rename fs/{cifs => smb/client}/cifs_fs_sb.h (100%)
- rename fs/{cifs => smb/client}/cifs_ioctl.h (100%)
- rename fs/{cifs => smb/client}/cifs_spnego.c (100%)
- rename fs/{cifs => smb/client}/cifs_spnego.h (100%)
- rename fs/{cifs => smb/client}/cifs_spnego_negtokeninit.asn1 (100%)
- rename fs/{cifs => smb/client}/cifs_swn.c (100%)
- rename fs/{cifs => smb/client}/cifs_swn.h (100%)
- rename fs/{cifs => smb/client}/cifs_unicode.c (100%)
- rename fs/{cifs => smb/client}/cifs_unicode.h (100%)
- rename fs/{cifs => smb/client}/cifs_uniupr.h (100%)
- rename fs/{cifs => smb/client}/cifsacl.c (100%)
- rename fs/{cifs => smb/client}/cifsacl.h (100%)
- rename fs/{cifs => smb/client}/cifsencrypt.c (99%)
- rename fs/{cifs => smb/client}/cifsfs.c (100%)
- rename fs/{cifs => smb/client}/cifsfs.h (100%)
- rename fs/{cifs => smb/client}/cifsglob.h (99%)
- rename fs/{cifs => smb/client}/cifspdu.h (99%)
- rename fs/{cifs => smb/client}/cifsproto.h (100%)
- rename fs/{cifs => smb/client}/cifsroot.c (100%)
- rename fs/{cifs => smb/client}/cifssmb.c (100%)
- rename fs/{cifs => smb/client}/connect.c (100%)
- rename fs/{cifs => smb/client}/dfs.c (99%)
- rename fs/{cifs => smb/client}/dfs.h (100%)
- rename fs/{cifs => smb/client}/dfs_cache.c (100%)
- rename fs/{cifs => smb/client}/dfs_cache.h (100%)
- rename fs/{cifs => smb/client}/dir.c (100%)
- rename fs/{cifs => smb/client}/dns_resolve.c (100%)
- rename fs/{cifs => smb/client}/dns_resolve.h (100%)
- rename fs/{cifs => smb/client}/export.c (100%)
- rename fs/{cifs => smb/client}/file.c (99%)
- rename fs/{cifs => smb/client}/fs_context.c (99%)
- rename fs/{cifs => smb/client}/fs_context.h (100%)
- rename fs/{cifs => smb/client}/fscache.c (100%)
- rename fs/{cifs => smb/client}/fscache.h (100%)
- rename fs/{cifs => smb/client}/inode.c (100%)
- rename fs/{cifs => smb/client}/ioctl.c (100%)
- rename fs/{cifs => smb/client}/link.c (100%)
- rename fs/{cifs => smb/client}/misc.c (100%)
- rename fs/{cifs => smb/client}/netlink.c (100%)
- rename fs/{cifs => smb/client}/netlink.h (100%)
- rename fs/{cifs => smb/client}/netmisc.c (100%)
- rename fs/{cifs => smb/client}/nterr.c (100%)
- rename fs/{cifs => smb/client}/nterr.h (100%)
- rename fs/{cifs => smb/client}/ntlmssp.h (100%)
- rename fs/{cifs => smb/client}/readdir.c (100%)
- rename fs/{cifs => smb/client}/rfc1002pdu.h (100%)
- rename fs/{cifs => smb/client}/sess.c (100%)
- rename fs/{cifs => smb/client}/smb1ops.c (100%)
- rename fs/{cifs => smb/client}/smb2file.c (100%)
- rename fs/{cifs => smb/client}/smb2glob.h (100%)
- rename fs/{cifs => smb/client}/smb2inode.c (100%)
- rename fs/{cifs => smb/client}/smb2maperror.c (100%)
- rename fs/{cifs => smb/client}/smb2misc.c (100%)
- rename fs/{cifs => smb/client}/smb2ops.c (100%)
- rename fs/{cifs => smb/client}/smb2pdu.c (100%)
- rename fs/{cifs => smb/client}/smb2pdu.h (100%)
- rename fs/{cifs => smb/client}/smb2proto.h (100%)
- rename fs/{cifs => smb/client}/smb2status.h (100%)
- rename fs/{cifs => smb/client}/smb2transport.c (100%)
- rename fs/{cifs => smb/client}/smbdirect.c (100%)
- rename fs/{cifs => smb/client}/smbdirect.h (100%)
- rename fs/{cifs => smb/client}/smbencrypt.c (98%)
- rename fs/{cifs => smb/client}/smberr.h (100%)
- rename fs/{cifs => smb/client}/trace.c (100%)
- rename fs/{cifs => smb/client}/trace.h (100%)
- rename fs/{cifs => smb/client}/transport.c (100%)
- rename fs/{cifs => smb/client}/unc.c (100%)
- rename fs/{cifs => smb/client}/winucase.c (100%)
- rename fs/{cifs => smb/client}/xattr.c (100%)
- rename fs/{smbfs_common => smb/common}/Makefile (59%)
- rename fs/{smbfs_common => smb/common}/arc4.h (100%)
- rename fs/{smbfs_common => smb/common}/cifs_arc4.c (100%)
- rename fs/{smbfs_common => smb/common}/cifs_md4.c (100%)
- rename fs/{smbfs_common => smb/common}/md4.h (100%)
- rename fs/{smbfs_common => smb/common}/smb2pdu.h (100%)
- rename fs/{smbfs_common => smb/common}/smbfsctl.h (100%)
- rename fs/{ksmbd => smb/server}/Kconfig (100%)
- rename fs/{ksmbd => smb/server}/Makefile (100%)
- rename fs/{ksmbd => smb/server}/asn1.c (100%)
- rename fs/{ksmbd => smb/server}/asn1.h (100%)
- rename fs/{ksmbd => smb/server}/auth.c (99%)
- rename fs/{ksmbd => smb/server}/auth.h (100%)
- rename fs/{ksmbd => smb/server}/connection.c (100%)
- rename fs/{ksmbd => smb/server}/connection.h (100%)
- rename fs/{ksmbd => smb/server}/crypto_ctx.c (100%)
- rename fs/{ksmbd => smb/server}/crypto_ctx.h (100%)
- rename fs/{ksmbd => smb/server}/glob.h (100%)
- rename fs/{ksmbd => smb/server}/ksmbd_netlink.h (100%)
- rename fs/{ksmbd => smb/server}/ksmbd_spnego_negtokeninit.asn1 (100%)
- rename fs/{ksmbd => smb/server}/ksmbd_spnego_negtokentarg.asn1 (100%)
- rename fs/{ksmbd => smb/server}/ksmbd_work.c (100%)
- rename fs/{ksmbd => smb/server}/ksmbd_work.h (100%)
- rename fs/{ksmbd => smb/server}/mgmt/ksmbd_ida.c (100%)
- rename fs/{ksmbd => smb/server}/mgmt/ksmbd_ida.h (100%)
- rename fs/{ksmbd => smb/server}/mgmt/share_config.c (100%)
- rename fs/{ksmbd => smb/server}/mgmt/share_config.h (100%)
- rename fs/{ksmbd => smb/server}/mgmt/tree_connect.c (100%)
- rename fs/{ksmbd => smb/server}/mgmt/tree_connect.h (100%)
- rename fs/{ksmbd => smb/server}/mgmt/user_config.c (100%)
- rename fs/{ksmbd => smb/server}/mgmt/user_config.h (100%)
- rename fs/{ksmbd => smb/server}/mgmt/user_session.c (100%)
- rename fs/{ksmbd => smb/server}/mgmt/user_session.h (100%)
- rename fs/{ksmbd => smb/server}/misc.c (100%)
- rename fs/{ksmbd => smb/server}/misc.h (100%)
- rename fs/{ksmbd => smb/server}/ndr.c (100%)
- rename fs/{ksmbd => smb/server}/ndr.h (100%)
- rename fs/{ksmbd => smb/server}/nterr.h (100%)
- rename fs/{ksmbd => smb/server}/ntlmssp.h (100%)
- rename fs/{ksmbd => smb/server}/oplock.c (100%)
- rename fs/{ksmbd => smb/server}/oplock.h (100%)
- rename fs/{ksmbd => smb/server}/server.c (100%)
- rename fs/{ksmbd => smb/server}/server.h (100%)
- rename fs/{ksmbd => smb/server}/smb2misc.c (100%)
- rename fs/{ksmbd => smb/server}/smb2ops.c (100%)
- rename fs/{ksmbd => smb/server}/smb2pdu.c (100%)
- rename fs/{ksmbd => smb/server}/smb2pdu.h (100%)
- rename fs/{ksmbd => smb/server}/smb_common.c (100%)
- rename fs/{ksmbd => smb/server}/smb_common.h (99%)
- rename fs/{ksmbd => smb/server}/smbacl.c (100%)
- rename fs/{ksmbd => smb/server}/smbacl.h (100%)
- rename fs/{ksmbd => smb/server}/smbfsctl.h (98%)
- rename fs/{ksmbd => smb/server}/smbstatus.h (99%)
- rename fs/{ksmbd => smb/server}/transport_ipc.c (100%)
- rename fs/{ksmbd => smb/server}/transport_ipc.h (100%)
- rename fs/{ksmbd => smb/server}/transport_rdma.c (100%)
- rename fs/{ksmbd => smb/server}/transport_rdma.h (100%)
- rename fs/{ksmbd => smb/server}/transport_tcp.c (100%)
- rename fs/{ksmbd => smb/server}/transport_tcp.h (100%)
- rename fs/{ksmbd => smb/server}/unicode.c (100%)
- rename fs/{ksmbd => smb/server}/unicode.h (100%)
- rename fs/{ksmbd => smb/server}/uniupr.h (100%)
- rename fs/{ksmbd => smb/server}/vfs.c (100%)
- rename fs/{ksmbd => smb/server}/vfs.h (100%)
- rename fs/{ksmbd => smb/server}/vfs_cache.c (100%)
- rename fs/{ksmbd => smb/server}/vfs_cache.h (100%)
- rename fs/{ksmbd => smb/server}/xattr.h (100%)
+I was also wondering how we should display (and how to retrieve via
+SMB3) "claims based ACLs" (presumably these are reasonably common on a
+few server types like Windows)?
 
 
--- 
+
+--=20
 Thanks,
 
 Steve
