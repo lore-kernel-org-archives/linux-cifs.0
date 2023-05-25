@@ -2,114 +2,118 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59478C7EE29
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 May 2023 10:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E096C77B7A
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 May 2023 11:49:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233615AbjEYK5e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 May 2023 06:57:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39202 "EHLO
+        id S236182AbjEYLtT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 May 2023 07:49:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229663AbjEYK5d (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 May 2023 06:57:33 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3070C5
-        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 03:57:31 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-970056276acso71706966b.2
-        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 03:57:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685012250; x=1687604250;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=k6Pgg5MYTu3woPKV5DNXP1ipgLfX0qRf9L756ApFYd0=;
-        b=kfoObmMZ6EzsuOH7B/fdbjB4O86L71DUQZAiD5s/4uQllBTlqc9EPooLBcUYXkgPSt
-         XcTdVs8jJPeh2T85vHarF+AwgIKp6+pbU6j1q1GWMH+GGNUDHWf5hyMaJCz7AJNvtNkP
-         d70Ssle1lL1zTAOVAZHtwx19yYfUbKmcVBIKhzlReQawiLQboEl1P2fYJF7QoviEaQwY
-         H5RFA1Pmn3hKAIqupSpaW5v7mluWWlZMeuWc1DBDQTqp4g+c3SZEjr3zf2S4WFqbsCoX
-         L7A8yrAoeH3oqPR+kUlRZ8APvGQx2fwXRJrYD0Gb2Znr84FZeG6+4NWGY0/lfzbZ0gGv
-         ShXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685012250; x=1687604250;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=k6Pgg5MYTu3woPKV5DNXP1ipgLfX0qRf9L756ApFYd0=;
-        b=e00Kdcu3gaYRp1w64GWmwbTO8qFml0O1XP4fVMuiZylmVDVKZ32DPmHEZKKVARhQ0M
-         sK5ZCnl8+khNubVrreKeMMEzADdlvhmpRlxFCJdRG4/e+Z8/sMPaE4igSZFEceb1s7Nm
-         W9Owg8/pbctBG+rdUPUq5OFph4eIUumTub2MbzAtyFKnJdzC0UIQJgnrxE+v/qDWREfr
-         hPQJ6oC+J/csbXyjVrXM1X8QuNSVwNtMuPkqluzJwKGF18ACjXCsjABFkvDxWxqDumpB
-         f6GkcCo94DKiOs6tOdc4o3qGDquMEToIZql0qguJcLldu12TihBrcc65sl9454WcfCuh
-         CQ4A==
-X-Gm-Message-State: AC+VfDwHFGBVvTAwCw7+otnUxcJt5ExU78bVkAVsoAEIwpCc/ZvMpE1G
-        jN23pCZxKMkqqd9lf8wRX69guabRC0yk+221864=
-X-Google-Smtp-Source: ACHHUZ4hWK7KF+x9ZbDG4tjBWYnpf2EraJ4WkN0KGTXqqMxpzsfg/aylHZUH6TALXInZHIIK4kXF9eT2fcPIFxD7DO0=
-X-Received: by 2002:a17:907:2dab:b0:96f:a0ee:114b with SMTP id
- gt43-20020a1709072dab00b0096fa0ee114bmr1145128ejc.21.1685012250235; Thu, 25
- May 2023 03:57:30 -0700 (PDT)
+        with ESMTP id S231160AbjEYLtS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 May 2023 07:49:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A5489C
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 04:49:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D92CA64509
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 11:49:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DD2AC433EF
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 11:49:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685015356;
+        bh=32PjOWc8DA4LC1qdtB/VZllFzomb1SVqhT8a20AGRdM=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=a2KaPf/9g3inA80l0hdTN+j6mqeyHIUNiDyZEZWqf3OdylLiewkYC9nIitA0oLQCO
+         17u1WjGx/V2tNoDMifga4TmLP75wAUNOQC5zcczVASgBRYW2MgKIAeX86T0qNt/ueS
+         1AJjy9BUqB/PtjMw2qqTM8pl4fYj3nJO+f7Tdhb3+2FVzvoaCyno9s1ViPv4MAU8xE
+         j17Ub1Dugz/BaGdXwdF9YIxhZTEKmJWXY5SYzxF6sYmUdXTaF2zCooWEdZS4OkJSgu
+         SJa8V+V/dKM9dg0wbKSCt1XAWcKw8BDMabWhCqtwFRVF179onapOCPYT9o0HrwZSBa
+         qvlSp+BpEz/wQ==
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-55517975c5fso219181eaf.2
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 04:49:16 -0700 (PDT)
+X-Gm-Message-State: AC+VfDwkcTicDZ84lFXkPcuG2A6MkTKqoWXRn1w432PN89KxKMP9+ClA
+        8xyUYIl/PcQUVUwE0Z+GjFR+ndn4/UdzpJZE06g=
+X-Google-Smtp-Source: ACHHUZ7YY833DndOrZYOu/a5bnMptHxhqBfAFIinVjYZ4jbwoPdaoML2dz0WUeOcHpZsSwlWDzkyFF4EgWRjc/GsjSA=
+X-Received: by 2002:a54:488c:0:b0:398:5473:89b9 with SMTP id
+ r12-20020a54488c000000b00398547389b9mr2033905oic.19.1685015355126; Thu, 25
+ May 2023 04:49:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mv8nAncg-f=Z5u8LkH4o7kfJLJdtoksYQgiguF7efKZkQ@mail.gmail.com>
- <CAN05THRKq9XPD11rBWXyTL_OGSh4pP6mQyufeW+xc+J3wvkMmw@mail.gmail.com>
- <CAH2r5mtJfSiQXBRUwv6zcR5rhG2Q-pCvjH+n+_SZmVQo1pMeVg@mail.gmail.com>
- <ZGuWhzP98U9Niog+@jeremy-rocky-laptop> <CAN05THRnHcZtTMLxUSCYQXULVHiOXVYDU9TRy9K+_wBQQ1CFAw@mail.gmail.com>
- <ZGzo+KVlSTNk/B0r@jeremy-rocky-laptop> <CAN05THQyraiyQ9tV=iAbDiirWzPxqPq9rY4WsrnqavguJCEjgg@mail.gmail.com>
- <ZG0/YyAqqf0NqUuO@jeremy-rocky-laptop>
-In-Reply-To: <ZG0/YyAqqf0NqUuO@jeremy-rocky-laptop>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 25 May 2023 20:57:18 +1000
-Message-ID: <CAN05THSWHq-3bJ5+tzZ==j9uGFGfbALw0FoLVa9UyucaZ92bGQ@mail.gmail.com>
-Subject: Re: Displaying streams as xattrs
-To:     Jeremy Allison <jra@samba.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        samba-technical <samba-technical@lists.samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+Received: by 2002:a8a:acb:0:b0:4de:afc5:4d13 with HTTP; Thu, 25 May 2023
+ 04:49:14 -0700 (PDT)
+In-Reply-To: <CAAn9K_vV2RVQSRvVp5q+Ksc6ZzxLhRHhD98LSA-JprxmAWZ49A@mail.gmail.com>
+References: <CAAn9K_vV2RVQSRvVp5q+Ksc6ZzxLhRHhD98LSA-JprxmAWZ49A@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 25 May 2023 20:49:14 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9SZd8n8D3pr0pZQupZy53ku1w7Z5P6ppQOt6BeR79tzQ@mail.gmail.com>
+Message-ID: <CAKYAXd9SZd8n8D3pr0pZQupZy53ku1w7Z5P6ppQOt6BeR79tzQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix out-of-bound read in deassemble_neg_contexts
+To:     =?UTF-8?B?5by15pm66Ku6?= <cc85nod@gmail.com>
+Cc:     linux-cifs@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>, tom@talpey.com,
+        atteh.mailbox@gmail.com, Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 24 May 2023 at 08:34, Jeremy Allison <jra@samba.org> wrote:
+2023-05-25 14:31 GMT+09:00, =E5=BC=B5=E6=99=BA=E8=AB=BA <cc85nod@gmail.com>=
+:
+> From 16b1d22ae886206def5fc71b26584c329755c81c Mon Sep 17 00:00:00 2001
+> From: Chih-Yen Chang <cc85nod@gmail.com>
+> Date: Thu, 25 May 2023 13:17:27 +0800
+> Subject: [PATCH] ksmbd: fix out-of-bound read in deassemble_neg_contexts
 >
-> On Wed, May 24, 2023 at 07:44:36AM +1000, ronnie sahlberg wrote:
-> >On Wed, 24 May 2023 at 02:25, Jeremy Allison <jra@samba.org> wrote:
-> >>
-> >> On Tue, May 23, 2023 at 10:59:27AM +1000, ronnie sahlberg wrote:
-> >>
-> >> >There are really nice use-cases for ADS where one can store additional
-> >> >metadata within the "file" itself.
-> >>
-> >> "Nice" for virus writers, yeah. A complete swamp for everyone
-> >> else :-).
-> >
-> >Viruses? I don't think they use ADS much since most tools under
-> >windows understand ADS.
+> The check in the beginning is
+> `clen + sizeof(struct smb2_neg_context) <=3D len_of_ctxts`,
+> but in the end of loop, `len_of_ctxts` will subtract
+> `((clen + 7) & ~0x7) + sizeof(struct smb2_neg_context)`, which causes
+> integer underflow when clen does the 8 alignment.
 >
-> https://insights.sei.cmu.edu/blog/using-alternate-data-streams-in-the-collection-and-exfiltration-of-data/
+> [   11.671070] BUG: KASAN: slab-out-of-bounds in
+> smb2_handle_negotiate+0x799/0x1610
+> [   11.671533] Read of size 2 at addr ffff888005e86cf2 by task
+> kworker/0:0/7
+> ...
+> [   11.673383] Call Trace:
+> [   11.673541]  <TASK>
+> [   11.673679]  dump_stack_lvl+0x33/0x50
+> [   11.673913]  print_report+0xcc/0x620
+> [   11.674671]  kasan_report+0xae/0xe0
+> [   11.675171]  kasan_check_range+0x35/0x1b0
+> [   11.675412]  smb2_handle_negotiate+0x799/0x1610
+> [   11.676217]  ksmbd_smb_negotiate_common+0x526/0x770
+> [   11.676795]  handle_ksmbd_work+0x274/0x810
+> ...
 >
-> "Malware that takes advantage of ADSs is not new. MITRE lists over a
-> dozen named malware examples that use ADSs to hide artifacts and evade
-> detection. Attack tools, such as Astaroth, Bitpaymer, and PowerDuke,
-> have been extensively detailed by various parties, providing insight
-> into how these threats take advantage of ADS evasion on a host system.
-> Authors, such as Berghel and Brajkovska, downplay the risks of ADSs. Our
-> opinion, however, is that ADSs introduced the host of concealment and
-> obfuscation techniques outlined above, but little has been done to
-> mitigate these worries since their publication in 2004."
+> Signed-off-by: Chih-Yen Chang <cc85nod@gmail.com>
+> ---
+>  fs/ksmbd/smb2pdu.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> As I also recall the published US "hacking toolset" also used
-> an ADS on the root directory of a share to exfiltrate data
-> from the target.
->
-> ADS - "Just Say No !"
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index cb93fd231..2d2a2eb96 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -1030,6 +1030,9 @@ static __le32 deassemble_neg_contexts(struct
+> ksmbd_conn *conn,
+>   clen =3D (clen + 7) & ~0x7;
+>   offset =3D clen + sizeof(struct smb2_neg_context);
+>   len_of_ctxts -=3D clen + sizeof(struct smb2_neg_context);
+> +
+> + if (len_of_ctxts < 0)
+> + break;
 
-I think that is a flawed argument.
-It only really means that the virus scanners are broken. So we tell
-the virus scanner folks to fix their software.
-Viruses hide inside all sort of files and metadata.
-There are viruses that hide inside JPEG files too and some of them
-even gain privilege escalations through carefully corrupted JPEG
-files.
-We fix the bugs in the parser, we don't "drop support for JPEG files".
-
-ronnie s
-
+There is a condition to check len_of_ctxts in this loop. How is this
+check not making a break ?
+                if (len_of_ctxts < sizeof(struct smb2_neg_context))
+                        break;
+Thanks.
+>   }
+>   return status;
+>  }
+> --
+> 2.39.2 (Apple Git-143)
 >
-> :-).
