@@ -2,113 +2,108 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D6FBC77B7E
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 May 2023 23:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E29C77B7A
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 May 2023 00:15:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbjEYXub (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 May 2023 19:50:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33556 "EHLO
+        id S229711AbjEZAPz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 May 2023 20:15:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229734AbjEYXua (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 May 2023 19:50:30 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB41612F
-        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 16:50:28 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f3b314b1d7so69752e87.1
-        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 16:50:28 -0700 (PDT)
+        with ESMTP id S229631AbjEZAPy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 May 2023 20:15:54 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B5F18D
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 17:15:53 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f4b2bc1565so85862e87.2
+        for <linux-cifs@vger.kernel.org>; Thu, 25 May 2023 17:15:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685058627; x=1687650627;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ggWLpR5SIsdGQr/iFMBh/HeMCJnyFwZgVHSjyUREoBU=;
-        b=Ar5pb64m8luvleoEMT5l/KwPtlu2fSEhq3qP0yDS9gQJI+EkOMIbMewT2mR1b2QpX+
-         MEv1wZ2FKg3Si8BVhfqBEZve1txGIDQSM+ew70/dfX47ecXkwXLr9X0bGwItZFZXTfYx
-         xEralR8UXsG/0G3jNiQyKzcvwDBbW+6REhF8kiVWP3Wj7hEskrsj/KXk702JND1UZmTX
-         ocrvOE+E6aSt/byH/tMjGUGyp0rp0t489V5PIzWZwURW7R2It6l2BKNjoZ7g10O4rLRn
-         7bYqUnWgEo9p3UT3icdMLpbBFRIVa333J6NbTouBGMMhS9idioZZsD8HOy6kaiK0AW6j
-         zgdw==
+        d=gmail.com; s=20221208; t=1685060151; x=1687652151;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZfhJaqPyjefpsKuZf0KN4c3vpMY0NKu2TD2PSGpqS8A=;
+        b=gqGCWt6WDQ17bGEUG7Gleu5D3Bdv/HM48cSbxH9GZpRHRAv9z42DqNi2z3lgOs5V8s
+         JzNTDhtgM+7sJ8qQ7bOKDPuXHjyp4PAxaNniSylg5/mlIzSLwj59tkhhRIwS0fCXJvnb
+         yl352wn9G2zOFqz3xZPNOl7RdmZmlcnmXCThsXomkVWWZSM46Bgc0xujUfLL0JECX6HO
+         LvGqaxP5Z9ny3ucfuaNi6taTzKqjrmiNYWi6HrYAM+/I1hWxza05Pab0GcXegasK7XF5
+         l8jukyTUkB6pCF6sfHYzsaXl5n5p6uWMhXgVsKgOFC7TLqgdgo/sLrNZIs8hh/nV8rXL
+         LqGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685058627; x=1687650627;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ggWLpR5SIsdGQr/iFMBh/HeMCJnyFwZgVHSjyUREoBU=;
-        b=YPh/uig08ucMWFcxkEo/XwSqkNYnMaIRSkuOgU7Fenf7/qGmWZqRyNFGXTv7LdaMQk
-         smwjceQ+uitXYJa1IfOTGWvM+EL8Bcen/qV4r6t8pHPitplAE+TJhiXt3NEI8iFEUiat
-         oRT4RGzFQFl9XVxnPNV+RJN57dgqH66KmCSMwhKc0T75FlgRhNX90ErDbICwbdbMXj+F
-         6iSueUxrLEk4UCvkAF+5KLXex9STVGFXsisSY7ShsRphrjsW4nBsRrda47c/HXEzoy5k
-         AMCUFGgGb3BpruO6Fsh6+J+Gl2skfTbumApK2I7S45tJMGTZO5eKWyO38VjunrJoW5hQ
-         9wAg==
-X-Gm-Message-State: AC+VfDwxA7PSskuuGz+LFVxARpslpdUQ5DakV355eW5qYHIWmzYJAuFU
-        HueMoxbbr0Myb7kLiGFvXceD5r7l3hQDCDFtSSI=
-X-Google-Smtp-Source: ACHHUZ60GaMNEO7fvqQdli4vTnAMaqI/aq6v+5xZUGoaDmitC4MDvDndxXc8/fkMnH2djVNGYSHK6kN4ZJs4zUJA0jo=
-X-Received: by 2002:a19:7003:0:b0:4e8:5576:98f4 with SMTP id
- h3-20020a197003000000b004e8557698f4mr6536043lfc.45.1685058626856; Thu, 25 May
- 2023 16:50:26 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685060151; x=1687652151;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZfhJaqPyjefpsKuZf0KN4c3vpMY0NKu2TD2PSGpqS8A=;
+        b=ORySrs1fjcT/0eJwXbOE+2aAyNwSU9bB5biU1Crpruq/ayu1zb6+vFanhNLmM2pigW
+         PGbROHpr4SEWE20Zoc1emkxB67hGEO1rGH3/KIoUGEb7OS8UjR0zFF2IyOG/Ia8obm7U
+         +qPhMUm7QvfUj7qr4xFfphiob0z/tGfT4XPiAnxpangPfYkMg1/zEsXtCIZlt/WfdSE1
+         qCLDGLgKGuvCTZabiAuU7Ih7SA/HhHA+1E/p1ZF4ctlUEaMcPQ8RZwBmCe5afWneViPj
+         o/giLenQ+IGNtbRL0lEga86FTBrAj6twZzqE6zyns84zUcL5uetPfORdaCeMGm/oYwTr
+         kLEA==
+X-Gm-Message-State: AC+VfDxnP2b7A6evGKH+fcLsEIhkxORtetxKdJQ0wmPuMTHizMiYvwuV
+        9Ew00nKCySjG5SwKxEGbF56dTY2UflgapCgvni2QuYcI8sxDMCR9
+X-Google-Smtp-Source: ACHHUZ6LE8cIz1gksl3d2AS1aneBPslU+v1yoAVpw9fY2RxinOzLCP3VC/QrWMqEn062CA8t64vEn2IASjzMjc1dPtc=
+X-Received: by 2002:ac2:547c:0:b0:4eb:3fb2:c56d with SMTP id
+ e28-20020ac2547c000000b004eb3fb2c56dmr6616116lfn.12.1685060150812; Thu, 25
+ May 2023 17:15:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mv8nAncg-f=Z5u8LkH4o7kfJLJdtoksYQgiguF7efKZkQ@mail.gmail.com>
- <CAN05THRKq9XPD11rBWXyTL_OGSh4pP6mQyufeW+xc+J3wvkMmw@mail.gmail.com>
- <CAH2r5mtJfSiQXBRUwv6zcR5rhG2Q-pCvjH+n+_SZmVQo1pMeVg@mail.gmail.com>
- <ZGuWhzP98U9Niog+@jeremy-rocky-laptop> <20230525093900.GA261009@sernet.de>
- <CAN05THTi0BC_iwjXMiWn61fg3hRemi5Momwp3O0WGygyWLGomQ@mail.gmail.com>
- <ZG+LOKTr8B+zjQsC@jeremy-rocky-laptop> <CAH2r5mv7aZ8nm30oKyYpa-bd8-MqA13EcEmQWV4mOyrV-rj8Ug@mail.gmail.com>
- <ZG/DajG6spMO6A7v@jeremy-rocky-laptop> <20230525221449.GA9932@sernet.de>
-In-Reply-To: <20230525221449.GA9932@sernet.de>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 25 May 2023 18:50:15 -0500
-Message-ID: <CAH2r5mvGb_e-kjLoKpwF3Eg7f7oOGGKcM7rL95SkU4q=pSE1AQ@mail.gmail.com>
-Subject: Re: Displaying streams as xattrs
-To:     Jeremy Allison <jra@samba.org>, Steve French <smfrench@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 25 May 2023 19:15:39 -0500
+Message-ID: <CAH2r5msJwaietr+iS09HJx+7ZwsJrd_AHcsvgP0zS4LPmX2++Q@mail.gmail.com>
+Subject: [PATCH][SMB3] missing null check in SMB2_change_notify
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     Dan Carpenter <dan.carpenter@linaro.org>,
+        kbuild test robot <lkp@intel.com>,
+        oe-kbuild-all@lists.linux.dev
+Content-Type: multipart/mixed; boundary="000000000000b8172305fc8da35f"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, May 25, 2023 at 5:14=E2=80=AFPM Bj=C3=B6rn JACKE <bj@sernet.de> wro=
-te:
->
-> On 2023-05-25 at 13:22 -0700 Jeremy Allison sent off:
-> > I think cifsfs providing access to ADS remotely on Windows
-> > and Samba shares is fine.
-> >
-> > What I'm scared of is adding ADS as a generic "feature" to
-> > the Linux VFS and other filesystems :-).
->
-> full ack on Jeremy's view here.
->
-> If there is something the the Linux VFS layer should *really* add to help
-> interoperability with basically all other major OS implementations is NFS=
-v4
-> ACLs.  Seriously, for so many people living with Linux is a real pain due=
- to
-> the lack of NFS4 ACLs here.
+--000000000000b8172305fc8da35f
+Content-Type: text/plain; charset="UTF-8"
 
-Today the "RichACLs" can be displayed multiple ways (e.g. "getcifsacl"
-and various other
-tools and also via system xattrs).
-Being able to display "RichACLs" makes sense - and I am fine with
-mapping these (and
-probably would make sense to at least have a readonly mapping of the
-existing richacls on
-a file to "posixacl") and RichACLs are very important.
+If plen is null when passed in, we only checked for null
+in one of the two places where it could be used. Although
+plen is always valid (not null) for current callers of the
+SMB2_change_notify function, this change makes it more consistent.
 
-Wouldn't it be easier to let them also be queried for cifs.ko via
-"system.getrichacl" (or whatever
-the "getrichacl" tool used in various xfstests uses)?
-
-I was also wondering how we should display (and how to retrieve via
-SMB3) "claims based ACLs" (presumably these are reasonably common on a
-few server types like Windows)?
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <error27@gmail.com>
+Closes: https://lore.kernel.org/all/202305251831.3V1gbbFs-lkp@intel.com/
 
 
-
---=20
+-- 
 Thanks,
 
 Steve
+
+--000000000000b8172305fc8da35f
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-missing-null-check-in-SMB2_change_notify.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-missing-null-check-in-SMB2_change_notify.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_li3taksv0>
+X-Attachment-Id: f_li3taksv0
+
+RnJvbSBlYTE2Mjg1OGM1MTU5YTYwNTJiZWYzZmU1MTk4YzI0ZTBkMDBjYjZjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFRodSwgMjUgTWF5IDIwMjMgMTg6NTM6MjggLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBtaXNzaW5nIG51bGwgY2hlY2sgaW4gU01CMl9jaGFuZ2Vfbm90aWZ5CgpJZiBwbGVuIGlz
+IG51bGwgd2hlbiBwYXNzZWQgaW4sIHdlIG9ubHkgY2hlY2tlZCBmb3IgbnVsbAppbiBvbmUgb2Yg
+dGhlIHR3byBwbGFjZXMgd2hlcmUgaXQgY291bGQgYmUgdXNlZC4gQWx0aG91Z2gKcGxlbiBpcyBh
+bHdheXMgdmFsaWQgKG5vdCBudWxsKSBmb3IgY3VycmVudCBjYWxsZXJzIG9mIHRoZQpTTUIyX2No
+YW5nZV9ub3RpZnkgZnVuY3Rpb24sIHRoaXMgY2hhbmdlIG1ha2VzIGl0IG1vcmUgY29uc2lzdGVu
+dC4KClJlcG9ydGVkLWJ5OiBrZXJuZWwgdGVzdCByb2JvdCA8bGtwQGludGVsLmNvbT4KUmVwb3J0
+ZWQtYnk6IERhbiBDYXJwZW50ZXIgPGVycm9yMjdAZ21haWwuY29tPgpDbG9zZXM6IGh0dHBzOi8v
+bG9yZS5rZXJuZWwub3JnL2FsbC8yMDIzMDUyNTE4MzEuM1YxZ2JiRnMtbGtwQGludGVsLmNvbS8K
+U2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0K
+IGZzL3NtYi9jbGllbnQvc21iMnBkdS5jIHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0
+aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9zbWIycGR1
+LmMgYi9mcy9zbWIvY2xpZW50L3NtYjJwZHUuYwppbmRleCA5ZWQ2MWI2ZjliMjEuLjcwNjNiMzk1
+ZDIyZiAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9zbWIycGR1LmMKKysrIGIvZnMvc21iL2Ns
+aWVudC9zbWIycGR1LmMKQEAgLTM3MjUsNyArMzcyNSw3IEBAIFNNQjJfY2hhbmdlX25vdGlmeShj
+b25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCQlpZiAoKm91
+dF9kYXRhID09IE5VTEwpIHsKIAkJCXJjID0gLUVOT01FTTsKIAkJCWdvdG8gY25vdGlmeV9leGl0
+OwotCQl9IGVsc2UKKwkJfSBlbHNlIGlmIChwbGVuKQogCQkJKnBsZW4gPSBsZTMyX3RvX2NwdShz
+bWJfcnNwLT5PdXRwdXRCdWZmZXJMZW5ndGgpOwogCX0KIAotLSAKMi4zNC4xCgo=
+--000000000000b8172305fc8da35f--
