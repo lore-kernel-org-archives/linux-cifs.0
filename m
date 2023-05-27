@@ -2,212 +2,166 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D1AC77B7E
-	for <linux-cifs@archiver.kernel.org>; Sat, 27 May 2023 08:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A7D0C77B7E
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 May 2023 12:21:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbjE0IuN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 27 May 2023 04:50:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55898 "EHLO
+        id S232114AbjE0MVA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 27 May 2023 08:21:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbjE0IuM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 May 2023 04:50:12 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF82EA;
-        Sat, 27 May 2023 01:50:09 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2af225e5b4bso15398981fa.3;
-        Sat, 27 May 2023 01:50:09 -0700 (PDT)
+        with ESMTP id S229637AbjE0MVA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 May 2023 08:21:00 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2111.outbound.protection.outlook.com [40.107.102.111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 905EAF7;
+        Sat, 27 May 2023 05:20:58 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cY4S9yraUOv3WHc/hRmL248v1THImThq2cp2waGoOnswMx98JC1zBDmSsGs8Y6CkPbeUzV6ujCNQKglelghUuV0j1SDdIXXUSFb3M0JKa3cIQU7kzJghTxTaJZdSnx00TVmYhtttnmKMING+8pMKcL5bqfqRDPJyb/UI7wY9XHpnsYXvEI9uKPgSPD6vZ6iAKjnpAaJsnBCSqJt7PhV2bNYzl7d8kNbhshqogRKsBPGpL5zlaEXjAtlVjEZG1QVJDuURVcs6RgjOwimDSeZzlpzDnhf7Vbh+WkqYqpNk0AnxH7Z612eTzDYd2xYBWi8Q4Nm2xfwo4jjc4FWtHwWvpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k53bNaCHg+WYrnuEYz4n7xSO1EeB/nZBSkS0KtMPTsU=;
+ b=Cb2Bp5xE6Bqha5Skm/jJ1rW9bzeOPzpkedH/My6Jwth1Y2et4l1v+dVYmneeBlLmYnt4uXmWRXkyt0vKpy4pknxItfN+xlPBeL64mLksCv6q7kg7orlAON6l+q+rqY6u9F25lGwEuk0DV6abKt++re0gLmwm5ar/eQkpi5RyBnKsrKavA2gvlIuYb3UWNgP7ziWPnx4WKX4TpNgG0pX14zHyTkRi82TT/Ot5/ZeIsL8qmr+GtPeNXISWHQHGaqe9aNUT9LyQi87ePh+9VKCDhLeNkH/jn3qZk3OrTMSDpw+jafcbTWHkNVAUjR26XbuX2kYDP0HOmU0IwwAihmiTyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685177408; x=1687769408;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yp3RI4Ymku1/YTl+AMFgKSN+8aZ0zpxNMENvg1UhqjA=;
-        b=Ptt7JTiP4ZPv/1u0OMFVreaqBUiUkHNLIfEaJu7PkbNYH4ikhlYdpbxoH/NKBHdctE
-         CicAamTd0e4BcN+ze9KnxX6/ij6ipLLjFQc2I2HiBPBH+KhbTMljB+NefVJbK2HB32j1
-         4cc99aykBdTTklzs3OQlYZWUgdKEkssEL7bkxqEcTMHxC8E8DSNgNj4MBOGyvZoXIlSU
-         JIpnihend08kga4/RhGGRfRJtl0BdAjbnpuiGkl5qIgBuFq/eUFCtx2FqsUAbb0WwvMW
-         1iR7kfbLTgH3D7Pq8+lB/BQjjKuI1aDFXkWekYsM9MFx8e3xxB3Crl65oYlAewknLAve
-         +xNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685177408; x=1687769408;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yp3RI4Ymku1/YTl+AMFgKSN+8aZ0zpxNMENvg1UhqjA=;
-        b=c3OdZl+z7MV6GlehMLHIRIdV4q7I+IYe7AuztaioRzXtFrPkDfcIvLNUN/zNQ1iH0a
-         uj1XwMl5ymT3B2fGSRHz0RYhKzvjrkW0PomWQsi31Uke+UubPUVkTHXboUwYMwaJF+YA
-         TB3aTYiVt/QIeDd/23JVwicIUcm4FngHEOUFy8kgf4Q02glfykvR6Hqts004aqA1eUz3
-         cm05Zwc50NldBi8KANqSJK+FC0413nkVR+/5fHhlFE/eDUDCzMq0z1phuhY3zsuhskSG
-         Q+Z9i2qwY0PK+afTHc3en7zDdwM9ZRtylijQlvPQkd7yAilveqWkaJGDe/Rxpc2n3+Hy
-         4ulw==
-X-Gm-Message-State: AC+VfDwAC76wUqYWnUXklnHn4Bo4xR7gDYMhYsC/gs9iCykUgjtEecV8
-        yNAawbZPW5wtSqgVX8j48Ryu8kyKB8KHMRKyflru03AVkyepuQBY
-X-Google-Smtp-Source: ACHHUZ6QkiPpv5AuB1/46USO8iSC4c3midYAAHwtmaIdo1azEAfjDclNb/+7inM/jy7obHUTC44tV5lDNXm1AV/xOhA=
-X-Received: by 2002:a2e:7e04:0:b0:2ac:7e64:ef8 with SMTP id
- z4-20020a2e7e04000000b002ac7e640ef8mr1778807ljc.16.1685177407243; Sat, 27 May
- 2023 01:50:07 -0700 (PDT)
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k53bNaCHg+WYrnuEYz4n7xSO1EeB/nZBSkS0KtMPTsU=;
+ b=mk+zsTnTcMI39S3zjvB07th1fwCPwJoXRrxN1rMIOH6FWq02mhK95SNA15ZKlCioKQzssHMHY8yDeXEZfA/lp6ayhTgdl9QHYpuCR0bruqCrfi2ydjMKVNeeuc6sVhrVnK5g6gXvwYyr2dKz1czhQXjWc3jS0gWFkuCgVVEu42U=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SJ2PR13MB6143.namprd13.prod.outlook.com (2603:10b6:a03:4f5::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.19; Sat, 27 May
+ 2023 12:20:54 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::5e55:9a39:751f:55f6]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::5e55:9a39:751f:55f6%3]) with mapi id 15.20.6433.018; Sat, 27 May 2023
+ 12:20:54 +0000
+Date:   Sat, 27 May 2023 14:20:46 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/8] Move netfs_extract_iter_to_sg() to
+ lib/scatterlist.c
+Message-ID: <ZHH1nqZWOGzxlidT@corigine.com>
+References: <20230526143104.882842-1-dhowells@redhat.com>
+ <20230526143104.882842-2-dhowells@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230526143104.882842-2-dhowells@redhat.com>
+X-ClientProxiedBy: AM0PR04CA0048.eurprd04.prod.outlook.com
+ (2603:10a6:208:1::25) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
-References: <202305250056.oZhsJmdD-lkp@intel.com> <DM4PR21MB344103E6766B9D586C0D11B1E441A@DM4PR21MB3441.namprd21.prod.outlook.com>
- <CAH2r5mteP0kHJN8SJzhU60q+TreP3AaMhVntEuXBiLQb49mBhw@mail.gmail.com>
-In-Reply-To: <CAH2r5mteP0kHJN8SJzhU60q+TreP3AaMhVntEuXBiLQb49mBhw@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 27 May 2023 03:49:55 -0500
-Message-ID: <CAH2r5mujTOvAdu2uu=ypRA4ZUPjcMUdefF3b59WMwoUvJrDxRg@mail.gmail.com>
-Subject: Re: [EXTERNAL] [samba-ksmbd:for-next 4/7] fs/smb/client/ioctl.c:324:17:
- warning: variable 'caps' set but not used
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000be618905fca8f028"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ2PR13MB6143:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6a2b2c9e-1703-484f-3077-08db5eacd16c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gnQJUwfhWb/6yyHot4adOrlymOrpRdyALlTpKkHNw0L5hGfD64UqALPIfDNR6qnTlReIBXaLUdBFHiUd6nLefz3RmevdwCCZzXOxbVgZB+v+9hOIwGINzawt2LwHW+QNdgbhUHfeNxy1qZrBqIUrj/zMEQ0Joze0I26MxgRJua1VyNbmtmCx190LwSlmN32NyLCwF5WgJsdaf9dbfoNtcW0kUoQ2if5G+FLKwL+K1aBx9UqdNOptrexuIRJ67/zdhNep82ayhupESnbDI45Z2PIV8BIOcR1AkMhAVtTPWvreuEEpeuXAOl0NBens6slHYI6q+19fqD3aYY6Fk8yTyMfy/l+Cj2z+H0+keXWBwvNsVfjNY1p3O58FJVRteCzw9N7Iu+eUoxiaRg2yQkIMfxdHpk5VcGxwkrTkzIYhuWm6YdKDU8VfPo9B4qaBySDfYFdgMQ27FjU1z37GOMiPU0zaIsxYQm76Sk2aY0n0VFxIHvYm1aQO03KSLBR7lmWNrkSAyH6bsDT+byMo/DXfLpLnaO1FXgDWiQE611U+fWW99haU0kQTzPnIxjkMHntU
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39830400003)(366004)(396003)(136003)(346002)(376002)(451199021)(4326008)(86362001)(36756003)(186003)(8676002)(8936002)(41300700001)(83380400001)(6512007)(6506007)(2616005)(7416002)(5660300002)(54906003)(478600001)(6916009)(66946007)(66476007)(66556008)(316002)(6486002)(6666004)(38100700002)(44832011)(2906002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?k5f0cerJ30/hXpQz2q12q1QpqrKX/KBfnbgRDORHvUewXNM5RmdqdRQg2Hbn?=
+ =?us-ascii?Q?/Ha485msQpZxB/WWJg1gh12VJAPyhLYawBCE7MGwnM3YfUnZBEGpWjVsQuTZ?=
+ =?us-ascii?Q?/Qv/sqCQhJleQ+rZvyiw+E/AMfivjIX4vPLB4vLU+qpOuFhF9PwDZn+ox0LH?=
+ =?us-ascii?Q?6NcnPUaGJvHCUU7aogUovg09ylYUbTRFJ/RkIn3OsesNRmNZPHHXdnR97kaX?=
+ =?us-ascii?Q?lP4y8qnF7B47ekLVIMg7M104tHP1BxcsGP6ZuLrvWmpNIOl1/k4/eI5/vuhy?=
+ =?us-ascii?Q?k5bB8P/Iz3c5mq7nTjLD3Sf/9ZLvuwMxZOP/xaqXldiMyzP/06wtSpjoTUy9?=
+ =?us-ascii?Q?wf6MwsgnukoQLd6OfnGXqT8iw/qWDzizrY0K6ZeH3VS0HaMDHweQSNpHW6fx?=
+ =?us-ascii?Q?YbQ1T9XQeuD3OP1HBiDZtLEGek9USF47aDp1BLSZRgOr5/vnKv/cnPAqzEP8?=
+ =?us-ascii?Q?JuRBXXfRw1rhopnLqzo1so83K0L3Or+Zgr1IOzy1Gfb4RhSZxhRWnWTEeRkD?=
+ =?us-ascii?Q?s/4mxuf9+7qV8AkdAnSgNVdVVigE7R5iTsz0aMkNd5PVtU37DqkKNd9o9UBa?=
+ =?us-ascii?Q?tLcfIST+0HUoQ7CyvT+X4wJdnwyQ0nkB9X3S6QfPgvs3jbX7M4YOokwwr9fs?=
+ =?us-ascii?Q?TCzax3IUKUTo7kcP/C+FOfODKEwXvtszG/IkFibK4tHM2hvnDsFQxOC5rrSe?=
+ =?us-ascii?Q?39IDbz7ov6DqJVWLLMPHicgBjLsxdUJ6egcLWaZ9aOSbot0c/IMm4d442lcv?=
+ =?us-ascii?Q?oe7LxYMBfTsOw0WitkfCVQ/AeqA48aWtesECNhsA21aJw9CRa7PulJGxq6SL?=
+ =?us-ascii?Q?+9K9C3PXD6vH3Dd73TY7aSnWeWjZ9S8lf2X2B6nqxOJMOW/uBW5bdn7HuM5K?=
+ =?us-ascii?Q?q3AlQuOjYryYHf5zbnnTnXhNh3yOnE0nQU92DY+413DJ8e8F8Nxhb48x81h5?=
+ =?us-ascii?Q?4QHBj7ZkPBJmGdVJsWCfrasFPQL99b4RBUm3FuCt4W4ETSvIgSMZF79hGtj4?=
+ =?us-ascii?Q?XVMtaocGEdpELsRShp5OQjcBfZVnM7weAfoR8+NnPDpDSMHPu9RP42HeQ/MM?=
+ =?us-ascii?Q?6VifeUqkjebcZlbmYbb21M/M+VaYRirfzCNfLkRxrNK1nnPSTisqbLjn+VwD?=
+ =?us-ascii?Q?iRdAgaod5RwmvQEAIfKJ8U2q7Bi9TDXj3gsjIBffB3qSM0LGrATisI9vgvLC?=
+ =?us-ascii?Q?6eNrUpSrPCR96/+HnX7anSfZrmoSfPAI2dOeor6i9zg2rCnSr3wSTSzSt/7N?=
+ =?us-ascii?Q?JtCScNE9vekzVFMMXi/U4GX0F0qBXpZcdoBn5C25J/s/lqfjaxjFSNEPCpRo?=
+ =?us-ascii?Q?um2bJB058q+AhvBFqLNezgy63wrLtedw699955M5tEUTy00+xO3TU7Lw977g?=
+ =?us-ascii?Q?Ki7wThY9wgxv4IdVb2krplfmVCOTUfBpXsBZtKHokodOkIQ3W+i4G8URoOvf?=
+ =?us-ascii?Q?wBR+IqGhEwuXgCW21R/NlYVtsnfd5Zd20V9O4L0N4XnHzy2steFpwykcXqAb?=
+ =?us-ascii?Q?0IyGaifUL/BbUuih7yDDcAFpstJmv0Orvb5RVOW3Mssw37xDIsKOaHD6n6j8?=
+ =?us-ascii?Q?L2dxNkPprEyqVgXvyeX5I23C7ansEOGT2yxFE1kfBjGtJoKpVWVpD+i/Lt8s?=
+ =?us-ascii?Q?o1TWEn99DqNi00m3fmPLMqk8ywhkZCZUV2Jav9E4txLTH7t7wKwUZKROGMPK?=
+ =?us-ascii?Q?rOiJvA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a2b2c9e-1703-484f-3077-08db5eacd16c
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2023 12:20:54.5261
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Qif1qLOblT+2Rt+zeOY2vOcnWyv8g80QjRNKwzZ+GNdgt14Epf0u0eDelBDo8YJxlyg8lzsZyOv9Bb+5JFGuWEN0Wwm8hqdIIIF1MxNTQ3U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR13MB6143
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000be618905fca8f028
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Fri, May 26, 2023 at 03:30:57PM +0100, David Howells wrote:
 
-Fix attached:
+...
 
-Fix trivial unused variable warning (when SMB1 support disabled)
+> +/**
+> + * netfs_extract_iter_to_sg - Extract pages from an iterator and add ot an sglist
+> + * @iter: The iterator to extract from
+> + * @maxsize: The amount of iterator to copy
+> + * @sgtable: The scatterlist table to fill in
+> + * @sg_max: Maximum number of elements in @sgtable that may be filled
+> + * @extraction_flags: Flags to qualify the request
+> + *
+> + * Extract the page fragments from the given amount of the source iterator and
+> + * add them to a scatterlist that refers to all of those bits, to a maximum
+> + * addition of @sg_max elements.
+> + *
+> + * The pages referred to by UBUF- and IOVEC-type iterators are extracted and
+> + * pinned; BVEC-, KVEC- and XARRAY-type are extracted but aren't pinned; PIPE-
+> + * and DISCARD-type are not supported.
+> + *
+> + * No end mark is placed on the scatterlist; that's left to the caller.
+> + *
+> + * @extraction_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA
+> + * be allowed on the pages extracted.
+> + *
+> + * If successul, @sgtable->nents is updated to include the number of elements
 
-"ioctl.c:324:17: warning: variable 'caps' set but not used
-[-Wunused-but-set-variable]"
+Hi David,
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202305250056.oZhsJmdD-lkp@int=
-el.com/
+I know you are just moving things about here.
+But if you need to re-spin for some other reason,
+perhaps you could correct the spelling of successful.
 
-> From: kernel test robot <lkp@intel.com>
-> Sent: Wednesday, May 24, 2023 7:01:39 AM
-> To: Steven French <Steven.French@microsoft.com>
-> Cc: oe-kbuild-all@lists.linux.dev <oe-kbuild-all@lists.linux.dev>
-> Subject: [EXTERNAL] [samba-ksmbd:for-next 4/7] fs/smb/client/ioctl.c:324:=
-17: warning: variable 'caps' set but not used
->
-> Hi Steve,
->
-> First bad commit (maybe !=3D root cause):
->
-> tree:   git://git.samba.org/ksmbd.git for-next
-> head:   d58a8a27a7cac75e82383c2a25704bd15b0045d5
-> commit: e3adc6b1f0d12b80a7a81fd4f345890a4fb483d6 [4/7] smb: move client a=
-nd server files to common directory fs/smb
-> config: i386-randconfig-i003-20230524
-> compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
-> reproduce (this is a W=3D1 build):
->         git remote add samba-ksmbd git://git.samba.org/ksmbd.git
->         git fetch --no-tags samba-ksmbd for-next
->         git checkout e3adc6b1f0d12b80a7a81fd4f345890a4fb483d6
->         # save the config file
->         mkdir build_dir && cp config build_dir/.config
->         make W=3D1 O=3Dbuild_dir ARCH=3Di386 olddefconfig
->         make W=3D1 O=3Dbuild_dir ARCH=3Di386 SHELL=3D/bin/bash fs/smb/cli=
-ent/
->
-> If you fix the issue, kindly add following tag where applicable
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%=
-2F%2Flore.kernel.org%2Foe-kbuild-all%2F202305250056.oZhsJmdD-lkp%40intel.co=
-m%2F&data=3D05%7C01%7CSteven.French%40microsoft.com%7Caf0e1ee950724b4eb2ce0=
-8db5c78aca3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C638205445595592058=
-%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haW=
-wiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DmoaptwMZutTbXzs%2F65jeBFL8bJmVzWsj=
-oLBeuDAQaMc%3D&reserved=3D0
->
-> All warnings (new ones prefixed by >>):
->
->    fs/smb/client/ioctl.c: In function 'cifs_ioctl':
-> >> fs/smb/client/ioctl.c:324:17: warning: variable 'caps' set but not use=
-d [-Wunused-but-set-variable]
->      324 |         __u64   caps;
->          |                 ^~~~
->
->
-> vim +/caps +324 fs/smb/client/ioctl.c
->
-> 7ba3d1cdb7988c fs/cifs/ioctl.c Steve French    2021-05-02  312
-> f9ddcca4cf7d95 fs/cifs/ioctl.c Steve French    2008-05-15  313  long cifs=
-_ioctl(struct file *filep, unsigned int command, unsigned long arg)
-> ^1da177e4c3f41 fs/cifs/ioctl.c Linus Torvalds  2005-04-16  314  {
-> 496ad9aa8ef448 fs/cifs/ioctl.c Al Viro         2013-01-23  315   struct i=
-node *inode =3D file_inode(filep);
-> 7e7db86c7e1088 fs/cifs/ioctl.c Steve French    2019-09-19  316   struct s=
-mb3_key_debug_info pkey_inf;
-> ^1da177e4c3f41 fs/cifs/ioctl.c Linus Torvalds  2005-04-16  317   int rc =
-=3D -ENOTTY; /* strange error - but the precedent */
-> 6d5786a34d98bf fs/cifs/ioctl.c Pavel Shilovsky 2012-06-20  318   unsigned=
- int xid;
-> ba00ba64cf0895 fs/cifs/ioctl.c Jeff Layton     2010-09-20  319   struct c=
-ifsFileInfo *pSMBFile =3D filep->private_data;
-> 96daf2b09178d8 fs/cifs/ioctl.c Steve French    2011-05-27  320   struct c=
-ifs_tcon *tcon;
-> a77592a70081ed fs/cifs/ioctl.c Ronnie Sahlberg 2020-07-09  321   struct t=
-con_link *tlink;
-> d26c2ddd335696 fs/cifs/ioctl.c Steve French    2020-02-06  322   struct c=
-ifs_sb_info *cifs_sb;
-> f654bac2227adc fs/cifs/ioctl.c Steve French    2005-04-28  323   __u64   =
-ExtAttrBits =3D 0;
-> 618763958b2291 fs/cifs/ioctl.c Jeff Layton     2010-11-08 @324   __u64   =
-caps;
->
-> :::::: The code at line 324 was first introduced by commit
-> :::::: 618763958b2291a09057dbfa553da6ded93dcfad cifs: make cifs_ioctl han=
-dle NULL filp->private_data correctly
->
-> :::::: TO: Jeff Layton <jlayton@redhat.com>
-> :::::: CC: Steve French <sfrench@us.ibm.com>
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgithu=
-b.com%2Fintel%2Flkp-tests%2Fwiki&data=3D05%7C01%7CSteven.French%40microsoft=
-.com%7Caf0e1ee950724b4eb2ce08db5c78aca3%7C72f988bf86f141af91ab2d7cd011db47%=
-7C1%7C0%7C638205445595592058%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLC=
-JQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3D4S7ypb=
-EmVEH0ItLaFq6203nT%2FVUHq%2FI%2B0DPIw8MLllw%3D&reserved=3D0
+> + * added and the number of bytes added is returned.  @sgtable->orig_nents is
+> + * left unaltered.
+> + *
+> + * The iov_iter_extract_mode() function should be used to query how cleanup
+> + * should be performed.
+> + */
 
-
-
---=20
-Thanks,
-
-Steve
-
---000000000000be618905fca8f028
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-address-unused-variable-warning.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-address-unused-variable-warning.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_li5r27q50>
-X-Attachment-Id: f_li5r27q50
-
-RnJvbSBmZGQ3ZDFmZmY0ZTNiOTdjNDcwNmY0YzBlMDAwYTM4YjEzNGI3YWU1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFNhdCwgMjcgTWF5IDIwMjMgMDM6MzM6MjMgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBhZGRyZXNzIHVudXNlZCB2YXJpYWJsZSB3YXJuaW5nCgpGaXggdHJpdmlhbCB1bnVzZWQg
-dmFyaWFibGUgd2FybmluZyAod2hlbiBTTUIxIHN1cHBvcnQgZGlzYWJsZWQpCgoiaW9jdGwuYzoz
-MjQ6MTc6IHdhcm5pbmc6IHZhcmlhYmxlICdjYXBzJyBzZXQgYnV0IG5vdCB1c2VkIFstV3VudXNl
-ZC1idXQtc2V0LXZhcmlhYmxlXSIKClJlcG9ydGVkLWJ5OiBrZXJuZWwgdGVzdCByb2JvdCA8bGtw
-QGludGVsLmNvbT4KQ2xvc2VzOiBodHRwczovL2xvcmUua2VybmVsLm9yZy9vZS1rYnVpbGQtYWxs
-LzIwMjMwNTI1MDA1Ni5vWmhzSm1kRC1sa3BAaW50ZWwuY29tLwpTaWduZWQtb2ZmLWJ5OiBTdGV2
-ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9pb2N0
-bC5jIHwgNiArKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDEgZGVsZXRp
-b24oLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2lvY3RsLmMgYi9mcy9zbWIvY2xpZW50
-L2lvY3RsLmMKaW5kZXggY2IzYmU1OGNkNTVlLi5mZmYwOTJiYmM3YTMgMTAwNjQ0Ci0tLSBhL2Zz
-L3NtYi9jbGllbnQvaW9jdGwuYworKysgYi9mcy9zbWIvY2xpZW50L2lvY3RsLmMKQEAgLTMyMSw3
-ICszMjEsMTEgQEAgbG9uZyBjaWZzX2lvY3RsKHN0cnVjdCBmaWxlICpmaWxlcCwgdW5zaWduZWQg
-aW50IGNvbW1hbmQsIHVuc2lnbmVkIGxvbmcgYXJnKQogCXN0cnVjdCB0Y29uX2xpbmsgKnRsaW5r
-OwogCXN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2I7CiAJX191NjQJRXh0QXR0ckJpdHMgPSAw
-OworI2lmZGVmIENPTkZJR19DSUZTX1BPU0lYCisjaWZkZWYgQ09ORklHX0NJRlNfQUxMT1dfSU5T
-RUNVUkVfTEVHQUNZCiAJX191NjQgICBjYXBzOworI2VuZGlmIC8qIENPTkZJR19DSUZTX0FMTE9X
-X0lOU0VDVVJFX0xFR0FDWSAqLworI2VuZGlmIC8qIENPTkZJR19DSUZTX1BPU0lYICovCiAKIAl4
-aWQgPSBnZXRfeGlkKCk7CiAKQEAgLTMzMSw5ICszMzUsOSBAQCBsb25nIGNpZnNfaW9jdGwoc3Ry
-dWN0IGZpbGUgKmZpbGVwLCB1bnNpZ25lZCBpbnQgY29tbWFuZCwgdW5zaWduZWQgbG9uZyBhcmcp
-CiAJCQlpZiAocFNNQkZpbGUgPT0gTlVMTCkKIAkJCQlicmVhazsKIAkJCXRjb24gPSB0bGlua190
-Y29uKHBTTUJGaWxlLT50bGluayk7Ci0JCQljYXBzID0gbGU2NF90b19jcHUodGNvbi0+ZnNVbml4
-SW5mby5DYXBhYmlsaXR5KTsKICNpZmRlZiBDT05GSUdfQ0lGU19QT1NJWAogI2lmZGVmIENPTkZJ
-R19DSUZTX0FMTE9XX0lOU0VDVVJFX0xFR0FDWQorCQkJY2FwcyA9IGxlNjRfdG9fY3B1KHRjb24t
-PmZzVW5peEluZm8uQ2FwYWJpbGl0eSk7CiAJCQlpZiAoQ0lGU19VTklYX0VYVEFUVFJfQ0FQICYg
-Y2FwcykgewogCQkJCV9fdTY0CUV4dEF0dHJNYXNrID0gMDsKIAkJCQlyYyA9IENJRlNHZXRFeHRB
-dHRyKHhpZCwgdGNvbiwKLS0gCjIuMzQuMQoK
---000000000000be618905fca8f028--
+...
