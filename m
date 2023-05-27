@@ -2,113 +2,128 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2711FC7EE23
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 May 2023 16:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65926C77B7A
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 May 2023 01:50:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236801AbjEZQma (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 May 2023 12:42:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44182 "EHLO
+        id S229726AbjE0BuY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 May 2023 21:50:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234439AbjEZQm3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 May 2023 12:42:29 -0400
-X-Greylist: delayed 552 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 26 May 2023 09:42:26 PDT
-Received: from smtp-42ac.mail.infomaniak.ch (smtp-42ac.mail.infomaniak.ch [84.16.66.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15B6B19A
-        for <linux-cifs@vger.kernel.org>; Fri, 26 May 2023 09:42:25 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QSVpc2hLFzMq9gR;
-        Fri, 26 May 2023 18:33:12 +0200 (CEST)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QSVpV20JTzMskdH;
-        Fri, 26 May 2023 18:33:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-        s=20191114; t=1685118792;
-        bh=HJQhmbmtbBhKQKuJigfXUA3I5dGt5vNd+kwPhAR19ZE=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=QqUfw9dzLlsE/jUv5i4Jbgo6yOquEH/LNulEp4j1bWACweWhxdKLOxVud95fbWB4E
-         npEnxoPtqyuJGwkskhuE2oFCSu10WcSFOgyuW8dZTYuf1lnresczWPQXS0hze8B1ou
-         boYfLZK8RC3g7VGc+V2WpOIG30d240jDxiyeRn5Q=
-Message-ID: <75b4746d-d41e-7c9f-4bb0-42a46bda7f17@digikod.net>
-Date:   Fri, 26 May 2023 18:33:05 +0200
+        with ESMTP id S229716AbjE0BuY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 May 2023 21:50:24 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CB8F3
+        for <linux-cifs@vger.kernel.org>; Fri, 26 May 2023 18:50:22 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2af177f12d1so14233001fa.0
+        for <linux-cifs@vger.kernel.org>; Fri, 26 May 2023 18:50:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685152220; x=1687744220;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LpZgqZg+kBm2WUGSX2QGnSQmGiuF2EmK2iiEE2sNjvI=;
+        b=LQgnILsCXixQZtTvT+ryRMvHs3UxE5Nq/4qDlecOkcgzOr7k9AqdOk3oHQfP8IkH3+
+         WfF4DvM9uCP8kuzyDAbmB2LyNb+OX1peiLnUfBy4G9xkvlDWORbLbEv1pebK9VNMwL/8
+         Kgh44dh9r1Q1GpW5NyH7TAN49uRfrVtVIfqYQ/7IhRdPWi52e7fqvL5fsQpuJPS4IhiR
+         Xo+Qhz+t6gDEnWCdv3WC6+DRov6FtUDq9bUX/WXOccqFczvq7Oez77JKjsyKJ/ymGppx
+         PXa/J56v+zG3A/ChPPCrZQNN4BMo4Bziz4YGmXhCY1GPfEJzdUdn/LdzB+McVqaLxWQ3
+         NNkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685152220; x=1687744220;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LpZgqZg+kBm2WUGSX2QGnSQmGiuF2EmK2iiEE2sNjvI=;
+        b=RTgBFaZXqlVvcEeypMiofZeCTS2BSZMxGWs/vYl3EwwIi+2G9HQAZL7XkslK96/diP
+         FOjOgavCsGZQbd8eQlBuN33JseFoNR8J1qRFOuhqVxQswA16d4OKCdt91xQCuObpRPyW
+         vhkOi1cjMdD66wgljWs/ngUO46TKiTFU3Opz8jfJI3DaQlaJ39zajBx6XA+KZVla5ehK
+         9aGQ/JdQ5TJiQsfeLyBasbti3PibRNTFH8AlJaxofPvX31nGtsQPK8+qbCS5fDTlu9ux
+         kRdwg2olzGBEJS5Kvlymz1natJoFXBmZdXT5ewJr8dwWh1gaFle7X9VOr6B/BlbV03EF
+         mWZg==
+X-Gm-Message-State: AC+VfDy0VR4DhzwYo4pOvaAwswd/4vqnUWI0sp3YfhWTjdqyyiIZw5Y8
+        wm/EcI2JgraFiL8K4/JrxknFp1Nvt/qowhJwepo=
+X-Google-Smtp-Source: ACHHUZ6J4K6jBj99WDJdTSvvrEHHAo2uLG4cZLgBiDRh5Ya5WQ2ZJrzMoJ7wnsO9kPUDMEfCdd0KtpC5OHUWsMzraIY=
+X-Received: by 2002:a2e:96da:0:b0:2af:1a58:2c83 with SMTP id
+ d26-20020a2e96da000000b002af1a582c83mr1174678ljj.30.1685152220266; Fri, 26
+ May 2023 18:50:20 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: 
-Subject: Re: [PATCH -next 0/2] lsm: Change inode_setattr() to take struct
-Content-Language: en-US
-To:     Christian Brauner <brauner@kernel.org>,
-        Xiu Jianfeng <xiujianfeng@huawei.com>
-Cc:     gregkh@linuxfoundation.org, rafael@kernel.org,
-        viro@zeniv.linux.org.uk, dhowells@redhat.com, code@tyhicks.com,
-        hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org,
-        sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        chuck.lever@oracle.com, jlayton@kernel.org, miklos@szeredi.hu,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        stephen.smalley.work@gmail.com, eparis@parisplace.org,
-        casey@schaufler-ca.com, dchinner@redhat.com,
-        john.johansen@canonical.com, mcgrof@kernel.org,
-        mortonm@chromium.org, fred@cloudflare.com, mpe@ellerman.id.au,
-        nathanl@linux.ibm.com, gnoack3000@gmail.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
-        wangweiyang2@huawei.com
-References: <20230505081200.254449-1-xiujianfeng@huawei.com>
- <20230515-nutzen-umgekehrt-eee629a0101e@brauner>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <20230515-nutzen-umgekehrt-eee629a0101e@brauner>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Infomaniak-Routing: alpha
+References: <CAN05THRKq9XPD11rBWXyTL_OGSh4pP6mQyufeW+xc+J3wvkMmw@mail.gmail.com>
+ <CAH2r5mtJfSiQXBRUwv6zcR5rhG2Q-pCvjH+n+_SZmVQo1pMeVg@mail.gmail.com>
+ <ZGuWhzP98U9Niog+@jeremy-rocky-laptop> <20230525093900.GA261009@sernet.de>
+ <CAN05THTi0BC_iwjXMiWn61fg3hRemi5Momwp3O0WGygyWLGomQ@mail.gmail.com>
+ <ZG+LOKTr8B+zjQsC@jeremy-rocky-laptop> <CAH2r5mv7aZ8nm30oKyYpa-bd8-MqA13EcEmQWV4mOyrV-rj8Ug@mail.gmail.com>
+ <ZG/DajG6spMO6A7v@jeremy-rocky-laptop> <20230525221449.GA9932@sernet.de>
+ <CAH2r5mvGb_e-kjLoKpwF3Eg7f7oOGGKcM7rL95SkU4q=pSE1AQ@mail.gmail.com>
+ <20230526160320.GA13176@sernet.de> <CAH2r5muD89QUcaqWNQy5NUwyji9CinN_5kGcfFSQAbpJP5gn+A@mail.gmail.com>
+In-Reply-To: <CAH2r5muD89QUcaqWNQy5NUwyji9CinN_5kGcfFSQAbpJP5gn+A@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 26 May 2023 20:50:08 -0500
+Message-ID: <CAH2r5mt-8fwG5h=K0qBiKY4S-7YAcJYt2HtOgb_zOxVzRvROLw@mail.gmail.com>
+Subject: Re: Displaying streams as xattrs
+To:     Steve French <smfrench@gmail.com>, Jeremy Allison <jra@samba.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Christoph Hellwig <hch@lst.de>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-
-On 15/05/2023 17:12, Christian Brauner wrote:
-> On Fri, May 05, 2023 at 04:11:58PM +0800, Xiu Jianfeng wrote:
->> Hi,
+On Fri, May 26, 2023 at 7:54=E2=80=AFPM Steve French <smfrench@gmail.com> w=
+rote:
+>
+>
+>
+> On Fri, May 26, 2023, 06:03 Bj=C3=B6rn JACKE <bj@sernet.de> wrote:
 >>
->> I am working on adding xattr/attr support for landlock [1], so we can
->> control fs accesses such as chmod, chown, uptimes, setxattr, etc.. inside
->> landlock sandbox. the LSM hooks as following are invoved:
->> 1.inode_setattr
->> 2.inode_setxattr
->> 3.inode_removexattr
->> 4.inode_set_acl
->> 5.inode_remove_acl
->> which are controlled by LANDLOCK_ACCESS_FS_WRITE_METADATA.
+>> On 2023-05-25 at 18:50 -0500 Steve French via samba-technical sent off:
+>> > Today the "RichACLs" can be displayed multiple ways (e.g. "getcifsacl"
+>> > and various other
+>> > tools and also via system xattrs).
+>> > Being able to display "RichACLs" makes sense - and I am fine with
+>> > mapping these (and
+>> > probably would make sense to at least have a readonly mapping of the
+>> > existing richacls on
+>> > a file to "posixacl") and RichACLs are very important.
+>> >
+>> > Wouldn't it be easier to let them also be queried for cifs.ko via
+>> > "system.getrichacl" (or whatever
+>> > the "getrichacl" tool used in various xfstests uses)?
+>> >
+>> > I was also wondering how we should display (and how to retrieve via
+>> > SMB3) "claims based ACLs" (presumably these are reasonably common on a
+>> > few server types like Windows)?
 >>
->> and
->> 1.inode_getattr
->> 2.inode_get_acl
->> 3.inode_getxattr
->> 4.inode_listxattr
->> which are controlled by LANDLOCK_ACCESS_FS_READ_METADATA
-> 
-> It would be helpful to get the complete, full picture.
-> 
-> Piecemeal extending vfs helpers with struct path arguments is costly,
-> will cause a lot of churn and will require a lot of review time from us.
-> 
-> Please give us the list of all security hooks to which you want to pass
-> a struct path (if there are more to come apart from the ones listed
-> here). Then please follow all callchains and identify the vfs helpers
-> that would need to be updated. Then please figure out where those
-> vfs helpers are called from and follow all callchains finding all
-> inode_operations that would have to be updated and passed a struct path
-> argument. So ultimately we'll end up with a list of vfs helpers and
-> inode_operations that would have to be changed.
-> 
-> I'm very reluctant to see anything merged without knowing _exactly_ what
-> you're getting us into.
+>> let's stop calling them RichACLs becuase that was only the name that And=
+reas
+>> Gr=C3=BCnbacher was giving his implementation of the NFS4 ACLs
 
-Ultimately we'd like the path-based LSMs to reach parity with the 
-inode-based LSMs. This proposal's goal is to provide users the ability 
-to control (in a complete and easy way) file metadata access. For these 
-we need to extend the inode_*attr hooks and inode_*acl hooks to handle 
-paths. The chown/chmod hooks are already good.
+The name "richacls" looks like it is embedded in the standard
+filesystem functional tests
+(to pass xfstests generic/362 through generic/370 requires this - so I
+would have to finish
+off the mapping of this richacl pseudo-xattr query to the SMB3.1.1 get
+acl query over the wire).
+It doesn't look too bad, and it would.   Most users would probably use
+the normal
+tools (like getcifsacl or even Samba's "smbcacls" user space tool or
+the pseudo-xattr
+e.g. system.cifs_ntsd_full) but if it helps to use a common format
+that helps ntfs and nfsv4.1 and later
+that is fine with me.
 
-In the future, I'd also like to be able to control directory traversals 
-(e.g. chdir), which currently only calls inode_permission().
 
-What would be the best way to reach this goal?
+> Remember that at Connectathon conferences years ago when nfs4.1 ACLS were=
+ explained  (fixing NFS 4 ACLS to address some missed things). The NFS ACL =
+ideas were modelled after smb ACLs so NFS ACLs have many similarities to th=
+eir predecessor SMB ACLs (although presumably do not support claims based A=
+CEs/CBAC/DAC yet)
+
+
+
+--=20
+Thanks,
+
+Steve
