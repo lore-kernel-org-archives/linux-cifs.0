@@ -2,124 +2,168 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65926C77B7A
-	for <linux-cifs@archiver.kernel.org>; Sat, 27 May 2023 01:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D1AC77B7E
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 May 2023 08:50:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbjE0BuY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 May 2023 21:50:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41954 "EHLO
+        id S229717AbjE0IuN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 27 May 2023 04:50:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbjE0BuY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 May 2023 21:50:24 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CB8F3
-        for <linux-cifs@vger.kernel.org>; Fri, 26 May 2023 18:50:22 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2af177f12d1so14233001fa.0
-        for <linux-cifs@vger.kernel.org>; Fri, 26 May 2023 18:50:22 -0700 (PDT)
+        with ESMTP id S229649AbjE0IuM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 May 2023 04:50:12 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF82EA;
+        Sat, 27 May 2023 01:50:09 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2af225e5b4bso15398981fa.3;
+        Sat, 27 May 2023 01:50:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685152220; x=1687744220;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LpZgqZg+kBm2WUGSX2QGnSQmGiuF2EmK2iiEE2sNjvI=;
-        b=LQgnILsCXixQZtTvT+ryRMvHs3UxE5Nq/4qDlecOkcgzOr7k9AqdOk3oHQfP8IkH3+
-         WfF4DvM9uCP8kuzyDAbmB2LyNb+OX1peiLnUfBy4G9xkvlDWORbLbEv1pebK9VNMwL/8
-         Kgh44dh9r1Q1GpW5NyH7TAN49uRfrVtVIfqYQ/7IhRdPWi52e7fqvL5fsQpuJPS4IhiR
-         Xo+Qhz+t6gDEnWCdv3WC6+DRov6FtUDq9bUX/WXOccqFczvq7Oez77JKjsyKJ/ymGppx
-         PXa/J56v+zG3A/ChPPCrZQNN4BMo4Bziz4YGmXhCY1GPfEJzdUdn/LdzB+McVqaLxWQ3
-         NNkw==
+        d=gmail.com; s=20221208; t=1685177408; x=1687769408;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=yp3RI4Ymku1/YTl+AMFgKSN+8aZ0zpxNMENvg1UhqjA=;
+        b=Ptt7JTiP4ZPv/1u0OMFVreaqBUiUkHNLIfEaJu7PkbNYH4ikhlYdpbxoH/NKBHdctE
+         CicAamTd0e4BcN+ze9KnxX6/ij6ipLLjFQc2I2HiBPBH+KhbTMljB+NefVJbK2HB32j1
+         4cc99aykBdTTklzs3OQlYZWUgdKEkssEL7bkxqEcTMHxC8E8DSNgNj4MBOGyvZoXIlSU
+         JIpnihend08kga4/RhGGRfRJtl0BdAjbnpuiGkl5qIgBuFq/eUFCtx2FqsUAbb0WwvMW
+         1iR7kfbLTgH3D7Pq8+lB/BQjjKuI1aDFXkWekYsM9MFx8e3xxB3Crl65oYlAewknLAve
+         +xNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685152220; x=1687744220;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LpZgqZg+kBm2WUGSX2QGnSQmGiuF2EmK2iiEE2sNjvI=;
-        b=RTgBFaZXqlVvcEeypMiofZeCTS2BSZMxGWs/vYl3EwwIi+2G9HQAZL7XkslK96/diP
-         FOjOgavCsGZQbd8eQlBuN33JseFoNR8J1qRFOuhqVxQswA16d4OKCdt91xQCuObpRPyW
-         vhkOi1cjMdD66wgljWs/ngUO46TKiTFU3Opz8jfJI3DaQlaJ39zajBx6XA+KZVla5ehK
-         9aGQ/JdQ5TJiQsfeLyBasbti3PibRNTFH8AlJaxofPvX31nGtsQPK8+qbCS5fDTlu9ux
-         kRdwg2olzGBEJS5Kvlymz1natJoFXBmZdXT5ewJr8dwWh1gaFle7X9VOr6B/BlbV03EF
-         mWZg==
-X-Gm-Message-State: AC+VfDy0VR4DhzwYo4pOvaAwswd/4vqnUWI0sp3YfhWTjdqyyiIZw5Y8
-        wm/EcI2JgraFiL8K4/JrxknFp1Nvt/qowhJwepo=
-X-Google-Smtp-Source: ACHHUZ6J4K6jBj99WDJdTSvvrEHHAo2uLG4cZLgBiDRh5Ya5WQ2ZJrzMoJ7wnsO9kPUDMEfCdd0KtpC5OHUWsMzraIY=
-X-Received: by 2002:a2e:96da:0:b0:2af:1a58:2c83 with SMTP id
- d26-20020a2e96da000000b002af1a582c83mr1174678ljj.30.1685152220266; Fri, 26
- May 2023 18:50:20 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685177408; x=1687769408;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yp3RI4Ymku1/YTl+AMFgKSN+8aZ0zpxNMENvg1UhqjA=;
+        b=c3OdZl+z7MV6GlehMLHIRIdV4q7I+IYe7AuztaioRzXtFrPkDfcIvLNUN/zNQ1iH0a
+         uj1XwMl5ymT3B2fGSRHz0RYhKzvjrkW0PomWQsi31Uke+UubPUVkTHXboUwYMwaJF+YA
+         TB3aTYiVt/QIeDd/23JVwicIUcm4FngHEOUFy8kgf4Q02glfykvR6Hqts004aqA1eUz3
+         cm05Zwc50NldBi8KANqSJK+FC0413nkVR+/5fHhlFE/eDUDCzMq0z1phuhY3zsuhskSG
+         Q+Z9i2qwY0PK+afTHc3en7zDdwM9ZRtylijQlvPQkd7yAilveqWkaJGDe/Rxpc2n3+Hy
+         4ulw==
+X-Gm-Message-State: AC+VfDwAC76wUqYWnUXklnHn4Bo4xR7gDYMhYsC/gs9iCykUgjtEecV8
+        yNAawbZPW5wtSqgVX8j48Ryu8kyKB8KHMRKyflru03AVkyepuQBY
+X-Google-Smtp-Source: ACHHUZ6QkiPpv5AuB1/46USO8iSC4c3midYAAHwtmaIdo1azEAfjDclNb/+7inM/jy7obHUTC44tV5lDNXm1AV/xOhA=
+X-Received: by 2002:a2e:7e04:0:b0:2ac:7e64:ef8 with SMTP id
+ z4-20020a2e7e04000000b002ac7e640ef8mr1778807ljc.16.1685177407243; Sat, 27 May
+ 2023 01:50:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAN05THRKq9XPD11rBWXyTL_OGSh4pP6mQyufeW+xc+J3wvkMmw@mail.gmail.com>
- <CAH2r5mtJfSiQXBRUwv6zcR5rhG2Q-pCvjH+n+_SZmVQo1pMeVg@mail.gmail.com>
- <ZGuWhzP98U9Niog+@jeremy-rocky-laptop> <20230525093900.GA261009@sernet.de>
- <CAN05THTi0BC_iwjXMiWn61fg3hRemi5Momwp3O0WGygyWLGomQ@mail.gmail.com>
- <ZG+LOKTr8B+zjQsC@jeremy-rocky-laptop> <CAH2r5mv7aZ8nm30oKyYpa-bd8-MqA13EcEmQWV4mOyrV-rj8Ug@mail.gmail.com>
- <ZG/DajG6spMO6A7v@jeremy-rocky-laptop> <20230525221449.GA9932@sernet.de>
- <CAH2r5mvGb_e-kjLoKpwF3Eg7f7oOGGKcM7rL95SkU4q=pSE1AQ@mail.gmail.com>
- <20230526160320.GA13176@sernet.de> <CAH2r5muD89QUcaqWNQy5NUwyji9CinN_5kGcfFSQAbpJP5gn+A@mail.gmail.com>
-In-Reply-To: <CAH2r5muD89QUcaqWNQy5NUwyji9CinN_5kGcfFSQAbpJP5gn+A@mail.gmail.com>
+References: <202305250056.oZhsJmdD-lkp@intel.com> <DM4PR21MB344103E6766B9D586C0D11B1E441A@DM4PR21MB3441.namprd21.prod.outlook.com>
+ <CAH2r5mteP0kHJN8SJzhU60q+TreP3AaMhVntEuXBiLQb49mBhw@mail.gmail.com>
+In-Reply-To: <CAH2r5mteP0kHJN8SJzhU60q+TreP3AaMhVntEuXBiLQb49mBhw@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 26 May 2023 20:50:08 -0500
-Message-ID: <CAH2r5mt-8fwG5h=K0qBiKY4S-7YAcJYt2HtOgb_zOxVzRvROLw@mail.gmail.com>
-Subject: Re: Displaying streams as xattrs
-To:     Steve French <smfrench@gmail.com>, Jeremy Allison <jra@samba.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date:   Sat, 27 May 2023 03:49:55 -0500
+Message-ID: <CAH2r5mujTOvAdu2uu=ypRA4ZUPjcMUdefF3b59WMwoUvJrDxRg@mail.gmail.com>
+Subject: Re: [EXTERNAL] [samba-ksmbd:for-next 4/7] fs/smb/client/ioctl.c:324:17:
+ warning: variable 'caps' set but not used
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000be618905fca8f028"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, May 26, 2023 at 7:54=E2=80=AFPM Steve French <smfrench@gmail.com> w=
-rote:
+--000000000000be618905fca8f028
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Fix attached:
+
+Fix trivial unused variable warning (when SMB1 support disabled)
+
+"ioctl.c:324:17: warning: variable 'caps' set but not used
+[-Wunused-but-set-variable]"
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202305250056.oZhsJmdD-lkp@int=
+el.com/
+
+> From: kernel test robot <lkp@intel.com>
+> Sent: Wednesday, May 24, 2023 7:01:39 AM
+> To: Steven French <Steven.French@microsoft.com>
+> Cc: oe-kbuild-all@lists.linux.dev <oe-kbuild-all@lists.linux.dev>
+> Subject: [EXTERNAL] [samba-ksmbd:for-next 4/7] fs/smb/client/ioctl.c:324:=
+17: warning: variable 'caps' set but not used
+>
+> Hi Steve,
+>
+> First bad commit (maybe !=3D root cause):
+>
+> tree:   git://git.samba.org/ksmbd.git for-next
+> head:   d58a8a27a7cac75e82383c2a25704bd15b0045d5
+> commit: e3adc6b1f0d12b80a7a81fd4f345890a4fb483d6 [4/7] smb: move client a=
+nd server files to common directory fs/smb
+> config: i386-randconfig-i003-20230524
+> compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
+> reproduce (this is a W=3D1 build):
+>         git remote add samba-ksmbd git://git.samba.org/ksmbd.git
+>         git fetch --no-tags samba-ksmbd for-next
+>         git checkout e3adc6b1f0d12b80a7a81fd4f345890a4fb483d6
+>         # save the config file
+>         mkdir build_dir && cp config build_dir/.config
+>         make W=3D1 O=3Dbuild_dir ARCH=3Di386 olddefconfig
+>         make W=3D1 O=3Dbuild_dir ARCH=3Di386 SHELL=3D/bin/bash fs/smb/cli=
+ent/
+>
+> If you fix the issue, kindly add following tag where applicable
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%=
+2F%2Flore.kernel.org%2Foe-kbuild-all%2F202305250056.oZhsJmdD-lkp%40intel.co=
+m%2F&data=3D05%7C01%7CSteven.French%40microsoft.com%7Caf0e1ee950724b4eb2ce0=
+8db5c78aca3%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C638205445595592058=
+%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haW=
+wiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DmoaptwMZutTbXzs%2F65jeBFL8bJmVzWsj=
+oLBeuDAQaMc%3D&reserved=3D0
+>
+> All warnings (new ones prefixed by >>):
+>
+>    fs/smb/client/ioctl.c: In function 'cifs_ioctl':
+> >> fs/smb/client/ioctl.c:324:17: warning: variable 'caps' set but not use=
+d [-Wunused-but-set-variable]
+>      324 |         __u64   caps;
+>          |                 ^~~~
 >
 >
+> vim +/caps +324 fs/smb/client/ioctl.c
 >
-> On Fri, May 26, 2023, 06:03 Bj=C3=B6rn JACKE <bj@sernet.de> wrote:
->>
->> On 2023-05-25 at 18:50 -0500 Steve French via samba-technical sent off:
->> > Today the "RichACLs" can be displayed multiple ways (e.g. "getcifsacl"
->> > and various other
->> > tools and also via system xattrs).
->> > Being able to display "RichACLs" makes sense - and I am fine with
->> > mapping these (and
->> > probably would make sense to at least have a readonly mapping of the
->> > existing richacls on
->> > a file to "posixacl") and RichACLs are very important.
->> >
->> > Wouldn't it be easier to let them also be queried for cifs.ko via
->> > "system.getrichacl" (or whatever
->> > the "getrichacl" tool used in various xfstests uses)?
->> >
->> > I was also wondering how we should display (and how to retrieve via
->> > SMB3) "claims based ACLs" (presumably these are reasonably common on a
->> > few server types like Windows)?
->>
->> let's stop calling them RichACLs becuase that was only the name that And=
-reas
->> Gr=C3=BCnbacher was giving his implementation of the NFS4 ACLs
-
-The name "richacls" looks like it is embedded in the standard
-filesystem functional tests
-(to pass xfstests generic/362 through generic/370 requires this - so I
-would have to finish
-off the mapping of this richacl pseudo-xattr query to the SMB3.1.1 get
-acl query over the wire).
-It doesn't look too bad, and it would.   Most users would probably use
-the normal
-tools (like getcifsacl or even Samba's "smbcacls" user space tool or
-the pseudo-xattr
-e.g. system.cifs_ntsd_full) but if it helps to use a common format
-that helps ntfs and nfsv4.1 and later
-that is fine with me.
-
-
-> Remember that at Connectathon conferences years ago when nfs4.1 ACLS were=
- explained  (fixing NFS 4 ACLS to address some missed things). The NFS ACL =
-ideas were modelled after smb ACLs so NFS ACLs have many similarities to th=
-eir predecessor SMB ACLs (although presumably do not support claims based A=
-CEs/CBAC/DAC yet)
+> 7ba3d1cdb7988c fs/cifs/ioctl.c Steve French    2021-05-02  312
+> f9ddcca4cf7d95 fs/cifs/ioctl.c Steve French    2008-05-15  313  long cifs=
+_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+> ^1da177e4c3f41 fs/cifs/ioctl.c Linus Torvalds  2005-04-16  314  {
+> 496ad9aa8ef448 fs/cifs/ioctl.c Al Viro         2013-01-23  315   struct i=
+node *inode =3D file_inode(filep);
+> 7e7db86c7e1088 fs/cifs/ioctl.c Steve French    2019-09-19  316   struct s=
+mb3_key_debug_info pkey_inf;
+> ^1da177e4c3f41 fs/cifs/ioctl.c Linus Torvalds  2005-04-16  317   int rc =
+=3D -ENOTTY; /* strange error - but the precedent */
+> 6d5786a34d98bf fs/cifs/ioctl.c Pavel Shilovsky 2012-06-20  318   unsigned=
+ int xid;
+> ba00ba64cf0895 fs/cifs/ioctl.c Jeff Layton     2010-09-20  319   struct c=
+ifsFileInfo *pSMBFile =3D filep->private_data;
+> 96daf2b09178d8 fs/cifs/ioctl.c Steve French    2011-05-27  320   struct c=
+ifs_tcon *tcon;
+> a77592a70081ed fs/cifs/ioctl.c Ronnie Sahlberg 2020-07-09  321   struct t=
+con_link *tlink;
+> d26c2ddd335696 fs/cifs/ioctl.c Steve French    2020-02-06  322   struct c=
+ifs_sb_info *cifs_sb;
+> f654bac2227adc fs/cifs/ioctl.c Steve French    2005-04-28  323   __u64   =
+ExtAttrBits =3D 0;
+> 618763958b2291 fs/cifs/ioctl.c Jeff Layton     2010-11-08 @324   __u64   =
+caps;
+>
+> :::::: The code at line 324 was first introduced by commit
+> :::::: 618763958b2291a09057dbfa553da6ded93dcfad cifs: make cifs_ioctl han=
+dle NULL filp->private_data correctly
+>
+> :::::: TO: Jeff Layton <jlayton@redhat.com>
+> :::::: CC: Steve French <sfrench@us.ibm.com>
+>
+> --
+> 0-DAY CI Kernel Test Service
+> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgithu=
+b.com%2Fintel%2Flkp-tests%2Fwiki&data=3D05%7C01%7CSteven.French%40microsoft=
+.com%7Caf0e1ee950724b4eb2ce08db5c78aca3%7C72f988bf86f141af91ab2d7cd011db47%=
+7C1%7C0%7C638205445595592058%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLC=
+JQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3D4S7ypb=
+EmVEH0ItLaFq6203nT%2FVUHq%2FI%2B0DPIw8MLllw%3D&reserved=3D0
 
 
 
@@ -127,3 +171,43 @@ CEs/CBAC/DAC yet)
 Thanks,
 
 Steve
+
+--000000000000be618905fca8f028
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-address-unused-variable-warning.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-address-unused-variable-warning.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_li5r27q50>
+X-Attachment-Id: f_li5r27q50
+
+RnJvbSBmZGQ3ZDFmZmY0ZTNiOTdjNDcwNmY0YzBlMDAwYTM4YjEzNGI3YWU1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFNhdCwgMjcgTWF5IDIwMjMgMDM6MzM6MjMgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBhZGRyZXNzIHVudXNlZCB2YXJpYWJsZSB3YXJuaW5nCgpGaXggdHJpdmlhbCB1bnVzZWQg
+dmFyaWFibGUgd2FybmluZyAod2hlbiBTTUIxIHN1cHBvcnQgZGlzYWJsZWQpCgoiaW9jdGwuYzoz
+MjQ6MTc6IHdhcm5pbmc6IHZhcmlhYmxlICdjYXBzJyBzZXQgYnV0IG5vdCB1c2VkIFstV3VudXNl
+ZC1idXQtc2V0LXZhcmlhYmxlXSIKClJlcG9ydGVkLWJ5OiBrZXJuZWwgdGVzdCByb2JvdCA8bGtw
+QGludGVsLmNvbT4KQ2xvc2VzOiBodHRwczovL2xvcmUua2VybmVsLm9yZy9vZS1rYnVpbGQtYWxs
+LzIwMjMwNTI1MDA1Ni5vWmhzSm1kRC1sa3BAaW50ZWwuY29tLwpTaWduZWQtb2ZmLWJ5OiBTdGV2
+ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9pb2N0
+bC5jIHwgNiArKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDEgZGVsZXRp
+b24oLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2lvY3RsLmMgYi9mcy9zbWIvY2xpZW50
+L2lvY3RsLmMKaW5kZXggY2IzYmU1OGNkNTVlLi5mZmYwOTJiYmM3YTMgMTAwNjQ0Ci0tLSBhL2Zz
+L3NtYi9jbGllbnQvaW9jdGwuYworKysgYi9mcy9zbWIvY2xpZW50L2lvY3RsLmMKQEAgLTMyMSw3
+ICszMjEsMTEgQEAgbG9uZyBjaWZzX2lvY3RsKHN0cnVjdCBmaWxlICpmaWxlcCwgdW5zaWduZWQg
+aW50IGNvbW1hbmQsIHVuc2lnbmVkIGxvbmcgYXJnKQogCXN0cnVjdCB0Y29uX2xpbmsgKnRsaW5r
+OwogCXN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2I7CiAJX191NjQJRXh0QXR0ckJpdHMgPSAw
+OworI2lmZGVmIENPTkZJR19DSUZTX1BPU0lYCisjaWZkZWYgQ09ORklHX0NJRlNfQUxMT1dfSU5T
+RUNVUkVfTEVHQUNZCiAJX191NjQgICBjYXBzOworI2VuZGlmIC8qIENPTkZJR19DSUZTX0FMTE9X
+X0lOU0VDVVJFX0xFR0FDWSAqLworI2VuZGlmIC8qIENPTkZJR19DSUZTX1BPU0lYICovCiAKIAl4
+aWQgPSBnZXRfeGlkKCk7CiAKQEAgLTMzMSw5ICszMzUsOSBAQCBsb25nIGNpZnNfaW9jdGwoc3Ry
+dWN0IGZpbGUgKmZpbGVwLCB1bnNpZ25lZCBpbnQgY29tbWFuZCwgdW5zaWduZWQgbG9uZyBhcmcp
+CiAJCQlpZiAocFNNQkZpbGUgPT0gTlVMTCkKIAkJCQlicmVhazsKIAkJCXRjb24gPSB0bGlua190
+Y29uKHBTTUJGaWxlLT50bGluayk7Ci0JCQljYXBzID0gbGU2NF90b19jcHUodGNvbi0+ZnNVbml4
+SW5mby5DYXBhYmlsaXR5KTsKICNpZmRlZiBDT05GSUdfQ0lGU19QT1NJWAogI2lmZGVmIENPTkZJ
+R19DSUZTX0FMTE9XX0lOU0VDVVJFX0xFR0FDWQorCQkJY2FwcyA9IGxlNjRfdG9fY3B1KHRjb24t
+PmZzVW5peEluZm8uQ2FwYWJpbGl0eSk7CiAJCQlpZiAoQ0lGU19VTklYX0VYVEFUVFJfQ0FQICYg
+Y2FwcykgewogCQkJCV9fdTY0CUV4dEF0dHJNYXNrID0gMDsKIAkJCQlyYyA9IENJRlNHZXRFeHRB
+dHRyKHhpZCwgdGNvbiwKLS0gCjIuMzQuMQoK
+--000000000000be618905fca8f028--
