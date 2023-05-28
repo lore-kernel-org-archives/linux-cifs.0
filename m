@@ -2,48 +2,50 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC180C77B7E
-	for <linux-cifs@archiver.kernel.org>; Sat, 27 May 2023 12:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 398DBC77B7E
+	for <linux-cifs@archiver.kernel.org>; Sun, 28 May 2023 08:34:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232317AbjE0MZT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 27 May 2023 08:25:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40828 "EHLO
+        id S229587AbjE1Iet (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 28 May 2023 04:34:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231883AbjE0MZO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 May 2023 08:25:14 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2111.outbound.protection.outlook.com [40.107.244.111])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88FBEF3;
-        Sat, 27 May 2023 05:25:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R6UwMUBSa/SDh664K8NvK9q8T5ZKP4AFyabSrhMueBeEm6t9zN0J3ZLlzyjiIS2dFQP3HDm3MRlXNLYND23qve5M5F5qI1w9HghRg42NX6AYxZIp/CD8xmMu6W0Sw/LKg8biiox+ycegJc6bhK2rqTkkpDRGBvURCAYPg1wAQppfvK2IYWcMkU2n9c8ruZj2pUwj9w7zgzrSGzQxpNLchj+kiYeG5QKkH2Is5vg8YehEUuAU2gik63wvPq/7ui6wjzLSvxaaZlRmkLJ63ES3aaZIhao8n/zF3xRKmZCIzm5L0z59q6WdW1klf1nzjO4CA9sHC8pS1jDY01x95KpocQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fizieVRhPX3hj13JBmTQ5Gv/nPYafPqwV7hC0mC6chI=;
- b=RgW2wbAOAQxxrMToxRrRVBYuDSp90hiBjWIATd/3lTuBxmgRfrbeu22/FM8tBZbVG3JqOwHjO1ZxrXYkSGuRHY6Ce+ANSjRfaz3+dGTZEdINAFVM+jNAaBVVwcGKXzh8L1sX0pV3tpccSuMjXUtAsoEyTaG1yIRsPPqyHmcEjILJX4N8cX/UGGYYK91rmr8vabLEEHVxqlvWBb/gMobtrGMyC58XysxIKRMPZt6gLrcws1J7mUdlgTBJOk1vuq1BFAOQ7BxrFI9VFU97KdEm7IdftPeWy/7apUQqPOFKDEjnF5SKfUjntSAzx89Ayc4BhkhH+1sj0MrMUmOaw3HUGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fizieVRhPX3hj13JBmTQ5Gv/nPYafPqwV7hC0mC6chI=;
- b=v31KmmquKvSIju5QOQAymwxYKwOPAnU/Ogp0tkzf2kSp/hO7QC0RevYeTVBSq7uhQx58pOSNHwTM5kz+r5AFoGv2KLKLCn2GtyScoi+M081RqqtyffAs/BnW5aJSgItMtVXL3kQ4Y6JN/uCrpFce9hrZozSN79tFMofmy2NevBU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH0PR13MB5471.namprd13.prod.outlook.com (2603:10b6:510:12a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.18; Sat, 27 May
- 2023 12:25:08 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::5e55:9a39:751f:55f6]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::5e55:9a39:751f:55f6%3]) with mapi id 15.20.6433.018; Sat, 27 May 2023
- 12:25:08 +0000
-Date:   Sat, 27 May 2023 14:24:57 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        with ESMTP id S229437AbjE1Ies (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 28 May 2023 04:34:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFCEDF
+        for <linux-cifs@vger.kernel.org>; Sun, 28 May 2023 01:34:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685262846;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kwxNaHisEq+hSYVrnROXXvszOL5x+627ymiwxF2+pCM=;
+        b=YwrZYVyhfBQVw8sJKvdXARpKNMQlWxknfItdIULLofgAsImDv72eVuU6zIgbKcqvz+E7Rh
+        gZL851lsJeK/R2cPf70B0ip7zq1X1Y9+F0dLu3kBuM6dHqUG+Ta8kWSpBrzH8XxiDHiGFd
+        wePPbXSwvdvItti8cJN6lF66QD3RIpI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-663-6Ul53yeCPrWlx62V8qraXA-1; Sun, 28 May 2023 04:34:01 -0400
+X-MC-Unique: 6Ul53yeCPrWlx62V8qraXA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2BC9101A52C;
+        Sun, 28 May 2023 08:34:00 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D3DE740CFD45;
+        Sun, 28 May 2023 08:33:57 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZHH1nqZWOGzxlidT@corigine.com>
+References: <ZHH1nqZWOGzxlidT@corigine.com> <20230526143104.882842-1-dhowells@redhat.com> <20230526143104.882842-2-dhowells@redhat.com>
+To:     Simon Horman <simon.horman@corigine.com>
+Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -59,88 +61,21 @@ Cc:     netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/8] Drop the netfs_ prefix from
- netfs_extract_iter_to_sg()
-Message-ID: <ZHH2mSRqeL4Gs1ft@corigine.com>
-References: <20230526143104.882842-1-dhowells@redhat.com>
- <20230526143104.882842-3-dhowells@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230526143104.882842-3-dhowells@redhat.com>
-X-ClientProxiedBy: AM0PR10CA0123.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:e6::40) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+Subject: Re: [PATCH net-next 1/8] Move netfs_extract_iter_to_sg() to lib/scatterlist.c
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH0PR13MB5471:EE_
-X-MS-Office365-Filtering-Correlation-Id: 55200223-d275-414b-eb58-08db5ead68e6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: y3+MoLq/14Ctzcat+G/USt33jdvYtkVasElOTf42r13hXoerUfrJHCRrvcWiaVAFmI3emFb69Rs1Abhoc+EzGgg2nD1h8u92t0McuCCh8cnFY0JPio77bP/P14mKHy79u/ONF4IIpqgeJR/OMCMRvOkeoMELLk1gpvO2UYYgFNmXWKId6dqLVSTUPmWfWKdA0Rlx9SF+qq7VKAKnuirvgc8o2kNA6BGWMzdZ4FFWsWyuuIkODaYkIVx05ZUWFHX979FURBrKT00HZVE7mOfNd3NkBndxcitnaBGL4uVh44GxwfwGpbwTSwUqvp2upjPt4uGmligskk41dJAnEivSjp9UWVfmVepkiUZBQGfx+DeViIAmJ4WHrxU3Y9Hfj76W3ia53VhQXWHNbcK2et7C55zklTdnHrIyqPANL+ObIqkctLT7VDG5qdTHqtV9JLFCJ8pnhjkcxmPgJPUIW8sgLq78Nr8s5x3vrDnCpQ0dAftQQmIdLbPQMIgAiGVjSIzBpK1QYsjIvecpvFpTajfRp6XEJhK7xgdS4ScICytc8MH6m5v90BcaEENaOPqSq7w7
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(39830400003)(376002)(396003)(346002)(366004)(451199021)(86362001)(2616005)(2906002)(4744005)(186003)(4326008)(66946007)(41300700001)(66476007)(66556008)(36756003)(6916009)(6512007)(6506007)(44832011)(7416002)(8936002)(5660300002)(8676002)(38100700002)(6486002)(316002)(6666004)(478600001)(54906003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZzarhNN+vecew2zpFG7ovDCdHs/ZI+5MT3rGhzw2HSUymuonsU6I61SJzcFw?=
- =?us-ascii?Q?L08Dxf8MLcO0AcanKzn+TAia37eSgW8UKkjBe3K9wr0kOtVJKJVLCriR1vmf?=
- =?us-ascii?Q?OYi5Eq27K+j1qhURDnAZfk/th52gF2arvRSp4PoiinSqXLr9zQoz3iv1a/um?=
- =?us-ascii?Q?bXhBfXPHJ0cleT4vNfVWo3Nf9IGWB4UalV/5tebIUxPmY4SFM3FmQrTyy/lm?=
- =?us-ascii?Q?TzoO4kAeGetjqzU3a/gSYIr+b2iPbsNdEbrnDdLiTlKPfwWPdRf0JwUfPw6Y?=
- =?us-ascii?Q?3/CU7wvJKAwMeUA1KGfPqYfDfUX66C+TKfmc5qoPhMJjH7f3tjvEYINWcdxm?=
- =?us-ascii?Q?JCQt+libUg5KoXRLG5td4MO3THl5KQei2PbKCNpdCphTjkPZdnXTiLvkYuGN?=
- =?us-ascii?Q?jy4Jt4UXEJcXBlyp+8Ft32saZgeuv+A8McKoeKQBuFDzNRypIfJwPqHQQDw+?=
- =?us-ascii?Q?r6KpC51ASqAC22htGb1YbLoKSt/3FdlJIw22mHnAvoTfa1IIwVEYmRa91ym0?=
- =?us-ascii?Q?wmbGYNCipmvgmghxgS7HofKo7lV14GJyoQlrawenWBak1HrhoomCYMaa3SCN?=
- =?us-ascii?Q?UL4KeHLxq6D0Xglv39JBWt1xjkPjCNTya7nT2NBTeByFGWg8zqSWv6Yc88qn?=
- =?us-ascii?Q?vpaxKeXzihc4oIW4mA+NE4Htye3+IiTFm6MlAM7SKuvQI+VicJuGWvNe2goD?=
- =?us-ascii?Q?bEoYX/u41+wS3D0dJ5cDvzk4PUXcPmqrjIzYKRY9tvcXOrEMu7GX5RRb8sF7?=
- =?us-ascii?Q?aK5HkOqvph2kVGFFYU9SpVkRryguZZ2lqklf6N6kEes+pcD92aamQPcRCV7s?=
- =?us-ascii?Q?a+vsgwy3OCkoLWCB0dkWdIFnIXJxg64BbGmqQ1+Hj89tKXQBzcZdcAKgzGxj?=
- =?us-ascii?Q?YQ4SBpSMJvKUxy1d8Jez6Kh8gWEwSQHBri3eWpwoUyLaFm75JB08I4tOBUUC?=
- =?us-ascii?Q?IfWfPhMsTK8Wakwgg2+Vzwgj0ekPCRYUnvSEUcWJQSN4Uv5AEIEJdIKs5jIh?=
- =?us-ascii?Q?TQewNV6Ks+bCiVWQkRR7xYwLf00PlYzWLGIfDrgWJMu2MhUkpxqpQAWoio/R?=
- =?us-ascii?Q?0Y8idv6jjdzoMOItS6Kl7WDzG6f1A7znR3TIouoSaDGa9swn2Mli5tI9mmvZ?=
- =?us-ascii?Q?iRkjaktQ089AX6lgg5fBiR8Bq5T+bJo+rMlfF8F80+tlgpufWfYbarro7bm5?=
- =?us-ascii?Q?kZWuUjn8tS7cHMBGyPTrhL/juJLhniIkid6ukh7r//1c4lNU1+Rj6mRdQdbG?=
- =?us-ascii?Q?Jt+IuTmQHrfpTr3KPpBLEzDEu/S15Z4ajDEWfa3VEXnZFLvpEDx1zfSsr3hx?=
- =?us-ascii?Q?GS5PiD9OMi0DxmI4UhhfUI1oREAe5V4rORiaBFcCMaSCBka/q66Tudp2sOZu?=
- =?us-ascii?Q?JnMEsxoaZ/RWWXNByXUwnP90esiE7RRNPYt/g37ya6ffzEvpMOqXCcdsiO7U?=
- =?us-ascii?Q?NqwH6qRHozT3BuLN0kTuxQH7WgL/U7TLHOJtCVShNpPCk162hQF9EBS0KgLc?=
- =?us-ascii?Q?6lC1vPuMa/Ms61TmPf/9Xub3HVSSQ7U0J2P9Ha8r1UL12ZXeiplzVH25d2A0?=
- =?us-ascii?Q?sfK5mN5ynrmuGyRAd8svZyNGG7RPqDzK0yr8VZzHHHZ5ldtAvVvdYBS16sGX?=
- =?us-ascii?Q?14S+WkibBairQ6bknYOy++o8NUFZ8kPJq6Z2Kz8NVd/oJgmrwq+OP5FHxSh5?=
- =?us-ascii?Q?KZBVbg=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55200223-d275-414b-eb58-08db5ead68e6
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2023 12:25:08.6580
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pLIHxkO10a28tXCgyB5GWmYYchoFQ/f0CGtqxDM6NuUPVvMgj+p1oMJK4nASZwfONJLfBut+UmIte3lrRUOS8E9A3RcrleaFgaF0F1LGwaA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5471
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <992933.1685262837.1@warthog.procyon.org.uk>
+Date:   Sun, 28 May 2023 09:33:57 +0100
+Message-ID: <992934.1685262837@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, May 26, 2023 at 03:30:58PM +0100, David Howells wrote:
+If it comes to a respin, I'll stick in an extra patch to fix the spellings -
+and if not, I'll submit the patch separately.  It shouldn't be changed in with
+the movement of code to give git analysis a better chance of tracking the
+movement.
 
-...
+David
 
-> @@ -1307,7 +1307,7 @@ static ssize_t netfs_extract_xarray_to_sg(struct iov_iter *iter,
->  }
->  
->  /**
-> - * netfs_extract_iter_to_sg - Extract pages from an iterator and add ot an sglist
-> + * extract_iter_to_sg - Extract pages from an iterator and add ot an sglist
-
-nit: While we are here, perhaps
-
-     s/and add ot an/and add to an/
-
->   * @iter: The iterator to extract from
->   * @maxsize: The amount of iterator to copy
->   * @sgtable: The scatterlist table to fill in
-
-..
