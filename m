@@ -2,151 +2,129 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F4AC7EE23
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 May 2023 11:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90581C7EE23
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 May 2023 12:59:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231830AbjE3LWG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 May 2023 07:22:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60764 "EHLO
+        id S232278AbjE3M7i (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 May 2023 08:59:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231823AbjE3LWE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 May 2023 07:22:04 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2060.outbound.protection.outlook.com [40.107.243.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1983106;
-        Tue, 30 May 2023 04:21:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=StYdE9MiVFuXLiKATH/f7Ifkw5SqjI/l5Pjq0SJ7mbqEclOfVjZkzWP1M4sj9ZUnscTv7Tr+LZWB7DSOZ6O2Z3UMG/utmUlZUnZKviHcmYVYZjq7UVs/5AtKeY7GRoqP/Bvzq67TsE3NkGL/9uKQ4VMWHRJjVzctAFFVWoUehoq0Uy3Ez/40nu0FIIr2V0K9URdfD5vH97wF4jsriuhQDdx8dtWchFrW/2Ifj5Yj2UHtVKmi1FIRokISTfLgkk3cQXc5pzdgk5W2j7ieVRkDx7/j+Wsg+lVTVFHHxuazbR6/BMLfjq638Ss3TUI22hyfLy+30w0O01cxnjK0Y1EhNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S2SUnZhB41qJC00+ZsdkOTNS3PmA/7k4AcnjdgHHZ5c=;
- b=bCkHJpGlpb5v9L0m+a7EpAO7caryOmT7+Rc0gO5un08/yXom1e71+GqIv4BgF119waITIKtXVCT0EYCT/DewhF4kkNGguYiIAceR/vAB9N8fWziR6m5+ymzETy+HHOEYFHRnls67ZOEpK52ye4WKmqgb6IwdmA7dc9L4cR+6TDovGyLK71qnXik2frJARxQV8elcuO67zi8yW7SFtKDEnLGHS7mcLEepa0LoItm0t/h+k/anxqse7XSt6R9TlHNhBlPR5NkceyZkzSmqrR3wQhleK4nmbx85q/j3T2ebuOnIMGPxDLk3M85Zq5zhcEPVG7iTZ2pw7v6fJtL2GtxuuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- SA0PR01MB6363.prod.exchangelabs.com (2603:10b6:806:d8::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6433.23; Tue, 30 May 2023 11:21:43 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::ef26:464c:ccdf:ee6b]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::ef26:464c:ccdf:ee6b%7]) with mapi id 15.20.6433.022; Tue, 30 May 2023
- 11:21:43 +0000
-Message-ID: <66f1e8f7-7023-4331-66cd-f3c02e59581d@talpey.com>
-Date:   Tue, 30 May 2023 07:21:40 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH] smb: Remove unnecessary variables
-To:     Lu Hongfei <luhongfei@vivo.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        "open list:KERNEL SMB3 SERVER (KSMBD)" <linux-cifs@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Cc:     opensource.kernel@vivo.com
-References: <20230530092055.16919-1-luhongfei@vivo.com>
-Content-Language: en-US
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <20230530092055.16919-1-luhongfei@vivo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR10CA0014.namprd10.prod.outlook.com
- (2603:10b6:208:120::27) To SN6PR01MB4445.prod.exchangelabs.com
- (2603:10b6:805:e2::33)
+        with ESMTP id S232172AbjE3M7h (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 May 2023 08:59:37 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C726F9
+        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 05:59:13 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-64d341bdedcso3176144b3a.3
+        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 05:59:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685451492; x=1688043492;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FnNMAiSYagBoQy7G3Rszl8N/LirJbUlAbAH4gMgMbNs=;
+        b=UjQnPs1Wc8cPWnQdlF+G7v9J1uAoKJXpcnrycrdyBA9AN+wcJR/qXE/Uj4SQpirCAl
+         W+ua+h2ZypiQUM/6+XwtmHeI20S469A2ndoIzvVkHWGDJAjtmLJBQ4Ya2KoFItABt+zZ
+         tk4w2GbYnNbU1ir7le5xoK+hpxZ2jKXj/KXuk+MJxurxn98Noq7lBAw0WMA4RMjks4qo
+         QtG+0JgAhi7Aj7LDcRLaj9T+7YIs78vsjnFPMwkmZAnIR4L8ktlqNTWXTeHLHNa3v3UR
+         clDj694FpkgKyHa3euY07XwrSNG5jed5Gep8NZdwUGINpRvQb24jBFwxnKB07W9FLpdG
+         gmVA==
+X-Gm-Message-State: AC+VfDwU42GzogPkx/wAeDXHwH7rKiLD4h2zT6KprBZMvvzEhGzVlalD
+        Y5yCfkVCDjG7vggWKetuc9nNn2xKgJ0=
+X-Google-Smtp-Source: ACHHUZ6LdYPbPOKcniKBCMf0cu3pkagQ4QoV+ZsfN6/fq30WPG1YWjjDVKFyLrMgCJ05ECqwoVotcw==
+X-Received: by 2002:a05:6a00:a0b:b0:64d:42cb:42af with SMTP id p11-20020a056a000a0b00b0064d42cb42afmr2762577pfh.4.1685451492564;
+        Tue, 30 May 2023 05:58:12 -0700 (PDT)
+Received: from localhost.localdomain ([211.49.23.9])
+        by smtp.gmail.com with ESMTPSA id c17-20020aa78c11000000b0063afb08afeesm1605007pfd.67.2023.05.30.05.58.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 May 2023 05:58:12 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
+        Chih-Yen Chang <cc85nod@gmail.com>
+Subject: [PATCH] ksmbd: fix out-of-bound read in deassemble_neg_contexts()
+Date:   Tue, 30 May 2023 21:57:54 +0900
+Message-Id: <20230530125757.12910-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|SA0PR01MB6363:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f54fdaf-9e36-42a0-18ae-08db61000bb0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +LjgVD4G4SQj1TxqUEpGtB9ieXgqsqFVFcpaNSLYZHiARBRqpx4Guj1j4A737m/RQg7ucegnVJspn7bEsm9Mrxi7abOxmqty44ELDk+wGeAe3Hpklvae7imY8NYL2czguKjFIW8jM5/584jgyNyXbSNQP4uH0CjRlq8ZSyHLRk3AJ2vKy9ecqKrLukFQJA8ELCkifrdvitmTKY1q6KTEaI0/RjVmF/BnmDthVgisjM3kL9o/adIP3X/dQ5RsDDcrqU3l8VHbjRsjlno4kb+MkgTTVNNHxIYcxT3BK4yAh8bqxXQUBes93BMR7olx0ftqRuze/Dn8XsEUwqPIIRz3/eyRdgWlvqZHBn/6oG0DnchoRWBFCwjo7521X5Pr7hAV4C+2KxgwlXoIWDwGHhcrtQf53XAPtj+90LstZNvgt1HUBL6TUzNmxsyn5RwKsNUv0rcMSv68rF7LYbmcx8gT6uzy9Cp8Ns6Xyf1rGy3Nmm9vanHYAfiGNm38OVMN0Ljyx//khFcWM3Yg5LKef3UY+DprdzW1heehdOq+KADFXqHvj0H0CSzjgySR/abaHvB/R5gno9Clb+7BKRwknPfkMA7tl9cBz0Z9l5xbNC5AeOk7PdXRKS8O6GGlAgogjrjmsi0evQq9eHSKUi7vgLbr4Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(396003)(376002)(136003)(39830400003)(366004)(451199021)(83380400001)(2616005)(2906002)(186003)(36756003)(38100700002)(38350700002)(41300700001)(52116002)(316002)(6486002)(5660300002)(86362001)(8676002)(8936002)(478600001)(110136005)(4326008)(66556008)(66476007)(66946007)(31686004)(26005)(53546011)(31696002)(6512007)(6506007)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cnFuUmo1Tm1Sc05Mem9zQk1hcVZ5NHlWWjkvTjFpVHV2RlE3S2Jocm5kenhR?=
- =?utf-8?B?U1BWUzZPT0lwV0luSndTNTB2V3U4NWFqdTZ6STBYbmRWL0dtRE9EWWlSNmYx?=
- =?utf-8?B?OVpmdHp6UWlVbW1zejg1RTZDTWEvRGNyNmdYZnVjTU1mVmNQbEt2SDJBNVln?=
- =?utf-8?B?Sjk3UkNnMEQvL2ZweDc2Z04vem14V3VaM202MWVNYklrcWdzeC81SytBcGJL?=
- =?utf-8?B?blk0MlVBYzVVVDhycWdrdE16SWtDaWZCZGVlODRJTzJJRCtkQ1ZjM0pJaUFX?=
- =?utf-8?B?NVVZOGlZWnAwLytqNW10Wm5KTkpYd3BmVHNselErTk43U2xxZ3NnTGJsS2xY?=
- =?utf-8?B?eGp6dHdMbk94SldvOFRsQmlsRUdoUUhkZmp0ZDVMT1l0VURkVTlSZyt1ZXBO?=
- =?utf-8?B?WmRYczFQK2l1cnAwVDlwemtWbjNTNktHVXJLcDFEc1FiNmE0dDl5dGNsTkx0?=
- =?utf-8?B?Y2d5QUo2Tnh5SVlPaDNRRFFIMW0xdS9VV29XemFvTUpITlRjWk54R3h6VzQ4?=
- =?utf-8?B?UlVTbEhoa01VUG9RRGIvN0Q5dlFmbjFubk9VdXRkbFhybGxQU3RVM2hBWCs4?=
- =?utf-8?B?bVp4ZTlleklwZzVYb3JlOTM3bzh1eGU4TEpmVWl0TmxrS20rSXlrbHEycFJS?=
- =?utf-8?B?NUdMRWljbDdkTGhpUVVVaE1pR09COUcxTjY1enlXVXNtbEJnZTdmMVphNVpn?=
- =?utf-8?B?RHgvS09JeURHSEZsUFBqY3ZRSGFhcVdZdU0rZk5jS3N4ajdtaGJ4QUNKZWcz?=
- =?utf-8?B?dXVzT1RSSkpYcGpyeWpjY3p1NVJWTnhqL254NzZwbUJjZkRMTG4xWW5NYzBK?=
- =?utf-8?B?SURlQWttT3hWK0ptaG41cTc5NkZTeFVZWUJsVWtTajgyYTMzQTkxK3MzTjhF?=
- =?utf-8?B?bzVYK2o1Q2gxK2ZreUNpczVOY2RjTTZqQ3NEL1c4b1kyRHdvcnRoSnEySHQ4?=
- =?utf-8?B?cEpBWVVPQzFaNStuZXNqZm82VDJJcjRCNXNLODZUU2JmYVM3dDhjNElWdHU3?=
- =?utf-8?B?V3UwRXFSR3JZYkVZa2lHcGwvQjZVQVpWTDAveE11MzlzTUowd3FZSkdVTXln?=
- =?utf-8?B?TkVRaTYxVFZhYnp1RTd0bkFNTkNidEJjMzRvVnBvUU5jS29KR2JGblFaSEJi?=
- =?utf-8?B?R2ZKa3lPYUVEN01Fekw1ZXJoK0RRUDJDeDVnVy9ZYkVmRy9pcmpsaVI1aXFB?=
- =?utf-8?B?WVc0anNMQTB4SXFkak50Rkd4ZC96TzhaTDN6SHFqUnRWL1lrd3V3eVZTSG1M?=
- =?utf-8?B?a3hubHYzZExUUVhxOEh0S296VU1Xc1Y4NEhMaGdMNWRSdFNiUzczdEJTZUta?=
- =?utf-8?B?c2lIOFdGWHVmRHROdUpSTWJCTHFqR2dCSkFNZ0hxeSsvYy85MXZxSnVtbHM2?=
- =?utf-8?B?T0ZycVNFUE5BWFlaQWg5enlIaGp4VlZjSHl6MUE5QnZ3VW9uSzhhNmNsQjdl?=
- =?utf-8?B?WUcrZnlVRkVLaXpyTmFUMnpqTTF2TzhVN3dkYkUvNDVSRmZDcC96VWdLL0Q4?=
- =?utf-8?B?QmZFRjlWUXI3QWs1N2ozNlY2OHB6UGs0YitjZFUyNVR5NzM1TTRwZGxxY2pq?=
- =?utf-8?B?ZWVpMGhHaGdsWXpoMjBZZTVPWUtPamhZd0hqcDRRYnVjNlpXTzQrOExjbE5h?=
- =?utf-8?B?ejd1bkRiakxBK08xZHYrVFZHa1RsME9IeG9pdWd6SW1SWGI2Y3dQelZDQUFj?=
- =?utf-8?B?MGFXVzlSZFprdnNOc2d1RDhzazUzMGNpWk1ML0xDMitib2tON3BnVDhxclNB?=
- =?utf-8?B?MmUrY1NMcFlhMlduVUVqZ21tbHJmcE9TU3k5anlzZWFEQVNoamVTbk1uOWdt?=
- =?utf-8?B?dWhSb1R3RTRLTTVFUWZrcG0xbndrUk9jVEEvN1J1Q0dHVVVJY1JjcUhZWUY2?=
- =?utf-8?B?QjZaUi8vUExJemxaNk13YUJsV3V4NW9lUXZyNmlkdm9FNXJnTkFFdjJ6OWtt?=
- =?utf-8?B?bEJ2emZvbVZiWm1KSElvd3dQM1hTWkpGU0RDMnpIbU11dTNBK0lDQmpEQXlu?=
- =?utf-8?B?TnVmVHBtUG94M3ZSV2J0dFZLWjZNYlcxVlhqckwvQjlsOExNNFRvODVMdTFS?=
- =?utf-8?B?RTZQM0dCTzRDaFBjZ1BQM2NqdklzQnQ2ejV4WFZoaVJYck9Tb0tQbEtrcHpX?=
- =?utf-8?Q?yoqXKk4rATH2TTgTJYJqD9A+I?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f54fdaf-9e36-42a0-18ae-08db61000bb0
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2023 11:21:42.8815
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mCFXjhZ3Yl3zYkmBEHhTzEo6FxQdsUYr5tSMZdaUN75KQnTRiMdvhIPuDl+aVGBH
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR01MB6363
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 5/30/2023 5:20 AM, Lu Hongfei wrote:
-> Remove unneeded variable:ret and return 0 at the end of the function
-> 
-> Signed-off-by: Lu Hongfei <luhongfei@vivo.com>
-> ---
->   fs/smb/server/vfs.c | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
->   mode change 100644 => 100755 fs/smb/server/vfs.c
-> 
-> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-> index 778c152708e4..cb3fc71cc59f
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -120,8 +120,6 @@ static int ksmbd_vfs_path_lookup_locked(struct ksmbd_share_config *share_conf,
->   int ksmbd_vfs_query_maximal_access(struct mnt_idmap *idmap,
->   				   struct dentry *dentry, __le32 *daccess)
->   {
-> -	int ret = 0;
-> -
->   	*daccess = cpu_to_le32(FILE_READ_ATTRIBUTES | READ_CONTROL);
->   
->   	if (!inode_permission(idmap, d_inode(dentry), MAY_OPEN | MAY_WRITE))
-> @@ -139,7 +137,7 @@ int ksmbd_vfs_query_maximal_access(struct mnt_idmap *idmap,
->   	if (!inode_permission(idmap, d_inode(dentry->d_parent), MAY_EXEC | MAY_WRITE))
->   		*daccess |= FILE_DELETE_LE;
->   
-> -	return ret;
-> +	return 0;
->   }
+The check in the beginning is
+`clen + sizeof(struct smb2_neg_context) <= len_of_ctxts`,
+but in the end of loop, `len_of_ctxts` will subtract
+`((clen + 7) & ~0x7) + sizeof(struct smb2_neg_context)`, which causes
+integer underflow when clen does the 8 alignment. We should use
+`(clen + 7) & ~0x7` in the check to avoid underflow from happening.
 
-I don't see this function being called at all. Let's either
-delete it, or change it to void.
+Then there are some variables that need to be declared unsigned
+instead of signed.
 
-Tom.
+[   11.671070] BUG: KASAN: slab-out-of-bounds in smb2_handle_negotiate+0x799/0x1610
+[   11.671533] Read of size 2 at addr ffff888005e86cf2 by task kworker/0:0/7
+...
+[   11.673383] Call Trace:
+[   11.673541]  <TASK>
+[   11.673679]  dump_stack_lvl+0x33/0x50
+[   11.673913]  print_report+0xcc/0x620
+[   11.674671]  kasan_report+0xae/0xe0
+[   11.675171]  kasan_check_range+0x35/0x1b0
+[   11.675412]  smb2_handle_negotiate+0x799/0x1610
+[   11.676217]  ksmbd_smb_negotiate_common+0x526/0x770
+[   11.676795]  handle_ksmbd_work+0x274/0x810
+...
+
+Signed-off-by: Chih-Yen Chang <cc85nod@gmail.com>
+Tested-by: Chih-Yen Chang <cc85nod@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/smb/server/smb2pdu.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 7a81541de602..25c0ba04c59d 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -963,13 +963,13 @@ static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
+ 
+ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
+ 				      struct smb2_negotiate_req *req,
+-				      int len_of_smb)
++				      unsigned int len_of_smb)
+ {
+ 	/* +4 is to account for the RFC1001 len field */
+ 	struct smb2_neg_context *pctx = (struct smb2_neg_context *)req;
+ 	int i = 0, len_of_ctxts;
+-	int offset = le32_to_cpu(req->NegotiateContextOffset);
+-	int neg_ctxt_cnt = le16_to_cpu(req->NegotiateContextCount);
++	unsigned int offset = le32_to_cpu(req->NegotiateContextOffset);
++	unsigned int neg_ctxt_cnt = le16_to_cpu(req->NegotiateContextCount);
+ 	__le32 status = STATUS_INVALID_PARAMETER;
+ 
+ 	ksmbd_debug(SMB, "decoding %d negotiate contexts\n", neg_ctxt_cnt);
+@@ -983,7 +983,7 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
+ 	while (i++ < neg_ctxt_cnt) {
+ 		int clen, ctxt_len;
+ 
+-		if (len_of_ctxts < sizeof(struct smb2_neg_context))
++		if (len_of_ctxts < (int)sizeof(struct smb2_neg_context))
+ 			break;
+ 
+ 		pctx = (struct smb2_neg_context *)((char *)pctx + offset);
+@@ -1038,9 +1038,8 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
+ 		}
+ 
+ 		/* offsets must be 8 byte aligned */
+-		clen = (clen + 7) & ~0x7;
+-		offset = clen + sizeof(struct smb2_neg_context);
+-		len_of_ctxts -= clen + sizeof(struct smb2_neg_context);
++		offset = (ctxt_len + 7) & ~0x7;
++		len_of_ctxts -= offset;
+ 	}
+ 	return status;
+ }
+-- 
+2.25.1
+
