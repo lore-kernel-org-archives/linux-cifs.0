@@ -2,166 +2,77 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C568C7EE23
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 May 2023 13:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07529C77B7A
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 May 2023 14:01:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232554AbjE3N6w (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 May 2023 09:58:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44954 "EHLO
+        id S230321AbjE3OBn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 May 2023 10:01:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232519AbjE3N6v (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 May 2023 09:58:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF4F7103;
-        Tue, 30 May 2023 06:58:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 64582622B2;
-        Tue, 30 May 2023 13:58:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8179C433EF;
-        Tue, 30 May 2023 13:58:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685455127;
-        bh=hcaXRRGzPBhBBLpEW0isVOB3DKBAASE/ESHMgHvcgQE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WiHDyUv0qet+LrK4Zo5p1pc0ctSRdXlGbGZ8tl02Vx1vVgIRAhB0H5UMaqqDHCAjZ
-         XQjzg7jCBTWXmvjejDMJipaWrKARky609Yw4j6YSdroUBzfV6QT0wSj8m6CaH3tf0a
-         g4ThSKzN/ETU2CeP8TDgy1vX+fJrEgQ9qrU3Cu+nWH+h4goHpMT99clf4C9yvIzoAB
-         u6Ie6MA2SMi94iAxjNCCjqDTP+kXpP/GK97lw9niukWZB/T5wC/9lm8/PN4UXluqrd
-         /1sYc6xTyVRqd7BZWVLzTIgi3XyklcdR9AufeJU8WFw8ZcapWsg4DCuEgpAdU784dC
-         miq8usuqEjdFQ==
-Date:   Tue, 30 May 2023 15:58:35 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-Cc:     Xiu Jianfeng <xiujianfeng@huawei.com>, gregkh@linuxfoundation.org,
-        rafael@kernel.org, viro@zeniv.linux.org.uk, dhowells@redhat.com,
-        code@tyhicks.com, hirofumi@mail.parknet.co.jp,
-        linkinjeon@kernel.org, sfrench@samba.org, senozhatsky@chromium.org,
-        tom@talpey.com, chuck.lever@oracle.com, jlayton@kernel.org,
-        miklos@szeredi.hu, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, stephen.smalley.work@gmail.com,
-        eparis@parisplace.org, casey@schaufler-ca.com, dchinner@redhat.com,
-        john.johansen@canonical.com, mcgrof@kernel.org,
-        mortonm@chromium.org, fred@cloudflare.com, mpe@ellerman.id.au,
-        nathanl@linux.ibm.com, gnoack3000@gmail.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
-        wangweiyang2@huawei.com, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH -next 0/2] lsm: Change inode_setattr() to take struct
-Message-ID: <20230530-mietfrei-zynisch-8b63a8566f66@brauner>
-References: <20230505081200.254449-1-xiujianfeng@huawei.com>
- <20230515-nutzen-umgekehrt-eee629a0101e@brauner>
- <75b4746d-d41e-7c9f-4bb0-42a46bda7f17@digikod.net>
+        with ESMTP id S230515AbjE3OBn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 May 2023 10:01:43 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C483EEC
+        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 07:01:40 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-30ae7cc0e86so2540036f8f.1
+        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 07:01:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1685455299; x=1688047299;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R6QyDstE5anjukt6eoV/kZWKhWe+uxVxjos/d/82Gyg=;
+        b=syvhcDptBbQPSmYPArGktGme7Gt0EkLyDEIm1u4+8zVPXqmF/4Lrf9qaIzgJ42KBjg
+         A1KT6lzT57XKq1omqcGCLA7ObyxB9jroO/1bLv1rFlRNM0x+NaOU5UOebA7gxKhGpajk
+         UgQjPJSSyv7v77y9d2okR5+/YdrvzLTFVeoJG6KZw0qyQ09EzInArJQ9zQvgwl8lu0PZ
+         IKKtw2aCfhRh2M4mYGjqZNJLd3rPyKhPJaHt0QImq+5/LFOX4GynNRSUHp4SNb9EOiSO
+         Cx5fwHZsaFFWkCZVLGFFblNZqh0/15o2m+4QzWzyVpqYizwLLCYE2JBdUcfHej6nu3r7
+         n6sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685455299; x=1688047299;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R6QyDstE5anjukt6eoV/kZWKhWe+uxVxjos/d/82Gyg=;
+        b=bz+hdLnXxEuB3rTk8HH6+3XK9xtFqv4v1Pxa+M2jtB4rE4+5BxPrNasc9BCtoycGW/
+         jbNsML60ZbqexUswt90ETh4/v24L9f4EFkVkgAQd7ONGl8JlebW7Xi0pb/hWzXd1qMRt
+         DzCvwJNZC16tBvNDkJCf70x0Nz//pqC77ENVgXwq3ATbVDKmAS26Bp6f+K4Elx5yREM1
+         s/VshYQkWw2ULtFQHZwojKt0BYUjtCqIjUx5VGlkMkaO66b4WoO8EOTB456yj364uTZV
+         zMTMeBRY9w6PuPW7k9lOtoEys6vcgbrM5UP6pa8tbQEZznJEGjxfM4tGqy1nx1nAkdQa
+         VNPA==
+X-Gm-Message-State: AC+VfDxBaIW3Xe/iqAbM5HAkGyM6RjO2WDjB4/4F/8mWczMp3eGC4CGg
+        f5+odgJHhQv3J+zGUtIRNZx4Gw==
+X-Google-Smtp-Source: ACHHUZ4dsGCUcQmLK6RgiPWOSYjSou1751HLkXEFDRIVp1AYAnxBNMMVB3pdCG9UmhnZyulkem1y2Q==
+X-Received: by 2002:adf:ce0a:0:b0:30a:eeff:3e63 with SMTP id p10-20020adfce0a000000b0030aeeff3e63mr2121544wrn.64.1685455299085;
+        Tue, 30 May 2023 07:01:39 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id o13-20020a5d474d000000b0030af54c5f33sm1933830wrs.113.2023.05.30.07.01.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 May 2023 07:01:36 -0700 (PDT)
+Date:   Tue, 30 May 2023 17:01:34 +0300
+From:   Dan Carpenter <dan.carpenter@linaro.org>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
+        senozhatsky@chromium.org, tom@talpey.com, atteh.mailbox@gmail.com
+Subject: Re: [PATCH] ksmbd: return a literal instead of 'err' in
+ ksmbd_vfs_kern_path_locked()
+Message-ID: <9f7d2528-45e8-45bb-b703-f4f8e1c08ed2@kili.mountain>
+References: <20230530125757.12910-1-linkinjeon@kernel.org>
+ <20230530125757.12910-4-linkinjeon@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <75b4746d-d41e-7c9f-4bb0-42a46bda7f17@digikod.net>
+In-Reply-To: <20230530125757.12910-4-linkinjeon@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, May 26, 2023 at 06:33:05PM +0200, Mickaël Salaün wrote:
+On Tue, May 30, 2023 at 09:57:57PM +0900, Namjae Jeon wrote:
+> Return a literal instead of 'err' in ksmbd_vfs_kern_path_locked().
 > 
-> On 15/05/2023 17:12, Christian Brauner wrote:
-> > On Fri, May 05, 2023 at 04:11:58PM +0800, Xiu Jianfeng wrote:
-> > > Hi,
-> > > 
-> > > I am working on adding xattr/attr support for landlock [1], so we can
-> > > control fs accesses such as chmod, chown, uptimes, setxattr, etc.. inside
-> > > landlock sandbox. the LSM hooks as following are invoved:
-> > > 1.inode_setattr
-> > > 2.inode_setxattr
-> > > 3.inode_removexattr
-> > > 4.inode_set_acl
-> > > 5.inode_remove_acl
-> > > which are controlled by LANDLOCK_ACCESS_FS_WRITE_METADATA.
-> > > 
-> > > and
-> > > 1.inode_getattr
-> > > 2.inode_get_acl
-> > > 3.inode_getxattr
-> > > 4.inode_listxattr
-> > > which are controlled by LANDLOCK_ACCESS_FS_READ_METADATA
-> > 
-> > It would be helpful to get the complete, full picture.
-> > 
-> > Piecemeal extending vfs helpers with struct path arguments is costly,
-> > will cause a lot of churn and will require a lot of review time from us.
-> > 
-> > Please give us the list of all security hooks to which you want to pass
-> > a struct path (if there are more to come apart from the ones listed
-> > here). Then please follow all callchains and identify the vfs helpers
-> > that would need to be updated. Then please figure out where those
-> > vfs helpers are called from and follow all callchains finding all
-> > inode_operations that would have to be updated and passed a struct path
-> > argument. So ultimately we'll end up with a list of vfs helpers and
-> > inode_operations that would have to be changed.
-> > 
-> > I'm very reluctant to see anything merged without knowing _exactly_ what
-> > you're getting us into.
-> 
-> Ultimately we'd like the path-based LSMs to reach parity with the
-> inode-based LSMs. This proposal's goal is to provide users the ability to
-> control (in a complete and easy way) file metadata access. For these we need
-> to extend the inode_*attr hooks and inode_*acl hooks to handle paths. The
-> chown/chmod hooks are already good.
-> 
-> In the future, I'd also like to be able to control directory traversals
-> (e.g. chdir), which currently only calls inode_permission().
-> 
-> What would be the best way to reach this goal?
+> Fixes: 74d7970febf7 ("ksmbd: fix racy issue from using ->d_parent and ->d_name")
 
-The main concern which was expressed on other patchsets before is that
-modifying inode operations to take struct path is not the way to go.
-Passing struct path into individual filesystems is a clear layering
-violation for most inode operations, sometimes downright not feasible,
-and in general exposing struct vfsmount to filesystems is a hard no. At
-least as far as I'm concerned.
+No need for a Fixes tag.
 
-So the best way to achieve the landlock goal might be to add new hooks
-in cases where you would be required to modify inode operations
-otherwise. Taking the chdir() case as an example. That calls
-path_permission(). Since inode_permission() and generic_permission() are
-called in a lot of places where not even a dentry might be readily
-available we will not extend them to take a struct path argument. This
-would also involve extending the inode ->permission() method which is a
-no go. That's neither feasible and would involve modifying a good chunk
-of code for the sole purpose of an LSM.
+regards,
+dan carpenter
 
-So in path_permission() you might have the potential to add an LSM hook.
-Or if you need to know what syscall this was called for you might have
-to add a hook into chdir() itself. That is still unpleasant but since
-the alternative to adding new LSM hooks might be endless layering
-violations that's a compromise that at least I can live with. Ultimately
-you have to convince more people.
-
-Some concerns around passing struct path to LSM hooks in general that I
-would like to just point out and ask you to keep in mind: As soon as
-there's an LSM hook that takes a path argument it means all LSMs have
-access to a struct path. At that point visibility into what's been done
-to that struct path is lost for the fs layer.
-
-One the one hand that's fine on the other hand sooner or later some LSM
-will try to get creative and do things like starting to infer
-relationships between mounts without understanding mount property and
-mount handling enough, or start trying to infer the parent of a path and
-perform permission checks on it in ways that aren't sane. And that sucks
-because this only becomes obvious when fs wide changes are done that
-affect LSM hooks as well.
-
-And that's the other thing. The more objects the LSM layer gets access
-to the greater the cost to do fs wide changes because the fs layer is
-now even closer entangled with the LSM layer. For example, even simple
-things like removing IOP_XATTR - even just for POSIX ACLs - suddenly
-become complicated not because of the fs layer but because of how the
-LSM layer makes use of it. It might start relying on internal flags that
-would be revoked later and so on. That also goes for struct vfsmount. So
-it means going through every LSM trying to figure out if a change is ok
-or not. And we keep adding new LSMs without deprecating older ones (A
-problem we also face in the fs layer.) and then they sit around but
-still need to be taken into account when doing changes.
