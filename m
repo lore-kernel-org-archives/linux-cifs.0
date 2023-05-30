@@ -2,75 +2,273 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9844AC77B73
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 May 2023 14:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E27ADC77B73
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 May 2023 14:19:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232196AbjE3OMt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 May 2023 10:12:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55010 "EHLO
+        id S233036AbjE3OTI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 May 2023 10:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230261AbjE3OMs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 May 2023 10:12:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E139B107
-        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 07:12:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S233000AbjE3OSm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 May 2023 10:18:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2272B135
+        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 07:17:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685456226;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SrEG3Id6KDn/gSf5yv4D68QElxexhX3bro3X0CJ6lE8=;
+        b=FklVq/qRiZBILKfoFLWSaUDVfwxNUgCwbbH6/O2Bfs+9+xxm6b9gx0a641IsGB/QkIZPee
+        OitTjMAy4gE7lxVfKCf3oi4mRyq9t187ROtt0ktFJUNdXaeZmmK8rPENZ1GOoluhvrZ/rz
+        t5+NhTC8tL1RVUW/tNEyndbceQgMFmo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-662-GYtZWPrcPFKGze4E1bwesg-1; Tue, 30 May 2023 10:17:04 -0400
+X-MC-Unique: GYtZWPrcPFKGze4E1bwesg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2FC1C630E1
-        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 14:12:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E3CC433EF
-        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 14:12:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685455944;
-        bh=+Pb9ix1wiw+nC9p3HhllbbxrYPtYrZWSc5N1XlwPqQQ=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Z4pBM3hnTAiU3FyEzpVeJPWW+BZNad9dSrhB2iBSRNepWGvnUVMV+PGnjEGER/5O3
-         MAUkR6HPxPOj3tu1hhpHAmnjnmvmCD7FJa+RMoSe8YSVZkP85/o6hZW1NKJyTFUUhs
-         z81DkMcVJ6H6CUOGz6nvINpZQuomfMSSh7wA4zbLeL6d/FcRVOiyZOYGHrXNJilwv3
-         aIHBNhkIMn0X6imdv2V1erzhXXLwDuzQtFG2b2kHwgv9NzTLjCB0tcwuUvyZNpOk9v
-         EP8f6GbwMKzuhew05ly7raC5VOQzgaUAGYu+OEcLKpxGsQAd/fWSzymMe+ZAuXGLUY
-         9CnuA69wWYAEw==
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-55554ab909cso2170232eaf.2
-        for <linux-cifs@vger.kernel.org>; Tue, 30 May 2023 07:12:24 -0700 (PDT)
-X-Gm-Message-State: AC+VfDyD30vAPU7Dl1diYenR7ViozCC5hzuU8JyaFppN5oiLZyl7ow6F
-        GgFBmDGSl95pHWfyyQn5tZaKBTXv+Bfd2Wb1R1I=
-X-Google-Smtp-Source: ACHHUZ7sHvNm+s2FC4GR8rw4OBhYyuTl2b+h5isKnBk0NC6LGPR5aCjq8nD/7eiB9vKSggDfIV4PVzYX+rt3HB1JpW8=
-X-Received: by 2002:a4a:2c90:0:b0:552:4a83:6e7d with SMTP id
- o138-20020a4a2c90000000b005524a836e7dmr1000618ooo.7.1685455943752; Tue, 30
- May 2023 07:12:23 -0700 (PDT)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BAE3B3C0ED43;
+        Tue, 30 May 2023 14:17:02 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 46E7917103;
+        Tue, 30 May 2023 14:16:57 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH net-next v2 01/10] Drop the netfs_ prefix from netfs_extract_iter_to_sg()
+Date:   Tue, 30 May 2023 15:16:25 +0100
+Message-ID: <20230530141635.136968-2-dhowells@redhat.com>
+In-Reply-To: <20230530141635.136968-1-dhowells@redhat.com>
+References: <20230530141635.136968-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a8a:acb:0:b0:4de:afc5:4d13 with HTTP; Tue, 30 May 2023
- 07:12:23 -0700 (PDT)
-In-Reply-To: <9f7d2528-45e8-45bb-b703-f4f8e1c08ed2@kili.mountain>
-References: <20230530125757.12910-1-linkinjeon@kernel.org> <20230530125757.12910-4-linkinjeon@kernel.org>
- <9f7d2528-45e8-45bb-b703-f4f8e1c08ed2@kili.mountain>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 30 May 2023 23:12:23 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-3OqQYP62tX=vfh9Cq4=k4rdmfWe9cTQPoAEjCZ0KPQQ@mail.gmail.com>
-Message-ID: <CAKYAXd-3OqQYP62tX=vfh9Cq4=k4rdmfWe9cTQPoAEjCZ0KPQQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: return a literal instead of 'err' in ksmbd_vfs_kern_path_locked()
-To:     Dan Carpenter <dan.carpenter@linaro.org>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, tom@talpey.com, atteh.mailbox@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-05-30 23:01 GMT+09:00, Dan Carpenter <dan.carpenter@linaro.org>:
-> On Tue, May 30, 2023 at 09:57:57PM +0900, Namjae Jeon wrote:
->> Return a literal instead of 'err' in ksmbd_vfs_kern_path_locked().
->>
->> Fixes: 74d7970febf7 ("ksmbd: fix racy issue from using ->d_parent and
->> ->d_name")
->
-> No need for a Fixes tag.
-OK.
+Rename netfs_extract_iter_to_sg() and its auxiliary functions to drop the
+netfs_ prefix.
 
-Thanks.
->
-> regards,
-> dan carpenter
->
->
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-crypto@vger.kernel.org
+cc: linux-cachefs@redhat.com
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
+
+Notes:
+    ver #2:
+     - Put the "netfs_" prefix removal first to shorten lines and avoid
+       checkpatch 80-char warnings.
+
+ fs/cifs/smb2ops.c     |  4 +--
+ fs/cifs/smbdirect.c   |  2 +-
+ fs/netfs/iterator.c   | 66 +++++++++++++++++++++----------------------
+ include/linux/netfs.h |  6 ++--
+ 4 files changed, 39 insertions(+), 39 deletions(-)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 5065398665f1..2a0e0a7f009c 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -4334,8 +4334,8 @@ static void *smb2_get_aead_req(struct crypto_aead *tfm, struct smb_rqst *rqst,
+ 		}
+ 		sgtable.orig_nents = sgtable.nents;
+ 
+-		rc = netfs_extract_iter_to_sg(iter, count, &sgtable,
+-					      num_sgs - sgtable.nents, 0);
++		rc = extract_iter_to_sg(iter, count, &sgtable,
++					num_sgs - sgtable.nents, 0);
+ 		iov_iter_revert(iter, rc);
+ 		sgtable.orig_nents = sgtable.nents;
+ 	}
+diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+index 0362ebd4fa0f..223e17c16b60 100644
+--- a/fs/cifs/smbdirect.c
++++ b/fs/cifs/smbdirect.c
+@@ -2227,7 +2227,7 @@ static int smbd_iter_to_mr(struct smbd_connection *info,
+ 
+ 	memset(sgt->sgl, 0, max_sg * sizeof(struct scatterlist));
+ 
+-	ret = netfs_extract_iter_to_sg(iter, iov_iter_count(iter), sgt, max_sg, 0);
++	ret = extract_iter_to_sg(iter, iov_iter_count(iter), sgt, max_sg, 0);
+ 	WARN_ON(ret < 0);
+ 	if (sgt->nents > 0)
+ 		sg_mark_end(&sgt->sgl[sgt->nents - 1]);
+diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
+index 8a4c86687429..f8eba3de1a97 100644
+--- a/fs/netfs/iterator.c
++++ b/fs/netfs/iterator.c
+@@ -106,11 +106,11 @@ EXPORT_SYMBOL_GPL(netfs_extract_user_iter);
+  * Extract and pin a list of up to sg_max pages from UBUF- or IOVEC-class
+  * iterators, and add them to the scatterlist.
+  */
+-static ssize_t netfs_extract_user_to_sg(struct iov_iter *iter,
+-					ssize_t maxsize,
+-					struct sg_table *sgtable,
+-					unsigned int sg_max,
+-					iov_iter_extraction_t extraction_flags)
++static ssize_t extract_user_to_sg(struct iov_iter *iter,
++				  ssize_t maxsize,
++				  struct sg_table *sgtable,
++				  unsigned int sg_max,
++				  iov_iter_extraction_t extraction_flags)
+ {
+ 	struct scatterlist *sg = sgtable->sgl + sgtable->nents;
+ 	struct page **pages;
+@@ -159,11 +159,11 @@ static ssize_t netfs_extract_user_to_sg(struct iov_iter *iter,
+  * Extract up to sg_max pages from a BVEC-type iterator and add them to the
+  * scatterlist.  The pages are not pinned.
+  */
+-static ssize_t netfs_extract_bvec_to_sg(struct iov_iter *iter,
+-					ssize_t maxsize,
+-					struct sg_table *sgtable,
+-					unsigned int sg_max,
+-					iov_iter_extraction_t extraction_flags)
++static ssize_t extract_bvec_to_sg(struct iov_iter *iter,
++				  ssize_t maxsize,
++				  struct sg_table *sgtable,
++				  unsigned int sg_max,
++				  iov_iter_extraction_t extraction_flags)
+ {
+ 	const struct bio_vec *bv = iter->bvec;
+ 	struct scatterlist *sg = sgtable->sgl + sgtable->nents;
+@@ -205,11 +205,11 @@ static ssize_t netfs_extract_bvec_to_sg(struct iov_iter *iter,
+  * scatterlist.  This can deal with vmalloc'd buffers as well as kmalloc'd or
+  * static buffers.  The pages are not pinned.
+  */
+-static ssize_t netfs_extract_kvec_to_sg(struct iov_iter *iter,
+-					ssize_t maxsize,
+-					struct sg_table *sgtable,
+-					unsigned int sg_max,
+-					iov_iter_extraction_t extraction_flags)
++static ssize_t extract_kvec_to_sg(struct iov_iter *iter,
++				  ssize_t maxsize,
++				  struct sg_table *sgtable,
++				  unsigned int sg_max,
++				  iov_iter_extraction_t extraction_flags)
+ {
+ 	const struct kvec *kv = iter->kvec;
+ 	struct scatterlist *sg = sgtable->sgl + sgtable->nents;
+@@ -266,11 +266,11 @@ static ssize_t netfs_extract_kvec_to_sg(struct iov_iter *iter,
+  * Extract up to sg_max folios from an XARRAY-type iterator and add them to
+  * the scatterlist.  The pages are not pinned.
+  */
+-static ssize_t netfs_extract_xarray_to_sg(struct iov_iter *iter,
+-					  ssize_t maxsize,
+-					  struct sg_table *sgtable,
+-					  unsigned int sg_max,
+-					  iov_iter_extraction_t extraction_flags)
++static ssize_t extract_xarray_to_sg(struct iov_iter *iter,
++				    ssize_t maxsize,
++				    struct sg_table *sgtable,
++				    unsigned int sg_max,
++				    iov_iter_extraction_t extraction_flags)
+ {
+ 	struct scatterlist *sg = sgtable->sgl + sgtable->nents;
+ 	struct xarray *xa = iter->xarray;
+@@ -312,7 +312,7 @@ static ssize_t netfs_extract_xarray_to_sg(struct iov_iter *iter,
+ }
+ 
+ /**
+- * netfs_extract_iter_to_sg - Extract pages from an iterator and add ot an sglist
++ * extract_iter_to_sg - Extract pages from an iterator and add ot an sglist
+  * @iter: The iterator to extract from
+  * @maxsize: The amount of iterator to copy
+  * @sgtable: The scatterlist table to fill in
+@@ -339,9 +339,9 @@ static ssize_t netfs_extract_xarray_to_sg(struct iov_iter *iter,
+  * The iov_iter_extract_mode() function should be used to query how cleanup
+  * should be performed.
+  */
+-ssize_t netfs_extract_iter_to_sg(struct iov_iter *iter, size_t maxsize,
+-				 struct sg_table *sgtable, unsigned int sg_max,
+-				 iov_iter_extraction_t extraction_flags)
++ssize_t extract_iter_to_sg(struct iov_iter *iter, size_t maxsize,
++			   struct sg_table *sgtable, unsigned int sg_max,
++			   iov_iter_extraction_t extraction_flags)
+ {
+ 	if (maxsize == 0)
+ 		return 0;
+@@ -349,21 +349,21 @@ ssize_t netfs_extract_iter_to_sg(struct iov_iter *iter, size_t maxsize,
+ 	switch (iov_iter_type(iter)) {
+ 	case ITER_UBUF:
+ 	case ITER_IOVEC:
+-		return netfs_extract_user_to_sg(iter, maxsize, sgtable, sg_max,
+-						extraction_flags);
++		return extract_user_to_sg(iter, maxsize, sgtable, sg_max,
++					  extraction_flags);
+ 	case ITER_BVEC:
+-		return netfs_extract_bvec_to_sg(iter, maxsize, sgtable, sg_max,
+-						extraction_flags);
++		return extract_bvec_to_sg(iter, maxsize, sgtable, sg_max,
++					  extraction_flags);
+ 	case ITER_KVEC:
+-		return netfs_extract_kvec_to_sg(iter, maxsize, sgtable, sg_max,
+-						extraction_flags);
++		return extract_kvec_to_sg(iter, maxsize, sgtable, sg_max,
++					  extraction_flags);
+ 	case ITER_XARRAY:
+-		return netfs_extract_xarray_to_sg(iter, maxsize, sgtable, sg_max,
+-						  extraction_flags);
++		return extract_xarray_to_sg(iter, maxsize, sgtable, sg_max,
++					    extraction_flags);
+ 	default:
+ 		pr_err("%s(%u) unsupported\n", __func__, iov_iter_type(iter));
+ 		WARN_ON_ONCE(1);
+ 		return -EIO;
+ 	}
+ }
+-EXPORT_SYMBOL_GPL(netfs_extract_iter_to_sg);
++EXPORT_SYMBOL_GPL(extract_iter_to_sg);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index a1f3522daa69..55e201c3a841 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -301,9 +301,9 @@ ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
+ 				struct iov_iter *new,
+ 				iov_iter_extraction_t extraction_flags);
+ struct sg_table;
+-ssize_t netfs_extract_iter_to_sg(struct iov_iter *iter, size_t len,
+-				 struct sg_table *sgtable, unsigned int sg_max,
+-				 iov_iter_extraction_t extraction_flags);
++ssize_t extract_iter_to_sg(struct iov_iter *iter, size_t len,
++			   struct sg_table *sgtable, unsigned int sg_max,
++			   iov_iter_extraction_t extraction_flags);
+ 
+ /**
+  * netfs_inode - Get the netfs inode context from the inode
+
