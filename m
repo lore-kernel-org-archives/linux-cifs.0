@@ -2,166 +2,116 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22BB3C7EE23
-	for <linux-cifs@archiver.kernel.org>; Wed, 31 May 2023 13:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC217C7EE23
+	for <linux-cifs@archiver.kernel.org>; Wed, 31 May 2023 14:20:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233109AbjEaNg1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 31 May 2023 09:36:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52932 "EHLO
+        id S237762AbjEaOUG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 31 May 2023 10:20:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229936AbjEaNg0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 May 2023 09:36:26 -0400
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38F5FC0
-        for <linux-cifs@vger.kernel.org>; Wed, 31 May 2023 06:36:24 -0700 (PDT)
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-33b1e83e204so8881245ab.1
-        for <linux-cifs@vger.kernel.org>; Wed, 31 May 2023 06:36:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685540183; x=1688132183;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6dDof1E7ccifmYNgK/6VRthgRC6mJbb72IGfJEO+C7I=;
-        b=JUseqjP5nkrAxOJRJI1adDxo7MXvfFe6tjrpAJZdzVNXCxmzsi4CSFVUHXFj1ybTNQ
-         ZhDirtwlNwR23gJtVOtDnf3gefuwzw3nXkrAVD+tQjQYXkPx2T3qdV3NZj0k7X6zbxZK
-         pM5SGlMmDfBITlJlCX9y1gfZ6RzVQsjpQ8sFWJRN7LZZ4UJqaMNAWJdQx5WmUXvRZfIo
-         LUXQDlADgW4C482NFBzNzAKwCak1QWUV+NHgIHkL3MFj0uPru0olTbDWFXzPH0i3DIPD
-         gRT3BP87F/6MPrx3wS5iUOZSV//FdiM4IJzAwQ3qu79GTkgeW+e0hV1/ODwog1We/ar4
-         3Jrw==
-X-Gm-Message-State: AC+VfDzFDEy/a7ahHmlZwA/4e4VrritZ/5/6v/8EYPY/q7LHvsCe4yKY
-        zqmmYYdd0uX3r/klAmxnuslhIhR5va0=
-X-Google-Smtp-Source: ACHHUZ66FrbYrq+1O+aD3LFyC0D85KaM2ts45dewWee+fo+PNh3Ip0wTbpcOnAWiIgBOukQIw5t14g==
-X-Received: by 2002:a92:d0c3:0:b0:33b:16e9:bba5 with SMTP id y3-20020a92d0c3000000b0033b16e9bba5mr2615137ila.28.1685540183282;
-        Wed, 31 May 2023 06:36:23 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id y12-20020a63fa0c000000b0051b36aee4f6sm1261809pgh.83.2023.05.31.06.36.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 May 2023 06:36:22 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH] ksmbd: use kvzalloc instead of kvmalloc
-Date:   Wed, 31 May 2023 22:36:14 +0900
-Message-Id: <20230531133614.15973-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S236660AbjEaOT3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 31 May 2023 10:19:29 -0400
+Received: from sonic311-29.consmr.mail.ne1.yahoo.com (sonic311-29.consmr.mail.ne1.yahoo.com [66.163.188.210])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E80031FE8
+        for <linux-cifs@vger.kernel.org>; Wed, 31 May 2023 07:18:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1685542634; bh=u06wsoXDKdLhDwBL6GQjdUhNEcg8dn6HnYPO197Z4ZY=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=uTl2NPF0uY45Lh47ZMmSIPqHz12daNS0NgeNKiReY8eyrxDDrfTQcgiz4NnQWUNQW7F1MwuSDHW9ZpVyLJqKOHJPOz/6KCpO4nKGd5BVNbzRyKmJHyu80qxzU/KEvZHBOfLp6u/SJMgRS0b0pLcN8zO52SWl1YDRCuA2SaotQ3TXufEATP7RYyKZYnLWthOz2EVCLnd2aIr7rdJVTCDb3fvEe/oQHsU+l8nHuw+OTcr/AF+gsikWYq13eAlw1UEkTq5PNC3MECGdLjrjmklJLYIaf8/CDVL5UuQVhvmo7Bzp6nE4UogviP7f3QRdcwQxCbsQypmHU8PKuSDA+WRWnQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1685542634; bh=In52hxvGcGscBnK4YcfxGoJg05ahXzVDO4vWcIkg9zX=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=FZcoenma9wFmozb+7JbcPV2PcIO/+4pT7+0R3axAr1SRbtx7EI4JAlM/1BveGMIbY5/tsB7TSdMdDoPO635kk3pi4OH2yXPwQL9RGvoIBv+SGfINgAwDfdKoKx50N5kV0s0L2STPyKq7F7FzFebllYJEYJ3uo5NUAHsE2hEpixpnCq+vJOongrz1lr2O5immV+bFN2Bw03Q6hv43aBYMle/pRgjoqhWpfI6aO9u9sYPrvKq0k91adtMIH2cpfvckSuHxsStj/3CaZJ7acD5JASKu7FwJe6R4fuSCz+LDohr6Vir2j/LSuECeSdR73HaRKDE6jPOUDMmA2yQE5Vv4QA==
+X-YMail-OSG: YS2OiOgVM1kmwmgmji0DUz5dLhGzTb5Z198M4.LCNKObOZhn4oZZvKSnFZmfrxY
+ UN6hR2P.A3qTmfVVDLFNYjn5QLt.nWYU8UGVZqmdVBdYYliraQ4peiZ_mZcfzn3.A8K3FJVwas4G
+ KCkturum0T2vml6moo5VB_FFFCpq9blIh4jyzDm553j1p2bCA71u8R6jlUzlpTIt_AfZPJNoCA__
+ H0qDyP0SzecdXb8h5oqmF9l3hveY.Oscf_4EXTa6rBmRoFDSjkoq8QSewWZX3XufbrpnwqTtTVUw
+ 5P4lE4bm8YEuzhtOqPLNsFHy8ALL9jifaNIHQeYWomRilT54uVLHQBjcs2PUTQk9EBgGFm1Rmmdt
+ B4KynaXuuw1_MkEUIlciCaFkiDKBTKzMlbGg2PyiNrmZEinAVHVh7PTVCsbfiMwSBRjXxhjqgdSt
+ ukLyssbUujJcgQLRcitba21rG1jjuK3FNCDPagA7f.v1IE_d76aBghD7vp8dhcSs2aiicgjLXhtp
+ 0KsakzlYZyz0O0sTeXe_c2ac9GCL_AlpGd9TzKiouagsNT9CCDbgbIU.MKNYAOMcAo1l7PChe4iE
+ zSTIZcZEnzmTx1Cwxy.VgFIeEXgxMD22KonFWwq1k8lyWC7isb9.8czYhGHqT4KuTjcg.fGOd.p5
+ PcYFKBOQm0244ErDybsrwRrRoYWLFQcFq5ZM3_akYqobgfpsqw1KPRGneQQA8Nz3fja7n6GUbi.0
+ sF3GEfazRl_OkzU9pLsL2tvFb2oo4cLKB9oLJQvfOMX5PVv6KquqCIGB9kQFvpCtGrDQpkhF9uwO
+ zByidQDBEvSU.ktIviMPVxB1aqq5pcdpQkfsVS.cPz9SKVqFZQ661XuWjjPg9Kgp3e9M0POOl4R1
+ rXvZJb_zS8HqbT.vWYysdJ5KhAGE6Iz5wlVivG2pXjXNGRJpLUOvz25viKevlGxdtO7j48C9FwUS
+ bJG0rsEKsL62VVoxF4PuMPsAyFj9B5XdmQL_8uEABBVfXBEFeiB26z7FB0vJ0a3YZ_uSrDioHI9k
+ nkQITYnz2FAAVrFLOcedWIc8xj4iPYDkkLJIqyno6KmWYiZQrQLAJWx4iOGKg72Fg2ihfubvT85r
+ fbelkwhNU7S814bNZoeXzHHJKHNqpW.SVpzgloR_rWwPhwopW2hv5P4zcV3N_BNwZ7hVDUwn0TBZ
+ TrnvLMAvHMzsjtYBAkpZE19ZH6b0R_qDTh95G_nF7DgX7oBkCp0lgN96yAmR9uxkxgRJGLxycFN5
+ I9iuict_MkQhlkgXJ3Z0HtOrvP.Eg6jO5tzPRE9zS23fN.zQb5mWCTkZO5tTD6f0v0gWiR4Ipy.Q
+ WP4x.2R7E5ZW4bBZ4Dyh_CmcklfnK6Xd5b6p3XFXwPn0iSWp1EyX7y7eKWSqjAzLG9e4sLtj4Ms8
+ OA9jegw6OLMyuMrqCGCN6aJ6mlG6jhFhiPgl8AkiPLFOD.KEoqO4IkMnkBE_cyF3EpqnDZOqHnbS
+ 1eg3T_W027MlCxYxaQnjXm3ovfPg3S2zbHe4E2Su6n5D7vpK_pcTsL.VBJP7M31FkZABOboMXUl8
+ 9OjG9feh6TKi7q1wcG4iNFhgeOlXfcxzG.1zgrTbib79_ZBbsgsob9dNCzCFEZkf8dhcXeqBGA8D
+ 35Re5Hm2sZgi1YAJK0qvF5hPlMFmciJVbhlYm9hDa50iGdskBZoLcn1SJFHjx6yxBNbXWnD2vqiX
+ zMwjsMNeICbbzvVLzWiA7iHhQ1jUvnKO8xGwQXjGy3b8CA2wQ6LOf4G2wabay9gwtSzKpAoNCRwf
+ 2903ZRu3jb1qoz3OXVdKb6G9phej1Yr1.G2LnSPYfiZGYNhFEsRXWF9JMI7IEX2TGbS6Yy4brrPf
+ TNrZ4dFaKP1cNxLBT7tQKWqHopat3VrDLHWs0pfcgBKvk1wJjWiVZuRPdMtlQ5m.YBhpcT3KeubG
+ 2Nddz9SCkTCdE9dLB6PQOLpd6IfCLw9clJNhKfccV1hvMEJ6B0Si2Dm5lG6ehw0.HhcC61YrSuNo
+ MZTp9MbC.z0KejFZeSUufaJa.0QwifMQkyjMV7LWTZnp.fo2C2RYgPyxqZCc46kXctvazZO.6WuD
+ 2puR7R75dq8bRw77TcUQ.gG1I6Lv4sdt8Fxf84nPpOLxQ0VR_kRW.3StmliYVsqwshi_2FIMrC.i
+ JraN9OfrRBrDGTnKPvU4OpTs8nRiDZNPm.CboKKDWSWk6uMsAXNkpyxWW7dRodvE1zI1oKKFsniL
+ 0ArNumaHMH7b9R6glIEZlbmcJ3zn.5mQyOhh0J4YxJszoanvccTV_P02lqJGioEc-
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 4d60b986-7ed3-4d05-823c-5d7a7b7466b1
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.ne1.yahoo.com with HTTP; Wed, 31 May 2023 14:17:14 +0000
+Received: by hermes--production-ne1-574d4b7954-bq277 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 174ebacd8784abefa7ff5b7a2ade66e9;
+          Wed, 31 May 2023 14:17:11 +0000 (UTC)
+Message-ID: <cbd61b82-43e1-ad4d-e984-775f1209948c@schaufler-ca.com>
+Date:   Wed, 31 May 2023 07:17:08 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH -next 0/2] lsm: Change inode_setattr() to take struct
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?= =?UTF-8?Q?n?= <mic@digikod.net>,
+        Xiu Jianfeng <xiujianfeng@huawei.com>,
+        gregkh@linuxfoundation.org, rafael@kernel.org,
+        viro@zeniv.linux.org.uk, dhowells@redhat.com, code@tyhicks.com,
+        hirofumi@mail.parknet.co.jp, linkinjeon@kernel.org,
+        sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
+        chuck.lever@oracle.com, jlayton@kernel.org, miklos@szeredi.hu,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        stephen.smalley.work@gmail.com, eparis@parisplace.org,
+        dchinner@redhat.com, john.johansen@canonical.com,
+        mcgrof@kernel.org, mortonm@chromium.org, fred@cloudflare.com,
+        mpe@ellerman.id.au, nathanl@linux.ibm.com, gnoack3000@gmail.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-cachefs@redhat.com,
+        ecryptfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+        linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+        wangweiyang2@huawei.com, Casey Schaufler <casey@schaufler-ca.com>
+References: <20230505081200.254449-1-xiujianfeng@huawei.com>
+ <20230515-nutzen-umgekehrt-eee629a0101e@brauner>
+ <75b4746d-d41e-7c9f-4bb0-42a46bda7f17@digikod.net>
+ <20230530-mietfrei-zynisch-8b63a8566f66@brauner>
+ <20230530142826.GA9376@lst.de>
+ <301a58de-e03f-02fd-57c5-1267876eb2df@schaufler-ca.com>
+ <20230531132200.GB30016@lst.de>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <20230531132200.GB30016@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.21495 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use kvzalloc instead of kvmalloc.
+On 5/31/2023 6:22 AM, Christoph Hellwig wrote:
+> On Tue, May 30, 2023 at 07:55:17AM -0700, Casey Schaufler wrote:
+>> Which LSM(s) do you think ought to be deprecated?
+> I have no idea.  But what I want is less weirdo things messing with
+> VFS semantics.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/smb2pdu.c       | 8 ++++----
- fs/smb/server/smb_common.c    | 4 ++--
- fs/smb/server/transport_ipc.c | 4 ++--
- fs/smb/server/vfs.c           | 4 ++--
- 4 files changed, 10 insertions(+), 10 deletions(-)
+I am curious what you consider a weirdo thing done by LSMs. Things like
+io_uring are much stranger than anything an LSM does.
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index b5e323b379c4..82cadebec459 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -526,7 +526,7 @@ int smb2_allocate_rsp_buf(struct ksmbd_work *work)
- 	if (le32_to_cpu(hdr->NextCommand) > 0)
- 		sz = large_sz;
- 
--	work->response_buf = kvmalloc(sz, GFP_KERNEL | __GFP_ZERO);
-+	work->response_buf = kvzalloc(sz, GFP_KERNEL);
- 	if (!work->response_buf)
- 		return -ENOMEM;
- 
-@@ -6064,7 +6064,7 @@ static noinline int smb2_read_pipe(struct ksmbd_work *work)
- 		}
- 
- 		work->aux_payload_buf =
--			kvmalloc(rpc_resp->payload_sz, GFP_KERNEL | __GFP_ZERO);
-+			kvmalloc(rpc_resp->payload_sz, GFP_KERNEL);
- 		if (!work->aux_payload_buf) {
- 			err = -ENOMEM;
- 			goto out;
-@@ -6216,7 +6216,7 @@ int smb2_read(struct ksmbd_work *work)
- 	ksmbd_debug(SMB, "filename %pD, offset %lld, len %zu\n",
- 		    fp->filp, offset, length);
- 
--	work->aux_payload_buf = kvmalloc(length, GFP_KERNEL | __GFP_ZERO);
-+	work->aux_payload_buf = kvzalloc(length, GFP_KERNEL);
- 	if (!work->aux_payload_buf) {
- 		err = -ENOMEM;
- 		goto out;
-@@ -6365,7 +6365,7 @@ static ssize_t smb2_write_rdma_channel(struct ksmbd_work *work,
- 	int ret;
- 	ssize_t nbytes;
- 
--	data_buf = kvmalloc(length, GFP_KERNEL | __GFP_ZERO);
-+	data_buf = kvzalloc(length, GFP_KERNEL);
- 	if (!data_buf)
- 		return -ENOMEM;
- 
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index af0c2a9b8529..c6e4d38319df 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -347,8 +347,8 @@ static int smb1_check_user_session(struct ksmbd_work *work)
-  */
- static int smb1_allocate_rsp_buf(struct ksmbd_work *work)
- {
--	work->response_buf = kmalloc(MAX_CIFS_SMALL_BUFFER_SIZE,
--			GFP_KERNEL | __GFP_ZERO);
-+	work->response_buf = kzalloc(MAX_CIFS_SMALL_BUFFER_SIZE,
-+			GFP_KERNEL);
- 	work->response_sz = MAX_CIFS_SMALL_BUFFER_SIZE;
- 
- 	if (!work->response_buf) {
-diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
-index 40c721f9227e..b49d47bdafc9 100644
---- a/fs/smb/server/transport_ipc.c
-+++ b/fs/smb/server/transport_ipc.c
-@@ -229,7 +229,7 @@ static struct ksmbd_ipc_msg *ipc_msg_alloc(size_t sz)
- 	struct ksmbd_ipc_msg *msg;
- 	size_t msg_sz = sz + sizeof(struct ksmbd_ipc_msg);
- 
--	msg = kvmalloc(msg_sz, GFP_KERNEL | __GFP_ZERO);
-+	msg = kvzalloc(msg_sz, GFP_KERNEL);
- 	if (msg)
- 		msg->sz = sz;
- 	return msg;
-@@ -268,7 +268,7 @@ static int handle_response(int type, void *payload, size_t sz)
- 			       entry->type + 1, type);
- 		}
- 
--		entry->response = kvmalloc(sz, GFP_KERNEL | __GFP_ZERO);
-+		entry->response = kvzalloc(sz, GFP_KERNEL);
- 		if (!entry->response) {
- 			ret = -ENOMEM;
- 			break;
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index a7b7264fb4e6..23eb1da4bcad 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -424,7 +424,7 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *fp, char *buf, loff_t *pos,
- 	}
- 
- 	if (v_len < size) {
--		wbuf = kvmalloc(size, GFP_KERNEL | __GFP_ZERO);
-+		wbuf = kvzalloc(size, GFP_KERNEL);
- 		if (!wbuf) {
- 			err = -ENOMEM;
- 			goto out;
-@@ -826,7 +826,7 @@ ssize_t ksmbd_vfs_listxattr(struct dentry *dentry, char **list)
- 	if (size <= 0)
- 		return size;
- 
--	vlist = kvmalloc(size, GFP_KERNEL | __GFP_ZERO);
-+	vlist = kvzalloc(size, GFP_KERNEL);
- 	if (!vlist)
- 		return -ENOMEM;
- 
--- 
-2.25.1
+>
+>> I only see one that I
+>> might consider a candidate. As for weird behavior, that's what LSMs are
+>> for, and the really weird ones proposed (e.g. pathname character set limitations)
+>> (and excepting for BPF, of course) haven't gotten far.
+> They haven't gotten far for a reason usually.  Trying to sneak things in
+> through the back door is exactly what is the problem with LSMs.
+
+Mostly developers play by the rules, and we don't let things sneak in. 
+
 
