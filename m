@@ -2,72 +2,93 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BE2C87FDD
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jun 2023 18:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17997C7EE43
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jun 2023 18:54:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231392AbjFGS1O (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 7 Jun 2023 14:27:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43780 "EHLO
+        id S232650AbjFGSyE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 7 Jun 2023 14:54:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231341AbjFGS1N (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Jun 2023 14:27:13 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2412689;
-        Wed,  7 Jun 2023 11:26:38 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9788faaca2dso51915966b.0;
-        Wed, 07 Jun 2023 11:26:38 -0700 (PDT)
+        with ESMTP id S233041AbjFGSyB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Jun 2023 14:54:01 -0400
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D04F31BD6;
+        Wed,  7 Jun 2023 11:54:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686162395; x=1688754395;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wODPx4uHZJHUTcdDegTDGQs4CeriK253kkjDqRsBvLs=;
-        b=PgvSlIT79OUd63jjASsNr92npBtidqBIIcr0/yPjJPwrQ/113jrShII9sGfjwbYNb3
-         bf1Erx4stn1BnaSvp0QRn3qhoAelcgpWg10/cZdcHU39eWCQ1zmmvFhsHckWl6Mpelo8
-         UrQi0n95qJH0NgcaprsRqK9EsuGGixeScoDOcZNRWhXrxGCKSJJrifQbQDpJ/NbpAVeB
-         jnMpK7MSMrzR6/c7dXnHLdH4Ep23xmPbYZOWN/75YGet+B2gqilLbPZb2Wn5na98SVuI
-         dVofyri9mYj/d28wmhB/SlSfcRQFKI3N6FrMTeZxK3M2g2XCX1xe1Rxen17YsRLYapOG
-         aV7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686162395; x=1688754395;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wODPx4uHZJHUTcdDegTDGQs4CeriK253kkjDqRsBvLs=;
-        b=evbCRQMJycX8FynDaH3KXyLrxisnPmIji7KFkTBnHmIEZTxPqKnEcWCV3pS43qBLkX
-         dSIlglmkYco9TtVl/VFPJ4bSMFFrmI9N5p3ExG1B2CgYm4j/9V5lZ1YuQmEuVzmggcCB
-         g84bRRhfv14k7wdReT1nenavAbmVwyPXl6pU8yi34ar5pUmm+Dn2YOSVK1Yho+QFp+OJ
-         JYflemTWZESyDUOCchdJUe+78VBY1wPEQ7+v8zxAUfJK9vngxfBgqq8bhy9uujz5SjB7
-         StMYy3mSYLM0uJzlKbdH21g8F5zHxoX5oZwopo83vuyFPmZPqUr5uF5IU+9W9od+xmWu
-         fSSg==
-X-Gm-Message-State: AC+VfDwjS50lfhjqlv1VINVtq+8v6+PtGAfQ8jVkxH19y79q0gBvt/43
-        jY4QkUYzKCmm/h+QXVZCg/oAG9iYuX8XOgxGWj0=
-X-Google-Smtp-Source: ACHHUZ4gkb4uXmtBfRalz/8gTBT4f6/AWlotdJNjgnU0y7BmJ/z28Vm/frajygWJFDgVS+dJ1qAf3w6FaHOtUUKNuBY=
-X-Received: by 2002:a17:907:2d2c:b0:977:c8a7:bed5 with SMTP id
- gs44-20020a1709072d2c00b00977c8a7bed5mr7336385ejc.47.1686162395234; Wed, 07
- Jun 2023 11:26:35 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1686164040; x=1717700040;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QQccf1KeyTZf6ZPMjV/HwnVR62uBW11Zlzl2mRiQIRQ=;
+  b=jpy35Re/yLIbl7HDAU7wscKlGkE1bdjlUv8Y3WpC8q0RI5mBI+wXcKtb
+   3dbDLBuSCWNu4r7uAsxdP7ygCZOu4BfL3LNyq5N6koDpiiF4W1kJk5qxc
+   M7wTJnQgazMmIlIMkJTB/pgR6AWTsAJOmE37Ou3jJf9hbZKcbKaDUxrwA
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.00,224,1681171200"; 
+   d="scan'208";a="1136280854"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 18:54:00 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com (Postfix) with ESMTPS id 31AA0413FA;
+        Wed,  7 Jun 2023 18:54:00 +0000 (UTC)
+Received: from EX19D002UWC001.ant.amazon.com (10.13.138.148) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 7 Jun 2023 18:53:50 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19D002UWC001.ant.amazon.com (10.13.138.148) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 7 Jun 2023 18:53:50 +0000
+Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
+ (10.189.73.169) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Server id 15.2.1118.26 via Frontend Transport; Wed, 7 Jun 2023 18:53:50 +0000
+Received: by dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com (Postfix, from userid 22673075)
+        id BF818222F; Wed,  7 Jun 2023 18:53:49 +0000 (UTC)
+From:   Rishabh Bhatnagar <risbhat@amazon.com>
+To:     <gregkh@linuxfoundation.org>
+CC:     <sfrench@samba.org>, <stable@vger.kernel.org>,
+        <linux-cifs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Rishabh Bhatnagar" <risbhat@amazon.com>
+Subject: [PATCH 5.4 0/2] Backport few dfs related fixes to cifs
+Date:   Wed, 7 Jun 2023 18:53:11 +0000
+Message-ID: <20230607185313.11363-1-risbhat@amazon.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-References: <20230216150701.3654894-1-dhowells@redhat.com> <CALF+zO=w2Gyz6JtzEoFgTVjH67-_CuTaK7e+2yoHEwXZ8bPx_A@mail.gmail.com>
- <CALF+zO=Y8dMsJ79RYp1e7n9B5_0=segpqW9_tetBqPhFiQcZxA@mail.gmail.com>
-In-Reply-To: <CALF+zO=Y8dMsJ79RYp1e7n9B5_0=segpqW9_tetBqPhFiQcZxA@mail.gmail.com>
-From:   Chris Chilvers <chilversc@gmail.com>
-Date:   Wed, 7 Jun 2023 19:26:23 +0100
-Message-ID: <CAAmbk-cBJprmRsW5uktAm49NtVw9WTLA=LPS7uLkwAknjs_1qA@mail.gmail.com>
-Subject: Re: [Linux-cachefs] [PATCH v6 0/2] mm, netfs, fscache: Stop read
- optimisation when folio removed from pagecache
-To:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     David Wysochanski <dwysocha@redhat.com>,
-        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-afs@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Any update on this? I assume it's too late for these patches to make 6.4.0.
+Recently we have been seeing kernel panic in cifs_reconnect function
+while accessing tgt_list. Looks like tgt_list is not initialized
+correctly. There are fixes already present in 5.10 and later trees.
+Backporting them to 5.4
+
+ CIFS VFS: \\172.30.1.14 cifs_reconnect: no target servers for DFS
+ failover
+ BUG: unable to handle page fault for address: fffffffffffffff8
+ #PF: supervisor read access in kernel mode
+ #PF: error_code(0x0000) - not-present page
+ PGD 260e067 P4D 260e067 PUD 2610067 PMD 0
+ Oops: 0000 [#1] SMP PTI
+ RIP: 0010:cifs_reconnect+0x51d/0xef0 [cifs]
+ RSP: 0018:ffffc90000693da0 EFLAGS: 00010282
+ RAX: fffffffffffffff8 RBX: ffff8887fa63b800 RCX: fffffffffffffff8
+ Call Trace:
+ cifs_handle_standard+0x18d/0x1b0 [cifs]
+ cifs_demultiplex_thread+0xa5c/0xc90 [cifs]
+ kthread+0x113/0x130
+
+*** BLURB HERE ***
+
+Paulo Alcantara (2):
+  cifs: get rid of unused parameter in reconn_setup_dfs_targets()
+  cifs: handle empty list of targets in cifs_reconnect()
+
+ fs/cifs/connect.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+-- 
+2.39.2
+
