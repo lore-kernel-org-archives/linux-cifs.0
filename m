@@ -2,107 +2,75 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 662C5C7EE23
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jun 2023 18:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F98C77B7A
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jun 2023 19:07:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233008AbjFGSyR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 7 Jun 2023 14:54:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60634 "EHLO
+        id S231176AbjFGTHP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 7 Jun 2023 15:07:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233088AbjFGSyO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Jun 2023 14:54:14 -0400
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2692A1FFA;
-        Wed,  7 Jun 2023 11:54:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1686164052; x=1717700052;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=eua5jDRET5Qb3t5nMSLO71rB3j2AsP15aUyCua1keY8=;
-  b=T9x9dpafYs2Mk5dc+6cwttALIswe/0gpr4QifrZKehLUAfJ6poO8bAeW
-   IcAdyUh+ZEpinMNtPVfhuuG33Zbj7PxBodumf1Tge1uCfZEAeVHfOqBmo
-   hleYUuBsWr3RNbd4Tz1reIKDcCk3VyngQH2isH59TzNGM10SMWBsXcC1K
-   o=;
-X-IronPort-AV: E=Sophos;i="6.00,224,1681171200"; 
-   d="scan'208";a="219517686"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2023 18:54:10 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-        by email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com (Postfix) with ESMTPS id 5267F80726;
-        Wed,  7 Jun 2023 18:54:07 +0000 (UTC)
-Received: from EX19D002UWC003.ant.amazon.com (10.13.138.183) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 7 Jun 2023 18:53:53 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.145) by
- EX19D002UWC003.ant.amazon.com (10.13.138.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 7 Jun 2023 18:53:53 +0000
-Received: from dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com
- (10.189.73.169) by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP
- Server id 15.2.1118.26 via Frontend Transport; Wed, 7 Jun 2023 18:53:53 +0000
-Received: by dev-dsk-risbhat-2b-8bdc64cd.us-west-2.amazon.com (Postfix, from userid 22673075)
-        id 4B942273E; Wed,  7 Jun 2023 18:53:53 +0000 (UTC)
-From:   Rishabh Bhatnagar <risbhat@amazon.com>
-To:     <gregkh@linuxfoundation.org>
-CC:     <sfrench@samba.org>, <stable@vger.kernel.org>,
-        <linux-cifs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>,
-        Steve French <stfrench@microsoft.com>,
-        Rishabh Bhatnagar <risbhat@amazon.com>
-Subject: [PATCH 5.10 2/2] cifs: handle empty list of targets in cifs_reconnect()
-Date:   Wed, 7 Jun 2023 18:53:13 +0000
-Message-ID: <20230607185313.11363-3-risbhat@amazon.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230607185313.11363-1-risbhat@amazon.com>
+        with ESMTP id S229614AbjFGTHN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Jun 2023 15:07:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C73E8E;
+        Wed,  7 Jun 2023 12:07:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ACFB463D85;
+        Wed,  7 Jun 2023 19:07:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F52C433EF;
+        Wed,  7 Jun 2023 19:07:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1686164832;
+        bh=G8DEs9I7UH+XGHugDOSGDS8/fXnM7e5FafIGJcFDcTE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lBuNueS1YZPZOhG8R2S21CP0YB45duJ/rLit1ecL5OOL/6lthveTZJDDRt+YGG0R+
+         N8tICWPYPZ6aQ+X9HB0bBx73k0pt1Rnnc3Ma4vCoP0/OX825dcG81uf+CIO8IBfK+J
+         ex6P+HiEXbvj0+wYhUVHiDTH6CzdlvODwvoRs5yU=
+Date:   Wed, 7 Jun 2023 21:07:09 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Rishabh Bhatnagar <risbhat@amazon.com>
+Cc:     sfrench@samba.org, stable@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5.4 0/2] Backport few dfs related fixes to cifs
+Message-ID: <2023060750-unpledged-effective-bd95@gregkh>
 References: <20230607185313.11363-1-risbhat@amazon.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230607185313.11363-1-risbhat@amazon.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Paulo Alcantara <pc@cjr.nz>
+On Wed, Jun 07, 2023 at 06:53:11PM +0000, Rishabh Bhatnagar wrote:
+> Recently we have been seeing kernel panic in cifs_reconnect function
+> while accessing tgt_list. Looks like tgt_list is not initialized
+> correctly. There are fixes already present in 5.10 and later trees.
+> Backporting them to 5.4
+> 
+>  CIFS VFS: \\172.30.1.14 cifs_reconnect: no target servers for DFS
+>  failover
+>  BUG: unable to handle page fault for address: fffffffffffffff8
+>  #PF: supervisor read access in kernel mode
+>  #PF: error_code(0x0000) - not-present page
+>  PGD 260e067 P4D 260e067 PUD 2610067 PMD 0
+>  Oops: 0000 [#1] SMP PTI
+>  RIP: 0010:cifs_reconnect+0x51d/0xef0 [cifs]
+>  RSP: 0018:ffffc90000693da0 EFLAGS: 00010282
+>  RAX: fffffffffffffff8 RBX: ffff8887fa63b800 RCX: fffffffffffffff8
+>  Call Trace:
+>  cifs_handle_standard+0x18d/0x1b0 [cifs]
+>  cifs_demultiplex_thread+0xa5c/0xc90 [cifs]
+>  kthread+0x113/0x130
+> 
+> *** BLURB HERE ***
 
-commit a52930353eaf443489a350a135c5525a4acbbf56 upstream.
+No blurb?
 
-In case there were no cached DFS referrals in
-reconn_setup_dfs_targets(), set cifs_sb to NULL prior to calling
-reconn_set_next_dfs_target() so it would not try to access an empty
-tgt_list.
+And this says 5.4, yet your patches say 5.10?
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Rishabh Bhatnagar <risbhat@amazon.com>
----
- fs/cifs/connect.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Totally confused...
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b5cd3dc479ce..d8d9d9061544 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -513,11 +513,13 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 		sb = NULL;
- 	} else {
- 		cifs_sb = CIFS_SB(sb);
--
- 		rc = reconn_setup_dfs_targets(cifs_sb, &tgt_list);
--		if (rc && (rc != -EOPNOTSUPP)) {
--			cifs_server_dbg(VFS, "%s: no target servers for DFS failover\n",
--				 __func__);
-+		if (rc) {
-+			cifs_sb = NULL;
-+			if (rc != -EOPNOTSUPP) {
-+				cifs_server_dbg(VFS, "%s: no target servers for DFS failover\n",
-+						__func__);
-+			}
- 		} else {
- 			server->nr_targets = dfs_cache_get_nr_tgts(&tgt_list);
- 		}
--- 
-2.39.2
-
+greg k-h
