@@ -2,114 +2,94 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B5C8C7EE25
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Jun 2023 20:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 332C3C7EE25
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Jun 2023 21:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235770AbjFHULW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 8 Jun 2023 16:11:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33800 "EHLO
+        id S236602AbjFHVAV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 8 Jun 2023 17:00:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235457AbjFHULU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Jun 2023 16:11:20 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ECC330C1
-        for <linux-cifs@vger.kernel.org>; Thu,  8 Jun 2023 13:11:11 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E8F7A1FD89;
-        Thu,  8 Jun 2023 20:11:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1686255069; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=609jRZbyXb9ju6sUBvg8mTRyhib2MEFvzNSarZseNbE=;
-        b=UPwa6MTjHdcBDCFtiNFLqqo/qz0uLQPiCsg+DqsuDrVEs7YRedpgq2UM4d0aMtiCD6qwTC
-        FFEWRh+cm+dzdBeEJq014ICPjF93YZq1ke6g6plJQWiq3fkLQWpEeB3n9W4vn3prXD1+7f
-        Sv9dH0Y8bZHeczbtMFmIlxXEmyGKnhg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1686255069;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=609jRZbyXb9ju6sUBvg8mTRyhib2MEFvzNSarZseNbE=;
-        b=SGeZ/GKhY1wG4BlLnDqMof+wu4iDoI8KVxtK3YQLyD+v60LcFTkRAMVEYZhvNgZwncZxjP
-        BG+RZtpBxb7rrDCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6B50013480;
-        Thu,  8 Jun 2023 20:11:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id aCvoC901gmT8DQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Thu, 08 Jun 2023 20:11:09 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, pc@cjr.nz, ronniesahlberg@gmail.com,
-        nspmangalore@gmail.com
-Subject: [PATCH] smb/client: print "Unknown" instead of bogus link speed value
-Date:   Thu,  8 Jun 2023 17:10:55 -0300
-Message-Id: <20230608201055.9716-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.40.1
+        with ESMTP id S235943AbjFHVAT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Jun 2023 17:00:19 -0400
+X-Greylist: delayed 344 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 08 Jun 2023 14:00:17 PDT
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE9DAE61;
+        Thu,  8 Jun 2023 14:00:17 -0700 (PDT)
+Message-ID: <a664029640828958e152e9a4c11c4b9a.pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1686257671;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yugc47XhE4TEXrwH5C7vyMDJJHrlVFt40w7KU/PJ/TE=;
+        b=GPHoIsc9HOLN9ekZ/lB29IAezz2ZRK7IzZVsNJlbKJytUsqpNdL+QEyg7GvPOmDEcVyR6V
+        a10C/Io+PqX7/XHYVrS+t+zAtGyLF2BoVwYWiwn7ro0damxvI8kO/EgC0mIVzAsmT6RybC
+        g11SWgP/+LKcDnvV8tv5MG4GuVT6oF5fxeDxG3PVmRL9PQAuRQu/Mla6NO4vXfPexw9dJl
+        rUhGDXanSnKSlqfTXz2ajpbuDW7T43Q/g93ZqoJxlvTQN3/9+EmTr0WnbwYbjQanl6YajQ
+        CX9baayflBJMeBE7WXN9Bsk/WfTlZ5KoeMwz8/Nix/SqvsAfoOhmk+1L+6EpBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1686257671;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yugc47XhE4TEXrwH5C7vyMDJJHrlVFt40w7KU/PJ/TE=;
+        b=Ola0AhVztQVlxiW8QnBqIgeEsz7JXIzZ9AxPumI6JNANd4+xCT9LcaM05JadYO2aLcAWrT
+        uSTDIPU8J1WMv5ydZcWgu1I/KKhsvXj8/eCte0FBpcHReypA/7dOiK/CLYwW+lrPJdQPaQ
+        UVytvu0+SnkizGCov1YCk9ymKVIvpgs9x7PUWCBxMHRgbQBnbDTCN+Ti25RAUNFbprkOCc
+        WpwK5Wvgp2v0n9KjN3zGJqd63VhdJDiIW1dlyXdAvxTNl6HAM9T4XXZC6SnA64arx9f03+
+        fArfQSEufBMWOXlY2iyQHiim/Py4rknDiRifq0Wrw4VSGzdIkfRSZ0mbr/hxIg==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1686257671; a=rsa-sha256;
+        cv=none;
+        b=mJrjHVb1G3xHgnChtFJ8tFhmt7gEcAXrzPlCzB6bigME2q52vJ3yXD+FtgpI4B1ni00V0I
+        LZ5j180bD7wjc7BYJkvbmmwvOJXpzljkQdm5O7AHo7Ek5Masob7aM2QyO8VgTScBxQhmVZ
+        hkYR068kbz2BwaabirwShxzhKSx0Iau9ABxQagpzLZxvwYlyWUNrRM6yoUWsdUPdPU8doU
+        mYl0lECpi2nU/ihL3Svl5de1EdgTnigJBZsm8vTAjETI1owD9esysngHwOcWfjejbqQSb2
+        5H2+9SdmpluLXURDDb494BxwwtJ0ubTCEnMP/nYEEuhrutyOnOwtI1TEBc56ag==
+From:   Paulo Alcantara <pc@manguebit.com>
+To:     Rishabh Bhatnagar <risbhat@amazon.com>, gregkh@linuxfoundation.org
+Cc:     sfrench@amazon.com, stable@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rishabh Bhatnagar <risbhat@amazon.com>
+Subject: Re: [PATCH v2 5.4 0/2] Backport few dfs related fixes to cifs
+In-Reply-To: <20230607203333.26669-1-risbhat@amazon.com>
+References: <20230607203333.26669-1-risbhat@amazon.com>
+Date:   Thu, 08 Jun 2023 17:54:26 -0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The virtio driver for Linux guests will not set a link speed to its
-paravirtualized NICs.  This will be seen as -1 in the ethernet layer, and
-when some servers (e.g. samba) fetches it, it's converted to an unsigned
-value (and multiplied by 1000 * 1000), so in client side we end up with:
+Rishabh Bhatnagar <risbhat@amazon.com> writes:
 
-1)      Speed: 4294967295000000 bps
+> Recently we have been seeing kernel panic in cifs_reconnect function
+> while accessing tgt_list. Looks like tgt_list is not initialized
+> correctly. There are fixes already present in 5.10 and later trees.
+> Backporting them to 5.4
+>
+>  CIFS VFS: \\172.30.1.14 cifs_reconnect: no target servers for DFS
+>  failover
+>  BUG: unable to handle page fault for address: fffffffffffffff8
+>  #PF: supervisor read access in kernel mode
+>  #PF: error_code(0x0000) - not-present page
+>  PGD 260e067 P4D 260e067 PUD 2610067 PMD 0
+>  Oops: 0000 [#1] SMP PTI
+>  RIP: 0010:cifs_reconnect+0x51d/0xef0 [cifs]
+>  RSP: 0018:ffffc90000693da0 EFLAGS: 00010282
+>  RAX: fffffffffffffff8 RBX: ffff8887fa63b800 RCX: fffffffffffffff8
+>  Call Trace:
+>  cifs_handle_standard+0x18d/0x1b0 [cifs]
+>  cifs_demultiplex_thread+0xa5c/0xc90 [cifs]
+>  kthread+0x113/0x130
+>
+> Paulo Alcantara (2):
+>   cifs: get rid of unused parameter in reconn_setup_dfs_targets()
+>   cifs: handle empty list of targets in cifs_reconnect()
+>
+>  fs/cifs/connect.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 
-in DebugData.
-
-This patch uses phy_speed_to_str() if interface speed is between SPEED_10
-and SPEED_800000, and print "Unknown" otherwise.
-
-The reason to not change the value in iface->speed is because we don't
-know the real speed of the HW backing the server NIC, so let's keep
-considering these as the fastest NICs available.
-
-Also print "Capabilities: None" when the interface doesn't support any.
-
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- fs/smb/client/cifs_debug.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 5034b862cec2..4a04b40bd7b3 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -12,6 +12,7 @@
- #include <linux/module.h>
- #include <linux/proc_fs.h>
- #include <linux/uaccess.h>
-+#include <linux/phy.h>
- #include "cifspdu.h"
- #include "cifsglob.h"
- #include "cifsproto.h"
-@@ -152,12 +153,15 @@ cifs_dump_iface(struct seq_file *m, struct cifs_server_iface *iface)
- 	struct sockaddr_in *ipv4 = (struct sockaddr_in *)&iface->sockaddr;
- 	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)&iface->sockaddr;
- 
--	seq_printf(m, "\tSpeed: %zu bps\n", iface->speed);
-+	seq_printf(m, "\tSpeed: %s\n", (iface->speed > SPEED_10 && iface->speed < SPEED_800000) ?
-+				       phy_speed_to_str(iface->speed) : "Unknown");
- 	seq_puts(m, "\t\tCapabilities: ");
- 	if (iface->rdma_capable)
- 		seq_puts(m, "rdma ");
- 	if (iface->rss_capable)
- 		seq_puts(m, "rss ");
-+	if (!iface->rdma_capable && !iface->rss_capable)
-+		seq_puts(m, "None");
- 	seq_putc(m, '\n');
- 	if (iface->sockaddr.ss_family == AF_INET)
- 		seq_printf(m, "\t\tIPv4: %pI4\n", &ipv4->sin_addr);
--- 
-2.40.1
-
+Looks good.
