@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E986DC87FE2
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Jun 2023 12:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1537BC87FE7
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Jun 2023 12:51:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241063AbjFIMvN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Jun 2023 08:51:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52472 "EHLO
+        id S241095AbjFIMvO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Jun 2023 08:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240874AbjFIMuq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Jun 2023 08:50:46 -0400
+        with ESMTP id S240196AbjFIMux (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Jun 2023 08:50:53 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6C6B2D4A;
-        Fri,  9 Jun 2023 05:50:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CAFE210A;
+        Fri,  9 Jun 2023 05:50:52 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 43137657CE;
-        Fri,  9 Jun 2023 12:50:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99BB7C433EF;
-        Fri,  9 Jun 2023 12:50:41 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DDFE3657D4;
+        Fri,  9 Jun 2023 12:50:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42A75C433A1;
+        Fri,  9 Jun 2023 12:50:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686315044;
-        bh=C+VzTLw0w0g9nKyYEhFUZrnWGPtk5Bk31eEt6nAAZUA=;
+        s=k20201202; t=1686315051;
+        bh=cBVsyVfj6l6TtKR74yV1q9ouP+rbYNbmg05dYGBxQN8=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=UU0QSo/Tqesjy1sfws4iEFGWbc1aWk7WgTcqFHMP/zkXRbTbKg0RIhASJtBj0wj/O
-         94UxGVPWvkUD+lTjh8/pd9mgd1ex2niBDqkSUwU+jS16RmnnrWCOT/J0GvLH9xwn8C
-         BWzjzjXPlcUgnEi0SDC56NVC06LBeyXGg6z3Fob14cqan5Np7tRBERq4mJuL79nS7v
-         Kv7LWrkcvSwg+6rEeEQkQa2rllPcEmFCl68BWQbd5nrPmAAZiPR8xyXyYEVnXiwVi1
-         Ili690n+HfGsH7jEd0Ri/5bbF4tHd8uY0r4EgtCH5FoE3k5hfztlZN3zrioC5MCzG1
-         OdbuqepssoZhg==
+        b=OPjGeiMhYDQoZwI7Ze3bfAqmmmVAPj3CpAIoXuPGdjrMrVrfc5DSkRVYD2wyAl/kK
+         Ixwqi2npxrUzFq5SxF94ZwcGV0ltTD+QLRx3Knz1x7TOy182BSKG1rEeqJfGjVAOy9
+         wi48nNRw4FNWyZvwtM+VX2NP85msXAc+rFJucTMQwJwBn/A83lVR3TJjobh2YLN3Qr
+         qd4Wsy/9jJMaXkQAIMtXnmK+aMxIrtCwbwbye0cQg5iEWq3x2EDolvlSo31O2BjkYE
+         FuttZiEldqMhsdNp6l39ZK+otEmEiQwn2ej+2FBTOtxAqfhG86FJUtqyPFNSQgYOqF
+         EcqwaNGGKnJbg==
 From:   Jeff Layton <jlayton@kernel.org>
 To:     Christian Brauner <brauner@kernel.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
@@ -63,9 +63,9 @@ To:     Christian Brauner <brauner@kernel.org>,
         linux-fsdevel@vger.kernel.org, cluster-devel@redhat.com,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
         apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org
-Subject: [PATCH 5/9] efivarfs: update ctime when mtime changes on a write
-Date:   Fri,  9 Jun 2023 08:50:19 -0400
-Message-Id: <20230609125023.399942-6-jlayton@kernel.org>
+Subject: [PATCH 7/9] gfs2: update ctime when quota is updated
+Date:   Fri,  9 Jun 2023 08:50:21 -0400
+Message-Id: <20230609125023.399942-8-jlayton@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230609125023.399942-1-jlayton@kernel.org>
 References: <20230609125023.399942-1-jlayton@kernel.org>
@@ -77,22 +77,22 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- fs/efivarfs/file.c | 2 +-
+ fs/gfs2/quota.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/efivarfs/file.c b/fs/efivarfs/file.c
-index d57ee15874f9..375576111dc3 100644
---- a/fs/efivarfs/file.c
-+++ b/fs/efivarfs/file.c
-@@ -51,7 +51,7 @@ static ssize_t efivarfs_file_write(struct file *file,
- 	} else {
- 		inode_lock(inode);
- 		i_size_write(inode, datasize + sizeof(attributes));
--		inode->i_mtime = current_time(inode);
-+		inode->i_mtime = inode->i_ctime = current_time(inode);
- 		inode_unlock(inode);
+diff --git a/fs/gfs2/quota.c b/fs/gfs2/quota.c
+index 1ed17226d9ed..6d283e071b90 100644
+--- a/fs/gfs2/quota.c
++++ b/fs/gfs2/quota.c
+@@ -869,7 +869,7 @@ static int gfs2_adjust_quota(struct gfs2_inode *ip, loff_t loc,
+ 		size = loc + sizeof(struct gfs2_quota);
+ 		if (size > inode->i_size)
+ 			i_size_write(inode, size);
+-		inode->i_mtime = inode->i_atime = current_time(inode);
++		inode->i_mtime = inode->i_atime = inode->i_ctime = current_time(inode);
+ 		mark_inode_dirty(inode);
+ 		set_bit(QDF_REFRESH, &qd->qd_flags);
  	}
- 
 -- 
 2.40.1
 
