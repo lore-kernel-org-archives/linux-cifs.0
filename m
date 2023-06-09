@@ -2,133 +2,113 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0D4DC7EE29
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Jun 2023 05:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 184BBC83005
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Jun 2023 12:51:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbjFIFHJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Jun 2023 01:07:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53226 "EHLO
+        id S240429AbjFIMui (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Jun 2023 08:50:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjFIFHH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Jun 2023 01:07:07 -0400
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2105.outbound.protection.outlook.com [40.107.255.105])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC3C1984;
-        Thu,  8 Jun 2023 22:06:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f/ve0L86bbJZ83j8DSAB/guJuHqJvVuDMwOM7tPcH8sVW7ZacsWPex+csSkaQI9KcFgFTNQIciz6JO5hFY5o1kJhpwjyR5GuNPl/8ktBNXe0f3XKsOoMA3Pk+l4NUaRdSzhIZ1NWmwu3+96k44kz4KKVMHROR1nTeYh4sJEGDdp3CYPS3aEuYmIYMprrwI6ruPnWorDbuJeQ1RaQAl+KdVzmdWihKw3T6+hefC+JIQoP1USI0T0ko/NAK3PLOIzabLnXfsalP8u7EPRULi+98CjxHM7WkPaihU9K3oEPE6jyzA6nXzxwm6tVZloosLSREkyEKwL48Hc3Y7V8ruyz6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=naFHnu4NozN3tzktJ2dc0Buu5Hkl/08DjfQw7Lv0JFU=;
- b=gPtcFCeCLSvro+ixVTxC3pA9psp5lI/AO2KRV4QYAfSk5aLW/qOhGDeWzA+h4Auio2qedaKdACA/5O69de1/P1mJ5593T/8jKzr0cbF5x2mQGQVTDskrvsD9bNeqeKbsFIiRgJIzikv/gdq79yWucMSS+P1mEWpP9qO4YY1Yss+7HLwKkLIpklXN4B8e29RgsygiBtAjrTewrL/LKH6pWQf1TqzucBl5BVdV773J3K4zHwPfvAKL82DqRMHiRZgDrs0Nria865dJPDTQiZV04oJ9Iru2uoqzCEM+cG6R0Bj8AdpUlS9fGRoYTW/Mut9ZUca2di3NFMwx4Ov2gfDZuw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=naFHnu4NozN3tzktJ2dc0Buu5Hkl/08DjfQw7Lv0JFU=;
- b=cHGISQklVAW5WTCtgzvKSU6o/gbD5gSoqJXTRzOeTGAH3uP5xTRz0nDcPpUz1ETNCXUOr1ev4vmmLAqC7wXvDzAwWUJiw/6RxnMPTHHTEPCHT5w598amfW8ZD2STtdqGIhLBe0mFKjQZVyhaWMrB5zVxS80VnxiLfRyfLHRQV9g6Vp6xxXdWaLeqOkDRjbTtADi0nQZJ/1k6iNRkvzwbyGqOcnDuEoudvHoIiUmgRkN5NXnO1aiSTLNhyiexcd2qTyAvlg28T4C7S65DBO/CMbnQlY5oU2znl1YfzFuRFbxuSDq2EDymMnVhb49mkaoFk80yrYWOV5gDHGI3oInTQw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from TYZPR06MB6697.apcprd06.prod.outlook.com (2603:1096:400:451::6)
- by SEYPR06MB5301.apcprd06.prod.outlook.com (2603:1096:101:82::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Fri, 9 Jun
- 2023 05:06:50 +0000
-Received: from TYZPR06MB6697.apcprd06.prod.outlook.com
- ([fe80::f652:a96b:482:409e]) by TYZPR06MB6697.apcprd06.prod.outlook.com
- ([fe80::f652:a96b:482:409e%5]) with mapi id 15.20.6455.030; Fri, 9 Jun 2023
- 05:06:50 +0000
-From:   Lu Hongfei <luhongfei@vivo.com>
-To:     Namjae Jeon <linkinjeon@kernel.org>,
+        with ESMTP id S240758AbjFIMua (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Jun 2023 08:50:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1446E272A;
+        Fri,  9 Jun 2023 05:50:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A053B65489;
+        Fri,  9 Jun 2023 12:50:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04CB9C433EF;
+        Fri,  9 Jun 2023 12:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686315028;
+        bh=gIZwlLvY4sTdkvZELuapNhoOFzzZExwAnWiPWsxbXHo=;
+        h=From:To:Subject:Date:From;
+        b=dcwqOrVfEIufAkx9HYctn0bCPuNyn/IoA3qeRLEf0QBZaM2ZxNK4fITHocjWjP+BS
+         ArXA2HvHcNMCbQoCJLgk3YNktWjq5smDP0btfPqHdZkDkaNlMvMKacJZXz5oGbyybS
+         Seh3kB1aYVkF1EaQIzj0KMYE2IM8/UE/RnW4K8gKxJc+5U/2OtM1xACvDi/T8P0Pdc
+         Xkm13/IgUo3Vr5PsmuoEohjK9wBWC2RLrPIKKbIGloomJhioPPXWTe43kEqN5X837K
+         nGxIOrekLqpwpPCILVczWkex/Sm2OoMe1QXBZj99WR32Ho0RhbyqroHBCWw41oCA3r
+         Vj6GOBo2c2fNw==
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Christian Brauner <brauner@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Brad Warrum <bwarrum@linux.ibm.com>,
+        Ritu Agarwal <rituagar@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ian Kent <raven@themaw.net>,
+        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+        Jeremy Kerr <jk@ozlabs.org>, Ard Biesheuvel <ardb@kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sungjong Seo <sj1557.seo@samsung.com>,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
         Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
         Tom Talpey <tom@talpey.com>,
-        linux-cifs@vger.kernel.org (open list:KERNEL SMB3 SERVER (KSMBD)),
-        linux-kernel@vger.kernel.org (open list)
-Cc:     opensource.kernel@vivo.com, luhongfei@vivo.com
-Subject: [PATCH] fs: smb: server: Replace the ternary conditional operator with min()
-Date:   Fri,  9 Jun 2023 13:06:36 +0800
-Message-Id: <20230609050636.27669-1-luhongfei@vivo.com>
-X-Mailer: git-send-email 2.39.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYWP286CA0011.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:178::18) To TYZPR06MB6697.apcprd06.prod.outlook.com
- (2603:1096:400:451::6)
+        John Johansen <john.johansen@canonical.com>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Ruihan Li <lrh2000@pku.edu.cn>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        autofs@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, cluster-devel@redhat.com,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org
+Subject: [PATCH 0/9] fs: add some missing ctime updates
+Date:   Fri,  9 Jun 2023 08:50:14 -0400
+Message-Id: <20230609125023.399942-1-jlayton@kernel.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TYZPR06MB6697:EE_|SEYPR06MB5301:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5be0bd39-1ba5-4df7-e17f-08db68a75521
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HMmiiyeWfCrtEZY9PqvvSK11D8Xl40awdfjlJVZTIkQCPdBKNcMcaYsPDJMZNgLNTvZRh6Mq4cJqJl/DuNO04eP4JdMTzwQzgEAddpnvILutvdpZFz/4fdmwIFw2pATPF9Hx0SkRAEoQvNXPKTQL8TyHtsAG7qb7NTP9HAreNMw/sZHp/8U7dUIsuiOTFdh24b5dP3+aqHNEZGNt2adYUwe03Tucy7NSY5wXI7fzmJU4xSAY/izuHk7lrvhUvq3kozQCLQ79Slvs0I1SWksSqyVCQyUDw5eYZ3vVQLK3aodHlXKFB7IF51U0O2bm/T/6iNuubRhBup3VvQUjD5OSA2IHAXawfBqljOFM+GTxxm3CIZILu+LaaZhLqAMWLNMaddwDaGwP4VRYqJLeSiUI46lUWPgQpYyKu+rX2EGtbbzu1Yeu3zBD4xAXiN3520VBldf/nfbOq0a2YAsH/0XDElqjJ/UWqry7jN63BrDOeexyMmeLWRChAeOWw2uGgtfYnIEGqbv1dzQfjCJKxhEOAPB3QtA9p7JFoyLbIwpO6dFS7UoeLcf4ozcZybeveO69c4sc9xTssAuw3FkNlTSug51+WJWzTdMwCvXG9djnhEjoJzEIac41oPZcungP3DMQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR06MB6697.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(346002)(396003)(39860400002)(366004)(451199021)(66946007)(66476007)(66556008)(8936002)(8676002)(4326008)(107886003)(316002)(110136005)(2906002)(41300700001)(4744005)(478600001)(5660300002)(52116002)(6486002)(6512007)(26005)(6506007)(1076003)(83380400001)(6666004)(186003)(2616005)(86362001)(36756003)(38350700002)(38100700002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xXd9iQezmAnwXXWwr+oduc/quJjeqbFfUx/f8LqZz8cXNXVN97BRdhHIQU4n?=
- =?us-ascii?Q?uQ94qOf9XqnkmkCizumQ4Jutdd6ar+J6NBDxtFJ2GDtDITDgshpQQjCuQGBd?=
- =?us-ascii?Q?09zfOkkuC54DKGrx0TuxbHfl+t5W71AutCBKPqMvvwchz/YvOmmb7VEUnh4j?=
- =?us-ascii?Q?YYccPxmlDnDz863Eem/+mZ4osL2FCnMtSbOVcy7+EWnT1MZ91M01DjCUJESO?=
- =?us-ascii?Q?K25ScxGLoHfxHLs/lx4h2oHracUr2aPsdeUddFiNxZu6o3mi3QdeXMjYL/km?=
- =?us-ascii?Q?+38RHdvQmWBsneV3vpotoAaQYxGzMJpKVngATs5xaIF4KJh2Av2YgTUvzVpW?=
- =?us-ascii?Q?YQTlOT/417aoIVoBwG7HI3z830oxP80jC4jdi7dBx/3zoUEGBdTQXbLQM5SA?=
- =?us-ascii?Q?dJtTlh/GI/x6sbtf5Jx0V14Md/0GBin8LnrtKs4OaSqbRXUrnvN8U5V3qos6?=
- =?us-ascii?Q?tE/8DYnSc+GGiQ2Vm2QUvvAzmwYJeVm7l34bdg6Tk1/o5CJDh7fU+66NJZ41?=
- =?us-ascii?Q?mW6wCPBYocIbuipFHEu4duUsjQWnl/XtipXWK62trqHGCc21cE2gd/O0cc7W?=
- =?us-ascii?Q?5u/BF/wHLHerk2Pe8EnwcYlJudhFUmSjqWlxilq02XhON7IdBW7dkoDXbuFu?=
- =?us-ascii?Q?3RXcpPG2k2+z5URPj9mxUL9lboerDY/Jj6ay0GzieLps4aqYfsVmXrRfTKBB?=
- =?us-ascii?Q?47Auqru71cgs/pAniTpF93GT+mWPSGmVaDzHuW8lenYEqq3OKnojsHh7HMQT?=
- =?us-ascii?Q?Ex7lfppmy8u2uX5pS5hht7xdxhDaz2j2waXwF9klmq28QYFqXzMNtfeEOQZ3?=
- =?us-ascii?Q?o/nJ4FDYOYLJG7+uUDvVP/OeTkT5NpaxhIVmWVZrmZf1RM7qL8/X5yPZF7IL?=
- =?us-ascii?Q?8XHRkkiPEs2Dlqx0FfvtWyjFntAiQoXYOPBuNbgjnnoYqmcgZ1UQZMfjNUuP?=
- =?us-ascii?Q?O8iXC0hOp6DAN1uJwXydvG8aWrhR7N+Uf19tMgVjY/9XNXEG1JQj0PnYf7Mn?=
- =?us-ascii?Q?U1hHxJW+iojB4oxXTbjqH9OlQ0GzoIQIPJG7FF57d8NQVQGyt9eb6bzy3uFB?=
- =?us-ascii?Q?QnGw/zJVrRu3RZkH2kSZHxi/3dBFoT+GlskAzBNs7Ztec8st79XSsU65owXs?=
- =?us-ascii?Q?Z1WzCriE5O1xYmZVx2ngiQXfrgctqKo5IeCu3HhyneQYtjLhOjgTeigA7wuy?=
- =?us-ascii?Q?B/5aAkhZIA0vIS4YOzv0kxo8IZzW6TkmQFDmibnef42pphxdBVQN8Abma0rA?=
- =?us-ascii?Q?E7PzUqt7jYeTk0TZWxQTtjHT7lFpHMmo0IWz9bZiYiJxIsY8aDnNY22mxtfk?=
- =?us-ascii?Q?pD/eT7li8v1K3VHmw90luaDbw2DycVwlBFlxeLE4XUzHk8UddnJKQ2SUfFSe?=
- =?us-ascii?Q?McdYQZZ5kHq9FMzfH5R4RXVRgedDrA1N6w0XYPdiqGZ+RZM8gb1go8jrrPMt?=
- =?us-ascii?Q?qlYtACtAnLed+BB6AaT8D+kMZMIb9qur7DNARlU6uthhGGBe0MnlHuHHzT7F?=
- =?us-ascii?Q?GyKyZQCYWG86uAayucrYn3FYlsCSbI1A9qVU/RVf1LKzlDtlFHCsPcDP94zh?=
- =?us-ascii?Q?N/njBU24lOhPyrFeOeQg/XgRCepmj1oDsaX3icbr?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5be0bd39-1ba5-4df7-e17f-08db68a75521
-X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB6697.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jun 2023 05:06:50.2705
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RuJat0taSjgvzWcK7X5JbZwU8Tl7469+pJmFXheOmmENadzweI9rVfi1fjQUQFn3Wepm9FLBxhWt5vwRDpzsDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR06MB5301
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-It would be better to replace the traditional ternary conditional
-operator with min() in compare_sids.
+While working on a patch series to change how we handle the ctime, I
+found a number of places that update the mtime without a corresponding
+ctime update. POSIX requires that when the mtime is updated that the
+ctime also be updated.
 
-Signed-off-by: Lu Hongfei <luhongfei@vivo.com>
----
- fs/smb/server/smbacl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Note that these are largely untested other than for compilation, so
+please review carefully. These are a preliminary set for the upcoming
+rework of how we handle the ctime.
 
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 0a5862a61c77..a93ae72fe4ef
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -97,7 +97,7 @@ int compare_sids(const struct smb_sid *ctsid, const struct smb_sid *cwsid)
- 	/* compare all of the subauth values if any */
- 	num_sat = ctsid->num_subauth;
- 	num_saw = cwsid->num_subauth;
--	num_subauth = num_sat < num_saw ? num_sat : num_saw;
-+	num_subauth = min(num_sat, num_saw);
- 	if (num_subauth) {
- 		for (i = 0; i < num_subauth; ++i) {
- 			if (ctsid->sub_auth[i] != cwsid->sub_auth[i]) {
+None of these seem to be very crucial, but it would be nice if
+various maintainers could pick these up for v6.5. Please let me know if
+you do.
+
+Jeff Layton (9):
+  ibmvmc: update ctime in conjunction with mtime on write
+  usb: update the ctime as well when updating mtime after an ioctl
+  autofs: set ctime as well when mtime changes on a dir
+  bfs: update ctime in addition to mtime when adding entries
+  efivarfs: update ctime when mtime changes on a write
+  exfat: ensure that ctime is updated whenever the mtime is
+  gfs2: update ctime when quota is updated
+  apparmor: update ctime whenever the mtime changes on an inode
+  cifs: update the ctime on a partial page write
+
+ drivers/misc/ibmvmc.c             |  2 +-
+ drivers/usb/core/devio.c          | 16 ++++++++--------
+ fs/autofs/root.c                  |  6 +++---
+ fs/bfs/dir.c                      |  2 +-
+ fs/efivarfs/file.c                |  2 +-
+ fs/exfat/namei.c                  |  8 ++++----
+ fs/gfs2/quota.c                   |  2 +-
+ fs/smb/client/file.c              |  2 +-
+ security/apparmor/apparmorfs.c    |  7 +++++--
+ security/apparmor/policy_unpack.c | 11 +++++++----
+ 10 files changed, 32 insertions(+), 26 deletions(-)
+
 -- 
-2.39.0
+2.40.1
 
