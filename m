@@ -2,57 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB1EC7EE29
-	for <linux-cifs@archiver.kernel.org>; Sat, 10 Jun 2023 19:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C9EC7EE29
+	for <linux-cifs@archiver.kernel.org>; Sat, 10 Jun 2023 19:48:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbjFJTpq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 10 Jun 2023 15:45:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35654 "EHLO
+        id S229675AbjFJTs6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 10 Jun 2023 15:48:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbjFJTpq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 10 Jun 2023 15:45:46 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1122D5F
-        for <linux-cifs@vger.kernel.org>; Sat, 10 Jun 2023 12:45:44 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b1a4250b07so33038051fa.3
-        for <linux-cifs@vger.kernel.org>; Sat, 10 Jun 2023 12:45:44 -0700 (PDT)
+        with ESMTP id S229436AbjFJTs6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 10 Jun 2023 15:48:58 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BC930ED
+        for <linux-cifs@vger.kernel.org>; Sat, 10 Jun 2023 12:48:57 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b1a4250b07so33066071fa.3
+        for <linux-cifs@vger.kernel.org>; Sat, 10 Jun 2023 12:48:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686426342; x=1689018342;
+        d=gmail.com; s=20221208; t=1686426535; x=1689018535;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/hxlwrjczMNQQihwKUFPYs4MHmUJg367619b/acktd4=;
-        b=JQbnSemfUxB9fjuSawLG9rGcFSr7bxsH3fu5Xfw+35Rrs8S8GaHoOaZ2LB6UIde4xd
-         xsIruudJmACuN7pRVx4E+oaZ1IMmYKCU0Tg0nS1dHMmponckhYL3PYsRplEqbS4sd70m
-         UWMAUIxjy7zKJW/7v3oosMhgK8KiivkbKrI8WaAEqRva5dizZuS1nG+Ju0iBOkxrwVDj
-         rm+jWqe3Cc8kfBSfQ/hI0ak0yzmDV6g1tJFXokf//xkn5NyvaY/UcQTN8qlMB5x6VyP7
-         TPT4h/fxvt6jH7ScsP/15+jdmq9mwVhWm5GPzfpA4c1FD0sFe5RITEoq4Avxs/U7z2ic
-         V26g==
+        bh=TEJ3+4vry4wwUKJ2Ebt6Wa7IFspgaPgPW1O4mrIUTlU=;
+        b=nh2fgUKgz1QxzSmkQIxcuuFVezv7UPPFlH6gn/xDJkHPfCBw6wit/VEegc0qX/ZkDy
+         OnXlEfXL65RSShwHVFOnfl07FYQ6AWfE2OCvsAndM284EtP5CY2dLisyVwkTP9wjYFgv
+         poiG+/yqesL6FtbXLNWj9kKA+uC17xdfcNtnQRvVfca9lwCUaLwITztocamBGTtd+Mls
+         WlCuIs0YePUiPGswuJhIPb4+g6CSPnAatSIHUQBewTB93MmEzGX5GGrar4pZyLTMwmEj
+         jZG7IdgeQdel1yJHr+hVqRvqDeS2jkB4szjF6gBh0WJPmBzkiiJCqCv9EomSUZ0rUIrE
+         5z4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686426342; x=1689018342;
+        d=1e100.net; s=20221208; t=1686426535; x=1689018535;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/hxlwrjczMNQQihwKUFPYs4MHmUJg367619b/acktd4=;
-        b=TGVD0Sab3FkVoNZyIZcXKhEAfTbTcv+soF1HzcR+a5CPFmbUyqMpfVPMwvlcLM78pW
-         mpFBiDi6PunYGtFrSnr+HcnlD6CLSJ5w+pdhuyqE2CJGXrpAXlWB8AtZZQ9H6zLuZNAF
-         2Yiow75/UI1dw+6BNo72JL3jlzmCSQ1oZuqsPSQEX+9Nhdsc4HmHE9Z4iHPhfKL3rGDj
-         Xa/3l9Rjc2sS3MsSwGPk8mrSzolQgcTq4aKLlOnWX0MJwElOQfT+iHpcDdZdrhn4RLY+
-         /6KOKeoOyFxw4t+x0XGdjbMl4XKV8jyG0nMyoaC4VRB+o3LGlVCrHUThDja4pfqviNDI
-         BVqA==
-X-Gm-Message-State: AC+VfDwWXo+MJaI0BJf8ZsRsirmqRaNDiwEi0X1ZYdstcuTX/B5O1ZRA
-        f/2Ip/WH+iAh+cL+5bXlOX8nfRlk1k2BSHrQlXzmipM+h64=
-X-Google-Smtp-Source: ACHHUZ5ih/bAR0dmfadih5BMp6krsHO75f6I2z4ww4W701CsMHVQc4qsNl4OCO/a/AKvU8Ib01NDUyLzAzBdsIslhCg=
-X-Received: by 2002:a2e:a0d3:0:b0:2b1:d4fc:75f2 with SMTP id
- f19-20020a2ea0d3000000b002b1d4fc75f2mr836659ljm.7.1686426342216; Sat, 10 Jun
- 2023 12:45:42 -0700 (PDT)
+        bh=TEJ3+4vry4wwUKJ2Ebt6Wa7IFspgaPgPW1O4mrIUTlU=;
+        b=X8mWavxFApzMDwDye7QQN+58pkY/kAjtyo5+VLxDwCLLs/WaiVFJBSgTNxWVYPElwT
+         Z09wUXx3U4DO8p7ElPBwYizYix0DMIA3Y3DYb1R471o5CI377OvYoQyD9u3ykaHz5hYu
+         SpfTb/zDDr8mmMX5RnVefymC54qZU9gKUhcsSnJZuhxavNZKUup441w38sGlind8AcQQ
+         Pp2cbT40SBRnp0p0c9uaZuecBnle9a9VcwbdurjrA5ctMt5+9KBxZxEQQz18vHsm2tqS
+         jTnrU3rrpQ6G6HNtug4Xfgn6CmVEg7PJ3VnSzHcOv60iLcwwN5g1Mqg3R5eItVQut312
+         o42A==
+X-Gm-Message-State: AC+VfDxbZ7inoceUm0Bl9AwkwnJP1JQAF13IEcSPvuhoFfvP+PgqNiNl
+        OIjm1WEsoBUMHSFg8nDwzCLwG4eFqXW+wFjSzEw=
+X-Google-Smtp-Source: ACHHUZ420mg0dlTLrzLLSXmgawcB5wMhphXZUr59I3wqpSA88f/Ijafk+ERxGNwwhqlqrkDk7dyGar6igXrrF3Me5ew=
+X-Received: by 2002:a2e:8097:0:b0:2b1:bb66:7b69 with SMTP id
+ i23-20020a2e8097000000b002b1bb667b69mr821149ljg.32.1686426534987; Sat, 10 Jun
+ 2023 12:48:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230609174659.60327-1-sprasad@microsoft.com>
-In-Reply-To: <20230609174659.60327-1-sprasad@microsoft.com>
+References: <20230609174659.60327-1-sprasad@microsoft.com> <20230609174659.60327-2-sprasad@microsoft.com>
+In-Reply-To: <20230609174659.60327-2-sprasad@microsoft.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 10 Jun 2023 14:45:31 -0500
-Message-ID: <CAH2r5ms-4CiFHS3nftNqkTLopF+AoJPYr-Yz5wpvfCV3Xe+9Mg@mail.gmail.com>
-Subject: Re: [PATCH 1/6] cifs: fix status checks in cifs_tree_connect
+Date:   Sat, 10 Jun 2023 14:48:44 -0500
+Message-ID: <CAH2r5ms6tuYjPCdxhrmaRdOQ6CXKA4_1RRNT9Q77xweW4bfeHg@mail.gmail.com>
+Subject: Re: [PATCH 2/6] cifs: print all credit counters in DebugData
 To:     Shyam Prasad N <nspmangalore@gmail.com>
 Cc:     linux-cifs@vger.kernel.org, pc@cjr.nz, bharathsm.hsk@gmail.com,
         tom@talpey.com, Shyam Prasad N <sprasad@microsoft.com>
@@ -62,78 +62,64 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next
+tentatively merged into cifs-2.6.git for-next pending additional testing
 
 On Fri, Jun 9, 2023 at 12:47=E2=80=AFPM Shyam Prasad N <nspmangalore@gmail.=
 com> wrote:
 >
-> The ordering of status checks at the beginning of
-> cifs_tree_connect is wrong. As a result, a tcon
-> which is good may stay marked as needing reconnect
-> infinitely.
+> Output of /proc/fs/cifs/DebugData shows only the per-connection
+> counter for the number of credits of regular type. i.e. the
+> credits reserved for echo and oplocks are not displayed.
 >
-> Fixes: 2f0e4f034220 ("cifs: check only tcon status on tcon related functi=
-ons")
+> There have been situations recently where having this info
+> would have been useful. This change prints the credit counters
+> of all three types: regular, echo, oplocks.
+>
 > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 > ---
->  fs/smb/client/connect.c | 9 +++++----
->  fs/smb/client/dfs.c     | 9 +++++----
->  2 files changed, 10 insertions(+), 8 deletions(-)
+>  fs/smb/client/cifs_debug.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 >
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index 8e9a672320ab..1250d156619b 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -4086,16 +4086,17 @@ int cifs_tree_connect(const unsigned int xid, str=
-uct cifs_tcon *tcon, const stru
+> diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+> index 5034b862cec2..17c884724590 100644
+> --- a/fs/smb/client/cifs_debug.c
+> +++ b/fs/smb/client/cifs_debug.c
+> @@ -130,12 +130,14 @@ cifs_dump_channel(struct seq_file *m, int i, struct=
+ cifs_chan *chan)
+>         struct TCP_Server_Info *server =3D chan->server;
 >
->         /* only send once per connect */
->         spin_lock(&tcon->tc_lock);
-> +       if (tcon->status =3D=3D TID_GOOD) {
-> +               spin_unlock(&tcon->tc_lock);
-> +               return 0;
-> +       }
-> +
->         if (tcon->status !=3D TID_NEW &&
->             tcon->status !=3D TID_NEED_TCON) {
->                 spin_unlock(&tcon->tc_lock);
->                 return -EHOSTDOWN;
->         }
->
-> -       if (tcon->status =3D=3D TID_GOOD) {
-> -               spin_unlock(&tcon->tc_lock);
-> -               return 0;
-> -       }
->         tcon->status =3D TID_IN_TCON;
->         spin_unlock(&tcon->tc_lock);
->
-> diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-> index 2f93bf8c3325..2390b2fedd6a 100644
-> --- a/fs/smb/client/dfs.c
-> +++ b/fs/smb/client/dfs.c
-> @@ -575,16 +575,17 @@ int cifs_tree_connect(const unsigned int xid, struc=
-t cifs_tcon *tcon, const stru
->
->         /* only send once per connect */
->         spin_lock(&tcon->tc_lock);
-> +       if (tcon->status =3D=3D TID_GOOD) {
-> +               spin_unlock(&tcon->tc_lock);
-> +               return 0;
-> +       }
-> +
->         if (tcon->status !=3D TID_NEW &&
->             tcon->status !=3D TID_NEED_TCON) {
->                 spin_unlock(&tcon->tc_lock);
->                 return -EHOSTDOWN;
->         }
->
-> -       if (tcon->status =3D=3D TID_GOOD) {
-> -               spin_unlock(&tcon->tc_lock);
-> -               return 0;
-> -       }
->         tcon->status =3D TID_IN_TCON;
->         spin_unlock(&tcon->tc_lock);
->
+>         seq_printf(m, "\n\n\t\tChannel: %d ConnectionId: 0x%llx"
+> -                  "\n\t\tNumber of credits: %d Dialect 0x%x"
+> +                  "\n\t\tNumber of credits: %d,%d,%d Dialect 0x%x"
+>                    "\n\t\tTCP status: %d Instance: %d"
+>                    "\n\t\tLocal Users To Server: %d SecMode: 0x%x Req On =
+Wire: %d"
+>                    "\n\t\tIn Send: %d In MaxReq Wait: %d",
+>                    i+1, server->conn_id,
+>                    server->credits,
+> +                  server->echo_credits,
+> +                  server->oplock_credits,
+>                    server->dialect,
+>                    server->tcpStatus,
+>                    server->reconnect_instance,
+> @@ -350,8 +352,11 @@ static int cifs_debug_data_proc_show(struct seq_file=
+ *m, void *v)
+>                         atomic_read(&server->smbd_conn->mr_used_count));
+>  skip_rdma:
+>  #endif
+> -               seq_printf(m, "\nNumber of credits: %d Dialect 0x%x",
+> -                       server->credits,  server->dialect);
+> +               seq_printf(m, "\nNumber of credits: %d,%d,%d Dialect 0x%x=
+",
+> +                       server->credits,
+> +                       server->echo_credits,
+> +                       server->oplock_credits,
+> +                       server->dialect);
+>                 if (server->compress_algorithm =3D=3D SMB3_COMPRESS_LZNT1=
+)
+>                         seq_printf(m, " COMPRESS_LZNT1");
+>                 else if (server->compress_algorithm =3D=3D SMB3_COMPRESS_=
+LZ77)
 > --
 > 2.34.1
 >
