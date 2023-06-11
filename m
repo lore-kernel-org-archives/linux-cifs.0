@@ -2,101 +2,100 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E39BBC7EE29
-	for <linux-cifs@archiver.kernel.org>; Sat, 10 Jun 2023 19:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 570B4C77B7A
+	for <linux-cifs@archiver.kernel.org>; Sun, 11 Jun 2023 01:59:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbjFJTtg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 10 Jun 2023 15:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36008 "EHLO
+        id S229911AbjFKB7V (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 10 Jun 2023 21:59:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjFJTtf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 10 Jun 2023 15:49:35 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6D6530ED
-        for <linux-cifs@vger.kernel.org>; Sat, 10 Jun 2023 12:49:33 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4f624daccd1so3391232e87.0
-        for <linux-cifs@vger.kernel.org>; Sat, 10 Jun 2023 12:49:33 -0700 (PDT)
+        with ESMTP id S229677AbjFKB7U (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 10 Jun 2023 21:59:20 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D087CD9;
+        Sat, 10 Jun 2023 18:59:18 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b1afe57bdfso35244661fa.0;
+        Sat, 10 Jun 2023 18:59:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686426572; x=1689018572;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dhjem3loLcN8pTSS0k+ToFrbb8uUCXqf+dt4x9dBS5o=;
-        b=RYPcxciKZeE/4OzrV7ZlN/ULsNZRtvxlF0Cp3ihQKxaYrGSzHy8JnyOSjxxLDLe2jc
-         QqQcjB4duEp9W/JLsq6VY/fgjeKJBgzLrRSHvuO9I9M+nQ7fYoVDD/mUbNMwztYy5uZ2
-         GZFcU+pDKyeSt5PgA3iE7A/hbNiO6X71Elo1En3c9iBIDy8C6yEsygGhhA/qy24KWe7S
-         X5PQxot4P+UCWsfuP6pc3pFzUiqk5OAZAJ3Rc/gJf6pcHv+2y+XtnZQjE/6ckdQAI4eB
-         lB+3JwJ2g4nSArvp+XAuhpia23WeLwGEvVD+LL28MWU0txAHXAYJj/6g/n4H+iWjQ7nh
-         0MYg==
+        d=gmail.com; s=20221208; t=1686448757; x=1689040757;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LYs5rPa9oP57vlaop+owTExqq9+WAq3Isnwpx5mzptM=;
+        b=HW0T0k3XyB/TIhFtLRhqSaarGDJoXGHAAgFtPMcBHbX7mvZTEufbs6azhF0h9s7Uss
+         uuWsjOeMEaYoTDBuiAtUyPsMg4PigUKVoDolYpGWM+eZB9jnjOVas7Xoah331Xh4tcuH
+         0+W5BiDS9wbYzilMO+Gb7yehs+0k55hTMSLqnO7WNh1yqPn5yZYQKdVBO3D0nd6mEe+c
+         hLB02V2VKyevA/cV/se2m706JIdTZN1WJaXqXTYmN5ReARxhV0JtqzBRXjtjBc6a9pv/
+         HnFoSdhXK/4Bmdxq9L0VRyMMam1sPY6gbDwlPjBpQ5QaRh89bPw6Xq78zRBNKRragbpn
+         SSzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686426572; x=1689018572;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dhjem3loLcN8pTSS0k+ToFrbb8uUCXqf+dt4x9dBS5o=;
-        b=if+Yo6+oCP14+FD1JIpwtSvZV1/TDjWrSQ6b2FtTqNniG2QyVlAHkjYn+SIfazt0it
-         zNNW0G5jtCFRTlK4RNWe29E0142vhLWZw2mlzushmIp2u9AvuIWIwD3/OBN2IKn6xX4g
-         UnTQ04+ZNOHTBfnD09PaIrkkuT+NAT4x/2kqORHkBuyoM1nu8+eQSmog3GTtGUGGM1TV
-         3gs+kmzZ8nKXsokGD/I1fqDuYpSmsvBp+y+g+mBy4CgSBDf/ZsfQp9ByYt6yrsNN4bAr
-         eYTekVJTVQx71vPpg4EN0ZIGg/S+rgWnTVcNicCPpeVdnj6QIJ0/2+cPXG9I84zWzYbZ
-         NM9g==
-X-Gm-Message-State: AC+VfDxuo0tOBLXU1vQABdBWUEGbBBPE2AMru10ENtNBhOjtmof+8Ow1
-        dOrmKDLcJznMwmT9plz805YcEt5tQhg/xYGDLH8=
-X-Google-Smtp-Source: ACHHUZ6SUQpOmuNucicAzjs6+jN4nR21DMFJ1PE+vF8KVpv3QYMO677pDT3rIT5izmezJJPaJ6jx8IrRG0SDZzeN5LI=
-X-Received: by 2002:a19:770b:0:b0:4ec:a18e:f989 with SMTP id
- s11-20020a19770b000000b004eca18ef989mr1863074lfc.17.1686426571697; Sat, 10
- Jun 2023 12:49:31 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1686448757; x=1689040757;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LYs5rPa9oP57vlaop+owTExqq9+WAq3Isnwpx5mzptM=;
+        b=T3D6zMc0IsM2fSdc0kviumLdOXW8zv/mlBa7w1PiYHX16x6eq8UGZfE696sjz9KBfH
+         1ZYCSGoCrA4p56cMwDsvAIcvRq0LhbFeF21SXtmdpgnvv2G03tvDCWS100jaVuVSd438
+         jUEOzgFNlx7h7aJ2kAgghL0PCloatyu9q6pkY4920Ru/o26boSfzE3COtiNSwgzWAMMx
+         nh2dI41N4XqsjvVisaICLSdRtEOsTXHM+N08Qnqk1a7+usnelV9aUIqovZplZjeYLFEc
+         EpDUIAKpo/b+wRHkYA93TEsdKPrzmTpNXmMXLokGY28Bk/no4mSRWqrjwTg8NNtuJiP4
+         LgGQ==
+X-Gm-Message-State: AC+VfDyTyxO/4WfLIUs0C4NQmgCPiGvtMMdUrqyYzMKycw41jjeidKVe
+        8pbacbIH1uE8uwylNmCyUmm5LpzNbBYlF92q0KPnfGUvrTaqKA==
+X-Google-Smtp-Source: ACHHUZ5rWtll5ZRcBCEkIjsZYMx/SS+KmkNfmQkBVuC5FyWlRJQNE592UCLssDqUCOoc8iTizKA4GV2ZwMo4gIp1Sqk=
+X-Received: by 2002:ac2:4985:0:b0:4f3:a485:919a with SMTP id
+ f5-20020ac24985000000b004f3a485919amr2188425lfl.57.1686448756747; Sat, 10 Jun
+ 2023 18:59:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230609174659.60327-1-sprasad@microsoft.com> <20230609174659.60327-3-sprasad@microsoft.com>
-In-Reply-To: <20230609174659.60327-3-sprasad@microsoft.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 10 Jun 2023 14:49:20 -0500
-Message-ID: <CAH2r5mtKozDLH+y-6ASL1mb_v5g9=TxjekRGO=L_AxJjfhrKnQ@mail.gmail.com>
-Subject: Re: [PATCH 3/6] cifs: add a warning when the in-flight count goes negative
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     linux-cifs@vger.kernel.org, pc@cjr.nz, bharathsm.hsk@gmail.com,
-        tom@talpey.com, Shyam Prasad N <sprasad@microsoft.com>
+Date:   Sat, 10 Jun 2023 20:59:05 -0500
+Message-ID: <CAH2r5msURVv3pndri8KF4iL74L8PJjMO6Rd7sWDuLanpmmRffg@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-should this be a warn once? Could it get very noisy?
+Please pull the following changes since commit
+8828003759391029fc45c15ac346622cdae19b6d:
 
-On Fri, Jun 9, 2023 at 12:47=E2=80=AFPM Shyam Prasad N <nspmangalore@gmail.=
-com> wrote:
->
-> We've seen the in-flight count go into negative with some
-> internal stress testing in Microsoft.
->
-> Adding a WARN when this happens, in hope of understanding
-> why this happens when it happens.
->
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/smb2ops.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 6e3be58cfe49..43162915e03c 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -91,6 +91,7 @@ smb2_add_credits(struct TCP_Server_Info *server,
->                                             server->conn_id, server->host=
-name, *val,
->                                             add, server->in_flight);
->         }
-> +       WARN_ON(server->in_flight =3D=3D 0);
->         server->in_flight--;
->         if (server->in_flight =3D=3D 0 &&
->            ((optype & CIFS_OP_MASK) !=3D CIFS_NEG_OP) &&
-> --
-> 2.34.1
->
+  Merge tag '6.4-rc4-smb3-server-fixes' of git://git.samba.org/ksmbd
+(2023-06-01 08:27:34 -0400)
 
+are available in the Git repository at:
 
---=20
+  git://git.samba.org/ksmbd.git tags/6.4-rc5-smb3-server-fixes
+
+for you to fetch changes up to 1c1bcf2d3ea061613119b534f57507c377df20f9:
+
+  ksmbd: validate smb request protocol id (2023-06-02 12:30:57 -0500)
+
+----------------------------------------------------------------
+Five smb3 server fixes, all also for stable
+- Fix four slab out of bounds warnings: improve checks for protocol id,
+   and for small packet length, and for create context parsing,
+   and for negotiate context parsing
+- Fix for incorrect dereferencing POSIX ACLs
+----------------------------------------------------------------
+Namjae Jeon (5):
+      ksmbd: fix out-of-bound read in deassemble_neg_contexts()
+      ksmbd: fix out-of-bound read in parse_lease_state()
+      ksmbd: fix posix_acls and acls dereferencing possible ERR_PTR()
+      ksmbd: check the validation of pdu_size in ksmbd_conn_handler_loop
+      ksmbd: validate smb request protocol id
+
+ fs/smb/server/connection.c | 17 +++++++++++++++--
+ fs/smb/server/oplock.c     | 66
+++++++++++++++++++++++++------------------------------------------
+ fs/smb/server/smb2pdu.c    | 13 ++++++-------
+ fs/smb/server/smb_common.c | 14 +++++++++++++-
+ fs/smb/server/smbacl.c     |  4 ++--
+ fs/smb/server/vfs.c        |  4 ++--
+ 6 files changed, 62 insertions(+), 56 deletions(-)
+
+-- 
 Thanks,
 
 Steve
