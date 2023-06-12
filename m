@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B48C7EE25
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jun 2023 10:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B00B9C7EE2E
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jun 2023 10:58:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237145AbjFLK5y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Jun 2023 06:57:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60792 "EHLO
+        id S237229AbjFLK57 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Jun 2023 06:57:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236952AbjFLK5e (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jun 2023 06:57:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D8E59D2;
-        Mon, 12 Jun 2023 03:45:32 -0700 (PDT)
+        with ESMTP id S236875AbjFLK5i (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jun 2023 06:57:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68F63E579;
+        Mon, 12 Jun 2023 03:45:42 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 70BA062418;
-        Mon, 12 Jun 2023 10:45:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0036FC4339B;
-        Mon, 12 Jun 2023 10:45:28 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F239862450;
+        Mon, 12 Jun 2023 10:45:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C4EAC433EF;
+        Mon, 12 Jun 2023 10:45:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686566731;
-        bh=U7K8PnSDrmyymIFt6bT08pkz1Ns5zBOLh78eoHWTYGs=;
+        s=k20201202; t=1686566741;
+        bh=aJO98WciVZrVlZcCKv5j2euy0SAQyZ/0j96e4FBSwR4=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=i06u1gEYX2bd4j+uPzysbIxDaAwT6/CTUZOpnTs1UyXa7/5s7cUOEwUqZ3dlGz3O4
-         jFNXbxogq3HUsHaG8qzS2pUjFsLZ0pwm34sHEhWINSBx3x3GHErV87Ysw0Qytwbwe8
-         fFUrKe3sgWnKHIxnfLIjIUsPaN3Sh8LJvyjX55+rRGLxXbSB1eObzfgCW6lRFnH3r+
-         h9bCABGuEIoV6ij5WT16QU8p0vaVIMpWRciWV/eJdOCZn29lSLhV+99EbZsWG/Pglk
-         4MesuWDQf7yKM7JEJ5xr1+7Gp2JHA67EJFTynNQZaj0+fP9ZhYPuRC0fRqK+SN0Ale
-         ksZ9p+qMIL1gg==
+        b=oZstYoY1+IwPBj84Mr1zP4YDtRIv3werVGAJ2+b6CsAytp4SAJPSGU+zc4JlpYmBP
+         i0I0UZNtMxsP37aH5z4pL54IcZZ1yygHjAAFPKpFU9x2lRdApQdrTuBFVjz/WeesZ7
+         C3h04CZRRWYbEH7sB4n6OEWq6BaO6VbnwTsQzY8j062H/Fz0/sgsOt4zwb1ayIP6fZ
+         7cG77M+iHxmvYKtuE/PcT/tB175OdEWjDJjk/JilIiutctTDWoidSZHK1hO15R4iQz
+         14MIjGOy5mac9sUGgBUCVdt16OnQDBpiwG4wJs6H+LwyCTwvuMy4yWgpjzdVRTkyEd
+         39wCWXoZtMX3Q==
 From:   Jeff Layton <jlayton@kernel.org>
 To:     Christian Brauner <brauner@kernel.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
@@ -62,9 +62,9 @@ To:     Christian Brauner <brauner@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, apparmor@lists.ubuntu.com,
         linux-security-module@vger.kernel.org
-Subject: [PATCH v2 1/8] ibmvmc: update ctime in conjunction with mtime on write
-Date:   Mon, 12 Jun 2023 06:45:17 -0400
-Message-Id: <20230612104524.17058-2-jlayton@kernel.org>
+Subject: [PATCH v2 4/8] bfs: update ctime in addition to mtime when adding entries
+Date:   Mon, 12 Jun 2023 06:45:20 -0400
+Message-Id: <20230612104524.17058-5-jlayton@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230612104524.17058-1-jlayton@kernel.org>
 References: <20230612104524.17058-1-jlayton@kernel.org>
@@ -74,30 +74,27 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-POSIX says:
-
-"Upon successful completion, where nbyte is greater than 0, write()
- shall mark for update the last data modification and last file status
- change timestamps of the file..."
+When adding entries to a directory, POSIX generally requires that the
+ctime be updated alongside the mtime.
 
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- drivers/misc/ibmvmc.c | 2 +-
+ fs/bfs/dir.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/misc/ibmvmc.c b/drivers/misc/ibmvmc.c
-index cbaf6d35e854..d7c7f0305257 100644
---- a/drivers/misc/ibmvmc.c
-+++ b/drivers/misc/ibmvmc.c
-@@ -1124,7 +1124,7 @@ static ssize_t ibmvmc_write(struct file *file, const char *buffer,
- 		goto out;
- 
- 	inode = file_inode(file);
--	inode->i_mtime = current_time(inode);
-+	inode->i_mtime = inode->i_ctime = current_time(inode);
- 	mark_inode_dirty(inode);
- 
- 	dev_dbg(adapter->dev, "write: file = 0x%lx, count = 0x%lx\n",
+diff --git a/fs/bfs/dir.c b/fs/bfs/dir.c
+index 040d5140e426..d2e8a2a56b05 100644
+--- a/fs/bfs/dir.c
++++ b/fs/bfs/dir.c
+@@ -294,7 +294,7 @@ static int bfs_add_entry(struct inode *dir, const struct qstr *child, int ino)
+ 					dir->i_size += BFS_DIRENT_SIZE;
+ 					dir->i_ctime = current_time(dir);
+ 				}
+-				dir->i_mtime = current_time(dir);
++				dir->i_mtime = dir->i_ctime = current_time(dir);
+ 				mark_inode_dirty(dir);
+ 				de->ino = cpu_to_le16((u16)ino);
+ 				for (i = 0; i < BFS_NAMELEN; i++)
 -- 
 2.40.1
 
