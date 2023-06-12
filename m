@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67EFEC7EE45
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jun 2023 10:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A157C7EE25
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jun 2023 10:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237279AbjFLK6F (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Jun 2023 06:58:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33176 "EHLO
+        id S237339AbjFLK6V (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Jun 2023 06:58:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236960AbjFLK5g (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jun 2023 06:57:36 -0400
+        with ESMTP id S237104AbjFLK5q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jun 2023 06:57:46 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26DB8E572;
-        Mon, 12 Jun 2023 03:45:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C820B127C4;
+        Mon, 12 Jun 2023 03:45:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A2DD162450;
-        Mon, 12 Jun 2023 10:45:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AB4FC433D2;
-        Mon, 12 Jun 2023 10:45:32 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4D3C562418;
+        Mon, 12 Jun 2023 10:45:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDF9EC4339B;
+        Mon, 12 Jun 2023 10:45:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686566735;
-        bh=f+sv9c83YeZdEFyBLfaVXVS9uGARTf71K6hxZfrcSr4=;
+        s=k20201202; t=1686566747;
+        bh=KX7S7KoBIOHdIFvOtciMzqUF0ZVLgZ3kkDz1+nuzm5g=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=XNPqT5xCR/WjIlqL84s4wlNFJCgGYAqKwg9zWLKMlluT43pgIvq6UYpc7QjKUhuWL
-         nVIrZgjKf9Le2yKWvchiJV4LBbC0ljP1qKKTZdnKa3LICWwFNHz7sMCYSAO1yPGWJc
-         ixIaxMQwn51TByDyIFIJ4whm3OajAgo0a8S2bf51eFvXRyczHtk84FQpWxkDHAGszp
-         9PgkQIWwHJTlHW8C02GLU7kZQHk3jA/g7J+XX7rjLsmWIk6SAhbZ3n7MsZXHbQi8fq
-         1BN620+hBAnd5L8CGYKibFXxe0Hxle4OVCsDLjX9mMgrdf+RzkMkt3m7jsKCrQeUGe
-         l++bREhCo36qQ==
+        b=oz4WHLbO2jQN18Ove6Yj01Q8O4ys1wPwCmlNiLDNkmgWHI4GseN0zZLHEM92GYoGu
+         boxFJi841L5bbyrUSD3RGup9DgX4l4qriaT0pGf+w6tErLMj+72DpzQ0vSvdMBFlbu
+         KXSDAZv890DWx+cavMPVeGecLZIAIS0tENSJ08AMARyzUalS9uU1veHX9UzzI6FQoK
+         GQ5IcM6JEkKLV02OZ7r4bZ+rjgcKQTK9aoJXpooAwIGA1rf40OBNSpEW02hvFu/dDK
+         7SNhtVCZvEX/ybEeXtinwolY6QwBsyPmrCP8B9kIeImVk/kMoxXe8UPrCWqnyVaGqr
+         GlER8Exgmr4Sg==
 From:   Jeff Layton <jlayton@kernel.org>
 To:     Christian Brauner <brauner@kernel.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
@@ -62,9 +62,9 @@ To:     Christian Brauner <brauner@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, apparmor@lists.ubuntu.com,
         linux-security-module@vger.kernel.org
-Subject: [PATCH v2 2/8] usb: update the ctime as well when updating mtime after an ioctl
-Date:   Mon, 12 Jun 2023 06:45:18 -0400
-Message-Id: <20230612104524.17058-3-jlayton@kernel.org>
+Subject: [PATCH v2 6/8] exfat: ensure that ctime is updated whenever the mtime is
+Date:   Mon, 12 Jun 2023 06:45:22 -0400
+Message-Id: <20230612104524.17058-7-jlayton@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230612104524.17058-1-jlayton@kernel.org>
 References: <20230612104524.17058-1-jlayton@kernel.org>
@@ -74,87 +74,54 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-In general, POSIX requires that when the mtime is updated that the ctime
-be updated as well. Add the missing timestamp updates to the usb ioctls.
+When removing entries from a directory, the ctime must also be updated
+alongside the mtime.
 
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- drivers/usb/core/devio.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ fs/exfat/namei.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/usb/core/devio.c b/drivers/usb/core/devio.c
-index fcf68818e999..1268d313a8df 100644
---- a/drivers/usb/core/devio.c
-+++ b/drivers/usb/core/devio.c
-@@ -2640,21 +2640,21 @@ static long usbdev_do_ioctl(struct file *file, unsigned int cmd,
- 		snoop(&dev->dev, "%s: CONTROL\n", __func__);
- 		ret = proc_control(ps, p);
- 		if (ret >= 0)
--			inode->i_mtime = current_time(inode);
-+			inode->i_mtime = inode->i_ctime = current_time(inode);
- 		break;
+diff --git a/fs/exfat/namei.c b/fs/exfat/namei.c
+index e0ff9d156f6f..d9b46fa36bff 100644
+--- a/fs/exfat/namei.c
++++ b/fs/exfat/namei.c
+@@ -817,7 +817,7 @@ static int exfat_unlink(struct inode *dir, struct dentry *dentry)
+ 	ei->dir.dir = DIR_DELETED;
  
- 	case USBDEVFS_BULK:
- 		snoop(&dev->dev, "%s: BULK\n", __func__);
- 		ret = proc_bulk(ps, p);
- 		if (ret >= 0)
--			inode->i_mtime = current_time(inode);
-+			inode->i_mtime = inode->i_ctime = current_time(inode);
- 		break;
+ 	inode_inc_iversion(dir);
+-	dir->i_mtime = dir->i_atime = current_time(dir);
++	dir->i_mtime = dir->i_atime = dir->i_ctime = current_time(dir);
+ 	exfat_truncate_atime(&dir->i_atime);
+ 	if (IS_DIRSYNC(dir))
+ 		exfat_sync_inode(dir);
+@@ -825,7 +825,7 @@ static int exfat_unlink(struct inode *dir, struct dentry *dentry)
+ 		mark_inode_dirty(dir);
  
- 	case USBDEVFS_RESETEP:
- 		snoop(&dev->dev, "%s: RESETEP\n", __func__);
- 		ret = proc_resetep(ps, p);
- 		if (ret >= 0)
--			inode->i_mtime = current_time(inode);
-+			inode->i_mtime = inode->i_ctime = current_time(inode);
- 		break;
+ 	clear_nlink(inode);
+-	inode->i_mtime = inode->i_atime = current_time(inode);
++	inode->i_mtime = inode->i_atime = inode->i_ctime = current_time(inode);
+ 	exfat_truncate_atime(&inode->i_atime);
+ 	exfat_unhash_inode(inode);
+ 	exfat_d_version_set(dentry, inode_query_iversion(dir));
+@@ -979,7 +979,7 @@ static int exfat_rmdir(struct inode *dir, struct dentry *dentry)
+ 	ei->dir.dir = DIR_DELETED;
  
- 	case USBDEVFS_RESET:
-@@ -2666,7 +2666,7 @@ static long usbdev_do_ioctl(struct file *file, unsigned int cmd,
- 		snoop(&dev->dev, "%s: CLEAR_HALT\n", __func__);
- 		ret = proc_clearhalt(ps, p);
- 		if (ret >= 0)
--			inode->i_mtime = current_time(inode);
-+			inode->i_mtime = inode->i_ctime = current_time(inode);
- 		break;
+ 	inode_inc_iversion(dir);
+-	dir->i_mtime = dir->i_atime = current_time(dir);
++	dir->i_mtime = dir->i_atime = dir->i_ctime = current_time(dir);
+ 	exfat_truncate_atime(&dir->i_atime);
+ 	if (IS_DIRSYNC(dir))
+ 		exfat_sync_inode(dir);
+@@ -988,7 +988,7 @@ static int exfat_rmdir(struct inode *dir, struct dentry *dentry)
+ 	drop_nlink(dir);
  
- 	case USBDEVFS_GETDRIVER:
-@@ -2693,7 +2693,7 @@ static long usbdev_do_ioctl(struct file *file, unsigned int cmd,
- 		snoop(&dev->dev, "%s: SUBMITURB\n", __func__);
- 		ret = proc_submiturb(ps, p);
- 		if (ret >= 0)
--			inode->i_mtime = current_time(inode);
-+			inode->i_mtime = inode->i_ctime = current_time(inode);
- 		break;
- 
- #ifdef CONFIG_COMPAT
-@@ -2701,14 +2701,14 @@ static long usbdev_do_ioctl(struct file *file, unsigned int cmd,
- 		snoop(&dev->dev, "%s: CONTROL32\n", __func__);
- 		ret = proc_control_compat(ps, p);
- 		if (ret >= 0)
--			inode->i_mtime = current_time(inode);
-+			inode->i_mtime = inode->i_ctime = current_time(inode);
- 		break;
- 
- 	case USBDEVFS_BULK32:
- 		snoop(&dev->dev, "%s: BULK32\n", __func__);
- 		ret = proc_bulk_compat(ps, p);
- 		if (ret >= 0)
--			inode->i_mtime = current_time(inode);
-+			inode->i_mtime = inode->i_ctime = current_time(inode);
- 		break;
- 
- 	case USBDEVFS_DISCSIGNAL32:
-@@ -2720,7 +2720,7 @@ static long usbdev_do_ioctl(struct file *file, unsigned int cmd,
- 		snoop(&dev->dev, "%s: SUBMITURB32\n", __func__);
- 		ret = proc_submiturb_compat(ps, p);
- 		if (ret >= 0)
--			inode->i_mtime = current_time(inode);
-+			inode->i_mtime = inode->i_ctime = current_time(inode);
- 		break;
- 
- 	case USBDEVFS_IOCTL32:
+ 	clear_nlink(inode);
+-	inode->i_mtime = inode->i_atime = current_time(inode);
++	inode->i_mtime = inode->i_atime = inode->i_ctime = current_time(inode);
+ 	exfat_truncate_atime(&inode->i_atime);
+ 	exfat_unhash_inode(inode);
+ 	exfat_d_version_set(dentry, inode_query_iversion(dir));
 -- 
 2.40.1
 
