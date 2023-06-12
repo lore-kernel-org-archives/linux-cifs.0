@@ -2,129 +2,91 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E19C88CB2
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jun 2023 13:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC3CC88CB4
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jun 2023 13:52:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236652AbjFLNwD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Jun 2023 09:52:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40048 "EHLO
+        id S234145AbjFLNwl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Jun 2023 09:52:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236666AbjFLNwA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jun 2023 09:52:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A64E6F;
-        Mon, 12 Jun 2023 06:51:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S231319AbjFLNwl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jun 2023 09:52:41 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0681B4
+        for <linux-cifs@vger.kernel.org>; Mon, 12 Jun 2023 06:52:40 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2E84C62976;
-        Mon, 12 Jun 2023 13:51:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92EC5C433A1;
-        Mon, 12 Jun 2023 13:51:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686577915;
-        bh=N35u9HNcA2GE6O0RLNmO/H/bI7DFCPIb/J9WbCfp+7I=;
-        h=Subject:From:To:Date:In-Reply-To:References:From;
-        b=ObL7C8SEHs/LzGPrSxC74RrT9T2yAr7+1XglnX3EW1FZM90y7O6ormobkdpAWuZ0e
-         RdLzx900Hqpy9HE3EfCtu+74BEGhE/aZtEqml+3NJgQSzQx53YAlTOFBgpsZKSbcTh
-         +zXor8GIZ20+va1qDjHAfR3RyRUEaBOMhmjJ7l5g2lpz8/OpJX+h5I3T6nxDG8Q0Ct
-         vPS6mDUmgWbpb1+t3cmEUqFflpPCwKrf9+eWZ+e4rjAuOfKobUeruOpGBYBZ90Wbpa
-         C9ELvqhW19k3IAANYXAYjz0pZ8SMZZaeiSfoRUPDrDPMlZiF0tSo1r2eVMBMPNiBkq
-         +CwHQ9soLqvPA==
-Message-ID: <a6ca6c14a6b3727b7416198824b37bd7bd386180.camel@kernel.org>
-Subject: Re: [PATCH v2 8/8] cifs: update the ctime on a partial page write
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Tom Talpey <tom@talpey.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Brad Warrum <bwarrum@linux.ibm.com>,
-        Ritu Agarwal <rituagar@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ian Kent <raven@themaw.net>,
-        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-        Jeremy Kerr <jk@ozlabs.org>, Ard Biesheuvel <ardb@kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        John Johansen <john.johansen@canonical.com>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Ruihan Li <lrh2000@pku.edu.cn>,
-        Sebastian Reichel <sebastian.reichel@collabora.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        autofs@vger.kernel.org, linux-efi@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, apparmor@lists.ubuntu.com,
-        linux-security-module@vger.kernel.org
-Date:   Mon, 12 Jun 2023 09:51:50 -0400
-In-Reply-To: <a34b598a-374b-5dbf-dd36-4b62e52fe36c@talpey.com>
-References: <20230612104524.17058-1-jlayton@kernel.org>
-         <20230612104524.17058-9-jlayton@kernel.org>
-         <a34b598a-374b-5dbf-dd36-4b62e52fe36c@talpey.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 26F371FFAD;
+        Mon, 12 Jun 2023 13:52:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1686577959; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dF4f07DxaELi595EPzWOwACPsJH+CJTd/EhWk3jtiB4=;
+        b=yAplS98sGy6AgXLmdPjGDF8s5KVkS59CmSKOOn1ZpVFKA04BsuBmQyzH08koi7U8BuDuMh
+        vVRdAGZESOIkCE1s7xTqXBKCbQ+sqdx22gGA0N70k5F9lUpFiD432TC1iR4wK5VS3sYANa
+        0zP+Nkn80QPHjVxaac7BsgNzQ60Eu0U=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1686577959;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dF4f07DxaELi595EPzWOwACPsJH+CJTd/EhWk3jtiB4=;
+        b=4FihiknBxb9Y8s6vh2ubQbO1759jexz4f/MiniwByd/cKTwFci8JgNmA0b9D70PHui6Jxv
+        mxW9f62w3GPZR4DA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9FF081357F;
+        Mon, 12 Jun 2023 13:52:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id BMX+GCYjh2RjDwAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Mon, 12 Jun 2023 13:52:38 +0000
+Date:   Mon, 12 Jun 2023 10:52:14 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@cjr.nz,
+        bharathsm.hsk@gmail.com, tom@talpey.com,
+        Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 4/6] cifs: display the endpoint IP details in DebugData
+Message-ID: <kbimjp6rcxxf6esnwov4q5t6b5tkb7fzxei4pv5jit3qzfu7ud@zp5shjx7ml6h>
+References: <20230609174659.60327-1-sprasad@microsoft.com>
+ <20230609174659.60327-4-sprasad@microsoft.com>
+ <nlpmf2nsqosbz5ifzycdpoqmi22tkcoouuk4pjsp4exa2jtyqm@wzdmdh625e5p>
+ <CANT5p=oGXceYkn=+7KjbN=9oC14S0ue16LAPB_56hyX588iOXw@mail.gmail.com>
+ <CANT5p=rPRPVaRe2S4j=OqJTbOhs9onqR2ZNTMPNE1L_71aNQbw@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CANT5p=rPRPVaRe2S4j=OqJTbOhs9onqR2ZNTMPNE1L_71aNQbw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 2023-06-12 at 09:41 -0400, Tom Talpey wrote:
-> On 6/12/2023 6:45 AM, Jeff Layton wrote:
-> > POSIX says:
-> >=20
-> >      "Upon successful completion, where nbyte is greater than 0, write(=
-)
-> >       shall mark for update the last data modification and last file st=
-atus
-> >       change timestamps of the file..."
-> >=20
-> > Add the missing ctime update.
-> >=20
-> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > ---
-> >   fs/smb/client/file.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> > index df88b8c04d03..a00038a326cf 100644
-> > --- a/fs/smb/client/file.c
-> > +++ b/fs/smb/client/file.c
-> > @@ -2596,7 +2596,7 @@ static int cifs_partialpagewrite(struct page *pag=
-e, unsigned from, unsigned to)
-> >   					   write_data, to - from, &offset);
-> >   		cifsFileInfo_put(open_file);
-> >   		/* Does mm or vfs already set times? */
-> > -		inode->i_atime =3D inode->i_mtime =3D current_time(inode);
-> > +		inode->i_atime =3D inode->i_mtime =3D inode->i_ctime =3D current_tim=
-e(inode);
->=20
-> Question. It appears that roughly half the filesystems in this series
-> don't touch the i_atime in this case. And the other half do. Which is
-> correct? Did they incorrectly set i_atime instead of i_ctime?
->=20
+Hi Shyam,
 
-I noticed that too, and with this set, I decided to not make any atime
-changes since I wasn't sure.
+On 06/12, Shyam Prasad N wrote:
 
-I think the answer to your question is "it depends". atime is supposed
-to be updated on reads, not writes, but sometimes a write requires a RMW
-cycle of some flavor so one can imagine that in some cases we'd need to
-update all three.
+... snip ...
 
-In this case, I'm not sure that updating any of these times is the right
-thing to do. This is called from ->launder_folio, so the syscall that
-issued the write is long gone and we're in writeback here.
+>Hi Enzo,
+>
+>Attached the updated patch. Please review.
+>I had to use kernel_getsockname to get socket source details, not
+>kernel_getpeername.
+>
+>Here's what the new output looks like:
+>IP addr: dst: 192.168.10.1:445, src: 192.168.10.12:57966
 
-With NFS, we generally leave timestamp updates to the server. Should any
-of these timestamps be updated by the (SMB1) client here?
---=20
-Jeff Layton <jlayton@kernel.org>
+Yeah, I noticed I mixed src/dst when writing the email (was dealing with
+exactly this when I wrote it).
+
+>> >         seq_print(m, "IP: src=%pISpc, dest=%pISpc", &server->dstaddr, &src);
+
+^ is also mixed up.
+
+Sorry for the confusion.
