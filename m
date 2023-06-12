@@ -2,82 +2,130 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 084A2C7EE43
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jun 2023 09:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E11FC7EE2E
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jun 2023 10:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233161AbjFLJYl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Jun 2023 05:24:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41904 "EHLO
+        id S235915AbjFLKwW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Jun 2023 06:52:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233150AbjFLJYJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jun 2023 05:24:09 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D2BD30F1;
-        Mon, 12 Jun 2023 02:18:12 -0700 (PDT)
+        with ESMTP id S229736AbjFLKvz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jun 2023 06:51:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F01B993FF;
+        Mon, 12 Jun 2023 03:36:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6A536616C9;
-        Mon, 12 Jun 2023 09:18:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B5B1C433D2;
-        Mon, 12 Jun 2023 09:18:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1686561490;
-        bh=KxCRjozkEmNTEVpik04VLm/33kLity8Xed0mLWEvHXE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Cz1qnUE7tDYcXBQb3O0qUolN7bzyssoGPFNLqvbkXN9Cjh6wOgW3OhUtTWki+U5TC
-         3gqC736BaJ4XZpVwYFV/OIvV0WnsB39eZVzZAlOHfcTNQDYx+bhcV9BG95cufcdxsq
-         qNFvrYxGEE8meW5TcP6a0j8j+lyogwF660XEP2vc=
-Date:   Mon, 12 Jun 2023 11:18:08 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     Rishabh Bhatnagar <risbhat@amazon.com>, sfrench@amazon.com,
-        stable@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 5.4 0/2] Backport few dfs related fixes to cifs
-Message-ID: <2023061203-skinning-guileless-0e13@gregkh>
-References: <20230607203333.26669-1-risbhat@amazon.com>
- <a664029640828958e152e9a4c11c4b9a.pc@manguebit.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A808C614F0;
+        Mon, 12 Jun 2023 10:36:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10C3AC4339C;
+        Mon, 12 Jun 2023 10:36:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686566191;
+        bh=7lfE8n4wCuge2Ilsu3h1F4ipyzhUj7bSJuflx8EXZtw=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=DU0ZjjsJO4rS5B/LrOhkcDtfvbBZTjXhclQjcMb8L0SMAJ/Zj8o6cOouP0LPA9kRi
+         VqJ/momrCYS9bgBfSwuBqZwMMGlKax5OQGCSRTBF7m/eO1OCct4ECh1Dq3q51n5hhV
+         Yhf0l7cjjbGMIJ2UYDeBi6gwKGFHv0g6f2BclJ5kTS9KJF0zsyYQaetziIibzJHykN
+         7tP2iy40SDcuxMKwZA7N7Mbn26TeBSys37uMErgDMUpaf6wBIfwFsLid/c78sbMh0z
+         WHZh5yV0lSHcOPaWQW6a50hTCYgYFvBa4rOsjTJ1iVF0vlDpRO8qNBXUJAB1ctdV+d
+         JMJSCsxLTJnJg==
+Message-ID: <a1f7a725186082d933aff702d1d50c6456da6f20.camel@kernel.org>
+Subject: Re: [PATCH 7/9] gfs2: update ctime when quota is updated
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Andreas Gruenbacher <agruenba@redhat.com>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Brad Warrum <bwarrum@linux.ibm.com>,
+        Ritu Agarwal <rituagar@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ian Kent <raven@themaw.net>,
+        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+        Jeremy Kerr <jk@ozlabs.org>, Ard Biesheuvel <ardb@kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sungjong Seo <sj1557.seo@samsung.com>,
+        Bob Peterson <rpeterso@redhat.com>,
+        Steve French <sfrench@samba.org>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        John Johansen <john.johansen@canonical.com>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Ruihan Li <lrh2000@pku.edu.cn>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        autofs@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, cluster-devel@redhat.com,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org
+Date:   Mon, 12 Jun 2023 06:36:26 -0400
+In-Reply-To: <CAHc6FU4wyfQT7T75j2Sd9WNp=ag7hpDZGYkR=m73h2nOaH+AqQ@mail.gmail.com>
+References: <20230609125023.399942-1-jlayton@kernel.org>
+         <20230609125023.399942-8-jlayton@kernel.org>
+         <CAHc6FU4wyfQT7T75j2Sd9WNp=ag7hpDZGYkR=m73h2nOaH+AqQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a664029640828958e152e9a4c11c4b9a.pc@manguebit.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jun 08, 2023 at 05:54:26PM -0300, Paulo Alcantara wrote:
-> Rishabh Bhatnagar <risbhat@amazon.com> writes:
-> 
-> > Recently we have been seeing kernel panic in cifs_reconnect function
-> > while accessing tgt_list. Looks like tgt_list is not initialized
-> > correctly. There are fixes already present in 5.10 and later trees.
-> > Backporting them to 5.4
-> >
-> >  CIFS VFS: \\172.30.1.14 cifs_reconnect: no target servers for DFS
-> >  failover
-> >  BUG: unable to handle page fault for address: fffffffffffffff8
-> >  #PF: supervisor read access in kernel mode
-> >  #PF: error_code(0x0000) - not-present page
-> >  PGD 260e067 P4D 260e067 PUD 2610067 PMD 0
-> >  Oops: 0000 [#1] SMP PTI
-> >  RIP: 0010:cifs_reconnect+0x51d/0xef0 [cifs]
-> >  RSP: 0018:ffffc90000693da0 EFLAGS: 00010282
-> >  RAX: fffffffffffffff8 RBX: ffff8887fa63b800 RCX: fffffffffffffff8
-> >  Call Trace:
-> >  cifs_handle_standard+0x18d/0x1b0 [cifs]
-> >  cifs_demultiplex_thread+0xa5c/0xc90 [cifs]
-> >  kthread+0x113/0x130
-> >
-> > Paulo Alcantara (2):
-> >   cifs: get rid of unused parameter in reconn_setup_dfs_targets()
-> >   cifs: handle empty list of targets in cifs_reconnect()
-> >
-> >  fs/cifs/connect.c | 15 ++++++++-------
-> >  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> Looks good.
+On Fri, 2023-06-09 at 18:44 +0200, Andreas Gruenbacher wrote:
+> Jeff,
+>=20
+> On Fri, Jun 9, 2023 at 2:50=E2=80=AFPM Jeff Layton <jlayton@kernel.org> w=
+rote:
+> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > ---
+> >  fs/gfs2/quota.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/fs/gfs2/quota.c b/fs/gfs2/quota.c
+> > index 1ed17226d9ed..6d283e071b90 100644
+> > --- a/fs/gfs2/quota.c
+> > +++ b/fs/gfs2/quota.c
+> > @@ -869,7 +869,7 @@ static int gfs2_adjust_quota(struct gfs2_inode *ip,=
+ loff_t loc,
+> >                 size =3D loc + sizeof(struct gfs2_quota);
+> >                 if (size > inode->i_size)
+> >                         i_size_write(inode, size);
+> > -               inode->i_mtime =3D inode->i_atime =3D current_time(inod=
+e);
+> > +               inode->i_mtime =3D inode->i_atime =3D inode->i_ctime =
+=3D current_time(inode);
+>=20
+> I don't think we need to worry about the ctime of the quota inode as
+> that inode is internal to the filesystem only.
+>=20
 
-Now queued up, thanks.
+Thanks Andreas.  I'll plan to drop this patch from the series for now.
 
-greg k-h
+Does updating the mtime and atime here serve any purpose, or should
+those also be removed? If you plan to keep the a/mtime updates then I'd
+still suggest updating the ctime for consistency's sake. It shouldn't
+cost anything extra to do so since you're dirtying the inode below
+anyway.
+
+Thanks!
+
+> >                 mark_inode_dirty(inode);
+> >                 set_bit(QDF_REFRESH, &qd->qd_flags);
+> >         }
+> > --
+> > 2.40.1
+> >=20
+>=20
+> Thanks,
+> Andreas
+>=20
+
+--=20
+Jeff Layton <jlayton@kernel.org>
