@@ -2,69 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13457EB64D9
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jun 2023 23:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA5BEB64D7
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jun 2023 03:41:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237188AbjFOXKU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Jun 2023 19:10:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42690 "EHLO
+        id S231305AbjFPDlu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Jun 2023 23:41:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237326AbjFOXKS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 19:10:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE1052972;
-        Thu, 15 Jun 2023 16:10:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4DFD760B4C;
-        Thu, 15 Jun 2023 23:10:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8B093C433C8;
-        Thu, 15 Jun 2023 23:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686870613;
-        bh=gUCosOlwBhLXkjfvtNnaPBXTtevVDuqaR314WQMK8Yg=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=MOwq8M8mPBrP2lmsvJeAJwNsHilTkEnhJVGsMhoFkoQUTNaetbI7N4SWCyxlZP3Dh
-         ISEOVqQ77n56jErzlnrkFDUm+9bw34W2YWLG1hwOqT5SytNpq/hlaJUrvmGTScsYiM
-         xYGq6hQsLxbSYVfTX0uQiB9BFEOaiYdiuz4JpEP7qED3OU311/ZFHfDnCAezXfR7ed
-         tFvxMrqB1rVk6nut5g3WOkc5bysRb/PUYxIRQ96R08Oq+r0qGcup7vWOxPA3dFHuCd
-         B5TE68xccmf5eYljdrcrF8UbOTzVhnoXXp/MyvgBJXP4pwppiFp7r1r0P+kTTQ3gxT
-         U9rbygKNH8TmA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 74F99C395E0;
-        Thu, 15 Jun 2023 23:10:13 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msGxr_kjUC=2GmALVuktLqhUtuVtRm6f=3fFPvAPH+OaA@mail.gmail.com>
-References: <CAH2r5msGxr_kjUC=2GmALVuktLqhUtuVtRm6f=3fFPvAPH+OaA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msGxr_kjUC=2GmALVuktLqhUtuVtRm6f=3fFPvAPH+OaA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc6-smb3-client-fixes
-X-PR-Tracked-Commit-Id: e4645cc2f1e2d6f268bb8dcfac40997c52432aed
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 7a043feb6cc02c9273c34392c41d17e08804a323
-Message-Id: <168687061346.8077.7452119781637217249.pr-tracker-bot@kernel.org>
-Date:   Thu, 15 Jun 2023 23:10:13 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        with ESMTP id S230021AbjFPDls (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 23:41:48 -0400
+X-Greylist: delayed 4195 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 15 Jun 2023 20:41:47 PDT
+Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 982BB18D
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Jun 2023 20:41:47 -0700 (PDT)
+Received: by mail.durme.pl (Postfix, from userid 1002)
+        id 3E7975C70E; Tue, 13 Jun 2023 08:00:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
+        t=1686645820; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=kOgkl+xdgeVof/fNh8n19zAPhVAdpTHU9YixDyT7SSWzldp8g5iWn6lJR2iSbjJ0H
+         iF9z0WZC5AIWgKw2YuAn1SyeranFVvcM7dZx6pEy4mBtC8yKzAiYhOWBCmy7518xCG
+         JNa+8cl2vywy+T3W5UyNEESMNmHz67WrZyE1IAD8T0FQXlihI5Rkj2+NuQckcpzQr7
+         k99ZvIjDSCi9qvdLG1oX+Itx0nfUYsd1NzyzuZ0umNkvQjPDooOPUtHzc4jQaSv++d
+         hvHbMGdD/mhnfr0gb6c1gbmZCsCtUmoBMMcC+P1JhXnBuATIInStKqngKKYFM0QolA
+         7aV0tf41wryCQ==
+Received: by mail.durme.pl for <linux-cifs@vger.kernel.org>; Tue, 13 Jun 2023 08:00:41 GMT
+Message-ID: <20230613064501-0.1.2g.aygn.0.1x2dab0d79@durme.pl>
+Date:   Tue, 13 Jun 2023 08:00:41 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
+To:     <linux-cifs@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.durme.pl
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Wed, 14 Jun 2023 23:36:08 -0500:
+Dzie=C5=84 dobry,
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc6-smb3-client-fixes
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/7a043feb6cc02c9273c34392c41d17e08804a323
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
 
-Thank you!
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
+
+
+Pozdrawiam
+Krystian Wieczorek
