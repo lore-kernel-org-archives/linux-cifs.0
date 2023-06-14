@@ -2,429 +2,173 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC4BEB64DC
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jun 2023 12:25:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 398C4EB64D9
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jun 2023 12:30:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243611AbjFNMYT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 14 Jun 2023 08:24:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58122 "EHLO
+        id S235818AbjFNMaf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 14 Jun 2023 08:30:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244344AbjFNMYJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 14 Jun 2023 08:24:09 -0400
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 590281FCC
-        for <linux-cifs@vger.kernel.org>; Wed, 14 Jun 2023 05:24:08 -0700 (PDT)
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-652a6bf4e6aso5133498b3a.2
-        for <linux-cifs@vger.kernel.org>; Wed, 14 Jun 2023 05:24:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686745447; x=1689337447;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jW1BUs54gtTJtzBvjBzwawUWMo5s+Du6aAOeKilYFF0=;
-        b=h3D9lfNa5/pT7A7wah3gbvHUQJy4dd0uiK8bt61elI3L9x/tQuhXCe7v7AaMfH1/92
-         GESFXHPQMIMsLTd+UvUf3i5Fmvyih06o41649Il32Erq5vFBLNV3z4p+Q5n9deESiXxG
-         G02dOASi3zENNtTlZ9AuBTr0RKRN7caLTT9JQItdyCKNE9lviwokgd9G+ElufdugVuna
-         MfQ4fSRsxQaf0+AhornTkKYVXz6nJ/YwzT8lf6SGdi+5EtISPh+tQyRTIar6qTHKLvU4
-         LwnGsp4uUTuJVMqUmwcx4rm0vhCtLydNbHv8DEZz0jPRJJqr1DvtkVuYXltTE5EXZQU9
-         Sm2A==
-X-Gm-Message-State: AC+VfDzBTCCaYQ3z9nEoYoscMRjXn8zoCAHtvmRsk9uIfEbQTsdTDP1i
-        HIba/mS7yRfZHhkFYfFjo1D7yF7DCFg=
-X-Google-Smtp-Source: ACHHUZ5pZ/KxriacKs7N9kO++B61WB3hKCcy3YRvR+LY4c2RM83PkAV2/tnsnYh8EDJP0sDsrIZRsg==
-X-Received: by 2002:a05:6a20:a124:b0:10a:ef63:4c33 with SMTP id q36-20020a056a20a12400b0010aef634c33mr1436626pzk.47.1686745447385;
-        Wed, 14 Jun 2023 05:24:07 -0700 (PDT)
-Received: from localhost.localdomain ([211.49.23.9])
-        by smtp.gmail.com with ESMTPSA id i21-20020aa78d95000000b0064d34ace753sm10386180pfr.114.2023.06.14.05.23.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jun 2023 05:23:54 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
-        Amir Goldstein <amir73il@gmail.com>
-Subject: [PATCH] ksmbd: add mnt_want_write to ksmbd vfs functions
-Date:   Wed, 14 Jun 2023 21:23:19 +0900
-Message-Id: <20230614122319.16381-1-linkinjeon@kernel.org>
+        with ESMTP id S236369AbjFNMae (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 14 Jun 2023 08:30:34 -0400
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on20703.outbound.protection.outlook.com [IPv6:2a01:111:f400:feae::703])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5E772680;
+        Wed, 14 Jun 2023 05:30:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WDeoHLPUq+gACUyfhOK7YpOcBqQEhQvI0vKknldgLh0qt3JKcq+BQR0Nrqe/fOTrjKsmBd4ztsmcSMhbIlcqEGLI8cxM3etEhqSUGCYX3jmrpD3utvwReqafURH6nyoMZzYmrRLY1kmQ7AStDmK0IJ9OEcuEb1FdFqNqs7Th26xjIdkuAJ21GV6kqtmJZoU6Qk8vL1neVEeiWCBsCYvP1/831zE/Z5N1j4a8xR1Xaj6rIGgz9CCyFF1cXWsayxKEHE++s/ezqWCDIRWy7ZsV6jfz1oe3KAvSI4x8zFqKETZ8hEkl/OuZPyYpOT811FZUE/C5tQuTrNyqOctMhVTo+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Qf0GbTXvMdgj5kqMqes5fyhHy9P9Q++NswyhnYonv/0=;
+ b=gJqrsb2jKaQbahEffpKI67HtdR05UO2tWgzzNL4EFEMG6wf2VhN3Gh5VjMQEEJfP3Se3yGbRckv8Tq2VqHamp9pLU9sxe0Yc/5pYO/w04WWPWG61dnmlCC463+ECmuMAoBpkGf5WbVGdCzl1uPAGicfWiFNoPhWjeE+nC6FDLDzV8zgAAYwE2QwhnhGHXGInnB1F7cpQOhuYnKRo1jSUC0A9E3KzICGBWwYhip+MvW+7RaWlRNwSRD8hGr6fd8oNNbcV832SBzPxLTOaSB0wIqPsilSta4/YwXs+ioVfBU7f+lOEzA7Zopr3bSvIwSDTDKpHPnVvEv4Xp0rEyWEoaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qf0GbTXvMdgj5kqMqes5fyhHy9P9Q++NswyhnYonv/0=;
+ b=qqcKN9mwh02OiOgheinuu53JcMZBSZLqOmI7pcbD511ODxKB7gT5t2yrsC+TgIFb8oE4l4AzPqk5TJFaitFj+p23OWpSjL0Nlw0cf67bB1dzwc/6wyw9tOZZq9+CsDyGlWpZgwK+TR7WHW17TFh3wOIL/kdg7XuBzooyHmk7KUXEm+HJO7hBkGk7tjP8q5Xic1z9jhiN9357Bka6n/++WL/Sf+Exv2z1gVoj1qwXu8CKeWwOkkxNJYs710fBYhh7Yoxtx5ef6+u6T3YTL4m+f/r77WzoBSlJBkG1HdIN7M5IcCYmC162U0R0pAPYyylQDtPCpCLdp6RKLN6oWLJWcg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
+ PUZPR06MB5849.apcprd06.prod.outlook.com (2603:1096:301:fb::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6455.38; Wed, 14 Jun 2023 12:29:22 +0000
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::7dfd:a3ed:33ca:9cc8]) by SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::7dfd:a3ed:33ca:9cc8%6]) with mapi id 15.20.6455.045; Wed, 14 Jun 2023
+ 12:29:22 +0000
+From:   Wang Ming <machel@vivo.com>
+To:     Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     opensource.kernel@vivo.com, Wang Ming <machel@vivo.com>
+Subject: [PATCH v1] fs:smb:server:Fix unsigned compared with less than zero
+Date:   Wed, 14 Jun 2023 20:27:57 +0800
+Message-Id: <20230614122808.1350-1-machel@vivo.com>
 X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-ClientProxiedBy: TYAPR01CA0162.jpnprd01.prod.outlook.com
+ (2603:1096:404:7e::30) To SG2PR06MB3743.apcprd06.prod.outlook.com
+ (2603:1096:4:d0::18)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|PUZPR06MB5849:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b218ec6-9b19-40f0-f2fa-08db6cd2fba0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 01OBd+oQY7pB0z0vgJWYcTjvEq7bQER+k3jvqUbEAJEAG1CpqHaBhFiiFQqsmRnRgU0EQWE/aKRUFHP7JnMjFl5R6Ep9qgM7ayvpkQrdXI5oUraIPHwG0XqhEr3JrmUB03PxkAI5yuImFZcn7YS/QU2KBgsCYlpnueoTG1ydiJ9ybraeHiKbqTud/xZo0PCcFyiNZQ2GZkJmQv3gytR84ZchTKiSNdb6nKvfZJ/MJnQ9pVNoBCSf/CsNorMQbInIVnrgII2EH8p2dky6bu8FxVqCuTEjc2TJl2Mx+Pet2YsrnrbIZgoQ4E9zeskM/s5VWR5rX0xvWp+96BMBx6TOv634PG2WELUaucrU3OIuYt6LdDtPS5ay3J9aHuFcddaeZ6zuMnFO5Ds4UvBBeZzYwktGS60xDR+lQYlMwQEiKf9iMcXmobwfWuO94HbKFy83ge/qYNpMUviUd3WBD8DcsJOnyV94q95O7i1TVm4lTeqIuPyQZCQQdzY677YffjzrCzZzvbWynRYRhhBEd5y/DE0Bd02A/Ze7d2dWkSP2BI8SkQ//0KEWBNrE1aCUl2q20vtSYeDGZh/CE1XJOAcOVtVSgKAfhybsL+/79+pqrrU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(136003)(39860400002)(376002)(396003)(451199021)(66476007)(66556008)(6486002)(110136005)(8676002)(478600001)(316002)(38100700002)(4326008)(41300700001)(8936002)(38350700002)(66946007)(186003)(83380400001)(6666004)(52116002)(26005)(6506007)(1076003)(6512007)(107886003)(5660300002)(86362001)(36756003)(2906002)(2616005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?efwBlQSlhJ5krHXPNJA0dSee+s5jKVofkqu5Wx6nv0VrXTNGkVfeftt7wjtm?=
+ =?us-ascii?Q?5le6K79sxL8wHbZ8f5L1SoldM0EeeA56uielyl8w2ziBnJfvyTOi4ow0mai6?=
+ =?us-ascii?Q?0fUqzx24J3IujICcmylPdEJ1u7VOQuDzYtAL7LT67+GscnCPLEkum9TpriXH?=
+ =?us-ascii?Q?F4cM3pz70kOFSNTEKlDm2PIuYV2l7XaLuOO88J0+yUNrfOPecEy2UFa5+qIP?=
+ =?us-ascii?Q?WP2Bjfq69FQgtV63zYI9Ll49HAJ95Eo0/aE9zU28COZ85UjzhkAH9Dl4E3p/?=
+ =?us-ascii?Q?RHLQW1qmxGCdkmCqK0264OyhfJWQgui8C58ruO+FIRoA+g6IdTC5bsMu6mx7?=
+ =?us-ascii?Q?zIma9hMcccER6DOruRBKoob+y4UCSx8ISrjzvjAFy1pPPDRNQP1mel/j7jAG?=
+ =?us-ascii?Q?fZ8CsemCEHUzAMklwOQDvDzYtaDDcP4X/OSfm5ApVqdWL1R2XBEGdERsv25P?=
+ =?us-ascii?Q?53r5Bg24E6coYFKifnBUhhftfbx3X0HTfGDdo1Pjvtyd/pa9TMUzTGD0o3Sh?=
+ =?us-ascii?Q?Q56x2YKtMLB35Qh+aD+Rd0CMNvLAuzqTwBOQceoXV+k9oEr4jqlduQgMazaV?=
+ =?us-ascii?Q?GkzPx0XtwSQKF886ri9EnBRF561TG6pCvtiou99YnDGTB6j8k6lmYvz5R/Wf?=
+ =?us-ascii?Q?IcqqGB/kq5CvEuFAO2baEy2c6RzPgt2WonbYTPwpYpAyiVSKwGOOHUKwDtxN?=
+ =?us-ascii?Q?OxLiCO90IwZE0XNp3h1wG0EDNQTjWQOCZ00jBYXJHNL1YHomJ9gixDLVi+fQ?=
+ =?us-ascii?Q?9Ftc56Rm2BoI7zlfsaWr18S98iqVXFXDQNQrkoSXC4mVFw2bpO7Is+K/VWn7?=
+ =?us-ascii?Q?cvVspd5LC+RhR26a+EMq/R1RuIHYgjwyxNXLy0ohnqUc66PnEY8bUya18ULw?=
+ =?us-ascii?Q?WhvMqXgf5gUZcoFKf4r4NK/HzF49nbdfC9mxo4Y334RSs5SLhwuey6IQNgP9?=
+ =?us-ascii?Q?q0VYKgRKon5BySK9yiq8PA/PrKdT5BoqukLHvYDG03RSHWyBwmJKhxVXxta5?=
+ =?us-ascii?Q?UBwU97GuNVdcA9MCShptYDz2MMFX6i5c2cBItS4HERAs00IxR80WtO8wDsjg?=
+ =?us-ascii?Q?x+1j9ZBqtpXYT3XDOGpCfqr8+JIshVexqsWVC529Bb1JDubHCEkESosM+2le?=
+ =?us-ascii?Q?YL6pVpX/8q7/d7kBwAKn7veGwJJPXVJeaPNsFO41v/UWA1I//BaYnPXtma54?=
+ =?us-ascii?Q?um6jOsmsO7pnrpbCd3PxDzDOCdBNIFuIAznHYxs5PiDe7Tlg6hCv6ieV19x6?=
+ =?us-ascii?Q?PB+1Z8LH5nZRyamiBGL3atMz6TZSWvwW2fNEpAZ+FNK6hjtj5BleFOymOCms?=
+ =?us-ascii?Q?X4tM7YR+HceYaICdfCCI+10J8j4eK9KCj4+AVliKTbqydUWxhomzuezwmBz+?=
+ =?us-ascii?Q?SY3qAvM8sJrM42a/ArX7tiu5XeS89zYsfEM+yW53aS743yX+tZVmv4tJFE0q?=
+ =?us-ascii?Q?KzfmYOC4t4OzgfwA9EK7VopYICn5WqHoLUjjE71nbpJiNXwqF9MPDaknQBOn?=
+ =?us-ascii?Q?zYsXfER++FGAbOO88/kEcSJ/uX8PoXRlwNlkb1IObAhfVt0wAzyuGOimp9UG?=
+ =?us-ascii?Q?3EaOAos6hafarIn4gUdZsXQD9AtSzVsaNL0cduj0?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b218ec6-9b19-40f0-f2fa-08db6cd2fba0
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2023 12:29:22.6278
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZCXCQj1AvZ53KpAH3KsGugUt2fTI+tcfwT1N2I/ZlB1OIPSB/nlYDsGJ+XA2DPufAI1nBV+/6kjw5Bc7keFr6Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR06MB5849
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-ksmbd is doing write access using vfs helpers. There are the cases that
-mnt_want_write() is not called in vfs helper. This patch add missing
-mnt_want_write() to ksmbd vfs functions.
+The return value of the ksmbd_vfs_getcasexattr() is long.
+However, the return value is being assigned to an unsignef
+long variable 'v_len',so making 'v_len' to long.
 
-Cc: Amir Goldstein <amir73il@gmail.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+silence the warning:
+./fs/smb/server/vfs.c:433:6-11:WARNING: Unsigned expression compared
+with zero: v_len > 0
+
+Signed-off-by: Wang Ming <machel@vivo.com>
 ---
- fs/smb/server/smb2pdu.c | 22 +++++++---------
- fs/smb/server/smbacl.c  |  6 ++---
- fs/smb/server/vfs.c     | 56 ++++++++++++++++++++++++++++++++++-------
- fs/smb/server/vfs.h     | 10 ++++----
- 4 files changed, 63 insertions(+), 31 deletions(-)
+ fs/smb/server/vfs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 82cadebec459..176061cfe674 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -2263,8 +2263,7 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
- 			/* if the EA doesn't exist, just do nothing. */
- 			rc = 0;
- 		} else {
--			rc = ksmbd_vfs_setxattr(idmap,
--						path->dentry, attr_name, value,
-+			rc = ksmbd_vfs_setxattr(idmap, path, attr_name, value,
- 						le16_to_cpu(eabuf->EaValueLength), 0);
- 			if (rc < 0) {
- 				ksmbd_debug(SMB,
-@@ -2321,8 +2320,7 @@ static noinline int smb2_set_stream_name_xattr(const struct path *path,
- 		return -EBADF;
- 	}
- 
--	rc = ksmbd_vfs_setxattr(idmap, path->dentry,
--				xattr_stream_name, NULL, 0, 0);
-+	rc = ksmbd_vfs_setxattr(idmap, path, xattr_stream_name, NULL, 0, 0);
- 	if (rc < 0)
- 		pr_err("Failed to store XATTR stream name :%d\n", rc);
- 	return 0;
-@@ -2397,8 +2395,7 @@ static void smb2_new_xattrs(struct ksmbd_tree_connect *tcon, const struct path *
- 	da.flags = XATTR_DOSINFO_ATTRIB | XATTR_DOSINFO_CREATE_TIME |
- 		XATTR_DOSINFO_ITIME;
- 
--	rc = ksmbd_vfs_set_dos_attrib_xattr(mnt_idmap(path->mnt),
--					    path->dentry, &da);
-+	rc = ksmbd_vfs_set_dos_attrib_xattr(mnt_idmap(path->mnt), path, &da);
- 	if (rc)
- 		ksmbd_debug(SMB, "failed to store file attribute into xattr\n");
- }
-@@ -2970,7 +2967,7 @@ int smb2_open(struct ksmbd_work *work)
- 		struct inode *inode = d_inode(path.dentry);
- 
- 		posix_acl_rc = ksmbd_vfs_inherit_posix_acl(idmap,
--							   path.dentry,
-+							   &path,
- 							   d_inode(path.dentry->d_parent));
- 		if (posix_acl_rc)
- 			ksmbd_debug(SMB, "inherit posix acl failed : %d\n", posix_acl_rc);
-@@ -2986,7 +2983,7 @@ int smb2_open(struct ksmbd_work *work)
- 			if (rc) {
- 				if (posix_acl_rc)
- 					ksmbd_vfs_set_init_posix_acl(idmap,
--								     path.dentry);
-+								     &path);
- 
- 				if (test_share_config_flag(work->tcon->share_conf,
- 							   KSMBD_SHARE_FLAG_ACL_XATTR)) {
-@@ -3026,7 +3023,7 @@ int smb2_open(struct ksmbd_work *work)
- 
- 					rc = ksmbd_vfs_set_sd_xattr(conn,
- 								    idmap,
--								    path.dentry,
-+								    &path,
- 								    pntsd,
- 								    pntsd_size);
- 					kfree(pntsd);
-@@ -5462,7 +5459,7 @@ static int smb2_rename(struct ksmbd_work *work,
- 			goto out;
- 
- 		rc = ksmbd_vfs_setxattr(file_mnt_idmap(fp->filp),
--					fp->filp->f_path.dentry,
-+					&fp->filp->f_path,
- 					xattr_stream_name,
- 					NULL, 0, 0);
- 		if (rc < 0) {
-@@ -5627,8 +5624,7 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 		da.flags = XATTR_DOSINFO_ATTRIB | XATTR_DOSINFO_CREATE_TIME |
- 			XATTR_DOSINFO_ITIME;
- 
--		rc = ksmbd_vfs_set_dos_attrib_xattr(idmap,
--						    filp->f_path.dentry, &da);
-+		rc = ksmbd_vfs_set_dos_attrib_xattr(idmap, &filp->f_path, &da);
- 		if (rc)
- 			ksmbd_debug(SMB,
- 				    "failed to restore file attribute in EA\n");
-@@ -7483,7 +7479,7 @@ static inline int fsctl_set_sparse(struct ksmbd_work *work, u64 id,
- 
- 		da.attr = le32_to_cpu(fp->f_ci->m_fattr);
- 		ret = ksmbd_vfs_set_dos_attrib_xattr(idmap,
--						     fp->filp->f_path.dentry, &da);
-+						     &fp->filp->f_path, &da);
- 		if (ret)
- 			fp->f_ci->m_fattr = old_fattr;
- 	}
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index a93ae72fe4ef..7c99e6ebee9f 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -1162,8 +1162,7 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
- 			pntsd_size += sizeof(struct smb_acl) + nt_size;
- 		}
- 
--		ksmbd_vfs_set_sd_xattr(conn, idmap,
--				       path->dentry, pntsd, pntsd_size);
-+		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, pntsd_size);
- 		kfree(pntsd);
- 	}
- 
-@@ -1415,8 +1414,7 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 	if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR)) {
- 		/* Update WinACL in xattr */
- 		ksmbd_vfs_remove_sd_xattrs(idmap, path->dentry);
--		ksmbd_vfs_set_sd_xattr(conn, idmap,
--				       path->dentry, pntsd, ntsd_len);
-+		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
- 	}
- 
- out:
 diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 23eb1da4bcad..eaa42f04303d 100644
+index 23eb1da4b..77909b298 100644
 --- a/fs/smb/server/vfs.c
 +++ b/fs/smb/server/vfs.c
-@@ -439,7 +439,7 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *fp, char *buf, loff_t *pos,
- 	memcpy(&stream_buf[*pos], buf, count);
- 
- 	err = ksmbd_vfs_setxattr(idmap,
--				 fp->filp->f_path.dentry,
-+				 &fp->filp->f_path,
- 				 fp->stream.name,
- 				 (void *)stream_buf,
- 				 size,
-@@ -585,6 +585,10 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, const struct path *path)
- 		goto out_err;
- 	}
- 
-+	err = mnt_want_write(path->mnt);
-+	if (err)
-+		goto out_err;
-+
- 	idmap = mnt_idmap(path->mnt);
- 	if (S_ISDIR(d_inode(path->dentry)->i_mode)) {
- 		err = vfs_rmdir(idmap, d_inode(parent), path->dentry);
-@@ -595,6 +599,7 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, const struct path *path)
- 		if (err)
- 			ksmbd_debug(VFS, "unlink failed, err %d\n", err);
- 	}
-+	mnt_drop_write(path->mnt);
- 
- out_err:
- 	ksmbd_revert_fsids(work);
-@@ -690,6 +695,10 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, const struct path *old_path,
- 		goto out2;
- 	}
- 
-+	err = mnt_want_write(old_path->mnt);
-+	if (err)
-+		goto out2;
-+
- 	trap = lock_rename_child(old_child, new_path.dentry);
- 
- 	old_parent = dget(old_child->d_parent);
-@@ -753,6 +762,7 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, const struct path *old_path,
- out3:
- 	dput(old_parent);
- 	unlock_rename(old_parent, new_path.dentry);
-+	mnt_drop_write(old_path->mnt);
- out2:
- 	path_put(&new_path);
- 
-@@ -893,19 +903,24 @@ ssize_t ksmbd_vfs_getxattr(struct mnt_idmap *idmap,
-  * Return:	0 on success, otherwise error
-  */
- int ksmbd_vfs_setxattr(struct mnt_idmap *idmap,
--		       struct dentry *dentry, const char *attr_name,
-+		       const struct path *path, const char *attr_name,
- 		       void *attr_value, size_t attr_size, int flags)
+@@ -400,7 +400,8 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *fp=
+, char *buf, loff_t *pos,
  {
- 	int err;
- 
-+	err = mnt_want_write(path->mnt);
-+	if (err)
-+		return err;
-+
- 	err = vfs_setxattr(idmap,
--			   dentry,
-+			   path->dentry,
- 			   attr_name,
- 			   attr_value,
- 			   attr_size,
- 			   flags);
- 	if (err)
- 		ksmbd_debug(VFS, "setxattr failed, err %d\n", err);
-+	mnt_drop_write(path->mnt);
- 	return err;
- }
- 
-@@ -1020,6 +1035,10 @@ int ksmbd_vfs_unlink(struct file *filp)
- 	struct dentry *dir, *dentry = filp->f_path.dentry;
- 	struct mnt_idmap *idmap = file_mnt_idmap(filp);
- 
-+	err = mnt_want_write(filp->f_path.mnt);
-+	if (err)
-+		return err;
-+
- 	dir = dget_parent(dentry);
- 	err = ksmbd_vfs_lock_parent(dir, dentry);
- 	if (err)
-@@ -1037,6 +1056,7 @@ int ksmbd_vfs_unlink(struct file *filp)
- 		ksmbd_debug(VFS, "failed to delete, err %d\n", err);
- out:
- 	dput(dir);
-+	mnt_drop_write(filp->f_path.mnt);
- 
- 	return err;
- }
-@@ -1370,13 +1390,14 @@ static struct xattr_smb_acl *ksmbd_vfs_make_xattr_posix_acl(struct mnt_idmap *id
- 
- int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
- 			   struct mnt_idmap *idmap,
--			   struct dentry *dentry,
-+			   const struct path *path,
- 			   struct smb_ntsd *pntsd, int len)
- {
- 	int rc;
- 	struct ndr sd_ndr = {0}, acl_ndr = {0};
- 	struct xattr_ntacl acl = {0};
- 	struct xattr_smb_acl *smb_acl, *def_smb_acl = NULL;
-+	struct dentry *dentry = path->dentry;
- 	struct inode *inode = d_inode(dentry);
- 
- 	acl.version = 4;
-@@ -1428,7 +1449,7 @@ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
- 		goto out;
- 	}
- 
--	rc = ksmbd_vfs_setxattr(idmap, dentry,
-+	rc = ksmbd_vfs_setxattr(idmap, path,
- 				XATTR_NAME_SD, sd_ndr.data,
- 				sd_ndr.offset, 0);
- 	if (rc < 0)
-@@ -1518,7 +1539,7 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- }
- 
- int ksmbd_vfs_set_dos_attrib_xattr(struct mnt_idmap *idmap,
--				   struct dentry *dentry,
-+				   const struct path *path,
- 				   struct xattr_dos_attrib *da)
- {
- 	struct ndr n;
-@@ -1528,7 +1549,7 @@ int ksmbd_vfs_set_dos_attrib_xattr(struct mnt_idmap *idmap,
- 	if (err)
- 		return err;
- 
--	err = ksmbd_vfs_setxattr(idmap, dentry, XATTR_NAME_DOS_ATTRIBUTE,
-+	err = ksmbd_vfs_setxattr(idmap, path, XATTR_NAME_DOS_ATTRIBUTE,
- 				 (void *)n.data, n.offset, 0);
- 	if (err)
- 		ksmbd_debug(SMB, "failed to store dos attribute in xattr\n");
-@@ -1765,10 +1786,11 @@ void ksmbd_vfs_posix_lock_unblock(struct file_lock *flock)
- }
- 
- int ksmbd_vfs_set_init_posix_acl(struct mnt_idmap *idmap,
--				 struct dentry *dentry)
-+				 struct path *path)
- {
- 	struct posix_acl_state acl_state;
- 	struct posix_acl *acls;
-+	struct dentry *dentry = path->dentry;
- 	struct inode *inode = d_inode(dentry);
- 	int rc;
- 
-@@ -1798,6 +1820,11 @@ int ksmbd_vfs_set_init_posix_acl(struct mnt_idmap *idmap,
- 		return -ENOMEM;
- 	}
- 	posix_state_to_acl(&acl_state, acls->a_entries);
-+
-+	rc = mnt_want_write(path->mnt);
-+	if (rc)
-+		goto out_err;
-+
- 	rc = set_posix_acl(idmap, dentry, ACL_TYPE_ACCESS, acls);
- 	if (rc < 0)
- 		ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_ACCESS) failed, rc : %d\n",
-@@ -1809,16 +1836,20 @@ int ksmbd_vfs_set_init_posix_acl(struct mnt_idmap *idmap,
- 			ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_DEFAULT) failed, rc : %d\n",
- 				    rc);
- 	}
-+	mnt_drop_write(path->mnt);
-+
-+out_err:
- 	free_acl_state(&acl_state);
- 	posix_acl_release(acls);
- 	return rc;
- }
- 
- int ksmbd_vfs_inherit_posix_acl(struct mnt_idmap *idmap,
--				struct dentry *dentry, struct inode *parent_inode)
-+				struct path *path, struct inode *parent_inode)
- {
- 	struct posix_acl *acls;
- 	struct posix_acl_entry *pace;
-+	struct dentry *dentry = path->dentry;
- 	struct inode *inode = d_inode(dentry);
- 	int rc, i;
- 
-@@ -1837,6 +1868,10 @@ int ksmbd_vfs_inherit_posix_acl(struct mnt_idmap *idmap,
- 		}
- 	}
- 
-+	rc = mnt_want_write(path->mnt);
-+	if (rc)
-+		goto out_err;
-+
- 	rc = set_posix_acl(idmap, dentry, ACL_TYPE_ACCESS, acls);
- 	if (rc < 0)
- 		ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_ACCESS) failed, rc : %d\n",
-@@ -1848,6 +1883,9 @@ int ksmbd_vfs_inherit_posix_acl(struct mnt_idmap *idmap,
- 			ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_DEFAULT) failed, rc : %d\n",
- 				    rc);
- 	}
-+	mnt_drop_write(path->mnt);
-+
-+out_err:
- 	posix_acl_release(acls);
- 	return rc;
- }
-diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
-index 68fe8347e1d5..13f0e6958838 100644
---- a/fs/smb/server/vfs.h
-+++ b/fs/smb/server/vfs.h
-@@ -108,7 +108,7 @@ ssize_t ksmbd_vfs_casexattr_len(struct mnt_idmap *idmap,
- 				struct dentry *dentry, char *attr_name,
- 				int attr_name_len);
- int ksmbd_vfs_setxattr(struct mnt_idmap *idmap,
--		       struct dentry *dentry, const char *attr_name,
-+		       const struct path *path, const char *attr_name,
- 		       void *attr_value, size_t attr_size, int flags);
- int ksmbd_vfs_xattr_stream_name(char *stream_name, char **xattr_stream_name,
- 				size_t *xattr_stream_name_size, int s_type);
-@@ -144,21 +144,21 @@ int ksmbd_vfs_remove_sd_xattrs(struct mnt_idmap *idmap,
- 			       struct dentry *dentry);
- int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
- 			   struct mnt_idmap *idmap,
--			   struct dentry *dentry,
-+			   const struct path *path,
- 			   struct smb_ntsd *pntsd, int len);
- int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 			   struct mnt_idmap *idmap,
- 			   struct dentry *dentry,
- 			   struct smb_ntsd **pntsd);
- int ksmbd_vfs_set_dos_attrib_xattr(struct mnt_idmap *idmap,
--				   struct dentry *dentry,
-+				   const struct path *path,
- 				   struct xattr_dos_attrib *da);
- int ksmbd_vfs_get_dos_attrib_xattr(struct mnt_idmap *idmap,
- 				   struct dentry *dentry,
- 				   struct xattr_dos_attrib *da);
- int ksmbd_vfs_set_init_posix_acl(struct mnt_idmap *idmap,
--				 struct dentry *dentry);
-+				 struct path *path);
- int ksmbd_vfs_inherit_posix_acl(struct mnt_idmap *idmap,
--				struct dentry *dentry,
-+				struct path *path,
- 				struct inode *parent_inode);
- #endif /* __KSMBD_VFS_H__ */
--- 
+        char *stream_buf =3D NULL, *wbuf;
+        struct mnt_idmap *idmap =3D file_mnt_idmap(fp->filp);
+-       size_t size, v_len;
++       size_t size;
++       ssize_t v_len;
+        int err =3D 0;
+
+        ksmbd_debug(VFS, "write stream data pos : %llu, count : %zd\n",
+@@ -417,7 +418,7 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *fp=
+, char *buf, loff_t *pos,
+                                       fp->stream.name,
+                                       fp->stream.size,
+                                       &stream_buf);
+-       if ((int)v_len < 0) {
++       if (v_len < 0) {
+                pr_err("not found stream in xattr : %zd\n", v_len);
+                err =3D (int)v_len;
+                goto out;
+--
 2.25.1
 
+
+________________________________
+=E6=9C=AC=E9=82=AE=E4=BB=B6=E5=8F=8A=E5=85=B6=E9=99=84=E4=BB=B6=E5=86=85=E5=
+=AE=B9=E5=8F=AF=E8=83=BD=E5=90=AB=E6=9C=89=E6=9C=BA=E5=AF=86=E5=92=8C/=E6=
+=88=96=E9=9A=90=E7=A7=81=E4=BF=A1=E6=81=AF=EF=BC=8C=E4=BB=85=E4=BE=9B=E6=8C=
+=87=E5=AE=9A=E4=B8=AA=E4=BA=BA=E6=88=96=E6=9C=BA=E6=9E=84=E4=BD=BF=E7=94=A8=
+=E3=80=82=E8=8B=A5=E6=82=A8=E9=9D=9E=E5=8F=91=E4=BB=B6=E4=BA=BA=E6=8C=87=E5=
+=AE=9A=E6=94=B6=E4=BB=B6=E4=BA=BA=E6=88=96=E5=85=B6=E4=BB=A3=E7=90=86=E4=BA=
+=BA=EF=BC=8C=E8=AF=B7=E5=8B=BF=E4=BD=BF=E7=94=A8=E3=80=81=E4=BC=A0=E6=92=AD=
+=E3=80=81=E5=A4=8D=E5=88=B6=E6=88=96=E5=AD=98=E5=82=A8=E6=AD=A4=E9=82=AE=E4=
+=BB=B6=E4=B9=8B=E4=BB=BB=E4=BD=95=E5=86=85=E5=AE=B9=E6=88=96=E5=85=B6=E9=99=
+=84=E4=BB=B6=E3=80=82=E5=A6=82=E6=82=A8=E8=AF=AF=E6=94=B6=E6=9C=AC=E9=82=AE=
+=E4=BB=B6=EF=BC=8C=E8=AF=B7=E5=8D=B3=E4=BB=A5=E5=9B=9E=E5=A4=8D=E6=88=96=E7=
+=94=B5=E8=AF=9D=E6=96=B9=E5=BC=8F=E9=80=9A=E7=9F=A5=E5=8F=91=E4=BB=B6=E4=BA=
+=BA=EF=BC=8C=E5=B9=B6=E5=B0=86=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6=E3=80=81=
+=E9=99=84=E4=BB=B6=E5=8F=8A=E5=85=B6=E6=89=80=E6=9C=89=E5=A4=8D=E6=9C=AC=E5=
+=88=A0=E9=99=A4=E3=80=82=E8=B0=A2=E8=B0=A2=E3=80=82
+The contents of this message and any attachments may contain confidential a=
+nd/or privileged information and are intended exclusively for the addressee=
+(s). If you are not the intended recipient of this message or their agent, =
+please note that any use, dissemination, copying, or storage of this messag=
+e or its attachments is not allowed. If you receive this message in error, =
+please notify the sender by reply the message or phone and delete this mess=
+age, any attachments and any copies immediately.
+Thank you
