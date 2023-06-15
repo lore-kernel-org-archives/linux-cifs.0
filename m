@@ -2,119 +2,74 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE53DEB64D9
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jun 2023 04:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8936DEB64DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jun 2023 06:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238078AbjFOEgZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Jun 2023 00:36:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37674 "EHLO
+        id S243297AbjFOGBg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Jun 2023 02:01:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237730AbjFOEgY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 00:36:24 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1480A212B;
-        Wed, 14 Jun 2023 21:36:23 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b34ac4b6e8so18128651fa.3;
-        Wed, 14 Jun 2023 21:36:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686803781; x=1689395781;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=pMlSSd4IHrr9XmOOrYPwJSR+ikcUyPn+0Joi1HvVvME=;
-        b=Grlcv7HBpsM5PS7LrLFoSG25dRDOP2Smu6ZMidL8bk2O+wGWKnohZGSw3849H2XGxH
-         hOGlTbla+g4LGpqC4fxSoo/zownDb31ngZXHqOzhcTTBxYKrOqB9QumwXTrDmw2iHK8q
-         FbBipZtQkxHB9DOTVYtUNOj1AlBTHVTIKwhsL6YnBUFvHdFpAEXEJhFM66e0XvIoQmnE
-         PVZNLBXwIXptcOLbncZYcgFORjVIfTQ4alDvaeCJfS/NqGVH49rL11WH7ubMQF/NRzw9
-         5EwksJ+Q8ORNZnrY/jlA+baTSZwA51BhwLgJ0oMYua2xJ7IeOA+pfv1pYI0bKeoLlzRh
-         U8oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686803781; x=1689395781;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pMlSSd4IHrr9XmOOrYPwJSR+ikcUyPn+0Joi1HvVvME=;
-        b=EfESkM+6B5CXlMTUIIu7H48z/R8eKgtptoIZARGuXx8RFJ6q1sFQx/Ao850KP5NqFO
-         2+TKLwIVv4A3jp/9fR0uIs4b0ey8MaBxr8gY7Vv6RE3UzpawX2Q6iY1Oay12M0D3mBXb
-         ANMJ8JqhkUozZCJrpPrn9RLQiSCnHhoBSvyYt9TXwDP6OHJkGyvjT7qJXymbxabcKx2c
-         d05ZHzJ3yN0DPzAFz/JoH1pCJlYBA7YHL+EM9x9a97JxmbW3I7ScVlhL0JSGzh9LB/Ig
-         15M2Wfgu1yfToIKbHu8f8sImmDBGxmnjtTkho/4Cz2TqX/l6qGq0EUUHwz8C8heWTfiT
-         rODQ==
-X-Gm-Message-State: AC+VfDxvJh75/6ayyr9uLYp6dDJbmelGfQWoisXmolA2M5Qmbe9JzyGP
-        /HlR3FTo/vJ5cxGiK+5lsIuhMqwGl+qdMzRbctE6tibB5BWnPQ==
-X-Google-Smtp-Source: ACHHUZ7xtGCkEd+hU3lQvDgzKIcYk78r4ONJDN6ReXJEmNYey3ohgnV/WWaAb0Z5IxIxVsY1QmKOlmsRRQYrHV17CN8=
-X-Received: by 2002:a2e:3816:0:b0:2af:1ebc:1e46 with SMTP id
- f22-20020a2e3816000000b002af1ebc1e46mr8242939lja.17.1686803780888; Wed, 14
- Jun 2023 21:36:20 -0700 (PDT)
+        with ESMTP id S239592AbjFOGBN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 02:01:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25EC270A;
+        Wed, 14 Jun 2023 23:01:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7ECEF62A9E;
+        Thu, 15 Jun 2023 06:01:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA400C433C9;
+        Thu, 15 Jun 2023 06:01:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686808867;
+        bh=LnT2QOWrLkLygOKdpJnnijsGZBH7LmWid7FpcJ5tIOQ=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=Ixi/MdUtGpvjNXVV/C0gKGroM9e4x4gT8DtDzAMrl3Y+I6bAaDU1/Hoi+RfnJYfdp
+         lUU85T/r6Gy/fBqsFprsSVw9fRH52TRzTfry4vCims6rMw337wcu7kDIjL3lf843No
+         z3WmjLxr6J1+gUerOMdo3NlF6rPUEx9FJnKzb9ANfVy+REVn5cpIe8wpK94FeGdHOh
+         eO2EyKbUiO1JRjqKOd0JN2jCBJa5MWGS2qHdcUWjlC4cRv6rxsxQyBoTWi0J5Cavj/
+         kmay0JDgScJHhMcljV9qILRnjaXb7Q0Lwje1n51aEJ6q34T4SSL/9u/TEmm6i22cd1
+         Cyjgknq0Uz2fA==
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1a9a3b00d50so127230fac.3;
+        Wed, 14 Jun 2023 23:01:07 -0700 (PDT)
+X-Gm-Message-State: AC+VfDyellrWtgm2ZUoccQ0qoFCL5bxoo19bYVvNLzsaSA8qxLw4QHVi
+        RMNovKusCRReg1gSo31b6Ez8ffjtbfRbieLbmxo=
+X-Google-Smtp-Source: ACHHUZ6t7AuCEfEIkNJjUtbmAwsxuB4uK1bvNW7NdhdrWorwoY+X2YafqSXZgaTEay8Lnv6xzE1RKb1YZQKwABVwIQk=
+X-Received: by 2002:a05:6870:d412:b0:18e:2e28:d3aa with SMTP id
+ i18-20020a056870d41200b0018e2e28d3aamr11430376oag.31.1686808866961; Wed, 14
+ Jun 2023 23:01:06 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 14 Jun 2023 23:36:08 -0500
-Message-ID: <CAH2r5msGxr_kjUC=2GmALVuktLqhUtuVtRm6f=3fFPvAPH+OaA@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+Received: by 2002:a8a:7cb:0:b0:4df:6fd3:a469 with HTTP; Wed, 14 Jun 2023
+ 23:01:06 -0700 (PDT)
+In-Reply-To: <20230614122808.1350-1-machel@vivo.com>
+References: <20230614122808.1350-1-machel@vivo.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 15 Jun 2023 15:01:06 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd96UE4T91ODspie4d6jr0FAPN13ke7XehXk5Qv6LcXfSQ@mail.gmail.com>
+Message-ID: <CAKYAXd96UE4T91ODspie4d6jr0FAPN13ke7XehXk5Qv6LcXfSQ@mail.gmail.com>
+Subject: Re: [PATCH v1] fs:smb:server:Fix unsigned compared with less than zero
+To:     Wang Ming <machel@vivo.com>
+Cc:     Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-858fd168a95c5b9669aac8db6c14a9aeab446375:
+2023-06-14 21:27 GMT+09:00, Wang Ming <machel@vivo.com>:
+> The return value of the ksmbd_vfs_getcasexattr() is long.
+> However, the return value is being assigned to an unsignef
+> long variable 'v_len',so making 'v_len' to long.
+>
+> silence the warning:
+> ./fs/smb/server/vfs.c:433:6-11:WARNING: Unsigned expression compared
+> with zero: v_len > 0
+>
+> Signed-off-by: Wang Ming <machel@vivo.com>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-  Linux 6.4-rc6 (2023-06-11 14:35:30 -0700)
-
-are available in the Git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc6-smb3-client-fixes
-
-for you to fetch changes up to e4645cc2f1e2d6f268bb8dcfac40997c52432aed:
-
-  cifs: add a warning when the in-flight count goes negative
-(2023-06-14 10:15:05 -0500)
-
-----------------------------------------------------------------
-Eight smb3 client fixes
-- important fix for deferred close oops (race with unmount) found with
-xfstest generic/098 to some servers
-- important reconnect fix
-- fix problem with max_credits mount option
-- two multichannel (interface related) fixes
-- one trivial removal of confusing comment
-- two small debugging improvements (to better spot crediting problems)
-
-----------------------------------------------------------------
-Enzo Matsumiya (1):
-      smb/client: print "Unknown" instead of bogus link speed value
-
-Shyam Prasad N (5):
-      cifs: fix status checks in cifs_tree_connect
-      cifs: print all credit counters in DebugData
-      cifs: fix sockaddr comparison in iface_cmp
-      cifs: fix max_credits implementation
-      cifs: add a warning when the in-flight count goes negative
-
-Steve French (1):
-      cifs: fix lease break oops in xfstest generic/098
-
-=E9=91=AB=E5=8D=8E (1):
-      smb: remove obsolete comment
-
- fs/smb/client/cifs_debug.c | 58
-++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- fs/smb/client/cifsglob.h   | 37 -------------------------------------
- fs/smb/client/cifsproto.h  |  1 +
- fs/smb/client/connect.c    | 59
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- fs/smb/client/dfs.c        |  9 +++++----
- fs/smb/client/file.c       |  8 ++++++--
- fs/smb/client/smb2ops.c    | 40 ++++++++++++++++++++++++++++++++++++++++
- fs/smb/client/smb2pdu.c    | 32 ++++++++++++++++++++++++++++----
- fs/smb/client/transport.c  |  2 +-
- 9 files changed, 190 insertions(+), 56 deletions(-)
-
-
---=20
-Thanks,
-
-Steve
+Thanks!
