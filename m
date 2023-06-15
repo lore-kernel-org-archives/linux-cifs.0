@@ -2,74 +2,112 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8936DEB64DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jun 2023 06:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E468EB64D9
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jun 2023 06:42:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243297AbjFOGBg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Jun 2023 02:01:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33488 "EHLO
+        id S243857AbjFOGmA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Jun 2023 02:42:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239592AbjFOGBN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 02:01:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25EC270A;
-        Wed, 14 Jun 2023 23:01:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7ECEF62A9E;
-        Thu, 15 Jun 2023 06:01:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA400C433C9;
-        Thu, 15 Jun 2023 06:01:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686808867;
-        bh=LnT2QOWrLkLygOKdpJnnijsGZBH7LmWid7FpcJ5tIOQ=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Ixi/MdUtGpvjNXVV/C0gKGroM9e4x4gT8DtDzAMrl3Y+I6bAaDU1/Hoi+RfnJYfdp
-         lUU85T/r6Gy/fBqsFprsSVw9fRH52TRzTfry4vCims6rMw337wcu7kDIjL3lf843No
-         z3WmjLxr6J1+gUerOMdo3NlF6rPUEx9FJnKzb9ANfVy+REVn5cpIe8wpK94FeGdHOh
-         eO2EyKbUiO1JRjqKOd0JN2jCBJa5MWGS2qHdcUWjlC4cRv6rxsxQyBoTWi0J5Cavj/
-         kmay0JDgScJHhMcljV9qILRnjaXb7Q0Lwje1n51aEJ6q34T4SSL/9u/TEmm6i22cd1
-         Cyjgknq0Uz2fA==
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1a9a3b00d50so127230fac.3;
-        Wed, 14 Jun 2023 23:01:07 -0700 (PDT)
-X-Gm-Message-State: AC+VfDyellrWtgm2ZUoccQ0qoFCL5bxoo19bYVvNLzsaSA8qxLw4QHVi
-        RMNovKusCRReg1gSo31b6Ez8ffjtbfRbieLbmxo=
-X-Google-Smtp-Source: ACHHUZ6t7AuCEfEIkNJjUtbmAwsxuB4uK1bvNW7NdhdrWorwoY+X2YafqSXZgaTEay8Lnv6xzE1RKb1YZQKwABVwIQk=
-X-Received: by 2002:a05:6870:d412:b0:18e:2e28:d3aa with SMTP id
- i18-20020a056870d41200b0018e2e28d3aamr11430376oag.31.1686808866961; Wed, 14
- Jun 2023 23:01:06 -0700 (PDT)
+        with ESMTP id S243884AbjFOGl0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 02:41:26 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E049135B8;
+        Wed, 14 Jun 2023 23:39:50 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-543c6a2aa07so4176777a12.0;
+        Wed, 14 Jun 2023 23:39:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686811190; x=1689403190;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5dr/pk1CTGpe8xWEsKJhTgU6K6RWawYjj0PJrmiMabI=;
+        b=j71V8tIoMnAkqTnlnzzM7y3ne0LUJHKP+0iSmYWbpVYC7DqsKJ4c3P5rQ5sld5JkWw
+         jEhSlL8jYe+SQ3gajlXkV5I3NNHWx5YwRtKxDcXTqiClFoiIZyUdcBVW5q+UdKqyT8x2
+         bRagHypQea3dDcmb2kvDA+4hUBAsJZ7qgOiRA1IjLYmvACI1HZfMpc2kUPyDa59tw84P
+         x4VWAGC0NXlo5MOsS+3s2bHy59bedoHboHeABypM4X84TNVATcDf8OmAi16wAt2GQfWL
+         N6lVO8I41+mJmFFhHpYUA/wET/EvYAoD57UJuXtaXyb0c7AetMLYjzyaJ5+Bh35csPYH
+         X4og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686811190; x=1689403190;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5dr/pk1CTGpe8xWEsKJhTgU6K6RWawYjj0PJrmiMabI=;
+        b=a0GPE8zj2NoGY/FJ1QOYAaarHrcgtHIWm0ztrfDoJ4p0Gv1X29KVJ6alrXVHiBlJqW
+         qEWpEoONQ16+MC3IJzVK8cnBeRzJs5qQ46dPNsPNHFGSAhPiyhb+234uFROgMqWsmc1A
+         SLGrEIH+M73UP5SDHGmDatSDc6/yB+pwIE4NIRj2Ys7O/8pg5JePhPsdp/g/C3Kw+YlT
+         cr461tCN0jk5epHaga3FjBH6O1e+zuO+Arb1MI8WwtA/W4bpqVSiXfeJeXTQGsARW4hT
+         F993zTCjecWn68sywSyVXCERULk8kf4qpN7QFO7azCLg4pHXmuYsM3jx32fzpzN2j96l
+         Qd/g==
+X-Gm-Message-State: AC+VfDzxmkw7jTvY/YYftIwPSF2TGc5t6gARi9NnZ/yGsHWq9i+Org8T
+        lPkRUk/FRwA1nVCbmQesfKbZCKQNYajQQg==
+X-Google-Smtp-Source: ACHHUZ7AQ3aMqwhakcw9+joN1EIbvod52rI078ZoK54hJ3gyiguRsgy7n/aKSDeVFyDYp8yba+iyZA==
+X-Received: by 2002:a17:90b:46c9:b0:25e:a1c0:af23 with SMTP id jx9-20020a17090b46c900b0025ea1c0af23mr59824pjb.38.1686811190294;
+        Wed, 14 Jun 2023 23:39:50 -0700 (PDT)
+Received: from oslab-pc.tsinghua.edu.cn ([166.111.139.122])
+        by smtp.gmail.com with ESMTPSA id mm23-20020a17090b359700b0025c1d5e3042sm4018845pjb.40.2023.06.14.23.39.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jun 2023 23:39:49 -0700 (PDT)
+From:   Tuo Li <islituo@gmail.com>
+To:     sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
+        sprasad@microsoft.com, tom@talpey.com
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, baijiaju1990@outlook.com,
+        Tuo Li <islituo@gmail.com>, BassCheck <bass@buaa.edu.cn>
+Subject: [PATCH v2] smb: fix a possible data race in cifs_can_echo()
+Date:   Thu, 15 Jun 2023 14:38:53 +0800
+Message-Id: <20230615063853.15500-1-islituo@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Received: by 2002:a8a:7cb:0:b0:4df:6fd3:a469 with HTTP; Wed, 14 Jun 2023
- 23:01:06 -0700 (PDT)
-In-Reply-To: <20230614122808.1350-1-machel@vivo.com>
-References: <20230614122808.1350-1-machel@vivo.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 15 Jun 2023 15:01:06 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd96UE4T91ODspie4d6jr0FAPN13ke7XehXk5Qv6LcXfSQ@mail.gmail.com>
-Message-ID: <CAKYAXd96UE4T91ODspie4d6jr0FAPN13ke7XehXk5Qv6LcXfSQ@mail.gmail.com>
-Subject: Re: [PATCH v1] fs:smb:server:Fix unsigned compared with less than zero
-To:     Wang Ming <machel@vivo.com>
-Cc:     Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-06-14 21:27 GMT+09:00, Wang Ming <machel@vivo.com>:
-> The return value of the ksmbd_vfs_getcasexattr() is long.
-> However, the return value is being assigned to an unsignef
-> long variable 'v_len',so making 'v_len' to long.
->
-> silence the warning:
-> ./fs/smb/server/vfs.c:433:6-11:WARNING: Unsigned expression compared
-> with zero: v_len > 0
->
-> Signed-off-by: Wang Ming <machel@vivo.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+The struct field TCP_Server_Info.tcpStatus is often protected by the lock
+srv_lock when is accessed. Here is an example in __cifs_reconnect():
 
-Thanks!
+  spin_lock(&server->srv_lock);
+  if (server->tcpStatus != CifsExiting)
+    server->tcpStatus = CifsNeedNegotiate;
+  spin_unlock(&server->srv_lock);
+
+However, the variable server->tcpStatus is accessed without holding the
+lock server->srv_lock in cifs_can_echo():
+
+  if (server->tcpStatus == CifsGood)
+    return true;
+
+To fix this possible data race, a lock and unlock pair is added when
+accessing the variable server->tcpStatus.
+
+Reported-by: BassCheck <bass@buaa.edu.cn>
+Signed-off-by: Tuo Li <islituo@gmail.com>
+---
+v2:
+* Release the lock server->srv_lock in the false branch.
+---
+ fs/smb/client/smb1ops.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index 7d1b3fc014d9..5120241d3c0e 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -1049,8 +1049,12 @@ cifs_dir_needs_close(struct cifsFileInfo *cfile)
+ static bool
+ cifs_can_echo(struct TCP_Server_Info *server)
+ {
+-	if (server->tcpStatus == CifsGood)
++	spin_lock(&server->srv_lock);
++	if (server->tcpStatus == CifsGood) {
++		spin_unlock(&server->srv_lock);
+ 		return true;
++	}
++	spin_unlock(&server->srv_lock);
+ 
+ 	return false;
+ }
+-- 
+2.34.1
+
