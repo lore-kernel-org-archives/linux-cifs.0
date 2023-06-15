@@ -2,108 +2,119 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8452EB64DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jun 2023 04:02:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE53DEB64D9
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jun 2023 04:36:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242120AbjFOECc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Jun 2023 00:02:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56806 "EHLO
+        id S238078AbjFOEgZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Jun 2023 00:36:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242836AbjFOECU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 00:02:20 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1517B1BF8;
-        Wed, 14 Jun 2023 21:02:07 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b4f9583404so13269985ad.2;
-        Wed, 14 Jun 2023 21:02:07 -0700 (PDT)
+        with ESMTP id S237730AbjFOEgY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 00:36:24 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1480A212B;
+        Wed, 14 Jun 2023 21:36:23 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b34ac4b6e8so18128651fa.3;
+        Wed, 14 Jun 2023 21:36:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686801726; x=1689393726;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3izBoZnsarVRGSGlTREJHeUFL5Dz9xWyg9wHmnWHSUU=;
-        b=R+hJAms9B5cyUKbbm45fYbRJynKJWUr25Plghjxw4l+ngGJltxbSaOSGsCFAWFjM4K
-         cDlvQsg9kRgKYBFHZL5EqVpyWLD6MyijZtTuLZa3ivcAv7ZaLWavknsLYivwdJF22a7g
-         bF3JCJ22ql8OdswGSUY8O3lHFp4twV8Cd0b0m/ZXVZz1zVCatxFva7tsO5OhNDoqA7Z+
-         x0Q7wrX/N6YsZn7Cpvb8X044E1VU214NLGj5Bm4SXTtbCwKHAOL1jg0Jw8arBG9Y4UlN
-         Xw8dLOYIMjh8NTWlBEt2U6LNopSI+gh2/yUiw1mby7qxJqmUg9QA+CLwGqFbKkVpOKyF
-         UcBQ==
+        d=gmail.com; s=20221208; t=1686803781; x=1689395781;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pMlSSd4IHrr9XmOOrYPwJSR+ikcUyPn+0Joi1HvVvME=;
+        b=Grlcv7HBpsM5PS7LrLFoSG25dRDOP2Smu6ZMidL8bk2O+wGWKnohZGSw3849H2XGxH
+         hOGlTbla+g4LGpqC4fxSoo/zownDb31ngZXHqOzhcTTBxYKrOqB9QumwXTrDmw2iHK8q
+         FbBipZtQkxHB9DOTVYtUNOj1AlBTHVTIKwhsL6YnBUFvHdFpAEXEJhFM66e0XvIoQmnE
+         PVZNLBXwIXptcOLbncZYcgFORjVIfTQ4alDvaeCJfS/NqGVH49rL11WH7ubMQF/NRzw9
+         5EwksJ+Q8ORNZnrY/jlA+baTSZwA51BhwLgJ0oMYua2xJ7IeOA+pfv1pYI0bKeoLlzRh
+         U8oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686801726; x=1689393726;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1686803781; x=1689395781;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3izBoZnsarVRGSGlTREJHeUFL5Dz9xWyg9wHmnWHSUU=;
-        b=M9aukiHYt1jZWu8WOLOHiRI1EYok1QF0bf/yWPF93K4LIZjF/WbrcIM8Uj+Pf3m/Yh
-         dV9nkbdakU15xBlWhVHSOj0+wwRAhHcW6cg5B77g6hOYj6bPkmCu7wVOh2CqKCKkpIH3
-         eG9P+1sx7eLV8NZh3Hd9bWlIFbgUMR34MCgqkwPEAXKZ4fEaB9ASd0d3gHD3zSJ7gaVJ
-         Y2psvb/cUwaKGCTBLiVEc6qNLblcsTEFTKyKtEuRiCEB9XNo5IUsMDRKSNF+IHxNb48q
-         OovcH0/yV/WENBdOUhGowXr72uRpLfn5Bg2ok1ZNsjTICipcD3Q0XI4+bZ1RahVDkWQl
-         P9lA==
-X-Gm-Message-State: AC+VfDziHJxGNgTlezdVIqJ65DhW7NxTGtdM01SUh3JjHx5opdFCpQl2
-        82Kp854RH5dHUZg6nt8MvgI=
-X-Google-Smtp-Source: ACHHUZ7pnWLwNT6A86yp7S8yhkm3zQVdAsYM08XNE5O+52gvCTnV5yQxxPuu2HGobQ4ewoFmhUizvg==
-X-Received: by 2002:a17:902:e80b:b0:1ab:11c8:777a with SMTP id u11-20020a170902e80b00b001ab11c8777amr17231180plg.13.1686801726375;
-        Wed, 14 Jun 2023 21:02:06 -0700 (PDT)
-Received: from oslab-pc.tsinghua.edu.cn ([166.111.139.122])
-        by smtp.gmail.com with ESMTPSA id c2-20020a170902d90200b001b0499bee05sm105064plz.191.2023.06.14.21.02.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jun 2023 21:02:05 -0700 (PDT)
-From:   Tuo Li <islituo@gmail.com>
-To:     sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
-        sprasad@microsoft.com, tom@talpey.com
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, baijiaju1990@outlook.com,
-        Tuo Li <islituo@gmail.com>, BassCheck <bass@buaa.edu.cn>
-Subject: [PATCH] smb: fix a possible data race in cifs_can_echo()
-Date:   Thu, 15 Jun 2023 12:01:31 +0800
-Message-Id: <20230615040131.13444-1-islituo@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        bh=pMlSSd4IHrr9XmOOrYPwJSR+ikcUyPn+0Joi1HvVvME=;
+        b=EfESkM+6B5CXlMTUIIu7H48z/R8eKgtptoIZARGuXx8RFJ6q1sFQx/Ao850KP5NqFO
+         2+TKLwIVv4A3jp/9fR0uIs4b0ey8MaBxr8gY7Vv6RE3UzpawX2Q6iY1Oay12M0D3mBXb
+         ANMJ8JqhkUozZCJrpPrn9RLQiSCnHhoBSvyYt9TXwDP6OHJkGyvjT7qJXymbxabcKx2c
+         d05ZHzJ3yN0DPzAFz/JoH1pCJlYBA7YHL+EM9x9a97JxmbW3I7ScVlhL0JSGzh9LB/Ig
+         15M2Wfgu1yfToIKbHu8f8sImmDBGxmnjtTkho/4Cz2TqX/l6qGq0EUUHwz8C8heWTfiT
+         rODQ==
+X-Gm-Message-State: AC+VfDxvJh75/6ayyr9uLYp6dDJbmelGfQWoisXmolA2M5Qmbe9JzyGP
+        /HlR3FTo/vJ5cxGiK+5lsIuhMqwGl+qdMzRbctE6tibB5BWnPQ==
+X-Google-Smtp-Source: ACHHUZ7xtGCkEd+hU3lQvDgzKIcYk78r4ONJDN6ReXJEmNYey3ohgnV/WWaAb0Z5IxIxVsY1QmKOlmsRRQYrHV17CN8=
+X-Received: by 2002:a2e:3816:0:b0:2af:1ebc:1e46 with SMTP id
+ f22-20020a2e3816000000b002af1ebc1e46mr8242939lja.17.1686803780888; Wed, 14
+ Jun 2023 21:36:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 14 Jun 2023 23:36:08 -0500
+Message-ID: <CAH2r5msGxr_kjUC=2GmALVuktLqhUtuVtRm6f=3fFPvAPH+OaA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The struct field TCP_Server_Info.tcpStatus is often protected by the lock 
-srv_lock when is accessed. Here is an example in __cifs_reconnect():
+Please pull the following changes since commit
+858fd168a95c5b9669aac8db6c14a9aeab446375:
 
-  spin_lock(&server->srv_lock);
-  if (server->tcpStatus != CifsExiting)
-    server->tcpStatus = CifsNeedNegotiate;
-  spin_unlock(&server->srv_lock);
+  Linux 6.4-rc6 (2023-06-11 14:35:30 -0700)
 
-However, the variable server->tcpStatus is accessed without holding the 
-lock server->srv_lock in cifs_can_echo():
+are available in the Git repository at:
 
-  if (server->tcpStatus == CifsGood)
-    return true;
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.4-rc6-smb3-client-fixes
 
-To fix this possible data race, a lock and unlock pair is added when
-accessing the variable server->tcpStatus.
+for you to fetch changes up to e4645cc2f1e2d6f268bb8dcfac40997c52432aed:
 
-Reported-by: BassCheck <bass@buaa.edu.cn>
-Signed-off-by: Tuo Li <islituo@gmail.com>
----
- fs/smb/client/smb1ops.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+  cifs: add a warning when the in-flight count goes negative
+(2023-06-14 10:15:05 -0500)
 
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index 7d1b3fc014d9..b258af1a75fe 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -1049,8 +1049,11 @@ cifs_dir_needs_close(struct cifsFileInfo *cfile)
- static bool
- cifs_can_echo(struct TCP_Server_Info *server)
- {
--	if (server->tcpStatus == CifsGood)
-+	spin_lock(&server->srv_lock);
-+	if (server->tcpStatus == CifsGood) {
-+		spin_unlock(&server->srv_lock);
- 		return true;
-+	}
- 
- 	return false;
- }
--- 
-2.34.1
+----------------------------------------------------------------
+Eight smb3 client fixes
+- important fix for deferred close oops (race with unmount) found with
+xfstest generic/098 to some servers
+- important reconnect fix
+- fix problem with max_credits mount option
+- two multichannel (interface related) fixes
+- one trivial removal of confusing comment
+- two small debugging improvements (to better spot crediting problems)
 
+----------------------------------------------------------------
+Enzo Matsumiya (1):
+      smb/client: print "Unknown" instead of bogus link speed value
+
+Shyam Prasad N (5):
+      cifs: fix status checks in cifs_tree_connect
+      cifs: print all credit counters in DebugData
+      cifs: fix sockaddr comparison in iface_cmp
+      cifs: fix max_credits implementation
+      cifs: add a warning when the in-flight count goes negative
+
+Steve French (1):
+      cifs: fix lease break oops in xfstest generic/098
+
+=E9=91=AB=E5=8D=8E (1):
+      smb: remove obsolete comment
+
+ fs/smb/client/cifs_debug.c | 58
+++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ fs/smb/client/cifsglob.h   | 37 -------------------------------------
+ fs/smb/client/cifsproto.h  |  1 +
+ fs/smb/client/connect.c    | 59
++++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ fs/smb/client/dfs.c        |  9 +++++----
+ fs/smb/client/file.c       |  8 ++++++--
+ fs/smb/client/smb2ops.c    | 40 ++++++++++++++++++++++++++++++++++++++++
+ fs/smb/client/smb2pdu.c    | 32 ++++++++++++++++++++++++++++----
+ fs/smb/client/transport.c  |  2 +-
+ 9 files changed, 190 insertions(+), 56 deletions(-)
+
+
+--=20
+Thanks,
+
+Steve
