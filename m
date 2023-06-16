@@ -2,118 +2,137 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B870EEB64D7
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jun 2023 14:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 077D0EB64D7
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jun 2023 14:42:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345595AbjFPOkR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 16 Jun 2023 10:40:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46390 "EHLO
+        id S1345655AbjFPOmj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 16 Jun 2023 10:42:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbjFPOkI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Jun 2023 10:40:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7012700;
-        Fri, 16 Jun 2023 07:40:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 13CA062CD6;
-        Fri, 16 Jun 2023 14:40:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173E8C43395;
-        Fri, 16 Jun 2023 14:40:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686926406;
-        bh=LmQ0A+9O9O846YKQ9SkKO3tmg56GUE4m1YrLD2TzUKQ=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=EvENScLdZ2899SCUlEib3TpooSqIrCtaEXZzsD1BE1WIVTLGsud+qlbOU2R/70Chw
-         bVtUjCBmb7msknzEaW5MevV/CFQBx0qFRiOjHZ7CLLp6nRCMzbAkHeuh6tz3C2YY2x
-         gIPd8Ozt7OMBe8OvEmFvRWqIo8oO+gSq03PszmfHZhd30q64iQBjFNq2/q+OytalAv
-         89Yj9aC0EDcLz2ksTAkRNCavGQCS4CT6Zn+JEC2/FeT7DRLqhsDxjePTfnOboQJCY4
-         FL153lVpC1R36Ndn/6pkh46PQAEh9VehBT00JaOqO+u50SDTRyCIZaq2RfKwpp7kQC
-         6T4vx1n6+9VDg==
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-555508fd7f9so467618eaf.3;
-        Fri, 16 Jun 2023 07:40:06 -0700 (PDT)
-X-Gm-Message-State: AC+VfDwXTp9v3gcRYNvmkt2AA3QpQbA+LYFsgjeaStH8Gsd+4miorLM4
-        QBB/n3xQD5PFiwbG50j05SKNCN2X1FwSPrGW0HA=
-X-Google-Smtp-Source: ACHHUZ6z8GA1qZV8cYgrktvFU8j0O2B9+u9zyzznMrSz3BZZRqGJ81uDTG5XgaLcvQipbezYj8K+9eZ0Q4y7eufjbkk=
-X-Received: by 2002:a4a:d786:0:b0:558:bb12:da9f with SMTP id
- c6-20020a4ad786000000b00558bb12da9fmr1811379oou.2.1686926405144; Fri, 16 Jun
- 2023 07:40:05 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a8a:7cb:0:b0:4df:6fd3:a469 with HTTP; Fri, 16 Jun 2023
- 07:40:04 -0700 (PDT)
-In-Reply-To: <20230616090749.2646749-1-arnd@kernel.org>
+        with ESMTP id S230368AbjFPOmi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Jun 2023 10:42:38 -0400
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5603730F3;
+        Fri, 16 Jun 2023 07:42:35 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.nyi.internal (Postfix) with ESMTP id 178FF5C01AA;
+        Fri, 16 Jun 2023 10:42:32 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Fri, 16 Jun 2023 10:42:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm1; t=1686926552; x=1687012952; bh=4V
+        GcUvtGEtw5RjxdkUnMC4EdyRen1ofbtMRBLCbhZxI=; b=ocdcBE3F46DzA6dg9C
+        SfDfRt0GTts1Qt1RyXWYtzbnfZt1E5amhSiKHlX+aLFdbamOntr5ZuqDZghOhfY1
+        mpbGXeodcqbPc2TQxxH1L7Px+nepEcH7a2Whx/qFga3WBsfxcNudt3X6aFRwUEk7
+        KtuskHiMd55lww3dta/SyCP76MEAR1eK55gxBpNElt7e1C76jwhXEGG7haW2yWiv
+        cxhfX3nXb2zwkEsWUujquiy4WR++oZYb9nA2k74QejLxfO5j3Y+0yJRRq41KAOdh
+        7EKEdIzem7+EcNBFmAHnGe0tMI6cvg5Eg3iZA0/ip+u5Uyh2KN1nxHYOPVk3i9bI
+        FbUg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1686926552; x=1687012952; bh=4VGcUvtGEtw5R
+        jxdkUnMC4EdyRen1ofbtMRBLCbhZxI=; b=ENMlyKe0rLiO7AjUzkgxdJAWtZ3Ix
+        NurGOr3ec7kD8JWlrJyE3KppO0u5rN4hIJRqyUPRsieAQbXzmmZ2WIxfx8rX2Emf
+        jsgNSxJiUAf9ZMWm9FfPL6DJ+RSp+warATmJsgqyl50Xs5GxAYUgpzZyjP0ooOo/
+        Pgch7FIvvbrQlXeGGSxW5uDCPnineM40v0BNlsxXuX4w40OsByelhALpnMj8/9gH
+        BF6hqcjT2PqP67kCt+g6JJ3tGFQMF6obsk7lCglNHM1eegFinTz545INKNSHB17L
+        Sl0pu11w9IX+mBIPAgsKtXVMbqSU8jTbMi+wW4J8erKKB1x3DKymfjWkw==
+X-ME-Sender: <xms:13SMZHOjKdgeY8RqeGIuRpQTnAHItlvYFWKb85KFnAaMjI04n5SKkA>
+    <xme:13SMZB8GjiIEV1m1NP_lPUfit9vVqivOy7L-UJ1JOsYpGKMsn6mRpbxnxIVuHHohn
+    OTGa86XyCIJ5blVE8A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgedvgedgkedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:13SMZGTN7M1QUZviaLNC3wZAgX5Du_qMaTzLp5BhvsEuOVfX_jN5tA>
+    <xmx:13SMZLu3bsPg8QVPRAsD5MaNNl3O_NuQypbsiCZJGtHE1UI7WkScZg>
+    <xmx:13SMZPcA3nUlAsZll98ljVPOeCEI_x9jdKKOkgMxSRRNxXjwtcyggQ>
+    <xmx:2HSMZK0t0DvXikhafboeUF2PfwlrewSk155sWP66D9OIJoeJzFqBNw>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 386D4B60086; Fri, 16 Jun 2023 10:42:31 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-496-g8c46984af0-fm-20230615.001-g8c46984a
+Mime-Version: 1.0
+Message-Id: <6742b2ce-02f1-43c1-811f-de7fd0a74f6a@app.fastmail.com>
+In-Reply-To: <CAKYAXd-j6mJ91hZUZi86HnGJahekHHgYz4ngWfF81QmYigGqVw@mail.gmail.com>
 References: <20230616090749.2646749-1-arnd@kernel.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 16 Jun 2023 23:40:04 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-j6mJ91hZUZi86HnGJahekHHgYz4ngWfF81QmYigGqVw@mail.gmail.com>
-Message-ID: <CAKYAXd-j6mJ91hZUZi86HnGJahekHHgYz4ngWfF81QmYigGqVw@mail.gmail.com>
-Subject: Re: [PATCH] smb: avoid field overflow warning
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Steve French <sfrench@samba.org>, Arnd Bergmann <arnd@arndb.de>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
+ <CAKYAXd-j6mJ91hZUZi86HnGJahekHHgYz4ngWfF81QmYigGqVw@mail.gmail.com>
+Date:   Fri, 16 Jun 2023 16:42:09 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Namjae Jeon" <linkinjeon@kernel.org>,
+        "Arnd Bergmann" <arnd@kernel.org>
+Cc:     "Steve French" <sfrench@samba.org>,
+        "Sergey Senozhatsky" <senozhatsky@chromium.org>,
+        "Tom Talpey" <tom@talpey.com>,
+        "Nathan Chancellor" <nathan@kernel.org>,
+        "Nick Desaulniers" <ndesaulniers@google.com>,
+        "Tom Rix" <trix@redhat.com>,
+        "Christian Brauner" <brauner@kernel.org>,
+        "Dave Chinner" <dchinner@redhat.com>,
+        "Kees Cook" <keescook@chromium.org>,
+        =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+        "Ronnie Sahlberg" <lsahlber@redhat.com>,
+        "Hyunchul Lee" <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
         linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] smb: avoid field overflow warning
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-06-16 18:07 GMT+09:00, Arnd Bergmann <arnd@kernel.org>:
-> From: Arnd Bergmann <arnd@arndb.de>
-Hi Arnd,
+On Fri, Jun 16, 2023, at 16:40, Namjae Jeon wrote:
+> 2023-06-16 18:07 GMT+09:00, Arnd Bergmann <arnd@kernel.org>:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>>
+>> clang warns about a possible field overflow in a memcpy:
+>>
+>> In file included from fs/smb/server/smb_common.c:7:
+>> include/linux/fortify-string.h:583:4: error: call to
+>> '__write_overflow_field' declared with 'warning' attribute: detected write
+>> beyond size of field (1st parameter); maybe use struct_group()?
+>> [-Werror,-Wattribute-warning]
+>>                         __write_overflow_field(p_size_field, size);
+>>
+>> It appears to interpret the "&out[baselen + 4]" as referring to a single
+>> byte of the character array, while the equivalen "out + baselen + 4" is
+>> seen as an offset into the array.
+>>
+>> I don't see that kind of warning elsewhere, so just go with the simple
+>> rework.
+>>
+>> Fixes: e2f34481b24db ("cifsd: add server-side procedures for SMB3")
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>> ---
+>>  fs/smb/server/smb_common.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
+>> index a7e81067bc991..e3273fa640b07 100644
+>> --- a/fs/smb/server/smb_common.c
+>> +++ b/fs/smb/server/smb_common.c
+>> @@ -536,7 +536,7 @@ int ksmbd_extract_shortname(struct ksmbd_conn *conn,
+>> const char *longname,
+>>  	out[baselen + 3] = PERIOD;
+>>
+>>  	if (dot_present)
+>> -		memcpy(&out[baselen + 4], extension, 4);
+>> +		memcpy(out + baselen + 4, extension, 1);
+> Is there any reason to change copy bytes from 4 bytes to 1 byte?
+>
 
->
-> clang warns about a possible field overflow in a memcpy:
->
-> In file included from fs/smb/server/smb_common.c:7:
-> include/linux/fortify-string.h:583:4: error: call to
-> '__write_overflow_field' declared with 'warning' attribute: detected write
-> beyond size of field (1st parameter); maybe use struct_group()?
-> [-Werror,-Wattribute-warning]
->                         __write_overflow_field(p_size_field, size);
->
-> It appears to interpret the "&out[baselen + 4]" as referring to a single
-> byte of the character array, while the equivalen "out + baselen + 4" is
-> seen as an offset into the array.
->
-> I don't see that kind of warning elsewhere, so just go with the simple
-> rework.
->
-> Fixes: e2f34481b24db ("cifsd: add server-side procedures for SMB3")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  fs/smb/server/smb_common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-> index a7e81067bc991..e3273fa640b07 100644
-> --- a/fs/smb/server/smb_common.c
-> +++ b/fs/smb/server/smb_common.c
-> @@ -536,7 +536,7 @@ int ksmbd_extract_shortname(struct ksmbd_conn *conn,
-> const char *longname,
->  	out[baselen + 3] = PERIOD;
->
->  	if (dot_present)
-> -		memcpy(&out[baselen + 4], extension, 4);
-> +		memcpy(out + baselen + 4, extension, 1);
-Is there any reason to change copy bytes from 4 bytes to 1 byte?
+No, that was an accident, this patch is wrong.
 
-Thanks!
->  	else
->  		out[baselen + 4] = '\0';
->  	smbConvertToUTF16((__le16 *)shortname, out, PATH_MAX,
-> --
-> 2.39.2
->
->
+I have to revisit this one and check if my change actually still works
+after I change it back to the correct length.
+
+      Arnd
