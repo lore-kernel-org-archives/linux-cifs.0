@@ -2,61 +2,105 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA5BEB64D7
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jun 2023 03:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34665EB64DB
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jun 2023 06:31:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231305AbjFPDlu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Jun 2023 23:41:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44906 "EHLO
+        id S233613AbjFPGbi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 16 Jun 2023 02:31:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230021AbjFPDls (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jun 2023 23:41:48 -0400
-X-Greylist: delayed 4195 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 15 Jun 2023 20:41:47 PDT
-Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 982BB18D
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Jun 2023 20:41:47 -0700 (PDT)
-Received: by mail.durme.pl (Postfix, from userid 1002)
-        id 3E7975C70E; Tue, 13 Jun 2023 08:00:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
-        t=1686645820; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
-        h=Date:From:To:Subject:From;
-        b=kOgkl+xdgeVof/fNh8n19zAPhVAdpTHU9YixDyT7SSWzldp8g5iWn6lJR2iSbjJ0H
-         iF9z0WZC5AIWgKw2YuAn1SyeranFVvcM7dZx6pEy4mBtC8yKzAiYhOWBCmy7518xCG
-         JNa+8cl2vywy+T3W5UyNEESMNmHz67WrZyE1IAD8T0FQXlihI5Rkj2+NuQckcpzQr7
-         k99ZvIjDSCi9qvdLG1oX+Itx0nfUYsd1NzyzuZ0umNkvQjPDooOPUtHzc4jQaSv++d
-         hvHbMGdD/mhnfr0gb6c1gbmZCsCtUmoBMMcC+P1JhXnBuATIInStKqngKKYFM0QolA
-         7aV0tf41wryCQ==
-Received: by mail.durme.pl for <linux-cifs@vger.kernel.org>; Tue, 13 Jun 2023 08:00:41 GMT
-Message-ID: <20230613064501-0.1.2g.aygn.0.1x2dab0d79@durme.pl>
-Date:   Tue, 13 Jun 2023 08:00:41 GMT
-From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
-To:     <linux-cifs@vger.kernel.org>
-Subject: W sprawie samochodu
-X-Mailer: mail.durme.pl
+        with ESMTP id S1344065AbjFPGbV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Jun 2023 02:31:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 219532D79;
+        Thu, 15 Jun 2023 23:31:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A749A61FD4;
+        Fri, 16 Jun 2023 06:31:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04035C433CB;
+        Fri, 16 Jun 2023 06:31:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686897068;
+        bh=I6y571LHiMxKVXP0TWJXM4f3J4zGZxDC3DJMVqBBmBM=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=pLOR2gkSe39D520vRGnFsns0F036Hc79Ccagpkg1yG3yblwRC3IbvqOSO68rSgc3B
+         TYBncfH4lShnG7nDhAWAeaxX1QFOBxQwn/TOgZZby3eEccc+Ge9syI0Mun+EnPefru
+         yXSjk93N3/B2D2pVYO7lYNmsXzm/MG5mnMSdpwzNn+Y40LZk8BxPY8q4j2Vho5YIGu
+         +h4mUTWq95GUuB58Snhz1/eXxUpM2DryNkj2J/IHQHaic7QQaa9SH7acr4l1gZUaye
+         qoyRuTo9mApqSv8NDD6cxUjKYMkESZqUgY+iygSA0zeQB5bssJPvFCsZpMFrxIYh45
+         kSNS3t0vwwqEA==
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-1a6b7060862so487587fac.2;
+        Thu, 15 Jun 2023 23:31:07 -0700 (PDT)
+X-Gm-Message-State: AC+VfDzyFq6b5RhZ2QNSX+GXdrus0F/6ZkzepjD0IGO9jLcHH0fH+coU
+        UZnPeIPF1k38MafiB6zMwGP4Q1YtsqYHvgm4pyo=
+X-Google-Smtp-Source: ACHHUZ41f41CQLRnM2Vk3qiZGX7SKetPHx2X9RhJ1NOvob8oHp1q3dcKa3Qgzsp7zpOC5xGMo7Y1MTTmVbJvME843Ks=
+X-Received: by 2002:a05:6870:8785:b0:19e:b8e0:1434 with SMTP id
+ r5-20020a056870878500b0019eb8e01434mr1337961oam.8.1686897067174; Thu, 15 Jun
+ 2023 23:31:07 -0700 (PDT)
 MIME-Version: 1.0
+Received: by 2002:a8a:7cb:0:b0:4df:6fd3:a469 with HTTP; Thu, 15 Jun 2023
+ 23:31:06 -0700 (PDT)
+In-Reply-To: <CAKYAXd96UE4T91ODspie4d6jr0FAPN13ke7XehXk5Qv6LcXfSQ@mail.gmail.com>
+References: <20230614122808.1350-1-machel@vivo.com> <CAKYAXd96UE4T91ODspie4d6jr0FAPN13ke7XehXk5Qv6LcXfSQ@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Fri, 16 Jun 2023 15:31:06 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-QYPjSofLAB1gys30M-xQ=TvtN=TSJCdLaZYxfMzeUng@mail.gmail.com>
+Message-ID: <CAKYAXd-QYPjSofLAB1gys30M-xQ=TvtN=TSJCdLaZYxfMzeUng@mail.gmail.com>
+Subject: Re: [PATCH v1] fs:smb:server:Fix unsigned compared with less than zero
+To:     Wang Ming <machel@vivo.com>
+Cc:     Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
+2023-06-15 15:01 GMT+09:00, Namjae Jeon <linkinjeon@kernel.org>:
+> 2023-06-14 21:27 GMT+09:00, Wang Ming <machel@vivo.com>:
+>> The return value of the ksmbd_vfs_getcasexattr() is long.
+>> However, the return value is being assigned to an unsignef
+>> long variable 'v_len',so making 'v_len' to long.
+>>
+>> silence the warning:
+>> ./fs/smb/server/vfs.c:433:6-11:WARNING: Unsigned expression compared
+>> with zero: v_len > 0
+>>
+>> Signed-off-by: Wang Ming <machel@vivo.com>
+> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Hi Wang,
 
-chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
-, je=C5=9Bli chodzi o system monitoringu GPS.
+Your patch seems to be corrupted.
 
-Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
-e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
-a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+ERROR: patch seems to be corrupt (line wrapped?)
+#107: FILE: fs/smb/server/vfs.c:399:
+, char *buf, loff_t *pos,
 
-Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
-dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
-szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
-mne znaczenie.
+WARNING: please, no spaces at the start of a line
+#112: FILE: fs/smb/server/vfs.c:403:
++       size_t size;$
 
-Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
-b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
+WARNING: please, no spaces at the start of a line
+#113: FILE: fs/smb/server/vfs.c:404:
++       ssize_t v_len;$
 
+WARNING: please, no spaces at the start of a line
+#123: FILE: fs/smb/server/vfs.c:421:
++       if (v_len < 0) {$
 
-Pozdrawiam
-Krystian Wieczorek
+WARNING: suspect code indent for conditional statements (7, 15)
+#123: FILE: fs/smb/server/vfs.c:421:
++       if (v_len < 0) {
+                pr_err("not found stream in xattr : %zd\n", v_len);
+
+total: 1 errors, 4 warnings, 19 lines checked
+
+Can you send the patch using git send-email or attach the patch file
+on this mail ?
+>
+> Thanks!
+>
