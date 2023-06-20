@@ -2,153 +2,86 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AF5EB64D7
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Jun 2023 07:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 762E8EB64D8
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Jun 2023 10:08:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231782AbjFTH7U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Jun 2023 03:59:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52892 "EHLO
+        id S231733AbjFTKId (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 20 Jun 2023 06:08:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231356AbjFTH6n (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Jun 2023 03:58:43 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 232EB1991;
-        Tue, 20 Jun 2023 00:58:32 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b466073e19so42601571fa.1;
-        Tue, 20 Jun 2023 00:58:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687247910; x=1689839910;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nUePLlIsXbvh6FDAcQ5EWj0nl9vClHwyNGCJCvpRtKU=;
-        b=dV/O+wJThT05mGVj3DHCFIln90RC/XQVt6kU8APLv8EExjjzQLGW/7LGbdh8KR5AMc
-         YwxVBzTZ7Ha2TYuSXhg5u4nj8FevKAgCpZa/tD4TgwJ0BPB2S2a+KcsXGfkZFyV/yL07
-         qLHBoTHHElTARXdNRzdgAfuQdrX+2evXERrPEIjumx7j9SuMPNj1h/CkcaG5FjjGQdyl
-         FKXgBdcAGYHFCHknbdGtfLHVx8nNZUdqIMnJHVlrEs4yteezqi9w9j/BBaKo2tdqJGzJ
-         Y+sAEWMc1P6xfxCyQBXZnkE+d/602RE0zZgqJupFTLxY/oI6cQjRG5eSKD8co6E8xFyo
-         Vdvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687247910; x=1689839910;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nUePLlIsXbvh6FDAcQ5EWj0nl9vClHwyNGCJCvpRtKU=;
-        b=IdjFMttk2NDU2iRdDhJAfWYhrbVIm/+4FUpQnSWoUhmtqHo46Vp8VXn/tTJBWyczCy
-         /2htTkP09OSyYp8Q7uRPDmjFMCbzdF10bUgL5sMO+uUWXXEbWdNWAouUllBP4bK9ppps
-         byMu+lBS6Wj1oczenq70PAfJtNI9lKKmEoCFqddFyDtPGWQauyiN+/WpAslp//QPckqy
-         UhPkfNPxi12PWPSt9yWdS4wZmtkwe8o+PHDpOZlnWv87XoM+llmg0dA1fxnKpsRPAOvE
-         CtuAxipecDnbeUajjTuyz14l99NEGM31eY3jtBFXaH2d6xknbD68kKLxlAIHSruAiMNr
-         eFag==
-X-Gm-Message-State: AC+VfDzHvNiCJxZevGYuDFD1iogX7MvbkwYI2k0Ek7t7wesf3H5AkBrT
-        cbpy1St9HrF7zVlfOjqn6dn9CMlIDZYVPIBcqq8=
-X-Google-Smtp-Source: ACHHUZ5XVKllmbPa/ga44q7tt984qf5Fm7N9w8OQYzB9qaD8eXbseT5P6oNjLOU70O2kDauFWowirwQpDy9tgyQ+780=
-X-Received: by 2002:a2e:8702:0:b0:2b4:7f2e:a433 with SMTP id
- m2-20020a2e8702000000b002b47f2ea433mr2945602lji.36.1687247909561; Tue, 20 Jun
- 2023 00:58:29 -0700 (PDT)
-MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Tue, 20 Jun 2023 13:28:18 +0530
-Message-ID: <CANT5p=qDON8uO9z92xEcP16kvRdHrf84owmcb20MGZnOxT_xmg@mail.gmail.com>
-Subject: Hang seen with the latest mainline kernel
-To:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
+        with ESMTP id S231735AbjFTKIV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Jun 2023 06:08:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A14DB
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jun 2023 03:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687255647;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mnUIleGLnJnV1R5zNo2NApBTcaLL4wPyP/w4+xH/thE=;
+        b=a9h4FJWbGw6e7A7NyyJd7JVODTpyyITDyLbUGeKR2kL8WlUBB1qW35UmvRmnyXxwYWtmFH
+        swhAE7l4RFFEjl0y2b5MV/J6JWR6WFmIT6DqCr3Akql+cufWBNyIOHK6JPysVrMUSwF4/Q
+        vnybIrEPzM4012S9JDuD0WzMIKx45LM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-354-aMBqZ9_kPkqieAhNWuteVQ-1; Tue, 20 Jun 2023 06:07:21 -0400
+X-MC-Unique: aMBqZ9_kPkqieAhNWuteVQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AE1F0810BB2;
+        Tue, 20 Jun 2023 10:07:20 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0AD83200A398;
+        Tue, 20 Jun 2023 10:07:19 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CANT5p=qDON8uO9z92xEcP16kvRdHrf84owmcb20MGZnOxT_xmg@mail.gmail.com>
+References: <CANT5p=qDON8uO9z92xEcP16kvRdHrf84owmcb20MGZnOxT_xmg@mail.gmail.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
         Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: Hang seen with the latest mainline kernel
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1238459.1687255639.1@warthog.procyon.org.uk>
+Date:   Tue, 20 Jun 2023 11:07:19 +0100
+Message-ID: <1238460.1687255639@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi David/Matthew,
+Shyam Prasad N <nspmangalore@gmail.com> wrote:
 
-We've been running some stress testing lately in Microsoft with Linux
-6.4-rc4 kernel, and I've noticed some warnings of hangs with this
-stack trace. Can you please take a look and let me know what you
-think?
+> [Mon Jun 19 16:05:49 2023]  invalidate_inode_pages2+0x17/0x30
+> [Mon Jun 19 16:05:49 2023]  cifs_invalidate_mapping+0x57/0x90 [cifs]
+> [Mon Jun 19 16:05:49 2023]  cifs_revalidate_mapping+0xd5/0x130 [cifs]
+> [Mon Jun 19 16:05:49 2023]  cifs_revalidate_dentry+0x32/0x40 [cifs]
+> [Mon Jun 19 16:05:49 2023]  cifs_d_revalidate+0xa3/0x220 [cifs]
+> [Mon Jun 19 16:05:49 2023]  lookup_fast+0xfc/0x1c0
+> [Mon Jun 19 16:05:49 2023]  walk_component+0x39/0x240
+> [Mon Jun 19 16:05:49 2023]  path_lookupat+0xb2/0x2f0
+> [Mon Jun 19 16:05:49 2023]  filename_lookup+0x16f/0x340
 
-This seems to be reproducing quite often on this test setup. So please
-let me know if there's more data you need to debug this.
+You don't have a deadlock between two inode locks, do you?  The one on the
+parent dir and the one on whatever is being invalidated.
 
-[Mon Jun 19 16:05:49 2023] INFO: task newstress:61476 blocked for more
-than 966 seconds.
-[Mon Jun 19 16:05:49 2023]       Tainted: G           OE
-6.4.0-rc3-wkasan #5
-[Mon Jun 19 16:05:49 2023] "echo 0 >
-/proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[Mon Jun 19 16:05:49 2023] task:newstress     state:D stack:0
-pid:61476 ppid:61160  flags:0x00000002
-[Mon Jun 19 16:05:49 2023] Call Trace:
-[Mon Jun 19 16:05:49 2023]  <TASK>
-[Mon Jun 19 16:05:49 2023]  __schedule+0x782/0x2500
-[Mon Jun 19 16:05:49 2023]  ? __rcu_read_unlock+0x53/0x80
-[Mon Jun 19 16:05:49 2023]  ? __kasan_check_read+0x11/0x20
-[Mon Jun 19 16:05:49 2023]  ? __pfx___schedule+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? __rcu_read_unlock+0x53/0x80
-[Mon Jun 19 16:05:49 2023]  ? cgroup_rstat_updated+0x82/0x250
-[Mon Jun 19 16:05:49 2023]  ? __kasan_check_write+0x14/0x30
-[Mon Jun 19 16:05:49 2023]  schedule+0x9b/0x150
-[Mon Jun 19 16:05:49 2023]  io_schedule+0x70/0xc0
-[Mon Jun 19 16:05:49 2023]  folio_wait_bit_common+0x232/0x550
-[Mon Jun 19 16:05:49 2023]  ? __pfx_folio_wait_bit_common+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? __filemap_remove_folio+0x177/0x3a0
-[Mon Jun 19 16:05:49 2023]  ? __pfx_wake_page_function+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? __pfx_workingset_update_node+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? __pfx__raw_spin_lock_irq+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  __folio_lock+0x17/0x30
-[Mon Jun 19 16:05:49 2023]  invalidate_inode_pages2_range+0x5b4/0x840
-[Mon Jun 19 16:05:49 2023]  ? __pfx_invalidate_inode_pages2_range+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? cifs_dentry_needs_reval+0x27f/0x390 [cifs]
-[Mon Jun 19 16:05:49 2023]  ? cifs_revalidate_dentry_attr+0xa4/0x650 [cifs]
-[Mon Jun 19 16:05:49 2023]  invalidate_inode_pages2+0x17/0x30
-[Mon Jun 19 16:05:49 2023]  cifs_invalidate_mapping+0x57/0x90 [cifs]
-[Mon Jun 19 16:05:49 2023]  cifs_revalidate_mapping+0xd5/0x130 [cifs]
-[Mon Jun 19 16:05:49 2023]  cifs_revalidate_dentry+0x32/0x40 [cifs]
-[Mon Jun 19 16:05:49 2023]  cifs_d_revalidate+0xa3/0x220 [cifs]
-[Mon Jun 19 16:05:49 2023]  lookup_fast+0xfc/0x1c0
-[Mon Jun 19 16:05:49 2023]  walk_component+0x39/0x240
-[Mon Jun 19 16:05:49 2023]  path_lookupat+0xb2/0x2f0
-[Mon Jun 19 16:05:49 2023]  filename_lookup+0x16f/0x340
-[Mon Jun 19 16:05:49 2023]  ? __pfx_filename_lookup+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? __kasan_slab_alloc+0x9d/0xa0
-[Mon Jun 19 16:05:49 2023]  ? kmem_cache_alloc+0x176/0x3a0
-[Mon Jun 19 16:05:49 2023]  ? getname_flags.part.0+0x3c/0x260
-[Mon Jun 19 16:05:49 2023]  ? getname_flags+0x56/0x90
-[Mon Jun 19 16:05:49 2023]  ? __x64_sys_statx+0x9b/0xf0
-[Mon Jun 19 16:05:49 2023]  ? do_syscall_64+0x5c/0x90
-[Mon Jun 19 16:05:49 2023]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
-[Mon Jun 19 16:05:49 2023]  ? __rcu_read_unlock+0x53/0x80
-[Mon Jun 19 16:05:49 2023]  vfs_statx+0xf4/0x260
-[Mon Jun 19 16:05:49 2023]  ? __pfx_vfs_statx+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? __kasan_check_write+0x14/0x30
-[Mon Jun 19 16:05:49 2023]  ? lockref_get+0xdb/0x170
-[Mon Jun 19 16:05:49 2023]  ? __pfx_lockref_get+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  do_statx+0x99/0x100
-[Mon Jun 19 16:05:49 2023]  ? __pfx_do_statx+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? __pfx_do_statx+0x10/0x10
-[Mon Jun 19 16:05:49 2023]  ? _raw_spin_unlock+0xe/0x40
-[Mon Jun 19 16:05:49 2023]  ? audit_alloc_name+0x1b0/0x1e0
-[Mon Jun 19 16:05:49 2023]  ? __audit_getname+0x98/0xb0
-[Mon Jun 19 16:05:49 2023]  ? getname_flags.part.0+0x10f/0x260
-[Mon Jun 19 16:05:49 2023]  ? getname_flags+0x56/0x90
-[Mon Jun 19 16:05:49 2023]  __x64_sys_statx+0xb3/0xf0
-[Mon Jun 19 16:05:49 2023]  do_syscall_64+0x5c/0x90
-[Mon Jun 19 16:05:49 2023]  ? do_syscall_64+0x69/0x90
-[Mon Jun 19 16:05:49 2023]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-[Mon Jun 19 16:05:49 2023] RIP: 0033:0x7f0e14f121ee
-[Mon Jun 19 16:05:49 2023] RSP: 002b:00007f0ccf7e3668 EFLAGS: 00000206
-ORIG_RAX: 000000000000014c
-[Mon Jun 19 16:05:49 2023] RAX: ffffffffffffffda RBX: 00007f0ccf7e3b30
-RCX: 00007f0e14f121ee
-[Mon Jun 19 16:05:49 2023] RDX: 0000000000002100 RSI: 00007f0d8073da80
-RDI: 0000000000000000
-[Mon Jun 19 16:05:49 2023] RBP: 00007f0ccf7e3a90 R08: 00007f0ccf7e3950
-R09: 00007f0d8073da80
-[Mon Jun 19 16:05:49 2023] R10: 0000000000000fff R11: 0000000000000206
-R12: 00007f0ccf7e37a0
-[Mon Jun 19 16:05:49 2023] R13: 00007f0d800061d0 R14: 00007f0ccf7e3740
-R15: 00007f0ccf7e3770
-[Mon Jun 19 16:05:49 2023]  </TASK>
+Or between invalidate and a write.  It doesn't seem that it should be that,
+since in both cases it should take the inode lock first and then PG_lock.
 
+There's the possibility that we missed unlocking a page after splitting a
+read or a write.
 
--- 
-Regards,
-Shyam
+What's the testcase like?  Would it be feasible to trace page activity on smb
+pages?  I have a patch to restrict the page count tracing to just trace the
+page lock flag that I might be able to adapt.
+
+David
+
