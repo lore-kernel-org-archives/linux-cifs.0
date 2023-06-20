@@ -2,302 +2,193 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72172EB64DC
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Jun 2023 05:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E59EB64D8
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Jun 2023 07:44:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbjFTFGA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Jun 2023 01:06:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51126 "EHLO
+        id S231282AbjFTHoW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 20 Jun 2023 03:44:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjFTFF7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Jun 2023 01:05:59 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319B6DF;
-        Mon, 19 Jun 2023 22:05:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687237558; x=1718773558;
-  h=date:from:to:cc:subject:message-id;
-  bh=k8dXJKm1Tj7CvpWo81Shwd/lfWNNX2BkVPkjhZZRA4s=;
-  b=hNR0obi/pd8JoWC29UH1y/BBrtFZexq4kdC5sgPcJiT/2Je7fBrWgOSM
-   Ixm7bqpTFVXihl67gJdgRZN324nU2I2slRgg+rv6IqEDbVVizqdGV8/k1
-   loTr64P7cDfQ9j8vUxR1iTEUx5re6CxFqp5B24hYOlcwxYcsacLSwfIA/
-   qo0Fj6Bg20n4XPNTYwrwSc7ubqK0BkOd9eUH2+HdIobDZSe9eQsCnkr1I
-   weVSB7PuRXQKGBlPc21nZ1Dz9qP0ll+u7mVsU5cwl2AP/8rG7Ty2RalaN
-   dbi3+SRhJsU0jxpZj0gaRRVImFmEmmeNuxc+UBYWzll7IH3RSagr8cqYL
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="359768858"
-X-IronPort-AV: E=Sophos;i="6.00,256,1681196400"; 
-   d="scan'208";a="359768858"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2023 22:05:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="858433812"
-X-IronPort-AV: E=Sophos;i="6.00,256,1681196400"; 
-   d="scan'208";a="858433812"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 19 Jun 2023 22:05:54 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qBTYv-0005VG-1l;
-        Tue, 20 Jun 2023 05:05:53 +0000
-Date:   Tue, 20 Jun 2023 13:05:49 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Linux Memory Management List <linux-mm@kvack.org>,
-        apparmor@lists.ubuntu.com, intel-gfx@lists.freedesktop.org,
-        kunit-dev@googlegroups.com, kvm-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [linux-next:master] BUILD REGRESSION
- 47045630bc409ce6606d97b790895210dd1d517d
-Message-ID: <202306201331.3wBBp3Up-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        with ESMTP id S229970AbjFTHoE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Jun 2023 03:44:04 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5986A19B6
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jun 2023 00:43:46 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4f849a0e371so5608139e87.1
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Jun 2023 00:43:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687247024; x=1689839024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pn9INY888qfu49qxiUk2N9RkspKhh1JKufeJdU1o29Q=;
+        b=sT5W0fxs9QI6/MWDEJw6cxBGg3W0PRXztVhAkC6qoKG62nB5oVkzIf3IBRgbEw5JiB
+         W1V/LTESiVHXYhHi3Ay3dSaSMQiIgiRlPTZiZ9dB+9IWGdNAj4wvSYPzho/IGyojLbrx
+         98S85XcX6BVWWQkXyE/nmBiri01YEQGKVUkEICkD7mmheRwU9+sK+UPY+6ePVtcfqcU6
+         FjczwhM6bKXNy95zhyyO0jBMgMMammNT70laykupEvw1A1pr7KWKORuO8h+JU2Ns4soY
+         91cMBG61QGNyzV1t6vQf7T9yu47tBh+mxSfMspch/B3sMUsPzRUE0UwvpX2Xyt8LKWqr
+         Ia8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687247024; x=1689839024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pn9INY888qfu49qxiUk2N9RkspKhh1JKufeJdU1o29Q=;
+        b=lh1Jsee2/9Qzq1xsayKegE25JYCmIJMp2gxUiqDSG7xNsQcN4Z9kHVOulPDo32IAU4
+         boaOELsERxLqpxT98L1dWNyPWT5pAouJWcIVfMQ6tZYlpgPX3qGewr2KKDkRARKIWYVe
+         FwPkIiNH92/WgRn8SNtzNA2g1TlFqlsRTJI8qDJOGVSWW9OmSSHMAALvxJ9rlxoYhA2j
+         q8I1jc21XmLbRshh6zSvVk8UZaBODfpHGeJAL9LEnuK3++8jbQ23DiaSbaVBGeY1gAIe
+         OEP818GiDXdcbeSnHosdOtzFpeY+6df7m0bHI6GyxuBfYPpGafed0THXfnizL368V18a
+         xfyA==
+X-Gm-Message-State: AC+VfDz5V36yxguF6SpfyztMe+z19uNiL2SusRgXJO1vdTZsURZWyIml
+        0s+EsqXm9qazUPo4dk+hV9/t83DNrWEOk+p4Da4=
+X-Google-Smtp-Source: ACHHUZ7CvPc9Z9zvxMnl3brNhuUVU761I9XvtzaxuQ7kGGGQRMW/Ebq1S/ZvMEjzAnOiJYd3aPzMbka7PfE0mVtSnW4=
+X-Received: by 2002:a2e:99cf:0:b0:2b4:6dbf:e6fe with SMTP id
+ l15-20020a2e99cf000000b002b46dbfe6femr4045424ljj.51.1687247024094; Tue, 20
+ Jun 2023 00:43:44 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230619033436.808928-1-bharathsm@microsoft.com>
+ <CAH2r5msQ_FXVuhhp6FzeVr3rVR5pw=_dQ2da=k+jtqqpouKWZg@mail.gmail.com>
+ <5a83a490-dc32-901c-5ea5-85458f815e0d@talpey.com> <CAGypqWyyL-1OU2XZyOPtKdvTi_M+hRdJXO+Y5VizvoE+0pwN7g@mail.gmail.com>
+ <793436e4-01ce-a552-03b9-7b45b0a9e020@talpey.com>
+In-Reply-To: <793436e4-01ce-a552-03b9-7b45b0a9e020@talpey.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Tue, 20 Jun 2023 13:13:32 +0530
+Message-ID: <CANT5p=p8Cx1AgHZVWDjVLrndXQ=aRymLbQiuERFVZFg=w-LgSA@mail.gmail.com>
+Subject: Re: [PATCH] SMB3: Do not send lease break acknowledgment if all file
+ handles have been closed
+To:     Tom Talpey <tom@talpey.com>
+Cc:     Bharath SM <bharathsm.hsk@gmail.com>,
+        Steve French <smfrench@gmail.com>, sfrench@samba.org,
+        pc@manguebit.com, lsahlber@redhat.com, sprasad@microsoft.com,
+        linux-cifs@vger.kernel.org, bharathsm@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 47045630bc409ce6606d97b790895210dd1d517d  Add linux-next specific files for 20230619
+On Mon, Jun 19, 2023 at 11:11=E2=80=AFPM Tom Talpey <tom@talpey.com> wrote:
+>
+> On 6/19/2023 1:27 PM, Bharath SM wrote:
+> > Please find the attached patch with suggested changes.
+>
+> LGTM, feel free to add my previous R-B.
+>
+> Tom.
+>
+> > On Mon, Jun 19, 2023 at 5:40=E2=80=AFPM Tom Talpey <tom@talpey.com> wro=
+te:
+> >>
+> >> On 6/19/2023 12:54 AM, Steve French wrote:
+> >>> tentatively merged into cifs-2.6.git for-next pending more testing
+> >>>
+> >>> On Sun, Jun 18, 2023 at 10:57=E2=80=AFPM Bharath SM <bharathsm.hsk@gm=
+ail.com> wrote:
+> >>>>
+> >>>> In case if all existing file handles are deferred handles and if all=
+ of
+> >>>> them gets closed due to handle lease break then we dont need to send
+> >>>> lease break acknowledgment to server, because last handle close will=
+ be
+> >>>> considered as lease break ack.
+> >>>> After closing deferred handels, we check for openfile list of inode,
+> >>>> if its empty then we skip sending lease break ack.
+> >>>>
+> >>>> Fixes: 59a556aebc43 ("SMB3: drop reference to cfile before sending o=
+plock break")
+> >>>> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> >>>> ---
+> >>>>    fs/smb/client/file.c | 7 +++++--
+> >>>>    1 file changed, 5 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> >>>> index 051283386e22..b8a3d60e7ac4 100644
+> >>>> --- a/fs/smb/client/file.c
+> >>>> +++ b/fs/smb/client/file.c
+> >>>> @@ -4941,7 +4941,9 @@ void cifs_oplock_break(struct work_struct *wor=
+k)
+> >>>>            * not bother sending an oplock release if session to serv=
+er still is
+> >>>>            * disconnected since oplock already released by the serve=
+r
+> >>>>            */
+> >>
+> >> The comment just above is a woefully incorrect SMB1 artifact, and
+> >> it's even worse now.
+> >>
+> >> Here's what it currently says:
+> >>
+> >>>        /*
+> >>>         * releasing stale oplock after recent reconnect of smb sessio=
+n using
+> >>>         * a now incorrect file handle is not a data integrity issue b=
+ut do
+> >>>         * not bother sending an oplock release if session to server s=
+till is
+> >>>         * disconnected since oplock already released by the server
+> >>>         */
+> >>
+> >> One option is deleting it entirely, but I suggest:
+> >>
+> >> "MS-SMB2 3.2.5.19.1 and 3.2.5.19.2 (and MS-CIFS 3.2.5.42) do not requi=
+re
+> >>    an acknowledgement to be sent when the file has already been closed=
+."
+> >>
+> >>>> -       if (!oplock_break_cancelled) {
+> >>>> +       spin_lock(&cinode->open_file_lock);
+> >>>> +       if (!oplock_break_cancelled && !list_empty(&cinode->openFile=
+List)) {
+> >>>> +               spin_unlock(&cinode->open_file_lock);
+> >>>>                   /* check for server null since can race with kill_=
+sb calling tree disconnect */
+> >>>>                   if (tcon->ses && tcon->ses->server) {
+> >>>>                           rc =3D tcon->ses->server->ops->oplock_resp=
+onse(tcon, persistent_fid,
+> >>>> @@ -4949,7 +4951,8 @@ void cifs_oplock_break(struct work_struct *wor=
+k)
+> >>>>                           cifs_dbg(FYI, "Oplock release rc =3D %d\n"=
+, rc);
+> >>>>                   } else
+> >>>>                           pr_warn_once("lease break not sent for unm=
+ounted share\n");
+> >>
+> >> Also, I think this warning is entirely pointless, in addition to
+> >> being similarly incorrect post-SMB1. Delete it. You will be able
+> >> to refactor the if/else branches more clearly in this case too.
+> >>
+> >> With those changes considered,
+> >> Reviewed-by: Tom Talpey <tom@talpey.com>
+> >>
 
-Error/Warning reports:
+Hi Tom,
 
-https://lore.kernel.org/oe-kbuild-all/202306122223.HHER4zOo-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306141934.UKmM9bFX-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306151954.Rsz6HP7h-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306191640.NE97q8G3-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306200328.NX4JlBDv-lkp@intel.com
+I'm leaning towards having the warning statement here. Although with
+more useful details about the inode/lease etc.
+If this condition is reached, it means that the cifs_inode still has
+at least one handle open.
+If that is the case, can the tcon/ses/server ever be NULL?
 
-Error/Warning: (recently discovered and may have been fixed)
+Regards,
+Shyam
 
-arch/parisc/kernel/pdt.c:65:6: warning: no previous prototype for 'arch_report_meminfo' [-Wmissing-prototypes]
-arch/riscv/kvm/aia_imsic.c:237:9: error: call to undeclared function 'arch_atomic_long_fetch_or'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/char/mem.c:164:25: error: implicit declaration of function 'unxlate_dev_mem_ptr'; did you mean 'xlate_dev_mem_ptr'? [-Werror=implicit-function-declaration]
-drivers/gpu/drm/i915/display/intel_display_power.h:255:70: error: declaration of 'struct seq_file' will not be visible outside of this function [-Werror,-Wvisibility]
-drivers/leds/leds-cht-wcove.c:144:21: warning: no previous prototype for 'cht_wc_leds_brightness_get' [-Wmissing-prototypes]
-lib/kunit/executor_test.c:138:4: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
-lib/kunit/test.c:775:38: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
-security/apparmor/policy_unpack.c:1173: warning: expecting prototype for verify_dfa_accept_xindex(). Prototype was for verify_dfa_accept_index() instead
+> >> Tom.
+> >>
+> >>>> -       }
+> >>>> +       } else
+> >>>> +               spin_unlock(&cinode->open_file_lock);
+> >>>>
+> >>>>           cifs_done_oplock_break(cinode);
+> >>>>    }
+> >>>> --
+> >>>> 2.34.1
+> >>>>
+> >>>
+> >>>
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
 
-drivers/staging/media/atomisp/pci/atomisp_fops.c:517 atomisp_open() warn: missing unwind goto?
-drivers/usb/cdns3/cdns3-starfive.c:23: warning: expecting prototype for cdns3(). Prototype was for USB_STRAP_HOST() instead
-fs/smb/client/cifsfs.c:984 cifs_smb3_do_mount() warn: possible memory leak of 'cifs_sb'
-fs/smb/client/cifssmb.c:4089 CIFSFindFirst() warn: missing error code? 'rc'
-fs/smb/client/cifssmb.c:4216 CIFSFindNext() warn: missing error code? 'rc'
-fs/smb/client/connect.c:2775 cifs_match_super() error: 'tlink' dereferencing possible ERR_PTR()
-fs/smb/client/connect.c:2974 generic_ip_connect() error: we previously assumed 'socket' could be null (see line 2962)
-{standard input}: Error: local label `"2" (instance number 9 of a fb label)' is not defined
-{standard input}:1097: Error: pcrel too far
 
-Error/Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- i386-allyesconfig
-|   `-- drivers-leds-leds-cht-wcove.c:warning:no-previous-prototype-for-cht_wc_leds_brightness_get
-|-- i386-randconfig-m021-20230618
-|   |-- drivers-staging-media-atomisp-pci-atomisp_fops.c-atomisp_open()-warn:missing-unwind-goto
-|   |-- fs-smb-client-cifsfs.c-cifs_smb3_do_mount()-warn:possible-memory-leak-of-cifs_sb
-|   |-- fs-smb-client-cifssmb.c-CIFSFindFirst()-warn:missing-error-code-rc
-|   |-- fs-smb-client-cifssmb.c-CIFSFindNext()-warn:missing-error-code-rc
-|   |-- fs-smb-client-connect.c-cifs_match_super()-error:tlink-dereferencing-possible-ERR_PTR()
-|   `-- fs-smb-client-connect.c-generic_ip_connect()-error:we-previously-assumed-socket-could-be-null-(see-line-)
-|-- parisc-allyesconfig
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- parisc-defconfig
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- parisc-randconfig-r001-20230619
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- parisc-randconfig-s042-20230618
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- parisc64-defconfig
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- riscv-allmodconfig
-|   `-- drivers-usb-cdns3-cdns3-starfive.c:warning:expecting-prototype-for-cdns3().-Prototype-was-for-USB_STRAP_HOST()-instead
-|-- riscv-allyesconfig
-|   `-- drivers-usb-cdns3-cdns3-starfive.c:warning:expecting-prototype-for-cdns3().-Prototype-was-for-USB_STRAP_HOST()-instead
-|-- riscv-randconfig-s051-20230618
-|   `-- arch-riscv-kernel-signal.c:sparse:sparse:incorrect-type-in-initializer-(different-address-spaces)-expected-void-__val-got-void-noderef-__user-assigned-datap
-|-- sh-allmodconfig
-|   |-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
-|   |-- standard-input:Error:local-label-(instance-number-of-a-fb-label)-is-not-defined
-|   `-- standard-input:Error:pcrel-too-far
-|-- sh-magicpanelr2_defconfig
-|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
-|-- sh-rsk7269_defconfig
-|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
-|-- x86_64-allyesconfig
-|   `-- drivers-leds-leds-cht-wcove.c:warning:no-previous-prototype-for-cht_wc_leds_brightness_get
-`-- x86_64-randconfig-m001-20230618
-    |-- fs-smb-client-cifsfs.c-cifs_smb3_do_mount()-warn:possible-memory-leak-of-cifs_sb
-    |-- fs-smb-client-cifssmb.c-CIFSFindFirst()-warn:missing-error-code-rc
-    |-- fs-smb-client-cifssmb.c-CIFSFindNext()-warn:missing-error-code-rc
-    |-- fs-smb-client-connect.c-cifs_match_super()-error:tlink-dereferencing-possible-ERR_PTR()
-    `-- fs-smb-client-connect.c-generic_ip_connect()-error:we-previously-assumed-socket-could-be-null-(see-line-)
-clang_recent_errors
-|-- arm-randconfig-r002-20230619
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   |-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- security-apparmor-policy_unpack.c:warning:expecting-prototype-for-verify_dfa_accept_xindex().-Prototype-was-for-verify_dfa_accept_index()-instead
-|-- hexagon-randconfig-r011-20230619
-|   `-- bin-bash:line:Segmentation-fault-LLVM_OBJCOPY-llvm-objcopy-pahole-J-btf_gen_floats-j-lang_exclude-rust-skip_encoding_btf_inconsistent_proto-btf_gen_optimized-btf_base-vmlinux-drivers-iio-adc-max1363.k
-|-- hexagon-randconfig-r041-20230619
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- hexagon-randconfig-r045-20230619
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- powerpc-randconfig-r012-20230619
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- riscv-randconfig-r042-20230619
-|   |-- arch-riscv-kvm-aia_imsic.c:error:call-to-undeclared-function-arch_atomic_long_fetch_or-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- x86_64-randconfig-a012-20230619
-|   `-- security-apparmor-policy_unpack.c:warning:expecting-prototype-for-verify_dfa_accept_xindex().-Prototype-was-for-verify_dfa_accept_index()-instead
-|-- x86_64-randconfig-r015-20230619
-|   |-- drivers-gpu-drm-i915-display-intel_display_power.h:error:declaration-of-struct-seq_file-will-not-be-visible-outside-of-this-function-Werror-Wvisibility
-|   `-- drivers-net-ethernet-jme.o:warning:objtool:jme_check_link()-falls-through-to-next-function-jme_powersave_phy()
-`-- x86_64-rhel-8.3-rust
-    `-- security-apparmor-policy_unpack.c:warning:expecting-prototype-for-verify_dfa_accept_xindex().-Prototype-was-for-verify_dfa_accept_index()-instead
-
-elapsed time: 1330m
-
-configs tested: 126
-configs skipped: 4
-
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r023-20230619   gcc  
-arc                              allyesconfig   gcc  
-arc                          axs101_defconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r021-20230619   gcc  
-arc                  randconfig-r043-20230619   gcc  
-arm                              alldefconfig   clang
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                       aspeed_g4_defconfig   clang
-arm                          collie_defconfig   clang
-arm                                 defconfig   gcc  
-arm                            hisi_defconfig   gcc  
-arm                       imx_v6_v7_defconfig   gcc  
-arm                      jornada720_defconfig   gcc  
-arm                        neponset_defconfig   clang
-arm                          pxa910_defconfig   gcc  
-arm                  randconfig-r002-20230619   clang
-arm                  randconfig-r046-20230619   gcc  
-arm                        vexpress_defconfig   clang
-arm                         vf610m4_defconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r031-20230619   gcc  
-csky                                defconfig   gcc  
-csky                 randconfig-r022-20230619   gcc  
-hexagon              randconfig-r011-20230619   clang
-hexagon              randconfig-r041-20230619   clang
-hexagon              randconfig-r045-20230619   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r004-20230619   gcc  
-i386         buildonly-randconfig-r005-20230619   gcc  
-i386         buildonly-randconfig-r006-20230619   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230619   gcc  
-i386                 randconfig-i002-20230619   gcc  
-i386                 randconfig-i003-20230619   gcc  
-i386                 randconfig-i004-20230619   gcc  
-i386                 randconfig-i005-20230619   gcc  
-i386                 randconfig-i006-20230619   gcc  
-i386                 randconfig-i011-20230619   clang
-i386                 randconfig-i012-20230619   clang
-i386                 randconfig-i013-20230619   clang
-i386                 randconfig-i014-20230619   clang
-i386                 randconfig-i015-20230619   clang
-i386                 randconfig-i016-20230619   clang
-i386                 randconfig-r033-20230619   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r006-20230619   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                       m5208evb_defconfig   gcc  
-m68k                 randconfig-r034-20230619   gcc  
-m68k                 randconfig-r036-20230619   gcc  
-microblaze           randconfig-r024-20230619   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                           mtx1_defconfig   clang
-nios2                               defconfig   gcc  
-nios2                randconfig-r003-20230619   gcc  
-nios2                randconfig-r004-20230619   gcc  
-nios2                randconfig-r016-20230619   gcc  
-nios2                randconfig-r032-20230619   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r001-20230619   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                    gamecube_defconfig   clang
-powerpc              randconfig-r012-20230619   clang
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                    nommu_k210_defconfig   gcc  
-riscv                    nommu_virt_defconfig   clang
-riscv                randconfig-r042-20230619   clang
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r044-20230619   clang
-sh                               allmodconfig   gcc  
-sh                        apsh4ad0a_defconfig   gcc  
-sh                          landisk_defconfig   gcc  
-sh                     magicpanelr2_defconfig   gcc  
-sh                          rsk7269_defconfig   gcc  
-sh                           se7750_defconfig   gcc  
-sh                             shx3_defconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64              randconfig-r005-20230619   gcc  
-sparc64              randconfig-r014-20230619   gcc  
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                   randconfig-r013-20230619   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r001-20230619   gcc  
-x86_64       buildonly-randconfig-r002-20230619   gcc  
-x86_64       buildonly-randconfig-r003-20230619   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-a001-20230619   gcc  
-x86_64               randconfig-a002-20230619   gcc  
-x86_64               randconfig-a003-20230619   gcc  
-x86_64               randconfig-a004-20230619   gcc  
-x86_64               randconfig-a005-20230619   gcc  
-x86_64               randconfig-a006-20230619   gcc  
-x86_64               randconfig-a011-20230619   clang
-x86_64               randconfig-a012-20230619   clang
-x86_64               randconfig-a013-20230619   clang
-x86_64               randconfig-a014-20230619   clang
-x86_64               randconfig-a015-20230619   clang
-x86_64               randconfig-a016-20230619   clang
-x86_64               randconfig-r015-20230619   clang
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa               randconfig-r025-20230619   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+Regards,
+Shyam
