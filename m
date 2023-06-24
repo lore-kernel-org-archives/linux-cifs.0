@@ -2,90 +2,74 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D15EB64D7
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jun 2023 22:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C025EEB64DC
+	for <linux-cifs@archiver.kernel.org>; Sat, 24 Jun 2023 03:50:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232076AbjFWWId (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 23 Jun 2023 18:08:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46562 "EHLO
+        id S229603AbjFXDuA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Jun 2023 23:50:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232011AbjFWWIc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Jun 2023 18:08:32 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A5401739;
-        Fri, 23 Jun 2023 15:08:32 -0700 (PDT)
-Message-ID: <56200b7e7f5a8852869814ff1f9f0fa7.pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1687558109;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tiY6seF1Cj834PsEkvde+98dbGnHtQYeTBKK+mvVmLo=;
-        b=mKM5w6+sTDptDrxZ1a5xHvJG/R+G3R1MCbuJyrlKqQ006K4/KVxlahine5g4MJqu6ov6NR
-        wXdpXr+sNXzU8vAPfpr6AXcOnInO7lzhKTksa214YXdHvkWst1vWnXOWLVX8BPNWjlez3j
-        V+ioRGJlzQH/wW5piJEmJPSQDMBVWs1+Kgo16BLEQdJkDj4Qiz5LkuKxaxrl293MHuHvdo
-        lli0NUHJE77DPvKAWleiqVH05urmTlQFlLvHhqqcEncVsw4HryKui2WiHD3F7QDF/t8KvL
-        iOI2qPU5P9gw+e6mY3MmBLkwSF4P7dz+tv4/N0pdYX4dnpFbps/FJByvLlFs+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1687558109;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tiY6seF1Cj834PsEkvde+98dbGnHtQYeTBKK+mvVmLo=;
-        b=NKku6EEST9xPwFhlgtVm2321CRN84eUn9ujTiJGSN5gC+lzUNCLqwyjyZohtTDI9773N6X
-        g6Fsk2WB/CtepRIc7wu00Dm+MLyrqqZH1MUvF3IWwc6LYmC8ocbUVCHbeATVtV/BmiShIT
-        xQPEDoYky5Ae56dBvEf5BfX7LA3UipcofXbUUvquSR8WmOZxcgrW2rdKIxwyzYgezQaV1n
-        ntHGq8L7IQAE/6XXKSxKMTDwkS7XRTsDtz3jPCg2v+pRp35i6jWqIDbM7KLghMOrzd7AUi
-        zhvbrNYRNGmFio2gsqV5TJVIzZkISdOsv1rb7BWQdUs+I1qwCZkquBF3yjtfgA==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1687558109; a=rsa-sha256;
-        cv=none;
-        b=Vj11e3ltI00XP1GCyYK2woQXJ8pfRzxOP1P/vIVuprT5Oou64ZTohk45xnAcw7ahXE/Z+S
-        +r6u8iZDyvS9T4DwuuTB10xVbNS6tnu84zFpOf8MM4uiX01Y+m0OrlLHdXbUz67LNPEKl+
-        Rs591Fc34dh7S/sciJ/tSC7X1LMdrwfH6iOxug2WLUD0Dln+BHIfgDS0t4Yca2ukJCNote
-        KxGiZbYQ3kx1p+HGvsk1gDrtKE1iqV1700MOBUoG/Zoh3Dbhbr+grCRNksI16lHFzuPefo
-        K+GeJx8fiAS0I00FrTnXaRvqx5159n6mGdRz8i6LzlZNMZt7MdcFLXxbxbS1zA==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     Rishabh Bhatnagar <risbhat@amazon.com>, gregkh@linuxfoundation.org
-Cc:     stable@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, Rishabh Bhatnagar <risbhat@amazon.com>
-Subject: Re: [PATCH 5.4 0/5] CIFS DFS fixes for 5.4
-In-Reply-To: <20230623213406.5596-1-risbhat@amazon.com>
-References: <20230623213406.5596-1-risbhat@amazon.com>
-Date:   Fri, 23 Jun 2023 19:08:22 -0300
+        with ESMTP id S229475AbjFXDt7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Jun 2023 23:49:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9392226A0;
+        Fri, 23 Jun 2023 20:49:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 58C9661B9C;
+        Sat, 24 Jun 2023 03:49:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9E75C433C9;
+        Sat, 24 Jun 2023 03:49:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687578596;
+        bh=aQPtQfX+vTNM9nJygU5Fyd3Ey+a/BTH7D16Cf3wXHIU=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=VDqdfb90lGZQLOpWplRjYuHoa6j77VqeuTRCpasruJM/zutx8BgY0g+8T7OnJTWpF
+         YCJn86SRSCWmjHS9V83Whr8DWJKegmh+742kYpV3MIWpSH3Uwy4t2UQqM3fh5fn4dR
+         a2IwQR2cVAYnWGS6xrtN48r5JHiNGWi69bUE9qvHeE6k9kIIKn1BISs0oUjctH2q5C
+         aRcYvSv7DSXWB2YXlW91ViSBHALfaMi8N3YTQfQdcQMhnYC3CYLGUtmQMgF+2F4RNh
+         KA8liMCNlNq7Nw8yw0I1TqWVPCNy0ROl0vWtWeS1Le/nzKos4lkAmXeUwvOhJrOxRC
+         8a9iNZ51fbAxg==
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-560b56b638eso976902eaf.0;
+        Fri, 23 Jun 2023 20:49:56 -0700 (PDT)
+X-Gm-Message-State: AC+VfDwPoi+Cd1tLTODFHRSB75ZtYlnsc30tTcC718Zea2Km1sihsxef
+        u7tTgurJxD8HKBaw89pozOOrNFsXT0fYxPfDE9o=
+X-Google-Smtp-Source: ACHHUZ5n3pvo2wJUTlDwdgugjI8xKaFqEGHY/4TudLoGYYUiX8prwI+W4ZabPuF6XrDBCC4FFZn4FkDZB62dmVYGNAs=
+X-Received: by 2002:a4a:e904:0:b0:563:16bf:4f9e with SMTP id
+ bx4-20020a4ae904000000b0056316bf4f9emr1424051oob.3.1687578595836; Fri, 23 Jun
+ 2023 20:49:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+Received: by 2002:ac9:5e18:0:b0:4df:6fd3:a469 with HTTP; Fri, 23 Jun 2023
+ 20:49:55 -0700 (PDT)
+In-Reply-To: <ZJNnynWOoTp6uTwF@work>
+References: <ZJNnynWOoTp6uTwF@work>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sat, 24 Jun 2023 12:49:55 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-tjowbv83M4PFqFSfzkOOU4RFAFB8AATcoyx8Rfg5tXg@mail.gmail.com>
+Message-ID: <CAKYAXd-tjowbv83M4PFqFSfzkOOU4RFAFB8AATcoyx8Rfg5tXg@mail.gmail.com>
+Subject: Re: [PATCH][next] smb: Replace one-element array with flexible-array member
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Rishabh Bhatnagar <risbhat@amazon.com> writes:
+2023-06-22 6:12 GMT+09:00, Gustavo A. R. Silva <gustavoars@kernel.org>:
+> One-element arrays are deprecated, and we are replacing them with flexible
+> array members instead. So, replace one-element array with flexible-array
+> member in struct smb_negotiate_req.
+>
+> This results in no differences in binary output.
+>
+> Link: https://github.com/KSPP/linux/issues/79
+> Link: https://github.com/KSPP/linux/issues/317
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Applied it with reviewed/acked-by tags  to #ksmbd-for-next-next.
 
-> We are seeing deadlock in cifs code while updating volume in
-> cifs_reconnect. There are few fixes available in stable trees
-> already. This series backports some patches back to 5.4 stable.
->
->  __schedule+0x268/0x6e0
->  schedule+0x2f/0xa0
->  schedule_preempt_disabled+0xa/0x10
->  __mutex_lock.isra.7+0x20b/0x470
->  ? dfs_cache_update_vol+0x45/0x2a0 [cifs]
->  dfs_cache_update_vol+0x45/0x2a0 [cifs]
->  cifs_reconnect+0x6f2/0xef0 [cifs]
->  cifs_handle_standard+0x18d/0x1b0 [cifs]
->  cifs_demultiplex_thread+0xa5c/0xc90 [cifs]
->  ? cifs_handle_standard+0x1b0/0x1b0 [cifs]
->
-> Paulo Alcantara (SUSE) (5):
->   cifs: Clean up DFS referral cache
->   cifs: Get rid of kstrdup_const()'d paths
->   cifs: Introduce helpers for finding TCP connection
->   cifs: Merge is_path_valid() into get_normalized_path()
->   cifs: Fix potential deadlock when updating vol in cifs_reconnect()
->
->  fs/cifs/dfs_cache.c | 701 +++++++++++++++++++++++---------------------
->  1 file changed, 372 insertions(+), 329 deletions(-)
-
-Looks good, thanks.
+Thanks.
