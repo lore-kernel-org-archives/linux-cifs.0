@@ -2,80 +2,153 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D994EB64DD
-	for <linux-cifs@archiver.kernel.org>; Sat, 24 Jun 2023 14:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 068DDEB64DC
+	for <linux-cifs@archiver.kernel.org>; Sun, 25 Jun 2023 07:06:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232459AbjFXOK3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 24 Jun 2023 10:10:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36722 "EHLO
+        id S230458AbjFYHGk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 25 Jun 2023 03:06:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229869AbjFXOK2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 24 Jun 2023 10:10:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39AA41BC2;
-        Sat, 24 Jun 2023 07:10:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C133860670;
-        Sat, 24 Jun 2023 14:10:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7558C433C8;
-        Sat, 24 Jun 2023 14:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1687615827;
-        bh=guBS/pXFgHuNgM7sT8xh/zRfKmjGXRbCU6mtO94IDLA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aVmxZgBo6RyuOrNnSx3g61md/oL2lzI0LMfINwpy8f70Vcx+MxMs4wtdagqUwbrFg
-         D7Z2PRiiBs3y7qDPFPdKYWGkEeJDCaFqGVNt0JplhqhzoNc4hyIyMJt3H69U5mbLBI
-         BLpUq2zK2g5PtbBMZgvnWDBKJTKfPHMDOgzf1qag=
-Date:   Sat, 24 Jun 2023 16:10:24 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     Rishabh Bhatnagar <risbhat@amazon.com>, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 5.4 0/5] CIFS DFS fixes for 5.4
-Message-ID: <2023062419-smoking-buggy-ebbf@gregkh>
-References: <20230623213406.5596-1-risbhat@amazon.com>
- <56200b7e7f5a8852869814ff1f9f0fa7.pc@manguebit.com>
+        with ESMTP id S229611AbjFYHGj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 25 Jun 2023 03:06:39 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE39E64
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 00:06:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687676795; x=1719212795;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=hlksZR3c9wMBRf2rmnzTNfQNp7SK292ma6AhRyIXh5c=;
+  b=HEMXRmsqLnRx13OooGVHBQwZZMgriP2TfZ5R1DOhfDVVufGJSHXo7x6M
+   0w1KREoJgBlvjXWZQqrnIP+VoUs35znmQhMzlhJEYudsR34P5qY1Qtvcm
+   DcRD3u7umHym/9AkkbOG8lqUwUiUatXZddwjmvT72SMolfbnVnYjobAce
+   JJhBkfoyPhUAgEBD6KteUrGNMqEHcgZBEfjpTpetUq9NVOPreuZz2Jsae
+   El9P6LNSpKVr9PoQn65yRDAEvqEqrkf77kOB+XKLOsJSZmfiQ0kSuFR8d
+   4Hk9IJiRK1jUtOA6dEB9B8PLIQWVfbGuZCYcEPvqWHwGYOnesO9GaQsni
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10751"; a="361071931"
+X-IronPort-AV: E=Sophos;i="6.01,156,1684825200"; 
+   d="scan'208";a="361071931"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2023 00:06:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10751"; a="962406519"
+X-IronPort-AV: E=Sophos;i="6.01,156,1684825200"; 
+   d="scan'208";a="962406519"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 25 Jun 2023 00:06:33 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qDJpQ-0009qj-1n;
+        Sun, 25 Jun 2023 07:06:32 +0000
+Date:   Sun, 25 Jun 2023 15:06:15 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Shyam Prasad N <sprasad@microsoft.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        Steve French <stfrench@microsoft.com>
+Subject: [cifs:for-next 13/14] fs/smb/client/cifs_debug.c:167:1: warning:
+ label at end of compound statement is a C2x extension
+Message-ID: <202306251539.R34e3RXd-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <56200b7e7f5a8852869814ff1f9f0fa7.pc@manguebit.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Jun 23, 2023 at 07:08:22PM -0300, Paulo Alcantara wrote:
-> Rishabh Bhatnagar <risbhat@amazon.com> writes:
-> 
-> > We are seeing deadlock in cifs code while updating volume in
-> > cifs_reconnect. There are few fixes available in stable trees
-> > already. This series backports some patches back to 5.4 stable.
-> >
-> >  __schedule+0x268/0x6e0
-> >  schedule+0x2f/0xa0
-> >  schedule_preempt_disabled+0xa/0x10
-> >  __mutex_lock.isra.7+0x20b/0x470
-> >  ? dfs_cache_update_vol+0x45/0x2a0 [cifs]
-> >  dfs_cache_update_vol+0x45/0x2a0 [cifs]
-> >  cifs_reconnect+0x6f2/0xef0 [cifs]
-> >  cifs_handle_standard+0x18d/0x1b0 [cifs]
-> >  cifs_demultiplex_thread+0xa5c/0xc90 [cifs]
-> >  ? cifs_handle_standard+0x1b0/0x1b0 [cifs]
-> >
-> > Paulo Alcantara (SUSE) (5):
-> >   cifs: Clean up DFS referral cache
-> >   cifs: Get rid of kstrdup_const()'d paths
-> >   cifs: Introduce helpers for finding TCP connection
-> >   cifs: Merge is_path_valid() into get_normalized_path()
-> >   cifs: Fix potential deadlock when updating vol in cifs_reconnect()
-> >
-> >  fs/cifs/dfs_cache.c | 701 +++++++++++++++++++++++---------------------
-> >  1 file changed, 372 insertions(+), 329 deletions(-)
-> 
-> Looks good, thanks.
+tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+head:   d75e841ced93ce9cd86dc46b8a9453241dcbc61b
+commit: 33bc5dec2b4fd8d00fed51183615d91badf607d6 [13/14] cifs: display the endpoint IP details in DebugData
+config: hexagon-randconfig-r045-20230625 (https://download.01.org/0day-ci/archive/20230625/202306251539.R34e3RXd-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230625/202306251539.R34e3RXd-lkp@intel.com/reproduce)
 
-All now queued up, thanks.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306251539.R34e3RXd-lkp@intel.com/
 
-greg k-h
+All warnings (new ones prefixed by >>):
+
+   In file included from fs/smb/client/cifs_debug.c:15:
+   In file included from include/uapi/linux/ethtool.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from fs/smb/client/cifs_debug.c:15:
+   In file included from include/uapi/linux/ethtool.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from fs/smb/client/cifs_debug.c:15:
+   In file included from include/uapi/linux/ethtool.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+>> fs/smb/client/cifs_debug.c:167:1: warning: label at end of compound statement is a C2x extension [-Wc2x-extensions]
+     167 | }
+         | ^
+   7 warnings generated.
+
+
+vim +167 fs/smb/client/cifs_debug.c
+
+33bc5dec2b4fd8 fs/smb/client/cifs_debug.c Shyam Prasad N 2023-06-09  166  
+85150929a15b4e fs/cifs/cifs_debug.c       Aurelien Aptel 2019-11-20 @167  }
+85150929a15b4e fs/cifs/cifs_debug.c       Aurelien Aptel 2019-11-20  168  
+
+:::::: The code at line 167 was first introduced by commit
+:::::: 85150929a15b4e0a225434d5970bba14ebdf31f1 cifs: dump channel info in DebugData
+
+:::::: TO: Aurelien Aptel <aaptel@suse.com>
+:::::: CC: Steve French <stfrench@microsoft.com>
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
