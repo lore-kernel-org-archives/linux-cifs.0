@@ -2,112 +2,85 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70361EB64D7
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Jun 2023 05:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 796F4EB64D7
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Jun 2023 05:32:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbjFZF1t (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Jun 2023 01:27:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54778 "EHLO
+        id S229592AbjFZFcF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Jun 2023 01:32:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjFZF1r (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Jun 2023 01:27:47 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85BB4116
-        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 22:27:46 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fb7769f15aso385791e87.0
-        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 22:27:46 -0700 (PDT)
+        with ESMTP id S229556AbjFZFcE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Jun 2023 01:32:04 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5507FE1
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 22:32:02 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4f865f0e16cso3466536e87.3
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 22:32:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687757264; x=1690349264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h7TvSgH0G5v2PmNV2p4Q4IexKZtFXs1mCWMHO1D/FXo=;
-        b=SkYPXIcq+PLYyBKOEqWjZu6USQFshI2HCazqsDpfGYLUnT/jQCCaxiCxi/MG/shV53
-         OkZ2KtNkzObcQIGSnMArmxjsBIm2z3qUnWkedhSdOnlQMDVomCH16ZLbU9ANyW1roMjq
-         I1FCyG4LU8uZ57dSBWAixyGuc8cPJ4aoc3VwYcqA2nEk0zgasBEQzvN4R4gBJ8m7T9D0
-         mY7F9hdoJ3rpu1umkyL74KENBblLP+iTGgUN/xCqMZcVA2B4aD3wbVmWCs/SRZuCPkLx
-         J9lN1F610Bqw5lC12BzO6KSIOB2B3xaCg5yMY7CZXUqatZsl2Pbj0byKRIq0cneDodkg
-         oYNA==
+        d=gmail.com; s=20221208; t=1687757520; x=1690349520;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/w7JG8rtdp7Al9AynqMYZ/Vjyx1V6F2+7ylD1hUPbSs=;
+        b=KJl1fwKcSmdwt2n+BeQY47/GCuZmQlBx/sLhzmklIAYITC7zx/eRPcJ0q7fU3y1nfR
+         WSu6Ku+baXLrhzssJ6SPDhFDR5qMWDVGu+pcYPWio90zNPkqoAVfWyap3kTx8j1o1p5X
+         Ev0QL4XKcBaTyhl5tEUNHYpKhAtsdnFUm6YB3WGHYdqRrnwUtcSFCrhCQyWAHSn0uLzu
+         l14JVp09B7TQPk7VHlnkYLyAFXmVEAD/YmiXTPokp5Nh23QAC3H9GRzb8FWH7EkiTKkV
+         IjXBo9NIsTCK3WNtxlc4wKCT78timRKbJ/ec62lEzJHiUqsuAK9mrakjJmMGtcm86gsn
+         q74w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687757264; x=1690349264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h7TvSgH0G5v2PmNV2p4Q4IexKZtFXs1mCWMHO1D/FXo=;
-        b=C8qtGShLlCxSFdc8V2OCOugizcEQfwUH6kkDjySlzT96YJ/yemyxAh8svE6by44CPt
-         obaVVB89kYNYv2DmHuhti2YeA3zld5547plDtJZ6zSd/tHUM+SeJIdx3UmdGzp4fHFID
-         qKgz3/+S45Aa2YFamSo9Z7eDGXcFbebUEkrw8H6vbBemtYR/SQrr90PlRz0nmqA+Mq6T
-         5t8kHAMTK6t5r63eI1XSShiN7TlyrVotoB0NmvcDSqAsJaarLwcvkWoXwMT/MJqkTapv
-         6eBn59zjZqmfa0B6Jy/nJBvao+GgtpLOzfofHXUORJZ1vA9yk7+TuCMxYwLk+R1YUhIh
-         bzRg==
-X-Gm-Message-State: AC+VfDxnINfTehIiPInudsYo86/PrQQTwhYKp4r5Qs/pny12Ul5jO2zM
-        CfgYDywjmfHBZEE14QduveN3+jKz0wiMOFZqK3E=
-X-Google-Smtp-Source: ACHHUZ5hUGF37YHQBgKdeJ0+oSX36Ff8V9E/gOC4WQn3A59xgHofixBDlQEFs2vAdHwkzncVDz7pYwcRo/hHF9TzNGI=
-X-Received: by 2002:a05:6512:3139:b0:4f8:6ecc:db15 with SMTP id
- p25-20020a056512313900b004f86eccdb15mr12311126lfd.49.1687757264074; Sun, 25
- Jun 2023 22:27:44 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687757520; x=1690349520;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/w7JG8rtdp7Al9AynqMYZ/Vjyx1V6F2+7ylD1hUPbSs=;
+        b=BolGX4hu+e+u7PxdWIplOocyOQzg8ZiyghFuy3kTF2wXkfojmBk2m+B19O22gqZMpe
+         hczPpFBsDX66FDvqpXQN4eaKL9uiXKHbFp1JlR8LrRONm9Wysq4Op3/qZxBenXyNhZ4N
+         nu6D7mI2o45vm7+rc0eJKiF8E4/m8cAXn0UEct4tUlxYcZ1rhAV2gbbvOjQM1e73h9oO
+         KuPLaSDS04j7UlhmsYFLrAfiZE2oiT+lBSvl4Zk4g8KBy6Pj5dRgJNvmUbhvqln3JRHh
+         buyFJcHfZj0M7bRmw5tYciDK+XsMCFl3AwI6bSqrGLINTV2ngcZII35HIMSyxqR7Cg6T
+         qQiA==
+X-Gm-Message-State: AC+VfDzyBVaH1VeA2ZxeQkBCWbx/YUlaNJcKzmH/h5Ov4GBc2nMzH30a
+        UDlo0sO26ytqBnwbDHCAnLTMbZS7oJ+zsOo1fjX8bbbq4wM=
+X-Google-Smtp-Source: ACHHUZ6dw+bSHw0iBd/RSvdxPFQVw0VG4ezPaypq4Ct36pEqOlRpfJvHd9OcZ8bogf2Uz/E+62Tt4TUt6HqkVo/g4Uk=
+X-Received: by 2002:a19:9106:0:b0:4f9:54f0:b6db with SMTP id
+ t6-20020a199106000000b004f954f0b6dbmr9598055lfd.13.1687757520214; Sun, 25 Jun
+ 2023 22:32:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230626034257.2078391-1-wentao@uniontech.com> <20230626034257.2078391-3-wentao@uniontech.com>
-In-Reply-To: <20230626034257.2078391-3-wentao@uniontech.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Mon, 26 Jun 2023 10:57:32 +0530
-Message-ID: <CANT5p=rv1hF7vX4G=HienkLFnyBdQh1_Qdbd1oeHum_-2fE6-g@mail.gmail.com>
-Subject: Re: [PATCH 2/3] cifs: fix session state check in reconnect to avoid
- use-after-free issue
-To:     Winston Wen <wentao@uniontech.com>
-Cc:     sfrench@samba.org, linux-cifs@vger.kernel.org, pc@manguebit.com,
-        sprasad@microsoft.com
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 26 Jun 2023 00:31:49 -0500
+Message-ID: <CAH2r5mu2cnsjar5O3Ks5x_eioR41iWRnNUm85OT9sGyMRxNe+A@mail.gmail.com>
+Subject: generic/091
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Paulo Alcantara <pc@manguebit.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jun 26, 2023 at 9:24=E2=80=AFAM Winston Wen <wentao@uniontech.com> =
-wrote:
->
-> Don't collect exiting session in smb2_reconnect_server(), because it
-> will be released soon.
->
-> Note that the exiting session will stay in server->smb_ses_list until
-> it complete the cifs_free_ipc() and logoff() and then delete itself
-> from the list.
->
-> Signed-off-by: Winston Wen <wentao@uniontech.com>
-> ---
->  fs/smb/client/smb2pdu.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index 17fe212ab895..e04766fe6f80 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -3797,6 +3797,12 @@ void smb2_reconnect_server(struct work_struct *wor=
-k)
->
->         spin_lock(&cifs_tcp_ses_lock);
->         list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
-> +               spin_lock(&ses->ses_lock);
-> +               if (ses->ses_status =3D=3D SES_EXITING) {
-> +                       spin_unlock(&ses->ses_lock);
-> +                       continue;
-> +               }
-> +               spin_unlock(&ses->ses_lock);
->
->                 tcon_selected =3D false;
->
-> --
-> 2.40.1
->
+Has anyone investigated (or have ideas) about why test generic/091
+fails to Samba server?
+I doubt that this is new since we had not included it in the Windows
+target group and were only running it to ksmbd and Azure, but I do see
+it passing in some of my tests earlier when run to Samba server on
+btrfs
 
-Hi Winston,
+generic/091 103s ... [failed, exit status 1]- output mismatch (see
+/home/smfrench/xfstests-dev/results//local/generic/091.out.bad)
+    --- tests/generic/091.out 2020-01-24 17:11:18.688861397 -0600
+    +++ /home/smfrench/xfstests-dev/results//local/generic/091.out.bad
+2023-06-26 00:23:03.249198244 -0500
+    @@ -1,7 +1,7584 @@
+     QA output created by 091
+     fsx -N 10000 -l 500000 -r PSIZE -t BSIZE -w BSIZE -Z -R -W
+    -fsx -N 10000 -o 8192 -l 500000 -r PSIZE -t BSIZE -w BSIZE -Z -R -W
+    -fsx -N 10000 -o 32768 -l 500000 -r PSIZE -t BSIZE -w BSIZE -Z -R -W
+    -fsx -N 10000 -o 8192 -l 500000 -r PSIZE -t BSIZE -w BSIZE -Z -R -W
+    -fsx -N 10000 -o 32768 -l 500000 -r PSIZE -t BSIZE -w BSIZE -Z -R -W
+    -fsx -N 10000 -o 128000 -l 500000 -r PSIZE -t BSIZE -w BSIZE -Z -W
 
-We already have this check in smb2_reconnect, which gets called from
-smb2_reconnect_server.
-But one additional check here will not hurt.
 
-Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+-- 
+Thanks,
 
---=20
-Regards,
-Shyam
+Steve
