@@ -2,60 +2,58 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA88EB64D7
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Jun 2023 05:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A326EB64D7
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Jun 2023 05:17:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbjFZFP3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Jun 2023 01:15:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53814 "EHLO
+        id S229616AbjFZFRy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Jun 2023 01:17:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjFZFP2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Jun 2023 01:15:28 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45ED0113
-        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 22:15:23 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4f973035d60so3272876e87.3
-        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 22:15:23 -0700 (PDT)
+        with ESMTP id S229566AbjFZFRx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Jun 2023 01:17:53 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44577113
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 22:17:52 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b5c231c23aso20603241fa.0
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Jun 2023 22:17:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687756521; x=1690348521;
+        d=gmail.com; s=20221208; t=1687756670; x=1690348670;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gE79CPGwJ7tV/UDZMyOZXTNfPTO1HxltodpKEoTRoTg=;
-        b=GP3qHv299SDNcxTHt7x2XJQT2dPci+jThQHPryVUT0utU9OK96FhiXz9n7X5j8Ef14
-         6Do/eoc93qaP+ZGhpkRJv+wXJH6YunNvg1DQvjd5TUoS09moVD3ySi9OIKUVvJruXIeI
-         XSO+7TVzwqihYweEUXD40oshOq6ddgdIzPcoii2ffskqghhL+8TxP5X/7GrNTmkeJ/k6
-         smDpNDsUZhi4qIoqhokfqjS2cHGkwWJVCQN4AeexjJl+fR9jkP8DF2VebQUW1lSR7+Bc
-         x1q64PcUoxDk71QQ28PaqL6sZmleA/EsPlKCVJS5wKJAemtnlx/BlWCKqt+8757Qk8sY
-         qppw==
+        bh=jEKmh3Bfvkb0mL5gv+kOl4X3aGZbk8QZOaGqxGplPuY=;
+        b=K/jTuuvue3IumvjxJMnVj+uOsmdtTUJ6eCleHRw90YzMjeBS+59p44v2UOZN49EKzX
+         YTW1qCOtrIlRzEsfxzuWpaOSbi+kL654EZWeEGy/FMysmKhNTkvgP7xIkTviOF/VCyiD
+         iFHLD1SOJJ90uICyCz2pmQs7ifAVZGt5F9ceILQ0T/YRmpWcYFdbaxbSCD3Fyp2AgU1A
+         u6tTg8nmXwcQNfkS3k/UZ0ZANTuRHukaHX9SsI03JODUUu4vqCI4c3400/K2xGgeZQwn
+         ENtyHlsv8klcG/gOMa3eD/1sSTi8OavlJymwiZ4uFEGXrrDN6LYdQXNb3yqQHaNBM49l
+         wAzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687756521; x=1690348521;
+        d=1e100.net; s=20221208; t=1687756670; x=1690348670;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gE79CPGwJ7tV/UDZMyOZXTNfPTO1HxltodpKEoTRoTg=;
-        b=JY3BILDiZJrEPVgB0KZtcfVe5vAqxqV7XRxJx6iMgE7tYZr16u9U7Rt6PQexyb18uu
-         mrn+siU79iCMBOkxIR5QoLQnetWpORHKZOv0ydXoXNhNCBPDRAOjR2Q+4Bvh1a2Q9pBZ
-         tbIUVvLbVjyEewkR8az34t+gdTrQMuhWl5Cnv5j7K7dLXPy1t6QjD5c25jkRqztFfORJ
-         rsCTg7cw8eWzpX4ern/23iHux1VlKQtcRXjeKQjPOj/YCuMPPtZztWegEysO6ytvBtSv
-         w5S667f0VX7FNf74LZlMLlLTZqZcPgtVZonuamyoIEGjnAHWBJiALa4lmsS/Qiyi/SJ6
-         OFWg==
-X-Gm-Message-State: AC+VfDwWBV8eh0Y15/m/9YXBhrOlZXGP+y/W0g0LQndjzaF1XvlT3diP
-        +ln8m0YehnaTR6SC0xUVwfAtirvtjK0kzrTLUYc=
-X-Google-Smtp-Source: ACHHUZ6sivauCGgOx4l1Udb+UnwryayZj7SU+XcbWWHMu4uQTFMtk0BebViUyy4YdsmbZms4crEmm2PH+lA/M5UCo38=
-X-Received: by 2002:a19:e343:0:b0:4f4:1959:b729 with SMTP id
- c3-20020a19e343000000b004f41959b729mr14203997lfk.68.1687756521066; Sun, 25
- Jun 2023 22:15:21 -0700 (PDT)
+        bh=jEKmh3Bfvkb0mL5gv+kOl4X3aGZbk8QZOaGqxGplPuY=;
+        b=Foxgq5vt5BBvyGfcCP1G5XOyp45fY2MOBPN/wWpixxkLEW5OinvWocWPG1rukH09d1
+         gaYT9/c8cTD25VQDcNQFpzbXOuorH7IQTcU7lXfbTWYj91t9i1FdmNE1XJn56LjmCxhh
+         w2w1vQgBu6QE+W1UqeBOzCbGtQATzvf9opAVGZVpcSZWUo8eyGC/jgMy7nijCRkcYiiK
+         T0GTt7m3wfLplpFRKZMEVfgSq0HHufs1VQDU2ghdLrNc/WlBxR9MwK8/4MxQzG0bnl3B
+         M9/rEeUSTDCdxXZG/IluX5Q5RIAkBFNRX1v7w4yg1AH0fm5uwBG6ikddYENYtCNRVBXy
+         jMuQ==
+X-Gm-Message-State: AC+VfDzKY6SEptdMbmbeBlG+eKmXjv1ZsHlO9FM4KToO/X39VDKhqqMt
+        PRIczazjPTGDyxYw0hv3R8oCEeTCRt+7aKb5rSQ=
+X-Google-Smtp-Source: ACHHUZ60rXz9fVyPQ5xaYlYrKBeaQZQtXBP8GPLtdQ8yyokjxq9KA2Cvh8NMoqvalXabxpDg9bth2HuUM8uxcKKDKs8=
+X-Received: by 2002:a19:f242:0:b0:4f3:b97c:2d91 with SMTP id
+ d2-20020a19f242000000b004f3b97c2d91mr14609899lfk.66.1687756670212; Sun, 25
+ Jun 2023 22:17:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230626034257.2078391-1-wentao@uniontech.com> <20230626034257.2078391-2-wentao@uniontech.com>
-In-Reply-To: <20230626034257.2078391-2-wentao@uniontech.com>
+References: <20230626034257.2078391-1-wentao@uniontech.com> <20230626034257.2078391-4-wentao@uniontech.com>
+In-Reply-To: <20230626034257.2078391-4-wentao@uniontech.com>
 From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Mon, 26 Jun 2023 10:45:09 +0530
-Message-ID: <CANT5p=pD+s8h33rgyjLHkJhz-OkAt3PMP5Oz612Qm3GO-PE2EQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] cifs: fix session state transition to avoid
- use-after-free issue
-To:     Winston Wen <wentao@uniontech.com>,
-        Steve French <smfrench@gmail.com>
+Date:   Mon, 26 Jun 2023 10:47:38 +0530
+Message-ID: <CANT5p=q_-yHy5Z0fcQ7KrRrJ4OLCJ8otqNfC1Ee0ZTUMMsw_gA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] cifs: fix session state check in smb2_find_smb_ses
+To:     Winston Wen <wentao@uniontech.com>
 Cc:     sfrench@samba.org, linux-cifs@vger.kernel.org, pc@manguebit.com,
         sprasad@microsoft.com
 Content-Type: text/plain; charset="UTF-8"
@@ -64,86 +62,44 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jun 26, 2023 at 9:25=E2=80=AFAM Winston Wen <wentao@uniontech.com> =
+On Mon, Jun 26, 2023 at 9:24=E2=80=AFAM Winston Wen <wentao@uniontech.com> =
 wrote:
 >
-> We switch session state to SES_EXITING without cifs_tcp_ses_lock now,
-> it may lead to potential use-after-free issue.
->
-> Consider the following execution processes:
->
-> Thread 1:
-> __cifs_put_smb_ses()
->     spin_lock(&cifs_tcp_ses_lock)
->     if (--ses->ses_count > 0)
->         spin_unlock(&cifs_tcp_ses_lock)
->         return
->     spin_unlock(&cifs_tcp_ses_lock)
->         ---> **GAP**
->     spin_lock(&ses->ses_lock)
->     if (ses->ses_status =3D=3D SES_GOOD)
->         ses->ses_status =3D SES_EXITING
->     spin_unlock(&ses->ses_lock)
->
-> Thread 2:
-> cifs_find_smb_ses()
->     spin_lock(&cifs_tcp_ses_lock)
->     list_for_each_entry(ses, ...)
->         spin_lock(&ses->ses_lock)
->         if (ses->ses_status =3D=3D SES_EXITING)
->             spin_unlock(&ses->ses_lock)
->             continue
->         ...
->         spin_unlock(&ses->ses_lock)
->     if (ret)
->         cifs_smb_ses_inc_refcount(ret)
->     spin_unlock(&cifs_tcp_ses_lock)
->
-> If thread 1 is preempted in the gap and thread 2 start executing, thread =
-2
-> will get the session, and soon thread 1 will switch the session state to
-> SES_EXITING and start releasing it, even though thread 1 had increased th=
-e
-> session's refcount and still uses it.
->
-> So switch session state under cifs_tcp_ses_lock to eliminate this gap.
+> Chech the session state and skip it if it's exiting.
 >
 > Signed-off-by: Winston Wen <wentao@uniontech.com>
 > ---
->  fs/smb/client/connect.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  fs/smb/client/smb2transport.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index 9d16626e7a66..165ecb222c19 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -1963,15 +1963,16 @@ void __cifs_put_smb_ses(struct cifs_ses *ses)
->                 spin_unlock(&cifs_tcp_ses_lock);
->                 return;
+> diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.=
+c
+> index 790acf65a092..22954a9c7a6c 100644
+> --- a/fs/smb/client/smb2transport.c
+> +++ b/fs/smb/client/smb2transport.c
+> @@ -153,7 +153,14 @@ smb2_find_smb_ses_unlocked(struct TCP_Server_Info *s=
+erver, __u64 ses_id)
+>         list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
+>                 if (ses->Suid !=3D ses_id)
+>                         continue;
+> +
+> +               spin_lock(&ses->ses_lock);
+> +               if (ses->ses_status =3D=3D SES_EXITING) {
+> +                       spin_unlock(&ses->ses_lock);
+> +                       continue;
+> +               }
+>                 ++ses->ses_count;
+> +               spin_unlock(&ses->ses_lock);
+>                 return ses;
 >         }
-> +       spin_lock(&ses->ses_lock);
-> +       if (ses->ses_status =3D=3D SES_GOOD)
-> +               ses->ses_status =3D SES_EXITING;
-> +       spin_unlock(&ses->ses_lock);
->         spin_unlock(&cifs_tcp_ses_lock);
 >
->         /* ses_count can never go negative */
->         WARN_ON(ses->ses_count < 0);
->
->         spin_lock(&ses->ses_lock);
-> -       if (ses->ses_status =3D=3D SES_GOOD)
-> -               ses->ses_status =3D SES_EXITING;
-> -
->         if (ses->ses_status =3D=3D SES_EXITING && server->ops->logoff) {
->                 spin_unlock(&ses->ses_lock);
->                 cifs_free_ipc(ses);
 > --
 > 2.40.1
 >
 
-Good catch.
+Thanks for the change.
 Looks good to me.
-@Steve French Please CC stable for this one.
+CC stable for this one too.
 
 --=20
 Regards,
