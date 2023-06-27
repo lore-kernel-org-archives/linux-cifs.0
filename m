@@ -2,182 +2,90 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 288E6EB64D9
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Jun 2023 10:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9316CEB64D9
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Jun 2023 12:10:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbjF0Kmw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 27 Jun 2023 06:42:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51472 "EHLO
+        id S230145AbjF0MKW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 27 Jun 2023 08:10:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbjF0Kmv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Jun 2023 06:42:51 -0400
-Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6ED10CB;
-        Tue, 27 Jun 2023 03:42:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-        ; s=bytemarkmx; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=b6mr6IUj1sLKRFPC3AWOY5M8vnn/8M/C9oYU60Dvbts=; b=dR9ol1QSKJfK37McjDOz41Gsv0
-        neGIJPSNJah6e0ntbkCkVhdo+dfy5MXj/zjGGmjB2fyUvBM9b/AMTEKfA8Pt+7XLM/XzB6zWCReeP
-        uyIxa/yfYC4zQTIAsvKh0chKBxbXcFI+vdnleBudNHab8ZNbAdX1So/1EdquIwvaAcZcrLHASDFFH
-        Bgx22cUwiPmM6M0cg9q1wInlsxibkDPYsMFFGB/z+HEly1KdnZVd3ZP6Yz2mXhxHZfdDWFlJGn6EX
-        3jXcNSCSDRg9f4x6763Kx6/okBhfM5G3J6hcvHZzNMQt7CrwB0oYOe8j5rO31GiAgYFnLFKHGzP9q
-        yE0NBpmA==;
-Received: from dg by mx.treblig.org with local (Exim 4.94.2)
-        (envelope-from <dg@treblig.org>)
-        id 1qE69V-00GFnB-4Y; Tue, 27 Jun 2023 10:42:29 +0000
-Date:   Tue, 27 Jun 2023 10:42:29 +0000
-From:   "Dr. David Alan Gilbert" <linux@treblig.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Dave Kleikamp <dave.kleikamp@oracle.com>, sfrench@samba.org,
-        linkinjeon@kernel.org, jfs-discussion@lists.sourceforge.net,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Duplicate unicode tables in smb/cifs/jfs
-Message-ID: <ZJq9FcdFLQIZ8cja@gallifrey>
-References: <ZJhPIYSUzBpuqosh@gallifrey>
- <25821273-d391-1502-ff8a-07ea7a59c8f3@oracle.com>
- <CAH2r5mvwZnd+S8CmZGQSdtnAWD45YjFx-1j0EaFBR3Qn-SjHEA@mail.gmail.com>
- <ZJov5VNakxNXU0Mk@gallifrey>
- <CAH2r5mvEWeSOM=NYrxSG1EZ1py-DSkOrwEyh+_L-KuFLVWktQw@mail.gmail.com>
+        with ESMTP id S231902AbjF0MKO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Jun 2023 08:10:14 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0AB2976
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Jun 2023 05:09:52 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-517bdc9e81dso1524847a12.1
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Jun 2023 05:09:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687867791; x=1690459791;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qZUCqgR69njopp+9FFA0BTmwbtbH9XZoF4se0bEvIBQ=;
+        b=LujkmDJW0xBQcc/MRcCBcCm8JvtRR8n9Akwm55VKkyfOkAidukQ5eOcpu0GafiSuel
+         tChohBokKYn8O0hTK9p7bEx9GM6pOPqY+Su6gL2axG3d3THE326VGQTvihGcNfXaX7dP
+         KTRIVm+zCIQBkxK+5qrHgxMhZbiLEeupJ5dJKbRx7tsfBLuVwZ8144W00d3teLU53xZK
+         DVCtICjn263EYFKaI5SfkrmvD65ki4Ptm07r8KwErwiViXBDyajgmts9oha9QL+EuMA7
+         vWQAFaOtwHoLMFwYm6kkwuqxk9l7pkBY72YqbjaMAaOt8SGnb7VHMs+ODTw2qn5mfEWr
+         XLtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687867791; x=1690459791;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qZUCqgR69njopp+9FFA0BTmwbtbH9XZoF4se0bEvIBQ=;
+        b=PG0qKR+yP4MBIlExEsV2mxDKoReCXc0hzHVr7p7M4jI6ViAt6wEI5DJweBZUky73oN
+         DXm8RUaqMQ9fc5+1xwmn1F7lsNXD51QyApkI9ZCOcSB6ghGrydty3xu6T2y2uWSN1Vuu
+         6VMsU6QOWdNjgvMV6eKJgcyUd6bZn04Qck1LEqrWtR4lmJfXtE76yB3W85gmu0ATRjEI
+         NjQzmr6mJl3OsDQwRF5SzXmOQJU7cfFX5MmmkfjT22z3Zg3LWhMHjXhOr2cNcVaf8kCn
+         OPlagrmDtKXK/XWyRD4rvkqMcDwBsW3PNtBD4uIFwEAZgEzucM7tL+bX/+ySuqXOerj9
+         DnYw==
+X-Gm-Message-State: AC+VfDznxYJvjSwPO4w4D1Yw7GmKioGVHeJigMOB6YB99xev42AqMu8l
+        oY6FJdBsdXKCVyDGb/TPHtov/fJdMkySNtMP
+X-Google-Smtp-Source: ACHHUZ7Z4aYysY95bxduGdvbXaW0Q9UazRmRpkKSWHtyoAH91S5y9WXld2IaABjx+1++3pskVX6ZfQ==
+X-Received: by 2002:a17:902:9f8e:b0:1b8:21f:bcc2 with SMTP id g14-20020a1709029f8e00b001b8021fbcc2mr5293292plq.34.1687867790966;
+        Tue, 27 Jun 2023 05:09:50 -0700 (PDT)
+Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:3:7e0c:5dff:fea8:2c14])
+        by smtp.gmail.com with ESMTPSA id jj11-20020a170903048b00b001b80e07989csm2885755plb.200.2023.06.27.05.09.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 05:09:50 -0700 (PDT)
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+X-Google-Original-From: Shyam Prasad N <sprasad@microsoft.com>
+To:     linux-cifs@vger.kernel.org, smfrench@gmail.com, tom@talpey.com,
+        pc@cjr.nz, ematsumiya@suse.de, bharathsm.hsk@gmail.com
+Cc:     Shyam Prasad N <sprasad@microsoft.com>
+Subject: [PATCH] cifs: print client_guid in DebugData
+Date:   Tue, 27 Jun 2023 12:09:43 +0000
+Message-Id: <20230627120943.16688-1-sprasad@microsoft.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mvEWeSOM=NYrxSG1EZ1py-DSkOrwEyh+_L-KuFLVWktQw@mail.gmail.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/5.10.0-21-amd64 (x86_64)
-X-Uptime: 10:42:00 up 99 days, 21:16,  1 user,  load average: 0.08, 0.04, 0.01
-User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-* Steve French (smfrench@gmail.com) wrote:
-> On Mon, Jun 26, 2023 at 7:40 PM Dr. David Alan Gilbert <linux@treblig.org>
-> wrote:
-> 
-> > * Steve French (smfrench@gmail.com) wrote:
-> > > probably is low risk to make the ksmbd/cifs (server and client) code
-> > common
-> > > for this
-> >
-> > I'm up for trying to do that mod; do you have a feel of the best way?
-> > I guess this is two copies to avoid symbol clashes if both the server
-> > and clients are built/loaded on the same kernel?
-> >
-> 
-> First step would be to move common Unicode/UCS-2 header definitions from
-> fs/smb/client
-> and fs/smb/server to fs/smb/common
-> 
-> Second stuff could be having a common helper module in fs/smb/common
-> similar to
-> fs/smb/common/cifs_md4.ko
+Having the ClientGUID info makes it easier to debug
+issues related to a client on a server that serves a
+number of clients.
 
-OK, let me have a crack at that and see where I get to.
+This change prints the ClientGUID in DebugData.
 
-Dave
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+---
+ fs/smb/client/cifs_debug.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 
-> 
-> > I guess the clean way is to make this a separate .c/module that the
-> > others depend on and hten you have a nice single copy in the binary
-> > as well as the source.
-> >
-> > The shorter hack that at least avoids the source dupe would be to
-> > change the declarations in the uniupr.h files to a #define that then
-> > instantiates it with different names in the place those are #included.
-> > You'd want to move the uniupr.h up somewhere, to hmm fs/uniupr.h ?
-> >
-> > (Incidentally, I think the UNIUPR_NOLOWER is always defined
-> > so that whole chunk can go in both of them).
-> >
-> > I guess the next level would be trying to merge parts of server/client
-> > unicode.[ch] - but I was just eyeing up this particularly simple dupe in
-> > that odd uniupr.h.
-> >
-> > > (and leave the JFS code alone as Dave Kleikamp suggests)
-> >
-> > Well hmm; my reading is the tables that JFS uses are *identical*
-> > to these; so if this header was somewhere outside of fs/smb it could
-> > probably #include it and just use the same table, with a
-> > no-binary-change.
-> >
-> > Dave
-> >
-> > > On Mon, Jun 26, 2023 at 12:03 PM Dave Kleikamp <dave.kleikamp@oracle.com
-> > >
-> > > wrote:
-> > >
-> > > > On 6/25/23 9:28AM, Dr. David Alan Gilbert wrote:
-> > > > > Hi All,
-> > > > >    I just tripped over three sets of duplicated unicode tables and
-> > > > > wondered if anyone had tried to rationalise them:
-> > > > >
-> > > > >    The pair of:
-> > > > >     ./fs/smb/server/uniupr.h
-> > > > >     ./fs/smb/client/cifs_uniupr.h
-> > > > >
-> > > > >     are identical except for formatting.
-> > > > >
-> > > > > ./fs/jfs/jfs_uniupr.c,
-> > > > >    and I think this is the same with some change in variable name.
-> > > >
-> > > >  From JFS's point of view, I wonder how relevant any of this code is.
-> > > > The Linux port of JFS originally was interested in compatibility with
-> > > > OS/2, which had case-insensitive file names. (Case-preserving, if I
-> > > > remember correctly, but names would match in a case-insensitive
-> > manner.)
-> > > >
-> > > > I would be surprised if anyone cares about this feature anymore.
-> > Without
-> > > > a JFS_OS2 flag set in the superblock, none of the case-conversion code
-> > > > comes into play.
-> > > >
-> > > > I assume SMB cares more about this and if Steve has an opinion on how
-> > to
-> > > > address this, I'd be happy to follow his lead. Probably better than
-> > > > ripping function out of JFS that could break some user that I'm not
-> > > > aware of.
-> > > >
-> > > > Shaggy
-> > > >
-> > > > >
-> > > > > (I'm guessing the same thing is implemented in a bunch of
-> > > > > other places as well in a different way)
-> > > > >
-> > > > > Would it make sense to swing fs/smb/server/uniupr.h up to
-> > > > > hmm, maybe fs/uniupr.h, remove any of the cifs_ prefixes
-> > > > > and then use the same include in all 3 places?
-> > > > >
-> > > > > Maybe then later look at using some of the nls code?
-> > > > >
-> > > > > Dave (who just tripped over this stuff)
-> > > > >
-> > > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> > --
-> >  -----Open up your eyes, open up your mind, open up your code -------
-> > / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
-> > \        dave @ treblig.org |                               | In Hex /
-> >  \ _________________________|_____ http://www.treblig.org   |_______/
-> >
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index 079c1df09172..f5af080ac100 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -347,6 +347,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 		spin_lock(&server->srv_lock);
+ 		if (server->hostname)
+ 			seq_printf(m, "Hostname: %s ", server->hostname);
++		seq_printf(m, "\nClientGUID: %pUL", server->client_guid);
+ 		spin_unlock(&server->srv_lock);
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 		if (!server->rdma)
 -- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+2.34.1
+
