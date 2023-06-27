@@ -2,264 +2,182 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D95C001B0
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Jun 2023 07:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 288E6EB64D9
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Jun 2023 10:42:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230297AbjF0Hel convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 27 Jun 2023 03:34:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37996 "EHLO
+        id S230159AbjF0Kmw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 27 Jun 2023 06:42:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230005AbjF0Hek (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Jun 2023 03:34:40 -0400
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E9DAC9
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Jun 2023 00:34:38 -0700 (PDT)
-X-QQ-mid: bizesmtp78t1687851271tpffjulq
-Received: from winn-pc ( [113.57.152.160])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Tue, 27 Jun 2023 15:34:30 +0800 (CST)
-X-QQ-SSF: 01400000000000F0H000000A0000000
-X-QQ-FEAT: znfcQSa1hKbtNrjRqLJF2KsOxN9ijOV25GRKURaNGtTVgw/XU84KU41iOf8D/
-        kSFUHSjDvObaEy+euilkTwf1JgmNYmsC7fchtesSsQgSvHSgF0dZB9pe1ieVqNqKgTUAnPI
-        rrpmqgXBP9wG4t0trb9tIChj4wf5I9iLwq9Tzzk7ksinwLvkFrzzAzFdq4GwLJUyHXv7beH
-        g4ZKb/VqKSyUa9yfnFHeSalBZowTjXWT+mFi9REXaxPMVKvL2UHdJJs7ya5A2BR24pTdldK
-        ysjn9emPg6CzVPlbz4EwsJZCViawogOVFwqy9NQSjWl8X9Gz5B6vlTReRQv9AfgltXild2h
-        6uPnSavSg5LSq6GufBKgHUK2/iH/lIquaUqe30qJp8C22kqqaUrrnq5s+TzrY0IdP+X6Y+K
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 5622404638375898419
-Date:   Tue, 27 Jun 2023 15:34:29 +0800
-From:   Winston Wen <wentao@uniontech.com>
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, pc@manguebit.com, sprasad@microsoft.com
-Subject: Re: [PATCH 1/3] cifs: fix session state transition to avoid
- use-after-free issue
-Message-ID: <6DE3D09EA3AEE6B1+20230627153429.7c34759f@winn-pc>
-In-Reply-To: <CANT5p=otyXgTf+UO1e2TQFUFbrhEwoV=xe861tJUWNiErUBG_g@mail.gmail.com>
-References: <20230626034257.2078391-1-wentao@uniontech.com>
-        <20230626034257.2078391-2-wentao@uniontech.com>
-        <CANT5p=pD+s8h33rgyjLHkJhz-OkAt3PMP5Oz612Qm3GO-PE2EQ@mail.gmail.com>
-        <CAH2r5mtE8EmEPdxHc+AT256-ekzH1wjmTO+DbODHx+5PEYC9eA@mail.gmail.com>
-        <CANT5p=oETR0vg29rGohLXoeqw0Lrrt8GsLbhjV6snLth7od=Nw@mail.gmail.com>
-        <5C32A54005DEE4A2+20230626163909.1bd13a8a@winn-pc>
-        <CANT5p=otyXgTf+UO1e2TQFUFbrhEwoV=xe861tJUWNiErUBG_g@mail.gmail.com>
-Organization: Uniontech
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.36; x86_64-pc-linux-gnu)
+        with ESMTP id S229647AbjF0Kmv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Jun 2023 06:42:51 -0400
+Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6ED10CB;
+        Tue, 27 Jun 2023 03:42:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+        ; s=bytemarkmx; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=b6mr6IUj1sLKRFPC3AWOY5M8vnn/8M/C9oYU60Dvbts=; b=dR9ol1QSKJfK37McjDOz41Gsv0
+        neGIJPSNJah6e0ntbkCkVhdo+dfy5MXj/zjGGmjB2fyUvBM9b/AMTEKfA8Pt+7XLM/XzB6zWCReeP
+        uyIxa/yfYC4zQTIAsvKh0chKBxbXcFI+vdnleBudNHab8ZNbAdX1So/1EdquIwvaAcZcrLHASDFFH
+        Bgx22cUwiPmM6M0cg9q1wInlsxibkDPYsMFFGB/z+HEly1KdnZVd3ZP6Yz2mXhxHZfdDWFlJGn6EX
+        3jXcNSCSDRg9f4x6763Kx6/okBhfM5G3J6hcvHZzNMQt7CrwB0oYOe8j5rO31GiAgYFnLFKHGzP9q
+        yE0NBpmA==;
+Received: from dg by mx.treblig.org with local (Exim 4.94.2)
+        (envelope-from <dg@treblig.org>)
+        id 1qE69V-00GFnB-4Y; Tue, 27 Jun 2023 10:42:29 +0000
+Date:   Tue, 27 Jun 2023 10:42:29 +0000
+From:   "Dr. David Alan Gilbert" <linux@treblig.org>
+To:     Steve French <smfrench@gmail.com>
+Cc:     Dave Kleikamp <dave.kleikamp@oracle.com>, sfrench@samba.org,
+        linkinjeon@kernel.org, jfs-discussion@lists.sourceforge.net,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Duplicate unicode tables in smb/cifs/jfs
+Message-ID: <ZJq9FcdFLQIZ8cja@gallifrey>
+References: <ZJhPIYSUzBpuqosh@gallifrey>
+ <25821273-d391-1502-ff8a-07ea7a59c8f3@oracle.com>
+ <CAH2r5mvwZnd+S8CmZGQSdtnAWD45YjFx-1j0EaFBR3Qn-SjHEA@mail.gmail.com>
+ <ZJov5VNakxNXU0Mk@gallifrey>
+ <CAH2r5mvEWeSOM=NYrxSG1EZ1py-DSkOrwEyh+_L-KuFLVWktQw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6a-1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5mvEWeSOM=NYrxSG1EZ1py-DSkOrwEyh+_L-KuFLVWktQw@mail.gmail.com>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/5.10.0-21-amd64 (x86_64)
+X-Uptime: 10:42:00 up 99 days, 21:16,  1 user,  load average: 0.08, 0.04, 0.01
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 27 Jun 2023 12:24:04 +0530
-Shyam Prasad N <nspmangalore@gmail.com> wrote:
-
-> On Mon, Jun 26, 2023 at 2:09 PM Winston Wen <wentao@uniontech.com>
+* Steve French (smfrench@gmail.com) wrote:
+> On Mon, Jun 26, 2023 at 7:40 PM Dr. David Alan Gilbert <linux@treblig.org>
 > wrote:
+> 
+> > * Steve French (smfrench@gmail.com) wrote:
+> > > probably is low risk to make the ksmbd/cifs (server and client) code
+> > common
+> > > for this
 > >
-> > On Mon, 26 Jun 2023 12:24:35 +0530
-> > Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> > I'm up for trying to do that mod; do you have a feel of the best way?
+> > I guess this is two copies to avoid symbol clashes if both the server
+> > and clients are built/loaded on the same kernel?
 > >
-> > > On Mon, Jun 26, 2023 at 10:54 AM Steve French <smfrench@gmail.com>
+> 
+> First step would be to move common Unicode/UCS-2 header definitions from
+> fs/smb/client
+> and fs/smb/server to fs/smb/common
+> 
+> Second stuff could be having a common helper module in fs/smb/common
+> similar to
+> fs/smb/common/cifs_md4.ko
+
+OK, let me have a crack at that and see where I get to.
+
+Dave
+
+> 
+> 
+> > I guess the clean way is to make this a separate .c/module that the
+> > others depend on and hten you have a nice single copy in the binary
+> > as well as the source.
+> >
+> > The shorter hack that at least avoids the source dupe would be to
+> > change the declarations in the uniupr.h files to a #define that then
+> > instantiates it with different names in the place those are #included.
+> > You'd want to move the uniupr.h up somewhere, to hmm fs/uniupr.h ?
+> >
+> > (Incidentally, I think the UNIUPR_NOLOWER is always defined
+> > so that whole chunk can go in both of them).
+> >
+> > I guess the next level would be trying to merge parts of server/client
+> > unicode.[ch] - but I was just eyeing up this particularly simple dupe in
+> > that odd uniupr.h.
+> >
+> > > (and leave the JFS code alone as Dave Kleikamp suggests)
+> >
+> > Well hmm; my reading is the tables that JFS uses are *identical*
+> > to these; so if this header was somewhere outside of fs/smb it could
+> > probably #include it and just use the same table, with a
+> > no-binary-change.
+> >
+> > Dave
+> >
+> > > On Mon, Jun 26, 2023 at 12:03 PM Dave Kleikamp <dave.kleikamp@oracle.com
+> > >
 > > > wrote:
-> > > >
-> > > > Added Cc: stable and Shyam's RB and merged into cifs-2.6.git
-> > > > for-next
-> > > >
-> > > > On Mon, Jun 26, 2023 at 12:15 AM Shyam Prasad N
-> > > > <nspmangalore@gmail.com> wrote:
+> > >
+> > > > On 6/25/23 9:28AM, Dr. David Alan Gilbert wrote:
+> > > > > Hi All,
+> > > > >    I just tripped over three sets of duplicated unicode tables and
+> > > > > wondered if anyone had tried to rationalise them:
 > > > > >
-> > > > > On Mon, Jun 26, 2023 at 9:25 AM Winston Wen
-> > > > > <wentao@uniontech.com> wrote:
-> > > > > >
-> > > > > > We switch session state to SES_EXITING without
-> > > > > > cifs_tcp_ses_lock now, it may lead to potential
-> > > > > > use-after-free issue.
-> > > > > >
-> > > > > > Consider the following execution processes:
-> > > > > >
-> > > > > > Thread 1:
-> > > > > > __cifs_put_smb_ses()
-> > > > > >     spin_lock(&cifs_tcp_ses_lock)
-> > > > > >     if (--ses->ses_count > 0)
-> > > > > >         spin_unlock(&cifs_tcp_ses_lock)
-> > > > > >         return
-> > > > > >     spin_unlock(&cifs_tcp_ses_lock)
-> > > > > >         ---> **GAP**
-> > > > > >     spin_lock(&ses->ses_lock)
-> > > > > >     if (ses->ses_status == SES_GOOD)
-> > > > > >         ses->ses_status = SES_EXITING
-> > > > > >     spin_unlock(&ses->ses_lock)
-> > > > > >
-> > > > > > Thread 2:
-> > > > > > cifs_find_smb_ses()
-> > > > > >     spin_lock(&cifs_tcp_ses_lock)
-> > > > > >     list_for_each_entry(ses, ...)
-> > > > > >         spin_lock(&ses->ses_lock)
-> > > > > >         if (ses->ses_status == SES_EXITING)
-> > > > > >             spin_unlock(&ses->ses_lock)
-> > > > > >             continue
-> > > > > >         ...
-> > > > > >         spin_unlock(&ses->ses_lock)
-> > > > > >     if (ret)
-> > > > > >         cifs_smb_ses_inc_refcount(ret)
-> > > > > >     spin_unlock(&cifs_tcp_ses_lock)
-> > > > > >
-> > > > > > If thread 1 is preempted in the gap and thread 2 start
-> > > > > > executing, thread 2 will get the session, and soon thread 1
-> > > > > > will switch the session state to SES_EXITING and start
-> > > > > > releasing it, even though thread 1 had increased the
-> > > > > > session's refcount and still uses it.
-> > > > > >
-> > > > > > So switch session state under cifs_tcp_ses_lock to eliminate
-> > > > > > this gap.
-> > > > > >
-> > > > > > Signed-off-by: Winston Wen <wentao@uniontech.com>
-> > > > > > ---
-> > > > > >  fs/smb/client/connect.c | 7 ++++---
-> > > > > >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > > > > >
-> > > > > > diff --git a/fs/smb/client/connect.c
-> > > > > > b/fs/smb/client/connect.c index 9d16626e7a66..165ecb222c19
-> > > > > > 100644 --- a/fs/smb/client/connect.c
-> > > > > > +++ b/fs/smb/client/connect.c
-> > > > > > @@ -1963,15 +1963,16 @@ void __cifs_put_smb_ses(struct
-> > > > > > cifs_ses *ses) spin_unlock(&cifs_tcp_ses_lock);
-> > > > > >                 return;
-> > > > > >         }
-> > > > > > +       spin_lock(&ses->ses_lock);
-> > > > > > +       if (ses->ses_status == SES_GOOD)
-> > > > > > +               ses->ses_status = SES_EXITING;
-> > > > > > +       spin_unlock(&ses->ses_lock);
-> > > > > >         spin_unlock(&cifs_tcp_ses_lock);
-> > > > > >
-> > > > > >         /* ses_count can never go negative */
-> > > > > >         WARN_ON(ses->ses_count < 0);
-> > > > > >
-> > > > > >         spin_lock(&ses->ses_lock);
-> > > > > > -       if (ses->ses_status == SES_GOOD)
-> > > > > > -               ses->ses_status = SES_EXITING;
-> > > > > > -
-> > > > > >         if (ses->ses_status == SES_EXITING &&
-> > > > > > server->ops->logoff) { spin_unlock(&ses->ses_lock);
-> > > > > >                 cifs_free_ipc(ses);
-> > > > > > --
-> > > > > > 2.40.1
-> > > > > >
+> > > > >    The pair of:
+> > > > >     ./fs/smb/server/uniupr.h
+> > > > >     ./fs/smb/client/cifs_uniupr.h
 > > > > >
-> > > > > Good catch.
-> > > > > Looks good to me.
-> > > > > @Steve French Please CC stable for this one.
+> > > > >     are identical except for formatting.
 > > > > >
-> > > > > --
-> > > > > Regards,
-> > > > > Shyam
+> > > > > ./fs/jfs/jfs_uniupr.c,
+> > > > >    and I think this is the same with some change in variable name.
 > > > >
+> > > >  From JFS's point of view, I wonder how relevant any of this code is.
+> > > > The Linux port of JFS originally was interested in compatibility with
+> > > > OS/2, which had case-insensitive file names. (Case-preserving, if I
+> > > > remember correctly, but names would match in a case-insensitive
+> > manner.)
 > > > >
+> > > > I would be surprised if anyone cares about this feature anymore.
+> > Without
+> > > > a JFS_OS2 flag set in the superblock, none of the case-conversion code
+> > > > comes into play.
 > > > >
-> > > > --
-> > > > Thanks,
+> > > > I assume SMB cares more about this and if Steve has an opinion on how
+> > to
+> > > > address this, I'd be happy to follow his lead. Probably better than
+> > > > ripping function out of JFS that could break some user that I'm not
+> > > > aware of.
 > > > >
-> > > > Steve
+> > > > Shaggy
+> > > >
+> > > > >
+> > > > > (I'm guessing the same thing is implemented in a bunch of
+> > > > > other places as well in a different way)
+> > > > >
+> > > > > Would it make sense to swing fs/smb/server/uniupr.h up to
+> > > > > hmm, maybe fs/uniupr.h, remove any of the cifs_ prefixes
+> > > > > and then use the same include in all 3 places?
+> > > > >
+> > > > > Maybe then later look at using some of the nls code?
+> > > > >
+> > > > > Dave (who just tripped over this stuff)
+> > > > >
+> > > >
 > > >
-> > > @Winston Wen I think the following change should be sufficient to
-> > > fix this issue:
-> > > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> > > index 9d16626e7a66..78874eb2537d 100644
-> > > --- a/fs/smb/client/connect.c
-> > > +++ b/fs/smb/client/connect.c
-> > > @@ -1963,10 +1963,11 @@ void __cifs_put_smb_ses(struct cifs_ses
-> > > *ses) spin_unlock(&cifs_tcp_ses_lock);
-> > >                 return;
-> > >         }
-> > > -       spin_unlock(&cifs_tcp_ses_lock);
 > > >
-> > >         /* ses_count can never go negative */
-> > >         WARN_ON(ses->ses_count < 0);
-> > > +       list_del_init(&ses->smb_ses_list);
-> > > +       spin_unlock(&cifs_tcp_ses_lock);
+> > > --
+> > > Thanks,
 > > >
-> > >         spin_lock(&ses->ses_lock);
-> > >         if (ses->ses_status == SES_GOOD)
-> > > @@ -1986,9 +1987,6 @@ void __cifs_put_smb_ses(struct cifs_ses
-> > > *ses) cifs_free_ipc(ses);
-> > >         }
-> > >
-> > > -       spin_lock(&cifs_tcp_ses_lock);
-> > > -       list_del_init(&ses->smb_ses_list);
-> > > -       spin_unlock(&cifs_tcp_ses_lock);
-> > >
-> > >         chan_count = ses->chan_count;
-> > >
-> > > The bug was that the ses was kept in the smb ses list, even after
-> > > the ref count had reached 0.
-> > > With the above change, that should be fixed, and no one should be
-> > > able to get to the ses from that point.
-> > >
-> > > Please let me know if you see a problem with this.
-> > >
-> >
-> > Hi Shyam,
-> >
-> > Thanks for the comments! And sorry for my late reply...
-> >
-> > It make sense to me that maybe we should remove the session from the
-> > list once its refcount is reduced to 0 to avoid any futher access.
-> > In fact, I did try to do this from the beginning. But I was not
-> > sure if we need to access the session from the list in the free
-> > process, such as the following:
-> >
-> > smb2_check_receive()
-> >   smb2_verify_signature()
-> >     server->ops->calc_signature()
-> >       smb2_calc_signature()
-> >         smb2_find_smb_ses()
-> >           /* scan the list and find the session */
-> >
-> > Perhaps we need some refactoring here.
-> 
-> Yes. The above ses finding is expected to fail during a reconnect.
-
-Agreed.
-
-> 
-> >
-> > So I gave up on this approach and did a small fix to make it work,
-> > but maybe I missed something elsewhere...
-> >
-> >
+> > > Steve
 > > --
-> > Thanks,
-> > Winston
+> >  -----Open up your eyes, open up your mind, open up your code -------
+> > / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
+> > \        dave @ treblig.org |                               | In Hex /
+> >  \ _________________________|_____ http://www.treblig.org   |_______/
+> >
 > 
-> Attaching the above change as a patch.
-> It replaces this particular patch in the series.
-
-I think this is a better way to fix the problem, the session really
-should not stay in the list and be found after it has been marked
-EXITING.
-
 > 
-> The other two patches are not strictly necessary with this change, but
-> don't hurt.
+> -- 
+> Thanks,
 > 
-
-Yes. Feel free to drop them if they are not necessary. And if that's
-the case, perhaps we should do some cleaning work on other paths to
-ensure consistency.
-
-Thanks for your review and comments!
-
-> 
-> --
-> Regards,
-> Shyam
-
-
+> Steve
 -- 
-Thanks,
-Winston
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
