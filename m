@@ -2,25 +2,25 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F219EB64D9
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Jun 2023 19:37:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D93B0EB64D9
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Jun 2023 19:40:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229483AbjF0ThZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 27 Jun 2023 15:37:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51412 "EHLO
+        id S229610AbjF0Tke (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 27 Jun 2023 15:40:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjF0ThY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Jun 2023 15:37:24 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2043.outbound.protection.outlook.com [40.107.220.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19C819B0
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Jun 2023 12:37:19 -0700 (PDT)
+        with ESMTP id S229501AbjF0Tkd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Jun 2023 15:40:33 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2088.outbound.protection.outlook.com [40.107.220.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A234B19B0
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Jun 2023 12:40:31 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MTZdX5mwJsNpnmPlsjyPQbEZJQolLzgLhfUyHGgJyzHLi7c1jlgUKIE0CnmbLbUgP1/OXJXsL4mXQUxyo5r1j1aNxqrlzA7QSdveKWC0HOYAH7HCidxwJaclS5Nf43Lb6fPbEksdnEAsIcFU5wLpj3GVCDZaxmwvvgS0tFe7yGH5VPg0Dm7nr0bBwDF5vPeX5geICeirrEb86KfIlgQJTU1yvUNoBRtUdFfpetDa1dGnb+RfavpAHlBOzkw42H4X1+n40qHHp4NHz1yGX6VK6XjwzPPTM1e+JIJ6UKZ924wmfeqXGZ4eagKfQuTMnaw1VdM7jOyqQdb96iMvJEl5Lg==
+ b=M1C0WlGQY2fPMb3DTihQwcbYwXN33z2k0nrciPYpgBUGvEiF9UhhSY9NDr9puXy52onDaM8af6dbkjZ2EHz28z4S2gQ/5GnuUr53Xz5OEUi0fk6yM4Qu6DikEmkhRF56mhUMQwk+6SRpE91AoHv3ENFI3pHfz1PgIsd9UMj5rqfbadtxUldIapiBRtFIKXv3rwKfOhrAwxQSrebwH1nA/nrm9V1izqI0M8a3xfOyL4moFgNL4GBiEWTf8rululaCHU2XelA498a8zYydATypm5hO9KbrpzgpyUQNQQMV5D365wPxAOh2nNIlzHAlMVcDhEWl7Dsg4O/PsV3FckPj5Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7hBVe/BSzyrhDJmpjrvkumGfmSOl+GajyeOAD/67PbM=;
- b=dU5WhuH9Z6ffq+46qgOtFSYzyKmbXCQATv9xbYtKPuZ1XfzNqqi/GkkRStlE9k+WxH6LHZ1AJgV2KacNGiWZWYFM/f7yEp8UFVA4EgBOLimegncaBazEhV5sumWlzGAbOqD1bxwLqyAstZDeMVMty6xaj5wCTRjJwM0z03dBko9Epd9TKRY2fzbkMRHj5MeBWhZJnAdqhfHLycySKZLDjcbGzgCLpHbjCOMWg/24tTg3Y0GPcwTAwTjVA9nAqa1sZXUvGpaJri1Ftd+g0zboyFMgikoWi1t3I8XbLqN8DunZZ/Rb6410j70Syz7r8bEqwdq72N+XhweTyYoxrfeTlQ==
+ bh=tALt0xKEGbNw2pvRmTWiVZCgbMT8zjdP9Xis1L4kIRI=;
+ b=W4b+k4yfu1M6jcrgd8ELYrw5RLoK3N6NyTX1/i3ofH6m0atjnJzzxPWwRvZ2m5u3kRRAEdak6qR/8IE/oQ92WG1Pk6m0+odFgSJ7pfwIgiNUjmeJFq00UIkj/+AkyglUUi7rlhw4gPXLPZ/k9okbvmZyF/xhx+VVc4tD51JG+a1hx2mVci0wkSc0XYCmvp9SaPPx/FYNzKgagskR6h9NInu3M9mPvwnggCX9Kt7XjqRexJxjGrR6XDkkL0MIUcY7f/qBv/gecFF1Xy/milYtCsXjYN9SJ+qW/Zl6db2Z2K+XcexGhAsWCoAhuY4DyMrh43ML1oRQo3UATIC51WScdA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
  dkim=pass header.d=talpey.com; arc=none
@@ -29,213 +29,156 @@ Authentication-Results: dkim=none (message not signed)
 Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
  CH3PR01MB8492.prod.exchangelabs.com (2603:10b6:610:19f::13) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6544.15; Tue, 27 Jun 2023 19:37:15 +0000
+ 15.20.6544.15; Tue, 27 Jun 2023 19:40:29 +0000
 Received: from SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::17e9:7e30:6603:23bc]) by SN6PR01MB4445.prod.exchangelabs.com
  ([fe80::17e9:7e30:6603:23bc%5]) with mapi id 15.20.6521.023; Tue, 27 Jun 2023
- 19:37:14 +0000
-Message-ID: <1a8f95fb-9371-0a8a-d510-83f2294d6ee4@talpey.com>
-Date:   Tue, 27 Jun 2023 15:37:12 -0400
+ 19:40:29 +0000
+Message-ID: <10914d74-e302-2430-8497-8532fae0348f@talpey.com>
+Date:   Tue, 27 Jun 2023 15:40:28 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH 6/6] cifs: fix sockaddr comparison in iface_cmp
+Subject: Re: [PATCH 3/6] cifs: add a warning when the in-flight count goes
+ negative
 Content-Language: en-US
-To:     Dan Carpenter <dan.carpenter@linaro.org>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@cjr.nz,
-        bharathsm.hsk@gmail.com, Shyam Prasad N <sprasad@microsoft.com>,
-        kernel test robot <lkp@intel.com>,
-        Dan Carpenter <error27@gmail.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org,
+        pc@cjr.nz, bharathsm.hsk@gmail.com,
+        Shyam Prasad N <sprasad@microsoft.com>
 References: <20230609174659.60327-1-sprasad@microsoft.com>
- <20230609174659.60327-6-sprasad@microsoft.com>
- <2099a884-2e27-cc43-a293-69de617ab5d7@talpey.com>
- <82239b61-4000-4f57-a7bb-17bbad7dd45f@kadam.mountain>
+ <20230609174659.60327-3-sprasad@microsoft.com>
+ <CAH2r5mtKozDLH+y-6ASL1mb_v5g9=TxjekRGO=L_AxJjfhrKnQ@mail.gmail.com>
+ <CANT5p=pa39qfZxu0jDp01L1AtvQTqoGdk1cB3jwq-rGOY-2+hg@mail.gmail.com>
+ <9a9b5fc2-8905-7169-90d9-d0ee3454f5a6@talpey.com>
+ <CANT5p=p62mGd8uwgNEHeAa9pEnC0TcJSx-pXDCwzFSCaX16O5g@mail.gmail.com>
 From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <82239b61-4000-4f57-a7bb-17bbad7dd45f@kadam.mountain>
+In-Reply-To: <CANT5p=p62mGd8uwgNEHeAa9pEnC0TcJSx-pXDCwzFSCaX16O5g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL1PR13CA0269.namprd13.prod.outlook.com
- (2603:10b6:208:2ba::34) To SN6PR01MB4445.prod.exchangelabs.com
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BLAP220CA0018.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:32c::23) To SN6PR01MB4445.prod.exchangelabs.com
  (2603:10b6:805:e2::33)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|CH3PR01MB8492:EE_
-X-MS-Office365-Filtering-Correlation-Id: 07a1182f-932b-4a65-68f5-08db7745e8bf
+X-MS-Office365-Filtering-Correlation-Id: 8ab3f1e0-e124-46e7-6a51-08db77465d12
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1xeR9KP8AkRJko64QqiaOYsHT05Kt3i1hWrYnKjVKBRKRiRR4v869DU/1KGLtcF1FFWQ2qlVBWmKiaorFx5l+iWot/5E8dg4d0TxRm1F0JsDisUq/2uIGv6vcuwaGCS5TeHhrYOmTcnPgSneawgRp4FGU/ubQc6giC4jJsNQ2SUJnQGuQFnA7pVAFxEb0Ci7f0z4Ub4AAjuKvIGkrCoiZPs768jLA/FAmb1wUsVerIKVhda+9EgDXnc9urW8BhsD+moFOYhzUwTrfq7HW04bZUIs2vRk3JXqKGGsXdXuX3p3xeRxtCCkXkqqawScFphBbC3i+V1boVrMJKuzUu+qbXOv5v5fhki8oqbdFdbu/uXR7XjDcYjLDrkyi20Omgt0loveu+Ff0vIvteKbcnkXRGjBHCkcnnu7daqWF/B1TFAZXPVXkL0qecOTYeQm2WXKl+iBPvXfpu+jl9OM7QtoZXGtsVy+18jLF2gd5VhxVWoRHO5Xqq2eJqbH3gg1xQeS47/Gg8ijuDB2pxyVuM5sEVQ+n08Iu9mTRewAqvsUuf2A60ZpyX9NhbHlH3YoH+yrQ8DbvNkX4ctqz+iD/gxNdrse8iNVPFK6DGwUiyekv/6dEV+z7TCXqhG4KaZ1s344GEQu1PnU86wneQVchMVaBA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(376002)(136003)(346002)(366004)(39830400003)(451199021)(2906002)(186003)(2616005)(66556008)(6916009)(66476007)(4326008)(66946007)(52116002)(316002)(54906003)(478600001)(5660300002)(6512007)(26005)(6506007)(8936002)(53546011)(6486002)(41300700001)(8676002)(38350700002)(38100700002)(36756003)(31696002)(86362001)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: IHOnpaEs2LFy/1RRgZ83zVH43ZwFDNe9cas380ut6H4QOIh1hcietTjH8uDcIR7mc2hfo18NFVMGHO0YKoihtkabYHY6ib1qqi9/ynNOAfiY7KSXGv+r6YmGln8S+0vkC+B4oDk8o+fEE/pYt3qg4LUPw57NLoKX9C4P5leVc/S1+EenJ/bqwlejiPeiypbTEuRONxqKCECnPdCVu3IvH1ffuijF4MnDpaGyi/boMmXrpJL/fxWmOu7k7X+71Ms7ce4J5ftNnvwbLvJY0vPW8uLfefcVQlqzDqiHQwz4oYx9zFnpa77l4eJ6Hx5IZ42uEYNnzirI/kF42Brn7ioZhvfj4CNMVaaepqsygz1XYAAy84imm4PoBBfb+cLVWUSeVmojKswaMFJwGjea2qidhVI1ND6aFjJr/+UJvzpp0Rha27biVDE1fNtiAu6fclVrU9oQOdA01v+Wj18AbbVKPsMt0Ip4JmSaIl/txZQitxm2hygKrNufmoBEUbBBti5k+Xve+LXOOtm+b1odhYVLEa63Y5xo/oyodym3XQSC54+OEX/R/FDsHhB60RFXp9KnWOYzxF4iFh1jrlJsbHRQe7TamMFsPrnpiM84HJggNec81KY/LJTPXXqO08DRB4ZVILFJmHtH4ReBetzM4ZV+tw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(376002)(39840400004)(136003)(346002)(366004)(451199021)(83380400001)(2906002)(186003)(2616005)(66556008)(6916009)(66476007)(4326008)(66946007)(52116002)(316002)(54906003)(478600001)(45080400002)(5660300002)(6512007)(26005)(6506007)(8936002)(53546011)(6486002)(41300700001)(8676002)(38350700002)(38100700002)(36756003)(31696002)(86362001)(31686004)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UjV2UERYVmVLbWVYb3ZDZHNySFBKZ3cxWVlJa25DU0Vjb1NwbkRoQ2RaMkd4?=
- =?utf-8?B?MDQ1TzVybEtmeGxXQ2hpNzcxT1grMXFZMDRPcFVKVlZGUi9CelB0Z1NUdUdK?=
- =?utf-8?B?YlQvT29QM0NZVTJ5dFpRQ3E3eDBnQ3dqOVVqZEF0WmdGQUEydEp1cnhCdXVE?=
- =?utf-8?B?ZVJKRjBpV3FvYktwMm9XR2xpRTBxNm96NnlSTmtoYk56TGZwWXVyd3h2bHR6?=
- =?utf-8?B?dXJ3cGNGcHNXRndzSUxDdC9mMzB3VEVUL2dFbUR3WU9QSGtQRWx3djh6L09y?=
- =?utf-8?B?QkFFdGhHaWtLRFhhOHBQVElUdUh4L0hJQnNnQnNRQ0NqekxvYStPYVNVdlA3?=
- =?utf-8?B?czVFckNuR3IzclE1dDd4Rm9wVnU3WE9uVEJBQzZPeDMxM2VMaTVnV0dNd1U2?=
- =?utf-8?B?QnJ6L0FqbkxQSk9rOWVGS0NITnlDdkxEM3FBd2pGUnluVUhGd0VWZTJJYkh1?=
- =?utf-8?B?eGkvOGcyOTZrczNLS0xYVG9xcG5jU2tkUk9CZGFsdUgzMEpUU1dZVFpKMHZh?=
- =?utf-8?B?VzJUM1pUcm9aeDJPbmEvVjVvVS93Vm9Lc3ZVUEwrelhrNnR0Z0lZbEhJdnRR?=
- =?utf-8?B?VlhBMlB3N1JPWlpqem4yY1kzQ2N6aUJhRHQxWGE5K3I1TnVGS055YnIzQjln?=
- =?utf-8?B?dHZSVEs3VXZmSlM0SjdkNHBYc01QQ3dBL2g4Wk9wSTdJRGpId3h1Vkd5akRp?=
- =?utf-8?B?OU1iNVRXa2ZySTJyY1RHZFM4Zi9mRS9QdUtIdk9abWMwL3g3Q1dRSWt1MXVq?=
- =?utf-8?B?cDdReG5IbEhjaXdvS3h6WDlFMUhhajhDYTYrRDd5NkRQTnlabVJVYjQ2bk1P?=
- =?utf-8?B?UWx5WDlOSDNFQ09WSVhxQXgrcUFOdFBERXptdG80SVZXbGptR2k1MDJlYUx3?=
- =?utf-8?B?cmtTRUVJQzhLdUNDc21FSVhTV3JYeldaTWE2aCtGRWlDR2tMa2NtUUlFZWJl?=
- =?utf-8?B?ZmNySURJNHZ2REo4SmNRdTQwR3RCWlc2QnhEeFQwY2pPY2NiQ2JGZU1lQnYy?=
- =?utf-8?B?dkI5cjFuUTg3emRPUG5PdmpXRi9rcFZ5aFQ3Zzg0V09hSVVKYTE2REN4VXB3?=
- =?utf-8?B?dGVMRUlaM3NldVJyWTNRKy94UnIxclBlQzE0bGEyMk8rT0loUitpVkJhUDRT?=
- =?utf-8?B?TytZSWYwQ1cvN1V1b3c1MHRkWkxwMUw3Y3dLQmVkampnZUxBZ3NoMjF3U0Uy?=
- =?utf-8?B?a1doU0txNEVXRURqR2RtV2ltVzFPZmRFUEhLVkRINFdmamxZNzdaZC9SVGhI?=
- =?utf-8?B?cTZKY04zOFVCSHpXaHhLQ0UyS3RkMVJZVUQzSFdhUC85RThmZmdaR2lZRTFV?=
- =?utf-8?B?bUVGTlJlUWhFeXppUDU0UGRyQm45ZEZlaUFGeDRXNk5URHNTUUYzbE9oMVFa?=
- =?utf-8?B?STZYRmxBTmFxSkhrVkR6bGJZQ2VBQ0VXdFRYMFROUmJQd1ZFbnl6OGhialhN?=
- =?utf-8?B?L1VsWnJBUzJKajVuSHVEQ1l5OXJhbzYvNWg2dlNYdFZ0TUtVYU91ekZFcTdX?=
- =?utf-8?B?UVY1ZGVWUVdBQVRzbkUzTzhSeFIvNnArRUdubzNqQXJSWmpQb1hwYmJLVUky?=
- =?utf-8?B?b2cxV1ZtTis2L0xtZ2I0TlN2MGl3YlhNVWxBbno5eVdydU5BQjFRd3dvMk5W?=
- =?utf-8?B?RE9kNWgwczArdnVHVGtRWUlaNGhWcHpoWU5WQXFvNFBTWHg5RXBFbkxMeXp4?=
- =?utf-8?B?ck9tN29Bb3dqTnBtem1IWFdIRFc4US82eXpuRXhQYVg5Sk5aYk1WZlZhNlVn?=
- =?utf-8?B?eG03VTR3bmkzTytQamNqM05ndkxkdTVvcWRWN2NOWG9KeGhXQlBmVDZENVE3?=
- =?utf-8?B?OVM2aXFhUWJ5dkFmdnhTQnh0RjNrQ0VlWXpQQWhhVDRrQW5jdnVjMmtpMHV0?=
- =?utf-8?B?b0dGZVlzamlwSTZjZ2JDUHFpZDBYa3pwVWNYSFdoRGxoREVUSHoxRHdHMlZC?=
- =?utf-8?B?TDgyKytuOUpucUlQbkx6c212ZFZmeFI3K3U4bFgrMWs4UnFua3JKTFVINENl?=
- =?utf-8?B?b3ZvVkhCbEEzTzR2NG5FU2NTem1Xb2pKK0d6WFJQZVNNMTFsZGlVenN5MGlS?=
- =?utf-8?B?NktNMnJvOGVqcXVrT2R5NUFOak5jN2Y4b1BwZmt3N05uWEdQNTlmZXJydGJi?=
- =?utf-8?Q?8z44i0MtIzrri2BZ4ETrjsa+a?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M3ZyU2dUdmlweWpWSnllRFZRTWtrNVV6ZFdpdDNQWklMdG1Nb3R4OFU5MUJi?=
+ =?utf-8?B?amo5SEZhQkFtb2JqdjltMTFuL1I5UHA1WWxyU3VaY0lTdmpWUUJjZ2dhMkxQ?=
+ =?utf-8?B?d3Q2QmFOczRobmJEalFTS1hiaFRId0dtNFVOcWRLOWJiaWsrdFJkalhaWnlD?=
+ =?utf-8?B?cU8vWjRPWlFxc2ZjZHRUMGtpRDJybUdsMDhWT1oxR0pWYkJDdGhrcmgxd0xZ?=
+ =?utf-8?B?VTIzUXlYZWc4UWZLQSt0eFc3MTRCRVFpU3N0bmdObyszMitReE4relJzQWxT?=
+ =?utf-8?B?ei9lYkFHbHRQd1hWNmpnYVJCSFliM2dqT214aUg5SCtkeU9reFQwT2l3UE82?=
+ =?utf-8?B?K05VQkJ6NUdPR1ZlYWJxbVhsUFR5UzVybk0vRjVjNk9FWEF3RlpTd0RxSzBs?=
+ =?utf-8?B?dHk2bFp1KzdxbTVxd1VERDRZVUdIbkw3QkJVWDByYmtiR0tkVmYydWdmWURq?=
+ =?utf-8?B?SWpEMzBNaFFmZVlxcFhaenc0VWtjYXdySDhaTXdDOWYxNWp6Mm5xNWt5MHFO?=
+ =?utf-8?B?L01yOUNWUklsTThXSmF6QUROL3RIY05XSS9OZ1pIbndndHN3Sm5ueDl3aEhO?=
+ =?utf-8?B?aVE5djNTa3dzS1VJU3MwelFDTTZ4cCtVdzRWQ0F1TFduYjArS0xCcFNsUVpS?=
+ =?utf-8?B?QllYWjNNMUZwTWs5WHZNVG5TOVZhcUVURXZjY1VGbXp2eE0xemV5WmNJbUxU?=
+ =?utf-8?B?SStFUDZqWmR4dlIrY1FKZ1ZIZ3lieVNyU0JvMzVvZUFjaEFEcjVwaU5Yb2xt?=
+ =?utf-8?B?NW1Pak5Ua0ttc1J1WFAyREhVYTNtYm1NSnl1ZVd1NHhyK0NoZmg3M2JISFVz?=
+ =?utf-8?B?K1ltQi83YmMrVEVNMS8yQ2RxSm1jTko4ZllMaHRKWEhFYjg5MnpCcERPQmF5?=
+ =?utf-8?B?b2FmajkrZ0FUcnVyUE83Z3VYaHdXLzRHN0UvNVZuM2FINVVsYnpXWUpzV0pV?=
+ =?utf-8?B?dll4SnRlZUhOdHY5ZXhBOG5zTDNKUHVHVU5WOUQ2RmpmbmJiUy81L0NHaGFo?=
+ =?utf-8?B?cld6elgrZXdkejlsUVBhdlp2cDByOUpqSnlQRG9tMi9iMFFNbW91c3NxSWs0?=
+ =?utf-8?B?NFZmR1loVzV6SHJlRy83cndHa0QzUlhtWHBhM3N3Sno5cDAyYXE2eDRRVk1P?=
+ =?utf-8?B?MDZ2UTNxelBNTUozdERUeWVWcEpqSWlldEZ0SUh2cmRaRjArVUh2a3RBU2VN?=
+ =?utf-8?B?TmtrOFVhMzVCUVZhTTZraHh4SHdiTGlZc1o3THNTQWpmWUVxMXZBQWlWMEtl?=
+ =?utf-8?B?QVZkbm11VlBSUkpzRERLWjZ6T0gwL3N3N0NOQ3V2bFdrOUJSTG1FTkhEUXMx?=
+ =?utf-8?B?RngxMUVBTjhEWGgxQUo1RS9ZYm9nTktJSldEM0lSZkNKYng2SVllcjFCTWwz?=
+ =?utf-8?B?bUhyeVo5Q1B0bHVsVWExNjYxWmw2M09abTdXbTV3N3pkZkhPQk1hZmtmd1Na?=
+ =?utf-8?B?UUJtLzE5OXZtSlh2MnRKQzFCRmo0bEcrR1dmU1o2dFRGaGJGbzNZMWlYYjlQ?=
+ =?utf-8?B?R0dGNnR5M1NzaXBlL3VWajkwY2xCR0pjQy9LQW4zdWpmNENSWllNQlhJWnB1?=
+ =?utf-8?B?Yjh5R2d4TlBXOHlwZTMwZHY3dVJHZnpTUmlYS1VLaUVHTWdkcU5TQjBVY2M2?=
+ =?utf-8?B?K2hmeUxpczAxYmtxalVuaU05a0dUS3Nsc2Qvdk1xN2RiZmtPdnlsWFpLYjZ0?=
+ =?utf-8?B?K2YwNy9obGJUWldzU09wWVFiMTcyOGdmcmpvY2l6U1U2MmdSaFdWVUdDMHpt?=
+ =?utf-8?B?cmliR3BDdGJ2MldFZ1dGNkRDR2NYa2lFbS9wQ0RZUmJGR1R3OHB6ZldKcSt6?=
+ =?utf-8?B?bFl4emRVSnJjNHR3WjlKY0hzVWlEQ0hSWWtSWEN1S1B2aEpaaGd6UmFIZzkw?=
+ =?utf-8?B?MEJxQ3d1a2Vmbk9KVDhwOU8wQm0wWVF1WWVBSXl2Q2p0U1hKRUUyVjFVYVNZ?=
+ =?utf-8?B?N0tWRyt6OUV6QmhKbzBkWmNDeXloOUE0NWYwbzg3UzdnRTZzYk55bmFNMTVB?=
+ =?utf-8?B?RkhsVHR6dWlZUG11VElzRmRSbGo4NVczTGlOZGdaR2FucXlMWDROMjBKbkdF?=
+ =?utf-8?B?MFNWalU1dTNJUlIvVzNub0hmWWZsMFp3ZWNNSHNtOEpwQ3J3aHA1WTZMTjdh?=
+ =?utf-8?Q?Sy91pHD1MhQ8e0p1xjpPmKr+H?=
 X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07a1182f-932b-4a65-68f5-08db7745e8bf
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ab3f1e0-e124-46e7-6a51-08db77465d12
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2023 19:37:14.5827
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2023 19:40:29.7137
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mPV9scNLWXusGm/7dtlaYJvlvO90wwMNbn9y7lOn+Byg8XIj36YQ77/2uNgUwhIC
+X-MS-Exchange-CrossTenant-UserPrincipalName: +UK2BhkQrlKWm6/dHYF2152JoN236j3i0oMx3FIPyITIuMdj11KNN8IF5juPlWFs
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR01MB8492
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 6/26/2023 7:12 AM, Dan Carpenter wrote:
-> On Fri, Jun 23, 2023 at 12:09:12PM -0400, Tom Talpey wrote:
->> On 6/9/2023 1:46 PM, Shyam Prasad N wrote:
->>> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
->>> index 1250d156619b..9d16626e7a66 100644
->>> --- a/fs/smb/client/connect.c
->>> +++ b/fs/smb/client/connect.c
->>> @@ -1288,6 +1288,56 @@ cifs_demultiplex_thread(void *p)
->>>    	module_put_and_kthread_exit(0);
->>>    }
->>> +int
->>> +cifs_ipaddr_cmp(struct sockaddr *srcaddr, struct sockaddr *rhs)
+On 6/26/2023 2:33 AM, Shyam Prasad N wrote:
+> On Fri, Jun 23, 2023 at 9:52 PM Tom Talpey <tom@talpey.com> wrote:
 >>
->> Please, please, please, let's not add a new shared entry starting with
->> this four-letter word.
+>> On 6/11/2023 4:01 AM, Shyam Prasad N wrote:
+>>> On Sun, Jun 11, 2023 at 1:19 AM Steve French <smfrench@gmail.com> wrote:
+>>>>
+>>>> should this be a warn once? Could it get very noisy?
+>>>>
+>>>> On Fri, Jun 9, 2023 at 12:47 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+>>>>>
+>>>>> We've seen the in-flight count go into negative with some
+>>>>> internal stress testing in Microsoft.
+>>>>>
+>>>>> Adding a WARN when this happens, in hope of understanding
+>>>>> why this happens when it happens.
+>>>>>
+>>>>> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+>>>>> ---
+>>>>>    fs/smb/client/smb2ops.c | 1 +
+>>>>>    1 file changed, 1 insertion(+)
+>>>>>
+>>>>> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+>>>>> index 6e3be58cfe49..43162915e03c 100644
+>>>>> --- a/fs/smb/client/smb2ops.c
+>>>>> +++ b/fs/smb/client/smb2ops.c
+>>>>> @@ -91,6 +91,7 @@ smb2_add_credits(struct TCP_Server_Info *server,
+>>>>>                                               server->conn_id, server->hostname, *val,
+>>>>>                                               add, server->in_flight);
+>>>>>           }
+>>>>> +       WARN_ON(server->in_flight == 0);
+>>>>>           server->in_flight--;
+>>>>>           if (server->in_flight == 0 &&
+>>>>>              ((optype & CIFS_OP_MASK) != CIFS_NEG_OP) &&
+>>>>> --
+>>>>> 2.34.1
+>>>>>
+>>>>
+>>>>
+>>>> --
+>>>> Thanks,
+>>>>
+>>>> Steve
+>>>
+>>> Makes sense. We can have a warn once.
 >>
+>> Which sounds great, but isn't this connection basically toast?
+>> It's not super helpful to just whine. Why not clamp it at zero?
+>>
+>> Tom.
 > 
-> What would you suggest instead?
+> So there's no "legal" way that this count can go negative.
+> If it has, that's definitely because there's a bug. The WARN will
+> hopefully help us catch and fix the bug.
 
-"smb" would be fine, but honestly it's only referenced in one
-place and used to be static inline, so it kind of doesn't matter
-what it's called. It's also unclear to me why it's being moved
-to a .c file and made visible.
+To be clear, I'm ok with the warn, it's the fact that the code
+goes to all the trouble to say it but doesn't do anything to
+recover.
 
-Anything but "cifs" though.
+> We could also have a clamp at 0. I'll send an updated patch.
+
+Sounds good.
 
 Tom.
-
-> 
->>> +/*
->>> + * compare two interfaces a and b
->>> + * return 0 if everything matches.
->>> + * return 1 if a is rdma capable, or rss capable, or has higher link speed
->>> + * return -1 otherwise.
->>> + */
->>> +static int
->>> +iface_cmp(struct cifs_server_iface *a, struct cifs_server_iface *b)
->>> +{
->>> +	int cmp_ret = 0;
->>> +
->>> +	WARN_ON(!a || !b);
->>> +	if (a->rdma_capable == b->rdma_capable) {
->>> +		if (a->rss_capable == b->rss_capable) {
->>> +			if (a->speed == b->speed) {
->>> +				cmp_ret = cifs_ipaddr_cmp((struct sockaddr *) &a->sockaddr,
->>> +							  (struct sockaddr *) &b->sockaddr);
->>> +				if (!cmp_ret)
->>> +					return 0;
->>> +				else if (cmp_ret > 0)
->>> +					return 1;
->>> +				else
->>> +					return -1;
->>> +			} else if (a->speed > b->speed)
->>> +				return 1;
->>> +			else
->>> +				return -1;
->>> +		} else if (a->rss_capable > b->rss_capable)
->>> +			return 1;
->>> +		else
->>> +			return -1;
->>> +	} else if (a->rdma_capable > b->rdma_capable)
->>> +		return 1;
->>> +	else
->>> +		return -1;
->>> +}
->>> +
->>
->> The { <0 / 0 / >0 } behavior of this code has been a source of
->> incorrect comparisons in the past, and it still makes my head hurt
->> to attempt a review.
->>
->> So I'll ask, have you thoroughly tested this to be certain that it
->> doesn't result in new channels being created needlessly?
-> 
-> I was not a huge fan of this function and the move makes it harder to
-> review.  But I didn't see anything wrong with it....  Here is a slightly
-> simplified diff that I use to review.
-> 
-> regards,
-> dan carpenter
-> 
->   iface_cmp(struct cifs_server_iface *a, struct cifs_server_iface *b)
->   {
->          int cmp_ret = 0;
->   
->          WARN_ON(!a || !b);
-> -       if (a->speed == b->speed) {
->                  if (a->rdma_capable == b->rdma_capable) {
->                          if (a->rss_capable == b->rss_capable) {
-> -                               cmp_ret = memcmp(&a->sockaddr, &b->sockaddr,
-> -                                                sizeof(a->sockaddr));
-> +                       if (a->speed == b->speed) {
-> +                               cmp_ret = cifs_ipaddr_cmp((struct sockaddr *) &a->sockaddr,
-> +                                                         (struct sockaddr *) &b->sockaddr);
->                                  if (!cmp_ret)
->                                          return 0;
->                                  else if (cmp_ret > 0)
->                                          return 1;
->                                  else
->                                          return -1;
-> -                       } else if (a->rss_capable > b->rss_capable)
-> +                       } else if (a->speed > b->speed)
->                                  return 1;
->                          else
->                                  return -1;
-> -               } else if (a->rdma_capable > b->rdma_capable)
-> +               } else if (a->rss_capable > b->rss_capable)
->                          return 1;
->                  else
->                          return -1;
-> -       } else if (a->speed > b->speed)
-> +       } else if (a->rdma_capable > b->rdma_capable)
->                  return 1;
->          else
->                  return -1;
->   }
-> 
-> regards,
-> dan carpenter
-> 
-> 
