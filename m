@@ -2,50 +2,50 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 491F2EB64D7
-	for <linux-cifs@archiver.kernel.org>; Wed, 28 Jun 2023 16:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B59D6EB64D7
+	for <linux-cifs@archiver.kernel.org>; Wed, 28 Jun 2023 17:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbjF1QvZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Jun 2023 12:51:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41234 "EHLO
+        id S229982AbjF1RIE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Jun 2023 13:08:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbjF1QvY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Jun 2023 12:51:24 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCF39F
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Jun 2023 09:51:23 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b6adef5c22so64191fa.3
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Jun 2023 09:51:23 -0700 (PDT)
+        with ESMTP id S230055AbjF1RIB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Jun 2023 13:08:01 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4D710C
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Jun 2023 10:07:59 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b6a0d91e80so425501fa.3
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Jun 2023 10:07:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687971082; x=1690563082;
+        d=gmail.com; s=20221208; t=1687972077; x=1690564077;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=x1jaCcgcWoYJQO24TPHweqTbLvTYLlQYxZJr8p9E70c=;
-        b=Tx6CJP1rFkbJq7v5L8juRNvTexaQO5ZQruhyL+VspRYYZglgOBwpsLLFwqRUuzuCWX
-         xJ8vXNvV/uucj88AO8nJjGKfa39enWKGWjRvXfgGCb2m+CdYEJ/PLe/AQF6pcrRTGdXy
-         pdyyCGvViLyEs9rlf9+bxUcFyoy7b35oCoA4uM8kgtfvMdwB9O9wJsQfjfFZjORmF+Xa
-         Pv3gBxErFHNa8M1ipugVcaC4rTMTSIIhBqzwi5x1KiAtCp4o+u1zbYBBELIhz4yDIchV
-         c0izEAGn2FaAHur8JIAM/sakFQ+Yj7XGr0e9M4ronzqmJE616d8c7fuGttMf26O+DaQa
-         XcdA==
+        bh=+6MWWCWR5nr8vTSycLn4vAHV/KLF19WnjpAv1YLvgX0=;
+        b=EKjrhxZzYrkCp8eXgVvyLYrqLn5Ju1ZQESW/76xJqlpGK4lyv1Hfydn4QYSDM9Q1mk
+         H/7MuuLvP+GoBjatsIXZYNc5FUoeMYDd6blCdagyepHVJcLzTorl3DNReRBV4kUOB0oI
+         vB3sr6B2gevrCs88blSKEP3U8ST5mtI3cmb+kWdmJ76foclLNDNEI9K2KWs5SSD4qZra
+         qXtaWAvZOGNvF0JsJpuzSgJrGK2jCwX9UJqqGiKqy+kek2/tC6KJVUKLzEnURm1ZmqSN
+         aSxFcgplicWh9cfnKb5L4IS2UWN1OUYhzRr+EAY+X0T68W2omnrQ3po4JRTcBa5WYDpR
+         J5uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687971082; x=1690563082;
+        d=1e100.net; s=20221208; t=1687972077; x=1690564077;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=x1jaCcgcWoYJQO24TPHweqTbLvTYLlQYxZJr8p9E70c=;
-        b=bgYiuqKxI5aM3r8rzWSVQDHMcYBfqh5kbag9Tir09DDZGBGdX5nnRWhIJCZR36BKiR
-         E9dF93/VwsBAUAhfJd+BdJDm4kFBvToPNJUqoWvqgsjP1bGtjf1QUXubFI7dcHk/UunT
-         qzK4Hl1tiUwqyapyc+hZJAWRtna4wOX7q4U09qfH+PlqDNutWiBL7A43vtV8z4tsXLau
-         kqhLfAzzpKS/c2IBTdRZViIiHUeXc7Da2s/hW8jozd3M5uBrItcwkSeaMjGASgJ/7eYC
-         HN4ifBhkWlV7rFw/vDQvUEwsakbLpvX47RDz+MIvhBr37Tq39ZLIuiLyMYb1g4rjmi3V
-         /5XA==
-X-Gm-Message-State: AC+VfDyEXwdfZ2eiVBKGUlyLigBY/YgyX0gaXKcgs7+YPJKQfBUWnfSF
-        KfLTSSASJsZc0vPSrYhFD1sY22yrcR+ZKazNYjg=
-X-Google-Smtp-Source: ACHHUZ7qiCC/3+V0MuxY4jAz9qtbp796BRJN9zGHNXTrDgKiNtHEFR3/rcuav/i6GClnenyBp+jlctiP335dAOJoDJk=
-X-Received: by 2002:a2e:848a:0:b0:2b4:6c76:332f with SMTP id
- b10-20020a2e848a000000b002b46c76332fmr25395149ljh.9.1687971081652; Wed, 28
- Jun 2023 09:51:21 -0700 (PDT)
+        bh=+6MWWCWR5nr8vTSycLn4vAHV/KLF19WnjpAv1YLvgX0=;
+        b=k8LP/KrW7YCwq3keRK4EuWdUpvfVmGuBmJ8WbTYBlanJfiiD5LO62U8gVo1yUK4dJr
+         6VzDkX3yHpS4NeIG7IyAp+hdN8dbTX4dYYSczHg5Wi1po8zwvMBFw4KMDc34MNNppCSL
+         Chv9N8Fm/jp+hEko+hu4lmjdbxyT9rZ7LEn/nh2GAk7zWuxelBHxtHcf98k6Ddc7stnL
+         P/12qbmM6mdPAeM3jX3lci5XMBfPXgoEQoHzsvmt0YJaGqMCT6BS8oqsc66LKRgPsT3R
+         kyrrRfnIjXiSgbhod+igeY/EJ4T7FqF5GgbvmLpKatGGWRKE9Jc8rhCqyVvYg/woTpqF
+         0FKg==
+X-Gm-Message-State: AC+VfDz3lZFdNFf4w0CsuchT5gIQ0tDXdwTfwDPPb5ypYl0Pp5VPuCEt
+        fey+Yvjmr/DOw7Z0KCYkbD9R0Uw/kScYokQPF+E=
+X-Google-Smtp-Source: ACHHUZ7pD3+3mPwiozlWlx5jTbjIFciIwvjsVmVrJwDBQgbW6TNbhvGBP/xkA5QH6+Hlh5k+7HrDPoCHeAqfYRJHgIY=
+X-Received: by 2002:a05:651c:118:b0:2b4:753d:9321 with SMTP id
+ a24-20020a05651c011800b002b4753d9321mr20552274ljb.21.1687972077098; Wed, 28
+ Jun 2023 10:07:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230609174659.60327-1-sprasad@microsoft.com> <20230609174659.60327-4-sprasad@microsoft.com>
  <nlpmf2nsqosbz5ifzycdpoqmi22tkcoouuk4pjsp4exa2jtyqm@wzdmdh625e5p>
@@ -57,8 +57,8 @@ References: <20230609174659.60327-1-sprasad@microsoft.com> <20230609174659.60327
  <CANT5p=qdS6FFj9ay3bDiP+mWnU1b-NJp2TLb0YdAFyvkqZcKFw@mail.gmail.com>
 In-Reply-To: <CANT5p=qdS6FFj9ay3bDiP+mWnU1b-NJp2TLb0YdAFyvkqZcKFw@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 28 Jun 2023 11:51:10 -0500
-Message-ID: <CAH2r5muE+a0mUCb0L8Rnxw08gB6u=Skcw7Jwr_ThWpb-dmrA3A@mail.gmail.com>
+Date:   Wed, 28 Jun 2023 12:07:45 -0500
+Message-ID: <CAH2r5msrTOKQdwr7vjOEAK0zqATXWNcdF5Vq0TOcSHjZp-O0zg@mail.gmail.com>
 Subject: Re: [PATCH 4/6] cifs: display the endpoint IP details in DebugData
 To:     Shyam Prasad N <nspmangalore@gmail.com>
 Cc:     Tom Talpey <tom@talpey.com>, Enzo Matsumiya <ematsumiya@suse.de>,
@@ -71,8 +71,8 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged updated patch in cifs-2.6.git for-next pending
-additional testing/review
+corrected a missing unlock (near line 451 of cifs_debug.c) and
+tentatively put in cifs-2.6.git for-next
 
 On Wed, Jun 28, 2023 at 5:20=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.=
 com> wrote:
