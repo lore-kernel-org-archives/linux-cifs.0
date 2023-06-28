@@ -2,67 +2,96 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C1BEB64D7
-	for <linux-cifs@archiver.kernel.org>; Wed, 28 Jun 2023 15:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC2FEB64DD
+	for <linux-cifs@archiver.kernel.org>; Wed, 28 Jun 2023 15:13:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231464AbjF1PHD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Jun 2023 11:07:03 -0400
-Received: from dfw.source.kernel.org ([139.178.84.217]:55358 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231969AbjF1PGz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Jun 2023 11:06:55 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5C8AF6124B;
-        Wed, 28 Jun 2023 15:06:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C45C8C433C8;
-        Wed, 28 Jun 2023 15:06:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687964814;
-        bh=tYONJNnGCQMJ80wSHKkNy+/9k7bcbNipagC4FIaSVh4=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=fH3IUtR0gjCfGcOCNMckBP2f/Vs37X+rPVTO1uoh0Ocxu9vLx7mIfIgmE5UNXcRoM
-         ogAbNleaeEMIL8vXfLUV9xsABdJYxzznt/+oUqFmmJgFQwmfr4ykUEi5VdEqL4emt1
-         VBrN0WQBW8RAQNhUWwGsrd7t1QlsAWmwUIRBJveXODht9U2Z5gU0KpuSJvCl+MFffJ
-         ZJ1Pg/F3xXwfFeeY29HbU7PmpVANRdsdDrdVOqc+In+rrGj/DN+DLIwgZIC5FnbX8k
-         x0aRa3Iax38OyIKeajKR4UkyJWdPxg6NH7l2luXYY/3JH5xRtngl8too4lulS6neTZ
-         LmMjwNWo1RHZg==
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-55b8f1c930eso3717093eaf.3;
-        Wed, 28 Jun 2023 08:06:54 -0700 (PDT)
-X-Gm-Message-State: AC+VfDynyw2x7qiJl5b2bHVt5o/pujFI9Aq8DGoUmYWrosoO9K1MoV2/
-        gkflC5YJvfSUFOVE4fxLgKNEip4oOHhE6c5cA+o=
-X-Google-Smtp-Source: ACHHUZ6B52reag+L2IlplUvg6F+aLqCsIPNfwwTs1JaQRfUZzOM5Xa4xbUxzeJQ+BYca+dwvBsArZR5zC0ac59AlOQA=
-X-Received: by 2002:a05:6820:396:b0:563:5542:c45 with SMTP id
- r22-20020a056820039600b0056355420c45mr5562605ooj.7.1687964813976; Wed, 28 Jun
- 2023 08:06:53 -0700 (PDT)
+        id S231555AbjF1PNp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Jun 2023 11:13:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231439AbjF1PNo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Jun 2023 11:13:44 -0400
+Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 290CFA1;
+        Wed, 28 Jun 2023 08:13:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+        ; s=bytemarkmx; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=DBTIfrxMdKKM9sBHIVJZO9vzHO75jz/0ZU+aMpxxKZE=; b=momUJtebq9yrc3OXvovd16djTJ
+        C2HZNqgjC41tWcLJkC0tbgDnDWHGEw49Oh4Z31tXD0nUhJpCz8kAg9dEcnanu0mDSfUq4o9gVap5F
+        VV+KfCoRy7wgdrot4IZ8s5qCAXFDc6d0IUqKAf9zaEKhv/lq3ef7LwcSblm7C8nw2mL2Oj7rwPUkX
+        dM65UjPbEl+047Kv+AKU7ZFlitQ06kT8qepIxE88HYf7PQueJZphHs4z5ovkW8EvzNZ45OnsPzViK
+        /7sf0rAiDmoRmcXMkyesoJcXXVY1X2QHwa0v97dNpB3Gp1FfxmZdYSPxjUxCCDELjCqaNVCUckCGK
+        SdWmijyg==;
+Received: from dg by mx.treblig.org with local (Exim 4.94.2)
+        (envelope-from <dg@treblig.org>)
+        id 1qEWr9-00GTya-Gw; Wed, 28 Jun 2023 15:13:19 +0000
+Date:   Wed, 28 Jun 2023 15:13:19 +0000
+From:   "Dr. David Alan Gilbert" <linux@treblig.org>
+To:     Steve French <smfrench@gmail.com>
+Cc:     Dave Kleikamp <dave.kleikamp@oracle.com>, krisman@collabora.com,
+        Tom Talpey <tom@talpey.com>, sfrench@samba.org,
+        linux-cifs@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
+        linkinjeon@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Jfs-discussion] [PATCH 0/3] dedupe smb unicode files
+Message-ID: <ZJxOD+OZzq3FR1dH@gallifrey>
+References: <20230628011439.159678-1-linux@treblig.org>
+ <9343462e-6a4a-ca7b-03b8-4855e5a33b72@talpey.com>
+ <ZJw4iLlFWRMq6a3S@gallifrey>
+ <ZJw50e0pvn/IN5Gj@gallifrey>
+ <90f35697-5941-d42d-b600-245454cbd040@oracle.com>
+ <ZJxGFBzuhU8t5rcx@gallifrey>
+ <CAH2r5ms1UE4vAuakBLuayv1CXw3sC_OcuhtCrz5mV_ftR+=rjg@mail.gmail.com>
 MIME-Version: 1.0
-Received: by 2002:ac9:7a97:0:b0:4e8:f6ff:2aab with HTTP; Wed, 28 Jun 2023
- 08:06:53 -0700 (PDT)
-In-Reply-To: <20230628011439.159678-3-linux@treblig.org>
-References: <20230628011439.159678-1-linux@treblig.org> <20230628011439.159678-3-linux@treblig.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 29 Jun 2023 00:06:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-KeNM56ecmnaDR2wA4meTqPRa=e+KT3JJkpvC9=PCeiw@mail.gmail.com>
-Message-ID: <CAKYAXd-KeNM56ecmnaDR2wA4meTqPRa=e+KT3JJkpvC9=PCeiw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] fs/smb: Swing unicode common code from server->common
-To:     linux@treblig.org
-Cc:     sfrench@samba.org, linux-cifs@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH2r5ms1UE4vAuakBLuayv1CXw3sC_OcuhtCrz5mV_ftR+=rjg@mail.gmail.com>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/5.10.0-21-amd64 (x86_64)
+X-Uptime: 15:12:06 up 101 days,  1:46,  1 user,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-06-28 10:14 GMT+09:00, linux@treblig.org <linux@treblig.org>:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
->
-> Swing most of the inline functions and unicode tables into smb/common
-> from the copy in smb/server.
->
-> UniStrcat has different types between the client and server
-> versions so I've not moved it (although I suspect it's OK).
-ksmbd doesn't use this function. You can move it to smb_unicode_common.h.
+* Steve French (smfrench@gmail.com) wrote:
+> On Wed, Jun 28, 2023 at 9:40 AM Dr. David Alan Gilbert
+> <linux@treblig.org> wrote:
+> > > > Actually, would you be ok with smb_unicode_common ?  The reason is that
+> > > > you end up with a module named unicode_common  that sounds too generic.
+> > >
+> > > I'd suggest make it generic and move it to fs/nls/. I'd run it by the nls
+> > > maintainers, but I don't think there are any.
+> >
+> > Steve & Tom - would you be OK with that?
+> 
+> Yes - absolutely
 
-Thanks.
+OK.
+
+> > (Copying in Gabriel Bertazi, owner of fs/unicode; although this isn't
+> > utf-8)
+> 
+> Unicode UCS-2
+
+(I'm going to regret the next question...)
+So how does this compare to the stuff in include/linux/ucs2_string.h
+and lib/ucs2_string.c ?
+
+Dave
+
+> 
+> -- 
+> Thanks,
+> 
+> Steve
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
