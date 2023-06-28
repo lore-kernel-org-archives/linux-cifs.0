@@ -2,92 +2,67 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0090EB64D7
-	for <linux-cifs@archiver.kernel.org>; Wed, 28 Jun 2023 15:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C1BEB64D7
+	for <linux-cifs@archiver.kernel.org>; Wed, 28 Jun 2023 15:07:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbjF1PDl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Jun 2023 11:03:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231940AbjF1PDh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Jun 2023 11:03:37 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC03A10D5;
-        Wed, 28 Jun 2023 08:03:36 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-98e011f45ffso474652066b.3;
-        Wed, 28 Jun 2023 08:03:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687964615; x=1690556615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8wS0/tVVfYmWAxxo37y+v0M6HIvge1vajIKiOpWu/wQ=;
-        b=ME6xclwZwAKxvdbSiH7N5rG8ryo5U4E538D0nnDMbunKQdRXYX78PbUueytpfqLFhB
-         nm08tVIGha1qYoNPECIqFEOr8sams/BfwupmWtLEwvaZJUuaKt5dth9n41ZkWYLW0OBF
-         58vvJ9OclwmfZLNmoRSfzZrfs9sEBCIKTLFU59hrHX525xL9UnaJKwT/8RozQJWOIbYS
-         Hn52ieE/PTBNEveYm0ZQ5w38seM577yXEC2AFMLmrOg60VLG2wH5q1Tr1UpzIHIuhT4C
-         0QxQRRt7Op67cHEbPJjCJETKBf7cX9JIXGomfJtJeRl04FaW9ZXeIv7oFBWv9Xz80Pns
-         aw9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687964615; x=1690556615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8wS0/tVVfYmWAxxo37y+v0M6HIvge1vajIKiOpWu/wQ=;
-        b=UvnIajN4KnO2WL323bENQcwoaDqRkp+wSSl9rycdpZGad2pynKuFSn84VQvETEhRS9
-         3p9vMun9Yh519QcohpdZzCSKzT6ldZjA7n99Kcr6qiQks/asUQ6G0dG8RaQ3PHvy10p/
-         i9rHn7JfLCCWlNabUuVePoMi487Qvgh0aoRM5g/UhVunYgrdef/NjfepqZtNYr8h25aX
-         3HxZxCaB082rJxJaOxzl1bsQMAWuV7sQ5Yjb5JWGBFAOjDAGVAnJ+JzDQuzOyzzrWhnD
-         ikSLbMYh555UDG9PcxkYGCCPlqjDHgqcYLAUVxZn8cQ6OpZC/177SBJAyR6ubp82EjMY
-         PvmA==
-X-Gm-Message-State: AC+VfDyrHetMobcKKMdnZ0wXaDcPPHSZ7I3uhXUIOICNG3Oo57a74ti7
-        lZzuyDKLmWreANZVBI6+wuVeL8amyYdmGu0NzCHYK9sM
-X-Google-Smtp-Source: ACHHUZ4bDstTP1DqJWuzHP2Nrm5f9oBvhMa44NotmxDjlNg0QAlbZg/QasCcLY/KGLdkWShNGNYgTSRq+ocENqiQQrA=
-X-Received: by 2002:a17:907:6d1d:b0:992:4a1b:30e2 with SMTP id
- sa29-20020a1709076d1d00b009924a1b30e2mr3237054ejc.7.1687964614906; Wed, 28
- Jun 2023 08:03:34 -0700 (PDT)
+        id S231464AbjF1PHD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Jun 2023 11:07:03 -0400
+Received: from dfw.source.kernel.org ([139.178.84.217]:55358 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231969AbjF1PGz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Jun 2023 11:06:55 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5C8AF6124B;
+        Wed, 28 Jun 2023 15:06:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C45C8C433C8;
+        Wed, 28 Jun 2023 15:06:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687964814;
+        bh=tYONJNnGCQMJ80wSHKkNy+/9k7bcbNipagC4FIaSVh4=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=fH3IUtR0gjCfGcOCNMckBP2f/Vs37X+rPVTO1uoh0Ocxu9vLx7mIfIgmE5UNXcRoM
+         ogAbNleaeEMIL8vXfLUV9xsABdJYxzznt/+oUqFmmJgFQwmfr4ykUEi5VdEqL4emt1
+         VBrN0WQBW8RAQNhUWwGsrd7t1QlsAWmwUIRBJveXODht9U2Z5gU0KpuSJvCl+MFffJ
+         ZJ1Pg/F3xXwfFeeY29HbU7PmpVANRdsdDrdVOqc+In+rrGj/DN+DLIwgZIC5FnbX8k
+         x0aRa3Iax38OyIKeajKR4UkyJWdPxg6NH7l2luXYY/3JH5xRtngl8too4lulS6neTZ
+         LmMjwNWo1RHZg==
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-55b8f1c930eso3717093eaf.3;
+        Wed, 28 Jun 2023 08:06:54 -0700 (PDT)
+X-Gm-Message-State: AC+VfDynyw2x7qiJl5b2bHVt5o/pujFI9Aq8DGoUmYWrosoO9K1MoV2/
+        gkflC5YJvfSUFOVE4fxLgKNEip4oOHhE6c5cA+o=
+X-Google-Smtp-Source: ACHHUZ6B52reag+L2IlplUvg6F+aLqCsIPNfwwTs1JaQRfUZzOM5Xa4xbUxzeJQ+BYca+dwvBsArZR5zC0ac59AlOQA=
+X-Received: by 2002:a05:6820:396:b0:563:5542:c45 with SMTP id
+ r22-20020a056820039600b0056355420c45mr5562605ooj.7.1687964813976; Wed, 28 Jun
+ 2023 08:06:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230628011439.159678-1-linux@treblig.org> <9343462e-6a4a-ca7b-03b8-4855e5a33b72@talpey.com>
- <ZJw4iLlFWRMq6a3S@gallifrey> <ZJw50e0pvn/IN5Gj@gallifrey> <90f35697-5941-d42d-b600-245454cbd040@oracle.com>
- <ZJxGFBzuhU8t5rcx@gallifrey>
-In-Reply-To: <ZJxGFBzuhU8t5rcx@gallifrey>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 28 Jun 2023 10:03:22 -0500
-Message-ID: <CAH2r5ms1UE4vAuakBLuayv1CXw3sC_OcuhtCrz5mV_ftR+=rjg@mail.gmail.com>
-Subject: Re: [Jfs-discussion] [PATCH 0/3] dedupe smb unicode files
-To:     "Dr. David Alan Gilbert" <linux@treblig.org>
-Cc:     Dave Kleikamp <dave.kleikamp@oracle.com>, krisman@collabora.com,
-        Tom Talpey <tom@talpey.com>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
-        linkinjeon@kernel.org, linux-kernel@vger.kernel.org
+Received: by 2002:ac9:7a97:0:b0:4e8:f6ff:2aab with HTTP; Wed, 28 Jun 2023
+ 08:06:53 -0700 (PDT)
+In-Reply-To: <20230628011439.159678-3-linux@treblig.org>
+References: <20230628011439.159678-1-linux@treblig.org> <20230628011439.159678-3-linux@treblig.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 29 Jun 2023 00:06:53 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-KeNM56ecmnaDR2wA4meTqPRa=e+KT3JJkpvC9=PCeiw@mail.gmail.com>
+Message-ID: <CAKYAXd-KeNM56ecmnaDR2wA4meTqPRa=e+KT3JJkpvC9=PCeiw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] fs/smb: Swing unicode common code from server->common
+To:     linux@treblig.org
+Cc:     sfrench@samba.org, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 9:40=E2=80=AFAM Dr. David Alan Gilbert
-<linux@treblig.org> wrote:
-> > > Actually, would you be ok with smb_unicode_common ?  The reason is th=
-at
-> > > you end up with a module named unicode_common  that sounds too generi=
-c.
-> >
-> > I'd suggest make it generic and move it to fs/nls/. I'd run it by the n=
-ls
-> > maintainers, but I don't think there are any.
+2023-06-28 10:14 GMT+09:00, linux@treblig.org <linux@treblig.org>:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
 >
-> Steve & Tom - would you be OK with that?
+> Swing most of the inline functions and unicode tables into smb/common
+> from the copy in smb/server.
+>
+> UniStrcat has different types between the client and server
+> versions so I've not moved it (although I suspect it's OK).
+ksmbd doesn't use this function. You can move it to smb_unicode_common.h.
 
-Yes - absolutely
-
-> (Copying in Gabriel Bertazi, owner of fs/unicode; although this isn't
-> utf-8)
-
-Unicode UCS-2
-
-
---=20
-Thanks,
-
-Steve
+Thanks.
