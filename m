@@ -2,317 +2,329 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC31CEB64DC
-	for <linux-cifs@archiver.kernel.org>; Wed, 28 Jun 2023 23:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4A5EB64D7
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Jun 2023 00:41:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231843AbjF1XZG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 28 Jun 2023 19:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34942 "EHLO
+        id S230446AbjF2AlC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 28 Jun 2023 20:41:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231966AbjF1XY5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Jun 2023 19:24:57 -0400
-Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C24B9E9;
-        Wed, 28 Jun 2023 16:24:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-        ; s=bytemarkmx; h=Content-Transfer-Encoding:MIME-Version:References:
-        In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=nMLPKXFOEvPRH5qIoR7+T1SMwSnc3wbTmke32V0c7oI=; b=fPsiPA0MRxyRCORVjm5Y8GE8fh
-        ijzHMdQnCliILH4ctQF8oo6CqiPuw7WgWgRtJSUfKNs3CRVjtj7jxZRPkR9Qunqi5SXIWkiHhL3iz
-        fTe0Db9PFP5k9M9pcC5YG+R4FHY0hRKZM0+McFNUx5fIy6ETDsdMkdnMiAw5U/AbJTM2zRVdrRvj1
-        d5zIQaqSvXnRvFw4l7RIYwWkNupafzDeM9APCfLmjjKjSgGRe54aJzlpgo9ELDxCSwGft1J9/zf5r
-        nDcfXSHvHGzo2zHCJ/LU7Scq/mtL8BMrwxHQt58nJ8d04F5/BB508ungdIJxXdk/rJR5sHvuHZngw
-        q+pSjV5w==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-        by mx.treblig.org with esmtp (Exim 4.94.2)
-        (envelope-from <linux@treblig.org>)
-        id 1qEeWf-00GXy3-3F; Wed, 28 Jun 2023 23:24:39 +0000
-From:   linux@treblig.org
-To:     sfrench@samba.org, linkinjeon@kernel.org, tom@talpey.com,
-        linux-cifs@vger.kernel.org
-Cc:     krisman@collabora.com, jfs-discussion@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org,
-        "Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH v2 4/4] fs/jfs: Use common ucs2 upper case table
-Date:   Thu, 29 Jun 2023 00:24:17 +0100
-Message-ID: <20230628232417.120844-5-linux@treblig.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230628232417.120844-1-linux@treblig.org>
-References: <20230628232417.120844-1-linux@treblig.org>
+        with ESMTP id S230413AbjF2AlB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 28 Jun 2023 20:41:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A7E2102
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Jun 2023 17:40:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687999209;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GBoFOtIWRHIKoWf0lrD2wG9OyN2hTf5a/5og68Y1whI=;
+        b=J8NjtdXPZB9CNuuTxyjT2qAaQht3XQCyUXgRNWYGFxqlJ+9wQOf3yfSx2EtIas3YXpHGeC
+        QezVT1nT7ZVfOEQrr0vnit3pTjVikDnQZil8G4hTWcOHE7ivZPTLg3jIFRX8LOCkiKHRiK
+        biMr53cbBNE3IZuM0rjDwrdBMP6xFrI=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-544-JylTuHREPxqTj32k6PXbrw-1; Wed, 28 Jun 2023 20:40:08 -0400
+X-MC-Unique: JylTuHREPxqTj32k6PXbrw-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-53f44c2566dso79358a12.2
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Jun 2023 17:40:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687999207; x=1690591207;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GBoFOtIWRHIKoWf0lrD2wG9OyN2hTf5a/5og68Y1whI=;
+        b=EEOQpHwbIAchOkSNYxI8yAwlx8etG5Gn1C2fofI/ITz7FwcfhItlHTSjtXZGn6Uezz
+         WUbKrFWCCPVXT0u3kmwNXtu1fuctsl139CtXME+wdl1tl/gWraUzCQVZyCVLtB82Rif3
+         WgCh4eG6MreVaB6WPfyhict5PJYqvE5tc5O95lBoIeo+5RgtppMoECnfb2uzNHTcJwyu
+         3Eb+bAhHmMIVIYQoqkfj7Wmuv0tgLgWuMXCjWeYqgNGAH4LVR7jEZs+OR35xVqpioxQC
+         4HACSkkmmYOxhZ8QoUpb4TFy6n/1tuvi2DjMXvW1c62YmP/q3lJF8MguocC9KDJ9Sr0Q
+         sEHg==
+X-Gm-Message-State: AC+VfDz5I/E+M9dH/EgruWYTGs4WEaMIxMhNJt4RDJNxxNj5pFCT4avx
+        YzELKCB8Q3guoMa2ucb04bVTbpBRr1+iPjwc341E+xJQ++ybcJEsaVkd6ob4oRxpMZB/BCw4FQg
+        NAcNxGjQgZ02FSLbt46o79Q==
+X-Received: by 2002:a05:6a21:32a2:b0:125:699a:599b with SMTP id yt34-20020a056a2132a200b00125699a599bmr15662843pzb.34.1687999206975;
+        Wed, 28 Jun 2023 17:40:06 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5vLdftDDvS6DadhOeggrwPU/ORSuzVvDK1nPTA87qiG12zTXbeuXwcom3dX8ucd1whR5HDYQ==
+X-Received: by 2002:a05:6a21:32a2:b0:125:699a:599b with SMTP id yt34-20020a056a2132a200b00125699a599bmr15662825pzb.34.1687999206657;
+        Wed, 28 Jun 2023 17:40:06 -0700 (PDT)
+Received: from [10.72.13.91] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id d14-20020aa78e4e000000b0067acbc74977sm4268764pfr.96.2023.06.28.17.40.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Jun 2023 17:40:06 -0700 (PDT)
+Message-ID: <41e1c831-29de-8494-d925-6e2eb379567f@redhat.com>
+Date:   Thu, 29 Jun 2023 08:39:58 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [Linux-cachefs] [PATCH v7 2/2] mm, netfs, fscache: Stop read
+ optimisation when folio removed from pagecache
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-nfs@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
+        linux-cifs@vger.kernel.org,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        linux-erofs@lists.ozlabs.org, Jeff Layton <jlayton@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cachefs@redhat.com,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
+        linux-ext4@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org,
+        Dominique Martinet <asmadeus@codewreck.org>
+References: <20230628104852.3391651-1-dhowells@redhat.com>
+ <20230628104852.3391651-3-dhowells@redhat.com>
+From:   Xiubo Li <xiubli@redhat.com>
+In-Reply-To: <20230628104852.3391651-3-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Use the UCS-2 upper case tables from nls, that are shared
-with smb.
+On 6/28/23 18:48, David Howells wrote:
+> Fscache has an optimisation by which reads from the cache are skipped until
+> we know that (a) there's data there to be read and (b) that data isn't
+> entirely covered by pages resident in the netfs pagecache.  This is done
+> with two flags manipulated by fscache_note_page_release():
+>
+> 	if (...
+> 	    test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&
+> 	    test_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags))
+> 		clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
+>
+> where the NO_DATA_TO_READ flag causes cachefiles_prepare_read() to indicate
+> that netfslib should download from the server or clear the page instead.
+>
+> The fscache_note_page_release() function is intended to be called from
+> ->releasepage() - but that only gets called if PG_private or PG_private_2
+> is set - and currently the former is at the discretion of the network
+> filesystem and the latter is only set whilst a page is being written to the
+> cache, so sometimes we miss clearing the optimisation.
+>
+> Fix this by following Willy's suggestion[1] and adding an address_space
+> flag, AS_RELEASE_ALWAYS, that causes filemap_release_folio() to always call
+> ->release_folio() if it's set, even if PG_private or PG_private_2 aren't
+> set.
+>
+> Note that this would require folio_test_private() and page_has_private() to
+> become more complicated.  To avoid that, in the places[*] where these are
+> used to conditionalise calls to filemap_release_folio() and
+> try_to_release_page(), the tests are removed the those functions just
+> jumped to unconditionally and the test is performed there.
+>
+> [*] There are some exceptions in vmscan.c where the check guards more than
+> just a call to the releaser.  I've added a function, folio_needs_release()
+> to wrap all the checks for that.
+>
+> AS_RELEASE_ALWAYS should be set if a non-NULL cookie is obtained from
+> fscache and cleared in ->evict_inode() before truncate_inode_pages_final()
+> is called.
+>
+> Additionally, the FSCACHE_COOKIE_NO_DATA_TO_READ flag needs to be cleared
+> and the optimisation cancelled if a cachefiles object already contains data
+> when we open it.
+>
+> Fixes: 1f67e6d0b188 ("fscache: Provide a function to note the release of a page")
+> Fixes: 047487c947e8 ("cachefiles: Implement the I/O routines")
+> Reported-by: Rohith Surabattula <rohiths.msft@gmail.com>
+> Suggested-by: Matthew Wilcox <willy@infradead.org>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Linus Torvalds <torvalds@linux-foundation.org>
+> cc: Steve French <sfrench@samba.org>
+> cc: Shyam Prasad N <nspmangalore@gmail.com>
+> cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> cc: Dave Wysochanski <dwysocha@redhat.com>
+> cc: Dominique Martinet <asmadeus@codewreck.org>
+> cc: Ilya Dryomov <idryomov@gmail.com>
+> cc: linux-cachefs@redhat.com
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-afs@lists.infradead.org
+> cc: v9fs-developer@lists.sourceforge.net
+> cc: ceph-devel@vger.kernel.org
+> cc: linux-nfs@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>
+> Notes:
+>      ver #7)
+>       - Make NFS set AS_RELEASE_ALWAYS.
+>      
+>      ver #4)
+>       - Split out merging of folio_has_private()/filemap_release_folio() call
+>         pairs into a preceding patch.
+>       - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
+>      
+>      ver #3)
+>       - Fixed mapping_clear_release_always() to use clear_bit() not set_bit().
+>       - Moved a '&&' to the correct line.
+>      
+>      ver #2)
+>       - Rewrote entirely according to Willy's suggestion[1].
+>
+>   fs/9p/cache.c           |  2 ++
+>   fs/afs/internal.h       |  2 ++
+>   fs/cachefiles/namei.c   |  2 ++
+>   fs/ceph/cache.c         |  2 ++
+>   fs/nfs/fscache.c        |  3 +++
+>   fs/smb/client/fscache.c |  2 ++
+>   include/linux/pagemap.h | 16 ++++++++++++++++
+>   mm/internal.h           |  5 ++++-
+>   8 files changed, 33 insertions(+), 1 deletion(-)
 
-This code in JFS is hard to test, so we're only reusing the
-same tables (which are identical), not trying to reuse the
-rest of the helper functions.
+Just one question. Shouldn't do this in 'fs/erofs/fscache.c' too ?
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- fs/jfs/Kconfig          |   1 +
- fs/jfs/Makefile         |   2 +-
- fs/jfs/jfs_unicode.h    |  17 ++----
- fs/jfs/jfs_uniupr.c     | 121 ----------------------------------------
- fs/nls/nls_ucs2_data.h  |  15 +++++
- fs/nls/nls_ucs2_utils.h |  14 +----
- 6 files changed, 23 insertions(+), 147 deletions(-)
- delete mode 100644 fs/jfs/jfs_uniupr.c
- create mode 100644 fs/nls/nls_ucs2_data.h
+>
+> diff --git a/fs/9p/cache.c b/fs/9p/cache.c
+> index cebba4eaa0b5..12c0ae29f185 100644
+> --- a/fs/9p/cache.c
+> +++ b/fs/9p/cache.c
+> @@ -68,6 +68,8 @@ void v9fs_cache_inode_get_cookie(struct inode *inode)
+>   				       &path, sizeof(path),
+>   				       &version, sizeof(version),
+>   				       i_size_read(&v9inode->netfs.inode));
+> +	if (v9inode->netfs.cache)
+> +		mapping_set_release_always(inode->i_mapping);
+>   
+>   	p9_debug(P9_DEBUG_FSC, "inode %p get cookie %p\n",
+>   		 inode, v9fs_inode_cookie(v9inode));
+> diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+> index 9d3d64921106..da73b97e19a9 100644
+> --- a/fs/afs/internal.h
+> +++ b/fs/afs/internal.h
+> @@ -681,6 +681,8 @@ static inline void afs_vnode_set_cache(struct afs_vnode *vnode,
+>   {
+>   #ifdef CONFIG_AFS_FSCACHE
+>   	vnode->netfs.cache = cookie;
+> +	if (cookie)
+> +		mapping_set_release_always(vnode->netfs.inode.i_mapping);
 
-diff --git a/fs/jfs/Kconfig b/fs/jfs/Kconfig
-index 51e856f0e4b8..eab2f2d2291f 100644
---- a/fs/jfs/Kconfig
-+++ b/fs/jfs/Kconfig
-@@ -2,6 +2,7 @@
- config JFS_FS
- 	tristate "JFS filesystem support"
- 	select NLS
-+	select NLS_UCS2_UTILS
- 	select CRC32
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/jfs/Makefile b/fs/jfs/Makefile
-index 7156d2c218c7..b769bbf8bdc2 100644
---- a/fs/jfs/Makefile
-+++ b/fs/jfs/Makefile
-@@ -9,7 +9,7 @@ jfs-y    := super.o file.o inode.o namei.o jfs_mount.o jfs_umount.o \
- 	    jfs_xtree.o jfs_imap.o jfs_debug.o jfs_dmap.o \
- 	    jfs_unicode.o jfs_dtree.o jfs_inode.o jfs_discard.o \
- 	    jfs_extent.o symlink.o jfs_metapage.o \
--	    jfs_logmgr.o jfs_txnmgr.o jfs_uniupr.o \
-+	    jfs_logmgr.o jfs_txnmgr.o \
- 	    resize.o xattr.o ioctl.o
- 
- jfs-$(CONFIG_JFS_POSIX_ACL) += acl.o
-diff --git a/fs/jfs/jfs_unicode.h b/fs/jfs/jfs_unicode.h
-index 9db62d047daa..b6a78d4aef1b 100644
---- a/fs/jfs/jfs_unicode.h
-+++ b/fs/jfs/jfs_unicode.h
-@@ -8,16 +8,9 @@
- 
- #include <linux/slab.h>
- #include <asm/byteorder.h>
-+#include "../nls/nls_ucs2_data.h"
- #include "jfs_types.h"
- 
--typedef struct {
--	wchar_t start;
--	wchar_t end;
--	signed char *table;
--} UNICASERANGE;
--
--extern signed char UniUpperTable[512];
--extern UNICASERANGE UniUpperRange[];
- extern int get_UCSname(struct component_name *, struct dentry *);
- extern int jfs_strfromUCS_le(char *, const __le16 *, int, struct nls_table *);
- 
-@@ -107,12 +100,12 @@ static inline wchar_t *UniStrncpy_from_le(wchar_t * ucs1, const __le16 * ucs2,
-  */
- static inline wchar_t UniToupper(wchar_t uc)
- {
--	UNICASERANGE *rp;
-+	const struct UniCaseRange *rp;
- 
--	if (uc < sizeof(UniUpperTable)) {	/* Latin characters */
--		return uc + UniUpperTable[uc];	/* Use base tables */
-+	if (uc < sizeof(NlsUniUpperTable)) {	/* Latin characters */
-+		return uc + NlsUniUpperTable[uc];	/* Use base tables */
- 	} else {
--		rp = UniUpperRange;	/* Use range tables */
-+		rp = NlsUniUpperRange;	/* Use range tables */
- 		while (rp->start) {
- 			if (uc < rp->start)	/* Before start of range */
- 				return uc;	/* Uppercase = input */
-diff --git a/fs/jfs/jfs_uniupr.c b/fs/jfs/jfs_uniupr.c
-deleted file mode 100644
-index d0b18c7befb8..000000000000
---- a/fs/jfs/jfs_uniupr.c
-+++ /dev/null
-@@ -1,121 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *   Copyright (C) International Business Machines Corp., 2000-2002
-- */
--
--#include <linux/fs.h>
--#include "jfs_unicode.h"
--
--/*
-- * Latin upper case
-- */
--signed char UniUpperTable[512] = {
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 000-00f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 010-01f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 020-02f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 030-03f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 040-04f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 050-05f */
--   0,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 060-06f */
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,  0,  0,  0,  0,  0, /* 070-07f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 080-08f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 090-09f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 0a0-0af */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 0b0-0bf */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 0c0-0cf */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 0d0-0df */
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 0e0-0ef */
-- -32,-32,-32,-32,-32,-32,-32,  0,-32,-32,-32,-32,-32,-32,-32,121, /* 0f0-0ff */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 100-10f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 110-11f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 120-12f */
--   0,  0,  0, -1,  0, -1,  0, -1,  0,  0, -1,  0, -1,  0, -1,  0, /* 130-13f */
--  -1,  0, -1,  0, -1,  0, -1,  0, -1,  0,  0, -1,  0, -1,  0, -1, /* 140-14f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 150-15f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 160-16f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0,  0, -1,  0, -1,  0, -1,  0, /* 170-17f */
--   0,  0,  0, -1,  0, -1,  0,  0, -1,  0,  0,  0, -1,  0,  0,  0, /* 180-18f */
--   0,  0, -1,  0,  0,  0,  0,  0,  0, -1,  0,  0,  0,  0,  0,  0, /* 190-19f */
--   0, -1,  0, -1,  0, -1,  0,  0, -1,  0,  0,  0,  0, -1,  0,  0, /* 1a0-1af */
--  -1,  0,  0,  0, -1,  0, -1,  0,  0, -1,  0,  0,  0, -1,  0,  0, /* 1b0-1bf */
--   0,  0,  0,  0,  0, -1, -2,  0, -1, -2,  0, -1, -2,  0, -1,  0, /* 1c0-1cf */
--  -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,-79,  0, -1, /* 1d0-1df */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e0-1ef */
--   0,  0, -1, -2,  0, -1,  0,  0,  0, -1,  0, -1,  0, -1,  0, -1, /* 1f0-1ff */
--};
--
--/* Upper case range - Greek */
--static signed char UniCaseRangeU03a0[47] = {
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,-38,-37,-37,-37, /* 3a0-3af */
--   0,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 3b0-3bf */
-- -32,-32,-31,-32,-32,-32,-32,-32,-32,-32,-32,-32,-64,-63,-63,
--};
--
--/* Upper case range - Cyrillic */
--static signed char UniCaseRangeU0430[48] = {
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 430-43f */
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 440-44f */
--   0,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,  0,-80,-80, /* 450-45f */
--};
--
--/* Upper case range - Extended cyrillic */
--static signed char UniCaseRangeU0490[61] = {
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 490-49f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 4a0-4af */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 4b0-4bf */
--   0,  0, -1,  0, -1,  0,  0,  0, -1,  0,  0,  0, -1,
--};
--
--/* Upper case range - Extended latin and greek */
--static signed char UniCaseRangeU1e00[509] = {
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e00-1e0f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e10-1e1f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e20-1e2f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e30-1e3f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e40-1e4f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e50-1e5f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e60-1e6f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e70-1e7f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e80-1e8f */
--   0, -1,  0, -1,  0, -1,  0,  0,  0,  0,  0,-59,  0, -1,  0, -1, /* 1e90-1e9f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1ea0-1eaf */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1eb0-1ebf */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1ec0-1ecf */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1ed0-1edf */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1ee0-1eef */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0,  0,  0,  0,  0,  0, /* 1ef0-1eff */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f00-1f0f */
--   8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f10-1f1f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f20-1f2f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f30-1f3f */
--   8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f40-1f4f */
--   0,  8,  0,  8,  0,  8,  0,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f50-1f5f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f60-1f6f */
--  74, 74, 86, 86, 86, 86,100,100,  0,  0,112,112,126,126,  0,  0, /* 1f70-1f7f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f80-1f8f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f90-1f9f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fa0-1faf */
--   8,  8,  0,  9,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fb0-1fbf */
--   0,  0,  0,  9,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fc0-1fcf */
--   8,  8,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fd0-1fdf */
--   8,  8,  0,  0,  0,  7,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fe0-1fef */
--   0,  0,  0,  9,  0,  0,  0,  0,  0,  0,  0,  0,  0,
--};
--
--/* Upper case range - Wide latin */
--static signed char UniCaseRangeUff40[27] = {
--   0,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* ff40-ff4f */
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,
--};
--
--/*
-- * Upper Case Range
-- */
--UNICASERANGE UniUpperRange[] = {
--    { 0x03a0,  0x03ce,  UniCaseRangeU03a0 },
--    { 0x0430,  0x045f,  UniCaseRangeU0430 },
--    { 0x0490,  0x04cc,  UniCaseRangeU0490 },
--    { 0x1e00,  0x1ffc,  UniCaseRangeU1e00 },
--    { 0xff40,  0xff5a,  UniCaseRangeUff40 },
--    { 0 }
--};
-diff --git a/fs/nls/nls_ucs2_data.h b/fs/nls/nls_ucs2_data.h
-new file mode 100644
-index 000000000000..1f454dc0f4e0
---- /dev/null
-+++ b/fs/nls/nls_ucs2_data.h
-@@ -0,0 +1,15 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+#ifndef _NLS_UCS2_DATA_H
-+#define _NLS_UCS2_DATA_H
-+
-+struct UniCaseRange {
-+	wchar_t start;
-+	wchar_t end;
-+	signed char *table;
-+};
-+
-+extern signed char NlsUniUpperTable[512];
-+extern const struct UniCaseRange NlsUniUpperRange[];
-+
-+#endif /* _NLS_UCS2_DATA_H */
-diff --git a/fs/nls/nls_ucs2_utils.h b/fs/nls/nls_ucs2_utils.h
-index 3500596ea993..ef18d30db1d0 100644
---- a/fs/nls/nls_ucs2_utils.h
-+++ b/fs/nls/nls_ucs2_utils.h
-@@ -26,6 +26,7 @@
- #include <linux/types.h>
- #include <linux/nls.h>
- #include <linux/unicode.h>
-+#include "nls_ucs2_data.h"
- 
- /*
-  * Windows maps these to the user defined 16 bit Unicode range since they are
-@@ -40,19 +41,6 @@
- #define UNI_PIPE        ((__u16)('|' + 0xF000))
- #define UNI_SLASH       ((__u16)('\\' + 0xF000))
- 
--#ifndef	UNICASERANGE_DEFINED
--struct UniCaseRange {
--	wchar_t start;
--	wchar_t end;
--	signed char *table;
--};
--#endif				/* UNICASERANGE_DEFINED */
--
--#ifndef UNIUPR_NOUPPER
--extern signed char NlsUniUpperTable[512];
--extern const struct UniCaseRange NlsUniUpperRange[];
--#endif				/* UNIUPR_NOUPPER */
--
- /*
-  * UniStrcat:  Concatenate the second string to the first
-  *
--- 
-2.41.0
+If all the cookie need to do the same thing, then how about doing this 
+in 'fscache_acquire_cookie()' ?
+
+Thanks
+
+- Xiubo
+
+>   #endif
+>   }
+>   
+> diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
+> index d9d22d0ec38a..7bf7a5fcc045 100644
+> --- a/fs/cachefiles/namei.c
+> +++ b/fs/cachefiles/namei.c
+> @@ -585,6 +585,8 @@ static bool cachefiles_open_file(struct cachefiles_object *object,
+>   	if (ret < 0)
+>   		goto check_failed;
+>   
+> +	clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &object->cookie->flags);
+> +
+>   	object->file = file;
+>   
+>   	/* Always update the atime on an object we've just looked up (this is
+> diff --git a/fs/ceph/cache.c b/fs/ceph/cache.c
+> index 177d8e8d73fe..de1dee46d3df 100644
+> --- a/fs/ceph/cache.c
+> +++ b/fs/ceph/cache.c
+> @@ -36,6 +36,8 @@ void ceph_fscache_register_inode_cookie(struct inode *inode)
+>   				       &ci->i_vino, sizeof(ci->i_vino),
+>   				       &ci->i_version, sizeof(ci->i_version),
+>   				       i_size_read(inode));
+> +	if (ci->netfs.cache)
+> +		mapping_set_release_always(inode->i_mapping);
+>   }
+>   
+>   void ceph_fscache_unregister_inode_cookie(struct ceph_inode_info *ci)
+> diff --git a/fs/nfs/fscache.c b/fs/nfs/fscache.c
+> index 8c35d88a84b1..b05717fe0d4e 100644
+> --- a/fs/nfs/fscache.c
+> +++ b/fs/nfs/fscache.c
+> @@ -180,6 +180,9 @@ void nfs_fscache_init_inode(struct inode *inode)
+>   					       &auxdata,      /* aux_data */
+>   					       sizeof(auxdata),
+>   					       i_size_read(inode));
+> +
+> +	if (netfs_inode(inode)->cache)
+> +		mapping_set_release_always(inode->i_mapping);
+>   }
+>   
+>   /*
+> diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
+> index 8f6909d633da..3677525ee993 100644
+> --- a/fs/smb/client/fscache.c
+> +++ b/fs/smb/client/fscache.c
+> @@ -108,6 +108,8 @@ void cifs_fscache_get_inode_cookie(struct inode *inode)
+>   				       &cifsi->uniqueid, sizeof(cifsi->uniqueid),
+>   				       &cd, sizeof(cd),
+>   				       i_size_read(&cifsi->netfs.inode));
+> +	if (cifsi->netfs.cache)
+> +		mapping_set_release_always(inode->i_mapping);
+>   }
+>   
+>   void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update)
+> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+> index a56308a9d1a4..a1176ceb4a0c 100644
+> --- a/include/linux/pagemap.h
+> +++ b/include/linux/pagemap.h
+> @@ -199,6 +199,7 @@ enum mapping_flags {
+>   	/* writeback related tags are not used */
+>   	AS_NO_WRITEBACK_TAGS = 5,
+>   	AS_LARGE_FOLIO_SUPPORT = 6,
+> +	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
+>   };
+>   
+>   /**
+> @@ -269,6 +270,21 @@ static inline int mapping_use_writeback_tags(struct address_space *mapping)
+>   	return !test_bit(AS_NO_WRITEBACK_TAGS, &mapping->flags);
+>   }
+>   
+> +static inline bool mapping_release_always(const struct address_space *mapping)
+> +{
+> +	return test_bit(AS_RELEASE_ALWAYS, &mapping->flags);
+> +}
+> +
+> +static inline void mapping_set_release_always(struct address_space *mapping)
+> +{
+> +	set_bit(AS_RELEASE_ALWAYS, &mapping->flags);
+> +}
+> +
+> +static inline void mapping_clear_release_always(struct address_space *mapping)
+> +{
+> +	clear_bit(AS_RELEASE_ALWAYS, &mapping->flags);
+> +}
+> +
+>   static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
+>   {
+>   	return mapping->gfp_mask;
+> diff --git a/mm/internal.h b/mm/internal.h
+> index a76314764d8c..86aef26df905 100644
+> --- a/mm/internal.h
+> +++ b/mm/internal.h
+> @@ -175,7 +175,10 @@ static inline void set_page_refcounted(struct page *page)
+>    */
+>   static inline bool folio_needs_release(struct folio *folio)
+>   {
+> -	return folio_has_private(folio);
+> +	struct address_space *mapping = folio->mapping;
+> +
+> +	return folio_has_private(folio) ||
+> +		(mapping && mapping_release_always(mapping));
+>   }
+>   
+>   extern unsigned long highest_memmap_pfn;
+> --
+> Linux-cachefs mailing list
+> Linux-cachefs@redhat.com
+> https://listman.redhat.com/mailman/listinfo/linux-cachefs
+>
 
