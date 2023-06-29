@@ -2,86 +2,60 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20548EB64D9
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Jun 2023 06:24:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EF0EB64DD
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Jun 2023 07:40:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbjF2GX6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Jun 2023 02:23:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39370 "EHLO
+        id S231861AbjF2Hk5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Jun 2023 03:40:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231204AbjF2GXy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Jun 2023 02:23:54 -0400
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FE382D54
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Jun 2023 23:23:53 -0700 (PDT)
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-5649d12abe1so380147eaf.2
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Jun 2023 23:23:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688019832; x=1690611832;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IpcX8yoGQwtDbbS2InhwrDWLqMJ+UOKxIROuGAmi4E4=;
-        b=inNabSwzu8tNFM0VCgjgMd6Xuv+BgHOeIQf5q/+W1orOQUC7PuMgdmW+3cppX+7ql1
-         z1oVBo3ZGiKDz5g/AdRm3sKrsO647Mlav7FuvB7rmJqEtaFCNwe2PTxo8GhXzV7Tjpfz
-         0oL3ThNdoAKzMGtODE0b94rYAmg76zYtqU9q1DLNTU4u/dawKPvZbappj20jkPxkJ/Bx
-         Edtr5hQjN0kTTzayl/bWl2k/MxjngOThMRmkL+7Y8s6JIVELQCVXofo0pmk53ZB5RSyR
-         O3RI/jbA8kY+pple/fCKdjOh4iLGK2vjQMl/AQYXyDIshT46JSqmqU2JsVbGRCm2Txco
-         ULGQ==
-X-Gm-Message-State: AC+VfDzHGmAtFDUf42w4Z+/fjphHbGXYUTGB7nLg/UNL55DflA69/tTf
-        XfKw6Mgh2qcN1FFAc6yNGJ9xM4raF0z3+9tAJW3nkyUJOP5aDgY=
-X-Google-Smtp-Source: ACHHUZ4OWqm0vehdzke3e3J+zETMbhDo9DI9nEBAGnL7yoqoyvW+/2sgnywN3ZZ+y+SSlxsWCFji9OEyNL2l7l4rcUPxsNr0edsv
+        with ESMTP id S232109AbjF2HkQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Jun 2023 03:40:16 -0400
+Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD3582D7B
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Jun 2023 00:37:27 -0700 (PDT)
+Received: by mail.durme.pl (Postfix, from userid 1002)
+        id 186224D244; Thu, 29 Jun 2023 07:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
+        t=1688024203; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=mryptWohmDcs0DDNAx6HH7rQLYL8iDFoDF8zWt2fjGWCfbMq+A7qSY5AnNz+gGXle
+         tzTKhcNlr8pxDKnxNdkzDXahAkERTHJDe8+BUTvwgqtbfuH59ZaBzLUaGRASrzipAW
+         m7pCzVyr3uMkumwzm1o3LSUi7m+nX9iRZIR9Olv1YGWpfrebtieCB8iGU9o5TEVu5w
+         Mb3/FmDhvq3IECNXaKze712N8s4TxwJTWk+dW1bK2an4IEz6l4m+v3M86VcHIbgYnH
+         ifbQxVLu6Apwzk9mkM6k6VVJhq7q4AvWFx3FlH+F25E2CUnQEZ03qyNhDj3dwg7mND
+         q1Lwa6Y55QdeQ==
+Received: by mail.durme.pl for <linux-cifs@vger.kernel.org>; Thu, 29 Jun 2023 07:35:27 GMT
+Message-ID: <20230629064500-0.1.2s.dmt4.0.oxn239d2yz@durme.pl>
+Date:   Thu, 29 Jun 2023 07:35:27 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
+To:     <linux-cifs@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.durme.pl
 MIME-Version: 1.0
-X-Received: by 2002:aca:de43:0:b0:39c:bfd3:7e with SMTP id v64-20020acade43000000b0039cbfd3007emr12130030oig.10.1688019832673;
- Wed, 28 Jun 2023 23:23:52 -0700 (PDT)
-Date:   Wed, 28 Jun 2023 23:23:52 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000801b1a05ff3ebee0@google.com>
-Subject: [syzbot] linux-next build error (15)
-From:   syzbot <syzbot+4c222134dc629d256ee8@syzkaller.appspotmail.com>
-To:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-next@vger.kernel.org, lsahlber@redhat.com, pc@manguebit.com,
-        samba-technical@lists.samba.org, sfr@canb.auug.org.au,
-        sfrench@samba.org, sprasad@microsoft.com,
-        syzkaller-bugs@googlegroups.com, tom@talpey.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello,
+Dzie=C5=84 dobry,
 
-syzbot found the following issue on:
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-HEAD commit:    8b14b70331aa Add linux-next specific files for 20230629
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=11079dbf280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=83c17849d18e7a86
-dashboard link: https://syzkaller.appspot.com/bug?extid=4c222134dc629d256ee8
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4c222134dc629d256ee8@syzkaller.appspotmail.com
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
 
-fs/smb/client/cifs_debug.c:169:1: error: label at end of compound statement
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Pozdrawiam
+Krystian Wieczorek
