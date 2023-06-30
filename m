@@ -2,389 +2,176 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D578EB64D9
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Jun 2023 16:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B20C8C001B0
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Jun 2023 03:21:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230401AbjF2QUe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Jun 2023 12:20:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40594 "EHLO
+        id S230125AbjF3DV1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Jun 2023 23:21:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232060AbjF2QUd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Jun 2023 12:20:33 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2CA4CF
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Jun 2023 09:20:31 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b5c231f842so13365791fa.2
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Jun 2023 09:20:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688055630; x=1690647630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v4cJKeFmFIlBfybDNKHucuRGkMEOvDUs6CvuRLBAtMM=;
-        b=MZixZaIelxY33/87pfqP9xndIYWlOGAvCyhPZZ/4s1OeqsNmS1uYuJwWAjQkHr/WBU
-         rW3SkR3Th+E5MudeD0yn2Ye1CGuXkcqCTKd3DGDOjhL6EylHiZQPoTmBcGPPf/v6O160
-         ipw/sMC9ac2xQUjXrxDPXBCPSxXSn5knBuG75oFffawuoIm7p+DXoqbyFByEmtD7v4C4
-         EIaMSYkndN86NduEdjMgUjha7cMwmLLPuaXVelrgLiIjaXDyNR8UtU0JD7IzpWBWfXBS
-         6ucEtQ9xdMTG1R9Ol1Xi6lD6bdN9gcwMx0pa5xk0lTirtFjuf8kS/35p0B3gvnefAm+q
-         OY3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688055630; x=1690647630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v4cJKeFmFIlBfybDNKHucuRGkMEOvDUs6CvuRLBAtMM=;
-        b=ldS60b/LngeIuPbAF8DYQ9bI/eIUNEbNeqDuc+BbtF+/RqhRJW5q/8mbfBloPYeDZ2
-         twfFvYDSzQLwnsHLsgeYhmWij6PFqxvJaBuHGsmOQ7G6vhY25kYykwv7NCeOuuOnDiXg
-         4XfhmpRN/oTRlJCMEkKdGvDrfbixsC3Q1ByyoXrXJZ2+Swbqyo/UDXCLrkKyaLbeJ1Ub
-         d3QYEYZlqQtRB69R+ngBzqgwG7NIYnlqS/Xh3D1jDZCzABMExfoZw7ARjOdHi08e7tPu
-         Z+7j76yrAp1x+4Ku2YrX2TvvafjHretxdwFKolQ98q4wWCDZsqrBjE1tlF9CUx06ZNcM
-         q/dA==
-X-Gm-Message-State: ABy/qLY5S09mzYqOoGoSCUQLVZe4MeB2m7xfFfKXv4n0iVTieeBfCr8b
-        4TsFQMryEvGc6UbNm5Kl0Crrj8ChmWmtZLAZ/WG/FD4pel3QGQ==
-X-Google-Smtp-Source: APBJJlFxs8L703T7qQL0hXLEN5JOf1SugDSCI7ZChxkEBeeUro1jMpAjKpKh/5bXHSa9MQNsJSY3KC6FrunaYvwhk2o=
-X-Received: by 2002:a2e:97cc:0:b0:2b5:7fd2:ec36 with SMTP id
- m12-20020a2e97cc000000b002b57fd2ec36mr210309ljj.21.1688055629814; Thu, 29 Jun
- 2023 09:20:29 -0700 (PDT)
+        with ESMTP id S232036AbjF3DVL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Jun 2023 23:21:11 -0400
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 626423A91;
+        Thu, 29 Jun 2023 20:21:07 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=22;SR=0;TI=SMTPD_---0VmGYo1U_1688095261;
+Received: from 30.13.161.45(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0VmGYo1U_1688095261)
+          by smtp.aliyun-inc.com;
+          Fri, 30 Jun 2023 11:21:02 +0800
+Message-ID: <bc37b040-701d-3b5a-5cf2-370c320affbb@linux.alibaba.com>
+Date:   Fri, 30 Jun 2023 11:20:59 +0800
 MIME-Version: 1.0
-References: <20230626034257.2078391-1-wentao@uniontech.com>
- <20230626034257.2078391-2-wentao@uniontech.com> <CANT5p=pD+s8h33rgyjLHkJhz-OkAt3PMP5Oz612Qm3GO-PE2EQ@mail.gmail.com>
- <CAH2r5mtE8EmEPdxHc+AT256-ekzH1wjmTO+DbODHx+5PEYC9eA@mail.gmail.com>
- <CANT5p=oETR0vg29rGohLXoeqw0Lrrt8GsLbhjV6snLth7od=Nw@mail.gmail.com>
- <5C32A54005DEE4A2+20230626163909.1bd13a8a@winn-pc> <CANT5p=otyXgTf+UO1e2TQFUFbrhEwoV=xe861tJUWNiErUBG_g@mail.gmail.com>
- <6DE3D09EA3AEE6B1+20230627153429.7c34759f@winn-pc> <CANT5p=pVwUUL2s_cOfxyw50bukT_iwpiCGvXHENqgYhkaD5oBg@mail.gmail.com>
- <20230628084333.7c9b8469@winn-pc> <4D492F4BF381CB0F+20230628095449.13f5ca57@winn-pc>
- <CAH2r5mtd4CXV1zoY0HYzLRUwTojOorvmdxQSaQ2h_HjbYZuHpw@mail.gmail.com> <B6042EB8D02BB921+20230629091443.26de9ea1@winn-pc>
-In-Reply-To: <B6042EB8D02BB921+20230629091443.26de9ea1@winn-pc>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Thu, 29 Jun 2023 21:50:18 +0530
-Message-ID: <CANT5p=qiPz+Mv-1b_Hk24zsi5FCFj033HCvKf9ptR++RfDZnzg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] cifs: fix session state transition to avoid
- use-after-free issue
-To:     Winston Wen <wentao@uniontech.com>
-Cc:     Steve French <smfrench@gmail.com>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, pc@manguebit.com, sprasad@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [Linux-cachefs] [PATCH v7 2/2] mm, netfs, fscache: Stop read
+ optimisation when folio removed from pagecache
+Content-Language: en-US
+To:     Xiubo Li <xiubli@redhat.com>, David Howells <dhowells@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, Rohith Surabattula <rohiths.msft@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-afs@lists.infradead.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Steve French <sfrench@samba.org>, linux-cachefs@redhat.com,
+        linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        Ilya Dryomov <idryomov@gmail.com>, linux-ext4@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, ceph-devel@vger.kernel.org
+References: <20230628104852.3391651-1-dhowells@redhat.com>
+ <20230628104852.3391651-3-dhowells@redhat.com>
+ <41e1c831-29de-8494-d925-6e2eb379567f@redhat.com>
+From:   Jingbo Xu <jefflexu@linux.alibaba.com>
+In-Reply-To: <41e1c831-29de-8494-d925-6e2eb379567f@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jun 29, 2023 at 6:45=E2=80=AFAM Winston Wen <wentao@uniontech.com> =
-wrote:
->
-> Hi Steve,
->
-> On Wed, 28 Jun 2023 12:16:09 -0500
-> Steve French <smfrench@gmail.com> wrote:
->
-> > this didn't apply (merge conflict with Shyam's updated patch) - can
-> > you update it based on for-next and resend
-> >
-> > Also let me know if you see other patches missing.
->
-> With Shyam's updated patch, It is expected that no
-> existing session would be found in the list, so the check of session
-> state is no longer strictly necessary now, but don't hurt.
->
-> So we have 2 choices in scanning the list:
-> - do the check. (patch 2/3, merged)
-> - remove the check and add a warning. (this new patch)
->
-> If you find the latter to be better, you have the option to replace the
-> original two patches with this new one.
->
-> Alternatively, you can simply disregard the new patch and take no
-> action, as the patch 2/3 has already been merged into the for-next
-> branch. (This may be a better choice for now, but I don't have a strong
-> opinion on this, both are okay to me.)
->
-> Really sorry for my poor English and the lack of clarity in my
-> explanation.
->
-> >
-> > On Tue, Jun 27, 2023 at 8:55=E2=80=AFPM Winston Wen <wentao@uniontech.c=
-om>
-> > wrote:
-> > >
-> > > On Wed, 28 Jun 2023 08:43:33 +0800
-> > > Winston Wen <wentao@uniontech.com> wrote:
-> > >
-> > > > On Tue, 27 Jun 2023 17:43:25 +0530
-> > > > Shyam Prasad N <nspmangalore@gmail.com> wrote:
-> > > >
-> > > > > On Tue, Jun 27, 2023 at 1:04=E2=80=AFPM Winston Wen
-> > > > > <wentao@uniontech.com> wrote:
-> > > > > >
-> > > > > > On Tue, 27 Jun 2023 12:24:04 +0530
-> > > > > > Shyam Prasad N <nspmangalore@gmail.com> wrote:
-> > > > > >
-> > > > > > > On Mon, Jun 26, 2023 at 2:09=E2=80=AFPM Winston Wen
-> > > > > > > <wentao@uniontech.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, 26 Jun 2023 12:24:35 +0530
-> > > > > > > > Shyam Prasad N <nspmangalore@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > > On Mon, Jun 26, 2023 at 10:54=E2=80=AFAM Steve French
-> > > > > > > > > <smfrench@gmail.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > Added Cc: stable and Shyam's RB and merged into
-> > > > > > > > > > cifs-2.6.git for-next
-> > > > > > > > > >
-> > > > > > > > > > On Mon, Jun 26, 2023 at 12:15=E2=80=AFAM Shyam Prasad N
-> > > > > > > > > > <nspmangalore@gmail.com> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > On Mon, Jun 26, 2023 at 9:25=E2=80=AFAM Winston Wen
-> > > > > > > > > > > <wentao@uniontech.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > We switch session state to SES_EXITING without
-> > > > > > > > > > > > cifs_tcp_ses_lock now, it may lead to potential
-> > > > > > > > > > > > use-after-free issue.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Consider the following execution processes:
-> > > > > > > > > > > >
-> > > > > > > > > > > > Thread 1:
-> > > > > > > > > > > > __cifs_put_smb_ses()
-> > > > > > > > > > > >     spin_lock(&cifs_tcp_ses_lock)
-> > > > > > > > > > > >     if (--ses->ses_count > 0)
-> > > > > > > > > > > >         spin_unlock(&cifs_tcp_ses_lock)
-> > > > > > > > > > > >         return
-> > > > > > > > > > > >     spin_unlock(&cifs_tcp_ses_lock)
-> > > > > > > > > > > >         ---> **GAP**
-> > > > > > > > > > > >     spin_lock(&ses->ses_lock)
-> > > > > > > > > > > >     if (ses->ses_status =3D=3D SES_GOOD)
-> > > > > > > > > > > >         ses->ses_status =3D SES_EXITING
-> > > > > > > > > > > >     spin_unlock(&ses->ses_lock)
-> > > > > > > > > > > >
-> > > > > > > > > > > > Thread 2:
-> > > > > > > > > > > > cifs_find_smb_ses()
-> > > > > > > > > > > >     spin_lock(&cifs_tcp_ses_lock)
-> > > > > > > > > > > >     list_for_each_entry(ses, ...)
-> > > > > > > > > > > >         spin_lock(&ses->ses_lock)
-> > > > > > > > > > > >         if (ses->ses_status =3D=3D SES_EXITING)
-> > > > > > > > > > > >             spin_unlock(&ses->ses_lock)
-> > > > > > > > > > > >             continue
-> > > > > > > > > > > >         ...
-> > > > > > > > > > > >         spin_unlock(&ses->ses_lock)
-> > > > > > > > > > > >     if (ret)
-> > > > > > > > > > > >         cifs_smb_ses_inc_refcount(ret)
-> > > > > > > > > > > >     spin_unlock(&cifs_tcp_ses_lock)
-> > > > > > > > > > > >
-> > > > > > > > > > > > If thread 1 is preempted in the gap and thread 2
-> > > > > > > > > > > > start executing, thread 2 will get the session,
-> > > > > > > > > > > > and soon thread 1 will switch the session state
-> > > > > > > > > > > > to SES_EXITING and start releasing it, even
-> > > > > > > > > > > > though thread 1 had increased the session's
-> > > > > > > > > > > > refcount and still uses it.
-> > > > > > > > > > > >
-> > > > > > > > > > > > So switch session state under cifs_tcp_ses_lock to
-> > > > > > > > > > > > eliminate this gap.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Signed-off-by: Winston Wen <wentao@uniontech.com>
-> > > > > > > > > > > > ---
-> > > > > > > > > > > >  fs/smb/client/connect.c | 7 ++++---
-> > > > > > > > > > > >  1 file changed, 4 insertions(+), 3 deletions(-)
-> > > > > > > > > > > >
-> > > > > > > > > > > > diff --git a/fs/smb/client/connect.c
-> > > > > > > > > > > > b/fs/smb/client/connect.c index
-> > > > > > > > > > > > 9d16626e7a66..165ecb222c19 100644 ---
-> > > > > > > > > > > > a/fs/smb/client/connect.c +++
-> > > > > > > > > > > > b/fs/smb/client/connect.c @@ -1963,15 +1963,16 @@
-> > > > > > > > > > > > void __cifs_put_smb_ses(struct cifs_ses *ses)
-> > > > > > > > > > > > spin_unlock(&cifs_tcp_ses_lock); return;
-> > > > > > > > > > > >         }
-> > > > > > > > > > > > +       spin_lock(&ses->ses_lock);
-> > > > > > > > > > > > +       if (ses->ses_status =3D=3D SES_GOOD)
-> > > > > > > > > > > > +               ses->ses_status =3D SES_EXITING;
-> > > > > > > > > > > > +       spin_unlock(&ses->ses_lock);
-> > > > > > > > > > > >         spin_unlock(&cifs_tcp_ses_lock);
-> > > > > > > > > > > >
-> > > > > > > > > > > >         /* ses_count can never go negative */
-> > > > > > > > > > > >         WARN_ON(ses->ses_count < 0);
-> > > > > > > > > > > >
-> > > > > > > > > > > >         spin_lock(&ses->ses_lock);
-> > > > > > > > > > > > -       if (ses->ses_status =3D=3D SES_GOOD)
-> > > > > > > > > > > > -               ses->ses_status =3D SES_EXITING;
-> > > > > > > > > > > > -
-> > > > > > > > > > > >         if (ses->ses_status =3D=3D SES_EXITING &&
-> > > > > > > > > > > > server->ops->logoff) {
-> > > > > > > > > > > > spin_unlock(&ses->ses_lock); cifs_free_ipc(ses);
-> > > > > > > > > > > > --
-> > > > > > > > > > > > 2.40.1
-> > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > Good catch.
-> > > > > > > > > > > Looks good to me.
-> > > > > > > > > > > @Steve French Please CC stable for this one.
-> > > > > > > > > > >
-> > > > > > > > > > > --
-> > > > > > > > > > > Regards,
-> > > > > > > > > > > Shyam
-> > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > --
-> > > > > > > > > > Thanks,
-> > > > > > > > > >
-> > > > > > > > > > Steve
-> > > > > > > > >
-> > > > > > > > > @Winston Wen I think the following change should be
-> > > > > > > > > sufficient to fix this issue:
-> > > > > > > > > diff --git a/fs/smb/client/connect.c
-> > > > > > > > > b/fs/smb/client/connect.c index
-> > > > > > > > > 9d16626e7a66..78874eb2537d 100644 ---
-> > > > > > > > > a/fs/smb/client/connect.c +++ b/fs/smb/client/connect.c
-> > > > > > > > > @@ -1963,10 +1963,11 @@ void __cifs_put_smb_ses(struct
-> > > > > > > > > cifs_ses *ses) spin_unlock(&cifs_tcp_ses_lock);
-> > > > > > > > >                 return;
-> > > > > > > > >         }
-> > > > > > > > > -       spin_unlock(&cifs_tcp_ses_lock);
-> > > > > > > > >
-> > > > > > > > >         /* ses_count can never go negative */
-> > > > > > > > >         WARN_ON(ses->ses_count < 0);
-> > > > > > > > > +       list_del_init(&ses->smb_ses_list);
-> > > > > > > > > +       spin_unlock(&cifs_tcp_ses_lock);
-> > > > > > > > >
-> > > > > > > > >         spin_lock(&ses->ses_lock);
-> > > > > > > > >         if (ses->ses_status =3D=3D SES_GOOD)
-> > > > > > > > > @@ -1986,9 +1987,6 @@ void __cifs_put_smb_ses(struct
-> > > > > > > > > cifs_ses *ses) cifs_free_ipc(ses);
-> > > > > > > > >         }
-> > > > > > > > >
-> > > > > > > > > -       spin_lock(&cifs_tcp_ses_lock);
-> > > > > > > > > -       list_del_init(&ses->smb_ses_list);
-> > > > > > > > > -       spin_unlock(&cifs_tcp_ses_lock);
-> > > > > > > > >
-> > > > > > > > >         chan_count =3D ses->chan_count;
-> > > > > > > > >
-> > > > > > > > > The bug was that the ses was kept in the smb ses list,
-> > > > > > > > > even after the ref count had reached 0.
-> > > > > > > > > With the above change, that should be fixed, and no one
-> > > > > > > > > should be able to get to the ses from that point.
-> > > > > > > > >
-> > > > > > > > > Please let me know if you see a problem with this.
-> > > > > > > > >
-> > > > > > > >
-> > > > > > > > Hi Shyam,
-> > > > > > > >
-> > > > > > > > Thanks for the comments! And sorry for my late reply...
-> > > > > > > >
-> > > > > > > > It make sense to me that maybe we should remove the
-> > > > > > > > session from the list once its refcount is reduced to 0
-> > > > > > > > to avoid any futher access. In fact, I did try to do this
-> > > > > > > > from the beginning. But I was not sure if we need to
-> > > > > > > > access the session from the list in the free process,
-> > > > > > > > such as the following:
-> > > > > > > >
-> > > > > > > > smb2_check_receive()
-> > > > > > > >   smb2_verify_signature()
-> > > > > > > >     server->ops->calc_signature()
-> > > > > > > >       smb2_calc_signature()
-> > > > > > > >         smb2_find_smb_ses()
-> > > > > > > >           /* scan the list and find the session */
-> > > > > > > >
-> > > > > > > > Perhaps we need some refactoring here.
-> > > > > > >
-> > > > > > > Yes. The above ses finding is expected to fail during a
-> > > > > > > reconnect.
-> > > > > >
-> > > > > > Agreed.
-> > > > > >
-> > > > > > >
-> > > > > > > >
-> > > > > > > > So I gave up on this approach and did a small fix to make
-> > > > > > > > it work, but maybe I missed something elsewhere...
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > --
-> > > > > > > > Thanks,
-> > > > > > > > Winston
-> > > > > > >
-> > > > > > > Attaching the above change as a patch.
-> > > > > > > It replaces this particular patch in the series.
-> > > > > >
-> > > > > > I think this is a better way to fix the problem, the session
-> > > > > > really should not stay in the list and be found after it has
-> > > > > > been marked EXITING.
-> > > > > >
-> > > > > > >
-> > > > > > > The other two patches are not strictly necessary with this
-> > > > > > > change, but don't hurt.
-> > > > > > >
-> > > > > >
-> > > > > > Yes. Feel free to drop them if they are not necessary. And if
-> > > > > > that's the case, perhaps we should do some cleaning work on
-> > > > > > other paths to ensure consistency.
-> > > > >
-> > > > > I don't really have a strong opinion about this. Even if they
-> > > > > stay, I'm okay. But curious to know what you mean by the
-> > > > > cleaning work on other paths here. Do you still think there's
-> > > > > more cleanup needed around this?
-> > > >
-> > > > IIRC there are other paths that scan the list and do the
-> > > > check, like cifs_find_smb_ses(). So I think if they become
-> > > > unnecessary now after this fix patch, maybe we can also remove
-> > > > them at the same time to avoid make others confused.
-> > > >
-> > > > But I also don't have a strong opinion about this. I think we
-> > > > have the following options and all are okay to me. Which one do
-> > > > you prefer?
-> > > >
-> > > > - keep/add the check
-> > > > - remove all checks
-> > > > - remove all checks and add a WARNING
-> > > >
-> > > > (I think we shouldn't find a exiting session in the list now.)
-> > > >
-> > > > >
-> > > > > >
-> > > > > > Thanks for your review and comments!
-> > > > > >
-> > > > > > >
-> > > > > > > --
-> > > > > > > Regards,
-> > > > > > > Shyam
-> > > > > >
-> > > > > >
-> > > > > > --
-> > > > > > Thanks,
-> > > > > > Winston
-> > > > >
-> > > > >
-> > > > >
-> > > >
-> > > >
-> > > >
-> > >
-> > > Attaching the patch (remove all checks and add a warning)
-> > >
-> > > --
-> > > Thanks,
-> > > Winston
-> >
-> >
-> >
->
->
->
-> --
-> Thanks,
-> Winston
 
-Hi Winston/Steve,
 
-It turns out that my patch above has a problem.
-For logoff to work, we need the session in the smb_ses_list.
-So I think Winston's patch series here make sense.
+On 6/29/23 8:39 AM, Xiubo Li wrote:
+> 
+> On 6/28/23 18:48, David Howells wrote:
+>> Fscache has an optimisation by which reads from the cache are skipped
+>> until
+>> we know that (a) there's data there to be read and (b) that data isn't
+>> entirely covered by pages resident in the netfs pagecache.  This is done
+>> with two flags manipulated by fscache_note_page_release():
+>>
+>>     if (...
+>>         test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&
+>>         test_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags))
+>>         clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
+>>
+>> where the NO_DATA_TO_READ flag causes cachefiles_prepare_read() to
+>> indicate
+>> that netfslib should download from the server or clear the page instead.
+>>
+>> The fscache_note_page_release() function is intended to be called from
+>> ->releasepage() - but that only gets called if PG_private or PG_private_2
+>> is set - and currently the former is at the discretion of the network
+>> filesystem and the latter is only set whilst a page is being written
+>> to the
+>> cache, so sometimes we miss clearing the optimisation.
+>>
+>> Fix this by following Willy's suggestion[1] and adding an address_space
+>> flag, AS_RELEASE_ALWAYS, that causes filemap_release_folio() to always
+>> call
+>> ->release_folio() if it's set, even if PG_private or PG_private_2 aren't
+>> set.
+>>
+>> Note that this would require folio_test_private() and
+>> page_has_private() to
+>> become more complicated.  To avoid that, in the places[*] where these are
+>> used to conditionalise calls to filemap_release_folio() and
+>> try_to_release_page(), the tests are removed the those functions just
+>> jumped to unconditionally and the test is performed there.
+>>
+>> [*] There are some exceptions in vmscan.c where the check guards more
+>> than
+>> just a call to the releaser.  I've added a function,
+>> folio_needs_release()
+>> to wrap all the checks for that.
+>>
+>> AS_RELEASE_ALWAYS should be set if a non-NULL cookie is obtained from
+>> fscache and cleared in ->evict_inode() before
+>> truncate_inode_pages_final()
+>> is called.
+>>
+>> Additionally, the FSCACHE_COOKIE_NO_DATA_TO_READ flag needs to be cleared
+>> and the optimisation cancelled if a cachefiles object already contains
+>> data
+>> when we open it.
+>>
+>> Fixes: 1f67e6d0b188 ("fscache: Provide a function to note the release
+>> of a page")
+>> Fixes: 047487c947e8 ("cachefiles: Implement the I/O routines")
+>> Reported-by: Rohith Surabattula <rohiths.msft@gmail.com>
+>> Suggested-by: Matthew Wilcox <willy@infradead.org>
+>> Signed-off-by: David Howells <dhowells@redhat.com>
+>> cc: Matthew Wilcox <willy@infradead.org>
+>> cc: Linus Torvalds <torvalds@linux-foundation.org>
+>> cc: Steve French <sfrench@samba.org>
+>> cc: Shyam Prasad N <nspmangalore@gmail.com>
+>> cc: Rohith Surabattula <rohiths.msft@gmail.com>
+>> cc: Dave Wysochanski <dwysocha@redhat.com>
+>> cc: Dominique Martinet <asmadeus@codewreck.org>
+>> cc: Ilya Dryomov <idryomov@gmail.com>
+>> cc: linux-cachefs@redhat.com
+>> cc: linux-cifs@vger.kernel.org
+>> cc: linux-afs@lists.infradead.org
+>> cc: v9fs-developer@lists.sourceforge.net
+>> cc: ceph-devel@vger.kernel.org
+>> cc: linux-nfs@vger.kernel.org
+>> cc: linux-fsdevel@vger.kernel.org
+>> cc: linux-mm@kvack.org
+>> ---
+>>
+>> Notes:
+>>      ver #7)
+>>       - Make NFS set AS_RELEASE_ALWAYS.
+>>           ver #4)
+>>       - Split out merging of
+>> folio_has_private()/filemap_release_folio() call
+>>         pairs into a preceding patch.
+>>       - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
+>>           ver #3)
+>>       - Fixed mapping_clear_release_always() to use clear_bit() not
+>> set_bit().
+>>       - Moved a '&&' to the correct line.
+>>           ver #2)
+>>       - Rewrote entirely according to Willy's suggestion[1].
+>>
+>>   fs/9p/cache.c           |  2 ++
+>>   fs/afs/internal.h       |  2 ++
+>>   fs/cachefiles/namei.c   |  2 ++
+>>   fs/ceph/cache.c         |  2 ++
+>>   fs/nfs/fscache.c        |  3 +++
+>>   fs/smb/client/fscache.c |  2 ++
+>>   include/linux/pagemap.h | 16 ++++++++++++++++
+>>   mm/internal.h           |  5 ++++-
+>>   8 files changed, 33 insertions(+), 1 deletion(-)
+> 
+> Just one question. Shouldn't do this in 'fs/erofs/fscache.c' too ?
+> 
 
-@Winston Wen We may need similar checks for SES_EXITING in other
-places where we iterate smb_ses_list.
-Can you see if all the places are covered and send additional patches if ne=
-eded?
-If you do not get to it in a few days, I can do it myself.
+Currently the read optimization is not used in fscache ondemand mode
+(used by erofs), though it may not be intended...
 
-Thanks for these patches. Keep them coming. :)
+cachefiles_ondemand_copen
+  if (size)
+    clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
 
---=20
-Regards,
-Shyam
+The read optimization is disabled as long as the backing file size is
+not 0 (which is the most case).  And thus currently erofs doesn't need
+to clear FSCACHE_COOKIE_NO_DATA_TO_READ in .release_folio().
+
+-- 
+Thanks,
+Jingbo
