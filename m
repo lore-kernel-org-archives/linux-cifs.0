@@ -2,102 +2,117 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB87EB64D7
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Jun 2023 11:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF2DEB64D7
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Jun 2023 15:28:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232033AbjF3Ldm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 30 Jun 2023 07:33:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37750 "EHLO
+        id S232840AbjF3P2c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 30 Jun 2023 11:28:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbjF3Ldl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 30 Jun 2023 07:33:41 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A81A41FC1;
-        Fri, 30 Jun 2023 04:33:40 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4fb761efa7aso2811586e87.0;
-        Fri, 30 Jun 2023 04:33:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688124819; x=1690716819;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7oDpGX7SadvHF0PBwxOvdE+kg9NeeEeLYzE8RLSZxyI=;
-        b=hNT+Q7klvxC/zjyhFtOH0PasSSR5T6dWL85jB02f0h/XRjrZqI40h82c6/TTdZbEVx
-         KNGw68S934TwE6OBBed4Xul2/X1DEeh5W64AuxiLmSV4wHxfJv9zXLlzJpzqM9VcXhT+
-         CJcx4QzGOK1isSlEuNMU8KyabdqrELfwXStJZgnSNC+M/IalpfwHySGws+FkIpjiRJfn
-         F20vvs0svavEcAqfiDVXAfJwYTF2FDX60X0zOq7zrKjN3Cd3Y4Ysw+wzQRJFTDbWsG1J
-         OSblJNQt7ZKgMvmtrRl0/vS4mb8HtNbhxQAPzMnJHUwXFYxdxfaoUQySUNlArZDHYVZu
-         upiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688124819; x=1690716819;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7oDpGX7SadvHF0PBwxOvdE+kg9NeeEeLYzE8RLSZxyI=;
-        b=VW+FAO0m9Q+Md+NtTjbspn1xGoP10bGb6sdiXE6EmqlKB2fwQX5BP20JWY0A/L0qfR
-         cCRwBdGF+eCZGbbh7SxteizYgEBpXyB07n8wI4HerJaG0ivP9UbgVlsdhWMPQIB/oeO8
-         aO9A0XC/e2cGgTofB0B6oANbXeb7hc4D873E5u+S3IAseQ9TCsH8VXQLKh+FPAEwj2KN
-         anjJuNzP3pTFOUzdQTEZCQvujJCe8qDla3l3uy4K+i/FL45ut5eynzTAA1spIBqjfGnr
-         HqK5NnNSfB3rkJ65bwrgMZp4uv1+fih529I0s8++z+eI3yYjwbGQxIHsDIseNjVWTpMi
-         Qfwg==
-X-Gm-Message-State: ABy/qLYC8Nu+/QLYEtbFMs6qaU5zR58Fo83Yquedfr02IJgGBq/KzBwh
-        jA/+ZHfojoB3qq2+G5dC6J8=
-X-Google-Smtp-Source: APBJJlFxTsPYthU3KN/Dq8lE2AoDRMrc2DPuPaIbkbwqbwp4wgN6PIImE0WFHCi56FDqlGDnBSgCqQ==
-X-Received: by 2002:a05:6512:3592:b0:4fb:9f93:365e with SMTP id m18-20020a056512359200b004fb9f93365emr1828727lfr.41.1688124818526;
-        Fri, 30 Jun 2023 04:33:38 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id z24-20020a05600c221800b003fa96fe2bd9sm13772194wml.22.2023.06.30.04.33.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jun 2023 04:33:37 -0700 (PDT)
-From:   Colin Ian King <colin.i.king@gmail.com>
-To:     Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
+        with ESMTP id S232783AbjF3P1Q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 30 Jun 2023 11:27:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C1633C3D
+        for <linux-cifs@vger.kernel.org>; Fri, 30 Jun 2023 08:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688138755;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7s8hoY7EpXAbXFSpowadN1tdtKV1KZLtOvJuBTKdpmw=;
+        b=Rf3ic+zmd4kJiFmnAGt0y7Gv5wDmC6njgEfp7iMRUHp3mljk6BUT7WC2JvVHAvOUs/PDdj
+        uKQgYOcsCg/tpkIk5Ug0QIomMgjSIA/ecNygaZf1DNAcq+g72ZGruztSJJ4STNqI7zXJRo
+        qg8UlUB7oz2A21ZcsfnQY38tEaXxMjA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-338-Zp02hgoBNIOVX0nerBYChA-1; Fri, 30 Jun 2023 11:25:50 -0400
+X-MC-Unique: Zp02hgoBNIOVX0nerBYChA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1C5C23C0E456;
+        Fri, 30 Jun 2023 15:25:49 +0000 (UTC)
+Received: from warthog.procyon.org.uk.com (unknown [10.42.28.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 18E074087C6A;
+        Fri, 30 Jun 2023 15:25:45 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH][next] smb: client: remove redundant pointer 'server'
-Date:   Fri, 30 Jun 2023 12:33:37 +0100
-Message-Id: <20230630113337.123257-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Tom Talpey <tom@talpey.com>, Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <christian@brauner.io>,
+        linux-cifs@vger.kernel.org
+Subject: [RFC PATCH 07/11] cifs: Drop the check using iov_iter_rw()
+Date:   Fri, 30 Jun 2023 16:25:20 +0100
+Message-ID: <20230630152524.661208-8-dhowells@redhat.com>
+In-Reply-To: <20230630152524.661208-1-dhowells@redhat.com>
+References: <20230630152524.661208-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pointer 'server' is assigned but never read, the pointer is
-redundant and can be removed. Cleans up clang scan build warning:
+smbd_recv() has a check that the iterator is the correct direction.  Drop
+this check as we're getting rid of iov_iter_rw().
 
-fs/smb/client/dfs.c:217:3: warning: Value stored to 'server' is
-never read [deadcode.DeadStores]
-
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@cjr.nz>
+cc: Ronnie Sahlberg <lsahlber@redhat.com>
+cc: Shyam Prasad N <sprasad@microsoft.com>
+cc: Tom Talpey <tom@talpey.com>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christian Brauner <christian@brauner.io>
+cc: Alexander Viro <viro@zeniv.linux.org.uk>
+cc: linux-cifs@vger.kernel.org
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 ---
- fs/smb/client/dfs.c | 2 --
- 1 file changed, 2 deletions(-)
+ fs/smb/client/smbdirect.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-index 26d14dd0482e..1403a2d1ab17 100644
---- a/fs/smb/client/dfs.c
-+++ b/fs/smb/client/dfs.c
-@@ -143,7 +143,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
- 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
- 	char *ref_path = NULL, *full_path = NULL;
- 	struct dfs_cache_tgt_iterator *tit;
--	struct TCP_Server_Info *server;
- 	struct cifs_tcon *tcon;
- 	char *origin_fullpath = NULL;
- 	char sep = CIFS_DIR_SEP(cifs_sb);
-@@ -214,7 +213,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
- 	} while (rc == -EREMOTE);
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 223e17c16b60..672078d00207 100644
+--- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -1906,14 +1906,6 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+ 	unsigned int to_read, page_offset;
+ 	int rc;
  
- 	if (!rc) {
--		server = mnt_ctx->server;
- 		tcon = mnt_ctx->tcon;
+-	if (iov_iter_rw(&msg->msg_iter) == WRITE) {
+-		/* It's a bug in upper layer to get there */
+-		cifs_dbg(VFS, "Invalid msg iter dir %u\n",
+-			 iov_iter_rw(&msg->msg_iter));
+-		rc = -EINVAL;
+-		goto out;
+-	}
+-
+ 	switch (iov_iter_type(&msg->msg_iter)) {
+ 	case ITER_KVEC:
+ 		buf = msg->msg_iter.kvec->iov_base;
+@@ -1935,7 +1927,6 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
+ 		rc = -EINVAL;
+ 	}
  
- 		spin_lock(&tcon->tc_lock);
--- 
-2.39.2
+-out:
+ 	/* SMBDirect will read it all or nothing */
+ 	if (rc > 0)
+ 		msg->msg_iter.count = 0;
 
