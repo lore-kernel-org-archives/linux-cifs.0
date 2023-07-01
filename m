@@ -2,70 +2,115 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B51B8C001B3
-	for <linux-cifs@archiver.kernel.org>; Sat,  1 Jul 2023 05:05:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CEAEB64DC
+	for <linux-cifs@archiver.kernel.org>; Sat,  1 Jul 2023 05:24:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbjGAFFX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 1 Jul 2023 01:05:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59388 "EHLO
+        id S229575AbjGAFYK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 1 Jul 2023 01:24:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230510AbjGAFFI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 Jul 2023 01:05:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51CB544B5;
-        Fri, 30 Jun 2023 22:04:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E2AFB60E97;
-        Sat,  1 Jul 2023 05:04:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4ED90C433C8;
-        Sat,  1 Jul 2023 05:04:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688187898;
-        bh=TwMV9+uujIXgBDvKLQKqMpwS4JWhr03Q1a3M+yiL1No=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Kbn43dW+L67lmEcypWYShj+L8iAJFTPmGz0/oKCMu2MXOYBrjkz9vC3FTDnvhQGzm
-         sgtQLmtCD5UFpqKbKzljM2HYxePFhGESCMzWXAWFfH6I1FjqV92taKQLtRhJafS1F1
-         oevLCzA6bDMSW5/VpubNXfzIFMZlevVoVnXbnnLPsggspp1/CeLBF8jIK+PTiD6+eW
-         Xv2zLwpzzvMtWCkUl0Fxe2+d1moIQVNpJV7nFg9BEFL8MZx5Y7ukYgcnAhg7BFzOei
-         wGR8XfM9t8qpcZ226IYwvN1j14MqqloGvSxVtjcgpElnk7roBC1AP/G/rJsDqxzcZB
-         ZI+DtFKUduCSA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3EF8DC0C40E;
-        Sat,  1 Jul 2023 05:04:58 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msmdAXS+55Mk0SjyBgGtgPb4vp5z--3=DdFodPgrEoeaw@mail.gmail.com>
-References: <CAH2r5msmdAXS+55Mk0SjyBgGtgPb4vp5z--3=DdFodPgrEoeaw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msmdAXS+55Mk0SjyBgGtgPb4vp5z--3=DdFodPgrEoeaw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.5-rc-ksmbd-server-fixes-part1
-X-PR-Tracked-Commit-Id: 9cedc58bdbe9fff9aacd0ca19ee5777659f28fd7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8976e9d0039574b2336044fa5e3adb717f3ba54b
-Message-Id: <168818789824.30776.4400111826873013720.pr-tracker-bot@kernel.org>
-Date:   Sat, 01 Jul 2023 05:04:58 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        with ESMTP id S229456AbjGAFYF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 Jul 2023 01:24:05 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CAF94204;
+        Fri, 30 Jun 2023 22:24:04 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b5c231c23aso42708831fa.0;
+        Fri, 30 Jun 2023 22:24:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688189042; x=1690781042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UWSfT3e2CdHXT3PPccjwI1PvUkLEKr2RqsUNIeb0KVU=;
+        b=dv4BNmhKurSjr4SFlv7PvcW3oxS+o5nRZ0A8lZkOheALgd3YqDXfLTZeSoDO3TwBO4
+         HeowMn4na6OlBLRtOwoXYQ9LpIT6ZY/iOzYi2Nn5U0IkAUbGVj/fVT6eU9tM/XYiM68U
+         7+00JLc0mja0wzB2ItiXGm0kOMLiyTqLhi6UXs6Eb24uspVLE18y8n8X7jtCqxmDPO9W
+         uzMm8WlrJxeJguV4qoXVRw6siOUYOkaKFRN5cXEPz8JN/lUMzKzHr2Lj68wXrp1YJTr7
+         rtSrycUqnjmq5hSVc8EzFqhtwWoFfNri+c0UhLgeHAPcxIa1AhcDfjVDdAB8acEuPM8+
+         CWcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688189042; x=1690781042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UWSfT3e2CdHXT3PPccjwI1PvUkLEKr2RqsUNIeb0KVU=;
+        b=KgJI3wBoEri1AT0CBoYlk7V+J2zH/956Cce5ZQ9C19cBkR6bLMxS/8ALQq3JP3+mGE
+         fOUY3c3iP+kAdMuPvp2wpP054tOOj+/U/C/MFK09ETEjnYL5E3z39GigQWkzcxiDUqq1
+         Dy4db4jHYUZzKIloGLHkT0fg7ydYBQAEgmwVbJ7MzRIqeYRVWRPSinsaFlqnT6T2fXoU
+         QSodpBfEkArtdyB2SA57J3sZLkRKaQkIFYBwxWBusYGWOMMiLiVeIJNARydSmRczOrr3
+         uKjpfib8sbvR+mOOz4lpDKMBKhank+BHpx3Ymk0kGd9oO0cbXFx++a+r7scMe4LK815I
+         WGGQ==
+X-Gm-Message-State: ABy/qLZllEm2bXdc3hosbrIFJlTm3xH7wKjEFuY6417sUBzAEaxKypEH
+        rEm8kgIdrEk2OWPubgmYSCZNmqcHU5dr+oBKI2E=
+X-Google-Smtp-Source: APBJJlGmNEZoTcJGC2KNmbJoTnMMgs2JN1FJjXl5qHsHC2/aeL9kSCLBqESKoi5FjagfbSLqnN3Yag9zoRE0fvq0Xs8=
+X-Received: by 2002:a2e:88c8:0:b0:2b6:ca1d:ee88 with SMTP id
+ a8-20020a2e88c8000000b002b6ca1dee88mr3354057ljk.12.1688189042086; Fri, 30 Jun
+ 2023 22:24:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230630113337.123257-1-colin.i.king@gmail.com>
+In-Reply-To: <20230630113337.123257-1-colin.i.king@gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 1 Jul 2023 00:23:50 -0500
+Message-ID: <CAH2r5mvkWeMO-AoPEpDbeKy8_K5hz3nJL3-BPh+w4Dow0qoOkg@mail.gmail.com>
+Subject: Re: [PATCH][next] smb: client: remove redundant pointer 'server'
+To:     Colin Ian King <colin.i.king@gmail.com>
+Cc:     Steve French <sfrench@samba.org>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 30 Jun 2023 00:59:52 -0500:
+merged into cifs-2.6.git for-next
 
-> git://git.samba.org/ksmbd.git tags/6.5-rc-ksmbd-server-fixes-part1
+On Fri, Jun 30, 2023 at 6:35=E2=80=AFAM Colin Ian King <colin.i.king@gmail.=
+com> wrote:
+>
+> The pointer 'server' is assigned but never read, the pointer is
+> redundant and can be removed. Cleans up clang scan build warning:
+>
+> fs/smb/client/dfs.c:217:3: warning: Value stored to 'server' is
+> never read [deadcode.DeadStores]
+>
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> ---
+>  fs/smb/client/dfs.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+> index 26d14dd0482e..1403a2d1ab17 100644
+> --- a/fs/smb/client/dfs.c
+> +++ b/fs/smb/client/dfs.c
+> @@ -143,7 +143,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *m=
+nt_ctx)
+>         struct smb3_fs_context *ctx =3D mnt_ctx->fs_ctx;
+>         char *ref_path =3D NULL, *full_path =3D NULL;
+>         struct dfs_cache_tgt_iterator *tit;
+> -       struct TCP_Server_Info *server;
+>         struct cifs_tcon *tcon;
+>         char *origin_fullpath =3D NULL;
+>         char sep =3D CIFS_DIR_SEP(cifs_sb);
+> @@ -214,7 +213,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *m=
+nt_ctx)
+>         } while (rc =3D=3D -EREMOTE);
+>
+>         if (!rc) {
+> -               server =3D mnt_ctx->server;
+>                 tcon =3D mnt_ctx->tcon;
+>
+>                 spin_lock(&tcon->tc_lock);
+> --
+> 2.39.2
+>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8976e9d0039574b2336044fa5e3adb717f3ba54b
 
-Thank you!
+--=20
+Thanks,
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Steve
