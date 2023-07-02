@@ -2,108 +2,130 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EEDEB64D9
-	for <linux-cifs@archiver.kernel.org>; Sun,  2 Jul 2023 13:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE9BEB64D9
+	for <linux-cifs@archiver.kernel.org>; Sun,  2 Jul 2023 23:36:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbjGBNEJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 2 Jul 2023 09:04:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37844 "EHLO
+        id S229496AbjGBXge (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 2 Jul 2023 19:36:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229702AbjGBNEJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Jul 2023 09:04:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3F9135
-        for <linux-cifs@vger.kernel.org>; Sun,  2 Jul 2023 06:03:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688302997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=BDWA0cHSXVgfvckMNf+JGKR/aUvwz+pDaTFzfeeBwos=;
-        b=gVAYefHkDlf4mK4jeVFr3IbpMrjjmtQq6bARN+YYrhINGVmigAd+gXvjipDcQauEuEAg0V
-        P+8F5DB2yT8zVetbYdDfgUjCRRLdvZOKNrm4B0AmCUBW8HLnpOnZe3iLjN2+TJO0pRnwwf
-        +gxp358oysyei5/3jdgMuaRXr3sxSAM=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-347-7YQgl3TPPNeJ1GZB8RrlOA-1; Sun, 02 Jul 2023 09:03:16 -0400
-X-MC-Unique: 7YQgl3TPPNeJ1GZB8RrlOA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-76735d5eb86so443243085a.3
-        for <linux-cifs@vger.kernel.org>; Sun, 02 Jul 2023 06:03:16 -0700 (PDT)
+        with ESMTP id S229445AbjGBXge (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 2 Jul 2023 19:36:34 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31F39E40;
+        Sun,  2 Jul 2023 16:36:33 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b6a084a34cso56200641fa.1;
+        Sun, 02 Jul 2023 16:36:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688340991; x=1690932991;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aHFK0zYmI9rlbwJHus0Wv+AFb/pa/A+qTUs5Ldro9ys=;
+        b=PHvb5Cg8BbZDJ4YrFM5VPTFAHADQN6xV3I+4zRrZKdXeKuUeFGmiP3paqBW/qHRqU3
+         eJDAMHnrU5E4y+/bBFH/Ivu2mMqcD2lcvlTa25sIX/04Dhbtio9Khh9T75r+htEUQuzK
+         JKngACNRLS8BtF13CE8Inhypux4V9yA0toA8P/jou3SP028huxGXw3d4qrAOoyPtFbrC
+         H0Y0kNusvB0n6bymhMEoSls7TUFGk+BUrwS01wTkjjLXtujw1f/YG1bZwTatZ+xoIMZp
+         Rcuq8xp87ril7dNXgBcR3aGxObq7J9fL8xgDynNd3Yh+jqOx9RB+hTofE2CD/eL+3frR
+         n9fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688302996; x=1690894996;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BDWA0cHSXVgfvckMNf+JGKR/aUvwz+pDaTFzfeeBwos=;
-        b=UJ7/U5rL3nMjjaNIKKH9hmhUtzetnP9LRPqQME0gq2as8jttoseyB3WOZfeIyNHobJ
-         6NDewpTUNn6Tt/rOjgMengEF9EeQh85o3cPboyUjTposMjgpMhEA7SvfqbAg1evuWDy1
-         7qeme+z6UrPw52YjzW+RvYHSvNU5b+3131ezkFlUYzz2KJ+yMmatqR0145aieoWzhi2U
-         iwSOVqJkcFeGH4JDv6hfjACT3/VVFOgfc2bk6dT+zjh7/vReB7R57Ktmm70jYzjSFwuc
-         oQASBDABeQlCMcOx+KJnuBGCVIVh2odG7V/Jizb8SHBxdpQQBWe3OFP+ip7ilQEfBakM
-         o9Gw==
-X-Gm-Message-State: ABy/qLYd0V87SxWAujv9IawGAExHtjrwh0T6Qkgw1piNzQQpYf2zszlo
-        N+wwETx1Xb2FN1v5wNyXRq/UCy0XHscC7WCzgONW1oFRkgUEcw6EC053xWOf+arlE4tnK3e3Mox
-        Kj9lpCUGwlAeKfGf4ooXfzA==
-X-Received: by 2002:a05:620a:454c:b0:767:5748:cae7 with SMTP id u12-20020a05620a454c00b007675748cae7mr5178668qkp.31.1688302995839;
-        Sun, 02 Jul 2023 06:03:15 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEMl5GYrjxK+ozQpsNv0BW9m8jGbSKQM1C6MW3iV+1TqtfpxpQ+GkCfzCCWz1B/9SRBwwFafQ==
-X-Received: by 2002:a05:620a:454c:b0:767:5748:cae7 with SMTP id u12-20020a05620a454c00b007675748cae7mr5178643qkp.31.1688302995592;
-        Sun, 02 Jul 2023 06:03:15 -0700 (PDT)
-Received: from dell-per740-01.7a2m.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id cx13-20020a05620a51cd00b007339c5114a9sm6142847qkb.103.2023.07.02.06.03.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Jul 2023 06:03:15 -0700 (PDT)
-From:   Tom Rix <trix@redhat.com>
-To:     sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
-        sprasad@microsoft.com, tom@talpey.com
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, Tom Rix <trix@redhat.com>
-Subject: [PATCH] smb: client: remove unused variable 'server'
-Date:   Sun,  2 Jul 2023 09:03:10 -0400
-Message-Id: <20230702130310.3437437-1-trix@redhat.com>
-X-Mailer: git-send-email 2.27.0
+        d=1e100.net; s=20221208; t=1688340991; x=1690932991;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aHFK0zYmI9rlbwJHus0Wv+AFb/pa/A+qTUs5Ldro9ys=;
+        b=T0wNqywozC8q1O8AKKQM8FvnWzcH+8ARp3vzBzGH5wHCEbI7XHsrT4gM9qoDGiUqy6
+         AG2F0hhEThzp8kmxNjsKB7xK3iA8t+PXo+4tWPL8N/78/9y0wNx1hpaUdLFeoKn71JpF
+         9Rn+9a5Tw2Uf4rfDv5rvUsGOM9jnneEH+bGaK96A0UP56z+aVrGDABO+HUO/YEnpc8Ug
+         IRuR2Awz15ts9g6s14x5sVjb8SkUVQZzj6kgm5fcik8l5eeA7yYVo4UCshynZJLN4gFx
+         IbDF8ceKR+67L0oAx1eSIdn6EX4itMLkgkZ/c2BEY4JGo8WHj3qLfXqrPQK0iaw4auhx
+         0SdA==
+X-Gm-Message-State: ABy/qLY8PMR3VByubvy/m7VAnj4DdBNz3vcHlF90vTBTMHX8vLVk4gPJ
+        JY6EUhDIwrt+N8utUMHd6W0FQSxG4K84gsmI+M4=
+X-Google-Smtp-Source: APBJJlGN/fuohbhJPjsFEtjooRsxjY/wQdtV8zUm4WJTk+M+D0zxJeC/LQFxPvO+NnqdjcxdO89yJzErPM02gej3v08=
+X-Received: by 2002:a2e:80d9:0:b0:2b6:a3a0:5f7 with SMTP id
+ r25-20020a2e80d9000000b002b6a3a005f7mr5158743ljg.9.1688340991083; Sun, 02 Jul
+ 2023 16:36:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20230702130310.3437437-1-trix@redhat.com>
+In-Reply-To: <20230702130310.3437437-1-trix@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 2 Jul 2023 18:36:19 -0500
+Message-ID: <CAH2r5mtuyXgfkNk65y0JjkUfaxxUuWHYOPuAXO8f_sp4_VDFAA@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: remove unused variable 'server'
+To:     Tom Rix <trix@redhat.com>
+Cc:     sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
+        sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        Colin Ian King <colin.i.king@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-gcc with W=1 reports
-fs/smb/client/dfs.c: In function ‘__dfs_mount_share’:
-fs/smb/client/dfs.c:146:33: error: variable ‘server
-  set but not used [-Werror=unused-but-set-variable]
-  146 |         struct TCP_Server_Info *server;
-      |                                 ^~~~~~
+Good catch - but this was removed a few days ago by Colin's patch
 
-This variable is not used, so remove it.
+smfrench@smfrench-ThinkPad-P52:~/cifs-2.6$ git log fs/smb/client/dfs.c
+commit dfbf0ee092a5d7a9301c81e815b5e50b7c0aeeda
+Author: Colin Ian King <colin.i.king@gmail.com>
+Date:   Fri Jun 30 12:33:37 2023 +0100
 
-Signed-off-by: Tom Rix <trix@redhat.com>
----
- fs/smb/client/dfs.c | 2 --
- 1 file changed, 2 deletions(-)
+    smb: client: remove redundant pointer 'server'
 
-diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-index 26d14dd0482e..1403a2d1ab17 100644
---- a/fs/smb/client/dfs.c
-+++ b/fs/smb/client/dfs.c
-@@ -143,7 +143,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
- 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
- 	char *ref_path = NULL, *full_path = NULL;
- 	struct dfs_cache_tgt_iterator *tit;
--	struct TCP_Server_Info *server;
- 	struct cifs_tcon *tcon;
- 	char *origin_fullpath = NULL;
- 	char sep = CIFS_DIR_SEP(cifs_sb);
-@@ -214,7 +213,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
- 	} while (rc == -EREMOTE);
- 
- 	if (!rc) {
--		server = mnt_ctx->server;
- 		tcon = mnt_ctx->tcon;
- 
- 		spin_lock(&tcon->tc_lock);
--- 
-2.27.0
+    The pointer 'server' is assigned but never read, the pointer is
+    redundant and can be removed. Cleans up clang scan build warning:
 
+    fs/smb/client/dfs.c:217:3: warning: Value stored to 'server' is
+    never read [deadcode.DeadStores]
+
+    Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+    Signed-off-by: Steve French <stfrench@microsoft.com>
+
+On Sun, Jul 2, 2023 at 8:43=E2=80=AFAM Tom Rix <trix@redhat.com> wrote:
+>
+> gcc with W=3D1 reports
+> fs/smb/client/dfs.c: In function =E2=80=98__dfs_mount_share=E2=80=99:
+> fs/smb/client/dfs.c:146:33: error: variable =E2=80=98server
+>   set but not used [-Werror=3Dunused-but-set-variable]
+>   146 |         struct TCP_Server_Info *server;
+>       |                                 ^~~~~~
+>
+> This variable is not used, so remove it.
+>
+> Signed-off-by: Tom Rix <trix@redhat.com>
+> ---
+>  fs/smb/client/dfs.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+> index 26d14dd0482e..1403a2d1ab17 100644
+> --- a/fs/smb/client/dfs.c
+> +++ b/fs/smb/client/dfs.c
+> @@ -143,7 +143,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *m=
+nt_ctx)
+>         struct smb3_fs_context *ctx =3D mnt_ctx->fs_ctx;
+>         char *ref_path =3D NULL, *full_path =3D NULL;
+>         struct dfs_cache_tgt_iterator *tit;
+> -       struct TCP_Server_Info *server;
+>         struct cifs_tcon *tcon;
+>         char *origin_fullpath =3D NULL;
+>         char sep =3D CIFS_DIR_SEP(cifs_sb);
+> @@ -214,7 +213,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *m=
+nt_ctx)
+>         } while (rc =3D=3D -EREMOTE);
+>
+>         if (!rc) {
+> -               server =3D mnt_ctx->server;
+>                 tcon =3D mnt_ctx->tcon;
+>
+>                 spin_lock(&tcon->tc_lock);
+> --
+> 2.27.0
+>
+
+
+--=20
+Thanks,
+
+Steve
