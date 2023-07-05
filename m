@@ -2,133 +2,113 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CB4EB64D9
-	for <linux-cifs@archiver.kernel.org>; Tue,  4 Jul 2023 13:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E9AEB64DD
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 Jul 2023 06:13:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230164AbjGDN6a (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 4 Jul 2023 09:58:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60968 "EHLO
+        id S229577AbjGEGNz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Jul 2023 02:13:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230316AbjGDN6a (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Jul 2023 09:58:30 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2072.outbound.protection.outlook.com [40.107.92.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D9A4FB;
-        Tue,  4 Jul 2023 06:58:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Adt76Ub//Ux06ZQofDOes/+YQX7kgJl+CMjAMou6IYVoOLoLYa0jfLTuEg8AH/0GvKjDVYG8KiTpqn4iWpAe9kFwaCqNLqNam7xvHXv3EEjQsq4YYhBFKKtZ3XAUHtC5oxAGHJ43LrcUaqzx05J9AuCy72VZwQ82vEQwX/P+M8EPnov4STCx0K2A1sKl5lP9vzvJoQ36nyGz0fLPLEviUJn4CSLdL+LBqTvOEqsu9OPjfMA0r51rwVsMMSQ3XEC8HioYH2lqKPMmLlz1DFx/Oyko8WX2hc2uOe5NMdb/TZKcOyauS/pqKVGU9OZpLBr7rV78vlLWvwQgQW+lSzR6qQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v635qKZrR17ClWa0pVpVyVYioV9OA7ijpEuPdwtWm8w=;
- b=JbpjEG7suxzBqmo54/nD4GFU1SjE4Nz3RavJH8wgMpEmUefQ48tlF9TV2NSYxzHd0Zq24SFjsq2q0TgcJf5QVDfe02lmhCeewf+p6kHV7tjp5Ol5urnB9Z4pHrY7fAxQEojbnz52nkblT5axFnwG2HILUoJltcrx2NcDeGXbB4E8t4sLrs7Y+lDnGoA9RyBlXxPrrlz5/tzs5sQ8aT8K7/zH3CZOicIBwAr347kGuN0QXb1SDR1vaXksFtAyAEvG0+AXg6JDki6gTWVw7yd19j/+U/WOtVEPeJls7SaIErFi4x0SlleziwAOWOijz669d0d7EDMQdhvWrMjpw9gm3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- PH0PR01MB7523.prod.exchangelabs.com (2603:10b6:510:f6::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6544.24; Tue, 4 Jul 2023 13:58:25 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::17e9:7e30:6603:23bc]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::17e9:7e30:6603:23bc%5]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
- 13:58:25 +0000
-Message-ID: <d5fbf1cc-9b79-5fbb-a109-87679caffcc4@talpey.com>
-Date:   Tue, 4 Jul 2023 09:58:22 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v1] fs:smb:Fix unsigned expression compared with zero
-To:     Namjae Jeon <linkinjeon@kernel.org>, Wang Ming <machel@vivo.com>
-Cc:     Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        opensource.kernel@vivo.com
-References: <20230704074057.1162-1-machel@vivo.com>
- <CAKYAXd85gpb2xzPEm8BJV6gsff3p-8b4Aj_rOaEvU=+n43SgBQ@mail.gmail.com>
-Content-Language: en-US
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <CAKYAXd85gpb2xzPEm8BJV6gsff3p-8b4Aj_rOaEvU=+n43SgBQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL1PR13CA0174.namprd13.prod.outlook.com
- (2603:10b6:208:2bd::29) To SN6PR01MB4445.prod.exchangelabs.com
- (2603:10b6:805:e2::33)
+        with ESMTP id S230297AbjGEGNz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Jul 2023 02:13:55 -0400
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C5F10E3
+        for <linux-cifs@vger.kernel.org>; Tue,  4 Jul 2023 23:13:54 -0700 (PDT)
+Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-c4cb4919bb9so4202553276.3
+        for <linux-cifs@vger.kernel.org>; Tue, 04 Jul 2023 23:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688537633; x=1691129633;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ctNai2q/TxxXaukpnDJk9J/3MAO1r4piN7WGssfunU4=;
+        b=Ol5yyK5Uje30GWE79UvpNIXLQ7E8ncRTshjEoezC4yb1HSWMz3rSwmarObQuzuKJqO
+         d3gpvNTF2FMPFdaUA/CKVhAKmI5YA+JrvDPNdiVj6RHH77g1Uwllyvp6pfx5MC5+fa2u
+         q0XSTdQatySgI4TSX9HHKPIRv0ZGkOtFFAnlOosDf4ZhsJLmGVpkxb9i55UJ+BRVYlud
+         t16h3dPTqe/nqsV1UA45JYUa6Lb/YYGDsJV2plZXx893ICnoAiRO0Q2rVVAZGCzA3x9L
+         nRsHxIIaHGHC9V0OMv/qmJHKN+156HRb3q/haGozvlS8ykS8f0NOlJz04r0Yx+ityVtN
+         P3Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688537633; x=1691129633;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ctNai2q/TxxXaukpnDJk9J/3MAO1r4piN7WGssfunU4=;
+        b=CqF/PKlPBWohWOQz5SJPL9B0WjwRX3wrzRPdHAmOiowKMfgzUQiCQnFxg4/Dvo0snm
+         GBAxO6mZRt2OHhvQh5SzP2LWHukD9ZJy1CDn3jVExH+yoH30Kel8a5l3yaJetathoMnK
+         DhdwQIox7WDasaTszW7VTGt5iujASaJUuVH7D2+Eluecvy+sFc+946igKR0NKPIuoM+1
+         dPwiGHtYsm01Ca4yYswajy5juQ3agK8FCZPIgDO9FYU83vG7T1gYzVOpC2NTx0k/xMzv
+         ZKtoYB0YdLd0A/0U8mUT+hPGNn6YSwVRoLxadNgioTvZC0Ln36BNZL34N7Pf77P6CULr
+         ci+Q==
+X-Gm-Message-State: ABy/qLZ+zjtyuTedcHoooETrdGajZsOtCZPSbIH0ybleo3E/BXpP7y+W
+        ZIQuzdNJcieXQhMsDMmIDI848L41VrcyVTsn/60=
+X-Google-Smtp-Source: APBJJlEhJoSmnvt9jJw4rD3SCMMV+Q0QHUEVBhmqKrsvYeUM//s3UrwZ0orlwBYbV4She4AHSM3iWCV/eY1/teC6dyY=
+X-Received: by 2002:a25:23c8:0:b0:c1a:b15d:81b5 with SMTP id
+ j191-20020a2523c8000000b00c1ab15d81b5mr13553662ybj.35.1688537633197; Tue, 04
+ Jul 2023 23:13:53 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|PH0PR01MB7523:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2cb4adaf-69c3-4002-4519-08db7c96bc2a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BTOv66ykPQ9VoSSJEHaBhoBeA/wveVRsy8aFkuU0nfhf+IrGJj5qI4SD2cNHQruw4lrBln/VVKU1HlUtTdh5mghf9NG8PZRSBTt0tD7Gp24T7WGt+iTUrJygcDoFTvWaHWgCqkgvk7kS50PuDaDh+ZstNDBF/7ncq0Fc0XsLWbP+9hut6gM+maYUHEdxtbEHvaO0CTa4/bbTdKxgFz4pQ4zifOOs4xXsJXc2bg8Li2XZzIuIYQorWGv2rWU4hl2bISZAeVfsMVSFGM52OnmTktDD5/vBzlHY6Ahx3hDaUs09Prk49OHYE09goTDLnpzunXnFuMHXqgdJD0RjnqER2eUobJFUa0smmT6znk2aXHH/z82ZgCp8FiqOImE2NWtCOa4ZPTSpbJQUNNEDKt5kTtMnfCf5+8fsXLYEpQH4zzkXDPT5O+zcINECe9e5+1X8QoG0MQRSihR1CTzQjp+/y0erchMZIknzQ7gQkFIi150BSdh55h9858tNQrwewW02w7n0+vT1evy0o4olR/bha0CCWj+VVY96aOn+uElUcRGIsgsMhCxZG3AbLnnBcmv0dsTwoQRV2s4uGizBisLg2kF3hGB59pUmisaZ08mheD1+JE6sVIkP2IgWlY/AAbkTvb+K/sjlVTR8xMLIQGojGA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39830400003)(396003)(376002)(136003)(366004)(451199021)(316002)(2616005)(4326008)(38100700002)(38350700002)(66476007)(41300700001)(66946007)(66556008)(54906003)(36756003)(2906002)(6512007)(86362001)(110136005)(53546011)(26005)(31696002)(186003)(478600001)(4744005)(8676002)(31686004)(8936002)(6506007)(83380400001)(52116002)(5660300002)(6666004)(6486002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dXkyQXVCRjluTSt0WFU5K3VGL1dncHViN3UvaXh0aGZxM04yaS93d3dyUko1?=
- =?utf-8?B?K0pOUVo3b2UrMGpBKzFjQ3ZLWW1ZU1hYQjlnY3ZVUG9WOWhGdmp2cTNhcS9o?=
- =?utf-8?B?OEQxNHV2YXZZTktuQTJ1MUU3ZE0xN1dLVkhST1lGNjQxSHVkaGdsYkxVZjdr?=
- =?utf-8?B?NWsvSy9JSXJPa0I0ekxEbGlQSjFDSnJXZ2FJZVdyZ2VCeDhCRVR3SlBiQWFE?=
- =?utf-8?B?YTRoWnNZSjZ3SlZSSy9zakhCODBheUZXRmVmd3Izek45eGpQZGp2c0JSTENG?=
- =?utf-8?B?QzJqb2U0ZkE5WlJ0M0NYUHhJUEkxZXp5VTBtTHFkMVBxd0RwMXVnZ2NVUWVp?=
- =?utf-8?B?UG5UK2lkRjEyeVRSM2lzNjFqMEJXMEZJS2JrSUJsRmtNMDQyVVdJdkZMT2po?=
- =?utf-8?B?cllYSmIxM2ZCNHZORVVxaFN2SWoraHkwVll4NTNkMUFCTnVPdVh1Z1M4dDZ2?=
- =?utf-8?B?UGtFZElIMTZ0aXJ4a3ExUlpYYm9YRjZDTm5PVklrWmNSeFI3Ym9xbmMrRG5S?=
- =?utf-8?B?dnRMRlB3VG5DdTBPYXViQStBc21sRkZkNjBDVUwwWmtBOXJJLzA1RVBleVZt?=
- =?utf-8?B?dDYwZHNMTHlYc1RpVXFsYSt5aDVXU1hNUm9VQVptUGRIWk5rN0txS0RJUDlH?=
- =?utf-8?B?MVRLZkFQM1pCNHloWXNHQStYNFhzNDVkT3ZRNnRMR2dZTmhGVXlGOXNOSnVD?=
- =?utf-8?B?ZmlFaDJBZ04xeHc4M3FscTloOW56SkIxQ0hoSWt5TndYalJFNkU0ZzlsT1ZY?=
- =?utf-8?B?VVIyM2grS0NWbUVPaVNENElpSDIzcllKb2VEb2lURzJHQ3JuOVBsaGVwVmh3?=
- =?utf-8?B?Z2pRbW5HNHJHSm5rd1dFQUsrWnhhdUFSbStwRkwvMTFaK0RuV1hxc2U1RkxH?=
- =?utf-8?B?T2RRSmwzUFRNa0MzOWlLeEZlS2VOTEJUYnBLZm9WRThKYjRodS9OcGdwOTFU?=
- =?utf-8?B?Ym80RmhFZFlLM0toRm5pcG8rZ2V3bFRhczFkTGIvQUVhUkpoTXFNVzlqSmEw?=
- =?utf-8?B?SEtla3NhdDJhUGdjMUlvZ1A4aWNQOFljOTBGNWZrQlRSdVVLcXNaTnBjR2RF?=
- =?utf-8?B?RWZEcXY1VVEvOGM3UkhZeCtDZktvWFMrYW5nbXI0akFyUTBqcWQybmxnekdY?=
- =?utf-8?B?QWVMZGpHRGNXaFREMlVVMWR5cGx5TVZFYjlkRVBSU3FNOWJNSXNCTmhsdmtJ?=
- =?utf-8?B?RDZJWmxxYnR3ODMvWU54M3VmQVRrSHczZEFzRVNEOTJEQVEzdllHVTRCK0Qw?=
- =?utf-8?B?QkFERmRWTjVhaTEweXBYZnJTc2s2MHB0WE04K081d0hLZWgzdFlVdnlxWGZO?=
- =?utf-8?B?MlZrc1AwZFJhYmJ1dW9nak4yTEoyQ0Q4VEdyTjRCSjcrWGdmbHVWM3k3ZTZw?=
- =?utf-8?B?d3BQWG52bTkyQXozUUM1WTJlM3B3NFRvdGtvWGFndlVZcnQxZlFDRG5USU1W?=
- =?utf-8?B?R0orYlBhVmRyaGM3N3JsQ1lHbDhoOEIydVJZUDdhRlFGdDloU3ZyL1oxRU1o?=
- =?utf-8?B?VlJobE5vQmR1aWsxaXNpL092Z0lYSWovZEVDcXRyYjkxRExmVThEQTdORmJq?=
- =?utf-8?B?bnFTZUNFbnU1WTYrMlBTUTlWbE5aZzVNV1FRYmNnT0xVNmRVMTJNWFdZWncy?=
- =?utf-8?B?M2t3bitXQUJlRFdhV3ljRVFvcTRZakhaK2I2b3VGYmcwK2V5ZC9mdVZQK01G?=
- =?utf-8?B?Q0lZVldONm5QbHVoZjRJVDB6WlpQajVULzFmTXY5ZWhvMmVEb1VPNGIyWWVS?=
- =?utf-8?B?dk1BWTliSTg4aWdiUDlyVE02WnR6SVNCYmo1Sk9DQ2l6VUg0TUVVdHZ0aVdY?=
- =?utf-8?B?bXRhMURwcWU5U3NQUlA5YUY0NzgyaU1TTUhGd291OCtzTEIrMXB3VGtrTjdW?=
- =?utf-8?B?TTZ6dkJIWk1OdXFkS1g2V1J3ZUt0S0M3R3hOSXdSYWFnWkxLUGFSWi96bDBW?=
- =?utf-8?B?WWJUeHR3UGErYkxJK3BlcmRobDh3aDF6M3RjMHJPK1ExYkwyQlZJQmtVMDl0?=
- =?utf-8?B?dW8xN0J1MUFURWZMK0l6bU9lYVd2dTdqQnZqeGtBNEVPUGhxMWhiWnl6eE9j?=
- =?utf-8?B?bmtuZkkxTWV0YXdpNGxoYlg3d3UyME5WK3hvaG1hNkF0a0dVMlBUWVc4SnVh?=
- =?utf-8?Q?at2NdMPCbAafc41yA3drt/TSE?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2cb4adaf-69c3-4002-4519-08db7c96bc2a
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 13:58:25.1279
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 41t9vG5J6BCvMiUaPlRlcxFIMIGSgB9RCexXIcy9RmCzcm+gjObAcODHPpm0ao/T
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB7523
+References: <20230703120709.3610-1-bharathsm@microsoft.com> <223dd925bd50acd04bfb25fa18cf276e.pc@manguebit.com>
+In-Reply-To: <223dd925bd50acd04bfb25fa18cf276e.pc@manguebit.com>
+From:   Bharath SM <bharathsm.hsk@gmail.com>
+Date:   Wed, 5 Jul 2023 11:43:42 +0530
+Message-ID: <CAGypqWzoo83xy0wbGUO6NX_24pFEM=tpS=e2_iuxvCdRk4e9mA@mail.gmail.com>
+Subject: Re: [PATCH] smb: add missing create options for O_DIRECT and O_SYNC flags
+To:     Paulo Alcantara <pc@manguebit.com>
+Cc:     sfrench@samba.org, lsahlber@redhat.com, sprasad@microsoft.com,
+        tom@talpey.com, linux-cifs@vger.kernel.org,
+        bharathsm@microsoft.com, nspmangalore@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 7/4/2023 4:58 AM, Namjae Jeon wrote:
-> 2023-07-04 16:40 GMT+09:00, Wang Ming <machel@vivo.com>:
->> The return value of the ksmbd_vfs_getcasexattr() is signed.
->> However, the return value is being assigned to an unsigned
->> variable and subsequently recasted, causing warnings. Use
->> a signed type.
->>
->> Signed-off-by: Wang Ming <machel@vivo.com>
-> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-> 
-> Thanks for your patch!
-> 
+On Mon, Jul 3, 2023 at 9:33=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> w=
+rote:
+>
+> Bharath SM <bharathsm.hsk@gmail.com> writes:
+>
+> > The CREATE_NO_BUFFER and CREATE_WRITE_THROUGH file create options
+> > are correctly set in cifs_nt_open and cifs_reopen functions based
+> > on O_DIRECT and O_SYNC flags. However flags are missing during the
+> > file creation process in cifs_atomic_open, this was leading to
+> > successful write operations with O_DIRECT even in case on un-aligned
+> > size. Fixed by setting create options based on open file flags.
+> >
+> > Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> > ---
+> >  fs/smb/client/dir.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+> > index 30b1e1bfd204..4178a7fb2ac2 100644
+> > --- a/fs/smb/client/dir.c
+> > +++ b/fs/smb/client/dir.c
+> > @@ -292,6 +292,12 @@ static int cifs_do_create(struct inode *inode, str=
+uct dentry *direntry, unsigned
+> >        * ACLs
+> >        */
+> >
+> > +     if (oflags & O_SYNC)
+> > +             create_options |=3D CREATE_WRITE_THROUGH;
+> > +
+> > +     if (oflags & O_DIRECT)
+> > +             create_options |=3D CREATE_NO_BUFFER;
+> > +
+>
+> Looks good, thanks.
+>
+> I see that cifs_nt_open(), cifs_reopen_file() and cifs_do_create() use
+> cifs_create_options().
+>
+> I'd rather have those flags set in cifs_create_options() by passing a
+> new @flags to it, so if we need to make any changes later, only
+> cifs_create_options() will require it.  What do you think?
 
-FYI, this is missing my previous Acked-by. The updated changelog
-otherwise looks good.
-
-Tom.
+Thanks,
+I see there are around 34 places where we call cifs_create_options()
+and currently it's taking cifs_sb,create options as arguments. Should
+we make another helper function with name
+"create_options=3Dcifs_parse_flags(flags)" then pass create_options into
+cifs_create_options() ?
+I think we can do this cleanup as the next patch. What do you think.?
