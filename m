@@ -2,219 +2,160 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C49AEB64DA
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Jul 2023 19:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD31EB64DD
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 Jul 2023 20:26:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234211AbjGETXs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Jul 2023 15:23:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60904 "EHLO
+        id S233729AbjGEU0x (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Jul 2023 16:26:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234205AbjGETXc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Jul 2023 15:23:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7571D30CF;
-        Wed,  5 Jul 2023 12:20:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B5DB26170E;
-        Wed,  5 Jul 2023 19:05:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD8CFC433C7;
-        Wed,  5 Jul 2023 19:05:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688583918;
-        bh=6SL6mUSfB28KQKat8cbksYV4mudw5XTM3p/j6GIEI7k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fBxoHWcYPCpxo2vQboMwtpHWVRXR9R3BF+3Iducwz7fJSJVJ/HmlEdHya3joPw2Z+
-         TE2flAeu1oqGVxvGQWcoCC+992jTRIpTthuoM2aogWWkxcUnSa55zkJoogWaKIyYiK
-         dB5j8nZWSnzgEyx7iAun1wS/h9eLYK9A/f0LiUHlZCTnSVlo2QD67tItalRanJpql3
-         QcpCSxF7hu8qlaEWzlkhVcqtremoum0i936kWVWtvNEW0Cw1U+2MRosckD354oEp0W
-         KCVS7NZPy2Dr9wI+rlS+32CkKN6TBP03uj4h4Oq1TBW3HpduOs/WZUCIU02wt6JXfy
-         eEkQb8HInhqdA==
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Christian Brauner <brauner@kernel.org>,
+        with ESMTP id S233720AbjGEU0w (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Jul 2023 16:26:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EFC2199D
+        for <linux-cifs@vger.kernel.org>; Wed,  5 Jul 2023 13:26:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688588768;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=t45r9A2YvfoSJv2GZo8UC8AtO/lxGa/2A2TsFaxOzFQ=;
+        b=YLdxz9HUX1AIz8+0BVAROus650U1s6sPa9I1As/2Fz0QsucrEdhg0R7CG+cxKHfZu/z82d
+        4AIj80vx746fYHTbCSYLc+LgYzHFlFQKQG0CTw/OpIa8M6lSArEEdgBR+6dH726oXA+tTg
+        WFMQQgRUQSsXqtsWQERLZWyaEQDR5Tc=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-167-StE-qh_-Ps2EO4c2Z1DCqg-1; Wed, 05 Jul 2023 16:26:06 -0400
+X-MC-Unique: StE-qh_-Ps2EO4c2Z1DCqg-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-67106f598b1so83811b3a.2
+        for <linux-cifs@vger.kernel.org>; Wed, 05 Jul 2023 13:26:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688588764; x=1691180764;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t45r9A2YvfoSJv2GZo8UC8AtO/lxGa/2A2TsFaxOzFQ=;
+        b=ZHXPzPkTexRtS/mOJcmw1YoHeaYwx5kQLBR7yYVLiBrqxXw7YTF1l8iyd7WZMSSqxC
+         nZHa0OyEff23f1s8pxRjTyTqvqga6b2k7bnGOT1Q5N+XmiQUo2uVHAr1GySHy56pWUK0
+         58QW4h78GVqBKwTyUqm3tOwrnQRXmBiFoAtjCeSt5d+tdmMtKzcZFqoATVvzcy3LY5KU
+         yaSwQJg764LoM22d2Eei0L0Zvv55boQmCE2zJa6SHesk7LPZVzEKS27TFWdRwnGlMDTJ
+         tjT9TWwE/CBUWDuP8udIhTOFzAF6+hApFzeUr22Ko+yZTek95oQbgnippB35eiRM4Bp7
+         9Suw==
+X-Gm-Message-State: AC+VfDwQccEqhNuXyPv3IttdsLWupXKHr+2mdgngl209pBJuFrYsHDh+
+        MhOnML1+ujexg0hUSErxigm8mkz6zE4kx4NUiUezTZbKIlc3R0J1+vT7vJPwhWUyM5837uG3pXt
+        5VrcI39tybz0kU191khaJBF5rx7Jpp5mN1DRWxQ==
+X-Received: by 2002:a05:6a21:6d88:b0:122:e4f:25c7 with SMTP id wl8-20020a056a216d8800b001220e4f25c7mr15659578pzb.31.1688588763773;
+        Wed, 05 Jul 2023 13:26:03 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6ds4xvbUG+ZYaDvJ2apGx91OQ4qB0akGNWWFL3LaWKhMz96IxFpmQ2sEuPoCI3p2ih7fuYhkf9fNjQ5oeaAq0=
+X-Received: by 2002:a05:6a21:6d88:b0:122:e4f:25c7 with SMTP id
+ wl8-20020a056a216d8800b001220e4f25c7mr15659535pzb.31.1688588763446; Wed, 05
+ Jul 2023 13:26:03 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230609125023.399942-1-jlayton@kernel.org> <20230609125023.399942-8-jlayton@kernel.org>
+ <CAHc6FU4wyfQT7T75j2Sd9WNp=ag7hpDZGYkR=m73h2nOaH+AqQ@mail.gmail.com> <a1f7a725186082d933aff702d1d50c6456da6f20.camel@kernel.org>
+In-Reply-To: <a1f7a725186082d933aff702d1d50c6456da6f20.camel@kernel.org>
+From:   Andreas Gruenbacher <agruenba@redhat.com>
+Date:   Wed, 5 Jul 2023 22:25:51 +0200
+Message-ID: <CAHc6FU54Gh+5hovqXZZSADqym=VCMis-EH9sKhAjgjXD6MUtqw@mail.gmail.com>
+Subject: Re: [PATCH 7/9] gfs2: update ctime when quota is updated
+To:     Jeff Layton <jlayton@kernel.org>
+Cc:     Christian Brauner <brauner@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Brad Warrum <bwarrum@linux.ibm.com>,
+        Ritu Agarwal <rituagar@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ian Kent <raven@themaw.net>,
+        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+        Jeremy Kerr <jk@ozlabs.org>, Ard Biesheuvel <ardb@kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sungjong Seo <sj1557.seo@samsung.com>,
+        Bob Peterson <rpeterso@redhat.com>,
         Steve French <sfrench@samba.org>,
         Paulo Alcantara <pc@manguebit.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
         Tom Talpey <tom@talpey.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH v2 74/92] smb: convert to ctime accessor functions
-Date:   Wed,  5 Jul 2023 15:01:39 -0400
-Message-ID: <20230705190309.579783-72-jlayton@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230705190309.579783-1-jlayton@kernel.org>
-References: <20230705185755.579053-1-jlayton@kernel.org>
- <20230705190309.579783-1-jlayton@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        John Johansen <john.johansen@canonical.com>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Ruihan Li <lrh2000@pku.edu.cn>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        autofs@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, cluster-devel@redhat.com,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-In later patches, we're going to change how the inode's ctime field is
-used. Switch to using accessor functions instead of raw accesses of
-inode->i_ctime.
+On Mon, Jun 12, 2023 at 12:36=E2=80=AFPM Jeff Layton <jlayton@kernel.org> w=
+rote:
+> On Fri, 2023-06-09 at 18:44 +0200, Andreas Gruenbacher wrote:
+> > Jeff,
+> >
+> > On Fri, Jun 9, 2023 at 2:50=E2=80=AFPM Jeff Layton <jlayton@kernel.org>=
+ wrote:
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > > ---
+> > >  fs/gfs2/quota.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/fs/gfs2/quota.c b/fs/gfs2/quota.c
+> > > index 1ed17226d9ed..6d283e071b90 100644
+> > > --- a/fs/gfs2/quota.c
+> > > +++ b/fs/gfs2/quota.c
+> > > @@ -869,7 +869,7 @@ static int gfs2_adjust_quota(struct gfs2_inode *i=
+p, loff_t loc,
+> > >                 size =3D loc + sizeof(struct gfs2_quota);
+> > >                 if (size > inode->i_size)
+> > >                         i_size_write(inode, size);
+> > > -               inode->i_mtime =3D inode->i_atime =3D current_time(in=
+ode);
+> > > +               inode->i_mtime =3D inode->i_atime =3D inode->i_ctime =
+=3D current_time(inode);
+> >
+> > I don't think we need to worry about the ctime of the quota inode as
+> > that inode is internal to the filesystem only.
+> >
+>
+> Thanks Andreas.  I'll plan to drop this patch from the series for now.
+>
+> Does updating the mtime and atime here serve any purpose, or should
+> those also be removed? If you plan to keep the a/mtime updates then I'd
+> still suggest updating the ctime for consistency's sake. It shouldn't
+> cost anything extra to do so since you're dirtying the inode below
+> anyway.
 
-Acked-by: Tom Talpey <tom@talpey.com>
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- fs/smb/client/file.c    |  4 ++--
- fs/smb/client/fscache.h |  5 +++--
- fs/smb/client/inode.c   | 14 +++++++-------
- fs/smb/client/smb2ops.c |  3 ++-
- fs/smb/server/smb2pdu.c |  8 ++++----
- 5 files changed, 18 insertions(+), 16 deletions(-)
+Yes, good point actually, we should keep things consistent for simplicity.
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 0a5fe8d5314b..689058e1b6e6 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -1085,7 +1085,7 @@ int cifs_close(struct inode *inode, struct file *file)
- 		    !test_bit(CIFS_INO_CLOSE_ON_LOCK, &cinode->flags) &&
- 		    dclose) {
- 			if (test_and_clear_bit(CIFS_INO_MODIFIED_ATTR, &cinode->flags)) {
--				inode->i_ctime = inode->i_mtime = current_time(inode);
-+				inode->i_mtime = inode_set_ctime_current(inode);
- 			}
- 			spin_lock(&cinode->deferred_lock);
- 			cifs_add_deferred_close(cfile, dclose);
-@@ -2596,7 +2596,7 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- 					   write_data, to - from, &offset);
- 		cifsFileInfo_put(open_file);
- 		/* Does mm or vfs already set times? */
--		inode->i_atime = inode->i_mtime = inode->i_ctime = current_time(inode);
-+		inode->i_atime = inode->i_mtime = inode_set_ctime_current(inode);
- 		if ((bytes_written > 0) && (offset))
- 			rc = 0;
- 		else if (bytes_written < 0)
-diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
-index 173999610997..a228964bc2ce 100644
---- a/fs/smb/client/fscache.h
-+++ b/fs/smb/client/fscache.h
-@@ -50,12 +50,13 @@ void cifs_fscache_fill_coherency(struct inode *inode,
- 				 struct cifs_fscache_inode_coherency_data *cd)
- {
- 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
-+	struct timespec64 ctime = inode_get_ctime(inode);
- 
- 	memset(cd, 0, sizeof(*cd));
- 	cd->last_write_time_sec   = cpu_to_le64(cifsi->netfs.inode.i_mtime.tv_sec);
- 	cd->last_write_time_nsec  = cpu_to_le32(cifsi->netfs.inode.i_mtime.tv_nsec);
--	cd->last_change_time_sec  = cpu_to_le64(cifsi->netfs.inode.i_ctime.tv_sec);
--	cd->last_change_time_nsec = cpu_to_le32(cifsi->netfs.inode.i_ctime.tv_nsec);
-+	cd->last_change_time_sec  = cpu_to_le64(ctime.tv_sec);
-+	cd->last_change_time_nsec  = cpu_to_le64(ctime.tv_nsec);
- }
- 
- 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index c3eeae07e139..218f03dd3f52 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -172,7 +172,7 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
- 	else
- 		inode->i_atime = fattr->cf_atime;
- 	inode->i_mtime = fattr->cf_mtime;
--	inode->i_ctime = fattr->cf_ctime;
-+	inode_set_ctime_to_ts(inode, fattr->cf_ctime);
- 	inode->i_rdev = fattr->cf_rdev;
- 	cifs_nlink_fattr_to_inode(inode, fattr);
- 	inode->i_uid = fattr->cf_uid;
-@@ -1744,9 +1744,9 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
- 		cifs_inode = CIFS_I(inode);
- 		cifs_inode->time = 0;	/* will force revalidate to get info
- 					   when needed */
--		inode->i_ctime = current_time(inode);
-+		inode_set_ctime_current(inode);
- 	}
--	dir->i_ctime = dir->i_mtime = current_time(dir);
-+	dir->i_mtime = inode_set_ctime_current(dir);
- 	cifs_inode = CIFS_I(dir);
- 	CIFS_I(dir)->time = 0;	/* force revalidate of dir as well */
- unlink_out:
-@@ -2060,8 +2060,8 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
- 	 */
- 	cifsInode->time = 0;
- 
--	d_inode(direntry)->i_ctime = inode->i_ctime = inode->i_mtime =
--		current_time(inode);
-+	inode_set_ctime_current(d_inode(direntry));
-+	inode->i_mtime = inode_set_ctime_current(inode);
- 
- rmdir_exit:
- 	free_dentry_path(page);
-@@ -2267,8 +2267,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
- 	/* force revalidate to go get info when needed */
- 	CIFS_I(source_dir)->time = CIFS_I(target_dir)->time = 0;
- 
--	source_dir->i_ctime = source_dir->i_mtime = target_dir->i_ctime =
--		target_dir->i_mtime = current_time(source_dir);
-+	source_dir->i_mtime = target_dir->i_mtime = inode_set_ctime_to_ts(source_dir,
-+									  inode_set_ctime_current(target_dir));
- 
- cifs_rename_exit:
- 	kfree(info_buf_source);
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 87abce010974..3cc3c4a71e32 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -1396,7 +1396,8 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (file_inf.LastWriteTime)
- 		inode->i_mtime = cifs_NTtimeToUnix(file_inf.LastWriteTime);
- 	if (file_inf.ChangeTime)
--		inode->i_ctime = cifs_NTtimeToUnix(file_inf.ChangeTime);
-+		inode_set_ctime_to_ts(inode,
-+				      cifs_NTtimeToUnix(file_inf.ChangeTime));
- 	if (file_inf.LastAccessTime)
- 		inode->i_atime = cifs_NTtimeToUnix(file_inf.LastAccessTime);
- 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index cf8822103f50..f9099831c8ff 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -4779,7 +4779,7 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
- 	file_info->LastAccessTime = cpu_to_le64(time);
- 	time = ksmbd_UnixTimeToNT(inode->i_mtime);
- 	file_info->LastWriteTime = cpu_to_le64(time);
--	time = ksmbd_UnixTimeToNT(inode->i_ctime);
-+	time = ksmbd_UnixTimeToNT(inode_get_ctime(inode));
- 	file_info->ChangeTime = cpu_to_le64(time);
- 	file_info->DosAttributes = fp->f_ci->m_fattr;
- 	file_info->Inode = cpu_to_le64(inode->i_ino);
-@@ -5422,7 +5422,7 @@ int smb2_close(struct ksmbd_work *work)
- 		rsp->LastAccessTime = cpu_to_le64(time);
- 		time = ksmbd_UnixTimeToNT(inode->i_mtime);
- 		rsp->LastWriteTime = cpu_to_le64(time);
--		time = ksmbd_UnixTimeToNT(inode->i_ctime);
-+		time = ksmbd_UnixTimeToNT(inode_get_ctime(inode));
- 		rsp->ChangeTime = cpu_to_le64(time);
- 		ksmbd_fd_put(work, fp);
- 	} else {
-@@ -5644,7 +5644,7 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 	if (file_info->ChangeTime)
- 		attrs.ia_ctime = ksmbd_NTtimeToUnix(file_info->ChangeTime);
- 	else
--		attrs.ia_ctime = inode->i_ctime;
-+		attrs.ia_ctime = inode_get_ctime(inode);
- 
- 	if (file_info->LastWriteTime) {
- 		attrs.ia_mtime = ksmbd_NTtimeToUnix(file_info->LastWriteTime);
-@@ -5689,7 +5689,7 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 			return -EACCES;
- 
- 		inode_lock(inode);
--		inode->i_ctime = attrs.ia_ctime;
-+		inode_set_ctime_to_ts(inode, attrs.ia_ctime);
- 		attrs.ia_valid &= ~ATTR_CTIME;
- 		rc = notify_change(idmap, dentry, &attrs, NULL);
- 		inode_unlock(inode);
--- 
-2.41.0
+Would you add this back in if you do another posting?
+
+Thanks,
+Andreas
+
+> Thanks!
+>
+> > >                 mark_inode_dirty(inode);
+> > >                 set_bit(QDF_REFRESH, &qd->qd_flags);
+> > >         }
+> > > --
+> > > 2.40.1
+> > >
+> >
+> > Thanks,
+> > Andreas
+> >
+>
+> --
+> Jeff Layton <jlayton@kernel.org>
+>
 
