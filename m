@@ -2,268 +2,143 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B42C3EB64DA
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Jul 2023 03:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E893EEB64DA
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Jul 2023 03:14:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233461AbjGFDIO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Jul 2023 23:08:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50568 "EHLO
+        id S232108AbjGFDO5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 Jul 2023 23:14:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233506AbjGFDHz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Jul 2023 23:07:55 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83F11FD3
-        for <linux-cifs@vger.kernel.org>; Wed,  5 Jul 2023 20:07:51 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b6ef9ed2fdso2076011fa.2
-        for <linux-cifs@vger.kernel.org>; Wed, 05 Jul 2023 20:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688612870; x=1691204870;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xRcIoeHcYX10ooGxDx9e9VqhMIBnFuaqoYcbWd0M2DY=;
-        b=AFZOK9f5IXm3U1O+dbhpIL+JaUUJcw85et958ZpAM7c5uq/m97P7WuQX0fkka06L+U
-         YLp1Ogg64TaSQBknvA4ljBuWUq1Uic/sZ29lu5nOfg/ZhyXeB8wg6jq25VBVz2LpZf9E
-         5/J5Tb4lw2cLAhBdxKc2mD1p2DQk5SbwyHkSztzqOjQ2zMANMigssMhB0KfCMFnDXWSn
-         XD1V7EBLTDgsGcia33BcC53EmetULjrc0zYkVMRJWRNeOfM6BzjEBR51P8QxAORiX/bH
-         NE9hUZqGr5fJFI/OaBdBS8OWSxzPmhqzqCZoEwZKJ5UnahovFeGZn7IE4DEQB7v1iUPn
-         Yqkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688612870; x=1691204870;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xRcIoeHcYX10ooGxDx9e9VqhMIBnFuaqoYcbWd0M2DY=;
-        b=E2yif7ARi3oXujB/YsAJigHH617RTmRbfUnV67ORVkgWBMkSqtqfwEAdCCZT9nnXMb
-         LnyiQ1QlPtGrsZvnzSwcu5RfHiTyo3gFr+KR2mm5kg1FW+brp6fPhjWIUmWL4MfGAncE
-         vakPT2oXdFMMF7eOO+YuPz8h9/4f4RX8Uy97GtucwWS892TyxdMcePMrQWHo+yfFduya
-         ikTyzooNZ4NL/lFI4y8v0G19/Sh4FojgWXDh3suxMHrIdDIZlAuj95CC1EW36xkRTncc
-         MMEsQEAnxLQDQVlXNRNahdjDHvwEuSqUQMMkQDOQICV8wNtNK2+1glyeH2b5lCjD9tr/
-         Uwhw==
-X-Gm-Message-State: ABy/qLalsaJPb1pDlUZeiMqs6Tc1GRoQsqJ410hUAjmgb7EA+eAgMutO
-        M8CiV+a8PoxE/Jfzb8CDgNemeTMMfTFaTnff7Il8/n5v
-X-Google-Smtp-Source: APBJJlF6qGAcmtNIiGMaSyOLKJkuu9QscvtfGVYFXJGUy4Uuad0qWFyp0Wg0Q0zujlDidePI+lsKLr8CWWMoe4/BhQE=
-X-Received: by 2002:a2e:9208:0:b0:2b6:f009:921a with SMTP id
- k8-20020a2e9208000000b002b6f009921amr321642ljg.13.1688612869701; Wed, 05 Jul
- 2023 20:07:49 -0700 (PDT)
+        with ESMTP id S229527AbjGFDO4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Jul 2023 23:14:56 -0400
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2102.outbound.protection.outlook.com [40.107.255.102])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C25119B2;
+        Wed,  5 Jul 2023 20:14:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oBU164usivaLdmlYyYH3OycYkVbSOM5/Xnuk6pwb0nH409a9a6Qk/iyliGqaH07WG7ds1KRAobTIvI8ZfIioiWd1oGP50tYM4391nKu4YkPVlIO7fv3qbCEsfXLV7h0h3hA0rm3yl33qypwsxM7DmqS14MbymtXc6QhTveZsLZ8HeP92RMKaC57Y4/oYvRFv+F6K7u7sDp8nJ5Oxin8KKm1aXkZtyDwDYMKhuCobR3dY6kgJetmDG7Hy9M9Kig2unFXy4I/TjTBcG00uy3WM/z5rzwvuqWaucmPpVhQvUxh0YYrH5Je43+QVk8+FeYvWwUGzfBvi2cu4S9qsgmnBrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sfS/ATkTvqbfwzEopg/eIO/513tQmQ8ekrogvNj+C5U=;
+ b=nKflT3ZynpGX3x9NUeGEyxUwd76iGAF+8TwiqqlNZdQ2BqSoWpPQkQdYInG7HUqPanvm/A/W37JqIySLH2DjAIM0WGAjb1A5NTCZ2Ph3x0eq9grF4do3M14nXHuDFp4q+G2GHMGMrnhZpjGa4bfYaeNy4keTzItRwAyTlTHNMpX6tXDaqjofzz2qraIwHyoQBFyNPLJzudBwtgbNhhOEkd1ZcGbM0EUHJrfkglTwmYurpUnrN+/hMvpBbzqIBTYaIu7CM43aa6AbQqQ1fc7fxhtJHnPd4MARgCtO6sxT9nbvsSw1xSJvlvk16EAN/kXuf6NWyoeXdyI/73cwMxCQ2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sfS/ATkTvqbfwzEopg/eIO/513tQmQ8ekrogvNj+C5U=;
+ b=ZOKW4fxBjjc4ofIEp3wgs+ZNOIfymYKuvbd/a/Lf9KnlPG46QK99vTr4ejM+THJU1fSHgYLlb433zArSXzrbpF9GABGZ9oqTfIYYQeYLCvsegHBGCdLCSeFGB8Kol1eY8ZCxV2nrToeACyAtvRkniVEm5rTMtCWpQ3uCCyBEy5P2ug+JGQ545lugiHjGv3ENnndPpqUtuprpzPJdeQ0jennsOvBiMJRwbwUfn/BVqbZfN/pIkdtd6JTlnA7918fb7MfEaUVQbSYfhNZ8AQZoER23lZEk6lMDk4dBmnSdB8J6Z3xnIBv50Q/jAqtbgd1jfw4XJn45err2l4reYbSIqQ==
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
+ TYZPR06MB6638.apcprd06.prod.outlook.com (2603:1096:400:463::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
+ 2023 03:14:50 +0000
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
+ 03:14:50 +0000
+From:   =?utf-8?B?546L5piOLei9r+S7tuW6leWxguaKgOacr+mDqA==?= 
+        <machel@vivo.com>
+To:     Markus Elfring <Markus.Elfring@web.de>
+CC:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <sfrench@samba.org>, Tom Talpey <tom@talpey.com>
+Subject: =?utf-8?B?5Zue5aSNOiBbUEFUQ0hdIGZzOiBzbWI6IEZpeCB1bnNpZ25lZCBleHByZXNz?=
+ =?utf-8?B?aW9uIGNvbXBhcmVkIHdpdGggemVybyBpbiBrc21iZF92ZnNfc3RyZWFtX3dy?=
+ =?utf-8?Q?ite()?=
+Thread-Topic: [PATCH] fs: smb: Fix unsigned expression compared with zero in
+ ksmbd_vfs_stream_write()
+Thread-Index: AQHZr3G1DBZTmDC5c0S4NmhPGriTd6+sEJqw
+Date:   Thu, 6 Jul 2023 03:14:50 +0000
+Message-ID: <SG2PR06MB37433E34BA3AE623D2B22FA0BD2CA@SG2PR06MB3743.apcprd06.prod.outlook.com>
+References: <20230701055556.23632-1-machel@vivo.com>
+ <374f7745-537c-27d6-09c4-3b77c9eac373@web.de>
+In-Reply-To: <374f7745-537c-27d6-09c4-3b77c9eac373@web.de>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SG2PR06MB3743:EE_|TYZPR06MB6638:EE_
+x-ms-office365-filtering-correlation-id: 3815c676-8b9a-4503-925f-08db7dcf291c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: O7HEQ7t8NCkRb4r7SAF3jjjV41tESi4T+KHfzoByY8VDrZkdwe3wrRopZrMxdRu+Pq8S21lpVyrw9NzFDJJpGthj1r0Oro35DiaFZPgBIcJd09Uf5PzUzY2YeHy+ly/eB/qDjm/2yZAZLvB/OubMr6BWXS+yKyszrwxWmWO8Jd6qV3R2JU0qDvzH8H9KuAmb22wWuNYxwBAU1hlAgpdY4g+zBKtjn8w5b1MBy5W5v+q7Baaxw8y6UMEHeRp4Hk9jJpQbcSbvmsuQlBGqD1iFFFsl+ueXLFZ8/M/Snn3usSRwDeIF/GZLl2EwUrbJ1sR8gKqj5qYgEwuojMYRIfv0eFcFobfZPTpwcsXbimZGL7+p9evCALBcUuZ2Myr/4apl7FnrB9ni10jjJyH7jLv61uZijAhpJtVL06hDH++h2T68z/V6TnUpstRwtVSP6DpNEsLg1RELJ2yC2ZULpteAwBM0NNVnhfgZb/cDtmphDKPEwOpUtQ+MhT4W6HFPAEaUCTwlBcMi6B8CekClQZhyXUv4E1UsdAC5XCHLkiBKDiZvVCDV6dp++/K6bvhCIQn142OjtpuBDck3vzwMLyPbEIkW5wCeBpiXX+dVxrGUSwo=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(39860400002)(376002)(396003)(366004)(451199021)(85182001)(224303003)(38070700005)(86362001)(33656002)(2906002)(4744005)(5660300002)(52536014)(4326008)(55016003)(186003)(9686003)(6506007)(26005)(54906003)(122000001)(7696005)(66946007)(478600001)(64756008)(316002)(66476007)(66446008)(38100700002)(66556008)(6916009)(71200400001)(76116006)(8936002)(41300700001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?aGhmT0lEN3VBVWs3ZFlUS1hpblpCd1ZUT28xZEFURHRVTGNROHFQZmRmQmlh?=
+ =?utf-8?B?ejJkK25vNEFxOVpDZzNZdzJSbGdpSC9kUzMxQ1UyMnozaEluL0NaOWMxVUFu?=
+ =?utf-8?B?VUpPbDRMNXhpZEcwYjVzdWcwdGpDTGptdVNvRHY4Nld6QVRxWm5IU2tTWDc2?=
+ =?utf-8?B?QkdLdENib1JGbkxOYkZMeUZacFJjSi9GSkFtanFyNjNmbm1YRHl2MlpwS3VM?=
+ =?utf-8?B?eUlLU1cwS28xcjVKZWV0Q2tnTG0yMnJkMURiZFBnR3dWaDRjcDBKbFlkdkJO?=
+ =?utf-8?B?UysrdEhOOFM0ZlFMV3dDbU1OTXVlUm05ek9kZkFiLzhzOHFXY003bWx1MGdJ?=
+ =?utf-8?B?dUUxd2Y4Vlo0a3N2eERWSi8wWUpMQmIyeTZEVFlUS29xRkJTTk5sSSs5dFdZ?=
+ =?utf-8?B?cUZoQ0lobDZIWnA2SHBzYzd1WGdOQ3Y4WERQMGM2MmdsUlg1TWJDQWRhMVlk?=
+ =?utf-8?B?VWxETlRid0lLUWExVHJ6REV4aDlRbFFsNEt5Kzh5dEZQL0xrMTBkRVArZkls?=
+ =?utf-8?B?WU1zemFKUFpTSC93TlhGMWx5eStvRXRWVTZBajdHU2I2Qk16NzBaYmlvRkR0?=
+ =?utf-8?B?Tkc2STVrSEpUNStxTndTbS9uSWFzbmR6SFFGVE5sUVZiK3Z6M0hidzN5Mkxm?=
+ =?utf-8?B?Sk42VnE5OVhURjJyNlEyT2dXb0dpRGlNYzRKeTJPNnZtak4xeDZCOXNsd0h4?=
+ =?utf-8?B?TTBnTlJDdndFNWRaTGt0OWVFaTY3ZFF4bURwd0VGMzFOcDUxVGUraEdidytJ?=
+ =?utf-8?B?aEZ6bDV2NE5ndUNZc2lzdFhreGphbWRjbmZ1MWFvTkZ4TkRVd1llTklXWXpB?=
+ =?utf-8?B?N1VYSDVOZGlUUjZjcEIrM01HdzRnang2ajVqQVlXdWV3L1cyaWhYdEVVenhM?=
+ =?utf-8?B?UTlYb1ptVnN5NE5zZkVKTlo5WXh6UmFpODBieTZEb0wrZExWQ1gybUNVRFFq?=
+ =?utf-8?B?TGFRRVQzRHI4OEM0WGJXM3JXaUZLY043NzlvMnUrdTU3cTZIWkdBUTdOQkdX?=
+ =?utf-8?B?VFcvc2FaUHQ2aWt6OGJXNXFobnV2RUVzcHplUUV6bTl1eTh0K0lWbkc1SW5u?=
+ =?utf-8?B?Vy94VkNja0ljcWt5L1FaQ053TmJUaGxQNVBDZnE4OS9NWFlLbENyeUs2aUxN?=
+ =?utf-8?B?cVdPQmpnbFhpZTJScTdNUUpVQkZvSE1ZdU4yRTZEL2JYeGpPbFhNY2VSYXQr?=
+ =?utf-8?B?NDdxdTUwdVhnVWNEcWk0TXhNTGVQeE1FSVFHdC9Hb2Y5TmF5NUhCUFN0RXhU?=
+ =?utf-8?B?eHVVeHhISTFFRVVyZUR2dmtEbkl5QmNxTUVhbE9KS1ZmN21oQ05uSkJKYTZa?=
+ =?utf-8?B?VUxzTWdBc0FpTzh2S0Y1bUs5WERod0hVZTJXeTdhdWQxUjhsSlFvbzU4d3FQ?=
+ =?utf-8?B?a3crY0NIVDBMdmttV00yQUwzSzBVWDRuTzBnWnJ2MVJJUWpac3E5djhseWlj?=
+ =?utf-8?B?cGd2MkZNdnlLRUMrQ1h5ZnV0Q1N1bnlHK2FrVFkvT0tEVTN0TXpkN2lWSmlj?=
+ =?utf-8?B?a2FRZitFYW0wemdwUTNaS0ppaFo3R0x2dy81b0g5UkJEMC9COVVyYkcrVlFF?=
+ =?utf-8?B?ZGhibml1ZUdpQUVYKzJHWjZIanFnZ1NUaENtOS9sL0NQODFHTEtieW1UWWt6?=
+ =?utf-8?B?a3FyVDJ1VkdrNnVpc244N3NPblkvbU4wcHJ5S1J4RCtGTTBqenJpTzVGcTJw?=
+ =?utf-8?B?ejJ4dHBZeC9KQ1ZOMkllN1pFSG1oKzFTK1BOUFZFUnNvdkFQNTlwZE9YQ0kw?=
+ =?utf-8?B?L3JzTndiSld5ZFJBUm1nSndqaG9sWk9NQlBZeUgyL2Jvak5wdElDNi9VdTla?=
+ =?utf-8?B?TU5SYkpOQjRlcktaT2dVbTErTzZQVWpOQWxlQjM2R0N5SHQ0eVpXTFh0eTdL?=
+ =?utf-8?B?VzAyYVcrMTROa1ZuZDdaOWJLYWNGeFYzZjBybUtHOFpNT3NrSVB2VGkzY1ZP?=
+ =?utf-8?B?ZGlJMi9CVEI3TDBYZHNISzVIczNnTXFxL2NPSWhPYVdXZElvQzR1MnZDczZ1?=
+ =?utf-8?B?d2VudDBBU3ZlZUIvc3pWZFJpNW94VVRMRDRLem1qOTJ4SnhnOThKMnM0ZE12?=
+ =?utf-8?B?cTFKdHQvT1JyVzkySmk0alllbUxKeHpoWk9XZGhiSmtoRjljSnowd1ptblUw?=
+ =?utf-8?Q?9+qw=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20230706023224.609324-1-lsahlber@redhat.com>
-In-Reply-To: <20230706023224.609324-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 5 Jul 2023 22:07:38 -0500
-Message-ID: <CAH2r5mtAXKOOUN6BfVD25SzAq6TXfeRt+9u19i5o+f6oSgfGrA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Add a laundromat thread for cached directories
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000043195f05ffc8d2a4"
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3815c676-8b9a-4503-925f-08db7dcf291c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 03:14:50.4263
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: L0mHHWxQNdGbhEaK0Ri7tVitTvSuEXZCKtMxdiFWcdtB2GUEKvn9LoH5q8c1XNSmVSonbB4NPWvn99JWeS/stA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6638
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000043195f05ffc8d2a4
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-updated to fix two checkpatch warnings (see attached) and tentatively
-merged into for-next pending review/testing
-
-
-On Wed, Jul 5, 2023 at 9:32=E2=80=AFPM Ronnie Sahlberg <lsahlber@redhat.com=
-> wrote:
->
-> and drop cached directories after 30 seconds
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/smb/client/cached_dir.c | 67 ++++++++++++++++++++++++++++++++++++++
->  fs/smb/client/cached_dir.h |  1 +
->  2 files changed, 68 insertions(+)
->
-> diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-> index bfc964b36c72..f567eea0a456 100644
-> --- a/fs/smb/client/cached_dir.c
-> +++ b/fs/smb/client/cached_dir.c
-> @@ -568,6 +568,53 @@ static void free_cached_dir(struct cached_fid *cfid)
->         kfree(cfid);
->  }
->
-> +static int
-> +cifs_cfids_laundromat_thread(void *p)
-> +{
-> +       struct cached_fids *cfids =3D p;
-> +       struct cached_fid *cfid, *q;
-> +       struct list_head entry;
-> +
-> +       while (!kthread_should_stop()) {
-> +               ssleep(1);
-> +               INIT_LIST_HEAD(&entry);
-> +               if (kthread_should_stop())
-> +                       return 0;
-> +               spin_lock(&cfids->cfid_list_lock);
-> +               list_for_each_entry_safe(cfid, q, &cfids->entries, entry)=
- {
-> +                       if (jiffies > cfid->time + HZ * 30) {
-> +                               list_del(&cfid->entry);
-> +                               list_add(&cfid->entry, &entry);
-> +                               cfids->num_entries--;
-> +                       }
-> +               }
-> +               spin_unlock(&cfids->cfid_list_lock);
-> +
-> +               list_for_each_entry_safe(cfid, q, &entry, entry) {
-> +                       cfid->on_list =3D false;
-> +                       list_del(&cfid->entry);
-> +                       /*
-> +                        * Cancel, and wait for the work to finish in
-> +                        * case we are racing with it.
-> +                        */
-> +                       cancel_work_sync(&cfid->lease_break);
-> +                       if (cfid->has_lease) {
-> +                               /*
-> +                                * We lease has not yet been cancelled fr=
-om
-> +                                * the server so we need to drop the refe=
-rence.
-> +                                */
-> +                               spin_lock(&cfids->cfid_list_lock);
-> +                               cfid->has_lease =3D false;
-> +                               spin_unlock(&cfids->cfid_list_lock);
-> +                               kref_put(&cfid->refcount, smb2_close_cach=
-ed_fid);
-> +                       }
-> +               }
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +
->  struct cached_fids *init_cached_dirs(void)
->  {
->         struct cached_fids *cfids;
-> @@ -577,6 +624,20 @@ struct cached_fids *init_cached_dirs(void)
->                 return NULL;
->         spin_lock_init(&cfids->cfid_list_lock);
->         INIT_LIST_HEAD(&cfids->entries);
-> +
-> +       /*
-> +        * since we're in a cifs function already, we know that
-> +        * this will succeed. No need for try_module_get().
-> +        */
-> +       __module_get(THIS_MODULE);
-> +       cfids->laundromat =3D kthread_run(cifs_cfids_laundromat_thread,
-> +                                 cfids, "cifsd-cfid-laundromat");
-> +       if (IS_ERR(cfids->laundromat)) {
-> +               cifs_dbg(VFS, "Failed to start cfids laundromat thread.\n=
-");
-> +               kfree(cfids);
-> +               module_put(THIS_MODULE);
-> +               return NULL;
-> +       }
->         return cfids;
->  }
->
-> @@ -589,6 +650,12 @@ void free_cached_dirs(struct cached_fids *cfids)
->         struct cached_fid *cfid, *q;
->         LIST_HEAD(entry);
->
-> +       if (cfids->laundromat) {
-> +               kthread_stop(cfids->laundromat);
-> +               cfids->laundromat =3D NULL;
-> +               module_put(THIS_MODULE);
-> +       }
-> +
->         spin_lock(&cfids->cfid_list_lock);
->         list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
->                 cfid->on_list =3D false;
-> diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-> index 2f4e764c9ca9..facc9b154d00 100644
-> --- a/fs/smb/client/cached_dir.h
-> +++ b/fs/smb/client/cached_dir.h
-> @@ -57,6 +57,7 @@ struct cached_fids {
->         spinlock_t cfid_list_lock;
->         int num_entries;
->         struct list_head entries;
-> +       struct task_struct *laundromat;
->  };
->
->  extern struct cached_fids *init_cached_dirs(void);
-> --
-> 2.35.3
->
-
-
---=20
-Thanks,
-
-Steve
-
---00000000000043195f05ffc8d2a4
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-Add-a-laundromat-thread-for-cached-directories.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-Add-a-laundromat-thread-for-cached-directories.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ljqkhm5f0>
-X-Attachment-Id: f_ljqkhm5f0
-
-RnJvbSBjYzllZDI2ODQ4ZjcyNDA2NWFiYTUwNjQ3NTQwZTVlYmU2ZTBkM2U5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
-CkRhdGU6IFRodSwgNiBKdWwgMjAyMyAxMjozMjoyNCArMTAwMApTdWJqZWN0OiBbUEFUQ0hdIGNp
-ZnM6IEFkZCBhIGxhdW5kcm9tYXQgdGhyZWFkIGZvciBjYWNoZWQgZGlyZWN0b3JpZXMKCmFuZCBk
-cm9wIGNhY2hlZCBkaXJlY3RvcmllcyBhZnRlciAzMCBzZWNvbmRzCgpTaWduZWQtb2ZmLWJ5OiBS
-b25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0ZXZl
-IEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9zbWIvY2xpZW50L2NhY2hl
-ZF9kaXIuYyB8IDY3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCiBmcy9z
-bWIvY2xpZW50L2NhY2hlZF9kaXIuaCB8ICAxICsKIDIgZmlsZXMgY2hhbmdlZCwgNjggaW5zZXJ0
-aW9ucygrKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2FjaGVkX2Rpci5jIGIvZnMvc21i
-L2NsaWVudC9jYWNoZWRfZGlyLmMKaW5kZXggYmZjOTY0YjM2YzcyLi5mNTY3ZWVhMGE0NTYgMTAw
-NjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY2FjaGVkX2Rpci5jCisrKyBiL2ZzL3NtYi9jbGllbnQv
-Y2FjaGVkX2Rpci5jCkBAIC01NjgsNiArNTY4LDUzIEBAIHN0YXRpYyB2b2lkIGZyZWVfY2FjaGVk
-X2RpcihzdHJ1Y3QgY2FjaGVkX2ZpZCAqY2ZpZCkKIAlrZnJlZShjZmlkKTsKIH0KIAorc3RhdGlj
-IGludAorY2lmc19jZmlkc19sYXVuZHJvbWF0X3RocmVhZCh2b2lkICpwKQoreworCXN0cnVjdCBj
-YWNoZWRfZmlkcyAqY2ZpZHMgPSBwOworCXN0cnVjdCBjYWNoZWRfZmlkICpjZmlkLCAqcTsKKwlz
-dHJ1Y3QgbGlzdF9oZWFkIGVudHJ5OworCisJd2hpbGUgKCFrdGhyZWFkX3Nob3VsZF9zdG9wKCkp
-IHsKKwkJc3NsZWVwKDEpOworCQlJTklUX0xJU1RfSEVBRCgmZW50cnkpOworCQlpZiAoa3RocmVh
-ZF9zaG91bGRfc3RvcCgpKQorCQkJcmV0dXJuIDA7CisJCXNwaW5fbG9jaygmY2ZpZHMtPmNmaWRf
-bGlzdF9sb2NrKTsKKwkJbGlzdF9mb3JfZWFjaF9lbnRyeV9zYWZlKGNmaWQsIHEsICZjZmlkcy0+
-ZW50cmllcywgZW50cnkpIHsKKwkJCWlmICh0aW1lX2FmdGVyKGppZmZpZXMsIGNmaWQtPnRpbWUg
-KyBIWiAqIDMwKSB7CisJCQkJbGlzdF9kZWwoJmNmaWQtPmVudHJ5KTsKKwkJCQlsaXN0X2FkZCgm
-Y2ZpZC0+ZW50cnksICZlbnRyeSk7CisJCQkJY2ZpZHMtPm51bV9lbnRyaWVzLS07CisJCQl9CisJ
-CX0KKwkJc3Bpbl91bmxvY2soJmNmaWRzLT5jZmlkX2xpc3RfbG9jayk7CisKKwkJbGlzdF9mb3Jf
-ZWFjaF9lbnRyeV9zYWZlKGNmaWQsIHEsICZlbnRyeSwgZW50cnkpIHsKKwkJCWNmaWQtPm9uX2xp
-c3QgPSBmYWxzZTsKKwkJCWxpc3RfZGVsKCZjZmlkLT5lbnRyeSk7CisJCQkvKgorCQkJICogQ2Fu
-Y2VsLCBhbmQgd2FpdCBmb3IgdGhlIHdvcmsgdG8gZmluaXNoIGluCisJCQkgKiBjYXNlIHdlIGFy
-ZSByYWNpbmcgd2l0aCBpdC4KKwkJCSAqLworCQkJY2FuY2VsX3dvcmtfc3luYygmY2ZpZC0+bGVh
-c2VfYnJlYWspOworCQkJaWYgKGNmaWQtPmhhc19sZWFzZSkgeworCQkJCS8qCisJCQkJICogV2Ug
-bGVhc2UgaGFzIG5vdCB5ZXQgYmVlbiBjYW5jZWxsZWQgZnJvbQorCQkJCSAqIHRoZSBzZXJ2ZXIg
-c28gd2UgbmVlZCB0byBkcm9wIHRoZSByZWZlcmVuY2UuCisJCQkJICovCisJCQkJc3Bpbl9sb2Nr
-KCZjZmlkcy0+Y2ZpZF9saXN0X2xvY2spOworCQkJCWNmaWQtPmhhc19sZWFzZSA9IGZhbHNlOwor
-CQkJCXNwaW5fdW5sb2NrKCZjZmlkcy0+Y2ZpZF9saXN0X2xvY2spOworCQkJCWtyZWZfcHV0KCZj
-ZmlkLT5yZWZjb3VudCwgc21iMl9jbG9zZV9jYWNoZWRfZmlkKTsKKwkJCX0KKwkJfQorCX0KKwor
-CXJldHVybiAwOworfQorCisKIHN0cnVjdCBjYWNoZWRfZmlkcyAqaW5pdF9jYWNoZWRfZGlycyh2
-b2lkKQogewogCXN0cnVjdCBjYWNoZWRfZmlkcyAqY2ZpZHM7CkBAIC01NzcsNiArNjI0LDIwIEBA
-IHN0cnVjdCBjYWNoZWRfZmlkcyAqaW5pdF9jYWNoZWRfZGlycyh2b2lkKQogCQlyZXR1cm4gTlVM
-TDsKIAlzcGluX2xvY2tfaW5pdCgmY2ZpZHMtPmNmaWRfbGlzdF9sb2NrKTsKIAlJTklUX0xJU1Rf
-SEVBRCgmY2ZpZHMtPmVudHJpZXMpOworCisJLyoKKwkgKiBzaW5jZSB3ZSdyZSBpbiBhIGNpZnMg
-ZnVuY3Rpb24gYWxyZWFkeSwgd2Uga25vdyB0aGF0CisJICogdGhpcyB3aWxsIHN1Y2NlZWQuIE5v
-IG5lZWQgZm9yIHRyeV9tb2R1bGVfZ2V0KCkuCisJICovCisJX19tb2R1bGVfZ2V0KFRISVNfTU9E
-VUxFKTsKKwljZmlkcy0+bGF1bmRyb21hdCA9IGt0aHJlYWRfcnVuKGNpZnNfY2ZpZHNfbGF1bmRy
-b21hdF90aHJlYWQsCisJCQkJICBjZmlkcywgImNpZnNkLWNmaWQtbGF1bmRyb21hdCIpOworCWlm
-IChJU19FUlIoY2ZpZHMtPmxhdW5kcm9tYXQpKSB7CisJCWNpZnNfZGJnKFZGUywgIkZhaWxlZCB0
-byBzdGFydCBjZmlkcyBsYXVuZHJvbWF0IHRocmVhZC5cbiIpOworCQlrZnJlZShjZmlkcyk7CisJ
-CW1vZHVsZV9wdXQoVEhJU19NT0RVTEUpOworCQlyZXR1cm4gTlVMTDsKKwl9CiAJcmV0dXJuIGNm
-aWRzOwogfQogCkBAIC01ODksNiArNjUwLDEyIEBAIHZvaWQgZnJlZV9jYWNoZWRfZGlycyhzdHJ1
-Y3QgY2FjaGVkX2ZpZHMgKmNmaWRzKQogCXN0cnVjdCBjYWNoZWRfZmlkICpjZmlkLCAqcTsKIAlM
-SVNUX0hFQUQoZW50cnkpOwogCisJaWYgKGNmaWRzLT5sYXVuZHJvbWF0KSB7CisJCWt0aHJlYWRf
-c3RvcChjZmlkcy0+bGF1bmRyb21hdCk7CisJCWNmaWRzLT5sYXVuZHJvbWF0ID0gTlVMTDsKKwkJ
-bW9kdWxlX3B1dChUSElTX01PRFVMRSk7CisJfQorCiAJc3Bpbl9sb2NrKCZjZmlkcy0+Y2ZpZF9s
-aXN0X2xvY2spOwogCWxpc3RfZm9yX2VhY2hfZW50cnlfc2FmZShjZmlkLCBxLCAmY2ZpZHMtPmVu
-dHJpZXMsIGVudHJ5KSB7CiAJCWNmaWQtPm9uX2xpc3QgPSBmYWxzZTsKZGlmZiAtLWdpdCBhL2Zz
-L3NtYi9jbGllbnQvY2FjaGVkX2Rpci5oIGIvZnMvc21iL2NsaWVudC9jYWNoZWRfZGlyLmgKaW5k
-ZXggMmY0ZTc2NGM5Y2E5Li5mYWNjOWIxNTRkMDAgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQv
-Y2FjaGVkX2Rpci5oCisrKyBiL2ZzL3NtYi9jbGllbnQvY2FjaGVkX2Rpci5oCkBAIC01Nyw2ICs1
-Nyw3IEBAIHN0cnVjdCBjYWNoZWRfZmlkcyB7CiAJc3BpbmxvY2tfdCBjZmlkX2xpc3RfbG9jazsK
-IAlpbnQgbnVtX2VudHJpZXM7CiAJc3RydWN0IGxpc3RfaGVhZCBlbnRyaWVzOworCXN0cnVjdCB0
-YXNrX3N0cnVjdCAqbGF1bmRyb21hdDsKIH07CiAKIGV4dGVybiBzdHJ1Y3QgY2FjaGVkX2ZpZHMg
-KmluaXRfY2FjaGVkX2RpcnModm9pZCk7Ci0tIAoyLjM0LjEKCg==
---00000000000043195f05ffc8d2a4--
+VGhhbmsgeW91LiBJIHdpbGwgTW9kaWZ5IGl0DQotLS0tLemCruS7tuWOn+S7ti0tLS0tDQrlj5Hk
+u7bkuro6IE1hcmt1cyBFbGZyaW5nIDxNYXJrdXMuRWxmcmluZ0B3ZWIuZGU+IA0K5Y+R6YCB5pe2
+6Ze0OiAyMDIz5bm0N+aciDbml6UgMjo1MQ0K5pS25Lu25Lq6OiDnjovmmI4t6L2v5Lu25bqV5bGC
+5oqA5pyv6YOoIDxtYWNoZWxAdml2by5jb20+OyBsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZzsg
+a2VybmVsLWphbml0b3JzQHZnZXIua2VybmVsLm9yZzsgTmFtamFlIEplb24gPGxpbmtpbmplb25A
+a2VybmVsLm9yZz47IFNlcmdleSBTZW5vemhhdHNreSA8c2Vub3poYXRza3lAY2hyb21pdW0ub3Jn
+PjsgU3RldmUgRnJlbmNoIDxzZnJlbmNoQHNhbWJhLm9yZz47IFRvbSBUYWxwZXkgPHRvbUB0YWxw
+ZXkuY29tPg0K5oqE6YCBOiBvcGVuc291cmNlLmtlcm5lbCA8b3BlbnNvdXJjZS5rZXJuZWxAdml2
+by5jb20+OyBMS01MIDxsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnPg0K5Li76aKYOiBSZTog
+W1BBVENIXSBmczogc21iOiBGaXggdW5zaWduZWQgZXhwcmVzc2lvbiBjb21wYXJlZCB3aXRoIHpl
+cm8gaW4ga3NtYmRfdmZzX3N0cmVhbV93cml0ZSgpDQoNCj4gVGhlIHJldHVybiB2YWx1ZSBvZiB0
+aGUga3NtYmRfdmZzX2dldGNhc2V4YXR0cigpIGlzIGxvbmcuDQoNClRoZSBmdW5jdGlvbiDigJxr
+c21iZF92ZnNfZ2V0Y2FzZXhhdHRy4oCdIGlzIGRlZmluZWQgd2l0aCB0aGUgcmV0dXJuIHR5cGUg
+4oCcbG9uZ+KAnS4NCg0KDQo+IEhvd2V2ZXIsIHRoZSByZXR1cm4gdmFsdWUgaXMgYmVpbmcgYXNz
+aWduZWQgdG8gYW4gdW5zaWduZWYgbG9uZyANCj4gdmFyaWFibGUgJ3ZfbGVuJyxzbyBtYWtpbmcg
+J3ZfbGVuJyB0byBsb25nLiDigKYNCg0KUGxlYXNlIGF2b2lkIGZ1cnRoZXIgdHlwb3MgZm9yIGFu
+IGltcHJvdmVkIGNoYW5nZSBkZXNjcmlwdGlvbi4NCg0KUmVnYXJkcywNCk1hcmt1cw0K
