@@ -2,102 +2,211 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 954C0EB64D9
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Jul 2023 16:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93201EB64DA
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Jul 2023 16:46:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjGGQRr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 Jul 2023 12:17:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49766 "EHLO
+        id S232308AbjGGQqs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 Jul 2023 12:46:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbjGGQRq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Jul 2023 12:17:46 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2C11FF6
-        for <linux-cifs@vger.kernel.org>; Fri,  7 Jul 2023 09:17:45 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b700e85950so31784361fa.3
-        for <linux-cifs@vger.kernel.org>; Fri, 07 Jul 2023 09:17:45 -0700 (PDT)
+        with ESMTP id S229540AbjGGQqr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Jul 2023 12:46:47 -0400
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F353F1FEF;
+        Fri,  7 Jul 2023 09:46:45 -0700 (PDT)
+Received: by mail-vk1-xa32.google.com with SMTP id 71dfb90a1353d-47e3f56ec02so845155e0c.2;
+        Fri, 07 Jul 2023 09:46:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688746663; x=1691338663;
+        d=gmail.com; s=20221208; t=1688748405; x=1691340405;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=b+j+PgDSJr6cQXOyx+DKqTeq3XXXtDMWv5YNVRgg2OY=;
-        b=snnm7xcDQSTVOw04hErQXdsyqnVYIRqk1LFPXdcQ3lcKJzvuuGrM5DtFXpi9WyaIqp
-         VXC5SY7RKzCjgVvuxF9na0wQrVOVSGvm6kFJfnHoTIVH3hE0M15ydhjymn55Q2MuiPZg
-         KlCq8J4nIljZVQPOzqV/S/ysOKKcknXJ0V3SOxQnT9dLVSNrguEsqEdCfRh7j0CyMD0g
-         RihNTJFI+v3Hp0j3vGndQ5hywWow2WoKepAdmskfMPPQi5eHdE6xHJR9BfHoWB65NTx+
-         ZBdtesLF6MFe8BLURTO6D1NYLB6liqcaPBHAF2CNnZzdfg77Slny6esW91jaRRErZ/ux
-         mjow==
+        bh=Z/ReIviycKOpXSvVBgcqd1EotrbzaoMQKO3qVU7I/G8=;
+        b=rdIoGdwP5Ghffl0SSNU+UexYiw7dQQTY/KbUSpraUXheaqWYQIzf9VS2G54zkxoXeK
+         Zs8WYI2qt4N0BqTuDA21gVijWUiGiy3OrYR8lv3DKyrgrFEFY/VwOEHPHcniApVN32A0
+         PyNQdCHlm8WB6hLN7Grylpw6RdoDNjUV6Py9A1+F4jya88T8Iq9Ka7vxdq5yT5c1LaGv
+         mhT4LjqqufdVQx6CIlQHGhtHR9EIUodVt14QLVcTA2E3j7ZHuNoD2AWGoyZkb9l6fTKO
+         8M1Q1mr7rQzV9JK8pww9IzJ4dCo0vnfyDZPwzvga/a4qwpdfyRbTwoQs0RfSeuNrnbjJ
+         agjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688746663; x=1691338663;
+        d=1e100.net; s=20221208; t=1688748405; x=1691340405;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=b+j+PgDSJr6cQXOyx+DKqTeq3XXXtDMWv5YNVRgg2OY=;
-        b=bQ8IJDEnV9yKY/kt5EMaXaj2LW13Xy0qFPYngAOVPjtSPDe2blOKMjSh2H1ofuDo+H
-         39V0U66Uia+UbWW5+b7uIa+GfUB68Rycr88XaXZbJkvc3LGxi5sb95yDPXYWOUE2f1su
-         mpox4oci/3N1G6e/VDnHqsMoPpMEIzFawji3GAyrYQKemLc7Q7MUWblEZqHwTWo5oIXF
-         4H0xJ6eiuRABIJAEl+uaiUtveIL6FpmZHmJ01oxCYYmw14jRQe/pjxXmY2CSiGLBPRrw
-         wjwFDbbLAtMNYebU3AIsLDp4+L36P+ospO9Yd92jOzXxLpKuJhuc/94utAEl2vLTam6f
-         rnCg==
-X-Gm-Message-State: ABy/qLZHfhYMS33nmaaTHzPu0Zl1w9vkmhvaIXNf2FiWWfW6wimrNz91
-        rWmiKaIevda6gV5cJHEXkd5UD5LdCuBCN/KR1fs=
-X-Google-Smtp-Source: APBJJlFf1b/6kTtBgN6s7hrDP8qvH3S6Vy2pX/76mi0lBtHikM5LkKxD3c2f9qE9LEIStU/94YM1JlUyvXFAsKvjaVA=
-X-Received: by 2002:a2e:9cc2:0:b0:2b6:d7d1:95bf with SMTP id
- g2-20020a2e9cc2000000b002b6d7d195bfmr4088942ljj.9.1688746663043; Fri, 07 Jul
- 2023 09:17:43 -0700 (PDT)
+        bh=Z/ReIviycKOpXSvVBgcqd1EotrbzaoMQKO3qVU7I/G8=;
+        b=JRkZb6423qO91aA8dIBYdKHE71w7M3HbP+jZIVW3f6g+mL77jtgRfiptqGZqo3aXz1
+         yce2FKoNDTGGV9dd4LJOpZjoQHneBtc8UIhO9BDnejf6VZ/E8ikQqXIUqB9GxktseSUd
+         tDateM2s6f77zGsusGZzBkbFPeAwMaHAy5r7moBhkIqSTvbd8US9g05YIlTp9q8KuPIf
+         KtL7V3YIOL+89zXAK3Ajony4WGITwfdz3qsAwf4J+k88ShS/1+Xp6XShjlWEuvjiGePI
+         8S1C8l4Qc4N52yvObIha43gL3QBv4UCZo0n8K5GzjSZVd69tk5cGU4+FLHazitc++/9Y
+         Hmfw==
+X-Gm-Message-State: ABy/qLZO53MtVqIBoCEO79B/VrPPELLzQmwmO4hA72PrFMc1nzzGft7I
+        7laA2TXAezY6BNDGjm4nnZX+kU3bsOPziTl/b6HAjeX2y26fzg==
+X-Google-Smtp-Source: APBJJlGKmNTgweK2kwJWs4/wFqNBmjg4Djz4jCj6ZqMtOK2vtD8XozEN8rFv3LAaQCX0JTqMTCJbsPKbO24byO+QNwg=
+X-Received: by 2002:a1f:43c4:0:b0:47e:91fc:d2b8 with SMTP id
+ q187-20020a1f43c4000000b0047e91fcd2b8mr3487027vka.2.1688748404847; Fri, 07
+ Jul 2023 09:46:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230706023224.609324-1-lsahlber@redhat.com> <CAH2r5mtAXKOOUN6BfVD25SzAq6TXfeRt+9u19i5o+f6oSgfGrA@mail.gmail.com>
- <CANT5p=oMg3wx4qPCV9EEtmP7FCLG43iqO47iFwimCNS6E=QnFA@mail.gmail.com>
- <CAN05THSjxZ=_L-Ho8tffz9xRfc8R8kCWf-_GtYUe=yFNEC2bhw@mail.gmail.com> <CANT5p=qxZjxpqx49BO7G-8=se2_5gEPyLOi_W-sUDm0p7VhbEQ@mail.gmail.com>
-In-Reply-To: <CANT5p=qxZjxpqx49BO7G-8=se2_5gEPyLOi_W-sUDm0p7VhbEQ@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 7 Jul 2023 11:17:31 -0500
-Message-ID: <CAH2r5mt5gt8E1riGaoPVs1o40ssFDpuv2CAL-wMz8ucGBJMamg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Add a laundromat thread for cached directories
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+References: <20230628104852.3391651-1-dhowells@redhat.com> <20230628104852.3391651-3-dhowells@redhat.com>
+ <ZKg/J3OG3kQ9ynSO@fedora>
+In-Reply-To: <ZKg/J3OG3kQ9ynSO@fedora>
+From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
+Date:   Sat, 8 Jul 2023 01:46:33 +0900
+Message-ID: <CAB=+i9Qbi7+o90Cd_ecd1TeaAYnWPcO-gNp7kzc95Pxecy0XTw@mail.gmail.com>
+Subject: Re: [BUG mm-unstable] BUG: KASAN: use-after-free in shrink_folio_list+0x9f4/0x1ae0
+To:     David Howells <dhowells@redhat.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, linux-erofs@lists.ozlabs.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        linux-fsdevel@vger.kernel.org,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Dave Wysochanski <dwysocha@redhat.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Ilya Dryomov <idryomov@gmail.com>, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Jul 7, 2023 at 1:37=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail.c=
-om> wrote:
+On Sat, Jul 8, 2023 at 1:39=E2=80=AFAM Hyeonggon Yoo <42.hyeyoo@gmail.com> =
+wrote:
 >
-> On Fri, Jul 7, 2023 at 11:20=E2=80=AFAM ronnie sahlberg
-> <ronniesahlberg@gmail.com> wrote:
+> On Wed, Jun 28, 2023 at 11:48:52AM +0100, David Howells wrote:
+> > Fscache has an optimisation by which reads from the cache are skipped u=
+ntil
+> > we know that (a) there's data there to be read and (b) that data isn't
+> > entirely covered by pages resident in the netfs pagecache.  This is don=
+e
+> > with two flags manipulated by fscache_note_page_release():
 > >
-> > We can only cache a limited amount of entries.
-> > We need to force entries to be dropped from the cache at regular
-> > intervals to make room for potential new entries/different
-> > directories.
+> >       if (...
+> >           test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&
+> >           test_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags))
+> >               clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags)=
+;
 > >
-> > Access patterns change over time and what is the "hot" directory will
-> > also change over time so we need to drop entries to make sure that
-> > when some directory becomes hot there will be decent chance that it
-> > will be able to become cached.
+> > where the NO_DATA_TO_READ flag causes cachefiles_prepare_read() to indi=
+cate
+> > that netfslib should download from the server or clear the page instead=
+.
 > >
-> > If a directory becomes "cold" we no longer want it to take up entries
-> > in our cache.
+> > The fscache_note_page_release() function is intended to be called from
+> > ->releasepage() - but that only gets called if PG_private or PG_private=
+_2
+> > is set - and currently the former is at the discretion of the network
+> > filesystem and the latter is only set whilst a page is being written to=
+ the
+> > cache, so sometimes we miss clearing the optimisation.
 > >
+> > Fix this by following Willy's suggestion[1] and adding an address_space
+> > flag, AS_RELEASE_ALWAYS, that causes filemap_release_folio() to always =
+call
+> > ->release_folio() if it's set, even if PG_private or PG_private_2 aren'=
+t
+> > set.
+> >
+> > Note that this would require folio_test_private() and page_has_private(=
+) to
+> > become more complicated.  To avoid that, in the places[*] where these a=
+re
+> > used to conditionalise calls to filemap_release_folio() and
+> > try_to_release_page(), the tests are removed the those functions just
+> > jumped to unconditionally and the test is performed there.
+> >
+> > [*] There are some exceptions in vmscan.c where the check guards more t=
+han
+> > just a call to the releaser.  I've added a function, folio_needs_releas=
+e()
+> > to wrap all the checks for that.
+> >
+> > AS_RELEASE_ALWAYS should be set if a non-NULL cookie is obtained from
+> > fscache and cleared in ->evict_inode() before truncate_inode_pages_fina=
+l()
+> > is called.
+> >
+> > Additionally, the FSCACHE_COOKIE_NO_DATA_TO_READ flag needs to be clear=
+ed
+> > and the optimisation cancelled if a cachefiles object already contains =
+data
+> > when we open it.
+> >
+> > Fixes: 1f67e6d0b188 ("fscache: Provide a function to note the release o=
+f a page")
+> > Fixes: 047487c947e8 ("cachefiles: Implement the I/O routines")
+> > Reported-by: Rohith Surabattula <rohiths.msft@gmail.com>
+> > Suggested-by: Matthew Wilcox <willy@infradead.org>
+> > Signed-off-by: David Howells <dhowells@redhat.com>
 >
-> Makes sense.
+> Hi David,
 >
-> However, the value of MAX_CACHED_FIDS to 16 seems very restrictive.
-> And as Steve suggested, 30s expiry seems very aggressive.
-> I think we can increase both.
+> I was bisecting a use-after-free BUG on the latest mm-unstable,
+> where HEAD is 347e208de0e4 ("rmap: pass the folio to __page_check_anon_rm=
+ap()").
+>
+> According to my bisection, this is the first bad commit.
+> Use-After-Free is triggered on reclamation path when swap is enabled.
 
-At least for the short term we can make this configurable (which will
-make it easier to test the best default values in the long run) e.g.
-via mount parm.   Will make it much easier to experiment to optimize
-the value
+This was originally occurred during kernel compilation but
+can easily be reproduced via:
 
+stress-ng --bigheap $(nproc)
 
---=20
-Thanks,
-
-Steve
+> (and couldn't trigger without swap enabled)
+>
+> the config, KASAN splat, bisect log are attached.
+> hope this isn't too late :(
+>
+> > cc: Matthew Wilcox <willy@infradead.org>
+> > cc: Linus Torvalds <torvalds@linux-foundation.org>
+> > cc: Steve French <sfrench@samba.org>
+> > cc: Shyam Prasad N <nspmangalore@gmail.com>
+> > cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> > cc: Dave Wysochanski <dwysocha@redhat.com>
+> > cc: Dominique Martinet <asmadeus@codewreck.org>
+> > cc: Ilya Dryomov <idryomov@gmail.com>
+> > cc: linux-cachefs@redhat.com
+> > cc: linux-cifs@vger.kernel.org
+> > cc: linux-afs@lists.infradead.org
+> > cc: v9fs-developer@lists.sourceforge.net
+> > cc: ceph-devel@vger.kernel.org
+> > cc: linux-nfs@vger.kernel.org
+> > cc: linux-fsdevel@vger.kernel.org
+> > cc: linux-mm@kvack.org
+> > ---
+> >
+> > Notes:
+> >     ver #7)
+> >      - Make NFS set AS_RELEASE_ALWAYS.
+> >
+> >     ver #4)
+> >      - Split out merging of folio_has_private()/filemap_release_folio()=
+ call
+> >        pairs into a preceding patch.
+> >      - Don't need to clear AS_RELEASE_ALWAYS in ->evict_inode().
+> >
+> >     ver #3)
+> >      - Fixed mapping_clear_release_always() to use clear_bit() not set_=
+bit().
+> >      - Moved a '&&' to the correct line.
+> >
+> >     ver #2)
+> >      - Rewrote entirely according to Willy's suggestion[1].
+> >
+> >  fs/9p/cache.c           |  2 ++
+> >  fs/afs/internal.h       |  2 ++
+> >  fs/cachefiles/namei.c   |  2 ++
+> >  fs/ceph/cache.c         |  2 ++
+> >  fs/nfs/fscache.c        |  3 +++
+> >  fs/smb/client/fscache.c |  2 ++
+> >  include/linux/pagemap.h | 16 ++++++++++++++++
+> >  mm/internal.h           |  5 ++++-
+> >  8 files changed, 33 insertions(+), 1 deletion(-)
