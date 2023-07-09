@@ -2,84 +2,106 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE20EB64DA
-	for <linux-cifs@archiver.kernel.org>; Sun,  9 Jul 2023 00:40:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDDA5EB64DC
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 Jul 2023 04:39:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229490AbjGIAk6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 8 Jul 2023 20:40:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53874 "EHLO
+        id S230006AbjGIEjZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 9 Jul 2023 00:39:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjGIAk5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 8 Jul 2023 20:40:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CE78198;
-        Sat,  8 Jul 2023 17:40:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A580960B50;
-        Sun,  9 Jul 2023 00:40:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B875C433C7;
-        Sun,  9 Jul 2023 00:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688863255;
-        bh=KWpxpNQo+2byrd2KGGBbuZGpodW4wrvCveqWOHgsQt4=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=sMLZXLXe3e4RgENUHt0Ecwo3NgZYQ0PGe82lva4Y/l62//gRbZJmvsOAFZflvAOCZ
-         yvfFvjwcvGgbt9u8NJTTTrYfGtKjt0CRm3KhINOEcSr48eRN+Yj1pXUWnpv8U+MSBT
-         pSNSuIhWorvAoG+aDQ8q3o8nxRVzQUJcqgc1YKpvFyh5Jn7bi6x/yCi2R1tkt6XxoL
-         zS3wqngnQy5r0bWGlCEzaHjTw8vRW3Y4plQ6SklrEp3K7aEVN227UTgNwhuj6XRta0
-         Q4nELNC+BqN/nYynXNfH11Q1Zck0W0FoLOCa5yKUP4EWUEDO2aknhC8lkj8n0RGm8e
-         WRRsvKl6m2A9Q==
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6b91e21365aso1009666a34.1;
-        Sat, 08 Jul 2023 17:40:54 -0700 (PDT)
-X-Gm-Message-State: ABy/qLYsjQS4PoCvsYCnbWJijsCscHdlBITVhAGC42VBXicDD66ebO+F
-        Y0E/cIYW1obUZT18i5p6sWAOKsJKjwVP+VKr6bs=
-X-Google-Smtp-Source: APBJJlGlo4zJHRJACYghPZr+CipHbVKjMI3FQTPJG0qd/b3Q8AsURiFe3bND7qhgCuH5lkTNBNWcI33VbGo+xN03yX0=
-X-Received: by 2002:a05:6808:1490:b0:3a3:7eb8:bbb with SMTP id
- e16-20020a056808149000b003a37eb80bbbmr8435569oiw.47.1688863254118; Sat, 08
- Jul 2023 17:40:54 -0700 (PDT)
+        with ESMTP id S229777AbjGIEjY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Jul 2023 00:39:24 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 820A5B6;
+        Sat,  8 Jul 2023 21:39:23 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4fba86f069bso5154046e87.3;
+        Sat, 08 Jul 2023 21:39:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688877562; x=1691469562;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wKe5r1gQ6s1Ey9/fn+Twfv7UiGM4dBpxhjxuitBrABM=;
+        b=CYY8hWw3F+AjKemNEUbJzoooZCZvy5OR9kdGSeTiaobLNuusIyEkL7S0081BbeMnib
+         0b6bQMBqpw9I/mtHG2Okw9YRVvRYRQ2QLDVz947Kh5Nks35vWo/6Cx85RA5JyqoxaEny
+         sVw+q0h/ZfTcs7TJ/0O0Kb3T2YwJuYkhWfz4ZSdg6A8oVJ6dVX1Z/UZvz3OPqP9+ek64
+         ZhoUfj1+HXC+aSorm5kOXDCBA2oyH2XsAyaTmFYh4PveqagIK7sz5lnjTgrdpQXX7d2/
+         eNhYZqd84wkZSKiife5j2RJ8fcSnAv57fl4Qk1muCneD3zsD+35ZKYEiLraiaPGMik1W
+         xvOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688877562; x=1691469562;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wKe5r1gQ6s1Ey9/fn+Twfv7UiGM4dBpxhjxuitBrABM=;
+        b=SZvuPtmuv6mvHQpY7o8DtLZluh9s3KeAstsAzqP9Pr1aJ1air0YOq8BFpc3ogV46Sw
+         oK5JvDPLAHcxTFccwKQ0ZHN5tHpd9PcnERDUk36G00kdOwUNrttkDWkFgtBu7UsONsjt
+         B0gK6jSys8/Wd8RT1m40tEXAIZ+HMMClwSJ4wwLq+q5MPDZZ1BfbhccVC3GyoOUEE+PM
+         BZiOnzghw2eF+ah8rPySCIrxV3Nj4X39J4Hxm7SRlwPIsu2JAemZEiBglkpyugBFOVjy
+         a9FTkvP+Lhmdw2kl0yl/8nskUqzE4oFkq0zFiRJI2IbS/AlOA7rKMq9xFLlQlBK8eizG
+         IUfQ==
+X-Gm-Message-State: ABy/qLYSWDuqO04KNS8JiaOsbq9xjH2OtLtvZoLS2weaedVwUJZWbH4q
+        0dDAvEWblD0Q0HtofIzFSss4OJLRYuZt2H+16cKJlu3KqxY=
+X-Google-Smtp-Source: APBJJlFVFpsoJvbQX1IbloX7CIMWuRW6aa4+6zIu2+kNh/iMPVwASFCofJexSC58earMPlmkTIoHUB5vp96bESes1/M=
+X-Received: by 2002:a05:6512:3157:b0:4f8:7617:6445 with SMTP id
+ s23-20020a056512315700b004f876176445mr6577459lfi.48.1688877561411; Sat, 08
+ Jul 2023 21:39:21 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:ac9:7814:0:b0:4e8:f6ff:2aab with HTTP; Sat, 8 Jul 2023
- 17:40:53 -0700 (PDT)
-In-Reply-To: <d5fbf1cc-9b79-5fbb-a109-87679caffcc4@talpey.com>
-References: <20230704074057.1162-1-machel@vivo.com> <CAKYAXd85gpb2xzPEm8BJV6gsff3p-8b4Aj_rOaEvU=+n43SgBQ@mail.gmail.com>
- <d5fbf1cc-9b79-5fbb-a109-87679caffcc4@talpey.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sun, 9 Jul 2023 09:40:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_0NyHYEKvsh5RSLQMsLFBRddaSJzGFBi9veh3qoCp4tQ@mail.gmail.com>
-Message-ID: <CAKYAXd_0NyHYEKvsh5RSLQMsLFBRddaSJzGFBi9veh3qoCp4tQ@mail.gmail.com>
-Subject: Re: [PATCH v1] fs:smb:Fix unsigned expression compared with zero
-To:     Tom Talpey <tom@talpey.com>
-Cc:     Wang Ming <machel@vivo.com>, Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        opensource.kernel@vivo.com
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 8 Jul 2023 23:39:10 -0500
+Message-ID: <CAH2r5mv9U44-ypmJam9KTWNky=8+TOPsv=cdWj3sRd6DPjhU1Q@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-07-04 22:58 GMT+09:00, Tom Talpey <tom@talpey.com>:
-> On 7/4/2023 4:58 AM, Namjae Jeon wrote:
->> 2023-07-04 16:40 GMT+09:00, Wang Ming <machel@vivo.com>:
->>> The return value of the ksmbd_vfs_getcasexattr() is signed.
->>> However, the return value is being assigned to an unsigned
->>> variable and subsequently recasted, causing warnings. Use
->>> a signed type.
->>>
->>> Signed-off-by: Wang Ming <machel@vivo.com>
->> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
->>
->> Thanks for your patch!
->>
->
-> FYI, this is missing my previous Acked-by. The updated changelog
-> otherwise looks good.
-Applied it with your acked-by tag to #ksmbd-for-next-next.
+Please pull the following changes since commit
+a507db1d8fdc39802415e4d2ef6d1aecd67927fa:
 
-Thanks!
->
-> Tom.
->
+  Merge tag '6.5-rc-smb3-client-fixes-part1' of
+git://git.samba.org/sfrench/cifs-2.6 (2023-06-30 22:00:28 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc-smb3-client-fixes-part2
+
+for you to fetch changes up to d14de8067e3f9653cdef5a094176d00f3260ab20:
+
+  cifs: Add a laundromat thread for cached directories (2023-07-05
+22:36:07 -0500)
+
+----------------------------------------------------------------
+3 smb3 client fixes;
+- fix potential use after free in unmount
+- minor cleanup fix
+- add worker to cleanup stale directory leases
+
+Not included in this P/R is the follow on patch to allow this timeout
+to be configurable at mount (is being tested), as are a pair of fixes
+for some cases where stale metadata can be incorrectly used, and a fix
+for O_DIRECT is also not included (still being tested).
+
+----------------------------------------------------------------
+Colin Ian King (1):
+      smb: client: remove redundant pointer 'server'
+
+Ronnie Sahlberg (1):
+      cifs: Add a laundromat thread for cached directories
+
+Winston Wen (1):
+      cifs: fix session state transition to avoid use-after-free issue
+
+ fs/smb/client/cached_dir.c | 67
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/smb/client/cached_dir.h |  1 +
+ fs/smb/client/connect.c    |  7 ++++---
+ fs/smb/client/dfs.c        |  2 --
+ 4 files changed, 72 insertions(+), 5 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
