@@ -2,69 +2,105 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A32C0015E
-	for <linux-cifs@archiver.kernel.org>; Sun,  9 Jul 2023 17:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEEFBEB64DC
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jul 2023 06:20:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231513AbjGIRqh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 9 Jul 2023 13:46:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44452 "EHLO
+        id S230426AbjGJGUd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jul 2023 02:20:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231607AbjGIRqf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Jul 2023 13:46:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF69106;
-        Sun,  9 Jul 2023 10:46:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D195660BC1;
-        Sun,  9 Jul 2023 17:46:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 46737C433C8;
-        Sun,  9 Jul 2023 17:46:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688924794;
-        bh=3h6dWCxcJWkqRwR6bq2lRWtikw9ob6vntS5yLLwCNpg=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=q5pMMbgOdwSafAAOfyHZoJz5mvn/GiSXpZBx3wEc5Sy/qVoXKCDfHa9PVuHrsVVp3
-         KY5lnNUxGYoBjWK9kKEGih98QhnGuGfZ/vmNiCuyrPg3BG7+ccrUPEu4PbUaxI+SIq
-         7iQX+j00YtjSbO+sAeYBONtwSCi/ISOlJ2aPbJsCZb8kSftKYXnBfVDR2lLU3U+Md3
-         72sZkfUUqT0ktCjrpb30YZv7D7YiCC5XnLBYX+ETYMv68ptEswf0s4YuLgakfUAy7S
-         226vUL5S63TMjjOGI2iURqqYKCQnU9wYvROVr2b+ja+xTwNbtGSbcA5SdtoI1IKJba
-         CTKYIz4TNAQFg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3629BE537FC;
-        Sun,  9 Jul 2023 17:46:34 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mv9U44-ypmJam9KTWNky=8+TOPsv=cdWj3sRd6DPjhU1Q@mail.gmail.com>
-References: <CAH2r5mv9U44-ypmJam9KTWNky=8+TOPsv=cdWj3sRd6DPjhU1Q@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mv9U44-ypmJam9KTWNky=8+TOPsv=cdWj3sRd6DPjhU1Q@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc-smb3-client-fixes-part2
-X-PR-Tracked-Commit-Id: d14de8067e3f9653cdef5a094176d00f3260ab20
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 4770353b660abc8b1a5d2afc233b6061d48e7d80
-Message-Id: <168892479421.9789.16886483160589339456.pr-tracker-bot@kernel.org>
-Date:   Sun, 09 Jul 2023 17:46:34 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        with ESMTP id S229522AbjGJGUb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jul 2023 02:20:31 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B163A115
+        for <linux-cifs@vger.kernel.org>; Sun,  9 Jul 2023 23:20:26 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b6a084a34cso60175101fa.1
+        for <linux-cifs@vger.kernel.org>; Sun, 09 Jul 2023 23:20:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688970025; x=1691562025;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jSkGO4JyGJZzGGM8QkNidvK+JmO6An3PBFa5/7UJLBs=;
+        b=GM/q6ca5qI6nEvQTDZnU6Eb0GCWwN4xdtAMRd1NLO5w4nNouimfwFlcfeBIk9PJxN5
+         YDNHM2doqly+WpFe1ytBrOxXZCLWrzFfS6TDJ33yMZUQ9xL/RjLp0mpP+ZMVdOqQ7EXl
+         Qs5C++Y3cJ38XlR56Hp1GJZ8hVCEg/uMhXYwjPtD0l5GYMpEWLmCQj0FS+Q6UM9385eZ
+         9395+POsP5D/ZjDXH3rGO7BSYqxEmBGGIijKx6kUcZly5z/LisHzgxkyKG0P1iw2N/WF
+         MZCfq4ayqplwpV4PltPJ/iX0dIe+aBLQ/uqhD2sGlAvX8bYk3bdUzEvJPMRUp4uo5rt+
+         xWLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688970025; x=1691562025;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jSkGO4JyGJZzGGM8QkNidvK+JmO6An3PBFa5/7UJLBs=;
+        b=kN+OmProH1oWsC+CmWZLFDVDhRj3atmo7JrHqy6JxBcBUh2lRStPPC0jneZ6s7kR1D
+         4ho4OswXwvRC8aee8OpZLgwjT0h+ES6WSziyuvlyXTNKPk2yjy5nI5+CZ6HG/hx7/z0F
+         cEkF3AqAl/GzqOd6voTz9uLKCF+Ugpe3Erh+vNdCQhwLE+NhjwIdnbckl+4mXJL91A7J
+         EcUlddOFs6LtnIodCqOjRXqR8Bud/ftaiQpqr6DKXTEfx/VrvVOiyi2eInsB/GpJm5hh
+         wpik7wB4KGSpzehnMNiklgLPC89HMQTzixluWt86FYSCilFoLdA+pjPxHklmTEwwEB+w
+         Ms7g==
+X-Gm-Message-State: ABy/qLa3mR273LhRV0IfJ/2VJGlwGHlRK6F6MR/KVouhYJ+aXfRrXw3Y
+        3Ka8+QVyLTPbtQr3q0/t/BCk10MCxKPGlHQYYEA=
+X-Google-Smtp-Source: APBJJlHHxeRp5SRwPzQWE9ZIOIbt0dHikT25gT8TXsEsjKEuIoh7nbgB5uB7Yo78XkHh+RE8uvEHh1vRz/KfbFVKqmc=
+X-Received: by 2002:a2e:800f:0:b0:2b6:d8d4:f871 with SMTP id
+ j15-20020a2e800f000000b002b6d8d4f871mr8309654ljg.40.1688970024590; Sun, 09
+ Jul 2023 23:20:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230707152901.503213-1-bharathsm@microsoft.com>
+In-Reply-To: <20230707152901.503213-1-bharathsm@microsoft.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Mon, 10 Jul 2023 11:50:13 +0530
+Message-ID: <CANT5p=qh1UYS5MjkdxWaMa_yNVBAsuWKb_6SDc0-=5AJ6a11QQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: if deferred close is disabled then close files immediately
+To:     Bharath SM <bharathsm.hsk@gmail.com>
+Cc:     sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
+        sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
+        bharathsm@microsoft.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 8 Jul 2023 23:39:10 -0500:
+On Fri, Jul 7, 2023 at 9:00=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.com>=
+ wrote:
+>
+> If defer close timeout value is set to 0, then there is no
+> need to include files in the deferred close list and utilize
+> the delayed worker for closing. Instead, we can close them
+> immediately.
+>
+> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+> ---
+>  fs/smb/client/file.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> index df88b8c04d03..5a58d438e044 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -1080,8 +1080,8 @@ int cifs_close(struct inode *inode, struct file *fi=
+le)
+>                 cfile =3D file->private_data;
+>                 file->private_data =3D NULL;
+>                 dclose =3D kmalloc(sizeof(struct cifs_deferred_close), GF=
+P_KERNEL);
+> -               if ((cinode->oplock =3D=3D CIFS_CACHE_RHW_FLG) &&
+> -                   cinode->lease_granted &&
+> +               if ((cifs_sb->ctx->closetimeo && cinode->oplock =3D=3D CI=
+FS_CACHE_RHW_FLG)
+> +                   && cinode->lease_granted &&
+>                     !test_bit(CIFS_INO_CLOSE_ON_LOCK, &cinode->flags) &&
+>                     dclose) {
+>                         if (test_and_clear_bit(CIFS_INO_MODIFIED_ATTR, &c=
+inode->flags)) {
+> --
+> 2.34.1
+>
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc-smb3-client-fixes-part2
+Looks good to me. And should be CC stable.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/4770353b660abc8b1a5d2afc233b6061d48e7d80
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--=20
+Regards,
+Shyam
