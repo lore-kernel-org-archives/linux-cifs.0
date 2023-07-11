@@ -2,149 +2,125 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 491CAEB64DC
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jul 2023 17:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F11C7C0015E
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jul 2023 23:11:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229921AbjGKRPX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 Jul 2023 13:15:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60078 "EHLO
+        id S230255AbjGKXLn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Jul 2023 19:11:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230091AbjGKRPW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Jul 2023 13:15:22 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74FF3A1
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Jul 2023 10:15:21 -0700 (PDT)
-From:   Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1689095719;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=iu40+Tzb3GvZHvjyMEogoDnfTThFzvXVk6B1eRx6Zrg=;
-        b=lnmOoEBp4HyghkXxgkFtZoaUzoCgyrlyHNbATIBIz+oXh3MdVAsDFjgz13AP+HEWoPh0j8
-        s2t8xqkCk1mk+SVRZc4VtVb8/xiv6qL89BuA0I+ILWyS6CDF03sRznKUVexYlhflp/c+UN
-        47P2vQsnfX7Wm/jk0WdZkG38QP3BJFHRAQJCSkjiseEZjn+bfCfE+NPLP7U236hQxdr9mm
-        LCmjuV5/hK+aKwB8kTsJG/a+WfOD0PmW2rLvYQTCKKAamc8zSMVMMrqpz68AYmaEK00nNA
-        1SSO/4Q5bBpk94Cs+BVkgNdBHtZotoAADgT0R7Y8IDWfWTjUHqT6PoScubXWkg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1689095719;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=iu40+Tzb3GvZHvjyMEogoDnfTThFzvXVk6B1eRx6Zrg=;
-        b=WQEFZBeFG64DTAwuitM32I6cL6GceWD7AQpbv0cznCKXm0oo2rdN0TQPOd0EJh1KqQhtkd
-        3ROWJF7PZVob9L6oAlJA/IeLgWCgVFRMU+1+T/vsNY4X/xq1n1cZB0jyQYIlJmPm3c3H2K
-        +RjVpzC2k9a7wxCaYygTJYIGBHtY9RtyD+1aGkELO7p8A6OD8iL7XZxYE9Kl+rk0zy+N0x
-        p4sG4cO6jXb/PcNUM0e7eTEwfZg4rCvPaGTtESNsVIWCpvMc3wFREfmEyMKPF1Xpl/IFv0
-        Yke8hHaCpbaiAS0vZmpT8TdJBNc5fdDCN97uUv4aYXwGA2FbDOVlkA+PepixeQ==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1689095719; a=rsa-sha256;
-        cv=none;
-        b=fmhB2v4H4ADpBXO98uyiV5L9f41X8KZiqbiHoTkfHL1moglJ5UhJkwwcQF1/YD8HCpNsFQ
-        uolJRZlc0ny+sLE8i81LhvtQDc7DcKQDlfJz+O3+kjvI5hUO2Q3B72K5AnT8qt64lkdVRa
-        vaYp4951RPLNCOYxmjN5P16CKevF+GAO4PpaL5h19Dr1OPvQQ8sEQGfOp1a/dgGVHo9pCP
-        iEi7S5ss5psdYcB+Usi/gPH7hJy0/WZbI0r+Ixsrfd1Ged62IMGTJGQz44X+ZG2mv2rYUM
-        m8ReUI7Tzxe0k9SYLlF0K+IUkhiwg6Q5OPZCHeQGNf1SYlAnjSvUhLfQrI9CIg==
-To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH] smb: client: fix missed ses refcounting
-Date:   Tue, 11 Jul 2023 14:15:10 -0300
-Message-ID: <20230711171510.5295-1-pc@manguebit.com>
+        with ESMTP id S229548AbjGKXLm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Jul 2023 19:11:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA39CF;
+        Tue, 11 Jul 2023 16:11:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CA5D06163E;
+        Tue, 11 Jul 2023 23:11:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F464C433C7;
+        Tue, 11 Jul 2023 23:11:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689117100;
+        bh=KIRd8DUSyWk0AEQuhquMChREFws8OSd5E3EodjVZs84=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Vijf9kHawoUsAHCRdUShMMlww1WeNa5kLeyDy0vtDHn0UjBXtNB8CR0H3FUIrFBNe
+         mniSZT6qLl4SVqtfIxZYqoEOvqi/XfOd6mS/ybTEDklNwFaDCgxdsNpzoUo8dhJvwT
+         WgQ+1gs3sJDvs6yKrJbCfMr6j4RiW1DFsNpx+8DAtmzFcYzVy3GbLtOrfqNja0jF5I
+         UHDS583jjfRisY18i3bzpE8eFM4I7bT944Werl1J2EwM18JsHLE4LboOpgje3x4H22
+         3/xoHmBUqCBtM6ZefMrE6ywlWiuBdcqlSE7aYnqNrCWgRyiDpSr/FNebscYSboQbPH
+         EpryJqUsX/ehw==
+Date:   Tue, 11 Jul 2023 17:12:31 -0600
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Steve French <sfrench@samba.org>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Christian Brauner <brauner@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-hardening@vger.kernel.org
+Subject: [PATCH] smb: client: Fix -Wstringop-overflow issues
+Message-ID: <ZK3h3+dHBGONHt+S@work>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use new cifs_smb_ses_inc_refcount() helper to get an active reference
-of @ses and @ses->dfs_root_ses (if set).  This will prevent
-@ses->dfs_root_ses of being put in the next call to cifs_put_smb_ses()
-and thus potentially causing an use-after-free bug.
+pSMB->hdr.Protocol is an array of size 4 bytes, hence when the compiler
+analyzes this line of code
 
-Fixes: 8e3554150d6c ("cifs: fix sharing of DFS connections")
-Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+	parm_data = ((char *) &pSMB->hdr.Protocol) + offset;
+
+it legitimately complains about the fact that offset points outside the
+bounds of the array. Notice that the compiler gives priority to the object
+as an array, rather than merely the address of one more byte in a structure
+to wich offset should be added (which seems to be the actual intention of
+the original implementation).
+
+Fix this by explicitly instructing the compiler to treat the code as a
+sequence of bytes in struct smb_com_transaction2_spi_req, and not as an
+array accessed through pointer notation.
+
+Notice that ((char *)pSMB) + sizeof(pSMB->hdr.smb_buf_length) points to
+the same address as ((char *) &pSMB->hdr.Protocol), therefore this results
+in no differences in binary output.
+
+Fixes the following -Wstringop-overflow warnings when built s390
+architecture with defconfig (GCC 13):
+  CC [M]  fs/smb/client/cifssmb.o
+In function 'cifs_init_ace',
+    inlined from 'posix_acl_to_cifs' at fs/smb/client/cifssmb.c:3046:3,
+    inlined from 'cifs_do_set_acl' at fs/smb/client/cifssmb.c:3191:15:
+fs/smb/client/cifssmb.c:2987:31: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
+ 2987 |         cifs_ace->cifs_e_perm = local_ace->e_perm;
+      |         ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+In file included from fs/smb/client/cifssmb.c:27:
+fs/smb/client/cifspdu.h: In function 'cifs_do_set_acl':
+fs/smb/client/cifspdu.h:384:14: note: at offset [7, 11] into destination object 'Protocol' of size 4
+  384 |         __u8 Protocol[4];
+      |              ^~~~~~~~
+In function 'cifs_init_ace',
+    inlined from 'posix_acl_to_cifs' at fs/smb/client/cifssmb.c:3046:3,
+    inlined from 'cifs_do_set_acl' at fs/smb/client/cifssmb.c:3191:15:
+fs/smb/client/cifssmb.c:2988:30: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
+ 2988 |         cifs_ace->cifs_e_tag =  local_ace->e_tag;
+      |         ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+fs/smb/client/cifspdu.h: In function 'cifs_do_set_acl':
+fs/smb/client/cifspdu.h:384:14: note: at offset [6, 10] into destination object 'Protocol' of size 4
+  384 |         __u8 Protocol[4];
+      |              ^~~~~~~~
+
+This helps with the ongoing efforts to globally enable
+-Wstringop-overflow.
+
+Link: https://github.com/KSPP/linux/issues/310
+Fixes: dc1af4c4b472 ("cifs: implement set acl method")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
- fs/smb/client/dfs.c           | 26 ++++++++++----------------
- fs/smb/client/smb2transport.c |  2 +-
- 2 files changed, 11 insertions(+), 17 deletions(-)
+ fs/smb/client/cifssmb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-index 1403a2d1ab17..df3fd3b720da 100644
---- a/fs/smb/client/dfs.c
-+++ b/fs/smb/client/dfs.c
-@@ -66,6 +66,12 @@ static int get_session(struct cifs_mount_ctx *mnt_ctx, const char *full_path)
- 	return rc;
- }
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 19f7385abeec..9dee267f1893 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -3184,7 +3184,7 @@ int cifs_do_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
+ 	param_offset = offsetof(struct smb_com_transaction2_spi_req,
+ 				InformationLevel) - 4;
+ 	offset = param_offset + params;
+-	parm_data = ((char *) &pSMB->hdr.Protocol) + offset;
++	parm_data = ((char *)pSMB) + sizeof(pSMB->hdr.smb_buf_length) + offset;
+ 	pSMB->ParameterOffset = cpu_to_le16(param_offset);
  
-+/*
-+ * Track individual DFS referral servers used by new DFS mount.
-+ *
-+ * On success, their lifetime will be shared by final tcon (dfs_ses_list).
-+ * Otherwise, they will be put by dfs_put_root_smb_sessions() in cifs_mount().
-+ */
- static int add_root_smb_session(struct cifs_mount_ctx *mnt_ctx)
- {
- 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
-@@ -80,11 +86,12 @@ static int add_root_smb_session(struct cifs_mount_ctx *mnt_ctx)
- 		INIT_LIST_HEAD(&root_ses->list);
- 
- 		spin_lock(&cifs_tcp_ses_lock);
--		ses->ses_count++;
-+		cifs_smb_ses_inc_refcount(ses);
- 		spin_unlock(&cifs_tcp_ses_lock);
- 		root_ses->ses = ses;
- 		list_add_tail(&root_ses->list, &mnt_ctx->dfs_ses_list);
- 	}
-+	/* Select new DFS referral server so that new referrals go through it */
- 	ctx->dfs_root_ses = ses;
- 	return 0;
- }
-@@ -242,7 +249,6 @@ static int __dfs_mount_share(struct cifs_mount_ctx *mnt_ctx)
- int dfs_mount_share(struct cifs_mount_ctx *mnt_ctx, bool *isdfs)
- {
- 	struct smb3_fs_context *ctx = mnt_ctx->fs_ctx;
--	struct cifs_ses *ses;
- 	bool nodfs = ctx->nodfs;
- 	int rc;
- 
-@@ -276,20 +282,8 @@ int dfs_mount_share(struct cifs_mount_ctx *mnt_ctx, bool *isdfs)
- 	}
- 
- 	*isdfs = true;
--	/*
--	 * Prevent DFS root session of being put in the first call to
--	 * cifs_mount_put_conns().  If another DFS root server was not found
--	 * while chasing the referrals (@ctx->dfs_root_ses == @ses), then we
--	 * can safely put extra refcount of @ses.
--	 */
--	ses = mnt_ctx->ses;
--	mnt_ctx->ses = NULL;
--	mnt_ctx->server = NULL;
--	rc = __dfs_mount_share(mnt_ctx);
--	if (ses == ctx->dfs_root_ses)
--		cifs_put_smb_ses(ses);
--
--	return rc;
-+	add_root_smb_session(mnt_ctx);
-+	return __dfs_mount_share(mnt_ctx);
- }
- 
- /* Update dfs referral path of superblock */
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index c6db898dab7c..7676091b3e77 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -160,7 +160,7 @@ smb2_find_smb_ses_unlocked(struct TCP_Server_Info *server, __u64 ses_id)
- 			spin_unlock(&ses->ses_lock);
- 			continue;
- 		}
--		++ses->ses_count;
-+		cifs_smb_ses_inc_refcount(ses);
- 		spin_unlock(&ses->ses_lock);
- 		return ses;
- 	}
+ 	/* convert to on the wire format for POSIX ACL */
 -- 
-2.41.0
+2.34.1
 
