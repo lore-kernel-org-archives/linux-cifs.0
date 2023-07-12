@@ -2,84 +2,131 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3176EB64DD
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jul 2023 21:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 952EEC001B0
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jul 2023 23:18:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232571AbjGLVKg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 Jul 2023 17:10:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35608 "EHLO
+        id S229556AbjGLXSN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 Jul 2023 19:18:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232541AbjGLVKf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jul 2023 17:10:35 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 961EF1FC9;
-        Wed, 12 Jul 2023 14:10:33 -0700 (PDT)
-Message-ID: <0bb4a367ebd7ae83dd1538965e3c0d2b.pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1689196231;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=87D1wgXkCoqNsHuc4E5XEDcTC2UydNXgWk7WyKAXs04=;
-        b=ac2WVo9qoJrkyo+lyly2EEiXahbuPNp05ERxwFMbuiSTeebMGJY6pANq5YIEQk3PtD01ST
-        uIWZvewXSKHpf5XObiwAFmTuobKj6aPGC/LaQq3dHokk7dB63G/awyWXlZ+SvE5X0oUp2w
-        XeLzlD7dQ+MxqLHOMniTuN11JUKboAvOQiVqplL2ze3foBFMjDIhrH9ggsNklBNxi6UBNs
-        4dhmU9EPJ5jZlq49bq9LIBwf7rfR1iXEuh3kAKCzAEgH6j0FdNt7EHa75+Aw47ZO4SyE4m
-        go760Cg/ez5Ux9Qx9gPo0NOroq3bdsXk5Ve9x25BgIWpRd1cfOShAqvJfmmGEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1689196231;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=87D1wgXkCoqNsHuc4E5XEDcTC2UydNXgWk7WyKAXs04=;
-        b=rlm0uQraE0YBWwFiHeIa8DqB4Jcwntz2OKeSi49LeUXR+qN1sFiAe8iMIE0Jiz59eYUEuU
-        tl+mzlN9FHAWeQ+jzPyoMwtcyAJe5lJDcjd9P+7HklY3tlblE8F3Bi7nvisuA4AjYH23P4
-        biTTcSseBvF9GpQ9i+Q/F+cwcX8N8Qvpf+JjPmwKCPYn32lXIInB3XThobqHWgpN0Z43QX
-        g+es4r17L8Z4sM3J1uwQpHzNdePC3t0nDjWqW0G9gXzswMq0ADCkR5U0ml/q65qoK6FXKH
-        KLWZ9YBbnbOehuW5wCjpMJo0NIAJzccU7wx1CS3OAfmJA+IxcoDuEuELN54ttA==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1689196231; a=rsa-sha256;
-        cv=none;
-        b=WUNnjkmo8Jz4mFmtub6TrzIo7XYgwURoaCmiMjREd3N5D/l9yp0lTq6cbrUkqYmAHXzcxS
-        nt8NJugqhY6MWWLFsX5Up/PtCir4dsl8PTY7KBYqHr45w1z7tUAdxJ/f/hlFlL6K/TdMMO
-        T6GEvLY01wAskO1lM1+cZWKYmdoTs2/iayqBZBtbw5pFCXavgH4aT5p+56Amv7c5qkJ1IB
-        ph+RvsNNYp5rsT0VyAU1N+JIOsxhXDy7cr9HPDhHDxeSKw3avsgW34p8aTNbIJWTS8u2A6
-        5me7AUxtqs9Cj2XudFLnDpkgwH0omYS3XxnXADNFPtlW7P/k8PILsuLyg9gKcQ==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     stable@vger.kernel.org
-Cc:     linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH 4/4] smb: client: improve DFS mount check
-In-Reply-To: <20230628002450.18781-4-pc@manguebit.com>
-References: <20230628002450.18781-1-pc@manguebit.com>
- <20230628002450.18781-4-pc@manguebit.com>
-Date:   Wed, 12 Jul 2023 18:10:27 -0300
+        with ESMTP id S233477AbjGLXSI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jul 2023 19:18:08 -0400
+Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662DF11D;
+        Wed, 12 Jul 2023 16:18:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+        ; s=bytemarkmx; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID
+        :Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID
+        :Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+        Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe
+        :List-Post:List-Owner:List-Archive;
+        bh=5mUxfgJDdckbP7JIrFh96lrJMsGTOSdHCH5f/f6iXKI=; b=H/xd/EKZwwwRnmzUWi1/zQisH2
+        EsVVAAe02P5WKT4gqRhUbexi1RsHzNExjO2c5HtLJ6vKe6rC1aOc6zM2vzG8hmbcZWy1KxtzThe56
+        slzKtID9BLsrkudsFh4OxH9IkdP27Pi3s6cxj3f0RjD4lOhSfGKDibpkBQzJps16zvsvNrdELdR9l
+        t0utAgVFxtOCWMFY1K/KdV6zEr2VLfqZOS9llfQjD0UknQm9Xby01/uj/s2ybFW+FXKeJZSU/FxEI
+        ow4sNWPl8bVcQ0tCmRLbtx1GiMrAyko1r8kiz9EbeaHvd1A7ZPjUgUhrtCIhgucw2jhyXkfdfCVWp
+        kCQqKrYQ==;
+Received: from dg by mx.treblig.org with local (Exim 4.94.2)
+        (envelope-from <dg@treblig.org>)
+        id 1qJj5e-000zJZ-74; Wed, 12 Jul 2023 23:17:46 +0000
+Date:   Wed, 12 Jul 2023 23:17:46 +0000
+From:   "Dr. David Alan Gilbert" <dave@treblig.org>
+To:     sfrench@samba.org, linkinjeon@kernel.org, tom@talpey.com,
+        dave.kleikamp@oracle.com, shaggy@kernel.org,
+        linux-cifs@vger.kernel.org
+Cc:     krisman@collabora.com, jfs-discussion@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
+Message-ID: <ZK80mu/YbHLEABAB@gallifrey>
+References: <20230628232417.120844-1-linux@treblig.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20230628232417.120844-1-linux@treblig.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/5.10.0-23-amd64 (x86_64)
+X-Uptime: 23:16:20 up 6 days,  8:47,  1 user,  load average: 0.05, 0.03, 0.00
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Paulo Alcantara <pc@manguebit.com> writes:
+* linux@treblig.org (linux@treblig.org) wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> The smb client and server code have (mostly) duplicated code
+> for unicode manipulation, in particular upper case handling.
+> 
+> Flatten this lot into shared code.
 
-> Some servers may return error codes from REQ_GET_DFS_REFERRAL requests
-> that are unexpected by the client, so to make it easier, assume
-> non-DFS mounts when the client can't get the initial DFS referral of
-> @ctx->UNC in dfs_mount_share().
->
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
-> ---
->  fs/smb/client/dfs.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-> index afbaef05a1f1..a7f2e0608adf 100644
+Gentle two week ping on this please.
 
-Stable team, could you please pick this up as a fix for
+Dave
 
-        8e3554150d6c ("cifs: fix sharing of DFS connections")
+(Apologies to the 3 of you who already got a copy of this ping,
+recent due to a missing header ',' )
 
-The upstream commit is 5f2a0afa9890 ("smb: client: improve DFS mount check").
-
-Thanks.
+> There's some code that's slightly different between the two, and
+> I've not attempted to share that - this should be strictly a no
+> behaviour change set.
+> 
+> In addition, the same tables and code are shared in jfs, however
+> there's very little testing available for the unicode in there,
+> so just share the raw data tables.
+> 
+> I suspect there's more UCS-2 code that can be shared, in the NLS code
+> and in the UCS-2 code used by the EFI interfaces.
+> 
+> Lightly tested with a module and a monolithic build, and just mounting
+> itself.
+> 
+> This dupe was found using PMD:
+>   https://pmd.github.io/pmd/pmd_userdocs_cpd.html
+> 
+> Dave
+> 
+> Version 2
+>   Moved the shared code to fs/nls after v1 feedback.
+>   Renamed shared tables from Smb to Nls prefix
+>   Move UniStrcat as well
+>   Share the JFS tables
+> 
+> Dr. David Alan Gilbert (4):
+>   fs/smb: Remove unicode 'lower' tables
+>   fs/smb: Swing unicode common code from smb->NLS
+>   fs/smb/client: Use common code in client
+>   fs/jfs: Use common ucs2 upper case table
+> 
+>  fs/jfs/Kconfig               |   1 +
+>  fs/jfs/Makefile              |   2 +-
+>  fs/jfs/jfs_unicode.h         |  17 +-
+>  fs/jfs/jfs_uniupr.c          | 121 -------------
+>  fs/nls/Kconfig               |   8 +
+>  fs/nls/Makefile              |   1 +
+>  fs/nls/nls_ucs2_data.h       |  15 ++
+>  fs/nls/nls_ucs2_utils.c      | 144 +++++++++++++++
+>  fs/nls/nls_ucs2_utils.h      | 285 ++++++++++++++++++++++++++++++
+>  fs/smb/client/Kconfig        |   1 +
+>  fs/smb/client/cifs_unicode.c |   1 -
+>  fs/smb/client/cifs_unicode.h | 330 +----------------------------------
+>  fs/smb/client/cifs_uniupr.h  | 239 -------------------------
+>  fs/smb/server/Kconfig        |   1 +
+>  fs/smb/server/unicode.c      |   1 -
+>  fs/smb/server/unicode.h      | 325 +---------------------------------
+>  fs/smb/server/uniupr.h       | 268 ----------------------------
+>  17 files changed, 467 insertions(+), 1293 deletions(-)
+>  delete mode 100644 fs/jfs/jfs_uniupr.c
+>  create mode 100644 fs/nls/nls_ucs2_data.h
+>  create mode 100644 fs/nls/nls_ucs2_utils.c
+>  create mode 100644 fs/nls/nls_ucs2_utils.h
+>  delete mode 100644 fs/smb/client/cifs_uniupr.h
+>  delete mode 100644 fs/smb/server/uniupr.h
+> 
+> -- 
+> 2.41.0
+> 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
