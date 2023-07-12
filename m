@@ -2,340 +2,84 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C00EB64DA
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jul 2023 17:43:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3176EB64DD
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jul 2023 21:10:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231398AbjGLRns (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 Jul 2023 13:43:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45762 "EHLO
+        id S232571AbjGLVKg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 Jul 2023 17:10:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbjGLRns (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jul 2023 13:43:48 -0400
-X-Greylist: delayed 1200 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 12 Jul 2023 10:43:45 PDT
-Received: from smtp.rcn.com (mail.rcn.syn-alias.com [129.213.13.252])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA604EA
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Jul 2023 10:43:45 -0700 (PDT)
-X-Authed-Username: dG10YWxwZXlAcmNuLmNvbQ==
-Authentication-Results:  smtp02.rcn.email-ash1.sync.lan smtp.user=<hidden>; auth=pass (PLAIN)
-Received: from [96.237.161.173] ([96.237.161.173:51665] helo=[192.168.0.206])
-        by smtp.rcn.com (envelope-from <tom@talpey.com>)
-        (ecelerity 4.4.0.19839 r(msys-ecelerity:tags/4.4.0.0^0)) with ESMTPSA (cipher=AES128-GCM-SHA256) 
-        id 2E/BF-10976-0A1EEA46; Wed, 12 Jul 2023 13:23:44 -0400
-Message-ID: <cda0b3e1-840f-25f6-3147-65c7526fdd33@talpey.com>
-Date:   Wed, 12 Jul 2023 13:23:43 -0400
+        with ESMTP id S232541AbjGLVKf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jul 2023 17:10:35 -0400
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 961EF1FC9;
+        Wed, 12 Jul 2023 14:10:33 -0700 (PDT)
+Message-ID: <0bb4a367ebd7ae83dd1538965e3c0d2b.pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1689196231;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=87D1wgXkCoqNsHuc4E5XEDcTC2UydNXgWk7WyKAXs04=;
+        b=ac2WVo9qoJrkyo+lyly2EEiXahbuPNp05ERxwFMbuiSTeebMGJY6pANq5YIEQk3PtD01ST
+        uIWZvewXSKHpf5XObiwAFmTuobKj6aPGC/LaQq3dHokk7dB63G/awyWXlZ+SvE5X0oUp2w
+        XeLzlD7dQ+MxqLHOMniTuN11JUKboAvOQiVqplL2ze3foBFMjDIhrH9ggsNklBNxi6UBNs
+        4dhmU9EPJ5jZlq49bq9LIBwf7rfR1iXEuh3kAKCzAEgH6j0FdNt7EHa75+Aw47ZO4SyE4m
+        go760Cg/ez5Ux9Qx9gPo0NOroq3bdsXk5Ve9x25BgIWpRd1cfOShAqvJfmmGEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1689196231;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=87D1wgXkCoqNsHuc4E5XEDcTC2UydNXgWk7WyKAXs04=;
+        b=rlm0uQraE0YBWwFiHeIa8DqB4Jcwntz2OKeSi49LeUXR+qN1sFiAe8iMIE0Jiz59eYUEuU
+        tl+mzlN9FHAWeQ+jzPyoMwtcyAJe5lJDcjd9P+7HklY3tlblE8F3Bi7nvisuA4AjYH23P4
+        biTTcSseBvF9GpQ9i+Q/F+cwcX8N8Qvpf+JjPmwKCPYn32lXIInB3XThobqHWgpN0Z43QX
+        g+es4r17L8Z4sM3J1uwQpHzNdePC3t0nDjWqW0G9gXzswMq0ADCkR5U0ml/q65qoK6FXKH
+        KLWZ9YBbnbOehuW5wCjpMJo0NIAJzccU7wx1CS3OAfmJA+IxcoDuEuELN54ttA==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1689196231; a=rsa-sha256;
+        cv=none;
+        b=WUNnjkmo8Jz4mFmtub6TrzIo7XYgwURoaCmiMjREd3N5D/l9yp0lTq6cbrUkqYmAHXzcxS
+        nt8NJugqhY6MWWLFsX5Up/PtCir4dsl8PTY7KBYqHr45w1z7tUAdxJ/f/hlFlL6K/TdMMO
+        T6GEvLY01wAskO1lM1+cZWKYmdoTs2/iayqBZBtbw5pFCXavgH4aT5p+56Amv7c5qkJ1IB
+        ph+RvsNNYp5rsT0VyAU1N+JIOsxhXDy7cr9HPDhHDxeSKw3avsgW34p8aTNbIJWTS8u2A6
+        5me7AUxtqs9Cj2XudFLnDpkgwH0omYS3XxnXADNFPtlW7P/k8PILsuLyg9gKcQ==
+From:   Paulo Alcantara <pc@manguebit.com>
+To:     stable@vger.kernel.org
+Cc:     linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH 4/4] smb: client: improve DFS mount check
+In-Reply-To: <20230628002450.18781-4-pc@manguebit.com>
+References: <20230628002450.18781-1-pc@manguebit.com>
+ <20230628002450.18781-4-pc@manguebit.com>
+Date:   Wed, 12 Jul 2023 18:10:27 -0300
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] ksmbd: check if a mount point is crossed during path
- lookup
-Content-Language: en-US
-To:     Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, hyc.lee@gmail.com,
-        atteh.mailbox@gmail.com
-References: <20230711123034.23856-1-linkinjeon@kernel.org>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <20230711123034.23856-1-linkinjeon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Vade-Verdict: clean
-X-Vade-Analysis-1: gggruggvucftvghtrhhoucdtuddrgedviedrfedvgdduuddvucetufdoteggodetrfdotffvucfrrhho
-X-Vade-Analysis-2: fhhilhgvmecuufgjpfetvefqtfdptfevpfdpgffpggdqtfevpfdpqfgfvfenuceurghilhhouhhtmecu
-X-Vade-Analysis-3: fedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgj
-X-Vade-Analysis-4: tgfgsehtjeertddtfeejnecuhfhrohhmpefvohhmucfvrghlphgvhicuoehtohhmsehtrghlphgvhidr
-X-Vade-Analysis-5: tghomheqnecuggftrfgrthhtvghrnhepudethfegfeejjeeghedtffegkedttdduueekleejhfduudek
-X-Vade-Analysis-6: gfehuedvudfgudefnecukfhppeeliedrvdefjedrudeiuddrudejfeenucevlhhushhtvghrufhiiigv
-X-Vade-Analysis-7: pedtnecurfgrrhgrmhepihhnvghtpeeliedrvdefjedrudeiuddrudejfedphhgvlhhopegludelvddr
-X-Vade-Analysis-8: udeikedrtddrvddtiegnpdhmrghilhhfrhhomhepthhomhesthgrlhhpvgihrdgtohhmpdhrtghpthht
-X-Vade-Analysis-9: oheplhhinhhkihhnjhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgtihhf
-X-Vade-Analysis-10: shesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsmhhfrhgvnhgthhesghhmrghilhdr
-X-Vade-Analysis-11: tghomhdprhgtphhtthhopehsvghnohiihhgrthhskhihsegthhhrohhmihhumhdrohhrghdprhgtphht
-X-Vade-Analysis-12: thhopehhhigtrdhlvggvsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghtthgvhhdrmhgrihhlsgho
-X-Vade-Analysis-13: giesghhmrghilhdrtghomhdpmhhtrghhohhsthepshhmthhptddvrdhrtghnrdgvmhgrihhlqdgrshhh
-X-Vade-Analysis-14: uddrshihnhgtrdhlrghn
-X-Vade-Client: RCN
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 7/11/2023 8:30 AM, Namjae Jeon wrote:
-> Since commit 74d7970febf7 ("ksmbd: fix racy issue from using ->d_parent and ->d_name"),
-> ksmbd can not lookup cross mount points. If last component is a cross
-> mount point during path lookup, check if it is crossed to follow it
-> down.
+Paulo Alcantara <pc@manguebit.com> writes:
 
-I actually thought not crossing mount points was intended, since
-semantics can shift if the crossing changes filesystems or fs types.
-
-Does this change somehow prevent walking out of a mount via embedded
-"/../" in the path? It's not obvious to me whether vfs_path_parent_lookup
-denies this.
-
-Tom.
-
-I'm not familiar enough with the VFS protection, but does this
-> 
-> Fixes: 74d7970febf7 ("ksmbd: fix racy issue from using ->d_parent and ->d_name")
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> Some servers may return error codes from REQ_GET_DFS_REFERRAL requests
+> that are unexpected by the client, so to make it easier, assume
+> non-DFS mounts when the client can't get the initial DFS referral of
+> @ctx->UNC in dfs_mount_share().
+>
+> Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 > ---
->   fs/smb/server/smb2pdu.c | 27 ++++++++++++--------
->   fs/smb/server/vfs.c     | 56 +++++++++++++++++++++++------------------
->   fs/smb/server/vfs.h     |  4 +--
->   3 files changed, 49 insertions(+), 38 deletions(-)
-> 
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index cf8822103f50..ca276634fd58 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -2467,8 +2467,9 @@ static void smb2_update_xattrs(struct ksmbd_tree_connect *tcon,
->   	}
->   }
->   
-> -static int smb2_creat(struct ksmbd_work *work, struct path *path, char *name,
-> -		      int open_flags, umode_t posix_mode, bool is_dir)
-> +static int smb2_creat(struct ksmbd_work *work, struct path *parent_path,
-> +		      struct path *path, char *name, int open_flags,
-> +		      umode_t posix_mode, bool is_dir)
->   {
->   	struct ksmbd_tree_connect *tcon = work->tcon;
->   	struct ksmbd_share_config *share = tcon->share_conf;
-> @@ -2495,7 +2496,7 @@ static int smb2_creat(struct ksmbd_work *work, struct path *path, char *name,
->   			return rc;
->   	}
->   
-> -	rc = ksmbd_vfs_kern_path_locked(work, name, 0, path, 0);
-> +	rc = ksmbd_vfs_kern_path_locked(work, name, 0, parent_path, path, 0);
->   	if (rc) {
->   		pr_err("cannot get linux path (%s), err = %d\n",
->   		       name, rc);
-> @@ -2565,7 +2566,7 @@ int smb2_open(struct ksmbd_work *work)
->   	struct ksmbd_tree_connect *tcon = work->tcon;
->   	struct smb2_create_req *req;
->   	struct smb2_create_rsp *rsp;
-> -	struct path path;
-> +	struct path path, parent_path;
->   	struct ksmbd_share_config *share = tcon->share_conf;
->   	struct ksmbd_file *fp = NULL;
->   	struct file *filp = NULL;
-> @@ -2786,7 +2787,8 @@ int smb2_open(struct ksmbd_work *work)
->   		goto err_out1;
->   	}
->   
-> -	rc = ksmbd_vfs_kern_path_locked(work, name, LOOKUP_NO_SYMLINKS, &path, 1);
-> +	rc = ksmbd_vfs_kern_path_locked(work, name, LOOKUP_NO_SYMLINKS,
-> +					&parent_path, &path, 1);
->   	if (!rc) {
->   		file_present = true;
->   
-> @@ -2906,7 +2908,8 @@ int smb2_open(struct ksmbd_work *work)
->   
->   	/*create file if not present */
->   	if (!file_present) {
-> -		rc = smb2_creat(work, &path, name, open_flags, posix_mode,
-> +		rc = smb2_creat(work, &parent_path, &path, name, open_flags,
-> +				posix_mode,
->   				req->CreateOptions & FILE_DIRECTORY_FILE_LE);
->   		if (rc) {
->   			if (rc == -ENOENT) {
-> @@ -3321,8 +3324,9 @@ int smb2_open(struct ksmbd_work *work)
->   
->   err_out:
->   	if (file_present || created) {
-> -		inode_unlock(d_inode(path.dentry->d_parent));
-> -		dput(path.dentry);
-> +		inode_unlock(d_inode(parent_path.dentry));
-> +		path_put(&path);
-> +		path_put(&parent_path);
->   	}
->   	ksmbd_revert_fsids(work);
->   err_out1:
-> @@ -5545,7 +5549,7 @@ static int smb2_create_link(struct ksmbd_work *work,
->   			    struct nls_table *local_nls)
->   {
->   	char *link_name = NULL, *target_name = NULL, *pathname = NULL;
-> -	struct path path;
-> +	struct path path, parent_path;
->   	bool file_present = false;
->   	int rc;
->   
-> @@ -5575,7 +5579,7 @@ static int smb2_create_link(struct ksmbd_work *work,
->   
->   	ksmbd_debug(SMB, "target name is %s\n", target_name);
->   	rc = ksmbd_vfs_kern_path_locked(work, link_name, LOOKUP_NO_SYMLINKS,
-> -					&path, 0);
-> +					&parent_path, &path, 0);
->   	if (rc) {
->   		if (rc != -ENOENT)
->   			goto out;
-> @@ -5605,8 +5609,9 @@ static int smb2_create_link(struct ksmbd_work *work,
->   		rc = -EINVAL;
->   out:
->   	if (file_present) {
-> -		inode_unlock(d_inode(path.dentry->d_parent));
-> +		inode_unlock(d_inode(parent_path.dentry));
->   		path_put(&path);
-> +		path_put(&parent_path);
->   	}
->   	if (!IS_ERR(link_name))
->   		kfree(link_name);
-> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-> index e35914457350..fd06d267de61 100644
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -63,13 +63,13 @@ int ksmbd_vfs_lock_parent(struct dentry *parent, struct dentry *child)
->   
->   static int ksmbd_vfs_path_lookup_locked(struct ksmbd_share_config *share_conf,
->   					char *pathname, unsigned int flags,
-> +					struct path *parent_path,
->   					struct path *path)
->   {
->   	struct qstr last;
->   	struct filename *filename;
->   	struct path *root_share_path = &share_conf->vfs_path;
->   	int err, type;
-> -	struct path parent_path;
->   	struct dentry *d;
->   
->   	if (pathname[0] == '\0') {
-> @@ -84,7 +84,7 @@ static int ksmbd_vfs_path_lookup_locked(struct ksmbd_share_config *share_conf,
->   		return PTR_ERR(filename);
->   
->   	err = vfs_path_parent_lookup(filename, flags,
-> -				     &parent_path, &last, &type,
-> +				     parent_path, &last, &type,
->   				     root_share_path);
->   	if (err) {
->   		putname(filename);
-> @@ -92,13 +92,13 @@ static int ksmbd_vfs_path_lookup_locked(struct ksmbd_share_config *share_conf,
->   	}
->   
->   	if (unlikely(type != LAST_NORM)) {
-> -		path_put(&parent_path);
-> +		path_put(parent_path);
->   		putname(filename);
->   		return -ENOENT;
->   	}
->   
-> -	inode_lock_nested(parent_path.dentry->d_inode, I_MUTEX_PARENT);
-> -	d = lookup_one_qstr_excl(&last, parent_path.dentry, 0);
-> +	inode_lock_nested(parent_path->dentry->d_inode, I_MUTEX_PARENT);
-> +	d = lookup_one_qstr_excl(&last, parent_path->dentry, 0);
->   	if (IS_ERR(d))
->   		goto err_out;
->   
-> @@ -108,15 +108,20 @@ static int ksmbd_vfs_path_lookup_locked(struct ksmbd_share_config *share_conf,
->   	}
->   
->   	path->dentry = d;
-> -	path->mnt = share_conf->vfs_path.mnt;
-> -	path_put(&parent_path);
-> -	putname(filename);
-> +	path->mnt = mntget(parent_path->mnt);
-> +
-> +	err = follow_down(path, 0);
-> +	if (err < 0) {
-> +		path_put(path);
-> +		goto err_out;
-> +	}
->   
-> +	putname(filename);
->   	return 0;
->   
->   err_out:
-> -	inode_unlock(parent_path.dentry->d_inode);
-> -	path_put(&parent_path);
-> +	inode_unlock(d_inode(parent_path->dentry));
-> +	path_put(parent_path);
->   	putname(filename);
->   	return -ENOENT;
->   }
-> @@ -1194,14 +1199,14 @@ static int ksmbd_vfs_lookup_in_dir(const struct path *dir, char *name,
->    * Return:	0 on success, otherwise error
->    */
->   int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
-> -			       unsigned int flags, struct path *path,
-> -			       bool caseless)
-> +			       unsigned int flags, struct path *parent_path,
-> +			       struct path *path, bool caseless)
->   {
->   	struct ksmbd_share_config *share_conf = work->tcon->share_conf;
->   	int err;
-> -	struct path parent_path;
->   
-> -	err = ksmbd_vfs_path_lookup_locked(share_conf, name, flags, path);
-> +	err = ksmbd_vfs_path_lookup_locked(share_conf, name, flags, parent_path,
-> +					   path);
->   	if (!err)
->   		return 0;
->   
-> @@ -1216,10 +1221,10 @@ int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
->   		path_len = strlen(filepath);
->   		remain_len = path_len;
->   
-> -		parent_path = share_conf->vfs_path;
-> -		path_get(&parent_path);
-> +		*parent_path = share_conf->vfs_path;
-> +		path_get(parent_path);
->   
-> -		while (d_can_lookup(parent_path.dentry)) {
-> +		while (d_can_lookup(parent_path->dentry)) {
->   			char *filename = filepath + path_len - remain_len;
->   			char *next = strchrnul(filename, '/');
->   			size_t filename_len = next - filename;
-> @@ -1228,7 +1233,7 @@ int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
->   			if (filename_len == 0)
->   				break;
->   
-> -			err = ksmbd_vfs_lookup_in_dir(&parent_path, filename,
-> +			err = ksmbd_vfs_lookup_in_dir(parent_path, filename,
->   						      filename_len,
->   						      work->conn->um);
->   			if (err)
-> @@ -1245,8 +1250,8 @@ int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
->   				goto out2;
->   			else if (is_last)
->   				goto out1;
-> -			path_put(&parent_path);
-> -			parent_path = *path;
-> +			path_put(parent_path);
-> +			*parent_path = *path;
->   
->   			next[0] = '/';
->   			remain_len -= filename_len + 1;
-> @@ -1254,16 +1259,17 @@ int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
->   
->   		err = -EINVAL;
->   out2:
-> -		path_put(&parent_path);
-> +		path_put(parent_path);
->   out1:
->   		kfree(filepath);
->   	}
->   
->   	if (!err) {
-> -		err = ksmbd_vfs_lock_parent(parent_path.dentry, path->dentry);
-> -		if (err)
-> -			dput(path->dentry);
-> -		path_put(&parent_path);
-> +		err = ksmbd_vfs_lock_parent(parent_path->dentry, path->dentry);
-> +		if (err) {
-> +			path_put(path);
-> +			path_put(parent_path);
-> +		}
->   	}
->   	return err;
->   }
-> diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
-> index 80039312c255..72f9fb4b48d1 100644
-> --- a/fs/smb/server/vfs.h
-> +++ b/fs/smb/server/vfs.h
-> @@ -115,8 +115,8 @@ int ksmbd_vfs_xattr_stream_name(char *stream_name, char **xattr_stream_name,
->   int ksmbd_vfs_remove_xattr(struct mnt_idmap *idmap,
->   			   const struct path *path, char *attr_name);
->   int ksmbd_vfs_kern_path_locked(struct ksmbd_work *work, char *name,
-> -			       unsigned int flags, struct path *path,
-> -			       bool caseless);
-> +			       unsigned int flags, struct path *parent_path,
-> +			       struct path *path, bool caseless);
->   struct dentry *ksmbd_vfs_kern_path_create(struct ksmbd_work *work,
->   					  const char *name,
->   					  unsigned int flags,
+>  fs/smb/client/dfs.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+> index afbaef05a1f1..a7f2e0608adf 100644
+
+Stable team, could you please pick this up as a fix for
+
+        8e3554150d6c ("cifs: fix sharing of DFS connections")
+
+The upstream commit is 5f2a0afa9890 ("smb: client: improve DFS mount check").
+
+Thanks.
