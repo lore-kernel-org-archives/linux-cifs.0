@@ -2,117 +2,62 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 054AFEB64DC
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jul 2023 16:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9314EB64DA
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jul 2023 15:33:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231484AbjGQQAZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Jul 2023 12:00:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52750 "EHLO
+        id S233191AbjGLPc7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 Jul 2023 11:32:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231298AbjGQQAY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jul 2023 12:00:24 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D0B9D8
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jul 2023 09:00:23 -0700 (PDT)
-Message-ID: <4a56f0980bb467d34705c8c21ff6f068.pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1689609620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bHJT4g7V1e2rj5DfXctKust347QDSMAe4bLR2YPm7Aw=;
-        b=S8YolU+rBLjLa/zEsl9kKkCE+C8PDgcwx+GEftwFBmfYiT/Owcy7L3y0GaFN7/N/mzz4ui
-        6rcTAQ7fSbxT+ozNEIxto6IPLWhk+riIE/YQqxvXcKjtStgY/fQRZWXlUwWxw/8ybY21Zh
-        NSSo5R4dsLBAI87ZzBSuvuVd1XuLRPyRh1tdbkfoLCgdB3DuZbg28Sw4vrs1LAyQUEiIXH
-        xb2/7FLJG929BOp0zeRM/RdTxQOLsIyCNvC3aXeOCub6YgCCqKZyYs+hDONdSPKoMv4Yql
-        /g8/sL2C2spSCQq+O3ThuOpKkRCfKw7uRaoujCwcG5DeaRiHpiI3TFr91dk7pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1689609620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bHJT4g7V1e2rj5DfXctKust347QDSMAe4bLR2YPm7Aw=;
-        b=JO71ebGQrX0+pcrXOLbXSRGNnOQEfeyZS1WB/XbPprlA+4d2SjTnyeJv3w58Ov3FVhDYlF
-        T40E0FrqzFqYUIxtC6vgx7Z+5ZZF+enlhEpoeWG5D0J7z6DVG6oW8/kd/O619UzRZt2ZRN
-        fwIG/1GEvsvtNSDMkzBIpXfRatycL3valTc0hIROYQBZXTqS49RXetSEAo/D8Otiq+MQGG
-        fMMAW6neFi/s51QykZMzM5AX/opjGCaY/g/o6LEPL/D+UHk2e2gCD0etSqWn8emijhXZ7c
-        OQNPXIWgh5fy5QiAMcvY6TRVbJvGmV/2fXwgrcBxsVUZlJ9CRV/ZS1risxk4OA==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1689609620; a=rsa-sha256;
-        cv=none;
-        b=kAyUt2NsWqAyw4abCUYc9PJtVN5TWYMA6ZrcJvPNZvyXKOiGPxVPINNRrIo82yG01/y6+M
-        iislpGP3S2pFnwLv3Mq9yT6PTL+I8lb+jO+BB8AmL+H+SY3Xx5nBPOeFNZbLmHpiD0PZlF
-        SP870g4koM+5NV0HLT3Encmv59BtulN6tMlXWav3LhwY7WEhfcVH0EVn6Whsi8NyQUUNS5
-        jk0w2R6X+DuVU2+tgE4S5Fk+e79RYs+QUGTdR9sEovLnHdJw+C8LkABSFWcI3fbdsvNK9N
-        Wiqxa4ZhNSw6ygvuBH1A996Nz8zO0sMNxQz0f4OWEK2SZBAOgpRG+JYxlE2XhQ==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     Winston Wen <wentao@uniontech.com>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, sprasad@microsoft.com
-Cc:     Winston Wen <wentao@uniontech.com>
-Subject: Re: [PATCH] cifs: fix charset issue in reconnection
-In-Reply-To: <20230717022227.1736113-1-wentao@uniontech.com>
-References: <20230717022227.1736113-1-wentao@uniontech.com>
-Date:   Mon, 17 Jul 2023 13:00:16 -0300
+        with ESMTP id S232884AbjGLPc6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jul 2023 11:32:58 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70720C2;
+        Wed, 12 Jul 2023 08:32:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
+        bh=689SEK0ciFY8KgDlRHFBreHHAC2z+cvH0wQ011Q2aMI=; b=df/VKiT91ZqRa0x7ofoJaXGlph
+        PM7CRP4KkwoXZKNJlvYdkig+/LLrQ9LVGVf40H6Qaywx20JwTqHlizlUxF15FF/hdi7QMcfJ88rOM
+        Tk9o3z44pMTcermnTCrLWAF39fzqRsD0ms+1lMmZtzToJzTD0SUcPG6eXBFgIigvbDeEBrSIYXiW/
+        GnykGmmqxl8DWPpBQb6tfrtLGgdO7lnddHDuy7SXW0bC9E1PhpCLadB/V3QSWJPX+bNFvOifeRdsy
+        3Vg5gSGOgGr74Cyg+9z9dxsezgnvq5bViTggfgF6K6g7cj7jT1ssxpJXUEt4gBcr4IJbEN74vqTce
+        EZsIkLBg==;
+Received: from [2601:1c2:980:9ec0::2764]
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qJboy-000MRl-20;
+        Wed, 12 Jul 2023 15:32:04 +0000
+Message-ID: <03e153ce-328b-f279-2a40-4074bea2bc8f@infradead.org>
+Date:   Wed, 12 Jul 2023 08:31:55 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 01/79] fs: add ctime accessors infrastructure
+Content-Language: en-US
+To:     Jeff Layton <jlayton@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+        linux-um <linux-um@lists.infradead.org>
+References: <20230621144507.55591-1-jlayton@kernel.org>
+ <20230621144507.55591-2-jlayton@kernel.org>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230621144507.55591-2-jlayton@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Winston Wen <wentao@uniontech.com> writes:
+Hi Jeff,
 
-> We need to specify charset, like "iocharset=utf-8", in mount options for
-> Chinese path if the nls_default don't support it, such as iso8859-1, the
-> default value for CONFIG_NLS_DEFAULT.
->
-> But now in reconnection the nls_default is used, instead of the one we
-> specified and used in mount, and this can lead to mount failure.
->
-> Signed-off-by: Winston Wen <wentao@uniontech.com>
-> ---
->  fs/smb/client/cifsglob.h | 1 +
->  fs/smb/client/connect.c  | 6 ++++++
->  fs/smb/client/smb2pdu.c  | 3 +--
->  3 files changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index c9a87d0123ce..31cadf9b2a98 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -1062,6 +1062,7 @@ struct cifs_ses {
->  	unsigned long chans_need_reconnect;
->  	/* ========= end: protected by chan_lock ======== */
->  	struct cifs_ses *dfs_root_ses;
-> +	struct nls_table *local_nls;
->  };
->  
->  static inline bool
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index 5dd09c6d762e..abb69a6d4fce 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -1842,6 +1842,10 @@ static int match_session(struct cifs_ses *ses, struct smb3_fs_context *ctx)
->  			    CIFS_MAX_PASSWORD_LEN))
->  			return 0;
->  	}
-> +
-> +	if (strcmp(ctx->local_nls->charset, ses->local_nls->charset))
-> +		return 0;
-> +
->  	return 1;
->  }
->  
-> @@ -2027,6 +2031,7 @@ void __cifs_put_smb_ses(struct cifs_ses *ses)
->  		}
->  	}
->  
-> +	unload_nls(ses->local_nls);
+On arch/um/, (subarch i386 or x86_64), hostfs build fails with:
 
-Please move this call to sesInfoFree().
+../fs/hostfs/hostfs_kern.c:520:36: error: incompatible type for arg
+ument 2 of 'inode_set_ctime_to_ts'
+../include/linux/fs.h:1499:73: note: expected 'struct timespec64' b
+ut argument is of type 'const struct hostfs_timespec *'
 
-cifs_reconnect_tcon() also needs to be fixed by using @ses->local_nls
-rather than load_nls_default().
 
-Otherwise, looks good te me.  Thanks!
+-- 
+~Randy
