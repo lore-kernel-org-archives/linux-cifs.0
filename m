@@ -2,206 +2,153 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21205C001E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 Jul 2023 23:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF18EB64DA
+	for <linux-cifs@archiver.kernel.org>; Fri, 14 Jul 2023 08:56:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234693AbjGMXDl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 13 Jul 2023 19:03:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46090 "EHLO
+        id S234916AbjGNI4r (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 14 Jul 2023 04:56:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234676AbjGMXCe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 13 Jul 2023 19:02:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 365C430E9;
-        Thu, 13 Jul 2023 16:02:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B5F0761B86;
-        Thu, 13 Jul 2023 23:01:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F2C8C433BD;
-        Thu, 13 Jul 2023 23:01:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689289319;
-        bh=t187d4hlj7Hd2B853hoiIPlXJE4vBx7O1lkOZGTYDW8=;
-        h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=BS7k3xvm0kV8VQrl/+Nc8umWhgO+pb9JT0LHiIqUglobFvawLeTwqlzQHpVKTDZvB
-         uzCvx/VSEkD7rBjIYWrgFJPCVeqzpiWP8yPt0omTj30LLcay2tknCTfGbRYu6T8MHO
-         XUKoIaSo5n/Bd8IGVTxHqLGvMrjMe0fw+PscScTZ4jWUdNZ+2byzzdy+o175llL7m5
-         o50SLzukRXrSYzl6VaWT8ZrHwmm4KFENLB31WgFlIK5T2Pi03WKPiptSSMpQZPxFLm
-         ct6V/7uDGKKjKZCyDiQclhCznfyT/lEVKO0vqyqaIX9NPJI1Mx1EUf0gKBJYoL63GW
-         31d2FfqFHu4Cw==
-From:   Jeff Layton <jlayton@kernel.org>
-Date:   Thu, 13 Jul 2023 19:00:57 -0400
-Subject: [PATCH v5 8/8] btrfs: convert to multigrain timestamps
+        with ESMTP id S234861AbjGNI4r (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 14 Jul 2023 04:56:47 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D32D198A
+        for <linux-cifs@vger.kernel.org>; Fri, 14 Jul 2023 01:56:46 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6686ef86110so1085255b3a.2
+        for <linux-cifs@vger.kernel.org>; Fri, 14 Jul 2023 01:56:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689325005; x=1689929805;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YvM1hWXocwOKRbWO7noznsaoRmtbEVDUR9rHc9KMkoc=;
+        b=WXd5h1smw+kNcnCCw8CoeKepBavQMUqAnON/M/u4cPrnd68xp1lTezrdEr4RZwwUDG
+         GyPL7kQlEyxwZsWg65mY6yuty1uuZjg9sWF/lcp63ziEBLmDKiaIn52CFeOSsA+XQfdk
+         +6Agtn2ta/eupQorGDFrQT/+HGCRhXyO/ww/4/afHmLsL9B/zOnAThHNEOb+HV4cIlAw
+         vh/jtqzSwyDP4GqLvMXt6P6AsCz/ZWaCmYgDA1NwVIQlv0AvzVckFknmkzZR5Ooyhtx0
+         h+92hJmjZZxrb+fgGsV5z8g8m2mBDIl9eecFDSyqjpDyk7iFxDxVFLnTmD4M3369UrY2
+         TWpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689325005; x=1689929805;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YvM1hWXocwOKRbWO7noznsaoRmtbEVDUR9rHc9KMkoc=;
+        b=gqSVZUubuN1TLygOHRjo0teHr4pBRXxkqa/Uo5XWmVCGdO9/Ymt/7SsBRhDDwqzDm3
+         8CDlPu3aq5a0hTgz1eEJozmPoucijVhOIqBfY46hT2CLdbtw4OWpXsS6uvGJgUS6ig1D
+         fiqA1vcWxl4TCV+1Sc4of3mX6NsVvjw3Tg2KokqbHWt1cPtW6ArYpK3OvtvVo0ANDKx6
+         Z3GaSbda8+b+HwmsG+2MY/cjL/JNMAiZtE7EYdWRVaf9KIs5MN+7gKaOHTG9bsNRU3R8
+         u3Muqd9Buq0H5NmNTs/UlHVxz1F8gPgH9kDEbzESyUdxB5isLWNtUKKsFO75UwF5/xjC
+         AzkQ==
+X-Gm-Message-State: ABy/qLYZ2eMkK1kb17tMqxRJgGBWsaElXquOjQ9KM8BcWMm8dULqFic2
+        p+ONhRLbu5JngXZkfVt1kiil8voU9EZVEg==
+X-Google-Smtp-Source: APBJJlFPHCCWLOkMnieQEvpNilH8A0NnevZjQ6A0NMVh2nXzwPinfHcZOO29/f31ilKWhQpDo9JCdg==
+X-Received: by 2002:a05:6a00:2196:b0:682:759c:644d with SMTP id h22-20020a056a00219600b00682759c644dmr3654707pfi.27.1689325005275;
+        Fri, 14 Jul 2023 01:56:45 -0700 (PDT)
+Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:1:7e0e:5dff:fea8:2c14])
+        by smtp.gmail.com with ESMTPSA id c11-20020aa78c0b000000b006765cb32558sm6702838pfd.139.2023.07.14.01.56.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jul 2023 01:56:44 -0700 (PDT)
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+X-Google-Original-From: Shyam Prasad N <sprasad@microsoft.com>
+To:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
+        bharathsm.hsk@gmail.com, pc@cjr.nz
+Cc:     Shyam Prasad N <sprasad@microsoft.com>
+Subject: [PATCH 1/2] cifs: fix mid leak during reconnection after timeout threshold
+Date:   Fri, 14 Jul 2023 08:56:33 +0000
+Message-Id: <20230714085634.10808-1-sprasad@microsoft.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230713-mgctime-v5-8-9eb795d2ae37@kernel.org>
-References: <20230713-mgctime-v5-0-9eb795d2ae37@kernel.org>
-In-Reply-To: <20230713-mgctime-v5-0-9eb795d2ae37@kernel.org>
-To:     Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Richard Weinberger <richard@nod.at>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Dave Chinner <david@fromorbit.com>, v9fs@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
-        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2706; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=t187d4hlj7Hd2B853hoiIPlXJE4vBx7O1lkOZGTYDW8=;
- b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBksIIv0d3fY46+2hyVZzGgFlf73uVo9uOX8lOx6
- K4UVJ9Da6yJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZLCCLwAKCRAADmhBGVaC
- FbztD/4uZXXSyTwCnSezUKeydXdyB1DOo4czPXF+iJ085mANTre9b4XbUvuEDf9bQijKjYvAiIF
- T6aBATLxstNxy4RGAHDXtSLWG232Ink6G1PNMhMC9R96FpJsuPjmMk8NUBog9j/mjyhM2PlaAMX
- tX5JL88Tb2gI1FbBxP6pQJCDRkYxbfydZ/FGNzZuAcvlJMt3BH7bGga81LPIjr5UOfLB+GnI8oe
- i5BFOw+r7A+Xu+KDGowTNXor3TGmR763yaM7A/mcig5Jp20jEJIXDGO1tVgSdAP0LebIstIif+9
- kiMe/3MWPnPs0eVd+mEtYR53HfccdkA9ShOKV+Jx7qg5v2TSojDh7bRQBVb22NQZGRPBlgv2560
- X83w+MU7yhsMU1MCxv2Whg6ooLLErWX5Zp68rM1FJYdQ/3YbvfDj6sg+4Aa3PF5ifwLM33BLCLr
- pXwEOeLySTL3OWSfSzMqbNqkSShHhPhxZs+ZtZsqAM1fTRTO3svFqI7T/IFjBt7NKwvQJKyhtIJ
- syGts3Gf66X08k1+2iwyGMuP2FA8o0TGMTCwUBXZtxQhhH4KlMpwsdFurHxhcT/j4CtVbSAH4Uc
- fB3KEuG+QiBPD89OSHahxCRhPa+vWgmHHVnmaRK/PJC6un6LOOBM1as6ikNxs/Lc9yixCPrHMNq
- /XZRVwDe3wtNV8A==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Enable multigrain timestamps, which should ensure that there is an
-apparent change to the timestamp whenever it has been written after
-being actively observed via getattr.
+When the number of responses with status of STATUS_IO_TIMEOUT
+exceeds a specified threshold (NUM_STATUS_IO_TIMEOUT), we reconnect
+the connection. But we do not return the mid, or the credits
+returned for the mid, or reduce the number of in-flight requests.
 
-Beyond enabling the FS_MGTIME flag, this patch eliminates
-update_time_for_write, which goes to great pains to avoid in-memory
-stores. Just have it overwrite the timestamps unconditionally.
+This bug could result in the server->in_flight count to go bad,
+and also cause a leak in the mids.
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
+This change moves the check to a few lines below where the
+response is decrypted, even of the response is read from the
+transform header. This way, the code for returning the mids
+can be reused.
+
+Also, the cifs_reconnect was reconnecting just the transport
+connection before. In case of multi-channel, this may not be
+what we want to do after several timeouts. Changed that to
+reconnect the session and the tree too.
+
+Also renamed NUM_STATUS_IO_TIMEOUT to a more appropriate name
+MAX_STATUS_IO_TIMEOUT.
+
+Fixes: 8e670f77c4a5 ("Handle STATUS_IO_TIMEOUT gracefully")
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/btrfs/file.c  | 24 ++++--------------------
- fs/btrfs/super.c |  5 +++--
- 2 files changed, 7 insertions(+), 22 deletions(-)
+ fs/smb/client/connect.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
-index d7a9ece7a40b..b9e75c9f95ac 100644
---- a/fs/btrfs/file.c
-+++ b/fs/btrfs/file.c
-@@ -1106,25 +1106,6 @@ void btrfs_check_nocow_unlock(struct btrfs_inode *inode)
- 	btrfs_drew_write_unlock(&inode->root->snapshot_lock);
- }
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 9d16626e7a66..87047bd38485 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -60,7 +60,7 @@ extern bool disable_legacy_dialects;
+ #define TLINK_IDLE_EXPIRE	(600 * HZ)
  
--static void update_time_for_write(struct inode *inode)
--{
--	struct timespec64 now, ctime;
--
--	if (IS_NOCMTIME(inode))
--		return;
--
--	now = current_time(inode);
--	if (!timespec64_equal(&inode->i_mtime, &now))
--		inode->i_mtime = now;
--
--	ctime = inode_get_ctime(inode);
--	if (!timespec64_equal(&ctime, &now))
--		inode_set_ctime_to_ts(inode, now);
--
--	if (IS_I_VERSION(inode))
--		inode_inc_iversion(inode);
--}
--
- static int btrfs_write_check(struct kiocb *iocb, struct iov_iter *from,
- 			     size_t count)
- {
-@@ -1156,7 +1137,10 @@ static int btrfs_write_check(struct kiocb *iocb, struct iov_iter *from,
- 	 * need to start yet another transaction to update the inode as we will
- 	 * update the inode when we finish writing whatever data we write.
- 	 */
--	update_time_for_write(inode);
-+	if (!IS_NOCMTIME(inode)) {
-+		inode->i_mtime = inode_set_ctime_current(inode);
-+		inode_inc_iversion(inode);
-+	}
+ /* Drop the connection to not overload the server */
+-#define NUM_STATUS_IO_TIMEOUT   5
++#define MAX_STATUS_IO_TIMEOUT   5
  
- 	start_pos = round_down(pos, fs_info->sectorsize);
- 	oldsize = i_size_read(inode);
-diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-index f1dd172d8d5b..8eda51b095c9 100644
---- a/fs/btrfs/super.c
-+++ b/fs/btrfs/super.c
-@@ -2144,7 +2144,7 @@ static struct file_system_type btrfs_fs_type = {
- 	.name		= "btrfs",
- 	.mount		= btrfs_mount,
- 	.kill_sb	= btrfs_kill_super,
--	.fs_flags	= FS_REQUIRES_DEV | FS_BINARY_MOUNTDATA,
-+	.fs_flags	= FS_REQUIRES_DEV | FS_BINARY_MOUNTDATA | FS_MGTIME,
- };
+ static int ip_connect(struct TCP_Server_Info *server);
+ static int generic_ip_connect(struct TCP_Server_Info *server);
+@@ -1118,6 +1118,7 @@ cifs_demultiplex_thread(void *p)
+ 	struct mid_q_entry *mids[MAX_COMPOUND];
+ 	char *bufs[MAX_COMPOUND];
+ 	unsigned int noreclaim_flag, num_io_timeout = 0;
++	bool pending_reconnect = false;
  
- static struct file_system_type btrfs_root_fs_type = {
-@@ -2152,7 +2152,8 @@ static struct file_system_type btrfs_root_fs_type = {
- 	.name		= "btrfs",
- 	.mount		= btrfs_mount_root,
- 	.kill_sb	= btrfs_kill_super,
--	.fs_flags	= FS_REQUIRES_DEV | FS_BINARY_MOUNTDATA | FS_ALLOW_IDMAP,
-+	.fs_flags	= FS_REQUIRES_DEV | FS_BINARY_MOUNTDATA |
-+			  FS_ALLOW_IDMAP | FS_MGTIME,
- };
+ 	noreclaim_flag = memalloc_noreclaim_save();
+ 	cifs_dbg(FYI, "Demultiplex PID: %d\n", task_pid_nr(current));
+@@ -1157,6 +1158,8 @@ cifs_demultiplex_thread(void *p)
+ 		cifs_dbg(FYI, "RFC1002 header 0x%x\n", pdu_length);
+ 		if (!is_smb_response(server, buf[0]))
+ 			continue;
++
++		pending_reconnect = false;
+ next_pdu:
+ 		server->pdu_size = pdu_length;
  
- MODULE_ALIAS_FS("btrfs");
-
+@@ -1214,10 +1217,13 @@ cifs_demultiplex_thread(void *p)
+ 		if (server->ops->is_status_io_timeout &&
+ 		    server->ops->is_status_io_timeout(buf)) {
+ 			num_io_timeout++;
+-			if (num_io_timeout > NUM_STATUS_IO_TIMEOUT) {
+-				cifs_reconnect(server, false);
++			if (num_io_timeout > MAX_STATUS_IO_TIMEOUT) {
++				cifs_server_dbg(VFS,
++						"Number of request timeouts exceeded %d. Reconnecting",
++						MAX_STATUS_IO_TIMEOUT);
++
++				pending_reconnect = true;
+ 				num_io_timeout = 0;
+-				continue;
+ 			}
+ 		}
+ 
+@@ -1264,6 +1270,11 @@ cifs_demultiplex_thread(void *p)
+ 			buf = server->smallbuf;
+ 			goto next_pdu;
+ 		}
++
++		/* do this reconnect at the very end after processing all MIDs */
++		if (pending_reconnect)
++			cifs_reconnect(server, true);
++
+ 	} /* end while !EXITING */
+ 
+ 	/* buffer usually freed in free_mid - need to free it here on exit */
 -- 
-2.41.0
+2.34.1
 
