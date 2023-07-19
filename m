@@ -2,54 +2,55 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B44EB64DC
-	for <linux-cifs@archiver.kernel.org>; Tue, 18 Jul 2023 17:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6529EB64DC
+	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jul 2023 00:51:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232607AbjGRROZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jul 2023 13:14:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46212 "EHLO
+        id S230029AbjGSAvF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Jul 2023 20:51:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232523AbjGRROY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jul 2023 13:14:24 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8981705
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Jul 2023 10:14:22 -0700 (PDT)
+        with ESMTP id S230036AbjGSAup (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jul 2023 20:50:45 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7D091FDD
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Jul 2023 17:50:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689700462; x=1721236462;
+  t=1689727825; x=1721263825;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=D85i3I1qv0UIg8otkHTCz8DY4aKxgAAO1rYzUaSYPhs=;
-  b=Ht1ybTENY/8HXgp30qx+veKRdsZaAs6mXl9n3G8Moqsz6gL/IwVz9/Ks
-   UYM6VhfodNzFyVIJx+fF4VCPe+Mbf6aI/USaKTDEmI7fazecKT98BFKtR
-   MueflRTKp3Fabk6FhYZ4wg/OQNk5lyamKpBsP72/k6JBMhP0KAdCFZNVI
-   3KSYOqgcrWVDnUFqxpZdmhIcJL0135JCrAAyREDJW/+VtjVrQy7h88xKz
-   +UB+FC3nMHRaRBOXkTVSckHjtxXql8sgeD62uhLbrW9iUZKzsARWX1mJP
-   JfH3JK44CtTMfyDWSlS2anrtFKwWXVo41IAONsd36a/JkY6ph6mzCemq1
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="430027098"
-X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="430027098"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 10:14:21 -0700
+  bh=NLYp821Xog/YiOvkjYk0MI/9pRUxQRtsFPmT4GhhPqM=;
+  b=Pj4VhqRFUUW8BCQ70ghEWyRpmmMH4IrhINKKz6hE6iAxMk8pq9QBAL2C
+   rKXOSuqPkKC/MSLy/zH4/pMzsmcEENx3oAa62azbg0guqniN8dBdIhzux
+   OJcp7jXFmYWJKhg66DuUasg4DBYfL0lKs9W6UHMp95tl1rhsZmsmfrJlv
+   KLq3wMrVLvD6zMH8gi5xIik8lornBRvxvLJHyroQBARjZY43IfMCn9fAm
+   yQR0eWbA2aXWPn7osYNHt/L/CI0SglpxJIbuLVTKD96MPEKzX1ofPjhyp
+   n0LKxVMd8TTYxWJXWdpot1EECtr1/YFj4qaGp1tZEGBF47/K8RGYKWy/c
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="365226441"
+X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
+   d="scan'208";a="365226441"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 17:50:24 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="717675999"
-X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="717675999"
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="847881331"
+X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
+   d="scan'208";a="847881331"
 Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 18 Jul 2023 10:14:19 -0700
+  by orsmga004.jf.intel.com with ESMTP; 18 Jul 2023 17:50:21 -0700
 Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
         (envelope-from <lkp@intel.com>)
-        id 1qLoH3-0002Jj-1C;
-        Tue, 18 Jul 2023 17:14:15 +0000
-Date:   Wed, 19 Jul 2023 01:13:27 +0800
+        id 1qLvOB-0003zr-2g;
+        Wed, 19 Jul 2023 00:50:05 +0000
+Date:   Wed, 19 Jul 2023 08:48:55 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Winston Wen <wentao@uniontech.com>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, pc@manguebit.com, lsahlber@redhat.com,
         sprasad@microsoft.com, tom@talpey.com
-Cc:     oe-kbuild-all@lists.linux.dev, Winston Wen <wentao@uniontech.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        Winston Wen <wentao@uniontech.com>
 Subject: Re: [PATCH v2] cifs: fix charset issue in reconnection
-Message-ID: <202307190007.EIqqUg1i-lkp@intel.com>
+Message-ID: <202307190835.WUgCXW8a-lkp@intel.com>
 References: <20230718012437.1841868-1-wentao@uniontech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -61,10 +62,10 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 Hi Winston,
 
-kernel test robot noticed the following build warnings:
+kernel test robot noticed the following build errors:
 
-[auto build test WARNING on cifs/for-next]
-[also build test WARNING on linus/master v6.5-rc2 next-20230718]
+[auto build test ERROR on cifs/for-next]
+[also build test ERROR on linus/master v6.5-rc2 next-20230718]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
@@ -73,26 +74,24 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Winston-Wen/cifs-fix-char
 base:   git://git.samba.org/sfrench/cifs-2.6.git for-next
 patch link:    https://lore.kernel.org/r/20230718012437.1841868-1-wentao%40uniontech.com
 patch subject: [PATCH v2] cifs: fix charset issue in reconnection
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20230719/202307190007.EIqqUg1i-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230719/202307190007.EIqqUg1i-lkp@intel.com/reproduce)
+config: i386-randconfig-i011-20230718 (https://download.01.org/0day-ci/archive/20230719/202307190835.WUgCXW8a-lkp@intel.com/config)
+compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
+reproduce: (https://download.01.org/0day-ci/archive/20230719/202307190835.WUgCXW8a-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307190007.EIqqUg1i-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307190835.WUgCXW8a-lkp@intel.com/
 
-All warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
-   fs/smb/client/connect.c: In function 'cifs_get_smb_ses':
->> fs/smb/client/connect.c:2293:49: warning: passing argument 1 of 'load_nls' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-    2293 |         ses->local_nls = load_nls(ctx->local_nls->charset);
-         |                                   ~~~~~~~~~~~~~~^~~~~~~~~
-   In file included from fs/smb/client/cifsproto.h:10,
-                    from fs/smb/client/connect.c:37:
-   include/linux/nls.h:50:35: note: expected 'char *' but argument is of type 'const char *'
-      50 | extern struct nls_table *load_nls(char *);
-         |                                   ^~~~~~
+>> fs/smb/client/connect.c:2293:28: error: passing 'const char *' to parameter of type 'char *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+           ses->local_nls = load_nls(ctx->local_nls->charset);
+                                     ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/nls.h:50:41: note: passing argument to parameter here
+   extern struct nls_table *load_nls(char *);
+                                           ^
+   1 error generated.
 
 
 vim +2293 fs/smb/client/connect.c
