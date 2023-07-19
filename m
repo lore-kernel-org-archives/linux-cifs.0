@@ -2,162 +2,208 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CB1C00528
-	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jul 2023 01:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC16C001B0
+	for <linux-cifs@archiver.kernel.org>; Wed, 19 Jul 2023 04:31:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229589AbjGSBfq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 18 Jul 2023 21:35:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38210 "EHLO
+        id S229990AbjGSEbh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 19 Jul 2023 00:31:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbjGSBfo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Jul 2023 21:35:44 -0400
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718471BDC
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Jul 2023 18:35:42 -0700 (PDT)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1b06da65bdbso4839946fac.1
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Jul 2023 18:35:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1689730541; x=1692322541;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZssYNKocP7SJAjxckC3wBJ507CzulE9IvrMWjf3P+k=;
-        b=5Slf0Wf1DkEOl9A1TiQUYv8SMKm8hpMZkE2pdlrBFVPzzvpLYuiVjUXLVmHCw57mm3
-         QfMAXPNPanSdHmq5ZWXmuM6TgukKEbveLzpwksx2dw9ZklwdjhA52vimEHT2eirBfa+2
-         IT2vnquxNaJm7BjHGdah8DmKJSIjdo0Yp6c26+N05rt7PzrzOKrn94s8yKsSInPTUfNp
-         YfGoevKBsYDtPuhIbewKvY1jLvJ5fb914inI0h60wc0+K8b0g/S/UYKcw11+BXpzkI08
-         6FecWUvMm8TYFIR2erayRFzaDHDt6sysMcKT2DfDdd2VqMiXCbsW5RRwMl7laE7GyBrL
-         HnfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689730541; x=1692322541;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xZssYNKocP7SJAjxckC3wBJ507CzulE9IvrMWjf3P+k=;
-        b=c0ZTPW1Q78vljlMcJhY8lBLQ3crs5LndKeD/NsFosTbP1yepJ0Zxgxz7dU8MwlSKbD
-         ytSzGf6Ne54iC5vjkJCHTt/JPnTRpxlvaByge/nxRzMheEYvuPAbN0wY7IEsO53iaqcI
-         cbXlj0DoF1GsxFo/0MmstxdO/2Gr9ctbEErzW6pzeWJt6IHDExujAJbfNrPe+fqAzvqc
-         EfPNdq95Ctmf+KxPptG4ZIN9w2/FCeCMsoMWV22ITzRzgqcsYPWiRolfAVEV6s4jswyJ
-         I6arPL2sJ2qsBqzGvs/bbScLwy1KKwtSB08w4PLjwn4MztjsFP0hapCC1Pfxe0Q02Jc8
-         KD0A==
-X-Gm-Message-State: ABy/qLZ2/xVuNQBskximytn2D7f7/xwYnizAiIYzaKRmLlhkd+eeUpcJ
-        e2wk9ZlblVWF3SjL9yppDy8Pgw==
-X-Google-Smtp-Source: APBJJlHb4gEwJfD+TL2icCrXL1rPSO1/If2sqk52+FC1gSV2ztjdma15fYoDbEqUpP5c7bsoFPcHEw==
-X-Received: by 2002:a05:6870:96a6:b0:1b3:8d35:c85f with SMTP id o38-20020a05687096a600b001b38d35c85fmr1011777oaq.1.1689730541592;
-        Tue, 18 Jul 2023 18:35:41 -0700 (PDT)
-Received: from dread.disaster.area (pa49-186-119-116.pa.vic.optusnet.com.au. [49.186.119.116])
-        by smtp.gmail.com with ESMTPSA id 201-20020a6301d2000000b005633311c70dsm2343100pgb.32.2023.07.18.18.35.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 18:35:40 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qLw6L-007mcz-1V;
-        Wed, 19 Jul 2023 11:35:37 +1000
-Date:   Wed, 19 Jul 2023 11:35:37 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Richard Weinberger <richard@nod.at>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, v9fs@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
-        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v5 6/8] xfs: switch to multigrain timestamps
-Message-ID: <ZLc96V2Yo72sthsi@dread.disaster.area>
-References: <20230713-mgctime-v5-0-9eb795d2ae37@kernel.org>
- <20230713-mgctime-v5-6-9eb795d2ae37@kernel.org>
+        with ESMTP id S229935AbjGSEbe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Jul 2023 00:31:34 -0400
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C20E42
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Jul 2023 21:31:30 -0700 (PDT)
+X-QQ-mid: bizesmtp79t1689741079t7bfujjs
+Received: from winn-pc ( [113.57.152.160])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Wed, 19 Jul 2023 12:31:18 +0800 (CST)
+X-QQ-SSF: 00400000000000F0H000000A0000000
+X-QQ-FEAT: UDLI1DvlgXoh7b3gyI1n2ADk6zYJUcyM/fhqlBuRIRWi6MGbGVtjAPanhRFkH
+        uB/kHa0s4J7FWEojHxXcZEnPA25E95vxs0WQH2FdTu2FfmxYxAakqwi48F5C0BmX/RWfjgs
+        e9a40mWFzdpWQAe4kTuSbAeiTYTCdLr9iLYu/Dc4UGJhfT79SUvaGxj6M4Xfzn9bO1ZVBpK
+        RUeQ6pzC980xV5zXOvKAoqQpzEseoMejDRgz8z0ZQ5DJ7v1B3GQOimqQfiKs1xB+c7EUjPX
+        WfZ2VCFF1cYtvzb5eOtCXsFR2z6tEo0koSRIadzyxCWCxKb2alEx7ON4awhfWcT0OvmB1cj
+        wNAyk7/gcZiiirXzFMpGFvIqEGd+MXiAaDsAdrf7g1DrIMjWekbFD8KE1zLBoTvAEo2UIfJ
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 14378794371490552226
+Date:   Wed, 19 Jul 2023 12:31:17 +0800
+From:   Winston Wen <wentao@uniontech.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     linux-cifs@vger.kernel.org, pc@manguebit.com, lsahlber@redhat.com,
+        sprasad@microsoft.com, tom@talpey.com
+Subject: Re: [PATCH v2] cifs: fix charset issue in reconnection
+Message-ID: <0559DC08D92C076E+20230719123117.692feb89@winn-pc>
+In-Reply-To: <CAH2r5mvPXwc4H_7bkcF_oqedLrKTSv4GKBhYkpYC9=H==d-G3g@mail.gmail.com>
+References: <20230718012437.1841868-1-wentao@uniontech.com>
+        <CAH2r5mvPXwc4H_7bkcF_oqedLrKTSv4GKBhYkpYC9=H==d-G3g@mail.gmail.com>
+Organization: Uniontech
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230713-mgctime-v5-6-9eb795d2ae37@kernel.org>
+Content-Type: multipart/mixed; boundary="MP_/WLL=gCy4vph/v5RhJ19y76R"
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jul 13, 2023 at 07:00:55PM -0400, Jeff Layton wrote:
-> Enable multigrain timestamps, which should ensure that there is an
-> apparent change to the timestamp whenever it has been written after
-> being actively observed via getattr.
-> 
-> Also, anytime the mtime changes, the ctime must also change, and those
-> are now the only two options for xfs_trans_ichgtime. Have that function
-> unconditionally bump the ctime, and warn if XFS_ICHGTIME_CHG is ever not
-> set.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  fs/xfs/libxfs/xfs_trans_inode.c | 6 +++---
->  fs/xfs/xfs_iops.c               | 4 ++--
->  fs/xfs/xfs_super.c              | 2 +-
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/fs/xfs/libxfs/xfs_trans_inode.c b/fs/xfs/libxfs/xfs_trans_inode.c
-> index 0c9df8df6d4a..86f5ffce2d89 100644
-> --- a/fs/xfs/libxfs/xfs_trans_inode.c
-> +++ b/fs/xfs/libxfs/xfs_trans_inode.c
-> @@ -62,12 +62,12 @@ xfs_trans_ichgtime(
->  	ASSERT(tp);
->  	ASSERT(xfs_isilocked(ip, XFS_ILOCK_EXCL));
->  
-> -	tv = current_time(inode);
-> +	/* If the mtime changes, then ctime must also change */
-> +	WARN_ON_ONCE(!(flags & XFS_ICHGTIME_CHG));
+--MP_/WLL=gCy4vph/v5RhJ19y76R
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Make that an ASSERT(flags & XFS_ICHGTIME_CHG), please. There's no
-need to verify this at runtime on production kernels.
+On Tue, 18 Jul 2023 10:42:27 -0500
+Steve French <smfrench@gmail.com> wrote:
 
--Dave.
+> I get compile warning:
+>=20
+> /home/smfrench/cifs-2.6/fs/smb/client/connect.c: In function
+> =E2=80=98cifs_get_smb_ses=E2=80=99:
+> /home/smfrench/cifs-2.6/fs/smb/client/connect.c:2293:49: warning:
+> passing argument 1 of =E2=80=98load_nls=E2=80=99 discards =E2=80=98const=
+=E2=80=99 qualifier from
+> pointer target type [-Wdiscarded-qualifiers]
+
+
+>  2293 |         ses->local_nls =3D load_nls(ctx->local_nls->charset);
+
+Hi Steve,
+
+Sorry about the mistake I made. I updated the patch with a very small
+change:
+
+	ses->local_nls =3D load_nls((char *)ctx->local_nls->charset);
+
+It works, but I'm not sure whether it's clean enough.=20
+
+Perhaps I should make a change to load_nls() to take a const char *
+instead of char *? If this make sense, I'll do it soon.
+
+Find the updated patch as attachment.
+
+--=20
+Thanks,
+Winston
+
+--MP_/WLL=gCy4vph/v5RhJ19y76R
+Content-Type: text/x-patch
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename=0001-cifs-fix-charset-issue-in-reconnection.patch
+
+From d9d010797ef790a599b2c8f1993f5b4d64f46352 Mon Sep 17 00:00:00 2001
+From: Winston Wen <wentao@uniontech.com>
+Date: Mon, 17 Jul 2023 08:51:50 +0800
+Subject: [PATCH] cifs: fix charset issue in reconnection
+
+We need to specify charset, like "iocharset=utf-8", in mount options for
+Chinese path if the nls_default don't support it, such as iso8859-1, the
+default value for CONFIG_NLS_DEFAULT.
+
+But now in reconnection the nls_default is used, instead of the one we
+specified and used in mount, and this can lead to mount failure.
+
+Signed-off-by: Winston Wen <wentao@uniontech.com>
+Reviewed-by: Paulo Alcantara <pc@manguebit.com>
+---
+ fs/smb/client/cifsglob.h | 1 +
+ fs/smb/client/cifssmb.c  | 3 +--
+ fs/smb/client/connect.c  | 5 +++++
+ fs/smb/client/misc.c     | 1 +
+ fs/smb/client/smb2pdu.c  | 3 +--
+ 5 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index c9a87d0123ce..31cadf9b2a98 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1062,6 +1062,7 @@ struct cifs_ses {
+ 	unsigned long chans_need_reconnect;
+ 	/* ========= end: protected by chan_lock ======== */
+ 	struct cifs_ses *dfs_root_ses;
++	struct nls_table *local_nls;
+ };
+ 
+ static inline bool
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 9dee267f1893..25503f1a4fd2 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -129,7 +129,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+ 	}
+ 	spin_unlock(&server->srv_lock);
+ 
+-	nls_codepage = load_nls_default();
++	nls_codepage = ses->local_nls;
+ 
+ 	/*
+ 	 * need to prevent multiple threads trying to simultaneously
+@@ -200,7 +200,6 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+ 		rc = -EAGAIN;
+ 	}
+ 
+-	unload_nls(nls_codepage);
+ 	return rc;
+ }
+ 
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 5dd09c6d762e..bec0e893be06 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -1842,6 +1842,10 @@ static int match_session(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+ 			    CIFS_MAX_PASSWORD_LEN))
+ 			return 0;
+ 	}
++
++	if (strcmp(ctx->local_nls->charset, ses->local_nls->charset))
++		return 0;
++
+ 	return 1;
+ }
+ 
+@@ -2286,6 +2290,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+ 
+ 	ses->sectype = ctx->sectype;
+ 	ses->sign = ctx->sign;
++	ses->local_nls = load_nls(ctx->local_nls->charset);
+ 
+ 	/* add server as first channel */
+ 	spin_lock(&ses->chan_lock);
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 70dbfe6584f9..d7e85d9a2655 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -95,6 +95,7 @@ sesInfoFree(struct cifs_ses *buf_to_free)
+ 		return;
+ 	}
+ 
++	unload_nls(buf_to_free->local_nls);
+ 	atomic_dec(&sesInfoAllocCount);
+ 	kfree(buf_to_free->serverOS);
+ 	kfree(buf_to_free->serverDomain);
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index e04766fe6f80..a457f07f820d 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -242,7 +242,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	}
+ 	spin_unlock(&server->srv_lock);
+ 
+-	nls_codepage = load_nls_default();
++	nls_codepage = ses->local_nls;
+ 
+ 	/*
+ 	 * need to prevent multiple threads trying to simultaneously
+@@ -324,7 +324,6 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		rc = -EAGAIN;
+ 	}
+ failed:
+-	unload_nls(nls_codepage);
+ 	return rc;
+ }
+ 
 -- 
-Dave Chinner
-david@fromorbit.com
+2.40.1
+
+
+--MP_/WLL=gCy4vph/v5RhJ19y76R--
