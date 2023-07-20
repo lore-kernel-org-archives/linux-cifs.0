@@ -2,102 +2,119 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41904C001B0
-	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jul 2023 00:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD93C001DC
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jul 2023 00:47:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbjGTAfr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 19 Jul 2023 20:35:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58404 "EHLO
+        id S229563AbjGTAr5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 19 Jul 2023 20:47:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjGTAfq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Jul 2023 20:35:46 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E741A8;
-        Wed, 19 Jul 2023 17:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1689813341;
-        bh=yVMVY4ZGVwKTCGyvtEewwCuRBTwtpUmcyBtB3yTy3pU=;
-        h=Date:From:To:Cc:Subject:From;
-        b=KRG05TnypiyYSuNIh2a6t75Z22TVHSxpO4F23xpq+cSbJNUWmupWzV1OWS16nmwZf
-         n7gOZQhvXquiIgVFKn5X+mGcSKGyXLfRhy5UeA4KiugkTH5dw+vLopjv9SCvaVH5j8
-         h/Jwwbj2M7vlhsA2qf8NqT5LMD6YC1KOqHQhleUH2AfR8eWQ8aPup2xLxdtnPN5g7d
-         BVAXKgLYfO4gjM2MKU5ZZHp31zAZdkjSejewuLZC1dGBHVOYSwpoyVC+CvDbM+VGgK
-         MuefqdGMqlVUCJR9KhZSCjLrLsVf2zhp8Ej6b0yUhCUIBtl0mzuTE0vNCVFXlGeCcT
-         IPQXYmqz+ECrw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4R5tyP47YWz4wxx;
-        Thu, 20 Jul 2023 10:35:41 +1000 (AEST)
-Date:   Thu, 20 Jul 2023 10:35:40 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Winston Wen <wentao@uniontech.com>,
+        with ESMTP id S229828AbjGTAr4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Jul 2023 20:47:56 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BA831BF7;
+        Wed, 19 Jul 2023 17:47:55 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b6f0508f54so2810921fa.3;
+        Wed, 19 Jul 2023 17:47:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689814074; x=1690418874;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RMC9ISeR+VkWGAWEa1cNLcI3IOnmieq6epgbCGmm3AE=;
+        b=a/OZqojo+/mRCY2PtQ1iv2PKZSj4yez4mdkwV9xl4MUcey2sSNCDLlMdPK3a2o9DrH
+         xg8Rf8tDdo5dThWKz4REi1YYf6WQniffqkHTRfq6RU5UieX2r9akqn82rZM1BuYBfukY
+         lfc2kIZlhBvSMrs7w+uyOd73wv7rv1zFO5ubvlBCeKDA7zmufcfH1Hxfvj/eGcjTZ1zD
+         PycPlOu96qMAh3oOwqvH0awsmqbS7dIs6ihtEv+FQBJRr7UuLdl8PHVbhhcGE7dx62Bs
+         AMUTYIZHqVKn9BJ4FDdkfh/pk/H1sHO6kEeqBd5ADy1/sGutKHcaE4kXT55b0mQf5Hk2
+         7ySA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689814074; x=1690418874;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RMC9ISeR+VkWGAWEa1cNLcI3IOnmieq6epgbCGmm3AE=;
+        b=PJbtlpuvrfivNcRQF3lOvkXlI/LJ8bOCXh58QIIqTmiMXTC6DWylmiIHAQRZXy+EfL
+         zPwgVlZ0678gGTLdoaniIbLQ2rvj5jbzvG9urug9Gxk73OtrTqmepbuAJrt5p9ZjQCpT
+         rAQbS66+oSI4qShmSRUNeBj6qimjykirKxGMUGNObB8vwdK2Lj9INbL76JqL1JrHmZIZ
+         L9GDNUAXsctU0AAqOji7zVrn9SiNaAvippPKpKGawNPXwDBSwQEDm5QYUp1fBJCytkb/
+         SQ+pJlkjPOo6gdxpWbCHIR/V2XMiZIJ2R1oA+UaU/tlr87uYPQrkCI5wZ4Pc8YqL6psy
+         p7TA==
+X-Gm-Message-State: ABy/qLbFzxr+yzKMKkta7iDaTeEueYeIHknShZomyIkbLRCCq2OzOXpo
+        KX2nL3YrAQELiipGt4MUOTfrluwNgI23Yv9Ansc=
+X-Google-Smtp-Source: APBJJlF/ndQHml697HrEn7Jjm/aiS76PxmyYplon1r3d25EKCUraEN7zi8GNSiXFox6i5kb+glZYhwIQi2uSSq2eJmg=
+X-Received: by 2002:a2e:8742:0:b0:2b6:9f95:46d3 with SMTP id
+ q2-20020a2e8742000000b002b69f9546d3mr761208ljj.9.1689814073489; Wed, 19 Jul
+ 2023 17:47:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230720103540.0436273d@canb.auug.org.au>
+In-Reply-To: <20230720103540.0436273d@canb.auug.org.au>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 19 Jul 2023 19:47:42 -0500
+Message-ID: <CAH2r5mugNKYBNXm7AuPFL=V=77Qkm3q6TtXCj-B0kugmpL0aYQ@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the cifs tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Winston Wen <wentao@uniontech.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>,
         Luis Chamberlain <mcgrof@kernel.org>,
         linux-modules@vger.kernel.org
-Subject: linux-next: build failure after merge of the cifs tree
-Message-ID: <20230720103540.0436273d@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/SNLc3YH5=1GospBWQy3z/qr";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/SNLc3YH5=1GospBWQy3z/qr
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Winston had an updated version of the patch - just replaced it with
+his updated one which does a cast to (char *)
 
-Hi all,
+          ses->local_nls =3D load_nls((char *)ctx->local_nls->charset);
 
-After merging the cifs tree, today's linux-next build (x86_64
-allmodconfig) failed like this:
+But as he noted in an earlier email thread:
+> Perhaps I should make a change to load_nls() to take a const char *
+> instead of char *? If this make sense, I'll do it soon.
 
-fs/smb/client/connect.c: In function 'cifs_get_smb_ses':
-fs/smb/client/connect.c:2293:49: error: passing argument 1 of 'load_nls' di=
-scards 'const' qualifier from pointer target type [-Werror=3Ddiscarded-qual=
-ifiers]
- 2293 |         ses->local_nls =3D load_nls(ctx->local_nls->charset);
-      |                                   ~~~~~~~~~~~~~~^~~~~~~~~
-In file included from fs/smb/client/cifsproto.h:10,
-                 from fs/smb/client/connect.c:37:
-include/linux/nls.h:50:35: note: expected 'char *' but argument is of type =
-'const char *'
-   50 | extern struct nls_table *load_nls(char *);
-      |                                   ^~~~~~
+which is probably cleaner
 
-Caused by commit
+On Wed, Jul 19, 2023 at 7:35=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
+>
+> Hi all,
+>
+> After merging the cifs tree, today's linux-next build (x86_64
+> allmodconfig) failed like this:
+>
+> fs/smb/client/connect.c: In function 'cifs_get_smb_ses':
+> fs/smb/client/connect.c:2293:49: error: passing argument 1 of 'load_nls' =
+discards 'const' qualifier from pointer target type [-Werror=3Ddiscarded-qu=
+alifiers]
+>  2293 |         ses->local_nls =3D load_nls(ctx->local_nls->charset);
+>       |                                   ~~~~~~~~~~~~~~^~~~~~~~~
+> In file included from fs/smb/client/cifsproto.h:10,
+>                  from fs/smb/client/connect.c:37:
+> include/linux/nls.h:50:35: note: expected 'char *' but argument is of typ=
+e 'const char *'
+>    50 | extern struct nls_table *load_nls(char *);
+>       |                                   ^~~~~~
+>
+> Caused by commit
+>
+>   46055407cd4a ("cifs: fix charset issue in reconnection")
+>
+> I have used the cifs tree from next-20230719 for today.
+>
+> It looks as though the parameter to load_nls could be made const safely
+> as it is just passed to try_then_request_module() passes it to
+> __request_module() which just passes it to vsnprintf() to construct the
+> module name.  There does not appear to be any maintainer for fs/nls ...
+> --
+> Cheers,
+> Stephen Rothwell
 
-  46055407cd4a ("cifs: fix charset issue in reconnection")
 
-I have used the cifs tree from next-20230719 for today.
 
-It looks as though the parameter to load_nls could be made const safely
-as it is just passed to try_then_request_module() passes it to
-__request_module() which just passes it to vsnprintf() to construct the
-module name.  There does not appear to be any maintainer for fs/nls ...
 --=20
-Cheers,
-Stephen Rothwell
+Thanks,
 
---Sig_/SNLc3YH5=1GospBWQy3z/qr
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmS4gVwACgkQAVBC80lX
-0Gy/8ggAoUGb9kyA06ycG74jKmmoNg9T4v+DDRjTyycfFIKih/2MxKXu2VJucbLJ
-WYiawBAi8eFUGNLwkYv/bczyT1fjGsN1w7bz48NDiesjgY/rZy8igqZRKCHanpxc
-RWCd6R+hvFRJlZZJ2akPqZdjatNzcluRodxiTDcFJ3fFtqmy+dpZHwcuaJXqmuvw
-lOtghx7+zlL6POxVkRxbDuV+VdOAxHblSbjp65Nud8lzjZaLOWJhlCjpw0DtWUpv
-x6YxApKzH7ua20roGBHef39hxy/9KQUr6pdckMp2YUUGFw2VIxomfrWiRQ+DJ2+C
-0CPNnq9jsapNYODYVX8eBjz6o6Xm6g==
-=pYt/
------END PGP SIGNATURE-----
-
---Sig_/SNLc3YH5=1GospBWQy3z/qr--
+Steve
