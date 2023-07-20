@@ -2,85 +2,117 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55536C001B0
-	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jul 2023 01:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4DEBEB64DA
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jul 2023 06:45:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229899AbjGTBeC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 19 Jul 2023 21:34:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46026 "EHLO
+        id S229663AbjGTGpX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 20 Jul 2023 02:45:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229762AbjGTBeB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Jul 2023 21:34:01 -0400
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14DCF2699;
-        Wed, 19 Jul 2023 18:33:44 -0700 (PDT)
-X-QQ-mid: bizesmtp69t1689816815thvqecog
-Received: from winn-pc ( [113.57.152.160])
+        with ESMTP id S231208AbjGTGpQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Jul 2023 02:45:16 -0400
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A861326B1;
+        Wed, 19 Jul 2023 23:45:08 -0700 (PDT)
+X-QQ-mid: bizesmtp68t1689834875t8uqaw1v
+Received: from localhost.localdomain ( [113.57.152.160])
         by bizesmtp.qq.com (ESMTP) with 
-        id ; Thu, 20 Jul 2023 09:33:34 +0800 (CST)
+        id ; Thu, 20 Jul 2023 14:34:34 +0800 (CST)
 X-QQ-SSF: 01400000000000F0H000000A0000000
-X-QQ-FEAT: ed3fCvOSdPtok9dqNbjZOUiBz3j5AlKdThUzqIrSzdkBL8VMn7X8/7SOjvGQD
-        1S0+Nn5RRbWySoa+AcUfAxlDEU67uYFBuLAChaaGsCVxgx7LQsGFzCSMHoB/efhqTdHPYrQ
-        P5xb06vUxcIiSeO3GDxz5XLGTknwFiD0kkmGnS2Aa1Grg0BgKYxJ3JGtf6i9eCTK3NiV0dR
-        TaacX/Dr8ZwtkxbUdNfx9R46anPlxWlAFsBpuvvMezWt0uMtYkUtHzVs/1XvA2hFa0ojmqs
-        zOEu9OJZ08rflGDk4J8BWR9beiot36Rx7y58Z90NRhfUyxYsAlGXKdsceVU7myrqsY4jw1e
-        wWR6gZLhtwvSmgNfZY1RieOpsPb+WucPSnmnl5VZH8G0ZdnqD1A8DEAumlcVqqBvt1Tzved
+X-QQ-FEAT: KTe/kbfylhYNEbP0cLXnuujVkVcG0fg7qq1gpxJ4cgX7rL0CEUgofhqLNhHfg
+        JY8BbIc6FphT+tFsl5D3j/Nj9cPSBAP3eY8/S9LHyygL6bgC4DJe3VjqY610Co59xIc70jS
+        REnua6FCRSzC1iUlE64Z3A6zbUG2aR3anS6H9Ys59E68N468w/FZeGQU152C7PiEm10UXAC
+        h/xsbRO/NcJuSgZACdTr9aTQJSAXZjRSIFSleS/mlNxQW0hLzGVE4fMELaOzr+Aju7+6Tuf
+        Emx0oJDbe+VP+FsaGmfAFFq4uS83jjvsym6yN5WHvHYmz+0TYlG2dHcejwi5Eo/Fa38vsq2
+        9J0Dh9bRnPPJFKHI5Z5VrDDQtfZdLSZDUhP69fUJhw90KemQvpeUSmcFQv+LXJbN8WZ2VD6
+        im0In4Yh7y+2qr1bkF0zow==
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 3347760861191863388
-Date:   Thu, 20 Jul 2023 09:33:34 +0800
+X-BIZMAIL-ID: 11999717834230943705
 From:   Winston Wen <wentao@uniontech.com>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-modules@vger.kernel.org
-Subject: Re: linux-next: build failure after merge of the cifs tree
-Message-ID: <C27A47B8189477B4+20230720093334.2682929e@winn-pc>
-In-Reply-To: <20230720110021.3f2f9457@canb.auug.org.au>
-References: <20230720103540.0436273d@canb.auug.org.au>
-        <CAH2r5mugNKYBNXm7AuPFL=V=77Qkm3q6TtXCj-B0kugmpL0aYQ@mail.gmail.com>
-        <20230720110021.3f2f9457@canb.auug.org.au>
-Organization: Uniontech
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-pc-linux-gnu)
+To:     Steve French <sfrench@samba.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     Winston Wen <wentao@uniontech.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: [PATCH] fs/nls: make load_nls() take a const parameter
+Date:   Thu, 20 Jul 2023 14:34:14 +0800
+Message-Id: <20230720063414.2546451-1-wentao@uniontech.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, 20 Jul 2023 11:00:21 +1000
-Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+load_nls() take a char * parameter, use it to find nls module in list or
+construct the module name to load it.
 
-> Hi all,
-> 
-> On Wed, 19 Jul 2023 19:47:42 -0500 Steve French <smfrench@gmail.com>
-> wrote:
-> >
-> > Winston had an updated version of the patch - just replaced it with
-> > his updated one which does a cast to (char *)
-> > 
-> >           ses->local_nls = load_nls((char
-> > *)ctx->local_nls->charset);
-> > 
-> > But as he noted in an earlier email thread:
-> > > Perhaps I should make a change to load_nls() to take a const char
-> > > * instead of char *? If this make sense, I'll do it soon.  
-> > 
-> > which is probably cleaner
-> 
-> s/probably/definitely/  ;-)
-> 
+This change make load_nls() take a const parameter, so we don't need do
+some cast like this:
 
-haha yes!
+        ses->local_nls = load_nls((char *)ctx->local_nls->charset);
 
-I'll make a small patch for this in the next cycle.
+Also remove the cast in cifs code.
 
+Suggested-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Winston Wen <wentao@uniontech.com>
+---
+ fs/nls/nls_base.c       | 4 ++--
+ fs/smb/client/connect.c | 2 +-
+ include/linux/nls.h     | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/fs/nls/nls_base.c b/fs/nls/nls_base.c
+index 52ccd34b1e79..a026dbd3593f 100644
+--- a/fs/nls/nls_base.c
++++ b/fs/nls/nls_base.c
+@@ -272,7 +272,7 @@ int unregister_nls(struct nls_table * nls)
+ 	return -EINVAL;
+ }
+ 
+-static struct nls_table *find_nls(char *charset)
++static struct nls_table *find_nls(const char *charset)
+ {
+ 	struct nls_table *nls;
+ 	spin_lock(&nls_lock);
+@@ -288,7 +288,7 @@ static struct nls_table *find_nls(char *charset)
+ 	return nls;
+ }
+ 
+-struct nls_table *load_nls(char *charset)
++struct nls_table *load_nls(const char *charset)
+ {
+ 	return try_then_request_module(find_nls(charset), "nls_%s", charset);
+ }
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 8ad10c96e8ce..238538dde4e3 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -2290,7 +2290,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx)
+ 
+ 	ses->sectype = ctx->sectype;
+ 	ses->sign = ctx->sign;
+-	ses->local_nls = load_nls((char *)ctx->local_nls->charset);
++	ses->local_nls = load_nls(ctx->local_nls->charset);
+ 
+ 	/* add server as first channel */
+ 	spin_lock(&ses->chan_lock);
+diff --git a/include/linux/nls.h b/include/linux/nls.h
+index 499e486b3722..e0bf8367b274 100644
+--- a/include/linux/nls.h
++++ b/include/linux/nls.h
+@@ -47,7 +47,7 @@ enum utf16_endian {
+ /* nls_base.c */
+ extern int __register_nls(struct nls_table *, struct module *);
+ extern int unregister_nls(struct nls_table *);
+-extern struct nls_table *load_nls(char *);
++extern struct nls_table *load_nls(const char *charset);
+ extern void unload_nls(struct nls_table *);
+ extern struct nls_table *load_nls_default(void);
+ #define register_nls(nls) __register_nls((nls), THIS_MODULE)
 -- 
-Thanks,
-Winston
+2.40.1
 
