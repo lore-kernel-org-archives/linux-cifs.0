@@ -2,242 +2,112 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F28EB64DA
-	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jul 2023 14:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05646EB64DA
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Jul 2023 14:30:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232230AbjGTOZl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 20 Jul 2023 10:25:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55632 "EHLO
+        id S230133AbjGTOab (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 20 Jul 2023 10:30:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232209AbjGTOZk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Jul 2023 10:25:40 -0400
+        with ESMTP id S230112AbjGTOaa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Jul 2023 10:30:30 -0400
 Received: from smtp.rcn.com (mail.rcn.syn-alias.com [129.213.13.252])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC3AE75
-        for <linux-cifs@vger.kernel.org>; Thu, 20 Jul 2023 07:25:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638691BF7
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Jul 2023 07:30:29 -0700 (PDT)
 X-Authed-Username: dG10YWxwZXlAcmNuLmNvbQ==
-Authentication-Results:  smtp02.rcn.email-ash1.sync.lan smtp.user=<hidden>; auth=pass (PLAIN)
-Received: from [96.237.161.173] ([96.237.161.173:51681] helo=[192.168.0.206])
+Authentication-Results:  smtp01.rcn.email-ash1.sync.lan smtp.user=<hidden>; auth=pass (PLAIN)
+Received: from [96.237.161.173] ([96.237.161.173:51688] helo=[192.168.0.206])
         by smtp.rcn.com (envelope-from <tom@talpey.com>)
         (ecelerity 4.4.0.19839 r(msys-ecelerity:tags/4.4.0.0^0)) with ESMTPSA (cipher=AES128-GCM-SHA256) 
-        id AB/37-10976-1E349B46; Thu, 20 Jul 2023 10:25:37 -0400
-Message-ID: <d1f7fbe9-8fe2-e3e3-d6ff-1544204202ff@talpey.com>
-Date:   Thu, 20 Jul 2023 10:25:38 -0400
+        id 0E/94-05333-40549B46; Thu, 20 Jul 2023 10:30:28 -0400
+Message-ID: <d14f85d1-ff05-94da-24bb-6a1e1afe29f6@talpey.com>
+Date:   Thu, 20 Jul 2023 10:30:27 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
+Subject: Re: Potential leak in file put
 Content-Language: en-US
-To:     Dave Kleikamp <dave.kleikamp@oracle.com>,
-        "Dr. David Alan Gilbert" <linux@treblig.org>,
-        Steve French <smfrench@gmail.com>
-Cc:     linkinjeon@kernel.org, shaggy@kernel.org,
-        linux-cifs@vger.kernel.org, krisman@collabora.com,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
-References: <20230628232417.120844-1-linux@treblig.org>
- <ZK80mu/YbHLEABAB@gallifrey>
- <CAH2r5mvrhr52hXFv87O9O=Qw45AXRXr0NQAsTk4Wj-6s19-2bA@mail.gmail.com>
- <CAH2r5mss4RsEF1b6gJo8LFWsN9-YBSEP6GV7axsNhX7ihj5CqA@mail.gmail.com>
- <ZLhchajZaWEVM6D7@gallifrey>
- <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Bharath SM <bharathsm.hsk@gmail.com>,
+        Paulo Alcantara <pc@cjr.nz>,
+        Enzo Matsumiya <ematsumiya@suse.de>
+References: <CANT5p=po=GSwj+bD_-uFWZ0r_ww5XbaV1pAauZecbmuzShmcpw@mail.gmail.com>
 From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
+In-Reply-To: <CANT5p=po=GSwj+bD_-uFWZ0r_ww5XbaV1pAauZecbmuzShmcpw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Vade-Verdict: clean
 X-Vade-Analysis-1: gggruggvucftvghtrhhoucdtuddrgedviedrhedtgdejiecutefuodetggdotefrodftvfcurfhrohhf
 X-Vade-Analysis-2: ihhlvgemucfujgfpteevqfftpdftvefppdfgpfggqdftvefppdfqfgfvnecuuegrihhlohhuthemucef
-X-Vade-Analysis-3: tddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenogfuuhhsphgvtghtffhomhgrihhnucdl
-X-Vade-Analysis-4: geelmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthekredttdefjeenucfhrhhomhepvfhomhcu
-X-Vade-Analysis-5: vfgrlhhpvgihuceothhomhesthgrlhhpvgihrdgtohhmqeenucggtffrrghtthgvrhhnpeelgeffvedu
-X-Vade-Analysis-6: fffftdekgfduhfeffeeffeeiiedvfeeifedvuddutddtudegfefgjeenucffohhmrghinhepghhithhh
-X-Vade-Analysis-7: uhgsrdhiohdpthhrvggslhhighdrohhrghenucfkphepleeirddvfeejrdduiedurddujeefnecuvehl
-X-Vade-Analysis-8: uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepleeirddvfeejrdduiedurddujeefpdhh
-X-Vade-Analysis-9: vghloheplgduledvrdduieekrddtrddvtdeingdpmhgrihhlfhhrohhmpehtohhmsehtrghlphgvhidr
-X-Vade-Analysis-10: tghomhdprhgtphhtthhopegurghvvgdrkhhlvghikhgrmhhpsehorhgrtghlvgdrtghomhdprhgtphht
-X-Vade-Analysis-11: thhopehlihhnuhigsehtrhgvsghlihhgrdhorhhgpdhrtghpthhtohepshhmfhhrvghntghhsehgmhgr
-X-Vade-Analysis-12: ihhlrdgtohhmpdhrtghpthhtoheplhhinhhkihhnjhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphht
-X-Vade-Analysis-13: thhopehshhgrghhghieskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqtghifhhssehv
-X-Vade-Analysis-14: ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhrihhsmhgrnhestgholhhlrggsohhrrgdr
-X-Vade-Analysis-15: tghomh
+X-Vade-Analysis-3: tddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfhfhfgjtgfg
+X-Vade-Analysis-4: sehtjeertddtfeejnecuhfhrohhmpefvohhmucfvrghlphgvhicuoehtohhmsehtrghlphgvhidrtgho
+X-Vade-Analysis-5: mheqnecuggftrfgrthhtvghrnhepgeffieefveeghffgjeelhfdvudfgtdeigfehudeggfffleeghfef
+X-Vade-Analysis-6: ffdukedvgefgnecukfhppeeliedrvdefjedrudeiuddrudejfeenucevlhhushhtvghrufhiiigvpedt
+X-Vade-Analysis-7: necurfgrrhgrmhepihhnvghtpeeliedrvdefjedrudeiuddrudejfedphhgvlhhopegludelvddrudei
+X-Vade-Analysis-8: kedrtddrvddtiegnpdhmrghilhhfrhhomhepthhomhesthgrlhhpvgihrdgtohhmpdhrtghpthhtohep
+X-Vade-Analysis-9: nhhsphhmrghnghgrlhhorhgvsehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugidqtghifhhs
+X-Vade-Analysis-10: sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhmfhhrvghntghhsehgmhgrihhlrdgt
+X-Vade-Analysis-11: ohhmpdhrtghpthhtoheprhhonhhnihgvshgrhhhlsggvrhhgsehgmhgrihhlrdgtohhmpdhrtghpthht
+X-Vade-Analysis-12: ohepsghhrghrrghthhhsmhdrhhhskhesghhmrghilhdrtghomhdprhgtphhtthhopehptgestghjrhdr
+X-Vade-Analysis-13: nhiipdhrtghpthhtohepvghmrghtshhumhhihigrsehsuhhsvgdruggv
 X-Vade-Client: RCN
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 7/19/2023 6:06 PM, Dave Kleikamp wrote:
-> On 7/19/23 4:58PM, Dr. David Alan Gilbert wrote:
->> * Steve French (smfrench@gmail.com) wrote:
->>> The related question is which tree to send it from, if no problems
->>> reported (presumably mine since it mostly affect cifs.ko and ksmbd.ko,
->>> and because there hasn't been activity in fs/nls for years)
->>
->> That was my hope, given that ~half of the patches are directly on that
->> code, and it's the only very active tree this touches as far as I can
->> tell.
->>
->>> On Wed, Jul 19, 2023 at 12:56 PM Steve French <smfrench@gmail.com> 
->>> wrote:
->>>>
->>>> No objections to this on my part.  If Shaggy is ok with the JFS
->>>> change, we could target it for 6.6-rc1 if it tests out ok
+On 7/19/2023 8:10 AM, Shyam Prasad N wrote:
+> Hi all,
 > 
-> For the series:
-> Reviewed-by: Dave Kleikamp <dave.kleikamp@oracle.com>
+> cifs.ko seems to be leaking handles occasionally when put under some
+> stress testing.
+> I was scanning the code for potential places where we could be
+> leaking, and one particular instance caught my attention.
 > 
-> Steve,
-> Feel free to pull in even the 4th patch into your tree with my consent. 
-> Or if you're more comfortable, I could submit it after yours hits mainline.
+> In _cifsFileInfo_put, when the ref count of a cifs_file reaches 0, we
+> remove it from the lists and then send the close request over the
+> wire...
+>          if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
+>                  struct TCP_Server_Info *server = tcon->ses->server;
+>                  unsigned int xid;
 > 
-> Shaggy
+>                  xid = get_xid();
+>                  if (server->ops->close_getattr)
+>                          server->ops->close_getattr(xid, tcon, cifs_file);
+>                  else if (server->ops->close)
+>                          server->ops->close(xid, tcon, &cifs_file->fid);
+>                  _free_xid(xid);
+>          }
+> 
+> But as you can see above, we do not have return value from the above handlers.
 
-The changes look good to me but there is one quirk with the
-copyrights and SPDX in patch 2.
+Yeah, that's a problem. The most obvious is if the network becomes
+partitioned and the close(s) fail. Are you injecting that kind of
+error?
 
-In the new fs/nls/nls_ucs2_utils.c, the SPDX line changes from
-a "/* ... */" form to "// ...", which may be a proper update, but
-then partway down, adds the same SPDX in "/* ... */ form. These
-should at least be consistent.
+Still, the logic is going to grow some serious hair if we start
+retrying every error. What will bound the retries, and what kind
+of error(s) might be considered fatal? Tying up credits, message
+id's, handles, etc can be super problematic.
 
-> +++ b/fs/nls/nls_ucs2_utils.c
-> @@ -1,19 +1,25 @@
-> -/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +// SPDX-License-Identifier: GPL-2.0-or-later
+Also, have you considered using some sort of laundromat? Or is it
+critical that these closes happen before proceeding?
 
-vs
+Tom.
 
-> +++ b/fs/nls/nls_ucs2_utils.h
-> @@ -0,0 +1,297 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-
-Second, the copyright in fs/nls/nls_ucs2_utils.c is a bit of
-a mash-up (adding 2009 especially).
-
-I think it's better to keep the exact text of both copyrights,
-perhaps with a note as to which files had them previously, and
-adding some new note/blank line to separate the recent contributions
-from Namjae and you from the ancient history.
-
-> +++ b/fs/nls/nls_ucs2_utils.c
-> ...
-> - *   Some of the source code in this file came from fs/cifs/uniupr.h
-> - *   Copyright (c) International Business Machines  Corp., 2000,2002
-> - *
-> - * uniupr.h - Unicode compressed case ranges
-> + *   Some of the source code in this file came from fs/cifs/cifs_unicode.c
-> + *   via fs/smb/unicode.c and fs/smb/uniupr.h and fs/cifs/uniupr.h
-> + *   Copyright (c) International Business Machines  Corp., 2000,2002,2009
-> + *   Modified by Steve French (sfrench@us.ibm.com)
-> + *   Modified by Namjae Jeon (linkinjeon@kernel.org)
-> + *   Modified by Dr. David Alan Gilbert <linux@treblig.org>
-
-Apart from considering these:
-
-Reviewed-by: Tom Talpey <tom@talpey.com>
-
-Nice work!
-
->>
->> Thanks.
->>
->> Dave
->>
->>>> On Wed, Jul 12, 2023 at 6:28 PM Dr. David Alan Gilbert 
->>>> <dave@treblig.org> wrote:
->>>>>
->>>>> * linux@treblig.org (linux@treblig.org) wrote:
->>>>>> From: "Dr. David Alan Gilbert" <linux@treblig.org>
->>>>>>
->>>>>> The smb client and server code have (mostly) duplicated code
->>>>>> for unicode manipulation, in particular upper case handling.
->>>>>>
->>>>>> Flatten this lot into shared code.
->>>>>
->>>>> Gentle two week ping on this please.
->>>>>
->>>>> Dave
->>>>>
->>>>> (Apologies to the 3 of you who already got a copy of this ping,
->>>>> recent due to a missing header ',' )
->>>>>
->>>>>> There's some code that's slightly different between the two, and
->>>>>> I've not attempted to share that - this should be strictly a no
->>>>>> behaviour change set.
->>>>>>
->>>>>> In addition, the same tables and code are shared in jfs, however
->>>>>> there's very little testing available for the unicode in there,
->>>>>> so just share the raw data tables.
->>>>>>
->>>>>> I suspect there's more UCS-2 code that can be shared, in the NLS code
->>>>>> and in the UCS-2 code used by the EFI interfaces.
->>>>>>
->>>>>> Lightly tested with a module and a monolithic build, and just 
->>>>>> mounting
->>>>>> itself.
->>>>>>
->>>>>> This dupe was found using PMD:
->>>>>>    https://pmd.github.io/pmd/pmd_userdocs_cpd.html
->>>>>>
->>>>>> Dave
->>>>>>
->>>>>> Version 2
->>>>>>    Moved the shared code to fs/nls after v1 feedback.
->>>>>>    Renamed shared tables from Smb to Nls prefix
->>>>>>    Move UniStrcat as well
->>>>>>    Share the JFS tables
->>>>>>
->>>>>> Dr. David Alan Gilbert (4):
->>>>>>    fs/smb: Remove unicode 'lower' tables
->>>>>>    fs/smb: Swing unicode common code from smb->NLS
->>>>>>    fs/smb/client: Use common code in client
->>>>>>    fs/jfs: Use common ucs2 upper case table
->>>>>>
->>>>>>   fs/jfs/Kconfig               |   1 +
->>>>>>   fs/jfs/Makefile              |   2 +-
->>>>>>   fs/jfs/jfs_unicode.h         |  17 +-
->>>>>>   fs/jfs/jfs_uniupr.c          | 121 -------------
->>>>>>   fs/nls/Kconfig               |   8 +
->>>>>>   fs/nls/Makefile              |   1 +
->>>>>>   fs/nls/nls_ucs2_data.h       |  15 ++
->>>>>>   fs/nls/nls_ucs2_utils.c      | 144 +++++++++++++++
->>>>>>   fs/nls/nls_ucs2_utils.h      | 285 ++++++++++++++++++++++++++++++
->>>>>>   fs/smb/client/Kconfig        |   1 +
->>>>>>   fs/smb/client/cifs_unicode.c |   1 -
->>>>>>   fs/smb/client/cifs_unicode.h | 330 
->>>>>> +----------------------------------
->>>>>>   fs/smb/client/cifs_uniupr.h  | 239 -------------------------
->>>>>>   fs/smb/server/Kconfig        |   1 +
->>>>>>   fs/smb/server/unicode.c      |   1 -
->>>>>>   fs/smb/server/unicode.h      | 325 
->>>>>> +---------------------------------
->>>>>>   fs/smb/server/uniupr.h       | 268 ----------------------------
->>>>>>   17 files changed, 467 insertions(+), 1293 deletions(-)
->>>>>>   delete mode 100644 fs/jfs/jfs_uniupr.c
->>>>>>   create mode 100644 fs/nls/nls_ucs2_data.h
->>>>>>   create mode 100644 fs/nls/nls_ucs2_utils.c
->>>>>>   create mode 100644 fs/nls/nls_ucs2_utils.h
->>>>>>   delete mode 100644 fs/smb/client/cifs_uniupr.h
->>>>>>   delete mode 100644 fs/smb/server/uniupr.h
->>>>>>
->>>>>> -- 
->>>>>> 2.41.0
->>>>>>
->>>>> -- 
->>>>>   -----Open up your eyes, open up your mind, open up your code -------
->>>>> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
->>>>> \        dave @ treblig.org |                               | In Hex /
->>>>>   \ _________________________|_____ http://www.treblig.org   |_______/
->>>>
->>>>
->>>>
->>>> -- 
->>>> Thanks,
->>>>
->>>> Steve
->>>
->>>
->>>
->>> -- 
->>> Thanks,
->>>
->>> Steve
+> What would happen if the above close_getattr or close calls fail?
+> Particularly, what would happen if the failure happens even before the
+> request is put in flight?
+> In this stress testing we have the server giving out lesser credits.
+> So with the testing, the credit counters on the active connections are
+> expected to be low in general.
+> I'm assuming that the above condition will leak handles.
+> 
+> I was thinking about making a change to let the above handlers return
+> rc rather than void. And then to check the status.
+> If failure, create a delayed work for closing the remote handle. But
+> I'm not convinced that this is the right approach.
+> I'd like to know more comments on this.
 > 
