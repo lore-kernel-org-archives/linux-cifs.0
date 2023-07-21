@@ -2,37 +2,43 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 009FDEB64DD
-	for <linux-cifs@archiver.kernel.org>; Fri, 21 Jul 2023 13:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D04C9EB64DC
+	for <linux-cifs@archiver.kernel.org>; Fri, 21 Jul 2023 13:26:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230355AbjGUNTS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 21 Jul 2023 09:19:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57878 "EHLO
+        id S231124AbjGUN03 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 21 Jul 2023 09:26:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230404AbjGUNTQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Jul 2023 09:19:16 -0400
-Received: from smtp.rcn.com (mail.rcn.syn-alias.com [129.213.13.252])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 612A230D2
-        for <linux-cifs@vger.kernel.org>; Fri, 21 Jul 2023 06:19:07 -0700 (PDT)
-X-Authed-Username: dG10YWxwZXlAcmNuLmNvbQ==
-Authentication-Results:  smtp01.rcn.email-ash1.sync.lan smtp.user=<hidden>; auth=pass (PLAIN)
-Received: from [96.237.161.173] ([96.237.161.173:53667] helo=[192.168.0.206])
-        by smtp.rcn.com (envelope-from <tom@talpey.com>)
-        (ecelerity 4.4.0.19839 r(msys-ecelerity:tags/4.4.0.0^0)) with ESMTPSA (cipher=AES128-GCM-SHA256) 
-        id 73/B7-05333-9C58AB46; Fri, 21 Jul 2023 09:19:05 -0400
-Message-ID: <f8f4a2c5-05d3-0b2d-688f-b3274a98fc73@talpey.com>
-Date:   Fri, 21 Jul 2023 09:19:06 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
-Content-Language: en-US
-To:     "Dr. David Alan Gilbert" <linux@treblig.org>
+        with ESMTP id S230327AbjGUN02 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Jul 2023 09:26:28 -0400
+Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE95230E4;
+        Fri, 21 Jul 2023 06:25:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+        ; s=bytemarkmx; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=N/j54p0bBVZYU2hQGT4jINYi1HudgJ7WGPgFJvmDgAU=; b=A6+zD6AabudE8Goh5BS5mi3dsp
+        suOuudZaqsC86+Gtt1pgIAKz4jcAnjaGR1KQD3ABCjVBvyf5rT2wuwCy6U4eOZUwZ6yrhnMPMPdk0
+        A1hglBsN4vtdaPS5Y68pieSAxSHh0VbIhjd25L82oP32CVGuvHdQls/2Ajwb/SWZSflt6eYIywRiZ
+        Xd38AqC85YAMbWxxMj+pTfA3Q7SjgSzCf1CQMSjm3GHekmcsfBghuYkTTyUvI6UNt62QrzUiNIhNw
+        SQ2r1a8MdkLTQ4vkQdhRBUrSJy6EIOZzFUWKDR7YfyR8dXjEPidWq48iPuA53FAdq7EmqCsWbPPT7
+        MOOtTdSg==;
+Received: from dg by mx.treblig.org with local (Exim 4.94.2)
+        (envelope-from <dg@treblig.org>)
+        id 1qMq8h-002YXb-4I; Fri, 21 Jul 2023 13:25:47 +0000
+Date:   Fri, 21 Jul 2023 13:25:47 +0000
+From:   "Dr. David Alan Gilbert" <linux@treblig.org>
+To:     Tom Talpey <tom@talpey.com>
 Cc:     Dave Kleikamp <dave.kleikamp@oracle.com>,
         Steve French <smfrench@gmail.com>, linkinjeon@kernel.org,
         shaggy@kernel.org, linux-cifs@vger.kernel.org,
         krisman@collabora.com, jfs-discussion@lists.sourceforge.net,
         linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
+Message-ID: <ZLqHW6B7/0wi8NmN@gallifrey>
 References: <20230628232417.120844-1-linux@treblig.org>
  <ZK80mu/YbHLEABAB@gallifrey>
  <CAH2r5mvrhr52hXFv87O9O=Qw45AXRXr0NQAsTk4Wj-6s19-2bA@mail.gmail.com>
@@ -41,257 +47,265 @@ References: <20230628232417.120844-1-linux@treblig.org>
  <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
  <d1f7fbe9-8fe2-e3e3-d6ff-1544204202ff@talpey.com>
  <ZLnJzUynpTBvZGtA@gallifrey>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <ZLnJzUynpTBvZGtA@gallifrey>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <f8f4a2c5-05d3-0b2d-688f-b3274a98fc73@talpey.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Vade-Verdict: clean
-X-Vade-Analysis-1: gggruggvucftvghtrhhoucdtuddrgedviedrhedvgdehlecutefuodetggdotefrodftvfcurfhrohhf
-X-Vade-Analysis-2: ihhlvgemucfujgfpteevqfftpdftvefppdfgpfggqdftvefppdfqfgfvnecuuegrihhlohhuthemucef
-X-Vade-Analysis-3: tddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenogfuuhhsphgvtghtffhomhgrihhnucdl
-X-Vade-Analysis-4: geelmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthekredttdefjeenucfhrhhomhepvfhomhcu
-X-Vade-Analysis-5: vfgrlhhpvgihuceothhomhesthgrlhhpvgihrdgtohhmqeenucggtffrrghtthgvrhhnpeelgeffvedu
-X-Vade-Analysis-6: fffftdekgfduhfeffeeffeeiiedvfeeifedvuddutddtudegfefgjeenucffohhmrghinhepghhithhh
-X-Vade-Analysis-7: uhgsrdhiohdpthhrvggslhhighdrohhrghenucfkphepleeirddvfeejrdduiedurddujeefnecuvehl
-X-Vade-Analysis-8: uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepleeirddvfeejrdduiedurddujeefpdhh
-X-Vade-Analysis-9: vghloheplgduledvrdduieekrddtrddvtdeingdpmhgrihhlfhhrohhmpehtohhmsehtrghlphgvhidr
-X-Vade-Analysis-10: tghomhdprhgtphhtthhopehlihhnuhigsehtrhgvsghlihhgrdhorhhgpdhrtghpthhtohepuggrvhgv
-X-Vade-Analysis-11: rdhklhgvihhkrghmphesohhrrggtlhgvrdgtohhmpdhrtghpthhtohepshhmfhhrvghntghhsehgmhgr
-X-Vade-Analysis-12: ihhlrdgtohhmpdhrtghpthhtoheplhhinhhkihhnjhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphht
-X-Vade-Analysis-13: thhopehshhgrghhghieskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqtghifhhssehv
-X-Vade-Analysis-14: ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhrihhsmhgrnhestgholhhlrggsohhrrgdr
-X-Vade-Analysis-15: tghomh
-X-Vade-Client: RCN
+In-Reply-To: <f8f4a2c5-05d3-0b2d-688f-b3274a98fc73@talpey.com>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/5.10.0-23-amd64 (x86_64)
+X-Uptime: 13:23:43 up 14 days, 22:55,  1 user,  load average: 0.04, 0.04, 0.00
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 7/20/2023 7:57 PM, Dr. David Alan Gilbert wrote:
-> * Tom Talpey (tom@talpey.com) wrote:
->> On 7/19/2023 6:06 PM, Dave Kleikamp wrote:
->>> On 7/19/23 4:58PM, Dr. David Alan Gilbert wrote:
->>>> * Steve French (smfrench@gmail.com) wrote:
->>>>> The related question is which tree to send it from, if no problems
->>>>> reported (presumably mine since it mostly affect cifs.ko and ksmbd.ko,
->>>>> and because there hasn't been activity in fs/nls for years)
->>>>
->>>> That was my hope, given that ~half of the patches are directly on that
->>>> code, and it's the only very active tree this touches as far as I can
->>>> tell.
->>>>
->>>>> On Wed, Jul 19, 2023 at 12:56 PM Steve French
->>>>> <smfrench@gmail.com> wrote:
->>>>>>
->>>>>> No objections to this on my part.  If Shaggy is ok with the JFS
->>>>>> change, we could target it for 6.6-rc1 if it tests out ok
->>>
->>> For the series:
->>> Reviewed-by: Dave Kleikamp <dave.kleikamp@oracle.com>
->>>
->>> Steve,
->>> Feel free to pull in even the 4th patch into your tree with my consent.
->>> Or if you're more comfortable, I could submit it after yours hits
->>> mainline.
->>>
->>> Shaggy
->>
->> The changes look good to me but there is one quirk with the
->> copyrights and SPDX in patch 2.
->>
->> In the new fs/nls/nls_ucs2_utils.c, the SPDX line changes from
->> a "/* ... */" form to "// ...", which may be a proper update, but
->> then partway down, adds the same SPDX in "/* ... */ form. These
->> should at least be consistent.
->>
->>> +++ b/fs/nls/nls_ucs2_utils.c
->>> @@ -1,19 +1,25 @@
->>> -/* SPDX-License-Identifier: GPL-2.0-or-later */
->>> +// SPDX-License-Identifier: GPL-2.0-or-later
->>
->> vs
->>
->>> +++ b/fs/nls/nls_ucs2_utils.h
->>> @@ -0,0 +1,297 @@
->>> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+* Tom Talpey (tom@talpey.com) wrote:
+> On 7/20/2023 7:57 PM, Dr. David Alan Gilbert wrote:
+> > * Tom Talpey (tom@talpey.com) wrote:
+> > > On 7/19/2023 6:06 PM, Dave Kleikamp wrote:
+> > > > On 7/19/23 4:58PM, Dr. David Alan Gilbert wrote:
+> > > > > * Steve French (smfrench@gmail.com) wrote:
+> > > > > > The related question is which tree to send it from, if no problems
+> > > > > > reported (presumably mine since it mostly affect cifs.ko and ksmbd.ko,
+> > > > > > and because there hasn't been activity in fs/nls for years)
+> > > > > 
+> > > > > That was my hope, given that ~half of the patches are directly on that
+> > > > > code, and it's the only very active tree this touches as far as I can
+> > > > > tell.
+> > > > > 
+> > > > > > On Wed, Jul 19, 2023 at 12:56 PM Steve French
+> > > > > > <smfrench@gmail.com> wrote:
+> > > > > > > 
+> > > > > > > No objections to this on my part.  If Shaggy is ok with the JFS
+> > > > > > > change, we could target it for 6.6-rc1 if it tests out ok
+> > > > 
+> > > > For the series:
+> > > > Reviewed-by: Dave Kleikamp <dave.kleikamp@oracle.com>
+> > > > 
+> > > > Steve,
+> > > > Feel free to pull in even the 4th patch into your tree with my consent.
+> > > > Or if you're more comfortable, I could submit it after yours hits
+> > > > mainline.
+> > > > 
+> > > > Shaggy
+> > > 
+> > > The changes look good to me but there is one quirk with the
+> > > copyrights and SPDX in patch 2.
+> > > 
+> > > In the new fs/nls/nls_ucs2_utils.c, the SPDX line changes from
+> > > a "/* ... */" form to "// ...", which may be a proper update, but
+> > > then partway down, adds the same SPDX in "/* ... */ form. These
+> > > should at least be consistent.
+> > > 
+> > > > +++ b/fs/nls/nls_ucs2_utils.c
+> > > > @@ -1,19 +1,25 @@
+> > > > -/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > > > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > > 
+> > > vs
+> > > 
+> > > > +++ b/fs/nls/nls_ucs2_utils.h
+> > > > @@ -0,0 +1,297 @@
+> > > > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > 
+> > Yeh that's an easy fix - so that's just the fact the .h has
+> > the older /* where I'd fixed up the .c ?
 > 
-> Yeh that's an easy fix - so that's just the fact the .h has
-> the older /* where I'd fixed up the .c ?
-
-Yep, for consistency that sounds good.
-
->> Second, the copyright in fs/nls/nls_ucs2_utils.c is a bit of
->> a mash-up (adding 2009 especially).
->>
->> I think it's better to keep the exact text of both copyrights,
->> perhaps with a note as to which files had them previously, and
->> adding some new note/blank line to separate the recent contributions
->> from Namjae and you from the ancient history.
+> Yep, for consistency that sounds good.
 > 
-> How about the following;
+> > > Second, the copyright in fs/nls/nls_ucs2_utils.c is a bit of
+> > > a mash-up (adding 2009 especially).
+> > > 
+> > > I think it's better to keep the exact text of both copyrights,
+> > > perhaps with a note as to which files had them previously, and
+> > > adding some new note/blank line to separate the recent contributions
+> > > from Namjae and you from the ancient history.
+> > 
+> > How about the following;
+> > 
+> >   * This file has taken chunks from a few other files
+> >   * smb/server/uniupr.h had the declaration:
 > 
->   * This file has taken chunks from a few other files
->   * smb/server/uniupr.h had the declaration:
+> These two lines above aren't needed, because the lines below
+> contain the copyright and where they originated. So just omit
+> the two above.
 
-These two lines above aren't needed, because the lines below
-contain the copyright and where they originated. So just omit
-the two above.
+OK, will do; although the reason I included them was because the
+path included in the declaration isn't the file the declaration is
+currently in.
 
->   *
->   *   Some of the source code in this file came from fs/cifs/uniupr.h
->   *   Copyright (c) International Business Machines  Corp., 2000,2002
->   *
->   * fs/smb/server/unicode.c had the declaration:
-
-And this one above - not needed.
-
->   *
->   *   Some of the source code in this file came from fs/cifs/cifs_unicode.c
->   *
->   *   Copyright (c) International Business Machines  Corp., 2000,2009
->   *   Modified by Steve French (sfrench@us.ibm.com)
->   *   Modified by Namjae Jeon (linkinjeon@kernel.org)
->   *
+> >   *
+> >   *   Some of the source code in this file came from fs/cifs/uniupr.h
+> >   *   Copyright (c) International Business Machines  Corp., 2000,2002
+> >   *
+> >   * fs/smb/server/unicode.c had the declaration:
 > 
-> I haven't added the extra line above Namjae's line, since it's now
-> a straight copy from the unicode.c entry.
-
-Straight copy is what's important. No deletion, no edit in a copyright.
-So, ok.
-
-> I'm not particularly fussed about adding my own line unless you think
-> it's needed; git keeps better history!
-
-In fact, since you technically didn't add any code, just deleted,
-moved or renamed, I think it might be best to leave yourself out.
-But, totally your choice.
-
-Tom.
-
->>> +++ b/fs/nls/nls_ucs2_utils.c
->>> ...
->>> - *   Some of the source code in this file came from fs/cifs/uniupr.h
->>> - *   Copyright (c) International Business Machines  Corp., 2000,2002
->>> - *
->>> - * uniupr.h - Unicode compressed case ranges
->>> + *   Some of the source code in this file came from fs/cifs/cifs_unicode.c
->>> + *   via fs/smb/unicode.c and fs/smb/uniupr.h and fs/cifs/uniupr.h
->>> + *   Copyright (c) International Business Machines  Corp., 2000,2002,2009
->>> + *   Modified by Steve French (sfrench@us.ibm.com)
->>> + *   Modified by Namjae Jeon (linkinjeon@kernel.org)
->>> + *   Modified by Dr. David Alan Gilbert <linux@treblig.org>
->>
->> Apart from considering these:
->>
->> Reviewed-by: Tom Talpey <tom@talpey.com>
+> And this one above - not needed.
 > 
-> Thanks!
+> >   *
+> >   *   Some of the source code in this file came from fs/cifs/cifs_unicode.c
+> >   *
+> >   *   Copyright (c) International Business Machines  Corp., 2000,2009
+> >   *   Modified by Steve French (sfrench@us.ibm.com)
+> >   *   Modified by Namjae Jeon (linkinjeon@kernel.org)
+> >   *
+> > 
+> > I haven't added the extra line above Namjae's line, since it's now
+> > a straight copy from the unicode.c entry.
 > 
-> Dave
+> Straight copy is what's important. No deletion, no edit in a copyright.
+> So, ok.
 > 
->> Nice work!
->>
->>>>
->>>> Thanks.
->>>>
->>>> Dave
->>>>
->>>>>> On Wed, Jul 12, 2023 at 6:28 PM Dr. David Alan Gilbert
->>>>>> <dave@treblig.org> wrote:
->>>>>>>
->>>>>>> * linux@treblig.org (linux@treblig.org) wrote:
->>>>>>>> From: "Dr. David Alan Gilbert" <linux@treblig.org>
->>>>>>>>
->>>>>>>> The smb client and server code have (mostly) duplicated code
->>>>>>>> for unicode manipulation, in particular upper case handling.
->>>>>>>>
->>>>>>>> Flatten this lot into shared code.
->>>>>>>
->>>>>>> Gentle two week ping on this please.
->>>>>>>
->>>>>>> Dave
->>>>>>>
->>>>>>> (Apologies to the 3 of you who already got a copy of this ping,
->>>>>>> recent due to a missing header ',' )
->>>>>>>
->>>>>>>> There's some code that's slightly different between the two, and
->>>>>>>> I've not attempted to share that - this should be strictly a no
->>>>>>>> behaviour change set.
->>>>>>>>
->>>>>>>> In addition, the same tables and code are shared in jfs, however
->>>>>>>> there's very little testing available for the unicode in there,
->>>>>>>> so just share the raw data tables.
->>>>>>>>
->>>>>>>> I suspect there's more UCS-2 code that can be shared, in the NLS code
->>>>>>>> and in the UCS-2 code used by the EFI interfaces.
->>>>>>>>
->>>>>>>> Lightly tested with a module and a monolithic build,
->>>>>>>> and just mounting
->>>>>>>> itself.
->>>>>>>>
->>>>>>>> This dupe was found using PMD:
->>>>>>>>     https://pmd.github.io/pmd/pmd_userdocs_cpd.html
->>>>>>>>
->>>>>>>> Dave
->>>>>>>>
->>>>>>>> Version 2
->>>>>>>>     Moved the shared code to fs/nls after v1 feedback.
->>>>>>>>     Renamed shared tables from Smb to Nls prefix
->>>>>>>>     Move UniStrcat as well
->>>>>>>>     Share the JFS tables
->>>>>>>>
->>>>>>>> Dr. David Alan Gilbert (4):
->>>>>>>>     fs/smb: Remove unicode 'lower' tables
->>>>>>>>     fs/smb: Swing unicode common code from smb->NLS
->>>>>>>>     fs/smb/client: Use common code in client
->>>>>>>>     fs/jfs: Use common ucs2 upper case table
->>>>>>>>
->>>>>>>>    fs/jfs/Kconfig               |   1 +
->>>>>>>>    fs/jfs/Makefile              |   2 +-
->>>>>>>>    fs/jfs/jfs_unicode.h         |  17 +-
->>>>>>>>    fs/jfs/jfs_uniupr.c          | 121 -------------
->>>>>>>>    fs/nls/Kconfig               |   8 +
->>>>>>>>    fs/nls/Makefile              |   1 +
->>>>>>>>    fs/nls/nls_ucs2_data.h       |  15 ++
->>>>>>>>    fs/nls/nls_ucs2_utils.c      | 144 +++++++++++++++
->>>>>>>>    fs/nls/nls_ucs2_utils.h      | 285 ++++++++++++++++++++++++++++++
->>>>>>>>    fs/smb/client/Kconfig        |   1 +
->>>>>>>>    fs/smb/client/cifs_unicode.c |   1 -
->>>>>>>>    fs/smb/client/cifs_unicode.h | 330
->>>>>>>> +----------------------------------
->>>>>>>>    fs/smb/client/cifs_uniupr.h  | 239 -------------------------
->>>>>>>>    fs/smb/server/Kconfig        |   1 +
->>>>>>>>    fs/smb/server/unicode.c      |   1 -
->>>>>>>>    fs/smb/server/unicode.h      | 325
->>>>>>>> +---------------------------------
->>>>>>>>    fs/smb/server/uniupr.h       | 268 ----------------------------
->>>>>>>>    17 files changed, 467 insertions(+), 1293 deletions(-)
->>>>>>>>    delete mode 100644 fs/jfs/jfs_uniupr.c
->>>>>>>>    create mode 100644 fs/nls/nls_ucs2_data.h
->>>>>>>>    create mode 100644 fs/nls/nls_ucs2_utils.c
->>>>>>>>    create mode 100644 fs/nls/nls_ucs2_utils.h
->>>>>>>>    delete mode 100644 fs/smb/client/cifs_uniupr.h
->>>>>>>>    delete mode 100644 fs/smb/server/uniupr.h
->>>>>>>>
->>>>>>>> -- 
->>>>>>>> 2.41.0
->>>>>>>>
->>>>>>> -- 
->>>>>>>    -----Open up your eyes, open up your mind, open up your code -------
->>>>>>> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
->>>>>>> \        dave @ treblig.org |                               | In Hex /
->>>>>>>    \ _________________________|_____ http://www.treblig.org   |_______/
->>>>>>
->>>>>>
->>>>>>
->>>>>> -- 
->>>>>> Thanks,
->>>>>>
->>>>>> Steve
->>>>>
->>>>>
->>>>>
->>>>> -- 
->>>>> Thanks,
->>>>>
->>>>> Steve
->>>
+> > I'm not particularly fussed about adding my own line unless you think
+> > it's needed; git keeps better history!
+> 
+> In fact, since you technically didn't add any code, just deleted,
+> moved or renamed, I think it might be best to leave yourself out.
+
+Oh that question could keep copyright lawyers occupied for years :-)
+
+> But, totally your choice.
+
+Thanks
+
+I'll post a modified version of this patch in a few hours.
+
+Dave
+
+> Tom.
+> 
+> > > > +++ b/fs/nls/nls_ucs2_utils.c
+> > > > ...
+> > > > - *   Some of the source code in this file came from fs/cifs/uniupr.h
+> > > > - *   Copyright (c) International Business Machines  Corp., 2000,2002
+> > > > - *
+> > > > - * uniupr.h - Unicode compressed case ranges
+> > > > + *   Some of the source code in this file came from fs/cifs/cifs_unicode.c
+> > > > + *   via fs/smb/unicode.c and fs/smb/uniupr.h and fs/cifs/uniupr.h
+> > > > + *   Copyright (c) International Business Machines  Corp., 2000,2002,2009
+> > > > + *   Modified by Steve French (sfrench@us.ibm.com)
+> > > > + *   Modified by Namjae Jeon (linkinjeon@kernel.org)
+> > > > + *   Modified by Dr. David Alan Gilbert <linux@treblig.org>
+> > > 
+> > > Apart from considering these:
+> > > 
+> > > Reviewed-by: Tom Talpey <tom@talpey.com>
+> > 
+> > Thanks!
+> > 
+> > Dave
+> > 
+> > > Nice work!
+> > > 
+> > > > > 
+> > > > > Thanks.
+> > > > > 
+> > > > > Dave
+> > > > > 
+> > > > > > > On Wed, Jul 12, 2023 at 6:28 PM Dr. David Alan Gilbert
+> > > > > > > <dave@treblig.org> wrote:
+> > > > > > > > 
+> > > > > > > > * linux@treblig.org (linux@treblig.org) wrote:
+> > > > > > > > > From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> > > > > > > > > 
+> > > > > > > > > The smb client and server code have (mostly) duplicated code
+> > > > > > > > > for unicode manipulation, in particular upper case handling.
+> > > > > > > > > 
+> > > > > > > > > Flatten this lot into shared code.
+> > > > > > > > 
+> > > > > > > > Gentle two week ping on this please.
+> > > > > > > > 
+> > > > > > > > Dave
+> > > > > > > > 
+> > > > > > > > (Apologies to the 3 of you who already got a copy of this ping,
+> > > > > > > > recent due to a missing header ',' )
+> > > > > > > > 
+> > > > > > > > > There's some code that's slightly different between the two, and
+> > > > > > > > > I've not attempted to share that - this should be strictly a no
+> > > > > > > > > behaviour change set.
+> > > > > > > > > 
+> > > > > > > > > In addition, the same tables and code are shared in jfs, however
+> > > > > > > > > there's very little testing available for the unicode in there,
+> > > > > > > > > so just share the raw data tables.
+> > > > > > > > > 
+> > > > > > > > > I suspect there's more UCS-2 code that can be shared, in the NLS code
+> > > > > > > > > and in the UCS-2 code used by the EFI interfaces.
+> > > > > > > > > 
+> > > > > > > > > Lightly tested with a module and a monolithic build,
+> > > > > > > > > and just mounting
+> > > > > > > > > itself.
+> > > > > > > > > 
+> > > > > > > > > This dupe was found using PMD:
+> > > > > > > > >     https://pmd.github.io/pmd/pmd_userdocs_cpd.html
+> > > > > > > > > 
+> > > > > > > > > Dave
+> > > > > > > > > 
+> > > > > > > > > Version 2
+> > > > > > > > >     Moved the shared code to fs/nls after v1 feedback.
+> > > > > > > > >     Renamed shared tables from Smb to Nls prefix
+> > > > > > > > >     Move UniStrcat as well
+> > > > > > > > >     Share the JFS tables
+> > > > > > > > > 
+> > > > > > > > > Dr. David Alan Gilbert (4):
+> > > > > > > > >     fs/smb: Remove unicode 'lower' tables
+> > > > > > > > >     fs/smb: Swing unicode common code from smb->NLS
+> > > > > > > > >     fs/smb/client: Use common code in client
+> > > > > > > > >     fs/jfs: Use common ucs2 upper case table
+> > > > > > > > > 
+> > > > > > > > >    fs/jfs/Kconfig               |   1 +
+> > > > > > > > >    fs/jfs/Makefile              |   2 +-
+> > > > > > > > >    fs/jfs/jfs_unicode.h         |  17 +-
+> > > > > > > > >    fs/jfs/jfs_uniupr.c          | 121 -------------
+> > > > > > > > >    fs/nls/Kconfig               |   8 +
+> > > > > > > > >    fs/nls/Makefile              |   1 +
+> > > > > > > > >    fs/nls/nls_ucs2_data.h       |  15 ++
+> > > > > > > > >    fs/nls/nls_ucs2_utils.c      | 144 +++++++++++++++
+> > > > > > > > >    fs/nls/nls_ucs2_utils.h      | 285 ++++++++++++++++++++++++++++++
+> > > > > > > > >    fs/smb/client/Kconfig        |   1 +
+> > > > > > > > >    fs/smb/client/cifs_unicode.c |   1 -
+> > > > > > > > >    fs/smb/client/cifs_unicode.h | 330
+> > > > > > > > > +----------------------------------
+> > > > > > > > >    fs/smb/client/cifs_uniupr.h  | 239 -------------------------
+> > > > > > > > >    fs/smb/server/Kconfig        |   1 +
+> > > > > > > > >    fs/smb/server/unicode.c      |   1 -
+> > > > > > > > >    fs/smb/server/unicode.h      | 325
+> > > > > > > > > +---------------------------------
+> > > > > > > > >    fs/smb/server/uniupr.h       | 268 ----------------------------
+> > > > > > > > >    17 files changed, 467 insertions(+), 1293 deletions(-)
+> > > > > > > > >    delete mode 100644 fs/jfs/jfs_uniupr.c
+> > > > > > > > >    create mode 100644 fs/nls/nls_ucs2_data.h
+> > > > > > > > >    create mode 100644 fs/nls/nls_ucs2_utils.c
+> > > > > > > > >    create mode 100644 fs/nls/nls_ucs2_utils.h
+> > > > > > > > >    delete mode 100644 fs/smb/client/cifs_uniupr.h
+> > > > > > > > >    delete mode 100644 fs/smb/server/uniupr.h
+> > > > > > > > > 
+> > > > > > > > > -- 
+> > > > > > > > > 2.41.0
+> > > > > > > > > 
+> > > > > > > > -- 
+> > > > > > > >    -----Open up your eyes, open up your mind, open up your code -------
+> > > > > > > > / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
+> > > > > > > > \        dave @ treblig.org |                               | In Hex /
+> > > > > > > >    \ _________________________|_____ http://www.treblig.org   |_______/
+> > > > > > > 
+> > > > > > > 
+> > > > > > > 
+> > > > > > > -- 
+> > > > > > > Thanks,
+> > > > > > > 
+> > > > > > > Steve
+> > > > > > 
+> > > > > > 
+> > > > > > 
+> > > > > > -- 
+> > > > > > Thanks,
+> > > > > > 
+> > > > > > Steve
+> > > > 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
