@@ -2,88 +2,91 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21894EB64DD
-	for <linux-cifs@archiver.kernel.org>; Fri, 21 Jul 2023 21:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24E43EB64DA
+	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jul 2023 14:19:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbjGUVNU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 21 Jul 2023 17:13:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37148 "EHLO
+        id S229609AbjGVOTj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 22 Jul 2023 10:19:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbjGUVNU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 21 Jul 2023 17:13:20 -0400
-Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319573A82;
-        Fri, 21 Jul 2023 14:12:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-        ; s=bytemarkmx; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID
-        :Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID
-        :Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-        Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe
-        :List-Post:List-Owner:List-Archive;
-        bh=lcJTNqRfG0mUbBpf0GldfJX03xDDVNXhUA/82mJ4Hcg=; b=d7E64/U87yqqjVZQBCQCP4nAVj
-        ErluQYoVQC0B/tpxx2WHgIozt2fE4m9D63syItC0OFFoiO1UvggtjLuM9obFGHU9WQQYrogvaj82/
-        CiiuPUTdlmyqEliHZoG7uKf+FcAiouez0a3vjPIuhUlb626mrSMFIH0+NxAc0JpyYWY9PoEnBGCoT
-        2N9Mo40i1aJzIN6F7qVMG4Cm/Iz7K8PIENPZSBzcM1N6OVI3hNwtPH8QG5ElQ5l79DpCAnjcctEBP
-        rF+ux/dp/YLUZUHJkEmG9NZw0Bdmr5rmG76p5DaZ72+ffJRZ4jW6GzXnPacMAM5MKva9I6TzwI3Nw
-        wcBr8Gjg==;
-Received: from dg by mx.treblig.org with local (Exim 4.94.2)
-        (envelope-from <dg@treblig.org>)
-        id 1qMxQO-002dYJ-BL; Fri, 21 Jul 2023 21:12:32 +0000
-Date:   Fri, 21 Jul 2023 21:12:32 +0000
-From:   "Dr. David Alan Gilbert" <dave@treblig.org>
-To:     Paulo Alcantara <pc@manguebit.com>, smfrench@gmail.com
-Cc:     Tom Talpey <tom@talpey.com>,
-        Dave Kleikamp <dave.kleikamp@oracle.com>,
-        linkinjeon@kernel.org, shaggy@kernel.org,
-        linux-cifs@vger.kernel.org, krisman@collabora.com,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
-Message-ID: <ZLr0wFMKhEaannov@gallifrey>
-References: <ZK80mu/YbHLEABAB@gallifrey>
- <CAH2r5mvrhr52hXFv87O9O=Qw45AXRXr0NQAsTk4Wj-6s19-2bA@mail.gmail.com>
- <CAH2r5mss4RsEF1b6gJo8LFWsN9-YBSEP6GV7axsNhX7ihj5CqA@mail.gmail.com>
- <ZLhchajZaWEVM6D7@gallifrey>
- <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
- <d1f7fbe9-8fe2-e3e3-d6ff-1544204202ff@talpey.com>
- <ZLnJzUynpTBvZGtA@gallifrey>
- <f8f4a2c5-05d3-0b2d-688f-b3274a98fc73@talpey.com>
- <ZLrxYzGXJzsLmGDs@gallifrey>
- <16f50dff126af9b20f9b99ca056ad5fa.pc@manguebit.com>
+        with ESMTP id S229477AbjGVOTi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jul 2023 10:19:38 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A69482709;
+        Sat, 22 Jul 2023 07:19:37 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b703cbfaf5so41883231fa.1;
+        Sat, 22 Jul 2023 07:19:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690035576; x=1690640376;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cj7Am9y7Ub1W147cRpCDox5jRFGPz/3xm9Zj5ypIhV4=;
+        b=FgbBkhrbb6/jRw2JfVhRhA6ZHxpJ00oIhBqj8Uizt7l1/HZk1+tLekUphlt97EHvmE
+         PoQKWBhXXPzjrQ1/hJ9040j/tgo6pbRstMynfpJFHSvDU8HcmCI06w7iN4zpMyV0L/8G
+         LIJteBlgAwQwCzpN36DVOMenx2AhExqe2lxVNPI0/XC67/feKivLfKRwHo7wT3NsYSHs
+         oKgNVfijaeCuSZqdsTe5t6ZgRGQDknvmzguaz58H4Wmc4Sc8OO0yBiZoV2eZBxm/X7FS
+         YdY/wjjYg6GUEhzojiPmtGKm8vMK5uVo0J3plISXSm169bHizaHMthIJ73hVNm7oG8F3
+         GORQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690035576; x=1690640376;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cj7Am9y7Ub1W147cRpCDox5jRFGPz/3xm9Zj5ypIhV4=;
+        b=DpAWi6pMP5CDRdGzfXEAGk2MgxKagP0LkycmZMvqcBJjy5lHm0R5wWjlNhqQGWCGJ8
+         L+FWQieuEedPRDTQQBRAVx0Nt/boNPg/DXRRpSg1Cd4EdJe16BHJEcjrKH/N6XisH1Ih
+         ZqgmNFtnlHTCkP8xvZGKUKoIU28z15/bD47eO+xrQSlxiFpiWYgqlosge8pdCK15IZKc
+         2ai8P0AFtG929nF99q13yDAgXv4FRFqEIGX0zVm7y0RBMRjYKQDihiYfT2TD1AALVKtI
+         iAmwponHeVQjk5BdhAcw5mzy9VuqqkM9Is321E4BGVJD+sDuX3tGsANP2lgnAX44L8Fq
+         5fVg==
+X-Gm-Message-State: ABy/qLbq3y3VK7s7mpyugV5zhVXa6O2I7M05+uFVPdheM6LaacGwbWdT
+        fHTbI23czmbTmUP4lhyIvnJRXqDyhSaaNeKznhZ6C8gJ
+X-Google-Smtp-Source: APBJJlE6cLw63WGQBPm5k6xt4dM/k8TPLxHhACie+tWizqLN2a/ompqsLyQ6v/MFlSvm22rScmbflCb/xpy4FezOiqw=
+X-Received: by 2002:a2e:7205:0:b0:2b9:383b:89fc with SMTP id
+ n5-20020a2e7205000000b002b9383b89fcmr3211936ljc.0.1690035575499; Sat, 22 Jul
+ 2023 07:19:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <16f50dff126af9b20f9b99ca056ad5fa.pc@manguebit.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/5.10.0-23-amd64 (x86_64)
-X-Uptime: 21:11:06 up 15 days,  6:42,  1 user,  load average: 0.06, 0.01, 0.00
-User-Agent: Mutt/2.0.5 (2021-01-21)
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 22 Jul 2023 09:19:24 -0500
+Message-ID: <CAH2r5msCqEDv1mUMMVTg8t7K+CO82Ha_xQoYJ-FkQ9h83By5wA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client minor debugging fix
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-* Paulo Alcantara (pc@manguebit.com) wrote:
-> "Dr. David Alan Gilbert" <linux@treblig.org> writes:
-> 
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/scripts/checkpatch.pl#n3737
-> > 	if ($realfile =~ /\.(h|s|S)$/) {
-> > 		$comment = '/*';
-> > 	} elsif ($realfile =~ /\.(c|rs|dts|dtsi)$/) {
-> > 		$comment = '//';
-> >
-> > I don't get where that idea came from.
-> 
-> Check Documentation/process/license-rules.rst.
+The following changes since commit fdf0eaf11452d72945af31804e2a1048ee1b574c:
 
-Oh, that's a painful history!
-Hmm that landed just after I posted a v3 (of just this patch)
+  Linux 6.5-rc2 (2023-07-16 15:10:37 -0700)
 
-Steve: Your call, do you want me to post a v4 with that comment
-back and but with the copyright lineas as in v3?
+are available in the Git repository at:
 
-Dave
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc2-smb3-client-fixes
 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+for you to fetch changes up to ac0ce20fd8eaa9f5e193d138fbf1749c780928d0:
+
+  cifs: update internal module version number for cifs.ko (2023-07-20
+08:30:32 -0500)
+
+----------------------------------------------------------------
+add small debugging improvement
+- it is helpful for network debugging of smb3 problems to be able to
+use directory not just file (e.g. access to empty share)
+----------------------------------------------------------------
+Shyam Prasad N (1):
+      cifs: allow dumping keys for directories too
+
+Steve French (1):
+      cifs: update internal module version number for cifs.ko
+
+ fs/smb/client/cifsfs.h |  2 +-
+ fs/smb/client/ioctl.c  | 17 +++++++++++++----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
+
+
+--
+Thanks,
+
+Steve
