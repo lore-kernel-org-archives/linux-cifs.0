@@ -2,91 +2,115 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52DBC0015E
-	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jul 2023 18:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F163DC0015E
+	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jul 2023 19:57:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229477AbjGVSYE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 22 Jul 2023 14:24:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45978 "EHLO
+        id S229632AbjGVT5B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 22 Jul 2023 15:57:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjGVSYD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jul 2023 14:24:03 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F54326B7
-        for <linux-cifs@vger.kernel.org>; Sat, 22 Jul 2023 11:24:02 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51ff0e3d8c1so4122706a12.0
-        for <linux-cifs@vger.kernel.org>; Sat, 22 Jul 2023 11:24:02 -0700 (PDT)
+        with ESMTP id S229489AbjGVT5B (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jul 2023 15:57:01 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A2A10C3;
+        Sat, 22 Jul 2023 12:56:59 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b701dee4bfso45311671fa.0;
+        Sat, 22 Jul 2023 12:56:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1690050241; x=1690655041;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jLlpX4ximjQ8EiWaYEdqr90sGKj83EdXmDgZ/NkCSBw=;
-        b=CH4gI2Dn9VA0UYtGTEIDdEKc/9szPsG5SqZxR+tnlfRASw9ZYFLo/VNbon1ya4NUc/
-         4JaavY+6jh2vbmjBP2Jvk9OK660Jyie/4osr8GivHZFE6q52hNnx1JSm59m0UH1V6DNV
-         qdXV5FutW8A7J8IKo7IIi9M9y4dQvUfl/qdQo=
+        d=gmail.com; s=20221208; t=1690055818; x=1690660618;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cP5qZpuE9PuKFQNB1UPD3lEvU+dXufBvkaX/xc8UOj4=;
+        b=CuUcZel0Z7E82US/0alNe2jdLhEtKOTKLbLQuzZ4SOrjS0fzjKpEGn/S6U2b1KYILU
+         rjn/ywGrMcst0pLsGLleCI5gRnFAlf6B1s4QkCsFdZlUOGrCeHFn/bfB8ilxQS6UL8hZ
+         qyHxpWowVpaXsqMYbO1b4wa23gbOMQcJcp59i9uEpxoW9yGC+AaP8OYgFG4XI9mNHQqG
+         j31ie0VUM7JdXHSIzwikTN+YnDSjLAEtwFM8k65tKmJt8ujh8hiXwYv9MoTHWVeKmJhl
+         FdT1TY4nnKyyayJbmQQfYTSvI4egfRSMUVHnZzApze8UCdW4zQe1i8Tsq4Bi0EqfRAOG
+         kWug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690050241; x=1690655041;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jLlpX4ximjQ8EiWaYEdqr90sGKj83EdXmDgZ/NkCSBw=;
-        b=GhApYT56u9pJsWrYUucTjpLnpNEFNcMEWUnEH7pklE4gZ3ZJYAiEIobpJLoi1j18xc
-         KC2eTdp5+HN2UUglXKVC559eDyIJKX71xecgwpYAdAevYWQ15ExkXmlgVooJHVAK/jBq
-         MR5xulLxXSJVhyQ4NIkxlMGQWa+07AEm7uoH+217KNxiFukr0+7/VkMpejnRsgZLrt5R
-         GoOjlRwFbEDMAIgXPO8Ppkd6wfAg+Udzn/S2OF3WoS5CvSBOqC1rNRnUIyBgweob8v21
-         +gRGD8bieAeuHOJ1V5aYQqEW1N84pC7JTvia6XYH5O+oXinHfwhpG16x2KjwbAJG7Vn3
-         nvFg==
-X-Gm-Message-State: ABy/qLbGKjLVgyZxVuzehhHId7NhfpXnFidqdbEfVsO9KWfMH8A2Cihf
-        Mnp/SbUgHbuuSGUiSo4heRC4OZkkykcgwgxirmfsIw==
-X-Google-Smtp-Source: APBJJlEfNkY1gjsqDOd0AX35POmnUeMiZpL5UWwMwUyp9Cmgu6fpkq/Wa52zExapcuo3mxVQBauBWA==
-X-Received: by 2002:aa7:d50f:0:b0:51d:d615:19af with SMTP id y15-20020aa7d50f000000b0051dd61519afmr4762095edq.28.1690050240895;
-        Sat, 22 Jul 2023 11:24:00 -0700 (PDT)
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com. [209.85.208.48])
-        by smtp.gmail.com with ESMTPSA id n12-20020aa7c44c000000b0051bed21a635sm3690635edr.74.2023.07.22.11.24.00
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Jul 2023 11:24:00 -0700 (PDT)
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5221ee899a0so492190a12.1
-        for <linux-cifs@vger.kernel.org>; Sat, 22 Jul 2023 11:24:00 -0700 (PDT)
-X-Received: by 2002:a05:6402:2025:b0:522:206a:d6d2 with SMTP id
- ay5-20020a056402202500b00522206ad6d2mr374604edb.26.1690050240086; Sat, 22 Jul
- 2023 11:24:00 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690055818; x=1690660618;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cP5qZpuE9PuKFQNB1UPD3lEvU+dXufBvkaX/xc8UOj4=;
+        b=QazELKvNmxRz2A4OLS/5ZQbl2BJDFol2y/3EK8zu5lclM6W5a33TsZ90HvQ3RnbHaQ
+         Orxi/8lkeJglNvXPcuZUmmJ2Rpz4DovZsiH0u+1yOuqTGXgGSugqZidE4TROWLzqiJBC
+         bkk0KyYxrLy4TiGd7JRBF56aaQjxaPvDcF3HQGHpEXh96gm5KeX9Jm6FclIFawZ4yd0S
+         NFXg3o6sHbNftni3iuUqB8qGDugAOe6Clwt/RKIHJR196Hk8umw3vi8Xbu+feoCmVVRc
+         imW6mk0EZRAx0uaNaI7U/2Zcr5vceMzobxY4tgDT5ovLKTBkIBVZ0u8vDeQCE9rBJBeT
+         TSUw==
+X-Gm-Message-State: ABy/qLbbUorjhyO7w+27dLlQsqBi68BebZ8BIb8s97pgyejhtqSG83Rn
+        wapmInjioBg6xwXAiPJDfPWe+KUNUVMabMk3VE7yBQJCDB4=
+X-Google-Smtp-Source: APBJJlHVSbTcg+CYyMwiAbVEa3n90aJp3WZPzZSAn+eYY9u0bBFm0E+bpJyZ4Lv6QlJL+tKKKo/+3qSD3hV1jLK3i98=
+X-Received: by 2002:a2e:8097:0:b0:2b7:33b3:ab5c with SMTP id
+ i23-20020a2e8097000000b002b733b3ab5cmr3449890ljg.35.1690055817569; Sat, 22
+ Jul 2023 12:56:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAH2r5msCqEDv1mUMMVTg8t7K+CO82Ha_xQoYJ-FkQ9h83By5wA@mail.gmail.com>
-In-Reply-To: <CAH2r5msCqEDv1mUMMVTg8t7K+CO82Ha_xQoYJ-FkQ9h83By5wA@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 22 Jul 2023 11:23:43 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whTnOWaYxG2sU8ikFZsowUPApWgHxf0jM77ELUb39SuAw@mail.gmail.com>
-Message-ID: <CAHk-=whTnOWaYxG2sU8ikFZsowUPApWgHxf0jM77ELUb39SuAw@mail.gmail.com>
+ <CAHk-=whTnOWaYxG2sU8ikFZsowUPApWgHxf0jM77ELUb39SuAw@mail.gmail.com>
+In-Reply-To: <CAHk-=whTnOWaYxG2sU8ikFZsowUPApWgHxf0jM77ELUb39SuAw@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 22 Jul 2023 14:56:46 -0500
+Message-ID: <CAH2r5mv2V8SDi=qDDwsnoeXSLxqLXHH7FESEz736scrfU+w=MQ@mail.gmail.com>
 Subject: Re: [GIT PULL] smb3 client minor debugging fix
-To:     Steve French <smfrench@gmail.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, 22 Jul 2023 at 07:19, Steve French <smfrench@gmail.com> wrote:
+On Sat, Jul 22, 2023 at 1:24=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> add small debugging improvement
-> - it is helpful for network debugging of smb3 problems to be able to
-> use directory not just file (e.g. access to empty share)
-> ----------------------------------------------------------------
-> Shyam Prasad N (1):
->       cifs: allow dumping keys for directories too
+> On Sat, 22 Jul 2023 at 07:19, Steve French <smfrench@gmail.com> wrote:
+> >
+> > add small debugging improvement
+> > - it is helpful for network debugging of smb3 problems to be able to
+> > use directory not just file (e.g. access to empty share)
+> > ----------------------------------------------------------------
+> > Shyam Prasad N (1):
+> >       cifs: allow dumping keys for directories too
+> >
+> > Steve French (1):
+> >       cifs: update internal module version number for cifs.ko
 >
-> Steve French (1):
->       cifs: update internal module version number for cifs.ko
+> Bah. I pulled, and then unpulled, because that module version number
+> change was obviously garbage.
 
-Bah. I pulled, and then unpulled, because that module version number
-change was obviously garbage.
+I had missed a line in the version update.  Have now fixed that typo.
+The module version number is used e.g. to tell when someone has
+backported fixes for cifs.ko to an earlier kernel release (so e.g. we
+can see from "modinfo cifs" or "cat /proc/fs/cifs/DebugData | grep
+Version" whether they are running an updated version of cifs.ko or the
+default version for that kernel).  I try to update the module version
+at the end of the merge window but have sometimes delayed updating it
+until after an important fix.
 
-That versioning has been problematic before too, and honestly seems to
-be just completely broken and pointless random numbers that mostly -
-but not always - are in sync.
+> This pull wasn't really a "fix" anyway, but then when I see nonsense
+> like that I just decide it's entirely bogus.
 
-This pull wasn't really a "fix" anyway, but then when I see nonsense
-like that I just decide it's entirely bogus.
+For some context on the debug improvement:
+- the keys change improves ability to read a network trace to debug
+problems on encrypted connections which are very common (e.g. using
+wireshark or tcpdump).  That works today with tools like "smbinfo keys
+/mnt/file" but requires passing in a filename on the mount (see e.g.
+https://wiki.samba.org/index.php/Wireshark_Decryption), but it often
+makes more sense to just pass in the mount point path (ie a directory
+not a filename).  And this fix was needed to debug some types of
+problems (an obvious example is on an encrypted connection failing
+operations on an empty share or with no files in the root of the
+directory) - so you can simply pass in the "smbinfo keys <mntpoint>"
+and get the information that wireshark needs.
 
-             Linus
+I have updated to correct the version missing line at
+git://git.samba.org/sfrench/cifs-2.6.git
+tags/6.5-rc2-smb3-client-fixes-ver2
+
+--=20
+Thanks,
+
+Steve
