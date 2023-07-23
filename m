@@ -2,115 +2,70 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F163DC0015E
-	for <linux-cifs@archiver.kernel.org>; Sat, 22 Jul 2023 19:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B655C001B0
+	for <linux-cifs@archiver.kernel.org>; Sun, 23 Jul 2023 18:44:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbjGVT5B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 22 Jul 2023 15:57:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32794 "EHLO
+        id S230054AbjGWSou (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 23 Jul 2023 14:44:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjGVT5B (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 22 Jul 2023 15:57:01 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A2A10C3;
-        Sat, 22 Jul 2023 12:56:59 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b701dee4bfso45311671fa.0;
-        Sat, 22 Jul 2023 12:56:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690055818; x=1690660618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cP5qZpuE9PuKFQNB1UPD3lEvU+dXufBvkaX/xc8UOj4=;
-        b=CuUcZel0Z7E82US/0alNe2jdLhEtKOTKLbLQuzZ4SOrjS0fzjKpEGn/S6U2b1KYILU
-         rjn/ywGrMcst0pLsGLleCI5gRnFAlf6B1s4QkCsFdZlUOGrCeHFn/bfB8ilxQS6UL8hZ
-         qyHxpWowVpaXsqMYbO1b4wa23gbOMQcJcp59i9uEpxoW9yGC+AaP8OYgFG4XI9mNHQqG
-         j31ie0VUM7JdXHSIzwikTN+YnDSjLAEtwFM8k65tKmJt8ujh8hiXwYv9MoTHWVeKmJhl
-         FdT1TY4nnKyyayJbmQQfYTSvI4egfRSMUVHnZzApze8UCdW4zQe1i8Tsq4Bi0EqfRAOG
-         kWug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690055818; x=1690660618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cP5qZpuE9PuKFQNB1UPD3lEvU+dXufBvkaX/xc8UOj4=;
-        b=QazELKvNmxRz2A4OLS/5ZQbl2BJDFol2y/3EK8zu5lclM6W5a33TsZ90HvQ3RnbHaQ
-         Orxi/8lkeJglNvXPcuZUmmJ2Rpz4DovZsiH0u+1yOuqTGXgGSugqZidE4TROWLzqiJBC
-         bkk0KyYxrLy4TiGd7JRBF56aaQjxaPvDcF3HQGHpEXh96gm5KeX9Jm6FclIFawZ4yd0S
-         NFXg3o6sHbNftni3iuUqB8qGDugAOe6Clwt/RKIHJR196Hk8umw3vi8Xbu+feoCmVVRc
-         imW6mk0EZRAx0uaNaI7U/2Zcr5vceMzobxY4tgDT5ovLKTBkIBVZ0u8vDeQCE9rBJBeT
-         TSUw==
-X-Gm-Message-State: ABy/qLbbUorjhyO7w+27dLlQsqBi68BebZ8BIb8s97pgyejhtqSG83Rn
-        wapmInjioBg6xwXAiPJDfPWe+KUNUVMabMk3VE7yBQJCDB4=
-X-Google-Smtp-Source: APBJJlHVSbTcg+CYyMwiAbVEa3n90aJp3WZPzZSAn+eYY9u0bBFm0E+bpJyZ4Lv6QlJL+tKKKo/+3qSD3hV1jLK3i98=
-X-Received: by 2002:a2e:8097:0:b0:2b7:33b3:ab5c with SMTP id
- i23-20020a2e8097000000b002b733b3ab5cmr3449890ljg.35.1690055817569; Sat, 22
- Jul 2023 12:56:57 -0700 (PDT)
-MIME-Version: 1.0
+        with ESMTP id S229750AbjGWSos (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 23 Jul 2023 14:44:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4732EE40;
+        Sun, 23 Jul 2023 11:44:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D0E9E60E00;
+        Sun, 23 Jul 2023 18:44:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 41AE5C433C8;
+        Sun, 23 Jul 2023 18:44:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690137887;
+        bh=dExd8VX+UcH8v9pAQXjfs/OHsaj6FriVpVkrXkBM0XA=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=T3ertNvOFUFC743xYziYzBV0KQFymLOL1O6y3IO0Q+rGA8fQIsjV7LeBFbbBWQLx9
+         3hxRXQn8ePSQgLcDLXzxOlq37NMIzXew94zvg6S2XCcr1e4bl7jRQLNLmaRsZzxgnH
+         x5xTxrZanzmKXDpjCSRxfTAJ+NWGukZBwL2LzUsnqzsOPamecNdXTyahoxTEONso0Q
+         tHnTxTIImYtAAZO1EUprZ/4t8zWzBbXa3e2f3d8Y6aFfWNJWkL3Bg6J3AseQkVUeoK
+         T4yXjKReK7mDRCaSSjrKa85iC7yWT/VU2oPOnqf1yRVZdEhz2SBjf57ZAeN19HEaVN
+         MJ+X4U1UysTJg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 31230C595C1;
+        Sun, 23 Jul 2023 18:44:47 +0000 (UTC)
+Subject: Re: Re: [GIT PULL] smb3 client minor debugging fix
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mv2V8SDi=qDDwsnoeXSLxqLXHH7FESEz736scrfU+w=MQ@mail.gmail.com>
 References: <CAH2r5msCqEDv1mUMMVTg8t7K+CO82Ha_xQoYJ-FkQ9h83By5wA@mail.gmail.com>
- <CAHk-=whTnOWaYxG2sU8ikFZsowUPApWgHxf0jM77ELUb39SuAw@mail.gmail.com>
-In-Reply-To: <CAHk-=whTnOWaYxG2sU8ikFZsowUPApWgHxf0jM77ELUb39SuAw@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 22 Jul 2023 14:56:46 -0500
-Message-ID: <CAH2r5mv2V8SDi=qDDwsnoeXSLxqLXHH7FESEz736scrfU+w=MQ@mail.gmail.com>
-Subject: Re: [GIT PULL] smb3 client minor debugging fix
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+ <CAHk-=whTnOWaYxG2sU8ikFZsowUPApWgHxf0jM77ELUb39SuAw@mail.gmail.com> <CAH2r5mv2V8SDi=qDDwsnoeXSLxqLXHH7FESEz736scrfU+w=MQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mv2V8SDi=qDDwsnoeXSLxqLXHH7FESEz736scrfU+w=MQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc2-smb3-client-fixes-ver2
+X-PR-Tracked-Commit-Id: ba61a03af29a5f305cb301eb83b42578474508f7
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8266f53b39087c195f0d011dc5696cb2e6155242
+Message-Id: <169013788719.27296.3358286910928653186.pr-tracker-bot@kernel.org>
+Date:   Sun, 23 Jul 2023 18:44:47 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, Jul 22, 2023 at 1:24=E2=80=AFPM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Sat, 22 Jul 2023 at 07:19, Steve French <smfrench@gmail.com> wrote:
-> >
-> > add small debugging improvement
-> > - it is helpful for network debugging of smb3 problems to be able to
-> > use directory not just file (e.g. access to empty share)
-> > ----------------------------------------------------------------
-> > Shyam Prasad N (1):
-> >       cifs: allow dumping keys for directories too
-> >
-> > Steve French (1):
-> >       cifs: update internal module version number for cifs.ko
->
-> Bah. I pulled, and then unpulled, because that module version number
-> change was obviously garbage.
+The pull request you sent on Sat, 22 Jul 2023 14:56:46 -0500:
 
-I had missed a line in the version update.  Have now fixed that typo.
-The module version number is used e.g. to tell when someone has
-backported fixes for cifs.ko to an earlier kernel release (so e.g. we
-can see from "modinfo cifs" or "cat /proc/fs/cifs/DebugData | grep
-Version" whether they are running an updated version of cifs.ko or the
-default version for that kernel).  I try to update the module version
-at the end of the merge window but have sometimes delayed updating it
-until after an important fix.
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc2-smb3-client-fixes-ver2
 
-> This pull wasn't really a "fix" anyway, but then when I see nonsense
-> like that I just decide it's entirely bogus.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8266f53b39087c195f0d011dc5696cb2e6155242
 
-For some context on the debug improvement:
-- the keys change improves ability to read a network trace to debug
-problems on encrypted connections which are very common (e.g. using
-wireshark or tcpdump).  That works today with tools like "smbinfo keys
-/mnt/file" but requires passing in a filename on the mount (see e.g.
-https://wiki.samba.org/index.php/Wireshark_Decryption), but it often
-makes more sense to just pass in the mount point path (ie a directory
-not a filename).  And this fix was needed to debug some types of
-problems (an obvious example is on an encrypted connection failing
-operations on an empty share or with no files in the root of the
-directory) - so you can simply pass in the "smbinfo keys <mntpoint>"
-and get the information that wireshark needs.
+Thank you!
 
-I have updated to correct the version missing line at
-git://git.samba.org/sfrench/cifs-2.6.git
-tags/6.5-rc2-smb3-client-fixes-ver2
-
---=20
-Thanks,
-
-Steve
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
