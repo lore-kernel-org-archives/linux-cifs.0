@@ -2,70 +2,135 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B655C001B0
-	for <linux-cifs@archiver.kernel.org>; Sun, 23 Jul 2023 18:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E73E7C001B0
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Jul 2023 01:36:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbjGWSou (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 23 Jul 2023 14:44:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38590 "EHLO
+        id S231879AbjGXBgg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 23 Jul 2023 21:36:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbjGWSos (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 23 Jul 2023 14:44:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4732EE40;
-        Sun, 23 Jul 2023 11:44:48 -0700 (PDT)
+        with ESMTP id S231485AbjGXBgL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 23 Jul 2023 21:36:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD691981;
+        Sun, 23 Jul 2023 18:32:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D0E9E60E00;
-        Sun, 23 Jul 2023 18:44:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 41AE5C433C8;
-        Sun, 23 Jul 2023 18:44:47 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B858A60F7B;
+        Mon, 24 Jul 2023 01:31:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61D7CC433C7;
+        Mon, 24 Jul 2023 01:31:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690137887;
-        bh=dExd8VX+UcH8v9pAQXjfs/OHsaj6FriVpVkrXkBM0XA=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=T3ertNvOFUFC743xYziYzBV0KQFymLOL1O6y3IO0Q+rGA8fQIsjV7LeBFbbBWQLx9
-         3hxRXQn8ePSQgLcDLXzxOlq37NMIzXew94zvg6S2XCcr1e4bl7jRQLNLmaRsZzxgnH
-         x5xTxrZanzmKXDpjCSRxfTAJ+NWGukZBwL2LzUsnqzsOPamecNdXTyahoxTEONso0Q
-         tHnTxTIImYtAAZO1EUprZ/4t8zWzBbXa3e2f3d8Y6aFfWNJWkL3Bg6J3AseQkVUeoK
-         T4yXjKReK7mDRCaSSjrKa85iC7yWT/VU2oPOnqf1yRVZdEhz2SBjf57ZAeN19HEaVN
-         MJ+X4U1UysTJg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 31230C595C1;
-        Sun, 23 Jul 2023 18:44:47 +0000 (UTC)
-Subject: Re: Re: [GIT PULL] smb3 client minor debugging fix
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mv2V8SDi=qDDwsnoeXSLxqLXHH7FESEz736scrfU+w=MQ@mail.gmail.com>
-References: <CAH2r5msCqEDv1mUMMVTg8t7K+CO82Ha_xQoYJ-FkQ9h83By5wA@mail.gmail.com>
- <CAHk-=whTnOWaYxG2sU8ikFZsowUPApWgHxf0jM77ELUb39SuAw@mail.gmail.com> <CAH2r5mv2V8SDi=qDDwsnoeXSLxqLXHH7FESEz736scrfU+w=MQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mv2V8SDi=qDDwsnoeXSLxqLXHH7FESEz736scrfU+w=MQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc2-smb3-client-fixes-ver2
-X-PR-Tracked-Commit-Id: ba61a03af29a5f305cb301eb83b42578474508f7
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8266f53b39087c195f0d011dc5696cb2e6155242
-Message-Id: <169013788719.27296.3358286910928653186.pr-tracker-bot@kernel.org>
-Date:   Sun, 23 Jul 2023 18:44:47 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        s=k20201202; t=1690162288;
+        bh=ZGGjLoliyL7W6df1EKhsmbL/I57wCGM33k/RC200KKQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=lLMUBukyQLteWNasVKbk7YNDvVeBDGR1KWhgADg+7WZjMMXvMOHYWZTPhEkkbwrGw
+         Hw5cJI6qwOr1OKJtqYo5SeQHDvofKTlcKakGB4+WqDGTXFth+ht6neg03v8J8pAcDp
+         YbmBRKq+8LES173JAfOI0sdfi4MUTSg00VWcO1Pav7+rkYHcNoKAAmPVSXPkvCxCh3
+         d51Y0G0gOC0pSeOfNNHb+22XraVDKlK46+X4T5Sm0kFUTufrLJbU62iQbRktvMc4py
+         rKu/8wTE5JowErQbGXxYkNAgxlwyzxDZZtMOPpNFn0oRdatd3tYcrUVXQh+rhcgpzJ
+         9Tvn3boA07kwA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Paulo Alcantara <pc@manguebit.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 5.15] smb: client: fix warning in cifs_smb3_do_mount()
+Date:   Sun, 23 Jul 2023 21:31:25 -0400
+Message-Id: <20230724013125.2327560-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.15.121
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 22 Jul 2023 14:56:46 -0500:
+From: Paulo Alcantara <pc@manguebit.com>
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc2-smb3-client-fixes-ver2
+[ Upstream commit 12c30f33cc6769bf411088a2872843c4f9ea32f9 ]
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8266f53b39087c195f0d011dc5696cb2e6155242
+This fixes the following warning reported by kernel test robot
 
-Thank you!
+  fs/smb/client/cifsfs.c:982 cifs_smb3_do_mount() warn: possible
+  memory leak of 'cifs_sb'
 
+Link: https://lore.kernel.org/all/202306170124.CtQqzf0I-lkp@intel.com/
+Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/cifsfs.c | 28 ++++++++++------------------
+ 1 file changed, 10 insertions(+), 18 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index c9481289266ca..b5ae209539ff1 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -848,11 +848,11 @@ struct dentry *
+ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 	      int flags, struct smb3_fs_context *old_ctx)
+ {
+-	int rc;
+-	struct super_block *sb = NULL;
+-	struct cifs_sb_info *cifs_sb = NULL;
+ 	struct cifs_mnt_data mnt_data;
++	struct cifs_sb_info *cifs_sb;
++	struct super_block *sb;
+ 	struct dentry *root;
++	int rc;
+ 
+ 	/*
+ 	 * Prints in Kernel / CIFS log the attempted mount operation
+@@ -863,11 +863,9 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 	else
+ 		cifs_info("Attempting to mount %s\n", old_ctx->UNC);
+ 
+-	cifs_sb = kzalloc(sizeof(struct cifs_sb_info), GFP_KERNEL);
+-	if (cifs_sb == NULL) {
+-		root = ERR_PTR(-ENOMEM);
+-		goto out;
+-	}
++	cifs_sb = kzalloc(sizeof(*cifs_sb), GFP_KERNEL);
++	if (!cifs_sb)
++		return ERR_PTR(-ENOMEM);
+ 
+ 	cifs_sb->ctx = kzalloc(sizeof(struct smb3_fs_context), GFP_KERNEL);
+ 	if (!cifs_sb->ctx) {
+@@ -910,10 +908,8 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 
+ 	sb = sget(fs_type, cifs_match_super, cifs_set_super, flags, &mnt_data);
+ 	if (IS_ERR(sb)) {
+-		root = ERR_CAST(sb);
+ 		cifs_umount(cifs_sb);
+-		cifs_sb = NULL;
+-		goto out;
++		return ERR_CAST(sb);
+ 	}
+ 
+ 	if (sb->s_root) {
+@@ -944,13 +940,9 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 	deactivate_locked_super(sb);
+ 	return root;
+ out:
+-	if (cifs_sb) {
+-		if (!sb || IS_ERR(sb)) {  /* otherwise kill_sb will handle */
+-			kfree(cifs_sb->prepath);
+-			smb3_cleanup_fs_context(cifs_sb->ctx);
+-			kfree(cifs_sb);
+-		}
+-	}
++	kfree(cifs_sb->prepath);
++	smb3_cleanup_fs_context(cifs_sb->ctx);
++	kfree(cifs_sb);
+ 	return root;
+ }
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.39.2
+
