@@ -2,138 +2,194 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7920C0015E
-	for <linux-cifs@archiver.kernel.org>; Wed, 26 Jul 2023 12:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48564C001DE
+	for <linux-cifs@archiver.kernel.org>; Wed, 26 Jul 2023 13:39:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231673AbjGZMvQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 26 Jul 2023 08:51:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53714 "EHLO
+        id S234169AbjGZNjM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 26 Jul 2023 09:39:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231167AbjGZMvP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 Jul 2023 08:51:15 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B960EE77;
-        Wed, 26 Jul 2023 05:50:49 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 5E8B31F86C;
-        Wed, 26 Jul 2023 12:50:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1690375848;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S234191AbjGZNjJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 Jul 2023 09:39:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3266173B
+        for <linux-cifs@vger.kernel.org>; Wed, 26 Jul 2023 06:38:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690378696;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DLHppaXGFFSDtpuekODV70zFeQ/hmYjpWgjjmDBlxQg=;
-        b=Yh+mGp59Iw5QMGCtlDIlNWwKo/uyyZYjkZAOUcL6/S+OudSRpJwysjDw0guTUrTOsQQjUJ
-        vlNyolBk5JflaK1zzdmDwnwyFhZTbcFdNkUQL3kp1ORYo0nPFT11tc728qt9TxKluIoBYR
-        bvA290OSK3O4YDVlwZxt/i+pZfiN/G8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1690375848;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DLHppaXGFFSDtpuekODV70zFeQ/hmYjpWgjjmDBlxQg=;
-        b=a7yMOzOE9A/VHNwBvkVeC1gNj684SaIQRNq/yMKl3/NNLP4Gf9u2O15OPwh2sc9i7LR/Wz
-        FjWgmRnlqgpU2KBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 13B5E139BD;
-        Wed, 26 Jul 2023 12:50:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 8yDlA6cWwWSeUgAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Wed, 26 Jul 2023 12:50:47 +0000
-Date:   Wed, 26 Jul 2023 14:44:02 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>,
-        Yue Hu <huyue2@gl0jj8bn.sched.sma.tdnsstic1.cn>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Richard Weinberger <richard@nod.at>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Chinner <david@fromorbit.com>,
-        Anthony Iliopoulos <ailiop@suse.com>, v9fs@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@telemann.coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
-        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v6 7/7] btrfs: convert to multigrain timestamps
-Message-ID: <20230726124402.GK20457@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20230725-mgctime-v6-0-a794c2b7abca@kernel.org>
- <20230725-mgctime-v6-7-a794c2b7abca@kernel.org>
+        bh=n8Z700vzR7baDs8b/e0kEl1jWEWNlBZFJe5eJ9LWL2M=;
+        b=cYKxX+f5W8GUBF/bVF+A9Se010HvytxlKcOf0y68e2N/F8OE1NI+wt2gjdQl0vBTJD0/jJ
+        IvYIFC5W8AcyrgYfqZSVITssoEt8EswqUuIJtuDadQcAspDSCa/l3q2cOS4WuXSN+cv080
+        TIGaEi5PrzUzo3ZsEOHyLEVblg/pJlo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-45-ng5GJYHbNZuEekWYEhYpyg-1; Wed, 26 Jul 2023 09:38:15 -0400
+X-MC-Unique: ng5GJYHbNZuEekWYEhYpyg-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-30932d15a30so3916721f8f.1
+        for <linux-cifs@vger.kernel.org>; Wed, 26 Jul 2023 06:38:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690378694; x=1690983494;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n8Z700vzR7baDs8b/e0kEl1jWEWNlBZFJe5eJ9LWL2M=;
+        b=Q1pOi4Tp9zCqf+RSCWcIvYzSzdDR9QeAEnDo1sgsSimOPtlbgbQabcjwF0E7CCKsGq
+         kWTuveDCCuIZrLjQHjynHBwd1so1Mdtm1dhEpdNpqrUfcYWdTtK50yyWFLhftcKUOGiS
+         i2i25QkXfzqJwU81sHeTflEdjwALtpiMJCnzhxqs7znIUfDdXZRlMCcrtSObps9aT6EC
+         8D0C90Tn8HZSaM1/upFfr717HFNrgZUnZQLNn2vi21S1Xg0JdPnYZkY9ZgdnyV8Ly2p2
+         zBUrTtb2QHyou3aQKhVn2SSsPWiMDqlJTOMg+TbgzAH/YAuB4gWhw+Iu6RIvKuTTFRgr
+         d1ZA==
+X-Gm-Message-State: ABy/qLatbOVBwjQMktz4as5EwXZGOAU1pnRYeU/GG/4zCuY2fdZQXhpQ
+        QaPB6SJK628s7phveamziWELcbXqkYacrXwkUtMggqSZ6KBUMF3S9qnxmajttR2rxGHIsB5UAPH
+        MLC1EjH3tg0xEWUgeQA2iIQ==
+X-Received: by 2002:a5d:468b:0:b0:317:59c8:17bc with SMTP id u11-20020a5d468b000000b0031759c817bcmr1262945wrq.15.1690378694087;
+        Wed, 26 Jul 2023 06:38:14 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFW6fWGnz4rPcAEd3A5rxFde+FjwCaa7dB2oKhB0S6J5Gte5BzfN0mtzCoUlg3SX0ZdBK9MJw==
+X-Received: by 2002:a5d:468b:0:b0:317:59c8:17bc with SMTP id u11-20020a5d468b000000b0031759c817bcmr1262918wrq.15.1690378693599;
+        Wed, 26 Jul 2023 06:38:13 -0700 (PDT)
+Received: from [192.168.3.108] (p5b0c6c57.dip0.t-ipconnect.de. [91.12.108.87])
+        by smtp.gmail.com with ESMTPSA id k11-20020adfd84b000000b0031773e3cf46sm2867991wrl.61.2023.07.26.06.38.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 06:38:13 -0700 (PDT)
+Message-ID: <416eca24-6baf-69d9-21a2-c434a9744596@redhat.com>
+Date:   Wed, 26 Jul 2023 15:38:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230725-mgctime-v6-7-a794c2b7abca@kernel.org>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] crypto, cifs: Fix error handling in extract_iter_to_sg()
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steve French <sfrench@samba.org>
+Cc:     akpm@linux-foundation.org, Sven Schnelle <svens@linux.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jeff Layton <jlayton@kernel.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, linux-cachefs@redhat.com,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20571.1690369076@warthog.procyon.org.uk>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20571.1690369076@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Jul 25, 2023 at 10:58:20AM -0400, Jeff Layton wrote:
-> Enable multigrain timestamps, which should ensure that there is an
-> apparent change to the timestamp whenever it has been written after
-> being actively observed via getattr.
+On 26.07.23 12:57, David Howells wrote:
+>      
+> Fix error handling in extract_iter_to_sg().  Pages need to be unpinned, not
+> put in extract_user_to_sg() when handling IOVEC/UBUF sources.
 > 
-> Beyond enabling the FS_MGTIME flag, this patch eliminates
-> update_time_for_write, which goes to great pains to avoid in-memory
-> stores. Just have it overwrite the timestamps unconditionally.
+> The bug may result in a warning like the following:
 > 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+>    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
+>    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
+>    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inline]
+>    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
+>    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 try_grab_page+0x108/0x160 mm/gup.c:252
+>    ...
+>    pc : try_grab_page+0x108/0x160 mm/gup.c:229
+>    lr : follow_page_pte+0x174/0x3e4 mm/gup.c:651
+>    ...
+>    Call trace:
+>     __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
+>     arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
+>     raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inline]
+>     atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
+>     try_grab_page+0x108/0x160 mm/gup.c:252
+>     follow_pmd_mask mm/gup.c:734 [inline]
+>     follow_pud_mask mm/gup.c:765 [inline]
+>     follow_p4d_mask mm/gup.c:782 [inline]
+>     follow_page_mask+0x12c/0x2e4 mm/gup.c:839
+>     __get_user_pages+0x174/0x30c mm/gup.c:1217
+>     __get_user_pages_locked mm/gup.c:1448 [inline]
+>     __gup_longterm_locked+0x94/0x8f4 mm/gup.c:2142
+>     internal_get_user_pages_fast+0x970/0xb60 mm/gup.c:3140
+>     pin_user_pages_fast+0x4c/0x60 mm/gup.c:3246
+>     iov_iter_extract_user_pages lib/iov_iter.c:1768 [inline]
+>     iov_iter_extract_pages+0xc8/0x54c lib/iov_iter.c:1831
+>     extract_user_to_sg lib/scatterlist.c:1123 [inline]
+>     extract_iter_to_sg lib/scatterlist.c:1349 [inline]
+>     extract_iter_to_sg+0x26c/0x6fc lib/scatterlist.c:1339
+>     hash_sendmsg+0xc0/0x43c crypto/algif_hash.c:117
+>     sock_sendmsg_nosec net/socket.c:725 [inline]
+>     sock_sendmsg+0x54/0x60 net/socket.c:748
+>     ____sys_sendmsg+0x270/0x2ac net/socket.c:2494
+>     ___sys_sendmsg+0x80/0xdc net/socket.c:2548
+>     __sys_sendmsg+0x68/0xc4 net/socket.c:2577
+>     __do_sys_sendmsg net/socket.c:2586 [inline]
+>     __se_sys_sendmsg net/socket.c:2584 [inline]
+>     __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2584
+>     __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
+>     invoke_syscall+0x48/0x114 arch/arm64/kernel/syscall.c:52
+>     el0_svc_common.constprop.0+0x44/0xe4 arch/arm64/kernel/syscall.c:142
+>     do_el0_svc+0x38/0xa4 arch/arm64/kernel/syscall.c:191
+>     el0_svc+0x2c/0xb0 arch/arm64/kernel/entry-common.c:647
+>     el0t_64_sync_handler+0xc0/0xc4 arch/arm64/kernel/entry-common.c:665
+>     el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:591
+> 
+> Fixes: 018584697533 ("netfs: Add a function to extract an iterator into a scatterlist")
+> Reported-by: syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/linux-mm/000000000000273d0105ff97bf56@google.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Sven Schnelle <svens@linux.ibm.com>
+> cc: akpm@linux-foundation.org
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: Steve French <sfrench@samba.org>
+> cc: Shyam Prasad N <nspmangalore@gmail.com>
+> cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: linux-mm@kvack.org
+> cc: linux-crypto@vger.kernel.org
+> cc: linux-cachefs@redhat.com
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> ---
+>   lib/scatterlist.c |    2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+> index e86231a44c3d..c65566b4dc66 100644
+> --- a/lib/scatterlist.c
+> +++ b/lib/scatterlist.c
+> @@ -1148,7 +1148,7 @@ static ssize_t extract_user_to_sg(struct iov_iter *iter,
+>   
+>   failed:
+>   	while (sgtable->nents > sgtable->orig_nents)
+> -		put_page(sg_page(&sgtable->sgl[--sgtable->nents]));
+> +		unpin_user_page(sg_page(&sgtable->sgl[--sgtable->nents]));
+>   	return res;
+>   }
+>   
+> 
 
-Acked-by: David Sterba <dsterba@suse.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+Cheers,
+
+David / dhildenb
+
