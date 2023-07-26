@@ -2,95 +2,149 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF8FC001DC
-	for <linux-cifs@archiver.kernel.org>; Wed, 26 Jul 2023 17:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A11C0015E
+	for <linux-cifs@archiver.kernel.org>; Wed, 26 Jul 2023 17:03:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbjGZRCZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 26 Jul 2023 13:02:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44874 "EHLO
+        id S230466AbjGZRDu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 26 Jul 2023 13:03:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231470AbjGZRCU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 Jul 2023 13:02:20 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C98B513D
-        for <linux-cifs@vger.kernel.org>; Wed, 26 Jul 2023 10:02:19 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-686ba29ccb1so842548b3a.1
-        for <linux-cifs@vger.kernel.org>; Wed, 26 Jul 2023 10:02:19 -0700 (PDT)
+        with ESMTP id S229528AbjGZRDt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 Jul 2023 13:03:49 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 208551724
+        for <linux-cifs@vger.kernel.org>; Wed, 26 Jul 2023 10:03:46 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4fcd615d7d6so10849700e87.3
+        for <linux-cifs@vger.kernel.org>; Wed, 26 Jul 2023 10:03:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690390939; x=1690995739;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y5uww9ZO1evp45inXtXx88FlAcfHMBu6ONhEK8hWeoo=;
-        b=YP/+Puo77KAJhzVAhT6IdwwYB0QvDZLPGGkSSjO00U8jemCsKrD0BBaalH7yfKIbeN
-         rSRFJi0HMdUgCkKAYoxq79Z1YJYjfu9YdJtRP1Raza4z7GWw+i8609PoiTngoZYften5
-         BExMMUSZBnl9FXeUm4khoD26H6vH4LBPKQBtoVmmI1Sq/8846pgYvKXoMPiI4cgFcRI5
-         LclJDzYN4bh4VySCJBE/ivgdVHIGU5M6PYQZDpoSij9pCERIE7hB8Auu83IMf0f3w4QL
-         BxVO3vmJNwLz5soPQAKfwMBYDWWMjJ9XEu0QrKlY+nlMylTUZcfLnrf2oGs4KcL3upEe
-         kADw==
+        d=gmail.com; s=20221208; t=1690391024; x=1690995824;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0P8qA4ersnNBGw+4kmWLlSR4WRYnTn2VOzN9X6TIxxw=;
+        b=Q1qltLsdcxZybA/5EU4IpxjlL6+8KrXUabQcd54erz1aae+veermtZHOB8Ek8f7Bap
+         bpK8rPYmc/25XutYjf5TUcuqmsnnlILYVR7EpxSa8QxsBalmJk44AL7EbW6nFhEKvTNL
+         3LmjaNc9o9sHv8SSwfhNi9sOofgLpTMZ4Qcf+1r5zUNGAn6sw7TfopS877/1ZoWPw/fh
+         ybWnywN0Z8+6DTS+I9KMuBRwcBwUywqtzuMPdCxmbU0WB4mFS1Ag4H6LVLLu7jgrbCAV
+         10aoN5dagTXtBD1GaaNqXxQMQaD8WgBPw0oekk0v34KzjVuOacf694MgOMdxyXq5XCGv
+         y2eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690390939; x=1690995739;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y5uww9ZO1evp45inXtXx88FlAcfHMBu6ONhEK8hWeoo=;
-        b=N+oe4XMHWOE25XnELq+9MLNUQwBcTZzzdQ3245SmDAOvBCzpLY1bwSbuywIQz7muBt
-         zOcuLD3xcM5tuP2+cx20T+7XY8ti7kfyXug3OLyT5IL02qw9hturx9qgaE5XJNAxevaH
-         PkjHuV87BMimEBClwDRBgHly98scC0Ngi4hyWs+npVYxlg4lVMIdGk4XnoQolPIsCFHK
-         aJxqg5y5rnyht2b/YlKRONWvQlPVgVDDXd+8IeclkTeVSCO0esoTOW4VSpk/Y1LIXbDL
-         WcRCY0ZG8x4SjUW963VEe7hEm/yHWU2tNuzQnDM+ILa6JR8Db7MhOUxxVQrVuHVsKnhY
-         SNiA==
-X-Gm-Message-State: ABy/qLZfYBWpggMRNJTvqoqpPKOIYFJ4ilFMsr+5bMEppxbnW+2ciKQT
-        tTqNtp8SNohdhm3PLPR3qWyCf1jSGyg=
-X-Google-Smtp-Source: APBJJlEJIfNWb0fxmJ0HMhdLDPC8Ii2MSRM2qmeTQ6n2oC/ZnflObNmmsDSQYZOGfPFfEGSCPV59Hg==
-X-Received: by 2002:a05:6a20:8f01:b0:132:d09f:1716 with SMTP id b1-20020a056a208f0100b00132d09f1716mr112784pzk.2.1690390939053;
-        Wed, 26 Jul 2023 10:02:19 -0700 (PDT)
-Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:1:7e0e:5dff:fea8:2c14])
-        by smtp.gmail.com with ESMTPSA id y11-20020aa7854b000000b006687b41c4dasm11640729pfn.110.2023.07.26.10.02.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 10:02:18 -0700 (PDT)
-From:   nspmangalore@gmail.com
-X-Google-Original-From: sprasad@microsoft.com
-To:     dan.carpenter@linaro.org, linux-cifs@vger.kernel.org,
-        smfrench@gmail.com, bharathsm.hsk@gmail.com
-Cc:     Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH] cifs: add missing return value check for cifs_sb_tlink
-Date:   Wed, 26 Jul 2023 17:02:11 +0000
-Message-Id: <20230726170211.378839-1-sprasad@microsoft.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20221208; t=1690391024; x=1690995824;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0P8qA4ersnNBGw+4kmWLlSR4WRYnTn2VOzN9X6TIxxw=;
+        b=ds9k5WQiRsN6gHu5mCz87sn0kcobJUBDEXzirMa9qV156vKq91GYi7/8P0Oq7BB+tU
+         duwz8QK44nMNJ0REoU7YdWoWKSy5/tq4Qg86nDUJ7CE0ifSAW21CkEtEDYwuSfIJs82H
+         Ucv0OolPavQYdJC1pNI26vl7/vMIe9k/4uiV6T/GfCki8ihzdRrOYsVxC8B+eCjj4XP3
+         8lWdsH29BKIi7Y6oSo/mbx6P4QxRoqzfw1EG4NcEl7CiJgNSLFowvbQHbzszXzNS67pq
+         vKO3+Byod01txcGqE0B4tkE1dzkoHLp/Anjlwh6pgeNgdQpmhI14dH4XcPhlXwsTa8AQ
+         mIyg==
+X-Gm-Message-State: ABy/qLZFo4UE6xdbtORciZWO82I8c2ZzCn2ErZOt+jPiTO4qS3sqPz8W
+        SlXShPvHJgHCCPxzJS4VWFneqWt2u0w1UwEQnv9FwOO9SMQ=
+X-Google-Smtp-Source: APBJJlFojys50Td7laiw0h+BrDiKOS+RVZXWLXGHv/jTB6s9QyRcp0IRkrCti12jwJlXXTAR2cNJUqdpyv7PUo+O1tY=
+X-Received: by 2002:a05:6512:3b8:b0:4f4:c6ab:f119 with SMTP id
+ v24-20020a05651203b800b004f4c6abf119mr1741762lfp.64.1690391023985; Wed, 26
+ Jul 2023 10:03:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <e36ce0a0-7bed-4184-8068-82151f175bec@moroto.mountain> <CANT5p=rPMFfUwVwcAveqjom7MUNOZvU_Wqp_3g+qgu5qJx+3sg@mail.gmail.com>
+In-Reply-To: <CANT5p=rPMFfUwVwcAveqjom7MUNOZvU_Wqp_3g+qgu5qJx+3sg@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 26 Jul 2023 22:33:32 +0530
+Message-ID: <CANT5p=oQCEtWsscKr3gt6gJxAS=msCV+uyT-5EfSRCo526wAog@mail.gmail.com>
+Subject: Re: [bug report] cifs: allow dumping keys for directories too
+To:     Dan Carpenter <dan.carpenter@linaro.org>,
+        Steve French <smfrench@gmail.com>
+Cc:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Shyam Prasad N <sprasad@microsoft.com>
+On Mon, Jul 24, 2023 at 2:02=E2=80=AFPM Shyam Prasad N <nspmangalore@gmail.=
+com> wrote:
+>
+> On Mon, Jul 24, 2023 at 1:25=E2=80=AFPM Dan Carpenter <dan.carpenter@lina=
+ro.org> wrote:
+> >
+> > Hello Shyam Prasad N,
+> >
+> > The patch 27bfeaa7b929: "cifs: allow dumping keys for directories
+> > too" from Jun 16, 2023 (linux-next), leads to the following Smatch
+> > static checker warning:
+> >
+> >         fs/smb/client/ioctl.c:481 cifs_ioctl()
+> >         error: 'tlink' dereferencing possible ERR_PTR()
+> >
+> > fs/smb/client/ioctl.c
+> >     469                 case CIFS_DUMP_FULL_KEY:
+> >     470                         /*
+> >     471                          * Dump encryption keys (handles any ke=
+y sizes)
+> >     472                          */
+> >     473                         if (pSMBFile =3D=3D NULL)
+> >     474                                 break;
+> >     475                         if (!capable(CAP_SYS_ADMIN)) {
+> >     476                                 rc =3D -EACCES;
+> >     477                                 break;
+> >     478                         }
+> >     479                         cifs_sb =3D CIFS_SB(inode->i_sb);
+> >     480                         tlink =3D cifs_sb_tlink(cifs_sb);
+> >
+> > cifs_sb_tlink() requires error checking.
+> >
+> > --> 481                         tcon =3D tlink_tcon(tlink);
+> >     482                         rc =3D cifs_dump_full_key(tcon, (void _=
+_user *)arg);
+> >     483                         cifs_put_tlink(tlink);
+> >     484                         break;
+> >     485                 case CIFS_IOC_NOTIFY:
+> >     486                         if (!S_ISDIR(inode->i_mode)) {
+> >     487                                 /* Notify can only be done on d=
+irectories */
+> >     488                                 rc =3D -EOPNOTSUPP;
+> >     489                                 break;
+> >     490                         }
+> >     491                         cifs_sb =3D CIFS_SB(inode->i_sb);
+> >     492                         tlink =3D cifs_sb_tlink(cifs_sb);
+> >     493                         if (IS_ERR(tlink)) {
+> >     494                                 rc =3D PTR_ERR(tlink);
+> >     495                                 break;
+> >     496                         }
+> >     497                         tcon =3D tlink_tcon(tlink);
+> >     498                         if (tcon && tcon->ses->server->ops->not=
+ify) {
+> >     499                                 rc =3D tcon->ses->server->ops->=
+notify(xid,
+> >     500                                                 filep, (void __=
+user *)arg,
+> >     501                                                 false /* no ret=
+ data */);
+> >     502                                 cifs_dbg(FYI, "ioctl notify rc =
+%d\n", rc);
+> >     503                         } else
+> >     504                                 rc =3D -EOPNOTSUPP;
+> >     505                         cifs_put_tlink(tlink);
+> >     506                         break;
+> >
+> > regards,
+> > dan carpenter
+>
+> Hi Dan,
+>
+> Thanks for bringing this to our notice.
+> I think similar checks are missing in a few other places in the code.
+> I'll submit a new patch for this soon.
+>
+> --
+> Regards,
+> Shyam
 
-Whenever a tlink is obtained by cifs_sb_tlink, we need
-to check that the tlink returned is not an error.
-It was missing with the last change here.
+My bad. Only this change is missing the check.
+Added that and submitted a new patch. Please check [PATCH] cifs: add
+missing return value check for cifs_sb_tlink
 
-Fixes: b3edef6b9cd0 ("cifs: allow dumping keys for directories too")
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
----
- fs/smb/client/ioctl.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
-index e1904b86ed96..f7160003e0ed 100644
---- a/fs/smb/client/ioctl.c
-+++ b/fs/smb/client/ioctl.c
-@@ -478,6 +478,11 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 			}
- 			cifs_sb = CIFS_SB(inode->i_sb);
- 			tlink = cifs_sb_tlink(cifs_sb);
-+			if (IS_ERR(tlink)) {
-+				rc = PTR_ERR(tlink);
-+				break;
-+			}
-+
- 			tcon = tlink_tcon(tlink);
- 			rc = cifs_dump_full_key(tcon, (void __user *)arg);
- 			cifs_put_tlink(tlink);
--- 
-2.34.1
-
+--=20
+Regards,
+Shyam
