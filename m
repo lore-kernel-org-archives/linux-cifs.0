@@ -2,57 +2,60 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A40C001DE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14F7C001DF
 	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jul 2023 19:50:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234811AbjG1TuY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S234866AbjG1TuY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Fri, 28 Jul 2023 15:50:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56510 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234074AbjG1TuX (ORCPT
+        with ESMTP id S234290AbjG1TuX (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jul 2023 15:50:23 -0400
 Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9410A3C07
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Jul 2023 12:50:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E74420F
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Jul 2023 12:50:22 -0700 (PDT)
 From:   Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1690573819;
+        s=dkim; t=1690573821;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=j2C3J9Tk0XRUlrb5yZy7WpiLI7CrUDLjmpi4rmr4xPI=;
-        b=qmKugTYsolR7iA43mUN+X0r0indjJBhNkiftkIpD1EC2F4nJ4m1tjHvLW8FPkMdAdJogRm
-        MfnQRegUtp8Jf1+ZFYyp7MQqeXgUU3h/jFYM10fbOpkceSvRVdR8N+JKPIpiLKfvmkimVJ
-        L1ltIviTT+H1tdLbxr7DTFMa5nWeOOveTFunRsy/CNW1FbTWhvZDx5Ln4Hr3Qq4aXIqqfF
-        QzoFETfM3IAXVDJDcFtl6SR+4Jp74EAOrI5sGsgqnqonX28HDAyxY6MhrPcfXRK9OFdt2a
-        4S92ITjseau9jxA/gFZmZWrn1daldUGAFI2Lgd2PvITDtCrvS6+KKLCjUNco7Q==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lTjDRReiGjyTPvMeCsJB3obpBf0aVkmd6MiO7iIGZ0Q=;
+        b=Lwu6WayQMhUAE4lf9yLEAhTB3e0PrlsVQfHShCSgzbcwdvTdIn6ndMfBdqdzKrYGlI5Qlz
+        jnm/N7DugEtq9WFmB8oXlYACXxhDb+uudQ5YPIZXD/zR43zTHfIhDwu0lKyoymhF7GOnVL
+        CAdH5V74FCQkTVAdzDd/BQh8j+dgnDb61pr4LAMS+CZdyRu3W5IoE3Q3LgikAetPFieGT9
+        8nlu/yKKnjjbG4FvXJZTpIAaXhRJo3b3K7VZzyaUsS/e6qg+2LxZ7THyUPGf3muqsGDE+p
+        X0GjkFYsRcN6DPmFzXnLL756FBrPsCNphAmSgjwhIBG/4tOdSfkOUYvT0pGRxg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1690573819;
+        s=dkim; t=1690573821;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=j2C3J9Tk0XRUlrb5yZy7WpiLI7CrUDLjmpi4rmr4xPI=;
-        b=dTguExKjj5oTst43aeaV9mNaw3HyLlONil8MsLsGAZd8PiNe8+I40di+cT+dQ++CWRsc/c
-        ZG9PZX6PydFVQmhTI9/xuCLw2JgaBpy3b/voIpSP21/1NhB8gOWFVB496BfzOd4NacfkCL
-        L8S3/CxnXvV7IPeHc+6pFl3EPYff2q0p9uEEqQXg9toOOnF6TfhnIFZquyRyGpAIL6+2HI
-        07oCbVRWaH63NiTiseOslPRfiVygAD990d/2ZkbbrqEOz+hK8nFg8RAQ0lIkV0VjeEn6TL
-        +x+75VYArPQhz5rgq4qXpX4tSRqSEQzxWnWZpnRVFswAQEMM0PZMFMIdGvjexg==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lTjDRReiGjyTPvMeCsJB3obpBf0aVkmd6MiO7iIGZ0Q=;
+        b=q8sCaPmYHQso24SwyZWUsaCi7qF3cQeSVlvT3SOC0FKI1xYh/JSMPA3cj4pyamXIOQQqKL
+        0n68IU2r85GRF/HjV9w7RzxyJfY9Xdh2yeL66qGDDQaaQh5qZnAS6miTgGbTp7WSdhBTQC
+        Ud1zlA/g0P1Kicww5RDiIXGRXHBCUYtWhks2kceUnIkUHMdNG0CINnpWWYTunoRZos9OUX
+        ZiTgzNSnvy2uASh2v7ke4oxpUyP4fm1jldclxy2p68jZ/WQFkip5KTb8X+YO6neSLL4UJa
+        aAdvhN4IYLT9Kt8t1NNAMzTY7j9h0iSNCh0OSLMKDYIGEvWOUBaNz23i32Um2Q==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1690573819; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1690573821; a=rsa-sha256;
         cv=none;
-        b=k6WW7fzQ000tUnyJRnBYrf3bwlTW1lXa9tuFVLn7o6408uxqS76hD+x6iw7JxR0srg3jVD
-        pE9DuLc+mChaR/3GiReakaLsx+LN1zhzgqR6hAAsKFM/7Jy4mrkh+gHQM1jHGpsIXmj/Ha
-        smN3KPq2XukDPwkLtqK4wqMnXg9zLw++jeBkcPC1Jk1u7a6aJnerkyN5IgGMz5Po10uVvo
-        yTRAO/ET8VxNf9CP2t4YfBxTfsdk2TNl7JzOQ0QaRtxGQHtafweYqnO1e6FO+oNg7iRFLK
-        s5fLn3DtLD02v8w6PWB1SWS+GnyD1MesOLz204b5GRTzNpsAekbyaBl6nWtCfw==
+        b=U7XJMFJybny7jGT4MdQLGOkMDZ8fX50etqg1IpavuFmPRzZEVo6XWxdM9bQQEJ25XYv8cG
+        hZhSu+/nrUYrMvw8r0qRFyLGvBFDYTHfCJmEW+yGGWdU7BC+AmwqKKLqt5QF3OBaq3itGT
+        tBNe9AzWRsTNocF7Pg5LsMDA1sVtllOfCpjcxjseD3eSoIDFpPy8yyPCQseidx+geLO9r5
+        2WPhJQPpqeeCgf7lZiDvof/B7PXrroKuvMeXLb/H15APgAbAk8R5hR5E8rhmbPhiUIFHad
+        Kl+IvnEqAQife+nXYRFhW5EoHAnFrMxmqqL6pWjRfyTc0W4i8166G6zrO36g0w==
 To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH 1/8] smb: client: reduce stack usage in cifs_try_adding_channels()
-Date:   Fri, 28 Jul 2023 16:50:03 -0300
-Message-ID: <20230728195010.19122-1-pc@manguebit.com>
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH 2/8] smb: client: reduce stack usage in smb_send_rqst()
+Date:   Fri, 28 Jul 2023 16:50:04 -0300
+Message-ID: <20230728195010.19122-2-pc@manguebit.com>
+In-Reply-To: <20230728195010.19122-1-pc@manguebit.com>
+References: <20230728195010.19122-1-pc@manguebit.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -61,139 +64,77 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 Clang warns about exceeded stack frame size
 
-  fs/smb/client/sess.c:160:5: warning: stack frame size (1368) exceeds
-  limit (1024) in 'cifs_try_adding_channels' [-Wframe-larger-than]
+  fs/smb/client/transport.c:420:1: warning: stack frame size (1048)
+  exceeds limit (1024) in 'smb_send_rqst' [-Wframe-larger-than]
 
-It turns out that cifs_ses_add_channel() got inlined into
-cifs_try_adding_channels() which had a stack-allocated variable @ctx
-of 624 bytes in size.  Fix this by making it heap-allocated.
+Fix this by allocating a structure that will hold transform header and
+compound requests.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202307270640.5ODmPwDl-lkp@intel.com/
 Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
- fs/smb/client/sess.c | 68 ++++++++++++++++++++++++++------------------
- 1 file changed, 41 insertions(+), 27 deletions(-)
+ fs/smb/client/transport.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index c57ca2050b73..5292216d9947 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -360,11 +360,11 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
- {
- 	struct TCP_Server_Info *chan_server;
- 	struct cifs_chan *chan;
--	struct smb3_fs_context ctx = {NULL};
-+	struct smb3_fs_context *ctx;
- 	static const char unc_fmt[] = "\\%s\\foo";
--	char unc[sizeof(unc_fmt)+SERVER_NAME_LEN_WITH_NULL] = {0};
- 	struct sockaddr_in *ipv4 = (struct sockaddr_in *)&iface->sockaddr;
- 	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)&iface->sockaddr;
-+	size_t len;
- 	int rc;
- 	unsigned int xid = get_xid();
- 
-@@ -388,54 +388,64 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
- 	 * the session and server without caring about memory
- 	 * management.
- 	 */
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx) {
-+		rc = -ENOMEM;
-+		goto out_free_xid;
-+	}
- 
- 	/* Always make new connection for now (TODO?) */
--	ctx.nosharesock = true;
-+	ctx->nosharesock = true;
- 
- 	/* Auth */
--	ctx.domainauto = ses->domainAuto;
--	ctx.domainname = ses->domainName;
-+	ctx->domainauto = ses->domainAuto;
-+	ctx->domainname = ses->domainName;
- 
- 	/* no hostname for extra channels */
--	ctx.server_hostname = "";
-+	ctx->server_hostname = "";
- 
--	ctx.username = ses->user_name;
--	ctx.password = ses->password;
--	ctx.sectype = ses->sectype;
--	ctx.sign = ses->sign;
-+	ctx->username = ses->user_name;
-+	ctx->password = ses->password;
-+	ctx->sectype = ses->sectype;
-+	ctx->sign = ses->sign;
- 
- 	/* UNC and paths */
- 	/* XXX: Use ses->server->hostname? */
--	sprintf(unc, unc_fmt, ses->ip_addr);
--	ctx.UNC = unc;
--	ctx.prepath = "";
-+	len = sizeof(unc_fmt) + SERVER_NAME_LEN_WITH_NULL;
-+	ctx->UNC = kzalloc(len, GFP_KERNEL);
-+	if (!ctx->UNC) {
-+		rc = -ENOMEM;
-+		goto out_free_ctx;
-+	}
-+	scnprintf(ctx->UNC, len, unc_fmt, ses->ip_addr);
-+	ctx->prepath = "";
- 
- 	/* Reuse same version as master connection */
--	ctx.vals = ses->server->vals;
--	ctx.ops = ses->server->ops;
-+	ctx->vals = ses->server->vals;
-+	ctx->ops = ses->server->ops;
- 
--	ctx.noblocksnd = ses->server->noblocksnd;
--	ctx.noautotune = ses->server->noautotune;
--	ctx.sockopt_tcp_nodelay = ses->server->tcp_nodelay;
--	ctx.echo_interval = ses->server->echo_interval / HZ;
--	ctx.max_credits = ses->server->max_credits;
-+	ctx->noblocksnd = ses->server->noblocksnd;
-+	ctx->noautotune = ses->server->noautotune;
-+	ctx->sockopt_tcp_nodelay = ses->server->tcp_nodelay;
-+	ctx->echo_interval = ses->server->echo_interval / HZ;
-+	ctx->max_credits = ses->server->max_credits;
- 
- 	/*
- 	 * This will be used for encoding/decoding user/domain/pw
- 	 * during sess setup auth.
- 	 */
--	ctx.local_nls = cifs_sb->local_nls;
-+	ctx->local_nls = cifs_sb->local_nls;
- 
- 	/* Use RDMA if possible */
--	ctx.rdma = iface->rdma_capable;
--	memcpy(&ctx.dstaddr, &iface->sockaddr, sizeof(struct sockaddr_storage));
-+	ctx->rdma = iface->rdma_capable;
-+	memcpy(&ctx->dstaddr, &iface->sockaddr, sizeof(ctx->dstaddr));
- 
- 	/* reuse master con client guid */
--	memcpy(&ctx.client_guid, ses->server->client_guid,
--	       SMB2_CLIENT_GUID_SIZE);
--	ctx.use_client_guid = true;
-+	memcpy(&ctx->client_guid, ses->server->client_guid,
-+	       sizeof(ctx->client_guid));
-+	ctx->use_client_guid = true;
- 
--	chan_server = cifs_get_tcp_session(&ctx, ses->server);
-+	chan_server = cifs_get_tcp_session(ctx, ses->server);
- 
- 	spin_lock(&ses->chan_lock);
- 	chan = &ses->chans[ses->chan_count];
-@@ -497,6 +507,10 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
- 		cifs_put_tcp_session(chan->server, 0);
- 	}
- 
-+	kfree(ctx->UNC);
-+out_free_ctx:
-+	kfree(ctx);
-+out_free_xid:
- 	free_xid(xid);
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index f280502a2aee..1b5d9794ed5b 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -416,13 +416,19 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
  	return rc;
  }
+ 
++struct send_req_vars {
++	struct smb2_transform_hdr tr_hdr;
++	struct smb_rqst rqst[MAX_COMPOUND];
++	struct kvec iov;
++};
++
+ static int
+ smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 	      struct smb_rqst *rqst, int flags)
+ {
+-	struct kvec iov;
+-	struct smb2_transform_hdr *tr_hdr;
+-	struct smb_rqst cur_rqst[MAX_COMPOUND];
++	struct send_req_vars *vars;
++	struct smb_rqst *cur_rqst;
++	struct kvec *iov;
+ 	int rc;
+ 
+ 	if (!(flags & CIFS_TRANSFORM_REQ))
+@@ -436,16 +442,15 @@ smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 		return -EIO;
+ 	}
+ 
+-	tr_hdr = kzalloc(sizeof(*tr_hdr), GFP_NOFS);
+-	if (!tr_hdr)
++	vars = kzalloc(sizeof(*vars), GFP_NOFS);
++	if (!vars)
+ 		return -ENOMEM;
++	cur_rqst = vars->rqst;
++	iov = &vars->iov;
+ 
+-	memset(&cur_rqst[0], 0, sizeof(cur_rqst));
+-	memset(&iov, 0, sizeof(iov));
+-
+-	iov.iov_base = tr_hdr;
+-	iov.iov_len = sizeof(*tr_hdr);
+-	cur_rqst[0].rq_iov = &iov;
++	iov->iov_base = &vars->tr_hdr;
++	iov->iov_len = sizeof(vars->tr_hdr);
++	cur_rqst[0].rq_iov = iov;
+ 	cur_rqst[0].rq_nvec = 1;
+ 
+ 	rc = server->ops->init_transform_rq(server, num_rqst + 1,
+@@ -456,7 +461,7 @@ smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+ 	rc = __smb_send_rqst(server, num_rqst + 1, &cur_rqst[0]);
+ 	smb3_free_compound_rqst(num_rqst, &cur_rqst[1]);
+ out:
+-	kfree(tr_hdr);
++	kfree(vars);
+ 	return rc;
+ }
+ 
 -- 
 2.41.0
 
