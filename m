@@ -2,157 +2,198 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6563C001DE
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jul 2023 11:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A40C001DE
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jul 2023 19:50:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236139AbjG1LBR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 28 Jul 2023 07:01:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51484 "EHLO
+        id S234811AbjG1TuY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 28 Jul 2023 15:50:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236129AbjG1LBK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jul 2023 07:01:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F8D3C30;
-        Fri, 28 Jul 2023 04:01:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 690D4620DC;
-        Fri, 28 Jul 2023 11:01:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71689C433C8;
-        Fri, 28 Jul 2023 11:00:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690542063;
-        bh=OHILmmeiUht8a/iNB32Wqo6p3CZSNTmmXf/wqdU8eyM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lUHncmkLN11wgaMD1KR1Gy5if09x5xh0KGyx50ZGUuC2fBx+ijTW2wECE/sOye+rG
-         qDHl4LIc5ruyg2PAO1VZI95ZW/5j7Q0Vo/saVvtDVwvUJlMtgeQjFVYzjalCOIixt6
-         gEQ+u8asPVZluAxs1HoSNgHXPJA0QhMWBw4NywwMFrjIj9j61U5pX9yO+iEoVUAfbu
-         mdakOz70WJL7rxDzg7P00Ji6kHPu+xHi68+/TquTtcuasIukOIAL/+DVn48WGku6nx
-         2ORenDwB3jD7HGc7jH1b/evq7YZ9RS2gsMH8Qjv3EgEZjMk8pxaawj3uGeQKo/zCuQ
-         +lMRyzmoHCobQ==
-From:   Christian Brauner <brauner@kernel.org>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        Dave Chinner <david@fromorbit.com>,
-        Anthony Iliopoulos <ailiop@suse.com>, v9fs@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
-        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Richard Weinberger <richard@nod.at>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Subject: Re: (subset) [PATCH v6 0/7] fs: implement multigrain timestamps
-Date:   Fri, 28 Jul 2023 13:00:37 +0200
-Message-Id: <20230728-unrecht-ersichtlich-cfa7d0c703d1@brauner>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230725-mgctime-v6-0-a794c2b7abca@kernel.org>
-References: <20230725-mgctime-v6-0-a794c2b7abca@kernel.org>
+        with ESMTP id S234074AbjG1TuX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jul 2023 15:50:23 -0400
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9410A3C07
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Jul 2023 12:50:21 -0700 (PDT)
+From:   Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1690573819;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=j2C3J9Tk0XRUlrb5yZy7WpiLI7CrUDLjmpi4rmr4xPI=;
+        b=qmKugTYsolR7iA43mUN+X0r0indjJBhNkiftkIpD1EC2F4nJ4m1tjHvLW8FPkMdAdJogRm
+        MfnQRegUtp8Jf1+ZFYyp7MQqeXgUU3h/jFYM10fbOpkceSvRVdR8N+JKPIpiLKfvmkimVJ
+        L1ltIviTT+H1tdLbxr7DTFMa5nWeOOveTFunRsy/CNW1FbTWhvZDx5Ln4Hr3Qq4aXIqqfF
+        QzoFETfM3IAXVDJDcFtl6SR+4Jp74EAOrI5sGsgqnqonX28HDAyxY6MhrPcfXRK9OFdt2a
+        4S92ITjseau9jxA/gFZmZWrn1daldUGAFI2Lgd2PvITDtCrvS6+KKLCjUNco7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1690573819;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=j2C3J9Tk0XRUlrb5yZy7WpiLI7CrUDLjmpi4rmr4xPI=;
+        b=dTguExKjj5oTst43aeaV9mNaw3HyLlONil8MsLsGAZd8PiNe8+I40di+cT+dQ++CWRsc/c
+        ZG9PZX6PydFVQmhTI9/xuCLw2JgaBpy3b/voIpSP21/1NhB8gOWFVB496BfzOd4NacfkCL
+        L8S3/CxnXvV7IPeHc+6pFl3EPYff2q0p9uEEqQXg9toOOnF6TfhnIFZquyRyGpAIL6+2HI
+        07oCbVRWaH63NiTiseOslPRfiVygAD990d/2ZkbbrqEOz+hK8nFg8RAQ0lIkV0VjeEn6TL
+        +x+75VYArPQhz5rgq4qXpX4tSRqSEQzxWnWZpnRVFswAQEMM0PZMFMIdGvjexg==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1690573819; a=rsa-sha256;
+        cv=none;
+        b=k6WW7fzQ000tUnyJRnBYrf3bwlTW1lXa9tuFVLn7o6408uxqS76hD+x6iw7JxR0srg3jVD
+        pE9DuLc+mChaR/3GiReakaLsx+LN1zhzgqR6hAAsKFM/7Jy4mrkh+gHQM1jHGpsIXmj/Ha
+        smN3KPq2XukDPwkLtqK4wqMnXg9zLw++jeBkcPC1Jk1u7a6aJnerkyN5IgGMz5Po10uVvo
+        yTRAO/ET8VxNf9CP2t4YfBxTfsdk2TNl7JzOQ0QaRtxGQHtafweYqnO1e6FO+oNg7iRFLK
+        s5fLn3DtLD02v8w6PWB1SWS+GnyD1MesOLz204b5GRTzNpsAekbyaBl6nWtCfw==
+To:     smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH 1/8] smb: client: reduce stack usage in cifs_try_adding_channels()
+Date:   Fri, 28 Jul 2023 16:50:03 -0300
+Message-ID: <20230728195010.19122-1-pc@manguebit.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1874; i=brauner@kernel.org; h=from:subject:message-id; bh=4DjYiXolHUh8qQu1N+OzbWT4vtvmgyT4c+N7Ht8XGtY=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQcnsy9IaFu+ZP9z1N8rj/+PH2Pm5FLY6hTmXAw+6xpv069 EIk93lHKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjARMyFGhh2xp3MqP+WJ6kre7E0z/m vxVuf2tOrqbz/KOXZnbdld4czI8C9ly15G/weVYRsOZM6bEHF4077Al0vcwkM2vDFrTz89nQsA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 25 Jul 2023 10:58:13 -0400, Jeff Layton wrote:
-> The VFS always uses coarse-grained timestamps when updating the
-> ctime and mtime after a change. This has the benefit of allowing
-> filesystems to optimize away a lot metadata updates, down to around 1
-> per jiffy, even when a file is under heavy writes.
-> 
-> Unfortunately, this coarseness has always been an issue when we're
-> exporting via NFSv3, which relies on timestamps to validate caches. A
-> lot of changes can happen in a jiffy, so timestamps aren't sufficient to
-> help the client decide to invalidate the cache.
-> 
-> [...]
+Clang warns about exceeded stack frame size
 
-Survives xfstests (tmpfs, ext4, overlayfs) and the fs portions of LTP.
-Let's keep our eyes open for any potential issues. Past suspects has
-been IMA interacting with overlayfs. We'll see. Picked everything minus
-the tmpfs-writepage patch that was contentious.
+  fs/smb/client/sess.c:160:5: warning: stack frame size (1368) exceeds
+  limit (1024) in 'cifs_try_adding_channels' [-Wframe-larger-than]
 
+It turns out that cifs_ses_add_channel() got inlined into
+cifs_try_adding_channels() which had a stack-allocated variable @ctx
+of 624 bytes in size.  Fix this by making it heap-allocated.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202307270640.5ODmPwDl-lkp@intel.com/
+Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
+ fs/smb/client/sess.c | 68 ++++++++++++++++++++++++++------------------
+ 1 file changed, 41 insertions(+), 27 deletions(-)
 
-Applied to the vfs.ctime branch of the vfs/vfs.git tree.
-Patches in the vfs.ctime branch should appear in linux-next soon.
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index c57ca2050b73..5292216d9947 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -360,11 +360,11 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
+ {
+ 	struct TCP_Server_Info *chan_server;
+ 	struct cifs_chan *chan;
+-	struct smb3_fs_context ctx = {NULL};
++	struct smb3_fs_context *ctx;
+ 	static const char unc_fmt[] = "\\%s\\foo";
+-	char unc[sizeof(unc_fmt)+SERVER_NAME_LEN_WITH_NULL] = {0};
+ 	struct sockaddr_in *ipv4 = (struct sockaddr_in *)&iface->sockaddr;
+ 	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)&iface->sockaddr;
++	size_t len;
+ 	int rc;
+ 	unsigned int xid = get_xid();
+ 
+@@ -388,54 +388,64 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
+ 	 * the session and server without caring about memory
+ 	 * management.
+ 	 */
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx) {
++		rc = -ENOMEM;
++		goto out_free_xid;
++	}
+ 
+ 	/* Always make new connection for now (TODO?) */
+-	ctx.nosharesock = true;
++	ctx->nosharesock = true;
+ 
+ 	/* Auth */
+-	ctx.domainauto = ses->domainAuto;
+-	ctx.domainname = ses->domainName;
++	ctx->domainauto = ses->domainAuto;
++	ctx->domainname = ses->domainName;
+ 
+ 	/* no hostname for extra channels */
+-	ctx.server_hostname = "";
++	ctx->server_hostname = "";
+ 
+-	ctx.username = ses->user_name;
+-	ctx.password = ses->password;
+-	ctx.sectype = ses->sectype;
+-	ctx.sign = ses->sign;
++	ctx->username = ses->user_name;
++	ctx->password = ses->password;
++	ctx->sectype = ses->sectype;
++	ctx->sign = ses->sign;
+ 
+ 	/* UNC and paths */
+ 	/* XXX: Use ses->server->hostname? */
+-	sprintf(unc, unc_fmt, ses->ip_addr);
+-	ctx.UNC = unc;
+-	ctx.prepath = "";
++	len = sizeof(unc_fmt) + SERVER_NAME_LEN_WITH_NULL;
++	ctx->UNC = kzalloc(len, GFP_KERNEL);
++	if (!ctx->UNC) {
++		rc = -ENOMEM;
++		goto out_free_ctx;
++	}
++	scnprintf(ctx->UNC, len, unc_fmt, ses->ip_addr);
++	ctx->prepath = "";
+ 
+ 	/* Reuse same version as master connection */
+-	ctx.vals = ses->server->vals;
+-	ctx.ops = ses->server->ops;
++	ctx->vals = ses->server->vals;
++	ctx->ops = ses->server->ops;
+ 
+-	ctx.noblocksnd = ses->server->noblocksnd;
+-	ctx.noautotune = ses->server->noautotune;
+-	ctx.sockopt_tcp_nodelay = ses->server->tcp_nodelay;
+-	ctx.echo_interval = ses->server->echo_interval / HZ;
+-	ctx.max_credits = ses->server->max_credits;
++	ctx->noblocksnd = ses->server->noblocksnd;
++	ctx->noautotune = ses->server->noautotune;
++	ctx->sockopt_tcp_nodelay = ses->server->tcp_nodelay;
++	ctx->echo_interval = ses->server->echo_interval / HZ;
++	ctx->max_credits = ses->server->max_credits;
+ 
+ 	/*
+ 	 * This will be used for encoding/decoding user/domain/pw
+ 	 * during sess setup auth.
+ 	 */
+-	ctx.local_nls = cifs_sb->local_nls;
++	ctx->local_nls = cifs_sb->local_nls;
+ 
+ 	/* Use RDMA if possible */
+-	ctx.rdma = iface->rdma_capable;
+-	memcpy(&ctx.dstaddr, &iface->sockaddr, sizeof(struct sockaddr_storage));
++	ctx->rdma = iface->rdma_capable;
++	memcpy(&ctx->dstaddr, &iface->sockaddr, sizeof(ctx->dstaddr));
+ 
+ 	/* reuse master con client guid */
+-	memcpy(&ctx.client_guid, ses->server->client_guid,
+-	       SMB2_CLIENT_GUID_SIZE);
+-	ctx.use_client_guid = true;
++	memcpy(&ctx->client_guid, ses->server->client_guid,
++	       sizeof(ctx->client_guid));
++	ctx->use_client_guid = true;
+ 
+-	chan_server = cifs_get_tcp_session(&ctx, ses->server);
++	chan_server = cifs_get_tcp_session(ctx, ses->server);
+ 
+ 	spin_lock(&ses->chan_lock);
+ 	chan = &ses->chans[ses->chan_count];
+@@ -497,6 +507,10 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
+ 		cifs_put_tcp_session(chan->server, 0);
+ 	}
+ 
++	kfree(ctx->UNC);
++out_free_ctx:
++	kfree(ctx);
++out_free_xid:
+ 	free_xid(xid);
+ 	return rc;
+ }
+-- 
+2.41.0
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
-
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.ctime
-
-[1/7] fs: pass the request_mask to generic_fillattr
-      https://git.kernel.org/vfs/vfs/c/0a6ab6dc6958
-[2/7] fs: add infrastructure for multigrain timestamps
-      https://git.kernel.org/vfs/vfs/c/d242b98ac3e9
-[4/7] tmpfs: add support for multigrain timestamps
-      https://git.kernel.org/vfs/vfs/c/1f31c58cf032
-[5/7] xfs: switch to multigrain timestamps
-      https://git.kernel.org/vfs/vfs/c/859dd91017dd
-[6/7] ext4: switch to multigrain timestamps
-      https://git.kernel.org/vfs/vfs/c/093af249eab4
-[7/7] btrfs: convert to multigrain timestamps
-      https://git.kernel.org/vfs/vfs/c/b90a04d1c30c
