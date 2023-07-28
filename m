@@ -2,58 +2,58 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE4FEC001DF
-	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jul 2023 19:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2082C00528
+	for <linux-cifs@archiver.kernel.org>; Fri, 28 Jul 2023 19:50:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234928AbjG1Tue (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S229680AbjG1Tue (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Fri, 28 Jul 2023 15:50:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56584 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234898AbjG1Tub (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jul 2023 15:50:31 -0400
+        with ESMTP id S234917AbjG1Tud (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 28 Jul 2023 15:50:33 -0400
 Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC5C2423C
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Jul 2023 12:50:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664DC422C
+        for <linux-cifs@vger.kernel.org>; Fri, 28 Jul 2023 12:50:31 -0700 (PDT)
 From:   Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1690573828;
+        s=dkim; t=1690573830;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ew33RdJsaf/1Ko58ba2y0RGKPZGcDWQ86Nfx7Gd2Vys=;
-        b=j+dildJ8a7kah4ZptU9J44tIzllHc0ST77YAbtzDKplYqtmsmb3hHM/hn2aLVYzP2/qD/1
-        8opdPJch4Pj9xoRIkFz6JDu4CV+cxInO2SE3RVoWQ4m2n42do0W3BhiDEkWd0Fbo4LIdl/
-        fCR67LeiEDo0HncpBGkY77g4JaiU/TXg9W0vsLKQ5gNAM8so9QL9SSVn5mxDxpepYPd5zY
-        t+S8+5JpBMAeMg3DHyv3rwssqiC2fILjpKlUeQ1s8gJZzduJgSoNhcxUCE5Ooh1R05wKNO
-        JXCWIiuSWxrrnXce0M/UwJlRWoepIHK2FDuDkQ3TT0XeMV0zGdT5IMtKKIqM6g==
+        bh=FoWtuTQmWodLTCmNngcddTZu4+cn7yVKE2521QaGd7A=;
+        b=D7htvM6OZNi87RPZQKhG0ABKFRxZlQ+X4z3XFTyAnURggu2zd0BgQ8Ys8M16ZltYC3UOO6
+        U4W0Fc3cH3VMlQBmVIh4vLq2vkiD4oW//dJYGrImZEaI2BbBQy+t5++ed7fTu9RZd2LdSP
+        o/nZItwA+jCD+189tVgXVwRmCDgIdC9ReQg31ZBpc26QQNcuBCp4CR7NszO2CLmSeSPQET
+        7rxLz6X8w/uMJlHxzis0YeIhGvYyZ9a9FV9PfHe1IGlYPbfFbcWdM1ygDobYId7nXrlQgV
+        5hcUHQHkoOY6hrKZYsbWMJJ/40tgdjAaNi4ZE1sFgLkuCemunVZHDhBPeskgCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1690573828;
+        s=dkim; t=1690573830;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ew33RdJsaf/1Ko58ba2y0RGKPZGcDWQ86Nfx7Gd2Vys=;
-        b=SWLzAa+QxJjyHDv43zKhSScNiQKImDznEioYZ80rox/kMEXtcIS6kif7+ZeBXRUkkWEpxC
-        HVOKGamVppehoxisEQSO0sCh8EqLGhiXYiQkU/xiFX6CBNUEEmtUizljyxJZtc8urxklEK
-        N3qrSVUcqGPdLjrjAEyE50c7hxatKrmdPtFhmzIWehl0aNDIx8Ic8MpDGf99yWr1+j2o2R
-        JJPyu0N3RIjM4G2+Dgwg8X6HF2gz7l9QfTtN9BP/YVOA1oB/Hh9JjY1wQCXNDs/pOcRvCB
-        /rKXwvkss13K5HU3W4uZRVaZzH2YyHvDwceRM3UbHPe2I4YRbwq2BJnqEDWs8Q==
+        bh=FoWtuTQmWodLTCmNngcddTZu4+cn7yVKE2521QaGd7A=;
+        b=OV8OqWcfQyr6MM4J0RYNG+JYvxhLp1srStuC3GohmXtGY/7GcGk9Uz87xB7C5MnhWAKvvk
+        SVkqhssmAcINn9BSH9VVVjCN3CpvOWBnBFzQy8+VqIvlTaMBAZREZpQLkiHgwe//AJ1uc4
+        A7qtw/Hht8fnnaW5zXW3nrmGd71/MoPizEA+iYPfe9N32uDAXV2yFrrJ2I3q8CeTGK62QN
+        aH6ifzDyLlnxM0NoFt8eyF+6BR4DxRA2qGqT3mZL6YEuUQe25mB5+nmqN/Pn5kehocIc9f
+        9R1JYkZakW8Ze0Ki/va5EH5NFD1pUK19VW4Cyg6XhwOvrm/xZUgn7NkYLXPWRw==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1690573828; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1690573830; a=rsa-sha256;
         cv=none;
-        b=ZpigDEB98nxqWMigR1FE8iSkgprSi/JfQjwEImkm/lDrI6JqZFEN/qvivkedZonFJye5Ex
-        iqOROXpDnqgQpT+XjD8K74+JegqX9tttLNkFaUlXhkx2stX6UUEYBO3lFncX8D0Yqwzzxu
-        D9j3nqiCo/YjZ42Uhnl1lljX2AiYRFVx2oEgcUiwMMGYLvaep9S9zbaTABeR2fygkcXt6w
-        630Coxza0GpYU3Hy3tI8XapliEnhipGMexKxtMs6bxhFSOOOBGk2iry1Qt9t+qyUPDUOQN
-        MkvP6cCio3l3RYhuCn2Um8XtXo7gapTPR9LsI7fbXlpd1yiMcUBrxRY9LQtW7g==
+        b=mZtLI88kIytR5dp41DIpzA/xHGtgUpLVpsHiiR8Po4Q5cNZdOymkLRzcB475jDKPbndSYd
+        nO13DyuIeVliM+lXV9GvaTFoqvmNacjyszBs01MKQp7+S1GHGnI82GHjwoGqo9g4leGUz9
+        bEcEBbq3kemcVhgm3KOZeB+0rWrh1CTNDXPyYtoPXx6ykU79gEXQj6/qBrX5hdqL3483O4
+        A/1qEokj8I0bld78b8hd26jZwzoS9RlZWaRI9Ag69GHQ9UlNU/BWsaZ+BVtXh3h9CS3VpK
+        AXRuax2gBFTX6iIi1TSIQibwam13DNE8FLXrQKWia4tT5SNCmFrZ3Vns9FPdlw==
 To:     smfrench@gmail.com
 Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 6/8] smb: client: reduce stack usage in smb2_query_reparse_tag()
-Date:   Fri, 28 Jul 2023 16:50:08 -0300
-Message-ID: <20230728195010.19122-6-pc@manguebit.com>
+Subject: [PATCH 7/8] smb: client: reduce stack usage in smb2_query_symlink()
+Date:   Fri, 28 Jul 2023 16:50:09 -0300
+Message-ID: <20230728195010.19122-7-pc@manguebit.com>
 In-Reply-To: <20230728195010.19122-1-pc@manguebit.com>
 References: <20230728195010.19122-1-pc@manguebit.com>
 MIME-Version: 1.0
@@ -64,27 +64,26 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 Clang warns about exceeded stack frame size
 
-  fs/smb/client/smb2ops.c:3117:1: warning: stack frame size (1336)
-  exceeds limit (1024) in 'smb2_query_reparse_tag'
-  [-Wframe-larger-than]
+  fs/smb/client/smb2ops.c:2974:1: warning: stack frame size (1368)
+  exceeds limit (1024) in 'smb2_query_symlink' [-Wframe-larger-than]
 
-Fix this by allocating a qr_vars structure that will hold most of the
+Fix this by allocating a qs_vars structure that will hold most of the
 large structures.
 
 Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
- fs/smb/client/smb2ops.c | 44 ++++++++++++++++++++++++++---------------
- 1 file changed, 28 insertions(+), 16 deletions(-)
+ fs/smb/client/smb2ops.c | 43 ++++++++++++++++++++++++++---------------
+ 1 file changed, 27 insertions(+), 16 deletions(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index d16036c86aa4..d6a15d5ec4d2 100644
+index d6a15d5ec4d2..9136c77cd407 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -3113,6 +3113,14 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
+@@ -2970,6 +2970,14 @@ parse_reparse_point(struct reparse_data_buffer *buf,
+ 	}
  }
  
-+struct qr_vars {
++struct qs_vars {
 +	struct smb_rqst rqst[3];
 +	struct kvec rsp_iov[3];
 +	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
@@ -92,16 +91,19 @@ index d16036c86aa4..d6a15d5ec4d2 100644
 +	struct kvec close_iov;
 +};
 +
- int
- smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+ static int
+ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
  		   struct cifs_sb_info *cifs_sb, const char *full_path,
-@@ -3124,13 +3132,11 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -2979,16 +2987,14 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	__le16 *utf16_path = NULL;
+ 	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
  	struct cifs_open_parms oparms;
- 	struct cifs_fid fid;
- 	struct TCP_Server_Info *server = cifs_pick_channel(tcon->ses);
 +	struct smb_rqst *rqst;
-+	struct qr_vars *vars;
+ 	struct cifs_fid fid;
++	struct qs_vars *vars;
+ 	struct kvec err_iov = {NULL, 0};
 +	struct kvec *rsp_iov;
+ 	struct TCP_Server_Info *server = cifs_pick_channel(tcon->ses);
  	int flags = CIFS_CP_CREATE_CLOSE_OP;
 -	struct smb_rqst rqst[3];
  	int resp_buftype[3];
@@ -109,10 +111,10 @@ index d16036c86aa4..d6a15d5ec4d2 100644
 -	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
 -	struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
 -	struct kvec close_iov[1];
+ 	struct smb2_create_rsp *create_rsp;
  	struct smb2_ioctl_rsp *ioctl_rsp;
  	struct reparse_data_buffer *reparse_buf;
- 	u32 plen;
-@@ -3140,20 +3146,25 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -3002,17 +3008,22 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
  	if (smb3_encryption_required(tcon))
  		flags |= CIFS_TRANSFORM_REQ;
  
@@ -134,17 +136,14 @@ index d16036c86aa4..d6a15d5ec4d2 100644
 +	rqst = vars->rqst;
 +	rsp_iov = vars->rsp_iov;
 +
- 	/*
- 	 * setup smb2open - TODO add optimization to call cifs_get_readable_path
- 	 * to see if there is a handle already open that we can use
- 	 */
+ 	/* Open */
 -	memset(&open_iov, 0, sizeof(open_iov));
 -	rqst[0].rq_iov = open_iov;
 +	rqst[0].rq_iov = vars->open_iov;
  	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
  
  	oparms = (struct cifs_open_parms) {
-@@ -3173,8 +3184,7 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -3032,8 +3043,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
  
  
  	/* IOCTL */
@@ -154,7 +153,7 @@ index d16036c86aa4..d6a15d5ec4d2 100644
  	rqst[1].rq_nvec = SMB2_IOCTL_IOV_SIZE;
  
  	rc = SMB2_ioctl_init(tcon, server,
-@@ -3191,8 +3201,7 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+@@ -3050,8 +3060,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
  
  
  	/* Close */
@@ -164,12 +163,11 @@ index d16036c86aa4..d6a15d5ec4d2 100644
  	rqst[2].rq_nvec = 1;
  
  	rc = SMB2_close_init(tcon, server,
-@@ -3230,13 +3239,16 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
- 	}
+@@ -3103,13 +3112,15 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
  
-  query_rp_exit:
+  querty_exit:
+ 	cifs_dbg(FYI, "query symlink rc %d\n", rc);
 -	kfree(utf16_path);
-+
  	SMB2_open_free(&rqst[0]);
  	SMB2_ioctl_free(&rqst[1]);
  	SMB2_close_free(&rqst[2]);
