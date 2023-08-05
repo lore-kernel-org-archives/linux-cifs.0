@@ -2,69 +2,92 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134E1C001DB
-	for <linux-cifs@archiver.kernel.org>; Sat,  5 Aug 2023 20:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF1CC001DB
+	for <linux-cifs@archiver.kernel.org>; Sat,  5 Aug 2023 23:51:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbjHEUqB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 5 Aug 2023 16:46:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
+        id S229530AbjHEXvg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 5 Aug 2023 19:51:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbjHEUqA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Aug 2023 16:46:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BBF6194;
-        Sat,  5 Aug 2023 13:45:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9338660EEA;
-        Sat,  5 Aug 2023 20:45:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F109EC433C7;
-        Sat,  5 Aug 2023 20:45:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691268358;
-        bh=QgSjMbGN5oT+YPU8NxvTKL5L7XEXos7GDLcjhJlYkUI=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=hhGC5uhqzgXJYYvL3r+lAL/c/VwYg15O5x52IRYzqha+X6wT97Ux+d5G7k1Wn0b7x
-         2zBACHvKG3MRNCjNuj3uesxw73suSkufAVzZftIYv/CyphXVtz/XGrjqJshH+78ysn
-         qe54r9tI92jmOwa47kgG+o8N+TdO0sVf9MfgEAQu8I8JdDwiP3S23LaUYb2QB08bnV
-         h4vKdttxN/7J96Mlw9yApo+R7FnhRRts8DgEwV37m9n4hP+oyoMmrgicbQsKwBSXFI
-         WDxl9wPVg/VG5zHljbMovXYMlBKfNc/p+76Uub7aGtU7NLlDT4VzkDETxK12oNmq/T
-         /gLEc/ajqBr0A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DC1CEC395C5;
-        Sat,  5 Aug 2023 20:45:57 +0000 (UTC)
-Subject: Re: [GIT PULL] SMB3 DFS Fix
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mt0UH0Z-nRdEDsFMbE_gj1d8ezcoAhScZoToQckVvT_fw@mail.gmail.com>
-References: <CAH2r5mt0UH0Z-nRdEDsFMbE_gj1d8ezcoAhScZoToQckVvT_fw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mt0UH0Z-nRdEDsFMbE_gj1d8ezcoAhScZoToQckVvT_fw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc4-smb3-client-fix
-X-PR-Tracked-Commit-Id: 11260c3d608b59231f4c228147a795ab21a10b33
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f6a691685962637e53371788fe2a72b171aedc68
-Message-Id: <169126835789.30402.13336993334935190114.pr-tracker-bot@kernel.org>
-Date:   Sat, 05 Aug 2023 20:45:57 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        with ESMTP id S229481AbjHEXvg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Aug 2023 19:51:36 -0400
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF9C171F
+        for <linux-cifs@vger.kernel.org>; Sat,  5 Aug 2023 16:51:35 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1bbff6b2679so21598525ad.1
+        for <linux-cifs@vger.kernel.org>; Sat, 05 Aug 2023 16:51:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691279495; x=1691884295;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Iditb/ZFOAXj+I4a6gaYv5U2EiR6wsrv7juI7vdeFGE=;
+        b=KVkcR5Jrh4YdKHgwzWe3yV2clvuwbSJ5VB0v+TdQCxhZSly+418QDWgkCqvIPE0hth
+         WPG0B5vdvaTw2ffQUqU5KpKLpgdHQsPQeYlsB4gCCyhP+dPR9vohCM/2KyI93tBwEo5G
+         JwD/81kr+qIxopFOCNGsr8vzmxehK1jNaRh56U2Oo1oGnyXArl+m51PZHz4Amxpb9ilT
+         e70ts7j4Ui8+x9hVpBHTKZOTOvFMQxH123DaOc2av+xC9YvTyLGQ5F/fsxSTLQIU+yl2
+         56hhsktyjH6FXbQhIbbK0YmscvLplaVvaEphF/yprVGq3a11Dk6GtkyD37+GFM9gDlxb
+         A+Ag==
+X-Gm-Message-State: AOJu0YxRULEzq7N2lfAnxeWcalNls8AHBSF8MlOqdnuPWoSMuFRB0Dxc
+        SGtjm1+B9mIdsCy+PWSod1xbwixsunGsNg==
+X-Google-Smtp-Source: AGHT+IEN7ZFT+5elI2zfCvPmQxmQSh/3ATvN8dFwOhtQ5NO+h9rwZc+3crdnIu3dM/gF5WFxDqAlWQ==
+X-Received: by 2002:a17:902:ecc8:b0:1bb:32de:95c5 with SMTP id a8-20020a170902ecc800b001bb32de95c5mr5257441plh.65.1691279494783;
+        Sat, 05 Aug 2023 16:51:34 -0700 (PDT)
+Received: from localhost.localdomain ([110.14.71.32])
+        by smtp.gmail.com with ESMTPSA id v24-20020a1709028d9800b001b8c6662094sm4006963plo.188.2023.08.05.16.51.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Aug 2023 16:51:34 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        hyc.lee@gmail.com, atteh.mailbox@gmail.com,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        zdi-disclosures@trendmicro.com
+Subject: [PATCH] ksmbd: fix wrong next length validation of ea buffer in smb2_set_ea()
+Date:   Sun,  6 Aug 2023 08:51:06 +0900
+Message-Id: <20230805235106.8845-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 5 Aug 2023 13:55:42 -0500:
+There are multiple smb2_ea_info buffers in FILE_FULL_EA_INFORMATION request
+from client. ksmbd find next smb2_ea_info using ->NextEntryOffset of
+current smb2_ea_info. ksmbd need to validate buffer length Before
+accessing the next ea. ksmbd should check buffer length using buf_len,
+not next variable. next is the start offset of current ea that got from
+previous ea.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc4-smb3-client-fix
+Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-21598
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/smb/server/smb2pdu.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f6a691685962637e53371788fe2a72b171aedc68
-
-Thank you!
-
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 9849d7489345..7cc1b0c47d0a 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -2324,9 +2324,16 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
+ 			break;
+ 		buf_len -= next;
+ 		eabuf = (struct smb2_ea_info *)((char *)eabuf + next);
+-		if (next < (u32)eabuf->EaNameLength + le16_to_cpu(eabuf->EaValueLength))
++		if (buf_len < sizeof(struct smb2_ea_info)) {
++			rc = -EINVAL;
+ 			break;
++		}
+ 
++		if (buf_len < sizeof(struct smb2_ea_info) + eabuf->EaNameLength +
++				le16_to_cpu(eabuf->EaValueLength)) {
++			rc = -EINVAL;
++			break;
++		}
+ 	} while (next != 0);
+ 
+ 	kfree(attr_name);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.25.1
+
