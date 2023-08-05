@@ -2,131 +2,87 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E440AC001DF
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Aug 2023 13:03:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCF6C001DE
+	for <linux-cifs@archiver.kernel.org>; Sat,  5 Aug 2023 18:55:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235892AbjHCNDw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Aug 2023 09:03:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53778 "EHLO
+        id S229988AbjHESz6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 5 Aug 2023 14:55:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233620AbjHCNDq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Aug 2023 09:03:46 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02FCB2137;
-        Thu,  3 Aug 2023 06:03:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9414A61D95;
-        Thu,  3 Aug 2023 13:03:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3421DC433CB;
-        Thu,  3 Aug 2023 13:03:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691067806;
-        bh=G5aTKgMXgAFBTMj/jxfMknL56AhfR6yDEIMpVmQ4PV8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tvvZu08Ca9AiGqS3u7eWnDj7zat0hKsrok/cCDSIX03jOuWMmJpF/6muVO58tl6Ym
-         jnahXcOsywbWM/nLaxTnSUvWBo+K9AakOpKg3tKgqPdpLYrw+t80DfQwik05f9IvRt
-         mH9TRRaccl943uYLTSfUDJPnm1aYJB2dbbk1iyW1RSnID8S8HN3NlpFSlnwBZ+h+0X
-         8+U5zQ5F+fA0ht/s6p7JYi744lNaY7jsjeUVbvarhGzPHZuPxwZW/CeP98iGaIpQJv
-         7zXAWpAhzQN8BzKx6IzhnJwI8iYE4W6b4KLU1VrQd3vjysK9hMpHw7soGUlsV4wzQU
-         /yZh8pl25/ueg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Winston Wen <wentao@uniontech.com>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.4 2/7] cifs: fix session state transition to avoid use-after-free issue
-Date:   Thu,  3 Aug 2023 09:03:15 -0400
-Message-Id: <20230803130321.641516-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230803130321.641516-1-sashal@kernel.org>
-References: <20230803130321.641516-1-sashal@kernel.org>
+        with ESMTP id S229445AbjHESz6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Aug 2023 14:55:58 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DFF2A7;
+        Sat,  5 Aug 2023 11:55:56 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b9b9f0387dso49868341fa.0;
+        Sat, 05 Aug 2023 11:55:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691261754; x=1691866554;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LIEL0tXVDTOWo0X4AX2HSPtn+A9sB8Rgxb5Azfh9x5I=;
+        b=gdHG3RepOtrk0+kc/f0sEMLkeYEBonCsY7LkhiYj6LGEXrf1L20ct3D7WCCCJ4igP8
+         5vBktCy7T85nglPOQG5XJh0bRkqoKewbL+F/q4RMHyU1UOPm3YPwo1aPoxS70k9LflEX
+         HKsnECg3D9Mp3c7YGdgpX19MNfrSuQR3kK+tbkL/w+xmx6+p4mSATzqk/kL310DlUIGD
+         RU0/abPM6cV7/1RZdBLsiom+AcMbsf5ziAEDBNRU5WAMdbcRLPnCiwENKBrF8Ts1kAqQ
+         r/0CLNyk66pdacD+fZNRBGBPrhnwpJd/ayV4kpJiLRI7Jzc1OrdwGLthbyeHMNyOUedV
+         89XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691261754; x=1691866554;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LIEL0tXVDTOWo0X4AX2HSPtn+A9sB8Rgxb5Azfh9x5I=;
+        b=ONBXOQawVn9xDebqRZ/w0b6kNlN8mUglyxe+FlKJ2RrklHOuxuV3klFW44RLILhNrJ
+         Qzsx/0+qOqg+EHftVkUB/wdwXTXh9I0IUP/QsHoyjeV3C9LNSkLJDlDWbAZvYgucC/cZ
+         wCbd0WMbLUIRs9s5PyyEjaZifQ0P2FXdqremcZrM+UbLfUsWduw5Dgo2X76fIOiiSEXy
+         tjBMe6CyKQAeHcJf+XzmJ2V2DBPyhKP9oxKyaByKxB3Gmitkm56NQLxZm5wPsaMYtqSV
+         emUlkgveALvLpJwdQv58Qkn/NOp2mjrHuorWNogzk/GJ1coAiz210UTJIkiFySFWZzsV
+         a6gw==
+X-Gm-Message-State: AOJu0Yyw53/76nT8ljvtDZAzq+oxhW65NNkICYXHhfAy4gv9a+p8X14u
+        qhKKMCGpIAhWtYZs0ZK+pGEmL0ZPek06byGrh0wFvTYNQIFfWA==
+X-Google-Smtp-Source: AGHT+IEhmqretDu+8l+NeMCDqrX2H9NlmnFMpB7rt77QXIlcG1jVUMCBzN+on0MjV6jFsQWFGSAGfHw6We9sEnCpfc8=
+X-Received: by 2002:a2e:b0d0:0:b0:2b9:b904:74d7 with SMTP id
+ g16-20020a2eb0d0000000b002b9b90474d7mr4221463ljl.18.1691261754220; Sat, 05
+ Aug 2023 11:55:54 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.4.7
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 5 Aug 2023 13:55:42 -0500
+Message-ID: <CAH2r5mt0UH0Z-nRdEDsFMbE_gj1d8ezcoAhScZoToQckVvT_fw@mail.gmail.com>
+Subject: [GIT PULL] SMB3 DFS Fix
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Winston Wen <wentao@uniontech.com>
+Please pull the following changes since commit
+5d0c230f1de8c7515b6567d9afba1f196fb4e2f4:
 
-[ Upstream commit ff7d80a9f2711bf3d9fe1cfb70b3fd15c50584b7 ]
+  Linux 6.5-rc4 (2023-07-30 13:23:47 -0700)
 
-We switch session state to SES_EXITING without cifs_tcp_ses_lock now,
-it may lead to potential use-after-free issue.
+are available in the Git repository at:
 
-Consider the following execution processes:
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc4-smb3-client-fix
 
-Thread 1:
-__cifs_put_smb_ses()
-    spin_lock(&cifs_tcp_ses_lock)
-    if (--ses->ses_count > 0)
-        spin_unlock(&cifs_tcp_ses_lock)
-        return
-    spin_unlock(&cifs_tcp_ses_lock)
-        ---> **GAP**
-    spin_lock(&ses->ses_lock)
-    if (ses->ses_status == SES_GOOD)
-        ses->ses_status = SES_EXITING
-    spin_unlock(&ses->ses_lock)
+for you to fetch changes up to 11260c3d608b59231f4c228147a795ab21a10b33:
 
-Thread 2:
-cifs_find_smb_ses()
-    spin_lock(&cifs_tcp_ses_lock)
-    list_for_each_entry(ses, ...)
-        spin_lock(&ses->ses_lock)
-        if (ses->ses_status == SES_EXITING)
-            spin_unlock(&ses->ses_lock)
-            continue
-        ...
-        spin_unlock(&ses->ses_lock)
-    if (ret)
-        cifs_smb_ses_inc_refcount(ret)
-    spin_unlock(&cifs_tcp_ses_lock)
+  smb: client: fix dfs link mount against w2k8 (2023-08-02 13:36:12 -0500)
 
-If thread 1 is preempted in the gap and thread 2 start executing, thread 2
-will get the session, and soon thread 1 will switch the session state to
-SES_EXITING and start releasing it, even though thread 1 had increased the
-session's refcount and still uses it.
+----------------------------------------------------------------
+small DFS fix
+- Fix DFS interlink problem (different namespace)
 
-So switch session state under cifs_tcp_ses_lock to eliminate this gap.
+----------------------------------------------------------------
+Paulo Alcantara (1):
+      smb: client: fix dfs link mount against w2k8
 
-Signed-off-by: Winston Wen <wentao@uniontech.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/connect.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ fs/smb/client/dfs.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 9d16626e7a669..165ecb222c19b 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1963,15 +1963,16 @@ void __cifs_put_smb_ses(struct cifs_ses *ses)
- 		spin_unlock(&cifs_tcp_ses_lock);
- 		return;
- 	}
-+	spin_lock(&ses->ses_lock);
-+	if (ses->ses_status == SES_GOOD)
-+		ses->ses_status = SES_EXITING;
-+	spin_unlock(&ses->ses_lock);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
- 	/* ses_count can never go negative */
- 	WARN_ON(ses->ses_count < 0);
- 
- 	spin_lock(&ses->ses_lock);
--	if (ses->ses_status == SES_GOOD)
--		ses->ses_status = SES_EXITING;
--
- 	if (ses->ses_status == SES_EXITING && server->ops->logoff) {
- 		spin_unlock(&ses->ses_lock);
- 		cifs_free_ipc(ses);
+
 -- 
-2.40.1
+Thanks,
 
+Steve
