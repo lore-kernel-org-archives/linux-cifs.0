@@ -2,174 +2,92 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F8EC3DA40
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Aug 2023 22:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CFBC001DE
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Aug 2023 23:11:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233066AbjHIWiI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 9 Aug 2023 18:38:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36410 "EHLO
+        id S229737AbjHIXLW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 9 Aug 2023 19:11:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232937AbjHIWiE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Aug 2023 18:38:04 -0400
-Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 51AA5138;
-        Wed,  9 Aug 2023 15:38:00 -0700 (PDT)
-Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
-        by mail.parknet.co.jp (Postfix) with ESMTPSA id 3CD87205DB98;
-        Thu, 10 Aug 2023 07:38:00 +0900 (JST)
-Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
-        by ibmpc.myhome.or.jp (8.17.2/8.17.2/Debian-1) with ESMTPS id 379Mbwf6230731
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-        Thu, 10 Aug 2023 07:38:00 +0900
-Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
-        by devron.myhome.or.jp (8.17.2/8.17.2/Debian-1) with ESMTPS id 379MbwGI248785
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-        Thu, 10 Aug 2023 07:37:58 +0900
-Received: (from hirofumi@localhost)
-        by devron.myhome.or.jp (8.17.2/8.17.2/Submit) id 379MbqTh248778;
-        Thu, 10 Aug 2023 07:37:52 +0900
-From:   OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     Frank Sorenson <sorenson@redhat.com>, Jan Kara <jack@suse.cz>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>,
-        Yue Hu <huyue2@gl0jj8bn.sched.sma.tdnsstic1.cn>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>, "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Richard Weinberger <richard@nod.at>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Amir Goldstein <amir73il@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Benjamin Coddington <bcodding@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@telemann.coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, ntfs3@lists.linux.dev,
-        ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-mtd@lists.infradead.org, linux-mm@kvack.org,
-        linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v7 05/13] fat: make fat_update_time get its own timestamp
-In-Reply-To: <e4cee2590f5cb9a13a8d4445e550e155d551670d.camel@kernel.org> (Jeff
-        Layton's message of "Wed, 09 Aug 2023 18:07:29 -0400")
-References: <20230807-mgctime-v7-0-d1dec143a704@kernel.org>
-        <20230807-mgctime-v7-5-d1dec143a704@kernel.org>
-        <87msz08vc7.fsf@mail.parknet.co.jp>
-        <52bead1d6a33fec89944b96e2ec20d1ea8747a9a.camel@kernel.org>
-        <878rak8hia.fsf@mail.parknet.co.jp>
-        <20230809150041.452w7gucjmvjnvbg@quack3>
-        <87v8do6y8q.fsf@mail.parknet.co.jp>
-        <2cb998ff14ace352a9dd553e82cfa0aa92ec09ce.camel@kernel.org>
-        <87leek6rh1.fsf@mail.parknet.co.jp>
-        <ccffe6ca3397c8374352b002fe01d55b09d84ef4.camel@kernel.org>
-        <87h6p86p9z.fsf@mail.parknet.co.jp>
-        <edf8e8ca3b38e56f30e0d24ac7293f848ffee371.camel@kernel.org>
-        <87a5v06kij.fsf@mail.parknet.co.jp>
-        <e4cee2590f5cb9a13a8d4445e550e155d551670d.camel@kernel.org>
-Date:   Thu, 10 Aug 2023 07:37:52 +0900
-Message-ID: <87zg2z3kqn.fsf@mail.parknet.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        with ESMTP id S229582AbjHIXLV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Aug 2023 19:11:21 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25201D1;
+        Wed,  9 Aug 2023 16:11:21 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b9ba3d6157so4957111fa.3;
+        Wed, 09 Aug 2023 16:11:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691622679; x=1692227479;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qvaA2dr27xwLbhrsEkqVsKRPGUbqoqs8Cc6VxoCBRhY=;
+        b=npDadkHPMFJnWf4isIAZ8VLDu9cORyOZFLOjD1RcXHMUv+RiU7JlXgasZ9g0FexOq7
+         KOpG/4Shf/Mbmd5yGc+wvnqW3H9Jy1yp679xMRLx3lMHkTDyke+lAnhY+KdHGtnGevOb
+         pWZnnfoNdBXJi1pKpecm/7f0Hx8own+r/YnQ+abqDzHOtCk09LyXAd1qXZWM2/5ElOfi
+         gYIv/zMY9lXETu+MMb5JeUfoTyEVbq7iiXK2QVCiHWOs1fZk5ihG3PVDOftDkDuADH72
+         zrf2LgebLtTe09zgvQOytRQnqgy2nxWdcw8hHHZC9rpLEEUXHrZ2siOU1Ty3kyWRSBK8
+         CW9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691622679; x=1692227479;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qvaA2dr27xwLbhrsEkqVsKRPGUbqoqs8Cc6VxoCBRhY=;
+        b=BDrZjWEml7aMcsOJOBePS610BMBDAJHwCGZQZ0sIDL+B2En0sdsjFWr3AIRJmthKUm
+         TwbWbswJJwLkzo60KpxsPdqyxmQGVxNyxfcLpbf1Y+E5smQsd6a8doqy0UIbV8elDndB
+         3JU6qghzHpy0PlnwKkKqqa+SwBGO3Aps/Qf527VTBvsNjKOJdpqW8KQ0cAijPv91+ibz
+         8/FmAs1kJDhQSsXDaix5SitPVFSAMjqFe5zhGawI+wlzXI18z5SdBcBzmV/XSEbttzo5
+         vhTUKiDaEUM5DSyofwAZX2ISi/cODDXO5bR6VAFmk16r+DRFy7H7GYf5mM1ahXGb9apW
+         rhnA==
+X-Gm-Message-State: AOJu0Yywx2KRPpM2GA7wztNSRofoz15sgjm2otHjwnjCWpXvFbhXmk8i
+        tddoN5IB05+7HqotP+ULhB+eIezRFg0l03h5HUh40Egl+iUjJfFC
+X-Google-Smtp-Source: AGHT+IH7zFRhQ8K0QTnS4GWmvelHzEanqe4bpcjccWQbl6SkEDRUz8XbLevSBqgLPNnO2Cvs9RpgvpsZ1HiKdRQemVM=
+X-Received: by 2002:a2e:9b51:0:b0:2b9:dd96:5340 with SMTP id
+ o17-20020a2e9b51000000b002b9dd965340mr418676ljj.50.1691622679027; Wed, 09 Aug
+ 2023 16:11:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 9 Aug 2023 18:11:07 -0500
+Message-ID: <CAH2r5mv+Sy5mrZThrQUf1na-mg-B9DiLd5fkYs9sPo97GWirCA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Jeff Layton <jlayton@kernel.org> writes:
+Please pull the following changes since commit
+5d0c230f1de8c7515b6567d9afba1f196fb4e2f4:
 
-> If you do that then the i_version counter would never be incremented.
-> But...I think I see what you're getting at.
->
-> Most filesystems that support the i_version counter have an on-disk
-> field for it. FAT obviously has no such thing. I suspect the i_version
-> bits in fat_update_time were added by mistake. FAT doesn't set
-> SB_I_VERSION so there's no need to do anything to the i_version field at
-> all.
->
-> Also, given that the mtime and ctime are always kept in sync on FAT,
-> we're probably fine to have it look something like this:
+  Linux 6.5-rc4 (2023-07-30 13:23:47 -0700)
 
-Yes.
+are available in the Git repository at:
 
-IIRC, when I wrote, I decided to make it keep similar with generic
-function, instead of heavily customize for FAT (for maintenance
-reason). It is why. There would be other places with same reason.
+  git://git.samba.org/ksmbd.git tags/6.5-rc5-ksmbd-server
 
-E.g. LAZYTIME check is same reason too. (current FAT doesn't support it)
+for you to fetch changes up to 79ed288cef201f1f212dfb934bcaac75572fb8f6:
 
-So I personally I would prefer to leave it. But if you want to remove
-it, it would be ok too.
+  ksmbd: fix wrong next length validation of ea buffer in
+smb2_set_ea() (2023-08-05 20:57:00 -0500)
 
-Thanks.
+----------------------------------------------------------------
+Two ksmbd server fixes, both also for stable
+- improve buffer validation when multiple EAs returned
+- missing check for command payload size
+----------------------------------------------------------------
+Long Li (1):
+      ksmbd: validate command request size
 
-> --------------------8<------------------
-> int fat_update_time(struct inode *inode, int flags) 
-> { 
->         int dirty_flags = 0;
->
->         if (inode->i_ino == MSDOS_ROOT_INO) 
->                 return 0;
->
->         fat_truncate_time(inode, NULL, flags);
->         if (inode->i_sb->s_flags & SB_LAZYTIME)
->                 dirty_flags |= I_DIRTY_TIME;
->         else
->                 dirty_flags |= I_DIRTY_SYNC;
->
->         __mark_inode_dirty(inode, dirty_flags);
->         return 0;
-> } 
-> --------------------8<------------------
->
-> ...and we should probably do that in a separate patch in advance of the
-> update_time rework, since it's really a different change.
->
-> If you're in agreement, then I'll plan to respin the series with this
-> fixed and resend.
->
-> Thanks for being patient!
+Namjae Jeon (1):
+      ksmbd: fix wrong next length validation of ea buffer in smb2_set_ea()
+
+ fs/smb/server/smb2misc.c | 10 +++++-----
+ fs/smb/server/smb2pdu.c  |  9 ++++++++-
+ 2 files changed, 13 insertions(+), 6 deletions(-)
+
 -- 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Thanks,
+
+Steve
