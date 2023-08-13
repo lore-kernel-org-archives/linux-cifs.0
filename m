@@ -2,36 +2,36 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74EE1C001B0
-	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 15:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F5AC04E69
+	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 15:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231694AbjHMPuN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 13 Aug 2023 11:50:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52094 "EHLO
+        id S231710AbjHMPuO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 13 Aug 2023 11:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231697AbjHMPuE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 13 Aug 2023 11:50:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E711993;
-        Sun, 13 Aug 2023 08:49:59 -0700 (PDT)
+        with ESMTP id S231664AbjHMPt5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 13 Aug 2023 11:49:57 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 304A51726;
+        Sun, 13 Aug 2023 08:49:55 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 193D26308C;
-        Sun, 13 Aug 2023 15:49:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B847CC433C7;
-        Sun, 13 Aug 2023 15:49:57 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BEED763178;
+        Sun, 13 Aug 2023 15:49:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B465C433BB;
+        Sun, 13 Aug 2023 15:49:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691941798;
-        bh=vxIAMDw40Bn4sHBM6oyXy4ZNp6BQcKAIvulLQ3JuQJU=;
+        s=k20201202; t=1691941794;
+        bh=JmSDlsRGpwsI4Td2KsQiUomvDh4Z7/CkAhiEgh5UJwk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AiQ/Kt8HVqAPeYeQJVKV2v6PXIvPtajDAJukCF+GkojGq9/xIUQ1S+qQXMSIkohnh
-         FfOZG7rJc4PJFfKWvrDPHJQXTBfpqKOOHMZzhXAsI2K3arXgTQAQNak4Lq9klxx5J2
-         VTnEHBHpK6zzduPtWg6rRLGKxm4IGgt8afFh0Bar0cQDLMtrYk6hQ3BDE7OPomajxk
-         I+8vkxyLfYA5E8uckuMqFMpFbZYOShc3GPpAHVQM+LHkydFkHaSBQfvGL4vyaEbQdV
-         vHWvnl70Jh8zjPNJBd21o/Scw53hPqiz00frwK1z/5o52QdWG7VviU+rUjFsByIUCS
-         lM00x9AwT/4WQ==
+        b=f3I5ye0ZgRviSAwaJx39v8n17U0DuQPPRFodDjSiFYl5CNHIKtsN4aHxnd3i22ZQp
+         h5En2Q8geIhiKdXhsA0swgovXVOZ6ZW8udrRnZvwQfMOj/9YUOUczascKUWon17/k9
+         sEmyFsOFo/l+7BdznVQVMCbr6fH0OrH1BW4GQN3ohCLdAIHXiyisAs9Xaf2zjqN2nc
+         Fg9EMKMw+oCZjCcsGiZKNCbDLD5hCFwUoLGz0jFgN8XyaCszr4VzR8YcM/dUyQoW/V
+         iCvyzv8SbO9xOachKTlQUidz6yIw+3t6LuYnMlVjYdRpAqbX9UYyM5h/fA5uP/9OtN
+         mhX/xu+sIJcBQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>,
@@ -39,9 +39,9 @@ Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 14/54] ksmbd: fix out of bounds in init_smb2_rsp_hdr()
-Date:   Sun, 13 Aug 2023 11:48:53 -0400
-Message-Id: <20230813154934.1067569-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.4 11/54] ksmbd: fix out of bounds in smb3_decrypt_req()
+Date:   Sun, 13 Aug 2023 11:48:50 -0400
+Message-Id: <20230813154934.1067569-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230813154934.1067569-1-sashal@kernel.org>
 References: <20230813154934.1067569-1-sashal@kernel.org>
@@ -56,103 +56,33 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 536bb492d39bb6c080c92f31e8a55fe9934f452b ]
+[ Upstream commit dc318846f3dd54574a36ae97fc8d8b75dd7cdb1e ]
 
-If client send smb2 negotiate request and then send smb1 negotiate
-request, init_smb2_rsp_hdr is called for smb1 negotiate request since
-need_neg is set to false. This patch ignore smb1 packets after ->need_neg
-is set to false.
+smb3_decrypt_req() validate if pdu_length is smaller than
+smb2_transform_hdr size.
 
-Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-21541
+Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-21589
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/server/server.c     |  7 ++++++-
- fs/smb/server/smb_common.c | 19 +++++++++++--------
- fs/smb/server/smb_common.h |  2 +-
- 3 files changed, 18 insertions(+), 10 deletions(-)
+ fs/smb/server/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index ced7a9e916f01..9df121bdf3492 100644
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -286,6 +286,7 @@ static void handle_ksmbd_work(struct work_struct *wk)
- static int queue_ksmbd_work(struct ksmbd_conn *conn)
- {
- 	struct ksmbd_work *work;
-+	int err;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 1cc336f512851..bd3da6cc6a98e 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -8611,7 +8611,8 @@ int smb3_decrypt_req(struct ksmbd_work *work)
+ 	struct smb2_transform_hdr *tr_hdr = smb2_get_msg(buf);
+ 	int rc = 0;
  
- 	work = ksmbd_alloc_work_struct();
- 	if (!work) {
-@@ -297,7 +298,11 @@ static int queue_ksmbd_work(struct ksmbd_conn *conn)
- 	work->request_buf = conn->request_buf;
- 	conn->request_buf = NULL;
- 
--	ksmbd_init_smb_server(work);
-+	err = ksmbd_init_smb_server(work);
-+	if (err) {
-+		ksmbd_free_work_struct(work);
-+		return 0;
-+	}
- 
- 	ksmbd_conn_enqueue_request(work);
- 	atomic_inc(&conn->r_count);
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index 3e391a7d5a3ab..27b8bd039791e 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -388,26 +388,29 @@ static struct smb_version_cmds smb1_server_cmds[1] = {
- 	[SMB_COM_NEGOTIATE_EX]	= { .proc = smb1_negotiate, },
- };
- 
--static void init_smb1_server(struct ksmbd_conn *conn)
-+static int init_smb1_server(struct ksmbd_conn *conn)
- {
- 	conn->ops = &smb1_server_ops;
- 	conn->cmds = smb1_server_cmds;
- 	conn->max_cmds = ARRAY_SIZE(smb1_server_cmds);
-+	return 0;
- }
- 
--void ksmbd_init_smb_server(struct ksmbd_work *work)
-+int ksmbd_init_smb_server(struct ksmbd_work *work)
- {
- 	struct ksmbd_conn *conn = work->conn;
- 	__le32 proto;
- 
--	if (conn->need_neg == false)
--		return;
--
- 	proto = *(__le32 *)((struct smb_hdr *)work->request_buf)->Protocol;
-+	if (conn->need_neg == false) {
-+		if (proto == SMB1_PROTO_NUMBER)
-+			return -EINVAL;
-+		return 0;
-+	}
-+
- 	if (proto == SMB1_PROTO_NUMBER)
--		init_smb1_server(conn);
--	else
--		init_smb3_11_server(conn);
-+		return init_smb1_server(conn);
-+	return init_smb3_11_server(conn);
- }
- 
- int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work, int info_level,
-diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index 6b0d5f1fe85ca..f0134d16067fb 100644
---- a/fs/smb/server/smb_common.h
-+++ b/fs/smb/server/smb_common.h
-@@ -427,7 +427,7 @@ bool ksmbd_smb_request(struct ksmbd_conn *conn);
- 
- int ksmbd_lookup_dialect_by_id(__le16 *cli_dialects, __le16 dialects_count);
- 
--void ksmbd_init_smb_server(struct ksmbd_work *work);
-+int ksmbd_init_smb_server(struct ksmbd_work *work);
- 
- struct ksmbd_kstat;
- int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work,
+-	if (buf_data_size < sizeof(struct smb2_hdr)) {
++	if (pdu_length < sizeof(struct smb2_transform_hdr) ||
++	    buf_data_size < sizeof(struct smb2_hdr)) {
+ 		pr_err("Transform message is too small (%u)\n",
+ 		       pdu_length);
+ 		return -ECONNABORTED;
 -- 
 2.40.1
 
