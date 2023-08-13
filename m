@@ -2,98 +2,121 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A79C001E0
-	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 00:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CCFBEB64DD
+	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 03:11:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbjHMA5Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 12 Aug 2023 20:57:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52508 "EHLO
+        id S229655AbjHMDLq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 12 Aug 2023 23:11:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjHMA5Q (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Aug 2023 20:57:16 -0400
-Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40411706;
-        Sat, 12 Aug 2023 17:57:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-        ; s=bytemarkmx; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID
-        :Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID
-        :Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-        Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe
-        :List-Post:List-Owner:List-Archive;
-        bh=GwNvcGCEu2wb+suTa9T22xUCaBCAWRmXtJQNZV9bEc8=; b=rGyupDRGsS+yvbfuxEnQ4FQ3rX
-        zs01jy5w5+/8V7nuNCZvI3bh7Av2rmpnD3rRwR9n+3WkdIGolhEmE+gpoFjqzdg5Vt9TqG+DgAojQ
-        K2jTugw69dKO1AFb/SaFVPx9dJKOwrDVo8EmRbyWpiZmtUwxL9aAL+su2RMoOTLnbC5j9rrGRN3H+
-        LifIzeBt8t+BeRH7fOUFXxBY+Xo9tPILUb7J6L7a6CjDsA4Sd+1nagYguZVp5jQkpt744z8WTgG+/
-        W4EzRhRdszNL/dUqKkjQ2K1OOAUa4RIYxo9o+KPPYkD8PpaIHAtuGpKUREOkquiLEUqKWvH6PLd4j
-        U5oCWvrg==;
-Received: from dg by mx.treblig.org with local (Exim 4.94.2)
-        (envelope-from <dg@treblig.org>)
-        id 1qUzPp-006b9Z-V5; Sun, 13 Aug 2023 00:57:09 +0000
-Date:   Sun, 13 Aug 2023 00:57:09 +0000
-From:   "Dr. David Alan Gilbert" <dave@treblig.org>
-To:     Paulo Alcantara <pc@manguebit.com>, smfrench@gmail.com
-Cc:     Tom Talpey <tom@talpey.com>,
+        with ESMTP id S229494AbjHMDLp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Aug 2023 23:11:45 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D0C10FB;
+        Sat, 12 Aug 2023 20:11:47 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b9aa1d3029so50197011fa.2;
+        Sat, 12 Aug 2023 20:11:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691896306; x=1692501106;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zvzp1gQ+6XfFk/eBBQ2JFjiH09Yw2NiXqDxjmFGA8Fs=;
+        b=ZAU8L+/3l6c5EOmAcZGSylH5KIYGymKiNm7cE+muL71RUAUKTBVcbA5L6U1mzR0WhW
+         XCiaWnqPlmZ5wGIcrvKYNK5+uXUpMtUd9OMCL2zjeXclsGt4szAiLGfgF1BNycXjRIwq
+         aeVx/jkiM8mnF+62JoXBi7c+GXuV7FJ7TDwaaTe4p88WVEfdWZi4HGTPOiUFaIBSi2Dc
+         DzKgvb38d7aO4Epe09kLqo+1o+UcqC7qOGrG6biQ1otzwPxE4NtkafHQ3OI2gbtPTcDg
+         t6KaJY7JMUWNi7BEkftPiCNQeCVj8fqNKlcLn03VCd9HkStAUhphS+mmcXWjfHXqD6jh
+         +yDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691896306; x=1692501106;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zvzp1gQ+6XfFk/eBBQ2JFjiH09Yw2NiXqDxjmFGA8Fs=;
+        b=L1aBvp1qHq0yx5t+EfG2wxIoKXgutYL61xPtu5z0VcahZhu74FZO73RHguDB7jE6rx
+         PYYwHJBWCcBjaZfJcKHiGcyOjF++TRLLUW9WlnexK15L9dJrg/rV7loLcXnIRXXn2Oe4
+         YG+i7Y+jEWZUM15l+2cxSp/OHksomHT20xQ3O8eI7JUt/+euK+Wq8eZnP+nCeVmnKVIg
+         rIcnkfU+WA6vbBl1FTCj4E/FioUMvluR10AGn1of7FPbVYqayipsBz3Vrm0IErvz/YSV
+         c2lNfFN/AuhLZ+aM/J5LRUqyyMpEtf2EKaieZqDUOLvWKsuPNPu9MQGkgYW7QObK5J0H
+         wsFw==
+X-Gm-Message-State: AOJu0YzqnJUTsfh3dK/UDymdTwfEBbR7pQJPUh2ntcFhHkKd1ppwRgV8
+        FJdgC11wFpwVSHS2TphRQgZFG98PH2llMdP6d0Q=
+X-Google-Smtp-Source: AGHT+IFkSnAm0x250e+D/C0jcEvZDPRPt61ghBsO0eg6LDYjULpEWYzx6hQqLTCCrNkRtj8RJxGYJborIl4l4MzCsCE=
+X-Received: by 2002:a05:6512:1154:b0:4f8:5635:2cd8 with SMTP id
+ m20-20020a056512115400b004f856352cd8mr4747504lfg.32.1691896305579; Sat, 12
+ Aug 2023 20:11:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAH2r5mvrhr52hXFv87O9O=Qw45AXRXr0NQAsTk4Wj-6s19-2bA@mail.gmail.com>
+ <CAH2r5mss4RsEF1b6gJo8LFWsN9-YBSEP6GV7axsNhX7ihj5CqA@mail.gmail.com>
+ <ZLhchajZaWEVM6D7@gallifrey> <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
+ <d1f7fbe9-8fe2-e3e3-d6ff-1544204202ff@talpey.com> <ZLnJzUynpTBvZGtA@gallifrey>
+ <f8f4a2c5-05d3-0b2d-688f-b3274a98fc73@talpey.com> <ZLrxYzGXJzsLmGDs@gallifrey>
+ <16f50dff126af9b20f9b99ca056ad5fa.pc@manguebit.com> <ZLr0wFMKhEaannov@gallifrey>
+ <ZNgqZRZNgN8JdiL4@gallifrey>
+In-Reply-To: <ZNgqZRZNgN8JdiL4@gallifrey>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 12 Aug 2023 22:11:31 -0500
+Message-ID: <CAH2r5muAQ=gqCKk5qv9SX2Q-YR-2gvFsubTk6sd9p17XS43Acw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
+To:     "Dr. David Alan Gilbert" <dave@treblig.org>
+Cc:     Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
         Dave Kleikamp <dave.kleikamp@oracle.com>,
         linkinjeon@kernel.org, shaggy@kernel.org,
         linux-cifs@vger.kernel.org, krisman@collabora.com,
         jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
-Message-ID: <ZNgqZRZNgN8JdiL4@gallifrey>
-References: <CAH2r5mvrhr52hXFv87O9O=Qw45AXRXr0NQAsTk4Wj-6s19-2bA@mail.gmail.com>
- <CAH2r5mss4RsEF1b6gJo8LFWsN9-YBSEP6GV7axsNhX7ihj5CqA@mail.gmail.com>
- <ZLhchajZaWEVM6D7@gallifrey>
- <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
- <d1f7fbe9-8fe2-e3e3-d6ff-1544204202ff@talpey.com>
- <ZLnJzUynpTBvZGtA@gallifrey>
- <f8f4a2c5-05d3-0b2d-688f-b3274a98fc73@talpey.com>
- <ZLrxYzGXJzsLmGDs@gallifrey>
- <16f50dff126af9b20f9b99ca056ad5fa.pc@manguebit.com>
- <ZLr0wFMKhEaannov@gallifrey>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <ZLr0wFMKhEaannov@gallifrey>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/5.10.0-23-amd64 (x86_64)
-X-Uptime: 00:57:00 up 37 days, 10:28,  1 user,  load average: 0.01, 0.02, 0.00
-User-Agent: Mutt/2.0.5 (2021-01-21)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-* Dr. David Alan Gilbert (dave@treblig.org) wrote:
-> * Paulo Alcantara (pc@manguebit.com) wrote:
-> > "Dr. David Alan Gilbert" <linux@treblig.org> writes:
-> > 
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/scripts/checkpatch.pl#n3737
-> > > 	if ($realfile =~ /\.(h|s|S)$/) {
-> > > 		$comment = '/*';
-> > > 	} elsif ($realfile =~ /\.(c|rs|dts|dtsi)$/) {
-> > > 		$comment = '//';
+thx - should be doable to put in for-next soon unless we find objections
+
+On Sat, Aug 12, 2023 at 7:57=E2=80=AFPM Dr. David Alan Gilbert <dave@trebli=
+g.org> wrote:
+>
+> * Dr. David Alan Gilbert (dave@treblig.org) wrote:
+> > * Paulo Alcantara (pc@manguebit.com) wrote:
+> > > "Dr. David Alan Gilbert" <linux@treblig.org> writes:
 > > >
-> > > I don't get where that idea came from.
-> > 
-> > Check Documentation/process/license-rules.rst.
-> 
-> Oh, that's a painful history!
-> Hmm that landed just after I posted a v3 (of just this patch)
-> 
-> Steve: Your call, do you want me to post a v4 with that comment
-> back and but with the copyright lineas as in v3?
-
-I've posted the v4.
-
-Dave
-
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
+tree/scripts/checkpatch.pl#n3737
+> > > >   if ($realfile =3D~ /\.(h|s|S)$/) {
+> > > >           $comment =3D '/*';
+> > > >   } elsif ($realfile =3D~ /\.(c|rs|dts|dtsi)$/) {
+> > > >           $comment =3D '//';
+> > > >
+> > > > I don't get where that idea came from.
+> > >
+> > > Check Documentation/process/license-rules.rst.
+> >
+> > Oh, that's a painful history!
+> > Hmm that landed just after I posted a v3 (of just this patch)
+> >
+> > Steve: Your call, do you want me to post a v4 with that comment
+> > back and but with the copyright lineas as in v3?
+>
+> I've posted the v4.
+>
 > Dave
-> 
-> -- 
->  -----Open up your eyes, open up your mind, open up your code -------   
-> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+>
+> > Dave
+> >
+> > --
+> >  -----Open up your eyes, open up your mind, open up your code -------
+> > / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
+> > \        dave @ treblig.org |                               | In Hex /
+> >  \ _________________________|_____ http://www.treblig.org   |_______/
+> --
+>  -----Open up your eyes, open up your mind, open up your code -------
+> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
 > \        dave @ treblig.org |                               | In Hex /
 >  \ _________________________|_____ http://www.treblig.org   |_______/
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+
+
+
+--=20
+Thanks,
+
+Steve
