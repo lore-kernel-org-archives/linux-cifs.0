@@ -2,36 +2,36 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D1FC001DE
-	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 16:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AD7C04A6A
+	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 16:02:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231895AbjHMQBY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 13 Aug 2023 12:01:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54942 "EHLO
+        id S231263AbjHMQC0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 13 Aug 2023 12:02:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231837AbjHMQBW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 13 Aug 2023 12:01:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92049171A;
-        Sun, 13 Aug 2023 09:01:08 -0700 (PDT)
+        with ESMTP id S232311AbjHMQCB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 13 Aug 2023 12:02:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46FE6268C;
+        Sun, 13 Aug 2023 09:01:39 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 575B6634F9;
-        Sun, 13 Aug 2023 16:00:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 929B5C433C9;
-        Sun, 13 Aug 2023 16:00:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C706063369;
+        Sun, 13 Aug 2023 16:00:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DE7FC433CA;
+        Sun, 13 Aug 2023 16:00:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691942454;
-        bh=KIJCOWIxsrZbQDT0kkcuzRKHVXvODCGJW3rPt/kAf5k=;
+        s=k20201202; t=1691942452;
+        bh=hm/avD0/sLzTVxMCvL9dd5hJKmtvP3tYHyqeunc5Y+8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=noMSI2ero8b8P8Xnz41kvO00vBlT/+Q2gMZhDX/AE1+0RY1Fbz0FwESZbOI7nS8qC
-         kAjfkLjn/E5WrFDx4/WxyuTRgu4QlnXMJSYjaX3US3q5sTej+hxNXP3IW4nYxxaTTU
-         EZT9nupa0axOUo3cHDPZs4FMuR5K6PUTpQJRVbsjK+3nTr/fJn2G8SVHyD/qv8p01z
-         iCpdlM4KBBC3e3xatVrIoAPW6NjJGvIjGphxx7vJBoVWvCuAA+Obx+A2KWbJrVhZKc
-         oDK1D7r1GzvkwyBud9Rd33yeWdcpukkrUqcQu+LKEndHaOspEVapdsEpjyqXW/hAFg
-         IPi2OBCD4egjg==
+        b=SEe8n5nYTjkVgDz6O5Tt87lLdmh7HwClKMYgQQk6DxEZMTzvtUrNIdJyPCdbfRbZr
+         6NEoImhkuedj3V3ZkpuyXkiPNO5cfEvb/6o6h8iY/FQJV+obDvkdTPI27mK/TSR1wA
+         B3R5lvOuh2/sG8YPMwBZoS20A26Mb8ArPA7OTN8ZcvLB3QMsR7F3NGdatiFHkLNWDP
+         6XGJHW12CvyXx6FG35CmvQkPG1RiBrK+nANexBU8hp3ojtZj+E+UBGada7+Zj5YsFv
+         f9PHzQ7RD8hxblAmuJKnMXx3req1zEcauSiFRbPXz7qRrtXE8BrRb/Gl79S6Emve8b
+         Wsiyy+Lif36pA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>,
@@ -39,9 +39,9 @@ Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 10/47] ksmbd: validate session id and tree id in compound request
-Date:   Sun, 13 Aug 2023 11:59:05 -0400
-Message-Id: <20230813160006.1073695-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 09/47] ksmbd: fix out of bounds in smb3_decrypt_req()
+Date:   Sun, 13 Aug 2023 11:59:04 -0400
+Message-Id: <20230813160006.1073695-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230813160006.1073695-1-sashal@kernel.org>
 References: <20230813160006.1073695-1-sashal@kernel.org>
@@ -56,68 +56,33 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 3df0411e132ee74a87aa13142dfd2b190275332e ]
+[ Upstream commit dc318846f3dd54574a36ae97fc8d8b75dd7cdb1e ]
 
-`smb2_get_msg()` in smb2_get_ksmbd_tcon() and smb2_check_user_session()
-will always return the first request smb2 header in a compound request.
-if `SMB2_TREE_CONNECT_HE` is the first command in compound request, will
-return 0, i.e. The tree id check is skipped.
-This patch use ksmbd_req_buf_next() to get current command in compound.
+smb3_decrypt_req() validate if pdu_length is smaller than
+smb2_transform_hdr size.
 
-Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-21506
+Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-21589
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/server/smb2pdu.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ fs/smb/server/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index c33249393ef36..d2873dc4322d7 100644
+index 26cf73d664f94..c33249393ef36 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -86,9 +86,9 @@ struct channel *lookup_chann_list(struct ksmbd_session *sess, struct ksmbd_conn
-  */
- int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
- {
--	struct smb2_hdr *req_hdr = smb2_get_msg(work->request_buf);
-+	struct smb2_hdr *req_hdr = ksmbd_req_buf_next(work);
- 	unsigned int cmd = le16_to_cpu(req_hdr->Command);
--	int tree_id;
-+	unsigned int tree_id;
+@@ -8706,7 +8706,8 @@ int smb3_decrypt_req(struct ksmbd_work *work)
+ 	struct smb2_transform_hdr *tr_hdr = smb2_get_msg(buf);
+ 	int rc = 0;
  
- 	if (cmd == SMB2_TREE_CONNECT_HE ||
- 	    cmd ==  SMB2_CANCEL_HE ||
-@@ -113,7 +113,7 @@ int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
- 			pr_err("The first operation in the compound does not have tcon\n");
- 			return -EINVAL;
- 		}
--		if (work->tcon->id != tree_id) {
-+		if (tree_id != UINT_MAX && work->tcon->id != tree_id) {
- 			pr_err("tree id(%u) is different with id(%u) in first operation\n",
- 					tree_id, work->tcon->id);
- 			return -EINVAL;
-@@ -565,9 +565,9 @@ int smb2_allocate_rsp_buf(struct ksmbd_work *work)
-  */
- int smb2_check_user_session(struct ksmbd_work *work)
- {
--	struct smb2_hdr *req_hdr = smb2_get_msg(work->request_buf);
-+	struct smb2_hdr *req_hdr = ksmbd_req_buf_next(work);
- 	struct ksmbd_conn *conn = work->conn;
--	unsigned int cmd = conn->ops->get_cmd_val(work);
-+	unsigned int cmd = le16_to_cpu(req_hdr->Command);
- 	unsigned long long sess_id;
- 
- 	/*
-@@ -593,7 +593,7 @@ int smb2_check_user_session(struct ksmbd_work *work)
- 			pr_err("The first operation in the compound does not have sess\n");
- 			return -EINVAL;
- 		}
--		if (work->sess->id != sess_id) {
-+		if (sess_id != ULLONG_MAX && work->sess->id != sess_id) {
- 			pr_err("session id(%llu) is different with the first operation(%lld)\n",
- 					sess_id, work->sess->id);
- 			return -EINVAL;
+-	if (buf_data_size < sizeof(struct smb2_hdr)) {
++	if (pdu_length < sizeof(struct smb2_transform_hdr) ||
++	    buf_data_size < sizeof(struct smb2_hdr)) {
+ 		pr_err("Transform message is too small (%u)\n",
+ 		       pdu_length);
+ 		return -ECONNABORTED;
 -- 
 2.40.1
 
