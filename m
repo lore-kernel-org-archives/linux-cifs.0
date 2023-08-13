@@ -2,36 +2,36 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD6A0C04A6A
-	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 16:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D1FC001DE
+	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 16:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231874AbjHMQBX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 13 Aug 2023 12:01:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54962 "EHLO
+        id S231895AbjHMQBY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 13 Aug 2023 12:01:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231865AbjHMQBT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 13 Aug 2023 12:01:19 -0400
+        with ESMTP id S231837AbjHMQBW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 13 Aug 2023 12:01:22 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A521BC0;
-        Sun, 13 Aug 2023 09:01:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92049171A;
+        Sun, 13 Aug 2023 09:01:08 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A7379634BE;
-        Sun, 13 Aug 2023 16:01:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE76CC433C7;
-        Sun, 13 Aug 2023 16:00:58 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 575B6634F9;
+        Sun, 13 Aug 2023 16:00:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 929B5C433C9;
+        Sun, 13 Aug 2023 16:00:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691942460;
-        bh=KPozp3XFVsCBL4Zz6wEhzoLnmhS1oIbHpQEHhZ9vol4=;
+        s=k20201202; t=1691942454;
+        bh=KIJCOWIxsrZbQDT0kkcuzRKHVXvODCGJW3rPt/kAf5k=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=H6tUu7tO4KdrcAmkgjK/MDhmxc5Igwx2s3nF4YPXgOq8SRqZUMWpGzaUlYvpcv5g1
-         RxuxL8O/p7HuuBouM4CS4SiBaVEJzC1Gunuzcm8mYuUtsuUMB6QBlmCZ5ibgtv8jlo
-         Xp1HeH/0EU/gQw3Mf3OSOMq5TRxsO4+kOMCgP8chuCu5ZdnYYX8QSR2baXRQfbcfwM
-         +z/Nxl2rJKYUOgDd5aQcAEB45CCl6aQ3Cuh29JFc/arNuIsbsBDxmAyd+RQCdL8hI5
-         dZ6zcPACL05bkoqFJL2OiAr2OeMpSc7NfkN61232L+FFENqRG4G3gUKPqsja6Yz3yS
-         FBNR5fmcXqUKQ==
+        b=noMSI2ero8b8P8Xnz41kvO00vBlT/+Q2gMZhDX/AE1+0RY1Fbz0FwESZbOI7nS8qC
+         kAjfkLjn/E5WrFDx4/WxyuTRgu4QlnXMJSYjaX3US3q5sTej+hxNXP3IW4nYxxaTTU
+         EZT9nupa0axOUo3cHDPZs4FMuR5K6PUTpQJRVbsjK+3nTr/fJn2G8SVHyD/qv8p01z
+         iCpdlM4KBBC3e3xatVrIoAPW6NjJGvIjGphxx7vJBoVWvCuAA+Obx+A2KWbJrVhZKc
+         oDK1D7r1GzvkwyBud9Rd33yeWdcpukkrUqcQu+LKEndHaOspEVapdsEpjyqXW/hAFg
+         IPi2OBCD4egjg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>,
@@ -39,9 +39,9 @@ Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 12/47] ksmbd: fix out of bounds in init_smb2_rsp_hdr()
-Date:   Sun, 13 Aug 2023 11:59:07 -0400
-Message-Id: <20230813160006.1073695-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 10/47] ksmbd: validate session id and tree id in compound request
+Date:   Sun, 13 Aug 2023 11:59:05 -0400
+Message-Id: <20230813160006.1073695-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230813160006.1073695-1-sashal@kernel.org>
 References: <20230813160006.1073695-1-sashal@kernel.org>
@@ -56,103 +56,68 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 536bb492d39bb6c080c92f31e8a55fe9934f452b ]
+[ Upstream commit 3df0411e132ee74a87aa13142dfd2b190275332e ]
 
-If client send smb2 negotiate request and then send smb1 negotiate
-request, init_smb2_rsp_hdr is called for smb1 negotiate request since
-need_neg is set to false. This patch ignore smb1 packets after ->need_neg
-is set to false.
+`smb2_get_msg()` in smb2_get_ksmbd_tcon() and smb2_check_user_session()
+will always return the first request smb2 header in a compound request.
+if `SMB2_TREE_CONNECT_HE` is the first command in compound request, will
+return 0, i.e. The tree id check is skipped.
+This patch use ksmbd_req_buf_next() to get current command in compound.
 
-Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-21541
+Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-21506
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/server/server.c     |  7 ++++++-
- fs/smb/server/smb_common.c | 19 +++++++++++--------
- fs/smb/server/smb_common.h |  2 +-
- 3 files changed, 18 insertions(+), 10 deletions(-)
+ fs/smb/server/smb2pdu.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index 847ee62afb8a1..9804cabe72a84 100644
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -286,6 +286,7 @@ static void handle_ksmbd_work(struct work_struct *wk)
- static int queue_ksmbd_work(struct ksmbd_conn *conn)
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index c33249393ef36..d2873dc4322d7 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -86,9 +86,9 @@ struct channel *lookup_chann_list(struct ksmbd_session *sess, struct ksmbd_conn
+  */
+ int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
  {
- 	struct ksmbd_work *work;
-+	int err;
+-	struct smb2_hdr *req_hdr = smb2_get_msg(work->request_buf);
++	struct smb2_hdr *req_hdr = ksmbd_req_buf_next(work);
+ 	unsigned int cmd = le16_to_cpu(req_hdr->Command);
+-	int tree_id;
++	unsigned int tree_id;
  
- 	work = ksmbd_alloc_work_struct();
- 	if (!work) {
-@@ -297,7 +298,11 @@ static int queue_ksmbd_work(struct ksmbd_conn *conn)
- 	work->request_buf = conn->request_buf;
- 	conn->request_buf = NULL;
- 
--	ksmbd_init_smb_server(work);
-+	err = ksmbd_init_smb_server(work);
-+	if (err) {
-+		ksmbd_free_work_struct(work);
-+		return 0;
-+	}
- 
- 	ksmbd_conn_enqueue_request(work);
- 	atomic_inc(&conn->r_count);
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index d937e2f45c829..a4421d9458d90 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -388,26 +388,29 @@ static struct smb_version_cmds smb1_server_cmds[1] = {
- 	[SMB_COM_NEGOTIATE_EX]	= { .proc = smb1_negotiate, },
- };
- 
--static void init_smb1_server(struct ksmbd_conn *conn)
-+static int init_smb1_server(struct ksmbd_conn *conn)
+ 	if (cmd == SMB2_TREE_CONNECT_HE ||
+ 	    cmd ==  SMB2_CANCEL_HE ||
+@@ -113,7 +113,7 @@ int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
+ 			pr_err("The first operation in the compound does not have tcon\n");
+ 			return -EINVAL;
+ 		}
+-		if (work->tcon->id != tree_id) {
++		if (tree_id != UINT_MAX && work->tcon->id != tree_id) {
+ 			pr_err("tree id(%u) is different with id(%u) in first operation\n",
+ 					tree_id, work->tcon->id);
+ 			return -EINVAL;
+@@ -565,9 +565,9 @@ int smb2_allocate_rsp_buf(struct ksmbd_work *work)
+  */
+ int smb2_check_user_session(struct ksmbd_work *work)
  {
- 	conn->ops = &smb1_server_ops;
- 	conn->cmds = smb1_server_cmds;
- 	conn->max_cmds = ARRAY_SIZE(smb1_server_cmds);
-+	return 0;
- }
- 
--void ksmbd_init_smb_server(struct ksmbd_work *work)
-+int ksmbd_init_smb_server(struct ksmbd_work *work)
- {
+-	struct smb2_hdr *req_hdr = smb2_get_msg(work->request_buf);
++	struct smb2_hdr *req_hdr = ksmbd_req_buf_next(work);
  	struct ksmbd_conn *conn = work->conn;
- 	__le32 proto;
+-	unsigned int cmd = conn->ops->get_cmd_val(work);
++	unsigned int cmd = le16_to_cpu(req_hdr->Command);
+ 	unsigned long long sess_id;
  
--	if (conn->need_neg == false)
--		return;
--
- 	proto = *(__le32 *)((struct smb_hdr *)work->request_buf)->Protocol;
-+	if (conn->need_neg == false) {
-+		if (proto == SMB1_PROTO_NUMBER)
-+			return -EINVAL;
-+		return 0;
-+	}
-+
- 	if (proto == SMB1_PROTO_NUMBER)
--		init_smb1_server(conn);
--	else
--		init_smb3_11_server(conn);
-+		return init_smb1_server(conn);
-+	return init_smb3_11_server(conn);
- }
- 
- int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work, int info_level,
-diff --git a/fs/smb/server/smb_common.h b/fs/smb/server/smb_common.h
-index e63d2a4f466b5..1cbb492cdefec 100644
---- a/fs/smb/server/smb_common.h
-+++ b/fs/smb/server/smb_common.h
-@@ -427,7 +427,7 @@ bool ksmbd_smb_request(struct ksmbd_conn *conn);
- 
- int ksmbd_lookup_dialect_by_id(__le16 *cli_dialects, __le16 dialects_count);
- 
--void ksmbd_init_smb_server(struct ksmbd_work *work);
-+int ksmbd_init_smb_server(struct ksmbd_work *work);
- 
- struct ksmbd_kstat;
- int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work,
+ 	/*
+@@ -593,7 +593,7 @@ int smb2_check_user_session(struct ksmbd_work *work)
+ 			pr_err("The first operation in the compound does not have sess\n");
+ 			return -EINVAL;
+ 		}
+-		if (work->sess->id != sess_id) {
++		if (sess_id != ULLONG_MAX && work->sess->id != sess_id) {
+ 			pr_err("session id(%llu) is different with the first operation(%lld)\n",
+ 					sess_id, work->sess->id);
+ 			return -EINVAL;
 -- 
 2.40.1
 
