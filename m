@@ -2,43 +2,43 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C88CC04FDF
-	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 00:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0589C001E0
+	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 00:54:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229458AbjHMAyN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 12 Aug 2023 20:54:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58528 "EHLO
+        id S230142AbjHMAyM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 12 Aug 2023 20:54:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230081AbjHMAyK (ORCPT
+        with ESMTP id S230096AbjHMAyK (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Aug 2023 20:54:10 -0400
 Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E2C51709;
-        Sat, 12 Aug 2023 17:54:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6A771708;
+        Sat, 12 Aug 2023 17:54:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
         ; s=bytemarkmx; h=Content-Transfer-Encoding:MIME-Version:References:
         In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
         Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
         Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
         List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=nMLPKXFOEvPRH5qIoR7+T1SMwSnc3wbTmke32V0c7oI=; b=dP9EPgqZFJjp4RKR8eXcILjLzz
-        zyK51Gd/15GTKANPrUNFxR6fltywSXGp4ioNI3D8jMd3GDYxaW/w7sb++hKbTjdhP5JgV1bYnCPlV
-        UHpFz4zLF/3Bt0Nk2rsyEQsCfCxlwLjcvAbruAeTzaNAtQ/1tFutPEFxNdHnmqm5QYvwpNoNdUTJl
-        5WIAp5KtGJGS/eVuze8ZZLcxrta3cTjm+VifldY4T4dYOwDnAiMM74aAumJc/l3lg4pVPyrfXEmJw
-        /PJZOPSyGbTqcN/pcnkFMcEOWu9PfUu2fzSgt3Hm0C/IF+6zlq5DbJm3nOF8kQi8QDvZEbpYgH9t2
-        +ykWUc4g==;
+        bh=y5tCgefofVOF+Jl1X4M4dmrctYVZ8TzBmUsn6af50QM=; b=der9XFlodIeg9qTC0sf5UJZ5x+
+        pc/6SYTq/pYdJ+MDIW+uX1jdufY/n9l4JpVwHgmM60hg81wYQ3qPx4/yBiDPSL6MTO3MJ7XG8Z8WJ
+        ZxNi8xZRRDz+8fBZrZi9cgXE0bmYSUNhTBT9FWHTKDJKC481shKH/zKiV8N4JwxT9qKUZ8lVbENgd
+        mc3RoqpJWBvG8x9aGmMsF3DyF5XxAEJ9QqBVyBj93f1bd1EnHPVJdtL9zfLZi8c82c0OcSW8TuVga
+        ShptoRVzQMweiX+xQGLVdiIQKKUD2YKEF3CzZmBp543LbqttW+ZQAJLY9dbR+vQ9/Gf1VYA9UZGeJ
+        iea/ljkw==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
         by mx.treblig.org with esmtp (Exim 4.94.2)
         (envelope-from <linux@treblig.org>)
-        id 1qUzMo-006b54-Aa; Sun, 13 Aug 2023 00:54:01 +0000
+        id 1qUzMk-006b54-Q5; Sun, 13 Aug 2023 00:53:57 +0000
 From:   linux@treblig.org
 To:     smfrench@gmail.com, dave.kleikamp@oracle.com, tom@talpey.com,
         pc@manguebit.com
 Cc:     linkinjeon@kernel.org, linux-cifs@vger.kernel.org,
         jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
         krisman@collabora.com, "Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH v4 4/4] fs/jfs: Use common ucs2 upper case table
-Date:   Sun, 13 Aug 2023 01:53:44 +0100
-Message-ID: <20230813005344.112955-5-linux@treblig.org>
+Subject: [PATCH v4 1/4] fs/smb: Remove unicode 'lower' tables
+Date:   Sun, 13 Aug 2023 01:53:41 +0100
+Message-ID: <20230813005344.112955-2-linux@treblig.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230813005344.112955-1-linux@treblig.org>
 References: <20230813005344.112955-1-linux@treblig.org>
@@ -50,269 +50,424 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Use the UCS-2 upper case tables from nls, that are shared
-with smb.
-
-This code in JFS is hard to test, so we're only reusing the
-same tables (which are identical), not trying to reuse the
-rest of the helper functions.
+The unicode glue in smb/*/..uniupr.h has a section guarded
+by 'ifndef UNIUPR_NOLOWER' - but that's always
+defined in smb/*/..unicode.h.  Nuke those tables.
 
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- fs/jfs/Kconfig          |   1 +
- fs/jfs/Makefile         |   2 +-
- fs/jfs/jfs_unicode.h    |  17 ++----
- fs/jfs/jfs_uniupr.c     | 121 ----------------------------------------
- fs/nls/nls_ucs2_data.h  |  15 +++++
- fs/nls/nls_ucs2_utils.h |  14 +----
- 6 files changed, 23 insertions(+), 147 deletions(-)
- delete mode 100644 fs/jfs/jfs_uniupr.c
- create mode 100644 fs/nls/nls_ucs2_data.h
+ fs/smb/client/cifs_unicode.h |  50 --------------
+ fs/smb/client/cifs_uniupr.h  | 116 -------------------------------
+ fs/smb/server/unicode.h      |  48 -------------
+ fs/smb/server/uniupr.h       | 129 -----------------------------------
+ 4 files changed, 343 deletions(-)
 
-diff --git a/fs/jfs/Kconfig b/fs/jfs/Kconfig
-index 51e856f0e4b8..eab2f2d2291f 100644
---- a/fs/jfs/Kconfig
-+++ b/fs/jfs/Kconfig
-@@ -2,6 +2,7 @@
- config JFS_FS
- 	tristate "JFS filesystem support"
- 	select NLS
-+	select NLS_UCS2_UTILS
- 	select CRC32
- 	select LEGACY_DIRECT_IO
- 	help
-diff --git a/fs/jfs/Makefile b/fs/jfs/Makefile
-index 7156d2c218c7..b769bbf8bdc2 100644
---- a/fs/jfs/Makefile
-+++ b/fs/jfs/Makefile
-@@ -9,7 +9,7 @@ jfs-y    := super.o file.o inode.o namei.o jfs_mount.o jfs_umount.o \
- 	    jfs_xtree.o jfs_imap.o jfs_debug.o jfs_dmap.o \
- 	    jfs_unicode.o jfs_dtree.o jfs_inode.o jfs_discard.o \
- 	    jfs_extent.o symlink.o jfs_metapage.o \
--	    jfs_logmgr.o jfs_txnmgr.o jfs_uniupr.o \
-+	    jfs_logmgr.o jfs_txnmgr.o \
- 	    resize.o xattr.o ioctl.o
- 
- jfs-$(CONFIG_JFS_POSIX_ACL) += acl.o
-diff --git a/fs/jfs/jfs_unicode.h b/fs/jfs/jfs_unicode.h
-index 9db62d047daa..b6a78d4aef1b 100644
---- a/fs/jfs/jfs_unicode.h
-+++ b/fs/jfs/jfs_unicode.h
-@@ -8,16 +8,9 @@
- 
- #include <linux/slab.h>
- #include <asm/byteorder.h>
-+#include "../nls/nls_ucs2_data.h"
- #include "jfs_types.h"
- 
--typedef struct {
--	wchar_t start;
--	wchar_t end;
--	signed char *table;
--} UNICASERANGE;
--
--extern signed char UniUpperTable[512];
--extern UNICASERANGE UniUpperRange[];
- extern int get_UCSname(struct component_name *, struct dentry *);
- extern int jfs_strfromUCS_le(char *, const __le16 *, int, struct nls_table *);
- 
-@@ -107,12 +100,12 @@ static inline wchar_t *UniStrncpy_from_le(wchar_t * ucs1, const __le16 * ucs2,
-  */
- static inline wchar_t UniToupper(wchar_t uc)
- {
--	UNICASERANGE *rp;
-+	const struct UniCaseRange *rp;
- 
--	if (uc < sizeof(UniUpperTable)) {	/* Latin characters */
--		return uc + UniUpperTable[uc];	/* Use base tables */
-+	if (uc < sizeof(NlsUniUpperTable)) {	/* Latin characters */
-+		return uc + NlsUniUpperTable[uc];	/* Use base tables */
- 	} else {
--		rp = UniUpperRange;	/* Use range tables */
-+		rp = NlsUniUpperRange;	/* Use range tables */
- 		while (rp->start) {
- 			if (uc < rp->start)	/* Before start of range */
- 				return uc;	/* Uppercase = input */
-diff --git a/fs/jfs/jfs_uniupr.c b/fs/jfs/jfs_uniupr.c
-deleted file mode 100644
-index d0b18c7befb8..000000000000
---- a/fs/jfs/jfs_uniupr.c
-+++ /dev/null
-@@ -1,121 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--/*
-- *   Copyright (C) International Business Machines Corp., 2000-2002
-- */
--
--#include <linux/fs.h>
--#include "jfs_unicode.h"
--
--/*
-- * Latin upper case
-- */
--signed char UniUpperTable[512] = {
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 000-00f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 010-01f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 020-02f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 030-03f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 040-04f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 050-05f */
--   0,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 060-06f */
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,  0,  0,  0,  0,  0, /* 070-07f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 080-08f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 090-09f */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 0a0-0af */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 0b0-0bf */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 0c0-0cf */
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 0d0-0df */
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 0e0-0ef */
-- -32,-32,-32,-32,-32,-32,-32,  0,-32,-32,-32,-32,-32,-32,-32,121, /* 0f0-0ff */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 100-10f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 110-11f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 120-12f */
--   0,  0,  0, -1,  0, -1,  0, -1,  0,  0, -1,  0, -1,  0, -1,  0, /* 130-13f */
--  -1,  0, -1,  0, -1,  0, -1,  0, -1,  0,  0, -1,  0, -1,  0, -1, /* 140-14f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 150-15f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 160-16f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0,  0, -1,  0, -1,  0, -1,  0, /* 170-17f */
--   0,  0,  0, -1,  0, -1,  0,  0, -1,  0,  0,  0, -1,  0,  0,  0, /* 180-18f */
--   0,  0, -1,  0,  0,  0,  0,  0,  0, -1,  0,  0,  0,  0,  0,  0, /* 190-19f */
--   0, -1,  0, -1,  0, -1,  0,  0, -1,  0,  0,  0,  0, -1,  0,  0, /* 1a0-1af */
--  -1,  0,  0,  0, -1,  0, -1,  0,  0, -1,  0,  0,  0, -1,  0,  0, /* 1b0-1bf */
--   0,  0,  0,  0,  0, -1, -2,  0, -1, -2,  0, -1, -2,  0, -1,  0, /* 1c0-1cf */
--  -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,-79,  0, -1, /* 1d0-1df */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e0-1ef */
--   0,  0, -1, -2,  0, -1,  0,  0,  0, -1,  0, -1,  0, -1,  0, -1, /* 1f0-1ff */
--};
--
--/* Upper case range - Greek */
--static signed char UniCaseRangeU03a0[47] = {
--   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,-38,-37,-37,-37, /* 3a0-3af */
--   0,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 3b0-3bf */
-- -32,-32,-31,-32,-32,-32,-32,-32,-32,-32,-32,-32,-64,-63,-63,
--};
--
--/* Upper case range - Cyrillic */
--static signed char UniCaseRangeU0430[48] = {
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 430-43f */
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* 440-44f */
--   0,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,-80,  0,-80,-80, /* 450-45f */
--};
--
--/* Upper case range - Extended cyrillic */
--static signed char UniCaseRangeU0490[61] = {
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 490-49f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 4a0-4af */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 4b0-4bf */
--   0,  0, -1,  0, -1,  0,  0,  0, -1,  0,  0,  0, -1,
--};
--
--/* Upper case range - Extended latin and greek */
--static signed char UniCaseRangeU1e00[509] = {
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e00-1e0f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e10-1e1f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e20-1e2f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e30-1e3f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e40-1e4f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e50-1e5f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e60-1e6f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e70-1e7f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1e80-1e8f */
--   0, -1,  0, -1,  0, -1,  0,  0,  0,  0,  0,-59,  0, -1,  0, -1, /* 1e90-1e9f */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1ea0-1eaf */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1eb0-1ebf */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1ec0-1ecf */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1ed0-1edf */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0, -1, /* 1ee0-1eef */
--   0, -1,  0, -1,  0, -1,  0, -1,  0, -1,  0,  0,  0,  0,  0,  0, /* 1ef0-1eff */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f00-1f0f */
--   8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f10-1f1f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f20-1f2f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f30-1f3f */
--   8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f40-1f4f */
--   0,  8,  0,  8,  0,  8,  0,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f50-1f5f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f60-1f6f */
--  74, 74, 86, 86, 86, 86,100,100,  0,  0,112,112,126,126,  0,  0, /* 1f70-1f7f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f80-1f8f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1f90-1f9f */
--   8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fa0-1faf */
--   8,  8,  0,  9,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fb0-1fbf */
--   0,  0,  0,  9,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fc0-1fcf */
--   8,  8,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fd0-1fdf */
--   8,  8,  0,  0,  0,  7,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, /* 1fe0-1fef */
--   0,  0,  0,  9,  0,  0,  0,  0,  0,  0,  0,  0,  0,
--};
--
--/* Upper case range - Wide latin */
--static signed char UniCaseRangeUff40[27] = {
--   0,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32, /* ff40-ff4f */
-- -32,-32,-32,-32,-32,-32,-32,-32,-32,-32,-32,
--};
--
--/*
-- * Upper Case Range
-- */
--UNICASERANGE UniUpperRange[] = {
--    { 0x03a0,  0x03ce,  UniCaseRangeU03a0 },
--    { 0x0430,  0x045f,  UniCaseRangeU0430 },
--    { 0x0490,  0x04cc,  UniCaseRangeU0490 },
--    { 0x1e00,  0x1ffc,  UniCaseRangeU1e00 },
--    { 0xff40,  0xff5a,  UniCaseRangeUff40 },
--    { 0 }
--};
-diff --git a/fs/nls/nls_ucs2_data.h b/fs/nls/nls_ucs2_data.h
-new file mode 100644
-index 000000000000..1f454dc0f4e0
---- /dev/null
-+++ b/fs/nls/nls_ucs2_data.h
-@@ -0,0 +1,15 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+#ifndef _NLS_UCS2_DATA_H
-+#define _NLS_UCS2_DATA_H
-+
-+struct UniCaseRange {
-+	wchar_t start;
-+	wchar_t end;
-+	signed char *table;
-+};
-+
-+extern signed char NlsUniUpperTable[512];
-+extern const struct UniCaseRange NlsUniUpperRange[];
-+
-+#endif /* _NLS_UCS2_DATA_H */
-diff --git a/fs/nls/nls_ucs2_utils.h b/fs/nls/nls_ucs2_utils.h
-index 3500596ea993..ef18d30db1d0 100644
---- a/fs/nls/nls_ucs2_utils.h
-+++ b/fs/nls/nls_ucs2_utils.h
-@@ -26,6 +26,7 @@
+diff --git a/fs/smb/client/cifs_unicode.h b/fs/smb/client/cifs_unicode.h
+index 80b3d845419f..33b651def482 100644
+--- a/fs/smb/client/cifs_unicode.h
++++ b/fs/smb/client/cifs_unicode.h
+@@ -22,8 +22,6 @@
  #include <linux/types.h>
  #include <linux/nls.h>
- #include <linux/unicode.h>
-+#include "nls_ucs2_data.h"
  
+-#define  UNIUPR_NOLOWER		/* Example to not expand lower case tables */
+-
  /*
   * Windows maps these to the user defined 16 bit Unicode range since they are
-@@ -40,19 +41,6 @@
- #define UNI_PIPE        ((__u16)('|' + 0xF000))
- #define UNI_SLASH       ((__u16)('\\' + 0xF000))
+  * reserved symbols (along with \ and /), otherwise illegal to store
+@@ -84,11 +82,6 @@ extern signed char CifsUniUpperTable[512];
+ extern const struct UniCaseRange CifsUniUpperRange[];
+ #endif				/* UNIUPR_NOUPPER */
  
--#ifndef	UNICASERANGE_DEFINED
--struct UniCaseRange {
--	wchar_t start;
--	wchar_t end;
--	signed char *table;
--};
--#endif				/* UNICASERANGE_DEFINED */
+-#ifndef UNIUPR_NOLOWER
+-extern signed char CifsUniLowerTable[512];
+-extern const struct UniCaseRange CifsUniLowerRange[];
+-#endif				/* UNIUPR_NOLOWER */
 -
--#ifndef UNIUPR_NOUPPER
--extern signed char NlsUniUpperTable[512];
--extern const struct UniCaseRange NlsUniUpperRange[];
--#endif				/* UNIUPR_NOUPPER */
+ #ifdef __KERNEL__
+ int cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
+ 		    const struct nls_table *cp, int map_type);
+@@ -358,47 +351,4 @@ UniStrupr(register __le16 *upin)
+ }
+ #endif				/* UNIUPR_NOUPPER */
+ 
+-#ifndef UNIUPR_NOLOWER
+-/*
+- * UniTolower:  Convert a unicode character to lower case
+- */
+-static inline wchar_t
+-UniTolower(register wchar_t uc)
+-{
+-	register const struct UniCaseRange *rp;
+-
+-	if (uc < sizeof(CifsUniLowerTable)) {
+-		/* Latin characters */
+-		return uc + CifsUniLowerTable[uc];	/* Use base tables */
+-	} else {
+-		rp = CifsUniLowerRange;	/* Use range tables */
+-		while (rp->start) {
+-			if (uc < rp->start)	/* Before start of range */
+-				return uc;	/* Uppercase = input */
+-			if (uc <= rp->end)	/* In range */
+-				return uc + rp->table[uc - rp->start];
+-			rp++;	/* Try next range */
+-		}
+-	}
+-	return uc;		/* Past last range */
+-}
+-
+-/*
+- * UniStrlwr:  Lower case a unicode string
+- */
+-static inline wchar_t *
+-UniStrlwr(register wchar_t *upin)
+-{
+-	register wchar_t *up;
+-
+-	up = upin;
+-	while (*up) {		/* For all characters */
+-		*up = UniTolower(*up);
+-		up++;
+-	}
+-	return upin;		/* Return input pointer */
+-}
+-
+-#endif
+-
+ #endif /* _CIFS_UNICODE_H */
+diff --git a/fs/smb/client/cifs_uniupr.h b/fs/smb/client/cifs_uniupr.h
+index 7b272fcdf0d3..b1d51d0da4fe 100644
+--- a/fs/smb/client/cifs_uniupr.h
++++ b/fs/smb/client/cifs_uniupr.h
+@@ -121,119 +121,3 @@ const struct UniCaseRange CifsUniUpperRange[] = {
+ 	{0}
+ };
+ #endif
+-
+-#ifndef UNIUPR_NOLOWER
+-/*
+- * Latin lower case
+- */
+-signed char CifsUniLowerTable[512] = {
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 000-00f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 010-01f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 020-02f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 030-03f */
+-	0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,	/* 040-04f */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 0, 0, 0, 0, 0,	/* 050-05f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 060-06f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 070-07f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 080-08f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 090-09f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0a0-0af */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0b0-0bf */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,	/* 0c0-0cf */
+-	32, 32, 32, 32, 32, 32, 32, 0, 32, 32, 32, 32, 32, 32, 32, 0,	/* 0d0-0df */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0e0-0ef */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0f0-0ff */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 100-10f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 110-11f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 120-12f */
+-	0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1,	/* 130-13f */
+-	0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0,	/* 140-14f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 150-15f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 160-16f */
+-	1, 0, 1, 0, 1, 0, 1, 0, -121, 1, 0, 1, 0, 1, 0, 0,	/* 170-17f */
+-	0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 79, 0,	/* 180-18f */
+-	0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,	/* 190-19f */
+-	1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1,	/* 1a0-1af */
+-	0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0,	/* 1b0-1bf */
+-	0, 0, 0, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1,	/* 1c0-1cf */
+-	0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0,	/* 1d0-1df */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e0-1ef */
+-	0, 2, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1f0-1ff */
+-};
+-
+-/* Lower case range - Greek */
+-static signed char UniCaseRangeL0380[44] = {
+-	0, 0, 0, 0, 0, 0, 38, 0, 37, 37, 37, 0, 64, 0, 63, 63,	/* 380-38f */
+-	0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,	/* 390-39f */
+-	32, 32, 0, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-};
+-
+-/* Lower case range - Cyrillic */
+-static signed char UniCaseRangeL0400[48] = {
+-	0, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 0, 80, 80,	/* 400-40f */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,	/* 410-41f */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,	/* 420-42f */
+-};
+-
+-/* Lower case range - Extended cyrillic */
+-static signed char UniCaseRangeL0490[60] = {
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 490-49f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 4a0-4af */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 4b0-4bf */
+-	0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1,
+-};
+-
+-/* Lower case range - Extended latin and greek */
+-static signed char UniCaseRangeL1e00[504] = {
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e00-1e0f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e10-1e1f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e20-1e2f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e30-1e3f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e40-1e4f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e50-1e5f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e60-1e6f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e70-1e7f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e80-1e8f */
+-	1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,	/* 1e90-1e9f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1ea0-1eaf */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1eb0-1ebf */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1ec0-1ecf */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1ed0-1edf */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1ee0-1eef */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,	/* 1ef0-1eff */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f00-1f0f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, 0, 0,	/* 1f10-1f1f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f20-1f2f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f30-1f3f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, 0, 0,	/* 1f40-1f4f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, -8, 0, -8, 0, -8,	/* 1f50-1f5f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f60-1f6f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f70-1f7f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f80-1f8f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f90-1f9f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1fa0-1faf */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -74, -74, -9, 0, 0, 0,	/* 1fb0-1fbf */
+-	0, 0, 0, 0, 0, 0, 0, 0, -86, -86, -86, -86, -9, 0, 0, 0,	/* 1fc0-1fcf */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -100, -100, 0, 0, 0, 0,	/* 1fd0-1fdf */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -112, -112, -7, 0, 0, 0,	/* 1fe0-1fef */
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-};
+-
+-/* Lower case range - Wide latin */
+-static signed char UniCaseRangeLff20[27] = {
+-	0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,	/* ff20-ff2f */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-};
+-
+-/*
+- * Lower Case Range
+- */
+-const struct UniCaseRange CifsUniLowerRange[] = {
+-	{0x0380, 0x03ab, UniCaseRangeL0380},
+-	{0x0400, 0x042f, UniCaseRangeL0400},
+-	{0x0490, 0x04cb, UniCaseRangeL0490},
+-	{0x1e00, 0x1ff7, UniCaseRangeL1e00},
+-	{0xff20, 0xff3a, UniCaseRangeLff20},
+-	{0}
+-};
+-#endif
+diff --git a/fs/smb/server/unicode.h b/fs/smb/server/unicode.h
+index 076f6034a789..b48c7b11b9c7 100644
+--- a/fs/smb/server/unicode.h
++++ b/fs/smb/server/unicode.h
+@@ -26,8 +26,6 @@
+ #include <linux/nls.h>
+ #include <linux/unicode.h>
+ 
+-#define  UNIUPR_NOLOWER		/* Example to not expand lower case tables */
 -
  /*
-  * UniStrcat:  Concatenate the second string to the first
-  *
+  * Windows maps these to the user defined 16 bit Unicode range since they are
+  * reserved symbols (along with \ and /), otherwise illegal to store
+@@ -57,11 +55,6 @@ extern signed char SmbUniUpperTable[512];
+ extern const struct UniCaseRange SmbUniUpperRange[];
+ #endif				/* UNIUPR_NOUPPER */
+ 
+-#ifndef UNIUPR_NOLOWER
+-extern signed char CifsUniLowerTable[512];
+-extern const struct UniCaseRange CifsUniLowerRange[];
+-#endif				/* UNIUPR_NOLOWER */
+-
+ #ifdef __KERNEL__
+ int smb_strtoUTF16(__le16 *to, const char *from, int len,
+ 		   const struct nls_table *codepage);
+@@ -314,45 +307,4 @@ static inline __le16 *UniStrupr(register __le16 *upin)
+ }
+ #endif				/* UNIUPR_NOUPPER */
+ 
+-#ifndef UNIUPR_NOLOWER
+-/*
+- * UniTolower:  Convert a unicode character to lower case
+- */
+-static inline wchar_t UniTolower(register wchar_t uc)
+-{
+-	register const struct UniCaseRange *rp;
+-
+-	if (uc < sizeof(CifsUniLowerTable)) {
+-		/* Latin characters */
+-		return uc + CifsUniLowerTable[uc];	/* Use base tables */
+-	}
+-
+-	rp = CifsUniLowerRange;	/* Use range tables */
+-	while (rp->start) {
+-		if (uc < rp->start)	/* Before start of range */
+-			return uc;	/* Uppercase = input */
+-		if (uc <= rp->end)	/* In range */
+-			return uc + rp->table[uc - rp->start];
+-		rp++;	/* Try next range */
+-	}
+-	return uc;		/* Past last range */
+-}
+-
+-/*
+- * UniStrlwr:  Lower case a unicode string
+- */
+-static inline wchar_t *UniStrlwr(register wchar_t *upin)
+-{
+-	register wchar_t *up;
+-
+-	up = upin;
+-	while (*up) {		/* For all characters */
+-		*up = UniTolower(*up);
+-		up++;
+-	}
+-	return upin;		/* Return input pointer */
+-}
+-
+-#endif
+-
+ #endif /* _CIFS_UNICODE_H */
+diff --git a/fs/smb/server/uniupr.h b/fs/smb/server/uniupr.h
+index 26583b776897..d09c585f20c9 100644
+--- a/fs/smb/server/uniupr.h
++++ b/fs/smb/server/uniupr.h
+@@ -136,133 +136,4 @@ const struct UniCaseRange SmbUniUpperRange[] = {
+ };
+ #endif
+ 
+-#ifndef UNIUPR_NOLOWER
+-/*
+- * Latin lower case
+- */
+-signed char CifsUniLowerTable[512] = {
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 000-00f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 010-01f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 020-02f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 030-03f */
+-	0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-					 32, 32, 32,	/* 040-04f */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 0, 0,
+-					 0, 0, 0,	/* 050-05f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 060-06f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 070-07f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 080-08f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 090-09f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0a0-0af */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0b0-0bf */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-				 32, 32, 32, 32,	/* 0c0-0cf */
+-	32, 32, 32, 32, 32, 32, 32, 0, 32, 32, 32, 32,
+-					 32, 32, 32, 0,	/* 0d0-0df */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0e0-0ef */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0f0-0ff */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 100-10f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 110-11f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 120-12f */
+-	0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1,	/* 130-13f */
+-	0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0,	/* 140-14f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 150-15f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 160-16f */
+-	1, 0, 1, 0, 1, 0, 1, 0, -121, 1, 0, 1, 0, 1, 0,
+-						 0,	/* 170-17f */
+-	0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 79,
+-						 0,	/* 180-18f */
+-	0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,	/* 190-19f */
+-	1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1,	/* 1a0-1af */
+-	0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0,	/* 1b0-1bf */
+-	0, 0, 0, 0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 1, 0, 1,	/* 1c0-1cf */
+-	0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0,	/* 1d0-1df */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e0-1ef */
+-	0, 2, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1f0-1ff */
+-};
+-
+-/* Lower case range - Greek */
+-static signed char UniCaseRangeL0380[44] = {
+-	0, 0, 0, 0, 0, 0, 38, 0, 37, 37, 37, 0, 64, 0, 63, 63,	/* 380-38f */
+-	0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-						 32, 32, 32,	/* 390-39f */
+-	32, 32, 0, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-};
+-
+-/* Lower case range - Cyrillic */
+-static signed char UniCaseRangeL0400[48] = {
+-	0, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80,
+-					 0, 80, 80,	/* 400-40f */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-					 32, 32, 32,	/* 410-41f */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-					 32, 32, 32,	/* 420-42f */
+-};
+-
+-/* Lower case range - Extended cyrillic */
+-static signed char UniCaseRangeL0490[60] = {
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 490-49f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 4a0-4af */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 4b0-4bf */
+-	0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1,
+-};
+-
+-/* Lower case range - Extended latin and greek */
+-static signed char UniCaseRangeL1e00[504] = {
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e00-1e0f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e10-1e1f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e20-1e2f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e30-1e3f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e40-1e4f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e50-1e5f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e60-1e6f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e70-1e7f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1e80-1e8f */
+-	1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,	/* 1e90-1e9f */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1ea0-1eaf */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1eb0-1ebf */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1ec0-1ecf */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1ed0-1edf */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,	/* 1ee0-1eef */
+-	1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,	/* 1ef0-1eff */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f00-1f0f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, 0, 0,	/* 1f10-1f1f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f20-1f2f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f30-1f3f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, 0, 0,	/* 1f40-1f4f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, -8, 0, -8, 0, -8,	/* 1f50-1f5f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f60-1f6f */
+-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f70-1f7f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f80-1f8f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1f90-1f9f */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -8, -8, -8, -8, -8, -8,	/* 1fa0-1faf */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -74, -74, -9, 0, 0, 0,	/* 1fb0-1fbf */
+-	0, 0, 0, 0, 0, 0, 0, 0, -86, -86, -86, -86, -9, 0,
+-							 0, 0,	/* 1fc0-1fcf */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -100, -100, 0, 0, 0, 0,	/* 1fd0-1fdf */
+-	0, 0, 0, 0, 0, 0, 0, 0, -8, -8, -112, -112, -7, 0,
+-							 0, 0,	/* 1fe0-1fef */
+-	0, 0, 0, 0, 0, 0, 0, 0,
+-};
+-
+-/* Lower case range - Wide latin */
+-static signed char UniCaseRangeLff20[27] = {
+-	0, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-							 32,	/* ff20-ff2f */
+-	32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+-};
+-
+-/*
+- * Lower Case Range
+- */
+-const struct UniCaseRange CifsUniLowerRange[] = {
+-	{0x0380, 0x03ab, UniCaseRangeL0380},
+-	{0x0400, 0x042f, UniCaseRangeL0400},
+-	{0x0490, 0x04cb, UniCaseRangeL0490},
+-	{0x1e00, 0x1ff7, UniCaseRangeL1e00},
+-	{0xff20, 0xff3a, UniCaseRangeLff20},
+-	{0}
+-};
+-#endif
+-
+ #endif /* __KSMBD_UNIUPR_H */
 -- 
 2.41.0
 
