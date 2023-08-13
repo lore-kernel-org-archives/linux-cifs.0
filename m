@@ -2,524 +2,98 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3224C001B0
-	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 00:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A79C001E0
+	for <linux-cifs@archiver.kernel.org>; Sun, 13 Aug 2023 00:57:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230178AbjHMAyZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 12 Aug 2023 20:54:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53756 "EHLO
+        id S229576AbjHMA5Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 12 Aug 2023 20:57:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbjHMAyR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Aug 2023 20:54:17 -0400
+        with ESMTP id S229494AbjHMA5Q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Aug 2023 20:57:16 -0400
 Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B43121712;
-        Sat, 12 Aug 2023 17:54:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40411706;
+        Sat, 12 Aug 2023 17:57:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-        ; s=bytemarkmx; h=Content-Transfer-Encoding:MIME-Version:References:
-        In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=kkctTGKHE1CYzCUMZUTYz0zRrmv8jhh2G+zf0185wvw=; b=GPOFbTcgw7Nncov5DVSI8e2GRq
-        S0ezgtc4p1F5aX+yssrBpfWoPlq7nPwnRIjsnMoDvdcQ5Ch4QYd682h+E4M239n71h/TdMJqn5BDZ
-        FAGe3smiy9qRGmAGqkoqq2DjIwM2aCTC5kBGOUexCwhS+LSt6I8LPOuTuM3lXd/UkG/O9SIRWHrAX
-        4QzC5wo7BBRtmt++IMijCMMqMVArpvG3QtMHYv6wMnacP/2Lc5KPGSYmVtzPbEDiCubL1IBX5nHlT
-        xWTjAshASaqTWqD90GY4mq6m1dfeG1vvB5NcWUUCpQuIgyGXqnAI6s+ogLgRPtXovLHO5yclijV5M
-        XLiZ5wFA==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-        by mx.treblig.org with esmtp (Exim 4.94.2)
-        (envelope-from <linux@treblig.org>)
-        id 1qUzMm-006b54-H5; Sun, 13 Aug 2023 00:53:59 +0000
-From:   linux@treblig.org
-To:     smfrench@gmail.com, dave.kleikamp@oracle.com, tom@talpey.com,
-        pc@manguebit.com
-Cc:     linkinjeon@kernel.org, linux-cifs@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        krisman@collabora.com, "Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH v4 3/4] fs/smb/client: Use common code in client
-Date:   Sun, 13 Aug 2023 01:53:43 +0100
-Message-ID: <20230813005344.112955-4-linux@treblig.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230813005344.112955-1-linux@treblig.org>
-References: <20230813005344.112955-1-linux@treblig.org>
+        ; s=bytemarkmx; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID
+        :Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID
+        :Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+        Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe
+        :List-Post:List-Owner:List-Archive;
+        bh=GwNvcGCEu2wb+suTa9T22xUCaBCAWRmXtJQNZV9bEc8=; b=rGyupDRGsS+yvbfuxEnQ4FQ3rX
+        zs01jy5w5+/8V7nuNCZvI3bh7Av2rmpnD3rRwR9n+3WkdIGolhEmE+gpoFjqzdg5Vt9TqG+DgAojQ
+        K2jTugw69dKO1AFb/SaFVPx9dJKOwrDVo8EmRbyWpiZmtUwxL9aAL+su2RMoOTLnbC5j9rrGRN3H+
+        LifIzeBt8t+BeRH7fOUFXxBY+Xo9tPILUb7J6L7a6CjDsA4Sd+1nagYguZVp5jQkpt744z8WTgG+/
+        W4EzRhRdszNL/dUqKkjQ2K1OOAUa4RIYxo9o+KPPYkD8PpaIHAtuGpKUREOkquiLEUqKWvH6PLd4j
+        U5oCWvrg==;
+Received: from dg by mx.treblig.org with local (Exim 4.94.2)
+        (envelope-from <dg@treblig.org>)
+        id 1qUzPp-006b9Z-V5; Sun, 13 Aug 2023 00:57:09 +0000
+Date:   Sun, 13 Aug 2023 00:57:09 +0000
+From:   "Dr. David Alan Gilbert" <dave@treblig.org>
+To:     Paulo Alcantara <pc@manguebit.com>, smfrench@gmail.com
+Cc:     Tom Talpey <tom@talpey.com>,
+        Dave Kleikamp <dave.kleikamp@oracle.com>,
+        linkinjeon@kernel.org, shaggy@kernel.org,
+        linux-cifs@vger.kernel.org, krisman@collabora.com,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
+Message-ID: <ZNgqZRZNgN8JdiL4@gallifrey>
+References: <CAH2r5mvrhr52hXFv87O9O=Qw45AXRXr0NQAsTk4Wj-6s19-2bA@mail.gmail.com>
+ <CAH2r5mss4RsEF1b6gJo8LFWsN9-YBSEP6GV7axsNhX7ihj5CqA@mail.gmail.com>
+ <ZLhchajZaWEVM6D7@gallifrey>
+ <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
+ <d1f7fbe9-8fe2-e3e3-d6ff-1544204202ff@talpey.com>
+ <ZLnJzUynpTBvZGtA@gallifrey>
+ <f8f4a2c5-05d3-0b2d-688f-b3274a98fc73@talpey.com>
+ <ZLrxYzGXJzsLmGDs@gallifrey>
+ <16f50dff126af9b20f9b99ca056ad5fa.pc@manguebit.com>
+ <ZLr0wFMKhEaannov@gallifrey>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <ZLr0wFMKhEaannov@gallifrey>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/5.10.0-23-amd64 (x86_64)
+X-Uptime: 00:57:00 up 37 days, 10:28,  1 user,  load average: 0.01, 0.02, 0.00
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+* Dr. David Alan Gilbert (dave@treblig.org) wrote:
+> * Paulo Alcantara (pc@manguebit.com) wrote:
+> > "Dr. David Alan Gilbert" <linux@treblig.org> writes:
+> > 
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/scripts/checkpatch.pl#n3737
+> > > 	if ($realfile =~ /\.(h|s|S)$/) {
+> > > 		$comment = '/*';
+> > > 	} elsif ($realfile =~ /\.(c|rs|dts|dtsi)$/) {
+> > > 		$comment = '//';
+> > >
+> > > I don't get where that idea came from.
+> > 
+> > Check Documentation/process/license-rules.rst.
+> 
+> Oh, that's a painful history!
+> Hmm that landed just after I posted a v3 (of just this patch)
+> 
+> Steve: Your call, do you want me to post a v4 with that comment
+> back and but with the copyright lineas as in v3?
 
-Now we've got the common code, use it for the client as well.
-Note there's a change here where we're using the server version of
-UniStrcat now which had different types (__le16 vs wchar_t) but
-it's not interpreting the value other than checking for 0.
+I've posted the v4.
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- fs/smb/client/Kconfig        |   1 +
- fs/smb/client/cifs_unicode.c |   1 -
- fs/smb/client/cifs_unicode.h | 280 +----------------------------------
- fs/smb/client/cifs_uniupr.h  | 123 ---------------
- 4 files changed, 2 insertions(+), 403 deletions(-)
- delete mode 100644 fs/smb/client/cifs_uniupr.h
+Dave
 
-diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
-index 4c0d53bf931a..2927bd174a88 100644
---- a/fs/smb/client/Kconfig
-+++ b/fs/smb/client/Kconfig
-@@ -3,6 +3,7 @@ config CIFS
- 	tristate "SMB3 and CIFS support (advanced network filesystem)"
- 	depends on INET
- 	select NLS
-+	select NLS_UCS2_UTILS
- 	select CRYPTO
- 	select CRYPTO_MD5
- 	select CRYPTO_SHA256
-diff --git a/fs/smb/client/cifs_unicode.c b/fs/smb/client/cifs_unicode.c
-index e7582dd79179..79d99a913944 100644
---- a/fs/smb/client/cifs_unicode.c
-+++ b/fs/smb/client/cifs_unicode.c
-@@ -8,7 +8,6 @@
- #include <linux/slab.h>
- #include "cifs_fs_sb.h"
- #include "cifs_unicode.h"
--#include "cifs_uniupr.h"
- #include "cifspdu.h"
- #include "cifsglob.h"
- #include "cifs_debug.h"
-diff --git a/fs/smb/client/cifs_unicode.h b/fs/smb/client/cifs_unicode.h
-index 33b651def482..e137a0dfbbe9 100644
---- a/fs/smb/client/cifs_unicode.h
-+++ b/fs/smb/client/cifs_unicode.h
-@@ -21,19 +21,7 @@
- #include <asm/byteorder.h>
- #include <linux/types.h>
- #include <linux/nls.h>
--
--/*
-- * Windows maps these to the user defined 16 bit Unicode range since they are
-- * reserved symbols (along with \ and /), otherwise illegal to store
-- * in filenames in NTFS
-- */
--#define UNI_ASTERISK    (__u16) ('*' + 0xF000)
--#define UNI_QUESTION    (__u16) ('?' + 0xF000)
--#define UNI_COLON       (__u16) (':' + 0xF000)
--#define UNI_GRTRTHAN    (__u16) ('>' + 0xF000)
--#define UNI_LESSTHAN    (__u16) ('<' + 0xF000)
--#define UNI_PIPE        (__u16) ('|' + 0xF000)
--#define UNI_SLASH       (__u16) ('\\' + 0xF000)
-+#include "../../nls/nls_ucs2_utils.h"
- 
- /*
-  * Macs use an older "SFM" mapping of the symbols above. Fortunately it does
-@@ -66,22 +54,6 @@
- #define SFM_MAP_UNI_RSVD	1
- #define SFU_MAP_UNI_RSVD	2
- 
--/* Just define what we want from uniupr.h.  We don't want to define the tables
-- * in each source file.
-- */
--#ifndef	UNICASERANGE_DEFINED
--struct UniCaseRange {
--	wchar_t start;
--	wchar_t end;
--	signed char *table;
--};
--#endif				/* UNICASERANGE_DEFINED */
--
--#ifndef UNIUPR_NOUPPER
--extern signed char CifsUniUpperTable[512];
--extern const struct UniCaseRange CifsUniUpperRange[];
--#endif				/* UNIUPR_NOUPPER */
--
- #ifdef __KERNEL__
- int cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
- 		    const struct nls_table *cp, int map_type);
-@@ -101,254 +73,4 @@ extern __le16 *cifs_strndup_to_utf16(const char *src, const int maxlen,
- 
- wchar_t cifs_toupper(wchar_t in);
- 
--/*
-- * UniStrcat:  Concatenate the second string to the first
-- *
-- * Returns:
-- *     Address of the first string
-- */
--static inline __le16 *
--UniStrcat(__le16 *ucs1, const __le16 *ucs2)
--{
--	__le16 *anchor = ucs1;	/* save a pointer to start of ucs1 */
--
--	while (*ucs1++) ;	/* To end of first string */
--	ucs1--;			/* Return to the null */
--	while ((*ucs1++ = *ucs2++)) ;	/* copy string 2 over */
--	return anchor;
--}
--
--/*
-- * UniStrchr:  Find a character in a string
-- *
-- * Returns:
-- *     Address of first occurrence of character in string
-- *     or NULL if the character is not in the string
-- */
--static inline wchar_t *
--UniStrchr(const wchar_t *ucs, wchar_t uc)
--{
--	while ((*ucs != uc) && *ucs)
--		ucs++;
--
--	if (*ucs == uc)
--		return (wchar_t *) ucs;
--	return NULL;
--}
--
--/*
-- * UniStrcmp:  Compare two strings
-- *
-- * Returns:
-- *     < 0:  First string is less than second
-- *     = 0:  Strings are equal
-- *     > 0:  First string is greater than second
-- */
--static inline int
--UniStrcmp(const wchar_t *ucs1, const wchar_t *ucs2)
--{
--	while ((*ucs1 == *ucs2) && *ucs1) {
--		ucs1++;
--		ucs2++;
--	}
--	return (int) *ucs1 - (int) *ucs2;
--}
--
--/*
-- * UniStrcpy:  Copy a string
-- */
--static inline wchar_t *
--UniStrcpy(wchar_t *ucs1, const wchar_t *ucs2)
--{
--	wchar_t *anchor = ucs1;	/* save the start of result string */
--
--	while ((*ucs1++ = *ucs2++)) ;
--	return anchor;
--}
--
--/*
-- * UniStrlen:  Return the length of a string (in 16 bit Unicode chars not bytes)
-- */
--static inline size_t
--UniStrlen(const wchar_t *ucs1)
--{
--	int i = 0;
--
--	while (*ucs1++)
--		i++;
--	return i;
--}
--
--/*
-- * UniStrnlen:  Return the length (in 16 bit Unicode chars not bytes) of a
-- *		string (length limited)
-- */
--static inline size_t
--UniStrnlen(const wchar_t *ucs1, int maxlen)
--{
--	int i = 0;
--
--	while (*ucs1++) {
--		i++;
--		if (i >= maxlen)
--			break;
--	}
--	return i;
--}
--
--/*
-- * UniStrncat:  Concatenate length limited string
-- */
--static inline wchar_t *
--UniStrncat(wchar_t *ucs1, const wchar_t *ucs2, size_t n)
--{
--	wchar_t *anchor = ucs1;	/* save pointer to string 1 */
--
--	while (*ucs1++) ;
--	ucs1--;			/* point to null terminator of s1 */
--	while (n-- && (*ucs1 = *ucs2)) {	/* copy s2 after s1 */
--		ucs1++;
--		ucs2++;
--	}
--	*ucs1 = 0;		/* Null terminate the result */
--	return (anchor);
--}
--
--/*
-- * UniStrncmp:  Compare length limited string
-- */
--static inline int
--UniStrncmp(const wchar_t *ucs1, const wchar_t *ucs2, size_t n)
--{
--	if (!n)
--		return 0;	/* Null strings are equal */
--	while ((*ucs1 == *ucs2) && *ucs1 && --n) {
--		ucs1++;
--		ucs2++;
--	}
--	return (int) *ucs1 - (int) *ucs2;
--}
--
--/*
-- * UniStrncmp_le:  Compare length limited string - native to little-endian
-- */
--static inline int
--UniStrncmp_le(const wchar_t *ucs1, const wchar_t *ucs2, size_t n)
--{
--	if (!n)
--		return 0;	/* Null strings are equal */
--	while ((*ucs1 == __le16_to_cpu(*ucs2)) && *ucs1 && --n) {
--		ucs1++;
--		ucs2++;
--	}
--	return (int) *ucs1 - (int) __le16_to_cpu(*ucs2);
--}
--
--/*
-- * UniStrncpy:  Copy length limited string with pad
-- */
--static inline wchar_t *
--UniStrncpy(wchar_t *ucs1, const wchar_t *ucs2, size_t n)
--{
--	wchar_t *anchor = ucs1;
--
--	while (n-- && *ucs2)	/* Copy the strings */
--		*ucs1++ = *ucs2++;
--
--	n++;
--	while (n--)		/* Pad with nulls */
--		*ucs1++ = 0;
--	return anchor;
--}
--
--/*
-- * UniStrncpy_le:  Copy length limited string with pad to little-endian
-- */
--static inline wchar_t *
--UniStrncpy_le(wchar_t *ucs1, const wchar_t *ucs2, size_t n)
--{
--	wchar_t *anchor = ucs1;
--
--	while (n-- && *ucs2)	/* Copy the strings */
--		*ucs1++ = __le16_to_cpu(*ucs2++);
--
--	n++;
--	while (n--)		/* Pad with nulls */
--		*ucs1++ = 0;
--	return anchor;
--}
--
--/*
-- * UniStrstr:  Find a string in a string
-- *
-- * Returns:
-- *     Address of first match found
-- *     NULL if no matching string is found
-- */
--static inline wchar_t *
--UniStrstr(const wchar_t *ucs1, const wchar_t *ucs2)
--{
--	const wchar_t *anchor1 = ucs1;
--	const wchar_t *anchor2 = ucs2;
--
--	while (*ucs1) {
--		if (*ucs1 == *ucs2) {
--			/* Partial match found */
--			ucs1++;
--			ucs2++;
--		} else {
--			if (!*ucs2)	/* Match found */
--				return (wchar_t *) anchor1;
--			ucs1 = ++anchor1;	/* No match */
--			ucs2 = anchor2;
--		}
--	}
--
--	if (!*ucs2)		/* Both end together */
--		return (wchar_t *) anchor1;	/* Match found */
--	return NULL;		/* No match */
--}
--
--#ifndef UNIUPR_NOUPPER
--/*
-- * UniToupper:  Convert a unicode character to upper case
-- */
--static inline wchar_t
--UniToupper(register wchar_t uc)
--{
--	register const struct UniCaseRange *rp;
--
--	if (uc < sizeof(CifsUniUpperTable)) {
--		/* Latin characters */
--		return uc + CifsUniUpperTable[uc];	/* Use base tables */
--	} else {
--		rp = CifsUniUpperRange;	/* Use range tables */
--		while (rp->start) {
--			if (uc < rp->start)	/* Before start of range */
--				return uc;	/* Uppercase = input */
--			if (uc <= rp->end)	/* In range */
--				return uc + rp->table[uc - rp->start];
--			rp++;	/* Try next range */
--		}
--	}
--	return uc;		/* Past last range */
--}
--
--/*
-- * UniStrupr:  Upper case a unicode string
-- */
--static inline __le16 *
--UniStrupr(register __le16 *upin)
--{
--	register __le16 *up;
--
--	up = upin;
--	while (*up) {		/* For all characters */
--		*up = cpu_to_le16(UniToupper(le16_to_cpu(*up)));
--		up++;
--	}
--	return upin;		/* Return input pointer */
--}
--#endif				/* UNIUPR_NOUPPER */
--
- #endif /* _CIFS_UNICODE_H */
-diff --git a/fs/smb/client/cifs_uniupr.h b/fs/smb/client/cifs_uniupr.h
-deleted file mode 100644
-index b1d51d0da4fe..000000000000
---- a/fs/smb/client/cifs_uniupr.h
-+++ /dev/null
-@@ -1,123 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-or-later */
--/*
-- *   Copyright (c) International Business Machines  Corp., 2000,2002
-- *
-- * uniupr.h - Unicode compressed case ranges
--*/
--
--#ifndef UNIUPR_NOUPPER
--/*
-- * Latin upper case
-- */
--signed char CifsUniUpperTable[512] = {
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 000-00f */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 010-01f */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 020-02f */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 030-03f */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 040-04f */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 050-05f */
--	0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32,	/* 060-06f */
--	-32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, 0, 0, 0, 0, 0,	/* 070-07f */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 080-08f */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 090-09f */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0a0-0af */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0b0-0bf */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0c0-0cf */
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 0d0-0df */
--	-32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32,	/* 0e0-0ef */
--	-32, -32, -32, -32, -32, -32, -32, 0, -32, -32, -32, -32, -32, -32, -32, 121,	/* 0f0-0ff */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 100-10f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 110-11f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 120-12f */
--	0, 0, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, 0, -1, 0,	/* 130-13f */
--	-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, 0, -1,	/* 140-14f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 150-15f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 160-16f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, 0, -1, 0, -1, 0, -1, 0,	/* 170-17f */
--	0, 0, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0,	/* 180-18f */
--	0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,	/* 190-19f */
--	0, -1, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0,	/* 1a0-1af */
--	-1, 0, 0, 0, -1, 0, -1, 0, 0, -1, 0, 0, 0, -1, 0, 0,	/* 1b0-1bf */
--	0, 0, 0, 0, 0, -1, -2, 0, -1, -2, 0, -1, -2, 0, -1, 0,	/* 1c0-1cf */
--	-1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, -79, 0, -1, /* 1d0-1df */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e0-1ef */
--	0, 0, -1, -2, 0, -1, 0, 0, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1f0-1ff */
--};
--
--/* Upper case range - Greek */
--static signed char UniCaseRangeU03a0[47] = {
--	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -38, -37, -37, -37,	/* 3a0-3af */
--	0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32,	/* 3b0-3bf */
--	-32, -32, -31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -64,
--	-63, -63,
--};
--
--/* Upper case range - Cyrillic */
--static signed char UniCaseRangeU0430[48] = {
--	-32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32,	/* 430-43f */
--	-32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32,	/* 440-44f */
--	0, -80, -80, -80, -80, -80, -80, -80, -80, -80, -80, -80, -80, 0, -80, -80,	/* 450-45f */
--};
--
--/* Upper case range - Extended cyrillic */
--static signed char UniCaseRangeU0490[61] = {
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 490-49f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 4a0-4af */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 4b0-4bf */
--	0, 0, -1, 0, -1, 0, 0, 0, -1, 0, 0, 0, -1,
--};
--
--/* Upper case range - Extended latin and greek */
--static signed char UniCaseRangeU1e00[509] = {
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e00-1e0f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e10-1e1f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e20-1e2f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e30-1e3f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e40-1e4f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e50-1e5f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e60-1e6f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e70-1e7f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1e80-1e8f */
--	0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, -59, 0, -1, 0, -1,	/* 1e90-1e9f */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1ea0-1eaf */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1eb0-1ebf */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1ec0-1ecf */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1ed0-1edf */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1,	/* 1ee0-1eef */
--	0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0,	/* 1ef0-1eff */
--	8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f00-1f0f */
--	8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f10-1f1f */
--	8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f20-1f2f */
--	8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f30-1f3f */
--	8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f40-1f4f */
--	0, 8, 0, 8, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f50-1f5f */
--	8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f60-1f6f */
--	74, 74, 86, 86, 86, 86, 100, 100, 0, 0, 112, 112, 126, 126, 0, 0,	/* 1f70-1f7f */
--	8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f80-1f8f */
--	8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1f90-1f9f */
--	8, 8, 8, 8, 8, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1fa0-1faf */
--	8, 8, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1fb0-1fbf */
--	0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1fc0-1fcf */
--	8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1fd0-1fdf */
--	8, 8, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,	/* 1fe0-1fef */
--	0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0,
--};
--
--/* Upper case range - Wide latin */
--static signed char UniCaseRangeUff40[27] = {
--	0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32,	/* ff40-ff4f */
--	-32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32,
--};
--
--/*
-- * Upper Case Range
-- */
--const struct UniCaseRange CifsUniUpperRange[] = {
--	{0x03a0, 0x03ce, UniCaseRangeU03a0},
--	{0x0430, 0x045f, UniCaseRangeU0430},
--	{0x0490, 0x04cc, UniCaseRangeU0490},
--	{0x1e00, 0x1ffc, UniCaseRangeU1e00},
--	{0xff40, 0xff5a, UniCaseRangeUff40},
--	{0}
--};
--#endif
+> Dave
+> 
+> -- 
+>  -----Open up your eyes, open up your mind, open up your code -------   
+> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+> \        dave @ treblig.org |                               | In Hex /
+>  \ _________________________|_____ http://www.treblig.org   |_______/
 -- 
-2.41.0
-
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
