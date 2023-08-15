@@ -2,82 +2,95 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A31C001B0
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Aug 2023 18:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 463CCC0015E
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Aug 2023 20:00:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231969AbjHOSlP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Aug 2023 14:41:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42592 "EHLO
+        id S240154AbjHOUAL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Aug 2023 16:00:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239282AbjHOSlE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Aug 2023 14:41:04 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31EAF1BF7
-        for <linux-cifs@vger.kernel.org>; Tue, 15 Aug 2023 11:40:37 -0700 (PDT)
-Message-ID: <2f7522c01a45f9052f423869040258ba.pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1692124835;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kJjeneACakyjixftgTs3skIu5CB0b3rHbi9cca9HEnA=;
-        b=FJZrpg01mrmsoPHkhHAzaxo7ZZ55i2jvKk8EBea5OB1Cs9dZR1rEnUQ9wi6LPFJBGUw2UV
-        qzTNWHJefPmnrYbNk5hPeEaXR5iojvWA6SsP8lnHJRuQDlR4SIcFNv23uhmU/9EwJUcjF4
-        Yl/YfPlXTmPqco74Oy5eAu2j1Dfw/eWsnRorHz6zDU78VYQ2qLJJ0Y53glF9r8UjGa4KAw
-        xVR1qE13dfMrFBGTuEtho0moZYXkCzUraMbo8neevW1vAoWd0y8CLFKZKRRvgveP6rMjgz
-        kxRWeJ5IGB1j/ZmMFcJnlOg20RB4R+0Ip6pDTtohUZnSoThY+SdFOrc4LuCSrg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1692124835;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kJjeneACakyjixftgTs3skIu5CB0b3rHbi9cca9HEnA=;
-        b=sgEX+zMm0KwH5JY6kJgT6JypLxG8sTkznUdSMrwnfUCaGP1xTGHOP9NCtS7QEUa9ysWs/G
-        eMkpfm+idxNpqwLrb6hswiFK5FVm3lvnil0Kqogs1VjIGy4attoobcwjdlwBI2qCvOwZog
-        wWc5c9uoG/93WxGNxPZx+heYgB/hq914XiFswmtTuttvv17i1KikCisEAPDcR8vUPMA5wc
-        N6fab/v2FGj4GEPFsTUwrK+I0XONhI7gIuLztzYtGtlz9lyur+bQCfoBl3uh3zQw87WHrG
-        t4CUhZ8VpcVfXn4a4j+xYdYfWgRI5MPSydj4o9F9JrNceITChMTc1VqqcCJ+dQ==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1692124835; a=rsa-sha256;
-        cv=none;
-        b=P7ahnPAeRIxx8jwOwFDl4P4LAVclIrqIsNrDQd9Dbu40taISzxiwSS3jHpGXNj63wCNqek
-        UIJoUJ+2VFcCQVxwOZEbU3Rk38rx/EFd+pcT4UCH2dxED0G8V2eQyT3GDuC8kkggJ3u+H4
-        lQi4q2Gb8n+yBz076+VBcvrk50DzminobmKIXq+yLpckXuTrRcGrZ6thDpCV5/qoE/bjux
-        NE8hYVfRAaQiVlZvYuEtlsfSEM4ZBt5/pfipOYDBSH4uyfuVgYA7qDWV7CCblzHDIRWJ6w
-        hIGtX/hFRzqQJHacVAZTu0SnspOd4/zvsBLejGAcBb3+KrDExvFZwgQTYKTXKQ==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     Scott Mayhew <smayhew@redhat.com>,
-        Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>
-Cc:     Steve French <stfrench@microsoft.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        Scott Mayhew <smayhew@redhat.com>
-Subject: Re: [PATCH] smb: client: fix null auth
-In-Reply-To: <20230815-fix-cifs-null-auth-v1-1-3cb785216d97@redhat.com>
-References: <20230815-fix-cifs-null-auth-v1-1-3cb785216d97@redhat.com>
-Date:   Tue, 15 Aug 2023 15:40:31 -0300
+        with ESMTP id S240089AbjHOT7m (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Aug 2023 15:59:42 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6A983;
+        Tue, 15 Aug 2023 12:59:40 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b9db1de50cso87702511fa.3;
+        Tue, 15 Aug 2023 12:59:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692129579; x=1692734379;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WDEeQ3eCIpybg5uj/Oi3ysP7TFHjBsBg7ziPx4BTTs4=;
+        b=iF0O5NPLl12GBWr6ulYkKxtXRAfw0CR5RaHzY3ChsLWDMn2eOjer+7LVC9ekDqNCyk
+         t830Eh1mQTtCy22nWxcS+GyDFiUGZ82Sq8pwQFB0c9sQbJMWDinn2gerTaEt1lJ2sXNm
+         DpGa2p+oY03rCtaZsaXGYdh8jatFNyeGbYH9EohauMXyoSxSBCnJHnOB3E5+fP2XC6z8
+         iXMCH1d/vSRkW1FItZ/4DjjQ9QfHhq2u/zV+3deGvRY1mcwsq/o8AuQZqP3zm2V0b+sw
+         Agahk8HGiZ2EJB4R34bcBoUDhHy4At/xoogWPfjUum4JYsond5NrOI3uAzpHctSSHryl
+         AdQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692129579; x=1692734379;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WDEeQ3eCIpybg5uj/Oi3ysP7TFHjBsBg7ziPx4BTTs4=;
+        b=G6KkMQKdaRNw1C24XknaFrGKOQrkYLclo0WA3HBa/fDXrzjbGQnFoWyb6/tO9Pb1zr
+         d9n7kIIhLmigpM7JV/4I8kEAkMwzWkBZ6QwFUsaS6XFnFcl3TWkSMfkFOvF4dfMCso4P
+         kDDgBgRicsDYI638sZBgqe8axODlnC2wUUyD9I5F7rxGWRuYROYYjkG1ydkYTsI5hBQQ
+         yaVXfSHRwa7fihC815b2ehggHjk3jVJnihtQ9C72ZrrPo4Al1Ogx5/9qEOB3Ekdl/blQ
+         89b1f6p453xXtT4l9ueLY2/tjj/i4D+w5y1j37lOy+ry38rjJZJuqcf/4Xgs7wDNXEq0
+         X2yg==
+X-Gm-Message-State: AOJu0YxuI7bjUraI+VnhBYsDjTn5mLUfqDFMnM//p6FxOSRR+d2OcXre
+        lbrVl8mTVAtmsXvZqDZlBvLOfAk8OFR8XYnJtEif1Jbauqj21w==
+X-Google-Smtp-Source: AGHT+IFw+oFbGPiiCcLVQSBjQ2DXiP4pctBQ++B+FVrG2nLkX5vIXlNO2sH0peC3UxM0C+mCrvXyuh5KfSs43zibb+Y=
+X-Received: by 2002:a2e:730c:0:b0:2b9:eeaa:1074 with SMTP id
+ o12-20020a2e730c000000b002b9eeaa1074mr9261552ljc.35.1692129578416; Tue, 15
+ Aug 2023 12:59:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 15 Aug 2023 14:59:27 -0500
+Message-ID: <CAH2r5mt9bY7hGagfTPS_uK9KnbTQVsWaO9JciJ6XekLb36Zusg@mail.gmail.com>
+Subject: [GIT PULL] SMB3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Scott Mayhew <smayhew@redhat.com> writes:
+Please pull the following changes since commit
+f6a691685962637e53371788fe2a72b171aedc68:
 
-> Commit abdb1742a312 removed code that clears ctx->username when
-> sec=none, so attempting to mount with '-o sec=none' now fails with
-> -EACCES.  Fix it by adding that logic to the parsing of the 'sec'
-> option, as well as checking if the mount is using null auth before
-> setting the username when parsing the 'user' option.
->
-> Fixes: abdb1742a312 ("cifs: get rid of mount options string parsing")
-> Signed-off-by: Scott Mayhew <smayhew@redhat.com>
-> ---
->  fs/smb/client/fs_context.c | 4 ++++
->  1 file changed, 4 insertions(+)
+  Merge tag '6.5-rc4-smb3-client-fix' of
+git://git.samba.org/sfrench/cifs-2.6 (2023-08-05 13:44:06 -0700)
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc6-smb3-client-fixes
+
+for you to fetch changes up to 7b38f6ddc97bf572c3422d3175e8678dd95502fa:
+
+  smb3: display network namespace in debug information (2023-08-14
+08:41:29 -0500)
+
+----------------------------------------------------------------
+Three smb client fixes, all for stable
+- fix for oops in unmount race with lease break of deferred close
+- debugging improvement for reconnect
+- fix for fscache deadlock (folio_wait_bit_common hang)
+----------------------------------------------------------------
+Russell Harmon via samba-technical (1):
+      cifs: Release folio lock on fscache read hit.
+
+Steve French (2):
+      cifs: fix potential oops in cifs_oplock_break
+      smb3: display network namespace in debug information
+
+ fs/smb/client/cifs_debug.c | 10 ++++++++++
+ fs/smb/client/file.c       | 25 +++++++++++++++++--------
+ 2 files changed, 27 insertions(+), 8 deletions(-)
+
+
+--
+Thanks,
+
+Steve
