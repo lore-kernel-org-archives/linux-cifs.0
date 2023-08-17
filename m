@@ -2,59 +2,58 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB49C3065C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E32C3DA41
 	for <linux-cifs@archiver.kernel.org>; Thu, 17 Aug 2023 15:36:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347286AbjHQPgO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Aug 2023 11:36:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39028 "EHLO
+        id S1352348AbjHQPgQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Aug 2023 11:36:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352650AbjHQPfr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Aug 2023 11:35:47 -0400
+        with ESMTP id S1353231AbjHQPfx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Aug 2023 11:35:53 -0400
 Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40BBA30C5
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Aug 2023 08:35:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A5F2D6D
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Aug 2023 08:35:52 -0700 (PDT)
 From:   Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1692286544;
+        s=dkim; t=1692286551;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j2C3J9Tk0XRUlrb5yZy7WpiLI7CrUDLjmpi4rmr4xPI=;
-        b=DJPvTKNwtno4B6i0+qgZvFwDmC/63tYPzPXyVX3xHB+cmpbZiYbtLP0+8twelxc4f4Ab1p
-        +5zqeaqvlN2yf8mlt3VbmcJJkWEIQxoKdFERakstm56LcDqQl3Hkyx4D4p6J5uIrJfWsSr
-        iiQv849wxh7ocTExscu4zUdAfSwQpJymWizB94HXQyPMVLH6zVVcIDuZ9CwpZnSWqDPCCM
-        opor6+QrQ3ffnnC4mVM8h87OMzXVQll+opkwudL++usE/IaQWb88Y0Z/irC/tWMbgy+T46
-        7C7dV0tGqrHFzg4VPMoabO0HbpPgB5nNo09hT1pALiZlalDgVZQCmJ0DbD8ICA==
+        bh=8NoM8oARTlwjkGW7XsrodOIMPlYfPQYSyAhtX9rK1K4=;
+        b=aM+Mnl6bYzi83AD66h+m+QX9Zg+fj5EBtYJTQtcaNKl67YBTk/PIgw0WEDA5DBuB4lKGlR
+        0HEpMjZtY9Pc02+ar1204JGYXCakbbOGtnFiDhIjnQgbGgfRYg5DkbxSjF855ogLhsH4Vs
+        6CTQe1OsJm8smlawPfSHUz4tI2znDUzUVR5bkTiXUcxG3VxFvF2IDY9N6+3zVXhAyyBxPV
+        2A/dn3YbQrTLkJFJ8ehR0wfkUkQYu4mrfUbss1dcT6kBJcOl7CJ8g/QhVqldQeB3ybBcXj
+        bbFJ6bC3Kvw1FwM6FnuPicFm7HDtSPsi7XqRdKxOHc7reWZel7ENEVtZPu30ig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1692286544;
+        s=dkim; t=1692286551;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j2C3J9Tk0XRUlrb5yZy7WpiLI7CrUDLjmpi4rmr4xPI=;
-        b=BOQKOaB0r8h3vF1fQhupDzdMI9dTAoecoycy+ntCLhcedmDtbfqMBp+gATeo1RKEQMEunp
-        yCIH5lZougHo811Q+5s4aNkKOTAhn3Xc0mdJ1yj8qG0EFLpFsi/864L3ZSaXKMWnxVeqdb
-        d+AqvrtoCc4Cr5UOA254icag8+AL6ok8ktkHsiWNiq9uHxQOMYt/Wz9hS3mCHoxvqfGNLY
-        OO9FLMBmkMvDUYMJoz+/7yNOmIQ1gSKbhURgCIM5oxyumQQuGoR17sKEHKzZfpUyXZXnIz
-        5FPU2blrWgocMtvhuNVOCtD+hmpBg09L50YlHxoeZm9lVRlekVPHjtu8mR0wUA==
+        bh=8NoM8oARTlwjkGW7XsrodOIMPlYfPQYSyAhtX9rK1K4=;
+        b=BMY2Gsvi3aS0tiaIccAWwB5tuEpVTFD/JqEv/IVvzh01o2427a6X1Qkbf3d54UQNLHen84
+        +NlCWJa/qTrq1UlbJnRs+A3F1ctht7m6B8Vo0VN6wcBTqUi8JT8LD8mU8NL9gg26uKrXLG
+        9jnYL3bAnH8Tgi+14qZeA0sln5k4TknVTtCiRhsW6OHFjkDhCv7202tCwVNAyiZ0obR83s
+        jaAsg3Azz8qMPkeAaeCc1MLDSfaEJxac386jr8BTuJ5Ep3mPI286keETc2WA8GfCBqTmuo
+        3BZSSA/Q8R9IZSCunjGaCdYrSC5WclQf4jykyIEkvVMuYLsgXuK7l0R65m4TDg==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1692286544; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1692286551; a=rsa-sha256;
         cv=none;
-        b=NIa1vJRTOn+sD2URC6aaccUsSlOCOWvxjvNVPKgnUxBLhJyYdelQRI4UrnxxK/v+5ff699
-        AO2pTBKOXdQ/HOoP12t0d1glEmbuaEKM2nSZXxtUqtTyEUUOVFyrfc30bdP90hhfremdIo
-        geWToSQEYxEowq4qJHTdBhXu6U6VzEf4zfPppXEAJ7/XkX/n7e9K1oTL02kRNIRzT0Y5U4
-        6OdlaUfmrG7fsnMe0cbDBsDkHez1uPkR6RFUQpkkk/iOeZIbwqycHCodXLiJ65/TZ2rZ98
-        4Z0KZUxc4QfmCPh6gSRUW9PPFwku2F3JcI92qZ58SH7mVLItzKyQS1bWq7SLVg==
+        b=h0hkJwfoC/lMdPzXw6cayiviB+hIeRtoUZ9eZNOK3PwC2Lw6TpxR1WNjJQ+Bg9pcJsNdI5
+        6W/rN8Pe8Gmf1AwvIg8hmW9omfcufGZC3cvaGDHqsfD0bMwcvUgiaIiZNeIi4SPI2JJD6R
+        BrdxtHnuRbaWFBGYaRRMvcFEBJveb3fMy9NaO3pCedNpFz+eKjTdFaALGsetwllLfUt7GM
+        d3mcL3gaspfzjY3kA+e0h3tNpHr5QJ1qBarroFlalh+0Ykyn36iJoGSCt16RN2c0lo3gFN
+        VLTB/U427PY9lPOSNTrtfXaA2KHc5fLeGigHFqnY8pzFBFnboWIJoDGNag02Qw==
 To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH 12/17] smb: client: reduce stack usage in cifs_try_adding_channels()
-Date:   Thu, 17 Aug 2023 12:34:10 -0300
-Message-ID: <20230817153416.28083-13-pc@manguebit.com>
+Cc:     linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH 16/17] smb: client: reduce stack usage in smb2_query_info_compound()
+Date:   Thu, 17 Aug 2023 12:34:14 -0300
+Message-ID: <20230817153416.28083-17-pc@manguebit.com>
 In-Reply-To: <20230817153416.28083-1-pc@manguebit.com>
 References: <20230817153416.28083-1-pc@manguebit.com>
 MIME-Version: 1.0
@@ -65,139 +64,106 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 Clang warns about exceeded stack frame size
 
-  fs/smb/client/sess.c:160:5: warning: stack frame size (1368) exceeds
-  limit (1024) in 'cifs_try_adding_channels' [-Wframe-larger-than]
+  fs/smb/client/smb2ops.c:2521:1: warning: stack frame size (1336)
+  exceeds limit (1024) in 'smb2_query_info_compound'
+  [-Wframe-larger-than]
 
-It turns out that cifs_ses_add_channel() got inlined into
-cifs_try_adding_channels() which had a stack-allocated variable @ctx
-of 624 bytes in size.  Fix this by making it heap-allocated.
+Fix this by allocating a structure that will hold most of the large
+variables.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202307270640.5ODmPwDl-lkp@intel.com/
 Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
- fs/smb/client/sess.c | 68 ++++++++++++++++++++++++++------------------
- 1 file changed, 41 insertions(+), 27 deletions(-)
+ fs/smb/client/smb2ops.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index c57ca2050b73..5292216d9947 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -360,11 +360,11 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index d31ea7e7fd84..015d13d9054d 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2513,15 +2513,13 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 			 struct kvec *rsp, int *buftype,
+ 			 struct cifs_sb_info *cifs_sb)
  {
- 	struct TCP_Server_Info *chan_server;
- 	struct cifs_chan *chan;
--	struct smb3_fs_context ctx = {NULL};
-+	struct smb3_fs_context *ctx;
- 	static const char unc_fmt[] = "\\%s\\foo";
--	char unc[sizeof(unc_fmt)+SERVER_NAME_LEN_WITH_NULL] = {0};
- 	struct sockaddr_in *ipv4 = (struct sockaddr_in *)&iface->sockaddr;
- 	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)&iface->sockaddr;
-+	size_t len;
- 	int rc;
- 	unsigned int xid = get_xid();
++	struct smb2_compound_vars *vars;
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct TCP_Server_Info *server = cifs_pick_channel(ses);
+ 	int flags = CIFS_CP_CREATE_CLOSE_OP;
+-	struct smb_rqst rqst[3];
++	struct smb_rqst *rqst;
+ 	int resp_buftype[3];
+-	struct kvec rsp_iov[3];
+-	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
+-	struct kvec qi_iov[1];
+-	struct kvec close_iov[1];
++	struct kvec *rsp_iov;
+ 	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_fid fid;
+@@ -2538,9 +2536,14 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (smb3_encryption_required(tcon))
+ 		flags |= CIFS_TRANSFORM_REQ;
  
-@@ -388,54 +388,64 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
- 	 * the session and server without caring about memory
- 	 * management.
- 	 */
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx) {
+-	memset(rqst, 0, sizeof(rqst));
+ 	resp_buftype[0] = resp_buftype[1] = resp_buftype[2] = CIFS_NO_BUFFER;
+-	memset(rsp_iov, 0, sizeof(rsp_iov));
++	vars = kzalloc(sizeof(*vars), GFP_KERNEL);
++	if (!vars) {
 +		rc = -ENOMEM;
-+		goto out_free_xid;
++		goto out_free_path;
 +	}
- 
- 	/* Always make new connection for now (TODO?) */
--	ctx.nosharesock = true;
-+	ctx->nosharesock = true;
- 
- 	/* Auth */
--	ctx.domainauto = ses->domainAuto;
--	ctx.domainname = ses->domainName;
-+	ctx->domainauto = ses->domainAuto;
-+	ctx->domainname = ses->domainName;
- 
- 	/* no hostname for extra channels */
--	ctx.server_hostname = "";
-+	ctx->server_hostname = "";
- 
--	ctx.username = ses->user_name;
--	ctx.password = ses->password;
--	ctx.sectype = ses->sectype;
--	ctx.sign = ses->sign;
-+	ctx->username = ses->user_name;
-+	ctx->password = ses->password;
-+	ctx->sectype = ses->sectype;
-+	ctx->sign = ses->sign;
- 
- 	/* UNC and paths */
- 	/* XXX: Use ses->server->hostname? */
--	sprintf(unc, unc_fmt, ses->ip_addr);
--	ctx.UNC = unc;
--	ctx.prepath = "";
-+	len = sizeof(unc_fmt) + SERVER_NAME_LEN_WITH_NULL;
-+	ctx->UNC = kzalloc(len, GFP_KERNEL);
-+	if (!ctx->UNC) {
-+		rc = -ENOMEM;
-+		goto out_free_ctx;
-+	}
-+	scnprintf(ctx->UNC, len, unc_fmt, ses->ip_addr);
-+	ctx->prepath = "";
- 
- 	/* Reuse same version as master connection */
--	ctx.vals = ses->server->vals;
--	ctx.ops = ses->server->ops;
-+	ctx->vals = ses->server->vals;
-+	ctx->ops = ses->server->ops;
- 
--	ctx.noblocksnd = ses->server->noblocksnd;
--	ctx.noautotune = ses->server->noautotune;
--	ctx.sockopt_tcp_nodelay = ses->server->tcp_nodelay;
--	ctx.echo_interval = ses->server->echo_interval / HZ;
--	ctx.max_credits = ses->server->max_credits;
-+	ctx->noblocksnd = ses->server->noblocksnd;
-+	ctx->noautotune = ses->server->noautotune;
-+	ctx->sockopt_tcp_nodelay = ses->server->tcp_nodelay;
-+	ctx->echo_interval = ses->server->echo_interval / HZ;
-+	ctx->max_credits = ses->server->max_credits;
++	rqst = vars->rqst;
++	rsp_iov = vars->rsp_iov;
  
  	/*
- 	 * This will be used for encoding/decoding user/domain/pw
- 	 * during sess setup auth.
- 	 */
--	ctx.local_nls = cifs_sb->local_nls;
-+	ctx->local_nls = cifs_sb->local_nls;
+ 	 * We can only call this for things we know are directories.
+@@ -2549,8 +2552,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 		open_cached_dir(xid, tcon, path, cifs_sb, false,
+ 				&cfid); /* cfid null if open dir failed */
  
- 	/* Use RDMA if possible */
--	ctx.rdma = iface->rdma_capable;
--	memcpy(&ctx.dstaddr, &iface->sockaddr, sizeof(struct sockaddr_storage));
-+	ctx->rdma = iface->rdma_capable;
-+	memcpy(&ctx->dstaddr, &iface->sockaddr, sizeof(ctx->dstaddr));
+-	memset(&open_iov, 0, sizeof(open_iov));
+-	rqst[0].rq_iov = open_iov;
++	rqst[0].rq_iov = vars->open_iov;
+ 	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
  
- 	/* reuse master con client guid */
--	memcpy(&ctx.client_guid, ses->server->client_guid,
--	       SMB2_CLIENT_GUID_SIZE);
--	ctx.use_client_guid = true;
-+	memcpy(&ctx->client_guid, ses->server->client_guid,
-+	       sizeof(ctx->client_guid));
-+	ctx->use_client_guid = true;
+ 	oparms = (struct cifs_open_parms) {
+@@ -2568,8 +2570,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 		goto qic_exit;
+ 	smb2_set_next_command(tcon, &rqst[0]);
  
--	chan_server = cifs_get_tcp_session(&ctx, ses->server);
-+	chan_server = cifs_get_tcp_session(ctx, ses->server);
+-	memset(&qi_iov, 0, sizeof(qi_iov));
+-	rqst[1].rq_iov = qi_iov;
++	rqst[1].rq_iov = &vars->qi_iov;
+ 	rqst[1].rq_nvec = 1;
  
- 	spin_lock(&ses->chan_lock);
- 	chan = &ses->chans[ses->chan_count];
-@@ -497,6 +507,10 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
- 		cifs_put_tcp_session(chan->server, 0);
+ 	if (cfid) {
+@@ -2596,8 +2597,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 		smb2_set_related(&rqst[1]);
  	}
  
-+	kfree(ctx->UNC);
-+out_free_ctx:
-+	kfree(ctx);
-+out_free_xid:
- 	free_xid(xid);
+-	memset(&close_iov, 0, sizeof(close_iov));
+-	rqst[2].rq_iov = close_iov;
++	rqst[2].rq_iov = &vars->close_iov;
+ 	rqst[2].rq_nvec = 1;
+ 
+ 	rc = SMB2_close_init(tcon, server,
+@@ -2628,7 +2628,6 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	*buftype = resp_buftype[1];
+ 
+  qic_exit:
+-	kfree(utf16_path);
+ 	SMB2_open_free(&rqst[0]);
+ 	SMB2_query_info_free(&rqst[1]);
+ 	SMB2_close_free(&rqst[2]);
+@@ -2636,6 +2635,9 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	free_rsp_buf(resp_buftype[2], rsp_iov[2].iov_base);
+ 	if (cfid)
+ 		close_cached_dir(cfid);
++	kfree(vars);
++out_free_path:
++	kfree(utf16_path);
  	return rc;
  }
+ 
 -- 
 2.41.0
 
