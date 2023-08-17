@@ -2,88 +2,110 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A427C25B4F
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Aug 2023 20:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D047C2FC0F
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Aug 2023 00:24:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231225AbjHPU20 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 16 Aug 2023 16:28:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54406 "EHLO
+        id S229815AbjHQAWx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Aug 2023 20:22:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346134AbjHPU2M (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Aug 2023 16:28:12 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E98D2690
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Aug 2023 13:28:11 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id 6a1803df08f44-649c6ea6e72so994586d6.2
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Aug 2023 13:28:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692217690; x=1692822490;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VHlecla1WGbAm1Rb3/JTGS2skoyoDs3XTDTXnb5PKoA=;
-        b=AIs7k7iyeHnsvZBEiDRST35qjkQBArUek0C1nQLaoXzgKjnNbAxPxUoBVgVFmexpPC
-         GxmVuAmKUa+8Jtxjj+Wo7tiZr/o3WoMz5xJcLIRH0o137un/zNKCsnhnt0uCYT3yEERX
-         pDxQRESx7SeRY2apX6/Njq7izCcUnLxurOw4l62uGldjUGJyHY5/6zh5gIHyZF9T3ZoE
-         5LhqNjhqHBRuJ1YTSDtBdCWQPCg/B1y19afBFizXCkmhASTtRfZAiwPCrRFhTqcJ03pr
-         tyvpSCzdT/etAMo6SqMn/Nxhxrb0S52snCTZXBmvRoDJB1QbsMlutk1x6lBbl7KyTykj
-         r+Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692217690; x=1692822490;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VHlecla1WGbAm1Rb3/JTGS2skoyoDs3XTDTXnb5PKoA=;
-        b=Cy3USs0q2vYnQMDKNgBSKAsOPVNVHluwnFvTGHAm5A9Sr1XrLAdrp7Rmz8k9dFF1sO
-         6YwZODWVdA+M/R32K6C/9AzGLSUq4/jtN+kSMVIEBy7u4p8Icl4VyRd9W6+M7BS2PTkS
-         RBeUdn22KzNbvlqUW2tQxNOyEESg28Qt2eM4fzXCayeXfNE9zUZgE6/Nv+zyptNkcF47
-         yfQzBmCNJKh4TCTXywvf9XP5299uUDbrgqUqIQRX4QuyLplpYAetuDqa2Hgg9PxfeGyo
-         smWyG75+p3u3ihrtY+5pRwLGy6fvL/wVW+co6ZBCv8jcOQmP9I+tBNWlvDhEcZysuTgh
-         5hTA==
-X-Gm-Message-State: AOJu0YxSpdd+EtbswWylwVdspPCm9c+f6vCX+IFVDUNNaa+lyzsnTSSX
-        nAqdHp9YxYrYUC+utMJS918=
-X-Google-Smtp-Source: AGHT+IH+4UmlB/33iumocrECs66UcYyGYuUhyvk+CxraAtqz5c8WlwXORfSGSlpenPoIbFHKJc0FEA==
-X-Received: by 2002:a0c:f48b:0:b0:62d:f806:7f80 with SMTP id i11-20020a0cf48b000000b0062df8067f80mr2911293qvm.13.1692217690556;
-        Wed, 16 Aug 2023 13:28:10 -0700 (PDT)
-Received: from ubuntu2004.1qqixozwsnuevircicbvxjrsib.bx.internal.cloudapp.net ([20.84.44.103])
-        by smtp.googlemail.com with ESMTPSA id t20-20020a0cb394000000b0063f78bd525asm5078715qve.144.2023.08.16.13.28.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 13:28:09 -0700 (PDT)
-From:   Bharath SM <bharathsm.hsk@gmail.com>
-X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
-To:     pc@manguebit.com, sfrench@samba.org, nspmangalore@gmail.com,
-        sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
-        bharathsm@microsoft.com
-Subject: [PATCH] cifs: update desired access while requesting for directory lease
-Date:   Wed, 16 Aug 2023 20:26:38 +0000
-Message-Id: <20230816202638.17616-1-bharathsm@microsoft.com>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S235975AbjHQAWt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Aug 2023 20:22:49 -0400
+Received: from mx.treblig.org (unknown [IPv6:2a00:1098:5b::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA0526AA;
+        Wed, 16 Aug 2023 17:22:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+        ; s=bytemarkmx; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:
+        Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=hL96hbBANHiT64hkAT/5gUF0HzFQ4uiBU5rrtSW63yA=; b=OENBcsTCIL0oi+tvbG5uRfvcPv
+        ovkXY+Gsc/KE8/8gROY5OAJc2EcDDwIhNOqb16/FjFuqQpgdvrDvzvqgyFsHKDX6+Wl9Rh/sXMJu5
+        Stz+GcLhklQmmHucmczMJRJhaWBJOJFDsAfO55K12eQsCFioUucyFc109tnKbYC1aqenXzMoZ9Jsp
+        lpzV32rbg8DRk4bjvxdUNzvVRpf/pFXV8GLvzG/gPXLaIh5Pg+6XPn9zx0HJOmHsF1IB7gT32j7x1
+        m49kC+f7ghpUTgTFe6qoGoeZsfz82/W0a0acPedBVrjzooX6ZQMhJQCJFj69EGfJQW7db2mmpqtw8
+        d03KqN/g==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+        by mx.treblig.org with esmtp (Exim 4.94.2)
+        (envelope-from <linux@treblig.org>)
+        id 1qWQmb-007LI0-FN; Thu, 17 Aug 2023 00:22:36 +0000
+From:   linux@treblig.org
+To:     smfrench@gmail.com, dave.kleikamp@oracle.com, tom@talpey.com,
+        pc@manguebit.com
+Cc:     linkinjeon@kernel.org, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        krisman@collabora.com, "Dr. David Alan Gilbert" <dave@treblig.org>
+Subject: [PATCH v5 0/4] dedupe smb unicode files
+Date:   Thu, 17 Aug 2023 01:22:28 +0100
+Message-ID: <20230817002232.80079-1-linux@treblig.org>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We read and cache directory contents when we get directory
-lease, so we should ask for read permission to read contents
-of directory.
+From: "Dr. David Alan Gilbert" <dave@treblig.org>
 
-Signed-off-by: Bharath SM <bharathsm@microsoft.com>
----
- fs/smb/client/cached_dir.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The smb client and server code have (mostly) duplicated code
+for unicode manipulation, in particular upper case handling.
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index fe483f163dbc..2d5e9a9d5b8b 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -218,7 +218,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		.tcon = tcon,
- 		.path = path,
- 		.create_options = cifs_create_options(cifs_sb, CREATE_NOT_FILE),
--		.desired_access = FILE_READ_ATTRIBUTES,
-+		.desired_access =  FILE_READ_DATA | FILE_READ_ATTRIBUTES,
- 		.disposition = FILE_OPEN,
- 		.fid = pfid,
- 	};
+Flatten this lot into shared code.
+
+There's some code that's slightly different between the two, and
+I've not attempted to share that - this should be strictly a no
+behaviour change set.
+
+In addition, the same tables and code are shared in jfs, however
+there's very little testing available for the unicode in there,
+so just share the raw data tables.
+
+I suspect there's more UCS-2 code that can be shared, in the NLS code
+and in the UCS-2 code used by the EFI interfaces.
+
+Lightly tested with a module and a monolithic build, and just mounting
+itself.
+
+This dupe was found using PMD:
+  https://pmd.github.io/pmd/pmd_userdocs_cpd.html
+
+Dave
+
+Version 5
+  Add some (wchar_t *) casts to keep sparse
+  happy, as spotted by kernel test robot
+
+Dr. David Alan Gilbert (4):
+  fs/smb: Remove unicode 'lower' tables
+  fs/smb: Swing unicode common code from smb->NLS
+  fs/smb/client: Use common code in client
+  fs/jfs: Use common ucs2 upper case table
+
+ fs/jfs/Kconfig                                |   1 +
+ fs/jfs/Makefile                               |   2 +-
+ fs/jfs/jfs_unicode.h                          |  17 +-
+ fs/jfs/jfs_uniupr.c                           | 121 -------
+ fs/nls/Kconfig                                |   8 +
+ fs/nls/Makefile                               |   1 +
+ fs/nls/nls_ucs2_data.h                        |  15 +
+ .../server/uniupr.h => nls/nls_ucs2_utils.c}  | 156 +--------
+ fs/nls/nls_ucs2_utils.h                       | 285 +++++++++++++++
+ fs/smb/client/Kconfig                         |   1 +
+ fs/smb/client/cifs_unicode.c                  |   1 -
+ fs/smb/client/cifs_unicode.h                  | 330 +-----------------
+ fs/smb/client/cifs_uniupr.h                   | 239 -------------
+ fs/smb/client/smb2pdu.c                       |   4 +-
+ fs/smb/server/Kconfig                         |   1 +
+ fs/smb/server/unicode.c                       |   1 -
+ fs/smb/server/unicode.h                       | 325 +----------------
+ 17 files changed, 342 insertions(+), 1166 deletions(-)
+ delete mode 100644 fs/jfs/jfs_uniupr.c
+ create mode 100644 fs/nls/nls_ucs2_data.h
+ rename fs/{smb/server/uniupr.h => nls/nls_ucs2_utils.c} (50%)
+ create mode 100644 fs/nls/nls_ucs2_utils.h
+ delete mode 100644 fs/smb/client/cifs_uniupr.h
+
 -- 
-2.39.2
+2.41.0
 
