@@ -2,65 +2,87 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F96C001DE
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Aug 2023 09:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B95C77B7C
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Aug 2023 15:56:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358992AbjHRJSE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Aug 2023 05:18:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49146 "EHLO
+        id S1378354AbjHRPzz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Aug 2023 11:55:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359054AbjHRJR6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Aug 2023 05:17:58 -0400
-X-Greylist: delayed 430 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 18 Aug 2023 02:17:57 PDT
-Received: from mail.cassleycruden.pl (mail.cassleycruden.pl [217.61.97.118])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA689358D
-        for <linux-cifs@vger.kernel.org>; Fri, 18 Aug 2023 02:17:57 -0700 (PDT)
-Received: by mail.cassleycruden.pl (Postfix, from userid 1001)
-        id DFC80843AE; Fri, 18 Aug 2023 10:10:44 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=cassleycruden.pl;
-        s=mail; t=1692349845;
-        bh=PMKe/ZGJ6BzTndUs3U4s+9I0+VR2MMUK715AFNxw4AM=;
-        h=Date:From:To:Subject:From;
-        b=XnvEWewnR/gB6p0xwU4j5tT8B2VjpMb1Kf197BZzGN6PVamr9icKURkMRI9vV/58m
-         gI8oZOykl07edN8hf+/FuxCct9JJ7BtwjoGIW3ZAr3b9fwFUI8BMAYJ8y1jiwcovIB
-         mE7U4MISOf85t+0/dpACczUXodvMPoSUjYDmulAgdzygoHz5z1d1Rrqh2YF/zpQPFY
-         vuhwfr9EVRpBWGeQmNmz6YxboH6DdBeEDjLy7L9xMZGSQeGP3oGBsZdHU5tt8zuSuT
-         g4TRu8cETotUzM6B4OEmVvYVaBQjQVU/1GNmnlJaU4BQ8LAIi3Z8mVRdJlXQT8up9H
-         SyAIMmoggnLUA==
-Received: by mail.cassleycruden.pl for <linux-cifs@vger.kernel.org>; Fri, 18 Aug 2023 09:10:25 GMT
-Message-ID: <20230818090522-0.1.6m.f5oo.0.r6ind954zv@cassleycruden.pl>
-Date:   Fri, 18 Aug 2023 09:10:25 GMT
-From:   "Adrian Giermata" <adrian.giermata@cassleycruden.pl>
-To:     <linux-cifs@vger.kernel.org>
-Subject: Nowa strona www
-X-Mailer: mail.cassleycruden.pl
+        with ESMTP id S1378359AbjHRPzs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Aug 2023 11:55:48 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 912AC2722;
+        Fri, 18 Aug 2023 08:55:46 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b9c0391749so17298931fa.0;
+        Fri, 18 Aug 2023 08:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692374145; x=1692978945;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ETDTZRuDCsJhdwG5H+kaBHFDL6q5sCZ3qYSKgjJ2APc=;
+        b=MySTeByZ5+SsV8iaiMfxQLhpfIxROX6fbB07JPFNKT5hUD3rENgnmh/vclZHxyAOI6
+         BKggqGCz/eGO5QoHVNHl/81qeTlje9XO/PoSVxOsjVeU7gSid6908dGCfo6blQiYtElC
+         oFj7ZNw9nRXdnWgKhmRtJ2zfFg+aKcj5mrRLXYRHvHiJ71d1KOBuM5evzjANbzrr4Fhf
+         jjBffDpfj3Ldpf6fSSJSTS6bTiWacfwhPca77VwVNL5U5KZpIcfhZLrL3q4ojADUedIT
+         BVQkOxLT6OCdNe0DlG4RaXQyHI45+02T97wLdwjj8HiDDfGyRrbAJW4Ga6WXop3YvAnd
+         bW2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692374145; x=1692978945;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ETDTZRuDCsJhdwG5H+kaBHFDL6q5sCZ3qYSKgjJ2APc=;
+        b=fWC58HSg2zLavjL1P0I0qv5/af1F/G9Q9PpHOLS94y/s7WaHzLP+bZ3n8agBA1Vz/3
+         nuPNx1iEmP9eIxVjn7Uwtph1qfpwl3XaBkIcmPmS0oom8pB7p8l9ydBhiKRyurRTrHqt
+         2Y2SdpkNje6jROvPC77OolNTV7l1WYn4lm4PANI0vy5PqM7LPYqBkuKt1sHPLyUAOJbT
+         7kQj1gvgMNeZ/HAJcMsfxNXz3OJZNaxIPVx+FwWF0pdnZT4o8A4ZClX6CjckN49Dpriv
+         vQfivOtNLneDJeuWofYanHiHV5GC09iR7jCpNyEHgJTc/rkpQARcfGV8KgK1STGkJ6IX
+         4Wjg==
+X-Gm-Message-State: AOJu0YzcpmEraaZxQS+o5q0w0o08//bX2swOJUfBuij+UGouDhOHyMvy
+        0FsUnxYXAB68j8s2OnpZSWQHIeQ8u6DktshY4OM9dPbaTFgFMude
+X-Google-Smtp-Source: AGHT+IHM/trkFBqEk8379E2mtIFqjpKMlBzJHDsLWs9QF/V/cQUq6YYzYKtgSo7tTpYhaB0BrXrqblSoeO5R87dBDXI=
+X-Received: by 2002:a2e:b05a:0:b0:2bb:985f:847b with SMTP id
+ d26-20020a2eb05a000000b002bb985f847bmr2042909ljl.27.1692374144393; Fri, 18
+ Aug 2023 08:55:44 -0700 (PDT)
 MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 18 Aug 2023 10:55:33 -0500
+Message-ID: <CAH2r5mtF7UiHyNArEancsoUnnzghBNjh3YRBAfzjjMU=KaE6SA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fix
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Szanowni Pa=C5=84stwo,
+Please pull the following changes since commit
+2d7b8c6b90e4054a35eb59cd6d7c66e903e8ae4b:
 
-czy wiedz=C4=85 Pa=C5=84stwo, =C5=BCe internauta ocenia Pa=C5=84stwa firm=
-ow=C4=85 stron=C4=99 www ju=C5=BC w ci=C4=85gu pierwszych 5 sekund?
+  Merge tag '6.5-rc6-smb3-client-fixes' of
+git://git.samba.org/sfrench/cifs-2.6 (2023-08-15 20:00:40 +0000)
 
-Je=C5=9Bli pierwsze wra=C5=BCenie, jakie wywrze witryna, jest pozytywne, =
-to klient zak=C5=82ada, =C5=BCe za dobr=C4=85 stron=C4=85 stoi godna zauf=
-ania i rzetelna firma, a jej oferta jest atrakcyjna.
+are available in the Git repository at:
 
-Reprezentuj=C4=99 software house, kt=C3=B3ry buduje nowoczesne strony int=
-ernetowe oraz dochodowe sklepy online, zmieniaj=C4=85c wirtualny =C5=9Bwi=
-at w rzeczywiste zyski. Dzi=C4=99ki nowoczesnym funkcjonalno=C5=9Bciom i =
-niestandardowej kreacji umacniamy wizerunek marki, dodaj=C4=85c jej warto=
-=C5=9Bci i to=C5=BCsamo=C5=9Bci, kt=C3=B3rej szukaj=C4=85 Klienci.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc6-smb3-client-fix
 
-Z przyjemno=C5=9Bci=C4=85 poznamy Pa=C5=84stwa oczekiwania, aby wsp=C3=B3=
-lnie przeanalizowa=C4=87 potencja=C5=82 wsp=C3=B3=C5=82pracy. Prosz=C4=99=
- o kontakt zwrotny, przedstawimy dok=C5=82adniej nasze mo=C5=BCliwo=C5=9B=
-ci.
+for you to fetch changes up to 270d73e6507f9c7fff43844d74f86365df000b36:
+
+  smb: client: fix null auth (2023-08-16 00:26:07 -0500)
+
+----------------------------------------------------------------
+small SMB mount option fix, also for stable
+- fix minor regression from move to the new mount api
+----------------------------------------------------------------
+Scott Mayhew (1):
+      smb: client: fix null auth
+
+ fs/smb/client/fs_context.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 
-Pozdrawiam
-Adrian Giermata
+-- 
+Thanks,
+
+Steve
