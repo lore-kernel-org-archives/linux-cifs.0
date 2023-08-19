@@ -2,69 +2,129 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62290EE498F
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Aug 2023 17:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32B6DEE499C
+	for <linux-cifs@archiver.kernel.org>; Sat, 19 Aug 2023 03:38:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379107AbjHRRtF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Aug 2023 13:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54250 "EHLO
+        id S229597AbjHSDhw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Aug 2023 23:37:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379253AbjHRRsm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Aug 2023 13:48:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3303F2D79;
-        Fri, 18 Aug 2023 10:48:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 63AF96528D;
-        Fri, 18 Aug 2023 17:48:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AF61CC433A9;
-        Fri, 18 Aug 2023 17:48:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692380919;
-        bh=3AIFYP9vHueu9XlT8TVFWICjTAeUq5bvsP2IX6xA1dw=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=LgmMvlhNEhqcxyA/h87n7nP/M9uxnWev8d3YAgZcTYatv9Z+lipK/Y48lwv9LNt48
-         9m4cr7s2NP0Ww+R3XrPp5y2KytgxOHLtbTdp+WOgzwrqGifwpyAsJf3pS20nOmzH6N
-         RY+Wq5zSlKMGXs7QbZVo0+Iib14fTdixGcbWxj33+5cIFJKYkte8Y1cYmUywtyn8LG
-         Sv9SGzAbhOWDOKfANSxkNixamYF5kHmoB+042KghgFoY6vu8g0nU4UP/i6PWQs/e56
-         YJE7M8dBTcmYsw2f9kRT4BWxusZy4EwDng8m5lMSG49b3Sbq+1n0kuOnhV7401fkcX
-         g/GlYEFBTyShw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9D406E93B34;
-        Fri, 18 Aug 2023 17:48:39 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fix
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtF7UiHyNArEancsoUnnzghBNjh3YRBAfzjjMU=KaE6SA@mail.gmail.com>
-References: <CAH2r5mtF7UiHyNArEancsoUnnzghBNjh3YRBAfzjjMU=KaE6SA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtF7UiHyNArEancsoUnnzghBNjh3YRBAfzjjMU=KaE6SA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc6-smb3-client-fix
-X-PR-Tracked-Commit-Id: 270d73e6507f9c7fff43844d74f86365df000b36
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8abd7287db9231485261d36c17d77f044de32d20
-Message-Id: <169238091964.10816.13969586347022820406.pr-tracker-bot@kernel.org>
-Date:   Fri, 18 Aug 2023 17:48:39 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        with ESMTP id S230393AbjHSDhl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Aug 2023 23:37:41 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FBE69B
+        for <linux-cifs@vger.kernel.org>; Fri, 18 Aug 2023 20:37:40 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2ba0f27a4c2so23397751fa.2
+        for <linux-cifs@vger.kernel.org>; Fri, 18 Aug 2023 20:37:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692416258; x=1693021058;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6tp42jAIOh6It5oyqUGVEGf4lTmeeJfFmoUI9UchpXw=;
+        b=cOUxsLcpJ4sff0834dNoCwWBBUynwNzjet5pXzQjRnkEjPcaoeiT+8UpK1zq4SV5jk
+         eFiET1F1XbYAfRMNWFwd59RCpg43AHmTL+hSups09jLQLPGfonwNSMQx3BCyS09EB6Sq
+         1abmC2MaPWTOxSdddl7agCt3rlrkjMIvDgk9Ia3fQZJsI+3ffU9K36ew4P1ht7kEaOd4
+         Lgougem2D+fTUX2s+2ChpcbPRmReTZhhnolFN0rTLmlVOKFCQ3bN33jSK68gVJic4PJx
+         nnRLBMdXEQgERDEjrsGAhZnKwLqKuA5Fs2JKdVrzzKQrP9TEdsMWZZ/Jx3IQVRIAv/9P
+         nXyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692416258; x=1693021058;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6tp42jAIOh6It5oyqUGVEGf4lTmeeJfFmoUI9UchpXw=;
+        b=Jbd9Td0yfzub0uT8UAl1ht9LqssE2PMjzu0J0xzjbuP1Yaf70HXMg/n2+BBQVDMtSe
+         rcJfweKSsF9dRlPyCKUIgsgHWj3Dwc9yy8it21ECf1dLuqsNhBuBrNXbFjITKEEbCXs+
+         PRPVUuI6v+RumpJQmnpvhnQJW645jQ0azDx7N17EOX2iO9Sd7ov2Ju899dFVn44AzxVB
+         WqmP2STGnD7x0YGK9uMQCbtQk90SiejrwOjq53MBbQpbpeu78LX4OY3RiDV3rXv7XpCw
+         jnjLK7Lq/KLu5tIBXipdoDceEsigy2jU8AAWYfkUzS1rq9vWObMvX2Q8W4u2lEOvJt3f
+         8WqQ==
+X-Gm-Message-State: AOJu0YxwIraeCyCSdMnFAF1yVefBInpH8MXMIACyel7C47T/ogQJ/9+7
+        fzR9myt0TSFg85q6RI40sS6wy9ubRV8rcQPwlNU=
+X-Google-Smtp-Source: AGHT+IFflEn7KTVH/bLGxwbttP77d7UGVgE/aHxoGOk5kFWRnr0j02qlil8NqJDR1jPLu9kZSYAwzCYxL2vucr9fiSE=
+X-Received: by 2002:a2e:6e0e:0:b0:2bb:8eea:7558 with SMTP id
+ j14-20020a2e6e0e000000b002bb8eea7558mr642664ljc.13.1692416257912; Fri, 18 Aug
+ 2023 20:37:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230817153416.28083-1-pc@manguebit.com>
+In-Reply-To: <20230817153416.28083-1-pc@manguebit.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 18 Aug 2023 22:37:26 -0500
+Message-ID: <CAH2r5mtmVF-f+rBGauyScVfrKC4Xi3TaTRYaQgbPR+hGf8gRpg@mail.gmail.com>
+Subject: Re: [PATCH 00/17] cifs.ko fixes
+To:     Paulo Alcantara <pc@manguebit.com>
+Cc:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 18 Aug 2023 10:55:33 -0500:
+Tentatively added to cifs-2.6.git for-next pending testing.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.5-rc6-smb3-client-fix
+Opinions on whether any should be cc:stable?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8abd7287db9231485261d36c17d77f044de32d20
+Also let me know if anyone wants to add RB or Acked-by
 
-Thank you!
+On Thu, Aug 17, 2023 at 10:35=E2=80=AFAM Paulo Alcantara <pc@manguebit.com>=
+ wrote:
+>
+> Hi Steve,
+>
+> Follow patchset with DFS, reparse point and -Wframe-larger-than fixes
+> for v6.6.
+>
+> Please review & test.
+>
+> Paulo Alcantara (17):
+>   smb: client: introduce DFS_CACHE_TGT_LIST()
+>   smb: client: ensure to try all targets when finding nested links
+>   smb: client: move some params to cifs_open_info_data
+>   smb: client: make smb2_compound_op() return resp buffer on success
+>   smb: client: rename cifs_dfs_ref.c to namespace.c
+>   smb: client: get rid of dfs naming in automount code
+>   smb: client: get rid of dfs code dep in namespace.c
+>   smb: client: parse reparse point flag in create response
+>   smb: client: do not query reparse points twice on symlinks
+>   smb: client: query reparse points in older dialects
+>   smb: cilent: set reparse mount points as automounts
+>   smb: client: reduce stack usage in cifs_try_adding_channels()
+>   smb: client: reduce stack usage in cifs_demultiplex_thread()
+>   smb: client: reduce stack usage in smb_send_rqst()
+>   smb: client: reduce stack usage in smb2_set_ea()
+>   smb: client: reduce stack usage in smb2_query_info_compound()
+>   smb: client: reduce stack usage in smb2_query_reparse_point()
+>
+>  fs/smb/client/Makefile                        |   5 +-
+>  fs/smb/client/cifsfs.c                        |   2 +-
+>  fs/smb/client/cifsfs.h                        |  11 +-
+>  fs/smb/client/cifsglob.h                      |  69 ++-
+>  fs/smb/client/cifsproto.h                     |   9 +-
+>  fs/smb/client/connect.c                       |   8 +-
+>  fs/smb/client/dfs.c                           | 291 +++++-----
+>  fs/smb/client/dfs.h                           | 141 +++--
+>  fs/smb/client/dfs_cache.c                     |  10 +-
+>  fs/smb/client/dfs_cache.h                     |  12 +-
+>  fs/smb/client/dir.c                           |   4 +-
+>  fs/smb/client/inode.c                         | 530 ++++++++++--------
+>  fs/smb/client/{cifs_dfs_ref.c =3D> namespace.c} | 113 ++--
+>  fs/smb/client/readdir.c                       |  23 +-
+>  fs/smb/client/sess.c                          |  68 ++-
+>  fs/smb/client/smb1ops.c                       |  26 +-
+>  fs/smb/client/smb2inode.c                     | 199 ++++---
+>  fs/smb/client/smb2ops.c                       | 283 +++-------
+>  fs/smb/client/smb2proto.h                     |  17 +-
+>  fs/smb/client/transport.c                     |  29 +-
+>  20 files changed, 993 insertions(+), 857 deletions(-)
+>  rename fs/smb/client/{cifs_dfs_ref.c =3D> namespace.c} (62%)
+>
+> --
+> 2.41.0
+>
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+
+--=20
+Thanks,
+
+Steve
