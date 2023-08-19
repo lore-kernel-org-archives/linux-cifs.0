@@ -2,122 +2,134 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32B6DEE499C
-	for <linux-cifs@archiver.kernel.org>; Sat, 19 Aug 2023 03:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 145D9EE499C
+	for <linux-cifs@archiver.kernel.org>; Sat, 19 Aug 2023 04:36:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229597AbjHSDhw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Aug 2023 23:37:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45686 "EHLO
+        id S234969AbjHSEgM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 19 Aug 2023 00:36:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230393AbjHSDhl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Aug 2023 23:37:41 -0400
+        with ESMTP id S229532AbjHSEfx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 19 Aug 2023 00:35:53 -0400
 Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FBE69B
-        for <linux-cifs@vger.kernel.org>; Fri, 18 Aug 2023 20:37:40 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2ba0f27a4c2so23397751fa.2
-        for <linux-cifs@vger.kernel.org>; Fri, 18 Aug 2023 20:37:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17A8F4211;
+        Fri, 18 Aug 2023 21:35:51 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2ba1e9b1fa9so23708751fa.3;
+        Fri, 18 Aug 2023 21:35:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692416258; x=1693021058;
+        d=gmail.com; s=20221208; t=1692419749; x=1693024549;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6tp42jAIOh6It5oyqUGVEGf4lTmeeJfFmoUI9UchpXw=;
-        b=cOUxsLcpJ4sff0834dNoCwWBBUynwNzjet5pXzQjRnkEjPcaoeiT+8UpK1zq4SV5jk
-         eFiET1F1XbYAfRMNWFwd59RCpg43AHmTL+hSups09jLQLPGfonwNSMQx3BCyS09EB6Sq
-         1abmC2MaPWTOxSdddl7agCt3rlrkjMIvDgk9Ia3fQZJsI+3ffU9K36ew4P1ht7kEaOd4
-         Lgougem2D+fTUX2s+2ChpcbPRmReTZhhnolFN0rTLmlVOKFCQ3bN33jSK68gVJic4PJx
-         nnRLBMdXEQgERDEjrsGAhZnKwLqKuA5Fs2JKdVrzzKQrP9TEdsMWZZ/Jx3IQVRIAv/9P
-         nXyg==
+        bh=E9RDO+mu4zOwSEJ716yo61Qz/xnDxFXm4Etyq0Z0RWE=;
+        b=R4WVLmz85gXbiZSANPHdMu3UK92btPoCkKlfVsdjxVVHj6uivXpvlPi5UT3us0hoOX
+         MBVKgDBpK+nW/qskN1URjcKwyFtND6PwzOWxXIHDu1qxQEMRq5Pjdf15bbw3CF5GSENN
+         cIc24CNROHF3jUvsO/ec03liqyq/xlomEoxULxBkzQASEgT7mywYpkmE5/aSRaE01iY+
+         LJ6gOl+qipqLVYfQLrQcYz2mGM5fxUjPNlmwRzRFB9Yf3OVkS9bHsvhPI4ge+bHmhzDJ
+         vbQIr9AZK5y2jZbuO9EIYwTvilo4YDGi/eSDf/anSKRqF3PlnH3KS5VqXitqdXQpJ12S
+         XFzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692416258; x=1693021058;
+        d=1e100.net; s=20221208; t=1692419749; x=1693024549;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6tp42jAIOh6It5oyqUGVEGf4lTmeeJfFmoUI9UchpXw=;
-        b=Jbd9Td0yfzub0uT8UAl1ht9LqssE2PMjzu0J0xzjbuP1Yaf70HXMg/n2+BBQVDMtSe
-         rcJfweKSsF9dRlPyCKUIgsgHWj3Dwc9yy8it21ECf1dLuqsNhBuBrNXbFjITKEEbCXs+
-         PRPVUuI6v+RumpJQmnpvhnQJW645jQ0azDx7N17EOX2iO9Sd7ov2Ju899dFVn44AzxVB
-         WqmP2STGnD7x0YGK9uMQCbtQk90SiejrwOjq53MBbQpbpeu78LX4OY3RiDV3rXv7XpCw
-         jnjLK7Lq/KLu5tIBXipdoDceEsigy2jU8AAWYfkUzS1rq9vWObMvX2Q8W4u2lEOvJt3f
-         8WqQ==
-X-Gm-Message-State: AOJu0YxwIraeCyCSdMnFAF1yVefBInpH8MXMIACyel7C47T/ogQJ/9+7
-        fzR9myt0TSFg85q6RI40sS6wy9ubRV8rcQPwlNU=
-X-Google-Smtp-Source: AGHT+IFflEn7KTVH/bLGxwbttP77d7UGVgE/aHxoGOk5kFWRnr0j02qlil8NqJDR1jPLu9kZSYAwzCYxL2vucr9fiSE=
-X-Received: by 2002:a2e:6e0e:0:b0:2bb:8eea:7558 with SMTP id
- j14-20020a2e6e0e000000b002bb8eea7558mr642664ljc.13.1692416257912; Fri, 18 Aug
- 2023 20:37:37 -0700 (PDT)
+        bh=E9RDO+mu4zOwSEJ716yo61Qz/xnDxFXm4Etyq0Z0RWE=;
+        b=cNqXh91ChG0V9f8ZiDC0ed8OIXKf6pUj1iGyTFVnqcetUacKH8dnmP9skULinkPOt7
+         jzA1xNaFePG2cUBsi4uSjcirXwo4NsqMI7J4gkI/P7xDq6GF3DS5sQiunl4MzOSrBREM
+         XQZY9dRI/ZZjRIC8zjsR99AhWZr4vnQBew+mAcekdf1IbYMN8XirnkqQ4/1H4P7jpX6A
+         6xVL8mBVnZby4T5S6BjkSwSyV6E3p3yFqqKmbwlJFFb4M29/KTXgJU4ZFVOiUp5tNDUS
+         XkXjPhPlfYZsgdg/80lV4nlSRzNhaI4m0x4w1QwAOr+whXVrVwy8yCAY+ksvSHIakKcU
+         piFQ==
+X-Gm-Message-State: AOJu0YyGHdvsq61RdbsMhXZVeqWD+xWbA3RGz+98UbOLITkSfZeHyb1Q
+        AQybsemTcQd5PijA+Hc95Y47o/fXns3iPSr7Pjs=
+X-Google-Smtp-Source: AGHT+IF8OAfn7lkBb+InQvpKMkIb+K37Z90E3TnGBaNlzHc4x7WwpS2lzxlJ6a5y0qpTlajnEBSjEwvtr99f082U4GY=
+X-Received: by 2002:a2e:a309:0:b0:2b5:68ad:291f with SMTP id
+ l9-20020a2ea309000000b002b568ad291fmr777624lje.19.1692419748974; Fri, 18 Aug
+ 2023 21:35:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230817153416.28083-1-pc@manguebit.com>
-In-Reply-To: <20230817153416.28083-1-pc@manguebit.com>
+References: <20230817002232.80079-1-linux@treblig.org>
+In-Reply-To: <20230817002232.80079-1-linux@treblig.org>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 18 Aug 2023 22:37:26 -0500
-Message-ID: <CAH2r5mtmVF-f+rBGauyScVfrKC4Xi3TaTRYaQgbPR+hGf8gRpg@mail.gmail.com>
-Subject: Re: [PATCH 00/17] cifs.ko fixes
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     linux-cifs@vger.kernel.org
+Date:   Fri, 18 Aug 2023 23:35:37 -0500
+Message-ID: <CAH2r5mtQCJZj7THQ7Kenx5sRS9frQNsJ7qkG0eKKy31JPcxiPQ@mail.gmail.com>
+Subject: Re: [PATCH v5 0/4] dedupe smb unicode files
+To:     linux@treblig.org
+Cc:     dave.kleikamp@oracle.com, tom@talpey.com, pc@manguebit.com,
+        linkinjeon@kernel.org, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        krisman@collabora.com, "Dr. David Alan Gilbert" <dave@treblig.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Tentatively added to cifs-2.6.git for-next pending testing.
+tentatively merged to cifs-2.6.git for-next pending additional testing
 
-Opinions on whether any should be cc:stable?
+Let me know if anyone wants to add RB or Acked-by to any of these or
+spots any issues
 
-Also let me know if anyone wants to add RB or Acked-by
-
-On Thu, Aug 17, 2023 at 10:35=E2=80=AFAM Paulo Alcantara <pc@manguebit.com>=
- wrote:
+On Wed, Aug 16, 2023 at 7:22=E2=80=AFPM <linux@treblig.org> wrote:
 >
-> Hi Steve,
+> From: "Dr. David Alan Gilbert" <dave@treblig.org>
 >
-> Follow patchset with DFS, reparse point and -Wframe-larger-than fixes
-> for v6.6.
+> The smb client and server code have (mostly) duplicated code
+> for unicode manipulation, in particular upper case handling.
 >
-> Please review & test.
+> Flatten this lot into shared code.
 >
-> Paulo Alcantara (17):
->   smb: client: introduce DFS_CACHE_TGT_LIST()
->   smb: client: ensure to try all targets when finding nested links
->   smb: client: move some params to cifs_open_info_data
->   smb: client: make smb2_compound_op() return resp buffer on success
->   smb: client: rename cifs_dfs_ref.c to namespace.c
->   smb: client: get rid of dfs naming in automount code
->   smb: client: get rid of dfs code dep in namespace.c
->   smb: client: parse reparse point flag in create response
->   smb: client: do not query reparse points twice on symlinks
->   smb: client: query reparse points in older dialects
->   smb: cilent: set reparse mount points as automounts
->   smb: client: reduce stack usage in cifs_try_adding_channels()
->   smb: client: reduce stack usage in cifs_demultiplex_thread()
->   smb: client: reduce stack usage in smb_send_rqst()
->   smb: client: reduce stack usage in smb2_set_ea()
->   smb: client: reduce stack usage in smb2_query_info_compound()
->   smb: client: reduce stack usage in smb2_query_reparse_point()
+> There's some code that's slightly different between the two, and
+> I've not attempted to share that - this should be strictly a no
+> behaviour change set.
 >
->  fs/smb/client/Makefile                        |   5 +-
->  fs/smb/client/cifsfs.c                        |   2 +-
->  fs/smb/client/cifsfs.h                        |  11 +-
->  fs/smb/client/cifsglob.h                      |  69 ++-
->  fs/smb/client/cifsproto.h                     |   9 +-
->  fs/smb/client/connect.c                       |   8 +-
->  fs/smb/client/dfs.c                           | 291 +++++-----
->  fs/smb/client/dfs.h                           | 141 +++--
->  fs/smb/client/dfs_cache.c                     |  10 +-
->  fs/smb/client/dfs_cache.h                     |  12 +-
->  fs/smb/client/dir.c                           |   4 +-
->  fs/smb/client/inode.c                         | 530 ++++++++++--------
->  fs/smb/client/{cifs_dfs_ref.c =3D> namespace.c} | 113 ++--
->  fs/smb/client/readdir.c                       |  23 +-
->  fs/smb/client/sess.c                          |  68 ++-
->  fs/smb/client/smb1ops.c                       |  26 +-
->  fs/smb/client/smb2inode.c                     | 199 ++++---
->  fs/smb/client/smb2ops.c                       | 283 +++-------
->  fs/smb/client/smb2proto.h                     |  17 +-
->  fs/smb/client/transport.c                     |  29 +-
->  20 files changed, 993 insertions(+), 857 deletions(-)
->  rename fs/smb/client/{cifs_dfs_ref.c =3D> namespace.c} (62%)
+> In addition, the same tables and code are shared in jfs, however
+> there's very little testing available for the unicode in there,
+> so just share the raw data tables.
+>
+> I suspect there's more UCS-2 code that can be shared, in the NLS code
+> and in the UCS-2 code used by the EFI interfaces.
+>
+> Lightly tested with a module and a monolithic build, and just mounting
+> itself.
+>
+> This dupe was found using PMD:
+>   https://pmd.github.io/pmd/pmd_userdocs_cpd.html
+>
+> Dave
+>
+> Version 5
+>   Add some (wchar_t *) casts to keep sparse
+>   happy, as spotted by kernel test robot
+>
+> Dr. David Alan Gilbert (4):
+>   fs/smb: Remove unicode 'lower' tables
+>   fs/smb: Swing unicode common code from smb->NLS
+>   fs/smb/client: Use common code in client
+>   fs/jfs: Use common ucs2 upper case table
+>
+>  fs/jfs/Kconfig                                |   1 +
+>  fs/jfs/Makefile                               |   2 +-
+>  fs/jfs/jfs_unicode.h                          |  17 +-
+>  fs/jfs/jfs_uniupr.c                           | 121 -------
+>  fs/nls/Kconfig                                |   8 +
+>  fs/nls/Makefile                               |   1 +
+>  fs/nls/nls_ucs2_data.h                        |  15 +
+>  .../server/uniupr.h =3D> nls/nls_ucs2_utils.c}  | 156 +--------
+>  fs/nls/nls_ucs2_utils.h                       | 285 +++++++++++++++
+>  fs/smb/client/Kconfig                         |   1 +
+>  fs/smb/client/cifs_unicode.c                  |   1 -
+>  fs/smb/client/cifs_unicode.h                  | 330 +-----------------
+>  fs/smb/client/cifs_uniupr.h                   | 239 -------------
+>  fs/smb/client/smb2pdu.c                       |   4 +-
+>  fs/smb/server/Kconfig                         |   1 +
+>  fs/smb/server/unicode.c                       |   1 -
+>  fs/smb/server/unicode.h                       | 325 +----------------
+>  17 files changed, 342 insertions(+), 1166 deletions(-)
+>  delete mode 100644 fs/jfs/jfs_uniupr.c
+>  create mode 100644 fs/nls/nls_ucs2_data.h
+>  rename fs/{smb/server/uniupr.h =3D> nls/nls_ucs2_utils.c} (50%)
+>  create mode 100644 fs/nls/nls_ucs2_utils.h
+>  delete mode 100644 fs/smb/client/cifs_uniupr.h
 >
 > --
 > 2.41.0
