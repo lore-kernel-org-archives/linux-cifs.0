@@ -2,108 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F87AEE4996
-	for <linux-cifs@archiver.kernel.org>; Mon, 21 Aug 2023 02:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE40EE4996
+	for <linux-cifs@archiver.kernel.org>; Mon, 21 Aug 2023 08:29:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230389AbjHUCnr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 20 Aug 2023 22:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56512 "EHLO
+        id S233961AbjHUI3M (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 21 Aug 2023 04:29:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229908AbjHUCnq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 20 Aug 2023 22:43:46 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0CB09C;
-        Sun, 20 Aug 2023 19:43:42 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-34baf19955cso9775665ab.2;
-        Sun, 20 Aug 2023 19:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692585822; x=1693190622;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pTs649jeA9tAOqsDzauJjFvBqiDtGSzL0YrvYTEwtc0=;
-        b=RFbbJ7k8CSMD8My5cNBZhD2EsbrmicQmSok1r+2NG5M1SU7CPw3jrwvTrpdOt6eVO2
-         QTfAS3e6OmGJqf2HLCtysU7yS9J2Jmj6HWlnJrfh01AX7tzh3vjJd5EU7GbgS94mHAwF
-         Xdkdy+bIGLFV381MYmh69ScuHPM8exdouQZObN1N+iQpQ1SIQ8i60oWh6Ca1jySxJIx9
-         silS6Y8DOxvHM64fzvZzGoSCCsoSn6GLich0pm9QGC1Z40KQEN8Pvj4LLfRo5bUNXuwa
-         dSdZT0lZuKkRLapuXh5CKDunrNiz9HszBEbNGLskH3oTgzSY7gZ6yCtPxVBSexKqRfri
-         TCDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692585822; x=1693190622;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pTs649jeA9tAOqsDzauJjFvBqiDtGSzL0YrvYTEwtc0=;
-        b=HQbfXPeblAPywF11hdyrQmoAWhJGr9ub0FZ6NF7PF0uT3OmJuAqE4DA8AdbYJErFCC
-         dFCF4F89QxTjyIVkhpOf5VUHUmIuzfEDjzVwWTbj/nVCmUtQs5Uv279QX3JUE6GRXlCF
-         0tQVk81oetyJ43DNP0xZ+CAkroGyw+Y7MwupilxNthVtNEFFexXxjGC+b5v875Nij/Ps
-         v3rpiNXLw1fB3X3NtvFw4wrT9K88mmk0HJiCDTIFXE0Z26fUiqv062oMd8Y5ArunUTlg
-         G9jAPy7rIuIn1MXMrRtTTXGSFHLxGDgR7P9EkCTlsZEIK3K1lj2AAfYI+Ha86kBep2ID
-         UXIg==
-X-Gm-Message-State: AOJu0YzFywrM2rArT7w3ijK5HTQ+mx5uoHyWxd8gLiBLTxU1iu7aMFrM
-        yaGL+DaqifEcwux9DHDCfGrGyVAcYxKEScWtzY1HKGsQdq08lw==
-X-Google-Smtp-Source: AGHT+IGQlKpY+eX+IltkCPBAaaoADlZ6ulJwBa+9Dbj5qsHffgXx6FRuG5834augCy++JDpDHeoro8MWvEz8im4xGhM=
-X-Received: by 2002:a05:6e02:118f:b0:34b:ad46:c3ab with SMTP id
- y15-20020a056e02118f00b0034bad46c3abmr6281248ili.7.1692585821856; Sun, 20 Aug
- 2023 19:43:41 -0700 (PDT)
+        with ESMTP id S233325AbjHUI3M (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 21 Aug 2023 04:29:12 -0400
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04EDCA6;
+        Mon, 21 Aug 2023 01:29:09 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VqDjToh_1692606544;
+Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VqDjToh_1692606544)
+          by smtp.aliyun-inc.com;
+          Mon, 21 Aug 2023 16:29:05 +0800
+From:   Yang Li <yang.lee@linux.alibaba.com>
+To:     linkinjeon@kernel.org, sfrench@samba.org
+Cc:     senozhatsky@chromium.org, tom@talpey.com,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yang Li <yang.lee@linux.alibaba.com>
+Subject: [PATCH -next] ksmbd: Fix one kernel-doc comment
+Date:   Mon, 21 Aug 2023 16:29:03 +0800
+Message-Id: <20230821082903.26423-1-yang.lee@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
 MIME-Version: 1.0
-From:   Nathan French <nathanmfrench17@gmail.com>
-Date:   Sun, 20 Aug 2023 21:43:32 -0500
-Message-ID: <CACp1nnB_nXtxAxNzoDqcDg=FTzQbxt14SFSTqN8tAE4fn_AQyw@mail.gmail.com>
-Subject: [PATCH][ksmbd] fix UAF in ksmbd_alloc_work_struct
-To:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linkinjeon@kernel.org
-Content-Type: multipart/mixed; boundary="000000000000a9fbcb060365d8ba"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000a9fbcb060365d8ba
-Content-Type: text/plain; charset="UTF-8"
+Fix one kernel-doc comment to silence the warning:
+fs/smb/server/smb2pdu.c:4160: warning: Excess function parameter 'infoclass_size' description in 'buffer_check_err'
 
-    avoid oops accessing null work struct pointer
+Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+---
+ fs/smb/server/smb2pdu.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-    Fixes: bdf1b0e2a1ea ("ksmbd_alloc_work_struct")
-    Addresses-Coverity: 1566875 ("Explicit null dereference")
-    Reviewed-by: Jackson Winslow <jackwinslow35@gmail.com>
-    Signed-off-by: Nathan French <nathanmfrench17@gmail.com>
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index a7325fe3319b..f4f2d51b56b5 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4150,7 +4150,6 @@ int smb2_query_dir(struct ksmbd_work *work)
+  * @reqOutputBufferLength:	max buffer length expected in command response
+  * @rsp:		query info response buffer contains output buffer length
+  * @rsp_org:		base response buffer pointer in case of chained response
+- * @infoclass_size:	query info class response buffer size
+  *
+  * Return:	0 on success, otherwise error
+  */
+-- 
+2.20.1.7.g153144c
 
-diff --git a/fs/smb/server/ksmbd_work.c b/fs/smb/server/ksmbd_work.c
-index 51def3ca74c0..9411f7e32a3c 100644
---- a/fs/smb/server/ksmbd_work.c
-+++ b/fs/smb/server/ksmbd_work.c
-@@ -33,7 +33,7 @@ struct ksmbd_work *ksmbd_alloc_work_struct(void)
-                                    GFP_KERNEL);
-                if (!work->iov) {
-                        kmem_cache_free(work_cache, work);
--                       work = NULL;
-+                       return NULL;
-                }
-        }
-        return work;
-
---000000000000a9fbcb060365d8ba
-Content-Type: application/octet-stream; 
-	name="0001-ksmbd-fix-UAF-in-ksmbd_alloc_work_struct.patch"
-Content-Disposition: attachment; 
-	filename="0001-ksmbd-fix-UAF-in-ksmbd_alloc_work_struct.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_llk9w05h0>
-X-Attachment-Id: f_llk9w05h0
-
-RnJvbSBjMTM4MTc0NDFjODYwZmVjMTRjYzlkNDMzNzE5YjgzY2E3ZGUxZWQwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBOYXRoYW4gRnJlbmNoIDxuYXRoYW5tZnJlbmNoMTdAZ21haWwu
-Y29tPgpEYXRlOiBNb24sIDIxIEF1ZyAyMDIxIDAyOjE3OjA0ICswMDAwClN1YmplY3Q6IFtQQVRD
-SF0ga3NtYmQ6IGZpeCBVQUYgaW4ga3NtYmRfYWxsb2Nfd29ya19zdHJ1Y3QKCmF2b2lkIG9vcHMg
-YWNjZXNzaW5nIG51bGwgd29yayBzdHJ1Y3QgcG9pbnRlcgoKRml4ZXM6IGJkZjFiMGUyYTFlYSAo
-ImtzbWJkX2FsbG9jX3dvcmtfc3RydWN0IikKQWRkcmVzc2VzLUNvdmVyaXR5OiAxNTY2ODc1ICgi
-RXhwbGljaXQgbnVsbCBkZXJlZmVyZW5jZSIpClJldmlld2VkLWJ5OiBKYWNrc29uIFdpbnNsb3cg
-PGphY2t3aW5zbG93MzVAZ21haWwuY29tPgpTaWduZWQtb2ZmLWJ5OiBOYXRoYW4gRnJlbmNoIDxu
-YXRoYW5tZnJlbmNoMTdAZ21haWwuY29tPgotLS0KIGZzL3NtYi9zZXJ2ZXIva3NtYmRfd29yay5j
-IHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpk
-aWZmIC0tZ2l0IGEvZnMvc21iL3NlcnZlci9rc21iZF93b3JrLmMgYi9mcy9zbWIvc2VydmVyL2tz
-bWJkX3dvcmsuYwppbmRleCA1MWRlZjNjYTc0YzAuLjk0MTFmN2UzMmEzYyAxMDA2NDQKLS0tIGEv
-ZnMvc21iL3NlcnZlci9rc21iZF93b3JrLmMKKysrIGIvZnMvc21iL3NlcnZlci9rc21iZF93b3Jr
-LmMKQEAgLTMzLDcgKzMzLDcgQEAgc3RydWN0IGtzbWJkX3dvcmsgKmtzbWJkX2FsbG9jX3dvcmtf
-c3RydWN0KHZvaWQpCiAJCQkJICAgIEdGUF9LRVJORUwpOwogCQlpZiAoIXdvcmstPmlvdikgewog
-CQkJa21lbV9jYWNoZV9mcmVlKHdvcmtfY2FjaGUsIHdvcmspOwotCQkJd29yayA9IE5VTEw7CisJ
-CQlyZXR1cm4gTlVMTDsKIAkJfQogCX0KIAlyZXR1cm4gd29yazsKLS0gCjIuMzkuMgoK
---000000000000a9fbcb060365d8ba--
