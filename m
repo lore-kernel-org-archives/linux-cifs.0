@@ -2,57 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8755EEE49B4
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 22:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4698FEE49B9
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 22:17:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229581AbjHYWA0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Aug 2023 18:00:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52862 "EHLO
+        id S229883AbjHYWQn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Aug 2023 18:16:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231426AbjHYWAE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 18:00:04 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B389426AF
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 14:59:46 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-68bee12e842so1076563b3a.3
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 14:59:46 -0700 (PDT)
+        with ESMTP id S230256AbjHYWQW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 18:16:22 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74F022703
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 15:16:19 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bf48546ccfso10100605ad.2
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 15:16:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1693000786; x=1693605586;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1693001779; x=1693606579;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wCmT1oESbAYhZeNNKJ5ShtRN4csCjH3Kne0S41EAnjg=;
-        b=41e5WqQODP0hmu8CXJSYnJoxP9CYCTQIjvtSx0suLjuCd2LQoihd/jLrKiko4xwooZ
-         7dYHeAbwy4v/acegR7zM2t87koKR6b9HdwUQM9+1khEZHSlP6Ay9Gyi1BnTTJyQ+N1sf
-         Tihv+CPf4TPS3j/ZySi0TL4gDqhyuMZ+nJxTaDnexRh6Pcmjy8aRHLfP/t/1vg9xEN/C
-         0OJKzvJcUqwLuYg4eu+OPeBIRa0lo/YObVmgzaCCijZ7OHy87LLvHUMM6er4JE4Dhtu4
-         AWYpsvb+nGYnjp1AziAY3+XfPWUVf+GXDgs/Cvrt+UTpnf3nupIw3K4PynKsZ49o3GsI
-         BY9g==
+        bh=ppeQOWgbWz5gqWZs/rbytV4GhpZ82FSsmBh/giRYIfc=;
+        b=oGxnlMh0S/WiVEBqRgXg0XkOHzHqDpTBvnGnagMxXiK0WZOe1Z4r+2p1ptsCZGDnWB
+         pXEktmY/ad0PuwAxCgT0YcHOMRjDsuwyrAXCFtdwEmAj+muyxYQXIE+r39jHMvXhT5B0
+         o+SPYmvdCE0AaqEX44rBk89wjuy74zXAp3Vwzk0u1JPoPtSJh1DrCjw1RqWqiFdJpqby
+         tMNly65LV0QvaLstk47azhvzcHLQyEtc8q2u/G93EQr7wDi/F72WQh2TPKv7ILrD/tve
+         HoezaGEwtih61yu0zT7giO0Mqh1qaOyneAEL9vdEIb12mBB0wZbgWFOwNbvY6RzLwUwH
+         OW2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693000786; x=1693605586;
+        d=1e100.net; s=20221208; t=1693001779; x=1693606579;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wCmT1oESbAYhZeNNKJ5ShtRN4csCjH3Kne0S41EAnjg=;
-        b=QaPe3sfYvCEskL8GMIBHnDN3u8WN3XaDrUtRpTSYH2dgBTVV7HXiEAW1KLaTF2hpm0
-         CtDa2w0dRY5DC4oapHurlsa8Utf8kOK+Z//C6MHd1t6EjqJ6yxrCS/w3GfBzzhz+vCp3
-         g6qahGU8OhipcK5ZIxWELF0i1AcYoSVtE9Mf22KAzVVPuqrdqkUUEZI5nsO76138IAZH
-         8FDALXr12ufc0hVuc+zsZ1rdTDeg+cxetUpVNMes+AqQIydK51bgmf7dMszvoVWkpv1B
-         rWPolAHEhZnnU2MZJi97FfmP28sCdDRx+OAQVTN7afVP4h3ekAhtIuYUbM8g7Ln6fOmb
-         N4Ug==
-X-Gm-Message-State: AOJu0YxMJHjQHdEDpjlixmBEA48OotoHzn1iL6ZJgn7qb+KwozryVQZe
-        J4NBsNGmbxfVW0M4oKLIWEWqGQ==
-X-Google-Smtp-Source: AGHT+IH1qPsbAkUY/ApYOINMHsRtAsDWZuWyGwI872JdnDKqNbs04KgeM02oT1drFck2zagaT8PEnw==
-X-Received: by 2002:a05:6a00:cc2:b0:68b:a137:3739 with SMTP id b2-20020a056a000cc200b0068ba1373739mr11002510pfv.4.1693000786153;
-        Fri, 25 Aug 2023 14:59:46 -0700 (PDT)
+        bh=ppeQOWgbWz5gqWZs/rbytV4GhpZ82FSsmBh/giRYIfc=;
+        b=Y6zY6VT9V94O4JgoDJ/sT9uy9s/QAQdPbq12j8eV3eZ5QOOWv8bM/u3WmIhk7BnWzk
+         K5H0wor2r3C48hXbreaS2O2Vzvx6WO6px6DY4EghA2Fd8HAdPwLALXiToQymwiYS7Egv
+         +6/pahZsOWjP4cja+VUvXDC3tm+YG7aC/KTt01MVZLu6mO1xExfuogXQkwXubaN7SqdR
+         JAvkbtIInmtAdHgbAhN4TK8QZt7AlPHNra7xQzqMJ+pc06HvqUBLR5U9VDL40m8BhnNk
+         ZfhvOmBeQ3HZ1ZFa9xDZ4jjmxcE11MVfWq27hSVuaIc3+HSyw7+kDEXGYCplvze5NMMG
+         e2sw==
+X-Gm-Message-State: AOJu0YwpaUJqcYbmeJFdNukyC3iwzNBubbojqxTlBUw+SMB/4G0IUyNY
+        GSNvGWcOKXAdaYn3C88YojOF4A==
+X-Google-Smtp-Source: AGHT+IEjt82Q7/ukix1Bwi0HcqOCAUCGzooSpz1T14B8KRhD3u7v0lApveU1bnKvxuVgpN4iNhxk8w==
+X-Received: by 2002:a17:903:264e:b0:1bd:c338:ae14 with SMTP id je14-20020a170903264e00b001bdc338ae14mr16243879plb.12.1693001778913;
+        Fri, 25 Aug 2023 15:16:18 -0700 (PDT)
 Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id g2-20020aa78742000000b0068be98f1228sm2025436pfo.57.2023.08.25.14.59.45
+        by smtp.gmail.com with ESMTPSA id f8-20020a170902684800b001c0bf60ba5csm2276046pln.272.2023.08.25.15.16.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 14:59:45 -0700 (PDT)
+        Fri, 25 Aug 2023 15:16:18 -0700 (PDT)
 Received: from dave by dread.disaster.area with local (Exim 4.96)
         (envelope-from <david@fromorbit.com>)
-        id 1qZeqF-006VO2-18;
-        Sat, 26 Aug 2023 07:59:43 +1000
-Date:   Sat, 26 Aug 2023 07:59:43 +1000
+        id 1qZf6F-006Va3-0j;
+        Sat, 26 Aug 2023 08:16:15 +1000
+Date:   Sat, 26 Aug 2023 08:16:15 +1000
 From:   Dave Chinner <david@fromorbit.com>
 To:     Hao Xu <hao.xu@linux.dev>
 Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
@@ -74,31 +74,160 @@ Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
         Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 28/29] xfs: support nowait semantics for xc_ctx_lock in
- xlog_cil_commit()
-Message-ID: <ZOkkT5Ai7wyMGcWC@dread.disaster.area>
+Subject: Re: [PATCH 25/29] xfs: support nowait for xfs_buf_item_init()
+Message-ID: <ZOkoL8nuXJDVZM1H@dread.disaster.area>
 References: <20230825135431.1317785-1-hao.xu@linux.dev>
- <20230825135431.1317785-29-hao.xu@linux.dev>
+ <20230825135431.1317785-26-hao.xu@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230825135431.1317785-29-hao.xu@linux.dev>
+In-Reply-To: <20230825135431.1317785-26-hao.xu@linux.dev>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 09:54:30PM +0800, Hao Xu wrote:
+On Fri, Aug 25, 2023 at 09:54:27PM +0800, Hao Xu wrote:
 > From: Hao Xu <howeyxu@tencent.com>
 > 
-> Apply trylock logic for xc_ctx_lock in xlog_cil_commit() in nowait
-> case and error out -EAGAIN for xlog_cil_commit().
+> support nowait for xfs_buf_item_init() and error out -EAGAIN to
+> _xfs_trans_bjoin() when it would block.
+> 
+> Signed-off-by: Hao Xu <howeyxu@tencent.com>
+> ---
+>  fs/xfs/xfs_buf_item.c         |  9 +++++++--
+>  fs/xfs/xfs_buf_item.h         |  2 +-
+>  fs/xfs/xfs_buf_item_recover.c |  2 +-
+>  fs/xfs/xfs_trans_buf.c        | 16 +++++++++++++---
+>  4 files changed, 22 insertions(+), 7 deletions(-)
+> 
+> diff --git a/fs/xfs/xfs_buf_item.c b/fs/xfs/xfs_buf_item.c
+> index 023d4e0385dd..b1e63137d65b 100644
+> --- a/fs/xfs/xfs_buf_item.c
+> +++ b/fs/xfs/xfs_buf_item.c
+> @@ -827,7 +827,8 @@ xfs_buf_item_free_format(
+>  int
+>  xfs_buf_item_init(
+>  	struct xfs_buf	*bp,
+> -	struct xfs_mount *mp)
+> +	struct xfs_mount *mp,
+> +	bool   nowait)
+>  {
+>  	struct xfs_buf_log_item	*bip = bp->b_log_item;
+>  	int			chunks;
+> @@ -847,7 +848,11 @@ xfs_buf_item_init(
+>  		return 0;
+>  	}
+>  
+> -	bip = kmem_cache_zalloc(xfs_buf_item_cache, GFP_KERNEL | __GFP_NOFAIL);
+> +	bip = kmem_cache_zalloc(xfs_buf_item_cache,
+> +				GFP_KERNEL | (nowait ? 0 : __GFP_NOFAIL));
+> +	if (!bip)
+> +		return -EAGAIN;
+> +
+>  	xfs_log_item_init(mp, &bip->bli_item, XFS_LI_BUF, &xfs_buf_item_ops);
+>  	bip->bli_buf = bp;
 
-Again, fundamentally broken. Any error from xlog_cil_commit() will
-result in a filesystem shutdown as we cannot back out from failure
-with dirty log items gracefully at this point.
+I see filesystem shutdowns....
+
+> diff --git a/fs/xfs/xfs_trans_buf.c b/fs/xfs/xfs_trans_buf.c
+> index 016371f58f26..a1e4f2e8629a 100644
+> --- a/fs/xfs/xfs_trans_buf.c
+> +++ b/fs/xfs/xfs_trans_buf.c
+> @@ -57,13 +57,14 @@ xfs_trans_buf_item_match(
+>   * If the buffer does not yet have a buf log item associated with it,
+>   * then allocate one for it.  Then add the buf item to the transaction.
+>   */
+> -STATIC void
+> +STATIC int
+>  _xfs_trans_bjoin(
+>  	struct xfs_trans	*tp,
+>  	struct xfs_buf		*bp,
+>  	int			reset_recur)
+>  {
+>  	struct xfs_buf_log_item	*bip;
+> +	int ret;
+>  
+>  	ASSERT(bp->b_transp == NULL);
+>  
+> @@ -72,7 +73,11 @@ _xfs_trans_bjoin(
+>  	 * it doesn't have one yet, then allocate one and initialize it.
+>  	 * The checks to see if one is there are in xfs_buf_item_init().
+>  	 */
+> -	xfs_buf_item_init(bp, tp->t_mountp);
+> +	ret = xfs_buf_item_init(bp, tp->t_mountp,
+> +				tp->t_flags & XFS_TRANS_NOWAIT);
+> +	if (ret < 0)
+> +		return ret;
+> +
+>  	bip = bp->b_log_item;
+>  	ASSERT(!(bip->bli_flags & XFS_BLI_STALE));
+>  	ASSERT(!(bip->__bli_format.blf_flags & XFS_BLF_CANCEL));
+> @@ -92,6 +97,7 @@ _xfs_trans_bjoin(
+>  	xfs_trans_add_item(tp, &bip->bli_item);
+>  	bp->b_transp = tp;
+>  
+> +	return 0;
+>  }
+>  
+>  void
+> @@ -309,7 +315,11 @@ xfs_trans_read_buf_map(
+>  	}
+>  
+>  	if (tp) {
+> -		_xfs_trans_bjoin(tp, bp, 1);
+> +		error = _xfs_trans_bjoin(tp, bp, 1);
+> +		if (error) {
+> +			xfs_buf_relse(bp);
+> +			return error;
+> +		}
+>  		trace_xfs_trans_read_buf(bp->b_log_item);
+
+So what happens at the callers when we have a dirty transaction and
+joining a buffer fails with -EAGAIN?
+
+Apart from the fact this may well propagate -EAGAIN up to userspace,
+cancelling a dirty transaction at this point will result in a
+filesystem shutdown....
+
+Indeed, this can happen in the "simple" timestamp update case that
+this "nowait" semantic is being aimed at. We log the inode in the
+timestamp update, which dirties the log item and registers a
+precommit operation to be run. We commit the
+transaction, which then runs xfs_inode_item_precommit() and that
+may need to attach the inode to the inode cluster buffer. This
+results in:
+
+xfs_inode_item_precommit
+  xfs_imap_to_bp
+    xfs_trans_read_buf_map
+      _xfs_trans_bjoin
+        xfs_buf_item_init(XFS_TRANS_NOWAIT)
+	  kmem_cache_zalloc(GFP_NOFS)
+	  <memory allocation fails>
+      gets -EAGAIN error
+    propagates -EAGAIN
+  fails due to -EAGAIN
+
+And now xfs_trans_commit() fails with a dirty transaction and the
+filesystem shuts down.
+
+IOWs, XFS_TRANS_NOWAIT as it stands is fundamentally broken. Once we
+dirty an item in a transaction, we *cannot* back out of the
+transaction. We *must block* in every place that could fail -
+locking, memory allocation and/or IO - until the transaction
+completes because we cannot undo the changes we've already made to
+the dirty items in the transaction....
+
+It's even worse than that - once we have committed intents, the
+whole chain of intent processing must be run to completionr. Hence
+we can't tolerate backing out of that defered processing chain half
+way through because we might have to block.
+
+Until we can roll back partial dirty transactions and partially
+completed defered intent chains at any random point of completion,
+XFS_TRANS_NOWAIT will not work.
 
 -Dave.
-
 -- 
 Dave Chinner
 david@fromorbit.com
