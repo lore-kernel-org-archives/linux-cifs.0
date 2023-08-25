@@ -2,29 +2,29 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 553F5C7EE2C
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 14:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D84C79F6A
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 14:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245724AbjHYOHQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Aug 2023 10:07:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50412 "EHLO
+        id S1343544AbjHYOIS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Aug 2023 10:08:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343515AbjHYOG7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 10:06:59 -0400
-Received: from out-246.mta1.migadu.com (out-246.mta1.migadu.com [95.215.58.246])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00B05270B
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 07:06:33 -0700 (PDT)
+        with ESMTP id S1343587AbjHYOHb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 10:07:31 -0400
+Received: from out-246.mta1.migadu.com (out-246.mta1.migadu.com [IPv6:2001:41d0:203:375::f6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A14C2701;
+        Fri, 25 Aug 2023 07:07:04 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692972337;
+        t=1692972368;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mjhC+caj2gJRQH+sSsUlDYCC/6KksdCJUKl454sdMkA=;
-        b=O2I4LuIVYgSn+nmzJUq/UHofHubEntakWSPFjqloiwwujETAFgWOGN3xteSPe9gSVMqAFq
-        d8hRn0Wa7uhhjg2GTvasuKf8CHjMi2bI9Lkmg+s4bspXsO5Xaxy412PPH/FB0SLGDG9CfT
-        9ayHr7HUCratE15Bg5Ihc+obof/8RuQ=
+        bh=o5eD4gq5Ypmv7xNjaJcQB3ZOSw79lNA3YgufxQ7kbUU=;
+        b=IDkI/8FcKGXMrBLpAzKCujyKyUIvnRClPZG+PDDA+Kg6Ww/HgNrG0d8/UaYBPttRvdNV2G
+        ImRsaH6EObyEWgQtf31bAS82oxf65cz7kpZXIj7D5nH1V4igKHLmt2T1OZkYhVy9UsI8OJ
+        u9rq7LaZ7EE10dyazZwRdVBs5aqDaMI=
 From:   Hao Xu <hao.xu@linux.dev>
 To:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc:     Dominique Martinet <asmadeus@codewreck.org>,
@@ -46,9 +46,9 @@ Cc:     Dominique Martinet <asmadeus@codewreck.org>,
         devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
         Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH 26/29] xfs: return -EAGAIN when nowait meets sync in transaction commit
-Date:   Fri, 25 Aug 2023 21:54:28 +0800
-Message-Id: <20230825135431.1317785-27-hao.xu@linux.dev>
+Subject: [PATCH 28/29] xfs: support nowait semantics for xc_ctx_lock in xlog_cil_commit()
+Date:   Fri, 25 Aug 2023 21:54:30 +0800
+Message-Id: <20230825135431.1317785-29-hao.xu@linux.dev>
 In-Reply-To: <20230825135431.1317785-1-hao.xu@linux.dev>
 References: <20230825135431.1317785-1-hao.xu@linux.dev>
 MIME-Version: 1.0
@@ -60,44 +60,88 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Hao Xu <howeyxu@tencent.com>
 
-if the log transaction is a sync one, let's fail the nowait try and
-return -EAGAIN directly since sync transaction means blocked by IO.
+Apply trylock logic for xc_ctx_lock in xlog_cil_commit() in nowait
+case and error out -EAGAIN for xlog_cil_commit().
 
 Signed-off-by: Hao Xu <howeyxu@tencent.com>
 ---
- fs/xfs/xfs_trans.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ fs/xfs/xfs_log_cil.c  | 12 ++++++++++--
+ fs/xfs/xfs_log_priv.h |  2 +-
+ fs/xfs/xfs_trans.c    |  4 +++-
+ 3 files changed, 14 insertions(+), 4 deletions(-)
 
+diff --git a/fs/xfs/xfs_log_cil.c b/fs/xfs/xfs_log_cil.c
+index b31830ee36dd..6d054359bbb5 100644
+--- a/fs/xfs/xfs_log_cil.c
++++ b/fs/xfs/xfs_log_cil.c
+@@ -1613,7 +1613,7 @@ xlog_cil_process_intents(
+  * background commit, returns without it held once background commits are
+  * allowed again.
+  */
+-void
++int
+ xlog_cil_commit(
+ 	struct xlog		*log,
+ 	struct xfs_trans	*tp,
+@@ -1623,6 +1623,7 @@ xlog_cil_commit(
+ 	struct xfs_cil		*cil = log->l_cilp;
+ 	struct xfs_log_item	*lip, *next;
+ 	uint32_t		released_space = 0;
++	bool			nowait = tp->t_flags & XFS_TRANS_NOWAIT;
+ 
+ 	/*
+ 	 * Do all necessary memory allocation before we lock the CIL.
+@@ -1632,7 +1633,12 @@ xlog_cil_commit(
+ 	xlog_cil_alloc_shadow_bufs(log, tp);
+ 
+ 	/* lock out background commit */
+-	down_read(&cil->xc_ctx_lock);
++	if (nowait) {
++		if (!down_read_trylock(&cil->xc_ctx_lock))
++			return -EAGAIN;
++	} else {
++		down_read(&cil->xc_ctx_lock);
++	}
+ 
+ 	if (tp->t_flags & XFS_TRANS_HAS_INTENT_DONE)
+ 		released_space = xlog_cil_process_intents(cil, tp);
+@@ -1668,6 +1674,8 @@ xlog_cil_commit(
+ 
+ 	/* xlog_cil_push_background() releases cil->xc_ctx_lock */
+ 	xlog_cil_push_background(log);
++
++	return 0;
+ }
+ 
+ /*
+diff --git a/fs/xfs/xfs_log_priv.h b/fs/xfs/xfs_log_priv.h
+index 41edaa0ae869..eb7a1241deab 100644
+--- a/fs/xfs/xfs_log_priv.h
++++ b/fs/xfs/xfs_log_priv.h
+@@ -580,7 +580,7 @@ int	xlog_cil_init(struct xlog *log);
+ void	xlog_cil_init_post_recovery(struct xlog *log);
+ void	xlog_cil_destroy(struct xlog *log);
+ bool	xlog_cil_empty(struct xlog *log);
+-void	xlog_cil_commit(struct xlog *log, struct xfs_trans *tp,
++int	xlog_cil_commit(struct xlog *log, struct xfs_trans *tp,
+ 			xfs_csn_t *commit_seq, bool regrant);
+ void	xlog_cil_set_ctx_write_state(struct xfs_cil_ctx *ctx,
+ 			struct xlog_in_core *iclog);
 diff --git a/fs/xfs/xfs_trans.c b/fs/xfs/xfs_trans.c
-index 7988b4c7f36e..f1f84a3dd456 100644
+index f1f84a3dd456..e5beda636a37 100644
 --- a/fs/xfs/xfs_trans.c
 +++ b/fs/xfs/xfs_trans.c
-@@ -968,12 +968,24 @@ __xfs_trans_commit(
- 	xfs_csn_t		commit_seq = 0;
- 	int			error = 0;
- 	int			sync = tp->t_flags & XFS_TRANS_SYNC;
-+	bool			nowait = tp->t_flags & XFS_TRANS_NOWAIT;
-+	bool			perm_log = tp->t_flags & XFS_TRANS_PERM_LOG_RES;
+@@ -1037,7 +1037,9 @@ __xfs_trans_commit(
+ 		xfs_trans_apply_sb_deltas(tp);
+ 	xfs_trans_apply_dquot_deltas(tp);
  
- 	trace_xfs_trans_commit(tp, _RET_IP_);
- 
-+	if (nowait && sync) {
-+		/*
-+		 * Currently nowait is only from xfs_vn_update_time()
-+		 * so perm_log is always false here, but let's make
-+		 * code general.
-+		 */
-+		if (perm_log)
-+			xfs_defer_cancel(tp);
+-	xlog_cil_commit(log, tp, &commit_seq, regrant);
++	error = xlog_cil_commit(log, tp, &commit_seq, regrant);
++	if (error)
 +		goto out_unreserve;
-+	}
- 	error = xfs_trans_run_precommits(tp);
- 	if (error) {
--		if (tp->t_flags & XFS_TRANS_PERM_LOG_RES)
-+		if (perm_log)
- 			xfs_defer_cancel(tp);
- 		goto out_unreserve;
- 	}
+ 
+ 	xfs_trans_free(tp);
+ 
 -- 
 2.25.1
 
