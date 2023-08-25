@@ -2,67 +2,72 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DDBC3DA66
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 07:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94884C3DA66
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 13:09:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243292AbjHYH4Y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Aug 2023 03:56:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48632 "EHLO
+        id S229851AbjHYNJK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Aug 2023 09:09:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241171AbjHYH4J (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 03:56:09 -0400
-Received: from mail.venturelinkbiz.com (mail.venturelinkbiz.com [51.195.119.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6C92CF1
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 00:56:07 -0700 (PDT)
-Received: by mail.venturelinkbiz.com (Postfix, from userid 1002)
-        id 593F747113; Fri, 25 Aug 2023 07:55:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=venturelinkbiz.com;
-        s=mail; t=1692950166;
-        bh=JBV4b8UUo1MSngn/QBoedt1Dv52bT8rWeq4R22MtJMs=;
-        h=Date:From:To:Subject:From;
-        b=P9F/OIxu8KZPAGp8z3e6rnZP5a0BKB05j587G4Vn89ZFBCa4ad+IxEhnzg+TAx42q
-         E9drMDyrUsOAnWR5eu9VPNYOmS+dKziW+7mqB7I8F2e3tYqxRMyBY6vZneeL5dPsZ0
-         oL6TYVPa106NlGopzfJkBUBhwSUDYuq2HaAUP/dsdrtEi0xgB4YL1AfiwiRKlfYckD
-         KtYoSKXnFiuca5h13zqYuFQSd+frlXQ7bb6adHCgXvnbg8nePDZQ9dBDDEuefr4IFC
-         thVoTLpcjx5n+O0ys1yiNci4psrvVmdIs+ESEYD2kY09kmfbPO+IQBl5l1ECZpUM90
-         Mq7899tqUDweg==
-Received: by mail.venturelinkbiz.com for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 07:55:54 GMT
-Message-ID: <20230825064500-0.1.20.5c37.0.b3697l0e0k@venturelinkbiz.com>
-Date:   Fri, 25 Aug 2023 07:55:54 GMT
-From:   "Michal Rmoutil" <michal.rmoutil@venturelinkbiz.com>
-To:     <linux-cifs@vger.kernel.org>
-Subject: =?UTF-8?Q?Efektivn=C3=AD_sledov=C3=A1n=C3=AD_a_optimalizace_v=C3=BDroby_pro_va=C5=A1i_spole=C4=8Dnost?=
-X-Mailer: mail.venturelinkbiz.com
+        with ESMTP id S236426AbjHYNI7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 09:08:59 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 869B31BE2
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 06:08:57 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2bccda76fb1so13478021fa.2
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 06:08:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692968936; x=1693573736;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=s7eqMtZG/296WN2nIurn7rT0RVX+f6NXe5PLdqXMKek=;
+        b=Miq8VtVLUy14+dE1LAFRtOORRmRipjz3fvLr3+j9EvIqhXPj1/BTndaR9ZOnMLonKv
+         08N6D29iVVfMerIwK+/vSs6o0iWzoKsMaxl7JPvLrKe5/c4UvwUlqtZoLKZ8vyqgLCXN
+         ExOOt/PvAU3FU3CjrAJwoQ4XDA52+/LJ2ucpUwpTeiy/i96fY0m3Vr7BTzGKBAV5qJko
+         pQ4mbVCYZIACDglH3cP+jKKISQc6Rr54UqUcuiYfvv9FCCic7bfz0k2m/3GUTz3Rol/K
+         NkY/tdST7nnTcQg+Da1KMPkI6wSHSWs6nd800+2Fg7ZP84uk9RFKIOX5GF9ORLQnKubp
+         sY9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692968936; x=1693573736;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=s7eqMtZG/296WN2nIurn7rT0RVX+f6NXe5PLdqXMKek=;
+        b=lfclcbLOg4PnFpsVdVoFYOBHEiHUnsg1B34WA5svSN/w3KeqLtNMXywsO8F+vmtCpa
+         7AJ5/167+u63PehF5X0lDpJZKDkciKW4+xJCCULdO/S1VR/ZKV39YUFz930jq8gZ0xSx
+         MNUdmFD43yhykLtTofWoNwRvxSmkffb/m/b2qWyn6RWtCpVXL05qkJUPQ55pZjM7GTpY
+         QDs9Fb3o31TcHUoGdfY62KWIPjue3jxrb4PLIPefLiRb4hiG6mon2b0Tpilkm3A1C4x/
+         vEvfsQ80lFWBwVuWkM/lcF0AEhKFQPIPF7IYibWLZ3mOqnWO0CM+0YJZr5mPeczQkoOR
+         39Fg==
+X-Gm-Message-State: AOJu0Yz6XzK4S0OufMgOA+o0OgyMdFHHHGJYI/hcA6c8YV7qEz+goP5+
+        xfyfHfod/Wk6qAqHPiPptlqq30tx4XgkuOUAKHSRnTe546ecqg==
+X-Google-Smtp-Source: AGHT+IHIkSCRG3ISQkWAaNFr7vfkxLqZjZAZxW4nMhlNNrCuqkAEvASjyhm92G1dalqRbv6k4KvYAEMHQB+/a6ttyFE=
+X-Received: by 2002:a2e:8717:0:b0:2bc:c11c:4471 with SMTP id
+ m23-20020a2e8717000000b002bcc11c4471mr11749354lji.21.1692968935350; Fri, 25
+ Aug 2023 06:08:55 -0700 (PDT)
 MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 25 Aug 2023 08:08:44 -0500
+Message-ID: <CAH2r5mviQ_UEwqwvaz33dgZwzsqJxYT-xXccNmjW-GvuYokgbA@mail.gmail.com>
+Subject: SMB3.1.1 QUIC mounts from Linux kernel
+To:     Xin Long <lucien.xin@gmail.com>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dobr=C3=A9 r=C3=A1no,
+Xin Long,
+I am very interested in trying out LInux kernel SMB3.1.1 mounts using
+QUIC but wasn't sure how far along your kernel code was.   Do you have
+an update on it?   There was at least one other server type that
+implements SMB3.1.1 over QUIC, but probably easiest to test to Windows
+server (e.g. in Azure).
 
-m=C3=A1te mo=C5=BEnost sledovat stav ka=C5=BEd=C3=A9ho stroje a v=C3=BDro=
-bn=C3=ADho procesu z kancel=C3=A1=C5=99e, konferen=C4=8Dn=C3=AD m=C3=ADst=
-nosti nebo dokonce z domova =C4=8Di na cest=C3=A1ch =E2=80=93 na va=C5=A1=
-em telefonu?
+The SMB3.1.1 changes are small to support QUIC, and I could do those
+(or review yours if you have already done it).
 
-Poskytujeme rychle implementovateln=C3=BD a snadno pou=C5=BEiteln=C3=BD n=
-=C3=A1stroj, kter=C3=BD zachyt=C3=AD i n=C4=9Bkolikasekundov=C3=BD mikrop=
-rostoj a okam=C5=BEit=C4=9B p=C5=99epo=C4=8D=C3=ADt=C3=A1 vyu=C5=BEit=C3=AD=
- stroje v kontextu dan=C3=A9 v=C3=BDrobn=C3=AD zak=C3=A1zky.
+-- 
+Thanks,
 
-Kdykoli vid=C3=ADte stav objedn=C3=A1vky a jste informov=C3=A1ni o p=C5=99=
-=C3=ADpadn=C3=A9m sn=C3=AD=C5=BEen=C3=AD efektivity. Syst=C3=A9m s=C3=A1m=
- analyzuje data a p=C5=99ipravuje cenn=C3=A9 reporty, co=C5=BE oper=C3=A1=
-tor=C5=AFm umo=C5=BE=C5=88uje soust=C5=99edit se na v=C3=BDrobn=C3=AD c=C3=
-=ADl.
-
-C=C3=ADl je jednoduch=C3=BD: jeden pohled =E2=80=93 cel=C3=A1 tov=C3=A1rn=
-a. =C4=8Cek=C3=A1m na odpov=C4=9B=C4=8F, jestli vid=C3=ADte mo=C5=BEnost =
-vyu=C5=BEit=C3=AD takov=C3=A9ho n=C3=A1stroje ve va=C5=A1=C3=AD firm=C4=9B=
-=2E
-
-
-Pozdravy
-Michal Rmoutil
+Steve
