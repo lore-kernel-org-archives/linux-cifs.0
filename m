@@ -2,83 +2,279 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE43C3DA66
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 14:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB92EE49A6
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 15:11:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343863AbjHYOtu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Aug 2023 10:49:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
+        id S232238AbjHYPL1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Aug 2023 11:11:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343910AbjHYOtk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 10:49:40 -0400
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21D72119
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 07:49:37 -0700 (PDT)
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1c09673b006so7503435ad.1
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 07:49:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692974976; x=1693579776;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f3DI36WNdRKRJ8jT0b6JWEBzJ5oQWCD9tqcC8NDl9nI=;
-        b=ZBH1MdHFsSXS3ZPYa3DBYgRvzasqtNRVUuU9XCE5glSHQR9U4ybT5A59JHDVshFURk
-         TNUofmQ/Gkj8ygvqKC5jUBdDv9tTghR2WQxPOP0wP/Ric2NTNB/pYdSUtQzzr6MWIq7O
-         OKTZC2WLgDkTmB6FlxeKBCmFtgVtMon3djBqVSYRMkDoAI8V3Ku3ZXbRJ4cd1BG2YXus
-         VMADkI6I/5ZTzZd2ai/bLE24D0cnpJ9un6JlJIcBZ4J1aFo/aWlSweUdV9SKNHUj1s95
-         Q5e1RRk76DlUL0lMP+LgZvu7okIJTj0CqTuiJcS8LyKymH87eQ6/h03EoV2j6b6zRGVw
-         arAA==
-X-Gm-Message-State: AOJu0YyMURxU1mH+2XCFw9KfO8FyKH5n2fsBY7QNTHIneOfFeT3ZrIEH
-        A+EW2lhA4L6YkPcmuM8ZaC04ZxrN04o=
-X-Google-Smtp-Source: AGHT+IH2GJv0YkTHCUxFd4VwMLoWWjVg8upoNtaMLR+VVGUlul/j9zKtAve4LxHWMEwrMeWiUFyolg==
-X-Received: by 2002:a17:902:ea06:b0:1c0:a5c9:e05a with SMTP id s6-20020a170902ea0600b001c0a5c9e05amr9839760plg.43.1692974976596;
-        Fri, 25 Aug 2023 07:49:36 -0700 (PDT)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id jh12-20020a170903328c00b001bee782a1desm1798020plb.181.2023.08.25.07.49.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 07:49:36 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        hyc.lee@gmail.com, atteh.mailbox@gmail.com,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        zdi-disclosures@trendmicro.com
-Subject: [PATCH 2/3] ksmbd: fix slub overflow in ksmbd_decode_ntlmssp_auth_blob()
-Date:   Fri, 25 Aug 2023 23:48:47 +0900
-Message-Id: <20230825144848.9034-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230825144848.9034-1-linkinjeon@kernel.org>
-References: <20230825144848.9034-1-linkinjeon@kernel.org>
+        with ESMTP id S235346AbjHYPLT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 11:11:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD010212E;
+        Fri, 25 Aug 2023 08:11:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4DC3962EC1;
+        Fri, 25 Aug 2023 15:11:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A51CFC433C7;
+        Fri, 25 Aug 2023 15:11:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692976275;
+        bh=Yk82zBo/CO5JhPqCebob30ONG4lnlvLUkORIUTY0ODE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NYYVRerqYqnGpLF8blJdmxVpMOEPQLv0528BjC5vvBFsZNAz6HSSGB0+0FSTqmw/7
+         Db7P0mmTsJO1oNY1/ZHWu8NyzK9JrsOCasrcwziq7v3vDEDceQvRopW668kANjqE5f
+         XtN676xYCoJvkIHN5kf251pR26YpJ9SQiBSWWbB3qvKX/kVrAeNfp0cfhulI06kGyS
+         rDA+euytpnrfPPjqUYcEaqjX12Vj0EdMyf1Oo7A6QZMfrIIcEUaHvGZ8srUTvsTFVz
+         en/rpIYHaZ7zIlQRk5TaAyXVnqxQP9imT2Z+zB9eRFWghRFbDct0Qujy/WQpJcsiaU
+         Wx3ea7l8r3I0w==
+Date:   Fri, 25 Aug 2023 08:11:15 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Hao Xu <hao.xu@linux.dev>
+Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+        Dave Chinner <david@fromorbit.com>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH RFC v5 00/29] io_uring getdents
+Message-ID: <20230825151115.GB17891@frogsfrogsfrogs>
+References: <20230825135431.1317785-1-hao.xu@linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230825135431.1317785-1-hao.xu@linux.dev>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If authblob->SessionKey.Length is bigger than session key
-size(CIFS_KEY_SIZE), slub overflow can happen in key exchange codes.
-cifs_arc4_crypt copy to session key array from SessionKey from client.
+On Fri, Aug 25, 2023 at 09:54:02PM +0800, Hao Xu wrote:
+> From: Hao Xu <howeyxu@tencent.com>
+> 
+> This series introduce getdents64 to io_uring, the code logic is similar
+> with the snychronized version's. It first try nowait issue, and offload
+> it to io-wq threads if the first try fails.
 
-Reported-by: zdi-disclosures@trendmicro.com # ZDI-CAN-21940
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/auth.c | 3 +++
- 1 file changed, 3 insertions(+)
+NAK on the entire series until Jens actually writes down what NOWAIT
+does, so that we can check that the *existing* nowait code branches
+actually behave how he says it should.
 
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index af7b2cdba126..229a6527870d 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -355,6 +355,9 @@ int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
- 		if (blob_len < (u64)sess_key_off + sess_key_len)
- 			return -EINVAL;
- 
-+		if (sess_key_len > CIFS_KEY_SIZE)
-+			return -EINVAL;
-+
- 		ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
- 		if (!ctx_arc4)
- 			return -ENOMEM;
--- 
-2.25.1
+https://lore.kernel.org/all/e2d8e5f1-f794-38eb-cecf-ed30c571206b@kernel.dk/
 
+--D
+
+> 
+> Patch1 and Patch2 are some preparation
+> Patch3 supports nowait for xfs getdents code
+> Patch4-11 are vfs change, include adding helpers and trylock for locks
+> Patch12-29 supports nowait for involved xfs journal stuff
+> note, Patch24 and 27 are actually two questions, might be removed later.
+> an xfs test may come later.
+> 
+> Tests I've done:
+> a liburing test case for functional test:
+> https://github.com/HowHsu/liburing/commit/39dc9a8e19c06a8cebf8c2301b85320eb45c061e?diff=unified
+> 
+> xfstests:
+>     test/generic: 1 fails and 171 not run
+>     test/xfs: 72 fails and 156 not run
+> run the code before without this patchset, same result.
+> I'll try to make the environment more right to run more tests here.
+> 
+> 
+> Tested it with a liburing performance test:
+> https://github.com/HowHsu/liburing/blob/getdents/test/getdents2.c
+> 
+> The test is controlled by the below script[2] which runs getdents2.t 100
+> times and calulate the avg.
+> The result show that io_uring version is about 2.6% faster:
+> 
+> note:
+> [1] the number of getdents call/request in io_uring and normal sync version
+> are made sure to be same beforehand.
+> 
+> [2] run_getdents.py
+> 
+> ```python3
+> 
+> import subprocess
+> 
+> N = 100
+> sum = 0.0
+> args = ["/data/home/howeyxu/tmpdir", "sync"]
+> 
+> for i in range(N):
+>     output = subprocess.check_output(["./liburing/test/getdents2.t"] + args)
+>     sum += float(output)
+> 
+> average = sum / N
+> print("Average of sync:", average)
+> 
+> sum = 0.0
+> args = ["/data/home/howeyxu/tmpdir", "iouring"]
+> 
+> for i in range(N):
+>     output = subprocess.check_output(["./liburing/test/getdents2.t"] + args)
+>     sum += float(output)
+> 
+> average = sum / N
+> print("Average of iouring:", average)
+> 
+> ```
+> 
+> v4->v5:
+>  - move atime update to the beginning of getdents operation
+>  - trylock for i_rwsem
+>  - nowait semantics for involved xfs journal stuff
+> 
+> v3->v4:
+>  - add Dave's xfs nowait code and fix a deadlock problem, with some code
+>    style tweak.
+>  - disable fixed file to avoid a race problem for now
+>  - add a test program.
+> 
+> v2->v3:
+>  - removed the kernfs patches
+>  - add f_pos_lock logic
+>  - remove the "reduce last EOF getdents try" optimization since
+>    Dominique reports that doesn't make difference
+>  - remove the rewind logic, I think the right way is to introduce lseek
+>    to io_uring not to patch this logic to getdents.
+>  - add Singed-off-by of Stefan Roesch for patch 1 since checkpatch
+>    complained that Co-developed-by someone should be accompanied with
+>    Signed-off-by same person, I can remove them if Stefan thinks that's
+>    not proper.
+> 
+> 
+> Dominique Martinet (1):
+>   fs: split off vfs_getdents function of getdents64 syscall
+> 
+> Hao Xu (28):
+>   xfs: rename XBF_TRYLOCK to XBF_NOWAIT
+>   xfs: add NOWAIT semantics for readdir
+>   vfs: add nowait flag for struct dir_context
+>   vfs: add a vfs helper for io_uring file pos lock
+>   vfs: add file_pos_unlock() for io_uring usage
+>   vfs: add a nowait parameter for touch_atime()
+>   vfs: add nowait parameter for file_accessed()
+>   vfs: move file_accessed() to the beginning of iterate_dir()
+>   vfs: add S_NOWAIT for nowait time update
+>   vfs: trylock inode->i_rwsem in iterate_dir() to support nowait
+>   xfs: enforce GFP_NOIO implicitly during nowait time update
+>   xfs: make xfs_trans_alloc() support nowait semantics
+>   xfs: support nowait for xfs_log_reserve()
+>   xfs: don't wait for free space in xlog_grant_head_check() in nowait
+>     case
+>   xfs: add nowait parameter for xfs_inode_item_init()
+>   xfs: make xfs_trans_ijoin() error out -EAGAIN
+>   xfs: set XBF_NOWAIT for xfs_buf_read_map if necessary
+>   xfs: support nowait memory allocation in _xfs_buf_alloc()
+>   xfs: distinguish error type of memory allocation failure for nowait
+>     case
+>   xfs: return -EAGAIN when bulk memory allocation fails in nowait case
+>   xfs: comment page allocation for nowait case in xfs_buf_find_insert()
+>   xfs: don't print warn info for -EAGAIN error in  xfs_buf_get_map()
+>   xfs: support nowait for xfs_buf_read_map()
+>   xfs: support nowait for xfs_buf_item_init()
+>   xfs: return -EAGAIN when nowait meets sync in transaction commit
+>   xfs: add a comment for xlog_kvmalloc()
+>   xfs: support nowait semantics for xc_ctx_lock in xlog_cil_commit()
+>   io_uring: add support for getdents
+> 
+>  arch/s390/hypfs/inode.c         |  2 +-
+>  block/fops.c                    |  2 +-
+>  fs/btrfs/file.c                 |  2 +-
+>  fs/btrfs/inode.c                |  2 +-
+>  fs/cachefiles/namei.c           |  2 +-
+>  fs/coda/dir.c                   |  4 +--
+>  fs/ecryptfs/file.c              |  4 +--
+>  fs/ext2/file.c                  |  4 +--
+>  fs/ext4/file.c                  |  6 ++--
+>  fs/f2fs/file.c                  |  4 +--
+>  fs/file.c                       | 13 +++++++
+>  fs/fuse/dax.c                   |  2 +-
+>  fs/fuse/file.c                  |  4 +--
+>  fs/gfs2/file.c                  |  2 +-
+>  fs/hugetlbfs/inode.c            |  2 +-
+>  fs/inode.c                      | 10 +++---
+>  fs/internal.h                   |  8 +++++
+>  fs/namei.c                      |  4 +--
+>  fs/nfsd/vfs.c                   |  2 +-
+>  fs/nilfs2/file.c                |  2 +-
+>  fs/orangefs/file.c              |  2 +-
+>  fs/orangefs/inode.c             |  2 +-
+>  fs/overlayfs/file.c             |  2 +-
+>  fs/overlayfs/inode.c            |  2 +-
+>  fs/pipe.c                       |  2 +-
+>  fs/ramfs/file-nommu.c           |  2 +-
+>  fs/readdir.c                    | 61 +++++++++++++++++++++++++--------
+>  fs/smb/client/cifsfs.c          |  2 +-
+>  fs/splice.c                     |  2 +-
+>  fs/stat.c                       |  2 +-
+>  fs/ubifs/file.c                 |  2 +-
+>  fs/udf/file.c                   |  2 +-
+>  fs/xfs/libxfs/xfs_alloc.c       |  2 +-
+>  fs/xfs/libxfs/xfs_attr_remote.c |  2 +-
+>  fs/xfs/libxfs/xfs_btree.c       |  2 +-
+>  fs/xfs/libxfs/xfs_da_btree.c    | 16 +++++++++
+>  fs/xfs/libxfs/xfs_da_btree.h    |  1 +
+>  fs/xfs/libxfs/xfs_dir2_block.c  |  7 ++--
+>  fs/xfs/libxfs/xfs_dir2_priv.h   |  2 +-
+>  fs/xfs/libxfs/xfs_shared.h      |  2 ++
+>  fs/xfs/libxfs/xfs_trans_inode.c | 12 +++++--
+>  fs/xfs/scrub/dir.c              |  2 +-
+>  fs/xfs/scrub/readdir.c          |  2 +-
+>  fs/xfs/scrub/repair.c           |  2 +-
+>  fs/xfs/xfs_buf.c                | 43 +++++++++++++++++------
+>  fs/xfs/xfs_buf.h                |  4 +--
+>  fs/xfs/xfs_buf_item.c           |  9 +++--
+>  fs/xfs/xfs_buf_item.h           |  2 +-
+>  fs/xfs/xfs_buf_item_recover.c   |  2 +-
+>  fs/xfs/xfs_dir2_readdir.c       | 49 ++++++++++++++++++++------
+>  fs/xfs/xfs_dquot.c              |  2 +-
+>  fs/xfs/xfs_file.c               |  6 ++--
+>  fs/xfs/xfs_inode.c              | 27 +++++++++++++++
+>  fs/xfs/xfs_inode.h              | 17 +++++----
+>  fs/xfs/xfs_inode_item.c         | 12 ++++---
+>  fs/xfs/xfs_inode_item.h         |  3 +-
+>  fs/xfs/xfs_iops.c               | 31 ++++++++++++++---
+>  fs/xfs/xfs_log.c                | 33 ++++++++++++------
+>  fs/xfs/xfs_log.h                |  5 +--
+>  fs/xfs/xfs_log_cil.c            | 17 +++++++--
+>  fs/xfs/xfs_log_priv.h           |  4 +--
+>  fs/xfs/xfs_trans.c              | 44 ++++++++++++++++++++----
+>  fs/xfs/xfs_trans.h              |  2 +-
+>  fs/xfs/xfs_trans_buf.c          | 18 ++++++++--
+>  fs/zonefs/file.c                |  4 +--
+>  include/linux/file.h            |  7 ++++
+>  include/linux/fs.h              | 16 +++++++--
+>  include/uapi/linux/io_uring.h   |  1 +
+>  io_uring/fs.c                   | 53 ++++++++++++++++++++++++++++
+>  io_uring/fs.h                   |  3 ++
+>  io_uring/opdef.c                |  8 +++++
+>  kernel/bpf/inode.c              |  4 +--
+>  mm/filemap.c                    |  8 ++---
+>  mm/shmem.c                      |  6 ++--
+>  net/unix/af_unix.c              |  4 +--
+>  75 files changed, 499 insertions(+), 161 deletions(-)
+> 
+> -- 
+> 2.25.1
+> 
