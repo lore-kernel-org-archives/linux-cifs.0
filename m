@@ -2,140 +2,214 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5658C83F06
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Aug 2023 22:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16641C83F01
+	for <linux-cifs@archiver.kernel.org>; Sun, 27 Aug 2023 05:13:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230467AbjHYWyE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Aug 2023 18:54:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48762 "EHLO
+        id S229379AbjH0FMo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 27 Aug 2023 01:12:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231217AbjHYWxq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Aug 2023 18:53:46 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DB3B272C
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-68c3ec0578bso52366b3a.2
-        for <linux-cifs@vger.kernel.org>; Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
+        with ESMTP id S229557AbjH0FMn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 27 Aug 2023 01:12:43 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3201BF
+        for <linux-cifs@vger.kernel.org>; Sat, 26 Aug 2023 22:12:39 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2bcd7a207f7so31800771fa.3
+        for <linux-cifs@vger.kernel.org>; Sat, 26 Aug 2023 22:12:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1693004012; x=1693608812;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pUz0mvDJOC9uQjgg5Uba361PK/6ticcfnjAOo3qTtYA=;
-        b=F6apRE+SrZTqCeuN1zLMRosK5ge3rhNKZnpOWKEqEdWDSsGDK7EQGyDQsb6/5NjMZA
-         3YMPbcTJ/D3BMiY5oD/xtnLm9pzhShZ6+Y7oDMWnO0DfFEZbieWLXokCpFNjeT5nfH1C
-         s22NB1Wf7ErFiXowqbOOitIpN8YQ6wn+7f9hHAh/AXrGUdDwlOs/O2qrqcuv4RSpXcnU
-         GbrxFepvZAk5VQgoyCmH+APqoM+wo3KvR0eb+zB1BsLvnPOQaJNrJEZsuvoY9FN/6wnP
-         PBrjyNBdKOdo0Hj7mZUOQ9904vJZldE2dQql827LKN+udL2AKxU33q1Q1ADVqqMaFs/v
-         qugw==
+        d=gmail.com; s=20221208; t=1693113158; x=1693717958;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=te0tCmhyJvqllLKSsV9ph8rZEfpv5ZujuK8WkWy2Hkc=;
+        b=lDL9jCDI69S82u9tcdDVm8CR1BZt+tWlNDtw7GtE5taJt7qQopuIbdEZfals7Faz9K
+         AvLzjuRdqczS5fmUteezxKlj1q4LVReBWeNuPKB9l9bYAJR2h8NUvUv8IF38hZKI+3Er
+         up4z2hkPxOZu/bmx1g5fkGi5G0iTFMLfeL2G/2O0n3spifOsGxzUhj42VqoG/UlJw5ly
+         KrfvQKFL/OmXsIgcpcf6OThBv3IC/E1HatqicepcpLP/S3ZmuDK1cEtnJEBV5G6hlXUj
+         8V0aJKriL+XYdsk9OXX+JaFGPxeMaE8hInYFgu0RDg0zfYNC13rBuKp5BwxRn3wba20T
+         j0GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693004012; x=1693608812;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pUz0mvDJOC9uQjgg5Uba361PK/6ticcfnjAOo3qTtYA=;
-        b=e30JRgiprsrMegWH623B2tEgSvI5cNrpL4+gg8sbMTkg5v7VGRB3vMj6nOXsP/FVES
-         YTS8tr1UYQXR1HNyjqDJECZBZxoB54+85mEPJ4TJdZ5bzv0/7ie+5WAwlKIfA9O78r8x
-         4j1m1Tgrv9FoIIM5ge7EsDbDKdxVoFunomXsXOYMeebXPKIEiXKmIgF5kBT1MDE4jq/e
-         GPzlq/wE2Y0cpVIbvP7r+zaUfnvBk7cW0iR8ZiZlbOYx00YlVI7Mktp2U5NPTPuOmXTo
-         R+7t7p6xDV8T/zGeuloK3sWMzBsqSfAeTt28vkqfCZCz9S1DA6I3dIcf37DiuPQfAtI1
-         y8mQ==
-X-Gm-Message-State: AOJu0YxZm42uYmKjpb1OBQFg7i8kW8u/7Ueanjp33s/CyJ/Vlg2v6u1z
-        LclW0FIZ66JJp7/miaxXBb4MNQ==
-X-Google-Smtp-Source: AGHT+IF7qLruqklxY40yAH4SKvsJCnFBTQ8pg1x9p8DXB9ryPTSvbA4aGhPPBTQdBXYgxxyeFGZdhA==
-X-Received: by 2002:a05:6a20:7354:b0:13d:5b8e:db83 with SMTP id v20-20020a056a20735400b0013d5b8edb83mr20399311pzc.9.1693004012072;
-        Fri, 25 Aug 2023 15:53:32 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id u15-20020a62ed0f000000b006887be16675sm2060364pfh.205.2023.08.25.15.53.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Aug 2023 15:53:31 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qZfgG-006WDY-1c;
-        Sat, 26 Aug 2023 08:53:28 +1000
-Date:   Sat, 26 Aug 2023 08:53:28 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Hao Xu <hao.xu@linux.dev>
-Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH RFC v5 00/29] io_uring getdents
-Message-ID: <ZOkw6KkdP1UWPNBW@dread.disaster.area>
-References: <20230825135431.1317785-1-hao.xu@linux.dev>
+        d=1e100.net; s=20221208; t=1693113158; x=1693717958;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=te0tCmhyJvqllLKSsV9ph8rZEfpv5ZujuK8WkWy2Hkc=;
+        b=TKFdDHDNtMRP0sDgQ0UrdWJUDuyRMcfCHolKp7SP15GGO+iqaH8HpNildvS6WsXgGz
+         GgNKnaAyKLiwqANM5gR34KajfgMtP08JWqE/b8JOv9mm/nekN2gJmkxICdkdPOWHkzpe
+         wVDko+hnlpAgtwpEFnEci7uV8L811Mwk6var/4/ml0j0qrImtofCJyDQq66iFXiVsDXr
+         vHpmz9drvn5B8O2Ps/S67EJwwOkfC0rOl49P5esF2UaU39lngVXS4hLGBb8lTKa0OW9Y
+         GK6Jm5aqsZc4TvuvyCG7AUGp1Ewcx3eoxNcwkiG2RpY85svMukeB7IjWktVrBERhHmNw
+         EMlw==
+X-Gm-Message-State: AOJu0YwIFX2IAO4g5PuidIDHLlG9bt+Myz1TJZZUaWEHdfbLE0hDVezS
+        ABPwqPFEBtBlMzD70yBMbT9KxBd5h3ijpP92xMzYErCnzzxiKxf1
+X-Google-Smtp-Source: AGHT+IHr8443w3l530CKAPvLY20946rraKFm00a7fPf3AmTFLwX2usx2e82PGITEytxd2xtNSabZeuJz0qpqxzeg6eI=
+X-Received: by 2002:a2e:88cb:0:b0:2bc:be3c:9080 with SMTP id
+ a11-20020a2e88cb000000b002bcbe3c9080mr13915988ljk.27.1693113157495; Sat, 26
+ Aug 2023 22:12:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230825135431.1317785-1-hao.xu@linux.dev>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 27 Aug 2023 00:12:26 -0500
+Message-ID: <CAH2r5mt99zVnZfTP_9Z4BNEa2L8Yw=8ds1USPhasbO06hLaGjQ@mail.gmail.com>
+Subject: [PATCH][SMB3] allow controlling length of time directory entries are
+ cached with dir leases
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Bharath S M <bharathsm@microsoft.com>
+Content-Type: multipart/mixed; boundary="0000000000005149270603e0a062"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 09:54:02PM +0800, Hao Xu wrote:
-> From: Hao Xu <howeyxu@tencent.com>
-> 
-> This series introduce getdents64 to io_uring, the code logic is similar
-> with the snychronized version's. It first try nowait issue, and offload
-> it to io-wq threads if the first try fails.
-> 
-> Patch1 and Patch2 are some preparation
-> Patch3 supports nowait for xfs getdents code
-> Patch4-11 are vfs change, include adding helpers and trylock for locks
-> Patch12-29 supports nowait for involved xfs journal stuff
-> note, Patch24 and 27 are actually two questions, might be removed later.
-> an xfs test may come later.
+--0000000000005149270603e0a062
+Content-Type: text/plain; charset="UTF-8"
 
-You need to drop all the XFS journal stuff. It's fundamentally
-broken as it stands, and we cannot support non-blocking
-transactional changes without first putting a massive investment in
-transaction and intent chain rollback to allow correctly undoing
-partially complete modifications.
+Currently with directory leases we cache directory contents for a fixed period
+of time (default 30 seconds) but for many workloads this is too short.  Allow
+configuring the maximum amount of time directory entries are cached when a
+directory lease is held on that directory (and set default timeout to
+60 seconds).
+Add module load parm "max_dir_cache"
 
-Regardless, non-blocking transactions are completely unnecessary for
-a non-blocking readdir implementation. readdir should only be
-touching atime, and with relatime it should only occur once every 24
-hours per inode. If that's a problem, then we have noatime mount
-options. Hence I just don't see any point in worrying about having a
-timestamp update block occasionally...
+For example to set the timeout to 10 minutes you would do:
 
-I also don't really don't see why you need to fiddle with xfs buffer
-cache semantics - it already has the functionality "nowait" buffer
-reads require (i.e.  XBF_INCORE|XBF_TRYLOCK).
+  echo 600 > /sys/module/cifs/parameters/max_dir_cache
 
-However, the readahead IO that the xfs readdir code issues cannot
-use your defined NOWAIT semantics - it must be able to allocate
-memory and issue IO. Readahead already avoids blocking on memory
-allocation and blocking on IO via the XBF_READ_AHEAD flag. This sets
-__GFP_NORETRY for buffer allocation and REQ_RAHEAD for IO. Hence
-readahead only needs the existing XBF_TRYLOCK flag to be set to be
-compatible with the required NOWAIT semantics....
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/smb/client/cached_dir.c |  2 +-
+ fs/smb/client/cifsfs.c     | 12 ++++++++++++
+ fs/smb/client/cifsglob.h   |  1 +
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-As for the NOIO memory allocation restrictions io_uring requires,
-that should be enforced at the io_uring layer before calling into
-the VFS using memalloc_noio_save/restore.  At that point no memory
-allocation will trigger IO and none of the code running under NOWAIT
-conditions even needs to be aware that io_uring has a GFP_NOIO
-restriction on memory allocation....
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 2d5e9a9d5b8b..e48a902efd52 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -582,7 +582,7 @@ cifs_cfids_laundromat_thread(void *p)
+  return 0;
+  spin_lock(&cfids->cfid_list_lock);
+  list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
+- if (time_after(jiffies, cfid->time + HZ * 30)) {
++ if (time_after(jiffies, cfid->time + HZ * max_dir_cache)) {
+  list_del(&cfid->entry);
+  list_add(&cfid->entry, &entry);
+  cfids->num_entries--;
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index d49fd2bf71b0..7a89718d2a59 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -117,6 +117,10 @@ module_param(cifs_max_pending, uint, 0444);
+ MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server for "
+     "CIFS/SMB1 dialect (N/A for SMB3) "
+     "Default: 32767 Range: 2 to 32767.");
++unsigned int max_dir_cache = 60;
++module_param(max_dir_cache, uint, 0644);
++MODULE_PARM_DESC(max_dir_cache, "Number of seconds to cache directory
+contents for which we have a lease. Default: 60 "
++ "Range: 1 to 65000 seconds");
+ #ifdef CONFIG_CIFS_STATS2
+ unsigned int slow_rsp_threshold = 1;
+ module_param(slow_rsp_threshold, uint, 0644);
+@@ -1679,6 +1683,14 @@ init_cifs(void)
+  CIFS_MAX_REQ);
+  }
 
-Please go back to the simple "do non-blocking buffer IO"
-implementation we started with and don't try to solve every little
-blocking problem that might exist in the VFS and filesystems...
++ if (max_dir_cache < 1) {
++ max_dir_cache = 1;
++ cifs_dbg(VFS, "max_dir_cache timeout set to min of 1 second\n");
++ } else if (max_dir_cache > 65000) {
++ max_dir_cache = 65000;
++ cifs_dbg(VFS, "max_dir_cache timeout set to max of 65000 seconds\n");
++ }
++
+  cifsiod_wq = alloc_workqueue("cifsiod", WQ_FREEZABLE|WQ_MEM_RECLAIM, 0);
+  if (!cifsiod_wq) {
+  rc = -ENOMEM;
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 259e231f8b4f..7aeeaa260cce 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -2016,6 +2016,7 @@ extern unsigned int CIFSMaxBufSize;  /* max size
+not including hdr */
+ extern unsigned int cifs_min_rcv;    /* min size of big ntwrk buf pool */
+ extern unsigned int cifs_min_small;  /* min size of small buf pool */
+ extern unsigned int cifs_max_pending; /* MAX requests at once to server*/
++extern unsigned int max_dir_cache; /* max time for directory lease
+caching of dir */
+ extern bool disable_legacy_dialects;  /* forbid vers=1.0 and vers=2.0 mounts */
+ extern atomic_t mid_count;
 
--Dave
+
 -- 
-Dave Chinner
-david@fromorbit.com
+Thanks,
+
+Steve
+
+--0000000000005149270603e0a062
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-allow-controlling-length-of-time-directory-entr.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-allow-controlling-length-of-time-directory-entr.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_llsztr790>
+X-Attachment-Id: f_llsztr790
+
+RnJvbSBjNTE0M2NjZDU5YjM4ODIxZjVjMjA4ZDgzNWI4YjdmODYxNmNhNjMxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFNhdCwgMjYgQXVnIDIwMjMgMjM6NTk6MjUgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBhbGxvdyBjb250cm9sbGluZyBsZW5ndGggb2YgdGltZSBkaXJlY3RvcnkgZW50cmllcyBh
+cmUKIGNhY2hlZCB3aXRoIGRpciBsZWFzZXMKCkN1cnJlbnRseSB3aXRoIGRpcmVjdG9yeSBsZWFz
+ZXMgd2UgY2FjaGUgZGlyZWN0b3J5IGNvbnRlbnRzIGZvciBhIGZpeGVkIHBlcmlvZApvZiB0aW1l
+IChkZWZhdWx0IDMwIHNlY29uZHMpIGJ1dCBmb3IgbWFueSB3b3JrbG9hZHMgdGhpcyBpcyB0b28g
+c2hvcnQuICBBbGxvdwpjb25maWd1cmluZyB0aGUgbWF4aW11bSBhbW91bnQgb2YgdGltZSBkaXJl
+Y3RvcnkgZW50cmllcyBhcmUgY2FjaGVkIHdoZW4gYQpkaXJlY3RvcnkgbGVhc2UgaXMgaGVsZCBv
+biB0aGF0IGRpcmVjdG9yeS4gQWRkIG1vZHVsZSBsb2FkIHBhcm0gIm1heF9kaXJfY2FjaGUiCgpG
+b3IgZXhhbXBsZSB0byBzZXQgdGhlIHRpbWVvdXQgdG8gMTAgbWludXRlcyB5b3Ugd291bGQgZG86
+CgogIGVjaG8gNjAwID4gL3N5cy9tb2R1bGUvY2lmcy9wYXJhbWV0ZXJzL21heF9kaXJfY2FjaGUK
+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0t
+CiBmcy9zbWIvY2xpZW50L2NhY2hlZF9kaXIuYyB8ICAyICstCiBmcy9zbWIvY2xpZW50L2NpZnNm
+cy5jICAgICB8IDEyICsrKysrKysrKysrKwogZnMvc21iL2NsaWVudC9jaWZzZ2xvYi5oICAgfCAg
+MSArCiAzIGZpbGVzIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKCmRp
+ZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2NhY2hlZF9kaXIuYyBiL2ZzL3NtYi9jbGllbnQvY2Fj
+aGVkX2Rpci5jCmluZGV4IDJkNWU5YTlkNWI4Yi4uZTQ4YTkwMmVmZDUyIDEwMDY0NAotLS0gYS9m
+cy9zbWIvY2xpZW50L2NhY2hlZF9kaXIuYworKysgYi9mcy9zbWIvY2xpZW50L2NhY2hlZF9kaXIu
+YwpAQCAtNTgyLDcgKzU4Miw3IEBAIGNpZnNfY2ZpZHNfbGF1bmRyb21hdF90aHJlYWQodm9pZCAq
+cCkKIAkJCXJldHVybiAwOwogCQlzcGluX2xvY2soJmNmaWRzLT5jZmlkX2xpc3RfbG9jayk7CiAJ
+CWxpc3RfZm9yX2VhY2hfZW50cnlfc2FmZShjZmlkLCBxLCAmY2ZpZHMtPmVudHJpZXMsIGVudHJ5
+KSB7Ci0JCQlpZiAodGltZV9hZnRlcihqaWZmaWVzLCBjZmlkLT50aW1lICsgSFogKiAzMCkpIHsK
+KwkJCWlmICh0aW1lX2FmdGVyKGppZmZpZXMsIGNmaWQtPnRpbWUgKyBIWiAqIG1heF9kaXJfY2Fj
+aGUpKSB7CiAJCQkJbGlzdF9kZWwoJmNmaWQtPmVudHJ5KTsKIAkJCQlsaXN0X2FkZCgmY2ZpZC0+
+ZW50cnksICZlbnRyeSk7CiAJCQkJY2ZpZHMtPm51bV9lbnRyaWVzLS07CmRpZmYgLS1naXQgYS9m
+cy9zbWIvY2xpZW50L2NpZnNmcy5jIGIvZnMvc21iL2NsaWVudC9jaWZzZnMuYwppbmRleCBkNDlm
+ZDJiZjcxYjAuLjdhODk3MThkMmE1OSAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jaWZzZnMu
+YworKysgYi9mcy9zbWIvY2xpZW50L2NpZnNmcy5jCkBAIC0xMTcsNiArMTE3LDEwIEBAIG1vZHVs
+ZV9wYXJhbShjaWZzX21heF9wZW5kaW5nLCB1aW50LCAwNDQ0KTsKIE1PRFVMRV9QQVJNX0RFU0Mo
+Y2lmc19tYXhfcGVuZGluZywgIlNpbXVsdGFuZW91cyByZXF1ZXN0cyB0byBzZXJ2ZXIgZm9yICIK
+IAkJCQkgICAiQ0lGUy9TTUIxIGRpYWxlY3QgKE4vQSBmb3IgU01CMykgIgogCQkJCSAgICJEZWZh
+dWx0OiAzMjc2NyBSYW5nZTogMiB0byAzMjc2Ny4iKTsKK3Vuc2lnbmVkIGludCBtYXhfZGlyX2Nh
+Y2hlID0gNjA7Cittb2R1bGVfcGFyYW0obWF4X2Rpcl9jYWNoZSwgdWludCwgMDY0NCk7CitNT0RV
+TEVfUEFSTV9ERVNDKG1heF9kaXJfY2FjaGUsICJOdW1iZXIgb2Ygc2Vjb25kcyB0byBjYWNoZSBk
+aXJlY3RvcnkgY29udGVudHMgZm9yIHdoaWNoIHdlIGhhdmUgYSBsZWFzZS4gRGVmYXVsdDogNjAg
+IgorCQkJCSAiUmFuZ2U6IDEgdG8gNjUwMDAgc2Vjb25kcyIpOwogI2lmZGVmIENPTkZJR19DSUZT
+X1NUQVRTMgogdW5zaWduZWQgaW50IHNsb3dfcnNwX3RocmVzaG9sZCA9IDE7CiBtb2R1bGVfcGFy
+YW0oc2xvd19yc3BfdGhyZXNob2xkLCB1aW50LCAwNjQ0KTsKQEAgLTE2NzksNiArMTY4MywxNCBA
+QCBpbml0X2NpZnModm9pZCkKIAkJCSBDSUZTX01BWF9SRVEpOwogCX0KIAorCWlmIChtYXhfZGly
+X2NhY2hlIDwgMSkgeworCQltYXhfZGlyX2NhY2hlID0gMTsKKwkJY2lmc19kYmcoVkZTLCAibWF4
+X2Rpcl9jYWNoZSB0aW1lb3V0IHNldCB0byBtaW4gb2YgMSBzZWNvbmRcbiIpOworCX0gZWxzZSBp
+ZiAobWF4X2Rpcl9jYWNoZSA+IDY1MDAwKSB7CisJCW1heF9kaXJfY2FjaGUgPSA2NTAwMDsKKwkJ
+Y2lmc19kYmcoVkZTLCAibWF4X2Rpcl9jYWNoZSB0aW1lb3V0IHNldCB0byBtYXggb2YgNjUwMDAg
+c2Vjb25kc1xuIik7CisJfQorCiAJY2lmc2lvZF93cSA9IGFsbG9jX3dvcmtxdWV1ZSgiY2lmc2lv
+ZCIsIFdRX0ZSRUVaQUJMRXxXUV9NRU1fUkVDTEFJTSwgMCk7CiAJaWYgKCFjaWZzaW9kX3dxKSB7
+CiAJCXJjID0gLUVOT01FTTsKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaCBi
+L2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaAppbmRleCAyNTllMjMxZjhiNGYuLjdhZWVhYTI2MGNj
+ZSAxMDA2NDQKLS0tIGEvZnMvc21iL2NsaWVudC9jaWZzZ2xvYi5oCisrKyBiL2ZzL3NtYi9jbGll
+bnQvY2lmc2dsb2IuaApAQCAtMjAxNiw2ICsyMDE2LDcgQEAgZXh0ZXJuIHVuc2lnbmVkIGludCBD
+SUZTTWF4QnVmU2l6ZTsgIC8qIG1heCBzaXplIG5vdCBpbmNsdWRpbmcgaGRyICovCiBleHRlcm4g
+dW5zaWduZWQgaW50IGNpZnNfbWluX3JjdjsgICAgLyogbWluIHNpemUgb2YgYmlnIG50d3JrIGJ1
+ZiBwb29sICovCiBleHRlcm4gdW5zaWduZWQgaW50IGNpZnNfbWluX3NtYWxsOyAgLyogbWluIHNp
+emUgb2Ygc21hbGwgYnVmIHBvb2wgKi8KIGV4dGVybiB1bnNpZ25lZCBpbnQgY2lmc19tYXhfcGVu
+ZGluZzsgLyogTUFYIHJlcXVlc3RzIGF0IG9uY2UgdG8gc2VydmVyKi8KK2V4dGVybiB1bnNpZ25l
+ZCBpbnQgbWF4X2Rpcl9jYWNoZTsgLyogbWF4IHRpbWUgZm9yIGRpcmVjdG9yeSBsZWFzZSBjYWNo
+aW5nIG9mIGRpciAqLwogZXh0ZXJuIGJvb2wgZGlzYWJsZV9sZWdhY3lfZGlhbGVjdHM7ICAvKiBm
+b3JiaWQgdmVycz0xLjAgYW5kIHZlcnM9Mi4wIG1vdW50cyAqLwogZXh0ZXJuIGF0b21pY190IG1p
+ZF9jb3VudDsKIAotLSAKMi4zNC4xCgo=
+--0000000000005149270603e0a062--
