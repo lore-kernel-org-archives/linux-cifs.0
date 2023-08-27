@@ -2,102 +2,140 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE377C83F01
-	for <linux-cifs@archiver.kernel.org>; Sun, 27 Aug 2023 15:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1ADC83F13
+	for <linux-cifs@archiver.kernel.org>; Sun, 27 Aug 2023 20:45:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229890AbjH0Pck (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 27 Aug 2023 11:32:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51126 "EHLO
+        id S229640AbjH0UpZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 27 Aug 2023 16:45:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230419AbjH0Pca (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 27 Aug 2023 11:32:30 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C5A4EC
-        for <linux-cifs@vger.kernel.org>; Sun, 27 Aug 2023 08:32:28 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-d743a5fe05aso2339094276.2
-        for <linux-cifs@vger.kernel.org>; Sun, 27 Aug 2023 08:32:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693150347; x=1693755147;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2mO0qrUD5MSFc1zYHTV1bESvJA5ZYnTSuX5uZplBzuo=;
-        b=WnCMxDVw1wC2AIXpFUDwlJIWBZ09Grle6of/dTw4F4rLsuYhN5Tc6isiWfb05/zTwE
-         IHa5nVfH+QR0sF6iMAZvTXc3NMNvX8vnTPzNClNqHylNPeD56URy54cpRjPIFiMxP8//
-         lGFbxiEQ69UxTTCA4K17xs4DMZ5PJx1P/jb6B8hw//l9fIREcrSTMT+9RhJRXIt56xjy
-         q13Nnw6mJa9LtVUe4KqB81nbbAe1XICPaDCV72EM3LJAH3kSZUCNLT0MnLC76sjLFSaf
-         6hPDX2uX3ZuXKrmrdD28BibewG5S5fqAEF/HFYT3aIyamSJlhQoXS3hxXZxonSaL6Oeq
-         JBcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693150347; x=1693755147;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2mO0qrUD5MSFc1zYHTV1bESvJA5ZYnTSuX5uZplBzuo=;
-        b=EpVW3qUuau6Ndh6uO9hoP0UtCELzbg91o5Ul5KcBGnIiRLV97mXU5fEOkO02Gdy7h3
-         6w5mU4swuHd56Rb1XCmJ9H6zTNMhFKg6LcR0Tr/DBN72KNGA+KNI7/PT4HP9HhbdvuZh
-         TcnmuPowFY3a7ICuklW1UrXmHxHhbIG/QM1U+FGHL3gBDeZu+6DxM/J6m7S9z+BYI181
-         BxMYTGRCGqh9mg5Av8VQr8SoHIC23mWEg8zUAH5zSeb0J+zlOKEJOgTWiwy6iJAgRakj
-         /K3c9iKe8bGYmd4wSx/X7l9jj6EVFdFjqvDdaBA1rsxEp+wCFYb17xMkrwoU7AauMLFN
-         3KKw==
-X-Gm-Message-State: AOJu0YwVOQxNOzrwE66fQLFQ/0iIKl4g3+kzpWFGHw4ppjjI5nRffh6H
-        12e6qyKp6sFCbV5b1+cFNCJapqNLVL/sHhf0klTDauErAFs=
-X-Google-Smtp-Source: AGHT+IFB5pVAZsz+zhh1JJMbE3Hn7keYS6kqT/nZnuSDAmlqpmY2pMj2LQRQW6GoN3nVNI9UcCGVIiX9GEkTfQTsesQ=
-X-Received: by 2002:a25:ad1f:0:b0:d62:6838:74b9 with SMTP id
- y31-20020a25ad1f000000b00d62683874b9mr24878882ybi.55.1693150346828; Sun, 27
- Aug 2023 08:32:26 -0700 (PDT)
+        with ESMTP id S229546AbjH0UpR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 27 Aug 2023 16:45:17 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 892F8BF;
+        Sun, 27 Aug 2023 13:45:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=b31OO6Xd9+jxzKw5QB3n4d33iA6sZ4nPi+nMylKSno4=; b=rh2eHyjfSChvP5M3GZFqng0djt
+        iCSjqmEmDczFMnSTrKUt8mmVXGPGgbJ4oq2lIEXyRSbFH+YR4YMUxP/z9QQKohjOoCQZks3WE0IMK
+        3S4hJ/QxWWGwrLIXBI8vnsgZg3HMNGIE+hIRemTa2iQvkDDHCCMd0yz1djBYQiyi1qOQAKg4GjHdy
+        fEL5cINLesPqAO5iR1xTPAPnXU+iFHAHJEGUTx86DeTnZzv1uxgeaR21j4BV+7nscvIXdd9sVE/Si
+        rCIGIbVvaskI417AUCK4HwQeBGpvqIcrg+ypempVGeBQFeEiZBUSg5QboubLY+HaM/1Y954EFPxgD
+        hXmevJ/g==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qaMcv-00Dkeb-PH; Sun, 27 Aug 2023 20:44:53 +0000
+Date:   Sun, 27 Aug 2023 21:44:53 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hao Xu <hao.xu@linux.dev>
+Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 02/11] xfs: add NOWAIT semantics for readdir
+Message-ID: <ZOu1xYS6LRmPgEiV@casper.infradead.org>
+References: <20230827132835.1373581-1-hao.xu@linux.dev>
+ <20230827132835.1373581-3-hao.xu@linux.dev>
 MIME-Version: 1.0
-References: <CAH2r5mviQ_UEwqwvaz33dgZwzsqJxYT-xXccNmjW-GvuYokgbA@mail.gmail.com>
-In-Reply-To: <CAH2r5mviQ_UEwqwvaz33dgZwzsqJxYT-xXccNmjW-GvuYokgbA@mail.gmail.com>
-From:   Xin Long <lucien.xin@gmail.com>
-Date:   Sun, 27 Aug 2023 11:32:07 -0400
-Message-ID: <CADvbK_djw8qB5kfBH6W1-qDtAWqhqc=VSXxe3LdkXkmgvuq-Bw@mail.gmail.com>
-Subject: Re: SMB3.1.1 QUIC mounts from Linux kernel
-To:     Steve French <smfrench@gmail.com>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230827132835.1373581-3-hao.xu@linux.dev>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 9:08=E2=80=AFAM Steve French <smfrench@gmail.com> w=
-rote:
->
-> Xin Long,
-> I am very interested in trying out LInux kernel SMB3.1.1 mounts using
-> QUIC but wasn't sure how far along your kernel code was.   Do you have
-> an update on it?   There was at least one other server type that
-> implements SMB3.1.1 over QUIC, but probably easiest to test to Windows
-> server (e.g. in Azure).
-Got it.
+On Sun, Aug 27, 2023 at 09:28:26PM +0800, Hao Xu wrote:
+> +++ b/fs/xfs/libxfs/xfs_da_btree.c
+> @@ -2643,16 +2643,32 @@ xfs_da_read_buf(
+>  	struct xfs_buf_map	map, *mapp = &map;
+>  	int			nmap = 1;
+>  	int			error;
+> +	int			buf_flags = 0;
+>  
+>  	*bpp = NULL;
+>  	error = xfs_dabuf_map(dp, bno, flags, whichfork, &mapp, &nmap);
+>  	if (error || !nmap)
+>  		goto out_free;
+>  
+> +	/*
+> +	 * NOWAIT semantics mean we don't wait on the buffer lock nor do we
+> +	 * issue IO for this buffer if it is not already in memory. Caller will
+> +	 * retry. This will return -EAGAIN if the buffer is in memory and cannot
+> +	 * be locked, and no buffer and no error if it isn't in memory.  We
+> +	 * translate both of those into a return state of -EAGAIN and *bpp =
+> +	 * NULL.
+> +	 */
 
-As for https://github.com/lxin/quic, it has implemented the basic support
-for most main features, but still some important ones are missing, like
-Streams and Connection IDs Managements. I'm recently doing interoperability
-testing with other C implementations like picoquic.
+I would not include this comment.
 
-It still has a long way to go to get into the upstream kernel, but I'm pret=
-ty
-sure the need by kernel SMB and NFS will speed this up. I think at the same
-time, some work can be done in fs/smb to move things forward.
+> +	if (flags & XFS_DABUF_NOWAIT)
+> +		buf_flags |= XBF_TRYLOCK | XBF_INCORE;
+>  	error = xfs_trans_read_buf_map(mp, tp, mp->m_ddev_targp, mapp, nmap, 0,
+>  			&bp, ops);
 
->
-> The SMB3.1.1 changes are small to support QUIC, and I could do those
-> (or review yours if you have already done it).
->
-Cool.
+what tsting did you do with this?  Because you don't actually _use_
+buf_flags anywhere in this patch (presumably they should be the
+sixth argument to xfs_trans_read_buf_map() instead of 0).  So I can only
+conclude that either you didn't test, or your testing was inadequate.
 
-I don't really have patches and don't know much detail of fs/smb. So it wil=
-l
-be great if you can try this out on fs/smb.
+>  	if (error)
+>  		goto out_free;
+> +	if (!bp) {
+> +		ASSERT(flags & XFS_DABUF_NOWAIT);
 
-For the test to Windows server, I will let you know once the basic support
-of the rest features is done in the QUIC implementation, maybe in 1-2 month=
-s.
-Meanwhile, on fs/smb side, I think checking tls_server/client_hello_x509()
-API use in net/sunrpc might be helpful for you to design the code in fs/smb=
-.
+I don't think this ASSERT is appropriate.
 
-Thanks.
+> @@ -391,10 +401,17 @@ xfs_dir2_leaf_getdents(
+>  				bp = NULL;
+>  			}
+>  
+> -			if (*lock_mode == 0)
+> -				*lock_mode = xfs_ilock_data_map_shared(dp);
+> +			if (*lock_mode == 0) {
+> +				*lock_mode =
+> +					xfs_ilock_data_map_shared_generic(dp,
+> +					ctx->flags & DIR_CONTEXT_F_NOWAIT);
+> +				if (!*lock_mode) {
+> +					error = -EAGAIN;
+> +					break;
+> +				}
+> +			}
+
+'generic' doesn't seem like a great suffix to mean 'takes nowait flag'.
+And this is far too far indented.
+
+			xfs_dir2_lock(dp, ctx, lock_mode);
+
+with:
+
+STATIC void xfs_dir2_lock(struct xfs_inode *dp, struct dir_context *ctx,
+		unsigned int lock_mode)
+{
+	if (*lock_mode)
+		return;
+	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
+		return xfs_ilock_data_map_shared_nowait(dp);
+	return xfs_ilock_data_map_shared(dp);
+}
+
+... which I think you can use elsewhere in this patch (reformat it to
+XFS coding style, of course).  And then you don't need
+xfs_ilock_data_map_shared_generic().
+
