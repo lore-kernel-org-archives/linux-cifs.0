@@ -2,137 +2,80 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68886C6FA8F
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 22:59:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD2DC6FA8F
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 23:24:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240075AbjH2W7Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 29 Aug 2023 18:59:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49354 "EHLO
+        id S241138AbjH2XXf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Aug 2023 19:23:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240656AbjH2W67 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Aug 2023 18:58:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3102FD7;
-        Tue, 29 Aug 2023 15:58:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C2A37635CE;
-        Tue, 29 Aug 2023 22:58:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9FABC433C7;
-        Tue, 29 Aug 2023 22:58:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693349935;
-        bh=rn2r8LG5beXDEpNUXXmAsWk7K7Z6B0SkbbGrSUfCikA=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=UJJSRKRH7LTjcnDdUPp7RtBE/dB7QJhjeEB1YQbMKrKaYzMACob4EBI4SsR0sy5Ye
-         mt7wmIqsOOWPvL2AjZ5YQtEhH9AU5fAVtL4UeL7OEXz9q6ZHDNk6+YIdzODX8+wqil
-         jlsqG5Nirzs8oHVVRgwIrBWk+tU4uj4vEMyBjQFrJmh/cCsnnPwHApt0qQlEh4VPoV
-         fx7tHB0NGyHo231wK83vtI9suH/0L3cn9cyGLY9db8p4Yc0AKTTsIBFPHCXTIrOvy6
-         YzP3/2IXTyd/Lvsgr1kAOQEzWJjTRoatnNjA657yXZ2FiJLFoy7sfB1K1HWwMGB4Ek
-         xBWdtuLvgMoog==
-Message-ID: <e1c4a6d5001d029548542a1f10425c5639ce28e4.camel@kernel.org>
-Subject: Re: [PATCH v6 1/7] fs: pass the request_mask to generic_fillattr
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Steve French <sfrench@samba.org>,
+        with ESMTP id S240035AbjH2XXN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Aug 2023 19:23:13 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7CD4139;
+        Tue, 29 Aug 2023 16:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=zmAvbKbvHPTK+tSdU1LtS5cJIoj5hGJqWxhJnxvR1TE=; b=bkHEmD8N0NCg57Z34V1rkyw9uD
+        Y/t/T67CzbZr9uXqiw/E9VtVFHYX4zsPf13GEqti8H0fmXeoFONAQbWAXpgGAdlqV/W9D+pL2kGr2
+        3UvXSEKce7SNAXikHXnPzbztWnCEI1f/7izMx2q9hMstLCv02rGTRXSb96hFOco3L5JtqqJtR7mO9
+        T3jGZhdoyyYmZojv9jDfulvK+5o5xhPn3ZHF4zWQ2f/8jm151LT8h0bmPROr3X7g/ueoY8N1jVDnZ
+        lxH2E7EF5X9eIA6k9Oo8lyMNv2CEnJREoeAUKAqr1wbchmvo6PGp+lC0W51ESSpWVX6Q3L0jybyyW
+        NwVL762cWCQvzzqAbE2TWYAuJvmmfoDAfI42qSlpxmgmVJtOdAuv/CipILNnVwazazVqwBRTc/s5g
+        U3YZSJHm6Vk72bL7Fa8FySuHDjXGZkvoYuSC0SH1aNYNgnWrwqi1F/XB39oV2GuDmp3YuNDtSxF1F
+        Kut9+xXj9tg/zmsKLuh9klvI;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1qb837-00AfZm-0X;
+        Tue, 29 Aug 2023 23:23:05 +0000
+Message-ID: <62bd6748-fedf-85c4-7416-7e620fa6b4f2@samba.org>
+Date:   Tue, 29 Aug 2023 18:23:01 -0500
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] smb: propagate error code of extract_sharename()
+Content-Language: en-US
+To:     Katya Orlova <e.orlova@ispras.ru>,
+        David Howells <dhowells@redhat.com>
+Cc:     Jeff Layton <jlayton@kernel.org>,
         Paulo Alcantara <pc@manguebit.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Richard Weinberger <richard@nod.at>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Chinner <david@fromorbit.com>,
-        Anthony Iliopoulos <ailiop@suse.com>, v9fs@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
-        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org
-Date:   Tue, 29 Aug 2023 18:58:47 -0400
-In-Reply-To: <20230829224454.GA461907@ZenIV>
-References: <20230725-mgctime-v6-0-a794c2b7abca@kernel.org>
-         <20230725-mgctime-v6-1-a794c2b7abca@kernel.org>
-         <20230829224454.GA461907@ZenIV>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
-MIME-Version: 1.0
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+        Steve French <smfrench@gmail.com>
+References: <20230815133831.3537-1-e.orlova@ispras.ru>
+From:   Steven French <sfrench@samba.org>
+In-Reply-To: <20230815133831.3537-1-e.orlova@ispras.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 2023-08-29 at 23:44 +0100, Al Viro wrote:
-> On Tue, Jul 25, 2023 at 10:58:14AM -0400, Jeff Layton wrote:
-> > generic_fillattr just fills in the entire stat struct indiscriminately
-> > today, copying data from the inode. There is at least one attribute
-> > (STATX_CHANGE_COOKIE) that can have side effects when it is reported,
-> > and we're looking at adding more with the addition of multigrain
-> > timestamps.
-> >=20
-> > Add a request_mask argument to generic_fillattr and have most callers
-> > just pass in the value that is passed to getattr. Have other callers
-> > (e.g. ksmbd) just pass in STATX_BASIC_STATS. Also move the setting of
-> > STATX_CHANGE_COOKIE into generic_fillattr.
->=20
-> Out of curiosity - how much PITA would it be to put request_mask into
-> kstat?  Set it in vfs_getattr_nosec() (and those get_file_..._info()
-> on smbd side) and don't bother with that kind of propagation boilerplate
-> - just have generic_fillattr() pick it there...
->=20
-> Reduces the patchset size quite a bit...
+Merged into cifs-2.6.git for-next
 
-It could be done. To do that right, I think we'd want to drop
-request_mask from the ->getattr prototype as well and just have
-everything use the mask in the kstat.
-
-I don't think it'd reduce the size of the patchset in any meaningful
-way, but it might make for a more sensible API over the long haul.
---=20
-Jeff Layton <jlayton@kernel.org>
+On 8/15/23 08:38, Katya Orlova wrote:
+> In addition to the EINVAL, there may be an ENOMEM.
+>
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>
+> Fixes: 70431bfd825d ("cifs: Support fscache indexing rewrite")
+> Signed-off-by: Katya Orlova <e.orlova@ispras.ru>
+> ---
+>   fs/smb/client/fscache.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
+> index 8f6909d633da..34e20c4cd507 100644
+> --- a/fs/smb/client/fscache.c
+> +++ b/fs/smb/client/fscache.c
+> @@ -48,7 +48,7 @@ int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
+>   	sharename = extract_sharename(tcon->tree_name);
+>   	if (IS_ERR(sharename)) {
+>   		cifs_dbg(FYI, "%s: couldn't extract sharename\n", __func__);
+> -		return -EINVAL;
+> +		return PTR_ERR(sharename);
+>   	}
+>   
+>   	slen = strlen(sharename);
