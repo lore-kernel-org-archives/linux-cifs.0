@@ -2,216 +2,169 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A1FC83F10
-	for <linux-cifs@archiver.kernel.org>; Sun, 27 Aug 2023 23:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A2AC83F12
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 07:43:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbjH0XPj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 27 Aug 2023 19:15:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43394 "EHLO
+        id S229737AbjH2Hmc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Aug 2023 03:42:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjH0XPJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 27 Aug 2023 19:15:09 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25CE2124;
-        Sun, 27 Aug 2023 16:15:06 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2ba1e9b1fa9so39907741fa.3;
-        Sun, 27 Aug 2023 16:15:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693178104; x=1693782904;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IDyOSgiaTZBOTyCSK6opZGFKNTnmThLJYrBi96TQhjw=;
-        b=bTHuEAmnT6JOXukEZ1V4X4jfm3+86j1EBtBDVMWkL0ZLgc6qashFc9bnY2Uy1EMB/7
-         mGZbOfqtiPwmidNjkyOyOEKsk2Ld19JiDqSzfYka5b2JyGFfkxX4VPKC27ABIJzxPpOz
-         Wnoagux2hZS9EfxuF9k0zrnjOOJfQ0CV0q3yVm1C6ufdUhvDEXXoyUi6BV0b3Z844kjA
-         FjwVmXRdPDtfo9ov8Dr1exQymcKrq8UsP8b6b/0x+NyXY0EDBcW+J+mnAreQetPW8VQR
-         Ey8M0IEzw/ftWN4AmcK+iZJ9/V7FQTM3NJFbIxE4IUDWNICtPG/nBMhQzu3vtARdePKe
-         Cicw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693178104; x=1693782904;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IDyOSgiaTZBOTyCSK6opZGFKNTnmThLJYrBi96TQhjw=;
-        b=XMQYfwSu80h0TZhAek1Lxpdo6oAGXoQ3wtycmAkfRpLBtI1YNt/BZgAUz1Lez8V+Nc
-         JZf2tdIbIyf2hRT5dSuj7cx27G905GEIpfaEGbddirhKXbmo0YKPTzM7XWFEevRiHmx1
-         0RlmFi+t7IU5urHAqcfyY0LnpyG/ISxZvDXPG6I6/bFy3aIwZnq0oZZILVbB/UmeT6oF
-         1XLvJyni1Atchu8I2Fl7jXCR8MgjmTokJI+dx5VF1mkD0Wvm4ISnzVh9efOKVmfVFYZt
-         fSOSFBTYIAQFyuGa5ZjAGnjO2T/j9jQIpVe75UlaB/krY+GhMfflcmA+TIfkBn6i8A2M
-         nbeg==
-X-Gm-Message-State: AOJu0YyXWLYoh6dm9sUoo+OrDTzFaxEoYrZJ95PCzFxwYWQsQQgmWupZ
-        rVJADUucZ7PeBhwXLobCL2ysIPVYDe44H42OhD4=
-X-Google-Smtp-Source: AGHT+IFTLhSC/X57Eee7vJx7GkarEgudwMA51wceosPi5cv22aXm4ogyqwY/Wgz4IJ11cpeytqMgTta5hWoKHE0rNJc=
-X-Received: by 2002:a2e:8717:0:b0:2bc:c11c:4471 with SMTP id
- m23-20020a2e8717000000b002bcc11c4471mr16078819lji.21.1693178104154; Sun, 27
- Aug 2023 16:15:04 -0700 (PDT)
+        with ESMTP id S233734AbjH2HmL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Aug 2023 03:42:11 -0400
+Received: from out-245.mta1.migadu.com (out-245.mta1.migadu.com [IPv6:2001:41d0:203:375::f5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AF8F1A1;
+        Tue, 29 Aug 2023 00:42:04 -0700 (PDT)
+Message-ID: <ca10040f-b7fa-7c43-1c89-6706d13b2747@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1693294923;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kzCYK+m1dXoYq1GdX9wRq/xLcjMjzBwHZbogX1zaiXI=;
+        b=wx9qXfUOb6FlguPiqwy6R82+yQxWta9+fR66YAQ2/1ZdnqJnQPp1kHU4jR8nRlngim3iOe
+        HThmnzNEUSaEuQwHiVi+WxF88JyUG2K+H0WcvTm70cW04LSIUXyP6AZ74VPb7aBxP9rojs
+        L1LrBvpa76A1LVLwfY5LHU6MjnCVZUs=
+Date:   Tue, 29 Aug 2023 15:41:43 +0800
 MIME-Version: 1.0
-References: <20230628232417.120844-1-linux@treblig.org> <ZK80mu/YbHLEABAB@gallifrey>
- <CAH2r5mvrhr52hXFv87O9O=Qw45AXRXr0NQAsTk4Wj-6s19-2bA@mail.gmail.com>
- <CAH2r5mss4RsEF1b6gJo8LFWsN9-YBSEP6GV7axsNhX7ihj5CqA@mail.gmail.com>
- <ZLhchajZaWEVM6D7@gallifrey> <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
-In-Reply-To: <79bbb44c-f3b1-5c5c-1ad4-bcaab0069666@oracle.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 27 Aug 2023 18:14:52 -0500
-Message-ID: <CAH2r5muFqOx91jiukxSVy3iqxZm+NOEZy7-oXKOT0G+yrUF3yw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] dedupe smb unicode files
-To:     Dave Kleikamp <dave.kleikamp@oracle.com>
-Cc:     "Dr. David Alan Gilbert" <linux@treblig.org>,
-        linkinjeon@kernel.org, tom@talpey.com, shaggy@kernel.org,
-        linux-cifs@vger.kernel.org, krisman@collabora.com,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 02/11] xfs: add NOWAIT semantics for readdir
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+        Dave Chinner <david@fromorbit.com>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>
+References: <20230827132835.1373581-1-hao.xu@linux.dev>
+ <20230827132835.1373581-3-hao.xu@linux.dev>
+ <ZOu1xYS6LRmPgEiV@casper.infradead.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Hao Xu <hao.xu@linux.dev>
+In-Reply-To: <ZOu1xYS6LRmPgEiV@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shaggy,
-I can add these - am updating the series to include your RB
+On 8/28/23 04:44, Matthew Wilcox wrote:
+> On Sun, Aug 27, 2023 at 09:28:26PM +0800, Hao Xu wrote:
+>> +++ b/fs/xfs/libxfs/xfs_da_btree.c
+>> @@ -2643,16 +2643,32 @@ xfs_da_read_buf(
+>>   	struct xfs_buf_map	map, *mapp = &map;
+>>   	int			nmap = 1;
+>>   	int			error;
+>> +	int			buf_flags = 0;
+>>   
+>>   	*bpp = NULL;
+>>   	error = xfs_dabuf_map(dp, bno, flags, whichfork, &mapp, &nmap);
+>>   	if (error || !nmap)
+>>   		goto out_free;
+>>   
+>> +	/*
+>> +	 * NOWAIT semantics mean we don't wait on the buffer lock nor do we
+>> +	 * issue IO for this buffer if it is not already in memory. Caller will
+>> +	 * retry. This will return -EAGAIN if the buffer is in memory and cannot
+>> +	 * be locked, and no buffer and no error if it isn't in memory.  We
+>> +	 * translate both of those into a return state of -EAGAIN and *bpp =
+>> +	 * NULL.
+>> +	 */
+> 
+> I would not include this comment.
 
-On Wed, Jul 19, 2023 at 5:06=E2=80=AFPM Dave Kleikamp <dave.kleikamp@oracle=
-.com> wrote:
->
-> On 7/19/23 4:58PM, Dr. David Alan Gilbert wrote:
-> > * Steve French (smfrench@gmail.com) wrote:
-> >> The related question is which tree to send it from, if no problems
-> >> reported (presumably mine since it mostly affect cifs.ko and ksmbd.ko,
-> >> and because there hasn't been activity in fs/nls for years)
-> >
-> > That was my hope, given that ~half of the patches are directly on that
-> > code, and it's the only very active tree this touches as far as I can
-> > tell.
-> >
-> >> On Wed, Jul 19, 2023 at 12:56=E2=80=AFPM Steve French <smfrench@gmail.=
-com> wrote:
-> >>>
-> >>> No objections to this on my part.  If Shaggy is ok with the JFS
-> >>> change, we could target it for 6.6-rc1 if it tests out ok
->
-> For the series:
-> Reviewed-by: Dave Kleikamp <dave.kleikamp@oracle.com>
->
-> Steve,
-> Feel free to pull in even the 4th patch into your tree with my consent.
-> Or if you're more comfortable, I could submit it after yours hits mainlin=
-e.
->
-> Shaggy
->
-> >
-> > Thanks.
-> >
-> > Dave
-> >
-> >>> On Wed, Jul 12, 2023 at 6:28=E2=80=AFPM Dr. David Alan Gilbert <dave@=
-treblig.org> wrote:
-> >>>>
-> >>>> * linux@treblig.org (linux@treblig.org) wrote:
-> >>>>> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> >>>>>
-> >>>>> The smb client and server code have (mostly) duplicated code
-> >>>>> for unicode manipulation, in particular upper case handling.
-> >>>>>
-> >>>>> Flatten this lot into shared code.
-> >>>>
-> >>>> Gentle two week ping on this please.
-> >>>>
-> >>>> Dave
-> >>>>
-> >>>> (Apologies to the 3 of you who already got a copy of this ping,
-> >>>> recent due to a missing header ',' )
-> >>>>
-> >>>>> There's some code that's slightly different between the two, and
-> >>>>> I've not attempted to share that - this should be strictly a no
-> >>>>> behaviour change set.
-> >>>>>
-> >>>>> In addition, the same tables and code are shared in jfs, however
-> >>>>> there's very little testing available for the unicode in there,
-> >>>>> so just share the raw data tables.
-> >>>>>
-> >>>>> I suspect there's more UCS-2 code that can be shared, in the NLS co=
-de
-> >>>>> and in the UCS-2 code used by the EFI interfaces.
-> >>>>>
-> >>>>> Lightly tested with a module and a monolithic build, and just mount=
-ing
-> >>>>> itself.
-> >>>>>
-> >>>>> This dupe was found using PMD:
-> >>>>>    https://pmd.github.io/pmd/pmd_userdocs_cpd.html
-> >>>>>
-> >>>>> Dave
-> >>>>>
-> >>>>> Version 2
-> >>>>>    Moved the shared code to fs/nls after v1 feedback.
-> >>>>>    Renamed shared tables from Smb to Nls prefix
-> >>>>>    Move UniStrcat as well
-> >>>>>    Share the JFS tables
-> >>>>>
-> >>>>> Dr. David Alan Gilbert (4):
-> >>>>>    fs/smb: Remove unicode 'lower' tables
-> >>>>>    fs/smb: Swing unicode common code from smb->NLS
-> >>>>>    fs/smb/client: Use common code in client
-> >>>>>    fs/jfs: Use common ucs2 upper case table
-> >>>>>
-> >>>>>   fs/jfs/Kconfig               |   1 +
-> >>>>>   fs/jfs/Makefile              |   2 +-
-> >>>>>   fs/jfs/jfs_unicode.h         |  17 +-
-> >>>>>   fs/jfs/jfs_uniupr.c          | 121 -------------
-> >>>>>   fs/nls/Kconfig               |   8 +
-> >>>>>   fs/nls/Makefile              |   1 +
-> >>>>>   fs/nls/nls_ucs2_data.h       |  15 ++
-> >>>>>   fs/nls/nls_ucs2_utils.c      | 144 +++++++++++++++
-> >>>>>   fs/nls/nls_ucs2_utils.h      | 285 ++++++++++++++++++++++++++++++
-> >>>>>   fs/smb/client/Kconfig        |   1 +
-> >>>>>   fs/smb/client/cifs_unicode.c |   1 -
-> >>>>>   fs/smb/client/cifs_unicode.h | 330 +-----------------------------=
------
-> >>>>>   fs/smb/client/cifs_uniupr.h  | 239 -------------------------
-> >>>>>   fs/smb/server/Kconfig        |   1 +
-> >>>>>   fs/smb/server/unicode.c      |   1 -
-> >>>>>   fs/smb/server/unicode.h      | 325 +-----------------------------=
-----
-> >>>>>   fs/smb/server/uniupr.h       | 268 ----------------------------
-> >>>>>   17 files changed, 467 insertions(+), 1293 deletions(-)
-> >>>>>   delete mode 100644 fs/jfs/jfs_uniupr.c
-> >>>>>   create mode 100644 fs/nls/nls_ucs2_data.h
-> >>>>>   create mode 100644 fs/nls/nls_ucs2_utils.c
-> >>>>>   create mode 100644 fs/nls/nls_ucs2_utils.h
-> >>>>>   delete mode 100644 fs/smb/client/cifs_uniupr.h
-> >>>>>   delete mode 100644 fs/smb/server/uniupr.h
-> >>>>>
-> >>>>> --
-> >>>>> 2.41.0
-> >>>>>
-> >>>> --
-> >>>>   -----Open up your eyes, open up your mind, open up your code -----=
---
-> >>>> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy =
- \
-> >>>> \        dave @ treblig.org |                               | In Hex=
- /
-> >>>>   \ _________________________|_____ http://www.treblig.org   |______=
-_/
-> >>>
-> >>>
-> >>>
-> >>> --
-> >>> Thanks,
-> >>>
-> >>> Steve
-> >>
-> >>
-> >>
-> >> --
-> >> Thanks,
-> >>
-> >> Steve
+No strong comment here, since this patch is mostly from Dave, it's
+better if Dave can ack this.
+
+> 
+>> +	if (flags & XFS_DABUF_NOWAIT)
+>> +		buf_flags |= XBF_TRYLOCK | XBF_INCORE;
+>>   	error = xfs_trans_read_buf_map(mp, tp, mp->m_ddev_targp, mapp, nmap, 0,
+>>   			&bp, ops);
+> 
+> what tsting did you do with this?  Because you don't actually _use_
+> buf_flags anywhere in this patch (presumably they should be the
+> sixth argument to xfs_trans_read_buf_map() instead of 0).  So I can only
+> conclude that either you didn't test, or your testing was inadequate.
+> 
 
 
+The tests I've done are listed in the cover-letter, this one is missed, 
+the tricky place is it's hard to get this kind of mistake since it runs
+well without nowait logic...I'll fix it in next version.
 
---=20
-Thanks,
+>>   	if (error)
+>>   		goto out_free;
+>> +	if (!bp) {
+>> +		ASSERT(flags & XFS_DABUF_NOWAIT);
+> 
+> I don't think this ASSERT is appropriate.
+> 
+>> @@ -391,10 +401,17 @@ xfs_dir2_leaf_getdents(
+>>   				bp = NULL;
+>>   			}
+>>   
+>> -			if (*lock_mode == 0)
+>> -				*lock_mode = xfs_ilock_data_map_shared(dp);
+>> +			if (*lock_mode == 0) {
+>> +				*lock_mode =
+>> +					xfs_ilock_data_map_shared_generic(dp,
+>> +					ctx->flags & DIR_CONTEXT_F_NOWAIT);
+>> +				if (!*lock_mode) {
+>> +					error = -EAGAIN;
+>> +					break;
+>> +				}
+>> +			}
+> 
+> 'generic' doesn't seem like a great suffix to mean 'takes nowait flag'.
+> And this is far too far indented.
+> 
+> 			xfs_dir2_lock(dp, ctx, lock_mode);
+> 
+> with:
+> 
+> STATIC void xfs_dir2_lock(struct xfs_inode *dp, struct dir_context *ctx,
+> 		unsigned int lock_mode)
+> {
+> 	if (*lock_mode)
+> 		return;
+> 	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
+> 		return xfs_ilock_data_map_shared_nowait(dp);
+> 	return xfs_ilock_data_map_shared(dp);
+> }
+> 
+> ... which I think you can use elsewhere in this patch (reformat it to
+> XFS coding style, of course).  And then you don't need
+> xfs_ilock_data_map_shared_generic().
+> 
 
-Steve
+How about rename xfs_ilock_data_map_shared() to 
+xfs_ilock_data_map_block() and rename 
+xfs_ilock_data_map_shared_generic() to xfs_ilock_data_map_shared()?
+
+STATIC void xfs_ilock_data_map_shared(struct xfs_inode *dp, struct 
+dir_context *ctx, unsigned int lock_mode)
+{
+  	if (*lock_mode)
+  		return;
+  	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
+  		return xfs_ilock_data_map_shared_nowait(dp);
+  	return xfs_ilock_data_map_shared_block(dp);
+}
+
+
