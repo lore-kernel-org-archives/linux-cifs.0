@@ -2,78 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF80C83F16
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 07:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3652C83F14
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 08:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233656AbjH2Hqx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 29 Aug 2023 03:46:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42216 "EHLO
+        id S230246AbjH2IQY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Aug 2023 04:16:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233956AbjH2Hqh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Aug 2023 03:46:37 -0400
-Received: from out-252.mta1.migadu.com (out-252.mta1.migadu.com [IPv6:2001:41d0:203:375::fc])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8B819F;
-        Tue, 29 Aug 2023 00:46:34 -0700 (PDT)
-Message-ID: <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1693295192;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WP3nN15JcnIGn7wEIePFcf6LVOuPCzTP32Hu73YPviw=;
-        b=ngCnTfY2JVdB7UbTvhBxaE99SXYf68v1UOzv1oD4Q4J5vfDrhRAI+RinhUow/HJ/SENsM3
-        ljkpELTTwPgx4fdS1Wsi0U6qZJzH3KEWBSpgNNnZhZo9Ah7qcNPQhnBWxHwyd9Ba5JlzW/
-        R7n89/DPeOOyD3xIKShExED+0gXsmv8=
-Date:   Tue, 29 Aug 2023 15:46:13 +0800
+        with ESMTP id S234221AbjH2IQF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Aug 2023 04:16:05 -0400
+Received: from mail.bizcodes.pl (mail.bizcodes.pl [151.80.57.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4B8198
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Aug 2023 01:15:42 -0700 (PDT)
+Received: by mail.bizcodes.pl (Postfix, from userid 1002)
+        id EE69AA5095; Tue, 29 Aug 2023 08:15:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bizcodes.pl; s=mail;
+        t=1693296927; bh=5QPMt7jNntM5ZbstM20BWsHIeLbmRE8lVU4Iu89IleQ=;
+        h=Date:From:To:Subject:From;
+        b=Y5+4IQzb/FO4elNNct9zyVaX+dbcfe/K3tt3PlnFQHZLXgSy95q4EN5JF0DvM1/ss
+         tZ4zHk7ju7ZqeKz/j46N2GJttRwVCTZd9OxxbjtySrELTPKVFmnMzaUQw0Qurxuqq5
+         wMAPOR015X9UYac0iiayEYYhg6BTfeYDNs5Efmjr8zKlroSJUOXugoahj7AKkoaW5m
+         fa5/QHJru+a9uwjli0Q7LZAM3WeNMdnkzLv3wtNhjJ/a5XxA4dmQ44W0Yr2aA4aUUC
+         fUtk35/DjJVVOY0LnfJxoOik/WXYrxCqXsnXOKgGuccCjA7JD1CV9wa/AFQy9OVq9e
+         9ELg3MvDsr38w==
+Received: by mail.bizcodes.pl for <linux-cifs@vger.kernel.org>; Tue, 29 Aug 2023 08:15:14 GMT
+Message-ID: <20230829064500-0.1.bc.1dvd2.0.5a1so8feqk@bizcodes.pl>
+Date:   Tue, 29 Aug 2023 08:15:14 GMT
+From:   "Marcin Chruszcz" <marcin.chruszcz@bizcodes.pl>
+To:     <linux-cifs@vger.kernel.org>
+Subject: Prezentacja
+X-Mailer: mail.bizcodes.pl
 MIME-Version: 1.0
-Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
-Content-Language: en-US
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-8-hao.xu@linux.dev>
- <ZOvA5DJDZN0FRymp@casper.infradead.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Hao Xu <hao.xu@linux.dev>
-In-Reply-To: <ZOvA5DJDZN0FRymp@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 8/28/23 05:32, Matthew Wilcox wrote:
-> On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
->> From: Hao Xu <howeyxu@tencent.com>
->>
->> Add a boolean parameter for file_accessed() to support nowait semantics.
->> Currently it is true only with io_uring as its initial caller.
-> 
-> So why do we need to do this as part of this series?  Apparently it
-> hasn't caused any problems for filemap_read().
-> 
+Dzie=C5=84 dobry!
 
-We need this parameter to indicate if nowait semantics should be 
-enforced in touch_atime(), There are locks and maybe IOs in it.
+Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
+=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
+zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
 
+Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
+=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
+dostaw.
+
+Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
+nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
+ co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
+
+Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
+=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
+zania w Pa=C5=84stwa firmie.
+
+
+Pozdrawiam
+Marcin Chruszcz
