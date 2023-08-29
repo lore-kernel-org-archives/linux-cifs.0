@@ -2,46 +2,45 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 197FAC83F2D
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 13:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B60C83F26
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 13:34:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236190AbjH2Ndx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S236184AbjH2Ndx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Tue, 29 Aug 2023 09:33:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59802 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236234AbjH2Ndh (ORCPT
+        with ESMTP id S236235AbjH2Ndh (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Aug 2023 09:33:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D6F1B7;
-        Tue, 29 Aug 2023 06:33:27 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38693CC0;
+        Tue, 29 Aug 2023 06:33:28 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D2C906577C;
-        Tue, 29 Aug 2023 13:32:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A01CC433CC;
-        Tue, 29 Aug 2023 13:32:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E097262AFA;
+        Tue, 29 Aug 2023 13:32:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C9A7C433C9;
+        Tue, 29 Aug 2023 13:32:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693315976;
-        bh=8A9HVwbG0lhe1zjrODO9hy3JO/qnRf1tmJiWu2sV0Ug=;
+        s=k20201202; t=1693315979;
+        bh=ONofFonNhy1v6HDNciwpk9ncxPbVgb2usueoO6IVAiA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UbEB3iZ4MBaQQ83hrsFbBMyEHR9bLwR3mv3ilsMWbo14/41TWFqUOs/Te4bgT3hXy
-         xZBonHcVdE1Orud8FmB22CtklxZYYGfwSfCi3yte2u4TOUBPP6nh08C/RssnhbG7qn
-         DN5zXiSJHZcc9As7hvtI/m22J3GnT/CU6aGnkTJhFoA/nfW3DgxIcQSE4J1xz9qyr6
-         avnxGgulZp+bZbt+ez84N/8/ksgtDXacFFIyo/Nfhwy3x3iHMNj3Rie9GycM/1FsKA
-         DWw0MScEA8oyweZenyPnKCluoOy3+n5AA5PLCneLVGlHxMj21sHI4zV1sf/NQyebCv
-         9/+16O+qmsT7w==
+        b=hZ1S5kwjcgSqLlSRNVVF+rHRrqMgF8tJDnY1KWXLsLNsSXvE6A9h3nkNEKiQbVTsn
+         1SHGppa7xZCK5uN1mRhRJjAA9k+ra9Ha6cK4znBaLf50BkcuxeViFhikfs3o3u6/zA
+         +ki4tFhXccYgLPRdfkXwSZsKttveCyY2iqj7d8rqcOW1HnquVC4rADpY2pY6/WmLtn
+         Vn8MCqhBE4gcCVm4nvk6IdUlo7EtnNr1IkIZaX38mF9FNm+MRZm0Nn1Wn6vr+EI4tU
+         MCcKNLmVi2jJbxRSfnGMmI1zjNQvh+PkbsXyBKa2CxfuHnVtlSibvmmZKqXZNZSzms
+         QY7gNjDYChYJA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Enzo Matsumiya <ematsumiya@suse.de>,
-        Shyam Prasad N <sprasad@microsoft.com>,
+Cc:     Shyam Prasad N <sprasad@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.1 05/15] smb/client: print "Unknown" instead of bogus link speed value
-Date:   Tue, 29 Aug 2023 09:32:35 -0400
-Message-Id: <20230829133245.520176-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 07/15] cifs: fix max_credits implementation
+Date:   Tue, 29 Aug 2023 09:32:37 -0400
+Message-Id: <20230829133245.520176-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230829133245.520176-1-sashal@kernel.org>
 References: <20230829133245.520176-1-sashal@kernel.org>
@@ -54,113 +53,117 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Enzo Matsumiya <ematsumiya@suse.de>
+From: Shyam Prasad N <sprasad@microsoft.com>
 
-[ Upstream commit 50e63d6db6fd30a6dd9a33c49aa5b0bba36e1a92 ]
+[ Upstream commit 5e90aa21eb1372736e08cee0c0bf47735c5c4b95 ]
 
-The virtio driver for Linux guests will not set a link speed to its
-paravirtualized NICs.  This will be seen as -1 in the ethernet layer, and
-when some servers (e.g. samba) fetches it, it's converted to an unsigned
-value (and multiplied by 1000 * 1000), so in client side we end up with:
+The current implementation of max_credits on the client does
+not work because the CreditRequest logic for several commands
+does not take max_credits into account.
 
-1)      Speed: 4294967295000000 bps
+Still, we can end up asking the server for more credits, depending
+on the number of credits in flight. For this, we need to
+limit the credits while parsing the responses too.
 
-in DebugData.
-
-This patch introduces a helper that returns a speed string (in Mbps or
-Gbps) if interface speed is valid (>= SPEED_10 and <= SPEED_800000), or
-"Unknown" otherwise.
-
-The reason to not change the value in iface->speed is because we don't
-know the real speed of the HW backing the server NIC, so let's keep
-considering these as the fastest NICs available.
-
-Also print "Capabilities: None" when the interface doesn't support any.
-
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/cifs_debug.c | 47 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 46 insertions(+), 1 deletion(-)
+ fs/smb/client/smb2ops.c |  2 ++
+ fs/smb/client/smb2pdu.c | 32 ++++++++++++++++++++++++++++----
+ 2 files changed, 30 insertions(+), 4 deletions(-)
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index e41154ad96afc..492f9b11e9ad0 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -11,6 +11,7 @@
- #include <linux/module.h>
- #include <linux/proc_fs.h>
- #include <linux/uaccess.h>
-+#include <uapi/linux/ethtool.h>
- #include "cifspdu.h"
- #include "cifsglob.h"
- #include "cifsproto.h"
-@@ -145,18 +146,62 @@ cifs_dump_channel(struct seq_file *m, int i, struct cifs_chan *chan)
- 		   atomic_read(&server->num_waiters));
- }
- 
-+static inline const char *smb_speed_to_str(size_t bps)
-+{
-+	size_t mbps = bps / 1000 / 1000;
-+
-+	switch (mbps) {
-+	case SPEED_10:
-+		return "10Mbps";
-+	case SPEED_100:
-+		return "100Mbps";
-+	case SPEED_1000:
-+		return "1Gbps";
-+	case SPEED_2500:
-+		return "2.5Gbps";
-+	case SPEED_5000:
-+		return "5Gbps";
-+	case SPEED_10000:
-+		return "10Gbps";
-+	case SPEED_14000:
-+		return "14Gbps";
-+	case SPEED_20000:
-+		return "20Gbps";
-+	case SPEED_25000:
-+		return "25Gbps";
-+	case SPEED_40000:
-+		return "40Gbps";
-+	case SPEED_50000:
-+		return "50Gbps";
-+	case SPEED_56000:
-+		return "56Gbps";
-+	case SPEED_100000:
-+		return "100Gbps";
-+	case SPEED_200000:
-+		return "200Gbps";
-+	case SPEED_400000:
-+		return "400Gbps";
-+	case SPEED_800000:
-+		return "800Gbps";
-+	default:
-+		return "Unknown";
-+	}
-+}
-+
- static void
- cifs_dump_iface(struct seq_file *m, struct cifs_server_iface *iface)
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 759a7d7b3ddfe..4fd377185c2ca 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -34,6 +34,8 @@ static int
+ change_conf(struct TCP_Server_Info *server)
  {
- 	struct sockaddr_in *ipv4 = (struct sockaddr_in *)&iface->sockaddr;
- 	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)&iface->sockaddr;
+ 	server->credits += server->echo_credits + server->oplock_credits;
++	if (server->credits > server->max_credits)
++		server->credits = server->max_credits;
+ 	server->oplock_credits = server->echo_credits = 0;
+ 	switch (server->credits) {
+ 	case 0:
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 3ca593cdda76e..a8b35c53c4113 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -1312,7 +1312,12 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
+ 	}
  
--	seq_printf(m, "\tSpeed: %zu bps\n", iface->speed);
-+	seq_printf(m, "\tSpeed: %s\n", smb_speed_to_str(iface->speed));
- 	seq_puts(m, "\t\tCapabilities: ");
- 	if (iface->rdma_capable)
- 		seq_puts(m, "rdma ");
- 	if (iface->rss_capable)
- 		seq_puts(m, "rss ");
-+	if (!iface->rdma_capable && !iface->rss_capable)
-+		seq_puts(m, "None");
- 	seq_putc(m, '\n');
- 	if (iface->sockaddr.ss_family == AF_INET)
- 		seq_printf(m, "\t\tIPv4: %pI4\n", &ipv4->sin_addr);
+ 	/* enough to enable echos and oplocks and one max size write */
+-	req->hdr.CreditRequest = cpu_to_le16(130);
++	if (server->credits >= server->max_credits)
++		req->hdr.CreditRequest = cpu_to_le16(0);
++	else
++		req->hdr.CreditRequest = cpu_to_le16(
++			min_t(int, server->max_credits -
++			      server->credits, 130));
+ 
+ 	/* only one of SMB2 signing flags may be set in SMB2 request */
+ 	if (server->sign)
+@@ -1907,7 +1912,12 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 	rqst.rq_nvec = 2;
+ 
+ 	/* Need 64 for max size write so ask for more in case not there yet */
+-	req->hdr.CreditRequest = cpu_to_le16(64);
++	if (server->credits >= server->max_credits)
++		req->hdr.CreditRequest = cpu_to_le16(0);
++	else
++		req->hdr.CreditRequest = cpu_to_le16(
++			min_t(int, server->max_credits -
++			      server->credits, 64));
+ 
+ 	rc = cifs_send_recv(xid, ses, server,
+ 			    &rqst, &resp_buftype, flags, &rsp_iov);
+@@ -4285,6 +4295,7 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 	struct TCP_Server_Info *server;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	unsigned int total_len;
++	int credit_request;
+ 
+ 	cifs_dbg(FYI, "%s: offset=%llu bytes=%u\n",
+ 		 __func__, rdata->offset, rdata->bytes);
+@@ -4316,7 +4327,13 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 	if (rdata->credits.value > 0) {
+ 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(rdata->bytes,
+ 						SMB2_MAX_BUFFER_SIZE));
+-		shdr->CreditRequest = cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 8);
++		credit_request = le16_to_cpu(shdr->CreditCharge) + 8;
++		if (server->credits >= server->max_credits)
++			shdr->CreditRequest = cpu_to_le16(0);
++		else
++			shdr->CreditRequest = cpu_to_le16(
++				min_t(int, server->max_credits -
++						server->credits, credit_request));
+ 
+ 		rc = adjust_credits(server, &rdata->credits, rdata->bytes);
+ 		if (rc)
+@@ -4526,6 +4543,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	unsigned int total_len;
+ 	struct cifs_io_parms _io_parms;
+ 	struct cifs_io_parms *io_parms = NULL;
++	int credit_request;
+ 
+ 	if (!wdata->server)
+ 		server = wdata->server = cifs_pick_channel(tcon->ses);
+@@ -4643,7 +4661,13 @@ smb2_async_writev(struct cifs_writedata *wdata,
+ 	if (wdata->credits.value > 0) {
+ 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(wdata->bytes,
+ 						    SMB2_MAX_BUFFER_SIZE));
+-		shdr->CreditRequest = cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 8);
++		credit_request = le16_to_cpu(shdr->CreditCharge) + 8;
++		if (server->credits >= server->max_credits)
++			shdr->CreditRequest = cpu_to_le16(0);
++		else
++			shdr->CreditRequest = cpu_to_le16(
++				min_t(int, server->max_credits -
++						server->credits, credit_request));
+ 
+ 		rc = adjust_credits(server, &wdata->credits, io_parms->length);
+ 		if (rc)
 -- 
 2.40.1
 
