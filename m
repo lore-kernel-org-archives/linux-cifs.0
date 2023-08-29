@@ -2,168 +2,164 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B60C83F26
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 13:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5665C71153
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Aug 2023 15:06:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236184AbjH2Ndx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 29 Aug 2023 09:33:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59814 "EHLO
+        id S237049AbjH2PF6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Aug 2023 11:05:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236235AbjH2Ndh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Aug 2023 09:33:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38693CC0;
-        Tue, 29 Aug 2023 06:33:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E097262AFA;
-        Tue, 29 Aug 2023 13:32:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C9A7C433C9;
-        Tue, 29 Aug 2023 13:32:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693315979;
-        bh=ONofFonNhy1v6HDNciwpk9ncxPbVgb2usueoO6IVAiA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hZ1S5kwjcgSqLlSRNVVF+rHRrqMgF8tJDnY1KWXLsLNsSXvE6A9h3nkNEKiQbVTsn
-         1SHGppa7xZCK5uN1mRhRJjAA9k+ra9Ha6cK4znBaLf50BkcuxeViFhikfs3o3u6/zA
-         +ki4tFhXccYgLPRdfkXwSZsKttveCyY2iqj7d8rqcOW1HnquVC4rADpY2pY6/WmLtn
-         Vn8MCqhBE4gcCVm4nvk6IdUlo7EtnNr1IkIZaX38mF9FNm+MRZm0Nn1Wn6vr+EI4tU
-         MCcKNLmVi2jJbxRSfnGMmI1zjNQvh+PkbsXyBKa2CxfuHnVtlSibvmmZKqXZNZSzms
-         QY7gNjDYChYJA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Shyam Prasad N <sprasad@microsoft.com>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 6.1 07/15] cifs: fix max_credits implementation
-Date:   Tue, 29 Aug 2023 09:32:37 -0400
-Message-Id: <20230829133245.520176-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230829133245.520176-1-sashal@kernel.org>
-References: <20230829133245.520176-1-sashal@kernel.org>
+        with ESMTP id S237050AbjH2PFa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Aug 2023 11:05:30 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDF38199
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Aug 2023 08:05:26 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-d77b9d574f8so3969492276.2
+        for <linux-cifs@vger.kernel.org>; Tue, 29 Aug 2023 08:05:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693321526; x=1693926326;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bQl0BGw22qTxaEhf2na9LSuyxRInVzmVAP1kL4EUs/c=;
+        b=r8qKCYGI/hwE7Uv11JC68gR7Ua0xvpyC2t9ZIj00Wzni/N+pFgYIVQjyburqLAx1SP
+         jF1zs29qPAvgJw7tMFygT/wS6dscNBw5EzSj/xGWnDw0CQIy08YMWB5ght2ru8+tSXz9
+         BAHBiEWRdnrX23TSghOEKWRRATOG0JbRLk9lkLxqf/uIm9ZbIdOPjonlc6aLrki25RxV
+         LX9lF53M+GO3ZPFFMZE0o/Bp0iZZbHxIJQf3uKGQFC90dIrjYLH99DoOTAmIoKsRWU8+
+         T+3yUmtRfB1OEydku3S/QDZgsSOaMZxBfvixezbFmAZG//5QoeQ0nC3dtBkBF9HlFT+c
+         Zv5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693321526; x=1693926326;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bQl0BGw22qTxaEhf2na9LSuyxRInVzmVAP1kL4EUs/c=;
+        b=cSYfWZH+ITcibAiEXmm2tTutyMoK2gEktuqWE2G92ZPkaAT894Pdk3qZTVGFPsKp0H
+         sxBd0/FyE1J4SjkhaVVZLmYASdIG1tchw1456dQksKzkybeaofLZUrXUlGVqLc+zHk0T
+         +5Hl94lcZEsbsAwZ7U9lru+qltDdfdkEP8QDnnBFjw9GIqW9bem4jpr4ZIEIZznXZ9lc
+         4wQRaDPNn7LO1d0TdW4z3NrnSur+mk5uaHy5GVtph+8HKNJWmPFaXdxHpHtihR0Gh3e4
+         Ssws1nY9X1RBZgmCY0t9KMNtrQ7rmcJyn9f/BLxRIZJ/dMH/K2bg2QRyCHE0dbBMUrCc
+         2YRQ==
+X-Gm-Message-State: AOJu0YwrJWSL+3MGL/5nBy8CgGGfDr9+afHuCfpLXuMeJFeaH+I2XPPI
+        MZMXDFeChMIYtLpikHAI4lWEOOImU70tBq4tjI0gPRf2sWv4Ng==
+X-Google-Smtp-Source: AGHT+IEIff9fzli9lbJlqF4gMm7OCVY96k3zvYWdmo+pSZxvdrxAgtuTdZstJJq2KKImkXZPPfuQSmC948FJCvYGIp4=
+X-Received: by 2002:a25:fc15:0:b0:d62:ba45:539f with SMTP id
+ v21-20020a25fc15000000b00d62ba45539fmr30652724ybd.43.1693321525914; Tue, 29
+ Aug 2023 08:05:25 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.49
-Content-Transfer-Encoding: 8bit
+References: <CAH2r5mviQ_UEwqwvaz33dgZwzsqJxYT-xXccNmjW-GvuYokgbA@mail.gmail.com>
+ <CADvbK_djw8qB5kfBH6W1-qDtAWqhqc=VSXxe3LdkXkmgvuq-Bw@mail.gmail.com> <CAH2r5msBn-yiZKL8sfd8NyCLnCzrTiDjr_9pqg73icZ_4V3LkA@mail.gmail.com>
+In-Reply-To: <CAH2r5msBn-yiZKL8sfd8NyCLnCzrTiDjr_9pqg73icZ_4V3LkA@mail.gmail.com>
+From:   Xin Long <lucien.xin@gmail.com>
+Date:   Tue, 29 Aug 2023 11:05:05 -0400
+Message-ID: <CADvbK_foNCexbH4g=9GeJwJ8LD+c43moOkXMg4qtc3yNmZZ7VA@mail.gmail.com>
+Subject: Re: SMB3.1.1 QUIC mounts from Linux kernel
+To:     Steve French <smfrench@gmail.com>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Shyam Prasad N <sprasad@microsoft.com>
+On Mon, Aug 28, 2023 at 2:02=E2=80=AFAM Steve French <smfrench@gmail.com> w=
+rote:
+>
+> For more detail on SMB311 over QUIC (which is already supported by some s=
+ervers) which I find exciting and very relevant to many use cases there are=
+ some overview presentations at eg:
+>
+> https://snia.org/sites/default/files/SDC/2020/103-Dantuluri-SMB-Over-QUIC=
+-Files.pdf
+>
+> And
+>
+> https://www.snia.org/sites/default/files/SDCEMEA/2021/snia-SMB-over-QUIC.=
+pdf
+>
+> And setup instructions for the windows example can be found here: https:/=
+/learn.microsoft.com/en-us/windows-server/storage/file-server/smb-over-quic
+>
+Thanks for sharing the slides, Samba over QUIC is indeed quite mature.
 
-[ Upstream commit 5e90aa21eb1372736e08cee0c0bf47735c5c4b95 ]
+After reading the slides, I can understand how these two QUIC features
+work in Samba:
 
-The current implementation of max_credits on the client does
-not work because the CreditRequest logic for several commands
-does not take max_credits into account.
+- All packets are always encrypted and handshake is authenticated with TLS =
+1.3
+- Improved congestion control and loss recovery
 
-Still, we can end up asking the server for more credits, depending
-on the number of credits in flight. For this, we need to
-limit the credits while parsing the responses too.
+But it seems not clear to me how some other features are used in samba:
 
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/smb2ops.c |  2 ++
- fs/smb/client/smb2pdu.c | 32 ++++++++++++++++++++++++++++----
- 2 files changed, 30 insertions(+), 4 deletions(-)
+- Parallel streams of reliable and unreliable application data
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 759a7d7b3ddfe..4fd377185c2ca 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -34,6 +34,8 @@ static int
- change_conf(struct TCP_Server_Info *server)
- {
- 	server->credits += server->echo_credits + server->oplock_credits;
-+	if (server->credits > server->max_credits)
-+		server->credits = server->max_credits;
- 	server->oplock_credits = server->echo_credits = 0;
- 	switch (server->credits) {
- 	case 0:
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 3ca593cdda76e..a8b35c53c4113 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -1312,7 +1312,12 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
- 	}
- 
- 	/* enough to enable echos and oplocks and one max size write */
--	req->hdr.CreditRequest = cpu_to_le16(130);
-+	if (server->credits >= server->max_credits)
-+		req->hdr.CreditRequest = cpu_to_le16(0);
-+	else
-+		req->hdr.CreditRequest = cpu_to_le16(
-+			min_t(int, server->max_credits -
-+			      server->credits, 130));
- 
- 	/* only one of SMB2 signing flags may be set in SMB2 request */
- 	if (server->sign)
-@@ -1907,7 +1912,12 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 	rqst.rq_nvec = 2;
- 
- 	/* Need 64 for max size write so ask for more in case not there yet */
--	req->hdr.CreditRequest = cpu_to_le16(64);
-+	if (server->credits >= server->max_credits)
-+		req->hdr.CreditRequest = cpu_to_le16(0);
-+	else
-+		req->hdr.CreditRequest = cpu_to_le16(
-+			min_t(int, server->max_credits -
-+			      server->credits, 64));
- 
- 	rc = cifs_send_recv(xid, ses, server,
- 			    &rqst, &resp_buftype, flags, &rsp_iov);
-@@ -4285,6 +4295,7 @@ smb2_async_readv(struct cifs_readdata *rdata)
- 	struct TCP_Server_Info *server;
- 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
- 	unsigned int total_len;
-+	int credit_request;
- 
- 	cifs_dbg(FYI, "%s: offset=%llu bytes=%u\n",
- 		 __func__, rdata->offset, rdata->bytes);
-@@ -4316,7 +4327,13 @@ smb2_async_readv(struct cifs_readdata *rdata)
- 	if (rdata->credits.value > 0) {
- 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(rdata->bytes,
- 						SMB2_MAX_BUFFER_SIZE));
--		shdr->CreditRequest = cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 8);
-+		credit_request = le16_to_cpu(shdr->CreditCharge) + 8;
-+		if (server->credits >= server->max_credits)
-+			shdr->CreditRequest = cpu_to_le16(0);
-+		else
-+			shdr->CreditRequest = cpu_to_le16(
-+				min_t(int, server->max_credits -
-+						server->credits, credit_request));
- 
- 		rc = adjust_credits(server, &rdata->credits, rdata->bytes);
- 		if (rc)
-@@ -4526,6 +4543,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 	unsigned int total_len;
- 	struct cifs_io_parms _io_parms;
- 	struct cifs_io_parms *io_parms = NULL;
-+	int credit_request;
- 
- 	if (!wdata->server)
- 		server = wdata->server = cifs_pick_channel(tcon->ses);
-@@ -4643,7 +4661,13 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 	if (wdata->credits.value > 0) {
- 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(wdata->bytes,
- 						    SMB2_MAX_BUFFER_SIZE));
--		shdr->CreditRequest = cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 8);
-+		credit_request = le16_to_cpu(shdr->CreditCharge) + 8;
-+		if (server->credits >= server->max_credits)
-+			shdr->CreditRequest = cpu_to_le16(0);
-+		else
-+			shdr->CreditRequest = cpu_to_le16(
-+				min_t(int, server->max_credits -
-+						server->credits, credit_request));
- 
- 		rc = adjust_credits(server, &wdata->credits, io_parms->length);
- 		if (rc)
--- 
-2.40.1
+Multi-streaming:
+How is Samba using the multi-streaming of QUIC? I saw there are Multichanne=
+l
+in Samba, but I'm not sure it's using multiple connections or multi-streami=
+ng
+in their implementation.
 
+Unreliable application data:
+Does Samba need to transmit unreliable data?
+
+- Exchanges application data in the first round trip (0-RTT)
+
+0-RTT: does Microsoft's Samba over QUIC implementation really support this?
+As the handshake of linux in-kernel QUIC happens in userspace, 0-RTT
+becomes difficult to implement.
+
+- Survives a change in the clients IP address or port
+
+Connection Migration: This could be a useful feature, but I don't see any
+spec in the slides, has their implementation supported it?
+
+Thanks.
+
+> On Sun, Aug 27, 2023, 10:32 Xin Long <lucien.xin@gmail.com> wrote:
+>>
+>> On Fri, Aug 25, 2023 at 9:08=E2=80=AFAM Steve French <smfrench@gmail.com=
+> wrote:
+>> >
+>> > Xin Long,
+>> > I am very interested in trying out LInux kernel SMB3.1.1 mounts using
+>> > QUIC but wasn't sure how far along your kernel code was.   Do you have
+>> > an update on it?   There was at least one other server type that
+>> > implements SMB3.1.1 over QUIC, but probably easiest to test to Windows
+>> > server (e.g. in Azure).
+>> Got it.
+>>
+>> As for https://github.com/lxin/quic, it has implemented the basic suppor=
+t
+>> for most main features, but still some important ones are missing, like
+>> Streams and Connection IDs Managements. I'm recently doing interoperabil=
+ity
+>> testing with other C implementations like picoquic.
+>>
+>> It still has a long way to go to get into the upstream kernel, but I'm p=
+retty
+>> sure the need by kernel SMB and NFS will speed this up. I think at the s=
+ame
+>> time, some work can be done in fs/smb to move things forward.
+>>
+>> >
+>> > The SMB3.1.1 changes are small to support QUIC, and I could do those
+>> > (or review yours if you have already done it).
+>> >
+>> Cool.
+>>
+>> I don't really have patches and don't know much detail of fs/smb. So it =
+will
+>> be great if you can try this out on fs/smb.
+>>
+>> For the test to Windows server, I will let you know once the basic suppo=
+rt
+>> of the rest features is done in the QUIC implementation, maybe in 1-2 mo=
+nths.
+>> Meanwhile, on fs/smb side, I think checking tls_server/client_hello_x509=
+()
+>> API use in net/sunrpc might be helpful for you to design the code in fs/=
+smb.
+>>
+>> Thanks.
