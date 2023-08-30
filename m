@@ -2,301 +2,186 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D965C83F1E
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Aug 2023 18:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FD7C83F01
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Aug 2023 20:50:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242722AbjH3Sx1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:53:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33030 "EHLO
+        id S240324AbjH3Uud (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 30 Aug 2023 16:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244043AbjH3MUg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Aug 2023 08:20:36 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E924CC2
-        for <linux-cifs@vger.kernel.org>; Wed, 30 Aug 2023 05:20:32 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d72cf9156easo4926620276.0
-        for <linux-cifs@vger.kernel.org>; Wed, 30 Aug 2023 05:20:32 -0700 (PDT)
+        with ESMTP id S240241AbjH3Uuc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Aug 2023 16:50:32 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4217EC0;
+        Wed, 30 Aug 2023 13:49:51 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b9c907bc68so4106841fa.2;
+        Wed, 30 Aug 2023 13:49:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693398031; x=1694002831; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=gmail.com; s=20221208; t=1693428524; x=1694033324; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=IB7GdhP2U/taz0sSfXrtyk6ebrvewemFx6/BdToafPM=;
-        b=m+A/keOQ/2xeqNMlupfJKhV3J7e8lPfm2OZREZuMKJMpJIWlf5MQN4L3TFxzT57LUr
-         hTu4cqFud1Nrc6jaSVzoP+5BsjisrJ6D29oAvxu0deqPeHZpgRWC/Ntcjnx6t/ulHPz1
-         od9JNGRFO9gNKtwrSwzpdE0J/iBoFc0Mai3VgoGOhQ3zXAjJp2NemOQgCzfDhUQDrQJq
-         /jDp/bJJROGZb7iG3dKHOkiuiH1YUNYx0Ww+RprAup3HhQ0UQQRA3L0RKKwk7roBzFcT
-         DGjLZrncaUuDPDLzImMsASZbACi26xGJTkA/B0omrBAlqjJ75X/Fg5CfLKbxh991kDpO
-         eYyQ==
+        bh=vU5QboVHVf3d9+7NH4BpUdZfH+akLsAHcB2wO5q79hM=;
+        b=HntmbxtVRILQW3IYklCiUs9KTJulj1V9BRwRrWPjUiKzrz0a1xO3CxrAgNBnMb9url
+         +1rnGPMxVhl8SnVPS4QuVWTulJEXqa/WTqZBnlHIJ8DFMoFr0JxkgyHVTNpEXEuS/tFx
+         fgkJsKUJV9zBonZOR6hDe+njgP4xwUHjYzxN7bms1iPDrU5Kg5NbWS/Mqs3diX6HIsFn
+         opitdqJ3X47xdCY9uCr/L5enZT150W+oNpnGWmvzt+AvlZtEEXpWZ1AC48VqKVEueDqb
+         c10gcnsjgQn3GXPXc3dAJqVFUktBEBSRDuIuYFRLG+H0DG1CNWP7uGtufzkVv+qCbmuF
+         LT2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693398031; x=1694002831;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=1e100.net; s=20221208; t=1693428524; x=1694033324;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=IB7GdhP2U/taz0sSfXrtyk6ebrvewemFx6/BdToafPM=;
-        b=i7cKwZ+yg7/a8YDm6iVfQKiNOWlVra44jYE9SupU0h7/NUNEG876Fio3r4qWs5LS73
-         iHkshsAV4FN529JahLV1piZrEWNX54fjBiEWDIBjglMjT9I1/Pf55/+Kk00JZNXPBgPw
-         Bv6/BM0WMj+OxN7TysfmCWXEQwvAJJIZ/icRTNYBROR1FpStG6ss5qUVwScRcUZMyxxn
-         lfhfs/TW3d5CEbEROVrRCuq6SEV+a08CY49HwjddrPldXwlLWqIt+jn5qYyWEJmnYJ1C
-         qC/YTBJtgHY3dahlPPSF93gwteZcoqyo9CIFKBneFNbw7uHkNAheo1pv0t0QUc+j+IN/
-         Zdyw==
-X-Gm-Message-State: AOJu0YxxOEwqhB+zCIhNwj3H/4+yvPlbsPbalhwuddLVY/GuCESeKsRp
-        NjiFAhIlB7nV3blncA5yiNFdzA3BZwbh3RHjFmKLo95AtH8=
-X-Google-Smtp-Source: AGHT+IG1tqDJAqHMwqwycaayaI5djw03Bs4gfTWV049ie02UoEJCWJ+H9PTleHmhrGG+eMtKlvrX3Eq6RRM5NuAmdxU=
-X-Received: by 2002:a25:257:0:b0:d7b:8acc:beb0 with SMTP id
- 84-20020a250257000000b00d7b8accbeb0mr1989408ybc.42.1693398031242; Wed, 30 Aug
- 2023 05:20:31 -0700 (PDT)
+        bh=vU5QboVHVf3d9+7NH4BpUdZfH+akLsAHcB2wO5q79hM=;
+        b=ltU+mqQPEILV6AwCNHWLEVwqaQ9LY03/Ap+uXxdgW1L3uIZ9TZo/vx+G92rmVgy3uk
+         y6mhtpwEl0R3/8sYPj4/QZoz7K6CGyY/cudcrjsJraVPOs0W52zvI8ZL/y5d4I0weaq6
+         BZICBV4MtVJcFearKHn9L+jAP4ENq0bVX95gqp460q2v9cOsaPA6y4qn33ZKwddXbh1X
+         nqi1JDSSAbElMb2eYFXclngWBDTa86WaxoombT5/bvBeEtmUGIIAO5QX7yWEQhz12MDa
+         uP8cznlXOgKD9NxD9EP15TDwYM69I4l4//7r45vXNb6stvkdfW3t3C7+H4cehE0tXSGY
+         p1fA==
+X-Gm-Message-State: AOJu0Yw2AvkmTXg8JWe3FRnfjU9Cn6iWTsCDgZlU2/KMYLSwZ4az92JE
+        N6Nf629S/dUnvco36HBYfOWvHIPJ0ahQb1utHTxf0ketHr1NftqZ
+X-Google-Smtp-Source: AGHT+IEiJElM6g/gvAJSVWZEdmn0tPeEphMbBxEm9I+yTO8q7sAr7YaiCI+TMTXU0irpQr4Ju6BPVkEaehtIdB2Nmss=
+X-Received: by 2002:a2e:9959:0:b0:2b9:e230:25ce with SMTP id
+ r25-20020a2e9959000000b002b9e23025cemr2972943ljj.12.1693428523493; Wed, 30
+ Aug 2023 13:48:43 -0700 (PDT)
 MIME-Version: 1.0
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-Date:   Wed, 30 Aug 2023 20:20:20 +0800
-Message-ID: <CADJHv_tztxLsa4GGEWXG4FxWp8cFh__5zF5qU5kTB45h9cO_VA@mail.gmail.com>
-Subject: WARNING: CPU: 5 PID: 60057 at fs/smb/client/connect.c:2417 cifs_put_tcon.part.0+0x281/0x290
-To:     CIFS <linux-cifs@vger.kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 30 Aug 2023 15:48:32 -0500
+Message-ID: <CAH2r5mtpOtiP3Hk6FJPav8tYDhKJTQmELP31zYzVxf4DPNKbiQ@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Dave Kleikamp <shaggy@kernel.org>,
+        "Dr. David Alan Gilbert" <linux@treblig.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+Please pull the following changes since commit
+706a741595047797872e669b3101429ab8d378ef:
 
-Looping fstests generic/412 can trigger this warning resulting a panic.
+  Linux 6.5-rc7 (2023-08-20 15:02:52 +0200)
 
-I'm using the samba server in Fedora Rawhide:
+are available in the Git repository at:
 
- samba                           x86_64  2:4.19.0-0.4.rc3.fc40
- samba-client                  x86_64  2:4.19.0-0.4.rc3.fc40
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc-smb3-client-fixes-part1
 
------- testparm info ------
+for you to fetch changes up to f3a9b3758e0b6d40183929aba599a7da52313a3e:
 
-samba shares:
-Load smb config files from /etc/samba/smb.conf
-Loaded services file OK.
-Weak crypto is allowed by GnuTLS (e.g. NTLM as a compatibility fallback)
+  fs/jfs: Use common ucs2 upper case table (2023-08-30 08:55:52 -0500)
 
-Server role: ROLE_STANDALONE
+----------------------------------------------------------------
+22 smb3/cifs client fixes and two related changes (cleaning up some
+common code for unicode mapping)
+- six fixes for excessive stack usage
+- multichannel reconnect improvements
+- DFS fix and four DFS cleanup patches
+- move UCS-2 conversion code to fs/nls and update cifs.ko and jfs.ko to use them
+- Cleanup patch for compounding, one to fix confusing function name
+- inode number collision fix
+- three reparse point fixes (including avoiding an extra unneeded
+query on symlinks) and one minor cleanup
+- directory lease (caching) improvement
 
-# Global parameters
-[global]
-idmap config * : backend = tdb
+----------------------------------------------------------------
+Bharath SM (1):
+      cifs: update desired access while requesting for directory lease
 
+Dr. David Alan Gilbert (4):
+      fs/smb: Remove unicode 'lower' tables
+      fs/smb: Swing unicode common code from smb->NLS
+      fs/smb/client: Use common code in client
+      fs/jfs: Use common ucs2 upper case table
 
-[test]
-path = /export/test
-read only = No
+Paulo Alcantara (17):
+      smb: client: introduce DFS_CACHE_TGT_LIST()
+      smb: client: ensure to try all targets when finding nested links
+      smb: client: move some params to cifs_open_info_data
+      smb: client: make smb2_compound_op() return resp buffer on success
+      smb: client: rename cifs_dfs_ref.c to namespace.c
+      smb: client: get rid of dfs naming in automount code
+      smb: client: get rid of dfs code dep in namespace.c
+      smb: client: parse reparse point flag in create response
+      smb: client: do not query reparse points twice on symlinks
+      smb: client: query reparse points in older dialects
+      smb: cilent: set reparse mount points as automounts
+      smb: client: reduce stack usage in cifs_try_adding_channels()
+      smb: client: reduce stack usage in cifs_demultiplex_thread()
+      smb: client: reduce stack usage in smb_send_rqst()
+      smb: client: reduce stack usage in smb2_set_ea()
+      smb: client: reduce stack usage in smb2_query_info_compound()
+      smb: client: reduce stack usage in smb2_query_reparse_point()
 
+Steve French (2):
+      [SMB3] send channel sequence number in SMB3 requests after reconnects
+      SMB3: rename macro CIFS_SERVER_IS_CHAN to avoid confusion
 
-[scratch]
-path = /export/scratch
-read only = No
+ fs/jfs/Kconfig                                   |   1 +
+ fs/jfs/Makefile                                  |   2 +-
+ fs/jfs/jfs_unicode.h                             |  17 ++---
+ fs/jfs/jfs_uniupr.c                              | 121
+---------------------------------
+ fs/nls/Kconfig                                   |   8 +++
+ fs/nls/Makefile                                  |   1 +
+ fs/nls/nls_ucs2_data.h                           |  15 ++++
+ fs/{smb/server/uniupr.h => nls/nls_ucs2_utils.c} | 156
++++++-------------------------------------
+ fs/nls/nls_ucs2_utils.h                          | 285
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/smb/client/Kconfig                            |   1 +
+ fs/smb/client/Makefile                           |   5 +-
+ fs/smb/client/cached_dir.c                       |   2 +-
+ fs/smb/client/cifs_debug.c                       |   2 +-
+ fs/smb/client/cifs_unicode.c                     |   1 -
+ fs/smb/client/cifs_unicode.h                     | 330
++---------------------------------------------------------------------------------------
+ fs/smb/client/cifs_uniupr.h                      | 239
+----------------------------------------------------------------
+ fs/smb/client/cifsfs.c                           |   2 +-
+ fs/smb/client/cifsfs.h                           |  11 +--
+ fs/smb/client/cifsglob.h                         |  72 ++++++++++++++++----
+ fs/smb/client/cifsproto.h                        |   9 ++-
+ fs/smb/client/connect.c                          |  21 +++---
+ fs/smb/client/dfs.c                              | 271
++++++++++++++++++++++++++++++++++++++++---------------------------------
+ fs/smb/client/dfs.h                              | 141
+++++++++++++++++++++++++++++----------
+ fs/smb/client/dfs_cache.c                        |  10 ++-
+ fs/smb/client/dfs_cache.h                        |  12 ++--
+ fs/smb/client/dir.c                              |   4 +-
+ fs/smb/client/inode.c                            | 498
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------------------------
+ fs/smb/client/misc.c                             |   2 +-
+ fs/smb/client/{cifs_dfs_ref.c => namespace.c}    | 113
+++++++++++++++++--------------
+ fs/smb/client/readdir.c                          |  23 ++-----
+ fs/smb/client/sess.c                             |  72 ++++++++++++--------
+ fs/smb/client/smb1ops.c                          |  26 ++++---
+ fs/smb/client/smb2inode.c                        | 203
+++++++++++++++++++++++++++++++------------------------
+ fs/smb/client/smb2misc.c                         |   6 +-
+ fs/smb/client/smb2ops.c                          | 298
++++++++++++++++++++++++++------------------------------------------------------
+ fs/smb/client/smb2pdu.c                          |  19 ++++--
+ fs/smb/client/smb2proto.h                        |  17 +++--
+ fs/smb/client/smb2transport.c                    |   4 +-
+ fs/smb/client/transport.c                        |  29 ++++----
+ fs/smb/common/smb2pdu.h                          |  22 ++++++
+ fs/smb/server/Kconfig                            |   1 +
+ fs/smb/server/unicode.c                          |   1 -
+ fs/smb/server/unicode.h                          | 325
+++-------------------------------------------------------------------------------------
+ 43 files changed, 1377 insertions(+), 2021 deletions(-)
+ delete mode 100644 fs/jfs/jfs_uniupr.c
+ create mode 100644 fs/nls/nls_ucs2_data.h
+ rename fs/{smb/server/uniupr.h => nls/nls_ucs2_utils.c} (50%)
+ create mode 100644 fs/nls/nls_ucs2_utils.h
+ delete mode 100644 fs/smb/client/cifs_uniupr.h
+ rename fs/smb/client/{cifs_dfs_ref.c => namespace.c} (62%)
 
------- testparm info  end------
-
-Mount options is " -o vers=3.11,mfsymlinks"
-
-Kernel version is the latest upstream 6.5.0.
-
+-- 
 Thanks,
-Murphy
 
-
-[  841.449048] ./checking generic/412
-[  841.683690] CIFS: Attempting to mount //127.0.0.1/test
-[  841.686211] ------------[ cut here ]------------
-[  841.686863] WARNING: CPU: 5 PID: 60057 at
-fs/smb/client/connect.c:2417 cifs_put_tcon.part.0+0x281/0x290 [cifs]
-[  841.688364] Modules linked in: nls_utf8 cifs cifs_arc4 cifs_md4
-dns_resolver fscache netfs rfkill intel_rapl_msr intel_rapl_common
-sunrpc sb_edac x86_pkg_temp_thermal intel_powerclamp ipmi_ssif
-coretemp kvm_intel kvm irqbypass iTCO_wdt acpi_ipmi ipmi_si rapl
-intel_pmc_bxt i2c_i801 iTCO_vendor_support intel_cstate ipmi_devintf
-intel_uncore hpilo lpc_ich ioatdma i2c_smbus ipmi_msghandler igb
-pcspkr acpi_power_meter acpi_tad dca fuse loop zram xfs
-crct10dif_pclmul crc32_pclmul crc32c_intel polyval_clmulni
-polyval_generic ghash_clmulni_intel sha512_ssse3 serio_raw mgag200
-hpwdt i2c_algo_bit wmi
-[  841.690949] CPU: 5 PID: 60057 Comm: mount.cifs Not tainted 6.5.0 #1
-[  841.691682] Hardware name: HP ProLiant DL80 Gen9/ProLiant DL80
-Gen9, BIOS U15 10/21/2019
-[  841.692086] RIP: 0010:cifs_put_tcon.part.0+0x281/0x290 [cifs]
-[  841.693113] Code: e8 48 c7 c1 b0 3d d9 c0 48 c7 c2 e0 a5 e2 c0 41
-89 c1 48 c7 c6 08 5b df c0 48 c7 c7 70 7e cd c0 e8 14 d7 c6 d9 e9 45
-fe ff ff <0f> 0b e9 c5 fd ff ff 0f 1f 84 00 00 00 00 00 90 90 90 90 90
-90 90
-[  841.694452] RSP: 0018:ffffb7bf40f73c68 EFLAGS: 00010286
-[  841.694731] RAX: 00000000ffffffff RBX: ffff9da3c5889800 RCX: 0000000000000000
-[  841.695470] RDX: 0000000000000001 RSI: ffff9da42f092c00 RDI: ffff9da3c5889828
-[  841.696221] RBP: ffff9da3c5889828 R08: 000000000000000a R09: 0000000000000000
-[  841.696988] R10: ffff9da42da78c40 R11: 0000000000000100 R12: ffff9da3d863a800
-[  841.697804] R13: ffff9da3c5889800 R14: ffff9da42486ee40 R15: ffff9da42f092c00
-[  841.698692] FS:  00007f91e9a06780(0000) GS:ffff9da537940000(0000)
-knlGS:0000000000000000
-[  841.699098] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  841.699807] CR2: 00007f9435193540 CR3: 0000000101024002 CR4: 00000000001706e0
-[  841.700589] Call Trace:
-[  841.700738]  <TASK>
-[  841.701227]  ? cifs_put_tcon.part.0+0x281/0x290 [cifs]
-[  841.701718]  ? __warn+0x81/0x130
-[  841.702376]  ? cifs_put_tcon.part.0+0x281/0x290 [cifs]
-[  841.702864]  ? report_bug+0x171/0x1a0
-[  841.703069]  ? handle_bug+0x3c/0x80
-[  841.703706]  ? exc_invalid_op+0x17/0x70
-[  841.703923]  ? asm_exc_invalid_op+0x1a/0x20
-[  841.704122]  ? cifs_put_tcon.part.0+0x281/0x290 [cifs]
-[  841.704626]  ? cifs_put_tcon.part.0+0x36/0x290 [cifs]
-[  841.705112]  cifs_put_tlink+0x49/0x70 [cifs]
-[  841.706092]  cifs_match_super+0x10f/0x3d0 [cifs]
-[  841.707020]  ? __pfx_cifs_match_super+0x10/0x10 [cifs]
-[  841.707504]  sget+0x1c1/0x2b0
-[  841.708065]  ? __pfx_cifs_set_super+0x10/0x10 [cifs]
-[  841.708554]  cifs_smb3_do_mount+0x217/0x760 [cifs]
-[  841.709679]  smb3_get_tree+0xce/0x280 [cifs]
-[  841.710598]  vfs_get_tree+0x29/0xf0
-[  841.711201]  path_mount+0x4a3/0xae0
-[  841.711968]  __x64_sys_mount+0x11a/0x150
-[  841.712217]  do_syscall_64+0x60/0x90
-[  841.712412]  ? count_memcg_events.constprop.0+0x1a/0x30
-[  841.712673]  ? handle_mm_fault+0x9e/0x350
-[  841.712878]  ? do_user_addr_fault+0x179/0x640
-[  841.713501]  ? exc_page_fault+e fa 49 89 ca b8 a5 00 00 00 0f 05
-<48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d b2 12 12 00 f7 d8 64 89 01 48
-[  842.214890] RSP: 002b:00007ffe6c404078 EFLAGS: 00000246 ORIG_RAX:
-00000000000000a5
-[  842.215693] RAX: ffffffffffffffda RBX: 000000000000000a RCX: 00007f91e9716b4e
-[  842.216624] RDX: 0000559bb88a1476 RSI: 0000559bb88a14dc RDI: 00007ffe6c405152
-[  842.217396] RBP: 00007ffe6c404130 R08: 0000559bb9a20eb0 R09: 0000000000000000
-[  842.218180] R10: 0000000000000000 R11: 0000000000000246 R12: 0000559bb88a103f
-[  842.218944] R13: 0000559bb9a21f10 R14: 00007ffe6c405152 R15: 00007f91e9a17000
-[  842.220193]  </TASK>
-[  842.220429] ---[ end trace 0000000000000000 ]---
-[  842.221077] BUG: scheduling while atomic: mount.cifs/60057/0x00000002
-[  842.221455] Modules linked in: nls_utf8 cifs cifs_arc4 cifs_md4
-dns_resolver fscache netfs rfkill intel_rapl_msr intel_rapl_common
-sunrpc sb_edac x86_pkg_temp_thermal intel_powerclamp ipmi_ssif
-coretemp kvm_intel kvm irqbypass iTCO_wdt acpi_ipmi ipmi_si rapl
-intel_pmc_bxt i2c_i801 iTCO_vendor_support intel_cstate ipmi_devintf
-intel_uncore hpilo lpc_ich ioatdma i2c_smbus ipmi_msghandler s
-Tainted: G        W          6.5.0 #1
-[  842.723585] Hardware name: HP ProLiant DL80 Gen9/ProLiant DL80
-Gen9, BIOS U15 10/21/2019
-[  842.723995] Call Trace:
-[  842.724128]  <TASK>
-[  842.724679]  dump_stack_lvl+0x47/0x60
-[  842.724901]  __schedule_bug+0x56/0x70
-[  842.725092]  __schedule+0x106a/0x14c0
-[  842.725313]  schedule+0x5e/0xd0
-[  842.725970]  wait_for_response+0x96/0xe0 [cifs]
-[  842.726771]  ? __pfx_autoremove_wake_function+0x10/0x10
-[  842.727054]  compound_send_recv+0x461/0xa90 [cifs]
-[  842.727941]  ? mempool_alloc+0x89/0x1b0
-[  842.728181]  cifs_send_recv+0x23/0x30 [cifs]
-[  842.729037]  SMB2_tdis+0x2b9/0x3c0 [cifs]
-[  842.729460]  ? cifs_put_tcon.part.0+0xe7/0x290 [cifs]
-[  842.729966]  cifs_put_tcon.part.0+0xe7/0x290 [cifs]
-[  842.730750]  cifs_put_tlink+0x49/0x70 [cifs]
-[  842.731547]  cifs_match_super+0x10f/0x3d0 [cifs]
-[  842.732541]  ? __pfx_cifs_match_super+0x10/0x10 [cifs]
-[  842.733097]  sget+0x1c1/0x2b0
-[  842.733678]  ? __pfx_cifs_set_super+0x10/0x10 [cifs]
-[  842.734213]  cifs_smb3_do_mount+0x217/0x760 [cifs]
-[  842.735003]  smb3_get_tree+0xce/0x280 [cifs]
-[  842.735778]  vfs_get_tree+0x29/0xf0
-[  842.736355]  path_mount+0x4a3/0xae0
-[  842.736993]  __ault+0x179/0x640
-[  843.237833]  ? exc_page_fault+0x7f/0x180
-[  843.238050]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-[  843.238334] RIP: 0033:0x7f91e9716b4e
-[  843.238527] Code: 48 8b 0d e5 12 12 00 f7 d8 64 89 01 48 83 c8 ff
-c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 a5 00 00
-00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d b2 12 12 00 f7 d8 64 89
-01 48
-[  843.239814] RSP: 002b:00007ffe6c404078 EFLAGS: 00000246 ORIG_RAX:
-00000000000000a5
-[  843.240749] RAX: ffffffffffffffda RBX: 000000000000000a RCX: 00007f91e9716b4e
-[  843.241566] RDX: 0000559bb88a1476 RSI: 0000559bb88a14dc RDI: 00007ffe6c405152
-[  843.242321] RBP: 00007ffe6c404130 R08: 0000559bb9a20eb0 R09: 0000000000000000
-[  843.243103] R10: 0000000000000000 R11: 0000000000000246 R12: 0000559bb88a103f
-[  843.244140] R13: 0000559bb9a21f10 R14: 00007ffe6c405152 R15: 00007f91e9a17000
-[  843.245109]  </TASK>
-[  843.245363] ------------[ cut here ]------------
-[  843.246039] kernel BUG at mm/slub.c:440!
-[  843.246277] invalid opcode: 0000 [#1] PREEMPT SMP PTI
-[  843.246533] CPU: 11 PID: 60057 Comm: mount.cifs Tainted: G        W
-         6.5.0 #1
-[  843.246914] Hardware name: HP ProLiant DL80 Gen9/ProLiant DL80
-Gen9, BIOS U15 10/21/2019
-[  843.247319] RIP: 0010:__slab_free+0x152/0x330
-[  843.248097] Code: 8b 06 48 89 0c 24 48 c1 e8 36 48 8b 84 c3 d8 00
-00 00 48 89 c7 48 89 44 24 20 e8 29 97 bc 00 48 8b 0c 24 48 89 44 24
-08 eb 87 <0f> 0b f7 43 08 00 0d 21 00 75 ca eb c3 f7 43 08 00 0d 21 00
-0f 84
-[  843.249649] RSP: 0018:ffffb7bf40f73b30 EFLAGS: 00010246
-[  843.249935] RAX: ffff9da3c5903390 RBX: ffff9da3c0042400 R[
-843.730400] R10: ffffb7bf40f73c68 R11: 0000000000000100 R12:
-ffff9da3c5903380
-[  843.751313] R13: ffff9da3c5903380 R14: fffff4aa441640c0 R15: dead000000000100
-[  843.752078] FS:  00007f91e9a06780(0000) GS:ffff9da537ac0000(0000)
-knlGS:0000000000000000
-[  843.752526] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  843.753228] CR2: 000055bad95f8290 CR3: 0000000101024003 CR4: 00000000001706e0
-[  843.754224] Call Trace:
-[  843.754417]  <TASK>
-[  843.754909]  ? die+0x36/0x90
-[  843.755472]  ? do_trap+0xda/0x100
-[  843.756140]  ? __slab_free+0x152/0x330
-[  843.756354]  ? do_error_trap+0x6a/0x90
-[  843.756548]  ? __slab_free+0x152/0x330
-[  843.756738]  ? exc_invalid_op+0x50/0x70
-[  843.756929]  ? __slab_free+0x152/0x330
-[  843.757117]  ? asm_exc_invalid_op+0x1a/0x20
-[  843.757332]  ? free_cached_dirs+0x14d/0x180 [cifs]
-[  843.758125]  ? __slab_free+0x152/0x330
-[  843.758347]  free_cached_dirs+0x14d/0x180 [cifs]
-[  843.759105]  tconInfoFree+0x29/0x130 [cifs]
-[  843.759468]  cifs_put_tcon.part.0+0xfe/0x290 [cifs]
-[  843.760219]  cifs_put_tlink+0x49/0x70 [cifs]
-[  843.760956]  cifs_match_super+0x10f/0x3d0 [cifs]
-[  843.761722]  ? __pfx_cifs_match_super+0x10/0x10 [cifs]
-[  843.762133]  sget+0x1c1/0x2b0
-[  843.762674]  ? __pfx_cifs_set_super+0x10/0x10 [cifs]
-[  843.763081]  cifs_smb3_do_m__x64_sys_mount+0x11a/0x150
-[  844.263687]  do_syscall_64+0x60/0x90
-[  844.263878]  ? count_memcg_events.constprop.0+0x1a/0x30
-[  844.264122]  ? handle_mm_fault+0x9e/0x350
-[  844.264375]  ? do_user_addr_fault+0x179/0x640
-[  844.264965]  ? exc_page_fault+0x7f/0x180
-[  844.265185]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-[  844.265441] RIP: 0033:0x7f91e9716b4e
-[  844.265644] Code: 48 8b 0d e5 12 12 00 f7 d8 64 89 01 48 83 c8 ff
-c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 a5 00 00
-00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d b2 12 12 00 f7 d8 64 89
-01 48
-[  844.266922] RSP: 002b:00007ffe6c404078 EFLAGS: 00000246 ORIG_RAX:
-00000000000000a5
-[  844.267666] RAX: ffffffffffffffda RBX: 000000000000000a RCX: 00007f91e9716b4e
-[  844.268380] RDX: 0000559bb88a1476 RSI: 0000559bb88a14dc RDI: 00007ffe6c405152
-[  844.269096] RBP: 00007ffe6c404130 R08: 0000559bb9a20eb0 R09: 0000000000000000
-[  844.269844] R10: 0000000000000000 R11: 0000000000000246 R12: 0000559bb88a103f
-[  844.270587] R13: 0000559bb9a21f10 R14: 00007ffe6c405152 R15: 00007f91e9a17000
-[  844.271299]  </TASK>
-[  844.271434] Modules linked in: nls_utf8 cifs cifs_arc4 cifs_md4
-dns_resolver fscache nec_smbus ipmi_msghandler igb pcspkr
-acpi_power_meter acpi_tad dca fuse loop zram xfs crct10dif_pclmul
-crc32_pclmul crc32c_intel polyval_clmulni polyval_generic
-ghash_clmulni_intel sha512_ssse3 serio_raw mgag200 hpwdt i2c_algo_bit
-wmi
-[  844.773065] ---[ end trace 0000000000000000 ]---
-[  844.775279] pstore: backend (erst) writing error (-28)
-[  844.775585] RIP: 0010:__slab_free+0x152/0x330
-[  844.776201] Code: 8b 06 48 89 0c 24 48 c1 e8 36 48 8b 84 c3 d8 00
-00 00 48 89 c7 48 89 44 24 20 e8 29 97 bc 00 48 8b 0c 24 48 89 44 24
-08 eb 87 <0f> 0b f7 43 08 00 0d 21 00 75 ca eb c3 f7 43 08 00 0d 21 00
-0f 84
-[  844.777437] RSP: 0018:ffffb7bf40f73b30 EFLAGS: 00010246
-[  844.777726] RAX: ffff9da3c5903390 RBX: ffff9da3c0042400 RCX: 0000000080800072
-[  844.778433] RDX: fffffffe8ef03380 RSI: ffff9da3c5903380 RDI: ffffb7bf40f73ba0
-[  844.779152] RBP: ffffb7bf40f73bd0 R08: 0000000000000001 R09: ffffffffc0c5d96d
-[  844.779900] R10: ffffb7bf40f73c68 R11: 0000000000000100 R12: ffff9da3c5903380
-[  844.780671] R13: ffff9da3c5903380 R14: fffff4aa441640c0 R15: dead000000000100
-[  844.0101024003 CR4: 00000000001706e0
-[  845.282046] Kernel panic - not syncing: Fatal exception
-[  845.282427] Kernel Offset: 0x19000000 from 0xffffffff81000000
-(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[  845.284558] ---[ end Kernel panic - not syncing: Fatal exception ]---
+Steve
