@@ -2,57 +2,113 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5191FC83F10
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Aug 2023 08:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FCCBC83F01
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Aug 2023 10:30:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244514AbjHaIPz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 31 Aug 2023 04:15:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57272 "EHLO
+        id S240413AbjHaKaP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 31 Aug 2023 06:30:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230222AbjHaIPz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Aug 2023 04:15:55 -0400
-X-Greylist: delayed 555 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 31 Aug 2023 01:15:50 PDT
-Received: from mail.svorkabrattegg.com (mail.svorkabrattegg.com [51.38.115.213])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27BC3CE7
-        for <linux-cifs@vger.kernel.org>; Thu, 31 Aug 2023 01:15:50 -0700 (PDT)
-Received: by mail.svorkabrattegg.com (Postfix, from userid 1002)
-        id 6FBFFA455F; Thu, 31 Aug 2023 08:05:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=svorkabrattegg.com;
-        s=mail; t=1693469160;
-        bh=/k89xfPLk1d0qR/RHuj9ICbI68AhaQrvzSmPJgcc5mA=;
-        h=Date:From:To:Subject:From;
-        b=Dd7/pVxjuv3WNheqnbXcyLhMilPTfc6GvjGrhSpWFTvj9Rz6iuieksi7aPG89Fa4W
-         vCbnmHCUFPTCywrwMNBaTVOyuVtmTu1MdtO0ZszUx7yXtVTmEIRIuzBrmzCliqfzVG
-         LbgRHX81TJqXoNFC0/qpqb2YHm13dwrrs1Pws0O2nwhP5IPXMmGUyGq81OfQAG8AIs
-         FZhLB0ONoHNWRmRhRYUbsJ/GDTPGfO1xU+TWXKBmM54dI1r+qAvndafj1k8tc2lLL6
-         Jg+NLDEzPXq2QA97TWgGnq6Pm7ddfkjIj0Y6rvr5lLfEh458S35oHsDnn+1NcOMIlb
-         /n04i1pylTeJg==
-Received: by mail.svorkabrattegg.com for <linux-cifs@vger.kernel.org>; Thu, 31 Aug 2023 08:05:32 GMT
-Message-ID: <20230831064500-0.1.cr.rpru.0.p1f7ox7i55@svorkabrattegg.com>
-Date:   Thu, 31 Aug 2023 08:05:32 GMT
-From:   "Hubert Kowalczyk" <hubert.kowalczyk@svorkabrattegg.com>
-To:     <linux-cifs@vger.kernel.org>
-Subject: =?UTF-8?Q?Prosz=C4=99_o_kontakt?=
-X-Mailer: mail.svorkabrattegg.com
+        with ESMTP id S233949AbjHaKaP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Aug 2023 06:30:15 -0400
+Received: from mx.treblig.org (mx.treblig.org [IPv6:2a00:1098:5b::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808D1CF3;
+        Thu, 31 Aug 2023 03:30:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+        ; s=bytemarkmx; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID
+        :Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID
+        :Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+        Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe
+        :List-Post:List-Owner:List-Archive;
+        bh=V6+vGYvq9Ire2nZ/1cMUzhYc/H6nR5gZGxtRuso2jbY=; b=hW3U+E/zCfg97z1i5EnmqtycDO
+        oBHvbe4PWhtWQWadGcmKSZBJUaN4PA8LgLz6fmya4vC66dkY+dNkDW3VWD8o9VEAXNoL2rRCtvSjK
+        oeoGVmsuf66/rv9OEnt/3tkaumPdhOYVZfmce2hN4aX6pjUSRQMp5LFqQRy41AQRts8FrjeAQKUdx
+        nwHKoA1r1j5IflSfQPNd3iYiK2GEDq1A+Q1Ie9hqZxA/mhVvm0chA9/L62DHFqmnP7admGVNLid2U
+        4TCe2RW5uRbYZX5JxLVjl5gV8T+wKewVaLSNJVRfFJl+7frpV4XbKhuk5Ahv4iA7r78fmR1amf22Y
+        P6CQexUw==;
+Received: from dg by mx.treblig.org with local (Exim 4.94.2)
+        (envelope-from <dg@treblig.org>)
+        id 1qbew9-009TQG-De; Thu, 31 Aug 2023 10:30:05 +0000
+Date:   Thu, 31 Aug 2023 10:30:05 +0000
+From:   "Dr. David Alan Gilbert" <linux@treblig.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Steve French <smfrench@gmail.com>
+Cc:     Dave Kleikamp <shaggy@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [GIT PULL] smb3 client fixes
+Message-ID: <ZPBrrfEw5xDx44Gm@gallifrey>
+References: <CAH2r5mtpOtiP3Hk6FJPav8tYDhKJTQmELP31zYzVxf4DPNKbiQ@mail.gmail.com>
+ <CAHk-=wiCPoGieS-hkV+ze6UqvzNyPNT7WoD_v54ZuVwi-d5Bmw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wiCPoGieS-hkV+ze6UqvzNyPNT7WoD_v54ZuVwi-d5Bmw@mail.gmail.com>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/5.10.0-23-amd64 (x86_64)
+X-Uptime: 10:27:51 up 55 days, 19:59,  1 user,  load average: 0.01, 0.01, 0.00
+User-Agent: Mutt/2.0.5 (2021-01-21)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
+* Linus Torvalds (torvalds@linux-foundation.org) wrote:
+> On Wed, 30 Aug 2023 at 13:48, Steve French <smfrench@gmail.com> wrote:
+> >
+> > - move UCS-2 conversion code to fs/nls and update cifs.ko and jfs.ko to use them
+> 
+> I've pulled this, but I think the new NLS_UCS2_UTILS config option
+> shouldn't be something that is asked about. The filesystems that want
+> it already select it, and users shouldn't be asked about a module with
+> no use.
+> 
+> The way to do that is to simply not have a user query string for it,
+> ie instead of
+> 
+>   config NLS_UCS2_UTILS
+>           tristate "NLS UCS-2 UTILS"
+> 
+> it could be (an dI think should be) just
+> 
+>   config NLS_UCS2_UTILS
+>           tristate
+> 
+> which tells the config system not to ask users about it.
+>
+> Because users really shouldn't be asked questions that there is no point in.
 
-Czy jest mo=C5=BCliwo=C5=9B=C4=87 nawi=C4=85zania wsp=C3=B3=C5=82pracy z =
-Pa=C5=84stwem?
+Agreed.
+I'll check it today and send a patch.
 
-Z ch=C4=99ci=C4=85 porozmawiam z osob=C4=85 zajmuj=C4=85c=C4=85 si=C4=99 =
-dzia=C5=82aniami zwi=C4=85zanymi ze sprzeda=C5=BC=C4=85.
+Thanks,
 
-Pomagamy skutecznie pozyskiwa=C4=87 nowych klient=C3=B3w.
+Dave
 
-Zapraszam do kontaktu.
-
-
-Z pozdrowieniami
-Hubert Kowalczyk
+> 
+> And then, on a purely visual commentary about your pull request -
+> lines like these are just noise:
+> 
+> >  fs/{smb/server/uniupr.h => nls/nls_ucs2_utils.c} | 156
+> > +++++-------------------------------------
+> >  fs/nls/nls_ucs2_utils.h                          | 285
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 
+> and the problem seems to be that you generate the diffstat in a very
+> wide terminal (where git tries to be helpful and give you lots of
+> detail), and then you cut-and-paste the result.
+> 
+> If you pipe it to a tool instead (xsel, perhaps), git will limit the
+> width of the diffstat to something sane.
+> 
+> Or, if you really want to use a terminal and cut-and-paste it
+> manually, you could try to tell git to use '--stat=72' to limit the
+> stat to 72 characters (which is the canonical "width for email", as
+> the Lord spake unto us all in rfc822, even if the Lord was confused
+> and also mentioned the number 65).
+> 
+>                          Linus
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
