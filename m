@@ -2,116 +2,140 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E69C71153
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Sep 2023 19:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44571CA0FE3
+	for <linux-cifs@archiver.kernel.org>; Sun,  3 Sep 2023 22:31:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229805AbjIBTLU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 2 Sep 2023 15:11:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57838 "EHLO
+        id S1346086AbjICWbF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 3 Sep 2023 18:31:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232225AbjIBTLT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Sep 2023 15:11:19 -0400
-X-Greylist: delayed 541 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 02 Sep 2023 12:11:15 PDT
-Received: from mail.cs.ucla.edu (mail.cs.ucla.edu [131.179.128.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF0FCC5
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Sep 2023 12:11:15 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.cs.ucla.edu (Postfix) with ESMTP id 11EA93C011BDF
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Sep 2023 12:02:14 -0700 (PDT)
-Received: from mail.cs.ucla.edu ([127.0.0.1])
-        by localhost (mail.cs.ucla.edu [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id dcbrHXTFq_tI for <linux-cifs@vger.kernel.org>;
-        Sat,  2 Sep 2023 12:02:13 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.cs.ucla.edu (Postfix) with ESMTP id ABE3D3C011BE9
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Sep 2023 12:02:13 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.cs.ucla.edu ABE3D3C011BE9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cs.ucla.edu;
-        s=9D0B346E-2AEB-11ED-9476-E14B719DCE6C; t=1693681333;
-        bh=w6eOJyYwIASsZC/vm2LObMxW3T9Zi90r6hBN5svBrY8=;
-        h=Message-ID:Date:MIME-Version:To:From;
-        b=U+Zq5a4AFagX998LdSvzOtmpeuV3Skh8yiOK96hiec442iFFwkN5KLNna9hbm9TAD
-         feTvOc747rYv/Luhy3ltUWq3WtiQcu28Fj5/YEwzVMkYHj8TxKmM8QKYR18OqLEu1q
-         IyR5TAt5PqWpCWQUou4aRLOTM/VLGOtta4gsuLNyDYPlUXBZkhrHUVfzoSGZCq3BT7
-         ixHQ0pguCBDlzOdkDc7wpdiwvXBKn+QaoTCYcSc0pB2Z34uX/cFojAUVOAupClmaDp
-         WLSofyek6rI5rHTswo32pZOMrTyevK3xfiYLTwr6nvoKBrjl7T3ksVKQrt/6dUrt3e
-         uAmQwJENq35dg==
-X-Virus-Scanned: amavisd-new at mail.cs.ucla.edu
-Received: from mail.cs.ucla.edu ([127.0.0.1])
-        by localhost (mail.cs.ucla.edu [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 8bN8ek1Lf7j4 for <linux-cifs@vger.kernel.org>;
-        Sat,  2 Sep 2023 12:02:13 -0700 (PDT)
-Received: from [192.168.1.9] (cpe-172-91-119-151.socal.res.rr.com [172.91.119.151])
-        by mail.cs.ucla.edu (Postfix) with ESMTPSA id 8EA3A3C011BDF
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Sep 2023 12:02:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="------------kX4so2sPkf0GNksWX0tGNxBg"
-Message-ID: <fe8ab586-c697-583b-650d-3adac64df7b2@cs.ucla.edu>
-Date:   Sat, 2 Sep 2023 12:02:13 -0700
+        with ESMTP id S240826AbjICWbE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 3 Sep 2023 18:31:04 -0400
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B74DA
+        for <linux-cifs@vger.kernel.org>; Sun,  3 Sep 2023 15:30:55 -0700 (PDT)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1c50438636fso786008fac.1
+        for <linux-cifs@vger.kernel.org>; Sun, 03 Sep 2023 15:30:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1693780255; x=1694385055; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nv6YpToDNZJcA/Ccz8YHJKQ8zE37n7OYKvDh05ivZ8M=;
+        b=eLvFMZ6HweV3i75Mje3KyiQMHp72f3fVYJp4X8QBR1sUoWt5LbUe2oYe6gz7J03xSV
+         aHsv7iDil4KTnD32vRddboJhyW5dIQThpWZBfmdQlNdU/+SQKnZqTkI+8YNmhDFqSNM4
+         M/5uOEBZigGEpPC3vmfjiwnDFOd47IixsMl044OpUX7QG234XdFYwtba/jPyi6PCo/kZ
+         okP+nX6zzbLjyilv/Ocy1qCe5aC4gkdgDOfyh92JWGe8bVg+DmwjlPuuV3kM/V8mAkRG
+         YMrGVWwsvVs5uRT8A9BN8JD3DAOcyXyqtn49LxBGuGru+09OFjvSzk6tINPlQnplnbJD
+         r/Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693780255; x=1694385055;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nv6YpToDNZJcA/Ccz8YHJKQ8zE37n7OYKvDh05ivZ8M=;
+        b=R2bJ/t9YDW1a1gQrHKTRhCXg2e5zr/4PwP95IsyABglvWBFCSXjT0Pd0a/P3ZkKIts
+         r7HUELeg9vafPee2F9mqjTk0CHF7ouVTeGjo8cY1xyFB9WOlSRMKr9It4bz07ueGUtgC
+         bfjvZ7WxI0IAoEy2sSoQVfZ/YksnjwEO39m7Q4WdkBMZ7+AUiIQf4RTyB61eTOLmKOkJ
+         TPzQbxpwH3IJtxmbUu3hpcWBCTSicoS2DV0K6g5+xrEjq8JyY+IDDxMjgpfaF7BOJnek
+         24cmpqPj6BtYZ+7zi1vavrmbIhfTmMTC+eUEJT4sQbqOnNoX+no+vCW1A7vJZhS9vwbl
+         joQg==
+X-Gm-Message-State: AOJu0YwZUhQoKrUATAhbne6lbzP2RDrunjH1FQrIEKieRIyrBMBHMlN0
+        +nIlChY8pjfY/WJnux3NaAVTrA==
+X-Google-Smtp-Source: AGHT+IGLu9Ypqvz2HQH6Ke2apJHDtGTD5ZHmV6+9u1MT+8XuCmbNG2jkA6AQg79Zc5mY+kWQOWShIA==
+X-Received: by 2002:a05:6870:568d:b0:1be:c8e2:3ec3 with SMTP id p13-20020a056870568d00b001bec8e23ec3mr11536784oao.14.1693780255066;
+        Sun, 03 Sep 2023 15:30:55 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
+        by smtp.gmail.com with ESMTPSA id i15-20020a63bf4f000000b00565e96d9874sm5648132pgo.89.2023.09.03.15.30.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Sep 2023 15:30:54 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qcvcK-00ASFy-0F;
+        Mon, 04 Sep 2023 08:30:52 +1000
+Date:   Mon, 4 Sep 2023 08:30:52 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Hao Xu <hao.xu@linux.dev>
+Cc:     Matthew Wilcox <willy@infradead.org>, io-uring@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
+Message-ID: <ZPUJHAKzxvXiEDYA@dread.disaster.area>
+References: <20230827132835.1373581-1-hao.xu@linux.dev>
+ <20230827132835.1373581-8-hao.xu@linux.dev>
+ <ZOvA5DJDZN0FRymp@casper.infradead.org>
+ <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
+ <ZO3cI+DkotHQo3md@casper.infradead.org>
+ <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-US
-To:     linux-cifs@vger.kernel.org
-From:   Paul Eggert <eggert@cs.ucla.edu>
-Subject: wrong errno for chown etc. privilege failures in Linux CIFS client
-Organization: UCLA Computer Science Department
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------kX4so2sPkf0GNksWX0tGNxBg
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Wed, Aug 30, 2023 at 02:11:31PM +0800, Hao Xu wrote:
+> On 8/29/23 19:53, Matthew Wilcox wrote:
+> > On Tue, Aug 29, 2023 at 03:46:13PM +0800, Hao Xu wrote:
+> > > On 8/28/23 05:32, Matthew Wilcox wrote:
+> > > > On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
+> > > > > From: Hao Xu <howeyxu@tencent.com>
+> > > > > 
+> > > > > Add a boolean parameter for file_accessed() to support nowait semantics.
+> > > > > Currently it is true only with io_uring as its initial caller.
+> > > > 
+> > > > So why do we need to do this as part of this series?  Apparently it
+> > > > hasn't caused any problems for filemap_read().
+> > > > 
+> > > 
+> > > We need this parameter to indicate if nowait semantics should be enforced in
+> > > touch_atime(), There are locks and maybe IOs in it.
+> > 
+> > That's not my point.  We currently call file_accessed() and
+> > touch_atime() for nowait reads and nowait writes.  You haven't done
+> > anything to fix those.
+> > 
+> > I suspect you can trim this patchset down significantly by avoiding
+> > fixing the file_accessed() problem.  And then come back with a later
+> > patchset that fixes it for all nowait i/o.  Or do a separate prep series
+> 
+> I'm ok to do that.
+> 
+> > first that fixes it for the existing nowait users, and then a second
+> > series to do all the directory stuff.
+> > 
+> > I'd do the first thing.  Just ignore the problem.  Directory atime
+> > updates cause I/O so rarely that you can afford to ignore it.  Almost
+> > everyone uses relatime or nodiratime.
+> 
+> Hi Matthew,
+> The previous discussion shows this does cause issues in real
+> producations: https://lore.kernel.org/io-uring/2785f009-2ebb-028d-8250-d5f3a30510f0@gmail.com/#:~:text=fwiw%2C%20we%27ve%20just%20recently%20had%20similar%20problems%20with%20io_uring%20read/write
+> 
 
-In <https://bugs.gnu.org/65599> Bruno Haible reports that GNU cp and mv 
-issue bogus diagnostics when copying from ext4 to cifs. We tracked this 
-down to fchownat failing with EACCES when it should fail with EPERM.
+Then separate it out into it's own patch set so we can have a
+discussion on the merits of requiring using noatime, relatime or
+lazytime for really latency sensitive IO applications. Changing code
+is not always the right solution...
 
-To reproduce the fchownat bug, compile and run the attached program in a 
-cifs subdirectory on Linux kernel 5.15. The program will issue 
-EACCES-related diagnostics like this:
-
-fchownat: Permission denied
-
-whereas it should issue EPERM-related diagnostics like this:
-
-fchownat: Operation not permitted
-
-EACCES is wrong because POSIX says that EACCES means that search 
-permission is denied on a component of the path prefix (a problem that 
-does not apply here), whereas EPERM means the calling process does not 
-have appropriate privileges to change ownership (the problem that does 
-apply here). See 
-<https://pubs.opengroup.org/onlinepubs/9699919799/functions/fchownat.html>.
-
-We discovered similar problems with fchown, chown, lchown, fchmodat, 
-lchmod, and chmod on CIFS. I assume fsetxattr etc. are also affected by 
-the bug.
-
-Although most programs don't care about the difference between EACCES 
-and EPERM, GNU coreutils does care and I expect other programs will too, 
-and it'd be nice if CIFS were fixed to not generate these false alarms.
---------------kX4so2sPkf0GNksWX0tGNxBg
-Content-Type: text/x-csrc; charset=UTF-8; name="fchownat-test.c"
-Content-Disposition: attachment; filename="fchownat-test.c"
-Content-Transfer-Encoding: base64
-
-I2RlZmluZSBfR05VX1NPVVJDRQojaW5jbHVkZSA8ZmNudGwuaD4KI2luY2x1ZGUgPHN0ZGlv
-Lmg+CiNpbmNsdWRlIDxzeXMvc3RhdC5oPgojaW5jbHVkZSA8dW5pc3RkLmg+CgppbnQKbWFp
-biAoaW50IGFyZ2MsIGNoYXIgKiphcmd2KQp7CiAgY2hhciBjb25zdCAqZmlsZSA9IGFyZ3Zb
-MV0gPyBhcmd2WzFdIDogIi4iOwogIHN0cnVjdCBzdGF0IHN0OwogIGlmIChsc3RhdCAoZmls
-ZSwgJnN0KSA8IDApCiAgICByZXR1cm4gcGVycm9yICgibHN0YXQiKSwgMTsKICBpbnQgc3Rh
-dHVzID0gMDsKICBpZiAobGNob3duIChmaWxlLCBzdC5zdF91aWQsIHN0LnN0X2dpZCkgPCAw
-KQogICAgcGVycm9yICgibGNob3duIiksIHN0YXR1cyA9IDE7CiAgaWYgKGZjaG93bmF0IChB
-VF9GRENXRCwgZmlsZSwgc3Quc3RfdWlkLCBzdC5zdF9naWQsIEFUX1NZTUxJTktfTk9GT0xM
-T1cpIDwgMCkKICAgIHBlcnJvciAoImZjaG93bmF0IiksIHN0YXR1cyA9IDE7CiAgaWYgKCFT
-X0lTTE5LIChzdC5zdF9tb2RlKSkKICAgIHsKICAgICAgaWYgKGNob3duIChmaWxlLCBzdC5z
-dF91aWQsIHN0LnN0X2dpZCkgPCAwKQoJcGVycm9yICgiY2hvd24iKSwgc3RhdHVzID0gMTsK
-ICAgICAgaW50IGZkID0gb3BlbmF0IChBVF9GRENXRCwgZmlsZSwgT19SRE9OTFkgfCBPX05P
-Rk9MTE9XKTsKICAgICAgaWYgKGZkIDwgMCkKCXBlcnJvciAoIm9wZW5hdCIpLCBzdGF0dXMg
-PSAxOwogICAgICBlbHNlIGlmIChmY2hvd24gKGZkLCBzdC5zdF91aWQsIHN0LnN0X2dpZCkg
-PCAwKQoJcGVycm9yICgiZmNob3duIiksIHN0YXR1cyA9IDE7CiAgICB9CiAgcmV0dXJuIHN0
-YXR1czsKfQo=
-
---------------kX4so2sPkf0GNksWX0tGNxBg--
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
