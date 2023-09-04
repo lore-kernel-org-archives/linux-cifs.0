@@ -2,385 +2,176 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA42C83F3E
-	for <linux-cifs@archiver.kernel.org>; Mon,  4 Sep 2023 01:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD1AC71153
+	for <linux-cifs@archiver.kernel.org>; Mon,  4 Sep 2023 03:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350251AbjIDBC6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 3 Sep 2023 21:02:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57064 "EHLO
+        id S234654AbjIDDpA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 3 Sep 2023 23:45:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350260AbjIDBC5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 3 Sep 2023 21:02:57 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145AD1B8
-        for <linux-cifs@vger.kernel.org>; Sun,  3 Sep 2023 18:02:36 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bf7a6509deso1973795ad.3
-        for <linux-cifs@vger.kernel.org>; Sun, 03 Sep 2023 18:02:36 -0700 (PDT)
+        with ESMTP id S234314AbjIDDo7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 3 Sep 2023 23:44:59 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72A08C5
+        for <linux-cifs@vger.kernel.org>; Sun,  3 Sep 2023 20:44:56 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9936b3d0286so151887366b.0
+        for <linux-cifs@vger.kernel.org>; Sun, 03 Sep 2023 20:44:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1693789356; x=1694394156; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7SkjlWpTOnFF4QpgAAxUR7lqv3IHtXsX9Ov+YWVrmXw=;
-        b=qC164uBpiTqMDgXCvRgiQKt4Gh699N5mZOL/vYt7en0Jbwz76nMzEY83UKBVSQIW6l
-         aeb79T1fQrqEYwAnWqEg0BUEVogsLmyDn7Er7QB5MMmb3evyGFkJ31LnyaFbCd66DWcw
-         2rEqHGNd94yLw2873vPlsxfffzMVRPFxi+gQvuhDp/nt+kHeFVOC7RU50NpTqz237x8d
-         0EgVDl7W9L5GKWAUtPLGkVf3nghZNwTKtocs80JusMNZMyy2xNrwPVPtVOWAc9Ov7Ec+
-         l+Jy4wlPaRYKxlaBf+eoyU6yz7sgMqtArlqAkIUtWnDR1tDFWMVYywwL0pwAGBUewBHm
-         OWuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693789356; x=1694394156;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1693799095; x=1694403895; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7SkjlWpTOnFF4QpgAAxUR7lqv3IHtXsX9Ov+YWVrmXw=;
-        b=D35UT9bSNaa5NpBEH7Q65jX2qlXZeCIT88gdn2d42YqVOuqcKx++/peTF91IS/qbSd
-         Ke3nchQoDD6zfKf56o0CgfW4APdxttCYdcz/dPGxHrroPUctGs9TwLk0QK0CZn8TmX4t
-         wdSXr6XWlpDN4DbOi3MugTZx7B9qQsucR9vjSwRk0DkVA2GRE5/2liWtFGWevbCQGGeN
-         cG1gV9mUhlEzL6vziT78ZHbqtsm2PrCzZxdLCbLP7lCA3B5HdgjI6WNd8uWVP2c+U8se
-         9fAg3h5vSvmShaJOcfCuaCIClrbv9w/LVSO1hEdEGbrCNWHuMbXo7orJmIIZz9j6hXKW
-         z05A==
-X-Gm-Message-State: AOJu0YxwiQvrRizuyeKDukdGtOJSx/KdxbCvRN48OAvz8OlFNBTjyuwI
-        jzmYJiaKOFsbPowIMsRa8KSwjw==
-X-Google-Smtp-Source: AGHT+IGGrky2P+bBuH4AKgWBeYdqXOP6u+qaOJyeKMBTbWb7BRdsdnk0jjxmGVwySX0sZe8eaRNDcw==
-X-Received: by 2002:a17:902:ecc8:b0:1c1:fe97:bf34 with SMTP id a8-20020a170902ecc800b001c1fe97bf34mr8040994plh.24.1693789355853;
-        Sun, 03 Sep 2023 18:02:35 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id d4-20020a170902c18400b001bdcafcf8d3sm6351806pld.69.2023.09.03.18.02.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Sep 2023 18:02:35 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qcxz6-00AVA9-2L;
-        Mon, 04 Sep 2023 11:02:32 +1000
-Date:   Mon, 4 Sep 2023 11:02:32 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Hao Xu <hao.xu@linux.dev>
-Cc:     io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 02/11] xfs: add NOWAIT semantics for readdir
-Message-ID: <ZPUsqGfeUwupdlLE@dread.disaster.area>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-3-hao.xu@linux.dev>
+        bh=gYYLuQTLzqjp9LGduO+rYd8endTdBP7gsdqEAxFVCmw=;
+        b=PaPyuzACZHyoyjE1z5LiJIASLHvA+XUbaASvPCC20lgvugTSUGrVTGSM/NjflorGhx
+         qzB8T3oE0zrK3AcAWmOIvGAgJClOO8Oiq103TA0WDycj5UfdQ2XetNRqP5VHnomFOgM5
+         Qsheqc8QKFhFFKFiwQynQnTlPqxdqVMy1jnKGZTUZhxepcT/X+SAJingKQapNe79qXyh
+         7U3tOOsqESKF/lyyw9kEPQb6TVQR3dUbZgrfu34+QYs+767fYE0IDQBae8pABM46GIfD
+         5HhFYhmoSraF1prpdgSX57Hlrvy4Wm65vCJRg/m8sHTWablVkkFoI57fPfFCmehAtoFd
+         ZsCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693799095; x=1694403895;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gYYLuQTLzqjp9LGduO+rYd8endTdBP7gsdqEAxFVCmw=;
+        b=M0lYuTh9xfB7TIVYaX3LVSvPG5suAcHwfNAeFoT2OKEhLkn9tK7gty03pfGwsAOPw3
+         wF3qUlG2sg/s8XTul9MB4WZE0p4fdKy5V3zgPPQgknyhvEGff12o+OaL8L049YQTgm4r
+         KgHbmPFXnM/D9kukrGZCQA5IZlHhFd1RElM9nBryw3Of8v9eYZQvw9+LKOpVVWL/fEeJ
+         b1j2wC03QZAbpjCdzbHG3ywS5/3tp54CLeHNps5571nurys96zdTyrSwhSd01RCTiXfo
+         UXVj5JKX2+DDd/up6bwXeCr096kIFM0UbeXAi/NKHA3e/pZBQhu7lnNbRJATYFNg1ykT
+         frAg==
+X-Gm-Message-State: AOJu0YypGyd3rqZI/X0JHaT/bnMCUp5NuOGh8rIVOK0VG+RXVryr2KzJ
+        yMlxAJnjw3WjOBOAXgh7KikT2tp4COuB/D3WZi/HGyvEftk=
+X-Google-Smtp-Source: AGHT+IGC2WvVD/VIHMxur3RUr0tfRH9MV6fb7zl/m+DokmXlnjvaFsDYWo9ZpLafU5qj2JaFu1nASzOaPwjCJnGuEW8=
+X-Received: by 2002:a17:906:30d4:b0:9a5:d972:af43 with SMTP id
+ b20-20020a17090630d400b009a5d972af43mr6611715ejb.65.1693799094581; Sun, 03
+ Sep 2023 20:44:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230827132835.1373581-3-hao.xu@linux.dev>
+References: <CAH2r5mt99zVnZfTP_9Z4BNEa2L8Yw=8ds1USPhasbO06hLaGjQ@mail.gmail.com>
+ <CAH2r5muP+oM1rDn0CMc1KbrV2-kwprreQ58Jj5CDRD3u7-G1yg@mail.gmail.com>
+ <7ed6285e-8278-9b20-2512-6bcac4a21af9@samba.org> <CAH2r5msreVdsetQ1DQYY0orfh=N+zkxLnsWvuecYJWzN3Xev+A@mail.gmail.com>
+ <CAN05THR=bR7Wr5qP_evmBEWuxFVtX-z2+o_KavZ5r_zbTD3W8g@mail.gmail.com>
+ <CAH2r5mvf+kqp_YdZear29kpEhbzHNa7z5nnXCTmn74ShMVTZYg@mail.gmail.com> <CAH2r5muNavsN6ELUFMUWCXV_8N=FuNQ9Efyp3Uwy9msQMGs_LQ@mail.gmail.com>
+In-Reply-To: <CAH2r5muNavsN6ELUFMUWCXV_8N=FuNQ9Efyp3Uwy9msQMGs_LQ@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Mon, 4 Sep 2023 13:44:43 +1000
+Message-ID: <CAN05THS7pQj2eb0uPurKH9WiFuGL9h6ucemUf8QF+co09WCOoA@mail.gmail.com>
+Subject: Re: [PATCH][SMB3] allow controlling length of time directory entries
+ are cached with dir leases
+To:     Steve French <smfrench@gmail.com>
+Cc:     Ralph Boehme <slow@samba.org>, CIFS <linux-cifs@vger.kernel.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Bharath S M <bharathsm@microsoft.com>,
+        Tom Talpey <tom@talpey.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sun, Aug 27, 2023 at 09:28:26PM +0800, Hao Xu wrote:
-> From: Hao Xu <howeyxu@tencent.com>
-> 
-> Implement NOWAIT semantics for readdir. Return EAGAIN error to the
-> caller if it would block, like failing to get locks, or going to
-> do IO.
-> 
-> Co-developed-by: Dave Chinner <dchinner@redhat.com>
+On Sat, 2 Sept 2023 at 08:47, Steve French <smfrench@gmail.com> wrote:
+>
+> I also noticed that Windows apparently lets you control the size of
+> the directory entry cache (the file info cached for directories). See
+> below:
+>
+> DirectoryCacheEntrySizeMax
+> HKLM\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\Direc=
+toryCacheEntrySizeMax
+> The default is 64 KB. This is the maximum size of directory cache entries=
+.
+>
+> Should we add a tuneable similar to this (per mount? per system?)
 
-Not really.
+Probably not because most of the time these settings do not really
+work, and often, when you increase them you make things worse.
 
-"Co-developed" implies equal development input between all the
-parties, which is not the case here - this patch is based on
-prototype I wrote, whilst you're doing the refining, testing and
-correctness work.
+I think you want to implement something like when a cached directory
+is re-opened then the timeout is reset so that
+hot directories will remain in the cache longer. Which is what you
+want. You want hot data in the case.
 
-In these cases with XFS code, we add a line in the commit message to
-say:
+On the other hand, you want cold data to expire as quickly as
+possible, because cache that is held up by cold data can not
+be used to store hot data until the cold data has expired from the
+cache. So you want this timer as short as possible.
+The shortest possible timeout without it also expiring out hot data.
 
-"This is based on a patch originally written by Dave Chinner."
+Shorter timeouts and quicker expunge oc cache =3D=3D better performance.
+It might not sound intuitively but I can show with a simple example.
 
+Assume your cache has 10 slots to store a directory.
+Assume you have 1000 cold directories that are accessed relatively infreque=
+ntly.
+Assume you have 1 directory that is hot and is accessed 10 times more
+frequently than a cold directory.
 
-> Signed-off-by: Dave Chinner <dchinner@redhat.com>
-> Signed-off-by: Hao Xu <howeyxu@tencent.com>
-> [fixes deadlock issue, tweak code style]
+We now changed the timeout to 60 seconds. This means any cold
+directory that enters the cache will sit in the cache and block that
+entry for 60 seconds
+until it is cleared and something else can use that cache slot.
+This is akin a model where every 60 seconds you have a lottery where
+10 directories will win entry to the cache.
+What is the probability that a hot directory wins the lottery and
+becomes cached?
+In this example it is 1%  because the access to the hot directory is
+only 1% of all access.
+All the cold directories have just a 0.1% chance of becomming cached
+but since there are so  many of them they will still dominate.
+(The problem we have to solve now is to get the hot directory into the
+cache as fast as possible and to get it to remain in cache for as long
+as possible.)
 
-With a signoff chain like you already have.
+On average thus we will have to wait 50 iterations until the hot
+directory will even enter the cache for the first time,  or it will on
+average take 50 minutes
+before the hot directory is even cached.
+If we had left the original 30 second timeout it would "only" have
+taken 25 minutes on average to get this directory into the cache.
+This kind of suggests that even 30 seconds would be way to big for
+this example and maybe we should use 10 seconds, or less.
 
-In the end you'll also get a RVB from me, which seems rather wrong
-to me if I've apparently been "co-developing" the code....
-
-....
-
-> @@ -156,7 +157,9 @@ xfs_dir2_block_getdents(
->  	if (xfs_dir2_dataptr_to_db(geo, ctx->pos) > geo->datablk)
->  		return 0;
->  
-> -	error = xfs_dir3_block_read(args->trans, dp, &bp);
-> +	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
-> +		flags |= XFS_DABUF_NOWAIT;
-> +	error = xfs_dir3_block_read(args->trans, dp, flags, &bp);
->  	if (error)
->  		return error;
->  
-
-Given we do this same check in both block and leaf formats to set
-XFS_DABUF_NOWAIT, and we do the DIR_CONTEXT_F_NOWAIT check in
-xfs_readdir() as well, we should probably do this check once at the
-higher level and pass flags down from there with XFS_DABUF_NOWAIT
-already set.
-
-> @@ -240,6 +243,7 @@ xfs_dir2_block_getdents(
->  STATIC int
->  xfs_dir2_leaf_readbuf(
->  	struct xfs_da_args	*args,
-> +	struct dir_context	*ctx,
->  	size_t			bufsize,
->  	xfs_dir2_off_t		*cur_off,
->  	xfs_dablk_t		*ra_blk,
-> @@ -258,10 +262,15 @@ xfs_dir2_leaf_readbuf(
->  	struct xfs_iext_cursor	icur;
->  	int			ra_want;
->  	int			error = 0;
-> -
-> -	error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
-> -	if (error)
-> -		goto out;
-> +	unsigned int		flags = 0;
-> +
-> +	if (ctx->flags & DIR_CONTEXT_F_NOWAIT) {
-> +		flags |= XFS_DABUF_NOWAIT;
-> +	} else {
-> +		error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
-> +		if (error)
-> +			goto out;
-> +	}
-
-Especially as, in hindsight, this doesn't make a whole lot of sense.
-If XFS_DABUF_NOWAIT is set, we keep going until
-xfs_ilock_data_map_shared_nowait() where we call
-xfs_need_iread_extents() to see if we need to read the extents in
-and abort at that point.
-
-So, really, we shouldn't get this far with nowait semantics if
-we haven't read the extents in yet - we're supposed to already have
-the inode locked here and so we should have already checked this
-condition before we bother locking the inode...
-
-i.e. all we should be doing here is this:
-
-	if (!(flags & XFS_DABUF_NOWAIT)) {
-		error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
-		if (error)
-			goto out;
-	}
-
-And then we don't need to pass the VFS dir_context down into low
-level XFS functions unnecessarily.
+You want hot directories in the cache for as long as possible. A good
+way to do this is to make them sticky, so that if they are frequently
+accessed while
+cached, make them sticky so they do not expire as easily from the cache.
+On the other hand, any cold directory you want to expire from the
+cache as fast as possible since every time you hold a cold directory
+in cache, that part of the cache becomes
+useless and wasted.  You do this by, for example, setting this timeout
+as low as possible. So they are kicked out as soon as possible.
 
 
->  
->  	/*
->  	 * Look for mapped directory blocks at or above the current offset.
-> @@ -280,7 +289,7 @@ xfs_dir2_leaf_readbuf(
->  	new_off = xfs_dir2_da_to_byte(geo, map.br_startoff);
->  	if (new_off > *cur_off)
->  		*cur_off = new_off;
-> -	error = xfs_dir3_data_read(args->trans, dp, map.br_startoff, 0, &bp);
-> +	error = xfs_dir3_data_read(args->trans, dp, map.br_startoff, flags, &bp);
->  	if (error)
->  		goto out;
->  
-> @@ -360,6 +369,7 @@ xfs_dir2_leaf_getdents(
->  	int			byteoff;	/* offset in current block */
->  	unsigned int		offset = 0;
->  	int			error = 0;	/* error return value */
-> +	int			written = 0;
->  
->  	/*
->  	 * If the offset is at or past the largest allowed value,
-> @@ -391,10 +401,17 @@ xfs_dir2_leaf_getdents(
->  				bp = NULL;
->  			}
->  
-> -			if (*lock_mode == 0)
-> -				*lock_mode = xfs_ilock_data_map_shared(dp);
-> -			error = xfs_dir2_leaf_readbuf(args, bufsize, &curoff,
-> -					&rablk, &bp);
-> +			if (*lock_mode == 0) {
-> +				*lock_mode =
-> +					xfs_ilock_data_map_shared_generic(dp,
-> +					ctx->flags & DIR_CONTEXT_F_NOWAIT);
-> +				if (!*lock_mode) {
-> +					error = -EAGAIN;
-> +					break;
-> +				}
-> +			}
-> +			error = xfs_dir2_leaf_readbuf(args, ctx, bufsize,
-> +					&curoff, &rablk, &bp);
-
-int
-xfs_ilock_readdir(
-	struct xfs_inode	*ip,
-	int			flags)
-{
-	if (flags & XFS_DABUF_NOWAIT) {
-		if (!xfs_ilock_nowait(dp, XFS_ILOCK_SHARED))
-			return -EAGAIN;
-		return XFS_ILOCK_SHARED;
-	}
-	return xfs_ilock_data_map_shared(dp);
-}
-
-And then this code simply becomes:
-
-			if (*lock_mode == 0)
-				*lock_mode = xfs_ilock_readdir(ip, flags);
 
 
->  			if (error || !bp)
->  				break;
->  
-> @@ -479,6 +496,7 @@ xfs_dir2_leaf_getdents(
->  		 */
->  		offset += length;
->  		curoff += length;
-> +		written += length;
->  		/* bufsize may have just been a guess; don't go negative */
->  		bufsize = bufsize > length ? bufsize - length : 0;
->  	}
-> @@ -492,6 +510,8 @@ xfs_dir2_leaf_getdents(
->  		ctx->pos = xfs_dir2_byte_to_dataptr(curoff) & 0x7fffffff;
->  	if (bp)
->  		xfs_trans_brelse(args->trans, bp);
-> +	if (error == -EAGAIN && written > 0)
-> +		error = 0;
->  	return error;
->  }
->  
-> @@ -514,6 +534,7 @@ xfs_readdir(
->  	unsigned int		lock_mode;
->  	bool			isblock;
->  	int			error;
-> +	bool			nowait;
->  
->  	trace_xfs_readdir(dp);
->  
-> @@ -531,7 +552,11 @@ xfs_readdir(
->  	if (dp->i_df.if_format == XFS_DINODE_FMT_LOCAL)
->  		return xfs_dir2_sf_getdents(&args, ctx);
->  
-> -	lock_mode = xfs_ilock_data_map_shared(dp);
-> +	nowait = ctx->flags & DIR_CONTEXT_F_NOWAIT;
-> +	lock_mode = xfs_ilock_data_map_shared_generic(dp, nowait);
-> +	if (!lock_mode)
-> +		return -EAGAIN;
-> +
 
-Given what I said above:
 
-	if (ctx->flags & DIR_CONTEXT_F_NOWAIT) {
-		/*
-		 * If we need to read extents, then we must do IO
-		 * and we must use exclusive locking. We don't want
-		 * to do either of those things, so just bail if we
-		 * have to read extents. Doing this check explicitly
-		 * here means we don't have to do it anywhere else
-		 * in the XFS_DABUF_NOWAIT path.
-		 */
-		if (xfs_need_iread_extents(&ip->i_df))
-			return -EAGAIN;
-		flags |= XFS_DABUF_NOWAIT;
-	}
-	lock_mode = xfs_ilock_readdir(dp, flags);
 
-And with this change, we probably should be marking the entire
-operation as having nowait semantics. i.e. using args->op_flags here
-and only use XFS_DABUF_NOWAIT for the actual IO. ie.
-
-		args->op_flags |= XFS_DA_OP_NOWAIT;
-
-This makes it clear that the entire directory op should run under
-NOWAIT constraints, and it avoids needing to pass an extra flag
-through the stack.  That then makes the readdir locking function
-look like this:
-
-/*
- * When we are locking an inode for readdir, we need to ensure that
- * the extents have been read in first. This requires the inode to
- * be locked exclusively across the extent read, but otherwise we
- * want to use shared locking.
- *
- * For XFS_DA_OP_NOWAIT operations, we do an up-front check to see
- * if the extents have been read in, so all we need to do in this
- * case is a shared try-lock as we never need exclusive locking in
- * this path.
- */
-static int
-xfs_ilock_readdir(
-	struct xfs_da_args	*args)
-{
-	if (args->op_flags & XFS_DA_OP_NOWAIT) {
-		if (!xfs_ilock_nowait(args->dp, XFS_ILOCK_SHARED))
-			return -EAGAIN;
-		return XFS_ILOCK_SHARED;
-	}
-	return xfs_ilock_data_map_shared(args->dp);
-}
-
-> diff --git a/fs/xfs/xfs_inode.c b/fs/xfs/xfs_inode.c
-> index 9e62cc500140..d088f7d0c23a 100644
-> --- a/fs/xfs/xfs_inode.c
-> +++ b/fs/xfs/xfs_inode.c
-> @@ -120,6 +120,33 @@ xfs_ilock_data_map_shared(
->  	return lock_mode;
->  }
->  
-> +/*
-> + * Similar to xfs_ilock_data_map_shared(), except that it will only try to lock
-> + * the inode in shared mode if the extents are already in memory. If it fails to
-> + * get the lock or has to do IO to read the extent list, fail the operation by
-> + * returning 0 as the lock mode.
-> + */
-> +uint
-> +xfs_ilock_data_map_shared_nowait(
-> +	struct xfs_inode	*ip)
-> +{
-> +	if (xfs_need_iread_extents(&ip->i_df))
-> +		return 0;
-> +	if (!xfs_ilock_nowait(ip, XFS_ILOCK_SHARED))
-> +		return 0;
-> +	return XFS_ILOCK_SHARED;
-> +}
-> +
-> +int
-> +xfs_ilock_data_map_shared_generic(
-> +	struct xfs_inode	*dp,
-> +	bool			nowait)
-> +{
-> +	if (nowait)
-> +		return xfs_ilock_data_map_shared_nowait(dp);
-> +	return xfs_ilock_data_map_shared(dp);
-> +}
-
-And all this "generic" locking stuff goes away.
-
-FWIW, IMO, "generic" is a poor name for an XFS function as there's
-nothing "generic" in XFS.  We tend name the functions after what
-they do, not some abstract concept. Leave "generic" as a keyword for
-widely used core infrastructure functions, not niche, one-off use
-cases like this.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+>
+> On Fri, Sep 1, 2023 at 5:20=E2=80=AFPM Steve French <smfrench@gmail.com> =
+wrote:
+> >
+> > On Fri, Sep 1, 2023 at 11:31=E2=80=AFAM ronnie sahlberg
+> > <ronniesahlberg@gmail.com> wrote:
+> > >
+> > > Maybe just re-set the timestamp every time the cached directory is re=
+opened,
+> > > that way a hot directory will remain in cache indefinitely but one
+> > > that is cold will
+> > > quickly time out and make space for something else to be chaced.
+> >
+> >
+> > Makes sense
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
