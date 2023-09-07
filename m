@@ -2,82 +2,56 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9346EEE14C3
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Sep 2023 03:40:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69595EC874B
+	for <linux-cifs@archiver.kernel.org>; Thu,  7 Sep 2023 19:04:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234536AbjIGDkm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 6 Sep 2023 23:40:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45900 "EHLO
+        id S230487AbjIGTEc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Sep 2023 15:04:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbjIGDkl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Sep 2023 23:40:41 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A3811B;
-        Wed,  6 Sep 2023 20:40:37 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qe5sg-0001c0-SR; Thu, 07 Sep 2023 05:40:34 +0200
-Message-ID: <f8588a24-85aa-405e-bd4d-7a570f69fe4c@leemhuis.info>
-Date:   Thu, 7 Sep 2023 05:40:34 +0200
+        with ESMTP id S229838AbjIGTEc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Sep 2023 15:04:32 -0400
+X-Greylist: delayed 4188 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 07 Sep 2023 12:04:26 PDT
+Received: from mail.crystalbizventures.pl (mail.crystalbizventures.pl [217.61.112.167])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 900449D
+        for <linux-cifs@vger.kernel.org>; Thu,  7 Sep 2023 12:04:26 -0700 (PDT)
+Received: by mail.crystalbizventures.pl (Postfix, from userid 1002)
+        id B078183580; Thu,  7 Sep 2023 11:00:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=crystalbizventures.pl; s=mail; t=1694077241;
+        bh=ylPEEFxKikzRNxw8qePBwubcoXBfCPGkyK2Vq3svM24=;
+        h=Date:From:To:Subject:From;
+        b=HzplqEv3Ryq0DgjCzeeLCkRwKxM2SV4hQ6TV7zjdZV1/GP2lK3FUdsbCO1mXa/iY/
+         OXm0IfruQA4TaTmvqjiS1wKIWAwyux6so73nfn7oLJYcNEMTb/CfFqlNKYk1xMCWtX
+         LBLtHOPgnuRzonAVa3bX+NtEss69FxhNAua4b5wQmZZrpur6oTSRwD/veJHKmQZX6g
+         Ozj/cbTBXSF4+4wxB4Dy3YtHSdxG/zmPaUTcBAupsLV66bmEOZGV5yyvrE6C6aaMzN
+         CGeZXt5EryKwwBamtOjXdf6eX+26doUCGQnFv6/KaeOxsSOt4aHfoDxyz62862Bqcr
+         4yml7CnOGLiCw==
+Received: by mail.crystalbizventures.pl for <linux-cifs@vger.kernel.org>; Thu,  7 Sep 2023 09:00:17 GMT
+Message-ID: <20230907101604-0.1.h.1vw7.0.7mkfwc3bqb@crystalbizventures.pl>
+Date:   Thu,  7 Sep 2023 09:00:17 GMT
+From:   "Dominik Chrostek" <dominik.chrostek@crystalbizventures.pl>
+To:     <linux-cifs@vger.kernel.org>
+Subject: =?UTF-8?Q?Wyd=C5=82u=C5=BCony_termin_p=C5=82atno=C5=9Bci_za_kupowane_towary?=
+X-Mailer: mail.crystalbizventures.pl
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS share
- is mounted (cifsd-cfid-laundromat in"D" state)
-Content-Language: en-US, de-DE
-To:     Linux CIFS <linux-cifs@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Bagas Sanjaya <bagasdotme@gmail.com>
-References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com>
- <ZPfPfyIoVxw5L6El@debian.me>
- <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
-From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1694058037;6fb4caec;
-X-HE-SMSGID: 1qe5sg-0001c0-SR
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-[TLDR: This mail in primarily relevant for Linux kernel regression
-tracking. See link in footer if these mails annoy you.]
+Dzie=C5=84 dobry,
 
-On 06.09.23 23:03, Brian Pardy wrote:
-> Added committer Ronnie Sahlberg to CC.
-> 
-> On Tue, Sep 5, 2023 at 9:01 PM Bagas Sanjaya <bagasdotme@gmail.com> wrote:
->> On Tue, Sep 05, 2023 at 01:09:05PM -0400, Brian Pardy wrote:
->>> I've noticed an issue with the CIFS client in kernel 6.5.0/6.5.1 that
->>> does not exist in 6.4.12 or other previous kernels (I have not tested
->>> 6.4.13). Almost immediately after mounting a CIFS share, the reported
->>> load average on my system goes up by 2. At the time this occurs I see
->>> two [cifsd-cfid-laundromat] kernel threads running the "D" state,
->>> where they remain for the entire time the CIFS share is mounted. The
->>> load will remain stable at 2 (otherwise idle) until the share is
->>> unmounted, at which point the [cifsd-cfid-laundromat] threads
->>> disappear and load drops back down to 0. This is easily reproducible
->>> on my system, but I am not sure what to do to retrieve more useful
->>> debugging information. If I mount two shares from this server, I get
->>> four laundromat threads in "D" state and a sustained load average of
->>> 4.
-> [...]
-> 
-> Thank you for directing me to the bug-bisect documentation. Results below:
-> 
-> # git bisect bad
-> d14de8067e3f9653cdef5a094176d00f3260ab20 is the first bad commit
->
+czy wiedz=C4=85 Pa=C5=84stwo, =C5=BCe macie mo=C5=BCliwo=C5=9B=C4=87 zap=C5=
+=82aty za towar w znacznie p=C3=B3=C5=BAniejszym terminie?
 
-#regzbot ^introduced: d14de8067e3f9653cdef5a094176d00f3260a
-#regzbot ignore-activity
+Terminowo uregulujemy w Pa=C5=84stwa imieniu faktury u dostawc=C3=B3w, a =
+po zap=C5=82acie wystawiamy Pa=C5=84stwu faktur=C4=99 sprzeda=C5=BCy z od=
+roczonym terminem p=C5=82atno=C5=9Bci (30-90 dni).
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+S=C4=85 Pa=C5=84stwo zainteresowani takim rozwi=C4=85zaniem?
 
+
+Pozdrawiam
+Dominik Chrostek
