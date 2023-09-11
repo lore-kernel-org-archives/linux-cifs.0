@@ -2,159 +2,162 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2482EEEB595
-	for <linux-cifs@archiver.kernel.org>; Sun, 10 Sep 2023 22:01:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F12CA0ECE
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Sep 2023 22:47:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231727AbjIJWBi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 10 Sep 2023 18:01:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46214 "EHLO
+        id S235397AbjIKWmi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 11 Sep 2023 18:42:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231750AbjIJWBg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 10 Sep 2023 18:01:36 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E1A1AD
-        for <linux-cifs@vger.kernel.org>; Sun, 10 Sep 2023 15:01:29 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-68a440a8a20so3655670b3a.3
-        for <linux-cifs@vger.kernel.org>; Sun, 10 Sep 2023 15:01:29 -0700 (PDT)
+        with ESMTP id S239916AbjIKObZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 11 Sep 2023 10:31:25 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E16F2F3
+        for <linux-cifs@vger.kernel.org>; Mon, 11 Sep 2023 07:31:20 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-523100882f2so5836423a12.2
+        for <linux-cifs@vger.kernel.org>; Mon, 11 Sep 2023 07:31:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1694383288; x=1694988088; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EyybjuBSw2AsBAibBPVqGccWs6P0JtTeGBB0Kwx90Dw=;
-        b=b1Q+Djrc6DRgK0lSMIXf6OVmm1S98Rb1dJdV/4AjeMobXYoqxa/k4Xb7XAYcmCuvbB
-         T8pFPhiJHk/Ig8CcU4is+jZGfReesXQjqK7ULjc+VZz110Uqhy1NjrWTu4Ej2kgb1UEn
-         ZHgnS7dDfuM0nrDuRkgBy+D/YOBtPecXxWCyUh6h/0/NlsJyyOwKHQwSKYYxfVY7xjkS
-         7I+QxdaDiDVRMV8qekGuV48jZlbOlbc6skR8a29kp5hS8zsrhWfeCv9XIJ/gwMURSkPX
-         Ncgzq9d3+KaDgvRq3XsvmeqBjcqt9Lc7ewxeY00IZtUnccPI4WIduUYqP2aDlo+H2VFl
-         7yRw==
+        d=linaro.org; s=google; t=1694442679; x=1695047479; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mrxLW/r54lgr1nVJd/PxNq4luBSvavciSR8GKMmXoGE=;
+        b=rHuZNcQvlG6OrFnQiJQf9fdbWch7k3FiLa7H4ymsrhai1aUOpUEIyek6miEKQ69Vjw
+         a4B9h/IWOfm0FSljpjy6JgZMt94F91rAVp70qLbDEl6gvFDmIsZgG9n5WIqkS5FgfoTD
+         7M1WH9rFaluEWff2/EM+w5lwzSSZohhLvVKLX+Q+JJuHiQO0/O+2uGR2s3JTTWZhEYjq
+         mQNg0nXv8dytlpQSP7YdVM8KLWkkx9iyKWiZOO31rxs61uQqPPo2IdhbFeVOlzaNxXXi
+         yJboEMwsIuZpEBCeF3Qh6bLzCnBvWhmqmZKG0ge5C/ZV4yCXX7i0wzbdPbT0vx8wQ2eg
+         n72g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694383288; x=1694988088;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EyybjuBSw2AsBAibBPVqGccWs6P0JtTeGBB0Kwx90Dw=;
-        b=bO3IEahUmRKr9CUMEW6TnLuIm/1V9ibZ3+hlkg7KAqZdLJmjr9B6HweKcfi5xI+fx9
-         ILs3aM7dYVe1otqF+bLXVJJlyU4AZZjAM5GYxCFYMZI2BDYiN6FmL2TDKfH5Qml4bQi6
-         J8SPd5KsNvPYv3KRlj7uxqiNkmxn4/EjCQrArwWHgIUb2cdWUPUISBEUMl9bLbv/+6x7
-         yplTMvnAJoInG/RDOmMkM480Ofhq2FGzpX2WMizTtoKXFtRhZzxhHjKem+0CkL2iGlBi
-         qzYlhSeVQIYjoO6VFT8p+hL2KLd/lyFISvpADqGw7s5LjICdccgvCtFZ4cHSd7pMhBJf
-         G1IQ==
-X-Gm-Message-State: AOJu0Yx7/j4Ulm1EEnmXvUH9c3t1Dkw8/P8/uc2BaJ1mANmlb4nP+6q8
-        RYSS1QooTJOpj/NRjm2XTIMdXA==
-X-Google-Smtp-Source: AGHT+IHSYFPf3w2qdTZr9bikkzuSsvPYQjYYZyW+Zfc616rQWXs3Eeo2BzwinmhhOfJVOtnHj1lBTA==
-X-Received: by 2002:a05:6a00:1a0c:b0:68c:57c7:1eb0 with SMTP id g12-20020a056a001a0c00b0068c57c71eb0mr9371853pfv.11.1694383287795;
-        Sun, 10 Sep 2023 15:01:27 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id u10-20020a62ed0a000000b0068a3dd6c1dasm4403641pfh.142.2023.09.10.15.01.27
+        d=1e100.net; s=20230601; t=1694442679; x=1695047479;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mrxLW/r54lgr1nVJd/PxNq4luBSvavciSR8GKMmXoGE=;
+        b=V4rrVwT81a6XOn1JSzhIKb72nxcGEslWoBZUBZ+eHnI7eP0rHu/zbFUDSGCZ019JKO
+         SMi1kHJuh5kEBbjoFkPZRGRorHWIigYuKjzUX9V9WDimjFbh3AyxM/5x4Am9VbH8a0SN
+         09aMHRppKNkbnw2KM1GYz05AQa0L/vB8Y3Ntgo/rJ/UwrykhOmD3x9NjuB9DI4kKUhW/
+         p1jfqEJASXkMoH4a1nRvaFgi9J+48dQVfCQe5McMoIz68wnj1Bd6j4O4bG6IzFEtOI20
+         023PGCGys5fIeEsV+BM8zwYzvmBtFwNy8KoWdZzhMX8S7TFkJKw9uGdfBBDfrkRguyZf
+         g8gQ==
+X-Gm-Message-State: AOJu0YzJ+EVWHHyFD7hjO5lRL8UnCR3r5yviP3x9kTFUaRplWrn8CRUC
+        hH82dA69I6HzBLFYJ7PaYG8otlt1OuuLIF/xzZM=
+X-Google-Smtp-Source: AGHT+IHzo8KvJ9JbxQtCpKUYt0rUKJbUBS6aiCiAL+dfyLFj7Lklz8nBU28nerR1XjZsofNsR+TVKw==
+X-Received: by 2002:a05:6402:1487:b0:52d:faa6:8ae3 with SMTP id e7-20020a056402148700b0052dfaa68ae3mr8897836edv.31.1694442679347;
+        Mon, 11 Sep 2023 07:31:19 -0700 (PDT)
+Received: from localhost (h3220.n1.ips.mtn.co.ug. [41.210.178.32])
+        by smtp.gmail.com with ESMTPSA id i23-20020a0564020f1700b0052f8c67a399sm384166eda.37.2023.09.11.07.31.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Sep 2023 15:01:27 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qfSUe-00DWBA-0u;
-        Mon, 11 Sep 2023 08:01:24 +1000
-Date:   Mon, 11 Sep 2023 08:01:24 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Hao Xu <hao.xu@linux.dev>, Matthew Wilcox <willy@infradead.org>,
-        io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
-Message-ID: <ZP48tAg2iS0UzKQf@dread.disaster.area>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-8-hao.xu@linux.dev>
- <ZOvA5DJDZN0FRymp@casper.infradead.org>
- <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
- <ZO3cI+DkotHQo3md@casper.infradead.org>
- <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
- <ZPUJHAKzxvXiEDYA@dread.disaster.area>
- <6489b8cb-7d54-1e29-f192-a3449ed87fa1@gmail.com>
+        Mon, 11 Sep 2023 07:31:18 -0700 (PDT)
+Date:   Mon, 11 Sep 2023 17:31:09 +0300
+From:   Dan Carpenter <dan.carpenter@linaro.org>
+To:     linkinjeon@kernel.org
+Cc:     linux-cifs@vger.kernel.org
+Subject: [bug report] ksmbd: add support for read compound
+Message-ID: <dfc735a8-c0a6-4691-80a0-bf5c3814662e@moroto.mountain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6489b8cb-7d54-1e29-f192-a3449ed87fa1@gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Sep 08, 2023 at 01:29:55AM +0100, Pavel Begunkov wrote:
-> On 9/3/23 23:30, Dave Chinner wrote:
-> > On Wed, Aug 30, 2023 at 02:11:31PM +0800, Hao Xu wrote:
-> > > On 8/29/23 19:53, Matthew Wilcox wrote:
-> > > > On Tue, Aug 29, 2023 at 03:46:13PM +0800, Hao Xu wrote:
-> > > > > On 8/28/23 05:32, Matthew Wilcox wrote:
-> > > > > > On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
-> > > > > > > From: Hao Xu <howeyxu@tencent.com>
-> > > > > > > 
-> > > > > > > Add a boolean parameter for file_accessed() to support nowait semantics.
-> > > > > > > Currently it is true only with io_uring as its initial caller.
-> > > > > > 
-> > > > > > So why do we need to do this as part of this series?  Apparently it
-> > > > > > hasn't caused any problems for filemap_read().
-> > > > > > 
-> > > > > 
-> > > > > We need this parameter to indicate if nowait semantics should be enforced in
-> > > > > touch_atime(), There are locks and maybe IOs in it.
-> > > > 
-> > > > That's not my point.  We currently call file_accessed() and
-> > > > touch_atime() for nowait reads and nowait writes.  You haven't done
-> > > > anything to fix those.
-> > > > 
-> > > > I suspect you can trim this patchset down significantly by avoiding
-> > > > fixing the file_accessed() problem.  And then come back with a later
-> > > > patchset that fixes it for all nowait i/o.  Or do a separate prep series
-> > > 
-> > > I'm ok to do that.
-> > > 
-> > > > first that fixes it for the existing nowait users, and then a second
-> > > > series to do all the directory stuff.
-> > > > 
-> > > > I'd do the first thing.  Just ignore the problem.  Directory atime
-> > > > updates cause I/O so rarely that you can afford to ignore it.  Almost
-> > > > everyone uses relatime or nodiratime.
-> > > 
-> > > Hi Matthew,
-> > > The previous discussion shows this does cause issues in real
-> > > producations: https://lore.kernel.org/io-uring/2785f009-2ebb-028d-8250-d5f3a30510f0@gmail.com/#:~:text=fwiw%2C%20we%27ve%20just%20recently%20had%20similar%20problems%20with%20io_uring%20read/write
-> > > 
-> > 
-> > Then separate it out into it's own patch set so we can have a
-> > discussion on the merits of requiring using noatime, relatime or
-> > lazytime for really latency sensitive IO applications. Changing code
-> > is not always the right solution...
-> 
-> Separation sounds reasonable, but it can hardly be said that only
-> latency sensitive apps would care about >1s nowait/async submission
-> delays. Presumably, btrfs can improve on that, but it still looks
-> like it's perfectly legit for filesystems do heavy stuff in
-> timestamping like waiting for IO. Right?
+Hello Namjae Jeon,
 
-Yes, it is, no-one is denying that. And some filesystems are worse
-than others, but none of that means it has to be fixed so getdents
-can be converted to NOWAIT semantics.
+The patch e2b76ab8b5c9: "ksmbd: add support for read compound" from
+Aug 29, 2023 (linux-next), leads to the following Smatch static
+checker warning:
 
-ie. this patchset is about the getdents NOWAIT machinery, and
-fiddling around with timestamps has much, much wider scope than just
-NOWAIT getdents machinery. We'll have this discussion about NOWAIT
-timestamp updates when a RFC is proposed to address the wider
-problem of how timestamp updates should behave in NOWAIT context.
+	fs/smb/server/smb2pdu.c:6329 smb2_read()
+	warn: passing freed memory 'aux_payload_buf'
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+fs/smb/server/smb2pdu.c
+    6283         ksmbd_debug(SMB, "filename %pD, offset %lld, len %zu\n",
+    6284                     fp->filp, offset, length);
+    6285 
+    6286         aux_payload_buf = kvzalloc(length, GFP_KERNEL);
+    6287         if (!aux_payload_buf) {
+    6288                 err = -ENOMEM;
+    6289                 goto out;
+    6290         }
+    6291 
+    6292         nbytes = ksmbd_vfs_read(work, fp, length, &offset, aux_payload_buf);
+    6293         if (nbytes < 0) {
+    6294                 err = nbytes;
+    6295                 goto out;
+    6296         }
+    6297 
+    6298         if ((nbytes == 0 && length != 0) || nbytes < mincount) {
+    6299                 kvfree(aux_payload_buf);
+    6300                 rsp->hdr.Status = STATUS_END_OF_FILE;
+    6301                 smb2_set_err_rsp(work);
+    6302                 ksmbd_fd_put(work, fp);
+    6303                 return 0;
+    6304         }
+    6305 
+    6306         ksmbd_debug(SMB, "nbytes %zu, offset %lld mincount %zu\n",
+    6307                     nbytes, offset, mincount);
+    6308 
+    6309         if (is_rdma_channel == true) {
+    6310                 /* write data to the client using rdma channel */
+    6311                 remain_bytes = smb2_read_rdma_channel(work, req,
+    6312                                                       aux_payload_buf,
+    6313                                                       nbytes);
+    6314                 kvfree(aux_payload_buf);
+                         ^^^^^^^^^^^^^^^^^^^^^^^
+freed
+
+    6315 
+    6316                 nbytes = 0;
+
+I guess probably it doesn't matter that we're passing a freed variable
+if nbytes is zero.  But could we also just set "aux_payload_buf = NULL"?
+I am not going to try silence this type of warning in Smatch.
+
+    6317                 if (remain_bytes < 0) {
+    6318                         err = (int)remain_bytes;
+    6319                         goto out;
+    6320                 }
+    6321         }
+    6322 
+    6323         rsp->StructureSize = cpu_to_le16(17);
+    6324         rsp->DataOffset = 80;
+    6325         rsp->Reserved = 0;
+    6326         rsp->DataLength = cpu_to_le32(nbytes);
+    6327         rsp->DataRemaining = cpu_to_le32(remain_bytes);
+    6328         rsp->Flags = 0;
+--> 6329         err = ksmbd_iov_pin_rsp_read(work, (void *)rsp,
+    6330                                      offsetof(struct smb2_read_rsp, Buffer),
+    6331                                      aux_payload_buf, nbytes);
+                                              ^^^^^^^^^^^^^^^
+Passing free variable.
+
+
+    6332         if (err)
+    6333                 goto out;
+    6334         ksmbd_fd_put(work, fp);
+    6335         return 0;
+    6336 
+    6337 out:
+    6338         if (err) {
+    6339                 if (err == -EISDIR)
+    6340                         rsp->hdr.Status = STATUS_INVALID_DEVICE_REQUEST;
+    6341                 else if (err == -EAGAIN)
+    6342                         rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
+    6343                 else if (err == -ENOENT)
+    6344                         rsp->hdr.Status = STATUS_FILE_CLOSED;
+    6345                 else if (err == -EACCES)
+    6346                         rsp->hdr.Status = STATUS_ACCESS_DENIED;
+    6347                 else if (err == -ESHARE)
+    6348                         rsp->hdr.Status = STATUS_SHARING_VIOLATION;
+    6349                 else if (err == -EINVAL)
+    6350                         rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+    6351                 else
+    6352                         rsp->hdr.Status = STATUS_INVALID_HANDLE;
+    6353 
+    6354                 smb2_set_err_rsp(work);
+    6355         }
+    6356         ksmbd_fd_put(work, fp);
+    6357         return err;
+    6358 }
+
+regards,
+dan carpenter
