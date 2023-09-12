@@ -2,167 +2,76 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19730CA0EC3
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Sep 2023 13:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D60E9CA0EEC
+	for <linux-cifs@archiver.kernel.org>; Tue, 12 Sep 2023 14:31:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235626AbjILNFL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 12 Sep 2023 09:05:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49734 "EHLO
+        id S236014AbjILObn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 12 Sep 2023 10:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235545AbjILNEw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Sep 2023 09:04:52 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C762130
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Sep 2023 06:03:29 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 832B9C433C8
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Sep 2023 13:03:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694523809;
-        bh=9LfnhffvLCkFuEGlSaZMxYpyZr3nwMKD2xC80hYIsFw=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=GDg2C/uRWwwFBch6KOL0+wD7aLzVNxthlLPDe2lWlzk5Z5esX3bmuprCh25k4SauV
-         k/xXjJRSHJKzb0jXIDFo8wXNS38Q/OeuFTuMwqXRzrtU6Dk8NlSsu1oRdyY6z0k52E
-         DGb6R1UyIUX/0UoycqmNx426oeL7NcvezZrqjpE1kcQt5kG6seIdAI9IdvBJ4iBcak
-         P/iTZ77vgt2y3OHGd7EL4+pE3xMGtLQUs+e10pWCxsTbdTzYMTFxAP2Rg4uPFuhmO3
-         FA4hVA9aFZjMWXtQROFwwWhIec/p1Q4haS9epSmr+sCcWySVsYx7oS1ldFmN94Q/Lq
-         N0ynd7rFP6jeg==
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5734b893a11so3563080eaf.1
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Sep 2023 06:03:29 -0700 (PDT)
-X-Gm-Message-State: AOJu0YyPX+Isj5Uh22Zi6EIzRQVRx7YxmMDT6RJ6NURCUXAeY2dLWkxu
-        ziVwS1MPvP/WiI9fLBlK8zrKmIjtnpm+fggn82A=
-X-Google-Smtp-Source: AGHT+IHxUa/JkvRicmwxbZx552AhxDenPSz4MkBseKf9rMP6JNzSSEoHYIX1Xv6c+KacN16+vGUqYbG15Fg9H+kBtYE=
-X-Received: by 2002:a05:6870:3c83:b0:1d5:a3b5:d89c with SMTP id
- gl3-20020a0568703c8300b001d5a3b5d89cmr8262862oab.3.1694523808488; Tue, 12 Sep
- 2023 06:03:28 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a8a:692:0:b0:4f6:2c4a:5156 with HTTP; Tue, 12 Sep 2023
- 06:03:27 -0700 (PDT)
-In-Reply-To: <dfc735a8-c0a6-4691-80a0-bf5c3814662e@moroto.mountain>
-References: <dfc735a8-c0a6-4691-80a0-bf5c3814662e@moroto.mountain>
+        with ESMTP id S236027AbjILObe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Sep 2023 10:31:34 -0400
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 675141718
+        for <linux-cifs@vger.kernel.org>; Tue, 12 Sep 2023 07:31:30 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1c1e3a4a06fso41003295ad.3
+        for <linux-cifs@vger.kernel.org>; Tue, 12 Sep 2023 07:31:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694529089; x=1695133889;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QOIR80oLXJt/XB21uNagI3Kc/7zE1b0K55yVxxInZ/A=;
+        b=A9I3wFs2OUE7x1fNg9tZ69ZJ8mja8qQUUYHt1gjXGsWJdo9LGV3lyiRPEydKwMora+
+         O8KCaWEglec0XfJz2Iodvx31UM3jYvsozhKbqzXA/3+vmEcjPtUkpsxdP729vyEuBgv5
+         kg1cqJZ0V72VYJFkgN2LyCLz4JgXTYIb4u39s79pvmMpvRPdjsn5DCABcSCt4LEnjdXU
+         Ho6xxypndHaopS06PCrWOE+mq0eWqvFw2dX2gczcYJkAHIvkjGLdnl0vibaldxUOMhrw
+         rTQENy65JsWrc0y+JOqgwtSdzZKFUIE1AZrDqshGXPF8x9wlPMzix+Pm/8xE0xaUtmBj
+         081A==
+X-Gm-Message-State: AOJu0Yz7bxz/MrdUBax2QE+gIRh91Ju7fDlgm62VxnjEVZAeJCX8hfTC
+        2Idrh8kxFadcpnvj8wH/6T/4cSqxEbg=
+X-Google-Smtp-Source: AGHT+IHgR/m0F5gsZEzpwmBzEnl2hPMcObLO8fHwQ+7MFWPC13d9+BiJsN9sm9l28KLOBkxEhaAupw==
+X-Received: by 2002:a17:902:ce8b:b0:1c3:9bce:817 with SMTP id f11-20020a170902ce8b00b001c39bce0817mr6862618plg.3.1694529089314;
+        Tue, 12 Sep 2023 07:31:29 -0700 (PDT)
+Received: from localhost.localdomain ([110.14.71.32])
+        by smtp.gmail.com with ESMTPSA id jb22-20020a170903259600b001bc9bfaba3esm8538670plb.126.2023.09.12.07.31.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 07:31:28 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 12 Sep 2023 22:03:27 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9_rxHxUioYdKD7HshfJq0nzw1hBrJKnE6vHnk+ztsN7g@mail.gmail.com>
-Message-ID: <CAKYAXd9_rxHxUioYdKD7HshfJq0nzw1hBrJKnE6vHnk+ztsN7g@mail.gmail.com>
-Subject: Re: [bug report] ksmbd: add support for read compound
-To:     Dan Carpenter <dan.carpenter@linaro.org>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        hyc.lee@gmail.com, atteh.mailbox@gmail.com,
+        Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: remove unneeded mark_inode_dirty in set_info_sec()
+Date:   Tue, 12 Sep 2023 23:31:17 +0900
+Message-Id: <20230912143118.6829-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-09-11 23:31 GMT+09:00, Dan Carpenter <dan.carpenter@linaro.org>:
-> Hello Namjae Jeon,
-Hi Dan,
->
-> The patch e2b76ab8b5c9: "ksmbd: add support for read compound" from
-> Aug 29, 2023 (linux-next), leads to the following Smatch static
-> checker warning:
->
-> 	fs/smb/server/smb2pdu.c:6329 smb2_read()
-> 	warn: passing freed memory 'aux_payload_buf'
->
-> fs/smb/server/smb2pdu.c
->     6283         ksmbd_debug(SMB, "filename %pD, offset %lld, len %zu\n",
->     6284                     fp->filp, offset, length);
->     6285
->     6286         aux_payload_buf = kvzalloc(length, GFP_KERNEL);
->     6287         if (!aux_payload_buf) {
->     6288                 err = -ENOMEM;
->     6289                 goto out;
->     6290         }
->     6291
->     6292         nbytes = ksmbd_vfs_read(work, fp, length, &offset,
-> aux_payload_buf);
->     6293         if (nbytes < 0) {
->     6294                 err = nbytes;
->     6295                 goto out;
->     6296         }
->     6297
->     6298         if ((nbytes == 0 && length != 0) || nbytes < mincount) {
->     6299                 kvfree(aux_payload_buf);
->     6300                 rsp->hdr.Status = STATUS_END_OF_FILE;
->     6301                 smb2_set_err_rsp(work);
->     6302                 ksmbd_fd_put(work, fp);
->     6303                 return 0;
->     6304         }
->     6305
->     6306         ksmbd_debug(SMB, "nbytes %zu, offset %lld mincount %zu\n",
->     6307                     nbytes, offset, mincount);
->     6308
->     6309         if (is_rdma_channel == true) {
->     6310                 /* write data to the client using rdma channel */
->     6311                 remain_bytes = smb2_read_rdma_channel(work, req,
->     6312
-> aux_payload_buf,
->     6313                                                       nbytes);
->     6314                 kvfree(aux_payload_buf);
->                          ^^^^^^^^^^^^^^^^^^^^^^^
-> freed
->
->     6315
->     6316                 nbytes = 0;
->
-> I guess probably it doesn't matter that we're passing a freed variable
-> if nbytes is zero.
->  But could we also just set "aux_payload_buf = NULL"?
-> I am not going to try silence this type of warning in Smatch.
-Yes, It isn't a problem... but will fix it to make smatch happy.
+mark_inode_dirty will be called in notify_change().
+This patch remove unneeded mark_inode_dirty in set_info_sec().
 
-Thanks.
->
->     6317                 if (remain_bytes < 0) {
->     6318                         err = (int)remain_bytes;
->     6319                         goto out;
->     6320                 }
->     6321         }
->     6322
->     6323         rsp->StructureSize = cpu_to_le16(17);
->     6324         rsp->DataOffset = 80;
->     6325         rsp->Reserved = 0;
->     6326         rsp->DataLength = cpu_to_le32(nbytes);
->     6327         rsp->DataRemaining = cpu_to_le32(remain_bytes);
->     6328         rsp->Flags = 0;
-> --> 6329         err = ksmbd_iov_pin_rsp_read(work, (void *)rsp,
->     6330                                      offsetof(struct smb2_read_rsp,
-> Buffer),
->     6331                                      aux_payload_buf, nbytes);
->                                               ^^^^^^^^^^^^^^^
-> Passing free variable.
->
->
->     6332         if (err)
->     6333                 goto out;
->     6334         ksmbd_fd_put(work, fp);
->     6335         return 0;
->     6336
->     6337 out:
->     6338         if (err) {
->     6339                 if (err == -EISDIR)
->     6340                         rsp->hdr.Status =
-> STATUS_INVALID_DEVICE_REQUEST;
->     6341                 else if (err == -EAGAIN)
->     6342                         rsp->hdr.Status =
-> STATUS_FILE_LOCK_CONFLICT;
->     6343                 else if (err == -ENOENT)
->     6344                         rsp->hdr.Status = STATUS_FILE_CLOSED;
->     6345                 else if (err == -EACCES)
->     6346                         rsp->hdr.Status = STATUS_ACCESS_DENIED;
->     6347                 else if (err == -ESHARE)
->     6348                         rsp->hdr.Status =
-> STATUS_SHARING_VIOLATION;
->     6349                 else if (err == -EINVAL)
->     6350                         rsp->hdr.Status =
-> STATUS_INVALID_PARAMETER;
->     6351                 else
->     6352                         rsp->hdr.Status = STATUS_INVALID_HANDLE;
->     6353
->     6354                 smb2_set_err_rsp(work);
->     6355         }
->     6356         ksmbd_fd_put(work, fp);
->     6357         return err;
->     6358 }
->
-> regards,
-> dan carpenter
->
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/smb/server/smbacl.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index e5e438bf5499..6c0305be895e 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1420,7 +1420,6 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ out:
+ 	posix_acl_release(fattr.cf_acls);
+ 	posix_acl_release(fattr.cf_dacls);
+-	mark_inode_dirty(inode);
+ 	return rc;
+ }
+ 
+-- 
+2.25.1
+
