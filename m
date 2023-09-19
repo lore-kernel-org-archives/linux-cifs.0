@@ -2,138 +2,171 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B13FBCD5BCE
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 14:49:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34834CE79AA
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 16:31:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232832AbjISOtZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Sep 2023 10:49:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59078 "EHLO
+        id S232278AbjISQbk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Sep 2023 12:31:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232132AbjISOtY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 10:49:24 -0400
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49735BF
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Sep 2023 07:49:19 -0700 (PDT)
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-274c05edb69so1676785a91.2
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Sep 2023 07:49:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695134958; x=1695739758;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TCfGEAocNR+gMVhiVZF+jdCdz3SCRrhLrW54hJ8Jz1I=;
-        b=hHJBQTl3aAAg8UUY7MTihriYnd9JS5BIJWakyf2AJZaM0ftLUieAo/nAgu6UqxoFHD
-         5g7K1R3+S+D145W2t3xc3rSyUFRwfx/I21npuaQALqBX56NdrnWAEp0YBPl5oRCNG2c4
-         8Y/Gxxobqp1DnvGSgNVk4p74rZQQ5FpoJVUTj4I0Xe2BEYUULjZXT3shoSS7xKeum5Wp
-         0aCcC0Ui490fWHa/ICjRi9hmmiIh0uKqzUdNV1/xbnu1LznrZmiVdZ/8HUPMRU0jsCWd
-         O//02leKcYW8KIdXvibC32bGIeIJxFmtFORWWfpq6HGSw8LmS8U1wBjbvMpKQeNUYm9L
-         rrwQ==
-X-Gm-Message-State: AOJu0Yzr/wjtbuH5bDl7FT4GV0XXAkgY/Zcc31BjdnhA4xy4Um/AJmGG
-        DlwUvnQTRJ82ONWFzNyqRJfzEChsnK8=
-X-Google-Smtp-Source: AGHT+IFpnUoXpdnBNpwkgghG0qF5RC6yGq+FN2pC6MVaibOQQB5te1xxibKR6yIVoN/Ji5Z8vAm0xQ==
-X-Received: by 2002:a17:90a:cf17:b0:274:9a85:2596 with SMTP id h23-20020a17090acf1700b002749a852596mr9267464pju.32.1695134957885;
-        Tue, 19 Sep 2023 07:49:17 -0700 (PDT)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id cu2-20020a17090afa8200b0026b6d0a68c5sm8866843pjb.18.2023.09.19.07.49.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 07:49:17 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        hyc.lee@gmail.com, atteh.mailbox@gmail.com,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 2/2] ksmbd: check iov vector index in ksmbd_conn_write()
-Date:   Tue, 19 Sep 2023 23:47:40 +0900
-Message-Id: <20230919144740.52610-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230919144740.52610-1-linkinjeon@kernel.org>
-References: <20230919144740.52610-1-linkinjeon@kernel.org>
+        with ESMTP id S232041AbjISQbd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 12:31:33 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6EAB1A7;
+        Tue, 19 Sep 2023 09:31:17 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07A27C433CD;
+        Tue, 19 Sep 2023 16:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695141076;
+        bh=2YOWI6/JAFOB4t8+Jl1G0UAU2WJNOEKR+ozWrF+wCHw=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=NSgO9mQ/kogScKOyruXs27QKGb28KeH5iN8518jdQIxYZ9Zq8W5Yeb8HJpLNbIZ40
+         EQDdGtIWCMRwCZr+hkVhSKagEDB2fBTdAzDnNexBTyvRGH8+mWpGC7k4O3oOthSODy
+         kLPJh5RYmd+l51ixbejRXP63ZyU1UyglaFGETEGRw2BGftvafb/kUzhWZeRY/B1ibo
+         Wti21rW2JgdQmcow8/EHQlT7uWQR0pPH/ecD4lkrfORAvjqUH6xcDxBDFUTwISNY24
+         GBmtqEOt9wCW1B2y4/2rn4A5SVB2ofaAjm8Z64p+ka1gu4ZTZ9u3KdunqSf9K8+AlP
+         OJGP0iADrktsQ==
+Message-ID: <08b5c6fd3b08b87fa564bb562d89381dd4e05b6a.camel@kernel.org>
+Subject: Re: [PATCH v7 12/13] ext4: switch to multigrain timestamps
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Bruno Haible <bruno@clisp.org>, Jan Kara <jack@suse.cz>,
+        Xi Ruoyao <xry111@linuxfromscratch.org>, bug-gnulib@gnu.org
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Eric Van Hensbergen <ericvh@kernel.org>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
+        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sungjong Seo <sj1557.seo@samsung.com>,
+        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Bo b Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Tejun Heo <tj@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Iurii Zaikin <yzaikin@google.com>,
+        Steve French <sfrench@samba.org>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Richard Weinberger <richard@nod.at>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Hugh Dickins <hughd@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Amir Goldstein <l@gmail.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Benjamin Coddington <bcodding@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, ntfs3@lists.linux.dev,
+        ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-mtd@lists.infradead.org, linux-mm@kvack.org,
+        linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org
+Date:   Tue, 19 Sep 2023 12:31:08 -0400
+In-Reply-To: <4511209.uG2h0Jr0uP@nimes>
+References: <20230807-mgctime-v7-0-d1dec143a704@kernel.org>
+         <20230919110457.7fnmzo4nqsi43yqq@quack3>
+         <1f29102c09c60661758c5376018eac43f774c462.camel@kernel.org>
+         <4511209.uG2h0Jr0uP@nimes>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If ->iov_idx is zero, This means that the iov vector for the response
-was not added during the request process. In other words, it means that
-there is a problem in generating a response, So this patch dump the command
-information in the request and returned as an error to avoid NULL pointer
-dereferencing problem.
+On Tue, 2023-09-19 at 16:52 +0200, Bruno Haible wrote:
+> Jeff Layton wrote:
+> > I'm not sure what we can do for this test. The nap() function is making
+> > an assumption that the timestamp granularity will be constant, and that
+> > isn't necessarily the case now.
+>=20
+> This is only of secondary importance, because the scenario by Jan Kara
+> shows a much more fundamental breakage:
+>=20
+> > > The ultimate problem is that a sequence like:
+> > >=20
+> > > write(f1)
+> > > stat(f2)
+> > > write(f2)
+> > > stat(f2)
+> > > write(f1)
+> > > stat(f1)
+> > >=20
+> > > can result in f1 timestamp to be (slightly) lower than the final f2
+> > > timestamp because the second write to f1 didn't bother updating the
+> > > timestamp. That can indeed be a bit confusing to programs if they com=
+pare
+> > > timestamps between two files. Jeff?
+> > >=20
+> >=20
+> > Basically yes.
+>=20
+> f1 was last written to *after* f2 was last written to. If the timestamp o=
+f f1
+> is then lower than the timestamp of f2, timestamps are fundamentally brok=
+en.
+>=20
+> Many things in user-space depend on timestamps, such as build system
+> centered around 'make', but also 'find ... -newer ...'.
+>=20
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/connection.c |  6 ++++++
- fs/smb/server/misc.c       | 15 +++++++++++++++
- fs/smb/server/misc.h       |  2 ++
- 3 files changed, 23 insertions(+)
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index 0d990c2f33cd..4e4133b3a4c9 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -14,6 +14,7 @@
- #include "connection.h"
- #include "transport_tcp.h"
- #include "transport_rdma.h"
-+#include "misc.h"
- 
- static DEFINE_MUTEX(init_lock);
- 
-@@ -197,6 +198,11 @@ int ksmbd_conn_write(struct ksmbd_work *work)
- 	if (work->send_no_response)
- 		return 0;
- 
-+	if (!work->iov_idx) {
-+		ksmbd_dump_commands(work);
-+		return -EINVAL;
-+	}
-+
- 	ksmbd_conn_lock(conn);
- 	sent = conn->transport->ops->writev(conn->transport, work->iov,
- 			work->iov_cnt,
-diff --git a/fs/smb/server/misc.c b/fs/smb/server/misc.c
-index 9e8afaa686e3..0e44ce850575 100644
---- a/fs/smb/server/misc.c
-+++ b/fs/smb/server/misc.c
-@@ -379,3 +379,18 @@ inline long long ksmbd_systime(void)
- 	ktime_get_real_ts64(&ts);
- 	return ksmbd_UnixTimeToNT(ts);
- }
-+
-+void ksmbd_dump_commands(struct ksmbd_work *work)
-+{
-+	char *buf = (char *)work->request_buf + 4;
-+	struct smb2_hdr *hdr;
-+
-+	pr_err("Dump commands in request\n");
-+	do {
-+		hdr = (struct smb2_hdr *)buf;
-+		pr_err("Command : 0x%x, Next offset : %u\n",
-+		       le16_to_cpu(hdr->Command),
-+		       le32_to_cpu(hdr->NextCommand));
-+		buf += le32_to_cpu(hdr->NextCommand);
-+	} while (hdr->NextCommand);
-+}
-diff --git a/fs/smb/server/misc.h b/fs/smb/server/misc.h
-index 1facfcd21200..3aef766fc722 100644
---- a/fs/smb/server/misc.h
-+++ b/fs/smb/server/misc.h
-@@ -10,6 +10,7 @@ struct ksmbd_share_config;
- struct nls_table;
- struct kstat;
- struct ksmbd_file;
-+struct ksmbd_work;
- 
- int match_pattern(const char *str, size_t len, const char *pattern);
- int ksmbd_validate_filename(char *filename);
-@@ -23,6 +24,7 @@ void ksmbd_conv_path_to_windows(char *path);
- char *ksmbd_casefold_sharename(struct unicode_map *um, const char *name);
- char *ksmbd_extract_sharename(struct unicode_map *um, const char *treename);
- char *convert_to_unix_name(struct ksmbd_share_config *share, const char *name);
-+void ksmbd_dump_commands(struct ksmbd_work *work);
- 
- #define KSMBD_DIR_INFO_ALIGNMENT	8
- struct ksmbd_dir_info;
--- 
-2.25.1
+What does breakage with make look like in this situation? The "fuzz"
+here is going to be on the order of a jiffy. The typical case for make
+timestamp comparisons is comparing source files vs. a build target. If
+those are being written nearly simultaneously, then that could be an
+issue, but is that a typical behavior? It seems like it would be hard to
+rely on that anyway, esp. given filesystems like NFS that can do lazy
+writeback.
 
+One of the operating principles with this series is that timestamps can
+be of varying granularity between different files. Note that Linux
+already violates this assumption when you're working across filesystems
+of different types.
+
+As to potential fixes if this is a real problem:
+
+I don't really want to put this behind a mount or mkfs option (a'la
+relatime, etc.), but that is one possibility.
+
+I wonder if it would be feasible to just advance the coarse-grained
+current_time whenever we end up updating a ctime with a fine-grained
+timestamp? It might produce some inode write amplification. Files that
+were written within the same jiffy could see more inode transactions
+logged, but that still might not be _too_ awful.
+
+I'll keep thinking about it for now.
+--=20
+Jeff Layton <jlayton@kernel.org>
