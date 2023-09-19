@@ -2,171 +2,218 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34834CE79AA
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 16:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA12CE79A8
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 16:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232278AbjISQbk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Sep 2023 12:31:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54450 "EHLO
+        id S231707AbjISQjT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Sep 2023 12:39:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232041AbjISQbd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 12:31:33 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6EAB1A7;
-        Tue, 19 Sep 2023 09:31:17 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07A27C433CD;
-        Tue, 19 Sep 2023 16:31:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695141076;
-        bh=2YOWI6/JAFOB4t8+Jl1G0UAU2WJNOEKR+ozWrF+wCHw=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=NSgO9mQ/kogScKOyruXs27QKGb28KeH5iN8518jdQIxYZ9Zq8W5Yeb8HJpLNbIZ40
-         EQDdGtIWCMRwCZr+hkVhSKagEDB2fBTdAzDnNexBTyvRGH8+mWpGC7k4O3oOthSODy
-         kLPJh5RYmd+l51ixbejRXP63ZyU1UyglaFGETEGRw2BGftvafb/kUzhWZeRY/B1ibo
-         Wti21rW2JgdQmcow8/EHQlT7uWQR0pPH/ecD4lkrfORAvjqUH6xcDxBDFUTwISNY24
-         GBmtqEOt9wCW1B2y4/2rn4A5SVB2ofaAjm8Z64p+ka1gu4ZTZ9u3KdunqSf9K8+AlP
-         OJGP0iADrktsQ==
-Message-ID: <08b5c6fd3b08b87fa564bb562d89381dd4e05b6a.camel@kernel.org>
-Subject: Re: [PATCH v7 12/13] ext4: switch to multigrain timestamps
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Bruno Haible <bruno@clisp.org>, Jan Kara <jack@suse.cz>,
-        Xi Ruoyao <xry111@linuxfromscratch.org>, bug-gnulib@gnu.org
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bo b Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Richard Weinberger <richard@nod.at>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Amir Goldstein <l@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Benjamin Coddington <bcodding@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, ntfs3@lists.linux.dev,
-        ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-mtd@lists.infradead.org, linux-mm@kvack.org,
-        linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org
-Date:   Tue, 19 Sep 2023 12:31:08 -0400
-In-Reply-To: <4511209.uG2h0Jr0uP@nimes>
-References: <20230807-mgctime-v7-0-d1dec143a704@kernel.org>
-         <20230919110457.7fnmzo4nqsi43yqq@quack3>
-         <1f29102c09c60661758c5376018eac43f774c462.camel@kernel.org>
-         <4511209.uG2h0Jr0uP@nimes>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        with ESMTP id S230203AbjISQjS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 12:39:18 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6712FD6;
+        Tue, 19 Sep 2023 09:39:12 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50325ce89e9so2742442e87.0;
+        Tue, 19 Sep 2023 09:39:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695141550; x=1695746350; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=U88FyZFLNVhaEQZwWxZFH6P6ol0REDPkpx/UumaXegY=;
+        b=mrk6IeWU0sdQyVZsbXhmcnKRx5OBesQ7DTsu264yO8rdMFufP6x5E2t7T0y3PSBCty
+         t5zelwPIOuX9oENZQbnJUo8PvU9hgmjyp3ddqDGRxp3yh7UC37JMwwLCeCKxc81xAeIy
+         BZn2qWko/ElhDwmjCp6VMh1cSiH5UOr36WJBW+20s0m8ALlpFHsxsm66K3zlAntRg6m9
+         SOAMFNTAFAONvlhY2MUGDlrrwG27g/utPo0MWotUkfFk8gpZb5G0j2ldcysG2Na10rRc
+         z8/Hanx2Me16Z66uFVzPcN81gm9nwEYP/ZFKJMooKlJSFHvf8BhSe383pbTukRjqkvbo
+         z7Jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695141550; x=1695746350;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U88FyZFLNVhaEQZwWxZFH6P6ol0REDPkpx/UumaXegY=;
+        b=EzxH8gRYgvYnsQeBipWJ2iuV2HfI3y7lpOkQUZD1yOnHNqFgfUWSL9r73dgAe7k8ZD
+         smIywZMtNM866c51AqXH/eAtL4Ir/tL42vEvcxnqP3wp8HdUlhFTHRL6wshtDYQ5zBp0
+         5aqVNbWidq/dzl4BUxGeO14203rFDoapZtg6z0oZRHfHaATsFaEJovcPN24FTCIF3Y8g
+         NNXOb0PjBhoaFGXZ2g3F2lclqJnK1PFA/pOf5CwR3cChv1N88dDOsc7owDEoMvYqvMJM
+         AGJjoajT4MnEks9k9QZk46mz8+s13zOtq/l/yJxpbv2KmkaH5fyOyxUX9TimVq2gYyFD
+         6V+w==
+X-Gm-Message-State: AOJu0YzcF47MQIpy5DA8PEDetuk92fOvNSVvy4M84sq46DJeyeZZ4uY7
+        csD5Bix/yH+S4gNtMRyqbBX0WbwexDg7/r7001U=
+X-Google-Smtp-Source: AGHT+IGOmUYI6WtsWykRGPttxRGI9zE7PMKS0i3oL019Yed7aKhd1rDy90f1AztJdb70HqFBb3TuS2MpILI5kKPPMco=
+X-Received: by 2002:a19:e01e:0:b0:4e0:a426:6ddc with SMTP id
+ x30-20020a19e01e000000b004e0a4266ddcmr260230lfg.0.1695141550164; Tue, 19 Sep
+ 2023 09:39:10 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com>
+ <ZPfPfyIoVxw5L6El@debian.me> <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
+ <CAO+kfxTvA6N=i+jGf0XbSyqf85i=q+vR6R9d_42OWfM2sWWXaA@mail.gmail.com>
+ <CAH2r5mtUedfLSv81Z-Yb3_=AbD_QpT3tVbU1PRzMTituaw7bgA@mail.gmail.com>
+ <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com> <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com>
+In-Reply-To: <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 19 Sep 2023 11:38:58 -0500
+Message-ID: <CAH2r5msNf9WDHrBZSi5FhHDSewSNxMAuXTetMJDnoNh3CF_oMA@mail.gmail.com>
+Subject: Re: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS share
+ is mounted (cifsd-cfid-laundromat in"D" state)
+To:     Brian Pardy <brian.pardy@gmail.com>
+Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Linux CIFS <linux-cifs@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Paulo Alcantara <pc@manguebit.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Bharath S M <bharathsm@microsoft.com>
+Content-Type: multipart/mixed; boundary="000000000000f1d6d40605b8e590"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 2023-09-19 at 16:52 +0200, Bruno Haible wrote:
-> Jeff Layton wrote:
-> > I'm not sure what we can do for this test. The nap() function is making
-> > an assumption that the timestamp granularity will be constant, and that
-> > isn't necessarily the case now.
->=20
-> This is only of secondary importance, because the scenario by Jan Kara
-> shows a much more fundamental breakage:
->=20
-> > > The ultimate problem is that a sequence like:
-> > >=20
-> > > write(f1)
-> > > stat(f2)
-> > > write(f2)
-> > > stat(f2)
-> > > write(f1)
-> > > stat(f1)
-> > >=20
-> > > can result in f1 timestamp to be (slightly) lower than the final f2
-> > > timestamp because the second write to f1 didn't bother updating the
-> > > timestamp. That can indeed be a bit confusing to programs if they com=
-pare
-> > > timestamps between two files. Jeff?
-> > >=20
-> >=20
-> > Basically yes.
->=20
-> f1 was last written to *after* f2 was last written to. If the timestamp o=
-f f1
-> is then lower than the timestamp of f2, timestamps are fundamentally brok=
-en.
->=20
-> Many things in user-space depend on timestamps, such as build system
-> centered around 'make', but also 'find ... -newer ...'.
->=20
+--000000000000f1d6d40605b8e590
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Minor updates (pointed out by Paulo) to patch. See attached.
+
+On Tue, Sep 19, 2023 at 8:21=E2=80=AFAM Brian Pardy <brian.pardy@gmail.com>=
+ wrote:
+>
+> On Tue, Sep 19, 2023 at 1:36=E2=80=AFAM Steve French <smfrench@gmail.com>=
+ wrote:
+> >
+> > Does the attached patch help in your case?  It avoids starting the
+> > laundromat thread for IPC shares (which cuts the number of the threads
+> > in half for many cases) and also avoids starting them if the server
+> > does not support directory leases (e.g. if Samba server instead of
+> > Windows server).
+>
+> Hello,
+>
+> I applied the 0001-smb3-do-not-start-laundromat-thread-when-dir-leases-.p=
+atch
+> you provided against the 6.5.3 kernel.
+>
+> I can confirm that it resolves this issue - no laundromat threads are
+> created, and the reported load average is as expected, not falsely
+> high.
+>
+> This appears to fully fix the issue in my case.  Thank you very much!
+>
+> > On Mon, Sep 18, 2023 at 10:00=E2=80=AFPM Steve French <smfrench@gmail.c=
+om> wrote:
+> > >
+> > > Paulo and I were discussing the laundromat thread at the SMB3.1.1 tes=
+t
+> > > event (at SDC this week) which is now going on - will let you know
+> > > what we find.
+> > >
+> > > One obvious thing is that it probably isn't necessary for cases when
+> > > the server does not support directory leases, but we noticed another
+> > > problem as well.
 
 
-What does breakage with make look like in this situation? The "fuzz"
-here is going to be on the order of a jiffy. The typical case for make
-timestamp comparisons is comparing source files vs. a build target. If
-those are being written nearly simultaneously, then that could be an
-issue, but is that a typical behavior? It seems like it would be hard to
-rely on that anyway, esp. given filesystems like NFS that can do lazy
-writeback.
 
-One of the operating principles with this series is that timestamps can
-be of varying granularity between different files. Note that Linux
-already violates this assumption when you're working across filesystems
-of different types.
-
-As to potential fixes if this is a real problem:
-
-I don't really want to put this behind a mount or mkfs option (a'la
-relatime, etc.), but that is one possibility.
-
-I wonder if it would be feasible to just advance the coarse-grained
-current_time whenever we end up updating a ctime with a fine-grained
-timestamp? It might produce some inode write amplification. Files that
-were written within the same jiffy could see more inode transactions
-logged, but that still might not be _too_ awful.
-
-I'll keep thinking about it for now.
 --=20
-Jeff Layton <jlayton@kernel.org>
+Thanks,
+
+Steve
+
+--000000000000f1d6d40605b8e590
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-do-not-start-laundromat-thread-when-dir-leases.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-do-not-start-laundromat-thread-when-dir-leases.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lmqjhtwa0>
+X-Attachment-Id: f_lmqjhtwa0
+
+RnJvbSBhODJkNDAxNzdhMDI3Mzg1MmZlODlhZTJlZGJhOWZkOTdiNWQxNjFlIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMTkgU2VwIDIwMjMgMTE6MzU6NTMgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBkbyBub3Qgc3RhcnQgbGF1bmRyb21hdCB0aHJlYWQgd2hlbiBkaXIgbGVhc2VzIAogZGlz
+YWJsZWQKCldoZW4gbm8gZGlyZWN0b3J5IGxlYXNlIHN1cHBvcnQsIG9yIGZvciBJUEMgc2hhcmVz
+IHdoZXJlIGRpcmVjdG9yaWVzCmNhbiBub3QgYmUgb3BlbmVkLCBkbyBub3Qgc3RhcnQgYW4gdW5u
+ZWVkZWQgbGF1bmRyb21hdCB0aHJlYWQgZm9yCnRoYXQgbW91bnQgKGl0IHdhc3RlcyByZXNvdXJj
+ZXMpLgoKRml4ZXM6IGQxNGRlODA2N2UzZiAoImNpZnM6IEFkZCBhIGxhdW5kcm9tYXQgdGhyZWFk
+IGZvciBjYWNoZWQgZGlyZWN0b3JpZXMiKQpSZXZpZXdlZC1ieTogUGF1bG8gQWxjYW50YXJhIChT
+VVNFKSA8cGNAbWFuZ3VlYml0LmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZy
+ZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvY2FjaGVkX2Rpci5jIHwgIDYg
+KysrKysrCiBmcy9zbWIvY2xpZW50L2NpZnNnbG9iLmggICB8ICAyICstCiBmcy9zbWIvY2xpZW50
+L2NpZnNwcm90by5oICB8ICAyICstCiBmcy9zbWIvY2xpZW50L2Nvbm5lY3QuYyAgICB8ICA4ICsr
+KysrKy0tCiBmcy9zbWIvY2xpZW50L21pc2MuYyAgICAgICB8IDE0ICsrKysrKysrKy0tLS0tCiBm
+cy9zbWIvY2xpZW50L3NtYjJwZHUuYyAgICB8ICAyICstCiA2IGZpbGVzIGNoYW5nZWQsIDI0IGlu
+c2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQv
+Y2FjaGVkX2Rpci5jIGIvZnMvc21iL2NsaWVudC9jYWNoZWRfZGlyLmMKaW5kZXggYjE3ZjA2N2U0
+YWRhLi5lMmJlOGFlZGIyNmUgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY2FjaGVkX2Rpci5j
+CisrKyBiL2ZzL3NtYi9jbGllbnQvY2FjaGVkX2Rpci5jCkBAIC00NTIsNiArNDUyLDkgQEAgdm9p
+ZCBpbnZhbGlkYXRlX2FsbF9jYWNoZWRfZGlycyhzdHJ1Y3QgY2lmc190Y29uICp0Y29uKQogCXN0
+cnVjdCBjYWNoZWRfZmlkICpjZmlkLCAqcTsKIAlMSVNUX0hFQUQoZW50cnkpOwogCisJaWYgKGNm
+aWRzID09IE5VTEwpCisJCXJldHVybjsKKwogCXNwaW5fbG9jaygmY2ZpZHMtPmNmaWRfbGlzdF9s
+b2NrKTsKIAlsaXN0X2Zvcl9lYWNoX2VudHJ5X3NhZmUoY2ZpZCwgcSwgJmNmaWRzLT5lbnRyaWVz
+LCBlbnRyeSkgewogCQlsaXN0X21vdmUoJmNmaWQtPmVudHJ5LCAmZW50cnkpOwpAQCAtNjUxLDYg
+KzY1NCw5IEBAIHZvaWQgZnJlZV9jYWNoZWRfZGlycyhzdHJ1Y3QgY2FjaGVkX2ZpZHMgKmNmaWRz
+KQogCXN0cnVjdCBjYWNoZWRfZmlkICpjZmlkLCAqcTsKIAlMSVNUX0hFQUQoZW50cnkpOwogCisJ
+aWYgKGNmaWRzID09IE5VTEwpCisJCXJldHVybjsKKwogCWlmIChjZmlkcy0+bGF1bmRyb21hdCkg
+ewogCQlrdGhyZWFkX3N0b3AoY2ZpZHMtPmxhdW5kcm9tYXQpOwogCQljZmlkcy0+bGF1bmRyb21h
+dCA9IE5VTEw7CmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2NpZnNnbG9iLmggYi9mcy9zbWIv
+Y2xpZW50L2NpZnNnbG9iLmgKaW5kZXggMDMyZDg3MTZmNjcxLi5mNTk0ZmNjMGU4ODkgMTAwNjQ0
+Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY2lmc2dsb2IuaAorKysgYi9mcy9zbWIvY2xpZW50L2NpZnNn
+bG9iLmgKQEAgLTE5NDMsNyArMTk0Myw3IEBAIHJlcXVpcmUgdXNlIG9mIHRoZSBzdHJvbmdlciBw
+cm90b2NvbCAqLwogICogY2lmc0lub2RlSW5mby0+bG9ja19zZW0JY2lmc0lub2RlSW5mby0+bGxp
+c3QJCWNpZnNfaW5pdF9vbmNlCiAgKgkJCQktPmNhbl9jYWNoZV9icmxja3MKICAqIGNpZnNJbm9k
+ZUluZm8tPmRlZmVycmVkX2xvY2sJY2lmc0lub2RlSW5mby0+ZGVmZXJyZWRfY2xvc2VzCWNpZnNJ
+bm9kZUluZm9fYWxsb2MKLSAqIGNhY2hlZF9maWQtPmZpZF9tdXRleAkJY2lmc190Y29uLT5jcmZp
+ZAkJdGNvbkluZm9BbGxvYworICogY2FjaGVkX2ZpZC0+ZmlkX211dGV4CQljaWZzX3Rjb24tPmNy
+ZmlkCQl0Y29uX2luZm9fYWxsb2MKICAqIGNpZnNGaWxlSW5mby0+ZmhfbXV0ZXgJCWNpZnNGaWxl
+SW5mbwkJCWNpZnNfbmV3X2ZpbGVpbmZvCiAgKiBjaWZzRmlsZUluZm8tPmZpbGVfaW5mb19sb2Nr
+CWNpZnNGaWxlSW5mby0+Y291bnQJCWNpZnNfbmV3X2ZpbGVpbmZvCiAgKgkJCQktPmludmFsaWRI
+YW5kbGUJCQlpbml0aWF0ZV9jaWZzX3NlYXJjaApkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9j
+aWZzcHJvdG8uaCBiL2ZzL3NtYi9jbGllbnQvY2lmc3Byb3RvLmgKaW5kZXggN2Q4MDM1ODQ2Njgw
+Li4wYzM3ZWVmYTE4YTUgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY2lmc3Byb3RvLmgKKysr
+IGIvZnMvc21iL2NsaWVudC9jaWZzcHJvdG8uaApAQCAtNTEyLDcgKzUxMiw3IEBAIGV4dGVybiBp
+bnQgQ0lGU1NNQkxvZ29mZihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc19zZXMg
+KnNlcyk7CiAKIGV4dGVybiBzdHJ1Y3QgY2lmc19zZXMgKnNlc0luZm9BbGxvYyh2b2lkKTsKIGV4
+dGVybiB2b2lkIHNlc0luZm9GcmVlKHN0cnVjdCBjaWZzX3NlcyAqKTsKLWV4dGVybiBzdHJ1Y3Qg
+Y2lmc190Y29uICp0Y29uSW5mb0FsbG9jKHZvaWQpOworZXh0ZXJuIHN0cnVjdCBjaWZzX3Rjb24g
+KnRjb25faW5mb19hbGxvYyhib29sIGRpcl9sZWFzZXNfZW5hYmxlZCk7CiBleHRlcm4gdm9pZCB0
+Y29uSW5mb0ZyZWUoc3RydWN0IGNpZnNfdGNvbiAqKTsKIAogZXh0ZXJuIGludCBjaWZzX3NpZ25f
+cnFzdChzdHJ1Y3Qgc21iX3Jxc3QgKnJxc3QsIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZl
+ciwKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY29ubmVjdC5jIGIvZnMvc21iL2NsaWVudC9j
+b25uZWN0LmMKaW5kZXggNjg3NzU0NzkxYmYwLi4zOTAyZTkwZGNhNmIgMTAwNjQ0Ci0tLSBhL2Zz
+L3NtYi9jbGllbnQvY29ubmVjdC5jCisrKyBiL2ZzL3NtYi9jbGllbnQvY29ubmVjdC5jCkBAIC0x
+ODgyLDcgKzE4ODIsOCBAQCBjaWZzX3NldHVwX2lwYyhzdHJ1Y3QgY2lmc19zZXMgKnNlcywgc3Ry
+dWN0IHNtYjNfZnNfY29udGV4dCAqY3R4KQogCQl9CiAJfQogCi0JdGNvbiA9IHRjb25JbmZvQWxs
+b2MoKTsKKwkvKiBubyBuZWVkIHRvIHNldHVwIGRpcmVjdG9yeSBjYWNoaW5nIG9uIElQQyBzaGFy
+ZSwgc28gcGFzcyBpbiBmYWxzZSAqLworCXRjb24gPSB0Y29uX2luZm9fYWxsb2MoZmFsc2UpOwog
+CWlmICh0Y29uID09IE5VTEwpCiAJCXJldHVybiAtRU5PTUVNOwogCkBAIC0yNDkyLDcgKzI0OTMs
+MTAgQEAgY2lmc19nZXRfdGNvbihzdHJ1Y3QgY2lmc19zZXMgKnNlcywgc3RydWN0IHNtYjNfZnNf
+Y29udGV4dCAqY3R4KQogCQlnb3RvIG91dF9mYWlsOwogCX0KIAotCXRjb24gPSB0Y29uSW5mb0Fs
+bG9jKCk7CisJaWYgKHNlcy0+c2VydmVyLT5jYXBhYmlsaXRpZXMgJiBTTUIyX0dMT0JBTF9DQVBf
+RElSRUNUT1JZX0xFQVNJTkcpCisJCXRjb24gPSB0Y29uX2luZm9fYWxsb2ModHJ1ZSk7CisJZWxz
+ZQorCQl0Y29uID0gdGNvbl9pbmZvX2FsbG9jKGZhbHNlKTsKIAlpZiAodGNvbiA9PSBOVUxMKSB7
+CiAJCXJjID0gLUVOT01FTTsKIAkJZ290byBvdXRfZmFpbDsKZGlmZiAtLWdpdCBhL2ZzL3NtYi9j
+bGllbnQvbWlzYy5jIGIvZnMvc21iL2NsaWVudC9taXNjLmMKaW5kZXggMzY2Yjc1NWNhOTEzLi4z
+NWIxNzY0NTdiYmUgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvbWlzYy5jCisrKyBiL2ZzL3Nt
+Yi9jbGllbnQvbWlzYy5jCkBAIC0xMTMsMTggKzExMywyMiBAQCBzZXNJbmZvRnJlZShzdHJ1Y3Qg
+Y2lmc19zZXMgKmJ1Zl90b19mcmVlKQogfQogCiBzdHJ1Y3QgY2lmc190Y29uICoKLXRjb25JbmZv
+QWxsb2Modm9pZCkKK3Rjb25faW5mb19hbGxvYyhib29sIGRpcl9sZWFzZXNfZW5hYmxlZCkKIHsK
+IAlzdHJ1Y3QgY2lmc190Y29uICpyZXRfYnVmOwogCiAJcmV0X2J1ZiA9IGt6YWxsb2Moc2l6ZW9m
+KCpyZXRfYnVmKSwgR0ZQX0tFUk5FTCk7CiAJaWYgKCFyZXRfYnVmKQogCQlyZXR1cm4gTlVMTDsK
+LQlyZXRfYnVmLT5jZmlkcyA9IGluaXRfY2FjaGVkX2RpcnMoKTsKLQlpZiAoIXJldF9idWYtPmNm
+aWRzKSB7Ci0JCWtmcmVlKHJldF9idWYpOwotCQlyZXR1cm4gTlVMTDsKKworCWlmIChkaXJfbGVh
+c2VzX2VuYWJsZWQgPT0gdHJ1ZSkgeworCQlyZXRfYnVmLT5jZmlkcyA9IGluaXRfY2FjaGVkX2Rp
+cnMoKTsKKwkJaWYgKCFyZXRfYnVmLT5jZmlkcykgeworCQkJa2ZyZWUocmV0X2J1Zik7CisJCQly
+ZXR1cm4gTlVMTDsKKwkJfQogCX0KKwkvKiBlbHNlIHJldF9idWYtPmNmaWRzIGlzIGFscmVhZHkg
+c2V0IHRvIE5VTEwgYWJvdmUgKi8KIAogCWF0b21pY19pbmMoJnRjb25JbmZvQWxsb2NDb3VudCk7
+CiAJcmV0X2J1Zi0+c3RhdHVzID0gVElEX05FVzsKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQv
+c21iMnBkdS5jIGIvZnMvc21iL2NsaWVudC9zbWIycGR1LmMKaW5kZXggNDRkNDk0M2U5YzU2Li40
+MDVlYTMyNGYyOGQgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvc21iMnBkdS5jCisrKyBiL2Zz
+L3NtYi9jbGllbnQvc21iMnBkdS5jCkBAIC0zODc4LDcgKzM4NzgsNyBAQCB2b2lkIHNtYjJfcmVj
+b25uZWN0X3NlcnZlcihzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspCiAJCWdvdG8gZG9uZTsKIAog
+CS8qIGFsbG9jYXRlIGEgZHVtbXkgdGNvbiBzdHJ1Y3QgdXNlZCBmb3IgcmVjb25uZWN0ICovCi0J
+dGNvbiA9IHRjb25JbmZvQWxsb2MoKTsKKwl0Y29uID0gdGNvbl9pbmZvX2FsbG9jKGZhbHNlKTsK
+IAlpZiAoIXRjb24pIHsKIAkJcmVzY2hlZCA9IHRydWU7CiAJCWxpc3RfZm9yX2VhY2hfZW50cnlf
+c2FmZShzZXMsIHNlczIsICZ0bXBfc2VzX2xpc3QsIHJsaXN0KSB7Ci0tIAoyLjM5LjIKCg==
+--000000000000f1d6d40605b8e590--
