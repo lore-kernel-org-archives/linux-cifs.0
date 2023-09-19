@@ -2,148 +2,178 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D116CE79A9
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 18:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D6ECE79A8
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 20:10:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbjISSYF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Sep 2023 14:24:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36226 "EHLO
+        id S233052AbjISUK7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Sep 2023 16:10:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbjISSYD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 14:24:03 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78378F;
-        Tue, 19 Sep 2023 11:23:57 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-502153ae36cso9731232e87.3;
-        Tue, 19 Sep 2023 11:23:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695147836; x=1695752636; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nwdzojJepsaJdah6ocqUuoQIoGD1sEl1BnvEuQsR990=;
-        b=lmDUWyV180yTarYyqkD+KocaH+jqK59jvlsZONl5T10vmVuwH2QSXmEWwUKlURDd5R
-         Dmv2CXyin2OLsRB+fYqcZZ/ge0tFIg197L+ylXVoSEiS05vhyVa1Wrk8g3bgfJ98jncy
-         WpSDZBXiCHRKdeKQk5iH9bhwj8yjZLYjIy7k37H7cKGTOYdtYX4h/U9dk6ZG5Rvb0LrY
-         ntDUFv4XEIOiqHQJ7eVM4UGd78qh8JycITqhcz5C0PizCaiB0RD87rOHL/51YRT9Pplx
-         3RhNfkvBnnvpC309jf44tSdr/MADSp6JZL7FQpCKklBldq3WHdOiwCzcDfY/J3POw1dD
-         /zAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695147836; x=1695752636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nwdzojJepsaJdah6ocqUuoQIoGD1sEl1BnvEuQsR990=;
-        b=fEnE31PbeZgTTwupG5vbZ5i7lCBCGQwoyM65UA01WMw1MCzbgs2tQIHF4Yy7ngh8KR
-         E7nQRggh+Jzc4MyMWuzmzu4E0PInK5bHZjJvjZJ/VHSoqO4nSlCmHoQ+kq9QW8YvZmsz
-         vcT1/tSzHPsLmEe2S8Ps9U70nT+o8lcDWPbkBsQp4zlsbkUcyIK9cM/oUDTX1m3Rcm9/
-         p8N2wzRIobYrrz0tLCproyIi2swX4yKf5ZaP/e+/Kl5mdjgvu27WOxbX9dvfam7bb5BA
-         xd9NhU37NXhIxRNu9iC6V+yrxcx3ra9c6nPMvpNEyi2Zg8PbGPpvg/o6Qvzi+2Tbly3U
-         1dSA==
-X-Gm-Message-State: AOJu0YxphvHgEo2oYj6uapeZWsAQE8htvwWK6ljinNk22AmoAyx3qMq+
-        8U2MzQkaAKV03UKb+OvHl6r5On6VlZhvin/BK28=
-X-Google-Smtp-Source: AGHT+IG7gFNTF7iTz5rY5TEprFxZe6zQ90t2hC4Tzng9aArvXIfBQ31lvfKSBX8kjpfFzT5cXvxUkkCpkmu2BVUC1vk=
-X-Received: by 2002:a05:6512:2f6:b0:4f9:6842:afc with SMTP id
- m22-20020a05651202f600b004f968420afcmr370132lfq.64.1695147835658; Tue, 19 Sep
- 2023 11:23:55 -0700 (PDT)
+        with ESMTP id S233139AbjISUK6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 16:10:58 -0400
+Received: from mail.cs.ucla.edu (mail.cs.ucla.edu [131.179.128.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 627F0BE
+        for <linux-cifs@vger.kernel.org>; Tue, 19 Sep 2023 13:10:51 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.cs.ucla.edu (Postfix) with ESMTP id 750A03C00D18B;
+        Tue, 19 Sep 2023 13:10:50 -0700 (PDT)
+Received: from mail.cs.ucla.edu ([127.0.0.1])
+        by localhost (mail.cs.ucla.edu [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id AMNmxh8IWcZs; Tue, 19 Sep 2023 13:10:50 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.cs.ucla.edu (Postfix) with ESMTP id EB6833C00D18D;
+        Tue, 19 Sep 2023 13:10:49 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.cs.ucla.edu EB6833C00D18D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cs.ucla.edu;
+        s=9D0B346E-2AEB-11ED-9476-E14B719DCE6C; t=1695154250;
+        bh=rkg9tbxTq6pJj5csNug/eDfUxuv8dlZEs8ZxbrqQ+Bs=;
+        h=Message-ID:Date:MIME-Version:To:From;
+        b=e7FwFS1NK+ibkS0cG53EL8AQUGclUFwkekbt01t0RrGTfteamSqMsn/mn3buwjYqP
+         Ss5aVs4mQTQ9vMjU5SbCpefiDChbloDYu1HfklTquHXpMe72pT4M6hvyzCQRVAncyf
+         WVOHo5BHpqQpInzk0XI1vkjThUjzXxG9DeoOO1hJGEZWIEF2xR1lMhg3hNLw6eelH3
+         vfkIEJZDbK4SvwqlaNARiGG/pYA5z0FuwJeduSFWqHIxx4VzcDeiRS6F9+AWa/lvRd
+         UJDA/fA+mrJldEyknr58vHs/9vvVt/ptANUNnDyTfqTMtd8U29s7w3jEOKzFb4QdS+
+         p/bV3Yp4QSW6g==
+X-Virus-Scanned: amavisd-new at mail.cs.ucla.edu
+Received: from mail.cs.ucla.edu ([127.0.0.1])
+        by localhost (mail.cs.ucla.edu [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id G7UgTQUjBKrV; Tue, 19 Sep 2023 13:10:49 -0700 (PDT)
+Received: from [192.168.254.12] (unknown [47.147.225.57])
+        by mail.cs.ucla.edu (Postfix) with ESMTPSA id C37643C00D18B;
+        Tue, 19 Sep 2023 13:10:48 -0700 (PDT)
+Message-ID: <c8315110-4684-9b83-d6c5-751647037623@cs.ucla.edu>
+Date:   Tue, 19 Sep 2023 13:10:47 -0700
 MIME-Version: 1.0
-References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com>
- <ZPfPfyIoVxw5L6El@debian.me> <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
- <CAO+kfxTvA6N=i+jGf0XbSyqf85i=q+vR6R9d_42OWfM2sWWXaA@mail.gmail.com>
- <CAH2r5mtUedfLSv81Z-Yb3_=AbD_QpT3tVbU1PRzMTituaw7bgA@mail.gmail.com>
- <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com>
- <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com>
- <CAH2r5msNf9WDHrBZSi5FhHDSewSNxMAuXTetMJDnoNh3CF_oMA@mail.gmail.com> <a895f860-11fa-e6d9-d042-a32bd08f9e9d@talpey.com>
-In-Reply-To: <a895f860-11fa-e6d9-d042-a32bd08f9e9d@talpey.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 19 Sep 2023 13:23:44 -0500
-Message-ID: <CAH2r5mszCxPtdURenMVgeVDX5zc8knumH=ASXyUufPa7SxbJBw@mail.gmail.com>
-Subject: Re: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS share
- is mounted (cifsd-cfid-laundromat in"D" state)
-To:     Tom Talpey <tom@talpey.com>
-Cc:     Brian Pardy <brian.pardy@gmail.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Linux CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Regressions <regressions@lists.linux.dev>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To:     Jeff Layton <jlayton@kernel.org>, Bruno Haible <bruno@clisp.org>,
+        Jan Kara <jack@suse.cz>,
+        Xi Ruoyao <xry111@linuxfromscratch.org>, bug-gnulib@gnu.org
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Eric Van Hensbergen <ericvh@kernel.org>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Christian Schoenebeck <linux_oss@crudebyte.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
+        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
+        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Sungjong Seo <sj1557.seo@samsung.com>,
+        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Bo b Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Tejun Heo <tj@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Iurii Zaikin <yzaikin@google.com>,
+        Steve French <sfrench@samba.org>,
         Paulo Alcantara <pc@manguebit.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Bharath S M <bharathsm@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Richard Weinberger <richard@nod.at>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Hugh Dickins <hughd@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Amir Goldstein <l@gmail.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Benjamin Coddington <bcodding@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
+        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, ntfs3@lists.linux.dev,
+        ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-mtd@lists.infradead.org, linux-mm@kvack.org,
+        linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org
+References: <20230807-mgctime-v7-0-d1dec143a704@kernel.org>
+ <20230919110457.7fnmzo4nqsi43yqq@quack3>
+ <1f29102c09c60661758c5376018eac43f774c462.camel@kernel.org>
+ <4511209.uG2h0Jr0uP@nimes>
+ <08b5c6fd3b08b87fa564bb562d89381dd4e05b6a.camel@kernel.org>
+From:   Paul Eggert <eggert@cs.ucla.edu>
+Organization: UCLA Computer Science Department
+Subject: Re: [PATCH v7 12/13] ext4: switch to multigrain timestamps
+In-Reply-To: <08b5c6fd3b08b87fa564bb562d89381dd4e05b6a.camel@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Sep 19, 2023 at 1:07=E2=80=AFPM Tom Talpey <tom@talpey.com> wrote:
->
-> On 9/19/2023 9:38 AM, Steve French wrote:
-> > Minor updates (pointed out by Paulo) to patch. See attached.
->
-> So, was the thread crashing before??
->
-> +       if (cfids =3D=3D NULL)
-> +               return;
-> +
+On 2023-09-19 09:31, Jeff Layton wrote:
+> The typical case for make
+> timestamp comparisons is comparing source files vs. a build target. If
+> those are being written nearly simultaneously, then that could be an
+> issue, but is that a typical behavior?
 
-Without laundromat initialized cfids can be null - so we need to check
-if cfids is initialized in a few places (may help in a few corner
-cases if there is a race in closing laundromat thread at umount but
-was added to avoid oops at unmount if laundromat not initialized)
+I vaguely remember running into problems with 'make' a while ago 
+(perhaps with a BSDish system) when filesystem timestamps were 
+arbitrarily truncated in some cases but not others. These files would 
+look older than they really were, so 'make' would think they were 
+up-to-date when they weren't, and 'make' would omit actions that it 
+should have done, thus screwing up the build.
 
-> These changes are good, but I'm skeptical they will reduce the load
-> when the laundromat thread is actually running. All these do is avoid
-> creating it when not necessary, right?
+File timestamps can be close together with 'make -j' on fast hosts. 
+Sometimes a shell script (or 'make' itself) will run 'make', then modify 
+a file F, then immediately run 'make' again; the latter 'make' won't 
+work if F's timestamp is mistakenly older than targets that depend on it.
 
-It does create half as many laundromat threads (we don't need
-laundromat on connection to IPC$) even for the Windows server target
-example, but helps more for cases where server doesn't support
-directory leases.
-
-> > On Tue, Sep 19, 2023 at 8:21=E2=80=AFAM Brian Pardy <brian.pardy@gmail.=
-com> wrote:
-> >>
-> >> On Tue, Sep 19, 2023 at 1:36=E2=80=AFAM Steve French <smfrench@gmail.c=
-om> wrote:
-> >>>
-> >>> Does the attached patch help in your case?  It avoids starting the
-> >>> laundromat thread for IPC shares (which cuts the number of the thread=
-s
-> >>> in half for many cases) and also avoids starting them if the server
-> >>> does not support directory leases (e.g. if Samba server instead of
-> >>> Windows server).
-> >>
-> >> Hello,
-> >>
-> >> I applied the 0001-smb3-do-not-start-laundromat-thread-when-dir-leases=
--.patch
-> >> you provided against the 6.5.3 kernel.
-> >>
-> >> I can confirm that it resolves this issue - no laundromat threads are
-> >> created, and the reported load average is as expected, not falsely
-> >> high.
-> >>
-> >> This appears to fully fix the issue in my case.  Thank you very much!
-> >>
-> >>> On Mon, Sep 18, 2023 at 10:00=E2=80=AFPM Steve French <smfrench@gmail=
-.com> wrote:
-> >>>>
-> >>>> Paulo and I were discussing the laundromat thread at the SMB3.1.1 te=
-st
-> >>>> event (at SDC this week) which is now going on - will let you know
-> >>>> what we find.
-> >>>>
-> >>>> One obvious thing is that it probably isn't necessary for cases when
-> >>>> the server does not support directory leases, but we noticed another
-> >>>> problem as well.
-> >
-> >
-> >
+Although 'make'-like apps are the biggest canaries in this coal mine, 
+the issue also affects 'find -newer' (as Bruno mentioned), 'rsync -u', 
+'mv -u', 'tar -u', Emacs file-newer-than-file-p, and surely many other 
+places. For example, any app that creates a timestamp file, then backs 
+up all files newer than that file, would be at risk.
 
 
+> I wonder if it would be feasible to just advance the coarse-grained
+> current_time whenever we end up updating a ctime with a fine-grained
+> timestamp?
 
---=20
-Thanks,
+Wouldn't this need to be done globally, that is, not just on a per-file 
+or per-filesystem basis? If so, I don't see how we'd avoid locking 
+performance issues.
 
-Steve
+
+PS. Although I'm no expert in the Linux inode code I hope you don't mind 
+my asking a question about this part of inode_set_ctime_current:
+
+	/*
+	 * If we've recently updated with a fine-grained timestamp,
+	 * then the coarse-grained one may still be earlier than the
+	 * existing ctime. Just keep the existing value if so.
+	 */
+	ctime.tv_sec = inode->__i_ctime.tv_sec;
+	if (timespec64_compare(&ctime, &now) > 0)
+		return ctime;
+
+Suppose root used clock_settime to set the clock backwards. Won't this 
+code incorrectly refuse to update the file's timestamp afterwards? That 
+is, shouldn't the last line be "goto fine_grained;" rather than "return 
+ctime;", with the comment changed from "keep the existing value" to "use 
+a fine-grained value"?
