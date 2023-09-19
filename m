@@ -2,172 +2,104 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA40CD54B6
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 11:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC5BCD5BBC
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 13:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231381AbjISLdl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Sep 2023 07:33:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
+        id S232286AbjISNV4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Sep 2023 09:21:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230404AbjISLdk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 07:33:40 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5DCCF2;
-        Tue, 19 Sep 2023 04:33:33 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D159EC433C8;
-        Tue, 19 Sep 2023 11:33:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695123213;
-        bh=3M0d3dD3pzePraPqdY5Lb/FSgSUINN1vw73+jr5dq7Q=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=tQh6lksLqcIOBj/Ff0JXOKys/7/S9IytLOiF0JDIywzjJVGnvZkHN89m5sE62mpoB
-         B3YDCwOOxX1gnLmVWc3ePStHNAbvbDg9jgbpVAv5wDbDdw2Vl89GZwZ9qNlNxra4Fg
-         kiXuONNyEoPOCmaTk9QAiioZqeXDdQ8Od2dvXiPB2jbqabD8+vET4rWht6VUqialFl
-         kMESlGGKraI/mfEF5XUwwnyQC7enBkaOr88DrXpjQxZ8vzJOm87lLPeOk13Z2jZZWP
-         +DF8dMCw1HMweouCpDWHzR5OF6xSCTUQlXvt6hjtZ1K1zZoSy0NQYp4mHOMzF7pFix
-         96Omsq9cDaYdg==
-Message-ID: <1f29102c09c60661758c5376018eac43f774c462.camel@kernel.org>
-Subject: Re: [PATCH v7 12/13] ext4: switch to multigrain timestamps
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Jan Kara <jack@suse.cz>, Xi Ruoyao <xry111@linuxfromscratch.org>
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Tyler Hicks <code@tyhicks.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Richard Weinberger <richard@nod.at>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Amir Goldstein <amir73il@gmail.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Benjamin Coddington <bcodding@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        v9fs@lists.linux.dev, linux-afs@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, ntfs3@lists.linux.dev,
-        ocfs2-devel@lists.linux.dev, devel@lists.orangefs.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-mtd@lists.infradead.org, linux-mm@kvack.org,
-        linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org,
-        bug-gnulib@gnu.org
-Date:   Tue, 19 Sep 2023 07:33:25 -0400
-In-Reply-To: <20230919110457.7fnmzo4nqsi43yqq@quack3>
-References: <20230807-mgctime-v7-0-d1dec143a704@kernel.org>
-         <20230807-mgctime-v7-12-d1dec143a704@kernel.org>
-         <bf0524debb976627693e12ad23690094e4514303.camel@linuxfromscratch.org>
-         <20230919110457.7fnmzo4nqsi43yqq@quack3>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        with ESMTP id S232301AbjISNVw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 09:21:52 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35454F5;
+        Tue, 19 Sep 2023 06:21:47 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b703a0453fso94298211fa.3;
+        Tue, 19 Sep 2023 06:21:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695129705; x=1695734505; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/4YCtSaeKIOsVXX/9czvJJANn7hd+Dn1kophFmS6+Ck=;
+        b=m6Cd//8KVvylAaB6pQJ48W9XvdquSz1XF8JAdKKxWnV0Id+FDZVbEP1+UtQM2tcQ5V
+         V6wAgMBI1Otp+GKVBREqh0DmlvKzSvYwqybWogzvkpiquRiHtf/PyFC6U7nplu9hNI1Y
+         0KEZ9EjQXT9SuSRTpJf+ckpX5HVaoOWO+Y1clUpKRBXYdanzYWG0cMXKTrCctJLuS5o3
+         Dl3aHfmt1Ysx1kRlZM6dNOpjGeiBOTX2sjmXZAALpAOfUDpGHP/oiiiN2UPRqI1vPtuc
+         dMk5xstdIm5EV6FLiwm5Cf3gwwpNgPS0pqTmBgZKdHk41fK6PpjVxz4YVmknBXhcboZ8
+         aVLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695129705; x=1695734505;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/4YCtSaeKIOsVXX/9czvJJANn7hd+Dn1kophFmS6+Ck=;
+        b=SWrieq/Vy2aHB3VDuxFMa+lwL3heau8M8Hv2U7DwHt9zpAcVQVy3iAM3lhDpWicY3q
+         f7Y4Ugbl8apgCvIrahSqU90oI9I3Py/czSObztOmBxA50+9E5H7NjT5fsWwy0JunhFts
+         RiWIGeWIhCtaBrcF0xhybV0lpVCr9g8fV/79eq3Ra7Z21yal4s8fvb8VmwuNO+2bM6Ba
+         mGLU2qpe3kOWkYBsrK75NSRftVpdK+theK2WUvTQLKmkdks+a4VwUqQqqot9yau/JXEF
+         rGqc5V5V/ynUn1H4j2Ou+5gi9tBuw0n83NIoloBl2xXm6CW+iFAkYurB8WD71TDBWO+t
+         XHqQ==
+X-Gm-Message-State: AOJu0YzjsCkRmVxFuZscWFM4H2Z/SgN5z+V8fSzmfZx1Od/erLUT03wv
+        55UnbW75D0iNSk2AWBX/nF5ZJOEUz101t0+WKQfqqzIRPvsYVw==
+X-Google-Smtp-Source: AGHT+IGwIDNKxuJMER6QtB2u+JbqXBdDTTB4wiUqOdzU3OsfhtVnBLn852uucjrJzC+13x+ndSD11x+lxWQaMPFY91E=
+X-Received: by 2002:a2e:7308:0:b0:2be:5b09:553b with SMTP id
+ o8-20020a2e7308000000b002be5b09553bmr10527479ljc.8.1695129705150; Tue, 19 Sep
+ 2023 06:21:45 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com>
+ <ZPfPfyIoVxw5L6El@debian.me> <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
+ <CAO+kfxTvA6N=i+jGf0XbSyqf85i=q+vR6R9d_42OWfM2sWWXaA@mail.gmail.com>
+ <CAH2r5mtUedfLSv81Z-Yb3_=AbD_QpT3tVbU1PRzMTituaw7bgA@mail.gmail.com> <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com>
+In-Reply-To: <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com>
+From:   Brian Pardy <brian.pardy@gmail.com>
+Date:   Tue, 19 Sep 2023 09:21:33 -0400
+Message-ID: <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com>
+Subject: Re: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS share
+ is mounted (cifsd-cfid-laundromat in"D" state)
+To:     Steve French <smfrench@gmail.com>
+Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Linux CIFS <linux-cifs@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Paulo Alcantara <pc@manguebit.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Bharath S M <bharathsm@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 2023-09-19 at 13:04 +0200, Jan Kara wrote:
-> On Tue 19-09-23 15:05:24, Xi Ruoyao wrote:
-> > On Mon, 2023-08-07 at 15:38 -0400, Jeff Layton wrote:
-> > > Enable multigrain timestamps, which should ensure that there is an
-> > > apparent change to the timestamp whenever it has been written after
-> > > being actively observed via getattr.
-> > >=20
-> > > For ext4, we only need to enable the FS_MGTIME flag.
-> >=20
-> > Hi Jeff,
-> >=20
-> > This patch causes a gnulib test failure:
-> >=20
-> > $ ~/sources/lfs/grep-3.11/gnulib-tests/test-stat-time
-> > test-stat-time.c:141: assertion 'statinfo[0].st_mtime < statinfo[2].st_=
-mtime || (statinfo[0].st_mtime =3D=3D statinfo[2].st_mtime && (get_stat_mti=
-me_ns (&statinfo[0]) < get_stat_mtime_ns (&statinfo[2])))' failed
-> > Aborted (core dumped)
-> >=20
-> > The source code of the test:
-> > https://git.savannah.gnu.org/cgit/gnulib.git/tree/tests/test-stat-time.=
-c
-> >=20
-> > Is this an expected change?
->=20
-> Kind of yes. The test first tries to estimate filesystem timestamp
-> granularity in nap() function - due to this patch, the detected granulari=
-ty
-> will likely be 1 ns so effectively all the test calls will happen
-> immediately one after another. But we don't bother setting the timestamps
-> with more than 1 jiffy (usually 4 ms) precision unless we think someone i=
-s
-> watching. So as a result timestamps of all stamp1 and stamp2 files are
-> going to be equal which makes the test fail.
->=20
-
-That was my take too. The multigrain ctime changes are probably causing
-nap() to settle on too small a time delta.
-
-> The ultimate problem is that a sequence like:
->=20
-> write(f1)
-> stat(f2)
-> write(f2)
-> stat(f2)
-> write(f1)
-> stat(f1)
+On Tue, Sep 19, 2023 at 1:36=E2=80=AFAM Steve French <smfrench@gmail.com> w=
+rote:
 >
-> can result in f1 timestamp to be (slightly) lower than the final f2
-> timestamp because the second write to f1 didn't bother updating the
-> timestamp. That can indeed be a bit confusing to programs if they compare
-> timestamps between two files. Jeff?
->=20
+> Does the attached patch help in your case?  It avoids starting the
+> laundromat thread for IPC shares (which cuts the number of the threads
+> in half for many cases) and also avoids starting them if the server
+> does not support directory leases (e.g. if Samba server instead of
+> Windows server).
 
-Basically yes. When there is no stat() call issued on the file in
-between writes, the kernel will use coarse-grained timestamps when
-updating it (since no one is watching).
+Hello,
 
+I applied the 0001-smb3-do-not-start-laundromat-thread-when-dir-leases-.pat=
+ch
+you provided against the 6.5.3 kernel.
 
-I'm not sure what we can do for this test. The nap() function is making
-an assumption that the timestamp granularity will be constant, and that
-isn't necessarily the case now.
+I can confirm that it resolves this issue - no laundromat threads are
+created, and the reported load average is as expected, not falsely
+high.
 
---=20
-Jeff Layton <jlayton@kernel.org>
+This appears to fully fix the issue in my case.  Thank you very much!
+
+> On Mon, Sep 18, 2023 at 10:00=E2=80=AFPM Steve French <smfrench@gmail.com=
+> wrote:
+> >
+> > Paulo and I were discussing the laundromat thread at the SMB3.1.1 test
+> > event (at SDC this week) which is now going on - will let you know
+> > what we find.
+> >
+> > One obvious thing is that it probably isn't necessary for cases when
+> > the server does not support directory leases, but we noticed another
+> > problem as well.
