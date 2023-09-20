@@ -2,79 +2,83 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 868F5CE79A9
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Sep 2023 21:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A187CE79A9
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Sep 2023 03:05:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233294AbjISVGl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Sep 2023 17:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58240 "EHLO
+        id S232363AbjITDFH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Sep 2023 23:05:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233279AbjISVGk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 17:06:40 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F6E4BD;
-        Tue, 19 Sep 2023 14:06:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1695157591;
-        bh=fOGQ9e4BVoLOtSBB5w72D7gWpOxX/9p2zqJYTCgMKa8=;
-        h=Date:From:To:Cc:Subject:From;
-        b=UzOdhLNhulU/A2u7orUuPSZpJVBdgdYlrN2pZ7HzcWp3hGygvloyosQUYALfWnV0V
-         570wI/vnB16PP6XvGfNhbyY0k7KYn0mDKK9Pc6qYSQujKlpByZt3dCz7qJEu2rLtLi
-         ijnlK7WfoYNc/hHPZX5Q60+EUCEzjx+DbTYYL22qJKJgrGeV9v/3kDjV9NRtzb4toy
-         5vRVW7eE5xvI3r5ubrDk37SntRJ0/KWMIu0zvLekVtQZQLoy4A7XqNRSvBoPeV57WY
-         FLgkdyLVkSKMrYVZQvHnspt5o4Vkv+k9WkunV+ZES+xdwDKOliZapaRzcH+H3znZpF
-         aS7iFsUZ+Xw4g==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4RqvNR00tdz4xGM;
-        Wed, 20 Sep 2023 07:06:30 +1000 (AEST)
-Date:   Wed, 20 Sep 2023 07:06:18 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the cifs tree
-Message-ID: <20230920070618.6c3d16e9@canb.auug.org.au>
+        with ESMTP id S231675AbjITDFG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Sep 2023 23:05:06 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA217CA;
+        Tue, 19 Sep 2023 20:04:59 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-502153ae36cso10281307e87.3;
+        Tue, 19 Sep 2023 20:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695179098; x=1695783898; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oaDjgFTmIBKoGKyaUqfkfNbHOF4Uuie+vdI+nMpIPEo=;
+        b=MdJNGH7ac0ZbQQrBElcPkQ2S/F2A51CzAbKkT21/OzhKnt5kvFNbC7yxJxeUILJeB6
+         JeIn5nSlS92zjFygZ7bgHhSydMoejzmMl6rTlOigXe0hZFnCPwAukdKoXuKPrATmBmcN
+         A7sXFHPGPfhqp2DadsYSNML/djjMfC0NmPzgZ4vB8TqNBb5tD8ahGir2nxsd+AxZ6Vvv
+         al3SJVDvelNmf+QJRezJZe7PWdod4O7kT+tZKr40zFX+kipW8Y0kDC0QYH5OMONVykAu
+         0ySB83jmBgdTTzgdWSVIxVm/vlOnkcCUGAwP+Lr/U9jCuEhMz//NRPQZOs2Aw+/rkXmc
+         DzEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695179098; x=1695783898;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oaDjgFTmIBKoGKyaUqfkfNbHOF4Uuie+vdI+nMpIPEo=;
+        b=d/bNFilIPvFKSXyrIhgKVWrLIqDRwFosRGt0r4JGAOGOy5lg5sDtKUztUQmz3zOy23
+         JbETOAmZkLzHhseL5paVBKI00Kbehd+foerN8af+notM9GHiVlTI70ADLJQE+JHpm2nI
+         QT1LWP13dyhjac80p7bGkJ3nuBjk91gWUg0k1caDWWiYx0/ZFu2R0E83+Yv7t1oAiMTZ
+         mtodg/fw/Nx9cPvYiKJWWDq8Sm4xloMmxpnaY2tsyR2KR/nO51hoJce49hpvV68ijVRy
+         5xwkpmjXjuPXCiVwLQZNo5eDJB6LcJAzrL04m5KKRp+dCFZTNKxTh68aKEziE6NqmoAO
+         CFeg==
+X-Gm-Message-State: AOJu0YwernYOLagH//3Qg3EJKXmtAKccd0z1HqYtsivk7dipLDOtYhGZ
+        /p93a9skPRdMPSs3T2yCLtnszBdeYwGA1Mp2HzwYAAlT
+X-Google-Smtp-Source: AGHT+IGn8i5bYsDQsO7WXsVvFcf0edDSTZ/yzVtmudtzgbkSRwO71391riQLxCWeXTeI4xywuzTxvThiREYiri8rJLE=
+X-Received: by 2002:a19:4f06:0:b0:502:a549:8fa4 with SMTP id
+ d6-20020a194f06000000b00502a5498fa4mr1279215lfb.13.1695179097631; Tue, 19 Sep
+ 2023 20:04:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/2sDYkqYlpE5GtM2lWcN1OCO";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+References: <20230920070618.6c3d16e9@canb.auug.org.au>
+In-Reply-To: <20230920070618.6c3d16e9@canb.auug.org.au>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 19 Sep 2023 22:04:46 -0500
+Message-ID: <CAH2r5mu2onb+9VvnqH=1Qe26a7GxtGjw1_RmpihaNSsnR3n=NQ@mail.gmail.com>
+Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/2sDYkqYlpE5GtM2lWcN1OCO
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Sep 19, 2023 at 4:06=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
+>
+> Hi all,
+>
+> Commit
+>
+>   46b169610922 ("cifs: Fix UAF in cifs_demultiplex_thread()")
+>
+> is missing a Signed-off-by from its committer.
 
-Hi all,
 
-Commit
+Fixed - thx
 
-  46b169610922 ("cifs: Fix UAF in cifs_demultiplex_thread()")
-
-is missing a Signed-off-by from its committer.
 
 --=20
-Cheers,
-Stephen Rothwell
+Thanks,
 
---Sig_/2sDYkqYlpE5GtM2lWcN1OCO
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmUKDUsACgkQAVBC80lX
-0GxKVAf/ZcCkKiP2LMC0jj4ToIcqtPcz0AV+3eoNd1hoWGqzk21AzMXbZnBqwLRt
-/JhIVTg0VfOQzhhTUivfxVofgZpGi3Vj2N/rccC/qZIeT3nCV3/+fKy1WmYd2jIS
-DqpDRexXStlOeIHOw8+NqY+OEOyZn44EEvA94sSRtVQUMjxR7SMHASfvhL8DBecT
-NJb9hA8BEn6/4SgWnCNEkwpk1sYwuhjKs6uUzxDV9JTlHjmaPMu7EgoanvBSp5r4
-OKMvo/nvZt5b8VcFTROd7PfQR+07qTNSf3HBLPAenX8FZUvjATHtpo7RO3qsOyS+
-uliGI6T1CSIERR5JCn8401whQuwEjQ==
-=GOkt
------END PGP SIGNATURE-----
-
---Sig_/2sDYkqYlpE5GtM2lWcN1OCO--
+Steve
