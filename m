@@ -2,49 +2,113 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FB8CD4F27
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 Sep 2023 07:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DDF2CE7A88
+	for <linux-cifs@archiver.kernel.org>; Sat, 23 Sep 2023 17:28:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231370AbjIVHcQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 22 Sep 2023 03:32:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35906 "EHLO
+        id S229923AbjIWR2Z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 23 Sep 2023 13:28:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231260AbjIVHcP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 22 Sep 2023 03:32:15 -0400
-Received: from mail.loanfly.pl (mail.loanfly.pl [141.94.250.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0669CA
-        for <linux-cifs@vger.kernel.org>; Fri, 22 Sep 2023 00:32:08 -0700 (PDT)
-Received: by mail.loanfly.pl (Postfix, from userid 1002)
-        id 27A8EA5815; Fri, 22 Sep 2023 07:31:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=loanfly.pl; s=mail;
-        t=1695367893; bh=Y0HnXqH+26AP5Uq6M8BQXaj1HIAPQY/WndV9tkpAHHU=;
-        h=Date:From:To:Subject:From;
-        b=T9yUrmCcD7n/wdfZGQMc1JHo6ajmPgSsXsBKiFHzewQB88kTE4HyfZQaZHb90waSk
-         zUnrM+w8LyKQMob1btDkgZp7wVlUpQqESpJ3AHcXwqNQhwR6UfMWsQQ0l97AjbvvK5
-         eASqXz2ChAutlPoDC6tnLBU6HsBynMWaLjmW86EpM5t9BvgaJgDmzQtEuZhvYe3kxz
-         cDUHUjSviQeVG8me+iIdJn0oCtuiK/ZYUthxiINi4mwCC0iOXDZgnKfgrKynJpXQKd
-         FT13sHLgxnIbeSMfBq5xIeu6IOekQjixleaXaHzc+uTzzZ4dkF3BuQkr+g81cqoVmK
-         E4ejHoJ7iqOUQ==
-Received: by mail.loanfly.pl for <linux-cifs@vger.kernel.org>; Fri, 22 Sep 2023 07:31:14 GMT
-Message-ID: <20230922064500-0.1.cp.1gsol.0.e7g92u18r9@loanfly.pl>
-Date:   Fri, 22 Sep 2023 07:31:14 GMT
-From:   "Damian Cichocki" <damian.cichocki@loanfly.pl>
-To:     <linux-cifs@vger.kernel.org>
-Subject: =?UTF-8?Q?Pytanie_o_samoch=C3=B3d?=
-X-Mailer: mail.loanfly.pl
+        with ESMTP id S229513AbjIWR2Z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 23 Sep 2023 13:28:25 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DE2AF;
+        Sat, 23 Sep 2023 10:28:18 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50437f39c9dso3941808e87.3;
+        Sat, 23 Sep 2023 10:28:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695490097; x=1696094897; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tAJqcoiRIbP3+YidYPizOIU9nGOIZqp53grJQHhvEMk=;
+        b=mHyNkOfBp1OkgMmUWWxp3SdrnXVAPxKoR7Kq95iNCYG8RMiPZ/8Ama1yd8O0hj/zXt
+         hTQ+Dh5gljxoBumsr13do2+OzD6TcjZW7Lt+T0X3jyc0iIH2XBqyDdBJxmdTkJPc/8fH
+         0I/MT7WLsIiUKdMdlT3b/G0o7CYO0KYSRLnnwaPYY399Hvx8QhJH4DLXFxBLVHLlXgQn
+         AHUpROA5glX3lbJKxH1/GYV74xpT2D8Hk7L6nGLXkNzIbs4oO46OBciPj8xO8QqMYp6Z
+         dkDOwfObI/2cQ3/atYtlADxdg7qOp3oYEjUIcqcvcztE5GH+AQjdgQcWJO3XTp+BaqqT
+         6nLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695490097; x=1696094897;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tAJqcoiRIbP3+YidYPizOIU9nGOIZqp53grJQHhvEMk=;
+        b=eUcOY7JehDC8YBXddJSNzNLPKLuRclmwRReZTeAx0ua1EFBWnwmTXMUj9PADixMLPW
+         6wtN048CUbyxh/V2Suc9fDwL3IJO0bVTTv2BDSHVssoxrnb0FqlpFwW5tNmKG53Eun9k
+         1J3UAkIaf52Nwmzs6jdB8yxa/NZEaEOw8rlf0csKTIkJqrbBVaKf1HFB1xfnlU4E4hnv
+         CyQ983H+XuU6kVtX68iMloUC6eZDAMR0FjG8lU1r2a+xkbuFhCwhjK3/nX65vgF52HRg
+         S1zB/3Hjtpc358E6qqAFJi6qi611eNWVJuJDcGG2ZkXYOYS0VP+FiATNm+Up9j2VOFvR
+         2Gpg==
+X-Gm-Message-State: AOJu0YwJ49NX/sFrclkRSV+KMM1uMEu4OyTrHhT4tVJv1Cm5Sb0LxA9r
+        ekwR8VS+wcVWg00bJPbsdKqORi4rQUzy/DQ4kneDaf5cd90=
+X-Google-Smtp-Source: AGHT+IHNBdnTigY92wOqORHWahSMmbVERL7rr/FvKY9wQ7tTbo6HGfSg4cxYWrR4okRxbSISs1Slx+5Z6+31z3iKhno=
+X-Received: by 2002:a05:6512:3a95:b0:502:a549:8fa4 with SMTP id
+ q21-20020a0565123a9500b00502a5498fa4mr2354858lfu.13.1695490096515; Sat, 23
+ Sep 2023 10:28:16 -0700 (PDT)
 MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 23 Sep 2023 12:28:05 -0500
+Message-ID: <CAH2r5muY+WP7WKfzpPxaGM53fdEEwCQnRgkwOFWFuh2y3Odb9A@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Please pull the following changes since commit
+ce9ecca0238b140b88f43859b211c9fdfd8e5b70:
 
-Czy interesuje Pa=C5=84stwa rozwi=C4=85zanie umo=C5=BCliwiaj=C4=85ce moni=
-torowanie samochod=C3=B3w firmowych oraz optymalizacj=C4=99 koszt=C3=B3w =
-ich utrzymania?=20
+  Linux 6.6-rc2 (2023-09-17 14:40:24 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc2-smb3-client-fixes
+
+for you to fetch changes up to c8ebf077fbebda3a24335660ded7cff4b90331b8:
+
+  smb3: fix confusing debug message (2023-09-20 19:50:05 -0500)
+
+----------------------------------------------------------------
+Six smb3 client fixes, including three for stable, from the SMB plugfest
+(testing event) this week
+
+- Reparse point handling fix (found when investigating dir enumeration
+when fifo in dir)
+- Fix excessive thread creation for dir lease cleanup
+- UAF fix in negotiate path
+- remove duplicate error message mapping and fix confusing warning message
+- add dynamic trace point to improve debugging RDMA connection attempts
+
+----------------------------------------------------------------
+Paulo Alcantara (1):
+      smb: client: handle STATUS_IO_REPARSE_TAG_NOT_HANDLED
+
+Steve French (4):
+      smb3: Add dynamic trace points for RDMA (smbdirect) reconnect
+      smb3: do not start laundromat thread when dir leases  disabled
+      smb3: remove duplicate error mapping
+      smb3: fix confusing debug message
+
+Zhang Xiaoxu (1):
+      cifs: Fix UAF in cifs_demultiplex_thread()
+
+ fs/smb/client/cached_dir.c   |  6 ++++++
+ fs/smb/client/cifsglob.h     |  3 ++-
+ fs/smb/client/cifsproto.h    |  2 +-
+ fs/smb/client/connect.c      |  8 ++++++--
+ fs/smb/client/misc.c         | 14 +++++++++-----
+ fs/smb/client/smb2inode.c    |  3 +++
+ fs/smb/client/smb2maperror.c |  2 --
+ fs/smb/client/smb2pdu.c      |  4 ++--
+ fs/smb/client/smbdirect.c    |  9 ++++++---
+ fs/smb/client/trace.h        |  2 ++
+ fs/smb/client/transport.c    | 34 +++++++++++++++++++++++-----------
+ 11 files changed, 60 insertions(+), 27 deletions(-)
 
 
-Pozdrawiam,
-Damian Cichocki
+-- 
+Thanks,
+
+Steve
