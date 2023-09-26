@@ -2,69 +2,88 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF05DE81808
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Sep 2023 01:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8ABE8180B
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Sep 2023 01:27:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232893AbjIZBVJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 25 Sep 2023 21:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60364 "EHLO
+        id S231249AbjIZB2B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 25 Sep 2023 21:28:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231225AbjIZBVI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Sep 2023 21:21:08 -0400
+        with ESMTP id S232218AbjIZB2A (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Sep 2023 21:28:00 -0400
 Received: from mail.nfschina.com (unknown [42.101.60.195])
-        by lindbergh.monkeyblade.net (Postfix) with SMTP id 5BDF910A;
-        Mon, 25 Sep 2023 18:21:01 -0700 (PDT)
-Received: from [172.30.11.106] (unknown [180.167.10.98])
-        by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPSA id 92714604DE905;
-        Tue, 26 Sep 2023 09:20:58 +0800 (CST)
-Message-ID: <8c2f8756-be5c-e2b3-e1a8-d2751a4531a0@nfschina.com>
-Date:   Tue, 26 Sep 2023 09:20:50 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH] cifs: avoid possible NULL dereference
-Content-Language: en-US
-To:     Dan Carpenter <dan.carpenter@linaro.org>
-Cc:     sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
-        sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
+        by lindbergh.monkeyblade.net (Postfix) with SMTP id F3DD4101;
+        Mon, 25 Sep 2023 18:27:52 -0700 (PDT)
+Received: from localhost.localdomain (unknown [180.167.10.98])
+        by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id D75F9604DFA33;
+        Tue, 26 Sep 2023 09:27:48 +0800 (CST)
 X-MD-Sfrom: suhui@nfschina.com
 X-MD-SrcIP: 180.167.10.98
 From:   Su Hui <suhui@nfschina.com>
-In-Reply-To: <1ae6c204-ed00-4626-8246-32d66ae7e232@kadam.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
+        sprasad@microsoft.com, tom@talpey.com
+Cc:     Su Hui <suhui@nfschina.com>, dan.carpenter@linaro.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH v2] cifs: avoid possible NULL dereference
+Date:   Tue, 26 Sep 2023 09:27:34 +0800
+Message-Id: <20230926012733.814657-1-suhui@nfschina.com>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 2023/9/25 23:07, Dan Carpenter wrote:
-> On Mon, Sep 25, 2023 at 12:52:21PM +0800, Su Hui wrote:
->> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
->> index 2108b3b40ce9..37eed057ded0 100644
->> --- a/fs/smb/client/file.c
->> +++ b/fs/smb/client/file.c
->> @@ -4878,6 +4878,12 @@ void cifs_oplock_break(struct work_struct *work)
->>   	struct cifsFileInfo *cfile = container_of(work, struct cifsFileInfo,
->>   						  oplock_break);
->>   	struct inode *inode = d_inode(cfile->dentry);
->> +
->> +	if (!inode) {
->> +		cifs_dbg(FYI, "%s : failed to find inode\n", __func__);
->> +		return;
->> +	}
->> +
-> Are we allowing this in the middle of the declaration block these days?
-Really sorry for this, I will modify it right now.
-Thanks for your reminder!
+smatch warn:
+fs/smb/client/file.c:4910 cifs_oplock_break() warn:
+variable dereferenced before check 'inode' (see line 4881)
 
-Su Hui
+If 'inode' is NULL, print some warning and return.
 
->
->>   	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->>   	struct cifsInodeInfo *cinode = CIFS_I(inode);
->>   	struct cifs_tcon *tcon;
->
-> regards,
-> dan carpenter
+Signed-off-by: Su Hui <suhui@nfschina.com>
+---
+ fs/smb/client/file.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 2108b3b40ce9..de705c8b2d22 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -4878,8 +4878,8 @@ void cifs_oplock_break(struct work_struct *work)
+ 	struct cifsFileInfo *cfile = container_of(work, struct cifsFileInfo,
+ 						  oplock_break);
+ 	struct inode *inode = d_inode(cfile->dentry);
+-	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+-	struct cifsInodeInfo *cinode = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb;
++	struct cifsInodeInfo *cinode;
+ 	struct cifs_tcon *tcon;
+ 	struct TCP_Server_Info *server;
+ 	struct tcon_link *tlink;
+@@ -4888,6 +4888,13 @@ void cifs_oplock_break(struct work_struct *work)
+ 	__u64 persistent_fid, volatile_fid;
+ 	__u16 net_fid;
+ 
++	if (!inode) {
++		cifs_dbg(FYI, "%s : failed to find inode\n", __func__);
++		return;
++	}
++	cifs_sb = CIFS_SB(inode->i_sb);
++	cinode = CIFS_I(inode);
++
+ 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
+ 			TASK_UNINTERRUPTIBLE);
+ 
+@@ -4907,7 +4914,7 @@ void cifs_oplock_break(struct work_struct *work)
+ 		cinode->oplock = 0;
+ 	}
+ 
+-	if (inode && S_ISREG(inode->i_mode)) {
++	if (S_ISREG(inode->i_mode)) {
+ 		if (CIFS_CACHE_READ(cinode))
+ 			break_lease(inode, O_RDONLY);
+ 		else
+-- 
+2.30.2
+
