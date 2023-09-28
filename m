@@ -2,282 +2,219 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C42CE732C6
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Sep 2023 11:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5A7E732C3
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Sep 2023 11:10:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232076AbjI1LEG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Sep 2023 07:04:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56774 "EHLO
+        id S232241AbjI1LKF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Sep 2023 07:10:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231997AbjI1LD7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Sep 2023 07:03:59 -0400
+        with ESMTP id S232464AbjI1LJT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Sep 2023 07:09:19 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0989DCDC;
-        Thu, 28 Sep 2023 04:03:32 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBF2CC433CD;
-        Thu, 28 Sep 2023 11:03:16 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EB2C2685;
+        Thu, 28 Sep 2023 04:05:33 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A55FCC433C7;
+        Thu, 28 Sep 2023 11:05:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695899012;
-        bh=2HU082C0O+wshN8razE9iX9Rxehg6mRJCvsU5n9rFmw=;
+        s=k20201202; t=1695899133;
+        bh=jJHGtqvYbQpN1Lkzg/E/Fz0cjbmCSvgm8QFG3HHE9Ls=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cgJqBVdgRTRGPcB9AYO9nuxbQNU/aRFlsoq2/9IfdhTUxto7jaIgTs2iK3Hh6VNmI
-         PQNGXum64iBmE5gmxTB5fzhsNqjzKt2sLpABU1iY4QR3sLG/3TAi2tRkz3bK5NdR2Q
-         5J/x2S1ciuMIVP8CxOGFxyla+hxGROy5UoKNIuzR78QFdYK0UlmPcZ7xnSW65TY0z1
-         d09jqnFZdRWx08/ZfFzae3DcpVgwGYgcj94ylvD+5VeIqKKaZOw2/kkGfhLURz1SoJ
-         LecijjrtKtsZor5I1BxBnr+8zBdASh0oRnrtfNreKI0opyGPJWi1hjF5WHyNrggNrR
-         Xz99F3TmopI2w==
+        b=moVKiKK/GVlQO98y9FOBzTkfAxr7VMvub+EJqxWL2Qz7W4LtmXNsdmp250g6z473Z
+         FuzrbnUyHJhrMpUmu7DFp+z20xpdy+J0QBq+9d1OXD6XnL2aVNmPODy/kStMTn5/2K
+         IqYIAl60aXTIuNf5AIO8I/LBKw5a29C7Oa5qlBBv905V46ol1zIM6H25lL2uq7fajz
+         KpMG1uBeQtdlBemjvH+KLuWmZ8CCJ0j1LBfaEwkbMmfvn2PTNNjea7OXWaonZpaGDL
+         jHRbH0UfPDoGXtcpEIXOMvYpxMlqTaHK0ou85ymZULuN1GBnIfXq5svGECvggYzuAT
+         qhTJDIouNMASQ==
 From:   Jeff Layton <jlayton@kernel.org>
 To:     Alexander Viro <viro@zeniv.linux.org.uk>,
         Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Sterba <dsterba@suse.cz>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Eric Biederman <ebiederm@xmission.com>,
-        Kees Cook <keescook@chromium.org>, Jeremy Kerr <jk@ozlabs.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
-        Todd Kjos <tkjos@android.com>,
-        Martijn Coenen <maco@android.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Carlos Llamas <cmllamas@google.com>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Mattia Dongili <malattia@linux.it>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Brad Warrum <bwarrum@linux.ibm.com>,
-        Ritu Agarwal <rituagar@linux.ibm.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Mark Gross <markgross@kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        David Sterba <dsterba@suse.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Ian Kent <raven@themaw.net>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Joel Becker <jlbec@evilplan.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Nicolas Pitre <nico@fluxnic.net>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        Jan Kara <jack@suse.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Christoph Hellwig <hch@infradead.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Muchun Song <muchun.song@linux.dev>, Jan Kara <jack@suse.cz>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Dave Kleikamp <shaggy@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Neil Brown <neilb@suse.de>,
-        Olga Kornievskaia <kolga@netapp.com>,
-        Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Bob Copeland <me@bobcopeland.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Tony Luck <tony.luck@intel.com>,
-        "Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-        Anders Larsen <al@alarsen.net>,
-        Steve French <sfrench@samba.org>,
-        Paulo Alcantara <pc@manguebit.com>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paulo Alcantara <pc@manguebit.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Evgeniy Dushistov <dushistov@mail.ru>,
-        Chandan Babu R <chandan.babu@oracle.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>,
-        Yonghong Song <yonghong.song@linux.dev>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        John Johansen <john.johansen@canonical.com>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Stephen Smalley <stephen.smalley.work@gmail.com>,
-        Eric Paris <eparis@parisplace.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
-        linux-afs@lists.infradead.org, autofs@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        codalist@coda.cs.cmu.edu, linux-efi@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, gfs2@lists.linux.dev,
-        linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
-        jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
-        linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
-        linux-unionfs@vger.kernel.org, linux-hardening@vger.kernel.org,
-        reiserfs-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org,
-        linux-trace-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        bpf@vger.kernel.org, netdev@vger.kernel.org,
-        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-        selinux@vger.kernel.org
-Subject: [PATCH 01/87] fs: new accessor methods for atime and mtime
-Date:   Thu, 28 Sep 2023 07:03:00 -0400
-Message-ID: <20230928110300.32891-2-jlayton@kernel.org>
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH 67/87] fs/smb/client: convert to new inode {a,m}time accessors
+Date:   Thu, 28 Sep 2023 07:03:16 -0400
+Message-ID: <20230928110413.33032-66-jlayton@kernel.org>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230928110300.32891-1-jlayton@kernel.org>
+In-Reply-To: <20230928110413.33032-1-jlayton@kernel.org>
 References: <20230928110300.32891-1-jlayton@kernel.org>
+ <20230928110413.33032-1-jlayton@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Recently, we converted the ctime accesses in the kernel to use new
-accessor functions. Linus recently pointed out though that if we add
-accessors for the atime and mtime, then that would allow us to
-seamlessly change how these timestamps are stored in the inode.
-
-Add new accessor functions for the atime and mtime that mirror the
-accessors for the ctime.
-
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- fs/libfs.c         | 13 +++++++++++++
- include/linux/fs.h | 42 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+)
+ fs/smb/client/file.c    | 18 ++++++++++--------
+ fs/smb/client/fscache.h |  6 +++---
+ fs/smb/client/inode.c   | 17 ++++++++---------
+ fs/smb/client/smb2ops.c |  6 ++++--
+ 4 files changed, 25 insertions(+), 22 deletions(-)
 
-diff --git a/fs/libfs.c b/fs/libfs.c
-index 37f2d34ee090..f5cdc7f7f5b5 100644
---- a/fs/libfs.c
-+++ b/fs/libfs.c
-@@ -1912,3 +1912,16 @@ ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
- 	return direct_written + buffered_written;
- }
- EXPORT_SYMBOL_GPL(direct_write_fallback);
-+
-+/**
-+ * simple_inode_init_ts - initialize the timestamps for a new inode
-+ * @inode: inode to be initialized
-+ *
-+ * When a new inode is created, most filesystems set the timestamps to the
-+ * current time. Add a helper to do this.
-+ */
-+struct timespec64 simple_inode_init_ts(struct inode *inode);
-+{
-+	return inode->i_atime = inode->i_mtime = inode_set_ctime_current(inode);
-+}
-+EXPORT_SYMBOL(simple_inode_init_ts);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index b528f063e8ff..12d247b82aa0 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1553,6 +1553,48 @@ static inline struct timespec64 inode_set_ctime(struct inode *inode,
- 	return inode_set_ctime_to_ts(inode, ts);
- }
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 2108b3b40ce9..cf17e3dd703e 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -1085,7 +1085,8 @@ int cifs_close(struct inode *inode, struct file *file)
+ 		    !test_bit(CIFS_INO_CLOSE_ON_LOCK, &cinode->flags) &&
+ 		    dclose) {
+ 			if (test_and_clear_bit(CIFS_INO_MODIFIED_ATTR, &cinode->flags)) {
+-				inode->i_mtime = inode_set_ctime_current(inode);
++				inode_set_mtime_to_ts(inode,
++						      inode_set_ctime_current(inode));
+ 			}
+ 			spin_lock(&cinode->deferred_lock);
+ 			cifs_add_deferred_close(cfile, dclose);
+@@ -2596,7 +2597,7 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ 					   write_data, to - from, &offset);
+ 		cifsFileInfo_put(open_file);
+ 		/* Does mm or vfs already set times? */
+-		inode->i_atime = inode->i_mtime = inode_set_ctime_current(inode);
++		simple_inode_init_ts(inode);
+ 		if ((bytes_written > 0) && (offset))
+ 			rc = 0;
+ 		else if (bytes_written < 0)
+@@ -4647,11 +4648,13 @@ static void cifs_readahead(struct readahead_control *ractl)
+ static int cifs_readpage_worker(struct file *file, struct page *page,
+ 	loff_t *poffset)
+ {
++	struct inode *inode = file_inode(file);
++	struct timespec64 atime, mtime;
+ 	char *read_data;
+ 	int rc;
  
-+static inline struct timespec64 inode_get_atime(const struct inode *inode)
-+{
-+	return inode->i_atime;
-+}
-+
-+static inline struct timespec64 inode_set_atime_to_ts(struct inode *inode,
-+						      struct timespec64 ts)
-+{
-+	inode->i_atime = ts;
-+	return ts;
-+}
-+
-+static inline struct timespec64 inode_set_atime(struct inode *inode,
-+						time64_t sec, long nsec)
-+{
-+	struct timespec64 ts = { .tv_sec  = sec,
-+				 .tv_nsec = nsec };
-+	return inode_set_atime_to_ts(inode, ts);
-+}
-+
-+static inline struct timespec64 inode_get_mtime(const struct inode *inode)
-+{
-+	return inode->i_mtime;
-+}
-+
-+static inline struct timespec64 inode_set_mtime_to_ts(struct inode *inode,
-+						      struct timespec64 ts)
-+{
-+	inode->i_mtime = ts;
-+	return ts;
-+}
-+
-+static inline struct timespec64 inode_set_mtime(struct inode *inode,
-+						time64_t sec, long nsec)
-+{
-+	struct timespec64 ts = { .tv_sec  = sec,
-+				 .tv_nsec = nsec };
-+	return inode_set_mtime_to_ts(inode, ts);
-+}
-+
-+struct timespec64 simple_inode_init_ts(struct inode *inode);
-+
- /*
-  * Snapshotting support.
-  */
+ 	/* Is the page cached? */
+-	rc = cifs_readpage_from_fscache(file_inode(file), page);
++	rc = cifs_readpage_from_fscache(inode, page);
+ 	if (rc == 0)
+ 		goto read_complete;
+ 
+@@ -4666,11 +4669,10 @@ static int cifs_readpage_worker(struct file *file, struct page *page,
+ 		cifs_dbg(FYI, "Bytes read %d\n", rc);
+ 
+ 	/* we do not want atime to be less than mtime, it broke some apps */
+-	file_inode(file)->i_atime = current_time(file_inode(file));
+-	if (timespec64_compare(&(file_inode(file)->i_atime), &(file_inode(file)->i_mtime)))
+-		file_inode(file)->i_atime = file_inode(file)->i_mtime;
+-	else
+-		file_inode(file)->i_atime = current_time(file_inode(file));
++	atime = inode_set_atime_to_ts(inode, current_time(inode));
++	mtime = inode_get_mtime(inode);
++	if (timespec64_compare(&atime, &mtime))
++		inode_set_atime_to_ts(inode, inode_get_mtime(inode));
+ 
+ 	if (PAGE_SIZE > rc)
+ 		memset(read_data + rc, 0, PAGE_SIZE - rc);
+diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
+index 84f3b09367d2..a3d73720914f 100644
+--- a/fs/smb/client/fscache.h
++++ b/fs/smb/client/fscache.h
+@@ -49,12 +49,12 @@ static inline
+ void cifs_fscache_fill_coherency(struct inode *inode,
+ 				 struct cifs_fscache_inode_coherency_data *cd)
+ {
+-	struct cifsInodeInfo *cifsi = CIFS_I(inode);
+ 	struct timespec64 ctime = inode_get_ctime(inode);
++	struct timespec64 mtime = inode_get_mtime(inode);
+ 
+ 	memset(cd, 0, sizeof(*cd));
+-	cd->last_write_time_sec   = cpu_to_le64(cifsi->netfs.inode.i_mtime.tv_sec);
+-	cd->last_write_time_nsec  = cpu_to_le32(cifsi->netfs.inode.i_mtime.tv_nsec);
++	cd->last_write_time_sec   = cpu_to_le64(mtime.tv_sec);
++	cd->last_write_time_nsec  = cpu_to_le32(mtime.tv_nsec);
+ 	cd->last_change_time_sec  = cpu_to_le64(ctime.tv_sec);
+ 	cd->last_change_time_nsec = cpu_to_le32(ctime.tv_nsec);
+ }
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index d7c302442c1e..3abfe77bfa46 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -82,6 +82,7 @@ cifs_revalidate_cache(struct inode *inode, struct cifs_fattr *fattr)
+ {
+ 	struct cifs_fscache_inode_coherency_data cd;
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
++	struct timespec64 mtime;
+ 
+ 	cifs_dbg(FYI, "%s: revalidating inode %llu\n",
+ 		 __func__, cifs_i->uniqueid);
+@@ -101,7 +102,8 @@ cifs_revalidate_cache(struct inode *inode, struct cifs_fattr *fattr)
+ 
+ 	 /* revalidate if mtime or size have changed */
+ 	fattr->cf_mtime = timestamp_truncate(fattr->cf_mtime, inode);
+-	if (timespec64_equal(&inode->i_mtime, &fattr->cf_mtime) &&
++	mtime = inode_get_mtime(inode);
++	if (timespec64_equal(&mtime, &fattr->cf_mtime) &&
+ 	    cifs_i->server_eof == fattr->cf_eof) {
+ 		cifs_dbg(FYI, "%s: inode %llu is unchanged\n",
+ 			 __func__, cifs_i->uniqueid);
+@@ -164,10 +166,10 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
+ 	fattr->cf_ctime = timestamp_truncate(fattr->cf_ctime, inode);
+ 	/* we do not want atime to be less than mtime, it broke some apps */
+ 	if (timespec64_compare(&fattr->cf_atime, &fattr->cf_mtime) < 0)
+-		inode->i_atime = fattr->cf_mtime;
++		inode_set_atime_to_ts(inode, fattr->cf_mtime);
+ 	else
+-		inode->i_atime = fattr->cf_atime;
+-	inode->i_mtime = fattr->cf_mtime;
++		inode_set_atime_to_ts(inode, fattr->cf_atime);
++	inode_set_mtime_to_ts(inode, fattr->cf_mtime);
+ 	inode_set_ctime_to_ts(inode, fattr->cf_ctime);
+ 	inode->i_rdev = fattr->cf_rdev;
+ 	cifs_nlink_fattr_to_inode(inode, fattr);
+@@ -1816,7 +1818,7 @@ int cifs_unlink(struct inode *dir, struct dentry *dentry)
+ 					   when needed */
+ 		inode_set_ctime_current(inode);
+ 	}
+-	dir->i_mtime = inode_set_ctime_current(dir);
++	inode_set_mtime_to_ts(dir, inode_set_ctime_current(dir));
+ 	cifs_inode = CIFS_I(dir);
+ 	CIFS_I(dir)->time = 0;	/* force revalidate of dir as well */
+ unlink_out:
+@@ -2131,7 +2133,7 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
+ 	cifsInode->time = 0;
+ 
+ 	inode_set_ctime_current(d_inode(direntry));
+-	inode->i_mtime = inode_set_ctime_current(inode);
++	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
+ 
+ rmdir_exit:
+ 	free_dentry_path(page);
+@@ -2337,9 +2339,6 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+ 	/* force revalidate to go get info when needed */
+ 	CIFS_I(source_dir)->time = CIFS_I(target_dir)->time = 0;
+ 
+-	source_dir->i_mtime = target_dir->i_mtime = inode_set_ctime_to_ts(source_dir,
+-									  inode_set_ctime_current(target_dir));
+-
+ cifs_rename_exit:
+ 	kfree(info_buf_source);
+ 	free_dentry_path(page2);
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 9aeecee6b91b..f4849a8ad40b 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -1403,12 +1403,14 @@ smb2_close_getattr(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Creation time should not need to be updated on close */
+ 	if (file_inf.LastWriteTime)
+-		inode->i_mtime = cifs_NTtimeToUnix(file_inf.LastWriteTime);
++		inode_set_mtime_to_ts(inode,
++				      cifs_NTtimeToUnix(file_inf.LastWriteTime));
+ 	if (file_inf.ChangeTime)
+ 		inode_set_ctime_to_ts(inode,
+ 				      cifs_NTtimeToUnix(file_inf.ChangeTime));
+ 	if (file_inf.LastAccessTime)
+-		inode->i_atime = cifs_NTtimeToUnix(file_inf.LastAccessTime);
++		inode_set_atime_to_ts(inode,
++				      cifs_NTtimeToUnix(file_inf.LastAccessTime));
+ 
+ 	/*
+ 	 * i_blocks is not related to (i_size / i_blksize),
 -- 
 2.41.0
 
