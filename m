@@ -2,69 +2,39 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3DEE732FD
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Sep 2023 17:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2C9CE7AFC
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Sep 2023 18:01:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231322AbjI1Rro (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Sep 2023 13:47:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39196 "EHLO
+        id S230251AbjI1SBx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Sep 2023 14:01:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjI1Rrm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Sep 2023 13:47:42 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99C7D19D
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Sep 2023 10:47:40 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9b2a3fd5764so779620666b.3
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Sep 2023 10:47:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1695923259; x=1696528059; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UoV8bp+GLn88RdeFyi+3G/jZGwWmlguHsi2KfbyyFTc=;
-        b=MX+AlbA/abOmOBzYDWBMWuOAAEsZuMqupDCZ9HR30Q6HsvbFiq+wiWIauaTQ3xtqCY
-         C6dykoZpxvkGOPO7LK5ZO+RF3bYcizAj5HI1gdq23AM6AEptqtH+t1ErQ+yq128ntypO
-         dRVwFVFCxHCldgmfwfaw4dPLDFxvwDAky+4hk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695923259; x=1696528059;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UoV8bp+GLn88RdeFyi+3G/jZGwWmlguHsi2KfbyyFTc=;
-        b=ErRdStFVWQnA4zJgmAPrJL/Nb3PxBVYK7GtJ6YDIQBZSgHygwO1wUUoGP3MciPkegv
-         zBuyl5/kUTj8xymzllDFyzlwEYZJCmvmJuFZ/hqu9OZxnmOdOwrGdqps0iGhQDFgj2Oa
-         2zpqJiUvCKfi9eWanxbNV4vzBKLNPeHHsacHaXXsTs+NR8I+ebVhaolcGMC7GKyhLZ56
-         luTICamWnwr1XGkjh7MHhDfL+L2YZtLW/Bf0ZXqouUvAagDw1r/nYEyqkfrTGAIVksnH
-         cKjWcwVKrVJL23T+H/hMYmzmP4/mDNA9LmZbml4xUC7tFf6CpSXfnX9wQpiwNv2loi+T
-         gqCA==
-X-Gm-Message-State: AOJu0Yw4Zx77d8xfM+y4j2ie1Jx/QDiNad7iw+DAcHTumeITSB2xui1G
-        IBk3g+5/pMCSeQEyeavpwGg+PokWIu5mCaH+qEUIzCKa7Q8=
-X-Google-Smtp-Source: AGHT+IG7+VXNMHj0NdNLXg/sMccFg3hCDtm9Y8pNne6ujmdX49Hriz0DmMZQYgeoqdcsH9e9wvShGw==
-X-Received: by 2002:a17:906:1ba1:b0:9aa:25f5:8d95 with SMTP id r1-20020a1709061ba100b009aa25f58d95mr1989966ejg.59.1695923258976;
-        Thu, 28 Sep 2023 10:47:38 -0700 (PDT)
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
-        by smtp.gmail.com with ESMTPSA id bg1-20020a170906a04100b009adce1c97ccsm11267078ejb.53.2023.09.28.10.47.38
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Sep 2023 10:47:38 -0700 (PDT)
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-534848725e8so6009248a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Sep 2023 10:47:38 -0700 (PDT)
-X-Received: by 2002:aa7:d899:0:b0:52f:c073:9c77 with SMTP id
- u25-20020aa7d899000000b0052fc0739c77mr1748627edq.35.1695922912868; Thu, 28
- Sep 2023 10:41:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230928110554.34758-1-jlayton@kernel.org> <20230928110554.34758-3-jlayton@kernel.org>
-In-Reply-To: <20230928110554.34758-3-jlayton@kernel.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 28 Sep 2023 10:41:34 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wij_42Q9WHY898r-gugmT5c-1JJKRh3C+nTUd1hc1aeqQ@mail.gmail.com>
-Message-ID: <CAHk-=wij_42Q9WHY898r-gugmT5c-1JJKRh3C+nTUd1hc1aeqQ@mail.gmail.com>
+        with ESMTP id S230291AbjI1SBv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Sep 2023 14:01:51 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D841A2;
+        Thu, 28 Sep 2023 11:01:49 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6C1DC433C7;
+        Thu, 28 Sep 2023 18:01:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695924109;
+        bh=EAdPFsmHcyWayc69u1pNQGVN/Od37LMkwOOQtSvFBiM=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=bfK28RLdLGgKZCUgDzeWTBKaqWs6brrGRaSyPdFXskOVm0On6PlLojE5M/xCgEEY5
+         grpUMo2uaqDtijMvKbHWfOGFJG+vQA/tkSyBcl6qHWL3dn3aU/KYO5L4q/l83Nz1PF
+         rjm7ECl0slpI4oU4YRq3Il4iqcNMzLzfgVWdoz5lG6ZAiTp3N12KGI95ZvFcFMlTR+
+         jbG318WOr9JpuRBEryTb1XBxjEr4Jw9k8E4/FfV1BqWFd1k5jtZEs5n6naq0zoe6ze
+         HRJ/cpQFseJro5/YEKgl8SVwodWHkLRLpC8H6rkjRLoCIio3JUF68vh6UiBMp7cQEp
+         W7opbVnaB1VbA==
+Message-ID: <00ca2e3997cc86401f7fb65d936fe5403abd5627.camel@kernel.org>
 Subject: Re: [PATCH 87/87] fs: move i_blocks up a few places in struct inode
-To:     Jeff Layton <jlayton@kernel.org>
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
         Christian Brauner <brauner@kernel.org>,
         David Sterba <dsterba@suse.cz>,
         Amir Goldstein <amir73il@gmail.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
+        Theodore Ts'o <tytso@mit.edu>,
         Eric Biederman <ebiederm@xmission.com>,
         Kees Cook <keescook@chromium.org>, Jeremy Kerr <jk@ozlabs.org>,
         Arnd Bergmann <arnd@arndb.de>,
@@ -77,7 +47,7 @@ Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
         Sven Schnelle <svens@linux.ibm.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>,
+        Arve =?ISO-8859-1?Q?Hj=F8nnev=E5g?= <arve@android.com>,
         Todd Kjos <tkjos@android.com>,
         Martijn Coenen <maco@android.com>,
         Joel Fernandes <joel@joelfernandes.org>,
@@ -90,7 +60,7 @@ Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
         Brad Warrum <bwarrum@linux.ibm.com>,
         Ritu Agarwal <rituagar@linux.ibm.com>,
         Hans de Goede <hdegoede@redhat.com>,
-        =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+        Ilpo =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
         Mark Gross <markgross@kernel.org>,
         Jiri Slaby <jirislaby@kernel.org>,
         Eric Van Hensbergen <ericvh@kernel.org>,
@@ -210,30 +180,54 @@ Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
         bpf@vger.kernel.org, netdev@vger.kernel.org,
         apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
         selinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Date:   Thu, 28 Sep 2023 14:01:33 -0400
+In-Reply-To: <CAHk-=wij_42Q9WHY898r-gugmT5c-1JJKRh3C+nTUd1hc1aeqQ@mail.gmail.com>
+References: <20230928110554.34758-1-jlayton@kernel.org>
+         <20230928110554.34758-3-jlayton@kernel.org>
+         <CAHk-=wij_42Q9WHY898r-gugmT5c-1JJKRh3C+nTUd1hc1aeqQ@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, 28 Sept 2023 at 04:06, Jeff Layton <jlayton@kernel.org> wrote:
->
-> Move i_blocks up above the i_lock, which moves the new 4 byte hole to
-> just after the timestamps, without changing the size of the structure.
+On Thu, 2023-09-28 at 10:41 -0700, Linus Torvalds wrote:
+> On Thu, 28 Sept 2023 at 04:06, Jeff Layton <jlayton@kernel.org> wrote:
+> >=20
+> > Move i_blocks up above the i_lock, which moves the new 4 byte hole to
+> > just after the timestamps, without changing the size of the structure.
+>=20
+> I'm sure others have mentioned this, but 'struct inode' is marked with
+> __randomize_layout, so the actual layout may end up being very
+> different.
+>=20
+> I'm personally not convinced the whole structure randomization is
+> worth it - it's easy enough to figure out for any distro kernel since
+> the seed has to be the same across machines for modules to work, so
+> even if the seed isn't "public", any layout is bound to be fairly
+> easily discoverable.
+>=20
+> So the whole randomization only really works for private kernel
+> builds, and it adds this kind of pain where "optimizing" the structure
+> layout is kind of pointless depending on various options.
+>=20
+> I certainly *hope* no distro enables that pointless thing, but it's a wor=
+ry.
+>=20
 
-I'm sure others have mentioned this, but 'struct inode' is marked with
-__randomize_layout, so the actual layout may end up being very
-different.
+I've never enabled struct randomization and don't know anyone who does.
+I figure if you turn that on, you get to keep all of the pieces when you
+start seeing weird performance problems.
 
-I'm personally not convinced the whole structure randomization is
-worth it - it's easy enough to figure out for any distro kernel since
-the seed has to be the same across machines for modules to work, so
-even if the seed isn't "public", any layout is bound to be fairly
-easily discoverable.
+I think that we have to optimize for that being disabled. Even without
+that though, turning on and off options can change the layout...and then
+there are different arches, etc.
 
-So the whole randomization only really works for private kernel
-builds, and it adds this kind of pain where "optimizing" the structure
-layout is kind of pointless depending on various options.
-
-I certainly *hope* no distro enables that pointless thing, but it's a worry.
-
-               Linus
+I'm using a config derived from the Fedora x86_64 kernel images and hope
+that represents a reasonably common configuration. The only conditional
+members before the timestamps are based on CONFIG_FS_POSIX_ACL and
+CONFIG_SECURITY, which are almost always turned on with most distros.
+--=20
+Jeff Layton <jlayton@kernel.org>
