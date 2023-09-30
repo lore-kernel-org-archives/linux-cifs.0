@@ -2,86 +2,63 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4091EE77363
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 Sep 2023 15:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F624E7737A
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Sep 2023 17:02:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234379AbjI3Pdu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 30 Sep 2023 11:33:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44408 "EHLO
+        id S234605AbjI3RCS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 30 Sep 2023 13:02:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234250AbjI3Pdt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Sep 2023 11:33:49 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00D7E1;
-        Sat, 30 Sep 2023 08:33:47 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-5043a01ee20so21140191e87.0;
-        Sat, 30 Sep 2023 08:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696088026; x=1696692826; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rz6qqauUwryTzT5iS+LhmUaiTkmOb6WCflVSmhCu3Fs=;
-        b=Hk0FbNTiR7Ouk43OfUTcwezyIcoEIfs1HrqZ8BuqYnWccqOQxd62eHsoS3eGvDVOMB
-         C3gM4aUDQOQG9D2FrgGnU3uhcoxQP5IwLZhabLDEp9Scpo9UPq9NZuEeEZ5M8tCNEazM
-         22o3mkNQ0fjNrG7dw/oKraCXye9IgkVbFF8b/pkzaYE9jhr4Jo8z4Wz3kQWj+MW8Sqvh
-         MrLBLlwo1ABMjXKesW7qK+1DLpAKu0QFsWZg1uSiJ6z+Q8vU0A2qKmo75H2a3mHzYZaj
-         81nGp8uKA4MZ9ZqNHcpV5aO1+7DGQW/yGMDlK0hukHTfc6KP2cUHW3uAYeB+NEBlQiei
-         u4lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696088026; x=1696692826;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rz6qqauUwryTzT5iS+LhmUaiTkmOb6WCflVSmhCu3Fs=;
-        b=VDqhiDK8SNe5Ysf9c2xPq4OVgtRQ3SnDeoo2BHDNO48ENPpYmWAnugWQu/7LGvQdPg
-         LzbFOBESwNRWmeIt3G6iE0VaBcP1l6MBvQJqLrt6/1ckD7MdQunpl1IzpNzN1oAX3elI
-         vYoxiz2dIIu2dvIzu+c+1BT1jv3itwdmrzpI9pVNETfU9CLPv2WSgeybx611wUgDNkUB
-         omdoiLrqgn941ubXTJQYkfzv82Noypah900y0SFZmSuE+3DMkiMk+umfC7538IgBdox8
-         U5OG8wmid8DcC6viw92npkSRAdYT/62zUn8XYKFXUDCxbPa8huOSpGxDmEHeS2S8NLOG
-         kaEw==
-X-Gm-Message-State: AOJu0Yw0C0lFuOUZloBvwMP/Gi58eHEhakfmfDinezn09oDHYTZnAbOM
-        TnlxoCajCBfsPhT1PsfRxjqW0d465aeYoVdkm+5I7EMTcbM=
-X-Google-Smtp-Source: AGHT+IFGtxrVq+ORNRlRk7ratzg+C3ejYyz/e/XjKHBazPHWqUu8d6LTu0OErQV3M8ExkaRQMnYIFG83pc/py9M6BGk=
-X-Received: by 2002:a05:6512:2507:b0:500:aed0:cb1b with SMTP id
- be7-20020a056512250700b00500aed0cb1bmr5688190lfb.24.1696088025715; Sat, 30
- Sep 2023 08:33:45 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 30 Sep 2023 10:33:34 -0500
-Message-ID: <CAH2r5mv+=bHF+Q1fge0yU21nBkrP+4T089nuS_PE+cJZAXoE9g@mail.gmail.com>
-Subject: [GIT PULL] SMB3 client fix
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        with ESMTP id S234582AbjI3RCS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Sep 2023 13:02:18 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21686DD;
+        Sat, 30 Sep 2023 10:02:16 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BDC19C433C7;
+        Sat, 30 Sep 2023 17:02:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696093335;
+        bh=3S6mq/Lq6gQreE/goEEQIkt0RB/YHVxq55dC7jm4yEc=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=W96v4R6slLMXtffdwFO4wgtBXVbyKBC1EHKlXsVKRRRyJmtdSx41NJa+sJ7iS9VsS
+         97NOpKThH210s9dmVGb1kq/ZDMtikrMsv8V5pfVYG01DZgjNp1sHDHC1HVXIecmbvo
+         MyMKRss6nncVhHSwTVIuqOF6z5Bieq9PbxQfYjKP8Kn3nglrS/mUTMrFMoOkNzL0BJ
+         hQteM4czkZmx+4o2xOG5wsVkMPnZzcnlAbdaXHtIKbCy3S34Rz3jNOXXnUCF62KH+W
+         dufTBBCY9PDpNHFkcZPzV/VbjLuFpD263URVge9v+v2OcVBctEpOw4RauIHHEUxYcS
+         HH9z8w8aNVtvg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AD1D2C43170;
+        Sat, 30 Sep 2023 17:02:15 +0000 (UTC)
+Subject: Re: [GIT PULL] SMB3 client fix
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mv+=bHF+Q1fge0yU21nBkrP+4T089nuS_PE+cJZAXoE9g@mail.gmail.com>
+References: <CAH2r5mv+=bHF+Q1fge0yU21nBkrP+4T089nuS_PE+cJZAXoE9g@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mv+=bHF+Q1fge0yU21nBkrP+4T089nuS_PE+cJZAXoE9g@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc3-smb3-client-fix
+X-PR-Tracked-Commit-Id: e6e43b8aa7cd3c3af686caf0c2e11819a886d705
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ba77f7a63f4e4d4ffa5ad8c6665a104822992538
+Message-Id: <169609333570.18163.5572406384609136155.pr-tracker-bot@kernel.org>
+Date:   Sat, 30 Sep 2023 17:02:15 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-6465e260f48790807eef06b583b38ca9789b6072:
+The pull request you sent on Sat, 30 Sep 2023 10:33:34 -0500:
 
-  Linux 6.6-rc3 (2023-09-24 14:31:13 -0700)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc3-smb3-client-fix
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ba77f7a63f4e4d4ffa5ad8c6665a104822992538
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc3-smb3-client-fix
+Thank you!
 
-for you to fetch changes up to e6e43b8aa7cd3c3af686caf0c2e11819a886d705:
-
-  fs/smb/client: Reset password pointer to NULL (2023-09-28 14:49:51 -0500)
-
-----------------------------------------------------------------
-small smb3 client fix for password freeing potential oops (also for stable)
-
-----------------------------------------------------------------
-Quang Le (1):
-      fs/smb/client: Reset password pointer to NULL
-
- fs/smb/client/fs_context.c | 1 +
- 1 file changed, 1 insertion(+)
-
-
---
-Thanks,
-
-Steve
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
