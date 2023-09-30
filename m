@@ -2,235 +2,86 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4502FE77376
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 Sep 2023 14:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4091EE77363
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Sep 2023 15:33:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234325AbjI3Ou7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 30 Sep 2023 10:50:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48792 "EHLO
+        id S234379AbjI3Pdu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 30 Sep 2023 11:33:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234317AbjI3Ou6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Sep 2023 10:50:58 -0400
+        with ESMTP id S234250AbjI3Pdt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Sep 2023 11:33:49 -0400
 Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB1CB7;
-        Sat, 30 Sep 2023 07:50:55 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-5046bf37daeso14337382e87.1;
-        Sat, 30 Sep 2023 07:50:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00D7E1;
+        Sat, 30 Sep 2023 08:33:47 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-5043a01ee20so21140191e87.0;
+        Sat, 30 Sep 2023 08:33:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696085453; x=1696690253; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=laSU2ptF5dJtGJTOfsu2vTDoKsI4bo31YwsLIpMZHsY=;
-        b=MwDUKEd6QG0EtvDSCKf1uxGsuk6yCPhM15PYIYhqDJOgasuaT7+4Oh6GiJZ/vmFugy
-         lmSCSLc0F+hG3ukOAM3WdNdBnEAtspfwfQIzIK1Wl+hsYj7CnlRK1SN0CwP2toV4bow4
-         LCG2gYB2ozawxJ9b/KfUJbxAn6Xa7t4YEVAl9uocXX1Jw3qs6c/EXfaIr8Rz78OCo8KR
-         46YxdeGs8zmcFe+Db4BddvMZE57ZBrJ3u+0YeAZwI0lUMX0nfUrsuM9wr1T+Cx+4tFCh
-         43LmQPeSUyLxSTkiFSJ67LGdePIyZblA6OKDAQ/vyk5/2yD5+W+J95PEpgI6GVNdDKdn
-         9Sww==
+        d=gmail.com; s=20230601; t=1696088026; x=1696692826; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rz6qqauUwryTzT5iS+LhmUaiTkmOb6WCflVSmhCu3Fs=;
+        b=Hk0FbNTiR7Ouk43OfUTcwezyIcoEIfs1HrqZ8BuqYnWccqOQxd62eHsoS3eGvDVOMB
+         C3gM4aUDQOQG9D2FrgGnU3uhcoxQP5IwLZhabLDEp9Scpo9UPq9NZuEeEZ5M8tCNEazM
+         22o3mkNQ0fjNrG7dw/oKraCXye9IgkVbFF8b/pkzaYE9jhr4Jo8z4Wz3kQWj+MW8Sqvh
+         MrLBLlwo1ABMjXKesW7qK+1DLpAKu0QFsWZg1uSiJ6z+Q8vU0A2qKmo75H2a3mHzYZaj
+         81nGp8uKA4MZ9ZqNHcpV5aO1+7DGQW/yGMDlK0hukHTfc6KP2cUHW3uAYeB+NEBlQiei
+         u4lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696085453; x=1696690253;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=laSU2ptF5dJtGJTOfsu2vTDoKsI4bo31YwsLIpMZHsY=;
-        b=T8inobxiaergECByFFZ1CXDbC3XpIp10sjfxquseZvUOFeu2160pvxp0AzdP6cwpsW
-         2kGV7KJk9GIz1Oj9AnixG0avheyT4r8wY1P+7mDouL4LbpFsN872mecuBdlfe7NvnDab
-         GVoo3WnsccIQpZ/XcHAdxWvc0C/REEi9X+IEwN2c1ii0X+WC4DGXGa6GwNPTKxqdIBet
-         A334oKWX3Ex4J8ygtgZKUbCrnpRs8SMDnD0/WXU+7QCJl4wyW29GabzCdhVuOYa/0CGr
-         fQvavOmh3je7pojydXHqJ+BKy6MuKRDfSGS4f/Azl+4tfeMHRvqFQCuuvAwXMD6ztg51
-         hRKA==
-X-Gm-Message-State: AOJu0YwxCCE2ZdXfvn+fN9bDB86YP0y09EvvFI143pYlVp4qXIMaSumB
-        jxSh19bFZGCMwTmkGL2yJGIgODIRi2Yhl2GhGJQ=
-X-Google-Smtp-Source: AGHT+IFKxuEfsWI2Hoye015VefDxXDDWWovJHhYR0GsRnul5m9+uvo7GWv6zNWozBrWHqGB+PwbJIGFbA8W5CapoIHU=
-X-Received: by 2002:a05:6512:124a:b0:503:5cd:998b with SMTP id
- fb10-20020a056512124a00b0050305cd998bmr7557694lfb.28.1696085453195; Sat, 30
- Sep 2023 07:50:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696088026; x=1696692826;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rz6qqauUwryTzT5iS+LhmUaiTkmOb6WCflVSmhCu3Fs=;
+        b=VDqhiDK8SNe5Ysf9c2xPq4OVgtRQ3SnDeoo2BHDNO48ENPpYmWAnugWQu/7LGvQdPg
+         LzbFOBESwNRWmeIt3G6iE0VaBcP1l6MBvQJqLrt6/1ckD7MdQunpl1IzpNzN1oAX3elI
+         vYoxiz2dIIu2dvIzu+c+1BT1jv3itwdmrzpI9pVNETfU9CLPv2WSgeybx611wUgDNkUB
+         omdoiLrqgn941ubXTJQYkfzv82Noypah900y0SFZmSuE+3DMkiMk+umfC7538IgBdox8
+         U5OG8wmid8DcC6viw92npkSRAdYT/62zUn8XYKFXUDCxbPa8huOSpGxDmEHeS2S8NLOG
+         kaEw==
+X-Gm-Message-State: AOJu0Yw0C0lFuOUZloBvwMP/Gi58eHEhakfmfDinezn09oDHYTZnAbOM
+        TnlxoCajCBfsPhT1PsfRxjqW0d465aeYoVdkm+5I7EMTcbM=
+X-Google-Smtp-Source: AGHT+IFGtxrVq+ORNRlRk7ratzg+C3ejYyz/e/XjKHBazPHWqUu8d6LTu0OErQV3M8ExkaRQMnYIFG83pc/py9M6BGk=
+X-Received: by 2002:a05:6512:2507:b0:500:aed0:cb1b with SMTP id
+ be7-20020a056512250700b00500aed0cb1bmr5688190lfb.24.1696088025715; Sat, 30
+ Sep 2023 08:33:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230928110554.34758-1-jlayton@kernel.org> <20230928110554.34758-2-jlayton@kernel.org>
- <6020d6e7-b187-4abb-bf38-dc09d8bd0f6d@app.fastmail.com> <af047e4a1c6947c59d4a13d4ae221c784a5386b4.camel@kernel.org>
- <20230928171943.GK11439@frogsfrogsfrogs> <6a6f37d16b55a3003af3f3dbb7778a367f68cd8d.camel@kernel.org>
- <636661.1695969129@warthog.procyon.org.uk>
-In-Reply-To: <636661.1695969129@warthog.procyon.org.uk>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 30 Sep 2023 09:50:41 -0500
-Message-ID: <CAH2r5ms14hPaz=Ex2a=Dj0Hz3XxYLRKFj_rHHekznTbNJ_wABQ@mail.gmail.com>
-Subject: Re: [PATCH 86/87] fs: switch timespec64 fields in inode to discrete integers
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jeff Layton <jlayton@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Anders Larsen <al@alarsen.net>,
-        Carlos Llamas <cmllamas@google.com>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Mattia Dongili <malattia@linux.it>,
-        Hugh Dickins <hughd@google.com>,
-        John Johansen <john.johansen@canonical.com>,
-        Yonghong Song <yonghong.song@linux.dev>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Paulo Alcantara <pc@manguebit.com>, linux-xfs@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        James Morris <jmorris@namei.org>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        devel@lists.orangefs.org, Shyam Prasad N <sprasad@microsoft.com>,
-        linux-um@lists.infradead.org, Nicholas Piggin <npiggin@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Stephen Smalley <stephen.smalley.work@gmail.com>,
-        linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Jiri Olsa <jolsa@kernel.org>, Jan Kara <jack@suse.com>,
-        Tejun Heo <tj@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-trace-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Dave Kleikamp <shaggy@kernel.org>, linux-mm@kvack.org,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Stanislav Fomichev <sdf@google.com>,
-        linux-s390@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        Paul Moore <paul@paul-moore.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Luis Chamberlain <mcgrof@kernel.org>, codalist@coda.cs.cmu.edu,
-        Iurii Zaikin <yzaikin@google.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Todd Kjos <tkjos@android.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, selinux@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, reiserfs-devel@vger.kernel.org,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Yue Hu <huyue2@coolpad.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Martijn Coenen <maco@android.com>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Hao Luo <haoluo@google.com>, Tony Luck <tony.luck@intel.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Nicolas Pitre <nico@fluxnic.net>,
-        linux-ntfs-dev@lists.sourceforge.net,
-        Muchun Song <muchun.song@linux.dev>,
-        linux-f2fs-devel@lists.sourceforge.net,
-        "Guilherme G. Piccoli" <gpiccoli@igalia.com>, gfs2@lists.linux.dev,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Brad Warrum <bwarrum@linux.ibm.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        linux-efi@vger.kernel.org,
-        Martin Brandenburg <martin@omnibond.com>,
-        ocfs2-devel@lists.linux.dev, Alexei Starovoitov <ast@kernel.org>,
-        platform-driver-x86@vger.kernel.org, Chris Mason <clm@fb.com>,
-        linux-mtd@lists.infradead.org, linux-hardening@vger.kernel.org,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        linux-afs@lists.infradead.org, Ian Kent <raven@themaw.net>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        linux-rdma@vger.kernel.org, coda@cs.cmu.edu,
-        =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergmann <arnd@arndb.de>, autofs@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Mark Gross <markgross@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Eric Paris <eparis@parisplace.org>, ceph-devel@vger.kernel.org,
-        Gao Xiang <xiang@kernel.org>, Jan Harkes <jaharkes@cs.cmu.edu>,
-        linux-nfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Olga Kornievskaia <kolga@netapp.com>,
-        Song Liu <song@kernel.org>, samba-technical@lists.samba.org,
-        Steve French <sfrench@samba.org>, Jeremy Kerr <jk@ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Bob Peterson <rpeterso@redhat.com>,
-        linux-fsdevel@vger.kernel.org, bpf@vger.kernel.org,
-        ntfs3@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Chandan Babu R <chandan.babu@oracle.com>,
-        jfs-discussion@lists.sourceforge.net, Jan Kara <jack@suse.cz>,
-        Neil Brown <neilb@suse.de>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Bob Copeland <me@bobcopeland.com>,
-        KP Singh <kpsingh@kernel.org>, linux-unionfs@vger.kernel.org,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Mark Fasheh <mark@fasheh.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, linux-serial@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        Evgeniy Dushistov <dushistov@mail.ru>,
-        linux-cifs@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Chao Yu <chao@kernel.org>, apparmor@lists.ubuntu.com,
-        Josef Bacik <josef@toxicpanda.com>,
-        Tom Talpey <tom@talpey.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-        David Sterba <dsterba@suse.com>, Xiubo Li <xiubli@redhat.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Ritu Agarwal <rituagar@linux.ibm.com>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        v9fs@lists.linux.dev, David Sterba <dsterba@suse.cz>,
-        linux-security-module@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Sungjong Seo <sj1557.seo@samsung.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        linux-karma-devel@lists.sourceforge.net,
-        linux-btrfs@vger.kernel.org, Joel Becker <jlbec@evilplan.org>
+Date:   Sat, 30 Sep 2023 10:33:34 -0500
+Message-ID: <CAH2r5mv+=bHF+Q1fge0yU21nBkrP+4T089nuS_PE+cJZAXoE9g@mail.gmail.com>
+Subject: [GIT PULL] SMB3 client fix
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Sep 29, 2023 at 3:06=E2=80=AFAM David Howells via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
->
-> Jeff Layton <jlayton@kernel.org> wrote:
->
-> > Correct. We'd lose some fidelity in currently stored timestamps, but as
-> > Linus and Ted pointed out, anything below ~100ns granularity is
-> > effectively just noise, as that's the floor overhead for calling into
-> > the kernel. It's hard to argue that any application needs that sort of
-> > timestamp resolution, at least with contemporary hardware.
->
-> Albeit with the danger of making Steve French very happy;-), would it mak=
-e
-> sense to switch internally to Microsoft-style 64-bit timestamps with thei=
-r
-> 100ns granularity?
+Please pull the following changes since commit
+6465e260f48790807eef06b583b38ca9789b6072:
 
-100ns granularity does seem to make sense and IIRC was used by various
-DCE standards in the 90s and 2000s (not just used for SMB2/SMB3 protocol an=
-d
-various Windows filesystems)
+  Linux 6.6-rc3 (2023-09-24 14:31:13 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc3-smb3-client-fix
+
+for you to fetch changes up to e6e43b8aa7cd3c3af686caf0c2e11819a886d705:
+
+  fs/smb/client: Reset password pointer to NULL (2023-09-28 14:49:51 -0500)
+
+----------------------------------------------------------------
+small smb3 client fix for password freeing potential oops (also for stable)
+
+----------------------------------------------------------------
+Quang Le (1):
+      fs/smb/client: Reset password pointer to NULL
+
+ fs/smb/client/fs_context.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 
---=20
+--
 Thanks,
 
 Steve
