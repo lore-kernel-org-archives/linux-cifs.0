@@ -2,86 +2,105 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 690A9E7849A
-	for <linux-cifs@archiver.kernel.org>; Mon,  2 Oct 2023 05:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4367DE8FDC3
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 Oct 2023 01:13:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229630AbjJBFc3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 2 Oct 2023 01:32:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41804 "EHLO
+        id S239246AbjJDBNQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Oct 2023 21:13:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjJBFc2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 2 Oct 2023 01:32:28 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01150C6;
-        Sun,  1 Oct 2023 22:32:23 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-27763c2c22eso8293917a91.3;
-        Sun, 01 Oct 2023 22:32:23 -0700 (PDT)
+        with ESMTP id S232316AbjJDBNQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 Oct 2023 21:13:16 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8FFB0
+        for <linux-cifs@vger.kernel.org>; Tue,  3 Oct 2023 18:13:13 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d81d85aae7cso376967276.0
+        for <linux-cifs@vger.kernel.org>; Tue, 03 Oct 2023 18:13:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696224743; x=1696829543; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jj1R+iIJv81f1aovwEhID5L6pS+zmKgxzLxTyl4tnQI=;
-        b=Xy/XXVhnPnL86oPlJXBZN/IqPour9820qmwsZDWjGnCrDvTv47ffYbdYGseRqGUTGr
-         2QqeVNvZvUc5C0O8RZz9p/qYwtblsPEthD7LmNAeve4Z9k3498rkbZLfWw6cP5Gwxxqz
-         0he/9kumYcK4ndAOUx0sGaTLGKGNE/t0fO3rTZRiCJSnhNft8JfLXQ1YWu+PKH8GlbKb
-         PpLboRbgdoKQWofEjSnCRmBqt8Sf0i7EbHKFAPznCsh/npaoG9VWDTIZvKTfqqcEALuK
-         Ly3oJxBa8OX9RtDKXt8CM5VEM3ihuDNo8sIXpqoNHE4sG/R05a9wxC7P8imUTSBEgQR5
-         WnSA==
+        d=google.com; s=20230601; t=1696381992; x=1696986792; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Vov+OjwAGZgpW+sJbWfht9dksDbSHqK3KW37zgfpqdI=;
+        b=WWnAHNfWc61NZZUuM2qMIj1LOV9En41kETs79JalCifw5ES4mSlOFtdfousDR/R50l
+         rdPzf2ug7a4dTy6xdr+V0TjBM3+XCC9fcRobgX7C0R0VhJQryqrk+LVXNhT5Titx5aMm
+         9YBrYBEj8sEmOs+LE8yyhx/oWz5+D3wTXA4C+F4Z/5jn6rvFR4khCdsJekmsPtnXgNo1
+         uVnzCYaV0m7XbpsXEeLCZHkNwUfRL6/D8d6QOrFNlda03Uq59bBF2/3h/HH9lNrcHRFS
+         wAGKgGpsiUHZBTUUnfzmU0i5z0e8X5kxQScbItQHjdHDEx+vOQKXLN16XJn3z9l/QiW2
+         MU/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696224743; x=1696829543;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jj1R+iIJv81f1aovwEhID5L6pS+zmKgxzLxTyl4tnQI=;
-        b=DeNR5rS6ehsaAWUrtTKHLJ6MIW7/MLAATWXxywwDmlK8pxVbavU5dnnj9SGHnBfd7E
-         keS/lS8ZypR4R9H6bz6ET+MB1xapbwJemCvKoYJw/QrxcmyiAlhdGkzC0FurCsvw4QZi
-         /Ung2A4hCmp8euHM1Ke5QnC2m6+8okAXRGs556uKC7xr5TWn4gkk18CHtQq5DlzpWua/
-         SpT2mm2Sx3EtGzy3dh6zOFIJWNFzGy+lla8B0eKIb6o+fc16Rvl4b/9DER5fsogbvqOp
-         NEUMkWrzB28Ifwh3o2Lsaq1pDoMrd7Cv7/dAf06iVv90D/8ykz7OV1qgErmJwu+NW1rH
-         Ji8A==
-X-Gm-Message-State: AOJu0YyYydNQBj90Cg9U/SrSlhOWokcjtUyIR0dfh/unVdFotczMvvZP
-        eZaUp3VEWU00pqlZZzhyHAI=
-X-Google-Smtp-Source: AGHT+IFFu5osZJ6tV/j8G5SqTnbmnsImfndlWC/16L6zimapvYYUy53GAvDscfbTywFTACPcEXpQcg==
-X-Received: by 2002:a17:90a:c214:b0:279:cea:cfa9 with SMTP id e20-20020a17090ac21400b002790ceacfa9mr8303320pjt.21.1696224743268;
-        Sun, 01 Oct 2023 22:32:23 -0700 (PDT)
-Received: from ubuntu-ThinkBook-14-G4-ARA.. ([2402:7500:95b:3495:ded6:1d:ca69:68ea])
-        by smtp.gmail.com with ESMTPSA id c4-20020a170902c1c400b001b850c9d7b3sm920565plc.249.2023.10.01.22.32.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Oct 2023 22:32:22 -0700 (PDT)
-From:   Cheng-Han Wu <hank20010209@gmail.com>
-To:     linkinjeon@kernel.org
-Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hank20010209@gmail.com
-Subject: [PATCH] ksmbd: Remove unused field in ksmbd_user struct
-Date:   Mon,  2 Oct 2023 13:32:03 +0800
-Message-Id: <20231002053203.17711-1-hank20010209@gmail.com>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        d=1e100.net; s=20230601; t=1696381992; x=1696986792;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vov+OjwAGZgpW+sJbWfht9dksDbSHqK3KW37zgfpqdI=;
+        b=Vt6f2CFbA8rvMFnw4DeNaEEZlic5ek8yoeC3RHHmPwT7cDNs9DhwWlVsdDgwrfHrND
+         sxom5OOi30PTJiXIMkiuPn3Fu+6Fse27Zg5uOZMFyRaBw949Ne9dF/7Znv0l5ZPZgkpp
+         /nGXxXUGxq6GiZcLDguU3fXs1NUSW6yJ9Xz7aOZztt7/HZcPZYgAo1T40vm5K9NmcJnw
+         OiUBO+HbPcN7MatQvjjHM5ssq8DE3TdU4zpN8dhs1wQBVdhPcIDMrkDfR3GTJ5YEzHeC
+         7L4qXyTp6vFWWu+KCbFGdfYUDfDGhyoIhDu07lFGDMrA3IT84/YB39GoSznKWzi83ZwL
+         WWKQ==
+X-Gm-Message-State: AOJu0YyZfk1yES7CAEIm9JOedE1sbYc6lTDQoF4dMHEkqfVUk6mukTPe
+        KTMv2Dz52NmY5p/UE9z4RJA2ifSJmw==
+X-Google-Smtp-Source: AGHT+IEXj6lXfUBrlzRw212Zm1JTFqKAIg+J3EbwcNfRJyryRiFJxPoFIWxFKK7aZfNWYvwatpny5enPqg==
+X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
+ (user=jrife job=sendgmr) by 2002:a25:14c1:0:b0:d81:5c03:df99 with SMTP id
+ 184-20020a2514c1000000b00d815c03df99mr16753ybu.3.1696381992379; Tue, 03 Oct
+ 2023 18:13:12 -0700 (PDT)
+Date:   Tue,  3 Oct 2023 20:13:03 -0500
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
+Message-ID: <20231004011303.979995-1-jrife@google.com>
+Subject: [PATCH] smb: use kernel_connect() and kernel_bind()
+From:   Jordan Rife <jrife@google.com>
+To:     sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
+        sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Cc:     Jordan Rife <jrife@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-fs/smb/server/mgmt/user_config.h:21: Remove the unused field 'failed_login_count' from the ksmbd_user struct.
+Recent changes to kernel_connect() and kernel_bind() ensure that
+callers are insulated from changes to the address parameter made by BPF
+SOCK_ADDR hooks. This patch wraps direct calls to ops->connect() and
+ops->bind() with kernel_connect() and kernel_bind() to ensure that SMB
+mounts do not see their mount address overwritten in such cases.
 
-Signed-off-by: Cheng-Han Wu <hank20010209@gmail.com>
+Link: https://lore.kernel.org/netdev/9944248dba1bce861375fcce9de663934d933ba9.camel@redhat.com/
+Cc: <stable@vger.kernel.org> # 6.x.y
+Signed-off-by: Jordan Rife <jrife@google.com>
 ---
- fs/smb/server/mgmt/user_config.h | 1 -
- 1 file changed, 1 deletion(-)
+ fs/smb/client/connect.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/fs/smb/server/mgmt/user_config.h b/fs/smb/server/mgmt/user_config.h
-index 6a44109617f1..e068a19fd904 100644
---- a/fs/smb/server/mgmt/user_config.h
-+++ b/fs/smb/server/mgmt/user_config.h
-@@ -18,7 +18,6 @@ struct ksmbd_user {
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 3902e90dca6b0..ce11165446cfb 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -2895,9 +2895,9 @@ bind_socket(struct TCP_Server_Info *server)
+ 	if (server->srcaddr.ss_family != AF_UNSPEC) {
+ 		/* Bind to the specified local IP address */
+ 		struct socket *socket = server->ssocket;
+-		rc = socket->ops->bind(socket,
+-				       (struct sockaddr *) &server->srcaddr,
+-				       sizeof(server->srcaddr));
++		rc = kernel_bind(socket,
++				 (struct sockaddr *) &server->srcaddr,
++				 sizeof(server->srcaddr));
+ 		if (rc < 0) {
+ 			struct sockaddr_in *saddr4;
+ 			struct sockaddr_in6 *saddr6;
+@@ -3046,8 +3046,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ 		 socket->sk->sk_sndbuf,
+ 		 socket->sk->sk_rcvbuf, socket->sk->sk_rcvtimeo);
  
- 	size_t			passkey_sz;
- 	char			*passkey;
--	unsigned int		failed_login_count;
- };
- 
- static inline bool user_guest(struct ksmbd_user *user)
+-	rc = socket->ops->connect(socket, saddr, slen,
+-				  server->noblockcnt ? O_NONBLOCK : 0);
++	rc = kernel_connect(socket, saddr, slen,
++			    server->noblockcnt ? O_NONBLOCK : 0);
+ 	/*
+ 	 * When mounting SMB root file systems, we do not want to block in
+ 	 * connect. Otherwise bail out and then let cifs_reconnect() perform
 -- 
-2.34.1
+2.42.0.582.g8ccd20d70d-goog
 
