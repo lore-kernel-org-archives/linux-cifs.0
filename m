@@ -2,70 +2,47 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84E4E772A2
-	for <linux-cifs@archiver.kernel.org>; Thu,  5 Oct 2023 16:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F81E772A2
+	for <linux-cifs@archiver.kernel.org>; Thu,  5 Oct 2023 16:07:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240011AbjJEQFP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 Oct 2023 12:05:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57574 "EHLO
+        id S229811AbjJEQHh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 5 Oct 2023 12:07:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237549AbjJEQEF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Oct 2023 12:04:05 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 130881F75B;
-        Thu,  5 Oct 2023 02:59:50 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-5041335fb9cso995857e87.0;
-        Thu, 05 Oct 2023 02:59:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696499988; x=1697104788; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fHh0oBhZAG630AHNboT2hexNbuam5K6tY+jffHRgTKc=;
-        b=JPSGDjQGH2l66LDseXbmTXS/Et764PY2qiHLRq1ZNVN7LC+wLSmhkyLeh3Lwg3jDZy
-         ZVD1qbStK658dMVnSWqhUgy3jpGcXQUFIYF6tGY0e/O9uohffOuOGTkZ5MA/JCcKFbIe
-         nxCjJBBwjyx2fpBzN2tg4hC06U4sVuZul4BvgScO3Xih6uqj8P03tqBWp5bKTWTLviP7
-         FQk5tHGLDI9mnHn6pFTn92d0EOa9KU8GWULd6DyiBP9aTpcnWN/Fq/VfdoDFzXfjLvVB
-         +8WvIx5PdJQwqwAH4B6zKCEgQnJy15kL7GVhLR+a+IejpabECQrMJFKM2DSdhuirvdby
-         fkqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696499988; x=1697104788;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fHh0oBhZAG630AHNboT2hexNbuam5K6tY+jffHRgTKc=;
-        b=WX/wkPKEafeOgVy3+kc+3Te+gYmY+WmxQJ4zKlDmabF7Fj5fnRDwNU5oPa8LJ7v6cW
-         iS2eG7z495Pby5aP8a+HTHqTAMZPiw2z6tUqG972RZOzUS1XfUaAxcoEJcZCVoTAEK5j
-         RHqIMpKNEc9IqKljPo6t/A7x1Eh4as1ahQcN+BLbawCQ9MMf9+Aoqz4SLTO9HoSuAfNQ
-         AZ6yGVhej0doPCfXvjiuSauVfDQRbboW0jZ+Qu2ar9k1b661j7euGEiId9DgbU5S18Yj
-         YD5kFSHmgec3vpxtrN9OoelUz4aDaKgrlpXKFe6E5e/Srt+KoghAZfA0kkPearoM8uvC
-         IPTQ==
-X-Gm-Message-State: AOJu0Yzhxw7g5nGL6WTEEXvp1+i05Vd8WUTPInGLpNJ4M9LaWQYtq6F+
-        TWLT2CGLuXcnBcLcVXAk2ZmXWWJGlin4n0adkeI+HQXD
-X-Google-Smtp-Source: AGHT+IFPACz7sGrDxBezV8qEBr3BzG13f2a87qwimWoz1maBHX2sPJvKE9svxA7G7+G6Ym0GhIJpzXKiz5DHQo/FB0E=
-X-Received: by 2002:a05:6512:3a83:b0:505:7360:6023 with SMTP id
- q3-20020a0565123a8300b0050573606023mr5442022lfu.39.1696499987978; Thu, 05 Oct
- 2023 02:59:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com>
- <ZPfPfyIoVxw5L6El@debian.me> <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
- <CAO+kfxTvA6N=i+jGf0XbSyqf85i=q+vR6R9d_42OWfM2sWWXaA@mail.gmail.com>
- <CAH2r5mtUedfLSv81Z-Yb3_=AbD_QpT3tVbU1PRzMTituaw7bgA@mail.gmail.com>
- <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com>
- <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com>
- <CAH2r5msNf9WDHrBZSi5FhHDSewSNxMAuXTetMJDnoNh3CF_oMA@mail.gmail.com>
- <a895f860-11fa-e6d9-d042-a32bd08f9e9d@talpey.com> <CAH2r5mszCxPtdURenMVgeVDX5zc8knumH=ASXyUufPa7SxbJBw@mail.gmail.com>
- <ZRN9MtBqYnT6oX60@vaarsuvius> <85d538fec5a086acf62d5a803056586a6c00e4bd.camel@uniklinik-freiburg.de>
-In-Reply-To: <85d538fec5a086acf62d5a803056586a6c00e4bd.camel@uniklinik-freiburg.de>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 5 Oct 2023 04:59:36 -0500
-Message-ID: <CAH2r5msDEs5Wi1aGc7KSDXXJv6FT_a5XmzM9oH-AnAWg2jCvTg@mail.gmail.com>
-Subject: Re: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS share
- is mounted (cifsd-cfid-laundromat in"D" state)
-To:     "Dr. Bernd Feige" <bernd.feige@uniklinik-freiburg.de>
-Cc:     "tom@talpey.com" <tom@talpey.com>,
-        "paul@darkrain42.org" <paul@darkrain42.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        with ESMTP id S237979AbjJEQFg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Oct 2023 12:05:36 -0400
+X-Greylist: delayed 4165 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 05 Oct 2023 08:54:29 PDT
+Received: from a1712.mx.srv.dfn.de (a1712.mx.srv.dfn.de [194.95.232.209])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BECC194;
+        Thu,  5 Oct 2023 08:54:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        uniklinik-freiburg.de; h=mime-version:content-transfer-encoding
+        :content-id:content-type:content-type:content-language
+        :accept-language:in-reply-to:references:message-id:date:date
+        :subject:subject:from:from:received:received:received; s=s1; t=
+        1696499748; x=1698314149; bh=lKcngNkNaJ2ZDxjfFkR58Vb8y7czhkiNh4X
+        i9DQEKJ8=; b=RNwuOCJBvaCCe6DAQSnKXYMYYGYTK3A/UCkvo4ZdmXogen8DtQf
+        9/V57bB9rE/uT8kb+OloNheioZUQRTPUTlPM/ju/e9zFevYHfyscYNDBJuAjFYnr
+        O4lLh59Hfk330BG7hXKIUQK2/fl7eKuG2iQXHtczRqOZRoTetikbVOUk=
+Received: from ukl-fm1.ukl.uni-freiburg.de (ukl-fm-ha.ukl.uni-freiburg.de [193.196.199.18])
+        by a1712.mx.srv.dfn.de (Postfix) with ESMTPS id D112538010B;
+        Thu,  5 Oct 2023 11:55:48 +0200 (CEST)
+Received: from UKL-EX3.ad.uniklinik-freiburg.de (xxx53.ukl.uni-freiburg.de [193.196.253.53])
+        by ukl-fm1.ukl.uni-freiburg.de  with ESMTPS id 3959tfPs008803-3959tfPu008803
+        (version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=OK);
+        Thu, 5 Oct 2023 11:55:41 +0200
+Received: from UKL-EX4.ad.uniklinik-freiburg.de (193.196.253.54) by
+ UKL-EX3.ad.uniklinik-freiburg.de (193.196.253.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 5 Oct 2023 11:55:41 +0200
+Received: from UKL-EX4.ad.uniklinik-freiburg.de ([fe80::6c6e:c675:beef:7071])
+ by UKL-EX4.ad.uniklinik-freiburg.de ([fe80::6c6e:c675:beef:7071%5]) with mapi
+ id 15.01.2507.032; Thu, 5 Oct 2023 11:55:41 +0200
+From:   "Dr. Bernd Feige" <bernd.feige@uniklinik-freiburg.de>
+To:     "tom@talpey.com" <tom@talpey.com>,
+        "smfrench@gmail.com" <smfrench@gmail.com>,
+        "paul@darkrain42.org" <paul@darkrain42.org>
+CC:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
         "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
         "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
         "pc@manguebit.com" <pc@manguebit.com>,
@@ -74,55 +51,62 @@ Cc:     "tom@talpey.com" <tom@talpey.com>,
         "brian.pardy@gmail.com" <brian.pardy@gmail.com>,
         "bharathsm@microsoft.com" <bharathsm@microsoft.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS share
+ is mounted (cifsd-cfid-laundromat in"D" state)
+Thread-Topic: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS
+ share is mounted (cifsd-cfid-laundromat in"D" state)
+Thread-Index: AQHZ92+sm0zmujZcU0uXcBrFhineoLA608yA
+Date:   Thu, 5 Oct 2023 09:55:41 +0000
+Message-ID: <85d538fec5a086acf62d5a803056586a6c00e4bd.camel@uniklinik-freiburg.de>
+References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com>
+         <ZPfPfyIoVxw5L6El@debian.me>
+         <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
+         <CAO+kfxTvA6N=i+jGf0XbSyqf85i=q+vR6R9d_42OWfM2sWWXaA@mail.gmail.com>
+         <CAH2r5mtUedfLSv81Z-Yb3_=AbD_QpT3tVbU1PRzMTituaw7bgA@mail.gmail.com>
+         <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com>
+         <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com>
+         <CAH2r5msNf9WDHrBZSi5FhHDSewSNxMAuXTetMJDnoNh3CF_oMA@mail.gmail.com>
+         <a895f860-11fa-e6d9-d042-a32bd08f9e9d@talpey.com>
+         <CAH2r5mszCxPtdURenMVgeVDX5zc8knumH=ASXyUufPa7SxbJBw@mail.gmail.com>
+         <ZRN9MtBqYnT6oX60@vaarsuvius>
+In-Reply-To: <ZRN9MtBqYnT6oX60@vaarsuvius>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [193.196.253.71]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <68FBD33032B9744A8A19C5C1FDCA7193@ad.uniklinik-freiburg.de>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-FEAS-Client-IP: 193.196.253.53
+X-FE-Last-Public-Client-IP: 193.196.253.53
+X-FE-Policy-ID: 1:4:1:SYSTEM
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-FYI - Paulo is looking at an additional patch to address this (and one
-small patch was also just added)
-
-On Thu, Oct 5, 2023 at 4:55=E2=80=AFAM Dr. Bernd Feige
-<bernd.feige@uniklinik-freiburg.de> wrote:
->
-> Am Dienstag, dem 26.09.2023 um 17:54 -0700 schrieb Paul Aurich:
-> > Perhaps the laundromat thread should be using msleep_interruptible()?
-> >
-> > Using an interruptible sleep appears to prevent the thread from
-> > contributing
-> > to the load average, and has the happy side-effect of removing the
-> > up-to-1s delay
-> > when tearing down the tcon (since a7c01fa93ae, kthread_stop() will
-> > return
-> > early triggered by kthread_stop).
->
-> Sorry for chiming in so late - I'm also on gentoo (kernel 6.5.5-
-> gentoo), but as a client of Windows AD.
->
-> Just want to emphasize that using uninterruptible sleep has not just
-> unhappy but devastating side-effects.
->
-> I have 8 processors and 16 cifsd-cfid-laundromat processes, so
-> /proc/loadavg reports a load average of 16 on a totally idle system.
->
-> This means that load-balancing software will never start additional
-> tasks on this system - "make -l" but also any other load-dependent
-> system. Just reducing the number of cifsd-cfid-laundromat processes
-> does not fix this - even a single one makes loadavg report a wrong
-> result for load balancing.
->
-> So, if cifsd-cfid-laundromat must really be uninterruptible, the only
-> solution would be to change the way loadavg is computed by the kernel
-> to exclude uninterruptible but sleeping processes. But must it be
-> uninterruptible?
->
-> Thanks and best regards,
-> Bernd
-
-
-
---=20
-Thanks,
-
-Steve
+QW0gRGllbnN0YWcsIGRlbSAyNi4wOS4yMDIzIHVtIDE3OjU0IC0wNzAwIHNjaHJpZWIgUGF1bCBB
+dXJpY2g6DQo+IFBlcmhhcHMgdGhlIGxhdW5kcm9tYXQgdGhyZWFkIHNob3VsZCBiZSB1c2luZyBt
+c2xlZXBfaW50ZXJydXB0aWJsZSgpPw0KPiANCj4gVXNpbmcgYW4gaW50ZXJydXB0aWJsZSBzbGVl
+cCBhcHBlYXJzIHRvIHByZXZlbnQgdGhlIHRocmVhZCBmcm9tDQo+IGNvbnRyaWJ1dGluZyANCj4g
+dG8gdGhlIGxvYWQgYXZlcmFnZSwgYW5kIGhhcyB0aGUgaGFwcHkgc2lkZS1lZmZlY3Qgb2YgcmVt
+b3ZpbmcgdGhlDQo+IHVwLXRvLTFzIGRlbGF5IA0KPiB3aGVuIHRlYXJpbmcgZG93biB0aGUgdGNv
+biAoc2luY2UgYTdjMDFmYTkzYWUsIGt0aHJlYWRfc3RvcCgpIHdpbGwNCj4gcmV0dXJuIA0KPiBl
+YXJseSB0cmlnZ2VyZWQgYnkga3RocmVhZF9zdG9wKS4NCg0KU29ycnkgZm9yIGNoaW1pbmcgaW4g
+c28gbGF0ZSAtIEknbSBhbHNvIG9uIGdlbnRvbyAoa2VybmVsIDYuNS41LQ0KZ2VudG9vKSwgYnV0
+IGFzIGEgY2xpZW50IG9mIFdpbmRvd3MgQUQuDQoNCkp1c3Qgd2FudCB0byBlbXBoYXNpemUgdGhh
+dCB1c2luZyB1bmludGVycnVwdGlibGUgc2xlZXAgaGFzIG5vdCBqdXN0DQp1bmhhcHB5IGJ1dCBk
+ZXZhc3RhdGluZyBzaWRlLWVmZmVjdHMuDQoNCkkgaGF2ZSA4IHByb2Nlc3NvcnMgYW5kIDE2IGNp
+ZnNkLWNmaWQtbGF1bmRyb21hdCBwcm9jZXNzZXMsIHNvDQovcHJvYy9sb2FkYXZnIHJlcG9ydHMg
+YSBsb2FkIGF2ZXJhZ2Ugb2YgMTYgb24gYSB0b3RhbGx5IGlkbGUgc3lzdGVtLg0KDQpUaGlzIG1l
+YW5zIHRoYXQgbG9hZC1iYWxhbmNpbmcgc29mdHdhcmUgd2lsbCBuZXZlciBzdGFydCBhZGRpdGlv
+bmFsDQp0YXNrcyBvbiB0aGlzIHN5c3RlbSAtICJtYWtlIC1sIiBidXQgYWxzbyBhbnkgb3RoZXIg
+bG9hZC1kZXBlbmRlbnQNCnN5c3RlbS4gSnVzdCByZWR1Y2luZyB0aGUgbnVtYmVyIG9mIGNpZnNk
+LWNmaWQtbGF1bmRyb21hdCBwcm9jZXNzZXMNCmRvZXMgbm90IGZpeCB0aGlzIC0gZXZlbiBhIHNp
+bmdsZSBvbmUgbWFrZXMgbG9hZGF2ZyByZXBvcnQgYSB3cm9uZw0KcmVzdWx0IGZvciBsb2FkIGJh
+bGFuY2luZy4NCg0KU28sIGlmIGNpZnNkLWNmaWQtbGF1bmRyb21hdCBtdXN0IHJlYWxseSBiZSB1
+bmludGVycnVwdGlibGUsIHRoZSBvbmx5DQpzb2x1dGlvbiB3b3VsZCBiZSB0byBjaGFuZ2UgdGhl
+IHdheSBsb2FkYXZnIGlzIGNvbXB1dGVkIGJ5IHRoZSBrZXJuZWwNCnRvIGV4Y2x1ZGUgdW5pbnRl
+cnJ1cHRpYmxlIGJ1dCBzbGVlcGluZyBwcm9jZXNzZXMuIEJ1dCBtdXN0IGl0IGJlDQp1bmludGVy
+cnVwdGlibGU/DQoNClRoYW5rcyBhbmQgYmVzdCByZWdhcmRzLA0KQmVybmQNCg==
