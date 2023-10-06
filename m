@@ -2,63 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A47F3E92FCF
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 Oct 2023 01:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4861BE92FF8
+	for <linux-cifs@archiver.kernel.org>; Fri,  6 Oct 2023 08:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbjJFBIN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 Oct 2023 21:08:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47476 "EHLO
+        id S230514AbjJFI2u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 6 Oct 2023 04:28:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbjJFBIM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Oct 2023 21:08:12 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A9CD8;
-        Thu,  5 Oct 2023 18:08:11 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40EC3C433CB;
-        Fri,  6 Oct 2023 01:08:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696554491;
-        bh=CgMSA4QfDKYOJoZMcXjw6f7wxM3hoXO3cvyl6n/VfBY=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=r9Bur9pdGOXRdqT2LPMxMJw4GiKOc1AnHibse9R4aQtmAmUDP6DiM4HuVgXv/WJzf
-         llLEastI2/PKBE/MY/ENDQMcuJCLUe9JT81/BslQEa1JdPNzmOhTewZXlIWahDRo6d
-         xONoDnkJ9naQRXaqXtdWT390gwMnP/xWE9mfl6Z9HIxoqzwxkPXqSgqhvYgB/eTW07
-         HQzW42WTue7c2iATxC73SpngGs8cxSaeBszUXKs154A5BMnlZf3sNpZfXSxU/y2Wy6
-         XKYyviX6Pr6icpj8ssHtJnG1ydUd2B/8cueAValHAJyMCXL3Ngwrf0SQ6+fqHEMy/j
-         +GdIdd2LcjJlw==
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-57bb6a2481fso847723eaf.1;
-        Thu, 05 Oct 2023 18:08:11 -0700 (PDT)
-X-Gm-Message-State: AOJu0YyLTFUJzofG70BteqjY74n+wFCrpmi2dG7f4XoTWNoW2Nvk+vX/
-        AtSNoZl5/CtsLFLd2N5eruqz6pvvXFpJVmUDJG8=
-X-Google-Smtp-Source: AGHT+IFlyLSbl3nrfTwv+jGaZu3ipdNNtmvz9xNoia5rKOvFfFq6z/0wJTHQ2k5G2rja0rE1qwPuBMrLRdPB34abHNQ=
-X-Received: by 2002:a4a:2518:0:b0:57b:734d:8993 with SMTP id
- g24-20020a4a2518000000b0057b734d8993mr6503881ooa.1.1696554490537; Thu, 05 Oct
- 2023 18:08:10 -0700 (PDT)
+        with ESMTP id S230076AbjJFI2s (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 6 Oct 2023 04:28:48 -0400
+X-Greylist: delayed 491 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 06 Oct 2023 01:28:45 PDT
+Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B9E883
+        for <linux-cifs@vger.kernel.org>; Fri,  6 Oct 2023 01:28:45 -0700 (PDT)
+Received: by mail.durme.pl (Postfix, from userid 1002)
+        id 307184FB62; Fri,  6 Oct 2023 08:17:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
+        t=1696580249; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=jeOT0JMhbLCJ9eAQADiPgS8MyhkVfAIcze6lLofI2ZZ9aG8AlmP8Okm7B+aF3mOiZ
+         y4l/BIYhC3v53N1H0dHeLyOWu+Dr5ZCvWxOpZ0+7ozTRhegpLYUuQMluqFQH2xA0ID
+         cg7obOiERxho40ZdVU364QH2KCIKEcycSslxsuNyDeD6xCuofyz+7mmjxQb41Z6Oyc
+         vDReDMQX9ORgzhCQf7g/36sHDpmci5I1G4HQ/nJAQHYdoVIpve20/44OGVEON5rTlu
+         rbAPOQwSnOBekDJnbFUN06KBh72cV48nwKYy14NXZ9X6O7IehRf3PUt/99apzd3JYp
+         FCGgIVkwex29Q==
+Received: by mail.durme.pl for <linux-cifs@vger.kernel.org>; Fri,  6 Oct 2023 08:15:51 GMT
+Message-ID: <20231006064501-0.1.4s.nlpr.0.hdeugrzpm9@durme.pl>
+Date:   Fri,  6 Oct 2023 08:15:51 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
+To:     <linux-cifs@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.durme.pl
 MIME-Version: 1.0
-Received: by 2002:ac9:7b41:0:b0:4fa:bc5a:10a5 with HTTP; Thu, 5 Oct 2023
- 18:08:09 -0700 (PDT)
-In-Reply-To: <20231002053203.17711-1-hank20010209@gmail.com>
-References: <20231002053203.17711-1-hank20010209@gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 6 Oct 2023 10:08:09 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_bgVq0r6-fC31sWeia1w27=dEdNnHPzxynnfttV-VLNQ@mail.gmail.com>
-Message-ID: <CAKYAXd_bgVq0r6-fC31sWeia1w27=dEdNnHPzxynnfttV-VLNQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: Remove unused field in ksmbd_user struct
-To:     Cheng-Han Wu <hank20010209@gmail.com>
-Cc:     sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-10-02 14:32 GMT+09:00, Cheng-Han Wu <hank20010209@gmail.com>:
-> fs/smb/server/mgmt/user_config.h:21: Remove the unused field
-> 'failed_login_count' from the ksmbd_user struct.
->
-> Signed-off-by: Cheng-Han Wu <hank20010209@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Dzie=C5=84 dobry,
 
-Applied it to #ksmbd-for-next-next.
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-Thanks for your patch!
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
+
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
+
+
+Pozdrawiam
+Krystian Wieczorek
