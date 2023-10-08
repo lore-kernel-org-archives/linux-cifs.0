@@ -2,63 +2,107 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B77AEE95A6C
-	for <linux-cifs@archiver.kernel.org>; Sat,  7 Oct 2023 18:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4743E95A8F
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Oct 2023 04:27:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234202AbjJGSMi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 7 Oct 2023 14:12:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56300 "EHLO
+        id S1344270AbjJHE1f (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Oct 2023 00:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234188AbjJGSMg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 7 Oct 2023 14:12:36 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FBEABC;
-        Sat,  7 Oct 2023 11:12:35 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E0E0CC433CC;
-        Sat,  7 Oct 2023 18:12:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696702354;
-        bh=mBNt6TabayTYrRPVHjDo8tyq8+aucpDb0waD6CEkedE=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=hC9Q3MilI/2ftzhi1ThKeKbEk22D6CEePSS8XSnwOtLrKVuZNwg+CeEA/grMNl23V
-         sGOpakYJZ8rPpGErhSvlfprScOj9C3NJ/rG541iN7l2qX4WvKD9OwEmO0+1vjyiJ7H
-         3vEGBjmEWqCS9Vl6xMx+MBjmdQ966xDdvhLVed/0DVYPky2cHiqLSPgyVBooqyS1Wj
-         lj9I4fpK2UCBXY2vl66n/qLrJGXd2SpR7YcSUmAWixJvMr6RNbKia1U/2LjnC6tqmA
-         L047yetT7t2OcxL7+dmjTIZfbB6SkJD3CFK1WyQ+WIq027uBgoOKd8F1PrAcaVoQYN
-         HknZe3tRqfVwA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CFABCC41671;
-        Sat,  7 Oct 2023 18:12:34 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mv0jM=ydHxYsw8zNNAMcUAt30pdtc=s-X-nfDo2pdtZNA@mail.gmail.com>
-References: <CAH2r5mv0jM=ydHxYsw8zNNAMcUAt30pdtc=s-X-nfDo2pdtZNA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mv0jM=ydHxYsw8zNNAMcUAt30pdtc=s-X-nfDo2pdtZNA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc4-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 3b8bb3171571f92eda863e5f78b063604c61f72a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 59f3fd30af355dc893e6df9ccb43ace0b9033faa
-Message-Id: <169670235484.17695.5061762203455830393.pr-tracker-bot@kernel.org>
-Date:   Sat, 07 Oct 2023 18:12:34 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        with ESMTP id S1344326AbjJHE1e (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 8 Oct 2023 00:27:34 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 106CBB9;
+        Sat,  7 Oct 2023 21:27:31 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-5068dab8c00so1614704e87.0;
+        Sat, 07 Oct 2023 21:27:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696739249; x=1697344049; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ltx5ybDBqORsfBzKBZDc0jiKiRVubCB+DjHy81LX9gA=;
+        b=WS0EofqPsju4npx6cGoEHHntyPRdvkbE4Ehc4QT1zcy+tlN6RaDF2cShP7DZis540i
+         07xbpWN1suVS4o8xwnCQE/zJuC9fr+P0F4aD7rR8WfY9oAibDNj1neB335XCyu5KF/KL
+         xQrVnl0N3KWtpP1UXNQB3+1M34Uro4BWNYroPzVUYEx+YkJETHaB0e9nfj9TJPIfVeC3
+         BznLR4XNUfiyaZXo18iCYtxpP6BXd84qeO3kMkYB+wcByYd2QU9JpRhM1XPIv5jq0w83
+         HqP7LCnM5CXg+ij1Z6Oy1lgvp0/5zoHl2bRoujVy+HsLNZ9CFxYathC9lRxQpJ8i2Pih
+         or4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696739249; x=1697344049;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ltx5ybDBqORsfBzKBZDc0jiKiRVubCB+DjHy81LX9gA=;
+        b=JThMrQMuet2MN2ArIhXZgNWv3BSqMNKMzH7/b11+fBpZJdq46yjD3qqyN9I9VdeHI4
+         uUE3knHNPEPTGsUbrceuLx2p81k+byqLfG+NvCZCQFnnqh1Pys8jf54tC/OaKtw3VUAc
+         a06AQxkNPqNiT01FOXpj7smGXKkjmo2cZLFKkr8Ywokl03RDOaICVKAzNMtiyvHEIRlP
+         NCu+UdIMFS+++dDnn9xK+WMyHabF+WQf+9iFJG0O6MIGQoejBI7/UFDS//gYmgqFJECF
+         acbj5ktkYuyZENHkd62BwOswCcKFWdj0i6L/FwiD3dZhcAhmy/D49FpxgmzFfqky6jf/
+         zoiQ==
+X-Gm-Message-State: AOJu0Ywx+dpTisUylD7y0eJV5TceT6doZdBuxCedPxGsMYjdbpjKYTUZ
+        T2GB5//gjeXFfKhf64bPTz+M+1jPEAM06jzavbEpO5Hkz/E=
+X-Google-Smtp-Source: AGHT+IGtgm9s30ZBGEh6BH/eOLrTHjgiCvELlv9Mz9zVPgGMe4z17+O1e8Qtlq9eA/+9En3mdzrxHO2yY/GaN8GBV2M=
+X-Received: by 2002:a19:f015:0:b0:500:d970:6541 with SMTP id
+ p21-20020a19f015000000b00500d9706541mr9799292lfc.39.1696739248750; Sat, 07
+ Oct 2023 21:27:28 -0700 (PDT)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 7 Oct 2023 23:27:16 -0500
+Message-ID: <CAH2r5mvzuQBU4UKEHMKjSDQHiHsGAx_VPRuwkr2BVcmT81wuCw@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 6 Oct 2023 16:44:57 -0500:
+Please pull the following changes since commit
+8a749fd1a8720d4619c91c8b6e7528c0a355c0aa:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc4-smb3-client-fixes
+  Linux 6.6-rc4 (2023-10-01 14:15:13 -0700)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/59f3fd30af355dc893e6df9ccb43ace0b9033faa
+are available in the Git repository at:
 
-Thank you!
+  git://git.samba.org/ksmbd.git tags/6.6-rc4-ksmbd-server-fixes
+
+for you to fetch changes up to 33b235a6e6ebe0f05f3586a71e8d281d00f71e2e:
+
+  ksmbd: fix race condition between tree conn lookup and disconnect
+(2023-10-04 21:56:28 -0500)
+
+----------------------------------------------------------------
+Six SMB3 server fixes for various races found by RO0T Lab of Huawei:
+- Fix oops when race between oplock break ack and freeing file
+- Simultaneous request fixes:for parallel logoffs, and for parallel
+lock requests
+- Fixes for tree disconnect race, session expire race, and close/open race
+
+----------------------------------------------------------------
+Namjae Jeon (5):
+      ksmbd: fix race condition between session lookup and expire
+      ksmbd: fix race condition with fp
+      ksmbd: fix race condition from parallel smb2 logoff requests
+      ksmbd: fix race condition from parallel smb2 lock requests
+      ksmbd: fix race condition between tree conn lookup and disconnect
+
+luosili (1):
+      ksmbd: fix uaf in smb20_oplock_break_ack
+
+ fs/smb/server/connection.c        |  2 +
+ fs/smb/server/connection.h        |  1 +
+ fs/smb/server/mgmt/tree_connect.c | 42 +++++++++++++++--
+ fs/smb/server/mgmt/tree_connect.h | 11 ++++-
+ fs/smb/server/mgmt/user_session.c | 11 +++--
+ fs/smb/server/mgmt/user_session.h |  1 +
+ fs/smb/server/server.c            |  2 +
+ fs/smb/server/smb2pdu.c           | 94 +++++++++++++++++++++++++--------------
+ fs/smb/server/vfs_cache.c         | 23 ++++++++--
+ fs/smb/server/vfs_cache.h         |  9 ++++
+ 10 files changed, 151 insertions(+), 45 deletions(-)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+
+Steve
