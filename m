@@ -2,49 +2,50 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 218FEE95A91
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Oct 2023 15:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96181E95A91
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Oct 2023 15:12:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376414AbjJIPMX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 9 Oct 2023 11:12:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51626 "EHLO
+        id S1376412AbjJIPM3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 9 Oct 2023 11:12:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376407AbjJIPMX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Oct 2023 11:12:23 -0400
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98BA9D8
-        for <linux-cifs@vger.kernel.org>; Mon,  9 Oct 2023 08:12:18 -0700 (PDT)
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-54290603887so3007737a12.1
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Oct 2023 08:12:18 -0700 (PDT)
+        with ESMTP id S1376438AbjJIPM2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Oct 2023 11:12:28 -0400
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18F9DA
+        for <linux-cifs@vger.kernel.org>; Mon,  9 Oct 2023 08:12:22 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-58d261807e8so969619a12.2
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Oct 2023 08:12:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696864338; x=1697469138;
+        d=1e100.net; s=20230601; t=1696864342; x=1697469142;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qHqAJN3/xKNjyKFwf0jueH44mOYUiTA0mEdNWN0qnuk=;
-        b=ng0+3aqFzgdyRQxNrbjv1R/Lz1PZFPZrmyCwJxjE2GhlJntj2khRUtwyub8Qm4X7oN
-         TAjHMy7wEzcTcA8zaPa6DmQ+YLn1HvkXxsPFQ8rSan18QynxehOkqk5Zz7LHmPk4tFZA
-         4mCbxRAkO7d62qySGR/m1Ipf1uYATO0pVGHhtpnZTnNB+ArnWLbekaSsqTIgI6Iz9YBB
-         C4/7QJZLaTGVA2Br4+Ttn48BX+Miim+6V/Uynra65whVxL7gciI3XlW3gTQ2cXxZjiLZ
-         gCF2k4wrxrtwq3pO9yY3l2dtupjTSArTMNHRWjytE5fUuSaYN2UTMEozxs/RUUt5M6U5
-         V7HA==
-X-Gm-Message-State: AOJu0YzITv6pK8dvMsoLetMwRBStPjehWUFKZyMdNpz9t0mnG6i8F/dV
-        Us4pqmdGoq2kM5oiLN8ObYALFIMiLFA=
-X-Google-Smtp-Source: AGHT+IFIPZQXiBKM9BOyj3IH0w7tNnIM2LT0A63jiTgozsiyqDWqIvGgnAo7kHHF5nlJzHAq+ZBG7A==
-X-Received: by 2002:a17:90b:1b50:b0:274:8041:94c with SMTP id nv16-20020a17090b1b5000b002748041094cmr12406871pjb.13.1696864337597;
-        Mon, 09 Oct 2023 08:12:17 -0700 (PDT)
+        bh=7wKQEsfuaUwEjy905nKuj/4SxmvwufkLX4YvzHqkqLQ=;
+        b=XJNcF/w0MagdfovZiRx8AmAdIxH25Lyy4jdQfKS5ifQX2lgTGpC+69xCLIJj7zDjcA
+         pV01BqdfhHpS1QgS3TdzMQilUhlfEUiJflpD+hUhb26B5Cno1lrYaOTXspdofcL3etrU
+         5A0qy82L8CWJfezyT+J5QKevWlaUmCPbNchCsdmSMai+OghNv4JJ7ZOhA39VG5CDbZt/
+         2+FCSMDgtpLHkzM+sHr2a+aK91wg8GUXoZeDCCL3nGj6udUt7lCfdk8bfj+aprzE1D9G
+         6LVZRGFp8xIrnMq0Hx/vBTJy52Ifn4Ue/BIjFGiecbLBng45arnTnILQk1vuupQZxBF8
+         HMhQ==
+X-Gm-Message-State: AOJu0Yxmt1lJwvjgmkCkFCywKNYEp7lh5WbDdxvtYmlAlpULWwYh8m86
+        hB4IlP/nJeUoa+rwQkF/9t6hF6HV2J8=
+X-Google-Smtp-Source: AGHT+IGTfcMhVHnQjL+HltrL+BdbcIxYm4n0uIHmbbfO+iSMVf4nkGvFTWkV3MPXk4NK/OKi7MBN7A==
+X-Received: by 2002:a17:90a:fa89:b0:273:ef1b:5a2 with SMTP id cu9-20020a17090afa8900b00273ef1b05a2mr12640520pjb.47.1696864341739;
+        Mon, 09 Oct 2023 08:12:21 -0700 (PDT)
 Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id mp3-20020a17090b190300b00267d9f4d340sm10529284pjb.44.2023.10.09.08.12.14
+        by smtp.gmail.com with ESMTPSA id mp3-20020a17090b190300b00267d9f4d340sm10529284pjb.44.2023.10.09.08.12.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 08:12:16 -0700 (PDT)
+        Mon, 09 Oct 2023 08:12:21 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
         hyc.lee@gmail.com, atteh.mailbox@gmail.com,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: fix wrong error response status by using set_smb2_rsp_status()
-Date:   Tue, 10 Oct 2023 00:11:52 +0900
-Message-Id: <20231009151153.7360-3-linkinjeon@kernel.org>
+        Namjae Jeon <linkinjeon@kernel.org>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH] ksmbd: fix kernel-doc comment of ksmbd_vfs_setxattr()
+Date:   Tue, 10 Oct 2023 00:11:53 +0900
+Message-Id: <20231009151153.7360-4-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231009151153.7360-1-linkinjeon@kernel.org>
 References: <20231009151153.7360-1-linkinjeon@kernel.org>
@@ -54,36 +55,31 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-set_smb2_rsp_status() after __process_request() sets the wrong error
-status. This patch resets all iov vectors and sets the error status
-on clean one.
+Fix argument list that the kdoc format and script verified in
+ksmbd_vfs_setxattr().
 
+fs/smb/server/vfs.c:929: warning: Function parameter or member 'path'
+not described in 'ksmbd_vfs_setxattr'
+
+Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ fs/smb/server/vfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 898860adf929..87c6401a6007 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -231,11 +231,12 @@ void set_smb2_rsp_status(struct ksmbd_work *work, __le32 err)
- {
- 	struct smb2_hdr *rsp_hdr;
- 
--	if (work->next_smb2_rcv_hdr_off)
--		rsp_hdr = ksmbd_resp_buf_next(work);
--	else
--		rsp_hdr = smb2_get_msg(work->response_buf);
-+	rsp_hdr = smb2_get_msg(work->response_buf);
- 	rsp_hdr->Status = err;
-+
-+	work->iov_idx = 0;
-+	work->iov_cnt = 0;
-+	work->next_smb2_rcv_hdr_off = 0;
- 	smb2_set_err_rsp(work);
- }
- 
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index b5a5e50fc9ca..2e37939a8ba0 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -919,7 +919,7 @@ ssize_t ksmbd_vfs_getxattr(struct mnt_idmap *idmap,
+ /**
+  * ksmbd_vfs_setxattr() - vfs helper for smb set extended attributes value
+  * @idmap:	idmap of the relevant mount
+- * @dentry:	dentry to set XATTR at
++ * @path:	path of dentry to set XATTR at
+  * @attr_name:	xattr name for setxattr
+  * @attr_value:	xattr value to set
+  * @attr_size:	size of xattr value
 -- 
 2.25.1
 
