@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC8BCDB47E
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C90A0CDB47E
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:14:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231682AbjJMQM2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Oct 2023 12:12:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45346 "EHLO
+        id S231435AbjJMQO5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Oct 2023 12:14:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230500AbjJMQMU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:12:20 -0400
+        with ESMTP id S231949AbjJMQOx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:14:53 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF9F25FFF
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:10:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0064A3586
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:07:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697213296;
+        s=mimecast20190719; t=1697213224;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NBQNHM0wunbYvI6HTykjMTr83II0AzFI4gI2+YuCnQ8=;
-        b=KOFoms9DDI31AZLU92lh53dXBRoe+pctE2VawPCAzKhVDouKEWzNbqsbseSlWSGYfJBXjk
-        1qs+SAJdrA4FZB+i7m9DxtELezXuPsJ2QbOTSpDpTlsOmzzTT1Max79v3LYWfw9xPIeN9H
-        rh+KMV3y5Np4V81HlGGStEZ9pAhNK6E=
+        bh=UutgwVYsQ7qyPNNqfHNDjBtmnrC2AaP6FcP8Hn/E1mo=;
+        b=SRuhUAnxDVEMItC4mxwDIZ4GEij8JFKek+uYLGZejjmC1EdOOjE5gVC9IvIUgrxtTQaE6X
+        iYei+4lrzuiEMsLZewkO37WpOQ9dhm4TwkQTOA6VxrcclFDD84FDxAOEOGeGsjWKBzs/Nz
+        MkKoLfU+TbgIQa4taaEa4wyZAoDVlls=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-441-0QYM3UNDMEG3fnODsDHD7w-1; Fri, 13 Oct 2023 12:08:01 -0400
-X-MC-Unique: 0QYM3UNDMEG3fnODsDHD7w-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-139-MuqWtbM4PUySpzr5ld3B_Q-1; Fri, 13 Oct 2023 12:06:59 -0400
+X-MC-Unique: MuqWtbM4PUySpzr5ld3B_Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BFB54801E62;
-        Fri, 13 Oct 2023 16:07:16 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2DAF6185A79B;
+        Fri, 13 Oct 2023 16:06:58 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C07F3492BD9;
-        Fri, 13 Oct 2023 16:07:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E90F200AE6F;
+        Fri, 13 Oct 2023 16:06:55 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -56,35 +56,23 @@ Cc:     David Howells <dhowells@redhat.com>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Rohith Surabattula <rohiths.msft@gmail.com>,
         linux-cachefs@redhat.com
-Subject: [RFC PATCH 48/53] cifs: Implement netfslib hooks
-Date:   Fri, 13 Oct 2023 17:04:17 +0100
-Message-ID: <20231013160423.2218093-49-dhowells@redhat.com>
+Subject: [RFC PATCH 43/53] cifs: Replace cifs_readdata with a wrapper around netfs_io_subrequest
+Date:   Fri, 13 Oct 2023 17:04:12 +0100
+Message-ID: <20231013160423.2218093-44-dhowells@redhat.com>
 In-Reply-To: <20231013160423.2218093-1-dhowells@redhat.com>
 References: <20231013160423.2218093-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Provide implementation of the netfslib hooks that will be used by netfslib
-to ask cifs to set up and perform operations.  Of particular note are
+Netfslib has a facility whereby the allocation for netfs_io_subrequest can
+be increased to so that filesystem-specific data can be tagged on the end.
 
- (*) cifs_clamp_length() - This is used to negotiate the size of the next
-     subrequest in a read request, taking into account the credit available
-     and the rsize.  The credits are attached to the subrequest.
-
- (*) cifs_req_issue_read() - This is used to issue a subrequest that has
-     been set up and clamped.
-
- (*) cifs_create_write_requests() - This is used to break the given span of
-     file positions into suboperations according to cifs's wsize and
-     available credits.  As each subop is created, it can be dispatched or
-     queued for dispatch.
-
-At this point, cifs is not wired up to actually *use* netfslib; that will
-be done in a subsequent patch.
+Prepare to use this by making a struct, cifs_io_subrequest, that wraps
+netfs_io_subrequest, and absorb struct cifs_readdata into it.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
@@ -96,499 +84,426 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/buffered_write.c    |   3 +
- fs/smb/client/Kconfig        |   1 +
- fs/smb/client/cifsglob.h     |  26 ++-
- fs/smb/client/file.c         | 373 +++++++++++++++++++++++++++++++++++
- include/linux/netfs.h        |   1 +
- include/trace/events/netfs.h |   1 +
- 6 files changed, 397 insertions(+), 8 deletions(-)
+ fs/smb/client/cifsglob.h  | 22 ++++++++++--------
+ fs/smb/client/cifsproto.h |  9 ++++++--
+ fs/smb/client/cifssmb.c   | 11 ++++-----
+ fs/smb/client/file.c      | 48 ++++++++++++++++++---------------------
+ fs/smb/client/smb2ops.c   |  2 +-
+ fs/smb/client/smb2pdu.c   | 13 ++++++-----
+ fs/smb/client/smb2proto.h |  2 +-
+ fs/smb/client/transport.c |  4 ++--
+ 8 files changed, 56 insertions(+), 55 deletions(-)
 
-diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-index 6657dbd07b9d..c2f7dc99ff92 100644
---- a/fs/netfs/buffered_write.c
-+++ b/fs/netfs/buffered_write.c
-@@ -373,6 +373,9 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
- 	} while (iov_iter_count(iter));
- 
- out:
-+	if (likely(written) && ctx->ops->post_modify)
-+		ctx->ops->post_modify(inode);
-+
- 	if (unlikely(wreq)) {
- 		ret = netfs_end_writethrough(wreq, iocb);
- 		wbc_detach_inode(&wbc);
-diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
-index 2927bd174a88..2517dc242386 100644
---- a/fs/smb/client/Kconfig
-+++ b/fs/smb/client/Kconfig
-@@ -2,6 +2,7 @@
- config CIFS
- 	tristate "SMB3 and CIFS support (advanced network filesystem)"
- 	depends on INET
-+	select NETFS_SUPPORT
- 	select NLS
- 	select NLS_UCS2_UTILS
- 	select CRYPTO
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 73367fc3a77c..a215c092725a 100644
+index 02082621d8e0..22fa98428845 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -1420,15 +1420,23 @@ struct cifs_aio_ctx {
- 	bool			direct_io;
+@@ -237,7 +237,7 @@ struct dfs_info3_param;
+ struct cifs_fattr;
+ struct smb3_fs_context;
+ struct cifs_fid;
+-struct cifs_readdata;
++struct cifs_io_subrequest;
+ struct cifs_writedata;
+ struct cifs_io_parms;
+ struct cifs_search_info;
+@@ -411,7 +411,7 @@ struct smb_version_operations {
+ 	/* send a flush request to the server */
+ 	int (*flush)(const unsigned int, struct cifs_tcon *, struct cifs_fid *);
+ 	/* async read from the server */
+-	int (*async_readv)(struct cifs_readdata *);
++	int (*async_readv)(struct cifs_io_subrequest *);
+ 	/* async write to the server */
+ 	int (*async_writev)(struct cifs_writedata *,
+ 			    void (*release)(struct kref *));
+@@ -1423,26 +1423,28 @@ struct cifs_aio_ctx {
  };
  
-+struct cifs_io_request {
-+	struct netfs_io_request		rreq;
-+	struct cifsFileInfo		*cfile;
-+};
-+
  /* asynchronous read support */
- struct cifs_io_subrequest {
--	struct netfs_io_subrequest	subreq;
--	struct cifsFileInfo		*cfile;
--	struct address_space		*mapping;
--	struct cifs_aio_ctx		*ctx;
-+	union {
-+		struct netfs_io_subrequest subreq;
-+		struct netfs_io_request *rreq;
-+		struct cifs_io_request *req;
-+	};
+-struct cifs_readdata {
+-	struct kref			refcount;
+-	struct list_head		list;
+-	struct completion		done;
++struct cifs_io_subrequest {
++	struct netfs_io_subrequest	subreq;
+ 	struct cifsFileInfo		*cfile;
+ 	struct address_space		*mapping;
+ 	struct cifs_aio_ctx		*ctx;
+-	__u64				offset;
  	ssize_t				got_bytes;
+-	unsigned int			bytes;
  	pid_t				pid;
-+	unsigned int			xid;
  	int				result;
-+	bool				have_credits;
+-	struct work_struct		work;
+-	struct iov_iter			iter;
  	struct kvec			iov[2];
  	struct TCP_Server_Info		*server;
  #ifdef CONFIG_CIFS_SMB_DIRECT
-@@ -1436,14 +1444,16 @@ struct cifs_io_subrequest {
+ 	struct smbd_mr			*mr;
  #endif
  	struct cifs_credits		credits;
- 
--	enum writeback_sync_modes	sync_mode;
--	bool				uncached;
--	struct bio_vec			*bv;
--
- 	// TODO: Remove following elements
- 	struct list_head		list;
- 	struct completion		done;
- 	struct work_struct		work;
-+	struct cifsFileInfo		*cfile;
-+	struct address_space		*mapping;
-+	struct cifs_aio_ctx		*ctx;
-+	enum writeback_sync_modes	sync_mode;
-+	bool				uncached;
-+	struct bio_vec			*bv;
++
++	// TODO: Remove following elements
++	struct list_head		list;
++	struct completion		done;
++	struct work_struct		work;
++	struct iov_iter			iter;
++	__u64				offset;
++	unsigned int			bytes;
  };
  
- /*
+ /* asynchronous write support */
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 0c37eefa18a5..7748fe148fb4 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -580,8 +580,13 @@ void __cifs_put_smb_ses(struct cifs_ses *ses);
+ extern struct cifs_ses *
+ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb3_fs_context *ctx);
+ 
+-void cifs_readdata_release(struct kref *refcount);
+-int cifs_async_readv(struct cifs_readdata *rdata);
++void cifs_readdata_release(struct cifs_io_subrequest *rdata);
++static inline void cifs_put_readdata(struct cifs_io_subrequest *rdata)
++{
++	if (refcount_dec_and_test(&rdata->subreq.ref))
++		cifs_readdata_release(rdata);
++}
++int cifs_async_readv(struct cifs_io_subrequest *rdata);
+ int cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid);
+ 
+ int cifs_async_writev(struct cifs_writedata *wdata,
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 25503f1a4fd2..76005b3d5ffe 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -24,6 +24,8 @@
+ #include <linux/swap.h>
+ #include <linux/task_io_accounting_ops.h>
+ #include <linux/uaccess.h>
++#include <linux/netfs.h>
++#include <trace/events/netfs.h>
+ #include "cifspdu.h"
+ #include "cifsfs.h"
+ #include "cifsglob.h"
+@@ -1260,12 +1262,11 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
+ static void
+ cifs_readv_callback(struct mid_q_entry *mid)
+ {
+-	struct cifs_readdata *rdata = mid->callback_data;
++	struct cifs_io_subrequest *rdata = mid->callback_data;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	struct smb_rqst rqst = { .rq_iov = rdata->iov,
+ 				 .rq_nvec = 2,
+-				 .rq_iter_size = iov_iter_count(&rdata->iter),
+ 				 .rq_iter = rdata->iter };
+ 	struct cifs_credits credits = { .value = 1, .instance = 0 };
+ 
+@@ -1310,7 +1311,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 
+ /* cifs_async_readv - send an async write, and set up mid to handle result */
+ int
+-cifs_async_readv(struct cifs_readdata *rdata)
++cifs_async_readv(struct cifs_io_subrequest *rdata)
+ {
+ 	int rc;
+ 	READ_REQ *smb = NULL;
+@@ -1362,15 +1363,11 @@ cifs_async_readv(struct cifs_readdata *rdata)
+ 	rdata->iov[1].iov_base = (char *)smb + 4;
+ 	rdata->iov[1].iov_len = get_rfc1002_length(smb);
+ 
+-	kref_get(&rdata->refcount);
+ 	rc = cifs_call_async(tcon->ses->server, &rqst, cifs_readv_receive,
+ 			     cifs_readv_callback, NULL, rdata, 0, NULL);
+ 
+ 	if (rc == 0)
+ 		cifs_stats_inc(&tcon->stats.cifs_stats.num_reads);
+-	else
+-		kref_put(&rdata->refcount, cifs_readdata_release);
+-
+ 	cifs_small_buf_release(smb);
+ 	return rc;
+ }
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index dd5e52d5e8d0..6c7b91728dd4 100644
+index 2108b3b40ce9..b4f16ef62115 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -36,6 +36,379 @@
- #include "fs_context.h"
- #include "cifs_ioctl.h"
- #include "cached_dir.h"
-+#include <trace/events/netfs.h>
-+
-+static int cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush);
-+
-+static void cifs_upload_to_server(struct netfs_io_subrequest *subreq)
-+{
-+	struct cifs_io_subrequest *wdata =
-+		container_of(subreq, struct cifs_io_subrequest, subreq);
-+	ssize_t rc;
-+
-+	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
-+
-+	if (wdata->req->cfile->invalidHandle)
-+		rc = -EAGAIN;
-+	else
-+		rc = wdata->server->ops->async_writev(wdata);
-+	if (rc < 0)
-+		add_credits_and_wake_if(wdata->server, &wdata->credits, 0);
-+}
-+
-+static void cifs_upload_to_server_worker(struct work_struct *work)
-+{
-+	struct netfs_io_subrequest *subreq =
-+		container_of(work, struct netfs_io_subrequest, work);
-+
-+	cifs_upload_to_server(subreq);
-+}
-+
-+/*
-+ * Set up write requests for a writeback slice.  We need to add a write request
-+ * for each write we want to make.
-+ */
-+static void cifs_create_write_requests(struct netfs_io_request *wreq,
-+				       loff_t start, size_t remain)
-+{
-+	struct netfs_io_subrequest *subreq;
-+	struct cifs_io_subrequest *wdata;
-+	struct cifs_io_request *req = container_of(wreq, struct cifs_io_request, rreq);
-+	struct TCP_Server_Info *server;
-+	struct cifsFileInfo *open_file = req->cfile;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(wreq->inode->i_sb);
-+	int rc = 0;
-+	size_t offset = 0;
-+	pid_t pid;
-+	unsigned int xid, max_segs = INT_MAX;
-+
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = open_file->pid;
-+	else
-+		pid = current->tgid;
-+
-+	server = cifs_pick_channel(tlink_tcon(open_file->tlink)->ses);
-+	xid = get_xid();
-+
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->smbd_conn)
-+		max_segs = server->smbd_conn->max_frmr_depth;
-+#endif
-+
-+	do {
-+		unsigned int nsegs = 0;
-+		size_t max_len, part, wsize;
-+
-+		subreq = netfs_create_write_request(wreq, NETFS_UPLOAD_TO_SERVER,
-+						    start, remain,
-+						    cifs_upload_to_server_worker);
-+		if (!subreq) {
-+			wreq->error = -ENOMEM;
-+			break;
-+		}
-+
-+		wdata = container_of(subreq, struct cifs_io_subrequest, subreq);
-+
-+	retry:
-+		if (signal_pending(current)) {
-+			wreq->error = -EINTR;
-+			break;
-+		}
-+
-+		if (open_file->invalidHandle) {
-+			rc = cifs_reopen_file(open_file, false);
-+			if (rc < 0) {
-+				if (rc == -EAGAIN)
-+					goto retry;
-+				break;
-+			}
-+		}
-+
-+		rc = server->ops->wait_mtu_credits(server, wreq->wsize, &wsize,
-+						   &wdata->credits);
-+		if (rc)
-+			break;
-+
-+		max_len = min(remain, wsize);
-+		if (!max_len) {
-+			rc = -EAGAIN;
-+			goto failed_return_credits;
-+		}
-+
-+		part = netfs_limit_iter(&wreq->io_iter, offset, max_len, max_segs);
-+		cifs_dbg(FYI, "create_write_request len=%zx/%zx nsegs=%u/%lu/%u\n",
-+			 part, max_len, nsegs, wreq->io_iter.nr_segs, max_segs);
-+		if (!part) {
-+			rc = -EIO;
-+			goto failed_return_credits;
-+		}
-+
-+		if (part < wdata->subreq.len) {
-+			wdata->subreq.len = part;
-+			iov_iter_truncate(&wdata->subreq.io_iter, part);
-+		}
-+
-+		wdata->server	= server;
-+		wdata->pid	= pid;
-+
-+		rc = adjust_credits(server, &wdata->credits, wdata->subreq.len);
-+		if (rc) {
-+			add_credits_and_wake_if(server, &wdata->credits, 0);
-+			if (rc == -EAGAIN)
-+				goto retry;
-+			goto failed;
-+		}
-+
-+		cifs_upload_to_server(subreq);
-+		//netfs_queue_write_request(subreq);
-+		start += part;
-+		offset += part;
-+		remain -= part;
-+	} while (remain > 0);
-+
-+	free_xid(xid);
-+	return;
-+
-+failed_return_credits:
-+	add_credits_and_wake_if(server, &wdata->credits, 0);
-+failed:
-+	netfs_write_subrequest_terminated(subreq, rc, false);
-+	free_xid(xid);
-+}
-+
-+/*
-+ * Split the read up according to how many credits we can get for each piece.
-+ * It's okay to sleep here if we need to wait for more credit to become
-+ * available.
-+ *
-+ * We also choose the server and allocate an operation ID to be cleaned up
-+ * later.
-+ */
-+static bool cifs_clamp_length(struct netfs_io_subrequest *subreq)
-+{
-+	struct netfs_io_request *rreq = subreq->rreq;
-+	struct TCP_Server_Info *server;
-+	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
-+	struct cifs_io_request *req = container_of(subreq->rreq, struct cifs_io_request, rreq);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
-+	size_t rsize = 0;
-+	int rc;
-+
-+	rdata->xid = get_xid();
-+
-+	server = cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
-+	rdata->server = server;
-+
-+	if (cifs_sb->ctx->rsize == 0)
-+		cifs_sb->ctx->rsize =
-+			server->ops->negotiate_rsize(tlink_tcon(req->cfile->tlink),
-+						     cifs_sb->ctx);
-+
-+
-+	rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize, &rsize,
-+					   &rdata->credits);
-+	if (rc) {
-+		subreq->error = rc;
-+		return false;
-+	}
-+
-+	rdata->have_credits = true;
-+	subreq->len = min_t(size_t, subreq->len, rsize);
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->smbd_conn)
-+		subreq->max_nr_segs = server->smbd_conn->max_frmr_depth;
-+#endif
-+	return true;
-+}
-+
-+/*
-+ * Issue a read operation on behalf of the netfs helper functions.  We're asked
-+ * to make a read of a certain size at a point in the file.  We are permitted
-+ * to only read a portion of that, but as long as we read something, the netfs
-+ * helper will call us again so that we can issue another read.
-+ */
-+static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
-+{
-+	struct netfs_io_request *rreq = subreq->rreq;
-+	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
-+	struct cifs_io_request *req = container_of(subreq->rreq, struct cifs_io_request, rreq);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
-+	pid_t pid;
-+	int rc = 0;
-+
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = req->cfile->pid;
-+	else
-+		pid = current->tgid; // Ummm...  This may be a workqueue
-+
-+	cifs_dbg(FYI, "%s: op=%08x[%x] mapping=%p len=%zu/%zu\n",
-+		 __func__, rreq->debug_id, subreq->debug_index, rreq->mapping,
-+		 subreq->transferred, subreq->len);
-+
-+	if (req->cfile->invalidHandle) {
-+		do {
-+			rc = cifs_reopen_file(req->cfile, true);
-+		} while (rc == -EAGAIN);
-+		if (rc)
-+			goto out;
-+	}
-+
-+	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
-+	rdata->pid = pid;
-+
-+	rc = adjust_credits(rdata->server, &rdata->credits, rdata->subreq.len);
-+	if (!rc) {
-+		if (rdata->req->cfile->invalidHandle)
-+			rc = -EAGAIN;
-+		else
-+			rc = rdata->server->ops->async_readv(rdata);
-+	}
-+
-+out:
-+	if (rc)
-+		netfs_subreq_terminated(subreq, rc, false);
-+}
-+
-+/*
-+ * Initialise a request.
-+ */
-+static int cifs_init_request(struct netfs_io_request *rreq, struct file *file)
-+{
-+	struct cifs_io_request *req = container_of(rreq, struct cifs_io_request, rreq);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
-+	struct cifsFileInfo *open_file = NULL;
-+	int ret;
-+
-+	rreq->rsize = cifs_sb->ctx->rsize;
-+	rreq->wsize = cifs_sb->ctx->wsize;
-+
-+	if (file) {
-+		open_file = file->private_data;
-+		rreq->netfs_priv = file->private_data;
-+		req->cfile = cifsFileInfo_get(open_file);
-+	} else if (rreq->origin == NETFS_WRITEBACK ||
-+		   rreq->origin == NETFS_LAUNDER_WRITE) {
-+		ret = cifs_get_writable_file(CIFS_I(rreq->inode), FIND_WR_ANY, &req->cfile);
-+		if (ret) {
-+			cifs_dbg(VFS, "No writable handle in writepages ret=%d\n", ret);
-+			return ret;
-+		}
-+	} else {
-+		WARN_ON_ONCE(1);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Expand the size of a readahead to the size of the rsize, if at least as
-+ * large as a page, allowing for the possibility that rsize is not pow-2
-+ * aligned.
-+ */
-+static void cifs_expand_readahead(struct netfs_io_request *rreq)
-+{
-+	unsigned int rsize = rreq->rsize;
-+	loff_t misalignment, i_size = i_size_read(rreq->inode);
-+
-+	if (rsize < PAGE_SIZE)
-+		return;
-+
-+	if (rsize < INT_MAX)
-+		rsize = roundup_pow_of_two(rsize);
-+	else
-+		rsize = ((unsigned int)INT_MAX + 1) / 2;
-+
-+	misalignment = rreq->start & (rsize - 1);
-+	if (misalignment) {
-+		rreq->start -= misalignment;
-+		rreq->len += misalignment;
-+	}
-+
-+	rreq->len = round_up(rreq->len, rsize);
-+	if (rreq->start < i_size && rreq->len > i_size - rreq->start)
-+		rreq->len = i_size - rreq->start;
-+}
-+
-+/*
-+ * Completion of a request operation.
-+ */
-+static void cifs_rreq_done(struct netfs_io_request *rreq)
-+{
-+	struct inode *inode = rreq->inode;
-+
-+	/* we do not want atime to be less than mtime, it broke some apps */
-+	inode->i_atime = current_time(inode);
-+	if (timespec64_compare(&inode->i_atime, &inode->i_mtime))
-+		inode->i_atime = inode->i_mtime;
-+	else
-+		inode->i_atime = current_time(inode);
-+}
-+
-+static void cifs_post_modify(struct inode *inode)
-+{
-+	/* Indication to update ctime and mtime as close is deferred */
-+	set_bit(CIFS_INO_MODIFIED_ATTR, &CIFS_I(inode)->flags);
-+}
-+
-+/*
-+ * Begin a cache operation.  This allows for the netfs to have caching
-+ * disabled or to use some cache other than fscache.
-+ */
-+static int cifs_begin_cache_operation(struct netfs_io_request *rreq)
-+{
-+#ifdef CONFIG_CIFS_FSCACHE
-+	struct fscache_cookie *cookie = cifs_inode_cookie(rreq->inode);
-+
-+	return fscache_begin_read_operation(&rreq->cache_resources, cookie);
-+#else
-+	return -ENOBUFS;
-+#endif
-+}
-+
-+static void cifs_free_request(struct netfs_io_request *rreq)
-+{
-+	struct cifs_io_request *req = container_of(rreq, struct cifs_io_request, rreq);
-+
-+	if (req->cfile)
-+		cifsFileInfo_put(req->cfile);
-+}
-+
-+static void cifs_free_subrequest(struct netfs_io_subrequest *subreq)
-+{
+@@ -2950,7 +2950,7 @@ static int cifs_writepages_region(struct address_space *mapping,
+ 			continue;
+ 		}
+ 
+-		folio_batch_release(&fbatch);		
++		folio_batch_release(&fbatch);
+ 		cond_resched();
+ 	} while (wbc->nr_to_write > 0);
+ 
+@@ -3784,13 +3784,13 @@ cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from)
+ 	return written;
+ }
+ 
+-static struct cifs_readdata *cifs_readdata_alloc(work_func_t complete)
++static struct cifs_io_subrequest *cifs_readdata_alloc(work_func_t complete)
+ {
+-	struct cifs_readdata *rdata;
++	struct cifs_io_subrequest *rdata;
+ 
+ 	rdata = kzalloc(sizeof(*rdata), GFP_KERNEL);
+ 	if (rdata) {
+-		kref_init(&rdata->refcount);
++		refcount_set(&rdata->subreq.ref, 1);
+ 		INIT_LIST_HEAD(&rdata->list);
+ 		init_completion(&rdata->done);
+ 		INIT_WORK(&rdata->work, complete);
+@@ -3800,11 +3800,8 @@ static struct cifs_readdata *cifs_readdata_alloc(work_func_t complete)
+ }
+ 
+ void
+-cifs_readdata_release(struct kref *refcount)
++cifs_readdata_release(struct cifs_io_subrequest *rdata)
+ {
+-	struct cifs_readdata *rdata = container_of(refcount,
+-					struct cifs_readdata, refcount);
+-
+ 	if (rdata->ctx)
+ 		kref_put(&rdata->ctx->refcount, cifs_aio_ctx_release);
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+@@ -3824,16 +3821,16 @@ static void collect_uncached_read_data(struct cifs_aio_ctx *ctx);
+ static void
+ cifs_uncached_readv_complete(struct work_struct *work)
+ {
+-	struct cifs_readdata *rdata = container_of(work,
+-						struct cifs_readdata, work);
 +	struct cifs_io_subrequest *rdata =
-+		container_of(subreq, struct cifs_io_subrequest, subreq);
-+	int rc;
-+
-+	if (rdata->subreq.source == NETFS_DOWNLOAD_FROM_SERVER) {
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+		if (rdata->mr) {
-+			smbd_deregister_mr(rdata->mr);
-+			rdata->mr = NULL;
-+		}
-+#endif
-+
-+		if (rdata->have_credits)
-+			add_credits_and_wake_if(rdata->server, &rdata->credits, 0);
-+		rc = subreq->error;
-+		free_xid(rdata->xid);
-+	}
-+}
-+
-+const struct netfs_request_ops cifs_req_ops = {
-+	.io_request_size	= sizeof(struct cifs_io_request),
-+	.io_subrequest_size	= sizeof(struct cifs_io_subrequest),
-+	.init_request		= cifs_init_request,
-+	.free_request		= cifs_free_request,
-+	.free_subrequest	= cifs_free_subrequest,
-+	.begin_cache_operation	= cifs_begin_cache_operation,
-+	.expand_readahead	= cifs_expand_readahead,
-+	.clamp_length		= cifs_clamp_length,
-+	.issue_read		= cifs_req_issue_read,
-+	.done			= cifs_rreq_done,
-+	.post_modify		= cifs_post_modify,
-+	.create_write_requests	= cifs_create_write_requests,
-+};
++		container_of(work, struct cifs_io_subrequest, work);
  
- /*
-  * Remove the dirty flags from a span of pages.
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index ff4f86ae64e4..8ba9f6d811e1 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -322,6 +322,7 @@ struct netfs_request_ops {
+ 	complete(&rdata->done);
+ 	collect_uncached_read_data(rdata->ctx);
+ 	/* the below call can possibly free the last ref to aio ctx */
+-	kref_put(&rdata->refcount, cifs_readdata_release);
++	cifs_put_readdata(rdata);
+ }
  
- 	/* Modification handling */
- 	void (*update_i_size)(struct inode *inode, loff_t i_size);
-+	void (*post_modify)(struct inode *inode);
+-static int cifs_resend_rdata(struct cifs_readdata *rdata,
++static int cifs_resend_rdata(struct cifs_io_subrequest *rdata,
+ 			struct list_head *rdata_list,
+ 			struct cifs_aio_ctx *ctx)
+ {
+@@ -3901,7 +3898,7 @@ static int cifs_resend_rdata(struct cifs_readdata *rdata,
+ 	} while (rc == -EAGAIN);
  
- 	/* Write request handling */
- 	void (*create_write_requests)(struct netfs_io_request *wreq,
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index 04cbe803c251..5c01c27fd3e7 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -106,6 +106,7 @@
- #define netfs_sreq_ref_traces					\
- 	EM(netfs_sreq_trace_get_copy_to_cache,	"GET COPY2C ")	\
- 	EM(netfs_sreq_trace_get_resubmit,	"GET RESUBMIT")	\
-+	EM(netfs_sreq_trace_get_submit,		"GET SUBMIT")	\
- 	EM(netfs_sreq_trace_get_short_read,	"GET SHORTRD")	\
- 	EM(netfs_sreq_trace_new,		"NEW        ")	\
- 	EM(netfs_sreq_trace_put_clear,		"PUT CLEAR  ")	\
+ fail:
+-	kref_put(&rdata->refcount, cifs_readdata_release);
++	cifs_put_readdata(rdata);
+ 	return rc;
+ }
+ 
+@@ -3910,7 +3907,7 @@ cifs_send_async_read(loff_t fpos, size_t len, struct cifsFileInfo *open_file,
+ 		     struct cifs_sb_info *cifs_sb, struct list_head *rdata_list,
+ 		     struct cifs_aio_ctx *ctx)
+ {
+-	struct cifs_readdata *rdata;
++	struct cifs_io_subrequest *rdata;
+ 	unsigned int rsize, nsegs, max_segs = INT_MAX;
+ 	struct cifs_credits credits_on_stack;
+ 	struct cifs_credits *credits = &credits_on_stack;
+@@ -3978,7 +3975,7 @@ cifs_send_async_read(loff_t fpos, size_t len, struct cifsFileInfo *open_file,
+ 		rdata->ctx	= ctx;
+ 		kref_get(&ctx->refcount);
+ 
+-		rdata->iter	= ctx->iter;
++		rdata->iter = ctx->iter;
+ 		iov_iter_truncate(&rdata->iter, cur_len);
+ 
+ 		rc = adjust_credits(server, &rdata->credits, rdata->bytes);
+@@ -3992,7 +3989,7 @@ cifs_send_async_read(loff_t fpos, size_t len, struct cifsFileInfo *open_file,
+ 
+ 		if (rc) {
+ 			add_credits_and_wake_if(server, &rdata->credits, 0);
+-			kref_put(&rdata->refcount, cifs_readdata_release);
++			cifs_put_readdata(rdata);
+ 			if (rc == -EAGAIN)
+ 				continue;
+ 			break;
+@@ -4010,7 +4007,7 @@ cifs_send_async_read(loff_t fpos, size_t len, struct cifsFileInfo *open_file,
+ static void
+ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+ {
+-	struct cifs_readdata *rdata, *tmp;
++	struct cifs_io_subrequest *rdata, *tmp;
+ 	struct cifs_sb_info *cifs_sb;
+ 	int rc;
+ 
+@@ -4056,8 +4053,7 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+ 						rdata->cfile, cifs_sb,
+ 						&tmp_list, ctx);
+ 
+-					kref_put(&rdata->refcount,
+-						cifs_readdata_release);
++					cifs_put_readdata(rdata);
+ 				}
+ 
+ 				list_splice(&tmp_list, &ctx->list);
+@@ -4073,7 +4069,7 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+ 			ctx->total_len += rdata->got_bytes;
+ 		}
+ 		list_del_init(&rdata->list);
+-		kref_put(&rdata->refcount, cifs_readdata_release);
++		cifs_put_readdata(rdata);
+ 	}
+ 
+ 	/* mask nodata case */
+@@ -4445,8 +4441,8 @@ static void cifs_unlock_folios(struct address_space *mapping, pgoff_t first, pgo
+ 
+ static void cifs_readahead_complete(struct work_struct *work)
+ {
+-	struct cifs_readdata *rdata = container_of(work,
+-						   struct cifs_readdata, work);
++	struct cifs_io_subrequest *rdata = container_of(work,
++						   struct cifs_io_subrequest, work);
+ 	struct folio *folio;
+ 	pgoff_t last;
+ 	bool good = rdata->result == 0 || (rdata->result == -EAGAIN && rdata->got_bytes);
+@@ -4472,7 +4468,7 @@ static void cifs_readahead_complete(struct work_struct *work)
+ 	}
+ 	rcu_read_unlock();
+ 
+-	kref_put(&rdata->refcount, cifs_readdata_release);
++	cifs_put_readdata(rdata);
+ }
+ 
+ static void cifs_readahead(struct readahead_control *ractl)
+@@ -4512,7 +4508,7 @@ static void cifs_readahead(struct readahead_control *ractl)
+ 	 */
+ 	while ((nr_pages = ra_pages)) {
+ 		unsigned int i, rsize;
+-		struct cifs_readdata *rdata;
++		struct cifs_io_subrequest *rdata;
+ 		struct cifs_credits credits_on_stack;
+ 		struct cifs_credits *credits = &credits_on_stack;
+ 		struct folio *folio;
+@@ -4631,11 +4627,11 @@ static void cifs_readahead(struct readahead_control *ractl)
+ 					   rdata->offset / PAGE_SIZE,
+ 					   (rdata->offset + rdata->bytes - 1) / PAGE_SIZE);
+ 			/* Fallback to the readpage in error/reconnect cases */
+-			kref_put(&rdata->refcount, cifs_readdata_release);
++			cifs_put_readdata(rdata);
+ 			break;
+ 		}
+ 
+-		kref_put(&rdata->refcount, cifs_readdata_release);
++		cifs_put_readdata(rdata);
+ 	}
+ 
+ 	free_xid(xid);
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 9aeecee6b91b..dc18130db9b3 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -4584,7 +4584,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 	unsigned int cur_off;
+ 	unsigned int cur_page_idx;
+ 	unsigned int pad_len;
+-	struct cifs_readdata *rdata = mid->callback_data;
++	struct cifs_io_subrequest *rdata = mid->callback_data;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)buf;
+ 	int length;
+ 	bool use_rdma_mr = false;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index c75a80bb6d9e..cc3d80a66869 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -23,6 +23,8 @@
+ #include <linux/uuid.h>
+ #include <linux/pagemap.h>
+ #include <linux/xattr.h>
++#include <linux/netfs.h>
++#include <trace/events/netfs.h>
+ #include "cifsglob.h"
+ #include "cifsacl.h"
+ #include "cifsproto.h"
+@@ -4070,7 +4072,7 @@ static inline bool smb3_use_rdma_offload(struct cifs_io_parms *io_parms)
+  */
+ static int
+ smb2_new_read_req(void **buf, unsigned int *total_len,
+-	struct cifs_io_parms *io_parms, struct cifs_readdata *rdata,
++	struct cifs_io_parms *io_parms, struct cifs_io_subrequest *rdata,
+ 	unsigned int remaining_bytes, int request_type)
+ {
+ 	int rc = -EACCES;
+@@ -4162,13 +4164,14 @@ smb2_new_read_req(void **buf, unsigned int *total_len,
+ static void
+ smb2_readv_callback(struct mid_q_entry *mid)
+ {
+-	struct cifs_readdata *rdata = mid->callback_data;
++	struct cifs_io_subrequest *rdata = mid->callback_data;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	struct TCP_Server_Info *server = rdata->server;
+ 	struct smb2_hdr *shdr =
+ 				(struct smb2_hdr *)rdata->iov[0].iov_base;
+ 	struct cifs_credits credits = { .value = 0, .instance = 0 };
+-	struct smb_rqst rqst = { .rq_iov = &rdata->iov[1], .rq_nvec = 1 };
++	struct smb_rqst rqst = { .rq_iov = &rdata->iov[1],
++				 .rq_nvec = 1 };
+ 
+ 	if (rdata->got_bytes) {
+ 		rqst.rq_iter	  = rdata->iter;
+@@ -4249,7 +4252,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 
+ /* smb2_async_readv - send an async read, and set up mid to handle result */
+ int
+-smb2_async_readv(struct cifs_readdata *rdata)
++smb2_async_readv(struct cifs_io_subrequest *rdata)
+ {
+ 	int rc, flags = 0;
+ 	char *buf;
+@@ -4307,13 +4310,11 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 		flags |= CIFS_HAS_CREDITS;
+ 	}
+ 
+-	kref_get(&rdata->refcount);
+ 	rc = cifs_call_async(server, &rqst,
+ 			     cifs_readv_receive, smb2_readv_callback,
+ 			     smb3_handle_read_data, rdata, flags,
+ 			     &rdata->credits);
+ 	if (rc) {
+-		kref_put(&rdata->refcount, cifs_readdata_release);
+ 		cifs_stats_fail_inc(io_parms.tcon, SMB2_READ_HE);
+ 		trace_smb3_read_err(0 /* xid */, io_parms.persistent_fid,
+ 				    io_parms.tcon->tid,
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index 46eff9ec302a..02ffe5ec9b21 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -186,7 +186,7 @@ extern int SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
+ extern int SMB2_get_srv_num(const unsigned int xid, struct cifs_tcon *tcon,
+ 			    u64 persistent_fid, u64 volatile_fid,
+ 			    __le64 *uniqueid);
+-extern int smb2_async_readv(struct cifs_readdata *rdata);
++extern int smb2_async_readv(struct cifs_io_subrequest *rdata);
+ extern int SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 		     unsigned int *nbytes, char **buf, int *buf_type);
+ extern int smb2_async_writev(struct cifs_writedata *wdata,
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index 14710afdc2a3..16d87867ef50 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -1686,7 +1686,7 @@ __cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ static int
+ cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ {
+-	struct cifs_readdata *rdata = mid->callback_data;
++	struct cifs_io_subrequest *rdata = mid->callback_data;
+ 
+ 	return  __cifs_readv_discard(server, mid, rdata->result);
+ }
+@@ -1696,7 +1696,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ {
+ 	int length, len;
+ 	unsigned int data_offset, data_len;
+-	struct cifs_readdata *rdata = mid->callback_data;
++	struct cifs_io_subrequest *rdata = mid->callback_data;
+ 	char *buf = server->smallbuf;
+ 	unsigned int buflen = server->pdu_size + HEADER_PREAMBLE_SIZE(server);
+ 	bool use_rdma_mr = false;
 
