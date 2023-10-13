@@ -2,78 +2,121 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD3F3CDB482
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 17:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40A4CDB47E
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 23:35:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230481AbjJMR2X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Oct 2023 13:28:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39476 "EHLO
+        id S229958AbjJMXfk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Oct 2023 19:35:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbjJMR2W (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 13:28:22 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC10A9;
-        Fri, 13 Oct 2023 10:28:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Imrv7hD55Mkc+SEoB4XVFrWjYvya+wwXsMRtGt0H5rA=; b=LfICwqNBIzNu3ioIqF7lzF8PE1
-        DNNDcUO+WN6s+RP2OMkJT/qU5k3RBo3ANrYkhAsydqGKT4ioL2RtakBCc/WjI9nTOwQif69iGoPrM
-        LIItLhrydjykR5FjKmttU+4/HwxH3uPMKcW4OygWjeOzbFRQPkvG/O43/t6okeN2/i09crXEZFKzi
-        k8D4OvY2OQU2yIehhAKYO9ouGdyvJ4MFCcMfiy3X2M3RigM5HJi6BJl951Sd53Ypx8tChN8KFZLHk
-        lxrVWGWMbWdDCC0v6yBYd6sAPv/6oLJTbIGWhm8cJL7F7vnRHhJQBHkL0w7AwREstcKxvFjdi2A5A
-        So6VZ8xg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qrLwx-006d2F-Oz; Fri, 13 Oct 2023 17:27:47 +0000
-Date:   Fri, 13 Oct 2023 18:27:47 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jeff Layton <jlayton@kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Christian Brauner <christian@brauner.io>,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Subject: Re: [RFC PATCH 12/53] netfs: Provide tools to create a buffer in an
- xarray
-Message-ID: <ZSl+Ezh3Av3LLyEf@casper.infradead.org>
-References: <20231013160423.2218093-1-dhowells@redhat.com>
- <20231013160423.2218093-13-dhowells@redhat.com>
+        with ESMTP id S229830AbjJMXfj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 19:35:39 -0400
+X-Greylist: delayed 920 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 13 Oct 2023 16:35:32 PDT
+Received: from matoro.tk (unknown [IPv6:2600:1700:4b10:9d80::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16629A9
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 16:35:32 -0700 (PDT)
+DKIM-Signature: a=rsa-sha256; bh=gPIeawjQuHddn41D6zeRo1qSWujy7kV/buuOoF9n4OY=;
+ c=relaxed/relaxed; d=matoro.tk;
+ h=Subject:Subject:Sender:To:To:Cc:Cc:From:From:Date:Date:MIME-Version:MIME-Version:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Reply-To:In-Reply-To:In-Reply-To:Message-Id:Message-Id:References:References:Autocrypt:Openpgp;
+ i=@matoro.tk; s=20230917; t=1697239177; v=1; x=1697671177;
+ b=pxk+1LUXTBRrIGazGe0iAZ9P+i/5Xu2Pvys6EHru0vVD5Ns9hQ3E5jOiQ7hQ/Mn0GzFbwtvL
+ fCPG9h1dncDv5nQuF195etaOxEIPFCpMcq1+m1payiLnHdY8Qlkoo6fpKBbArmWcxQhe2Rlu3HG
+ ViZtjYsrLNBx0ZeSMRHQpmZz7O4M+IisGCscUSytz7AnLTZr1ZFGFheFggfJs7NXK4h5Rt2ofh3
+ UlrBnjMEZsbJ4Ob0I8RTmtTJ2clVgGeLbgvQsJOBH3/KM7NpJZMcmsiIPXngKqdUS8mup9Wrke6
+ +z7a2TY7G18BU6aJBYYE0mREmoCyfaQJuyqznRlXl2CmQDVWQuA1wMUWom3xwTjvigZT9qwewyS
+ 7wDeAt9rkZyFMuNln22tutBY+Pan4XFlXbXF2xUQryyk6qKg7XP+FIkhKLg/sTAd5rzRPAyJblr
+ nHU9utmcG9KmoEsrog9FNxi2HRMt88f8ee6XlcMGFJUkK+WSTxTESehd8rZEmJJXx6EahwOKrox
+ ZTXxL/E3hr3AxghoLFzDOwhYEfNyq9bmBU43fjbmyGdLlr6VfbvCZtOJkR/ztxeTjIPdJ9PcpmI
+ /Mf5+FoayzHoh18qFPwZ0JCM6tvHXvSpm3qN0Lrtb4JQClnWQbj5T5pxWSKQ3wFehU0CQrnxHzK
+ 9HmvyTO5i2E=
+Received: by matoro.tk (envelope-sender
+ <matoro_mailinglist_kernel@matoro.tk>) with ESMTPS id 0b729feb; Fri, 13 Oct
+ 2023 19:19:37 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231013160423.2218093-13-dhowells@redhat.com>
+Date:   Fri, 13 Oct 2023 19:19:37 -0400
+From:   matoro <matoro_mailinglist_kernel@matoro.tk>
+To:     "Dr. Bernd Feige" <bernd.feige@uniklinik-freiburg.de>
+Cc:     tom@talpey.com, smfrench@gmail.com, paul@darkrain42.org,
+        linux-cifs@vger.kernel.org, bagasdotme@gmail.com,
+        regressions@lists.linux.dev, pc@manguebit.com,
+        ronniesahlberg@gmail.com, nspmangalore@gmail.com,
+        brian.pardy@gmail.com, bharathsm@microsoft.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS share
+ is mounted (cifsd-cfid-laundromat in"D" state)
+In-Reply-To: <85d538fec5a086acf62d5a803056586a6c00e4bd.camel@uniklinik-freiburg.de>
+References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com>
+ <ZPfPfyIoVxw5L6El@debian.me>
+ <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
+ <CAO+kfxTvA6N=i+jGf0XbSyqf85i=q+vR6R9d_42OWfM2sWWXaA@mail.gmail.com>
+ <CAH2r5mtUedfLSv81Z-Yb3_=AbD_QpT3tVbU1PRzMTituaw7bgA@mail.gmail.com>
+ <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com>
+ <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com>
+ <CAH2r5msNf9WDHrBZSi5FhHDSewSNxMAuXTetMJDnoNh3CF_oMA@mail.gmail.com>
+ <a895f860-11fa-e6d9-d042-a32bd08f9e9d@talpey.com>
+ <CAH2r5mszCxPtdURenMVgeVDX5zc8knumH=ASXyUufPa7SxbJBw@mail.gmail.com>
+ <ZRN9MtBqYnT6oX60@vaarsuvius>
+ <85d538fec5a086acf62d5a803056586a6c00e4bd.camel@uniklinik-freiburg.de>
+Message-ID: <83d00d50bc628a85db71adb440d8afb5@matoro.tk>
+X-Sender: matoro_mailinglist_kernel@matoro.tk
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Oct 13, 2023 at 05:03:41PM +0100, David Howells wrote:
-> +int netfs_xa_store_and_mark(struct xarray *xa, unsigned long index,
-> +			    struct folio *folio, bool put_mark,
-> +			    bool pagecache_mark, gfp_t gfp_mask);
+On 2023-10-05 05:55, Dr. Bernd Feige wrote:
+> Am Dienstag, dem 26.09.2023 um 17:54 -0700 schrieb Paul Aurich:
+>> Perhaps the laundromat thread should be using msleep_interruptible()?
+>> 
+>> Using an interruptible sleep appears to prevent the thread from
+>> contributing
+>> to the load average, and has the happy side-effect of removing the
+>> up-to-1s delay
+>> when tearing down the tcon (since a7c01fa93ae, kthread_stop() will
+>> return
+>> early triggered by kthread_stop).
+> 
+> Sorry for chiming in so late - I'm also on gentoo (kernel 6.5.5-
+> gentoo), but as a client of Windows AD.
+> 
+> Just want to emphasize that using uninterruptible sleep has not just
+> unhappy but devastating side-effects.
+> 
+> I have 8 processors and 16 cifsd-cfid-laundromat processes, so
+> /proc/loadavg reports a load average of 16 on a totally idle system.
+> 
+> This means that load-balancing software will never start additional
+> tasks on this system - "make -l" but also any other load-dependent
+> system. Just reducing the number of cifsd-cfid-laundromat processes
+> does not fix this - even a single one makes loadavg report a wrong
+> result for load balancing.
+> 
+> So, if cifsd-cfid-laundromat must really be uninterruptible, the only
+> solution would be to change the way loadavg is computed by the kernel
+> to exclude uninterruptible but sleeping processes. But must it be
+> uninterruptible?
+> 
+> Thanks and best regards,
+> Bernd
 
-Linus has been unhappy recently with functions that take two bools.
-When you're reading the caller, you see:
+This is a huge problem here as well, as a client to Samba using SMB1 
+(for Unix extensions).
 
-	netfs_xa_store_and_mark(xa, index, true, false, GFP_FOO);
+For others encountering this problem, I was able to work around it with 
+the following snippet:
 
-and you don't know instantly what true and false mean.  He prefers
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 2d5e9a9d5b8b..fc2caccb597a 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -576,7 +576,7 @@ cifs_cfids_laundromat_thread(void *p)
+         struct list_head entry;
 
-#define NETFS_FLAG_PUT		(1 << 0)
-#define NETFS_FLAG_PAGECACHE	(1 << 1)
-
-and then the caller looks like:
-
-	netfs_xa_store_and_mark(xa, index, NETFS_FLAG_PUT, GFP_FOO);
-
-and you know exactly what it's doing.
-
+         while (!kthread_should_stop()) {
+-               ssleep(1);
++               msleep_interruptible(1000);
+                 INIT_LIST_HEAD(&entry);
+                 if (kthread_should_stop())
+                         return 0;
