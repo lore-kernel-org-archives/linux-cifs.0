@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F8A0CDB483
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FE2CDB47E
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:26:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231808AbjJMQ0M (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Oct 2023 12:26:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46474 "EHLO
+        id S229743AbjJMQ00 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Oct 2023 12:26:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231395AbjJMQ0E (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:26:04 -0400
+        with ESMTP id S231588AbjJMQ0F (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:26:05 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 215AF2D41
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:06:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D313ABE
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:08:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697213208;
+        s=mimecast20190719; t=1697213239;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UOuHGM4ycbvjj38l0WSkUP2aqRFFc0lkv8Oh1G3x/FU=;
-        b=bLd5oO4vGue33NvYr8vwDJDfFHq+RVgyFLapNAY0gdy0c+DJIDzg0oAILF5NSjHTtEErnV
-        ZGFjAp2q7nZfC1UrgYI+12Jxx6s6dNk9fgy5bWbLDL6lvXccH9tDBDrYiAQLvl7JYlboJX
-        cjnhOBjTYerzUf0gf0iO2ZE+kczhECI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-74-Whk-vkIlNHKs64JvpVrt_w-1; Fri, 13 Oct 2023 12:06:45 -0400
-X-MC-Unique: Whk-vkIlNHKs64JvpVrt_w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        bh=GeVD+dT3EGEazLCy4JSSSP9p9uWw4JNjPo9O68lwEeY=;
+        b=fP/sLlqpmrT/Akc7ybzlOE74LtcmS/11AnTvn+Bj7hFIV++ipU8jOvAvLaZqztWfh/ajfC
+        4TSq6s63ivhyEdB8MvWyBYn36rf1yNgSWrOqeuoT988bIGZeVFIdoe724ISPupIwaOeFTL
+        ofyv813VvXdDwUGHSGvrQdyIjFH9kPE=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-610-aTExQ2g8PFmgL8TuEFeRIA-1; Fri, 13 Oct 2023 12:07:14 -0400
+X-MC-Unique: aTExQ2g8PFmgL8TuEFeRIA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0F46085829F;
-        Fri, 13 Oct 2023 16:06:44 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 044AD3C01BBE;
+        Fri, 13 Oct 2023 16:07:13 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 83A9F1C060DF;
-        Fri, 13 Oct 2023 16:06:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2DA676403C;
+        Fri, 13 Oct 2023 16:07:10 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -52,170 +52,171 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Subject: [RFC PATCH 39/53] netfs: Provide a launder_folio implementation
-Date:   Fri, 13 Oct 2023 17:04:08 +0100
-Message-ID: <20231013160423.2218093-40-dhowells@redhat.com>
+        linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        linux-cachefs@redhat.com
+Subject: [RFC PATCH 47/53] cifs: Make wait_mtu_credits take size_t args
+Date:   Fri, 13 Oct 2023 17:04:16 +0100
+Message-ID: <20231013160423.2218093-48-dhowells@redhat.com>
 In-Reply-To: <20231013160423.2218093-1-dhowells@redhat.com>
 References: <20231013160423.2218093-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Provide a launder_folio implementation for netfslib.
+Make the wait_mtu_credits functions use size_t for the size and num
+arguments rather than unsigned int as netfslib uses size_t/ssize_t for
+arguments and return values to allow for extra capacity.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
 cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
 cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/buffered_write.c    | 71 ++++++++++++++++++++++++++++++++++++
- fs/netfs/main.c              |  1 +
- include/linux/netfs.h        |  2 +
- include/trace/events/netfs.h |  3 ++
- 4 files changed, 77 insertions(+)
+ fs/smb/client/cifsglob.h  |  4 ++--
+ fs/smb/client/cifsproto.h |  2 +-
+ fs/smb/client/file.c      | 18 ++++++++++--------
+ fs/smb/client/smb2ops.c   |  4 ++--
+ fs/smb/client/transport.c |  4 ++--
+ 5 files changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-index b81d807f89f0..5695bc3acf6c 100644
---- a/fs/netfs/buffered_write.c
-+++ b/fs/netfs/buffered_write.c
-@@ -1101,3 +1101,74 @@ int netfs_writepages(struct address_space *mapping,
- 	return ret;
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index c7f04f9853c5..73367fc3a77c 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -507,8 +507,8 @@ struct smb_version_operations {
+ 	/* writepages retry size */
+ 	unsigned int (*wp_retry_size)(struct inode *);
+ 	/* get mtu credits */
+-	int (*wait_mtu_credits)(struct TCP_Server_Info *, unsigned int,
+-				unsigned int *, struct cifs_credits *);
++	int (*wait_mtu_credits)(struct TCP_Server_Info *, size_t,
++				size_t *, struct cifs_credits *);
+ 	/* adjust previously taken mtu credits to request size */
+ 	int (*adjust_credits)(struct TCP_Server_Info *server,
+ 			      struct cifs_credits *credits,
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 561dac1576a5..735337e8326c 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -121,7 +121,7 @@ extern struct mid_q_entry *cifs_setup_async_request(struct TCP_Server_Info *,
+ extern int cifs_check_receive(struct mid_q_entry *mid,
+ 			struct TCP_Server_Info *server, bool log_error);
+ extern int cifs_wait_mtu_credits(struct TCP_Server_Info *server,
+-				 unsigned int size, unsigned int *num,
++				 size_t size, size_t *num,
+ 				 struct cifs_credits *credits);
+ extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
+ 			struct kvec *, int /* nvec to send */,
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index c70d106a413f..dd5e52d5e8d0 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -2733,9 +2733,9 @@ static ssize_t cifs_write_back_from_locked_folio(struct address_space *mapping,
+ 	struct cifs_credits credits_on_stack;
+ 	struct cifs_credits *credits = &credits_on_stack;
+ 	struct cifsFileInfo *cfile = NULL;
+-	unsigned int xid, wsize, len;
++	unsigned int xid, len;
+ 	loff_t i_size = i_size_read(inode);
+-	size_t max_len;
++	size_t max_len, wsize;
+ 	long count = wbc->nr_to_write;
+ 	int rc;
+ 
+@@ -3248,7 +3248,7 @@ static int
+ cifs_resend_wdata(struct cifs_io_subrequest *wdata, struct list_head *wdata_list,
+ 	struct cifs_aio_ctx *ctx)
+ {
+-	unsigned int wsize;
++	size_t wsize;
+ 	struct cifs_credits credits;
+ 	int rc;
+ 	struct TCP_Server_Info *server = wdata->server;
+@@ -3382,7 +3382,8 @@ cifs_write_from_iter(loff_t fpos, size_t len, struct iov_iter *from,
+ 	do {
+ 		struct cifs_credits credits_on_stack;
+ 		struct cifs_credits *credits = &credits_on_stack;
+-		unsigned int wsize, nsegs = 0;
++		unsigned int nsegs = 0;
++		size_t wsize;
+ 
+ 		if (signal_pending(current)) {
+ 			rc = -EINTR;
+@@ -3819,7 +3820,7 @@ static int cifs_resend_rdata(struct cifs_io_subrequest *rdata,
+ 			struct list_head *rdata_list,
+ 			struct cifs_aio_ctx *ctx)
+ {
+-	unsigned int rsize;
++	size_t rsize;
+ 	struct cifs_credits credits;
+ 	int rc;
+ 	struct TCP_Server_Info *server;
+@@ -3893,10 +3894,10 @@ cifs_send_async_read(loff_t fpos, size_t len, struct cifsFileInfo *open_file,
+ 		     struct cifs_aio_ctx *ctx)
+ {
+ 	struct cifs_io_subrequest *rdata;
+-	unsigned int rsize, nsegs, max_segs = INT_MAX;
++	unsigned int nsegs, max_segs = INT_MAX;
+ 	struct cifs_credits credits_on_stack;
+ 	struct cifs_credits *credits = &credits_on_stack;
+-	size_t cur_len, max_len;
++	size_t cur_len, max_len, rsize;
+ 	int rc;
+ 	pid_t pid;
+ 	struct TCP_Server_Info *server;
+@@ -4492,12 +4493,13 @@ static void cifs_readahead(struct readahead_control *ractl)
+ 	 * Chop the readahead request up into rsize-sized read requests.
+ 	 */
+ 	while ((nr_pages = ra_pages)) {
+-		unsigned int i, rsize;
++		unsigned int i;
+ 		struct cifs_io_subrequest *rdata;
+ 		struct cifs_credits credits_on_stack;
+ 		struct cifs_credits *credits = &credits_on_stack;
+ 		struct folio *folio;
+ 		pgoff_t fsize;
++		size_t rsize;
+ 
+ 		/*
+ 		 * Find out if we have anything cached in the range of
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index bb1e8415bcf3..c26bc64b7fad 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -216,8 +216,8 @@ smb2_get_credits(struct mid_q_entry *mid)
  }
- EXPORT_SYMBOL(netfs_writepages);
-+
-+/*
-+ * Deal with the disposition of a laundered folio.
-+ */
-+static void netfs_cleanup_launder_folio(struct netfs_io_request *wreq)
-+{
-+	if (wreq->error) {
-+		pr_notice("R=%08x Laundering error %d\n", wreq->debug_id, wreq->error);
-+		mapping_set_error(wreq->mapping, wreq->error);
-+	}
-+}
-+
-+/**
-+ * netfs_launder_folio - Clean up a dirty folio that's being invalidated
-+ * @folio: The folio to clean
-+ *
-+ * This is called to write back a folio that's being invalidated when an inode
-+ * is getting torn down.  Ideally, writepages would be used instead.
-+ */
-+int netfs_launder_folio(struct folio *folio)
-+{
-+	struct netfs_io_request *wreq;
-+	struct address_space *mapping = folio->mapping;
-+	struct netfs_folio *finfo;
-+	struct bio_vec bvec;
-+	unsigned long long i_size = i_size_read(mapping->host);
-+	unsigned long long start = folio_pos(folio);
-+	size_t offset = 0, len;
-+	int ret = 0;
-+
-+	finfo = netfs_folio_info(folio);
-+	if (finfo) {
-+		offset = finfo->dirty_offset;
-+		start += offset;
-+		len = finfo->dirty_len;
-+	} else {
-+		len = folio_size(folio);
-+	}
-+	len = min_t(unsigned long long, len, i_size - start);
-+
-+	wreq = netfs_alloc_request(mapping, NULL, start, len, NETFS_LAUNDER_WRITE);
-+	if (IS_ERR(wreq)) {
-+		ret = PTR_ERR(wreq);
-+		goto out;
-+	}
-+
-+	if (!folio_clear_dirty_for_io(folio))
-+		goto out_put;
-+
-+	trace_netfs_folio(folio, netfs_folio_trace_launder);
-+
-+	_debug("launder %llx-%llx", start, start + len - 1);
-+
-+	/* Speculatively write to the cache.  We have to fix this up later if
-+	 * the store fails.
-+	 */
-+	wreq->cleanup = netfs_cleanup_launder_folio;
-+
-+	bvec_set_folio(&bvec, folio, len, offset);
-+	iov_iter_bvec(&wreq->iter, ITER_SOURCE, &bvec, 1, len);
-+	__set_bit(NETFS_RREQ_UPLOAD_TO_SERVER, &wreq->flags);
-+	ret = netfs_begin_write(wreq, true, netfs_write_trace_launder);
-+
-+out_put:
-+	netfs_put_request(wreq, false, netfs_rreq_trace_put_return);
-+out:
-+	folio_wait_fscache(folio);
-+	_leave(" = %d", ret);
-+	return ret;
-+}
-+EXPORT_SYMBOL(netfs_launder_folio);
-diff --git a/fs/netfs/main.c b/fs/netfs/main.c
-index b335e6a50f9c..577c8a9fc0f2 100644
---- a/fs/netfs/main.c
-+++ b/fs/netfs/main.c
-@@ -33,6 +33,7 @@ static const char *netfs_origins[nr__netfs_io_origin] = {
- 	[NETFS_READPAGE]		= "RP",
- 	[NETFS_READ_FOR_WRITE]		= "RW",
- 	[NETFS_WRITEBACK]		= "WB",
-+	[NETFS_LAUNDER_WRITE]		= "LW",
- 	[NETFS_RMW_READ]		= "RM",
- 	[NETFS_UNBUFFERED_WRITE]	= "UW",
- 	[NETFS_DIO_READ]		= "DR",
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 9661ae24120f..d4a1073cc541 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -234,6 +234,7 @@ enum netfs_io_origin {
- 	NETFS_READPAGE,			/* This read is a synchronous read */
- 	NETFS_READ_FOR_WRITE,		/* This read is to prepare a write */
- 	NETFS_WRITEBACK,		/* This write was triggered by writepages */
-+	NETFS_LAUNDER_WRITE,		/* This is triggered by ->launder_folio() */
- 	NETFS_RMW_READ,			/* This is an unbuffered read for RMW */
- 	NETFS_UNBUFFERED_WRITE,		/* This is an unbuffered write */
- 	NETFS_DIO_READ,			/* This is a direct I/O read */
-@@ -422,6 +423,7 @@ int netfs_writepages(struct address_space *mapping,
- 		     struct writeback_control *wbc);
- void netfs_invalidate_folio(struct folio *folio, size_t offset, size_t length);
- bool netfs_release_folio(struct folio *folio, gfp_t gfp);
-+int netfs_launder_folio(struct folio *folio);
  
- /* VMA operations API. */
- vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, struct netfs_group *netfs_group);
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index 825946f510ee..54b2d781d3a9 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -25,6 +25,7 @@
+ static int
+-smb2_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
+-		      unsigned int *num, struct cifs_credits *credits)
++smb2_wait_mtu_credits(struct TCP_Server_Info *server, size_t size,
++		      size_t *num, struct cifs_credits *credits)
+ {
+ 	int rc = 0;
+ 	unsigned int scredits, in_flight;
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index c52b9bc10242..9d22b1cdfc9f 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -693,8 +693,8 @@ wait_for_compound_request(struct TCP_Server_Info *server, int num,
+ }
  
- #define netfs_write_traces					\
- 	EM(netfs_write_trace_dio_write,		"DIO-WRITE")	\
-+	EM(netfs_write_trace_launder,		"LAUNDER  ")	\
- 	EM(netfs_write_trace_unbuffered_write,	"UNB-WRITE")	\
- 	E_(netfs_write_trace_writeback,		"WRITEBACK")
- 
-@@ -33,6 +34,7 @@
- 	EM(NETFS_READPAGE,			"RP")		\
- 	EM(NETFS_READ_FOR_WRITE,		"RW")		\
- 	EM(NETFS_WRITEBACK,			"WB")		\
-+	EM(NETFS_LAUNDER_WRITE,			"LW")		\
- 	EM(NETFS_RMW_READ,			"RM")		\
- 	EM(NETFS_UNBUFFERED_WRITE,		"UW")		\
- 	EM(NETFS_DIO_READ,			"DR")		\
-@@ -129,6 +131,7 @@
- 	EM(netfs_folio_trace_clear_g,		"clear-g")	\
- 	EM(netfs_folio_trace_filled_gaps,	"filled-gaps")	\
- 	EM(netfs_folio_trace_kill,		"kill")		\
-+	EM(netfs_folio_trace_launder,		"launder")	\
- 	EM(netfs_folio_trace_mkwrite,		"mkwrite")	\
- 	EM(netfs_folio_trace_mkwrite_plus,	"mkwrite+")	\
- 	EM(netfs_folio_trace_read_gaps,		"read-gaps")	\
+ int
+-cifs_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
+-		      unsigned int *num, struct cifs_credits *credits)
++cifs_wait_mtu_credits(struct TCP_Server_Info *server, size_t size,
++		      size_t *num, struct cifs_credits *credits)
+ {
+ 	*num = size;
+ 	credits->value = 0;
 
