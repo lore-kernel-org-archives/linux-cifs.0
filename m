@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E8ACDB483
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F81CDB484
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232014AbjJMQO5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Oct 2023 12:14:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
+        id S231873AbjJMQO7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Oct 2023 12:14:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231911AbjJMQOx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:14:53 -0400
+        with ESMTP id S229699AbjJMQO5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:14:57 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B1263255
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:07:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262231BE4
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:06:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697213221;
+        s=mimecast20190719; t=1697213179;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SmcQ2OYS80jrv0Qt98hHYwlE6Ftq6y8QJ4ZIMlhPlus=;
-        b=NI0CNxp3iisrqhLN93r20JcWL0HBJjQwBudZGkvOmNosLwiBNPKuOJ69w+vZcDFjGl/vyh
-        N2TvMuNrmIgihK16nbs/FftvAScbtvHrYOLBqQxS087R1pdOsY9Z2H0HonxCDyGSAvDXrf
-        KoAq2QPRKDiJ9kXm6xo5WO+HdNYIukw=
+        bh=+JXKAIpr84btCw1blQ/2Pq/kPda4roUzVk+ID6i5/YY=;
+        b=YM7+vsuO+MbsnR8LPR7VGCaFRp/OhwTHJEupAs1l8+P3QQZNMz8o1yf3J62JcTuXgyW6qa
+        APgTJbupTioW1qxAhSrryXsEUzDflzRal+V44LE+abDtAKYEV1xDvpu85aK8TuLOMsCqRv
+        vwl0taTzNqZuC2fRQxnU5WN5zBbLldU=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-121-iBl8tUgMNS-bxksqX8UMGg-1; Fri, 13 Oct 2023 12:06:55 -0400
-X-MC-Unique: iBl8tUgMNS-bxksqX8UMGg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-373-dY8y93B-NfO9PkdbPyLPog-1; Fri, 13 Oct 2023 12:06:06 -0400
+X-MC-Unique: dY8y93B-NfO9PkdbPyLPog-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8C8CB18312C1;
-        Fri, 13 Oct 2023 16:06:54 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6CA29811731;
+        Fri, 13 Oct 2023 16:06:05 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CB051C15BBC;
-        Fri, 13 Oct 2023 16:06:51 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C32B61C060DF;
+        Fri, 13 Oct 2023 16:06:02 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -53,1010 +53,402 @@ Cc:     David Howells <dhowells@redhat.com>,
         v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Subject: [RFC PATCH 42/53] afs: Use the netfs write helpers
-Date:   Fri, 13 Oct 2023 17:04:11 +0100
-Message-ID: <20231013160423.2218093-43-dhowells@redhat.com>
+Subject: [RFC PATCH 28/53] netfs: Implement unbuffered/DIO write support
+Date:   Fri, 13 Oct 2023 17:03:57 +0100
+Message-ID: <20231013160423.2218093-29-dhowells@redhat.com>
 In-Reply-To: <20231013160423.2218093-1-dhowells@redhat.com>
 References: <20231013160423.2218093-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make afs use the netfs write helpers.
+Implement support for unbuffered writes and direct I/O writes.  If the
+write is misaligned with respect to the fscrypt block size, then RMW cycles
+are performed if necessary.  DIO writes are a special case of unbuffered
+writes with extra restriction imposed, such as block size alignment
+requirements.
+
+Also provide a field that can tell the code to add some extra space onto
+the bounce buffer for use by the filesystem in the case of a
+content-encrypted file.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
 cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-afs@lists.infradead.org
 cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/afs/file.c              |  65 +++-
- fs/afs/internal.h          |  10 +-
- fs/afs/write.c             | 704 ++-----------------------------------
- include/trace/events/afs.h |  23 --
- 4 files changed, 81 insertions(+), 721 deletions(-)
+ fs/afs/inode.c               |   2 +-
+ fs/netfs/Makefile            |   1 +
+ fs/netfs/direct_write.c      | 159 +++++++++++++++++++++++++++++++++++
+ fs/netfs/internal.h          |   6 ++
+ fs/netfs/io.c                |   2 +-
+ fs/netfs/main.c              |  12 +--
+ fs/netfs/objects.c           |   6 +-
+ fs/netfs/output.c            |  24 ++++++
+ include/linux/netfs.h        |   4 +
+ include/trace/events/netfs.h |   4 +-
+ 10 files changed, 210 insertions(+), 10 deletions(-)
+ create mode 100644 fs/netfs/direct_write.c
 
-diff --git a/fs/afs/file.c b/fs/afs/file.c
-index 5bb78d874292..586a573b1a9b 100644
---- a/fs/afs/file.c
-+++ b/fs/afs/file.c
-@@ -34,7 +34,7 @@ const struct file_operations afs_file_operations = {
- 	.release	= afs_release,
- 	.llseek		= generic_file_llseek,
- 	.read_iter	= afs_file_read_iter,
--	.write_iter	= afs_file_write,
-+	.write_iter	= netfs_file_write_iter,
- 	.mmap		= afs_file_mmap,
- 	.splice_read	= afs_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
-@@ -50,16 +50,15 @@ const struct inode_operations afs_file_inode_operations = {
- };
- 
- const struct address_space_operations afs_file_aops = {
-+	.direct_IO	= noop_direct_IO,
- 	.read_folio	= netfs_read_folio,
- 	.readahead	= netfs_readahead,
- 	.dirty_folio	= afs_dirty_folio,
--	.launder_folio	= afs_launder_folio,
-+	.launder_folio	= netfs_launder_folio,
- 	.release_folio	= netfs_release_folio,
- 	.invalidate_folio = netfs_invalidate_folio,
--	.write_begin	= afs_write_begin,
--	.write_end	= afs_write_end,
--	.writepages	= afs_writepages,
- 	.migrate_folio	= filemap_migrate_folio,
-+	.writepages	= afs_writepages,
- };
- 
- const struct address_space_operations afs_symlink_aops = {
-@@ -355,8 +354,10 @@ static int afs_symlink_read_folio(struct file *file, struct folio *folio)
- 
- static int afs_init_request(struct netfs_io_request *rreq, struct file *file)
- {
--	rreq->netfs_priv = key_get(afs_file_key(file));
-+	if (file)
-+		rreq->netfs_priv = key_get(afs_file_key(file));
- 	rreq->rsize = 4 * 1024 * 1024;
-+	rreq->wsize = 16 * 1024;
- 	return 0;
- }
- 
-@@ -373,12 +374,37 @@ static void afs_free_request(struct netfs_io_request *rreq)
- 	key_put(rreq->netfs_priv);
- }
- 
-+static void afs_update_i_size(struct inode *inode, loff_t new_i_size)
-+{
-+	struct afs_vnode *vnode = AFS_FS_I(inode);
-+	loff_t i_size;
+diff --git a/fs/afs/inode.c b/fs/afs/inode.c
+index 46bc5574d6f5..a8f4301aca9a 100644
+--- a/fs/afs/inode.c
++++ b/fs/afs/inode.c
+@@ -250,7 +250,7 @@ static void afs_apply_status(struct afs_operation *op,
+ 		 * what's on the server.
+ 		 */
+ 		vnode->netfs.remote_i_size = status->size;
+-		if (change_size) {
++		if (change_size || status->size > i_size_read(inode)) {
+ 			afs_set_i_size(vnode, status->size);
+ 			vnode->netfs.zero_point = status->size;
+ 			inode_set_ctime_to_ts(inode, t);
+diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+index 27643557b443..d5c2809fc029 100644
+--- a/fs/netfs/Makefile
++++ b/fs/netfs/Makefile
+@@ -4,6 +4,7 @@ netfs-y := \
+ 	buffered_read.o \
+ 	buffered_write.o \
+ 	direct_read.o \
++	direct_write.o \
+ 	io.o \
+ 	iterator.o \
+ 	locking.o \
+diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
+new file mode 100644
+index 000000000000..b1a4921ac4a2
+--- /dev/null
++++ b/fs/netfs/direct_write.c
+@@ -0,0 +1,159 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Unbuffered and direct write support.
++ *
++ * Copyright (C) 2023 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
 +
-+	write_seqlock(&vnode->cb_lock);
-+	i_size = i_size_read(&vnode->netfs.inode);
-+	if (new_i_size > i_size) {
-+		i_size_write(&vnode->netfs.inode, new_i_size);
-+		inode_set_bytes(&vnode->netfs.inode, new_i_size);
++#include <linux/export.h>
++#include <linux/uio.h>
++#include "internal.h"
++
++static void netfs_cleanup_dio_write(struct netfs_io_request *wreq)
++{
++	struct inode *inode = wreq->inode;
++	unsigned long long end = wreq->start + wreq->len;
++
++	if (!wreq->error &&
++	    i_size_read(inode) < end) {
++		if (wreq->netfs_ops->update_i_size)
++			wreq->netfs_ops->update_i_size(inode, end);
++		else
++			i_size_write(inode, end);
 +	}
-+	write_sequnlock(&vnode->cb_lock);
-+	fscache_update_cookie(afs_vnode_cache(vnode), NULL, &new_i_size);
 +}
 +
-+static void afs_netfs_invalidate_cache(struct netfs_io_request *wreq)
++/*
++ * Perform an unbuffered write where we may have to do an RMW operation on an
++ * encrypted file.  This can also be used for direct I/O writes.
++ */
++ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *iter,
++					   struct netfs_group *netfs_group)
 +{
-+	struct afs_vnode *vnode = AFS_FS_I(wreq->inode);
++	struct netfs_io_request *wreq;
++	unsigned long long start = iocb->ki_pos;
++	unsigned long long end = start + iov_iter_count(iter);
++	ssize_t ret, n;
++	bool async = !is_sync_kiocb(iocb);
 +
-+	afs_invalidate_cache(vnode, 0);
++	_enter("");
++
++	/* We're going to need a bounce buffer if what we transmit is going to
++	 * be different in some way to the source buffer, e.g. because it gets
++	 * encrypted/compressed or because it needs expanding to a block size.
++	 */
++	// TODO
++
++	_debug("uw %llx-%llx", start, end);
++
++	wreq = netfs_alloc_request(iocb->ki_filp->f_mapping, iocb->ki_filp,
++				   start, end - start,
++				   iocb->ki_flags & IOCB_DIRECT ?
++				   NETFS_DIO_WRITE : NETFS_UNBUFFERED_WRITE);
++	if (IS_ERR(wreq))
++		return PTR_ERR(wreq);
++
++	{
++		/* If this is an async op and we're not using a bounce buffer,
++		 * we have to save the source buffer as the iterator is only
++		 * good until we return.  In such a case, extract an iterator
++		 * to represent as much of the the output buffer as we can
++		 * manage.  Note that the extraction might not be able to
++		 * allocate a sufficiently large bvec array and may shorten the
++		 * request.
++		 */
++		if (async || user_backed_iter(iter)) {
++			n = netfs_extract_user_iter(iter, wreq->len, &wreq->iter, 0);
++			if (n < 0) {
++				ret = n;
++				goto out;
++			}
++			wreq->direct_bv = (struct bio_vec *)wreq->iter.bvec;
++			wreq->direct_bv_count = n;
++			wreq->direct_bv_unpin = iov_iter_extract_will_pin(iter);
++			wreq->len = iov_iter_count(&wreq->iter);
++		} else {
++			wreq->iter = *iter;
++		}
++
++		wreq->io_iter = wreq->iter;
++	}
++
++	/* Copy the data into the bounce buffer and encrypt it. */
++	// TODO
++
++	/* Dispatch the write. */
++	__set_bit(NETFS_RREQ_UPLOAD_TO_SERVER, &wreq->flags);
++	if (async)
++		wreq->iocb = iocb;
++	wreq->cleanup = netfs_cleanup_dio_write;
++	ret = netfs_begin_write(wreq, is_sync_kiocb(iocb),
++				iocb->ki_flags & IOCB_DIRECT ?
++				netfs_write_trace_dio_write :
++				netfs_write_trace_unbuffered_write);
++	if (ret < 0) {
++		_debug("begin = %zd", ret);
++		goto out;
++	}
++
++	if (!async) {
++		trace_netfs_rreq(wreq, netfs_rreq_trace_wait_ip);
++		wait_on_bit(&wreq->flags, NETFS_RREQ_IN_PROGRESS,
++			    TASK_UNINTERRUPTIBLE);
++
++		ret = wreq->error;
++		_debug("waited = %zd", ret);
++		if (ret == 0) {
++			ret = wreq->transferred;
++			iocb->ki_pos += ret;
++		}
++	} else {
++		ret = -EIOCBQUEUED;
++	}
++
++out:
++	netfs_put_request(wreq, false, netfs_rreq_trace_put_return);
++	return ret;
 +}
 +
- const struct netfs_request_ops afs_req_ops = {
- 	.init_request		= afs_init_request,
- 	.free_request		= afs_free_request,
- 	.begin_cache_operation	= fscache_begin_cache_operation,
- 	.check_write_begin	= afs_check_write_begin,
- 	.issue_read		= afs_issue_read,
-+	.update_i_size		= afs_update_i_size,
-+	.invalidate_cache	= afs_netfs_invalidate_cache,
-+	.create_write_requests	= afs_create_write_requests,
++/**
++ * netfs_unbuffered_write_iter - Unbuffered write to a file
++ * @iocb: IO state structure
++ * @from: iov_iter with data to write
++ *
++ * Do an unbuffered write to a file, writing the data directly to the server
++ * and not lodging the data in the pagecache.
++ *
++ * Return:
++ * * Negative error code if no data has been written at all of
++ *   vfs_fsync_range() failed for a synchronous write
++ * * Number of bytes written, even for truncated writes
++ */
++ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
++{
++	struct file *file = iocb->ki_filp;
++	struct inode *inode = file->f_mapping->host;
++	ssize_t ret;
++
++	_enter("%llx,%zx,%llx", iocb->ki_pos, iov_iter_count(from), i_size_read(inode));
++
++	trace_netfs_write_iter(iocb, from);
++
++	ret = netfs_start_io_direct(inode);
++	if (ret < 0)
++		return ret;
++	ret = generic_write_checks(iocb, from);
++	if (ret < 0)
++		goto out;
++	ret = file_remove_privs(file);
++	if (ret < 0)
++		goto out;
++	ret = file_update_time(file);
++	if (ret < 0)
++		goto out;
++	ret = netfs_unbuffered_write_iter_locked(iocb, from, NULL);
++out:
++	netfs_end_io_direct(inode);
++	return ret;
++}
++EXPORT_SYMBOL(netfs_unbuffered_write_iter);
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index 0fe9aa5c6114..6a67abdf71c8 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -22,6 +22,12 @@ void netfs_rreq_unlock_folios(struct netfs_io_request *rreq);
+ int netfs_prefetch_for_write(struct file *file, struct folio *folio,
+ 			     size_t offset, size_t len);
+ 
++/*
++ * direct_write.c
++ */
++ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *iter,
++					   struct netfs_group *netfs_group);
++
+ /*
+  * io.c
+  */
+diff --git a/fs/netfs/io.c b/fs/netfs/io.c
+index 921daecf5fde..36a3f720193a 100644
+--- a/fs/netfs/io.c
++++ b/fs/netfs/io.c
+@@ -643,7 +643,7 @@ static bool netfs_rreq_submit_slice(struct netfs_io_request *rreq,
+ 
+ 	subreq->debug_index	= (*_debug_index)++;
+ 	subreq->start		= rreq->start + rreq->submitted;
+-	subreq->len		= rreq->len   - rreq->submitted;
++	subreq->len		= io_iter->count;
+ 
+ 	_debug("slice %llx,%zx,%zx", subreq->start, subreq->len, rreq->submitted);
+ 	list_add_tail(&subreq->rreq_link, &rreq->subrequests);
+diff --git a/fs/netfs/main.c b/fs/netfs/main.c
+index d0eb6654efa3..1cf10f9c4c1f 100644
+--- a/fs/netfs/main.c
++++ b/fs/netfs/main.c
+@@ -29,11 +29,13 @@ LIST_HEAD(netfs_io_requests);
+ DEFINE_SPINLOCK(netfs_proc_lock);
+ 
+ static const char *netfs_origins[nr__netfs_io_origin] = {
+-	[NETFS_READAHEAD]	= "RA",
+-	[NETFS_READPAGE]	= "RP",
+-	[NETFS_READ_FOR_WRITE]	= "RW",
+-	[NETFS_WRITEBACK]	= "WB",
+-	[NETFS_DIO_READ]	= "DR",
++	[NETFS_READAHEAD]		= "RA",
++	[NETFS_READPAGE]		= "RP",
++	[NETFS_READ_FOR_WRITE]		= "RW",
++	[NETFS_WRITEBACK]		= "WB",
++	[NETFS_UNBUFFERED_WRITE]	= "UW",
++	[NETFS_DIO_READ]		= "DR",
++	[NETFS_DIO_WRITE]		= "DW",
  };
  
- int afs_write_inode(struct inode *inode, struct writeback_control *wbc)
-@@ -453,28 +479,39 @@ static vm_fault_t afs_vm_map_pages(struct vm_fault *vmf, pgoff_t start_pgoff, pg
- 
- static ssize_t afs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- {
--	struct afs_vnode *vnode = AFS_FS_I(file_inode(iocb->ki_filp));
-+	struct inode *inode = file_inode(iocb->ki_filp);
-+	struct afs_vnode *vnode = AFS_FS_I(inode);
- 	struct afs_file *af = iocb->ki_filp->private_data;
+ /*
+diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+index d46e957812a6..c1218b183197 100644
+--- a/fs/netfs/objects.c
++++ b/fs/netfs/objects.c
+@@ -20,8 +20,10 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
+ 	struct inode *inode = file ? file_inode(file) : mapping->host;
+ 	struct netfs_inode *ctx = netfs_inode(inode);
+ 	struct netfs_io_request *rreq;
+-	bool is_dio = (origin == NETFS_DIO_READ);
+-	bool cached = is_dio && netfs_is_cache_enabled(ctx);
++	bool is_unbuffered = (origin == NETFS_UNBUFFERED_WRITE ||
++			      origin == NETFS_DIO_READ ||
++			      origin == NETFS_DIO_WRITE);
++	bool cached = !is_unbuffered && netfs_is_cache_enabled(ctx);
  	int ret;
  
--	ret = afs_validate(vnode, af->key);
-+	if (iocb->ki_flags & IOCB_DIRECT)
-+		return netfs_unbuffered_read_iter(iocb, iter);
+ 	rreq = kzalloc(ctx->ops->io_request_size ?: sizeof(struct netfs_io_request),
+diff --git a/fs/netfs/output.c b/fs/netfs/output.c
+index e93453f4372d..bb42789c7a24 100644
+--- a/fs/netfs/output.c
++++ b/fs/netfs/output.c
+@@ -74,11 +74,21 @@ static void netfs_write_terminated(struct netfs_io_request *wreq, bool was_async
+ {
+ 	struct netfs_io_subrequest *subreq;
+ 	struct netfs_inode *ctx = netfs_inode(wreq->inode);
++	size_t transferred = 0;
+ 
+ 	_enter("R=%x[]", wreq->debug_id);
+ 
+ 	trace_netfs_rreq(wreq, netfs_rreq_trace_write_done);
+ 
++	list_for_each_entry(subreq, &wreq->subrequests, rreq_link) {
++		if (subreq->error || subreq->transferred == 0)
++			break;
++		transferred += subreq->transferred;
++		if (subreq->transferred < subreq->len)
++			break;
++	}
++	wreq->transferred = transferred;
 +
-+	ret = netfs_start_io_read(inode);
- 	if (ret < 0)
- 		return ret;
--
--	return generic_file_read_iter(iocb, iter);
-+	ret = afs_validate(vnode, af->key);
-+	if (ret == 0)
-+		ret = netfs_file_read_iter(iocb, iter);
-+	netfs_end_io_read(inode);
-+	return ret;
- }
+ 	list_for_each_entry(subreq, &wreq->subrequests, rreq_link) {
+ 		if (!subreq->error)
+ 			continue;
+@@ -110,11 +120,25 @@ static void netfs_write_terminated(struct netfs_io_request *wreq, bool was_async
  
- static ssize_t afs_file_splice_read(struct file *in, loff_t *ppos,
- 				    struct pipe_inode_info *pipe,
- 				    size_t len, unsigned int flags)
- {
--	struct afs_vnode *vnode = AFS_FS_I(file_inode(in));
-+	struct inode *inode = file_inode(in);
-+	struct afs_vnode *vnode = AFS_FS_I(inode);
- 	struct afs_file *af = in->private_data;
- 	int ret;
+ 	wreq->cleanup(wreq);
  
--	ret = afs_validate(vnode, af->key);
-+	ret = netfs_start_io_read(inode);
- 	if (ret < 0)
- 		return ret;
--
--	return filemap_splice_read(in, ppos, pipe, len, flags);
-+	ret = afs_validate(vnode, af->key);
-+	if (ret == 0)
-+		ret = filemap_splice_read(in, ppos, pipe, len, flags);
-+	netfs_end_io_read(inode);
-+	return ret;
++	if (wreq->origin == NETFS_DIO_WRITE &&
++	    wreq->mapping->nrpages) {
++		pgoff_t first = wreq->start >> PAGE_SHIFT;
++		pgoff_t last = (wreq->start + wreq->transferred - 1) >> PAGE_SHIFT;
++		invalidate_inode_pages2_range(wreq->mapping, first, last);
++	}
++
+ 	_debug("finished");
+ 	trace_netfs_rreq(wreq, netfs_rreq_trace_wake_ip);
+ 	clear_bit_unlock(NETFS_RREQ_IN_PROGRESS, &wreq->flags);
+ 	wake_up_bit(&wreq->flags, NETFS_RREQ_IN_PROGRESS);
+ 
++	if (wreq->iocb) {
++		wreq->iocb->ki_pos += transferred;
++		if (wreq->iocb->ki_complete)
++			wreq->iocb->ki_complete(
++				wreq->iocb, wreq->error ? wreq->error : transferred);
++	}
++
+ 	netfs_clear_subrequests(wreq, was_async);
+ 	netfs_put_request(wreq, was_async, netfs_rreq_trace_put_complete);
  }
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 03fed7ecfab9..da5de62b5f9c 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -1468,19 +1468,11 @@ bool afs_dirty_folio(struct address_space *, struct folio *);
- #else
- #define afs_dirty_folio filemap_dirty_folio
- #endif
--extern int afs_write_begin(struct file *file, struct address_space *mapping,
--			loff_t pos, unsigned len,
--			struct page **pagep, void **fsdata);
--extern int afs_write_end(struct file *file, struct address_space *mapping,
--			loff_t pos, unsigned len, unsigned copied,
--			struct page *page, void *fsdata);
--extern int afs_writepage(struct page *, struct writeback_control *);
- extern int afs_writepages(struct address_space *, struct writeback_control *);
--extern ssize_t afs_file_write(struct kiocb *, struct iov_iter *);
- extern int afs_fsync(struct file *, loff_t, loff_t, int);
- extern vm_fault_t afs_page_mkwrite(struct vm_fault *vmf);
- extern void afs_prune_wb_keys(struct afs_vnode *);
--int afs_launder_folio(struct folio *);
-+void afs_create_write_requests(struct netfs_io_request *wreq, loff_t start, size_t len);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 1d7e44d3c915..052d62625796 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -140,6 +140,7 @@ struct netfs_inode {
+ 						 * on the server */
+ 	unsigned long		flags;
+ #define NETFS_ICTX_ODIRECT	0		/* The file has DIO in progress */
++#define NETFS_ICTX_UNBUFFERED	1		/* I/O should not use the pagecache */
+ };
  
  /*
-  * xattr.c
-diff --git a/fs/afs/write.c b/fs/afs/write.c
-index cdb1391ec46e..748d5954f0ee 100644
---- a/fs/afs/write.c
-+++ b/fs/afs/write.c
-@@ -12,17 +12,9 @@
- #include <linux/writeback.h>
- #include <linux/pagevec.h>
- #include <linux/netfs.h>
-+#include <trace/events/netfs.h>
- #include "internal.h"
+@@ -228,7 +229,9 @@ enum netfs_io_origin {
+ 	NETFS_READPAGE,			/* This read is a synchronous read */
+ 	NETFS_READ_FOR_WRITE,		/* This read is to prepare a write */
+ 	NETFS_WRITEBACK,		/* This write was triggered by writepages */
++	NETFS_UNBUFFERED_WRITE,		/* This is an unbuffered write */
+ 	NETFS_DIO_READ,			/* This is a direct I/O read */
++	NETFS_DIO_WRITE,		/* This is a direct I/O write */
+ 	nr__netfs_io_origin
+ } __mode(byte);
  
--static int afs_writepages_region(struct address_space *mapping,
--				 struct writeback_control *wbc,
--				 unsigned long long start,
--				 unsigned long long end, loff_t *_next,
--				 bool max_one_loop);
--
--static void afs_write_to_cache(struct afs_vnode *vnode, loff_t start, size_t len,
--			       loff_t i_size, bool caching);
--
- #ifdef CONFIG_AFS_FSCACHE
- /*
-  * Mark a page as having been made dirty and thus needing writeback.  We also
-@@ -33,216 +25,16 @@ bool afs_dirty_folio(struct address_space *mapping, struct folio *folio)
- 	return fscache_dirty_folio(mapping, folio,
- 				afs_vnode_cache(AFS_FS_I(mapping->host)));
- }
--static void afs_folio_start_fscache(bool caching, struct folio *folio)
--{
--	if (caching)
--		folio_start_fscache(folio);
--}
--#else
--static void afs_folio_start_fscache(bool caching, struct folio *folio)
--{
--}
- #endif
+@@ -385,6 +388,7 @@ ssize_t netfs_unbuffered_read_iter(struct kiocb *iocb, struct iov_iter *iter);
+ /* High-level write API */
+ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
+ 			    struct netfs_group *netfs_group);
++ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from);
  
--/*
-- * prepare to perform part of a write to a page
-- */
--int afs_write_begin(struct file *file, struct address_space *mapping,
--		    loff_t pos, unsigned len,
--		    struct page **_page, void **fsdata)
--{
--	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
--	struct folio *folio;
--	int ret;
--
--	_enter("{%llx:%llu},%llx,%x",
--	       vnode->fid.vid, vnode->fid.vnode, pos, len);
--
--	/* Prefetch area to be written into the cache if we're caching this
--	 * file.  We need to do this before we get a lock on the page in case
--	 * there's more than one writer competing for the same cache block.
--	 */
--	ret = netfs_write_begin(&vnode->netfs, file, mapping, pos, len, &folio, fsdata);
--	if (ret < 0)
--		return ret;
--
--try_again:
--	/* See if this page is already partially written in a way that we can
--	 * merge the new write with.
--	 */
--	if (folio_test_writeback(folio)) {
--		trace_afs_folio_dirty(vnode, tracepoint_string("alrdy"), folio);
--		folio_unlock(folio);
--		goto wait_for_writeback;
--	}
--
--	*_page = folio_file_page(folio, pos / PAGE_SIZE);
--	_leave(" = 0");
--	return 0;
--
--wait_for_writeback:
--	ret = folio_wait_writeback_killable(folio);
--	if (ret < 0)
--		goto error;
--
--	ret = folio_lock_killable(folio);
--	if (ret < 0)
--		goto error;
--	goto try_again;
--
--error:
--	folio_put(folio);
--	_leave(" = %d", ret);
--	return ret;
--}
--
--/*
-- * finalise part of a write to a page
-- */
--int afs_write_end(struct file *file, struct address_space *mapping,
--		  loff_t pos, unsigned len, unsigned copied,
--		  struct page *subpage, void *fsdata)
--{
--	struct folio *folio = page_folio(subpage);
--	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
--	loff_t i_size, write_end_pos;
--
--	_enter("{%llx:%llu},{%lx}",
--	       vnode->fid.vid, vnode->fid.vnode, folio_index(folio));
--
--	if (!folio_test_uptodate(folio)) {
--		if (copied < len) {
--			copied = 0;
--			goto out;
--		}
--
--		folio_mark_uptodate(folio);
--	}
--
--	if (copied == 0)
--		goto out;
--
--	write_end_pos = pos + copied;
--
--	i_size = i_size_read(&vnode->netfs.inode);
--	if (write_end_pos > i_size) {
--		write_seqlock(&vnode->cb_lock);
--		i_size = i_size_read(&vnode->netfs.inode);
--		if (write_end_pos > i_size)
--			afs_set_i_size(vnode, write_end_pos);
--		write_sequnlock(&vnode->cb_lock);
--		fscache_update_cookie(afs_vnode_cache(vnode), NULL, &write_end_pos);
--	}
--
--	if (folio_mark_dirty(folio))
--		_debug("dirtied %lx", folio_index(folio));
--
--out:
--	folio_unlock(folio);
--	folio_put(folio);
--	return copied;
--}
--
--/*
-- * kill all the pages in the given range
-- */
--static void afs_kill_pages(struct address_space *mapping,
--			   loff_t start, loff_t len)
--{
--	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
--	struct folio *folio;
--	pgoff_t index = start / PAGE_SIZE;
--	pgoff_t last = (start + len - 1) / PAGE_SIZE, next;
--
--	_enter("{%llx:%llu},%llx @%llx",
--	       vnode->fid.vid, vnode->fid.vnode, len, start);
--
--	do {
--		_debug("kill %lx (to %lx)", index, last);
--
--		folio = filemap_get_folio(mapping, index);
--		if (IS_ERR(folio)) {
--			next = index + 1;
--			continue;
--		}
--
--		next = folio_next_index(folio);
--
--		folio_clear_uptodate(folio);
--		folio_end_writeback(folio);
--		folio_lock(folio);
--		generic_error_remove_page(mapping, &folio->page);
--		folio_unlock(folio);
--		folio_put(folio);
--
--	} while (index = next, index <= last);
--
--	_leave("");
--}
--
--/*
-- * Redirty all the pages in a given range.
-- */
--static void afs_redirty_pages(struct writeback_control *wbc,
--			      struct address_space *mapping,
--			      loff_t start, loff_t len)
--{
--	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
--	struct folio *folio;
--	pgoff_t index = start / PAGE_SIZE;
--	pgoff_t last = (start + len - 1) / PAGE_SIZE, next;
--
--	_enter("{%llx:%llu},%llx @%llx",
--	       vnode->fid.vid, vnode->fid.vnode, len, start);
--
--	do {
--		_debug("redirty %llx @%llx", len, start);
--
--		folio = filemap_get_folio(mapping, index);
--		if (IS_ERR(folio)) {
--			next = index + 1;
--			continue;
--		}
--
--		next = index + folio_nr_pages(folio);
--		folio_redirty_for_writepage(wbc, folio);
--		folio_end_writeback(folio);
--		folio_put(folio);
--	} while (index = next, index <= last);
--
--	_leave("");
--}
--
- /*
-  * completion of write to server
-  */
- static void afs_pages_written_back(struct afs_vnode *vnode, loff_t start, unsigned int len)
- {
--	struct address_space *mapping = vnode->netfs.inode.i_mapping;
--	struct folio *folio;
--	pgoff_t end;
--
--	XA_STATE(xas, &mapping->i_pages, start / PAGE_SIZE);
--
- 	_enter("{%llx:%llu},{%x @%llx}",
- 	       vnode->fid.vid, vnode->fid.vnode, len, start);
+ /* Address operations API */
+ struct readahead_control;
+diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
+index cc7cb55f3420..60f98c99fe21 100644
+--- a/include/trace/events/netfs.h
++++ b/include/trace/events/netfs.h
+@@ -33,7 +33,9 @@
+ 	EM(NETFS_READPAGE,			"RP")		\
+ 	EM(NETFS_READ_FOR_WRITE,		"RW")		\
+ 	EM(NETFS_WRITEBACK,			"WB")		\
+-	E_(NETFS_DIO_READ,			"DR")
++	EM(NETFS_UNBUFFERED_WRITE,		"UW")		\
++	EM(NETFS_DIO_READ,			"DR")		\
++	E_(NETFS_DIO_WRITE,			"DW")
  
--	rcu_read_lock();
--
--	end = (start + len - 1) / PAGE_SIZE;
--	xas_for_each(&xas, folio, end) {
--		if (!folio_test_writeback(folio)) {
--			kdebug("bad %x @%llx page %lx %lx",
--			       len, start, folio_index(folio), end);
--			ASSERT(folio_test_writeback(folio));
--		}
--
--		trace_afs_folio_dirty(vnode, tracepoint_string("clear"), folio);
--		folio_end_writeback(folio);
--	}
--
--	rcu_read_unlock();
--
- 	afs_prune_wb_keys(vnode);
- 	_leave("");
- }
-@@ -379,339 +171,53 @@ static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter, loff_t
- 	return afs_put_operation(op);
- }
- 
--/*
-- * Extend the region to be written back to include subsequent contiguously
-- * dirty pages if possible, but don't sleep while doing so.
-- *
-- * If this page holds new content, then we can include filler zeros in the
-- * writeback.
-- */
--static void afs_extend_writeback(struct address_space *mapping,
--				 struct afs_vnode *vnode,
--				 long *_count,
--				 loff_t start,
--				 loff_t max_len,
--				 bool caching,
--				 size_t *_len)
-+static void afs_upload_to_server(struct netfs_io_subrequest *subreq)
- {
--	struct folio_batch fbatch;
--	struct folio *folio;
--	pgoff_t index = (start + *_len) / PAGE_SIZE;
--	bool stop = true;
--	unsigned int i;
--
--	XA_STATE(xas, &mapping->i_pages, index);
--	folio_batch_init(&fbatch);
--
--	do {
--		/* Firstly, we gather up a batch of contiguous dirty pages
--		 * under the RCU read lock - but we can't clear the dirty flags
--		 * there if any of those pages are mapped.
--		 */
--		rcu_read_lock();
--
--		xas_for_each(&xas, folio, ULONG_MAX) {
--			stop = true;
--			if (xas_retry(&xas, folio))
--				continue;
--			if (xa_is_value(folio))
--				break;
--			if (folio_index(folio) != index)
--				break;
--
--			if (!folio_try_get_rcu(folio)) {
--				xas_reset(&xas);
--				continue;
--			}
--
--			/* Has the folio moved or been split? */
--			if (unlikely(folio != xas_reload(&xas))) {
--				folio_put(folio);
--				break;
--			}
--
--			if (!folio_trylock(folio)) {
--				folio_put(folio);
--				break;
--			}
--			if (!folio_test_dirty(folio) ||
--			    folio_test_writeback(folio) ||
--			    folio_test_fscache(folio)) {
--				folio_unlock(folio);
--				folio_put(folio);
--				break;
--			}
--
--			index += folio_nr_pages(folio);
--			*_count -= folio_nr_pages(folio);
--			*_len += folio_size(folio);
--			stop = false;
--			if (*_len >= max_len || *_count <= 0)
--				stop = true;
--
--			if (!folio_batch_add(&fbatch, folio))
--				break;
--			if (stop)
--				break;
--		}
--
--		if (!stop)
--			xas_pause(&xas);
--		rcu_read_unlock();
--
--		/* Now, if we obtained any folios, we can shift them to being
--		 * writable and mark them for caching.
--		 */
--		if (!folio_batch_count(&fbatch))
--			break;
--
--		for (i = 0; i < folio_batch_count(&fbatch); i++) {
--			folio = fbatch.folios[i];
--			trace_afs_folio_dirty(vnode, tracepoint_string("store+"), folio);
-+	struct afs_vnode *vnode = AFS_FS_I(subreq->rreq->inode);
-+	ssize_t ret;
- 
--			if (!folio_clear_dirty_for_io(folio))
--				BUG();
--			if (folio_start_writeback(folio))
--				BUG();
--			afs_folio_start_fscache(caching, folio);
--			folio_unlock(folio);
--		}
-+	_enter("%x[%x],%zx",
-+	       subreq->rreq->debug_id, subreq->debug_index, subreq->io_iter.count);
- 
--		folio_batch_release(&fbatch);
--		cond_resched();
--	} while (!stop);
-+	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
-+	ret = afs_store_data(vnode, &subreq->io_iter, subreq->start,
-+			     subreq->rreq->origin == NETFS_LAUNDER_WRITE);
-+	netfs_write_subrequest_terminated(subreq, ret < 0 ? ret : subreq->len,
-+					  false);
- }
- 
--/*
-- * Synchronously write back the locked page and any subsequent non-locked dirty
-- * pages.
-- */
--static ssize_t afs_write_back_from_locked_folio(struct address_space *mapping,
--						struct writeback_control *wbc,
--						struct folio *folio,
--						unsigned long long start,
--						unsigned long long end)
-+static void afs_upload_to_server_worker(struct work_struct *work)
- {
--	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
--	struct iov_iter iter;
--	unsigned long long i_size = i_size_read(&vnode->netfs.inode);
--	size_t len, max_len;
--	bool caching = fscache_cookie_enabled(afs_vnode_cache(vnode));
--	long count = wbc->nr_to_write;
--	int ret;
--
--	_enter(",%lx,%llx-%llx", folio_index(folio), start, end);
--
--	if (folio_start_writeback(folio))
--		BUG();
--	afs_folio_start_fscache(caching, folio);
--
--	count -= folio_nr_pages(folio);
--
--	/* Find all consecutive lockable dirty pages that have contiguous
--	 * written regions, stopping when we find a page that is not
--	 * immediately lockable, is not dirty or is missing, or we reach the
--	 * end of the range.
--	 */
--	trace_afs_folio_dirty(vnode, tracepoint_string("store"), folio);
--
--	len = folio_size(folio);
--	if (start < i_size) {
--		/* Trim the write to the EOF; the extra data is ignored.  Also
--		 * put an upper limit on the size of a single storedata op.
--		 */
--		max_len = 65536 * 4096;
--		max_len = min_t(unsigned long long, max_len, end - start + 1);
--		max_len = min_t(unsigned long long, max_len, i_size - start);
--
--		if (len < max_len)
--			afs_extend_writeback(mapping, vnode, &count,
--					     start, max_len, caching, &len);
--		len = min_t(unsigned long long, len, i_size - start);
--	}
--
--	/* We now have a contiguous set of dirty pages, each with writeback
--	 * set; the first page is still locked at this point, but all the rest
--	 * have been unlocked.
--	 */
--	folio_unlock(folio);
-+	struct netfs_io_subrequest *subreq =
-+		container_of(work, struct netfs_io_subrequest, work);
- 
--	if (start < i_size) {
--		_debug("write back %zx @%llx [%llx]", len, start, i_size);
--
--		/* Speculatively write to the cache.  We have to fix this up
--		 * later if the store fails.
--		 */
--		afs_write_to_cache(vnode, start, len, i_size, caching);
--
--		iov_iter_xarray(&iter, ITER_SOURCE, &mapping->i_pages, start, len);
--		ret = afs_store_data(vnode, &iter, start, false);
--	} else {
--		_debug("write discard %zx @%llx [%llx]", len, start, i_size);
--
--		/* The dirty region was entirely beyond the EOF. */
--		fscache_clear_page_bits(mapping, start, len, caching);
--		afs_pages_written_back(vnode, start, len);
--		ret = 0;
--	}
--
--	switch (ret) {
--	case 0:
--		wbc->nr_to_write = count;
--		ret = len;
--		break;
--
--	default:
--		pr_notice("kAFS: Unexpected error from FS.StoreData %d\n", ret);
--		fallthrough;
--	case -EACCES:
--	case -EPERM:
--	case -ENOKEY:
--	case -EKEYEXPIRED:
--	case -EKEYREJECTED:
--	case -EKEYREVOKED:
--	case -ENETRESET:
--		afs_redirty_pages(wbc, mapping, start, len);
--		mapping_set_error(mapping, ret);
--		break;
--
--	case -EDQUOT:
--	case -ENOSPC:
--		afs_redirty_pages(wbc, mapping, start, len);
--		mapping_set_error(mapping, -ENOSPC);
--		break;
--
--	case -EROFS:
--	case -EIO:
--	case -EREMOTEIO:
--	case -EFBIG:
--	case -ENOENT:
--	case -ENOMEDIUM:
--	case -ENXIO:
--		trace_afs_file_error(vnode, ret, afs_file_error_writeback_fail);
--		afs_kill_pages(mapping, start, len);
--		mapping_set_error(mapping, ret);
--		break;
--	}
--
--	_leave(" = %d", ret);
--	return ret;
-+	afs_upload_to_server(subreq);
- }
- 
- /*
-- * write a region of pages back to the server
-+ * Set up write requests for a writeback slice.  We need to add a write request
-+ * for each write we want to make.
-  */
--static int afs_writepages_region(struct address_space *mapping,
--				 struct writeback_control *wbc,
--				 unsigned long long start,
--				 unsigned long long end, loff_t *_next,
--				 bool max_one_loop)
-+void afs_create_write_requests(struct netfs_io_request *wreq, loff_t start, size_t len)
- {
--	struct folio *folio;
--	struct folio_batch fbatch;
--	ssize_t ret;
--	unsigned int i;
--	int n, skips = 0;
--
--	_enter("%llx,%llx,", start, end);
--	folio_batch_init(&fbatch);
--
--	do {
--		pgoff_t index = start / PAGE_SIZE;
-+	struct netfs_io_subrequest *subreq;
- 
--		n = filemap_get_folios_tag(mapping, &index, end / PAGE_SIZE,
--					PAGECACHE_TAG_DIRTY, &fbatch);
-+	_enter("%x,%llx-%llx", wreq->debug_id, start, start + len);
- 
--		if (!n)
--			break;
--		for (i = 0; i < n; i++) {
--			folio = fbatch.folios[i];
--			start = folio_pos(folio); /* May regress with THPs */
--
--			_debug("wback %lx", folio_index(folio));
--
--			/* At this point we hold neither the i_pages lock nor the
--			 * page lock: the page may be truncated or invalidated
--			 * (changing page->mapping to NULL), or even swizzled
--			 * back from swapper_space to tmpfs file mapping
--			 */
--try_again:
--			if (wbc->sync_mode != WB_SYNC_NONE) {
--				ret = folio_lock_killable(folio);
--				if (ret < 0) {
--					folio_batch_release(&fbatch);
--					return ret;
--				}
--			} else {
--				if (!folio_trylock(folio))
--					continue;
--			}
--
--			if (folio->mapping != mapping ||
--			    !folio_test_dirty(folio)) {
--				start += folio_size(folio);
--				folio_unlock(folio);
--				continue;
--			}
--
--			if (folio_test_writeback(folio) ||
--			    folio_test_fscache(folio)) {
--				folio_unlock(folio);
--				if (wbc->sync_mode != WB_SYNC_NONE) {
--					folio_wait_writeback(folio);
--#ifdef CONFIG_AFS_FSCACHE
--					folio_wait_fscache(folio);
--#endif
--					goto try_again;
--				}
--
--				start += folio_size(folio);
--				if (wbc->sync_mode == WB_SYNC_NONE) {
--					if (skips >= 5 || need_resched()) {
--						*_next = start;
--						folio_batch_release(&fbatch);
--						_leave(" = 0 [%llx]", *_next);
--						return 0;
--					}
--					skips++;
--				}
--				continue;
--			}
--
--			if (!folio_clear_dirty_for_io(folio))
--				BUG();
--			ret = afs_write_back_from_locked_folio(mapping, wbc,
--					folio, start, end);
--			if (ret < 0) {
--				_leave(" = %zd", ret);
--				folio_batch_release(&fbatch);
--				return ret;
--			}
--
--			start += ret;
--		}
--
--		folio_batch_release(&fbatch);
--		cond_resched();
--	} while (wbc->nr_to_write > 0);
--
--	*_next = start;
--	_leave(" = 0 [%llx]", *_next);
--	return 0;
-+	subreq = netfs_create_write_request(wreq, NETFS_UPLOAD_TO_SERVER,
-+					    start, len, afs_upload_to_server_worker);
-+	if (subreq)
-+		netfs_queue_write_request(subreq);
- }
- 
- /*
-  * write some of the pending data back to the server
-  */
--int afs_writepages(struct address_space *mapping,
--		   struct writeback_control *wbc)
-+int afs_writepages(struct address_space *mapping, struct writeback_control *wbc)
- {
- 	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
--	loff_t start, next;
- 	int ret;
- 
--	_enter("");
--
- 	/* We have to be careful as we can end up racing with setattr()
- 	 * truncating the pagecache since the caller doesn't take a lock here
- 	 * to prevent it.
-@@ -721,68 +227,11 @@ int afs_writepages(struct address_space *mapping,
- 	else if (!down_read_trylock(&vnode->validate_lock))
- 		return 0;
- 
--	if (wbc->range_cyclic) {
--		start = mapping->writeback_index * PAGE_SIZE;
--		ret = afs_writepages_region(mapping, wbc, start, LLONG_MAX,
--					    &next, false);
--		if (ret == 0) {
--			mapping->writeback_index = next / PAGE_SIZE;
--			if (start > 0 && wbc->nr_to_write > 0) {
--				ret = afs_writepages_region(mapping, wbc, 0,
--							    start, &next, false);
--				if (ret == 0)
--					mapping->writeback_index =
--						next / PAGE_SIZE;
--			}
--		}
--	} else if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX) {
--		ret = afs_writepages_region(mapping, wbc, 0, LLONG_MAX,
--					    &next, false);
--		if (wbc->nr_to_write > 0 && ret == 0)
--			mapping->writeback_index = next / PAGE_SIZE;
--	} else {
--		ret = afs_writepages_region(mapping, wbc,
--					    wbc->range_start, wbc->range_end,
--					    &next, false);
--	}
--
-+	ret = netfs_writepages(mapping, wbc);
- 	up_read(&vnode->validate_lock);
--	_leave(" = %d", ret);
- 	return ret;
- }
- 
--/*
-- * write to an AFS file
-- */
--ssize_t afs_file_write(struct kiocb *iocb, struct iov_iter *from)
--{
--	struct afs_vnode *vnode = AFS_FS_I(file_inode(iocb->ki_filp));
--	struct afs_file *af = iocb->ki_filp->private_data;
--	ssize_t result;
--	size_t count = iov_iter_count(from);
--
--	_enter("{%llx:%llu},{%zu},",
--	       vnode->fid.vid, vnode->fid.vnode, count);
--
--	if (IS_SWAPFILE(&vnode->netfs.inode)) {
--		printk(KERN_INFO
--		       "AFS: Attempt to write to active swap file!\n");
--		return -EBUSY;
--	}
--
--	if (!count)
--		return 0;
--
--	result = afs_validate(vnode, af->key);
--	if (result < 0)
--		return result;
--
--	result = generic_file_write_iter(iocb, from);
--
--	_leave(" = %zd", result);
--	return result;
--}
--
- /*
-  * flush any dirty pages for this process, and check for write errors.
-  * - the return status from this call provides a reliable indication of
-@@ -811,49 +260,11 @@ int afs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
-  */
- vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
- {
--	struct folio *folio = page_folio(vmf->page);
- 	struct file *file = vmf->vma->vm_file;
--	struct inode *inode = file_inode(file);
--	struct afs_vnode *vnode = AFS_FS_I(inode);
--	struct afs_file *af = file->private_data;
--	vm_fault_t ret = VM_FAULT_RETRY;
--
--	_enter("{{%llx:%llu}},{%lx}", vnode->fid.vid, vnode->fid.vnode, folio_index(folio));
--
--	afs_validate(vnode, af->key);
--
--	sb_start_pagefault(inode->i_sb);
--
--	/* Wait for the page to be written to the cache before we allow it to
--	 * be modified.  We then assume the entire page will need writing back.
--	 */
--#ifdef CONFIG_AFS_FSCACHE
--	if (folio_test_fscache(folio) &&
--	    folio_wait_fscache_killable(folio) < 0)
--		goto out;
--#endif
--
--	if (folio_wait_writeback_killable(folio))
--		goto out;
--
--	if (folio_lock_killable(folio) < 0)
--		goto out;
--
--	if (folio_wait_writeback_killable(folio) < 0) {
--		folio_unlock(folio);
--		goto out;
--	}
--
--	if (folio_test_dirty(folio))
--		trace_afs_folio_dirty(vnode, tracepoint_string("mkwrite+"), folio);
--	else
--		trace_afs_folio_dirty(vnode, tracepoint_string("mkwrite"), folio);
--	file_update_time(file);
- 
--	ret = VM_FAULT_LOCKED;
--out:
--	sb_end_pagefault(inode->i_sb);
--	return ret;
-+	if (afs_validate(AFS_FS_I(file_inode(file)), afs_file_key(file)) < 0)
-+		return VM_FAULT_SIGBUS;
-+	return netfs_page_mkwrite(vmf, NULL);
- }
- 
- /*
-@@ -883,60 +294,3 @@ void afs_prune_wb_keys(struct afs_vnode *vnode)
- 		afs_put_wb_key(wbk);
- 	}
- }
--
--/*
-- * Clean up a page during invalidation.
-- */
--int afs_launder_folio(struct folio *folio)
--{
--	struct afs_vnode *vnode = AFS_FS_I(folio_inode(folio));
--	struct iov_iter iter;
--	struct bio_vec bv;
--	unsigned long long fend, i_size = vnode->netfs.inode.i_size;
--	size_t len;
--	int ret = 0;
--
--	_enter("{%lx}", folio->index);
--
--	if (folio_clear_dirty_for_io(folio) && folio_pos(folio) < i_size) {
--		len = folio_size(folio);
--		fend = folio_pos(folio) + len;
--		if (vnode->netfs.inode.i_size < fend)
--			len = fend - i_size;
--
--		bvec_set_folio(&bv, folio, len, 0);
--		iov_iter_bvec(&iter, WRITE, &bv, 1, len);
--
--		trace_afs_folio_dirty(vnode, tracepoint_string("launder"), folio);
--		ret = afs_store_data(vnode, &iter, folio_pos(folio), true);
--	}
--
--	trace_afs_folio_dirty(vnode, tracepoint_string("laundered"), folio);
--	folio_wait_fscache(folio);
--	return ret;
--}
--
--/*
-- * Deal with the completion of writing the data to the cache.
-- */
--static void afs_write_to_cache_done(void *priv, ssize_t transferred_or_error,
--				    bool was_async)
--{
--	struct afs_vnode *vnode = priv;
--
--	if (IS_ERR_VALUE(transferred_or_error) &&
--	    transferred_or_error != -ENOBUFS)
--		afs_invalidate_cache(vnode, 0);
--}
--
--/*
-- * Save the write to the cache also.
-- */
--static void afs_write_to_cache(struct afs_vnode *vnode,
--			       loff_t start, size_t len, loff_t i_size,
--			       bool caching)
--{
--	fscache_write_to_cache(afs_vnode_cache(vnode),
--			       vnode->netfs.inode.i_mapping, start, len, i_size,
--			       afs_write_to_cache_done, vnode, caching);
--}
-diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index 08506680350c..754358149372 100644
---- a/include/trace/events/afs.h
-+++ b/include/trace/events/afs.h
-@@ -837,29 +837,6 @@ TRACE_EVENT(afs_dir_check_failed,
- 		      __entry->vnode, __entry->off, __entry->i_size)
- 	    );
- 
--TRACE_EVENT(afs_folio_dirty,
--	    TP_PROTO(struct afs_vnode *vnode, const char *where, struct folio *folio),
--
--	    TP_ARGS(vnode, where, folio),
--
--	    TP_STRUCT__entry(
--		    __field(struct afs_vnode *,		vnode)
--		    __field(const char *,		where)
--		    __field(pgoff_t,			index)
--		    __field(size_t,			size)
--			     ),
--
--	    TP_fast_assign(
--		    __entry->vnode = vnode;
--		    __entry->where = where;
--		    __entry->index = folio_index(folio);
--		    __entry->size = folio_size(folio);
--			   ),
--
--	    TP_printk("vn=%p ix=%05lx s=%05lx %s",
--		      __entry->vnode, __entry->index, __entry->size, __entry->where)
--	    );
--
- TRACE_EVENT(afs_call_state,
- 	    TP_PROTO(struct afs_call *call,
- 		     enum afs_call_state from,
+ #define netfs_rreq_traces					\
+ 	EM(netfs_rreq_trace_assess,		"ASSESS ")	\
 
