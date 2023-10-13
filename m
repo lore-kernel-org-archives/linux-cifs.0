@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7DA5CDB47E
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:15:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B560CDB483
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:22:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231452AbjJMQPy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Oct 2023 12:15:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45868 "EHLO
+        id S230239AbjJMQWZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Oct 2023 12:22:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231172AbjJMQPx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:15:53 -0400
+        with ESMTP id S230288AbjJMQV6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:21:58 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FBD0211D
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:06:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D55149F4
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697213190;
+        s=mimecast20190719; t=1697213260;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yJ0EH3j50U389igBFANhTwAFPV4cR9SbiJMpaWBP0sQ=;
-        b=Xhei/j3b7aimM3DiUUPX9HEQQjkNRBEUodrMIOngJXqgzNCT26+YZHYByoInia85EZhWbf
-        8ONMqbqgNb7LPVp5S+iksl6rnWmGNA9HMFHcoCXD/9awCdKMpso2ROjOlmCznuaGw0ZNg3
-        WUecsAQaRfKhdOUZ9zyp90dzk+r38DU=
+        bh=siiUCfm/6wTPe3NeddwK5MIcndctwu37QkcVcSF/dvI=;
+        b=MhLNpVT0uK3qXue2h6Of8OQC2ks0yrY6twsZswiGW8saLmMzBArsOLIvpe3SZZr7BGy5E6
+        Alz7oYCdXkA4TE+kRoU3ZfO9myc09GWD+Y/hdXkkhEYRRhy9Ane1SpDkrPoWUn2IPeB5zV
+        qRn5baO29NS4ss8S08FKApG5HyuGWhw=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-646-YdQnHyJONxOiGOy-PV0Gow-1; Fri, 13 Oct 2023 12:06:27 -0400
-X-MC-Unique: YdQnHyJONxOiGOy-PV0Gow-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-312-Vll3KhhUMQuYBLcsr0GY-w-1; Fri, 13 Oct 2023 12:07:21 -0400
+X-MC-Unique: Vll3KhhUMQuYBLcsr0GY-w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6D0E085A5BF;
-        Fri, 13 Oct 2023 16:06:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 502851029F42;
+        Fri, 13 Oct 2023 16:07:20 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DDB741C060DF;
-        Fri, 13 Oct 2023 16:06:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6C4DE20267FC;
+        Fri, 13 Oct 2023 16:07:17 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -52,102 +52,182 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Subject: [RFC PATCH 34/53] netfs: Make netfs_skip_folio_read() take account of blocksize
-Date:   Fri, 13 Oct 2023 17:04:03 +0100
-Message-ID: <20231013160423.2218093-35-dhowells@redhat.com>
+        linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        linux-cachefs@redhat.com
+Subject: [RFC PATCH 49/53] cifs: Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c
+Date:   Fri, 13 Oct 2023 17:04:18 +0100
+Message-ID: <20231013160423.2218093-50-dhowells@redhat.com>
 In-Reply-To: <20231013160423.2218093-1-dhowells@redhat.com>
 References: <20231013160423.2218093-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make netfs_skip_folio_read() take account of blocksize such as crypto
-blocksize.
+Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c so that
+they are colocated with similar functions rather than being split with
+cifsfs.c.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
 cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
 cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/buffered_read.c | 32 +++++++++++++++++++++-----------
- 1 file changed, 21 insertions(+), 11 deletions(-)
+ fs/smb/client/cifsfs.c | 55 ------------------------------------------
+ fs/smb/client/cifsfs.h |  2 ++
+ fs/smb/client/file.c   | 53 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 55 insertions(+), 55 deletions(-)
 
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index e06461ef0bfa..de696aaaefbd 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -337,6 +337,7 @@ EXPORT_SYMBOL(netfs_read_folio);
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 85799e9e0f4c..0c19b65206f6 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -982,61 +982,6 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 	return root;
+ }
  
- /*
-  * Prepare a folio for writing without reading first
-+ * @ctx: File context
-  * @folio: The folio being prepared
-  * @pos: starting position for the write
-  * @len: length of write
-@@ -350,32 +351,41 @@ EXPORT_SYMBOL(netfs_read_folio);
-  * If any of these criteria are met, then zero out the unwritten parts
-  * of the folio and return true. Otherwise, return false.
-  */
--static bool netfs_skip_folio_read(struct folio *folio, loff_t pos, size_t len,
--				 bool always_fill)
-+static bool netfs_skip_folio_read(struct netfs_inode *ctx, struct folio *folio,
-+				  loff_t pos, size_t len, bool always_fill)
+-
+-static ssize_t
+-cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+-{
+-	ssize_t rc;
+-	struct inode *inode = file_inode(iocb->ki_filp);
+-
+-	if (iocb->ki_flags & IOCB_DIRECT)
+-		return cifs_user_readv(iocb, iter);
+-
+-	rc = cifs_revalidate_mapping(inode);
+-	if (rc)
+-		return rc;
+-
+-	return generic_file_read_iter(iocb, iter);
+-}
+-
+-static ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+-{
+-	struct inode *inode = file_inode(iocb->ki_filp);
+-	struct cifsInodeInfo *cinode = CIFS_I(inode);
+-	ssize_t written;
+-	int rc;
+-
+-	if (iocb->ki_filp->f_flags & O_DIRECT) {
+-		written = cifs_user_writev(iocb, from);
+-		if (written > 0 && CIFS_CACHE_READ(cinode)) {
+-			cifs_zap_mapping(inode);
+-			cifs_dbg(FYI,
+-				 "Set no oplock for inode=%p after a write operation\n",
+-				 inode);
+-			cinode->oplock = 0;
+-		}
+-		return written;
+-	}
+-
+-	written = cifs_get_writer(cinode);
+-	if (written)
+-		return written;
+-
+-	written = generic_file_write_iter(iocb, from);
+-
+-	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
+-		goto out;
+-
+-	rc = filemap_fdatawrite(inode->i_mapping);
+-	if (rc)
+-		cifs_dbg(FYI, "cifs_file_write_iter: %d rc on %p inode\n",
+-			 rc, inode);
+-
+-out:
+-	cifs_put_writer(cinode);
+-	return written;
+-}
+-
+ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
  {
- 	struct inode *inode = folio_inode(folio);
--	loff_t i_size = i_size_read(inode);
-+	loff_t i_size = i_size_read(inode), low, high;
- 	size_t offset = offset_in_folio(folio, pos);
- 	size_t plen = folio_size(folio);
-+	size_t min_bsize = 1UL << ctx->min_bshift;
+ 	struct cifsFileInfo *cfile = file->private_data;
+diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
+index 41daebd220ff..24d5bac07f87 100644
+--- a/fs/smb/client/cifsfs.h
++++ b/fs/smb/client/cifsfs.h
+@@ -100,6 +100,8 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
++ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from);
++ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter);
+ extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
+ extern int cifs_lock(struct file *, int, struct file_lock *);
+ extern int cifs_fsync(struct file *, loff_t, loff_t, int);
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 6c7b91728dd4..3112233c4835 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -4584,6 +4584,59 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+ 	return __cifs_readv(iocb, to, false);
+ }
+ 
++ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
++{
++	ssize_t rc;
++	struct inode *inode = file_inode(iocb->ki_filp);
 +
-+	if (likely(min_bsize == 1)) {
-+		low = folio_file_pos(folio);
-+		high = low + plen;
-+	} else {
-+		low = round_down(pos, min_bsize);
-+		high = round_up(pos + len, min_bsize);
++	if (iocb->ki_flags & IOCB_DIRECT)
++		return cifs_user_readv(iocb, iter);
++
++	rc = cifs_revalidate_mapping(inode);
++	if (rc)
++		return rc;
++
++	return generic_file_read_iter(iocb, iter);
++}
++
++ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
++{
++	struct inode *inode = file_inode(iocb->ki_filp);
++	struct cifsInodeInfo *cinode = CIFS_I(inode);
++	ssize_t written;
++	int rc;
++
++	if (iocb->ki_filp->f_flags & O_DIRECT) {
++		written = cifs_user_writev(iocb, from);
++		if (written > 0 && CIFS_CACHE_READ(cinode)) {
++			cifs_zap_mapping(inode);
++			cifs_dbg(FYI,
++				 "Set no oplock for inode=%p after a write operation\n",
++				 inode);
++			cinode->oplock = 0;
++		}
++		return written;
 +	}
- 
- 	if (unlikely(always_fill)) {
--		if (pos - offset + len <= i_size)
--			return false; /* Page entirely before EOF */
-+		if (low < i_size)
-+			return false; /* Some part of the block before EOF */
- 		zero_user_segment(&folio->page, 0, plen);
- 		folio_mark_uptodate(folio);
- 		return true;
- 	}
- 
--	/* Full folio write */
--	if (offset == 0 && len >= plen)
-+	/* Full page write */
-+	if (pos == low && high == pos + len)
- 		return true;
- 
--	/* Page entirely beyond the end of the file */
--	if (pos - offset >= i_size)
-+	/* pos beyond last page in the file */
-+	if (low >= i_size)
- 		goto zero_out;
- 
- 	/* Write that covers from the start of the folio to EOF or beyond */
--	if (offset == 0 && (pos + len) >= i_size)
-+	if (pos == low && (pos + len) >= i_size)
- 		goto zero_out;
- 
- 	return false;
-@@ -454,7 +464,7 @@ int netfs_write_begin(struct netfs_inode *ctx,
- 	 * to preload the granule.
- 	 */
- 	if (!netfs_is_cache_enabled(ctx) &&
--	    netfs_skip_folio_read(folio, pos, len, false)) {
-+	    netfs_skip_folio_read(ctx, folio, pos, len, false)) {
- 		netfs_stat(&netfs_n_rh_write_zskip);
- 		goto have_folio_no_wait;
- 	}
++
++	written = cifs_get_writer(cinode);
++	if (written)
++		return written;
++
++	written = generic_file_write_iter(iocb, from);
++
++	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
++		goto out;
++
++	rc = filemap_fdatawrite(inode->i_mapping);
++	if (rc)
++		cifs_dbg(FYI, "cifs_file_write_iter: %d rc on %p inode\n",
++			 rc, inode);
++
++out:
++	cifs_put_writer(cinode);
++	return written;
++}
++
+ ssize_t
+ cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to)
+ {
 
