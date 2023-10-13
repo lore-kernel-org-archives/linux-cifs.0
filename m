@@ -2,41 +2,41 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0634CDB484
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D510CDB487
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Oct 2023 16:06:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233046AbjJMQGm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S232938AbjJMQGm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Fri, 13 Oct 2023 12:06:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41142 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232925AbjJMQGP (ORCPT
+        with ESMTP id S232941AbjJMQGP (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 12:06:15 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F96610A
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:05:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79A6619B
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 09:05:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697213122;
+        s=mimecast20190719; t=1697213112;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=My5vhPID0cGh8dfo8fU6SjTEUwiUM3vyJnExzTG3s6g=;
-        b=Zb1/E3iHwz498Yu9mgjvGlup0a1zk6AmA1jRrzo2pF7lSmHIQCzM753P2KNaZjGXKwA2/k
-        cHV1VYIT1Tgd1c4667LlTIjJA0+bmjVoomPpk7ev/dx8yk8RRG8NNJPN+pcn/ysXEFaz14
-        Ob3T6qyG+ASq3gTl8dbZqbNqddRZXSU=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-161-UOB1c2_XOhGlcUUO4m1fqg-1; Fri, 13 Oct 2023 12:05:18 -0400
-X-MC-Unique: UOB1c2_XOhGlcUUO4m1fqg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        bh=jWgnbo20VG+CFeOrUh8dec9VrlPmTpjksj3Uwlk63eE=;
+        b=f41jid6ISKsPrmX2zC79aKP5/+QJ3s/CYhe3rvoiFy9yiU2Y+4Y0hrohZf6iOxzmALHCWR
+        aIgalLJaZ9o/6Qc3j0tsZCued9e0aAs28eXWPvnueIylZP7fKLBdXseYoUC6BNTIKaU98B
+        nEEKxweJ7yJTbk51H6iK5LMYl1KMT3I=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-483-TfxWRZ-fOGSKd-858CLGYg-1; Fri, 13 Oct 2023 12:04:59 -0400
+X-MC-Unique: TfxWRZ-fOGSKd-858CLGYg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5743E382333F;
-        Fri, 13 Oct 2023 16:05:17 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F243C858F19;
+        Fri, 13 Oct 2023 16:04:57 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CAF5040C6CA5;
-        Fri, 13 Oct 2023 16:05:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 68C676403C;
+        Fri, 13 Oct 2023 16:04:55 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>
 Cc:     David Howells <dhowells@redhat.com>,
@@ -53,22 +53,23 @@ Cc:     David Howells <dhowells@redhat.com>,
         v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Subject: [RFC PATCH 15/53] netfs: Limit subrequest by size or number of segments
-Date:   Fri, 13 Oct 2023 17:03:44 +0100
-Message-ID: <20231013160423.2218093-16-dhowells@redhat.com>
+Subject: [RFC PATCH 09/53] netfs: Implement unbuffered/DIO vs buffered I/O locking
+Date:   Fri, 13 Oct 2023 17:03:38 +0100
+Message-ID: <20231013160423.2218093-10-dhowells@redhat.com>
 In-Reply-To: <20231013160423.2218093-1-dhowells@redhat.com>
 References: <20231013160423.2218093-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Limit a subrequest to a maximum size and/or a maximum number of contiguous
-physical regions.  This permits, for instance, an subreq's iterator to be
-limited to the number of DMA'able segments that a large RDMA request can
-handle.
+Borrow NFS's direct-vs-buffered I/O locking into netfslib.  Similar code is
+also used in ceph.
+
+Modify it to have the correct checker annotations for i_rwsem lock
+acquisition/release and to return -ERESTARTSYS if waits are interrupted.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Jeff Layton <jlayton@kernel.org>
@@ -76,76 +77,272 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/io.c                | 18 ++++++++++++++++++
- include/linux/netfs.h        |  1 +
- include/trace/events/netfs.h |  1 +
- 3 files changed, 20 insertions(+)
+ fs/netfs/Makefile     |   1 +
+ fs/netfs/locking.c    | 209 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/netfs.h |  10 ++
+ 3 files changed, 220 insertions(+)
+ create mode 100644 fs/netfs/locking.c
 
-diff --git a/fs/netfs/io.c b/fs/netfs/io.c
-index d8e9cd6ce338..c80b8eed1209 100644
---- a/fs/netfs/io.c
-+++ b/fs/netfs/io.c
-@@ -525,6 +525,7 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq,
- 			struct iov_iter *io_iter)
- {
- 	enum netfs_io_source source;
-+	size_t lsize;
- 
- 	_enter("%llx-%llx,%llx", subreq->start, subreq->start + subreq->len, rreq->i_size);
- 
-@@ -547,13 +548,30 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq,
- 			source = NETFS_INVALID_READ;
- 			goto out;
- 		}
+diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+index cd22554d9048..647ce1935674 100644
+--- a/fs/netfs/Makefile
++++ b/fs/netfs/Makefile
+@@ -4,6 +4,7 @@ netfs-y := \
+ 	buffered_read.o \
+ 	io.o \
+ 	iterator.o \
++	locking.o \
+ 	main.o \
+ 	misc.o \
+ 	objects.o
+diff --git a/fs/netfs/locking.c b/fs/netfs/locking.c
+new file mode 100644
+index 000000000000..fecca8ea6322
+--- /dev/null
++++ b/fs/netfs/locking.c
+@@ -0,0 +1,209 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * I/O and data path helper functionality.
++ *
++ * Borrowed from NFS Copyright (c) 2016 Trond Myklebust
++ */
 +
-+		if (subreq->max_nr_segs) {
-+			lsize = netfs_limit_iter(io_iter, 0, subreq->len,
-+						 subreq->max_nr_segs);
-+			if (subreq->len > lsize) {
-+				subreq->len = lsize;
-+				trace_netfs_sreq(subreq, netfs_sreq_trace_limited);
++#include <linux/kernel.h>
++#include <linux/netfs.h>
++
++/*
++ * inode_dio_wait_interruptible - wait for outstanding DIO requests to finish
++ * @inode: inode to wait for
++ *
++ * Waits for all pending direct I/O requests to finish so that we can
++ * proceed with a truncate or equivalent operation.
++ *
++ * Must be called under a lock that serializes taking new references
++ * to i_dio_count, usually by inode->i_mutex.
++ */
++static int inode_dio_wait_interruptible(struct inode *inode)
++{
++	if (!atomic_read(&inode->i_dio_count))
++		return 0;
++
++	wait_queue_head_t *wq = bit_waitqueue(&inode->i_state, __I_DIO_WAKEUP);
++	DEFINE_WAIT_BIT(q, &inode->i_state, __I_DIO_WAKEUP);
++
++	for (;;) {
++		prepare_to_wait(wq, &q.wq_entry, TASK_INTERRUPTIBLE);
++		if (!atomic_read(&inode->i_dio_count))
++			break;
++		if (signal_pending(current))
++			break;
++		schedule();
++	}
++	finish_wait(wq, &q.wq_entry);
++
++	return atomic_read(&inode->i_dio_count) ? -ERESTARTSYS : 0;
++}
++
++/* Call with exclusively locked inode->i_rwsem */
++static int netfs_block_o_direct(struct netfs_inode *ictx)
++{
++	if (!test_bit(NETFS_ICTX_ODIRECT, &ictx->flags))
++		return 0;
++	clear_bit(NETFS_ICTX_ODIRECT, &ictx->flags);
++	return inode_dio_wait_interruptible(&ictx->inode);
++}
++
++/**
++ * netfs_start_io_read - declare the file is being used for buffered reads
++ * @inode: file inode
++ *
++ * Declare that a buffered read operation is about to start, and ensure
++ * that we block all direct I/O.
++ * On exit, the function ensures that the NETFS_ICTX_ODIRECT flag is unset,
++ * and holds a shared lock on inode->i_rwsem to ensure that the flag
++ * cannot be changed.
++ * In practice, this means that buffered read operations are allowed to
++ * execute in parallel, thanks to the shared lock, whereas direct I/O
++ * operations need to wait to grab an exclusive lock in order to set
++ * NETFS_ICTX_ODIRECT.
++ * Note that buffered writes and truncates both take a write lock on
++ * inode->i_rwsem, meaning that those are serialised w.r.t. the reads.
++ */
++int netfs_start_io_read(struct inode *inode)
++	__acquires(inode->i_rwsem)
++{
++	struct netfs_inode *ictx = netfs_inode(inode);
++
++	/* Be an optimist! */
++	if (down_read_interruptible(&inode->i_rwsem) < 0)
++		return -ERESTARTSYS;
++	if (test_bit(NETFS_ICTX_ODIRECT, &ictx->flags) == 0)
++		return 0;
++	up_read(&inode->i_rwsem);
++
++	/* Slow path.... */
++	if (down_write_killable(&inode->i_rwsem) < 0)
++		return -ERESTARTSYS;
++	if (netfs_block_o_direct(ictx) < 0) {
++		up_write(&inode->i_rwsem);
++		return -ERESTARTSYS;
++	}
++	downgrade_write(&inode->i_rwsem);
++	return 0;
++}
++
++/**
++ * netfs_end_io_read - declare that the buffered read operation is done
++ * @inode: file inode
++ *
++ * Declare that a buffered read operation is done, and release the shared
++ * lock on inode->i_rwsem.
++ */
++void netfs_end_io_read(struct inode *inode)
++	__releases(inode->i_rwsem)
++{
++	up_read(&inode->i_rwsem);
++}
++
++/**
++ * netfs_start_io_write - declare the file is being used for buffered writes
++ * @inode: file inode
++ *
++ * Declare that a buffered read operation is about to start, and ensure
++ * that we block all direct I/O.
++ */
++int netfs_start_io_write(struct inode *inode)
++	__acquires(inode->i_rwsem)
++{
++	struct netfs_inode *ictx = netfs_inode(inode);
++
++	if (down_write_killable(&inode->i_rwsem) < 0)
++		return -ERESTARTSYS;
++	if (netfs_block_o_direct(ictx) < 0) {
++		up_write(&inode->i_rwsem);
++		return -ERESTARTSYS;
++	}
++	return 0;
++}
++
++/**
++ * netfs_end_io_write - declare that the buffered write operation is done
++ * @inode: file inode
++ *
++ * Declare that a buffered write operation is done, and release the
++ * lock on inode->i_rwsem.
++ */
++void netfs_end_io_write(struct inode *inode)
++	__releases(inode->i_rwsem)
++{
++	up_write(&inode->i_rwsem);
++}
++
++/* Call with exclusively locked inode->i_rwsem */
++static int netfs_block_buffered(struct inode *inode)
++{
++	struct netfs_inode *ictx = netfs_inode(inode);
++	int ret;
++
++	if (!test_bit(NETFS_ICTX_ODIRECT, &ictx->flags)) {
++		set_bit(NETFS_ICTX_ODIRECT, &ictx->flags);
++		if (inode->i_mapping->nrpages != 0) {
++			unmap_mapping_range(inode->i_mapping, 0, 0, 0);
++			ret = filemap_fdatawait(inode->i_mapping);
++			if (ret < 0) {
++				clear_bit(NETFS_ICTX_ODIRECT, &ictx->flags);
++				return ret;
 +			}
 +		}
- 	}
- 
-+	if (subreq->len > rreq->len)
-+		pr_warn("R=%08x[%u] SREQ>RREQ %zx > %zx\n",
-+			rreq->debug_id, subreq->debug_index,
-+			subreq->len, rreq->len);
++	}
++	return 0;
++}
 +
- 	if (WARN_ON(subreq->len == 0)) {
- 		source = NETFS_INVALID_READ;
- 		goto out;
- 	}
- 
-+	subreq->source = source;
-+	trace_netfs_sreq(subreq, netfs_sreq_trace_prepare);
++/**
++ * netfs_start_io_direct - declare the file is being used for direct i/o
++ * @inode: file inode
++ *
++ * Declare that a direct I/O operation is about to start, and ensure
++ * that we block all buffered I/O.
++ * On exit, the function ensures that the NETFS_ICTX_ODIRECT flag is set,
++ * and holds a shared lock on inode->i_rwsem to ensure that the flag
++ * cannot be changed.
++ * In practice, this means that direct I/O operations are allowed to
++ * execute in parallel, thanks to the shared lock, whereas buffered I/O
++ * operations need to wait to grab an exclusive lock in order to clear
++ * NETFS_ICTX_ODIRECT.
++ * Note that buffered writes and truncates both take a write lock on
++ * inode->i_rwsem, meaning that those are serialised w.r.t. O_DIRECT.
++ */
++int netfs_start_io_direct(struct inode *inode)
++	__acquires(inode->i_rwsem)
++{
++	struct netfs_inode *ictx = netfs_inode(inode);
++	int ret;
 +
- 	subreq->io_iter = *io_iter;
- 	iov_iter_truncate(&subreq->io_iter, subreq->len);
- 	iov_iter_advance(io_iter, subreq->len);
++	/* Be an optimist! */
++	if (down_read_interruptible(&inode->i_rwsem) < 0)
++		return -ERESTARTSYS;
++	if (test_bit(NETFS_ICTX_ODIRECT, &ictx->flags) != 0)
++		return 0;
++	up_read(&inode->i_rwsem);
++
++	/* Slow path.... */
++	if (down_write_killable(&inode->i_rwsem) < 0)
++		return -ERESTARTSYS;
++	ret = netfs_block_buffered(inode);
++	if (ret < 0) {
++		up_write(&inode->i_rwsem);
++		return ret;
++	}
++	downgrade_write(&inode->i_rwsem);
++	return 0;
++}
++
++/**
++ * netfs_end_io_direct - declare that the direct i/o operation is done
++ * @inode: file inode
++ *
++ * Declare that a direct I/O operation is done, and release the shared
++ * lock on inode->i_rwsem.
++ */
++void netfs_end_io_direct(struct inode *inode)
++	__releases(inode->i_rwsem)
++{
++	up_read(&inode->i_rwsem);
++}
 diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 2b5e04ea4db2..aaf1c1d4de51 100644
+index 02e888c170da..33d4487a91e9 100644
 --- a/include/linux/netfs.h
 +++ b/include/linux/netfs.h
-@@ -163,6 +163,7 @@ struct netfs_io_subrequest {
- 	refcount_t		ref;
- 	short			error;		/* 0 or error that occurred */
- 	unsigned short		debug_index;	/* Index in list (for debugging output) */
-+	unsigned int		max_nr_segs;	/* 0 or max number of segments in an iterator */
- 	enum netfs_io_source	source;		/* Where to read from/write to */
- 	unsigned long		flags;
- #define NETFS_SREQ_COPY_TO_CACHE	0	/* Set if should copy the data to the cache */
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index beec534cbaab..fce6d0bc78e5 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -44,6 +44,7 @@
- #define netfs_sreq_traces					\
- 	EM(netfs_sreq_trace_download_instead,	"RDOWN")	\
- 	EM(netfs_sreq_trace_free,		"FREE ")	\
-+	EM(netfs_sreq_trace_limited,		"LIMIT")	\
- 	EM(netfs_sreq_trace_prepare,		"PREP ")	\
- 	EM(netfs_sreq_trace_resubmit_short,	"SHORT")	\
- 	EM(netfs_sreq_trace_submit,		"SUBMT")	\
+@@ -131,6 +131,8 @@ struct netfs_inode {
+ 	loff_t			remote_i_size;	/* Size of the remote file */
+ 	loff_t			zero_point;	/* Size after which we assume there's no data
+ 						 * on the server */
++	unsigned long		flags;
++#define NETFS_ICTX_ODIRECT	0		/* The file has DIO in progress */
+ };
+ 
+ /*
+@@ -315,6 +317,13 @@ ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
+ 				struct iov_iter *new,
+ 				iov_iter_extraction_t extraction_flags);
+ 
++int netfs_start_io_read(struct inode *inode);
++void netfs_end_io_read(struct inode *inode);
++int netfs_start_io_write(struct inode *inode);
++void netfs_end_io_write(struct inode *inode);
++int netfs_start_io_direct(struct inode *inode);
++void netfs_end_io_direct(struct inode *inode);
++
+ /**
+  * netfs_inode - Get the netfs inode context from the inode
+  * @inode: The inode to query
+@@ -341,6 +350,7 @@ static inline void netfs_inode_init(struct netfs_inode *ctx,
+ 	ctx->ops = ops;
+ 	ctx->remote_i_size = i_size_read(&ctx->inode);
+ 	ctx->zero_point = ctx->remote_i_size;
++	ctx->flags = 0;
+ #if IS_ENABLED(CONFIG_FSCACHE)
+ 	ctx->cache = NULL;
+ #endif
 
