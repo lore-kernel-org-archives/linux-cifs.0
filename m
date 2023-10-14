@@ -2,236 +2,147 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A99BCCDB47E
-	for <linux-cifs@archiver.kernel.org>; Sat, 14 Oct 2023 00:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DEE4CDB47E
+	for <linux-cifs@archiver.kernel.org>; Sat, 14 Oct 2023 00:01:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231500AbjJNAAA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Oct 2023 20:00:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47574 "EHLO
+        id S232350AbjJNABM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Oct 2023 20:01:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbjJMX77 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 19:59:59 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D60FAD
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 16:59:58 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C61E6C433C9
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 23:59:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697241597;
-        bh=1RMd4p+C+RVwLWTlmJNFRrMCPKl6iHFNF1Ki/z9/M/g=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=E8Mj+1QmxkJBKLbMpg7xeiA9RLKhiOdcmwRYDx3H/HK9S76niU2QyELvlF+8sXuXk
-         YHC8mHNblnH8lhYIcZLk9+co57WW1+mNgnxX3dVsjLe3RLftW6yhzN3t2je1fSOxfK
-         jI1nQ3qksHktV+AGqmI5dJEZPFeO6FApw3uSm2MdixL/7oH1YNuGdJb+wyvnnLp1Po
-         shtdOeeI0c5jpOwvbAEjEW7TWn6xeYJ30uk0hyqpLtDa8sNLUKWVN+iEdsgYQTbcuu
-         IoiPYJ+o5RIi3RBPZKXp2L86JoC6aLdfNVPeGgBzJKW5JssaowurC0/ZEDlVjVPWy0
-         7Eu/pk1LqBkyQ==
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5812eaed1eeso1413852eaf.0
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Oct 2023 16:59:57 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yz/xV3gfCE/fr9x14tXbtqDs3NaP0v1uH3vpnk8K52V++Rwg70V
-        vXjvH030BweDHqGm1jLbQ5i4aUWeI+/AviVMEvc=
-X-Google-Smtp-Source: AGHT+IGcXWezvVodcat29WLdYOCEarxHzm0OJTuEsLG2ah5Vb0hzLLJp/aLgfxbXdNagzp0Z/x6ubrj4SGwhA+Z4uWc=
-X-Received: by 2002:a4a:d28b:0:b0:57e:1c6a:d551 with SMTP id
- h11-20020a4ad28b000000b0057e1c6ad551mr28895496oos.3.1697241596945; Fri, 13
- Oct 2023 16:59:56 -0700 (PDT)
+        with ESMTP id S232555AbjJNABL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Oct 2023 20:01:11 -0400
+X-Greylist: delayed 527 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 13 Oct 2023 17:01:09 PDT
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F206EAD;
+        Fri, 13 Oct 2023 17:01:09 -0700 (PDT)
+Date:   Fri, 13 Oct 2023 21:01:02 -0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1697241668;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=M+A9cxjZQ4atgBjgDYZMNYaWX62CwYSOelOrpz+DrBc=;
+        b=IUYRNUB2n9flw0Qrs+BVpZQGsPvws4cj8J2FQtPLoQjvoDQmuue5BR2WeOq+V6oO4TOfnS
+        iTuUHO/yWmGZQkGb5686ffOqMuiMZasA5smLINyYliG2Dk0prpvZ7TNl0YZLfOq0odU4MS
+        PxTQ9M7/enOmF/kDKHFrsqjmJVVFdt6TD/ETQpZb1364bkjeeZMoeEeu5cXIfe5cJ7KRM7
+        gJz3W8B9JAiEmJPqrv8F7KATYBIj5wfH8WnojxPt2Wy5iCNXConqcUZXlLPU5fdU6rRcLy
+        gM+ck8NUZncJ7jwC2QLSum4FDtaSXuVH/a88Ie7J9PRrVEpN/F9pVgf77OmfFw==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1697241668; a=rsa-sha256;
+        cv=none;
+        b=CyrTzOZgcs/RdLoYXwknk1SCFF6NjEBWvok+tDTMlid3AWtC6xsYmb3swmmBPb3QwsShsV
+        4HKl064uYwip+a/JMcutplDI6MOBPu2cIGikmPwZWi2MNIYlvdhwiyDulEyij2/sfY5tIk
+        EkHAx/56+Joo7vw435L9d9KNbyp47k2M6XnauLz9KE+WAkjXVjXVJFDqrX5PtJkkZiXigb
+        ZO0EQXKuq1SI3lszJZ8+Oot0rX933YZ57my+wQBlez9p4mzXFPEDfZf9loTZvRQGUOXEIb
+        X3x288QcOHXW8SNzusiCNRGRlZ0SQtpm0faRbko+FXR7DXTjo5rMKal2sZ4a1Q==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1697241668;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=M+A9cxjZQ4atgBjgDYZMNYaWX62CwYSOelOrpz+DrBc=;
+        b=g+jeq8MEkYE7JKlrGfn92iyVK6zlmLs9pEYvD1gAFHUxiW27SUVlYnEVt6ysNWNk0z6JDT
+        IAJ30VLEqtpcYUHLQVMwF+DFqN9tjRxt0t7X83+QbsxPcTggCPWyodXhoIF4Ybti9ES/zw
+        fnl7N00wVKW26bwTIn5EpKsLpP/AZ02mckKQqF+COyXLprKBQ9enuX/YeOrDOKZxiggbMX
+        RveGkCzxDuQ2kyPQQDNj64VTReYfIoWF7KgEdxseFS40txF6a0/KgCQY8XRGkp0jbThYbv
+        1bBM6YIcY1AMqls9q5CZmXZ6FebnRc2TZGGVq2hxr17OUdxcZ2cDf5itNnQ89w==
+From:   Paulo Alcantara <pc@manguebit.com>
+To:     matoro <matoro_mailinglist_kernel@matoro.tk>,
+        "Dr. Bernd Feige" <bernd.feige@uniklinik-freiburg.de>
+CC:     tom@talpey.com, smfrench@gmail.com, paul@darkrain42.org,
+        linux-cifs@vger.kernel.org, bagasdotme@gmail.com,
+        regressions@lists.linux.dev, ronniesahlberg@gmail.com,
+        nspmangalore@gmail.com, brian.pardy@gmail.com,
+        bharathsm@microsoft.com, linux-kernel@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_Possible_bug_report=3A_kern?= =?US-ASCII?Q?el_6=2E5=2E0/6=2E5=2E1_high_load_when?= =?US-ASCII?Q?_CIFS_share_is_mounted_=28cifsd?= =?US-ASCII?Q?-cfid-laundromat_in=22D=22_state=29?=
+In-Reply-To: <E1F307C7-9B1E-40F6-860B-6050856E8395@manguebit.com>
+References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com> <ZPfPfyIoVxw5L6El@debian.me> <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com> <CAO+kfxTvA6N=i+jGf0XbSyqf85i=q+vR6R9d_42OWfM2sWWXaA@mail.gmail.com> <CAH2r5mtUedfLSv81Z-Yb3_=AbD_QpT3tVbU1PRzMTituaw7bgA@mail.gmail.com> <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com> <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com> <CAH2r5msNf9WDHrBZSi5FhHDSewSNxMAuXTetMJDnoNh3CF_oMA@mail.gmail.com> <a895f860-11fa-e6d9-d042-a32bd08f9e9d@talpey.com> <CAH2r5mszCxPtdURenMVgeVDX5zc8knumH=ASXyUufPa7SxbJBw@mail.gmail.com> <ZRN9MtBqYnT6oX60@vaarsuvius> <85d538fec5a086acf62d5a803056586a6c00e4bd.camel@uniklinik-freiburg.de> <83d00d50bc628a85db71adb440d8afb5@matoro.tk> <E1F307C7-9B1E-40F6-860B-6050856E8395@manguebit.com>
+Message-ID: <CA6E0F87-65FD-4672-AA0C-A761E5006B7D@manguebit.com>
 MIME-Version: 1.0
-Received: by 2002:ac9:7a42:0:b0:4fa:bc5a:10a5 with HTTP; Fri, 13 Oct 2023
- 16:59:55 -0700 (PDT)
-In-Reply-To: <20231012174349.462290-1-mmakassikis@freebox.fr>
-References: <20231012174349.462290-1-mmakassikis@freebox.fr>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sat, 14 Oct 2023 08:59:55 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-ApYG=edN7ocheLtTe3R_+pz-TitCNX7XoBi0fK3709A@mail.gmail.com>
-Message-ID: <CAKYAXd-ApYG=edN7ocheLtTe3R_+pz-TitCNX7XoBi0fK3709A@mail.gmail.com>
-Subject: Re: [PATCH] fs/smb: server: fix recursive locking in vfs helpers
-To:     Marios Makassikis <mmakassikis@freebox.fr>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-10-13 2:43 GMT+09:00, Marios Makassikis <mmakassikis@freebox.fr>:
-> Running smb2.rename test from Samba smbtorture suite against a kernel built
-> with lockdep triggers a "possible recursive locking detected" warning.
+You probably want these two as well
+
+https://git=2Esamba=2Eorg/?p=3Dsfrench/cifs-2=2E6=2Egit;a=3Dcommit;h=3D2da=
+338ff752a2789470d733111a5241f30026675
+
+https://git=2Esamba=2Eorg/?p=3Dsfrench/cifs-2=2E6=2Egit;a=3Dcommit;h=3D3b8=
+bb3171571f92eda863e5f78b063604c61f72a
+
+as directory leases isn't supported in SMB1, so no waste of system resourc=
+es by having those kthreads running=2E
+
+On 13 October 2023 20:52:11 GMT-03:00, Paulo Alcantara <pc@manguebit=2Ecom=
+> wrote:
+>Could you please try two commits[1][2] from for-next?
 >
-> This is because mnt_want_write() is called twice with no mnt_drop_write()
-> in between:
->   -> ksmbd_vfs_mkdir()
->     -> ksmbd_vfs_kern_path_create()
->        -> kern_path_create()
->           -> filename_create()
->             -> mnt_want_write()
->        -> mnt_want_write()
+>[1] https://git=2Esamba=2Eorg/?p=3Dsfrench/cifs-2=2E6=2Egit;a=3Dcommit;h=
+=3De95f3f74465072c2545d8e65a3c3a96e37129cf8
+>[2] https://git=2Esamba=2Eorg/?p=3Dsfrench/cifs-2=2E6=2Egit;a=3Dcommit;h=
+=3D81ba10959970d15c388bf29866b01b62f387e6a3
 >
-> Fix this by removing the mnt_want_write/mnt_drop_write calls from vfs
-> helpers that call kern_path_create().
->
-> Full lockdep trace below:
->
-> ============================================
-> WARNING: possible recursive locking detected
-> 6.6.0-rc5 #775 Not tainted
-> --------------------------------------------
-> kworker/1:1/32 is trying to acquire lock:
-> ffff888005ac83f8 (sb_writers#5){.+.+}-{0:0}, at: ksmbd_vfs_mkdir+0xe1/0x410
->
-> but task is already holding lock:
-> ffff888005ac83f8 (sb_writers#5){.+.+}-{0:0}, at: filename_create+0xb6/0x260
->
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
->
->        CPU0
->        ----
->   lock(sb_writers#5);
->   lock(sb_writers#5);
->
->  *** DEADLOCK ***
->
->  May be due to missing lock nesting notation
->
-> 4 locks held by kworker/1:1/32:
->  #0: ffff8880064e4138 ((wq_completion)ksmbd-io){+.+.}-{0:0}, at:
-> process_one_work+0x40e/0x980
->  #1: ffff888005b0fdd0 ((work_completion)(&work->work)){+.+.}-{0:0}, at:
-> process_one_work+0x40e/0x980
->  #2: ffff888005ac83f8 (sb_writers#5){.+.+}-{0:0}, at:
-> filename_create+0xb6/0x260
->  #3: ffff8880057ce760 (&type->i_mutex_dir_key#3/1){+.+.}-{3:3}, at:
-> filename_create+0x123/0x260
->
-> stack backtrace:
-> CPU: 1 PID: 32 Comm: kworker/1:1 Not tainted 6.6.0-rc5 #775
-> Workqueue: ksmbd-io handle_ksmbd_work
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x4f/0x90
->  dump_stack+0x14/0x20
->  print_deadlock_bug+0x2f0/0x410
->  check_deadlock+0x26b/0x3b0
->  __lock_acquire+0xce2/0x1060
->  ? mark_lock.part.0+0xff/0x720
->  ? __pfx___lock_acquire+0x10/0x10
->  ? mark_held_locks+0x6b/0x90
->  lock_acquire.part.0+0x125/0x2d0
->  ? ksmbd_vfs_mkdir+0xe1/0x410
->  ? __pfx_lock_acquire.part.0+0x10/0x10
->  ? __kmem_cache_free+0x179/0x280
->  ? ____kasan_slab_free+0x15b/0x1d0
->  ? __kasan_slab_free+0x16/0x20
->  ? slab_free_freelist_hook+0xbc/0x180
->  lock_acquire+0x93/0x160
->  ? ksmbd_vfs_mkdir+0xe1/0x410
->  mnt_want_write+0x49/0x220
->  ? ksmbd_vfs_mkdir+0xe1/0x410
->  ksmbd_vfs_mkdir+0xe1/0x410
->  ? __pfx__printk+0x10/0x10
->  ? __pfx_ksmbd_vfs_mkdir+0x10/0x10
->  smb2_open+0x1064/0x38b0
->  ? __pfx___lock_acquire+0x10/0x10
->  ? __pfx_smb2_open+0x10/0x10
->  ? __lock_release+0x13f/0x290
->  ? smb2_validate_credit_charge+0x25d/0x360
->  ? __pfx___lock_release+0x10/0x10
->  ? do_raw_spin_lock+0x127/0x1c0
->  ? __pfx_do_raw_spin_lock+0x10/0x10
->  ? do_raw_spin_unlock+0xac/0x110
->  ? _raw_spin_unlock+0x22/0x50
->  ? smb2_validate_credit_charge+0x25d/0x360
->  ? ksmbd_smb2_check_message+0x3be/0x400
->  ? __pfx_ksmbd_smb2_check_message+0x10/0x10
->  __process_request+0x151/0x310
->  __handle_ksmbd_work+0x33c/0x520
->  ? __pfx___handle_ksmbd_work+0x10/0x10
->  handle_ksmbd_work+0x4a/0xd0
->  process_one_work+0x4a7/0x980
->  ? __pfx_process_one_work+0x10/0x10
->  ? assign_work+0xe1/0x120
->  worker_thread+0x365/0x570
->  ? __pfx_worker_thread+0x10/0x10
->  kthread+0x18d/0x1d0
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork+0x38/0x70
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork_asm+0x1b/0x30
->  </TASK>
->
-> Fixes: 40b268d384a2 ("ksmbd: add mnt_want_write to ksmbd vfs functions")
-> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-> ---
->  fs/smb/server/vfs.c | 17 -----------------
->  1 file changed, 17 deletions(-)
->
-> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-> index b5a5e50fc9ca..ac49e295d4c3 100644
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -173,10 +173,6 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const
-> char *name, umode_t mode)
->  		return err;
->  	}
->
-> -	err = mnt_want_write(path.mnt);
-> -	if (err)
-> -		goto out_err;
-> -
->  	mode |= S_IFREG;
->  	err = vfs_create(mnt_idmap(path.mnt), d_inode(path.dentry),
->  			 dentry, mode, true);
-> @@ -186,9 +182,7 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const char
-> *name, umode_t mode)
->  	} else {
->  		pr_err("File(%s): creation failed (err:%d)\n", name, err);
->  	}
-> -	mnt_drop_write(path.mnt);
->
-> -out_err:
->  	done_path_create(&path, dentry);
->  	return err;
->  }
-> @@ -219,10 +213,6 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char
-> *name, umode_t mode)
->  		return err;
->  	}
->
-> -	err = mnt_want_write(path.mnt);
-> -	if (err)
-> -		goto out_err2;
-> -
->  	idmap = mnt_idmap(path.mnt);
->  	mode |= S_IFDIR;
->  	err = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode);
-> @@ -246,8 +236,6 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char
-> *name, umode_t mode)
->  	}
->
->  out_err1:
-minor nit: we can change it with our_err if removing out_err2.
-> -	mnt_drop_write(path.mnt);
-> -out_err2:
->  	done_path_create(&path, dentry);
->  	if (err)
->  		pr_err("mkdir(%s): creation failed (err:%d)\n", name, err);
-> @@ -665,16 +653,11 @@ int ksmbd_vfs_link(struct ksmbd_work *work, const char
-> *oldname,
->  		goto out3;
->  	}
->
-> -	err = mnt_want_write(newpath.mnt);
-> -	if (err)
-> -		goto out3;
-> -
->  	err = vfs_link(oldpath.dentry, mnt_idmap(newpath.mnt),
->  		       d_inode(newpath.dentry),
->  		       dentry, NULL);
->  	if (err)
->  		ksmbd_debug(VFS, "vfs_link failed err %d\n", err);
-> -	mnt_drop_write(newpath.mnt);
->
->  out3:
->  	done_path_create(&newpath, dentry);
-> --
-> 2.34.1
->
->
+>On 13 October 2023 20:19:37 GMT-03:00, matoro <matoro_mailinglist_kernel@=
+matoro=2Etk> wrote:
+>>On 2023-10-05 05:55, Dr=2E Bernd Feige wrote:
+>>> Am Dienstag, dem 26=2E09=2E2023 um 17:54 -0700 schrieb Paul Aurich:
+>>>> Perhaps the laundromat thread should be using msleep_interruptible()?
+>>>>=20
+>>>> Using an interruptible sleep appears to prevent the thread from
+>>>> contributing
+>>>> to the load average, and has the happy side-effect of removing the
+>>>> up-to-1s delay
+>>>> when tearing down the tcon (since a7c01fa93ae, kthread_stop() will
+>>>> return
+>>>> early triggered by kthread_stop)=2E
+>>>=20
+>>> Sorry for chiming in so late - I'm also on gentoo (kernel 6=2E5=2E5-
+>>> gentoo), but as a client of Windows AD=2E
+>>>=20
+>>> Just want to emphasize that using uninterruptible sleep has not just
+>>> unhappy but devastating side-effects=2E
+>>>=20
+>>> I have 8 processors and 16 cifsd-cfid-laundromat processes, so
+>>> /proc/loadavg reports a load average of 16 on a totally idle system=2E
+>>>=20
+>>> This means that load-balancing software will never start additional
+>>> tasks on this system - "make -l" but also any other load-dependent
+>>> system=2E Just reducing the number of cifsd-cfid-laundromat processes
+>>> does not fix this - even a single one makes loadavg report a wrong
+>>> result for load balancing=2E
+>>>=20
+>>> So, if cifsd-cfid-laundromat must really be uninterruptible, the only
+>>> solution would be to change the way loadavg is computed by the kernel
+>>> to exclude uninterruptible but sleeping processes=2E But must it be
+>>> uninterruptible?
+>>>=20
+>>> Thanks and best regards,
+>>> Bernd
+>>
+>>This is a huge problem here as well, as a client to Samba using SMB1 (fo=
+r Unix extensions)=2E
+>>
+>>For others encountering this problem, I was able to work around it with =
+the following snippet:
+>>
+>>diff --git a/fs/smb/client/cached_dir=2Ec b/fs/smb/client/cached_dir=2Ec
+>>index 2d5e9a9d5b8b=2E=2Efc2caccb597a 100644
+>>--- a/fs/smb/client/cached_dir=2Ec
+>>+++ b/fs/smb/client/cached_dir=2Ec
+>>@@ -576,7 +576,7 @@ cifs_cfids_laundromat_thread(void *p)
+>>        struct list_head entry;
+>>
+>>        while (!kthread_should_stop()) {
+>>-               ssleep(1);
+>>+               msleep_interruptible(1000);
+>>                INIT_LIST_HEAD(&entry);
+>>                if (kthread_should_stop())
+>>                        return 0;
