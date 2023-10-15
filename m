@@ -2,56 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A7ACDB465
-	for <linux-cifs@archiver.kernel.org>; Sun, 15 Oct 2023 02:16:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E349CDB465
+	for <linux-cifs@archiver.kernel.org>; Sun, 15 Oct 2023 02:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233328AbjJOCQL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 14 Oct 2023 22:16:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43908 "EHLO
+        id S233390AbjJOCrD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 14 Oct 2023 22:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229733AbjJOCQK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 14 Oct 2023 22:16:10 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E08D6;
-        Sat, 14 Oct 2023 19:16:07 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-50573e85ee0so4094547e87.3;
-        Sat, 14 Oct 2023 19:16:06 -0700 (PDT)
+        with ESMTP id S229733AbjJOCrD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 14 Oct 2023 22:47:03 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1D8ED9;
+        Sat, 14 Oct 2023 19:47:00 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-507a55302e0so885464e87.0;
+        Sat, 14 Oct 2023 19:47:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697336165; x=1697940965; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697338019; x=1697942819; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=CqVE6uodm+iyb6Wqc7ayNNI6THJDNZR8gRKY9AL1+Rg=;
-        b=nRoBLHMBEGnq0B9XK8X3Ct2P7PLfznhN+qZw/Mus7LXBe+k9TsmOpljuJb7AMFW8tg
-         /eIjoXObjy5RLEeS4yaNNEIwjwGf+7RChi1Ar3jOv+cDPV6Z1hlggR5KT9uEJFhv7Rz4
-         BzrF8Igzg1Ts1rRQRYDuDhoa55E5pKArUOQWg1w+JDSylYjFe/oMwRlgOlL61EPzQHEg
-         7C5Nhsjk+Ec+4IiCDHNSj4F1Lr97z4L4MZWB2mGuw88Olu3WisCDf/SrZXEcaDjeDF1g
-         CKC84Tk4d79Q41XqbLixThSP7KArICy4nkpPS1KbIuyWuaRdFJEdTDBL+O6835jjGQdP
-         pmrQ==
+        bh=ay7zsasRnZ/tBmxbe/iCuIZqVf1cOHfG/pAJIzyurgI=;
+        b=B3AHYMvl3y2E/qqlLbbyN5AReS7itDxaHDMVH6evLHqrDxnnfMUubFtji2FgDV1xEI
+         e9sQgdjUT+BMy9tQP7exijbb63SX6+6ySOMMMUm7+kD9zvABFtpscAQWi2Y5N2a77l6S
+         nmMyOzu128qSpIlehJsLjfKkTW2fWAGB+x7pafy5rvnaVUjUNHugwu4Af0pJeR7VhW3L
+         8dtlpZbvejBfGwCzCYjQ6oyjNmJdUhtsTZ+c7tfSIsUTvowWxINJao3Kpf4tTGzsXzDT
+         X4tNBD8ZOkMJqL9gKTZY/IqTYARS0UNGoX+6kUVKQrtaO3inrnwEn7lZ0IJv+5X4hLX+
+         gaqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697336165; x=1697940965;
+        d=1e100.net; s=20230601; t=1697338019; x=1697942819;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=CqVE6uodm+iyb6Wqc7ayNNI6THJDNZR8gRKY9AL1+Rg=;
-        b=dG/2y7PO05NhD4gtWSm1b2SbyqirOpGvd7Z8Y2pcx81MhaXLI9KKh97OLj4dX7jkvo
-         tv4gD6jpasrI4SsN2YtjQkTCf0XNtzMnhqnGtln7dkTi+DCIJteIfBNK/O0LX0+KSRXo
-         zWKfjlYAtBOnQXsMD4bWEXYla94RfiW1zgckIrrr6S9l5YJFH92ai4tmeClP4r3Z5sjN
-         0y9h+3oC7oR2tgsJkLEvZXHD3uix0m7rV+PM24LMWNuVnp8fjjyZKDW6wClH6IolQe/J
-         f098ElQeWKOuRTWRNq38k3XPWYUy471UcQRD88hRNkxmCCEyomnQcO8k+sciJpsxOHcE
-         Py8g==
-X-Gm-Message-State: AOJu0Ywel3kGZ+PZUQMc5CUaIBQSAgk+P9N/46eHjSZ5XOgE6TPslz0Y
-        6/eWQPgxOJJggJ8YHr9qPo4V5H1JE9hnOyacmqPMaCgkMu8=
-X-Google-Smtp-Source: AGHT+IHKx5dK8HN6Ub70InFkq5cz+jMHeSY+Ijdez+ueCMPXXZfFXC5hAdiXfX89AKweVDJBSeS7Z8aiNl1+l+W6dKU=
-X-Received: by 2002:a05:6512:3f10:b0:500:be57:ce53 with SMTP id
- y16-20020a0565123f1000b00500be57ce53mr31645337lfa.42.1697336164883; Sat, 14
- Oct 2023 19:16:04 -0700 (PDT)
+        bh=ay7zsasRnZ/tBmxbe/iCuIZqVf1cOHfG/pAJIzyurgI=;
+        b=qFmnjKvuFODb9rrni9myTA3KeoJDAHjz9gps5kaekB8RkfCTEks0qdT4TS5ivemork
+         rPiB39wUS4T7Q/DWsh3awdNOSx1DxDCXm1228P9x5bFcYOAvONQJamA9z/pOwluODoD0
+         aDv+q/SeqSZY5AcZaG5gTLEu7f9+6ROMDLGol73K9khZjYkIoQsmGSLrErllfSXL8MId
+         T6eSRnKRVyw1l4kIQY/P/KtZ7E/6f1Lz5cfm5CQOQGH19Z1CnY6PzTEheW5/PuCQ+BHI
+         aUhVYKHElPaL8MAOlq1Af9efVWyPtyonuQZjdEKHA902kOhUjSMOhCaP6MIIk/bnqz9z
+         KQuQ==
+X-Gm-Message-State: AOJu0Yw/84/lL1EJcD4R6WNWsUlxW/dlT7ZWyD30yW9XZFDbXcsU1Qag
+        v0GXZFyBBIAuhDYy7PAnRMc3PC1lqjzlrydHyY+znBWraRdXTA==
+X-Google-Smtp-Source: AGHT+IEmIABzDflRNUFixP2iO1KWgKs4v49S9NBmO9g7VZS1D6ZsUK9/D6xiOjCqJI8BESN5lFVnYo3jo1NXmZQgrM8=
+X-Received: by 2002:ac2:4d92:0:b0:507:96e5:2ff4 with SMTP id
+ g18-20020ac24d92000000b0050796e52ff4mr5043581lfe.52.1697338018898; Sat, 14
+ Oct 2023 19:46:58 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 14 Oct 2023 21:15:53 -0500
-Message-ID: <CAH2r5ms0UzM_VjC6rUjyYX5X1dR2Jxp3t9_fSoqw_0h2zqk4qg@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
+Date:   Sat, 14 Oct 2023 21:46:47 -0500
+Message-ID: <CAH2r5mtOMhHDNhjf0Lhd2nGLE4asiDex7q61fDj9qh1J6H+eag@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        CIFS <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
@@ -64,31 +65,31 @@ Please pull the following changes since commit
 
 are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc5-smb3-client-fixes
+  git://git.samba.org/ksmbd.git 6.6-rc5-ksmbd-server-fixes
 
-for you to fetch changes up to 81ba10959970d15c388bf29866b01b62f387e6a3:
+for you to fetch changes up to 1903e6d0578118e9aab1ee23f4a9de55737d1d05:
 
-  smb: client: prevent new fids from being removed by laundromat
-(2023-10-12 09:41:32 -0500)
-
-----------------------------------------------------------------
-Two SMB3 client fixes
-- Fix caching race with open_cached_dir and laundromat cleanup of
-cached dirs (addresses a problem spotted with xfstest run with
-directory leases enabled)
-- reduce excessive resource usage of laundromat threads
+  ksmbd: fix potential double free on smb2_read_pipe() error path
+(2023-10-12 22:44:11 -0500)
 
 ----------------------------------------------------------------
-Paulo Alcantara (2):
-      smb: client: make laundromat a delayed worker
-      smb: client: prevent new fids from being removed by laundromat
+Four SMB3 server fixes
+- Fix for possible double free in RPC read
+- Add additional check to clarify smb2_open path and quiet Coverity
+- Fix incorrect error rsp in a compounding path
+- Fix to properly fail open of file with pending delete on close
+----------------------------------------------------------------
+Namjae Jeon (4):
+      ksmbd: not allow to open file if delelete on close bit is set
+      ksmbd: fix wrong error response status by using set_smb2_rsp_status()
+      ksmbd: fix Null pointer dereferences in ksmbd_update_fstate()
+      ksmbd: fix potential double free on smb2_read_pipe() error path
 
- fs/smb/client/cached_dir.c | 141 ++++++++++++++++++++++-----------------------
- fs/smb/client/cached_dir.h |   2 +-
- 2 files changed, 69 insertions(+), 74 deletions(-)
+ fs/smb/server/smb2pdu.c   | 11 ++++++-----
+ fs/smb/server/vfs_cache.c |  7 +++++--
+ 2 files changed, 11 insertions(+), 7 deletions(-)
 
-
---
+-- 
 Thanks,
 
 Steve
