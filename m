@@ -2,60 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F829CDB474
-	for <linux-cifs@archiver.kernel.org>; Sun, 15 Oct 2023 02:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0551CDB465
+	for <linux-cifs@archiver.kernel.org>; Sun, 15 Oct 2023 02:53:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233421AbjJOCr4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 14 Oct 2023 22:47:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37838 "EHLO
+        id S233429AbjJOCxA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 14 Oct 2023 22:53:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233394AbjJOCrz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 14 Oct 2023 22:47:55 -0400
+        with ESMTP id S233465AbjJOCw7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 14 Oct 2023 22:52:59 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C1DD9;
-        Sat, 14 Oct 2023 19:47:54 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 609E8C433C8;
-        Sun, 15 Oct 2023 02:47:54 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD9CE0;
+        Sat, 14 Oct 2023 19:52:57 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F59AC433CB;
+        Sun, 15 Oct 2023 02:52:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697338074;
-        bh=sHPnDtnAgu+NinMc0o3MQxOp7WkKMEovbs4go5cCxgw=;
+        s=k20201202; t=1697338377;
+        bh=K5tMCSjp/r8Y4o/XKdP+y3Z17d5UBStn0id+mRZ6Kxs=;
         h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=aoB7gp0YE8I5lqnzJpj0mJvC3HmmmE4dXdicqVgro+5glK8pmoVIbLh+JikmNsOyz
-         dWU4YnFYL2mw9U+QpqvCQmE/uRnCJ8TQj3uNrziHau0U0PM0dUJoC3pDwi/wYg4Yjn
-         fwav1ENmtlfHgx/vuzw5mZXEojoczm/yzIxFBCLfBjjQ4ly8vpsv8ZEA85JnMgHv0m
-         d4J9Z9t8zYSta3/O/3G1GrFXY/osIseTQjEOqN3CB0F/7A/HYSKXdnrXh117YxcNVg
-         dIHUW5ISCoqNDLXMTclUfO/G1zY+oKOSFLBTwmtJdhyTNDLnnNtZMP1uUO0mbLnHJu
-         eHo7a3AguwuRQ==
+        b=HtPmJ191fFvYCByfzTRpQ7uVhj/7Lp9ngL/djNAvSYwjaP4Sgm3qTz1OgO4bL9Yi3
+         BlHmAkXqf3ULMrLGGalELWTFf1ClrHU6YYkHkaDv4wYBGdn+m781zDE0L8cAMCAgMO
+         lcXRV/QQdkCuJH4H6OYzdTS90Xj1Fk8jB3666N5SiHQ9ydn+4YLZDzM3pNNvNBytBz
+         Mhwu6X9pkvnLNToCaiirbkjngqWtI7GsG7XSjPxBVTfINLHxjtjC9Q78f/6BXOkQSL
+         MtuVMdphgOvlyJ0ag8mTd3HkEntEDWZusQcO3BzprBLQgNmB/HVNTD1xu+s2nl1nnw
+         VT87twIUPUFbw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4CE0CC1614E;
-        Sun, 15 Oct 2023 02:47:54 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1C812C1614E;
+        Sun, 15 Oct 2023 02:52:57 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fixes
 From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5ms0UzM_VjC6rUjyYX5X1dR2Jxp3t9_fSoqw_0h2zqk4qg@mail.gmail.com>
-References: <CAH2r5ms0UzM_VjC6rUjyYX5X1dR2Jxp3t9_fSoqw_0h2zqk4qg@mail.gmail.com>
+In-Reply-To: <CAH2r5mtOMhHDNhjf0Lhd2nGLE4asiDex7q61fDj9qh1J6H+eag@mail.gmail.com>
+References: <CAH2r5mtOMhHDNhjf0Lhd2nGLE4asiDex7q61fDj9qh1J6H+eag@mail.gmail.com>
 X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5ms0UzM_VjC6rUjyYX5X1dR2Jxp3t9_fSoqw_0h2zqk4qg@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc5-smb3-client-fixes
-X-PR-Tracked-Commit-Id: 81ba10959970d15c388bf29866b01b62f387e6a3
+X-PR-Tracked-Message-Id: <CAH2r5mtOMhHDNhjf0Lhd2nGLE4asiDex7q61fDj9qh1J6H+eag@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git 6.6-rc5-ksmbd-server-fixes
+X-PR-Tracked-Commit-Id: 1903e6d0578118e9aab1ee23f4a9de55737d1d05
 X-PR-Merge-Tree: torvalds/linux.git
 X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bf2069d151b7bb5dfd7c7f834c016205a517c5ad
-Message-Id: <169733807430.25471.15657703741943303667.pr-tracker-bot@kernel.org>
-Date:   Sun, 15 Oct 2023 02:47:54 +0000
+X-PR-Merge-Commit-Id: 9a3dad63edbe9a2ab2be1e7361a2133f519f855b
+Message-Id: <169733837710.28493.2254609340003410175.pr-tracker-bot@kernel.org>
+Date:   Sun, 15 Oct 2023 02:52:57 +0000
 To:     Steve French <smfrench@gmail.com>
 Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        CIFS <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 14 Oct 2023 21:15:53 -0500:
+The pull request you sent on Sat, 14 Oct 2023 21:46:47 -0500:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.6-rc5-smb3-client-fixes
+> git://git.samba.org/ksmbd.git 6.6-rc5-ksmbd-server-fixes
 
 has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bf2069d151b7bb5dfd7c7f834c016205a517c5ad
+https://git.kernel.org/torvalds/c/9a3dad63edbe9a2ab2be1e7361a2133f519f855b
 
 Thank you!
 
