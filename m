@@ -2,102 +2,103 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC7ACDB474
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Oct 2023 16:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A5CCDB465
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Oct 2023 17:26:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233597AbjJPQtw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 16 Oct 2023 12:49:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38102 "EHLO
+        id S229952AbjJPR0k (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 16 Oct 2023 13:26:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230271AbjJPQh6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Oct 2023 12:37:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB70B46B9
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Oct 2023 09:20:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1697473215;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=63Rq1KcfOTDhlc8whKkbAUCIQI+yHNiEHhPiU2TPE3M=;
-        b=HRNQytnv7Y6pZMpjuu1yAzzjcGGzFjvfIthtsY5oQ5g821gtGns5wa5M3wZ0g2CRosNoft
-        6HXCqRzz2ihMxC6sEjTMKmhfTI40wSxRJSOtiSFm/56k/DoTRYUvGbU2QXNWm/S3/ok9FR
-        ehkS4nK9I8ATQAV9O9T+/nBGGHFQhpg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-27-bJAGqS1LPQevnpXDvvjhEQ-1; Mon, 16 Oct 2023 12:19:55 -0400
-X-MC-Unique: bJAGqS1LPQevnpXDvvjhEQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E3DE862F4E;
-        Mon, 16 Oct 2023 16:19:54 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.178])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A802825C8;
-        Mon, 16 Oct 2023 16:19:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <be2434a2d51900b9e51d8bf0fe5a8b82e3f1a879.camel@kernel.org>
-References: <be2434a2d51900b9e51d8bf0fe5a8b82e3f1a879.camel@kernel.org> <20231013160423.2218093-1-dhowells@redhat.com> <20231013160423.2218093-9-dhowells@redhat.com>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Paulo Alcantara <pc@manguebit.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Tom Talpey <tom@talpey.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Christian Brauner <christian@brauner.io>,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Subject: Re: [RFC PATCH 08/53] netfs: Add rsize to netfs_io_request
+        with ESMTP id S229666AbjJPR0j (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Oct 2023 13:26:39 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C64C283;
+        Mon, 16 Oct 2023 10:26:37 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2c5028e5b88so48084161fa.3;
+        Mon, 16 Oct 2023 10:26:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697477196; x=1698081996; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AsBurwJXbB4R5awevx162dcbGLikXeWMaEzzvRwyTNk=;
+        b=S317Igb0HnsgcDGaE2FBwBcLt2Xg0DcfIocFl0iK0S/YjPld5cSo8CF4LXiI2ZiLd+
+         /fNQssOT1DUyTmj0A0I5kHykSaHOfL0ts8/SV4spXIGaPaGTO1r212zGQa438YCTlOf6
+         PI1/WfHcTphYD002V4LC7mHa+eKhAU8klQBhAprpakRyZfdm//vglogYx5BbevQbf6wA
+         UdvrNsaWbGhl/dgXuKqHPePz7FSraud965xV7t+6GUxpRagq/eQncbINwTP7e/IiblnU
+         RpmUcJ51EKQ6moVb26zsu2SQ14uNpXa/xD8o36NTUzjX1Pd0+RY6qr+Ca3N74WCNPQzA
+         AJuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697477196; x=1698081996;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AsBurwJXbB4R5awevx162dcbGLikXeWMaEzzvRwyTNk=;
+        b=IGNXiLyDPf2BsUcvPRNWt7GhxQphNCg+zG103glm17ZEriojPylnHDjPOeclVuup+8
+         g9jGFBSETZ7p6P5IGjZWAwj8KA+kV1FPHaMD7qD9+1lxbxC6X/VD2khSouO3r8rkJsMU
+         1TbuTdBLUCIrmDH9Ld5/flAvTNT9oBD9VuLx2ea5vRdjqEezWBCo2RJV8cWr+XL2bLx3
+         AkUjZ9BeICit/Qp054a5L8b8p0z9BqQwv7yknt7j4TiXO3bRK4r6hZIGSef8dhjZV6FQ
+         1vQXnUKzE035gcGg1b3n7QXbUZHEzSC3/TkM98ZeomlROagC0NFIsavgkdwQ+2raw7Kc
+         VFUg==
+X-Gm-Message-State: AOJu0YyPJq1McDqn+BB24N13K1Ij3MgCAPntk8YX4UTdRPNRSYPB7jTd
+        iH8XHcI1GtCJtLO4ev3Hsgx24rMX6DKXvec8b4if6pm3GW8PZQ==
+X-Google-Smtp-Source: AGHT+IGgujqKyKcOrEpjXPQnPSTK+WOvMNi0lUfQFbpw2hAKHjQ6nShR1n4EuyDlQwMEWQOiKAkbAmPDk1YmkQTiPRg=
+X-Received: by 2002:a2e:740e:0:b0:2c1:8a24:7afb with SMTP id
+ p14-20020a2e740e000000b002c18a247afbmr29329503ljc.7.1697477195291; Mon, 16
+ Oct 2023 10:26:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2840973.1697473191.1@warthog.procyon.org.uk>
-Date:   Mon, 16 Oct 2023 17:19:51 +0100
-Message-ID: <2840974.1697473191@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 16 Oct 2023 12:26:23 -0500
+Message-ID: <CAH2r5mui-uk5XVnJMM2UQ40VJM5dyA=+YChGpDcLAapBTCk4kw@mail.gmail.com>
+Subject: [PATCH][SMB3 client] fix touch -h of symlink
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000003d7e240607d8b5ee"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Jeff Layton <jlayton@kernel.org> wrote:
+--0000000000003d7e240607d8b5ee
+Content-Type: text/plain; charset="UTF-8"
 
-> > +	rreq->rsize = 4 * 1024 * 1024;
-> >  	return 0;
-> ...
-> > +	rreq->rsize = 1024 * 1024;
-> > +
-> 
-> Holy magic numbers, batman! I think this deserves a comment that
-> explains how you came up with these values.
+For example:
+          touch -h -t 02011200 testfile
+    where testfile is a symlink would not change the timestamp, but
+          touch -t 02011200 testfile
+    does work to change the timestamp of the target
 
-Actually, that should be set to something like the object size for ceph.
+Looks like some symlink inode operations are missing for other fs as well
 
-> Also, do 9p and cifs not need this for some reason?
+-- 
+Thanks,
 
-At this point, cifs doesn't use netfslib, so that's implemented in a later
-patch in this series.
+Steve
 
-9p does need setting, but I haven't tested that yet.  It probably needs
-setting to 1MiB as I think that's the maximum the 9p transport can handle.
+--0000000000003d7e240607d8b5ee
+Content-Type: text/x-patch; charset="US-ASCII"; name="0001-smb3-fix-touch-h-of-symlink.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-fix-touch-h-of-symlink.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lnt62yk00>
+X-Attachment-Id: f_lnt62yk00
 
-But in the case of cifs, this is actually dynamic, depending on how many
-credits we can obtain.  The same may be true of ceph, though I'm not entirely
-clear on that as yet.
-
-For afs, the maximum [rw]size the protocol supports is actually something like
-281350422593565 (ie. (65535-28) * (2^32-1)) minus a few bytes, but that's
-probably not a good idea.  I might be best setting it at something like 256KiB
-as that's what OpenAFS uses.
-
-David
-
+RnJvbSA2YWY1ZjgzNWJhNDk4Nzk5NGFlY2JiYTBkN2MwNjAxNjBjODkyODU2IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgMTYgT2N0IDIwMjMgMTI6MTg6MjMgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBmaXggdG91Y2ggLWggb2Ygc3ltbGluawoKRm9yIGV4YW1wbGU6CiAgICAgIHRvdWNoIC1o
+IC10IDAyMDExMjAwIHRlc3RmaWxlCndoZXJlIHRlc3RmaWxlIGlzIGEgc3ltbGluayB3b3VsZCBu
+b3QgY2hhbmdlIHRoZSB0aW1lc3RhbXAsIGJ1dAogICAgICB0b3VjaCAtdCAwMjAxMTIwMCB0ZXN0
+ZmlsZQpkb2VzIHdvcmsgdG8gY2hhbmdlIHRoZSB0aW1lc3RhbXAgb2YgdGhlIHRhcmdldAoKUmVw
+b3J0ZWQtYnk6IE1pY2FoIFZlaWxsZXV4IDxtaWNhaC52ZWlsbGV1eEBpYmEtZ3JvdXAuY29tPgpD
+bG9zZXM6IGh0dHBzOi8vYnVnemlsbGEuc2FtYmEub3JnL3Nob3dfYnVnLmNnaT9pZD0xNDQ3NgpD
+YzogU3RhYmxlIDxzdGFibGVAdmdlci5rZXJuZWwub3JnPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBG
+cmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvc21iL2NsaWVudC9jaWZzZnMu
+YyB8IDEgKwogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspCgpkaWZmIC0tZ2l0IGEvZnMv
+c21iL2NsaWVudC9jaWZzZnMuYyBiL2ZzL3NtYi9jbGllbnQvY2lmc2ZzLmMKaW5kZXggMjI4Njlj
+ZGExMzU2Li5lYTNhN2E2NjhiNDUgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY2lmc2ZzLmMK
+KysrIGIvZnMvc21iL2NsaWVudC9jaWZzZnMuYwpAQCAtMTE5MSw2ICsxMTkxLDcgQEAgY29uc3Qg
+Y2hhciAqY2lmc19nZXRfbGluayhzdHJ1Y3QgZGVudHJ5ICpkZW50cnksIHN0cnVjdCBpbm9kZSAq
+aW5vZGUsCiAKIGNvbnN0IHN0cnVjdCBpbm9kZV9vcGVyYXRpb25zIGNpZnNfc3ltbGlua19pbm9k
+ZV9vcHMgPSB7CiAJLmdldF9saW5rID0gY2lmc19nZXRfbGluaywKKwkuc2V0YXR0ciA9IGNpZnNf
+c2V0YXR0ciwKIAkucGVybWlzc2lvbiA9IGNpZnNfcGVybWlzc2lvbiwKIAkubGlzdHhhdHRyID0g
+Y2lmc19saXN0eGF0dHIsCiB9OwotLSAKMi4zOS4yCgo=
+--0000000000003d7e240607d8b5ee--
