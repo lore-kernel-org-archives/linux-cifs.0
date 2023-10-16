@@ -2,130 +2,275 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C42CDB47E
-	for <linux-cifs@archiver.kernel.org>; Sun, 15 Oct 2023 14:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FEFCDB465
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Oct 2023 14:44:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbjJOOp6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 15 Oct 2023 10:45:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56490 "EHLO
+        id S231478AbjJPOoa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 16 Oct 2023 10:44:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjJOOp6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 15 Oct 2023 10:45:58 -0400
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D74C5
-        for <linux-cifs@vger.kernel.org>; Sun, 15 Oct 2023 07:45:55 -0700 (PDT)
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1c9e95aa02dso20550385ad.0
-        for <linux-cifs@vger.kernel.org>; Sun, 15 Oct 2023 07:45:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697381154; x=1697985954;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0MqiRZ802aB7bIXDvDpnVMpNS5vhsyYtdlDFyH6fIRw=;
-        b=Tb8VdMo68Zs8IB2/5dgyvGKys6pBLpGv40se8x3PdSszLjNTczDwOllOGmRfcxB+yy
-         LsaX7woPDV/iRMXnzajaCIN7K0TLUdfWZ4CgvDxU7vtILBeSre5VIS3vfrfKakAG4mAd
-         vcG835Zg5Tvs7H4qrzzmCK8waaQNBbNqHxHt9KZNCbnope1rFM+BLbX3ZRewAXprZ09B
-         u/4Fm7B2IPtIEui24JQY5ZvIIQcF2wVBDyDEPdlT36xaA306qyXk25K9ETq8w4dL9t3A
-         wp5vMRnjUI8bPx3TjA0Y90ymPHCSiMw+Q7OoTOnjZg6sM4BrgBXFMvC7Ut0kuB1yWASy
-         HI8A==
-X-Gm-Message-State: AOJu0YxgzqfFMKIGb6K/yuJqc2Ae7g9154qMmYzJY2I21A0MB/I/+zDF
-        CAS+/dWFR3Vs4iiZs+5NNWvXkQXo9WU=
-X-Google-Smtp-Source: AGHT+IHVxCw0QE69Yn3CcjOjlf26r9H2tJ74OiinQJW52754/nK6GVgEVcADFGBKUlD+clQRWGVFaA==
-X-Received: by 2002:a17:902:d486:b0:1c6:11ca:8861 with SMTP id c6-20020a170902d48600b001c611ca8861mr8386637plg.21.1697381154168;
-        Sun, 15 Oct 2023 07:45:54 -0700 (PDT)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id ja20-20020a170902efd400b001c1f4edfb9csm6899043plb.173.2023.10.15.07.45.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Oct 2023 07:45:53 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Kangjing Huang <huangkangjing@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: fix missing RDMA-capable flag for IPoIB device in ksmbd_rdma_capable_netdev()
-Date:   Sun, 15 Oct 2023 23:45:36 +0900
-Message-Id: <20231015144536.9100-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S229459AbjJPOo3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Oct 2023 10:44:29 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8017A2;
+        Mon, 16 Oct 2023 07:44:27 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65C62C433C7;
+        Mon, 16 Oct 2023 14:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697467467;
+        bh=EosIPRQRkZS/m8fRSYLf1GF9E5dQpYw/H0GO2FrhMzU=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=pbL0JENlz5RnGYP4I9kBXyy7y5PAbYeNgIvdEtdEfV+6JtSnYAgZxXfj6QS0OTvnq
+         7EQLcIfg5sdun4AKj6ILT0f9Sn+Lj6uvsAiodPVGiYDgFZBItlIo32ZAZ94e+7xhcC
+         EzgeCAxFRNF1lIZMxpTdwOblh/UZLmbq4cioT65oxIZDzZFXQX7uvm9EQBD1jalFt1
+         7JjsKBkOkgur951+Esn3xom0VBOBX9uF/8bVz6kjKcDLzBtDl8aS9RlYKjQ/3DdqNd
+         U2gH58YxGzyynaLl9ZTOovVYCLIQjHNnnlfnqltpw7WhZQlr1WcoivXsWgUIsn7mNI
+         RHCnJAlJeYfQA==
+Message-ID: <bd10b3e5a826d8658a2ee6bba510d25b27c35b50.camel@kernel.org>
+Subject: Re: [RFC PATCH 01/53] netfs: Add a procfile to list in-progress
+ requests
+From:   Jeff Layton <jlayton@kernel.org>
+To:     David Howells <dhowells@redhat.com>,
+        Steve French <smfrench@gmail.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Christian Brauner <christian@brauner.io>,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
+Date:   Mon, 16 Oct 2023 10:44:24 -0400
+In-Reply-To: <20231013155727.2217781-2-dhowells@redhat.com>
+References: <20231013155727.2217781-1-dhowells@redhat.com>
+         <20231013155727.2217781-2-dhowells@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Kangjing Huang <huangkangjing@gmail.com>
+On Fri, 2023-10-13 at 16:56 +0100, David Howells wrote:
+> Add a procfile, /proc/fs/netfs/requests, to list in-progress netfslib I/O
+> requests.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: linux-cachefs@redhat.com
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-mm@kvack.org
+> ---
+>  fs/netfs/internal.h   | 22 +++++++++++
+>  fs/netfs/main.c       | 91 +++++++++++++++++++++++++++++++++++++++++++
+>  fs/netfs/objects.c    |  4 +-
+>  include/linux/netfs.h |  6 ++-
+>  4 files changed, 121 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+> index 43fac1b14e40..1f067aa96c50 100644
+> --- a/fs/netfs/internal.h
+> +++ b/fs/netfs/internal.h
+> @@ -29,6 +29,28 @@ int netfs_begin_read(struct netfs_io_request *rreq, bo=
+ol sync);
+>   * main.c
+>   */
+>  extern unsigned int netfs_debug;
+> +extern struct list_head netfs_io_requests;
+> +extern spinlock_t netfs_proc_lock;
+> +
+> +#ifdef CONFIG_PROC_FS
+> +static inline void netfs_proc_add_rreq(struct netfs_io_request *rreq)
+> +{
+> +	spin_lock(&netfs_proc_lock);
+> +	list_add_tail_rcu(&rreq->proc_link, &netfs_io_requests);
+> +	spin_unlock(&netfs_proc_lock);
+> +}
+> +static inline void netfs_proc_del_rreq(struct netfs_io_request *rreq)
+> +{
+> +	if (!list_empty(&rreq->proc_link)) {
+> +		spin_lock(&netfs_proc_lock);
+> +		list_del_rcu(&rreq->proc_link);
+> +		spin_unlock(&netfs_proc_lock);
+> +	}
+> +}
+> +#else
+> +static inline void netfs_proc_add_rreq(struct netfs_io_request *rreq) {}
+> +static inline void netfs_proc_del_rreq(struct netfs_io_request *rreq) {}
+> +#endif
+> =20
+>  /*
+>   * objects.c
+> diff --git a/fs/netfs/main.c b/fs/netfs/main.c
+> index 068568702957..21f814eee6af 100644
+> --- a/fs/netfs/main.c
+> +++ b/fs/netfs/main.c
+> @@ -7,6 +7,8 @@
+> =20
+>  #include <linux/module.h>
+>  #include <linux/export.h>
+> +#include <linux/proc_fs.h>
+> +#include <linux/seq_file.h>
+>  #include "internal.h"
+>  #define CREATE_TRACE_POINTS
+>  #include <trace/events/netfs.h>
+> @@ -18,3 +20,92 @@ MODULE_LICENSE("GPL");
+>  unsigned netfs_debug;
+>  module_param_named(debug, netfs_debug, uint, S_IWUSR | S_IRUGO);
+>  MODULE_PARM_DESC(netfs_debug, "Netfs support debugging mask");
+> +
+> +#ifdef CONFIG_PROC_FS
+> +LIST_HEAD(netfs_io_requests);
+> +DEFINE_SPINLOCK(netfs_proc_lock);
+> +
+> +static const char *netfs_origins[] =3D {
+> +	[NETFS_READAHEAD]	=3D "RA",
+> +	[NETFS_READPAGE]	=3D "RP",
+> +	[NETFS_READ_FOR_WRITE]	=3D "RW",
+> +};
+> +
+> +/*
+> + * Generate a list of I/O requests in /proc/fs/netfs/requests
+> + */
+> +static int netfs_requests_seq_show(struct seq_file *m, void *v)
+> +{
+> +	struct netfs_io_request *rreq;
+> +
+> +	if (v =3D=3D &netfs_io_requests) {
+> +		seq_puts(m,
+> +			 "REQUEST  OR REF FL ERR  OPS COVERAGE\n"
+> +			 "=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D =3D=3D=3D =3D=3D =3D=3D=3D=3D =3D=
+=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D\n"
+> +			 );
+> +		return 0;
+> +	}
+> +
+> +	rreq =3D list_entry(v, struct netfs_io_request, proc_link);
+> +	seq_printf(m,
+> +		   "%08x %s %3d %2lx %4d %3d @%04llx %zx/%zx",
+> +		   rreq->debug_id,
+> +		   netfs_origins[rreq->origin],
+> +		   refcount_read(&rreq->ref),
+> +		   rreq->flags,
+> +		   rreq->error,
+> +		   atomic_read(&rreq->nr_outstanding),
+> +		   rreq->start, rreq->submitted, rreq->len);
+> +	seq_putc(m, '\n');
+> +	return 0;
+> +}
+> +
+> +static void *netfs_requests_seq_start(struct seq_file *m, loff_t *_pos)
+> +	__acquires(rcu)
+> +{
+> +	rcu_read_lock();
+> +	return seq_list_start_head(&netfs_io_requests, *_pos);
+> +}
+> +
+> +static void *netfs_requests_seq_next(struct seq_file *m, void *v, loff_t=
+ *_pos)
+> +{
+> +	return seq_list_next(v, &netfs_io_requests, _pos);
+> +}
+> +
+> +static void netfs_requests_seq_stop(struct seq_file *m, void *v)
+> +	__releases(rcu)
+> +{
+> +	rcu_read_unlock();
+> +}
+> +
+> +static const struct seq_operations netfs_requests_seq_ops =3D {
+> +	.start  =3D netfs_requests_seq_start,
+> +	.next   =3D netfs_requests_seq_next,
+> +	.stop   =3D netfs_requests_seq_stop,
+> +	.show   =3D netfs_requests_seq_show,
+> +};
+> +#endif /* CONFIG_PROC_FS */
+> +
+> +static int __init netfs_init(void)
+> +{
+> +	if (!proc_mkdir("fs/netfs", NULL))
+> +		goto error;
+> +
 
-Physical ib_device does not have an underlying net_device, thus its
-association with IPoIB net_device cannot be retrieved via
-ops.get_netdev() or ib_device_get_by_netdev(). ksmbd reads physical
-ib_device port GUID from the lower 16 bytes of the hardware addresses on
-IPoIB net_device and match its underlying ib_device using ib_find_gid()
+It seems like this should go under debugfs instead.
 
-Signed-off-by: Kangjing Huang <huangkangjing@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/transport_rdma.c | 39 +++++++++++++++++++++++++---------
- 1 file changed, 29 insertions(+), 10 deletions(-)
+> +	if (!proc_create_seq("fs/netfs/requests", S_IFREG | 0444, NULL,
+> +			     &netfs_requests_seq_ops))
+> +		goto error_proc;
+> +
+> +	return 0;
+> +
+> +error_proc:
+> +	remove_proc_entry("fs/netfs", NULL);
+> +error:
+> +	return -ENOMEM;
+> +}
+> +fs_initcall(netfs_init);
+> +
+> +static void __exit netfs_exit(void)
+> +{
+> +	remove_proc_entry("fs/netfs", NULL);
+> +}
+> +module_exit(netfs_exit);
+> diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+> index e17cdf53f6a7..85f428fc52e6 100644
+> --- a/fs/netfs/objects.c
+> +++ b/fs/netfs/objects.c
+> @@ -45,6 +45,7 @@ struct netfs_io_request *netfs_alloc_request(struct add=
+ress_space *mapping,
+>  		}
+>  	}
+> =20
+> +	netfs_proc_add_rreq(rreq);
+>  	netfs_stat(&netfs_n_rh_rreq);
+>  	return rreq;
+>  }
+> @@ -76,12 +77,13 @@ static void netfs_free_request(struct work_struct *wo=
+rk)
+>  		container_of(work, struct netfs_io_request, work);
+> =20
+>  	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
+> +	netfs_proc_del_rreq(rreq);
+>  	netfs_clear_subrequests(rreq, false);
+>  	if (rreq->netfs_ops->free_request)
+>  		rreq->netfs_ops->free_request(rreq);
+>  	if (rreq->cache_resources.ops)
+>  		rreq->cache_resources.ops->end_operation(&rreq->cache_resources);
+> -	kfree(rreq);
+> +	kfree_rcu(rreq, rcu);
+>  	netfs_stat_d(&netfs_n_rh_rreq);
+>  }
+> =20
+> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+> index b11a84f6c32b..b447cb67f599 100644
+> --- a/include/linux/netfs.h
+> +++ b/include/linux/netfs.h
+> @@ -175,10 +175,14 @@ enum netfs_io_origin {
+>   * operations to a variety of data stores and then stitch the result tog=
+ether.
+>   */
+>  struct netfs_io_request {
+> -	struct work_struct	work;
+> +	union {
+> +		struct work_struct work;
+> +		struct rcu_head rcu;
+> +	};
+>  	struct inode		*inode;		/* The file being accessed */
+>  	struct address_space	*mapping;	/* The mapping being accessed */
+>  	struct netfs_cache_resources cache_resources;
+> +	struct list_head	proc_link;	/* Link in netfs_iorequests */
+>  	struct list_head	subrequests;	/* Contributory I/O operations */
+>  	void			*netfs_priv;	/* Private data for the netfs */
+>  	unsigned int		debug_id;
+>=20
 
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 3b269e1f523a..a82131f7dd83 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -2140,8 +2140,7 @@ static int smb_direct_ib_client_add(struct ib_device *ib_dev)
- 	if (ib_dev->node_type != RDMA_NODE_IB_CA)
- 		smb_direct_port = SMB_DIRECT_PORT_IWARP;
- 
--	if (!ib_dev->ops.get_netdev ||
--	    !rdma_frwr_is_supported(&ib_dev->attrs))
-+	if (!rdma_frwr_is_supported(&ib_dev->attrs))
- 		return 0;
- 
- 	smb_dev = kzalloc(sizeof(*smb_dev), GFP_KERNEL);
-@@ -2241,17 +2240,37 @@ bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
- 		for (i = 0; i < smb_dev->ib_dev->phys_port_cnt; i++) {
- 			struct net_device *ndev;
- 
--			ndev = smb_dev->ib_dev->ops.get_netdev(smb_dev->ib_dev,
--							       i + 1);
--			if (!ndev)
--				continue;
-+			/* RoCE and iWRAP ib_dev is backed by a netdev */
-+			if (smb_dev->ib_dev->ops.get_netdev) {
-+				ndev = smb_dev->ib_dev->ops.get_netdev(
-+					smb_dev->ib_dev, i + 1);
-+				if (!ndev)
-+					continue;
- 
--			if (ndev == netdev) {
-+				if (ndev == netdev) {
-+					dev_put(ndev);
-+					rdma_capable = true;
-+					goto out;
-+				}
- 				dev_put(ndev);
--				rdma_capable = true;
--				goto out;
-+			/* match physical ib_dev with IPoIB netdev by GUID */
-+			} else if (netdev->type == ARPHRD_INFINIBAND) {
-+				struct netdev_hw_addr *ha;
-+				union ib_gid gid;
-+				u32 port_num;
-+				int ret;
-+
-+				netdev_hw_addr_list_for_each(
-+					ha, &netdev->dev_addrs) {
-+					memcpy(&gid, ha->addr + 4, sizeof(gid));
-+					ret = ib_find_gid(smb_dev->ib_dev, &gid,
-+							  &port_num, NULL);
-+					if (!ret) {
-+						rdma_capable = true;
-+						goto out;
-+					}
-+				}
- 			}
--			dev_put(ndev);
- 		}
- 	}
- out:
--- 
-2.25.1
-
+ACK on the general concept however. This is useful debugging info.
+--=20
+Jeff Layton <jlayton@kernel.org>
