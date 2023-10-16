@@ -2,38 +2,53 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A5CCC41513
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Oct 2023 16:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E729CDB465
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Oct 2023 16:42:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233706AbjJPQLL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 16 Oct 2023 12:11:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43144 "EHLO
+        id S234154AbjJPQmL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 16 Oct 2023 12:42:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233837AbjJPQLB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Oct 2023 12:11:01 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120721B2;
-        Mon, 16 Oct 2023 09:10:52 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6700C433C9;
-        Mon, 16 Oct 2023 16:10:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697472652;
-        bh=gWHVm67UjtqFw6+7yv4rt62zVL2QbQsf6kz0OqfM+T4=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=oZSi9Cr46VJvDfJqXMvyt3WZMnh3kWQOGId5Ykf8NhRUkV1JLSq60ZEuW9aLkCetX
-         sil+IjGAZbvHruvhuOiI8djrgL/SiaanaZOLMiaQa1tSFyoNb5Nlkh0TjdFGAJiay5
-         SfJPKb8r8exJavmsBQGw4TiOA8LZFqvuinK7G3ADrnTpV7Idmg/KlDlaR5SYbA4LeI
-         X6h60yT/c0b1f+iN5XqRzmx03D1z5a9WHAS97cpg8XRftJnID1Kr4zsHf46LaSw39s
-         Sn6yblOrRc68OCh2l6paV3F2P/vXsQoBQ8A3E/1gLqYl8X+0LyMWIKHZUPKSFQWxv3
-         idwbIz0NRNM+g==
-Message-ID: <bb0b02b4241da7f486cde28bdc83bb9ce077ee0e.camel@kernel.org>
-Subject: Re: [RFC PATCH 11/53] netfs: Add support for DIO buffering
-From:   Jeff Layton <jlayton@kernel.org>
-To:     David Howells <dhowells@redhat.com>,
-        Steve French <smfrench@gmail.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
+        with ESMTP id S234416AbjJPQlv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Oct 2023 12:41:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EA121FEB
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Oct 2023 09:31:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697473880;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rbzg7U/87dJSaK89YmTgCyu23XfU1BhnpwaB496FV9g=;
+        b=BOBTuB52y0K0wAR6s5CX7xgG1BncSFYX1sn3YfPs1bk0qfe7Wa4BiskcwpkSPMKCQ0r5U/
+        qo3DAlcGX3nEFEsVMLh67Lhri50sAV56zmTQJH+qGWU/NuxQHOGhVU/F+wXFR+fgxvIuAe
+        Y8Zf8lhtAI+B+rmlKFxv+LPgw34oOKQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-613-g1DVukGdOg29WJloZ1VP1g-1; Mon, 16 Oct 2023 12:31:16 -0400
+X-MC-Unique: g1DVukGdOg29WJloZ1VP1g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 523CF81D9E2;
+        Mon, 16 Oct 2023 16:31:15 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.178])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B7B49492BEE;
+        Mon, 16 Oct 2023 16:31:12 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <11ec6f637698feb04963c6a7c39a5ca80af95464.camel@kernel.org>
+References: <11ec6f637698feb04963c6a7c39a5ca80af95464.camel@kernel.org> <20231013155727.2217781-1-dhowells@redhat.com> <20231013155727.2217781-3-dhowells@redhat.com>
+To:     Jeff Layton <jlayton@kernel.org>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        Matthew Wilcox <willy@infradead.org>,
         Marc Dionne <marc.dionne@auristor.com>,
         Paulo Alcantara <pc@manguebit.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
         Shyam Prasad N <sprasad@microsoft.com>,
         Tom Talpey <tom@talpey.com>,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -44,105 +59,62 @@ Cc:     Matthew Wilcox <willy@infradead.org>,
         v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-cachefs@redhat.com
-Date:   Mon, 16 Oct 2023 12:10:49 -0400
-In-Reply-To: <20231013160423.2218093-12-dhowells@redhat.com>
-References: <20231013160423.2218093-1-dhowells@redhat.com>
-         <20231013160423.2218093-12-dhowells@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Subject: Re: [RFC PATCH 02/53] netfs: Track the fpos above which the server has no data
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2841425.1697473872.1@warthog.procyon.org.uk>
+Date:   Mon, 16 Oct 2023 17:31:12 +0100
+Message-ID: <2841426.1697473872@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 2023-10-13 at 17:03 +0100, David Howells wrote:
-> Add a bvec array pointer and an iterator to netfs_io_request for either
-> holding a copy of a DIO iterator or a list of all the bits of buffer
-> pointed to by a DIO iterator.
->=20
-> There are two problems:  Firstly, if an iovec-class iov_iter is passed to
-> ->read_iter() or ->write_iter(), this cannot be passed directly to
-> kernel_sendmsg() or kernel_recvmsg() as that may cause locking recursion =
-if
-> a fault is generated, so we need to keep track of the pages involved
-> separately.
->=20
-> Secondly, if the I/O is asynchronous, we must copy the iov_iter describin=
-g
-> the buffer before returning to the caller as it may be immediately
-> deallocated.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: linux-cachefs@redhat.com
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->  fs/netfs/objects.c    | 10 ++++++++++
->  include/linux/netfs.h |  3 +++
->  2 files changed, 13 insertions(+)
->=20
-> diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
-> index 8e92b8401aaa..4396318081bf 100644
-> --- a/fs/netfs/objects.c
-> +++ b/fs/netfs/objects.c
-> @@ -78,6 +78,7 @@ static void netfs_free_request(struct work_struct *work=
-)
->  {
->  	struct netfs_io_request *rreq =3D
->  		container_of(work, struct netfs_io_request, work);
-> +	unsigned int i;
-> =20
->  	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
->  	netfs_proc_del_rreq(rreq);
-> @@ -86,6 +87,15 @@ static void netfs_free_request(struct work_struct *wor=
-k)
->  		rreq->netfs_ops->free_request(rreq);
->  	if (rreq->cache_resources.ops)
->  		rreq->cache_resources.ops->end_operation(&rreq->cache_resources);
-> +	if (rreq->direct_bv) {
-> +		for (i =3D 0; i < rreq->direct_bv_count; i++) {
-> +			if (rreq->direct_bv[i].bv_page) {
-> +				if (rreq->direct_bv_unpin)
-> +					unpin_user_page(rreq->direct_bv[i].bv_page);
-> +			}
-> +		}
-> +		kvfree(rreq->direct_bv);
-> +	}
->  	kfree_rcu(rreq, rcu);
->  	netfs_stat_d(&netfs_n_rh_rreq);
->  }
-> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-> index bd0437088f0e..66479a61ad00 100644
-> --- a/include/linux/netfs.h
-> +++ b/include/linux/netfs.h
-> @@ -191,7 +191,9 @@ struct netfs_io_request {
->  	struct list_head	subrequests;	/* Contributory I/O operations */
->  	struct iov_iter		iter;		/* Unencrypted-side iterator */
->  	struct iov_iter		io_iter;	/* I/O (Encrypted-side) iterator */
-> +	struct bio_vec		*direct_bv;	/* DIO buffer list (when handling iovec-ite=
-r) */
->  	void			*netfs_priv;	/* Private data for the netfs */
-> +	unsigned int		direct_bv_count; /* Number of elements in bv[] */
+Jeff Layton <jlayton@kernel.org> wrote:
 
-nit: "number of elements in direct_bv[]"
+> >  (7) If stored data is culled from the local cache, we must set zero_point
+> >      above that if the data also got written to the server.
+> 
+> When you say culled here, it sounds like you're just throwing out the
+> dirty cache without writing the data back. That shouldn't be allowed
+> though, so I must be misunderstanding what you mean here. Can you
+> explain?
 
-Also, just for better readability, can you swap direct_bv and
-netfs_priv? Then at least the array and count are together.
+I meant fscache specifically.  Too many caches - and some of them with the
+same names!
 
->  	unsigned int		debug_id;
->  	unsigned int		rsize;		/* Maximum read size (0 for none) */
->  	atomic_t		nr_outstanding;	/* Number of ops in progress */
-> @@ -200,6 +202,7 @@ struct netfs_io_request {
->  	size_t			len;		/* Length of the request */
->  	short			error;		/* 0 or error that occurred */
->  	enum netfs_io_origin	origin;		/* Origin of the request */
-> +	bool			direct_bv_unpin; /* T if direct_bv[] must be unpinned */
->  	loff_t			i_size;		/* Size of the file */
->  	loff_t			start;		/* Start position */
->  	pgoff_t			no_unlock_folio; /* Don't unlock this folio after read */
->=20
+> >  (8) If dirty data is written back to the server, but not the local cache,
+> >      we must set zero_point above that.
+> 
+> How do you write back without writing to the local cache? I'm guessing
+> this means you're doing a non-buffered write?
 
---=20
-Jeff Layton <jlayton@kernel.org>
+I meant fscache.  fscache can decline to honour a request to store data.
+
+> > +		if (size != i_size) {
+> > +			truncate_pagecache(&vnode->netfs.inode, size);
+> > +			netfs_resize_file(&vnode->netfs, size);
+> > +			fscache_resize_cookie(afs_vnode_cache(vnode), size);
+> > +		}
+> 
+> Isn't this an existing bug? AFS is not setting remote_i_size in the
+> setattr path currently? I think this probably ought to be done in a
+> preliminary AFS patch.
+
+It is being set.  afs_apply_status() sets it.  This is called by
+afs_vnode_commit_status() which is called from afs_setattr_success().  The
+value isn't updated until we get the return status from the server that
+includes the new value.
+
+> > +	loff_t			zero_point;	/* Size after which we assume there's no data
+> > +						 * on the server */
+> 
+> While I understand the concept, I'm not yet sure I understand how this
+> new value will be used. It might be better to merge this patch in with
+> the patch that adds the first user of this data.
+
+I'll consider it.  At least it might make sense to move them adjacent to each
+other in the series.
+
+David
+
