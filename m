@@ -2,95 +2,107 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81167CDB474
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Oct 2023 22:14:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 627B2CDB483
+	for <linux-cifs@archiver.kernel.org>; Tue, 17 Oct 2023 10:43:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233574AbjJPWOW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 16 Oct 2023 18:14:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48052 "EHLO
+        id S233570AbjJQKnc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 17 Oct 2023 06:43:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbjJPWOV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Oct 2023 18:14:21 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5A19B;
-        Mon, 16 Oct 2023 15:14:20 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-5079eed8bfbso4055113e87.1;
-        Mon, 16 Oct 2023 15:14:20 -0700 (PDT)
+        with ESMTP id S234843AbjJQKnb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Oct 2023 06:43:31 -0400
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17A0DF0
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Oct 2023 03:43:29 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d9a6b21d1daso6447108276.3
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Oct 2023 03:43:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697494458; x=1698099258; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KvN8fCLlFe7Jrcf7tnyNS2O/KMreYubvjkRXV3ZF900=;
-        b=jZNsRbOSRBEMNnJXAd+I0My/oZyydqs0wjNPcMlv/8bALsBZSfk7rpti63vbfe20Sv
-         dkngUZ1vpxkTz+7lrxBsLZ0zvgwF/VuxX5bcJncSEao90kNyyOV9FydZ3GKM15K3/1sB
-         HG4XG/JHzfSoPDYY1FXF1R0mtZELyQWV9xJLjrZZeqEcsXql64EJwIStXPlZAdDnZx63
-         xoQgKkUhlQ57yAwANd1i2fj4BBdnJGPCbfIXF4tpE4II09PDXQr5StKTJlZdjJGfuaOS
-         b9e3a3nnTAw+IzDgOtVkoq3Ynk3aTYCd6Yo3u2PID1Rz9STocQzvjrJsCI85CJRbvagr
-         cCQA==
+        d=dneg.com; s=google; t=1697539408; x=1698144208; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OmZ/33TllYLHL47d/dVmhdUXpMsytcSlpt83kTPbFEw=;
+        b=v1VTrk5a5bMTOZAKX2/e+XVcQcJmyGbghSCmPgyIzGBryi3CaKjqN09EYPuAacxJov
+         p4wKEgL0UQafikbFUpuJOkA/w53hSzC7ZgBZ07Y+wYJDStMoMyXaRqZB9+y+nISGMtdy
+         yT+NpBh5oPbMyKZ8XWbR32SUWLMYQN1rglWYApNNliuC/fg+owINkQyqZqv2lwpjhk2b
+         lfjKfelGs7rBxb/EHzUHvDErgZiAPYhXwruP4Zl9BOyqgxYWsfQHeD47xgs0drMYjNsY
+         xDt6RvYRGOXdbyU50V0/yHNVIX+I/XtRTsplsryIh+ZcuwK16EDTsKGqBp0AqP0zC4ut
+         uGQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697494458; x=1698099258;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KvN8fCLlFe7Jrcf7tnyNS2O/KMreYubvjkRXV3ZF900=;
-        b=TmEFoxeKI9/gHylF5VtL7bStJ2KCux0qEGbKmt/0ED+FVbiB2zXvcwzY3wWsSUZRgG
-         /xhcl0uCPvK+W7gJX6nEOUmku1mVp1NGZBWxOVaGEPwBt+fuBuSHvzCIQOGnLyttMDVe
-         pMR+ps1KYwXH1DhQYic/AE7R5BZuEGtBaOG3GyF/pgGeE+0aocEy4iFJnVacjC3SZDDl
-         3KzYtIcuw0lyqXAiKvtgAA4JwUkmJuIyelnu2RcB4s0le2iOkyBBRc87QpKxbIpB8fdD
-         aUDJ8dA5IchasBHf80EUtVKJ3ljFG06IYY1FURa9qnZT1Yw9qvPf+Rb/LgOLxwZqqp1d
-         RAww==
-X-Gm-Message-State: AOJu0Yycw771QItygW18NUaG6EUsAhXSRYfPvf9uVH2iT0lLRyp/w+2D
-        QtmmL4WDH3QfvU0BlswCo+SmrWuI55TpLc8YHDgPGGSAP+bezw==
-X-Google-Smtp-Source: AGHT+IFXFt/eaJWjHKduGhvzniZ6R3YYjayeqqEwooMHqMLyF5XD1We0e5s+zndoyLW1kupxy0QwGcfYS3q2cotGUGo=
-X-Received: by 2002:ac2:5de2:0:b0:503:1775:fc1 with SMTP id
- z2-20020ac25de2000000b0050317750fc1mr474446lfq.31.1697494458303; Mon, 16 Oct
- 2023 15:14:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697539408; x=1698144208;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OmZ/33TllYLHL47d/dVmhdUXpMsytcSlpt83kTPbFEw=;
+        b=jHV7es4syDhtg9rE9WSC/kPKcEM1xQHqhRNuu4DQUFGb538fC82NNbYVr6+QRml6fV
+         PcGu7TwJ+Ys+qJLh2K9oY94G88bP48ZNIz2MT1fg/BwnTEZOKWlQeoS09zEIyRMowJBi
+         Ss9ZYriwG30l2jST9NQqlF/sKupMJcPiu7/WBVGgz3Dj4vgjYFzKqtvKLmAeN5HaXKyn
+         CjE+YpP1p7BVXtKH9Bv9p1CZlXhcc7kn6+5phEgVlIuw+5Df490FtwKor6tebYxxR4Xv
+         5Z5AYqcFo3RnNMztssH6Id31HXF/rHCWjMGAmrJ0uXmWN81D8sOVJRzZ2I/oXEW2Hycn
+         dkYA==
+X-Gm-Message-State: AOJu0Yx2koOHo066sx+39wXztRkAFgBgb52sqHeD6Vp1vQFEZqm6tNx/
+        jIDksD1jMawG8WHABgEIsc9jygjCoUk/R41Vbf6GuQ==
+X-Google-Smtp-Source: AGHT+IEguG9VkvSZyN+YQKkbnzU4bPPMH68Gm77P3bS20bpQvkVCehXFFJFu9p/7GSuuBt2Sz4dkmWLIuiXDJ62NRdc=
+X-Received: by 2002:a25:cd44:0:b0:d9b:6c9d:e6a with SMTP id
+ d65-20020a25cd44000000b00d9b6c9d0e6amr1563929ybf.0.1697539408286; Tue, 17 Oct
+ 2023 03:43:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mui-uk5XVnJMM2UQ40VJM5dyA=+YChGpDcLAapBTCk4kw@mail.gmail.com>
- <ZS1zSoRwv+yr5BHS@casper.infradead.org>
-In-Reply-To: <ZS1zSoRwv+yr5BHS@casper.infradead.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 16 Oct 2023 17:14:06 -0500
-Message-ID: <CAH2r5mvBqqas=qrR+Sxfz2T99B2YbuJRn1O8vdpXhUc1CcnoQw@mail.gmail.com>
-Subject: Re: [PATCH][SMB3 client] fix touch -h of symlink
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+References: <20231013155727.2217781-1-dhowells@redhat.com>
+In-Reply-To: <20231013155727.2217781-1-dhowells@redhat.com>
+From:   Daire Byrne <daire@dneg.com>
+Date:   Tue, 17 Oct 2023 11:42:52 +0100
+Message-ID: <CAPt2mGNpo0Uw0Ud18N4dV=ojoGK-xyj1P29tzWEhZw0i4FNVPg@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/53] netfs, afs, cifs: Delegate high-level I/O to netfslib
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jeff Layton <jlayton@kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Paulo Alcantara <pc@manguebit.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Tom Talpey <tom@talpey.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Christian Brauner <christian@brauner.io>,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 12:30=E2=80=AFPM Matthew Wilcox <willy@infradead.or=
-g> wrote:
+On Fri, 13 Oct 2023 at 16:58, David Howells <dhowells@redhat.com> wrote:
 >
-> On Mon, Oct 16, 2023 at 12:26:23PM -0500, Steve French wrote:
-> > For example:
-> >           touch -h -t 02011200 testfile
-> >     where testfile is a symlink would not change the timestamp, but
-> >           touch -t 02011200 testfile
-> >     does work to change the timestamp of the target
-> >
-> > Looks like some symlink inode operations are missing for other fs as we=
-ll
->
-> Do we have an xfstests for this?
+>  (2) Use of fscache is not yet tested.  I'm not sure whether to allow a
+>      cache to be used with a write-through write.
 
-I was thinking the same thing - would be useful to add an xfstest for
-this.  I actually noticed this old bug when someone reported an
-unrelated problem (where "find . -type l" doesn't show the symlink but
-"ls" and "stat" do) and the other unrelated symlink bug could be
-useful to add to the same test
+Just adding a quick end user "thumbs up" for this potential feature.
+We currently use fscache as the backend for "NFS re-export" servers to
+extend our onprem storage to remote cloud compute (which works great).
 
-Are there other scenarios we could repro problems to an fs that
-doesn't have a .getattr method (like cifs.ko, afs) or .permission
-(like nfs and ext4)?
+But batch compute hosts (think VFX render farm) often chunk up stages
+of work into multiple batch jobs such that they read data, write
+results and then read the same data on different clients. Having the
+ability to also cache the recent writes closer to the compute clients
+(on the re-export server) would open up a lot of new workload
+possibilities for us.
 
+>  (5) Write-through caching will generate and dispatch write subrequests as
+>      it gathers enough data to hit wsize and has whole pages that at least
+>      span that size.  This needs to be a bit more flexible, allowing for a
+>      filesystem such as CIFS to have a variable wsize.
 
---=20
-Thanks,
+If I understand correctly, this is above and beyond the normal write
+back cache and is more in tune with the wsize (of NFS, CIFS etc) for
+each file? Again, our workloads are over longer latencies than are
+normal (NFS over 200ms!) so this sounds like a nice optimisation when
+dealing with slow stuttering file writes over high latency.
 
-Steve
+I can definitely volunteer for some of the fscache + NFS testing.
+
+Cheers,
+
+Daire
