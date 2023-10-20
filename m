@@ -2,291 +2,154 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD62C001DF
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Oct 2023 01:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94916CDB474
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Oct 2023 04:32:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233375AbjJTBOP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Oct 2023 21:14:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37638 "EHLO
+        id S229721AbjJTEct (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 20 Oct 2023 00:32:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233033AbjJTBON (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Oct 2023 21:14:13 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C1C4112
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Oct 2023 18:14:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KZQqL6a4pfbZWenTxX1Tf1R7ufwezcMufhIxlVzCvepA8RevuWmRphTQDhLpc9mlNNaModRcgUQaJ4TmB7HoP496xGEF9A5LIcTPnIEeDS4Q7WHKADLEHokPFtkDmeqXV2T17Uh7/rPD6IZSQS6fzv40MrChPu/CEBTb6SYixG45U8MP54cZuBWSPbcUAgbhBBzwdqVfTlqTgV5LrAfknsjrciKDcLjTVBrnFEIShydvLx+nO/GOZEUeMp8za3DeuWK0YIZnl/c0Q6oszNe6hXyi2vBsO3zvnOye01OcBZ59AsdOlvRWwKjdVRdSIXFDJ7Y9kxyIFKTEquWJEjRIbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cS23UurgNZQqCios7t4wGK8VDimRGm3TzCwywSxFKSQ=;
- b=ERKjUqFBEEGK9DUWZWjyQ5YBe5JVAF/pwxU+xUjF0ko70uSIlK4OMSzxpQJGFtUxFreCz9A/KbvQNvlQE9sA7GjvltKCKbm4mGgGX9q2EjhfJSTnD82cTcbnsm13LnH2x44IAatlRiVDApEHnqacXDvPd6rx0UIuPLPfhCUST02SSLA1xf3KCnS36AIlyOXvE4Y+FJf1V/mvOBKSSK19SITuCF7O5Ds5yBXxgX1Pc0aGgjMc1VoRVYOb0ejRstfxMfxRanPFhY5jRkzAXZlWLBrSGdC5HJ7QlLD+MdcHSBcNgdZ3fiwGkygxxtZvKtrsrz6s4xsX1PsnI7OS45oBiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
- dkim=pass header.d=talpey.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=talpey.com;
-Received: from SN6PR01MB4445.prod.exchangelabs.com (2603:10b6:805:e2::33) by
- PH7PR01MB8000.prod.exchangelabs.com (2603:10b6:510:271::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6907.23; Fri, 20 Oct 2023 01:14:09 +0000
-Received: from SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::28cd:b4e1:d64b:7160]) by SN6PR01MB4445.prod.exchangelabs.com
- ([fe80::28cd:b4e1:d64b:7160%4]) with mapi id 15.20.6907.021; Fri, 20 Oct 2023
- 01:14:09 +0000
-Message-ID: <e54f1a07-bc68-474f-83c1-a046d2b61b12@talpey.com>
-Date:   Thu, 19 Oct 2023 21:14:07 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ksmbd: fix missing RDMA-capable flag for IPoIB device in
- ksmbd_rdma_capable_netdev()
-Content-Language: en-US
-To:     Namjae Jeon <linkinjeon@kernel.org>,
-        "Kangjing (Chaser) Huang" <huangkangjing@gmail.com>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, atteh.mailbox@gmail.com
-References: <20231015144536.9100-1-linkinjeon@kernel.org>
- <11e5bc36-677d-474d-acae-ab7e6ade9b2b@talpey.com>
- <CAPbmFQZoXXdu6StcGrQO1iAzEyFfybt=GgTeqizP-KYQp7LLgQ@mail.gmail.com>
- <CAKYAXd-baiZEY=5Z4vaX=OQiSBKfKXsn+_tJOJo1mZ3uniRSzQ@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-In-Reply-To: <CAKYAXd-baiZEY=5Z4vaX=OQiSBKfKXsn+_tJOJo1mZ3uniRSzQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MN2PR08CA0012.namprd08.prod.outlook.com
- (2603:10b6:208:239::17) To SN6PR01MB4445.prod.exchangelabs.com
- (2603:10b6:805:e2::33)
+        with ESMTP id S229695AbjJTEcs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Oct 2023 00:32:48 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E1861A8
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Oct 2023 21:32:46 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-5079f6efd64so450952e87.2
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Oct 2023 21:32:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697776364; x=1698381164; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cJ8v4thUWvHEDZGBSVKt08OJQRuQ1zq3oUS8VnC3WW8=;
+        b=eDJolx0LtSHDJqde6Y6YdYCXZfxQh8BIAE00vquKbwDrV9NmL7IXzQzXGWPnMxYhyV
+         EDYCJlIoSkd80ShOutI5lO15xnFyDmkfzv/xDM+oQJ/r/o3ZKAg+1uXAdEnLLcqCVyP7
+         KrlcWSseo41JhGZ8JIQN03A2N8hQmEdbZr1J0wWdKbLbGkXvHRlEgMPtjkrfW+nE8yzx
+         SX8MJzayXNJhwhhx8wWKN0/Zv5bo92D2qQF6mwFVTbkG+bDcxNBzQA4mrruNh7oZ6vBY
+         XX/9A8668nmjxc7Ng7COD3HIx9zEmc9CxB0hGSQrI4DQ6oUlfsAInzWSqvVGHOf6XBm1
+         WECA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697776364; x=1698381164;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cJ8v4thUWvHEDZGBSVKt08OJQRuQ1zq3oUS8VnC3WW8=;
+        b=edDGtPNRzBnKbNdELetBcd8xmNfQIGOKEekwRCmDl05/R96Cjs1EpRMgzQLRAdwY2s
+         tLtoSFh95pCDZ7bWQTgMLJiyhNNkwV2Ua1zcRiQDqQQB6vZz9VB2oO2DUgLZIGRJLc5I
+         mgKb2ksF4HzBSMXL6N/C2SFMDMCPm2w+82GfC9FaoMnCG7GpW+ceAqorhs7Ssti+gXEN
+         kEzUJa+lV2gtCbFWdTIgOXgh9I2cCknKW3nx+ldidc8bZvzAapZiPZqxnmDziUEjchh6
+         /EkB+AO0YmnZ8pkctaCqwlsrJyuLLmEqvY5oJCxrOAI/gGvdVA+xwaETJyog50Ea2Z/p
+         NPkA==
+X-Gm-Message-State: AOJu0Yz+/nINfZugAd9UJRN8eDo14cGgwp/IvynbO9UseobN1YN5UUUv
+        pSA5XsNn9pCe4qogY+GoHcBdnjLftFDmt3MR8thFEmuxbcKzEA==
+X-Google-Smtp-Source: AGHT+IGOTp69NW4A0m+s+fQ2mKgb9bjJnQ0wIIGs9YAWSl20SJpg6PtVkApnjMt1DQrniZvXq0BsY77uLtNki/boFsc=
+X-Received: by 2002:ac2:5548:0:b0:507:9996:f62b with SMTP id
+ l8-20020ac25548000000b005079996f62bmr395168lfk.56.1697776363599; Thu, 19 Oct
+ 2023 21:32:43 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4445:EE_|PH7PR01MB8000:EE_
-X-MS-Office365-Filtering-Correlation-Id: acffd660-ae78-4e66-22a3-08dbd109dc92
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 997uDOP+RMf4BWLoe/bQp2rZJyg1yIZNLpZUEvo1ar1vtoPJB0IaqnCdQgtqR/yTJ4g9UD8QSNXPmyNVGlMEEyg6EXXMb0zCI+HYJwky4VaTxMxSjnfCqJi79Z0WoG4hQK4HTckeyWJmKbd6/pxpwCrWdzPDn8rPDqz7UgtWHkD3H/2wpydV+NDtl5lMkDRsJnJ78dsa6Pi1eoQonxWZpzvKWITMHmJqBB6YufrjXJJ96Y2RdIq9w10yag443mamlftPYCkttqPg81rGxUFCAqMcQWhwukzynuzs52okuLLKhoLgUAvw+b3pPfPFB6orJDnStYODCZDg5N7+jZJewT67q3DxFtJA859JCN49AuXhOLf9wrnHPOvphnTfeoGF0gMoubA3VpDhKMg6NbecOmX1PhkFsEg6G0wVO6pWAA+lNAYaUvqtXH5Q+8sgPbJ9TSBuf6ewEmhCahBe1NICaGTEBLxN77zm9GyYoB/O49Q+TkaK/qOQ/s9yYINQRfmW7AnklYDH6RcL5ce1QbkLtzPHqOORaEn332gHXiUaB4q8uXSkEBvC9JTHJLO4uPpdBVDUM0Zc5WpGxjCRSlgcia9LbeJdFil6ih4GSMAF/ljBCm0uSsQBdzYQELA1EqhS
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB4445.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39830400003)(346002)(396003)(376002)(136003)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(36756003)(31686004)(110136005)(31696002)(66476007)(38100700002)(86362001)(66556008)(83380400001)(6512007)(26005)(6506007)(2616005)(53546011)(66946007)(4001150100001)(478600001)(6486002)(5660300002)(4326008)(2906002)(8936002)(316002)(41300700001)(8676002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eXZJRnFhamJtRTc3VWZRMjV3K3JqblJEMHZwdy8vWXpkNExHWmtVQ1NpdS9E?=
- =?utf-8?B?MGhiM0RhOUZDWUNnL2V5R00wQk1obEg3bjV3d3FERFFsQzlmZWd4WEVzekV1?=
- =?utf-8?B?N0czSWZ0VGw5WHhSOCtPOXpmOUlPQVNxRHE3R3J1NVhHYUVQelMzSGZRZkRL?=
- =?utf-8?B?VGc1WkFuc0t4dy9FRmgwMjJ3ZnZhYjZXS3NLRWx2UTQrUHM0bE5RcDJoTEN3?=
- =?utf-8?B?anQzOXRnWkZkLzZrVmFhWE9YMnBZVGI4OEl3a3BCRGtIcy83VG82SUYwRWxR?=
- =?utf-8?B?UHBkTlE4TFgwbW15OUxhb3RRTXdpVlJkN3RZNjJ0SExPaWlVTXJvNUlZV1N3?=
- =?utf-8?B?TmZvaUJ6aXo1WGFOQlpvdGRlYm1LOXpmUGF6YWJiV3dFVXdUc1ZyMXhjMUNE?=
- =?utf-8?B?VWV2QVY4QWZvUkZTbG1La1piejhqcm5Kd2ZlUEFuNVh0VEdMU3VUaTAyaWli?=
- =?utf-8?B?MTVCdmhkMERVR3IwQjA2Z3lWNVowNWVqTC95QTQzZVI2dk5NZkd3VThndDdV?=
- =?utf-8?B?Rm1KQzVQVjBDMm5pRVZrWDdIQVhCYzVCUFdlU3dZOGRBVWFTTjNWdWtTSEJC?=
- =?utf-8?B?YVY0US9EK24weVkwc2ovUlZFdG13Zm9haEJBV25kcmZyY3Mxd0NEdnNGZisr?=
- =?utf-8?B?SmRnZS9EL2dRN2gvMktTaEtzN3dlZkhQUHNGSnkzeC9POTBKWHVQVjlldSta?=
- =?utf-8?B?WW9HOUJwVHREU2s2SGNid0FiUGNpVlVUYkl4MWo4MDB2UE90L1hOTFpkRlU4?=
- =?utf-8?B?R0pBUEpSNDdIdzdoUm1ST01LOTRDNXV6a3dVZzZ3aGVuNE11Qm9HQXl1Ukhi?=
- =?utf-8?B?S3RaSnFRcmQ4NzBKZkQxRC9ZWnd2VkRsbldKZ1h0WE00ZmVoM213R0oxMFd2?=
- =?utf-8?B?K1N0MnRyRXVGOUxVUC9XNjFBK29MWGE2UE9SNlZzcWp0ODZzZExqR1I1UVF3?=
- =?utf-8?B?MjROQm9rZEQxNURWdXZEL05HNWVGMXNHU0toUzF3SjB1VTFaV2RlN0RPOGlG?=
- =?utf-8?B?WS9WRWpOUW5ZU2FYU1VOWEVMemVsb0xVaVdPSVE5bzBQVGo1bnJaOG53K2Jq?=
- =?utf-8?B?QklkRVR6Q2UzYzRTTGVnNy82WkFqS2tkWDBZY1htV3dHSTVXSWhDczhtN0xT?=
- =?utf-8?B?eTg2MVU0bHREOG9KZjRUN0xaank2OEdDeVBMUXRiZWJxNWUxYnptMlVCZzVI?=
- =?utf-8?B?MXA4VEJCWERlUjhjSmJtbDNzdE9odktEbGRFM0ZVYmw3LzllWTdWKzBMVGtw?=
- =?utf-8?B?TFNiekpjWGk0MW1OK3hZSUYzaGd4c3V3bFcvU1ZOSk5lN2s1R3RveUl5bEpE?=
- =?utf-8?B?UU1CUXhSOUpIOUhDeG02QTNzNWx6d21WcHJzTU11OWxta1NGdFR6T0JaSnIx?=
- =?utf-8?B?S0VoNHpsRkZFRHJuVVczT21ZNmNxbkJhYmpjQUxBRTRJTDZQZVMrNWtnei9X?=
- =?utf-8?B?aU8xaTBQM0ZHT0pXY2JLY21zdC9Uc2twRkpNVzkvTUc2NWdjaXdnOFhISmtC?=
- =?utf-8?B?RzFzem9UOXlEMkNmSXFKZkJQOStFbUNyZnExRi96Yi9pQzl5WkJHSkw4U3NM?=
- =?utf-8?B?UTNRbnB0K3Rlcm9iYS9vWDh5b25LSjcyeEhZVEpFbXczMldQUWphSVpySW9P?=
- =?utf-8?B?NGpIalk4MGNlajZ4anN2Q0MzNjJYMzJWWmg4MTBRcndlWWM1SkhxeE9ZMkdw?=
- =?utf-8?B?dlMwK2lrNk5OODcvUy9CWlUyaDdPbkhWdWdhUHpobC9vLy9oQnJoMThZaEFH?=
- =?utf-8?B?TUdzNEFHS2x4bGlBanE4VUJqZ2tMTkdWNXNuTHoxVEEwZGIwR2daNWRLTklv?=
- =?utf-8?B?TnB5a1lpUUNvYm5HUzF2eHZVM1lKNVNXL0RMRGdtSi8vaXFhdXF2aDJPZ2Za?=
- =?utf-8?B?Rk83UHZwWnBabVpIMVhwWnVBWWFQNFo1K0xYRFZhYnNvSXlyZkxrSDJrSzc2?=
- =?utf-8?B?d0tuZzUwMndWOXlyOEUraCtzUm4vSk9Pck5HdE9qOHZmcDF4RUw1b1FvVU93?=
- =?utf-8?B?VjEvSjVGTVFRdjVTM2Rrb1RhdVkzVzF6alczR3hvMERzaStRY2FrR2d4Unlj?=
- =?utf-8?B?elhkbk1sZXp4VWJ2ZS84WDhBOXBaeVZGOWFwTjBrZ0VlaWxjUENlM3FoTERq?=
- =?utf-8?Q?aKQbAFOWN6WFQMlqj7YI6vaZU?=
-X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: acffd660-ae78-4e66-22a3-08dbd109dc92
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4445.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2023 01:14:08.9890
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 07O7rYKF9A51kSGS0enE2NJ7kGX0gHj/s51SWBMdWcLUSLUnuwmFvl91K3fx6gzP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR01MB8000
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 19 Oct 2023 23:32:32 -0500
+Message-ID: <CAH2r5mvve4euMUqsBBqRr2VWgz7ukEZ15vZRVDO=zbzY=XhF1Q@mail.gmail.com>
+Subject: [PATCH][CIFS] allow creating FIFOs when "sfu" mount option specified
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     samba-technical <samba-technical@lists.samba.org>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@samba.org>,
+        Pavel Shilovsky <piastryyy@gmail.com>
+Content-Type: multipart/mixed; boundary="0000000000000f92e306081e5d0b"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/19/2023 6:37 PM, Namjae Jeon wrote:
-> 2023-10-19 15:01 GMT+09:00, Kangjing (Chaser) Huang <huangkangjing@gmail.com>:
->> Thank you for the review. Also thanks a lot to Namjae for submitting
->> this patch on my behalf.
->>
->>
->> On Tue, Oct 17, 2023 at 10:07 AM Tom Talpey <tom@talpey.com> wrote:
->>>
->>> On 10/15/2023 10:45 AM, Namjae Jeon wrote:
->>>> From: Kangjing Huang <huangkangjing@gmail.com>
->>>>
->>>> Physical ib_device does not have an underlying net_device, thus its
->>>> association with IPoIB net_device cannot be retrieved via
->>>> ops.get_netdev() or ib_device_get_by_netdev(). ksmbd reads physical
->>>> ib_device port GUID from the lower 16 bytes of the hardware addresses
->>>> on
->>>> IPoIB net_device and match its underlying ib_device using ib_find_gid()
->>>>
->>>> Signed-off-by: Kangjing Huang <huangkangjing@gmail.com>
->>>> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
->>>> ---
->>>>    fs/smb/server/transport_rdma.c | 39
->>>> +++++++++++++++++++++++++---------
->>>>    1 file changed, 29 insertions(+), 10 deletions(-)
->>>>
->>>> diff --git a/fs/smb/server/transport_rdma.c
->>>> b/fs/smb/server/transport_rdma.c
->>>> index 3b269e1f523a..a82131f7dd83 100644
->>>> --- a/fs/smb/server/transport_rdma.c
->>>> +++ b/fs/smb/server/transport_rdma.c
->>>> @@ -2140,8 +2140,7 @@ static int smb_direct_ib_client_add(struct
->>>> ib_device *ib_dev)
->>>>        if (ib_dev->node_type != RDMA_NODE_IB_CA)
->>>>                smb_direct_port = SMB_DIRECT_PORT_IWARP;
->>>>
->>>> -     if (!ib_dev->ops.get_netdev ||
->>>> -         !rdma_frwr_is_supported(&ib_dev->attrs))
->>>> +     if (!rdma_frwr_is_supported(&ib_dev->attrs))
->>>>                return 0;
->>>>
->>>>        smb_dev = kzalloc(sizeof(*smb_dev), GFP_KERNEL);
->>>> @@ -2241,17 +2240,37 @@ bool ksmbd_rdma_capable_netdev(struct net_device
->>>> *netdev)
->>>>                for (i = 0; i < smb_dev->ib_dev->phys_port_cnt; i++) {
->>>>                        struct net_device *ndev;
->>>>
->>>> -                     ndev =
->>>> smb_dev->ib_dev->ops.get_netdev(smb_dev->ib_dev,
->>>> -                                                            i + 1);
->>>> -                     if (!ndev)
->>>> -                             continue;
->>>> +                     /* RoCE and iWRAP ib_dev is backed by a netdev */
->>>> +                     if (smb_dev->ib_dev->ops.get_netdev) {
->>>
->>> The "IWRAP" is a typo, but IMO the comment is misleading. This is simply
->>> looking up the target netdev, it's not limited to these two rdma types.
->>> I suggest deleting the comment.
->>>
->>
->> I agree with this point and will update this comment in version 2 of the
->> patch.
->>
->>>> +                             ndev = smb_dev->ib_dev->ops.get_netdev(
->>>> +                                     smb_dev->ib_dev, i + 1);
->>>> +                             if (!ndev)
->>>> +                                     continue;
->>>>
->>>> -                     if (ndev == netdev) {
->>>> +                             if (ndev == netdev) {
->>>> +                                     dev_put(ndev);
->>>> +                                     rdma_capable = true;
->>>> +                                     goto out;
->>>> +                             }
->>>>                                dev_put(ndev);
->>>
->>> Why not move this dev_put up above the if (ndev == netdev) test? It's
->>> needed in both cases, so it's confusing to have two copies.
->>
->> I do agree that these two puts are very confusing. However, this code
->> structure comes from the original ksmbd_rdma_capable_netdev() and
->> this patch only indents it one more level and puts it in the if test for
->> get_netdev.
->>
->> Also, while two puts look very weird, IMO putting it before the if
->> statement
->> is equally unintuitive as well since that would be testing the pointer after
->> its
->> reference is released. Although since no de-reference is happening here, it
->> might be fine. Please confirm this is good coding-style-wise and I will
->> include
->> this change in v2 of the patch.
-> There is no need to update code that does not have problems.
+--0000000000000f92e306081e5d0b
+Content-Type: text/plain; charset="UTF-8"
 
-Well, there are now at least half a dozen stanzas of
-	dev_put
-	rdma_capable = <T|f>
-	goto out
+mb3: fix creating FIFOs when mounting with "sfu" mount
+ option
 
-and I don't see why these can't be simplified to
+Fixes some xfstests including generic/564 and generic/157
 
-	goto out_capable|out_notcapable
+The "sfu" mount option can be useful for creating special files (character
+and block devices in particular) but could not create FIFOs. It did
+recognize existing empty files with the "system" attribute flag as FIFOs
+but this is too general, so to support creating FIFOs more safely use a new
+tag (but the same length as those for char and block devices ie "IntxLNK"
+and "IntxBLK") "LnxFIFO" to indicate that the file should be treated as a
+FIFO (when mounted with the "sfu").   For some additional context note that
+"sfu" followed the way that "Services for Unix" on Windows handled these
+special files (at least for character and block devices and symlinks),
+which is different than newer Windows which can handle special files
+as reparse points (which isn't an option to many servers).
 
-It woud be a lot clearer, at least to this reviewer. And more reliable
-to maintain.
+See attached.
 
->>
->>>
->>>> -                             rdma_capable = true;
->>>> -                             goto out;
->>>> +                     /* match physical ib_dev with IPoIB netdev by GUID
->>>> */
->>>
->>> Add more information to this comment, perhaps:
->>>
->>>     /* if no exact netdev match, check for matching Infiniband GUID */
->>>
->>
->> Fair point, will update this comment in v2.
->>
->>>> +                     } else if (netdev->type == ARPHRD_INFINIBAND) {
->>>> +                             struct netdev_hw_addr *ha;
->>>> +                             union ib_gid gid;
->>>> +                             u32 port_num;
->>>> +                             int ret;
->>>> +
->>>> +                             netdev_hw_addr_list_for_each(
->>>> +                                     ha, &netdev->dev_addrs) {
->>>> +                                     memcpy(&gid, ha->addr + 4,
->>>> sizeof(gid));
->>>> +                                     ret = ib_find_gid(smb_dev->ib_dev,
->>>> &gid,
->>>> +                                                       &port_num,
->>>> NULL);
->>>> +                                     if (!ret) {
->>>> +                                             rdma_capable = true;
->>>> +                                             goto out;
->>>
->>> Won't this leak the ndev? It needs a dev_put(ndev) before breaking
->>> the loop, too, right?
->>>
->>
->> This will not leak the ndev. Please look closer, this else branch matches
->> with
->> the if test on the existence of ops.get_netdev of the current ib_dev. And
->> ndev
->> is acquired only through that op. In the else branch, ndev is just not
->> acquired.
->> The original code was indented one more level here so the patch might look
->> a bit confusing, but one of the if before this block is a deleted(-) line.
-> You're right.
+-- 
+Thanks,
 
-Ok, so I repeat my comment above!
+Steve
 
-Tom.
+--0000000000000f92e306081e5d0b
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-fix-creating-FIFOs-when-mounting-with-sfu-mount.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-fix-creating-FIFOs-when-mounting-with-sfu-mount.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lny46ebi0>
+X-Attachment-Id: f_lny46ebi0
 
-> 
-> Please send v2 patch after adding comments that Tom pointed out.
-> 
-> Thanks!
->>
->>>> +                                     }
->>>> +                             }
->>>>                        }
->>>> -                     dev_put(ndev);
->>>>                }
->>>>        }
->>>>    out:
->>
->>
->>
->> --
->> Kangjing "Chaser" Huang
->>
-> 
+RnJvbSBhNzg4ZGUzMjUyNTUyYWJlYWNiNzU3ZjU1NDczMTZjZWQ3MTcwOTExIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFRodSwgMTkgT2N0IDIwMjMgMjM6MDE6NDkgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBmaXggY3JlYXRpbmcgRklGT3Mgd2hlbiBtb3VudGluZyB3aXRoICJzZnUiIG1vdW50CiBv
+cHRpb24KCkZpeGVzIHNvbWUgeGZzdGVzdHMgaW5jbHVkaW5nIGdlbmVyaWMvNTY0IGFuZCBnZW5l
+cmljLzE1NwoKVGhlICJzZnUiIG1vdW50IG9wdGlvbiBjYW4gYmUgdXNlZnVsIGZvciBjcmVhdGlu
+ZyBzcGVjaWFsIGZpbGVzIChjaGFyYWN0ZXIKYW5kIGJsb2NrIGRldmljZXMgaW4gcGFydGljdWxh
+cikgYnV0IGNvdWxkIG5vdCBjcmVhdGUgRklGT3MuIEl0IGRpZApyZWNvZ25pemUgZXhpc3Rpbmcg
+ZW1wdHkgZmlsZXMgd2l0aCB0aGUgInN5c3RlbSIgYXR0cmlidXRlIGZsYWcgYXMgRklGT3MKYnV0
+IHRoaXMgaXMgdG9vIGdlbmVyYWwsIHNvIHRvIHN1cHBvcnQgY3JlYXRpbmcgRklGT3MgbW9yZSBz
+YWZlbHkgdXNlIGEgbmV3CnRhZyAoYnV0IHRoZSBzYW1lIGxlbmd0aCBhcyB0aG9zZSBmb3IgY2hh
+ciBhbmQgYmxvY2sgZGV2aWNlcyBpZSAiSW50eExOSyIKYW5kICJJbnR4QkxLIikgIkxueEZJRk8i
+IHRvIGluZGljYXRlIHRoYXQgdGhlIGZpbGUgc2hvdWxkIGJlIHRyZWF0ZWQgYXMgYQpGSUZPICh3
+aGVuIG1vdW50ZWQgd2l0aCB0aGUgInNmdSIpLiAgIEZvciBzb21lIGFkZGl0aW9uYWwgY29udGV4
+dCBub3RlIHRoYXQKInNmdSIgZm9sbG93ZWQgdGhlIHdheSB0aGF0ICJTZXJ2aWNlcyBmb3IgVW5p
+eCIgb24gV2luZG93cyBoYW5kbGVkIHRoZXNlCnNwZWNpYWwgZmlsZXMgKGF0IGxlYXN0IGZvciBj
+aGFyYWN0ZXIgYW5kIGJsb2NrIGRldmljZXMgYW5kIHN5bWxpbmtzKSwKd2hpY2ggaXMgZGlmZmVy
+ZW50IHRoYW4gbmV3ZXIgV2luZG93cyB3aGljaCBjYW4gaGFuZGxlIHNwZWNpYWwgZmlsZXMKYXMg
+cmVwYXJzZSBwb2ludHMgKHdoaWNoIGlzbid0IGFuIG9wdGlvbiB0byBtYW55IHNlcnZlcnMpLgoK
+Q2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxz
+dGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL3NtYi9jbGllbnQvY2lmc3BkdS5oIHwgMiAr
+LQogZnMvc21iL2NsaWVudC9pbm9kZS5jICAgfCA0ICsrKysKIGZzL3NtYi9jbGllbnQvc21iMm9w
+cy5jIHwgOCArKysrKysrLQogMyBmaWxlcyBjaGFuZ2VkLCAxMiBpbnNlcnRpb25zKCspLCAyIGRl
+bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9jbGllbnQvY2lmc3BkdS5oIGIvZnMvc21i
+L2NsaWVudC9jaWZzcGR1LmgKaW5kZXggZTE3MjIyZmVjOWQyLi5hNzUyMjBkYjVjMWUgMTAwNjQ0
+Ci0tLSBhL2ZzL3NtYi9jbGllbnQvY2lmc3BkdS5oCisrKyBiL2ZzL3NtYi9jbGllbnQvY2lmc3Bk
+dS5oCkBAIC0yNTcwLDcgKzI1NzAsNyBAQCB0eXBlZGVmIHN0cnVjdCB7CiAKIAogc3RydWN0IHdp
+bl9kZXYgewotCXVuc2lnbmVkIGNoYXIgdHlwZVs4XTsgLyogSW50eENIUiBvciBJbnR4QkxLICov
+CisJdW5zaWduZWQgY2hhciB0eXBlWzhdOyAvKiBJbnR4Q0hSIG9yIEludHhCTEsgb3IgTG54RklG
+TyovCiAJX19sZTY0IG1ham9yOwogCV9fbGU2NCBtaW5vcjsKIH0gX19hdHRyaWJ1dGVfXygocGFj
+a2VkKSk7CmRpZmYgLS1naXQgYS9mcy9zbWIvY2xpZW50L2lub2RlLmMgYi9mcy9zbWIvY2xpZW50
+L2lub2RlLmMKaW5kZXggZDdjMzAyNDQyYzFlLi5jMDNhMjg2ZWQ0MTggMTAwNjQ0Ci0tLSBhL2Zz
+L3NtYi9jbGllbnQvaW5vZGUuYworKysgYi9mcy9zbWIvY2xpZW50L2lub2RlLmMKQEAgLTU5Miw2
+ICs1OTIsMTAgQEAgY2lmc19zZnVfdHlwZShzdHJ1Y3QgY2lmc19mYXR0ciAqZmF0dHIsIGNvbnN0
+IGNoYXIgKnBhdGgsCiAJCQljaWZzX2RiZyhGWUksICJTeW1saW5rXG4iKTsKIAkJCWZhdHRyLT5j
+Zl9tb2RlIHw9IFNfSUZMTks7CiAJCQlmYXR0ci0+Y2ZfZHR5cGUgPSBEVF9MTks7CisJCX0gZWxz
+ZSBpZiAobWVtY21wKCJMbnhGSUZPIiwgcGJ1ZiwgOCkgPT0gMCkgeworCQkJY2lmc19kYmcoRllJ
+LCAiRklGT1xuIik7CisJCQlmYXR0ci0+Y2ZfbW9kZSB8PSBTX0lGSUZPOworCQkJZmF0dHItPmNm
+X2R0eXBlID0gRFRfRklGTzsKIAkJfSBlbHNlIHsKIAkJCWZhdHRyLT5jZl9tb2RlIHw9IFNfSUZS
+RUc7IC8qIGZpbGU/ICovCiAJCQlmYXR0ci0+Y2ZfZHR5cGUgPSBEVF9SRUc7CmRpZmYgLS1naXQg
+YS9mcy9zbWIvY2xpZW50L3NtYjJvcHMuYyBiL2ZzL3NtYi9jbGllbnQvc21iMm9wcy5jCmluZGV4
+IDlhZWVjZWU2YjkxYi4uMjg5ODVkYzgxYzA5IDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L3Nt
+YjJvcHMuYworKysgYi9mcy9zbWIvY2xpZW50L3NtYjJvcHMuYwpAQCAtNTA4Nyw3ICs1MDg3LDcg
+QEAgc21iMl9tYWtlX25vZGUodW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGlub2RlICppbm9kZSwK
+IAkgKiBvdmVyIFNNQjIvU01CMyBhbmQgU2FtYmEgd2lsbCBkbyB0aGlzIHdpdGggU01CMy4xLjEg
+UE9TSVggRXh0ZW5zaW9ucwogCSAqLwogCi0JaWYgKCFTX0lTQ0hSKG1vZGUpICYmICFTX0lTQkxL
+KG1vZGUpKQorCWlmICghU19JU0NIUihtb2RlKSAmJiAhU19JU0JMSyhtb2RlKSAmJiAhU19JU0ZJ
+Rk8obW9kZSkpCiAJCXJldHVybiByYzsKIAogCWNpZnNfZGJnKEZZSSwgInNmdSBjb21wYXQgY3Jl
+YXRlIHNwZWNpYWwgZmlsZVxuIik7CkBAIC01MTM1LDYgKzUxMzUsMTIgQEAgc21iMl9tYWtlX25v
+ZGUodW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGlub2RlICppbm9kZSwKIAkJcGRldi0+bWlub3Ig
+PSBjcHVfdG9fbGU2NChNSU5PUihkZXYpKTsKIAkJcmMgPSB0Y29uLT5zZXMtPnNlcnZlci0+b3Bz
+LT5zeW5jX3dyaXRlKHhpZCwgJmZpZCwgJmlvX3Bhcm1zLAogCQkJCQkJCSZieXRlc193cml0dGVu
+LCBpb3YsIDEpOworCX0gZWxzZSBpZiAoU19JU0JMSyhtb2RlKSkgeworCQltZW1jcHkocGRldi0+
+dHlwZSwgIkxueEZJRk8iLCA4KTsKKwkJcGRldi0+bWFqb3IgPSAwOworCQlwZGV2LT5taW5vciA9
+IDA7CisJCXJjID0gdGNvbi0+c2VzLT5zZXJ2ZXItPm9wcy0+c3luY193cml0ZSh4aWQsICZmaWQs
+ICZpb19wYXJtcywKKwkJCQkJCQkmYnl0ZXNfd3JpdHRlbiwgaW92LCAxKTsKIAl9CiAJdGNvbi0+
+c2VzLT5zZXJ2ZXItPm9wcy0+Y2xvc2UoeGlkLCB0Y29uLCAmZmlkKTsKIAlkX2Ryb3AoZGVudHJ5
+KTsKLS0gCjIuMzkuMgoK
+--0000000000000f92e306081e5d0b--
