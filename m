@@ -2,147 +2,226 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 926EAC0032E
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Oct 2023 07:42:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D14FC004C0
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Oct 2023 11:23:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbjJUHmX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 21 Oct 2023 03:42:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46106 "EHLO
+        id S229686AbjJULXt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 21 Oct 2023 07:23:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbjJUHmW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 21 Oct 2023 03:42:22 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA806D70
-        for <linux-cifs@vger.kernel.org>; Sat, 21 Oct 2023 00:42:20 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-66d09b6d007so11472226d6.1
-        for <linux-cifs@vger.kernel.org>; Sat, 21 Oct 2023 00:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697874140; x=1698478940; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jmmaZAzaLOmtXGk7S4psyAS16yA14QyEkiFSwJwm14U=;
-        b=Rs57AIW+AZEq0souPToNI4IN94urS29J2H2aLW+UVM3J6p4wMsuKsfIAwlYYQXAdsF
-         W4F/LskYJB7bRhVb0B/XPcIi6wMoiKBrU7h2hkfLNmkB6isV96EsdtMBq8YBjcqnGDL+
-         RYWGa1o26JyIV21TQYcGwvlVWjP1wPqR0HD5hGm/5WHc1hVX3kT6PGN2mfLWzGRLflxw
-         TqV1d5+t9AJgMZaqVmVGmNUkcbCFRQjQ8RbMYeske74TTlEtckOwt6cFX1KUZU6TRrwz
-         /qb0lfGKMmPi6Qddg6AGJUB/8wQa5jVzaweZfL4wo5sM+HGKAqbC4ZrIEScLzifkZVWa
-         9LTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697874140; x=1698478940;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jmmaZAzaLOmtXGk7S4psyAS16yA14QyEkiFSwJwm14U=;
-        b=CcZJqISta8qs+ks0uEMlK5ek5ZukRX0ywyuw6qkyjGHrQPG3+KNlrdvKechChzSC8Y
-         oIiT9PKAReKh4rFbHRhxINzW5pfAQQYv0zsOQ5mr2+nyUVuE4Si6ic6stYSjETcIEBP1
-         UQSsKTK7MI0SFKfWkKSHUWTcytf0zGBA3464IjJ+4gqaBDF28RebxMrmbfKULeauppvY
-         qay5FRFZwujg5V7/gSxEZqC6nbXJWxcHGkLupMbesI0RUliQeOw4LzVGRUJ50eOJk7kk
-         KpQ/0WzHBi/swILM+HRTBIJnUErenwNk4qxCRqf74H4sT9d3HusD+LNHMGqcYSlxWgB2
-         vpYQ==
-X-Gm-Message-State: AOJu0Yw93d/BnUFozD9wxv9K4oVGokHPOn+iemdjascBAAVxOHK9qZXD
-        uoJ+yTFaC9+Vc0VqtVnsc+f5bTbGWT2iHk0H1Q==
-X-Google-Smtp-Source: AGHT+IGhaaQ8JkK20KZMm6crRESAZPDrYE/NrGnAAT7W1lSibjZWZs0ZRgw5/h0FiOTT3buspCjKHg==
-X-Received: by 2002:a05:6214:2465:b0:66d:1217:18fd with SMTP id im5-20020a056214246500b0066d121718fdmr4844712qvb.26.1697874139749;
-        Sat, 21 Oct 2023 00:42:19 -0700 (PDT)
-Received: from hkj-desktop ([2607:fea8:1da0:b84::e1c])
-        by smtp.gmail.com with ESMTPSA id n18-20020a0cec52000000b0065afd35c762sm1313309qvq.91.2023.10.21.00.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Oct 2023 00:42:19 -0700 (PDT)
-Received: by hkj-desktop (sSMTP sendmail emulation); Sat, 21 Oct 2023 03:42:17 -0400
-From:   Kangjing Huang <huangkangjing@gmail.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     linkinjeon@kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, atteh.mailbox@gmail.com, tom@talpey.com,
-        Kangjing Huang <huangkangjing@gmail.com>
-Subject: [PATCH v3] ksmbd: fix missing RDMA-capable flag for IPoIB device in ksmbd_rdma_capable_netdev()
-Date:   Sat, 21 Oct 2023 03:42:07 -0400
-Message-ID: <20231021074207.1066986-1-huangkangjing@gmail.com>
-X-Mailer: git-send-email 2.42.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S229478AbjJULXt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 21 Oct 2023 07:23:49 -0400
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA5CC1A4;
+        Sat, 21 Oct 2023 04:23:43 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+         client-signature RSA-PSS (4096 bits) client-digest SHA256)
+        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
+        by bmailout2.hostsharing.net (Postfix) with ESMTPS id 71EBC2800B75F;
+        Sat, 21 Oct 2023 13:23:41 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+        id 64FAB11768A; Sat, 21 Oct 2023 13:23:41 +0200 (CEST)
+Message-Id: <143690ecc1102c0f67fa7faec437ec7b02bb2304.1697885975.git.lukas@wunner.de>
+From:   Lukas Wunner <lukas@wunner.de>
+Date:   Sat, 21 Oct 2023 13:23:44 +0200
+Subject: [PATCH] treewide: Add SPDX identifier to IETF ASN.1 modules
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-spdx@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        Taehee Yoo <ap420073@gmail.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, coreteam@netfilter.org,
+        netfilter-devel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Physical ib_device does not have an underlying net_device, thus its
-association with IPoIB net_device cannot be retrieved via
-ops.get_netdev() or ib_device_get_by_netdev(). ksmbd reads physical
-ib_device port GUID from the lower 16 bytes of the hardware addresses on
-IPoIB net_device and match its underlying ib_device using ib_find_gid()
+Per section 4.c. of the IETF Trust Legal Provisions, "Code Components"
+in IETF Documents are licensed on the terms of the BSD-3-Clause license:
 
-Signed-off-by: Kangjing Huang <huangkangjing@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Reviewed-by: Tom Talpey <tom@talpey.com>
+https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/
 
-v3 -> v2:
-* Fix comment formatting warning
-v2 -> v1:
-* Add more detailed description to comment
+The term "Code Components" specifically includes ASN.1 modules:
+
+https://trustee.ietf.org/documents/trust-legal-provisions/code-components-list-3/
+
+Add an SPDX identifier as well as a copyright notice pursuant to section
+6.d. of the Trust Legal Provisions to all ASN.1 modules in the tree
+which are derived from IETF Documents.
+
+Section 4.d. of the Trust Legal Provisions requests that each Code
+Component identify the RFC from which it is taken, so link that RFC
+in every ASN.1 module.
+
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
 ---
- fs/smb/server/transport_rdma.c | 40 +++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 10 deletions(-)
+ I'm adding a new IETF ASN.1 module for PCI device authentication, hence
+ had to research what the correct license is.  Thought I'd fix this up
+ treewide while at it.
 
-diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
-index 3b269e1f523a..c5629a68c8b7 100644
---- a/fs/smb/server/transport_rdma.c
-+++ b/fs/smb/server/transport_rdma.c
-@@ -2140,8 +2140,7 @@ static int smb_direct_ib_client_add(struct ib_device *ib_dev)
- 	if (ib_dev->node_type != RDMA_NODE_IB_CA)
- 		smb_direct_port = SMB_DIRECT_PORT_IWARP;
- 
--	if (!ib_dev->ops.get_netdev ||
--	    !rdma_frwr_is_supported(&ib_dev->attrs))
-+	if (!rdma_frwr_is_supported(&ib_dev->attrs))
- 		return 0;
- 
- 	smb_dev = kzalloc(sizeof(*smb_dev), GFP_KERNEL);
-@@ -2241,17 +2240,38 @@ bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
- 		for (i = 0; i < smb_dev->ib_dev->phys_port_cnt; i++) {
- 			struct net_device *ndev;
- 
--			ndev = smb_dev->ib_dev->ops.get_netdev(smb_dev->ib_dev,
--							       i + 1);
--			if (!ndev)
--				continue;
-+			if (smb_dev->ib_dev->ops.get_netdev) {
-+				ndev = smb_dev->ib_dev->ops.get_netdev(
-+					smb_dev->ib_dev, i + 1);
-+				if (!ndev)
-+					continue;
- 
--			if (ndev == netdev) {
-+				if (ndev == netdev) {
-+					dev_put(ndev);
-+					rdma_capable = true;
-+					goto out;
-+				}
- 				dev_put(ndev);
--				rdma_capable = true;
--				goto out;
-+			/* if ib_dev does not implement ops.get_netdev
-+			 * check for matching infiniband GUID in hw_addr
-+			 */
-+			} else if (netdev->type == ARPHRD_INFINIBAND) {
-+				struct netdev_hw_addr *ha;
-+				union ib_gid gid;
-+				u32 port_num;
-+				int ret;
+ Not included here is fs/smb/client/cifs_spnego_negtokeninit.asn1,
+ which is similar to fs/smb/client/ksmbd_spnego_negtokeninit.asn1,
+ but contains a Microsoft extension published as Open Specifications
+ Documentation.  It's unclear to me what license they use:
+ https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-spng/
+
+ crypto/asymmetric_keys/pkcs7.asn1            | 7 +++++++
+ crypto/asymmetric_keys/pkcs8.asn1            | 6 ++++++
+ crypto/asymmetric_keys/x509.asn1             | 7 +++++++
+ crypto/asymmetric_keys/x509_akid.asn1        | 5 +++++
+ crypto/rsaprivkey.asn1                       | 7 +++++++
+ crypto/rsapubkey.asn1                        | 7 +++++++
+ fs/smb/server/ksmbd_spnego_negtokeninit.asn1 | 8 ++++++++
+ fs/smb/server/ksmbd_spnego_negtokentarg.asn1 | 7 +++++++
+ net/ipv4/netfilter/nf_nat_snmp_basic.asn1    | 8 ++++++++
+ 9 files changed, 62 insertions(+)
+
+diff --git a/crypto/asymmetric_keys/pkcs7.asn1 b/crypto/asymmetric_keys/pkcs7.asn1
+index 1eca740..28e1f4a 100644
+--- a/crypto/asymmetric_keys/pkcs7.asn1
++++ b/crypto/asymmetric_keys/pkcs7.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2009 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc5652#section-3
 +
-+				netdev_hw_addr_list_for_each(
-+					ha, &netdev->dev_addrs) {
-+					memcpy(&gid, ha->addr + 4, sizeof(gid));
-+					ret = ib_find_gid(smb_dev->ib_dev, &gid,
-+							  &port_num, NULL);
-+					if (!ret) {
-+						rdma_capable = true;
-+						goto out;
-+					}
-+				}
- 			}
--			dev_put(ndev);
- 		}
- 	}
- out:
+ PKCS7ContentInfo ::= SEQUENCE {
+ 	contentType	ContentType ({ pkcs7_check_content_type }),
+ 	content		[0] EXPLICIT SignedData OPTIONAL
+diff --git a/crypto/asymmetric_keys/pkcs8.asn1 b/crypto/asymmetric_keys/pkcs8.asn1
+index 702c41a..a2a8af2 100644
+--- a/crypto/asymmetric_keys/pkcs8.asn1
++++ b/crypto/asymmetric_keys/pkcs8.asn1
+@@ -1,3 +1,9 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2010 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc5958#section-2
+ --
+ -- This is the unencrypted variant
+ --
+diff --git a/crypto/asymmetric_keys/x509.asn1 b/crypto/asymmetric_keys/x509.asn1
+index 92d59c3..feb9573 100644
+--- a/crypto/asymmetric_keys/x509.asn1
++++ b/crypto/asymmetric_keys/x509.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2008 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc5280#section-4
++
+ Certificate ::= SEQUENCE {
+ 	tbsCertificate		TBSCertificate ({ x509_note_tbs_certificate }),
+ 	signatureAlgorithm	AlgorithmIdentifier,
+diff --git a/crypto/asymmetric_keys/x509_akid.asn1 b/crypto/asymmetric_keys/x509_akid.asn1
+index 1a33231..164b2ed 100644
+--- a/crypto/asymmetric_keys/x509_akid.asn1
++++ b/crypto/asymmetric_keys/x509_akid.asn1
+@@ -1,3 +1,8 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2008 IETF Trust and the persons identified as authors
++-- of the code
++--
+ -- X.509 AuthorityKeyIdentifier
+ -- rfc5280 section 4.2.1.1
+ 
+diff --git a/crypto/rsaprivkey.asn1 b/crypto/rsaprivkey.asn1
+index 4ce0675..76865124 100644
+--- a/crypto/rsaprivkey.asn1
++++ b/crypto/rsaprivkey.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2016 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc8017#appendix-A.1.2
++
+ RsaPrivKey ::= SEQUENCE {
+ 	version		INTEGER,
+ 	n		INTEGER ({ rsa_get_n }),
+diff --git a/crypto/rsapubkey.asn1 b/crypto/rsapubkey.asn1
+index 725498e..0d32b1c 100644
+--- a/crypto/rsapubkey.asn1
++++ b/crypto/rsapubkey.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 2016 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc8017#appendix-A.1.1
++
+ RsaPubKey ::= SEQUENCE {
+ 	n INTEGER ({ rsa_get_n }),
+ 	e INTEGER ({ rsa_get_e })
+diff --git a/fs/smb/server/ksmbd_spnego_negtokeninit.asn1 b/fs/smb/server/ksmbd_spnego_negtokeninit.asn1
+index 0065f19..00151380 100644
+--- a/fs/smb/server/ksmbd_spnego_negtokeninit.asn1
++++ b/fs/smb/server/ksmbd_spnego_negtokeninit.asn1
+@@ -1,3 +1,11 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 1998, 2000 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc2478#section-3.2.1
++-- https://www.rfc-editor.org/rfc/rfc2743#section-3.1
++
+ GSSAPI ::=
+ 	[APPLICATION 0] IMPLICIT SEQUENCE {
+ 		thisMech
+diff --git a/fs/smb/server/ksmbd_spnego_negtokentarg.asn1 b/fs/smb/server/ksmbd_spnego_negtokentarg.asn1
+index 1151933..797e485 100644
+--- a/fs/smb/server/ksmbd_spnego_negtokentarg.asn1
++++ b/fs/smb/server/ksmbd_spnego_negtokentarg.asn1
+@@ -1,3 +1,10 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 1998 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc2478#section-3.2.1
++
+ GSSAPI ::=
+ 	CHOICE {
+ 		negTokenInit
+diff --git a/net/ipv4/netfilter/nf_nat_snmp_basic.asn1 b/net/ipv4/netfilter/nf_nat_snmp_basic.asn1
+index 24b7326..dc2cc57 100644
+--- a/net/ipv4/netfilter/nf_nat_snmp_basic.asn1
++++ b/net/ipv4/netfilter/nf_nat_snmp_basic.asn1
+@@ -1,3 +1,11 @@
++-- SPDX-License-Identifier: BSD-3-Clause
++--
++-- Copyright (C) 1990, 2002 IETF Trust and the persons identified as authors
++-- of the code
++--
++-- https://www.rfc-editor.org/rfc/rfc1157#section-4
++-- https://www.rfc-editor.org/rfc/rfc3416#section-3
++
+ Message ::=
+ 	SEQUENCE {
+ 		version
 -- 
-2.42.0
+2.40.1
 
