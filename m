@@ -2,65 +2,109 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99366C0032E
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Oct 2023 12:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E71C25B41
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Oct 2023 13:25:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229478AbjJUMHy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 21 Oct 2023 08:07:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50118 "EHLO
+        id S230451AbjJUNZG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 21 Oct 2023 09:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231281AbjJUMHU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 21 Oct 2023 08:07:20 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2AAFD51
-        for <linux-cifs@vger.kernel.org>; Sat, 21 Oct 2023 05:07:18 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E2CC433CD
-        for <linux-cifs@vger.kernel.org>; Sat, 21 Oct 2023 12:07:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697890038;
-        bh=nI4fO19jTVe69LiKV1uHGdIuR+eI7pn7nTzo+cFfuSk=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=a9bPxtc/NCDAx4Y+IPyEk7CxQ1yJH4hgHDcj7WmV3cMdFsFEgnDh+mLMOHU9zi2yR
-         SUTDCsRW7SL8EFbYHIJ7aqH2RBik79aPhNk9G7r/ez3QmU5qIDf4PuRPxhE8w/akwQ
-         5B008mNKPZb6/lGlAQAIQkJd4CBVe4OZThjkXQ5MEvtbFl8Ig11bJAiNya9uGzWcGM
-         wpa6bOqHAcZvFb2xFSasc5VfwEKgnpx80NRT2BWJH0HY5XKx893TS2J0FztEX7/0jF
-         cxJNNChvzNI4rngALk5gfaRfVwgQDVBiv+42HU5PO4XStYu4VQqGfrlgqCf2YAxySq
-         6QncUIpFXw9mQ==
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-58111e624bdso1051593eaf.3
-        for <linux-cifs@vger.kernel.org>; Sat, 21 Oct 2023 05:07:18 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzHHwps8OYnRfJwc6NW2mkzyGLB4YO6n3s1qumK9h9h7uos4jGY
-        wvJuCQypCKY899zoCQceIUqD06jFJYQrH6PiUbg=
-X-Google-Smtp-Source: AGHT+IFBc0xJHl8Oenmr+H/id3D6o3QGMKPSz5NjTkclqhhIFtU17cIYsAyhwE7dPGC4aUWGtg0HCP+cC0PAV0+pznU=
-X-Received: by 2002:a4a:e6cb:0:b0:573:4da2:4427 with SMTP id
- v11-20020a4ae6cb000000b005734da24427mr4211060oot.7.1697890037491; Sat, 21 Oct
- 2023 05:07:17 -0700 (PDT)
+        with ESMTP id S229831AbjJUNZE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 21 Oct 2023 09:25:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FBA2D66
+        for <linux-cifs@vger.kernel.org>; Sat, 21 Oct 2023 06:24:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1697894649;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sAJJoylF1cW1oW2mCcwy+DSGsa9dllVFEwoULjFHt7U=;
+        b=bavzUNnJWFisWT60X4K6nCXnzfZeiMBQpSuOzflL9KYThC9ogtneKFS6foFLEfyb/2DmPI
+        9Om0M68ZmsV7S4klCWWyGEFwhNzcs2SczuMretQlVcF5wfM9TGDoygqitGyKHW+zAwcgbs
+        h9+8PQxoLQJs99WFA164zDWLbcCaXhg=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-209-2kTYFEgwOaKoBCJ6_Z9_3Q-1; Sat, 21 Oct 2023 09:24:08 -0400
+X-MC-Unique: 2kTYFEgwOaKoBCJ6_Z9_3Q-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-53ffd4937d6so368214a12.3
+        for <linux-cifs@vger.kernel.org>; Sat, 21 Oct 2023 06:24:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697894647; x=1698499447;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sAJJoylF1cW1oW2mCcwy+DSGsa9dllVFEwoULjFHt7U=;
+        b=V+Y6WUvfY0s6l2J4KM//bYv8c8FRLnY1br8NzB8W04rdfgr14YeZBx394qw4OTOvE7
+         KAt2HoSUR+UPLVVhQSMvFkh8lyHg5zV2PgHnFeUcbyixdNP/d1SEIyqIo+0dny1ACTX6
+         CXEZ9abAfhxDsr/PK/ZZmOve7DzurQlEYpvzQQ6HzClnyFe3UloOIA2pvLoCghty9IU9
+         iUmLPWdowFgtDH0JBqTJbfcYsBUE4BlQ8kAUart9JG+iPS6I6e4UJScbQOeBEHdhgpYU
+         PxC6E2OlKaSlTh7BvUswWYTJQZO9wBejb1ik6XOTt+LQLT74BEdKZz8RWSu3NiYEg8bM
+         U1vA==
+X-Gm-Message-State: AOJu0YzK7pDC7Y/ZatocubyfN0pzmaZ4WdCQW/wbHi05Pxd2VhTKftHR
+        0UUcX/nc36pirOkBJLR9jL/mvqJfjh3VS0dbFXjfUy3gCD+ak56dfNv9a0MZ6u6Z7obV+WEaLOT
+        nWYJsjNLbk4XfJOLdZEpcUjrawmXtHzaKGHgR8w==
+X-Received: by 2002:a50:aacf:0:b0:53e:1388:cb2e with SMTP id r15-20020a50aacf000000b0053e1388cb2emr3332769edc.35.1697894647034;
+        Sat, 21 Oct 2023 06:24:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEyy9uSFCMUqfgN2rj17ch/G/jvq1QTWJGPAXTF5FtC6Qouo5v3kERhMpzgMczbfZXe5FR3mAcf/aFuBhBAvjs=
+X-Received: by 2002:a50:aacf:0:b0:53e:1388:cb2e with SMTP id
+ r15-20020a50aacf000000b0053e1388cb2emr3332740edc.35.1697894646692; Sat, 21
+ Oct 2023 06:24:06 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a8a:347:0:b0:4fa:bc5a:10a5 with HTTP; Sat, 21 Oct 2023
- 05:07:16 -0700 (PDT)
-In-Reply-To: <20231021074207.1066986-1-huangkangjing@gmail.com>
-References: <20231021074207.1066986-1-huangkangjing@gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sat, 21 Oct 2023 21:07:16 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd86EeMnuQOZ-R+TTfdrhtc_fopVpwXuUMF-23yjvP3Gmg@mail.gmail.com>
-Message-ID: <CAKYAXd86EeMnuQOZ-R+TTfdrhtc_fopVpwXuUMF-23yjvP3Gmg@mail.gmail.com>
-Subject: Re: [PATCH v3] ksmbd: fix missing RDMA-capable flag for IPoIB device
- in ksmbd_rdma_capable_netdev()
-To:     Kangjing Huang <huangkangjing@gmail.com>
-Cc:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        senozhatsky@chromium.org, atteh.mailbox@gmail.com, tom@talpey.com
+References: <143690ecc1102c0f67fa7faec437ec7b02bb2304.1697885975.git.lukas@wunner.de>
+In-Reply-To: <143690ecc1102c0f67fa7faec437ec7b02bb2304.1697885975.git.lukas@wunner.de>
+From:   Richard Fontana <rfontana@redhat.com>
+Date:   Sat, 21 Oct 2023 09:23:55 -0400
+Message-ID: <CAC1cPGx-cb+YZ9KgEFvSjtf+fp9Dhcn4sm9qHmFFDRDxb=7fHg@mail.gmail.com>
+Subject: Re: [PATCH] treewide: Add SPDX identifier to IETF ASN.1 modules
+To:     Lukas Wunner <lukas@wunner.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-spdx@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        Taehee Yoo <ap420073@gmail.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, coreteam@netfilter.org,
+        netfilter-devel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2023-10-21 16:42 GMT+09:00, Kangjing Huang <huangkangjing@gmail.com>:
-> Physical ib_device does not have an underlying net_device, thus its
-> association with IPoIB net_device cannot be retrieved via
-> ops.get_netdev() or ib_device_get_by_netdev(). ksmbd reads physical
-> ib_device port GUID from the lower 16 bytes of the hardware addresses on
-> IPoIB net_device and match its underlying ib_device using ib_find_gid()
+On Sat, Oct 21, 2023 at 7:25=E2=80=AFAM Lukas Wunner <lukas@wunner.de> wrot=
+e:
 >
-> Signed-off-by: Kangjing Huang <huangkangjing@gmail.com>
-> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-> Reviewed-by: Tom Talpey <tom@talpey.com>
-Applied it to #ksmbd-for-next-next. Thanks for your patch!
+> Per section 4.c. of the IETF Trust Legal Provisions, "Code Components"
+> in IETF Documents are licensed on the terms of the BSD-3-Clause license:
+>
+> https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/
+>
+> The term "Code Components" specifically includes ASN.1 modules:
+>
+> https://trustee.ietf.org/documents/trust-legal-provisions/code-components=
+-list-3/
+
+Sorry if this seems super-pedantic but I am pretty sure the license
+text in the IETF Trust Legal Provisions does not actually match SPDX
+`BSD-3-Clause` because of one additional word in clause 3 ("specific"
+before "contributors"), so IMO you should get SPDX to modify its
+definition of `BSD-3-Clause` prior to applying this patch (or get IETF
+to change its version of the license, but I imagine that would be more
+difficult). This issue of a multitude of nonsubstantively different,
+non-matching versions of clause 3 is a common issue that has been
+coming up in the Fedora project's adoption of SPDX identifiers for
+license metadata.
+
+Richard
+
