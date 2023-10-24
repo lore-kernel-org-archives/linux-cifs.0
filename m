@@ -2,92 +2,142 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51462CDB465
-	for <linux-cifs@archiver.kernel.org>; Sat, 14 Oct 2023 16:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C26B0C25B67
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Oct 2023 02:51:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233033AbjJNQRz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 14 Oct 2023 12:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57600 "EHLO
+        id S232399AbjJXCvm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 23 Oct 2023 22:51:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbjJNQRy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 14 Oct 2023 12:17:54 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87460AB
-        for <linux-cifs@vger.kernel.org>; Sat, 14 Oct 2023 09:17:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Message-ID:Date:To:From:CC;
-        bh=1hNVIRqsLw38wv7t9mssjGkym4kEzLZLi9ZDTwdpSGo=; b=SU8+6rdt8dNAoglwfR41MSGbCu
-        jADt5RxOxiL13Xjq9zeStzG+d9f4+Q2RnaXcLxAEDHr8ALONm0/gXRtLrCoMpxau+OpLdF3hw4Oq7
-        9mYiCUdHywBvjVqAkcdKRcLPDJGHScsstWVv9b2tUHNvT+LHAMaHuP7+YAqaZRTiaXFvrB67P9Y9f
-        2vbeDjBAUTrPGK0aXfvZTEMQuKmUPYXsG7PML5nUWnRxmoqV2XndfO/35Ytz+K1Cxl4GLe3RHWL2c
-        eHKA2mRLGFE8ODsoMsVRn1AelRtV8jspqfdJfuPnVJayedNwJrTRawNSn0aqMhV3PLyYiP5jbQwPe
-        YeH+Y8cJwmuWyzk3Dh7lsZ9113epFivWFxAQsX7plVfYcGD+TfnfdEU3LONUU0CKR+YLZLNgY57xf
-        bUf14U9V5BPLAz5ZeF/sX9vWp/YV5eMeHLh89qN0Gng76EFQMWAWa1gjMCjkLvJKtrd+QLKgnEVsh
-        V3XDbft8CMSLD5kCu2UvddjP;
-Received: from [2a01:4f8:192:486::6:0] (port=50622 helo=hr6.samba.org) 
-        by hr2.samba.org with esmtps (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1qrhKm-000chs-2f
-        for cifs-qa@samba.org;
-        Sat, 14 Oct 2023 16:17:49 +0000
-Received: from www-data by hr6.samba.org with local (Exim 4.95)
-        (envelope-from <www-data@samba.org>)
-        id 1qrhKi-000KAQ-C5
-        for cifs-qa@samba.org;
-        Sat, 14 Oct 2023 16:17:44 +0000
-From:   samba-bugs@samba.org
-To:     cifs-qa@samba.org
-Subject: [Bug 14476] Cannot set timestamp of Minshall-French symlinks from a
- CIFS mount
-Date:   Sat, 14 Oct 2023 16:17:43 +0000
-X-Bugzilla-Reason: QAcontact
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: CifsVFS
-X-Bugzilla-Component: kernel fs
-X-Bugzilla-Version: 5.x
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sfrench@samba.org
-X-Bugzilla-Status: ASSIGNED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P5
-X-Bugzilla-Assigned-To: sfrench@samba.org
-X-Bugzilla-Target-Milestone: ---
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-14476-10630-hGnnyw1b0c@https.bugzilla.samba.org/>
-In-Reply-To: <bug-14476-10630@https.bugzilla.samba.org/>
-References: <bug-14476-10630@https.bugzilla.samba.org/>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-X-Bugzilla-URL: https://bugzilla.samba.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S232371AbjJXCvm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 23 Oct 2023 22:51:42 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B05A611A;
+        Mon, 23 Oct 2023 19:51:34 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2c503da4fd6so58897081fa.1;
+        Mon, 23 Oct 2023 19:51:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698115893; x=1698720693; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YZaWM6/+je0+6Ad3eiiKjXQ3HfajEyj0oCdz07xSxDw=;
+        b=WZkfdl0/YfGH8XajsJB1LpL6o6SKOi9ZlEAeZhlIEjaPzMS9F3Zn/VZ0k68jeL/5t9
+         IgppkNMH4xKhslCbAZ5Mt7tEcs86l8WcUIU2SWL97sDtgDirjZ3gb3KrccWdWyMz15vH
+         crMQbCHDIYmG14z8rDvcyWQ0SNFQsgdJgNg0mXDWD/cR+uzPqu/zGv7psKK9VHXJfjBq
+         SZDdneuxqGW+SyqUrro3R+D6x7urxRtW32tED+hlFh1zsnDID3Zq08RsopPAPByCWubP
+         J5MER8WEkYkVclS25H9gDABefCHFiezPcrLACDg2sPoecGLx21izi39lsT6ONr+CijLg
+         vlsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698115893; x=1698720693;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YZaWM6/+je0+6Ad3eiiKjXQ3HfajEyj0oCdz07xSxDw=;
+        b=q17pw/KeB631du8rHoBJhLajTzN1UlpPkyiPYDgiftX/if+6u0XlQwH4u9oolbKdEx
+         CdUqwmUoFydWVbE2p7b4V6eS+pyN41kr16cy7cIMZqHEXjvm326ZfPyGLmLXz793UUaK
+         9asIOyAZdbP4vV5EO0y7oDtKYRZBiIrzvfIXGwlnSe0E1KNM0RMfnKUhGUbJ1izPHU0G
+         UhVsyedYtVLnVuDM5ule86AGGBANO3lwmYbTklnZ8ShDkuovJQ1ljt0Gf0E6unLD93x5
+         XKUPHhpWxehjjyE4F1FKmLN7tR5r74B+IZ26pC0zIGNYabKWfPkvq3w/t66nfw1dCfyY
+         9fpg==
+X-Gm-Message-State: AOJu0YyORpUw3aPQDvmuS2N9J1g67e/BStn2IrTJRWKlhYQH0/KwTHgg
+        7pt6mfsBDqoZDJtkvCcaVHmSj/tKv6tQuPsMt3w=
+X-Google-Smtp-Source: AGHT+IE15gUn9K7p+MAoiUp78PHfvPFV8p3z4lXTdH0WVzVhQJC7geJvFnoRawPbvYwyDQxTWNWSLhDT2MuUwDpIUfo=
+X-Received: by 2002:a05:6512:10c9:b0:507:aa8d:a572 with SMTP id
+ k9-20020a05651210c900b00507aa8da572mr9566227lfg.49.1698115892433; Mon, 23 Oct
+ 2023 19:51:32 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAO+kfxTwOvaxYV0ZRESxZB-4LHsF9b_VBjAKahhwUm5a1_c4ug@mail.gmail.com>
+ <ZPfPfyIoVxw5L6El@debian.me> <CAO+kfxQgXOsx6u+xLKGJe0KDiFsRAGstSpnrwxjQF6udgz5HFQ@mail.gmail.com>
+ <CAO+kfxTvA6N=i+jGf0XbSyqf85i=q+vR6R9d_42OWfM2sWWXaA@mail.gmail.com>
+ <CAH2r5mtUedfLSv81Z-Yb3_=AbD_QpT3tVbU1PRzMTituaw7bgA@mail.gmail.com>
+ <CAH2r5mt6YzapEKDo=hQ64yvBn7=jwMmY1c85NOABKcMPKPp3KA@mail.gmail.com>
+ <CAO+kfxQtOKoKdb+LtMeFxgu8VXa73nbmTPSfscbdwjUXM7ME_A@mail.gmail.com>
+ <CAH2r5msNf9WDHrBZSi5FhHDSewSNxMAuXTetMJDnoNh3CF_oMA@mail.gmail.com>
+ <a895f860-11fa-e6d9-d042-a32bd08f9e9d@talpey.com> <CAH2r5mszCxPtdURenMVgeVDX5zc8knumH=ASXyUufPa7SxbJBw@mail.gmail.com>
+ <ZRN9MtBqYnT6oX60@vaarsuvius> <85d538fec5a086acf62d5a803056586a6c00e4bd.camel@uniklinik-freiburg.de>
+ <83d00d50bc628a85db71adb440d8afb5@matoro.tk> <E1F307C7-9B1E-40F6-860B-6050856E8395@manguebit.com>
+ <CA6E0F87-65FD-4672-AA0C-A761E5006B7D@manguebit.com> <CAH2r5mse_2sfXF+tdTmie5LLtBuc+6DOumDH3rn=5V24yhrYVQ@mail.gmail.com>
+ <c88b2ecd27524153c2acd8aba6ae3c80@matoro.tk> <457a5483c3c4ca5bb6c7ec6f4231074c.pc@manguebit.com>
+ <779ef3ac542e7e39027dee19d669ad2f81b05bcc.camel@uniklinik-freiburg.de> <b8e37bfc992532038f9d562f5596cbf3.pc@manguebit.com>
+In-Reply-To: <b8e37bfc992532038f9d562f5596cbf3.pc@manguebit.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 23 Oct 2023 21:51:21 -0500
+Message-ID: <CAH2r5muM71aR9gwgu7ep0dP3SBTkMjVnH5OmXz5JEiB2JsuBBw@mail.gmail.com>
+Subject: Re: Possible bug report: kernel 6.5.0/6.5.1 high load when CIFS share
+ is mounted (cifsd-cfid-laundromat in"D" state)
+To:     Paulo Alcantara <pc@manguebit.com>
+Cc:     "Dr. Bernd Feige" <bernd.feige@uniklinik-freiburg.de>,
+        "matoro_mailinglist_kernel@matoro.tk" 
+        <matoro_mailinglist_kernel@matoro.tk>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "paul@darkrain42.org" <paul@darkrain42.org>,
+        "tom@talpey.com" <tom@talpey.com>,
+        "ronniesahlberg@gmail.com" <ronniesahlberg@gmail.com>,
+        "bharathsm@microsoft.com" <bharathsm@microsoft.com>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        "brian.pardy@gmail.com" <brian.pardy@gmail.com>,
+        "nspmangalore@gmail.com" <nspmangalore@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-https://bugzilla.samba.org/show_bug.cgi?id=3D14476
+We probably want this one as well ...
 
---- Comment #3 from Steve French <sfrench@samba.org> ---
-This change fixes it:
+commit 2da338ff752a2789470d733111a5241f30026675
+Author: Steve French <stfrench@microsoft.com>
+Date:   Tue Sep 19 11:35:53 2023 -0500
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 22869cda1356..ea3a7a668b45 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -1191,6 +1191,7 @@ const char *cifs_get_link(struct dentry *dentry, stru=
-ct
-inode *inode,
+    smb3: do not start laundromat thread when dir leases
+     disabled
 
- const struct inode_operations cifs_symlink_inode_ops =3D {
-        .get_link =3D cifs_get_link,
-+       .setattr =3D cifs_setattr,
-        .permission =3D cifs_permission,
-        .listxattr =3D cifs_listxattr,
- };
+    When no directory lease support, or for IPC shares where directories
+    can not be opened, do not start an unneeded laundromat thread for
+    that mount (it wastes resources).
+
+    Fixes: d14de8067e3f ("cifs: Add a laundromat thread for cached director=
+ies")
+    Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+    Acked-by: Tom Talpey <tom@talpey.com>
+    Signed-off-by: Steve French <stfrench@microsoft.com>
+
+
+
+Any objections to adding that one to the list as well?  The patches
+all seem to apply fine to current 6.5-stable-rc
+
+On Mon, Oct 23, 2023 at 9:07=E2=80=AFAM Paulo Alcantara <pc@manguebit.com> =
+wrote:
+>
+> "Dr. Bernd Feige" <bernd.feige@uniklinik-freiburg.de> writes:
+>
+> > I can confirm that the patches apply cleanly on 6.5.8 and help a lot
+> > with the issue here (vers=3D3.1.1, gentoo client, MS AD server with DFS=
+).
+>
+> Thanks for testing it.
+>
+> Steve, I would suggest below commits for v6.5.y
+>
+>         238b351d0935 ("smb3: allow controlling length of time directory e=
+ntries are cached with dir leases")
+>         6a50d71d0fff ("smb3: allow controlling maximum number of cached d=
+irectories")
+>         2da338ff752a ("smb3: do not start laundromat thread when dir leas=
+es  disabled")
+>         e95f3f744650 ("smb: client: make laundromat a delayed worker")
+>         81ba10959970 ("smb: client: prevent new fids from being removed b=
+y laundromat")
+>
+> If OK, please ask stable team to pick those up.
+
+
 
 --=20
-You are receiving this mail because:
-You are the QA Contact for the bug.=
+Thanks,
+
+Steve
