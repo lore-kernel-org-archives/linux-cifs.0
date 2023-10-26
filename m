@@ -2,110 +2,123 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7FFC07545
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Oct 2023 13:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE32CC25B6B
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Oct 2023 12:21:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234484AbjJYNm1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Oct 2023 09:42:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46770 "EHLO
+        id S229647AbjJZMVm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 26 Oct 2023 08:21:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233249AbjJYNm0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Oct 2023 09:42:26 -0400
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E90131
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Oct 2023 06:42:21 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40853c639abso41821595e9.0
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Oct 2023 06:42:21 -0700 (PDT)
+        with ESMTP id S230405AbjJZMVk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Oct 2023 08:21:40 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3FFAB9
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Oct 2023 05:21:37 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-307d58b3efbso557066f8f.0
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Oct 2023 05:21:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698241340; x=1698846140; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xek/D1c/3ZtFYXMJxxDYFmlYYDLtkPgvYXa4SHLOo8w=;
-        b=FSIneL1bGbsFhYElHdkebl2vwX3SfP9cd6vGBtIy12Z8zZTEqMGnogIbSAubPLOojt
-         6n+u+adRRE3Evx694M62+hLDld8JwoLers/A/ok2PAd6xGBnQOFGRRKnJoi4oULcrLCz
-         wAbIx3d7jw172xAtnVSKOdDG9ldrDxeERz2rPopOrFp3ySXhttkhCOpUEDz0c1xKcesP
-         YYRDhO+aqmKVXklnZsGLx/nFyOSVJo6+212hLDiMNtFCjZikhixwEF89wJwZDPEdIY3u
-         qnvgC3hfju4H+Ydp+o13iqEz+cXUjDZzfsFiWqfJ2oINDFv5m6tWQJfzbpiUfNfzV9yN
-         XAKg==
+        d=freebox-fr.20230601.gappssmtp.com; s=20230601; t=1698322896; x=1698927696; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IYKDgrAzD1gMVxECHKdB8cUz08FCSkNLHk2nBH8sV7A=;
+        b=3WkFWjZgryKpQi+QRJNArd01aWoXAv5Qjpcah9wQfz5GExkOOnxoEnIK68sUYQieRS
+         ynluJbf6glRkuqQxf3jy847TbsqaswQmiKjIwULGCO6GM88Qx5Ma3kT9D2C/LS2d/JSQ
+         hsqnG4JjzyV9rMJr07rCvFtClpiuyqqobsK9k6nyg7DiXqvp2V4FRu30T+qJ78frzII2
+         Ro4wLy90uTtDrkAIbJ36t5SlBEDES/7taW3CQ/aUMOr1gUpKgFB3rkupYIHC5S0FuQAZ
+         mLMxY9u2odbuvzdbJ6NYn4115Fk3lc5xAegf/JIpBQZtlVpHJv6dfelQHC32lyn8YVZ1
+         hwMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698241340; x=1698846140;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xek/D1c/3ZtFYXMJxxDYFmlYYDLtkPgvYXa4SHLOo8w=;
-        b=vw2wyibOcg3+v291154O9+kCW4BGPnfO1wJ3G5LiMRSBGcHNd9yAfwLsqW+bqgLjH/
-         2rG3TqrzPY4kjYLwev0WgapMsRVKnRsJvyrY+F50118mO+QXb82NF9uHzphzRxxnqWtE
-         sGsFLKYQcjPZ9zmacHfvtxRLJtQc8jmKcrKuLya8voSmfNDoI2jiNdAK6IslbG+ukHca
-         4JGk1XduIu5KHEc3IRVQewaejHTgNHtpPwHBI36hR7WmFzrKCwnVquWblvf4PilclQ52
-         yvck6poZvbX6QtK03P0k0H2oUI8SKx2WDMD28FJxytJ9Vd1GKTHa2ZIApn4xcVQ62Zpc
-         S4Kw==
-X-Gm-Message-State: AOJu0YztSzDa8NG1OWfCEfCVTSSiQzbbMYD+yDgg/C+k3lPJptp8EiZM
-        nlaAhhXQlwLP7J6gABCeS7qUbNejS2Eu+SSJwio=
-X-Google-Smtp-Source: AGHT+IFc5YkiNLcgpT8QYigQ5Nt8Xc4O1/4mLxIVz39cLajUukfrAkwjz6VEnI7fS0dLukPpD6CHFw==
-X-Received: by 2002:adf:db48:0:b0:32d:9d80:4038 with SMTP id f8-20020adfdb48000000b0032d9d804038mr11438583wrj.49.1698241339709;
-        Wed, 25 Oct 2023 06:42:19 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id a6-20020adfeec6000000b0032da8fb0d05sm12112029wrp.110.2023.10.25.06.42.18
+        d=1e100.net; s=20230601; t=1698322896; x=1698927696;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IYKDgrAzD1gMVxECHKdB8cUz08FCSkNLHk2nBH8sV7A=;
+        b=xIO7p3CDhNHuH9C2o+sWVT91BQ9A45ff7y3szW4S9I42MGHGRBFQPXZ395Ai1DQzQT
+         4nNhdbahWHpN1PkVPumRuJepynXO1NTGWQKYVLMWp+aNDBuuojxetsZfxeJtqVDBJ3Xb
+         pX+10ptZg4fIE0nluPhdy3NxS4HROCAwX7D42At10Cf8y1gr+Rmobvaow/f3piknLtmq
+         55daxj9sLfpaeNlJwL5SZ9dl9UcYiDVB7UYhOhChs9TPVhcNNg9iyagJlhWLEhMPIJ9X
+         +v09Q+KU+ovKtVy4A9EBoa3DKf7+yD6eVp7psx4i3D2GcyEnCzOMMs7eQI1dIFDc7qR/
+         LyQg==
+X-Gm-Message-State: AOJu0Yy2kTJpQUarmElG8v5WHecRj+BNX9Um99eb+7iyeYPGzVD9r/K2
+        T55ZsycgqNH6gmUZfBIeaLrtw2AcjYLNibFzXKc=
+X-Google-Smtp-Source: AGHT+IHKNUC6PjI7fovH5rbGOL3DKJJ4YzhUNHohIWg/SM12I3uBuQSQQlJzycr0pGI9gjurO0Am+w==
+X-Received: by 2002:a5d:5341:0:b0:320:1c7:fd30 with SMTP id t1-20020a5d5341000000b0032001c7fd30mr12839982wrv.17.1698322896071;
+        Thu, 26 Oct 2023 05:21:36 -0700 (PDT)
+Received: from marios-t5500.iliad.local (freebox.vlq16.iliad.fr. [213.36.7.13])
+        by smtp.gmail.com with ESMTPSA id o12-20020adfe80c000000b0032da49e18fasm14251669wrm.23.2023.10.26.05.21.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Oct 2023 06:42:19 -0700 (PDT)
-Date:   Wed, 25 Oct 2023 16:42:15 +0300
-From:   Dan Carpenter <dan.carpenter@linaro.org>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Tom Talpey <tom@talpey.com>, Hyunchul Lee <hyc.lee@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] ksmbd: prevent some integer overflows
-Message-ID: <a6aacc23-a24b-4f4e-af8e-30bf574c110c@kadam.mountain>
-References: <205c4ec1-7c41-4f5d-8058-501fc1b5163c@moroto.mountain>
- <CAKYAXd_vhTswRUQMGXXMKOO4i_cuyZte28qDZ3AzfOKd76jdAQ@mail.gmail.com>
+        Thu, 26 Oct 2023 05:21:35 -0700 (PDT)
+From:   Marios Makassikis <mmakassikis@freebox.fr>
+To:     linux-cifs@vger.kernel.org
+Cc:     Marios Makassikis <mmakassikis@freebox.fr>
+Subject: [PATCH] ksmbd: add processed command debug log
+Date:   Thu, 26 Oct 2023 14:21:08 +0200
+Message-Id: <20231026122107.3755159-1-mmakassikis@freebox.fr>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKYAXd_vhTswRUQMGXXMKOO4i_cuyZte28qDZ3AzfOKd76jdAQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Oct 25, 2023 at 10:11:41PM +0900, Namjae Jeon wrote:
-> > @@ -757,7 +756,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct
-> Hi Dan,
-> 
-> > ksmbd_session *sess, int handle
-> >  	struct ksmbd_rpc_command *req;
-> >  	struct ksmbd_rpc_command *resp;
-> >
-> > -	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command) + payload_sz + 1);
-> > +	msg = ipc_msg_alloc(size_add(sizeof(struct ksmbd_rpc_command) + 1,
-> > payload_sz));
-> >  	if (!msg)
-> >  		return NULL;
-> There is a memcpy() below as follows.
->  memcpy(req->payload, payload, payload_sz);
-> 
-> Doesn't memcpy with payload_sz cause buffer overflow?
-> Wouldn't it be better to handle integer overflows as an error?
+Additional log to help identify what command is going to be
+processed next.
 
-In the original code, then the memcpy() is the issue I was concerned
-about.  I don't think it can be easily used for privelege escalation but
-it can definitly crash the system.
+Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+---
+ fs/smb/server/smb2pdu.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-The danger over integer overflows is that you do some math and the size
-becomes small and the allocation succeeds.  But then we do an memcpy()
-with no math and the size is very large.  We're trying to memcpy() a
-large thing into a small buffer and it overflows.
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 93262ca3f58a..d2b51177f0ca 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -39,6 +39,36 @@
+ #include "mgmt/ksmbd_ida.h"
+ #include "ndr.h"
+ 
++static const char *const smb2_cmd_str[] = {
++	[SMB2_NEGOTIATE_HE] = "SMB2_NEGOTIATE",
++	[SMB2_SESSION_SETUP_HE] = "SMB2_SESSION_SETUP",
++	[SMB2_LOGOFF_HE] = "SMB2_LOGOFF",
++	[SMB2_TREE_CONNECT_HE] = "SMB2_TREE_CONNECT",
++	[SMB2_TREE_DISCONNECT_HE] = "SMB2_TREE_DISCONNECT",
++	[SMB2_CREATE_HE] = "SMB2_CREATE",
++	[SMB2_CLOSE_HE] = "SMB2_CLOSE",
++	[SMB2_FLUSH_HE] = "SMB2_FLUSH",
++	[SMB2_READ_HE] = "SMB2_READ",
++	[SMB2_WRITE_HE] = "SMB2_WRITE",
++	[SMB2_LOCK_HE] = "SMB2_LOCK",
++	[SMB2_IOCTL_HE] = "SMB2_IOCTL",
++	[SMB2_CANCEL_HE] = "SMB2_CANCEL",
++	[SMB2_ECHO_HE] = "SMB2_ECHO",
++	[SMB2_QUERY_DIRECTORY_HE] = "SMB2_QUERY_DIRECTORY",
++	[SMB2_CHANGE_NOTIFY_HE] = "SMB2_CHANGE_NOTIFY",
++	[SMB2_QUERY_INFO_HE] = "SMB2_QUERY_INFO",
++	[SMB2_SET_INFO_HE] = "SMB2_SET_INFO",
++	[SMB2_OPLOCK_BREAK_HE] = "SMB2_OPLOCK_BREAK",
++};
++
++static const char *smb2_cmd_to_str(u16 cmd)
++{
++	if (cmd < ARRAY_SIZE(smb2_cmd_str))
++		return smb2_cmd_str[cmd];
++
++	return "unknown_cmd";
++}
++
+ static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
+ {
+ 	if (work->next_smb2_rcv_hdr_off) {
+@@ -568,6 +598,8 @@ int smb2_check_user_session(struct ksmbd_work *work)
+ 	unsigned int cmd = le16_to_cpu(req_hdr->Command);
+ 	unsigned long long sess_id;
+ 
++	ksmbd_debug(SMB, "received command: %s\n",
++		    smb2_cmd_to_str(req_hdr->Command));
+ 	/*
+ 	 * SMB2_ECHO, SMB2_NEGOTIATE, SMB2_SESSION_SETUP command do not
+ 	 * require a session id, so no need to validate user session's for
+-- 
+2.34.1
 
-What size_add() does is that if there is an integer overflow then
-instead of wrapping to a small number then it just gets stuck at
-ULONG_MAX.  The allocation will fail.  The allocation will actually
-fail pretty quickly but even if it didn't that's fine because we
-optimize for the success case (and not for hackers).
-
-The rules with size_add() are that you have to be careful with the
-results.  You can't add use it for math again except through the
-size_add/mul() helpers.  You also must always save the result to size_t
-or unsigned long.
-
-regards,
-dan carpenter
