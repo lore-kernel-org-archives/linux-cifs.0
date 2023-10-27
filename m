@@ -2,109 +2,94 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D75EBC25B6B
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Oct 2023 19:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1280C25B6E
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Oct 2023 10:56:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229668AbjJZT7a (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 26 Oct 2023 15:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60840 "EHLO
+        id S1345658AbjJ0K4n (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 Oct 2023 06:56:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjJZT73 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Oct 2023 15:59:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159EDB9
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Oct 2023 12:58:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698350321;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DKGH30ebKbNOdnmAvexW15bM5fXzpA/juQXVVxLdAxk=;
-        b=F0gtUy14VgO9+9hDvCuiy9wYRGtPLVYMt3cPbPZwBdpozRxlAZEAw8KvzsbT1XisSQ7+q8
-        OQuC8458zbHKdSS7uBPk7TOLNTwlzBxGx7RQM19RWl4AK/IB7SmiNW9DwTmGu2m0qYBK3W
-        pgYabMV9Kju/wMLDjgzFgOmi7yk2zR4=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-624-0ppK8IiROy6FFBbK__hy4w-1; Thu, 26 Oct 2023 15:58:39 -0400
-X-MC-Unique: 0ppK8IiROy6FFBbK__hy4w-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7a832e1a358so104187039f.3
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Oct 2023 12:58:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698350319; x=1698955119;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DKGH30ebKbNOdnmAvexW15bM5fXzpA/juQXVVxLdAxk=;
-        b=SPxq6IOyiR2NcX5ry950wfhV25Ctrgp9wpwUBGRt7KcXalKu3/3eaO4z8PBxcf9fdC
-         f9FsZIPG+7BDdgDgsLorqx7rT1zbyVNHbOVkaUiVarJ7k+nvEuH9EhXxQ/V6yegjtv4p
-         4hVw7IN4X534Rwg6KZCxcR5scS56RWYCS9dce1+OPDTlPB1Cmpbmd2DeCPM/2UYZGN1l
-         unZ2wMR4GoxOYjaK4obTrUrXM4r148BNwwM2xFFFSC7bqhhxiQRukdrfGI5YJBvpWhux
-         pd7WLGpAqnaPrU8kHX03Lt4qr4fMW9YZI+6GlMirjZxuGw1Kh7tPWx0JlQSLNRP99GsY
-         s5WA==
-X-Gm-Message-State: AOJu0Yz5GPwC41pPu0R/h7sOSGScrRA8C1hUbctgcQetxzPgLhyUYOTd
-        ZChTBsilldCjOEktBEuuf2Uk8X3+Pt8ya64g5b5eh8q/VVi8a7JjZdZ8JAftqjQ5vvjpgbzzqoA
-        A0NsdVWdVZxTT1W9567lbORG4JLVfew==
-X-Received: by 2002:a05:6e02:1d96:b0:351:526a:4bc with SMTP id h22-20020a056e021d9600b00351526a04bcmr1067409ila.15.1698350318804;
-        Thu, 26 Oct 2023 12:58:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF4OK91wHuAkcVZ8wytpXmJiDuwLvMnoSvTS33a9Xm/dy+XO5YKJA6cSB46m5FZCtfWFQr4mw==
-X-Received: by 2002:a05:6e02:1d96:b0:351:526a:4bc with SMTP id h22-20020a056e021d9600b00351526a04bcmr1067396ila.15.1698350318517;
-        Thu, 26 Oct 2023 12:58:38 -0700 (PDT)
-Received: from [172.16.0.69] (c-67-184-72-25.hsd1.il.comcast.net. [67.184.72.25])
-        by smtp.gmail.com with ESMTPSA id y7-20020a029507000000b0045c8e7e68a3sm766474jah.105.2023.10.26.12.58.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Oct 2023 12:58:38 -0700 (PDT)
-Message-ID: <7ef19ef0-c339-8127-9561-57c0d07a215b@redhat.com>
-Date:   Thu, 26 Oct 2023 14:58:37 -0500
+        with ESMTP id S1345598AbjJ0K4m (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 Oct 2023 06:56:42 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4329C;
+        Fri, 27 Oct 2023 03:56:39 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qwKVK-00Bece-Dv; Fri, 27 Oct 2023 18:55:51 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Oct 2023 18:55:56 +0800
+Date:   Fri, 27 Oct 2023 18:55:56 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Lukas Wunner <lukas@wunner.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-spdx@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
+        Taehee Yoo <ap420073@gmail.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>, coreteam@netfilter.org,
+        netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH] treewide: Add SPDX identifier to IETF ASN.1 modules
+Message-ID: <ZTuXPAZWVkLvVPHq@gondor.apana.org.au>
+References: <143690ecc1102c0f67fa7faec437ec7b02bb2304.1697885975.git.lukas@wunner.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Reply-To: sorenson@redhat.com
-Subject: Re: possible circular locking dependency detected warning and
- deadlock
-Content-Language: en-US
-To:     Paulo Alcantara <pc@manguebit.com>,
-        Frank Sorenson <frank@tuxrocks.com>, linux-cifs@vger.kernel.org
-References: <e04c7696-fc8a-b799-13f9-2cc051ba80dd@redhat.com>
- <92abdb27545d717b4e4898a1708b2013.pc@manguebit.com>
-From:   Frank Sorenson <sorenson@redhat.com>
-In-Reply-To: <92abdb27545d717b4e4898a1708b2013.pc@manguebit.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <143690ecc1102c0f67fa7faec437ec7b02bb2304.1697885975.git.lukas@wunner.de>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/26/23 13:07, Paulo Alcantara wrote:
-> Frank Sorenson <frank@tuxrocks.com> writes:
->
->> I'm getting a 'WARNING: possible circular locking dependency detected'
->> followed by a DEADLOCK when I access /proc/fs/cifs/DebugData while doing
->> a lot of mounts/unmounts/IO, etc.
-> Could you please retry with attached patches?
->
-> I was able to reproduce an GPF with a similar test by running xfstests
-> from Steve's for-next branch with
->
->          'vers=3.1.1,multichannel,max_channels=2'
->
-> against Windows Server 2022.
->
-> No deadlocks or lockdep warnings.  The deadlock fix from second patch
-> was just based on code analysis.
+On Sat, Oct 21, 2023 at 01:23:44PM +0200, Lukas Wunner wrote:
+> Per section 4.c. of the IETF Trust Legal Provisions, "Code Components"
+> in IETF Documents are licensed on the terms of the BSD-3-Clause license:
+> 
+> https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/
+> 
+> The term "Code Components" specifically includes ASN.1 modules:
+> 
+> https://trustee.ietf.org/documents/trust-legal-provisions/code-components-list-3/
+> 
+> Add an SPDX identifier as well as a copyright notice pursuant to section
+> 6.d. of the Trust Legal Provisions to all ASN.1 modules in the tree
+> which are derived from IETF Documents.
+> 
+> Section 4.d. of the Trust Legal Provisions requests that each Code
+> Component identify the RFC from which it is taken, so link that RFC
+> in every ASN.1 module.
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> ---
+>  I'm adding a new IETF ASN.1 module for PCI device authentication, hence
+>  had to research what the correct license is.  Thought I'd fix this up
+>  treewide while at it.
+> 
+>  Not included here is fs/smb/client/cifs_spnego_negtokeninit.asn1,
+>  which is similar to fs/smb/client/ksmbd_spnego_negtokeninit.asn1,
+>  but contains a Microsoft extension published as Open Specifications
+>  Documentation.  It's unclear to me what license they use:
+>  https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-spng/
+> 
+>  crypto/asymmetric_keys/pkcs7.asn1            | 7 +++++++
+>  crypto/asymmetric_keys/pkcs8.asn1            | 6 ++++++
+>  crypto/asymmetric_keys/x509.asn1             | 7 +++++++
+>  crypto/asymmetric_keys/x509_akid.asn1        | 5 +++++
+>  crypto/rsaprivkey.asn1                       | 7 +++++++
+>  crypto/rsapubkey.asn1                        | 7 +++++++
+>  fs/smb/server/ksmbd_spnego_negtokeninit.asn1 | 8 ++++++++
+>  fs/smb/server/ksmbd_spnego_negtokentarg.asn1 | 7 +++++++
+>  net/ipv4/netfilter/nf_nat_snmp_basic.asn1    | 8 ++++++++
+>  9 files changed, 62 insertions(+)
 
-Thanks.
-
-I'll test and report back.
-
-Frank
-
+Patch applied.  Thanks.
 -- 
-Frank Sorenson
-sorenson@redhat.com
-Principal Software Maintenance Engineer, filesystems
-Red Hat
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
