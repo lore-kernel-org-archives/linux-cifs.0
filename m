@@ -2,92 +2,74 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36396C4332F
-	for <linux-cifs@archiver.kernel.org>; Sun, 29 Oct 2023 12:01:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84995C4332F
+	for <linux-cifs@archiver.kernel.org>; Sun, 29 Oct 2023 23:41:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229487AbjJ2MBC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 29 Oct 2023 08:01:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56654 "EHLO
+        id S230495AbjJ2XlI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 Oct 2023 19:41:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjJ2MBB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Oct 2023 08:01:01 -0400
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD378BD
-        for <linux-cifs@vger.kernel.org>; Sun, 29 Oct 2023 05:00:59 -0700 (PDT)
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6b3c2607d9bso3112582b3a.1
-        for <linux-cifs@vger.kernel.org>; Sun, 29 Oct 2023 05:00:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698580859; x=1699185659;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NEVDXW+mNruLUYQB9PVdTNA6z0NQ5aR9Y+Ze5U+dTZ4=;
-        b=DyNRrNsl6fJBbsZV7l1sdc+Tl8+ZYAoP64X7WkJRGvuEFy/H0T6Alp5ofAXYW+MhTX
-         XUQF3Ljk2lfshZqpTxUpP62azTbtiVgWcOb5Xn83D+uus/iHHjOERVoB3YZFTA7ZcBbm
-         pRC1hyrdsNr9s4LK5uq6JqwgfCiJMIOmSEJmvA8CojlBVmtRMDXpY1d/pObMxZZINi9L
-         H5Vf1AdAELtGnc2IEkQ5xMJtz04EMlF2wet0W4BZSRotON8SnPh21EZNo5uG4q62ml/4
-         Cd0ylUSDuWNrV+h7Aha4ltZpEHkH0NA9TzoMiQxLm+HGUigTNewvL51/k6V7XV3JpFxN
-         o+KA==
-X-Gm-Message-State: AOJu0YxzOKWff6tJh1muPqiCKL7NxOtjOdk9MT49UuojFim202O/H0cK
-        MmoN35eo2orBlag1EgdV9WEyCT2LZkM=
-X-Google-Smtp-Source: AGHT+IGXJYbL2AVMa7FVnDzhuWXElwj5t1ZUGR5WcWB/4GO+kL5MXfGquLsLVoKtOOrRpe5JkfsDrw==
-X-Received: by 2002:a05:6a00:2302:b0:68b:e710:ee9c with SMTP id h2-20020a056a00230200b0068be710ee9cmr5567638pfh.19.1698580858872;
-        Sun, 29 Oct 2023 05:00:58 -0700 (PDT)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id m16-20020aa78a10000000b0068bc6a75848sm4199649pfa.156.2023.10.29.05.00.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Oct 2023 05:00:58 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
-        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: no need to wait for binded connection termination at logoff
-Date:   Sun, 29 Oct 2023 21:00:44 +0900
-Message-Id: <20231029120044.6619-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S229533AbjJ2XlH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Oct 2023 19:41:07 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDA70F3
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Oct 2023 16:41:05 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59681C433C8
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Oct 2023 23:41:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698622865;
+        bh=yKOeVqYdGMHmZ70/pj3Gqm7bdCOA6guw7BWbeSC202M=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=FbgzUddut43TH2QMMCCvFb3p5Fnhf5bpa+Afm8vpQEQl3csgcaI/maFBmo+eKPD8B
+         zLRSEbJ/Aq9OuGs0kjpMQiqHRraW08p2dLp07SOkWEDeal/29NKCvYxZtUTbMLHOJL
+         R2fS39dZe9KJ/fhocoFpve22Y7f5R9bBWXKiZWXHOhJVfKdqsMuzRW9auSrBT1FQKR
+         IuiuwlevxFyfTM58Qq3F/VVpjBOn3OJv4FDxkrRpzS2cJG/Q0x5Pav9k9aVwctAqZI
+         fz/iIYHIxvq4NB5nMHaK6juHX+M30RsOT/IZ1hgMVfiJUeqkjWxXgQWXaGUp4Qhale
+         LRWJ2JoS9bPLw==
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6ce322b62aeso2601647a34.3
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Oct 2023 16:41:05 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzugphunkRPqiITKUPSdkPngi7GcWlx++eun01HhGeLQVeJNVEV
+        1c6py37lsHWRI4fVVDM7FoTTTzs8AVZWHie87gE=
+X-Google-Smtp-Source: AGHT+IEHHLIBUit++/DFKozEY3zBfpR9Cs2XnM9pgFXHYIUbByYFiJCERV0bYG7/MpJ9Cg/Ujua8qUN8qgP5T7YKJTQ=
+X-Received: by 2002:a05:6830:d0:b0:6bd:c7c3:aabc with SMTP id
+ x16-20020a05683000d000b006bdc7c3aabcmr9020393oto.19.1698622864631; Sun, 29
+ Oct 2023 16:41:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a8a:1d53:0:b0:4fa:bc5a:10a5 with HTTP; Sun, 29 Oct 2023
+ 16:41:02 -0700 (PDT)
+In-Reply-To: <20231026122107.3755159-1-mmakassikis@freebox.fr>
+References: <20231026122107.3755159-1-mmakassikis@freebox.fr>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Mon, 30 Oct 2023 08:41:02 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8NbMBpvZQmrU2Z5PaJzFHc_f-8_TrYmRrjVhxOwGKggw@mail.gmail.com>
+Message-ID: <CAKYAXd8NbMBpvZQmrU2Z5PaJzFHc_f-8_TrYmRrjVhxOwGKggw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: add processed command debug log
+To:     Marios Makassikis <mmakassikis@freebox.fr>
+Cc:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The connection could be binded to the existing session for Multichannel.
-session will be destroyed when binded connections are released.
-So no need to wait for that's connection at logoff.
+2023-10-26 21:21 GMT+09:00, Marios Makassikis <mmakassikis@freebox.fr>:
+> Additional log to help identify what command is going to be
+> processed next.
+There are the functions that doesn't call WORK_BUFFERS(). e.g.
+smb2_handle_negotiate(), smb2_cancel, smb2_ioctl(), etc... And
+duplicated prints will show from smb2_sess_setup().
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/connection.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+int smb2_sess_setup(struct ksmbd_work *work)
+{
+        struct ksmbd_conn *conn = work->conn;
+        struct smb2_sess_setup_req *req;
+        struct smb2_sess_setup_rsp *rsp;
+        struct ksmbd_session *sess;
+        struct negotiate_message *negblob;
+        unsigned int negblob_len, negblob_off;
+        int rc = 0;
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index 4b38c3a285f6..b6fa1e285c40 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -167,23 +167,7 @@ void ksmbd_all_conn_set_status(u64 sess_id, u32 status)
- 
- void ksmbd_conn_wait_idle(struct ksmbd_conn *conn, u64 sess_id)
- {
--	struct ksmbd_conn *bind_conn;
--
- 	wait_event(conn->req_running_q, atomic_read(&conn->req_running) < 2);
--
--	down_read(&conn_list_lock);
--	list_for_each_entry(bind_conn, &conn_list, conns_list) {
--		if (bind_conn == conn)
--			continue;
--
--		if ((bind_conn->binding || xa_load(&bind_conn->sessions, sess_id)) &&
--		    !ksmbd_conn_releasing(bind_conn) &&
--		    atomic_read(&bind_conn->req_running)) {
--			wait_event(bind_conn->req_running_q,
--				atomic_read(&bind_conn->req_running) == 0);
--		}
--	}
--	up_read(&conn_list_lock);
- }
- 
- int ksmbd_conn_write(struct ksmbd_work *work)
--- 
-2.25.1
+        ksmbd_debug(SMB, "Received request for session setup\n");
 
+        WORK_BUFFERS(work, req, rsp);
+
+Thanks!
