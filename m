@@ -2,60 +2,99 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0BFC25B70
-	for <linux-cifs@archiver.kernel.org>; Sat, 28 Oct 2023 02:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79323C4167B
+	for <linux-cifs@archiver.kernel.org>; Sun, 29 Oct 2023 05:03:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbjJ1CaB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 Oct 2023 22:30:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55144 "EHLO
+        id S229529AbjJ2FDm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 Oct 2023 01:03:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjJ1CaA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 Oct 2023 22:30:00 -0400
-Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40C490
-        for <linux-cifs@vger.kernel.org>; Fri, 27 Oct 2023 19:29:58 -0700 (PDT)
-Received: by mail.durme.pl (Postfix, from userid 1002)
-        id B827E5E026; Thu, 26 Oct 2023 08:10:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
-        t=1698313195; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
-        h=Date:From:To:Subject:From;
-        b=J94KUXW+j+zcDBeR0k6TXaCNp0FbEIkGIye6R1H5h3q8Icro8fili9DwsDQIirI9u
-         K66UJ95XrboNN8uC4ul3UnrJScCT21n0yvejl+JvSheZGwnBPT3p7R008r9vJ0pyb5
-         hy51W7Tis4wA9ugjvBNYqc9QgbDqQV/pgixlsvqWbE9GLLcLVK3z5KCypvkeMeOoRC
-         4v4iHDPtCRZXDmu12NHdLDTsgTRGXjFQcmHMMJPWocco4lsSUDcgcNzGPW8hTuwgMT
-         Qk3BCAuyTsEQhR3/9FCqx6BF3uDpc78J6urku/GpiCWLxuNRGR/33kcI3AgiCM9VPp
-         q/CEp7s29Onqg==
-Received: by mail.durme.pl for <linux-cifs@vger.kernel.org>; Thu, 26 Oct 2023 08:10:22 GMT
-Message-ID: <20231026064500-0.1.56.rhaq.0.wli74ikol0@durme.pl>
-Date:   Thu, 26 Oct 2023 08:10:22 GMT
-From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
-To:     <linux-cifs@vger.kernel.org>
-Subject: W sprawie samochodu
-X-Mailer: mail.durme.pl
+        with ESMTP id S229446AbjJ2FDl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Oct 2023 01:03:41 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81BD3C5;
+        Sat, 28 Oct 2023 22:03:39 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F197EC433C7;
+        Sun, 29 Oct 2023 05:03:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1698555819;
+        bh=MxEvELIX1VCJ8n2KTB9rpSMvJBA5jHAN9kCXwNIb6UE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=GKf1L/Mkh7QgCKPYk8j72HNU8A63TXE0E88aURkYZ/gq3pbVliWkfbPXrT6NXOb3F
+         EMyR8ofKTJsXmiHz0mLej1+LQX0KVhN8m+5QC4XMCF1H+cMojCGMx5VtYCdKwHJd2+
+         c8bTl5I2IrlshKdwWbV7xo9+HghSqDDPxi28WwdJWLBrFb+Og5KOv5LDjEGYKoT/D7
+         Q0OnWwIg66g4ZRepb3cvkx9TEtTKEW+IIM+juAh6L/E0rwpO5+sIJVBWluWq383oNx
+         yzS8uj204tHdyrRSXSxh4HjGSORvQlrhKOnAD/o0cKj3Knen+TDBZPXw90CSRbP6jJ
+         o1zfSSGZQIX2w==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org
+Subject: [PATCH] smb: use crypto_shash_digest() in symlink_hash()
+Date:   Sat, 28 Oct 2023 22:03:00 -0700
+Message-ID: <20231029050300.154832-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.42.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Dzie=C5=84 dobry,
+From: Eric Biggers <ebiggers@google.com>
 
-chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
-, je=C5=9Bli chodzi o system monitoringu GPS.
+Simplify symlink_hash() by using crypto_shash_digest() instead of an
+init+update+final sequence.  This should also improve performance.
 
-Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
-e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
-a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ fs/smb/client/link.c | 16 ++--------------
+ 1 file changed, 2 insertions(+), 14 deletions(-)
 
-Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
-dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
-szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
-mne znaczenie.
+diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
+index c66be4904e1f..a1da50e66fbb 100644
+--- a/fs/smb/client/link.c
++++ b/fs/smb/client/link.c
+@@ -35,37 +35,25 @@
+ #define CIFS_MF_SYMLINK_MD5_ARGS(md5_hash) md5_hash
+ 
+ static int
+ symlink_hash(unsigned int link_len, const char *link_str, u8 *md5_hash)
+ {
+ 	int rc;
+ 	struct shash_desc *md5 = NULL;
+ 
+ 	rc = cifs_alloc_hash("md5", &md5);
+ 	if (rc)
+-		goto symlink_hash_err;
++		return rc;
+ 
+-	rc = crypto_shash_init(md5);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not init md5 shash\n", __func__);
+-		goto symlink_hash_err;
+-	}
+-	rc = crypto_shash_update(md5, link_str, link_len);
+-	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not update with link_str\n", __func__);
+-		goto symlink_hash_err;
+-	}
+-	rc = crypto_shash_final(md5, md5_hash);
++	rc = crypto_shash_digest(md5, link_str, link_len, md5_hash);
+ 	if (rc)
+ 		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
+-
+-symlink_hash_err:
+ 	cifs_free_hash(&md5);
+ 	return rc;
+ }
+ 
+ static int
+ parse_mf_symlink(const u8 *buf, unsigned int buf_len, unsigned int *_link_len,
+ 		 char **_link_str)
+ {
+ 	int rc;
+ 	unsigned int link_len;
 
-Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
-b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
+base-commit: 2af9b20dbb39f6ebf9b9b6c090271594627d818e
+-- 
+2.42.0
 
-
-Pozdrawiam
-Krystian Wieczorek
