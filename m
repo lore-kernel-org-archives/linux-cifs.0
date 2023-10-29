@@ -2,99 +2,92 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79323C4167B
-	for <linux-cifs@archiver.kernel.org>; Sun, 29 Oct 2023 05:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36396C4332F
+	for <linux-cifs@archiver.kernel.org>; Sun, 29 Oct 2023 12:01:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbjJ2FDm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 29 Oct 2023 01:03:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45650 "EHLO
+        id S229487AbjJ2MBC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 Oct 2023 08:01:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjJ2FDl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Oct 2023 01:03:41 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81BD3C5;
-        Sat, 28 Oct 2023 22:03:39 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F197EC433C7;
-        Sun, 29 Oct 2023 05:03:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1698555819;
-        bh=MxEvELIX1VCJ8n2KTB9rpSMvJBA5jHAN9kCXwNIb6UE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=GKf1L/Mkh7QgCKPYk8j72HNU8A63TXE0E88aURkYZ/gq3pbVliWkfbPXrT6NXOb3F
-         EMyR8ofKTJsXmiHz0mLej1+LQX0KVhN8m+5QC4XMCF1H+cMojCGMx5VtYCdKwHJd2+
-         c8bTl5I2IrlshKdwWbV7xo9+HghSqDDPxi28WwdJWLBrFb+Og5KOv5LDjEGYKoT/D7
-         Q0OnWwIg66g4ZRepb3cvkx9TEtTKEW+IIM+juAh6L/E0rwpO5+sIJVBWluWq383oNx
-         yzS8uj204tHdyrRSXSxh4HjGSORvQlrhKOnAD/o0cKj3Knen+TDBZPXw90CSRbP6jJ
-         o1zfSSGZQIX2w==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org
-Subject: [PATCH] smb: use crypto_shash_digest() in symlink_hash()
-Date:   Sat, 28 Oct 2023 22:03:00 -0700
-Message-ID: <20231029050300.154832-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.42.0
+        with ESMTP id S229482AbjJ2MBB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Oct 2023 08:01:01 -0400
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD378BD
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Oct 2023 05:00:59 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6b3c2607d9bso3112582b3a.1
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Oct 2023 05:00:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698580859; x=1699185659;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NEVDXW+mNruLUYQB9PVdTNA6z0NQ5aR9Y+Ze5U+dTZ4=;
+        b=DyNRrNsl6fJBbsZV7l1sdc+Tl8+ZYAoP64X7WkJRGvuEFy/H0T6Alp5ofAXYW+MhTX
+         XUQF3Ljk2lfshZqpTxUpP62azTbtiVgWcOb5Xn83D+uus/iHHjOERVoB3YZFTA7ZcBbm
+         pRC1hyrdsNr9s4LK5uq6JqwgfCiJMIOmSEJmvA8CojlBVmtRMDXpY1d/pObMxZZINi9L
+         H5Vf1AdAELtGnc2IEkQ5xMJtz04EMlF2wet0W4BZSRotON8SnPh21EZNo5uG4q62ml/4
+         Cd0ylUSDuWNrV+h7Aha4ltZpEHkH0NA9TzoMiQxLm+HGUigTNewvL51/k6V7XV3JpFxN
+         o+KA==
+X-Gm-Message-State: AOJu0YxzOKWff6tJh1muPqiCKL7NxOtjOdk9MT49UuojFim202O/H0cK
+        MmoN35eo2orBlag1EgdV9WEyCT2LZkM=
+X-Google-Smtp-Source: AGHT+IGXJYbL2AVMa7FVnDzhuWXElwj5t1ZUGR5WcWB/4GO+kL5MXfGquLsLVoKtOOrRpe5JkfsDrw==
+X-Received: by 2002:a05:6a00:2302:b0:68b:e710:ee9c with SMTP id h2-20020a056a00230200b0068be710ee9cmr5567638pfh.19.1698580858872;
+        Sun, 29 Oct 2023 05:00:58 -0700 (PDT)
+Received: from localhost.localdomain ([110.14.71.32])
+        by smtp.gmail.com with ESMTPSA id m16-20020aa78a10000000b0068bc6a75848sm4199649pfa.156.2023.10.29.05.00.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Oct 2023 05:00:58 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, senozhatsky@chromium.org, tom@talpey.com,
+        atteh.mailbox@gmail.com, Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: no need to wait for binded connection termination at logoff
+Date:   Sun, 29 Oct 2023 21:00:44 +0900
+Message-Id: <20231029120044.6619-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+The connection could be binded to the existing session for Multichannel.
+session will be destroyed when binded connections are released.
+So no need to wait for that's connection at logoff.
 
-Simplify symlink_hash() by using crypto_shash_digest() instead of an
-init+update+final sequence.  This should also improve performance.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/client/link.c | 16 ++--------------
- 1 file changed, 2 insertions(+), 14 deletions(-)
+ fs/smb/server/connection.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-index c66be4904e1f..a1da50e66fbb 100644
---- a/fs/smb/client/link.c
-+++ b/fs/smb/client/link.c
-@@ -35,37 +35,25 @@
- #define CIFS_MF_SYMLINK_MD5_ARGS(md5_hash) md5_hash
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 4b38c3a285f6..b6fa1e285c40 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -167,23 +167,7 @@ void ksmbd_all_conn_set_status(u64 sess_id, u32 status)
  
- static int
- symlink_hash(unsigned int link_len, const char *link_str, u8 *md5_hash)
+ void ksmbd_conn_wait_idle(struct ksmbd_conn *conn, u64 sess_id)
  {
- 	int rc;
- 	struct shash_desc *md5 = NULL;
- 
- 	rc = cifs_alloc_hash("md5", &md5);
- 	if (rc)
--		goto symlink_hash_err;
-+		return rc;
- 
--	rc = crypto_shash_init(md5);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not init md5 shash\n", __func__);
--		goto symlink_hash_err;
--	}
--	rc = crypto_shash_update(md5, link_str, link_len);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not update with link_str\n", __func__);
--		goto symlink_hash_err;
--	}
--	rc = crypto_shash_final(md5, md5_hash);
-+	rc = crypto_shash_digest(md5, link_str, link_len, md5_hash);
- 	if (rc)
- 		cifs_dbg(VFS, "%s: Could not generate md5 hash\n", __func__);
+-	struct ksmbd_conn *bind_conn;
 -
--symlink_hash_err:
- 	cifs_free_hash(&md5);
- 	return rc;
+ 	wait_event(conn->req_running_q, atomic_read(&conn->req_running) < 2);
+-
+-	down_read(&conn_list_lock);
+-	list_for_each_entry(bind_conn, &conn_list, conns_list) {
+-		if (bind_conn == conn)
+-			continue;
+-
+-		if ((bind_conn->binding || xa_load(&bind_conn->sessions, sess_id)) &&
+-		    !ksmbd_conn_releasing(bind_conn) &&
+-		    atomic_read(&bind_conn->req_running)) {
+-			wait_event(bind_conn->req_running_q,
+-				atomic_read(&bind_conn->req_running) == 0);
+-		}
+-	}
+-	up_read(&conn_list_lock);
  }
  
- static int
- parse_mf_symlink(const u8 *buf, unsigned int buf_len, unsigned int *_link_len,
- 		 char **_link_str)
- {
- 	int rc;
- 	unsigned int link_len;
-
-base-commit: 2af9b20dbb39f6ebf9b9b6c090271594627d818e
+ int ksmbd_conn_write(struct ksmbd_work *work)
 -- 
-2.42.0
+2.25.1
 
