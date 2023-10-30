@@ -2,61 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C66C4332F
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Oct 2023 11:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD231C4167B
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Oct 2023 11:00:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232845AbjJ3LAu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Oct 2023 07:00:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40314 "EHLO
+        id S232477AbjJ3LAw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Oct 2023 07:00:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232834AbjJ3LAs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Oct 2023 07:00:48 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A980A2
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 04:00:45 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1cc5b705769so1669295ad.0
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 04:00:45 -0700 (PDT)
+        with ESMTP id S232902AbjJ3LAu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Oct 2023 07:00:50 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA83DA2
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 04:00:47 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cc394f4cdfso6749755ad.0
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 04:00:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698663644; x=1699268444; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698663647; x=1699268447; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VbxzwsYML2TG9HjAaC8hFOUftGKDbbj8oRkfNsQrJGA=;
-        b=YpN5s6DJgceXik7lBazXetZrphV3vAtQuDDMxr3Zgg3AFdCfF2OBhwPMDgTJEyEd1w
-         dW0LxJQtJS2iozgeiow6U5uu/+t1yUI1fwf8fmRLJkc4w/2dXHSnrSH8EREj0FJjjtmn
-         sC8gA26PdgFJ0UbTcVtSVky7/ijid08Iq3NwuTxdjVBHzQpUDB3ij7BoNKB8Nzx9kPn5
-         jHiVPYUsY4TZng7lEyBcTn6tsz+82HTPGpToeeFeutC1sZeut9iFPk5HO0YhvM1Jdnh4
-         KD8/JWdkAD5xzIM8rP49TwOq2i32qzdsFqhiDS8JzzjwKiEBl8BiM9abwqZbshm1iHNw
-         NeeQ==
+        bh=qyP4YNE6Ns7yBrAVyG5IyRivauhL8xPwm1O+XM8Vg3I=;
+        b=j0ZrNlKRYZBz7P3OR3RsyUOZx15g6gyCihQ/vMCY1iiSipSRzDPUhzTnnZlvApo6pW
+         Vp2CC33u/xap8Aell9boGILZCv4P4GHj1gfLanwDylLUrbuABL/F31wJQTdqqt20aKWE
+         V7mJ6jl4q4xMywMlnoJa3JjEyM3OV2UeCEz1mBkMhHvmSSd0dOzqllbtGTI0Lwx2IInk
+         U5vB5P9wrt10qKR1QYU2HZyC5g25aAGg6FmmXGNaLGwgAobWWCAYSxcfc5DpDa7o4YaS
+         HmVABaPAa46SnHpx1K8e4c+7qPPfmgP0WWiDiu6WNkkCcqN7ksIwic+pC8nTxp1N/PNT
+         tTfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698663644; x=1699268444;
+        d=1e100.net; s=20230601; t=1698663647; x=1699268447;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VbxzwsYML2TG9HjAaC8hFOUftGKDbbj8oRkfNsQrJGA=;
-        b=a0lVHb2vuu5jR9QYIDhKgbOKaaaFbervEjqI90cz8XwoXFL/I3yq5WHeDUjm5fYDgl
-         nm8bOtWwdjIEq0j6+n6qT0kQQx3BP41r8PrkPC4GrUu8aZU4SQG4Z6zzG0BLVFXR3xKg
-         PQTjo7a8Kfyc9uPrftF6XpqWkmAPPCpKu69PTYyt1lKEjP8UFKujX6RcmMyE5l4chIQG
-         D0CLPF4VaZ0m4FTRxNwJ9LXdz39n2Eo/ZIdHwnB6noFo/d3xYq/L++RjpSuNa7VAN3HD
-         M+qcj//0ATvF03Xf9kOxS1rfilbaePkqZMZllHUeOf1Gee+DTu5JkC3iBtidNLCsLVSb
-         vf1w==
-X-Gm-Message-State: AOJu0YzvdZnNuncuFjncfkiY4eMXHv/2um6VK959N8E1j8ZLW6wZ3j7V
-        2iXpmDWdu+E+af0VaKA9QGrq1mTPmlyRZw==
-X-Google-Smtp-Source: AGHT+IFb7mvdmTS/GRL/xLdFpjH5ZZfqX7Tgi6Pn3Rh//f9BI2TraqH9+8jtpHM2tovHy/jYcj/jvA==
-X-Received: by 2002:a17:902:c1cb:b0:1cc:29ed:96ae with SMTP id c11-20020a170902c1cb00b001cc29ed96aemr7824865plc.41.1698663644447;
-        Mon, 30 Oct 2023 04:00:44 -0700 (PDT)
+        bh=qyP4YNE6Ns7yBrAVyG5IyRivauhL8xPwm1O+XM8Vg3I=;
+        b=Fu3nre6HW5YgGkOrOtqWaXjqZ9sBqTVuQ7PnXNeMmVSeMT+8HpbRTPlPiRAXO6AUY4
+         xhq6uZImAr0MOsuZkEoSeJlh1UtwtSW5j+WH1yM1ts2NXBlKxDF6YuW8cIcn2PuYZtgp
+         4EdPpQolLW4Ja7kGeq0oZKaXmTLtzvnRVtqEAkvOQ1ONDXjDYnAm9+S/reENs+OeyRE1
+         dhBSwldGS2nouAeO4cogt8Ha7dorW6koM7WGJYDljJxDA1M8spLwrs0lDnt5n/QeegvQ
+         4O3VnEuXAiZO6BU+ZJ+UjOCFKmTb4KmTWhTkNBTVHv/U3KXyVTqaxUdTbZjNw+ZEeDtn
+         eRdw==
+X-Gm-Message-State: AOJu0YyerfdQVYhCpNU9JkIdFpH5jFco7ceJ5U/++GwbprvZogsKnFvC
+        nyI3f2L5ovDIYYjH/IRGh1U=
+X-Google-Smtp-Source: AGHT+IEybekkA1aC6fawp0wfMdfQL2ho3g0NSMKBtnx7YivgK5T/bbDCDDA6205JMs1Z30PN7iMdvQ==
+X-Received: by 2002:a17:903:2387:b0:1cc:54fa:f15a with SMTP id v7-20020a170903238700b001cc54faf15amr935226plh.13.1698663647082;
+        Mon, 30 Oct 2023 04:00:47 -0700 (PDT)
 Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:3:7e0c:5dff:fea8:2c14])
-        by smtp.gmail.com with ESMTPSA id n3-20020a170902e54300b001c9cc44eb60sm6006034plf.201.2023.10.30.04.00.42
+        by smtp.gmail.com with ESMTPSA id n3-20020a170902e54300b001c9cc44eb60sm6006034plf.201.2023.10.30.04.00.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 04:00:44 -0700 (PDT)
+        Mon, 30 Oct 2023 04:00:46 -0700 (PDT)
 From:   nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To:     smfrench@gmail.com, pc@manguebit.com, bharathsm.hsk@gmail.com,
         linux-cifs@vger.kernel.org
 Cc:     Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 07/14] cifs: distribute channels across interfaces based on speed
-Date:   Mon, 30 Oct 2023 11:00:13 +0000
-Message-Id: <20231030110020.45627-7-sprasad@microsoft.com>
+Subject: [PATCH 08/14] cifs: account for primary channel in the interface list
+Date:   Mon, 30 Oct 2023 11:00:14 +0000
+Message-Id: <20231030110020.45627-8-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231030110020.45627-1-sprasad@microsoft.com>
 References: <20231030110020.45627-1-sprasad@microsoft.com>
@@ -68,242 +68,89 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-Today, if the server interfaces RSS capable, we simply
-choose the fastest interface to setup a channel. This is not
-a scalable approach, and does not make a lot of attempt to
-distribute the connections.
-
-This change does a weighted distribution of channels across
-all the available server interfaces, where the weight is
-a function of the advertised interface speed.
-
-Also make sure that we don't mix rdma and non-rdma for channels.
+The refcounting of server interfaces should account
+for the primary channel too. Although this is not
+strictly necessary, doing so will account for the primary
+channel in DebugData.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/cifs_debug.c | 16 ++++++++
- fs/smb/client/cifsglob.h   |  2 +
- fs/smb/client/sess.c       | 83 +++++++++++++++++++++++++++++++-------
- 3 files changed, 87 insertions(+), 14 deletions(-)
+ fs/smb/client/sess.c    | 23 +++++++++++++++++++++++
+ fs/smb/client/smb2ops.c |  6 ++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 9fca09539728..e23fcabb78d6 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -284,6 +284,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
- 	struct cifs_server_iface *iface;
-+	size_t iface_weight = 0, iface_min_speed = 0;
-+	struct cifs_server_iface *last_iface = NULL;
- 	int c, i, j;
- 
- 	seq_puts(m,
-@@ -543,11 +545,25 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 					   "\tLast updated: %lu seconds ago",
- 					   ses->iface_count,
- 					   (jiffies - ses->iface_last_update) / HZ);
-+
-+			last_iface = list_last_entry(&ses->iface_list,
-+						     struct cifs_server_iface,
-+						     iface_head);
-+			iface_min_speed = last_iface->speed;
-+
- 			j = 0;
- 			list_for_each_entry(iface, &ses->iface_list,
- 						 iface_head) {
- 				seq_printf(m, "\n\t%d)", ++j);
- 				cifs_dump_iface(m, iface);
-+
-+				iface_weight = iface->speed / iface_min_speed;
-+				seq_printf(m, "\t\tWeight (cur,total): (%zu,%zu)"
-+					   "\n\t\tAllocated channels: %u\n",
-+					   iface->weight_fulfilled,
-+					   iface_weight,
-+					   iface->num_channels);
-+
- 				if (is_ses_using_iface(ses, iface))
- 					seq_puts(m, "\t\t[CONNECTED]\n");
- 			}
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 552ed441281a..81e7a45f413d 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -969,6 +969,8 @@ struct cifs_server_iface {
- 	struct list_head iface_head;
- 	struct kref refcount;
- 	size_t speed;
-+	size_t weight_fulfilled;
-+	unsigned int num_channels;
- 	unsigned int rdma_capable : 1;
- 	unsigned int rss_capable : 1;
- 	unsigned int is_active : 1; /* unset if non existent */
 diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index 9d2228c2d7e5..d009994f82cf 100644
+index d009994f82cf..6843deed6119 100644
 --- a/fs/smb/client/sess.c
 +++ b/fs/smb/client/sess.c
-@@ -178,7 +178,9 @@ int cifs_try_adding_channels(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses)
- 	int left;
- 	int rc = 0;
- 	int tries = 0;
-+	size_t iface_weight = 0, iface_min_speed = 0;
- 	struct cifs_server_iface *iface = NULL, *niface = NULL;
-+	struct cifs_server_iface *last_iface = NULL;
+@@ -332,6 +332,16 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
  
- 	spin_lock(&ses->chan_lock);
- 
-@@ -206,21 +208,11 @@ int cifs_try_adding_channels(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses)
- 	}
- 	spin_unlock(&ses->chan_lock);
- 
--	/*
--	 * Keep connecting to same, fastest, iface for all channels as
--	 * long as its RSS. Try next fastest one if not RSS or channel
--	 * creation fails.
--	 */
--	spin_lock(&ses->iface_lock);
--	iface = list_first_entry(&ses->iface_list, struct cifs_server_iface,
--				 iface_head);
--	spin_unlock(&ses->iface_lock);
--
- 	while (left > 0) {
- 
- 		tries++;
- 		if (tries > 3*ses->chan_max) {
--			cifs_dbg(FYI, "too many channel open attempts (%d channels left to open)\n",
-+			cifs_dbg(VFS, "too many channel open attempts (%d channels left to open)\n",
- 				 left);
- 			break;
- 		}
-@@ -228,17 +220,34 @@ int cifs_try_adding_channels(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses)
- 		spin_lock(&ses->iface_lock);
- 		if (!ses->iface_count) {
- 			spin_unlock(&ses->iface_lock);
-+			cifs_dbg(VFS, "server %s does not advertise interfaces\n", ses->server->hostname);
- 			break;
- 		}
- 
-+		if (!iface)
-+			iface = list_first_entry(&ses->iface_list, struct cifs_server_iface,
-+						 iface_head);
-+		last_iface = list_last_entry(&ses->iface_list, struct cifs_server_iface,
-+					     iface_head);
-+		iface_min_speed = last_iface->speed;
-+
- 		list_for_each_entry_safe_from(iface, niface, &ses->iface_list,
- 				    iface_head) {
-+			/* do not mix rdma and non-rdma interfaces */
-+			if (iface->rdma_capable != ses->server->rdma)
+ 	/* then look for a new one */
+ 	list_for_each_entry(iface, &ses->iface_list, iface_head) {
++		if (!chan_index) {
++			/* if we're trying to get the updated iface for primary channel */
++			if (!cifs_match_ipaddr((struct sockaddr *) &server->dstaddr,
++					       (struct sockaddr *) &iface->sockaddr))
 +				continue;
 +
- 			/* skip ifaces that are unusable */
- 			if (!iface->is_active ||
- 			    (is_ses_using_iface(ses, iface) &&
--			     !iface->rss_capable)) {
-+			     !iface->rss_capable))
-+				continue;
-+
-+			/* check if we already allocated enough channels */
-+			iface_weight = iface->speed / iface_min_speed;
-+
-+			if (iface->weight_fulfilled >= iface_weight)
- 				continue;
--			}
- 
- 			/* take ref before unlock */
- 			kref_get(&iface->refcount);
-@@ -255,10 +264,21 @@ int cifs_try_adding_channels(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses)
- 				continue;
- 			}
- 
--			cifs_dbg(FYI, "successfully opened new channel on iface:%pIS\n",
-+			iface->num_channels++;
-+			iface->weight_fulfilled++;
-+			cifs_dbg(VFS, "successfully opened new channel on iface:%pIS\n",
- 				 &iface->sockaddr);
- 			break;
- 		}
-+
-+		/* reached end of list. reset weight_fulfilled and start over */
-+		if (list_entry_is_head(iface, &ses->iface_list, iface_head)) {
-+			list_for_each_entry(iface, &ses->iface_list, iface_head)
-+				iface->weight_fulfilled = 0;
-+			spin_unlock(&ses->iface_lock);
-+			iface = NULL;
-+			continue;
++			kref_get(&iface->refcount);
++			break;
 +		}
- 		spin_unlock(&ses->iface_lock);
++
+ 		/* do not mix rdma and non-rdma interfaces */
+ 		if (iface->rdma_capable != server->rdma)
+ 			continue;
+@@ -358,6 +368,13 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+ 		cifs_dbg(FYI, "unable to find a suitable iface\n");
+ 	}
  
- 		left--;
-@@ -277,8 +297,10 @@ int
- cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
- {
- 	unsigned int chan_index;
-+	size_t iface_weight = 0, iface_min_speed = 0;
- 	struct cifs_server_iface *iface = NULL;
- 	struct cifs_server_iface *old_iface = NULL;
-+	struct cifs_server_iface *last_iface = NULL;
- 	int rc = 0;
- 
- 	spin_lock(&ses->chan_lock);
-@@ -298,13 +320,34 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
- 	spin_unlock(&ses->chan_lock);
- 
- 	spin_lock(&ses->iface_lock);
-+	if (!ses->iface_count) {
++	if (!chan_index && !iface) {
++		cifs_dbg(VFS, "unable to get the interface matching: %pIS\n",
++			 &server->dstaddr);
 +		spin_unlock(&ses->iface_lock);
-+		cifs_dbg(VFS, "server %s does not advertise interfaces\n", ses->server->hostname);
 +		return 0;
 +	}
 +
-+	last_iface = list_last_entry(&ses->iface_list, struct cifs_server_iface,
-+				     iface_head);
-+	iface_min_speed = last_iface->speed;
-+
- 	/* then look for a new one */
- 	list_for_each_entry(iface, &ses->iface_list, iface_head) {
-+		/* do not mix rdma and non-rdma interfaces */
-+		if (iface->rdma_capable != server->rdma)
-+			continue;
-+
- 		if (!iface->is_active ||
- 		    (is_ses_using_iface(ses, iface) &&
- 		     !iface->rss_capable)) {
- 			continue;
- 		}
-+
-+		/* check if we already allocated enough channels */
-+		iface_weight = iface->speed / iface_min_speed;
-+
-+		if (iface->weight_fulfilled >= iface_weight)
-+			continue;
-+
- 		kref_get(&iface->refcount);
- 		break;
- 	}
-@@ -320,10 +363,22 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+ 	/* now drop the ref to the current iface */
+ 	if (old_iface && iface) {
  		cifs_dbg(FYI, "replacing iface: %pIS with %pIS\n",
- 			 &old_iface->sockaddr,
- 			 &iface->sockaddr);
-+
-+		old_iface->num_channels--;
-+		if (old_iface->weight_fulfilled)
-+			old_iface->weight_fulfilled--;
+@@ -380,6 +397,12 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
+ 			old_iface->weight_fulfilled--;
+ 
+ 		kref_put(&old_iface->refcount, release_iface);
++	} else if (!chan_index) {
++		/* special case: update interface for primary channel */
++		cifs_dbg(FYI, "referencing primary channel iface: %pIS\n",
++			 &iface->sockaddr);
 +		iface->num_channels++;
 +		iface->weight_fulfilled++;
-+
- 		kref_put(&old_iface->refcount, release_iface);
- 	} else if (old_iface) {
- 		cifs_dbg(FYI, "releasing ref to iface: %pIS\n",
- 			 &old_iface->sockaddr);
-+
-+		old_iface->num_channels--;
-+		if (old_iface->weight_fulfilled)
-+			old_iface->weight_fulfilled--;
-+
- 		kref_put(&old_iface->refcount, release_iface);
  	} else {
  		WARN_ON(!iface);
+ 		cifs_dbg(FYI, "adding new iface: %pIS\n", &iface->sockaddr);
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 9aeecee6b91b..e7e1e0e5bdfe 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -756,6 +756,7 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon, bool in_
+ 	unsigned int ret_data_len = 0;
+ 	struct network_interface_info_ioctl_rsp *out_buf = NULL;
+ 	struct cifs_ses *ses = tcon->ses;
++	struct TCP_Server_Info *pserver;
+ 
+ 	/* do not query too frequently */
+ 	if (ses->iface_last_update &&
+@@ -780,6 +781,11 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon, bool in_
+ 	if (rc)
+ 		goto out;
+ 
++	/* check if iface is still active */
++	pserver = ses->chans[0].server;
++	if (pserver && !cifs_chan_is_iface_active(ses, pserver))
++		cifs_chan_update_iface(ses, pserver);
++
+ out:
+ 	kfree(out_buf);
+ 	return rc;
 -- 
 2.34.1
 
