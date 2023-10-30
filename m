@@ -2,61 +2,61 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F46C4167D
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Oct 2023 11:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3425C4332F
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Oct 2023 11:00:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232834AbjJ3LA4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Oct 2023 07:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40484 "EHLO
+        id S232839AbjJ3LA7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Oct 2023 07:00:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232839AbjJ3LAz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Oct 2023 07:00:55 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1211C0
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 04:00:52 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1c8a1541232so38205065ad.0
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 04:00:52 -0700 (PDT)
+        with ESMTP id S232860AbjJ3LA6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Oct 2023 07:00:58 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2A9F8E
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 04:00:55 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-5aa481d53e5so2527880a12.1
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 04:00:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698663652; x=1699268452; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698663655; x=1699268455; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g2rHcIvsbGvPqhqUsa3jjoReaW4WV1bGbaJkMyFwPlQ=;
-        b=icJphQnDErani1wQ/1G+/UAKR5uXxG3zCgn6sVUjXdooLq4Lanol74y1rsz8nQuonp
-         WqQlTANH1p6Ci2/Pj4uSb0MsTTu1ceqKxg5agwG0bkX+/Q/kWx+bTYHylNOqXhNlYUR/
-         n+983mPhFGr4xPuEH5n+8KMcIOoDOB60ecaH8qq326fDefZiDrTWqTQwvkq+XW15w9RD
-         4DaCkdcHCqPCAoSFmLXCR2zIx0udEJfhehMsQ3Ci93wQVr0XQFneeU+nrJKpB255UWEH
-         2V/lPgqeBdJsxc0AqMw7yUP63BMZ9Xf4IJ7kSZuuAw+fnsA5MWcLP4WLRhX8YfGf7Rbf
-         JXjQ==
+        bh=ANtRK5CIMrRcnxqCNV/cGBCNsANqWR7d1jq+KVeQWF8=;
+        b=dogt0l9dQnwrWb6HmW7g3Axhek19+v4yNEicQ93T91JfDEZcHUm17epWyCqzvxTPCt
+         aHYvBciPgd+FoD1ZbxjsKs7LZe/grQtGZRU+11aZLJbvmjyyR8IR6fL+yArPlbc5Olbs
+         XWsuCYwUkicjMluw4JuQCNUEzdIijn7VAay14haXrMXKfwUslGDOHH0QsJ/f7QXg+MCu
+         J3sXJTPPKbRlBWf6vZIZXFI4EoY/KTLiFG8yU8TQaD/0fLBWXh1mgv2sc7BuLXB5bVbZ
+         +7sbJOmCZShJFX/7lymguZOxG6u9fS5ypETwxmJC+lLt1/ycQ8PLQMgA6Tejuh74EN9n
+         sUiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698663652; x=1699268452;
+        d=1e100.net; s=20230601; t=1698663655; x=1699268455;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=g2rHcIvsbGvPqhqUsa3jjoReaW4WV1bGbaJkMyFwPlQ=;
-        b=NvBAPc2Fom6+XAS5HODQylPRYOGGIwHwHMr0LBDP+b4nsN8308qrvt3QV/gjA7Ba+G
-         GyipgaugLT1ygTI4B7rsxPjfREx3FhhOurVH1n2BEnT5QAypIGoZx4vto0J9YA99Q6TC
-         MfExKPbzqXtjhBdPzh99UtZNBbC0+ifeinERVPv7UPi8KGojN7/UfpZ4EnWuTn0ArOFf
-         pS/65SV033bLoCezAUwXB2PYrQ7m5N3xo57kRvMonQhbU7EpqJuOwzQZq5w4UwNUONOH
-         ltQo3ql/i8Py/fi0UmmNTU1vkkZUWq/f3zupesLZqpsR/YLbADFZr/d7CrQTwqKSqFX6
-         EeXg==
-X-Gm-Message-State: AOJu0YzI9vOAZ+hJg5717zH+HRAsET5qaGWkaaQlc3+h2HFhXvrZC3mu
-        I18DbqUjXn6TMy3MldXAWf1kKq8/NjEaRg==
-X-Google-Smtp-Source: AGHT+IF4BAh+X7Yt7GNoJGm6Tc4Xcv1ztPi+0caPGJZ2W5OTgJFZlbV38qk5vqG8WbuBk3CKE3YBEw==
-X-Received: by 2002:a17:902:ecce:b0:1cc:59a1:79c6 with SMTP id a14-20020a170902ecce00b001cc59a179c6mr672446plh.18.1698663652338;
-        Mon, 30 Oct 2023 04:00:52 -0700 (PDT)
+        bh=ANtRK5CIMrRcnxqCNV/cGBCNsANqWR7d1jq+KVeQWF8=;
+        b=DgKmgsiWGXlbvIvkGDQFzGHuWxiA340AVO1Cmg33FXwNvZ/3fjabYEKejS8MwP5NWQ
+         Id+CONmkQEaeyLisY2UtmnKLudSay4EA6p6EFxz50RuhS9Gkx4khgxRg3ihpeFOj5IpF
+         KBeCYx1CV4yKMAUk2qZAvxvsj1zJzejPaAdsoS+KRbsa3VqSKtFTb1kTQU8XRQklqcws
+         j0TA6Yb8H67GUVSjlzXbknv0ge18sA6KzFMN2soeIaP1/oVImGjDC7fnpPweB8Nnl/Db
+         gQKvhAPYY66Tq82x7ltBAt5gbiT6QOp12DaOLyXFntyqOnJEqW7seVD5AuNfRC+SFw6r
+         TOBw==
+X-Gm-Message-State: AOJu0Yy1jGO35yd2P70GSiGMewiaHYBDFEwbevudP8u78RLiMD9HWIva
+        QqydTx0Eq2nNJwcIvEDZZm0=
+X-Google-Smtp-Source: AGHT+IGA1vo0Cff6eRm5JxcBxa66prGWn8wrTxcHsele2EsQTd5E4SGAjM3KBjfxqjRyV6jKrdNpow==
+X-Received: by 2002:a05:6a21:6da1:b0:175:7085:ba18 with SMTP id wl33-20020a056a216da100b001757085ba18mr8223932pzb.58.1698663655099;
+        Mon, 30 Oct 2023 04:00:55 -0700 (PDT)
 Received: from lindev-local-latest.corp.microsoft.com ([2404:f801:8028:3:7e0c:5dff:fea8:2c14])
-        by smtp.gmail.com with ESMTPSA id n3-20020a170902e54300b001c9cc44eb60sm6006034plf.201.2023.10.30.04.00.50
+        by smtp.gmail.com with ESMTPSA id n3-20020a170902e54300b001c9cc44eb60sm6006034plf.201.2023.10.30.04.00.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 04:00:51 -0700 (PDT)
+        Mon, 30 Oct 2023 04:00:54 -0700 (PDT)
 From:   nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To:     smfrench@gmail.com, pc@manguebit.com, bharathsm.hsk@gmail.com,
         linux-cifs@vger.kernel.org
 Cc:     Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH 10/14] cifs: reconnect work should have reference on server struct
-Date:   Mon, 30 Oct 2023 11:00:16 +0000
-Message-Id: <20231030110020.45627-10-sprasad@microsoft.com>
+Subject: [PATCH 11/14] cifs: handle when server starts supporting multichannel
+Date:   Mon, 30 Oct 2023 11:00:17 +0000
+Message-Id: <20231030110020.45627-11-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231030110020.45627-1-sprasad@microsoft.com>
 References: <20231030110020.45627-1-sprasad@microsoft.com>
@@ -68,137 +68,115 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-The delayed work for reconnect takes server struct
-as a parameter. But it does so without holding a ref
-to it. Normally, this may not show a problem as
-the reconnect work is only cancelled on umount.
+When the user mounts with multichannel option, but the
+server does not support it, there can be a time in future
+where it can be supported.
 
-However, since we now plan to support scaling down of
-channels, and the scale down can happen from reconnect
-work itself, we need to fix it.
-
-This change takes a reference on the server struct
-before it is passed to the delayed work. And drops
-the reference in the delayed work itself. Or if
-the delayed work is successfully cancelled, by the
-process that cancels it.
+With this change, such a case is handled.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/connect.c | 27 +++++++++++++++++++++------
- fs/smb/client/smb2pdu.c | 23 +++++++++++++----------
- 2 files changed, 34 insertions(+), 16 deletions(-)
+ fs/smb/client/cifsproto.h |  4 ++++
+ fs/smb/client/connect.c   |  6 +++++-
+ fs/smb/client/smb2pdu.c   | 31 ++++++++++++++++++++++++++++---
+ 3 files changed, 37 insertions(+), 4 deletions(-)
 
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 65c84b3d1a65..5a4c1f1e0d91 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -132,6 +132,10 @@ extern int SendReceiveBlockingLock(const unsigned int xid,
+ 			struct smb_hdr *in_buf,
+ 			struct smb_hdr *out_buf,
+ 			int *bytes_returned);
++
++void
++smb2_query_server_interfaces(struct work_struct *work);
++
+ void
+ cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
+ 				      bool all_channels);
 diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 184075da5c6e..e71aa33bf026 100644
+index e71aa33bf026..149cde77500e 100644
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
-@@ -389,7 +389,13 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
- 			spin_unlock(&server->srv_lock);
- 			cifs_swn_reset_server_dstaddr(server);
- 			cifs_server_unlock(server);
--			mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+
-+			/* increase ref count which reconnect work will drop */
-+			spin_lock(&cifs_tcp_ses_lock);
-+			server->srv_count++;
-+			spin_unlock(&cifs_tcp_ses_lock);
-+			if (mod_delayed_work(cifsiod_wq, &server->reconnect, 0))
-+				cifs_put_tcp_session(server, false);
- 		}
- 	} while (server->tcpStatus == CifsNeedReconnect);
- 
-@@ -519,7 +525,13 @@ static int reconnect_dfs_server(struct TCP_Server_Info *server)
- 		spin_unlock(&server->srv_lock);
- 		cifs_swn_reset_server_dstaddr(server);
- 		cifs_server_unlock(server);
--		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+
-+		/* increase ref count which reconnect work will drop */
-+		spin_lock(&cifs_tcp_ses_lock);
-+		server->srv_count++;
-+		spin_unlock(&cifs_tcp_ses_lock);
-+		if (mod_delayed_work(cifsiod_wq, &server->reconnect, 0))
-+			cifs_put_tcp_session(server, false);
- 	} while (server->tcpStatus == CifsNeedReconnect);
- 
- 	mutex_lock(&server->refpath_lock);
-@@ -1601,16 +1613,19 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
- 
- 	cancel_delayed_work_sync(&server->echo);
- 
--	if (from_reconnect)
-+	if (from_reconnect) {
- 		/*
- 		 * Avoid deadlock here: reconnect work calls
- 		 * cifs_put_tcp_session() at its end. Need to be sure
- 		 * that reconnect work does nothing with server pointer after
- 		 * that step.
- 		 */
--		cancel_delayed_work(&server->reconnect);
--	else
--		cancel_delayed_work_sync(&server->reconnect);
-+		if (cancel_delayed_work(&server->reconnect))
-+			cifs_put_tcp_session(server, from_reconnect);
-+	} else {
-+		if (cancel_delayed_work_sync(&server->reconnect))
-+			cifs_put_tcp_session(server, from_reconnect);
-+	}
- 
- 	spin_lock(&server->srv_lock);
- 	server->tcpStatus = CifsExiting;
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index c75a80bb6d9e..b7665155f4e2 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3852,12 +3852,6 @@ void smb2_reconnect_server(struct work_struct *work)
- 		}
- 		spin_unlock(&ses->chan_lock);
- 	}
--	/*
--	 * Get the reference to server struct to be sure that the last call of
--	 * cifs_put_tcon() in the loop below won't release the server pointer.
--	 */
--	if (tcon_exist || ses_exist)
--		server->srv_count++;
- 
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
-@@ -3905,13 +3899,17 @@ void smb2_reconnect_server(struct work_struct *work)
- 
- done:
- 	cifs_dbg(FYI, "Reconnecting tcons and channels finished\n");
--	if (resched)
-+	if (resched) {
- 		queue_delayed_work(cifsiod_wq, &server->reconnect, 2 * HZ);
-+		mutex_unlock(&pserver->reconnect_mutex);
-+
-+		/* no need to put tcp session as we're retrying */
-+		return;
-+	}
- 	mutex_unlock(&pserver->reconnect_mutex);
- 
- 	/* now we can safely release srv struct */
--	if (tcon_exist || ses_exist)
--		cifs_put_tcp_session(server, 1);
-+	cifs_put_tcp_session(server, true);
+@@ -116,7 +116,8 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
+ 	return rc;
  }
  
- int
-@@ -3931,7 +3929,12 @@ SMB2_echo(struct TCP_Server_Info *server)
- 	    server->ops->need_neg(server)) {
- 		spin_unlock(&server->srv_lock);
- 		/* No need to send echo on newly established connections */
--		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-+		spin_lock(&cifs_tcp_ses_lock);
-+		server->srv_count++;
-+		spin_unlock(&cifs_tcp_ses_lock);
-+		if (mod_delayed_work(cifsiod_wq, &server->reconnect, 0))
-+			cifs_put_tcp_session(server, false);
+-static void smb2_query_server_interfaces(struct work_struct *work)
++void
++smb2_query_server_interfaces(struct work_struct *work)
+ {
+ 	int rc;
+ 	int xid;
+@@ -134,6 +135,9 @@ static void smb2_query_server_interfaces(struct work_struct *work)
+ 	if (rc) {
+ 		cifs_dbg(FYI, "%s: failed to query server interfaces: %d\n",
+ 				__func__, rc);
 +
- 		return rc;
++		if (rc == -EOPNOTSUPP)
++			return;
  	}
- 	spin_unlock(&server->srv_lock);
+ 
+ 	queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index b7665155f4e2..2617437a4627 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -163,6 +163,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	int rc = 0;
+ 	struct nls_table *nls_codepage = NULL;
+ 	struct cifs_ses *ses;
++	int xid;
+ 
+ 	/*
+ 	 * SMB2s NegProt, SessSetup, Logoff do not have tcon yet so
+@@ -307,17 +308,41 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		tcon->need_reopen_files = true;
+ 
+ 	rc = cifs_tree_connect(0, tcon, nls_codepage);
+-	mutex_unlock(&ses->session_mutex);
+ 
+ 	cifs_dbg(FYI, "reconnect tcon rc = %d\n", rc);
+ 	if (rc) {
+ 		/* If sess reconnected but tcon didn't, something strange ... */
++		mutex_unlock(&ses->session_mutex);
+ 		cifs_dbg(VFS, "reconnect tcon failed rc = %d\n", rc);
+ 		goto out;
+ 	}
+ 
+-	if (smb2_command != SMB2_INTERNAL_CMD)
+-		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
++	if (!rc &&
++	    (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
++		mutex_unlock(&ses->session_mutex);
++
++		/*
++		 * query server network interfaces, in case they change
++		 */
++		xid = get_xid();
++		rc = SMB3_request_interfaces(xid, tcon, false);
++		free_xid(xid);
++
++		if (rc)
++			cifs_dbg(FYI, "%s: failed to query server interfaces: %d\n",
++				 __func__, rc);
++
++		if (ses->chan_max > ses->chan_count &&
++		    !SERVER_IS_CHAN(server)) {
++			if (ses->chan_count == 1)
++				cifs_dbg(VFS, "server %s supports multichannel now\n",
++					 ses->server->hostname);
++
++			cifs_try_adding_channels(tcon->cifs_sb, ses);
++		}
++	} else {
++		mutex_unlock(&ses->session_mutex);
++	}
+ 
+ 	atomic_inc(&tconInfoReconnectCount);
+ out:
 -- 
 2.34.1
 
