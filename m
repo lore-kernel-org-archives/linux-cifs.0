@@ -2,101 +2,106 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30DAAC4167D
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Oct 2023 12:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A18DC4332F
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Oct 2023 14:54:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233167AbjJ3Mvp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Oct 2023 08:51:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55552 "EHLO
+        id S233501AbjJ3Oyy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Oct 2023 10:54:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233424AbjJ3Mvo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Oct 2023 08:51:44 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12B54D3
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 05:51:42 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-507a3b8b113so6356349e87.0
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 05:51:41 -0700 (PDT)
+        with ESMTP id S231919AbjJ3Oyx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Oct 2023 10:54:53 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F7A3C2
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 07:54:50 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-507bd644a96so6594303e87.3
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Oct 2023 07:54:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698670300; x=1699275100; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698677688; x=1699282488; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zMgCo6a/aqYJkcdpD1HJrAsw5ftXhvegVtE8ZQqMwLg=;
-        b=DA0x7R/ethUyri8K0/HbweAECWnfdGrG3FCrs5b3J3ARuxjlv5fUicNA1GXIWBWAd9
-         FLAO7DIxtrT0l8hNJ61eaJsUMFltnAr8rl+K0VHexuU5HQrH3ZSHVThLg1cbw2/hzUmh
-         KQ1vYcZ3K1XpXEGOiENCXUU6ClMF/z1LkG6TJoEatZthHRH2JAQstgQRuqt7rCKOIH5A
-         Aw1aeS9VpX8X/eif3iTXy1TR6sj+ImYBdGQK0ov1ufOMTbRAv3x7UJNO5B0jNzFlF9Tx
-         sqFj3kMcBBpPGbZl5HwDhuQJig8HvrahQaFITPEnO1ofu9RoeM0HmCu5WV0tMejpO0G1
-         KaHA==
+        bh=JU1+AlOjb6oMmpfgDjxA0bJFuXNbbKopM4PYQVmoSYk=;
+        b=jjv6pjnVOUEl9J24wOSrdBdQw8u2rCtgGGzfzUI1tjy+PwmMeZHiwedRoSCSUKXTQA
+         964lDI0Cu42pLGkZWlmK+KYmFhQEV4U0cg0LavdvcLj4cBU0/uBeQJBwUGWWOe0SXcxz
+         Knh6SlAGGq76XLSjL7TFevK0xa9zboSUo/pU4Dm0bbER/7SeWCa5AnSBzRDUmwg5a5aU
+         0lotWJG4hAYet7LAd5rxb6hRBMakj+XMx8zhA62IumFeoeARfr6FqgGRQ5ZpPSqW0UGb
+         YVVTd4/xTMfZIOjOL0tNB86LquGUReokXiECR4jBMhJ1BXkaX/jv29KS3kkJaR9kBTVy
+         Fang==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698670300; x=1699275100;
+        d=1e100.net; s=20230601; t=1698677688; x=1699282488;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zMgCo6a/aqYJkcdpD1HJrAsw5ftXhvegVtE8ZQqMwLg=;
-        b=I+KS2fjLoRPMasZnVWJEUz4T3gEYo0SrzpGt7zjb8VOFoYh9ZFAPo7ScXLCwgvvNqQ
-         fU9OGfsZ6zKoHmOTguUAgOQy44ssyyrnWQcMwYcBYIfmRF9CS4dGsuviaAqH9rQi894V
-         zSf5hosVOvCgANeHL4w74ovNT3T/drp5V28LjSnBIIz3JvSBVZ+sFLeTL2g+8f1gxm3K
-         fiCNPwu/nxNjWSKEWM0SK1kT1Qtw5CPU9+J55QeFOx8fkt7227Hw3HyllfHP0UCqj3Bp
-         L2NNIdeR9RnDfduI5FNn2BgCBcKxzUr4cGRZcz0UoYKQtKvy/Okr5uJrtuZ8zblgWMum
-         QeyQ==
-X-Gm-Message-State: AOJu0YxV0HnJcXhVN6mvw67gBsKR0uKGexBajdgXAoJk6DQcN9pqkm0w
-        knqk6EW3l0V7NK03iJ7E6vBqsITmS+JnZpz25C4=
-X-Google-Smtp-Source: AGHT+IHEuzKJuDsj/9Oq6oq9bdYcsAR4LSsKlZkHScxxBaTkXkUDltTZvlD7MqLRZKw81H555teD7VKasOuYpEMdvK8=
-X-Received: by 2002:ac2:4c94:0:b0:507:96cd:e641 with SMTP id
- d20-20020ac24c94000000b0050796cde641mr5957693lfl.51.1698670299945; Mon, 30
- Oct 2023 05:51:39 -0700 (PDT)
+        bh=JU1+AlOjb6oMmpfgDjxA0bJFuXNbbKopM4PYQVmoSYk=;
+        b=M+CcaoJs4oLsfZP4UDnNmCUKtt4J+yEaxBpemJogpy+D0D+t8pbFcG/MrUVkZiSzUW
+         oh+lmvRObZA4MYoyyhJlKBxxfgbnEtnbFyO0spOYaSee1FcTXs9wfDLZ9nJbcqaqlHjo
+         1q8+DHWeBo/hNSRPqZWAfUkEfo3ZB7c9XEKB9JWRx0k/IkOlnaw/rG/MB39hVZ2mnotx
+         H6FS8MOO7PWOqp+P9ob843WIG6SkZo7epwaaHWYpyGQ/Ng4dFkppvtVgn0NBARV/7Ex8
+         s4DJ/2W36fW3ISqptCYJ7l0m5Za2l/Bwp7HwlIE2Aygwr4cjzcgYjqktexLQwhL3qyWp
+         YvVA==
+X-Gm-Message-State: AOJu0Yzpm5RYAxObZJyUi6Lx4AxX+PLnIA7WNigcPTnzRffhcGqOVx8h
+        nBWPVjzFcmM+6ujn4PgtaTFHtlobTwv/HYNvK2Vz1Gg9e9A=
+X-Google-Smtp-Source: AGHT+IG4ViKvRp8SR2hr2B8ZXI6y4INhtaOt08Lv+PyiaD8+FsmmrWKMmaipeEXZbpRYLr0WgIzg52XJs0/kxTWHWjw=
+X-Received: by 2002:ac2:54bc:0:b0:4ff:9a75:211e with SMTP id
+ w28-20020ac254bc000000b004ff9a75211emr7340285lfk.42.1698677687948; Mon, 30
+ Oct 2023 07:54:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20231030110020.45627-1-sprasad@microsoft.com> <CAGypqWz2sq7w3SkjD-9hTFA7_uY69DrdYGpKek9iH2x5SHfz7g@mail.gmail.com>
- <CANT5p=qJyHAECHANqAc+qas8Aadq0Or5FXo1JBy-6qQFrLd_yQ@mail.gmail.com>
-In-Reply-To: <CANT5p=qJyHAECHANqAc+qas8Aadq0Or5FXo1JBy-6qQFrLd_yQ@mail.gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Mon, 30 Oct 2023 18:21:28 +0530
-Message-ID: <CANT5p=qpPqK0KM2XANyTh8dHYSKNoN-VHbtN_0Jk5uLzwmNxvg@mail.gmail.com>
+References: <20231030110020.45627-1-sprasad@microsoft.com>
+In-Reply-To: <20231030110020.45627-1-sprasad@microsoft.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 30 Oct 2023 09:54:33 -0500
+Message-ID: <CAH2r5msCnBt9yqE8G80eh5mcA+8U5UsV_83++by++5wuzZ5UqQ@mail.gmail.com>
 Subject: Re: [PATCH 01/14] cifs: print server capabilities in DebugData
-To:     Bharath SM <bharathsm.hsk@gmail.com>
-Cc:     smfrench@gmail.com, pc@manguebit.com, linux-cifs@vger.kernel.org,
-        Shyam Prasad N <sprasad@microsoft.com>
+To:     nspmangalore@gmail.com
+Cc:     pc@manguebit.com, bharathsm.hsk@gmail.com,
+        linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Oct 30, 2023 at 6:10=E2=80=AFPM Shyam Prasad N <nspmangalore@gmail.=
-com> wrote:
->
-> On Mon, Oct 30, 2023 at 6:04=E2=80=AFPM Bharath SM <bharathsm.hsk@gmail.c=
-om> wrote:
-> >
-> > On Mon, Oct 30, 2023 at 4:30=E2=80=AFPM <nspmangalore@gmail.com> wrote:
-> > >
-> > > From: Shyam Prasad N <sprasad@microsoft.com>
-> > >
-> > > In the output of /proc/fs/cifs/DebugData, we do not
-> > > print the server->capabilities field today.
-> > > With this change, we will do that.
-> >
-> > We already print session capabilities in DebugData. How is it
-> > different from that.?
->
-> These are capabilities at the server level. That one is at session level.
-> Actually, there's tcon capabilities as well, which I think we should
-> also dump in DebugData.
-> I'll submit a revised version for that as well.
+Made a minor change "Server capability: "  --> "Server capabilities:"
+to make it consistent with the places we print session and tcon
+capabilities in the DebugData
 
-Actually, it looks like that's already done in smb2_dump_share_caps.
-It would be even better to print server capabilities in the symbolic
-form similar to how it's done there.
-But this works too. I think we can do a follow up patch for that if needed.
+Let me know if any objections
 
+On Mon, Oct 30, 2023 at 6:00=E2=80=AFAM <nspmangalore@gmail.com> wrote:
 >
+> From: Shyam Prasad N <sprasad@microsoft.com>
+>
+> In the output of /proc/fs/cifs/DebugData, we do not
+> print the server->capabilities field today.
+> With this change, we will do that.
+>
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> ---
+>  fs/smb/client/cifs_debug.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+> index 76922fcc4bc6..a9dfecc397a8 100644
+> --- a/fs/smb/client/cifs_debug.c
+> +++ b/fs/smb/client/cifs_debug.c
+> @@ -427,6 +427,8 @@ static int cifs_debug_data_proc_show(struct seq_file =
+*m, void *v)
+>                 if (server->nosharesock)
+>                         seq_printf(m, " nosharesock");
+>
+> +               seq_printf(m, "\nServer capability: 0x%x", server->capabi=
+lities);
+> +
+>                 if (server->rdma)
+>                         seq_printf(m, "\nRDMA ");
+>                 seq_printf(m, "\nTCP status: %d Instance: %d"
 > --
-> Regards,
-> Shyam
-
+> 2.34.1
+>
 
 
 --=20
-Regards,
-Shyam
+Thanks,
+
+Steve
