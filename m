@@ -2,80 +2,229 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F338C4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Oct 2023 14:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A51DC4167B
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Oct 2023 15:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344323AbjJaO5m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Oct 2023 10:57:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59204 "EHLO
+        id S1344689AbjJaPTo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Oct 2023 11:19:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344312AbjJaO5m (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Oct 2023 10:57:42 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E823BE4
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 07:57:39 -0700 (PDT)
-Message-ID: <24f65f57980f7010cdc44f17023d475b.pc@manguebit.com>
+        with ESMTP id S1344756AbjJaPTo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Oct 2023 11:19:44 -0400
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E0B1BC5
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 08:18:21 -0700 (PDT)
+Message-ID: <364e6840dba943b3d23e5b50b793550d.pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1698764258;
+        s=dkim; t=1698765498;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=mwcYmzMGLrIJAKwwPAsSOg0b5letFz0OQC+Kd8SAaXA=;
-        b=I1e1Nm3/SfRhcsEPVlr3BsdMch/5F6GBpdFrsAg1JJujq9CXM8y4rxR24iCsA7o6/kyGZp
-        1eCCN7BrEhrlr29kw8EycGIAC+5VDuUcJYePQHMu2vEAmJ4yxojoixAajxg0pawMUhgVTX
-        QDBrcp7oSZRLbOeOSt7aOJyvxUcicZECrSuV0JKJEDb6DYVjDr21xE7l+QvMMYABmigplc
-        1AfzaAYXQ6e8jTxHcF/kWRS333VQxMV5+N5KodR26RDwk7QubXRb6jXNnXjJsdQLu+XTkp
-        Nf4mYapUIelWMsR6I/nkAX8L5IccpK/9kI4hTmeWRvj/Fbm/AJn6/sj1G1lvTA==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1698764258; a=rsa-sha256;
+        bh=pu0rl9d2zICtGR2C9PV7BqpjSP6H7Sp24F9TBCXtkqA=;
+        b=P7c8Jmfbv52VNjjh7LHDTdSpzyNul7k1SHA5DQOsCDHcIAuy4ZsiOQcM2VH/RvuKInkMr/
+        DT+tC64NHTMEmruMYd6m6Sn8vFQY2DbLrfZp3CW18SmB98CApl2Ee9WdaNaDd1jJ3PVvaL
+        w7FHMdphhUme0PiY0+0tjn+rpScNB1RYmiVyP/fy3S6LmThBJM9+Bnw5mGqe+zJ5uZlRd+
+        pyLvF25etSXyVWx3WV/KvGt/0rdmPlv6o2aQp2ejEgb0wCqgwhSjHghzANn09LjnFTwxYW
+        z2ZZ1BxxaVUDtKofTslsRYGpJ81TCim+T8/yleqN+B+5BXrhqs0YpoW/fbdfog==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1698765498; a=rsa-sha256;
         cv=none;
-        b=i9bohQPBrDXw9uor/Yysn5EWlj4iUdv06t7PRa/UiMtTBkwnQGge9pdjQJ7Hr8Xo2+WfyW
-        SieYjt/UzTwhv/9WosiDwa+kun/pe0Z/IjNKc2fZh99Qv/HkIFTw7fCrLyIDgjdacLaGrN
-        Rn9CgiFZozdDnrPWH/jjr1OOL7SxCqPXFMXu4hMA1CxTniOzpzVWDGXkuHOBe+VCmGx6BT
-        cuosu+OfgYR0WR54D6OHSv65Cm+flu3+5SCyeQHx+grfkHOhnRC12eP3K/J7c7csP1zH3W
-        VJ9Cfisoru1tmYPhBa9Mu4fPdfjldAJE3wfeQABw9KWg2Ofd9ojtH76FtOovPg==
+        b=XtnDIs+vko0K/uLOmyWdjbznI4GbiDDwG2hrDe0N2sa1jocNhWz3Anm0tReslUJnc0I98X
+        b/7ZiZlz9WOAw+DJM0Au20oH0sNaIiIYyG+/onTU3l9ZTspRRDj7xjKlNUp8R6L142Lx6l
+        yCx9Vi60d2AxYXMGuWuCNrUwa7PskGnJtfK7M8uFB//U9yT0hFFLIlJZerJo7i4HzjjWI5
+        1NrosEoQ6iqQx8qA6A4aI48FQ/0ILpASe9YCGrD0eJM4vvv8dHwB9dfVLhtxjiAs0OqWif
+        tk9sciwvCxkA9FgPMi0zGOKy04j5XVeIgTrQQyyx3lIwO+S2dv3zUoqLgfY4TQ==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1698764258;
+        s=dkim; t=1698765498;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=mwcYmzMGLrIJAKwwPAsSOg0b5letFz0OQC+Kd8SAaXA=;
-        b=VdZSD1LxJvjK1IQrc4FCTSyQxFh1H5WvOt5KnTyBWEXhcC4ghqf1GKZrrG9YF5/S9sPf6E
-        mffkbQaRcqyisi6hXv0k4N3cjRcZVVgS5K1Jn8EsFN3fYV+ZRUeFDgqLtLIpT/F+CFSOq1
-        P8NibH9fLliAA47kBmqFGG9sGy0OT5Jr+oGkvDRZaBZa8am/gcvTGpenflRKK4mzZ+kXv/
-        +sbZjFouzCUDeI8IkKk1wKIyheRybaI9KkOKSXSKwwtg6+cIBF3MS+OLd1V5h45cBZGwsw
-        kTcjrWtxPpG4a357qe2phi913waBylEG2q5+mzCBqdLDiUShTaah+tIhQTMmHw==
+        bh=pu0rl9d2zICtGR2C9PV7BqpjSP6H7Sp24F9TBCXtkqA=;
+        b=EeRoJivyRuabqJFKvgfwakaoMeHX2CqJhJyV0Z24Y2BHM4qNdrqXJYDPmNQd9gYzAxlOv1
+        oye7FVTdcxlrRPXMzmdgeySKdAoRkr1wOtrIpboIQh9tGLfY+sGoIhxjLU6MUF1yHWg7GB
+        a+Zb/zTnikfW/MeqMZs70sV/DCIgYS6PPon95r2uHclIAepwia2qgeeIf69lX3C9XFTGyu
+        8JqEkAmoNVt+Vt3ScJYi6fi77GgxSKE1Q6zhez/4QUisE+E/PN3Uz8JBKuCxHbWXPM6YDy
+        Mj5ubfkinz7Bd83Bg8fytKAchWfSAzSgAMl4a87BPRU9NYD6Y5aHAWq5JMHhcA==
 From:   Paulo Alcantara <pc@manguebit.com>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] smb: use crypto_shash_digest() in symlink_hash()
-In-Reply-To: <20231029050300.154832-1-ebiggers@kernel.org>
-References: <20231029050300.154832-1-ebiggers@kernel.org>
-Date:   Tue, 31 Oct 2023 11:57:33 -0300
+To:     nspmangalore@gmail.com, smfrench@gmail.com,
+        bharathsm.hsk@gmail.com, linux-cifs@vger.kernel.org
+Cc:     Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 13/14] cifs: display the endpoint IP details in DebugData
+In-Reply-To: <20231030110020.45627-13-sprasad@microsoft.com>
+References: <20231030110020.45627-1-sprasad@microsoft.com>
+ <20231030110020.45627-13-sprasad@microsoft.com>
+Date:   Tue, 31 Oct 2023 12:18:14 -0300
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Eric Biggers <ebiggers@kernel.org> writes:
+nspmangalore@gmail.com writes:
 
-> From: Eric Biggers <ebiggers@google.com>
+> From: Shyam Prasad N <sprasad@microsoft.com>
 >
-> Simplify symlink_hash() by using crypto_shash_digest() instead of an
-> init+update+final sequence.  This should also improve performance.
+> With multichannel, it is useful to know the src port details
+> for each channel. This change will print the ip addr and
+> port details for both the socket dest and src endpoints.
 >
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 > ---
->  fs/smb/client/link.c | 16 ++--------------
->  1 file changed, 2 insertions(+), 14 deletions(-)
+>  fs/smb/client/cifs_debug.c | 73 ++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 71 insertions(+), 2 deletions(-)
 >
-> diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-> index c66be4904e1f..a1da50e66fbb 100644
-> --- a/fs/smb/client/link.c
-> +++ b/fs/smb/client/link.c
+> diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+> index e23fcabb78d6..d8362e098310 100644
+> --- a/fs/smb/client/cifs_debug.c
+> +++ b/fs/smb/client/cifs_debug.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/proc_fs.h>
+>  #include <linux/uaccess.h>
+>  #include <uapi/linux/ethtool.h>
+> +#include <net/inet_sock.h>
+>  #include "cifspdu.h"
+>  #include "cifsglob.h"
+>  #include "cifsproto.h"
+> @@ -158,11 +159,37 @@ cifs_dump_channel(struct seq_file *m, int i, struct cifs_chan *chan)
+>  		   in_flight(server),
+>  		   atomic_read(&server->in_send),
+>  		   atomic_read(&server->num_waiters));
+> +
+>  #ifdef CONFIG_NET_NS
+>  	if (server->net)
+>  		seq_printf(m, " Net namespace: %u ", server->net->ns.inum);
+>  #endif /* NET_NS */
+>  
+> +#ifdef CONFIG_CIFS_SMB_DIRECT
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+No need to check for CONFIG_CIFS_SMB_DIRECT as @server->{rdma,smbd_conn}
+are always defined.
+
+> +	if (!server->rdma)
+
+cifs_rdma_enabled()?  To be consistent with other places.
+
+> +		goto skip_rdma;
+> +
+> +	if (server->smbd_conn && server->smbd_conn->id) {
+> +		struct rdma_addr *addr =
+> +			&server->smbd_conn->id->route.addr;
+> +		seq_printf(m, "\n\t\tIP addr: dst: %pISpc, src: %pISpc",
+> +			   &addr->dst_addr, &addr->src_addr);
+> +	}
+> +
+> +skip_rdma:
+> +#endif
+
+The goto is no longer necessary when removing above #ifdef.
+
+> +	if (server->ssocket) {
+> +		struct sockaddr src;
+> +		int addrlen;
+> +
+> +		addrlen = kernel_getsockname(server->ssocket, &src);
+> +		if (addrlen != sizeof(struct sockaddr_in) &&
+> +		    addrlen != sizeof(struct sockaddr_in6))
+> +			return;
+> +
+> +		seq_printf(m, "\n\t\tIP addr: dst: %pISpc, src: %pISpc",
+> +			   &server->dstaddr, &src);
+> +	}
+>  }
+>  
+>  static inline const char *smb_speed_to_str(size_t bps)
+> @@ -279,7 +306,7 @@ static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
+>  static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+>  {
+>  	struct mid_q_entry *mid_entry;
+> -	struct TCP_Server_Info *server;
+> +	struct TCP_Server_Info *server, *nserver;
+>  	struct TCP_Server_Info *chan_server;
+>  	struct cifs_ses *ses;
+>  	struct cifs_tcon *tcon;
+> @@ -336,7 +363,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+>  
+>  	c = 0;
+>  	spin_lock(&cifs_tcp_ses_lock);
+> -	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+> +	list_for_each_entry_safe(server, nserver, &cifs_tcp_ses_list, tcp_ses_list) {
+>  		/* channel info will be printed as a part of sessions below */
+>  		if (SERVER_IS_CHAN(server))
+>  			continue;
+> @@ -414,8 +441,39 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+>  		seq_printf(m, "\nMR mr_ready_count: %x mr_used_count: %x",
+>  			atomic_read(&server->smbd_conn->mr_ready_count),
+>  			atomic_read(&server->smbd_conn->mr_used_count));
+> +		if (server->smbd_conn->id) {
+> +			struct rdma_addr *addr =
+> +				&server->smbd_conn->id->route.addr;
+> +			seq_printf(m, "\nIP addr: dst: %pISpc, src: %pISpc",
+> +				   &addr->dst_addr, &addr->src_addr);
+> +		}
+>  skip_rdma:
+>  #endif
+> +		if (server->ssocket) {
+> +			struct sockaddr src;
+> +			int addrlen;
+> +
+> +			/* kernel_getsockname can block. so drop the lock first */
+> +			server->srv_count++;
+> +			spin_unlock(&cifs_tcp_ses_lock);
+> +
+> +			addrlen = kernel_getsockname(server->ssocket, &src);
+> +			if (addrlen != sizeof(struct sockaddr_in) &&
+> +			    addrlen != sizeof(struct sockaddr_in6)) {
+> +				cifs_put_tcp_session(server, 0);
+> +				spin_lock(&cifs_tcp_ses_lock);
+> +
+> +				goto skip_addr_details;
+> +			}
+
+What about
+
+			addrlen = kernel_getsockname(server->ssocket, &src);
+			if (addrlen == sizeof(struct sockaddr_in) &&
+			    addrlen == sizeof(struct sockaddr_in6)) {
+                                seq_printf(m, "\nIP addr: dst: %pISpc, src: %pISpc",
+				           &server->dstaddr, &src);
+                                cifs_put_tcp_session(server, 0);
+                                spin_lock(&cifs_tcp_ses_lock);
+                        }
+
+> +
+> +			seq_printf(m, "\nIP addr: dst: %pISpc, src: %pISpc",
+> +				   &server->dstaddr, &src);
+> +
+> +			cifs_put_tcp_session(server, 0);
+> +			spin_lock(&cifs_tcp_ses_lock);
+> +		}
+> +
+> +skip_addr_details:
+
+Then you can get rid of this goto as well.
+
+>  		seq_printf(m, "\nNumber of credits: %d,%d,%d Dialect 0x%x",
+>  			server->credits,
+>  			server->echo_credits,
+> @@ -515,7 +573,18 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+>  				seq_printf(m, "\n\n\tExtra Channels: %zu ",
+>  					   ses->chan_count-1);
+>  				for (j = 1; j < ses->chan_count; j++) {
+> +					/*
+> +					 * kernel_getsockname can block inside
+> +					 * cifs_dump_channel. so drop the lock first
+> +					 */
+> +					server->srv_count++;
+> +					spin_unlock(&cifs_tcp_ses_lock);
+> +
+>  					cifs_dump_channel(m, j, &ses->chans[j]);
+> +
+> +					cifs_put_tcp_session(server, 0);
+> +					spin_lock(&cifs_tcp_ses_lock);
+
+Here you are re-acquiring @cifs_tcp_ses_lock spinlock under
+@ses->chan_lock, which will introduce deadlocks in threads calling
+cifs_match_super(), cifs_signal_cifsd_for_reconnect(),
+cifs_mark_tcp_ses_conns_for_reconnect(), cifs_find_smb_ses(), ...
