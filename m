@@ -2,57 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9E7C4332F
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Nov 2023 03:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A34C4332F
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Nov 2023 03:30:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232094AbjKADaZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Oct 2023 23:30:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38110 "EHLO
+        id S231332AbjKADag (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Oct 2023 23:30:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231924AbjKADaY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Oct 2023 23:30:24 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D00B9
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 20:30:20 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-507c1936fd5so490640e87.1
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 20:30:19 -0700 (PDT)
+        with ESMTP id S231164AbjKADae (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Oct 2023 23:30:34 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CEDFB9
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 20:30:31 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-507b96095abso9120977e87.3
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 20:30:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698809418; x=1699414218; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698809430; x=1699414230; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rLy+eCHcpUx16byVdIwKtNlDqZnO2zFS+DqgVGCMlRQ=;
-        b=IvBNWPrc44BpqvMKv7HxRzlZOw8GZnOI0U01slSCuscGRyV+Ue4reaFPDEPbYJNfj9
-         j8+pCABR1jlgZQwUtBpp6T1oFE+AuJgsLQRJ68IPKofyveUGAhgyZXf2VWhjDijvo8WK
-         cYis3JqZfIDmukZMYFKHs33GHYn5OnjR9hDCbyjI3ENIyRBpCUXLgdGn8zcc1KNOR0if
-         yVbg30I8D+W52K5MTncMJOw+2JTIUpyVFQLz+ZBIUok1OqGNunnu3SnwSlf8VXlAM97X
-         +DR/iGURsd24lQQszEf0DmuH9/SMbOK2n6P0J1Z5n1urGA5mx+04GnEqBtYYFTpkRsS8
-         OCkg==
+        bh=1w+A+Y7vAyEUSxzUUH3ttu6AnCktzZEmWLeostJbBXM=;
+        b=Z5acprlBm8mHTSDIzSoRhDT0r2boN+27qTglVAmIYxow/Lcu9TI98A92okAbX+C7m4
+         JRc2XXe7jUmjQoq7Ox9NNqGV3RiCsl143iFCiyH52BK6HgMnUHNw1vf9t/GuKjWZYScR
+         IfKAi5IngJhzBNYBo12u5iLH1QcleYC55Fyb0ECUGBl9a5tZFK0+fFgIPvIbMgvScpSB
+         XnnpDXbIWyfyQ+FGGFYu7QPSZLLamO86IHZi9ThEiJaqiwMDQpo80Yiyztc9YRELCG2/
+         +bX+XQ2kxwjc4VlipPttEebVA/mMItZyMIQ8+aVuUVMWr/DwasDuneNE7MV+qPbIESP+
+         SveA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698809418; x=1699414218;
+        d=1e100.net; s=20230601; t=1698809430; x=1699414230;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rLy+eCHcpUx16byVdIwKtNlDqZnO2zFS+DqgVGCMlRQ=;
-        b=cy2/0/wDrd1VnJ/qjPTGUIcXQxV7KARbqS1ZYKm81DKwBWL2BXMFhXMIXzXDROGFK4
-         sVIkKkb1C30LnEt8L1i4dpzquLt/9QG8BC8Y3TjD+3YlDvgxq1g36NC7tGEza/ajBgud
-         JKC8yXODDBnAbp2XBYEbcRMik9MhRxcixKDOm7MqfFnaz6+oYQl32h29wPT1pB7EM2wx
-         aETPEcZqDB7/NgikQR1pJJH2ZEEldpNLhse+kVFF7KqSJql5d+J3CWWUVHfpOJYnO+dh
-         zvTE/Nn5u9DxcAEU7WY6aw2w8mxAEmTlXxYu0QX2DhTScxdtaWy57awO6okHgxkZtEc4
-         mLgQ==
-X-Gm-Message-State: AOJu0YzRU7U5H/5jG8UUB35AOBNx1IkFNjkhPeD94l2zY0JsYlHhpjQQ
-        PJxucBFOxd0LjUg05O/b37bP45sB2KlTQOFmPCM=
-X-Google-Smtp-Source: AGHT+IHUVS8tDlzZg5rEylJLIYbSfbXh+kZSZHVsFyipMB56sKcOMYc16u1hM+NWsUw8jePCU1NvkTMCRvANiBlDpnE=
-X-Received: by 2002:a05:6512:ac6:b0:4fd:c8fb:eb71 with SMTP id
- n6-20020a0565120ac600b004fdc8fbeb71mr1876042lfu.11.1698809417675; Tue, 31 Oct
- 2023 20:30:17 -0700 (PDT)
+        bh=1w+A+Y7vAyEUSxzUUH3ttu6AnCktzZEmWLeostJbBXM=;
+        b=Iqic2OhXro7Q6m4qP/P8qMB0swixyc3klaZmrrwzUE7zg2uHFnOnudP3qI5cpYikvq
+         TlqTnJbxwtYoMtM6os3EMRC+Qj1MFct6Iac9jLGXYXWI7K3YMacYDuqnL8XX0jOflYQF
+         RSJwXw2+rrOcVqON+79z5+9VVjqWYjy6+R+yl3JVZzpzf2oFT9vMP6r2yYmHw0mAyqZB
+         1omyb1n6yRnRCqxULE9cCC+f5y0EiuvmsQhnPaZEDLA4QsAQ/8Bbw1VCqLYIIUUfD596
+         s/aslZogWYwvkziKNsRdjOY4Avw8Jlc3zYzLW5kktkzxEV+sXNf05DpGk9gS8hKPKDNt
+         KVfA==
+X-Gm-Message-State: AOJu0Yw8UfLeb4ZxZC+2rq7W2onkIbMrFBMuRIfWCQtFO2r493uO0QWV
+        Hbem1pCmo24rwOx+if3lo/B/yLARvmJwXmtwVAA=
+X-Google-Smtp-Source: AGHT+IFjq/TuOC4saa2EKikrUIsEW9tCElB+OWcXxVjA+DeundYIFdB0Ptb0k4n+yNmdZKUzvyLcNEhl2Mt1YfsFxrs=
+X-Received: by 2002:a05:6512:2345:b0:507:a766:ad29 with SMTP id
+ p5-20020a056512234500b00507a766ad29mr13604932lfu.12.1698809429122; Tue, 31
+ Oct 2023 20:30:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20231030110020.45627-1-sprasad@microsoft.com> <20231030110020.45627-11-sprasad@microsoft.com>
-In-Reply-To: <20231030110020.45627-11-sprasad@microsoft.com>
+References: <20231030110020.45627-1-sprasad@microsoft.com> <20231030110020.45627-9-sprasad@microsoft.com>
+In-Reply-To: <20231030110020.45627-9-sprasad@microsoft.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 31 Oct 2023 22:30:06 -0500
-Message-ID: <CAH2r5msNBJd2aSp9X8C3PChRvJN87ztq_478XiM6NG9ahha1wQ@mail.gmail.com>
-Subject: Re: [PATCH 11/14] cifs: handle when server starts supporting multichannel
+Date:   Tue, 31 Oct 2023 22:30:17 -0500
+Message-ID: <CAH2r5mvHPRjWwY9vVaFtEiOHh87vttNCUnkGpx3tH+XsXyMiFw@mail.gmail.com>
+Subject: Re: [PATCH 09/14] cifs: add a back pointer to cifs_sb from tcon
 To:     nspmangalore@gmail.com
 Cc:     pc@manguebit.com, bharathsm.hsk@gmail.com,
         linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
@@ -70,124 +70,64 @@ On Mon, Oct 30, 2023 at 6:00=E2=80=AFAM <nspmangalore@gmail.com> wrote:
 >
 > From: Shyam Prasad N <sprasad@microsoft.com>
 >
-> When the user mounts with multichannel option, but the
-> server does not support it, there can be a time in future
-> where it can be supported.
+> Today, we have no way to access the cifs_sb when we
+> just have pointers to struct tcon. This is very
+> limiting as many functions deal with cifs_sb, and
+> these calls do not directly originate from VFS.
 >
-> With this change, such a case is handled.
+> This change introduces a new cifs_sb field in cifs_tcon
+> that points to the cifs_sb for the tcon. The assumption
+> here is that a tcon will always map to this cifs_sb and
+> will never change.
+>
+> Also, refcounting should not be necessary, since cifs_sb
+> will never be freed before tcon.
 >
 > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 > ---
->  fs/smb/client/cifsproto.h |  4 ++++
->  fs/smb/client/connect.c   |  6 +++++-
->  fs/smb/client/smb2pdu.c   | 31 ++++++++++++++++++++++++++++---
->  3 files changed, 37 insertions(+), 4 deletions(-)
+>  fs/smb/client/cifsglob.h | 1 +
+>  fs/smb/client/connect.c  | 2 ++
+>  2 files changed, 3 insertions(+)
 >
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index 65c84b3d1a65..5a4c1f1e0d91 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -132,6 +132,10 @@ extern int SendReceiveBlockingLock(const unsigned in=
-t xid,
->                         struct smb_hdr *in_buf,
->                         struct smb_hdr *out_buf,
->                         int *bytes_returned);
-> +
-> +void
-> +smb2_query_server_interfaces(struct work_struct *work);
-> +
->  void
->  cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
->                                       bool all_channels);
+> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+> index 81e7a45f413d..cdbc2cd207dc 100644
+> --- a/fs/smb/client/cifsglob.h
+> +++ b/fs/smb/client/cifsglob.h
+> @@ -1134,6 +1134,7 @@ struct cifs_tcon {
+>         int tc_count;
+>         struct list_head rlist; /* reconnect list */
+>         spinlock_t tc_lock;  /* protect anything here that is not protect=
+ed */
+> +       struct cifs_sb_info *cifs_sb; /* back pointer to cifs super block=
+ */
+>         atomic_t num_local_opens;  /* num of all opens including disconne=
+cted */
+>         atomic_t num_remote_opens; /* num of all network opens on server =
+*/
+>         struct list_head openFileList;
 > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index e71aa33bf026..149cde77500e 100644
+> index 8393977e21ee..184075da5c6e 100644
 > --- a/fs/smb/client/connect.c
 > +++ b/fs/smb/client/connect.c
-> @@ -116,7 +116,8 @@ static int reconn_set_ipaddr_from_hostname(struct TCP=
-_Server_Info *server)
->         return rc;
->  }
->
-> -static void smb2_query_server_interfaces(struct work_struct *work)
-> +void
-> +smb2_query_server_interfaces(struct work_struct *work)
->  {
->         int rc;
->         int xid;
-> @@ -134,6 +135,9 @@ static void smb2_query_server_interfaces(struct work_=
-struct *work)
->         if (rc) {
->                 cifs_dbg(FYI, "%s: failed to query server interfaces: %d\=
-n",
->                                 __func__, rc);
-> +
-> +               if (rc =3D=3D -EOPNOTSUPP)
-> +                       return;
->         }
->
->         queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index b7665155f4e2..2617437a4627 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -163,6 +163,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon =
-*tcon,
->         int rc =3D 0;
->         struct nls_table *nls_codepage =3D NULL;
->         struct cifs_ses *ses;
-> +       int xid;
->
->         /*
->          * SMB2s NegProt, SessSetup, Logoff do not have tcon yet so
-> @@ -307,17 +308,41 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tco=
-n *tcon,
->                 tcon->need_reopen_files =3D true;
->
->         rc =3D cifs_tree_connect(0, tcon, nls_codepage);
-> -       mutex_unlock(&ses->session_mutex);
->
->         cifs_dbg(FYI, "reconnect tcon rc =3D %d\n", rc);
->         if (rc) {
->                 /* If sess reconnected but tcon didn't, something strange=
- ... */
-> +               mutex_unlock(&ses->session_mutex);
->                 cifs_dbg(VFS, "reconnect tcon failed rc =3D %d\n", rc);
+> @@ -3355,6 +3355,7 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_=
+ctx)
+>                 tcon =3D NULL;
 >                 goto out;
 >         }
+> +       tcon->cifs_sb =3D cifs_sb;
 >
-> -       if (smb2_command !=3D SMB2_INTERNAL_CMD)
-> -               mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
-> +       if (!rc &&
-> +           (server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
-> +               mutex_unlock(&ses->session_mutex);
-> +
-> +               /*
-> +                * query server network interfaces, in case they change
-> +                */
-> +               xid =3D get_xid();
-> +               rc =3D SMB3_request_interfaces(xid, tcon, false);
-> +               free_xid(xid);
-> +
-> +               if (rc)
-> +                       cifs_dbg(FYI, "%s: failed to query server interfa=
-ces: %d\n",
-> +                                __func__, rc);
-> +
-> +               if (ses->chan_max > ses->chan_count &&
-> +                   !SERVER_IS_CHAN(server)) {
-> +                       if (ses->chan_count =3D=3D 1)
-> +                               cifs_dbg(VFS, "server %s supports multich=
-annel now\n",
-> +                                        ses->server->hostname);
-> +
-> +                       cifs_try_adding_channels(tcon->cifs_sb, ses);
-> +               }
-> +       } else {
-> +               mutex_unlock(&ses->session_mutex);
-> +       }
+>         /* if new SMB3.11 POSIX extensions are supported do not remap / a=
+nd \ */
+>         if (tcon->posix_extensions)
+> @@ -3986,6 +3987,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, k=
+uid_t fsuid)
+>                 cifs_put_smb_ses(ses);
+>                 goto out;
+>         }
+> +       tcon->cifs_sb =3D cifs_sb;
 >
->         atomic_inc(&tconInfoReconnectCount);
->  out:
+>  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+>         if (cap_unix(ses))
 > --
 > 2.34.1
 >
