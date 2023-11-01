@@ -2,58 +2,57 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B62FC4332F
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Nov 2023 03:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9AFEC4332F
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Nov 2023 03:14:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbjKADOU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Oct 2023 23:14:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55542 "EHLO
+        id S229873AbjKADOq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Oct 2023 23:14:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229873AbjKADOU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Oct 2023 23:14:20 -0400
+        with ESMTP id S229850AbjKADOp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Oct 2023 23:14:45 -0400
 Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53709E8
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 20:14:16 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-507c78d258fso9147021e87.2
-        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 20:14:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09C43A4
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 20:14:43 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-507d7b73b74so8662330e87.3
+        for <linux-cifs@vger.kernel.org>; Tue, 31 Oct 2023 20:14:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698808454; x=1699413254; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1698808481; x=1699413281; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5Wy/GlBNQRCsMLyXWA/sPihYfn3p1I2JDT7U84EplO8=;
-        b=DB5Mz/QAtqsfNCW9IDBdQBaLAL9Bikr4CdQqm0tNe1U09v87jmdvQPpLYfdjGOOJb4
-         GymSV6y+fvc2DZ44BtMyP3Z2adriqdcwPlOotFL3HIg8wT4E4MQKX89jIHeErhkGUKWH
-         V585mBf81TKr9gmQc8b+I2oWlSmWaApHAcD2purUWmHjIXg5XhWz6ZfjAumSPXgeXlw3
-         dnfKZY9XBj+Jro/u39OuJajK1M37iBNytARCCUbjtozgrscqO2hkJ0/RfyGi5tSAGsOu
-         ZEQBywSGGfWKuwj0JC9q834A2YVJeyXK9b4F69IzQZFOrzX6auwVyz6l+CgLwD4Ao8cS
-         HNeQ==
+        bh=WD9CCz2w2BJxavVMsiWxRTfjo/DA5qmyHMhCIutfnMw=;
+        b=fQqEiWJkZN+7UoUx+WpjgBOdYv5T9cSM9DEN/E0IEh7KmUAyJidj/t9QwsRsQBZcJa
+         bYRz79qoTQzpUy2F5UlXeFaERJIBDs0lEU7W+4DeOIUlvWK8Fe/taydOy2ccN4cfR9DH
+         W2HzBpEWPrhmNDhUYl3zSgBJPii+lY5Ptc38l9NaS6r9YZ+huTI0uSdDuIfiIMQ6B+wq
+         ki0bhBH0FsF53kAF55G1eEYp04Dm+QCyU0357+/4jyQCvJ/UllEpoj/d+jSz6dEmb75i
+         2QPpUwrZDBY9o2lG4OGswmmI/CBnNeYSXzdSgLpl5Xqpkp7vNc2GPPHX8aVnMx8B6bF3
+         C5ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698808454; x=1699413254;
+        d=1e100.net; s=20230601; t=1698808481; x=1699413281;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5Wy/GlBNQRCsMLyXWA/sPihYfn3p1I2JDT7U84EplO8=;
-        b=N2zOBiF4OadhYzoglXI8xT5GmlgGEiK8fCWBxVLTNK66sTToLYK9PiagGmbi65U8ff
-         fcTCbXQ6hce1vUgLCh3FPD5UEi2EIZrT0vFArPrfMbOfu5NfUQdVhuZKZKVQwBobiDo9
-         3hn+JtVCwxqjQf5iqP0wxJ2YXBPcWRs/zKYVnXYSDqGTxSp8JLldOtjNEgMJ5RYulMUC
-         kaWWsb9ZuANlWObL9eLEmNgYVaZGCzXlXL1iDknxUPTMb/nl+m3s83/Yl/ZwSCu7Sfxu
-         5HkmEcEFn7BUzZB7CVnStieFJRdMag0LQ5P7ivPNsHa4mHtzrueQp5ug+5eGYbRXEv5v
-         FyXA==
-X-Gm-Message-State: AOJu0YxSCqB2CCdpU5rQ/z/DqeOTKCc4xVe4P8AfcKS5qLVaPXCrT1ao
-        XC9DL9pcYey3KBDAf8+VQq0Z3HyrIfEWUVk17lc=
-X-Google-Smtp-Source: AGHT+IE0igpuxb1NasC/1iSn1QUQXvftxnCMolW9hU/AOEZY11ro+hTi5Q3k0SOLIWUIOTxXMtc5fkPjVjMK47xKDNc=
-X-Received: by 2002:ac2:5de1:0:b0:503:19d9:4b6f with SMTP id
- z1-20020ac25de1000000b0050319d94b6fmr10843127lfq.0.1698808454048; Tue, 31 Oct
- 2023 20:14:14 -0700 (PDT)
+        bh=WD9CCz2w2BJxavVMsiWxRTfjo/DA5qmyHMhCIutfnMw=;
+        b=BsK1a3ynBRMu5cJz0zQrvDLYAQytuCIh01rOP4AtKDO+Nh+TckGdAFXNOKjqx3otaa
+         sH1ynNG6wwHi4codiTVBSaPk4py8rboyiVPAXo+KeNIGccMGhL1YCc6vUx17loqYKXpN
+         Cn4WPZCpIjy16k21bqUj8kcK5VgWx7dp6Xp+DovQC9A6fsWS+6LjP3gpWUpGjPqdSHDY
+         v6xpG4ASxJB5WI3Vqa6ZxKz4G0nEOg2s6om7jT7YlZ1IEpKG91qi79g1mu6agqeD/KmZ
+         R1oQjaOywbrzm2UT6I+3XUILTUI5tPJR15Z98AR+enUwziJQ0i4IOfvSyVy+cditZX72
+         szeg==
+X-Gm-Message-State: AOJu0YymWmy1eZqzMu8e1U6EZSqEYe6p+EjF6e8kLdJxpqTwYUQ3DAWj
+        12qUlKPc7ivIzm7vkFXy8uT1Ose8asiIy31UBjY=
+X-Google-Smtp-Source: AGHT+IGABJALALnmrOw4V1pEf5dICBKXYtEkyzWB2Y1QFGHJo9GTeP8wMYThxnN7HKwLxSzoAzpdm3VxZhpmc7tgO0k=
+X-Received: by 2002:ac2:4c82:0:b0:507:9a33:f105 with SMTP id
+ d2-20020ac24c82000000b005079a33f105mr9389358lfl.69.1698808481017; Tue, 31 Oct
+ 2023 20:14:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <20231030110020.45627-1-sprasad@microsoft.com> <20231030110020.45627-4-sprasad@microsoft.com>
-In-Reply-To: <20231030110020.45627-4-sprasad@microsoft.com>
+References: <20231030110020.45627-1-sprasad@microsoft.com> <20231030110020.45627-5-sprasad@microsoft.com>
+In-Reply-To: <20231030110020.45627-5-sprasad@microsoft.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 31 Oct 2023 22:14:02 -0500
-Message-ID: <CAH2r5msi2OfU6GtkdvSZLc2SR3tXWpsv8+KRZiTKs=k65-P+=w@mail.gmail.com>
-Subject: Re: [PATCH 04/14] cifs: do not reset chan_max if multichannel is not
- supported at mount
+Date:   Tue, 31 Oct 2023 22:14:29 -0500
+Message-ID: <CAH2r5muuT6TCqxsa9_v-DAX+D31JWTQi7DM4Dzwf8qhSB27oww@mail.gmail.com>
+Subject: Re: [PATCH 05/14] cifs: force interface update before a fresh session setup
 To:     nspmangalore@gmail.com
 Cc:     pc@manguebit.com, bharathsm.hsk@gmail.com,
         linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
@@ -71,35 +70,37 @@ On Mon, Oct 30, 2023 at 6:00=E2=80=AFAM <nspmangalore@gmail.com> wrote:
 >
 > From: Shyam Prasad N <sprasad@microsoft.com>
 >
-> If the mount command has specified multichannel as a mount option,
-> but multichannel is found to be unsupported by the server at the time
-> of mount, we set chan_max to 1. Which means that the user needs to
-> remount the share if the server starts supporting multichannel.
->
-> This change removes this reset. What it means is that if the user
-> specified multichannel or max_channels during mount, and at this
-> time, multichannel is not supported, but the server starts supporting
-> it at a later point, the client will be capable of scaling out the
-> number of channels.
+> During a session reconnect, it is possible that the
+> server moved to another physical server (happens in case
+> of Azure files). So at this time, force a query of server
+> interfaces again (in case of multichannel session), such
+> that the secondary channels connect to the right
+> IP addresses (possibly updated now).
 >
 > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 > ---
->  fs/smb/client/sess.c | 1 -
->  1 file changed, 1 deletion(-)
+>  fs/smb/client/connect.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> index 79f26c560edf..c899b05c92f7 100644
-> --- a/fs/smb/client/sess.c
-> +++ b/fs/smb/client/sess.c
-> @@ -186,7 +186,6 @@ int cifs_try_adding_channels(struct cifs_sb_info *cif=
-s_sb, struct cifs_ses *ses)
->         }
+> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> index c993c7a3415a..97c9a32cff36 100644
+> --- a/fs/smb/client/connect.c
+> +++ b/fs/smb/client/connect.c
+> @@ -3854,8 +3854,12 @@ cifs_setup_session(const unsigned int xid, struct =
+cifs_ses *ses,
+>         is_binding =3D !CIFS_ALL_CHANS_NEED_RECONNECT(ses);
+>         spin_unlock(&ses->chan_lock);
 >
->         if (!(server->capabilities & SMB2_GLOBAL_CAP_MULTI_CHANNEL)) {
-> -               ses->chan_max =3D 1;
->                 spin_unlock(&ses->chan_lock);
->                 cifs_server_dbg(VFS, "no multichannel support\n");
->                 return 0;
+> -       if (!is_binding)
+> +       if (!is_binding) {
+>                 ses->ses_status =3D SES_IN_SETUP;
+> +
+> +               /* force iface_list refresh */
+> +               ses->iface_last_update =3D 0;
+> +       }
+>         spin_unlock(&ses->ses_lock);
+>
+>         /* update ses ip_addr only for primary chan */
 > --
 > 2.34.1
 >
