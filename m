@@ -2,261 +2,162 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D925C4332F
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Nov 2023 14:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9B5C4167D
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Nov 2023 15:52:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233876AbjKAOTz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Nov 2023 10:19:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54996 "EHLO
+        id S230091AbjKAPwr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Nov 2023 11:52:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229980AbjKAOTz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Nov 2023 10:19:55 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A45D10F
-        for <linux-cifs@vger.kernel.org>; Wed,  1 Nov 2023 07:19:47 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-53e2dc8fa02so11891827a12.2
-        for <linux-cifs@vger.kernel.org>; Wed, 01 Nov 2023 07:19:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698848386; x=1699453186; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pqqN9abM+9vLvesc7JZh1YpolZ9R2mnAgODH/2OVCrM=;
-        b=mEaLKRtWk8rvzMM0Grhn/w8yHLZ0D2+OPnb5JvN9WojwuAXO+cTwwhtZs//ieksadF
-         e43OWOEYzmjV5gwl1BwvSvv9yTinmO7wHr44UqECsYeUvMiXQV18nM1w9vhz/JAn4Zmu
-         0JpFntQRpgTMh7qEr5rW+DJ3JBA+NoolF6FzhbiV5wFMudGA8o+4eZZk/wO80Pa61X9e
-         ptDlFU/NLu4+ijWh3RPvNsjj4V15wifHfrrYnCs0WMxyr7+slqa1uVbaoCytIfBUozy2
-         s5cFGKAXjMNYZ9BQ6Z3EoEx+lnEzHAtWwEJVThtzFiKTFzbHuIubOzlpP9/53n19JFJd
-         VH9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698848386; x=1699453186;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pqqN9abM+9vLvesc7JZh1YpolZ9R2mnAgODH/2OVCrM=;
-        b=OH8pRMCSA73Ax3PSQHgZHppa6oiKFJoKKOeaoFdYKrc65Rn+Sueq0nRK5sjLw5mrwV
-         p7eMr+lPOsfgTgNirvSz0Xp0t56WvSdmf1s06JYhp8NvWIKr4FUoS8H5/dX65gF+OAJ0
-         ckWx9x2YvG4eU8JSX13dANS+dp7vMiM0XktOQNN+e0h/+Y+MwyJYA9t87uCAIviyMmET
-         LuBeN0WHzn9ayLSx/KPDZgceuLUqVuXAIgy4/cPEG2vYUaicvV/KzE5YmHx2nBLAVIvN
-         iGAoItrJgE/nvl59hRxpXW9iZSZxLs4zMkhUnaKKwDsY5FlwSoCtrlEigl9gW3EjCsmA
-         p7BA==
-X-Gm-Message-State: AOJu0YzDTZkWRNiJdqU0ZM4JM+MZU249Z2aH+aLscdbo33/oLZny8m/p
-        qOrHImVi2FU4bvc9v3l2XW7YYs+CT99BUdGCZRs=
-X-Google-Smtp-Source: AGHT+IHfXtsgRvXzoSCAd4nrLSLeoeTUlnAZsqFBM9h1SgkcriD1S6tmMsCUZkg/6hnW6qVIhf+vZ5K+ilf7xzEQLLo=
-X-Received: by 2002:a50:8e58:0:b0:543:3df8:cc95 with SMTP id
- 24-20020a508e58000000b005433df8cc95mr6427638edx.9.1698848385597; Wed, 01 Nov
- 2023 07:19:45 -0700 (PDT)
+        with ESMTP id S229498AbjKAPwq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Nov 2023 11:52:46 -0400
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE353E4
+        for <linux-cifs@vger.kernel.org>; Wed,  1 Nov 2023 08:52:40 -0700 (PDT)
+Message-ID: <412fe393cd49401e26a5624f0290eb43.pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1698853958;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=roc3salG/iBzdCTw02HYKXBTEjo+ITZiLo5IAP3KDc4=;
+        b=JRgET8dn74KCYwx+aO0W8df59rPdHfCjnxEV2zoKBVIILgAGIvx6bzfzI3gjD+HRHFxmNa
+        FhvWII0amjwBb6e0FCWDPFfV+ISbAxANUrpyv3UvJhc5WabP/RUqijFWFf65/wB2vs6Sod
+        gvD+Gnu34cejnat1Ju4wHbOvYchBlIPdXfzy5FWS1KBRsLXxjvmvkR72jUym2ffzggOuZr
+        8ARzfo/Z3ldwfvNXTGR/cxPuZpzrvBtg+iZ9Bfmb8vxGgFYHDZpHXFYcbL5DT8Wy+lI//M
+        tqaXEFsO8LlRTKx1BnR30TJ9GE1n954wnt2h4+mTbOLCA4kbnLGnFTMFuQj1Jg==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1698853958; a=rsa-sha256;
+        cv=none;
+        b=NPZyC8lfwkapX80p0FZzE9kY4PyfHjbWV0xWoqk4X6mh/uFNCYkEe3hMsjNF5EWvrXR63c
+        zwQ6tR6dfegfa+yEdpragWhN6xx749Udu8315xciW8Tyy8zyteVMOw0d6s3fhXhMmbV+6s
+        trxBwqUYoXBFwVcaSq3sy8FLkonyLfOrHzd6m+I/JNTCOJWMnnJZVaEombPoueQ+pAagv6
+        0xLbTCzb8DiABwWhvGqASug3ZQGI+9PQM7VRXwSTwfcgy17uDgd9w9lTkaZVkLpMawnnL/
+        OKK90eGPn/h5lBXSkcqHnRdnMLdLdxOY9/itM09TshcYENJT3l3HUQSRAoc58A==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+        s=dkim; t=1698853958;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=roc3salG/iBzdCTw02HYKXBTEjo+ITZiLo5IAP3KDc4=;
+        b=S6iOvaT/k/sFwUaEz95WDyhO0VaCxRJIhV4S3/no/K+CQPwiYDQ01ggCYDaOEBUcVWTfyO
+        fu5PDr1Gw0COK0naZVHvl2LNQQN72pA6kKmVTvg241768AtLRP/HL0vuiTkUqyuv0xj00a
+        9oLPtNkOK1p9R3mux3PWJ5AUBbTFCBx+tpf0pKDNq4f4ZAJgtawANDnA6Or6FzSHp7kWCk
+        ElT5Vu9fP6GidYjXWQY8Bb4cgyJ9AMp8lo+3jvKslQ0KkaM2oO7SHsrGhQVdZRK0QEnIDs
+        JZPotISbsCFHfgjBwxyKY0jCfUTRTyK8rNSmoHDidU6qVUSMYsODDvpmMPOnCg==
+From:   Paulo Alcantara <pc@manguebit.com>
+To:     nspmangalore@gmail.com, smfrench@gmail.com,
+        bharathsm.hsk@gmail.com, linux-cifs@vger.kernel.org
+Cc:     Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 11/14] cifs: handle when server starts supporting
+ multichannel
+In-Reply-To: <20231030110020.45627-11-sprasad@microsoft.com>
+References: <20231030110020.45627-1-sprasad@microsoft.com>
+ <20231030110020.45627-11-sprasad@microsoft.com>
+Date:   Wed, 01 Nov 2023 12:52:33 -0300
 MIME-Version: 1.0
-References: <20231030110020.45627-1-sprasad@microsoft.com> <20231030110020.45627-13-sprasad@microsoft.com>
- <d1c99946663662e7160bf1ed0a6b2dc6.pc@manguebit.com>
-In-Reply-To: <d1c99946663662e7160bf1ed0a6b2dc6.pc@manguebit.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 1 Nov 2023 09:19:34 -0500
-Message-ID: <CAH2r5msCUvq7S4jbw3iW2c3Gux20AGKscZypP2wO5ZMoJKbwXw@mail.gmail.com>
-Subject: Re: [PATCH 13/14] cifs: display the endpoint IP details in DebugData
-To:     Paulo Alcantara <pc@manguebit.com>
-Cc:     nspmangalore@gmail.com, bharathsm.hsk@gmail.com,
-        linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-removed this patch from for-next until patch updated to address this
+nspmangalore@gmail.com writes:
 
-On Wed, Nov 1, 2023 at 9:12=E2=80=AFAM Paulo Alcantara <pc@manguebit.com> w=
-rote:
+> From: Shyam Prasad N <sprasad@microsoft.com>
 >
-> Paulo Alcantara <pc@manguebit.com> writes:
+> When the user mounts with multichannel option, but the
+> server does not support it, there can be a time in future
+> where it can be supported.
 >
-> >> @@ -515,7 +573,18 @@ static int cifs_debug_data_proc_show(struct seq_f=
-ile *m, void *v)
-> >>                              seq_printf(m, "\n\n\tExtra Channels: %zu =
-",
-> >>                                         ses->chan_count-1);
-> >>                              for (j =3D 1; j < ses->chan_count; j++) {
-> >> +                                    /*
-> >> +                                     * kernel_getsockname can block i=
-nside
-> >> +                                     * cifs_dump_channel. so drop the=
- lock first
-> >> +                                     */
-> >> +                                    server->srv_count++;
-> >> +                                    spin_unlock(&cifs_tcp_ses_lock);
-> >> +
-> >>                                      cifs_dump_channel(m, j, &ses->cha=
-ns[j]);
-> >> +
-> >> +                                    cifs_put_tcp_session(server, 0);
-> >> +                                    spin_lock(&cifs_tcp_ses_lock);
-> >
-> > Here you are re-acquiring @cifs_tcp_ses_lock spinlock under
-> > @ses->chan_lock, which will introduce deadlocks in threads calling
-> > cifs_match_super(), cifs_signal_cifsd_for_reconnect(),
-> > cifs_mark_tcp_ses_conns_for_reconnect(), cifs_find_smb_ses(), ...
+> With this change, such a case is handled.
 >
-> A simple reproducer
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> ---
+>  fs/smb/client/cifsproto.h |  4 ++++
+>  fs/smb/client/connect.c   |  6 +++++-
+>  fs/smb/client/smb2pdu.c   | 31 ++++++++++++++++++++++++++++---
+>  3 files changed, 37 insertions(+), 4 deletions(-)
 >
->   $ mount.cifs //srv/share /mnt -o ...,multichannel
->   $ cat /proc/fs/cifs/DebugData
->
->   [ 1293.512572] BUG: sleeping function called from invalid context at ne=
-t/core/sock.c:3507
->   [ 1293.513915] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 1=
-068, name: cat
->   [ 1293.515381] preempt_count: 1, expected: 0
->   [ 1293.516321] RCU nest depth: 0, expected: 0
->   [ 1293.517294] 3 locks held by cat/1068:
->   [ 1293.518165]  #0: ffff88800818fc48 (&p->lock){+.+.}-{3:3}, at: seq_re=
-ad_iter+0x59/0x470
->   [ 1293.519383]  #1: ffff88800aed2b28 (&ret_buf->chan_lock){+.+.}-{2:2},=
- at: cifs_debug_data_proc_show+0x555/0xee0 [cifs]
->   [ 1293.520865]  #2: ffff888011c9a540 (sk_lock-AF_INET-CIFS){+.+.}-{0:0}=
-, at: inet_getname+0x29/0xa0
->   [ 1293.522098] CPU: 3 PID: 1068 Comm: cat Not tainted 6.6.0-rc7 #2
->   [ 1293.522901] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS=
- rel-1.16.2-3-gd478f380-rebuilt.opensuse.org 04/01/2014
->   [ 1293.524368] Call Trace:
->   [ 1293.524711]  <TASK>
->   [ 1293.525015]  dump_stack_lvl+0x64/0x80
->   [ 1293.525519]  __might_resched+0x173/0x280
->   [ 1293.526059]  lock_sock_nested+0x43/0x80
->   [ 1293.526578]  ? inet_getname+0x29/0xa0
->   [ 1293.527097]  inet_getname+0x29/0xa0
->   [ 1293.527584]  cifs_debug_data_proc_show+0xcf9/0xee0 [cifs]
->   [ 1293.528360]  seq_read_iter+0x118/0x470
->   [ 1293.528877]  proc_reg_read_iter+0x53/0x90
->   [ 1293.529419]  ? srso_alias_return_thunk+0x5/0x7f
->   [ 1293.530037]  vfs_read+0x201/0x350
->   [ 1293.530507]  ksys_read+0x75/0x100
->   [ 1293.530968]  do_syscall_64+0x3f/0x90
->   [ 1293.531461]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
->   [ 1293.532138] RIP: 0033:0x7f71d767e381
->   [ 1293.532630] Code: ff ff eb c3 e8 0e ea 01 00 90 90 90 90 90 90 90 90=
- 90 90 90 90 90 90 f3 0f 1e fa 90 90 80 3d a5 f6 0e 00 00 74 13 31 c0 0f 05=
- <48> 3d 00 f0 ff ff 77 57 c3 66 0f 1f 44 00 00 48 83 ec 28 48 89 54
->   [ 1293.535095] RSP: 002b:00007ffc312d65a8 EFLAGS: 00000246 ORIG_RAX: 00=
-00000000000000
->   [ 1293.536106] RAX: ffffffffffffffda RBX: 0000000000020000 RCX: 00007f7=
-1d767e381
->   [ 1293.537056] RDX: 0000000000020000 RSI: 00007f71d74f8000 RDI: 0000000=
-000000003
->   [ 1293.538003] RBP: 0000000000020000 R08: 00000000ffffffff R09: 0000000=
-000000000
->   [ 1293.538957] R10: 0000000000000022 R11: 0000000000000246 R12: 00007f7=
-1d74f8000
->   [ 1293.539908] R13: 0000000000000003 R14: 0000000000000000 R15: 0000000=
-000020000
->   [ 1293.540877]  </TASK>
->   [ 1293.541233]
->   [ 1293.541449] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->   [ 1293.542270] WARNING: possible circular locking dependency detected
->   [ 1293.543098] 6.6.0-rc7 #2 Tainted: G        W
->   [ 1293.543782] ------------------------------------------------------
->   [ 1293.544606] cat/1068 is trying to acquire lock:
->   [ 1293.545214] ffffffffc015b5f8 (&cifs_tcp_ses_lock){+.+.}-{2:2}, at: c=
-ifs_put_tcp_session+0x1c/0x180 [cifs]
->   [ 1293.546516]
->   [ 1293.546516] but task is already holding lock:
->   [ 1293.547292] ffff88800aed2b28 (&ret_buf->chan_lock){+.+.}-{2:2}, at: =
-cifs_debug_data_proc_show+0x555/0xee0 [cifs]
->   [ 1293.548454]
->   [ 1293.548454] which lock already depends on the new lock.
->   [ 1293.548454]
->   [ 1293.549350]
->   [ 1293.549350] the existing dependency chain (in reverse order) is:
->   [ 1293.550183]
->   [ 1293.550183] -> #1 (&ret_buf->chan_lock){+.+.}-{2:2}:
->   [ 1293.550899]        _raw_spin_lock+0x34/0x80
->   [ 1293.551401]        cifs_debug_data_proc_show+0x555/0xee0 [cifs]
->   [ 1293.552082]        seq_read_iter+0x118/0x470
->   [ 1293.552556]        proc_reg_read_iter+0x53/0x90
->   [ 1293.553054]        vfs_read+0x201/0x350
->   [ 1293.553490]        ksys_read+0x75/0x100
->   [ 1293.553925]        do_syscall_64+0x3f/0x90
->   [ 1293.554389]        entry_SYSCALL_64_after_hwframe+0x6e/0xd8
->   [ 1293.555004]
->   [ 1293.555004] -> #0 (&cifs_tcp_ses_lock){+.+.}-{2:2}:
->   [ 1293.555709]        __lock_acquire+0x1521/0x2660
->   [ 1293.556218]        lock_acquire+0xbf/0x2b0
->   [ 1293.556680]        _raw_spin_lock+0x34/0x80
->   [ 1293.557148]        cifs_put_tcp_session+0x1c/0x180 [cifs]
->   [ 1293.557773]        cifs_debug_data_proc_show+0xd15/0xee0 [cifs]
->   [ 1293.558463]        seq_read_iter+0x118/0x470
->   [ 1293.558945]        proc_reg_read_iter+0x53/0x90
->   [ 1293.559450]        vfs_read+0x201/0x350
->   [ 1293.559882]        ksys_read+0x75/0x100
->   [ 1293.560317]        do_syscall_64+0x3f/0x90
->   [ 1293.560773]        entry_SYSCALL_64_after_hwframe+0x6e/0xd8
->   [ 1293.561390]
->   [ 1293.561390] other info that might help us debug this:
->   [ 1293.561390]
->   [ 1293.562267]  Possible unsafe locking scenario:
->   [ 1293.562267]
->   [ 1293.562927]        CPU0                    CPU1
->   [ 1293.563394]        ----                    ----
->   [ 1293.563754]   lock(&ret_buf->chan_lock);
->   [ 1293.564068]                                lock(&cifs_tcp_ses_lock);
->   [ 1293.564573]                                lock(&ret_buf->chan_lock)=
-;
->   [ 1293.565077]   lock(&cifs_tcp_ses_lock);
->   [ 1293.565387]
->   [ 1293.565387]  *** DEADLOCK ***
->   [ 1293.565387]
->   [ 1293.565852] 2 locks held by cat/1068:
->   [ 1293.566147]  #0: ffff88800818fc48 (&p->lock){+.+.}-{3:3}, at: seq_re=
-ad_iter+0x59/0x470
->   [ 1293.566767]  #1: ffff88800aed2b28 (&ret_buf->chan_lock){+.+.}-{2:2},=
- at: cifs_debug_data_proc_show+0x555/0xee0 [cifs]
->   [ 1293.567611]
->   [ 1293.567611] stack backtrace:
->   [ 1293.567954] CPU: 3 PID: 1068 Comm: cat Tainted: G        W          =
-6.6.0-rc7 #2
->   [ 1293.568536] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS=
- rel-1.16.2-3-gd478f380-rebuilt.opensuse.org 04/01/2014
->   [ 1293.569387] Call Trace:
->   [ 1293.569585]  <TASK>
->   [ 1293.569755]  dump_stack_lvl+0x4a/0x80
->   [ 1293.570047]  check_noncircular+0x14e/0x170
->   [ 1293.570373]  ? save_trace+0x3e/0x390
->   [ 1293.570659]  __lock_acquire+0x1521/0x2660
->   [ 1293.570982]  lock_acquire+0xbf/0x2b0
->   [ 1293.571268]  ? cifs_put_tcp_session+0x1c/0x180 [cifs]
->   [ 1293.571687]  _raw_spin_lock+0x34/0x80
->   [ 1293.571977]  ? cifs_put_tcp_session+0x1c/0x180 [cifs]
->   [ 1293.572394]  cifs_put_tcp_session+0x1c/0x180 [cifs]
->   [ 1293.572795]  cifs_debug_data_proc_show+0xd15/0xee0 [cifs]
->   [ 1293.573241]  seq_read_iter+0x118/0x470
->   [ 1293.573546]  proc_reg_read_iter+0x53/0x90
->   [ 1293.573861]  ? srso_alias_return_thunk+0x5/0x7f
->   [ 1293.574218]  vfs_read+0x201/0x350
->   [ 1293.574489]  ksys_read+0x75/0x100
->   [ 1293.574752]  do_syscall_64+0x3f/0x90
->   [ 1293.575030]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
->   [ 1293.575428] RIP: 0033:0x7f71d767e381
->   [ 1293.575716] Code: ff ff eb c3 e8 0e ea 01 00 90 90 90 90 90 90 90 90=
- 90 90 90 90 90 90 f3 0f 1e fa 90 90 80 3d a5 f6 0e 00 00 74 13 31 c0 0f 05=
- <48> 3d 00 f0 ff ff 77 57 c3 66 0f 1f 44 00 00 48 83 ec 28 48 89 54
->   [ 1293.577151] RSP: 002b:00007ffc312d65a8 EFLAGS: 00000246 ORIG_RAX: 00=
-00000000000000
->   [ 1293.577736] RAX: ffffffffffffffda RBX: 0000000000020000 RCX: 00007f7=
-1d767e381
->   [ 1293.578286] RDX: 0000000000020000 RSI: 00007f71d74f8000 RDI: 0000000=
-000000003
->   [ 1293.578839] RBP: 0000000000020000 R08: 00000000ffffffff R09: 0000000=
-000000000
->   [ 1293.579391] R10: 0000000000000022 R11: 0000000000000246 R12: 00007f7=
-1d74f8000
->   [ 1293.579951] R13: 0000000000000003 R14: 0000000000000000 R15: 0000000=
-000020000
->   [ 1293.580511]  </TASK>
+> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+> index 65c84b3d1a65..5a4c1f1e0d91 100644
+> --- a/fs/smb/client/cifsproto.h
+> +++ b/fs/smb/client/cifsproto.h
+> @@ -132,6 +132,10 @@ extern int SendReceiveBlockingLock(const unsigned int xid,
+>  			struct smb_hdr *in_buf,
+>  			struct smb_hdr *out_buf,
+>  			int *bytes_returned);
+> +
+> +void
+> +smb2_query_server_interfaces(struct work_struct *work);
+> +
 
+Why are you exporting this?  smb2_query_server_interfaces() seems to be
+used only in fs/smb/client/connect.c.
 
+>  void
+>  cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
+>  				      bool all_channels);
+> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> index e71aa33bf026..149cde77500e 100644
+> --- a/fs/smb/client/connect.c
+> +++ b/fs/smb/client/connect.c
+> @@ -116,7 +116,8 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
+>  	return rc;
+>  }
+>  
+> -static void smb2_query_server_interfaces(struct work_struct *work)
+> +void
+> +smb2_query_server_interfaces(struct work_struct *work)
+>  {
 
---=20
-Thanks,
+Ditto.
 
-Steve
+>  	int rc;
+>  	int xid;
+> @@ -134,6 +135,9 @@ static void smb2_query_server_interfaces(struct work_struct *work)
+>  	if (rc) {
+>  		cifs_dbg(FYI, "%s: failed to query server interfaces: %d\n",
+>  				__func__, rc);
+> +
+> +		if (rc == -EOPNOTSUPP)
+> +			return;
+
+Maybe also get rid of cifs_dbg() when rc == -EOPNOTSUPP?
+
+>  	}
+>  
+>  	queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index b7665155f4e2..2617437a4627 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -163,6 +163,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+>  	int rc = 0;
+>  	struct nls_table *nls_codepage = NULL;
+>  	struct cifs_ses *ses;
+> +	int xid;
+>  
+>  	/*
+>  	 * SMB2s NegProt, SessSetup, Logoff do not have tcon yet so
+> @@ -307,17 +308,41 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+>  		tcon->need_reopen_files = true;
+>  
+>  	rc = cifs_tree_connect(0, tcon, nls_codepage);
+> -	mutex_unlock(&ses->session_mutex);
+>  
+>  	cifs_dbg(FYI, "reconnect tcon rc = %d\n", rc);
+>  	if (rc) {
+>  		/* If sess reconnected but tcon didn't, something strange ... */
+> +		mutex_unlock(&ses->session_mutex);
+>  		cifs_dbg(VFS, "reconnect tcon failed rc = %d\n", rc);
+>  		goto out;
+>  	}
+>  
+> -	if (smb2_command != SMB2_INTERNAL_CMD)
+> -		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
+
+Why are you removing this optimisation?  For example, session/tcon
+reconnect will no longer be triggered after returning back to userspace,
+only when next I/O comes in.
