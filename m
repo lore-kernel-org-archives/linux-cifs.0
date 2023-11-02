@@ -2,162 +2,112 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9B5C4167D
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Nov 2023 15:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5945CC4332F
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Nov 2023 02:46:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230091AbjKAPwr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Nov 2023 11:52:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48560 "EHLO
+        id S232622AbjKBCqX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Nov 2023 22:46:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjKAPwq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Nov 2023 11:52:46 -0400
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE353E4
-        for <linux-cifs@vger.kernel.org>; Wed,  1 Nov 2023 08:52:40 -0700 (PDT)
-Message-ID: <412fe393cd49401e26a5624f0290eb43.pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1698853958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=roc3salG/iBzdCTw02HYKXBTEjo+ITZiLo5IAP3KDc4=;
-        b=JRgET8dn74KCYwx+aO0W8df59rPdHfCjnxEV2zoKBVIILgAGIvx6bzfzI3gjD+HRHFxmNa
-        FhvWII0amjwBb6e0FCWDPFfV+ISbAxANUrpyv3UvJhc5WabP/RUqijFWFf65/wB2vs6Sod
-        gvD+Gnu34cejnat1Ju4wHbOvYchBlIPdXfzy5FWS1KBRsLXxjvmvkR72jUym2ffzggOuZr
-        8ARzfo/Z3ldwfvNXTGR/cxPuZpzrvBtg+iZ9Bfmb8vxGgFYHDZpHXFYcbL5DT8Wy+lI//M
-        tqaXEFsO8LlRTKx1BnR30TJ9GE1n954wnt2h4+mTbOLCA4kbnLGnFTMFuQj1Jg==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1698853958; a=rsa-sha256;
-        cv=none;
-        b=NPZyC8lfwkapX80p0FZzE9kY4PyfHjbWV0xWoqk4X6mh/uFNCYkEe3hMsjNF5EWvrXR63c
-        zwQ6tR6dfegfa+yEdpragWhN6xx749Udu8315xciW8Tyy8zyteVMOw0d6s3fhXhMmbV+6s
-        trxBwqUYoXBFwVcaSq3sy8FLkonyLfOrHzd6m+I/JNTCOJWMnnJZVaEombPoueQ+pAagv6
-        0xLbTCzb8DiABwWhvGqASug3ZQGI+9PQM7VRXwSTwfcgy17uDgd9w9lTkaZVkLpMawnnL/
-        OKK90eGPn/h5lBXSkcqHnRdnMLdLdxOY9/itM09TshcYENJT3l3HUQSRAoc58A==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1698853958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=roc3salG/iBzdCTw02HYKXBTEjo+ITZiLo5IAP3KDc4=;
-        b=S6iOvaT/k/sFwUaEz95WDyhO0VaCxRJIhV4S3/no/K+CQPwiYDQ01ggCYDaOEBUcVWTfyO
-        fu5PDr1Gw0COK0naZVHvl2LNQQN72pA6kKmVTvg241768AtLRP/HL0vuiTkUqyuv0xj00a
-        9oLPtNkOK1p9R3mux3PWJ5AUBbTFCBx+tpf0pKDNq4f4ZAJgtawANDnA6Or6FzSHp7kWCk
-        ElT5Vu9fP6GidYjXWQY8Bb4cgyJ9AMp8lo+3jvKslQ0KkaM2oO7SHsrGhQVdZRK0QEnIDs
-        JZPotISbsCFHfgjBwxyKY0jCfUTRTyK8rNSmoHDidU6qVUSMYsODDvpmMPOnCg==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     nspmangalore@gmail.com, smfrench@gmail.com,
-        bharathsm.hsk@gmail.com, linux-cifs@vger.kernel.org
-Cc:     Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 11/14] cifs: handle when server starts supporting
- multichannel
-In-Reply-To: <20231030110020.45627-11-sprasad@microsoft.com>
-References: <20231030110020.45627-1-sprasad@microsoft.com>
- <20231030110020.45627-11-sprasad@microsoft.com>
-Date:   Wed, 01 Nov 2023 12:52:33 -0300
+        with ESMTP id S231574AbjKBCqW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Nov 2023 22:46:22 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 970F283;
+        Wed,  1 Nov 2023 19:46:16 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5079f3f3d7aso507894e87.1;
+        Wed, 01 Nov 2023 19:46:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698893175; x=1699497975; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IQ5dYrRG7/rq9Ng5gsXj2Nv4rJ8MwiyXRaJl+IZPwvs=;
+        b=VXroKxYcDKD7M3aX8bVPpojTDNnLE0XBdUN5fJ747j/bLNDGsic23lhGR8x3axeGUr
+         WNGznUhUOiWs57VJRI2J7UmHTW6l5CnoQD7m1oHSkN53lGCf2E7mKmmPZ2jZZEI7ha9r
+         fKGzlhbkcLlR4lseovuJai95ZqZ4VwPKL4OG3ONJDVTTPENUFRAYUVSGyTn+HJAAmR9+
+         X3C3rRyM2a5EfpdHHXDAe8n4g5aneaqWQKZnnaRdcXRqmgJcVwwmtY++L7O0Sfe/qH9Y
+         eD9tEoIq7VZ75mqUH9NDbWEd9Jg6WFL8CxgCjstDz3hN9GubLkJimzqWBnnK4fcbX/kq
+         rT+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698893175; x=1699497975;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IQ5dYrRG7/rq9Ng5gsXj2Nv4rJ8MwiyXRaJl+IZPwvs=;
+        b=TmN0jc1d6229nW/Cnt1U/+O1XzTCIBMPEfDPogt51foPQKNRU6q06okzZAwsl4VDkz
+         Xjb2FWL8DoIwUs27HilLA5aOMbddTQQm6wg32K+BCea2xpZCx7OgAy6YOv93RCc22T9p
+         1/TXJMMJL+igv0Yi+v5ATdOPZwk2ySLvgeh126Q5swlHcn7R72pmcKcgxQ47+9wfHZdL
+         ryR8Sss7RuGhmgEnPr2rF7IoLuFT/D45cl1M2XdlhovP3Y60va+IAzX7pc7rPfyTMX3y
+         ejBBf1CMU95S4Yyf7DZXuDS9h3gD3Ctd/wYAJsbmgqPVuf6JYZ5hNp7Ssq5lDpTfkCHm
+         OSVg==
+X-Gm-Message-State: AOJu0Yy/4yrUE8y3/Z3CsvU8ihA2Cy7V3y8FhppKDHlwaZR4Je8Dbztb
+        AkX80+zxBVRFKiNneEtE0YA4wmqMcMNMaAM/2WI=
+X-Google-Smtp-Source: AGHT+IFx51rAWG2jZcULXoGk9fvZ08uUiypbGYzr1bmenajR80kkhxoBdA4NQF0LQMEJrXLPYWTmDf64aqiXevt4RS0=
+X-Received: by 2002:ac2:4db2:0:b0:509:441d:9bea with SMTP id
+ h18-20020ac24db2000000b00509441d9beamr1393598lfe.20.1698893174574; Wed, 01
+ Nov 2023 19:46:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 1 Nov 2023 21:46:03 -0500
+Message-ID: <CAH2r5muPW=PY1mDGqR-Mpfv95RbR7w6XpumoXpu7cdRv1HS0-A@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-nspmangalore@gmail.com writes:
+Please pull the following changes since commit
+05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1:
 
-> From: Shyam Prasad N <sprasad@microsoft.com>
->
-> When the user mounts with multichannel option, but the
-> server does not support it, there can be a time in future
-> where it can be supported.
->
-> With this change, such a case is handled.
->
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/cifsproto.h |  4 ++++
->  fs/smb/client/connect.c   |  6 +++++-
->  fs/smb/client/smb2pdu.c   | 31 ++++++++++++++++++++++++++++---
->  3 files changed, 37 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index 65c84b3d1a65..5a4c1f1e0d91 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -132,6 +132,10 @@ extern int SendReceiveBlockingLock(const unsigned int xid,
->  			struct smb_hdr *in_buf,
->  			struct smb_hdr *out_buf,
->  			int *bytes_returned);
-> +
-> +void
-> +smb2_query_server_interfaces(struct work_struct *work);
-> +
+  Linux 6.6-rc7 (2023-10-22 12:11:21 -1000)
 
-Why are you exporting this?  smb2_query_server_interfaces() seems to be
-used only in fs/smb/client/connect.c.
+are available in the Git repository at:
 
->  void
->  cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
->  				      bool all_channels);
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index e71aa33bf026..149cde77500e 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -116,7 +116,8 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
->  	return rc;
->  }
->  
-> -static void smb2_query_server_interfaces(struct work_struct *work)
-> +void
-> +smb2_query_server_interfaces(struct work_struct *work)
->  {
+  git://git.samba.org/ksmbd.git tags/6.7-rc-ksmbd-server-fixes
 
-Ditto.
+for you to fetch changes up to 67797da8a4b82446d42c52b6ee1419a3100d78ff:
 
->  	int rc;
->  	int xid;
-> @@ -134,6 +135,9 @@ static void smb2_query_server_interfaces(struct work_struct *work)
->  	if (rc) {
->  		cifs_dbg(FYI, "%s: failed to query server interfaces: %d\n",
->  				__func__, rc);
-> +
-> +		if (rc == -EOPNOTSUPP)
-> +			return;
+  ksmbd: no need to wait for binded connection termination at logoff
+(2023-10-30 21:58:12 -0500)
 
-Maybe also get rid of cifs_dbg() when rc == -EOPNOTSUPP?
+----------------------------------------------------------------
+Seven ksmbd server fixes
+- logoff improvement for multichannel bound connections
+- unicode fix for surrogate pairs
+- RDMA (smbdirect) fix for IB devices
+- fix locking deadlock in kern_path_create during rename
+- iov memory allocation fix
+- Two minor cleanup patches (doc cleanup, and unused variable)
 
->  	}
->  
->  	queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
-> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-> index b7665155f4e2..2617437a4627 100644
-> --- a/fs/smb/client/smb2pdu.c
-> +++ b/fs/smb/client/smb2pdu.c
-> @@ -163,6 +163,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
->  	int rc = 0;
->  	struct nls_table *nls_codepage = NULL;
->  	struct cifs_ses *ses;
-> +	int xid;
->  
->  	/*
->  	 * SMB2s NegProt, SessSetup, Logoff do not have tcon yet so
-> @@ -307,17 +308,41 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
->  		tcon->need_reopen_files = true;
->  
->  	rc = cifs_tree_connect(0, tcon, nls_codepage);
-> -	mutex_unlock(&ses->session_mutex);
->  
->  	cifs_dbg(FYI, "reconnect tcon rc = %d\n", rc);
->  	if (rc) {
->  		/* If sess reconnected but tcon didn't, something strange ... */
-> +		mutex_unlock(&ses->session_mutex);
->  		cifs_dbg(VFS, "reconnect tcon failed rc = %d\n", rc);
->  		goto out;
->  	}
->  
-> -	if (smb2_command != SMB2_INTERNAL_CMD)
-> -		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
+----------------------------------------------------------------
+Cheng-Han Wu (1):
+      ksmbd: Remove unused field in ksmbd_user struct
 
-Why are you removing this optimisation?  For example, session/tcon
-reconnect will no longer be triggered after returning back to userspace,
-only when next I/O comes in.
+Kangjing Huang (1):
+      ksmbd: fix missing RDMA-capable flag for IPoIB device in
+ksmbd_rdma_capable_netdev()
+
+Marios Makassikis (1):
+      ksmbd: fix recursive locking in vfs helpers
+
+Namjae Jeon (4):
+      ksmbd: reorganize ksmbd_iov_pin_rsp()
+      ksmbd: fix kernel-doc comment of ksmbd_vfs_setxattr()
+      ksmbd: add support for surrogate pair conversion
+      ksmbd: no need to wait for binded connection termination at logoff
+
+ fs/smb/server/connection.c       |  16 ----
+ fs/smb/server/ksmbd_work.c       |  43 ++++-----
+ fs/smb/server/mgmt/user_config.h |   1 -
+ fs/smb/server/transport_rdma.c   |  40 ++++++---
+ fs/smb/server/unicode.c          | 187 +++++++++++++++++++++++++++++----------
+ fs/smb/server/vfs.c              |  25 +-----
+ 6 files changed, 194 insertions(+), 118 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
