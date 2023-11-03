@@ -2,83 +2,98 @@ Return-Path: <linux-cifs-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F430C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Nov 2023 20:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7EDDC4332F
+	for <linux-cifs@archiver.kernel.org>; Fri,  3 Nov 2023 21:03:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378250AbjKCUcd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Nov 2023 16:32:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43246 "EHLO
+        id S229484AbjKCVDa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Nov 2023 17:03:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377822AbjKCUcc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Nov 2023 16:32:32 -0400
+        with ESMTP id S229436AbjKCVD3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Nov 2023 17:03:29 -0400
 Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D724718B
-        for <linux-cifs@vger.kernel.org>; Fri,  3 Nov 2023 13:32:28 -0700 (PDT)
-Message-ID: <3117a7bb50531c6f47f44b41a3404d02.pc@manguebit.com>
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD5DD55
+        for <linux-cifs@vger.kernel.org>; Fri,  3 Nov 2023 14:03:26 -0700 (PDT)
+Message-ID: <ffa541bac7417c9dea79c73e22de1eda.pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1699043546;
+        s=dkim; t=1699045389;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=GdtF9tnUWvVdIZvFli+jXu0JyDwWGwKXV5cBQwUe6CI=;
-        b=Dsi1zDHKjLe4u2wxmk3xl/zuCIxxpoMk/Sk4iRrnxYmCMI/nC6J0PF4FresrbgLddtWo7W
-        IOeZSnVeewoSeEOiL3SUCNkfINPt8ePkQiYPQua/rwWqCH7+gULlDjtor/z+wQdFoCgNER
-        70wWbQBfid0S8LhH+sLQRNup/pmMJ1EhmMgy5RKg9dRASIxLXsJacxKsqK4AZKkt846c3F
-        T+P7JY71L+qYhohJXGWrM968YHeiGs+HCkUr/JTj9lwlEP1Y4P6ahvdfoewPzlEHFg4s0a
-        jQjdgWjLf8SBW+GN+6jue6Cp5aszNEXZ6IhxHIRKdG4BLXdjNJSfLlWSUPtAcg==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1699043546; a=rsa-sha256;
+        bh=Qe7hP/Y5IxAcEKtKfdU55O3dqGhnJd8hWYZMbPWGrds=;
+        b=fxchevonHjTgO9UQXX548SmoHOT0TVa3fVCoGBFZrHHVPm6RJwuiqx90Q8Z9fKAi1+pfgP
+        UNyaXukhQ/y+Ru4sG6D+8hErNiAnEbLls4hp9c9sYQz+kNwdQbmzoRaoaiWYOKaIU4r6mO
+        HGvOSj7hnCJRtPysZYZ1l7oXZJu20bmOiSjZkLB2CDGHCMEGJxPD3x46aYNA6VuKVORhiE
+        Kj+ZgeD+YdiaQRT0lowGYBdBQusT2ltprQjcBG5vFp87Cp+k/YZ6SEz0yKXSGJBDAGxywZ
+        WyWO28Z6c2FtjCtC5twOyXysHF0BtWVfo+Wi+8JbTqCYvp2gH2xgpbqOJIqtmw==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1699045389; a=rsa-sha256;
         cv=none;
-        b=VJMxwkce5kGMAszk6TmUoQsCzWcf3ek5HXut5QkoxsXHWQ6o/kuZ+zFLpRontwI8CPYGIR
-        v02fvGbAFnCPfYy5nSwV+2677J23bhtnGTAxEc8wZecE4UhRfWvtiP23KleGoMcPtUaqBw
-        gScmlMEZi1i/c+M1FSbRKUwPKC57zXUa+zNCPPuuymSC1d4is3o3actzpAtHXpHdjyHjZ6
-        jHOjDA38/g9CuJJP2TCzcdA/Egp0MgScNx1aqOr7g9kz+uNDz4RZROIS3gZlQFFWY5JiA2
-        Y/nk1PfW1peJE5DiI6kYdocgbinrIrGLEa5vwugwxNrVTyARMywsTtiLSOBQoQ==
+        b=cmKvAACluosL3uA7RSjo2/zu5VYQmSOQEit58F08KRNXD0lT7ZrQnWsDL6//ca3JC/Ula7
+        dZzjmeBUwgZynpXv/+8bS0qmeqk06mN53Hz5wVkoOwbLWNEvcflu/BknX8xAmx40uX71el
+        I3A33qGBlvmZELFqbpLAiX6+FQSUYMC3RgT2dGlukJVHzSBR9kAxODwC8NV/hfrnJZNdHn
+        JQmDLs1+hJb+nQqCWiwHdHQyMeBpt7FEdm65SnOwGKjG5Sf5y5d38LVeIxxHexAihspSyQ
+        VvKG4BfXwudwNVqY+ow+fwSZCYDnEqDjGfPAKNT+MW9i1w1bF3mi51jxv2IqVA==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1699043546;
+        s=dkim; t=1699045389;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=GdtF9tnUWvVdIZvFli+jXu0JyDwWGwKXV5cBQwUe6CI=;
-        b=IRMtkSNpkaCx+B3N3994kCdnALe4XHElw+Oo5mmNcQcmwtZckCkeNhK4AmX1oIGqcRGvuE
-        WDR2RKwBSpuRE+Xi0d9JnjH79zJRKg9/crU3cbY56yjSqsHjp40t9xS1nGd/XmyWy6p5Wb
-        FTVvjIIm+3hjZHKnlFkkhgyX0uYSkM7tr/1LP5h4FYjd0peF8EbNuKLdISGmDDGWcjfzQb
-        +mOi3fDA2Ynd0E9WEnZ2/SuRjfaSkirIcPYEdg86MNZBiLM8+v09jqQ0Uyyks2lbJ8YM6W
-        Z0LbKjUmXkni6tbWKZUBYyMS7cx7Kwxn3PNBClA5EmJw6+PVsAS3aygyUgpw7w==
+        bh=Qe7hP/Y5IxAcEKtKfdU55O3dqGhnJd8hWYZMbPWGrds=;
+        b=bRYikDyX8KAEBV4OJcDJ5NZ6+Ksdf0SQZEbgqTBaOP7UkQXd9wTaS88CNkUVdryDcIBX53
+        Ascki+JryjBBUQoiM5Gy/vj3hx2eFC76LI/6QuxupXBJGQhaQG9VsHK/ogmcNpA4E2yD7n
+        ZzTxQx/skoOIgxFH23zjNoQG7hcihEKy0PUbr/TlPZuUebf+WMjRyVLA7OsmHazaCeZ2dY
+        P/IZoqFSkQ+kOjI0MVie+2azMrhnPiggdT8GFZ/7UXc+xGEvv6PcttuPjiUYXjKEglfAm/
+        bmtO/mKDad2S5Etb4z3thl2ZMWNGUuSL9K6G5urBggOw/vrfI722YmMPcLkhdQ==
 From:   Paulo Alcantara <pc@manguebit.com>
-To:     Steve French <smfrench@gmail.com>
-Cc:     nspmangalore@gmail.com, bharathsm.hsk@gmail.com,
-        linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 11/14] cifs: handle when server starts supporting
- multichannel
-In-Reply-To: <CAH2r5mtSZGJJYqFK1N+uT5gcr8vkUhLdYNE_VQ3nP67XxnnpPQ@mail.gmail.com>
+To:     nspmangalore@gmail.com, smfrench@gmail.com,
+        bharathsm.hsk@gmail.com, linux-cifs@vger.kernel.org
+Cc:     Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 09/14] cifs: add a back pointer to cifs_sb from tcon
+In-Reply-To: <20231030110020.45627-9-sprasad@microsoft.com>
 References: <20231030110020.45627-1-sprasad@microsoft.com>
- <20231030110020.45627-11-sprasad@microsoft.com>
- <b709f32a96f04ff6136b69605788a2e6.pc@manguebit.com>
- <CAH2r5mtSZGJJYqFK1N+uT5gcr8vkUhLdYNE_VQ3nP67XxnnpPQ@mail.gmail.com>
-Date:   Fri, 03 Nov 2023 17:32:21 -0300
+ <20231030110020.45627-9-sprasad@microsoft.com>
+Date:   Fri, 03 Nov 2023 18:03:05 -0300
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve French <smfrench@gmail.com> writes:
+nspmangalore@gmail.com writes:
 
-> removed cc:stable and changed
+> From: Shyam Prasad N <sprasad@microsoft.com>
 >
->> +                             cifs_dbg(VFS, "server %s supports multichannel now\n",
->> +                                      ses->server->hostname);
+> Today, we have no way to access the cifs_sb when we
+> just have pointers to struct tcon. This is very
+> limiting as many functions deal with cifs_sb, and
+> these calls do not directly originate from VFS.
 >
-> to`
+> This change introduces a new cifs_sb field in cifs_tcon
+> that points to the cifs_sb for the tcon. The assumption
+> here is that a tcon will always map to this cifs_sb and
+> will never change.
 >
-> +                               cifs_server_dbg(VFS, "supports
-> multichannel now\n");
+> Also, refcounting should not be necessary, since cifs_sb
+> will never be freed before tcon.
+>
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> ---
+>  fs/smb/client/cifsglob.h | 1 +
+>  fs/smb/client/connect.c  | 2 ++
+>  2 files changed, 3 insertions(+)
 
-Looks good, thanks.
+This is wrong as a single tcon may be shared among different
+superblocks.  You can, however, map those superblocks to a tcon by using
+the cifs_sb_master_tcon() helper.
 
-> Let me know if that is ok for you.  (See attached updated patch)
+If you do something like this
 
-For the s/cifs_dbg/cifs_server_dbg/ change, it is.
+	mount.cifs //srv/share /mnt/1 -o ...
+	mount.cifs //srv/share /mnt/1 -o ... -> -EBUSY
+
+tcon->cifs_sb will end up with the already freed superblock pointer that
+was compared to the existing one.  So, you'll get an use-after-free when
+you dereference tcon->cifs_sb as in patch 11/14.
