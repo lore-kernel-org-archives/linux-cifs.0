@@ -1,156 +1,217 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3219738B
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Nov 2023 04:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E565BA31
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Nov 2023 05:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GH0j8J/N"
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55076FD
-	for <linux-cifs@vger.kernel.org>; Mon,  6 Nov 2023 20:43:01 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-509109104e2so6862305e87.3
-        for <linux-cifs@vger.kernel.org>; Mon, 06 Nov 2023 20:43:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=riscv-rocks.de header.i=@riscv-rocks.de header.b="ghuG62nt"
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F4B114
+	for <linux-cifs@vger.kernel.org>; Mon,  6 Nov 2023 21:18:45 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4084b0223ccso38151405e9.2
+        for <linux-cifs@vger.kernel.org>; Mon, 06 Nov 2023 21:18:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699332179; x=1699936979; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4HB4n7MRJafoCUjnai4jeZh3LhBUXHcniK4G0oAK5d8=;
-        b=GH0j8J/NiFPqBKzSzqJ1Ihy03XJKebrhxWMWl0gq77EvSnKjIkRR+d4njdG4/Skm0Y
-         WY1ZP/kY933VrmwmlApJckAmLKrKoMGYPhgJ6lq0d3/YA7XXNzTqmeofcdZD0F6sdHXc
-         nHQswEb2SKzjUY+fJITkpqyOZtoE17PcgYk20kO57CCuSq32o+SOG77j7sO4pW2SipyI
-         O3q4O6TVwFXUu/dMZdmyVqaPrA0ETQS1GEUbNb9FR2gIyvH/Bs93VQAOfSH3rIgNWOBJ
-         LZPuYLtUi7PX4V2xJ/yv4yaGleIn/Fv9X3ldDsquRv4QZs6iyNtwxvZRXeC0xTcs2/v3
-         3V1A==
+        d=riscv-rocks.de; s=google; t=1699334324; x=1699939124; darn=vger.kernel.org;
+        h=organization:user-agent:in-reply-to:content-disposition
+         :mime-version:references:mail-followup-to:reply-to:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9sJTMReKQmrBy3JWoqVqeZdB1qJQ8aGUI4Df5EyrF2M=;
+        b=ghuG62ntBtxywO8xjkGhRQYnokrzmX0Qq5JyxW7REYJsa/NWwHhDGvdn3C6lLDtbmX
+         0UBOhis9f/nyKjFWaAZgRVxYH0g3gHEvwBH8lGnb0Iz2DiIR8NRwyA37MHrkcIz1RDhf
+         f/7EcWDsTyit6A4rxSo1lT1YcImODsBOTKXULn7/XZoHFVjEbS+lT/GAxt7G21kY2ZMB
+         BqsAw1jNulJ9VhD3q7H3hD1m5npWid+hhpSpOFI/DpUZaShBr9MyB8Ca5nukgdhuN79S
+         8Z99u5nwinZjoKORU+qWmojPj4VJ3cnL7v5RRcBwElRqJpsqDxgquwGG0r89oRBP5IZz
+         YZYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699332179; x=1699936979;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4HB4n7MRJafoCUjnai4jeZh3LhBUXHcniK4G0oAK5d8=;
-        b=NwjCfPbNYeyEH2OEA3G3L+jDmGkFQk4dEo/BE/niTP6oAUXON8Fa5msjHHBtTAX9KG
-         3L4NhvtxpkTRtHN95EXXSe/8TDksOi1Wov13yp3waiEoKGs+mEVMKOFQGXYI3hDAsKI3
-         7qlcN5xco3NkrNEyW9k8cKjqWTi+ayUywO573mM1atbVnsDIsQXGSku6dnuFM4FBZIVg
-         PvoffCpbbPD5S7q+LMf/MLolZnxcbwY/K6fA57QOr/22WGsHyc4/rzepqF3UnLdWppKD
-         inn6q7M2gKzo5vPpaMuKyygKt9WncRWoI7ZImWzXPLRBkCKC8HKsHWUUnByssE9ba2jI
-         NicQ==
-X-Gm-Message-State: AOJu0YyBgPINcCMcwg3nxPDVdZjkR8d1u+UxNhWW2iILR2QroQqeEeXB
-	P/RAmC2NnxXoD1iQVi/WGve//26Muz6N7rhzGDa/z7wzSPo4XRKr
-X-Google-Smtp-Source: AGHT+IGms/NfkW/K5ZtbD6ziMwlEUAV74QD+frdu8vrZuYDGTpM6Ktoi6GrJNT1ttGKy5x7/iboTxqP6acBK4tvKmlU=
-X-Received: by 2002:ac2:4e08:0:b0:509:2b57:32e with SMTP id
- e8-20020ac24e08000000b005092b57032emr22345815lfr.8.1699332178710; Mon, 06 Nov
- 2023 20:42:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699334324; x=1699939124;
+        h=organization:user-agent:in-reply-to:content-disposition
+         :mime-version:references:mail-followup-to:reply-to:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9sJTMReKQmrBy3JWoqVqeZdB1qJQ8aGUI4Df5EyrF2M=;
+        b=YlVmVzBSTlPHsg2mwuIcnQWJ5NG9HauIvhWviwmvxiVFGvKM/QJhHSWkZsnr1z0XEf
+         m7qVMfJD1jNHU+mTfhQlu1FDipBA8+Of9kczSttVlo1MfGLv4OBK97DRFA4Sq3wvd8mN
+         lfIevbDJF4MwXMMB9ki7S+NTzBBDkKKdWxCFvut9UcxNhzhFe1Vf6X7VbbnlP9Cz5uSi
+         feDc2EWJDwfR0Qp96iVxrAiKUI0IvD0x3a41pqW2ESsEH5RBtOeeIqnLFgkOVma83wTx
+         CPjlLFpnR5eWG6DkAjhyznRdrG82dX9ads+WKKrq4Y4HDhVsrXiqiSzXjihuAb/ZGTLa
+         R8vg==
+X-Gm-Message-State: AOJu0YzswHh9kmNdzYDGX6YUV89+WmWLeVHpOOD4L5Bu3juVTVxTSeRn
+	uNu3/vOWQOXLUUv6NT1NqS+ljA==
+X-Google-Smtp-Source: AGHT+IF7cFIfmSCXiDieDJOC0fc632oc8tYaDyxQSPe4yc+y4AEhXbIfboAFmLnH/p4P7N9WhSIrDQ==
+X-Received: by 2002:a05:600c:4e4c:b0:409:2825:6dd5 with SMTP id e12-20020a05600c4e4c00b0040928256dd5mr1429161wmq.13.1699334323511;
+        Mon, 06 Nov 2023 21:18:43 -0800 (PST)
+Received: from fedora.fritz.box (p5494469c.dip0.t-ipconnect.de. [84.148.70.156])
+        by smtp.gmail.com with ESMTPSA id n5-20020a05600c3b8500b004064e3b94afsm14464494wms.4.2023.11.06.21.18.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Nov 2023 21:18:42 -0800 (PST)
+Date: Tue, 7 Nov 2023 06:18:41 +0100
+From: Damian Tometzki <damian@riscv-rocks.de>
+To: David Howells <dhowells@redhat.com>
+Cc: Damian Tometzki <damian@riscv-rocks.de>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Steve French <smfrench@gmail.com>, John Sanpe <sanpeqf@gmail.com>,
+	CIFS <linux-cifs@vger.kernel.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] cifs: Fix encryption of cleared, but unset rq_iter data
+ buffers
+Message-ID: <ZUnIsXpjd7ckkTVw@fedora.fritz.box>
+Reply-To: Damian Tometzki <damian@riscv-rocks.de>
+Mail-Followup-To: David Howells <dhowells@redhat.com>,
+	Damian Tometzki <damian@riscv-rocks.de>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Steve French <smfrench@gmail.com>, John Sanpe <sanpeqf@gmail.com>,
+	CIFS <linux-cifs@vger.kernel.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	LKML <linux-kernel@vger.kernel.org>
+References: <ZUiXkPPP1TuOgmmf@fedora.fritz.box>
+ <20231022183917.1013135-1-sanpeqf@gmail.com>
+ <ZUfQo47uo0p2ZsYg@fedora.fritz.box>
+ <CAH2r5msde65PMtn-96VZDAQkT_rq+e-2G4O+zbPUR8zSWGxMsg@mail.gmail.com>
+ <20231105193601.GB91123@sol.localdomain>
+ <ZUfvk-6y2pER6Rmc@fedora.fritz.box>
+ <20231105201516.GC91123@sol.localdomain>
+ <2610852.1699281611@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 6 Nov 2023 22:42:47 -0600
-Message-ID: <CAH2r5muqSPutkdHgmBNQbUh=YQVr+7N4tV4GVM2hWa2ZsQHaqQ@mail.gmail.com>
-Subject: Minor cleanup patch - and question about returning -ENOSYS
-To: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000de61be0609889a92"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2610852.1699281611@warthog.procyon.org.uk>
+User-Agent: Mutt
+X-Operating-System: Linux Fedora release 39 (Thirty Nine) (Kernel 6.6.0)
+Organization: Linux hacker
 
---000000000000de61be0609889a92
-Content-Type: text/plain; charset="UTF-8"
+On Mon, 06. Nov 14:40, David Howells wrote:
+> Hi Damian,
+> 
+> Does the attached fix it for you?
+Hello David,
 
-Attached is another minor cleanup of comments pointed out by checkpatch ...
-but checkpatch also complains about these two places in sess.c (see
-below in select_sec function) where we return -ENOSYS (since
-apparently it can only be returned for invalid syscall). Any thoughts?
+this fix my issue with the cifs mount. 
 
-static int select_sec(struct sess_data *sess_data)
-{
-        int type;
-        struct cifs_ses *ses = sess_data->ses;
-        struct TCP_Server_Info *server = sess_data->server;
+Great many Thanks
 
-        type = cifs_select_sectype(server, ses->sectype);
-        cifs_dbg(FYI, "sess setup type %d\n", type);
-        if (type == Unspecified) {
-                cifs_dbg(VFS, "Unable to select appropriate
-authentication method!\n");
-                return -EINVAL;
-        }
+Damian
 
-        switch (type) {
-        case NTLMv2:
-                sess_data->func = sess_auth_ntlmv2;
-                break;
-        case Kerberos:
-#ifdef CONFIG_CIFS_UPCALL
-                sess_data->func = sess_auth_kerberos;
-                break;
-#else
-                cifs_dbg(VFS, "Kerberos negotiated but upcall support
-disabled!\n");
-                return -ENOSYS;
-#endif /* CONFIG_CIFS_UPCALL */
-        case RawNTLMSSP:
-                sess_data->func = sess_auth_rawntlmssp_negotiate;
-                break;
-        default:
-                cifs_dbg(VFS, "secType %d not supported!\n", type);
-                return -ENOSYS;
-        }
-
-
--- 
-Thanks,
-
-Steve
-
---000000000000de61be0609889a92
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-more-minor-cleanups-for-session-handling-routin.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-more-minor-cleanups-for-session-handling-routin.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lonuh90t0>
-X-Attachment-Id: f_lonuh90t0
-
-RnJvbSAwYmZmZWVkMDEzZWM4NDA4NGJjNTA5MGIzNzdkMjE4M2VmYThkNzJiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IE1vbiwgNiBOb3YgMjAyMyAyMjo0MDozOCAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjM6IG1vcmUgbWlub3IgY2xlYW51cHMgZm9yIHNlc3Npb24gaGFuZGxpbmcgcm91dGluZXMKClNv
-bWUgdHJpdmlhbCBjbGVhbnVwIHBvaW50ZWQgb3V0IGJ5IGNoZWNrcGF0Y2gKClNpZ25lZC1vZmYt
-Ynk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9zbWIvY2xp
-ZW50L3Nlc3MuYyB8IDI1ICsrKysrKysrKysrKysrKy0tLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2Vk
-LCAxNSBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIv
-Y2xpZW50L3Nlc3MuYyBiL2ZzL3NtYi9jbGllbnQvc2Vzcy5jCmluZGV4IDlkNzFjMjNmZTIzNC4u
-NmZkMDc0ZmNhZTViIDEwMDY0NAotLS0gYS9mcy9zbWIvY2xpZW50L3Nlc3MuYworKysgYi9mcy9z
-bWIvY2xpZW50L3Nlc3MuYwpAQCAtODEyLDggKzgxMiw3IEBAIHN0YXRpYyB2b2lkIGFzY2lpX3Nz
-ZXR1cF9zdHJpbmdzKGNoYXIgKipwYmNjX2FyZWEsIHN0cnVjdCBjaWZzX3NlcyAqc2VzLAogCQlp
-ZiAoV0FSTl9PTl9PTkNFKGxlbiA8IDApKQogCQkJbGVuID0gQ0lGU19NQVhfRE9NQUlOTkFNRV9M
-RU4gLSAxOwogCQliY2NfcHRyICs9IGxlbjsKLQl9IC8qIGVsc2Ugd2Ugd2lsbCBzZW5kIGEgbnVs
-bCBkb21haW4gbmFtZQotCSAgICAgc28gdGhlIHNlcnZlciB3aWxsIGRlZmF1bHQgdG8gaXRzIG93
-biBkb21haW4gKi8KKwl9IC8qIGVsc2Ugd2Ugc2VuZCBhIG51bGwgZG9tYWluIG5hbWUgc28gc2Vy
-dmVyIHdpbGwgZGVmYXVsdCB0byBpdHMgb3duIGRvbWFpbiAqLwogCSpiY2NfcHRyID0gMDsKIAli
-Y2NfcHRyKys7CiAKQEAgLTkwOSwxMSArOTA4LDE0IEBAIHN0YXRpYyB2b2lkIGRlY29kZV9hc2Np
-aV9zc2V0dXAoY2hhciAqKnBiY2NfYXJlYSwgX191MTYgYmxlZnQsCiAJaWYgKGxlbiA+IGJsZWZ0
-KQogCQlyZXR1cm47CiAKLQkvKiBObyBkb21haW4gZmllbGQgaW4gTEFOTUFOIGNhc2UuIERvbWFp
-biBpcwotCSAgIHJldHVybmVkIGJ5IG9sZCBzZXJ2ZXJzIGluIHRoZSBTTUIgbmVncHJvdCByZXNw
-b25zZSAqLwotCS8qIEJCIEZvciBuZXdlciBzZXJ2ZXJzIHdoaWNoIGRvIG5vdCBzdXBwb3J0IFVu
-aWNvZGUsCi0JICAgYnV0IHRodXMgZG8gcmV0dXJuIGRvbWFpbiBoZXJlIHdlIGNvdWxkIGFkZCBw
-YXJzaW5nCi0JICAgZm9yIGl0IGxhdGVyLCBidXQgaXQgaXMgbm90IHZlcnkgaW1wb3J0YW50ICov
-CisJLyoKKwkgKiBObyBkb21haW4gZmllbGQgaW4gTEFOTUFOIGNhc2UuIERvbWFpbiBpcworCSAq
-IHJldHVybmVkIGJ5IG9sZCBzZXJ2ZXJzIGluIHRoZSBTTUIgbmVncHJvdCByZXNwb25zZQorCSAq
-CisJICogQkIgRm9yIG5ld2VyIHNlcnZlcnMgd2hpY2ggZG8gbm90IHN1cHBvcnQgVW5pY29kZSwK
-KwkgKiBidXQgdGh1cyBkbyByZXR1cm4gZG9tYWluIGhlcmUsIHdlIGNvdWxkIGFkZCBwYXJzaW5n
-CisJICogZm9yIGl0IGxhdGVyLCBidXQgaXQgaXMgbm90IHZlcnkgaW1wb3J0YW50CisJICovCiAJ
-Y2lmc19kYmcoRllJLCAiYXNjaWk6IGJ5dGVzIGxlZnQgJWRcbiIsIGJsZWZ0KTsKIH0KICNlbmRp
-ZiAvKiBDT05GSUdfQ0lGU19BTExPV19JTlNFQ1VSRV9MRUdBQ1kgKi8KQEAgLTk2OSw5ICs5NzEs
-MTIgQEAgaW50IGRlY29kZV9udGxtc3NwX2NoYWxsZW5nZShjaGFyICpiY2NfcHRyLCBpbnQgYmxv
-Yl9sZW4sCiAJc2VzLT5udGxtc3NwLT5zZXJ2ZXJfZmxhZ3MgPSBzZXJ2ZXJfZmxhZ3M7CiAKIAlt
-ZW1jcHkoc2VzLT5udGxtc3NwLT5jcnlwdGtleSwgcGJsb2ItPkNoYWxsZW5nZSwgQ0lGU19DUllQ
-VE9fS0VZX1NJWkUpOwotCS8qIEluIHBhcnRpY3VsYXIgd2UgY2FuIGV4YW1pbmUgc2lnbiBmbGFn
-cyAqLwotCS8qIEJCIHNwZWMgc2F5cyB0aGF0IGlmIEF2SWQgZmllbGQgb2YgTXN2QXZUaW1lc3Rh
-bXAgaXMgcG9wdWxhdGVkIHRoZW4KLQkJd2UgbXVzdCBzZXQgdGhlIE1JQyBmaWVsZCBvZiB0aGUg
-QVVUSEVOVElDQVRFX01FU1NBR0UgKi8KKwkvKgorCSAqIEluIHBhcnRpY3VsYXIgd2UgY2FuIGV4
-YW1pbmUgc2lnbiBmbGFncworCSAqCisJICogQkIgc3BlYyBzYXlzIHRoYXQgaWYgQXZJZCBmaWVs
-ZCBvZiBNc3ZBdlRpbWVzdGFtcCBpcyBwb3B1bGF0ZWQgdGhlbgorCSAqIHdlIG11c3Qgc2V0IHRo
-ZSBNSUMgZmllbGQgb2YgdGhlIEFVVEhFTlRJQ0FURV9NRVNTQUdFCisJICovCiAKIAl0aW9mZnNl
-dCA9IGxlMzJfdG9fY3B1KHBibG9iLT5UYXJnZXRJbmZvQXJyYXkuQnVmZmVyT2Zmc2V0KTsKIAl0
-aWxlbiA9IGxlMTZfdG9fY3B1KHBibG9iLT5UYXJnZXRJbmZvQXJyYXkuTGVuZ3RoKTsKLS0gCjIu
-MzkuMgoK
---000000000000de61be0609889a92--
+> 
+> David
+> ---
+> cifs: Fix encryption of cleared, but unset rq_iter data buffers
+> 
+> Each smb_rqst struct contains two things: an array of kvecs (rq_iov) that
+> contains the protocol data for an RPC op and an iterator (rq_iter) that
+> contains the data payload of an RPC op.  When an smb_rqst is allocated
+> rq_iter is it always cleared, but we don't set it up unless we're going to
+> use it.
+> 
+> The functions that determines the size of the ciphertext buffer that will
+> be needed to encrypt a request, cifs_get_num_sgs(), assumes that rq_iter is
+> always initialised - and employs user_backed_iter() to check that the
+> iterator isn't user-backed.  This used to incidentally work, because
+> ->user_backed was set to false because the iterator has never been
+> initialised, but with commit f1b4cb650b9a0eeba206d8f069fcdc532bfbcd74[1]
+> which changes user_backed_iter() to determine this based on the iterator
+> type insted, a warning is now emitted:
+> 
+>         WARNING: CPU: 7 PID: 4584 at fs/smb/client/cifsglob.h:2165 smb2_get_aead_req+0x3fc/0x420 [cifs]
+>         ...
+>         RIP: 0010:smb2_get_aead_req+0x3fc/0x420 [cifs]
+>         ...
+>          crypt_message+0x33e/0x550 [cifs]
+>          smb3_init_transform_rq+0x27d/0x3f0 [cifs]
+>          smb_send_rqst+0xc7/0x160 [cifs]
+>          compound_send_recv+0x3ca/0x9f0 [cifs]
+>          cifs_send_recv+0x25/0x30 [cifs]
+>          SMB2_tcon+0x38a/0x820 [cifs]
+>          cifs_get_smb_ses+0x69c/0xee0 [cifs]
+>          cifs_mount_get_session+0x76/0x1d0 [cifs]
+>          dfs_mount_share+0x74/0x9d0 [cifs]
+>          cifs_mount+0x6e/0x2e0 [cifs]
+>          cifs_smb3_do_mount+0x143/0x300 [cifs]
+>          smb3_get_tree+0x15e/0x290 [cifs]
+>          vfs_get_tree+0x2d/0xe0
+>          do_new_mount+0x124/0x340
+>          __se_sys_mount+0x143/0x1a0
+> 
+> The problem is that rq_iter was never set, so the type is 0 (ie. ITER_UBUF)
+> which causes user_backed_iter() to return true.  The code doesn't
+> malfunction because it checks the size of the iterator - which is 0.
+> 
+> Fix cifs_get_num_sgs() to ignore rq_iter if its count is 0, thereby
+> bypassing the warnings.
+> 
+> It might be better to explicitly initialise rq_iter to a zero-length
+> ITER_BVEC, say, as it can always be reinitialised later.
+> 
+> Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rather than a page list")
+> Reported-by: Damian Tometzki <damian@riscv-rocks.de>
+> Link: https://lore.kernel.org/r/ZUfQo47uo0p2ZsYg@fedora.fritz.box/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Steve French <smfrench@gmail.com>
+> cc: Shyam Prasad N <sprasad@microsoft.com>
+> cc: Rohith Surabattula <rohiths.msft@gmail.com>
+> cc: Paulo Alcantara <pc@manguebit.com>
+> cc: Namjae Jeon <linkinjeon@kernel.org>
+> cc: Tom Talpey <tom@talpey.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: Eric Biggers <ebiggers@kernel.org>
+> cc: linux-cifs@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f1b4cb650b9a0eeba206d8f069fcdc532bfbcd74 [1]
+> ---
+>  fs/smb/client/cifsglob.h |   12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+> index 02082621d8e0..c70760871606 100644
+> --- a/fs/smb/client/cifsglob.h
+> +++ b/fs/smb/client/cifsglob.h
+> @@ -2143,6 +2143,7 @@ static inline int cifs_get_num_sgs(const struct smb_rqst *rqst,
+>  	unsigned int len, skip;
+>  	unsigned int nents = 0;
+>  	unsigned long addr;
+> +	size_t data_size;
+>  	int i, j;
+>  
+>  	/*
+> @@ -2158,17 +2159,21 @@ static inline int cifs_get_num_sgs(const struct smb_rqst *rqst,
+>  	 * rqst[1+].rq_iov[0+] data to be encrypted/decrypted
+>  	 */
+>  	for (i = 0; i < num_rqst; i++) {
+> +		data_size = iov_iter_count(&rqst[i].rq_iter);
+> +		    
+>  		/* We really don't want a mixture of pinned and unpinned pages
+>  		 * in the sglist.  It's hard to keep track of which is what.
+>  		 * Instead, we convert to a BVEC-type iterator higher up.
+>  		 */
+> -		if (WARN_ON_ONCE(user_backed_iter(&rqst[i].rq_iter)))
+> +		if (data_size &&
+> +		    WARN_ON_ONCE(user_backed_iter(&rqst[i].rq_iter)))
+>  			return -EIO;
+>  
+>  		/* We also don't want to have any extra refs or pins to clean
+>  		 * up in the sglist.
+>  		 */
+> -		if (WARN_ON_ONCE(iov_iter_extract_will_pin(&rqst[i].rq_iter)))
+> +		if (data_size &&
+> +		    WARN_ON_ONCE(iov_iter_extract_will_pin(&rqst[i].rq_iter)))
+>  			return -EIO;
+>  
+>  		for (j = 0; j < rqst[i].rq_nvec; j++) {
+> @@ -2184,7 +2189,8 @@ static inline int cifs_get_num_sgs(const struct smb_rqst *rqst,
+>  			}
+>  			skip = 0;
+>  		}
+> -		nents += iov_iter_npages(&rqst[i].rq_iter, INT_MAX);
+> +		if (data_size)
+> +			nents += iov_iter_npages(&rqst[i].rq_iter, INT_MAX);
+>  	}
+>  	nents += DIV_ROUND_UP(offset_in_page(sig) + SMB2_SIGNATURE_SIZE, PAGE_SIZE);
+>  	return nents;
+> 
