@@ -1,60 +1,57 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BD837151
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Nov 2023 19:31:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6771945E
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Nov 2023 19:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="b2MZYspJ"
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C1482121
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Nov 2023 11:31:22 -0800 (PST)
-Message-ID: <bd3b5bc3626faf170ff83d4e35de490a.pc@manguebit.com>
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="jT+c4W7M"
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14040211B
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Nov 2023 11:41:05 -0800 (PST)
+Message-ID: <147809311fa1593993c7852e32fa52fd.pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1699471881;
+	s=dkim; t=1699472463;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KA4tTBQb2AIozl2engjMAXBr0HlbXvYntWVT7j+BSq4=;
-	b=b2MZYspJttKIap7zsKlnBIfvBiWIUXKRf5CGprqAHisAb8XyYS8YOd7kisEurDsECr6qbE
-	eKgy1ZlQHJUFufqN+1m0OSagRwpVmcq0zxAKDM+iRXiImgvMB2Y4hSDSwinCsP9dQ7+u3r
-	abrWO1l0olTQ/sN8S4GlDG+qXVFka15N8vqz+6ilXxv1bJelMisXtjxQLV0gYJ/mVWt1DJ
-	yyafRd+rLH0Rn2bpXrspsiLjSNY6PV9ZUVvhWlAjvQ/1YZjxIACG762c8E0Rf/d8bv9Rlq
-	chFPZCPxitQtlVbGTeJff8haAZdICwYTPIxMcozcWC1UHzR67c65Iv2OFOY+cQ==
+	bh=FQKGVpUiF1mpGEKJ24/XP7V2zEfiT2wTo0saMsGm4lI=;
+	b=jT+c4W7MaOW7e5XyeIoPinzfANk6VYN8EJs3v349PsqQGLm9gxpmM8bLRGXNo2b/ULj7mL
+	uQ9BuCjcJXsXRgUIaW8MtJg+VpriWA8Ax00+E80l0Ls9MoQHs27sMNH3a1cWgw0SoNN9Zx
+	8Z4WtJGg1ZMLbU42Mh/uhC7ZL2B2oDBvR3+Yvltz8w7sTeVvUrEqZfvISMTDRDNIWrW88z
+	Iv/OrAaOGNTTXolVCta8Aiwt8PgheRiRJSD23sMGrUx9C96o9u7tBpKRmUmgtXKzviPuCb
+	G+d6HIW8c+mLjwm8rUxo/cvuaoUg5t5xkS/Cd7ybsf168B4Pv548mKxvDjX51g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1699471881; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1699472463; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KA4tTBQb2AIozl2engjMAXBr0HlbXvYntWVT7j+BSq4=;
-	b=drmbBp0xhMVtYjgW3g0S0WmaIF/UbmYpJw9kUdQKJ8RcN29BP1Rr7kv9mpJ+AAw/an/Anc
-	JeL/8Fxxdb8yF3TnhLapMCXcrqrqLDyZZ9w2zq15Vx2cS9rLiRKaxKOnvrXs0xN/TwyWKE
-	9XekAM+WhRU4me9EzC9ZLrGhMJshawCjhGBj2nUsHyHRs81xDtA/Xr0e/S3jDMOG7uS52Y
-	f0IRjGE0rQ5HelqNrMkmfMqaFnxd+gJNmmfFbVfwovDKbCTjhtqJu3YPvO5Y9B5MTN4Hb0
-	6EjqNYqAw/mtVr6SFU6PtXzayv9JZJz5+2qFo99bqY4qt7iXu/iH/tyLWoc7tA==
+	bh=FQKGVpUiF1mpGEKJ24/XP7V2zEfiT2wTo0saMsGm4lI=;
+	b=h8IYCxOQJgi9PWvmYhp77nWxA4sagnFtzxA+QxOIXQypUAIqB8fuEsrwRPNVTu9UBZloVf
+	n0Ke7RIaZpJLT+GaK5OefCSmKjXGWlrGxJus17nJUZtLGuD2fqu1y5ZnX0gXq0bi3E41en
+	rqWTTdbU8jy58ZMXHTWVnjqa6vo2rqemJwC0kMRg6W/lt5h8T4+ttCz0G0ZD9pe/51Zowk
+	tCIKK+PJT1oop/b2whAiswkY53ykxRsXqFqneCooqM3AH0T0H01Hkj3jKWmVly1QqaoZTV
+	phx9bFZeirQkZ8h59WWcEJO8hN8d4YCHz3srDSbXPj0pMjGf685H+IkAaZ/YPw==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1699471881; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1699472463; a=rsa-sha256;
 	cv=none;
-	b=so3aBbcwt066KTHz1Tyt6ayh2J5nvRTyR8ZhmzJj84h7ab9BlmW4XZLWdeM3L0g22VFAAo
-	n6qN0Y1LiHfxjEmiM92Y0xqLVFOVFGiM/En71jlg6b3GHHakL6yPTFTAFtHmrGDKVyeZHs
-	wtes/uzoscvjIxvdlTbYtp1TJvWPD5ICUBVOOCi7io93WXZ7GFMpPd3gmJ3yxH1s6X3ZdZ
-	ZttG9FLJyezVB9/uqtR5vUU9X1aVFUsX1stieotjsbSkKliMct/5VxayChD+cwOqQcuveD
-	VhIAO7nBzf93H+AuCCZyByfLJ7gP/i4CKDQnaRPVqr/+79Sb2ZDhQ2iT2r9Ucg==
+	b=rKxa0sHa6b8ja8daIbbdOxQx0nrTVRm5+8NkPnw4OUElTbtyT9ixVcOkJL4PmBnNbbz52k
+	r1jDUBdhh0tS8r5qX4Qes0fhQzXRiYmGDNtfYWndOWWlgWEHWqDcdvBkXqWlmX44/V62X0
+	Im0tVjzD1gSrwQ2ZImN2PMBhdlYPyirdVki3W4DxCIL8zdrCNZZKrMGQERVyHxBhF53NEU
+	73jAN0DRK7q6+Z3Mt77tV5x/kQTmFFLAgOgj92hO+Xjr55qEqdsqM1+rTlvzg6pn9tescB
+	9Awt49StmtD5amg/o0KcTncQMsqIEXVXUYf7hQ9sL06YYjyf9B4WwoGnPOTn/A==
 From: Paulo Alcantara <pc@manguebit.com>
-To: Steve French <smfrench@gmail.com>
-Cc: nspmangalore@gmail.com, bharathsm.hsk@gmail.com,
- linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 11/14] cifs: handle when server starts supporting
+To: nspmangalore@gmail.com, smfrench@gmail.com, bharathsm.hsk@gmail.com,
+ linux-cifs@vger.kernel.org
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 12/14] cifs: handle when server stops supporting
  multichannel
-In-Reply-To: <CAH2r5mvAYAJKGvG-Jm42L-5EG6CYxVS4bNs1y_+0477RO2e20Q@mail.gmail.com>
+In-Reply-To: <5890a4eec52f50b271ba8188f1ace1c9.pc@manguebit.com>
 References: <20231030110020.45627-1-sprasad@microsoft.com>
- <20231030110020.45627-11-sprasad@microsoft.com>
- <b709f32a96f04ff6136b69605788a2e6.pc@manguebit.com>
- <CAH2r5mtSZGJJYqFK1N+uT5gcr8vkUhLdYNE_VQ3nP67XxnnpPQ@mail.gmail.com>
- <5deda9f23865fafcbd99d57424791138.pc@manguebit.com>
- <CAH2r5mvAYAJKGvG-Jm42L-5EG6CYxVS4bNs1y_+0477RO2e20Q@mail.gmail.com>
-Date: Wed, 08 Nov 2023 16:31:17 -0300
+ <20231030110020.45627-12-sprasad@microsoft.com>
+ <5890a4eec52f50b271ba8188f1ace1c9.pc@manguebit.com>
+Date: Wed, 08 Nov 2023 16:41:00 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -63,17 +60,58 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Steve French <smfrench@gmail.com> writes:
+> and leaked server connections
+>
+> 	Display Internal CIFS Data Structures for Debugging
+> 	---------------------------------------------------
+> 	CIFS Version 2.46
+> 	Features: DFS,FSCACHE,STATS2,DEBUG2,ALLOW_INSECURE_LEGACY,CIFS_POSIX,UPCALL(SPNEGO),XATTR,ACL,WITNESS
+> 	CIFSMaxBufSize: 16384
+> 	Active VFS Requests: 0
+> 	
+> 	Servers: 
+> 	1) ConnectionId: 0x70e Hostname: w22-root2.gandalf.test 
+> 	ClientGUID: 44DAE383-3E91-3042-85FE-87D6F17298B7
+> 	Number of credits: 1,1,1 Dialect 0x210
+> 	Server capabilities: 0x300007
+> 	TCP status: 4 Instance: 77
+> 	Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Net namespace: 4026531840 
+> 	In Send: 0 In MaxReq Wait: 0
+> 	DFS leaf full path: \\W22-ROOT1.GANDALF.TEST\dfstest3\link10
+> 	
+> 	        Sessions: 
+> 	                [NONE]
+> 	2) ConnectionId: 0x706 Hostname: w22-root2.gandalf.test 
+> 	ClientGUID: C8CF45E4-F70D-DF40-8821-0234A2E20DD4
+> 	Number of credits: 1,1,1 Dialect 0x210
+> 	Server capabilities: 0x300007
+> 	TCP status: 4 Instance: 81
+> 	Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Net namespace: 4026531840 
+> 	In Send: 0 In MaxReq Wait: 0
+> 	DFS leaf full path: \\W22-ROOT1.GANDALF.TEST\dfstest3\link6
+> 	
+> 	        Sessions: 
+> 	                [NONE]
+> 	3) ConnectionId: 0x6ae Hostname: w22-root1.gandalf.test 
+> 	ClientGUID: AB059CDD-12FF-B94D-B30C-9E1928ACBA95
+> 	Number of credits: 1,1,1 Dialect 0x210
+> 	Server capabilities: 0x300007
+> 	TCP status: 4 Instance: 96
+> 	Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Net namespace: 4026531840 
+> 	In Send: 0 In MaxReq Wait: 0
+> 	DFS leaf full path: \\W22-ROOT1.GANDALF.TEST\dfstest3\link9
+> 	
+> 	        Sessions: 
+> 	                [NONE]
+>         ...
 
-> I just updated the patch in for-next (see attached)
+I ended up with a simple reproducer for the above
 
-Thanks.
-
-> I removed the unneeded export of smb2_query_server_interfaces() but it
-> looks like the logging of failed network interface queries is fine
-> (and is an FYI message so not turned on automatically) - I could
-> definitely see cases where FYI logging is turned on to see why query
-> server interfaces failed even in the EOPNOTSUPP case - so the debug
-> FYI looks ok to me
-
-Yeah, no problem.
+        mount.cifs //srv/share /mnt/1 -o ...,echo_interval=10
+        iptables -I INPUT -s $srvaddr -j DROP
+        stat -f /mnt/1
+        # check dmesg for "BUG: sleeping function called from invalid context"
+        iptables -I INPUT -s $srvaddr -j ACCEPT
+        stat -f /mnt/1
+        umount /mnt/1
+        # check /proc/fs/cifs/DebugData for leaked server connection
