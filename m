@@ -1,56 +1,58 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DB8199A5
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Nov 2023 15:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756FB30656
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Nov 2023 16:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="BN26Q2Wj"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="Mv5W0san"
 Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C491FD8
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Nov 2023 07:44:20 -0800 (PST)
-Message-ID: <efd21d30cc8b110347931c98fb21db62.pc@manguebit.com>
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD2921BFD
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Nov 2023 08:02:36 -0800 (PST)
+Message-ID: <5deda9f23865fafcbd99d57424791138.pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1699458259;
+	s=dkim; t=1699459355;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RipaHVPwMGGhbwJJPFTXj3Tjyq2bAG9KSaqxO9ECzrs=;
-	b=BN26Q2Wjdm/VjViXbOCngio8lAHX5vd4pMmeH9vDtgxgercs5pOQxaR5hB0+0Q+W7VBbT1
-	uKrqxpVNfAO67BIX1CoTVANVcJMHxQU1+2v9oMczTalaVC8+eNYgElNv8MAx9LMISACi4p
-	lIgHafNowucV0A7xgDZRHJgn5y0hCUsRldmKR8Cq3wDmVVZ3VRO49j5s2+YN3OIuUVeQlB
-	ka2It+hr9ZELgBmEJDQvEIPyvW+q3eK43NHqclBgq33Rq9/8VFRDkAHgdSrU7pm9W1W16e
-	LBksTtNSuPIe7fZAnYZmHiBO6cTb5ncwiw6pjhWhTj5BeDNR7qrRJttclXlEWg==
+	bh=Dk7dwy8NWfdLQyKcFnKlwrM/x1+oCmnez3djqBLF/5g=;
+	b=Mv5W0sanXzg685E0pPdslTgo+dFkbTQ6aK4Z4r27QDYcqdopbrCRTbIz7hrW0n3F3cyA/o
+	iBcNUp9g0SVKN3mU4kq43wKE7UElghovfNbp+vBKKOFtFDwf2Xif/lcvteVPXby8uo/Uvt
+	VDq0rz5M4crDQuI1XuEGF9CNWvAA63YZdXO1opR9lmXLHI2mZwciv5WCf/MQ1f0rGePbmb
+	3lA4zYGWo6H1/udHlsID8whayU5wru3ToltzXUTHoVSy4TEGIKgz1l2APkULQkhrWGNF/L
+	wJW5QXF7n3SgEb5ClnsFN+EW8whBmZneV4SZ0BYvWgxkJKbVsLFhJ/nf2yt3XA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1699458259; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1699459355; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RipaHVPwMGGhbwJJPFTXj3Tjyq2bAG9KSaqxO9ECzrs=;
-	b=HlDchp0dSaz47fMm0hJiq/Xi210KJilLLBsJ6mqYzfM/NuGSpm8yOztKuxbEpX55EBpcKJ
-	VQje8LlrXfVRx1CxC0plxKvxjLdIk0R9ggMoZC9ichGJ+xuPL9NDVs8ZR5QtgGdQdTzdKI
-	9IeYRZ+n61Mk15UDtIauJryRZy+qsCt/TXMrpvCCMfZE5mVWfsLo5pywBs+fu9z0MnglSH
-	Cifu2YRORBw7qh8m5MU0/E9KmaTzjxqHtY04IDMatOIdf8mFGQxngm1DdO9w5bwgA/o029
-	e3EolOpZKTAQy351UcsaCOchiduxcy60Pn9Hfm/Ho2Wu4BumfG7zDWVPhCH8hQ==
+	bh=Dk7dwy8NWfdLQyKcFnKlwrM/x1+oCmnez3djqBLF/5g=;
+	b=AtPWmXmP2nlW1WlxYN3gkoEZHraLfLCRO2I5NRdgJx2dorfp9gyPI3FcJ5w2SJ2va4UFx3
+	2R2lVVmlUpG16R6NN0v/3FkMvdhU2S44Ha9vTDyUqQvPiGv9kfHUg7D0xZN4062r05zXp8
+	rlQI1Aj9sIPK8nz9B2d+F1rESG4kDVnHMESxCeQuXeg4dzb/wG7eMADumonY98ht4w4PEo
+	E1pqjWdpPO5cwPiymXqnVIaoeJ0uaiB5zWysDC44zUE5nqh5t8cllrYboVk/uYrb70UFVq
+	vAW6diDX5Rix3m/iHWxIQs0TAwmhL+PuQ1VTX+RS5UfnIKkda/g0IaS5HKyoFA==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1699458259; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1699459355; a=rsa-sha256;
 	cv=none;
-	b=s+lUGjmHIyiQNK6Z599xL8wH0CX1SJDwPPKqc+kvtrTqZhEDQxsoIeEb2rcau6SZ6tv9/f
-	59QJrTPVYfj30nxW9blaURITlDpcsXFx8j9bVfJtnYfQ+4rBUXIQsE2YuKyW9llpAQ2bsu
-	7Q6uVwzlf/NMRIB6437/0czbknVvIlc2c/3PGDvVidl3NPnNSRz46ABA7jImWxrpibVe2o
-	1OBdkTMUBI/rUef0wyc+aZFICHt5GR1WuS3ztCiy+1SegnU1FPAc7SI7uSKPK1cBl2rKMi
-	Xkj47WyKZxS8BvgDg8y/O5O1dv0QFLMpzrbslUggnVEf668D/eIEoeBtYTTZ4A==
+	b=dAaASI46L2briNY7ODu8UZIz8gd81rMUmZwTQCF6jetkPzfG2aVrPH7Hy8G/Y+6KuU+zlF
+	ha5I27k02GiluA7HZiMVF2zorMdnSTndEUlZT3R5tJw11CokyObmZdYSRy3RxIPgyiqeJG
+	YIKIBRLzA7DdYt5cfTxrNJGgaXURmNIlAAV4YTlKVV4I6Mvqr/sVJMuvCH3+o4PdqoayQj
+	mBSVQM+yzvThLAjsyGblhLmWJwnhkDArgLQnNkmddtOznscF+agybAJqwQGRjft5JvPlvZ
+	BUHSC+07fSFnhmcrOrY83mJa/Sct9J8+72PcH3sVVOkaEnkkEWKkpU/RQefLcA==
 From: Paulo Alcantara <pc@manguebit.com>
-To: nspmangalore@gmail.com, smfrench@gmail.com, bharathsm.hsk@gmail.com,
- linux-cifs@vger.kernel.org
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: Re: [PATCH 08/14] cifs: account for primary channel in the
- interface list
-In-Reply-To: <20231030110020.45627-8-sprasad@microsoft.com>
+To: Steve French <smfrench@gmail.com>
+Cc: nspmangalore@gmail.com, bharathsm.hsk@gmail.com,
+ linux-cifs@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>
+Subject: Re: [PATCH 11/14] cifs: handle when server starts supporting
+ multichannel
+In-Reply-To: <notmuch-sha1-c3bfa7f4ae0bb24c5ee7cfddb408c2fbeca5d8f7>
 References: <20231030110020.45627-1-sprasad@microsoft.com>
- <20231030110020.45627-8-sprasad@microsoft.com>
-Date: Wed, 08 Nov 2023 12:44:16 -0300
+ <20231030110020.45627-11-sprasad@microsoft.com>
+ <b709f32a96f04ff6136b69605788a2e6.pc@manguebit.com>
+ <CAH2r5mtSZGJJYqFK1N+uT5gcr8vkUhLdYNE_VQ3nP67XxnnpPQ@mail.gmail.com>
+Date: Wed, 08 Nov 2023 13:02:32 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -59,55 +61,31 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-nspmangalore@gmail.com writes:
+Paulo Alcantara <pc@manguebit.com> writes:
 
-> From: Shyam Prasad N <sprasad@microsoft.com>
+> Steve French <smfrench@gmail.com> writes:
 >
-> The refcounting of server interfaces should account
-> for the primary channel too. Although this is not
-> strictly necessary, doing so will account for the primary
-> channel in DebugData.
+>> removed cc:stable and changed
+>>
+>>> +                             cifs_dbg(VFS, "server %s supports multichannel now\n",
+>>> +                                      ses->server->hostname);
+>>
+>> to`
+>>
+>> +                               cifs_server_dbg(VFS, "supports
+>> multichannel now\n");
 >
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/smb/client/sess.c    | 23 +++++++++++++++++++++++
->  fs/smb/client/smb2ops.c |  6 ++++++
->  2 files changed, 29 insertions(+)
+> Looks good, thanks.
 >
-> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> index d009994f82cf..6843deed6119 100644
-> --- a/fs/smb/client/sess.c
-> +++ b/fs/smb/client/sess.c
-> @@ -332,6 +332,16 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
->  
->  	/* then look for a new one */
->  	list_for_each_entry(iface, &ses->iface_list, iface_head) {
-> +		if (!chan_index) {
-> +			/* if we're trying to get the updated iface for primary channel */
-> +			if (!cifs_match_ipaddr((struct sockaddr *) &server->dstaddr,
-> +					       (struct sockaddr *) &iface->sockaddr))
-> +				continue;
+>> Let me know if that is ok for you.  (See attached updated patch)
+>
+> For the s/cifs_dbg/cifs_server_dbg/ change, it is.
 
-You should hold @server->srv_lock to protect access of @server->dstaddr
-as it might change over reconnect or mount.
+BTW, this patch in for-next branch still contains
 
-> +
-> +			kref_get(&iface->refcount);
-> +			break;
-> +		}
-> +
->  		/* do not mix rdma and non-rdma interfaces */
->  		if (iface->rdma_capable != server->rdma)
->  			continue;
-> @@ -358,6 +368,13 @@ cifs_chan_update_iface(struct cifs_ses *ses, struct TCP_Server_Info *server)
->  		cifs_dbg(FYI, "unable to find a suitable iface\n");
->  	}
->  
-> +	if (!chan_index && !iface) {
-> +		cifs_dbg(VFS, "unable to get the interface matching: %pIS\n",
-> +			 &server->dstaddr);
+        (1) misleading export of smb2_query_server_interfaces()
 
-Ditto.
+        (2) removal of mod_delayed_work() when reconnect failed
 
-Also, I think you should log in FYI level as the above doesn't seem
-unlikely to happen.
+        (3) logging of failed network interface queries even when server
+        doesn't support it.
