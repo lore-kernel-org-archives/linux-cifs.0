@@ -1,58 +1,58 @@
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D491B22EF6
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Nov 2023 18:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4800D224C1
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Nov 2023 18:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="GS9FJ1mC"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="YPH52W0v"
 Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE7941BD;
-	Mon, 13 Nov 2023 10:11:43 -0800 (PST)
-Message-ID: <05bfafca49fbed96ea500c25a0606205.pc@manguebit.com>
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87FB710F4;
+	Mon, 13 Nov 2023 10:49:46 -0800 (PST)
+Message-ID: <6bcf9eb2d4ca5faa17e8e0842c4d69fd.pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1699899102;
+	s=dkim; t=1699901384;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yKSrjtxbuj9NYHKxn0CA+1z9ujAMfGaUyn32vutlNYo=;
-	b=GS9FJ1mCnxnQQpV5S3pvgFV9msp4MULkEwJy1c84k7K7H4tMkrRAo/OHJgjf1KxZiME0Ez
-	Aij6N9cc6+/bjJcwRW0+W/d5VeHSNjXM3ihtIUZ6E0+ppNaEBIXmXPnZMgdc3QingLZoRe
-	v5JChg++fLyyap+EjEnc1GDKVj2A2ktX8pbl3IHfejKB1VUUiow4oNDE6OzH8EpkIXSpy0
-	MZvEaq0ykg0RK8VXMLcd0slkweWBacy4e6y/UlJ6+87IdGrDnomK2QC2CgxBQaNfVANxKH
-	12S5J2U43Ptx8yQ2jRNbHMnR/kHDAAJCquHAFRy2QJ18D4v2DHrMoc151/y2cw==
+	bh=YdugKrF1IHQlb6TkxWiEpumPtlmZ379QWs8fZvedX24=;
+	b=YPH52W0vCrsa65YO0LWx28OiLIEZNBi9nurcA/VlQfU+CVhc4XSv9teWPiiXs1gcZ/1S6j
+	2z6MMwfd8OkzBd5XtpWD0d1jPzocppDfGsmsY3/drw2AAPshTJlSBzCpZUPzSLbrfuvkB6
+	ymCPO/7JjQd0NXRxBi4v+t/uLTYZ+SFDkZ71rVWk7UHbVdcKcTmE4govFPIHZNuaQcH2AV
+	8Y3iAank794IxdExgLcjag4xkxyEzScpvdSHjKN5QJUrslHk0waL+X4k7/muesei2Gq/NX
+	MK84RCVSmjfqn76DjhOU8Dt57bep+RotwQ0WgX5lh5w+ISu7XfufWzE4yVYqoA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1699899102; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1699901384; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yKSrjtxbuj9NYHKxn0CA+1z9ujAMfGaUyn32vutlNYo=;
-	b=Tk3B5gXGy4901LYXYS682EHokjf4ZKcukDBWeDHKrt/1G11h4KMuqDDZLg/710GljnuQZF
-	i+cPq2hgmhMuLBhOdSlBg34RU9HGAri4zsSGCeIZXKwx43VcOd9JTy1ehcCmDHRPKar+SQ
-	q5virzBVEr8vBcdrAsSKep/TpmNlshcVqhH7EIBMLtkjyWQ7cr1/Pz/yH3+KpSnNZkTd+2
-	YvJ1rABBI7AV+HD0VBT4Mp5xXi6mgHluR1vJ2tWWj5Cxai+jpaqv9dNXNrdfz0+IqYaWvd
-	GTK+Gqa4wD9bMQjr9lLr14Odjk9eeDsTZmqPk0YNhMJiLJ8oAM9QauXfPJAfeQ==
+	bh=YdugKrF1IHQlb6TkxWiEpumPtlmZ379QWs8fZvedX24=;
+	b=IVzS7DHdzhuBCTwZEqcrJ0EebdfaWtnBVQZ6Tw+SV10HTFOC7qiUOOF+qiAgtNE2oqyUp3
+	yujSJGmPc3XaAqgWbbde5G+cSFKXbfvWPX/QKlhBwyCwj1gTti0B3O6RsFH0yfPyNR5cmQ
+	Va8kvIh3FMMkGlANinL+Cn7mBqvnXZ4eQ9jFKCa1hlIrTR54qLH1eRLh3q06w7kaRqcp52
+	oSF1FZ/aQEHG6tbAR+yDY9uOlLwGLZ9Vso6JZbxxQ5/MaLlAAbBZpoqsjMp8VBF1Bl44Q0
+	8tfv52fOJnxnh4V6zU67knG0RoWXoUnDTy4Ea8OKjFk0nd5Ztut2s8KFZrOyTw==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1699899102; a=rsa-sha256;
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1699901384; a=rsa-sha256;
 	cv=none;
-	b=NQIi+hdOWOW3kWFB0mPd14F7ABAkz4M01Mu2/JUeZA8xWS9BNMrgAa7Hk+f8RzTlY+4USC
-	GditludfOky8+Kt6u7v+RepyLRQMDkRMCvCZqV+VA8qgjhnvfO6gb76AmnIW5c8KNDdeiC
-	IQOYcWGh+LHonLr+bYuaUkjxH3c0RXg1CAI/8stYwDVNlxQ60d2pccDeaY/wyUjhXQRy7a
-	mpexNcTund2kk3S/Nz96GI8ihM6a7HCfIHnWT6VDd7f5T09/bS0sDo6LQqu3fDAvwMYMTF
-	wHJLBsLfAOy7v6Ot+hVb3WArZcmeE2Inzn0esrehbvvNkal7GdQH/VgweC9DCQ==
+	b=govAlo1L714Gbqo1VbQfkM6vjRsK6bhNSG9DtUwjDdkU3lMBmC6+ud9z2NrKh9jj2D0PkB
+	yIRk3dPQksDdh6Yi04mjjjTA1RpTozaISCoZrZrYIJYaTqcHrd9VbN+ciUQ2OioDao8vu9
+	T8Ygh0cWuG/vVbIc+asUd+GgyLrWuhB5rsU8iuACu5+SNkWAG0m75Ykjzvec5KGLSpLOwe
+	AloD5BcZc6XOF4a+NTZXcw6jhI8WBqi87a2SU59AqC9+nTDJhw51fgsqhPgGblhGPWfBCd
+	olJoZV6+MNASjIPOVtxOL5/OR6QEOac9JvWGOdCc8SUlj7c2af8WnkYA58jEKw==
 From: Paulo Alcantara <pc@manguebit.com>
-To: Anastasia Belova <abelova@astralinux.ru>, Steve French <sfrench@samba.org>
-Cc: Anastasia Belova <abelova@astralinux.ru>, Ronnie Sahlberg
+To: Ekaterina Esina <eesina@astralinux.ru>, Steve French <sfrench@samba.org>
+Cc: Ekaterina Esina <eesina@astralinux.ru>, Ronnie Sahlberg
  <lsahlber@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey
- <tom@talpey.com>, Jeff Layton <jlayton@kernel.org>,
+ <tom@talpey.com>, Aurelien Aptel <aaptel@suse.com>,
  linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, Ekaterina
- Esina <eesina@astralinux.ru>
-Subject: Re: [PATCH] cifs: spnego: add ';' in HOST_KEY_LEN
-In-Reply-To: <20231113145232.12448-1-abelova@astralinux.ru>
-References: <20231113145232.12448-1-abelova@astralinux.ru>
-Date: Mon, 13 Nov 2023 15:11:37 -0300
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, Anastasia
+ Belova <abelova@astralinux.ru>
+Subject: Re: [PATCH] cifs: fix check of rc in function generate_smb3signingkey
+In-Reply-To: <20231113164241.32310-1-eesina@astralinux.ru>
+References: <20231113164241.32310-1-eesina@astralinux.ru>
+Date: Mon, 13 Nov 2023 15:49:41 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -61,19 +61,20 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Anastasia Belova <abelova@astralinux.ru> writes:
+Ekaterina Esina <eesina@astralinux.ru> writes:
 
-> "host=" should start with ';' (as in cifs_get_spnego_key)
-> So its length should be 6.
+> Remove extra check after condition, add check after generating key
+> for encryption. The check is needed to return non zero rc before
+> rewriting it with generating key for decryption.
 >
 > Found by Linux Verification Center (linuxtesting.org) with SVACE.
 >
-> Fixes: 7c9c3760b3a5 ("[CIFS] add constants for string lengths of keynames in SPNEGO upcall string")
-> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
-> Co-developed-by: Ekaterina Esina <eesina@astralinux.ru>
+> Fixes: d70e9fa55884 ("cifs: try opening channels after mounting")
 > Signed-off-by: Ekaterina Esina <eesina@astralinux.ru>
+> Co-developed-by: Anastasia Belova <abelova@astralinux.ru>
+> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
 > ---
->  fs/smb/client/cifs_spnego.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  fs/smb/client/smb2transport.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 
 Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
