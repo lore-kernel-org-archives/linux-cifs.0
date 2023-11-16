@@ -1,38 +1,38 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EvjxfPrW"
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD0D3B8
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Nov 2023 11:09:22 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50a6ff9881fso1734966e87.1
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Nov 2023 11:09:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPTzU4/q"
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2CFE1A8;
+	Thu, 16 Nov 2023 11:11:12 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-50970c2115eso1787835e87.1;
+        Thu, 16 Nov 2023 11:11:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700161760; x=1700766560; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1700161870; x=1700766670; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=Dn04mRqD381J0knM3vu5fALJ+ePstcD8oihEcanhTwM=;
-        b=EvjxfPrWJvebZ1SgNDgkY20512h6G4L3cW/5WT6VsSq4D9Jgj4VA4h820vk8k67cTY
-         1j4u/XmCFym5WOYOxRpU97YCdZ61wirKAzDydb6nn7x5I+wHSz+QEmIlY6kzdLHp3may
-         jzyyv5vjiq3LHeYDI1cPvbe7WUkAt46OuZR5lJism7/qYQbuT48GRSR6aILE50ptkcPa
-         Blmo0VNY6ga0W+hYkuoFrqf9IfyhWN1eOjK8b6d7Q/qL1mCZXhwYRgNBidRVuuOS527t
-         nZvRmM2Kro5pffbPnaNA/rQ+QPpnEzs4NrA84vnYD95k3KMJZi3K3LZFc7BUIyXHRkEA
-         9VQQ==
+        bh=HvqoSmET7AGneC0DU+9vvXM7mU+Afpt1Gl2P+52o3jI=;
+        b=bPTzU4/q8JqrgXJ+fQZSq/aWqpH7hf1mh4lavpeNeHyaLOUoihyjLoQI0aY2re5rBu
+         eSWMw/KZUNvJO9GQGXHFbX+2AdPWmiUsLmsKbf7qrEAxZy+ysFyzrjnw83bZwgekQUZW
+         dRTSAXsORz1SKPPXH5QBys6mewE7V+H+iEfDvHGlIohP30CrlIwLzxm4BjYSuNOiEZOj
+         8awYKaThax7T5n7vUa1l1lPQ3VlTrtgiPIC3JkPegZz82D3mvg62VDfZiRN004yDvTFu
+         bkDbWkgy/Nt06VKmtEH3ucPcr0KQoermMZhPOkv01xfgp7lXumunb20L6z/2/yhPGOvm
+         MRqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700161760; x=1700766560;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1700161870; x=1700766670;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Dn04mRqD381J0knM3vu5fALJ+ePstcD8oihEcanhTwM=;
-        b=HYp/qRP7q1q0TiXkcwYzXZTzvnp14PFIEcRv8u0+gdYtYV/9cy6mFpg25xw/s+I/SX
-         bsvdtHNdaZeAaY8/4aoSMjrMXYQmQ4DREdItrYQ0tJzs69mVl9hGzb3nUUnQadGJlLrt
-         Etgkt3TaBSx05En/S5i8DuS/wnCRfFDe8nKvdm6NX+SHmsu5NYq6jEobcmY5yrD7V7ST
-         G65qzXLyMglMlnifejoLIxqCzzpqdnJNWF3hYK74TkrixP8nIzW6x0txBaHJl9SO9Bsd
-         xhXgLI5ZjSPHZnLXsIG3NhcpGEPoVS+UgoUnjkNGBm7ATdEraA7CUdj54uzwrrFCmwjI
-         2Svw==
-X-Gm-Message-State: AOJu0YwAUVmvqshf1LgmXRXO+H/p5QIbB+oxayEu8MhMT3RDlSVViHHh
-	cLeod/K49nC3ZuojpNETHXK3gRXvRZ5R2QP6enITrlmTeShqkw==
-X-Google-Smtp-Source: AGHT+IF1F+EubZIXeGExd5+TESvIhpKbU4PqgysTlfOId+BT+ooMNX3ywZHQS4ThhqWc1R1JaQsKEuzn1Zy++AhioaI=
-X-Received: by 2002:a05:6512:398a:b0:509:145c:6a49 with SMTP id
- j10-20020a056512398a00b00509145c6a49mr16599331lfu.42.1700161760232; Thu, 16
- Nov 2023 11:09:20 -0800 (PST)
+        bh=HvqoSmET7AGneC0DU+9vvXM7mU+Afpt1Gl2P+52o3jI=;
+        b=xB98dfGwm8D2ixC2nmswiROsSaxbKnHWaWAe3sagW363+lQlco02msD321z0ICJfu/
+         7GyXU9BRnJCOe0zKLTwhaQdcRQtEq9aaYuqCr/apUvqLG2XRXXiPmtXx8N6+cfbLF1+y
+         Cki1srSu5ceWP6Yi0GAbAM3IoTQNFq/NpLcXv5eUlNpN6lu8br5OF2mNu6mmW/zFOHQ1
+         CKV12SADlBeOQGA2R6FmVziNnnUoYAxyqBkeSizl4W8CpU6iQlS+7cP39dIEeBXObFbd
+         VJJ8fpU5/stMro6bnNtpQCQwqwQ5TnLn4vjKnt+K2D2WytT8utQ3HcEycP0Esp+2xdrk
+         7gZg==
+X-Gm-Message-State: AOJu0Yw7U4vW6NOoHHhBAIFKvMXcCbRNLK41h1fcs9IYkVdDEv7e8bpl
+	sytRC5vd9BRkqTY7qG0G4O2AdzFPjcVlqerZdFvU08H4SEPphQ==
+X-Google-Smtp-Source: AGHT+IFRVCxgaf/Z3tqusQJxhVAgc3v+PKDVWuF/KqBZYrhhWCHzv/pxlMIixAMYXwSLHgQOvnmQmNNwffletgg3BXU=
+X-Received: by 2002:a19:6409:0:b0:509:4e4f:65ac with SMTP id
+ y9-20020a196409000000b005094e4f65acmr10428397lfb.63.1700161870144; Thu, 16
+ Nov 2023 11:11:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,25 +40,23 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 16 Nov 2023 13:09:09 -0600
-Message-ID: <CAH2r5mvJ9=b=HCKPbi937SP-a0EhY1f5XcQHXPfXCD6TZq70BQ@mail.gmail.com>
+Date: Thu, 16 Nov 2023 13:10:58 -0600
+Message-ID: <CAH2r5mu8NBbW3ipMYd-UdfV+oDA1R7mwV-A8=PzU5qrd4kEiGg@mail.gmail.com>
 Subject: [PATCH][SMB client] two multichannel patches
 To: CIFS <linux-cifs@vger.kernel.org>, 
 	samba-technical <samba-technical@lists.samba.org>
-Content-Type: multipart/mixed; boundary="000000000000c7aa00060a49c1ea"
+Cc: LKML <linux-kernel@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000005558fa060a49c8f3"
 
---000000000000c7aa00060a49c1ea
-Content-Type: multipart/alternative; boundary="000000000000c7a9fd060a49c1e8"
-
---000000000000c7a9fd060a49c1e8
+--0000000000005558fa060a49c8f3
 Content-Type: text/plain; charset="UTF-8"
 
 Any thoughts on these two multichannel patches from Shyam (attached)?
 
-The first fixes: "cifs: account for primary channel in the interface list"
-which fixes a refcounting issue in channel deallocation.  The second fixes
-a lock ordering problem in the recent patch: "cifs: handle when server
-stops supporting multichannel"
+The first fixes: "cifs: account for primary channel in the interface
+list" which fixes a refcounting issue in channel deallocation.  The
+second fixes a lock ordering problem in the recent patch: "cifs:
+handle when server stops supporting multichannel"
 
 The code to handle the case of server disabling multichannel
 was picking iface_lock with chan_lock held. This goes against
@@ -77,43 +75,20 @@ that order for each secondary channel:
 8. lock chan_lock again
 
 Let me know if any test feedback or reviews
+
 -- 
 Thanks,
 
 Steve
 
---000000000000c7a9fd060a49c1e8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Any thoughts on these two multichannel patches from Shyam =
-(attached)?<br clear=3D"all"><div><br></div><div>The first fixes: &quot;cif=
-s: account for primary channel in the interface list&quot; which fixes a re=
-fcounting issue in channel deallocation.=C2=A0 The second fixes a lock orde=
-ring problem in the recent patch:=C2=A0&quot;cifs: handle when server stops=
- supporting multichannel&quot;</div><div><br></div><div>The code to handle =
-the case of server disabling multichannel<br>was picking iface_lock with ch=
-an_lock held. This goes against<br>the lock ordering rules, as iface_lock i=
-s a higher order lock<br>(even if it isn&#39;t so obvious).<br><br>This cha=
-nge fixes the lock ordering by doing the following in<br>that order for eac=
-h secondary channel:<br>1. store iface and server pointers in local variabl=
-e<br>2. remove references to iface and server in channels<br>3. unlock chan=
-_lock<br>4. lock iface_lock<br>5. dec ref count for iface<br>6. unlock ifac=
-e_lock<br>7. dec ref count for server<br>8. lock chan_lock again<br></div><=
-div><br></div><div>Let me know if any test feedback or reviews</div><span c=
-lass=3D"gmail_signature_prefix">-- </span><br><div dir=3D"ltr" class=3D"gma=
-il_signature" data-smartmail=3D"gmail_signature">Thanks,<br><br>Steve</div>=
-</div>
-
---000000000000c7a9fd060a49c1e8--
---000000000000c7aa00060a49c1ea
+--0000000000005558fa060a49c8f3
 Content-Type: text/x-patch; charset="US-ASCII"; 
 	name="0001-cifs-fix-leak-of-iface-for-primary-channel.patch"
 Content-Disposition: attachment; 
 	filename="0001-cifs-fix-leak-of-iface-for-primary-channel.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_lp1kbwn30>
-X-Attachment-Id: f_lp1kbwn30
+Content-ID: <f_lp1kgb1d0>
+X-Attachment-Id: f_lp1kgb1d0
 
 RnJvbSAyOTk1NGQ1YjFlMGQ2N2E0Y2Q2MWMzMGMyMjAxMDMwYzk3ZTk0YjFlIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
@@ -140,14 +115,14 @@ dW50ICovCisJaWYgKHNlcy0+Y2hhbnNbMF0uaWZhY2UpIHsKKwkJa3JlZl9wdXQoJnNlcy0+Y2hh
 bnNbMF0uaWZhY2UtPnJlZmNvdW50LCByZWxlYXNlX2lmYWNlKTsKKwkJc2VzLT5jaGFuc1swXS5z
 ZXJ2ZXIgPSBOVUxMOworCX0KKwogCXNlc0luZm9GcmVlKHNlcyk7CiAJY2lmc19wdXRfdGNwX3Nl
 c3Npb24oc2VydmVyLCAwKTsKIH0KLS0gCjIuMzkuMgoK
---000000000000c7aa00060a49c1ea
+--0000000000005558fa060a49c8f3
 Content-Type: text/x-patch; charset="US-ASCII"; 
 	name="0002-cifs-fix-lock-ordering-while-disabling-multichannel.patch"
 Content-Disposition: attachment; 
 	filename="0002-cifs-fix-lock-ordering-while-disabling-multichannel.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_lp1kc5bv1>
-X-Attachment-Id: f_lp1kc5bv1
+Content-ID: <f_lp1kgf651>
+X-Attachment-Id: f_lp1kgf651
 
 RnJvbSA1ZWVmMTJjNGUzMjMwZjIwMjVkYzQ2YWQ4YzRhM2JjMTk5NzhlNWQ3IE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
@@ -195,4 +170,4 @@ cm1pbmF0ZSA9IHRydWU7CisJCQkJY2lmc19zaWduYWxfY2lmc2RfZm9yX3JlY29ubmVjdChzZXJ2
 ZXIsIGZhbHNlKTsKKwkJCX0KIAkJCWNpZnNfcHV0X3RjcF9zZXNzaW9uKHNlcnZlciwgZmFsc2Up
 OwogCQl9CiAKKwkJc3Bpbl9sb2NrKCZzZXMtPmNoYW5fbG9jayk7CiAJfQogCiBkb25lOgotLSAK
 Mi4zOS4yCgo=
---000000000000c7aa00060a49c1ea--
+--0000000000005558fa060a49c8f3--
