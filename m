@@ -1,60 +1,55 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E07419BCC
+	for <linux-cifs@vger.kernel.org>; Sat, 18 Nov 2023 19:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E4t6n75y"
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4560129
-	for <linux-cifs@vger.kernel.org>; Sat, 18 Nov 2023 05:24:54 -0800 (PST)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5bf58914bacso31950787b3.3
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Nov 2023 05:24:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700313893; x=1700918693; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:content-language:to
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8sASxTprz7iqMnqUhV2io7qqAJmSIwJfp20Hyqkb8VU=;
-        b=E4t6n75yDpM3DNmZVam8i+wfqXIk/p28ShxQq2zeqKTzhrEUYdUsNLT36nwcOOGZy/
-         75afQCU7HRLB3VQSB88Qj7cjT0opCeIEftkBTonT6KLQ4GUJzPRrG+dsI6SagdvA9K3P
-         H2Rn8gyATtj488VuTGW8KEKkX6tg4jzyEdXMqNKL5DcLpGO0YrbqK8W60tOVOdv0jyPR
-         NRTFobR4OfQSZy1UAAlMSdGjOz/mbgfO9ZFvZwAmgLQanddQ9zqfcL+sfjEV6/zBdoUI
-         sLsYZYHF/vyw7WoAPwMBa6bRcB1XdSLiPUuywnphwmZXcSb3Jz91fyC/bmSf4fUSngsY
-         Lt6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700313893; x=1700918693;
-        h=content-transfer-encoding:subject:from:content-language:to
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8sASxTprz7iqMnqUhV2io7qqAJmSIwJfp20Hyqkb8VU=;
-        b=sk6BboqVLjpuBib5ve9fZW0MiR2QG8IyEJ/YaO1Gf8Ff/KyFLGxZHtPZNanXgKb0x7
-         Zf+qKn+j9Kf17a4GvvjzMPh5lswcu8SEItxkFPZqOlQbP6W4TT62cE10L7l2cd68lXBj
-         NSRFPomxqCocSebaCgzPSFr9fKDFsemYPBP3HqkQNEahf84d+Q+nJ/dUnBMUA3m1ly4I
-         6NlxVr2eLciKcwgxGpto3louQHlKxnSyzCppWRx/ZJuWylNLbxKx04cA3uVPPM5MXg+k
-         XVkP/rKH2Je/wYY5zZFxSpTaWNUnx9ESZNSaZqQ9dL8MoKe8dPRxaI6Ngb1Sm5JbkSju
-         c2mw==
-X-Gm-Message-State: AOJu0YyUDPO4TiGS5Sfov3VuUlhCF/jSzAA1GjJvxFlCqGhaVKt7U1ku
-	m0mbIdp1DVwQqr2FCZmK99Z0oNBdgVHuCg==
-X-Google-Smtp-Source: AGHT+IFLEvojm0FeCCkunX2jh7pEgIhCbT92bdLxgIETeqFWsNH+5X164rn4zBuDH+SslHbVNBabuw==
-X-Received: by 2002:a0d:d553:0:b0:5a7:ba09:52c7 with SMTP id x80-20020a0dd553000000b005a7ba0952c7mr2221101ywd.11.1700313893226;
-        Sat, 18 Nov 2023 05:24:53 -0800 (PST)
-Received: from [10.0.0.28] ([194.36.111.27])
-        by smtp.gmail.com with ESMTPSA id p195-20020a0de6cc000000b0059be6a5fcffsm1111702ywe.44.2023.11.18.05.24.52
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 18 Nov 2023 05:24:52 -0800 (PST)
-Message-ID: <767cd9ed-c145-4fd5-8eed-5d0ab8e0866c@gmail.com>
-Date: Sat, 18 Nov 2023 08:24:51 -0500
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nsa2H2P6"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ADC42C433C8;
+	Sat, 18 Nov 2023 19:44:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700336699;
+	bh=iPOzN9M4W3f0bjODzDe2uZ3OY8xdK/MklwqPBnFlIGM=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=nsa2H2P6Bn5OYrrEQGh9baA1qRjxAngf7mB8zX2bUVxF3c6VhvWMP43kOzzuidCrP
+	 q0isz2k7e4F6CHMTyhy2aYjfNzDe0xpaB9UqJ5H/IerMYp+F9FW9l7h5jV9lW/oL3a
+	 EYicglCHvJZOBfrthyhtB/Kt+D0nWc4YIqbOP6/LMqsaArRhsjpg20bJ2qGaqeRfK2
+	 /ScCYVhcYWzW3Xey9lhv6QqYN00TijxzHWJq1Lob9XDDbixXUUD7lVHwIYC4VFaLj0
+	 JSuNIAxIpHwDE/ljtmrkfSIcoCbq0533NgJ1Kbe4IlhX37G0vtZs8YTKhMn4LZZLNW
+	 m7c1hBxvh35/w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 99D09EA6303;
+	Sat, 18 Nov 2023 19:44:59 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5msETjR-mEd6PUkE-E=OTMFKh-jD2ucuHP=uGyLScZQCLA@mail.gmail.com>
+References: <CAH2r5msETjR-mEd6PUkE-E=OTMFKh-jD2ucuHP=uGyLScZQCLA@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5msETjR-mEd6PUkE-E=OTMFKh-jD2ucuHP=uGyLScZQCLA@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc1-smb3-client-fixes
+X-PR-Tracked-Commit-Id: 5eef12c4e3230f2025dc46ad8c4a3bc19978e5d7
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 33b63f159a435c6dcaaf2cd0f312b28c76b61373
+Message-Id: <170033669962.17055.15504208894696400054.pr-tracker-bot@kernel.org>
+Date: Sat, 18 Nov 2023 19:44:59 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: linux-cifs@vger.kernel.org
-Content-Language: en-US
-From: Larry Marek <larrym404@gmail.com>
-Subject: subscribe
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-auth c3709a96 subscribe linux-cifs \
-         larrym404@gmail.com
+The pull request you sent on Fri, 17 Nov 2023 18:37:16 -0600:
 
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc1-smb3-client-fixes
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/33b63f159a435c6dcaaf2cd0f312b28c76b61373
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
