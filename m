@@ -1,91 +1,60 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LB5pso34"
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CACB5B0;
-	Fri, 17 Nov 2023 16:37:29 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-50a6ff9881fso3755792e87.1;
-        Fri, 17 Nov 2023 16:37:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E4t6n75y"
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4560129
+	for <linux-cifs@vger.kernel.org>; Sat, 18 Nov 2023 05:24:54 -0800 (PST)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5bf58914bacso31950787b3.3
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Nov 2023 05:24:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700267848; x=1700872648; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CxtVFoV3G/MmorB/F0YD8MQFUJsJvmktt5r+tHpZpZ8=;
-        b=LB5pso34cv04SMV6nGtIjeTrlbF0sg+zwZ+GWScf0a+ms1WuM9RmVGpvodok80hosC
-         87l0NYFPxMDHBuD46eznhlq9KH18vSjzJVO0VdFPPmIZjQH6gG6M2rYR4OpWIO8olym7
-         qXHvWW52aM6OdBVs9w3INjJzIRF0NdhQom82hQTvDh1GKcOXHYdu0t9v43t/8iRvVL2l
-         Wbe1AiMKxEdXrLnyhmOakawMewidfZwScluN2QnzMSKvrzECJbFFSPAmUrHG5uzMEOgk
-         O2NQl1IWQo+pl8QdAyhFLog0D//5MqpWNWwjhSCuXKe7uNhYMUiEL7FaGcqpxfsyAWyv
-         uCrQ==
+        d=gmail.com; s=20230601; t=1700313893; x=1700918693; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:content-language:to
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8sASxTprz7iqMnqUhV2io7qqAJmSIwJfp20Hyqkb8VU=;
+        b=E4t6n75yDpM3DNmZVam8i+wfqXIk/p28ShxQq2zeqKTzhrEUYdUsNLT36nwcOOGZy/
+         75afQCU7HRLB3VQSB88Qj7cjT0opCeIEftkBTonT6KLQ4GUJzPRrG+dsI6SagdvA9K3P
+         H2Rn8gyATtj488VuTGW8KEKkX6tg4jzyEdXMqNKL5DcLpGO0YrbqK8W60tOVOdv0jyPR
+         NRTFobR4OfQSZy1UAAlMSdGjOz/mbgfO9ZFvZwAmgLQanddQ9zqfcL+sfjEV6/zBdoUI
+         sLsYZYHF/vyw7WoAPwMBa6bRcB1XdSLiPUuywnphwmZXcSb3Jz91fyC/bmSf4fUSngsY
+         Lt6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700267848; x=1700872648;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CxtVFoV3G/MmorB/F0YD8MQFUJsJvmktt5r+tHpZpZ8=;
-        b=WZLgcbdNQrC4fg6zeniGb7LKToyBTBt2pQPTzWWF5hHmMCZfptqvNJ8CfpVGN2QCWg
-         gRa1YkYKwXJpLfNU2DWwu3gI6yoXnm9Q6yy7xQCYRGpi1F5nswobINmwFPHYEZGL6XOt
-         ZtpzoYl4Fz+qUiCGjVqZn6m+jbOuNxbS8H2L9h5ARZFgGoj+aHe2ujqm/tGZouNj2O9+
-         qQbZhfba5X+RqwlyoxhCnsHI0TF0eVdpt3Ib8TawrvgtMJyYaHziQJ89Juo9BmbsxYKl
-         v9ns0X8TDskcHHk2GxKwkbOcsj6cc0DSw5urh6iTDU82X3P4GOTIyTNjtq96mviKQPjQ
-         zyXQ==
-X-Gm-Message-State: AOJu0Yw5vxvI9/7KGRGIwvmA7hSUqQQ8otaEqJ2wDVnPWZ44j2ObLsZz
-	2M+xoEMTpdsGMhVSyNBWQATWwFmV0umitwGGYs1Jvggeiv4=
-X-Google-Smtp-Source: AGHT+IHMVCa5N6+PbZh3LRTxQsaEaet4ICSjDflQIYHwg/nDji7SsWKQUqLoH9Mydml6avg9Xnfgw57zQTUiD5X3N2M=
-X-Received: by 2002:ac2:4203:0:b0:500:acf1:b432 with SMTP id
- y3-20020ac24203000000b00500acf1b432mr720823lfh.63.1700267847640; Fri, 17 Nov
- 2023 16:37:27 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700313893; x=1700918693;
+        h=content-transfer-encoding:subject:from:content-language:to
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8sASxTprz7iqMnqUhV2io7qqAJmSIwJfp20Hyqkb8VU=;
+        b=sk6BboqVLjpuBib5ve9fZW0MiR2QG8IyEJ/YaO1Gf8Ff/KyFLGxZHtPZNanXgKb0x7
+         Zf+qKn+j9Kf17a4GvvjzMPh5lswcu8SEItxkFPZqOlQbP6W4TT62cE10L7l2cd68lXBj
+         NSRFPomxqCocSebaCgzPSFr9fKDFsemYPBP3HqkQNEahf84d+Q+nJ/dUnBMUA3m1ly4I
+         6NlxVr2eLciKcwgxGpto3louQHlKxnSyzCppWRx/ZJuWylNLbxKx04cA3uVPPM5MXg+k
+         XVkP/rKH2Je/wYY5zZFxSpTaWNUnx9ESZNSaZqQ9dL8MoKe8dPRxaI6Ngb1Sm5JbkSju
+         c2mw==
+X-Gm-Message-State: AOJu0YyUDPO4TiGS5Sfov3VuUlhCF/jSzAA1GjJvxFlCqGhaVKt7U1ku
+	m0mbIdp1DVwQqr2FCZmK99Z0oNBdgVHuCg==
+X-Google-Smtp-Source: AGHT+IFLEvojm0FeCCkunX2jh7pEgIhCbT92bdLxgIETeqFWsNH+5X164rn4zBuDH+SslHbVNBabuw==
+X-Received: by 2002:a0d:d553:0:b0:5a7:ba09:52c7 with SMTP id x80-20020a0dd553000000b005a7ba0952c7mr2221101ywd.11.1700313893226;
+        Sat, 18 Nov 2023 05:24:53 -0800 (PST)
+Received: from [10.0.0.28] ([194.36.111.27])
+        by smtp.gmail.com with ESMTPSA id p195-20020a0de6cc000000b0059be6a5fcffsm1111702ywe.44.2023.11.18.05.24.52
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 Nov 2023 05:24:52 -0800 (PST)
+Message-ID: <767cd9ed-c145-4fd5-8eed-5d0ab8e0866c@gmail.com>
+Date: Sat, 18 Nov 2023 08:24:51 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 17 Nov 2023 18:37:16 -0600
-Message-ID: <CAH2r5msETjR-mEd6PUkE-E=OTMFKh-jD2ucuHP=uGyLScZQCLA@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: linux-cifs@vger.kernel.org
+Content-Language: en-US
+From: Larry Marek <larrym404@gmail.com>
+Subject: subscribe
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Please pull the following changes since commit
-b85ea95d086471afb4ad062012a4d73cd328fa86:
+auth c3709a96 subscribe linux-cifs \
+         larrym404@gmail.com
 
-  Linux 6.7-rc1 (2023-11-12 16:19:07 -0800)
-
-are available in the Git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc1-smb3-client-fixes
-
-for you to fetch changes up to 5eef12c4e3230f2025dc46ad8c4a3bc19978e5d7:
-
-  cifs: fix lock ordering while disabling multichannel (2023-11-14
-11:39:35 -0600)
-
-----------------------------------------------------------------
-Four cifs/smb3 client fixes
-- three multichannel fixes (including a lock ordering fix and an
-important refcounting fix)
-- spnego fix
-
-----------------------------------------------------------------
-Anastasia Belova (1):
-      cifs: spnego: add ';' in HOST_KEY_LEN
-
-Ekaterina Esina (1):
-      cifs: fix check of rc in function generate_smb3signingkey
-
-Shyam Prasad N (2):
-      cifs: fix leak of iface for primary channel
-      cifs: fix lock ordering while disabling multichannel
-
- fs/smb/client/cifs_spnego.c   |  4 ++--
- fs/smb/client/connect.c       |  6 ++++++
- fs/smb/client/sess.c          | 22 +++++++++++++---------
- fs/smb/client/smb2transport.c |  5 ++---
- 4 files changed, 23 insertions(+), 14 deletions(-)
-
-
---
-Thanks,
-
-Steve
