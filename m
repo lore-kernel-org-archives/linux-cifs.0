@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZE00JxRQ"
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B35CC11D;
-	Sun, 19 Nov 2023 01:14:09 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6c398717726so2889555b3a.2;
-        Sun, 19 Nov 2023 01:14:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vw7FD2tg"
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47472D8;
+	Sun, 19 Nov 2023 06:16:43 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6cb66fbc63dso437344b3a.0;
+        Sun, 19 Nov 2023 06:16:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700385249; x=1700990049; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M+p8pqMrpXZyEZIe5esFa4AbHp5eeTaCs5mJkwXEzzc=;
-        b=ZE00JxRQ4Czu9CK4e1LZvefrdugZGUUpXvFEuTjKXSoZlu19w7B3pNHiOTvnDlEQQx
-         UA1eUQ5c4Gr/HvJgqkRgds4B1V0sPh4P7NZXtjVTYm6Tqp2MMyjmm/hxnNlV9kpIAyIo
-         XUGPI7l3dEVIzlnxt26WrCN5/s2k7bBXFfktzKfrXw8lHjmVH9DPdm72m6VWzNHsGC1D
-         aUyg/r7Jc4Tobp0zQCfYGV5Uv9mXQRX3WXtqTHj/6aWCmZkFed3nnooegS7zWsE+oWso
-         RzV9p31AZoUdxNw5Hq3ZiyYptNRqCiJAAkArgHx+yoyaYtglozQ0MKIf8lEj4In0TvIB
-         +l3Q==
+        d=gmail.com; s=20230601; t=1700403402; x=1701008202; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D5YMdSJ+DNHbcNIRlOywcDm3j9WNKn1Pp1oJN74vpQo=;
+        b=Vw7FD2tgK4Z8xiw4KOuYbCOvEL+l3CTXca7XYjAn3rdPaydbH9qsEYo+gIOPAFNXkY
+         3ivvljBnngXo9NtypR61CYlBZDOY5oMxdD+OwR6Xd2qFIUWg0JvOPehraCx5qcMTOsUT
+         T0RlVMvJ/Y15gES9CbdW41wOApnRGsWE/Io7p8EMwGiSZEwKxvIHwbToAcBdvIalJN1Z
+         S6eYxkRaVEZib/2X07gsKPup14TWWIwYO8zE52Y2JK6IbiOgfJk7XhtNt3tsdMfngrKi
+         W2mQPMJeUWnsC08ZnkKD+HLPKHKihI+jeQ456LuT6SD09rw9inTpbb0cl05duDeukkhf
+         tFzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700385249; x=1700990049;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M+p8pqMrpXZyEZIe5esFa4AbHp5eeTaCs5mJkwXEzzc=;
-        b=CgWuNJKXypc+lUVjQ01O04KUFhE6AbarERza+mUA7Xf72blU3bfWB5Vq6ksyEtMzX3
-         T/VOvivgH6IQzjUUWAtiAOlxFAJi/Bao8I7/DB6xfiSe96w3jxQiRhj8EuamSpHMjuP7
-         zgLu7HRf+iRjp1ZIGV4LC7bgYjamP+L3ErMj2r3/6K+XmXLpziMw6upcjhRU2QVQzw1h
-         udRKGNNyzCMCdlHsw46IWhMqhYVvzEGLNJHOju8rwoKUrXBy+FkEARCip7R38Ms3YzwM
-         ZfMGhjLFup8TxWot5ZIoWAhPehe1pJ4lLKX2XKgMW4h7tvOwu7YsBdcNvuXsUqinBYVV
-         UmbA==
-X-Gm-Message-State: AOJu0YyCy1a7DhmyCX4rl+cRRJKbR+apyydd4N5/U1VR7TErY681L/rc
-	4AHdNybhJ2nx4k6LU/LbjO8=
-X-Google-Smtp-Source: AGHT+IEsVyXir4hby69YJEQRz3oyzWpCAybRDINiHwCtq9D6F64T2biYeLp0Vulwa+n/S2PW4P28Gw==
-X-Received: by 2002:a05:6a20:8628:b0:187:440b:6e40 with SMTP id l40-20020a056a20862800b00187440b6e40mr2186180pze.17.1700385249040;
-        Sun, 19 Nov 2023 01:14:09 -0800 (PST)
-Received: from [192.168.1.170] (c-73-109-30-110.hsd1.wa.comcast.net. [73.109.30.110])
-        by smtp.gmail.com with ESMTPSA id f17-20020a170902ce9100b001cf5d4f8f26sm117015plg.248.2023.11.19.01.14.08
+        d=1e100.net; s=20230601; t=1700403402; x=1701008202;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=D5YMdSJ+DNHbcNIRlOywcDm3j9WNKn1Pp1oJN74vpQo=;
+        b=L6mhLUSbDmMT9fcX2SiHA4ASEP4MiJ4T69t6HmIi/zYnr2vv7zvJCeyphBwP/LksYr
+         Ez28T3Kfu/YHzCpnixHPvpU34zgDjqzNZ7CuRq2ig7Mw84oVuiKzBWPlDd/sPid1KA7C
+         uWZWZ2pyypmOult+vmrpJ8Y6ihZIVUMQy4k5jcejlLBCQarZ9Fr98ayJnSm/c8xRghDd
+         tOd4CuaLiGamnT0IbukS84m5aj+oZTnaLDJ6KhMhl3dB5TrRO7n52/2PvKJj9RTvBQZk
+         sM5Kp8jU+/A8GpHAGs7E27r0Ckgguhx2IQ4qbUqm4mBoD6GUMiS+IfI/XcyokvIfite0
+         4vgQ==
+X-Gm-Message-State: AOJu0YwG8ZCBBlrNSiA5anJ1bLASTyQ442Gu6Fy6jc5Gtm63lMrur4zq
+	BN5nllhG7GFTtqzBk/PwBcpg7IytYRc80g==
+X-Google-Smtp-Source: AGHT+IF6byi9ymN4DR72v6SwaZ7fg1ETCkw4C37szrVsW7+y/f5lsYg20gWNhM9MeNk2sZLcRmN0kw==
+X-Received: by 2002:a05:6a20:6a10:b0:187:b2cb:2b0f with SMTP id p16-20020a056a206a1000b00187b2cb2b0fmr6631658pzk.8.1700403402435;
+        Sun, 19 Nov 2023 06:16:42 -0800 (PST)
+Received: from [192.168.0.106] ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id p18-20020a63fe12000000b0058988954686sm4360457pgh.90.2023.11.19.06.16.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Nov 2023 01:14:08 -0800 (PST)
-Message-ID: <b503d929-ff3a-4dc3-9de8-aa0eb00d181a@gmail.com>
-Date: Sun, 19 Nov 2023 01:14:06 -0800
+        Sun, 19 Nov 2023 06:16:41 -0800 (PST)
+Message-ID: <0fd91726-942d-40dd-adef-5b43e25ec49c@gmail.com>
+Date: Sun, 19 Nov 2023 21:16:35 +0700
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -47,54 +47,96 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] ksmbd: prevent memory leak on error return
 Content-Language: en-US
-To: Zongmin Zhou <min_halo@163.com>, linkinjeon@kernel.org
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
- senozhatsky@chromium.org, sfrench@samba.org, tom@talpey.com,
- kernel test robot <lkp@intel.com>, Dan Carpenter <error27@gmail.com>,
- Zongmin Zhou <zhouzongmin@kylinos.cn>
-References: <CAKYAXd8qZTiSBR3aSUk4YRSo+LG-Z20FRJfGgV1Awf+Lep4kpg@mail.gmail.com>
- <20231109011725.1798784-1-min_halo@163.com>
-From: Pierre Mariani <pierre.mariani@gmail.com>
-In-Reply-To: <20231109011725.1798784-1-min_halo@163.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux ACPI <linux-acpi@vger.kernel.org>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ Linux Common Internet File System & SMB3 <linux-cifs@vger.kernel.org>
+Cc: Hugh Dickins <hughd@google.com>, Chuck Lever <chuck.lever@oracle.com>,
+ Christian Brauner <brauner@kernel.org>,
+ "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+ Steve French <sfrench@samba.org>, Namjae Jeon <linkinjeon@kernel.org>,
+ Tom Talpey <tom@talpey.com>, Sergey Senozhatsky <senozhatsky@chromium.org>,
+ walter59 <walter.moeller@moeller-it.net>, Fabio Rossi <rossi.f@inwind.it>
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Fwd: kernel 6.6.x and higher , apci reboot problems
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/8/2023 5:17 PM, Zongmin Zhou wrote:
-> When allocated memory for 'new' failed,just return
-> will cause memory leak of 'ar'.
-> 
-> v2: rollback iov_alloc_cnt when allocate memory failed.
-> 
-> Fixes: 1819a9042999 ("ksmbd: reorganize ksmbd_iov_pin_rsp()")
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Reported-by: Dan Carpenter <error27@gmail.com>
-> Closes: https://lore.kernel.org/r/202311031837.H3yo7JVl-lkp@intel.com/
-> Signed-off-by: Zongmin Zhou<zhouzongmin@kylinos.cn>
-> ---
->  fs/smb/server/ksmbd_work.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/smb/server/ksmbd_work.c b/fs/smb/server/ksmbd_work.c
-> index a2ed441e837a..44bce4c56daf 100644
-> --- a/fs/smb/server/ksmbd_work.c
-> +++ b/fs/smb/server/ksmbd_work.c
-> @@ -123,8 +123,11 @@ static int __ksmbd_iov_pin_rsp(struct ksmbd_work *work, void *ib, int len,
->  		new = krealloc(work->iov,
->  			       sizeof(struct kvec) * work->iov_alloc_cnt,
->  			       GFP_KERNEL | __GFP_ZERO);
-> -		if (!new)
-> +		if (!new) {
-> +			kfree(ar);
-> +			work->iov_alloc_cnt -= 4;
->  			return -ENOMEM;
-> +		}
->  		work->iov = new;
->  	}
->  
+Hi,
 
-A few lines above, ar is allocated inside the 'if (aux_size)' block.
-If aux_size is falsy, isn't it possible that ar will be NULL hence
-we should have 'if (ar) kfree(ar);'?  
+I notice a regression report on Bugzilla [1] (albeit terse). Quoting
+from it:
+
+> since kernel 6.6 problems , reboot fails or me muss use double enter key .
+> under xfce4 it jumps on console and hangs.
+> 
+> restart under xfce4 fails shutdown also --- 6.5.11 it works all fine 
+> 
+> regards 
+> 
+> ps: all pcs . notebooks , nucs, workstation
+
+Then another reporter can reproduce the regression with bisection:
+
+> I have found a similar problem but in my case I don't think it's related to ACPI. In fact the problem is still there after adding the kernel option acpi=off. @walter59, can you test on your system by disabling ACPI too?
+> 
+> During system shutdown, started by "shutdown -h now", the process hangs (but the system is still working) during stopping of samba service. Instead the reboot still works.
+> 
+> My problem appeared with the upgrade 6.5.11 -> 6.6-rc1 so I have bisected until I have found the first bad commit:
+> 
+> $ git bisect log
+> 
+> git bisect start
+> # status: waiting for both good and bad commits
+> # good: [799441832db16b99e400ccbec55db801e6992819] Linux 6.5.11
+> git bisect good 799441832db16b99e400ccbec55db801e6992819
+> # status: waiting for bad commit, 1 good commit known
+> # bad: [0bb80ecc33a8fb5a682236443c1e740d5c917d1d] Linux 6.6-rc1
+> git bisect bad 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+> # good: [2dde18cd1d8fac735875f2e4987f11817cc0bc2c] Linux 6.5
+> git bisect good 2dde18cd1d8fac735875f2e4987f11817cc0bc2c
+> # bad: [461f35f014466c4e26dca6be0f431f57297df3f2] Merge tag 'drm-next-2023-08-30' of git://anongit.freedesktop.org/drm/drm
+> git bisect bad 461f35f014466c4e26dca6be0f431f57297df3f2
+> # bad: [bd6c11bc43c496cddfc6cf603b5d45365606dbd5] Merge tag 'net-next-6.6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
+> git bisect bad bd6c11bc43c496cddfc6cf603b5d45365606dbd5
+> # good: [6c9cfb853063f317b2953c5e852b6bac1eb0cade] net: ethernet: mtk_wed: minor change in wed_{tx,rx}info_show
+> git bisect good 6c9cfb853063f317b2953c5e852b6bac1eb0cade
+> # bad: [ccc5e9817719f59b3dea7b7a168861b4bf0b4ff4] Merge tag 'pm-6.6-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+> git bisect bad ccc5e9817719f59b3dea7b7a168861b4bf0b4ff4
+> # bad: [68cadad11fe2ddd126b37a8fba3726be7fa0f5c6] Merge tag 'rcu.2023.08.21a' of git://git.kernel.org/pub/scm/linux/kernel/git/paulmck/linux-rcu
+> git bisect bad 68cadad11fe2ddd126b37a8fba3726be7fa0f5c6
+> # bad: [dd2c0198a8365dcc3bb6aed22313d56088e3af55] Merge tag 'erofs-for-6.6-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs
+> git bisect bad dd2c0198a8365dcc3bb6aed22313d56088e3af55
+> # bad: [ecd7db20474c3859d4d01f34aaabf41bd28c7d84] Merge tag 'v6.6-vfs.tmpfs' of git://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs
+> git bisect bad ecd7db20474c3859d4d01f34aaabf41bd28c7d84
+> # good: [e9d7d3cb9fb3f142df574664507ac0ee4a26365a] procfs: convert to ctime accessor functions
+> git bisect good e9d7d3cb9fb3f142df574664507ac0ee4a26365a
+> # good: [6f4aaee3faa84f00d38bfaba88a9f75d8c78e7e0] fat: make fat_update_time get its own timestamp
+> git bisect good 6f4aaee3faa84f00d38bfaba88a9f75d8c78e7e0
+> # bad: [2daf18a7884dc03d5164ab9c7dc3f2ea70638469] tmpfs,xattr: enable limited user extended attributes
+> git bisect bad 2daf18a7884dc03d5164ab9c7dc3f2ea70638469
+> # good: [6faddda69f623d38bb097640689901a4b5ff881a] libfs: Add directory operations for stable offsets
+> git bisect good 6faddda69f623d38bb097640689901a4b5ff881a
+> # bad: [2be4f05af71bb2a9958c5680c19e5a489636ff42] libfs: Remove parent dentry locking in offset_iterate_dir()
+> git bisect bad 2be4f05af71bb2a9958c5680c19e5a489636ff42
+> # bad: [a2e459555c5f9da3e619b7e47a63f98574dc75f1] shmem: stable directory offsets
+> git bisect bad a2e459555c5f9da3e619b7e47a63f98574dc75f1
+> # good: [23a31d87645c652734f89f477f69ddac9aa402cb] shmem: Refactor shmem_symlink()
+> git bisect good 23a31d87645c652734f89f477f69ddac9aa402cb
+> # first bad commit: [a2e459555c5f9da3e619b7e47a63f98574dc75f1] shmem: stable directory offsets
+
+See Bugzilla for the full thread.
+
+Anyway, I'm adding this regression to regzbot:
+
+#regzbot introduced: a2e459555c5f9d https://bugzilla.kernel.org/show_bug.cgi?id=218147
+#regzbot title: shmem's stable directory offsets hangs samba shutdown
+
+Thanks.
+
+[1]: https://bugzilla.kernel.org/show_bug.cgi?id=218147
+
+-- 
+An old man doll... just what I always wanted! - Clara
