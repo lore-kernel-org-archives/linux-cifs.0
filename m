@@ -1,362 +1,99 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="A9mm6rk5"
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA25E97
-	for <linux-cifs@vger.kernel.org>; Tue, 21 Nov 2023 15:13:18 -0800 (PST)
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1700608397;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ji4+ahOvS8M4dU41GB8m91a4Z6TH23q9ypTuE0Oz5MU=;
-	b=A9mm6rk59/LDX8U52oC4okZzy8KqXkk01E3/A8wyj7/Zktf0wLQp3bPsqz8HZGNz7F5rM0
-	fKfGpuYdeR5Bw2v95QlQp9+BoX4TwPiqUS0mMQI9H0f2v8BhWWQTrR6hLbwU2FbS/v5C6b
-	JtandOshUUaIS9JFTmAD0M7e3KYiGN1TfXuoup4vo+z5GjZAhDZeKPdemuFjbFryw8DoR2
-	pAZArtOc/6iVMx6lD+5jkdV5DfUWG0LiLITEFtoqu1aQhOZKs0BCs5FLAkeug81MPMA9r4
-	SWoCS9NpoUXAOpLrK+sFBiRgllj68/e/s03VVYtBSoLQFSXa3Mo+z3waAt8NvQ==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1700608397; a=rsa-sha256;
-	cv=none;
-	b=WZnc/HLbsplPwNQ4YrNjgeHMqL9IzJ6K7A8PWnMbx3fA99vgjBo8cTuZtBxhg0KNLsgD5N
-	q8eFYhrncdNiVx8nzNrSIkoxrqQ4o28qox815+QHI2PqN0NUsV3A1+B1TLL8NYGvICTedR
-	dGk6LtS+2HWeBOJtxTTofsP/C2cigOdTBxoSh+Mhf2FZ2sQDQdCliPckfjkqcn0acgblYI
-	LksdbeLx/4zy2m5ufBcy549P4XoOPlsbl/4Vgxdj4pendF5yK5ANMFAAL44dbYKoHfhDzb
-	QgdWF5fECG05p3q40Yp6JcuZf3IHI+cq3JPnpi0yaJPuXKU7n3ixm5Hp5XVE/g==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1700608397; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ji4+ahOvS8M4dU41GB8m91a4Z6TH23q9ypTuE0Oz5MU=;
-	b=h/2DurWpQLB9L0SvKVgs3GJPUumpFV3kss25v5KveZVN4vxVqKQn0MzVVCxgEsayqnfd/5
-	5tLZWv6i03xap9XwcyRm3mDfzEUqpdWzQ956LEm/JnNdvjuxOUi28U4dHNH3WFC4duO4n5
-	58SN2Pr1g+e5IuAtTqhlvTA5O0m9Wrg0CuqNHdbEu82RHLEq5rvloWo9jLhrtiAZ1gu4uU
-	sPplXuW4QEzJDESAAm1IDCc5nHoPLiwvGPWOQQNVrXfAY34Imj9D/jSFxkv6qaAvWEYwz8
-	DUJ9MqDuAOmLsdI3VM//K2JdBkTe9kFHDWa9AiSoBuhCpneHMMbL0LHKlMNdiQ==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 7/7] smb: client: handle reparse points over SMB3 POSIX
-Date: Tue, 21 Nov 2023 20:12:58 -0300
-Message-ID: <20231121231258.29562-7-pc@manguebit.com>
-In-Reply-To: <20231121231258.29562-1-pc@manguebit.com>
-References: <20231119182209.5140-1-pc@manguebit.com>
- <20231121231258.29562-1-pc@manguebit.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Px6vDO4L"
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57373DD
+	for <linux-cifs@vger.kernel.org>; Tue, 21 Nov 2023 17:49:09 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c83d37a492so77582801fa.3
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Nov 2023 17:49:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700617747; x=1701222547; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ziFoHX+4kCiKcRbktHrzMuyijvTMJEebMtNMTmeUZeE=;
+        b=Px6vDO4LCIIyO+AJdYdHP1yLdOs4TuEOREzla5G6rySi6IchSaqQnTFCL2ZWkPsUwi
+         fUNHjMtnhrtm8xwhfMFUrew+O2aTM6BcMhWN0thlJMhtks0VPgw3MHgU8dk/iji45IXh
+         zqSY0t/PoWw1RrM+hOYSsmEc0S2ZbgnGRcuB1IyEN2JIOGHc6MW7j9gIMJk6cNtwks4U
+         R+kYGr5GGka7teVjlTKgu4mzwqC5+UAVIhUbuk2lSlXgzVn+iNud6p4x07Q7JUtbLh0s
+         2NERi/XFQX/jd6zsXZn1GiPBeoq6C5e/MLMt5j90jcsgFsN2/sdiuCOk7ZHukCB311eo
+         kK/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700617747; x=1701222547;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ziFoHX+4kCiKcRbktHrzMuyijvTMJEebMtNMTmeUZeE=;
+        b=RqVjqMW8nJCAXuAical/hKmwN9QYlYwaaFUcxpvGa+rsBra432FLfKDa5jOPh0L6KJ
+         NsYqmX6/978BD8oz4U9e38sTdVgMIN4TAxjPZRqK2SvICqee87QkVCQfNsk8BkXjsrvn
+         ZC41Eb7LOEaj61sLOuR1O5IDT/3QqdHDWszyOc5MUVP9oqV8tvUVmlhhBegNxs/mpOCo
+         d3V/gpFI3B6lXIpv/in85nG0rE5e0i+XXyNk5syDqqUAVlSZu2/Royqc0hWJ39bBDv7d
+         l4Rgr3fDCuIRkkcdErejgRR2t1NHlHpBg5cIJBo2s9/CDzS3bfj/iZkchFZtAhEvE4I0
+         6nUw==
+X-Gm-Message-State: AOJu0YzkltuTJQuqkBelo5UWmd6DLuT84VG+6Yc6NFfO48g8j4jagAIj
+	rFrZG19ISUJCcEnsGQGVEq13dM9W6jWpeBYrkEM=
+X-Google-Smtp-Source: AGHT+IEmsJsmo/6KSMZLFPdhgevEKhK5clb4Lx9ephJg4UfziAigfctwjViRzrR6eGYHBFA4+v3QmTUkwi9JhTT+Vew=
+X-Received: by 2002:ac2:5e7a:0:b0:503:99d:5a97 with SMTP id
+ a26-20020ac25e7a000000b00503099d5a97mr544919lfr.20.1700617747233; Tue, 21 Nov
+ 2023 17:49:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231121134347.3117-1-rbudhiraja@microsoft.com>
+In-Reply-To: <20231121134347.3117-1-rbudhiraja@microsoft.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 21 Nov 2023 19:48:55 -0600
+Message-ID: <CAH2r5mtuRSEYtbJGpSTpWDB7moUPKnA8fAj7L6CERSiP_LZFbw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix use after free for iface while disabling
+ secondary channels
+To: Ritvik Budhiraja <budhirajaritviksmb@gmail.com>
+Cc: pc@manguebit.com, linux-cifs@vger.kernel.org, sprasad@mirosoft.com, 
+	bharathsm.hsk@gmail.com, Ritvik Budhiraja <rbudhiraja@microsoft.com>, 
+	kernel test robot <lkp@intel.com>, Dan Carpenter <error27@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support for creating and listing special files via reparse points
-when using SMB3 POSIX extensions.
+tentatively merged into for-next pending testing
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
----
- fs/smb/client/cifsproto.h |  8 +++--
- fs/smb/client/dir.c       |  7 ++--
- fs/smb/client/file.c      | 10 +++---
- fs/smb/client/inode.c     | 71 ++++++++++++++++++++++++++-------------
- fs/smb/client/link.c      | 10 +++---
- fs/smb/client/smb2inode.c | 21 ++++++++----
- 6 files changed, 84 insertions(+), 43 deletions(-)
+On Tue, Nov 21, 2023 at 7:44=E2=80=AFAM Ritvik Budhiraja
+<budhirajaritviksmb@gmail.com> wrote:
+>
+> We were deferencing iface after it has been released. Fix is to
+> release after all dereference instances have been encountered.
+>
+> Signed-off-by: Ritvik Budhiraja <rbudhiraja@microsoft.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <error27@gmail.com>
+> Closes: https://lore.kernel.org/r/202311110815.UJaeU3Tt-lkp@intel.com/
+> ---
+>  fs/smb/client/sess.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+> index 8b2d7c1ca428..816e01c5589b 100644
+> --- a/fs/smb/client/sess.c
+> +++ b/fs/smb/client/sess.c
+> @@ -332,10 +332,10 @@ cifs_disable_secondary_channels(struct cifs_ses *se=
+s)
+>
+>                 if (iface) {
+>                         spin_lock(&ses->iface_lock);
+> -                       kref_put(&iface->refcount, release_iface);
+>                         iface->num_channels--;
+>                         if (iface->weight_fulfilled)
+>                                 iface->weight_fulfilled--;
+> +                       kref_put(&iface->refcount, release_iface);
+>                         spin_unlock(&ses->iface_lock);
+>                 }
+>
+> --
+> 2.34.1
+>
 
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 46feaa0880bd..0adeaa84b662 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -211,8 +211,12 @@ int cifs_get_inode_info(struct inode **inode, const char *full_path,
- bool cifs_reparse_point_to_fattr(struct cifs_sb_info *cifs_sb,
- 				 struct cifs_fattr *fattr,
- 				 struct cifs_open_info_data *data);
--extern int smb311_posix_get_inode_info(struct inode **pinode, const char *search_path,
--			struct super_block *sb, unsigned int xid);
-+
-+extern int smb311_posix_get_inode_info(struct inode **inode,
-+				       const char *full_path,
-+				       struct cifs_open_info_data *data,
-+				       struct super_block *sb,
-+				       const unsigned int xid);
- extern int cifs_get_inode_info_unix(struct inode **pinode,
- 			const unsigned char *search_path,
- 			struct super_block *sb, unsigned int xid);
-diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index 580a27a3a7e6..89333d9bce36 100644
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -680,9 +680,10 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- 		 full_path, d_inode(direntry));
- 
- again:
--	if (pTcon->posix_extensions)
--		rc = smb311_posix_get_inode_info(&newInode, full_path, parent_dir_inode->i_sb, xid);
--	else if (pTcon->unix_ext) {
-+	if (pTcon->posix_extensions) {
-+		rc = smb311_posix_get_inode_info(&newInode, full_path, NULL,
-+						 parent_dir_inode->i_sb, xid);
-+	} else if (pTcon->unix_ext) {
- 		rc = cifs_get_inode_info_unix(&newInode, full_path,
- 					      parent_dir_inode->i_sb, xid);
- 	} else {
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index cf17e3dd703e..2b69c4e79b17 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -1020,14 +1020,16 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 		if (!is_interrupt_error(rc))
- 			mapping_set_error(inode->i_mapping, rc);
- 
--		if (tcon->posix_extensions)
--			rc = smb311_posix_get_inode_info(&inode, full_path, inode->i_sb, xid);
--		else if (tcon->unix_ext)
-+		if (tcon->posix_extensions) {
-+			rc = smb311_posix_get_inode_info(&inode, full_path,
-+							 NULL, inode->i_sb, xid);
-+		} else if (tcon->unix_ext) {
- 			rc = cifs_get_inode_info_unix(&inode, full_path,
- 						      inode->i_sb, xid);
--		else
-+		} else {
- 			rc = cifs_get_inode_info(&inode, full_path, NULL,
- 						 inode->i_sb, xid, NULL);
-+		}
- 	}
- 	/*
- 	 * Else we are writing out data to server already and could deadlock if
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 88b7cf23348c..7baa02940bce 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1059,7 +1059,9 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
- 				 const unsigned int xid,
- 				 struct cifs_tcon *tcon,
- 				 const char *full_path,
--				 struct cifs_fattr *fattr)
-+				 struct cifs_fattr *fattr,
-+				 struct cifs_sid *owner,
-+				 struct cifs_sid *group)
- {
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-@@ -1100,7 +1102,10 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
- 		break;
- 	}
- 
--	cifs_open_info_to_fattr(fattr, data, sb);
-+	if (tcon->posix_extensions)
-+		smb311_posix_info_to_fattr(fattr, data, owner, group, sb);
-+	else
-+		cifs_open_info_to_fattr(fattr, data, sb);
- out:
- 	free_rsp_buf(rsp_buftype, rsp_iov.iov_base);
- 	return rc;
-@@ -1151,7 +1156,8 @@ static int cifs_get_fattr(struct cifs_open_info_data *data,
- 		 */
- 		if (cifs_open_data_reparse(data)) {
- 			rc = reparse_info_to_fattr(data, sb, xid, tcon,
--						   full_path, fattr);
-+						   full_path, fattr,
-+						   NULL, NULL);
- 		} else {
- 			cifs_open_info_to_fattr(fattr, data, sb);
- 		}
-@@ -1289,12 +1295,13 @@ int cifs_get_inode_info(struct inode **inode,
- 	return rc;
- }
- 
--static int smb311_posix_get_fattr(struct cifs_fattr *fattr,
-+static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
-+				  struct cifs_fattr *fattr,
- 				  const char *full_path,
- 				  struct super_block *sb,
- 				  const unsigned int xid)
- {
--	struct cifs_open_info_data data = {};
-+	struct cifs_open_info_data tmp_data = {};
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	struct cifs_tcon *tcon;
- 	struct tcon_link *tlink;
-@@ -1308,12 +1315,14 @@ static int smb311_posix_get_fattr(struct cifs_fattr *fattr,
- 	tcon = tlink_tcon(tlink);
- 
- 	/*
--	 * 1. Fetch file metadata
-+	 * 1. Fetch file metadata if not provided (data)
- 	 */
--
--	rc = smb311_posix_query_path_info(xid, tcon, cifs_sb,
--					  full_path, &data,
--					  &owner, &group);
-+	if (!data) {
-+		rc = smb311_posix_query_path_info(xid, tcon, cifs_sb,
-+						  full_path, &tmp_data,
-+						  &owner, &group);
-+		data = &tmp_data;
-+	}
- 
- 	/*
- 	 * 2. Convert it to internal cifs metadata (fattr)
-@@ -1321,7 +1330,14 @@ static int smb311_posix_get_fattr(struct cifs_fattr *fattr,
- 
- 	switch (rc) {
- 	case 0:
--		smb311_posix_info_to_fattr(fattr, &data, &owner, &group, sb);
-+		if (cifs_open_data_reparse(data)) {
-+			rc = reparse_info_to_fattr(data, sb, xid, tcon,
-+						   full_path, fattr,
-+						   &owner, &group);
-+		} else {
-+			smb311_posix_info_to_fattr(fattr, data,
-+						   &owner, &group, sb);
-+		}
- 		break;
- 	case -EREMOTE:
- 		/* DFS link, no metadata available on this server */
-@@ -1352,12 +1368,15 @@ static int smb311_posix_get_fattr(struct cifs_fattr *fattr,
- 
- out:
- 	cifs_put_tlink(tlink);
--	cifs_free_open_info(&data);
-+	cifs_free_open_info(data);
- 	return rc;
- }
- 
--int smb311_posix_get_inode_info(struct inode **inode, const char *full_path,
--				struct super_block *sb, const unsigned int xid)
-+int smb311_posix_get_inode_info(struct inode **inode,
-+				const char *full_path,
-+				struct cifs_open_info_data *data,
-+				struct super_block *sb,
-+				const unsigned int xid)
- {
- 	struct cifs_fattr fattr = {};
- 	int rc;
-@@ -1367,7 +1386,7 @@ int smb311_posix_get_inode_info(struct inode **inode, const char *full_path,
- 		return 0;
- 	}
- 
--	rc = smb311_posix_get_fattr(&fattr, full_path, sb, xid);
-+	rc = smb311_posix_get_fattr(data, &fattr, full_path, sb, xid);
- 	if (rc)
- 		goto out;
- 
-@@ -1515,7 +1534,7 @@ struct inode *cifs_root_iget(struct super_block *sb)
- 
- 	convert_delimiter(path, CIFS_DIR_SEP(cifs_sb));
- 	if (tcon->posix_extensions)
--		rc = smb311_posix_get_fattr(&fattr, path, sb, xid);
-+		rc = smb311_posix_get_fattr(NULL, &fattr, path, sb, xid);
- 	else
- 		rc = cifs_get_fattr(NULL, sb, xid, NULL, &fattr, &inode, path);
- 
-@@ -1888,16 +1907,18 @@ cifs_mkdir_qinfo(struct inode *parent, struct dentry *dentry, umode_t mode,
- 	int rc = 0;
- 	struct inode *inode = NULL;
- 
--	if (tcon->posix_extensions)
--		rc = smb311_posix_get_inode_info(&inode, full_path, parent->i_sb, xid);
-+	if (tcon->posix_extensions) {
-+		rc = smb311_posix_get_inode_info(&inode, full_path,
-+						 NULL, parent->i_sb, xid);
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
--	else if (tcon->unix_ext)
-+	} else if (tcon->unix_ext) {
- 		rc = cifs_get_inode_info_unix(&inode, full_path, parent->i_sb,
- 					      xid);
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
--	else
-+	} else {
- 		rc = cifs_get_inode_info(&inode, full_path, NULL, parent->i_sb,
- 					 xid, NULL);
-+	}
- 
- 	if (rc)
- 		return rc;
-@@ -2578,13 +2599,15 @@ int cifs_revalidate_dentry_attr(struct dentry *dentry)
- 		 dentry, cifs_get_time(dentry), jiffies);
- 
- again:
--	if (cifs_sb_master_tcon(CIFS_SB(sb))->posix_extensions)
--		rc = smb311_posix_get_inode_info(&inode, full_path, sb, xid);
--	else if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext)
-+	if (cifs_sb_master_tcon(CIFS_SB(sb))->posix_extensions) {
-+		rc = smb311_posix_get_inode_info(&inode, full_path,
-+						 NULL, sb, xid);
-+	} else if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext) {
- 		rc = cifs_get_inode_info_unix(&inode, full_path, sb, xid);
--	else
-+	} else {
- 		rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
- 					 xid, NULL);
-+	}
- 	if (rc == -EAGAIN && count++ < 10)
- 		goto again;
- out:
-diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-index 5c91376d1c1f..82fb069c6ce4 100644
---- a/fs/smb/client/link.c
-+++ b/fs/smb/client/link.c
-@@ -619,14 +619,16 @@ cifs_symlink(struct mnt_idmap *idmap, struct inode *inode,
- 	}
- 
- 	if (rc == 0) {
--		if (pTcon->posix_extensions)
--			rc = smb311_posix_get_inode_info(&newinode, full_path, inode->i_sb, xid);
--		else if (pTcon->unix_ext)
-+		if (pTcon->posix_extensions) {
-+			rc = smb311_posix_get_inode_info(&newinode, full_path,
-+							 NULL, inode->i_sb, xid);
-+		} else if (pTcon->unix_ext) {
- 			rc = cifs_get_inode_info_unix(&newinode, full_path,
- 						      inode->i_sb, xid);
--		else
-+		} else {
- 			rc = cifs_get_inode_info(&newinode, full_path, NULL,
- 						 inode->i_sb, xid, NULL);
-+		}
- 
- 		if (rc != 0) {
- 			cifs_dbg(FYI, "Create symlink ok, getinodeinfo fail rc = %d\n",
-diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index c09da386a36b..0d2c58e5051b 100644
---- a/fs/smb/client/smb2inode.c
-+++ b/fs/smb/client/smb2inode.c
-@@ -540,14 +540,23 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
- 	struct inode *new = NULL;
- 	int rc;
- 
-+	/*
-+	 * Since we know it is a reparse point already, query info it
-+	 * directly and provide cached file metadata to *get_inode_info() calls
-+	 * in order to avoid extra roundtrips.
-+	 */
- 	if (tcon->posix_extensions) {
--		rc = smb311_posix_get_inode_info(&new, full_path, sb, xid);
-+		cifs_get_readable_path(tcon, full_path, &cfile);
-+		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
-+				      FILE_READ_ATTRIBUTES, FILE_OPEN,
-+				      OPEN_REPARSE_POINT, ACL_NO_MODE, data,
-+				      SMB2_OP_POSIX_QUERY_INFO, cfile, NULL,
-+				      NULL, NULL, NULL);
-+		if (rc)
-+			return ERR_PTR(rc);
-+		rc = smb311_posix_get_inode_info(&new, full_path,
-+						 data, sb, xid);
- 	} else {
--		/*
--		 * Since we know it is a reparse point already, query info it
--		 * directly and provide cached file metadata to
--		 * cifs_get_inode_info() in order to avoid extra roundtrips.
--		 */
- 		cifs_get_readable_path(tcon, full_path, &cfile);
- 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
- 				      FILE_READ_ATTRIBUTES, FILE_OPEN,
--- 
-2.42.1
 
+--=20
+Thanks,
+
+Steve
