@@ -1,99 +1,92 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Px6vDO4L"
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57373DD
-	for <linux-cifs@vger.kernel.org>; Tue, 21 Nov 2023 17:49:09 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c83d37a492so77582801fa.3
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Nov 2023 17:49:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700617747; x=1701222547; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ziFoHX+4kCiKcRbktHrzMuyijvTMJEebMtNMTmeUZeE=;
-        b=Px6vDO4LCIIyO+AJdYdHP1yLdOs4TuEOREzla5G6rySi6IchSaqQnTFCL2ZWkPsUwi
-         fUNHjMtnhrtm8xwhfMFUrew+O2aTM6BcMhWN0thlJMhtks0VPgw3MHgU8dk/iji45IXh
-         zqSY0t/PoWw1RrM+hOYSsmEc0S2ZbgnGRcuB1IyEN2JIOGHc6MW7j9gIMJk6cNtwks4U
-         R+kYGr5GGka7teVjlTKgu4mzwqC5+UAVIhUbuk2lSlXgzVn+iNud6p4x07Q7JUtbLh0s
-         2NERi/XFQX/jd6zsXZn1GiPBeoq6C5e/MLMt5j90jcsgFsN2/sdiuCOk7ZHukCB311eo
-         kK/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700617747; x=1701222547;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ziFoHX+4kCiKcRbktHrzMuyijvTMJEebMtNMTmeUZeE=;
-        b=RqVjqMW8nJCAXuAical/hKmwN9QYlYwaaFUcxpvGa+rsBra432FLfKDa5jOPh0L6KJ
-         NsYqmX6/978BD8oz4U9e38sTdVgMIN4TAxjPZRqK2SvICqee87QkVCQfNsk8BkXjsrvn
-         ZC41Eb7LOEaj61sLOuR1O5IDT/3QqdHDWszyOc5MUVP9oqV8tvUVmlhhBegNxs/mpOCo
-         d3V/gpFI3B6lXIpv/in85nG0rE5e0i+XXyNk5syDqqUAVlSZu2/Royqc0hWJ39bBDv7d
-         l4Rgr3fDCuIRkkcdErejgRR2t1NHlHpBg5cIJBo2s9/CDzS3bfj/iZkchFZtAhEvE4I0
-         6nUw==
-X-Gm-Message-State: AOJu0YzkltuTJQuqkBelo5UWmd6DLuT84VG+6Yc6NFfO48g8j4jagAIj
-	rFrZG19ISUJCcEnsGQGVEq13dM9W6jWpeBYrkEM=
-X-Google-Smtp-Source: AGHT+IEmsJsmo/6KSMZLFPdhgevEKhK5clb4Lx9ephJg4UfziAigfctwjViRzrR6eGYHBFA4+v3QmTUkwi9JhTT+Vew=
-X-Received: by 2002:ac2:5e7a:0:b0:503:99d:5a97 with SMTP id
- a26-20020ac25e7a000000b00503099d5a97mr544919lfr.20.1700617747233; Tue, 21 Nov
- 2023 17:49:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="ees8dQZ0"
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D64092
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Nov 2023 07:16:06 -0800 (PST)
+Message-ID: <e18f51d8eca56a0f948ff6b9fa37f61c@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1700666164;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gcs5RYGWs3iVuxomdifA+yfPnoapKGRfQvFhls2WexA=;
+	b=ees8dQZ0BU1vuVDJFTHgGkV6EXB1sSGbuQOwsbdPkg2w2g/m6VbhVI/9n6uPiJ+f+WYkaF
+	iBxVaFZctxM/jQWnw2YQIsVFiCzf1BtAuQzyAt3QI3IoQ8JlkArYGjALSk50WEMMAwW98V
+	F1iv0emU2ImEoCinb1qZqSVr/TAIGfD1hoQ/n85auyZ5eajSySkE83isk7aArtHBs1C2Yv
+	jXNBPzugRNhk/9Yi7tg+lbCXn6nBJKNjHFxHX6VoSoxJs0+Xs2+ek5+B9a7exnvwvQQgXk
+	wKJLCz/RtCYjhZ36uRFD02t3XPbLKk4VWosWQHl0L/XXIB1B2lFGYxJ56esGCw==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1700666164; a=rsa-sha256;
+	cv=none;
+	b=XSeC5Y8fdVGDO2NIZhBPpUyQok1Acn2/dw8ca/rzSt1gYh6n6KuQe7PSx+5kK638c1lvoj
+	J7z/aQ/Y39KBdxZGT8r98gW1m1IU4BEf0HZo7BfVnok648VoOcySc3P74HAwDOLuziebSO
+	ceWlfiP+Z426QbqE32J001yNfOWnAs6BM4Hw/5aSKwGcVIIoOTrkP+8KoKlYhpQfLLu/pD
+	6I8IMf4jR6PBlWdRitJQzH00NjwPudHH4RATavOR37MrpaEarH8VXrQclnl88F6KpEzPdG
+	SBzB0vDOVvoLZo8halPZmFLZx/iHuZnlgRj13rRSSurhe0HP4cNQLTC+xIMhEQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1700666164; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gcs5RYGWs3iVuxomdifA+yfPnoapKGRfQvFhls2WexA=;
+	b=oZyUyxWii0dywbvmvdgy0voLx7Ms/s1pQUVvgI5sH2nSq9Y9g6X+3YUyaVON9iIwO1xWmt
+	mR1NMOeQo3u9EvTbtp4IkkNIwde/DhT8swckmJWIMnigxG7xy/5I5eXv5bTTAcc1JJHtM/
+	AXJfqLNDxWLTxnf8skwv9LFP221X1/A1abP/Ydd+lG5zXky8bDLdpAi6Ad7VgcEWazA7XG
+	hJcXavKOEE1I/XgT5BtpaPOOWvM10cSwz6s2QO5Ds4+1Ld/Y/eofbEUA7DT2Gx9QJAqeJo
+	rxda4V8UI1BvP2QCiPvMCb8S4PQFzlZsjhazfnQJ/Xc3sXcfbf6OO9roGkZYyQ==
+From: Paulo Alcantara <pc@manguebit.com>
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org
+Subject: Re: [PATCH 5/7] smb: client: allow creating special files via
+ reparse points
+In-Reply-To: <20231121231258.29562-5-pc@manguebit.com>
+References: <20231119182209.5140-1-pc@manguebit.com>
+ <20231121231258.29562-1-pc@manguebit.com>
+ <20231121231258.29562-5-pc@manguebit.com>
+Date: Wed, 22 Nov 2023 12:16:01 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231121134347.3117-1-rbudhiraja@microsoft.com>
-In-Reply-To: <20231121134347.3117-1-rbudhiraja@microsoft.com>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 21 Nov 2023 19:48:55 -0600
-Message-ID: <CAH2r5mtuRSEYtbJGpSTpWDB7moUPKnA8fAj7L6CERSiP_LZFbw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix use after free for iface while disabling
- secondary channels
-To: Ritvik Budhiraja <budhirajaritviksmb@gmail.com>
-Cc: pc@manguebit.com, linux-cifs@vger.kernel.org, sprasad@mirosoft.com, 
-	bharathsm.hsk@gmail.com, Ritvik Budhiraja <rbudhiraja@microsoft.com>, 
-	kernel test robot <lkp@intel.com>, Dan Carpenter <error27@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-tentatively merged into for-next pending testing
+Paulo Alcantara <pc@manguebit.com> writes:
 
-On Tue, Nov 21, 2023 at 7:44=E2=80=AFAM Ritvik Budhiraja
-<budhirajaritviksmb@gmail.com> wrote:
->
-> We were deferencing iface after it has been released. Fix is to
-> release after all dereference instances have been encountered.
->
-> Signed-off-by: Ritvik Budhiraja <rbudhiraja@microsoft.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Reported-by: Dan Carpenter <error27@gmail.com>
-> Closes: https://lore.kernel.org/r/202311110815.UJaeU3Tt-lkp@intel.com/
-> ---
->  fs/smb/client/sess.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-> index 8b2d7c1ca428..816e01c5589b 100644
-> --- a/fs/smb/client/sess.c
-> +++ b/fs/smb/client/sess.c
-> @@ -332,10 +332,10 @@ cifs_disable_secondary_channels(struct cifs_ses *se=
-s)
->
->                 if (iface) {
->                         spin_lock(&ses->iface_lock);
-> -                       kref_put(&iface->refcount, release_iface);
->                         iface->num_channels--;
->                         if (iface->weight_fulfilled)
->                                 iface->weight_fulfilled--;
-> +                       kref_put(&iface->refcount, release_iface);
->                         spin_unlock(&ses->iface_lock);
->                 }
->
-> --
-> 2.34.1
->
+> +static int create_nfs_reparse(const unsigned int xid,
+> +			      struct cifs_tcon *tcon,
+> +			      struct cifs_sb_info *cifs_sb,
+> +			      const char *full_path, mode_t mode,
+> +			      struct reparse_posix_data *buf)
+> +{
+> +	u64 type;
+> +	u16 len, dlen;
+> +
+> +	len = sizeof(*buf);
+> +
+> +	switch ((type = mode_nfs_type(mode))) {
+> +	case NFS_SPECFILE_BLK:
+> +	case NFS_SPECFILE_CHR:
+> +		dlen = sizeof(__le64);
+> +		break;
+> +	case NFS_SPECFILE_FIFO:
+> +	case NFS_SPECFILE_SOCK:
+> +		dlen = 0;
+> +		break;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	buf->ReparseTag = cpu_to_le32(IO_REPARSE_TAG_NFS);
+> +	buf->InodeType = cpu_to_le64(type);
+> +	buf->ReparseDataLength = cpu_to_le16(len + dlen -
+> +					     sizeof(struct reparse_data_buffer));
 
+Err, forgot having @buf->Reserved set to 0 here, sorry.  MS-FSCC
+doesnt't say we _must_ to, however it's better not sending garbage over
+the wire.
 
---=20
-Thanks,
-
-Steve
+Let me know if you'd need v2 for the above.
