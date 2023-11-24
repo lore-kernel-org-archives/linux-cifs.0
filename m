@@ -1,41 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aE2Ckw8h"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I8iW/8co"
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 056CD198D
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Nov 2023 13:51:24 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F3E410CB
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Nov 2023 15:27:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700862684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=Hgj8B8xMgHNPRV+C3WI4kW0phmnLrWnRPCMxmjhfjYA=;
-	b=aE2Ckw8h0lbdfMX5gth4oIgYRii5bp9Gtyqs73SKf22xMeIUyouYfqElqzcTZ5RPKfkpw4
-	uzmPaC2SMa5Hv+liBnSFw1J2y2iiPijrZHmY5l1wOLru6CeiQ5TH1xpPyPBWOKKLZS41ai
-	eXsTYlN4sDffGlTtRQX5Qy6HWzO2xfo=
+	s=mimecast20190719; t=1700868430;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2RrwbTeSbC5XCVA4N2cHN28MMNgejQdbSfaWFJUoo78=;
+	b=I8iW/8co0gJtpjiDOseH8h6eexIsPkT/TLrEZme9U9wanDfb3kzLnW3jNLGSohmZBizg+0
+	BLbPgS5XO4Cz54xDddeur8C20X/lsghi09Ou+8usZ9bgea0AA3026LS01EPAulIgPZ6Iuk
+	D6iYKVQ7J3/qRnCMPK3qoA6DU4HCDTg=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-372-NQ-g0QsfPie5Dl7zSx4g0A-1; Fri, 24 Nov 2023 16:51:19 -0500
-X-MC-Unique: NQ-g0QsfPie5Dl7zSx4g0A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-228-RHCueqjrPQOc_2qATkB3tQ-1; Fri, 24 Nov 2023 18:27:07 -0500
+X-MC-Unique: RHCueqjrPQOc_2qATkB3tQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 96E91812C28;
-	Fri, 24 Nov 2023 21:51:18 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 047CA101A529;
+	Fri, 24 Nov 2023 23:27:07 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 939085028;
-	Fri, 24 Nov 2023 21:51:17 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1A6EA1C060B0;
+	Fri, 24 Nov 2023 23:27:05 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
 	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
 	Kingdom.
 	Registered in England and Wales under Company Registration No. 3798903
 From: David Howells <dhowells@redhat.com>
-To: Steve French <sfrench@samba.org>
-cc: dhowells@redhat.com, Shyam Prasad N <nspmangalore@gmail.com>,
+In-Reply-To: <1297339.1700862676@warthog.procyon.org.uk>
+References: <1297339.1700862676@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
+    Shyam Prasad N <nspmangalore@gmail.com>,
     Rohith Surabattula <rohiths.msft@gmail.com>,
     Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
     linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Set the file size after doing copychunk_range
+Subject: Re: [PATCH] cifs: Set the file size after doing copychunk_range
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -43,52 +46,18 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1297338.1700862676.1@warthog.procyon.org.uk>
-Date: Fri, 24 Nov 2023 21:51:16 +0000
-Message-ID: <1297339.1700862676@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Content-ID: <1335876.1700868425.1@warthog.procyon.org.uk>
+Date: Fri, 24 Nov 2023 23:27:05 +0000
+Message-ID: <1335877.1700868425@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-    
-Set i_size on the inode after doing the copychunk_range operation as this
-value may be used by various things internally.  stat() hides the issue
-because setting ->time to 0 causes cifs_getatr() to revalidate the
-attributes.
+David Howells <dhowells@redhat.com> wrote:
 
-Also reduce the pagecache truncation to only invalidate the range of bytes
-that will be copied over otherwise we will discard dirty data that isn't
-inside the target range.
+> +	truncate_inode_pages_range(&target_inode->i_data, destoff, len);
 
-Fixes: 620d8745b35d ("Introduce cifs_copy_file_range()")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
----
- fs/smb/client/cifsfs.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+That should actually be:
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index ea3a7a668b45..5a69e93c302e 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -1307,12 +1307,15 @@ ssize_t cifs_file_copychunk_range(unsigned int xid,
- 		goto unlock;
- 
- 	/* should we flush first and last page first */
--	truncate_inode_pages(&target_inode->i_data, 0);
-+	truncate_inode_pages_range(&target_inode->i_data, destoff, len);
- 
- 	rc = file_modified(dst_file);
--	if (!rc)
-+	if (!rc) {
- 		rc = target_tcon->ses->server->ops->copychunk_range(xid,
- 			smb_file_src, smb_file_target, off, len, destoff);
-+		if (rc > 0 && destoff + rc > i_size_read(target_inode))
-+			truncate_setsize(target_inode, destoff + rc);
-+	}
- 
- 	file_accessed(src_file);
- 
+	truncate_inode_pages_range(&target_inode->i_data, destoff, destoff + len);
+
+David
 
