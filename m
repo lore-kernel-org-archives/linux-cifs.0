@@ -1,160 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6F033CCC;
-	Fri, 24 Nov 2023 18:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gQoq5aZg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AC51C433C8;
-	Fri, 24 Nov 2023 18:41:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1700851306;
-	bh=rSKjR4kPDiHrtOEUb2nxNXOqHhNE005/NufjuESuqNQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gQoq5aZg9LmZmvmulfNk5InSDNXh4ZZXF3xBPymaE933L/bc8me8vGf3RNx0SqYRn
-	 nHdn/r56TReCvwbgDm2iAPf1wj08aUwsAI5IhAMs0GE2vmvMSKeLZYNBnnx8j0BrQt
-	 lTzjMSBAb5W564NEPF0QImaJqEgDDNxbuXw2izWE=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Damian Tometzki <damian@riscv-rocks.de>,
-	Eric Biggers <ebiggers@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	"Paulo Alcantara (SUSE)" <pc@manguebit.com>,
-	David Howells <dhowells@redhat.com>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.5 396/491] cifs: Fix encryption of cleared, but unset rq_iter data buffers
-Date: Fri, 24 Nov 2023 17:50:32 +0000
-Message-ID: <20231124172036.511408593@linuxfoundation.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231124172024.664207345@linuxfoundation.org>
-References: <20231124172024.664207345@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aE2Ckw8h"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 056CD198D
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Nov 2023 13:51:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700862684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=Hgj8B8xMgHNPRV+C3WI4kW0phmnLrWnRPCMxmjhfjYA=;
+	b=aE2Ckw8h0lbdfMX5gth4oIgYRii5bp9Gtyqs73SKf22xMeIUyouYfqElqzcTZ5RPKfkpw4
+	uzmPaC2SMa5Hv+liBnSFw1J2y2iiPijrZHmY5l1wOLru6CeiQ5TH1xpPyPBWOKKLZS41ai
+	eXsTYlN4sDffGlTtRQX5Qy6HWzO2xfo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-372-NQ-g0QsfPie5Dl7zSx4g0A-1; Fri, 24 Nov 2023 16:51:19 -0500
+X-MC-Unique: NQ-g0QsfPie5Dl7zSx4g0A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 96E91812C28;
+	Fri, 24 Nov 2023 21:51:18 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.161])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 939085028;
+	Fri, 24 Nov 2023 21:51:17 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Steve French <sfrench@samba.org>
+cc: dhowells@redhat.com, Shyam Prasad N <nspmangalore@gmail.com>,
+    Rohith Surabattula <rohiths.msft@gmail.com>,
+    Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Set the file size after doing copychunk_range
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1297338.1700862676.1@warthog.procyon.org.uk>
+Date: Fri, 24 Nov 2023 21:51:16 +0000
+Message-ID: <1297339.1700862676@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-6.5-stable review patch.  If anyone has any objections, please let me know.
+    
+Set i_size on the inode after doing the copychunk_range operation as this
+value may be used by various things internally.  stat() hides the issue
+because setting ->time to 0 causes cifs_getatr() to revalidate the
+attributes.
 
-------------------
+Also reduce the pagecache truncation to only invalidate the range of bytes
+that will be copied over otherwise we will discard dirty data that isn't
+inside the target range.
 
-From: David Howells <dhowells@redhat.com>
-
-commit 37de5a80e932f828c34abeaae63170d73930dca3 upstream.
-
-Each smb_rqst struct contains two things: an array of kvecs (rq_iov) that
-contains the protocol data for an RPC op and an iterator (rq_iter) that
-contains the data payload of an RPC op.  When an smb_rqst is allocated
-rq_iter is it always cleared, but we don't set it up unless we're going to
-use it.
-
-The functions that determines the size of the ciphertext buffer that will
-be needed to encrypt a request, cifs_get_num_sgs(), assumes that rq_iter is
-always initialised - and employs user_backed_iter() to check that the
-iterator isn't user-backed.  This used to incidentally work, because
-->user_backed was set to false because the iterator has never been
-initialised, but with commit f1b4cb650b9a0eeba206d8f069fcdc532bfbcd74[1]
-which changes user_backed_iter() to determine this based on the iterator
-type insted, a warning is now emitted:
-
-        WARNING: CPU: 7 PID: 4584 at fs/smb/client/cifsglob.h:2165 smb2_get_aead_req+0x3fc/0x420 [cifs]
-        ...
-        RIP: 0010:smb2_get_aead_req+0x3fc/0x420 [cifs]
-        ...
-         crypt_message+0x33e/0x550 [cifs]
-         smb3_init_transform_rq+0x27d/0x3f0 [cifs]
-         smb_send_rqst+0xc7/0x160 [cifs]
-         compound_send_recv+0x3ca/0x9f0 [cifs]
-         cifs_send_recv+0x25/0x30 [cifs]
-         SMB2_tcon+0x38a/0x820 [cifs]
-         cifs_get_smb_ses+0x69c/0xee0 [cifs]
-         cifs_mount_get_session+0x76/0x1d0 [cifs]
-         dfs_mount_share+0x74/0x9d0 [cifs]
-         cifs_mount+0x6e/0x2e0 [cifs]
-         cifs_smb3_do_mount+0x143/0x300 [cifs]
-         smb3_get_tree+0x15e/0x290 [cifs]
-         vfs_get_tree+0x2d/0xe0
-         do_new_mount+0x124/0x340
-         __se_sys_mount+0x143/0x1a0
-
-The problem is that rq_iter was never set, so the type is 0 (ie. ITER_UBUF)
-which causes user_backed_iter() to return true.  The code doesn't
-malfunction because it checks the size of the iterator - which is 0.
-
-Fix cifs_get_num_sgs() to ignore rq_iter if its count is 0, thereby
-bypassing the warnings.
-
-It might be better to explicitly initialise rq_iter to a zero-length
-ITER_BVEC, say, as it can always be reinitialised later.
-
-Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rather than a page list")
-Reported-by: Damian Tometzki <damian@riscv-rocks.de>
-Closes: https://lore.kernel.org/r/ZUfQo47uo0p2ZsYg@fedora.fritz.box/
-Tested-by: Damian Tometzki <damian@riscv-rocks.de>
-Cc: stable@vger.kernel.org
-cc: Eric Biggers <ebiggers@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f1b4cb650b9a0eeba206d8f069fcdc532bfbcd74 [1]
-Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+Fixes: 620d8745b35d ("Introduce cifs_copy_file_range()")
 Signed-off-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: linux-cifs@vger.kernel.org
 ---
- fs/smb/client/cifsglob.h |   12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ fs/smb/client/cifsfs.c |    7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -2113,6 +2113,7 @@ static inline int cifs_get_num_sgs(const
- 	unsigned int len, skip;
- 	unsigned int nents = 0;
- 	unsigned long addr;
-+	size_t data_size;
- 	int i, j;
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index ea3a7a668b45..5a69e93c302e 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -1307,12 +1307,15 @@ ssize_t cifs_file_copychunk_range(unsigned int xid,
+ 		goto unlock;
  
- 	/*
-@@ -2128,17 +2129,21 @@ static inline int cifs_get_num_sgs(const
- 	 * rqst[1+].rq_iov[0+] data to be encrypted/decrypted
- 	 */
- 	for (i = 0; i < num_rqst; i++) {
-+		data_size = iov_iter_count(&rqst[i].rq_iter);
-+
- 		/* We really don't want a mixture of pinned and unpinned pages
- 		 * in the sglist.  It's hard to keep track of which is what.
- 		 * Instead, we convert to a BVEC-type iterator higher up.
- 		 */
--		if (WARN_ON_ONCE(user_backed_iter(&rqst[i].rq_iter)))
-+		if (data_size &&
-+		    WARN_ON_ONCE(user_backed_iter(&rqst[i].rq_iter)))
- 			return -EIO;
+ 	/* should we flush first and last page first */
+-	truncate_inode_pages(&target_inode->i_data, 0);
++	truncate_inode_pages_range(&target_inode->i_data, destoff, len);
  
- 		/* We also don't want to have any extra refs or pins to clean
- 		 * up in the sglist.
- 		 */
--		if (WARN_ON_ONCE(iov_iter_extract_will_pin(&rqst[i].rq_iter)))
-+		if (data_size &&
-+		    WARN_ON_ONCE(iov_iter_extract_will_pin(&rqst[i].rq_iter)))
- 			return -EIO;
+ 	rc = file_modified(dst_file);
+-	if (!rc)
++	if (!rc) {
+ 		rc = target_tcon->ses->server->ops->copychunk_range(xid,
+ 			smb_file_src, smb_file_target, off, len, destoff);
++		if (rc > 0 && destoff + rc > i_size_read(target_inode))
++			truncate_setsize(target_inode, destoff + rc);
++	}
  
- 		for (j = 0; j < rqst[i].rq_nvec; j++) {
-@@ -2154,7 +2159,8 @@ static inline int cifs_get_num_sgs(const
- 			}
- 			skip = 0;
- 		}
--		nents += iov_iter_npages(&rqst[i].rq_iter, INT_MAX);
-+		if (data_size)
-+			nents += iov_iter_npages(&rqst[i].rq_iter, INT_MAX);
- 	}
- 	nents += DIV_ROUND_UP(offset_in_page(sig) + SMB2_SIGNATURE_SIZE, PAGE_SIZE);
- 	return nents;
-
+ 	file_accessed(src_file);
+ 
 
