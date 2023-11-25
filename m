@@ -1,48 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="k/GvYtMC"
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 980B7C5
-	for <linux-cifs@vger.kernel.org>; Sat, 25 Nov 2023 14:08:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="XmfIbKEr"
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91298115
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Nov 2023 14:08:40 -0800 (PST)
 From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1700950117;
+	s=dkim; t=1700950119;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QjZ7NAVTTYnZYPPVITyN5OKVsVj2BZ/hPg5wcMVea8U=;
-	b=k/GvYtMC75vVr8hO4lSs/RSVbLDkZzuGSxuNg4Ri4H2d5ejSl3Wq1QPGbrM7MKd5cP+xlB
-	9nWrxj9Os55Ev7RxM6iK+0Soz4bKEMBjfJ5JsS1jkIKk5sV/Zbflo/5GM71x0Gth/QPdEz
-	pQ7CwnOJqskUx1qjnJLFavll5ulwf6LhBC15dejzpUi6SNAe5QDd6CaoRKXy+6SfzKomo5
-	aZUyQ5b4AkGcgmueTFw0g50RKlv/Y1Gy8bJEG3+b15A8NEbiNz09/gUKN6gBY/p1AMr9lV
-	wMVuX1rUHhjkuZT9OeBPFxSR/S5sVrevuTOqQbcFY+RiYR44qcEb+0Ihc/yFUQ==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1700950117; a=rsa-sha256;
+	bh=jKE6PDcn7tJRX7kZyShYdzRfdjgdx+AQ4l8aH2CMfrE=;
+	b=XmfIbKErQmcFyVII34Bz37AujHKR7IHyN+I7N2n1uOUI4L9CKyJOg55iJMPt1KkmLhmKc7
+	q0DbYE5nLL9QzA1udLj335WQfimp8we4FnptCA1VPD66yAQMw7hGIlFo+UWR286yp/ugrK
+	sGEVAv8xZro126HpI8iHcsnE3IGnKuhUaTavFgXX05qqOInEkHG1HLKDyDduJi/WufwzUx
+	AVblzIJMI/yLCAUpW/LSh2Uni1f1V2JWdBmsh+jJK8gNXJo6MPImWwncM8eRqhQIrNzX1X
+	fR2aNiEPIP1Sx6ILDz9d0NyO0OS/L92JO3ph9vllVTdMJNdAPZnFkKERyGjkmQ==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1700950119; a=rsa-sha256;
 	cv=none;
-	b=bBECi0xYZm64BzitlE8V91e+U7Ag8HKzI9agyVy0/Ym+gZoZgVRzGTEKWsiqc76J8E1Mlq
-	f3bb/l8OwtapFtAAoa+H+Sznu4afXfUo5rFGExcFlaiLydBYRRnOBVPezJsi8L1URX/YYP
-	byli0EiAyoUs5bxjVSyFJ/pigTBBJzC0afBs8gHM7MGIizehILiGo8hqCf7lhz5dwpi7qm
-	uEcP8sa6tXbUwYCVOs1usYLx9NZYkA7qtHMopQDPYSz1mPfRFwuk9pcuXfO21I1pU/NgvD
-	JXRNtYzuzv7d8XGa1jgt4v/RIiqManNapIUw3VzYopwGO7Hh4h/FNRyBcDpPeA==
+	b=pM1ryY0x/TpHHzLs/Ka7GQQqb8Qd0JYvyod42tcE7Ubf4H+FM4nrd9W8zxMu8PVy9rZMtL
+	xAUFg0eAZFG8PEKzEji1y2rkmrgUJLLCqhqZZYJtzJsMgfWvgxIfw6FYTEo9Vk/XGuVOnI
+	qM2ZUkaFBZUVyF/oaJfP+mLyGEESHtRK8t4TM47+wjnuPrA3ncyJc4ECHD6t069ualRbSm
+	2bYWQv+QE56cMU6u5K0AvIO1JIHjKeBcN4zR7ScIoWGGg2/JalDwZSfFEuFVkeWI7caFUz
+	cFHlJZPEw1FfFPMyurRicgP2jG/kJZV2oOW1lYETtljtIUhRadIzYuiiA8iitg==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1700950117; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1700950119; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QjZ7NAVTTYnZYPPVITyN5OKVsVj2BZ/hPg5wcMVea8U=;
-	b=mdqpcq6gfl9FV7S9KxWffE2PoVWujmV1VW2FiaRy1pOmE+hRU1skpzai928gtKN5beBC+/
-	v4t9D3/4jqrGAJaKS4Wu34GfJiDPSlLXs0ku3vXV0tP0fj6Ie1RQ9J4BzaqkIIFcX1bOwh
-	LwuSVxDnEL0v1/EkvJk6M/EvmYGP5bwFW94jmvFXCsPiwA4JsSQQJYxTYSHe+NDDpZA7/y
-	rmua9VOOw3g4/VQiE+GVrbFD+4Wf7c6u3+H80Jir8Dp5CujhR47wa+jdX/y/Q2Ogjd2EkA
-	WxCRq4pAzrDOAHb2+ohWiYbOI9GlvysoyAYU4zEkDNZZrFtSbtD7uh1J++HwLg==
+	bh=jKE6PDcn7tJRX7kZyShYdzRfdjgdx+AQ4l8aH2CMfrE=;
+	b=kEjsX7MdiPQsEr2vDEoSM9NJvhavZIZ5HnJ0O8HO46wRZIiiLPfVYvyByJVJH454x5MF5U
+	KpQGFCQQahw3GH1ZwgD2Ogw5j4EkGogconOOvRbkxzbVS8jkDuNLIFKLe9G1RDWVMdqFK1
+	4T5jCui2RnOxNFqqrJbEoZ4rtn+b+rxdzWYgzMln8aYx6YzTMBuKsL7SpaRQNjKJxHhk6g
+	WT2gLew0Cslvm/7e/uEqq0DAFdG+pnu2gzOR82nZxYVDJk2OeHGS2x/3clgP58vdq/2MTO
+	zN/hkUZt8LyxpqwucDzsajRcP3aand0bBoYU/p8cVYRx+VWsmxMzQtmA5sMB4A==
 To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org,
 	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 6/8] smb: client: fix hardlinking of reparse points
-Date: Sat, 25 Nov 2023 19:08:11 -0300
-Message-ID: <20231125220813.30538-7-pc@manguebit.com>
+Subject: [PATCH 7/8] smb: client: cleanup smb2_query_reparse_point()
+Date: Sat, 25 Nov 2023 19:08:12 -0300
+Message-ID: <20231125220813.30538-8-pc@manguebit.com>
 In-Reply-To: <20231125220813.30538-1-pc@manguebit.com>
 References: <20231125220813.30538-1-pc@manguebit.com>
 Precedence: bulk
@@ -53,177 +53,217 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The client was sending an SMB2_CREATE request without setting
-OPEN_REPARSE_POINT flag thus failing the entire hardlink operation.
-
-Fix this by setting OPEN_REPARSE_POINT in create options for
-SMB2_CREATE request when the source inode is a repase point.
+Use smb2_compound_op() with SMB2_OP_GET_REPARSE to get reparse point.
 
 Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
- fs/smb/client/cifsglob.h  |  8 +++++---
- fs/smb/client/cifsproto.h |  8 +++++---
- fs/smb/client/cifssmb.c   |  9 +++++----
- fs/smb/client/link.c      |  4 ++--
- fs/smb/client/smb2inode.c | 34 ++++++++++++++++++++++------------
- fs/smb/client/smb2proto.h |  8 +++++---
- 6 files changed, 44 insertions(+), 27 deletions(-)
+ fs/smb/client/smb2inode.c |  33 ++++++++++
+ fs/smb/client/smb2ops.c   | 133 --------------------------------------
+ fs/smb/client/smb2proto.h |   6 ++
+ 3 files changed, 39 insertions(+), 133 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 7ceea52058ab..50fedc2513c3 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -405,9 +405,11 @@ struct smb_version_operations {
- 		      const char *from_name, const char *to_name,
- 		      struct cifs_sb_info *cifs_sb);
- 	/* send create hardlink request */
--	int (*create_hardlink)(const unsigned int, struct cifs_tcon *,
--			       const char *, const char *,
--			       struct cifs_sb_info *);
-+	int (*create_hardlink)(const unsigned int xid,
-+			       struct cifs_tcon *tcon,
-+			       struct dentry *source_dentry,
-+			       const char *from_name, const char *to_name,
-+			       struct cifs_sb_info *cifs_sb);
- 	/* query symlink target */
- 	int (*query_symlink)(const unsigned int xid,
- 			     struct cifs_tcon *tcon,
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index e680fe46d4e8..afbab86331a1 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -447,9 +447,11 @@ extern int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *tcon,
- 				 int netfid, const char *target_name,
- 				 const struct nls_table *nls_codepage,
- 				 int remap_special_chars);
--extern int CIFSCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
--			      const char *from_name, const char *to_name,
--			      struct cifs_sb_info *cifs_sb);
-+int CIFSCreateHardLink(const unsigned int xid,
-+		       struct cifs_tcon *tcon,
-+		       struct dentry *source_dentry,
-+		       const char *from_name, const char *to_name,
-+		       struct cifs_sb_info *cifs_sb);
- extern int CIFSUnixCreateHardLink(const unsigned int xid,
- 			struct cifs_tcon *tcon,
- 			const char *fromName, const char *toName,
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 43a90e646a7a..5331fda8b013 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -2528,10 +2528,11 @@ CIFSUnixCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
--int
--CIFSCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
--		   const char *from_name, const char *to_name,
--		   struct cifs_sb_info *cifs_sb)
-+int CIFSCreateHardLink(const unsigned int xid,
-+		       struct cifs_tcon *tcon,
-+		       struct dentry *source_dentry,
-+		       const char *from_name, const char *to_name,
-+		       struct cifs_sb_info *cifs_sb)
- {
- 	int rc = 0;
- 	NT_RENAME_REQ *pSMB = NULL;
-diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-index 82fb069c6ce4..d86da949a919 100644
---- a/fs/smb/client/link.c
-+++ b/fs/smb/client/link.c
-@@ -510,8 +510,8 @@ cifs_hardlink(struct dentry *old_file, struct inode *inode,
- 			rc = -ENOSYS;
- 			goto cifs_hl_exit;
- 		}
--		rc = server->ops->create_hardlink(xid, tcon, from_name, to_name,
--						  cifs_sb);
-+		rc = server->ops->create_hardlink(xid, tcon, old_file,
-+						  from_name, to_name, cifs_sb);
- 		if ((rc == -EIO) || (rc == -EINVAL))
- 			rc = -EOPNOTSUPP;
- 	}
 diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
-index 956f74328860..1a19b0cc34d7 100644
+index 1a19b0cc34d7..3e8ba41b790d 100644
 --- a/fs/smb/client/smb2inode.c
 +++ b/fs/smb/client/smb2inode.c
-@@ -43,6 +43,18 @@ static struct reparse_data_buffer *reparse_buf_ptr(struct kvec *iov)
- 	return buf;
+@@ -1053,3 +1053,36 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+ 	}
+ 	return rc ? ERR_PTR(rc) : new;
  }
- 
-+static inline __u32 file_create_options(struct dentry *dentry)
++
++int smb2_query_reparse_point(const unsigned int xid,
++			     struct cifs_tcon *tcon,
++			     struct cifs_sb_info *cifs_sb,
++			     const char *full_path,
++			     u32 *tag, struct kvec *rsp,
++			     int *rsp_buftype)
 +{
-+	struct cifsInodeInfo *ci;
++	struct cifs_open_info_data data = {};
++	struct cifsFileInfo *cfile;
++	struct kvec in_iov = { .iov_base = &data, .iov_len = sizeof(data), };
++	int rc;
 +
-+	if (dentry) {
-+		ci = CIFS_I(d_inode(dentry));
-+		if (ci->reparse)
-+			return OPEN_REPARSE_POINT;
-+	}
-+	return 0;
++	cifs_dbg(FYI, "%s: path: %s\n", __func__, full_path);
++
++	cifs_get_readable_path(tcon, full_path, &cfile);
++	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
++			      FILE_READ_ATTRIBUTES, FILE_OPEN,
++			      OPEN_REPARSE_POINT, ACL_NO_MODE, &in_iov,
++			      &(int){SMB2_OP_GET_REPARSE}, 1, cfile,
++			      NULL, NULL, NULL, NULL);
++	if (rc)
++		goto out;
++
++	*tag = data.reparse.tag;
++	*rsp = data.reparse.io.iov;
++	*rsp_buftype = data.reparse.io.buftype;
++	memset(&data.reparse.io.iov, 0, sizeof(data.reparse.io.iov));
++	data.reparse.io.buftype = CIFS_NO_BUFFER;
++out:
++	cifs_free_open_info(&data);
++	return rc;
 +}
-+
- /*
-  * note: If cfile is passed, the reference to it is dropped here.
-  * So make sure that you do not reuse cfile after return from this func.
-@@ -919,15 +931,10 @@ int smb2_rename_path(const unsigned int xid,
- 		     const char *from_name, const char *to_name,
- 		     struct cifs_sb_info *cifs_sb)
- {
--	struct cifsInodeInfo *ci;
-+
- 	struct cifsFileInfo *cfile;
--	__u32 co = 0;
-+	__u32 co = file_create_options(source_dentry);
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index c8441e766369..b00a1902d226 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2981,139 +2981,6 @@ static int smb2_parse_reparse_point(struct cifs_sb_info *cifs_sb,
+ 	return parse_reparse_point(buf, plen, cifs_sb, true, data);
+ }
  
--	if (source_dentry) {
--		ci = CIFS_I(d_inode(source_dentry));
--		if (ci->reparse)
--			co |= OPEN_REPARSE_POINT;
+-static int smb2_query_reparse_point(const unsigned int xid,
+-				    struct cifs_tcon *tcon,
+-				    struct cifs_sb_info *cifs_sb,
+-				    const char *full_path,
+-				    u32 *tag, struct kvec *rsp,
+-				    int *rsp_buftype)
+-{
+-	struct smb2_compound_vars *vars;
+-	int rc;
+-	__le16 *utf16_path = NULL;
+-	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+-	struct cifs_open_parms oparms;
+-	struct cifs_fid fid;
+-	struct TCP_Server_Info *server = cifs_pick_channel(tcon->ses);
+-	int flags = CIFS_CP_CREATE_CLOSE_OP;
+-	struct smb_rqst *rqst;
+-	int resp_buftype[3];
+-	struct kvec *rsp_iov;
+-	struct smb2_ioctl_rsp *ioctl_rsp;
+-	struct reparse_data_buffer *reparse_buf;
+-	u32 plen;
+-
+-	cifs_dbg(FYI, "%s: path: %s\n", __func__, full_path);
+-
+-	if (smb3_encryption_required(tcon))
+-		flags |= CIFS_TRANSFORM_REQ;
+-
+-	utf16_path = cifs_convert_path_to_utf16(full_path, cifs_sb);
+-	if (!utf16_path)
+-		return -ENOMEM;
+-
+-	resp_buftype[0] = resp_buftype[1] = resp_buftype[2] = CIFS_NO_BUFFER;
+-	vars = kzalloc(sizeof(*vars), GFP_KERNEL);
+-	if (!vars) {
+-		rc = -ENOMEM;
+-		goto out_free_path;
 -	}
- 	drop_cached_dir_by_name(xid, tcon, from_name, cifs_sb);
- 	cifs_get_writable_path(tcon, from_name, FIND_WR_WITH_DELETE, &cfile);
- 
-@@ -935,13 +942,16 @@ int smb2_rename_path(const unsigned int xid,
- 				  co, DELETE, SMB2_OP_RENAME, cfile);
- }
- 
--int
--smb2_create_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
--		     const char *from_name, const char *to_name,
--		     struct cifs_sb_info *cifs_sb)
-+int smb2_create_hardlink(const unsigned int xid,
-+			 struct cifs_tcon *tcon,
-+			 struct dentry *source_dentry,
-+			 const char *from_name, const char *to_name,
-+			 struct cifs_sb_info *cifs_sb)
- {
-+	__u32 co = file_create_options(source_dentry);
-+
- 	return smb2_set_path_attr(xid, tcon, from_name, to_name,
--				  cifs_sb, 0, FILE_READ_ATTRIBUTES,
-+				  cifs_sb, co, FILE_READ_ATTRIBUTES,
- 				  SMB2_OP_HARDLINK, NULL);
- }
- 
+-	rqst = vars->rqst;
+-	rsp_iov = vars->rsp_iov;
+-
+-	/*
+-	 * setup smb2open - TODO add optimization to call cifs_get_readable_path
+-	 * to see if there is a handle already open that we can use
+-	 */
+-	rqst[0].rq_iov = vars->open_iov;
+-	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
+-
+-	oparms = (struct cifs_open_parms) {
+-		.tcon = tcon,
+-		.path = full_path,
+-		.desired_access = FILE_READ_ATTRIBUTES,
+-		.disposition = FILE_OPEN,
+-		.create_options = cifs_create_options(cifs_sb, OPEN_REPARSE_POINT),
+-		.fid = &fid,
+-	};
+-
+-	rc = SMB2_open_init(tcon, server,
+-			    &rqst[0], &oplock, &oparms, utf16_path);
+-	if (rc)
+-		goto query_rp_exit;
+-	smb2_set_next_command(tcon, &rqst[0]);
+-
+-
+-	/* IOCTL */
+-	rqst[1].rq_iov = vars->io_iov;
+-	rqst[1].rq_nvec = SMB2_IOCTL_IOV_SIZE;
+-
+-	rc = SMB2_ioctl_init(tcon, server,
+-			     &rqst[1], COMPOUND_FID,
+-			     COMPOUND_FID, FSCTL_GET_REPARSE_POINT, NULL, 0,
+-			     CIFSMaxBufSize -
+-			     MAX_SMB2_CREATE_RESPONSE_SIZE -
+-			     MAX_SMB2_CLOSE_RESPONSE_SIZE);
+-	if (rc)
+-		goto query_rp_exit;
+-
+-	smb2_set_next_command(tcon, &rqst[1]);
+-	smb2_set_related(&rqst[1]);
+-
+-	/* Close */
+-	rqst[2].rq_iov = &vars->close_iov;
+-	rqst[2].rq_nvec = 1;
+-
+-	rc = SMB2_close_init(tcon, server,
+-			     &rqst[2], COMPOUND_FID, COMPOUND_FID, false);
+-	if (rc)
+-		goto query_rp_exit;
+-
+-	smb2_set_related(&rqst[2]);
+-
+-	rc = compound_send_recv(xid, tcon->ses, server,
+-				flags, 3, rqst,
+-				resp_buftype, rsp_iov);
+-
+-	ioctl_rsp = rsp_iov[1].iov_base;
+-
+-	/*
+-	 * Open was successful and we got an ioctl response.
+-	 */
+-	if (rc == 0) {
+-		/* See MS-FSCC 2.3.23 */
+-
+-		reparse_buf = (struct reparse_data_buffer *)
+-			((char *)ioctl_rsp +
+-			 le32_to_cpu(ioctl_rsp->OutputOffset));
+-		plen = le32_to_cpu(ioctl_rsp->OutputCount);
+-
+-		if (plen + le32_to_cpu(ioctl_rsp->OutputOffset) >
+-		    rsp_iov[1].iov_len) {
+-			cifs_tcon_dbg(FYI, "srv returned invalid ioctl len: %d\n",
+-				 plen);
+-			rc = -EIO;
+-			goto query_rp_exit;
+-		}
+-		*tag = le32_to_cpu(reparse_buf->ReparseTag);
+-		*rsp = rsp_iov[1];
+-		*rsp_buftype = resp_buftype[1];
+-		resp_buftype[1] = CIFS_NO_BUFFER;
+-	}
+-
+- query_rp_exit:
+-	SMB2_open_free(&rqst[0]);
+-	SMB2_ioctl_free(&rqst[1]);
+-	SMB2_close_free(&rqst[2]);
+-	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+-	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+-	free_rsp_buf(resp_buftype[2], rsp_iov[2].iov_base);
+-	kfree(vars);
+-out_free_path:
+-	kfree(utf16_path);
+-	return rc;
+-}
+-
+ static struct cifs_ntsd *
+ get_smb2_acl_by_fid(struct cifs_sb_info *cifs_sb,
+ 		    const struct cifs_fid *cifsfid, u32 *pacllen, u32 info)
 diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 5e68ddc7b422..3639588709a2 100644
+index 3639588709a2..f08cd5821b55 100644
 --- a/fs/smb/client/smb2proto.h
 +++ b/fs/smb/client/smb2proto.h
-@@ -91,9 +91,11 @@ int smb2_rename_path(const unsigned int xid,
- 		     struct dentry *source_dentry,
- 		     const char *from_name, const char *to_name,
- 		     struct cifs_sb_info *cifs_sb);
--extern int smb2_create_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
--				const char *from_name, const char *to_name,
--				struct cifs_sb_info *cifs_sb);
-+int smb2_create_hardlink(const unsigned int xid,
-+			 struct cifs_tcon *tcon,
-+			 struct dentry *source_dentry,
-+			 const char *from_name, const char *to_name,
-+			 struct cifs_sb_info *cifs_sb);
- extern int smb3_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 			struct cifs_sb_info *cifs_sb, const unsigned char *path,
- 			char *pbuf, unsigned int *pbytes_written);
+@@ -62,6 +62,12 @@ struct inode *smb2_get_reparse_inode(struct cifs_open_info_data *data,
+ 				     struct cifs_tcon *tcon,
+ 				     const char *full_path,
+ 				     struct kvec *iov);
++int smb2_query_reparse_point(const unsigned int xid,
++			     struct cifs_tcon *tcon,
++			     struct cifs_sb_info *cifs_sb,
++			     const char *full_path,
++			     u32 *tag, struct kvec *rsp,
++			     int *rsp_buftype);
+ int smb2_query_path_info(const unsigned int xid,
+ 			 struct cifs_tcon *tcon,
+ 			 struct cifs_sb_info *cifs_sb,
 -- 
 2.43.0
 
