@@ -1,79 +1,99 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="DuiWnCUr"
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E32AF
-	for <linux-cifs@vger.kernel.org>; Sat, 25 Nov 2023 18:55:48 -0800 (PST)
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1700967347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bSiHnLC5dn5ssQuI322/VMB5vHz405QLyt75lZjzNUA=;
-	b=DuiWnCUrfgYV1YxGpgTKrvyqrVgRPMf2c1kvpHUjudApJx9dcR0MUDPZ8NZBd2FtUrszmh
-	j/+wPKRhQzWEKRSXKHk1zwDjXCT8HhGdEzcoujbvI0Qz8gxJgem6W+tV22Xs0a44oLby31
-	bRnzkCIDMD/92SWOO5zZwjlHoKG3vyBw9Wg5XgL5HMnSeLpliP5N3aX6+wDHVV3b5rZNFS
-	Vr9JT9rbW473wNBUcxy9WTJY3/y0eModlx6/5GjQ4CyIwE6UIZog3JIOU0csT4ANExy7gu
-	S7VE7/GaAPRW5JoIj60D3/ZXmuziEiiS+OApdvRdvBX2TE9AJHDRoSMj+4PXwA==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1700967347; a=rsa-sha256;
-	cv=none;
-	b=XpFBYhsWCTmMOCH7CNh6ufWlFPdTVqgF8KYaobSkTCaw0YQ8RkVwixXPJoqBCkp5lEteTF
-	d5Mo7KENgqMSPgfiOCkh69hfaJyXxB0p7kayEJ/Prfm14kfc4Cb9ghjduPgIe3kR2x8ds8
-	BYQCUNdKII3PT94szh90P3IgWsg76/LO/JQ64AEJxSwsGctpzRVWoy8qjLkxREJX09p5B3
-	0+Ent1mjEEskhVBeGw5nhBJSGsP1sJATePQJjLtWSijidXLpl84t7cmWLSU8usd1qsCVeW
-	kjBcFQ6SSBLNQalpVr2Mnr56dTMHoKtTcpoJw6ycirj/4V/eg7TJ6gnF5HPo8A==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1700967347; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bSiHnLC5dn5ssQuI322/VMB5vHz405QLyt75lZjzNUA=;
-	b=NN90X5wOXV4a60sNyA8+QfO7255qvIkNUqIvy0Kztr/deJiG7vOyUXqQeq7OgXIHXZrThI
-	HL/0PWKOphytqIWlLNOCmeiejD5RuCw0RdIyvWJv1WfIru+Bn4BIQxCBrt93mIUT0750jl
-	VPtV9YhwKvqUVL57swSBT6cI7zpWVikYQz6j+ZXPjE8MdUgTO7x6ejbORWYsY3OV/wmqUi
-	5T6+a2/k3bJetuBtJuWbzsRe6LMDMpYHZAB19ymysub8plOhJZ3LzNE/3eNCgAurRo6a/D
-	ebV7glqeUWUly52Mm4TfhYzAa7G3yNIV4koteAPokntYjfMOyB3eRwNB2Ik5IA==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH v2 9/9] smb: client: fix missing mode bits for SMB symlinks
-Date: Sat, 25 Nov 2023 23:55:10 -0300
-Message-ID: <20231126025510.28147-10-pc@manguebit.com>
-In-Reply-To: <20231126025510.28147-1-pc@manguebit.com>
-References: <20231126025510.28147-1-pc@manguebit.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BaNlCZf1"
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17FF9CE;
+	Sat, 25 Nov 2023 21:26:13 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-50aab20e828so4624063e87.2;
+        Sat, 25 Nov 2023 21:26:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700976371; x=1701581171; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XU0TRDEiogUmhBiqOshigQkhmH3QUgJ6MV2/oP6qstA=;
+        b=BaNlCZf1HJ07guQQoLZqDnlKotQRK1cPHd+/uown4trzK2b5meI+vKOlauB6e4xIwg
+         jEgCAlCV1RutpMSDAchpcScDICLkt/k+TF1VzNBMlcG/yOr1vL/SCLnXw73gxgNn5tDx
+         dOR+K2drocEOLmbAGzbljIEmb8ofaZk8W55Sge1Ylq+AI9NTTfPMwkBzcrzumzjxdxEw
+         g5iy7xLvsk4GJcS4ceQ6A0kpNRuW1Zb4FH4mEv6CB3gpDwfQ8DUauYG/wdA16r6kwFdP
+         eQYLSmS3WmhPcoW1UIn9cHVR6bYPAILYpdcDz276/oLWUrkRF6FAnZm5evXMJ08lfVhF
+         AtMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700976371; x=1701581171;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XU0TRDEiogUmhBiqOshigQkhmH3QUgJ6MV2/oP6qstA=;
+        b=LN5n22V6T1139h2aZPbPeIIYGfM3OoSvSFguP3sFrLmvDa6v7isBmwnryCRqnuCOEM
+         1iak2fmtcEtl1Ai0JH48Orrg4hNquk4WGxXwmLvQ7MnLzFNmirD6DnmJngElPkb/4uaI
+         FHQpgtAd6ZEYqE8Oh6QM0W9PDV9mmXeRkzp3OspnKhuIXL6H4T5FyWO2EIbCtBTY8mYM
+         RY3HAuBccXwqr0ZOTYxKN5El6ZByR8do/70AXoNEGk87M1B/dxnhCefbgdurPxS6vw3p
+         jvTREtTR3fw7yenTaRicNQ9fgNgBBZbiWtvM1m909cY/xporIukcRJDwW+cj2fAkQXpR
+         oKeA==
+X-Gm-Message-State: AOJu0YzUjivQY8GSi9SPYg/GGxAamqHZ45BGhEF1+B67ACC7r8EmiJX3
+	URw8Fd0Xb0NNh7K5u2mRozrEf3NBrnJvGqj/6O1CTNJVzLh5sg==
+X-Google-Smtp-Source: AGHT+IHqNi35gn66DTSyR2qorB2aTwWKQwlGJdVj8SMW4yb9GNS3EYaBsph4pvkHIK4HfTxIBzhDeif5wuzEiaCUdgY=
+X-Received: by 2002:a05:6512:280d:b0:507:ba75:b016 with SMTP id
+ cf13-20020a056512280d00b00507ba75b016mr6927777lfb.3.1700976370939; Sat, 25
+ Nov 2023 21:26:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Steve French <smfrench@gmail.com>
+Date: Sat, 25 Nov 2023 23:25:59 -0600
+Message-ID: <CAH2r5mtFbhGETfqO=qE185xWY+82Yv2AF3BoOH5TLa8_TnY35A@mail.gmail.com>
+Subject: [GIT PULL] smb3/cifs client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-When instantiating inodes for SMB symlinks, add the mode bits from
-@cifs_sb->ctx->file_mode as we already do for the other special files.
+Please pull the following changes since commit
+98b1cc82c4affc16f5598d4fa14b1858671b2263:
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
----
- fs/smb/client/inode.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Linux 6.7-rc2 (2023-11-19 15:02:14 -0800)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index d7d19cdb3c8c..39a08f80735d 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -791,7 +791,7 @@ bool cifs_reparse_point_to_fattr(struct cifs_sb_info *cifs_sb,
- 	case 0: /* SMB1 symlink */
- 	case IO_REPARSE_TAG_SYMLINK:
- 	case IO_REPARSE_TAG_NFS:
--		fattr->cf_mode = S_IFLNK;
-+		fattr->cf_mode = S_IFLNK | cifs_sb->ctx->file_mode;
- 		fattr->cf_dtype = DT_LNK;
- 		break;
- 	default:
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc2-smb3-client-fixes
+
+for you to fetch changes up to b0348e459c836abdb0f4b967e006d15c77cf1c87:
+
+  smb: client: introduce cifs_sfu_make_node() (2023-11-23 11:46:05 -0600)
+
+----------------------------------------------------------------
+Five cifs/smb3 fixes
+- use after free fix in releasing multichannel interfaces
+- fixes for special file types (report char, block, FIFOs properly
+when created e.g. by NFS to Windows)
+- fixes for reporting various special file types and symlinks properly
+when using SMB1
+
+----------------------------------------------------------------
+Paulo Alcantara (4):
+      smb: client: implement ->query_reparse_point() for SMB1
+      smb: client: introduce ->parse_reparse_point()
+      smb: client: set correct file type from NFS reparse points
+      smb: client: introduce cifs_sfu_make_node()
+
+Ritvik Budhiraja (1):
+      cifs: fix use after free for iface while disabling secondary channels
+
+ fs/smb/client/cifsglob.h  |  14 ++++-
+ fs/smb/client/cifspdu.h   |   4 +-
+ fs/smb/client/cifsproto.h |  14 ++++-
+ fs/smb/client/cifssmb.c   | 193
++++++++++++++++++++++++----------------------------------
+ fs/smb/client/inode.c     |  74 +++++++++++++++++-----
+ fs/smb/client/readdir.c   |   6 +-
+ fs/smb/client/sess.c      |   2 +-
+ fs/smb/client/smb1ops.c   | 153 ++++++++++-----------------------------------
+ fs/smb/client/smb2inode.c |   2 +-
+ fs/smb/client/smb2ops.c   | 227
++++++++++++++++++++++++++++++++++----------------------------------
+ 10 files changed, 314 insertions(+), 375 deletions(-)
+
+
 -- 
-2.43.0
+Thanks,
 
+Steve
