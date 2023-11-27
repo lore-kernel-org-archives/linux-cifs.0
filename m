@@ -1,55 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA17DDA0
-	for <linux-cifs@vger.kernel.org>; Sun, 26 Nov 2023 17:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f8BvU2cj"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 94B81C433C8;
-	Sun, 26 Nov 2023 17:16:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701018979;
-	bh=8qwCMrGr6c2uYi/MHjPT0Z/qLAZNLU2bIMQyUuo966A=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=f8BvU2cjhPcjXD+GMMWS3VXfUT31i9uzeCYkKfAZhHA6XPTTMGovCLZJgYa8LC8OG
-	 zUnAA6yY6ZU4OdHABYVdrRI4CBin757dC0abHvKJjtim1nEmNuw9jO7ej9Mk4go5mb
-	 Pki2LulGmSn9hW6mIG/hDuo34SoOxnN8oJKgI5LVY15OeKudS7HRuQSmKHEK9BoHq3
-	 bHbAJhqi6G3EzJMHzSbinomoh9ZIfvdByOuVXE2Pz77wprRihIhAsvdnl3I5G+sUGM
-	 O7nbVA2KRZDZqvP2NxEopIMyQ8nfAwlsMs5cU9SfkQnmevjYTKjb0ee8s3d0ybg/91
-	 7PMa8QcaWww9w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 82D8DEAA958;
-	Sun, 26 Nov 2023 17:16:19 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3/cifs client fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtFbhGETfqO=qE185xWY+82Yv2AF3BoOH5TLa8_TnY35A@mail.gmail.com>
-References: <CAH2r5mtFbhGETfqO=qE185xWY+82Yv2AF3BoOH5TLa8_TnY35A@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtFbhGETfqO=qE185xWY+82Yv2AF3BoOH5TLa8_TnY35A@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc2-smb3-client-fixes
-X-PR-Tracked-Commit-Id: b0348e459c836abdb0f4b967e006d15c77cf1c87
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 4515866db1346d0b3d7c53214c60ff5373e39bb7
-Message-Id: <170101897952.23229.15045361391381087966.pr-tracker-bot@kernel.org>
-Date: Sun, 26 Nov 2023 17:16:19 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLb+9PxL"
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2068111
+	for <linux-cifs@vger.kernel.org>; Sun, 26 Nov 2023 20:28:56 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-507cd62472dso4891052e87.0
+        for <linux-cifs@vger.kernel.org>; Sun, 26 Nov 2023 20:28:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1701059335; x=1701664135; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mWs0zAUZCHgyK9hzTG6Z0XLXxbQmHI/Fv5ekP1h46M0=;
+        b=nLb+9PxL5bdD6FS5T+DTGo99Lh1rXQ7W+ZuQGhXK8jYZLJa/GQmvA1VqMC72PcudzS
+         W3p7qirWxj7iPCY3LQi3L4aYwbNMR6LxmTTdjvkFWuzDTk5bVegeBAbELUpARSM9nUWc
+         ByWYXOfbYzuKfoDxtbrHWu9yub0bKZtoR8TXhNhvCsuYCKkDxfCUupjpWWEp23/4fPFt
+         3aN6Tix1zc8tzkA29P1z56cF21XtwguvWCmpI48Xw9wtaxwCUtj+pn+TZnhhdjd15tw2
+         Atjy3rVJB9AuDu2lbDbsfv7U/Sn1KfrBLQQM8GhteUefZdvF+H5yA7nHmE1Wc980c+yz
+         P8Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1701059335; x=1701664135;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mWs0zAUZCHgyK9hzTG6Z0XLXxbQmHI/Fv5ekP1h46M0=;
+        b=remhWN0hcARWav3AfJx82hM8GUmaw1r2RCW1bkczsRuYo2a+nsaf1PkbM/wr5F5v9+
+         wsgmG6YbJv2fnJ/mippWtdyMGizPKlFyHn0j1VR/DDjMHIvZ9DzQMJk1Q6QonbN49ELS
+         mUZfwLDHIpcuPsrCCYh+l2sCbciAC/5V0RbKT+pY2YhwBf0JnKqG6Kj1+n60J1L26LOy
+         DCZdAUg0H9MCaWn9sB8F7tsAEdWKhijRdzEpUYnoIgFx6ZGr3cclN601yWA1jKL+8i27
+         5sxH44Y3XDgZHsjw+nQK3gkEzWJfpzaPiLondr7aYfncijaAyX2RZjkXBumM+OgPHFV5
+         HInw==
+X-Gm-Message-State: AOJu0YzaEf2hMfMGPwSXfTjcsKhSWEKuS5sFDmAGKNwP2I0P/gXsDy/g
+	qXEmLivYSFSjg1e/0h1btG7uLdcVuTDeNorrQtgO2mMDHOU=
+X-Google-Smtp-Source: AGHT+IH8AzOCPA7DdKDLbSmnIRB3fICu7v58sL1SmQcmdQ9ax8c4FHkalydxwrfi6X1C6biHWu59BT1vEhO2VPOeYuk=
+X-Received: by 2002:a05:6512:1383:b0:50b:b216:fe18 with SMTP id
+ fc3-20020a056512138300b0050bb216fe18mr406535lfb.2.1701059334463; Sun, 26 Nov
+ 2023 20:28:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20231126025510.28147-1-pc@manguebit.com>
+In-Reply-To: <20231126025510.28147-1-pc@manguebit.com>
+From: Steve French <smfrench@gmail.com>
+Date: Sun, 26 Nov 2023 22:28:42 -0600
+Message-ID: <CAH2r5mttTq-JhMVa7uMheJ8gmm9dJjMSCjhAWczuA5yUR4Tr2Q@mail.gmail.com>
+Subject: Re: [PATCH v2 0/9] reparse points work
+To: Paulo Alcantara <pc@manguebit.com>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Sat, 25 Nov 2023 23:25:59 -0600:
+tentatively merged to cifs-2.6.git for-next pending more testing and review
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc2-smb3-client-fixes
+rearranged order slightly to move patch 9 up (and added Cc: stable to that =
+one)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/4515866db1346d0b3d7c53214c60ff5373e39bb7
+On Sat, Nov 25, 2023 at 8:55=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
+wrote:
+>
+> Hi Steve,
+>
+> This series contains reparse point fixes and improvements for SMB2+:
+>
+> - Add support for creating character/block devices, sockets and fifos
+>   via NFS reparse points by default.
+>
+> - Add support for creating SMB symlinks via IO_REPARSE_TAG_SYMLINK
+>   reparse points.
+>
+> - smb2_compound_op()
+>
+>   * allow up to MAX_COMPOUND(5) commands in a single compound request
+>   * introduce SMB2_OP_{GET,SET}_REPARSE commands
+>
+> - Optimisations for dentry revalidation and read/write of reparse
+>   points by reducing number of roundtrips.
+>
+> - Fix renaming and hardlinking of reparse points
+>
+> For people who pass 'mfsymlinks' and 'sfu' mount options, the
+> implementation is expected to avoid creating reparse points at all.
+>
+> Volker Lendecke had suggested trying to create both SMB symlink and
+> mfsymlink in a single compound request but this series doesn't have
+> it.  It could be implemented later.
+>
+> Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+> ---
+> Changes in v2:
+> - Fix missing mode bits for SMB symlinks (reported by Steve)
+> - Fix uninitialised var warnings (reported by kernel test robot)
+> - Add dentry reval optimisation for SMB3 POSIX query info as well
+>
+> ---
+> Paulo Alcantara (9):
+>   smb: client: extend smb2_compound_op() to accept more commands
+>   smb: client: allow creating special files via reparse points
+>   smb: client: allow creating symlinks via reparse points
+>   smb: client: optimise reparse point querying
+>   smb: client: fix renaming of reparse points
+>   smb: client: fix hardlinking of reparse points
+>   smb: client: cleanup smb2_query_reparse_point()
+>   smb: client: optimise dentry revalidation for reparse points
+>   smb: client: fix missing mode bits for SMB symlinks
+>
+>  fs/smb/client/cifsglob.h  |   47 +-
+>  fs/smb/client/cifsproto.h |   30 +-
+>  fs/smb/client/cifssmb.c   |   17 +-
+>  fs/smb/client/dir.c       |    7 +-
+>  fs/smb/client/file.c      |   10 +-
+>  fs/smb/client/inode.c     |   98 ++--
+>  fs/smb/client/link.c      |   29 +-
+>  fs/smb/client/smb2glob.h  |   26 +-
+>  fs/smb/client/smb2inode.c | 1054 ++++++++++++++++++++++---------------
+>  fs/smb/client/smb2ops.c   |  297 ++++++-----
+>  fs/smb/client/smb2proto.h |   29 +-
+>  fs/smb/client/trace.h     |    7 +-
+>  12 files changed, 997 insertions(+), 654 deletions(-)
+>
+> --
+> 2.43.0
+>
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--=20
+Thanks,
+
+Steve
