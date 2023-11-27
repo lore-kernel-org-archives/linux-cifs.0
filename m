@@ -1,48 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xsb56h6y"
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E8AE11B
-	for <linux-cifs@vger.kernel.org>; Sun, 26 Nov 2023 20:52:41 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6cbb71c3020so3247874b3a.1
-        for <linux-cifs@vger.kernel.org>; Sun, 26 Nov 2023 20:52:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EddBnaaL"
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EBA311B
+	for <linux-cifs@vger.kernel.org>; Sun, 26 Nov 2023 20:52:59 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5bd306f86a8so2569430a12.0
+        for <linux-cifs@vger.kernel.org>; Sun, 26 Nov 2023 20:52:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701060760; x=1701665560; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701060778; x=1701665578; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JwdK+jEr6Ipps30SEjJjB1pVi3bO7y85nSCuPw4Un9I=;
-        b=Xsb56h6y73n4oz39e6GbLsqTnEISbsrFEv/Js/tWr72F+PqsK6D+kGtc9B6eSY4n3B
-         lpgMaFFSz4MC8DUy77Kt4NLGhiB6RM4TImHjFD2MxGgav/esbhCjJPClC7FttqvD43MH
-         7YGU87oJvONSrnIAV/ddGEys1vaqAjqLdhjJY2rVu/XYzQDtkFkvsKUKmKTNeNQ5OD63
-         J/sNENFZgS2XughiVhTGlbhFWyeWyDfjUafqdR/e5U2GuYKBH51pIsXbEjyMh9W+86CL
-         XWQ36FxEjDV+3PvbV9Zj5iwgNwdkjd49FYBCVmDQhlirMs4RDrXTzPmU0z9eA1yYalRV
-         UcDg==
+        bh=BP9yAem4I4lZebSeh8gfMO8NQkE1HVsF4wxWOmIJcrE=;
+        b=EddBnaaLtiMfs7hw3oxjAGrKuM0U3XtwxtXLd3HZPhD9Q0BhbJ8gNrRgz/ajyFtXY7
+         dK6rPvRVPhw+F2AKh4SfL7q3Y2A3GAz6Hy+LnGfV+1VX7Fq2b5QhK3r8jEfJbN35sy9o
+         DO2QWeNe4wn8VN98oMgiuOWTEyvd+rrDXcbMZ76qUxkpEQsIKHcCV9gm6e72XhdHs52E
+         pFcxXUhPRZh/h9Yagat4NxSUNtqAJThWY3G7p178woduTzE0sI/PDLG6ftYe7VHr2+2Y
+         qBVki536uwok+RUfZTZQRtHUm8S8tmfL0TNE2tYIU26eycPg7TY3EsmHxIXDY/MQQ6DH
+         jGjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701060760; x=1701665560;
+        d=1e100.net; s=20230601; t=1701060778; x=1701665578;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JwdK+jEr6Ipps30SEjJjB1pVi3bO7y85nSCuPw4Un9I=;
-        b=wBPlT5uNNeTBUgRA0+AhxQnnBm54PfWZnetsVAZboKdxVsLatvwwb4NRv95fwLLTfW
-         Bpl8uLEN7drL64324Z4+c6RvTX66nAItfs3+Yc5aiMvP92sLsFsKkMhpNvKWHT1Z7Av0
-         L9zvOA8gmEZ5PfOJcAmQbPlCLgux9hzY3Jqf4RrE0W56NPF8k0VXn/U4dQWRiELiTcQr
-         3eQckhWITexuqbh/ZKuN+uYG+BfOcb+b2ZOpTJ69G+McP+KPEP9v0glUD2F8Bo6BB1wa
-         gL0LlqwbzpU4l4W+XHvmyYZpRM8QOzt3Ty922EWK7+DQtPhBxCLpbaD+UbQC6EuSMKq4
-         XjeA==
-X-Gm-Message-State: AOJu0YyWBlsuPnQcxW1xe+6VitmFDOd6IWLX0WlaKxLm81cSNo64VpaQ
-	u4kmJGXxrgLzZP1iT5juoz3rxh4Yg5M=
-X-Google-Smtp-Source: AGHT+IHXSVfYqjHa145rUwYgwEbzYbedA3gsAWhwi3hbGnOq3FfqZFmRA4J4RbISDuLrWqo9Idj59g==
-X-Received: by 2002:a05:6a20:6a20:b0:18a:d791:6629 with SMTP id p32-20020a056a206a2000b0018ad7916629mr13013222pzk.11.1701060760448;
-        Sun, 26 Nov 2023 20:52:40 -0800 (PST)
+        bh=BP9yAem4I4lZebSeh8gfMO8NQkE1HVsF4wxWOmIJcrE=;
+        b=eRGIt9J76HmEO2pf2cZP7c+Jc9vB2X7Wx4hSlXwmKRVr779KxPHMKO1lU5F6L45JVq
+         +1jApNAWOl0Ow3Rds5ZwuzUWx/1xxUw8jMzkVGWeHAQFmdfh8SPjXV/FgNiJJ5veVWs0
+         3FVl0LG07scHk8hZcLGswBpP60bnIZT7qMn9HuxY/40vshyrsb5PiNEPlyC7mfu4Kcqj
+         zqhufg9pdsf1WwFIhxmZ5j/CCM6CICBYtvjjSCLuOYzvCPFqc/TNcZXxQ8RejmFgRG2M
+         xEZXnsiNCyPOAacuQkNKxxG8QoQW1Nky2x6f+yTkwvLza0ZNhkBP5hA3N/H2iycNieZR
+         JdOw==
+X-Gm-Message-State: AOJu0YxgGjRdgKqD2DC7hUZssrxa6NE+O61sMQjIO+IC7qB4EXs1FFmw
+	O1jEDFox9vbokrpY9Z5iynTn+Wa6Xh4=
+X-Google-Smtp-Source: AGHT+IHlrutzZCiElxyX/H0HE21qS0h/5gfvkPHb4MaH3PKvEYPyrnJmVuiDUDLJYZRlJLD/XNngQw==
+X-Received: by 2002:a17:90a:a08e:b0:280:3650:382a with SMTP id r14-20020a17090aa08e00b002803650382amr10295225pjp.16.1701060778390;
+        Sun, 26 Nov 2023 20:52:58 -0800 (PST)
 Received: from debian (c-73-109-30-110.hsd1.wa.comcast.net. [73.109.30.110])
-        by smtp.gmail.com with ESMTPSA id fd5-20020a056a002e8500b006cbd24d8d0dsm6308203pfb.85.2023.11.26.20.52.40
+        by smtp.gmail.com with ESMTPSA id nh19-20020a17090b365300b002851466f471sm6541051pjb.31.2023.11.26.20.52.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Nov 2023 20:52:40 -0800 (PST)
-Date: Sun, 26 Nov 2023 20:52:38 -0800
+        Sun, 26 Nov 2023 20:52:58 -0800 (PST)
+Date: Sun, 26 Nov 2023 20:52:56 -0800
 From: Pierre Mariani <pierre.mariani@gmail.com>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com, pierre.mariani@gmail.com
-Subject: [PATCH 3/4] smb: client: Protect tcon->status with tc_lock spin lock
-Message-ID: <8ba54b531064f48c90bdac82dfc43efedaaaed71.1701060106.git.pierre.mariani@gmail.com>
+Subject: [PATCH 4/4] smb: client: Fix checkpatch whitespace errors and
+ warnings
+Message-ID: <b8c930087bbe9f2a4771e9b5a007fd0208cd1b6c.1701060106.git.pierre.mariani@gmail.com>
 References: <b9f9f617abc69d0a7ddb3109bc257073c8b165de.1701060106.git.pierre.mariani@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -54,29 +55,135 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <b9f9f617abc69d0a7ddb3109bc257073c8b165de.1701060106.git.pierre.mariani@gmail.com>
 
-Protect the update of tcon->status with tc_lock spin lock as per documentation
-from cifsglob.h.
-Fixes Coverity 1560722 Data race condition.
+Fixes no-op checkpatch errors and warnings.
 
 Signed-off-by: Pierre Mariani <pierre.mariani@gmail.com>
 ---
- fs/smb/client/connect.c | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/smb/client/connect.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
 diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 0512835f399c..a381c4cdb8c4 100644
+index a381c4cdb8c4..59f95ea5105e 100644
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
-@@ -2710,7 +2710,9 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 	tcon->nodelete = ctx->nodelete;
- 	tcon->local_lease = ctx->local_lease;
- 	INIT_LIST_HEAD(&tcon->pending_opens);
-+	spin_lock(&tcon->tc_lock);
- 	tcon->status = TID_GOOD;
-+	spin_unlock(&tcon->tc_lock);
+@@ -482,6 +482,7 @@ static int reconnect_target_unlocked(struct TCP_Server_Info *server, struct dfs_
+ static int reconnect_dfs_server(struct TCP_Server_Info *server)
+ {
+ 	struct dfs_cache_tgt_iterator *target_hint = NULL;
++
+ 	DFS_CACHE_TGT_LIST(tl);
+ 	int num_targets = 0;
+ 	int rc = 0;
+@@ -750,6 +751,7 @@ cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
+ {
+ 	struct msghdr smb_msg = {};
+ 	struct kvec iov = {.iov_base = buf, .iov_len = to_read};
++
+ 	iov_iter_kvec(&smb_msg.msg_iter, ITER_DEST, &iov, 1, to_read);
  
- 	INIT_DELAYED_WORK(&tcon->query_interfaces,
- 			  smb2_query_server_interfaces);
+ 	return cifs_readv_from_socket(server, &smb_msg);
+@@ -1400,11 +1402,13 @@ cifs_match_ipaddr(struct sockaddr *srcaddr, struct sockaddr *rhs)
+ 	case AF_INET: {
+ 		struct sockaddr_in *saddr4 = (struct sockaddr_in *)srcaddr;
+ 		struct sockaddr_in *vaddr4 = (struct sockaddr_in *)rhs;
++
+ 		return (saddr4->sin_addr.s_addr == vaddr4->sin_addr.s_addr);
+ 	}
+ 	case AF_INET6: {
+ 		struct sockaddr_in6 *saddr6 = (struct sockaddr_in6 *)srcaddr;
+ 		struct sockaddr_in6 *vaddr6 = (struct sockaddr_in6 *)rhs;
++
+ 		return (ipv6_addr_equal(&saddr6->sin6_addr, &vaddr6->sin6_addr)
+ 			&& saddr6->sin6_scope_id == vaddr6->sin6_scope_id);
+ 	}
+@@ -2605,8 +2609,8 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+ 			rc = -EOPNOTSUPP;
+ 			goto out_fail;
+ 		} else {
+-			cifs_dbg(VFS, "Check vers= mount option. SMB3.11 "
+-				"disabled but required for POSIX extensions\n");
++			cifs_dbg(VFS,
++				"Check vers= mount option. SMB3.11 disabled but required for POSIX extensions\n");
+ 			rc = -EOPNOTSUPP;
+ 			goto out_fail;
+ 		}
+@@ -2751,7 +2755,6 @@ cifs_put_tlink(struct tcon_link *tlink)
+ 	if (!IS_ERR(tlink_tcon(tlink)))
+ 		cifs_put_tcon(tlink_tcon(tlink));
+ 	kfree(tlink);
+-	return;
+ }
+ 
+ static int
+@@ -2892,6 +2895,7 @@ static inline void
+ cifs_reclassify_socket4(struct socket *sock)
+ {
+ 	struct sock *sk = sock->sk;
++
+ 	BUG_ON(!sock_allow_reclassification(sk));
+ 	sock_lock_init_class_and_name(sk, "slock-AF_INET-CIFS",
+ 		&cifs_slock_key[0], "sk_lock-AF_INET-CIFS", &cifs_key[0]);
+@@ -2901,6 +2905,7 @@ static inline void
+ cifs_reclassify_socket6(struct socket *sock)
+ {
+ 	struct sock *sk = sock->sk;
++
+ 	BUG_ON(!sock_allow_reclassification(sk));
+ 	sock_lock_init_class_and_name(sk, "slock-AF_INET6-CIFS",
+ 		&cifs_slock_key[1], "sk_lock-AF_INET6-CIFS", &cifs_key[1]);
+@@ -2935,15 +2940,18 @@ static int
+ bind_socket(struct TCP_Server_Info *server)
+ {
+ 	int rc = 0;
++
+ 	if (server->srcaddr.ss_family != AF_UNSPEC) {
+ 		/* Bind to the specified local IP address */
+ 		struct socket *socket = server->ssocket;
++
+ 		rc = kernel_bind(socket,
+ 				 (struct sockaddr *) &server->srcaddr,
+ 				 sizeof(server->srcaddr));
+ 		if (rc < 0) {
+ 			struct sockaddr_in *saddr4;
+ 			struct sockaddr_in6 *saddr6;
++
+ 			saddr4 = (struct sockaddr_in *)&server->srcaddr;
+ 			saddr6 = (struct sockaddr_in6 *)&server->srcaddr;
+ 			if (saddr6->sin6_family == AF_INET6)
+@@ -3173,6 +3181,7 @@ void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	if (!CIFSSMBQFSUnixInfo(xid, tcon)) {
+ 		__u64 cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
++
+ 		cifs_dbg(FYI, "unix caps which server supports %lld\n", cap);
+ 		/*
+ 		 * check for reconnect case in which we do not
+@@ -3676,7 +3685,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 	smb_buffer_response = smb_buffer;
+ 
+ 	header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
+-			NULL /*no tid */ , 4 /*wct */ );
++			NULL /*no tid */, 4 /*wct */);
+ 
+ 	smb_buffer->Mid = get_next_mid(ses->server);
+ 	smb_buffer->Uid = ses->Suid;
+@@ -3695,12 +3704,12 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 	if (ses->server->sign)
+ 		smb_buffer->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
+ 
+-	if (ses->capabilities & CAP_STATUS32) {
++	if (ses->capabilities & CAP_STATUS32)
+ 		smb_buffer->Flags2 |= SMBFLG2_ERR_STATUS;
+-	}
+-	if (ses->capabilities & CAP_DFS) {
++
++	if (ses->capabilities & CAP_DFS)
+ 		smb_buffer->Flags2 |= SMBFLG2_DFS;
+-	}
++
+ 	if (ses->capabilities & CAP_UNICODE) {
+ 		smb_buffer->Flags2 |= SMBFLG2_UNICODE;
+ 		length =
 -- 
 2.39.2
 
