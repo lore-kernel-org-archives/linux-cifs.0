@@ -1,110 +1,244 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NMDTjVkT"
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4702DC1
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Nov 2023 21:20:22 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-5c194b111d6so3805130a12.0
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Nov 2023 21:20:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701148821; x=1701753621; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5BGrTwTsyS7NBuZTQigvvPInSB8iz4TgT2/Lb29b0gg=;
-        b=NMDTjVkTe04HMURWHBFkqxnOJN8GLYsSFglU4JyxRJ+oTVf7pc4rlZN/lwN0Obgqq2
-         XyCNP3HjlJ+8wa4lAxh6qkLVQEkyacRRhy2giOabazTXX2pOF++4OQ2Fuhb+y+OeR9PR
-         7JzbvRXMdm8XjRkzD3R9UN1H/qVElhDPLkGZUlxx1tilKBumdJfF6qHh4Zg3OXJfw2Wm
-         FOUmk06QMF+X78TdpDqFEbRob4JcFx0U9bdUY8Ak/P9SnMkOVYDG3XKo9NtRX94gSkr/
-         yaAReO4ORESoMgCecvl3AlCLGjFKhBN5q6wMV+xrlQf0TvCVaHdYsL2V71cbKWZueSSb
-         JPZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701148821; x=1701753621;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5BGrTwTsyS7NBuZTQigvvPInSB8iz4TgT2/Lb29b0gg=;
-        b=SNLgBX4uM1tlbLIAKqYnfCyol5oTGrXnTZU4/H/N78rXSveUxA1SOB0154Hr7UC3dW
-         6duXkyY2iFpGWZjD+8psJnxw9nKsxG3ZxJZ3xHTtQeslBtq1/CI0t9n8SY9eTPV2+DD+
-         vRxW7aWEaG6hzY8XRv+8TGV2d3SLG69DylFYrPjpPAzeHT5avmhIIFRBXeyRGU+2fxGx
-         axJFoWczdVevg8YBv3KSZ6Te3kepBRiADCMNsuvn8MHFsl16mrMv4vK0qLtqd2dewzS/
-         jaH0It0ZB2Ak0AHEPcr7LXDgspn/qvxQ+4g023wxKkq/T1AL7oSDToeNXqpRL/DAt3oV
-         GG6g==
-X-Gm-Message-State: AOJu0Yw6YBeAh9jwGTfaYLRO5bynx8+Oo4LHXl0akndtv74k7anf7thN
-	warINB1HUc/MhpYSLlLIF8Y=
-X-Google-Smtp-Source: AGHT+IFxrS3QLl0IeHJBBzeOonePvCkMN/BlU9I2RoygRyXFyEjVgcaOiuRikPQ0tvY1F7ChZONUhw==
-X-Received: by 2002:a05:6a20:3d11:b0:18c:9855:e949 with SMTP id y17-20020a056a203d1100b0018c9855e949mr6742177pzi.15.1701148821633;
-        Mon, 27 Nov 2023 21:20:21 -0800 (PST)
-Received: from debian (c-73-109-30-110.hsd1.wa.comcast.net. [73.109.30.110])
-        by smtp.gmail.com with ESMTPSA id gx1-20020a17090b124100b0027e289ac436sm8198601pjb.8.2023.11.27.21.20.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Nov 2023 21:20:21 -0800 (PST)
-Date: Mon, 27 Nov 2023 21:20:19 -0800
-From: Pierre Mariani <pierre.mariani@gmail.com>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org
-Subject: Re: [PATCH 1/4] smb: client: Delete unused value
-Message-ID: <ZWV4k-HP7rYOo-Ky@debian>
-References: <b9f9f617abc69d0a7ddb3109bc257073c8b165de.1701060106.git.pierre.mariani@gmail.com>
- <CAH2r5mujUZgEiHJZgo-6Z6Xe3xykWMqUoTvQ8_ev__5-5RmO3w@mail.gmail.com>
- <ZWQl2yN7iOpKegcJ@debian>
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="KdeDRLZz"
+X-Greylist: delayed 495 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 28 Nov 2023 03:03:26 PST
+Received: from forward205a.mail.yandex.net (forward205a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED16118F
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Nov 2023 03:03:26 -0800 (PST)
+Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d100])
+	by forward205a.mail.yandex.net (Yandex) with ESMTP id 60DE262570
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Nov 2023 13:55:14 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-31.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-31.vla.yp-c.yandex.net [IPv6:2a02:6b8:c18:3b87:0:640:4625:0])
+	by forward100a.mail.yandex.net (Yandex) with ESMTP id 42D6846DE3;
+	Tue, 28 Nov 2023 13:55:09 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-31.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 8tRuttSwKeA0-DCfqUafc;
+	Tue, 28 Nov 2023 13:55:08 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1701168908; bh=P3T6EYcEjAVFAsITElSfRXD06fXVImImpPgNUeS6Df4=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=KdeDRLZzZfdr7vpq5XZufUEmen8SuBW5rAEGpuBB8WyRfMAKHPElzznVvnQSXExG5
+	 DVNgEEhOdkPWN/QRiKb331LHV9yNqASugm2CJeHjXVvDaByxoVFv14ytjwlqIPO99x
+	 BQH9svH1NW8aZNY09FH1wyiQnQfPGkzbS0J9mxV0=
+Authentication-Results: mail-nwsmtp-smtp-production-main-31.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Steve French <sfrench@samba.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	linux-cifs@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] smb: client, common: fix fortify warnings
+Date: Tue, 28 Nov 2023 13:53:47 +0300
+Message-ID: <20231128105351.47201-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZWQl2yN7iOpKegcJ@debian>
 
-On Sun, Nov 26, 2023 at 09:15:07PM -0800, Pierre Mariani wrote:
-> On Sun, Nov 26, 2023 at 10:54:38PM -0600, Steve French wrote:
-> > on this one - I lean toward leaving it in (although technically
-> > unused) since may reduce future errors by being clear that this is not
-> > an error case and may be a bit clearer to read to some.  No strong
-> > opinion though on this.
-> > 
-> 
-> I will undo this change and update the Coverity triage data instead.
+When compiling with gcc version 14.0.0 20231126 (experimental)
+and CONFIG_FORTIFY_SOURCE=y, I've noticed the following:
 
-I will not be able to make updates to Coverity until I get contributor access,
-which will happen if and when one of my patches gets merged. I will update
-Coverity whenever it becomes possible.
+In file included from ./include/linux/string.h:295,
+                 from ./include/linux/bitmap.h:12,
+                 from ./include/linux/cpumask.h:12,
+                 from ./arch/x86/include/asm/paravirt.h:17,
+                 from ./arch/x86/include/asm/cpuid.h:62,
+                 from ./arch/x86/include/asm/processor.h:19,
+                 from ./arch/x86/include/asm/cpufeature.h:5,
+                 from ./arch/x86/include/asm/thread_info.h:53,
+                 from ./include/linux/thread_info.h:60,
+                 from ./arch/x86/include/asm/preempt.h:9,
+                 from ./include/linux/preempt.h:79,
+                 from ./include/linux/spinlock.h:56,
+                 from ./include/linux/wait.h:9,
+                 from ./include/linux/wait_bit.h:8,
+                 from ./include/linux/fs.h:6,
+                 from fs/smb/client/smb2pdu.c:18:
+In function 'fortify_memcpy_chk',
+    inlined from '__SMB2_close' at fs/smb/client/smb2pdu.c:3480:4:
+./include/linux/fortify-string.h:588:25: warning: call to '__read_overflow2_field'
+declared with attribute warning: detected read beyond size of field (2nd parameter);
+maybe use struct_group()? [-Wattribute-warning]
+  588 |                         __read_overflow2_field(q_size_field, size);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-I have undone the change and submitted a v2 patch set.
+and:
 
-> 
-> > On Sun, Nov 26, 2023 at 10:52 PM Pierre Mariani
-> > <pierre.mariani@gmail.com> wrote:
-> > >
-> > > rc does not need to be set to any value in this location as it gets set to other
-> > > values is all subsequent logical branches before being used.
-> > > Fixes Coverity 1562035 Unused value.
-> > >
-> > > Signed-off-by: Pierre Mariani <pierre.mariani@gmail.com>
-> > > ---
-> > >  fs/smb/client/connect.c | 1 -
-> > >  1 file changed, 1 deletion(-)
-> > >
-> > > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> > > index f896f60c924b..449d56802692 100644
-> > > --- a/fs/smb/client/connect.c
-> > > +++ b/fs/smb/client/connect.c
-> > > @@ -1770,7 +1770,6 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
-> > >                         tcp_ses, (struct sockaddr *)&ctx->dstaddr);
-> > >                 if (tcp_ses->smbd_conn) {
-> > >                         cifs_dbg(VFS, "RDMA transport established\n");
-> > > -                       rc = 0;
-> > >                         goto smbd_connected;
-> > >                 } else {
-> > >                         rc = -ENOENT;
-> > > --
-> > > 2.39.2
-> > >
-> > 
-> > 
-> > -- 
-> > Thanks,
-> > 
-> > Steve
+In file included from ./include/linux/string.h:295,
+                 from ./include/linux/bitmap.h:12,
+                 from ./include/linux/cpumask.h:12,
+                 from ./arch/x86/include/asm/paravirt.h:17,
+                 from ./arch/x86/include/asm/cpuid.h:62,
+                 from ./arch/x86/include/asm/processor.h:19,
+                 from ./arch/x86/include/asm/cpufeature.h:5,
+                 from ./arch/x86/include/asm/thread_info.h:53,
+                 from ./include/linux/thread_info.h:60,
+                 from ./arch/x86/include/asm/preempt.h:9,
+                 from ./include/linux/preempt.h:79,
+                 from ./include/linux/spinlock.h:56,
+                 from ./include/linux/wait.h:9,
+                 from ./include/linux/wait_bit.h:8,
+                 from ./include/linux/fs.h:6,
+                 from fs/smb/client/cifssmb.c:17:
+In function 'fortify_memcpy_chk',
+    inlined from 'CIFS_open' at fs/smb/client/cifssmb.c:1248:3:
+./include/linux/fortify-string.h:588:25: warning: call to '__read_overflow2_field'
+declared with attribute warning: detected read beyond size of field (2nd parameter);
+maybe use struct_group()? [-Wattribute-warning]
+  588 |                         __read_overflow2_field(q_size_field, size);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In both cases, the fortification logic inteprets calls to 'memcpy()' as an
+attempts to copy an amount of data which exceeds the size of the specified
+field (i.e. more than 8 bytes from __le64 value) and thus issues an overread
+warning. Both of these warnings may be silenced by using the convenient
+'struct_group()' quirk.
+
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+ fs/smb/client/cifspdu.h | 24 ++++++++++++++----------
+ fs/smb/client/cifssmb.c |  6 ++++--
+ fs/smb/client/smb2pdu.c |  8 +++-----
+ fs/smb/client/smb2pdu.h | 16 +++++++++-------
+ fs/smb/common/smb2pdu.h | 17 ++++++++++-------
+ 5 files changed, 40 insertions(+), 31 deletions(-)
+
+diff --git a/fs/smb/client/cifspdu.h b/fs/smb/client/cifspdu.h
+index 83ccc51a54d0..c0513fbb8a59 100644
+--- a/fs/smb/client/cifspdu.h
++++ b/fs/smb/client/cifspdu.h
+@@ -882,11 +882,13 @@ typedef struct smb_com_open_rsp {
+ 	__u8 OplockLevel;
+ 	__u16 Fid;
+ 	__le32 CreateAction;
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le32 FileAttributes;
++	struct_group(common_attributes,
++		__le64 CreationTime;
++		__le64 LastAccessTime;
++		__le64 LastWriteTime;
++		__le64 ChangeTime;
++		__le32 FileAttributes;
++	);
+ 	__le64 AllocationSize;
+ 	__le64 EndOfFile;
+ 	__le16 FileType;
+@@ -2264,11 +2266,13 @@ typedef struct {
+ /* QueryFileInfo/QueryPathinfo (also for SetPath/SetFile) data buffer formats */
+ /******************************************************************************/
+ typedef struct { /* data block encoding of response to level 263 QPathInfo */
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le32 Attributes;
++	struct_group(common_attributes,
++		__le64 CreationTime;
++		__le64 LastAccessTime;
++		__le64 LastWriteTime;
++		__le64 ChangeTime;
++		__le32 Attributes;
++	);
+ 	__u32 Pad1;
+ 	__le64 AllocationSize;
+ 	__le64 EndOfFile;	/* size ie offset to first free byte in file */
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index bad91ba6c3a9..9ee348e6d106 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -1244,8 +1244,10 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
+ 		*oplock |= CIFS_CREATE_ACTION;
+ 
+ 	if (buf) {
+-		/* copy from CreationTime to Attributes */
+-		memcpy((char *)buf, (char *)&rsp->CreationTime, 36);
++		/* copy commonly used attributes */
++		memcpy(&buf->common_attributes,
++		       &rsp->common_attributes,
++		       sizeof(buf->common_attributes));
+ 		/* the file_info buf is endian converted by caller */
+ 		buf->AllocationSize = rsp->AllocationSize;
+ 		buf->EndOfFile = rsp->EndOfFile;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 2eb29fa278c3..395e1230ddbc 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -3472,12 +3472,10 @@ __SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 	} else {
+ 		trace_smb3_close_done(xid, persistent_fid, tcon->tid,
+ 				      ses->Suid);
+-		/*
+-		 * Note that have to subtract 4 since struct network_open_info
+-		 * has a final 4 byte pad that close response does not have
+-		 */
+ 		if (pbuf)
+-			memcpy(pbuf, (char *)&rsp->CreationTime, sizeof(*pbuf) - 4);
++			memcpy(&pbuf->network_open_info,
++			       &rsp->network_open_info,
++			       sizeof(pbuf->network_open_info));
+ 	}
+ 
+ 	atomic_dec(&tcon->num_remote_opens);
+diff --git a/fs/smb/client/smb2pdu.h b/fs/smb/client/smb2pdu.h
+index 220994d0a0f7..db08194484e0 100644
+--- a/fs/smb/client/smb2pdu.h
++++ b/fs/smb/client/smb2pdu.h
+@@ -319,13 +319,15 @@ struct smb2_file_reparse_point_info {
+ } __packed;
+ 
+ struct smb2_file_network_open_info {
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le64 AllocationSize;
+-	__le64 EndOfFile;
+-	__le32 Attributes;
++	struct_group(network_open_info,
++		__le64 CreationTime;
++		__le64 LastAccessTime;
++		__le64 LastWriteTime;
++		__le64 ChangeTime;
++		__le64 AllocationSize;
++		__le64 EndOfFile;
++		__le32 Attributes;
++	);
+ 	__le32 Reserved;
+ } __packed; /* level 34 Query also similar returned in close rsp and open rsp */
+ 
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index 8983f45f8430..9fbaaa387dcc 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -702,13 +702,16 @@ struct smb2_close_rsp {
+ 	__le16 StructureSize; /* 60 */
+ 	__le16 Flags;
+ 	__le32 Reserved;
+-	__le64 CreationTime;
+-	__le64 LastAccessTime;
+-	__le64 LastWriteTime;
+-	__le64 ChangeTime;
+-	__le64 AllocationSize;	/* Beginning of FILE_STANDARD_INFO equivalent */
+-	__le64 EndOfFile;
+-	__le32 Attributes;
++	struct_group(network_open_info,
++		__le64 CreationTime;
++		__le64 LastAccessTime;
++		__le64 LastWriteTime;
++		__le64 ChangeTime;
++		/* Beginning of FILE_STANDARD_INFO equivalent */
++		__le64 AllocationSize;
++		__le64 EndOfFile;
++		__le32 Attributes;
++	);
+ } __packed;
+ 
+ 
+-- 
+2.43.0
+
