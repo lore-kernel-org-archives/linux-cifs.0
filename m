@@ -1,188 +1,79 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="XOWwSYlt"
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06B04C22
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Nov 2023 13:24:01 -0800 (PST)
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1701206640;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pPFDU0u95ADShs4KFsOTiX6GZDKjGRCfrv7BAx3Lnb4=;
-	b=XOWwSYltE6dXhidJVz/XjoeVwlcv7yUs/D1S0DlsQ0TeBG6F9BpF7mzS0AObyxGr8gu5nt
-	1ys5SyG9Z5jELHqtQ1bGp+xTImnq0pLUMyMsRIRA0JKasKtCy7JkkmNgPCc/NW2hwsV86U
-	HfrbHQIjYrUIBua8yfmbJyDHbeWH7uqGMECwUF3vmF53QShRtg5/UMZNXaPQ8IsnMd6Y0D
-	psmZmO6d8rCHzKFkn6uEJAjhIHMZeBPuG1Y08G+rW41E1TB9L6liE6/bJazfhSPCdWWozW
-	GcHz4GQuIYEPLcEhcnzdInDWEpmCbwPyjEjEK9hp390+eV94NDTaa3Gr2pOpEA==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1701206640; a=rsa-sha256;
-	cv=none;
-	b=SPpxdqisqK+2+xU3bv3u2XrmY25iOCeR9ZCBdwLThshy9hWwOMtB9YRvwrb3tN+kRHggEk
-	+05+q+n5ncq+DaXmxDcu9+XgEGYHHIxiXNSdqhrOcQ1nmVRcomUlLY9f76htS4I/kFrl4B
-	YkcIFrta3GPlf5ERuF2jZRmx80nJVOuNcOXWKcejxtcVXduvz5brTPDr1HKlMKONYkA4M9
-	j0ULQ/N1r8TSDlI1mCKKinuwabnNl+VToaL+4zosumomAzm93QZlDg5T8VyGpuRy8cXNGY
-	4u4n/2tWABFiF98WHBLJT50Wm5E9bZS0fibCLDHWwyhB8qRQFnTX5RYhgvaBww==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1701206640; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:references; bh=pPFDU0u95ADShs4KFsOTiX6GZDKjGRCfrv7BAx3Lnb4=;
-	b=R4dg9HK7w6PqzmMQF9zZ4F2AsJxs0npe5hlvLZx+FFg21IdNeuteGB+WF4K3sPazkLuhF+
-	h6km+nGHmncILzDTAlxkFFAUK3hP9NlC76F3wKGcj/XX5a9mBje/ofQePCcmXci5aWcc4+
-	DK0r6QSGzg1eRDAIjlITpQU3SMUCf0t8/MEwJXsWS86ymvHy2v0ZVPFmDBodQDLr69gUW8
-	b1VO0l0gQ6Qpg5kjFcSvveRPYMso/u+wcFhy39hLBlbXDdR3Bct32jQI0IZWuMSP5Z+pTK
-	pzFcE/d37UtlsLjdtbs4vdcbhbDrb8oo2LMlYyssg85H0t0/O/MyqreM+uz+SA==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH] smb: client: handle special files and symlinks in SMB3 POSIX
-Date: Tue, 28 Nov 2023 18:23:33 -0300
-Message-ID: <20231128212333.13413-1-pc@manguebit.com>
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 307221AD;
+	Tue, 28 Nov 2023 19:32:00 -0800 (PST)
+X-UUID: e55f3d86a61743f49a2c513ff5a2c083-20231129
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.33,REQID:51b088d5-7b57-494f-9d68-1c6afe0d940c,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.33,REQID:51b088d5-7b57-494f-9d68-1c6afe0d940c,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:364b77b,CLOUDID:12679960-c89d-4129-91cb-8ebfae4653fc,B
+	ulkID:2311291131566H9M43EO,BulkQuantity:0,Recheck:0,SF:44|64|66|38|24|17|1
+	9|102,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil
+	,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
+X-UUID: e55f3d86a61743f49a2c513ff5a2c083-20231129
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
+	(envelope-from <zhouzongmin@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 816927675; Wed, 29 Nov 2023 11:31:53 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 1B55EE0080FF;
+	Wed, 29 Nov 2023 11:31:53 +0800 (CST)
+X-ns-mid: postfix-6566B0A9-53082935
+Received: from [172.20.12.156] (unknown [172.20.12.156])
+	by mail.kylinos.cn (NSMail) with ESMTPA id E0382E0080FF;
+	Wed, 29 Nov 2023 11:31:47 +0800 (CST)
+Message-ID: <328ad7a1-7c54-4028-ae79-eb25c8c7399b@kylinos.cn>
+Date: Wed, 29 Nov 2023 11:31:47 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ksmbd: initialize ar to NULL
+Content-Language: en-US
+To: linkinjeon@kernel.org, sfrench@samba.org
+Cc: senozhatsky@chromium.org, tom@talpey.com, linux-cifs@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231120023950.667246-1-zhouzongmin@kylinos.cn>
+From: Zongmin Zhou <zhouzongmin@kylinos.cn>
+In-Reply-To: <20231120023950.667246-1-zhouzongmin@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Parse reparse points in SMB3 posix query info as they will be
-supported and required by the new specification.
+Friendly ping. I think this patch was forgotten.
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
----
- fs/smb/client/inode.c | 50 +++++++++++++++++++++++++------------------
- 1 file changed, 29 insertions(+), 21 deletions(-)
+Best regards!
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 0b05e664008e..c600b715edd6 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -692,29 +692,36 @@ static void smb311_posix_info_to_fattr(struct cifs_fattr *fattr,
- 		fattr->cf_mtime.tv_sec += tcon->ses->server->timeAdj;
- 	}
- 
-+	/*
-+	 * The srv fs device id is overridden on network mount so setting
-+	 * @fattr->cf_rdev isn't needed here.
-+	 */
- 	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
- 	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
- 	fattr->cf_createtime = le64_to_cpu(info->CreationTime);
--
- 	fattr->cf_nlink = le32_to_cpu(info->HardLinks);
- 	fattr->cf_mode = (umode_t) le32_to_cpu(info->Mode);
--	/* The srv fs device id is overridden on network mount so setting rdev isn't needed here */
--	/* fattr->cf_rdev = le32_to_cpu(info->DeviceId); */
- 
--	if (data->symlink) {
--		fattr->cf_mode |= S_IFLNK;
--		fattr->cf_dtype = DT_LNK;
--		fattr->cf_symlink_target = data->symlink_target;
--		data->symlink_target = NULL;
--	} else if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
-+	if (cifs_open_data_reparse(data) &&
-+	    cifs_reparse_point_to_fattr(cifs_sb, fattr, data))
-+		goto out_reparse;
-+
-+	fattr->cf_mode &= ~S_IFMT;
-+	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
- 		fattr->cf_mode |= S_IFDIR;
- 		fattr->cf_dtype = DT_DIR;
- 	} else { /* file */
- 		fattr->cf_mode |= S_IFREG;
- 		fattr->cf_dtype = DT_REG;
- 	}
--	/* else if reparse point ... TODO: add support for FIFO and blk dev; special file types */
- 
-+out_reparse:
-+	if (S_ISLNK(fattr->cf_mode)) {
-+		if (likely(data->symlink_target))
-+			fattr->cf_eof = strnlen(data->symlink_target, PATH_MAX);
-+		fattr->cf_symlink_target = data->symlink_target;
-+		data->symlink_target = NULL;
-+	}
- 	sid_to_id(cifs_sb, owner, fattr, SIDOWNER);
- 	sid_to_id(cifs_sb, group, fattr, SIDGROUP);
- 
-@@ -739,25 +746,25 @@ bool cifs_reparse_point_to_fattr(struct cifs_sb_info *cifs_sb,
- 	if (tag == IO_REPARSE_TAG_NFS && buf) {
- 		switch (le64_to_cpu(buf->InodeType)) {
- 		case NFS_SPECFILE_CHR:
--			fattr->cf_mode |= S_IFCHR | cifs_sb->ctx->file_mode;
-+			fattr->cf_mode |= S_IFCHR;
- 			fattr->cf_dtype = DT_CHR;
- 			fattr->cf_rdev = nfs_mkdev(buf);
- 			break;
- 		case NFS_SPECFILE_BLK:
--			fattr->cf_mode |= S_IFBLK | cifs_sb->ctx->file_mode;
-+			fattr->cf_mode |= S_IFBLK;
- 			fattr->cf_dtype = DT_BLK;
- 			fattr->cf_rdev = nfs_mkdev(buf);
- 			break;
- 		case NFS_SPECFILE_FIFO:
--			fattr->cf_mode |= S_IFIFO | cifs_sb->ctx->file_mode;
-+			fattr->cf_mode |= S_IFIFO;
- 			fattr->cf_dtype = DT_FIFO;
- 			break;
- 		case NFS_SPECFILE_SOCK:
--			fattr->cf_mode |= S_IFSOCK | cifs_sb->ctx->file_mode;
-+			fattr->cf_mode |= S_IFSOCK;
- 			fattr->cf_dtype = DT_SOCK;
- 			break;
- 		case NFS_SPECFILE_LNK:
--			fattr->cf_mode = S_IFLNK | cifs_sb->ctx->file_mode;
-+			fattr->cf_mode |= S_IFLNK;
- 			fattr->cf_dtype = DT_LNK;
- 			break;
- 		default:
-@@ -769,29 +776,29 @@ bool cifs_reparse_point_to_fattr(struct cifs_sb_info *cifs_sb,
- 
- 	switch (tag) {
- 	case IO_REPARSE_TAG_LX_SYMLINK:
--		fattr->cf_mode |= S_IFLNK | cifs_sb->ctx->file_mode;
-+		fattr->cf_mode |= S_IFLNK;
- 		fattr->cf_dtype = DT_LNK;
- 		break;
- 	case IO_REPARSE_TAG_LX_FIFO:
--		fattr->cf_mode |= S_IFIFO | cifs_sb->ctx->file_mode;
-+		fattr->cf_mode |= S_IFIFO;
- 		fattr->cf_dtype = DT_FIFO;
- 		break;
- 	case IO_REPARSE_TAG_AF_UNIX:
--		fattr->cf_mode |= S_IFSOCK | cifs_sb->ctx->file_mode;
-+		fattr->cf_mode |= S_IFSOCK;
- 		fattr->cf_dtype = DT_SOCK;
- 		break;
- 	case IO_REPARSE_TAG_LX_CHR:
--		fattr->cf_mode |= S_IFCHR | cifs_sb->ctx->file_mode;
-+		fattr->cf_mode |= S_IFCHR;
- 		fattr->cf_dtype = DT_CHR;
- 		break;
- 	case IO_REPARSE_TAG_LX_BLK:
--		fattr->cf_mode |= S_IFBLK | cifs_sb->ctx->file_mode;
-+		fattr->cf_mode |= S_IFBLK;
- 		fattr->cf_dtype = DT_BLK;
- 		break;
- 	case 0: /* SMB1 symlink */
- 	case IO_REPARSE_TAG_SYMLINK:
- 	case IO_REPARSE_TAG_NFS:
--		fattr->cf_mode = S_IFLNK | cifs_sb->ctx->file_mode;
-+		fattr->cf_mode |= S_IFLNK;
- 		fattr->cf_dtype = DT_LNK;
- 		break;
- 	default:
-@@ -831,6 +838,7 @@ static void cifs_open_info_to_fattr(struct cifs_fattr *fattr,
- 	fattr->cf_createtime = le64_to_cpu(info->CreationTime);
- 	fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
- 
-+	fattr->cf_mode = cifs_sb->ctx->file_mode;
- 	if (cifs_open_data_reparse(data) &&
- 	    cifs_reparse_point_to_fattr(cifs_sb, fattr, data))
- 		goto out_reparse;
--- 
-2.43.0
-
+On 2023/11/20 10:39, Zongmin Zhou wrote:
+> Initialize ar to NULL to avoid the case of aux_size will be false,
+> and kfree(ar) without ar been initialized will be unsafe.
+> But kfree(NULL) is safe.
+>
+> Signed-off-by: Zongmin Zhou<zhouzongmin@kylinos.cn>
+> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>   fs/smb/server/ksmbd_work.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/server/ksmbd_work.c b/fs/smb/server/ksmbd_work.c
+> index 44bce4c56daf..2510b9f3c8c1 100644
+> --- a/fs/smb/server/ksmbd_work.c
+> +++ b/fs/smb/server/ksmbd_work.c
+> @@ -106,7 +106,7 @@ static inline void __ksmbd_iov_pin(struct ksmbd_work *work, void *ib,
+>   static int __ksmbd_iov_pin_rsp(struct ksmbd_work *work, void *ib, int len,
+>   			       void *aux_buf, unsigned int aux_size)
+>   {
+> -	struct aux_read *ar;
+> +	struct aux_read *ar = NULL;
+>   	int need_iov_cnt = 1;
+>   
+>   	if (aux_size) {
