@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606246FA5
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Nov 2023 04:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FB83D8F
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Nov 2023 05:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X5O51FlS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB815C433C7;
-	Wed, 29 Nov 2023 04:47:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kudsE8/A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DDD8C433C8
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Nov 2023 05:12:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701233275;
-	bh=YI4fuxLiITTplMPMdCUaoMC9gkukDp8WeBYUthwy3Es=;
+	s=k20201202; t=1701234756;
+	bh=ysu+2eSq6wVSjP4uxzWx/54QyFxDVB0qbzkNHJQVLpg=;
 	h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-	b=X5O51FlSMIA8mrnaokXk/71U+U4uj+W37AvfVjLvchhEkGGtPbGDchtTkq+qZ+bXF
-	 U+Z9cVy6RpYC/Op3qo4bYnucpy31LKh50Nj1jqYoSOEz6+FNAYHtanysrqBaaXQ1Qz
-	 v3XFfvpTvZwkC50YY9o+KzzuyAFgfEkX9N3wPvuCap7O+VTnhChN02dbCkh+Omwa9s
-	 gTvjDdASLkinOJUqYc4D9vIg7afjn+uN9skV4nIBAyBiSrkm8KCDN7xHkmg2gTwer9
-	 Z40vnH6f+my/jAzqlV0lPYpGEOgtpV+JP1ASWi0amJTKwxKFMLNdeamq73DgKSONIM
-	 IxYPH7MjhhzLA==
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-58d521f12ebso2458906eaf.2;
-        Tue, 28 Nov 2023 20:47:55 -0800 (PST)
-X-Gm-Message-State: AOJu0Yzep1ftciDa8dDGQTuG6d8b1HYF2QuXXgrBWqaH+2cK0aBTj8nN
-	evqhAJfpNDe/VMg5VnbNjh4uqYoAWty6uxQPYU4=
-X-Google-Smtp-Source: AGHT+IGb0ugC9E+RvEgS0yj8ZkWshxvDoCAwhaaRXF7Avjz5Pqv71cN5VMYLSwe0bVDR5MICFgpLD2bS7hrmaxhkRY4=
-X-Received: by 2002:a05:6820:228c:b0:581:e303:807c with SMTP id
- ck12-20020a056820228c00b00581e303807cmr20742246oob.5.1701233275064; Tue, 28
- Nov 2023 20:47:55 -0800 (PST)
+	b=kudsE8/A+p78QyffsT31FR8aPhNAXLyJtjcPp8JA8GifrqvwjT/I3NbWSZNqVZyTa
+	 +mk93+VRmxN9BYs425QDNFUT7goWz0k8J87faIalyA1DK0W/DdjKXe1IDB4/9EkrKw
+	 jfStp3x70a2MZFD/B4TVvNSpDz30kGrgtHebYNRrc/rdcNX2aA49aBVB9+h6/EfQKo
+	 xCRuWLExHaNd51Q08KtJxtfeSqN5nTtPBQjHyno+Hiri2iJqd6sWquXSxMcRfFSB3b
+	 5Q3jGnjqrLq3kQuqX9Md4LWFU6pV60tVcQaqacXhTEdsg6X8/DO08z5y/Oo49z2HPg
+	 n1r/rhehpmdlg==
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-1f0f160e293so3655562fac.0
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Nov 2023 21:12:36 -0800 (PST)
+X-Gm-Message-State: AOJu0YwIT2cGlZQPI+ik7PX7yVmvCMCrOB23vOfcgXM8CDwRpqAH57Hd
+	ecJw5TkTOMGOb50xGvxZCsr8sFKlBLMVx4QwZrU=
+X-Google-Smtp-Source: AGHT+IGM8sF8epMfgyWTU/yhA0Osu/2rKMGWcMR+sXop7rImKevoT5MxnOw2Dma1JU5efsPk24pjS10yT7rb2NAcHc0=
+X-Received: by 2002:a05:6870:b418:b0:1ea:2e2c:e9e7 with SMTP id
+ x24-20020a056870b41800b001ea2e2ce9e7mr19393614oap.59.1701234755331; Tue, 28
+ Nov 2023 21:12:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -32,53 +32,87 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Received: by 2002:ac9:5bce:0:b0:507:5de0:116e with HTTP; Tue, 28 Nov 2023
- 20:47:53 -0800 (PST)
-In-Reply-To: <328ad7a1-7c54-4028-ae79-eb25c8c7399b@kylinos.cn>
-References: <20231120023950.667246-1-zhouzongmin@kylinos.cn> <328ad7a1-7c54-4028-ae79-eb25c8c7399b@kylinos.cn>
+ 21:12:34 -0800 (PST)
+In-Reply-To: <20231128105351.47201-1-dmantipov@yandex.ru>
+References: <20231128105351.47201-1-dmantipov@yandex.ru>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 29 Nov 2023 13:47:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_FtiMghZ=LCLmOmJer8dHQS-unnVH5cG+75dnAGjmVqA@mail.gmail.com>
-Message-ID: <CAKYAXd_FtiMghZ=LCLmOmJer8dHQS-unnVH5cG+75dnAGjmVqA@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: initialize ar to NULL
-To: Zongmin Zhou <zhouzongmin@kylinos.cn>
-Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Wed, 29 Nov 2023 14:12:34 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-QzUq4Ejv6Q8BFPHes-vSwqJW-kPt6tfhTu=h-OKAHsQ@mail.gmail.com>
+Message-ID: <CAKYAXd-QzUq4Ejv6Q8BFPHes-vSwqJW-kPt6tfhTu=h-OKAHsQ@mail.gmail.com>
+Subject: Re: [PATCH] smb: client, common: fix fortify warnings
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-2023-11-29 12:31 GMT+09:00, Zongmin Zhou <zhouzongmin@kylinos.cn>:
-> Friendly ping. I think this patch was forgotten.
-Sorry for not sharing it, I have merged it into another patch from
-you("ksmbd: prevent memory leak on error return").
+2023-11-28 19:53 GMT+09:00, Dmitry Antipov <dmantipov@yandex.ru>:
+> When compiling with gcc version 14.0.0 20231126 (experimental)
+> and CONFIG_FORTIFY_SOURCE=y, I've noticed the following:
+>
+> In file included from ./include/linux/string.h:295,
+>                  from ./include/linux/bitmap.h:12,
+>                  from ./include/linux/cpumask.h:12,
+>                  from ./arch/x86/include/asm/paravirt.h:17,
+>                  from ./arch/x86/include/asm/cpuid.h:62,
+>                  from ./arch/x86/include/asm/processor.h:19,
+>                  from ./arch/x86/include/asm/cpufeature.h:5,
+>                  from ./arch/x86/include/asm/thread_info.h:53,
+>                  from ./include/linux/thread_info.h:60,
+>                  from ./arch/x86/include/asm/preempt.h:9,
+>                  from ./include/linux/preempt.h:79,
+>                  from ./include/linux/spinlock.h:56,
+>                  from ./include/linux/wait.h:9,
+>                  from ./include/linux/wait_bit.h:8,
+>                  from ./include/linux/fs.h:6,
+>                  from fs/smb/client/smb2pdu.c:18:
+> In function 'fortify_memcpy_chk',
+>     inlined from '__SMB2_close' at fs/smb/client/smb2pdu.c:3480:4:
+> ./include/linux/fortify-string.h:588:25: warning: call to
+> '__read_overflow2_field'
+> declared with attribute warning: detected read beyond size of field (2nd
+> parameter);
+> maybe use struct_group()? [-Wattribute-warning]
+>   588 |                         __read_overflow2_field(q_size_field, size);
+>       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> and:
+>
+> In file included from ./include/linux/string.h:295,
+>                  from ./include/linux/bitmap.h:12,
+>                  from ./include/linux/cpumask.h:12,
+>                  from ./arch/x86/include/asm/paravirt.h:17,
+>                  from ./arch/x86/include/asm/cpuid.h:62,
+>                  from ./arch/x86/include/asm/processor.h:19,
+>                  from ./arch/x86/include/asm/cpufeature.h:5,
+>                  from ./arch/x86/include/asm/thread_info.h:53,
+>                  from ./include/linux/thread_info.h:60,
+>                  from ./arch/x86/include/asm/preempt.h:9,
+>                  from ./include/linux/preempt.h:79,
+>                  from ./include/linux/spinlock.h:56,
+>                  from ./include/linux/wait.h:9,
+>                  from ./include/linux/wait_bit.h:8,
+>                  from ./include/linux/fs.h:6,
+>                  from fs/smb/client/cifssmb.c:17:
+> In function 'fortify_memcpy_chk',
+>     inlined from 'CIFS_open' at fs/smb/client/cifssmb.c:1248:3:
+> ./include/linux/fortify-string.h:588:25: warning: call to
+> '__read_overflow2_field'
+> declared with attribute warning: detected read beyond size of field (2nd
+> parameter);
+> maybe use struct_group()? [-Wattribute-warning]
+>   588 |                         __read_overflow2_field(q_size_field, size);
+>       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> In both cases, the fortification logic inteprets calls to 'memcpy()' as an
+> attempts to copy an amount of data which exceeds the size of the specified
+> field (i.e. more than 8 bytes from __le64 value) and thus issues an
+> overread
+> warning. Both of these warnings may be silenced by using the convenient
+> 'struct_group()' quirk.
+I'm confused by your use of the word "may" above. Did you checked if
+the warnings are silenced with this patch ?
 
-Thanks.
+Otherwise Looks good to me.
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
 >
-> Best regards!
->
-> On 2023/11/20 10:39, Zongmin Zhou wrote:
->> Initialize ar to NULL to avoid the case of aux_size will be false,
->> and kfree(ar) without ar been initialized will be unsafe.
->> But kfree(NULL) is safe.
->>
->> Signed-off-by: Zongmin Zhou<zhouzongmin@kylinos.cn>
->> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>   fs/smb/server/ksmbd_work.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/fs/smb/server/ksmbd_work.c b/fs/smb/server/ksmbd_work.c
->> index 44bce4c56daf..2510b9f3c8c1 100644
->> --- a/fs/smb/server/ksmbd_work.c
->> +++ b/fs/smb/server/ksmbd_work.c
->> @@ -106,7 +106,7 @@ static inline void __ksmbd_iov_pin(struct ksmbd_work
->> *work, void *ib,
->>   static int __ksmbd_iov_pin_rsp(struct ksmbd_work *work, void *ib, int
->> len,
->>   			       void *aux_buf, unsigned int aux_size)
->>   {
->> -	struct aux_read *ar;
->> +	struct aux_read *ar = NULL;
->>   	int need_iov_cnt = 1;
->>
->>   	if (aux_size) {
->
->
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
