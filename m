@@ -1,148 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTkuFrHq"
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B5B6D5C;
-	Wed, 29 Nov 2023 18:27:49 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-50bc811d12fso667503e87.1;
-        Wed, 29 Nov 2023 18:27:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FgwC5isQ"
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77A2190
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Nov 2023 18:29:38 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-50bc36725bbso708903e87.2
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Nov 2023 18:29:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701311267; x=1701916067; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1701311377; x=1701916177; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fs2Qbf7gFiyubdVRtAJXZWd4e/yXPtXupOcM8TnNWjQ=;
-        b=VTkuFrHqLi4p8c6Fb6N7JT4HeyiOaEdsqliOrwGYM8qqypFjH66Ik76JRvRotlRstT
-         cJ9le19N21rPmjZMLI1IjA6lFLxTZ5KpIPCXQ7X/Zb6I9fyvkO6wZYEiaxLAI0PEX0+n
-         jspYtyPMmNhQMl6XU4C75gYAj1OgDyygY4V6Yyq49g/+xQihwKCJuR1upIqnJ3VxWFBX
-         ZE47NqT2IT6SVZlbFg/KLqWK8ac9VCVgUZyQvRDDAReCUMvmIe6sktTdwsB7S0drTA2H
-         lEicF+VMxX4OFCdR0krfgoLKXvD9lYj4qDOiTWcpEsb/Tzhx07cHe/GQCgJCBw1aZrDM
-         LA3w==
+        bh=20eNRNxEsdBKCGiU8N0BYUqtEEyn4jxP5YDCANyHCo4=;
+        b=FgwC5isQs/rX9cmZP15iFW1dBORIVDPLr6waFZ8zvyd7Z7IkeC7SQ4KQTpoHcZ27xT
+         aN9OZMRhnTeUYqDd7Of7GOhUWikomZGslA3jdIHnO0XtST3UocJFbVB0n0vyKugP14+r
+         +5y620Q2nuaxizYuGlGn4FoHM2jEBpCo0C5OGkXN8k94+Ya03LYCl0lxcpEKeJPfjpLb
+         RxUfc2LABTNEp1lkJvS80r7PZoAirClfzeqP5idVgHCNyRHCka1q96hg+qa+XuZz3fvm
+         tfGLOwUgSgn2W2er/Qjp2kHUNBTXP09RF6MjlS0X4H9wvZ5fAvVnK9pikUdfJJ7hWFHy
+         2nkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701311267; x=1701916067;
+        d=1e100.net; s=20230601; t=1701311377; x=1701916177;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fs2Qbf7gFiyubdVRtAJXZWd4e/yXPtXupOcM8TnNWjQ=;
-        b=j6hzGj5oeYiiqXjl74rjcBBzym2yIjHhnLW7gWV5Or5oj0O8wxV1cyDMYN+aeZQU9T
-         wti6TnPDRYzQ9oWaJbnNBxAYBX624qdwInrxD6okwzUKLnyN0zJe74kHx6Gpbe29PLdc
-         yKjyVtcbl+w3tXI7gQMhLKIx5UGBbT56H+UuB+uBPdvD2j1SDc4GZ/Yi0lhpaZVeMqVy
-         WKQPVmvWBZpU0xCD4GzglctbptaiL39uT0Rv2l4WjLxqRo/OZabHNz5VJnq6jFMLc32P
-         Q4niXuZTVvcQcZEkoH0CHiEyBcx8GlDANGCUWAl2S0APxYzDs4eX3LKo+pRskcC8/UA6
-         F6lg==
-X-Gm-Message-State: AOJu0Yxlsf+MVPEVKA8oioGmIEvr6RlI5uRsFKocow8wF6W6HNWwvbs3
-	fhyYQZMAqLwuStII+H2XOyJyo8vBHhf/fYDurVg=
-X-Google-Smtp-Source: AGHT+IECATlAJ9Xw7a71zSU7LDRNoRULn3qkGW6SO3ISO7FTCzP+J8weaGa2npL+0/hjQRprHqCQm+wQ0xUycMNXMaQ=
-X-Received: by 2002:ac2:4ec7:0:b0:50b:bf07:5a84 with SMTP id
- p7-20020ac24ec7000000b0050bbf075a84mr3681468lfr.56.1701311267349; Wed, 29 Nov
- 2023 18:27:47 -0800 (PST)
+        bh=20eNRNxEsdBKCGiU8N0BYUqtEEyn4jxP5YDCANyHCo4=;
+        b=WlQ17t1aQJbpCMA/rSGj5rz+gtZ37+3fbQgbdd7XksQw29f5XTRO01C5oo+WLiIWzx
+         BRNfMhLT8pu8w4NLWJvr+KAa91zD9QmPyQuAMLGpoggh7ptl1UrE27HRSDIjQNBjl35n
+         PprD0lWJlKFGnPWdXj3r46NmQTUHyrqzSED/rtuHUVpw6JcSOSwgmht5YtvKsHVyce2m
+         gm3NnTlDHJhW6ktyxI8G96g4qeX4S4EN/HQh5CWUrlO6bbtIWUIFyrVbd7wr1fZ+4yi7
+         /fy3wYfvCWhPMLCz+CGwrIhIkpB4kFe+j+tydNswxX5D1k7r9RNymsKNglOfUzOHKpFA
+         EI/Q==
+X-Gm-Message-State: AOJu0YyACj6Fy61EpTCOIGo9f70DKI60b/E67RTJZfYg2arAW+0iNFLr
+	0vqs93BYhSfpjfOsUlCGKz7bu7NVnww4EQQvdPPn3SnKgZVQIQ==
+X-Google-Smtp-Source: AGHT+IFLxxPzr25kxwc9GopROImJ6X1SXgLuYqi99nONA2LhwtI+B2rYK2PDGdynAkq4SrU4TchcthBO/+2dmQIwguI=
+X-Received: by 2002:a05:6512:a92:b0:500:99a9:bc40 with SMTP id
+ m18-20020a0565120a9200b0050099a9bc40mr12006734lfu.69.1701311376425; Wed, 29
+ Nov 2023 18:29:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231129165619.2339490-1-dhowells@redhat.com> <20231129165619.2339490-4-dhowells@redhat.com>
- <9704ab96ba04eb3591a62ef5e6a97af6@manguebit.com>
-In-Reply-To: <9704ab96ba04eb3591a62ef5e6a97af6@manguebit.com>
+References: <20231128105351.47201-1-dmantipov@yandex.ru> <CAKYAXd-QzUq4Ejv6Q8BFPHes-vSwqJW-kPt6tfhTu=h-OKAHsQ@mail.gmail.com>
+ <411a0163-8169-48bd-8b89-75713e95311b@yandex.ru>
+In-Reply-To: <411a0163-8169-48bd-8b89-75713e95311b@yandex.ru>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 29 Nov 2023 20:27:36 -0600
-Message-ID: <CAH2r5mvwzU1N5osqUPcuyHtXapuaJt-o9orHFr42MRGoCzy+2Q@mail.gmail.com>
-Subject: Re: [PATCH 3/3] cifs: Fix flushing, invalidation and file size with copy_file_range()
-To: Paulo Alcantara <pc@manguebit.com>
-Cc: David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org
+Date: Wed, 29 Nov 2023 20:29:25 -0600
+Message-ID: <CAH2r5mthsZZJz8aBnrzeJbrQpb3YLDuB27Y+gyrje8VHS6KHzw@mail.gmail.com>
+Subject: Re: [PATCH] smb: client, common: fix fortify warnings
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-updated all three patches with the acked-by and put in cifs-2.6.git for-nex=
-t
+added the acked-by and tentatively put patch in cifs-2.6.git for-next
+pending testing
 
-
-On Wed, Nov 29, 2023 at 4:28=E2=80=AFPM Paulo Alcantara <pc@manguebit.com> =
-wrote:
+On Tue, Nov 28, 2023 at 11:30=E2=80=AFPM Dmitry Antipov <dmantipov@yandex.r=
+u> wrote:
 >
-> David Howells <dhowells@redhat.com> writes:
+> On 11/29/23 08:12, Namjae Jeon wrote:
 >
-> > Fix a number of issues in the cifs filesystem implementation of the
-> > copy_file_range() syscall in cifs_file_copychunk_range().
-> >
-> > Firstly, the invalidation of the destination range is handled incorrect=
-ly:
-> > We shouldn't just invalidate the whole file as dirty data in the file m=
-ay
-> > get lost and we can't just call truncate_inode_pages_range() to invalid=
-ate
-> > the destination range as that will erase parts of a partial folio at ea=
-ch
-> > end whilst invalidating and discarding all the folios in the middle.  W=
-e
-> > need to force all the folios covering the range to be reloaded, but we
-> > mustn't lose dirty data in them that's not in the destination range.
-> >
-> > Further, we shouldn't simply round out the range to PAGE_SIZE at each e=
-nd
-> > as cifs should move to support multipage folios.
-> >
-> > Secondly, there's an issue whereby a write may have extended the file
-> > locally, but not have been written back yet.  This can leaves the local
-> > idea of the EOF at a later point than the server's EOF.  If a copy requ=
-est
-> > is issued, this will fail on the server with STATUS_INVALID_VIEW_SIZE
-> > (which gets translated to -EIO locally) if the copy source extends past=
- the
-> > server's EOF.
-> >
-> > Fix this by:
-> >
-> >  (0) Flush the source region (already done).  The flush does nothing an=
-d
-> >      the EOF isn't moved if the source region has no dirty data.
-> >
-> >  (1) Move the EOF to the end of the source region if it isn't already a=
-t
-> >      least at this point.
-> >
-> >      [!] Rather than moving the EOF, it might be better to split the co=
-py
-> >      range into a part to be copied and a part to be cleared with
-> >      FSCTL_SET_ZERO_DATA.
-> >
-> >  (2) Find the folio (if present) at each end of the range, flushing it =
-and
-> >      increasing the region-to-be-invalidated to cover those in their
-> >      entirety.
-> >
-> >  (3) Fully discard all the folios covering the range as we want them to=
- be
-> >      reloaded.
-> >
-> >  (4) Then perform the copy.
-> >
-> > Thirdly, set i_size after doing the copychunk_range operation as this v=
-alue
-> > may be used by various things internally.  stat() hides the issue becau=
-se
-> > setting ->time to 0 causes cifs_getatr() to revalidate the attributes.
-> >
-> > These were causing the generic/075 xfstest to fail.
-> >
-> > Fixes: 620d8745b35d ("Introduce cifs_copy_file_range()")
-> > Signed-off-by: David Howells <dhowells@redhat.com>
-> > cc: Steve French <sfrench@samba.org>
-> > cc: Paulo Alcantara <pc@manguebit.com>
-> > cc: Shyam Prasad N <nspmangalore@gmail.com>
-> > cc: Rohith Surabattula <rohiths.msft@gmail.com>
-> > cc: Matthew Wilcox <willy@infradead.org>
-> > cc: Jeff Layton <jlayton@kernel.org>
-> > cc: linux-cifs@vger.kernel.org
-> > cc: linux-mm@kvack.org
-> > ---
-> >  fs/smb/client/cifsfs.c | 80 ++++++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 77 insertions(+), 3 deletions(-)
+> > I'm confused by your use of the word "may" above. Did you checked if
+> > the warnings are silenced with this patch ?
 >
-> Looks good,
+> Sure (but note I've used an experimental gcc-14 and clang-18 to check).
 >
-> Acked-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+> Dmitry
 >
 
 
