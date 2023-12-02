@@ -1,93 +1,139 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40C215A6
+	for <linux-cifs@vger.kernel.org>; Sat,  2 Dec 2023 00:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IN4R5nAB"
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8409A;
-	Fri,  1 Dec 2023 15:59:18 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-50bc39dcbcbso3787873e87.1;
-        Fri, 01 Dec 2023 15:59:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701475157; x=1702079957; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ry6rEWWIPy9XfFGMdahZWvFS711IvLdFUKUk5teU+cs=;
-        b=IN4R5nABiyR7DBsu3DGnCH/83CvtM7qnTHM98BoWDrHNUWOLyErDPt29gAPTHNncaM
-         myMtYbgsp4FJCxMT+m6E+vTfZ9BajKoXvX5amGefQ6MTDT6rN4pOcpoRLqe3fGWW/BgF
-         Lwijrb1E9KWEK5yj82HK1esljluQG8K7DMR9J77/sIolISjKlgdDoubLqVGYyqIG7yFz
-         R17pDrJ28LC5KE1UW+P6EfYz8G2TPBKkp5+6+EnlFzM6GWVzAHfmZeuNGRhCi4x63y0b
-         zq5DrqiCpF1iINjvMjCRy3hfManCVBqdpJWH6dvQ5zdMtnWZ1s3Tpo6PzOY/Tx4+lVx4
-         NCfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701475157; x=1702079957;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ry6rEWWIPy9XfFGMdahZWvFS711IvLdFUKUk5teU+cs=;
-        b=DHn6pOu4/30gnuEoPeB3kjqSexrQh+BYt0fhfNF2p3Vo7GnH9uWnSIk5RqRF7tIPYN
-         lTW72ncrsORZ3mq0SNCAdEkWXJEqGigUGGGNZiPRSYU6u/ookmsYgcZnVVGdhAHmF/VC
-         zrb12o3ri5Ttci4wTtepvGYWxh2w2xtH2X4TlMHu+9u6Jvgfj8YAHdM8fnM4wRpdWPi8
-         JhfmHf3x6I11yCTK5XmF1rbzGJNBLYtYjC+BfiX2M02zKG8iH2+yGWQHSq/egLLPVdew
-         Ry1gLbAA3QSkqJVw7uDwK48lNJopR7mRGeOfCE8izHMw/iYKe4gVA6RwQJNTMa4J8UH+
-         ephg==
-X-Gm-Message-State: AOJu0Yw6CI61rMJqi9J/vrpSUrRWJ6b6vh975cK+D7WGviK6aHHnF4Py
-	gk1zJdwXBnPAUjVdY2uQWq5+8gW07JhLE3BXn2zNmos2B45Nqg==
-X-Google-Smtp-Source: AGHT+IH50E9HdfKAyfxobkJqFbIei6OxD2pYN5qDl8PyNoRCUhSxa0yHbciJAIBVBsfpLRxZkKddfI7MRIxAuCzvgCo=
-X-Received: by 2002:ac2:5584:0:b0:50b:d103:2e3a with SMTP id
- v4-20020ac25584000000b0050bd1032e3amr1203880lfg.10.1701475156107; Fri, 01 Dec
- 2023 15:59:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPHNLZdB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67B51C433CA
+	for <linux-cifs@vger.kernel.org>; Sat,  2 Dec 2023 00:05:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701475557;
+	bh=++MCZ2Ieb2OAcuZdg75MIKfVpHHcuNL5UKJBnW1OacA=;
+	h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+	b=DPHNLZdB5VxBgqEcZ3osIphufNTXWCe6PWxnvANxzkXkrJjJAA5TvYYmTDR9hji6z
+	 i2y0Mys8E9SSq/iQPnsOfXfNwZCWWJNJiAMaW7yHaBdjBKt+pTVtajdfHSHbAU32X6
+	 ZHxBJ2Ds8T06+2V28BSvvf85Uv8qUEzNzfWZQS+y1y16+GNp7+sOnGAF/kddUEU/SU
+	 VHaIxnbvcFx76wRfHSqf3TjDeVchnBkyUGX0jO6U8Ok+HdrdvmDlib7LSVEkVKFiQ8
+	 N6VxoBM525zX1vD0jOH0qX03uXiGyRBQwYZFMlSnHHFA4xXi6q+tsEqWzDnBJPsZYd
+	 PbG9bpwQOsK8g==
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-1efabc436e4so675919fac.1
+        for <linux-cifs@vger.kernel.org>; Fri, 01 Dec 2023 16:05:57 -0800 (PST)
+X-Gm-Message-State: AOJu0Yx4xqBELirB9WI58OuR1GYhhzjPoNH8gbnuzjV5wAzIoW31oLoT
+	xYNAbZs0kEnqu7nuSdk2vhTCT9YBInE8errXIso=
+X-Google-Smtp-Source: AGHT+IHfJEt6Kiqc8EsiffCOQNMm3V+dOfFDV8YCqGGSrLmMIBRjbSthL8g3D2875db3NA4b4wm/zcEnAC5Kigj4O5Y=
+X-Received: by 2002:a05:6871:8782:b0:1fa:fa0a:bb40 with SMTP id
+ td2-20020a056871878200b001fafa0abb40mr410830oab.18.1701475556660; Fri, 01 Dec
+ 2023 16:05:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 1 Dec 2023 17:59:05 -0600
-Message-ID: <CAH2r5muZp5cizyqC94OT0KkwfKkUBAA0cR3J-0nMxprFpQYwfg@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Received: by 2002:ac9:72d3:0:b0:507:5de0:116e with HTTP; Fri, 1 Dec 2023
+ 16:05:55 -0800 (PST)
+In-Reply-To: <3755038.1701447306@warthog.procyon.org.uk>
+References: <3755038.1701447306@warthog.procyon.org.uk>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 2 Dec 2023 09:05:55 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9ijC1ypq=JUgkmtgaN6KDUxLiUr_RT+Ju7kXNadRwhrw@mail.gmail.com>
+Message-ID: <CAKYAXd9ijC1ypq=JUgkmtgaN6KDUxLiUr_RT+Ju7kXNadRwhrw@mail.gmail.com>
+Subject: Re: cifs hardlink misbehaviour in generic/002?
+To: David Howells <dhowells@redhat.com>
+Cc: Steve French <sfrench@samba.org>, ronniesahlberg@gmail.com, aaptel@samba.org, 
+	linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Please pull the following changes since commit
-2cc14f52aeb78ce3f29677c2de1f06c0e91471ab:
+2023-12-02 1:15 GMT+09:00, David Howells <dhowells@redhat.com>:
+>
+> Hi Steve,
+Hi David,
 
-  Linux 6.7-rc3 (2023-11-26 19:59:33 -0800)
+We have already sent the fixes on this week, So It has been in the
+latest linus master.
+Could you please check it on the latest master or after applying
+commit 4274a9dc6aeb "ksmbd: separately allocate ci per dentry" ?
 
-are available in the Git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v6.7-rc3-smb3-client-fixes
-
-for you to fetch changes up to 0015eb6e12384ff1c589928e84deac2ad1ceb236:
-
-  smb: client, common: fix fortify warnings (2023-11-30 11:17:03 -0600)
-
-----------------------------------------------------------------
-Five cifs/smb3 client fixes, most for stable as well
-- Two fallocate fixes
-- Fix warnings from new gcc
-- Two symlink fixes
-
-----------------------------------------------------------------
-David Howells (2):
-      cifs: Fix FALLOC_FL_ZERO_RANGE by setting i_size if EOF moved
-      cifs: Fix FALLOC_FL_INSERT_RANGE by setting i_size after EOF moved
-
-Dmitry Antipov (1):
-      smb: client, common: fix fortify warnings
-
-Paulo Alcantara (2):
-      smb: client: fix missing mode bits for SMB symlinks
-      smb: client: report correct st_size for SMB and NFS symlinks
-
- fs/smb/client/cifspdu.h | 24 ++++++++++++++----------
- fs/smb/client/cifssmb.c |  6 ++++--
- fs/smb/client/inode.c   |  4 +++-
- fs/smb/client/smb2ops.c | 13 +++++++++++--
- fs/smb/client/smb2pdu.c |  8 +++-----
- fs/smb/client/smb2pdu.h | 16 +++++++++-------
- fs/smb/common/smb2pdu.h | 17 ++++++++++-------
-
-
--- 
-Thanks,
-
-Steve
+Thanks.
+>
+> I've seeing some weird behaviour in the upstream Linux cifs filesystem
+> that's
+> causing generic/002 to fail.  The test case makes a file and creates a
+> number
+> of hardlinks to it, then deletes those hardlinks in reverse order, checking
+> the link count on the original file each time it removes one.
+>
+> However, I'm seeing the original file disappear when the most recent link
+> is
+> removed, leading to the check for the link count to fail due to $x
+> evaluating
+> blank and the '[' program complaining about syntax.
+>
+> I've distilled the testcase down to a small shell script:
+>
+> 	#!/bin/sh
+> 	TEST_DIR=/xfstest.test/tmp/
+> 	top=3
+> 	if [ ! -d $TEST_DIR ]
+> 	then
+> 	    mkdir $TEST_DIR || exit $?
+> 	else
+> 	    rm $TEST_DIR/foo.*
+> 	fi
+> 	touch $TEST_DIR/foo.1
+> 	for ((l=2; l<=$top; l++))
+> 	do
+> 	    ln -v $TEST_DIR/foo.1 $TEST_DIR/foo.$l
+> 	done
+> 	ls $TEST_DIR
+> 	for ((l=$top; l>=1; l--))
+> 	do
+> 	    if [ ! -f $TEST_DIR/foo.1 ]
+> 	    then
+> 		echo "Arrgh, foo.1 is missing!"
+> 		ls $TEST_DIR
+> 		exit 1
+> 	    fi
+> 	    x=`stat -c %h $TEST_DIR/foo.1`
+> 	    if [ "$l" -ne $x ]
+> 	    then
+> 		echo "Arrgh, incorrect link count"
+> 		$here/src/lstat64 $TEST_DIR/foo.1
+> 		status=1
+> 	    fi
+> 	    rm -v -f $TEST_DIR/foo.$l
+> 	done
+>
+> that I'm running on a Linux v6.6 ksmbd share mounted with:
+>
+> 	mount //192.168.6.1/test /xfstest.test -o
+> user=...,pass=...,noperm,vers=3.1.1,cache=loose
+>
+> The server includes the following settings:
+>
+>         server role = standalone server
+>         log level = 1
+>         security = user
+>         load printers = no
+>         #smb3 encryption = yes
+>         netbios name = SMBD
+>         server multi channel support = yes
+>         smb2 leases = yes
+>
+> The output I see is:
+>
+> 	'/xfstest.test/tmp//foo.2' => '/xfstest.test/tmp//foo.1'
+> 	'/xfstest.test/tmp//foo.3' => '/xfstest.test/tmp//foo.1'
+> 	foo.1  foo.2  foo.3
+> 	removed '/xfstest.test/tmp//foo.3'
+> 	Arrgh, foo.1 is missing!
+> 	foo.1  foo.2  foo.3
+>
+> I've attached a wireshark trace of the script being run.
+>
+> I see a lot of STATUS_DELETE_PENDING apparently being applied to foo.1.
+>
+> David
+>
+>
