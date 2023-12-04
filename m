@@ -1,54 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iFZ2EI75"
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044B8119
-	for <linux-cifs@vger.kernel.org>; Sat,  2 Dec 2023 22:36:02 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-7b37dd4bb35so127678239f.3
-        for <linux-cifs@vger.kernel.org>; Sat, 02 Dec 2023 22:36:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="QxR10dg7"
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D66D9
+	for <linux-cifs@vger.kernel.org>; Sun,  3 Dec 2023 16:00:54 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6cc02e77a9cso3905328b3a.0
+        for <linux-cifs@vger.kernel.org>; Sun, 03 Dec 2023 16:00:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1701585362; x=1702190162; darn=vger.kernel.org;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1701648054; x=1702252854; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=ZOYjk3fBCrVbXQrD12LPYY82QoNmvGMphdENcKryFjM=;
-        b=iFZ2EI75FauYL5zkWbfbkPhcn9sxsQrGcvGnGCDkYOmid9yxXKEJWBH4qAiPMg8uBV
-         HIXzO4BSJ477rGEhNM4FRvbDGQzxnMnWT8xlO29wvR1uoCTDJtONVoT0VCwWinN6GCJt
-         KLjXg8qzsBM1c3tLR3y8mzoDsfVKQ0lsP7/O/h3whjC/AJX8LVBSP4dM4tUiOQK2yRLC
-         +7YXmzQ/+bl2sNfrzVNqYqUg04cFPwPqGWPW/3FabNC3hooX43P1RjZUEZTvXj+zMLVD
-         BHK+2+Maht6zrzH3DClQKKU69YENHnPWZnO3xdDbz0TA6GvBVSkKBsnqvwwfZy1xOQWQ
-         3yLQ==
+        bh=wA9mzrJUkC4Y0SM4FjMDprcAvnu/0rPfrIiWvVZdpKA=;
+        b=QxR10dg7EXHlplNY3r4XNgLrbgKDAIC+4hk2ucrxZCRIhKqcucwYl6I9QOl28gEUiv
+         32p8f8/bSlR0hbuQ5WNiArUnJ9+dlQNrjs8SKgiOptzbjEUA5lLFlA+ZEzUKinqnsn0M
+         AGrm1pUjB/vrr7phnKraZvV1P/0LSoNnRzG1QUxuwog25NK66uF9OtyxQKoruQ2KcOXs
+         ImnWtQnVjqXKykITWAu3fGvLFAAOjLMZnXKvg78WA1VZILVYNgojM7GXnFrfkJjNqVAx
+         bfJvNRXANviDqmeVazW+X3fWrWOvyR7rA+tCmkFKjQLLla5HH19XESRVaI9eqc/YKNIE
+         Tg0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701585362; x=1702190162;
+        d=1e100.net; s=20230601; t=1701648054; x=1702252854;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZOYjk3fBCrVbXQrD12LPYY82QoNmvGMphdENcKryFjM=;
-        b=B6fM8C35jq5x4xzJRNdMdGjE/CfUqNat25Maz1mePj2C4pqLR/MfHvaD9LcZ346yWd
-         tEFZD+7MIUH+IFXdJfkTfCgt+MinmPDw8TMX85Y/Aq18SdmUhGV9dj+e7nZDmOOvsuHZ
-         A+t9Sqs17CqagC+7p0p3wM2v3xNt5f7OBiv7cqIAk8sPokiRwX5ipcE9R9NAZfvB6KBL
-         M+pulpFQX64RQzX+XLRi8Iyfp34sWW2Ldzd+dYPvI1xsGxKcDzZWMgbQNbWZZJMx2JyP
-         jSGLWf+iEdaWsrs8iJZSQ84bgC2kqqN+6ANn/3mJtShG1HmYlD7SrXG49743s8qCox+P
-         W4TA==
-X-Gm-Message-State: AOJu0YzteQYYqA/pgtSFe6NuWTIlGa9EkrqemdgiXoGQZcBcvue5k2Dl
-	0SUhUxH1Hd5nCQ0UDCGGKAA=
-X-Google-Smtp-Source: AGHT+IEI3FH9+iyQppuiOkrmKy3NKsMeQCb+rCjb/kNljXr1CvYNHHQEUBk9EpQth0Mlwa3bBVBvAA==
-X-Received: by 2002:a6b:ec19:0:b0:7b0:ae77:36ec with SMTP id c25-20020a6bec19000000b007b0ae7736ecmr2624017ioh.9.1701585362159;
-        Sat, 02 Dec 2023 22:36:02 -0800 (PST)
-Received: from debian (c-73-109-30-110.hsd1.wa.comcast.net. [73.109.30.110])
-        by smtp.gmail.com with ESMTPSA id l17-20020a170902eb1100b001d060d6cde0sm3439675plb.162.2023.12.02.22.36.01
+        bh=wA9mzrJUkC4Y0SM4FjMDprcAvnu/0rPfrIiWvVZdpKA=;
+        b=m8eEZe6yaQzP+PZwfx8KkceNU3nRN1nXJBvtMsmr9JqwPcsESIkLMabr9EOPj1PZK4
+         4sIJ4x+UA9rEjfqB6Tv+Q17l8CQn2fQsaTbDlpF1hzwLzK4vMElORdAJrM+GkmFPYkS7
+         rDkUkYjukDoVdZwBG1RIFV2ou4I9rL+6XAhcfJMcctt2vqkR6b8OoHZhpD1clvOyLVo1
+         3jfhbQcglWYxqF9D62czmCaERVi1B9WiianXDlZMAhQTIdsmylz3QzCIthrRx0WJ0ba+
+         Z4PkdOMzSH7/NHjbevzXRlDd6iDxBF0Sv7tYYrwkwN0Typ7VzzFYtvKuyIrBZfVTsBds
+         qFPA==
+X-Gm-Message-State: AOJu0Yx00RapC/9+qUy0dRRABXOJ5QBDtTJd4iMePmCg2gIOGI3jxU8R
+	Daa8DjQ5elqYm5/H/ko3tuHE0w==
+X-Google-Smtp-Source: AGHT+IEgi1aLDy6p4K2RqOAGlLrTqzl5tLa4ovdVOOC2E3K5WaL3dOt8jtpIa9XuDDvyMFbVNTVDww==
+X-Received: by 2002:a05:6a00:1256:b0:6cb:a434:b58f with SMTP id u22-20020a056a00125600b006cba434b58fmr3914828pfi.33.1701648054085;
+        Sun, 03 Dec 2023 16:00:54 -0800 (PST)
+Received: from dread.disaster.area (pa49-180-125-5.pa.nsw.optusnet.com.au. [49.180.125.5])
+        by smtp.gmail.com with ESMTPSA id r9-20020a62e409000000b006cbae51f335sm1538619pfh.144.2023.12.03.16.00.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Dec 2023 22:36:01 -0800 (PST)
-Date: Sat, 2 Dec 2023 22:36:00 -0800
-From: Pierre Mariani <pierre.mariani@gmail.com>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com
-Subject: Re: [PATCH 2/4] smb: client: Protect ses->chans update with
- chan_lock spin lock
-Message-ID: <ZWwh0BEvUcbFdal6@debian>
-References: <b9f9f617abc69d0a7ddb3109bc257073c8b165de.1701060106.git.pierre.mariani@gmail.com>
- <234ee19f9706fa55af3bae3e339e39c42d5b0b0a.1701060106.git.pierre.mariani@gmail.com>
- <CANT5p=o6NBZn15pVk885tC7PhRoYJjw5-Mx0Li5EN6_MTw7-ow@mail.gmail.com>
- <ZWfXvixWhkZRO_SF@debian>
+        Sun, 03 Dec 2023 16:00:53 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1r9wOJ-003V6Y-0i;
+	Mon, 04 Dec 2023 11:00:51 +1100
+Date: Mon, 4 Dec 2023 11:00:51 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: David Howells <dhowells@redhat.com>
+Cc: fstests@vger.kernel.org, darrick.wong@oracle.com,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Subject: Re: generic/304 doesn't seem terminable for cifs
+Message-ID: <ZW0Ws9Z3t1WnrNjI@dread.disaster.area>
+References: <3876191.1701555260@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -58,99 +59,95 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZWfXvixWhkZRO_SF@debian>
+In-Reply-To: <3876191.1701555260@warthog.procyon.org.uk>
 
-On Wed, Nov 29, 2023 at 04:30:54PM -0800, Pierre Mariani wrote:
-> On Wed, Nov 29, 2023 at 02:30:37PM +0530, Shyam Prasad N wrote:
-> > On Mon, Nov 27, 2023 at 10:22 AM Pierre Mariani
-> > <pierre.mariani@gmail.com> wrote:
-> > >
-> > > Protect the update of ses->chans with chan_lock spin lock as per documentation
-> > > from cifsglob.h.
-> > > Fixes Coverity 1561738.
-> > >
-> > > Signed-off-by: Pierre Mariani <pierre.mariani@gmail.com>
-> > > ---
-> > >  fs/smb/client/connect.c | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > >
-> > > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> > > index 449d56802692..0512835f399c 100644
-> > > --- a/fs/smb/client/connect.c
-> > > +++ b/fs/smb/client/connect.c
-> > > @@ -2055,6 +2055,7 @@ void __cifs_put_smb_ses(struct cifs_ses *ses)
-> > >         spin_unlock(&cifs_tcp_ses_lock);
-> > >
-> > >         /* close any extra channels */
-> > > +       spin_lock(&ses->chan_lock);
-> > >         for (i = 1; i < ses->chan_count; i++) {
-> > >                 if (ses->chans[i].iface) {
-> > >                         kref_put(&ses->chans[i].iface->refcount, release_iface);
-> > > @@ -2063,11 +2064,14 @@ void __cifs_put_smb_ses(struct cifs_ses *ses)
-> > >                 cifs_put_tcp_session(ses->chans[i].server, 0);
-> > >                 ses->chans[i].server = NULL;
-> > >         }
-> > > +       spin_unlock(&ses->chan_lock);
-> > >
-> > >         /* we now account for primary channel in iface->refcount */
-> > >         if (ses->chans[0].iface) {
-> > >                 kref_put(&ses->chans[0].iface->refcount, release_iface);
-> > > +               spin_lock(&ses->chan_lock);
-> > >                 ses->chans[0].server = NULL;
-> > > +               spin_unlock(&ses->chan_lock);
-> > >         }
-> > >
-> > >         sesInfoFree(ses);
-> > > --
-> > > 2.39.2
-> > >
-> > >
-> > 
-> > Hi Pierre,
-> > 
-> > Thanks for proposing this change.
-> > 
-> > While it is true in general that chan_lock needs to be locked when
-> > dealing with session channel details, this particular instance above
-> > is during __cifs_put_smb_ses.
-> > And this code is reached when ses_count has already reached 0. i.e.
-> > this process is the last user of the session.
-> > So taking chan_lock can be avoided. We did have this under a lock
-> > before, but it resulted in deadlocks due to calls to
-> > cifs_put_tcp_session, which locks bigger locks.
-> > So the quick and dirty fix at that point was to not take chan_lock
-> > here, knowing that we'll be the last user.
-> > 
-> > Perhaps a better fix exists?
-> > Or we should probably document this as a comment for now.
-> > 
-> > This version of the patch will result in the deadlocks again.
+On Sat, Dec 02, 2023 at 10:14:20PM +0000, David Howells wrote:
 > 
-> Thank you for educating me on this, Shyam. I will re-read the code from that
-> point of view and see if I can think of any improvement.
+> I've been running "-g quick" on a CIFS mount and it got to generic/304... and
+> is still there nearly 30 hours later.  The kernel isn't stuck - userspace is
+> cranking out BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE at a great rate.
 > 
+> The ps tree looks like:
+> 
+> S+     0:03       \_ /bin/bash ./check -E .exclude -g quick
+> S+     0:00           \_ /bin/bash /root/xfstests-dev/tests/generic/304
+> S+     0:00               \_ /bin/bash /root/xfstests-dev/tests/generic/304
+> Dl+  316:55               |   \_ /usr/sbin/xfs_io -i -f -c dedupe /xfstest.test/test-304/file0 0 0 9223372036854775807 /xfstest.test/test-
 
-Looking at the code in more details, I can see how the order of relevant locks
-is cifs_tcp_ses_lock > srv_lock > chan_lock.
-cifs_tcp_ses_lock and srv_lock are locked by cifs_put_tcp_session.
-__cifs_put_smb_ses calls cifs_put_tcp_session. Hence we cannot lock chan_lock
-and then call cifs_put_tcp_session or the lock order will not be respected.
+$ printf "0x%x\n" 9223372036854775807
+0x7fffffffffffffff
+$
 
-To work around this issue, the following change could be made to read the value
-of ses->chan_lock while holding chan_lock, but release it before starting the
-loop where cifs_put_tcp_session is called.
+So this is asking for dedupe of the entire empty file. The files
+are both sparse, so dedupe should be instantenous because there is
+nothing to dedupe.
 
--       for (i = 1; i < ses->chan_count; i++) {
-+       spin_lock(&ses->chan_lock);
-+       int ses_chan_count = ses->chan_count;
-+
-+       spin_unlock(&ses->chan_lock);
-+
-+       for (i = 1; i < ses_chan_count; i++) {
 
-Please, let me know if this is acceptable.
+> S+     0:00               \_ /bin/bash /root/xfstests-dev/tests/generic/304
+> S+     0:00                   \_ sed -e s/^dedupe:/XFS_IOC_FILE_EXTENT_SAME:/g
+> 
+> The xfs_io command strace is an endlessly repeated:
+> 
+> ioctl(4, BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE, {src_offset=389438053887770624, src_length=8833933982967005183, dest_count=1, info=[{dest_fd=3, dest_offset=389438053887770624}]} => {info=[{bytes_deduped=1073741824, status=0}]}) = 0
+> ioctl(4, BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE, {src_offset=389438054961512448, src_length=8833933981893263359, dest_count=1, info=[{dest_fd=3, dest_offset=389438054961512448}]} => {info=[{bytes_deduped=1073741824, status=0}]}) = 0
+> ioctl(4, BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE, {src_offset=389438056035254272, src_length=8833933980819521535, dest_count=1, info=[{dest_fd=3, dest_offset=389438056035254272}]} => {info=[{bytes_deduped=1073741824, status=0}]}) = 0
+> ioctl(4, BTRFS_IOC_FILE_EXTENT_SAME or FIDEDUPERANGE, {src_offset=389438057108996096, src_length=8833933979745779711, dest_count=1, info=[{dest_fd=3, dest_offset=389438057108996096}]}^Cstrace: Process 105030 detache
 
-> > 
-> > -- 
-> > Regards,
-> > Shyam
+And this indicates the src_offset is going up by 1GB and the
+src_length is going down by 1GB on each pass.
+
+So what is happening here is that either the CIFS client or the
+server is only able to process dedupe requests in 1GB chunks, yet
+the files are 8EB in size. That's only 8.5 billion round trips to
+the server - it should be done in a few thousand years.
+
+So, nothing apparently wrong with the test of xfs_io - it's the
+filesystem dedupe max range limits that appear to be the issue.
+
+> 
+> with the dest_offset increasing a bit each time.  The log so far is:
+> 
+> wrote 1/1 bytes at offset 9223372036854775806
+> 1.000000 bytes, 1 ops; 0.0000 sec (97.656 KiB/sec and 100000.0000 ops/sec)
+> wrote 1/1 bytes at offset 9223372036854775806
+> 1.000000 bytes, 1 ops; 0.0000 sec (97.656 KiB/sec and 100000.0000 ops/sec)
+> wrote 1/1 bytes at offset 1048575
+> 1.000000 bytes, 1 ops; 0.0000 sec (139.509 KiB/sec and 142857.1429 ops/sec)
+> 
+> Looking in the protocol dump, it's endlessly repeating:
+> 
+>   190 0.007930488  192.168.6.2 → 192.168.6.1  SMB2 174 SetInfo Request FILE_INFO/SMB2_FILE_ENDOFFILE_INFO
+>   191 0.007962785  192.168.6.1 → 192.168.6.2  SMB2 136 SetInfo Response
+>   192 0.007974644  192.168.6.2 → 192.168.6.1  SMB2 230 Ioctl Request FILE_SYSTEM Function:0x00d1
+>   193 0.008069283  192.168.6.1 → 192.168.6.2  SMB2 182 Ioctl Response FILE_SYSTEM Function:0x00d1
+
+Huh. I think CIFS is complete broken w.r.t. dedupe requests.
+
+The client passes the ->remap_file_range() call to the server via
+->duplicate_extents() to execute, but it does not pass any of the
+remap flags to the server. One of those remap flags is
+REMAP_FILE_DEDUPE, and that tells the filesysetm that it is a dedupe
+operation, not a clone operation.
+
+The CIFS client implements this callout in smb2_duplicate_extents(),
+which translates to a FSCTL_DUPLICATE_EXTENTS_TO_FILE smb2
+operation. The server side takes this operation and calls
+vfs_clone_file_range() and/or vfs_copy_file_range(), which means
+that the server can only execute a clone operation via this protocol
+request. Hence it executes a clone/copy operation on reciept rather
+than a dedupe operation and hence is potentially destroying the data
+in the destination file.
+
+Yeah, that's bad, but the server is only doing what the client asked
+it to do.
+
+Really, this looks like a CIFS client bug - it should not be
+advertising support for FIDEDUPERANGE to applications. i.e. the smb2
+protocol implementation only appears to support FICLONERANGE
+semantics and so the client should be returning -EOPNOTSUPP when
+REMAP_FILE_DEDUPE is set in ->remap_file_range().
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
