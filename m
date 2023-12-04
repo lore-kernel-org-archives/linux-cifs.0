@@ -1,42 +1,65 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03179F3
-	for <linux-cifs@vger.kernel.org>; Mon,  4 Dec 2023 05:46:20 -0800 (PST)
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d048d38881so15456765ad.2
-        for <linux-cifs@vger.kernel.org>; Mon, 04 Dec 2023 05:46:20 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZQ1TjyN+"
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DA10106
+	for <linux-cifs@vger.kernel.org>; Mon,  4 Dec 2023 05:51:39 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1d05e4a94c3so25583005ad.1
+        for <linux-cifs@vger.kernel.org>; Mon, 04 Dec 2023 05:51:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1701697898; x=1702302698; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nhsR47NQqcsB+hF3MEiVjLTWyDrKXr3SCjTnGdW0LC4=;
+        b=ZQ1TjyN+IMlrOf8ASbIAGHOP4EL0Z30ZHqnZ1dZpPghU+VXhnfYamL8iQmZvPrFH2/
+         G5ovT2WKCbg5r1qYzPKkobfns32M5do347Ivu9VSHOhRjW57UoAovY0jx3MbBXIYQniQ
+         VZCoSa67pI42sp0DOWrTtZDyALuYYydZxjDmDfBJx5Fovz7yK1B0R/U0TCRS4hyeACej
+         MaOfsaAJyvOXseAfte85AcRkX0y1Wnm3TEi2C+4LZMqKsfoysfuZdZ9Y0kyw/gMsTK/Y
+         KM6hpdlsqimCtwU0KH5jQiLPkknsWCBjnkQ3dQNeOjdiTSWD5ZTdGNUHb9u40Ixu5iie
+         OvxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1701697580; x=1702302380;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/yzdZhn9w9Ag3A2hr189ngA8axr2DQvxkZG3Gsd4d+M=;
-        b=TGHsY4gP33bnpiIsfm6+Xqu2gTDLQZRiuOgf4+CUFb1xjYKHnRaHPyprlR8naX9Zqp
-         3qDUQnWnbb39vCkLmXMyj/PvumyGykVoMbemtsuYY2zkh79x+unQCTLM+JGWmmQXcRHm
-         6Egusi6aANJaRyTa7Ogm/yenvVWX2LiIYQZ9AQL4BFirBM2YrKMbQQF59NxkjYVEqc7z
-         S0PwPOI6tcQDo8S2R5VHVlBVuZUm8E4lX1OZTcmF+uNwj1gCSwjbXnmsEOQ6CpAemmNz
-         ZnB2ToPj2p1q8tOIZ+/t7RuOM2aY1bx1HPGm1QXoYSYAkan+JD4cEcbNiGQcPny8PGSt
-         ICHA==
-X-Gm-Message-State: AOJu0YwFsb1XHF6tGAiZVJwW1iNEWZsSIHS2KBZgrolacFhT4YFzChyw
-	WwEkXhU5EoUlIDZBZgU7Cfjgmjccy/Q=
-X-Google-Smtp-Source: AGHT+IFHq+VkjdCbTqV+qt0dkBbKsQin+tdqGn3PgateB+Az6svNTcCD4YWG/J2ncUtCVPDsVDT34w==
-X-Received: by 2002:a17:902:a585:b0:1d0:6ffd:ced1 with SMTP id az5-20020a170902a58500b001d06ffdced1mr1667506plb.138.1701697579919;
-        Mon, 04 Dec 2023 05:46:19 -0800 (PST)
-Received: from localhost.localdomain ([110.14.71.32])
-        by smtp.gmail.com with ESMTPSA id m9-20020a170902db0900b001cfcbf4b0cbsm8428475plx.128.2023.12.04.05.46.17
+        d=1e100.net; s=20230601; t=1701697898; x=1702302698;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nhsR47NQqcsB+hF3MEiVjLTWyDrKXr3SCjTnGdW0LC4=;
+        b=GT347Ay2WJHFDwoe0kQuJmf6wIe3F+nahwOPBfQvq4w3m7X3WP6NTcvo/gHgwi0ZGG
+         SK29rJBGhTEVgvCYefWol4Kg2MRg8adZD8Jo6UYZMRQ3RSZwCLnRyTzIdp6fY9Lt2qdw
+         skWUqUSZAMpEwniAVI0PeZG4/DsEsVpaGu07XbaVdaTowDBSQ18zyiTAf56PHnYfGtZg
+         anrdK2fcPNScmrtM4qdyk8Ze7p6c5RwupOdmFEBbo7WCkuxiPbmfJFSn5wpQQzNJEcii
+         h89JC9Gfrl1fKPzB1nTFyGqjOgdX4Z7YMqTVSf4NHpwTNgZfuXaOY+/DFY2INAv5lJ+o
+         9dlA==
+X-Gm-Message-State: AOJu0Yy1kMkPgitrL6Y/B+C2QuleL7Rp8d/GumfXM3/bKPj0IuB+foIm
+	UMMEQih3Vtlx/zf/pYQcKhpnW/TNIUPbQLm4J94=
+X-Google-Smtp-Source: AGHT+IGpZRU6Qq//lUtmdB6JjrukeFfiGMamCDzG3vRZ0jBeM1IzZgY0HzZ4UZfMdZGkRxSqQbc5OQ==
+X-Received: by 2002:a17:903:2350:b0:1d0:6ffe:a02 with SMTP id c16-20020a170903235000b001d06ffe0a02mr4864795plh.96.1701697898163;
+        Mon, 04 Dec 2023 05:51:38 -0800 (PST)
+Received: from localhost.localdomain ([124.123.164.183])
+        by smtp.gmail.com with ESMTPSA id l6-20020a170902f68600b001c72d5e16acsm8450176plg.57.2023.12.04.05.51.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Dec 2023 05:46:19 -0800 (PST)
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 7/7] ksmbd: fix wrong allocation size update in smb2_open()
-Date: Mon,  4 Dec 2023 22:45:09 +0900
-Message-Id: <20231204134509.11413-7-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231204134509.11413-1-linkinjeon@kernel.org>
-References: <20231204134509.11413-1-linkinjeon@kernel.org>
+        Mon, 04 Dec 2023 05:51:37 -0800 (PST)
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+To: linux-cifs@vger.kernel.org,
+	linux-mm@kvack.org,
+	regressions@lists.linux.dev,
+	lkft-triage@lists.linaro.org,
+	linux-kernel@vger.kernel.org
+Cc: amir73il@gmail.com,
+	mszeredi@redhat.com,
+	ebiggers@google.com,
+	krisman@collabora.com,
+	dhowells@redhat.com,
+	sfrench@samba.org,
+	hch@lst.de,
+	pc@manguebit.com,
+	nspmangalore@gmail.com,
+	rohiths.msft@gmail.com,
+	willy@infradead.org,
+	jlayton@kernel.org,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: "copy_file_range03.c:52: TFAIL: diff_us = 0, copy_file_range might not update timestamp"
+Date: Mon,  4 Dec 2023 19:21:27 +0530
+Message-Id: <20231204135127.40002-1-naresh.kamboju@linaro.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -45,76 +68,45 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When client send SMB2_CREATE_ALLOCATION_SIZE create context, ksmbd update
-old size to ->AllocationSize in smb2 create response. ksmbd_vfs_getattr()
-should be called after it to get updated stat result.
+The LTP syscalls copy_file_range01 and copy_file_range03 failed on all devices
+running Linux next-20231204 kernel.
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/smb2pdu.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+## Test Regressions (compared to next-20231201)
+* qemu-arm64, ltp-syscalls
+* e850-96, ltp-syscalls
+* x15, ltp-syscalls
+* x86, ltp-syscalls
+  - copy_file_range01
+  - copy_file_range03
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index f3af83dc49c4..f1322b39dc90 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -2516,7 +2516,7 @@ static void smb2_new_xattrs(struct ksmbd_tree_connect *tcon, const struct path *
- 	da.flags = XATTR_DOSINFO_ATTRIB | XATTR_DOSINFO_CREATE_TIME |
- 		XATTR_DOSINFO_ITIME;
- 
--	rc = ksmbd_vfs_set_dos_attrib_xattr(mnt_idmap(path->mnt), path, &da, false);
-+	rc = ksmbd_vfs_set_dos_attrib_xattr(mnt_idmap(path->mnt), path, &da, true);
- 	if (rc)
- 		ksmbd_debug(SMB, "failed to store file attribute into xattr\n");
- }
-@@ -3185,23 +3185,6 @@ int smb2_open(struct ksmbd_work *work)
- 		goto err_out;
- 	}
- 
--	rc = ksmbd_vfs_getattr(&path, &stat);
--	if (rc)
--		goto err_out;
--
--	if (stat.result_mask & STATX_BTIME)
--		fp->create_time = ksmbd_UnixTimeToNT(stat.btime);
--	else
--		fp->create_time = ksmbd_UnixTimeToNT(stat.ctime);
--	if (req->FileAttributes || fp->f_ci->m_fattr == 0)
--		fp->f_ci->m_fattr =
--			cpu_to_le32(smb2_get_dos_mode(&stat, le32_to_cpu(req->FileAttributes)));
--
--	if (!created)
--		smb2_update_xattrs(tcon, &path, fp);
--	else
--		smb2_new_xattrs(tcon, &path, fp);
--
- 	if (file_present || created)
- 		ksmbd_vfs_kern_path_unlock(&parent_path, &path);
- 
-@@ -3302,6 +3285,23 @@ int smb2_open(struct ksmbd_work *work)
- 		}
- 	}
- 
-+	rc = ksmbd_vfs_getattr(&path, &stat);
-+	if (rc)
-+		goto err_out;
-+
-+	if (stat.result_mask & STATX_BTIME)
-+		fp->create_time = ksmbd_UnixTimeToNT(stat.btime);
-+	else
-+		fp->create_time = ksmbd_UnixTimeToNT(stat.ctime);
-+	if (req->FileAttributes || fp->f_ci->m_fattr == 0)
-+		fp->f_ci->m_fattr =
-+			cpu_to_le32(smb2_get_dos_mode(&stat, le32_to_cpu(req->FileAttributes)));
-+
-+	if (!created)
-+		smb2_update_xattrs(tcon, &path, fp);
-+	else
-+		smb2_new_xattrs(tcon, &path, fp);
-+
- 	memcpy(fp->client_guid, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
- 
- 	rsp->StructureSize = cpu_to_le16(89);
--- 
-2.25.1
 
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+Test log:
+-------  
+
+tst_test.c:1119: TINFO: Mounting /dev/loop0 to 
+       /scratch/ltp-XLc1JftiUn/LTP_copns9ldR/mnt_point fstyp=ext2 flags=0
+copy_file_range.h:36: TINFO: Testing libc copy_file_range()
+Test timeouted,sending SIGKILL!
+[ ] EXT4-fs (loop0): unmounting filesystem c58dd839-66b3-4c79-81f7-9cc9a7ed0dfd.
+tst_test.c:1628: TINFO: If you are running on slow machine, try exporting LTP_TIMEOUT_MUL > 1
+tst_test.c:1630: TBROK: Test killed! (timeout?)
+
+<trim>
+
+tst_test.c:1690: TINFO: LTP version: 20230929
+tst_test.c:1574: TINFO: Timeout per run is 0h 05m 00s
+copy_file_range.h:36: TINFO: Testing libc copy_file_range()
+copy_file_range03.c:52: TFAIL: diff_us = 0, copy_file_range might not update timestamp
+
+Links:
+ - https://lkft.validation.linaro.org/scheduler/job/7077286#L37034
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20231204/testrun/21474387/suite/ltp-syscalls/test/copy_file_range03/log
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20231204/testrun/21474387/suite/ltp-syscalls/test/copy_file_range03/history/
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20231204/testrun/21474387/suite/ltp-syscalls/test/copy_file_range01/history/
+
+
+--
+Linaro LKFT
+https://lkft.linaro.org
