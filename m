@@ -1,107 +1,72 @@
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B0141220
+	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 23:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="JC99lz1L"
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F87CAB
-	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 11:32:18 -0800 (PST)
-Message-ID: <65d6d76197069e56b472bbfead425913@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1701804736;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Sy2exrWwdWVk8Ud1LmuEfA2+4tiGS4R+0EFqPn5NA38=;
-	b=JC99lz1LXy9+tdDxydJkvT/WNm46ipwZUXDD+xEFJ17k37dp6nOfkPm1Z+89L2zyCTp34H
-	YVEYnDL3eBE9KZS+yDRGyNuJbYhTaHLKkJdy4aqPeJUC1Td8VB5I0BFqxKfFH0JmM2jJUX
-	4XbTYxZOESyQSuuoyuJ6tm4JRmaupqioxIOQiLqQQHPkzsnxypIe8p3+myOSdNZ4Z9IVLE
-	WHV4KR28Lcu4HWTCB2TtX8/YDbXtOF3u0Hvif/gJquSum1Lo6S/EHTFSYZz/n5WPQ+jU8u
-	/+9aCSMqy7FMrmEN5S4VvrL4yPy1mX5T1qLj8NicikGfWRPUYk2t4kco5w+yJg==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1701804736; a=rsa-sha256;
-	cv=none;
-	b=YB2qTvz6XEvF1+6InuRQBKCzbO3HFRIPMhyrtOtuPudV90Hu89EwgK31qlkP2pvOOuoFxz
-	PtzDJerDd2gHxC1/XEm8bmbGbiyVXSdgP+Xl6lC7gQJWCg9AQinkAVI1aI6/mSIWvZTjDq
-	eiOP4bPiVaa7MT1sIISo7S0eX6h1sle+pho3P5rukZllIahuhJGjcyVW6VH8+Udqd8iQyf
-	QFGTll4kqaltQ2qfSwd8KHCWaEnPUZ8YSUyFsqEcDFWr6YeykPsGyt34LHdHPAYO2Thm4s
-	jtAYrVgFwQw+AWMb33d7mYQcf8yGBaoxgIBStGV6qxcbROpqL0rKewaftT7XfQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1701804736; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Sy2exrWwdWVk8Ud1LmuEfA2+4tiGS4R+0EFqPn5NA38=;
-	b=j53u5Lglp8uYH/BOctoFuoOeAUc0feRMhof7JzNXkfwOSKLmX0Ixi0NY4+QzST+wl5S6Cy
-	FkfHIfRmo2RBvNFJELDJGMPDlbRM4U00UR370QNjxqhhCat+6UC4vUTRM+AkhcFMOHyFoj
-	RS03snAljjSNKNoiAdEn5JghlYG6q4Ayo+Xw0++kOW9qe/9MB3DdZdLycvyo8v7ZAUoYy/
-	h+ztFA+5cK54G8MSh1dhCv4XHxClqYtpjjDbsDi0JX6PxfOx6RHTmZX1Wyt5DaTUlnaiPh
-	qkUkg0gtgvYxCeXCCGBWvtnuQfpQCiimsaMT2F3o3w1U49b9qQPAI5Y6lBcDLQ==
-From: Paulo Alcantara <pc@manguebit.com>
-To: meetakshisetiyaoss@gmail.com, linux-cifs@vger.kernel.org,
- smfrench@gmail.com, nspmangalore@gmail.com, bharathsm.hsk@gmail.com,
- lsahlber@redhat.com, tom@talpey.com
-Cc: Meetakshi Setiya <msetiya@microsoft.com>
-Subject: Re: [PATCH] cifs: Reuse file lease key in compound operations
-In-Reply-To: <20231204045632.72226-1-meetakshisetiyaoss@gmail.com>
-References: <20231204045632.72226-1-meetakshisetiyaoss@gmail.com>
-Date: Tue, 05 Dec 2023 16:32:13 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FpmF0Ht5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06147C433C8
+	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 23:46:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701819971;
+	bh=azp99BqdCzvYuD7/6MEXJLghkJLXNEE5WlfaDru3ITc=;
+	h=From:Date:Subject:To:Cc:From;
+	b=FpmF0Ht5QiMzNMk3BT+ifISq29/R/ChkLocWJ+OXGwe3BrLFgp/joyGIrR2naRlz2
+	 L+yjLs+E/TX9weLSwQcsv1U43pcFJSHrQMhGc9ltTXDIoVclH4TnRHrGiqjNiYyL+G
+	 8EtvZCRQ8Kf7vmzZ1rLAxAPXuzuhYRbpqYW9AI2yaCErcqn55lBDYAFdOXNb9FAChZ
+	 Fl65Mi1XV5EBczjtMR6/IQcSOK+uGd8jsDw1xHH5llyXlOC5lbksJqMcaIWO4A6eyZ
+	 VwlT2Jjm+3LFF7s+qz0dir3j/GYFKXh53sRAcZOr2AkB/ZsglNOIFNcs/UBz7RPpBZ
+	 736RzREGLIDNQ==
+Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-1f5bd86ceb3so3573233fac.2
+        for <linux-cifs@vger.kernel.org>; Tue, 05 Dec 2023 15:46:11 -0800 (PST)
+X-Gm-Message-State: AOJu0YyMNAqV69avjsPcFuOSQ1c+lmsRQHHeog+d62Ntz17bauHK4tCE
+	tjd23wG5BkWZ7TWzfcD83Gb/ygf/Bv1zZwUB4Z4=
+X-Google-Smtp-Source: AGHT+IHIHqGhy5MlMpQHuIRTX5tVH9LFd01w2SmIN+UB2sRPePiKu4q9oHI1QtV2JVbYs4pA6BeiyE5s3YQX8w/uJsA=
+X-Received: by 2002:a05:6871:459a:b0:1fa:25de:2f6b with SMTP id
+ nl26-20020a056871459a00b001fa25de2f6bmr7282989oab.23.1701819968740; Tue, 05
+ Dec 2023 15:46:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Received: by 2002:ac9:5a85:0:b0:507:5de0:116e with HTTP; Tue, 5 Dec 2023
+ 15:46:07 -0800 (PST)
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 6 Dec 2023 08:46:07 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_2diW78c1kCehQ3suGyOC6Zj_3fn=A=_GzFAbL8D4nQw@mail.gmail.com>
+Message-ID: <CAKYAXd_2diW78c1kCehQ3suGyOC6Zj_3fn=A=_GzFAbL8D4nQw@mail.gmail.com>
+Subject: ksmbd: fix wrong name of SMB2_CREATE_ALLOCATION_SIZE
+To: CIFS <linux-cifs@vger.kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, atheik <atteh.mailbox@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-meetakshisetiyaoss@gmail.com writes:
+MS confirm that "AISi" name of SMB2_CREATE_ALLOCATION_SIZE in MS-SMB2
+specification is a typo. cifs/ksmbd have been using this wrong name from
+MS-SMB2. It should be "AlSi". Also It will cause problem when running
+smb2.create.open test in smbtorture against ksmbd.
 
-> From: Meetakshi Setiya <msetiya@microsoft.com>
->
-> Lock contention during unlink operation causes cifs lease break ack
-> worker thread to block and delay sending lease break acks to server.
-> This case occurs when multiple threads perform unlink, write and lease
-> break acks on the same file. Thhis patch fixes the problem by reusing
-> the existing lease keys for rename, unlink and set path size compound
-> operations so that the client does not break its own lease.
->
-> Signed-off-by: Meetakshi Setiya <msetiya@microsoft.com>
-> ---
->  fs/smb/client/cifsglob.h  |  6 ++---
->  fs/smb/client/cifsproto.h |  8 +++----
->  fs/smb/client/cifssmb.c   |  6 ++---
->  fs/smb/client/inode.c     | 12 +++++-----
->  fs/smb/client/smb2inode.c | 49 +++++++++++++++++++++++++--------------
->  fs/smb/client/smb2proto.h |  8 +++----
->  6 files changed, 51 insertions(+), 38 deletions(-)
+Cc: stable@vger.kernel.org
+Fixes: 12197a7fdda9 ("Clarify SMB2/SMB3 create context and add missing ones")
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/smb/common/smb2pdu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-NAK.  This patch broke some xfstests.
-
-Consider this reproducer:
-
-$ cat repro.sh
-#!/bin/sh
-
-umount /mnt/1 &>/dev/null
-mount.cifs //srv/share /mnt/1 -o ...,vers=3.1.1
-rm /mnt/1/* &>/dev/null
-pushd /mnt/1 >/dev/null
-touch foo
-ln -v foo bar
-rm -v bar
-popd >/dev/null
-umount /mnt/1 &>/dev/null
-$ ./repro.sh
-'bar' => 'foo'
-rm: cannot remove 'bar': Invalid argument
-
-This is what going on
-
-- client creates 'foo' with RHW lease granted.
-- client creates hardlink file 'bar'.
-
-At this point, we have two positive dentries (foo & bar) which share
-same inode.
-
-- The client then attempts to remove 'bar' by re-using lease key from
-'foo' through compound request CREATE(DELETE)+CLOSE, which fails with
-STATUS_INVALID_PARAMETER.
+diff --git a/fs/smb/common/smb2pdu.h b/fs/smb/common/smb2pdu.h
+index e373018259e5..5a721c952c2f 100644
+--- a/fs/smb/common/smb2pdu.h
++++ b/fs/smb/common/smb2pdu.h
+@@ -1142,7 +1142,7 @@ struct smb2_server_client_notification {
+ #define SMB2_CREATE_SD_BUFFER			"SecD" /* security descriptor */
+ #define SMB2_CREATE_DURABLE_HANDLE_REQUEST	"DHnQ"
+ #define SMB2_CREATE_DURABLE_HANDLE_RECONNECT	"DHnC"
+-#define SMB2_CREATE_ALLOCATION_SIZE		"AISi"
++#define SMB2_CREATE_ALLOCATION_SIZE		"AlSi"
+ #define SMB2_CREATE_QUERY_MAXIMAL_ACCESS_REQUEST "MxAc"
+ #define SMB2_CREATE_TIMEWARP_REQUEST		"TWrp"
+ #define SMB2_CREATE_QUERY_ON_DISK_ID		"QFid"
+-- 
+2.34.1
