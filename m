@@ -1,57 +1,63 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274AE17727
-	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 07:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OPSTIIjM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D07DC433C7
-	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 07:48:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701762485;
-	bh=C6D0tLjPt3YkY5YoBs7Uj9K/0s2gcRdGIebkQ7OcGk0=;
-	h=From:Date:Subject:To:From;
-	b=OPSTIIjMZBPWjKvzj4GdvujQTV+DbIq3NGRJmz9uMYTWbBJJFa+amr6/JlQtodOUG
-	 +iZHQVkJIDMTe/EM+ztg5V5L/JPOQmEZqwuR0M4hZUljV1a4V61XcAKvoXpUWcQpvz
-	 WC1gGZRlTibUynErpiHGIoYP4Ty0mAI628F/KTUpTIxWXjc9WT5CEj2p+yYmI+fcqC
-	 kw4VBgJ98Ywxw+E2W4Ekkw+wlLaXRPJrWoBkT5pCXnQuDHL47mLfJmUud7qF6mUW8x
-	 MVE2yjNEEAe/HwjC+o5catj8Bg94HKAXp+siXOKytVjh1iPyRkGQwhToRMQw0q5zXN
-	 RXH8VMqPtNEpg==
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-1faf56466b8so2422712fac.3
-        for <linux-cifs@vger.kernel.org>; Mon, 04 Dec 2023 23:48:05 -0800 (PST)
-X-Gm-Message-State: AOJu0YwoZp0ImDa36p3rjXg6aScgc1KYNWSUPbjgkP38F2G2CEnzEnkv
-	vT+GAkkZA0pXRhpbYbPc3kI+DarU7PhpPwVg9wI=
-X-Google-Smtp-Source: AGHT+IGFvKbDumO/yFY9gPgUBCLeqsIvgmFpCai1pu68IuofO01ga+7en9K/PbtDESb/Y6ZHe2kxWKl7UPSNJJPn7Zo=
-X-Received: by 2002:a05:6870:350f:b0:1fa:31c4:6fd9 with SMTP id
- k15-20020a056870350f00b001fa31c46fd9mr7730172oah.43.1701762484887; Mon, 04
- Dec 2023 23:48:04 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O9dbYV0z"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19684BA
+	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 01:39:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701769188;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o/7QNpl+o3++WlXZ53pi5zU7K9qsD8TgZ3XJeC4u0Is=;
+	b=O9dbYV0zfQM7/p7Sj9NieeGsgI7na+k/Nq9OwoRVZ6rnWMWcnvr4rGBwfPmZ747T4/6asB
+	IliCIQwvmMpAIvernzS/vsl/WBAtJoY4xzA9liuHvJninh62LiEeyWvdXcV9Vqk9AH6U7f
+	6C0LjpbZdZckwM1sQHmHAfMLxfbm31k=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-652-6PnFNsaEONyiNsakdJ4hUQ-1; Tue, 05 Dec 2023 04:39:45 -0500
+X-MC-Unique: 6PnFNsaEONyiNsakdJ4hUQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9789B101A52A;
+	Tue,  5 Dec 2023 09:39:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.161])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C16B43C25;
+	Tue,  5 Dec 2023 09:39:43 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAKYAXd9ijC1ypq=JUgkmtgaN6KDUxLiUr_RT+Ju7kXNadRwhrw@mail.gmail.com>
+References: <CAKYAXd9ijC1ypq=JUgkmtgaN6KDUxLiUr_RT+Ju7kXNadRwhrw@mail.gmail.com> <3755038.1701447306@warthog.procyon.org.uk>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: dhowells@redhat.com, Steve French <sfrench@samba.org>,
+    ronniesahlberg@gmail.com, aaptel@samba.org,
+    linux-cifs@vger.kernel.org
+Subject: Re: cifs hardlink misbehaviour in generic/002?
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: by 2002:ac9:5a85:0:b0:507:5de0:116e with HTTP; Mon, 4 Dec 2023
- 23:48:03 -0800 (PST)
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 5 Dec 2023 16:48:03 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9-61f1cjXMrovSEdio8fuTSbegfde4FZ9m1DAAS+CxRg@mail.gmail.com>
-Message-ID: <CAKYAXd9-61f1cjXMrovSEdio8fuTSbegfde4FZ9m1DAAS+CxRg@mail.gmail.com>
-Subject: Name string of SMB2_CREATE_ALLOCATION_SIZE is AlSi or AISi ?
-To: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <315463.1701769183.1@warthog.procyon.org.uk>
+Date: Tue, 05 Dec 2023 09:39:43 +0000
+Message-ID: <315464.1701769183@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-I found that name strings of SMB2_CREATE_ALLOCATION_SIZE are different
-between samba and cifs/ksmbd like the following. In the MS-SMB2
-specification, the name of SMB2_CREATE_ALLOCATION_SIZE is defined as
-AISi.
-Is it a typo in the specification or is samba defining it incorrectly?
+Namjae Jeon <linkinjeon@kernel.org> wrote:
 
-samba-4.19.2/libcli/smb/smb2_constants.h :
-#define SMB2_CREATE_TAG_ALSI "AlSi"
+> We have already sent the fixes on this week, So It has been in the
+> latest linus master.
+> Could you please check it on the latest master or after applying
+> commit 4274a9dc6aeb "ksmbd: separately allocate ci per dentry" ?
 
-/fs/smb/common/smb2pdu.h :
-#define SMB2_CREATE_ALLOCATION_SIZE             "AISi"
+Yep.  That fixes it.
 
-Thanks.
+David
+
