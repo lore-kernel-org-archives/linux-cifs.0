@@ -1,87 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496DB8BEC;
-	Tue,  5 Dec 2023 03:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274AE17727
+	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 07:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="kG1Zg4zY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA68AC433C7;
-	Tue,  5 Dec 2023 03:29:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1701746964;
-	bh=og+a53QuKge8Gc1TWbf2ss2U+eH+YKzJ7HF/FZ+u6zc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kG1Zg4zYDFprCks3cSmOc1ZE+COYivkRi3c1lmueSQaHxzDtviEHT8jYZy4pZo8rG
-	 Myt/rS5Z5RUjodw40w87BPts8JMxY+XS9JauPwzTWdAXUTJ8xjMjEe3FJowK1u/px7
-	 gGWrg38dJvAabsLmwcUHeAbbHooLdBs+mP4VAKbA=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Rohith Surabattula <rohiths.msft@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	linux-cifs@vger.kernel.org,
-	linux-mm@kvack.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.1 002/107] cifs: Fix FALLOC_FL_INSERT_RANGE by setting i_size after EOF moved
-Date: Tue,  5 Dec 2023 12:15:37 +0900
-Message-ID: <20231205031531.622164020@linuxfoundation.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231205031531.426872356@linuxfoundation.org>
-References: <20231205031531.426872356@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OPSTIIjM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D07DC433C7
+	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 07:48:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1701762485;
+	bh=C6D0tLjPt3YkY5YoBs7Uj9K/0s2gcRdGIebkQ7OcGk0=;
+	h=From:Date:Subject:To:From;
+	b=OPSTIIjMZBPWjKvzj4GdvujQTV+DbIq3NGRJmz9uMYTWbBJJFa+amr6/JlQtodOUG
+	 +iZHQVkJIDMTe/EM+ztg5V5L/JPOQmEZqwuR0M4hZUljV1a4V61XcAKvoXpUWcQpvz
+	 WC1gGZRlTibUynErpiHGIoYP4Ty0mAI628F/KTUpTIxWXjc9WT5CEj2p+yYmI+fcqC
+	 kw4VBgJ98Ywxw+E2W4Ekkw+wlLaXRPJrWoBkT5pCXnQuDHL47mLfJmUud7qF6mUW8x
+	 MVE2yjNEEAe/HwjC+o5catj8Bg94HKAXp+siXOKytVjh1iPyRkGQwhToRMQw0q5zXN
+	 RXH8VMqPtNEpg==
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-1faf56466b8so2422712fac.3
+        for <linux-cifs@vger.kernel.org>; Mon, 04 Dec 2023 23:48:05 -0800 (PST)
+X-Gm-Message-State: AOJu0YwoZp0ImDa36p3rjXg6aScgc1KYNWSUPbjgkP38F2G2CEnzEnkv
+	vT+GAkkZA0pXRhpbYbPc3kI+DarU7PhpPwVg9wI=
+X-Google-Smtp-Source: AGHT+IGFvKbDumO/yFY9gPgUBCLeqsIvgmFpCai1pu68IuofO01ga+7en9K/PbtDESb/Y6ZHe2kxWKl7UPSNJJPn7Zo=
+X-Received: by 2002:a05:6870:350f:b0:1fa:31c4:6fd9 with SMTP id
+ k15-20020a056870350f00b001fa31c46fd9mr7730172oah.43.1701762484887; Mon, 04
+ Dec 2023 23:48:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:ac9:5a85:0:b0:507:5de0:116e with HTTP; Mon, 4 Dec 2023
+ 23:48:03 -0800 (PST)
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 5 Dec 2023 16:48:03 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9-61f1cjXMrovSEdio8fuTSbegfde4FZ9m1DAAS+CxRg@mail.gmail.com>
+Message-ID: <CAKYAXd9-61f1cjXMrovSEdio8fuTSbegfde4FZ9m1DAAS+CxRg@mail.gmail.com>
+Subject: Name string of SMB2_CREATE_ALLOCATION_SIZE is AlSi or AISi ?
+To: CIFS <linux-cifs@vger.kernel.org>, 
+	samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+I found that name strings of SMB2_CREATE_ALLOCATION_SIZE are different
+between samba and cifs/ksmbd like the following. In the MS-SMB2
+specification, the name of SMB2_CREATE_ALLOCATION_SIZE is defined as
+AISi.
+Is it a typo in the specification or is samba defining it incorrectly?
 
-------------------
+samba-4.19.2/libcli/smb/smb2_constants.h :
+#define SMB2_CREATE_TAG_ALSI "AlSi"
 
-From: David Howells <dhowells@redhat.com>
+/fs/smb/common/smb2pdu.h :
+#define SMB2_CREATE_ALLOCATION_SIZE             "AISi"
 
-commit 88010155f02b2c3b03c71609ba6ceeb457ece095 upstream.
-
-Fix the cifs filesystem implementations of FALLOC_FL_INSERT_RANGE, in
-smb3_insert_range(), to set i_size after extending the file on the server
-and before we do the copy to open the gap (as we don't clean up the EOF
-marker if the copy fails).
-
-Fixes: 7fe6fe95b936 ("cifs: add FALLOC_FL_INSERT_RANGE support")
-Cc: stable@vger.kernel.org
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Paulo Alcantara <pc@manguebit.com>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
-cc: linux-mm@kvack.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/smb/client/smb2ops.c |    3 +++
- 1 file changed, 3 insertions(+)
-
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3858,6 +3858,9 @@ static long smb3_insert_range(struct fil
- 	if (rc < 0)
- 		goto out_2;
- 
-+	truncate_setsize(inode, old_eof + len);
-+	fscache_resize_cookie(cifs_inode_cookie(inode), i_size_read(inode));
-+
- 	rc = smb2_copychunk_range(xid, cfile, cfile, off, count, off + len);
- 	if (rc < 0)
- 		goto out_2;
-
-
+Thanks.
