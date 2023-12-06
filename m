@@ -1,75 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5361641220
-	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 23:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JDjsQFKS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAC7FC433C9
-	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 23:48:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701820083;
-	bh=5haMR6z10LwAOwz3Tsgh9GHuu+CZhIvtF+q3fYjk5Oc=;
-	h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-	b=JDjsQFKSdDZ3KN5McafVlUhX4zob3BuFxFNTUM7tEW/39sUeJZY47zbqnzsNsguZN
-	 tsV5sMN5cRS8YG11g7zG6XjLMPJeWWMztDtLsU538zKAHE7UxPuQGx1WvNr4oSA/SD
-	 HMPTn3sj3zot0WbBcaE5hy6vt3SW4UwuWjfVgmDxeP+A0qvHKEbN8TCyuBki5cZwJ3
-	 EIVpjcsS/Nj2yQayPZ9IoWqKN8PVDS3yL4Oy5oFf8ThWalb+wYOKZOuKwDBrpLqzKT
-	 UYxz8jMPaVpUIm87F4NvfpqmFi/mQB320yUrXN6BwSH5N9MiVTSCk3VE09k/zM/VC8
-	 dKHtMf9+8ep7Q==
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-1fb04b2251bso2930374fac.0
-        for <linux-cifs@vger.kernel.org>; Tue, 05 Dec 2023 15:48:03 -0800 (PST)
-X-Gm-Message-State: AOJu0YzecoWO0C5QnPci8fdPQmufL3PYusHgim698t3SCQ9f8ozPKh9K
-	EjlXnX00kSswkG9TzvIO2p4Qd+HYuBm1rQsO43g=
-X-Google-Smtp-Source: AGHT+IGLUX8l5j/S/fZgLsr0lFIdYu0vrQ/Oo28txNFc1zOl3DhBkxBJGMHYVqofCO+o/yKrZSN+AwBKhd31fzPT0Qc=
-X-Received: by 2002:a05:6870:8e0c:b0:1fb:75a:de69 with SMTP id
- lw12-20020a0568708e0c00b001fb075ade69mr9264911oab.87.1701820082923; Tue, 05
- Dec 2023 15:48:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="LyaKZlOH"
+Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BD21A2
+	for <linux-cifs@vger.kernel.org>; Tue,  5 Dec 2023 16:06:33 -0800 (PST)
+Message-ID: <fb9c59cf8da2881158d54014feaadee5@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1701821191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hxQ2SynPSg3hgN+UU2wX4tE5qyV9/n0Z9bzzghD6Ufw=;
+	b=LyaKZlOHycQza1UtmRK45rd/m+t3EM96E5R4ZpbnVtMtfAudSwbGviuQjk77e9BoYp6Q+x
+	l6mXMvtBdiZVupNBeG4SkTzRfaUD4ZEYP9pXrIo5SmIHP+yxuqHwq88KszgCH5z2BNyICd
+	YE5audEbTBv40x8hyM3LoRbMkO1GlS3b75VmBxwdmA4hyqBUr7WrvUvyRkpCwmYNNUQ8kv
+	/7N3jdPluPcl+X2rtAfCoJvomfVWscRpL/FQScGs2cSMYslniSO0Y2waQy1SsiKVsuwRYu
+	/IovkSqXeHBmiRCrDIFti2qEP9pXLN7DdR5qXHqkyvBz6O73VnA14cmG8kEbsA==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1701821191; a=rsa-sha256;
+	cv=none;
+	b=QQENDculH566E/0l0VxQvuyWs+l456jVmLzlkbXkZRUatoJYREQBGPlhl06F0OXOSzABVV
+	kEq0LBTtkjXZbmiQkpBnzmYyItSLkx1Ie4c7VgZ/R+tdmCrpynVt8iPhezj56xQAZqIkVl
+	vw7w71vh4Unf5JmBfr/K1Cd2xUtqgkpcIHqRWfIB/MeRHBih9KLdCjr7hh2Yc8pReoPgk4
+	0pvjpZYrS6CFgrroSwezB0ql7Uc/qxVqDKeB7QWBDGl0wx76FBbk9IOw85mGkst8RqrJb8
+	3z+y1Jb7jV9WE7KG4EfZKJNcR95PfkMjcs5HoM4i/8yQ823yYMLJt3Efl4G2pw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1701821191; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hxQ2SynPSg3hgN+UU2wX4tE5qyV9/n0Z9bzzghD6Ufw=;
+	b=PePTbM2CYEkIxcUBvKnkLKZNQKrdOUNb62RyJIIE3aaRit4NoXVLsF8jROZHrfjNuBEiYz
+	0OLZHGLouksDnBzqWsmIrseIxphXYlXyXgDZA4F8mdYNSsvby+P3uK1iYJWJThksbMWGut
+	HzeDlBLBxwhsMm9/vheX8+6dA7uOIU5fx2M3Vubc0E+X9j1EAftfZaQ69PnsbO+Oa8GYBl
+	FMQaXXE2tl9efJymJ3JkgwfSlICl2nTDe/Ts9Dkh4AqySd78LZ3+VZEAQFmwdTKPsHIPWL
+	1U27dwBGkCswHSDUgFvfBCSelgN0faVhrOkYTJg7/p6azbjmI0AmOjUNQaxsdg==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Tom Talpey <tom@talpey.com>, Sergey
+ Senozhatsky <senozhatsky@chromium.org>, atheik <atteh.mailbox@gmail.com>
+Subject: Re: ksmbd: fix wrong name of SMB2_CREATE_ALLOCATION_SIZE
+In-Reply-To: <CAKYAXd_2diW78c1kCehQ3suGyOC6Zj_3fn=A=_GzFAbL8D4nQw@mail.gmail.com>
+References: <CAKYAXd_2diW78c1kCehQ3suGyOC6Zj_3fn=A=_GzFAbL8D4nQw@mail.gmail.com>
+Date: Tue, 05 Dec 2023 21:06:28 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Received: by 2002:ac9:5a85:0:b0:507:5de0:116e with HTTP; Tue, 5 Dec 2023
- 15:48:02 -0800 (PST)
-In-Reply-To: <e20433c2-82e8-41e0-aa29-279dd64996fc@samba.org>
-References: <CAKYAXd9-61f1cjXMrovSEdio8fuTSbegfde4FZ9m1DAAS+CxRg@mail.gmail.com>
- <e20433c2-82e8-41e0-aa29-279dd64996fc@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 6 Dec 2023 08:48:02 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_m2OTmh_DyYSULXiMDPNzG-mWZRhB4oZXsCZ6saaTdrg@mail.gmail.com>
-Message-ID: <CAKYAXd_m2OTmh_DyYSULXiMDPNzG-mWZRhB4oZXsCZ6saaTdrg@mail.gmail.com>
-Subject: Re: Name string of SMB2_CREATE_ALLOCATION_SIZE is AlSi or AISi ?
-To: Ralph Boehme <slow@samba.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, 
-	samba-technical <samba-technical@lists.samba.org>, 
-	Interoperability Documentation Help <dochelp@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-2023-12-05 19:01 GMT+09:00, Ralph Boehme <slow@samba.org>:
-> On 12/5/23 08:48, Namjae Jeon via samba-technical wrote:
->> I found that name strings of SMB2_CREATE_ALLOCATION_SIZE are different
->> between samba and cifs/ksmbd like the following. In the MS-SMB2
->> specification, the name of SMB2_CREATE_ALLOCATION_SIZE is defined as
->> AISi.
->> Is it a typo in the specification or is samba defining it incorrectly?
->>
->> samba-4.19.2/libcli/smb/smb2_constants.h :
->> #define SMB2_CREATE_TAG_ALSI "AlSi"
->>
->> /fs/smb/common/smb2pdu.h :
->> #define SMB2_CREATE_ALLOCATION_SIZE             "AISi"
->
-> looks like a bug in MS-SMB2: they have the value as 0x416c5369, which is
-> "AlSi", with an "l" like in "l"ake.
-I will fix it in common header of cifs/ksmbd.
-Thanks for your check!
+Namjae Jeon <linkinjeon@kernel.org> writes:
 
->
-> Adding dochelp to cc.
->
-> @dochelp: looks like you have a small bug in MS-SMB2. :)
->
-> -slow
->
+> MS confirm that "AISi" name of SMB2_CREATE_ALLOCATION_SIZE in MS-SMB2
+> specification is a typo. cifs/ksmbd have been using this wrong name from
+> MS-SMB2. It should be "AlSi". Also It will cause problem when running
+> smb2.create.open test in smbtorture against ksmbd.
+
+I see only ksmbd using it.
+
+> Cc: stable@vger.kernel.org
+> Fixes: 12197a7fdda9 ("Clarify SMB2/SMB3 create context and add missing ones")
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  fs/smb/common/smb2pdu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Looks good,
+
+Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
