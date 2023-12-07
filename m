@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="haW+cunq"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08B0269A
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:25:49 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SlK+eQRQ"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718E647BF
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:25:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701984326;
+	s=mimecast20190719; t=1701984334;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kBacVVRtZdnRtEtQDNHAHlchMq/cBVjOZngpB3YVhv4=;
-	b=haW+cunqdgFbRFqIpgw8vYddnZfE0k0Zj32vDiqNT4RWFFd6RZyehgnJzeS0WMKEkRnhN9
-	w9bDcp+by+vQR1NSl87HZkERk+bLGRG9A4F6CBCNgWgEmJw/8giwGxioEGn3zcn2cT3AiY
-	vFC8qM8L/DxpFLIqk2UG7pFzX+4KLJw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-686-BxwfoQndP-y9B487aRPz7w-1; Thu, 07 Dec 2023 16:25:20 -0500
-X-MC-Unique: BxwfoQndP-y9B487aRPz7w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	bh=+RGhYTY83CzEEwD3sxxlcJDtqFoFg1xQiYrcAXYGcq4=;
+	b=SlK+eQRQjITb5U93bbL4rKCg2LiZXRoUysbmLue8y/fFzmqoCxcHOegyfNLErhLb0SvBvR
+	lmPrT442Qsx9ow98r5v592rJESLd9jXsTizPnsNKTrXcceUHViY7KZyFB0NgjoC23R9bJH
+	yT3A4Edvp3XVshx/uiq9JwLBNUUl5CQ=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-644-GP4ZXKzINJ2l4ohXuOv0Hw-1; Thu,
+ 07 Dec 2023 16:24:20 -0500
+X-MC-Unique: GP4ZXKzINJ2l4ohXuOv0Hw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 49E4686C042;
-	Thu,  7 Dec 2023 21:25:18 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E987B386A0A1;
+	Thu,  7 Dec 2023 21:24:18 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 41A063C2E;
-	Thu,  7 Dec 2023 21:25:15 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 51189C15880;
+	Thu,  7 Dec 2023 21:24:16 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -49,13 +49,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: [PATCH v3 53/59] cifs: Implement netfslib hooks
-Date: Thu,  7 Dec 2023 21:22:00 +0000
-Message-ID: <20231207212206.1379128-54-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 37/59] netfs: Perform content encryption
+Date: Thu,  7 Dec 2023 21:21:44 +0000
+Message-ID: <20231207212206.1379128-38-dhowells@redhat.com>
 In-Reply-To: <20231207212206.1379128-1-dhowells@redhat.com>
 References: <20231207212206.1379128-1-dhowells@redhat.com>
 Precedence: bulk
@@ -65,513 +62,283 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Provide implementation of the netfslib hooks that will be used by netfslib
-to ask cifs to set up and perform operations.  Of particular note are
+When dealing with an encrypted file, we gather together sufficient pages
+from the pagecache to constitute a logical crypto block, allocate a bounce
+buffer and then ask the filesystem to encrypt between the buffers.  The
+bounce buffer is then passed to the filesystem to upload.
 
- (*) cifs_clamp_length() - This is used to negotiate the size of the next
-     subrequest in a read request, taking into account the credit available
-     and the rsize.  The credits are attached to the subrequest.
+The network filesystem must set a flag to indicate what service is desired
+and what the logical blocksize will be.
 
- (*) cifs_req_issue_read() - This is used to issue a subrequest that has
-     been set up and clamped.
+The netfs library iterates through each block to be processed, providing a
+pair of scatterlists to describe the start and end buffers.
 
- (*) cifs_create_write_requests() - This is used to break the given span of
-     file positions into suboperations according to cifs's wsize and
-     available credits.  As each subop is created, it can be dispatched or
-     queued for dispatch.
-
-At this point, cifs is not wired up to actually *use* netfslib; that will
-be done in a subsequent patch.
+Note that it should be possible in future to encrypt DIO writes also by
+this same mechanism.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
 cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
 cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/buffered_write.c    |   3 +
- fs/smb/client/Kconfig        |   1 +
- fs/smb/client/cifsglob.h     |  26 ++-
- fs/smb/client/file.c         | 357 +++++++++++++++++++++++++++++++++++
- include/linux/netfs.h        |   1 +
- include/trace/events/netfs.h |   1 +
- 6 files changed, 381 insertions(+), 8 deletions(-)
+ fs/netfs/Makefile            |  1 +
+ fs/netfs/buffered_write.c    |  3 +-
+ fs/netfs/crypto.c            | 89 ++++++++++++++++++++++++++++++++++++
+ fs/netfs/internal.h          |  5 ++
+ fs/netfs/objects.c           |  2 +
+ fs/netfs/output.c            |  7 ++-
+ include/linux/netfs.h        | 11 +++++
+ include/trace/events/netfs.h |  2 +
+ 8 files changed, 118 insertions(+), 2 deletions(-)
+ create mode 100644 fs/netfs/crypto.c
 
+diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+index d4d1d799819e..0c433fce15dc 100644
+--- a/fs/netfs/Makefile
++++ b/fs/netfs/Makefile
+@@ -3,6 +3,7 @@
+ netfs-y := \
+ 	buffered_read.o \
+ 	buffered_write.o \
++	crypto.o \
+ 	direct_read.o \
+ 	direct_write.o \
+ 	io.o \
 diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-index 64d84a0544ae..0a6ec52a3aa3 100644
+index 8339e3f753af..bffa508945cb 100644
 --- a/fs/netfs/buffered_write.c
 +++ b/fs/netfs/buffered_write.c
-@@ -379,6 +379,9 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
- 	} while (iov_iter_count(iter));
+@@ -77,7 +77,8 @@ static enum netfs_how_to_modify netfs_how_to_modify(struct netfs_inode *ctx,
+ 	if (!maybe_trouble && offset == 0 && len >= flen)
+ 		return NETFS_WHOLE_FOLIO_MODIFY;
  
- out:
-+	if (likely(written) && ctx->ops->post_modify)
-+		ctx->ops->post_modify(inode);
-+
- 	if (unlikely(wreq)) {
- 		ret = netfs_end_writethrough(wreq, iocb);
- 		wbc_detach_inode(&wbc);
-diff --git a/fs/smb/client/Kconfig b/fs/smb/client/Kconfig
-index 2927bd174a88..2517dc242386 100644
---- a/fs/smb/client/Kconfig
-+++ b/fs/smb/client/Kconfig
-@@ -2,6 +2,7 @@
- config CIFS
- 	tristate "SMB3 and CIFS support (advanced network filesystem)"
- 	depends on INET
-+	select NETFS_SUPPORT
- 	select NLS
- 	select NLS_UCS2_UTILS
- 	select CRYPTO
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index a0d348b166c2..7d17e515624f 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1432,15 +1432,23 @@ struct cifs_aio_ctx {
- 	bool			direct_io;
- };
+-	if (file->f_mode & FMODE_READ)
++	if (file->f_mode & FMODE_READ ||
++	    test_bit(NETFS_ICTX_ENCRYPTED, &ctx->flags))
+ 		return NETFS_JUST_PREFETCH;
  
-+struct cifs_io_request {
-+	struct netfs_io_request		rreq;
-+	struct cifsFileInfo		*cfile;
-+};
-+
- /* asynchronous read support */
- struct cifs_io_subrequest {
--	struct netfs_io_subrequest	subreq;
--	struct cifsFileInfo		*cfile;
--	struct address_space		*mapping;
--	struct cifs_aio_ctx		*ctx;
-+	union {
-+		struct netfs_io_subrequest subreq;
-+		struct netfs_io_request *rreq;
-+		struct cifs_io_request *req;
-+	};
- 	ssize_t				got_bytes;
- 	pid_t				pid;
-+	unsigned int			xid;
- 	int				result;
-+	bool				have_credits;
- 	struct kvec			iov[2];
- 	struct TCP_Server_Info		*server;
- #ifdef CONFIG_CIFS_SMB_DIRECT
-@@ -1448,14 +1456,16 @@ struct cifs_io_subrequest {
- #endif
- 	struct cifs_credits		credits;
- 
--	enum writeback_sync_modes	sync_mode;
--	bool				uncached;
--	struct bio_vec			*bv;
--
- 	// TODO: Remove following elements
- 	struct list_head		list;
- 	struct completion		done;
- 	struct work_struct		work;
-+	struct cifsFileInfo		*cfile;
-+	struct address_space		*mapping;
-+	struct cifs_aio_ctx		*ctx;
-+	enum writeback_sync_modes	sync_mode;
-+	bool				uncached;
-+	struct bio_vec			*bv;
- };
- 
- /*
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index b47abeefe628..255d78581e56 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -36,6 +36,363 @@
- #include "fs_context.h"
- #include "cifs_ioctl.h"
- #include "cached_dir.h"
-+#include <trace/events/netfs.h>
-+
-+static int cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush);
-+
-+static void cifs_upload_to_server(struct netfs_io_subrequest *subreq)
-+{
-+	struct cifs_io_subrequest *wdata =
-+		container_of(subreq, struct cifs_io_subrequest, subreq);
-+	ssize_t rc;
-+
-+	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
-+
-+	if (wdata->req->cfile->invalidHandle)
-+		rc = -EAGAIN;
-+	else
-+		rc = wdata->server->ops->async_writev(wdata);
-+	if (rc < 0)
-+		add_credits_and_wake_if(wdata->server, &wdata->credits, 0);
-+}
-+
-+static void cifs_upload_to_server_worker(struct work_struct *work)
-+{
-+	struct netfs_io_subrequest *subreq =
-+		container_of(work, struct netfs_io_subrequest, work);
-+
-+	cifs_upload_to_server(subreq);
-+}
-+
-+/*
-+ * Set up write requests for a writeback slice.  We need to add a write request
-+ * for each write we want to make.
-+ */
-+static void cifs_create_write_requests(struct netfs_io_request *wreq,
-+				       loff_t start, size_t remain)
-+{
-+	struct netfs_io_subrequest *subreq;
-+	struct cifs_io_subrequest *wdata;
-+	struct cifs_io_request *req = container_of(wreq, struct cifs_io_request, rreq);
-+	struct TCP_Server_Info *server;
-+	struct cifsFileInfo *open_file = req->cfile;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(wreq->inode->i_sb);
-+	int rc = 0;
-+	size_t offset = 0;
-+	pid_t pid;
-+	unsigned int xid, max_segs = INT_MAX;
-+
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = open_file->pid;
-+	else
-+		pid = current->tgid;
-+
-+	server = cifs_pick_channel(tlink_tcon(open_file->tlink)->ses);
-+	xid = get_xid();
-+
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->smbd_conn)
-+		max_segs = server->smbd_conn->max_frmr_depth;
-+#endif
-+
-+	do {
-+		unsigned int nsegs = 0;
-+		size_t max_len, part, wsize;
-+
-+		subreq = netfs_create_write_request(wreq, NETFS_UPLOAD_TO_SERVER,
-+						    start, remain,
-+						    cifs_upload_to_server_worker);
-+		if (!subreq) {
-+			wreq->error = -ENOMEM;
-+			break;
-+		}
-+
-+		wdata = container_of(subreq, struct cifs_io_subrequest, subreq);
-+
-+	retry:
-+		if (signal_pending(current)) {
-+			wreq->error = -EINTR;
-+			break;
-+		}
-+
-+		if (open_file->invalidHandle) {
-+			rc = cifs_reopen_file(open_file, false);
-+			if (rc < 0) {
-+				if (rc == -EAGAIN)
-+					goto retry;
-+				break;
-+			}
-+		}
-+
-+		rc = server->ops->wait_mtu_credits(server, wreq->wsize, &wsize,
-+						   &wdata->credits);
-+		if (rc)
-+			break;
-+
-+		max_len = min(remain, wsize);
-+		if (!max_len) {
-+			rc = -EAGAIN;
-+			goto failed_return_credits;
-+		}
-+
-+		part = netfs_limit_iter(&wreq->io_iter, offset, max_len, max_segs);
-+		cifs_dbg(FYI, "create_write_request len=%zx/%zx nsegs=%u/%lu/%u\n",
-+			 part, max_len, nsegs, wreq->io_iter.nr_segs, max_segs);
-+		if (!part) {
-+			rc = -EIO;
-+			goto failed_return_credits;
-+		}
-+
-+		if (part < wdata->subreq.len) {
-+			wdata->subreq.len = part;
-+			iov_iter_truncate(&wdata->subreq.io_iter, part);
-+		}
-+
-+		wdata->server	= server;
-+		wdata->pid	= pid;
-+
-+		rc = adjust_credits(server, &wdata->credits, wdata->subreq.len);
-+		if (rc) {
-+			add_credits_and_wake_if(server, &wdata->credits, 0);
-+			if (rc == -EAGAIN)
-+				goto retry;
-+			goto failed;
-+		}
-+
-+		cifs_upload_to_server(subreq);
-+		//netfs_queue_write_request(subreq);
-+		start += part;
-+		offset += part;
-+		remain -= part;
-+	} while (remain > 0);
-+
-+	free_xid(xid);
-+	return;
-+
-+failed_return_credits:
-+	add_credits_and_wake_if(server, &wdata->credits, 0);
-+failed:
-+	netfs_write_subrequest_terminated(subreq, rc, false);
-+	free_xid(xid);
-+}
-+
-+/*
-+ * Split the read up according to how many credits we can get for each piece.
-+ * It's okay to sleep here if we need to wait for more credit to become
-+ * available.
+ 	if (netfs_is_cache_enabled(ctx) ||
+diff --git a/fs/netfs/crypto.c b/fs/netfs/crypto.c
+new file mode 100644
+index 000000000000..943d01f430e2
+--- /dev/null
++++ b/fs/netfs/crypto.c
+@@ -0,0 +1,89 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Network filesystem content encryption support.
 + *
-+ * We also choose the server and allocate an operation ID to be cleaned up
-+ * later.
++ * Copyright (C) 2023 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
 + */
-+static bool cifs_clamp_length(struct netfs_io_subrequest *subreq)
++
++#include <linux/fs.h>
++#include <linux/mm.h>
++#include <linux/pagemap.h>
++#include <linux/slab.h>
++#include <linux/scatterlist.h>
++#include "internal.h"
++
++/*
++ * Populate a scatterlist from the next bufferage of an I/O iterator.
++ */
++static int netfs_iter_to_sglist(const struct iov_iter *iter, size_t len,
++				struct scatterlist *sg, unsigned int n_sg)
 +{
-+	struct netfs_io_request *rreq = subreq->rreq;
-+	struct TCP_Server_Info *server;
-+	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
-+	struct cifs_io_request *req = container_of(subreq->rreq, struct cifs_io_request, rreq);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
-+	size_t rsize = 0;
-+	int rc;
++	struct iov_iter tmp_iter = *iter;
++	struct sg_table sgtable = { .sgl = sg };
++	ssize_t ret;
 +
-+	rdata->xid = get_xid();
++	_enter("%zx/%zx", len, iov_iter_count(iter));
 +
-+	server = cifs_pick_channel(tlink_tcon(req->cfile->tlink)->ses);
-+	rdata->server = server;
-+
-+	if (cifs_sb->ctx->rsize == 0)
-+		cifs_sb->ctx->rsize =
-+			server->ops->negotiate_rsize(tlink_tcon(req->cfile->tlink),
-+						     cifs_sb->ctx);
-+
-+
-+	rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize, &rsize,
-+					   &rdata->credits);
-+	if (rc) {
-+		subreq->error = rc;
-+		return false;
-+	}
-+
-+	rdata->have_credits = true;
-+	subreq->len = min_t(size_t, subreq->len, rsize);
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+	if (server->smbd_conn)
-+		subreq->max_nr_segs = server->smbd_conn->max_frmr_depth;
-+#endif
-+	return true;
++	sg_init_table(sg, n_sg);
++	ret = extract_iter_to_sg(&tmp_iter, len, &sgtable, n_sg, 0);
++	if (ret < 0)
++		return ret;
++	sg_mark_end(&sg[sgtable.nents - 1]);
++	return sgtable.nents;
 +}
 +
 +/*
-+ * Issue a read operation on behalf of the netfs helper functions.  We're asked
-+ * to make a read of a certain size at a point in the file.  We are permitted
-+ * to only read a portion of that, but as long as we read something, the netfs
-+ * helper will call us again so that we can issue another read.
++ * Prepare a write request for writing.  We encrypt in/into the bounce buffer.
 + */
-+static void cifs_req_issue_read(struct netfs_io_subrequest *subreq)
++bool netfs_encrypt(struct netfs_io_request *wreq)
 +{
-+	struct netfs_io_request *rreq = subreq->rreq;
-+	struct cifs_io_subrequest *rdata = container_of(subreq, struct cifs_io_subrequest, subreq);
-+	struct cifs_io_request *req = container_of(subreq->rreq, struct cifs_io_request, rreq);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
-+	pid_t pid;
-+	int rc = 0;
-+
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = req->cfile->pid;
-+	else
-+		pid = current->tgid; // Ummm...  This may be a workqueue
-+
-+	cifs_dbg(FYI, "%s: op=%08x[%x] mapping=%p len=%zu/%zu\n",
-+		 __func__, rreq->debug_id, subreq->debug_index, rreq->mapping,
-+		 subreq->transferred, subreq->len);
-+
-+	if (req->cfile->invalidHandle) {
-+		do {
-+			rc = cifs_reopen_file(req->cfile, true);
-+		} while (rc == -EAGAIN);
-+		if (rc)
-+			goto out;
-+	}
-+
-+	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
-+	rdata->pid = pid;
-+
-+	rc = adjust_credits(rdata->server, &rdata->credits, rdata->subreq.len);
-+	if (!rc) {
-+		if (rdata->req->cfile->invalidHandle)
-+			rc = -EAGAIN;
-+		else
-+			rc = rdata->server->ops->async_readv(rdata);
-+	}
-+
-+out:
-+	if (rc)
-+		netfs_subreq_terminated(subreq, rc, false);
-+}
-+
-+/*
-+ * Initialise a request.
-+ */
-+static int cifs_init_request(struct netfs_io_request *rreq, struct file *file)
-+{
-+	struct cifs_io_request *req = container_of(rreq, struct cifs_io_request, rreq);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
-+	struct cifsFileInfo *open_file = NULL;
++	struct netfs_inode *ctx = netfs_inode(wreq->inode);
++	struct scatterlist source_sg[16], dest_sg[16];
++	unsigned int n_dest;
++	size_t n, chunk, bsize = 1UL << ctx->crypto_bshift;
++	loff_t pos;
 +	int ret;
 +
-+	rreq->rsize = cifs_sb->ctx->rsize;
-+	rreq->wsize = cifs_sb->ctx->wsize;
++	_enter("");
 +
-+	if (file) {
-+		open_file = file->private_data;
-+		rreq->netfs_priv = file->private_data;
-+		req->cfile = cifsFileInfo_get(open_file);
-+	} else if (rreq->origin == NETFS_WRITEBACK ||
-+		   rreq->origin == NETFS_LAUNDER_WRITE) {
-+		ret = cifs_get_writable_file(CIFS_I(rreq->inode), FIND_WR_ANY, &req->cfile);
-+		if (ret) {
-+			cifs_dbg(VFS, "No writable handle in writepages ret=%d\n", ret);
-+			return ret;
++	trace_netfs_rreq(wreq, netfs_rreq_trace_encrypt);
++
++	pos = wreq->start;
++	n = wreq->len;
++	_debug("ENCRYPT %llx-%llx", pos, pos + n - 1);
++
++	for (; n > 0; n -= chunk, pos += chunk) {
++		chunk = min(n, bsize);
++
++		ret = netfs_iter_to_sglist(&wreq->io_iter, chunk,
++					   dest_sg, ARRAY_SIZE(dest_sg));
++		if (ret < 0)
++			goto error;
++		n_dest = ret;
++
++		if (test_bit(NETFS_RREQ_CRYPT_IN_PLACE, &wreq->flags)) {
++			ret = ctx->ops->encrypt_block(wreq, pos, chunk,
++						      dest_sg, n_dest,
++						      dest_sg, n_dest);
++		} else {
++			ret = netfs_iter_to_sglist(&wreq->iter, chunk,
++						   source_sg, ARRAY_SIZE(source_sg));
++			if (ret < 0)
++				goto error;
++			ret = ctx->ops->encrypt_block(wreq, pos, chunk,
++						      source_sg, ret,
++						      dest_sg, n_dest);
 +		}
-+	} else {
-+		WARN_ON_ONCE(1);
-+		return -EIO;
++
++		if (ret < 0)
++			goto error_failed;
 +	}
 +
-+	return 0;
++	return true;
++
++error_failed:
++	trace_netfs_failure(wreq, NULL, ret, netfs_fail_encryption);
++error:
++	wreq->error = ret;
++	return false;
 +}
-+
-+/*
-+ * Expand the size of a readahead to the size of the rsize, if at least as
-+ * large as a page, allowing for the possibility that rsize is not pow-2
-+ * aligned.
-+ */
-+static void cifs_expand_readahead(struct netfs_io_request *rreq)
-+{
-+	unsigned int rsize = rreq->rsize;
-+	loff_t misalignment, i_size = i_size_read(rreq->inode);
-+
-+	if (rsize < PAGE_SIZE)
-+		return;
-+
-+	if (rsize < INT_MAX)
-+		rsize = roundup_pow_of_two(rsize);
-+	else
-+		rsize = ((unsigned int)INT_MAX + 1) / 2;
-+
-+	misalignment = rreq->start & (rsize - 1);
-+	if (misalignment) {
-+		rreq->start -= misalignment;
-+		rreq->len += misalignment;
-+	}
-+
-+	rreq->len = round_up(rreq->len, rsize);
-+	if (rreq->start < i_size && rreq->len > i_size - rreq->start)
-+		rreq->len = i_size - rreq->start;
-+}
-+
-+/*
-+ * Completion of a request operation.
-+ */
-+static void cifs_rreq_done(struct netfs_io_request *rreq)
-+{
-+	struct timespec64 atime, mtime;
-+	struct inode *inode = rreq->inode;
-+
-+	/* we do not want atime to be less than mtime, it broke some apps */
-+	atime = inode_set_atime_to_ts(inode, current_time(inode));
-+	mtime = inode_get_mtime(inode);
-+	if (timespec64_compare(&atime, &mtime))
-+		inode_set_atime_to_ts(inode, inode_get_mtime(inode));
-+}
-+
-+static void cifs_post_modify(struct inode *inode)
-+{
-+	/* Indication to update ctime and mtime as close is deferred */
-+	set_bit(CIFS_INO_MODIFIED_ATTR, &CIFS_I(inode)->flags);
-+}
-+
-+static void cifs_free_request(struct netfs_io_request *rreq)
-+{
-+	struct cifs_io_request *req = container_of(rreq, struct cifs_io_request, rreq);
-+
-+	if (req->cfile)
-+		cifsFileInfo_put(req->cfile);
-+}
-+
-+static void cifs_free_subrequest(struct netfs_io_subrequest *subreq)
-+{
-+	struct cifs_io_subrequest *rdata =
-+		container_of(subreq, struct cifs_io_subrequest, subreq);
-+	int rc;
-+
-+	if (rdata->subreq.source == NETFS_DOWNLOAD_FROM_SERVER) {
-+#ifdef CONFIG_CIFS_SMB_DIRECT
-+		if (rdata->mr) {
-+			smbd_deregister_mr(rdata->mr);
-+			rdata->mr = NULL;
-+		}
-+#endif
-+
-+		if (rdata->have_credits)
-+			add_credits_and_wake_if(rdata->server, &rdata->credits, 0);
-+		rc = subreq->error;
-+		free_xid(rdata->xid);
-+	}
-+}
-+
-+const struct netfs_request_ops cifs_req_ops = {
-+	.io_request_size	= sizeof(struct cifs_io_request),
-+	.io_subrequest_size	= sizeof(struct cifs_io_subrequest),
-+	.init_request		= cifs_init_request,
-+	.free_request		= cifs_free_request,
-+	.free_subrequest	= cifs_free_subrequest,
-+	.expand_readahead	= cifs_expand_readahead,
-+	.clamp_length		= cifs_clamp_length,
-+	.issue_read		= cifs_req_issue_read,
-+	.done			= cifs_rreq_done,
-+	.post_modify		= cifs_post_modify,
-+	.create_write_requests	= cifs_create_write_requests,
-+};
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index ae7a6aedc7cb..9412ec886df1 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -26,6 +26,11 @@ void netfs_rreq_unlock_folios(struct netfs_io_request *rreq);
+ int netfs_prefetch_for_write(struct file *file, struct folio *folio,
+ 			     size_t offset, size_t len);
  
++/*
++ * crypto.c
++ */
++bool netfs_encrypt(struct netfs_io_request *wreq);
++
  /*
-  * Remove the dirty flags from a span of pages.
+  * direct_write.c
+  */
+diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+index 16252cc4576e..8e4585216fc7 100644
+--- a/fs/netfs/objects.c
++++ b/fs/netfs/objects.c
+@@ -45,6 +45,8 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
+ 	refcount_set(&rreq->ref, 1);
+ 
+ 	__set_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
++	if (test_bit(NETFS_ICTX_ENCRYPTED, &ctx->flags))
++		__set_bit(NETFS_RREQ_CONTENT_ENCRYPTION, &rreq->flags);
+ 	if (cached)
+ 		__set_bit(NETFS_RREQ_WRITE_TO_CACHE, &rreq->flags);
+ 	if (file && file->f_flags & O_NONBLOCK)
+diff --git a/fs/netfs/output.c b/fs/netfs/output.c
+index cc9065733b42..c0ac3ac57861 100644
+--- a/fs/netfs/output.c
++++ b/fs/netfs/output.c
+@@ -364,7 +364,11 @@ int netfs_begin_write(struct netfs_io_request *wreq, bool may_wait,
+ 	 * background whilst we generate a list of write ops that we want to
+ 	 * perform.
+ 	 */
+-	// TODO: Encrypt or compress the region as appropriate
++	if (test_bit(NETFS_RREQ_CONTENT_ENCRYPTION, &wreq->flags) &&
++	    !netfs_encrypt(wreq)) {
++		may_wait = true;
++		goto out;
++	}
+ 
+ 	/* We need to write all of the region to the cache */
+ 	if (test_bit(NETFS_RREQ_WRITE_TO_CACHE, &wreq->flags))
+@@ -376,6 +380,7 @@ int netfs_begin_write(struct netfs_io_request *wreq, bool may_wait,
+ 	if (test_bit(NETFS_RREQ_UPLOAD_TO_SERVER, &wreq->flags))
+ 		ctx->ops->create_write_requests(wreq, wreq->start, wreq->len);
+ 
++out:
+ 	if (atomic_dec_and_test(&wreq->nr_outstanding))
+ 		netfs_write_terminated(wreq, false);
+ 
 diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 29072b6418c3..39ff06dd4c17 100644
+index 69ff5d652931..c2985f73d870 100644
 --- a/include/linux/netfs.h
 +++ b/include/linux/netfs.h
-@@ -323,6 +323,7 @@ struct netfs_request_ops {
+@@ -19,6 +19,7 @@
+ #include <linux/pagemap.h>
+ #include <linux/uio.h>
  
- 	/* Modification handling */
- 	void (*update_i_size)(struct inode *inode, loff_t i_size);
-+	void (*post_modify)(struct inode *inode);
++struct scatterlist;
+ enum netfs_sreq_ref_trace;
  
- 	/* Write request handling */
+ /*
+@@ -139,7 +140,9 @@ struct netfs_inode {
+ 	unsigned long		flags;
+ #define NETFS_ICTX_ODIRECT	0		/* The file has DIO in progress */
+ #define NETFS_ICTX_UNBUFFERED	1		/* I/O should not use the pagecache */
++#define NETFS_ICTX_ENCRYPTED	2		/* The file contents are encrypted */
+ 	unsigned char		min_bshift;	/* log2 min block size for bounding box or 0 */
++	unsigned char		crypto_bshift;	/* log2 of crypto block size */
+ };
+ 
+ /*
+@@ -285,6 +288,8 @@ struct netfs_io_request {
+ #define NETFS_RREQ_UPLOAD_TO_SERVER	8	/* Need to write to the server */
+ #define NETFS_RREQ_NONBLOCK		9	/* Don't block if possible (O_NONBLOCK) */
+ #define NETFS_RREQ_BLOCKED		10	/* We blocked */
++#define NETFS_RREQ_CONTENT_ENCRYPTION	11	/* Content encryption is in use */
++#define NETFS_RREQ_CRYPT_IN_PLACE	12	/* Enc/dec in place in ->io_iter */
+ 	const struct netfs_request_ops *netfs_ops;
+ 	void (*cleanup)(struct netfs_io_request *req);
+ };
+@@ -315,6 +320,11 @@ struct netfs_request_ops {
  	void (*create_write_requests)(struct netfs_io_request *wreq,
+ 				      loff_t start, size_t len);
+ 	void (*invalidate_cache)(struct netfs_io_request *wreq);
++
++	/* Content encryption */
++	int (*encrypt_block)(struct netfs_io_request *wreq, loff_t pos, size_t len,
++			     struct scatterlist *source_sg, unsigned int n_source,
++			     struct scatterlist *dest_sg, unsigned int n_dest);
+ };
+ 
+ /*
+@@ -464,6 +474,7 @@ static inline void netfs_inode_init(struct netfs_inode *ctx,
+ 	ctx->remote_i_size = i_size_read(&ctx->inode);
+ 	ctx->flags = 0;
+ 	ctx->min_bshift = 0;
++	ctx->crypto_bshift = 0;
+ #if IS_ENABLED(CONFIG_FSCACHE)
+ 	ctx->cache = NULL;
+ #endif
 diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index fcf4e41e280d..6d39292559bf 100644
+index 914a24b03d08..3f50819613e2 100644
 --- a/include/trace/events/netfs.h
 +++ b/include/trace/events/netfs.h
-@@ -106,6 +106,7 @@
- #define netfs_sreq_ref_traces					\
- 	EM(netfs_sreq_trace_get_copy_to_cache,	"GET COPY2C ")	\
- 	EM(netfs_sreq_trace_get_resubmit,	"GET RESUBMIT")	\
-+	EM(netfs_sreq_trace_get_submit,		"GET SUBMIT")	\
- 	EM(netfs_sreq_trace_get_short_read,	"GET SHORTRD")	\
- 	EM(netfs_sreq_trace_new,		"NEW        ")	\
- 	EM(netfs_sreq_trace_put_clear,		"PUT CLEAR  ")	\
+@@ -41,6 +41,7 @@
+ 	EM(netfs_rreq_trace_assess,		"ASSESS ")	\
+ 	EM(netfs_rreq_trace_copy,		"COPY   ")	\
+ 	EM(netfs_rreq_trace_done,		"DONE   ")	\
++	EM(netfs_rreq_trace_encrypt,		"ENCRYPT")	\
+ 	EM(netfs_rreq_trace_free,		"FREE   ")	\
+ 	EM(netfs_rreq_trace_redirty,		"REDIRTY")	\
+ 	EM(netfs_rreq_trace_resubmit,		"RESUBMT")	\
+@@ -76,6 +77,7 @@
+ 	EM(netfs_fail_copy_to_cache,		"copy-to-cache")	\
+ 	EM(netfs_fail_dio_read_short,		"dio-read-short")	\
+ 	EM(netfs_fail_dio_read_zero,		"dio-read-zero")	\
++	EM(netfs_fail_encryption,		"encryption")		\
+ 	EM(netfs_fail_read,			"read")			\
+ 	EM(netfs_fail_short_read,		"short-read")		\
+ 	EM(netfs_fail_prepare_write,		"prep-write")		\
 
