@@ -1,82 +1,72 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="mXUBpnum"
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2FFD53
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 09:40:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-ID:Cc:To:From:Date;
-	bh=6Dx/xHDA5bswLH7hOt9ozbRBLobX7v1+DWHkXXnAEGU=; b=mXUBpnumu8oIKipJijbTqMSLG1
-	ZfQNW3yQAEwVsb1s6Zv/FEDD5xnKvuqLAKEEbBrICGXxLr1Z0A8kFJJTFWn+aZfFjYjU+H1MLHGVS
-	LS1LUggLofb7ADhdbm3xq5xXVS0+fGSJuuErwuS5B21AsImLtxlKOavPNjS9LQ4DYax0MrQK/aJOn
-	1WGntH5Y4JKHasXz5Y3cANDUUpQxkkY+kP0MfRpnQ/T5WuXfeOIvTx+CIsDzxo4KQP9eh4U28Z40w
-	31Av1CshYvJ8g0onhUczhVxowycjIBoPG/GIX2pCWqXhAVd7M+JRxPrziub+piMNWvFOwJRDEWB2V
-	iVddDpsTOdK3xuhJvhHhY7je+62bf/6JTU2gebfuhhmJVkZ/MJj4cmLVJaFBkMU3S9ayM1M/l6ngH
-	QRoi8CXw9CzjE5/0iwWDZSlkMYtGrWvRbBRGtVmkEsNZdtsWZUT+MBDqY+PCNUoUN99gte60yWu9b
-	g6Oayszt97c53mKHXHkaJoD3;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1rBIMI-002QYw-0w;
-	Thu, 07 Dec 2023 17:40:24 +0000
-Date: Thu, 7 Dec 2023 09:40:18 -0800
-From: Jeremy Allison <jra@samba.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
-	ronniesahlberg@gmail.com, Tom Talpey <tom@talpey.com>,
-	Stefan Metzmacher <metze@samba.org>, jlayton@kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: Re: Can fallocate() ops be emulated better using SMB request
- compounding?
-Message-ID: <ZXIDgvZ8/iBhYXwy@jeremy-HP-Z840-Workstation>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <700923.1701964726@warthog.procyon.org.uk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gDwVYsb7"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8701210DA
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 09:51:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1701971460;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IocSxJJV+aeVvbf5dVtiipJ1I/lExGhWur9qd5IRbhM=;
+	b=gDwVYsb79Cfz7d+QcF1MyQy2kZJ+ZxlSBbSni4mYoGFTV8rrnSCTcToY788EO8UMf+3APu
+	PWB/yzmfCDKIGTR7vBEKCtlNQ8zaFHcM4J6kXCZQbt33L6PeYGWA3tVCViqAlq83RkT8Pv
+	kSRoKc43EI9yW4DcltsCKKTLxhVf1Jg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-252-FlwmlI5vNmODlFIOVUiARA-1; Thu, 07 Dec 2023 12:50:53 -0500
+X-MC-Unique: FlwmlI5vNmODlFIOVUiARA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7B96A185A780;
+	Thu,  7 Dec 2023 17:50:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.161])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 318351121312;
+	Thu,  7 Dec 2023 17:50:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <ZXIDgvZ8/iBhYXwy@jeremy-HP-Z840-Workstation>
+References: <ZXIDgvZ8/iBhYXwy@jeremy-HP-Z840-Workstation> <700923.1701964726@warthog.procyon.org.uk>
+To: Jeremy Allison <jra@samba.org>
+Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+    Namjae Jeon <linkinjeon@kernel.org>, ronniesahlberg@gmail.com,
+    Tom Talpey <tom@talpey.com>, Stefan Metzmacher <metze@samba.org>,
+    jlayton@kernel.org, linux-cifs@vger.kernel.org,
+    samba-technical@lists.samba.org
+Subject: Re: Can fallocate() ops be emulated better using SMB request compounding?
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <700923.1701964726@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1215460.1701971450.1@warthog.procyon.org.uk>
+Date: Thu, 07 Dec 2023 17:50:50 +0000
+Message-ID: <1215461.1701971450@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Thu, Dec 07, 2023 at 03:58:46PM +0000, David Howells wrote:
->Hi Steve, Namjae, Jeremy,
->
->At the moment certain fallocate() operations aren't very well implemented in
->the cifs filesystem on Linux, either because the protocol doesn't fully
->support them or because the ops being used don't also set the EOF marker at
->the same time and a separate RPC must be made to do that.
->
->For instance:
->
-> - FALLOC_FL_ZERO_RANGE does some zeroing and then sets the EOF as two
->   distinctly separate operations.  The code prevents you from doing this op
->   under some circumstances as it doesn't have an oplock and doesn't want to
->   race with a third party (note that smb3_punch_hole() doesn't have this
->   check).
->
-> - FALLOC_FL_COLLAPSE_RANGE uses COPYCHUNK to move the file down and then sets
->   the EOF as two separate operations as there is no protocol op for this.
->   However, the copy will likely fail if the ranges overlap and it's
->   non-atomic with respect to a third party.
->
-> - FALLOC_FL_INSERT_RANGE has the same issues as FALLOC_FL_COLLAPSE_RANGE.
->
->Question: Would it be possible to do all of these better by using compounding
->with SMB2_FLAGS_RELATED_OPERATIONS?  In particular, if two components of a
->compound are marked related, does the second get skipped if the first fails?
+Jeremy Allison <jra@samba.org> wrote:
 
-Yes:
+> >Further, are the two ops then essentially done atomically?
+> 
+> No. They are processed (at least in Samba) as two separate
+> requests and can be raced by local or other remote access.
 
-https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/46dd4182-62d3-4e30-9fe5-e2ec124edca1
+So just compounding them would leave us in the same situation we are in now -
+which would be fine.
 
-"When the current operation requires a FileId and the previous operation
-either contains or generates a FileId, if the previous operation fails
-with an error, the server SHOULD<253> fail the current operation with
-the same error code returned by the previous operation."
+What do you think about the idea of having the server see a specifically
+arranged compounded pair and turn them into an op that can't otherwise be
+represented in the protocol?
 
->Further, are the two ops then essentially done atomically?
+Or is it better to try and get the protocol extended?
 
-No. They are processed (at least in Samba) as two separate
-requests and can be raced by local or other remote access.
+David
+
