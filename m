@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GzfqPDFC"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748C447BB
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:25:48 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+/4RJMo"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7900C35AC
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:24:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701984326;
+	s=mimecast20190719; t=1701984243;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CTmXKlaARSc+/4qCQwpNxe6YLvLKHn4pqqsvYn+RGCg=;
-	b=GzfqPDFCXcBNZRrx0TB7dSNqZGBN/gZsoqT4nBusZyLxnk3wZoxLqnnXmul+Zfemnsg5Xj
-	LMm2FZThL2L7ADi7QmKZ/dGRMbPissc1hTRr4PJSwQMLJdB0+Cu4u3sRoyPCrTuVjEEMXw
-	rBkJaQK/9gjVXMAC6uB5sWgT0UXnhvg=
+	bh=bK45Roxm3IC/nkVEsH43k2qGwF+l+q9rJ2GGBczBW+0=;
+	b=K+/4RJMoX4mj6jkn7l7Ab1yRPLT+gGMHZ47+BI4l5Zf3HWA8l75/2VgANkUXJKGxQy7rxv
+	VSCyWXsNjZtzjps9Q8kN/IbqAnnnJY8AjwD+1PTgzbwzXH81wjQVkFmObmk+2HZu+TAdrS
+	sxLe87fUpwpuH3eaPsjr6X8/GV1tjj8=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-679-td7G57ocMXuIQoNIfh4pWA-1; Thu,
- 07 Dec 2023 16:25:23 -0500
-X-MC-Unique: td7G57ocMXuIQoNIfh4pWA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-posFfXSVM5iCUojQBMehhw-1; Thu,
+ 07 Dec 2023 16:23:57 -0500
+X-MC-Unique: posFfXSVM5iCUojQBMehhw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ED3E53C40B56;
-	Thu,  7 Dec 2023 21:25:21 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5D1CE29AC011;
+	Thu,  7 Dec 2023 21:23:55 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EFF6C3C2E;
-	Thu,  7 Dec 2023 21:25:18 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BF5661C060BC;
+	Thu,  7 Dec 2023 21:23:52 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -49,13 +49,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: [PATCH v3 54/59] cifs: Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c
-Date: Thu,  7 Dec 2023 21:22:01 +0000
-Message-ID: <20231207212206.1379128-55-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 30/59] netfs: Implement buffered write API
+Date: Thu,  7 Dec 2023 21:21:37 +0000
+Message-ID: <20231207212206.1379128-31-dhowells@redhat.com>
 In-Reply-To: <20231207212206.1379128-1-dhowells@redhat.com>
 References: <20231207212206.1379128-1-dhowells@redhat.com>
 Precedence: bulk
@@ -65,168 +62,127 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c so that
-they are colocated with similar functions rather than being split with
-cifsfs.c.
+Institute a netfs write helper, netfs_file_write_iter(), to be pointed at
+by the network filesystem ->write_iter() call.  Make it handled buffered
+writes by calling the previously defined netfs_perform_write() to copy the
+source data into the pagecache.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
 cc: Jeff Layton <jlayton@kernel.org>
-cc: linux-cifs@vger.kernel.org
 cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/smb/client/cifsfs.c | 55 ------------------------------------------
- fs/smb/client/cifsfs.h |  2 ++
- fs/smb/client/file.c   | 53 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+), 55 deletions(-)
+ fs/netfs/buffered_write.c | 83 +++++++++++++++++++++++++++++++++++++++
+ include/linux/netfs.h     |  3 ++
+ 2 files changed, 86 insertions(+)
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index ebe04c78a955..1cd9309e46f7 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -981,61 +981,6 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
- 	return root;
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index b76688e98f81..f244123ab568 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -333,3 +333,86 @@ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
+ 	goto out;
  }
- 
--
--static ssize_t
--cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
--{
--	ssize_t rc;
--	struct inode *inode = file_inode(iocb->ki_filp);
--
--	if (iocb->ki_flags & IOCB_DIRECT)
--		return cifs_user_readv(iocb, iter);
--
--	rc = cifs_revalidate_mapping(inode);
--	if (rc)
--		return rc;
--
--	return generic_file_read_iter(iocb, iter);
--}
--
--static ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
--{
--	struct inode *inode = file_inode(iocb->ki_filp);
--	struct cifsInodeInfo *cinode = CIFS_I(inode);
--	ssize_t written;
--	int rc;
--
--	if (iocb->ki_filp->f_flags & O_DIRECT) {
--		written = cifs_user_writev(iocb, from);
--		if (written > 0 && CIFS_CACHE_READ(cinode)) {
--			cifs_zap_mapping(inode);
--			cifs_dbg(FYI,
--				 "Set no oplock for inode=%p after a write operation\n",
--				 inode);
--			cinode->oplock = 0;
--		}
--		return written;
--	}
--
--	written = cifs_get_writer(cinode);
--	if (written)
--		return written;
--
--	written = generic_file_write_iter(iocb, from);
--
--	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
--		goto out;
--
--	rc = filemap_fdatawrite(inode->i_mapping);
--	if (rc)
--		cifs_dbg(FYI, "cifs_file_write_iter: %d rc on %p inode\n",
--			 rc, inode);
--
--out:
--	cifs_put_writer(cinode);
--	return written;
--}
--
- static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
- {
- 	struct cifsFileInfo *cfile = file->private_data;
-diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
-index 3adea10aa9da..28c41c449205 100644
---- a/fs/smb/client/cifsfs.h
-+++ b/fs/smb/client/cifsfs.h
-@@ -100,6 +100,8 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
- extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
- extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
- extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
-+ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from);
-+ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter);
- extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
- extern int cifs_lock(struct file *, int, struct file_lock *);
- extern int cifs_fsync(struct file *, loff_t, loff_t, int);
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 255d78581e56..dfeb8cb86d61 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -4567,6 +4567,59 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
- 	return __cifs_readv(iocb, to, false);
- }
- 
-+ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ EXPORT_SYMBOL(netfs_perform_write);
++
++/**
++ * netfs_buffered_write_iter_locked - write data to a file
++ * @iocb:	IO state structure (file, offset, etc.)
++ * @from:	iov_iter with data to write
++ * @netfs_group: Grouping for dirty pages (eg. ceph snaps).
++ *
++ * This function does all the work needed for actually writing data to a
++ * file. It does all basic checks, removes SUID from the file, updates
++ * modification times and calls proper subroutines depending on whether we
++ * do direct IO or a standard buffered write.
++ *
++ * The caller must hold appropriate locks around this function and have called
++ * generic_write_checks() already.  The caller is also responsible for doing
++ * any necessary syncing afterwards.
++ *
++ * This function does *not* take care of syncing data in case of O_SYNC write.
++ * A caller has to handle it. This is mainly due to the fact that we want to
++ * avoid syncing under i_rwsem.
++ *
++ * Return:
++ * * number of bytes written, even for truncated writes
++ * * negative error code if no data has been written at all
++ */
++ssize_t netfs_buffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *from,
++					 struct netfs_group *netfs_group)
 +{
-+	ssize_t rc;
-+	struct inode *inode = file_inode(iocb->ki_filp);
++	struct file *file = iocb->ki_filp;
++	ssize_t ret;
 +
-+	if (iocb->ki_flags & IOCB_DIRECT)
-+		return cifs_user_readv(iocb, iter);
++	trace_netfs_write_iter(iocb, from);
 +
-+	rc = cifs_revalidate_mapping(inode);
-+	if (rc)
-+		return rc;
++	ret = file_remove_privs(file);
++	if (ret)
++		return ret;
 +
-+	return generic_file_read_iter(iocb, iter);
++	ret = file_update_time(file);
++	if (ret)
++		return ret;
++
++	return netfs_perform_write(iocb, from, netfs_group);
 +}
++EXPORT_SYMBOL(netfs_buffered_write_iter_locked);
 +
-+ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
++/**
++ * netfs_file_write_iter - write data to a file
++ * @iocb: IO state structure
++ * @from: iov_iter with data to write
++ *
++ * Perform a write to a file, writing into the pagecache if possible and doing
++ * an unbuffered write instead if not.
++ *
++ * Return:
++ * * Negative error code if no data has been written at all of
++ *   vfs_fsync_range() failed for a synchronous write
++ * * Number of bytes written, even for truncated writes
++ */
++ssize_t netfs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
 +{
-+	struct inode *inode = file_inode(iocb->ki_filp);
-+	struct cifsInodeInfo *cinode = CIFS_I(inode);
-+	ssize_t written;
-+	int rc;
++	struct file *file = iocb->ki_filp;
++	struct inode *inode = file->f_mapping->host;
++	struct netfs_inode *ictx = netfs_inode(inode);
++	ssize_t ret;
 +
-+	if (iocb->ki_filp->f_flags & O_DIRECT) {
-+		written = cifs_user_writev(iocb, from);
-+		if (written > 0 && CIFS_CACHE_READ(cinode)) {
-+			cifs_zap_mapping(inode);
-+			cifs_dbg(FYI,
-+				 "Set no oplock for inode=%p after a write operation\n",
-+				 inode);
-+			cinode->oplock = 0;
-+		}
-+		return written;
-+	}
++	_enter("%llx,%zx,%llx", iocb->ki_pos, iov_iter_count(from), i_size_read(inode));
 +
-+	written = cifs_get_writer(cinode);
-+	if (written)
-+		return written;
++	if ((iocb->ki_flags & IOCB_DIRECT) ||
++	    test_bit(NETFS_ICTX_UNBUFFERED, &ictx->flags))
++		return netfs_unbuffered_write_iter(iocb, from);
 +
-+	written = generic_file_write_iter(iocb, from);
++	ret = netfs_start_io_write(inode);
++	if (ret < 0)
++		return ret;
 +
-+	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
-+		goto out;
-+
-+	rc = filemap_fdatawrite(inode->i_mapping);
-+	if (rc)
-+		cifs_dbg(FYI, "cifs_file_write_iter: %d rc on %p inode\n",
-+			 rc, inode);
-+
-+out:
-+	cifs_put_writer(cinode);
-+	return written;
++	ret = generic_write_checks(iocb, from);
++	if (ret > 0)
++		ret = netfs_buffered_write_iter_locked(iocb, from, NULL);
++	netfs_end_io_write(inode);
++	if (ret > 0)
++		ret = generic_write_sync(iocb, ret);
++	return ret;
 +}
-+
- ssize_t
- cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to)
- {
++EXPORT_SYMBOL(netfs_file_write_iter);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 00c87f4e809c..702b864a4993 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -385,7 +385,10 @@ ssize_t netfs_unbuffered_read_iter(struct kiocb *iocb, struct iov_iter *iter);
+ /* High-level write API */
+ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
+ 			    struct netfs_group *netfs_group);
++ssize_t netfs_buffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *from,
++					 struct netfs_group *netfs_group);
+ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from);
++ssize_t netfs_file_write_iter(struct kiocb *iocb, struct iov_iter *from);
+ 
+ /* Address operations API */
+ struct readahead_control;
 
