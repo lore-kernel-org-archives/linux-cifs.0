@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bNWsIC5u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pn25jT4g"
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C92763ABD
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:24:26 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46D3E385C
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:24:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701984260;
+	s=mimecast20190719; t=1701984247;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=C7Yf3Gyz2poDrlJ/i6bRFpW4r3T86H5wARr3qsse2RM=;
-	b=bNWsIC5uceWzi9heB0FTGPaxX0iOpYOPKKWV3bgEfzA+iks5uSzmUp5zES+A9a55z67rev
-	MRlH0t1pChCCkxvQ8/pcmCik7cnk/xb+J4CLLNmRgZT/gZg05yJGHcMtXhq1Wj6yC1OQ40
-	8iNyHhGKjh1XPjRaCe7vuyEHipvh2Bk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-8zEOlF5DPGemNRiwVlcCcg-1; Thu,
- 07 Dec 2023 16:24:17 -0500
-X-MC-Unique: 8zEOlF5DPGemNRiwVlcCcg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	bh=BBeV+gPa6exSN5f9Ij71agEQGyyesbGBrZnLGz9yhJU=;
+	b=Pn25jT4gHEPBbzqhiyw1V97qur+I1p6D4SzmUAxkhMFxGfTM2c8WtXdTOaO0OJsXT8iqK2
+	rG3Li8BFQFNo4AaWgyJ6lpBu6es50pB337MRxI4fi88xDOoDFQ3w96qyjUUfcIfde5yXAU
+	EZWT+mhWRGQs0H32mYQ7hN159+4fQgA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-467-xRXaFeGcNgOaRy7C7CAhjw-1; Thu, 07 Dec 2023 16:24:03 -0500
+X-MC-Unique: xRXaFeGcNgOaRy7C7CAhjw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A78C93C40B58;
-	Thu,  7 Dec 2023 21:24:15 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 17FBE870825;
+	Thu,  7 Dec 2023 21:24:02 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1024B1C060AF;
-	Thu,  7 Dec 2023 21:24:12 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6E8473C35;
+	Thu,  7 Dec 2023 21:23:59 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -50,9 +50,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 36/59] netfs: Make netfs_skip_folio_read() take account of blocksize
-Date: Thu,  7 Dec 2023 21:21:43 +0000
-Message-ID: <20231207212206.1379128-37-dhowells@redhat.com>
+Subject: [PATCH v3 32/59] netfs: Provide netfs_file_read_iter()
+Date: Thu,  7 Dec 2023 21:21:39 +0000
+Message-ID: <20231207212206.1379128-33-dhowells@redhat.com>
 In-Reply-To: <20231207212206.1379128-1-dhowells@redhat.com>
 References: <20231207212206.1379128-1-dhowells@redhat.com>
 Precedence: bulk
@@ -62,10 +62,10 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Make netfs_skip_folio_read() take account of blocksize such as crypto
-blocksize.
+Provide a top-level-ish function that can be pointed to directly by
+->read_iter file op.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Jeff Layton <jlayton@kernel.org>
@@ -73,80 +73,102 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/buffered_read.c | 32 +++++++++++++++++++++-----------
- 1 file changed, 21 insertions(+), 11 deletions(-)
+ fs/netfs/buffered_read.c | 73 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/netfs.h    |  2 ++
+ 2 files changed, 75 insertions(+)
 
 diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index 0d47e5ea6870..8b27ef2e78ca 100644
+index 950f63fc156a..a59e7b2edaac 100644
 --- a/fs/netfs/buffered_read.c
 +++ b/fs/netfs/buffered_read.c
-@@ -331,6 +331,7 @@ EXPORT_SYMBOL(netfs_read_folio);
- 
- /*
-  * Prepare a folio for writing without reading first
-+ * @ctx: File context
-  * @folio: The folio being prepared
-  * @pos: starting position for the write
-  * @len: length of write
-@@ -344,32 +345,41 @@ EXPORT_SYMBOL(netfs_read_folio);
-  * If any of these criteria are met, then zero out the unwritten parts
-  * of the folio and return true. Otherwise, return false.
-  */
--static bool netfs_skip_folio_read(struct folio *folio, loff_t pos, size_t len,
--				 bool always_fill)
-+static bool netfs_skip_folio_read(struct netfs_inode *ctx, struct folio *folio,
-+				  loff_t pos, size_t len, bool always_fill)
- {
- 	struct inode *inode = folio_inode(folio);
--	loff_t i_size = i_size_read(inode);
-+	loff_t i_size = i_size_read(inode), low, high;
- 	size_t offset = offset_in_folio(folio, pos);
- 	size_t plen = folio_size(folio);
-+	size_t min_bsize = 1UL << ctx->min_bshift;
+@@ -558,3 +558,76 @@ int netfs_prefetch_for_write(struct file *file, struct folio *folio,
+ 	_leave(" = %d", ret);
+ 	return ret;
+ }
 +
-+	if (likely(min_bsize == 1)) {
-+		low = folio_file_pos(folio);
-+		high = low + plen;
-+	} else {
-+		low = round_down(pos, min_bsize);
-+		high = round_up(pos + len, min_bsize);
++/**
++ * netfs_buffered_read_iter - Filesystem buffered I/O read routine
++ * @iocb: kernel I/O control block
++ * @iter: destination for the data read
++ *
++ * This is the ->read_iter() routine for all filesystems that can use the page
++ * cache directly.
++ *
++ * The IOCB_NOWAIT flag in iocb->ki_flags indicates that -EAGAIN shall be
++ * returned when no data can be read without waiting for I/O requests to
++ * complete; it doesn't prevent readahead.
++ *
++ * The IOCB_NOIO flag in iocb->ki_flags indicates that no new I/O requests
++ * shall be made for the read or for readahead.  When no data can be read,
++ * -EAGAIN shall be returned.  When readahead would be triggered, a partial,
++ * possibly empty read shall be returned.
++ *
++ * Return:
++ * * number of bytes copied, even for partial reads
++ * * negative error code (or 0 if IOCB_NOIO) if nothing was read
++ */
++ssize_t netfs_buffered_read_iter(struct kiocb *iocb, struct iov_iter *iter)
++{
++	struct inode *inode = file_inode(iocb->ki_filp);
++	struct netfs_inode *ictx = netfs_inode(inode);
++	ssize_t ret;
++
++	if (WARN_ON_ONCE((iocb->ki_flags & IOCB_DIRECT) ||
++			 test_bit(NETFS_ICTX_UNBUFFERED, &ictx->flags)))
++		return -EINVAL;
++
++	ret = netfs_start_io_read(inode);
++	if (ret == 0) {
++		ret = filemap_read(iocb, iter, 0);
++		netfs_end_io_read(inode);
 +	}
++	return ret;
++}
++EXPORT_SYMBOL(netfs_buffered_read_iter);
++
++/**
++ * netfs_file_read_iter - Generic filesystem read routine
++ * @iocb: kernel I/O control block
++ * @iter: destination for the data read
++ *
++ * This is the ->read_iter() routine for all filesystems that can use the page
++ * cache directly.
++ *
++ * The IOCB_NOWAIT flag in iocb->ki_flags indicates that -EAGAIN shall be
++ * returned when no data can be read without waiting for I/O requests to
++ * complete; it doesn't prevent readahead.
++ *
++ * The IOCB_NOIO flag in iocb->ki_flags indicates that no new I/O requests
++ * shall be made for the read or for readahead.  When no data can be read,
++ * -EAGAIN shall be returned.  When readahead would be triggered, a partial,
++ * possibly empty read shall be returned.
++ *
++ * Return:
++ * * number of bytes copied, even for partial reads
++ * * negative error code (or 0 if IOCB_NOIO) if nothing was read
++ */
++ssize_t netfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
++{
++	struct netfs_inode *ictx = netfs_inode(iocb->ki_filp->f_mapping->host);
++
++	if ((iocb->ki_flags & IOCB_DIRECT) ||
++	    test_bit(NETFS_ICTX_UNBUFFERED, &ictx->flags))
++		return netfs_unbuffered_read_iter(iocb, iter);
++
++	return netfs_buffered_read_iter(iocb, iter);
++}
++EXPORT_SYMBOL(netfs_file_read_iter);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 46c0a6b45bb8..638f42fdaef5 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -381,6 +381,8 @@ struct netfs_cache_ops {
  
- 	if (unlikely(always_fill)) {
--		if (pos - offset + len <= i_size)
--			return false; /* Page entirely before EOF */
-+		if (low < i_size)
-+			return false; /* Some part of the block before EOF */
- 		zero_user_segment(&folio->page, 0, plen);
- 		folio_mark_uptodate(folio);
- 		return true;
- 	}
+ /* High-level read API. */
+ ssize_t netfs_unbuffered_read_iter(struct kiocb *iocb, struct iov_iter *iter);
++ssize_t netfs_buffered_read_iter(struct kiocb *iocb, struct iov_iter *iter);
++ssize_t netfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter);
  
--	/* Full folio write */
--	if (offset == 0 && len >= plen)
-+	/* Full page write */
-+	if (pos == low && high == pos + len)
- 		return true;
- 
--	/* Page entirely beyond the end of the file */
--	if (pos - offset >= i_size)
-+	/* pos beyond last page in the file */
-+	if (low >= i_size)
- 		goto zero_out;
- 
- 	/* Write that covers from the start of the folio to EOF or beyond */
--	if (offset == 0 && (pos + len) >= i_size)
-+	if (pos == low && (pos + len) >= i_size)
- 		goto zero_out;
- 
- 	return false;
-@@ -448,7 +458,7 @@ int netfs_write_begin(struct netfs_inode *ctx,
- 	 * to preload the granule.
- 	 */
- 	if (!netfs_is_cache_enabled(ctx) &&
--	    netfs_skip_folio_read(folio, pos, len, false)) {
-+	    netfs_skip_folio_read(ctx, folio, pos, len, false)) {
- 		netfs_stat(&netfs_n_rh_write_zskip);
- 		goto have_folio_no_wait;
- 	}
+ /* High-level write API */
+ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
 
