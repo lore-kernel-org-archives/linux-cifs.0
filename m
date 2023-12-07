@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pn25jT4g"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7lXiVPX"
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46D3E385C
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:24:08 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163EF4215
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:24:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701984247;
+	s=mimecast20190719; t=1701984269;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BBeV+gPa6exSN5f9Ij71agEQGyyesbGBrZnLGz9yhJU=;
-	b=Pn25jT4gHEPBbzqhiyw1V97qur+I1p6D4SzmUAxkhMFxGfTM2c8WtXdTOaO0OJsXT8iqK2
-	rG3Li8BFQFNo4AaWgyJ6lpBu6es50pB337MRxI4fi88xDOoDFQ3w96qyjUUfcIfde5yXAU
-	EZWT+mhWRGQs0H32mYQ7hN159+4fQgA=
+	bh=5weY3TAEZXAYDCmBDEVYygYM1kFM1iNPdRbIVf5ORpg=;
+	b=W7lXiVPXUikMnn1Z6XOnXLlel+XOSI96RX8icn45j1cFWqMkTlbnKNiQ8Vt8K6q9xS0u7X
+	Npg/LFzP/zFS88jIkYPXDHqv88F8TM2RBQ1KlfKhnd8vTzFFSA5Ob+E/aUdg5tcthU5I9n
+	AziLucPaZbGkc3tfOy9uoSBEbmQI9Lk=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-xRXaFeGcNgOaRy7C7CAhjw-1; Thu, 07 Dec 2023 16:24:03 -0500
-X-MC-Unique: xRXaFeGcNgOaRy7C7CAhjw-1
+ us-mta-641-qyXwTIyJO_uXXDNIGmcfsw-1; Thu, 07 Dec 2023 16:24:26 -0500
+X-MC-Unique: qyXwTIyJO_uXXDNIGmcfsw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 17FBE870825;
-	Thu,  7 Dec 2023 21:24:02 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A05CA870820;
+	Thu,  7 Dec 2023 21:24:25 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6E8473C35;
-	Thu,  7 Dec 2023 21:23:59 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 096233C2E;
+	Thu,  7 Dec 2023 21:24:22 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -50,9 +50,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 32/59] netfs: Provide netfs_file_read_iter()
-Date: Thu,  7 Dec 2023 21:21:39 +0000
-Message-ID: <20231207212206.1379128-33-dhowells@redhat.com>
+Subject: [PATCH v3 39/59] netfs: Support decryption on ubuffered/DIO read
+Date: Thu,  7 Dec 2023 21:21:46 +0000
+Message-ID: <20231207212206.1379128-40-dhowells@redhat.com>
 In-Reply-To: <20231207212206.1379128-1-dhowells@redhat.com>
 References: <20231207212206.1379128-1-dhowells@redhat.com>
 Precedence: bulk
@@ -64,8 +64,10 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Provide a top-level-ish function that can be pointed to directly by
-->read_iter file op.
+Support unbuffered and direct I/O reads from an encrypted file.  This may
+require making a larger read than is required into a bounce buffer and
+copying out the required bits.  We don't decrypt in-place in the user
+buffer lest userspace interfere and muck up the decryption.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Jeff Layton <jlayton@kernel.org>
@@ -73,102 +75,57 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/buffered_read.c | 73 ++++++++++++++++++++++++++++++++++++++++
- include/linux/netfs.h    |  2 ++
- 2 files changed, 75 insertions(+)
+ fs/netfs/direct_read.c | 10 ++++++++++
+ fs/netfs/internal.h    | 17 +++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index 950f63fc156a..a59e7b2edaac 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -558,3 +558,76 @@ int netfs_prefetch_for_write(struct file *file, struct folio *folio,
- 	_leave(" = %d", ret);
- 	return ret;
- }
-+
-+/**
-+ * netfs_buffered_read_iter - Filesystem buffered I/O read routine
-+ * @iocb: kernel I/O control block
-+ * @iter: destination for the data read
-+ *
-+ * This is the ->read_iter() routine for all filesystems that can use the page
-+ * cache directly.
-+ *
-+ * The IOCB_NOWAIT flag in iocb->ki_flags indicates that -EAGAIN shall be
-+ * returned when no data can be read without waiting for I/O requests to
-+ * complete; it doesn't prevent readahead.
-+ *
-+ * The IOCB_NOIO flag in iocb->ki_flags indicates that no new I/O requests
-+ * shall be made for the read or for readahead.  When no data can be read,
-+ * -EAGAIN shall be returned.  When readahead would be triggered, a partial,
-+ * possibly empty read shall be returned.
-+ *
-+ * Return:
-+ * * number of bytes copied, even for partial reads
-+ * * negative error code (or 0 if IOCB_NOIO) if nothing was read
-+ */
-+ssize_t netfs_buffered_read_iter(struct kiocb *iocb, struct iov_iter *iter)
-+{
-+	struct inode *inode = file_inode(iocb->ki_filp);
-+	struct netfs_inode *ictx = netfs_inode(inode);
-+	ssize_t ret;
-+
-+	if (WARN_ON_ONCE((iocb->ki_flags & IOCB_DIRECT) ||
-+			 test_bit(NETFS_ICTX_UNBUFFERED, &ictx->flags)))
-+		return -EINVAL;
-+
-+	ret = netfs_start_io_read(inode);
-+	if (ret == 0) {
-+		ret = filemap_read(iocb, iter, 0);
-+		netfs_end_io_read(inode);
+diff --git a/fs/netfs/direct_read.c b/fs/netfs/direct_read.c
+index 52ad8fa66dd5..158719b56900 100644
+--- a/fs/netfs/direct_read.c
++++ b/fs/netfs/direct_read.c
+@@ -181,6 +181,16 @@ static ssize_t netfs_unbuffered_read_iter_locked(struct kiocb *iocb, struct iov_
+ 		iov_iter_advance(iter, orig_count);
+ 	}
+ 
++	/* If we're going to do decryption or decompression, we're going to
++	 * need a bounce buffer - and if the data is misaligned for the crypto
++	 * algorithm, we decrypt in place and then copy.
++	 */
++	if (test_bit(NETFS_RREQ_CONTENT_ENCRYPTION, &rreq->flags)) {
++		if (!netfs_is_crypto_aligned(rreq, iter))
++			__set_bit(NETFS_RREQ_CRYPT_IN_PLACE, &rreq->flags);
++		__set_bit(NETFS_RREQ_USE_BOUNCE_BUFFER, &rreq->flags);
 +	}
-+	return ret;
-+}
-+EXPORT_SYMBOL(netfs_buffered_read_iter);
 +
-+/**
-+ * netfs_file_read_iter - Generic filesystem read routine
-+ * @iocb: kernel I/O control block
-+ * @iter: destination for the data read
-+ *
-+ * This is the ->read_iter() routine for all filesystems that can use the page
-+ * cache directly.
-+ *
-+ * The IOCB_NOWAIT flag in iocb->ki_flags indicates that -EAGAIN shall be
-+ * returned when no data can be read without waiting for I/O requests to
-+ * complete; it doesn't prevent readahead.
-+ *
-+ * The IOCB_NOIO flag in iocb->ki_flags indicates that no new I/O requests
-+ * shall be made for the read or for readahead.  When no data can be read,
-+ * -EAGAIN shall be returned.  When readahead would be triggered, a partial,
-+ * possibly empty read shall be returned.
-+ *
-+ * Return:
-+ * * number of bytes copied, even for partial reads
-+ * * negative error code (or 0 if IOCB_NOIO) if nothing was read
+ 	/* If we're going to use a bounce buffer, we need to set it up.  We
+ 	 * will then need to pad the request out to the minimum block size.
+ 	 */
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index b6c142ef996a..7180e2931189 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -198,6 +198,23 @@ static inline void netfs_put_group_many(struct netfs_group *netfs_group, int nr)
+ 		netfs_group->free(netfs_group);
+ }
+ 
++/*
++ * Check to see if a buffer aligns with the crypto unit block size.  If it
++ * doesn't the crypto layer is going to copy all the data - in which case
++ * relying on the crypto op for a free copy is pointless.
 + */
-+ssize_t netfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
++static inline bool netfs_is_crypto_aligned(struct netfs_io_request *rreq,
++					   struct iov_iter *iter)
 +{
-+	struct netfs_inode *ictx = netfs_inode(iocb->ki_filp->f_mapping->host);
++	struct netfs_inode *ctx = netfs_inode(rreq->inode);
++	unsigned long align, mask = (1UL << ctx->min_bshift) - 1;
 +
-+	if ((iocb->ki_flags & IOCB_DIRECT) ||
-+	    test_bit(NETFS_ICTX_UNBUFFERED, &ictx->flags))
-+		return netfs_unbuffered_read_iter(iocb, iter);
-+
-+	return netfs_buffered_read_iter(iocb, iter);
++	if (!ctx->min_bshift)
++		return true;
++	align = iov_iter_alignment(iter);
++	return (align & mask) == 0;
 +}
-+EXPORT_SYMBOL(netfs_file_read_iter);
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 46c0a6b45bb8..638f42fdaef5 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -381,6 +381,8 @@ struct netfs_cache_ops {
- 
- /* High-level read API. */
- ssize_t netfs_unbuffered_read_iter(struct kiocb *iocb, struct iov_iter *iter);
-+ssize_t netfs_buffered_read_iter(struct kiocb *iocb, struct iov_iter *iter);
-+ssize_t netfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter);
- 
- /* High-level write API */
- ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
++
+ /*
+  * fscache-cache.c
+  */
 
