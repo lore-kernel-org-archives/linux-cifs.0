@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mw+4/mDq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GzfqPDFC"
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C274795
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:25:43 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748C447BB
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:25:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701984319;
+	s=mimecast20190719; t=1701984326;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1l+FS8mq19pOpm0UjSmptv5Ycz0H+4vPP+t7D9sPQnY=;
-	b=Mw+4/mDqGc9RnRtEoaCvm+HV2VB7cDpGHrjXIrI53mFnsTNssIxsdJEpjs3FXIEZRPe5SD
-	e6APx/VKEjHEKavGWAJlSLnfHSS0u9l3yYdDbLEZlHMwdrX/JFh1EUUJdybeP26MqyQ08Z
-	hZH3Yrol2HgMWDmPMIINwwWgk8f6RY4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-bVki4nEnMbukiB6G7H8s5A-1; Thu, 07 Dec 2023 16:25:15 -0500
-X-MC-Unique: bVki4nEnMbukiB6G7H8s5A-1
+	bh=CTmXKlaARSc+/4qCQwpNxe6YLvLKHn4pqqsvYn+RGCg=;
+	b=GzfqPDFCXcBNZRrx0TB7dSNqZGBN/gZsoqT4nBusZyLxnk3wZoxLqnnXmul+Zfemnsg5Xj
+	LMm2FZThL2L7ADi7QmKZ/dGRMbPissc1hTRr4PJSwQMLJdB0+Cu4u3sRoyPCrTuVjEEMXw
+	rBkJaQK/9gjVXMAC6uB5sWgT0UXnhvg=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-679-td7G57ocMXuIQoNIfh4pWA-1; Thu,
+ 07 Dec 2023 16:25:23 -0500
+X-MC-Unique: td7G57ocMXuIQoNIfh4pWA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7BFFD86C044;
-	Thu,  7 Dec 2023 21:25:14 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ED3E53C40B56;
+	Thu,  7 Dec 2023 21:25:21 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E1AD03C2E;
-	Thu,  7 Dec 2023 21:25:10 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id EFF6C3C2E;
+	Thu,  7 Dec 2023 21:25:18 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -53,9 +53,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Steve French <sfrench@samba.org>,
 	Shyam Prasad N <nspmangalore@gmail.com>,
 	Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: [PATCH v3 52/59] cifs: Make wait_mtu_credits take size_t args
-Date: Thu,  7 Dec 2023 21:21:59 +0000
-Message-ID: <20231207212206.1379128-53-dhowells@redhat.com>
+Subject: [PATCH v3 54/59] cifs: Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c
+Date: Thu,  7 Dec 2023 21:22:01 +0000
+Message-ID: <20231207212206.1379128-55-dhowells@redhat.com>
 In-Reply-To: <20231207212206.1379128-1-dhowells@redhat.com>
 References: <20231207212206.1379128-1-dhowells@redhat.com>
 Precedence: bulk
@@ -67,9 +67,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Make the wait_mtu_credits functions use size_t for the size and num
-arguments rather than unsigned int as netfslib uses size_t/ssize_t for
-arguments and return values to allow for extra capacity.
+Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c so that
+they are colocated with similar functions rather than being split with
+cifsfs.c.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
@@ -81,141 +81,152 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/smb/client/cifsglob.h  |  4 ++--
- fs/smb/client/cifsproto.h |  2 +-
- fs/smb/client/file.c      | 18 ++++++++++--------
- fs/smb/client/smb2ops.c   |  4 ++--
- fs/smb/client/transport.c |  4 ++--
- 5 files changed, 17 insertions(+), 15 deletions(-)
+ fs/smb/client/cifsfs.c | 55 ------------------------------------------
+ fs/smb/client/cifsfs.h |  2 ++
+ fs/smb/client/file.c   | 53 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 55 insertions(+), 55 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 80a9f15828cc..a0d348b166c2 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -512,8 +512,8 @@ struct smb_version_operations {
- 	/* writepages retry size */
- 	unsigned int (*wp_retry_size)(struct inode *);
- 	/* get mtu credits */
--	int (*wait_mtu_credits)(struct TCP_Server_Info *, unsigned int,
--				unsigned int *, struct cifs_credits *);
-+	int (*wait_mtu_credits)(struct TCP_Server_Info *, size_t,
-+				size_t *, struct cifs_credits *);
- 	/* adjust previously taken mtu credits to request size */
- 	int (*adjust_credits)(struct TCP_Server_Info *server,
- 			      struct cifs_credits *credits,
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 47c352426fcf..85e115da8899 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -121,7 +121,7 @@ extern struct mid_q_entry *cifs_setup_async_request(struct TCP_Server_Info *,
- extern int cifs_check_receive(struct mid_q_entry *mid,
- 			struct TCP_Server_Info *server, bool log_error);
- extern int cifs_wait_mtu_credits(struct TCP_Server_Info *server,
--				 unsigned int size, unsigned int *num,
-+				 size_t size, size_t *num,
- 				 struct cifs_credits *credits);
- extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct kvec *, int /* nvec to send */,
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index ebe04c78a955..1cd9309e46f7 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -981,61 +981,6 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 	return root;
+ }
+ 
+-
+-static ssize_t
+-cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+-{
+-	ssize_t rc;
+-	struct inode *inode = file_inode(iocb->ki_filp);
+-
+-	if (iocb->ki_flags & IOCB_DIRECT)
+-		return cifs_user_readv(iocb, iter);
+-
+-	rc = cifs_revalidate_mapping(inode);
+-	if (rc)
+-		return rc;
+-
+-	return generic_file_read_iter(iocb, iter);
+-}
+-
+-static ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+-{
+-	struct inode *inode = file_inode(iocb->ki_filp);
+-	struct cifsInodeInfo *cinode = CIFS_I(inode);
+-	ssize_t written;
+-	int rc;
+-
+-	if (iocb->ki_filp->f_flags & O_DIRECT) {
+-		written = cifs_user_writev(iocb, from);
+-		if (written > 0 && CIFS_CACHE_READ(cinode)) {
+-			cifs_zap_mapping(inode);
+-			cifs_dbg(FYI,
+-				 "Set no oplock for inode=%p after a write operation\n",
+-				 inode);
+-			cinode->oplock = 0;
+-		}
+-		return written;
+-	}
+-
+-	written = cifs_get_writer(cinode);
+-	if (written)
+-		return written;
+-
+-	written = generic_file_write_iter(iocb, from);
+-
+-	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
+-		goto out;
+-
+-	rc = filemap_fdatawrite(inode->i_mapping);
+-	if (rc)
+-		cifs_dbg(FYI, "cifs_file_write_iter: %d rc on %p inode\n",
+-			 rc, inode);
+-
+-out:
+-	cifs_put_writer(cinode);
+-	return written;
+-}
+-
+ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
+ {
+ 	struct cifsFileInfo *cfile = file->private_data;
+diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
+index 3adea10aa9da..28c41c449205 100644
+--- a/fs/smb/client/cifsfs.h
++++ b/fs/smb/client/cifsfs.h
+@@ -100,6 +100,8 @@ extern ssize_t cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to);
+ extern ssize_t cifs_user_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_direct_writev(struct kiocb *iocb, struct iov_iter *from);
+ extern ssize_t cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from);
++ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from);
++ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter);
+ extern int cifs_flock(struct file *pfile, int cmd, struct file_lock *plock);
+ extern int cifs_lock(struct file *, int, struct file_lock *);
+ extern int cifs_fsync(struct file *, loff_t, loff_t, int);
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 16f6c15e0d06..b47abeefe628 100644
+index 255d78581e56..dfeb8cb86d61 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -2733,9 +2733,9 @@ static ssize_t cifs_write_back_from_locked_folio(struct address_space *mapping,
- 	struct cifs_credits credits_on_stack;
- 	struct cifs_credits *credits = &credits_on_stack;
- 	struct cifsFileInfo *cfile = NULL;
--	unsigned int xid, wsize, len;
-+	unsigned int xid, len;
- 	loff_t i_size = i_size_read(inode);
--	size_t max_len;
-+	size_t max_len, wsize;
- 	long count = wbc->nr_to_write;
- 	int rc;
- 
-@@ -3247,7 +3247,7 @@ static int
- cifs_resend_wdata(struct cifs_io_subrequest *wdata, struct list_head *wdata_list,
- 	struct cifs_aio_ctx *ctx)
- {
--	unsigned int wsize;
-+	size_t wsize;
- 	struct cifs_credits credits;
- 	int rc;
- 	struct TCP_Server_Info *server = wdata->server;
-@@ -3381,7 +3381,8 @@ cifs_write_from_iter(loff_t fpos, size_t len, struct iov_iter *from,
- 	do {
- 		struct cifs_credits credits_on_stack;
- 		struct cifs_credits *credits = &credits_on_stack;
--		unsigned int wsize, nsegs = 0;
-+		unsigned int nsegs = 0;
-+		size_t wsize;
- 
- 		if (signal_pending(current)) {
- 			rc = -EINTR;
-@@ -3818,7 +3819,7 @@ static int cifs_resend_rdata(struct cifs_io_subrequest *rdata,
- 			struct list_head *rdata_list,
- 			struct cifs_aio_ctx *ctx)
- {
--	unsigned int rsize;
-+	size_t rsize;
- 	struct cifs_credits credits;
- 	int rc;
- 	struct TCP_Server_Info *server;
-@@ -3892,10 +3893,10 @@ cifs_send_async_read(loff_t fpos, size_t len, struct cifsFileInfo *open_file,
- 		     struct cifs_aio_ctx *ctx)
- {
- 	struct cifs_io_subrequest *rdata;
--	unsigned int rsize, nsegs, max_segs = INT_MAX;
-+	unsigned int nsegs, max_segs = INT_MAX;
- 	struct cifs_credits credits_on_stack;
- 	struct cifs_credits *credits = &credits_on_stack;
--	size_t cur_len, max_len;
-+	size_t cur_len, max_len, rsize;
- 	int rc;
- 	pid_t pid;
- 	struct TCP_Server_Info *server;
-@@ -4491,12 +4492,13 @@ static void cifs_readahead(struct readahead_control *ractl)
- 	 * Chop the readahead request up into rsize-sized read requests.
- 	 */
- 	while ((nr_pages = ra_pages)) {
--		unsigned int i, rsize;
-+		unsigned int i;
- 		struct cifs_io_subrequest *rdata;
- 		struct cifs_credits credits_on_stack;
- 		struct cifs_credits *credits = &credits_on_stack;
- 		struct folio *folio;
- 		pgoff_t fsize;
-+		size_t rsize;
- 
- 		/*
- 		 * Find out if we have anything cached in the range of
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index b27df9e239dd..5850d6afd788 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -216,8 +216,8 @@ smb2_get_credits(struct mid_q_entry *mid)
+@@ -4567,6 +4567,59 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struct iov_iter *to)
+ 	return __cifs_readv(iocb, to, false);
  }
  
- static int
--smb2_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
--		      unsigned int *num, struct cifs_credits *credits)
-+smb2_wait_mtu_credits(struct TCP_Server_Info *server, size_t size,
-+		      size_t *num, struct cifs_credits *credits)
++ssize_t cifs_loose_read_iter(struct kiocb *iocb, struct iov_iter *iter)
++{
++	ssize_t rc;
++	struct inode *inode = file_inode(iocb->ki_filp);
++
++	if (iocb->ki_flags & IOCB_DIRECT)
++		return cifs_user_readv(iocb, iter);
++
++	rc = cifs_revalidate_mapping(inode);
++	if (rc)
++		return rc;
++
++	return generic_file_read_iter(iocb, iter);
++}
++
++ssize_t cifs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
++{
++	struct inode *inode = file_inode(iocb->ki_filp);
++	struct cifsInodeInfo *cinode = CIFS_I(inode);
++	ssize_t written;
++	int rc;
++
++	if (iocb->ki_filp->f_flags & O_DIRECT) {
++		written = cifs_user_writev(iocb, from);
++		if (written > 0 && CIFS_CACHE_READ(cinode)) {
++			cifs_zap_mapping(inode);
++			cifs_dbg(FYI,
++				 "Set no oplock for inode=%p after a write operation\n",
++				 inode);
++			cinode->oplock = 0;
++		}
++		return written;
++	}
++
++	written = cifs_get_writer(cinode);
++	if (written)
++		return written;
++
++	written = generic_file_write_iter(iocb, from);
++
++	if (CIFS_CACHE_WRITE(CIFS_I(inode)))
++		goto out;
++
++	rc = filemap_fdatawrite(inode->i_mapping);
++	if (rc)
++		cifs_dbg(FYI, "cifs_file_write_iter: %d rc on %p inode\n",
++			 rc, inode);
++
++out:
++	cifs_put_writer(cinode);
++	return written;
++}
++
+ ssize_t
+ cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to)
  {
- 	int rc = 0;
- 	unsigned int scredits, in_flight;
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 3048516573e8..5cf653463c55 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -684,8 +684,8 @@ wait_for_compound_request(struct TCP_Server_Info *server, int num,
- }
- 
- int
--cifs_wait_mtu_credits(struct TCP_Server_Info *server, unsigned int size,
--		      unsigned int *num, struct cifs_credits *credits)
-+cifs_wait_mtu_credits(struct TCP_Server_Info *server, size_t size,
-+		      size_t *num, struct cifs_credits *credits)
- {
- 	*num = size;
- 	credits->value = 0;
 
