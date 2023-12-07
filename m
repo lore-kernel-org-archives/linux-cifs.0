@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PNA76BMG"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F60D44BF
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:25:14 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PySEnKSV"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E29F146A3
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:25:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701984287;
+	s=mimecast20190719; t=1701984293;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OLRxuYEyNmYWJaAue2cZSyhh27IY81lv9xDi1f+6vNc=;
-	b=PNA76BMGEJbu8HFt2JIqZwPcNffUkdfzvEFOduwSS4tCkLFYWfkn2tMYCgwnJUgagSIDj7
-	DK6e9f/fXcXK6UB8h6weGzAaeFXC4UWsiX5+UxGZ+Gsi8svMeUVqPhenA9PUmSYtYCnXTR
-	++mk60CNC0KyWzu5GUCysbKyDbQlITs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-449-kjQ_PNzmNHOZs9S6D1nZsA-1; Thu, 07 Dec 2023 16:24:43 -0500
-X-MC-Unique: kjQ_PNzmNHOZs9S6D1nZsA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	bh=pMhIQ6aISypGsdHnWqsl+SXoW21sfinmVcVhNAIlJGg=;
+	b=PySEnKSVN2t8t84fF94NUSgt7qupj8vwYEemPthsZWq7DjU+Xrw/L1klcQF1S8IkldhHmq
+	cT5rpBgnWWuQTCF74klJIZcXagGjaKWQbi4Kdxw/ge3TnGAA44pMHFJk7IMQ+k8TFdvU/h
+	usCiRZbX9aYbv/+LgFVjWUe0GAV16j4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-146-PbqVJ8qaPa2dYrh0aRLesQ-1; Thu,
+ 07 Dec 2023 16:24:52 -0500
+X-MC-Unique: PbqVJ8qaPa2dYrh0aRLesQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CBD3C86C043;
-	Thu,  7 Dec 2023 21:24:42 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 115033C40B55;
+	Thu,  7 Dec 2023 21:24:51 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3DBB8492BC6;
-	Thu,  7 Dec 2023 21:24:40 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DBD5A3C32;
+	Thu,  7 Dec 2023 21:24:47 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -49,10 +49,12 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 44/59] netfs: Optimise away reads above the point at which there can be no data
-Date: Thu,  7 Dec 2023 21:21:51 +0000
-Message-ID: <20231207212206.1379128-45-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>
+Subject: [PATCH v3 46/59] 9p: Use netfslib read/write_iter
+Date: Thu,  7 Dec 2023 21:21:53 +0000
+Message-ID: <20231207212206.1379128-47-dhowells@redhat.com>
 In-Reply-To: <20231207212206.1379128-1-dhowells@redhat.com>
 References: <20231207212206.1379128-1-dhowells@redhat.com>
 Precedence: bulk
@@ -62,286 +64,506 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Track the file position above which the server is not expected to have any
-data (the "zero point") and preemptively assume that we can satisfy
-requests by filling them with zeroes locally rather than attempting to
-download them if they're over that line - even if we've written data back
-to the server.  Assume that any data that was written back above that
-position is held in the local cache.  Note that we have to split requests
-that straddle the line.
+Use netfslib's read and write iteration helpers, allowing netfslib to take
+over the management of the page cache for 9p files and to manage local disk
+caching.  In particular, this eliminates write_begin, write_end, writepage
+and all mentions of struct page and struct folio from 9p.
 
-Make use of this to optimise away some reads from the server.  We need to
-set the zero point in the following circumstances:
+Note that netfslib now offers the possibility of write-through caching if
+that is desirable for 9p: just set the NETFS_ICTX_WRITETHROUGH flag in
+v9inode->netfs.flags in v9fs_set_netfs_context().
 
- (1) When we see an extant remote inode and have no cache for it, we set
-     the zero_point to i_size.
-
- (2) On local inode creation, we set zero_point to 0.
-
- (3) On local truncation down, we reduce zero_point to the new i_size if
-     the new i_size is lower.
-
- (4) On local truncation up, we don't change zero_point.
-
- (5) On local modification, we don't change zero_point.
-
- (6) On remote invalidation, we set zero_point to the new i_size.
-
- (7) If stored data is discarded from the pagecache or culled from fscache,
-     we must set zero_point above that if the data also got written to the
-     server.
-
- (8) If dirty data is written back to the server, but not fscache, we must
-     set zero_point above that.
-
- (9) If a direct I/O write is made, set zero_point above that.
-
-Assuming the above, any read from the server at or above the zero_point
-position will return all zeroes.
-
-The zero_point value can be stored in the cache, provided the above rules
-are applied to it by any code that culls part of the local cache.
+Note also this is untested as I can't get ganesha.nfsd to correctly parse
+the config to turn on 9p support.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
+cc: Eric Van Hensbergen <ericvh@kernel.org>
+cc: Latchesar Ionkov <lucho@ionkov.net>
+cc: Dominique Martinet <asmadeus@codewreck.org>
+cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+cc: v9fs@lists.linux.dev
 cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
 ---
- fs/afs/inode.c            | 22 +++++++++++++---------
- fs/netfs/buffered_write.c |  2 +-
- fs/netfs/direct_write.c   |  4 ++++
- fs/netfs/io.c             | 10 ++++++++++
- fs/netfs/misc.c           |  5 +++++
- fs/smb/client/cifsfs.c    |  4 ++--
- include/linux/netfs.h     | 14 ++++++++++++--
- 7 files changed, 47 insertions(+), 14 deletions(-)
+ fs/9p/vfs_addr.c  | 291 +++++++++++-----------------------------------
+ fs/9p/vfs_file.c  |  89 ++------------
+ fs/9p/vfs_inode.c |   2 -
+ 3 files changed, 77 insertions(+), 305 deletions(-)
 
-diff --git a/fs/afs/inode.c b/fs/afs/inode.c
-index 37485ae31471..2b44a342b4a1 100644
---- a/fs/afs/inode.c
-+++ b/fs/afs/inode.c
-@@ -168,6 +168,7 @@ static void afs_apply_status(struct afs_operation *op,
- 	struct inode *inode = &vnode->netfs.inode;
- 	struct timespec64 t;
- 	umode_t mode;
-+	bool unexpected_jump = false;
- 	bool data_changed = false;
- 	bool change_size = vp->set_size;
+diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+index 055b672a247d..6f1fa16f7471 100644
+--- a/fs/9p/vfs_addr.c
++++ b/fs/9p/vfs_addr.c
+@@ -19,12 +19,48 @@
+ #include <linux/netfs.h>
+ #include <net/9p/9p.h>
+ #include <net/9p/client.h>
++#include <trace/events/netfs.h>
  
-@@ -231,6 +232,7 @@ static void afs_apply_status(struct afs_operation *op,
- 		}
- 		change_size = true;
- 		data_changed = true;
-+		unexpected_jump = true;
- 	} else if (vnode->status.type == AFS_FTYPE_DIR) {
- 		/* Expected directory change is handled elsewhere so
- 		 * that we can locally edit the directory and save on a
-@@ -252,6 +254,8 @@ static void afs_apply_status(struct afs_operation *op,
- 		vnode->netfs.remote_i_size = status->size;
- 		if (change_size || status->size > i_size_read(inode)) {
- 			afs_set_i_size(vnode, status->size);
-+			if (unexpected_jump)
-+				vnode->netfs.zero_point = status->size;
- 			inode_set_ctime_to_ts(inode, t);
- 			inode_set_atime_to_ts(inode, t);
- 		}
-@@ -865,17 +869,17 @@ static void afs_setattr_success(struct afs_operation *op)
- static void afs_setattr_edit_file(struct afs_operation *op)
- {
- 	struct afs_vnode_param *vp = &op->file[0];
--	struct inode *inode = &vp->vnode->netfs.inode;
-+	struct afs_vnode *vnode = vp->vnode;
+ #include "v9fs.h"
+ #include "v9fs_vfs.h"
+ #include "cache.h"
+ #include "fid.h"
  
- 	if (op->setattr.attr->ia_valid & ATTR_SIZE) {
- 		loff_t size = op->setattr.attr->ia_size;
- 		loff_t i_size = op->setattr.old_i_size;
- 
--		if (size < i_size)
--			truncate_pagecache(inode, size);
--		if (size != i_size)
--			fscache_resize_cookie(afs_vnode_cache(vp->vnode),
--					      vp->scb.status.size);
-+		if (size != i_size) {
-+			truncate_setsize(&vnode->netfs.inode, size);
-+			netfs_resize_file(&vnode->netfs, size, true);
-+			fscache_resize_cookie(afs_vnode_cache(vnode), size);
-+		}
- 	}
- }
- 
-@@ -943,11 +947,11 @@ int afs_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
- 		 */
- 		if (!(attr->ia_valid & (supported & ~ATTR_SIZE & ~ATTR_MTIME)) &&
- 		    attr->ia_size < i_size &&
--		    attr->ia_size > vnode->status.size) {
--			truncate_pagecache(inode, attr->ia_size);
-+		    attr->ia_size > vnode->netfs.remote_i_size) {
-+			truncate_setsize(inode, attr->ia_size);
-+			netfs_resize_file(&vnode->netfs, size, false);
- 			fscache_resize_cookie(afs_vnode_cache(vnode),
- 					      attr->ia_size);
--			i_size_write(inode, attr->ia_size);
- 			ret = 0;
- 			goto out_unlock;
- 		}
-diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-index 461be124b35d..64d84a0544ae 100644
---- a/fs/netfs/buffered_write.c
-+++ b/fs/netfs/buffered_write.c
-@@ -73,7 +73,7 @@ static enum netfs_how_to_modify netfs_how_to_modify(struct netfs_inode *ctx,
- 	if (folio_test_uptodate(folio))
- 		return NETFS_FOLIO_IS_UPTODATE;
- 
--	if (pos >= ctx->remote_i_size)
-+	if (pos >= ctx->zero_point)
- 		return NETFS_MODIFY_AND_CLEAR;
- 
- 	if (!maybe_trouble && offset == 0 && len >= flen)
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index 45165a3d5f99..37923dfeaae4 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -334,6 +334,7 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct file *file = iocb->ki_filp;
- 	struct inode *inode = file->f_mapping->host;
- 	struct netfs_inode *ictx = netfs_inode(inode);
-+	unsigned long long end;
- 	ssize_t ret;
- 
- 	_enter("%llx,%zx,%llx", iocb->ki_pos, iov_iter_count(from), i_size_read(inode));
-@@ -355,6 +356,9 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	ret = kiocb_invalidate_pages(iocb, iov_iter_count(from));
- 	if (ret < 0)
- 		goto out;
-+	end = iocb->ki_pos + iov_iter_count(from);
-+	if (end > ictx->zero_point)
-+		ictx->zero_point = end;
- 
- 	fscache_invalidate(netfs_i_cookie(ictx), NULL, i_size_read(inode),
- 			   FSCACHE_INVAL_DIO_WRITE);
-diff --git a/fs/netfs/io.c b/fs/netfs/io.c
-index ae014efe8728..5f112afcf578 100644
---- a/fs/netfs/io.c
-+++ b/fs/netfs/io.c
-@@ -573,6 +573,7 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq,
- 			struct iov_iter *io_iter)
- {
- 	enum netfs_io_source source = NETFS_DOWNLOAD_FROM_SERVER;
-+	struct netfs_inode *ictx = netfs_inode(rreq->inode);
- 	size_t lsize;
- 
- 	_enter("%llx-%llx,%llx", subreq->start, subreq->start + subreq->len, rreq->i_size);
-@@ -590,6 +591,14 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq,
- 		 * to make serial calls, it can indicate a short read and then
- 		 * we will call it again.
- 		 */
-+		if (rreq->origin != NETFS_DIO_READ) {
-+			if (subreq->start >= ictx->zero_point) {
-+				source = NETFS_FILL_WITH_ZEROES;
-+				goto set;
-+			}
-+			if (subreq->len > ictx->zero_point - subreq->start)
-+				subreq->len = ictx->zero_point - subreq->start;
-+		}
- 		if (subreq->len > rreq->i_size - subreq->start)
- 			subreq->len = rreq->i_size - subreq->start;
- 		if (rreq->rsize && subreq->len > rreq->rsize)
-@@ -611,6 +620,7 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq,
- 		}
- 	}
- 
-+set:
- 	if (subreq->len > rreq->len)
- 		pr_warn("R=%08x[%u] SREQ>RREQ %zx > %zx\n",
- 			rreq->debug_id, subreq->debug_index,
-diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
-index 40421ced4cd3..31e45dfad5b0 100644
---- a/fs/netfs/misc.c
-+++ b/fs/netfs/misc.c
-@@ -240,6 +240,11 @@ EXPORT_SYMBOL(netfs_invalidate_folio);
- bool netfs_release_folio(struct folio *folio, gfp_t gfp)
- {
- 	struct netfs_inode *ctx = netfs_inode(folio_inode(folio));
-+	unsigned long long end;
++static void v9fs_upload_to_server(struct netfs_io_subrequest *subreq)
++{
++	struct inode *inode = subreq->rreq->inode;
++	struct v9fs_inode __maybe_unused *v9inode = V9FS_I(inode);
++	struct p9_fid *fid = subreq->rreq->netfs_priv;
++	int err;
 +
-+	end = folio_pos(folio) + folio_size(folio);
-+	if (end > ctx->zero_point)
-+		ctx->zero_point = end;
- 
- 	if (folio_test_private(folio))
- 		return false;
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 96a65cf9b5ec..07cd88897c33 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -1220,7 +1220,7 @@ static int cifs_precopy_set_eof(struct inode *src_inode, struct cifsInodeInfo *s
- 	if (rc < 0)
- 		goto set_failed;
- 
--	netfs_resize_file(&src_cifsi->netfs, src_end);
-+	netfs_resize_file(&src_cifsi->netfs, src_end, true);
- 	fscache_resize_cookie(cifs_inode_cookie(src_inode), src_end);
- 	return 0;
- 
-@@ -1351,7 +1351,7 @@ static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
- 			smb_file_src, smb_file_target, off, len, destoff);
- 		if (rc == 0 && new_size > i_size_read(target_inode)) {
- 			truncate_setsize(target_inode, new_size);
--			netfs_resize_file(&target_cifsi->netfs, new_size);
-+			netfs_resize_file(&target_cifsi->netfs, new_size, true);
- 			fscache_resize_cookie(cifs_inode_cookie(target_inode),
- 					      new_size);
- 		}
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 08040da65336..29072b6418c3 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -137,6 +137,8 @@ struct netfs_inode {
- 	struct fscache_cookie	*cache;
- #endif
- 	loff_t			remote_i_size;	/* Size of the remote file */
-+	loff_t			zero_point;	/* Size after which we assume there's no data
-+						 * on the server */
- 	unsigned long		flags;
- #define NETFS_ICTX_ODIRECT	0		/* The file has DIO in progress */
- #define NETFS_ICTX_UNBUFFERED	1		/* I/O should not use the pagecache */
-@@ -482,6 +484,7 @@ static inline void netfs_inode_init(struct netfs_inode *ctx,
- {
- 	ctx->ops = ops;
- 	ctx->remote_i_size = i_size_read(&ctx->inode);
-+	ctx->zero_point = ctx->remote_i_size;
- 	ctx->flags = 0;
- 	ctx->min_bshift = 0;
- 	ctx->crypto_bshift = 0;
-@@ -489,18 +492,25 @@ static inline void netfs_inode_init(struct netfs_inode *ctx,
- #if IS_ENABLED(CONFIG_FSCACHE)
- 	ctx->cache = NULL;
- #endif
-+	/* ->releasepage() drives zero_point */
-+	mapping_set_release_always(ctx->inode.i_mapping);
- }
- 
++	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
++	p9_client_write(fid, subreq->start, &subreq->io_iter, &err);
++	netfs_write_subrequest_terminated(subreq, err < 0 ? err : subreq->len,
++					  false);
++}
++
++static void v9fs_upload_to_server_worker(struct work_struct *work)
++{
++	struct netfs_io_subrequest *subreq =
++		container_of(work, struct netfs_io_subrequest, work);
++
++	v9fs_upload_to_server(subreq);
++}
++
++/*
++ * Set up write requests for a writeback slice.  We need to add a write request
++ * for each write we want to make.
++ */
++static void v9fs_create_write_requests(struct netfs_io_request *wreq, loff_t start, size_t len)
++{
++	struct netfs_io_subrequest *subreq;
++
++	subreq = netfs_create_write_request(wreq, NETFS_UPLOAD_TO_SERVER,
++					    start, len, v9fs_upload_to_server_worker);
++	if (subreq)
++		netfs_queue_write_request(subreq);
++}
++
  /**
-  * netfs_resize_file - Note that a file got resized
-  * @ctx: The netfs inode being resized
-  * @new_i_size: The new file size
-+ * @changed_on_server: The change was applied to the server
-  *
-  * Inform the netfs lib that a file got resized so that it can adjust its state.
+  * v9fs_issue_read - Issue a read from 9P
+  * @subreq: The read to make
+@@ -33,14 +69,10 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
+ {
+ 	struct netfs_io_request *rreq = subreq->rreq;
+ 	struct p9_fid *fid = rreq->netfs_priv;
+-	struct iov_iter to;
+-	loff_t pos = subreq->start + subreq->transferred;
+-	size_t len = subreq->len   - subreq->transferred;
+ 	int total, err;
+ 
+-	iov_iter_xarray(&to, ITER_DEST, &rreq->mapping->i_pages, pos, len);
+-
+-	total = p9_client_read(fid, pos, &to, &err);
++	total = p9_client_read(fid, subreq->start + subreq->transferred,
++			       &subreq->io_iter, &err);
+ 
+ 	/* if we just extended the file size, any portion not in
+ 	 * cache won't be on server and is zeroes */
+@@ -56,17 +88,32 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
   */
--static inline void netfs_resize_file(struct netfs_inode *ctx, loff_t new_i_size)
-+static inline void netfs_resize_file(struct netfs_inode *ctx, loff_t new_i_size,
-+				     bool changed_on_server)
+ static int v9fs_init_request(struct netfs_io_request *rreq, struct file *file)
  {
--	ctx->remote_i_size = new_i_size;
-+	if (changed_on_server)
-+		ctx->remote_i_size = new_i_size;
-+	if (new_i_size < ctx->zero_point)
-+		ctx->zero_point = new_i_size;
+-	struct p9_fid *fid = file->private_data;
+-
+-	BUG_ON(!fid);
++	struct p9_fid *fid;
++	bool writing = (rreq->origin == NETFS_READ_FOR_WRITE ||
++			rreq->origin == NETFS_WRITEBACK ||
++			rreq->origin == NETFS_WRITETHROUGH ||
++			rreq->origin == NETFS_LAUNDER_WRITE ||
++			rreq->origin == NETFS_RMW_READ ||
++			rreq->origin == NETFS_UNBUFFERED_WRITE ||
++			rreq->origin == NETFS_DIO_WRITE);
++
++	if (file) {
++		fid = file->private_data;
++		BUG_ON(!fid);
++		p9_fid_get(fid);
++	} else {
++		fid = v9fs_fid_find_inode(rreq->inode, writing, INVALID_UID, true);
++		if (!fid) {
++			WARN_ONCE(1, "folio expected an open fid inode->i_private=%p\n",
++				  rreq->inode->i_private);
++			return -EINVAL;
++		}
++	}
+ 
+ 	/* we might need to read from a fid that was opened write-only
+ 	 * for read-modify-write of page cache, use the writeback fid
+ 	 * for that */
+-	WARN_ON(rreq->origin == NETFS_READ_FOR_WRITE &&
+-			!(fid->mode & P9_ORDWR));
+-
+-	p9_fid_get(fid);
++	WARN_ON(writing && !(fid->mode & P9_ORDWR));
+ 	rreq->netfs_priv = fid;
+ 	return 0;
+ }
+@@ -86,217 +133,15 @@ const struct netfs_request_ops v9fs_req_ops = {
+ 	.init_request		= v9fs_init_request,
+ 	.free_request		= v9fs_free_request,
+ 	.issue_read		= v9fs_issue_read,
++	.create_write_requests	= v9fs_create_write_requests,
+ };
+ 
+-#ifdef CONFIG_9P_FSCACHE
+-static void v9fs_write_to_cache_done(void *priv, ssize_t transferred_or_error,
+-				     bool was_async)
+-{
+-	struct v9fs_inode *v9inode = priv;
+-	__le32 version;
+-
+-	if (IS_ERR_VALUE(transferred_or_error) &&
+-	    transferred_or_error != -ENOBUFS) {
+-		version = cpu_to_le32(v9inode->qid.version);
+-		fscache_invalidate(v9fs_inode_cookie(v9inode), &version,
+-				   i_size_read(&v9inode->netfs.inode), 0);
+-	}
+-}
+-#endif
+-
+-static int v9fs_vfs_write_folio_locked(struct folio *folio)
+-{
+-	struct inode *inode = folio_inode(folio);
+-	loff_t start = folio_pos(folio);
+-	loff_t i_size = i_size_read(inode);
+-	struct iov_iter from;
+-	size_t len = folio_size(folio);
+-	struct p9_fid *writeback_fid;
+-	int err;
+-	struct v9fs_inode __maybe_unused *v9inode = V9FS_I(inode);
+-	struct fscache_cookie __maybe_unused *cookie = v9fs_inode_cookie(v9inode);
+-
+-	if (start >= i_size)
+-		return 0; /* Simultaneous truncation occurred */
+-
+-	len = min_t(loff_t, i_size - start, len);
+-
+-	iov_iter_xarray(&from, ITER_SOURCE, &folio_mapping(folio)->i_pages, start, len);
+-
+-	writeback_fid = v9fs_fid_find_inode(inode, true, INVALID_UID, true);
+-	if (!writeback_fid) {
+-		WARN_ONCE(1, "folio expected an open fid inode->i_private=%p\n",
+-			inode->i_private);
+-		return -EINVAL;
+-	}
+-
+-	folio_wait_fscache(folio);
+-	folio_start_writeback(folio);
+-
+-	p9_client_write(writeback_fid, start, &from, &err);
+-
+-#ifdef CONFIG_9P_FSCACHE
+-	if (err == 0 &&
+-		fscache_cookie_enabled(cookie) &&
+-		test_bit(FSCACHE_COOKIE_IS_CACHING, &cookie->flags)) {
+-		folio_start_fscache(folio);
+-		fscache_write_to_cache(v9fs_inode_cookie(v9inode),
+-					folio_mapping(folio), start, len, i_size,
+-					v9fs_write_to_cache_done, v9inode,
+-					true);
+-	}
+-#endif
+-
+-	folio_end_writeback(folio);
+-	p9_fid_put(writeback_fid);
+-
+-	return err;
+-}
+-
+-static int v9fs_vfs_writepage(struct page *page, struct writeback_control *wbc)
+-{
+-	struct folio *folio = page_folio(page);
+-	int retval;
+-
+-	p9_debug(P9_DEBUG_VFS, "folio %p\n", folio);
+-
+-	retval = v9fs_vfs_write_folio_locked(folio);
+-	if (retval < 0) {
+-		if (retval == -EAGAIN) {
+-			folio_redirty_for_writepage(wbc, folio);
+-			retval = 0;
+-		} else {
+-			mapping_set_error(folio_mapping(folio), retval);
+-		}
+-	} else
+-		retval = 0;
+-
+-	folio_unlock(folio);
+-	return retval;
+-}
+-
+-static int v9fs_launder_folio(struct folio *folio)
+-{
+-	int retval;
+-
+-	if (folio_clear_dirty_for_io(folio)) {
+-		retval = v9fs_vfs_write_folio_locked(folio);
+-		if (retval)
+-			return retval;
+-	}
+-	folio_wait_fscache(folio);
+-	return 0;
+-}
+-
+-/**
+- * v9fs_direct_IO - 9P address space operation for direct I/O
+- * @iocb: target I/O control block
+- * @iter: The data/buffer to use
+- *
+- * The presence of v9fs_direct_IO() in the address space ops vector
+- * allowes open() O_DIRECT flags which would have failed otherwise.
+- *
+- * In the non-cached mode, we shunt off direct read and write requests before
+- * the VFS gets them, so this method should never be called.
+- *
+- * Direct IO is not 'yet' supported in the cached mode. Hence when
+- * this routine is called through generic_file_aio_read(), the read/write fails
+- * with an error.
+- *
+- */
+-static ssize_t
+-v9fs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+-{
+-	struct file *file = iocb->ki_filp;
+-	loff_t pos = iocb->ki_pos;
+-	ssize_t n;
+-	int err = 0;
+-
+-	if (iov_iter_rw(iter) == WRITE) {
+-		n = p9_client_write(file->private_data, pos, iter, &err);
+-		if (n) {
+-			struct inode *inode = file_inode(file);
+-			loff_t i_size = i_size_read(inode);
+-
+-			if (pos + n > i_size)
+-				inode_add_bytes(inode, pos + n - i_size);
+-		}
+-	} else {
+-		n = p9_client_read(file->private_data, pos, iter, &err);
+-	}
+-	return n ? n : err;
+-}
+-
+-static int v9fs_write_begin(struct file *filp, struct address_space *mapping,
+-			    loff_t pos, unsigned int len,
+-			    struct page **subpagep, void **fsdata)
+-{
+-	int retval;
+-	struct folio *folio;
+-	struct v9fs_inode *v9inode = V9FS_I(mapping->host);
+-
+-	p9_debug(P9_DEBUG_VFS, "filp %p, mapping %p\n", filp, mapping);
+-
+-	/* Prefetch area to be written into the cache if we're caching this
+-	 * file.  We need to do this before we get a lock on the page in case
+-	 * there's more than one writer competing for the same cache block.
+-	 */
+-	retval = netfs_write_begin(&v9inode->netfs, filp, mapping, pos, len, &folio, fsdata);
+-	if (retval < 0)
+-		return retval;
+-
+-	*subpagep = &folio->page;
+-	return retval;
+-}
+-
+-static int v9fs_write_end(struct file *filp, struct address_space *mapping,
+-			  loff_t pos, unsigned int len, unsigned int copied,
+-			  struct page *subpage, void *fsdata)
+-{
+-	loff_t last_pos = pos + copied;
+-	struct folio *folio = page_folio(subpage);
+-	struct inode *inode = mapping->host;
+-
+-	p9_debug(P9_DEBUG_VFS, "filp %p, mapping %p\n", filp, mapping);
+-
+-	if (!folio_test_uptodate(folio)) {
+-		if (unlikely(copied < len)) {
+-			copied = 0;
+-			goto out;
+-		}
+-
+-		folio_mark_uptodate(folio);
+-	}
+-
+-	/*
+-	 * No need to use i_size_read() here, the i_size
+-	 * cannot change under us because we hold the i_mutex.
+-	 */
+-	if (last_pos > inode->i_size) {
+-		inode_add_bytes(inode, last_pos - inode->i_size);
+-		i_size_write(inode, last_pos);
+-#ifdef CONFIG_9P_FSCACHE
+-		fscache_update_cookie(v9fs_inode_cookie(V9FS_I(inode)), NULL,
+-			&last_pos);
+-#endif
+-	}
+-	folio_mark_dirty(folio);
+-out:
+-	folio_unlock(folio);
+-	folio_put(folio);
+-
+-	return copied;
+-}
+-
+ const struct address_space_operations v9fs_addr_operations = {
+-	.read_folio	= netfs_read_folio,
+-	.readahead	= netfs_readahead,
+-	.dirty_folio	= netfs_dirty_folio,
+-	.writepage	= v9fs_vfs_writepage,
+-	.write_begin	= v9fs_write_begin,
+-	.write_end	= v9fs_write_end,
+-	.release_folio	= netfs_release_folio,
+-	.invalidate_folio = netfs_invalidate_folio,
+-	.launder_folio	= v9fs_launder_folio,
+-	.direct_IO	= v9fs_direct_IO,
++	.read_folio		= netfs_read_folio,
++	.readahead		= netfs_readahead,
++	.dirty_folio		= netfs_dirty_folio,
++	.release_folio		= netfs_release_folio,
++	.invalidate_folio	= netfs_invalidate_folio,
++	.launder_folio		= netfs_launder_folio,
++	.direct_IO		= noop_direct_IO,
+ };
+diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
+index 11cd8d23f6f2..bca765183f33 100644
+--- a/fs/9p/vfs_file.c
++++ b/fs/9p/vfs_file.c
+@@ -353,25 +353,15 @@ static ssize_t
+ v9fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ {
+ 	struct p9_fid *fid = iocb->ki_filp->private_data;
+-	int ret, err = 0;
+ 
+ 	p9_debug(P9_DEBUG_VFS, "fid %d count %zu offset %lld\n",
+ 		 fid->fid, iov_iter_count(to), iocb->ki_pos);
+ 
+-	if (!(fid->mode & P9L_DIRECT)) {
+-		p9_debug(P9_DEBUG_VFS, "(cached)\n");
+-		return generic_file_read_iter(iocb, to);
+-	}
+-
+-	if (iocb->ki_filp->f_flags & O_NONBLOCK)
+-		ret = p9_client_read_once(fid, iocb->ki_pos, to, &err);
+-	else
+-		ret = p9_client_read(fid, iocb->ki_pos, to, &err);
+-	if (!ret)
+-		return err;
++	if (fid->mode & P9L_DIRECT)
++		return netfs_unbuffered_write_iter(iocb, to);
+ 
+-	iocb->ki_pos += ret;
+-	return ret;
++	p9_debug(P9_DEBUG_VFS, "(cached)\n");
++	return netfs_file_read_iter(iocb, to);
  }
  
- /**
+ /*
+@@ -407,46 +397,14 @@ v9fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ {
+ 	struct file *file = iocb->ki_filp;
+ 	struct p9_fid *fid = file->private_data;
+-	ssize_t retval;
+-	loff_t origin;
+-	int err = 0;
+ 
+ 	p9_debug(P9_DEBUG_VFS, "fid %d\n", fid->fid);
+ 
+-	if (!(fid->mode & (P9L_DIRECT | P9L_NOWRITECACHE))) {
+-		p9_debug(P9_DEBUG_CACHE, "(cached)\n");
+-		return generic_file_write_iter(iocb, from);
+-	}
++	if (fid->mode & (P9L_DIRECT | P9L_NOWRITECACHE))
++		return netfs_unbuffered_write_iter(iocb, from);
+ 
+-	retval = generic_write_checks(iocb, from);
+-	if (retval <= 0)
+-		return retval;
+-
+-	origin = iocb->ki_pos;
+-	retval = p9_client_write(file->private_data, iocb->ki_pos, from, &err);
+-	if (retval > 0) {
+-		struct inode *inode = file_inode(file);
+-		loff_t i_size;
+-		unsigned long pg_start, pg_end;
+-
+-		pg_start = origin >> PAGE_SHIFT;
+-		pg_end = (origin + retval - 1) >> PAGE_SHIFT;
+-		if (inode->i_mapping && inode->i_mapping->nrpages)
+-			invalidate_inode_pages2_range(inode->i_mapping,
+-						      pg_start, pg_end);
+-		iocb->ki_pos += retval;
+-		i_size = i_size_read(inode);
+-		if (iocb->ki_pos > i_size) {
+-			inode_add_bytes(inode, iocb->ki_pos - i_size);
+-			/*
+-			 * Need to serialize against i_size_write() in
+-			 * v9fs_stat2inode()
+-			 */
+-			v9fs_i_size_write(inode, iocb->ki_pos);
+-		}
+-		return retval;
+-	}
+-	return err;
++	p9_debug(P9_DEBUG_CACHE, "(cached)\n");
++	return netfs_file_write_iter(iocb, from);
+ }
+ 
+ static int v9fs_file_fsync(struct file *filp, loff_t start, loff_t end,
+@@ -519,36 +477,7 @@ v9fs_file_mmap(struct file *filp, struct vm_area_struct *vma)
+ static vm_fault_t
+ v9fs_vm_page_mkwrite(struct vm_fault *vmf)
+ {
+-	struct folio *folio = page_folio(vmf->page);
+-	struct file *filp = vmf->vma->vm_file;
+-	struct inode *inode = file_inode(filp);
+-
+-
+-	p9_debug(P9_DEBUG_VFS, "folio %p fid %lx\n",
+-		 folio, (unsigned long)filp->private_data);
+-
+-	/* Wait for the page to be written to the cache before we allow it to
+-	 * be modified.  We then assume the entire page will need writing back.
+-	 */
+-#ifdef CONFIG_9P_FSCACHE
+-	if (folio_test_fscache(folio) &&
+-	    folio_wait_fscache_killable(folio) < 0)
+-		return VM_FAULT_NOPAGE;
+-#endif
+-
+-	/* Update file times before taking page lock */
+-	file_update_time(filp);
+-
+-	if (folio_lock_killable(folio) < 0)
+-		return VM_FAULT_RETRY;
+-	if (folio_mapping(folio) != inode->i_mapping)
+-		goto out_unlock;
+-	folio_wait_stable(folio);
+-
+-	return VM_FAULT_LOCKED;
+-out_unlock:
+-	folio_unlock(folio);
+-	return VM_FAULT_NOPAGE;
++	return netfs_page_mkwrite(vmf, NULL);
+ }
+ 
+ static void v9fs_mmap_vm_close(struct vm_area_struct *vma)
+diff --git a/fs/9p/vfs_inode.c b/fs/9p/vfs_inode.c
+index 74122540e00f..1c3f931914c0 100644
+--- a/fs/9p/vfs_inode.c
++++ b/fs/9p/vfs_inode.c
+@@ -374,10 +374,8 @@ void v9fs_evict_inode(struct inode *inode)
+ 
+ 	truncate_inode_pages_final(&inode->i_data);
+ 
+-#ifdef CONFIG_9P_FSCACHE
+ 	version = cpu_to_le32(v9inode->qid.version);
+ 	netfs_clear_inode_writeback(inode, &version);
+-#endif
+ 
+ 	clear_inode(inode);
+ 	filemap_fdatawrite(&inode->i_data);
 
