@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V5cg8nLX"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E5C13C35
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:24:33 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZ2o4RwO"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C3B3AAD
+	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:24:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701984267;
+	s=mimecast20190719; t=1701984255;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0/ZWBPm/tHnmUrEq/8pNkYJ1kzJiXAey759Ylmcjid8=;
-	b=V5cg8nLXAZEa+fgwgkUFK8LOOmlJjvghAvzi1JJi0sfruFjmZoAS32b5AiNt4M25L+CNny
-	lQLNy8bBbzKPojP7JIB7YrIh+ybzpYwnj4IPUeBpMAyKYVCfbJqYQEZyr0F6MpT2jx/crF
-	hbp/5+0THCTR27PWdvLmGr75DzdwI/4=
+	bh=ffwHrME+qwnYjEte5BzYbjGIILNzwy45sAFMV1nfCCk=;
+	b=CZ2o4RwOJt9bGwghRyNQenE7+wVXLgl3wysnfg0q1Y9We4gR11uqW0XhcrAMhHxfxt2n8G
+	Q3RzOScX+GA08VzsL9Mn0tGdMDFaZApEVrhPw25zgo+0/d7BNmwL+uLvHcT7QTgCfRc/OI
+	3Y5MGJky8GCqSy9BvWZriIw/LAikIlM=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-77-GRh1YG8LNE-t36Dw5asoYA-1; Thu, 07 Dec 2023 16:24:23 -0500
-X-MC-Unique: GRh1YG8LNE-t36Dw5asoYA-1
+ us-mta-34-i3afSiBNN_KaTDZMlzLmAw-1; Thu, 07 Dec 2023 16:24:10 -0500
+X-MC-Unique: i3afSiBNN_KaTDZMlzLmAw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5F78D86C043;
-	Thu,  7 Dec 2023 21:24:22 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E343610C04E2;
+	Thu,  7 Dec 2023 21:24:08 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B769D8174;
-	Thu,  7 Dec 2023 21:24:19 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 34D428174;
+	Thu,  7 Dec 2023 21:24:06 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -50,9 +50,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 38/59] netfs: Decrypt encrypted content
-Date: Thu,  7 Dec 2023 21:21:45 +0000
-Message-ID: <20231207212206.1379128-39-dhowells@redhat.com>
+Subject: [PATCH v3 34/59] netfs: Provide a writepages implementation
+Date: Thu,  7 Dec 2023 21:21:41 +0000
+Message-ID: <20231207212206.1379128-35-dhowells@redhat.com>
 In-Reply-To: <20231207212206.1379128-1-dhowells@redhat.com>
 References: <20231207212206.1379128-1-dhowells@redhat.com>
 Precedence: bulk
@@ -64,14 +64,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-Implement a facility to provide decryption for encrypted content to a whole
-read-request in one go (which might have been stitched together from
-disparate sources with divisions that don't match page boundaries).
-
-Note that this doesn't necessarily gain the best throughput if the crypto
-block size is equal to or less than the size of a page (in which case we
-might be better doing it as pages become read), but it will handle crypto
-blocks larger than the size of a page.
+Provide an implementation of writepages for network filesystems to delegate
+to.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Jeff Layton <jlayton@kernel.org>
@@ -79,148 +73,683 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/crypto.c            | 59 ++++++++++++++++++++++++++++++++++++
- fs/netfs/internal.h          |  1 +
- fs/netfs/io.c                |  6 +++-
- include/linux/netfs.h        |  3 ++
- include/trace/events/netfs.h |  2 ++
- 5 files changed, 70 insertions(+), 1 deletion(-)
+ fs/netfs/buffered_write.c | 647 ++++++++++++++++++++++++++++++++++++++
+ include/linux/netfs.h     |   2 +
+ 2 files changed, 649 insertions(+)
 
-diff --git a/fs/netfs/crypto.c b/fs/netfs/crypto.c
-index 943d01f430e2..6729bcda4f47 100644
---- a/fs/netfs/crypto.c
-+++ b/fs/netfs/crypto.c
-@@ -87,3 +87,62 @@ bool netfs_encrypt(struct netfs_io_request *wreq)
- 	wreq->error = ret;
- 	return false;
+diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+index 70cb8e98d068..42f89f8ea8af 100644
+--- a/fs/netfs/buffered_write.c
++++ b/fs/netfs/buffered_write.c
+@@ -32,6 +32,18 @@ static void netfs_set_group(struct folio *folio, struct netfs_group *netfs_group
+ 		folio_attach_private(folio, netfs_get_group(netfs_group));
  }
+ 
++#if IS_ENABLED(CONFIG_FSCACHE)
++static void netfs_folio_start_fscache(bool caching, struct folio *folio)
++{
++	if (caching)
++		folio_start_fscache(folio);
++}
++#else
++static void netfs_folio_start_fscache(bool caching, struct folio *folio)
++{
++}
++#endif
++
+ /*
+  * Decide how we should modify a folio.  We might be attempting to do
+  * write-streaming, in which case we don't want to a local RMW cycle if we can
+@@ -475,3 +487,638 @@ vm_fault_t netfs_page_mkwrite(struct vm_fault *vmf, struct netfs_group *netfs_gr
+ 	return ret;
+ }
+ EXPORT_SYMBOL(netfs_page_mkwrite);
 +
 +/*
-+ * Decrypt the result of a read request.
++ * Kill all the pages in the given range
 + */
-+void netfs_decrypt(struct netfs_io_request *rreq)
++static void netfs_kill_pages(struct address_space *mapping,
++			     loff_t start, loff_t len)
 +{
-+	struct netfs_inode *ctx = netfs_inode(rreq->inode);
-+	struct scatterlist source_sg[16], dest_sg[16];
-+	unsigned int n_source;
-+	size_t n, chunk, bsize = 1UL << ctx->crypto_bshift;
-+	loff_t pos;
-+	int ret;
++	struct folio *folio;
++	pgoff_t index = start / PAGE_SIZE;
++	pgoff_t last = (start + len - 1) / PAGE_SIZE, next;
 +
-+	trace_netfs_rreq(rreq, netfs_rreq_trace_decrypt);
-+	if (rreq->start >= rreq->i_size)
-+		return;
++	_enter("%llx-%llx", start, start + len - 1);
 +
-+	n = min_t(unsigned long long, rreq->len, rreq->i_size - rreq->start);
++	do {
++		_debug("kill %lx (to %lx)", index, last);
 +
-+	_debug("DECRYPT %llx-%llx f=%lx",
-+	       rreq->start, rreq->start + n, rreq->flags);
-+
-+	pos = rreq->start;
-+	for (; n > 0; n -= chunk, pos += chunk) {
-+		chunk = min(n, bsize);
-+
-+		ret = netfs_iter_to_sglist(&rreq->io_iter, chunk,
-+					   source_sg, ARRAY_SIZE(source_sg));
-+		if (ret < 0)
-+			goto error;
-+		n_source = ret;
-+
-+		if (test_bit(NETFS_RREQ_CRYPT_IN_PLACE, &rreq->flags)) {
-+			ret = ctx->ops->decrypt_block(rreq, pos, chunk,
-+						      source_sg, n_source,
-+						      source_sg, n_source);
-+		} else {
-+			ret = netfs_iter_to_sglist(&rreq->iter, chunk,
-+						   dest_sg, ARRAY_SIZE(dest_sg));
-+			if (ret < 0)
-+				goto error;
-+			ret = ctx->ops->decrypt_block(rreq, pos, chunk,
-+						      source_sg, n_source,
-+						      dest_sg, ret);
++		folio = filemap_get_folio(mapping, index);
++		if (IS_ERR(folio)) {
++			next = index + 1;
++			continue;
 +		}
 +
-+		if (ret < 0)
-+			goto error_failed;
++		next = folio_next_index(folio);
++
++		trace_netfs_folio(folio, netfs_folio_trace_kill);
++		folio_clear_uptodate(folio);
++		if (folio_test_fscache(folio))
++			folio_end_fscache(folio);
++		folio_end_writeback(folio);
++		folio_lock(folio);
++		generic_error_remove_folio(mapping, folio);
++		folio_unlock(folio);
++		folio_put(folio);
++
++	} while (index = next, index <= last);
++
++	_leave("");
++}
++
++/*
++ * Redirty all the pages in a given range.
++ */
++static void netfs_redirty_pages(struct address_space *mapping,
++				loff_t start, loff_t len)
++{
++	struct folio *folio;
++	pgoff_t index = start / PAGE_SIZE;
++	pgoff_t last = (start + len - 1) / PAGE_SIZE, next;
++
++	_enter("%llx-%llx", start, start + len - 1);
++
++	do {
++		_debug("redirty %llx @%llx", len, start);
++
++		folio = filemap_get_folio(mapping, index);
++		if (IS_ERR(folio)) {
++			next = index + 1;
++			continue;
++		}
++
++		next = folio_next_index(folio);
++		trace_netfs_folio(folio, netfs_folio_trace_redirty);
++		filemap_dirty_folio(mapping, folio);
++		if (folio_test_fscache(folio))
++			folio_end_fscache(folio);
++		folio_end_writeback(folio);
++		folio_put(folio);
++	} while (index = next, index <= last);
++
++	balance_dirty_pages_ratelimited(mapping);
++
++	_leave("");
++}
++
++/*
++ * Completion of write to server
++ */
++static void netfs_pages_written_back(struct netfs_io_request *wreq)
++{
++	struct address_space *mapping = wreq->mapping;
++	struct netfs_folio *finfo;
++	struct netfs_group *group = NULL;
++	struct folio *folio;
++	pgoff_t last;
++	int gcount = 0;
++
++	XA_STATE(xas, &mapping->i_pages, wreq->start / PAGE_SIZE);
++
++	_enter("%llx-%llx", wreq->start, wreq->start + wreq->len);
++
++	rcu_read_lock();
++
++	last = (wreq->start + wreq->len - 1) / PAGE_SIZE;
++	xas_for_each(&xas, folio, last) {
++		WARN(!folio_test_writeback(folio),
++		     "bad %zx @%llx page %lx %lx\n",
++		     wreq->len, wreq->start, folio_index(folio), last);
++
++		if ((finfo = netfs_folio_info(folio))) {
++			/* Streaming writes cannot be redirtied whilst under
++			 * writeback, so discard the streaming record.
++			 */
++			folio_detach_private(folio);
++			group = finfo->netfs_group;
++			gcount++;
++			trace_netfs_folio(folio, netfs_folio_trace_clear_s);
++			kfree(finfo);
++		} else if ((group = netfs_folio_group(folio))) {
++			/* Need to detach the group pointer if the page didn't
++			 * get redirtied.  If it has been redirtied, then it
++			 * must be within the same group.
++			 */
++			if (folio_test_dirty(folio)) {
++				trace_netfs_folio(folio, netfs_folio_trace_redirtied);
++				goto end_wb;
++			}
++			if (folio_trylock(folio)) {
++				if (!folio_test_dirty(folio)) {
++					folio_detach_private(folio);
++					gcount++;
++					trace_netfs_folio(folio, netfs_folio_trace_clear_g);
++				} else {
++					trace_netfs_folio(folio, netfs_folio_trace_redirtied);
++				}
++				folio_unlock(folio);
++				goto end_wb;
++			}
++
++			xas_pause(&xas);
++			rcu_read_unlock();
++			folio_lock(folio);
++			if (!folio_test_dirty(folio)) {
++				folio_detach_private(folio);
++				gcount++;
++				trace_netfs_folio(folio, netfs_folio_trace_clear_g);
++			} else {
++				trace_netfs_folio(folio, netfs_folio_trace_redirtied);
++			}
++			folio_unlock(folio);
++			rcu_read_lock();
++		} else {
++			trace_netfs_folio(folio, netfs_folio_trace_clear);
++		}
++	end_wb:
++		if (folio_test_fscache(folio))
++			folio_end_fscache(folio);
++		folio_end_writeback(folio);
 +	}
 +
-+	return;
-+
-+error_failed:
-+	trace_netfs_failure(rreq, NULL, ret, netfs_fail_decryption);
-+error:
-+	rreq->error = ret;
-+	set_bit(NETFS_RREQ_FAILED, &rreq->flags);
-+	return;
++	rcu_read_unlock();
++	netfs_put_group_many(group, gcount);
++	_leave("");
 +}
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 9412ec886df1..b6c142ef996a 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -30,6 +30,7 @@ int netfs_prefetch_for_write(struct file *file, struct folio *folio,
-  * crypto.c
-  */
- bool netfs_encrypt(struct netfs_io_request *wreq);
-+void netfs_decrypt(struct netfs_io_request *rreq);
- 
- /*
-  * direct_write.c
-diff --git a/fs/netfs/io.c b/fs/netfs/io.c
-index 5d9098db815a..e4633ebc269f 100644
---- a/fs/netfs/io.c
-+++ b/fs/netfs/io.c
-@@ -400,6 +400,9 @@ static void netfs_rreq_assess(struct netfs_io_request *rreq, bool was_async)
- 		return;
- 	}
- 
-+	if (!test_bit(NETFS_RREQ_FAILED, &rreq->flags) &&
-+	    test_bit(NETFS_RREQ_CONTENT_ENCRYPTION, &rreq->flags))
-+		netfs_decrypt(rreq);
- 	if (rreq->origin != NETFS_DIO_READ)
- 		netfs_rreq_unlock_folios(rreq);
- 	else
-@@ -429,7 +432,8 @@ static void netfs_rreq_work(struct work_struct *work)
- static void netfs_rreq_terminated(struct netfs_io_request *rreq,
- 				  bool was_async)
- {
--	if (test_bit(NETFS_RREQ_INCOMPLETE_IO, &rreq->flags) &&
-+	if ((test_bit(NETFS_RREQ_INCOMPLETE_IO, &rreq->flags) ||
-+	     test_bit(NETFS_RREQ_CONTENT_ENCRYPTION, &rreq->flags)) &&
- 	    was_async) {
- 		if (!queue_work(system_unbound_wq, &rreq->work))
- 			BUG();
++
++/*
++ * Deal with the disposition of the folios that are under writeback to close
++ * out the operation.
++ */
++static void netfs_cleanup_buffered_write(struct netfs_io_request *wreq)
++{
++	struct address_space *mapping = wreq->mapping;
++
++	_enter("");
++
++	switch (wreq->error) {
++	case 0:
++		netfs_pages_written_back(wreq);
++		break;
++
++	default:
++		pr_notice("R=%08x Unexpected error %d\n", wreq->debug_id, wreq->error);
++		fallthrough;
++	case -EACCES:
++	case -EPERM:
++	case -ENOKEY:
++	case -EKEYEXPIRED:
++	case -EKEYREJECTED:
++	case -EKEYREVOKED:
++	case -ENETRESET:
++	case -EDQUOT:
++	case -ENOSPC:
++		netfs_redirty_pages(mapping, wreq->start, wreq->len);
++		break;
++
++	case -EROFS:
++	case -EIO:
++	case -EREMOTEIO:
++	case -EFBIG:
++	case -ENOENT:
++	case -ENOMEDIUM:
++	case -ENXIO:
++		netfs_kill_pages(mapping, wreq->start, wreq->len);
++		break;
++	}
++
++	if (wreq->error)
++		mapping_set_error(mapping, wreq->error);
++	if (wreq->netfs_ops->done)
++		wreq->netfs_ops->done(wreq);
++}
++
++/*
++ * Extend the region to be written back to include subsequent contiguously
++ * dirty pages if possible, but don't sleep while doing so.
++ *
++ * If this page holds new content, then we can include filler zeros in the
++ * writeback.
++ */
++static void netfs_extend_writeback(struct address_space *mapping,
++				   struct netfs_group *group,
++				   struct xa_state *xas,
++				   long *_count,
++				   loff_t start,
++				   loff_t max_len,
++				   bool caching,
++				   size_t *_len,
++				   size_t *_top)
++{
++	struct netfs_folio *finfo;
++	struct folio_batch fbatch;
++	struct folio *folio;
++	unsigned int i;
++	pgoff_t index = (start + *_len) / PAGE_SIZE;
++	size_t len;
++	void *priv;
++	bool stop = true;
++
++	folio_batch_init(&fbatch);
++
++	do {
++		/* Firstly, we gather up a batch of contiguous dirty pages
++		 * under the RCU read lock - but we can't clear the dirty flags
++		 * there if any of those pages are mapped.
++		 */
++		rcu_read_lock();
++
++		xas_for_each(xas, folio, ULONG_MAX) {
++			stop = true;
++			if (xas_retry(xas, folio))
++				continue;
++			if (xa_is_value(folio))
++				break;
++			if (folio_index(folio) != index) {
++				xas_reset(xas);
++				break;
++			}
++
++			priv = rcu_dereference(*(__force void __rcu **)&folio->private);
++			if ((const struct netfs_group *)priv != group) {
++				finfo = (void *)((unsigned long)priv & ~NETFS_FOLIO_INFO);
++				if (finfo->netfs_group != group) {
++					xas_reset(xas);
++					break;
++				}
++				if (finfo->dirty_offset > 0) {
++					xas_reset(xas);
++					break;
++				}
++			}
++
++			if (!folio_try_get_rcu(folio)) {
++				xas_reset(xas);
++				continue;
++			}
++
++			/* Has the folio moved or been split? */
++			if (unlikely(folio != xas_reload(xas))) {
++				folio_put(folio);
++				xas_reset(xas);
++				break;
++			}
++
++			if (!folio_trylock(folio)) {
++				folio_put(folio);
++				xas_reset(xas);
++				break;
++			}
++			if (!folio_test_dirty(folio) ||
++			    folio_test_writeback(folio) ||
++			    folio_test_fscache(folio)) {
++				folio_unlock(folio);
++				folio_put(folio);
++				xas_reset(xas);
++				break;
++			}
++
++			stop = false;
++			len = folio_size(folio);
++			priv = folio->private;
++			if ((const struct netfs_group *)priv != group) {
++				stop = true;
++				finfo = (void *)((unsigned long)priv & ~NETFS_FOLIO_INFO);
++				if (finfo->netfs_group != group ||
++				    finfo->dirty_offset > 0) {
++					folio_unlock(folio);
++					folio_put(folio);
++					xas_reset(xas);
++					break;
++				}
++				len = finfo->dirty_len;
++			}
++
++			*_top += folio_size(folio);
++			index += folio_nr_pages(folio);
++			*_count -= folio_nr_pages(folio);
++			*_len += len;
++			if (*_len >= max_len || *_count <= 0)
++				stop = true;
++
++			if (!folio_batch_add(&fbatch, folio))
++				break;
++			if (stop)
++				break;
++		}
++
++		xas_pause(xas);
++		rcu_read_unlock();
++
++		/* Now, if we obtained any folios, we can shift them to being
++		 * writable and mark them for caching.
++		 */
++		if (!folio_batch_count(&fbatch))
++			break;
++
++		for (i = 0; i < folio_batch_count(&fbatch); i++) {
++			folio = fbatch.folios[i];
++			trace_netfs_folio(folio, netfs_folio_trace_store_plus);
++
++			if (!folio_clear_dirty_for_io(folio))
++				BUG();
++			folio_start_writeback(folio);
++			netfs_folio_start_fscache(caching, folio);
++			folio_unlock(folio);
++		}
++
++		folio_batch_release(&fbatch);
++		cond_resched();
++	} while (!stop);
++}
++
++/*
++ * Synchronously write back the locked page and any subsequent non-locked dirty
++ * pages.
++ */
++static ssize_t netfs_write_back_from_locked_folio(struct address_space *mapping,
++						  struct writeback_control *wbc,
++						  struct netfs_group *group,
++						  struct xa_state *xas,
++						  struct folio *folio,
++						  unsigned long long start,
++						  unsigned long long end)
++{
++	struct netfs_io_request *wreq;
++	struct netfs_folio *finfo;
++	struct netfs_inode *ctx = netfs_inode(mapping->host);
++	unsigned long long i_size = i_size_read(&ctx->inode);
++	size_t len, max_len;
++	bool caching = netfs_is_cache_enabled(ctx);
++	long count = wbc->nr_to_write;
++	int ret;
++
++	_enter(",%lx,%llx-%llx,%u", folio_index(folio), start, end, caching);
++
++	wreq = netfs_alloc_request(mapping, NULL, start, folio_size(folio),
++				   NETFS_WRITEBACK);
++	if (IS_ERR(wreq)) {
++		folio_unlock(folio);
++		return PTR_ERR(wreq);
++	}
++
++	if (!folio_clear_dirty_for_io(folio))
++		BUG();
++	folio_start_writeback(folio);
++	netfs_folio_start_fscache(caching, folio);
++
++	count -= folio_nr_pages(folio);
++
++	/* Find all consecutive lockable dirty pages that have contiguous
++	 * written regions, stopping when we find a page that is not
++	 * immediately lockable, is not dirty or is missing, or we reach the
++	 * end of the range.
++	 */
++	trace_netfs_folio(folio, netfs_folio_trace_store);
++
++	len = wreq->len;
++	finfo = netfs_folio_info(folio);
++	if (finfo) {
++		start += finfo->dirty_offset;
++		if (finfo->dirty_offset + finfo->dirty_len != len) {
++			len = finfo->dirty_len;
++			goto cant_expand;
++		}
++		len = finfo->dirty_len;
++	}
++
++	if (start < i_size) {
++		/* Trim the write to the EOF; the extra data is ignored.  Also
++		 * put an upper limit on the size of a single storedata op.
++		 */
++		max_len = 65536 * 4096;
++		max_len = min_t(unsigned long long, max_len, end - start + 1);
++		max_len = min_t(unsigned long long, max_len, i_size - start);
++
++		if (len < max_len)
++			netfs_extend_writeback(mapping, group, xas, &count, start,
++					       max_len, caching, &len, &wreq->upper_len);
++	}
++
++cant_expand:
++	len = min_t(unsigned long long, len, i_size - start);
++
++	/* We now have a contiguous set of dirty pages, each with writeback
++	 * set; the first page is still locked at this point, but all the rest
++	 * have been unlocked.
++	 */
++	folio_unlock(folio);
++	wreq->start = start;
++	wreq->len = len;
++
++	if (start < i_size) {
++		_debug("write back %zx @%llx [%llx]", len, start, i_size);
++
++		/* Speculatively write to the cache.  We have to fix this up
++		 * later if the store fails.
++		 */
++		wreq->cleanup = netfs_cleanup_buffered_write;
++
++		iov_iter_xarray(&wreq->iter, ITER_SOURCE, &mapping->i_pages, start,
++				wreq->upper_len);
++		__set_bit(NETFS_RREQ_UPLOAD_TO_SERVER, &wreq->flags);
++		ret = netfs_begin_write(wreq, true, netfs_write_trace_writeback);
++		if (ret == 0 || ret == -EIOCBQUEUED)
++			wbc->nr_to_write -= len / PAGE_SIZE;
++	} else {
++		_debug("write discard %zx @%llx [%llx]", len, start, i_size);
++
++		/* The dirty region was entirely beyond the EOF. */
++		fscache_clear_page_bits(mapping, start, len, caching);
++		netfs_pages_written_back(wreq);
++		ret = 0;
++	}
++
++	netfs_put_request(wreq, false, netfs_rreq_trace_put_return);
++	_leave(" = 1");
++	return 1;
++}
++
++/*
++ * Write a region of pages back to the server
++ */
++static ssize_t netfs_writepages_begin(struct address_space *mapping,
++				      struct writeback_control *wbc,
++				      struct netfs_group *group,
++				      struct xa_state *xas,
++				      unsigned long long *_start,
++				      unsigned long long end)
++{
++	const struct netfs_folio *finfo;
++	struct folio *folio;
++	unsigned long long start = *_start;
++	ssize_t ret;
++	void *priv;
++	int skips = 0;
++
++	_enter("%llx,%llx,", start, end);
++
++search_again:
++	/* Find the first dirty page in the group. */
++	rcu_read_lock();
++
++	for (;;) {
++		folio = xas_find_marked(xas, end / PAGE_SIZE, PAGECACHE_TAG_DIRTY);
++		if (xas_retry(xas, folio) || xa_is_value(folio))
++			continue;
++		if (!folio)
++			break;
++
++		/* Skip any dirty folio that's not in the group of interest. */
++		priv = rcu_dereference(*(__force void __rcu **)&folio->private);
++		if ((const struct netfs_group *)priv != group) {
++			finfo = (void *)((unsigned long)priv & ~NETFS_FOLIO_INFO);
++			if (finfo->netfs_group != group)
++				continue;
++		}
++
++		if (!folio_try_get_rcu(folio)) {
++			xas_reset(xas);
++			continue;
++		}
++
++		if (unlikely(folio != xas_reload(xas))) {
++			folio_put(folio);
++			xas_reset(xas);
++			continue;
++		}
++
++		xas_pause(xas);
++		break;
++	}
++	rcu_read_unlock();
++	if (!folio)
++		return 0;
++
++	start = folio_pos(folio); /* May regress with THPs */
++
++	_debug("wback %lx", folio_index(folio));
++
++	/* At this point we hold neither the i_pages lock nor the page lock:
++	 * the page may be truncated or invalidated (changing page->mapping to
++	 * NULL), or even swizzled back from swapper_space to tmpfs file
++	 * mapping
++	 */
++lock_again:
++	if (wbc->sync_mode != WB_SYNC_NONE) {
++		ret = folio_lock_killable(folio);
++		if (ret < 0)
++			return ret;
++	} else {
++		if (!folio_trylock(folio))
++			goto search_again;
++	}
++
++	if (folio->mapping != mapping ||
++	    !folio_test_dirty(folio)) {
++		start += folio_size(folio);
++		folio_unlock(folio);
++		goto search_again;
++	}
++
++	if (folio_test_writeback(folio) ||
++	    folio_test_fscache(folio)) {
++		folio_unlock(folio);
++		if (wbc->sync_mode != WB_SYNC_NONE) {
++			folio_wait_writeback(folio);
++#ifdef CONFIG_NETFS_FSCACHE
++			folio_wait_fscache(folio);
++#endif
++			goto lock_again;
++		}
++
++		start += folio_size(folio);
++		if (wbc->sync_mode == WB_SYNC_NONE) {
++			if (skips >= 5 || need_resched()) {
++				ret = 0;
++				goto out;
++			}
++			skips++;
++		}
++		goto search_again;
++	}
++
++	ret = netfs_write_back_from_locked_folio(mapping, wbc, group, xas,
++						 folio, start, end);
++out:
++	if (ret > 0)
++		*_start = start + ret;
++	_leave(" = %zd [%llx]", ret, *_start);
++	return ret;
++}
++
++/*
++ * Write a region of pages back to the server
++ */
++static int netfs_writepages_region(struct address_space *mapping,
++				   struct writeback_control *wbc,
++				   struct netfs_group *group,
++				   unsigned long long *_start,
++				   unsigned long long end)
++{
++	ssize_t ret;
++
++	XA_STATE(xas, &mapping->i_pages, *_start / PAGE_SIZE);
++
++	do {
++		ret = netfs_writepages_begin(mapping, wbc, group, &xas,
++					     _start, end);
++		if (ret > 0 && wbc->nr_to_write > 0)
++			cond_resched();
++	} while (ret > 0 && wbc->nr_to_write > 0);
++
++	return ret > 0 ? 0 : ret;
++}
++
++/*
++ * write some of the pending data back to the server
++ */
++int netfs_writepages(struct address_space *mapping,
++		     struct writeback_control *wbc)
++{
++	struct netfs_group *group = NULL;
++	loff_t start, end;
++	int ret;
++
++	_enter("");
++
++	/* We have to be careful as we can end up racing with setattr()
++	 * truncating the pagecache since the caller doesn't take a lock here
++	 * to prevent it.
++	 */
++
++	if (wbc->range_cyclic && mapping->writeback_index) {
++		start = mapping->writeback_index * PAGE_SIZE;
++		ret = netfs_writepages_region(mapping, wbc, group,
++					      &start, LLONG_MAX);
++		if (ret < 0)
++			goto out;
++
++		if (wbc->nr_to_write <= 0) {
++			mapping->writeback_index = start / PAGE_SIZE;
++			goto out;
++		}
++
++		start = 0;
++		end = mapping->writeback_index * PAGE_SIZE;
++		mapping->writeback_index = 0;
++		ret = netfs_writepages_region(mapping, wbc, group, &start, end);
++		if (ret == 0)
++			mapping->writeback_index = start / PAGE_SIZE;
++	} else if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX) {
++		start = 0;
++		ret = netfs_writepages_region(mapping, wbc, group,
++					      &start, LLONG_MAX);
++		if (wbc->nr_to_write > 0 && ret == 0)
++			mapping->writeback_index = start / PAGE_SIZE;
++	} else {
++		start = wbc->range_start;
++		ret = netfs_writepages_region(mapping, wbc, group,
++					      &start, wbc->range_end);
++	}
++
++out:
++	_leave(" = %d", ret);
++	return ret;
++}
++EXPORT_SYMBOL(netfs_writepages);
 diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index c2985f73d870..50adcf6942b8 100644
+index f98deef22d06..ef17d94a2fbd 100644
 --- a/include/linux/netfs.h
 +++ b/include/linux/netfs.h
-@@ -325,6 +325,9 @@ struct netfs_request_ops {
- 	int (*encrypt_block)(struct netfs_io_request *wreq, loff_t pos, size_t len,
- 			     struct scatterlist *source_sg, unsigned int n_source,
- 			     struct scatterlist *dest_sg, unsigned int n_dest);
-+	int (*decrypt_block)(struct netfs_io_request *rreq, loff_t pos, size_t len,
-+			     struct scatterlist *source_sg, unsigned int n_source,
-+			     struct scatterlist *dest_sg, unsigned int n_dest);
- };
- 
- /*
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index 3f50819613e2..6394fdf7a9cd 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -40,6 +40,7 @@
- #define netfs_rreq_traces					\
- 	EM(netfs_rreq_trace_assess,		"ASSESS ")	\
- 	EM(netfs_rreq_trace_copy,		"COPY   ")	\
-+	EM(netfs_rreq_trace_decrypt,		"DECRYPT")	\
- 	EM(netfs_rreq_trace_done,		"DONE   ")	\
- 	EM(netfs_rreq_trace_encrypt,		"ENCRYPT")	\
- 	EM(netfs_rreq_trace_free,		"FREE   ")	\
-@@ -75,6 +76,7 @@
- #define netfs_failures							\
- 	EM(netfs_fail_check_write_begin,	"check-write-begin")	\
- 	EM(netfs_fail_copy_to_cache,		"copy-to-cache")	\
-+	EM(netfs_fail_decryption,		"decryption")		\
- 	EM(netfs_fail_dio_read_short,		"dio-read-short")	\
- 	EM(netfs_fail_dio_read_zero,		"dio-read-zero")	\
- 	EM(netfs_fail_encryption,		"encryption")		\
+@@ -400,6 +400,8 @@ int netfs_read_folio(struct file *, struct folio *);
+ int netfs_write_begin(struct netfs_inode *, struct file *,
+ 		      struct address_space *, loff_t pos, unsigned int len,
+ 		      struct folio **, void **fsdata);
++int netfs_writepages(struct address_space *mapping,
++		     struct writeback_control *wbc);
+ bool netfs_dirty_folio(struct address_space *mapping, struct folio *folio);
+ int netfs_unpin_writeback(struct inode *inode, struct writeback_control *wbc);
+ void netfs_clear_inode_writeback(struct inode *inode, const void *aux);
 
