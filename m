@@ -1,91 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jImzH38J"
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76090BA
-	for <linux-cifs@vger.kernel.org>; Fri,  8 Dec 2023 09:01:40 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-50be3611794so2613503e87.0
-        for <linux-cifs@vger.kernel.org>; Fri, 08 Dec 2023 09:01:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702054899; x=1702659699; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Hx+KXbsrDsXqQ/asxho25qjSNIITqY/mDTMJmu3//Io=;
-        b=jImzH38J/NbFS5nXcgNlLo7564ZCcw3kCl8PGSEuHh0JJ3qaxBPabZ+yscoVOpmPIh
-         7diT1bNCY6YOtmJN5jhg6tiLRP3txb5Gytu8RkdgXZDNAhrfO2BCf+Vu1MDT2rUXCuis
-         X/n9hVB2Uauex+2RQ+nuulxfs91IwgA601Fw9+UlRc5Z1KpYP+lFY6tz6I4tL8+pC0BJ
-         vc7MXZBD9kOZkDs51Gi4grtJRYr+tEeEtpqoTxa/Pe7+nTBoBC0REpYrhQ1j2cAwuM6r
-         Ho8peEXDaZvtsIHiuB1t8O8+1WHInjySArBtkBFkgrUaPy/M201UTao/9jdEjZ6by6Zy
-         HmzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702054899; x=1702659699;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Hx+KXbsrDsXqQ/asxho25qjSNIITqY/mDTMJmu3//Io=;
-        b=AnB2ILjU29Ev7j+WQj465Tf1yvJ28Bzr5xXChUisquHkdLnlbLfqI7I/fkUidOmd3f
-         WDTeBWK4m4KO2wjx2va2TQl4KrT/JZ3TZUW73+QudK9Ej39dBS997YwuTBdunSNTBOjP
-         SgGtCVgGSSuAjxY8jdRuphTn7cEIf/BtN4W0+z3QpiNyd4TIRwnySLd3Qy6yCcdVCD9Q
-         4Sy8flK5lkz9EsnUydngB7TDh1iXtBCvtTSmZF9CeH1G1cDm0PlxJonpTtHSvgvlGBgI
-         jo2DE0v2ZvqGqDNgItDMTbotntnB4iFrzQ+YicvjksdtDkEohVS1IPLISzqNbAfTkN97
-         2zZw==
-X-Gm-Message-State: AOJu0YxRf5+RljVXs+cyivkAC0P+1HBeJIBN1babn9dfnQSQoynRDWmx
-	k4XwcipyGKDMfIavyUI8ezoOsx8jEZX27rXO2EA=
-X-Google-Smtp-Source: AGHT+IHWoPbuGSShxjR5HvyR57kAa14AEktbOwWC3/ZYoENSvlNd1Q8kPjNtjFOpN0sqDeJapBz2dA1iUIWVEF7vi9w=
-X-Received: by 2002:a05:6512:2350:b0:50b:f798:28be with SMTP id
- p16-20020a056512235000b0050bf79828bemr115677lfu.92.1702054898254; Fri, 08 Dec
- 2023 09:01:38 -0800 (PST)
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="axsVKUVH"
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5524BF4
+	for <linux-cifs@vger.kernel.org>; Fri,  8 Dec 2023 09:45:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Cc:To:From:Date;
+	bh=d1V+Y7dJncXQ9Ctk/pTkzup2pAVzspT42o3Qu1BUGCk=; b=axsVKUVHJUBH7h556Usf2cm6Pm
+	YR42fiSqFSSomRHXUWP0/3eFWXSS06HvzKtUU+cSxfC1colvLBKZZXR41iLGzDIffuGryjbCiFbS0
+	LAZBXsri3cSK0gCqWMNDwNbvV1H9ACOb6h9MT2MGNBnssvLiAyeW+xsVMbnHQV12TrXkADaDpFtXz
+	RAoVolUmXfSQTMxTnNvV/4IjrFdP/GtrT3rD2ixd6qP8fuz/+wpbM67Ws2R8QCSJstVxcphBAx08L
+	AxYatdD0nhmQAtU+hwZyYwaF4lnsCq83rDku0uO5kWphctpeSVQpxySGAKwYsdUMiNhS1erfseh7W
+	kpSmTwbyhSnVMjT2kDr1XT9HkTIWZ9lkI+9GSZV7OyWIcAuGNOMpwBvcXQOkUMECcuJ0XcA3R8XTY
+	mVdzHOsGXQSv2KP+zoEqBQl15izuE2CfHKZgU1Amf8p2pSXyX9yJt3+TKJu9HLfB1KQwOHK352dBQ
+	1iKfA9HwOVlY3MKhXd2hdJK6;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1rBeut-002dUW-0z;
+	Fri, 08 Dec 2023 17:45:35 +0000
+Date: Fri, 8 Dec 2023 09:45:31 -0800
+From: Jeremy Allison <jra@samba.org>
+To: Tom Talpey <tom@talpey.com>
+Cc: Shyam Prasad N <nspmangalore@gmail.com>,
+	Paulo Alcantara <pc@manguebit.com>, meetakshisetiyaoss@gmail.com,
+	linux-cifs@vger.kernel.org, smfrench@gmail.com,
+	bharathsm.hsk@gmail.com, lsahlber@redhat.com,
+	Meetakshi Setiya <msetiya@microsoft.com>
+Subject: Re: [PATCH] cifs: Reuse file lease key in compound operations
+Message-ID: <ZXNWO3hkP46959hE@jeremy-HP-Z840-Workstation>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <20231204045632.72226-1-meetakshisetiyaoss@gmail.com>
+ <65d6d76197069e56b472bbfead425913@manguebit.com>
+ <CANT5p=qnEFJDTTrSRkdBfkE9Kzw9BzGRegtCuW6Hb4xc7PSdaQ@mail.gmail.com>
+ <9980a249-043c-4140-a5ee-bc06cf156747@talpey.com>
+ <CANT5p=p0Fk5j73Hu50DeywQdBSffKo8TNvZhSjQaj+-LtrNOTA@mail.gmail.com>
+ <f67c5e4e-8c0f-4755-b974-0b76a044433e@talpey.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 8 Dec 2023 11:01:27 -0600
-Message-ID: <CAH2r5mtK-JQeH5gLoGjUS5sywfd-KTJhnF_Mf4c+KCoapMEPhQ@mail.gmail.com>
-Subject: Lease keys and hardlinked files
-To: samba-technical <samba-technical@lists.samba.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, Shyam Prasad N <nspmangalore@gmail.com>, 
-	meetakshisetiyaoss@gmail.com, Meetakshi Setiya <msetiya@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <f67c5e4e-8c0f-4755-b974-0b76a044433e@talpey.com>
 
-Following up on a question about hardlinks and caching data remotely,
-I tried a simple experiment:
+On Fri, Dec 08, 2023 at 09:02:45AM -0500, Tom Talpey wrote:
+>So, this next statement makes an incorrect assumption:
+>
+>>Hard links are in-fact pointing to the same file. So I would've
+>>assumed that the server would have treated both links to have the same
+>>lease.
+>
+>Not at all - the lease key is chosen by the *client*, not the server,
+>and the key can only look up one actual lease. So the protocol enforces
+>it, meaning the server must verify the path.
 
-1) ln /mnt/hardlink1 /mnt/hardlink2
-   then
-2) echo "some data" >> /mnt/hardlink1
-   then
-3) echo "more stuff" >> /mnt/hardlink2
+IMHO this was a big mistake in the protocol design.
 
-I see the second open (ie the one to hardlink2) fail with
-STATUS_INVALID_PARAMETER, presumably due to the lease key being reused
-for the second open (for hardlink2) came from the first open (of
-hardlink1).  It would be logical that leasekeys depend on the inode
-not that the pathname (so could handle hardlinks on the same mount)
-but that appears not to be the case.
+The server has complete knowledge of what paths map
+to what files, so the lease key really should have
+been a server created token.
 
-Interestingly the case when two clients access the hardlink (or eg.
-nosharesock mount to same share on /mnt1 and /mnt2) works more
-logically:
-
-1) hardlink /mnt1/hardlink1 /mnt1/hardlink2
-   then
-2) nosharesock mount /mnt2 to the same share
-   then
-3) echo "some data" >> /mnt1/hardlink1
-   then
-4) echo "more data" >> /mnt2/hardlink2
-
-What you see at step 4 is the open of /mnt2/hardlink2 generates a
-lease break of the (deferred close) handle on /mnt1/hardlink1 from RWH
-to RH, and the open of /mnt2/hardlink2 is given RH then after the
-write to hardlink2 you see a lease break from RH to none as expected
-before the close.
-
-
-
-
--- 
-Thanks,
-
-Steve
+Well, too late now :-).
