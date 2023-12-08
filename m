@@ -1,89 +1,52 @@
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86CD1718;
-	Thu,  7 Dec 2023 22:58:06 -0800 (PST)
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SmhmS6xz0z4f3jqZ;
-	Fri,  8 Dec 2023 14:58:00 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 181101A0A9B;
-	Fri,  8 Dec 2023 14:58:02 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-	by APP1 (Coremail) with SMTP id cCh0CgDn6hB3vnJlRn4+DA--.35987S4;
-	Fri, 08 Dec 2023 14:58:00 +0800 (CST)
-From: linan666@huaweicloud.com
-To: linkinjeon@kernel.org,
-	sfrench@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linan122@huawei.com,
-	yukuai3@huawei.com,
-	yi.zhang@huawei.com,
-	houtao1@huawei.com,
-	yangerkun@huawei.com
-Subject: [PATCH] ksmbd: validate the zero field of packet header
-Date: Fri,  8 Dec 2023 14:56:47 +0800
-Message-Id: <20231208065647.745640-1-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=venturelinkbiz.com header.i=@venturelinkbiz.com header.b="Zhk9ZJ1/"
+Received: from mail.venturelinkbiz.com (mail.venturelinkbiz.com [51.195.119.142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE57173A
+	for <linux-cifs@vger.kernel.org>; Fri,  8 Dec 2023 00:51:23 -0800 (PST)
+Received: by mail.venturelinkbiz.com (Postfix, from userid 1002)
+	id 121FD478EC; Fri,  8 Dec 2023 08:51:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=venturelinkbiz.com;
+	s=mail; t=1702025482;
+	bh=Mjfq+hZZ0+rPTC06HjjASvlnsTMgj1yAndWxi/OAu2M=;
+	h=Date:From:To:Subject:From;
+	b=Zhk9ZJ1//+GEcwewIcOzbNLOrfPEO2V+VtCkNxvFNvH4360bxEScFI/txoWDUfyiL
+	 5CPT880InYbtyZ/iLzGZQG69CVL0ny+fJXuCGeH2xFO7BowL7GzXnBwb5R9aMWMMkP
+	 fBTk7yd1b5Fn7lokfPMrteepIp5m0UP/p8qTm5dm3cSFYcgKojiqENPEDX8XM9r2Me
+	 38Wd7coUylVVU7hJfQnPM/c39gVpKx4X5owucXxeqwSK63UQ6CHcptbON4B8zaVviR
+	 z4NVmekXgGUDNVW+mL7sDrFmUCVxbNvkahwS9aIW2o6dTQYecTqe1RxHfizd5p5POe
+	 W1a7oxzDk91Ug==
+Received: by mail.venturelinkbiz.com for <linux-cifs@vger.kernel.org>; Fri,  8 Dec 2023 08:51:08 GMT
+Message-ID: <20231208074500-0.1.42.c4cj.0.2e9292ait6@venturelinkbiz.com>
+Date: Fri,  8 Dec 2023 08:51:08 GMT
+From: "Michal Rmoutil" <michal.rmoutil@venturelinkbiz.com>
+To: <linux-cifs@vger.kernel.org>
+Subject: =?UTF-8?Q?Bezplatn=C3=A1_60denn=C3=AD_zku=C5=A1ebn=C3=AD_verze:_Vylep=C5=A1ete_sv=C3=A9_v=C3=BDrobn=C3=AD_procesy?=
+X-Mailer: mail.venturelinkbiz.com
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDn6hB3vnJlRn4+DA--.35987S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cr1xWF1UuFW3Xr1UKw4Uurg_yoW8Gr18pr
-	45Ary5WrWrXr43CF4ktFy8u3WYgr1kJr47trZrCwnrZrZ7tw48tF1IqwnIgF1fXFyrJFy0
-	vr4qvanYka40kaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487
-	Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aV
-	AFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4kE6xkIj40E
-	w7xC0wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
-	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UKoG
-	dUUUUU=
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Li Nan <linan122@huawei.com>
+Dobr=C3=A9 r=C3=A1no
 
-The SMB2 Protocol requires that "The first byte of the Direct TCP
-transport packet header MUST be zero (0x00)"[1]. Commit 1c1bcf2d3ea0
-("ksmbd: validate smb request protocol id") removed the validation of
-this 1-byte zero. Add the validation back now.
+Zn=C3=A1te syst=C3=A9m, kter=C3=BD nejen hl=C3=ADd=C3=A1, ale i optimaliz=
+uje v=C3=BDrobu a p=C5=99in=C3=A1=C5=A1=C3=AD st=C3=A1l=C3=BD p=C5=99=C3=AD=
+jem?
 
-[1]: [MS-SMB2] - v20230227, page 30.
-https://winprotocoldoc.blob.core.windows.net/productionwindowsarchives/MS-SMB2/%5bMS-SMB2%5d-230227.pdf
+D=C3=ADky nejnov=C4=9Bj=C5=A1=C3=ADm technologi=C3=ADm a anal=C3=BDze dat=
+ na=C5=A1e =C5=99e=C5=A1en=C3=AD identifikuje oblasti optimalizace, zv=C3=
+=BD=C5=A1en=C3=AD efektivity a sn=C3=AD=C5=BEen=C3=AD n=C3=A1klad=C5=AF. =
+Na=C5=A1i klienti zaznamenali n=C3=A1r=C5=AFst p=C5=99=C3=ADjm=C5=AF v pr=
+=C5=AFm=C4=9Bru o 20 % a dnes si to m=C5=AF=C5=BEete vyzkou=C5=A1et na 60=
+ dn=C3=AD zdarma.
 
-Fixes: 1c1bcf2d3ea0 ("ksmbd: validate smb request protocol id")
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- fs/smb/server/smb_common.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Pokud chcete dal=C5=A1=C3=AD podrobnosti, odpov=C4=9Bzte pros=C3=ADm na k=
+ontaktn=C3=AD =C4=8D=C3=ADslo.
 
-diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
-index 6691ae68af0c..7c98bf699772 100644
---- a/fs/smb/server/smb_common.c
-+++ b/fs/smb/server/smb_common.c
-@@ -158,8 +158,12 @@ int ksmbd_verify_smb_message(struct ksmbd_work *work)
-  */
- bool ksmbd_smb_request(struct ksmbd_conn *conn)
- {
--	__le32 *proto = (__le32 *)smb2_get_msg(conn->request_buf);
-+	__le32 *proto;
- 
-+	if (conn->request_buf[0] != 0)
-+		return false;
-+
-+	proto = (__le32 *)smb2_get_msg(conn->request_buf);
- 	if (*proto == SMB2_COMPRESSION_TRANSFORM_ID) {
- 		pr_err_ratelimited("smb2 compression not support yet");
- 		return false;
--- 
-2.39.2
 
+Pozdravy
+Michal Rmoutil
