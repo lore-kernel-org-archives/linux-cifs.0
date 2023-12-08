@@ -1,75 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zn4BRdw5"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 493701733
-	for <linux-cifs@vger.kernel.org>; Thu,  7 Dec 2023 13:58:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1701986281;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2gpuqenBf/seLQmhrTte/4HdPOyV33jxxLbSCYkPyeM=;
-	b=Zn4BRdw5e9GjbQlK/IzkyGHo2P2snQ9aVjyzHl7CBGCn0Ug/azInrjBWraSxiqU6lLvDvt
-	Upc4q8kY9wUuP1rRG0Ey4tcGouk/mzkKkmOzf9Vk9Ajf+AF0jerdG9jj6htXGO7Xo+SHhb
-	ssmpxCkT0UKGx21cgU8rmIUBI7T4Gmg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-494-3pxRZfFcM5CBFUREWELNAA-1; Thu,
- 07 Dec 2023 16:57:57 -0500
-X-MC-Unique: 3pxRZfFcM5CBFUREWELNAA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7B64C1C0BB50;
-	Thu,  7 Dec 2023 21:57:56 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.161])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E59971C060AF;
-	Thu,  7 Dec 2023 21:57:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZXI7aGHkxZyiytXg@casper.infradead.org>
-References: <ZXI7aGHkxZyiytXg@casper.infradead.org> <20231207212206.1379128-1-dhowells@redhat.com> <20231207212206.1379128-60-dhowells@redhat.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-    Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 59/59] netfs: Eliminate PG_fscache by setting folio->private and marking dirty
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86CD1718;
+	Thu,  7 Dec 2023 22:58:06 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4SmhmS6xz0z4f3jqZ;
+	Fri,  8 Dec 2023 14:58:00 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 181101A0A9B;
+	Fri,  8 Dec 2023 14:58:02 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+	by APP1 (Coremail) with SMTP id cCh0CgDn6hB3vnJlRn4+DA--.35987S4;
+	Fri, 08 Dec 2023 14:58:00 +0800 (CST)
+From: linan666@huaweicloud.com
+To: linkinjeon@kernel.org,
+	sfrench@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linan122@huawei.com,
+	yukuai3@huawei.com,
+	yi.zhang@huawei.com,
+	houtao1@huawei.com,
+	yangerkun@huawei.com
+Subject: [PATCH] ksmbd: validate the zero field of packet header
+Date: Fri,  8 Dec 2023 14:56:47 +0800
+Message-Id: <20231208065647.745640-1-linan666@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1451125.1701986273.1@warthog.procyon.org.uk>
-Date: Thu, 07 Dec 2023 21:57:53 +0000
-Message-ID: <1451127.1701986273@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgDn6hB3vnJlRn4+DA--.35987S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr1xWF1UuFW3Xr1UKw4Uurg_yoW8Gr18pr
+	45Ary5WrWrXr43CF4ktFy8u3WYgr1kJr47trZrCwnrZrZ7tw48tF1IqwnIgF1fXFyrJFy0
+	vr4qvanYka40kaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487
+	Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aV
+	AFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4kE6xkIj40E
+	w7xC0wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
+	6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UKoG
+	dUUUUU=
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-Matthew Wilcox <willy@infradead.org> wrote:
+From: Li Nan <linan122@huawei.com>
 
-> On Thu, Dec 07, 2023 at 09:22:06PM +0000, David Howells wrote:
-> > With this, PG_fscache is no longer required.
-> 
-> ... for filesystems that use netfslib, right?  ie we can't delete
-> folio_wait_private_2_killable() and friends because nfs still uses it?
+The SMB2 Protocol requires that "The first byte of the Direct TCP
+transport packet header MUST be zero (0x00)"[1]. Commit 1c1bcf2d3ea0
+("ksmbd: validate smb request protocol id") removed the validation of
+this 1-byte zero. Add the validation back now.
 
-Yeah.  Though I have my eye on NFS too ;-)
+[1]: [MS-SMB2] - v20230227, page 30.
+https://winprotocoldoc.blob.core.windows.net/productionwindowsarchives/MS-SMB2/%5bMS-SMB2%5d-230227.pdf
 
-David
+Fixes: 1c1bcf2d3ea0 ("ksmbd: validate smb request protocol id")
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ fs/smb/server/smb_common.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
+index 6691ae68af0c..7c98bf699772 100644
+--- a/fs/smb/server/smb_common.c
++++ b/fs/smb/server/smb_common.c
+@@ -158,8 +158,12 @@ int ksmbd_verify_smb_message(struct ksmbd_work *work)
+  */
+ bool ksmbd_smb_request(struct ksmbd_conn *conn)
+ {
+-	__le32 *proto = (__le32 *)smb2_get_msg(conn->request_buf);
++	__le32 *proto;
+ 
++	if (conn->request_buf[0] != 0)
++		return false;
++
++	proto = (__le32 *)smb2_get_msg(conn->request_buf);
+ 	if (*proto == SMB2_COMPRESSION_TRANSFORM_ID) {
+ 		pr_err_ratelimited("smb2 compression not support yet");
+ 		return false;
+-- 
+2.39.2
 
