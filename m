@@ -1,49 +1,49 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="VrzrMQ2o"
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="W5xdTOGm"
 Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DCADF
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Dec 2023 05:26:59 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E179A
+	for <linux-cifs@vger.kernel.org>; Mon, 11 Dec 2023 05:27:01 -0800 (PST)
 From: Paulo Alcantara <pc@manguebit.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1702301217;
+	s=dkim; t=1702301219;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GylB4GX2Wj3U+P2mGgsqQMh6p0MZvDAIFEJHvnhlWYY=;
-	b=VrzrMQ2olVYNUOm6kl5j5qEbS7mKkJqqTjt9Kqmzu+Ggxe7qmJwpBfHghQ6shqJMOQ4+uN
-	VAy1q8nPVShXHkwVEMmPA+SZeifkpI6BYiFIhPGskfXwU+iJKc5vN7l8+N7lkR64iXv6BE
-	GvG9RHhG2ZZATdvVCo7Rp+cdHCHk5e5rtdnWtbqOn4mNwED9Dlc+QJ1x5pSzVQovyTro96
-	2X5ALQgwfJLP3saN1CFNu/Rk7Mmb07t7OHufofuQYH3zJftR04p2DxP7LHxDn6J27fyAMV
-	ajBxM6jnV5D6fUOG0YcUpMdczf5g7DYAuZttwyPZGTO/g9Bxm94YOKmA45ZP8A==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1702301217; a=rsa-sha256;
+	bh=Wx9vzItDY34yg1d1Z+UQPCLcN35MfbLnda4QNZANaBU=;
+	b=W5xdTOGmOZH+BcM5tQUvNIXXVSDPO2OAXm7mbwq9TMc7lziwKjZeJo++4pSWblr/yp/bWT
+	JrkBNHEZZF+MLlqT5p78T9FXgcCbi66i+JCPAuZ4lD6uIVBM4CNUnEl4lVixV+Li60wVmF
+	BJKPIVXjpvQAB3aTlHiH8SK3HsD4wUOkuL35/vbe4BDJZJtomU1lxuuvS13JJLGkUckTlm
+	tyqSKOhcPJxx4u/OeENYgFh1hjIuyMP6DSxAhgL3SyPGMvmjhrxWlMGlnT5Cx6I6Yj1qnz
+	lsVQJ3efSvaUfbhdXf15rGMC9tbCMqgKXSY0x5NUhQSiqjTTmt+9SWMIQcflbw==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1702301219; a=rsa-sha256;
 	cv=none;
-	b=PYTmugtlSmEYJrfhngXLA9GMjOV4O7778wHhFfTsVRI3uQUcoZzI2VwmrtgJi4XPckTJW1
-	EDtZIL0QuySI1YsAKvJyZCi+nRznZ+iQl6ngazxCV3Hxeta280fmEQNi4rAvRdfCKkdNxu
-	AmVvPUDxJusfPLscpCgC1oRNMMnyPyx4wqiwMI5VZawqj3OrkyOHyM+SGt8uCGIbp22syN
-	Jd3ShWxrGLwmwU6gzK+DyyDLRqHWJ32TFnxbSVfse4U3LfhbjIKRH4Ur81kdDquHxoVbi4
-	4U7k/r5hnggzpa21OrC3Z+9whJq1w4zYktm2j5YGyc4MUo6LhGoA50fZdeEBTQ==
+	b=UnXJAqDpf0j7gqeIJHdIHSSuR1897Jp53KBObA0ZZvdfJYHQx82DMn3W8nPjgyO5Li8Zqt
+	Lkrcm+LJthy/LrymZfArqE/OooPN7b5LtFde7c5kvPB0D+sbMZJAyVSjRmG7cx6i48FtVE
+	r4aiY/7WnXe6ch3s4y3ZX9l9vnIgkILHnzC6rc3BJaxrrvkcbo8BNE6kgkCLx7UG8RlfTF
+	FCpSxW/CeoAGlrEbncb+RRr39TZmYbWmXE7JVrUkHkiOHe7QqEd5nE5JaTojJ2TUsq1z8u
+	pva7vc9oMeCydCHe6RvAtCPRE54Mn+pssUbzrmJeUBQiE+NizU9uSMhep55/Mg==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1702301217; h=from:from:sender:reply-to:subject:subject:date:date:
+	s=dkim; t=1702301219; h=from:from:sender:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GylB4GX2Wj3U+P2mGgsqQMh6p0MZvDAIFEJHvnhlWYY=;
-	b=DkqGzAIHI66tMG0lUk+g5fCxkF2vpav/1KNEmyq95hAlUPmH12rPDegsB707oeUec9At87
-	TzeswGjwPU0rGg8/MjaqYbv3OH4pA9jRJ/OPRjC4cvQFl6kmDQPPAILJNN3e4Ucd0YP6KF
-	2EmrRnv9tWZaxL8ii5rUPA337pIf9tet8dwdFRMV0baYMyelXA9lz8tggJ+u40wog4/fW/
-	Ep/DuyxEUPG48mZvijMbaFDkzsLTgUK0KDes0P7x/7pJ/v2wfYGvEfIgnxqvdToC1jW5dx
-	grPsYk9tCkYmj+e4iPaRc9Rp6AMosAXA4zmDxTOSAN5zIIq70SPzTfi7IN837A==
+	bh=Wx9vzItDY34yg1d1Z+UQPCLcN35MfbLnda4QNZANaBU=;
+	b=EYMR7q5nZaYHyOB8zbXJBXh7VlHpgEpOtahIy8OTX52zpj4YDhFVEjVNvBEdPYDXFiv4U7
+	dX6OsA0ndAep6+gRuIf2q9pizh51F1Rh39PJVXYxeJtsyGsNIGvGShjQ4Et6pqar0NMMmS
+	Eoes9C/hfLN8oaRFf1gZTmBDIkm3oNLNHYM6Tqh96ZSKoH5y/O4G2LNFrOjRB4WgChLTiG
+	zdceMJowX9VbIKYVuLblV9zHUmufTNE3JbXfg0S8k3LBYz0YFIazI7iK/5fNUd7ptbXhoP
+	iyvaAhhOyWcgcCwfmqZJukDo75B2N+2EfHiUnJneeYUf6BsmEwj9GI3UriQ38Q==
 To: smfrench@gmail.com
 Cc: linux-cifs@vger.kernel.org,
 	Paulo Alcantara <pc@manguebit.com>,
 	Robert Morris <rtm@csail.mit.edu>
-Subject: [PATCH 2/4] smb: client: fix potential OOBs in smb2_parse_contexts()
-Date: Mon, 11 Dec 2023 10:26:41 -0300
-Message-ID: <20231211132643.18724-2-pc@manguebit.com>
+Subject: [PATCH 3/4] smb: client: fix NULL deref in asn1_ber_decoder()
+Date: Mon, 11 Dec 2023 10:26:42 -0300
+Message-ID: <20231211132643.18724-3-pc@manguebit.com>
 In-Reply-To: <20231211132643.18724-1-pc@manguebit.com>
 References: <20231211132643.18724-1-pc@manguebit.com>
 Precedence: bulk
@@ -54,48 +54,54 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Validate offsets and lengths before dereferencing create contexts in
-smb2_parse_contexts().
+If server replied SMB2_NEGOTIATE with a zero SecurityBufferOffset,
+smb2_get_data_area() sets @len to non-zero but return NULL, so
+decode_negTokeninit() ends up being called with a NULL @security_blob:
 
-This fixes following oops when accessing invalid create contexts from
-server:
-
-  BUG: unable to handle page fault for address: ffff8881178d8cc3
+  BUG: kernel NULL pointer dereference, address: 0000000000000000
   #PF: supervisor read access in kernel mode
   #PF: error_code(0x0000) - not-present page
-  PGD 4a01067 P4D 4a01067 PUD 0
+  PGD 0 P4D 0
   Oops: 0000 [#1] PREEMPT SMP NOPTI
-  CPU: 3 PID: 1736 Comm: mount.cifs Not tainted 6.7.0-rc4 #1
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-  rel-1.16.2-3-gd478f380-rebuilt.opensuse.org 04/01/2014
-  RIP: 0010:smb2_parse_contexts+0xa0/0x3a0 [cifs]
-  Code: f8 10 75 13 48 b8 93 ad 25 50 9c b4 11 e7 49 39 06 0f 84 d2 00
-  00 00 8b 45 00 85 c0 74 61 41 29 c5 48 01 c5 41 83 fd 0f 76 55 <0f> b7
-  7d 04 0f b7 45 06 4c 8d 74 3d 00 66 83 f8 04 75 bc ba 04 00
-  RSP: 0018:ffffc900007939e0 EFLAGS: 00010216
-  RAX: ffffc90000793c78 RBX: ffff8880180cc000 RCX: ffffc90000793c90
-  RDX: ffffc90000793cc0 RSI: ffff8880178d8cc0 RDI: ffff8880180cc000
-  RBP: ffff8881178d8cbf R08: ffffc90000793c22 R09: 0000000000000000
-  R10: ffff8880180cc000 R11: 0000000000000024 R12: 0000000000000000
-  R13: 0000000000000020 R14: 0000000000000000 R15: ffffc90000793c22
-  FS: 00007f873753cbc0(0000) GS:ffff88806bc00000(0000)
-  knlGS:0000000000000000
+  CPU: 2 PID: 871 Comm: mount.cifs Not tainted 6.7.0-rc4 #2
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.2-3-gd478f380-rebuilt.opensuse.org 04/01/2014
+  RIP: 0010:asn1_ber_decoder+0x173/0xc80
+  Code: 01 4c 39 2c 24 75 09 45 84 c9 0f 85 2f 03 00 00 48 8b 14 24 4c 29 ea 48 83 fa 01 0f 86 1e 07 00 00 48 8b 74 24 28 4d 8d 5d 01 <42> 0f b6 3c 2e 89 fa 40 88 7c 24 5c f7 d2 83 e2 1f 0f 84 3d 07 00
+  RSP: 0018:ffffc9000063f950 EFLAGS: 00010202
+  RAX: 0000000000000002 RBX: 0000000000000000 RCX: 000000000000004a
+  RDX: 000000000000004a RSI: 0000000000000000 RDI: 0000000000000000
+  RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+  R10: 0000000000000002 R11: 0000000000000001 R12: 0000000000000000
+  R13: 0000000000000000 R14: 000000000000004d R15: 0000000000000000
+  FS:  00007fce52b0fbc0(0000) GS:ffff88806ba00000(0000) knlGS:0000000000000000
   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: ffff8881178d8cc3 CR3: 00000000181ca000 CR4: 0000000000750ef0
+  CR2: 0000000000000000 CR3: 000000001ae64000 CR4: 0000000000750ef0
   PKRU: 55555554
   Call Trace:
    <TASK>
    ? __die+0x23/0x70
    ? page_fault_oops+0x181/0x480
-   ? search_module_extables+0x19/0x60
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? exc_page_fault+0x1b6/0x1c0
+   ? __stack_depot_save+0x1e6/0x480
+   ? exc_page_fault+0x6f/0x1c0
    ? asm_exc_page_fault+0x26/0x30
-   ? smb2_parse_contexts+0xa0/0x3a0 [cifs]
-   SMB2_open+0x38d/0x5f0 [cifs]
-   ? smb2_is_path_accessible+0x138/0x260 [cifs]
-   smb2_is_path_accessible+0x138/0x260 [cifs]
-   cifs_is_path_remote+0x8d/0x230 [cifs]
+   ? asn1_ber_decoder+0x173/0xc80
+   ? check_object+0x40/0x340
+   decode_negTokenInit+0x1e/0x30 [cifs]
+   SMB2_negotiate+0xc99/0x17c0 [cifs]
+   ? smb2_negotiate+0x46/0x60 [cifs]
+   ? srso_alias_return_thunk+0x5/0xfbef5
+   smb2_negotiate+0x46/0x60 [cifs]
+   cifs_negotiate_protocol+0xae/0x130 [cifs]
+   cifs_get_smb_ses+0x517/0x1040 [cifs]
+   ? srso_alias_return_thunk+0x5/0xfbef5
+   ? srso_alias_return_thunk+0x5/0xfbef5
+   ? queue_delayed_work_on+0x5d/0x90
+   cifs_mount_get_session+0x78/0x200 [cifs]
+   dfs_mount_share+0x13a/0x9f0 [cifs]
+   ? srso_alias_return_thunk+0x5/0xfbef5
+   ? lock_acquire+0xbf/0x2b0
+   ? find_nls+0x16/0x80
+   ? srso_alias_return_thunk+0x5/0xfbef5
    cifs_mount+0x7e/0x350 [cifs]
    cifs_smb3_do_mount+0x128/0x780 [cifs]
    smb3_get_tree+0xd9/0x290 [cifs]
@@ -107,204 +113,68 @@ server:
    __x64_sys_mount+0x11a/0x150
    do_syscall_64+0x47/0xf0
    entry_SYSCALL_64_after_hwframe+0x6f/0x77
-  RIP: 0033:0x7f8737657b1e
+  RIP: 0033:0x7fce52c2ab1e
+
+Fix this by setting @len to zero when @off == 0 so callers won't
+attempt to dereference non-existing data areas.
 
 Reported-by: Robert Morris <rtm@csail.mit.edu>
 Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
- fs/smb/client/cached_dir.c | 17 ++++---
- fs/smb/client/smb2pdu.c    | 91 +++++++++++++++++++++++---------------
- fs/smb/client/smb2proto.h  | 12 ++---
- 3 files changed, 74 insertions(+), 46 deletions(-)
+ fs/smb/client/smb2misc.c | 26 ++++++++++----------------
+ 1 file changed, 10 insertions(+), 16 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 59f6b8e32cc9..d64a306a414b 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -291,16 +291,23 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	oparms.fid->mid = le64_to_cpu(o_rsp->hdr.MessageId);
- #endif /* CIFS_DEBUG2 */
- 
--	rc = -EINVAL;
-+
- 	if (o_rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE) {
- 		spin_unlock(&cfids->cfid_list_lock);
-+		rc = -EINVAL;
- 		goto oshr_free;
- 	}
- 
--	smb2_parse_contexts(server, o_rsp,
--			    &oparms.fid->epoch,
--			    oparms.fid->lease_key, &oplock,
--			    NULL, NULL);
-+	rc = smb2_parse_contexts(server, rsp_iov,
-+				 &oparms.fid->epoch,
-+				 oparms.fid->lease_key,
-+				 &oplock, NULL, NULL);
-+	if (rc) {
-+		spin_unlock(&cfids->cfid_list_lock);
-+		goto oshr_free;
-+	}
-+
-+	rc = -EINVAL;
- 	if (!(oplock & SMB2_LEASE_READ_CACHING_HE)) {
- 		spin_unlock(&cfids->cfid_list_lock);
- 		goto oshr_free;
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 20634fc6d4f0..c571760ad39a 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -2236,17 +2236,18 @@ parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info,
- 		 posix->nlink, posix->mode, posix->reparse_tag);
- }
- 
--void
--smb2_parse_contexts(struct TCP_Server_Info *server,
--		    struct smb2_create_rsp *rsp,
--		    unsigned int *epoch, char *lease_key, __u8 *oplock,
--		    struct smb2_file_all_info *buf,
--		    struct create_posix_rsp *posix)
-+int smb2_parse_contexts(struct TCP_Server_Info *server,
-+			struct kvec *rsp_iov,
-+			unsigned int *epoch,
-+			char *lease_key, __u8 *oplock,
-+			struct smb2_file_all_info *buf,
-+			struct create_posix_rsp *posix)
+diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
+index 32dfa0f7a78c..e20b4354e703 100644
+--- a/fs/smb/client/smb2misc.c
++++ b/fs/smb/client/smb2misc.c
+@@ -313,6 +313,9 @@ static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
+ char *
+ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
  {
--	char *data_offset;
-+	struct smb2_create_rsp *rsp = rsp_iov->iov_base;
- 	struct create_context *cc;
--	unsigned int next;
--	unsigned int remaining;
-+	size_t rem, off, len;
-+	size_t doff, dlen;
-+	size_t noff, nlen;
- 	char *name;
- 	static const char smb3_create_tag_posix[] = {
- 		0x93, 0xAD, 0x25, 0x50, 0x9C,
-@@ -2255,45 +2256,63 @@ smb2_parse_contexts(struct TCP_Server_Info *server,
- 	};
- 
- 	*oplock = 0;
--	data_offset = (char *)rsp + le32_to_cpu(rsp->CreateContextsOffset);
--	remaining = le32_to_cpu(rsp->CreateContextsLength);
--	cc = (struct create_context *)data_offset;
++	const int max_off = 4096;
++	const int max_len = 128 * 1024;
 +
-+	off = le32_to_cpu(rsp->CreateContextsOffset);
-+	rem = le32_to_cpu(rsp->CreateContextsLength);
-+	if (check_add_overflow(off, rem, &len) || len > rsp_iov->iov_len)
-+		return -EINVAL;
-+	cc = (struct create_context *)((u8 *)rsp + off);
+ 	*off = 0;
+ 	*len = 0;
  
- 	/* Initialize inode number to 0 in case no valid data in qfid context */
- 	if (buf)
- 		buf->IndexNumber = 0;
- 
--	while (remaining >= sizeof(struct create_context)) {
--		name = le16_to_cpu(cc->NameOffset) + (char *)cc;
--		if (le16_to_cpu(cc->NameLength) == 4 &&
--		    strncmp(name, SMB2_CREATE_REQUEST_LEASE, 4) == 0)
--			*oplock = server->ops->parse_lease_buf(cc, epoch,
--							   lease_key);
--		else if (buf && (le16_to_cpu(cc->NameLength) == 4) &&
--		    strncmp(name, SMB2_CREATE_QUERY_ON_DISK_ID, 4) == 0)
--			parse_query_id_ctxt(cc, buf);
--		else if ((le16_to_cpu(cc->NameLength) == 16)) {
--			if (posix &&
--			    memcmp(name, smb3_create_tag_posix, 16) == 0)
-+	while (rem >= sizeof(*cc)) {
-+		doff = le16_to_cpu(cc->DataOffset);
-+		dlen = le32_to_cpu(cc->DataLength);
-+		if (check_add_overflow(doff, dlen, &len) || len > rem)
-+			return -EINVAL;
-+
-+		noff = le16_to_cpu(cc->NameOffset);
-+		nlen = le16_to_cpu(cc->NameLength);
-+		if (noff + nlen >= doff)
-+			return -EINVAL;
-+
-+		name = (char *)cc + noff;
-+		switch (nlen) {
-+		case 4:
-+			if (!strncmp(name, SMB2_CREATE_REQUEST_LEASE, 4)) {
-+				*oplock = server->ops->parse_lease_buf(cc, epoch,
-+								       lease_key);
-+			} else if (buf &&
-+				   !strncmp(name, SMB2_CREATE_QUERY_ON_DISK_ID, 4)) {
-+				parse_query_id_ctxt(cc, buf);
-+			}
-+			break;
-+		case 16:
-+			if (posix && !memcmp(name, smb3_create_tag_posix, 16))
- 				parse_posix_ctxt(cc, buf, posix);
-+			break;
-+		default:
-+			cifs_dbg(FYI, "%s: unhandled context (nlen=%zu dlen=%zu)\n",
-+				 __func__, nlen, dlen);
-+			if (IS_ENABLED(CONFIG_CIFS_DEBUG2))
-+				cifs_dump_mem("context data: ", cc, dlen);
-+			break;
- 		}
--		/* else {
--			cifs_dbg(FYI, "Context not matched with len %d\n",
--				le16_to_cpu(cc->NameLength));
--			cifs_dump_mem("Cctxt name: ", name, 4);
--		} */
- 
--		next = le32_to_cpu(cc->Next);
--		if (!next)
-+		off = le32_to_cpu(cc->Next);
-+		if (!off)
- 			break;
--		remaining -= next;
--		cc = (struct create_context *)((char *)cc + next);
-+		if (check_sub_overflow(rem, off, &rem))
-+			return -EINVAL;
-+		cc = (struct create_context *)((u8 *)cc + off);
+@@ -384,29 +387,20 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
+ 	 * Invalid length or offset probably means data area is invalid, but
+ 	 * we have little choice but to ignore the data area in this case.
+ 	 */
+-	if (*off > 4096) {
+-		cifs_dbg(VFS, "offset %d too large, data area ignored\n", *off);
+-		*len = 0;
+-		*off = 0;
+-	} else if (*off < 0) {
+-		cifs_dbg(VFS, "negative offset %d to data invalid ignore data area\n",
+-			 *off);
++	if (unlikely(*off < 0 || *off > max_off ||
++		     *len < 0 || *len > max_len)) {
++		cifs_dbg(VFS, "%s: invalid data area (off=%d len=%d)\n",
++			 __func__, *off, *len);
+ 		*off = 0;
+ 		*len = 0;
+-	} else if (*len < 0) {
+-		cifs_dbg(VFS, "negative data length %d invalid, data area ignored\n",
+-			 *len);
+-		*len = 0;
+-	} else if (*len > 128 * 1024) {
+-		cifs_dbg(VFS, "data area larger than 128K: %d\n", *len);
++	} else if (*off == 0) {
+ 		*len = 0;
  	}
  
- 	if (rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE)
- 		*oplock = rsp->OplockLevel;
- 
--	return;
-+	return 0;
+ 	/* return pointer to beginning of data area, ie offset from SMB start */
+-	if ((*off != 0) && (*len != 0))
++	if (*off > 0 && *len > 0)
+ 		return (char *)shdr + *off;
+-	else
+-		return NULL;
++	return NULL;
  }
  
- static int
-@@ -3124,8 +3143,8 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	}
- 
- 
--	smb2_parse_contexts(server, rsp, &oparms->fid->epoch,
--			    oparms->fid->lease_key, oplock, buf, posix);
-+	rc = smb2_parse_contexts(server, &rsp_iov, &oparms->fid->epoch,
-+				 oparms->fid->lease_key, oplock, buf, posix);
- creat_exit:
- 	SMB2_open_free(&rqst);
- 	free_rsp_buf(resp_buftype, rsp);
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 46eff9ec302a..0e371f7e2854 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -251,11 +251,13 @@ extern int smb3_validate_negotiate(const unsigned int, struct cifs_tcon *);
- 
- extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
- 					enum securityEnum);
--extern void smb2_parse_contexts(struct TCP_Server_Info *server,
--				struct smb2_create_rsp *rsp,
--				unsigned int *epoch, char *lease_key,
--				__u8 *oplock, struct smb2_file_all_info *buf,
--				struct create_posix_rsp *posix);
-+int smb2_parse_contexts(struct TCP_Server_Info *server,
-+			struct kvec *rsp_iov,
-+			unsigned int *epoch,
-+			char *lease_key, __u8 *oplock,
-+			struct smb2_file_all_info *buf,
-+			struct create_posix_rsp *posix);
-+
- extern int smb3_encryption_required(const struct cifs_tcon *tcon);
- extern int smb2_validate_iov(unsigned int offset, unsigned int buffer_length,
- 			     struct kvec *iov, unsigned int min_buf_size);
+ /*
 -- 
 2.43.0
 
