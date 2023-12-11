@@ -1,51 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="SalmdnJu"
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D96CB3
-	for <linux-cifs@vger.kernel.org>; Mon, 11 Dec 2023 05:27:03 -0800 (PST)
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1702301221;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3mW1TZP"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A779FB4
+	for <linux-cifs@vger.kernel.org>; Mon, 11 Dec 2023 08:34:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702312468;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5YWnuuY6cnhb3xQ30lNjNpm7N7j/987LT3QzkeuMcxE=;
-	b=SalmdnJuK3oZmAMHoHxNnnWNsFvM1aIvm7Kpe7ZDLrfw7UHXopnLiEDYo7hw4EThdIqttA
-	hVhRz2kf38/GCrxcARmTFcZdBOL2l7GK+abDdTmJSDqeivNVEyLFlGUz1Tz2BptmjWOiqx
-	dpu6ijqSCBCLFn41U8ze2uEY/STJcZxo1gBmQ/Ssmsnu6BZf6QoYCsh1Ep9zWLXIs0+ScV
-	P5KoKeU3hi4W1bN1A67YPGZrDW8TCqjn6j8DSDh/zwY2KQsqOXwQDzd3Ald2hOx4Du3Gsd
-	8/mHCRZ73/7QFGDc1X2uerEJYMUl/xUIZ7Ru121eBuyFvWYISWqtoke+NRGoZg==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1702301221; a=rsa-sha256;
-	cv=none;
-	b=Dc+Nxwc+MWg7BpcGKPa4f+1eas7yubdhwxuR9qSCGfdsGvYUUg4Ci99E7RTUhgNuKPdTli
-	OqIdH7e9tzR03KCJqhkwQ5mePD/2k6NE6QXTThhNU9w07lX3pqlGiT1lz6R2kZIU+PkoK4
-	diWMdTj3Mt0WWYmdVaZSeTAu+akVGokOZE440+3GjZ8zV2tpvNfkmGo2IbcAAlAAjX1Mrl
-	q+zRrCNBLKeEXbGU80CEA9wi0OxY4q6JClka775zn3RK2GatwXrJsmJDhW7l3L1H+I2K07
-	Qx4vlkYWWWKzKLkZbKXpwksqupBtBpOhlopA2jAedXFsjjo+cni9Vzl/gseumw==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1702301221; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5YWnuuY6cnhb3xQ30lNjNpm7N7j/987LT3QzkeuMcxE=;
-	b=W8SOCckPeJU0x1fz8DSf09ctDTO15dw0fg04F3TFy813ThOC0GfRlvQyQ9SmyODfScfnqs
-	B8TjYo21wDnnV90fvWyZvYSjgEKYSinjBMY+af695QjBG1M0m//oHi02lBFnXOox+MQlS4
-	wLvklK61BMsjpUjVqej21RJfFtac6LwPkBOU8CLCV8NbAU6PtoxoLMCpVNPD+veXELMuij
-	wxW3mevxxC3ssMBKLub4xXSUdUW+iCrfaNKINYRpPRiMl5BHZD5xnX/VMrFYCTLnAJlTJW
-	VZTQTIuNymMBtwQHzu+VuwGpvE+vvil1bETpNEeOYKKNwbGuER/2cqXuZMkrrQ==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>,
-	Robert Morris <rtm@csail.mit.edu>
-Subject: [PATCH 4/4] smb: client: fix OOB in smb2_query_reparse_point()
-Date: Mon, 11 Dec 2023 10:26:43 -0300
-Message-ID: <20231211132643.18724-4-pc@manguebit.com>
-In-Reply-To: <20231211132643.18724-1-pc@manguebit.com>
-References: <20231211132643.18724-1-pc@manguebit.com>
+	bh=vLk+s36CrmcN/jHutHg878NqXnxvoZdKdAeSrt1NZXM=;
+	b=N3mW1TZPB09rHPSXIPmzWFBnFzvddVqAuqhKJerit0SFYa29w2gQsQ/bEe2/reia3EY9sp
+	3BzjfBRxQA55hqpvE4vsEf2YG9V7jEO/QUH2jfDUQhTbQAK+OJkSexrRAj2VYmGJMIPOc4
+	WCiR8nrbilXYEYX3JtNC2cF39v0SDX4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-396-saFToYxHPwiAC-rkKFA2CA-1; Mon, 11 Dec 2023 11:34:25 -0500
+X-MC-Unique: saFToYxHPwiAC-rkKFA2CA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AEE87101CC60;
+	Mon, 11 Dec 2023 16:34:24 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.2])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4B545492BE6;
+	Mon, 11 Dec 2023 16:34:22 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Markus Suvanto <markus.suvanto@gmail.com>,
+	Marc Dionne <marc.dionne@auristor.com>
+Cc: David Howells <dhowells@redhat.com>,
+	linux-afs@lists.infradead.org,
+	keyrings@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wang Lei <wang840925@gmail.com>,
+	Jeff Layton <jlayton@redhat.com>,
+	Steve French <sfrench@us.ibm.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 3/3] keys, dns: Allow key types (eg. DNS) to be reclaimed immediately on expiry
+Date: Mon, 11 Dec 2023 16:34:12 +0000
+Message-ID: <20231211163412.2766147-4-dhowells@redhat.com>
+In-Reply-To: <20231211163412.2766147-1-dhowells@redhat.com>
+References: <20231211163412.2766147-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -53,112 +59,269 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Validate @ioctl_rsp->OutputOffset and @ioctl_rsp->OutputCount so that
-their sum does not wrap to a number that is smaller than @reparse_buf
-and we end up with a wild pointer as follows:
+If a key has an expiration time, then when that time passes, the key is
+left around for a certain amount of time before being collected (5 mins by
+default) so that EKEYEXPIRED can be returned instead of ENOKEY.  This is a
+problem for DNS keys because we want to redo the DNS lookup immediately at
+that point.
 
-  BUG: unable to handle page fault for address: ffff88809c5cd45f
-  #PF: supervisor read access in kernel mode
-  #PF: error_code(0x0000) - not-present page
-  PGD 4a01067 P4D 4a01067 PUD 0
-  Oops: 0000 [#1] PREEMPT SMP NOPTI
-  CPU: 2 PID: 1260 Comm: mount.cifs Not tainted 6.7.0-rc4 #2
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-  rel-1.16.2-3-gd478f380-rebuilt.opensuse.org 04/01/2014
-  RIP: 0010:smb2_query_reparse_point+0x3e0/0x4c0 [cifs]
-  Code: ff ff e8 f3 51 fe ff 41 89 c6 58 5a 45 85 f6 0f 85 14 fe ff ff
-  49 8b 57 48 8b 42 60 44 8b 42 64 42 8d 0c 00 49 39 4f 50 72 40 <8b>
-  04 02 48 8b 9d f0 fe ff ff 49 8b 57 50 89 03 48 8b 9d e8 fe ff
-  RSP: 0018:ffffc90000347a90 EFLAGS: 00010212
-  RAX: 000000008000001f RBX: ffff88800ae11000 RCX: 00000000000000ec
-  RDX: ffff88801c5cd440 RSI: 0000000000000000 RDI: ffffffff82004aa4
-  RBP: ffffc90000347bb0 R08: 00000000800000cd R09: 0000000000000001
-  R10: 0000000000000000 R11: 0000000000000024 R12: ffff8880114d4100
-  R13: ffff8880114d4198 R14: 0000000000000000 R15: ffff8880114d4000
-  FS: 00007f02c07babc0(0000) GS:ffff88806ba00000(0000)
-  knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: ffff88809c5cd45f CR3: 0000000011750000 CR4: 0000000000750ef0
-  PKRU: 55555554
-  Call Trace:
-   <TASK>
-   ? __die+0x23/0x70
-   ? page_fault_oops+0x181/0x480
-   ? search_module_extables+0x19/0x60
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? exc_page_fault+0x1b6/0x1c0
-   ? asm_exc_page_fault+0x26/0x30
-   ? _raw_spin_unlock_irqrestore+0x44/0x60
-   ? smb2_query_reparse_point+0x3e0/0x4c0 [cifs]
-   cifs_get_fattr+0x16e/0xa50 [cifs]
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? lock_acquire+0xbf/0x2b0
-   cifs_root_iget+0x163/0x5f0 [cifs]
-   cifs_smb3_do_mount+0x5bd/0x780 [cifs]
-   smb3_get_tree+0xd9/0x290 [cifs]
-   vfs_get_tree+0x2c/0x100
-   ? capable+0x37/0x70
-   path_mount+0x2d7/0xb80
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? _raw_spin_unlock_irqrestore+0x44/0x60
-   __x64_sys_mount+0x11a/0x150
-   do_syscall_64+0x47/0xf0
-   entry_SYSCALL_64_after_hwframe+0x6f/0x77
-  RIP: 0033:0x7f02c08d5b1e
+Fix this by allowing key types to be marked such that keys of that type
+don't have this extra period, but are reclaimed as soon as they expire and
+turn this on for dns_resolver-type keys.  To make this easier to handle,
+key->expiry is changed to be permanent if TIME64_MAX rather than 0.
 
-Fixes: 2e4564b31b64 ("smb3: add support for stat of WSL reparse points for special file types")
-Reported-by: Robert Morris <rtm@csail.mit.edu>
-Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+Furthermore, give such new-style negative DNS results a 10s default expiry
+if no other expiry time is set rather than allowing it to stick around
+indefinitely.  This shouldn't be zero as ls will follow a failing stat call
+immediately with a second with AT_SYMLINK_NOFOLLOW added.
+
+Fixes: 1a4240f4764a ("DNS: Separate out CIFS DNS Resolver code")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Wang Lei <wang840925@gmail.com>
+cc: Jeff Layton <jlayton@redhat.com>
+cc: Steve French <sfrench@us.ibm.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jarkko Sakkinen <jarkko@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-nfs@vger.kernel.org
+cc: ceph-devel@vger.kernel.org
+cc: keyrings@vger.kernel.org
+cc: netdev@vger.kernel.org
 ---
- fs/smb/client/smb2ops.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ include/linux/key-type.h   |  1 +
+ net/dns_resolver/dns_key.c | 10 +++++++++-
+ security/keys/gc.c         | 31 +++++++++++++++++++++----------
+ security/keys/internal.h   |  8 +++++++-
+ security/keys/key.c        | 15 +++++----------
+ security/keys/proc.c       |  2 +-
+ 6 files changed, 44 insertions(+), 23 deletions(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index a6f4948adcbb..8f6f0a38b886 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3003,7 +3003,7 @@ static int smb2_query_reparse_point(const unsigned int xid,
- 	struct kvec *rsp_iov;
- 	struct smb2_ioctl_rsp *ioctl_rsp;
- 	struct reparse_data_buffer *reparse_buf;
--	u32 plen;
-+	u32 off, count, len;
+diff --git a/include/linux/key-type.h b/include/linux/key-type.h
+index 7d985a1dfe4a..5caf3ce82373 100644
+--- a/include/linux/key-type.h
++++ b/include/linux/key-type.h
+@@ -73,6 +73,7 @@ struct key_type {
  
- 	cifs_dbg(FYI, "%s: path: %s\n", __func__, full_path);
+ 	unsigned int flags;
+ #define KEY_TYPE_NET_DOMAIN	0x00000001 /* Keys of this type have a net namespace domain */
++#define KEY_TYPE_INSTANT_REAP	0x00000002 /* Keys of this type don't have a delay after expiring */
  
-@@ -3084,16 +3084,22 @@ static int smb2_query_reparse_point(const unsigned int xid,
- 	 */
- 	if (rc == 0) {
- 		/* See MS-FSCC 2.3.23 */
-+		off = le32_to_cpu(ioctl_rsp->OutputOffset);
-+		count = le32_to_cpu(ioctl_rsp->OutputCount);
-+		if (check_add_overflow(off, count, &len) ||
-+		    len > rsp_iov[1].iov_len) {
-+			cifs_tcon_dbg(VFS, "%s: invalid ioctl: off=%d count=%d\n",
-+				      __func__, off, count);
-+			rc = -EIO;
-+			goto query_rp_exit;
-+		}
- 
--		reparse_buf = (struct reparse_data_buffer *)
--			((char *)ioctl_rsp +
--			 le32_to_cpu(ioctl_rsp->OutputOffset));
--		plen = le32_to_cpu(ioctl_rsp->OutputCount);
--
--		if (plen + le32_to_cpu(ioctl_rsp->OutputOffset) >
--		    rsp_iov[1].iov_len) {
--			cifs_tcon_dbg(FYI, "srv returned invalid ioctl len: %d\n",
--				 plen);
-+		reparse_buf = (void *)((u8 *)ioctl_rsp + off);
-+		len = sizeof(*reparse_buf);
-+		if (count < len ||
-+		    count < le16_to_cpu(reparse_buf->ReparseDataLength) + len) {
-+			cifs_tcon_dbg(VFS, "%s: invalid ioctl: off=%d count=%d\n",
-+				      __func__, off, count);
- 			rc = -EIO;
- 			goto query_rp_exit;
+ 	/* vet a description */
+ 	int (*vet_description)(const char *description);
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index 01e54b46ae0b..3233f4f25fed 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -91,6 +91,7 @@ const struct cred *dns_resolver_cache;
+ static int
+ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ {
++	const struct dns_server_list_v1_header *v1;
+ 	const struct dns_payload_header *bin;
+ 	struct user_key_payload *upayload;
+ 	unsigned long derrno;
+@@ -122,6 +123,13 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ 			return -EINVAL;
  		}
--- 
-2.43.0
+ 
++		v1 = (const struct dns_server_list_v1_header *)bin;
++		if ((v1->status != DNS_LOOKUP_GOOD &&
++		     v1->status != DNS_LOOKUP_GOOD_WITH_BAD)) {
++			if (prep->expiry == TIME64_MAX)
++				prep->expiry = ktime_get_real_seconds() + 10;
++		}
++
+ 		result_len = datalen;
+ 		goto store_result;
+ 	}
+@@ -314,7 +322,7 @@ static long dns_resolver_read(const struct key *key,
+ 
+ struct key_type key_type_dns_resolver = {
+ 	.name		= "dns_resolver",
+-	.flags		= KEY_TYPE_NET_DOMAIN,
++	.flags		= KEY_TYPE_NET_DOMAIN | KEY_TYPE_INSTANT_REAP,
+ 	.preparse	= dns_resolver_preparse,
+ 	.free_preparse	= dns_resolver_free_preparse,
+ 	.instantiate	= generic_key_instantiate,
+diff --git a/security/keys/gc.c b/security/keys/gc.c
+index 3c90807476eb..eaddaceda14e 100644
+--- a/security/keys/gc.c
++++ b/security/keys/gc.c
+@@ -66,6 +66,19 @@ void key_schedule_gc(time64_t gc_at)
+ 	}
+ }
+ 
++/*
++ * Set the expiration time on a key.
++ */
++void key_set_expiry(struct key *key, time64_t expiry)
++{
++	key->expiry = expiry;
++	if (expiry != TIME64_MAX) {
++		if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++			expiry += key_gc_delay;
++		key_schedule_gc(expiry);
++	}
++}
++
+ /*
+  * Schedule a dead links collection run.
+  */
+@@ -176,7 +189,6 @@ static void key_garbage_collector(struct work_struct *work)
+ 	static u8 gc_state;		/* Internal persistent state */
+ #define KEY_GC_REAP_AGAIN	0x01	/* - Need another cycle */
+ #define KEY_GC_REAPING_LINKS	0x02	/* - We need to reap links */
+-#define KEY_GC_SET_TIMER	0x04	/* - We need to restart the timer */
+ #define KEY_GC_REAPING_DEAD_1	0x10	/* - We need to mark dead keys */
+ #define KEY_GC_REAPING_DEAD_2	0x20	/* - We need to reap dead key links */
+ #define KEY_GC_REAPING_DEAD_3	0x40	/* - We need to reap dead keys */
+@@ -184,21 +196,17 @@ static void key_garbage_collector(struct work_struct *work)
+ 
+ 	struct rb_node *cursor;
+ 	struct key *key;
+-	time64_t new_timer, limit;
++	time64_t new_timer, limit, expiry;
+ 
+ 	kenter("[%lx,%x]", key_gc_flags, gc_state);
+ 
+ 	limit = ktime_get_real_seconds();
+-	if (limit > key_gc_delay)
+-		limit -= key_gc_delay;
+-	else
+-		limit = key_gc_delay;
+ 
+ 	/* Work out what we're going to be doing in this pass */
+ 	gc_state &= KEY_GC_REAPING_DEAD_1 | KEY_GC_REAPING_DEAD_2;
+ 	gc_state <<= 1;
+ 	if (test_and_clear_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags))
+-		gc_state |= KEY_GC_REAPING_LINKS | KEY_GC_SET_TIMER;
++		gc_state |= KEY_GC_REAPING_LINKS;
+ 
+ 	if (test_and_clear_bit(KEY_GC_REAP_KEYTYPE, &key_gc_flags))
+ 		gc_state |= KEY_GC_REAPING_DEAD_1;
+@@ -233,8 +241,11 @@ static void key_garbage_collector(struct work_struct *work)
+ 			}
+ 		}
+ 
+-		if (gc_state & KEY_GC_SET_TIMER) {
+-			if (key->expiry > limit && key->expiry < new_timer) {
++		expiry = key->expiry;
++		if (expiry != TIME64_MAX) {
++			if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++				expiry += key_gc_delay;
++			if (expiry > limit && expiry < new_timer) {
+ 				kdebug("will expire %x in %lld",
+ 				       key_serial(key), key->expiry - limit);
+ 				new_timer = key->expiry;
+@@ -276,7 +287,7 @@ static void key_garbage_collector(struct work_struct *work)
+ 	 */
+ 	kdebug("pass complete");
+ 
+-	if (gc_state & KEY_GC_SET_TIMER && new_timer != (time64_t)TIME64_MAX) {
++	if (new_timer != TIME64_MAX) {
+ 		new_timer += key_gc_delay;
+ 		key_schedule_gc(new_timer);
+ 	}
+diff --git a/security/keys/internal.h b/security/keys/internal.h
+index 471cf36dedc0..b63a8c41635a 100644
+--- a/security/keys/internal.h
++++ b/security/keys/internal.h
+@@ -167,6 +167,7 @@ extern unsigned key_gc_delay;
+ extern void keyring_gc(struct key *keyring, time64_t limit);
+ extern void keyring_restriction_gc(struct key *keyring,
+ 				   struct key_type *dead_type);
++void key_set_expiry(struct key *key, time64_t expiry);
+ extern void key_schedule_gc(time64_t gc_at);
+ extern void key_schedule_gc_links(void);
+ extern void key_gc_keytype(struct key_type *ktype);
+@@ -215,10 +216,15 @@ extern struct key *key_get_instantiation_authkey(key_serial_t target_id);
+  */
+ static inline bool key_is_dead(const struct key *key, time64_t limit)
+ {
++	time64_t expiry = key->expiry;
++
++	if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
++		expiry += key_gc_delay;
++
+ 	return
+ 		key->flags & ((1 << KEY_FLAG_DEAD) |
+ 			      (1 << KEY_FLAG_INVALIDATED)) ||
+-		(key->expiry > 0 && key->expiry <= limit) ||
++		expiry <= limit ||
+ 		key->domain_tag->removed;
+ }
+ 
+diff --git a/security/keys/key.c b/security/keys/key.c
+index 0260a1902922..5b10641debd5 100644
+--- a/security/keys/key.c
++++ b/security/keys/key.c
+@@ -294,6 +294,7 @@ struct key *key_alloc(struct key_type *type, const char *desc,
+ 	key->uid = uid;
+ 	key->gid = gid;
+ 	key->perm = perm;
++	key->expiry = TIME64_MAX;
+ 	key->restrict_link = restrict_link;
+ 	key->last_used_at = ktime_get_real_seconds();
+ 
+@@ -463,10 +464,7 @@ static int __key_instantiate_and_link(struct key *key,
+ 			if (authkey)
+ 				key_invalidate(authkey);
+ 
+-			if (prep->expiry != TIME64_MAX) {
+-				key->expiry = prep->expiry;
+-				key_schedule_gc(prep->expiry + key_gc_delay);
+-			}
++			key_set_expiry(key, prep->expiry);
+ 		}
+ 	}
+ 
+@@ -606,8 +604,7 @@ int key_reject_and_link(struct key *key,
+ 		atomic_inc(&key->user->nikeys);
+ 		mark_key_instantiated(key, -error);
+ 		notify_key(key, NOTIFY_KEY_INSTANTIATED, -error);
+-		key->expiry = ktime_get_real_seconds() + timeout;
+-		key_schedule_gc(key->expiry + key_gc_delay);
++		key_set_expiry(key, ktime_get_real_seconds() + timeout);
+ 
+ 		if (test_and_clear_bit(KEY_FLAG_USER_CONSTRUCT, &key->flags))
+ 			awaken = 1;
+@@ -723,16 +720,14 @@ struct key_type *key_type_lookup(const char *type)
+ 
+ void key_set_timeout(struct key *key, unsigned timeout)
+ {
+-	time64_t expiry = 0;
++	time64_t expiry = TIME64_MAX;
+ 
+ 	/* make the changes with the locks held to prevent races */
+ 	down_write(&key->sem);
+ 
+ 	if (timeout > 0)
+ 		expiry = ktime_get_real_seconds() + timeout;
+-
+-	key->expiry = expiry;
+-	key_schedule_gc(key->expiry + key_gc_delay);
++	key_set_expiry(key, expiry);
+ 
+ 	up_write(&key->sem);
+ }
+diff --git a/security/keys/proc.c b/security/keys/proc.c
+index d0cde6685627..4f4e2c1824f1 100644
+--- a/security/keys/proc.c
++++ b/security/keys/proc.c
+@@ -198,7 +198,7 @@ static int proc_keys_show(struct seq_file *m, void *v)
+ 
+ 	/* come up with a suitable timeout value */
+ 	expiry = READ_ONCE(key->expiry);
+-	if (expiry == 0) {
++	if (expiry == TIME64_MAX) {
+ 		memcpy(xbuf, "perm", 5);
+ 	} else if (now >= expiry) {
+ 		memcpy(xbuf, "expd", 5);
 
