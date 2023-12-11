@@ -1,24 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C408651C2D;
-	Mon, 11 Dec 2023 18:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AF051C2D;
+	Mon, 11 Dec 2023 18:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="1NXVFx9X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F65AC433C8;
-	Mon, 11 Dec 2023 18:52:40 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="RfSDUp76"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7CD8C433C7;
+	Mon, 11 Dec 2023 18:52:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1702320760;
-	bh=Dae98sA+NJSuWPKFzhhxEfwIoYWG7wmJKBnEJjrqGSA=;
+	s=korg; t=1702320763;
+	bh=tEGtx/nh930r8lvj8sYKGUBIdOpimYf5dneerXxg6p4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=1NXVFx9XTpDe4Vql2zDN5JrNY3qBJBrjKnrbwYKleWeG3NhjLI/JZt/67QiydUOMT
-	 j+XJt+Hin0AHsipSIl9oW5It4QOKdIpXAVOfDXTgQcqbfQ+0Ysc6Ete2fOgRxXQCW5
-	 LYy8d76E+QdK4x9zWWNK4zHi4YaXepxmmbQa9qD8=
+	b=RfSDUp76zUL05tterVc4crT69E5NCk5Nv/ardq1ENRfGP1BkETarR/hFBM43BH/ty
+	 Bo7H/Uz9GRCBH/yyNFc9FEl6KQvtDhkaQ5Gp4hTIfn48wFhX909dJXPXog3u44YQqq
+	 WXoUz6SHO8NwFVF5JgqMLRh46si0bZqlla2jALCI=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
 	David Howells <dhowells@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
 	Paulo Alcantara <pc@manguebit.com>,
 	Shyam Prasad N <nspmangalore@gmail.com>,
 	Rohith Surabattula <rohiths.msft@gmail.com>,
@@ -27,9 +28,9 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-cifs@vger.kernel.org,
 	linux-mm@kvack.org,
 	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 6.1 181/194] cifs: Fix flushing, invalidation and file size with copy_file_range()
-Date: Mon, 11 Dec 2023 19:22:51 +0100
-Message-ID: <20231211182044.740126090@linuxfoundation.org>
+Subject: [PATCH 6.1 182/194] cifs: Fix flushing, invalidation and file size with FICLONE
+Date: Mon, 11 Dec 2023 19:22:52 +0100
+Message-ID: <20231211182044.787296338@linuxfoundation.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20231211182036.606660304@linuxfoundation.org>
 References: <20231211182036.606660304@linuxfoundation.org>
@@ -50,10 +51,12 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-commit 7b2404a886f8b91250c31855d287e632123e1746 upstream.
+commit c54fc3a4f375663f2361a9cbb2955fb4ef912879 upstream.
 
-Fix a number of issues in the cifs filesystem implementation of the
-copy_file_range() syscall in cifs_file_copychunk_range().
+Fix a number of issues in the cifs filesystem implementation of the FICLONE
+ioctl in cifs_remap_file_range().  This is analogous to the previously
+fixed bug in cifs_file_copychunk_range() and can share the helper
+functions.
 
 Firstly, the invalidation of the destination range is handled incorrectly:
 We shouldn't just invalidate the whole file as dirty data in the file may
@@ -68,10 +71,10 @@ as cifs should move to support multipage folios.
 
 Secondly, there's an issue whereby a write may have extended the file
 locally, but not have been written back yet.  This can leaves the local
-idea of the EOF at a later point than the server's EOF.  If a copy request
+idea of the EOF at a later point than the server's EOF.  If a clone request
 is issued, this will fail on the server with STATUS_INVALID_VIEW_SIZE
-(which gets translated to -EIO locally) if the copy source extends past the
-server's EOF.
+(which gets translated to -EIO locally) if the clone source extends past
+the server's EOF.
 
 Fix this by:
 
@@ -89,17 +92,19 @@ Fix this by:
  (3) Fully discard all the folios covering the range as we want them to be
      reloaded.
 
- (4) Then perform the copy.
+ (4) Then perform the extent duplication.
 
-Thirdly, set i_size after doing the copychunk_range operation as this value
-may be used by various things internally.  stat() hides the issue because
-setting ->time to 0 causes cifs_getatr() to revalidate the attributes.
+Thirdly, set i_size after doing the duplicate_extents operation as this
+value may be used by various things internally.  stat() hides the issue
+because setting ->time to 0 causes cifs_getatr() to revalidate the
+attributes.
 
-These were causing the generic/075 xfstest to fail.
+These were causing the cifs/001 xfstest to fail.
 
-Fixes: 620d8745b35d ("Introduce cifs_copy_file_range()")
-Cc: stable@vger.kernel.org
+Fixes: 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
 Signed-off-by: David Howells <dhowells@redhat.com>
+Cc: stable@vger.kernel.org
+cc: Christoph Hellwig <hch@lst.de>
 cc: Paulo Alcantara <pc@manguebit.com>
 cc: Shyam Prasad N <nspmangalore@gmail.com>
 cc: Rohith Surabattula <rohiths.msft@gmail.com>
@@ -111,115 +116,72 @@ Signed-off-by: David Howells <dhowells@redhat.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/cifsfs.c |  102 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 99 insertions(+), 3 deletions(-)
+ fs/smb/client/cifsfs.c |   68 +++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 57 insertions(+), 11 deletions(-)
 
 --- a/fs/smb/client/cifsfs.c
 +++ b/fs/smb/client/cifsfs.c
-@@ -1191,6 +1191,72 @@ const struct inode_operations cifs_symli
- 	.listxattr = cifs_listxattr,
- };
- 
-+/*
-+ * Advance the EOF marker to after the source range.
-+ */
-+static int cifs_precopy_set_eof(struct inode *src_inode, struct cifsInodeInfo *src_cifsi,
-+				struct cifs_tcon *src_tcon,
-+				unsigned int xid, loff_t src_end)
-+{
-+	struct cifsFileInfo *writeable_srcfile;
-+	int rc = -EINVAL;
-+
-+	writeable_srcfile = find_writable_file(src_cifsi, FIND_WR_FSUID_ONLY);
-+	if (writeable_srcfile) {
-+		if (src_tcon->ses->server->ops->set_file_size)
-+			rc = src_tcon->ses->server->ops->set_file_size(
-+				xid, src_tcon, writeable_srcfile,
-+				src_inode->i_size, true /* no need to set sparse */);
-+		else
-+			rc = -ENOSYS;
-+		cifsFileInfo_put(writeable_srcfile);
-+		cifs_dbg(FYI, "SetFSize for copychunk rc = %d\n", rc);
-+	}
-+
-+	if (rc < 0)
-+		goto set_failed;
-+
-+	netfs_resize_file(&src_cifsi->netfs, src_end);
-+	fscache_resize_cookie(cifs_inode_cookie(src_inode), src_end);
-+	return 0;
-+
-+set_failed:
-+	return filemap_write_and_wait(src_inode->i_mapping);
-+}
-+
-+/*
-+ * Flush out either the folio that overlaps the beginning of a range in which
-+ * pos resides or the folio that overlaps the end of a range unless that folio
-+ * is entirely within the range we're going to invalidate.  We extend the flush
-+ * bounds to encompass the folio.
-+ */
-+static int cifs_flush_folio(struct inode *inode, loff_t pos, loff_t *_fstart, loff_t *_fend,
-+			    bool first)
-+{
-+	struct folio *folio;
-+	unsigned long long fpos, fend;
-+	pgoff_t index = pos / PAGE_SIZE;
-+	size_t size;
-+	int rc = 0;
-+
-+	folio = filemap_get_folio(inode->i_mapping, index);
-+	if (IS_ERR(folio))
-+		return 0;
-+
-+	size = folio_size(folio);
-+	fpos = folio_pos(folio);
-+	fend = fpos + size - 1;
-+	*_fstart = min_t(unsigned long long, *_fstart, fpos);
-+	*_fend   = max_t(unsigned long long, *_fend, fend);
-+	if ((first && pos == fpos) || (!first && pos == fend))
-+		goto out;
-+
-+	rc = filemap_write_and_wait_range(inode->i_mapping, fpos, fend);
-+out:
-+	folio_put(folio);
-+	return rc;
-+}
-+
- static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
- 		struct file *dst_file, loff_t destoff, loff_t len,
- 		unsigned int remap_flags)
-@@ -1260,10 +1326,12 @@ ssize_t cifs_file_copychunk_range(unsign
+@@ -1263,9 +1263,12 @@ static loff_t cifs_remap_file_range(stru
  {
  	struct inode *src_inode = file_inode(src_file);
  	struct inode *target_inode = file_inode(dst_file);
 +	struct cifsInodeInfo *src_cifsi = CIFS_I(src_inode);
- 	struct cifsFileInfo *smb_file_src;
- 	struct cifsFileInfo *smb_file_target;
- 	struct cifs_tcon *src_tcon;
- 	struct cifs_tcon *target_tcon;
-+	unsigned long long destend, fstart, fend;
- 	ssize_t rc;
++	struct cifsInodeInfo *target_cifsi = CIFS_I(target_inode);
+ 	struct cifsFileInfo *smb_file_src = src_file->private_data;
+-	struct cifsFileInfo *smb_file_target;
+-	struct cifs_tcon *target_tcon;
++	struct cifsFileInfo *smb_file_target = dst_file->private_data;
++	struct cifs_tcon *target_tcon, *src_tcon;
++	unsigned long long destend, fstart, fend, new_size;
+ 	unsigned int xid;
+ 	int rc;
  
- 	cifs_dbg(FYI, "copychunk range\n");
-@@ -1303,13 +1371,41 @@ ssize_t cifs_file_copychunk_range(unsign
- 	if (rc)
- 		goto unlock;
+@@ -1278,13 +1281,13 @@ static loff_t cifs_remap_file_range(stru
  
+ 	xid = get_xid();
+ 
+-	if (!src_file->private_data || !dst_file->private_data) {
++	if (!smb_file_src || !smb_file_target) {
+ 		rc = -EBADF;
+ 		cifs_dbg(VFS, "missing cifsFileInfo on copy range src file\n");
+ 		goto out;
+ 	}
+ 
+-	smb_file_target = dst_file->private_data;
++	src_tcon = tlink_tcon(smb_file_src->tlink);
+ 	target_tcon = tlink_tcon(smb_file_target->tlink);
+ 
+ 	/*
+@@ -1297,20 +1300,63 @@ static loff_t cifs_remap_file_range(stru
+ 	if (len == 0)
+ 		len = src_inode->i_size - off;
+ 
+-	cifs_dbg(FYI, "about to flush pages\n");
 -	/* should we flush first and last page first */
--	truncate_inode_pages(&target_inode->i_data, 0);
+-	truncate_inode_pages_range(&target_inode->i_data, destoff,
+-				   PAGE_ALIGN(destoff + len)-1);
++	cifs_dbg(FYI, "clone range\n");
++
++	/* Flush the source buffer */
++	rc = filemap_write_and_wait_range(src_inode->i_mapping, off,
++					  off + len - 1);
++	if (rc)
++		goto unlock;
++
 +	/* The server-side copy will fail if the source crosses the EOF marker.
 +	 * Advance the EOF marker after the flush above to the end of the range
 +	 * if it's short of that.
 +	 */
-+	if (src_cifsi->server_eof < off + len) {
++	if (src_cifsi->netfs.remote_i_size < off + len) {
 +		rc = cifs_precopy_set_eof(src_inode, src_cifsi, src_tcon, xid, off + len);
 +		if (rc < 0)
 +			goto unlock;
 +	}
 +
++	new_size = destoff + len;
 +	destend = destoff + len - 1;
-+
+ 
+-	if (target_tcon->ses->server->ops->duplicate_extents)
 +	/* Flush the folios at either end of the destination range to prevent
 +	 * accidental loss of dirty data outside of the range.
 +	 */
@@ -234,18 +196,32 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 +		goto unlock;
 +
 +	/* Discard all the folios that overlap the destination region. */
++	cifs_dbg(FYI, "about to discard pages %llx-%llx\n", fstart, fend);
 +	truncate_inode_pages_range(&target_inode->i_data, fstart, fend);
- 
- 	rc = file_modified(dst_file);
--	if (!rc)
-+	if (!rc) {
- 		rc = target_tcon->ses->server->ops->copychunk_range(xid,
++
++	fscache_invalidate(cifs_inode_cookie(target_inode), NULL,
++			   i_size_read(target_inode), 0);
++
++	rc = -EOPNOTSUPP;
++	if (target_tcon->ses->server->ops->duplicate_extents) {
+ 		rc = target_tcon->ses->server->ops->duplicate_extents(xid,
  			smb_file_src, smb_file_target, off, len, destoff);
-+		if (rc > 0 && destoff + rc > i_size_read(target_inode))
-+			truncate_setsize(target_inode, destoff + rc);
+-	else
+-		rc = -EOPNOTSUPP;
++		if (rc == 0 && new_size > i_size_read(target_inode)) {
++			truncate_setsize(target_inode, new_size);
++			netfs_resize_file(&target_cifsi->netfs, new_size);
++			fscache_resize_cookie(cifs_inode_cookie(target_inode),
++					      new_size);
++		}
 +	}
  
- 	file_accessed(src_file);
- 
+ 	/* force revalidate of size and timestamps of target file now
+ 	   that target is updated on the server */
+ 	CIFS_I(target_inode)->time = 0;
++unlock:
+ 	/* although unlocking in the reverse order from locking is not
+ 	   strictly necessary here it is a little cleaner to be consistent */
+ 	unlock_two_nondirectories(src_inode, target_inode);
 
 
