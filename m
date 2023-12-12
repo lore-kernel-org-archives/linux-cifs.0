@@ -1,101 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cbVdDIio"
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF0E93;
-	Mon, 11 Dec 2023 20:44:45 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50bf4f97752so6752443e87.1;
-        Mon, 11 Dec 2023 20:44:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1702356283; x=1702961083; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iIHkL66LFa2jiwaKlsxw7JsD4efvV/JqZ9e9EFR+iVw=;
-        b=cbVdDIioEum1OHKpWpsVZQABdqjodZkcwbvoOi85bk/P3rsOQtVqtSjM2Je8nI1DON
-         DlHP8c7bTSUZsuWVeLlkdkHf2cXBvi1MVjG606g7JlwGJTZGENNoAH9eCNwudIWIRQ2O
-         LpvkKS2MBmP4xjMGhKqQS++Yfsd7ZT+QEfbSqTiR0o+BybjGwN5vw/2yeMp0nEQnhFUv
-         k7T/t7wQ5zQEDq/YGHdqc1eMeRsJX6PrT0MmpaTQufodzJd+nR/o0QGRpLX6j1KiiPOA
-         H9wnYoKbuRGyPUiY0YtLZQRSrwhmiuefHzJZozNZDl2ad3qJN9tqMnatKMnkM5GUBOE7
-         IFpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702356283; x=1702961083;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iIHkL66LFa2jiwaKlsxw7JsD4efvV/JqZ9e9EFR+iVw=;
-        b=LX4NBemn51z49K8Z0DYZ9hM2YRv8ZZTEdYsX5XSL3+U9fFmnqzk5ahCl68VOBbtlR+
-         vTc1nFrwfBNqJxMLdEzZF+nEGZfJmb7x3aewXytXrjewxFlEfFq1zQ4egwa/4QUIC33y
-         Nkw7GlFBc2HKHSSkJfBx8skM/Oh7iSOKl9WghkTPIBfkDMDciwl4jMGDk8dTbeHEeD90
-         ch2DIHQcdmtNmYCIvNkrnpp87VddjQCZhN7e7C6BMBFuUdWI8G9NgKQ66jLHnzvFLDpd
-         oTLtNUGV1y2z6N/ybg6s96FzagagLg8ybf1gCsq46p33y9X3iZAhLGe49RQrqmbb0n65
-         J3WA==
-X-Gm-Message-State: AOJu0Yzg788iIMTUZi2r2bS7hrXCJki9dvMFHaj/RtUIk1TZAe6uyjcL
-	h1yPMZn8EpsHzCWAyHcKU2+z5tiORvyfwDwNcSo=
-X-Google-Smtp-Source: AGHT+IErdha9WKQ1NIW/F1zJJqzgS19pFjxcUoJrisvbevXs6kjF4Axp1rEgMKQ/GEbaF2dBZg65cdSW+mIZ+WA+0bI=
-X-Received: by 2002:ac2:5631:0:b0:50b:f859:8294 with SMTP id
- b17-20020ac25631000000b0050bf8598294mr2154143lff.32.1702356283233; Mon, 11
- Dec 2023 20:44:43 -0800 (PST)
+X-Greylist: delayed 1025 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 12 Dec 2023 06:17:16 PST
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F3BAC;
+	Tue, 12 Dec 2023 06:17:16 -0800 (PST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4SqKxc45G4z1vnkB;
+	Tue, 12 Dec 2023 22:00:04 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 274F91A0190;
+	Tue, 12 Dec 2023 22:00:08 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.67) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 12 Dec 2023 22:00:07 +0800
+From: Zizhi Wo <wozizhi@huawei.com>
+To: <sfrench@samba.org>, <lsahlber@redhat.com>
+CC: <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+	<linux-kernel@vger.kernel.org>, <wozizhi@huawei.com>, <yangerkun@huawei.com>
+Subject: [PATCH -next] fs: cifs: Fix atime update check
+Date: Tue, 12 Dec 2023 21:58:40 +0800
+Message-ID: <20231212135840.1462711-1-wozizhi@huawei.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Mon, 11 Dec 2023 22:44:32 -0600
-Message-ID: <CAH2r5mscEZygkgAK49pr0Tf89eJAhngE35AUo+Rmt1800m9TnQ@mail.gmail.com>
-Subject: [GIT PULL] ksmbd fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-Please pull the following changes since commit
-33cc938e65a98f1d29d0a18403dbbee050dcad9a:
+Commit 9b9c5bea0b96 ("cifs: do not return atime less than mtime") indicates
+that in cifs, if atime is less than mtime, some apps will break.
+Therefore, it introduce a function to compare this two variables in two
+places where atime is updated. If atime is less than mtime, update it to
+mtime.
 
-  Linux 6.7-rc4 (2023-12-03 18:52:56 +0900)
+However, the patch was handled incorrectly, resulting in atime and mtime
+being exactly equal. A previous commit 69738cfdfa70 ("fs: cifs: Fix atime
+update check vs mtime") fixed one place and forgot to fix another. Fix it.
 
-are available in the Git repository at:
+Fixes: 9b9c5bea0b96 ("cifs: do not return atime less than mtime")
+Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
+---
+ fs/smb/client/file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  git://git.samba.org/ksmbd.git tags/6.7-rc5-ksmbd-server-fixes
-
-for you to fetch changes up to 13736654481198e519059d4a2e2e3b20fa9fdb3e:
-
-  ksmbd: fix wrong name of SMB2_CREATE_ALLOCATION_SIZE (2023-12-08
-10:11:33 -0600)
-
-----------------------------------------------------------------
-Nine smb3 server fixes
-- Memory leak fix (in lock error path)
-- Two fixes for create with allocation size
-- FIx for potential UAF in lease break error path
-- Five directory lease (caching) fixes found during additional recent testing
-
-----------------------------------------------------------------
-Namjae Jeon (8):
-      ksmbd: set epoch in create context v2 lease
-      ksmbd: set v2 lease capability
-      ksmbd: downgrade RWH lease caching state to RH for directory
-      ksmbd: send v2 lease break notification for directory
-      ksmbd: lazy v2 lease break on smb2_write()
-      ksmbd: avoid duplicate opinfo_put() call on error of
-smb21_lease_break_ack()
-      ksmbd: fix wrong allocation size update in smb2_open()
-      ksmbd: fix wrong name of SMB2_CREATE_ALLOCATION_SIZE
-
-Zizhi Wo (1):
-      ksmbd: fix memory leak in smb2_lock()
-
- fs/smb/common/smb2pdu.h   |   3 +-
- fs/smb/server/oplock.c    | 115
-+++++++++++++++++++++++++++++++++++++++++++------
- fs/smb/server/oplock.h    |   8 +++-
- fs/smb/server/smb2ops.c   |   9 ++--
- fs/smb/server/smb2pdu.c   |  62 ++++++++++++++------------
- fs/smb/server/vfs.c       |   3 ++
- fs/smb/server/vfs_cache.c |  13 +++++-
- fs/smb/server/vfs_cache.h |   3 ++
- 8 files changed, 171 insertions(+), 45 deletions(-)
-
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index cf17e3dd703e..32a8525415d9 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -4671,7 +4671,7 @@ static int cifs_readpage_worker(struct file *file, struct page *page,
+ 	/* we do not want atime to be less than mtime, it broke some apps */
+ 	atime = inode_set_atime_to_ts(inode, current_time(inode));
+ 	mtime = inode_get_mtime(inode);
+-	if (timespec64_compare(&atime, &mtime))
++	if (timespec64_compare(&atime, &mtime) < 0)
+ 		inode_set_atime_to_ts(inode, inode_get_mtime(inode));
+ 
+ 	if (PAGE_SIZE > rc)
 -- 
-Thanks,
+2.39.2
 
-Steve
