@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T8KHOus+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Invr/rg+"
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6419E2117
-	for <linux-cifs@vger.kernel.org>; Wed, 13 Dec 2023 07:25:50 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF1B10F5
+	for <linux-cifs@vger.kernel.org>; Wed, 13 Dec 2023 07:26:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702481149;
+	s=mimecast20190719; t=1702481162;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=s/wuPVyGasrVALHALpJTImhcNEkEG3+akMJGWVq4CGc=;
-	b=T8KHOus+3c2BpMPpAJ4j3hl3nM6WxmgbA/1t/SKobbPuoDKT7k3Vhw3UyCSkWefsewt3Lk
-	J9VcZOZsd4cEPVlN3XCLixnkYTz8uAYq0hDBY3PWVyN7klUOBpjwIM1ydJqxKcMR7Z3E5a
-	mbqFk/GPSUpmAUgPW+UUKGgBxEXlaZI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-348-R2jZbAjqPKeVIZ9nPy0rYQ-1; Wed, 13 Dec 2023 10:25:43 -0500
-X-MC-Unique: R2jZbAjqPKeVIZ9nPy0rYQ-1
+	bh=oIwLzDiZpaZMbFiReSwdjbMUxVWmR1x4Wpn5Zq569s4=;
+	b=Invr/rg+XZzJc3nv1PD0FMFVIEtzdlZXrGHfD3PcLiYTYepdsPJnXgywCd4C0bjSiHLgX8
+	21KovPQDnoGL07kiCzybKGtgVadEhaVpMgkNmJZ0zpb4UJeQXNBJgwB4WAVzyfJhuWUcaO
+	sla2FNWnM4/AlliasGeAjU+hVMd6QCY=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-558-J6bMlVj2NQiuKCy5TuSEbg-1; Wed,
+ 13 Dec 2023 10:25:59 -0500
+X-MC-Unique: J6bMlVj2NQiuKCy5TuSEbg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6908B890FC2;
-	Wed, 13 Dec 2023 15:25:41 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DDD7F1C18CCA;
+	Wed, 13 Dec 2023 15:25:57 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0155740C6EBA;
-	Wed, 13 Dec 2023 15:25:37 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 65E3440C6EB9;
+	Wed, 13 Dec 2023 15:25:54 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -50,9 +50,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 25/39] netfs: Provide func to copy data to pagecache for buffered write
-Date: Wed, 13 Dec 2023 15:23:35 +0000
-Message-ID: <20231213152350.431591-26-dhowells@redhat.com>
+Subject: [PATCH v4 28/39] netfs: Implement support for unbuffered/DIO read
+Date: Wed, 13 Dec 2023 15:23:38 +0000
+Message-ID: <20231213152350.431591-29-dhowells@redhat.com>
 In-Reply-To: <20231213152350.431591-1-dhowells@redhat.com>
 References: <20231213152350.431591-1-dhowells@redhat.com>
 Precedence: bulk
@@ -64,16 +64,26 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Provide a netfs write helper, netfs_perform_write() to buffer data to be
-written in the pagecache and mark the modified folios dirty.
+Implement support for unbuffered and DIO reads in the netfs library,
+utilising the existing read helper code to do block splitting and
+individual queuing.  The code also handles extraction of the destination
+buffer from the supplied iterator, allowing async unbuffered reads to take
+place.
 
-It will perform "streaming writes" for folios that aren't currently
-resident, if possible, storing data in partially modified folios that are
-marked dirty, but not uptodate.  It will also tag pages as belonging to
-fs-specific write groups if so directed by the filesystem.
+The read will be split up according to the rsize setting and, if supplied,
+the ->clamp_length() method.  Note that the next subrequest will be issued
+as soon as issue_op returns, without waiting for previous ones to finish.
+The network filesystem needs to pause or handle queuing them if it doesn't
+want to fire them all at the server simultaneously.
 
-This is derived from generic_perform_write(), but doesn't use
-->write_begin() and ->write_end(), having that logic rolled in instead.
+Once all the subrequests have finished, the state will be assessed and the
+amount of data to be indicated as having being obtained will be
+determined.  As the subrequests may finish in any order, if an intermediate
+subrequest is short, any further subrequests may be copied into the buffer
+and then abandoned.
+
+In the future, this will also take care of doing an unbuffered read from
+encrypted content, with the decryption being done by the library.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Jeff Layton <jlayton@kernel.org>
@@ -82,99 +92,38 @@ cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
  fs/netfs/Makefile            |   1 +
- fs/netfs/buffered_read.c     |  49 ++++++
- fs/netfs/buffered_write.c    | 330 +++++++++++++++++++++++++++++++++++
- fs/netfs/internal.h          |   2 +
- fs/netfs/io.c                |   1 +
- include/linux/netfs.h        |   5 +
- include/trace/events/netfs.h |  73 ++++++++
- 7 files changed, 461 insertions(+)
- create mode 100644 fs/netfs/buffered_write.c
+ fs/netfs/direct_read.c       | 252 +++++++++++++++++++++++++++++++++++
+ fs/netfs/internal.h          |   1 +
+ fs/netfs/io.c                |  82 ++++++++++--
+ fs/netfs/main.c              |   1 +
+ fs/netfs/objects.c           |   5 +-
+ fs/netfs/stats.c             |   4 +-
+ include/linux/netfs.h        |   9 ++
+ include/trace/events/netfs.h |   7 +-
+ mm/filemap.c                 |   1 +
+ 10 files changed, 352 insertions(+), 11 deletions(-)
+ create mode 100644 fs/netfs/direct_read.c
 
 diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
-index c69c6775b8ac..85d8333a1ed4 100644
+index 85d8333a1ed4..e968ab1eca40 100644
 --- a/fs/netfs/Makefile
 +++ b/fs/netfs/Makefile
-@@ -2,6 +2,7 @@
- 
+@@ -3,6 +3,7 @@
  netfs-y := \
  	buffered_read.o \
-+	buffered_write.o \
+ 	buffered_write.o \
++	direct_read.o \
  	io.o \
  	iterator.o \
  	locking.o \
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index 6b9a44cafbac..73a6e4d61f9d 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -63,6 +63,7 @@ void netfs_rreq_unlock_folios(struct netfs_io_request *rreq)
- 				break;
- 			}
- 			if (!folio_started && test_bit(NETFS_SREQ_COPY_TO_CACHE, &subreq->flags)) {
-+				trace_netfs_folio(folio, netfs_folio_trace_copy_to_cache);
- 				folio_start_fscache(folio);
- 				folio_started = true;
- 			}
-@@ -454,3 +455,51 @@ int netfs_write_begin(struct netfs_inode *ctx,
- 	return ret;
- }
- EXPORT_SYMBOL(netfs_write_begin);
-+
-+/*
-+ * Preload the data into a page we're proposing to write into.
-+ */
-+int netfs_prefetch_for_write(struct file *file, struct folio *folio,
-+			     size_t offset, size_t len)
-+{
-+	struct netfs_io_request *rreq;
-+	struct address_space *mapping = folio_file_mapping(folio);
-+	struct netfs_inode *ctx = netfs_inode(mapping->host);
-+	unsigned long long start = folio_pos(folio);
-+	size_t flen = folio_size(folio);
-+	int ret;
-+
-+	_enter("%zx @%llx", flen, start);
-+
-+	ret = -ENOMEM;
-+
-+	rreq = netfs_alloc_request(mapping, file, start, flen,
-+				   NETFS_READ_FOR_WRITE);
-+	if (IS_ERR(rreq)) {
-+		ret = PTR_ERR(rreq);
-+		goto error;
-+	}
-+
-+	rreq->no_unlock_folio = folio_index(folio);
-+	__set_bit(NETFS_RREQ_NO_UNLOCK_FOLIO, &rreq->flags);
-+	ret = netfs_begin_cache_read(rreq, ctx);
-+	if (ret == -ENOMEM || ret == -EINTR || ret == -ERESTARTSYS)
-+		goto error_put;
-+
-+	netfs_stat(&netfs_n_rh_write_begin);
-+	trace_netfs_read(rreq, start, flen, netfs_read_trace_prefetch_for_write);
-+
-+	/* Set up the output buffer */
-+	iov_iter_xarray(&rreq->iter, ITER_DEST, &mapping->i_pages,
-+			rreq->start, rreq->len);
-+
-+	ret = netfs_begin_read(rreq, true);
-+	netfs_put_request(rreq, false, netfs_rreq_trace_put_return);
-+	return ret;
-+
-+error_put:
-+	netfs_put_request(rreq, false, netfs_rreq_trace_put_discard);
-+error:
-+	_leave(" = %d", ret);
-+	return ret;
-+}
-diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
+diff --git a/fs/netfs/direct_read.c b/fs/netfs/direct_read.c
 new file mode 100644
-index 000000000000..6e7f06d9962d
+index 000000000000..1d26468aafd9
 --- /dev/null
-+++ b/fs/netfs/buffered_write.c
-@@ -0,0 +1,330 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Network filesystem high-level write support.
++++ b/fs/netfs/direct_read.c
+@@ -0,0 +1,252 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Direct I/O support.
 + *
 + * Copyright (C) 2023 Red Hat, Inc. All Rights Reserved.
 + * Written by David Howells (dhowells@redhat.com)
@@ -185,475 +134,576 @@ index 000000000000..6e7f06d9962d
 +#include <linux/mm.h>
 +#include <linux/pagemap.h>
 +#include <linux/slab.h>
-+#include <linux/pagevec.h>
++#include <linux/uio.h>
++#include <linux/sched/mm.h>
++#include <linux/task_io_accounting_ops.h>
++#include <linux/netfs.h>
 +#include "internal.h"
 +
 +/*
-+ * Determined write method.  Adjust netfs_folio_traces if this is changed.
++ * Copy all of the data from the folios in the source xarray into the
++ * destination iterator.  We cannot step through and kmap the dest iterator if
++ * it's an iovec, so we have to step through the xarray and drop the RCU lock
++ * each time.
 + */
-+enum netfs_how_to_modify {
-+	NETFS_FOLIO_IS_UPTODATE,	/* Folio is uptodate already */
-+	NETFS_JUST_PREFETCH,		/* We have to read the folio anyway */
-+	NETFS_WHOLE_FOLIO_MODIFY,	/* We're going to overwrite the whole folio */
-+	NETFS_MODIFY_AND_CLEAR,		/* We can assume there is no data to be downloaded. */
-+	NETFS_STREAMING_WRITE,		/* Store incomplete data in non-uptodate page. */
-+	NETFS_STREAMING_WRITE_CONT,	/* Continue streaming write. */
-+	NETFS_FLUSH_CONTENT,		/* Flush incompatible content. */
-+};
-+
-+static void netfs_set_group(struct folio *folio, struct netfs_group *netfs_group)
++static int netfs_copy_xarray_to_iter(struct netfs_io_request *rreq,
++				     struct xarray *xa, struct iov_iter *dst,
++				     unsigned long long start, size_t avail)
 +{
-+	if (netfs_group && !folio_get_private(folio))
-+		folio_attach_private(folio, netfs_get_group(netfs_group));
++	struct folio *folio;
++	void *base;
++	pgoff_t index = start / PAGE_SIZE;
++	size_t len, copied, count = min(avail, iov_iter_count(dst));
++
++	XA_STATE(xas, xa, index);
++
++	_enter("%zx", count);
++
++	if (!count) {
++		trace_netfs_failure(rreq, NULL, -EIO, netfs_fail_dio_read_zero);
++		return -EIO;
++	}
++
++	len = PAGE_SIZE - offset_in_page(start);
++	rcu_read_lock();
++	xas_for_each(&xas, folio, ULONG_MAX) {
++		size_t offset;
++
++		if (xas_retry(&xas, folio))
++			continue;
++
++		/* There shouldn't be a need to call xas_pause() as no one else
++		 * should be modifying the xarray we're iterating over.
++		 * Really, we only need the RCU readlock to keep lockdep happy
++		 * inside xas_for_each().
++		 */
++		rcu_read_unlock();
++
++		offset = offset_in_folio(folio, start);
++		kdebug("folio %lx +%zx [%llx]", folio->index, offset, start);
++
++		while (offset < folio_size(folio)) {
++			len = min(count, len);
++
++			base = kmap_local_folio(folio, offset);
++			copied = copy_to_iter(base, len, dst);
++			kunmap_local(base);
++			if (copied != len)
++				goto out;
++			count -= len;
++			if (count == 0)
++				goto out;
++
++			start += len;
++			offset += len;
++			len = PAGE_SIZE;
++		}
++
++		rcu_read_lock();
++	}
++
++	rcu_read_unlock();
++out:
++	_leave(" = %zx", count);
++	return count ? -EFAULT : 0;
 +}
 +
 +/*
-+ * Decide how we should modify a folio.  We might be attempting to do
-+ * write-streaming, in which case we don't want to a local RMW cycle if we can
-+ * avoid it.  If we're doing local caching or content crypto, we award that
-+ * priority over avoiding RMW.  If the file is open readably, then we also
-+ * assume that we may want to read what we wrote.
++ * If we did a direct read to a bounce buffer (say we needed to decrypt it),
++ * copy the data obtained to the destination iterator.
 + */
-+static enum netfs_how_to_modify netfs_how_to_modify(struct netfs_inode *ctx,
-+						    struct file *file,
-+						    struct folio *folio,
-+						    void *netfs_group,
-+						    size_t flen,
-+						    size_t offset,
-+						    size_t len,
-+						    bool maybe_trouble)
++static int netfs_dio_copy_bounce_to_dest(struct netfs_io_request *rreq)
 +{
-+	struct netfs_folio *finfo = netfs_folio_info(folio);
-+	loff_t pos = folio_file_pos(folio);
++	struct iov_iter *dest_iter = &rreq->iter;
++	struct kiocb *iocb = rreq->iocb;
++	unsigned long long start = rreq->start;
 +
-+	_enter("");
++	_enter("%zx/%zx @%llx", rreq->transferred, rreq->len, start);
 +
-+	if (netfs_folio_group(folio) != netfs_group)
-+		return NETFS_FLUSH_CONTENT;
++	if (!test_bit(NETFS_RREQ_USE_BOUNCE_BUFFER, &rreq->flags))
++		return 0;
 +
-+	if (folio_test_uptodate(folio))
-+		return NETFS_FOLIO_IS_UPTODATE;
++	if (start < iocb->ki_pos) {
++		if (rreq->transferred <= iocb->ki_pos - start) {
++			trace_netfs_failure(rreq, NULL, -EIO, netfs_fail_dio_read_short);
++			return -EIO;
++		}
++		rreq->len = rreq->transferred;
++		rreq->transferred -= iocb->ki_pos - start;
++	}
 +
-+	if (pos >= ctx->remote_i_size)
-+		return NETFS_MODIFY_AND_CLEAR;
++	if (rreq->transferred > iov_iter_count(dest_iter))
++		rreq->transferred = iov_iter_count(dest_iter);
 +
-+	if (!maybe_trouble && offset == 0 && len >= flen)
-+		return NETFS_WHOLE_FOLIO_MODIFY;
-+
-+	if (file->f_mode & FMODE_READ)
-+		return NETFS_JUST_PREFETCH;
-+
-+	if (netfs_is_cache_enabled(ctx))
-+		return NETFS_JUST_PREFETCH;
-+
-+	if (!finfo)
-+		return NETFS_STREAMING_WRITE;
-+
-+	/* We can continue a streaming write only if it continues on from the
-+	 * previous.  If it overlaps, we must flush lest we suffer a partial
-+	 * copy and disjoint dirty regions.
-+	 */
-+	if (offset == finfo->dirty_offset + finfo->dirty_len)
-+		return NETFS_STREAMING_WRITE_CONT;
-+	return NETFS_FLUSH_CONTENT;
-+}
-+
-+/*
-+ * Grab a folio for writing and lock it.
-+ */
-+static struct folio *netfs_grab_folio_for_write(struct address_space *mapping,
-+						loff_t pos, size_t part)
-+{
-+	pgoff_t index = pos / PAGE_SIZE;
-+
-+	return __filemap_get_folio(mapping, index, FGP_WRITEBEGIN,
-+				   mapping_gfp_mask(mapping));
++	_debug("xfer %zx/%zx @%llx", rreq->transferred, rreq->len, iocb->ki_pos);
++	return netfs_copy_xarray_to_iter(rreq, &rreq->bounce, dest_iter,
++					 iocb->ki_pos, rreq->transferred);
 +}
 +
 +/**
-+ * netfs_perform_write - Copy data into the pagecache.
-+ * @iocb: The operation parameters
-+ * @iter: The source buffer
-+ * @netfs_group: Grouping for dirty pages (eg. ceph snaps).
++ * netfs_unbuffered_read_iter_locked - Perform an unbuffered or direct I/O read
++ * @iocb: The I/O control descriptor describing the read
++ * @iter: The output buffer (also specifies read length)
 + *
-+ * Copy data into pagecache pages attached to the inode specified by @iocb.
-+ * The caller must hold appropriate inode locks.
++ * Perform an unbuffered I/O or direct I/O from the file in @iocb to the
++ * output buffer.  No use is made of the pagecache.
 + *
-+ * Dirty pages are tagged with a netfs_folio struct if they're not up to date
-+ * to indicate the range modified.  Dirty pages may also be tagged with a
-+ * netfs-specific grouping such that data from an old group gets flushed before
-+ * a new one is started.
++ * The caller must hold any appropriate locks.
 + */
-+ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
-+			    struct netfs_group *netfs_group)
++static ssize_t netfs_unbuffered_read_iter_locked(struct kiocb *iocb, struct iov_iter *iter)
 +{
-+	struct file *file = iocb->ki_filp;
-+	struct inode *inode = file_inode(file);
-+	struct address_space *mapping = inode->i_mapping;
-+	struct netfs_inode *ctx = netfs_inode(inode);
-+	struct netfs_folio *finfo;
-+	struct folio *folio;
-+	enum netfs_how_to_modify howto;
-+	enum netfs_folio_trace trace;
-+	unsigned int bdp_flags = (iocb->ki_flags & IOCB_SYNC) ? 0: BDP_ASYNC;
-+	ssize_t written = 0, ret;
-+	loff_t i_size, pos = iocb->ki_pos, from, to;
-+	size_t max_chunk = PAGE_SIZE << MAX_PAGECACHE_ORDER;
-+	bool maybe_trouble = false;
++	struct netfs_io_request *rreq;
++	struct netfs_inode *ctx;
++	unsigned long long start, end;
++	unsigned int min_bsize;
++	pgoff_t first, last;
++	ssize_t ret;
++	size_t orig_count = iov_iter_count(iter);
++	bool async = !is_sync_kiocb(iocb);
 +
-+	do {
-+		size_t flen;
-+		size_t offset;	/* Offset into pagecache folio */
-+		size_t part;	/* Bytes to write to folio */
-+		size_t copied;	/* Bytes copied from user */
++	_enter("");
 +
-+		ret = balance_dirty_pages_ratelimited_flags(mapping, bdp_flags);
-+		if (unlikely(ret < 0))
-+			break;
++	if (!orig_count)
++		return 0; /* Don't update atime */
 +
-+		offset = pos & (max_chunk - 1);
-+		part = min(max_chunk - offset, iov_iter_count(iter));
++	ret = kiocb_write_and_wait(iocb, orig_count);
++	if (ret < 0)
++		return ret;
++	file_accessed(iocb->ki_filp);
 +
-+		/* Bring in the user pages that we will copy from _first_ lest
-+		 * we hit a nasty deadlock on copying from the same page as
-+		 * we're writing to, without it being marked uptodate.
-+		 *
-+		 * Not only is this an optimisation, but it is also required to
-+		 * check that the address is actually valid, when atomic
-+		 * usercopies are used below.
-+		 *
-+		 * We rely on the page being held onto long enough by the LRU
-+		 * that we can grab it below if this causes it to be read.
-+		 */
-+		ret = -EFAULT;
-+		if (unlikely(fault_in_iov_iter_readable(iter, part) == part))
-+			break;
++	rreq = netfs_alloc_request(iocb->ki_filp->f_mapping, iocb->ki_filp,
++				   iocb->ki_pos, orig_count,
++				   NETFS_DIO_READ);
++	if (IS_ERR(rreq))
++		return PTR_ERR(rreq);
 +
-+		ret = -ENOMEM;
-+		folio = netfs_grab_folio_for_write(mapping, pos, part);
-+		if (!folio)
-+			break;
++	ctx = netfs_inode(rreq->inode);
++	netfs_stat(&netfs_n_rh_dio_read);
++	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_dio_read);
 +
-+		flen = folio_size(folio);
-+		offset = pos & (flen - 1);
-+		part = min_t(size_t, flen - offset, part);
-+
-+		if (signal_pending(current)) {
-+			ret = written ? -EINTR : -ERESTARTSYS;
-+			goto error_folio_unlock;
-+		}
-+
-+		/* See if we need to prefetch the area we're going to modify.
-+		 * We need to do this before we get a lock on the folio in case
-+		 * there's more than one writer competing for the same cache
-+		 * block.
-+		 */
-+		howto = netfs_how_to_modify(ctx, file, folio, netfs_group,
-+					    flen, offset, part, maybe_trouble);
-+		_debug("howto %u", howto);
-+		switch (howto) {
-+		case NETFS_JUST_PREFETCH:
-+			ret = netfs_prefetch_for_write(file, folio, offset, part);
-+			if (ret < 0) {
-+				_debug("prefetch = %zd", ret);
-+				goto error_folio_unlock;
-+			}
-+			break;
-+		case NETFS_FOLIO_IS_UPTODATE:
-+		case NETFS_WHOLE_FOLIO_MODIFY:
-+		case NETFS_STREAMING_WRITE_CONT:
-+			break;
-+		case NETFS_MODIFY_AND_CLEAR:
-+			zero_user_segment(&folio->page, 0, offset);
-+			break;
-+		case NETFS_STREAMING_WRITE:
-+			ret = -EIO;
-+			if (WARN_ON(folio_get_private(folio)))
-+				goto error_folio_unlock;
-+			break;
-+		case NETFS_FLUSH_CONTENT:
-+			trace_netfs_folio(folio, netfs_flush_content);
-+			from = folio_pos(folio);
-+			to = from + folio_size(folio) - 1;
-+			folio_unlock(folio);
-+			folio_put(folio);
-+			ret = filemap_write_and_wait_range(mapping, from, to);
-+			if (ret < 0)
-+				goto error_folio_unlock;
-+			continue;
-+		}
-+
-+		if (mapping_writably_mapped(mapping))
-+			flush_dcache_folio(folio);
-+
-+		copied = copy_folio_from_iter_atomic(folio, offset, part, iter);
-+
-+		flush_dcache_folio(folio);
-+
-+		/* Deal with a (partially) failed copy */
-+		if (copied == 0) {
-+			ret = -EFAULT;
-+			goto error_folio_unlock;
-+		}
-+
-+		trace = (enum netfs_folio_trace)howto;
-+		switch (howto) {
-+		case NETFS_FOLIO_IS_UPTODATE:
-+		case NETFS_JUST_PREFETCH:
-+			netfs_set_group(folio, netfs_group);
-+			break;
-+		case NETFS_MODIFY_AND_CLEAR:
-+			zero_user_segment(&folio->page, offset + copied, flen);
-+			netfs_set_group(folio, netfs_group);
-+			folio_mark_uptodate(folio);
-+			break;
-+		case NETFS_WHOLE_FOLIO_MODIFY:
-+			if (unlikely(copied < part)) {
-+				maybe_trouble = true;
-+				iov_iter_revert(iter, copied);
-+				copied = 0;
-+				goto retry;
-+			}
-+			netfs_set_group(folio, netfs_group);
-+			folio_mark_uptodate(folio);
-+			break;
-+		case NETFS_STREAMING_WRITE:
-+			if (offset == 0 && copied == flen) {
-+				netfs_set_group(folio, netfs_group);
-+				folio_mark_uptodate(folio);
-+				trace = netfs_streaming_filled_page;
-+				break;
-+			}
-+			finfo = kzalloc(sizeof(*finfo), GFP_KERNEL);
-+			if (!finfo) {
-+				iov_iter_revert(iter, copied);
-+				ret = -ENOMEM;
-+				goto error_folio_unlock;
-+			}
-+			finfo->netfs_group = netfs_get_group(netfs_group);
-+			finfo->dirty_offset = offset;
-+			finfo->dirty_len = copied;
-+			folio_attach_private(folio, (void *)((unsigned long)finfo |
-+							     NETFS_FOLIO_INFO));
-+			break;
-+		case NETFS_STREAMING_WRITE_CONT:
-+			finfo = netfs_folio_info(folio);
-+			finfo->dirty_len += copied;
-+			if (finfo->dirty_offset == 0 && finfo->dirty_len == flen) {
-+				if (finfo->netfs_group)
-+					folio_change_private(folio, finfo->netfs_group);
-+				else
-+					folio_detach_private(folio);
-+				folio_mark_uptodate(folio);
-+				kfree(finfo);
-+				trace = netfs_streaming_cont_filled_page;
-+			}
-+			break;
-+		default:
-+			WARN(true, "Unexpected modify type %u ix=%lx\n",
-+			     howto, folio_index(folio));
-+			ret = -EIO;
-+			goto error_folio_unlock;
-+		}
-+
-+		trace_netfs_folio(folio, trace);
-+
-+		/* Update the inode size if we moved the EOF marker */
-+		i_size = i_size_read(inode);
-+		pos += copied;
-+		if (pos > i_size) {
-+			if (ctx->ops->update_i_size) {
-+				ctx->ops->update_i_size(inode, pos);
-+			} else {
-+				i_size_write(inode, pos);
-+#if IS_ENABLED(CONFIG_FSCACHE)
-+				fscache_update_cookie(ctx->cache, NULL, &pos);
-+#endif
-+			}
-+		}
-+		written += copied;
-+
-+		folio_mark_dirty(folio);
-+	retry:
-+		folio_unlock(folio);
-+		folio_put(folio);
-+		folio = NULL;
-+
-+		cond_resched();
-+	} while (iov_iter_count(iter));
-+
-+out:
-+	if (likely(written)) {
-+		/* Flush and wait for a write that requires immediate synchronisation. */
-+		if (iocb->ki_flags & (IOCB_DSYNC | IOCB_SYNC)) {
-+			_debug("dsync");
-+			ret = filemap_fdatawait_range(mapping, iocb->ki_pos,
-+						      iocb->ki_pos + written);
-+		}
-+
-+		iocb->ki_pos += written;
++	/* If this is an async op, we have to keep track of the destination
++	 * buffer for ourselves as the caller's iterator will be trashed when
++	 * we return.
++	 *
++	 * In such a case, extract an iterator to represent as much of the the
++	 * output buffer as we can manage.  Note that the extraction might not
++	 * be able to allocate a sufficiently large bvec array and may shorten
++	 * the request.
++	 */
++	if (user_backed_iter(iter)) {
++		ret = netfs_extract_user_iter(iter, rreq->len, &rreq->iter, 0);
++		if (ret < 0)
++			goto out;
++		rreq->direct_bv = (struct bio_vec *)rreq->iter.bvec;
++		rreq->direct_bv_count = ret;
++		rreq->direct_bv_unpin = iov_iter_extract_will_pin(iter);
++		rreq->len = iov_iter_count(&rreq->iter);
++	} else {
++		rreq->iter = *iter;
++		rreq->len = orig_count;
++		rreq->direct_bv_unpin = false;
++		iov_iter_advance(iter, orig_count);
 +	}
 +
-+	_leave(" = %zd [%zd]", written, ret);
-+	return written ? written : ret;
++	/* If we're going to use a bounce buffer, we need to set it up.  We
++	 * will then need to pad the request out to the minimum block size.
++	 */
++	if (test_bit(NETFS_RREQ_USE_BOUNCE_BUFFER, &rreq->flags)) {
++		start = rreq->start;
++		end = min_t(unsigned long long,
++			    round_up(rreq->start + rreq->len, min_bsize),
++			    ctx->remote_i_size);
 +
-+error_folio_unlock:
-+	folio_unlock(folio);
-+	folio_put(folio);
-+	goto out;
++		rreq->start = start;
++		rreq->len   = end - start;
++		first = start / PAGE_SIZE;
++		last  = (end - 1) / PAGE_SIZE;
++		_debug("bounce %llx-%llx %lx-%lx",
++		       rreq->start, end, first, last);
++
++		ret = netfs_add_folios_to_buffer(&rreq->bounce, rreq->mapping,
++						 first, last, GFP_KERNEL);
++		if (ret < 0)
++			goto out;
++	}
++
++	if (async)
++		rreq->iocb = iocb;
++
++	ret = netfs_begin_read(rreq, is_sync_kiocb(iocb));
++	if (ret < 0)
++		goto out; /* May be -EIOCBQUEUED */
++	if (!async) {
++		ret = netfs_dio_copy_bounce_to_dest(rreq);
++		if (ret == 0) {
++			iocb->ki_pos += rreq->transferred;
++			ret = rreq->transferred;
++		}
++	}
++
++out:
++	netfs_put_request(rreq, false, netfs_rreq_trace_put_return);
++	if (ret > 0)
++		orig_count -= ret;
++	if (ret != -EIOCBQUEUED)
++		iov_iter_revert(iter, orig_count - iov_iter_count(iter));
++	return ret;
 +}
-+EXPORT_SYMBOL(netfs_perform_write);
++
++/**
++ * netfs_unbuffered_read_iter - Perform an unbuffered or direct I/O read
++ * @iocb: The I/O control descriptor describing the read
++ * @iter: The output buffer (also specifies read length)
++ *
++ * Perform an unbuffered I/O or direct I/O from the file in @iocb to the
++ * output buffer.  No use is made of the pagecache.
++ */
++ssize_t netfs_unbuffered_read_iter(struct kiocb *iocb, struct iov_iter *iter)
++{
++	struct inode *inode = file_inode(iocb->ki_filp);
++	ssize_t ret;
++
++	if (!iter->count)
++		return 0; /* Don't update atime */
++
++	ret = netfs_start_io_direct(inode);
++	if (ret == 0) {
++		ret = netfs_unbuffered_read_iter_locked(iocb, iter);
++		netfs_end_io_direct(inode);
++	}
++	return ret;
++}
++EXPORT_SYMBOL(netfs_unbuffered_read_iter);
 diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index a71fc21fc4ad..62c349cc71f9 100644
+index 62c349cc71f9..5bb1cdbdee0e 100644
 --- a/fs/netfs/internal.h
 +++ b/fs/netfs/internal.h
-@@ -23,6 +23,8 @@
-  * buffered_read.c
+@@ -100,6 +100,7 @@ int netfs_begin_write(struct netfs_io_request *wreq, bool may_wait,
+  * stats.c
   */
- void netfs_rreq_unlock_folios(struct netfs_io_request *rreq);
-+int netfs_prefetch_for_write(struct file *file, struct folio *folio,
-+			     size_t offset, size_t len);
- 
- /*
-  * io.c
+ #ifdef CONFIG_NETFS_STATS
++extern atomic_t netfs_n_rh_dio_read;
+ extern atomic_t netfs_n_rh_readahead;
+ extern atomic_t netfs_n_rh_readpage;
+ extern atomic_t netfs_n_rh_rreq;
 diff --git a/fs/netfs/io.c b/fs/netfs/io.c
-index 1795f8679be9..776ca0aa6b62 100644
+index 776ca0aa6b62..e017dc735cdb 100644
 --- a/fs/netfs/io.c
 +++ b/fs/netfs/io.c
-@@ -125,6 +125,7 @@ static void netfs_rreq_unmark_after_write(struct netfs_io_request *rreq,
- 			if (have_unlocked && folio_index(folio) <= unlocked)
- 				continue;
- 			unlocked = folio_index(folio);
-+			trace_netfs_folio(folio, netfs_folio_trace_end_copy);
- 			folio_end_fscache(folio);
- 			have_unlocked = true;
+@@ -78,7 +78,9 @@ static void netfs_read_from_server(struct netfs_io_request *rreq,
+ 				   struct netfs_io_subrequest *subreq)
+ {
+ 	netfs_stat(&netfs_n_rh_download);
+-	if (iov_iter_count(&subreq->io_iter) != subreq->len - subreq->transferred)
++
++	if (rreq->origin != NETFS_DIO_READ &&
++	    iov_iter_count(&subreq->io_iter) != subreq->len - subreq->transferred)
+ 		pr_warn("R=%08x[%u] ITER PRE-MISMATCH %zx != %zx-%zx %lx\n",
+ 			rreq->debug_id, subreq->debug_index,
+ 			iov_iter_count(&subreq->io_iter), subreq->len,
+@@ -341,6 +343,43 @@ static void netfs_rreq_is_still_valid(struct netfs_io_request *rreq)
+ 	}
+ }
+ 
++/*
++ * Determine how much we can admit to having read from a DIO read.
++ */
++static void netfs_rreq_assess_dio(struct netfs_io_request *rreq)
++{
++	struct netfs_io_subrequest *subreq;
++	unsigned int i;
++	size_t transferred = 0;
++
++	for (i = 0; i < rreq->direct_bv_count; i++)
++		flush_dcache_page(rreq->direct_bv[i].bv_page);
++
++	list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
++		if (subreq->error || subreq->transferred == 0)
++			break;
++		transferred += subreq->transferred;
++		if (subreq->transferred < subreq->len)
++			break;
++	}
++
++	for (i = 0; i < rreq->direct_bv_count; i++)
++		flush_dcache_page(rreq->direct_bv[i].bv_page);
++
++	rreq->transferred = transferred;
++	task_io_account_read(transferred);
++
++	if (rreq->iocb) {
++		rreq->iocb->ki_pos += transferred;
++		if (rreq->iocb->ki_complete)
++			rreq->iocb->ki_complete(
++				rreq->iocb, rreq->error ? rreq->error : transferred);
++	}
++	if (rreq->netfs_ops->done)
++		rreq->netfs_ops->done(rreq);
++	inode_dio_end(rreq->inode);
++}
++
+ /*
+  * Assess the state of a read request and decide what to do next.
+  *
+@@ -361,7 +400,10 @@ static void netfs_rreq_assess(struct netfs_io_request *rreq, bool was_async)
+ 		return;
+ 	}
+ 
+-	netfs_rreq_unlock_folios(rreq);
++	if (rreq->origin != NETFS_DIO_READ)
++		netfs_rreq_unlock_folios(rreq);
++	else
++		netfs_rreq_assess_dio(rreq);
+ 
+ 	trace_netfs_rreq(rreq, netfs_rreq_trace_wake_ip);
+ 	clear_bit_unlock(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
+@@ -526,14 +568,16 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq,
+ 			struct netfs_io_subrequest *subreq,
+ 			struct iov_iter *io_iter)
+ {
+-	enum netfs_io_source source;
++	enum netfs_io_source source = NETFS_DOWNLOAD_FROM_SERVER;
+ 	size_t lsize;
+ 
+ 	_enter("%llx-%llx,%llx", subreq->start, subreq->start + subreq->len, rreq->i_size);
+ 
+-	source = netfs_cache_prepare_read(subreq, rreq->i_size);
+-	if (source == NETFS_INVALID_READ)
+-		goto out;
++	if (rreq->origin != NETFS_DIO_READ) {
++		source = netfs_cache_prepare_read(subreq, rreq->i_size);
++		if (source == NETFS_INVALID_READ)
++			goto out;
++	}
+ 
+ 	if (source == NETFS_DOWNLOAD_FROM_SERVER) {
+ 		/* Call out to the netfs to let it shrink the request to fit
+@@ -544,6 +588,8 @@ netfs_rreq_prepare_read(struct netfs_io_request *rreq,
+ 		 */
+ 		if (subreq->len > rreq->i_size - subreq->start)
+ 			subreq->len = rreq->i_size - subreq->start;
++		if (rreq->rsize && subreq->len > rreq->rsize)
++			subreq->len = rreq->rsize;
+ 
+ 		if (rreq->netfs_ops->clamp_length &&
+ 		    !rreq->netfs_ops->clamp_length(subreq)) {
+@@ -662,6 +708,9 @@ int netfs_begin_read(struct netfs_io_request *rreq, bool sync)
+ 		return -EIO;
+ 	}
+ 
++	if (rreq->origin == NETFS_DIO_READ)
++		inode_dio_begin(rreq->inode);
++
+ 	if (test_bit(NETFS_RREQ_USE_BOUNCE_BUFFER, &rreq->flags))
+ 		iov_iter_xarray(&rreq->io_iter, ITER_DEST, &rreq->bounce,
+ 				rreq->start, rreq->len);
+@@ -677,11 +726,25 @@ int netfs_begin_read(struct netfs_io_request *rreq, bool sync)
+ 	atomic_set(&rreq->nr_outstanding, 1);
+ 	io_iter = rreq->io_iter;
+ 	do {
++		_debug("submit %llx + %zx >= %llx",
++		       rreq->start, rreq->submitted, rreq->i_size);
++		if (rreq->origin == NETFS_DIO_READ &&
++		    rreq->start + rreq->submitted >= rreq->i_size)
++			break;
+ 		if (!netfs_rreq_submit_slice(rreq, &io_iter, &debug_index))
+ 			break;
++		if (test_bit(NETFS_RREQ_BLOCKED, &rreq->flags) &&
++		    test_bit(NETFS_RREQ_NONBLOCK, &rreq->flags))
++			break;
+ 
+ 	} while (rreq->submitted < rreq->len);
+ 
++	if (!rreq->submitted) {
++		netfs_put_request(rreq, false, netfs_rreq_trace_put_no_submit);
++		ret = 0;
++		goto out;
++	}
++
+ 	if (sync) {
+ 		/* Keep nr_outstanding incremented so that the ref always
+ 		 * belongs to us, and the service code isn't punted off to a
+@@ -698,7 +761,8 @@ int netfs_begin_read(struct netfs_io_request *rreq, bool sync)
+ 			    TASK_UNINTERRUPTIBLE);
+ 
+ 		ret = rreq->error;
+-		if (ret == 0 && rreq->submitted < rreq->len) {
++		if (ret == 0 && rreq->submitted < rreq->len &&
++		    rreq->origin != NETFS_DIO_READ) {
+ 			trace_netfs_failure(rreq, NULL, ret, netfs_fail_short_read);
+ 			ret = -EIO;
  		}
+@@ -706,7 +770,9 @@ int netfs_begin_read(struct netfs_io_request *rreq, bool sync)
+ 		/* If we decrement nr_outstanding to 0, the ref belongs to us. */
+ 		if (atomic_dec_and_test(&rreq->nr_outstanding))
+ 			netfs_rreq_assess(rreq, false);
+-		ret = 0;
++		ret = -EIOCBQUEUED;
+ 	}
++
++out:
+ 	return ret;
+ }
+diff --git a/fs/netfs/main.c b/fs/netfs/main.c
+index 6584eafda944..d4430b51b03c 100644
+--- a/fs/netfs/main.c
++++ b/fs/netfs/main.c
+@@ -33,6 +33,7 @@ static const char *netfs_origins[nr__netfs_io_origin] = {
+ 	[NETFS_READPAGE]	= "RP",
+ 	[NETFS_READ_FOR_WRITE]	= "RW",
+ 	[NETFS_WRITEBACK]	= "WB",
++	[NETFS_DIO_READ]	= "DR",
+ };
+ 
+ /*
+diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+index 3ce6313cc5f9..d46e957812a6 100644
+--- a/fs/netfs/objects.c
++++ b/fs/netfs/objects.c
+@@ -20,7 +20,8 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
+ 	struct inode *inode = file ? file_inode(file) : mapping->host;
+ 	struct netfs_inode *ctx = netfs_inode(inode);
+ 	struct netfs_io_request *rreq;
+-	bool cached = netfs_is_cache_enabled(ctx);
++	bool is_dio = (origin == NETFS_DIO_READ);
++	bool cached = is_dio && netfs_is_cache_enabled(ctx);
+ 	int ret;
+ 
+ 	rreq = kzalloc(ctx->ops->io_request_size ?: sizeof(struct netfs_io_request),
+@@ -43,6 +44,8 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
+ 	__set_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
+ 	if (cached)
+ 		__set_bit(NETFS_RREQ_WRITE_TO_CACHE, &rreq->flags);
++	if (file && file->f_flags & O_NONBLOCK)
++		__set_bit(NETFS_RREQ_NONBLOCK, &rreq->flags);
+ 	if (rreq->netfs_ops->init_request) {
+ 		ret = rreq->netfs_ops->init_request(rreq, file);
+ 		if (ret < 0) {
+diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
+index c1f85cd595a4..15fd5c3f0f39 100644
+--- a/fs/netfs/stats.c
++++ b/fs/netfs/stats.c
+@@ -9,6 +9,7 @@
+ #include <linux/seq_file.h>
+ #include "internal.h"
+ 
++atomic_t netfs_n_rh_dio_read;
+ atomic_t netfs_n_rh_readahead;
+ atomic_t netfs_n_rh_readpage;
+ atomic_t netfs_n_rh_rreq;
+@@ -36,7 +37,8 @@ atomic_t netfs_n_wh_write_failed;
+ 
+ int netfs_stats_show(struct seq_file *m, void *v)
+ {
+-	seq_printf(m, "Netfs  : RA=%u RP=%u WB=%u WBZ=%u rr=%u sr=%u\n",
++	seq_printf(m, "Netfs  : DR=%u RA=%u RP=%u WB=%u WBZ=%u rr=%u sr=%u\n",
++		   atomic_read(&netfs_n_rh_dio_read),
+ 		   atomic_read(&netfs_n_rh_readahead),
+ 		   atomic_read(&netfs_n_rh_readpage),
+ 		   atomic_read(&netfs_n_rh_write_begin),
 diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 143374a77e84..63258998defb 100644
+index 63258998defb..da391f8c81c7 100644
 --- a/include/linux/netfs.h
 +++ b/include/linux/netfs.h
-@@ -370,6 +370,11 @@ struct netfs_cache_ops {
+@@ -226,6 +226,7 @@ enum netfs_io_origin {
+ 	NETFS_READPAGE,			/* This read is a synchronous read */
+ 	NETFS_READ_FOR_WRITE,		/* This read is to prepare a write */
+ 	NETFS_WRITEBACK,		/* This write was triggered by writepages */
++	NETFS_DIO_READ,			/* This is a direct I/O read */
+ 	nr__netfs_io_origin
+ } __mode(byte);
+ 
+@@ -240,6 +241,7 @@ struct netfs_io_request {
+ 	};
+ 	struct inode		*inode;		/* The file being accessed */
+ 	struct address_space	*mapping;	/* The mapping being accessed */
++	struct kiocb		*iocb;		/* AIO completion vector */
+ 	struct netfs_cache_resources cache_resources;
+ 	struct list_head	proc_link;	/* Link in netfs_iorequests */
+ 	struct list_head	subrequests;	/* Contributory I/O operations */
+@@ -251,12 +253,14 @@ struct netfs_io_request {
+ 	__counted_by(direct_bv_count);
+ 	unsigned int		direct_bv_count; /* Number of elements in direct_bv[] */
+ 	unsigned int		debug_id;
++	unsigned int		rsize;		/* Maximum read size (0 for none) */
+ 	unsigned int		wsize;		/* Maximum write size (0 for none) */
+ 	unsigned int		subreq_counter;	/* Next subreq->debug_index */
+ 	atomic_t		nr_outstanding;	/* Number of ops in progress */
+ 	atomic_t		nr_copy_ops;	/* Number of copy-to-cache ops in progress */
+ 	size_t			submitted;	/* Amount submitted for I/O so far */
+ 	size_t			len;		/* Length of the request */
++	size_t			transferred;	/* Amount to be indicated as transferred */
+ 	short			error;		/* 0 or error that occurred */
+ 	enum netfs_io_origin	origin;		/* Origin of the request */
+ 	bool			direct_bv_unpin; /* T if direct_bv[] must be unpinned */
+@@ -274,6 +278,8 @@ struct netfs_io_request {
+ #define NETFS_RREQ_USE_BOUNCE_BUFFER	6	/* Use bounce buffer */
+ #define NETFS_RREQ_WRITE_TO_CACHE	7	/* Need to write to the cache */
+ #define NETFS_RREQ_UPLOAD_TO_SERVER	8	/* Need to write to the server */
++#define NETFS_RREQ_NONBLOCK		9	/* Don't block if possible (O_NONBLOCK) */
++#define NETFS_RREQ_BLOCKED		10	/* We blocked */
+ 	const struct netfs_request_ops *netfs_ops;
+ 	void (*cleanup)(struct netfs_io_request *req);
+ };
+@@ -370,6 +376,9 @@ struct netfs_cache_ops {
  			       loff_t *_data_start, size_t *_data_len);
  };
  
-+/* High-level write API */
-+ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
-+			    struct netfs_group *netfs_group);
++/* High-level read API. */
++ssize_t netfs_unbuffered_read_iter(struct kiocb *iocb, struct iov_iter *iter);
 +
-+/* Address operations API */
- struct readahead_control;
- void netfs_readahead(struct readahead_control *);
- int netfs_read_folio(struct file *, struct folio *);
+ /* High-level write API */
+ ssize_t netfs_perform_write(struct kiocb *iocb, struct iov_iter *iter,
+ 			    struct netfs_group *netfs_group);
 diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index e03635172760..8308b81f36be 100644
+index 082a5e717b58..5a4edadf0e59 100644
 --- a/include/trace/events/netfs.h
 +++ b/include/trace/events/netfs.h
-@@ -19,6 +19,7 @@
+@@ -16,6 +16,7 @@
+  * Define enums for tracing information.
+  */
+ #define netfs_read_traces					\
++	EM(netfs_read_trace_dio_read,		"DIO-READ ")	\
  	EM(netfs_read_trace_expanded,		"EXPANDED ")	\
  	EM(netfs_read_trace_readahead,		"READAHEAD")	\
  	EM(netfs_read_trace_readpage,		"READPAGE ")	\
-+	EM(netfs_read_trace_prefetch_for_write,	"PREFETCHW")	\
- 	E_(netfs_read_trace_write_begin,	"WRITEBEGN")
+@@ -31,7 +32,8 @@
+ 	EM(NETFS_READAHEAD,			"RA")		\
+ 	EM(NETFS_READPAGE,			"RP")		\
+ 	EM(NETFS_READ_FOR_WRITE,		"RW")		\
+-	E_(NETFS_WRITEBACK,			"WB")
++	EM(NETFS_WRITEBACK,			"WB")		\
++	E_(NETFS_DIO_READ,			"DR")
  
- #define netfs_write_traces					\
-@@ -100,6 +101,31 @@
- 	EM(netfs_sreq_trace_put_work,		"PUT WORK   ")	\
- 	E_(netfs_sreq_trace_put_terminated,	"PUT TERM   ")
+ #define netfs_rreq_traces					\
+ 	EM(netfs_rreq_trace_assess,		"ASSESS ")	\
+@@ -70,6 +72,8 @@
+ #define netfs_failures							\
+ 	EM(netfs_fail_check_write_begin,	"check-write-begin")	\
+ 	EM(netfs_fail_copy_to_cache,		"copy-to-cache")	\
++	EM(netfs_fail_dio_read_short,		"dio-read-short")	\
++	EM(netfs_fail_dio_read_zero,		"dio-read-zero")	\
+ 	EM(netfs_fail_read,			"read")			\
+ 	EM(netfs_fail_short_read,		"short-read")		\
+ 	EM(netfs_fail_prepare_write,		"prep-write")		\
+@@ -81,6 +85,7 @@
+ 	EM(netfs_rreq_trace_put_complete,	"PUT COMPLT ")	\
+ 	EM(netfs_rreq_trace_put_discard,	"PUT DISCARD")	\
+ 	EM(netfs_rreq_trace_put_failed,		"PUT FAILED ")	\
++	EM(netfs_rreq_trace_put_no_submit,	"PUT NO-SUBM")	\
+ 	EM(netfs_rreq_trace_put_return,		"PUT RETURN ")	\
+ 	EM(netfs_rreq_trace_put_subreq,		"PUT SUBREQ ")	\
+ 	EM(netfs_rreq_trace_put_work,		"PUT WORK   ")	\
+diff --git a/mm/filemap.c b/mm/filemap.c
+index c0d7e1d7eea2..85a8eb23cfd2 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2678,6 +2678,7 @@ int kiocb_write_and_wait(struct kiocb *iocb, size_t count)
  
-+#define netfs_folio_traces					\
-+	/* The first few correspond to enum netfs_how_to_modify */	\
-+	EM(netfs_folio_is_uptodate,		"mod-uptodate")	\
-+	EM(netfs_just_prefetch,			"mod-prefetch")	\
-+	EM(netfs_whole_folio_modify,		"mod-whole-f")	\
-+	EM(netfs_modify_and_clear,		"mod-n-clear")	\
-+	EM(netfs_streaming_write,		"mod-streamw")	\
-+	EM(netfs_streaming_write_cont,		"mod-streamw+")	\
-+	EM(netfs_flush_content,			"flush")	\
-+	EM(netfs_streaming_filled_page,		"mod-streamw-f") \
-+	EM(netfs_streaming_cont_filled_page,	"mod-streamw-f+") \
-+	/* The rest are for writeback */			\
-+	EM(netfs_folio_trace_clear,		"clear")	\
-+	EM(netfs_folio_trace_clear_s,		"clear-s")	\
-+	EM(netfs_folio_trace_clear_g,		"clear-g")	\
-+	EM(netfs_folio_trace_copy_to_cache,	"copy")		\
-+	EM(netfs_folio_trace_end_copy,		"end-copy")	\
-+	EM(netfs_folio_trace_kill,		"kill")		\
-+	EM(netfs_folio_trace_mkwrite,		"mkwrite")	\
-+	EM(netfs_folio_trace_mkwrite_plus,	"mkwrite+")	\
-+	EM(netfs_folio_trace_redirty,		"redirty")	\
-+	EM(netfs_folio_trace_redirtied,		"redirtied")	\
-+	EM(netfs_folio_trace_store,		"store")	\
-+	E_(netfs_folio_trace_store_plus,	"store+")
-+
- #ifndef __NETFS_DECLARE_TRACE_ENUMS_ONCE_ONLY
- #define __NETFS_DECLARE_TRACE_ENUMS_ONCE_ONLY
+ 	return filemap_write_and_wait_range(mapping, pos, end);
+ }
++EXPORT_SYMBOL_GPL(kiocb_write_and_wait);
  
-@@ -115,6 +141,7 @@ enum netfs_sreq_trace { netfs_sreq_traces } __mode(byte);
- enum netfs_failure { netfs_failures } __mode(byte);
- enum netfs_rreq_ref_trace { netfs_rreq_ref_traces } __mode(byte);
- enum netfs_sreq_ref_trace { netfs_sreq_ref_traces } __mode(byte);
-+enum netfs_folio_trace { netfs_folio_traces } __mode(byte);
- 
- #endif
- 
-@@ -135,6 +162,7 @@ netfs_sreq_traces;
- netfs_failures;
- netfs_rreq_ref_traces;
- netfs_sreq_ref_traces;
-+netfs_folio_traces;
- 
- /*
-  * Now redefine the EM() and E_() macros to map the enums to the strings that
-@@ -335,6 +363,51 @@ TRACE_EVENT(netfs_sreq_ref,
- 		      __entry->ref)
- 	    );
- 
-+TRACE_EVENT(netfs_folio,
-+	    TP_PROTO(struct folio *folio, enum netfs_folio_trace why),
-+
-+	    TP_ARGS(folio, why),
-+
-+	    TP_STRUCT__entry(
-+		    __field(ino_t,			ino)
-+		    __field(pgoff_t,			index)
-+		    __field(unsigned int,		nr)
-+		    __field(enum netfs_folio_trace,	why)
-+			     ),
-+
-+	    TP_fast_assign(
-+		    __entry->ino = folio->mapping->host->i_ino;
-+		    __entry->why = why;
-+		    __entry->index = folio_index(folio);
-+		    __entry->nr = folio_nr_pages(folio);
-+			   ),
-+
-+	    TP_printk("i=%05lx ix=%05lx-%05lx %s",
-+		      __entry->ino, __entry->index, __entry->index + __entry->nr - 1,
-+		      __print_symbolic(__entry->why, netfs_folio_traces))
-+	    );
-+
-+TRACE_EVENT(netfs_write_iter,
-+	    TP_PROTO(const struct kiocb *iocb, const struct iov_iter *from),
-+
-+	    TP_ARGS(iocb, from),
-+
-+	    TP_STRUCT__entry(
-+		    __field(unsigned long long,		start		)
-+		    __field(size_t,			len		)
-+		    __field(unsigned int,		flags		)
-+			     ),
-+
-+	    TP_fast_assign(
-+		    __entry->start	= iocb->ki_pos;
-+		    __entry->len	= iov_iter_count(from);
-+		    __entry->flags	= iocb->ki_flags;
-+			   ),
-+
-+	    TP_printk("WRITE-ITER s=%llx l=%zx f=%x",
-+		      __entry->start, __entry->len, __entry->flags)
-+	    );
-+
- TRACE_EVENT(netfs_write,
- 	    TP_PROTO(const struct netfs_io_request *wreq,
- 		     enum netfs_write_trace what),
+ int kiocb_invalidate_pages(struct kiocb *iocb, size_t count)
+ {
 
