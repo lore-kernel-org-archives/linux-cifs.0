@@ -1,32 +1,32 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PP/DZLAb"
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DF9C139
-	for <linux-cifs@vger.kernel.org>; Wed, 13 Dec 2023 07:25:56 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F13rQRbZ"
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB3D3198C
+	for <linux-cifs@vger.kernel.org>; Wed, 13 Dec 2023 07:26:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702481155;
+	s=mimecast20190719; t=1702481188;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n7vsxkTeFDyw/Xz/jQpnFttohdwf2WdzS8Vx6FHSJ3Y=;
-	b=PP/DZLAbE6AipEZ5AC+d24abyyiL1h1lejerkoUTpdSe9qYLQ85xf7FpCKtav5rpropNNh
-	P3u0KG/TvlcCco5YgUC+U05wDjrKZ6bBhID02JeXHIA0nPChna3PQKh6S9+qO3cbtZPseo
-	bpdAx+iivZWyjTQt5Lfw9+ibbuKS+pk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-160-Hk0BL4cxNNG-H2Glo3kY9Q-1; Wed, 13 Dec 2023 10:25:49 -0500
-X-MC-Unique: Hk0BL4cxNNG-H2Glo3kY9Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	bh=GWz3UetJ1H2inkDCEy0FPsiHj6M0nuo6NxktZOcXvKA=;
+	b=F13rQRbZ2T+XJIOGweYCLtRX+iqLQyJ2APg0Mmf3szmrE8rBKoZEjlgPwDT3V2fX5UxdCu
+	UDJYv+LMNSdH4ABntaZNUZX51Nx+JoTUBgOrGtKZPcNltcYKlwPyaYwGiCorlEH6YY4DuD
+	EIPONuZxy3i0ZvLYnpdOXjDsyDvnC+8=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-39-froc9UFwN7-mmdgB76l15A-1; Wed,
+ 13 Dec 2023 10:26:22 -0500
+X-MC-Unique: froc9UFwN7-mmdgB76l15A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E65E8881F47;
-	Wed, 13 Dec 2023 15:25:45 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DAA1F1C18CC3;
+	Wed, 13 Dec 2023 15:26:20 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 718511121312;
-	Wed, 13 Dec 2023 15:25:42 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 68A102026D66;
+	Wed, 13 Dec 2023 15:26:17 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jeff Layton <jlayton@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -50,9 +50,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 26/39] netfs: Make netfs_read_folio() handle streaming-write pages
-Date: Wed, 13 Dec 2023 15:23:36 +0000
-Message-ID: <20231213152350.431591-27-dhowells@redhat.com>
+Subject: [PATCH v4 33/39] netfs, cachefiles: Pass upper bound length to allow expansion
+Date: Wed, 13 Dec 2023 15:23:43 +0000
+Message-ID: <20231213152350.431591-34-dhowells@redhat.com>
 In-Reply-To: <20231213152350.431591-1-dhowells@redhat.com>
 References: <20231213152350.431591-1-dhowells@redhat.com>
 Precedence: bulk
@@ -62,20 +62,13 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-netfs_read_folio() needs to handle partially-valid pages that are marked
-dirty, but not uptodate in the event that someone tries to read a page was
-used to cache data by a streaming write.
-
-In such a case, make netfs_read_folio() set up a bvec iterator that points
-to the parts of the folio that need filling and to a sink page for the data
-that should be discarded and use that instead of i_pages as the iterator to
-be written to.
-
-This requires netfs_rreq_unlock_folios() to convert the page into a normal
-dirty uptodate page, getting rid of the partial write record and bumping
-the group pointer over to folio->private.
+Make netfslib pass the maximum length to the ->prepare_write() op to tell
+the cache how much it can expand the length of a write to.  This allows a
+write to the server at the end of a file to be limited to a few bytes
+whilst writing an entire block to the cache (something required by direct
+I/O).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Jeff Layton <jlayton@kernel.org>
@@ -83,120 +76,206 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/netfs/buffered_read.c     | 61 ++++++++++++++++++++++++++++++++++--
- include/trace/events/netfs.h |  2 ++
- 2 files changed, 60 insertions(+), 3 deletions(-)
+ fs/cachefiles/internal.h |  2 +-
+ fs/cachefiles/io.c       | 10 ++++++----
+ fs/cachefiles/ondemand.c |  2 +-
+ fs/netfs/fscache_io.c    |  2 +-
+ fs/netfs/io.c            |  2 +-
+ fs/netfs/objects.c       |  1 +
+ fs/netfs/output.c        | 25 ++++++++++---------------
+ fs/smb/client/fscache.c  |  2 +-
+ include/linux/netfs.h    |  5 +++--
+ 9 files changed, 25 insertions(+), 26 deletions(-)
 
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index 73a6e4d61f9d..950f63fc156a 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -16,6 +16,7 @@
- void netfs_rreq_unlock_folios(struct netfs_io_request *rreq)
+diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
+index 4a87c9d714a9..d33169f0018b 100644
+--- a/fs/cachefiles/internal.h
++++ b/fs/cachefiles/internal.h
+@@ -246,7 +246,7 @@ extern bool cachefiles_begin_operation(struct netfs_cache_resources *cres,
+ 				       enum fscache_want_state want_state);
+ extern int __cachefiles_prepare_write(struct cachefiles_object *object,
+ 				      struct file *file,
+-				      loff_t *_start, size_t *_len,
++				      loff_t *_start, size_t *_len, size_t upper_len,
+ 				      bool no_space_allocated_yet);
+ extern int __cachefiles_write(struct cachefiles_object *object,
+ 			      struct file *file,
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index 5857241c5918..9fe69a60eb24 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -517,7 +517,7 @@ cachefiles_prepare_ondemand_read(struct netfs_cache_resources *cres,
+  */
+ int __cachefiles_prepare_write(struct cachefiles_object *object,
+ 			       struct file *file,
+-			       loff_t *_start, size_t *_len,
++			       loff_t *_start, size_t *_len, size_t upper_len,
+ 			       bool no_space_allocated_yet)
  {
- 	struct netfs_io_subrequest *subreq;
-+	struct netfs_folio *finfo;
- 	struct folio *folio;
- 	pgoff_t start_page = rreq->start / PAGE_SIZE;
- 	pgoff_t last_page = ((rreq->start + rreq->len) / PAGE_SIZE) - 1;
-@@ -87,6 +88,15 @@ void netfs_rreq_unlock_folios(struct netfs_io_request *rreq)
+ 	struct cachefiles_cache *cache = object->volume->cache;
+@@ -529,6 +529,8 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+ 	down = start - round_down(start, PAGE_SIZE);
+ 	*_start = start - down;
+ 	*_len = round_up(down + len, PAGE_SIZE);
++	if (down < start || *_len > upper_len)
++		return -ENOBUFS;
  
- 		if (!pg_failed) {
- 			flush_dcache_folio(folio);
-+			finfo = netfs_folio_info(folio);
-+			if (finfo) {
-+				trace_netfs_folio(folio, netfs_folio_trace_filled_gaps);
-+				if (finfo->netfs_group)
-+					folio_change_private(folio, finfo->netfs_group);
-+				else
-+					folio_detach_private(folio);
-+				kfree(finfo);
-+			}
- 			folio_mark_uptodate(folio);
+ 	/* We need to work out whether there's sufficient disk space to perform
+ 	 * the write - but we can skip that check if we have space already
+@@ -591,8 +593,8 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+ }
+ 
+ static int cachefiles_prepare_write(struct netfs_cache_resources *cres,
+-				    loff_t *_start, size_t *_len, loff_t i_size,
+-				    bool no_space_allocated_yet)
++				    loff_t *_start, size_t *_len, size_t upper_len,
++				    loff_t i_size, bool no_space_allocated_yet)
+ {
+ 	struct cachefiles_object *object = cachefiles_cres_object(cres);
+ 	struct cachefiles_cache *cache = object->volume->cache;
+@@ -608,7 +610,7 @@ static int cachefiles_prepare_write(struct netfs_cache_resources *cres,
+ 
+ 	cachefiles_begin_secure(cache, &saved_cred);
+ 	ret = __cachefiles_prepare_write(object, cachefiles_cres_file(cres),
+-					 _start, _len,
++					 _start, _len, upper_len,
+ 					 no_space_allocated_yet);
+ 	cachefiles_end_secure(cache, saved_cred);
+ 	return ret;
+diff --git a/fs/cachefiles/ondemand.c b/fs/cachefiles/ondemand.c
+index b8fbbb1961bb..5fd74ec60bef 100644
+--- a/fs/cachefiles/ondemand.c
++++ b/fs/cachefiles/ondemand.c
+@@ -50,7 +50,7 @@ static ssize_t cachefiles_ondemand_fd_write_iter(struct kiocb *kiocb,
+ 		return -ENOBUFS;
+ 
+ 	cachefiles_begin_secure(cache, &saved_cred);
+-	ret = __cachefiles_prepare_write(object, file, &pos, &len, true);
++	ret = __cachefiles_prepare_write(object, file, &pos, &len, len, true);
+ 	cachefiles_end_secure(cache, saved_cred);
+ 	if (ret < 0)
+ 		return ret;
+diff --git a/fs/netfs/fscache_io.c b/fs/netfs/fscache_io.c
+index 79171a687930..ad572f7ee897 100644
+--- a/fs/netfs/fscache_io.c
++++ b/fs/netfs/fscache_io.c
+@@ -237,7 +237,7 @@ void __fscache_write_to_cache(struct fscache_cookie *cookie,
+ 				    fscache_access_io_write) < 0)
+ 		goto abandon_free;
+ 
+-	ret = cres->ops->prepare_write(cres, &start, &len, i_size, false);
++	ret = cres->ops->prepare_write(cres, &start, &len, len, i_size, false);
+ 	if (ret < 0)
+ 		goto abandon_end;
+ 
+diff --git a/fs/netfs/io.c b/fs/netfs/io.c
+index 894c3305710d..5d9098db815a 100644
+--- a/fs/netfs/io.c
++++ b/fs/netfs/io.c
+@@ -199,7 +199,7 @@ static void netfs_rreq_do_write_to_cache(struct netfs_io_request *rreq)
  		}
  
-@@ -239,6 +249,7 @@ int netfs_read_folio(struct file *file, struct folio *folio)
- 	struct address_space *mapping = folio_file_mapping(folio);
- 	struct netfs_io_request *rreq;
- 	struct netfs_inode *ctx = netfs_inode(mapping->host);
-+	struct folio *sink = NULL;
- 	int ret;
+ 		ret = cres->ops->prepare_write(cres, &subreq->start, &subreq->len,
+-					       rreq->i_size, true);
++					       subreq->len, rreq->i_size, true);
+ 		if (ret < 0) {
+ 			trace_netfs_failure(rreq, subreq, ret, netfs_fail_prepare_write);
+ 			trace_netfs_sreq(subreq, netfs_sreq_trace_write_skip);
+diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+index c1218b183197..16252cc4576e 100644
+--- a/fs/netfs/objects.c
++++ b/fs/netfs/objects.c
+@@ -33,6 +33,7 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
  
- 	_enter("%lx", folio_index(folio));
-@@ -259,12 +270,56 @@ int netfs_read_folio(struct file *file, struct folio *folio)
- 	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_readpage);
+ 	rreq->start	= start;
+ 	rreq->len	= len;
++	rreq->upper_len	= len;
+ 	rreq->origin	= origin;
+ 	rreq->netfs_ops	= ctx->ops;
+ 	rreq->mapping	= mapping;
+diff --git a/fs/netfs/output.c b/fs/netfs/output.c
+index 560cbcea0c0a..cc9065733b42 100644
+--- a/fs/netfs/output.c
++++ b/fs/netfs/output.c
+@@ -280,7 +280,7 @@ EXPORT_SYMBOL(netfs_queue_write_request);
+  */
+ static void netfs_set_up_write_to_cache(struct netfs_io_request *wreq)
+ {
+-	struct netfs_cache_resources *cres;
++	struct netfs_cache_resources *cres = &wreq->cache_resources;
+ 	struct netfs_io_subrequest *subreq;
+ 	struct netfs_inode *ctx = netfs_inode(wreq->inode);
+ 	struct fscache_cookie *cookie = netfs_i_cookie(ctx);
+@@ -294,26 +294,21 @@ static void netfs_set_up_write_to_cache(struct netfs_io_request *wreq)
+ 	}
  
- 	/* Set up the output buffer */
--	iov_iter_xarray(&rreq->iter, ITER_DEST, &mapping->i_pages,
--			rreq->start, rreq->len);
-+	if (folio_test_dirty(folio)) {
-+		/* Handle someone trying to read from an unflushed streaming
-+		 * write.  We fiddle the buffer so that a gap at the beginning
-+		 * and/or a gap at the end get copied to, but the middle is
-+		 * discarded.
-+		 */
-+		struct netfs_folio *finfo = netfs_folio_info(folio);
-+		struct bio_vec *bvec;
-+		unsigned int from = finfo->dirty_offset;
-+		unsigned int to = from + finfo->dirty_len;
-+		unsigned int off = 0, i = 0;
-+		size_t flen = folio_size(folio);
-+		size_t nr_bvec = flen / PAGE_SIZE + 2;
-+		size_t part;
-+
-+		ret = -ENOMEM;
-+		bvec = kmalloc_array(nr_bvec, sizeof(*bvec), GFP_KERNEL);
-+		if (!bvec)
-+			goto discard;
-+
-+		sink = folio_alloc(GFP_KERNEL, 0);
-+		if (!sink)
-+			goto discard;
-+
-+		trace_netfs_folio(folio, netfs_folio_trace_read_gaps);
-+
-+		rreq->direct_bv = bvec;
-+		rreq->direct_bv_count = nr_bvec;
-+		if (from > 0) {
-+			bvec_set_folio(&bvec[i++], folio, from, 0);
-+			off = from;
-+		}
-+		while (off < to) {
-+			part = min_t(size_t, to - off, PAGE_SIZE);
-+			bvec_set_folio(&bvec[i++], sink, part, 0);
-+			off += part;
-+		}
-+		if (to < flen)
-+			bvec_set_folio(&bvec[i++], folio, flen - to, to);
-+		iov_iter_bvec(&rreq->iter, ITER_DEST, bvec, i, rreq->len);
-+	} else {
-+		iov_iter_xarray(&rreq->iter, ITER_DEST, &mapping->i_pages,
-+				rreq->start, rreq->len);
-+	}
+ 	_debug("write to cache");
+-	subreq = netfs_create_write_request(wreq, NETFS_WRITE_TO_CACHE, start, len,
+-					    netfs_write_to_cache_op_worker);
+-	if (!subreq)
++	ret = fscache_begin_write_operation(cres, cookie);
++	if (ret < 0)
+ 		return;
  
- 	ret = netfs_begin_read(rreq, true);
-+	if (sink)
-+		folio_put(sink);
- 	netfs_put_request(rreq, false, netfs_rreq_trace_put_return);
--	return ret;
-+	return ret < 0 ? ret : 0;
+-	cres = &wreq->cache_resources;
+-	ret = fscache_begin_read_operation(cres, cookie);
+-	if (ret < 0) {
+-		netfs_write_subrequest_terminated(subreq, ret, false);
++	ret = cres->ops->prepare_write(cres, &start, &len, wreq->upper_len,
++				       i_size_read(wreq->inode), true);
++	if (ret < 0)
+ 		return;
+-	}
  
- discard:
- 	netfs_put_request(rreq, false, netfs_rreq_trace_put_discard);
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index 8308b81f36be..082a5e717b58 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -118,9 +118,11 @@
- 	EM(netfs_folio_trace_clear_g,		"clear-g")	\
- 	EM(netfs_folio_trace_copy_to_cache,	"copy")		\
- 	EM(netfs_folio_trace_end_copy,		"end-copy")	\
-+	EM(netfs_folio_trace_filled_gaps,	"filled-gaps")	\
- 	EM(netfs_folio_trace_kill,		"kill")		\
- 	EM(netfs_folio_trace_mkwrite,		"mkwrite")	\
- 	EM(netfs_folio_trace_mkwrite_plus,	"mkwrite+")	\
-+	EM(netfs_folio_trace_read_gaps,		"read-gaps")	\
- 	EM(netfs_folio_trace_redirty,		"redirty")	\
- 	EM(netfs_folio_trace_redirtied,		"redirtied")	\
- 	EM(netfs_folio_trace_store,		"store")	\
+-	ret = cres->ops->prepare_write(cres, &start, &len, i_size_read(wreq->inode),
+-				       true);
+-	if (ret < 0) {
+-		netfs_write_subrequest_terminated(subreq, ret, false);
++	subreq = netfs_create_write_request(wreq, NETFS_WRITE_TO_CACHE, start, len,
++					    netfs_write_to_cache_op_worker);
++	if (!subreq)
+ 		return;
+-	}
+ 
+-	netfs_queue_write_request(subreq);
++	netfs_write_to_cache_op(subreq);
+ }
+ 
+ /*
+diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
+index e5cad149f5a2..c4a3cb736881 100644
+--- a/fs/smb/client/fscache.c
++++ b/fs/smb/client/fscache.c
+@@ -180,7 +180,7 @@ static int fscache_fallback_write_pages(struct inode *inode, loff_t start, size_
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	ret = cres.ops->prepare_write(&cres, &start, &len, i_size_read(inode),
++	ret = cres.ops->prepare_write(&cres, &start, &len, len, i_size_read(inode),
+ 				      no_space_allocated_yet);
+ 	if (ret == 0)
+ 		ret = fscache_write(&cres, start, &iter, NULL, NULL);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 638f42fdaef5..f98deef22d06 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -263,6 +263,7 @@ struct netfs_io_request {
+ 	atomic_t		nr_copy_ops;	/* Number of copy-to-cache ops in progress */
+ 	size_t			submitted;	/* Amount submitted for I/O so far */
+ 	size_t			len;		/* Length of the request */
++	size_t			upper_len;	/* Length can be extended to here */
+ 	size_t			transferred;	/* Amount to be indicated as transferred */
+ 	short			error;		/* 0 or error that occurred */
+ 	enum netfs_io_origin	origin;		/* Origin of the request */
+@@ -360,8 +361,8 @@ struct netfs_cache_ops {
+ 	 * actually do.
+ 	 */
+ 	int (*prepare_write)(struct netfs_cache_resources *cres,
+-			     loff_t *_start, size_t *_len, loff_t i_size,
+-			     bool no_space_allocated_yet);
++			     loff_t *_start, size_t *_len, size_t upper_len,
++			     loff_t i_size, bool no_space_allocated_yet);
+ 
+ 	/* Prepare an on-demand read operation, shortening it to a cached/uncached
+ 	 * boundary as appropriate.
 
