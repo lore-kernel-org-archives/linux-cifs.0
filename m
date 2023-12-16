@@ -1,38 +1,50 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E571FCB;
-	Sat, 16 Dec 2023 03:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664698498
+	for <linux-cifs@vger.kernel.org>; Sat, 16 Dec 2023 04:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yS+78uw3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=H9AWDBao+ixPxKIxPD9Emyx97BYYwRxtEc/lm+btQTw=; b=yS+78uw3z9HwPDeTKkPUt+o2Ns
-	splw76Qff1Ylvc1UGBTHUOGy9zJmvizQtp2COTnrk3reiWT18DU5opAPHxfv7phKUEE7gs0jaF5Km
-	+bXxkI7/4YXvOL7sLXls8Nt+6KYr9cH33+o9Jfc+mlsMf24k/SZ/4fqXEeO97/dud3XmD2iZyg4hF
-	lHQFk4zNXK0ub8ZEYBsxWOh0rfdPs50EVpGzCXle8cTu3rRY4r1qOPKBDkF3JtsSmR6wKqgQZAHbW
-	QppjyC4joCadj8RbxQgC4EsLXn84pkJQJMI+JS8U++Z0cyAPxP6xGjDV6/qwGzT92WdiYcw0atoKI
-	Zs+PfeVA==;
-Received: from [50.53.46.231] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rELLb-005FSr-17;
-	Sat, 16 Dec 2023 03:28:15 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH] ksmbd: vfs: fix all kernel-doc warnings
-Date: Fri, 15 Dec 2023 19:28:14 -0800
-Message-ID: <20231216032814.10560-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="q7JaF2Xj"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1702699813;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1MWkrAALI2O2O/9VtX/7hA45pQY69vm6tgh+X3v3yN8=;
+	b=q7JaF2XjCqICkrLEQR9ESP+LS8dONwuKE/6aDnPptQa9tGCQaIGaQC8YAqiTzuBFNkpWhl
+	o1gG+R3OoOwQEok7RHGDwERpal59WfFlH8ueu2W7Jm2PCvXL/uldPdrxH2tCPuvs6eG2VH
+	p9cj4iUCDHjnuhfIWDWLbtSEP20N3DxRWDDI8XLBXnJ0eNzdgrwnFRYCh3y5ounlIqMRnW
+	sIk/ss6uxgjgiY2ztQrz/kNS/QMJICVtxngu8Ca/BO6bLIjbSi9Ed8zp5Di3pv05/pUjtY
+	OwA7PIoxQajzl5wN9xCLYMhJjbK8YcaZ9WvJeoBs5EFzWlU1NMv+vXH2emv8yA==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1702699813; a=rsa-sha256;
+	cv=none;
+	b=cqOIYyg1hoC9pu0GKbSMSfQwdj1EMHWxP+gRiHYKC7UxA/JOiGMb8+bqLPk/oZBxOOsV4u
+	1ww1PvAKgMYdNfrjUMjDY0ntTM2OhQZ9aQ492X2choryX7yMeLh7IGG2EuxD7tXfg/TiTl
+	QU4pXJCAM9aBJ3PGR+ikuz8JQV+nZ8CScIlPFxU1f2QIrh5Sd5zxv0CpvaPZkON5texW26
+	tPWP9mMyrPUgiobCMpupccB4wZZG1XO1nBfR5UAG3sG1niecO5SjqplqNSp4NaDN1u9ZWE
+	DQslQEHFDsI2i+WVsSgmLJwpRB4e4WGj/4Q98CzcdHlzkSxNGj8LmNiT28gXHA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1702699813; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:references; bh=1MWkrAALI2O2O/9VtX/7hA45pQY69vm6tgh+X3v3yN8=;
+	b=I5ulei8nKOGXCkIeOHA8kyRvyGfLb0BTFEPtRGLxGYwmAO3VAoJzwTZvjyM4ZjSf4BY8WT
+	+80IwJsPiak7rOHJmR/bOj8eWxFGyZhkCYR3abJXU0eQGQF3aKrK5kmAPUCMrkfzqCiEHr
+	ofSbrEng1TFfYMFYI1VjdLQP9ChKTdHWfNElWAkGa20daFc+ezdaj2tJCWy4esZYoOc9K6
+	ZwX97rk2Mm3LMyb5pIxOSQQpDGrSrdeZ4eFkQu/BM1zlVCJ7n4+GjtqdI/s7A8PSsSCXPm
+	l7eseVoJOm916X28sYvMybNmyYfqUMQXFBlWe089aoWw3YwGpZWzzLxZ8hiBrg==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.com>
+Subject: [PATCH 1/2] smb: client: fix potential OOB in cifs_dump_detail()
+Date: Sat, 16 Dec 2023 01:10:04 -0300
+Message-ID: <20231216041005.7948-1-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -41,163 +53,37 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix all kernel-doc warnings in vfs.c:
+Validate SMB message with ->check_message() before calling
+->calc_smb_size().
 
-vfs.c:54: warning: Function parameter or member 'parent' not described in 'ksmbd_vfs_lock_parent'
-vfs.c:54: warning: Function parameter or member 'child' not described in 'ksmbd_vfs_lock_parent'
-vfs.c:54: warning: No description found for return value of 'ksmbd_vfs_lock_parent'
-vfs.c:372: warning: Function parameter or member 'fp' not described in 'ksmbd_vfs_read'
-vfs.c:372: warning: Excess function parameter 'fid' description in 'ksmbd_vfs_read'
-vfs.c:489: warning: Function parameter or member 'fp' not described in 'ksmbd_vfs_write'
-vfs.c:489: warning: Excess function parameter 'fid' description in 'ksmbd_vfs_write'
-vfs.c:555: warning: Function parameter or member 'path' not described in 'ksmbd_vfs_getattr'
-vfs.c:555: warning: Function parameter or member 'stat' not described in 'ksmbd_vfs_getattr'
-vfs.c:555: warning: Excess function parameter 'work' description in 'ksmbd_vfs_getattr'
-vfs.c:555: warning: Excess function parameter 'fid' description in 'ksmbd_vfs_getattr'
-vfs.c:555: warning: Excess function parameter 'attrs' description in 'ksmbd_vfs_getattr'
-vfs.c:572: warning: Function parameter or member 'p_id' not described in 'ksmbd_vfs_fsync'
-vfs.c:595: warning: Function parameter or member 'work' not described in 'ksmbd_vfs_remove_file'
-vfs.c:595: warning: Function parameter or member 'path' not described in 'ksmbd_vfs_remove_file'
-vfs.c:595: warning: Excess function parameter 'name' description in 'ksmbd_vfs_remove_file'
-vfs.c:633: warning: Function parameter or member 'work' not described in 'ksmbd_vfs_link'
-vfs.c:805: warning: Function parameter or member 'fp' not described in 'ksmbd_vfs_truncate'
-vfs.c:805: warning: Excess function parameter 'fid' description in 'ksmbd_vfs_truncate'
-vfs.c:846: warning: Excess function parameter 'size' description in 'ksmbd_vfs_listxattr'
-vfs.c:953: warning: Function parameter or member 'option' not described in 'ksmbd_vfs_set_fadvise'
-vfs.c:953: warning: Excess function parameter 'options' description in 'ksmbd_vfs_set_fadvise'
-vfs.c:1167: warning: Function parameter or member 'um' not described in 'ksmbd_vfs_lookup_in_dir'
-vfs.c:1203: warning: Function parameter or member 'work' not described in 'ksmbd_vfs_kern_path_locked'
-vfs.c:1641: warning: No description found for return value of 'ksmbd_vfs_init_kstat'
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <sfrench@samba.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
 ---
- fs/smb/server/vfs.c |   28 ++++++++++++++++++----------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ fs/smb/client/cifs_debug.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff -- a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -49,6 +49,10 @@ static void ksmbd_vfs_inherit_owner(stru
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index 5596c9f30ccb..60027f5aebe8 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -40,11 +40,13 @@ void cifs_dump_detail(void *buf, struct TCP_Server_Info *server)
+ #ifdef CONFIG_CIFS_DEBUG2
+ 	struct smb_hdr *smb = buf;
  
- /**
-  * ksmbd_vfs_lock_parent() - lock parent dentry if it is stable
-+ * @parent: parent dentry
-+ * @child: child dentry
-+ *
-+ * Returns: %0 on success, %-ENOENT if the parent dentry is not stable
-  */
- int ksmbd_vfs_lock_parent(struct dentry *parent, struct dentry *child)
- {
-@@ -360,7 +364,7 @@ out:
- /**
-  * ksmbd_vfs_read() - vfs helper for smb file read
-  * @work:	smb work
-- * @fid:	file id of open file
-+ * @fp:		ksmbd file pointer
-  * @count:	read byte count
-  * @pos:	file pos
-  * @rbuf:	read data buffer
-@@ -474,7 +478,7 @@ out:
- /**
-  * ksmbd_vfs_write() - vfs helper for smb file write
-  * @work:	work
-- * @fid:	file id of open file
-+ * @fp:		ksmbd file pointer
-  * @buf:	buf containing data for writing
-  * @count:	read byte count
-  * @pos:	file pos
-@@ -545,10 +549,8 @@ out:
+-	cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d\n",
+-		 smb->Command, smb->Status.CifsError,
+-		 smb->Flags, smb->Flags2, smb->Mid, smb->Pid);
+-	cifs_dbg(VFS, "smb buf %p len %u\n", smb,
+-		 server->ops->calc_smb_size(smb));
++	cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d Wct: %d\n",
++		 smb->Command, smb->Status.CifsError, smb->Flags,
++		 smb->Flags2, smb->Mid, smb->Pid, smb->WordCount);
++	if (!server->ops->check_message(buf, server->total_read, server)) {
++		cifs_dbg(VFS, "smb buf %p len %u\n", smb,
++			 server->ops->calc_smb_size(smb));
++	}
+ #endif /* CONFIG_CIFS_DEBUG2 */
+ }
  
- /**
-  * ksmbd_vfs_getattr() - vfs helper for smb getattr
-- * @work:	work
-- * @fid:	file id of open file
-- * @attrs:	inode attributes
-- *
-+ * @path:	path of dentry
-+ * @stat:	pointer to returned kernel stat structure
-  * Return:	0 on success, otherwise error
-  */
- int ksmbd_vfs_getattr(const struct path *path, struct kstat *stat)
-@@ -565,6 +567,7 @@ int ksmbd_vfs_getattr(const struct path
-  * ksmbd_vfs_fsync() - vfs helper for smb fsync
-  * @work:	work
-  * @fid:	file id of open file
-+ * @p_id:	persistent file id
-  *
-  * Return:	0 on success, otherwise error
-  */
-@@ -587,7 +590,8 @@ int ksmbd_vfs_fsync(struct ksmbd_work *w
- 
- /**
-  * ksmbd_vfs_remove_file() - vfs helper for smb rmdir or unlink
-- * @name:	directory or file name that is relative to share
-+ * @work:	work
-+ * @path:	path of dentry
-  *
-  * Return:	0 on success, otherwise error
-  */
-@@ -623,6 +627,7 @@ out_err:
- 
- /**
-  * ksmbd_vfs_link() - vfs helper for creating smb hardlink
-+ * @work:	work
-  * @oldname:	source file name
-  * @newname:	hardlink name that is relative to share
-  *
-@@ -795,7 +800,7 @@ revert_fsids:
- /**
-  * ksmbd_vfs_truncate() - vfs helper for smb file truncate
-  * @work:	work
-- * @fid:	file id of old file
-+ * @fp:		ksmbd file pointer
-  * @size:	truncate to given size
-  *
-  * Return:	0 on success, otherwise error
-@@ -838,7 +843,6 @@ int ksmbd_vfs_truncate(struct ksmbd_work
-  * ksmbd_vfs_listxattr() - vfs helper for smb list extended attributes
-  * @dentry:	dentry of file for listing xattrs
-  * @list:	destination buffer
-- * @size:	destination buffer length
-  *
-  * Return:	xattr list length on success, otherwise error
-  */
-@@ -947,7 +951,7 @@ int ksmbd_vfs_setxattr(struct mnt_idmap
- /**
-  * ksmbd_vfs_set_fadvise() - convert smb IO caching options to linux options
-  * @filp:	file pointer for IO
-- * @options:	smb IO options
-+ * @option:	smb IO options
-  */
- void ksmbd_vfs_set_fadvise(struct file *filp, __le32 option)
- {
-@@ -1159,6 +1163,7 @@ static bool __caseless_lookup(struct dir
-  * @dir:	path info
-  * @name:	filename to lookup
-  * @namelen:	filename length
-+ * @um:		&struct unicode_map to use
-  *
-  * Return:	0 on success, otherwise error
-  */
-@@ -1189,6 +1194,7 @@ static int ksmbd_vfs_lookup_in_dir(const
- 
- /**
-  * ksmbd_vfs_kern_path_locked() - lookup a file and get path info
-+ * @work:	work
-  * @name:		file path that is relative to share
-  * @flags:		lookup flags
-  * @parent_path:	if lookup succeed, return parent_path info
-@@ -1636,6 +1642,8 @@ int ksmbd_vfs_get_dos_attrib_xattr(struc
-  * ksmbd_vfs_init_kstat() - convert unix stat information to smb stat format
-  * @p:          destination buffer
-  * @ksmbd_kstat:      ksmbd kstat wrapper
-+ *
-+ * Returns: pointer to the converted &struct file_directory_info
-  */
- void *ksmbd_vfs_init_kstat(char **p, struct ksmbd_kstat *ksmbd_kstat)
- {
+-- 
+2.43.0
+
