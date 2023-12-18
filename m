@@ -1,72 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C43515E8E;
-	Mon, 18 Dec 2023 10:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88595199A5;
+	Mon, 18 Dec 2023 11:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="2c5lkad8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8454C433C7;
-	Mon, 18 Dec 2023 10:37:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1702895877;
-	bh=ybyi1d3sA58qzNYwRDx5s0PVDcrLSSPeJQ7tCbKuzaQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=2c5lkad8kACJJJI37g5WeSrgyOFe/2iS/xgadTIM44wC2wEm3V0s1B/ONlsblIJB2
-	 cVkePsv2YI+js31FFg728oqULtItVPowhhMAK42Sk3/zo4dAM1Fr3yVvvPP6yVZysl
-	 LkJ/pOWCalyftakgJNnQNroHnr2OHIe3qTbLCUMg=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Steve French <sfrench@samba.org>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH] ksmbd: Mark as BROKEN in the 5.15.y kernel
-Date: Mon, 18 Dec 2023 11:37:42 +0100
-Message-ID: <2023121841-register-nutshell-9d6d@gregkh>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkL3jKDV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46498C433C7;
+	Mon, 18 Dec 2023 11:05:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1702897558;
+	bh=WTNLubnfyisNRdtZDWlLkSm9Rz36/vqI/xP24+xTDcM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KkL3jKDVwOB5N0/qhs/9JjBN+vonQpMsSa26ZBjSeCRCaulbO8roJteQgbMujfTXZ
+	 3Pk24oNiYkl7kaOJH4+l0B3vvYwfgHe+iQlHgl15JWbDlqDuqUGQCkNX74IYjTVe8/
+	 WAi00oyNO8Glx7CMmqcF7w8ioqLSdeBZVo+RVjflOBISKeZQ9jhqo6YoYcd635YauS
+	 Nsvk9hyOKA3yRH7fpSLt2AJb6VqO2taL90lrMsyF44GZGUESZwPaw3Y5N/W7g2DNrx
+	 nBHyVnuPNVNNsyf1euBS6V7GssBV7vDeg58lO1OxEBSBMWuW+9Gg4JBPJiuck8Y32G
+	 /lwgRnx87ZYWw==
+Date: Mon, 18 Dec 2023 12:05:50 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Dominique Martinet <asmadeus@codewreck.org>
+Cc: Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 00/39] netfs, afs, 9p: Delegate high-level I/O to
+ netfslib
+Message-ID: <20231218-gegen-unumstritten-fb0aeb7519af@brauner>
+References: <20231213152350.431591-1-dhowells@redhat.com>
+ <20231215-einziehen-landen-94a63dd17637@brauner>
+ <ZXxUx_nh4HNTaDJx@codewreck.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1018; i=gregkh@linuxfoundation.org; h=from:subject:message-id; bh=ybyi1d3sA58qzNYwRDx5s0PVDcrLSSPeJQ7tCbKuzaQ=; b=owGbwMvMwCRo6H6F97bub03G02pJDKkNCt//cFodfccw70tt3t72Kvvcf6vnR8U0V/72OVzqd s0vXfZZRywLgyATg6yYIsuXbTxH91ccUvQytD0NM4eVCWQIAxenAEyks4VhfjKbxM2L5xeK7Zg8 0+rIrejuX9NVLBjm6T6zZYqef3zfpG6tFSXxM1kC3dc6AQA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZXxUx_nh4HNTaDJx@codewreck.org>
 
-Due to many known bugfixes not being backported properly to the 5.15.y
-kernel tree, the ksmbd code in this branch is just not safe to be used
-at this point in time at all.  So mark it as BROKEN so it will not be
-used.
+On Fri, Dec 15, 2023 at 10:29:43PM +0900, Dominique Martinet wrote:
+> Christian Brauner wrote on Fri, Dec 15, 2023 at 01:03:14PM +0100:
+> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+> > branch: vfs.netfs
+> 
+> This doesn't seem to build:
 
-This can be changed in the future if all needed backports are made by
-anyone who cares about this code in this stable kernel branch.
-
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Steve French <sfrench@samba.org>
-Cc: Hyunchul Lee <hyc.lee@gmail.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- fs/ksmbd/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/ksmbd/Kconfig b/fs/ksmbd/Kconfig
-index 6af339cfdc04..bc8b7fc8894d 100644
---- a/fs/ksmbd/Kconfig
-+++ b/fs/ksmbd/Kconfig
-@@ -3,6 +3,7 @@ config SMB_SERVER
- 	depends on INET
- 	depends on MULTIUSER
- 	depends on FILE_LOCKING
-+	depends on BROKEN
- 	select NLS
- 	select NLS_UTF8
- 	select CRYPTO
--- 
-2.43.0
-
+Yeah, I'm aware. That's why I didn't push it out. I couldn't finish the
+rebase completely on Friday.
