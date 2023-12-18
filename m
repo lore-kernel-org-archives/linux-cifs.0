@@ -1,22 +1,22 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7A837883;
-	Mon, 18 Dec 2023 12:44:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC995BF9A;
+	Mon, 18 Dec 2023 12:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="myJh/V5s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03EFBC433CA;
-	Mon, 18 Dec 2023 12:44:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h9GQ1qKF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96E06C433CD;
+	Mon, 18 Dec 2023 12:45:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1702903477;
-	bh=fshcEVw9K2IIEPBWEG2Uqu+aE3s8suJzHOqMwGZRdno=;
+	s=k20201202; t=1702903529;
+	bh=6eKzjKDBC78dUmxhoC0jdQqyt2Xp6+zTCPS2GcKBzdk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=myJh/V5sIw3CaUvW6kPfxXwIirwhtHb+k7cKARGd3O1hdj4Kyq8ulNCopzoicT9Je
-	 P9WuBUBIBYO/SD/YzjTNwhz8PMO0A8A9nCcn4ZaXRbr2BWZNW5iMr2bh2ARt24Pa4w
-	 eKBYejiy0rv1v9XrqOjlcCsjxrSIV/pQtq+PEZ51R87kl6sA5ek4+7WN0TYezdRSSD
-	 2OeLIUNZTiIKaZWN8TlBmfqRuAu4LCSX+Fqj/+dvkp+F59ZpGXNBzbfy+cvWSc45u4
-	 49QR5G2YMMcjj2o9DBJD3WSCknaeEQwLoIIVErcubl6ignEUg87mz4u+4Biwj4Zw00
-	 BuzYb7MlfrOyw==
+	b=h9GQ1qKFqWT/HA5YTStZ3NKMn24bggIkYO+rxq0fszbGsHmL/7cTo6Ps0lbYGHXaT
+	 Idj5EcnobnioOGh6w0Ru1CQPXm3B2OuG4XZExS4xw2kpzoxD1HZqcI+gl8J6Fk4ecM
+	 J4vTNiZYyqIrZfxNw4Z4veZ4GobTvkMJGmxksqgiaDD65RxaKRIZaa9Er3o3rHcWSi
+	 hIA4GGOd0Hfle5LzXc9kXkIG3q0tgloa+jd+7EOPC0V0h6J2orBgTgKYpRE/1apiIb
+	 Ru91yN8XoSkA2JNSEFVwcp0P8gZ95J2bN+NfkgsWyVXQ4Rl5/qWQewd55F7fZRNLrx
+	 yFOrM/LpVprMg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -25,12 +25,12 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	sfrench@samba.org,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 10/18] ksmbd: avoid duplicate opinfo_put() call on error of smb21_lease_break_ack()
-Date: Mon, 18 Dec 2023 07:43:44 -0500
-Message-ID: <20231218124415.1379060-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 08/15] ksmbd: avoid duplicate opinfo_put() call on error of smb21_lease_break_ack()
+Date: Mon, 18 Dec 2023 07:44:55 -0500
+Message-ID: <20231218124513.1380056-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231218124415.1379060-1-sashal@kernel.org>
-References: <20231218124415.1379060-1-sashal@kernel.org>
+In-Reply-To: <20231218124513.1380056-1-sashal@kernel.org>
+References: <20231218124513.1380056-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -39,7 +39,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.7
+X-stable-base: Linux 6.1.68
 Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
@@ -57,10 +57,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 269fbfb3cd678..c0c92898c86a1 100644
+index 683152007566c..f81e19e92c207 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -8205,6 +8205,11 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
+@@ -8272,6 +8272,11 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
  			    le32_to_cpu(req->LeaseState));
  	}
  
@@ -72,7 +72,7 @@ index 269fbfb3cd678..c0c92898c86a1 100644
  	lease_state = lease->state;
  	opinfo->op_state = OPLOCK_STATE_NONE;
  	wake_up_interruptible_all(&opinfo->oplock_q);
-@@ -8212,11 +8217,6 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
+@@ -8279,11 +8284,6 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
  	wake_up_interruptible_all(&opinfo->oplock_brk);
  	opinfo_put(opinfo);
  
