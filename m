@@ -1,79 +1,92 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D05B1BDE6
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 14:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0B420DE0
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 14:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AWdQBVBT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702997315;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="eo9aVJJs"
+Message-ID: <3b34f59a0f89fb09dec5e1b04f74b70d@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1702997826;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UWtsZhR3mqpEo9xJldP9MDyJRchqzHme83vu4hlTHKQ=;
-	b=AWdQBVBTR5YucDsOiCosCy/2z/Ro1QR1Fdth0EJPk7WvPANriYDhxMrGeT57wfj6t8VWQc
-	EkuEjh1DILZNwMTvQ79uiXovK2ZTUX0WuKL9UmmFGzDY7JXLIR9lWfhSrFRbuo8Er/yGqv
-	h+5DYN71eU0UxIjgze095ieaQ9ORF5c=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-215-Vp4WzdsaO4ChcYxqYCX88g-1; Tue,
- 19 Dec 2023 09:48:32 -0500
-X-MC-Unique: Vp4WzdsaO4ChcYxqYCX88g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5FC511C0513E;
-	Tue, 19 Dec 2023 14:48:31 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 936FD1121306;
-	Tue, 19 Dec 2023 14:48:28 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <488867.1702996927@warthog.procyon.org.uk>
-References: <488867.1702996927@warthog.procyon.org.uk> <6f8c3f22f77e9e0154f4131260559c39d6740678.camel@kernel.org> <20231213152350.431591-1-dhowells@redhat.com> <20231213152350.431591-19-dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 18/39] netfs: Export netfs_put_subrequest() and some tracepoints
+	bh=gOkAB0mtxVue5kaFMSSkV8+JBktLRuPm95L6EMwrwfA=;
+	b=eo9aVJJsy+PWQ1wdLk7nVgjXSvH7KmnuwYVj6L93pWeXhKLmxbPWSd47uWg1hDuQTsqf0/
+	7xD8Hc2++PXGLrDPkOS6Qx0HEIneelwRDjWmxR0fzRWn5GFEKFyxZQX8PlmRewLpSyfLt1
+	FjIfVl+TcVGCz82ccCSC2Zd84vC2L9S0VKZrvPZ2+QGm9WKFjkWycVtaO2PzebK3rpUq/j
+	UAzirD+WQTT0qYtK94LdWhFuM/f7dqhAOtd6WLGspiZQ64F0q8/FRnvNZYAD89Mp+tdSJI
+	ngB3weX09rjENqfHOflvdihSnXgy3WbG2Pnk2G9oqn6cErptA6aqa/2p+lqhSg==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1702997826; a=rsa-sha256;
+	cv=none;
+	b=K3Z0ppJ5J6vh8DLz5CnWD0qoHuBev477/JrgRV/Oxkh1mDw8s/qZBvCunRX46iab2zzIq2
+	BLLOAxhdEZr69iT8NF/H6P0iaTUHgKxXdDTEzeCsT4PzLZNqTr+Ujqf4IOdUnXcVSrnoh5
+	pI6xHUvgwSn5z/zsBxK9954FNxavhkIYEt9n04DMNiSyMhDuWyohnvvFiK3ZJ7TOFvHxHu
+	OevLqDVprE19QyRjnUvDcIdVDjjuc2lxMoEX9Do5KG+/w3Sc1UXIMIukL5ci1aap3P17G0
+	Lcknw6cRsyNrynnAdd9+n27Oeoq2Qqy8nqhkuYiWtKCnCrtUW4qZeiDiawRtIQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1702997826; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gOkAB0mtxVue5kaFMSSkV8+JBktLRuPm95L6EMwrwfA=;
+	b=tD/Diy2dVAYSLKAji4sw9TuafaCJi9rFJRiX1t/lAXfz76MDbpBGe4n9a2w1urNrtSeqVx
+	uFE38C0btZO8tKzj+LEzXjqKCLDOyErr3Ughl2BEg5QBgoaDlGBvLFBNOubiSWPV54t3YU
+	eY4fFAln2anPTqErJm8NyB0PnR7Q8GwpcfGCgCvCMZGZU1if8tx/gkDFaAdRogKGoMgrkM
+	5N6YDNytg4xvrKxGweJinjP3EVOp2wXz1apTTjqYD7p/g28vPe1CSlIBuAJB5DT93greJm
+	6386J13X1HpHfBJXT0OiGxRD2RoBkbXPIvUucJi51rQt7oiha2Sb9suCyzQ0Dw==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Maximilian Heyne <mheyne@amazon.de>
+Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org, j51569436@gmail.com
+Subject: Re: [PATCH 2/2] smb: client: fix potential OOB in smb2_dump_detail()
+In-Reply-To: <ZYGp5FL9UYY5lYHg@amazon.de>
+References: <20231216041005.7948-1-pc@manguebit.com>
+ <20231216041005.7948-2-pc@manguebit.com> <ZYGp5FL9UYY5lYHg@amazon.de>
+Date: Tue, 19 Dec 2023 11:57:03 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <489636.1702997307.1@warthog.procyon.org.uk>
-Date: Tue, 19 Dec 2023 14:48:27 +0000
-Message-ID: <489637.1702997307@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain
 
-David Howells <dhowells@redhat.com> wrote:
+Maximilian Heyne <mheyne@amazon.de> writes:
 
-> Jeff Layton <jlayton@kernel.org> wrote:
-> 
-> > Erm...why? Are these called directly from module code in a later patch?
-> 
-> Yes.  I'll expand the commit message.
+> On Sat, Dec 16, 2023 at 01:10:05AM -0300, Paulo Alcantara wrote:
+>> Validate SMB message with ->check_message() before calling
+>> ->calc_smb_size().
+>> 
+>> This fixes CVE-2023-6610.
+>> 
+>> Reported-by: j51569436@gmail.com
+>> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218219
+>> Signed-off-by: Paulo Alcantara <pc@manguebit.com>
+>> ---
+>>  fs/smb/client/smb2ops.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+>> index 62b0a8df867b..66b310208545 100644
+>> --- a/fs/smb/client/smb2ops.c
+>> +++ b/fs/smb/client/smb2ops.c
+>> @@ -403,8 +403,10 @@ smb2_dump_detail(void *buf, struct TCP_Server_Info *server)
+>>  	cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
+>>  		 shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
+>>  		 shdr->Id.SyncId.ProcessId);
+>> -	cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
+>> -		 server->ops->calc_smb_size(buf));
+>> +	if (!server->ops->check_message(buf, server->total_read, server)) {
+>
+> Why is this check negated? Sorry for this stupid question. I'm not
+> familiar with this code but only stumbled upon this commit due to a
+> CVE.
 
-That said, only trace_netfs_sreq() is required.  The other two can be dropped.
-
-David
-
+Because smb2_check_message() returns 0 for a valid SMB response and then
+it would be safe to call ->calc_smb_size() as we know the header has a
+valid Command (< NUMBER_OF_SMB2_COMMANDS).
