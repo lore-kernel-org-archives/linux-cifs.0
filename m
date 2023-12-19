@@ -1,146 +1,136 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC2F1D133
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 16:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832FB20DE5
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 16:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="bicXm2Id"
-From: Paulo Alcantara <pc@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1703002239;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPMEWXOr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703004694;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5eTteXyPwfhHoZHhwrIkU5+hL3HLY0Qf/cTrIh6hLVc=;
-	b=bicXm2IdSOKn0pcTeReKN0TZEcmPjivc+qRmTDUCUZEtzeIBS0DULM4iHOE4LBDwPlJOSu
-	CP7xZOmCPbxdz6dMLIXE23dxxnYlHntaAXTo8IkSkvuCH1plGDJKnT2cpwpaS/BUIP8DX9
-	h8DIY9KBrRfMhNCa9f/Lzc5pTWKta2Nv0cyPwntvfp3r1eZmvcHqzaFbW4B1uPZLL2yc1N
-	ke6mXzrRaM1vt8pnXA8/kV/P4XZICYPSyTH79vBTKoMG2CLibozy8cjaxaVS31XM7VlJKO
-	IwDkD9gDQbJA55G3KIfCD0JMr7LSPzWsiLAJbrsAYQVek3Bno20fJ+gIpzLufw==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1703002239; a=rsa-sha256;
-	cv=none;
-	b=MvhBIdmjr15DfbVj+/RwT7JyznZeiPbHMtn/3lpPMnqPZPNz/TZ0+OJc6QJks4W1WCfhJ+
-	IL3mor9kK8VBcpj5iPk6SoWjPrrI795jwXRkApN25o3SUnETjFYK4VUb/Nzj/c1fO7FsSS
-	1uqa4Dp5FCAUC1RPgOVNizXfCxTZRhjYr+DTV4Etw1Y1Hr6IaA0o0gVTMQJ4/XxEPSaxTL
-	0MC90OMrpIQ1sv0d6vkDKSNZIpvUWmKQxonR/CFch5zEodsOTI3abE6Xlg+Upd97ZCm94L
-	qWw8jk8m3ktd23NYUL91I8EnBUMA7wuE6b0tmUKy78KZIpIrgGAqAy6L0lBsxQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1703002239; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5eTteXyPwfhHoZHhwrIkU5+hL3HLY0Qf/cTrIh6hLVc=;
-	b=N904ssHIgklJ5sOZAhC8sPBxqOEthBuYXA2PHfil/c7JujiksNm6J+xUGgf8UICqDhsfT7
-	rmsifxyYoIK+Idliic77ora0pCBLOfcFnD6tZEleRXbv2bhyDBffFSfo7CQCnu/MuFUFRt
-	rraOPkHqsTfKDryWNgV2WXArmDZnVGrqg+rOrjh1OdfTHmyq+yW2wrZ+CuFKMc6kNGSZM3
-	PaZhGF8OZ0/WbcLIXVTVMIXMOR/cc2HU1AGUsGQNqP3jQlIZF8mnDB+S5GuSZ/cG/wd15X
-	vRCy618KgMnHZFcZF3vm3GQdisfNKaAh26Oo0JVNwsluGDyR9RXiQszjqeR/jw==
-To: smfrench@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.com>,
-	j51569436@gmail.com
-Subject: [PATCH v2] smb: client: fix potential OOB in smb2_dump_detail()
-Date: Tue, 19 Dec 2023 13:10:31 -0300
-Message-ID: <20231219161031.27068-1-pc@manguebit.com>
-In-Reply-To: <20231216041005.7948-2-pc@manguebit.com>
-References: <20231216041005.7948-2-pc@manguebit.com>
+	bh=w5Xe1M0Gz0LaWjI/lQS6+uzcaH3a3lGFMV4s4r+jDpI=;
+	b=MPMEWXOrq3Qf0xMRkSpgpydM4GEqPmebi4ymHnKJweYdrvz2xueqONpfXiZe4ts17Lao29
+	x5lPQKn5jjD7gShrHu3qpHGuHt6GtZaD5UNpKUH1vtp9dDFl4KZidrZgWWMSpax6JKZ0/0
+	KXJpcr6i35TWNVyKTo/eD5R2d46+njs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-538-SZhKt4N1MPKXfQGXxUAb8Q-1; Tue, 19 Dec 2023 11:51:31 -0500
+X-MC-Unique: SZhKt4N1MPKXfQGXxUAb8Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 544C185A589;
+	Tue, 19 Dec 2023 16:51:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 745142166B31;
+	Tue, 19 Dec 2023 16:51:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <d1d4f3996f55cb98ab6297844a51bc905e2ce631.camel@kernel.org>
+References: <d1d4f3996f55cb98ab6297844a51bc905e2ce631.camel@kernel.org> <20231213152350.431591-1-dhowells@redhat.com> <20231213152350.431591-37-dhowells@redhat.com>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 36/39] netfs: Implement a write-through caching option
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1075259.1703004686.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Dec 2023 16:51:26 +0000
+Message-ID: <1075260.1703004686@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Validate SMB message with ->check_message() before calling
-->calc_smb_size().
+Jeff Layton <jlayton@kernel.org> wrote:
 
-This fixes CVE-2023-6610.
+> > This can't be used with content encryption as that may require expansi=
+on of
+> > the write RPC beyond the write being made.
+> > =
 
-Reported-by: j51569436@gmail.com
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218219
-Signed-off-by: Paulo Alcantara <pc@manguebit.com>
----
-Steve, I tried to make as little changes as possible for v1 to make
-backporting easier, but unfortunately we still need to handle "@len <
-@pdu_size" case in smb2_check_message() otherwise we could call
-smb2_calc_size() with an invalid command, too.
+> > This doesn't affect writes via mmap - those are written back in the no=
+rmal
+> > way; similarly failed writethrough writes are marked dirty and left to
+> > writeback to retry.  Another option would be to simply invalidate them=
+, but
+> > the contents can be simultaneously accessed by read() and through mmap=
+.
+> > =
 
- fs/smb/client/smb2misc.c | 30 +++++++++++++++---------------
- fs/smb/client/smb2ops.c  |  6 ++++--
- 2 files changed, 19 insertions(+), 17 deletions(-)
+> =
 
-diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index e20b4354e703..82b84a4941dd 100644
---- a/fs/smb/client/smb2misc.c
-+++ b/fs/smb/client/smb2misc.c
-@@ -173,6 +173,21 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
- 	}
- 
- 	mid = le64_to_cpu(shdr->MessageId);
-+	if (check_smb2_hdr(shdr, mid))
-+		return 1;
-+
-+	if (shdr->StructureSize != SMB2_HEADER_STRUCTURE_SIZE) {
-+		cifs_dbg(VFS, "Invalid structure size %u\n",
-+			 le16_to_cpu(shdr->StructureSize));
-+		return 1;
-+	}
-+
-+	command = le16_to_cpu(shdr->Command);
-+	if (command >= NUMBER_OF_SMB2_COMMANDS) {
-+		cifs_dbg(VFS, "Invalid SMB2 command %d\n", command);
-+		return 1;
-+	}
-+
- 	if (len < pdu_size) {
- 		if ((len >= hdr_size)
- 		    && (shdr->Status != 0)) {
-@@ -193,21 +208,6 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
- 		return 1;
- 	}
- 
--	if (check_smb2_hdr(shdr, mid))
--		return 1;
--
--	if (shdr->StructureSize != SMB2_HEADER_STRUCTURE_SIZE) {
--		cifs_dbg(VFS, "Invalid structure size %u\n",
--			 le16_to_cpu(shdr->StructureSize));
--		return 1;
--	}
--
--	command = le16_to_cpu(shdr->Command);
--	if (command >= NUMBER_OF_SMB2_COMMANDS) {
--		cifs_dbg(VFS, "Invalid SMB2 command %d\n", command);
--		return 1;
--	}
--
- 	if (smb2_rsp_struct_sizes[command] != pdu->StructureSize2) {
- 		if (command != SMB2_OPLOCK_BREAK_HE && (shdr->Status == 0 ||
- 		    pdu->StructureSize2 != SMB2_ERROR_STRUCTURE_SIZE2_LE)) {
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 62b0a8df867b..66b310208545 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -403,8 +403,10 @@ smb2_dump_detail(void *buf, struct TCP_Server_Info *server)
- 	cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
- 		 shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
- 		 shdr->Id.SyncId.ProcessId);
--	cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
--		 server->ops->calc_smb_size(buf));
-+	if (!server->ops->check_message(buf, server->total_read, server)) {
-+		cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
-+				server->ops->calc_smb_size(buf));
-+	}
- #endif
- }
- 
--- 
-2.43.0
+> I do wish Linux were less of a mess in this regard. Different
+> filesystems behave differently when writeback fails.
+
+Cifs is particularly, um, entertaining in this regard as it allows the wri=
+te
+to fail on the server due to a checksum failure if the source data changes
+during the write and then just retries it later.
+
+> That said, the modern consensus with local filesystems is to just leave
+> the pages clean when buffered writeback fails, but set a writeback error
+> on the inode. That at least keeps dirty pages from stacking up in the
+> cache. In the case of something like a netfs, we usually invalidate the
+> inode and the pages -- netfs's usually have to spontaneously deal with
+> that anyway, so we might as well.
+> =
+
+> Marking the pages dirty here should mean that they'll effectively get a
+> second try at writeback, which is a change in behavior from most
+> filesystems. I'm not sure it's a bad one, but writeback can take a long
+> time if you have a laggy network.
+
+I'm not sure what the best thing to do is.  If everything is doing
+O_DSYNC/writethrough I/O on an inode and there is no mmap, then invalidati=
+ng
+the pages is probably not a bad way to deal with failure here.
+
+> When a write has already failed once, why do you think it'll succeed on
+> a second attempt (and probably with page-aligned I/O, I guess)?
+
+See above with cifs.  I wonder if the pages being written to should be mad=
+e RO
+and page_mkwrite() forced to lock against DSYNC writethrough.
+
+> Another question: when the writeback is (re)attempted, will it end up
+> just doing page-aligned I/O, or is the byte range still going to be
+> limited to the written range?
+
+At the moment, it then happens exactly as it would if it wasn't doing
+writethrough - so it will write partial folios if it's doing a streaming w=
+rite
+and will do full folios otherwise.
+
+> The more I consider it, I think it might be a lot simpler to just "fail
+> fast" here rather than remarking the write dirty.
+
+You may be right - but, again, mmap:-/
+
+David
 
