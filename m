@@ -1,92 +1,102 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0B420DE0
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 14:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DB21D125
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 15:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="eo9aVJJs"
-Message-ID: <3b34f59a0f89fb09dec5e1b04f74b70d@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1702997826;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFvSoo6U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1703000800;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gOkAB0mtxVue5kaFMSSkV8+JBktLRuPm95L6EMwrwfA=;
-	b=eo9aVJJsy+PWQ1wdLk7nVgjXSvH7KmnuwYVj6L93pWeXhKLmxbPWSd47uWg1hDuQTsqf0/
-	7xD8Hc2++PXGLrDPkOS6Qx0HEIneelwRDjWmxR0fzRWn5GFEKFyxZQX8PlmRewLpSyfLt1
-	FjIfVl+TcVGCz82ccCSC2Zd84vC2L9S0VKZrvPZ2+QGm9WKFjkWycVtaO2PzebK3rpUq/j
-	UAzirD+WQTT0qYtK94LdWhFuM/f7dqhAOtd6WLGspiZQ64F0q8/FRnvNZYAD89Mp+tdSJI
-	ngB3weX09rjENqfHOflvdihSnXgy3WbG2Pnk2G9oqn6cErptA6aqa/2p+lqhSg==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1702997826; a=rsa-sha256;
-	cv=none;
-	b=K3Z0ppJ5J6vh8DLz5CnWD0qoHuBev477/JrgRV/Oxkh1mDw8s/qZBvCunRX46iab2zzIq2
-	BLLOAxhdEZr69iT8NF/H6P0iaTUHgKxXdDTEzeCsT4PzLZNqTr+Ujqf4IOdUnXcVSrnoh5
-	pI6xHUvgwSn5z/zsBxK9954FNxavhkIYEt9n04DMNiSyMhDuWyohnvvFiK3ZJ7TOFvHxHu
-	OevLqDVprE19QyRjnUvDcIdVDjjuc2lxMoEX9Do5KG+/w3Sc1UXIMIukL5ci1aap3P17G0
-	Lcknw6cRsyNrynnAdd9+n27Oeoq2Qqy8nqhkuYiWtKCnCrtUW4qZeiDiawRtIQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1702997826; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gOkAB0mtxVue5kaFMSSkV8+JBktLRuPm95L6EMwrwfA=;
-	b=tD/Diy2dVAYSLKAji4sw9TuafaCJi9rFJRiX1t/lAXfz76MDbpBGe4n9a2w1urNrtSeqVx
-	uFE38C0btZO8tKzj+LEzXjqKCLDOyErr3Ughl2BEg5QBgoaDlGBvLFBNOubiSWPV54t3YU
-	eY4fFAln2anPTqErJm8NyB0PnR7Q8GwpcfGCgCvCMZGZU1if8tx/gkDFaAdRogKGoMgrkM
-	5N6YDNytg4xvrKxGweJinjP3EVOp2wXz1apTTjqYD7p/g28vPe1CSlIBuAJB5DT93greJm
-	6386J13X1HpHfBJXT0OiGxRD2RoBkbXPIvUucJi51rQt7oiha2Sb9suCyzQ0Dw==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Maximilian Heyne <mheyne@amazon.de>
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org, j51569436@gmail.com
-Subject: Re: [PATCH 2/2] smb: client: fix potential OOB in smb2_dump_detail()
-In-Reply-To: <ZYGp5FL9UYY5lYHg@amazon.de>
-References: <20231216041005.7948-1-pc@manguebit.com>
- <20231216041005.7948-2-pc@manguebit.com> <ZYGp5FL9UYY5lYHg@amazon.de>
-Date: Tue, 19 Dec 2023 11:57:03 -0300
+	bh=wZJGy675CLReZdRFDQqYih3Khpsr0+z+wYGm8WjxUuI=;
+	b=CFvSoo6U80LwJYjfkGOiCZWXCB3s1rz6JAuCgqO6QC2ouwT7PJr16NT/fMZabS3Br4KpOw
+	fTdk99MGRpB/ERq80jw8V5FtHMJJ7nMZtKTh9T+JpC46lwENGtJVIMQJ4tdtH93YzB4rCC
+	UvSQgZ5ExtuKQx/FaugaXImDeF4Zxu0=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-IJX7nCWPOzWJ4d7l3Db6MQ-1; Tue,
+ 19 Dec 2023 10:46:35 -0500
+X-MC-Unique: IJX7nCWPOzWJ4d7l3Db6MQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 936DD1C0513E;
+	Tue, 19 Dec 2023 15:46:33 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B5C1E3C25;
+	Tue, 19 Dec 2023 15:46:30 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <36ba1d9f8668e701a9eebcc6cbaa9367e7ccb182.camel@kernel.org>
+References: <36ba1d9f8668e701a9eebcc6cbaa9367e7ccb182.camel@kernel.org> <20231213152350.431591-1-dhowells@redhat.com> <20231213152350.431591-29-dhowells@redhat.com>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 28/39] netfs: Implement support for unbuffered/DIO read
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <844304.1703000788.1@warthog.procyon.org.uk>
+Date: Tue, 19 Dec 2023 15:46:28 +0000
+Message-ID: <844305.1703000788@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Maximilian Heyne <mheyne@amazon.de> writes:
+Jeff Layton <jlayton@kernel.org> wrote:
 
-> On Sat, Dec 16, 2023 at 01:10:05AM -0300, Paulo Alcantara wrote:
->> Validate SMB message with ->check_message() before calling
->> ->calc_smb_size().
->> 
->> This fixes CVE-2023-6610.
->> 
->> Reported-by: j51569436@gmail.com
->> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218219
->> Signed-off-by: Paulo Alcantara <pc@manguebit.com>
->> ---
->>  fs/smb/client/smb2ops.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
->> 
->> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
->> index 62b0a8df867b..66b310208545 100644
->> --- a/fs/smb/client/smb2ops.c
->> +++ b/fs/smb/client/smb2ops.c
->> @@ -403,8 +403,10 @@ smb2_dump_detail(void *buf, struct TCP_Server_Info *server)
->>  	cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
->>  		 shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
->>  		 shdr->Id.SyncId.ProcessId);
->> -	cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
->> -		 server->ops->calc_smb_size(buf));
->> +	if (!server->ops->check_message(buf, server->total_read, server)) {
->
-> Why is this check negated? Sorry for this stupid question. I'm not
-> familiar with this code but only stumbled upon this commit due to a
-> CVE.
+> > +static int netfs_copy_xarray_to_iter(struct netfs_io_request *rreq,
+> > +				     struct xarray *xa, struct iov_iter *dst,
+> > +				     unsigned long long start, size_t avail)
+> ...
+> > +	xas_for_each(&xas, folio, ULONG_MAX) {
+> > +		size_t offset;
+> > +
+> > +		if (xas_retry(&xas, folio))
+> > +			continue;
+> > +
+> > +		/* There shouldn't be a need to call xas_pause() as no one else
+> > +		 * should be modifying the xarray we're iterating over.
+> > +		 * Really, we only need the RCU readlock to keep lockdep happy
+> > +		 * inside xas_for_each().
+> > +		 */
+> > +		rcu_read_unlock();
+> > +
+> 
+> Are you sure it's still safe to access "folio" once you've dropped the
+> rcu_read_lock? I wonder if you need to take a reference or something.
+> 
+> I guess if this is a "private" xarray then nothing should be modifying
+> it?
 
-Because smb2_check_message() returns 0 for a valid SMB response and then
-it would be safe to call ->calc_smb_size() as we know the header has a
-valid Command (< NUMBER_OF_SMB2_COMMANDS).
+It is a private xarray in this case.  The only reason I need the RCU read lock
+is because the xarray code will complain if we're not holding it:-/.
+
+Actually, I can probably excise the bounce buffer code for this series as
+nothing in 9p or afs currently uses it.  It's needed for content crypto - so
+ceph will need it.
+
+David
+
