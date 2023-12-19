@@ -1,50 +1,59 @@
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDA91CA82
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 14:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5471C2AC
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 14:41:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="GzWQhCl1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1702996457; x=1734532457;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=W6VDjDYf14QSxQDawbrb1gkDsbFWMzWpadsIl9dpbKM=;
-  b=GzWQhCl1W4/e0LFO8nBnn8IxKcdKAVP2KYr9SNIk5iZpLo2pIMWh1kVN
-   zz3TuQsvYh8YK5M5zur5sPrq9vVuaAPfPwiQTcSUCM9v7IicVGo5FsSui
-   m/ALom6/+FzmlYJ90gnJLitToJXxQm6TTJyW3hAgcM97MTBqtG2hZgalu
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.04,288,1695686400"; 
-   d="scan'208";a="375014698"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2023 14:34:14 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 917C2A2E95;
-	Tue, 19 Dec 2023 14:34:13 +0000 (UTC)
-Received: from EX19MTAUEC001.ant.amazon.com [10.0.44.209:65164]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.59.79:2525] with esmtp (Farcaster)
- id 89d90a09-ef0b-4430-98c9-943989a62ded; Tue, 19 Dec 2023 14:34:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 89d90a09-ef0b-4430-98c9-943989a62ded
-Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 19 Dec 2023 14:34:12 +0000
-Received: from dev-dsk-mheyne-1b-c1362c4d.eu-west-1.amazon.com (10.15.57.183)
- by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP Server id
- 15.2.1118.40 via Frontend Transport; Tue, 19 Dec 2023 14:34:12 +0000
-Received: by dev-dsk-mheyne-1b-c1362c4d.eu-west-1.amazon.com (Postfix, from userid 5466572)
-	id 4784296D; Tue, 19 Dec 2023 14:34:12 +0000 (UTC)
-Date: Tue, 19 Dec 2023 14:34:12 +0000
-From: Maximilian Heyne <mheyne@amazon.de>
-To: Paulo Alcantara <pc@manguebit.com>
-CC: <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>, <j51569436@gmail.com>
-Subject: Re: [PATCH 2/2] smb: client: fix potential OOB in smb2_dump_detail()
-Message-ID: <ZYGp5FL9UYY5lYHg@amazon.de>
-References: <20231216041005.7948-1-pc@manguebit.com>
- <20231216041005.7948-2-pc@manguebit.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0gv2AAJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1702996867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7TWKhr2LMbpjEPBw/2MEwrqBs0s6c+M03rN98iODU4U=;
+	b=a0gv2AAJXp3Ke6BrLokSmefzF9rYGmm4tavxRl09a2pUFbgyFRIDLpdee2f9ExhpD5Cq8K
+	AqNnwOuddYBajjDgHaYk68aPCXZw2ldQYq58iBxohK02zDxSZ7nSkfmqM2oomemuntMj+F
+	uk1OM+im6TSnUddzikWnU2LBLm/ADKs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-53-pxkXtkAlOI-jeHJPe9wIAw-1; Tue,
+ 19 Dec 2023 09:41:01 -0500
+X-MC-Unique: pxkXtkAlOI-jeHJPe9wIAw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7A47299E748;
+	Tue, 19 Dec 2023 14:40:59 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 27B1F1121306;
+	Tue, 19 Dec 2023 14:40:57 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <488523.1702996313@warthog.procyon.org.uk>
+References: <488523.1702996313@warthog.procyon.org.uk> <367107fa03540f7ddd2e8de51c751348bd7eb42c.camel@kernel.org> <20231213152350.431591-1-dhowells@redhat.com> <20231213152350.431591-13-dhowells@redhat.com>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 12/39] netfs: Add iov_iters to (sub)requests to describe various buffers
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,56 +61,71 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20231216041005.7948-2-pc@manguebit.com>
+Content-ID: <488793.1702996856.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Dec 2023 14:40:56 +0000
+Message-ID: <488794.1702996856@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Sat, Dec 16, 2023 at 01:10:05AM -0300, Paulo Alcantara wrote:
-> Validate SMB message with ->check_message() before calling
-> ->calc_smb_size().
-> 
-> This fixes CVE-2023-6610.
-> 
-> Reported-by: j51569436@gmail.com
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218219
-> Signed-off-by: Paulo Alcantara <pc@manguebit.com>
-> ---
->  fs/smb/client/smb2ops.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 62b0a8df867b..66b310208545 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -403,8 +403,10 @@ smb2_dump_detail(void *buf, struct TCP_Server_Info *server)
->  	cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
->  		 shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
->  		 shdr->Id.SyncId.ProcessId);
-> -	cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
-> -		 server->ops->calc_smb_size(buf));
-> +	if (!server->ops->check_message(buf, server->total_read, server)) {
+David Howells <dhowells@redhat.com> wrote:
 
-Why is this check negated? Sorry for this stupid question. I'm not
-familiar with this code but only stumbled upon this commit due to a CVE.
+> > > @@ -88,6 +78,11 @@ static void netfs_read_from_server(struct netfs_i=
+o_request *rreq,
+> > >  				   struct netfs_io_subrequest *subreq)
+> > >  {
+> > >  	netfs_stat(&netfs_n_rh_download);
+> > > +	if (iov_iter_count(&subreq->io_iter) !=3D subreq->len - subreq->tr=
+ansferred)
+> > > +		pr_warn("R=3D%08x[%u] ITER PRE-MISMATCH %zx !=3D %zx-%zx %lx\n",
+> > > +			rreq->debug_id, subreq->debug_index,
+> > > +			iov_iter_count(&subreq->io_iter), subreq->len,
+> > > +			subreq->transferred, subreq->flags);
+> > =
 
-> +		cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
-> +				server->ops->calc_smb_size(buf));
-> +	}
->  #endif
->  }
->  
-> -- 
-> 2.43.0
-> 
+> > pr_warn is a bit alarmist, esp given the cryptic message.  Maybe demot=
+e
+> > this to INFO or DEBUG?
+> > =
 
+> > Does this indicate a bug in the client or that the server is sending u=
+s
+> > malformed frames?
+> =
 
+> Good question.  The network filesystem updated subreq->transferred to in=
+dicate
+> it had transferred X amount of data, but the iterator had been updated t=
+o
+> indicate Y amount of data was transferred.  They really ought to match a=
+s it
+> may otherwise indicate an underrun (and potential leakage of old data).
+> Overruns are less of a problem since the iterator would have to 'go nega=
+tive'
+> as it were.
+> =
 
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
+> However, it might be better just to leave io_iter unchecked since we end=
+ up
+> resetting it anyway each time we reinvoke the ->issue_read() op.  It's a=
+lways
+> possible that it will get copied and a different iterator get passed to =
+the
+> network layer or cache fs - and so the change to the iterator then has t=
+o be
+> manually propagated just to avoid the warning.
 
+Actually, it's more complicated than that.  It's an assertion that netfsli=
+b is
+doing the right prep.  This assertion is checked both when we initially ma=
+ke a
+request (in which case it definitely shouldn't fire) and when we perform a
+resubmission on partial/complete read failure when we need to carefully
+revalidate the numbers to make sure we don't end up with holes or wrinkles=
+ in
+the buffer.
 
+Anyway, it shouldn't happen - but if it does, it probably presages data
+corruption.
+
+David
 
