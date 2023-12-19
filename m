@@ -1,102 +1,146 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DB21D125
-	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 15:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC2F1D133
+	for <linux-cifs@vger.kernel.org>; Tue, 19 Dec 2023 16:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFvSoo6U"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1703000800;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="bicXm2Id"
+From: Paulo Alcantara <pc@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1703002239;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wZJGy675CLReZdRFDQqYih3Khpsr0+z+wYGm8WjxUuI=;
-	b=CFvSoo6U80LwJYjfkGOiCZWXCB3s1rz6JAuCgqO6QC2ouwT7PJr16NT/fMZabS3Br4KpOw
-	fTdk99MGRpB/ERq80jw8V5FtHMJJ7nMZtKTh9T+JpC46lwENGtJVIMQJ4tdtH93YzB4rCC
-	UvSQgZ5ExtuKQx/FaugaXImDeF4Zxu0=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-IJX7nCWPOzWJ4d7l3Db6MQ-1; Tue,
- 19 Dec 2023 10:46:35 -0500
-X-MC-Unique: IJX7nCWPOzWJ4d7l3Db6MQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 936DD1C0513E;
-	Tue, 19 Dec 2023 15:46:33 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.195.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B5C1E3C25;
-	Tue, 19 Dec 2023 15:46:30 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <36ba1d9f8668e701a9eebcc6cbaa9367e7ccb182.camel@kernel.org>
-References: <36ba1d9f8668e701a9eebcc6cbaa9367e7ccb182.camel@kernel.org> <20231213152350.431591-1-dhowells@redhat.com> <20231213152350.431591-29-dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 28/39] netfs: Implement support for unbuffered/DIO read
+	bh=5eTteXyPwfhHoZHhwrIkU5+hL3HLY0Qf/cTrIh6hLVc=;
+	b=bicXm2IdSOKn0pcTeReKN0TZEcmPjivc+qRmTDUCUZEtzeIBS0DULM4iHOE4LBDwPlJOSu
+	CP7xZOmCPbxdz6dMLIXE23dxxnYlHntaAXTo8IkSkvuCH1plGDJKnT2cpwpaS/BUIP8DX9
+	h8DIY9KBrRfMhNCa9f/Lzc5pTWKta2Nv0cyPwntvfp3r1eZmvcHqzaFbW4B1uPZLL2yc1N
+	ke6mXzrRaM1vt8pnXA8/kV/P4XZICYPSyTH79vBTKoMG2CLibozy8cjaxaVS31XM7VlJKO
+	IwDkD9gDQbJA55G3KIfCD0JMr7LSPzWsiLAJbrsAYQVek3Bno20fJ+gIpzLufw==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1703002239; a=rsa-sha256;
+	cv=none;
+	b=MvhBIdmjr15DfbVj+/RwT7JyznZeiPbHMtn/3lpPMnqPZPNz/TZ0+OJc6QJks4W1WCfhJ+
+	IL3mor9kK8VBcpj5iPk6SoWjPrrI795jwXRkApN25o3SUnETjFYK4VUb/Nzj/c1fO7FsSS
+	1uqa4Dp5FCAUC1RPgOVNizXfCxTZRhjYr+DTV4Etw1Y1Hr6IaA0o0gVTMQJ4/XxEPSaxTL
+	0MC90OMrpIQ1sv0d6vkDKSNZIpvUWmKQxonR/CFch5zEodsOTI3abE6Xlg+Upd97ZCm94L
+	qWw8jk8m3ktd23NYUL91I8EnBUMA7wuE6b0tmUKy78KZIpIrgGAqAy6L0lBsxQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1703002239; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5eTteXyPwfhHoZHhwrIkU5+hL3HLY0Qf/cTrIh6hLVc=;
+	b=N904ssHIgklJ5sOZAhC8sPBxqOEthBuYXA2PHfil/c7JujiksNm6J+xUGgf8UICqDhsfT7
+	rmsifxyYoIK+Idliic77ora0pCBLOfcFnD6tZEleRXbv2bhyDBffFSfo7CQCnu/MuFUFRt
+	rraOPkHqsTfKDryWNgV2WXArmDZnVGrqg+rOrjh1OdfTHmyq+yW2wrZ+CuFKMc6kNGSZM3
+	PaZhGF8OZ0/WbcLIXVTVMIXMOR/cc2HU1AGUsGQNqP3jQlIZF8mnDB+S5GuSZ/cG/wd15X
+	vRCy618KgMnHZFcZF3vm3GQdisfNKaAh26Oo0JVNwsluGDyR9RXiQszjqeR/jw==
+To: smfrench@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.com>,
+	j51569436@gmail.com
+Subject: [PATCH v2] smb: client: fix potential OOB in smb2_dump_detail()
+Date: Tue, 19 Dec 2023 13:10:31 -0300
+Message-ID: <20231219161031.27068-1-pc@manguebit.com>
+In-Reply-To: <20231216041005.7948-2-pc@manguebit.com>
+References: <20231216041005.7948-2-pc@manguebit.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <844304.1703000788.1@warthog.procyon.org.uk>
-Date: Tue, 19 Dec 2023 15:46:28 +0000
-Message-ID: <844305.1703000788@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
 
-Jeff Layton <jlayton@kernel.org> wrote:
+Validate SMB message with ->check_message() before calling
+->calc_smb_size().
 
-> > +static int netfs_copy_xarray_to_iter(struct netfs_io_request *rreq,
-> > +				     struct xarray *xa, struct iov_iter *dst,
-> > +				     unsigned long long start, size_t avail)
-> ...
-> > +	xas_for_each(&xas, folio, ULONG_MAX) {
-> > +		size_t offset;
-> > +
-> > +		if (xas_retry(&xas, folio))
-> > +			continue;
-> > +
-> > +		/* There shouldn't be a need to call xas_pause() as no one else
-> > +		 * should be modifying the xarray we're iterating over.
-> > +		 * Really, we only need the RCU readlock to keep lockdep happy
-> > +		 * inside xas_for_each().
-> > +		 */
-> > +		rcu_read_unlock();
-> > +
-> 
-> Are you sure it's still safe to access "folio" once you've dropped the
-> rcu_read_lock? I wonder if you need to take a reference or something.
-> 
-> I guess if this is a "private" xarray then nothing should be modifying
-> it?
+This fixes CVE-2023-6610.
 
-It is a private xarray in this case.  The only reason I need the RCU read lock
-is because the xarray code will complain if we're not holding it:-/.
+Reported-by: j51569436@gmail.com
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218219
+Signed-off-by: Paulo Alcantara <pc@manguebit.com>
+---
+Steve, I tried to make as little changes as possible for v1 to make
+backporting easier, but unfortunately we still need to handle "@len <
+@pdu_size" case in smb2_check_message() otherwise we could call
+smb2_calc_size() with an invalid command, too.
 
-Actually, I can probably excise the bounce buffer code for this series as
-nothing in 9p or afs currently uses it.  It's needed for content crypto - so
-ceph will need it.
+ fs/smb/client/smb2misc.c | 30 +++++++++++++++---------------
+ fs/smb/client/smb2ops.c  |  6 ++++--
+ 2 files changed, 19 insertions(+), 17 deletions(-)
 
-David
+diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
+index e20b4354e703..82b84a4941dd 100644
+--- a/fs/smb/client/smb2misc.c
++++ b/fs/smb/client/smb2misc.c
+@@ -173,6 +173,21 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
+ 	}
+ 
+ 	mid = le64_to_cpu(shdr->MessageId);
++	if (check_smb2_hdr(shdr, mid))
++		return 1;
++
++	if (shdr->StructureSize != SMB2_HEADER_STRUCTURE_SIZE) {
++		cifs_dbg(VFS, "Invalid structure size %u\n",
++			 le16_to_cpu(shdr->StructureSize));
++		return 1;
++	}
++
++	command = le16_to_cpu(shdr->Command);
++	if (command >= NUMBER_OF_SMB2_COMMANDS) {
++		cifs_dbg(VFS, "Invalid SMB2 command %d\n", command);
++		return 1;
++	}
++
+ 	if (len < pdu_size) {
+ 		if ((len >= hdr_size)
+ 		    && (shdr->Status != 0)) {
+@@ -193,21 +208,6 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *server)
+ 		return 1;
+ 	}
+ 
+-	if (check_smb2_hdr(shdr, mid))
+-		return 1;
+-
+-	if (shdr->StructureSize != SMB2_HEADER_STRUCTURE_SIZE) {
+-		cifs_dbg(VFS, "Invalid structure size %u\n",
+-			 le16_to_cpu(shdr->StructureSize));
+-		return 1;
+-	}
+-
+-	command = le16_to_cpu(shdr->Command);
+-	if (command >= NUMBER_OF_SMB2_COMMANDS) {
+-		cifs_dbg(VFS, "Invalid SMB2 command %d\n", command);
+-		return 1;
+-	}
+-
+ 	if (smb2_rsp_struct_sizes[command] != pdu->StructureSize2) {
+ 		if (command != SMB2_OPLOCK_BREAK_HE && (shdr->Status == 0 ||
+ 		    pdu->StructureSize2 != SMB2_ERROR_STRUCTURE_SIZE2_LE)) {
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 62b0a8df867b..66b310208545 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -403,8 +403,10 @@ smb2_dump_detail(void *buf, struct TCP_Server_Info *server)
+ 	cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
+ 		 shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
+ 		 shdr->Id.SyncId.ProcessId);
+-	cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
+-		 server->ops->calc_smb_size(buf));
++	if (!server->ops->check_message(buf, server->total_read, server)) {
++		cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
++				server->ops->calc_smb_size(buf));
++	}
+ #endif
+ }
+ 
+-- 
+2.43.0
 
