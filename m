@@ -1,107 +1,55 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772588BFA;
-	Thu, 21 Dec 2023 04:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AE09477;
+	Thu, 21 Dec 2023 05:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iN/u13mF"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ca04b1cc37so3457261fa.1;
-        Wed, 20 Dec 2023 20:09:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703131748; x=1703736548; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=C46kmWTthThAJwVWVLgOdKWhTKLPOhQZ8tCfQwfEl1A=;
-        b=iN/u13mF6U0N80eP58huATRwo5bUhrqIclK7/epGyZYoHx/1D1WDmMtO78vbhIa7tC
-         X2vPsgk7T6wukdNfwrkK0eDB8pMP8GJiXINMayU5g3FzXA5X1lLwETqsfPM9hBeMNEvz
-         3g8h3UZCR5P5bDjisA5N8MYY/9jhiL+X65MGaV2nT1wy8ms3w5KI21BQ6IZe4IyDdL4M
-         /vpZStLRoR+Wqz+i9X9haFBk7qn6kC0ohjUPhArfu7f49LXEgW08w2V64+0/TFIa9n9U
-         ckIJlmmyWY+hpkYmXHk7yHvH2G4QpBevYv/OzyOcGAnukqaRGSP4pkkhBsMD3KY/zGBD
-         urCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703131748; x=1703736548;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C46kmWTthThAJwVWVLgOdKWhTKLPOhQZ8tCfQwfEl1A=;
-        b=wK+R87wDJywbU9MCv5KooE47AbWUdwPnjr4fjaNcfoef6UTfqZ0hyAS34wHfHGGauT
-         6WLcC/4DkOTd7OS86OPYxZxfMoqFmbNeJlfeS7FlaWoQXM1356ngXkM5dGbuYlkzp7vJ
-         uvJmLLRQNAlBnfof8Qi+LZU9/HgpzDGBRDS3Hr8RqG+w740et7C9vOBpWP4qM0cWHZY/
-         aWEGrWeHNf21BZFzQESjz8LuEgm6V4vQaIhG+nGGPZCghs2ybngc7J0KcvRczqDgMaaQ
-         WKhoYfS88XUHIA+tzPvrCxn7p9f26ZcCNeJMLnQ9VZDVnWj6JYzSEI02aeLomlrQEWnC
-         Solw==
-X-Gm-Message-State: AOJu0YwIqvIjEbvWHIFxb1agd6Js/50/IJibJfCONNLVundjIuHp7Nlk
-	SZixNoD9d02zedAW8jrYz7j6j2OswGYn6BNxBqfMXdAQ
-X-Google-Smtp-Source: AGHT+IEPG6AL6kRIpXgvlRT1r2MGEr/O4X+6PKN5NfEDL2xQdSa7jJhQKCS963pqiq54Lk6FPKXgZaOeEX5w3h0gzHA=
-X-Received: by 2002:a2e:9f0a:0:b0:2cb:27ff:d663 with SMTP id
- u10-20020a2e9f0a000000b002cb27ffd663mr38122ljk.11.1703131748074; Wed, 20 Dec
- 2023 20:09:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SceD/I7f"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 89F1DC433C7;
+	Thu, 21 Dec 2023 05:22:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703136126;
+	bh=Lw+V06Yn69FY5ftFPf3ftY+ZYPlSO27puJXjTIAOhvI=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=SceD/I7fZMJQVPJeQCz4+hXcLeJdSbQ+ojU3Wv70G9lQRrJiDTEcTArGtlaa4/J4q
+	 gOorr/63yLEWwI7z0gp2s+10TuVIxi9W4cRaKfxg/pD4yv44y7rIepRNmtXR5bcb7W
+	 Rio49uJzDQ31MvS6mlggzYZ+mj/KC0Twm1QCcG8W+oLGeuREWjPuiXITee38KvORj5
+	 Ic4bXlP+SfEkE3MQgwFOpK139eZdXU5S9uVmdIiNka2jty5LCFG8WzpTANbCaoKItf
+	 R/KaWlgISOZJhTkR05TOnfbiNlraABrvxqdr2ypTx6pVw7zFcc0NHdSyRn0X3pyF6o
+	 uwSv/3CQi/mtA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 789A5D8C988;
+	Thu, 21 Dec 2023 05:22:06 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mvnbV3AxWeibhBaL7UtfZ7ko18-1SZg2LN0U0YNgvJ6Cg@mail.gmail.com>
+References: <CAH2r5mvnbV3AxWeibhBaL7UtfZ7ko18-1SZg2LN0U0YNgvJ6Cg@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mvnbV3AxWeibhBaL7UtfZ7ko18-1SZg2LN0U0YNgvJ6Cg@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc6-smb3-client-fixes
+X-PR-Tracked-Commit-Id: 12d1e301bdfd1f2e2f371432dedef7cce8f01c4a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: eee7f5b48e20c585dc8069b3ab8abdcabd0afded
+Message-Id: <170313612648.796.18134558177984902202.pr-tracker-bot@kernel.org>
+Date: Thu, 21 Dec 2023 05:22:06 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Wed, 20 Dec 2023 22:08:56 -0600
-Message-ID: <CAH2r5mvnbV3AxWeibhBaL7UtfZ7ko18-1SZg2LN0U0YNgvJ6Cg@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Please pull the following changes since commit
-ceb6a6f023fd3e8b07761ed900352ef574010bcb:
+The pull request you sent on Wed, 20 Dec 2023 22:08:56 -0600:
 
-  Linux 6.7-rc6 (2023-12-17 15:19:28 -0800)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc6-smb3-client-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/eee7f5b48e20c585dc8069b3ab8abdcabd0afded
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc6-smb3-client-fixes
+Thank you!
 
-for you to fetch changes up to 12d1e301bdfd1f2e2f371432dedef7cce8f01c4a:
-
-  cifs: do not let cifs_chan_update_iface deallocate channels
-(2023-12-19 11:04:04 -0600)
-
-----------------------------------------------------------------
-Eight import client fixes, most also for stable
-- two multichannel reconnect fixes, one fixing an important
-refcounting problem that can lead to umount problems
-- atime fix
-- five fixes for various potential OOB accesses, including a CVE fix,
-and two additional
-  fixes for problems pointed out by Robert Morris's fuzzing investigating)
-
-----------------------------------------------------------------
-Paulo Alcantara (5):
-      smb: client: fix OOB in cifsd when receiving compounded resps
-      smb: client: fix OOB in SMB2_query_info_init()
-      smb: client: fix OOB in smbCalcSize()
-      smb: client: fix potential OOB in cifs_dump_detail()
-      smb: client: fix potential OOB in smb2_dump_detail()
-
-Shyam Prasad N (2):
-      cifs: fix a pending undercount of srv_count
-      cifs: do not let cifs_chan_update_iface deallocate channels
-
-Zizhi Wo (1):
-      fs: cifs: Fix atime update check
-
- fs/smb/client/cifs_debug.c | 12 +++++++-----
- fs/smb/client/cifsglob.h   |  3 ++-
- fs/smb/client/connect.c    |  7 ++++++-
- fs/smb/client/file.c       |  2 +-
- fs/smb/client/misc.c       |  4 ++++
- fs/smb/client/sess.c       | 50
-++++++++++++++++++------------------------------
- fs/smb/client/smb2misc.c   | 30 ++++++++++++++---------------
- fs/smb/client/smb2ops.c    | 25 +++++++++++++++---------
- fs/smb/client/smb2pdu.c    | 32 ++++++++++++++++++++++---------
- 9 files changed, 93 insertions(+), 72 deletions(-)
-
---
-Thanks,
-
-Steve
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
