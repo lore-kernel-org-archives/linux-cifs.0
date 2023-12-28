@@ -1,100 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DC210A09;
-	Thu, 28 Dec 2023 16:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF791096A;
+	Thu, 28 Dec 2023 22:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWpAGoY8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9499CC433C9;
-	Thu, 28 Dec 2023 16:58:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1703782714;
-	bh=LtB9LsZRFoK2mRick0kUYbdhu9aPS6cGfKbd+Bt8FtI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lWpAGoY88Go6sFhC5oHMizbI6XpsDbe3P9/irSiWfwoLQGwfrrdzSswLuoybnRUFT
-	 Y+XqOp9YWoQsYRrr6bvMkd8mxSERkT48kgdNRqDjCUUttR5Q3H3U0h6pPQweVEORBc
-	 I8WSnOqHV1rhNFbW5BbgKKPNaTH+Ac5AbrB8xN5rrfXe+tCgqQs5Rp1ezx8NBaLOU2
-	 N34MiXPPv82Oc2WqM4yvpi5XSNSYcpVl0ehK6ySaDLDFWybSeNgF8bZuALCNNz0wJQ
-	 6D8Um8C0blfpXdkHQK5vaSPd/HhcXAfTjTliP0Y6lp9eN5VXRU/sim+RtVXRhf+tQ6
-	 UVcz4gfMLuMIw==
-Date: Thu, 28 Dec 2023 09:58:31 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v5 15/40] netfs: Add support for DIO buffering
-Message-ID: <20231228165831.GA348702@dev-arch.thelio-3990X>
-References: <20231221132400.1601991-1-dhowells@redhat.com>
- <20231221132400.1601991-16-dhowells@redhat.com>
- <20231226165442.GA1202197@dev-arch.thelio-3990X>
- <20231228-wohlbefinden-museen-c5efad4e0d84@brauner>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPel9GsK"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ccabf5a4beso50675181fa.2;
+        Thu, 28 Dec 2023 14:09:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703801380; x=1704406180; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MuNkt2PB+Z062eBAg21yz2J6ycJCgagCNtoRGXOXMpA=;
+        b=CPel9GsK3m3ZFosGQ6tUsiSqA4GgAvh8G+lluYZqzKXXCpWxv2bEvocKQfnXVQPmh0
+         8QFwyDF09pvvdLIVLeW1BmfZcPVz0eJg+CLeY6pa00QLTQ2FaAYtJkEPGKiANhMehLVV
+         dvL8m49Tpbna8BFNRvLspwVzF2SUbXLHY3pa2GszrxxqW8Y6DjN4OpArzQ2aGht3sYpa
+         9dpYzT0kv/3mEsrNvhunLbl/l8F5/EC1kPyTiUGFdIdkZNSxQHJ3Y9L6fask7UiGgPTG
+         0KFcL8lUCPr4oD2Dmzvp/2XSVmbGYLcmj9uox7cJWraNAUGIlNzRPqyR+VjS1CeeN6a+
+         u6+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703801380; x=1704406180;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MuNkt2PB+Z062eBAg21yz2J6ycJCgagCNtoRGXOXMpA=;
+        b=ExVTWlKIZRkQo7uwgc2N5XioRyuBSiX09crjVCIsvMxolZoHmRljGLC0M4ictCGV/1
+         RDhK9CG4xtzcPCcvx4A37yg22e2Y714JSf3upYqJOo5tX7GoN48e1AhWbnP25Qt41JmJ
+         3q5XpicidLxfM2N4ocloOqqiyI/sO9lFkSX/YWDgsvzmkUvlcHFjXd5BHiMcEZ/oeRea
+         2PqzNY+gMRWPLXaut0XLHhKdEQ4bX4D7URPVhzPAFi+Es0XlF+8Qm8Ppj9dA0PRJqrR1
+         8xpMXjXBulvMH3SyOjMgRr4sPvMbKw7oDGj2ci+cT3mMP6RHKhgmoI8joYUWw4e0IFEK
+         ujEg==
+X-Gm-Message-State: AOJu0YxrMwJSGZcGYozvr0o7XD8pfis/Crsaq+vLinoL4Rdh1Pp9ipsp
+	jEk3quKDlocBswb2OOY78K47x75E/wPMpo9DcJM=
+X-Google-Smtp-Source: AGHT+IGEyl0Mtl9HJ4bO8JI/BbyhwfKXLqzO5WlKp4E/jZf2T6ZAlaDT1C0o4AtB08bJVkEURCgyjFQ8P1ruKciqDjc=
+X-Received: by 2002:a2e:8883:0:b0:2cc:a532:a6e3 with SMTP id
+ k3-20020a2e8883000000b002cca532a6e3mr2278203lji.15.1703801380097; Thu, 28 Dec
+ 2023 14:09:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231228-wohlbefinden-museen-c5efad4e0d84@brauner>
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 28 Dec 2023 16:09:28 -0600
+Message-ID: <CAH2r5msxiNuCoXCvEF0X=7gdxD4-_X=E0b8mE_k7e=8HHz-VpQ@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fix
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Dec 28, 2023 at 11:47:45AM +0100, Christian Brauner wrote:
-> > This will break the build with versions of clang that have support for
-> > counted_by (as it has been reverted in main but reapplication to main is
-> > being actively worked on) because while annotating pointers with this
-> > attribute is a goal of the counted_by attribute, it is not ready yet.
-> > Please consider removing this and adding a TODO to annotate it when
-> > support is available.
-> 
-> It's really unpleasant that we keep getting new attributes that we
-> seemingly are encouraged to use and get sent patches for it. And then we
-> learn a little later that that stuff isn't ready yet. It's annoying. I
+Please pull the following changes since commit
+ceb6a6f023fd3e8b07761ed900352ef574010bcb:
 
-I will assume the "get sent patches for it" is referring to the patches
-that Kees has been sending out to add this attribute to flexible array
-members. In his defense, that part of the attribute is very nearly ready
-(it is only the pointer annotations that are not ready, as in not worked
-on at all as far as I am aware). In fact, it was merged in clang's main
-branch for some time and the only reason that it was backed out was
-because adoption in the kernel had pointed out bugs in the original
-implementation that were harder to fix than initially thought; in other
-words, only because we started adding this attribute to the kernel were
-we able to realize that the initial implementation in clang needed to be
-improved, otherwise this feature may have shipped completely broken in
-clang 18.1.0 because it had not been stress tested yet. Now we can get
-it right.
+  Linux 6.7-rc6 (2023-12-17 15:19:28 -0800)
 
-However, I do not necessarily disagree that it is annoying for
-maintainers who are not following this saga but are just receiving
-patches to add these annotatations because adds additional things to
-check for. Perhaps there should be some guidance added to the
-__counted_by definition or Documentation around how it is expected to be
-used so that there is clear advice for both developers and maintainers?
+are available in the Git repository at:
 
-> know it isn't your fault but it would be wise to be a little more
-> careful. IOW, unless both clang and gcc do support that thing
-> appropriately don't send patches to various subsystems for this.
+  git://git.samba.org/ksmbd.git tags/6.7rc7-smb3-srv-fix
 
-I will assume this was not necessarily directed at me because I have not
-sent any patches for __counted_by.
+for you to fetch changes up to d10c77873ba1e9e6b91905018e29e196fd5f863d:
 
-> In any case, this is now fixed. I pulled an updated version from David.
+  ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()
+(2023-12-27 22:55:36 -0600)
 
-Thanks a lot.
+----------------------------------------------------------------
+ksmbd server fix, also for stable
+ - address possible slab out of bounds in parsing of open requests
+----------------------------------------------------------------
+Namjae Jeon (1):
+      ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()
 
-Cheers,
-Nathan
+ fs/smb/server/smb2misc.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
