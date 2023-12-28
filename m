@@ -1,120 +1,108 @@
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04olkn2072.outbound.protection.outlook.com [40.92.75.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com [209.85.161.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13FC6FB6;
-	Thu, 28 Dec 2023 11:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AF06FD3;
+	Thu, 28 Dec 2023 11:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="CBzhdiWl"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vt/zy2qLo0dQ/UUn7yvyfQvyaiahCL0lil4NORPWpaGsgZJR+a/+u1aOVzyNsYI1MxKtLuOzhNN0KS13E7pLQWcX7sUe3Yh8ZaMYJ0ISkeQBlfV9mOT3cGAU8wJDbF0m/VTUNRJSVicCgw9uN7mX5qtpykuBuz4TmWmorwQy+GcKYtVSkR43RWZjGzdf8ujqWQWtKvB2sElGUN9OXt2HVg7Rc8Z9PLsU4+EGuzxaB6RTxqlWGTfVgAWTYJgcc6DXQoWLyFf6JB9epjRzsP4zTTY/SJLufGb1z3eGhPHmkR/aCqWLx0bfZTncTRfzq+FOYY5+B5Sap0+5cfJxSH36eQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tVZESnMbtRH/AuZoizFX9ZcLAZzjlOW+OgvGd5AfFoY=;
- b=XgcKI5d+yD8+sHJMd4zpHRlUy/2ftNUKCashL3MneZoFeF3QTVi5ijaWWXpAl3jUKEDKDiKH4lAWDIn6YDP0BlXEKrD2l9KAlrRQ3F9s4WlBFH839li9Nk4ocKXnVIwNAPk2xi2ewMKmZt7ScZKWco1e4W7/c53yCWdpGK1uGwviGCgf6yWRanRJD3NGNEzFgg9Uq882I0HYYDK8Zg+TTZC5HczIvYmVhQlBNPIOSMVghXuYFBYgJGmE2XoivP6aKLVxBL1rt8RwhmmskpgImZBMN1JI7MRB+oQSHdDPHw9D5hBLNptDagqnHwzSNzvS1tdgVSgZX56Cgf/jIf9Gkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tVZESnMbtRH/AuZoizFX9ZcLAZzjlOW+OgvGd5AfFoY=;
- b=CBzhdiWlJ1Pw/ZC9RsgcS+W7oCePDP08q7nkdlsbczbD3D73dz2m5rK0hioyC8LEw3kef+bsa0uEgiUzIMdc+K2MeuDt74htK0SV3K9LPIrYsKJ1KCU9ucGO4JqtZW1JJxe0M6lj36SZuKtHVgpdzqgKASfXPysKTkALS92C4kVH5Hgm3OJ8Fv3t2uelINXOGUiawZhwuOWVaLQhxtKzfcmiiNEheFbUngZ112jtdnXvxUxprOx3kwTeE8A5vTkFa8TAp+xMBani6gI/88FB8/PuWhSr1M/RZtaNM5OxPbLlP4XbQ8qNv89q1ucChNkY3x5YBChhDIm/0XE99TtxFg==
-Received: from AS8PR02MB10217.eurprd02.prod.outlook.com
- (2603:10a6:20b:63e::17) by AM0PR02MB5764.eurprd02.prod.outlook.com
- (2603:10a6:208:18d::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7135.19; Thu, 28 Dec
- 2023 11:35:29 +0000
-Received: from AS8PR02MB10217.eurprd02.prod.outlook.com
- ([fe80::2b9c:230f:3297:57e8]) by AS8PR02MB10217.eurprd02.prod.outlook.com
- ([fe80::2b9c:230f:3297:57e8%7]) with mapi id 15.20.7135.019; Thu, 28 Dec 2023
- 11:35:29 +0000
-From: David Binderman <dcb314@hotmail.com>
-To: "sfrench@samba.org" <sfrench@samba.org>, "pc@manguebit.com"
-	<pc@manguebit.com>, "lsahlber@redhat.com" <lsahlber@redhat.com>,
-	"sprasad@microsoft.com" <sprasad@microsoft.com>, "tom@talpey.com"
-	<tom@talpey.com>, "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject:
- =?Windows-1252?Q?fs/smb/client/sess.c:462:20:_warning:_duplicated_=91if?=
- =?Windows-1252?Q?=92_condition?=
-Thread-Topic:
- =?Windows-1252?Q?fs/smb/client/sess.c:462:20:_warning:_duplicated_=91if?=
- =?Windows-1252?Q?=92_condition?=
-Thread-Index: AQHaOYFrCCXlZ38mvkmOuPmXNZXsLQ==
-Date: Thu, 28 Dec 2023 11:35:29 +0000
-Message-ID:
- <AS8PR02MB1021708E77D868F8AE5EFD8859C9EA@AS8PR02MB10217.eurprd02.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-GB
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tmn: [nGjUdUxKBWBOvXbCLZZ9TDpdbyj/Ep4U]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS8PR02MB10217:EE_|AM0PR02MB5764:EE_
-x-ms-office365-filtering-correlation-id: d2fb97ee-2918-4982-940a-08dc079917e5
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- OZHLepnlXDqq2E1XTJXmHrau99mQYzbpUjwIJpkgMhlJHATdd7XupCGdxl71JVQJmfm8rpM5UgzISB6rZDkFaSXjKRMPqdFOLqMCrKxnNZb/Fjk14AvPKJO7HoiPobsZy3n8LYRFAfXH/VhaWULt5OxWgRC/GcKFwNVEVt9s8gyMGfIkZ1KhgF0g8iS8N1JQ3slIxqMaVQPaeLjJ4HzVu2+KI7OZlqWTESBhf8tGEAmbziv2xT35cWKRkv/sttwbAm7GYwrcGthwtAa/s6pVx5aI8pKMF9JEGM0ndNEhQXnSQDPRbIjxKaa+IgTczdwYCEFWDfGRmfVz6bH+ieKRzBxxNFo0SMOsy0hDHkD3T0XXBcmDnkn/Qk4JqWzH55T8QU8R+9LJnr4TWQV3hBN1BoRC66JDgwY3THLKRhB3s9gBeg0v2TZxDgtMbLCXSZ3X8XOCJB5ZWoRskMCNLoZwv1NlpT6ZQdgNcc/usvf/9y7ukeKpSOKxB9TcgYaR6PP4aFHTb4xtKe1VNJGTRZFsVlS7xf57EjHvD4lm3uaHmFkuJZyiIhxA+XZg3Gn9fU0t
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?Windows-1252?Q?EfjtrhDEwkbX9EZ74UvHoSrbmmRWYyUoyQG1671wm0UEE9ojA2SU2Cex?=
- =?Windows-1252?Q?KWSqo2WASrmjrrL5XD9yhh5KKjGTuqt31A7IqibtxSrrW5yjffUtXibQ?=
- =?Windows-1252?Q?zXGUb4JvffkeztGeCKJiVhdJU+djTlXlTragPsn0zGaU+4/u6TZpqhrB?=
- =?Windows-1252?Q?1dqYx2/5zG5aukn5EApLVjZHVHniG4SScJKfbezBwzEHHq5FsYemJs3G?=
- =?Windows-1252?Q?xSddzXhul7rCSbg4GPztg44HhjtRAZmywNBMEoAQL7jtQHlIevE52vB0?=
- =?Windows-1252?Q?YLR1edt+5dpDQb+0rFslus8zDP38IaPTOnWi8cZ2rDClOcXZ4tnGyUP3?=
- =?Windows-1252?Q?ICX2cewHOCzmVQdldBmWlUZGAR7JHpksUyh2XRUGzytghY4+cSueJlt+?=
- =?Windows-1252?Q?RpUvjX9valyItrypHvAPiBGqh9AwBzkt9CAfbtmMVywy1cm2BdMJK75G?=
- =?Windows-1252?Q?RkAYoKayXG2FksvEfeZDx80jWT/NzJ+YzTLpDn9D5SfDtnQGxnLL6BoY?=
- =?Windows-1252?Q?X2oeXQdBJwORe5Kv7ndzb639tQhTsn9yetSntrVPdNe2jwou7tHfcS4Y?=
- =?Windows-1252?Q?54cnCc6uMbTxkm/46uarFPSna4cNN5H5KS6yCaknA+uWIQ4toF6dIqWr?=
- =?Windows-1252?Q?+GiUwH/0rk8615AyPrp/IBrQZYz5Zv1yKH5Rion2wLvyRJ3EmDz8VXzW?=
- =?Windows-1252?Q?9QPlZxx7x9oGhq0BwHPER5ZIJ/QTYmBCcAM9vf2o1O6lNzbEK85t2dyS?=
- =?Windows-1252?Q?Mr+v08wRUnme0NjnLoOxYesK/+C4XTtK400Xhz6xeJ6hejH/oblv3iPF?=
- =?Windows-1252?Q?wJWBVMiUbx2E+kzz849BCBx6XBvHrfJulbVkzKSrdCPHrJVZ5JIGkTq8?=
- =?Windows-1252?Q?Z6QmX5M4wfl3V8yoocjcGWxuRkbZCzxsQAGLIW90w0DUobwQmfGX47LH?=
- =?Windows-1252?Q?JSXPoWTcuB3uTU9ki3XSGwIifYnPd6MT3OU8zN/TNvw/1OlkdVqXTf5B?=
- =?Windows-1252?Q?nYvZ4qaaspAw87IFBFvuo8hhg4NcG+lLtGKYuyzo4XJoo/sCcAQJRRzh?=
- =?Windows-1252?Q?yh3SDQp72mafatRxZ+up1NddyriIk/10tnjD4tu1mWPQVdTIQ8O97C7u?=
- =?Windows-1252?Q?v08tg759bdWJYdDnfxsa39dsecLMfk8JypiybFWaxZJQIfSV0VcKGWGt?=
- =?Windows-1252?Q?B3EVddM6OZm/7lKJRuiaIepr3c77Y2BrWBPbVuj/lC7iEqECuZ4dZc8E?=
- =?Windows-1252?Q?L9oz+Bb1mnVvgN8WRuIvDy6zp9Hz4wyFdbt3I2SR?=
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZveAfP2"
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-594965fbb3cso1873377eaf.1;
+        Thu, 28 Dec 2023 03:52:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703764342; x=1704369142; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tsN75v0buLJQ38tkV4cmhuBqPvoeWy9Oxr4haYwM744=;
+        b=ZZveAfP2CJymG9fF3UsWVr5uXN6CmrDLPeOdm4oT9/uHA+L03xrfT64Md02UOKRqu+
+         l5MeYw54bOF1zDXrQtLEmYSuYA3pR/SPpJXl5ZzXq4Aq9AAd0yncSTyrl7834oXuoHjI
+         MIgvKwu4uZAd2647IytTK/oT0fHsd/jAaK9j82q48v12N0Lpfrhc9xWT2QRNYkZVc8dd
+         uNPvxVE84e8Xckx2Y32J6Esof516Ga+Cv9tqLJgCqlHxlKIkfj0OrM3WV6+ba2nvM91d
+         RGaXhUpcVoCNOcw9FF9KQ+aExB+62Xtc42ZxvTZ4Dg40ycNZznTNqrtdzkV8VTm5pysx
+         4tXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703764342; x=1704369142;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tsN75v0buLJQ38tkV4cmhuBqPvoeWy9Oxr4haYwM744=;
+        b=VX/dyKg+6gohZ4f6kLLqNcNap61RubsbFi9sKHzsesCsx34HMaqYBOpTnSTn66VTsj
+         ZHEr1gE2QrTL+hKfC9wqKm6yOrm0YdQBzdkSZZ8UR1SG2o47lvm4tJyY2kGLDF6GF5yr
+         0n9HmIIjMO5YYZUiAK+S5HK3BcPwtU9LYCdhbdmSgrPL7qYW9Xm7KzBqdBYi3nhFH/9I
+         7LrbZO02E24wcan7KCrBnbms0GgjYeQkO+ioSwe5R1edqHoCBif9M3ksrHnec3l90jTq
+         NCkOO2qvyUacbnTKoJXB69C2rxMVXFYyew41rWNE607ZDz9h09r4ZgkuLr7KxeSq4IIi
+         RMzQ==
+X-Gm-Message-State: AOJu0YzJhs26Vs9Pla7MKWBQ3IiYFXsBbx3BOe3CXShvQKKB3BKy7Fpg
+	SkzxD67OV0EQFfMwZ8A7VCo=
+X-Google-Smtp-Source: AGHT+IFpDIR0rcTSc8BOt2vcCjty10gHsFxPzeP2aD/C4y/+RCqLvvhgnCRMU/hh7nKfHCPN9jSutw==
+X-Received: by 2002:a05:6358:948b:b0:16b:c401:e714 with SMTP id i11-20020a056358948b00b0016bc401e714mr13045085rwb.5.1703764342378;
+        Thu, 28 Dec 2023 03:52:22 -0800 (PST)
+Received: from archie.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id c21-20020a17090abf1500b0028c95804922sm2613520pjs.51.2023.12.28.03.52.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Dec 2023 03:52:21 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id D732A10242C47; Thu, 28 Dec 2023 18:52:16 +0700 (WIB)
+Date: Thu, 28 Dec 2023 18:52:16 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: David Binderman <dcb314@hotmail.com>,
+	"sfrench@samba.org" <sfrench@samba.org>,
+	"pc@manguebit.com" <pc@manguebit.com>,
+	"lsahlber@redhat.com" <lsahlber@redhat.com>,
+	"sprasad@microsoft.com" <sprasad@microsoft.com>,
+	"tom@talpey.com" <tom@talpey.com>,
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: =?utf-8?B?ZnMvc21iL2NsaWVudC9zZXNzLmM6?=
+ =?utf-8?B?NDYyOjIwOiB3YXJuaW5nOiBkdXBsaWNhdGVkIOKAmGlm4oCZ?= condition
+Message-ID: <ZY1hcE5E3Mizv2il@archie.me>
+References: <AS8PR02MB1021708E77D868F8AE5EFD8859C9EA@AS8PR02MB10217.eurprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-bcc80.templateTenant
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB10217.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2fb97ee-2918-4982-940a-08dc079917e5
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Dec 2023 11:35:29.2005
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR02MB5764
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="j9Y55VhaNyESaLgn"
+Content-Disposition: inline
+In-Reply-To: <AS8PR02MB1021708E77D868F8AE5EFD8859C9EA@AS8PR02MB10217.eurprd02.prod.outlook.com>
 
-Hello there,=0A=
-=0A=
-Recent development versions of gcc compiler produce the above warning=0A=
-in linux-6.7-rc7.=0A=
-=0A=
-Source code is=0A=
-=0A=
-   if (old_iface) {=0A=
-     ....=0A=
-    } else if (old_iface) {=0A=
-=0A=
-Regards=0A=
-=0A=
-David Binderman=0A=
+
+--j9Y55VhaNyESaLgn
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Dec 28, 2023 at 11:35:29AM +0000, David Binderman wrote:
+> Hello there,
+>=20
+> Recent development versions of gcc compiler produce the above warning
+> in linux-6.7-rc7.
+>=20
+> Source code is
+>=20
+>    if (old_iface) {
+>      ....
+>     } else if (old_iface) {
+
+What warnings? And what gcc version? gcc 14?
+
+Confused...
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--j9Y55VhaNyESaLgn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZY1hbAAKCRD2uYlJVVFO
+o6w7AQCKtIFbhZJhnYuEYWDY5MrIyDWaON51NhouAHcBok44VwEAuNQOTcKi2+yh
+/DS4li4njTBszSZPTRNeyOB5MigPEQk=
+=IuY7
+-----END PGP SIGNATURE-----
+
+--j9Y55VhaNyESaLgn--
