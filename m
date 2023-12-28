@@ -1,116 +1,113 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E436E748F;
-	Thu, 28 Dec 2023 12:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEC1848D;
+	Thu, 28 Dec 2023 13:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XwSsT6Rj"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-35fff22678eso9288905ab.3;
-        Thu, 28 Dec 2023 04:51:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHxIKVTa"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d3e6c86868so47460265ad.1;
+        Thu, 28 Dec 2023 05:36:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703767915; x=1704372715; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8g5ynfSY07qPeX049rGLQx5z1LWGJLy6ofOSXI+4anE=;
-        b=XwSsT6RjAXs4LI6xpKNdAzF6rV3ZSQkV8yWOfL83sjkNgtPJuVTfWGlxR5DtxXmWjg
-         aULUL7Hr6k5dmGVTnVBF+bwche5y5do4l/zFAPttsleelsBXr3MdTlEop0Kv23QJUZGY
-         43pO2cf210yqFW889WfouDDva+ScW7JnvnBAdogHo9w6MTBj7Ncsy9adkJy1bYCS9QZy
-         GviK1f8qEiwTqvS/Pphtb9Ci99AHD7cNEbpR1SxDcGP3JntMk8WPIzkzd5Tpzm1gj5OS
-         jZTI2pY9GyDvlvinZkiY2FGvywLD16HwKLOBzptRHdBVc3qW9keebM4jIFnrHgVbIdwJ
-         cAsQ==
+        d=gmail.com; s=20230601; t=1703770600; x=1704375400; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SAwkVfYi710Nnw5LBAMKV15DX6mTtHBBaUhJfsCYgbU=;
+        b=EHxIKVTaj9VTpd+Dl+A2qA1KsPe+fPxYbGEavTJermzVrmDKBls+D3LWIMm5lbEF3Z
+         TIRt+q9B8MtdCfFiw9dSME29uIrnPAKS2laggb3fu8qRYMC5v+DEZ83cu9q+kmoZWmPn
+         1WiAnvigKfH0sJWptDjGBKKVXoCnc71cejftUHi8Li0CgHSNeDLD+pxcWKavo9q6oK00
+         6iCML6nF3OtQ/IrnascKKFnn+dMz23WL2EVb48aljSqEaSDj4ZFxysB/ukET7JRs90fp
+         xZGDyJ2Og9tm/wPttH10qWNt+gTiGisz+b32OX7MplQRL23xl5/edBiupfG2OJZ7FWEC
+         bWvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703767915; x=1704372715;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8g5ynfSY07qPeX049rGLQx5z1LWGJLy6ofOSXI+4anE=;
-        b=Lr4s7+ReivhrqSkZUN4YLXLVSaKbRZ/ncZkhor4jtfPUZZN7l+yyW6u61CQnFp2TX7
-         rAfJ5sxS5wB7uT6iSi6QZMA0gYEJ6Di64Q6ABMGnCUeaKMQ2ijn5BF7IQ9z4lxYwR0XW
-         ArlodNJhobS7ToQ8NHGAglG8kKlaLFgWUAgp36RRrmKLyWyeXIcM9q3uAE6NUrAeJLSV
-         karLwXXhEB2bxJqzp1zVx5zTby0fV90FNjxF+6c9dl1qPaX/Fc2E+gTHRPKlWPPC17gW
-         CVNpRVXHRZ11HAsrUDI4PL74gg/DbvZjrdR79zDIad3UdHQ/ewH+Zscv4ZzOc+/6Xbgc
-         qJxQ==
-X-Gm-Message-State: AOJu0Yz6qPg/ZdHrIDWvL4vBgYlNufzO1CWkscmDr8Lm5iVQn6z6lAyT
-	p9beokwd8UDwsAYlDACHl1c=
-X-Google-Smtp-Source: AGHT+IF2eGUtVz5MaqqOWVP4xH+Rvq1xgqfuJGwwoqse5DMWmSb+FqfgobHEtftloxz+hNAv3e78PA==
-X-Received: by 2002:a05:6e02:1845:b0:35f:f01e:bb26 with SMTP id b5-20020a056e02184500b0035ff01ebb26mr9617052ilv.51.1703767914854;
-        Thu, 28 Dec 2023 04:51:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1703770600; x=1704375400;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SAwkVfYi710Nnw5LBAMKV15DX6mTtHBBaUhJfsCYgbU=;
+        b=sIMpqpPjGmiSdCyI+1qXqxyTBhlEVOtaeFsEH+u+8v9odl3mossZoXENW0h7HZ6Qny
+         9RkuIFEiAiPvW+sh5eZEveHyoKhRnP3yPlAq7JLxous9JKGjm+AiV83aegMYGHToJcqW
+         Q6GZX0dpQHw0sO+nODXSyZpRp26CDnBHapqo/oLqutmd/Hw7Notg6oiXdx4DgE3+CycG
+         74hLkrcEKcEzgHKomPQHRWQm+8bpcSwURIun6sfQ5yelXNCGl+VDEVS2JILYVrvah2Vx
+         MlSIdrx4LbilGaf2N7R6d+tibsz8NkDLmq1qtEm1FKpOuR/34qiTtB72GYD+yDK/lcz4
+         iRyg==
+X-Gm-Message-State: AOJu0YwMimNxheHdo+RmUOf+95gwAlvJKhVNJOcMw7uEjIjivqkgS8zG
+	Eh3qXF72+3zwqXs/Et/OV+o=
+X-Google-Smtp-Source: AGHT+IEalSMo2J/vSjFgltbw/cKbNuTbIL9VxJn0WDGfFnu5vZkWmChKCs2Fpn19Wnx1WSwFiELgFw==
+X-Received: by 2002:a17:902:c408:b0:1d4:3cd4:23d1 with SMTP id k8-20020a170902c40800b001d43cd423d1mr12629729plk.96.1703770599998;
+        Thu, 28 Dec 2023 05:36:39 -0800 (PST)
 Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id ji5-20020a170903324500b001d3ccdeeaecsm13834658plb.264.2023.12.28.04.51.53
+        by smtp.gmail.com with ESMTPSA id e4-20020a170902744400b001d496033787sm604848plt.11.2023.12.28.05.36.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Dec 2023 04:51:54 -0800 (PST)
+        Thu, 28 Dec 2023 05:36:39 -0800 (PST)
 Received: by archie.me (Postfix, from userid 1000)
-	id 417DB10788B6A; Thu, 28 Dec 2023 19:51:49 +0700 (WIB)
-Date: Thu, 28 Dec 2023 19:51:48 +0700
+	id 7D63F1033E0BF; Thu, 28 Dec 2023 20:36:34 +0700 (WIB)
 From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: David Binderman <dcb314@hotmail.com>,
-	"sfrench@samba.org" <sfrench@samba.org>,
-	"pc@manguebit.com" <pc@manguebit.com>,
-	"lsahlber@redhat.com" <lsahlber@redhat.com>,
-	"sprasad@microsoft.com" <sprasad@microsoft.com>,
-	"tom@talpey.com" <tom@talpey.com>,
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: =?utf-8?B?ZnMvc21iL2NsaWVudC9zZXNzLmM6?=
- =?utf-8?B?NDYyOjIwOiB3YXJuaW5nOiBkdXBsaWNhdGVkIOKAmGlm4oCZ?= condition
-Message-ID: <ZY1vZLLKX8RIinFa@archie.me>
-References: <AS8PR02MB1021708E77D868F8AE5EFD8859C9EA@AS8PR02MB10217.eurprd02.prod.outlook.com>
- <ZY1hcE5E3Mizv2il@archie.me>
- <AS8PR02MB102175EE04EAB5CAB6E459BEF9C9EA@AS8PR02MB10217.eurprd02.prod.outlook.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Linux CIFS <linux-cifs@vger.kernel.org>,
+	samba-technical@lists.samba.org
+Cc: Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH] MAINTAINERS: Update Ronnie Sahlberg's address
+Date: Thu, 28 Dec 2023 20:36:12 +0700
+Message-ID: <20231228133611.8816-2-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gFTAUEjMnkShEXtR"
-Content-Disposition: inline
-In-Reply-To: <AS8PR02MB102175EE04EAB5CAB6E459BEF9C9EA@AS8PR02MB10217.eurprd02.prod.outlook.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1767; i=bagasdotme@gmail.com; h=from:subject; bh=nqlU6hrskpxEZ2QpVb1+Hcg1h5UX5JIrbT9uZ4c8XvA=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKm9lcePZ/3ZZRBstPgme7rfyTLDp2+mHzWIn2J7J9D7/ IdtEi6aHaUsDGJcDLJiiiyTEvmaTu8yErnQvtYRZg4rE8gQBi5OAZhIrjQjw8/sm3vzfhz3P33R adHvi5zMiy0VjVQ6Ms8qhQYFKJVO+cTIcEd4rsXbh9yWvlPd9nvd2sbLG7hAz//CuxuJ7Av3G4Y y8QAA
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
+Content-Transfer-Encoding: 8bit
 
+Emails to <lsahlber@redhat.com> bounce (address not found), since he
+had left Red Hat some time ago.
 
---gFTAUEjMnkShEXtR
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Update his address to personal gmail one and add corresponding .mailmap
+entry.
 
-On Thu, Dec 28, 2023 at 12:03:21PM +0000, David Binderman wrote:
-> Hello there,
->=20
-> >What warnings?=20
->=20
-> The warning mentioned in the title.
->=20
-> >And what gcc version?=20
->=20
-> Probably most versions.
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+---
+ .mailmap    | 1 +
+ MAINTAINERS | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-So gcc 13 doesn't have the warning but gcc 14 (still in development) do,
-right?
+diff --git a/.mailmap b/.mailmap
+index 19eb49e55836b0..76501bc09c8200 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -508,6 +508,7 @@ Rocky Liao <quic_rjliao@quicinc.com> <rjliao@codeaurora.org>
+ Roman Gushchin <roman.gushchin@linux.dev> <guro@fb.com>
+ Roman Gushchin <roman.gushchin@linux.dev> <guroan@gmail.com>
+ Roman Gushchin <roman.gushchin@linux.dev> <klamm@yandex-team.ru>
++Ronnie Sahlberg <ronniesahlberg@gmail.com> <lsahlber@redhat.com>
+ Muchun Song <muchun.song@linux.dev> <songmuchun@bytedance.com>
+ Muchun Song <muchun.song@linux.dev> <smuchun@gmail.com>
+ Ross Zwisler <zwisler@kernel.org> <ross.zwisler@linux.intel.com>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4acc4a3d4fcd96..3ffc06c19aa2ec 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5191,7 +5191,7 @@ X:	drivers/clk/clkdev.c
+ COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)
+ M:	Steve French <sfrench@samba.org>
+ R:	Paulo Alcantara <pc@manguebit.com> (DFS, global name space)
+-R:	Ronnie Sahlberg <lsahlber@redhat.com> (directory leases, sparse files)
++R:	Ronnie Sahlberg <ronniesahlberg@gmail.com> (directory leases, sparse files)
+ R:	Shyam Prasad N <sprasad@microsoft.com> (multichannel)
+ R:	Tom Talpey <tom@talpey.com> (RDMA, smbdirect)
+ L:	linux-cifs@vger.kernel.org
 
->=20
-> You will probably have to switch on gcc compiler flag -Wduplicated-cond
-> in any random released version of gcc to see what I see.
-
-Full gcc output please?
-
-Still confused...
-
---=20
+base-commit: 453e404bc3e7cc24a63433a6cdeed2e0830496c0
+-- 
 An old man doll... just what I always wanted! - Clara
 
---gFTAUEjMnkShEXtR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZY1vYAAKCRD2uYlJVVFO
-o+kKAQCHWf5YzeTvwh+erEiv1QyPQeVrOCjkWMHoumn0EPZFfQD/cKAwPgqjOkus
-Elnd+mrWpFNltQbYNoQWUggB9vEesAE=
-=/xiG
------END PGP SIGNATURE-----
-
---gFTAUEjMnkShEXtR--
