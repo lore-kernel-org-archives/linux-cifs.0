@@ -1,83 +1,111 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A2D125AD
-	for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 15:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8AB12B69
+	for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 17:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="eES9z8qb"
-Message-ID: <7e61ce96ef41bdaf26ac765eda224381@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1703864593;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NKz/uc+BSnXfJrlFDCo1YHpsQp75sUcISpy4NlnEtuA=;
-	b=eES9z8qbXMeYiiB5Fz/+Ihl5XgKZs42QGVXU4Qr0ywEV57h1hDLQvOahAkEydG0cUYYywp
-	BjCldiSJ29k4YK2i2XJcc4pOcgFP8sOpfgWQfDt50nF3UczbbKUIwDfXxTV1smW6qRLLxW
-	M2WGOvHWicTxOjgVQYqB+UpkGdtexRf7SWfrleG/4hj3x/1XZUHt7HCwyamiy1GL3ShJxj
-	pM3atdQmwzo7FIdTme5wPBkdxCs/DLbHEOa5seXq7dn3StbIiym2G2L1tNW6cMu0r/aiIL
-	5twwRSHWlTjoASnbiT/WOsUZP0oHdr4Xb49xwIVr39iZ0d4Z3/bNnz54Xl7LTA==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1703864593; a=rsa-sha256;
-	cv=none;
-	b=PKT5kXBeGKXpAx4CUfnzMaeX0wigxogwo6MQJ7wibOW6y7YviA2h0APAf43eOH1P3c6Oq+
-	L7WjtkojU/VzNrO/VdCY1oWEQ7k4vD+nOPiefYKQ9lKIBGEteC5fqgfSKNrQmzVPZ9Bcsb
-	de6KNKsNsl9yciD1koiPoyl0v3ghBKfDo4yOcWRw/4vEIjXWjk27Q9I5TLr6eAnWW42GSV
-	letB7u8GgoTe8gjl5BNw2Bm1txKdPNSrJFa/TCorVEa7P7AAPgcR8q2GLwu0mIXGs2hcGB
-	dTo9heqkwEViVJo0ERMUgn+/KeTWpzEN6KKlMRblc27h81tqsFbqJhkIMMgyOg==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1703864593; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NKz/uc+BSnXfJrlFDCo1YHpsQp75sUcISpy4NlnEtuA=;
-	b=Gei/jY/BMffoCYBaThPd25cCS90C7fi/VK4mVvdiDSz9ls9rb/i7ghB9fR+QPuIujnF0BQ
-	/MOGUOP+x/ySESP2hftPUxVUWeXOHHYaO99lbobLv8naB4vl0yYZrGWpeGnL64HmyxBUz1
-	+vo17HbXifDzxrF2FQV878Tr+tDp+L36QTx+WO2i5hflRXymgiIDQayaOrL6Q7QtnDpW/7
-	hv2FNdfNJKjLFmbXPel7w85D90yX38M/ydKqZgBc/blf7qaziyizMQt+AurFwVVPXzF+Wl
-	lw7qZvYFpY5R2VRbBNDN43er+fl3ksZ0iEAn0ePTZYaghwoxaNc4Vo7lE9KX1g==
-From: Paulo Alcantara <pc@manguebit.com>
-To: meetakshisetiyaoss@gmail.com, sfrench@samba.org, lsahlber@redhat.com,
- sprasad@microsoft.com, tom@talpey.com, linux-cifs@vger.kernel.org,
- nspmangalore@gmail.com, bharathsm.hsk@gmail.com,
- samba-technical@lists.samba.org
-Cc: Meetakshi Setiya <msetiya@microsoft.com>
-Subject: Re: [PATCH 2/2] smb: client: retry compound request without reusing
- lease
-In-Reply-To: <20231229143521.44880-2-meetakshisetiyaoss@gmail.com>
-References: <20231229143521.44880-1-meetakshisetiyaoss@gmail.com>
- <20231229143521.44880-2-meetakshisetiyaoss@gmail.com>
-Date: Fri, 29 Dec 2023 12:43:08 -0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atmke36H"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50e80d14404so2984730e87.1
+        for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 09:02:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1703869368; x=1704474168; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=isTzEV5UE0pjGK+XqZlgHESWnrYMvY1ZoOVUhuCF5QY=;
+        b=atmke36H8dSaJF7fpXkgKOcuWn27nQH+migSbZkE14P0HaSZGL/PygbCm+BSh57v4z
+         L5m0+yosJb6NOlqyWcYbKZ7xNKyzG9eJnmL0cEzxaOX760fBqippWxDKsMU6QA0kbkpK
+         /ZvZUfRxAmzK2CzlB01NbpCCvniPGIbpgu74YWEhAkkYRESs3+mXUjhKNoB9noJ6/zU6
+         CxCQl6adwnczxdoZCyjLTOgPqx631I3Yw8olw3EBCToCfjsg3tsegrkwQwVySkCLCK6u
+         EAH5YmfDCDa0oPDK/nYIxGlu5Fnhhc229x2nuSg9uUZysuboaoXWE/nN75q4lU7XNOsG
+         pF0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1703869368; x=1704474168;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=isTzEV5UE0pjGK+XqZlgHESWnrYMvY1ZoOVUhuCF5QY=;
+        b=kCBFVxFsEvUFO7MfgMbaXQNhnTyrX77EPA1F5dtHeXRLa15lzePavd4pxabwIJLWis
+         Y4rpgIb2IKEtqQLycx4tVzyr5L0RHzIz3WxWeFlzCtpJSuSQkSc1FVOD64FOu6jkheHv
+         80ThvhyTCyZEdWdAEME3UhVjbOr7dsMdRff/QumKd4wPDfQLvgU8Lz4NI9txQW+W6ZCJ
+         y/T8Lhk3r9VIzR9XCnp4AKA0WSC+6JYj23ZfFaJTYCaZHTehGqVoH2ptsznRM4iTVjlD
+         WOCYVYxNE0LeBBMR//bsvuCRJo0QuYS0ISxp8BTiVDSRAfSlU5qUh4OjQsYZ2Jm4C7ZD
+         KgjA==
+X-Gm-Message-State: AOJu0YyPecSowlkya2pVwFcABmYCPVxJreXPAvkJUlhbZPh1SpW1yBD2
+	IsAPuuBmDRJYq4b2RIer7KFNGG1j4Qk2ZPPKsdIlQbJG
+X-Google-Smtp-Source: AGHT+IEP9VusOUBXhRIOTL2f+DSfBqxzOmcXuBqP77ImBbxr31CtmKYDHNp/JCl6gQ5SPpJSSz6xJOoE0ddjw/DYiAU=
+X-Received: by 2002:a05:6512:1388:b0:50e:74f3:c320 with SMTP id
+ fc8-20020a056512138800b0050e74f3c320mr6230703lfb.21.1703869367394; Fri, 29
+ Dec 2023 09:02:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20231229111618.38887-1-sprasad@microsoft.com> <20231229111618.38887-3-sprasad@microsoft.com>
+In-Reply-To: <20231229111618.38887-3-sprasad@microsoft.com>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Fri, 29 Dec 2023 22:32:36 +0530
+Message-ID: <CANT5p=reagZz5yL-3wutgyk0ePR=eRLkLqt3DYhW=kTXuvOXfQ@mail.gmail.com>
+Subject: Re: [PATCH 3/4] cifs: cifs_pick_channel should skip unhealthy channels
+To: smfrench@gmail.com, linux-cifs@vger.kernel.org, pc@manguebit.com, 
+	meetakshisetiyaoss@gmail.com
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-meetakshisetiyaoss@gmail.com writes:
-
-> From: Meetakshi Setiya <msetiya@microsoft.com>
+On Fri, Dec 29, 2023 at 4:46=E2=80=AFPM <nspmangalore@gmail.com> wrote:
 >
-> There is a shortcoming in the current implementation of the file
-> lease mechanism exposed when the lease keys were attempted to be reused
-> for unlink, rename and set_path_size operations for a client. As per
-> MS-SMB2, lease keys are associated with the file name. Linux cifs client
-> maintains lease keys with the inode. If the file has any hardlinks,
-> it is possible that the lease for a file be wrongly reused for an
-> operation on the hardlink or vice versa. In these cases, the mentioned
-> compound operations fail with STATUS_INVALID_PARAMETER.
-> This patch adds a fallback to the old mechanism of not sending any
-> lease with these compound operations if the request with lease key fails
-> with STATUS_INVALID_PARAMETER. Resending the same request without lease
-> key should not hurt any functionality, but might impact performance
-> especially in cases where the error is not because of the usage of wrong
-> lease key and we might end up doing an extra roundtrip.
+> From: Shyam Prasad N <sprasad@microsoft.com>
+>
+> cifs_pick_channel does not take into account the current
+> state of the channel today. As a result, if some channels
+> are unhealthy, they could still get picked, resulting
+> in unnecessary errors.
+>
+> This change checks the channel transport status before
+> making the choice. If all channels are unhealthy, the
+> primary channel will be returned anyway.
+>
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> ---
+>  fs/smb/client/transport.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>
+> diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+> index 4f717ad7c21b..f8e6636e90a3 100644
+> --- a/fs/smb/client/transport.c
+> +++ b/fs/smb/client/transport.c
+> @@ -1026,6 +1026,19 @@ struct TCP_Server_Info *cifs_pick_channel(struct c=
+ifs_ses *ses)
+>                 if (!server || server->terminate)
+>                         continue;
+>
+> +               /*
+> +                * do not pick a channel that's not healthy.
+> +                * if all channels are unhealthy, we'll use
+> +                * the primary channel
+> +                */
+> +               spin_lock(&server->srv_lock);
+> +               if (server->tcpStatus !=3D CifsNew &&
+> +                   server->tcpStatus !=3D CifsGood) {
+> +                       spin_unlock(&server->srv_lock);
+> +                       continue;
+> +               }
+> +               spin_unlock(&server->srv_lock);
+> +
+>                 /*
+>                  * strictly speaking, we should pick up req_lock to read
+>                  * server->in_flight. But it shouldn't matter much here i=
+f we
+> --
+> 2.34.1
+>
+Please skip this patch. I'll submit a revised patch next week.
 
-What's the problem with checking ->i_nlink to decide whether reusing
-lease key?
+--=20
+Regards,
+Shyam
