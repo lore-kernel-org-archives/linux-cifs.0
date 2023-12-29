@@ -1,56 +1,57 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A813510A1C
-	for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 11:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296A210A3A
+	for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 11:25:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dSS+TDUA"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-50e7b51b0ceso3492032e87.1
-        for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 03:19:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nvvc/o5e"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50e72e3d435so4371663e87.2
+        for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 03:25:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703848796; x=1704453596; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1703849158; x=1704453958; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YRHD7+eveERIT8vkmKrl70k+OujOJSAeP5ggkjr4fBw=;
-        b=dSS+TDUAghKjyO702N/+eW3EINuWyu/hWbBQ3r9bLM6CiQu+kth2LpXPU8Gk7QoRqg
-         FFQch4YNtIRquMmHMl7oKdgr4ZzytS4CgO/1B6tDZderkK9i7h1ql1dxHLYJ5GJDjc/I
-         lQYTyFfMMSkAsfq9QrNLXcUx9UToLs+pgHUojFB893MPmnOhsS5qRFay8HBFNf5DQYZc
-         uyZuccRWJJptuFeX24MJMMED6JR42xOMH//hm2XWDMpdxldp7uURBF96gFFklUdG6y2F
-         wONyG8eecYN9zvU8lodkx8QHMnJLmVNXVbsL9AtEfXFZ8zdWHHO1ngB7LSMCsjUlkBa4
-         DDHg==
+        bh=LGauJLu8Kk5d9GlJNfGNiZFBcnW+nUPspvry1T6v1yY=;
+        b=Nvvc/o5e2nH6pEKNY6ifw1WDHaYXxY5a41FTSJQiY2EkJ+69v09soBM63XD315fuU9
+         JdQp4HUqkZj8H8OKufitVWPwUoQcdYLsGRTmqPa2St21lCrOJEkgJsX/58HlMV0R79Bf
+         wp4S5x5m+2TK40XcAEs5j/M8lPUjnZKExvk17CgQM62XVQSo9DpsZsAsJo72oVvML9QR
+         5y8op1QxcHK79uJ6SffeDAymW9yvsWzCyDoz0fe9NTMINWNGhRfxCPascnIn4dw7B+DL
+         O6/K6ur3wiKF8jsuHv9AtnL8sNhgJe0wVSiHRhbRxf0duB/r/Szlwm2FE5dGnjhOmDF/
+         GrOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703848796; x=1704453596;
+        d=1e100.net; s=20230601; t=1703849158; x=1704453958;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YRHD7+eveERIT8vkmKrl70k+OujOJSAeP5ggkjr4fBw=;
-        b=v3iEQlwX+veLpzRmHigdw04U7Yia5Cu01JqOY+Y3NmQucXUyLyaw+ssaI+qiqA2EMz
-         VHncW60K7OyIGtyTr+BBFygAn7UdWAKNX3XI8hT0xaKwC/VPau9vBpD2cO7tM7f+4gSG
-         V1EBqqswSGY3qWLWkDudf4PmtDISjx/Qkhm7TdoIayT7I/CDJNStwAqG3wtt1kMmVSE7
-         EJpQpzAklSctg9Fp5k0ZesnXIX5E3WVWYGAtwrXpm301iSNmJ3G9qDjCmEQ2YgFiVLSo
-         Wq5Wn/CbaQLxlTWyIwGizv5A44HZOW0x//Z+uqlIXG//f4Nx2CLVHp/uOPNkhsRUTwNF
-         gSgA==
-X-Gm-Message-State: AOJu0YzmK/mZ4p4DGB3fvA1MiIy0uOX0l+0tH30BGD3X2VcstL8pDASj
-	QaYBvfz2UDmL8huEB8tkZSW8KJV5oIF/xqC/+I4=
-X-Google-Smtp-Source: AGHT+IGSHxZlT4xWDYPAjT+lolFKkhxEpjj45TRqRb0XZLylzZA3NwkzD2qTnSFYcPX+VyOKBO0uT+wDm3+B2GHlU3g=
-X-Received: by 2002:ac2:4da4:0:b0:50e:7bbf:f365 with SMTP id
- h4-20020ac24da4000000b0050e7bbff365mr3629411lfe.31.1703848796008; Fri, 29 Dec
- 2023 03:19:56 -0800 (PST)
+        bh=LGauJLu8Kk5d9GlJNfGNiZFBcnW+nUPspvry1T6v1yY=;
+        b=CkUa0eFz/NMwZ9aIvHXf4MTU6c8SumDG00ENBItfCYxPr0D6lPgs09q7OrvD2kmcyL
+         2fnfeLLdiiX6MrEojY7nJIrita+bie9xN0p1s39WJmCqCdKSSBddGKXeT8bvE67VIam/
+         4IwKt3nSkVQzDPvfGnmQ+i07Jz7VdgQe+coaqUdMFx3KdlFCNPJB/lYhrhFxdAF8vFFf
+         QKQKUclccTNxAuKm++aasSzThqF4kjcqCl9sr0YtPr+o7Hz3nIRv1I/6EoI1Vkqrr4Sn
+         fw8mRswOf4c88Y593BwiRiPdPjHqNRb2Yym4PBsmlDzWXwjxwW1aKx3wxrkkcc3ka6+I
+         49qw==
+X-Gm-Message-State: AOJu0YxDRcAUjf6Tt7KihlazMtTfpPz7tZSk648MibTgh2gZjGBYV/it
+	pZmnMBr/el9aN9bTNon1xpuOxHYJyj+cKjuue5Q=
+X-Google-Smtp-Source: AGHT+IHXF1aKUQ8Zc80QzrwDM/zC8gcF9hjVVOs4PbXUnuL2uIjpysyBt2zjDhDHHQ6Vfw5npaBu++PZOWudSd+T9Bc=
+X-Received: by 2002:a05:6512:3d88:b0:50e:4bf6:bb6a with SMTP id
+ k8-20020a0565123d8800b0050e4bf6bb6amr3460119lfv.161.1703849157908; Fri, 29
+ Dec 2023 03:25:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231229111618.38887-1-sprasad@microsoft.com> <20231229111618.38887-2-sprasad@microsoft.com>
-In-Reply-To: <20231229111618.38887-2-sprasad@microsoft.com>
+References: <20231229111618.38887-1-sprasad@microsoft.com>
+In-Reply-To: <20231229111618.38887-1-sprasad@microsoft.com>
 From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Fri, 29 Dec 2023 16:49:44 +0530
-Message-ID: <CANT5p=rjbLTmPz73PnF4FNMTJ6+KAJ9yodLy5PjTuOZ+ueOxyg@mail.gmail.com>
-Subject: Re: [PATCH 2/4] cifs: do not depend on release_iface for maintaining iface_list
+Date: Fri, 29 Dec 2023 16:55:46 +0530
+Message-ID: <CANT5p=rX81OL+cU+EVSRcv+xF_cHQQ+Oz6JkMQoTDzH6YVBWqA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] cifs: cifs_chan_is_iface_active should be called with
+ chan_lock held
 To: smfrench@gmail.com, linux-cifs@vger.kernel.org, pc@manguebit.com, 
 	meetakshisetiyaoss@gmail.com
 Cc: Shyam Prasad N <sprasad@microsoft.com>
@@ -61,106 +62,75 @@ On Fri, Dec 29, 2023 at 4:46=E2=80=AFPM <nspmangalore@gmail.com> wrote:
 >
 > From: Shyam Prasad N <sprasad@microsoft.com>
 >
-> parse_server_interfaces should be in complete charge of maintaining
-> the iface_list linked list. Today, iface entries are removed
-> from the list only when the last refcount is dropped.
-> i.e. in release_iface. However, this can result in undercounting
-> of refcount if the server stops advertising interfaces (which
-> Azure SMB server does).
+> cifs_chan_is_iface_active checks the channels of a session to see
+> if the associated iface is active. This should always happen
+> with chan_lock held. However, these two callers of this function
+> were missing this locking.
 >
-> This change puts parse_server_interfaces in full charge of
-> maintaining the iface_list. So if an empty list is returned
-> by the server, the entries in the list will immediately be
-> removed. This way, a following call to the same function will
-> not find entries in the list.
+> This change makes sure the function calls are protected with
+> proper locking.
 >
-> Fixes: aa45dadd34e4 ("cifs: change iface_list from array to sorted linked=
- list")
 > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 > ---
->  fs/smb/client/cifsglob.h |  1 -
->  fs/smb/client/smb2ops.c  | 27 +++++++++++++++++----------
->  2 files changed, 17 insertions(+), 11 deletions(-)
+>  fs/smb/client/connect.c | 7 +++++--
+>  fs/smb/client/smb2ops.c | 7 ++++++-
+>  2 files changed, 11 insertions(+), 3 deletions(-)
 >
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index ba80c854c9ca..f840756e0169 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -1014,7 +1014,6 @@ release_iface(struct kref *ref)
->         struct cifs_server_iface *iface =3D container_of(ref,
->                                                        struct cifs_server=
-_iface,
->                                                        refcount);
-> -       list_del_init(&iface->iface_head);
->         kfree(iface);
->  }
+> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+> index 8b7cffba1ad5..3052a208c6ca 100644
+> --- a/fs/smb/client/connect.c
+> +++ b/fs/smb/client/connect.c
+> @@ -232,10 +232,13 @@ cifs_mark_tcp_ses_conns_for_reconnect(struct TCP_Se=
+rver_Info *server,
+>         spin_lock(&cifs_tcp_ses_lock);
+>         list_for_each_entry_safe(ses, nses, &pserver->smb_ses_list, smb_s=
+es_list) {
+>                 /* check if iface is still active */
+> -               if (!cifs_chan_is_iface_active(ses, server))
+> +               spin_lock(&ses->chan_lock);
+> +               if (!cifs_chan_is_iface_active(ses, server)) {
+> +                       spin_unlock(&ses->chan_lock);
+>                         cifs_chan_update_iface(ses, server);
+> +                       spin_lock(&ses->chan_lock);
+> +               }
 >
+> -               spin_lock(&ses->chan_lock);
+>                 if (!mark_smb_session && cifs_chan_needs_reconnect(ses, s=
+erver)) {
+>                         spin_unlock(&ses->chan_lock);
+>                         continue;
 > diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 104c58df0368..b813485c0e86 100644
+> index 441d144bd712..104c58df0368 100644
 > --- a/fs/smb/client/smb2ops.c
 > +++ b/fs/smb/client/smb2ops.c
-> @@ -595,16 +595,12 @@ parse_server_interfaces(struct network_interface_in=
-fo_ioctl_rsp *buf,
->         }
+> @@ -784,9 +784,14 @@ SMB3_request_interfaces(const unsigned int xid, stru=
+ct cifs_tcon *tcon, bool in_
+>                 goto out;
 >
->         /*
-> -        * Go through iface_list and do kref_put to remove
-> -        * any unused ifaces. ifaces in use will be removed
-> -        * when the last user calls a kref_put on it
-> +        * Go through iface_list and mark them as inactive
->          */
->         list_for_each_entry_safe(iface, niface, &ses->iface_list,
-> -                                iface_head) {
-> +                                iface_head)
->                 iface->is_active =3D 0;
-> -               kref_put(&iface->refcount, release_iface);
-> -               ses->iface_count--;
-> -       }
-> +
->         spin_unlock(&ses->iface_lock);
->
->         /*
-> @@ -678,10 +674,7 @@ parse_server_interfaces(struct network_interface_inf=
-o_ioctl_rsp *buf,
->                                          iface_head) {
->                         ret =3D iface_cmp(iface, &tmp_iface);
->                         if (!ret) {
-> -                               /* just get a ref so that it doesn't get =
-picked/freed */
->                                 iface->is_active =3D 1;
-> -                               kref_get(&iface->refcount);
-> -                               ses->iface_count++;
->                                 spin_unlock(&ses->iface_lock);
->                                 goto next_iface;
->                         } else if (ret < 0) {
-> @@ -748,6 +741,20 @@ parse_server_interfaces(struct network_interface_inf=
-o_ioctl_rsp *buf,
->         }
+>         /* check if iface is still active */
+> +       spin_lock(&ses->chan_lock);
+>         pserver =3D ses->chans[0].server;
+> -       if (pserver && !cifs_chan_is_iface_active(ses, pserver))
+> +       if (pserver && !cifs_chan_is_iface_active(ses, pserver)) {
+> +               spin_unlock(&ses->chan_lock);
+>                 cifs_chan_update_iface(ses, pserver);
+> +               spin_lock(&ses->chan_lock);
+> +       }
+> +       spin_unlock(&ses->chan_lock);
 >
 >  out:
-> +       /*
-> +        * Go through the list again and put the inactive entries
-> +        */
-> +       spin_lock(&ses->iface_lock);
-> +       list_for_each_entry_safe(iface, niface, &ses->iface_list,
-> +                                iface_head) {
-> +               if (!iface->is_active) {
-> +                       list_del(&iface->iface_head);
-> +                       kref_put(&iface->refcount, release_iface);
-> +                       ses->iface_count--;
-> +               }
-> +       }
-> +       spin_unlock(&ses->iface_lock);
-> +
->         return rc;
->  }
->
+>         kfree(out_buf);
 > --
 > 2.34.1
 >
-Hi Steve..
-This one should also be marked for stable. I missed tagging it before I sen=
-t.
+
+This one fixes two changes. Not sure if it's valid to have two Fixes tag.
+Fixes: b54034a73baf ("cifs: during reconnect, update interface if necessary=
+")
+Fixes: fa1d0508bdd4 ("cifs: account for primary channel in the interface li=
+st")
+
+Should also CC stable.
 
 --=20
 Regards,
