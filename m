@@ -1,83 +1,55 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF791096A;
-	Thu, 28 Dec 2023 22:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4568A15A6;
+	Fri, 29 Dec 2023 00:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPel9GsK"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ccabf5a4beso50675181fa.2;
-        Thu, 28 Dec 2023 14:09:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703801380; x=1704406180; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MuNkt2PB+Z062eBAg21yz2J6ycJCgagCNtoRGXOXMpA=;
-        b=CPel9GsK3m3ZFosGQ6tUsiSqA4GgAvh8G+lluYZqzKXXCpWxv2bEvocKQfnXVQPmh0
-         8QFwyDF09pvvdLIVLeW1BmfZcPVz0eJg+CLeY6pa00QLTQ2FaAYtJkEPGKiANhMehLVV
-         dvL8m49Tpbna8BFNRvLspwVzF2SUbXLHY3pa2GszrxxqW8Y6DjN4OpArzQ2aGht3sYpa
-         9dpYzT0kv/3mEsrNvhunLbl/l8F5/EC1kPyTiUGFdIdkZNSxQHJ3Y9L6fask7UiGgPTG
-         0KFcL8lUCPr4oD2Dmzvp/2XSVmbGYLcmj9uox7cJWraNAUGIlNzRPqyR+VjS1CeeN6a+
-         u6+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703801380; x=1704406180;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MuNkt2PB+Z062eBAg21yz2J6ycJCgagCNtoRGXOXMpA=;
-        b=ExVTWlKIZRkQo7uwgc2N5XioRyuBSiX09crjVCIsvMxolZoHmRljGLC0M4ictCGV/1
-         RDhK9CG4xtzcPCcvx4A37yg22e2Y714JSf3upYqJOo5tX7GoN48e1AhWbnP25Qt41JmJ
-         3q5XpicidLxfM2N4ocloOqqiyI/sO9lFkSX/YWDgsvzmkUvlcHFjXd5BHiMcEZ/oeRea
-         2PqzNY+gMRWPLXaut0XLHhKdEQ4bX4D7URPVhzPAFi+Es0XlF+8Qm8Ppj9dA0PRJqrR1
-         8xpMXjXBulvMH3SyOjMgRr4sPvMbKw7oDGj2ci+cT3mMP6RHKhgmoI8joYUWw4e0IFEK
-         ujEg==
-X-Gm-Message-State: AOJu0YxrMwJSGZcGYozvr0o7XD8pfis/Crsaq+vLinoL4Rdh1Pp9ipsp
-	jEk3quKDlocBswb2OOY78K47x75E/wPMpo9DcJM=
-X-Google-Smtp-Source: AGHT+IGEyl0Mtl9HJ4bO8JI/BbyhwfKXLqzO5WlKp4E/jZf2T6ZAlaDT1C0o4AtB08bJVkEURCgyjFQ8P1ruKciqDjc=
-X-Received: by 2002:a2e:8883:0:b0:2cc:a532:a6e3 with SMTP id
- k3-20020a2e8883000000b002cca532a6e3mr2278203lji.15.1703801380097; Thu, 28 Dec
- 2023 14:09:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F51AE/Y+"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F107C433C8;
+	Fri, 29 Dec 2023 00:17:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1703809047;
+	bh=eSSN4KKzB2XOnkcmbwYQFa4UDz/rJO3Urd8y14awU0I=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=F51AE/Y+2UjB47VEdlgkIbYQLBNPVlU6hpEtZKGdZyeHP3NajugTMtKYFINanKfv4
+	 niPewYlUwgaAWgFqxBSEVyFooG0QNvyBuu3CnA0VR8fCPwASxZGovjsdU2gnKHAHh/
+	 37XbLsbqFmJ1ZMiMBHXPBip4ImPZDqUe+B8l2Z+vhwToAHN1NN1YJE4SZJQnk8mf++
+	 F1n3xw0XHtO+g20NGyFbOsC0yiu/z1Zjj27YTPQEb7sCOz9c6ffc6ihYxemCXJrkx3
+	 yfbCxTDE+Eo3MtRjwavi/10Z93IRGArqpgG/wuD7SjSfWjK328NLE+BusDGj+O/YsV
+	 Wggv+A2R/saLA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EE83BC4314C;
+	Fri, 29 Dec 2023 00:17:26 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd server fix
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5msxiNuCoXCvEF0X=7gdxD4-_X=E0b8mE_k7e=8HHz-VpQ@mail.gmail.com>
+References: <CAH2r5msxiNuCoXCvEF0X=7gdxD4-_X=E0b8mE_k7e=8HHz-VpQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5msxiNuCoXCvEF0X=7gdxD4-_X=E0b8mE_k7e=8HHz-VpQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/6.7rc7-smb3-srv-fix
+X-PR-Tracked-Commit-Id: d10c77873ba1e9e6b91905018e29e196fd5f863d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8735c7c84d1bc5c3e481c02b6b6163bdefe4132f
+Message-Id: <170380904696.28076.3961045483590418430.pr-tracker-bot@kernel.org>
+Date: Fri, 29 Dec 2023 00:17:26 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 28 Dec 2023 16:09:28 -0600
-Message-ID: <CAH2r5msxiNuCoXCvEF0X=7gdxD4-_X=E0b8mE_k7e=8HHz-VpQ@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fix
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Please pull the following changes since commit
-ceb6a6f023fd3e8b07761ed900352ef574010bcb:
+The pull request you sent on Thu, 28 Dec 2023 16:09:28 -0600:
 
-  Linux 6.7-rc6 (2023-12-17 15:19:28 -0800)
+> git://git.samba.org/ksmbd.git tags/6.7rc7-smb3-srv-fix
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8735c7c84d1bc5c3e481c02b6b6163bdefe4132f
 
-  git://git.samba.org/ksmbd.git tags/6.7rc7-smb3-srv-fix
-
-for you to fetch changes up to d10c77873ba1e9e6b91905018e29e196fd5f863d:
-
-  ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()
-(2023-12-27 22:55:36 -0600)
-
-----------------------------------------------------------------
-ksmbd server fix, also for stable
- - address possible slab out of bounds in parsing of open requests
-----------------------------------------------------------------
-Namjae Jeon (1):
-      ksmbd: fix slab-out-of-bounds in smb_strndup_from_utf16()
-
- fs/smb/server/smb2misc.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
-
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
