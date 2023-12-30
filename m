@@ -1,125 +1,106 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F7A12B6A
-	for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 17:15:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E64522D;
+	Sat, 30 Dec 2023 09:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C2lCONyV"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ccbc328744so47493021fa.3
-        for <linux-cifs@vger.kernel.org>; Fri, 29 Dec 2023 09:15:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1703870142; x=1704474942; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dofN43VXWkM2wNCZHkHFpdfJqDmk692Vc0w/7BuIzBA=;
-        b=C2lCONyVetl57aWIrblZu/8sCPCTy56X1/pWAyjMG/dTLPrMBh5ahglzMdYgvnaLTq
-         6kKXFY/DqPsPBWXuWucONw4V20hTFYxIb7OVuhnX2KYFVa7PO1w1ZGvYGilocuwTOvUO
-         uppPQywRGputq8jF5Kr8hfWeCAEuydLsi0YCdHKmdsJ61FYgyuH8n1q/5D9c8Rbht0hg
-         6NbxLziEylJsHONwOlSy8cbyakZIXkbxM37asPtJohUPMcn4JUn5lnHm8twBw+LjjoLU
-         13+Kb3nPqKGxJYDZu/BlnLdQOZlO39wlQYKQt4U/9vs8fiMyoiiPzF7bB6bK7NvZznUx
-         MWEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1703870142; x=1704474942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dofN43VXWkM2wNCZHkHFpdfJqDmk692Vc0w/7BuIzBA=;
-        b=nm97D7Xwxlfe4k4fAeVjplgPiKaFsMooAXXX8ByxHcIITdBwiZpQjW8mwbjhRtoDwU
-         o08lOVJbdikFDu9bpD9bajPv7N6FQMj1sVwU323Tn4uUMznHjQ8WWPXc4H34ZFveZODZ
-         PW+qvzdvFDH4iRAQv1FTlRyVE85VIobDC5MqfY1RFq/+OZpc33VipfqDqXBu4V4GZyh+
-         bxWT+h63v8kSmqw4dNBDSnxiXSMKg7031PxKF68ER0X1oxTKNE8hRKQYVgujUeZtO3CB
-         JkZ6+fEfnfvUGahX7HEX2Oq+/WJyEdbgA3lI4btFz2FlGm1BZGfekEiYmMG//9vE72Si
-         X57A==
-X-Gm-Message-State: AOJu0YzdK4jv0wGSzyNP0t9CVwBEZtHQrRRaWtplXMl0GscbTgUJlPzx
-	dSAEG5yQCzH+cB4usJMZMv6UtmW/CE11w3r3qHR4yyWmzHY=
-X-Google-Smtp-Source: AGHT+IGp0wX/SeL3Nu4jIrIgye/qHb7u5S+QAUVhiNojL/j/c6AX0t1CD/bTyVdyhH87G6m60AmxVdE5/QiNY58Ozqs=
-X-Received: by 2002:a2e:9dd8:0:b0:2cc:8bd4:b860 with SMTP id
- x24-20020a2e9dd8000000b002cc8bd4b860mr5425583ljj.85.1703870141829; Fri, 29
- Dec 2023 09:15:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="BJJLiWk/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1703929627; x=1704534427; i=markus.elfring@web.de;
+	bh=GMs2AVW2tBxrY1cqGnNO0p1p+ejcs3wt5swaa17M8Ms=;
+	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
+	b=BJJLiWk/mbLZLmwSf9sX03bZ17ZDQbChKauFsiexn9TjJaIw7DdZcq4w7lQnCqOn
+	 cFTS59htgk7ykh95PX+TzecV+aPD84vURal9xt3bW6In6wLu4PJ36sUCvg7WosuiC
+	 xBPEEKN2fjlHexdSo9ojfIlsWWXdMPyQgQ880WsXQhkOcOJslSJ0LoPlEc947NIRO
+	 Fu4FAN6SaTdrvWDAlfeX5wsw78MVkBj7482Q95NfeOLwFKNHTyhEIYNvV6y4xzYol
+	 wPFrtjFLfPinKjg0CJScOJ8kXRAfAGdJyfA+3gb5erNGD+kX0zYIOwwqIsRI6Mwg/
+	 LL7bxLDL8beqP11ZVA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.87.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MiuOW-1qnUZ51ov6-00f17H; Sat, 30
+ Dec 2023 10:47:07 +0100
+Message-ID: <9e415e37-a5bf-459f-8b9c-a02431e8fcfd@web.de>
+Date: Sat, 30 Dec 2023 10:47:04 +0100
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231229111618.38887-1-sprasad@microsoft.com> <20231229111618.38887-3-sprasad@microsoft.com>
- <CANT5p=reagZz5yL-3wutgyk0ePR=eRLkLqt3DYhW=kTXuvOXfQ@mail.gmail.com>
-In-Reply-To: <CANT5p=reagZz5yL-3wutgyk0ePR=eRLkLqt3DYhW=kTXuvOXfQ@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 29 Dec 2023 11:15:30 -0600
-Message-ID: <CAH2r5mtfBB+Ci3c-Ct8bpuhNaVxfTcOd4rwJkb=bMQSjww-7Hw@mail.gmail.com>
-Subject: Re: [PATCH 3/4] cifs: cifs_pick_channel should skip unhealthy channels
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, meetakshisetiyaoss@gmail.com, 
-	Shyam Prasad N <sprasad@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ kernel-janitors@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>,
+ Ronnie Sahlberg <lsahlber@redhat.com>, Shyam Prasad N
+ <sprasad@microsoft.com>, Steve French <sfrench@samba.org>,
+ Tom Talpey <tom@talpey.com>
+Content-Language: en-GB
+Cc: LKML <linux-kernel@vger.kernel.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] smb3: Improve exception handling in allocate_mr_list()
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:lDb7IcjYgBLfG8EuKhdeSTkwDqhLg/3gRRrk4elDkaVQbGNzQ5r
+ ixGGqPvxmdc8s3Q2GidDRQQcb8IPSx2RcQTKl0ijg0X1l/hLMFoCn3GqWOVRi+na5HjqRJt
+ aQFnrJtkLoOPZWr921rHmohcvOWlLeSiS9iQN2AS/waQt85x481kiQPpzZC4MmaMZTCArPT
+ 0e94FZLBooZv5v4HkXMVw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:EsAHDhYQdgc=;Eqlz2JfG0la3g86X0JV40k/BH8q
+ ynQGpcjQ/yiQ6SDKyEz4LFpqfkD4joGcozanBVZ2VFiQKzXQRlbYrler90PI6tKZuBwSt/R2u
+ LY2Qd3zGmtPdgfdPKg8YuMVuAAbpxvp0BPvMRzmkyvgpmNQI6l5/GrmzEgO5847NlzHOv+hPY
+ prpGW5gpf5Zch2uart2QVtv7yo3oO6gUqiBxH9Bpl1HB2tXMF7D2OYFM/P5rzfaXjMvzRN865
+ HxSmMWp73h5wq0m7xcY+Tr+O/gIr+3l1ZejZupcqxsOipsiVAV6QdJkHcdBzf+GK5gcetLDkY
+ Vo1ObWYn3CQJJ4rbVgiLAus7D08YgxXt5KlQJjyvPKOI5aCloMfwEUlK6afXOus/HirO1wlYW
+ 8xUgPrrTkjhyuGCi7Md75a754YtGQH2f4Xd7ZbFh70hujt1A0JQVN+WpX6zjA0W6MYGjjSFHw
+ SBTV3wSt5hNnKp+raoBOr6YeveSuwl8jEKJA9/Clr7i3M9wzRWvNhJRuoQc0P04n42FAE6g1r
+ nIqRqjEFaKzJBn1Xf3HjJgZRyGBhjOZKcMGLFaBLFD3ZHuNAIs25aanQNqPt4uSojHzspP4V2
+ fnWALsR7Sd1m40OVm9IGIiNU/CaIarHY8uuTBhTsUb4+lxuBAvjxYxaCWQk2b1u+DCtYRupAy
+ h2p2F9ovhH5GT0oyQ2wzWV2cryKHhtoFH2vr0DSVO+nbeem1QxN/ZqDCPem8XZ0XVVhlfjsBz
+ f9Cl48HOZeGj4gvYn5GFvzdM7/YQB8+UpFrcj5OH7JUSRtgdXoiLbmfiop4wUb8gSkEs595va
+ QZlAJbM1qPJJfqcTezUT1O2an8c7cYYihEMxtHh3WezNmNI17FW8dKFTkV4hLwhfGh92ftwL+
+ VuyS6Pl5yFaRWmWLo59UdrVDBfy6Y/GkZbWTL2cClLxh+XXKF41+qtUvxLRO3ko87mBcIhq48
+ NPDaAQ==
 
-for-next updated to remove that patch
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Fri, 29 Dec 2023 20:43:12 +0100
 
-On Fri, Dec 29, 2023 at 11:02=E2=80=AFAM Shyam Prasad N <nspmangalore@gmail=
-.com> wrote:
->
-> On Fri, Dec 29, 2023 at 4:46=E2=80=AFPM <nspmangalore@gmail.com> wrote:
-> >
-> > From: Shyam Prasad N <sprasad@microsoft.com>
-> >
-> > cifs_pick_channel does not take into account the current
-> > state of the channel today. As a result, if some channels
-> > are unhealthy, they could still get picked, resulting
-> > in unnecessary errors.
-> >
-> > This change checks the channel transport status before
-> > making the choice. If all channels are unhealthy, the
-> > primary channel will be returned anyway.
-> >
-> > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> > ---
-> >  fs/smb/client/transport.c | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> >
-> > diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-> > index 4f717ad7c21b..f8e6636e90a3 100644
-> > --- a/fs/smb/client/transport.c
-> > +++ b/fs/smb/client/transport.c
-> > @@ -1026,6 +1026,19 @@ struct TCP_Server_Info *cifs_pick_channel(struct=
- cifs_ses *ses)
-> >                 if (!server || server->terminate)
-> >                         continue;
-> >
-> > +               /*
-> > +                * do not pick a channel that's not healthy.
-> > +                * if all channels are unhealthy, we'll use
-> > +                * the primary channel
-> > +                */
-> > +               spin_lock(&server->srv_lock);
-> > +               if (server->tcpStatus !=3D CifsNew &&
-> > +                   server->tcpStatus !=3D CifsGood) {
-> > +                       spin_unlock(&server->srv_lock);
-> > +                       continue;
-> > +               }
-> > +               spin_unlock(&server->srv_lock);
-> > +
-> >                 /*
-> >                  * strictly speaking, we should pick up req_lock to rea=
-d
-> >                  * server->in_flight. But it shouldn't matter much here=
- if we
-> > --
-> > 2.34.1
-> >
-> Please skip this patch. I'll submit a revised patch next week.
->
-> --
-> Regards,
-> Shyam
+The kfree() function was called in one case by
+the allocate_mr_list() function during error handling
+even if the passed variable contained a null pointer.
+This issue was detected by using the Coccinelle software.
 
+Thus use another label.
 
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ fs/smb/client/smbdirect.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---=20
-Thanks,
+diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
+index 94df9eec3d8d..d74e829de51c 100644
+=2D-- a/fs/smb/client/smbdirect.c
++++ b/fs/smb/client/smbdirect.c
+@@ -2136,7 +2136,7 @@ static int allocate_mr_list(struct smbd_connection *=
+info)
+ 	for (i =3D 0; i < info->responder_resources * 2; i++) {
+ 		smbdirect_mr =3D kzalloc(sizeof(*smbdirect_mr), GFP_KERNEL);
+ 		if (!smbdirect_mr)
+-			goto out;
++			goto cleanup_entries;
+ 		smbdirect_mr->mr =3D ib_alloc_mr(info->pd, info->mr_type,
+ 					info->max_frmr_depth);
+ 		if (IS_ERR(smbdirect_mr->mr)) {
+@@ -2162,7 +2162,7 @@ static int allocate_mr_list(struct smbd_connection *=
+info)
 
-Steve
+ out:
+ 	kfree(smbdirect_mr);
+-
++cleanup_entries:
+ 	list_for_each_entry_safe(smbdirect_mr, tmp, &info->mr_list, list) {
+ 		list_del(&smbdirect_mr->list);
+ 		ib_dereg_mr(smbdirect_mr->mr);
+=2D-
+2.43.0
+
