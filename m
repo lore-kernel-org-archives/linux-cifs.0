@@ -1,83 +1,111 @@
-Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7311A5A4
-	for <linux-cifs@vger.kernel.org>; Wed,  3 Jan 2024 14:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9B81A704
+	for <linux-cifs@vger.kernel.org>; Wed,  3 Jan 2024 14:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="rczfx8TK"
-Message-ID: <c618ab330758fcba46f4a0a6e4158414@manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1704292635;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSbXC+oD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1704293986;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Gf6yVhAv9f2rq7jigdRYPH0tEWw88szm+CnwRKddM0=;
-	b=rczfx8TKkKI1CshqnrRJ92rd/e+XtYZEri4JOGoKkOF7LL3aq7BxGWUyjJbGthZapWRFm/
-	zIKXDcbD0sPjKHuGWNB4tWzFZppYPio7FwJIK64Hl2AG3ZbjnRiZDlnlOFlYN3Z3IxSTXw
-	Uq5rTMemV7CeztejsknIdFUxUv3pGI4S3bR/I+sHON5rnGDgHfb19obPOaltEWY4KjL6l+
-	8O7BfEOD287BamSYqvtkzlGvGA87IwkX/BWuYltXDXs0M7KmBCSzWxXOZJF1f24OoNvOfc
-	1Anj+9fVBow15YryJv02ySLEY/QjGn5noFT0TpEFzHzBwH6bgZHhQdg+TvzvXQ==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1704292635; a=rsa-sha256;
-	cv=none;
-	b=eU2mU/Q+iESvc3pgxBA7qtu2SJYIFXZKRjcgxdNRshuCr2Asafo4IU/oXEWcJPVau8dNzL
-	7Lj84Z5GP+8ZVq3S0QsgayJt87jaLP6ydTH4wDp2H0CnD/Nu4YQ1yDR/ZlK1KkHHL4gXI3
-	3v1WPlro/zcGnJnMgFbPwHcaTuPtRCc+b5KniPBiElQPuKZ803Ilzbm9ZK1HD6qKVngtrU
-	dl2WUhHFhqUW6lblkLji1shTZ+AgMF6dm+lkb2OEIG/Gji5C58o7lcFc93xwsRXa9d/Rzy
-	PmGSsZDDFeOFeW2xulUDiEwD3xMbsPp64zY2hIjhop5Yx4P448/UK+Z7InMykQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-	s=dkim; t=1704292635; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Gf6yVhAv9f2rq7jigdRYPH0tEWw88szm+CnwRKddM0=;
-	b=Ba0F1KBeeFXcPhgQdNyKm9dJ8Cz2S08VQE1jYK0b0jPD2H7ZUMNuC7WOCPlXiOw+HEFx9B
-	KLLBYoZrOJXYdidvOzt0S/OHW9XbOqlcKhbwIYVQyR4iA9rSWjtsJfdu3HWkq4BUwSn0N/
-	kx3MkNNU/wNwNKSc9FDiOqAOxU18a/hMnX+wKwS2feRZkqgki5cQZJqGtfFqdG8zpBpthZ
-	fikfu0P3c5GEnQEwkSDKuv9QptiMkdIBiAhNzPDLcWzfq7A41cAUWdpLrO8advp9moeXbz
-	F9iBM+LEoaSS+xlktarpPVhWzsJs3Gyl3C+p4DAOhwt9gFrfdp2RCkBSrIceKw==
-From: Paulo Alcantara <pc@manguebit.com>
-To: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Cc: sfrench@samba.org, lsahlber@redhat.com, sprasad@microsoft.com,
- tom@talpey.com, linux-cifs@vger.kernel.org, nspmangalore@gmail.com,
- bharathsm.hsk@gmail.com, samba-technical@lists.samba.org, Meetakshi Setiya
- <msetiya@microsoft.com>
-Subject: Re: [PATCH 2/2] smb: client: retry compound request without reusing
- lease
-In-Reply-To: <CAFTVevWC-6S-fbDupfUugEOh_gP-1xrNuZpD15Of9zW5G9BuDQ@mail.gmail.com>
-References: <20231229143521.44880-1-meetakshisetiyaoss@gmail.com>
- <20231229143521.44880-2-meetakshisetiyaoss@gmail.com>
- <7e61ce96ef41bdaf26ac765eda224381@manguebit.com>
- <CAFTVevWC-6S-fbDupfUugEOh_gP-1xrNuZpD15Of9zW5G9BuDQ@mail.gmail.com>
-Date: Wed, 03 Jan 2024 11:37:11 -0300
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=s3o3MrTd6nm5lawOB5Ax6jA2uuGzy36Eef5IBUe+5HY=;
+	b=HSbXC+oDHmMAyySC3bMh7FgNgTVOVbCgEnEEWtcpmKf+8EtyO6Q5oQOINXsz82KWZaPGzN
+	gNSzryMtuoh4BO1DgIXY2iEUxkpufkN8aa5xU62d/kFnb+0uTPsK2/CXVPCM3Oo2sKJsmL
+	ARHAZ9JCcv7to9MTlNMWYRyvCuzdBng=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-298-3VxcmtpCOkq8GL6PiBMlJQ-1; Wed, 03 Jan 2024 09:59:43 -0500
+X-MC-Unique: 3VxcmtpCOkq8GL6PiBMlJQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F93C83B821;
+	Wed,  3 Jan 2024 14:59:42 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 24175C15A0C;
+	Wed,  3 Jan 2024 14:59:37 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Jeff Layton <jlayton@kernel.org>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Dominique Martinet <asmadeus@codewreck.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	linux-cachefs@redhat.com,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/5] netfs, cachefiles, 9p: Additional patches
+Date: Wed,  3 Jan 2024 14:59:24 +0000
+Message-ID: <20240103145935.384404-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Meetakshi Setiya <meetakshisetiyaoss@gmail.com> writes:
+Hi Christian, Jeff, Gao, Dominique,
 
-> As per the discussion with Tom on the previous version of the changes, I
-> conferred with Shyam and Steve about possible workarounds and this seemed like a
-> choice which did the job without much perf drawbacks and code changes. One
-> highlighted difference between the two could be that in the previous
-> version, lease
-> would not be reused for any file with hardlinks at all, even though the inode
-> may hold the correct lease for that particular file. The current changes
-> would take care of this by sending the lease at least once, irrespective of the
-> number of hardlinks.
+Here are some additional patches for my netfs-lib tree:
 
-Thanks for the explanation.  However, the code change size is no excuse
-for providing workarounds rather than the actual fix.
+ (1) Fix __cachefiles_prepare_write() to correctly validate against the DIO
+     alignment.
 
-A possible way to handle such case would be keeping a list of
-pathname:lease_key pairs inside the inode, so in smb2_compound_op() you
-could look up the lease key by using @dentry.  I'm not sure if there's a
-better way to handle it as I haven't looked into it further.
+ (2) 9p: Fix initialisation of the netfs_inode so that i_size is set before
+     netfs_inode_init() is called.
+
+ (3) 9p: Do a couple of cleanups (remove a couple of unused vars and turn a
+     BUG_ON() into a warning).
+
+ (4) 9p: Always update remote_i_size, even if we're asked not to update
+     i_size in stat2inode.
+
+ (5) 9p: Return the amount written in preference to an error if we wrote
+     something.
+
+David
+
+The netfslib postings:
+Link: https://lore.kernel.org/r/20231013160423.2218093-1-dhowells@redhat.com/ # v1
+Link: https://lore.kernel.org/r/20231117211544.1740466-1-dhowells@redhat.com/ # v2
+Link: https://lore.kernel.org/r/20231207212206.1379128-1-dhowells@redhat.com/ # v3
+Link: https://lore.kernel.org/r/20231213152350.431591-1-dhowells@redhat.com/ # v4
+Link: https://lore.kernel.org/r/20231221132400.1601991-1-dhowells@redhat.com/ # v5
+
+David Howells (5):
+  cachefiles: Fix __cachefiles_prepare_write()
+  9p: Fix initialisation of netfs_inode for 9p
+  9p: Do a couple of cleanups
+  9p: Always update remote_i_size in stat2inode
+  9p: Use length of data written to the server in preference to error
+
+ fs/9p/v9fs_vfs.h       |  1 +
+ fs/9p/vfs_addr.c       | 24 ++++++++++++------------
+ fs/9p/vfs_inode.c      |  6 +++---
+ fs/9p/vfs_inode_dotl.c |  7 ++++---
+ fs/cachefiles/io.c     | 28 +++++++++++++++++-----------
+ 5 files changed, 37 insertions(+), 29 deletions(-)
+
