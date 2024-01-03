@@ -1,78 +1,83 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx.manguebit.com (mx.manguebit.com [167.235.159.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9431D1A282
-	for <linux-cifs@vger.kernel.org>; Wed,  3 Jan 2024 14:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7311A5A4
+	for <linux-cifs@vger.kernel.org>; Wed,  3 Jan 2024 14:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qq+TZ9nM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704290669;
+	dkim=pass (2048-bit key) header.d=manguebit.com header.i=@manguebit.com header.b="rczfx8TK"
+Message-ID: <c618ab330758fcba46f4a0a6e4158414@manguebit.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1704292635;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dm5uQwn+49K96zJWxQsiqkazcQLayYKEShHZEQ+JYDg=;
-	b=Qq+TZ9nM1o4ZomOCIr9KhLWeHeOAEd7d4jwIADH//G7/p4/98DRakhV1gZ+p8jL4UEauup
-	J5YkEbEUq+3XW/XVz+cRkDBjeiGak7oO3YMReV4Nv0wuig3PNy4RSrtOCEOb2oqE0ExBhg
-	OUotu39ZFyq5fbfWeS4YcX+Nz+1S6BM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-613-i-DxWH5nPu6c-fysuoabdA-1; Wed, 03 Jan 2024 09:04:26 -0500
-X-MC-Unique: i-DxWH5nPu6c-fysuoabdA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1041384AF84;
-	Wed,  3 Jan 2024 14:04:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 372852026D66;
-	Wed,  3 Jan 2024 14:04:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZZVctju5TEjS218p@codewreck.org>
-References: <ZZVctju5TEjS218p@codewreck.org> <20231221132400.1601991-41-dhowells@redhat.com> <20231221132400.1601991-1-dhowells@redhat.com> <292837.1704232179@warthog.procyon.org.uk>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: dhowells@redhat.com, Eric Van Hensbergen <ericvh@kernel.org>,
-    Latchesar Ionkov <lucho@ionkov.net>,
-    Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: Re: [PATCH] 9p: Fix initialisation of netfs_inode for 9p
+	bh=5Gf6yVhAv9f2rq7jigdRYPH0tEWw88szm+CnwRKddM0=;
+	b=rczfx8TKkKI1CshqnrRJ92rd/e+XtYZEri4JOGoKkOF7LL3aq7BxGWUyjJbGthZapWRFm/
+	zIKXDcbD0sPjKHuGWNB4tWzFZppYPio7FwJIK64Hl2AG3ZbjnRiZDlnlOFlYN3Z3IxSTXw
+	Uq5rTMemV7CeztejsknIdFUxUv3pGI4S3bR/I+sHON5rnGDgHfb19obPOaltEWY4KjL6l+
+	8O7BfEOD287BamSYqvtkzlGvGA87IwkX/BWuYltXDXs0M7KmBCSzWxXOZJF1f24OoNvOfc
+	1Anj+9fVBow15YryJv02ySLEY/QjGn5noFT0TpEFzHzBwH6bgZHhQdg+TvzvXQ==
+ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1704292635; a=rsa-sha256;
+	cv=none;
+	b=eU2mU/Q+iESvc3pgxBA7qtu2SJYIFXZKRjcgxdNRshuCr2Asafo4IU/oXEWcJPVau8dNzL
+	7Lj84Z5GP+8ZVq3S0QsgayJt87jaLP6ydTH4wDp2H0CnD/Nu4YQ1yDR/ZlK1KkHHL4gXI3
+	3v1WPlro/zcGnJnMgFbPwHcaTuPtRCc+b5KniPBiElQPuKZ803Ilzbm9ZK1HD6qKVngtrU
+	dl2WUhHFhqUW6lblkLji1shTZ+AgMF6dm+lkb2OEIG/Gji5C58o7lcFc93xwsRXa9d/Rzy
+	PmGSsZDDFeOFeW2xulUDiEwD3xMbsPp64zY2hIjhop5Yx4P448/UK+Z7InMykQ==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
+	s=dkim; t=1704292635; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Gf6yVhAv9f2rq7jigdRYPH0tEWw88szm+CnwRKddM0=;
+	b=Ba0F1KBeeFXcPhgQdNyKm9dJ8Cz2S08VQE1jYK0b0jPD2H7ZUMNuC7WOCPlXiOw+HEFx9B
+	KLLBYoZrOJXYdidvOzt0S/OHW9XbOqlcKhbwIYVQyR4iA9rSWjtsJfdu3HWkq4BUwSn0N/
+	kx3MkNNU/wNwNKSc9FDiOqAOxU18a/hMnX+wKwS2feRZkqgki5cQZJqGtfFqdG8zpBpthZ
+	fikfu0P3c5GEnQEwkSDKuv9QptiMkdIBiAhNzPDLcWzfq7A41cAUWdpLrO8advp9moeXbz
+	F9iBM+LEoaSS+xlktarpPVhWzsJs3Gyl3C+p4DAOhwt9gFrfdp2RCkBSrIceKw==
+From: Paulo Alcantara <pc@manguebit.com>
+To: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
+Cc: sfrench@samba.org, lsahlber@redhat.com, sprasad@microsoft.com,
+ tom@talpey.com, linux-cifs@vger.kernel.org, nspmangalore@gmail.com,
+ bharathsm.hsk@gmail.com, samba-technical@lists.samba.org, Meetakshi Setiya
+ <msetiya@microsoft.com>
+Subject: Re: [PATCH 2/2] smb: client: retry compound request without reusing
+ lease
+In-Reply-To: <CAFTVevWC-6S-fbDupfUugEOh_gP-1xrNuZpD15Of9zW5G9BuDQ@mail.gmail.com>
+References: <20231229143521.44880-1-meetakshisetiyaoss@gmail.com>
+ <20231229143521.44880-2-meetakshisetiyaoss@gmail.com>
+ <7e61ce96ef41bdaf26ac765eda224381@manguebit.com>
+ <CAFTVevWC-6S-fbDupfUugEOh_gP-1xrNuZpD15Of9zW5G9BuDQ@mail.gmail.com>
+Date: Wed, 03 Jan 2024 11:37:11 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <368445.1704290657.1@warthog.procyon.org.uk>
-Date: Wed, 03 Jan 2024 14:04:17 +0000
-Message-ID: <368446.1704290657@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Type: text/plain
 
-Dominique Martinet <asmadeus@codewreck.org> wrote:
+Meetakshi Setiya <meetakshisetiyaoss@gmail.com> writes:
 
-> Would it make sense to just always update netfs's ctx->remote_i_size in
-> the various stat2inode calls instead?
+> As per the discussion with Tom on the previous version of the changes, I
+> conferred with Shyam and Steve about possible workarounds and this seemed like a
+> choice which did the job without much perf drawbacks and code changes. One
+> highlighted difference between the two could be that in the previous
+> version, lease
+> would not be reused for any file with hardlinks at all, even though the inode
+> may hold the correct lease for that particular file. The current changes
+> would take care of this by sending the lease at least once, irrespective of the
+> number of hardlinks.
 
-Btw, v9fs_i_size_write() should be redundant.  It should be sufficient to just
-use i_size_write() as long as you use i_size_read().
+Thanks for the explanation.  However, the code change size is no excuse
+for providing workarounds rather than the actual fix.
 
-David
-
+A possible way to handle such case would be keeping a list of
+pathname:lease_key pairs inside the inode, so in smb2_compound_op() you
+could look up the lease key by using @dentry.  I'm not sure if there's a
+better way to handle it as I haven't looked into it further.
