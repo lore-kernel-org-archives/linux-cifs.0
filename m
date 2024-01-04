@@ -1,94 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D111DA21
-	for <linux-cifs@vger.kernel.org>; Wed,  3 Jan 2024 21:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B723D1865A;
+	Thu,  4 Jan 2024 05:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jSnkE+Ix"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704316550;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lz9BpuJT9ZqjBzLEQFTtycxe4tbIVPZFPrNygtaFHDI=;
-	b=jSnkE+IxS6qrhG1gdu8h9t18XkLwOh2kIEwB7/VjvtubnAgxpKHhGcP2cGs8/fjr6Cf+Gg
-	JgUh5wnyWonTADJ5EdBCn2Yt5ddcfPkLQhzGMA57PpjW3RLaZ8LHEp1F3xSHkTzTCVdwB0
-	3zq74lwnEJ+Cv7sAv606ZH/IMjNoisE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-640-1v-GWHbRM9e1RxN52-Av-w-1; Wed,
- 03 Jan 2024 16:15:48 -0500
-X-MC-Unique: 1v-GWHbRM9e1RxN52-Av-w-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5354F3806710;
-	Wed,  3 Jan 2024 21:15:47 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.68])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 576BF492BC6;
-	Wed,  3 Jan 2024 21:15:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240103145935.384404-1-dhowells@redhat.com>
-References: <20240103145935.384404-1-dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-    Jeff Layton <jlayton@kernel.org>,
-    Marc Dionne <marc.dionne@auristor.com>
-Cc: dhowells@redhat.com, Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 7/5] netfs: Fix proc/fs/fscache symlink to point to "netfs" not "../netfs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GCO7cl8q"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-50e7b51b0ceso118475e87.1;
+        Wed, 03 Jan 2024 21:46:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704347207; x=1704952007; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=D1hePiwwPWJ2XA1ilYXmZCLY4DSOPTqBpRyLgRU6YnM=;
+        b=GCO7cl8qKOSepPRPOrFN+jJNRwwLnfW+NBdGdckpeekCWJGetA8Qa1jRnpJi2YPh/j
+         BzXRSYG4uxLDJ+s8fgpXYLTa4kl69a1uTCjpF73z284T57DzwWdsNhic6qOnbQ+TIWEm
+         wFauECCLNQguV+BzbAIsl0txL41RihWJPH4LuQ036NRmuS5LK2nzMJ6aBx1TJ6/K5360
+         Q05yCxOgUdQ0L4grYC/W2117tjZ42V5hq7geNNlniUDV0UFg5mzsgMgChkwYon5qhq/4
+         qtDjf3+FRWrLh4wV6EHPXi0z6MXpH3PthsBeTReeno9iIrUMm59riL/C10CP1/AbaZOo
+         wopA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704347207; x=1704952007;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D1hePiwwPWJ2XA1ilYXmZCLY4DSOPTqBpRyLgRU6YnM=;
+        b=FkpQZYtUpDO638gwxnxYtLZ8naPiwqRIJPnbbGe+Rv46UtFvQ8SVpdgaSJ/YKVnj/q
+         Wp58ZZyP+Ru/nNRYVw0Gwh4SGvUnzpYIVymAYCgYQwIZbwgJR7aO4XO0nzVeLXFCXOeL
+         M82iC5tmI5e/cQotGfBAbJSF4z6dGO3kgemZb+wjMWLkfNOkQhtMddFbL4igKvm5ATsn
+         VRnh4Dt5T+i9CCzCcYC2ot6DHrTe/m5Jax/gZfO88usht3yhXGygHXxy8J39u0ekuLF9
+         CgMXBGltYHbvHLhqBGwIrQ+wZLamYdhLDFMvqV45DjkRCi0IXRisJuRbcg35fMd71UN+
+         3LUw==
+X-Gm-Message-State: AOJu0YxgGHPQYvA/MwiV0zkDP3xH7XzxT1jZkY+YITE8C/2h//FXQqHh
+	xtnpP587Ip9mJ+vYtLxpRfCoN1osumYRT6hqeMA=
+X-Google-Smtp-Source: AGHT+IEofVGvBg7wumZRh+Y7cCfGBtGe23r+MWBmOqHY5tYDJY4Wnk9Vvbss3X4LgKybt3T1hBEW3JQqiCXWlHWUM0g=
+X-Received: by 2002:ac2:5dfb:0:b0:50e:6b57:4628 with SMTP id
+ z27-20020ac25dfb000000b0050e6b574628mr19504lfq.13.1704347207272; Wed, 03 Jan
+ 2024 21:46:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <900276.1704316543.1@warthog.procyon.org.uk>
-Date: Wed, 03 Jan 2024 21:15:43 +0000
-Message-ID: <900277.1704316543@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 3 Jan 2024 23:46:36 -0600
+Message-ID: <CAH2r5msj3W0t7QqkZuTgP9vW+gF=P2Y53ELGaiQe_Xi-pyTHfA@mail.gmail.com>
+Subject: [GIT PULL] SMB3 client multichannel fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Fix the proc/fs/fscache symlink to point to "netfs" not "../netfs".
+Please pull the following changes since commit
+861deac3b092f37b2c5e6871732f3e11486f7082:
 
-Reported-by: Marc Dionne <marc.dionne@auristor.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Christian Brauner <christian@brauner.io>
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-cachefs@redhat.com
----
- fs/netfs/fscache_proc.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Linux 6.7-rc7 (2023-12-23 16:25:56 -0800)
 
-diff --git a/fs/netfs/fscache_proc.c b/fs/netfs/fscache_proc.c
-index ecd0d1edafaa..874d951bc390 100644
---- a/fs/netfs/fscache_proc.c
-+++ b/fs/netfs/fscache_proc.c
-@@ -16,7 +16,7 @@
-  */
- int __init fscache_proc_init(void)
- {
--	if (!proc_symlink("fs/fscache", NULL, "../netfs"))
-+	if (!proc_symlink("fs/fscache", NULL, "netfs"))
- 		goto error_sym;
- 
- 	if (!proc_create_seq("fs/netfs/caches", S_IFREG | 0444, NULL,
+are available in the Git repository at:
 
+  git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc8-smb3-mchan-fixes
+
+for you to fetch changes up to 09eeb0723f219fbd96d8865bf9b935e03ee2ec22:
+
+  cifs: do not depend on release_iface for maintaining iface_list
+(2023-12-29 09:11:26 -0600)
+
+----------------------------------------------------------------
+Three important multichannel smb3 client fixes found in recent testing
+- fix oops due to incorrect refcounting of interfaces after disabling
+multichannel
+- fix possible unrecoverable session state after disabling
+multichannel with active sessions
+- fix two places that were missing use of chan_lock
+----------------------------------------------------------------
+Shyam Prasad N (3):
+      cifs: after disabling multichannel, mark tcon for reconnect
+      cifs: cifs_chan_is_iface_active should be called with chan_lock held
+      cifs: do not depend on release_iface for maintaining iface_list
+
+ fs/smb/client/cifsglob.h |  1 -
+ fs/smb/client/connect.c  | 27 +++++++++++++++++----------
+ fs/smb/client/smb2ops.c  | 34 +++++++++++++++++++++++-----------
+
+-- 
+Thanks,
+
+Steve
