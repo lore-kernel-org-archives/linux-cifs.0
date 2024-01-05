@@ -1,92 +1,55 @@
-Received: from nautica.notk.org (nautica.notk.org [91.121.71.147])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F9C32186;
-	Fri,  5 Jan 2024 17:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5022D358AD;
+	Fri,  5 Jan 2024 18:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="tn6PqWq+";
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="CvojuvDV"
-Received: by nautica.notk.org (Postfix, from userid 108)
-	id 47DCEC026; Fri,  5 Jan 2024 18:20:55 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1704475255; bh=G5QLtqgPgUPlhX16D8cxgZSrhZwA8FdHTj67GHw0qi8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=tn6PqWq+0UHN3QxCRZid+V+fJBenvC3IrIIcqOsdUbUgqD8BvhWt2WB90oSw7XpPg
-	 QlUFE2ue/FCeJ/DLCFsWomlZCxMLnpaB0lM3wvwMCs4jctG4fvUBqrc03/wmY/sc0S
-	 8N2iRbE0aTsPVsWcNX4DCgvZISkj+1s2RpUktuXRQ7liHWaMGGelG/otThKmTb5+o9
-	 rqsKWauiSE5eYZH82ZaqL1LP0H6bbwJzQQG77J3sBIpVhHOvH02KIeT/rFE6grRJ9i
-	 cHB85E+b1u50A//1wjlYgDkzEh8xzHxoPl97Y55v0xmCQmwlSI3+S7yRacHEVsWfLm
-	 H0mNlD3NjjkYw==
-X-Spam-Level: 
-Received: from gaia (localhost [127.0.0.1])
-	by nautica.notk.org (Postfix) with ESMTPS id 448ADC009;
-	Fri,  5 Jan 2024 18:20:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1704475254; bh=G5QLtqgPgUPlhX16D8cxgZSrhZwA8FdHTj67GHw0qi8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=CvojuvDVolRZkDDlIyj4uY5hFwD/G9sunkTM46WaLCaS3QIrYNL/Um2wFEN1Efbub
-	 AMgqrgm0WuuDyTu9RFhh8PxIVWprskRaMfCAUwhNw8adtnNMYHs5Bky4OntLrV86/Q
-	 XmU2feeoZdQm8hdpDIY+BLbeIyzFOjK2HbobG5a9E+yEpXx9TfaYR70WhcumYdlH5T
-	 HkCWSMxrchak5K5WPOkEkbPG2H9CmhaW1116sshIwrG/ZnK1AyARzAH5rYoKYuS2Jk
-	 AqxoyHMYpNvvuolbdXa2aaLMFmQjd42lAcZqTp8w5LAgtmHV3I+9GZc8lkKE5jXWtd
-	 swfGIM6q8sjVg==
-Received: from localhost (gaia [local])
-	by gaia (OpenSMTPD) with ESMTPA id 39ce6c8b;
-	Fri, 5 Jan 2024 17:20:44 +0000 (UTC)
-Date: Sat, 6 Jan 2024 02:20:29 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Matthew Wilcox <willy@infradead.org>,
-	David Howells <dhowells@redhat.com>
-Cc: Nathan Chancellor <nathan@kernel.org>,
-	Anna Schumaker <Anna.Schumaker@netapp.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Fix oops in NFS
-Message-ID: <ZZg6XQOjlOA0CL17@codewreck.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fLp9yzjT"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 263EAC433C8;
+	Fri,  5 Jan 2024 18:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704478229;
+	bh=0p6QTSUgNzsy9asxqQk+44xwJruAdICSzwzpvoLiajU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=fLp9yzjTqfVghbhL0XHqYq7jtiEH/lsZ3gjAcLgE2B7N9HGSIaZa7R45PYSeApc5d
+	 TYBh1gjUUbCHBEqbrh0cd9B42NhhQSwqk9DMmk/pgkv6YdJ9bq0Jg3Y4t83tcA3Bh5
+	 1YWZUuAhGgjccL+/z3GEr0Y1TZmv+HY5kMBQj/gFXXWrukS4TedIhI+pHQHdQ6e8Re
+	 us67HIy09q92LMbv+F3X97qVgj2WYnj+rarYFnf5IEiex5CwPsg2lDghzwgwWC900H
+	 UlTp3rZS4BxdP9+v8N9fytHvNTOdQKMl9UA0ZZTz41TSgqzc42cd/EwKVqYMDuL6oC
+	 62iCNSSh3oNug==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14362DCB6D8;
+	Fri,  5 Jan 2024 18:10:29 +0000 (UTC)
+Subject: Re: [GIT PULL] SMB3 client multichannel fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5msj3W0t7QqkZuTgP9vW+gF=P2Y53ELGaiQe_Xi-pyTHfA@mail.gmail.com>
+References: <CAH2r5msj3W0t7QqkZuTgP9vW+gF=P2Y53ELGaiQe_Xi-pyTHfA@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5msj3W0t7QqkZuTgP9vW+gF=P2Y53ELGaiQe_Xi-pyTHfA@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc8-smb3-mchan-fixes
+X-PR-Tracked-Commit-Id: 09eeb0723f219fbd96d8865bf9b935e03ee2ec22
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3eca89454aec4278c0debc918b4978a3f4a0581e
+Message-Id: <170447822907.11319.13715010278654155092.pr-tracker-bot@kernel.org>
+Date: Fri, 05 Jan 2024 18:10:29 +0000
+To: Steve French <smfrench@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1197168.1704465212@warthog.procyon.org.uk>
- <ZZgBcJ7OAS7Ui6gi@casper.infradead.org>
 
-Matthew Wilcox wrote on Fri, Jan 05, 2024 at 01:17:36PM +0000:
-> host on /host type 9p (rw,relatime,access=client,trans=virtio)
+The pull request you sent on Wed, 3 Jan 2024 23:46:36 -0600:
 
-David Howells wrote on Fri, Jan 05, 2024 at 02:33:32PM +0000:
-> > This commit (100ccd18bb41 in linux-next 20240104) is bad for me.  After
-> > it, running xfstests gives me first a bunch of errors along these lines:
-> 
-> This may be related to a patch that is in linux-next 20240105, but not
-> 20240104 ("9p: Fix initialisation of netfs_inode for 9p").
+> git://git.samba.org/sfrench/cifs-2.6.git tags/6.7-rc8-smb3-mchan-fixes
 
-Yes, you'd be reading zeroes without that patch because the netfs code
-thinks the file has 0 size and doesn't bother reading, that'd explain
-the exec format error loading other modules...
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3eca89454aec4278c0debc918b4978a3f4a0581e
 
-One thing that surprised me is that this also affects cache=none, I
-thought we had different file ops going straight to p9_client_read in
-this case?
-But turning my brain on this would be the read-only mmap case that we
-need to support for execs, which module loading also uses, so this came
-biting there alright.
+Thank you!
 
 -- 
-Dominique Martinet | Asmadeus
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
