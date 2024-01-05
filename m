@@ -1,104 +1,164 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D722F24B42
-	for <linux-cifs@vger.kernel.org>; Fri,  5 Jan 2024 10:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC51D250E9
+	for <linux-cifs@vger.kernel.org>; Fri,  5 Jan 2024 10:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HN9TQ5kQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704449585;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ogjygCadqZqQPF0RXbXaEDph9fgsETZY7v/OnrLD3js=;
-	b=HN9TQ5kQRNYlEvQJNA+99G6IttvtbAPBx03MW50n4yHPr41cgOmm8EVG91ZW65L9vxos7q
-	S9rSofM0xYTryNVTp2EYgHWoZ06ABcuw1aXgaNot9w52qJvuvKTmt9pY8QRzzwy7UsjQKP
-	Aa2yUG5ATVPM0WEERXnaDkrSRTf8gNk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-306-4WUKZcOBNQ-J7NNVXyZBEg-1; Fri,
- 05 Jan 2024 05:13:01 -0500
-X-MC-Unique: 4WUKZcOBNQ-J7NNVXyZBEg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC9E41C05148;
-	Fri,  5 Jan 2024 10:12:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 96FAA40C6EB9;
-	Fri,  5 Jan 2024 10:12:56 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZZeLAAf6qiieA5fy@casper.infradead.org>
-References: <ZZeLAAf6qiieA5fy@casper.infradead.org> <2202548.1703245791@warthog.procyon.org.uk> <20231221230153.GA1607352@dev-arch.thelio-3990X> <20231221132400.1601991-1-dhowells@redhat.com> <20231221132400.1601991-38-dhowells@redhat.com> <2229136.1703246451@warthog.procyon.org.uk>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: dhowells@redhat.com, Nathan Chancellor <nathan@kernel.org>,
-    Anna Schumaker <Anna.Schumaker@netapp.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    Jeff Layton <jlayton@kernel.org>, Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    Christian Brauner <christian@brauner.io>, linux-cachefs@redhat.com,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Fix oops in NFS
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PIPPdcPF"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-50e7dff3e9fso1653340e87.2
+        for <linux-cifs@vger.kernel.org>; Fri, 05 Jan 2024 02:23:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704450235; x=1705055035; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lraO2XeH29IEphDl7lyWKGHaK/kn7b8KfS/+Ygu7O90=;
+        b=PIPPdcPFAk3uL0U+tV2x/BTJ1xnhJ8XC9158eExyM1WzPetF5YMN37ieVDayZMaSBS
+         1PreaI8siXr5AIKubyD84NH70ZLZ0rKOTIhFD8dVXf7ubo+cNkz6Nx+aeyOgYT/xLOc0
+         xFuPHw3xGGjC+s6t7XuBfeL3GUys8kevD/x0/NbNdUMl340QW7R0q+6A57orvFvKMUfl
+         7kEeJtVFUB1XRUqkZp7fAI8086jkGfTPZaVHvrpwoFHDEpjjxxFkskug+hwhrNoOI2bQ
+         c81FfipWthaQvHJDAcoElCbQYEJ3rYmSN0B5GAUgbFmQhVZGE0Yd1I8pTrQuwxff7mEw
+         1Z0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704450235; x=1705055035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lraO2XeH29IEphDl7lyWKGHaK/kn7b8KfS/+Ygu7O90=;
+        b=sboRUpRToFCcjQUf2Vr7SBZRM8gJXR8gmDsPrGNjXnbNJl4URiblfb+87lr1z1wO+r
+         rGMKr5Tj7GU3QmTiszaYzxnIxSgLhGxEphakdcxEB6jrJmNYdZByxU5TVZA7WVpTDl3L
+         m3WH6C3GkQSSwm//6dkl4SjY6HPq+5zZCQfYoxADESGWqWH2JZEIXeUmHJBmxhj550Xz
+         ZR0BR1YUgg+j4nCBN/TrdQx4DNreegPPddbtmmyC3BlkLVWtRI1Ji9ZcFXISv4BF0J3P
+         ZrX/+eMdkHB1jMXMlXoG036tMQRl6//0IZfZNh1QJGLQddwepyJ/lcqYWM56OVLPE9dr
+         +xHw==
+X-Gm-Message-State: AOJu0YxP5wofOxJYd1dqMWfW8/b4LK3/KgDcVvCd5KaQaetlJmsza+3M
+	Z+udDR9suaEm8FKbbx8dQOc5YsaKVmF8H1qKdVA=
+X-Google-Smtp-Source: AGHT+IEhxJ6rzAN3ItavqYUezN+dWr+l5CN5kAUj7vCDCjan4UdmOQBt+vGMwskzlpAj8lPWpQKSoD/Y3hsuX8O2tBg=
+X-Received: by 2002:a05:6512:3e07:b0:50e:714f:f2ca with SMTP id
+ i7-20020a0565123e0700b0050e714ff2camr1238829lfv.91.1704450234583; Fri, 05 Jan
+ 2024 02:23:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1094258.1704449575.1@warthog.procyon.org.uk>
+References: <20231229143521.44880-1-meetakshisetiyaoss@gmail.com>
+ <20231229143521.44880-2-meetakshisetiyaoss@gmail.com> <7e61ce96ef41bdaf26ac765eda224381@manguebit.com>
+ <CAFTVevWC-6S-fbDupfUugEOh_gP-1xrNuZpD15Of9zW5G9BuDQ@mail.gmail.com>
+ <c618ab330758fcba46f4a0a6e4158414@manguebit.com> <62eb08fb-b27f-4c95-ab29-ac838f24d70f@talpey.com>
+ <CANT5p=qqUbqbedW+ccdSQz2q1N-NNA-kqw4y8xSrfdOdbjAyjg@mail.gmail.com> <242e196c-dc38-49d2-a213-e703c3b4e647@samba.org>
+In-Reply-To: <242e196c-dc38-49d2-a213-e703c3b4e647@samba.org>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Fri, 5 Jan 2024 15:53:43 +0530
+Message-ID: <CANT5p=oFxQEB5G4CzVuJBkg76Fu-gqxKuFdYJ8NCnGkS-HhFJA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] smb: client: retry compound request without reusing lease
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Tom Talpey <tom@talpey.com>, Paulo Alcantara <pc@manguebit.com>, 
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>, sprasad@microsoft.com, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	sfrench@samba.org, Meetakshi Setiya <msetiya@microsoft.com>, bharathsm.hsk@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 05 Jan 2024 10:12:55 +0000
-Message-ID: <1094259.1704449575@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Matthew Wilcox <willy@infradead.org> wrote:
+Hi Metze,
 
-> This commit (100ccd18bb41 in linux-next 20240104) is bad for me.  After
-> it, running xfstests gives me first a bunch of errors along these lines:
-> =
+On Fri, Jan 5, 2024 at 3:30=E2=80=AFPM Stefan Metzmacher <metze@samba.org> =
+wrote:
+>
+> Am 05.01.24 um 10:39 schrieb Shyam Prasad N via samba-technical:
+> > On Fri, Jan 5, 2024 at 2:39=E2=80=AFAM Tom Talpey <tom@talpey.com> wrot=
+e:
+> >>
+> >> On 1/3/2024 9:37 AM, Paulo Alcantara wrote:
+> >>> Meetakshi Setiya <meetakshisetiyaoss@gmail.com> writes:
+> >>>
+> >>>> As per the discussion with Tom on the previous version of the change=
+s, I
+> >>>> conferred with Shyam and Steve about possible workarounds and this s=
+eemed like a
+> >>>> choice which did the job without much perf drawbacks and code change=
+s. One
+> >>>> highlighted difference between the two could be that in the previous
+> >>>> version, lease
+> >>>> would not be reused for any file with hardlinks at all, even though =
+the inode
+> >>>> may hold the correct lease for that particular file. The current cha=
+nges
+> >>>> would take care of this by sending the lease at least once, irrespec=
+tive of the
+> >>>> number of hardlinks.
+> >>>
+> >>> Thanks for the explanation.  However, the code change size is no excu=
+se
+> >>> for providing workarounds rather than the actual fix.
+> >>
+> >> I have to agree. And it really isn't much of a workaround either.
+> >>
+> >
+> > The original problem, i.e. compound operations like
+> > unlink/rename/setsize not sending a lease key is very prevalent on the
+> > field.
+> > Unfortunately, fixing that exposed this problem with hard links.
+> > So Steve suggested getting this fix to a shape where it's fixing the
+> > original problem, even if it means that it does not fix it for the
+> > case of where there are open handles to multiple hard links to the
+> > same file.
+> > Only thing we need to be careful of is that it does not make things
+> > worse for other workloads.
+> >
+> >>> A possible way to handle such case would be keeping a list of
+> >>> pathname:lease_key pairs inside the inode, so in smb2_compound_op() y=
+ou
+> >>> could look up the lease key by using @dentry.  I'm not sure if there'=
+s a
+> >>> better way to handle it as I haven't looked into it further.
+> >>
+> >
+> > This seems like a reasonable change to make. That will make sure that
+> > we stick to what the protocol recommends.
+> > I'm not sure that this change will be a simple one. There could be
+> > several places where we make an assumption that the lease is
+> > associated with an inode, and not a link.
+> >
+> > And I'm not yet fully convinced that the spec itself is doing the
+> > right thing by tying the lease with the link, rather than the file.
+> > Shouldn't the lease protect the data of the file, and not the link
+> > itself? If opening two links to the same file with two different lease
+> > keys end up breaking each other's leases, what's the point?
+>
+> I guess the reason for making the lease key per path on
+> the client is that the client can't know about possible hardlinks
+> before opening the file, but that open wants to use a leasekey...
+> Or a "stat" open that won't any lease needs to be done first,
+> which doubles the roundtrip for every open.
+>
+> And hard links are not that common...
+>
 
-> 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-=
-00037-g100ccd18bb41/kernel/fs/gfs2/gfs2.ko: Exec format error
-> 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-=
-00037-g100ccd18bb41/kernel/fs/zonefs/zonefs.ko: Exec format error
-> 00004 depmod: ERROR: failed to load symbols from /lib/modules/6.7.0-rc7-=
-00037-g100ccd18bb41/kernel/security/keys/encrypted-keys/encrypted-keys.ko:=
- Exec format error
-> =
+That does makes sense.
 
-> and then later:
-> =
+> Maybe choosing und using a new leasekey would be the
+> way to start with and when a hardlink is detected
+> the open on the hardlink is closed again and retried
+> with the former lease key, which would also upgrade it again.
 
-> 00016 generic/001       run fstests generic/001 at 2024-01-05 04:50:46
-> 00017 [not run] this test requires a valid $TEST_DEV
-> 00017 generic/002       run fstests generic/002 at 2024-01-05 04:50:46
-> 00017 [not run] this test requires a valid $TEST_DEV
-> 00017 generic/003       run fstests generic/003 at 2024-01-05 04:50:47
-> 00018 [not run] this test requires a valid $SCRATCH_DEV
-> ...
-> =
+That would not work today, as the former lease key would be associated
+with the other hardlink. And would result in the server returning
+STATUS_INVALID_PARAMETER.
 
-> so I think that's page cache corruption of some kind.
+>
+> But sharing the handle lease for two pathnames seems wrong,
+> as the idea of the handle lease is to cache the patchname on the client.
+>
+> While sharing the RW lease between two hardlinks would be desired.
+>
+> metze
 
-Is that being run on NFS?  Is /lib on NFS?
 
-David
 
+--=20
+Regards,
+Shyam
